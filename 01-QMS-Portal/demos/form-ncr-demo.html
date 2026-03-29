@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FRM-631 — Non-Conformity Report | HESEM QMS</title>
+<title>FRM-631 — Báo cáo không phù hợp | HESEM QMS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ════════════════════════════════════════════════════
    HESEM QMS — FORM DESIGN SYSTEM TOKENS
@@ -17,6 +19,8 @@
   --form-primary-hover: #0d47a1;
   --form-primary-light: #dbeafe;
   --form-primary-focus-ring: rgba(21,101,192,0.12);
+  --form-accent: #f9a825;
+  --form-accent-light: #fff8e1;
 
   /* Surfaces */
   --form-bg: #f8fafc;
@@ -159,16 +163,26 @@ body {
 }
 
 /* ════════════════════════════════════════════════════
-   FORM HEADER CARD
+   SOP-STYLE FORM HEADER
    ════════════════════════════════════════════════════ */
 .qf-header {
-  background: linear-gradient(135deg, #0c2d48 0%, #133e68 48%, #1a5a94 100%);
+  background: var(--form-brand);
   border-radius: var(--form-radius-2xl);
   padding: 0;
   margin-bottom: var(--form-space-6);
-  box-shadow: var(--form-shadow-lg);
+  box-shadow: 0 8px 32px rgba(12,45,72,0.22), 0 2px 8px rgba(12,45,72,0.12);
   overflow: hidden;
   color: #fff;
+  position: relative;
+}
+
+/* Subtle gradient overlay */
+.qf-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(21,101,192,0.08) 0%, transparent 50%, rgba(249,168,37,0.05) 100%);
+  pointer-events: none;
 }
 
 .qf-header-main {
@@ -176,9 +190,12 @@ body {
   grid-template-columns: auto 1fr auto;
   gap: var(--form-space-5);
   align-items: center;
-  padding: var(--form-space-6) var(--form-space-8);
+  padding: var(--form-space-5) var(--form-space-8);
+  position: relative;
+  z-index: 1;
 }
 
+/* Left: Logo + Brand */
 .qf-header-logo {
   display: flex;
   align-items: center;
@@ -186,19 +203,27 @@ body {
 }
 
 .qf-logo-mark {
-  width: 48px;
-  height: 48px;
-  background: rgba(255,255,255,0.12);
+  width: 52px;
+  height: 52px;
+  background: rgba(255,255,255,0.08);
   border-radius: var(--form-radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.1);
+  flex-shrink: 0;
 }
 
+.qf-logo-mark img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+/* Fallback SVG if img fails */
 .qf-logo-mark svg {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   fill: #2099d5;
 }
 
@@ -207,7 +232,8 @@ body {
   font-weight: var(--form-weight-bold);
   letter-spacing: var(--form-tracking-widest);
   text-transform: uppercase;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255,255,255,0.55);
+  line-height: 1.2;
 }
 
 .qf-logo-brand {
@@ -215,32 +241,37 @@ body {
   font-weight: var(--form-weight-bold);
   color: #fff;
   margin-top: 2px;
+  letter-spacing: 0.02em;
 }
 
+/* Center: Form Title (bilingual) */
 .qf-header-center {
   text-align: center;
 }
 
 .qf-header-title-en {
-  font-size: var(--form-text-xl);
+  font-size: 1.375rem;
   font-weight: var(--form-weight-bold);
-  letter-spacing: var(--form-tracking-tight);
+  letter-spacing: var(--form-tracking-wide);
   line-height: var(--form-leading-tight);
   color: #fff;
+  text-transform: uppercase;
 }
 
 .qf-header-title-vi {
-  font-size: var(--form-text-base);
-  color: rgba(255,255,255,0.65);
-  margin-top: 4px;
+  font-size: var(--form-text-sm);
+  color: rgba(255,255,255,0.5);
+  margin-top: 3px;
   font-weight: var(--form-weight-medium);
+  letter-spacing: 0.02em;
 }
 
+/* Right: Doc Info */
 .qf-header-right {
   text-align: right;
   display: flex;
   flex-direction: column;
-  gap: var(--form-space-2);
+  gap: 6px;
   align-items: flex-end;
 }
 
@@ -249,28 +280,34 @@ body {
   font-size: var(--form-text-sm);
   font-weight: var(--form-weight-bold);
   color: #fff;
-  background: rgba(255,255,255,0.12);
-  padding: 3px 12px;
+  background: rgba(255,255,255,0.1);
+  padding: 4px 14px;
   border-radius: var(--form-radius-sm);
   letter-spacing: 0.05em;
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.12);
 }
 
 .qf-doc-rev {
   font-size: var(--form-text-xs);
   font-weight: var(--form-weight-semibold);
-  color: rgba(255,255,255,0.55);
+  color: rgba(255,255,255,0.45);
 }
 
 .qf-record-id {
   font-family: var(--form-font-mono);
   font-size: var(--form-text-sm);
   font-weight: var(--form-weight-bold);
-  color: #fbbf24;
-  background: rgba(251,191,36,0.1);
-  padding: 3px 12px;
+  color: var(--form-accent);
+  background: rgba(249,168,37,0.1);
+  padding: 4px 14px;
   border-radius: var(--form-radius-sm);
-  border: 1px solid rgba(251,191,36,0.2);
+  border: 1px solid rgba(249,168,37,0.2);
+}
+
+/* Golden accent line */
+.qf-header-accent {
+  height: 3px;
+  background: linear-gradient(90deg, var(--form-accent) 0%, rgba(249,168,37,0.3) 100%);
 }
 
 /* Status Stepper */
@@ -280,8 +317,9 @@ body {
   justify-content: center;
   gap: 0;
   padding: var(--form-space-3) var(--form-space-8);
-  background: rgba(0,0,0,0.15);
-  border-top: 1px solid rgba(255,255,255,0.06);
+  background: rgba(0,0,0,0.2);
+  position: relative;
+  z-index: 1;
 }
 
 .qf-step {
@@ -293,43 +331,44 @@ body {
   font-weight: var(--form-weight-bold);
   text-transform: uppercase;
   letter-spacing: var(--form-tracking-wider);
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.3);
   position: relative;
 }
 
 .qf-step-num {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 10px;
   font-weight: 700;
-  background: rgba(255,255,255,0.1);
-  border: 1.5px solid rgba(255,255,255,0.2);
-  color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.08);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.35);
+  transition: all 0.25s;
 }
 
 .qf-step.active { color: #fff; }
 .qf-step.active .qf-step-num {
-  background: #1565c0;
-  border-color: #1565c0;
-  color: #fff;
-  box-shadow: 0 0 0 3px rgba(21,101,192,0.3);
+  background: var(--form-accent);
+  border-color: var(--form-accent);
+  color: var(--form-brand);
+  box-shadow: 0 0 0 3px rgba(249,168,37,0.25);
 }
 
-.qf-step.complete { color: rgba(255,255,255,0.55); }
+.qf-step.complete { color: rgba(255,255,255,0.5); }
 .qf-step.complete .qf-step-num {
-  background: #16a34a;
-  border-color: #16a34a;
+  background: var(--form-success);
+  border-color: var(--form-success);
   color: #fff;
 }
 
 .qf-step-line {
-  width: 32px;
+  width: 36px;
   height: 2px;
-  background: rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.1);
   flex-shrink: 0;
 }
 
@@ -447,10 +486,11 @@ body {
 
 @media (max-width: 768px) {
   .qf-grid--2, .qf-grid--3, .qf-grid--2-1 { grid-template-columns: 1fr; }
-  .qf-header-main { grid-template-columns: 1fr; text-align: center; }
+  .qf-header-main { grid-template-columns: 1fr; text-align: center; gap: var(--form-space-3); }
   .qf-header-logo { justify-content: center; }
   .qf-header-right { align-items: center; text-align: center; }
-  .qf-status-bar { flex-wrap: wrap; gap: var(--form-space-1); }
+  .qf-status-bar { flex-wrap: wrap; gap: var(--form-space-1); padding: var(--form-space-3) var(--form-space-4); }
+  .qf-header-title-en { font-size: 1.125rem; }
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
@@ -602,7 +642,7 @@ body {
 .qf-select option[data-color="green"]  { color: #16a34a; }
 .qf-select option[data-color="red"]    { color: #dc2626; }
 
-/* Severity indicator dot next to select */
+/* Severity indicator dot */
 .qf-severity-wrap {
   position: relative;
 }
@@ -624,31 +664,31 @@ body {
 .qf-severity-dot.sev-critical { background: #dc2626; box-shadow: 0 0 0 3px rgba(220,38,38,0.15); }
 
 /* ════════════════════════════════════════════════════
-   6M ROOT CAUSE RADIO CARDS
+   6M ROOT CAUSE CHECKBOX CARDS (multi-select)
    ════════════════════════════════════════════════════ */
-.qf-radio-cards {
+.qf-check-cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--form-space-3);
 }
 
 @media (max-width: 640px) {
-  .qf-radio-cards { grid-template-columns: repeat(2, 1fr); }
+  .qf-check-cards { grid-template-columns: repeat(2, 1fr); }
 }
 
-.qf-radio-card {
+.qf-check-card {
   position: relative;
   cursor: pointer;
 }
 
-.qf-radio-card input {
+.qf-check-card input {
   position: absolute;
   opacity: 0;
   width: 0;
   height: 0;
 }
 
-.qf-radio-card-inner {
+.qf-check-card-inner {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -659,36 +699,53 @@ body {
   background: var(--form-surface);
   transition: all var(--form-duration-normal) var(--form-easing-default);
   text-align: center;
+  position: relative;
 }
 
-.qf-radio-card-inner:hover {
+.qf-check-card-inner:hover {
   border-color: var(--form-border-strong);
   background: var(--form-surface-sunken);
 }
 
-.qf-radio-card input:checked + .qf-radio-card-inner {
+.qf-check-card input:checked + .qf-check-card-inner {
   border-color: var(--form-primary);
   background: var(--form-primary-light);
   box-shadow: 0 0 0 3px var(--form-primary-focus-ring);
 }
 
-.qf-radio-card input:focus-visible + .qf-radio-card-inner {
+.qf-check-card input:focus-visible + .qf-check-card-inner {
   outline: 2px solid var(--form-primary);
   outline-offset: 2px;
 }
 
-.qf-radio-card-icon {
+/* Checkmark badge */
+.qf-check-card input:checked + .qf-check-card-inner::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 18px;
+  height: 18px;
+  background: var(--form-primary);
+  border-radius: 50%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
+  background-size: 12px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.qf-check-card-icon {
   font-size: 1.75rem;
   line-height: 1;
 }
 
-.qf-radio-card-label {
+.qf-check-card-label {
   font-size: var(--form-text-sm);
   font-weight: var(--form-weight-semibold);
   color: var(--form-text);
 }
 
-.qf-radio-card-label-vi {
+.qf-check-card-label-vi {
   font-size: var(--form-text-xs);
   color: var(--form-text-tertiary);
   font-weight: var(--form-weight-normal);
@@ -756,6 +813,18 @@ body {
   border: 1px dashed var(--form-border);
   border-radius: var(--form-radius-lg);
   background: var(--form-surface-sunken);
+  cursor: pointer;
+  transition: all var(--form-duration-normal);
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.qf-signature-block:hover {
+  border-color: var(--form-primary);
+  background: var(--form-primary-light);
 }
 
 .qf-signature-title {
@@ -767,47 +836,15 @@ body {
   margin-bottom: var(--form-space-3);
 }
 
-.qf-signature-pad {
-  width: 100%;
-  height: 64px;
-  border: 1px solid var(--form-border-light);
-  border-radius: var(--form-radius-md);
-  background: var(--form-surface);
-  margin-bottom: var(--form-space-3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--form-text-disabled);
+.qf-signature-hint {
   font-size: var(--form-text-xs);
-}
-
-.qf-signature-fields {
-  display: flex;
-  flex-direction: column;
-  gap: var(--form-space-2);
-}
-
-.qf-signature-fields input {
-  width: 100%;
-  height: 32px;
-  padding: 4px 10px;
-  font-family: var(--form-font-family);
-  font-size: var(--form-text-sm);
-  border: 1px solid var(--form-border-light);
-  border-radius: var(--form-radius-sm);
-  text-align: center;
-  background: var(--form-surface);
-}
-
-.qf-signature-fields input:focus {
-  outline: none;
-  border-color: var(--form-border-focus);
-  box-shadow: 0 0 0 2px var(--form-primary-focus-ring);
-}
-
-.qf-signature-fields input::placeholder {
   color: var(--form-text-disabled);
-  font-size: var(--form-text-xs);
+  margin-top: var(--form-space-2);
+}
+
+.qf-signature-hint svg {
+  vertical-align: middle;
+  margin-right: 4px;
 }
 
 /* ════════════════════════════════════════════════════
@@ -884,7 +921,7 @@ body {
 }
 
 .qf-btn--primary {
-  background: #16a34a;
+  background: var(--form-success);
   color: #fff;
   min-width: 160px;
 }
@@ -972,10 +1009,6 @@ body {
 }
 
 /* ════════════════════════════════════════════════════
-   DISPOSITION OPTION ICONS
-   ════════════════════════════════════════════════════ */
-
-/* ════════════════════════════════════════════════════
    PRINT / PDF
    ════════════════════════════════════════════════════ */
 @media print {
@@ -998,7 +1031,8 @@ body {
   .qf-actions,
   .qf-toolbar,
   .qf-file-drop,
-  .qf-section-toggle {
+  .qf-section-toggle,
+  .qf-signature-hint {
     display: none !important;
   }
 
@@ -1035,12 +1069,12 @@ body {
     border: 1px solid #999;
   }
 
-  .qf-radio-card-inner {
+  .qf-check-card-inner {
     border: 1px solid #ccc;
     box-shadow: none;
   }
 
-  .qf-radio-card input:checked + .qf-radio-card-inner {
+  .qf-check-card input:checked + .qf-check-card-inner {
     border: 2px solid #1565c0;
     background: #dbeafe;
   }
@@ -1061,7 +1095,7 @@ body {
   border-width: 0;
 }
 
-/* Fade-in animation for page load */
+/* Fade-in animation */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -1096,24 +1130,26 @@ body {
 <form class="qf" id="ncrForm" novalidate>
 
 <!-- ═══════════════════════════════════════════════════
-     FORM HEADER
+     SOP-STYLE FORM HEADER
      ═══════════════════════════════════════════════════ -->
 <div class="qf-header">
   <div class="qf-header-main">
-    <!-- Left: Logo -->
+    <!-- Left: Logo + Brand -->
     <div class="qf-header-logo">
       <div class="qf-logo-mark">
-        <svg viewBox="0 0 849 837" xmlns="http://www.w3.org/2000/svg">
+        <img src="../assets/hesem-logo.svg" alt="HESEM Logo"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <svg viewBox="0 0 849 837" xmlns="http://www.w3.org/2000/svg" style="display:none">
           <path fill="#2099d5" d="M794 325c-28,-16 -60,-18 -88,-9l-36 -62 -96 -166 -191 0 -72 0c-10,-49 -54,-86 -107,-86 -60,0 -109,49 -109,109 0,32 14,61 36,81l-36 62 -96 166 96 166 36 62c-37,34 -48,90 -21,135 30,52 97,70 149,40 28,-16 46,-42 52,-72l72 0 191 0 96 -166 36 -62c48,16 102,-4 128,-49 30,-52 12,-119 -40,-149z"/>
         </svg>
       </div>
       <div>
         <div class="qf-logo-text">HESEM ENGINEERING</div>
-        <div class="qf-logo-brand">HESEM QMS</div>
+        <div class="qf-logo-brand">Tài liệu kiểm soát</div>
       </div>
     </div>
 
-    <!-- Center: Title -->
+    <!-- Center: Title (bilingual) -->
     <div class="qf-header-center">
       <div class="qf-header-title-en">NON-CONFORMITY REPORT</div>
       <div class="qf-header-title-vi">BÁO CÁO KHÔNG PHÙ HỢP</div>
@@ -1126,6 +1162,9 @@ body {
       <span class="qf-record-id">NCR-2026-___</span>
     </div>
   </div>
+
+  <!-- Golden accent line -->
+  <div class="qf-header-accent"></div>
 
   <!-- Status Stepper -->
   <div class="qf-status-bar" role="navigation" aria-label="Form progress">
@@ -1153,14 +1192,14 @@ body {
 
 
 <!-- ═══════════════════════════════════════════════════
-     SECTION 1: IDENTIFICATION
+     SECTION 1: IDENTIFICATION (with searchable inputs)
      ═══════════════════════════════════════════════════ -->
 <div class="qf-section qf-section--blue" data-section="1">
   <div class="qf-section-header" onclick="toggleSection(this)" role="button" aria-expanded="true" tabindex="0">
     <div class="qf-section-title-wrap">
       <span class="qf-section-num">1</span>
       <div class="qf-section-title-text">
-        <h3>Identification</h3>
+        <h3>Thông tin nhận dạng</h3>
         <p class="qf-section-subtitle">Thông tin nhận dạng</p>
       </div>
     </div>
@@ -1175,7 +1214,7 @@ body {
         <label class="qf-label">NCR Date <span class="qf-required">*</span></label>
         <span class="qf-label-vi">Ngày phát hiện</span>
         <input type="date" class="qf-input" name="ncr_date" required>
-        <span class="qf-error-msg">Required field</span>
+        <span class="qf-error-msg">Trường bắt buộc</span>
       </div>
       <div class="qf-field" data-required>
         <label class="qf-label">Department <span class="qf-required">*</span></label>
@@ -1188,7 +1227,7 @@ body {
           <option value="SCM">Chuỗi cung ứng (Supply Chain)</option>
           <option value="WH">Kho vận (Warehouse)</option>
         </select>
-        <span class="qf-error-msg">Required field</span>
+        <span class="qf-error-msg">Trường bắt buộc</span>
       </div>
       <div class="qf-field">
         <label class="qf-label">Shift</label>
@@ -1202,60 +1241,63 @@ body {
       </div>
     </div>
 
-    <!-- Row 2: Job, Work Order -->
+    <!-- Row 2: Customer + Supplier (searchable) -->
     <div class="qf-grid qf-grid--2" style="margin-top: var(--form-field-gap);">
-      <div class="qf-field" data-required>
-        <label class="qf-label">Job Number <span class="qf-required">*</span></label>
-        <span class="qf-label-vi">Số Job</span>
-        <input type="text" class="qf-input" name="job_number" placeholder="VD: J-2026-0150" required>
-        <span class="qf-error-msg">Required field</span>
-      </div>
-      <div class="qf-field">
-        <label class="qf-label">Work Order</label>
-        <span class="qf-label-vi">Lệnh sản xuất</span>
-        <input type="text" class="qf-input" name="work_order" placeholder="VD: WO-2026-0088">
-      </div>
-    </div>
-
-    <!-- Row 3: Part, Revision -->
-    <div class="qf-grid qf-grid--2" style="margin-top: var(--form-field-gap);">
-      <div class="qf-field" data-required>
-        <label class="qf-label">Part Number <span class="qf-required">*</span></label>
-        <span class="qf-label-vi">Mã chi tiết</span>
-        <input type="text" class="qf-input" name="part_number" required>
-        <span class="qf-error-msg">Required field</span>
-      </div>
-      <div class="qf-field" data-required>
-        <label class="qf-label">Part Revision <span class="qf-required">*</span></label>
-        <span class="qf-label-vi">Revision</span>
-        <input type="text" class="qf-input" name="part_rev" placeholder="VD: Rev C" required>
-        <span class="qf-error-msg">Required field</span>
-      </div>
-    </div>
-
-    <!-- Row 4: Customer -->
-    <div class="qf-grid" style="margin-top: var(--form-field-gap);">
       <div class="qf-field" data-required>
         <label class="qf-label">Customer <span class="qf-required">*</span></label>
         <span class="qf-label-vi">Khách hàng</span>
-        <select class="qf-select" name="customer" required>
-          <option value="">-- Select --</option>
-          <option value="acme">ACME Industries</option>
-          <option value="globex">Globex Corporation</option>
-          <option value="initech">Initech Manufacturing</option>
-          <option value="umbrella">Umbrella Tech</option>
-          <option value="other">Other / Khác</option>
-        </select>
-        <span class="qf-error-msg">Required field</span>
+        <div id="si-customer"></div>
+        <span class="qf-error-msg">Trường bắt buộc</span>
+      </div>
+      <div class="qf-field">
+        <label class="qf-label">Supplier / Processor</label>
+        <span class="qf-label-vi">Nhà cung cấp / công đoạn thuê ngoài</span>
+        <div id="si-supplier"></div>
       </div>
     </div>
 
-    <!-- Row 5: Operation, Machine -->
+    <!-- Row 3: SO Number, Job Number (searchable) -->
     <div class="qf-grid qf-grid--2" style="margin-top: var(--form-field-gap);">
+      <div class="qf-field">
+        <label class="qf-label">SO Number</label>
+        <span class="qf-label-vi">Số đơn hàng</span>
+        <div id="si-so-number"></div>
+      </div>
+      <div class="qf-field" data-required>
+        <label class="qf-label">Job Number <span class="qf-required">*</span></label>
+        <span class="qf-label-vi">Số Job</span>
+        <div id="si-job-number"></div>
+        <span class="qf-error-msg">Trường bắt buộc</span>
+      </div>
+    </div>
+
+    <!-- Row 4: Work Order (depends on Job), Part Number (searchable) -->
+    <div class="qf-grid qf-grid--2" style="margin-top: var(--form-field-gap);">
+      <div class="qf-field">
+        <label class="qf-label">Work Order</label>
+        <span class="qf-label-vi">Lệnh sản xuất</span>
+        <div id="si-work-order"></div>
+      </div>
+      <div class="qf-field" data-required>
+        <label class="qf-label">Part Number <span class="qf-required">*</span></label>
+        <span class="qf-label-vi">Mã chi tiết</span>
+        <div id="si-part-number"></div>
+        <span class="qf-error-msg">Trường bắt buộc</span>
+      </div>
+    </div>
+
+    <!-- Row 5: Part Revision, Operation, Machine -->
+    <div class="qf-grid qf-grid--3" style="margin-top: var(--form-field-gap);">
+      <div class="qf-field" data-required>
+        <label class="qf-label">Part Revision <span class="qf-required">*</span></label>
+        <span class="qf-label-vi">Revision</span>
+        <div id="si-part-rev"></div>
+        <span class="qf-error-msg">Trường bắt buộc</span>
+      </div>
       <div class="qf-field">
         <label class="qf-label">Operation</label>
         <span class="qf-label-vi">Công đoạn phát hiện</span>
-        <input type="text" class="qf-input" name="operation" placeholder="VD: OP20 -- Milling">
+        <input type="text" class="qf-input" name="operation" placeholder="VD: OP20 — Milling">
       </div>
       <div class="qf-field">
         <label class="qf-label">Machine ID</label>
@@ -1275,7 +1317,7 @@ body {
     <div class="qf-section-title-wrap">
       <span class="qf-section-num">2</span>
       <div class="qf-section-title-text">
-        <h3>Defect Description</h3>
+        <h3>Mô tả khuyết tật</h3>
         <p class="qf-section-subtitle">Mô tả khuyết tật</p>
       </div>
     </div>
@@ -1298,7 +1340,7 @@ body {
           <option value="process" data-color="orange">Quy trình (Process)</option>
           <option value="other" data-color="slate">Khác (Other)</option>
         </select>
-        <span class="qf-error-msg">Required field</span>
+        <span class="qf-error-msg">Trường bắt buộc</span>
       </div>
       <div class="qf-field" data-required>
         <label class="qf-label">Severity <span class="qf-required">*</span></label>
@@ -1312,7 +1354,7 @@ body {
           </select>
           <span class="qf-severity-dot" id="severityDot"></span>
         </div>
-        <span class="qf-error-msg">Required field</span>
+        <span class="qf-error-msg">Trường bắt buộc</span>
       </div>
     </div>
 
@@ -1322,7 +1364,7 @@ body {
         <label class="qf-label">Defect Description <span class="qf-required">*</span></label>
         <span class="qf-label-vi">Mô tả lỗi</span>
         <textarea class="qf-textarea" name="defect_description" rows="4" required placeholder="Mô tả chi tiết lỗi không phù hợp..."></textarea>
-        <span class="qf-error-msg">Required field</span>
+        <span class="qf-error-msg">Trường bắt buộc</span>
       </div>
     </div>
 
@@ -1332,19 +1374,19 @@ body {
         <label class="qf-label">Qty Inspected <span class="qf-required">*</span></label>
         <span class="qf-label-vi">SL kiểm tra</span>
         <input type="number" class="qf-input" name="qty_inspected" min="1" required>
-        <span class="qf-error-msg">Required field</span>
+        <span class="qf-error-msg">Trường bắt buộc</span>
       </div>
       <div class="qf-field" data-required>
         <label class="qf-label">Qty Affected <span class="qf-required">*</span></label>
         <span class="qf-label-vi">SL bị ảnh hưởng</span>
         <input type="number" class="qf-input" name="qty_affected" min="1" required>
-        <span class="qf-error-msg">Required field</span>
+        <span class="qf-error-msg">Trường bắt buộc</span>
       </div>
       <div class="qf-field" data-required>
         <label class="qf-label">Qty Rejected <span class="qf-required">*</span></label>
         <span class="qf-label-vi">SL loại bỏ</span>
         <input type="number" class="qf-input" name="qty_rejected" min="0" required>
-        <span class="qf-error-msg">Required field</span>
+        <span class="qf-error-msg">Trường bắt buộc</span>
       </div>
     </div>
 
@@ -1373,7 +1415,7 @@ body {
     <div class="qf-section-title-wrap">
       <span class="qf-section-num">3</span>
       <div class="qf-section-title-text">
-        <h3>Containment Actions</h3>
+        <h3>Hành động ngăn chặn</h3>
         <p class="qf-section-subtitle">Hành động ngăn chặn</p>
       </div>
     </div>
@@ -1386,14 +1428,14 @@ body {
       <span class="qf-callout-icon">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
       </span>
-      <span>Describe immediate actions taken to isolate defective product and prevent further nonconformity.</span>
+        <span>Mô tả hành động tức thời để cô lập sản phẩm lỗi và ngăn phát sinh thêm không phù hợp.</span>
     </div>
 
     <div class="qf-field" data-required>
-      <label class="qf-label">Containment Action <span class="qf-required">*</span></label>
+      <label class="qf-label">Containment Action / Hành động ngăn chặn <span class="qf-required">*</span></label>
       <span class="qf-label-vi">Hành động ngăn chặn tức thời</span>
       <textarea class="qf-textarea" name="containment_action" rows="3" required placeholder="Hành động ngăn chặn tức thời để cô lập sản phẩm lỗi..."></textarea>
-      <span class="qf-error-msg">Required field</span>
+      <span class="qf-error-msg">Trường bắt buộc</span>
     </div>
 
     <div class="qf-grid qf-grid--2" style="margin-top: var(--form-field-gap);">
@@ -1408,7 +1450,7 @@ body {
           <option value="return_to_vendor">&#8617; Trả nhà cung cấp (Return to Vendor)</option>
           <option value="mrb">&#128196; MRB (Material Review Board)</option>
         </select>
-        <span class="qf-error-msg">Required field</span>
+        <span class="qf-error-msg">Trường bắt buộc</span>
       </div>
       <div class="qf-field">
         <label class="qf-label">Disposition Authority</label>
@@ -1421,14 +1463,14 @@ body {
 
 
 <!-- ═══════════════════════════════════════════════════
-     SECTION 4: ROOT CAUSE
+     SECTION 4: ROOT CAUSE (6M with CHECKBOXES)
      ═══════════════════════════════════════════════════ -->
 <div class="qf-section qf-section--purple" data-section="4">
   <div class="qf-section-header" onclick="toggleSection(this)" role="button" aria-expanded="true" tabindex="0">
     <div class="qf-section-title-wrap">
       <span class="qf-section-num">4</span>
       <div class="qf-section-title-text">
-        <h3>Root Cause Analysis</h3>
+        <h3>Phân tích nguyên nhân gốc</h3>
         <p class="qf-section-subtitle">Phân tích nguyên nhân gốc</p>
       </div>
     </div>
@@ -1437,94 +1479,89 @@ body {
     </div>
   </div>
   <div class="qf-section-body">
-    <!-- 6M Radio Cards -->
+    <!-- 6M Checkbox Cards (multi-select) -->
     <div class="qf-field">
-      <label class="qf-label">Root Cause Category (6M)</label>
-      <span class="qf-label-vi">Nhóm nguyên nhân gốc</span>
+      <label class="qf-label">Root Cause Category (6M) / Nhóm nguyên nhân gốc (chọn nhiều)</label>
+      <span class="qf-label-vi">Nhóm nguyên nhân gốc (chọn nhiều)</span>
     </div>
-    <div class="qf-radio-cards" style="margin-top: var(--form-space-2);">
-      <label class="qf-radio-card">
-        <input type="radio" name="root_cause_category" value="man">
-        <div class="qf-radio-card-inner">
-          <span class="qf-radio-card-icon">&#128100;</span>
-          <span class="qf-radio-card-label">Man</span>
-          <span class="qf-radio-card-label-vi">Con người</span>
+    <div class="qf-check-cards" style="margin-top: var(--form-space-2);">
+      <label class="qf-check-card">
+        <input type="checkbox" name="root_cause_category" value="man">
+        <div class="qf-check-card-inner">
+          <span class="qf-check-card-icon">&#128100;</span>
+          <span class="qf-check-card-label">Man</span>
+          <span class="qf-check-card-label-vi">Con người</span>
         </div>
       </label>
-      <label class="qf-radio-card">
-        <input type="radio" name="root_cause_category" value="machine">
-        <div class="qf-radio-card-inner">
-          <span class="qf-radio-card-icon">&#128295;</span>
-          <span class="qf-radio-card-label">Machine</span>
-          <span class="qf-radio-card-label-vi">Máy móc</span>
+      <label class="qf-check-card">
+        <input type="checkbox" name="root_cause_category" value="machine">
+        <div class="qf-check-card-inner">
+          <span class="qf-check-card-icon">&#128295;</span>
+          <span class="qf-check-card-label">Machine</span>
+          <span class="qf-check-card-label-vi">Máy móc</span>
         </div>
       </label>
-      <label class="qf-radio-card">
-        <input type="radio" name="root_cause_category" value="method">
-        <div class="qf-radio-card-inner">
-          <span class="qf-radio-card-icon">&#128203;</span>
-          <span class="qf-radio-card-label">Method</span>
-          <span class="qf-radio-card-label-vi">Phương pháp</span>
+      <label class="qf-check-card">
+        <input type="checkbox" name="root_cause_category" value="method">
+        <div class="qf-check-card-inner">
+          <span class="qf-check-card-icon">&#128203;</span>
+          <span class="qf-check-card-label">Method</span>
+          <span class="qf-check-card-label-vi">Phương pháp</span>
         </div>
       </label>
-      <label class="qf-radio-card">
-        <input type="radio" name="root_cause_category" value="material">
-        <div class="qf-radio-card-inner">
-          <span class="qf-radio-card-icon">&#129521;</span>
-          <span class="qf-radio-card-label">Material</span>
-          <span class="qf-radio-card-label-vi">Vật liệu</span>
+      <label class="qf-check-card">
+        <input type="checkbox" name="root_cause_category" value="material">
+        <div class="qf-check-card-inner">
+          <span class="qf-check-card-icon">&#129521;</span>
+          <span class="qf-check-card-label">Material</span>
+          <span class="qf-check-card-label-vi">Vật liệu</span>
         </div>
       </label>
-      <label class="qf-radio-card">
-        <input type="radio" name="root_cause_category" value="measurement">
-        <div class="qf-radio-card-inner">
-          <span class="qf-radio-card-icon">&#128207;</span>
-          <span class="qf-radio-card-label">Measurement</span>
-          <span class="qf-radio-card-label-vi">Đo lường</span>
+      <label class="qf-check-card">
+        <input type="checkbox" name="root_cause_category" value="measurement">
+        <div class="qf-check-card-inner">
+          <span class="qf-check-card-icon">&#128207;</span>
+          <span class="qf-check-card-label">Measurement</span>
+          <span class="qf-check-card-label-vi">Đo lường</span>
         </div>
       </label>
-      <label class="qf-radio-card">
-        <input type="radio" name="root_cause_category" value="environment">
-        <div class="qf-radio-card-inner">
-          <span class="qf-radio-card-icon">&#127777;</span>
-          <span class="qf-radio-card-label">Environment</span>
-          <span class="qf-radio-card-label-vi">Môi trường</span>
+      <label class="qf-check-card">
+        <input type="checkbox" name="root_cause_category" value="environment">
+        <div class="qf-check-card-inner">
+          <span class="qf-check-card-icon">&#127777;</span>
+          <span class="qf-check-card-label">Environment</span>
+          <span class="qf-check-card-label-vi">Môi trường</span>
         </div>
       </label>
     </div>
 
     <!-- Root Cause Description -->
     <div class="qf-field" style="margin-top: var(--form-field-gap);">
-      <label class="qf-label">Root Cause Description</label>
+      <label class="qf-label">Root Cause Description / Mô tả nguyên nhân gốc</label>
       <span class="qf-label-vi">Mô tả nguyên nhân gốc</span>
       <textarea class="qf-textarea" name="root_cause_description" rows="3" placeholder="Phân tích nguyên nhân gốc..."></textarea>
     </div>
 
-    <!-- Linked CAPA -->
+    <!-- Linked CAPA (searchable) -->
     <div class="qf-field" style="margin-top: var(--form-field-gap);">
-      <label class="qf-label">Linked CAPA Number</label>
+      <label class="qf-label">Linked CAPA Number / Số CAPA liên kết</label>
       <span class="qf-label-vi">CAPA liên kết</span>
-      <div class="qf-lookup-wrap">
-        <input type="text" class="qf-input" name="linked_capa" placeholder="VD: CAPA-2026-001">
-        <span class="qf-lookup-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        </span>
-      </div>
-      <span class="qf-helper">Search or enter CAPA reference number</span>
+      <div id="si-capa-number"></div>
+      <span class="qf-helper">Tìm CAPA đã có trong hệ thống để liên kết hồ sơ.</span>
     </div>
   </div>
 </div>
 
 
 <!-- ═══════════════════════════════════════════════════
-     SECTION 5: SIGNATURES
+     SECTION 5: SIGNATURES (e-signature enabled)
      ═══════════════════════════════════════════════════ -->
 <div class="qf-section qf-section--green" data-section="5">
   <div class="qf-section-header" onclick="toggleSection(this)" role="button" aria-expanded="true" tabindex="0">
     <div class="qf-section-title-wrap">
       <span class="qf-section-num">5</span>
       <div class="qf-section-title-text">
-        <h3>Signatures</h3>
+        <h3>Chữ ký điện tử</h3>
         <p class="qf-section-subtitle">Chữ ký</p>
       </div>
     </div>
@@ -1533,37 +1570,37 @@ body {
     </div>
   </div>
   <div class="qf-section-body">
+    <div class="qf-callout qf-callout--info">
+      <span class="qf-callout-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+      </span>
+      <span>Click each signature block to apply your electronic signature. 21 CFR Part 11 compliant.</span>
+    </div>
     <div class="qf-signature-grid">
       <!-- Reported By -->
-      <div class="qf-signature-block">
+      <div class="qf-signature-block" id="sig-reported" onclick="openSignature('sig-reported', 'Reported By', 'Người báo cáo')">
         <div class="qf-signature-title">Reported By / Người báo cáo</div>
-        <div class="qf-signature-pad">Signature area</div>
-        <div class="qf-signature-fields">
-          <input type="text" name="sig_reported_name" placeholder="Full Name">
-          <input type="text" name="sig_reported_role" placeholder="Role / Position">
-          <input type="date" name="sig_reported_date">
+        <div class="qf-signature-hint">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 1 1 3.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+          Nhấn để ký
         </div>
       </div>
 
       <!-- Inspector -->
-      <div class="qf-signature-block">
+      <div class="qf-signature-block" id="sig-inspector" onclick="openSignature('sig-inspector', 'QC Inspector', 'Kiểm tra viên')">
         <div class="qf-signature-title">Inspector / QC Inspector</div>
-        <div class="qf-signature-pad">Signature area</div>
-        <div class="qf-signature-fields">
-          <input type="text" name="sig_inspector_name" placeholder="Full Name">
-          <input type="text" name="sig_inspector_role" placeholder="Role / Position">
-          <input type="date" name="sig_inspector_date">
+        <div class="qf-signature-hint">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 1 1 3.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+          Nhấn để ký
         </div>
       </div>
 
       <!-- Approved By -->
-      <div class="qf-signature-block">
+      <div class="qf-signature-block" id="sig-approved" onclick="openSignature('sig-approved', 'Approved By', 'Người phê duyệt')">
         <div class="qf-signature-title">Approved By / Người phê duyệt</div>
-        <div class="qf-signature-pad">Signature area</div>
-        <div class="qf-signature-fields">
-          <input type="text" name="sig_approved_name" placeholder="Full Name">
-          <input type="text" name="sig_approved_role" placeholder="Role / Position">
-          <input type="date" name="sig_approved_date">
+        <div class="qf-signature-hint">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 1 1 3.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+          Nhấn để ký
         </div>
       </div>
     </div>
@@ -1581,28 +1618,289 @@ body {
       <span class="qf-btn-icon">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
       </span>
-      Save Draft / Lưu nháp
+      Lưu nháp
     </button>
     <button type="button" class="qf-btn qf-btn--ghost" onclick="clearForm()">
       <span class="qf-btn-icon">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
       </span>
-      Clear / Xóa
+      Xóa trắng
     </button>
     <div class="qf-actions-spacer"></div>
     <button type="button" class="qf-btn qf-btn--primary" onclick="submitForm()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-      Submit / Gửi
+      Gửi duyệt
     </button>
   </div>
 </div>
 
 
 <!-- ═══════════════════════════════════════════════════
-     JAVASCRIPT
+     EXTERNAL SCRIPTS
+     ═══════════════════════════════════════════════════ -->
+<script src="../scripts/portal/12-searchable-input.js"></script>
+<script src="../scripts/portal/11-e-signature.js"></script>
+
+<!-- ═══════════════════════════════════════════════════
+     APPLICATION JAVASCRIPT
      ═══════════════════════════════════════════════════ -->
 <script>
-/* Section collapse/expand */
+/* ──────────────────────────────────────────────────
+   DEMO MASTER DATA (in production: fetched from API)
+   ────────────────────────────────────────────────── */
+var DEMO_CUSTOMERS = [
+  { id: 'lam', name: 'Lam Research', type: 'OEM', contact: 'SQE - Lam Research' },
+  { id: 'acme', name: 'ACME Industries', type: 'OEM', contact: 'John Smith' },
+  { id: 'globex', name: 'Globex Corporation', type: 'Tier 1', contact: 'Jane Doe' },
+  { id: 'stark', name: 'Stark Industries', type: 'Tier 1', contact: 'Tony Stark' }
+];
+
+var DEMO_SUPPLIERS = [
+  { id: 'mitutoyo', name: 'Mitutoyo Vietnam', type: 'Calibration', customer: 'lam', contact: 'Service Desk' },
+  { id: 'acoat', name: 'A-Coat Surface Treatment', type: 'Special Process', customer: 'lam', contact: 'Planner' },
+  { id: 'thaco', name: 'THACO Materials', type: 'Raw Material', customer: 'acme', contact: 'Sales Support' },
+  { id: 'kimlong', name: 'Kim Long Precision Supply', type: 'Raw Material', customer: 'globex', contact: 'Buyer 02' }
+];
+
+var DEMO_JOBS = [
+  { id: 'JO-2026-0150', name: 'JO-2026-0150', customer: 'lam', part: '714-1101', so: 'SO-2026-088', description: 'Valve Housing - Lam Research', revision: 'REV-C', supplier: 'acoat' },
+  { id: 'JO-2026-0151', name: 'JO-2026-0151', customer: 'globex', part: 'P-2003', so: 'SO-2026-089', description: 'Drive Shaft - Globex', revision: 'REV-B', supplier: 'kimlong' },
+  { id: 'JO-2026-0152', name: 'JO-2026-0152', customer: 'acme', part: 'P-1001', so: 'SO-2026-091', description: 'Mounting Bracket - ACME', revision: 'REV-C', supplier: 'thaco' },
+  { id: 'JO-2026-0160', name: 'JO-2026-0160', customer: 'stark', part: 'P-4001', so: 'SO-2026-095', description: 'Reactor Housing - Stark', revision: 'REV-A', supplier: 'mitutoyo' }
+];
+
+var DEMO_WORK_ORDERS = [
+  { id: 'WO-2026-0088', name: 'WO-2026-0088', job: 'JO-2026-0150', description: 'OP10-OP30 Machining' },
+  { id: 'WO-2026-0089', name: 'WO-2026-0089', job: 'JO-2026-0150', description: 'OP40 Final Inspection' },
+  { id: 'WO-2026-0090', name: 'WO-2026-0090', job: 'JO-2026-0151', description: 'Turning & Grinding' },
+  { id: 'WO-2026-0091', name: 'WO-2026-0091', job: 'JO-2026-0152', description: 'CNC Milling' },
+  { id: 'WO-2026-0100', name: 'WO-2026-0100', job: 'JO-2026-0160', description: 'Precision Machining' }
+];
+
+var DEMO_PARTS = [
+  { id: '714-1101', name: '714-1101', description: 'Valve Housing, 17-4PH', customer: 'lam', preferred_supplier: 'acoat' },
+  { id: 'P-1001', name: 'P-1001', description: 'Mounting Bracket, AL6061', customer: 'acme', preferred_supplier: 'thaco' },
+  { id: 'P-2003', name: 'P-2003', description: 'Drive Shaft, 316SS', customer: 'globex', preferred_supplier: 'kimlong' },
+  { id: 'P-4001', name: 'P-4001', description: 'Reactor Housing, Inconel', customer: 'stark', preferred_supplier: 'mitutoyo' }
+];
+
+var DEMO_PART_REVISIONS = [
+  { id: '714-1101-REV-C', name: 'REV-C', description: 'Current released revision', part: '714-1101' },
+  { id: '714-1101-REV-B', name: 'REV-B', description: 'Superseded reference', part: '714-1101' },
+  { id: 'P-1001-REV-C', name: 'REV-C', description: 'Customer released revision', part: 'P-1001' },
+  { id: 'P-2003-REV-B', name: 'REV-B', description: 'Approved for production', part: 'P-2003' },
+  { id: 'P-4001-REV-A', name: 'REV-A', description: 'Prototype baseline', part: 'P-4001' }
+];
+
+var DEMO_SO = [
+  { id: 'SO-2026-088', name: 'SO-2026-088', customer: 'lam', description: 'Lam Research Batch 01' },
+  { id: 'SO-2026-089', name: 'SO-2026-089', customer: 'globex', description: 'Globex Shaft Order' },
+  { id: 'SO-2026-091', name: 'SO-2026-091', customer: 'acme', description: 'ACME Bracket Batch' },
+  { id: 'SO-2026-095', name: 'SO-2026-095', customer: 'stark', description: 'Stark Prototype Run' }
+];
+
+var DEMO_CAPAS = [
+  { id: 'CAPA-2026-001', name: 'CAPA-2026-001', description: 'Tooling wear on CNC-05' },
+  { id: 'CAPA-2026-002', name: 'CAPA-2026-002', description: 'Operator training gap - night shift' },
+  { id: 'CAPA-2026-003', name: 'CAPA-2026-003', description: 'Raw material spec deviation' },
+  { id: 'CAPA-2026-004', name: 'CAPA-2026-004', description: 'Calibration schedule missed' },
+  { id: 'CAPA-2025-015', name: 'CAPA-2025-015', description: 'Weld procedure update needed' }
+];
+
+/* ──────────────────────────────────────────────────
+   INITIALIZE SEARCHABLE INPUTS
+   ────────────────────────────────────────────────── */
+var siCustomer = new SearchableInput({
+  containerId: 'si-customer',
+  fieldId: 'customer',
+  name: 'customer',
+  placeholder: 'Search customer...',
+  placeholderVi: 'Tìm khách hàng...',
+  dataSource: DEMO_CUSTOMERS,
+  displayField: 'name',
+  valueField: 'id',
+  subField: 'type',
+  lang: 'vi',
+  strictSelect: true,
+  storeValueInHiddenField: true
+});
+
+var siSupplier = new SearchableInput({
+  containerId: 'si-supplier',
+  fieldId: 'supplier',
+  name: 'supplier',
+  placeholder: 'Search supplier...',
+  placeholderVi: 'Tìm nhà cung cấp...',
+  dataSource: DEMO_SUPPLIERS,
+  displayField: 'name',
+  valueField: 'id',
+  subField: 'type',
+  lang: 'vi',
+  strictSelect: true,
+  storeValueInHiddenField: true,
+  dependsOn: 'customer',
+  dependsOnField: 'customer'
+});
+
+var siJob = new SearchableInput({
+  containerId: 'si-job-number',
+  fieldId: 'job_number',
+  name: 'job_number',
+  placeholder: 'Search job number...',
+  placeholderVi: 'Tìm số Job...',
+  dataSource: DEMO_JOBS,
+  displayField: 'name',
+  valueField: 'id',
+  subField: 'description',
+  lang: 'vi',
+  strictSelect: true,
+  storeValueInHiddenField: true,
+  dependsOn: 'customer',
+  dependsOnField: 'customer',
+  autoPopulate: {
+    'part_number': 'part',
+    'customer': 'customer',
+    'so_number': 'so',
+    'part_rev': 'revision',
+    'supplier': 'supplier'
+  }
+});
+
+var siSO = new SearchableInput({
+  containerId: 'si-so-number',
+  fieldId: 'so_number',
+  name: 'so_number',
+  placeholder: 'Search SO number...',
+  placeholderVi: 'Tìm số đơn hàng...',
+  dataSource: DEMO_SO,
+  displayField: 'name',
+  valueField: 'id',
+  subField: 'description',
+  lang: 'vi',
+  strictSelect: true,
+  storeValueInHiddenField: true,
+  dependsOn: 'customer',
+  dependsOnField: 'customer'
+});
+
+var siWorkOrder = new SearchableInput({
+  containerId: 'si-work-order',
+  fieldId: 'work_order',
+  name: 'work_order',
+  placeholder: 'Search work order...',
+  placeholderVi: 'Tìm lệnh sản xuất...',
+  dataSource: DEMO_WORK_ORDERS,
+  displayField: 'name',
+  valueField: 'id',
+  subField: 'description',
+  lang: 'vi',
+  strictSelect: true,
+  storeValueInHiddenField: true,
+  dependsOn: 'job_number',
+  dependsOnField: 'job'
+});
+
+var siPart = new SearchableInput({
+  containerId: 'si-part-number',
+  fieldId: 'part_number',
+  name: 'part_number',
+  placeholder: 'Search part number...',
+  placeholderVi: 'Tìm mã chi tiết...',
+  dataSource: DEMO_PARTS,
+  displayField: 'name',
+  valueField: 'id',
+  subField: 'description',
+  lang: 'vi',
+  strictSelect: true,
+  storeValueInHiddenField: true,
+  dependsOn: 'customer',
+  dependsOnField: 'customer',
+  autoPopulate: {
+    'supplier': 'preferred_supplier'
+  }
+});
+
+var siPartRev = new SearchableInput({
+  containerId: 'si-part-rev',
+  fieldId: 'part_rev',
+  name: 'part_rev',
+  placeholder: 'Search revision...',
+  placeholderVi: 'Tìm revision...',
+  dataSource: DEMO_PART_REVISIONS,
+  displayField: 'name',
+  valueField: 'name',
+  subField: 'description',
+  lang: 'vi',
+  strictSelect: true,
+  storeValueInHiddenField: true,
+  dependsOn: 'part_number',
+  dependsOnField: 'part'
+});
+
+var siCAPA = new SearchableInput({
+  containerId: 'si-capa-number',
+  fieldId: 'linked_capa',
+  name: 'linked_capa',
+  placeholder: 'Search CAPA number...',
+  placeholderVi: 'Tìm số CAPA...',
+  dataSource: DEMO_CAPAS,
+  displayField: 'name',
+  valueField: 'id',
+  subField: 'description',
+  lang: 'vi',
+  strictSelect: true,
+  storeValueInHiddenField: true
+});
+
+/* ──────────────────────────────────────────────────
+   E-SIGNATURE INSTANCE
+   ────────────────────────────────────────────────── */
+var eSig = new ESignature({
+  lang: 'vi',
+  requireReason: true,
+  requirePin: true,
+  onAuditLog: function (event) {
+    console.log('[AuditTrail]', event);
+  }
+});
+
+/* Demo user context */
+var DEMO_USER = {
+  name: 'Nguyễn Văn A',
+  role: 'QC Inspector',
+  id: 'USR-0042'
+};
+
+function openSignature(containerId, titleEn, titleVi) {
+  /* Don't re-sign if already signed */
+  if (eSig.isComplete(containerId)) {
+    if (!confirm('This block is already signed. Re-sign?\nKhối này đã được ký. Ký lại?')) return;
+  }
+
+  var meaning = 'Xác nhận';
+  if (containerId === 'sig-approved') meaning = 'Phê duyệt phát hành';
+  if (containerId === 'sig-inspector') meaning = 'Xác nhận kiểm tra';
+  if (containerId === 'sig-reported') meaning = 'Xác nhận khai báo';
+
+  eSig.show({
+    signerId: DEMO_USER.id,
+    signerName: DEMO_USER.name,
+    signerRole: DEMO_USER.role,
+    signatureMeaning: meaning,
+    appliedTo: containerId,
+    reason: meaning,
+    onSign: function (data) {
+      eSig.insertSignature(containerId, data);
+    },
+    onCancel: function () {
+      /* nothing */
+    }
+  });
+}
+
+/* ──────────────────────────────────────────────────
+   SECTION COLLAPSE / EXPAND
+   ────────────────────────────────────────────────── */
 function toggleSection(header) {
   var section = header.closest('.qf-section');
   var expanded = !section.classList.contains('collapsed');
@@ -1617,7 +1915,9 @@ function expandAll() {
   });
 }
 
-/* Severity dot update */
+/* ──────────────────────────────────────────────────
+   SEVERITY DOT
+   ────────────────────────────────────────────────── */
 function updateSeverityDot(select) {
   var dot = document.getElementById('severityDot');
   dot.className = 'qf-severity-dot';
@@ -1637,10 +1937,18 @@ function styleDefectType(select) {
   select.style.color = colorMap[color] || '';
 }
 
-/* Form validation */
+/* ──────────────────────────────────────────────────
+   FORM VALIDATION
+   ────────────────────────────────────────────────── */
 function validateForm() {
   var form = document.getElementById('ncrForm');
   var valid = true;
+
+  [siCustomer, siSupplier, siSO, siJob, siWorkOrder, siPart, siPartRev, siCAPA].forEach(function(si) {
+    if (si && si.config && si.config.strictSelect && si._enforceStrictSelection) {
+      si._enforceStrictSelection();
+    }
+  });
 
   /* Clear previous errors */
   form.querySelectorAll('.qf-field.is-error').forEach(function(f) {
@@ -1650,14 +1958,17 @@ function validateForm() {
   /* Check required fields */
   form.querySelectorAll('[data-required]').forEach(function(field) {
     var input = field.querySelector('input[required], select[required], textarea[required]');
-    if (input && !input.value.trim()) {
+    var siInput = field.querySelector('.si-input');
+    var siHidden = field.querySelector('.si-hidden');
+    var target = input || siHidden || siInput;
+
+    if (target && !String(target.value || '').trim()) {
       field.classList.add('is-error');
       valid = false;
     }
   });
 
   if (!valid) {
-    /* Scroll to first error */
     var first = form.querySelector('.qf-field.is-error');
     if (first) {
       var section = first.closest('.qf-section');
@@ -1671,16 +1982,36 @@ function validateForm() {
   return valid;
 }
 
-/* Submit */
+/* ──────────────────────────────────────────────────
+   SUBMIT — triggers e-signature if not already signed
+   ────────────────────────────────────────────────── */
 function submitForm() {
-  if (validateForm()) {
-    alert('Form validated successfully. Ready to submit.\n\nIn production this would POST to the API.');
+  if (!validateForm()) return;
+
+  /* Check if at least "Reported By" is signed */
+  if (!eSig.isComplete('sig-reported')) {
+    alert('Please sign the "Reported By" block before submitting.\nVui lòng ký khối "Người báo cáo" trước khi gửi.');
+    document.getElementById('sig-reported').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
   }
+
+  /* Collect selected 6M categories */
+  var categories = [];
+  document.querySelectorAll('input[name="root_cause_category"]:checked').forEach(function(cb) {
+    categories.push(cb.value);
+  });
+
+  alert(
+    'Form validated and signed successfully!\n' +
+    'Ready to submit to API.\n\n' +
+    'Selected 6M categories: ' + (categories.length ? categories.join(', ') : 'None') + '\n' +
+    'Signature verified: ' + (eSig.getSignatureData('sig-reported') ? 'Yes' : 'No')
+  );
 }
 
 /* Save Draft */
 function saveDraft() {
-  alert('Draft saved.\n\nIn production this would save to localStorage and API.');
+  alert('Đã lưu nháp.\nBản production sẽ lưu vào localStorage và API.');
 }
 
 /* Clear Form */
@@ -1690,12 +2021,18 @@ function clearForm() {
     document.querySelectorAll('.qf-field.is-error').forEach(function(f) {
       f.classList.remove('is-error');
     });
-    var dot = document.getElementById('severityDot');
-    dot.className = 'qf-severity-dot';
+    document.getElementById('severityDot').className = 'qf-severity-dot';
+
+    /* Reset searchable inputs */
+    [siCustomer, siSupplier, siJob, siSO, siWorkOrder, siPart, siPartRev, siCAPA].forEach(function(si) {
+      if (si && si.reset) si.reset();
+    });
   }
 }
 
-/* Keyboard: Enter on section header toggles it */
+/* ──────────────────────────────────────────────────
+   KEYBOARD: Enter on section header toggles it
+   ────────────────────────────────────────────────── */
 document.querySelectorAll('.qf-section-header').forEach(function(header) {
   header.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' || e.key === ' ') {
