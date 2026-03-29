@@ -162,12 +162,58 @@ function _showDetail(id,type){
     html+='</div></section>';
     if((o.status_history||[]).length){ html+='<section class="sj-sec"><h4>'+_t('Lịch sử trạng thái','Status history')+'</h4><div class="sj-history">'+o.status_history.map(function(h){ return '<div class="sj-h"><strong>'+_esc(_status(type,h.status||'').text)+'</strong><span>'+_esc(_fmtDateTime(h.timestamp||h.date||''))+'</span><em>'+_esc(h.user||'')+'</em></div>'; }).join('')+'</div></section>'; }
     if(type==='jo' && (o.operations||[]).length){ html+='<section class="sj-sec"><h4>'+_t('Danh sách công đoạn','Operations')+'</h4><div class="sj-history">'+o.operations.map(function(op){ return '<div class="sj-h"><strong>OP'+_esc(op.operation_number||'')+' · '+_esc(op.operation_desc||'-')+'</strong><span>'+_esc(op.machine_id||'')+'</span><em>'+_esc(_status('wo',op.status||'').text)+'</em></div>'; }).join('')+'</div></section>'; }
-    html+='<section class="sj-sec"><h4>'+_t('Biểu mẫu / hồ sơ liên kết','Linked forms / records')+'</h4>' + ((o.linked_forms||[]).length ? '<div class="sj-history">'+o.linked_forms.map(function(f){ return '<div class="sj-h"><strong>'+_esc(f.record_id||'-')+'</strong><span>'+_esc(f.status||_t('Đã liên kết','Linked'))+'</span><em>'+_esc(f.linked_by||'')+'</em></div>'; }).join('')+'</div>' : '<p class="sj-muted">'+_t('Chưa có biểu mẫu liên kết nào.','No linked forms yet.')+'</p>') + (_permission(type,'edit')?'<button type="button" class="sj-btn mini" id="'+_id+'-link-form">+ '+_t('Liên kết hồ sơ','Link record')+'</button>':'')+'</section>';
+    html+='<section class="sj-sec"><h4>'+_t('Hồ sơ liên kết','Linked Evidence')+'</h4><div id="'+_id+'-linked-forms-panel"><div class="sj-loading"><div class="sj-spinner"></div></div></div>'+(_permission(type,'edit')?'<button type="button" class="sj-btn mini" id="'+_id+'-link-form" style="margin-top:8px">+ '+_t('Liên kết hồ sơ','Link record')+'</button>':'')+'</section>';
     body.innerHTML=html;
+    // ── G2 P1-01: Load enriched linked forms via dedicated endpoint ──
+    _loadLinkedFormsPanel(id, type);
     var next=(TRANSITIONS[type]&&TRANSITIONS[type][o.status||''])?TRANSITIONS[type][o.status||'']:[];
     actions.innerHTML=next.map(function(s){ var st=_status(type,s); return '<button type="button" class="sj-btn mini sj-outline" data-next="'+_esc(s)+'" style="color:'+st.color+';border-color:'+st.color+'">'+_esc(st.text)+'</button>'; }).join('');
     actions.onclick=function(e){ var b=e.target.closest('[data-next]'); if(!b||!_selected) return; _api(type==='so'?'order_so_update_status':type==='jo'?'order_jo_update_status':'order_wo_update_status',{ order_id:_selected.id, status:b.getAttribute('data-next') }).then(function(r){ if(r&&r.ok){ _toast(_t('Đã cập nhật trạng thái.','Status updated.'),'success'); _refresh(); } else { _toast(_t('Không thể cập nhật trạng thái.','Unable to update status.'),'error'); } }); };
     var linkBtn=document.getElementById(_id+'-link-form'); if(linkBtn) linkBtn.onclick=_showLinkModal;
+  });
+}
+
+// ── G2 P1-01: Linked Evidence panel ───────────────────────────────
+function _loadLinkedFormsPanel(orderId, orderType) {
+  var panel = document.getElementById(_id + '-linked-forms-panel');
+  if (!panel) return;
+  fetch('api.php?action=order_get_linked_forms&order_type=' + encodeURIComponent(orderType) + '&order_id=' + encodeURIComponent(orderId), {
+    method: 'GET', credentials: 'include',
+    headers: typeof csrfToken !== 'undefined' && csrfToken ? { 'X-CSRF-Token': csrfToken } : {}
+  }).then(function(r) { return r.json(); }).then(function(res) {
+    if (!res || !res.ok) { panel.innerHTML = '<p class="sj-muted">' + _t('Không thể tải hồ sơ liên kết.', 'Unable to load linked forms.') + '</p>'; return; }
+    var forms = res.forms || [];
+    if (!forms.length) { panel.innerHTML = '<p class="sj-muted">' + _t('Chưa có hồ sơ liên kết nào.', 'No linked evidence yet.') + '</p>'; return; }
+    var h = '<table class="sj-link-tbl"><thead><tr>'
+      + '<th>' + _t('Mã hồ sơ', 'Record ID') + '</th>'
+      + '<th>' + _t('Biểu mẫu', 'Form Code') + '</th>'
+      + '<th>' + _t('Trạng thái', 'Status') + '</th>'
+      + '<th>' + _t('Ngày', 'Date') + '</th>'
+      + '<th>' + _t('Người tạo', 'Created by') + '</th>'
+      + '<th>' + _t('Nguồn', 'Source') + '</th>'
+      + '</tr></thead><tbody>';
+    forms.forEach(function(f) {
+      var st = f.alloc_status || f.status || 'linked';
+      var stLabel = { linked: _t('Đã liên kết', 'Linked'), allocated: _t('Đã cấp phát', 'Allocated'), submitted: _t('Đã nộp', 'Submitted'), downloaded: _t('Đã tải', 'Downloaded'), received: _t('Đã nhận', 'Received'), void: _t('Đã hủy', 'Void') };
+      var stColor = { linked: '#3b82f6', allocated: '#94a3b8', submitted: '#10b981', downloaded: '#f59e0b', received: '#8b5cf6', void: '#ef4444' };
+      var displaySt = stLabel[st] || _esc(st);
+      var color = stColor[st] || '#94a3b8';
+      var dateStr = _fmtDateTime(f.created_at || f.linked_at || '');
+      var who = f.created_by || f.linked_by || '';
+      var src = f.auto_linked ? _t('Tự động', 'Auto') : _t('Thủ công', 'Manual');
+      h += '<tr>'
+        + '<td><strong>' + _esc(f.record_id || '-') + '</strong></td>'
+        + '<td>' + _esc(f.form_code || '-') + '</td>'
+        + '<td><span class="sj-tag" style="background:' + _rgba(color, 0.12) + ';color:' + color + '">' + displaySt + '</span></td>'
+        + '<td>' + _esc(dateStr) + '</td>'
+        + '<td>' + _esc(who) + '</td>'
+        + '<td><span class="sj-tag" style="background:' + (f.auto_linked ? _rgba('#10b981', 0.12) : _rgba('#3b82f6', 0.12)) + ';color:' + (f.auto_linked ? '#10b981' : '#3b82f6') + '">' + src + '</span></td>'
+        + '</tr>';
+    });
+    h += '</tbody></table>';
+    panel.innerHTML = h;
+  }).catch(function() {
+    panel.innerHTML = '<p class="sj-muted">' + _t('Lỗi khi tải hồ sơ liên kết.', 'Error loading linked evidence.') + '</p>';
   });
 }
 
@@ -285,6 +331,8 @@ window._renderSoJoWoDashboard=function(schemas,entries,container){ _container=co
     '.sj-modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.32);backdrop-filter:blur(4px);z-index:1300;display:flex;align-items:center;justify-content:center;padding:20px}.sj-modal{width:min(760px,96vw);max-height:88vh;background:#fff;border-radius:26px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(15,23,42,.24)}.sj-modal-sm{width:min(440px,96vw)}.sj-modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid #edf2f7}.sj-modal-head h3{margin:0}.sj-modal-body{padding:18px 20px;overflow:auto}.sj-modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 20px;border-top:1px solid #edf2f7}.sj-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.sj-form-field{display:flex;flex-direction:column;gap:6px}.sj-form-field.wide{grid-column:1 / -1}.sj-form-field label{font-size:.82rem;font-weight:800;color:#334155}',
     '.sj-loading{min-height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#64748b}.sj-spinner{width:28px;height:28px;border:3px solid #dbe7f3;border-top-color:#1565c0;border-radius:999px;animation:sjspin .7s linear infinite}@keyframes sjspin{to{transform:rotate(360deg)}}',
     '.sj-toast{position:fixed;right:24px;bottom:24px;padding:12px 16px;border-radius:14px;border-left:4px solid;box-shadow:0 16px 36px rgba(15,23,42,.14);z-index:1400;opacity:0;transform:translateY(10px);transition:all .18s ease}.sj-toast.show{opacity:1;transform:translateY(0)}.sj-toast.info{background:#dbeafe;color:#1d4ed8;border-color:#1565c0}.sj-toast.success{background:#dcfce7;color:#166534;border-color:#15803d}.sj-toast.warn{background:#fef3c7;color:#b45309;border-color:#d97706}.sj-toast.error{background:#fef2f2;color:#b91c1c;border-color:#dc2626}',
+    '.sj-link-tbl{width:100%;border-collapse:collapse;font-size:.84rem}.sj-link-tbl th{padding:8px 10px;border-bottom:2px solid #e2e8f0;font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#64748b;text-align:left}.sj-link-tbl td{padding:8px 10px;border-bottom:1px solid #f1f5f9;color:#334155}.sj-link-tbl tr:last-child td{border-bottom:none}.sj-link-tbl tr:hover td{background:#f8fbff}',
+    '.sj-tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.72rem;font-weight:700;white-space:nowrap}',
     '@media (max-width: 1100px){.sj-kpi{grid-template-columns:repeat(2,minmax(0,1fr))}.sj-pipeline{grid-template-columns:repeat(2,minmax(0,1fr))}}',
     '@media (max-width: 860px){.sj-wrap{padding:16px}.sj-hero{flex-direction:column;align-items:flex-start;padding:18px}.sj-actions{justify-content:flex-start}.sj-kpi{grid-template-columns:1fr}.sj-pipeline{grid-template-columns:1fr}.sj-form,.sj-grid{grid-template-columns:1fr}.sj-detail{top:10px;right:10px;bottom:10px;width:calc(100vw - 20px)}.sj-modal-overlay{padding:10px}.sj-modal{width:100%;max-height:92vh}}'
   ].join('\n');

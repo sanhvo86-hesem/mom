@@ -8785,6 +8785,184 @@ if ($username === '') {
     api_json(['ok' => true, 'entries' => $slice, 'total' => $total, 'page' => $page, 'pages' => $pages]);
   }
 
+  // ── Evidence Approval Engine (G3 P1-02) ─────────────────────────────────
+
+  case 'evidence_submit_for_review': {
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $allocationId = trim((string)($body['allocation_id'] ?? ''));
+    if ($allocationId === '') api_json(['ok' => false, 'error' => 'missing_allocation_id'], 400);
+
+    $allocationStore = load_allocation_store();
+    $allocation =& allocation_find_ref($allocationStore, $allocationId);
+    if (!is_array($allocation)) api_json(['ok' => false, 'error' => 'allocation_not_found'], 404);
+
+    $currentStatus = allocation_status_normalize((string)($allocation['status'] ?? 'allocated'));
+    if ($currentStatus !== 'submitted') {
+      api_json(['ok' => false, 'error' => 'invalid_status_for_review', 'current_status' => $currentStatus], 409);
+    }
+
+    $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+    allocation_append_event($allocation, 'in_review', $username, 'evidence_submitted_for_review');
+    save_allocation_store($allocationStore);
+
+    api_json(['ok' => true, 'allocation' => $allocation]);
+  }
+
+  case 'evidence_review': {
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $allocationId = trim((string)($body['allocation_id'] ?? ''));
+    $reviewAction = strtolower(trim((string)($body['action'] ?? '')));
+    $reason = trim((string)($body['reason'] ?? ''));
+    $signatureData = is_array($body['signature_data'] ?? null) ? $body['signature_data'] : null;
+
+    if ($allocationId === '') api_json(['ok' => false, 'error' => 'missing_allocation_id'], 400);
+    if (!in_array($reviewAction, ['approve', 'reject'], true)) {
+      api_json(['ok' => false, 'error' => 'invalid_action', 'hint' => 'action must be approve or reject'], 400);
+    }
+
+    $allocationStore = load_allocation_store();
+    $allocation =& allocation_find_ref($allocationStore, $allocationId);
+    if (!is_array($allocation)) api_json(['ok' => false, 'error' => 'allocation_not_found'], 404);
+
+    $currentStatus = allocation_status_normalize((string)($allocation['status'] ?? 'allocated'));
+    if ($currentStatus !== 'in_review') {
+      api_json(['ok' => false, 'error' => 'allocation_not_in_review', 'current_status' => $currentStatus], 409);
+    }
+
+    // Validate reviewer role against form schema roles_allowed
+    $formCode = trim((string)($allocation['form_code'] ?? ''));
+    if ($formCode !== '') {
+      $schema = load_form_schema_by_code($formCode);
+      if (is_array($schema) && !empty($schema['roles_allowed'])) {
+        $userRoles = is_array($me['roles'] ?? null) ? $me['roles'] : [(string)($me['role'] ?? '')];
+        $hasRole = false;
+        foreach ($userRoles as $userRole) {
+          if (in_array(strtolower(trim((string)$userRole)), array_map('strtolower', $schema['roles_allowed']), true)) {
+            $hasRole = true;
+            break;
+          }
+        }
+        if (!$hasRole) {
+          api_json(['ok' => false, 'error' => 'insufficient_role', 'required' => $schema['roles_allowed']], 403);
+        }
+      }
+    }
+
+    $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+
+    if ($reviewAction === 'approve') {
+      // Step-up re-auth: verify password
+      $password = trim((string)($body['password'] ?? ''));
+      if ($password === '') {
+        api_json(['ok' => false, 'error' => 'password_required'], 400);
+      }
+      global $DATA_DIR;
+      $usersData = json_decode((string)file_get_contents($DATA_DIR . '/config/users.json'), true);
+      $authUser = null;
+      foreach (($usersData['users'] ?? []) as $u) {
+        if (is_array($u) && (string)($u['username'] ?? '') === $username) { $authUser = $u; break; }
+      }
+      if (!$authUser || !password_verify($password, (string)($authUser['password_hash'] ?? ''))) {
+        api_json(['ok' => false, 'error' => 'invalid_password'], 403);
+      }
+
+      // Store signature data and approve
+      if ($signatureData !== null) {
+        $allocation['approval_signature'] = $signatureData;
+      }
+      $allocation['approved_at'] = now_iso();
+      $allocation['approved_by'] = $username;
+      $allocation['approval_reason'] = $reason;
+      allocation_append_event($allocation, 'approved', $username, $reason ?: 'evidence_approved', [
+        'signature_hash' => is_array($signatureData) ? (string)($signatureData['hash'] ?? '') : '',
+        'signature_signer' => is_array($signatureData) ? (string)($signatureData['signerName'] ?? '') : '',
+      ]);
+    } else {
+      // Reject
+      if ($reason === '') {
+        api_json(['ok' => false, 'error' => 'reason_required_for_rejection'], 400);
+      }
+      $allocation['rejected_at'] = now_iso();
+      $allocation['rejected_by'] = $username;
+      $allocation['rejection_reason'] = $reason;
+      allocation_append_event($allocation, 'rejected', $username, $reason, [
+        'review_action' => 'reject',
+      ]);
+    }
+
+    save_allocation_store($allocationStore);
+
+    $newStatus = allocation_status_normalize((string)($allocation['status'] ?? ''));
+    api_json(['ok' => true, 'status' => $newStatus, 'allocation' => $allocation]);
+  }
+
+  case 'evidence_reopen': {
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $allocationId = trim((string)($body['allocation_id'] ?? ''));
+    $reason = trim((string)($body['reason'] ?? ''));
+
+    if ($allocationId === '') api_json(['ok' => false, 'error' => 'missing_allocation_id'], 400);
+    if ($reason === '') api_json(['ok' => false, 'error' => 'reason_required'], 400);
+
+    // Only managers can reopen
+    $userRoles = is_array($me['roles'] ?? null) ? $me['roles'] : [(string)($me['role'] ?? '')];
+    $managerRoles = ['admin', 'qa_manager', 'quality_manager', 'production_manager', 'engineering_manager'];
+    $isManager = false;
+    foreach ($userRoles as $userRole) {
+      if (in_array(strtolower(trim((string)$userRole)), $managerRoles, true)) {
+        $isManager = true;
+        break;
+      }
+    }
+    if (!$isManager) {
+      api_json(['ok' => false, 'error' => 'only_managers_can_reopen'], 403);
+    }
+
+    $allocationStore = load_allocation_store();
+    $allocation =& allocation_find_ref($allocationStore, $allocationId);
+    if (!is_array($allocation)) api_json(['ok' => false, 'error' => 'allocation_not_found'], 404);
+
+    $currentStatus = allocation_status_normalize((string)($allocation['status'] ?? 'allocated'));
+    if (!in_array($currentStatus, ['in_review', 'approved', 'rejected'], true)) {
+      api_json(['ok' => false, 'error' => 'cannot_reopen_from_status', 'current_status' => $currentStatus], 409);
+    }
+
+    $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+    // Clear previous approval/rejection metadata
+    unset($allocation['approval_signature'], $allocation['approved_at'], $allocation['approved_by'], $allocation['approval_reason']);
+    unset($allocation['rejected_at'], $allocation['rejected_by'], $allocation['rejection_reason']);
+    allocation_append_event($allocation, 'submitted', $username, $reason, [
+      'review_action' => 'reopen',
+      'reopened_from' => $currentStatus,
+    ]);
+    save_allocation_store($allocationStore);
+
+    api_json(['ok' => true, 'allocation' => $allocation]);
+  }
+
+  case 'evidence_get_pending': {
+    require_logged_in($store);
+    $department = strtoupper(trim((string)($_GET['department'] ?? '')));
+    $formCode = trim((string)($_GET['form_code'] ?? ''));
+
+    $allocationStore = load_allocation_store();
+    $pending = array_values(array_filter((array)($allocationStore['allocations'] ?? []), function ($row) use ($department, $formCode) {
+      if (!is_array($row)) return false;
+      if (allocation_status_normalize((string)($row['status'] ?? '')) !== 'in_review') return false;
+      if ($department !== '' && strtoupper(trim((string)($row['department'] ?? ''))) !== $department) return false;
+      if ($formCode !== '' && trim((string)($row['form_code'] ?? '')) !== $formCode) return false;
+      return true;
+    }));
+
+    api_json(['ok' => true, 'pending' => $pending, 'count' => count($pending)]);
+  }
+
   default:
     api_json(['ok' => false, 'error' => 'unknown_action'], 400);
 }
