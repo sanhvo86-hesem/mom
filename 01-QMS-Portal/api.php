@@ -1824,9 +1824,9 @@ function save_orders_store(array $data): void {
 function master_data_store_default(): array {
   return [
     '_meta' => [
-      'version' => '1.0',
+      'version' => '1.1',
       'updated' => now_iso(),
-      'description' => 'Governed master data for lookups in orders and evidence forms.',
+      'description' => 'Governed master data for lookups in orders, evidence forms, and MES connectivity.',
     ],
     'customers' => [],
     'suppliers' => [],
@@ -1868,14 +1868,16 @@ function save_master_data_store(array $data): void {
 function mes_runtime_default(): array {
   return [
     '_meta' => [
-      'version' => '1.1',
+      'version' => '1.2',
       'updated' => now_iso(),
-      'description' => 'MES runtime store for dispatch, machine state, downtime, maintenance, tooling, and progress reporting.',
+      'description' => 'MES runtime store for dispatch, machine state, downtime, maintenance, tooling, connectivity, and progress reporting.',
     ],
     'downtime_events' => [],
     'maintenance_requests' => [],
     'progress_reports' => [],
     'tooling_status' => [],
+    'connector_feeds' => [],
+    'machine_signals' => [],
   ];
 }
 
@@ -2141,6 +2143,79 @@ function mes_minutes_between(string $startAt = '', string $endAt = '', ?DateTime
   }
 }
 
+function mes_timestamp_age_seconds(string $timestamp = '', ?DateTimeImmutable $now = null): ?int {
+  $timestamp = trim($timestamp);
+  if ($timestamp === '') return null;
+  try {
+    $dt = new DateTimeImmutable($timestamp);
+  } catch (Throwable) {
+    return null;
+  }
+  $now = $now ?: new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
+  return max(0, $now->getTimestamp() - $dt->getTimestamp());
+}
+
+function mes_machine_state_normalize(string $state = ''): string {
+  $state = strtolower(trim($state));
+  $map = [
+    'running' => 'running',
+    'executing' => 'running',
+    'cycle' => 'running',
+    'cutting' => 'running',
+    'setup' => 'setup',
+    'set_up' => 'setup',
+    'inspection' => 'inspection',
+    'probing' => 'inspection',
+    'measure' => 'inspection',
+    'on_hold' => 'on_hold',
+    'hold' => 'on_hold',
+    'feed_hold' => 'on_hold',
+    'stopped' => 'idle',
+    'idle' => 'idle',
+    'ready' => 'idle',
+    'scheduled' => 'scheduled',
+    'maintenance' => 'maintenance',
+    'service' => 'maintenance',
+    'down' => 'down',
+    'alarm' => 'down',
+    'fault' => 'down',
+    'estop' => 'down',
+    'offline' => 'offline',
+  ];
+  return $map[$state] ?? $state;
+}
+
+function mes_connector_health_from_age(?int $ageSeconds, int $slaSeconds = 120, string $connectorType = 'manual_bridge'): string {
+  $connectorType = strtolower(trim($connectorType));
+  $slaSeconds = max(30, $slaSeconds);
+  if ($connectorType === 'disabled') return 'disabled';
+  if (in_array($connectorType, ['manual', 'manual_bridge'], true) && $ageSeconds === null) return 'manual_only';
+  if ($ageSeconds === null) return 'offline';
+  if ($ageSeconds <= $slaSeconds) return 'healthy';
+  if ($ageSeconds <= ($slaSeconds * 3)) return 'delayed';
+  return 'stale';
+}
+
+function mes_latest_rows_by_machine(array $rows, string $timeKey = 'updated_at'): array {
+  $indexed = [];
+  foreach ($rows as $row) {
+    if (!is_array($row)) continue;
+    $machineId = trim((string)($row['machine_id'] ?? ''));
+    if ($machineId === '') continue;
+    $candidateTs = trim((string)($row[$timeKey] ?? $row['last_heartbeat_at'] ?? $row['signal_at'] ?? ''));
+    if (!isset($indexed[$machineId])) {
+      $indexed[$machineId] = $row;
+      continue;
+    }
+    $current = $indexed[$machineId];
+    $currentTs = trim((string)($current[$timeKey] ?? $current['last_heartbeat_at'] ?? $current['signal_at'] ?? ''));
+    if ($candidateTs !== '' && strcmp($candidateTs, $currentTs) >= 0) {
+      $indexed[$machineId] = $row;
+    }
+  }
+  return $indexed;
+}
+
 function load_mes_gate_rules(): array {
   global $CONF_DIR;
   $file = $CONF_DIR . '/mes_evidence_gate_rules.json';
@@ -2328,6 +2403,8 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $formLinksByOrder = mes_form_link_index($orders);
   $gateRules = load_mes_gate_rules();
   $now = new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
+  $connectorFeeds = mes_latest_rows_by_machine((array)($mes['connector_feeds'] ?? []), 'updated_at');
+  $machineSignals = mes_latest_rows_by_machine((array)($mes['machine_signals'] ?? []), 'signal_at');
 
   $jos = master_index_by((array)($orders['job_orders'] ?? []), 'jo_number');
   $wos = master_index_by((array)($orders['work_orders'] ?? []), 'wo_number');
@@ -2426,6 +2503,31 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
       'priority' => (string)($so['priority'] ?? 'normal'),
     ];
 
+    $machineMeta = $machines[$machineId] ?? [];
+    $feed = $machineId !== '' ? ($connectorFeeds[$machineId] ?? []) : [];
+    $signal = $machineId !== '' ? ($machineSignals[$machineId] ?? []) : [];
+    $connectorType = (string)($feed['connector_type'] ?? $machineMeta['connector_type'] ?? $machineMeta['telemetry_mode'] ?? $signal['source'] ?? 'manual_bridge');
+    $heartbeatSla = (int)($feed['heartbeat_sla_seconds'] ?? $machineMeta['heartbeat_sla_seconds'] ?? 120);
+    $lastHeartbeatAt = (string)($signal['last_heartbeat_at'] ?? $feed['last_heartbeat_at'] ?? $signal['signal_at'] ?? '');
+    $signalAgeSeconds = mes_timestamp_age_seconds($lastHeartbeatAt, $now);
+    $connectorHealth = mes_connector_health_from_age($signalAgeSeconds, $heartbeatSla, $connectorType);
+    $signalState = mes_machine_state_normalize((string)($signal['machine_state'] ?? ''));
+    $dispatchRow['telemetry'] = [
+      'connector_type' => $connectorType,
+      'connector_name' => (string)($feed['connector_name'] ?? $machineMeta['connector_name'] ?? strtoupper($connectorType)),
+      'connector_health' => $connectorHealth,
+      'heartbeat_sla_seconds' => $heartbeatSla,
+      'last_heartbeat_at' => $lastHeartbeatAt,
+      'signal_state' => $signalState,
+      'signal_source' => (string)($signal['source'] ?? $connectorType),
+      'signal_freshness_seconds' => $signalAgeSeconds,
+      'current_program_id' => (string)($signal['current_program_id'] ?? $wo['nc_program_id'] ?? ''),
+      'spindle_load_pct' => isset($signal['spindle_load_pct']) ? (float)$signal['spindle_load_pct'] : null,
+      'feed_override_pct' => isset($signal['feed_override_pct']) ? (float)$signal['feed_override_pct'] : null,
+      'part_count' => isset($signal['part_count']) ? (int)$signal['part_count'] : null,
+      'telemetry_mode' => (string)($machineMeta['telemetry_mode'] ?? ($connectorType === 'manual_bridge' ? 'manual' : 'machine')),
+    ];
+
     $woLinks = array_values((array)($formLinksByOrder['wo'][$woNumber] ?? []));
     $openDowntime = $machineId !== '' ? ($activeDowntimeByMachine[$machineId] ?? null) : null;
     $openMaintenance = $machineId !== '' ? ($activeMaintenanceByMachine[$machineId] ?? null) : null;
@@ -2471,11 +2573,23 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     }
     if ($activeWo === null && !empty($queue)) $activeWo = $queue[0];
 
+    $feed = $connectorFeeds[$machineId] ?? [];
+    $signal = $machineSignals[$machineId] ?? [];
+    $connectorType = (string)($feed['connector_type'] ?? $machine['connector_type'] ?? $machine['telemetry_mode'] ?? $signal['source'] ?? 'manual_bridge');
+    $heartbeatSla = (int)($feed['heartbeat_sla_seconds'] ?? $machine['heartbeat_sla_seconds'] ?? 120);
+    $lastHeartbeatAt = (string)($signal['last_heartbeat_at'] ?? $feed['last_heartbeat_at'] ?? $signal['signal_at'] ?? '');
+    $signalAgeSeconds = mes_timestamp_age_seconds($lastHeartbeatAt, $now);
+    $connectorHealth = mes_connector_health_from_age($signalAgeSeconds, $heartbeatSla, $connectorType);
+    $signalState = mes_machine_state_normalize((string)($signal['machine_state'] ?? ''));
+    $signalIsFresh = in_array($connectorHealth, ['healthy', 'delayed'], true);
+
     $status = 'idle';
     if (isset($activeDowntimeByMachine[$machineId])) {
       $status = 'down';
     } elseif (isset($activeMaintenanceByMachine[$machineId])) {
       $status = 'maintenance';
+    } elseif ($signalIsFresh && $signalState !== '' && $signalState !== 'offline') {
+      $status = $signalState;
     } elseif ($activeWo) {
       $status = (string)($activeWo['status'] ?? 'scheduled');
     } elseif (!empty($queue)) {
@@ -2526,6 +2640,20 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
       'work_center_id' => (string)($machine['work_center_id'] ?? ''),
       'work_center_name' => (string)($workCenters[(string)($machine['work_center_id'] ?? '')]['work_center_name'] ?? ''),
       'location' => (string)($machine['location'] ?? ''),
+      'telemetry_mode' => (string)($machine['telemetry_mode'] ?? ($connectorType === 'manual_bridge' ? 'manual' : 'machine')),
+      'connector_type' => $connectorType,
+      'connector_name' => (string)($feed['connector_name'] ?? $machine['connector_name'] ?? strtoupper($connectorType)),
+      'connector_endpoint' => (string)($feed['connector_endpoint'] ?? $machine['connector_endpoint'] ?? ''),
+      'connector_health' => $connectorHealth,
+      'heartbeat_sla_seconds' => $heartbeatSla,
+      'last_heartbeat_at' => $lastHeartbeatAt,
+      'signal_state' => $signalState,
+      'signal_source' => (string)($signal['source'] ?? $connectorType),
+      'signal_freshness_seconds' => $signalAgeSeconds,
+      'current_program_id' => (string)($signal['current_program_id'] ?? $activeWo['nc_program_id'] ?? ''),
+      'spindle_load_pct' => isset($signal['spindle_load_pct']) ? (float)$signal['spindle_load_pct'] : null,
+      'feed_override_pct' => isset($signal['feed_override_pct']) ? (float)$signal['feed_override_pct'] : null,
+      'part_count' => isset($signal['part_count']) ? (int)$signal['part_count'] : null,
       'preferred_operator_id' => (string)($machine['preferred_operator_id'] ?? ''),
       'preferred_operator_name' => (string)($operators[(string)($machine['preferred_operator_id'] ?? '')]['operator_name'] ?? ''),
       'queue_count' => count($queue),
@@ -2575,6 +2703,10 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     'machines_total' => count($machineWall),
     'machines_running' => count(array_filter($machineWall, fn($row) => in_array((string)($row['status'] ?? ''), ['running', 'setup', 'inspection'], true))),
     'machines_down' => count(array_filter($machineWall, fn($row) => (string)($row['status'] ?? '') === 'down')),
+    'connectors_total' => count($machineWall),
+    'connectors_healthy' => count(array_filter($machineWall, fn($row) => in_array((string)($row['connector_health'] ?? ''), ['healthy', 'delayed'], true))),
+    'connectors_stale' => count(array_filter($machineWall, fn($row) => in_array((string)($row['connector_health'] ?? ''), ['stale', 'offline'], true))),
+    'manual_bridges' => count(array_filter($machineWall, fn($row) => in_array((string)($row['connector_type'] ?? ''), ['manual', 'manual_bridge'], true))),
     'maintenance_open' => count($maintenanceQueue),
     'downtime_open' => count($openDowntimes),
     'wo_active' => count(array_filter($dispatch, fn($row) => in_array((string)($row['status'] ?? ''), ['scheduled', 'setup', 'running', 'inspection', 'on_hold'], true))),
@@ -2602,11 +2734,42 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
       'wo_count' => count($centerOrders),
       'running_count' => count(array_filter($centerMachines, fn($row) => in_array((string)($row['status'] ?? ''), ['running', 'setup', 'inspection'], true))),
       'down_count' => count(array_filter($centerMachines, fn($row) => (string)($row['status'] ?? '') === 'down')),
+      'connector_risk_count' => count(array_filter($centerMachines, fn($row) => in_array((string)($row['connector_health'] ?? ''), ['stale', 'offline'], true))),
       'tooling_alert_count' => count(array_filter($centerMachines, fn($row) => (int)($row['tool_alert_count'] ?? 0) > 0)),
       'gate_missing_count' => count(array_filter($centerOrders, fn($row) => in_array((string)($row['evidence_gate']['status'] ?? 'not_required'), ['missing', 'partial'], true))),
       'oee_pct' => count($centerMachines) ? round(array_sum(array_map(fn($row) => (float)($row['oee_pct'] ?? 0), array_filter($centerMachines, fn($row) => $row['oee_pct'] !== null))) / max(1, count(array_filter($centerMachines, fn($row) => $row['oee_pct'] !== null))), 1) : null,
     ];
   }
+
+  $connectorSummary = array_map(function ($row) {
+    return [
+      'machine_id' => (string)($row['machine_id'] ?? ''),
+      'machine_name' => (string)($row['machine_name'] ?? ''),
+      'work_center_id' => (string)($row['work_center_id'] ?? ''),
+      'connector_type' => (string)($row['connector_type'] ?? ''),
+      'connector_name' => (string)($row['connector_name'] ?? ''),
+      'connector_health' => (string)($row['connector_health'] ?? 'offline'),
+      'heartbeat_sla_seconds' => (int)($row['heartbeat_sla_seconds'] ?? 120),
+      'last_heartbeat_at' => (string)($row['last_heartbeat_at'] ?? ''),
+      'signal_state' => (string)($row['signal_state'] ?? ''),
+      'signal_source' => (string)($row['signal_source'] ?? ''),
+      'signal_freshness_seconds' => $row['signal_freshness_seconds'] ?? null,
+      'telemetry_mode' => (string)($row['telemetry_mode'] ?? ''),
+      'current_program_id' => (string)($row['current_program_id'] ?? ''),
+      'spindle_load_pct' => $row['spindle_load_pct'] ?? null,
+      'feed_override_pct' => $row['feed_override_pct'] ?? null,
+      'part_count' => $row['part_count'] ?? null,
+      'status' => (string)($row['status'] ?? 'idle'),
+    ];
+  }, $machineWall);
+
+  usort($connectorSummary, function ($a, $b) {
+    $priority = ['stale' => 0, 'offline' => 1, 'delayed' => 2, 'manual_only' => 3, 'healthy' => 4, 'disabled' => 5];
+    $ap = $priority[(string)($a['connector_health'] ?? 'offline')] ?? 9;
+    $bp = $priority[(string)($b['connector_health'] ?? 'offline')] ?? 9;
+    if ($ap !== $bp) return $ap <=> $bp;
+    return strcmp((string)($a['machine_id'] ?? ''), (string)($b['machine_id'] ?? ''));
+  });
 
   $evidenceGateQueue = array_values(array_map(function ($row) {
     return [
@@ -2635,6 +2798,7 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     'maintenance_queue' => $maintenanceQueue,
     'progress_reports' => array_slice(array_values(array_reverse((array)($mes['progress_reports'] ?? []))), 0, 20),
     'work_center_summary' => $workCenterSummary,
+    'connector_summary' => $connectorSummary,
     'tooling_alerts' => array_slice($toolingAlerts, 0, 20),
     'evidence_gate_queue' => array_slice($evidenceGateQueue, 0, 20),
   ];
@@ -9108,6 +9272,143 @@ if ($username === '') {
       'orders_updated' => (string)($orders['_meta']['updated'] ?? ''),
       'master_updated' => (string)($master['_meta']['updated'] ?? ''),
       'mes_updated' => (string)($mes['_meta']['updated'] ?? ''),
+    ]);
+  }
+
+  case 'mes_connector_snapshot': {
+    require_logged_in($store);
+    $orders = load_orders_store();
+    $master = load_master_data_store();
+    $mes = load_mes_runtime_store();
+    $snapshot = build_mes_snapshot($orders, $master, $mes);
+    api_json([
+      'ok' => true,
+      'items' => array_values((array)($snapshot['connector_summary'] ?? [])),
+      'kpis' => [
+        'connectors_total' => (int)($snapshot['kpis']['connectors_total'] ?? 0),
+        'connectors_healthy' => (int)($snapshot['kpis']['connectors_healthy'] ?? 0),
+        'connectors_stale' => (int)($snapshot['kpis']['connectors_stale'] ?? 0),
+        'manual_bridges' => (int)($snapshot['kpis']['manual_bridges'] ?? 0),
+      ],
+      'data' => $snapshot,
+      'updated' => (string)($mes['_meta']['updated'] ?? ''),
+    ]);
+  }
+
+  case 'mes_machine_signal_upsert': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+
+    $machineId = trim((string)($body['machine_id'] ?? ''));
+    if ($machineId === '') api_json(['ok' => false, 'error' => 'missing_machine_id'], 400);
+
+    $orders = load_orders_store();
+    $master = load_master_data_store();
+    $mes = load_mes_runtime_store();
+    $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
+    $machines = master_index_by((array)($master['machines'] ?? []), 'machine_id');
+    $operators = master_index_by((array)($master['operators'] ?? []), 'operator_id');
+
+    if (!isset($machines[$machineId])) api_json(['ok' => false, 'error' => 'machine_not_found'], 404);
+    $machine = $machines[$machineId];
+
+    $woNumber = trim((string)($body['wo_number'] ?? ''));
+    if ($woNumber !== '') {
+      $wo = find_order_record($orders, 'wo', $woNumber);
+      if (!$wo) api_json(['ok' => false, 'error' => 'work_order_not_found'], 404);
+      $woMachineId = trim((string)($wo['machine_id'] ?? ''));
+      if ($woMachineId !== '' && $woMachineId !== $machineId) {
+        api_json(['ok' => false, 'error' => 'wo_machine_mismatch'], 409);
+      }
+    }
+
+    $operatorId = trim((string)($body['operator_id'] ?? ''));
+    if ($operatorId !== '' && !isset($operators[$operatorId])) api_json(['ok' => false, 'error' => 'operator_not_found'], 404);
+
+    $connectorType = strtolower(trim((string)($body['connector_type'] ?? $machine['connector_type'] ?? $machine['telemetry_mode'] ?? 'manual_bridge')));
+    if ($connectorType === '') $connectorType = 'manual_bridge';
+    $signalAt = trim((string)($body['signal_at'] ?? now_iso()));
+    $lastHeartbeatAt = trim((string)($body['last_heartbeat_at'] ?? $signalAt));
+    $machineState = mes_machine_state_normalize((string)($body['machine_state'] ?? 'idle'));
+    $heartbeatSla = max(30, (int)($body['heartbeat_sla_seconds'] ?? $machine['heartbeat_sla_seconds'] ?? 120));
+    $signalAge = mes_timestamp_age_seconds($lastHeartbeatAt);
+    $connectorHealth = mes_connector_health_from_age($signalAge, $heartbeatSla, $connectorType);
+    $connectorName = trim((string)($body['connector_name'] ?? $machine['connector_name'] ?? strtoupper($connectorType)));
+    $connectorEndpoint = trim((string)($body['connector_endpoint'] ?? $machine['connector_endpoint'] ?? ''));
+
+    $feedPayload = [
+      'feed_id' => '',
+      'machine_id' => $machineId,
+      'machine_name' => (string)($machine['machine_name'] ?? ''),
+      'work_center_id' => (string)($machine['work_center_id'] ?? ''),
+      'connector_type' => $connectorType,
+      'connector_name' => $connectorName,
+      'connector_endpoint' => $connectorEndpoint,
+      'telemetry_mode' => (string)($body['telemetry_mode'] ?? $machine['telemetry_mode'] ?? ($connectorType === 'manual_bridge' ? 'manual' : 'machine')),
+      'heartbeat_sla_seconds' => $heartbeatSla,
+      'last_heartbeat_at' => $lastHeartbeatAt,
+      'last_signal_at' => $signalAt,
+      'connection_status' => $connectorHealth,
+      'enabled' => array_key_exists('enabled', $body) ? (bool)$body['enabled'] : true,
+      'updated_at' => now_iso(),
+      'updated_by' => $username,
+    ];
+    $feedSaved = null;
+    foreach ($mes['connector_feeds'] as $idx => $row) {
+      if (!is_array($row) || (string)($row['machine_id'] ?? '') !== $machineId) continue;
+      $feedPayload['feed_id'] = (string)($row['feed_id'] ?? '');
+      $mes['connector_feeds'][$idx] = array_merge($row, $feedPayload);
+      $feedSaved = $mes['connector_feeds'][$idx];
+      break;
+    }
+    if (!$feedSaved) {
+      $feedPayload['feed_id'] = mes_runtime_id('CNX');
+      $feedSaved = $feedPayload;
+      $mes['connector_feeds'][] = $feedSaved;
+    }
+
+    $signalPayload = [
+      'signal_id' => '',
+      'machine_id' => $machineId,
+      'machine_name' => (string)($machine['machine_name'] ?? ''),
+      'work_center_id' => (string)($machine['work_center_id'] ?? ''),
+      'source' => trim((string)($body['source'] ?? $connectorType)),
+      'connector_type' => $connectorType,
+      'machine_state' => $machineState,
+      'signal_at' => $signalAt,
+      'last_heartbeat_at' => $lastHeartbeatAt,
+      'wo_number' => $woNumber,
+      'operator_id' => $operatorId !== '' ? $operatorId : trim((string)($body['operator_id'] ?? '')),
+      'current_program_id' => trim((string)($body['current_program_id'] ?? '')),
+      'spindle_load_pct' => array_key_exists('spindle_load_pct', $body) && $body['spindle_load_pct'] !== '' ? max(0, min(100, (float)$body['spindle_load_pct'])) : null,
+      'feed_override_pct' => array_key_exists('feed_override_pct', $body) && $body['feed_override_pct'] !== '' ? max(0, min(200, (float)$body['feed_override_pct'])) : null,
+      'part_count' => array_key_exists('part_count', $body) && $body['part_count'] !== '' ? max(0, (int)$body['part_count']) : null,
+      'note' => trim((string)($body['note'] ?? '')),
+      'updated_at' => now_iso(),
+      'updated_by' => $username,
+    ];
+    $signalSaved = null;
+    foreach ($mes['machine_signals'] as $idx => $row) {
+      if (!is_array($row) || (string)($row['machine_id'] ?? '') !== $machineId) continue;
+      $signalPayload['signal_id'] = (string)($row['signal_id'] ?? '');
+      $mes['machine_signals'][$idx] = array_merge($row, $signalPayload);
+      $signalSaved = $mes['machine_signals'][$idx];
+      break;
+    }
+    if (!$signalSaved) {
+      $signalPayload['signal_id'] = mes_runtime_id('SIG');
+      $signalSaved = $signalPayload;
+      $mes['machine_signals'][] = $signalSaved;
+    }
+
+    save_mes_runtime_store($mes);
+    api_json([
+      'ok' => true,
+      'signal' => $signalSaved,
+      'feed' => $feedSaved,
+      'data' => build_mes_snapshot($orders, $master, $mes),
     ]);
   }
 

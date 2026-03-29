@@ -1,9 +1,9 @@
 {
   "_meta": {
-    "version": "1.1",
+    "version": "1.2",
     "created": "2026-03-29T17:00:00+07:00",
-    "updated": "2026-03-29T21:10:00+07:00",
-    "description": "MES runtime seed for dispatch, machine state, downtime, maintenance, tooling, and progress reporting."
+    "updated": "2026-03-29T23:20:00+07:00",
+    "description": "MES runtime seed for dispatch, machine state, downtime, maintenance, tooling, connectivity, and progress reporting."
   },
   "downtime_events": [
     {
@@ -143,6 +143,121 @@
       "last_change_at": "2026-03-20T08:00:00+07:00",
       "last_verified_at": "2026-03-29T12:40:00+07:00",
       "updated_at": "2026-03-29T17:00:00+07:00",
+      "updated_by": "qa.manager"
+    }
+  ],
+  "connector_feeds": [
+    {
+      "feed_id": "CNX-202603291640-A10001",
+      "machine_id": "MC-5AX-01",
+      "machine_name": "Makino DA300",
+      "work_center_id": "WC-5AX",
+      "connector_type": "mtconnect",
+      "connector_name": "Makino MTConnect Adapter",
+      "connector_endpoint": "https://mes.hesem.local/mtconnect/mc-5ax-01/current",
+      "telemetry_mode": "machine",
+      "heartbeat_sla_seconds": 90,
+      "last_heartbeat_at": "2026-03-29T13:47:00+07:00",
+      "last_signal_at": "2026-03-29T13:47:00+07:00",
+      "connection_status": "healthy",
+      "enabled": true,
+      "updated_at": "2026-03-29T13:47:00+07:00",
+      "updated_by": "system"
+    },
+    {
+      "feed_id": "CNX-202603291645-B20002",
+      "machine_id": "MC-3AX-04",
+      "machine_name": "Brother S700X2",
+      "work_center_id": "WC-3AX",
+      "connector_type": "opcua",
+      "connector_name": "Brother OPC UA Bridge",
+      "connector_endpoint": "opc.tcp://192.168.10.44:4840",
+      "telemetry_mode": "machine",
+      "heartbeat_sla_seconds": 120,
+      "last_heartbeat_at": "2026-03-29T13:38:00+07:00",
+      "last_signal_at": "2026-03-29T13:38:00+07:00",
+      "connection_status": "stale",
+      "enabled": true,
+      "updated_at": "2026-03-29T13:38:00+07:00",
+      "updated_by": "system"
+    },
+    {
+      "feed_id": "CNX-202603291650-C30003",
+      "machine_id": "CMM-01",
+      "machine_name": "Mitutoyo Crysta-Apex",
+      "work_center_id": "WC-QA",
+      "connector_type": "manual_bridge",
+      "connector_name": "CMM Manual Bridge",
+      "connector_endpoint": "manual://cmm-01",
+      "telemetry_mode": "manual",
+      "heartbeat_sla_seconds": 180,
+      "last_heartbeat_at": "2026-03-29T13:05:00+07:00",
+      "last_signal_at": "2026-03-29T13:05:00+07:00",
+      "connection_status": "healthy",
+      "enabled": true,
+      "updated_at": "2026-03-29T13:05:00+07:00",
+      "updated_by": "qa.manager"
+    }
+  ],
+  "machine_signals": [
+    {
+      "signal_id": "SIG-202603291647-1100AA",
+      "machine_id": "MC-5AX-01",
+      "machine_name": "Makino DA300",
+      "work_center_id": "WC-5AX",
+      "source": "mtconnect",
+      "connector_type": "mtconnect",
+      "machine_state": "running",
+      "signal_at": "2026-03-29T13:47:00+07:00",
+      "last_heartbeat_at": "2026-03-29T13:47:00+07:00",
+      "wo_number": "WO-2026-00001",
+      "operator_id": "OPR-001",
+      "current_program_id": "NC_714-1101_REVC_OP10_5AX_V3",
+      "spindle_load_pct": 68,
+      "feed_override_pct": 100,
+      "part_count": 24,
+      "note": "Heartbeat tốt, spindle load ổn định sau prove-out.",
+      "updated_at": "2026-03-29T13:47:00+07:00",
+      "updated_by": "system"
+    },
+    {
+      "signal_id": "SIG-202603291638-2200BB",
+      "machine_id": "MC-3AX-04",
+      "machine_name": "Brother S700X2",
+      "work_center_id": "WC-3AX",
+      "source": "opcua",
+      "connector_type": "opcua",
+      "machine_state": "on_hold",
+      "signal_at": "2026-03-29T13:38:00+07:00",
+      "last_heartbeat_at": "2026-03-29T13:38:00+07:00",
+      "wo_number": "WO-2026-00003",
+      "operator_id": "OPR-014",
+      "current_program_id": "NC_P-1001_REVC_OP10_3AX_V2",
+      "spindle_load_pct": 0,
+      "feed_override_pct": 100,
+      "part_count": 18,
+      "note": "Tín hiệu đang stale vì máy giữ WO sau downtime chờ xác nhận thay dao.",
+      "updated_at": "2026-03-29T13:38:00+07:00",
+      "updated_by": "system"
+    },
+    {
+      "signal_id": "SIG-202603291305-3300CC",
+      "machine_id": "CMM-01",
+      "machine_name": "Mitutoyo Crysta-Apex",
+      "work_center_id": "WC-QA",
+      "source": "manual_bridge",
+      "connector_type": "manual_bridge",
+      "machine_state": "inspection",
+      "signal_at": "2026-03-29T13:05:00+07:00",
+      "last_heartbeat_at": "2026-03-29T13:05:00+07:00",
+      "wo_number": "WO-2026-00002",
+      "operator_id": "QC-002",
+      "current_program_id": "CMM_714-1101_REVC_FAI_V2",
+      "spindle_load_pct": 0,
+      "feed_override_pct": 100,
+      "part_count": 24,
+      "note": "CMM đang dùng cầu nối nhập tay để xác nhận trạng thái inspection.",
+      "updated_at": "2026-03-29T13:05:00+07:00",
       "updated_by": "qa.manager"
     }
   ]

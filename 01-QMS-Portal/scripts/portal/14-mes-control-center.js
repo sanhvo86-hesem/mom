@@ -61,6 +61,15 @@ var EXCEPTION_META = {
   orphan_links:        { vi:'Liên kết mồ côi', en:'Orphan links', icon:'🧷' }
 };
 
+var CONNECTOR_META = {
+  healthy:     { vi:'Kết nối tốt', en:'Healthy', color:'#059669' },
+  delayed:     { vi:'Trễ heartbeat', en:'Delayed', color:'#d97706' },
+  stale:       { vi:'Mất nhịp', en:'Stale', color:'#dc2626' },
+  offline:     { vi:'Offline', en:'Offline', color:'#7f1d1d' },
+  manual_only: { vi:'Cầu nối tay', en:'Manual bridge', color:'#1d4ed8' },
+  disabled:    { vi:'Tắt kết nối', en:'Disabled', color:'#64748b' }
+};
+
 function t(vi, en){ return (typeof lang !== 'undefined' && lang === 'en') ? en : vi; }
 function esc(value){
   var div = document.createElement('div');
@@ -118,8 +127,39 @@ function gateMeta(key){
   var meta = GATE_META[String(key || '').toLowerCase()];
   return meta || { vi:key || '—', en:key || '—', color:'#64748b' };
 }
+function connectorMeta(key){
+  var meta = CONNECTOR_META[String(key || '').toLowerCase()];
+  return meta || { vi:key || '—', en:key || '—', color:'#64748b' };
+}
 function badge(meta){
   return '<span class="mesx-pill" style="--pill:' + meta.color + '">' + esc(t(meta.vi, meta.en)) + '</span>';
+}
+function connectorTypeLabel(type){
+  var map = {
+    mtconnect: ['MTConnect', 'MTConnect'],
+    opcua: ['OPC UA', 'OPC UA'],
+    dnc: ['DNC', 'DNC'],
+    manual_bridge: ['Cầu nối nhập tay', 'Manual bridge'],
+    manual: ['Nhập tay', 'Manual'],
+    disabled: ['Tắt kết nối', 'Disabled']
+  };
+  var item = map[String(type || '').toLowerCase()];
+  return item ? t(item[0], item[1]) : String(type || '—');
+}
+function signalStateLabel(state){
+  var normalized = String(state || '').toLowerCase();
+  if(normalized === 'offline') return t('Offline', 'Offline');
+  var meta = statusMeta(normalized);
+  return t(meta.vi, meta.en);
+}
+function freshnessLabel(seconds, slaSeconds){
+  if(seconds === null || seconds === undefined || seconds === '') return t('Chưa có heartbeat', 'No heartbeat');
+  var value = Number(seconds || 0);
+  if(!isFinite(value)) return t('Không xác định', 'Unknown');
+  if(value < 60) return t('Cách đây ' + Math.round(value) + ' giây', Math.round(value) + 's ago');
+  if(value < 3600) return t('Cách đây ' + Math.round(value / 60) + ' phút', Math.round(value / 60) + 'm ago');
+  var hours = Math.round(value / 3600);
+  return t('Cách đây ' + hours + ' giờ', hours + 'h ago') + (slaSeconds ? ' · SLA ' + slaSeconds + 's' : '');
 }
 function toast(message, type){
   if(typeof window._fhShowToast === 'function') return window._fhShowToast(message, type);
@@ -153,6 +193,7 @@ function defaultSnapshot(){
     maintenance_queue: [],
     progress_reports: [],
     work_center_summary: [],
+    connector_summary: [],
     tooling_alerts: [],
     evidence_gate_queue: []
   };
@@ -201,8 +242,8 @@ function ensureStyles(){
     '.mesx-panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}',
     '.mesx-panel-head h2,.mesx-panel-head h3{margin:0;font-size:18px;color:#0c2d48}',
     '.mesx-panel-head p{margin:4px 0 0;font-size:12px;color:#64748b;line-height:1.68}',
-    '.mesx-center-grid,.mesx-ex-grid,.mesx-machine-grid,.mesx-form-grid{display:grid;gap:12px}',
-    '.mesx-center-grid,.mesx-ex-grid{grid-template-columns:repeat(3,minmax(0,1fr))}',
+    '.mesx-center-grid,.mesx-ex-grid,.mesx-machine-grid,.mesx-form-grid,.mesx-connector-grid{display:grid;gap:12px}',
+    '.mesx-center-grid,.mesx-ex-grid,.mesx-connector-grid{grid-template-columns:repeat(3,minmax(0,1fr))}',
     '.mesx-machine-grid{grid-template-columns:repeat(2,minmax(0,1fr))}',
     '.mesx-form-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}',
     '.mesx-form-grid .full{grid-column:1 / -1}',
@@ -211,6 +252,12 @@ function ensureStyles(){
     '.mesx-center h4{margin:0;font-size:14px;color:#0f172a}',
     '.mesx-center p{margin:4px 0 0;font-size:12px;color:#64748b}',
     '.mesx-center-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}',
+    '.mesx-connector{border:1px solid #e2e8f0;border-radius:18px;padding:14px;background:linear-gradient(180deg,#ffffff 0%,#fbfdff 100%)}',
+    '.mesx-connector-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}',
+    '.mesx-connector h4{margin:0;font-size:14px;color:#0f172a}',
+    '.mesx-connector p{margin:4px 0 0;font-size:12px;color:#64748b;line-height:1.55}',
+    '.mesx-connector-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}',
+    '.mesx-connector-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}',
     '.mesx-mini{padding:10px 12px;border-radius:14px;background:#f8fafc;border:1px solid #edf2f7}',
     '.mesx-mini small{display:block;font-size:10px;font-weight:800;color:#64748b;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}',
     '.mesx-mini strong{display:block;font-size:13px;color:#0f172a}',
@@ -259,8 +306,8 @@ function ensureStyles(){
     '.mesx-detail-table th,.mesx-detail-table td{padding:10px 12px;border-bottom:1px solid #eef2f6;font-size:12px;text-align:left;vertical-align:top}',
     '.mesx-detail-table th{font-size:11px;text-transform:uppercase;color:#64748b;letter-spacing:.08em;font-weight:800;background:#f8fafc}',
     '@media (max-width:1280px){.mesx-hero,.mesx-band,.mesx-main{grid-template-columns:1fr}.mesx-kpi-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}',
-    '@media (max-width:980px){.mesx-kpi-grid,.mesx-center-grid,.mesx-ex-grid,.mesx-machine-grid,.mesx-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}',
-    '@media (max-width:720px){.mesx{padding:18px 16px 28px}.mesx-poster h1{font-size:28px}.mesx-kpi-grid,.mesx-center-grid,.mesx-ex-grid,.mesx-machine-grid,.mesx-form-grid{grid-template-columns:1fr}.mesx-table{min-width:960px}}'
+    '@media (max-width:980px){.mesx-kpi-grid,.mesx-center-grid,.mesx-ex-grid,.mesx-machine-grid,.mesx-form-grid,.mesx-connector-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}',
+    '@media (max-width:720px){.mesx{padding:18px 16px 28px}.mesx-poster h1{font-size:28px}.mesx-kpi-grid,.mesx-center-grid,.mesx-ex-grid,.mesx-machine-grid,.mesx-form-grid,.mesx-connector-grid{grid-template-columns:1fr}.mesx-table{min-width:960px}}'
   ].join('\n');
   document.head.appendChild(style);
 }
@@ -430,6 +477,20 @@ function renderKpiTile(label, value, sub){
 function renderWorkCenterCard(center){
   return '<article class="mesx-center"><div class="mesx-center-top"><div><h4>' + esc(center.work_center_id || '') + '</h4><p>' + esc(center.work_center_name || '') + '</p></div>' + badge((center.down_count || 0) > 0 ? statusMeta('down') : statusMeta('running')) + '</div><div class="mesx-center-metrics"><div class="mesx-mini"><small>' + esc(t('Máy', 'Machines')) + '</small><strong>' + esc(center.machine_count || 0) + '</strong></div><div class="mesx-mini"><small>' + esc(t('WO', 'WO')) + '</small><strong>' + esc(center.wo_count || 0) + '</strong></div><div class="mesx-mini"><small>' + esc(t('OEE', 'OEE')) + '</small><strong>' + esc(fmtPercent(center.oee_pct)) + '</strong></div><div class="mesx-mini"><small>' + esc(t('Gate / Tool', 'Gate / Tool')) + '</small><strong>' + esc((center.gate_missing_count || 0) + ' / ' + (center.tooling_alert_count || 0)) + '</strong></div></div></article>';
 }
+function renderConnectorCard(row){
+  var meta = connectorMeta(row.connector_health || 'offline');
+  var status = statusMeta(row.status || 'idle');
+  return '<article class="mesx-connector">' +
+    '<div class="mesx-connector-top"><div><h4>' + esc(row.machine_id || '') + ' · ' + esc(row.machine_name || '') + '</h4><p>' + esc([connectorTypeLabel(row.connector_type), row.connector_name || '', row.work_center_id || ''].filter(Boolean).join(' · ')) + '</p></div>' + badge(meta) + '</div>' +
+    '<div class="mesx-connector-meta">' +
+      '<div class="mesx-mini"><small>' + esc(t('Heartbeat', 'Heartbeat')) + '</small><strong>' + esc(freshnessLabel(row.signal_freshness_seconds, row.heartbeat_sla_seconds)) + '</strong></div>' +
+      '<div class="mesx-mini"><small>' + esc(t('Trạng thái tín hiệu', 'Signal state')) + '</small><strong>' + esc(signalStateLabel(row.signal_state || row.status || 'idle')) + '</strong></div>' +
+      '<div class="mesx-mini"><small>' + esc(t('WO / chương trình', 'WO / program')) + '</small><strong>' + esc([row.current_program_id || '', row.part_count == null ? '' : ('Parts ' + row.part_count)].filter(Boolean).join(' · ') || '—') + '</strong></div>' +
+      '<div class="mesx-mini"><small>' + esc(t('Spindle / override', 'Spindle / override')) + '</small><strong>' + esc([(row.spindle_load_pct == null ? '' : (Number(row.spindle_load_pct).toFixed(0) + '%')), (row.feed_override_pct == null ? '' : (Number(row.feed_override_pct).toFixed(0) + '%'))].filter(Boolean).join(' · ') || '—') + '</strong></div>' +
+    '</div>' +
+    '<div class="mesx-connector-actions"><span>' + badge(status) + '</span><button type="button" class="mesx-link" data-open-signal-bridge="' + esc(row.machine_id || '') + '">' + esc(t('Cập nhật tín hiệu', 'Update signal')) + '</button></div>' +
+  '</article>';
+}
 function renderExceptionRail(){
   var ex = state.exceptions || {};
   var keys = Object.keys(EXCEPTION_META);
@@ -497,6 +558,7 @@ function renderMachineCard(machine){
   var gate = machine.evidence_gate || {};
   var toolingRows = Array.isArray(machine.tooling_items) ? machine.tooling_items : [];
   var active = machine.active_work_order || {};
+  var connector = connectorMeta(machine.connector_health || 'offline');
   var context = {
     customer_id: active.customer_id || '',
     so_number: active.so_number || '',
@@ -508,7 +570,7 @@ function renderMachineCard(machine){
     work_center_id: machine.work_center_id || '',
     operator_id: active.operator_id || machine.preferred_operator_id || ''
   };
-  return '<article class="mesx-machine"><div class="mesx-machine-head"><div><h4>' + esc(machine.machine_id || '') + ' · ' + esc(machine.machine_name || '') + '</h4><p>' + esc([machine.work_center_id || '', machine.machine_type || '', machine.location || ''].filter(Boolean).join(' · ')) + '</p></div>' + badge(status) + '</div><div class="mesx-machine-grid"><div class="mesx-mini"><small>' + esc(t('WO hiện tại', 'Active WO')) + '</small><strong>' + esc(active.wo_number || '—') + '</strong></div><div class="mesx-mini"><small>' + esc(t('Queue', 'Queue')) + '</small><strong>' + esc((machine.queue_count || 0) + ' ' + t('WO', 'WO')) + '</strong></div><div class="mesx-mini"><small>' + esc(t('OEE', 'OEE')) + '</small><strong>' + esc(fmtPercent(machine.oee_pct)) + '</strong></div><div class="mesx-mini"><small>' + esc(t('Availability', 'Availability')) + '</small><strong>' + esc(fmtPercent(machine.availability_pct)) + '</strong></div><div class="mesx-mini"><small>' + esc(t('Performance', 'Performance')) + '</small><strong>' + esc(fmtPercent(machine.performance_pct)) + '</strong></div><div class="mesx-mini"><small>' + esc(t('Quality', 'Quality')) + '</small><strong>' + esc(fmtPercent(machine.quality_pct)) + '</strong></div></div><div class="mesx-section"><div class="mesx-mini"><small>' + esc(t('Gate chứng cứ', 'Evidence gate')) + '</small><strong>' + esc(t(gate.summary_vi || 'Không yêu cầu', gate.summary_en || 'Not required')) + '</strong></div><div class="mesx-alert-stack">' + (Array.isArray(gate.missing_form_codes) && gate.missing_form_codes.length ? gate.missing_form_codes.map(function(code){ return '<button type="button" class="mesx-link warning" data-open-form="' + esc(code) + '" data-context="' + esc(jsonAttr(context)) + '">' + esc(code) + '</button>'; }).join('') : '<span class="mesx-chip stone">' + esc(t('Không có gate còn thiếu', 'No missing gates')) + '</span>') + '</div></div><div class="mesx-section"><div class="mesx-mini"><small>' + esc(t('Tooling active', 'Active tooling')) + '</small><strong>' + esc((machine.loaded_tool_count || 0) + ' · ' + (machine.tool_alert_count || 0) + ' ' + t('cảnh báo', 'alerts')) + '</strong></div><div class="mesx-alert-stack">' + (toolingRows.length ? toolingRows.slice(0, 3).map(function(item){ return '<button type="button" class="mesx-link ' + ((item.alert_level || '') === 'critical' ? 'danger' : ((item.alert_level || '') === 'warning' ? 'warning' : '')) + '" data-edit-tooling="' + esc(machine.machine_id || '') + '" data-tool-runtime="' + esc(item.tool_runtime_id || '') + '">' + esc((item.tool_id || '') + ' · ' + (item.life_used_pct == null ? '—' : fmtPercent(item.life_used_pct))) + '</button>'; }).join('') : '<span class="mesx-chip stone">' + esc(t('Chưa có runtime tool-life', 'No tool-life runtime')) + '</span>') + '</div></div><div class="mesx-mini-actions" style="margin-top:14px"><button type="button" class="mesx-link" data-report-progress="' + esc(active.wo_number || '') + '"' + (!active.wo_number ? ' disabled' : '') + '>' + esc(t('Báo tiến độ', 'Report progress')) + '</button>' + (machine.open_downtime ? '<button type="button" class="mesx-link danger" data-resolve-downtime="' + esc(machine.open_downtime.downtime_id || '') + '">' + esc(t('Khôi phục downtime', 'Resolve downtime')) + '</button>' : '<button type="button" class="mesx-link warning" data-new-downtime="' + esc(machine.machine_id || '') + '">' + esc(t('Báo dừng máy', 'Log downtime')) + '</button>') + '<button type="button" class="mesx-link" data-new-maintenance="' + esc(machine.machine_id || '') + '">' + esc(t('Tạo bảo trì', 'New maintenance')) + '</button><button type="button" class="mesx-link" data-edit-tooling="' + esc(machine.machine_id || '') + '">' + esc(t('Cập nhật tooling', 'Update tooling')) + '</button><button type="button" class="mesx-link" data-open-form="FRM-521" data-context="' + esc(jsonAttr(context)) + '">' + esc(t('Mở PM form', 'Open PM form')) + '</button></div></article>';
+  return '<article class="mesx-machine"><div class="mesx-machine-head"><div><h4>' + esc(machine.machine_id || '') + ' · ' + esc(machine.machine_name || '') + '</h4><p>' + esc([machine.work_center_id || '', machine.machine_type || '', machine.location || ''].filter(Boolean).join(' · ')) + '</p></div>' + badge(status) + '</div><div class="mesx-machine-grid"><div class="mesx-mini"><small>' + esc(t('WO hiện tại', 'Active WO')) + '</small><strong>' + esc(active.wo_number || '—') + '</strong></div><div class="mesx-mini"><small>' + esc(t('Queue', 'Queue')) + '</small><strong>' + esc((machine.queue_count || 0) + ' ' + t('WO', 'WO')) + '</strong></div><div class="mesx-mini"><small>' + esc(t('OEE', 'OEE')) + '</small><strong>' + esc(fmtPercent(machine.oee_pct)) + '</strong></div><div class="mesx-mini"><small>' + esc(t('Availability', 'Availability')) + '</small><strong>' + esc(fmtPercent(machine.availability_pct)) + '</strong></div><div class="mesx-mini"><small>' + esc(t('Performance', 'Performance')) + '</small><strong>' + esc(fmtPercent(machine.performance_pct)) + '</strong></div><div class="mesx-mini"><small>' + esc(t('Quality', 'Quality')) + '</small><strong>' + esc(fmtPercent(machine.quality_pct)) + '</strong></div><div class="mesx-mini"><small>' + esc(t('Connector', 'Connector')) + '</small><strong>' + esc(connectorTypeLabel(machine.connector_type || 'manual_bridge')) + '</strong><span class="mesx-sub">' + esc(t(connector.vi, connector.en) + ' · ' + freshnessLabel(machine.signal_freshness_seconds, machine.heartbeat_sla_seconds)) + '</span></div><div class="mesx-mini"><small>' + esc(t('Tín hiệu máy', 'Machine signal')) + '</small><strong>' + esc(signalStateLabel(machine.signal_state || machine.status || 'idle')) + '</strong><span class="mesx-sub">' + esc([machine.current_program_id || '', machine.spindle_load_pct == null ? '' : ('Load ' + Number(machine.spindle_load_pct).toFixed(0) + '%'), machine.feed_override_pct == null ? '' : ('FO ' + Number(machine.feed_override_pct).toFixed(0) + '%')].filter(Boolean).join(' · ') || t('Chưa có signal runtime', 'No runtime signal')) + '</span></div></div><div class="mesx-section"><div class="mesx-mini"><small>' + esc(t('Gate chứng cứ', 'Evidence gate')) + '</small><strong>' + esc(t(gate.summary_vi || 'Không yêu cầu', gate.summary_en || 'Not required')) + '</strong></div><div class="mesx-alert-stack">' + (Array.isArray(gate.missing_form_codes) && gate.missing_form_codes.length ? gate.missing_form_codes.map(function(code){ return '<button type="button" class="mesx-link warning" data-open-form="' + esc(code) + '" data-context="' + esc(jsonAttr(context)) + '">' + esc(code) + '</button>'; }).join('') : '<span class="mesx-chip stone">' + esc(t('Không có gate còn thiếu', 'No missing gates')) + '</span>') + '</div></div><div class="mesx-section"><div class="mesx-mini"><small>' + esc(t('Tooling active', 'Active tooling')) + '</small><strong>' + esc((machine.loaded_tool_count || 0) + ' · ' + (machine.tool_alert_count || 0) + ' ' + t('cảnh báo', 'alerts')) + '</strong></div><div class="mesx-alert-stack">' + (toolingRows.length ? toolingRows.slice(0, 3).map(function(item){ return '<button type="button" class="mesx-link ' + ((item.alert_level || '') === 'critical' ? 'danger' : ((item.alert_level || '') === 'warning' ? 'warning' : '')) + '" data-edit-tooling="' + esc(machine.machine_id || '') + '" data-tool-runtime="' + esc(item.tool_runtime_id || '') + '">' + esc((item.tool_id || '') + ' · ' + (item.life_used_pct == null ? '—' : fmtPercent(item.life_used_pct))) + '</button>'; }).join('') : '<span class="mesx-chip stone">' + esc(t('Chưa có runtime tool-life', 'No tool-life runtime')) + '</span>') + '</div></div><div class="mesx-mini-actions" style="margin-top:14px"><button type="button" class="mesx-link" data-report-progress="' + esc(active.wo_number || '') + '"' + (!active.wo_number ? ' disabled' : '') + '>' + esc(t('Báo tiến độ', 'Report progress')) + '</button><button type="button" class="mesx-link" data-open-signal-bridge="' + esc(machine.machine_id || '') + '">' + esc(t('Cập nhật tín hiệu', 'Update signal')) + '</button>' + (machine.open_downtime ? '<button type="button" class="mesx-link danger" data-resolve-downtime="' + esc(machine.open_downtime.downtime_id || '') + '">' + esc(t('Khôi phục downtime', 'Resolve downtime')) + '</button>' : '<button type="button" class="mesx-link warning" data-new-downtime="' + esc(machine.machine_id || '') + '">' + esc(t('Báo dừng máy', 'Log downtime')) + '</button>') + '<button type="button" class="mesx-link" data-new-maintenance="' + esc(machine.machine_id || '') + '">' + esc(t('Tạo bảo trì', 'New maintenance')) + '</button><button type="button" class="mesx-link" data-edit-tooling="' + esc(machine.machine_id || '') + '">' + esc(t('Cập nhật tooling', 'Update tooling')) + '</button><button type="button" class="mesx-link" data-open-form="FRM-521" data-context="' + esc(jsonAttr(context)) + '">' + esc(t('Mở PM form', 'Open PM form')) + '</button></div></article>';
 }
 function renderToolingWatchlist(rows){
   if(!rows.length){
@@ -575,12 +637,13 @@ function render(){
   var rows = filteredDispatch();
   var centers = workCenters();
   var machineWall = Array.isArray(snapshot.machine_wall) ? snapshot.machine_wall : [];
+  var connectors = Array.isArray(snapshot.connector_summary) ? snapshot.connector_summary : [];
   var kpi = snapshot.kpis || {};
 
   state.container.innerHTML = '<div class="mesx">' +
     '<section class="mesx-hero">' +
       '<article class="mesx-poster">' +
-        '<div class="mesx-brand"><div class="mesx-brand-main"><div class="mesx-logo"><img src="./assets/hesem-logo.svg" alt="HESEM"></div><div><div class="mesx-kicker">HESEM CNC MOM / MES</div><h1>' + esc(t('Trung tâm điều hành MES', 'MES Control Center')) + '</h1><p>' + esc(t('Một màn hình duy nhất để điều độ WO, đọc trạng thái máy, khóa gate chứng cứ, bắt cảnh báo tool-life và ra quyết định khôi phục xưởng nhanh theo ngữ cảnh thật.', 'One production surface to dispatch WO, read machine status, enforce evidence gates, catch tool-life alerts, and drive recovery decisions in real shop-floor context.')) + '</p><div class="mesx-facts"><span class="mesx-fact">⏱ ' + esc(currentStamp()) + '</span><span class="mesx-fact">📦 ' + esc((kpi.wo_active || 0) + ' ' + t('WO đang hoạt động', 'active WO')) + '</span><span class="mesx-fact">🏭 ' + esc((kpi.machines_total || 0) + ' ' + t('tài sản theo dõi', 'assets tracked')) + '</span><span class="mesx-fact">📊 OEE ' + esc(fmtPercent(kpi.oee_pct)) + '</span></div></div></div><div>' + badge((kpi.machines_down || 0) > 0 ? statusMeta('down') : statusMeta('running')) + '</div></div>' +
+        '<div class="mesx-brand"><div class="mesx-brand-main"><div class="mesx-logo"><img src="./assets/hesem-logo.svg" alt="HESEM"></div><div><div class="mesx-kicker">HESEM CNC MOM / MES</div><h1>' + esc(t('Trung tâm điều hành MES', 'MES Control Center')) + '</h1><p>' + esc(t('Một màn hình duy nhất để điều độ WO, đọc trạng thái máy, khóa gate chứng cứ, bắt cảnh báo tool-life và ra quyết định khôi phục xưởng nhanh theo ngữ cảnh thật.', 'One production surface to dispatch WO, read machine status, enforce evidence gates, catch tool-life alerts, and drive recovery decisions in real shop-floor context.')) + '</p><div class="mesx-facts"><span class="mesx-fact">⏱ ' + esc(currentStamp()) + '</span><span class="mesx-fact">📦 ' + esc((kpi.wo_active || 0) + ' ' + t('WO đang hoạt động', 'active WO')) + '</span><span class="mesx-fact">🏭 ' + esc((kpi.machines_total || 0) + ' ' + t('tài sản theo dõi', 'assets tracked')) + '</span><span class="mesx-fact">🔌 ' + esc((kpi.connectors_healthy || 0) + '/' + (kpi.connectors_total || 0) + ' ' + t('kết nối ổn', 'healthy links')) + '</span><span class="mesx-fact">📊 OEE ' + esc(fmtPercent(kpi.oee_pct)) + '</span></div></div></div><div>' + badge((kpi.machines_down || 0) > 0 ? statusMeta('down') : statusMeta('running')) + '</div></div>' +
         '<div class="mesx-actions"><button type="button" class="mesx-btn primary" id="mes-refresh">⟳ ' + esc(t('Làm mới runtime', 'Refresh runtime')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-orders">📦 ' + esc(t('Quản lý đơn hàng', 'Order management')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-master">🧭 ' + esc(t('Dữ liệu nền', 'Master data')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-forms">📋 ' + esc(t('Kiểm soát chứng cứ', 'Evidence control')) + '</button></div>' +
       '</article>' +
       '<aside class="mesx-side">' +
@@ -588,8 +651,11 @@ function render(){
         '<article class="mesx-card"><div class="mesx-kpi-grid">' +
           renderKpiTile(t('Máy đang chạy', 'Machines running'), kpi.machines_running || 0, t('Bao gồm chạy, setup và inspection', 'Running, setup, and inspection')) +
           renderKpiTile(t('Máy dừng', 'Machines down'), kpi.machines_down || 0, t('Downtime chưa khôi phục', 'Unresolved downtime')) +
+          renderKpiTile(t('Kết nối khỏe', 'Healthy connectors'), kpi.connectors_healthy || 0, t('Heartbeat còn tươi hoặc chỉ trễ nhẹ', 'Fresh heartbeat or only slightly delayed')) +
+          renderKpiTile(t('Kết nối rủi ro', 'Connector risk'), kpi.connectors_stale || 0, t('Stale hoặc offline cần xử lý ngay', 'Stale or offline, needs action')) +
           renderKpiTile(t('Tooling cảnh báo', 'Tooling alerts'), kpi.tooling_alerts || 0, t('Tool gần tới hạn hoặc lệch offset', 'Tool near limit or offset risk')) +
           renderKpiTile(t('WO thiếu gate', 'WO missing gates'), kpi.wo_gate_missing || 0, t('Cần bổ sung chứng cứ bắt buộc', 'Evidence gate completion required')) +
+          renderKpiTile(t('Cầu nối tay', 'Manual bridges'), kpi.manual_bridges || 0, t('Máy đang cập nhật bằng manual bridge', 'Machines currently updated through the manual bridge')) +
           renderKpiTile('Availability', fmtPercent(kpi.availability_pct), t('Thời gian sẵn sàng của máy', 'Machine readiness time')) +
           renderKpiTile('Performance', fmtPercent(kpi.performance_pct), t('So với takt / runtime kế hoạch', 'Against planned runtime')) +
           renderKpiTile('Quality', fmtPercent(kpi.quality_pct), t('Tỷ lệ chi tiết đạt', 'Good-part ratio')) +
@@ -601,6 +667,7 @@ function render(){
       '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Work center radar', 'Work center radar')) + '</h2><p>' + esc(t('Nhìn một hàng là biết cell nào đang nghẽn vì máy dừng, OEE thấp, thiếu gate hay tooling warning.', 'See at a glance which cell is blocked by downtime, low OEE, missing gates, or tooling warnings.')) + '</p></div></div><div class="mesx-center-grid">' + (centers.length ? centers.map(renderWorkCenterCard).join('') : '<div class="mesx-empty"><strong>' + esc(t('Chưa có work center', 'No work centers yet')) + '</strong>' + esc(t('Kiểm tra master data hoặc seed runtime.', 'Check the master data or runtime seed.')) + '</div>') + '</div></article>' +
       '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Ngoại lệ cần xử lý', 'Exceptions to handle')) + '</h2><p>' + esc(t('Nhóm các ngoại lệ ảnh hưởng trực tiếp đến truy xuất, giao hàng, upload và evidence readiness.', 'Grouped exceptions that directly affect traceability, delivery, uploads, and evidence readiness.')) + '</p></div></div>' + renderExceptionRail() + '</article>' +
     '</section>' +
+    '<section class="mesx-band" style="margin-top:18px"><article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Giám sát kết nối máy', 'Machine connectivity overview')) + '</h2><p>' + esc(t('Theo dõi từng máy đang lấy trạng thái từ MTConnect, OPC UA hay cầu nối nhập tay; nhịp heartbeat nào stale sẽ nổi lên trước để không bị mù dữ liệu shop-floor.', 'Track whether each machine is reading state from MTConnect, OPC UA, or a manual bridge; stale heartbeats rise to the top so the shop floor never goes blind.')) + '</p></div></div><div class="mesx-connector-grid">' + (connectors.length ? connectors.map(renderConnectorCard).join('') : '<div class="mesx-empty"><strong>' + esc(t('Chưa có connector runtime', 'No connector runtime yet')) + '</strong>' + esc(t('Hãy bơm tín hiệu pilot hoặc khai báo metadata kết nối cho máy.', 'Seed a pilot signal or declare connector metadata for the machine first.')) + '</div>') + '</div></article><article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Điểm rơi vận hành', 'Runtime guidance')) + '</h2><p>' + esc(t('Luôn ưu tiên xử lý theo thứ tự: stale connector -> downtime -> gate chứng cứ -> tooling alert. Điều này giúp OEE và traceability không lệch nhau.', 'Always triage in this order: stale connector -> downtime -> evidence gate -> tooling alert. This keeps OEE and traceability aligned.')) + '</p></div></div><div class="mesx-list"><div class="mesx-list-item"><h4>' + esc(t('Heartbeat stale là blocker ẩn', 'Stale heartbeat is a hidden blocker')) + '</h4><p>' + esc(t('Nếu máy vẫn chạy nhưng connector stale, OEE và dispatch có thể đẹp giả. Hãy cập nhật tín hiệu hoặc khôi phục adapter trước khi tin vào số liệu.', 'If the machine keeps running while the connector is stale, OEE and dispatch can look falsely healthy. Update the signal or restore the adapter before trusting the numbers.')) + '</p></div><div class="mesx-list-item"><h4>' + esc(t('Cầu nối tay là chế độ chuyển tiếp', 'Manual bridge is a transition mode')) + '</h4><p>' + esc(t('Dùng manual bridge cho CMM hoặc pilot machine là hợp lý, nhưng phải nhìn rõ máy nào còn đang phụ thuộc nhập tay để ưu tiên tự động hóa tiếp.', 'Using the manual bridge for a CMM or a pilot machine is acceptable, but operators must clearly see which assets still depend on manual input so automation can be prioritized next.')) + '</p></div></div></article></section>' +
     '<section class="mesx-main">' +
       '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Dispatch board theo Work Order', 'Work Order dispatch board')) + '</h2><p>' + esc(t('Lọc theo work center và trạng thái, sau đó báo tiến độ hoặc mở đúng form chứng cứ mà không phải nhập tay context.', 'Filter by work center and status, then report progress or launch the correct evidence form without typing context by hand.')) + '</p></div></div><div class="mesx-toolbar"><input class="mesx-input search" id="mes-search" type="search" value="' + esc(state.search) + '" placeholder="' + esc(t('Tìm WO / Part / máy / khách hàng...', 'Search WO / part / machine / customer...')) + '"><select class="mesx-select" id="mes-filter-center"><option value="">' + esc(t('Tất cả work center', 'All work centers')) + '</option>' + centers.map(function(center){ return '<option value="' + esc(center.work_center_id || '') + '"' + (state.workCenter === center.work_center_id ? ' selected' : '') + '>' + esc((center.work_center_id || '') + ' · ' + (center.work_center_name || '')) + '</option>'; }).join('') + '</select><select class="mesx-select" id="mes-filter-status"><option value="">' + esc(t('Tất cả trạng thái', 'All statuses')) + '</option>' + ['scheduled','setup','running','inspection','on_hold','completed'].map(function(key){ return '<option value="' + esc(key) + '"' + (state.dispatchStatus === key ? ' selected' : '') + '>' + esc(t(statusMeta(key).vi, statusMeta(key).en)) + '</option>'; }).join('') + '</select></div>' + renderDispatchTable(rows) + '</article>' +
       '<div class="mesx-stack"><article class="mesx-panel"><div class="mesx-panel-head"><div><h3>' + esc(t('Machine wall', 'Machine wall')) + '</h3><p>' + esc(t('Từng máy hiển thị tình trạng, OEE, gate chứng cứ và tool-life để trưởng ca xử lý ngay tại chỗ.', 'Each machine shows state, OEE, evidence gate, and tool-life so supervisors can act directly on the floor.')) + '</p></div></div><div class="mesx-machine-wall">' + (machineWall.length ? machineWall.map(renderMachineCard).join('') : '<div class="mesx-empty"><strong>' + esc(t('Chưa có machine wall', 'No machine wall data')) + '</strong>' + esc(t('Hãy khai báo máy trong master data trước.', 'Define machines in master data first.')) + '</div>') + '</div></article></div>' +
@@ -663,9 +730,73 @@ function bind(){
   Array.prototype.forEach.call(state.container.querySelectorAll('[data-edit-tooling]'), function(button){
     button.onclick = function(){ openToolingModal(button.getAttribute('data-edit-tooling') || '', button.getAttribute('data-tool-runtime') || ''); };
   });
+  Array.prototype.forEach.call(state.container.querySelectorAll('[data-open-signal-bridge]'), function(button){
+    button.onclick = function(){ openSignalBridgeModal(button.getAttribute('data-open-signal-bridge') || ''); };
+  });
   Array.prototype.forEach.call(state.container.querySelectorAll('[data-open-exception]'), function(button){
     button.onclick = function(){ openExceptionDetail(button.getAttribute('data-open-exception') || ''); };
   });
+}
+
+function openSignalBridgeModal(machineId){
+  var machine = machineById(machineId);
+  if(!machine){ toast(t('Không tìm thấy máy để cập nhật tín hiệu.', 'Could not find the machine for signal update.'), 'error'); return; }
+  var woRows = workOrderOptions(machineId);
+  var operators = operatorOptions(machine.work_center_id || '');
+  showModal(
+    t('Cập nhật connector / tín hiệu máy', 'Update connector / machine signal'),
+    (machine.machine_id || '') + ' · ' + (machine.machine_name || '') + ' · ' + connectorTypeLabel(machine.connector_type || 'manual_bridge'),
+    '<div class="mesx-form-grid">' +
+      fieldDisplay(t('Work center', 'Work center'), machine.work_center_name || machine.work_center_id || '—') +
+      fieldDisplay(t('Heartbeat gần nhất', 'Last heartbeat'), freshnessLabel(machine.signal_freshness_seconds, machine.heartbeat_sla_seconds)) +
+      editableField('mes-sig-connector-type', t('Loại connector', 'Connector type'), '<select class="mesx-select" id="mes-sig-connector-type"><option value="mtconnect"' + ((machine.connector_type || '') === 'mtconnect' ? ' selected' : '') + '>MTConnect</option><option value="opcua"' + ((machine.connector_type || '') === 'opcua' ? ' selected' : '') + '>OPC UA</option><option value="dnc"' + ((machine.connector_type || '') === 'dnc' ? ' selected' : '') + '>DNC</option><option value="manual_bridge"' + ((machine.connector_type || '') === 'manual_bridge' ? ' selected' : '') + '>' + esc(t('Cầu nối nhập tay', 'Manual bridge')) + '</option><option value="disabled"' + ((machine.connector_type || '') === 'disabled' ? ' selected' : '') + '>' + esc(t('Tắt kết nối', 'Disabled')) + '</option></select>') +
+      editableField('mes-sig-state', t('Trạng thái máy', 'Machine state'), '<select class="mesx-select" id="mes-sig-state"><option value="running"' + ((machine.signal_state || machine.status || '') === 'running' ? ' selected' : '') + '>' + esc(t('Đang chạy', 'Running')) + '</option><option value="setup"' + ((machine.signal_state || machine.status || '') === 'setup' ? ' selected' : '') + '>' + esc(t('Đang setup', 'Setup')) + '</option><option value="inspection"' + ((machine.signal_state || machine.status || '') === 'inspection' ? ' selected' : '') + '>' + esc(t('Đang kiểm tra', 'Inspection')) + '</option><option value="on_hold"' + ((machine.signal_state || machine.status || '') === 'on_hold' ? ' selected' : '') + '>' + esc(t('Tạm dừng', 'On hold')) + '</option><option value="idle"' + ((machine.signal_state || machine.status || '') === 'idle' ? ' selected' : '') + '>' + esc(t('Rảnh', 'Idle')) + '</option><option value="maintenance"' + ((machine.signal_state || machine.status || '') === 'maintenance' ? ' selected' : '') + '>' + esc(t('Bảo trì', 'Maintenance')) + '</option><option value="down"' + ((machine.signal_state || machine.status || '') === 'down' ? ' selected' : '') + '>' + esc(t('Dừng máy', 'Down')) + '</option></select>') +
+      editableField('mes-sig-wo', t('WO hiện hành', 'Current WO'), '<select class="mesx-select" id="mes-sig-wo">' + renderSelectOptions(woRows, 'wo_number', function(item){ return [item.wo_number, item.operation_desc, item.part_number].filter(Boolean).join(' · '); }, (machine.active_work_order || {}).wo_number || '', t('Không gắn WO', 'No WO linked')) + '</select>') +
+      editableField('mes-sig-operator', t('Người vận hành', 'Operator'), '<select class="mesx-select" id="mes-sig-operator">' + renderSelectOptions(operators, 'operator_id', function(item){ return [item.operator_id, item.operator_name].filter(Boolean).join(' · '); }, (machine.active_work_order || {}).operator_id || machine.preferred_operator_id || '', t('Không gắn operator', 'No operator linked')) + '</select>') +
+      editableField('mes-sig-heartbeat', t('Heartbeat / signal time', 'Heartbeat / signal time'), '<input class="mesx-input" id="mes-sig-heartbeat" type="datetime-local" value="' + esc(nowInputValue()) + '">') +
+      editableField('mes-sig-program', t('NC / chương trình', 'NC / program'), '<input class="mesx-input" id="mes-sig-program" type="text" value="' + esc(machine.current_program_id || '') + '" placeholder="' + esc(t('Ví dụ: NC_714-1101_REVC_OP10_5AX_V3', 'Example: NC_714-1101_REVC_OP10_5AX_V3')) + '">') +
+      editableField('mes-sig-spindle', t('Spindle load (%)', 'Spindle load (%)'), '<input class="mesx-input" id="mes-sig-spindle" type="number" min="0" max="100" value="' + esc(machine.spindle_load_pct == null ? '' : Number(machine.spindle_load_pct).toFixed(0)) + '">') +
+      editableField('mes-sig-override', t('Feed override (%)', 'Feed override (%)'), '<input class="mesx-input" id="mes-sig-override" type="number" min="0" max="200" value="' + esc(machine.feed_override_pct == null ? '' : Number(machine.feed_override_pct).toFixed(0)) + '">') +
+      editableField('mes-sig-count', t('Part count', 'Part count'), '<input class="mesx-input" id="mes-sig-count" type="number" min="0" value="' + esc(machine.part_count == null ? '' : Number(machine.part_count)) + '">') +
+      editableField('mes-sig-note', t('Ghi chú connector', 'Connector note'), '<textarea class="mesx-textarea" id="mes-sig-note" placeholder="' + esc(t('Ví dụ: heartbeat pilot từ adapter, line tạm mất tín hiệu, đang fallback manual bridge...', 'Example: pilot heartbeat from adapter, line temporarily lost signal, falling back to manual bridge...')) + '"></textarea>', true) +
+      '<div class="full mesx-modal-foot"><button type="button" class="mesx-btn ghost" data-modal-cancel>↩ ' + esc(t('Hủy', 'Cancel')) + '</button><button type="button" class="mesx-btn primary" data-modal-submit>📡 ' + esc(t('Lưu tín hiệu', 'Save signal')) + '</button></div>' +
+    '</div>',
+    function(modal, submit){
+      submit.disabled = true;
+      var heartbeat = (modal.querySelector('#mes-sig-heartbeat') || {}).value || '';
+      var connectorType = (modal.querySelector('#mes-sig-connector-type') || {}).value || machine.connector_type || 'manual_bridge';
+      var connectorName = connectorType === (machine.connector_type || '') ? (machine.connector_name || '') : ((machine.machine_name || machine.machine_id || 'Machine') + ' ' + connectorTypeLabel(connectorType));
+      var connectorEndpoint = connectorType === (machine.connector_type || '') ? (machine.connector_endpoint || '') : (connectorType === 'manual_bridge' ? ('manual://' + String(machine.machine_id || '').toLowerCase()) : '');
+      api('mes_machine_signal_upsert', {
+        machine_id: machine.machine_id || '',
+        connector_type: connectorType,
+        connector_name: connectorName,
+        connector_endpoint: connectorEndpoint,
+        telemetry_mode: connectorType === 'manual_bridge' ? 'manual' : (connectorType === 'disabled' ? 'disabled' : 'machine'),
+        heartbeat_sla_seconds: machine.heartbeat_sla_seconds || 120,
+        machine_state: (modal.querySelector('#mes-sig-state') || {}).value || 'idle',
+        signal_at: heartbeat,
+        last_heartbeat_at: heartbeat,
+        wo_number: (modal.querySelector('#mes-sig-wo') || {}).value || '',
+        operator_id: (modal.querySelector('#mes-sig-operator') || {}).value || '',
+        current_program_id: (modal.querySelector('#mes-sig-program') || {}).value || '',
+        spindle_load_pct: (modal.querySelector('#mes-sig-spindle') || {}).value || '',
+        feed_override_pct: (modal.querySelector('#mes-sig-override') || {}).value || '',
+        part_count: (modal.querySelector('#mes-sig-count') || {}).value || '',
+        note: (modal.querySelector('#mes-sig-note') || {}).value || ''
+      }, 'POST').then(function(resp){
+        if(!resp || !resp.ok) throw new Error((resp && resp.error) || 'signal_failed');
+        state.snapshot = resp.data || state.snapshot;
+        toast(t('Đã cập nhật connector và tín hiệu máy.', 'Connector and machine signal updated.'), 'success');
+        closeModal();
+        render();
+      }).catch(function(error){
+        toast(t('Không thể cập nhật tín hiệu máy.', 'Could not update the machine signal.'), 'error');
+        if(window.console) console.error(error);
+      }).finally(function(){ submit.disabled = false; });
+    }
+  );
+  bindModalButtons();
 }
 
 function openProgressModal(woNumber){

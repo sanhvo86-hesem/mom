@@ -148,6 +148,11 @@ var ENTITY_CONFIG = {
       { key:'work_center_id', type:'lookup', entity:'work_centers', required:true, label:'Work center' },
       { key:'machine_type', type:'select', required:true, label:'Loại máy', options:['5-axis','3-axis','turning','mill-turn','cmm','washing','support'] },
       { key:'location', type:'text', label:'Vị trí máy' },
+      { key:'telemetry_mode', type:'select', label:'Chế độ telemetry', options:['machine','manual','disabled'] },
+      { key:'connector_type', type:'select', label:'Kiểu connector', options:['mtconnect','opcua','dnc','manual_bridge','disabled'] },
+      { key:'connector_name', type:'text', label:'Tên connector' },
+      { key:'connector_endpoint', type:'text', label:'Endpoint / adapter' },
+      { key:'heartbeat_sla_seconds', type:'number', label:'Heartbeat SLA (giây)' },
       { key:'preferred_operator_id', type:'lookup', entity:'operators', label:'Người vận hành ưu tiên' },
       { key:'status', type:'select', required:true, label:'Trạng thái', options:['active','idle','maintenance','down','blocked','retired'] },
       { key:'last_pm_date', type:'date', label:'Ngày PM gần nhất' },
@@ -271,7 +276,12 @@ function _defaultDraft(entity){
   if(entity === 'revisions') draft.status = 'released';
   if(entity === 'capas') draft.status = 'open';
   if(entity === 'work_centers') draft.status = 'active';
-  if(entity === 'machines') draft.status = 'active';
+  if(entity === 'machines') {
+    draft.status = 'active';
+    draft.telemetry_mode = 'machine';
+    draft.connector_type = 'mtconnect';
+    draft.heartbeat_sla_seconds = '120';
+  }
   if(entity === 'operators') draft.status = 'active';
   if(entity === 'tooling_assets') { draft.status = 'active'; draft.warning_pct = '80'; draft.critical_pct = '95'; }
   return draft;
