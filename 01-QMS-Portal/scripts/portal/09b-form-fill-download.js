@@ -16,8 +16,28 @@ var state = {
   lookupInstances: {},
   activeDraftKey: '',
   hasLocalDraft: false,
-  loadedServerEntryKey: ''
+  loadedServerEntryKey: '',
+  quickAllocDept: '',
+  quickAllocNotes: '',
+  quickAllocBusy: false
 };
+
+var _recordTypes = {};
+var _formToRecordType = {};
+var _quickAllocContextValues = {};
+
+var QA_DEPARTMENTS = [
+  { value:'QA',  label:'Đảm bảo chất lượng', labelEn:'Quality Assurance' },
+  { value:'PRO', label:'Sản xuất', labelEn:'Production' },
+  { value:'ENG', label:'Kỹ thuật', labelEn:'Engineering' },
+  { value:'SCM', label:'Chuỗi cung ứng', labelEn:'Supply Chain' },
+  { value:'HR',  label:'Nhân sự & Đào tạo', labelEn:'HR & Training' },
+  { value:'EXE', label:'Ban giám đốc', labelEn:'Executive / Management' },
+  { value:'SAL', label:'Kinh doanh', labelEn:'Sales' },
+  { value:'WH',  label:'Kho vận', labelEn:'Warehouse / Logistics' },
+  { value:'IT',  label:'Công nghệ thông tin', labelEn:'IT / Digital' },
+  { value:'EHS', label:'An toàn & Môi trường', labelEn:'EHS / Safety' }
+];
 
 function t(vi, en){ return (typeof lang !== 'undefined' && lang === 'en') ? en : vi; }
 function esc(value){ var d=document.createElement('div'); d.appendChild(document.createTextNode(String(value == null ? '' : value))); return d.innerHTML; }
@@ -130,6 +150,29 @@ function flattenOrders(list){
 function ensureOrders(){
   if(state.orders.sales_orders.length || state.orders.job_orders.length || state.orders.work_orders.length) return Promise.resolve(state.orders);
   return api('order_hierarchy', {}, 'GET').then(function(resp){ state.orders = flattenOrders((resp && (resp.hierarchy || resp.data)) || []); return state.orders; }).catch(function(){ state.orders = { sales_orders: [], job_orders: [], work_orders: [] }; return state.orders; });
+}
+
+function ensureRecordTypes(){
+  if(Object.keys(_recordTypes).length) return Promise.resolve();
+  return api('config_record_types', {}, 'GET').then(function(resp){
+    _recordTypes = resp && resp.record_types ? resp.record_types : {};
+    _formToRecordType = {};
+    Object.keys(_recordTypes).forEach(function(code){
+      var linked = (_recordTypes[code] || {}).linked_form;
+      if(linked) _formToRecordType[linked] = code;
+    });
+  }).catch(function(){ _recordTypes = {}; _formToRecordType = {}; });
+}
+
+function detectRecordType(form){
+  if(!form) return '';
+  return _formToRecordType[form.form_code] || '';
+}
+
+function detectDepartment(form){
+  var rt = detectRecordType(form);
+  if(rt && _recordTypes[rt]) return _recordTypes[rt].department_owner || '';
+  return '';
 }
 
 function normalizeForms(forms){
@@ -323,8 +366,103 @@ function renderSidebar(selected){
   return '<aside class="ecf-sidebar"><div class="ecf-head"><div><h2>' + esc(t('Chọn form', 'Select a form')) + '</h2><p>' + esc(t('Chuyển nhanh giữa form online và form offline đã được kiểm soát phiên bản.', 'Switch between online and offline forms governed by the same runtime.')) + '</p></div></div><input id="ecf-form-search" class="ecf-search" type="search" value="' + esc(state.formSearch) + '" placeholder="' + esc(t('Tìm form theo mã, tên, SOP...', 'Search form by code, title, SOP...')) + '"><div class="ecf-form-list">' + rows.map(function(form){ return '<button type="button" class="ecf-form-card' + (selected && selected.form_code === form.form_code ? ' active' : '') + '" data-form-code="' + esc(form.form_code) + '"><div class="ecf-form-top"><span class="ecf-form-badge">' + esc(form.form_code) + '</span><span class="ecf-mode ' + (form.online === false ? 'offline' : 'online') + '">' + esc(form.online === false ? t('Offline', 'Offline') : t('Online', 'Online')) + '</span></div><div class="ecf-form-title">' + esc(form.title_vi || form.title || form.form_code) + '</div><div class="ecf-meta">' + esc([form.version || 'V1', form.sop_ref || '', form.category || 'other'].filter(Boolean).join(' · ')) + '</div></button>'; }).join('') + '</div></aside>';
 }
 
+function renderQuickAllocate(form){
+  var rt = detectRecordType(form);
+  var rtCfg = rt ? (_recordTypes[rt] || {}) : {};
+  var defaultDept = state.quickAllocDept || detectDepartment(form) || '';
+  var isOffline = form.online === false;
+  var actionLabel = isOffline ? t('Cấp mã & tải form', 'Allocate & download') : t('Cấp mã & tiếp tục', 'Allocate & continue');
+  var busy = state.quickAllocBusy;
+
+  var html = '<div class="ecf-card" style="border:2px solid #3b82f6;background:#f0f7ff">' +
+    '<div class="ecf-panel-head" style="border-bottom:none;background:transparent;padding-bottom:0">' +
+      '<h3 style="color:#1e40af">' + esc(t('Cấp mã nhanh cho form này', 'Quick allocate for this form')) + '</h3>' +
+      '<p>' + esc(t('Hệ thống tự phát hiện loại hồ sơ và phòng ban từ form. Chọn ngữ cảnh nếu cần, rồi bấm nút bên dưới.', 'Record type and department are auto-detected from the form. Add context if needed, then click below.')) + '</p>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;padding:0 16px">' +
+      '<div><label class="ecf-label">' + esc(t('Loại hồ sơ', 'Record type')) + '</label>' +
+        '<input class="ecf-input" value="' + esc(rt ? (rt + ' · ' + (rtCfg.label || rt)) : t('Không xác định', 'Unknown')) + '" readonly style="background:#e2e8f0;cursor:not-allowed">' +
+      '</div>' +
+      '<div><label class="ecf-label">' + esc(t('Phòng ban', 'Department')) + '</label>' +
+        '<select class="ecf-select" id="ecf-qa-dept">' + QA_DEPARTMENTS.map(function(d){
+          return '<option value="' + d.value + '"' + (d.value === defaultDept ? ' selected' : '') + '>' + esc(t(d.label, d.labelEn)) + '</option>';
+        }).join('') + '</select>' +
+      '</div>' +
+      '<div><label class="ecf-label">' + esc(t('Ghi chú', 'Note')) + '</label>' +
+        '<input class="ecf-input" id="ecf-qa-notes" type="text" value="' + esc(state.quickAllocNotes || '') + '" placeholder="' + esc(t('Tùy chọn', 'Optional')) + '">' +
+      '</div>' +
+    '</div>' +
+    '<div style="display:flex;gap:10px;padding:12px 16px 16px;justify-content:flex-end;align-items:center">' +
+      (rt ? '' : '<span style="font-size:11px;color:#dc2626;margin-right:auto">' + esc(t('Không tìm thấy loại hồ sơ liên kết. Hãy dùng tab Trợ lý tạo mã.', 'No linked record type found. Use the Record ID Assistant tab.')) + '</span>') +
+      '<button type="button" class="ecf-btn primary" id="ecf-quick-allocate"' + (busy || !rt ? ' disabled' : '') + ' style="min-width:200px">' +
+        (busy ? esc(t('Đang xử lý...', 'Processing...')) : esc(actionLabel)) +
+      '</button>' +
+    '</div>' +
+  '</div>';
+  return html;
+}
+
+function quickAllocate(form){
+  if(state.quickAllocBusy) return;
+  var rt = detectRecordType(form);
+  if(!rt){ toast(t('Không xác định loại hồ sơ cho form này.', 'Cannot determine record type for this form.'), 'error'); return; }
+  var dept = state.quickAllocDept || detectDepartment(form) || 'QA';
+  var notes = (state.quickAllocNotes || '').trim();
+  var masterContext = {};
+  if(window._fhState && window._fhState.pendingContext) masterContext = window._fhState.pendingContext;
+
+  state.quickAllocBusy = true;
+  render(state.container);
+
+  window.AllocationTracker.allocate(rt, dept, {
+    year: new Date().getFullYear(),
+    form_code: form.form_code,
+    notes: notes,
+    master_context: masterContext,
+    linked_order_id: masterContext.wo_number || masterContext.jo_number || masterContext.so_number || ''
+  }).then(function(resp){
+    state.quickAllocBusy = false;
+    state.quickAllocNotes = '';
+    if(!resp || !resp.ok){
+      toast(t('Không thể cấp mã hồ sơ.', 'Could not allocate record ID.'), 'error');
+      render(state.container);
+      return;
+    }
+    toast(t('Đã cấp mã: ', 'Allocated: ') + (resp.record_id || ''), 'success');
+    state.selectedAllocationId = resp.allocation_id || '';
+    state.pendingRecordId = resp.record_id || '';
+    return refreshAllocations().then(function(){
+      return preloadSelectedOnlineEntry();
+    }).then(function(){
+      render(state.container);
+      if(form.online === false){
+        setTimeout(function(){
+          var downloadBtn = document.getElementById('ecf-download-offline');
+          if(downloadBtn) downloadBtn.click();
+        }, 300);
+      }
+    });
+  }).catch(function(){
+    state.quickAllocBusy = false;
+    toast(t('Lỗi kết nối khi cấp mã.', 'Connection error during allocation.'), 'error');
+    render(state.container);
+  });
+}
+
 function renderAllocationPanel(form){
-  return '<section class="ecf-card"><div class="ecf-panel-head"><h3>' + esc(t('Mã hồ sơ đã cấp cho form này', 'Allocated record IDs for this form')) + '</h3><p>' + esc(t('Chọn allocation để điền online hoặc tải gói Excel có hidden metadata kiểm soát.', 'Pick an allocation to fill online or download the governed Excel package with hidden metadata.')) + '</p></div>' + ((state.allocations || []).length ? '<div class="ecf-alloc-list">' + state.allocations.map(function(allocation){ var ctx = allocation.master_context || {}; return '<article class="ecf-alloc-card' + (String(allocation.allocation_id || '') === String(state.selectedAllocationId || '') ? ' active' : '') + '" data-allocation-id="' + esc(allocation.allocation_id || '') + '"><div class="ecf-alloc-top"><div><div class="ecf-record-id">' + esc(allocation.record_id || '') + '</div><div class="ecf-meta">' + esc(allocation.form_revision || form.version || 'V1') + '</div></div><div>' + (window.AllocationTracker ? window.AllocationTracker.renderStatusBadge(allocation.status || 'allocated') : esc(allocation.status || 'allocated')) + '</div></div><div class="ecf-meta">' + esc([allocation.department || '', ctx.customer_id || '', ctx.so_number || '', ctx.jo_number || '', ctx.wo_number || '', ctx.part_number || '', ctx.part_revision || ''].filter(Boolean).join(' · ') || t('Chưa gắn ngữ cảnh master data', 'No governed context yet')) + '</div></article>'; }).join('') + '</div>' : '<div class="ecf-empty"><strong>' + esc(t('Chưa có allocation cho form này', 'No allocation for this form yet')) + '</strong>' + esc(t('Hãy sang tab Trợ lý tạo mã để cấp mã hồ sơ trước khi điền hoặc tải form.', 'Open the Record ID Assistant first to allocate a record ID before filling or downloading this form.')) + '</div>') + '</section>';
+  var hasAllocations = (state.allocations || []).length > 0;
+  var html = '<section class="ecf-card"><div class="ecf-panel-head"><h3>' + esc(t('Mã hồ sơ đã cấp cho form này', 'Allocated record IDs for this form')) + '</h3><p>' + esc(t('Chọn allocation để điền online hoặc tải gói Excel có hidden metadata kiểm soát.', 'Pick an allocation to fill online or download the governed Excel package with hidden metadata.')) + '</p></div>';
+
+  if(hasAllocations){
+    html += '<div class="ecf-alloc-list">' + state.allocations.map(function(allocation){ var ctx = allocation.master_context || {}; return '<article class="ecf-alloc-card' + (String(allocation.allocation_id || '') === String(state.selectedAllocationId || '') ? ' active' : '') + '" data-allocation-id="' + esc(allocation.allocation_id || '') + '"><div class="ecf-alloc-top"><div><div class="ecf-record-id">' + esc(allocation.record_id || '') + '</div><div class="ecf-meta">' + esc(allocation.form_revision || form.version || 'V1') + '</div></div><div>' + (window.AllocationTracker ? window.AllocationTracker.renderStatusBadge(allocation.status || 'allocated') : esc(allocation.status || 'allocated')) + '</div></div><div class="ecf-meta">' + esc([allocation.department || '', ctx.customer_id || '', ctx.so_number || '', ctx.jo_number || '', ctx.wo_number || '', ctx.part_number || '', ctx.part_revision || ''].filter(Boolean).join(' · ') || t('Chưa gắn ngữ cảnh master data', 'No governed context yet')) + '</div></article>'; }).join('') + '</div>';
+    html += '<div style="padding:10px 0 4px;text-align:center"><button type="button" class="ecf-btn ghost" id="ecf-toggle-new-alloc" style="font-size:12px">+ ' + esc(t('Cấp mã mới cho form này', 'Allocate new ID for this form')) + '</button></div>';
+    html += '<div id="ecf-new-alloc-panel" style="display:none">' + renderQuickAllocate(form) + '</div>';
+  } else {
+    html += renderQuickAllocate(form);
+  }
+
+  html += '</section>';
+  return html;
 }
 
 function renderRuntimePanel(form){
@@ -480,10 +618,31 @@ function applyAutofill(field, item){
 function bindShellEvents(){
   var formSearch = document.getElementById('ecf-form-search');
   if(formSearch) formSearch.oninput = function(){ state.formSearch = formSearch.value || ''; render(state.container); };
-  Array.prototype.forEach.call(state.container.querySelectorAll('[data-form-code]'), function(button){ button.onclick = function(){ state.selectedFormCode = button.getAttribute('data-form-code') || state.selectedFormCode; state.selectedAllocationId = ''; state.pendingRecordId = ''; state.fieldValues = {}; state.signatures = {}; state.activeDraftKey = ''; state.hasLocalDraft = false; state.loadedServerEntryKey = ''; loadSchemaFromApi(state.selectedFormCode).then(function(){ return refreshAllocations(); }).then(function(){ return preloadSelectedOnlineEntry(); }).then(function(){ render(state.container); }); }; });
+  Array.prototype.forEach.call(state.container.querySelectorAll('[data-form-code]'), function(button){ button.onclick = function(){ state.selectedFormCode = button.getAttribute('data-form-code') || state.selectedFormCode; state.selectedAllocationId = ''; state.pendingRecordId = ''; state.fieldValues = {}; state.signatures = {}; state.activeDraftKey = ''; state.hasLocalDraft = false; state.loadedServerEntryKey = ''; state.quickAllocDept = detectDepartment(state.formMap[state.selectedFormCode]) || ''; state.quickAllocNotes = ''; loadSchemaFromApi(state.selectedFormCode).then(function(){ return refreshAllocations(); }).then(function(){ return preloadSelectedOnlineEntry(); }).then(function(){ render(state.container); }); }; });
   Array.prototype.forEach.call(state.container.querySelectorAll('[data-allocation-id]'), function(card){ card.onclick = function(){ state.selectedAllocationId = card.getAttribute('data-allocation-id') || ''; state.fieldValues = {}; state.signatures = {}; state.activeDraftKey = ''; state.hasLocalDraft = false; state.loadedServerEntryKey = ''; preloadSelectedOnlineEntry().then(function(){ render(state.container); }); }; });
   var openMaster = document.getElementById('ecf-open-master'); if(openMaster) openMaster.onclick = function(){ if(typeof window._mdOpenControl === 'function') window._mdOpenControl(); };
   var openRid = document.getElementById('ecf-open-record-id'); if(openRid) openRid.onclick = function(){ if(typeof window._fhSwitchTab === 'function') window._fhSwitchTab('record-id'); };
+  bindQuickAllocateEvents();
+}
+
+function bindQuickAllocateEvents(){
+  var form = selectedForm(); if(!form) return;
+  var deptSelect = document.getElementById('ecf-qa-dept');
+  if(deptSelect) deptSelect.onchange = function(){ state.quickAllocDept = deptSelect.value; };
+  var notesInput = document.getElementById('ecf-qa-notes');
+  if(notesInput) notesInput.oninput = function(){ state.quickAllocNotes = notesInput.value; };
+  var allocBtn = document.getElementById('ecf-quick-allocate');
+  if(allocBtn) allocBtn.onclick = function(){ quickAllocate(form); };
+  var toggleBtn = document.getElementById('ecf-toggle-new-alloc');
+  var newPanel = document.getElementById('ecf-new-alloc-panel');
+  if(toggleBtn && newPanel){
+    toggleBtn.onclick = function(){
+      var visible = newPanel.style.display !== 'none';
+      newPanel.style.display = visible ? 'none' : 'block';
+      toggleBtn.textContent = visible ? ('+ ' + t('Cấp mã mới cho form này', 'Allocate new ID for this form')) : ('- ' + t('Ẩn panel cấp mã', 'Hide allocation panel'));
+      if(!visible) bindQuickAllocateEvents();
+    };
+  }
 }
 
 function bindOfflineWorkspace(form){
@@ -784,7 +943,11 @@ function submitOnline(form, allocation, button){
 
 window._renderFillDownload = function(schemas, entries, container){
   normalizeForms(schemas); applyPendingSelection();
-  Promise.all([ensureMaster(), ensureOrders(), loadSchemaFromApi(state.selectedFormCode)]).then(function(){ return refreshAllocations(); }).then(function(){ return preloadSelectedOnlineEntry(); }).then(function(){ render(container); }).catch(function(error){ container.innerHTML = '<div class="ecf-empty"><strong>' + esc(t('Không thể khởi tạo runtime Điền & Tải form', 'Could not initialize the Fill & Download runtime')) + '</strong>' + esc((error && error.message) ? error.message : t('Vui lòng kiểm tra dữ liệu nền hoặc thử lại.', 'Please review master data or try again.')) + '</div>'; });
+  Promise.all([ensureMaster(), ensureOrders(), ensureRecordTypes(), loadSchemaFromApi(state.selectedFormCode)]).then(function(){
+    var detectedDept = detectDepartment(selectedForm());
+    if(detectedDept && !state.quickAllocDept) state.quickAllocDept = detectedDept;
+    return refreshAllocations();
+  }).then(function(){ return preloadSelectedOnlineEntry(); }).then(function(){ render(container); }).catch(function(error){ container.innerHTML = '<div class="ecf-empty"><strong>' + esc(t('Không thể khởi tạo runtime Điền & Tải form', 'Could not initialize the Fill & Download runtime')) + '</strong>' + esc((error && error.message) ? error.message : t('Vui lòng kiểm tra dữ liệu nền hoặc thử lại.', 'Please review master data or try again.')) + '</div>'; });
 };
 
 })();
