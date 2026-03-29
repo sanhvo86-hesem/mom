@@ -20,7 +20,7 @@
 - Giữ nguyên toàn bộ viết tắt chuẩn ở mục C.
 - Giữ nguyên 3 thuật ngữ ngành: `Setup`, `Traveler`, `Balloon`.
 - Giữ nguyên các phương pháp/tên học thuyết: `Kaizen`, `Dreyfus`, `Pareto`, `Kolb`, `Poka-yoke`.
-- Giữ nguyên tên riêng hệ thống, thương hiệu và danh xưng kỹ thuật như `Epicor`, `SharePoint`, `M365`, `HESEM`, `Zalo`.
+- Giữ nguyên tên riêng hệ thống, thương hiệu và danh xưng kỹ thuật như `Epicor`, `Epicor Kinetic`, `SharePoint`, `M365`, `Microsoft 365`, `Entra ID`, `Power Automate`, `Power BI`, `Azure`, `HESEM`, `Zalo`.
 - Ngoài các nhóm ngoại lệ trên, phần văn xuôi hiển thị cho người đọc phải được Việt hóa theo đúng ngữ cảnh vận hành.
 - Không được vin vào ngoại lệ để giữ lại các cụm nửa Anh nửa Việt như `review plan`, `shipment pack`, `tool readiness`, `change logic`, `route control` nếu đã có bản Việt chuẩn trong mục E và F.
 
@@ -597,8 +597,8 @@ Danh từ riêng là tên **định danh duy nhất** trong hệ thống. Dịch
 | Tên chủ sở hữu | `QMS-Chủ sở hữu` | Giữ nguyên 100% |
 | Tên cột CamelCase | `RecordType`, `JobNum`, `CustomerID` | Giữ nguyên 100% |
 | Tên cột VN đặt sẵn | `Người phê duyệt`, `Phiên bản` (khi là tên cột) | Giữ nguyên 100% |
-| Tên thương hiệu | Epicor, SharePoint, M365, HESEM | Giữ nguyên 100% |
-| Tên phần mềm/hệ thống | Power Automate, Power BI, Azure | Giữ nguyên 100% |
+| Tên thương hiệu | Epicor, Epicor Kinetic, SharePoint, M365, Microsoft 365, HESEM | Giữ nguyên 100% |
+| Tên phần mềm/hệ thống | Entra ID, Power Automate, Power BI, Azure | Giữ nguyên 100% |
 
 **Cách nhận dạng danh từ riêng:**
 1. Viết CamelCase (chữ hoa xen kẽ) → tên cột kỹ thuật

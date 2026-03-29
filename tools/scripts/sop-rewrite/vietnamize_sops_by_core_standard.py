@@ -2605,6 +2605,7 @@ FINAL_VIETNAMESE_REFINEMENTS: dict[str, list[tuple[str, str]]] = {
         (r"\bFRM-511 Setup và First Piece hồ sơ\b", "FRM-511 hồ sơ Setup và chi tiết đầu tiên"),
         (r"\bhiện trường sản xuất / First Piece\b", "hiện trường sản xuất / chi tiết đầu tiên"),
         (r"\bJD kỹ thuật Lead, Setup Technician, QA quản lý, CNC phân xưởng quản lý và sản xuất Planner\b", "JD-ENGM, JD-SET, JD-QA, JD-WKM và JD-PPL"),
+        (r"\bSetup Technician\b", "SET"),
     ],
     "05-SOP-500/sop-505-finishing-deburr-and-secondary-operations-control.html": [
         (r"\btẩy ba via Technician giữ R cho thao tác tại bàn và tự kiểm; Team Lead giữ A cho phương pháp và báo vượt cấp tại khu; QC giữ A cho chấp nhận sau gia công hoàn thiện; QA quản lý giữ A cho giới hạn làm lại và NCR quyết định\.", "DBT giữ R cho thao tác tại bàn và tự kiểm; DBL giữ A cho phương pháp và báo vượt cấp tại khu; QC giữ A cho chấp nhận sau gia công hoàn thiện; QA giữ A cho giới hạn làm lại và quyết định NCR."),
@@ -2621,6 +2622,12 @@ FINAL_VIETNAMESE_REFINEMENTS: dict[str, list[tuple[str, str]]] = {
         (r"\bchất lượng kỹ sư giữ R cho nghiên cứu design và diễn giải; đo lường giữ R cho device mức sẵn sàng; QA quản lý giữ A cho trường hợp sử dụng quyết định; người đo giữ R cho dữ liệu tính toàn vẹn trong nghiên cứu\.", "QE giữ R cho thiết kế nghiên cứu và diễn giải; MCS giữ R cho mức sẵn sàng của thiết bị; QA giữ A cho quyết định trường hợp sử dụng; người đo giữ R cho tính toàn vẹn dữ liệu trong nghiên cứu."),
         (r"\bJD chất lượng kỹ sư, đo lường Specialist, QA quản lý và QC Inspector phải mô tả rõ giới hạn sử dụng dữ liệu đo và trách nhiệm giữ tính toàn vẹn của nghiên cứu theo SOP-602\.", "JD-QE, JD-MCS, JD-QA và JD-QC phải mô tả rõ giới hạn sử dụng dữ liệu đo và trách nhiệm giữ tính toàn vẹn của nghiên cứu theo SOP-602."),
         (r"Áp dụng cho variable MSA, GRR, độ chệch, linearity, stability, attribute agreement và thẩm định của hệ đo khi dữ liệu đầu ra sẽ được dùng cho chấp nhận, quy trình kiểm soát, năng lực quá trình hoặc hướng khách hàng hồ sơ\.", "Áp dụng cho MSA biến liên tục, GRR, độ chệch, độ tuyến tính, độ ổn định, mức nhất trí thuộc tính và thẩm định hệ đo khi dữ liệu đầu ra được dùng cho chấp nhận, kiểm soát quy trình, năng lực quá trình hoặc hồ sơ hướng khách hàng."),
+        (r"\bLưu nghiên cứu repeatability và reproducibility cho hệ đo dạng biến\.", "Lưu nghiên cứu độ lặp lại và độ tái lập cho hệ đo dạng biến."),
+        (r"\bFRM-612 độ chệch / Linearity / Stability nghiên cứu biểu mẫu\b", "FRM-612 biểu mẫu nghiên cứu độ chệch / độ tuyến tính / độ ổn định"),
+        (r"\bFRM-613 Attribute MSA và CMM thẩm định hồ sơ\b", "FRM-613 MSA thuộc tính và hồ sơ thẩm định CMM"),
+        (r"\bLưu attribute-agreement hoặc thẩm định hồ sơ cho hệ đo tương ứng\.", "Lưu mức nhất trí thuộc tính hoặc hồ sơ thẩm định cho hệ đo tương ứng."),
+        (r"\bcommunicated\b", "đã được truyền đạt"),
+        (r"\bđo lường error\b", "sai số đo lường"),
     ],
     "06-SOP-600/sop-604-spc-and-capability-control.html": [
         (r"\bFRM-511 Setup và First Piece hồ sơ\b", "FRM-511 hồ sơ Setup và chi tiết đầu tiên"),
@@ -2681,9 +2688,26 @@ FINAL_VIETNAMESE_REFINEMENTS: dict[str, list[tuple[str, str]]] = {
         (r"\bimpacted jobs/WIP\b", "đơn hàng/WIP bị ảnh hưởng"),
         (r"\bpost-thay đổi xác minh\b", "xác minh sau thay đổi"),
         (r"\bJD-ENGM, JD-QA, JD-PD, JD-ITA và JD-ESA phải ghi rõ quyền phê duyệt thay đổi, trách nhiệm tác động rà soát, cắt chuyển, cấu hình đánh giá, WIP cách ly và KPI thay đổi chưa được phê duyệt / post-thay đổi xác minh\.", "JD-ENGM, JD-QA, JD-PD, JD-ITA và JD-ESA phải ghi rõ quyền phê duyệt thay đổi, trách nhiệm rà soát tác động, cắt chuyển, đánh giá cấu hình, cách ly WIP và xác minh sau thay đổi đối với KPI thay đổi chưa được phê duyệt."),
+        (r"\bxác nhận/effectiveness kế hoạch\b", "xác nhận/kế hoạch hiệu lực"),
+        (r"\bmức phân loại A — High tác động\b", "mức phân loại A — tác động cao"),
+        (r"\bsetup cơ chế\b", "cơ chế Setup"),
+        (r"\bconsistency\b", "tính nhất quán"),
+        (r"\bmáy setting\b", "thiết lập máy"),
+        (r"\bdocuments\b", "tài liệu"),
     ],
     "09-SOP-900/sop-903-continual-improvement-and-kaizen.html": [
         (r"\bJD sản xuất Director, sản xuất kỹ sư hoặc IE, QA quản lý, chất lượng kỹ sư, Finance quản lý và HR quản lý\b", "JD-PD, JD-PE hoặc JD-IE, JD-QA, JD-QE, JD-FIN và JD-HR"),
+        (r"\bFRM-151 Lessons Learned sổ đăng ký\b", "FRM-151 sổ đăng ký bài học kinh nghiệm"),
+        (r"\bM365 / Knowledge\b", "M365 / tri thức tổ chức"),
+        (r"\bFRM-131 Risks và Opportunities sổ đăng ký\b", "FRM-131 sổ đăng ký rủi ro và cơ hội"),
+    ],
+    "05-SOP-500/sop-502-cnc-machining-operations.html": [
+        (r"\bJD CNC người vận hành, Setup Technician, SL, CNC phân xưởng quản lý và QC Inspector phải thống nhất rằng quyền dừng máy khi có nghi ngờ điều kiện là quyền bắt buộc phải dùng, không phải lựa chọn tùy ý theo sản lượng\.", "JD-OPR, JD-SET, JD-SL, JD-WKM và JD-QC phải thống nhất rằng quyền dừng máy khi có nghi ngờ điều kiện là quyền bắt buộc phải dùng, không phải lựa chọn tùy ý theo sản lượng."),
+        (r"\bSetup Technician\b", "SET"),
+    ],
+    "03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html": [
+        (r"\bsetup cơ chế\b", "cơ chế Setup"),
+        (r"\bGiữ setup cơ chế, danh sách dao cụ, giả định về máy và dữ kiện cần cho chạy thử xác nhận hoặc thực thi theo bản chụp trạng thái\.", "Giữ cơ chế Setup, danh sách dao cụ, giả định về máy và dữ kiện cần cho chạy thử xác nhận hoặc thực thi theo bản chụp trạng thái."),
     ],
 }
 
