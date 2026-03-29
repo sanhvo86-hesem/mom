@@ -1,0 +1,130 @@
+{
+  "form_code": "FRM-715",
+  "title": "Certificate of Conformance",
+  "title_vi": "Giấy chứng nhận phù hợp (CoC)",
+  "version": "V1",
+  "category": "quality",
+  "frequency": "per_event",
+  "sop_ref": "SOP-605",
+  "description": "Chứng nhận lô hàng đáp ứng yêu cầu kỹ thuật và chất lượng theo bản vẽ, PO và tiêu chuẩn áp dụng.",
+  "roles_allowed": ["admin", "qa_manager", "quality_engineer", "qc_inspector"],
+  "fields": [
+    {"id": "coc_date", "type": "date", "label": "Ngày phát hành", "label_en": "Issue Date", "required": true, "default": "today"},
+    {"id": "coc_number", "type": "text", "label": "Số CoC", "label_en": "CoC Number", "required": true, "placeholder": "VD: COC-2026-001"},
+    {"id": "customer", "type": "text", "label": "Khách hàng", "label_en": "Customer", "required": true},
+    {"id": "customer_po", "type": "text", "label": "Số PO khách hàng", "label_en": "Customer PO", "required": true},
+    {"id": "job_number", "type": "text", "label": "Số Job", "label_en": "Job Number", "required": true},
+    {
+      "id": "line_items",
+      "type": "table",
+      "label": "Danh sách chi tiết",
+      "label_en": "Line Items",
+      "min_rows": 1,
+      "max_rows": 20,
+      "columns": [
+        {"id": "part_number", "type": "text", "label": "Mã chi tiết", "width": "18%", "required": true},
+        {"id": "part_rev", "type": "text", "label": "Rev", "width": "8%", "required": true},
+        {"id": "part_name", "type": "text", "label": "Tên chi tiết", "width": "22%"},
+        {"id": "material", "type": "text", "label": "Vật liệu", "width": "16%"},
+        {"id": "qty_shipped", "type": "text", "label": "SL giao", "width": "10%", "required": true},
+        {"id": "lot_number", "type": "text", "label": "Số lô", "width": "14%"},
+        {"id": "heat_lot", "type": "text", "label": "Heat / Lot", "width": "12%"}
+      ]
+    },
+    {
+      "id": "conformance_statement",
+      "type": "textarea",
+      "label": "Tuyên bố phù hợp",
+      "label_en": "Conformance Statement",
+      "required": true,
+      "rows": 4,
+      "default": "Chúng tôi xác nhận rằng các sản phẩm được liệt kê ở trên đã được sản xuất, kiểm tra và thử nghiệm theo yêu cầu của bản vẽ kỹ thuật, đơn đặt hàng và các tiêu chuẩn áp dụng. Tất cả kết quả kiểm tra nằm trong dung sai quy định."
+    },
+    {
+      "id": "applicable_specs",
+      "type": "textarea",
+      "label": "Tiêu chuẩn áp dụng",
+      "label_en": "Applicable Specifications",
+      "rows": 3,
+      "placeholder": "VD: AS9100D, ISO 9001:2015, ASTM B209, AMS 2175..."
+    },
+    {
+      "id": "processes_performed",
+      "type": "textarea",
+      "label": "Các quá trình đã thực hiện",
+      "label_en": "Processes Performed",
+      "rows": 3,
+      "placeholder": "VD: CNC milling, CNC turning, anodize, heat treat..."
+    },
+    {
+      "id": "special_processes",
+      "type": "textarea",
+      "label": "Quá trình đặc biệt",
+      "label_en": "Special Processes",
+      "rows": 2,
+      "placeholder": "VD: Xử lý nhiệt (Cert #), Mạ (Cert #), NDT (Cert #)..."
+    },
+    {
+      "id": "inspection_method",
+      "type": "select",
+      "label": "Phương pháp kiểm tra",
+      "label_en": "Inspection Method",
+      "required": true,
+      "options": [
+        {"value": "100_pct", "label": "Kiểm tra 100%"},
+        {"value": "sampling", "label": "Lấy mẫu theo AQL"},
+        {"value": "fai", "label": "FAI (First Article)"},
+        {"value": "combination", "label": "Kết hợp (Combination)"}
+      ]
+    },
+    {
+      "id": "material_certs_attached",
+      "type": "select",
+      "label": "Chứng chỉ vật liệu đính kèm",
+      "label_en": "Material Certs Attached",
+      "required": true,
+      "options": [
+        {"value": "yes", "label": "Có (Yes)", "color": "#2f9e44"},
+        {"value": "no", "label": "Không (No)", "color": "#e03131"},
+        {"value": "na", "label": "N/A", "color": "#868e96"}
+      ]
+    },
+    {
+      "id": "special_process_certs_attached",
+      "type": "select",
+      "label": "Chứng chỉ quá trình đặc biệt đính kèm",
+      "label_en": "Special Process Certs Attached",
+      "options": [
+        {"value": "yes", "label": "Có (Yes)", "color": "#2f9e44"},
+        {"value": "no", "label": "Không (No)", "color": "#e03131"},
+        {"value": "na", "label": "N/A", "color": "#868e96"}
+      ]
+    },
+    {
+      "id": "country_of_origin",
+      "type": "text",
+      "label": "Xuất xứ",
+      "label_en": "Country of Origin",
+      "placeholder": "VD: Việt Nam"
+    },
+    {
+      "id": "rohs_compliant",
+      "type": "select",
+      "label": "Tuân thủ RoHS",
+      "label_en": "RoHS Compliant",
+      "options": [
+        {"value": "yes", "label": "Có (Yes)", "color": "#2f9e44"},
+        {"value": "no", "label": "Không (No)", "color": "#e03131"},
+        {"value": "na", "label": "N/A", "color": "#868e96"}
+      ]
+    },
+    {"id": "issued_by", "type": "text", "label": "Người phát hành", "label_en": "Issued By", "required": true},
+    {"id": "title_position", "type": "text", "label": "Chức danh", "label_en": "Title / Position", "required": true},
+    {"id": "approved_by", "type": "text", "label": "Người phê duyệt", "label_en": "Approved By", "required": true},
+    {"id": "notes", "type": "textarea", "label": "Ghi chú", "label_en": "Notes", "rows": 3}
+  ],
+  "auto_fields": ["submitted_by", "submitted_at", "entry_id"],
+  "notifications": {
+    "on_submit": ["qa_manager"]
+  }
+}
