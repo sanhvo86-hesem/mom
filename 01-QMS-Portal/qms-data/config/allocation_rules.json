@@ -16,13 +16,13 @@
   },
 
   "status_labels": {
-    "allocated":       { "label": "Allocated",        "label_vi": "Da cap phat",          "color": "#3b82f6", "icon": "tag" },
-    "form_downloaded": { "label": "Form Downloaded",   "label_vi": "Da tai form",          "color": "#8b5cf6", "icon": "download" },
-    "submitted":       { "label": "Submitted",         "label_vi": "Da nop",               "color": "#f59e0b", "icon": "upload" },
-    "received":        { "label": "Received",          "label_vi": "Da nhan",              "color": "#10b981", "icon": "check-circle" },
-    "resubmitted":     { "label": "Resubmitted",       "label_vi": "Nop lai",              "color": "#6366f1", "icon": "refresh-cw" },
-    "void":            { "label": "Void",              "label_vi": "Huy",                  "color": "#ef4444", "icon": "x-circle" },
-    "closed":          { "label": "Closed",            "label_vi": "Dong",                 "color": "#6b7280", "icon": "archive" }
+    "allocated":       { "label": "Allocated",        "label_vi": "Đã cấp phát",         "color": "#3b82f6", "icon": "tag" },
+    "form_downloaded": { "label": "Form Downloaded",   "label_vi": "Đã tải form",         "color": "#8b5cf6", "icon": "download" },
+    "submitted":       { "label": "Submitted",         "label_vi": "Đã nộp",              "color": "#f59e0b", "icon": "upload" },
+    "received":        { "label": "Received",          "label_vi": "Đã nhận",             "color": "#10b981", "icon": "check-circle" },
+    "resubmitted":     { "label": "Resubmitted",       "label_vi": "Nộp lại",             "color": "#6366f1", "icon": "refresh-cw" },
+    "void":            { "label": "Void",              "label_vi": "Hủy",                 "color": "#ef4444", "icon": "x-circle" },
+    "closed":          { "label": "Closed",            "label_vi": "Đóng",                "color": "#6b7280", "icon": "archive" }
   },
 
   "auto_void_days": 90,

@@ -112,13 +112,13 @@
         "cancelled":     []
       },
       "labels": {
-        "draft":         { "label": "Draft",          "label_vi": "Nhap",            "color": "#9ca3af" },
-        "quoted":        { "label": "Quoted",         "label_vi": "Da bao gia",      "color": "#3b82f6" },
-        "confirmed":     { "label": "Confirmed",      "label_vi": "Da xac nhan",     "color": "#8b5cf6" },
-        "in_production": { "label": "In Production",  "label_vi": "Dang san xuat",   "color": "#f59e0b" },
-        "shipped":       { "label": "Shipped",        "label_vi": "Da giao hang",    "color": "#10b981" },
-        "closed":        { "label": "Closed",         "label_vi": "Dong",            "color": "#6b7280" },
-        "cancelled":     { "label": "Cancelled",      "label_vi": "Da huy",          "color": "#ef4444" }
+        "draft":         { "label": "Draft",          "label_vi": "Nháp",            "color": "#9ca3af" },
+        "quoted":        { "label": "Quoted",         "label_vi": "Đã báo giá",     "color": "#3b82f6" },
+        "confirmed":     { "label": "Confirmed",      "label_vi": "Đã xác nhận",    "color": "#8b5cf6" },
+        "in_production": { "label": "In Production",  "label_vi": "Đang sản xuất",  "color": "#f59e0b" },
+        "shipped":       { "label": "Shipped",        "label_vi": "Đã giao hàng",   "color": "#10b981" },
+        "closed":        { "label": "Closed",         "label_vi": "Đóng",           "color": "#6b7280" },
+        "cancelled":     { "label": "Cancelled",      "label_vi": "Đã hủy",         "color": "#ef4444" }
       }
     },
     "jo": {
@@ -132,12 +132,12 @@
         "closed":    []
       },
       "labels": {
-        "planned":   { "label": "Planned",    "label_vi": "Da lap ke hoach", "color": "#9ca3af" },
-        "released":  { "label": "Released",   "label_vi": "Da phat hanh",    "color": "#3b82f6" },
-        "active":    { "label": "Active",     "label_vi": "Dang chay",       "color": "#f59e0b" },
-        "on_hold":   { "label": "On Hold",    "label_vi": "Tam dung",        "color": "#ef4444" },
-        "completed": { "label": "Completed",  "label_vi": "Hoan thanh",      "color": "#10b981" },
-        "closed":    { "label": "Closed",     "label_vi": "Dong",            "color": "#6b7280" }
+        "planned":   { "label": "Planned",    "label_vi": "Đã lập kế hoạch", "color": "#9ca3af" },
+        "released":  { "label": "Released",   "label_vi": "Đã phát hành",    "color": "#3b82f6" },
+        "active":    { "label": "Active",     "label_vi": "Đang chạy",       "color": "#f59e0b" },
+        "on_hold":   { "label": "On Hold",    "label_vi": "Tạm dừng",        "color": "#ef4444" },
+        "completed": { "label": "Completed",  "label_vi": "Hoàn thành",      "color": "#10b981" },
+        "closed":    { "label": "Closed",     "label_vi": "Đóng",            "color": "#6b7280" }
       }
     },
     "wo": {
@@ -151,12 +151,12 @@
         "on_hold":    ["scheduled", "setup", "running"]
       },
       "labels": {
-        "scheduled":  { "label": "Scheduled",  "label_vi": "Da len lich",   "color": "#9ca3af" },
-        "setup":      { "label": "Setup",       "label_vi": "Dang setup",    "color": "#3b82f6" },
-        "running":    { "label": "Running",     "label_vi": "Dang chay",     "color": "#f59e0b" },
-        "inspection": { "label": "Inspection",  "label_vi": "Dang kiem tra", "color": "#8b5cf6" },
-        "completed":  { "label": "Completed",   "label_vi": "Hoan thanh",    "color": "#10b981" },
-        "on_hold":    { "label": "On Hold",     "label_vi": "Tam dung",      "color": "#ef4444" }
+        "scheduled":  { "label": "Scheduled",  "label_vi": "Đã lên lịch",    "color": "#9ca3af" },
+        "setup":      { "label": "Setup",       "label_vi": "Đang setup",    "color": "#3b82f6" },
+        "running":    { "label": "Running",     "label_vi": "Đang chạy",     "color": "#f59e0b" },
+        "inspection": { "label": "Inspection",  "label_vi": "Đang kiểm tra", "color": "#8b5cf6" },
+        "completed":  { "label": "Completed",   "label_vi": "Hoàn thành",    "color": "#10b981" },
+        "on_hold":    { "label": "On Hold",     "label_vi": "Tạm dừng",      "color": "#ef4444" }
       }
     }
   },
