@@ -1,0 +1,85 @@
+{
+  "form_code": "FRM-519",
+  "title": "Pre-Run Quick Check",
+  "title_vi": "Phiếu kiểm tra nhanh trước khi chạy",
+  "version": "V1",
+  "category": "production",
+  "frequency": "per_event",
+  "sop_ref": "SOP-504",
+  "description": "Phiếu kiểm tra nhanh 7 điểm trước khi bắt đầu chạy sản xuất, đảm bảo đủ điều kiện an toàn và chất lượng.",
+  "roles_allowed": ["admin", "production_manager", "shift_leader", "cnc_operator", "qc_inspector"],
+  "fields": [
+    {"id": "date", "type": "date", "label": "Ngày", "label_en": "Date", "required": true, "default": "today"},
+    {"id": "job_number", "type": "text", "label": "Số Job", "label_en": "Job Number", "required": true},
+    {"id": "part_number", "type": "text", "label": "Mã chi tiết", "label_en": "Part Number", "required": true},
+    {"id": "part_rev", "type": "text", "label": "Revision", "label_en": "Part Revision", "required": true},
+    {"id": "machine_id", "type": "text", "label": "Mã máy", "label_en": "Machine ID", "required": true, "placeholder": "VD: CNC-01"},
+    {"id": "operator_id", "type": "text", "label": "Người vận hành", "label_en": "Operator", "required": true},
+    {
+      "id": "document_set_ok",
+      "type": "checkbox",
+      "label": "Bộ tài liệu đầy đủ (bản vẽ, WI, Control Plan)",
+      "label_en": "Document Set OK",
+      "required": true,
+      "default": false
+    },
+    {
+      "id": "material_lot_ok",
+      "type": "checkbox",
+      "label": "Vật liệu / lô hàng đúng và có truy xuất",
+      "label_en": "Material & Lot OK",
+      "required": true,
+      "default": false
+    },
+    {
+      "id": "tool_list_ok",
+      "type": "checkbox",
+      "label": "Danh sách dao đầy đủ và đúng quy cách",
+      "label_en": "Tool List OK",
+      "required": true,
+      "default": false
+    },
+    {
+      "id": "offset_probe_ok",
+      "type": "checkbox",
+      "label": "Offset và probe đã được xác nhận",
+      "label_en": "Offset & Probe OK",
+      "required": true,
+      "default": false
+    },
+    {
+      "id": "fixture_setup_ok",
+      "type": "checkbox",
+      "label": "Đồ gá lắp đặt đúng và chắc chắn",
+      "label_en": "Fixture Setup OK",
+      "required": true,
+      "default": false
+    },
+    {
+      "id": "coolant_chip_ok",
+      "type": "checkbox",
+      "label": "Dung dịch cắt và phoi đã kiểm tra",
+      "label_en": "Coolant & Chip OK",
+      "required": true,
+      "default": false
+    },
+    {
+      "id": "dry_run_ok",
+      "type": "checkbox",
+      "label": "Chạy thử không phôi (Dry Run) hoàn tất",
+      "label_en": "Dry Run OK",
+      "required": true,
+      "default": false
+    },
+    {"id": "supervisor_signoff", "type": "text", "label": "Xác nhận của quản lý ca", "label_en": "Supervisor Sign-off", "required": true},
+    {"id": "notes", "type": "textarea", "label": "Ghi chú", "label_en": "Notes", "rows": 3, "placeholder": "Các lưu ý hoặc ngoại lệ..."}
+  ],
+  "auto_fields": ["submitted_by", "submitted_at", "entry_id"],
+  "computed_fields": [
+    {"id": "all_pass", "formula": "all(document_set_ok, material_lot_ok, tool_list_ok, offset_probe_ok, fixture_setup_ok, coolant_chip_ok, dry_run_ok)", "label": "Tất cả đạt"}
+  ],
+  "notifications": {
+    "on_fail": ["shift_leader", "qc_inspector"],
+    "on_submit": ["shift_leader"]
+  }
+}
