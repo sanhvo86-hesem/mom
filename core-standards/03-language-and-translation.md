@@ -13,6 +13,16 @@
 - Viết tắt tiếng Anh giữ nguyên (xem danh sách đầy đủ tại mục C)
 - Thuật ngữ ngành không có tương đương chính xác giữ nguyên tiếng Anh (xem mục D)
 - Không viết hàn lâm, không viết dài dòng — mỗi câu phục vụ vận hành thật
+- Mọi nội dung hiển thị trong SOP/WI/ANNEX/JD PHẢI ưu tiên tiếng Việt, trừ các ngoại lệ đã khóa tại mục C, D và A4
+
+### A4. Ngoại lệ khóa cứng đã được xác nhận
+
+- Giữ nguyên toàn bộ viết tắt chuẩn ở mục C.
+- Giữ nguyên 3 thuật ngữ ngành: `Setup`, `Traveler`, `Balloon`.
+- Giữ nguyên các phương pháp/tên học thuyết: `Kaizen`, `Dreyfus`, `Pareto`, `Kolb`, `Poka-yoke`.
+- Giữ nguyên tên riêng hệ thống, thương hiệu và danh xưng kỹ thuật như `Epicor`, `SharePoint`, `M365`, `HESEM`, `Zalo`.
+- Ngoài các nhóm ngoại lệ trên, phần văn xuôi hiển thị cho người đọc phải được Việt hóa theo đúng ngữ cảnh vận hành.
+- Không được vin vào ngoại lệ để giữ lại các cụm nửa Anh nửa Việt như `review plan`, `shipment pack`, `tool readiness`, `change logic`, `route control` nếu đã có bản Việt chuẩn trong mục E và F.
 
 ### A2. Quy tắc vàng
 

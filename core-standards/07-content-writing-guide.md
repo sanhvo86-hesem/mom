@@ -25,6 +25,7 @@
 | 13 | Không dùng ngôn ngữ lai cho role/department boundary | Không viết `Customer Dịch vụ`, `Process Owner`, `all functions`, `Quy trình Owner`, `Department Head`. |
 | 14 | Không che coverage gap bằng cụm chung chung | Nếu thiếu phạm vi phòng ban hoặc thiếu JD cho một quyết định lặp lại, phải ghi nhận gap và cập nhật handbook/core-standard/JD theo rule. |
 | 15 | Handbook/matrix tổ chức không được giữ placeholder mơ hồ | Trong handbook hoặc bảng interface cấp chức năng, không để `các phòng liên quan`, `các phòng chức năng`, `line manager`, `line owner`, `bộ phận chuyên môn`; phải resolve thành `D-code` hoặc `role code`. |
+| 16 | Không giữ tiếng Anh trong thân SOP ngoài danh sách ngoại lệ đã khóa | Chỉ được giữ viết tắt chuẩn, tên riêng hệ thống, `Setup`, `Traveler`, `Balloon`, `Kaizen`, `Dreyfus`, `Pareto`, `Kolb`, `Poka-yoke` và các proper noun kỹ thuật đã khóa ở `03-language-and-translation.md`. |
 
 ### 1.2 Giọng văn
 
@@ -156,6 +157,8 @@ Bảng 2 cột:
 - Thuật ngữ chỉ được giữ lại khi thật sự cần để hiểu gate, step, hold, release hoặc exception của SOP đó.
 - KHÔNG viết kiểu nửa Anh nửa Việt như `mixed source kiểm soát`, `job close tài chính`, `trace gap`, `first-piece release` nếu SOP đã có bản Việt chuẩn.
 - Chỉ giữ nguyên chữ viết tắt hoặc mã chuẩn khi đây là ngôn ngữ vận hành phổ biến và không làm mờ nghĩa, ví dụ `FAI`, `SPC`, `Cpk`, `NCR`.
+- Các ngoại lệ đã được chốt cứng cho toàn hệ thống là: toàn bộ viết tắt chuẩn; `Setup`, `Traveler`, `Balloon`; `Kaizen`, `Dreyfus`, `Pareto`, `Kolb`, `Poka-yoke`; và proper noun hệ thống/brand ở `03-language-and-translation.md`.
+- Ngoài các ngoại lệ trên, câu văn hiển thị trong SOP phải dùng tiếng Việt vận hành, không để tiếng Anh tồn dư chỉ vì quen dùng nội bộ.
 - Không thêm note giải thích quy tắc viết thuật ngữ ngay trong thân SOP; quy tắc thuộc `core-standard`, không thuộc tài liệu vận hành.
 
 ### Section 4: Vai trò, quyền hạn & RACI
