@@ -77,9 +77,9 @@ var FIELDS = {
     { key:'jo_number', labelVi:'JO gốc', labelEn:'Parent JO', lookup:'jo', required:true },
     { key:'operation_number', labelVi:'Số công đoạn', labelEn:'Operation Number', type:'integer', required:true },
     { key:'operation_desc', labelVi:'Tên công đoạn', labelEn:'Operation Description', required:true },
-    { key:'machine_id', labelVi:'Mã máy', labelEn:'Machine ID', required:true },
-    { key:'work_center_id', labelVi:'Mã work center', labelEn:'Work Center ID', required:true },
-    { key:'operator_id', labelVi:'Người vận hành', labelEn:'Operator' },
+    { key:'machine_id', labelVi:'Mã máy', labelEn:'Machine ID', lookup:'machines', required:true },
+    { key:'work_center_id', labelVi:'Mã work center', labelEn:'Work Center ID', lookup:'work_centers', required:true },
+    { key:'operator_id', labelVi:'Người vận hành', labelEn:'Operator', lookup:'operators' },
     { key:'nc_program_id', labelVi:'Mã chương trình NC', labelEn:'NC Program ID' },
     { key:'setup_time_est', labelVi:'Setup kế hoạch (phút)', labelEn:'Estimated Setup (min)', type:'number' },
     { key:'run_time_est', labelVi:'Run kế hoạch (phút)', labelEn:'Estimated Run (min)', type:'number' },
@@ -87,6 +87,12 @@ var FIELDS = {
     { key:'scheduled_end', labelVi:'Kết thúc kế hoạch', labelEn:'Scheduled End', type:'datetime' },
     { key:'fixture_id', labelVi:'Mã đồ gá', labelEn:'Fixture ID' }
   ]
+};
+
+var EDITABLE_FIELDS = {
+  so: ['customer_po','order_date','due_date','total_qty','priority','contract_review','special_requirements'],
+  jo: ['part_revision','part_description','material_spec','qty_ordered','start_date','due_date','routing_id','fai_required','customer_source_inspection','special_process'],
+  wo: ['operation_desc','machine_id','work_center_id','operator_id','nc_program_id','setup_time_est','run_time_est','scheduled_start','scheduled_end','fixture_id']
 };
 
 function _t(vi, en){ return (typeof lang !== 'undefined' && lang === 'en') ? en : vi; }
@@ -104,7 +110,18 @@ function _flatten(h){ var rows=[]; (h||[]).forEach(function(so){ rows.push(Objec
 function _sortValue(item,key){ if(key==='order_number') return String(item.so_number||item.jo_number||item.wo_number||'').toLowerCase(); if(key==='type') return String(item._type||''); if(key==='subject') return String(item.customer_name||item.customer_id||item.part_number||item.operation_desc||'').toLowerCase(); if(key==='status') return String(item.status||''); if(key==='due_date') return String(item.due_date||item.scheduled_end||''); if(key==='qty') return Number(item.total_qty||item.qty_ordered||item.qty_completed||0); return ''; }
 function _sortRows(rows,key,dir){ return rows.slice().sort(function(a,b){ var va=_sortValue(a,key), vb=_sortValue(b,key); var cmp=va<vb?-1:(va>vb?1:0); return dir==='asc'?cmp:-cmp; }); }
 function _filterRows(rows,q){ if(!q) return rows; q=q.toLowerCase(); return rows.filter(function(r){ return [r.so_number,r.jo_number,r.wo_number,r.customer_name,r.customer_id,r.customer_po,r.part_number,r.part_revision,r.operation_desc,r.machine_id,r.status].filter(Boolean).join(' ').toLowerCase().indexOf(q)>=0; }); }
-function _lookupRows(kind){ var m=_master(); if(kind==='customers') return (m.customers||[]).map(function(x){ return { value:x.customer_id, label:x.customer_id, sub:x.customer_name||'' }; }); if(kind==='parts') return (m.parts||[]).map(function(x){ return { value:x.part_number, label:x.part_number, sub:x.part_description||'', description:x.part_description||'' }; }); if(kind==='revisions') return (m.revisions||[]).map(function(x){ return { value:x.revision, label:x.revision, sub:(x.part_number||'') + (x.status ? ' · ' + x.status : '') }; }); if(kind==='so') return _flat.filter(function(x){ return x._type==='so'; }).map(function(x){ return { value:x.so_number, label:x.so_number, sub:(x.customer_name||x.customer_id||'') + (x.customer_po ? ' · PO ' + x.customer_po : '') }; }); if(kind==='jo') return _flat.filter(function(x){ return x._type==='jo'; }).map(function(x){ return { value:x.jo_number, label:x.jo_number, sub:(x.part_number||'') + (x.part_revision ? ' · Rev.' + x.part_revision : '') }; }); return []; }
+function _lookupRows(kind){
+  var m=_master();
+  if(kind==='customers') return (m.customers||[]).map(function(x){ return { value:x.customer_id, label:x.customer_id, sub:x.customer_name||'' }; });
+  if(kind==='parts') return (m.parts||[]).map(function(x){ return { value:x.part_number, label:x.part_number, sub:x.part_description||'', description:x.part_description||'' }; });
+  if(kind==='revisions') return (m.revisions||[]).map(function(x){ return { value:x.revision, label:x.revision, sub:(x.part_number||'') + (x.status ? ' · ' + x.status : '') }; });
+  if(kind==='work_centers') return (m.work_centers||[]).map(function(x){ return { value:x.work_center_id, label:x.work_center_id, sub:x.work_center_name||'' }; });
+  if(kind==='machines') return (m.machines||[]).map(function(x){ return { value:x.machine_id, label:x.machine_id, sub:(x.machine_name||'') + (x.work_center_id ? ' · ' + x.work_center_id : '') }; });
+  if(kind==='operators') return (m.operators||[]).map(function(x){ return { value:x.operator_id, label:x.operator_id, sub:(x.operator_name||'') + (x.role ? ' · ' + x.role : '') }; });
+  if(kind==='so') return _flat.filter(function(x){ return x._type==='so'; }).map(function(x){ return { value:x.so_number, label:x.so_number, sub:(x.customer_name||x.customer_id||'') + (x.customer_po ? ' · PO ' + x.customer_po : '') }; });
+  if(kind==='jo') return _flat.filter(function(x){ return x._type==='jo'; }).map(function(x){ return { value:x.jo_number, label:x.jo_number, sub:(x.part_number||'') + (x.part_revision ? ' · Rev.' + x.part_revision : '') }; });
+  return [];
+}
 function _pipelineCol(status){ return ({ draft:'planned', quoted:'planned', confirmed:'active', in_production:'active', shipped:'completed', closed:'completed', cancelled:'cancelled', planned:'planned', released:'planned', active:'active', on_hold:'on_hold', scheduled:'planned', setup:'active', running:'active', inspection:'active', completed:'completed' })[status] || 'planned'; }
 function _pipelineStatus(type,col){ var map={ so:{planned:'draft',active:'in_production',completed:'shipped',cancelled:'cancelled'}, jo:{planned:'planned',active:'active',on_hold:'on_hold',completed:'completed'}, wo:{planned:'scheduled',active:'running',on_hold:'on_hold',completed:'completed'} }; return map[type]?map[type][col]:null; }
 function _renderLoading(){ _container.innerHTML='<div class="sj-wrap"><div class="sj-loading"><div class="sj-spinner"></div><p>'+_t('Đang tải dữ liệu đơn hàng...','Loading order data...')+'</p></div></div>'; }
@@ -159,9 +176,10 @@ function _showDetail(id,type){
     var o=res.data||{}; _selected={ id:id, type:type, data:o };
     var html='<section class="sj-sec"><h4>'+_t('Thông tin chính','Primary information')+'</h4><div class="sj-grid">';
     var hasTransitions=(TRANSITIONS[type]&&TRANSITIONS[type][o.status||'']&&TRANSITIONS[type][o.status||''].length>0);
-    Object.keys(o||{}).forEach(function(key){ if(typeof o[key]==='object' || o[key]==='' || o[key]==null || ['status_history','operations','linked_forms','job_orders','job_order','master_data_ref'].indexOf(key)>=0) return; var val=o[key]; if(key==='status'){ var st=_status(type,val||''); html+='<div class="sj-f'+(hasTransitions?' sj-f-clickable':'')+'"'+(hasTransitions?' id="'+_id+'-status-badge" role="button" tabindex="0"':'')+'><small>'+_esc(key)+'</small><span class="sj-status" style="color:'+st.color+';background:'+_rgba(st.color,.12)+'">'+_esc(st.text)+(hasTransitions?' ▸':'')+'</span></div>'; return; } if(key.indexOf('_date')>=0||key.indexOf('_at')>=0) val=(key.indexOf('_at')>=0||String(val).indexOf('T')>=0)?_fmtDateTime(val):_fmtDate(val); if(typeof val==='boolean') val=val?_t('Có','Yes'):_t('Không','No'); html+='<div class="sj-f"><small>'+_esc(key)+'</small><strong>'+_esc(val)+'</strong></div>'; });
+    Object.keys(o||{}).forEach(function(key){ if(typeof o[key]==='object' || o[key]==='' || o[key]==null || ['status_history','change_history','operations','linked_forms','job_orders','job_order','master_data_ref'].indexOf(key)>=0) return; var val=o[key]; if(key==='status'){ var st=_status(type,val||''); html+='<div class="sj-f'+(hasTransitions?' sj-f-clickable':'')+'"'+(hasTransitions?' id="'+_id+'-status-badge" role="button" tabindex="0"':'')+'><small>'+_esc(key)+'</small><span class="sj-status" style="color:'+st.color+';background:'+_rgba(st.color,.12)+'">'+_esc(st.text)+(hasTransitions?' ▸':'')+'</span></div>'; return; } if(key.indexOf('_date')>=0||key.indexOf('_at')>=0) val=(key.indexOf('_at')>=0||String(val).indexOf('T')>=0)?_fmtDateTime(val):_fmtDate(val); if(typeof val==='boolean') val=val?_t('Có','Yes'):_t('Không','No'); html+='<div class="sj-f"><small>'+_esc(key)+'</small><strong>'+_esc(val)+'</strong></div>'; });
     html+='</div></section>';
     if((o.status_history||[]).length){ html+='<section class="sj-sec"><h4>'+_t('Lịch sử trạng thái','Status history')+'</h4><div class="sj-timeline">'+(o.status_history||[]).slice().reverse().map(function(h,i,arr){ var st=_status(type,h.status||''); var isFirst=(i===0); return '<div class="sj-tl-item'+(isFirst?' sj-tl-current':'')+'"><div class="sj-tl-dot" style="background:'+st.color+';box-shadow:0 0 0 4px '+_rgba(st.color,.18)+'"></div><div class="sj-tl-line"></div><div class="sj-tl-content"><span class="sj-status" style="color:'+st.color+';background:'+_rgba(st.color,.12)+'">'+_esc(st.text)+'</span><span class="sj-tl-date">'+_esc(_fmtDateTime(h.timestamp||h.date||''))+'</span><span class="sj-tl-user">'+_esc(h.user||'')+'</span>'+(h.note?'<span class="sj-tl-note">'+_esc(h.note)+'</span>':'')+'</div></div>'; }).join('')+'</div></section>'; }
+    if((o.change_history||[]).length){ html+='<section class="sj-sec"><h4>'+_t('Lịch sử chỉnh sửa','Change history')+'</h4><div class="sj-history">'+(o.change_history||[]).slice().reverse().map(function(entry){ var summary=(entry.changes||[]).map(function(c){ return (c.field||'') + ': ' + (c.old==null?'—':String(c.old)) + ' → ' + (c.new==null?'—':String(c.new)); }).join(' · '); return '<div class="sj-h"><strong>'+_esc(_fmtDateTime(entry.timestamp||''))+'</strong><span>'+_esc(entry.user||'')+'</span><em>'+_esc(summary||_t('Không có thay đổi nội dung.','No field change.'))+'</em></div>'; }).join('')+'</div></section>'; }
     if(type==='jo' && (o.operations||[]).length){ html+='<section class="sj-sec"><h4>'+_t('Danh sách công đoạn','Operations')+'</h4><div class="sj-history">'+o.operations.map(function(op){ return '<div class="sj-h"><strong>OP'+_esc(op.operation_number||'')+' · '+_esc(op.operation_desc||'-')+'</strong><span>'+_esc(op.machine_id||'')+'</span><em>'+_esc(_status('wo',op.status||'').text)+'</em></div>'; }).join('')+'</div></section>'; }
     html+='<section class="sj-sec"><h4>'+_t('Hồ sơ liên kết','Linked Evidence')+'</h4><div id="'+_id+'-linked-forms-panel"><div class="sj-loading"><div class="sj-spinner"></div></div></div>'+(_permission(type,'edit')?'<button type="button" class="sj-btn mini" id="'+_id+'-link-form" style="margin-top:8px">+ '+_t('Liên kết hồ sơ','Link record')+'</button>':'')+'</section>';
     body.innerHTML=html;
@@ -173,10 +191,12 @@ function _showDetail(id,type){
     var next=(TRANSITIONS[type]&&TRANSITIONS[type][o.status||''])?TRANSITIONS[type][o.status||'']:[];
     var actHtml='';
     if(next.length){ actHtml+='<button type="button" class="sj-btn mini sj-outline" id="'+_id+'-change-status" style="color:#1565c0;border-color:#1565c0">'+_t('Chuyển trạng thái','Change status')+'</button>'; }
+    if(_permission(type,'edit')){ actHtml+='<button type="button" class="sj-btn mini" id="'+_id+'-edit-order">'+_t('Chỉnh sửa','Edit')+'</button>'; }
     if(type==='so' && _permission('jo','create')){ actHtml+='<button type="button" class="sj-btn mini accent-2" id="'+_id+'-add-jo">+ '+_t('Lệnh sản xuất','Job Order')+'</button>'; }
     if(type==='jo' && _permission('wo','create')){ actHtml+='<button type="button" class="sj-btn mini accent-3" id="'+_id+'-add-wo">+ '+_t('Lệnh công đoạn','Work Order')+'</button>'; }
     actions.innerHTML=actHtml;
     var statusBtn=document.getElementById(_id+'-change-status'); if(statusBtn) statusBtn.onclick=function(){ _showStatusTransition(type,_selected.id,o.status||''); };
+    var editBtn=document.getElementById(_id+'-edit-order'); if(editBtn) editBtn.onclick=function(){ _showEdit(type, _selected.data||o); };
     var addJoBtn=document.getElementById(_id+'-add-jo'); if(addJoBtn) addJoBtn.onclick=function(){ _showCreateInContext('jo',{ so_number:_selected.id }); };
     var addWoBtn=document.getElementById(_id+'-add-wo'); if(addWoBtn) addWoBtn.onclick=function(){ _showCreateInContext('wo',{ jo_number:_selected.id }); };
     var linkBtn=document.getElementById(_id+'-link-form'); if(linkBtn) linkBtn.onclick=_showLinkModal;
@@ -375,6 +395,75 @@ function _hydrateCreateForm(type,form){
   });
   ['order_date','start_date','due_date'].forEach(function(k){ var el=form.querySelector('[name="'+k+'"]'); if(el&&!el.value) el.value=_today(); });
   var desc=form.querySelector('[name="part_description"]'); if(desc) desc.readOnly=true;
+}
+
+function _datetimeLocal(value){
+  if(!value) return '';
+  var d = new Date(value);
+  if(isNaN(d.getTime())) return String(value).replace(' ', 'T').slice(0, 16);
+  return new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0, 16);
+}
+
+function _hydrateEditForm(type, form, data){
+  if(typeof window._mdEnsureSnapshot==='function') window._mdEnsureSnapshot();
+  var editable = EDITABLE_FIELDS[type] || [];
+  FIELDS[type].forEach(function(field){
+    var canEdit = editable.indexOf(field.key) >= 0;
+    var target = document.getElementById(_id+'-'+type+'-'+field.key);
+    var value = data[field.key];
+
+    if(field.lookup){
+      if(!target) return;
+      if(!canEdit){
+        target.innerHTML = '<input class="sj-input" name="'+field.key+'" value="'+_esc(value==null?'':value)+'" readonly style="background:#f1f5f9">';
+        return;
+      }
+      if(typeof SearchableInput==='function'){
+        new SearchableInput({ containerId:target.id, fieldId:target.id+'-si', name:field.key, dataSource:_lookupRows(field.lookup), displayField:'label', valueField:'value', subField:'sub', placeholderVi:_t('Tìm và chọn','Search and select'), placeholder:'Search and select', strictSelect:true, storeValueInHiddenField:true, onSelect:function(item){ if(type==='jo' && field.key==='part_number'){ var desc=form.querySelector('[name="part_description"]'); if(desc) desc.value=item.description||''; } } });
+        setTimeout(function(){ var si = SearchableInput.get(target.id+'-si'); if(si && value!=null && value!=='') si.setValue(value); }, 0);
+      } else {
+        target.innerHTML='<select class="sj-input" name="'+field.key+'"><option value="">'+_t('Chọn','Select')+'</option>'+_lookupRows(field.lookup).map(function(x){ return '<option value="'+_esc(x.value)+'">'+_esc(x.label+(x.sub?' · '+x.sub:''))+'</option>'; }).join('')+'</select>';
+        var sel = target.querySelector('select');
+        if(sel) sel.value = value || '';
+      }
+      return;
+    }
+
+    var el = form.querySelector('[name="'+field.key+'"]');
+    if(!el) return;
+    if(field.type==='boolean') el.value = value === true ? 'true' : (value === false ? 'false' : '');
+    else if(field.type==='datetime') el.value = _datetimeLocal(value);
+    else el.value = value == null ? '' : value;
+    if(!canEdit || field.readonly){
+      if(el.tagName === 'SELECT'){ el.disabled = true; }
+      else { el.readOnly = true; }
+      el.style.background = '#f1f5f9';
+    }
+  });
+}
+
+function _showEdit(type, data){
+  var overlay=document.createElement('div'); overlay.className='sj-modal-overlay';
+  var modal=document.createElement('div'); modal.className='sj-modal';
+  var titleMap={ so:_t('Chỉnh sửa đơn hàng','Edit Sales Order'), jo:_t('Chỉnh sửa lệnh sản xuất','Edit Job Order'), wo:_t('Chỉnh sửa lệnh công đoạn','Edit Work Order') };
+  modal.innerHTML='<div class="sj-modal-head"><h3>'+_esc(type.toUpperCase())+' · '+_esc(titleMap[type]||_t('Chỉnh sửa','Edit'))+'</h3><button type="button" class="sj-x">×</button></div><div class="sj-modal-body"><form id="'+_id+'-edit-form" class="sj-form">'+FIELDS[type].map(function(f){ return _renderField(f,type); }).join('')+'</form></div><div class="sj-modal-foot"><button type="button" class="sj-btn" data-close>'+_t('Hủy','Cancel')+'</button><button type="button" class="sj-btn accent" id="'+_id+'-submit-edit">'+_t('Lưu thay đổi','Save changes')+'</button></div>';
+  document.body.appendChild(overlay); document.body.appendChild(modal);
+  function close(){ _closeModal(overlay, modal); }
+  overlay.onclick=close; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
+  _modalKeyHandler(overlay, modal);
+  var form=modal.querySelector('#'+_id+'-edit-form');
+  _hydrateEditForm(type, form, data||{});
+  var submitBtn=modal.querySelector('#'+_id+'-submit-edit');
+  submitBtn.onclick=function(){
+    var fd=new FormData(form), changes={};
+    fd.forEach(function(v,k){ var def=FIELDS[type].find(function(x){ return x.key===k; }); if(!def) return; if(def.type==='integer') changes[k]=parseInt(v,10); else if(def.type==='number') changes[k]=parseFloat(v); else if(def.type==='boolean') changes[k]=(v==='true'); else changes[k]=v; });
+    _setSubmitLoading(submitBtn, true);
+    _api('order_update_fields',{ order_type:type, order_id:data[type==='so'?'so_number':type==='jo'?'jo_number':'wo_number'], changes:changes }).then(function(r){
+      _setSubmitLoading(submitBtn, false);
+      if(r&&r.ok){ close(); _toast(_t('Đã cập nhật đơn hàng.','Order updated successfully.'),'success'); _refresh(); }
+      else { _toast(_t('Không thể cập nhật đơn hàng.','Unable to update order.'),'error'); }
+    }).catch(function(){ _setSubmitLoading(submitBtn, false); _toast(_t('Lỗi kết nối.','Connection error.'),'error'); });
+  };
 }
 function _bind(){
   var md=document.getElementById(_id+'-md'); if(md) md.onclick=function(){ if(typeof window._mdOpenControl==='function') window._mdOpenControl(); };

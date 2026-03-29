@@ -1935,6 +1935,28 @@ function order_transition_allowed(string $entity, string $fromStatus, string $to
   return in_array(strtolower($toStatus), $allowed, true);
 }
 
+function order_editable_fields(string $entity): array {
+  $map = [
+    'so' => ['customer_po', 'order_date', 'due_date', 'total_qty', 'priority', 'contract_review', 'special_requirements'],
+    'jo' => ['part_revision', 'part_description', 'material_spec', 'qty_ordered', 'start_date', 'due_date', 'routing_id', 'fai_required', 'customer_source_inspection', 'special_process'],
+    'wo' => ['operation_desc', 'machine_id', 'work_center_id', 'operator_id', 'nc_program_id', 'setup_time_est', 'run_time_est', 'scheduled_start', 'scheduled_end', 'fixture_id'],
+  ];
+  return $map[$entity] ?? [];
+}
+
+function order_normalize_edit_value(string $field, $value) {
+  if (in_array($field, ['total_qty', 'qty_ordered'], true)) {
+    return max(0, (int)$value);
+  }
+  if (in_array($field, ['setup_time_est', 'run_time_est'], true)) {
+    return max(0, (float)$value);
+  }
+  if (in_array($field, ['fai_required', 'customer_source_inspection'], true)) {
+    return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false;
+  }
+  return trim((string)$value);
+}
+
 function mes_maintenance_transition_allowed(string $fromStatus, string $toStatus): bool {
   if ($fromStatus === '' || $toStatus === '') return false;
   if ($fromStatus === $toStatus) return true;
@@ -9747,6 +9769,107 @@ if ($username === '') {
   }
 
   // ── G2 P1-01: Retrieve linked forms for an order ────────────────
+  case 'order_update_fields': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+
+    $body = read_json_body();
+    $entity = strtolower(trim((string)($body['order_type'] ?? '')));
+    $orderId = trim((string)($body['order_id'] ?? ''));
+    $changes = is_array($body['changes'] ?? null) ? $body['changes'] : [];
+    if (!in_array($entity, ['so', 'jo', 'wo'], true) || $orderId === '' || !$changes) {
+      api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
+    }
+    require_order_permission($me, $entity, 'edit');
+
+    $orders = load_orders_store();
+    $master = load_master_data_store();
+    $meta = order_entity_config($entity);
+    $storeKey = $meta['store_key'];
+    $idKey = $meta['number_key'];
+    $allowed = array_flip(order_editable_fields($entity));
+    $username = (string)($_SESSION['user'] ?? 'system');
+    $updated = null;
+
+    $machines = master_index_by((array)($master['machines'] ?? []), 'machine_id');
+    $operators = master_index_by((array)($master['operators'] ?? []), 'operator_id');
+    $workCenters = master_index_by((array)($master['work_centers'] ?? []), 'work_center_id');
+    $revisions = (array)($master['revisions'] ?? []);
+
+    foreach ($orders[$storeKey] as $idx => $row) {
+      if (!is_array($row) || (string)($row[$idKey] ?? '') !== $orderId) continue;
+
+      $audit = [];
+      foreach ($changes as $field => $rawValue) {
+        if (!is_string($field) || !isset($allowed[$field])) continue;
+        $newValue = order_normalize_edit_value($field, $rawValue);
+        $oldValue = $orders[$storeKey][$idx][$field] ?? null;
+        if (json_encode($oldValue, JSON_UNESCAPED_UNICODE) === json_encode($newValue, JSON_UNESCAPED_UNICODE)) {
+          continue;
+        }
+        $orders[$storeKey][$idx][$field] = $newValue;
+        $audit[] = [
+          'field' => $field,
+          'old' => $oldValue,
+          'new' => $newValue,
+        ];
+      }
+
+      if (!$audit) {
+        $updated = $orders[$storeKey][$idx];
+        break;
+      }
+
+      if ($entity === 'jo') {
+        $partNumber = trim((string)($orders[$storeKey][$idx]['part_number'] ?? ''));
+        $partRevision = trim((string)($orders[$storeKey][$idx]['part_revision'] ?? ''));
+        $hasRevision = false;
+        foreach ($revisions as $revision) {
+          if (!is_array($revision)) continue;
+          if ((string)($revision['part_number'] ?? '') === $partNumber && (string)($revision['revision'] ?? '') === $partRevision) {
+            $hasRevision = true;
+            break;
+          }
+        }
+        if (!$hasRevision) {
+          api_json(['ok' => false, 'error' => 'revision_not_found_for_part'], 422);
+        }
+      }
+
+      if ($entity === 'wo') {
+        $machineId = trim((string)($orders[$storeKey][$idx]['machine_id'] ?? ''));
+        $workCenterId = trim((string)($orders[$storeKey][$idx]['work_center_id'] ?? ''));
+        $operatorId = trim((string)($orders[$storeKey][$idx]['operator_id'] ?? ''));
+        if ($machineId !== '') {
+          if (!isset($machines[$machineId])) api_json(['ok' => false, 'error' => 'machine_not_found'], 404);
+          $machineWorkCenter = trim((string)($machines[$machineId]['work_center_id'] ?? ''));
+          if ($machineWorkCenter !== '') {
+            $orders[$storeKey][$idx]['work_center_id'] = $machineWorkCenter;
+            $workCenterId = $machineWorkCenter;
+          }
+        }
+        if ($workCenterId !== '' && !isset($workCenters[$workCenterId])) api_json(['ok' => false, 'error' => 'work_center_not_found'], 404);
+        if ($operatorId !== '' && !isset($operators[$operatorId])) api_json(['ok' => false, 'error' => 'operator_not_found'], 404);
+      }
+
+      $orders[$storeKey][$idx]['updated_at'] = now_iso();
+      $orders[$storeKey][$idx]['updated_by'] = $username;
+      $orders[$storeKey][$idx]['change_history'] = array_values((array)($orders[$storeKey][$idx]['change_history'] ?? []));
+      $orders[$storeKey][$idx]['change_history'][] = [
+        'timestamp' => now_iso(),
+        'user' => $username,
+        'changes' => $audit,
+      ];
+      $updated = $orders[$storeKey][$idx];
+      break;
+    }
+
+    if (!$updated) api_json(['ok' => false, 'error' => 'not_found'], 404);
+    save_orders_store($orders);
+    api_json(['ok' => true, 'data' => $updated]);
+  }
+
   case 'order_get_linked_forms': {
     $me = require_logged_in($store);
     $orderType = strtolower(trim((string)($_GET['order_type'] ?? '')));
