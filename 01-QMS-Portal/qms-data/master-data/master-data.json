@@ -2,8 +2,8 @@
   "_meta": {
     "version": "1.1",
     "created": "2026-03-29T12:00:00+07:00",
-    "updated": "2026-03-29T21:10:00+07:00",
-    "description": "Master data seed for customer, supplier, part, revision, CAPA, work center, machine, operator, and tooling linkage used by Evidence Control, Order Management, and MES runtime."
+    "updated": "2026-03-29T23:58:00+07:00",
+    "description": "Master data seed for customer, supplier, part, revision, NC program release, CAPA, work center, machine, operator, and tooling linkage used by Evidence Control, Order Management, and MES runtime."
   },
   "customers": [
     {
@@ -113,6 +113,56 @@
       "revision": "REV-B",
       "status": "released",
       "release_date": "2026-01-21"
+    }
+  ],
+  "nc_program_releases": [
+    {
+      "program_id": "NC_714-1101_REVC_OP10_5AX_V3",
+      "release_title": "714-1101 REV-C OP10 roughing release",
+      "part_number": "714-1101",
+      "part_revision": "REV-C",
+      "operation_number": 10,
+      "machine_type": "5-axis",
+      "work_center_id": "WC-5AX",
+      "cam_source_rev": "CAM-7141101-OP10-R7",
+      "post_processor_rev": "PP-MAKINO-5AX-R3",
+      "checksum": "sha256:7ad4e091c6f8",
+      "status": "released",
+      "released_at": "2026-03-29T07:40:00+07:00",
+      "released_by": "eng.manager",
+      "notes": "Bản release chuẩn cho prove-out và batch đầu tiên."
+    },
+    {
+      "program_id": "NC_P-1001_REVC_OP10_3AX_V2",
+      "release_title": "P-1001 REV-C OP10 production release",
+      "part_number": "P-1001",
+      "part_revision": "REV-C",
+      "operation_number": 10,
+      "machine_type": "3-axis",
+      "work_center_id": "WC-3AX",
+      "cam_source_rev": "CAM-P1001-OP10-R4",
+      "post_processor_rev": "PP-BROTHER-3AX-R2",
+      "checksum": "sha256:58bc101a0f2e",
+      "status": "draft",
+      "released_at": "",
+      "released_by": "",
+      "notes": "Đang chờ xác nhận bù dao sau thay cutter và review prove-out."
+    },
+    {
+      "program_id": "CMM_714-1101_REVC_FAI_V2",
+      "release_title": "714-1101 REV-C FAI CMM release",
+      "part_number": "714-1101",
+      "part_revision": "REV-C",
+      "operation_number": 90,
+      "machine_type": "cmm",
+      "work_center_id": "WC-QA",
+      "cam_source_rev": "CMM-7141101-FAI-R2",
+      "post_processor_rev": "MITUTOYO-CMM-R1",
+      "checksum": "sha256:4ef0b1f90c44",
+      "status": "released",
+      "released_at": "2026-03-28T16:10:00+07:00",
+      "released_by": "qe.lead",
+      "notes": "Dùng cho FAI và final inspection CMM."
     }
   ],
   "capas": [

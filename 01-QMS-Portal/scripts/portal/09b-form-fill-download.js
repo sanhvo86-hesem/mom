@@ -116,6 +116,7 @@ function flattenOrders(list){
           machine_id:wo.machine_id || '',
           work_center_id:wo.work_center_id || '',
           operator_id:wo.operator_id || '',
+          nc_program_id:wo.nc_program_id || '',
           scheduled_start:wo.scheduled_start || '',
           scheduled_end:wo.scheduled_end || '',
           status:wo.status || ''
@@ -408,17 +409,44 @@ function buildLookupItems(field){
   var source = String(field.lookup_source || '').trim();
   var currentCustomer = state.fieldValues.customer_id || '';
   var currentPart = state.fieldValues.part_number || '';
+  var currentRevision = state.fieldValues.part_revision || '';
   var currentSo = state.fieldValues.so_number || '';
   var currentJo = state.fieldValues.jo_number || '';
+  var currentWo = state.fieldValues.wo_number || '';
   var currentMachine = state.fieldValues.machine_id || '';
   var currentWorkCenter = state.fieldValues.work_center_id || '';
   var master = state.master || {};
   var currentMachineRow = (master.machines || []).find(function(item){ return String(item.machine_id || '') === String(currentMachine); }) || null;
   var currentMachineType = currentMachineRow ? String(currentMachineRow.machine_type || '') : '';
+  var currentWoRow = (state.orders.work_orders || []).find(function(item){ return String(item.wo_number || '') === String(currentWo); }) || null;
+  var currentOperation = currentWoRow ? String(currentWoRow.operation_number || '') : '';
   if(source === 'customers') return (master.customers || []).map(function(item){ return { value:item.customer_id, label:item.customer_id, sub:item.customer_name || '', customer_id:item.customer_id, customer_name:item.customer_name || '' }; });
   if(source === 'suppliers') return (master.suppliers || []).map(function(item){ return { value:item.supplier_id, label:item.supplier_id, sub:item.supplier_name || '', supplier_id:item.supplier_id, supplier_name:item.supplier_name || '' }; });
   if(source === 'parts') return (master.parts || []).filter(function(item){ return !currentCustomer || String(item.customer_id || '') === String(currentCustomer); }).map(function(item){ return { value:item.part_number, label:item.part_number, sub:item.part_description || '', part_number:item.part_number, part_description:item.part_description || '', customer_id:item.customer_id || '' }; });
   if(source === 'revisions') return (master.revisions || []).filter(function(item){ return !currentPart || String(item.part_number || '') === String(currentPart); }).map(function(item){ return { value:item.revision, label:item.revision, sub:(item.part_number || '') + (item.status ? (' · ' + item.status) : ''), part_number:item.part_number || '', revision:item.revision || '', revision_id:item.revision_id || '' }; });
+  if(source === 'nc_program_releases') return (master.nc_program_releases || []).filter(function(item){
+    if(currentPart && String(item.part_number || '') !== String(currentPart)) return false;
+    if(currentRevision && String(item.part_revision || '') !== String(currentRevision)) return false;
+    if(currentOperation && String(item.operation_number || '') !== String(currentOperation)) return false;
+    if(currentWorkCenter && String(item.work_center_id || '') && String(item.work_center_id || '') !== String(currentWorkCenter)) return false;
+    if(currentMachineType && String(item.machine_type || '') && ['multi', currentMachineType].indexOf(String(item.machine_type || '')) < 0) return false;
+    return true;
+  }).map(function(item){
+    return {
+      value:item.program_id,
+      label:item.program_id,
+      sub:[item.release_title || '', item.part_number || '', item.part_revision || '', item.status || ''].filter(Boolean).join(' · '),
+      program_id:item.program_id || '',
+      release_title:item.release_title || '',
+      part_number:item.part_number || '',
+      part_revision:item.part_revision || '',
+      operation_number:item.operation_number || '',
+      work_center_id:item.work_center_id || '',
+      machine_type:item.machine_type || '',
+      status:item.status || '',
+      checksum:item.checksum || ''
+    };
+  });
   if(source === 'capas') return (master.capas || []).filter(function(item){ if(currentCustomer && String(item.customer_id || '') !== String(currentCustomer)) return false; if(currentPart && String(item.part_number || '') !== String(currentPart)) return false; return true; }).map(function(item){ return { value:item.capa_number, label:item.capa_number, sub:[item.title || '', item.status || ''].filter(Boolean).join(' · '), capa_number:item.capa_number, customer_id:item.customer_id || '', part_number:item.part_number || '', title:item.title || '' }; });
   if(source === 'work_centers') return (master.work_centers || []).map(function(item){ return { value:item.work_center_id, label:item.work_center_id, sub:[item.work_center_name || '', item.department || '', item.process_family || ''].filter(Boolean).join(' · '), work_center_id:item.work_center_id || '', work_center_name:item.work_center_name || '', department:item.department || '' }; });
   if(source === 'machines') return (master.machines || []).filter(function(item){ return !currentWorkCenter || String(item.work_center_id || '') === String(currentWorkCenter); }).map(function(item){ return { value:item.machine_id, label:item.machine_id, sub:[item.machine_name || '', item.work_center_id || '', item.machine_type || ''].filter(Boolean).join(' · '), machine_id:item.machine_id || '', machine_name:item.machine_name || '', work_center_id:item.work_center_id || '', machine_type:item.machine_type || '', location:item.location || '', preferred_operator_id:item.preferred_operator_id || '' }; });

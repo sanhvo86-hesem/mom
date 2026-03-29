@@ -1832,6 +1832,7 @@ function master_data_store_default(): array {
     'suppliers' => [],
     'parts' => [],
     'revisions' => [],
+    'nc_program_releases' => [],
     'capas' => [],
     'work_centers' => [],
     'machines' => [],
@@ -2393,6 +2394,362 @@ function mes_tool_alert_payload(array $row): array {
   return $row;
 }
 
+function mes_is_cutting_resource(string $workCenterId, string $machineType = ''): bool {
+  $center = strtoupper(trim($workCenterId));
+  $type = strtolower(trim($machineType));
+  if (in_array($center, ['WC-5AX', 'WC-3AX', 'WC-TURN', 'WC-MTURN'], true)) return true;
+  return in_array($type, ['5-axis', '3-axis', 'turning', 'mill-turn'], true);
+}
+
+function mes_program_release_summary(array $dispatchRow, array $programReleases): array {
+  $expectedProgram = trim((string)($dispatchRow['nc_program_id'] ?? ''));
+  $workCenterId = trim((string)($dispatchRow['work_center_id'] ?? ''));
+  $machineType = trim((string)($dispatchRow['machine_type'] ?? ''));
+  $partNumber = trim((string)($dispatchRow['part_number'] ?? ''));
+  $partRevision = trim((string)($dispatchRow['part_revision'] ?? ''));
+  $operationNumber = (int)($dispatchRow['operation_number'] ?? 0);
+
+  if (!mes_is_cutting_resource($workCenterId, $machineType)) {
+    return [
+      'band' => 'not_required',
+      'status' => 'not_required',
+      'severity' => 'info',
+      'release_found' => false,
+      'summary_vi' => 'Không yêu cầu NC release',
+      'summary_en' => 'NC release not required',
+      'message_vi' => 'WO này không thuộc nhóm máy cắt cần khóa NC release.',
+      'message_en' => 'This WO is not on a cutting resource that requires NC release governance.',
+      'program_id' => $expectedProgram,
+      'checksum' => '',
+      'release_status' => '',
+      'released_at' => '',
+      'released_by' => '',
+      'context_issues' => [],
+      'cam_source_rev' => '',
+      'post_processor_rev' => '',
+      'release_title' => '',
+    ];
+  }
+
+  if ($expectedProgram === '') {
+    return [
+      'band' => 'warning',
+      'status' => 'missing_reference',
+      'severity' => 'warning',
+      'release_found' => false,
+      'summary_vi' => 'WO chưa có mã NC kỳ vọng',
+      'summary_en' => 'WO has no expected NC program',
+      'message_vi' => 'Work order chưa khai báo nc_program_id nên không thể khóa handshake trước khi chạy.',
+      'message_en' => 'The work order has no nc_program_id, so the handshake cannot be governed before run.',
+      'program_id' => '',
+      'checksum' => '',
+      'release_status' => '',
+      'released_at' => '',
+      'released_by' => '',
+      'context_issues' => [],
+      'cam_source_rev' => '',
+      'post_processor_rev' => '',
+      'release_title' => '',
+    ];
+  }
+
+  $release = is_array($programReleases[$expectedProgram] ?? null) ? $programReleases[$expectedProgram] : null;
+  if ($release === null) {
+    return [
+      'band' => 'critical',
+      'status' => 'missing_release',
+      'severity' => 'critical',
+      'release_found' => false,
+      'summary_vi' => 'Không tìm thấy NC release',
+      'summary_en' => 'Released NC not found',
+      'message_vi' => 'WO đang tham chiếu chương trình NC chưa có trong controlled master.',
+      'message_en' => 'The WO points to an NC program that does not exist in the controlled master.',
+      'program_id' => $expectedProgram,
+      'checksum' => '',
+      'release_status' => '',
+      'released_at' => '',
+      'released_by' => '',
+      'context_issues' => [],
+      'cam_source_rev' => '',
+      'post_processor_rev' => '',
+      'release_title' => '',
+    ];
+  }
+
+  $releaseStatus = strtolower(trim((string)($release['status'] ?? 'draft')));
+  $contextIssues = [];
+  if ($partNumber !== '' && trim((string)($release['part_number'] ?? '')) !== '' && strcasecmp((string)$release['part_number'], $partNumber) !== 0) {
+    $contextIssues[] = 'part_mismatch';
+  }
+  if ($partRevision !== '' && trim((string)($release['part_revision'] ?? '')) !== '' && strcasecmp((string)$release['part_revision'], $partRevision) !== 0) {
+    $contextIssues[] = 'revision_mismatch';
+  }
+  if ($operationNumber > 0 && (int)($release['operation_number'] ?? 0) > 0 && (int)$release['operation_number'] !== $operationNumber) {
+    $contextIssues[] = 'operation_mismatch';
+  }
+  if ($machineType !== '' && trim((string)($release['machine_type'] ?? '')) !== '' && !in_array(strtolower((string)$release['machine_type']), ['multi', strtolower($machineType)], true)) {
+    $contextIssues[] = 'machine_type_mismatch';
+  }
+  if ($workCenterId !== '' && trim((string)($release['work_center_id'] ?? '')) !== '' && strcasecmp((string)$release['work_center_id'], $workCenterId) !== 0) {
+    $contextIssues[] = 'work_center_mismatch';
+  }
+
+  $band = 'ready';
+  $status = 'released';
+  $severity = 'info';
+  $summaryVi = 'NC release hợp lệ';
+  $summaryEn = 'NC release is valid';
+  $messageVi = 'WO đang tham chiếu đúng bản release đã kiểm soát.';
+  $messageEn = 'The WO points to the correct governed NC release.';
+
+  if (!empty($contextIssues)) {
+    $band = 'critical';
+    $status = 'context_mismatch';
+    $severity = 'critical';
+    $summaryVi = 'NC release lệch ngữ cảnh';
+    $summaryEn = 'NC release context mismatch';
+    $messageVi = 'Bản NC release tồn tại nhưng không khớp part / rev / operation / machine context của WO.';
+    $messageEn = 'The NC release exists but does not match the WO part / revision / operation / machine context.';
+  } elseif ($releaseStatus !== 'released') {
+    $band = in_array($releaseStatus, ['blocked', 'superseded', 'obsolete'], true) ? 'critical' : 'warning';
+    $status = $releaseStatus === 'draft' ? 'not_released' : $releaseStatus;
+    $severity = $band === 'critical' ? 'critical' : 'warning';
+    $summaryVi = $releaseStatus === 'draft' ? 'NC chưa release' : 'NC release bị chặn';
+    $summaryEn = $releaseStatus === 'draft' ? 'NC not released' : 'NC release blocked';
+    $messageVi = $releaseStatus === 'draft'
+      ? 'Chương trình NC đã có master record nhưng chưa ở trạng thái released.'
+      : 'Chương trình NC master đang ở trạng thái không được phép đưa vào sản xuất.';
+    $messageEn = $releaseStatus === 'draft'
+      ? 'The NC program has a master record but it is not yet in released status.'
+      : 'The NC program master is in a status that is not allowed for production use.';
+  }
+
+  return [
+    'band' => $band,
+    'status' => $status,
+    'severity' => $severity,
+    'release_found' => true,
+    'summary_vi' => $summaryVi,
+    'summary_en' => $summaryEn,
+    'message_vi' => $messageVi,
+    'message_en' => $messageEn,
+    'program_id' => $expectedProgram,
+    'checksum' => (string)($release['checksum'] ?? ''),
+    'release_status' => (string)($release['status'] ?? ''),
+    'released_at' => (string)($release['released_at'] ?? ''),
+    'released_by' => (string)($release['released_by'] ?? ''),
+    'context_issues' => $contextIssues,
+    'cam_source_rev' => (string)($release['cam_source_rev'] ?? ''),
+    'post_processor_rev' => (string)($release['post_processor_rev'] ?? ''),
+    'release_title' => (string)($release['release_title'] ?? ''),
+  ];
+}
+
+function mes_tool_readiness_summary(array $dispatchRow): array {
+  $tooling = (array)($dispatchRow['tooling'] ?? []);
+  $items = array_values((array)($tooling['items'] ?? []));
+  $workCenterId = trim((string)($dispatchRow['work_center_id'] ?? ''));
+  $machineType = trim((string)($dispatchRow['machine_type'] ?? ''));
+  $loadedToolCount = (int)($tooling['loaded_tool_count'] ?? count($items));
+  $needsTooling = mes_is_cutting_resource($workCenterId, $machineType);
+
+  if (!$needsTooling) {
+    return [
+      'band' => 'not_required',
+      'status' => 'not_required',
+      'severity' => 'info',
+      'summary_vi' => 'Không yêu cầu tooling runtime',
+      'summary_en' => 'Tooling runtime not required',
+      'message_vi' => 'WO này không thuộc nhóm công đoạn cần kiểm soát tool-life theo runtime MES.',
+      'message_en' => 'This WO is not in a process family that requires MES tool-life runtime governance.',
+      'loaded_tool_count' => $loadedToolCount,
+      'alert_count' => 0,
+      'top_tool_id' => '',
+      'top_tool_runtime_id' => '',
+      'top_issue' => '',
+      'highest_life_pct' => null,
+    ];
+  }
+
+  if ($loadedToolCount <= 0 || empty($items)) {
+    return [
+      'band' => 'warning',
+      'status' => 'untracked',
+      'severity' => 'warning',
+      'summary_vi' => 'Chưa có tool-life runtime',
+      'summary_en' => 'No tool-life runtime',
+      'message_vi' => 'WO đang ở cell gia công nhưng chưa có runtime dao / tooling để khóa mức sẵn sàng.',
+      'message_en' => 'The WO is on a machining cell but has no runtime tool / tooling data to govern readiness.',
+      'loaded_tool_count' => 0,
+      'alert_count' => 0,
+      'top_tool_id' => '',
+      'top_tool_runtime_id' => '',
+      'top_issue' => 'missing_runtime',
+      'highest_life_pct' => null,
+    ];
+  }
+
+  $critical = null;
+  $warning = null;
+  $untracked = null;
+  $highestLife = null;
+  foreach ($items as $item) {
+    if (!is_array($item)) continue;
+    $life = isset($item['life_used_pct']) ? (float)$item['life_used_pct'] : null;
+    if ($life !== null) $highestLife = $highestLife === null ? $life : max($highestLife, $life);
+    $level = (string)($item['alert_level'] ?? 'healthy');
+    if ($critical === null && $level === 'critical') $critical = $item;
+    if ($warning === null && $level === 'warning') $warning = $item;
+    if ($untracked === null && $level === 'untracked') $untracked = $item;
+  }
+
+  $focus = $critical ?? $warning ?? $untracked;
+  $band = 'ready';
+  $status = 'ready';
+  $severity = 'info';
+  $summaryVi = 'Tooling sẵn sàng chạy';
+  $summaryEn = 'Tooling is ready';
+  $messageVi = 'Tooling runtime đang ổn định và không có cảnh báo chặn chạy.';
+  $messageEn = 'Tooling runtime is stable and there is no blocking readiness alert.';
+
+  if ($critical) {
+    $band = 'critical';
+    $status = 'critical';
+    $severity = 'critical';
+    $summaryVi = 'Tooling tới hạn';
+    $summaryEn = 'Tooling is critical';
+    $messageVi = (string)($critical['alert_message_vi'] ?? 'Có tool đã tới hạn hoặc offset vượt kiểm soát.');
+    $messageEn = (string)($critical['alert_message_en'] ?? 'A tool is critical or the offset is out of control.');
+  } elseif ($warning) {
+    $band = 'warning';
+    $status = 'warning';
+    $severity = 'warning';
+    $summaryVi = 'Tooling cần xác nhận lại';
+    $summaryEn = 'Tooling needs reconfirmation';
+    $messageVi = (string)($warning['alert_message_vi'] ?? 'Có tool gần ngưỡng life hoặc cần xác nhận lại offset.');
+    $messageEn = (string)($warning['alert_message_en'] ?? 'A tool is nearing its life limit or needs offset reconfirmation.');
+  } elseif ($untracked) {
+    $band = 'warning';
+    $status = 'untracked';
+    $severity = 'warning';
+    $summaryVi = 'Tooling chưa được theo dõi chuẩn';
+    $summaryEn = 'Tooling is not fully tracked';
+    $messageVi = (string)($untracked['alert_message_vi'] ?? 'Có tooling chưa được theo dõi tool-life đúng chuẩn.');
+    $messageEn = (string)($untracked['alert_message_en'] ?? 'Some tooling is not governed by the standard tool-life runtime.');
+  }
+
+  return [
+    'band' => $band,
+    'status' => $status,
+    'severity' => $severity,
+    'summary_vi' => $summaryVi,
+    'summary_en' => $summaryEn,
+    'message_vi' => $messageVi,
+    'message_en' => $messageEn,
+    'loaded_tool_count' => $loadedToolCount,
+    'alert_count' => (int)($tooling['alert_count'] ?? 0),
+    'top_tool_id' => (string)($focus['tool_id'] ?? ''),
+    'top_tool_runtime_id' => (string)($focus['tool_runtime_id'] ?? ''),
+    'top_issue' => $focus ? (string)($focus['alert_level'] ?? '') : '',
+    'highest_life_pct' => $highestLife,
+  ];
+}
+
+function mes_build_program_release_queue(array $dispatch): array {
+  $rows = [];
+  foreach ($dispatch as $row) {
+    if (!is_array($row)) continue;
+    $status = strtolower((string)($row['status'] ?? 'scheduled'));
+    if (!in_array($status, ['scheduled', 'setup', 'running', 'inspection', 'on_hold'], true)) continue;
+    $release = (array)($row['program_release'] ?? []);
+    if (in_array((string)($release['band'] ?? 'ready'), ['ready', 'not_required'], true)) continue;
+    $rows[] = [
+      'wo_number' => (string)($row['wo_number'] ?? ''),
+      'jo_number' => (string)($row['jo_number'] ?? ''),
+      'so_number' => (string)($row['so_number'] ?? ''),
+      'machine_id' => (string)($row['machine_id'] ?? ''),
+      'machine_name' => (string)($row['machine_name'] ?? ''),
+      'work_center_id' => (string)($row['work_center_id'] ?? ''),
+      'operator_id' => (string)($row['operator_id'] ?? ''),
+      'operator_name' => (string)($row['operator_name'] ?? ''),
+      'customer_name' => (string)($row['customer_name'] ?? ''),
+      'part_number' => (string)($row['part_number'] ?? ''),
+      'part_revision' => (string)($row['part_revision'] ?? ''),
+      'operation_number' => (int)($row['operation_number'] ?? 0),
+      'expected_program_id' => (string)($row['nc_program_id'] ?? ''),
+      'band' => (string)($release['band'] ?? 'warning'),
+      'severity' => (string)($release['severity'] ?? 'warning'),
+      'status' => (string)($release['status'] ?? 'warning'),
+      'release_status' => (string)($release['release_status'] ?? ''),
+      'checksum' => (string)($release['checksum'] ?? ''),
+      'released_at' => (string)($release['released_at'] ?? ''),
+      'released_by' => (string)($release['released_by'] ?? ''),
+      'context_issues' => array_values((array)($release['context_issues'] ?? [])),
+      'message_vi' => (string)($release['message_vi'] ?? ''),
+      'message_en' => (string)($release['message_en'] ?? ''),
+      'summary_vi' => (string)($release['summary_vi'] ?? ''),
+      'summary_en' => (string)($release['summary_en'] ?? ''),
+    ];
+  }
+
+  usort($rows, static function ($a, $b) {
+    $priority = ['critical' => 0, 'warning' => 1, 'info' => 2];
+    $ap = $priority[(string)($a['severity'] ?? 'info')] ?? 9;
+    $bp = $priority[(string)($b['severity'] ?? 'info')] ?? 9;
+    if ($ap !== $bp) return $ap <=> $bp;
+    return strcmp((string)($a['wo_number'] ?? ''), (string)($b['wo_number'] ?? ''));
+  });
+
+  return $rows;
+}
+
+function mes_build_tool_readiness_queue(array $dispatch): array {
+  $rows = [];
+  foreach ($dispatch as $row) {
+    if (!is_array($row)) continue;
+    $status = strtolower((string)($row['status'] ?? 'scheduled'));
+    if (!in_array($status, ['scheduled', 'setup', 'running', 'inspection', 'on_hold'], true)) continue;
+    $toolReadiness = (array)($row['tool_readiness'] ?? []);
+    if (in_array((string)($toolReadiness['band'] ?? 'ready'), ['ready', 'not_required'], true)) continue;
+    $rows[] = [
+      'wo_number' => (string)($row['wo_number'] ?? ''),
+      'jo_number' => (string)($row['jo_number'] ?? ''),
+      'so_number' => (string)($row['so_number'] ?? ''),
+      'machine_id' => (string)($row['machine_id'] ?? ''),
+      'machine_name' => (string)($row['machine_name'] ?? ''),
+      'work_center_id' => (string)($row['work_center_id'] ?? ''),
+      'operator_id' => (string)($row['operator_id'] ?? ''),
+      'operator_name' => (string)($row['operator_name'] ?? ''),
+      'customer_name' => (string)($row['customer_name'] ?? ''),
+      'part_number' => (string)($row['part_number'] ?? ''),
+      'part_revision' => (string)($row['part_revision'] ?? ''),
+      'band' => (string)($toolReadiness['band'] ?? 'warning'),
+      'severity' => (string)($toolReadiness['severity'] ?? 'warning'),
+      'status' => (string)($toolReadiness['status'] ?? 'warning'),
+      'summary_vi' => (string)($toolReadiness['summary_vi'] ?? ''),
+      'summary_en' => (string)($toolReadiness['summary_en'] ?? ''),
+      'message_vi' => (string)($toolReadiness['message_vi'] ?? ''),
+      'message_en' => (string)($toolReadiness['message_en'] ?? ''),
+      'loaded_tool_count' => (int)($toolReadiness['loaded_tool_count'] ?? 0),
+      'alert_count' => (int)($toolReadiness['alert_count'] ?? 0),
+      'top_tool_id' => (string)($toolReadiness['top_tool_id'] ?? ''),
+      'top_tool_runtime_id' => (string)($toolReadiness['top_tool_runtime_id'] ?? ''),
+      'top_issue' => (string)($toolReadiness['top_issue'] ?? ''),
+      'highest_life_pct' => $toolReadiness['highest_life_pct'] ?? null,
+    ];
+  }
+
+  usort($rows, static function ($a, $b) {
+    $priority = ['critical' => 0, 'warning' => 1, 'info' => 2];
+    $ap = $priority[(string)($a['severity'] ?? 'info')] ?? 9;
+    $bp = $priority[(string)($b['severity'] ?? 'info')] ?? 9;
+    if ($ap !== $bp) return $ap <=> $bp;
+    return strcmp((string)($a['wo_number'] ?? ''), (string)($b['wo_number'] ?? ''));
+  });
+
+  return $rows;
+}
+
 function mes_metric_band(?float $value, float $good = 85.0, float $watch = 65.0): string {
   if ($value === null) return 'unknown';
   if ($value >= $good) return 'strong';
@@ -2576,6 +2933,7 @@ function mes_build_program_handshake_queue(array $dispatch): array {
 function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $customers = master_index_by((array)($master['customers'] ?? []), 'customer_id');
   $parts = master_index_by((array)($master['parts'] ?? []), 'part_number');
+  $programReleases = master_index_by((array)($master['nc_program_releases'] ?? []), 'program_id');
   $workCenters = master_index_by((array)($master['work_centers'] ?? []), 'work_center_id');
   $machines = master_index_by((array)($master['machines'] ?? []), 'machine_id');
   $operators = master_index_by((array)($master['operators'] ?? []), 'operator_id');
@@ -2657,6 +3015,7 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
       'operation_desc' => (string)($wo['operation_desc'] ?? ''),
       'machine_id' => $machineId,
       'machine_name' => (string)($machines[$machineId]['machine_name'] ?? ''),
+      'machine_type' => (string)($machines[$machineId]['machine_type'] ?? ''),
       'work_center_id' => (string)($wo['work_center_id'] ?? ''),
       'work_center_name' => (string)($workCenters[(string)($wo['work_center_id'] ?? '')]['work_center_name'] ?? ''),
       'operator_id' => (string)($wo['operator_id'] ?? ''),
@@ -2729,6 +3088,8 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
       'summary_vi' => $toolStatus === 'critical' ? 'Có tool tới hạn' : ($toolStatus === 'warning' ? 'Có tool cần chú ý' : ($toolStatus === 'untracked' ? 'Chưa theo dõi tool-life' : 'Tooling ổn định')),
       'summary_en' => $toolStatus === 'critical' ? 'Critical tool risk' : ($toolStatus === 'warning' ? 'Tool warning' : ($toolStatus === 'untracked' ? 'Tool-life not tracked' : 'Tooling stable')),
     ];
+    $dispatchRow['program_release'] = mes_program_release_summary($dispatchRow, $programReleases);
+    $dispatchRow['tool_readiness'] = mes_tool_readiness_summary($dispatchRow);
     $dispatch[] = $dispatchRow;
     if ($machineId !== '') $workOrdersByMachine[$machineId][] = $dispatchRow;
   }
@@ -2845,6 +3206,8 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
       'loaded_tool_count' => count($machineToolRows),
       'tool_alert_count' => $machineAlertCount,
       'tooling_items' => $machineToolRows,
+      'program_release' => (array)($activeWo['program_release'] ?? []),
+      'tool_readiness' => (array)($activeWo['tool_readiness'] ?? []),
       'availability_pct' => $availability,
       'performance_pct' => $performance,
       'quality_pct' => $quality,
@@ -2973,8 +3336,12 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $oeeTimeline = mes_build_oee_timeline($machineWall);
   $downtimePareto = mes_build_downtime_pareto((array)($mes['downtime_events'] ?? []), $now);
   $programHandshakeQueue = mes_build_program_handshake_queue($dispatch);
+  $programReleaseQueue = mes_build_program_release_queue($dispatch);
+  $toolReadinessQueue = mes_build_tool_readiness_queue($dispatch);
 
   $kpis['program_mismatches'] = count($programHandshakeQueue);
+  $kpis['program_release_risk'] = count($programReleaseQueue);
+  $kpis['tool_readiness_risk'] = count($toolReadinessQueue);
 
   return [
     'kpis' => $kpis,
@@ -2988,6 +3355,8 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     'oee_timeline' => array_slice($oeeTimeline, 0, 12),
     'downtime_pareto' => array_slice($downtimePareto, 0, 8),
     'program_handshake_queue' => array_slice($programHandshakeQueue, 0, 20),
+    'program_release_queue' => array_slice($programReleaseQueue, 0, 20),
+    'tool_readiness_queue' => array_slice($toolReadinessQueue, 0, 20),
     'tooling_alerts' => array_slice($toolingAlerts, 0, 20),
     'evidence_gate_queue' => array_slice($evidenceGateQueue, 0, 20),
   ];
@@ -2999,6 +3368,7 @@ function upsert_master_data_item(array &$store, string $entity, array $item, str
     'suppliers' => 'supplier_id',
     'parts' => 'part_number',
     'revisions' => 'revision_id',
+    'nc_program_releases' => 'program_id',
     'capas' => 'capa_number',
     'work_centers' => 'work_center_id',
     'machines' => 'machine_id',
@@ -9414,6 +9784,7 @@ if ($username === '') {
         'suppliers' => count($data['suppliers'] ?? []),
         'parts' => count($data['parts'] ?? []),
         'revisions' => count($data['revisions'] ?? []),
+        'nc_program_releases' => count($data['nc_program_releases'] ?? []),
         'capas' => count($data['capas'] ?? []),
         'work_centers' => count($data['work_centers'] ?? []),
         'machines' => count($data['machines'] ?? []),

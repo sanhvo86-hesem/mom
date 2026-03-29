@@ -71,6 +71,14 @@ var CONNECTOR_META = {
   disabled:    { vi:'Tắt kết nối', en:'Disabled', color:'#64748b' }
 };
 
+var GOVERNANCE_META = {
+  ready:        { vi:'Sẵn sàng', en:'Ready', color:'#059669' },
+  warning:      { vi:'Cần chốt lại', en:'Needs reconfirmation', color:'#d97706' },
+  critical:     { vi:'Chặn phát hành', en:'Blocking risk', color:'#dc2626' },
+  untracked:    { vi:'Chưa theo dõi', en:'Untracked', color:'#7c3aed' },
+  not_required: { vi:'Không áp dụng', en:'Not required', color:'#64748b' }
+};
+
 function t(vi, en){ return (typeof lang !== 'undefined' && lang === 'en') ? en : vi; }
 function esc(value){
   var div = document.createElement('div');

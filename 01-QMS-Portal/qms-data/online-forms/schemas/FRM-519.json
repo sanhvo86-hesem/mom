@@ -2,15 +2,15 @@
   "form_code": "FRM-519",
   "title": "Pre-Run Quick Check",
   "title_vi": "Phiếu kiểm tra nhanh trước khi chạy",
-  "version": "V2",
+  "version": "V3",
   "category": "production",
   "frequency": "per_event",
   "delivery_mode": "online",
   "online": true,
   "decision_score": 84,
   "sop_ref": "SOP-504",
-  "description": "Governed pre-run release for CNC work orders with machine, WO, operator, tooling, and setup-readiness confirmation before machining starts.",
-  "description_vi": "Biểu mẫu pre-run có kiểm soát cho WO CNC với máy, WO, người vận hành, tooling và xác nhận mức sẵn sàng setup trước khi chạy máy.",
+  "description": "Governed pre-run release for CNC work orders with machine, WO, operator, NC release, tooling, and setup-readiness confirmation before machining starts.",
+  "description_vi": "Biểu mẫu pre-run có kiểm soát cho WO CNC với máy, WO, người vận hành, NC release, tooling và xác nhận mức sẵn sàng setup trước khi chạy máy.",
   "roles_allowed": [
     "admin",
     "production_manager",
@@ -31,9 +31,21 @@
       "id": "context",
       "title": "Execution Context",
       "title_vi": "Ngữ cảnh thực thi",
-      "description": "Select the governed WO, machine, operator, and the primary tooling package before machining starts.",
-      "description_vi": "Chọn WO, máy, người vận hành và bộ tooling chính đã được quản lý trước khi cho máy chạy.",
-      "field_ids": ["check_date", "shift", "work_center_id", "machine_id", "wo_number", "operator_id", "primary_tool_id", "part_number", "part_revision"]
+      "description": "Select the governed WO, machine, operator, tooling package, and the released NC program before machining starts.",
+      "description_vi": "Chọn WO, máy, người vận hành, bộ tooling và chương trình NC đã được quản lý trước khi cho máy chạy.",
+      "field_ids": [
+        "check_date",
+        "shift",
+        "work_center_id",
+        "machine_id",
+        "wo_number",
+        "operator_id",
+        "primary_tool_id",
+        "part_number",
+        "part_revision",
+        "expected_nc_program_id",
+        "released_program_id"
+      ]
     },
     {
       "id": "readiness",
@@ -41,7 +53,21 @@
       "title_vi": "Kiểm tra mức sẵn sàng",
       "description": "Verify the minimum release conditions before machining starts.",
       "description_vi": "Xác nhận các điều kiện tối thiểu trước khi cho máy chạy sản xuất.",
-      "field_ids": ["document_set_ok", "material_lot_ok", "tool_list_ok", "offset_probe_ok", "fixture_setup_ok", "coolant_chip_ok", "dry_run_ok", "risk_flags", "tooling_note", "notes"]
+      "field_ids": [
+        "document_set_ok",
+        "material_lot_ok",
+        "tool_list_ok",
+        "program_release_verified",
+        "tool_life_verified",
+        "offset_probe_ok",
+        "fixture_setup_ok",
+        "coolant_chip_ok",
+        "dry_run_ok",
+        "risk_flags",
+        "tooling_note",
+        "program_release_note",
+        "notes"
+      ]
     }
   ],
   "fields": [
@@ -118,7 +144,8 @@
         "part_revision": "part_revision",
         "machine_id": "machine_id",
         "work_center_id": "work_center_id",
-        "operator_id": "operator_id"
+        "operator_id": "operator_id",
+        "expected_nc_program_id": "nc_program_id"
       },
       "placeholder": "Search work order",
       "placeholder_vi": "Tìm Work Order"
@@ -188,6 +215,30 @@
       "placeholder_vi": "Tìm revision"
     },
     {
+      "id": "expected_nc_program_id",
+      "type": "text",
+      "label": "Expected NC Program",
+      "label_vi": "Chương trình NC kỳ vọng",
+      "required": false,
+      "width": "third",
+      "placeholder": "Autofilled from work order",
+      "placeholder_vi": "Tự điền từ Work Order"
+    },
+    {
+      "id": "released_program_id",
+      "type": "lookup",
+      "label": "Released NC Program",
+      "label_vi": "Chương trình NC đã release",
+      "required": true,
+      "width": "third",
+      "lookup_source": "nc_program_releases",
+      "strict_select": true,
+      "depends_on": ["wo_number", "part_number", "part_revision", "machine_id", "work_center_id"],
+      "display_fields": ["program_id", "part_number", "part_revision", "status"],
+      "placeholder": "Search released NC program",
+      "placeholder_vi": "Tìm chương trình NC đã release"
+    },
+    {
       "id": "document_set_ok",
       "type": "checkbox",
       "label": "Document Set",
@@ -214,6 +265,26 @@
       "label_vi": "Danh sách dao",
       "checkbox_label": "Tool list and cutter configuration are correct",
       "checkbox_label_vi": "Danh sách dao và cấu hình dao là đúng",
+      "required": true,
+      "default": false
+    },
+    {
+      "id": "program_release_verified",
+      "type": "checkbox",
+      "label": "NC Release Verification",
+      "label_vi": "Xác nhận NC release",
+      "checkbox_label": "The released NC program matches the WO, revision, and machine context",
+      "checkbox_label_vi": "Chương trình NC đã release khớp với WO, revision và bối cảnh máy",
+      "required": true,
+      "default": false
+    },
+    {
+      "id": "tool_life_verified",
+      "type": "checkbox",
+      "label": "Tool-Life Verification",
+      "label_vi": "Xác nhận tool-life",
+      "checkbox_label": "Primary tool life, sister tool, and offset readiness have been verified",
+      "checkbox_label_vi": "Đã xác nhận tool-life, sister tool và độ sẵn sàng offset của dao chính",
       "required": true,
       "default": false
     },
@@ -268,7 +339,8 @@
         { "value": "customer_hold_point", "label": "Customer hold point", "label_vi": "Điểm hold khách hàng" },
         { "value": "special_process", "label": "Special process downstream", "label_vi": "Có special process phía sau" },
         { "value": "tight_tolerance", "label": "Tight tolerance", "label_vi": "Dung sai chặt" },
-        { "value": "first_run_on_machine", "label": "First run on this machine", "label_vi": "Lần đầu chạy trên máy này" }
+        { "value": "first_run_on_machine", "label": "First run on this machine", "label_vi": "Lần đầu chạy trên máy này" },
+        { "value": "program_reloaded", "label": "Program reloaded", "label_vi": "Vừa nạp lại chương trình" }
       ]
     },
     {
@@ -281,6 +353,17 @@
       "width": "full",
       "placeholder": "Probe offset, sister tool, holder, or pocket notes",
       "placeholder_vi": "Ghi chú về probe offset, sister tool, holder hoặc pocket"
+    },
+    {
+      "id": "program_release_note",
+      "type": "textarea",
+      "label": "Program Release Note",
+      "label_vi": "Ghi chú NC release",
+      "required": false,
+      "rows": 3,
+      "width": "full",
+      "placeholder": "Checksum, CAM/post revision, or handshake note",
+      "placeholder_vi": "Ghi chú checksum, CAM/post revision hoặc handshake"
     },
     {
       "id": "notes",
@@ -312,8 +395,8 @@
       "label": "Shift Leader / QC Verification",
       "label_vi": "Chữ ký xác nhận của trưởng ca / QC",
       "label_en": "Shift Leader / QC Verification",
-      "help": "Verify that the WO is safe and ready to release for machining.",
-      "help_vi": "Xác nhận WO đủ điều kiện an toàn và chất lượng để cho máy chạy.",
+      "help": "Verify that the WO, NC release, and tooling state are safe for machining release.",
+      "help_vi": "Xác nhận WO, NC release và tình trạng tooling đủ điều kiện an toàn để cho máy chạy.",
       "require_reason": true,
       "require_pin": true,
       "signature_meaning": "Pre-run release verification",

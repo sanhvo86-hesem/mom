@@ -95,6 +95,33 @@ var ENTITY_CONFIG = {
       { key:'release_date', type:'date', label:'Ngày phát hành' }
     ]
   },
+  nc_program_releases: {
+    key: 'program_id',
+    labelVi: 'NC release',
+    labelEn: 'NC releases',
+    emptyVi: 'Chưa có chương trình NC nào được quản lý release.',
+    listColumns: [
+      { key:'program_id', label:'Mã chương trình' },
+      { key:'part_number', label:'Part Number' },
+      { key:'status', label:'Trạng thái' }
+    ],
+    fields: [
+      { key:'program_id', type:'text', required:true, label:'Mã chương trình NC' },
+      { key:'release_title', type:'text', required:true, label:'Tên release / tiêu đề' },
+      { key:'part_number', type:'lookup', entity:'parts', required:true, label:'Part Number' },
+      { key:'part_revision', type:'text', required:true, label:'Revision áp dụng' },
+      { key:'operation_number', type:'number', required:true, label:'Operation number' },
+      { key:'machine_type', type:'select', label:'Machine family', options:['5-axis','3-axis','turning','mill-turn','cmm','multi'] },
+      { key:'work_center_id', type:'lookup', entity:'work_centers', label:'Work center áp dụng' },
+      { key:'cam_source_rev', type:'text', label:'CAM source revision' },
+      { key:'post_processor_rev', type:'text', label:'Post-processor revision' },
+      { key:'checksum', type:'text', label:'Checksum / fingerprint' },
+      { key:'status', type:'select', required:true, label:'Trạng thái release', options:['draft','released','superseded','blocked','obsolete'] },
+      { key:'released_at', type:'datetime-local', label:'Thời điểm release' },
+      { key:'released_by', type:'text', label:'Người release' },
+      { key:'notes', type:'textarea', label:'Ghi chú release', helper:'Ghi rõ phạm vi áp dụng, risk note hoặc handshake cần khóa tại máy.' }
+    ]
+  },
   capas: {
     key: 'capa_number',
     labelVi: 'CAPA',
@@ -252,6 +279,7 @@ function _optionLabel(entity, row){
   if(entity === 'suppliers') return row.supplier_name || row.supplier_id || '';
   if(entity === 'parts') return row.part_number || '';
   if(entity === 'revisions') return row.revision_id || row.revision || '';
+  if(entity === 'nc_program_releases') return row.program_id || '';
   if(entity === 'capas') return row.capa_number || '';
   if(entity === 'work_centers') return row.work_center_name || row.work_center_id || '';
   if(entity === 'machines') return row.machine_name || row.machine_id || '';
@@ -274,6 +302,7 @@ function _defaultDraft(entity){
   if(entity === 'suppliers') draft.status = 'approved';
   if(entity === 'parts') draft.status = 'active';
   if(entity === 'revisions') draft.status = 'released';
+  if(entity === 'nc_program_releases') draft.status = 'draft';
   if(entity === 'capas') draft.status = 'open';
   if(entity === 'work_centers') draft.status = 'active';
   if(entity === 'machines') {
