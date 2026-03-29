@@ -97,6 +97,30 @@ var EXCEPTION_TYPES = [
     page: 'mes'
   },
   {
+    key: 'program_release_risk',
+    icon: '\ud83d\udddc\ufe0f',
+    accent: '#2563eb',
+    surface: '#eff6ff',
+    border: '#93c5fd',
+    labelVi: 'Thiếu release NC',
+    labelEn: 'NC release risk',
+    descVi: 'WO chưa có bản phát hành NC hợp lệ theo part, revision, operation hoặc machine context.',
+    descEn: 'The WO does not yet have a valid governed NC release for its part, revision, operation, or machine context.',
+    page: 'mes'
+  },
+  {
+    key: 'tool_readiness_risk',
+    icon: '\ud83e\uddf0',
+    accent: '#0f766e',
+    surface: '#ecfeff',
+    border: '#99f6e4',
+    labelVi: 'Tooling chưa sẵn sàng',
+    labelEn: 'Tool readiness risk',
+    descVi: 'WO đang bị chặn bởi tool-life, offset hoặc dữ liệu runtime tooling chưa đủ.',
+    descEn: 'The WO is blocked by tool-life, offset drift, or incomplete tooling runtime.',
+    page: 'mes'
+  },
+  {
     key: 'orphan_links',
     icon: '\ud83e\uddf7',
     accent: '#2563eb',
@@ -283,7 +307,7 @@ function renderSummary(){
     total += count;
     if (count > 0) activeGroups += 1;
   });
-  highPriority = Number(state.summary.overdue_allocations || 0) + Number(state.summary.wo_missing_evidence || 0) + Number(state.summary.program_mismatches || 0) + Number(state.summary.overdue_orders || 0);
+  highPriority = Number(state.summary.overdue_allocations || 0) + Number(state.summary.wo_missing_evidence || 0) + Number(state.summary.program_mismatches || 0) + Number(state.summary.program_release_risk || 0) + Number(state.summary.tool_readiness_risk || 0) + Number(state.summary.overdue_orders || 0);
   var nextPage = highPriority > 0 ? t('MES / Chứng cứ', 'MES / Evidence') : (activeGroups > 0 ? t('Đơn hàng', 'Orders') : t('Ổn định', 'Stable'));
   var totalEl = state.container.querySelector('#excx-total');
   var groupsEl = state.container.querySelector('#excx-groups');

@@ -11205,6 +11205,8 @@ if ($username === '') {
     $mesSnapshot = build_mes_snapshot($orders, $master, $mes);
     $woMissingEvidence = count((array)($mesSnapshot['evidence_gate_queue'] ?? []));
     $programMismatches = count((array)($mesSnapshot['program_handshake_queue'] ?? []));
+    $programReleaseRisk = count((array)($mesSnapshot['program_release_queue'] ?? []));
+    $toolReadinessRisk = count((array)($mesSnapshot['tool_readiness_queue'] ?? []));
 
     // 6. Orphan record links (links pointing to non-existent orders)
     $orphanLinks = 0;
@@ -11225,6 +11227,8 @@ if ($username === '') {
       'overdue_capas'       => $overdueCapas,
       'wo_missing_evidence' => $woMissingEvidence,
       'program_mismatches'  => $programMismatches,
+      'program_release_risk'=> $programReleaseRisk,
+      'tool_readiness_risk' => $toolReadinessRisk,
       'orphan_links'        => $orphanLinks,
     ]);
   }
@@ -11359,6 +11363,54 @@ if ($username === '') {
               trim((string)($row['part_number'] ?? '') . ' ' . (string)($row['part_revision'] ?? '')),
               'EXP ' . (string)($row['expected_program_id'] ?? ''),
               ($row['actual_program_id'] ?? '') !== '' ? ('ACT ' . (string)$row['actual_program_id']) : 'ACT missing',
+            ])),
+          ];
+        }
+        break;
+      }
+      case 'program_release_risk': {
+        $orders = load_orders_store();
+        $master = load_master_data_store();
+        $mes = load_mes_runtime_store();
+        $snapshot = build_mes_snapshot($orders, $master, $mes);
+        foreach ((array)($snapshot['program_release_queue'] ?? []) as $row) {
+          if (!is_array($row)) continue;
+          $items[] = [
+            'id' => (string)($row['wo_number'] ?? ''),
+            'type' => (string)($row['release_status'] ?? $row['status'] ?? 'release_risk'),
+            'department' => (string)($row['work_center_id'] ?? ''),
+            'date' => substr((string)($row['released_at'] ?? ''), 0, 10),
+            'responsible' => (string)($row['machine_id'] ?? ''),
+            'detail' => implode(' · ', array_filter([
+              (string)($row['customer_name'] ?? ''),
+              trim((string)($row['part_number'] ?? '') . ' ' . (string)($row['part_revision'] ?? '')),
+              'EXP ' . (string)($row['expected_program_id'] ?? ''),
+              'REL ' . (string)($row['program_id'] ?? $row['expected_program_id'] ?? ''),
+              !empty($row['context_issues']) ? ('Mismatch: ' . implode(', ', (array)$row['context_issues'])) : '',
+            ])),
+          ];
+        }
+        break;
+      }
+      case 'tool_readiness_risk': {
+        $orders = load_orders_store();
+        $master = load_master_data_store();
+        $mes = load_mes_runtime_store();
+        $snapshot = build_mes_snapshot($orders, $master, $mes);
+        foreach ((array)($snapshot['tool_readiness_queue'] ?? []) as $row) {
+          if (!is_array($row)) continue;
+          $items[] = [
+            'id' => (string)($row['wo_number'] ?? ''),
+            'type' => (string)($row['status'] ?? 'tool_readiness'),
+            'department' => (string)($row['work_center_id'] ?? ''),
+            'date' => '',
+            'responsible' => (string)($row['machine_id'] ?? ''),
+            'detail' => implode(' · ', array_filter([
+              (string)($row['customer_name'] ?? ''),
+              trim((string)($row['part_number'] ?? '') . ' ' . (string)($row['part_revision'] ?? '')),
+              (string)($row['top_tool_id'] ?? ''),
+              $row['highest_life_pct'] === null ? '' : ('Life ' . round((float)$row['highest_life_pct'], 1) . '%'),
+              (string)($row['top_issue'] ?? ''),
             ])),
           ];
         }
