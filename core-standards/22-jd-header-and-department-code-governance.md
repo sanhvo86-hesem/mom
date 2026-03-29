@@ -122,6 +122,11 @@ Ma tran tham quyen, ma tran deputy, dashboard audience table, authority summary 
 - `Chuc danh theo tai lieu` trong JD PHAI giu plain English title, khong doi thanh role chip.
 - `Ma vai tro dung trong SOP/RACI` PHAI la role chip co link JD.
 - `Bo phan` trong row cau truc PHAI la `D-code` chip theo role-boundary profile.
+- Moi cho nhac toi JD trong body, note, OJT index, roadmap, gate-test, matrix hoac annex PHAI dung 1 trong 2 dang hop le:
+  - `JD-XXX` voi `XXX` la ma JD canonical da ton tai trong thu vien JD;
+  - role chip / role-cluster co link ve file JD that.
+- Khong duoc viet textual-JD nua mua nhu `JD-Operator / production family`, `JD-Setup Technician / Shift leadership`, `JD-CAM/NC Programmer`, `JD-QA Manager / QMS Engineer / Quality Engineer`, `JD-Buyer / supply chain family`, `JD-Warehouse / logistics family`.
+- Neu can chi mot nhom role lien doi, PHAI list bang role chip explicit nhu `OPR`, `SET / SL`, `CAM`, `QE / QMS / QA`, `BUY / SCM`, `WAR / LOG`; khong duoc tu dat family label roi gan tien to `JD-`.
 - Preface `Tai lieu lien doi` PHAI duoc dedupe; khong duoc lap cung mot handbook/link nhieu lan.
 - Header, preface va row cau truc cua JD PHAI khop nhau ve layer: title = English title, owner = D-code, approver = role code.
 - Cau mo dau trong `jd-purpose` PHAI goi ten vi tri bang `English title (ROLECODE)` de khoa ten chuc danh, tranh tro lai cac bien the nua mua nhu `Truong bo phan ...`, `Specialist Bao gia`, `Governance He thong ...`.
@@ -212,3 +217,4 @@ Khong duoc sua HTML downstream truoc khi nguon JD/handbook da dung.
 - Trong SOP/WI/ANNEX, cac cot owner da tach ro `role code` va `D-code` theo ban chat o du lieu chua?
 - Co con residue kieu `D-HR` dung sai, `Department Head`, `Process Owner`, `Data Owner`, `QA/QMS` hoac ten phong ban viet dai dong trong header hay owner cell khong?
 - Co con pseudo-role chua resolve nhu `QMS Manager`, `IT Manager`, `Sales Manager`, `Engineering Manager`, `Production Supervisor`, `IQC Team Leader`, `Business Owner`, `System Owner`, `KPI owner` hoac `IT Data Owner` khong?
+- Co con textual JD residue kieu `JD-... family`, `JD-... Technician`, `JD-... Manager / ... Engineer` ma khong phai ma JD canonical hoac role chip link JD khong?

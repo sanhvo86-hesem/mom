@@ -1,7 +1,7 @@
 -- Migration: 011_quality.sql
--- Description: Quality tables - inspection_plans, inspection_results, spc_data, ncr_records, capa_records, fai_records, fai_characteristics, certificates, npi_projects, ehs_incidents, contamination_checks
+-- Description: Quality tables - inspection_plans, inspection_results, spc_data, ncr_records, capa_records, fai_records, fai_characteristics, certificates, npi_projects, ehs_incidents, contamination_checks, engineering_change_requests
 -- Dependencies: 005_record_management.sql, 006_erp_master_data.sql, 007_customers_sales.sql
--- Rollback: DROP TABLE contamination_checks, ehs_incidents, npi_projects, certificates, fai_characteristics, fai_records, capa_records, ncr_records, spc_data, inspection_results, inspection_plans CASCADE;
+-- Rollback: DROP TABLE engineering_change_requests, contamination_checks, ehs_incidents, npi_projects, certificates, fai_characteristics, fai_records, capa_records, ncr_records, spc_data, inspection_results, inspection_plans CASCADE;
 
 BEGIN;
 
@@ -262,6 +262,48 @@ CREATE TABLE contamination_checks (
     recorded_at         TIMESTAMPTZ     NOT NULL DEFAULT now()
 );
 COMMENT ON TABLE contamination_checks IS 'Contamination and FOD checks. Maps contamination_fod variables. / Kiem tra nhiem ban va FOD.';
+
+-- ---------------------------------------------------------------------------
+-- engineering_change_requests / Yeu cau thay doi ky thuat (11 vars from engineering)
+-- ---------------------------------------------------------------------------
+CREATE TABLE engineering_change_requests (
+    ecr_id              UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
+    ecr_number          VARCHAR(30)     NOT NULL UNIQUE,
+    ecr_status          ecr_status_enum NOT NULL DEFAULT 'Draft',
+    ecr_type            VARCHAR(50),    -- design/process/material/tooling/documentation
+    change_description  TEXT,
+    change_reason       TEXT,
+    revision_from       VARCHAR(20),
+    revision_to         VARCHAR(20),
+    impact_assessment   TEXT,
+    affected_documents  JSONB           DEFAULT '[]',
+    cam_program_id      VARCHAR(50),
+    baseline_version    VARCHAR(20),
+    department          dept_code,
+    requested_by        UUID            REFERENCES users(user_id),
+    approved_by         UUID            REFERENCES users(user_id),
+    item_id             UUID            REFERENCES items(item_id),
+    linked_record_id    UUID            REFERENCES records(record_id),
+    metadata            JSONB           DEFAULT '{}',
+    valid_from          TIMESTAMPTZ     DEFAULT now(),
+    valid_to            TIMESTAMPTZ     DEFAULT 'infinity',
+    created_at          TIMESTAMPTZ     DEFAULT now(),
+    updated_at          TIMESTAMPTZ     DEFAULT now()
+);
+COMMENT ON TABLE engineering_change_requests IS 'Engineering change requests (ECR). Maps engineering variables. / Yeu cau thay doi ky thuat.';
+COMMENT ON COLUMN engineering_change_requests.ecr_number IS 'Unique ECR identifier, format ECR-{YYYY}-{NNN}. / Ma ECR duy nhat.';
+COMMENT ON COLUMN engineering_change_requests.ecr_status IS 'Current ECR lifecycle status. / Trang thai vong doi ECR hien tai.';
+COMMENT ON COLUMN engineering_change_requests.ecr_type IS 'Type of change: design, process, material, tooling, documentation. / Loai thay doi.';
+COMMENT ON COLUMN engineering_change_requests.impact_assessment IS 'Assessment of change impact on processes, tooling, documentation. / Danh gia tac dong thay doi.';
+COMMENT ON COLUMN engineering_change_requests.affected_documents IS 'JSONB array of document IDs affected by this change. / Mang JSONB cac tai lieu bi anh huong.';
+COMMENT ON COLUMN engineering_change_requests.cam_program_id IS 'Engineering baseline program identifier per Pattern 3 naming. / Ma chuong trinh CAM theo quy tac P3.';
+COMMENT ON COLUMN engineering_change_requests.baseline_version IS 'Version number for engineering baseline files. / So phien ban co so ky thuat.';
+CREATE INDEX idx_ecr_status ON engineering_change_requests (ecr_status);
+CREATE INDEX idx_ecr_number ON engineering_change_requests (ecr_number);
+CREATE INDEX idx_ecr_department ON engineering_change_requests (department);
+CREATE INDEX idx_ecr_item ON engineering_change_requests (item_id);
+CREATE INDEX idx_ecr_requested_by ON engineering_change_requests (requested_by);
+CREATE INDEX idx_ecr_valid_range ON engineering_change_requests USING gist (tstzrange(valid_from, valid_to));
 
 COMMIT;
 

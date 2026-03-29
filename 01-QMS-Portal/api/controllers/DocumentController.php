@@ -1017,4 +1017,57 @@ class DocumentController extends BaseController
             '</body>' . "\n" .
             '</html>';
     }
+
+    /**
+     * POST docsSnapshot — Batch-fetch document/form states for a list of codes.
+     *
+     * Legacy action: `docs_snapshot`
+     *
+     * Accepts JSON body: { docs: [{ code, base_path|path }, ...] }
+     * Returns: { states: { CODE: stateObj, ... }, server_time: "..." }
+     *
+     * @return never
+     */
+    public function docsSnapshot(): never
+    {
+        $this->requireAuth();
+
+        // Release session lock early — this action can be heavy.
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            @session_write_close();
+        }
+
+        $data = $this->jsonBody();
+        $docs = $data['docs'] ?? [];
+        if (!is_array($docs)) $docs = [];
+
+        $registryFile = $this->confDir . '/form_control_registry.json';
+        $archiveDir   = $this->rootDir . '/archive';
+
+        $out = [];
+        foreach ($docs as $d) {
+            if (!is_array($d)) continue;
+            $code     = (string)($d['code'] ?? '');
+            $basePath = (string)($d['base_path'] ?? ($d['path'] ?? ''));
+            if ($code === '') continue;
+            if (trim($basePath) === '') continue;
+
+            // Try form registry first
+            $formEntry = form_registry_get_entry($registryFile, $code, $basePath);
+            if (is_array($formEntry)) {
+                $st = form_load_state_existing($this->dataDir, (string)$formEntry['code']);
+                if (!is_array($st)) $st = form_state_fallback_from_registry($formEntry);
+                $out[$code] = $st;
+                continue;
+            }
+
+            // Fall back to document state
+            $st = load_doc_state($this->rootDir, $basePath, $archiveDir, $code);
+            if ($st) {
+                $out[$code] = $st;
+            }
+        }
+
+        $this->success(['states' => $out, 'server_time' => $this->nowIso()]);
+    }
 }

@@ -1,0 +1,122 @@
+{
+  "form_code": "FRM-631",
+  "title": "Non-Conformity Report (NCR)",
+  "title_vi": "Phiếu báo lỗi không phù hợp (NCR)",
+  "version": "V1",
+  "category": "quality",
+  "frequency": "per_event",
+  "sop_ref": "SOP-606",
+  "description": "Ghi nhận sự không phù hợp về sản phẩm, quá trình hoặc hệ thống; xác định nguyên nhân gốc, xử lý và hành động khắc phục.",
+  "roles_allowed": ["admin", "qa_manager", "qc_inspector", "quality_engineer", "production_manager", "shift_leader", "engineering_manager"],
+  "fields": [
+    {"id": "ncr_date", "type": "date", "label": "Ngày phát hiện", "label_en": "NCR Date", "required": true, "default": "today"},
+    {
+      "id": "department",
+      "type": "select",
+      "label": "Phòng ban phát hiện",
+      "label_en": "Department",
+      "required": true,
+      "options": [
+        {"value": "PROD", "label": "Sản xuất"},
+        {"value": "ENG", "label": "Kỹ thuật"},
+        {"value": "QA", "label": "Chất lượng"},
+        {"value": "SCM", "label": "Chuỗi cung ứng"},
+        {"value": "WH", "label": "Kho vận"}
+      ]
+    },
+    {"id": "job_number", "type": "text", "label": "Số Job", "label_en": "Job Number", "required": true, "placeholder": "VD: J-2026-0150"},
+    {"id": "part_number", "type": "text", "label": "Mã chi tiết", "label_en": "Part Number", "required": true},
+    {"id": "part_rev", "type": "text", "label": "Revision", "label_en": "Part Revision", "required": true, "placeholder": "VD: Rev C"},
+    {"id": "customer", "type": "text", "label": "Khách hàng", "label_en": "Customer", "required": true},
+    {"id": "operation", "type": "text", "label": "Công đoạn phát hiện", "label_en": "Operation", "required": false, "placeholder": "VD: OP20 — Milling"},
+    {
+      "id": "defect_type",
+      "type": "select",
+      "label": "Loại lỗi",
+      "label_en": "Defect Type",
+      "required": true,
+      "options": [
+        {"value": "dimensional", "label": "Kích thước (Dimensional)"},
+        {"value": "surface", "label": "Bề mặt (Surface)"},
+        {"value": "material", "label": "Vật liệu (Material)"},
+        {"value": "documentation", "label": "Tài liệu (Documentation)"},
+        {"value": "process", "label": "Quy trình (Process)"},
+        {"value": "other", "label": "Khác (Other)"}
+      ]
+    },
+    {"id": "defect_description", "type": "textarea", "label": "Mô tả lỗi", "label_en": "Defect Description", "rows": 4, "required": true, "placeholder": "Mô tả chi tiết lỗi không phù hợp..."},
+    {"id": "quantity_affected", "type": "number", "label": "Số lượng bị ảnh hưởng", "label_en": "Quantity Affected", "min": 1, "required": true},
+    {"id": "quantity_rejected", "type": "number", "label": "Số lượng loại bỏ", "label_en": "Quantity Rejected", "min": 0, "required": true},
+    {
+      "id": "severity",
+      "type": "select",
+      "label": "Mức độ nghiêm trọng",
+      "label_en": "Severity",
+      "required": true,
+      "options": [
+        {"value": "minor", "label": "Nhẹ (Minor)", "color": "#2f9e44"},
+        {"value": "major", "label": "Nặng (Major)", "color": "#e67700"},
+        {"value": "critical", "label": "Nghiêm trọng (Critical)", "color": "#e03131"}
+      ]
+    },
+    {"id": "containment_action", "type": "textarea", "label": "Hành động ngăn chặn", "label_en": "Containment Action", "rows": 3, "required": true, "placeholder": "Hành động ngăn chặn tức thời để cô lập sản phẩm lỗi..."},
+    {
+      "id": "disposition",
+      "type": "select",
+      "label": "Quyết định xử lý",
+      "label_en": "Disposition",
+      "required": true,
+      "options": [
+        {"value": "rework", "label": "Sửa chữa (Rework)"},
+        {"value": "scrap", "label": "Phế phẩm (Scrap)"},
+        {"value": "use_as_is", "label": "Sử dụng nguyên trạng (Use As-Is)"},
+        {"value": "return_to_vendor", "label": "Trả nhà cung cấp (Return to Vendor)"},
+        {"value": "mrb", "label": "MRB (Material Review Board)"}
+      ]
+    },
+    {
+      "id": "root_cause_category",
+      "type": "select",
+      "label": "Nhóm nguyên nhân gốc",
+      "label_en": "Root Cause Category",
+      "required": false,
+      "options": [
+        {"value": "man", "label": "Con người (Man)"},
+        {"value": "machine", "label": "Máy móc (Machine)"},
+        {"value": "method", "label": "Phương pháp (Method)"},
+        {"value": "material", "label": "Vật liệu (Material)"},
+        {"value": "measurement", "label": "Đo lường (Measurement)"},
+        {"value": "environment", "label": "Môi trường (Environment)"}
+      ]
+    },
+    {"id": "root_cause_description", "type": "textarea", "label": "Mô tả nguyên nhân gốc", "label_en": "Root Cause Description", "rows": 3, "placeholder": "Phân tích nguyên nhân gốc..."},
+    {"id": "corrective_action", "type": "textarea", "label": "Hành động khắc phục", "label_en": "Corrective Action", "rows": 3, "placeholder": "Hành động khắc phục để loại bỏ nguyên nhân..."},
+    {"id": "preventive_action", "type": "textarea", "label": "Hành động phòng ngừa", "label_en": "Preventive Action", "rows": 3, "placeholder": "Hành động phòng ngừa tái phát..."},
+    {"id": "inspector_id", "type": "text", "label": "Mã QC Inspector", "label_en": "Inspector ID", "required": false},
+    {"id": "reported_by", "type": "text", "label": "Người báo cáo", "label_en": "Reported By", "required": true},
+    {"id": "approved_by", "type": "text", "label": "Người phê duyệt", "label_en": "Approved By", "required": false},
+    {
+      "id": "status",
+      "type": "select",
+      "label": "Trạng thái",
+      "label_en": "Status",
+      "required": true,
+      "default": "open",
+      "options": [
+        {"value": "open", "label": "Mở (Open)", "color": "#e03131"},
+        {"value": "containment", "label": "Đang ngăn chặn (Containment)", "color": "#e67700"},
+        {"value": "investigation", "label": "Đang điều tra (Investigation)", "color": "#1971c2"},
+        {"value": "corrective_action", "label": "Đang khắc phục (Corrective Action)", "color": "#862e9c"},
+        {"value": "verification", "label": "Đang xác nhận (Verification)", "color": "#0369a1"},
+        {"value": "closed", "label": "Đã đóng (Closed)", "color": "#2f9e44"}
+      ]
+    },
+    {"id": "photos", "type": "file", "label": "Hình ảnh đính kèm", "label_en": "Photos", "accept": "image/*", "multiple": true, "max_files": 10, "required": false},
+    {"id": "linked_capa", "type": "text", "label": "CAPA liên kết", "label_en": "Linked CAPA", "required": false, "placeholder": "VD: CAPA-2026-001"}
+  ],
+  "auto_fields": ["submitted_by", "submitted_at", "entry_id"],
+  "notifications": {
+    "on_critical": ["qa_manager", "production_manager", "production_director"],
+    "on_submit": ["qa_manager"]
+  }
+}

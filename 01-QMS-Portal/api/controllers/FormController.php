@@ -276,4 +276,176 @@ class FormController extends BaseController
         readfile($absPath);
         exit;
     }
+
+    /**
+     * POST uploadDraft — Upload a workbook file as a form draft.
+     *
+     * Legacy action: `form_upload_draft`
+     *
+     * Expects multipart/form-data with fields: code, base_path|path, note, revision, file.
+     *
+     * @return never
+     */
+    public function uploadDraft(): never
+    {
+        if ($this->method() !== 'POST') $this->error('method_not_allowed', 405);
+
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+
+        $rolePermsFile = $this->confDir . '/role_permissions.json';
+        require_doc_workflow_editor($me, $rolePermsFile);
+
+        $code     = strtoupper(trim((string)($_POST['code'] ?? '')));
+        $basePath = (string)($_POST['base_path'] ?? ($_POST['path'] ?? ''));
+        $note     = trim((string)($_POST['note'] ?? ''));
+
+        if ($code === '') $this->error('missing_code', 400);
+        if (trim($basePath) === '') $this->error('missing_base_path', 400);
+        if (!isset($_FILES['file']) || !is_array($_FILES['file'])) {
+            $this->error('missing_file', 400);
+        }
+
+        $baseRel      = safe_rel_path($basePath);
+        $registryFile = $this->confDir . '/form_control_registry.json';
+        $formEntry    = form_registry_get_entry($registryFile, $code, $baseRel);
+        if (!is_array($formEntry)) $this->error('form_not_found', 404);
+
+        $state = form_load_state($this->dataDir, $this->rootDir, $formEntry);
+        if (($state['status'] ?? 'approved') === 'approved') {
+            $this->error('start_new_revision_required', 400);
+        }
+
+        $manifest   = form_load_manifest($this->dataDir, $this->rootDir, $formEntry);
+        $revision   = form_normalize_revision(
+            (string)($_POST['revision'] ?? ($state['revision'] ?? '0')),
+            form_normalize_revision((string)($state['revision'] ?? '0'), '0')
+        );
+        $updateType = (($state['updateType'] ?? 'minor') === 'major') ? 'major' : 'minor';
+
+        // Validate upload
+        $upload      = $_FILES['file'];
+        $tmpName     = (string)($upload['tmp_name'] ?? '');
+        $uploadError = (int)($upload['error'] ?? UPLOAD_ERR_NO_FILE);
+        if ($uploadError !== UPLOAD_ERR_OK || $tmpName === '') {
+            $this->error('upload_failed', 400);
+        }
+
+        $uploadSize = (int)($upload['size'] ?? 0);
+        if ($uploadSize <= 0) $this->error('invalid_upload_size', 400);
+
+        $maxBytes = 25 * 1024 * 1024; // 25 MB
+        if ($uploadSize > $maxBytes) {
+            $this->error('upload_too_large', 413);
+        }
+
+        // Extension checks
+        $liveExt   = form_extension_from_path((string)$formEntry['path']);
+        $uploadExt = strtolower(pathinfo((string)($upload['name'] ?? ''), PATHINFO_EXTENSION));
+        if (!form_is_workbook_extension($uploadExt)) {
+            $this->error('unsupported_form_extension', 400);
+        }
+        if ($liveExt !== '' && $uploadExt !== $liveExt) {
+            $this->error('extension_mismatch', 400);
+        }
+
+        // Store the draft file
+        $draftMeta = form_private_file_meta($this->dataDir, (string)$formEntry['code'], $revision, 'draft', $uploadExt);
+        ensure_dir(dirname($draftMeta['abs']));
+        $moved = @move_uploaded_file($tmpName, $draftMeta['abs']);
+        if (!$moved) {
+            $moved = @copy($tmpName, $draftMeta['abs']);
+        }
+        if (!$moved || !is_file($draftMeta['abs'])) {
+            $this->error('upload_store_failed', 500);
+        }
+
+        clearstatcache(true, $draftMeta['abs']);
+        $storedSize = @filesize($draftMeta['abs']) ?: 0;
+        if ($storedSize <= 0 || $storedSize > $maxBytes) {
+            if (is_file($draftMeta['abs'])) @unlink($draftMeta['abs']);
+            $this->error(
+                $storedSize > $maxBytes ? 'upload_too_large' : 'invalid_upload_size',
+                $storedSize > $maxBytes ? 413 : 400
+            );
+        }
+
+        // Validate file signature
+        if (!uploaded_workbook_signature_valid($draftMeta['abs'], $uploadExt)) {
+            if (is_file($draftMeta['abs'])) @unlink($draftMeta['abs']);
+            $this->error('invalid_file_signature', 400);
+        }
+
+        $sha  = form_sha256_file($draftMeta['abs']);
+        $size = $storedSize;
+        $dt   = human_dt();
+
+        // Update manifest versions
+        $versions = is_array($manifest['versions'] ?? null) ? $manifest['versions'] : [];
+        $idx = form_find_working_entry_index($versions, $revision, ['draft', 'in_review', 'pending_approval']);
+
+        $entry = [
+            'id'            => $idx >= 0
+                ? (string)($versions[$idx]['id'] ?? (ts_compact() . '_draft'))
+                : (ts_compact() . '_draft'),
+            'version'       => 'v' . $revision,
+            'status'        => 'draft',
+            'date'          => $dt,
+            'user'          => (string)($me['name'] ?? $me['username'] ?? ''),
+            'role'          => (string)($me['role'] ?? ''),
+            'note'          => $note !== '' ? $note : 'Uploaded workbook draft',
+            'updateType'    => $updateType,
+            'storage'       => 'private',
+            'private_rel'   => $draftMeta['rel'],
+            'sha256'        => $sha,
+            'size_bytes'    => $size,
+            'original_name' => (string)($upload['name'] ?? ''),
+        ];
+
+        if ($idx >= 0) {
+            // Clean up previous draft file if different
+            $oldPrivateRel = trim((string)($versions[$idx]['private_rel'] ?? ''));
+            if ($oldPrivateRel !== '' && $oldPrivateRel !== $draftMeta['rel']) {
+                try {
+                    $oldPrivateAbs = form_resolve_private_abs($this->dataDir, $oldPrivateRel);
+                    if (is_file($oldPrivateAbs)) @unlink($oldPrivateAbs);
+                } catch (Throwable $e) {
+                    // ignore stale file
+                }
+            }
+            $versions[$idx] = array_merge($versions[$idx], $entry);
+        } else {
+            array_unshift($versions, $entry);
+        }
+
+        $manifest['versions'] = $versions;
+        $manifest['base']     = (string)$formEntry['path'];
+        $manifest['kind']     = 'excel_form';
+        form_save_manifest($this->dataDir, (string)$formEntry['code'], $manifest);
+
+        // Update state
+        $state['status']     = 'draft';
+        $state['revision']   = $revision;
+        $state['updateType'] = $updateType;
+        $state['checked_out_by'] = [
+            'name' => (string)($me['name'] ?? $me['username'] ?? ''),
+            'role' => (string)($me['role'] ?? ''),
+            'date' => $dt,
+        ];
+        $state['lastEdit'] = [
+            'by'   => (string)($me['name'] ?? $me['username'] ?? ''),
+            'role' => (string)($me['role'] ?? ''),
+            'date' => $dt,
+            'note' => $note !== '' ? $note : 'Uploaded workbook draft',
+        ];
+        form_save_state($this->dataDir, (string)$formEntry['code'], $state);
+        invalidate_scan_cache($this->dataDir);
+
+        $this->success([
+            'code'        => (string)$formEntry['code'],
+            'state'       => $state,
+            'versions'    => form_public_versions($manifest, $state, (string)$formEntry['code'], (string)$formEntry['path']),
+            'server_time' => $this->nowIso(),
+        ]);
+    }
 }

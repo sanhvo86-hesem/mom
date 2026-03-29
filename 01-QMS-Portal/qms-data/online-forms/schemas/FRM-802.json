@@ -1,0 +1,122 @@
+{
+  "form_code": "FRM-802",
+  "title": "Training Record",
+  "title_vi": "Hồ sơ đào tạo",
+  "version": "V1",
+  "category": "hr",
+  "frequency": "per_event",
+  "sop_ref": "SOP-801",
+  "description": "Ghi nhận sự kiện đào tạo bao gồm danh sách học viên, kết quả đánh giá và xác nhận năng lực.",
+  "roles_allowed": ["admin", "hr_manager", "qa_manager", "production_manager", "engineering_manager", "shift_leader"],
+  "fields": [
+    {"id": "training_date", "type": "date", "label": "Ngày đào tạo", "label_en": "Training Date", "required": true, "default": "today"},
+    {
+      "id": "training_type",
+      "type": "select",
+      "label": "Hình thức đào tạo",
+      "label_en": "Training Type",
+      "required": true,
+      "options": [
+        {"value": "classroom", "label": "Lớp học (Classroom)"},
+        {"value": "ojt", "label": "Đào tạo tại chỗ (OJT)"},
+        {"value": "e_learning", "label": "E-Learning"},
+        {"value": "drill", "label": "Bài tập thực hành (Drill)"},
+        {"value": "assessment", "label": "Đánh giá năng lực (Assessment)"}
+      ]
+    },
+    {"id": "course_name", "type": "text", "label": "Tên khóa đào tạo", "label_en": "Course Name", "required": true},
+    {"id": "course_code", "type": "text", "label": "Mã khóa đào tạo", "label_en": "Course Code", "required": false, "placeholder": "VD: C01-L2, SOP-606-v1"},
+    {
+      "id": "competency_code",
+      "type": "select",
+      "label": "Mã năng lực",
+      "label_en": "Competency Code",
+      "required": false,
+      "options": [
+        {"value": "C01", "label": "C01 — An toàn & 5S"},
+        {"value": "C02", "label": "C02 — Kỷ luật quy trình"},
+        {"value": "C03", "label": "C03 — Đúng ngay lần đầu"},
+        {"value": "C04", "label": "C04 — Giao tiếp liên phòng"},
+        {"value": "C05", "label": "C05 — Dịch vụ khách hàng B2B"},
+        {"value": "C06", "label": "C06 — Giải quyết vấn đề & RCA"},
+        {"value": "C07", "label": "C07 — Kaizen & Lean"},
+        {"value": "C08", "label": "C08 — Sử dụng dữ liệu & ERP"},
+        {"value": "C09", "label": "C09 — Quản lý thời gian"},
+        {"value": "C10", "label": "C10 — Quy trình Job Order CNC"},
+        {"value": "C11", "label": "C11 — Xem xét hợp đồng bán hàng"},
+        {"value": "C12", "label": "C12 — Ước tính & Định giá"},
+        {"value": "C13", "label": "C13 — Kiểm soát rủi ro & Revision"},
+        {"value": "C14", "label": "C14 — Bản vẽ & GD&T"},
+        {"value": "C15", "label": "C15 — Khoa học vật liệu"},
+        {"value": "C16", "label": "C16 — Đo lường nâng cao"},
+        {"value": "C17", "label": "C17 — CNC Setup & CAM"},
+        {"value": "C18", "label": "C18 — Chuỗi cung ứng"},
+        {"value": "C19", "label": "C19 — Lãnh đạo & Coaching"}
+      ]
+    },
+    {"id": "trainer_name", "type": "text", "label": "Tên giảng viên", "label_en": "Trainer Name", "required": true},
+    {"id": "trainer_qualification", "type": "text", "label": "Trình độ giảng viên", "label_en": "Trainer Qualification", "placeholder": "VD: Certified Lead Auditor, Master Trainer L3"},
+    {
+      "id": "department",
+      "type": "select",
+      "label": "Phòng ban",
+      "label_en": "Department",
+      "required": true,
+      "options": [
+        {"value": "PROD", "label": "Sản xuất"},
+        {"value": "ENG", "label": "Kỹ thuật"},
+        {"value": "QA", "label": "Chất lượng"},
+        {"value": "SCM", "label": "Chuỗi cung ứng"},
+        {"value": "SALES", "label": "Kinh doanh"},
+        {"value": "FIN", "label": "Tài chính"},
+        {"value": "HR", "label": "Nhân sự"},
+        {"value": "IT", "label": "IT"},
+        {"value": "EHS", "label": "An toàn"},
+        {"value": "ALL", "label": "Toàn nhà máy"}
+      ]
+    },
+    {
+      "id": "trainees",
+      "type": "table",
+      "label": "Danh sách học viên",
+      "label_en": "Trainees",
+      "min_rows": 1,
+      "max_rows": 50,
+      "columns": [
+        {"id": "employee_id", "type": "text", "label": "Mã NV", "width": "12%", "required": true},
+        {"id": "employee_name", "type": "text", "label": "Họ tên", "width": "22%", "required": true},
+        {"id": "role", "type": "text", "label": "Chức danh", "width": "18%"},
+        {"id": "pre_score", "type": "number", "label": "Điểm trước", "width": "12%", "min": 0, "max": 100},
+        {"id": "post_score", "type": "number", "label": "Điểm sau", "width": "12%", "min": 0, "max": 100},
+        {"id": "pass_fail", "type": "select", "label": "Kết quả", "width": "12%", "options": [
+          {"value": "pass", "label": "Đạt", "color": "#2f9e44"},
+          {"value": "fail", "label": "Không đạt", "color": "#e03131"}
+        ]}
+      ]
+    },
+    {"id": "duration_hours", "type": "number", "label": "Thời lượng (giờ)", "label_en": "Duration (Hours)", "min": 0.5, "step": 0.5, "required": true},
+    {"id": "training_material_ref", "type": "text", "label": "Tài liệu đào tạo", "label_en": "Training Material Ref", "placeholder": "VD: C06-Module, SOP-606-slides"},
+    {
+      "id": "assessment_method",
+      "type": "select",
+      "label": "Phương pháp đánh giá",
+      "label_en": "Assessment Method",
+      "required": true,
+      "options": [
+        {"value": "written_test", "label": "Bài kiểm tra viết (Written Test)"},
+        {"value": "practical_demo", "label": "Thực hành (Practical Demo)"},
+        {"value": "observation", "label": "Quan sát (Observation)"},
+        {"value": "quiz", "label": "Trắc nghiệm (Quiz)"}
+      ]
+    },
+    {"id": "pass_criteria", "type": "text", "label": "Tiêu chí đạt", "label_en": "Pass Criteria", "placeholder": "VD: >= 80% điểm kiểm tra"},
+    {"id": "location", "type": "text", "label": "Địa điểm", "label_en": "Location", "placeholder": "VD: Phòng đào tạo, Xưởng CNC"},
+    {"id": "notes", "type": "textarea", "label": "Ghi chú", "label_en": "Notes", "rows": 3},
+    {"id": "trainer_signature_date", "type": "date", "label": "Ngày ký giảng viên", "label_en": "Trainer Signature Date"},
+    {"id": "trainee_acknowledgment", "type": "checkbox", "label": "Học viên xác nhận đã tham dự và hiểu nội dung", "label_en": "Trainee Acknowledgment", "default": false}
+  ],
+  "auto_fields": ["submitted_by", "submitted_at", "entry_id"],
+  "notifications": {
+    "on_submit": ["hr_manager"]
+  }
+}

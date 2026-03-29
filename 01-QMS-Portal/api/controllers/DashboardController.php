@@ -135,7 +135,7 @@ final class DashboardController extends BaseController
      * GET /api/dashboard/executive
      * ?action=dashboard_executive
      */
-    private function executive(): never
+    public function executive(): never
     {
         $this->requireAuth();
         $period = $this->parsePeriod();
@@ -147,7 +147,7 @@ final class DashboardController extends BaseController
      * GET /api/dashboard/quality
      * ?action=dashboard_quality
      */
-    private function quality(): never
+    public function quality(): never
     {
         $this->requireAuth();
         $period = $this->parsePeriod();
@@ -159,7 +159,7 @@ final class DashboardController extends BaseController
      * GET /api/dashboard/production
      * ?action=dashboard_production
      */
-    private function production(): never
+    public function production(): never
     {
         $this->requireAuth();
         $period = $this->parsePeriod();
@@ -171,7 +171,7 @@ final class DashboardController extends BaseController
      * GET /api/dashboard/supplier
      * ?action=dashboard_supplier
      */
-    private function supplier(): never
+    public function supplier(): never
     {
         $this->requireAuth();
         $period = $this->parsePeriod();
@@ -183,7 +183,7 @@ final class DashboardController extends BaseController
      * GET /api/dashboard/{department}
      * ?action=dashboard_department&department=PROD
      */
-    private function department(?string $deptCode = null): never
+    public function department(?string $deptCode = null): never
     {
         $this->requireAuth();
         $dept   = $deptCode ?? $this->query('department', 'ALL');
@@ -196,7 +196,7 @@ final class DashboardController extends BaseController
      * GET /api/dashboard/widget/{type}
      * ?action=dashboard_widget&widget_type=ncr_pareto
      */
-    private function widget(): never
+    public function widget(): never
     {
         $this->requireAuth();
         $type = $this->query('widget_type', '');
@@ -225,7 +225,7 @@ final class DashboardController extends BaseController
      * GET /api/kpi/{metricCode}
      * ?action=kpi_get&metric_code=OEE
      */
-    private function kpiGet(): never
+    public function kpiGet(): never
     {
         $this->requireAuth();
         $code = strtoupper(trim($this->query('metric_code', '')));
@@ -253,7 +253,7 @@ final class DashboardController extends BaseController
      * GET /api/kpi/{metricCode}/trend
      * ?action=kpi_trend&metric_code=OEE&granularity=weekly
      */
-    private function kpiTrend(): never
+    public function kpiTrend(): never
     {
         $this->requireAuth();
         $code = strtoupper(trim($this->query('metric_code', '')));
@@ -281,7 +281,7 @@ final class DashboardController extends BaseController
      * GET /api/kpi/alerts
      * ?action=kpi_alerts
      */
-    private function kpiAlerts(): never
+    public function kpiAlerts(): never
     {
         $this->requireAuth();
         $alerts = $this->kpi->getKpiAlerts();
@@ -296,7 +296,7 @@ final class DashboardController extends BaseController
      *
      * Body: { measurements: float[], usl: float, lsl: float, subgroup_size?: int }
      */
-    private function spcCapability(): never
+    public function spcCapability(): never
     {
         $this->requireAuth();
         $body = $this->jsonBody();
@@ -320,7 +320,7 @@ final class DashboardController extends BaseController
      *
      * Body: { chart_type: string, measurements: float[], subgroup_size?: int }
      */
-    private function spcChart(): never
+    public function spcChart(): never
     {
         $this->requireAuth();
         $body = $this->jsonBody();
@@ -346,7 +346,7 @@ final class DashboardController extends BaseController
      * GET /api/spc/{partNumber}/{characteristic}
      * ?action=spc_summary&part_number=XXX&characteristic=YYY
      */
-    private function spcSummary(): never
+    public function spcSummary(): never
     {
         $this->requireAuth();
         $partNumber     = $this->query('part_number', '');
@@ -370,7 +370,7 @@ final class DashboardController extends BaseController
      * GET /api/spc/alerts
      * ?action=spc_alerts
      */
-    private function spcAlerts(): never
+    public function spcAlerts(): never
     {
         $this->requireAuth();
         $alerts = $this->spc->getSpcAlerts();

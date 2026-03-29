@@ -311,13 +311,12 @@ class DataLayer
         $code = strtoupper(trim($formCode));
         return $this->read(
             jsonReader: function () use ($code): ?array {
-                $registry = $this->readJson($this->confDir() . '/form_control_registry.json');
-                foreach ($registry as $entry) {
-                    if (strtoupper(trim((string)($entry['code'] ?? ''))) === $code) {
-                        return $entry;
-                    }
+                $file = $this->dataDir . '/online-forms/schemas/' . $code . '.json';
+                if (!is_file($file)) {
+                    return null;
                 }
-                return null;
+                $schema = $this->readJson($file);
+                return $schema !== [] ? $schema : null;
             },
             pgReader: function () use ($code): ?array {
                 return $this->db->queryOne(
@@ -340,22 +339,13 @@ class DataLayer
         $code = strtoupper(trim($formCode));
         return $this->write(
             jsonWriter: function () use ($code, $schema): bool {
-                $file = $this->confDir() . '/form_control_registry.json';
-                $registry = $this->readJson($file);
-                $found = false;
-                foreach ($registry as &$entry) {
-                    if (strtoupper(trim((string)($entry['code'] ?? ''))) === $code) {
-                        $entry = array_merge($entry, $schema);
-                        $found = true;
-                        break;
-                    }
+                $dir = $this->dataDir . '/online-forms/schemas';
+                if (!is_dir($dir)) {
+                    @mkdir($dir, 0755, true);
                 }
-                unset($entry);
-                if (!$found) {
-                    $schema['code'] = $code;
-                    $registry[] = $schema;
-                }
-                $this->writeJson($file, $registry);
+                $file = $dir . '/' . $code . '.json';
+                $schema['code'] = $code;
+                $this->writeJson($file, $schema);
                 return true;
             },
             pgWriter: function () use ($code, $schema): bool {
@@ -401,19 +391,14 @@ class DataLayer
         $code = strtoupper(trim($formCode));
         return $this->read(
             jsonReader: function () use ($code, $filters): array {
-                $dir = $this->dataDir . '/online-forms/entries/' . $code;
-                if (!is_dir($dir)) {
+                $entryFile = $this->dataDir . '/online-forms/entries/' . $code . '.json';
+                if (!is_file($entryFile)) {
                     return [];
                 }
-                $entries = [];
-                foreach ((array)@scandir($dir) as $fn) {
-                    if (!str_ends_with((string)$fn, '.json')) {
-                        continue;
-                    }
-                    $entry = $this->readJson($dir . '/' . $fn);
-                    if ($entry !== []) {
-                        $entries[] = $entry;
-                    }
+                $raw = @file_get_contents($entryFile);
+                $entries = $raw ? json_decode($raw, true) : [];
+                if (!is_array($entries)) {
+                    $entries = [];
                 }
                 return $this->applyArrayFilters($entries, $filters);
             },
@@ -443,20 +428,43 @@ class DataLayer
     public function submitFormEntry(string $formCode, array $data): string
     {
         $code = strtoupper(trim($formCode));
-        $entryId = $this->generateUuid();
+        $entryId = $data['entry_id'] ?? ($code . '-' . (string)round(microtime(true) * 1000));
 
         $this->write(
             jsonWriter: function () use ($code, $data, $entryId): bool {
-                $dir = $this->dataDir . '/online-forms/entries/' . $code;
-                if (!is_dir($dir)) {
-                    @mkdir($dir, 0775, true);
+                $entriesDir = $this->dataDir . '/online-forms/entries';
+                if (!is_dir($entriesDir)) {
+                    @mkdir($entriesDir, 0755, true);
                 }
-                $entry = array_merge($data, [
-                    'entry_id'     => $entryId,
-                    'form_code'    => $code,
-                    'submitted_at' => $this->nowIso(),
-                ]);
-                $this->writeJson($dir . '/' . $entryId . '.json', $entry);
+                $entryFile = $entriesDir . '/' . $code . '.json';
+
+                // Load existing entries (flat JSON array)
+                $existing = [];
+                if (is_file($entryFile)) {
+                    $raw = @file_get_contents($entryFile);
+                    $existing = $raw ? json_decode($raw, true) : [];
+                    if (!is_array($existing)) {
+                        $existing = [];
+                    }
+                }
+
+                // Add server-side metadata
+                $data['_server_time'] = date('c');
+                $data['_status'] = $data['_status'] ?? $data['status'] ?? 'submitted';
+
+                // Prepend new entry (newest first)
+                array_unshift($existing, $data);
+
+                // Keep max 1000 entries per form
+                if (count($existing) > 1000) {
+                    $existing = array_slice($existing, 0, 1000);
+                }
+
+                @file_put_contents(
+                    $entryFile,
+                    json_encode($existing, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+                    LOCK_EX,
+                );
                 return true;
             },
             pgWriter: function () use ($code, $data, $entryId): bool {
@@ -610,10 +618,10 @@ class DataLayer
      * @param string $type Record type (NCR, CAPA, FAI, etc.).
      * @return string Generated ID (e.g. "NCR-2026-001").
      */
-    public function getNextRecordId(string $type): string
+    public function getNextRecordId(string $type, ?string $year = null): string
     {
-        $type = strtoupper(trim($type));
-        $year = (int)date('Y');
+        $prefix = strtoupper(trim($type));
+        $year = $year ?? date('Y');
 
         if ($this->usesPostgres()) {
             $row = $this->db->insertReturning(
@@ -622,22 +630,62 @@ class DataLayer
                  ON CONFLICT (record_type, fiscal_year)
                  DO UPDATE SET last_number = record_counters.last_number + 1
                  RETURNING last_number, counter_digits',
-                [':type' => $type, ':year' => $year],
+                [':type' => $prefix, ':year' => (int)$year],
             );
             $num = (int)($row['last_number'] ?? 1);
             $digits = (int)($row['counter_digits'] ?? 3);
         } else {
-            // JSON-based counter
-            $counterFile = $this->confDir() . '/record_counters.json';
-            $counters = $this->readJson($counterFile);
-            $key = "{$type}_{$year}";
-            $num = ((int)($counters[$key] ?? 0)) + 1;
-            $counters[$key] = $num;
-            $this->writeJson($counterFile, $counters);
-            $digits = 3;
+            // Validate prefix against registry
+            $regFile = $this->dataDir . '/counters/_registry.json';
+            $registry = $this->readJson($regFile);
+            if (!isset($registry[$prefix])) {
+                throw new RuntimeException("Prefix '{$prefix}' not found in counter registry.");
+            }
+            $digits = (int)($registry[$prefix]['digits'] ?? 3);
+
+            // Atomic counter with file lock
+            $countersDir = $this->dataDir . '/counters';
+            if (!is_dir($countersDir)) {
+                @mkdir($countersDir, 0755, true);
+            }
+            $counterFile = $countersDir . '/' . $prefix . '-' . $year . '.txt';
+
+            $fp = @fopen($counterFile, 'c+');
+            if (!$fp) {
+                throw new RuntimeException("Cannot open counter file: {$counterFile}");
+            }
+            if (!flock($fp, LOCK_EX)) {
+                fclose($fp);
+                throw new RuntimeException("Cannot lock counter file: {$counterFile}");
+            }
+            $raw = fread($fp, 20);
+            $current = $raw !== false ? (int)trim($raw) : 0;
+            $num = $current + 1;
+            $padded = str_pad((string)$num, $digits, '0', STR_PAD_LEFT);
+            ftruncate($fp, 0);
+            rewind($fp);
+            fwrite($fp, $padded);
+            fflush($fp);
+            flock($fp, LOCK_UN);
+            fclose($fp);
+
+            // Log the allocation
+            $logFile = $countersDir . '/_allocation_log.jsonl';
+            $recordId = $prefix . '-' . $year . '-' . $padded;
+            $logEntry = json_encode([
+                'record_id' => $recordId,
+                'prefix'    => $prefix,
+                'year'      => $year,
+                'seq'       => $num,
+                'user'      => $_SESSION['user'] ?? 'anonymous',
+                'ip'        => $_SERVER['REMOTE_ADDR'] ?? '',
+                'time'      => date('c'),
+            ], JSON_UNESCAPED_UNICODE) . "\n";
+            @file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
         }
 
-        return sprintf('%s-%d-%0' . $digits . 'd', $type, $year, $num);
+        $padded = str_pad((string)$num, $digits, '0', STR_PAD_LEFT);
+        return $prefix . '-' . $year . '-' . $padded;
     }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -1360,6 +1408,40 @@ class DataLayer
                 return true;
             },
         );
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    //  REGISTRY / LIBRARY ACCESSORS
+    // ═══════════════════════════════════════════════════════════════════════
+
+    /**
+     * Get the counter registry (prefix definitions for record IDs).
+     *
+     * @return array Associative array keyed by prefix (e.g. "NCR", "CAPA").
+     */
+    public function getCounterRegistry(): array
+    {
+        return $this->readJson($this->dataDir . '/counters/_registry.json');
+    }
+
+    /**
+     * Get the document type registry.
+     *
+     * @return array Document type definitions.
+     */
+    public function getDocumentTypeRegistry(): array
+    {
+        return $this->readJson($this->confDir() . '/document_type_registry.json');
+    }
+
+    /**
+     * Get the variable library.
+     *
+     * @return array Variable library data.
+     */
+    public function getVariableLibrary(): array
+    {
+        return $this->readJson($this->confDir() . '/variable_library.json');
     }
 
     // ═══════════════════════════════════════════════════════════════════════

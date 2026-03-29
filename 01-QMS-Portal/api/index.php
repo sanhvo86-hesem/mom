@@ -67,13 +67,11 @@ spl_autoload_register(function (string $class): void {
 // action dispatch (the switch statement). We achieve this by requiring the
 // legacy file only if the functions are not yet defined.
 if (!function_exists('api_json')) {
-    // Load the legacy api.php for its helper functions and global setup.
-    // The legacy file will handle the request if we let it reach the switch.
-    // Instead, we bootstrap our router first and only fall back if needed.
+    // Load the legacy api.php for its helper functions only.
+    // The API_HELPERS_ONLY guard prevents the boot section and switch statement
+    // from executing, so we can bootstrap the MVC router ourselves.
+    define('API_HELPERS_ONLY', true);
     require_once $BASE_DIR . '/api.php';
-    // If we get here, the legacy api.php already handled the request (it calls exit).
-    // This line should never execute in normal flow because api.php calls api_json() which exits.
-    return;
 }
 
 // If helper functions are already loaded (e.g. from a separate bootstrap),
@@ -100,6 +98,7 @@ use HESEM\QMS\Api\Controllers\FileController;
 use HESEM\QMS\Api\Controllers\UserController;
 use HESEM\QMS\Api\Controllers\AdminController;
 use HESEM\QMS\Api\Controllers\DictController;
+use HESEM\QMS\Api\Controllers\DashboardController;
 use HESEM\QMS\Database\DataLayer;
 
 // ── Bootstrap DataLayer ─────────────────────────────────────────────────────
@@ -152,6 +151,7 @@ $router->actions([
     'save_doc_description'      => [DocumentController::class, 'saveDescription'],
     'docs_visibility_get'       => [DocumentController::class, 'getVisibility'],
     'admin_docs_visibility_save' => [DocumentController::class, 'saveVisibility'],
+    'docs_snapshot'              => [DocumentController::class, 'docsSnapshot'],
 ]);
 
 // Forms & Records
@@ -164,6 +164,7 @@ $router->actions([
     'record_id_next'      => [FormController::class, 'getNextId'],
     'record_id_peek'      => [FormController::class, 'peekNextId'],
     'form_version_stream' => [FormController::class, 'streamVersion'],
+    'form_upload_draft'   => [FormController::class, 'uploadDraft'],
 ]);
 
 // Files & Folders
@@ -204,6 +205,23 @@ $router->actions([
     'dict_list'   => [DictController::class, 'list'],
     'dict_upsert' => [DictController::class, 'upsert'],
     'dict_delete' => [DictController::class, 'delete'],
+]);
+
+// Dashboards, KPI & SPC
+$router->actions([
+    'dashboard_executive'  => [DashboardController::class, 'executive'],
+    'dashboard_quality'    => [DashboardController::class, 'quality'],
+    'dashboard_production' => [DashboardController::class, 'production'],
+    'dashboard_supplier'   => [DashboardController::class, 'supplier'],
+    'dashboard_department' => [DashboardController::class, 'department'],
+    'dashboard_widget'     => [DashboardController::class, 'widget'],
+    'kpi_get'              => [DashboardController::class, 'kpiGet'],
+    'kpi_trend'            => [DashboardController::class, 'kpiTrend'],
+    'kpi_alerts'           => [DashboardController::class, 'kpiAlerts'],
+    'spc_capability'       => [DashboardController::class, 'spcCapability'],
+    'spc_chart'            => [DashboardController::class, 'spcChart'],
+    'spc_summary'          => [DashboardController::class, 'spcSummary'],
+    'spc_alerts'           => [DashboardController::class, 'spcAlerts'],
 ]);
 
 // ── Register RESTful Routes ─────────────────────────────────────────────────
@@ -249,6 +267,31 @@ $router->post('/api/folders', FileController::class, 'createFolder');
 $router->post('/api/admin/git/sync', AdminController::class, 'gitSync');
 $router->post('/api/admin/git/pull', AdminController::class, 'gitPull');
 $router->post('/api/admin/cache/clear', AdminController::class, 'clearCache');
+
+// Documents — snapshot
+$router->post('/api/documents/snapshot', DocumentController::class, 'docsSnapshot');
+
+// Forms — draft upload
+$router->post('/api/forms/upload-draft', FormController::class, 'uploadDraft');
+
+// Dashboards
+$router->get('/api/dashboard/executive', DashboardController::class, 'executive');
+$router->get('/api/dashboard/quality', DashboardController::class, 'quality');
+$router->get('/api/dashboard/production', DashboardController::class, 'production');
+$router->get('/api/dashboard/supplier', DashboardController::class, 'supplier');
+$router->get('/api/dashboard/department', DashboardController::class, 'department');
+$router->get('/api/dashboard/widget', DashboardController::class, 'widget');
+
+// KPI
+$router->get('/api/kpi/alerts', DashboardController::class, 'kpiAlerts');
+$router->get('/api/kpi/{metricCode}', DashboardController::class, 'kpiGet');
+$router->get('/api/kpi/{metricCode}/trend', DashboardController::class, 'kpiTrend');
+
+// SPC
+$router->post('/api/spc/capability', DashboardController::class, 'spcCapability');
+$router->post('/api/spc/chart', DashboardController::class, 'spcChart');
+$router->get('/api/spc/alerts', DashboardController::class, 'spcAlerts');
+$router->get('/api/spc/summary', DashboardController::class, 'spcSummary');
 
 // ── Dispatch ────────────────────────────────────────────────────────────────
 

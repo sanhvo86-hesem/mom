@@ -2683,6 +2683,13 @@ function random_password(int $len = 12): string {
 
 
 
+// ---------- Guard for api/index.php MVC bootstrap ----------
+// When api/index.php loads this file, it only needs the helper functions above.
+// The constant API_HELPERS_ONLY prevents executing the boot + switch below.
+if (defined('API_HELPERS_ONLY')) {
+    return;
+}
+
 // ---------- Boot ----------
 ensure_dir($DATA_DIR);
 migrate_legacy_data_dir($LEGACY_DATA_DIR, $DATA_DIR);
@@ -7005,6 +7012,37 @@ if ($username === '') {
       $entries = $raw ? json_decode($raw, true) : [];
     }
     api_json(['ok' => true, 'entries' => is_array($entries) ? $entries : []]);
+  }
+
+  // ── Dashboard, KPI & SPC Analytics ─────────────────────────────────────
+  case 'dashboard_executive':
+  case 'dashboard_quality':
+  case 'dashboard_production':
+  case 'dashboard_supplier':
+  case 'dashboard_department':
+  case 'dashboard_widget':
+  case 'kpi_get':
+  case 'kpi_trend':
+  case 'kpi_alerts':
+  case 'spc_capability':
+  case 'spc_chart':
+  case 'spc_summary':
+  case 'spc_alerts': {
+    require_logged_in($store);
+    // Delegate to DashboardController (MVC layer)
+    require_once __DIR__ . '/api/controllers/BaseController.php';
+    require_once __DIR__ . '/api/controllers/DashboardController.php';
+    require_once __DIR__ . '/api/services/KpiEngine.php';
+    require_once __DIR__ . '/api/services/SpcEngine.php';
+    require_once __DIR__ . '/api/services/DashboardService.php';
+    require_once __DIR__ . '/database/Connection.php';
+    require_once __DIR__ . '/database/DataLayer.php';
+
+    $dataLayer = new \HESEM\QMS\Database\DataLayer($DATA_DIR, $ROOT_DIR);
+    $ctrl = new \HESEM\QMS\Api\Controllers\DashboardController($dataLayer, $ROOT_DIR, $DATA_DIR);
+    $ctrl->setStore($store);
+    $ctrl->handleAction($action);
+    break; // handleAction() calls exit, but break for safety
   }
 
   default:
