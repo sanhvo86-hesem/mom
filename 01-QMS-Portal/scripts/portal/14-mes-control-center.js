@@ -79,6 +79,17 @@ var GOVERNANCE_META = {
   not_required: { vi:'Không áp dụng', en:'Not required', color:'#64748b' }
 };
 
+var DOWNTIME_CATEGORY_META = {
+  breakdown: { vi:'Hỏng máy', en:'Breakdown' },
+  planned_pm: { vi:'Bảo trì kế hoạch', en:'Planned PM' },
+  setup: { vi:'Setup / đổi mã', en:'Setup / changeover' },
+  material_wait: { vi:'Chờ vật tư', en:'Material wait' },
+  quality_hold: { vi:'Giữ lô chất lượng', en:'Quality hold' },
+  tool_change: { vi:'Thay dao / chỉnh offset', en:'Tool change / offset' },
+  utility: { vi:'Tiện ích / nguồn', en:'Utility / power' },
+  other: { vi:'Khác', en:'Other' }
+};
+
 function t(vi, en){ return (typeof lang !== 'undefined' && lang === 'en') ? en : vi; }
 function esc(value){
   var div = document.createElement('div');
@@ -143,6 +154,10 @@ function connectorMeta(key){
 function governanceMeta(key){
   var meta = GOVERNANCE_META[String(key || '').toLowerCase()];
   return meta || { vi:key || '—', en:key || '—', color:'#64748b' };
+}
+function downtimeCategoryMeta(key){
+  var meta = DOWNTIME_CATEGORY_META[String(key || '').toLowerCase()];
+  return meta || { vi:key || '—', en:key || '—' };
 }
 function badge(meta){
   return '<span class="mesx-pill" style="--pill:' + meta.color + '">' + esc(t(meta.vi, meta.en)) + '</span>';
@@ -453,6 +468,82 @@ function workOrderOptions(machineId){
     if(!machineId) return true;
     return String(row.machine_id || '') === String(machineId);
   });
+}
+function downtimeReasonOptions(category){
+  var rows = state.master && Array.isArray(state.master.downtime_reason_codes) ? state.master.downtime_reason_codes : [];
+  return rows.filter(function(row){
+    if(String(row.status || 'active').toLowerCase() !== 'active') return false;
+    if(category && String(row.category || '') !== String(category)) return false;
+    return true;
+  }).sort(function(a, b){
+    return String(a.reason_name_vi || a.reason_name || a.reason_code || '').localeCompare(String(b.reason_name_vi || b.reason_name || b.reason_code || ''));
+  });
+}
+function resolutionCodeOptions(){
+  var rows = state.master && Array.isArray(state.master.downtime_resolution_codes) ? state.master.downtime_resolution_codes : [];
+  return rows.filter(function(row){
+    return String(row.status || 'active').toLowerCase() === 'active';
+  }).sort(function(a, b){
+    return String(a.resolution_name_vi || a.resolution_name || a.resolution_code || '').localeCompare(String(b.resolution_name_vi || b.resolution_name || b.resolution_code || ''));
+  });
+}
+function reasonByCode(code){
+  var rows = state.master && Array.isArray(state.master.downtime_reason_codes) ? state.master.downtime_reason_codes : [];
+  for(var i = 0; i < rows.length; i += 1){
+    if(String(rows[i].reason_code || '') === String(code || '')) return rows[i];
+  }
+  return null;
+}
+function renderDowntimeReasonOptions(category, selectedCode){
+  var rows = downtimeReasonOptions(category);
+  var html = '<option value="">' + esc(t('Chọn mã lý do downtime', 'Select downtime reason code')) + '</option>';
+  rows.forEach(function(row){
+    var label = [row.reason_code, row.reason_name_vi || row.reason_name].filter(Boolean).join(' · ');
+    html += '<option value="' + esc(row.reason_code || '') + '"' + (String(selectedCode || '') === String(row.reason_code || '') ? ' selected' : '') + '>' + esc(label) + '</option>';
+  });
+  return html;
+}
+function renderResolutionCodeOptions(selectedCode){
+  var rows = resolutionCodeOptions();
+  var html = '<option value="">' + esc(t('Chọn mã khôi phục', 'Select resolution code')) + '</option>';
+  rows.forEach(function(row){
+    var label = [row.resolution_code, row.resolution_name_vi || row.resolution_name].filter(Boolean).join(' · ');
+    html += '<option value="' + esc(row.resolution_code || '') + '"' + (String(selectedCode || '') === String(row.resolution_code || '') ? ' selected' : '') + '>' + esc(label) + '</option>';
+  });
+  return html;
+}
+function syncDowntimeReasonFields(modal){
+  if(!modal) return;
+  var categorySelect = modal.querySelector('#mes-dt-category');
+  var reasonSelect = modal.querySelector('#mes-dt-reason-code');
+  var severitySelect = modal.querySelector('#mes-dt-severity');
+  var category = categorySelect ? String(categorySelect.value || '') : '';
+  var currentReason = reasonSelect ? String(reasonSelect.value || '') : '';
+  if(reasonSelect){
+    reasonSelect.innerHTML = renderDowntimeReasonOptions(category, currentReason);
+    if(currentReason && !reasonByCode(currentReason)) reasonSelect.value = '';
+  }
+  var reason = reasonByCode(reasonSelect ? reasonSelect.value : '');
+  var categoryView = modal.querySelector('[data-dt-category-view]');
+  var reasonMeta = modal.querySelector('[data-dt-reason-meta]');
+  if(categoryView){
+    var resolvedCategory = downtimeCategoryMeta((reason && reason.category) || category || 'other');
+    categoryView.textContent = t(resolvedCategory.vi, resolvedCategory.en);
+  }
+  if(reasonMeta){
+    if(reason){
+      var details = [];
+      if(reason.reason_group) details.push(t('Nhóm', 'Group') + ': ' + reason.reason_group);
+      if(reason.escalation_sla_minutes) details.push('SLA ' + reason.escalation_sla_minutes + ' ' + t('phút', 'min'));
+      if(String(reason.planned_flag || 'no').toLowerCase() === 'yes') details.push(t('Downtime có kế hoạch', 'Planned downtime'));
+      reasonMeta.textContent = details.join(' · ') || t('Mã lý do đã được quản trị.', 'Reason code is governed.');
+    } else {
+      reasonMeta.textContent = t('Chọn mã lý do để hệ thống khóa category, severity mặc định và SLA escalation.', 'Select a reason code so the system can govern category, default severity, and escalation SLA.');
+    }
+  }
+  if(reason && severitySelect && !severitySelect.dataset.lockedByUser){
+    severitySelect.value = String(reason.default_severity || 'major');
+  }
 }
 function renderSelectOptions(rows, valueKey, labelBuilder, selectedValue, placeholder){
   var html = '<option value="">' + esc(placeholder || t('Chưa chọn', 'Not selected')) + '</option>';
@@ -1258,6 +1349,139 @@ function openToolingModal(machineId, toolRuntimeId){
         render();
       }).catch(function(error){
         toast(t('Không thể cập nhật tooling.', 'Could not update tooling.'), 'error');
+        if(window.console) console.error(error);
+      }).finally(function(){ submit.disabled = false; });
+    }
+  );
+  bindModalButtons();
+}
+
+function renderDowntimePareto(rows){
+  if(!rows.length){
+    return '<div class="mesx-empty"><strong>' + esc(t('Chưa có downtime đủ để phân tích', 'No downtime available for pareto')) + '</strong>' + esc(t('Khi runtime có downtime, bảng pareto sẽ xếp hạng theo tổng phút mất.', 'Once downtime exists in runtime, the pareto view will rank losses by total minutes.')) + '</div>';
+  }
+  return '<div class="mesx-analytics-stack">' + rows.slice(0, 5).map(function(row){
+    var band = Number(row.share_pct || 0) >= 50 ? 'risk' : (Number(row.share_pct || 0) >= 25 ? 'watch' : 'strong');
+    var label = t(row.label_vi || row.category || 'Khác', row.label_en || row.category || 'Other');
+    var categoryMeta = downtimeCategoryMeta(row.category || 'other');
+    var metaLine = [t(categoryMeta.vi, categoryMeta.en), row.reason_group ? (t('Nhóm', 'Group') + ': ' + row.reason_group) : ''].filter(Boolean).join(' · ');
+    return '<div class="mesx-pareto-row">' +
+      '<div class="mesx-pareto-main"><strong>' + esc(label) + '</strong><span>' + esc([(row.event_count || 0) + ' ' + t('sự kiện', 'events'), (row.open_count || 0) + ' ' + t('đang mở', 'open'), (row.major_count || 0) + ' ' + t('mức major+', 'major+'), metaLine].filter(Boolean).join(' · ')) + '</span><div class="mesx-bar" data-band="' + esc(band) + '" style="margin-top:8px"><span style="width:' + esc(String(Math.max(0, Math.min(100, Number(row.share_pct || 0))))) + '%"></span></div></div>' +
+      '<div class="mesx-metric-value">' + esc(fmtMinutes(row.minutes || 0) + ' · ' + fmtPercent(row.share_pct || 0)) + '</div>' +
+    '</div>';
+  }).join('') + '</div>';
+}
+
+function openDowntimeModal(machineId){
+  var machine = machineId ? machineById(machineId) : null;
+  var workCenterId = machine ? machine.work_center_id : state.workCenter;
+  var woRows = workOrderOptions(machineId);
+  var toolRows = machineId ? toolOptionsForMachine(machineId) : [];
+  var defaultCategory = toolRows.length ? 'tool_change' : 'breakdown';
+  showModal(
+    t('Ghi nhận downtime', 'Create downtime event'),
+    machine ? ((machine.machine_id || '') + ' · ' + (machine.machine_name || '')) : t('Khởi tạo downtime mới', 'Start a new downtime event'),
+    '<div class="mesx-form-grid">' +
+      (machine ? fieldDisplay(t('Work center', 'Work center'), machine.work_center_name || machine.work_center_id || '—') : editableField('mes-dt-machine', t('Máy', 'Machine'), '<select class="mesx-select" id="mes-dt-machine">' + renderSelectOptions(state.snapshot.machine_wall || [], 'machine_id', function(item){ return [item.machine_id, item.machine_name].filter(Boolean).join(' · '); }, '', t('Chọn máy', 'Select machine')) + '</select>')) +
+      editableField('mes-dt-category', t('Nhóm downtime', 'Downtime category'), '<select class="mesx-select" id="mes-dt-category"><option value="breakdown"' + (defaultCategory === 'breakdown' ? ' selected' : '') + '>' + esc(t('Hỏng máy', 'Breakdown')) + '</option><option value="planned_pm">' + esc(t('Bảo trì kế hoạch', 'Planned PM')) + '</option><option value="setup"' + (defaultCategory === 'setup' ? ' selected' : '') + '>' + esc(t('Setup / đổi mã', 'Setup / changeover')) + '</option><option value="material_wait">' + esc(t('Chờ vật tư', 'Material wait')) + '</option><option value="quality_hold">' + esc(t('Giữ lô chất lượng', 'Quality hold')) + '</option><option value="tool_change"' + (defaultCategory === 'tool_change' ? ' selected' : '') + '>' + esc(t('Thay dao / chỉnh offset', 'Tool change / offset')) + '</option><option value="utility">' + esc(t('Tiện ích / nguồn', 'Utility / power')) + '</option><option value="other">' + esc(t('Khác', 'Other')) + '</option></select>') +
+      editableField('mes-dt-reason-code', t('Mã lý do downtime', 'Downtime reason code'), '<select class="mesx-select" id="mes-dt-reason-code"></select>') +
+      editableField('mes-dt-category-view', t('Category bị khóa theo mã', 'Governed category'), '<div class="mesx-mini"><strong data-dt-category-view>—</strong></div>') +
+      editableField('mes-dt-severity', t('Mức độ', 'Severity'), '<select class="mesx-select" id="mes-dt-severity"><option value="minor">' + esc(t('Nhẹ', 'Minor')) + '</option><option value="major" selected>' + esc(t('Lớn', 'Major')) + '</option><option value="critical">' + esc(t('Nghiêm trọng', 'Critical')) + '</option></select>') +
+      editableField('mes-dt-start', t('Bắt đầu dừng', 'Downtime start'), '<input class="mesx-input" id="mes-dt-start" type="datetime-local" value="' + esc(nowInputValue()) + '">') +
+      editableField('mes-dt-wo', t('WO liên quan', 'Affected WO'), '<select class="mesx-select" id="mes-dt-wo">' + renderSelectOptions(woRows, 'wo_number', function(item){ return [item.wo_number, item.operation_desc, item.part_number].filter(Boolean).join(' · '); }, machine && machine.active_work_order ? machine.active_work_order.wo_number : '', t('Chọn WO bị ảnh hưởng', 'Select affected WO')) + '</select>') +
+      editableField('mes-dt-tool', t('Tool liên quan', 'Affected tool'), '<select class="mesx-select" id="mes-dt-tool">' + renderSelectOptions(toolRows, 'tool_id', function(item){ return [item.tool_id, item.tool_name].filter(Boolean).join(' · '); }, '', t('Không chọn tool', 'No tool selected')) + '</select>') +
+      editableField('mes-dt-reason', t('Triệu chứng hiện trường', 'Shop-floor symptom'), '<textarea class="mesx-textarea" id="mes-dt-reason" placeholder="' + esc(t('Mô tả điều gì đang xảy ra trên máy, alarm, dao, offset hoặc tín hiệu bất thường...', 'Describe what is happening on the machine: alarm, tool, offset, or abnormal signal...')) + '"></textarea>', true) +
+      editableField('mes-dt-note', t('Ghi chú thêm', 'Additional note'), '<textarea class="mesx-textarea" id="mes-dt-note" placeholder="' + esc(t('Ai đã escalation, có ảnh hưởng giao hàng hay không, cần hỗ trợ gì thêm...', 'Who escalated it, whether delivery is affected, and what extra support is needed...')) + '"></textarea>', true) +
+      editableField('mes-dt-reason-meta', t('Quy tắc escalation', 'Escalation rule'), '<div class="mesx-mini"><strong data-dt-reason-meta>' + esc(t('Chọn mã lý do để hệ thống khóa category, severity mặc định và SLA escalation.', 'Select a reason code so the system can govern category, default severity, and escalation SLA.')) + '</strong></div>', true) +
+      '<div class="full mesx-modal-foot"><button type="button" class="mesx-btn ghost" data-modal-cancel>↩ ' + esc(t('Hủy', 'Cancel')) + '</button><button type="button" class="mesx-btn primary" data-modal-submit>🚨 ' + esc(t('Tạo downtime', 'Create downtime')) + '</button></div>' +
+    '</div>',
+    function(modal, submit){
+      submit.disabled = true;
+      var selectedMachineId = machine ? (machine.machine_id || '') : ((modal.querySelector('#mes-dt-machine') || {}).value || '');
+      var severitySelect = modal.querySelector('#mes-dt-severity');
+      var reasonCode = (modal.querySelector('#mes-dt-reason-code') || {}).value || '';
+      if(!reasonCode){
+        toast(t('Cần chọn mã lý do downtime trước khi tạo sự kiện.', 'A governed downtime reason code is required before creating the event.'), 'error');
+        submit.disabled = false;
+        return;
+      }
+      api('mes_downtime_create', {
+        machine_id: selectedMachineId,
+        work_center_id: machine ? machine.work_center_id || '' : workCenterId || '',
+        wo_number: (modal.querySelector('#mes-dt-wo') || {}).value || '',
+        category: (modal.querySelector('#mes-dt-category') || {}).value || defaultCategory,
+        reason_code: reasonCode,
+        severity: severitySelect ? (severitySelect.value || 'major') : 'major',
+        tool_id: (modal.querySelector('#mes-dt-tool') || {}).value || '',
+        started_at: (modal.querySelector('#mes-dt-start') || {}).value || '',
+        reason: (modal.querySelector('#mes-dt-reason') || {}).value || '',
+        note: (modal.querySelector('#mes-dt-note') || {}).value || ''
+      }, 'POST').then(function(resp){
+        if(!resp || !resp.ok) throw new Error((resp && resp.error) || 'downtime_failed');
+        state.snapshot = resp.data || state.snapshot;
+        toast(t('Đã tạo sự kiện downtime.', 'Downtime event created.'), 'success');
+        closeModal();
+        render();
+      }).catch(function(error){
+        toast(t('Không thể tạo downtime.', 'Could not create the downtime event.'), 'error');
+        if(window.console) console.error(error);
+      }).finally(function(){ submit.disabled = false; });
+    }
+  );
+  if(state.modal){
+    var categorySelect = state.modal.querySelector('#mes-dt-category');
+    var severitySelect = state.modal.querySelector('#mes-dt-severity');
+    if(categorySelect) categorySelect.onchange = function(){ syncDowntimeReasonFields(state.modal); };
+    if(severitySelect) severitySelect.onchange = function(){ severitySelect.dataset.lockedByUser = '1'; };
+    syncDowntimeReasonFields(state.modal);
+    var reasonSelect = state.modal.querySelector('#mes-dt-reason-code');
+    if(reasonSelect) reasonSelect.onchange = function(){ syncDowntimeReasonFields(state.modal); };
+  }
+  bindModalButtons();
+}
+
+function openResolveDowntimeModal(downtimeId){
+  var row = downtimeById(downtimeId);
+  if(!row){ toast(t('Không tìm thấy downtime cần khôi phục.', 'Could not find the downtime event to resolve.'), 'error'); return; }
+  var reasonLabel = [row.reason_code || '', row.reason_name_vi || row.reason_name || '', row.reason || ''].filter(Boolean).join(' · ');
+  showModal(
+    t('Khôi phục downtime', 'Resolve downtime'),
+    (row.machine_id || '') + ' · ' + (row.wo_number || t('Không có WO', 'No WO')),
+    '<div class="mesx-form-grid">' +
+      fieldDisplay(t('Mã lý do / triệu chứng', 'Reason code / symptom'), reasonLabel || '—') +
+      fieldDisplay(t('Bắt đầu dừng', 'Downtime start'), fmtDateTime(row.started_at || '')) +
+      editableField('mes-dt-resume', t('Trạng thái WO sau khôi phục', 'WO status after recovery'), '<select class="mesx-select" id="mes-dt-resume"><option value="setup">Setup</option><option value="running" selected>Running</option><option value="inspection">Inspection</option><option value="on_hold">On Hold</option></select>') +
+      editableField('mes-dt-code', t('Mã khôi phục', 'Resolution code'), '<select class="mesx-select" id="mes-dt-code">' + renderResolutionCodeOptions('resolved') + '</select>') +
+      editableField('mes-dt-resolved-at', t('Thời điểm khôi phục', 'Resolved at'), '<input class="mesx-input" id="mes-dt-resolved-at" type="datetime-local" value="' + esc(nowInputValue()) + '">') +
+      editableField('mes-dt-action', t('Hành động khắc phục', 'Corrective action'), '<textarea class="mesx-textarea" id="mes-dt-action" placeholder="' + esc(t('Mô tả hành động khắc phục đã thực hiện, ai xác nhận, có thay dao / nạp lại chương trình hay không...', 'Describe the corrective action, who verified it, and whether tooling or NC program was changed...')) + '"></textarea>', true) +
+      '<div class="full mesx-modal-foot"><button type="button" class="mesx-btn ghost" data-modal-cancel>↩ ' + esc(t('Hủy', 'Cancel')) + '</button><button type="button" class="mesx-btn primary" data-modal-submit>✅ ' + esc(t('Khôi phục và đóng downtime', 'Resolve and close downtime')) + '</button></div>' +
+    '</div>',
+    function(modal, submit){
+      submit.disabled = true;
+      var resolutionCode = (modal.querySelector('#mes-dt-code') || {}).value || '';
+      if(!resolutionCode){
+        toast(t('Cần chọn mã khôi phục downtime.', 'A governed resolution code is required.'), 'error');
+        submit.disabled = false;
+        return;
+      }
+      api('mes_downtime_resolve', {
+        downtime_id: row.downtime_id || '',
+        resume_status: (modal.querySelector('#mes-dt-resume') || {}).value || 'running',
+        resolution_code: resolutionCode,
+        resolved_at: (modal.querySelector('#mes-dt-resolved-at') || {}).value || '',
+        corrective_action: (modal.querySelector('#mes-dt-action') || {}).value || ''
+      }, 'POST').then(function(resp){
+        if(!resp || !resp.ok){
+          toast(governanceFailureMessage(resp, 'Không thể khôi phục downtime.', 'Could not resolve the downtime event.'), 'error');
+          if(window.console) console.error(resp);
+          return;
+        }
+        state.snapshot = resp.data || state.snapshot;
+        toast(t('Đã khôi phục downtime.', 'Downtime resolved.'), 'success');
+        closeModal();
+        render();
+      }).catch(function(error){
+        toast(t('Không thể khôi phục downtime.', 'Could not resolve the downtime event.'), 'error');
         if(window.console) console.error(error);
       }).finally(function(){ submit.disabled = false; });
     }

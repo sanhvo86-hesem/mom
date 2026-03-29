@@ -1824,9 +1824,9 @@ function save_orders_store(array $data): void {
 function master_data_store_default(): array {
   return [
     '_meta' => [
-      'version' => '1.1',
+      'version' => '1.2',
       'updated' => now_iso(),
-      'description' => 'Governed master data for lookups in orders, evidence forms, and MES connectivity.',
+      'description' => 'Governed master data for lookups in orders, evidence forms, MES connectivity, and reason-code governance.',
     ],
     'customers' => [],
     'suppliers' => [],
@@ -1838,6 +1838,8 @@ function master_data_store_default(): array {
     'machines' => [],
     'operators' => [],
     'tooling_assets' => [],
+    'downtime_reason_codes' => [],
+    'downtime_resolution_codes' => [],
   ];
 }
 
@@ -2920,15 +2922,23 @@ function mes_build_downtime_pareto(array $downtimeEvents, DateTimeImmutable $now
     if (!is_array($event)) continue;
     $category = trim((string)($event['category'] ?? 'uncategorized'));
     if ($category === '') $category = 'uncategorized';
+    $reasonCode = trim((string)($event['reason_code'] ?? ''));
+    $bucket = $reasonCode !== '' ? ('reason:' . $reasonCode) : ('category:' . $category);
+    $labelVi = trim((string)($event['reason_name_vi'] ?? ''));
+    $labelEn = trim((string)($event['reason_name'] ?? ''));
     $minutes = mes_minutes_between(
       (string)($event['started_at'] ?? ''),
       strtolower((string)($event['status'] ?? 'open')) === 'resolved' ? (string)($event['resolved_at'] ?? '') : '',
       $now
     );
     if ($minutes <= 0) continue;
-    if (!isset($grouped[$category])) {
-      $grouped[$category] = [
+    if (!isset($grouped[$bucket])) {
+      $grouped[$bucket] = [
         'category' => $category,
+        'reason_code' => $reasonCode,
+        'label_vi' => $labelVi !== '' ? $labelVi : $category,
+        'label_en' => $labelEn !== '' ? $labelEn : $category,
+        'reason_group' => trim((string)($event['reason_group'] ?? '')),
         'minutes' => 0.0,
         'event_count' => 0,
         'open_count' => 0,
@@ -2936,13 +2946,13 @@ function mes_build_downtime_pareto(array $downtimeEvents, DateTimeImmutable $now
         'latest_started_at' => '',
       ];
     }
-    $grouped[$category]['minutes'] += $minutes;
-    $grouped[$category]['event_count']++;
-    if (strtolower((string)($event['status'] ?? 'open')) === 'open') $grouped[$category]['open_count']++;
-    if (in_array(strtolower((string)($event['severity'] ?? 'minor')), ['major', 'critical'], true)) $grouped[$category]['major_count']++;
+    $grouped[$bucket]['minutes'] += $minutes;
+    $grouped[$bucket]['event_count']++;
+    if (strtolower((string)($event['status'] ?? 'open')) === 'open') $grouped[$bucket]['open_count']++;
+    if (in_array(strtolower((string)($event['severity'] ?? 'minor')), ['major', 'critical'], true)) $grouped[$bucket]['major_count']++;
     $startedAt = (string)($event['started_at'] ?? '');
-    if ($startedAt !== '' && $startedAt > (string)$grouped[$category]['latest_started_at']) {
-      $grouped[$category]['latest_started_at'] = $startedAt;
+    if ($startedAt !== '' && $startedAt > (string)$grouped[$bucket]['latest_started_at']) {
+      $grouped[$bucket]['latest_started_at'] = $startedAt;
     }
     $totalMinutes += $minutes;
   }
@@ -3475,6 +3485,8 @@ function upsert_master_data_item(array &$store, string $entity, array $item, str
     'machines' => 'machine_id',
     'operators' => 'operator_id',
     'tooling_assets' => 'tool_id',
+    'downtime_reason_codes' => 'reason_code',
+    'downtime_resolution_codes' => 'resolution_code',
   ];
   if (!isset($map[$entity])) throw new RuntimeException('invalid_master_entity');
   $idKey = $map[$entity];
@@ -9891,6 +9903,8 @@ if ($username === '') {
         'machines' => count($data['machines'] ?? []),
         'operators' => count($data['operators'] ?? []),
         'tooling_assets' => count($data['tooling_assets'] ?? []),
+        'downtime_reason_codes' => count($data['downtime_reason_codes'] ?? []),
+        'downtime_resolution_codes' => count($data['downtime_resolution_codes'] ?? []),
       ],
     ]);
   }
@@ -10199,9 +10213,15 @@ if ($username === '') {
     $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
     $machines = master_index_by((array)($master['machines'] ?? []), 'machine_id');
     $toolAssets = master_index_by((array)($master['tooling_assets'] ?? []), 'tool_id');
+    $reasonCodes = master_index_by((array)($master['downtime_reason_codes'] ?? []), 'reason_code');
     if (!isset($machines[$machineId])) api_json(['ok' => false, 'error' => 'machine_not_found'], 404);
     $toolId = trim((string)($body['tool_id'] ?? ''));
     if ($toolId !== '' && !isset($toolAssets[$toolId])) api_json(['ok' => false, 'error' => 'tool_not_found'], 404);
+    $reasonCode = trim((string)($body['reason_code'] ?? ''));
+    if ($reasonCode === '') api_json(['ok' => false, 'error' => 'missing_reason_code'], 400);
+    $reasonMeta = $reasonCodes[$reasonCode] ?? null;
+    if (!is_array($reasonMeta)) api_json(['ok' => false, 'error' => 'downtime_reason_not_found'], 404);
+    if (strtolower(trim((string)($reasonMeta['status'] ?? 'active'))) !== 'active') api_json(['ok' => false, 'error' => 'downtime_reason_inactive'], 409);
 
     $woNumber = trim((string)($body['wo_number'] ?? ''));
     $jo = [];
@@ -10218,10 +10238,15 @@ if ($username === '') {
       'machine_name' => (string)($machines[$machineId]['machine_name'] ?? ''),
       'work_center_id' => trim((string)($body['work_center_id'] ?? $machines[$machineId]['work_center_id'] ?? '')),
       'wo_number' => $woNumber,
-      'category' => $category,
-      'severity' => strtolower(trim((string)($body['severity'] ?? 'major'))),
+      'category' => strtolower(trim((string)($reasonMeta['category'] ?? $category))),
+      'severity' => strtolower(trim((string)($body['severity'] ?? $reasonMeta['default_severity'] ?? 'major'))),
       'tool_id' => $toolId,
       'tool_name' => (string)($toolAssets[$toolId]['tool_name'] ?? ''),
+      'reason_code' => $reasonCode,
+      'reason_name' => trim((string)($reasonMeta['reason_name'] ?? '')),
+      'reason_name_vi' => trim((string)($reasonMeta['reason_name_vi'] ?? '')),
+      'reason_group' => trim((string)($reasonMeta['reason_group'] ?? '')),
+      'planned_flag' => in_array(strtolower(trim((string)($reasonMeta['planned_flag'] ?? 'no'))), ['yes', 'true', '1'], true),
       'reason' => trim((string)($body['reason'] ?? '')),
       'note' => trim((string)($body['note'] ?? '')),
       'started_at' => trim((string)($body['started_at'] ?? now_iso())),
@@ -10275,6 +10300,12 @@ if ($username === '') {
     $master = load_master_data_store();
     $mes = load_mes_runtime_store();
     $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
+    $resolutionCodes = master_index_by((array)($master['downtime_resolution_codes'] ?? []), 'resolution_code');
+    $resolutionCode = trim((string)($body['resolution_code'] ?? ''));
+    if ($resolutionCode === '') api_json(['ok' => false, 'error' => 'missing_resolution_code'], 400);
+    $resolutionMeta = $resolutionCodes[$resolutionCode] ?? null;
+    if (!is_array($resolutionMeta)) api_json(['ok' => false, 'error' => 'downtime_resolution_not_found'], 404);
+    if (strtolower(trim((string)($resolutionMeta['status'] ?? 'active'))) !== 'active') api_json(['ok' => false, 'error' => 'downtime_resolution_inactive'], 409);
     $resolved = null;
     foreach ($mes['downtime_events'] as $idx => $row) {
       if (!is_array($row) || (string)($row['downtime_id'] ?? '') !== $downtimeId) continue;
@@ -10282,7 +10313,9 @@ if ($username === '') {
       $mes['downtime_events'][$idx]['resolved_at'] = trim((string)($body['resolved_at'] ?? now_iso()));
       $mes['downtime_events'][$idx]['resolved_by'] = $username;
       $mes['downtime_events'][$idx]['corrective_action'] = trim((string)($body['corrective_action'] ?? ''));
-      $mes['downtime_events'][$idx]['resolution_code'] = trim((string)($body['resolution_code'] ?? 'resolved'));
+      $mes['downtime_events'][$idx]['resolution_code'] = $resolutionCode;
+      $mes['downtime_events'][$idx]['resolution_name'] = trim((string)($resolutionMeta['resolution_name'] ?? ''));
+      $mes['downtime_events'][$idx]['resolution_name_vi'] = trim((string)($resolutionMeta['resolution_name_vi'] ?? ''));
       $resolved = $mes['downtime_events'][$idx];
       break;
     }

@@ -1,6 +1,6 @@
 ﻿/* ===================================================================
    13-master-data-control.js -- Governed Master Data Control
-   HESEM QMS Portal -- Customer / Supplier / Part / Revision / CAPA / Work Center / Machine / Operator
+   HESEM QMS Portal -- Customer / Supplier / Part / Revision / CAPA / Work Center / Machine / Operator / MES reason codes
    Shared source for Order Management, Evidence Control, and MES runtime lookups
    =================================================================== */
 
@@ -229,6 +229,46 @@ var ENTITY_CONFIG = {
       { key:'default_offset_band_mm', type:'number', label:'Dải offset chuẩn (mm)' },
       { key:'status', type:'select', required:true, label:'Trạng thái', options:['active','quarantine','retired'] }
     ]
+  },
+  downtime_reason_codes: {
+    key: 'reason_code',
+    labelVi: 'Mã lý do downtime',
+    labelEn: 'Downtime reason codes',
+    emptyVi: 'Chưa có mã lý do downtime nào.',
+    listColumns: [
+      { key:'reason_code', label:'Mã lý do' },
+      { key:'reason_name_vi', label:'Tên tiếng Việt' },
+      { key:'status', label:'Trạng thái' }
+    ],
+    fields: [
+      { key:'reason_code', type:'text', required:true, label:'Mã lý do' },
+      { key:'reason_name', type:'text', required:true, label:'Tên tiếng Anh' },
+      { key:'reason_name_vi', type:'text', required:true, label:'Tên tiếng Việt' },
+      { key:'category', type:'select', required:true, label:'Nhóm downtime', options:['breakdown','planned_pm','setup','material_wait','quality_hold','tool_change','utility','other'] },
+      { key:'reason_group', type:'select', label:'Nhóm nguyên nhân', options:['machine','tooling','program','quality','material','maintenance','utility','other'] },
+      { key:'default_severity', type:'select', label:'Mức độ mặc định', options:['minor','major','critical'] },
+      { key:'planned_flag', type:'select', label:'Downtime có kế hoạch', options:['no','yes'] },
+      { key:'escalation_sla_minutes', type:'number', label:'SLA escalation (phút)' },
+      { key:'status', type:'select', required:true, label:'Trạng thái', options:['active','inactive'] }
+    ]
+  },
+  downtime_resolution_codes: {
+    key: 'resolution_code',
+    labelVi: 'Mã khôi phục downtime',
+    labelEn: 'Downtime resolution codes',
+    emptyVi: 'Chưa có mã khôi phục downtime nào.',
+    listColumns: [
+      { key:'resolution_code', label:'Mã khôi phục' },
+      { key:'resolution_name_vi', label:'Tên tiếng Việt' },
+      { key:'status', label:'Trạng thái' }
+    ],
+    fields: [
+      { key:'resolution_code', type:'text', required:true, label:'Mã khôi phục' },
+      { key:'resolution_name', type:'text', required:true, label:'Tên tiếng Anh' },
+      { key:'resolution_name_vi', type:'text', required:true, label:'Tên tiếng Việt' },
+      { key:'resolution_group', type:'select', label:'Nhóm xử lý', options:['reset','temporary_fix','tooling','program','parts_wait','maintenance','quality','other'] },
+      { key:'status', type:'select', required:true, label:'Trạng thái', options:['active','inactive'] }
+    ]
   }
 };
 
@@ -285,6 +325,8 @@ function _optionLabel(entity, row){
   if(entity === 'machines') return row.machine_name || row.machine_id || '';
   if(entity === 'operators') return row.operator_name || row.operator_id || '';
   if(entity === 'tooling_assets') return row.tool_name || row.tool_id || '';
+  if(entity === 'downtime_reason_codes') return row.reason_name_vi || row.reason_name || row.reason_code || '';
+  if(entity === 'downtime_resolution_codes') return row.resolution_name_vi || row.resolution_name || row.resolution_code || '';
   return '';
 }
 
@@ -313,6 +355,8 @@ function _defaultDraft(entity){
   }
   if(entity === 'operators') draft.status = 'active';
   if(entity === 'tooling_assets') { draft.status = 'active'; draft.warning_pct = '80'; draft.critical_pct = '95'; }
+  if(entity === 'downtime_reason_codes') { draft.status = 'active'; draft.default_severity = 'major'; draft.planned_flag = 'no'; draft.escalation_sla_minutes = '30'; }
+  if(entity === 'downtime_resolution_codes') draft.status = 'active';
   return draft;
 }
 

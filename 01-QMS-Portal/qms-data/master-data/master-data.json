@@ -1,9 +1,9 @@
 {
   "_meta": {
-    "version": "1.1",
+    "version": "1.2",
     "created": "2026-03-29T12:00:00+07:00",
-    "updated": "2026-03-29T23:58:00+07:00",
-    "description": "Master data seed for customer, supplier, part, revision, NC program release, CAPA, work center, machine, operator, and tooling linkage used by Evidence Control, Order Management, and MES runtime."
+    "updated": "2026-03-29T23:59:00+07:00",
+    "description": "Master data seed for customer, supplier, part, revision, NC program release, CAPA, work center, machine, operator, tooling linkage, and governed MES reason codes used by Evidence Control, Order Management, and MES runtime."
   },
   "customers": [
     {
@@ -364,6 +364,122 @@
       "warning_pct": 80,
       "critical_pct": 95,
       "default_offset_band_mm": 0.01,
+      "status": "active"
+    }
+  ],
+  "downtime_reason_codes": [
+    {
+      "reason_code": "DT-BRK-SPINDLE",
+      "reason_name": "Spindle alarm or machine breakdown",
+      "reason_name_vi": "Báo lỗi trục chính hoặc hỏng máy",
+      "category": "breakdown",
+      "reason_group": "machine",
+      "default_severity": "critical",
+      "planned_flag": "no",
+      "escalation_sla_minutes": 10,
+      "status": "active"
+    },
+    {
+      "reason_code": "DT-TOOL-LIFE",
+      "reason_name": "Tool life exceeded or offset re-verification",
+      "reason_name_vi": "Dao vượt ngưỡng life hoặc cần xác nhận lại offset",
+      "category": "tool_change",
+      "reason_group": "tooling",
+      "default_severity": "major",
+      "planned_flag": "no",
+      "escalation_sla_minutes": 15,
+      "status": "active"
+    },
+    {
+      "reason_code": "DT-SETUP-PROGRAM",
+      "reason_name": "NC program mismatch during setup",
+      "reason_name_vi": "Lệch chương trình NC trong giai đoạn setup",
+      "category": "setup",
+      "reason_group": "program",
+      "default_severity": "major",
+      "planned_flag": "no",
+      "escalation_sla_minutes": 20,
+      "status": "active"
+    },
+    {
+      "reason_code": "DT-MATL-WAIT",
+      "reason_name": "Material or outsource lot not ready",
+      "reason_name_vi": "Vật tư hoặc lô outsource chưa sẵn sàng",
+      "category": "material_wait",
+      "reason_group": "material",
+      "default_severity": "major",
+      "planned_flag": "no",
+      "escalation_sla_minutes": 30,
+      "status": "active"
+    },
+    {
+      "reason_code": "DT-QUAL-HOLD",
+      "reason_name": "Quality hold or verification pending",
+      "reason_name_vi": "Giữ lô chất lượng hoặc chờ xác nhận kiểm tra",
+      "category": "quality_hold",
+      "reason_group": "quality",
+      "default_severity": "major",
+      "planned_flag": "no",
+      "escalation_sla_minutes": 20,
+      "status": "active"
+    },
+    {
+      "reason_code": "DT-PM-WINDOW",
+      "reason_name": "Planned preventive maintenance window",
+      "reason_name_vi": "Cửa sổ bảo trì phòng ngừa đã hoạch định",
+      "category": "planned_pm",
+      "reason_group": "maintenance",
+      "default_severity": "minor",
+      "planned_flag": "yes",
+      "escalation_sla_minutes": 60,
+      "status": "active"
+    },
+    {
+      "reason_code": "DT-UTIL-AIR",
+      "reason_name": "Utility interruption or low air pressure",
+      "reason_name_vi": "Gián đoạn tiện ích hoặc áp suất khí thấp",
+      "category": "utility",
+      "reason_group": "utility",
+      "default_severity": "critical",
+      "planned_flag": "no",
+      "escalation_sla_minutes": 10,
+      "status": "active"
+    }
+  ],
+  "downtime_resolution_codes": [
+    {
+      "resolution_code": "resolved",
+      "resolution_name": "Resolved and released",
+      "resolution_name_vi": "Đã khôi phục và cho chạy lại",
+      "resolution_group": "reset",
+      "status": "active"
+    },
+    {
+      "resolution_code": "temporary_fix",
+      "resolution_name": "Temporary fix applied",
+      "resolution_name_vi": "Đã khắc phục tạm",
+      "resolution_group": "temporary_fix",
+      "status": "active"
+    },
+    {
+      "resolution_code": "awaiting_parts",
+      "resolution_name": "Awaiting spare parts",
+      "resolution_name_vi": "Đang chờ phụ tùng",
+      "resolution_group": "parts_wait",
+      "status": "active"
+    },
+    {
+      "resolution_code": "tool_replaced",
+      "resolution_name": "Tool or holder replaced",
+      "resolution_name_vi": "Đã thay dao hoặc holder",
+      "resolution_group": "tooling",
+      "status": "active"
+    },
+    {
+      "resolution_code": "program_reloaded",
+      "resolution_name": "Program reloaded and verified",
+      "resolution_name_vi": "Đã nạp lại chương trình và xác nhận",
+      "resolution_group": "program",
       "status": "active"
     }
   ]
