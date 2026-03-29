@@ -8615,11 +8615,14 @@ if ($username === '') {
       $orders[$storeKey][$idx]['updated_at'] = now_iso();
       $orders[$storeKey][$idx]['updated_by'] = (string)($_SESSION['user'] ?? 'system');
       $orders[$storeKey][$idx]['status_history'] = array_values((array)($orders[$storeKey][$idx]['status_history'] ?? []));
-      $orders[$storeKey][$idx]['status_history'][] = [
+      $statusNote = trim((string)($body['note'] ?? ''));
+      $historyEntry = [
         'status' => $newStatus,
         'timestamp' => now_iso(),
         'user' => (string)($_SESSION['user'] ?? 'system'),
       ];
+      if ($statusNote !== '') $historyEntry['note'] = $statusNote;
+      $orders[$storeKey][$idx]['status_history'][] = $historyEntry;
       if ($entity === 'so' && $newStatus === 'shipped' && empty($orders[$storeKey][$idx]['shipped_date'])) {
         $orders[$storeKey][$idx]['shipped_date'] = date('Y-m-d');
       }
@@ -8961,6 +8964,343 @@ if ($username === '') {
     }));
 
     api_json(['ok' => true, 'pending' => $pending, 'count' => count($pending)]);
+  }
+
+  // ── G5 P1-03: Upload Hardening — quarantine flow ───────────────────────
+  case 'upload_quarantine': {
+    $me = require_logged_in($store);
+    require_csrf();
+    if (empty($_FILES['file']) || !is_array($_FILES['file'])) {
+      api_json(['ok' => false, 'error' => 'missing_file'], 400);
+    }
+    require_once __DIR__ . '/api/services/UploadHardeningService.php';
+    $svc = new UploadHardeningService($DATA_DIR);
+    $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+    $extra = [
+      'allocation_id' => trim((string)($_POST['allocation_id'] ?? '')),
+      'form_code'     => trim((string)($_POST['form_code'] ?? '')),
+      'context'       => trim((string)($_POST['context'] ?? '')),
+    ];
+    $result = $svc->quarantineFile($_FILES['file'], $username, $extra);
+    if (!$result->ok) {
+      api_json(['ok' => false, 'error' => 'quarantine_failed', 'message' => $result->message], 422);
+    }
+    api_json(['ok' => true, 'quarantine_id' => $result->quarantineId, 'metadata' => $result->metadata]);
+  }
+
+  case 'upload_verify_quarantine': {
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $quarantineId = trim((string)($body['quarantine_id'] ?? $_GET['quarantine_id'] ?? ''));
+    if ($quarantineId === '') api_json(['ok' => false, 'error' => 'missing_quarantine_id'], 400);
+
+    require_once __DIR__ . '/api/services/UploadHardeningService.php';
+    $svc = new UploadHardeningService($DATA_DIR);
+    $vr = $svc->verifyQuarantinedFile($quarantineId);
+    api_json(['ok' => $vr->ok, 'status' => $vr->status, 'message' => $vr->message, 'checks' => $vr->checks]);
+  }
+
+  case 'upload_accept': {
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $quarantineId = trim((string)($body['quarantine_id'] ?? ''));
+    $targetDir = trim((string)($body['target_dir'] ?? ''));
+    if ($quarantineId === '') api_json(['ok' => false, 'error' => 'missing_quarantine_id'], 400);
+
+    require_once __DIR__ . '/api/services/UploadHardeningService.php';
+    $svc = new UploadHardeningService($DATA_DIR);
+    try {
+      $path = $svc->acceptFile($quarantineId, $targetDir);
+      api_json(['ok' => true, 'accepted_path' => $path]);
+    } catch (Throwable $e) {
+      api_json(['ok' => false, 'error' => $e->getMessage()], 500);
+    }
+  }
+
+  case 'upload_reject': {
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $quarantineId = trim((string)($body['quarantine_id'] ?? ''));
+    $reason = trim((string)($body['reason'] ?? 'Bị từ chối bởi quản trị viên'));
+    if ($quarantineId === '') api_json(['ok' => false, 'error' => 'missing_quarantine_id'], 400);
+
+    require_once __DIR__ . '/api/services/UploadHardeningService.php';
+    $svc = new UploadHardeningService($DATA_DIR);
+    try {
+      $svc->rejectFile($quarantineId, $reason);
+      api_json(['ok' => true]);
+    } catch (Throwable $e) {
+      api_json(['ok' => false, 'error' => $e->getMessage()], 500);
+    }
+  }
+
+  case 'upload_exception_queue': {
+    require_logged_in($store);
+    require_once __DIR__ . '/api/services/UploadHardeningService.php';
+    $svc = new UploadHardeningService($DATA_DIR);
+    $days = max(1, min(365, (int)($_GET['days'] ?? 30)));
+    $exceptions = $svc->getExceptionQueue($days);
+    api_json(['ok' => true, 'exceptions' => $exceptions, 'count' => count($exceptions)]);
+  }
+
+  case 'upload_cleanup_quarantine': {
+    $me = require_logged_in($store);
+    $role = migrate_role((string)($me['role'] ?? ''));
+    if (!in_array($role, admin_roles(), true)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
+    require_csrf();
+
+    require_once __DIR__ . '/api/services/UploadHardeningService.php';
+    $svc = new UploadHardeningService($DATA_DIR);
+    $maxDays = max(1, (int)($_GET['max_days'] ?? 7));
+    $purged = $svc->cleanupExpired($maxDays);
+    api_json(['ok' => true, 'purged' => $purged]);
+  }
+
+  // ── G6 P1-06: Exception Dashboard ─────────────────────────────────────
+  case 'exception_dashboard': {
+    $me = require_logged_in($store);
+
+    // 1. Overdue allocations: downloaded > 30 days ago, not yet submitted
+    $allocationStore = load_allocation_store();
+    $allocations = (array)($allocationStore['allocations'] ?? []);
+    $cutoff30 = date('c', strtotime('-30 days'));
+    $overdueAllocations = 0;
+    foreach ($allocations as $alloc) {
+      if (!is_array($alloc)) continue;
+      $st = allocation_status_normalize((string)($alloc['status'] ?? ''));
+      if (!in_array($st, ['allocated', 'downloaded'], true)) continue;
+      $dl = (string)($alloc['downloaded_at'] ?? '');
+      if ($dl !== '' && $dl < $cutoff30) $overdueAllocations++;
+    }
+
+    // 2. Failed uploads in last 30 days
+    require_once __DIR__ . '/api/services/UploadHardeningService.php';
+    $uploadSvc = new UploadHardeningService($DATA_DIR);
+    $failedUploads = count($uploadSvc->getExceptionQueue(30));
+
+    // 3. Overdue orders (due_date < today)
+    $orders = load_orders_store();
+    $today = date('Y-m-d');
+    $overdueOrders = 0;
+    foreach (['sales_orders', 'job_orders', 'work_orders'] as $key) {
+      foreach ((array)($orders[$key] ?? []) as $ord) {
+        if (!is_array($ord)) continue;
+        $status = strtolower(trim((string)($ord['status'] ?? '')));
+        if (in_array($status, ['closed', 'completed', 'cancelled', 'shipped'], true)) continue;
+        $due = (string)($ord['due_date'] ?? '');
+        if ($due !== '' && $due < $today) $overdueOrders++;
+      }
+    }
+
+    // 4. Open CAPAs > 60 days
+    $master = load_master_data_store();
+    $cutoff60 = date('Y-m-d', strtotime('-60 days'));
+    $overdueCapas = 0;
+    foreach ((array)($master['capas'] ?? []) as $capa) {
+      if (!is_array($capa)) continue;
+      $st = strtolower(trim((string)($capa['status'] ?? '')));
+      if (in_array($st, ['closed', 'completed', 'cancelled'], true)) continue;
+      $opened = (string)($capa['opened_date'] ?? $capa['created_at'] ?? '');
+      if ($opened !== '' && substr($opened, 0, 10) < $cutoff60) $overdueCapas++;
+    }
+
+    // 5. WOs missing evidence gates
+    $woMissingEvidence = 0;
+    $formLinks = (array)($orders['form_links'] ?? []);
+    foreach ((array)($orders['work_orders'] ?? []) as $wo) {
+      if (!is_array($wo)) continue;
+      $st = strtolower(trim((string)($wo['status'] ?? '')));
+      if (!in_array($st, ['in_progress', 'running', 'started'], true)) continue;
+      $woId = (string)($wo['wo_number'] ?? '');
+      $hasEvidence = false;
+      foreach ($formLinks as $link) {
+        if (is_array($link) && (string)($link['order_type'] ?? '') === 'wo' && (string)($link['order_id'] ?? '') === $woId) {
+          $hasEvidence = true;
+          break;
+        }
+      }
+      if (!$hasEvidence) $woMissingEvidence++;
+    }
+
+    // 6. Orphan record links (links pointing to non-existent orders)
+    $orphanLinks = 0;
+    foreach ($formLinks as $link) {
+      if (!is_array($link)) continue;
+      $ot = (string)($link['order_type'] ?? '');
+      $oid = (string)($link['order_id'] ?? '');
+      if ($ot === '' || $oid === '') { $orphanLinks++; continue; }
+      $found = find_order_record($orders, $ot, $oid);
+      if (!$found) $orphanLinks++;
+    }
+
+    api_json([
+      'ok' => true,
+      'overdue_allocations' => $overdueAllocations,
+      'failed_uploads'      => $failedUploads,
+      'overdue_orders'      => $overdueOrders,
+      'overdue_capas'       => $overdueCapas,
+      'wo_missing_evidence' => $woMissingEvidence,
+      'orphan_links'        => $orphanLinks,
+    ]);
+  }
+
+  case 'exception_detail': {
+    $me = require_logged_in($store);
+    $type = trim((string)($_GET['type'] ?? ''));
+    $page = max(1, (int)($_GET['page'] ?? 1));
+    $perPage = min(100, max(10, (int)($_GET['per_page'] ?? 25)));
+
+    $items = [];
+    $today = date('Y-m-d');
+    $cutoff30 = date('c', strtotime('-30 days'));
+    $cutoff60 = date('Y-m-d', strtotime('-60 days'));
+
+    switch ($type) {
+      case 'overdue_allocations': {
+        $allocationStore = load_allocation_store();
+        foreach ((array)($allocationStore['allocations'] ?? []) as $alloc) {
+          if (!is_array($alloc)) continue;
+          $st = allocation_status_normalize((string)($alloc['status'] ?? ''));
+          if (!in_array($st, ['allocated', 'downloaded'], true)) continue;
+          $dl = (string)($alloc['downloaded_at'] ?? '');
+          if ($dl !== '' && $dl < $cutoff30) {
+            $items[] = [
+              'id'         => (string)($alloc['allocation_id'] ?? ''),
+              'type'       => 'allocation',
+              'department' => (string)($alloc['department'] ?? ''),
+              'date'       => substr($dl, 0, 10),
+              'responsible'=> (string)($alloc['allocated_to'] ?? $alloc['downloaded_by'] ?? ''),
+              'detail'     => (string)($alloc['form_code'] ?? '') . ' / ' . (string)($alloc['record_id'] ?? ''),
+            ];
+          }
+        }
+        break;
+      }
+      case 'failed_uploads': {
+        require_once __DIR__ . '/api/services/UploadHardeningService.php';
+        $svc = new UploadHardeningService($DATA_DIR);
+        foreach ($svc->getExceptionQueue(30) as $ex) {
+          $items[] = [
+            'id'         => (string)($ex['id'] ?? ''),
+            'type'       => (string)($ex['type'] ?? 'upload_error'),
+            'department' => '',
+            'date'       => substr((string)($ex['timestamp'] ?? ''), 0, 10),
+            'responsible'=> (string)($ex['uploaded_by'] ?? ''),
+            'detail'     => (string)($ex['message'] ?? ''),
+          ];
+        }
+        break;
+      }
+      case 'overdue_orders': {
+        $orders = load_orders_store();
+        foreach (['sales_orders' => 'SO', 'job_orders' => 'JO', 'work_orders' => 'WO'] as $key => $label) {
+          foreach ((array)($orders[$key] ?? []) as $ord) {
+            if (!is_array($ord)) continue;
+            $status = strtolower(trim((string)($ord['status'] ?? '')));
+            if (in_array($status, ['closed', 'completed', 'cancelled', 'shipped'], true)) continue;
+            $due = (string)($ord['due_date'] ?? '');
+            if ($due !== '' && $due < $today) {
+              $numKey = $key === 'sales_orders' ? 'so_number' : ($key === 'job_orders' ? 'jo_number' : 'wo_number');
+              $items[] = [
+                'id'         => (string)($ord[$numKey] ?? ''),
+                'type'       => $label,
+                'department' => (string)($ord['department'] ?? $ord['work_center_id'] ?? ''),
+                'date'       => $due,
+                'responsible'=> (string)($ord['created_by'] ?? ''),
+                'detail'     => "Quá hạn: {$due}",
+              ];
+            }
+          }
+        }
+        break;
+      }
+      case 'overdue_capas': {
+        $master = load_master_data_store();
+        foreach ((array)($master['capas'] ?? []) as $capa) {
+          if (!is_array($capa)) continue;
+          $st = strtolower(trim((string)($capa['status'] ?? '')));
+          if (in_array($st, ['closed', 'completed', 'cancelled'], true)) continue;
+          $opened = (string)($capa['opened_date'] ?? $capa['created_at'] ?? '');
+          if ($opened !== '' && substr($opened, 0, 10) < $cutoff60) {
+            $items[] = [
+              'id'         => (string)($capa['capa_id'] ?? $capa['id'] ?? ''),
+              'type'       => 'CAPA',
+              'department' => (string)($capa['department'] ?? ''),
+              'date'       => substr($opened, 0, 10),
+              'responsible'=> (string)($capa['owner'] ?? $capa['assigned_to'] ?? ''),
+              'detail'     => (string)($capa['title'] ?? $capa['description'] ?? ''),
+            ];
+          }
+        }
+        break;
+      }
+      case 'wo_missing_evidence': {
+        $orders = load_orders_store();
+        $formLinks = (array)($orders['form_links'] ?? []);
+        foreach ((array)($orders['work_orders'] ?? []) as $wo) {
+          if (!is_array($wo)) continue;
+          $st = strtolower(trim((string)($wo['status'] ?? '')));
+          if (!in_array($st, ['in_progress', 'running', 'started'], true)) continue;
+          $woId = (string)($wo['wo_number'] ?? '');
+          $hasEvidence = false;
+          foreach ($formLinks as $link) {
+            if (is_array($link) && (string)($link['order_type'] ?? '') === 'wo' && (string)($link['order_id'] ?? '') === $woId) {
+              $hasEvidence = true;
+              break;
+            }
+          }
+          if (!$hasEvidence) {
+            $items[] = [
+              'id'         => $woId,
+              'type'       => 'WO',
+              'department' => (string)($wo['work_center_id'] ?? ''),
+              'date'       => (string)($wo['start_date'] ?? $wo['created_at'] ?? ''),
+              'responsible'=> (string)($wo['created_by'] ?? ''),
+              'detail'     => (string)($wo['operation_desc'] ?? ''),
+            ];
+          }
+        }
+        break;
+      }
+      case 'orphan_links': {
+        $orders = load_orders_store();
+        foreach ((array)($orders['form_links'] ?? []) as $link) {
+          if (!is_array($link)) continue;
+          $ot = (string)($link['order_type'] ?? '');
+          $oid = (string)($link['order_id'] ?? '');
+          $isOrphan = ($ot === '' || $oid === '' || !find_order_record($orders, $ot, $oid));
+          if ($isOrphan) {
+            $items[] = [
+              'id'         => (string)($link['link_id'] ?? ''),
+              'type'       => 'form_link',
+              'department' => '',
+              'date'       => (string)($link['linked_at'] ?? ''),
+              'responsible'=> (string)($link['linked_by'] ?? ''),
+              'detail'     => "Liên kết mồ côi: {$ot}/{$oid} -> " . (string)($link['form_code'] ?? ''),
+            ];
+          }
+        }
+        break;
+      }
+      default:
+        api_json(['ok' => false, 'error' => 'invalid_exception_type'], 400);
+    }
+
+    $total = count($items);
+    $pages = max(1, (int)ceil($total / $perPage));
+    $offset = ($page - 1) * $perPage;
+    $pagedItems = array_slice($items, $offset, $perPage);
+
+    api_json([
+      'ok'    => true,
+      'items' => $pagedItems,
+      'total' => $total,
+      'page'  => $page,
+      'pages' => $pages,
+    ]);
   }
 
   default:

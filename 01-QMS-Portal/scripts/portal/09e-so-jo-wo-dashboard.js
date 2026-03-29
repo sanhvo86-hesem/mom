@@ -158,17 +158,27 @@ function _showDetail(id,type){
     if(!res||!res.ok){ body.innerHTML='<p class="sj-error">'+_t('Không thể tải chi tiết.','Unable to load detail.')+'</p>'; return; }
     var o=res.data||{}; _selected={ id:id, type:type, data:o };
     var html='<section class="sj-sec"><h4>'+_t('Thông tin chính','Primary information')+'</h4><div class="sj-grid">';
-    Object.keys(o||{}).forEach(function(key){ if(typeof o[key]==='object' || o[key]==='' || o[key]==null || ['status_history','operations','linked_forms','job_orders','job_order','master_data_ref'].indexOf(key)>=0) return; var val=o[key]; if(key.indexOf('_date')>=0||key.indexOf('_at')>=0) val=(key.indexOf('_at')>=0||String(val).indexOf('T')>=0)?_fmtDateTime(val):_fmtDate(val); if(typeof val==='boolean') val=val?_t('Có','Yes'):_t('Không','No'); html+='<div class="sj-f"><small>'+_esc(key)+'</small><strong>'+_esc(val)+'</strong></div>'; });
+    var hasTransitions=(TRANSITIONS[type]&&TRANSITIONS[type][o.status||'']&&TRANSITIONS[type][o.status||''].length>0);
+    Object.keys(o||{}).forEach(function(key){ if(typeof o[key]==='object' || o[key]==='' || o[key]==null || ['status_history','operations','linked_forms','job_orders','job_order','master_data_ref'].indexOf(key)>=0) return; var val=o[key]; if(key==='status'){ var st=_status(type,val||''); html+='<div class="sj-f'+(hasTransitions?' sj-f-clickable':'')+'"'+(hasTransitions?' id="'+_id+'-status-badge" role="button" tabindex="0"':'')+'><small>'+_esc(key)+'</small><span class="sj-status" style="color:'+st.color+';background:'+_rgba(st.color,.12)+'">'+_esc(st.text)+(hasTransitions?' ▸':'')+'</span></div>'; return; } if(key.indexOf('_date')>=0||key.indexOf('_at')>=0) val=(key.indexOf('_at')>=0||String(val).indexOf('T')>=0)?_fmtDateTime(val):_fmtDate(val); if(typeof val==='boolean') val=val?_t('Có','Yes'):_t('Không','No'); html+='<div class="sj-f"><small>'+_esc(key)+'</small><strong>'+_esc(val)+'</strong></div>'; });
     html+='</div></section>';
-    if((o.status_history||[]).length){ html+='<section class="sj-sec"><h4>'+_t('Lịch sử trạng thái','Status history')+'</h4><div class="sj-history">'+o.status_history.map(function(h){ return '<div class="sj-h"><strong>'+_esc(_status(type,h.status||'').text)+'</strong><span>'+_esc(_fmtDateTime(h.timestamp||h.date||''))+'</span><em>'+_esc(h.user||'')+'</em></div>'; }).join('')+'</div></section>'; }
+    if((o.status_history||[]).length){ html+='<section class="sj-sec"><h4>'+_t('Lịch sử trạng thái','Status history')+'</h4><div class="sj-timeline">'+(o.status_history||[]).slice().reverse().map(function(h,i,arr){ var st=_status(type,h.status||''); var isFirst=(i===0); return '<div class="sj-tl-item'+(isFirst?' sj-tl-current':'')+'"><div class="sj-tl-dot" style="background:'+st.color+';box-shadow:0 0 0 4px '+_rgba(st.color,.18)+'"></div><div class="sj-tl-line"></div><div class="sj-tl-content"><span class="sj-status" style="color:'+st.color+';background:'+_rgba(st.color,.12)+'">'+_esc(st.text)+'</span><span class="sj-tl-date">'+_esc(_fmtDateTime(h.timestamp||h.date||''))+'</span><span class="sj-tl-user">'+_esc(h.user||'')+'</span>'+(h.note?'<span class="sj-tl-note">'+_esc(h.note)+'</span>':'')+'</div></div>'; }).join('')+'</div></section>'; }
     if(type==='jo' && (o.operations||[]).length){ html+='<section class="sj-sec"><h4>'+_t('Danh sách công đoạn','Operations')+'</h4><div class="sj-history">'+o.operations.map(function(op){ return '<div class="sj-h"><strong>OP'+_esc(op.operation_number||'')+' · '+_esc(op.operation_desc||'-')+'</strong><span>'+_esc(op.machine_id||'')+'</span><em>'+_esc(_status('wo',op.status||'').text)+'</em></div>'; }).join('')+'</div></section>'; }
     html+='<section class="sj-sec"><h4>'+_t('Hồ sơ liên kết','Linked Evidence')+'</h4><div id="'+_id+'-linked-forms-panel"><div class="sj-loading"><div class="sj-spinner"></div></div></div>'+(_permission(type,'edit')?'<button type="button" class="sj-btn mini" id="'+_id+'-link-form" style="margin-top:8px">+ '+_t('Liên kết hồ sơ','Link record')+'</button>':'')+'</section>';
     body.innerHTML=html;
+    // ── G4 P1-04: Clickable status badge opens transition modal ──
+    var statusBadge=document.getElementById(_id+'-status-badge');
+    if(statusBadge) statusBadge.onclick=function(){ _showStatusTransition(type, id, o.status||''); };
     // ── G2 P1-01: Load enriched linked forms via dedicated endpoint ──
     _loadLinkedFormsPanel(id, type);
     var next=(TRANSITIONS[type]&&TRANSITIONS[type][o.status||''])?TRANSITIONS[type][o.status||'']:[];
-    actions.innerHTML=next.map(function(s){ var st=_status(type,s); return '<button type="button" class="sj-btn mini sj-outline" data-next="'+_esc(s)+'" style="color:'+st.color+';border-color:'+st.color+'">'+_esc(st.text)+'</button>'; }).join('');
-    actions.onclick=function(e){ var b=e.target.closest('[data-next]'); if(!b||!_selected) return; _api(type==='so'?'order_so_update_status':type==='jo'?'order_jo_update_status':'order_wo_update_status',{ order_id:_selected.id, status:b.getAttribute('data-next') }).then(function(r){ if(r&&r.ok){ _toast(_t('Đã cập nhật trạng thái.','Status updated.'),'success'); _refresh(); } else { _toast(_t('Không thể cập nhật trạng thái.','Unable to update status.'),'error'); } }); };
+    var actHtml='';
+    if(next.length){ actHtml+='<button type="button" class="sj-btn mini sj-outline" id="'+_id+'-change-status" style="color:#1565c0;border-color:#1565c0">'+_t('Chuyển trạng thái','Change status')+'</button>'; }
+    if(type==='so' && _permission('jo','create')){ actHtml+='<button type="button" class="sj-btn mini accent-2" id="'+_id+'-add-jo">+ '+_t('Lệnh sản xuất','Job Order')+'</button>'; }
+    if(type==='jo' && _permission('wo','create')){ actHtml+='<button type="button" class="sj-btn mini accent-3" id="'+_id+'-add-wo">+ '+_t('Lệnh công đoạn','Work Order')+'</button>'; }
+    actions.innerHTML=actHtml;
+    var statusBtn=document.getElementById(_id+'-change-status'); if(statusBtn) statusBtn.onclick=function(){ _showStatusTransition(type,_selected.id,o.status||''); };
+    var addJoBtn=document.getElementById(_id+'-add-jo'); if(addJoBtn) addJoBtn.onclick=function(){ _showCreateInContext('jo',{ so_number:_selected.id }); };
+    var addWoBtn=document.getElementById(_id+'-add-wo'); if(addWoBtn) addWoBtn.onclick=function(){ _showCreateInContext('wo',{ jo_number:_selected.id }); };
     var linkBtn=document.getElementById(_id+'-link-form'); if(linkBtn) linkBtn.onclick=_showLinkModal;
   });
 }
@@ -223,9 +233,98 @@ function _showLinkModal(){
   var modal=document.createElement('div'); modal.className='sj-modal sj-modal-sm';
   modal.innerHTML='<div class="sj-modal-head"><h3>'+_t('Liên kết hồ sơ','Link record')+'</h3><button type="button" class="sj-x">×</button></div><div class="sj-modal-body"><label>'+_t('Mã hồ sơ','Record ID')+'</label><input id="'+_id+'-record-link" class="sj-input" placeholder="NCR-2026-001"></div><div class="sj-modal-foot"><button type="button" class="sj-btn" data-close>'+_t('Hủy','Cancel')+'</button><button type="button" class="sj-btn accent" id="'+_id+'-record-submit">'+_t('Liên kết','Link')+'</button></div>';
   document.body.appendChild(overlay); document.body.appendChild(modal);
-  function close(){ overlay.remove(); modal.remove(); }
+  function close(){ _closeModal(overlay, modal); }
   overlay.onclick=close; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
-  modal.querySelector('#'+_id+'-record-submit').onclick=function(){ var rid=(modal.querySelector('#'+_id+'-record-link').value||'').trim().toUpperCase(); if(!rid){ _toast(_t('Vui lòng nhập mã hồ sơ.','Please enter a record ID.'),'warn'); return; } _api('order_link_form',{ order_id:_selected.id, order_type:_selected.type, record_id:rid }).then(function(r){ if(r&&r.ok){ close(); _toast(_t('Đã liên kết hồ sơ.','Record linked.'),'success'); _showDetail(_selected.id,_selected.type); } else { _toast(_t('Không thể liên kết hồ sơ.','Unable to link record.'),'error'); } }); };
+  _modalKeyHandler(overlay, modal);
+  var submitBtn=modal.querySelector('#'+_id+'-record-submit');
+  submitBtn.onclick=function(){ var rid=(modal.querySelector('#'+_id+'-record-link').value||'').trim().toUpperCase(); if(!rid){ _toast(_t('Vui lòng nhập mã hồ sơ.','Please enter a record ID.'),'warn'); return; } _setSubmitLoading(submitBtn, true); _api('order_link_form',{ order_id:_selected.id, order_type:_selected.type, record_id:rid }).then(function(r){ _setSubmitLoading(submitBtn, false); if(r&&r.ok){ close(); _toast(_t('Đã liên kết hồ sơ.','Record linked.'),'success'); _showDetail(_selected.id,_selected.type); } else { _toast(_t('Không thể liên kết hồ sơ.','Unable to link record.'),'error'); } }).catch(function(){ _setSubmitLoading(submitBtn, false); _toast(_t('Lỗi kết nối.','Connection error.'),'error'); }); };
+}
+
+/* ── G4 P1-04: Modal helpers ─────────────────────────────────────── */
+function _closeModal(overlay, modal){
+  if(overlay && overlay.parentNode) overlay.remove();
+  if(modal && modal.parentNode) modal.remove();
+}
+function _modalKeyHandler(overlay, modal){
+  function handler(e){ if(e.key==='Escape'){ _closeModal(overlay, modal); document.removeEventListener('keydown', handler); } }
+  document.addEventListener('keydown', handler);
+  return handler;
+}
+function _setSubmitLoading(btn, loading){
+  if(!btn) return;
+  if(loading){ btn._origText=btn.textContent; btn.disabled=true; btn.textContent=_t('Đang xử lý...','Processing...'); }
+  else { btn.disabled=false; btn.textContent=btn._origText||_t('Xác nhận','Confirm'); }
+}
+
+/* ── G4 P1-04: Status Transition Modal ──────────────────────────── */
+function _showStatusTransition(type, orderId, currentStatus){
+  var next=(TRANSITIONS[type]&&TRANSITIONS[type][currentStatus])?TRANSITIONS[type][currentStatus]:[];
+  if(!next.length) return;
+  var overlay=document.createElement('div'); overlay.className='sj-modal-overlay';
+  var modal=document.createElement('div'); modal.className='sj-modal sj-modal-sm';
+  var curSt=_status(type, currentStatus);
+  var requiresNote=['cancelled','on_hold'];
+  var h='<div class="sj-modal-head"><h3>'+_t('Chuyển trạng thái','Change Status')+'</h3><button type="button" class="sj-x">×</button></div>';
+  h+='<div class="sj-modal-body"><div class="sj-st-current"><small>'+_t('Trạng thái hiện tại','Current status')+'</small><span class="sj-status" style="color:'+curSt.color+';background:'+_rgba(curSt.color,.12)+'">'+_esc(curSt.text)+'</span></div>';
+  h+='<div class="sj-st-options"><small>'+_t('Chuyển sang','Transition to')+'</small>';
+  next.forEach(function(s, i){ var st=_status(type, s); h+='<label class="sj-st-radio"><input type="radio" name="next_status" value="'+_esc(s)+'"'+(i===0?' checked':'')+'/><span class="sj-status" style="color:'+st.color+';background:'+_rgba(st.color,.12)+'">'+_esc(st.text)+'</span></label>'; });
+  h+='</div>';
+  h+='<div class="sj-st-reason" id="'+_id+'-st-reason-wrap"><label>'+_t('Lý do (bắt buộc cho Hủy / Tạm dừng)','Reason (required for Cancel / Hold)')+'</label><textarea class="sj-input" id="'+_id+'-st-reason" rows="3" placeholder="'+_t('Nhập lý do...','Enter reason...')+'"></textarea></div>';
+  h+='</div>';
+  h+='<div class="sj-modal-foot"><button type="button" class="sj-btn" data-close>'+_t('Hủy','Cancel')+'</button><button type="button" class="sj-btn accent" id="'+_id+'-st-submit">'+_t('Xác nhận','Confirm')+'</button></div>';
+  modal.innerHTML=h;
+  document.body.appendChild(overlay); document.body.appendChild(modal);
+  function close(){ _closeModal(overlay, modal); }
+  overlay.onclick=close; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
+  _modalKeyHandler(overlay, modal);
+  // Show/hide reason based on selected status
+  var radios=modal.querySelectorAll('[name="next_status"]');
+  var reasonWrap=document.getElementById(_id+'-st-reason-wrap');
+  function updateReasonVisibility(){ var val=''; radios.forEach(function(r){ if(r.checked) val=r.value; }); reasonWrap.style.display=(requiresNote.indexOf(val)>=0)?'':'none'; }
+  radios.forEach(function(r){ r.onchange=updateReasonVisibility; }); updateReasonVisibility();
+  var submitBtn=document.getElementById(_id+'-st-submit');
+  submitBtn.onclick=function(){
+    var selected=''; radios.forEach(function(r){ if(r.checked) selected=r.value; });
+    if(!selected){ _toast(_t('Vui lòng chọn trạng thái mới.','Please select a new status.'),'warn'); return; }
+    var reason=(document.getElementById(_id+'-st-reason').value||'').trim();
+    if(requiresNote.indexOf(selected)>=0 && !reason){ _toast(_t('Vui lòng nhập lý do.','Please enter a reason.'),'warn'); return; }
+    var payload={ order_id:orderId, status:selected };
+    if(reason) payload.note=reason;
+    _setSubmitLoading(submitBtn, true);
+    _api(type==='so'?'order_so_update_status':type==='jo'?'order_jo_update_status':'order_wo_update_status', payload).then(function(r){
+      _setSubmitLoading(submitBtn, false);
+      if(r&&r.ok){ close(); _toast(_t('Đã cập nhật trạng thái.','Status updated.'),'success'); _refresh(); }
+      else { _toast(_t('Không thể cập nhật trạng thái.','Unable to update status.'),'error'); }
+    }).catch(function(){ _setSubmitLoading(submitBtn, false); _toast(_t('Lỗi kết nối.','Connection error.'),'error'); });
+  };
+}
+
+/* ── G4 P1-04: Context-aware Create Modal ───────────────────────── */
+function _showCreateInContext(type, prefill){
+  var overlay=document.createElement('div'); overlay.className='sj-modal-overlay';
+  var modal=document.createElement('div'); modal.className='sj-modal';
+  var titleMap={ so:_t('Tạo đơn hàng mới','Create Sales Order'), jo:_t('Tạo lệnh sản xuất','Create Job Order'), wo:_t('Tạo lệnh công đoạn','Create Work Order') };
+  modal.innerHTML='<div class="sj-modal-head"><h3>'+_esc(type.toUpperCase())+' · '+_esc(titleMap[type]||_t('Tạo mới','Create'))+'</h3><button type="button" class="sj-x">×</button></div><div class="sj-modal-body"><form id="'+_id+'-ctx-form" class="sj-form">'+FIELDS[type].map(function(f){ return _renderField(f,type); }).join('')+'</form></div><div class="sj-modal-foot"><button type="button" class="sj-btn" data-close>'+_t('Hủy','Cancel')+'</button><button type="button" class="sj-btn accent" id="'+_id+'-ctx-submit">'+_t('Tạo mới','Create')+'</button></div>';
+  document.body.appendChild(overlay); document.body.appendChild(modal);
+  function close(){ _closeModal(overlay, modal); }
+  overlay.onclick=close; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
+  _modalKeyHandler(overlay, modal);
+  var form=modal.querySelector('#'+_id+'-ctx-form');
+  _hydrateCreateForm(type, form);
+  // Prefill parent fields and make them readonly
+  if(prefill){ Object.keys(prefill).forEach(function(k){ var inp=form.querySelector('[name="'+k+'"]'); if(inp){ inp.value=prefill[k]; inp.readOnly=true; inp.style.background='#f1f5f9'; } var siWrap=document.getElementById(_id+'-'+type+'-'+k); if(siWrap){ siWrap.innerHTML='<input class="sj-input" name="'+k+'" value="'+_esc(prefill[k])+'" readonly style="background:#f1f5f9"/>'; } }); }
+  var submitBtn=document.getElementById(_id+'-ctx-submit');
+  submitBtn.onclick=function(){
+    if(!form.checkValidity()){ form.reportValidity(); return; }
+    var fd=new FormData(form), payload={};
+    fd.forEach(function(v,k){ if(v==='') return; var def=FIELDS[type].find(function(x){ return x.key===k; }); if(def&&def.type==='integer') payload[k]=parseInt(v,10); else if(def&&def.type==='number') payload[k]=parseFloat(v); else if(def&&def.type==='boolean') payload[k]=(v==='true'); else payload[k]=v; });
+    _setSubmitLoading(submitBtn, true);
+    _api(type==='so'?'order_so_create':type==='jo'?'order_jo_create':'order_wo_create', payload).then(function(r){
+      _setSubmitLoading(submitBtn, false);
+      if(r&&r.ok){ close(); _toast(_t('Tạo đơn thành công.','Order created successfully.'),'success'); _refresh(); }
+      else { _toast((r&&r.error==='missing_required_fields')?_t('Vui lòng điền đầy đủ các trường bắt buộc.','Please fill all required fields.'):_t('Không thể tạo đơn.','Unable to create order.'),'error'); }
+    }).catch(function(){ _setSubmitLoading(submitBtn, false); _toast(_t('Lỗi kết nối.','Connection error.'),'error'); });
+  };
 }
 
 function _renderField(field,type){
@@ -240,17 +339,25 @@ function _renderField(field,type){
 function _showCreate(type){
   var overlay=document.createElement('div'); overlay.className='sj-modal-overlay';
   var modal=document.createElement('div'); modal.className='sj-modal';
-  modal.innerHTML='<div class="sj-modal-head"><h3>'+_esc(type.toUpperCase())+' · '+_esc(_t('Tạo mới','Create'))+'</h3><button type="button" class="sj-x">×</button></div><div class="sj-modal-body"><form id="'+_id+'-create-form" class="sj-form">'+FIELDS[type].map(function(f){ return _renderField(f,type); }).join('')+'</form></div><div class="sj-modal-foot"><button type="button" class="sj-btn" data-close>'+_t('Hủy','Cancel')+'</button><button type="button" class="sj-btn accent" id="'+_id+'-submit-create">'+_t('Tạo mới','Create')+'</button></div>';
+  var titleMap={ so:_t('Tạo đơn hàng mới','Create Sales Order'), jo:_t('Tạo lệnh sản xuất','Create Job Order'), wo:_t('Tạo lệnh công đoạn','Create Work Order') };
+  modal.innerHTML='<div class="sj-modal-head"><h3>'+_esc(type.toUpperCase())+' · '+_esc(titleMap[type]||_t('Tạo mới','Create'))+'</h3><button type="button" class="sj-x">×</button></div><div class="sj-modal-body"><form id="'+_id+'-create-form" class="sj-form">'+FIELDS[type].map(function(f){ return _renderField(f,type); }).join('')+'</form></div><div class="sj-modal-foot"><button type="button" class="sj-btn" data-close>'+_t('Hủy','Cancel')+'</button><button type="button" class="sj-btn accent" id="'+_id+'-submit-create">'+_t('Tạo mới','Create')+'</button></div>';
   document.body.appendChild(overlay); document.body.appendChild(modal);
-  function close(){ overlay.remove(); modal.remove(); }
+  function close(){ _closeModal(overlay, modal); }
   overlay.onclick=close; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
+  _modalKeyHandler(overlay, modal);
   var form=modal.querySelector('#'+_id+'-create-form');
   _hydrateCreateForm(type,form);
-  modal.querySelector('#'+_id+'-submit-create').onclick=function(){
+  var submitBtn=modal.querySelector('#'+_id+'-submit-create');
+  submitBtn.onclick=function(){
     if(!form.checkValidity()){ form.reportValidity(); return; }
     var fd=new FormData(form), payload={};
     fd.forEach(function(v,k){ if(v==='') return; var def=FIELDS[type].find(function(x){ return x.key===k; }); if(def&&def.type==='integer') payload[k]=parseInt(v,10); else if(def&&def.type==='number') payload[k]=parseFloat(v); else if(def&&def.type==='boolean') payload[k]=(v==='true'); else payload[k]=v; });
-    _api(type==='so'?'order_so_create':type==='jo'?'order_jo_create':'order_wo_create',payload).then(function(r){ if(r&&r.ok){ close(); _toast(_t('Tạo đơn thành công.','Order created successfully.'),'success'); _refresh(); } else { _toast(_t('Không thể tạo đơn.','Unable to create order.'),'error'); } });
+    _setSubmitLoading(submitBtn, true);
+    _api(type==='so'?'order_so_create':type==='jo'?'order_jo_create':'order_wo_create',payload).then(function(r){
+      _setSubmitLoading(submitBtn, false);
+      if(r&&r.ok){ close(); _toast(_t('Tạo đơn thành công.','Order created successfully.'),'success'); _refresh(); }
+      else { _toast((r&&r.error==='missing_required_fields')?_t('Vui lòng điền đầy đủ các trường bắt buộc.','Please fill all required fields.'):_t('Không thể tạo đơn.','Unable to create order.'),'error'); }
+    }).catch(function(){ _setSubmitLoading(submitBtn, false); _toast(_t('Lỗi kết nối.','Connection error.'),'error'); });
   };
 }
 
@@ -333,6 +440,25 @@ window._renderSoJoWoDashboard=function(schemas,entries,container){ _container=co
     '.sj-toast{position:fixed;right:24px;bottom:24px;padding:12px 16px;border-radius:14px;border-left:4px solid;box-shadow:0 16px 36px rgba(15,23,42,.14);z-index:1400;opacity:0;transform:translateY(10px);transition:all .18s ease}.sj-toast.show{opacity:1;transform:translateY(0)}.sj-toast.info{background:#dbeafe;color:#1d4ed8;border-color:#1565c0}.sj-toast.success{background:#dcfce7;color:#166534;border-color:#15803d}.sj-toast.warn{background:#fef3c7;color:#b45309;border-color:#d97706}.sj-toast.error{background:#fef2f2;color:#b91c1c;border-color:#dc2626}',
     '.sj-link-tbl{width:100%;border-collapse:collapse;font-size:.84rem}.sj-link-tbl th{padding:8px 10px;border-bottom:2px solid #e2e8f0;font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#64748b;text-align:left}.sj-link-tbl td{padding:8px 10px;border-bottom:1px solid #f1f5f9;color:#334155}.sj-link-tbl tr:last-child td{border-bottom:none}.sj-link-tbl tr:hover td{background:#f8fbff}',
     '.sj-tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.72rem;font-weight:700;white-space:nowrap}',
+    '.sj-timeline{display:flex;flex-direction:column;gap:0;position:relative;padding-left:18px}',
+    '.sj-tl-item{display:flex;gap:12px;position:relative;padding-bottom:16px}',
+    '.sj-tl-item:last-child{padding-bottom:0}',
+    '.sj-tl-item:last-child .sj-tl-line{display:none}',
+    '.sj-tl-dot{width:12px;height:12px;border-radius:999px;flex-shrink:0;margin-top:6px;position:relative;z-index:1}',
+    '.sj-tl-line{position:absolute;left:5px;top:20px;bottom:0;width:2px;background:#e2e8f0}',
+    '.sj-tl-content{display:flex;flex-direction:column;gap:4px;min-width:0}',
+    '.sj-tl-date{font-size:.78rem;color:#64748b}',
+    '.sj-tl-user{font-size:.78rem;color:#94a3b8}',
+    '.sj-tl-note{font-size:.8rem;color:#475569;font-style:italic;padding:6px 10px;background:#f8fafc;border-radius:8px;border-left:3px solid #d1d5db}',
+    '.sj-tl-current .sj-tl-dot{animation:sjtlpulse 2s ease-in-out infinite}',
+    '@keyframes sjtlpulse{0%,100%{opacity:1}50%{opacity:.5}}',
+    '.sj-st-current{margin-bottom:16px}.sj-st-current small{display:block;font-size:.76rem;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}',
+    '.sj-st-options{margin-bottom:16px}.sj-st-options small{display:block;font-size:.76rem;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}',
+    '.sj-st-radio{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid #e2e8f0;border-radius:12px;cursor:pointer;margin-bottom:6px;transition:background .15s}',
+    '.sj-st-radio:hover{background:#f8fbff}',
+    '.sj-st-radio input[type="radio"]{accent-color:#1565c0}',
+    '.sj-st-reason{margin-top:12px}.sj-st-reason label{display:block;font-size:.82rem;font-weight:800;color:#334155;margin-bottom:6px}',
+    '.sj-f-clickable{cursor:pointer;transition:background .15s,border-color .15s}.sj-f-clickable:hover{background:#eff6ff;border-color:#93c5fd}',
     '@media (max-width: 1100px){.sj-kpi{grid-template-columns:repeat(2,minmax(0,1fr))}.sj-pipeline{grid-template-columns:repeat(2,minmax(0,1fr))}}',
     '@media (max-width: 860px){.sj-wrap{padding:16px}.sj-hero{flex-direction:column;align-items:flex-start;padding:18px}.sj-actions{justify-content:flex-start}.sj-kpi{grid-template-columns:1fr}.sj-pipeline{grid-template-columns:1fr}.sj-form,.sj-grid{grid-template-columns:1fr}.sj-detail{top:10px;right:10px;bottom:10px;width:calc(100vw - 20px)}.sj-modal-overlay{padding:10px}.sj-modal{width:100%;max-height:92vh}}'
   ].join('\n');
