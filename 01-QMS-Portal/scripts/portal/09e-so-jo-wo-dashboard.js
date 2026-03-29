@@ -21,23 +21,23 @@ function _escHtml(str){
   d.appendChild(document.createTextNode(str || ''));
   return d.innerHTML;
 }
-function _formatDate(dateStr){
+function _formatĐạte(dateStr){
   if(!dateStr) return '';
   try {
-    var d = new Date(dateStr);
+    var d = new Đạte(dateStr);
     if(isNaN(d.getTime())) return dateStr;
-    var dd = String(d.getDate()).padStart(2, '0');
+    var dd = String(d.getĐạte()).padStart(2, '0');
     var mm = String(d.getMonth() + 1).padStart(2, '0');
     var yy = d.getFullYear();
     return dd + '/' + mm + '/' + yy;
   } catch(e){ return dateStr; }
 }
-function _formatDateTime(dateStr){
+function _formatĐạteTime(dateStr){
   if(!dateStr) return '';
   try {
-    var d = new Date(dateStr);
+    var d = new Đạte(dateStr);
     if(isNaN(d.getTime())) return dateStr;
-    var dd = String(d.getDate()).padStart(2, '0');
+    var dd = String(d.getĐạte()).padStart(2, '0');
     var mm = String(d.getMonth() + 1).padStart(2, '0');
     var yy = d.getFullYear();
     var hh = String(d.getHours()).padStart(2, '0');
@@ -58,38 +58,38 @@ function _apiCall(action, payload, method, timeout){
 
 // ── Status Config (from so_jo_wo_config.json) ──
 var SO_STATUSES = {
-  draft:         { label:'Draft',         labelVi:'Nhap',           color:'#9ca3af' },
-  quoted:        { label:'Quoted',        labelVi:'Da bao gia',     color:'#3b82f6' },
-  confirmed:     { label:'Confirmed',     labelVi:'Da xac nhan',    color:'#8b5cf6' },
-  in_production: { label:'In Production', labelVi:'Dang san xuat',  color:'#f59e0b' },
-  shipped:       { label:'Shipped',       labelVi:'Da giao hang',   color:'#10b981' },
-  closed:        { label:'Closed',        labelVi:'Dong',           color:'#6b7280' },
-  cancelled:     { label:'Cancelled',     labelVi:'Da huy',         color:'#ef4444' }
+  draft:         { label:'Draft',         labelVi:'Nháp',           color:'#9ca3af' },
+  quoted:        { label:'Quoted',        labelVi:'Đã báo giá',     color:'#3b82f6' },
+  confirmed:     { label:'Confirmed',     labelVi:'Đã xác nhận',    color:'#8b5cf6' },
+  in_production: { label:'In Production', labelVi:'Đang sản xuất',  color:'#f59e0b' },
+  shipped:       { label:'Shipped',       labelVi:'Đã giao hàng',   color:'#10b981' },
+  closed:        { label:'Closed',        labelVi:'Đóng',           color:'#6b7280' },
+  cancelled:     { label:'Cancelled',     labelVi:'Đã hủy',         color:'#ef4444' }
 };
 var JO_STATUSES = {
-  planned:   { label:'Planned',   labelVi:'Da lap ke hoach', color:'#9ca3af' },
-  released:  { label:'Released',  labelVi:'Da phat hanh',    color:'#3b82f6' },
-  active:    { label:'Active',    labelVi:'Dang chay',       color:'#f59e0b' },
-  on_hold:   { label:'On Hold',   labelVi:'Tam dung',        color:'#ef4444' },
-  completed: { label:'Completed', labelVi:'Hoan thanh',      color:'#10b981' },
-  closed:    { label:'Closed',    labelVi:'Dong',            color:'#6b7280' }
+  planned:   { label:'Planned',   labelVi:'Đã lập kế hoạch', color:'#9ca3af' },
+  released:  { label:'Released',  labelVi:'Đã phát hành',    color:'#3b82f6' },
+  active:    { label:'Active',    labelVi:'Đang chạy',       color:'#f59e0b' },
+  on_hold:   { label:'On Hold',   labelVi:'Tạm dừng',        color:'#ef4444' },
+  completed: { label:'Completed', labelVi:'Hoàn thành',      color:'#10b981' },
+  closed:    { label:'Closed',    labelVi:'Đóng',            color:'#6b7280' }
 };
 var WO_STATUSES = {
-  scheduled:  { label:'Scheduled',  labelVi:'Da len lich',   color:'#9ca3af' },
-  setup:      { label:'Setup',      labelVi:'Dang setup',    color:'#3b82f6' },
-  running:    { label:'Running',    labelVi:'Dang chay',     color:'#f59e0b' },
-  inspection: { label:'Inspection', labelVi:'Dang kiem tra', color:'#8b5cf6' },
-  completed:  { label:'Completed',  labelVi:'Hoan thanh',    color:'#10b981' },
-  on_hold:    { label:'On Hold',    labelVi:'Tam dung',      color:'#ef4444' }
+  scheduled:  { label:'Scheduled',  labelVi:'Đã lên lịch',   color:'#9ca3af' },
+  setup:      { label:'Setup',      labelVi:'Đang setup',    color:'#3b82f6' },
+  running:    { label:'Running',    labelVi:'Đang chạy',     color:'#f59e0b' },
+  inspection: { label:'Inspection', labelVi:'Đang kiểm tra', color:'#8b5cf6' },
+  completed:  { label:'Completed',  labelVi:'Hoàn thành',    color:'#10b981' },
+  on_hold:    { label:'On Hold',    labelVi:'Tạm dừng',      color:'#ef4444' }
 };
 
 // Pipeline column config
 var PIPELINE_COLS = [
-  { key:'planned',   label:'Planned',   labelVi:'Ke hoach',    color:'#9ca3af', bg:'#f1f5f9' },
-  { key:'active',    label:'Active',    labelVi:'Dang chay',   color:'#1565c0', bg:'#dbeafe' },
-  { key:'on_hold',   label:'On Hold',   labelVi:'Tam dung',    color:'#d97706', bg:'#fef3c7' },
-  { key:'completed', label:'Completed', labelVi:'Hoan thanh',  color:'#16a34a', bg:'#dcfce7' },
-  { key:'cancelled', label:'Cancelled', labelVi:'Da huy',      color:'#dc2626', bg:'#fef2f2' }
+  { key:'planned',   label:'Planned',   labelVi:'Kế hoạch',    color:'#9ca3af', bg:'#f1f5f9' },
+  { key:'active',    label:'Active',    labelVi:'Đang chạy',   color:'#1565c0', bg:'#dbeafe' },
+  { key:'on_hold',   label:'On Hold',   labelVi:'Tạm dừng',    color:'#d97706', bg:'#fef3c7' },
+  { key:'completed', label:'Completed', labelVi:'Hoàn thành',  color:'#16a34a', bg:'#dcfce7' },
+  { key:'cancelled', label:'Cancelled', labelVi:'Đã hủy',      color:'#dc2626', bg:'#fef2f2' }
 ];
 
 // Role-based access config
@@ -117,9 +117,9 @@ var ROLES_CONFIG = {
 // ── Module State ──
 var _containerId = '';
 var _viewMode = 'hierarchy'; // hierarchy | pipeline | table
-var _hierarchyData = [];
-var _flatData = [];
-var _kpiData = {};
+var _hierarchyĐạta = [];
+var _flatĐạta = [];
+var _kpiĐạta = {};
 var _selectedNode = null;
 var _detailOpen = false;
 var _expandedNodes = {};
@@ -137,9 +137,9 @@ window._renderSoJoWoDashboard = function(schemas, entries, container){
   _containerId = container.id || 'sojowo-root';
   if(!container.id) container.id = _containerId;
   _viewMode = 'hierarchy';
-  _hierarchyData = [];
-  _flatData = [];
-  _kpiData = {};
+  _hierarchyĐạta = [];
+  _flatĐạta = [];
+  _kpiĐạta = {};
   _selectedNode = null;
   _detailOpen = false;
   _expandedNodes = {};
@@ -149,7 +149,7 @@ window._renderSoJoWoDashboard = function(schemas, entries, container){
   // Show loading
   container.innerHTML = '<div class="sojowo-container"><div class="sojowo-loading-full">' +
     '<div class="sojowo-spinner"></div>' +
-    '<p>' + _t('Dang tai du lieu don hang...', 'Loading order data...') + '</p>' +
+    '<p>' + _t('Đang tải dữ liệu đơn hàng...', 'Loading order data...') + '</p>' +
     '</div></div>';
 
   // Load data in parallel
@@ -157,14 +157,14 @@ window._renderSoJoWoDashboard = function(schemas, entries, container){
     _apiCall('order_dashboard_stats', {}),
     _apiCall('order_hierarchy', {})
   ]).then(function(results){
-    _kpiData = (results[0] && results[0].ok) ? (results[0].data || results[0]) : {};
-    _hierarchyData = (results[1] && results[1].ok) ? (results[1].data || results[1].hierarchy || []) : [];
-    _flatData = _flattenHierarchy(_hierarchyData);
+    _kpiĐạta = (results[0] && results[0].ok) ? (results[0].data || results[0]) : {};
+    _hierarchyĐạta = (results[1] && results[1].ok) ? (results[1].data || results[1].hierarchy || []) : [];
+    _flatĐạta = _flattenHierarchy(_hierarchyĐạta);
     _renderDashboard(container);
   }).catch(function(){
-    _kpiData = {};
-    _hierarchyData = [];
-    _flatData = [];
+    _kpiĐạta = {};
+    _hierarchyĐạta = [];
+    _flatĐạta = [];
     _renderDashboard(container);
   });
 };
@@ -175,27 +175,27 @@ function _renderDashboard(container){
 
   // ── Header ──
   h += '<div class="sojowo-header">';
-  h += '<h1>' + _t('Quan ly Don hang', 'Order Management') + '</h1>';
+  h += '<h1>' + _t('Quản lý Đơn hàng', 'Order Management') + '</h1>';
   h += '<div class="sojowo-header-actions">';
 
   // Create buttons (role-based)
   if(_hasPermission('so', 'create')){
     h += '<button type="button" class="sojowo-create-btn sojowo-create-so" id="' + _containerId + '-create-so">';
-    h += '+ ' + _t('Tao SO', 'New SO') + '</button>';
+    h += '+ ' + _t('Tạo SO', 'New SO') + '</button>';
   }
   if(_hasPermission('jo', 'create')){
     h += '<button type="button" class="sojowo-create-btn sojowo-create-jo" id="' + _containerId + '-create-jo">';
-    h += '+ ' + _t('Tao JO', 'New JO') + '</button>';
+    h += '+ ' + _t('Tạo JO', 'New JO') + '</button>';
   }
 
   // View toggle
   h += '<div class="sojowo-view-toggle">';
   h += '<button type="button" class="sojowo-view-btn' + (_viewMode === 'hierarchy' ? ' active' : '') + '" data-view="hierarchy">';
-  h += _t('Cay phan cap', 'Hierarchy') + '</button>';
+  h += _t('Cây phân cấp', 'Hierarchy') + '</button>';
   h += '<button type="button" class="sojowo-view-btn' + (_viewMode === 'pipeline' ? ' active' : '') + '" data-view="pipeline">';
   h += _t('Pipeline', 'Pipeline') + '</button>';
   h += '<button type="button" class="sojowo-view-btn' + (_viewMode === 'table' ? ' active' : '') + '" data-view="table">';
-  h += _t('Bang', 'Table') + '</button>';
+  h += _t('Bảng', 'Table') + '</button>';
   h += '</div>';
 
   h += '</div></div>';
@@ -212,7 +212,7 @@ function _renderDashboard(container){
   h += '<div class="sojowo-detail-overlay" id="' + _containerId + '-overlay"></div>';
   h += '<div class="sojowo-detail" id="' + _containerId + '-detail">';
   h += '<div class="sojowo-detail-header">';
-  h += '<h2 id="' + _containerId + '-detail-title">' + _t('Chi tiet', 'Details') + '</h2>';
+  h += '<h2 id="' + _containerId + '-detail-title">' + _t('Chi tiết', 'Details') + '</h2>';
   h += '<button type="button" class="sojowo-detail-close" id="' + _containerId + '-detail-close">';
   h += '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>';
   h += '</button>';
@@ -232,41 +232,41 @@ function _renderDashboard(container){
 // ===================================================================
 
 function _renderKpiCards(){
-  var k = _kpiData;
+  var k = _kpiĐạta;
   var h = '<div class="sojowo-kpi">';
 
   // Active SOs
   h += '<div class="sojowo-kpi-card sojowo-kpi-so">';
-  h += '<div class="sojowo-kpi-label">' + _t('SO dang hoat dong', 'Active SOs') + '</div>';
+  h += '<div class="sojowo-kpi-label">' + _t('SO đang hoạt động', 'Active SOs') + '</div>';
   h += '<strong>' + _escHtml(String(k.active_so || 0)) + '</strong>';
-  h += '<span>' + _t('Don hang', 'Sales Orders') + '</span>';
+  h += '<span>' + _t('Đơn hàng', 'Sales Orders') + '</span>';
   h += '</div>';
 
   // Active JOs
   h += '<div class="sojowo-kpi-card sojowo-kpi-jo">';
-  h += '<div class="sojowo-kpi-label">' + _t('JO dang hoat dong', 'Active JOs') + '</div>';
+  h += '<div class="sojowo-kpi-label">' + _t('JO đang hoạt động', 'Active JOs') + '</div>';
   h += '<strong>' + _escHtml(String(k.active_jo || 0)) + '</strong>';
-  h += '<span>' + _t('Lenh san xuat', 'Job Orders') + '</span>';
+  h += '<span>' + _t('Lệnh sản xuất', 'Job Orders') + '</span>';
   h += '</div>';
 
   // On-Time %
   var otd = k.otd_percent != null ? k.otd_percent : '-';
   h += '<div class="sojowo-kpi-card sojowo-kpi-completion">';
-  h += '<div class="sojowo-kpi-label">' + _t('Dung han', 'On-Time %') + '</div>';
+  h += '<div class="sojowo-kpi-label">' + _t('Đúng hạn', 'On-Time %') + '</div>';
   h += '<strong>' + _escHtml(String(otd)) + (otd !== '-' ? '%' : '') + '</strong>';
-  h += '<span>' + _t('Muc tieu: 95%', 'Target: 95%') + '</span>';
+  h += '<span>' + _t('Mục tiêu: 95%', 'Target: 95%') + '</span>';
   if(typeof otd === 'number'){
     h += '<div class="sojowo-kpi-trend ' + (otd >= 95 ? 'sojowo-kpi-trend-up' : 'sojowo-kpi-trend-down') + '">';
-    h += (otd >= 95 ? '+ ' : '') + _t('Dat', otd >= 95 ? 'On track' : 'Below target');
+    h += (otd >= 95 ? '+ ' : '') + _t('Đạt', otd >= 95 ? 'On track' : 'Below target');
     h += '</div>';
   }
   h += '</div>';
 
   // Overdue Count
   h += '<div class="sojowo-kpi-card sojowo-kpi-overdue">';
-  h += '<div class="sojowo-kpi-label">' + _t('Qua han', 'Overdue') + '</div>';
+  h += '<div class="sojowo-kpi-label">' + _t('Quá hạn', 'Overdue') + '</div>';
   h += '<strong>' + _escHtml(String(k.overdue_count || 0)) + '</strong>';
-  h += '<span>' + _t('Can xu ly', 'Need attention') + '</span>';
+  h += '<span>' + _t('Cần xử lý', 'Need attention') + '</span>';
   h += '</div>';
 
   h += '</div>';
@@ -289,19 +289,19 @@ function _renderHierarchyView(){
   var h = '';
   h += '<div class="sojowo-hierarchy">';
   h += '<div class="sojowo-tree-header">';
-  h += '<h3>' + _t('Cay don hang SO / JO / WO', 'Order Hierarchy SO / JO / WO') + '</h3>';
+  h += '<h3>' + _t('Cây đơn hàng SO / JO / WO', 'Order Hierarchy SO / JO / WO') + '</h3>';
   h += '<input type="text" class="sojowo-tree-search" id="' + _containerId + '-tree-search" ';
-  h += 'placeholder="' + _t('Tim kiem don hang...', 'Search orders...') + '">';
+  h += 'placeholder="' + _t('Tìm kiếm đơn hàng...', 'Search orders...') + '">';
   h += '</div>';
   h += '<div class="sojowo-tree-body" id="' + _containerId + '-tree-body">';
 
-  if(!_hierarchyData || _hierarchyData.length === 0){
+  if(!_hierarchyĐạta || _hierarchyĐạta.length === 0){
     h += '<div class="sojowo-tree-empty">';
-    h += '<p>' + _t('Chua co don hang nao', 'No orders yet') + '</p>';
+    h += '<p>' + _t('Chưa có đơn hàng nào', 'No orders yet') + '</p>';
     h += '</div>';
   } else {
-    for(var i = 0; i < _hierarchyData.length; i++){
-      h += _renderTreeNode(_hierarchyData[i], 'so', 0);
+    for(var i = 0; i < _hierarchyĐạta.length; i++){
+      h += _renderTreeNode(_hierarchyĐạta[i], 'so', 0);
     }
   }
 
@@ -338,7 +338,7 @@ function _renderTreeNode(node, type, depth){
 
   // Toggle arrow
   if(hasChildren){
-    h += '<button type="button" class="sojowo-node-toggle' + (isExpanded ? ' expanded' : '') + '" data-toggle-id="' + _escHtml(id) + '" aria-label="' + _t('Mo rong', 'Expand') + '">';
+    h += '<button type="button" class="sojowo-node-toggle' + (isExpanded ? ' expanded' : '') + '" data-toggle-id="' + _escHtml(id) + '" aria-label="' + _t('Mở rộng', 'Expand') + '">';
     h += '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg>';
     h += '</button>';
   } else {
@@ -356,9 +356,9 @@ function _renderTreeNode(node, type, depth){
   h += '<span class="sojowo-node-id">' + _escHtml(id) + '</span>';
 
   // Due date
-  var dueDate = node.due_date || '';
-  if(dueDate){
-    h += '<span class="sojowo-node-id" style="margin-left:6px">' + _escHtml(_formatDate(dueDate)) + '</span>';
+  var dueĐạte = node.due_date || '';
+  if(dueĐạte){
+    h += '<span class="sojowo-node-id" style="margin-left:6px">' + _escHtml(_formatĐạte(dueĐạte)) + '</span>';
   }
 
   // Qty
@@ -389,7 +389,7 @@ function _renderTreeNode(node, type, depth){
 
 // ── Pipeline (Kanban) View ──
 function _renderPipelineView(){
-  var grouped = _groupByPipelineStatus(_flatData);
+  var grouped = _groupByPipelineStatus(_flatĐạta);
 
   var h = '<div class="sojowo-pipeline">';
 
@@ -409,7 +409,7 @@ function _renderPipelineView(){
     }
 
     if(items.length === 0){
-      h += '<div class="sojowo-pipeline-empty">' + _t('Khong co', 'Empty') + '</div>';
+      h += '<div class="sojowo-pipeline-empty">' + _t('Không có', 'Empty') + '</div>';
     }
 
     h += '</div></div>';
@@ -427,7 +427,7 @@ function _renderPipelineCard(item){
   else if(type === 'jo') label = item.part_number || '';
   else label = item.operation_desc || '';
 
-  var dueDate = item.due_date || '';
+  var dueĐạte = item.due_date || '';
   var qty = item.total_qty || item.qty_ordered || item.qty_completed || '';
 
   // Progress calculation for JO
@@ -445,10 +445,10 @@ function _renderPipelineCard(item){
   h += '<div class="sojowo-card-title">' + _escHtml(label || '-') + '</div>';
   h += '<div class="sojowo-card-meta">';
 
-  if(dueDate){
+  if(dueĐạte){
     h += '<span class="sojowo-card-meta-item">';
     h += '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5z"/></svg>';
-    h += _escHtml(_formatDate(dueDate));
+    h += _escHtml(_formatĐạte(dueĐạte));
     h += '</span>';
   }
   if(qty){
@@ -476,7 +476,7 @@ function _renderTableView(){
   // Search & filter bar
   h += '<div class="sojowo-table-toolbar">';
   h += '<input type="text" class="sojowo-table-search" id="' + _containerId + '-table-search" ';
-  h += 'placeholder="' + _t('Tim kiem don hang...', 'Search orders...') + '" value="' + _escHtml(_tableSearch) + '">';
+  h += 'placeholder="' + _t('Tìm kiếm đơn hàng...', 'Search orders...') + '" value="' + _escHtml(_tableSearch) + '">';
   h += '</div>';
 
   // Table
@@ -485,13 +485,13 @@ function _renderTableView(){
   h += '<thead><tr>';
 
   var cols = [
-    { key:'order_number', label:_t('Ma don', 'Order #') },
-    { key:'type',         label:_t('Loai', 'Type') },
-    { key:'customer',     label:_t('Khach hang / Chi tiet', 'Customer / Part') },
-    { key:'status',       label:_t('Trang thai', 'Status') },
-    { key:'due_date',     label:_t('Han', 'Due Date') },
+    { key:'order_number', label:_t('Mã đơn', 'Order #') },
+    { key:'type',         label:_t('Loại', 'Type') },
+    { key:'customer',     label:_t('Khach hang / Chi tiết', 'Customer / Part') },
+    { key:'status',       label:_t('Trạng thái', 'Status') },
+    { key:'due_date',     label:_t('Han', 'Due Đạte') },
     { key:'qty',          label:_t('SL', 'Qty') },
-    { key:'progress',     label:_t('Tien do', 'Progress') }
+    { key:'progress',     label:_t('Tiến độ', 'Progress') }
   ];
 
   for(var ci = 0; ci < cols.length; ci++){
@@ -506,8 +506,8 @@ function _renderTableView(){
   h += '<tbody>';
 
   // Filter and sort data
-  var filtered = _filterTableData(_flatData, _tableSearch);
-  var sorted = _sortTableData(filtered, _tableSort.key, _tableSort.dir);
+  var filtered = _filterTableĐạta(_flatĐạta, _tableSearch);
+  var sorted = _sortTableĐạta(filtered, _tableSort.key, _tableSort.dir);
 
   // Paginate
   var totalPages = Math.ceil(sorted.length / _tablePageSize) || 1;
@@ -515,7 +515,7 @@ function _renderTableView(){
   var pageItems = sorted.slice(start, start + _tablePageSize);
 
   if(pageItems.length === 0){
-    h += '<tr><td colspan="7" class="sojowo-table-empty">' + _t('Khong co ket qua', 'No results') + '</td></tr>';
+    h += '<tr><td colspan="7" class="sojowo-table-empty">' + _t('Không có kết quả', 'No results') + '</td></tr>';
   }
 
   for(var i = 0; i < pageItems.length; i++){
@@ -546,7 +546,7 @@ function _renderTableRow(item){
   var statusCfg = statusMap[status] || { label: status, labelVi: status, color: '#94a3b8' };
   var statusLabel = _t(statusCfg.labelVi || statusCfg.label, statusCfg.label);
 
-  var dueDate = item.due_date || '';
+  var dueĐạte = item.due_date || '';
   var qty = item.total_qty || item.qty_ordered || item.qty_completed || '';
 
   // Progress
@@ -564,7 +564,7 @@ function _renderTableRow(item){
   h += '<td><span class="sojowo-card-type sojowo-card-type-' + type + '">' + type.toUpperCase() + '</span></td>';
   h += '<td>' + _escHtml(customer) + '</td>';
   h += '<td><span class="sojowo-node-status" style="color:' + statusCfg.color + ';background:' + _hexToRgba(statusCfg.color, 0.12) + '">' + _escHtml(statusLabel) + '</span></td>';
-  h += '<td class="sojowo-table-date">' + _escHtml(_formatDate(dueDate)) + '</td>';
+  h += '<td class="sojowo-table-date">' + _escHtml(_formatĐạte(dueĐạte)) + '</td>';
   h += '<td class="sojowo-table-center">' + _escHtml(qty ? String(qty) : '-') + '</td>';
 
   // Progress bar
@@ -587,7 +587,7 @@ function _renderTableRow(item){
 function _renderTablePagination(totalPages){
   var h = '<div class="sojowo-table-pagination">';
   h += '<button type="button" class="sojowo-tpage-btn" data-page="' + (_tablePage - 1) + '"' + (_tablePage <= 1 ? ' disabled' : '') + '>';
-  h += '&laquo; ' + _t('Truoc', 'Prev') + '</button>';
+  h += '&laquo; ' + _t('Trước', 'Prev') + '</button>';
 
   var startP = Math.max(1, _tablePage - 2);
   var endP = Math.min(totalPages, _tablePage + 2);
@@ -627,7 +627,7 @@ function _openDetail(id, type){
   // Fetch detail
   _apiCall('order_detail', { order_id: id, order_type: type }).then(function(data){
     if(!data || !data.ok){
-      bodyEl.innerHTML = '<p style="color:#dc2626">' + _t('Khong the tai chi tiet', 'Could not load details') + '</p>';
+      bodyEl.innerHTML = '<p style="color:#dc2626">' + _t('Không thể tải chi tiết', 'Could not load details') + '</p>';
       return;
     }
 
@@ -635,7 +635,7 @@ function _openDetail(id, type){
     _selectedNode = { id: id, type: type, data: order };
     _renderDetailContent(order, type, bodyEl, actionsEl);
   }).catch(function(){
-    bodyEl.innerHTML = '<p style="color:#dc2626">' + _t('Loi mang', 'Network error') + '</p>';
+    bodyEl.innerHTML = '<p style="color:#dc2626">' + _t('Lỗi mạng', 'Network error') + '</p>';
   });
 }
 
@@ -653,7 +653,7 @@ function _renderDetailContent(order, type, bodyEl, actionsEl){
 
   // ── Order Information Section ──
   h += '<div class="sojowo-detail-section">';
-  h += '<h4>' + _t('Thong tin don hang', 'Order Information') + '</h4>';
+  h += '<h4>' + _t('Thông tin đơn hàng', 'Order Information') + '</h4>';
 
   var fields = _getFieldsForType(type);
   for(var i = 0; i < fields.length; i++){
@@ -662,8 +662,8 @@ function _renderDetailContent(order, type, bodyEl, actionsEl){
     if(val === undefined || val === null) val = '';
 
     // Format special types
-    if(f.type === 'date') val = _formatDate(val);
-    if(f.type === 'datetime') val = _formatDateTime(val);
+    if(f.type === 'date') val = _formatĐạte(val);
+    if(f.type === 'datetime') val = _formatĐạteTime(val);
     if(f.type === 'boolean') val = val ? _t('Co', 'Yes') : _t('Khong', 'No');
 
     // Status field with badge
@@ -688,7 +688,7 @@ function _renderDetailContent(order, type, bodyEl, actionsEl){
   // ── Status Timeline ──
   if(order.status_history && order.status_history.length > 0){
     h += '<div class="sojowo-detail-section">';
-    h += '<h4>' + _t('Lich su trang thai', 'Status Timeline') + '</h4>';
+    h += '<h4>' + _t('Lịch sử trạng thái', 'Status Timeline') + '</h4>';
     h += '<div class="sojowo-timeline">';
     for(var t = 0; t < order.status_history.length; t++){
       var th = order.status_history[t];
@@ -696,7 +696,7 @@ function _renderDetailContent(order, type, bodyEl, actionsEl){
       h += '<div class="sojowo-timeline-dot"></div>';
       h += '<div class="sojowo-timeline-content">';
       h += '<span class="sojowo-timeline-status">' + _escHtml(th.status || '') + '</span>';
-      h += '<span class="sojowo-timeline-date">' + _escHtml(_formatDateTime(th.timestamp || th.date || '')) + '</span>';
+      h += '<span class="sojowo-timeline-date">' + _escHtml(_formatĐạteTime(th.timestamp || th.date || '')) + '</span>';
       if(th.user) h += '<span class="sojowo-timeline-user">' + _escHtml(th.user) + '</span>';
       h += '</div></div>';
     }
@@ -706,7 +706,7 @@ function _renderDetailContent(order, type, bodyEl, actionsEl){
   // ── Operations List (for JO) ──
   if(type === 'jo' && order.operations && order.operations.length > 0){
     h += '<div class="sojowo-detail-section">';
-    h += '<h4>' + _t('Cac cong doan', 'Operations') + '</h4>';
+    h += '<h4>' + _t('Các công đoạn', 'Operations') + '</h4>';
     h += '<div class="sojowo-ops-list">';
     for(var o = 0; o < order.operations.length; o++){
       var op = order.operations[o];
@@ -729,7 +729,7 @@ function _renderDetailContent(order, type, bodyEl, actionsEl){
 
   // ── Linked Forms / Records ──
   h += '<div class="sojowo-linked-forms">';
-  h += '<h4>' + _t('Bieu mau / Ho so lien ket', 'Linked Forms & Records') + '</h4>';
+  h += '<h4>' + _t('Biểu mẫu / Hồ sơ liên kết', 'Linked Forms & Records') + '</h4>';
 
   if(order.linked_forms && order.linked_forms.length > 0){
     for(var lf = 0; lf < order.linked_forms.length; lf++){
@@ -751,13 +751,13 @@ function _renderDetailContent(order, type, bodyEl, actionsEl){
       h += '</div>';
     }
   } else {
-    h += '<p style="font-size:12px;color:#94a3b8">' + _t('Chua co bieu mau lien ket', 'No linked forms yet') + '</p>';
+    h += '<p style="font-size:12px;color:#94a3b8">' + _t('Chưa có biểu mẫu liên kết', 'No linked forms yet') + '</p>';
   }
 
   // Link form button
   if(_hasPermission(type, 'edit')){
     h += '<button type="button" class="sojowo-link-form-btn" id="' + _containerId + '-link-form-btn">';
-    h += '+ ' + _t('Lien ket bieu mau', 'Link form') + '</button>';
+    h += '+ ' + _t('Liên kết biểu mẫu', 'Link form') + '</button>';
   }
 
   h += '</div>';
@@ -811,16 +811,16 @@ function _updateOrderStatus(orderId, type, newStatus){
 
   _apiCall(action, { order_id: orderId, status: newStatus }).then(function(data){
     if(data && data.ok){
-      _showToast(_t('Da cap nhat trang thai', 'Status updated'), 'success');
+      _showToast(_t('Đã cập nhật trạng thái', 'Status updated'), 'success');
       // Re-open detail to refresh
       _openDetail(orderId, type);
       // Refresh main view
       _refreshMainView();
     } else {
-      _showToast(_t('Loi cap nhat: ' + (data && data.error || ''), 'Update error: ' + (data && data.error || '')), 'error');
+      _showToast(_t('Lỗi cập nhật: ' + (data && data.error || ''), 'Update error: ' + (data && data.error || '')), 'error');
     }
   }).catch(function(){
-    _showToast(_t('Loi mang', 'Network error'), 'error');
+    _showToast(_t('Lỗi mạng', 'Network error'), 'error');
   });
 }
 
@@ -830,7 +830,7 @@ function _updateOrderStatus(orderId, type, newStatus){
 
 function _showCreateModal(type){
   var fields = _getFieldsForType(type);
-  var title = type === 'so' ? _t('Tao Sales Order moi', 'Create New Sales Order') : _t('Tao Job Order moi', 'Create New Job Order');
+  var title = type === 'so' ? _t('Tạo Sales Order mới', 'Create New Sales Order') : _t('Tạo Job Order mới', 'Create New Job Order');
 
   var overlay = document.createElement('div');
   overlay.className = 'sojowo-modal-overlay';
@@ -864,7 +864,7 @@ function _showCreateModal(type){
       h += '<input type="date" class="sojowo-modal-input" name="' + f.key + '"' + (f.required ? ' required' : '') + '>';
     } else if(f.type === 'boolean'){
       h += '<select class="sojowo-modal-input" name="' + f.key + '">';
-      h += '<option value="">' + _t('Chon', 'Select') + '</option>';
+      h += '<option value="">' + _t('Chọn', 'Select') + '</option>';
       h += '<option value="true">' + _t('Co', 'Yes') + '</option>';
       h += '<option value="false">' + _t('Khong', 'No') + '</option>';
       h += '</select>';
@@ -872,7 +872,7 @@ function _showCreateModal(type){
       h += '<input type="number" class="sojowo-modal-input" name="' + f.key + '"' + (f.required ? ' required' : '') + ' step="' + (f.type === 'number' ? 'any' : '1') + '">';
     } else if(f.enum){
       h += '<select class="sojowo-modal-input" name="' + f.key + '"' + (f.required ? ' required' : '') + '>';
-      h += '<option value="">' + _t('Chon', 'Select') + '</option>';
+      h += '<option value="">' + _t('Chọn', 'Select') + '</option>';
       for(var ei = 0; ei < f.enum.length; ei++){
         h += '<option value="' + _escHtml(f.enum[ei]) + '">' + _escHtml(f.enum[ei]) + '</option>';
       }
@@ -887,7 +887,7 @@ function _showCreateModal(type){
   h += '</form>';
   h += '</div>';
   h += '<div class="sojowo-modal-footer">';
-  h += '<button type="button" class="sojowo-modal-cancel">' + _t('Huy', 'Cancel') + '</button>';
+  h += '<button type="button" class="sojowo-modal-cancel">' + _t('Hủy', 'Cancel') + '</button>';
   h += '<button type="button" class="sojowo-modal-submit" id="' + _containerId + '-modal-submit">' + _t('Tao', 'Create') + '</button>';
   h += '</div>';
 
@@ -924,32 +924,32 @@ function _submitCreateForm(type){
   }
 
   // Collect data
-  var formData = {};
+  var formĐạta = {};
   var inputs = form.querySelectorAll('input, select, textarea');
   for(var i = 0; i < inputs.length; i++){
     var input = inputs[i];
     var name = input.name;
     var val = input.value;
-    if(name && val !== '') formData[name] = val;
+    if(name && val !== '') formĐạta[name] = val;
   }
 
   var actionMap = { so: 'order_so_create', jo: 'order_jo_create', wo: 'order_wo_create' };
   var action = actionMap[type] || 'order_so_create';
 
   var submitBtn = document.getElementById(_containerId + '-modal-submit');
-  if(submitBtn){ submitBtn.disabled = true; submitBtn.textContent = _t('Dang tao...', 'Creating...'); }
+  if(submitBtn){ submitBtn.disabled = true; submitBtn.textContent = _t('Đang tạo...', 'Creating...'); }
 
-  _apiCall(action, formData).then(function(data){
+  _apiCall(action, formĐạta).then(function(data){
     if(data && data.ok){
-      _showToast(_t('Da tao thanh cong', 'Created successfully'), 'success');
+      _showToast(_t('Đã tạo thành công', 'Created successfully'), 'success');
       _closeCreateModal();
       _refreshMainView();
     } else {
-      _showToast(_t('Loi tao: ' + (data && data.error || ''), 'Create error: ' + (data && data.error || '')), 'error');
+      _showToast(_t('Lỗi tạo: ' + (data && data.error || ''), 'Create error: ' + (data && data.error || '')), 'error');
       if(submitBtn){ submitBtn.disabled = false; submitBtn.textContent = _t('Tao', 'Create'); }
     }
   }).catch(function(){
-    _showToast(_t('Loi mang', 'Network error'), 'error');
+    _showToast(_t('Lỗi mạng', 'Network error'), 'error');
     if(submitBtn){ submitBtn.disabled = false; submitBtn.textContent = _t('Tao', 'Create'); }
   });
 }
@@ -967,19 +967,19 @@ function _showLinkFormModal(){
 
   var h = '';
   h += '<div class="sojowo-modal-header">';
-  h += '<h3>' + _t('Lien ket bieu mau', 'Link Form / Record') + '</h3>';
+  h += '<h3>' + _t('Liên kết biểu mẫu', 'Link Form / Record') + '</h3>';
   h += '<button type="button" class="sojowo-detail-close sojowo-link-close">';
   h += '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>';
   h += '</button></div>';
   h += '<div class="sojowo-modal-body">';
   h += '<div class="sojowo-modal-field">';
-  h += '<label class="sojowo-modal-label">' + _t('Ma ho so', 'Record ID') + '</label>';
+  h += '<label class="sojowo-modal-label">' + _t('Mã hồ sơ', 'Record ID') + '</label>';
   h += '<input type="text" class="sojowo-modal-input" id="' + _containerId + '-link-record-id" placeholder="NCR-2026-001">';
   h += '</div>';
   h += '</div>';
   h += '<div class="sojowo-modal-footer">';
-  h += '<button type="button" class="sojowo-modal-cancel sojowo-link-cancel">' + _t('Huy', 'Cancel') + '</button>';
-  h += '<button type="button" class="sojowo-modal-submit" id="' + _containerId + '-link-submit">' + _t('Lien ket', 'Link') + '</button>';
+  h += '<button type="button" class="sojowo-modal-cancel sojowo-link-cancel">' + _t('Hủy', 'Cancel') + '</button>';
+  h += '<button type="button" class="sojowo-modal-submit" id="' + _containerId + '-link-submit">' + _t('Liên kết', 'Link') + '</button>';
   h += '</div>';
 
   modal.innerHTML = h;
@@ -998,7 +998,7 @@ function _showLinkFormModal(){
   document.getElementById(_containerId + '-link-submit').addEventListener('click', function(){
     var recordId = (document.getElementById(_containerId + '-link-record-id') || {}).value || '';
     if(!recordId.trim()){
-      _showToast(_t('Vui long nhap ma ho so', 'Please enter a record ID'), 'warn');
+      _showToast(_t('Vui lòng nhập mã hồ sơ', 'Please enter a record ID'), 'warn');
       return;
     }
     _apiCall('order_link_form', {
@@ -1007,14 +1007,14 @@ function _showLinkFormModal(){
       record_id: recordId.trim()
     }).then(function(data){
       if(data && data.ok){
-        _showToast(_t('Da lien ket thanh cong', 'Linked successfully'), 'success');
+        _showToast(_t('Đã liên kết thành công', 'Linked successfully'), 'success');
         closeLink();
         _openDetail(_selectedNode.id, _selectedNode.type);
       } else {
-        _showToast(_t('Loi: ' + (data && data.error || ''), 'Error: ' + (data && data.error || '')), 'error');
+        _showToast(_t('Lỗi: ' + (data && data.error || ''), 'Error: ' + (data && data.error || '')), 'error');
       }
     }).catch(function(){
-      _showToast(_t('Loi mang', 'Network error'), 'error');
+      _showToast(_t('Lỗi mạng', 'Network error'), 'error');
     });
   });
 }
@@ -1160,7 +1160,7 @@ function _bindPipelineEvents(){
       };
       this.classList.add('sojowo-card-dragging');
       e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', this.getAttribute('data-card-id'));
+      e.dataTransfer.setĐạta('text/plain', this.getAttribute('data-card-id'));
     });
     cards[i].addEventListener('dragend', function(){
       this.classList.remove('sojowo-card-dragging');
@@ -1257,7 +1257,7 @@ function _bindTableEvents(){
 }
 
 // ===================================================================
-// Data Utilities
+// Đạta Utilities
 // ===================================================================
 
 function _flattenHierarchy(hierarchy){
@@ -1333,7 +1333,7 @@ function _mapPipelineToStatus(type, pipelineCol){
   return m ? m[pipelineCol] : null;
 }
 
-function _filterTableData(data, search){
+function _filterTableĐạta(data, search){
   if(!search || !search.trim()) return data;
   var q = search.toLowerCase().trim();
   return data.filter(function(item){
@@ -1347,7 +1347,7 @@ function _filterTableData(data, search){
   });
 }
 
-function _sortTableData(data, key, dir){
+function _sortTableĐạta(data, key, dir){
   return data.slice().sort(function(a, b){
     var va = _getSortValue(a, key);
     var vb = _getSortValue(b, key);
@@ -1377,8 +1377,8 @@ function _getFieldsForType(type){
       { key:'customer_id', type:'string', required:true, label:'Customer ID' },
       { key:'customer_name', type:'string', required:true, label:'Customer Name' },
       { key:'customer_po', type:'string', required:true, label:'Customer PO' },
-      { key:'order_date', type:'date', required:true, label:'Order Date' },
-      { key:'due_date', type:'date', required:true, label:'Due Date' },
+      { key:'order_date', type:'date', required:true, label:'Order Đạte' },
+      { key:'due_date', type:'date', required:true, label:'Due Đạte' },
       { key:'total_qty', type:'integer', required:true, label:'Total Qty' },
       { key:'total_value', type:'number', required:false, label:'Order Value (USD)' },
       { key:'priority', type:'string', required:false, label:'Priority', enum:['normal','high','urgent','aog'] },
@@ -1396,8 +1396,8 @@ function _getFieldsForType(type){
       { key:'qty_ordered', type:'integer', required:true, label:'Qty Ordered' },
       { key:'qty_good', type:'integer', required:false, label:'Qty Good' },
       { key:'qty_scrap', type:'integer', required:false, label:'Qty Scrap' },
-      { key:'start_date', type:'date', required:true, label:'Start Date' },
-      { key:'due_date', type:'date', required:true, label:'Due Date' },
+      { key:'start_date', type:'date', required:true, label:'Start Đạte' },
+      { key:'due_date', type:'date', required:true, label:'Due Đạte' },
       { key:'routing_id', type:'string', required:false, label:'Routing ID' },
       { key:'fai_required', type:'boolean', required:false, label:'FAI Required?' },
       { key:'customer_source_inspection', type:'boolean', required:false, label:'Customer Source Inspection?' },
@@ -1479,8 +1479,8 @@ function _hasPermission(type, action){
 function _refreshMainView(){
   // Re-fetch hierarchy data and re-render
   _apiCall('order_hierarchy', {}).then(function(data){
-    _hierarchyData = (data && data.ok) ? (data.data || data.hierarchy || []) : [];
-    _flatData = _flattenHierarchy(_hierarchyData);
+    _hierarchyĐạta = (data && data.ok) ? (data.data || data.hierarchy || []) : [];
+    _flatĐạta = _flattenHierarchy(_hierarchyĐạta);
     var main = document.getElementById(_containerId + '-main');
     if(main){
       main.innerHTML = _renderViewContent();
@@ -1492,7 +1492,7 @@ function _refreshMainView(){
 
   // Also refresh KPIs
   _apiCall('order_dashboard_stats', {}).then(function(data){
-    _kpiData = (data && data.ok) ? (data.data || data) : _kpiData;
+    _kpiĐạta = (data && data.ok) ? (data.data || data) : _kpiĐạta;
     var kpiContainer = document.querySelector('.sojowo-kpi');
     if(kpiContainer){
       var temp = document.createElement('div');

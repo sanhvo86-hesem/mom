@@ -27,7 +27,7 @@ var _cascadeInstance = null;
 var _moduleId = _uid();
 var _selectedDept = '';
 var _selectedType = '';
-var _selectedYear = new Date().getFullYear();
+var _selectedYear = new Đạte().getFullYear();
 var _previewId = '';
 var _lastGenerated = null;
 var _generating = false;
@@ -59,16 +59,16 @@ var DEPT_RECORD_TYPES = {
 };
 
 var DEPARTMENTS = [
-  {value:'QA',  label:'Dam bao Chat luong',     labelEn:'Quality Assurance'},
-  {value:'PRO', label:'San xuat',               labelEn:'Production'},
-  {value:'ENG', label:'Ky thuat',               labelEn:'Engineering'},
-  {value:'SCM', label:'Chuoi cung ung',         labelEn:'Supply Chain'},
-  {value:'HR',  label:'Nhan su & Dao tao',      labelEn:'HR & Training'},
-  {value:'EXE', label:'Ban Giam doc',           labelEn:'Executive / Management'},
+  {value:'QA',  label:'Đảm bảo Chất lượng',     labelEn:'Quality Assurance'},
+  {value:'PRO', label:'Sản xuất',               labelEn:'Production'},
+  {value:'ENG', label:'Kỹ thuật',               labelEn:'Engineering'},
+  {value:'SCM', label:'Chuỗi cung ứng',         labelEn:'Supply Chain'},
+  {value:'HR',  label:'Nhân sự & Đào tạo',      labelEn:'HR & Training'},
+  {value:'EXE', label:'Ban Giám đốc',           labelEn:'Executive / Management'},
   {value:'SAL', label:'Kinh doanh',             labelEn:'Sales'},
-  {value:'WH',  label:'Kho van',                labelEn:'Warehouse / Logistics'},
-  {value:'IT',  label:'Cong nghe thong tin',    labelEn:'IT / Digital'},
-  {value:'EHS', label:'An toan & Moi truong',   labelEn:'EHS / Safety'}
+  {value:'WH',  label:'Kho vận',                labelEn:'Warehouse / Logistics'},
+  {value:'IT',  label:'Công nghệ thông tin',    labelEn:'IT / Digital'},
+  {value:'EHS', label:'An toàn & Môi trường',   labelEn:'EHS / Safety'}
 ];
 
 // Record type registry (loaded from record_type_expanded.json at build or inlined)
@@ -112,8 +112,8 @@ function _renderContent(schemas, entries, container){
   // ── Section Header ──
   h += '<div class="fh-section">';
   h += '<div class="fh-section-head">';
-  h += '<h2>&#x1F522; ' + _t('Xin ma ho so moi','Request New Record ID') + '</h2>';
-  h += '<span>' + _t('Lay ma ho so duy nhat (Record-ID) truoc khi dien form. Server tu sinh, khong trung.','Get a unique Record-ID before filling forms. Server-generated, guaranteed unique.') + '</span>';
+  h += '<h2>&#x1F522; ' + _t('Xin mã hồ sơ mới','Request New Record ID') + '</h2>';
+  h += '<span>' + _t('Lấy mã hồ sơ duy nhất (Record-ID) trước khi điền form. Server tự sinh, không trùng.','Get a unique Record-ID before filling forms. Server-generated, guaranteed unique.') + '</span>';
   h += '</div>';
   h += '</div>';
 
@@ -127,7 +127,7 @@ function _renderContent(schemas, entries, container){
   h += '<div class="rid-year-row">';
   h += '<label>' + _t('Nam','Year') + '</label>';
   h += '<select id="' + _moduleId + '-year" onchange="_ridOnYearChange(this.value)" class="rid-year-select">';
-  var cy = new Date().getFullYear();
+  var cy = new Đạte().getFullYear();
   for(var y = cy; y >= cy - 1; y--){
     h += '<option value="' + y + '"' + (y === _selectedYear ? ' selected' : '') + '>' + y + '</option>';
   }
@@ -136,15 +136,15 @@ function _renderContent(schemas, entries, container){
 
   // ID Preview Panel
   h += '<div class="rid-preview-panel" id="' + _moduleId + '-preview">';
-  h += '<div class="rid-preview-label">' + _t('Xem truoc ma:','ID Preview:') + '</div>';
-  h += '<div class="rid-preview-id" id="' + _moduleId + '-preview-id">' + _t('Chon loai ho so o tren...','Select record type above...') + '</div>';
+  h += '<div class="rid-preview-label">' + _t('Xem trước mã:','ID Preview:') + '</div>';
+  h += '<div class="rid-preview-id" id="' + _moduleId + '-preview-id">' + _t('Chọn loại hồ sơ ở trên...','Select record type above...') + '</div>';
   h += '<div class="rid-preview-format" id="' + _moduleId + '-preview-format"></div>';
   h += '</div>';
 
   // Generate button
   h += '<div class="rid-gen-actions">';
   h += '<button type="button" class="rid-gen-btn" id="' + _moduleId + '-gen-btn" onclick="_ridGenerate()" disabled>';
-  h += '&#x26A1; ' + _t('Tao ma moi','Generate New ID');
+  h += '&#x26A1; ' + _t('Tạo mã mới','Generate New ID');
   h += '</button>';
   h += '</div>';
 
@@ -156,7 +156,7 @@ function _renderContent(schemas, entries, container){
   // ── Allocation History ──
   h += '<div class="rid-history-section" id="' + _moduleId + '-history-section">';
   h += '<div class="rid-history-header">';
-  h += '<h2>&#x1F4CB; ' + _t('Lich su cap ma','Allocation History') + '</h2>';
+  h += '<h2>&#x1F4CB; ' + _t('Lịch sử cấp mã','Allocation History') + '</h2>';
   h += '</div>';
 
   // History filters
@@ -165,17 +165,17 @@ function _renderContent(schemas, entries, container){
 
   // Type filter
   h += '<div class="rid-hist-filter">';
-  h += '<label>' + _t('Loai','Type') + '</label>';
+  h += '<label>' + _t('Loại','Type') + '</label>';
   h += '<select id="' + _moduleId + '-hf-type" onchange="_ridHistFilterChange()">';
-  h += '<option value="">' + _t('Tat ca','All') + '</option>';
+  h += '<option value="">' + _t('Tất cả','All') + '</option>';
   h += '</select>';
   h += '</div>';
 
   // Department filter
   h += '<div class="rid-hist-filter">';
-  h += '<label>' + _t('Phong ban','Department') + '</label>';
+  h += '<label>' + _t('Phòng ban','Department') + '</label>';
   h += '<select id="' + _moduleId + '-hf-dept" onchange="_ridHistFilterChange()">';
-  h += '<option value="">' + _t('Tat ca','All') + '</option>';
+  h += '<option value="">' + _t('Tất cả','All') + '</option>';
   DEPARTMENTS.forEach(function(d){
     h += '<option value="' + d.value + '">' + _t(d.label, d.labelEn) + '</option>';
   });
@@ -184,24 +184,24 @@ function _renderContent(schemas, entries, container){
 
   // Status filter
   h += '<div class="rid-hist-filter">';
-  h += '<label>' + _t('Trang thai','Status') + '</label>';
+  h += '<label>' + _t('Trạng thái','Status') + '</label>';
   h += '<select id="' + _moduleId + '-hf-status" onchange="_ridHistFilterChange()">';
-  h += '<option value="">' + _t('Tat ca','All') + '</option>';
-  h += '<option value="allocated">' + _t('Da cap ma','Allocated') + '</option>';
-  h += '<option value="form_downloaded">' + _t('Da tai form','Downloaded') + '</option>';
-  h += '<option value="submitted">' + _t('Da nop','Submitted') + '</option>';
-  h += '<option value="received">' + _t('Da tiep nhan','Received') + '</option>';
-  h += '<option value="void">' + _t('Huy','Void') + '</option>';
+  h += '<option value="">' + _t('Tất cả','All') + '</option>';
+  h += '<option value="allocated">' + _t('Đã cấp mã','Allocated') + '</option>';
+  h += '<option value="form_downloaded">' + _t('Đã tải form','Downloaded') + '</option>';
+  h += '<option value="submitted">' + _t('Đã nộp','Submitted') + '</option>';
+  h += '<option value="received">' + _t('Đã tiếp nhận','Received') + '</option>';
+  h += '<option value="void">' + _t('Hủy','Void') + '</option>';
   h += '</select>';
   h += '</div>';
 
-  // Date range
+  // Đạte range
   h += '<div class="rid-hist-filter">';
-  h += '<label>' + _t('Tu ngay','From') + '</label>';
+  h += '<label>' + _t('Từ ngày','From') + '</label>';
   h += '<input type="date" id="' + _moduleId + '-hf-from" onchange="_ridHistFilterChange()">';
   h += '</div>';
   h += '<div class="rid-hist-filter">';
-  h += '<label>' + _t('Den ngay','To') + '</label>';
+  h += '<label>' + _t('Đến ngày','To') + '</label>';
   h += '<input type="date" id="' + _moduleId + '-hf-to" onchange="_ridHistFilterChange()">';
   h += '</div>';
 
@@ -209,8 +209,8 @@ function _renderContent(schemas, entries, container){
 
   // Bulk actions
   h += '<div class="rid-hist-bulk">';
-  h += '<button type="button" class="rid-hist-bulk-btn" onclick="_ridVoidUnused()" title="' + _t('Huy tat ca ma chua su dung','Void all unused IDs') + '">';
-  h += '&#x26D4; ' + _t('Huy ma chua dung','Void unused');
+  h += '<button type="button" class="rid-hist-bulk-btn" onclick="_ridVoidUnused()" title="' + _t('Hủy tat ca ma chua su dung','Void all unused IDs') + '">';
+  h += '&#x26D4; ' + _t('Hủy ma chua dung','Void unused');
   h += '</button>';
   h += '</div>';
 
@@ -249,7 +249,7 @@ function _initCascade(){
     levels: [
       {
         key: 'department',
-        label: 'Phong ban',
+        label: 'Phòng ban',
         labelEn: 'Department',
         dataSource: 'static',
         options: DEPARTMENTS.map(function(d){
@@ -258,7 +258,7 @@ function _initCascade(){
       },
       {
         key: 'record_type',
-        label: 'Loai ho so',
+        label: 'Loại ho so',
         labelEn: 'Record Type',
         dataSource: 'dependent',
         dependsOn: 'department',
@@ -304,7 +304,7 @@ function _getRecordTypeInfo(code){
 // YEAR CHANGE
 // ===================================================================
 window._ridOnYearChange = function(val){
-  _selectedYear = parseInt(val, 10) || new Date().getFullYear();
+  _selectedYear = parseInt(val, 10) || new Đạte().getFullYear();
   _updatePreview();
 };
 
@@ -317,7 +317,7 @@ function _updatePreview(){
   if(!previewEl || !formatEl) return;
 
   if(!_selectedType){
-    previewEl.textContent = _t('Chon loai ho so o tren...','Select record type above...');
+    previewEl.textContent = _t('Chọn loại hồ sơ ở trên...','Select record type above...');
     previewEl.className = 'rid-preview-id rid-preview-placeholder';
     formatEl.textContent = '';
     return;
@@ -346,9 +346,9 @@ function _updatePreview(){
   previewEl.className = 'rid-preview-id rid-preview-pending';
 
   // Format explanation
-  var explanation = _t('Dinh dang: ','Format: ') + pattern;
+  var explanation = _t('Định dạng: ','Format: ') + pattern;
   if(info.linked_form){
-    explanation += ' | ' + _t('Form lien quan: ','Linked form: ') + info.linked_form;
+    explanation += ' | ' + _t('Form liên quan: ','Linked form: ') + info.linked_form;
   }
   formatEl.textContent = explanation;
 }
@@ -371,7 +371,7 @@ window._ridGenerate = function(){
   var resultDiv = document.getElementById(_moduleId + '-result');
   if(resultDiv){
     resultDiv.style.display = 'block';
-    resultDiv.innerHTML = '<div class="rid-generating"><div class="rid-generating-spinner"></div><span>' + _t('Dang kiem tra trung va tao ma...','Checking duplicates and generating...') + '</span></div>';
+    resultDiv.innerHTML = '<div class="rid-generating"><div class="rid-generating-spinner"></div><span>' + _t('Đang kiểm tra trung va tao ma...','Checking duplicates and generating...') + '</span></div>';
   }
 
   var toast = window._fhShowToast || function(){};
@@ -384,7 +384,7 @@ window._ridGenerate = function(){
   checkDuplicate().then(function(checkResult){
     if(checkResult && checkResult.exists){
       // Warn but proceed -- server will skip to next available
-      toast(_t('Phat hien ID trung, tu dong nhay sang so tiep theo.','Duplicate detected, auto-skipping to next available.'), 'warn');
+      toast(_t('Phát hiện ID trùng, tự động nhảy sang số tiếp theo.','Duplicate detected, auto-skipping to next available.'), 'warn');
     }
 
     // Step 2: Allocate
@@ -407,12 +407,12 @@ window._ridGenerate = function(){
       _renderSuccess(data);
       _loadHistory(); // Refresh history table
     } else {
-      _renderError((data && data.error) || _t('Khong the tao ma.','Could not generate ID.'));
+      _renderError((data && data.error) || _t('Không thể tạo mã.','Could not generate ID.'));
     }
   }).catch(function(err){
     _generating = false;
     _updateGenButton();
-    _renderError(_t('Loi ket noi mang.','Network error.'));
+    _renderError(_t('Lỗi kết nối mạng.','Network error.'));
   });
 };
 
@@ -470,19 +470,19 @@ function _renderSuccess(data){
 
   // Large ID display
   h += '<div class="rid-success-id-wrap">';
-  h += '<div class="rid-success-label">' + _t('Ma ho so cua ban','Your Record ID') + '</div>';
+  h += '<div class="rid-success-label">' + _t('Mã hồ sơ của bạn','Your Record ID') + '</div>';
   h += '<div class="rid-success-id">' + _escHtml(rid) + '</div>';
   h += '</div>';
 
   // Meta info
   h += '<div class="rid-success-meta">';
-  h += '<div class="rid-success-meta-item"><span class="rid-meta-label">' + _t('Loai','Type') + '</span><span class="rid-meta-value">' + _escHtml(_selectedType) + '</span></div>';
-  h += '<div class="rid-success-meta-item"><span class="rid-meta-label">' + _t('Phong ban','Dept') + '</span><span class="rid-meta-value">' + _escHtml(_selectedDept) + '</span></div>';
+  h += '<div class="rid-success-meta-item"><span class="rid-meta-label">' + _t('Loại','Type') + '</span><span class="rid-meta-value">' + _escHtml(_selectedType) + '</span></div>';
+  h += '<div class="rid-success-meta-item"><span class="rid-meta-label">' + _t('Phòng ban','Dept') + '</span><span class="rid-meta-value">' + _escHtml(_selectedDept) + '</span></div>';
   if(linkedForm){
-    h += '<div class="rid-success-meta-item"><span class="rid-meta-label">' + _t('Form lien quan','Linked form') + '</span><span class="rid-meta-value">' + _escHtml(linkedForm) + '</span></div>';
+    h += '<div class="rid-success-meta-item"><span class="rid-meta-label">' + _t('Form liên quan','Linked form') + '</span><span class="rid-meta-value">' + _escHtml(linkedForm) + '</span></div>';
   }
   if(suggestedFilename){
-    h += '<div class="rid-success-meta-item rid-meta-wide"><span class="rid-meta-label">' + _t('Ten file de xuat','Suggested filename') + '</span><span class="rid-meta-value mono" id="' + _moduleId + '-suggested-fn">' + _escHtml(suggestedFilename) + '</span></div>';
+    h += '<div class="rid-success-meta-item rid-meta-wide"><span class="rid-meta-label">' + _t('Tên file đề xuất','Suggested filename') + '</span><span class="rid-meta-value mono" id="' + _moduleId + '-suggested-fn">' + _escHtml(suggestedFilename) + '</span></div>';
   }
   h += '</div>';
 
@@ -491,12 +491,12 @@ function _renderSuccess(data){
 
   // Copy to clipboard (auto-copies on render)
   h += '<button type="button" class="rid-action-btn rid-btn-copy" onclick="_ridCopyId(\'' + _escHtml(rid) + '\')">';
-  h += '&#x1F4CB; ' + _t('Sao chep ma','Copy ID');
+  h += '&#x1F4CB; ' + _t('Sao chép ma','Copy ID');
   h += '</button>';
 
   // Download .txt
   h += '<button type="button" class="rid-action-btn rid-btn-txt" onclick="_ridDownloadTxt(\'' + _escHtml(rid) + '\')">';
-  h += '&#x1F4C4; ' + _t('Tai .txt','Download .txt');
+  h += '&#x1F4C4; ' + _t('Tải .txt','Download .txt');
   h += '</button>';
 
   // Linked form actions
@@ -507,12 +507,12 @@ function _renderSuccess(data){
 
     if(isOnline){
       h += '<button type="button" class="rid-action-btn rid-btn-fill" onclick="_ridFillForm(\'' + _escHtml(linkedForm) + '\')">';
-      h += '&#x270F; ' + _t('Dien form online','Fill form online') + ' &rarr;';
+      h += '&#x270F; ' + _t('Điền form online','Fill form online') + ' &rarr;';
       h += '</button>';
     }
 
     h += '<button type="button" class="rid-action-btn rid-btn-dl" onclick="_ridDownloadForm(\'' + _escHtml(linkedForm) + '\', \'' + _escHtml(allocId) + '\')">';
-    h += '&#x2B07; ' + _t('Tai form','Download form') + ' ' + _escHtml(linkedForm);
+    h += '&#x2B07; ' + _t('Tải form','Download form') + ' ' + _escHtml(linkedForm);
     h += '</button>';
   }
 
@@ -558,9 +558,9 @@ function _ridCopyIdSilent(rid){
 
 window._ridDownloadTxt = function(rid){
   if(typeof AllocationTracker !== 'undefined' && AllocationTracker.downloadRecordTxt){
-    AllocationTracker.downloadRecordTxt(rid, 'Record ID: ' + rid + '\nGenerated: ' + new Date().toISOString() + '\nDepartment: ' + _selectedDept + '\nType: ' + _selectedType + '\n');
+    AllocationTracker.downloadRecordTxt(rid, 'Record ID: ' + rid + '\nGenerated: ' + new Đạte().toISOString() + '\nDepartment: ' + _selectedDept + '\nType: ' + _selectedType + '\n');
   } else {
-    var blob = new Blob(['Record ID: ' + rid + '\nGenerated: ' + new Date().toISOString() + '\n'], {type: 'text/plain;charset=utf-8'});
+    var blob = new Blob(['Record ID: ' + rid + '\nGenerated: ' + new Đạte().toISOString() + '\n'], {type: 'text/plain;charset=utf-8'});
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url;
@@ -580,12 +580,12 @@ window._ridFillForm = function(formCode){
 
 window._ridDownloadForm = function(formCode, allocId){
   var toast = window._fhShowToast || function(){};
-  toast(_t('Dang tai form...','Downloading form...'), 'info');
+  toast(_t('Đang tải form...','Downloading form...'), 'info');
 
   if(typeof AllocationTracker !== 'undefined' && AllocationTracker.downloadForm && allocId){
     AllocationTracker.downloadForm(allocId, formCode).then(function(data){
       if(data && data.ok){
-        toast(_t('Da tai thanh cong!','Downloaded successfully!'), 'success');
+        toast(_t('Đã tải thành công!','Downloaded successfully!'), 'success');
       } else {
         // Fallback
         if(typeof window._fhDownloadBlank === 'function') window._fhDownloadBlank(formCode);
@@ -645,7 +645,7 @@ function _populateTypeFilter(){
   });
 
   allTypes.sort();
-  var h = '<option value="">' + _t('Tat ca','All') + '</option>';
+  var h = '<option value="">' + _t('Tất cả','All') + '</option>';
   allTypes.forEach(function(t){
     var info = _getRecordTypeInfo(t);
     h += '<option value="' + _escHtml(t) + '">' + _escHtml(t) + ' - ' + _escHtml(_t(info.label_vi || info.label, info.label)) + '</option>';
@@ -668,7 +668,7 @@ function _loadHistory(){
   if(!tableContainer) return;
 
   // Show loading state
-  tableContainer.innerHTML = '<div style="text-align:center;padding:20px;color:#64748b">&#x23F3; ' + _t('Dang tai...','Loading...') + '</div>';
+  tableContainer.innerHTML = '<div style="text-align:center;padding:20px;color:#64748b">&#x23F3; ' + _t('Đang tải...','Loading...') + '</div>';
 
   if(typeof AllocationTracker !== 'undefined' && AllocationTracker.getHistory){
     var filters = {
@@ -684,16 +684,16 @@ function _loadHistory(){
 
     AllocationTracker.getHistory(filters).then(function(data){
       if(data && data.ok){
-        var historyData = data.data || [];
+        var historyĐạta = data.data || [];
         var totalPages = data.total_pages || 1;
         var currentPage = data.page || 1;
 
         // Render table
-        AllocationTracker.renderHistoryTable(_moduleId + '-history-table', historyData, {
+        AllocationTracker.renderHistoryTable(_moduleId + '-history-table', historyĐạta, {
           searchable: true,
           sortable: true,
           paginated: true,
-          emptyMessage: _t('Chua co ma nao duoc cap','No IDs allocated yet'),
+          emptyMessage: _t('Chưa có mã nào được cấp','No IDs allocated yet'),
           onRowClick: function(allocId){
             _showAllocationDetail(allocId);
           }
@@ -713,13 +713,13 @@ function _loadHistory(){
           }
         }
       } else {
-        tableContainer.innerHTML = '<div class="rid-empty"><div class="rid-empty-icon">&#x1F4C2;</div><p>' + _t('Chua co du lieu','No data available') + '</p></div>';
+        tableContainer.innerHTML = '<div class="rid-empty"><div class="rid-empty-icon">&#x1F4C2;</div><p>' + _t('Chưa có dữ liệu','No data available') + '</p></div>';
       }
     }).catch(function(){
-      tableContainer.innerHTML = '<div class="rid-empty"><div class="rid-empty-icon">&#x26A0;</div><p>' + _t('Loi tai du lieu lich su','Error loading history data') + '</p></div>';
+      tableContainer.innerHTML = '<div class="rid-empty"><div class="rid-empty-icon">&#x26A0;</div><p>' + _t('Lỗi tải dữ liệu lịch sử','Error loading history data') + '</p></div>';
     });
   } else {
-    tableContainer.innerHTML = '<div class="rid-empty"><div class="rid-empty-icon">&#x1F4C2;</div><p>' + _t('AllocationTracker chua san sang','AllocationTracker not available') + '</p></div>';
+    tableContainer.innerHTML = '<div class="rid-empty"><div class="rid-empty-icon">&#x1F4C2;</div><p>' + _t('AllocationTracker chưa sẵn sàng','AllocationTracker not available') + '</p></div>';
   }
 }
 
@@ -736,11 +736,11 @@ function _bindHistoryActions(){
   AllocationTracker.on('action_download', function(data){
     if(!data || !data.allocationId) return;
     var toast = window._fhShowToast || function(){};
-    toast(_t('Dang tai form cho allocation...','Downloading form for allocation...'), 'info');
+    toast(_t('Đang tải form cho allocation...','Downloading form for allocation...'), 'info');
 
-    AllocationTracker.getAllocationStatus(data.allocationId).then(function(statusData){
-      if(statusData && statusData.ok && statusData.form_code){
-        _ridDownloadForm(statusData.form_code, data.allocationId);
+    AllocationTracker.getAllocationStatus(data.allocationId).then(function(statusĐạta){
+      if(statusĐạta && statusĐạta.ok && statusĐạta.form_code){
+        _ridDownloadForm(statusĐạta.form_code, data.allocationId);
       }
     });
   });
@@ -751,7 +751,7 @@ function _showAllocationDetail(allocId){
   if(typeof AllocationTracker !== 'undefined' && AllocationTracker.copyToClipboard){
     AllocationTracker.copyToClipboard(allocId);
     var toast = window._fhShowToast || function(){};
-    toast(_t('Da sao chep allocation ID','Copied allocation ID'), 'success');
+    toast(_t('Đã sao chép allocation ID','Copied allocation ID'), 'success');
   }
 }
 
@@ -760,7 +760,7 @@ function _showAllocationDetail(allocId){
 // ===================================================================
 function _ridVoidSingle(allocId){
   if(!allocId) return;
-  var reason = prompt(_t('Ly do huy ma (tuy chon):','Reason for voiding (optional):'), '');
+  var reason = prompt(_t('Lý do hủy mã (tùy chọn):','Reason for voiding (optional):'), '');
   if(reason === null) return; // Cancelled
 
   var toast = window._fhShowToast || function(){};
@@ -768,19 +768,19 @@ function _ridVoidSingle(allocId){
   if(typeof AllocationTracker !== 'undefined' && AllocationTracker.void){
     AllocationTracker.void(allocId, reason).then(function(data){
       if(data && data.ok){
-        toast(_t('Da huy thanh cong.','Voided successfully.'), 'success');
+        toast(_t('Đã hủy thanh cong.','Voided successfully.'), 'success');
         _loadHistory();
       } else {
-        toast(_t('Khong the huy: ','Cannot void: ') + ((data && data.error) || 'Unknown error'), 'error');
+        toast(_t('Không thể hủy: ','Cannot void: ') + ((data && data.error) || 'Unknown error'), 'error');
       }
     }).catch(function(){
-      toast(_t('Loi ket noi.','Network error.'), 'error');
+      toast(_t('Lỗi kết nối.','Network error.'), 'error');
     });
   }
 }
 
 window._ridVoidUnused = function(){
-  if(!confirm(_t('Ban co chac muon huy TAT CA ma chua su dung? Hanh dong nay khong the hoan tac.','Are you sure you want to void ALL unused IDs? This cannot be undone.'))){
+  if(!confirm(_t('Bạn có chắc muốn hủy TẤT CẢ mã chưa sử dụng? Hành động này không thể hoàn tác.','Are you sure you want to void ALL unused IDs? This cannot be undone.'))){
     return;
   }
 
@@ -791,16 +791,16 @@ window._ridVoidUnused = function(){
     callFn('record_id_void_unused', {department: _historyFilters.department || ''}, 'POST').then(function(data){
       if(data && data.ok){
         var count = data.voided_count || 0;
-        toast(_t('Da huy ' + count + ' ma chua dung.','Voided ' + count + ' unused IDs.'), 'success');
+        toast(_t('Đã hủy ' + count + ' ma chua dung.','Voided ' + count + ' unused IDs.'), 'success');
         _loadHistory();
       } else {
-        toast(_t('Loi: ','Error: ') + ((data && data.error) || ''), 'error');
+        toast(_t('Lỗi: ','Error: ') + ((data && data.error) || ''), 'error');
       }
     }).catch(function(){
-      toast(_t('Loi ket noi.','Network error.'), 'error');
+      toast(_t('Lỗi kết nối.','Network error.'), 'error');
     });
   } else {
-    toast(_t('Chuc nang chua ho tro.','Feature not yet supported.'), 'warn');
+    toast(_t('Chức năng chưa hỗ trợ.','Feature not yet supported.'), 'warn');
   }
 };
 

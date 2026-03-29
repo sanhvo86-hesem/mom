@@ -28,12 +28,12 @@ function _formatBytes(bytes){
   var i = Math.floor(Math.log(bytes) / Math.log(k));
   return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
 }
-function _formatDate(dateStr){
+function _formatĐạte(dateStr){
   if(!dateStr) return '';
   try {
-    var d = new Date(dateStr);
+    var d = new Đạte(dateStr);
     if(isNaN(d.getTime())) return dateStr;
-    var dd = String(d.getDate()).padStart(2, '0');
+    var dd = String(d.getĐạte()).padStart(2, '0');
     var mm = String(d.getMonth() + 1).padStart(2, '0');
     var yy = d.getFullYear();
     var hh = String(d.getHours()).padStart(2, '0');
@@ -51,12 +51,12 @@ function _apiCall(action, payload, method, timeout){
   if(payload && (method || 'POST') !== 'GET') opts.body = JSON.stringify(payload);
   return fetch(url, opts).then(function(r){ return r.json(); });
 }
-function _apiCallFormData(action, formData){
-  if(typeof apiCallFormData === 'function'){
-    return apiCallFormData(action, formData);
+function _apiCallFormĐạta(action, formĐạta){
+  if(typeof apiCallFormĐạta === 'function'){
+    return apiCallFormĐạta(action, formĐạta);
   }
   var url = 'api.php?action=' + encodeURIComponent(action);
-  var opts = { method: 'POST', credentials: 'include', body: formData };
+  var opts = { method: 'POST', credentials: 'include', body: formĐạta };
   if(typeof csrfToken !== 'undefined' && csrfToken) opts.headers = {'X-CSRF-Token': csrfToken};
   return fetch(url, opts).then(function(r){ return r.json(); });
 }
@@ -112,9 +112,9 @@ window._renderUploadVerify = function(schemas, entries, container){
   // ── Header ──
   h += '<div class="uv-header">';
   h += '<div>';
-  h += '<h2 class="uv-title">' + _t('Upload & Xac minh', 'Upload & Verify') + '</h2>';
+  h += '<h2 class="uv-title">' + _t('Upload & Xác minh', 'Upload & Verify') + '</h2>';
   h += '<p class="uv-subtitle">' + _t(
-    'Tai len bieu mau da dien va xac minh tinh hop le truoc khi nop',
+    'Tải lên biểu mẫu đã điền và xác minh tính hợp lệ trước khi nộp',
     'Upload completed forms and verify integrity before submission'
   ) + '</p>';
   h += '</div>';
@@ -122,15 +122,15 @@ window._renderUploadVerify = function(schemas, entries, container){
 
   // ── Dropzone ──
   h += '<div class="uv-dropzone" id="' + _containerId + '-dropzone" tabindex="0" role="button" ';
-  h += 'aria-label="' + _t('Keo tha file hoac nhan de chon', 'Drag & drop files or click to browse') + '">';
+  h += 'aria-label="' + _t('Kéo thả file hoặc nhấn để chọn', 'Drag & drop files or click to browse') + '">';
   h += '<div class="uv-dropzone-inner">';
   h += '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
   h += '<p class="uv-dropzone-text">' + _t(
-    'Keo tha file vao day hoac <strong>nhan de chon file</strong>',
+    'Kéo thả file vào đây hoặc <strong>nhấn để chọn file</strong>',
     'Drag & drop files here or <strong>click to browse</strong>'
   ) + '</p>';
   h += '<p class="uv-dropzone-hint">' + _t(
-    'Excel (.xlsx/.xlsm), PDF, Hinh anh — Toi da 25 MB/file',
+    'Excel (.xlsx/.xlsm), PDF, Hình ảnh — Tối đa 25 MB/file',
     'Excel (.xlsx/.xlsm), PDF, Images — Max 25 MB per file'
   ) + '</p>';
   h += '</div>';
@@ -145,7 +145,7 @@ window._renderUploadVerify = function(schemas, entries, container){
   h += '<div class="uv-submit-area" id="' + _containerId + '-submit-area" style="display:none">';
   h += '<button type="button" class="uv-submit-btn" id="' + _containerId + '-submit-btn" disabled>';
   h += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
-  h += '<span>' + _t('Nop tat ca file hop le', 'Submit all valid files') + '</span>';
+  h += '<span>' + _t('Nộp tất cả file hợp lệ', 'Submit all valid files') + '</span>';
   h += '</button>';
   h += '<span class="uv-submit-count" id="' + _containerId + '-submit-count"></span>';
   h += '</div>';
@@ -154,12 +154,12 @@ window._renderUploadVerify = function(schemas, entries, container){
   h += '<div class="uv-history-section" id="' + _containerId + '-history-section">';
   h += '<button type="button" class="uv-history-toggle" id="' + _containerId + '-history-toggle">';
   h += '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" class="uv-history-chevron"><path d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg>';
-  h += '<span>' + _t('Lich su upload', 'Upload History') + '</span>';
+  h += '<span>' + _t('Lịch sử upload', 'Upload History') + '</span>';
   h += '</button>';
   h += '<div class="uv-history-body" id="' + _containerId + '-history-body" style="display:none">';
   h += '<div class="uv-history-filters" id="' + _containerId + '-history-filters"></div>';
   h += '<div class="uv-history-table" id="' + _containerId + '-history-table">';
-  h += '<div class="uv-loading">' + _t('Dang tai...', 'Loading...') + '</div>';
+  h += '<div class="uv-loading">' + _t('Đang tải...', 'Loading...') + '</div>';
   h += '</div>';
   h += '</div>';
   h += '</div>';
@@ -260,9 +260,9 @@ function _processFiles(fileList){
       ext: ext,
       type: _getFileType(ext),
       steps: [
-        { name: _t('Kiem tra ten file', 'Filename check'), status: 'pending', detail: '' },
-        { name: _t('Kiem tra hidden sheet', 'Hidden sheet check'), status: 'pending', detail: '' },
-        { name: _t('Doi chieu cap phat', 'Allocation cross-ref'), status: 'pending', detail: '' }
+        { name: _t('Kiểm tra tên file', 'Filename check'), status: 'pending', detail: '' },
+        { name: _t('Kiểm tra hidden sheet', 'Hidden sheet check'), status: 'pending', detail: '' },
+        { name: _t('Đối chiếu cấp phát', 'Allocation cross-ref'), status: 'pending', detail: '' }
       ],
       overallStatus: 'pending',
       allocationId: null,
@@ -333,7 +333,7 @@ function _renderFileCard(entry){
   h += '<div class="uv-file-meta">' + _escHtml(_formatBytes(entry.size)) + ' &middot; ' + _escHtml(entry.ext.toUpperCase().replace('.','')) + '</div>';
   h += '</div>';
   h += '<div class="uv-file-overall">' + _renderOverallBadge(entry.overallStatus) + '</div>';
-  h += '<button type="button" class="uv-file-remove" data-remove-id="' + entry.id + '" title="' + _t('Xoa', 'Remove') + '" aria-label="' + _t('Xoa file', 'Remove file') + '">';
+  h += '<button type="button" class="uv-file-remove" data-remove-id="' + entry.id + '" title="' + _t('Xoa', 'Remove') + '" aria-label="' + _t('Xóa file', 'Remove file') + '">';
   h += '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>';
   h += '</button>';
   h += '</div>';
@@ -346,7 +346,7 @@ function _renderFileCard(entry){
     h += '<div class="uv-step uv-step-' + step.status + '">';
     h += '<div class="uv-step-icon">' + stepIcon + '</div>';
     h += '<div class="uv-step-content">';
-    h += '<div class="uv-step-name">' + _t('Buoc ' + (s + 1), 'Step ' + (s + 1)) + ': ' + _escHtml(step.name) + '</div>';
+    h += '<div class="uv-step-name">' + _t('Bước ' + (s + 1), 'Step ' + (s + 1)) + ': ' + _escHtml(step.name) + '</div>';
     if(step.detail){
       h += '<div class="uv-step-detail">' + step.detail + '</div>';
     }
@@ -366,7 +366,7 @@ function _renderFileCard(entry){
     ) + '</span>';
     h += '</div>';
     h += '<button type="button" class="uv-warn-confirm-btn" data-confirm-id="' + entry.id + '">';
-    h += _t('Xac nhan nop lai', 'Confirm resubmission');
+    h += _t('Xác nhận nộp lại', 'Confirm resubmission');
     h += '</button>';
     h += '</div>';
   }
@@ -377,12 +377,12 @@ function _renderFileCard(entry){
 
 function _renderOverallBadge(status){
   var config = {
-    pending:  { label: _t('Dang cho', 'Pending'),          color: '#94a3b8', bg: '#f1f5f9' },
-    loading:  { label: _t('Dang kiem tra', 'Verifying'),    color: '#3b82f6', bg: '#dbeafe' },
-    ready:    { label: _t('San sang nop', 'Ready'),         color: '#16a34a', bg: '#dcfce7' },
-    warn:     { label: _t('Can xac nhan', 'Needs confirm'), color: '#d97706', bg: '#fef3c7' },
-    rejected: { label: _t('Tu choi', 'Rejected'),           color: '#dc2626', bg: '#fef2f2' },
-    submitted:{ label: _t('Da nop', 'Submitted'),           color: '#059669', bg: '#d1fae5' }
+    pending:  { label: _t('Đang chờ', 'Pending'),          color: '#94a3b8', bg: '#f1f5f9' },
+    loading:  { label: _t('Đang kiểm tra', 'Verifying'),    color: '#3b82f6', bg: '#dbeafe' },
+    ready:    { label: _t('Sẵn sàng nộp', 'Ready'),         color: '#16a34a', bg: '#dcfce7' },
+    warn:     { label: _t('Cần xác nhận', 'Needs confirm'), color: '#d97706', bg: '#fef3c7' },
+    rejected: { label: _t('Từ chối', 'Rejected'),           color: '#dc2626', bg: '#fef2f2' },
+    submitted:{ label: _t('Đã nộp', 'Submitted'),           color: '#059669', bg: '#d1fae5' }
   };
   var c = config[status] || config.pending;
   return '<span class="uv-badge" style="color:' + c.color + ';background:' + c.bg + '">' + _escHtml(c.label) + '</span>';
@@ -497,17 +497,17 @@ function _runStep1(entry, callback){
 
     if(result.status === 'PASS'){
       entry.steps[0].status = 'pass';
-      entry.steps[0].detail = _t('Hop le', 'Valid') + ' (' + _escHtml(result.pattern) + ')';
+      entry.steps[0].detail = _t('Hợp lệ', 'Valid') + ' (' + _escHtml(result.pattern) + ')';
       callback(true);
     } else if(result.status === 'WARN' || result.status === 'FLAG'){
       entry.steps[0].status = 'pass';
       var issues = result.issues.map(function(i){ return _escHtml(i); }).join('<br>');
-      entry.steps[0].detail = _t('Hop le voi canh bao', 'Valid with warnings') + ': ' + issues;
+      entry.steps[0].detail = _t('Hợp lệ với cảnh báo', 'Valid with warnings') + ': ' + issues;
       callback(true);
     } else {
       entry.steps[0].status = 'fail';
       var failIssues = result.issues.map(function(i){ return _escHtml(i); }).join('<br>');
-      entry.steps[0].detail = _t('Khong hop le', 'Invalid') + ': ' + failIssues;
+      entry.steps[0].detail = _t('Không hợp lệ', 'Invalid') + ': ' + failIssues;
       callback(false);
     }
   }, 100);
@@ -530,10 +530,10 @@ function _runStep2(entry, callback){
   }
 
   // Upload file for server-side hidden sheet reading
-  var fd = new FormData();
+  var fd = new FormĐạta();
   fd.append('file', entry.file);
 
-  _apiCallFormData('upload_read_hidden_sheet', fd).then(function(data){
+  _apiCallFormĐạta('upload_read_hidden_sheet', fd).then(function(data){
     if(!data || !data.ok){
       // No hidden sheet found
       entry.steps[1].status = 'fail';
@@ -573,7 +573,7 @@ function _runStep2(entry, callback){
     entry.allocationId = sheet.allocation_id || null;
 
     entry.steps[1].status = 'pass';
-    entry.steps[1].detail = _t('Xac minh thanh cong', 'Verification passed') +
+    entry.steps[1].detail = _t('Xác minh thành công', 'Verification passed') +
       ' — ' + _escHtml(sheet.form_code || '') + ' ' + _escHtml(sheet.form_revision || '');
     callback(true);
 
@@ -624,7 +624,7 @@ function _runStep3(entry, callback){
     if(!data || !data.ok){
       entry.steps[2].status = 'fail';
       entry.steps[2].detail = _t(
-        'Khong tim thay ban ghi cap phat',
+        'Khong tim thay bản ghi cap phat',
         'Allocation record not found'
       );
       callback(false, false);
@@ -651,7 +651,7 @@ function _runStep3(entry, callback){
       entry.versionInfo = { currentVersion: currentVersion };
       entry.steps[2].status = 'warn';
       entry.steps[2].detail = _t(
-        'Da nop truoc do la V' + currentVersion + '. Day se la V' + (currentVersion + 1),
+        'Đã nộp truoc do la V' + currentVersion + '. Day se la V' + (currentVersion + 1),
         'Already submitted as V' + currentVersion + '. This will be V' + (currentVersion + 1)
       );
       callback(true, true);
@@ -661,7 +661,7 @@ function _runStep3(entry, callback){
     // Valid states for submission
     if(status === 'allocated' || status === 'form_downloaded'){
       entry.steps[2].status = 'pass';
-      entry.steps[2].detail = _t('Hop le', 'Valid') +
+      entry.steps[2].detail = _t('Hợp lệ', 'Valid') +
         ' — ' + _escHtml(alloc.record_id || alloc.recordId || '') +
         ' (' + _escHtml(alloc.record_type || alloc.recordType || '') + ')';
       callback(true, false);
@@ -671,7 +671,7 @@ function _runStep3(entry, callback){
     // Closed or unknown
     entry.steps[2].status = 'fail';
     entry.steps[2].detail = _t(
-      'Trang thai cap phat khong hop le: ' + status,
+      'Trạng thái cap phat khong hop le: ' + status,
       'Invalid allocation status: ' + status
     );
     callback(false, false);
@@ -737,11 +737,11 @@ function _updateSubmitArea(){
     var warnCount = _files.filter(function(f){ return f.overallStatus === 'warn' && !f.confirmed; }).length;
 
     if(pendingCount > 0){
-      count.textContent = _t('Dang xac minh...', 'Verifying...');
+      count.textContent = _t('Đang xác minh...', 'Verifying...');
     } else if(warnCount > 0){
       count.textContent = _t(warnCount + ' file can xac nhan', warnCount + ' file(s) need confirmation');
     } else {
-      count.textContent = _t('Khong co file hop le de nop', 'No valid files to submit');
+      count.textContent = _t('Không có file hợp lệ để nộp', 'No valid files to submit');
     }
   }
 }
@@ -787,7 +787,7 @@ function _submitSingleFile(entry, onDone){
   entry.overallStatus = 'loading';
   _updateFileCard(entry);
 
-  var fd = new FormData();
+  var fd = new FormĐạta();
   fd.append('file', entry.file);
   if(entry.allocationId){
     fd.append('allocation_id', entry.allocationId);
@@ -802,7 +802,7 @@ function _submitSingleFile(entry, onDone){
   if(entry.allocationId && typeof AllocationTracker !== 'undefined' && AllocationTracker.receiveUpload){
     promise = AllocationTracker.receiveUpload(entry.allocationId, entry.file);
   } else {
-    promise = _apiCallFormData('upload_submit', fd);
+    promise = _apiCallFormĐạta('upload_submit', fd);
   }
 
   promise.then(function(data){
@@ -814,7 +814,7 @@ function _submitSingleFile(entry, onDone){
       var version = data.version || (entry.versionInfo ? entry.versionInfo.currentVersion + 1 : 1);
 
       _showToast(_t(
-        'Da nop thanh cong: ' + entry.name + ' (V' + version + ')' + (path ? ' -> ' + path : ''),
+        'Đã nộp thanh cong: ' + entry.name + ' (V' + version + ')' + (path ? ' -> ' + path : ''),
         'Successfully submitted: ' + entry.name + ' (V' + version + ')' + (path ? ' -> ' + path : '')
       ), 'success');
     } else {
@@ -830,7 +830,7 @@ function _submitSingleFile(entry, onDone){
     entry.overallStatus = 'rejected';
     _updateFileCard(entry);
     _showToast(_t(
-      'Loi mang khi nop: ' + entry.name,
+      'Lỗi mạng khi nop: ' + entry.name,
       'Network error submitting: ' + entry.name
     ), 'error');
     if(onDone) onDone();
@@ -871,40 +871,40 @@ function _renderHistoryFilters(){
 
   // Form code filter
   h += '<div class="uv-hf-field">';
-  h += '<label class="uv-hf-label">' + _t('Ma form', 'Form Code') + '</label>';
+  h += '<label class="uv-hf-label">' + _t('Mã form', 'Form Code') + '</label>';
   h += '<input type="text" class="uv-hf-input" id="' + _containerId + '-hf-formcode" placeholder="FRM-..." ';
   h += 'value="' + _escHtml(_historyFilters.formCode || '') + '">';
   h += '</div>';
 
-  // Date from
+  // Đạte from
   h += '<div class="uv-hf-field">';
-  h += '<label class="uv-hf-label">' + _t('Tu ngay', 'From date') + '</label>';
+  h += '<label class="uv-hf-label">' + _t('Từ ngày', 'From date') + '</label>';
   h += '<input type="date" class="uv-hf-input" id="' + _containerId + '-hf-datefrom" ';
   h += 'value="' + _escHtml(_historyFilters.dateFrom || '') + '">';
   h += '</div>';
 
-  // Date to
+  // Đạte to
   h += '<div class="uv-hf-field">';
-  h += '<label class="uv-hf-label">' + _t('Den ngay', 'To date') + '</label>';
+  h += '<label class="uv-hf-label">' + _t('Đến ngày', 'To date') + '</label>';
   h += '<input type="date" class="uv-hf-input" id="' + _containerId + '-hf-dateto" ';
   h += 'value="' + _escHtml(_historyFilters.dateTo || '') + '">';
   h += '</div>';
 
   // Status filter
   h += '<div class="uv-hf-field">';
-  h += '<label class="uv-hf-label">' + _t('Trang thai', 'Status') + '</label>';
+  h += '<label class="uv-hf-label">' + _t('Trạng thái', 'Status') + '</label>';
   h += '<select class="uv-hf-input" id="' + _containerId + '-hf-status">';
-  h += '<option value="">' + _t('Tat ca', 'All') + '</option>';
-  h += '<option value="received"' + (_historyFilters.status === 'received' ? ' selected' : '') + '>' + _t('Da nhan', 'Received') + '</option>';
-  h += '<option value="submitted"' + (_historyFilters.status === 'submitted' ? ' selected' : '') + '>' + _t('Da nop', 'Submitted') + '</option>';
-  h += '<option value="rejected"' + (_historyFilters.status === 'rejected' ? ' selected' : '') + '>' + _t('Tu choi', 'Rejected') + '</option>';
+  h += '<option value="">' + _t('Tất cả', 'All') + '</option>';
+  h += '<option value="received"' + (_historyFilters.status === 'received' ? ' selected' : '') + '>' + _t('Đã nhận', 'Received') + '</option>';
+  h += '<option value="submitted"' + (_historyFilters.status === 'submitted' ? ' selected' : '') + '>' + _t('Đã nộp', 'Submitted') + '</option>';
+  h += '<option value="rejected"' + (_historyFilters.status === 'rejected' ? ' selected' : '') + '>' + _t('Từ chối', 'Rejected') + '</option>';
   h += '</select>';
   h += '</div>';
 
   // Search button
   h += '<div class="uv-hf-field uv-hf-actions">';
   h += '<button type="button" class="uv-hf-btn" id="' + _containerId + '-hf-search">' + _t('Tim', 'Search') + '</button>';
-  h += '<button type="button" class="uv-hf-btn uv-hf-btn-reset" id="' + _containerId + '-hf-reset">' + _t('Dat lai', 'Reset') + '</button>';
+  h += '<button type="button" class="uv-hf-btn uv-hf-btn-reset" id="' + _containerId + '-hf-reset">' + _t('Đạt lai', 'Reset') + '</button>';
   h += '</div>';
 
   h += '</div>';
@@ -939,7 +939,7 @@ function _loadUploadHistory(){
   var tableContainer = document.getElementById(_containerId + '-history-table');
   if(!tableContainer) return;
 
-  tableContainer.innerHTML = '<div class="uv-loading"><div class="uv-spinner-sm"></div> ' + _t('Dang tai...', 'Loading...') + '</div>';
+  tableContainer.innerHTML = '<div class="uv-loading"><div class="uv-spinner-sm"></div> ' + _t('Đang tải...', 'Loading...') + '</div>';
 
   var payload = { page: _historyPage, page_size: 15 };
   if(_historyFilters.formCode) payload.form_code = _historyFilters.formCode;
@@ -949,7 +949,7 @@ function _loadUploadHistory(){
 
   _apiCall('upload_history', payload).then(function(data){
     if(!data || !data.ok){
-      tableContainer.innerHTML = '<div class="uv-empty">' + _t('Khong the tai lich su', 'Could not load history') + '</div>';
+      tableContainer.innerHTML = '<div class="uv-empty">' + _t('Không thể tải lịch sử', 'Could not load history') + '</div>';
       return;
     }
 
@@ -959,14 +959,14 @@ function _loadUploadHistory(){
     if(entries.length === 0){
       tableContainer.innerHTML = '<div class="uv-empty">' +
         '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' +
-        '<p>' + _t('Chua co lich su upload', 'No upload history yet') + '</p>' +
+        '<p>' + _t('Chưa có lịch sử upload', 'No upload history yet') + '</p>' +
         '</div>';
       return;
     }
 
     _renderHistoryTable(entries, totalPages, tableContainer);
   }).catch(function(){
-    tableContainer.innerHTML = '<div class="uv-empty">' + _t('Loi tai lich su', 'Error loading history') + '</div>';
+    tableContainer.innerHTML = '<div class="uv-empty">' + _t('Lỗi tải lịch sử', 'Error loading history') + '</div>';
   });
 }
 
@@ -975,12 +975,12 @@ function _renderHistoryTable(entries, totalPages, container){
   h += '<div class="uv-htable-wrap">';
   h += '<table class="uv-htable">';
   h += '<thead><tr>';
-  h += '<th>' + _t('Ten file', 'Filename') + '</th>';
-  h += '<th>' + _t('Ma form', 'Form Code') + '</th>';
-  h += '<th>' + _t('Phien ban', 'Version') + '</th>';
-  h += '<th>' + _t('Thoi gian', 'Timestamp') + '</th>';
-  h += '<th>' + _t('Trang thai', 'Status') + '</th>';
-  h += '<th>' + _t('Nguoi nop', 'Uploaded By') + '</th>';
+  h += '<th>' + _t('Tên file', 'Filename') + '</th>';
+  h += '<th>' + _t('Mã form', 'Form Code') + '</th>';
+  h += '<th>' + _t('Phiên bản', 'Version') + '</th>';
+  h += '<th>' + _t('Thời gian', 'Timestamp') + '</th>';
+  h += '<th>' + _t('Trạng thái', 'Status') + '</th>';
+  h += '<th>' + _t('Người nộp', 'Uploaded By') + '</th>';
   h += '</tr></thead>';
   h += '<tbody>';
 
@@ -993,7 +993,7 @@ function _renderHistoryTable(entries, totalPages, container){
     h += '<code>' + _escHtml(_truncate(e.filename || '-', 40)) + '</code></td>';
     h += '<td><span class="uv-htable-formcode">' + _escHtml(e.form_code || e.formCode || '-') + '</span></td>';
     h += '<td class="uv-htable-center">V' + (e.version || 1) + '</td>';
-    h += '<td class="uv-htable-date">' + _escHtml(_formatDate(e.upload_timestamp || e.uploaded_at || e.created_at || '')) + '</td>';
+    h += '<td class="uv-htable-date">' + _escHtml(_formatĐạte(e.upload_timestamp || e.uploaded_at || e.created_at || '')) + '</td>';
     h += '<td><span class="uv-htable-status" style="color:' + statusColor.color + ';background:' + statusColor.bg + '">';
     h += _escHtml(e.status || e.verification_status || '-') + '</span></td>';
     h += '<td>' + _escHtml(e.uploaded_by || e.user || '-') + '</td>';
@@ -1007,7 +1007,7 @@ function _renderHistoryTable(entries, totalPages, container){
   if(totalPages > 1){
     h += '<div class="uv-hpagination">';
     h += '<button type="button" class="uv-hpage-btn" data-page="' + (_historyPage - 1) + '"' + (_historyPage <= 1 ? ' disabled' : '') + '>';
-    h += '&laquo; ' + _t('Truoc', 'Prev') + '</button>';
+    h += '&laquo; ' + _t('Trước', 'Prev') + '</button>';
 
     var startP = Math.max(1, _historyPage - 2);
     var endP = Math.min(totalPages, _historyPage + 2);

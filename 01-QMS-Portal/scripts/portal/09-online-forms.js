@@ -88,7 +88,7 @@ function _renderFormHub(schemas, page){
   h += '<div class="fh-hero-kicker">HESEM QMS &mdash; ANNEX-137 Compliant</div>';
   h += '<h1>' + _t('Kiểm soát chứng cứ &mdash; Trung tâm quản lý biểu mẫu','Evidence Control &mdash; Central Form Management') + '</h1>';
   h += '<p>' + _t(
-    'Tao ho so, xin ma, dien form online, tai Excel, upload evidence &mdash; tat ca tai day. Ten file tu dong theo ANNEX-137.',
+    'Tạo hồ sơ, xin mã, điền form online, tải Excel, upload evidence &mdash; tất cả tại đây. Tên file tự động theo ANNEX-137.',
     'Create records, request IDs, fill forms online, download Excel, upload evidence &mdash; all in one place. Filenames auto-generated per ANNEX-137.'
   ) + '</p>';
   h += '</div>';
@@ -271,7 +271,7 @@ function _renderFormCards(schemas){
   catOrder.forEach(function(cat){
     if(!groups[cat] || groups[cat].length === 0) return;
     var cfg = FORM_COLORS[cat] || {bg:'#f8f9fa', border:'#adb5bd', icon:'&#x1F4C4;', label:cat, labelEn:cat};
-    var freqLabel = {daily:'Hang ngay',per_shift:'Moi ca',per_event:'Moi su kien',weekly:'Hang tuan',monthly:'Hang thang',periodic:'Dinh ky'};
+    var freqLabel = {daily:'Hàng ngày',per_shift:'Mỗi ca',per_event:'Mỗi sự kiện',weekly:'Hàng tuần',monthly:'Hàng tháng',periodic:'Định kỳ'};
 
     h += '<div class="forms-group">';
     h += '<h2 class="forms-group-title"><span class="forms-group-icon">' + cfg.icon + '</span> ' + _t(cfg.label, cfg.labelEn) + ' <span style="font-size:11px;color:#64748b;font-weight:400;margin-left:4px">(' + groups[cat].length + ')</span></h2>';
@@ -566,13 +566,13 @@ function _applyDefaults(schema){
   (schema.fields || []).forEach(function(field){
     if(field.default === 'today' && field.type === 'date'){
       var el = document.getElementById('of-' + field.id);
-      if(el) el.value = new Date().toISOString().slice(0,10);
+      if(el) el.value = new Đạte().toISOString().slice(0,10);
     }
     if(field.type === 'group' && field.fields){
       field.fields.forEach(function(sub){
         if(sub.default === 'today' && sub.type === 'date'){
           var el2 = document.getElementById('of-' + sub.id);
-          if(el2) el2.value = new Date().toISOString().slice(0,10);
+          if(el2) el2.value = new Đạte().toISOString().slice(0,10);
         }
       });
     }
@@ -582,12 +582,12 @@ function _applyDefaults(schema){
 // ===================================================================
 // FORM DATA COLLECTION & SUBMIT (shared by Tab 2 + direct fill)
 // ===================================================================
-window._collectFormData = function(schema){
+window._collectFormĐạta = function(schema){
   var data = {};
   var form = document.getElementById('online-form-body');
   if(!form) return data;
   (schema.fields || []).forEach(function(field){
-    if(field.type === 'table') data[field.id] = _collectTableData(field);
+    if(field.type === 'table') data[field.id] = _collectTableĐạta(field);
     else if(field.type === 'group'){
       (field.fields||[]).forEach(function(sub){
         var el = document.getElementById('of-' + sub.id);
@@ -602,24 +602,24 @@ window._collectFormData = function(schema){
     }
   });
   data.submitted_by = (typeof currentUser !== 'undefined' && currentUser) ? (currentUser.display_name || currentUser.username) : 'unknown';
-  data.submitted_at = new Date().toISOString();
-  data.entry_id = schema.form_code + '-' + Date.now();
+  data.submitted_at = new Đạte().toISOString();
+  data.entry_id = schema.form_code + '-' + Đạte.now();
   data.form_code = schema.form_code;
   return data;
 };
 
-function _collectTableData(field){
+function _collectTableĐạta(field){
   var rows = [];
   var tbody = document.getElementById('of-table-' + field.id + '-body');
   if(!tbody) return rows;
   tbody.querySelectorAll('tr').forEach(function(tr){
     var row = {};
-    var hasData = false;
+    var hasĐạta = false;
     (field.columns||[]).forEach(function(col){
       var input = tr.querySelector('[name*=".' + col.id + '"]');
-      if(input){ row[col.id] = input.value; if(input.value) hasData = true; }
+      if(input){ row[col.id] = input.value; if(input.value) hasĐạta = true; }
     });
-    if(hasData) rows.push(row);
+    if(hasĐạta) rows.push(row);
   });
   return rows;
 }
@@ -628,7 +628,7 @@ window._onlineFormSubmit = function(e){
   if(e) e.preventDefault();
   var schema = _formSchemas[_currentForm];
   if(!schema) return false;
-  var data = _collectFormData(schema);
+  var data = _collectFormĐạta(schema);
   var missing = [];
   (schema.fields || []).forEach(function(f){
     if(f.required && f.type !== 'table' && f.type !== 'group'){
@@ -681,13 +681,13 @@ window._onlineFormSubmit = function(e){
 window._onlineFormSaveDraft = function(){
   var schema = _formSchemas[_currentForm];
   if(!schema) return;
-  var data = _collectFormData(schema);
+  var data = _collectFormĐạta(schema);
   data._draft = true;
-  try{ localStorage.setItem('qms_form_draft_' + _currentForm, JSON.stringify(data)); _showFormToast(_t('Da luu nhap','Draft saved'), 'success'); }catch(e){}
+  try{ localStorage.setItem('qms_form_draft_' + _currentForm, JSON.stringify(data)); _showFormToast(_t('Đã lưu nháp','Draft saved'), 'success'); }catch(e){}
 };
 
 window._onlineFormClear = function(){
-  if(_formDirty && !confirm(_t('Huy thay doi?','Discard changes?'))) return;
+  if(_formDirty && !confirm(_t('Hủy thay doi?','Discard changes?'))) return;
   var schema = _formSchemas[_currentForm];
   if(!schema) return;
   var page = document.getElementById('page-forms');
@@ -698,10 +698,10 @@ function _renderRecentEntries(schema){
   var entries = _formEntries[schema.form_code] || [];
   if(entries.length === 0) return '';
   var html = '<div class="form-recent">';
-  html += '<h2 class="form-recent-title">&#x1F4CA; ' + _t('Ban ghi gan day','Recent Entries') + ' <span class="form-recent-count">' + entries.length + '</span></h2>';
+  html += '<h2 class="form-recent-title">&#x1F4CA; ' + _t('Bản ghi gan day','Recent Entries') + ' <span class="form-recent-count">' + entries.length + '</span></h2>';
   html += '<div class="form-recent-list">';
   entries.slice(0, 10).forEach(function(entry, i){
-    var dt = entry.submitted_at ? new Date(entry.submitted_at).toLocaleString('vi-VN') : '&mdash;';
+    var dt = entry.submitted_at ? new Đạte(entry.submitted_at).toLocaleString('vi-VN') : '&mdash;';
     html += '<div class="form-recent-item">';
     html += '<div class="form-recent-id">' + _escHtml(entry.entry_id||'#'+(i+1)) + '</div>';
     html += '<div class="form-recent-info"><span>' + _escHtml(entry.submitted_by||'') + '</span><span>' + dt + '</span></div>';
@@ -761,7 +761,7 @@ window._copyRecordFilename = function(){
 function _copyToClipboard(text){
   if(navigator.clipboard){
     navigator.clipboard.writeText(text).then(function(){
-      _showFormToast(_t('Da sao chep!','Copied!'), 'success');
+      _showFormToast(_t('Đã sao chép!','Copied!'), 'success');
     });
   } else {
     var ta = document.createElement('textarea');
@@ -772,7 +772,7 @@ function _copyToClipboard(text){
     ta.select();
     try{ document.execCommand('copy'); }catch(e){}
     document.body.removeChild(ta);
-    _showFormToast(_t('Da sao chep!','Copied!'), 'success');
+    _showFormToast(_t('Đã sao chép!','Copied!'), 'success');
   }
 }
 window._fhCopyToClipboard = _copyToClipboard;
