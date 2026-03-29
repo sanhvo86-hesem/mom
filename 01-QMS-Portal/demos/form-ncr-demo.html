@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FRM-631 — Non-Conformity Report | HESEM QMS</title>
+<style>
+/* ════════════════════════════════════════════════════
+   HESEM QMS — FORM DESIGN SYSTEM TOKENS
+   ════════════════════════════════════════════════════ */
+:root {
+  /* Brand */
+  --form-brand: #0c2d48;
+  --form-brand-hover: #0a2540;
+  --form-brand-light: #e3f2fd;
+  --form-primary: #1565c0;
+  --form-primary-hover: #0d47a1;
+  --form-primary-light: #dbeafe;
+  --form-primary-focus-ring: rgba(21,101,192,0.12);
+
+  /* Surfaces */
+  --form-bg: #f8fafc;
+  --form-surface: #ffffff;
+  --form-surface-raised: #ffffff;
+  --form-surface-sunken: #f1f5f9;
+  --form-surface-hover: #f8fafc;
+
+  /* Borders */
+  --form-border: #d1d5db;
+  --form-border-light: #e2e8f0;
+  --form-border-strong: #9ca3af;
+  --form-border-focus: #1565c0;
+
+  /* Text */
+  --form-text: #1e293b;
+  --form-text-secondary: #475569;
+  --form-text-tertiary: #64748b;
+  --form-text-disabled: #94a3b8;
+  --form-text-on-primary: #ffffff;
+
+  /* Status */
+  --form-success: #16a34a;
+  --form-success-light: #f0fdf4;
+  --form-success-border: #bbf7d0;
+  --form-warning: #d97706;
+  --form-warning-light: #fffbeb;
+  --form-warning-border: #fde68a;
+  --form-error: #dc2626;
+  --form-error-light: #fef2f2;
+  --form-error-border: #fecaca;
+  --form-info: #2563eb;
+  --form-info-light: #eff6ff;
+  --form-info-border: #bfdbfe;
+
+  /* Typography */
+  --form-font-family: 'Inter', -apple-system, 'Segoe UI', 'Noto Sans', 'Roboto', 'Arial', sans-serif;
+  --form-font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  --form-text-xs: 0.6875rem;
+  --form-text-sm: 0.75rem;
+  --form-text-base: 0.875rem;
+  --form-text-md: 0.9375rem;
+  --form-text-lg: 1.125rem;
+  --form-text-xl: 1.5rem;
+  --form-leading-tight: 1.25;
+  --form-leading-normal: 1.5;
+  --form-leading-relaxed: 1.625;
+  --form-weight-normal: 400;
+  --form-weight-medium: 500;
+  --form-weight-semibold: 600;
+  --form-weight-bold: 700;
+  --form-tracking-tight: -0.01em;
+  --form-tracking-normal: 0;
+  --form-tracking-wide: 0.025em;
+  --form-tracking-wider: 0.05em;
+  --form-tracking-widest: 0.1em;
+
+  /* Spacing */
+  --form-space-1: 0.25rem;
+  --form-space-2: 0.5rem;
+  --form-space-3: 0.75rem;
+  --form-space-4: 1rem;
+  --form-space-5: 1.25rem;
+  --form-space-6: 1.5rem;
+  --form-space-8: 2rem;
+  --form-space-10: 2.5rem;
+  --form-space-12: 3rem;
+
+  /* Shape */
+  --form-radius-sm: 4px;
+  --form-radius-md: 6px;
+  --form-radius-lg: 8px;
+  --form-radius-xl: 12px;
+  --form-radius-2xl: 16px;
+  --form-radius-full: 9999px;
+
+  /* Elevation */
+  --form-shadow-xs: 0 1px 2px rgba(15,23,42,0.04);
+  --form-shadow-sm: 0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
+  --form-shadow-md: 0 4px 6px -1px rgba(15,23,42,0.06), 0 2px 4px -2px rgba(15,23,42,0.04);
+  --form-shadow-lg: 0 10px 15px -3px rgba(15,23,42,0.06), 0 4px 6px -4px rgba(15,23,42,0.04);
+  --form-shadow-focus: 0 0 0 3px var(--form-primary-focus-ring);
+
+  /* Motion */
+  --form-duration-fast: 100ms;
+  --form-duration-normal: 150ms;
+  --form-duration-slow: 250ms;
+  --form-easing-default: cubic-bezier(0.2, 0, 0.38, 0.9);
+
+  /* Input */
+  --form-input-height-md: 2.5rem;
+  --form-input-padding-x: 0.75rem;
+  --form-input-padding-y: 0.5rem;
+  --form-input-font-size: var(--form-text-base);
+  --form-input-border-width: 1px;
+  --form-input-radius: var(--form-radius-md);
+  --form-label-font-size: var(--form-text-sm);
+  --form-label-weight: var(--form-weight-semibold);
+  --form-label-color: var(--form-text-secondary);
+  --form-label-gap: var(--form-space-1);
+  --form-helper-font-size: var(--form-text-xs);
+  --form-helper-gap: var(--form-space-1);
+  --form-field-gap: var(--form-space-5);
+  --form-section-gap: var(--form-space-8);
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --form-input-height-md: 2.75rem;
+    --form-input-padding-x: 1rem;
+    --form-input-font-size: 1rem;
+    --form-label-font-size: 0.8125rem;
+    --form-field-gap: 1.5rem;
+  }
+}
+
+/* ════════════════════════════════════════════════════
+   RESET & BASE
+   ════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--form-font-family);
+  font-size: var(--form-text-base);
+  line-height: var(--form-leading-normal);
+  color: var(--form-text);
+  background: var(--form-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding-bottom: 80px;
+}
+
+/* ════════════════════════════════════════════════════
+   FORM CONTAINER
+   ════════════════════════════════════════════════════ */
+.qf {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: var(--form-space-6) var(--form-space-4);
+}
+
+/* ════════════════════════════════════════════════════
+   FORM HEADER CARD
+   ════════════════════════════════════════════════════ */
+.qf-header {
+  background: linear-gradient(135deg, #0c2d48 0%, #133e68 48%, #1a5a94 100%);
+  border-radius: var(--form-radius-2xl);
+  padding: 0;
+  margin-bottom: var(--form-space-6);
+  box-shadow: var(--form-shadow-lg);
+  overflow: hidden;
+  color: #fff;
+}
+
+.qf-header-main {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--form-space-5);
+  align-items: center;
+  padding: var(--form-space-6) var(--form-space-8);
+}
+
+.qf-header-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--form-space-3);
+}
+
+.qf-logo-mark {
+  width: 48px;
+  height: 48px;
+  background: rgba(255,255,255,0.12);
+  border-radius: var(--form-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+.qf-logo-mark svg {
+  width: 32px;
+  height: 32px;
+  fill: #2099d5;
+}
+
+.qf-logo-text {
+  font-size: var(--form-text-xs);
+  font-weight: var(--form-weight-bold);
+  letter-spacing: var(--form-tracking-widest);
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+}
+
+.qf-logo-brand {
+  font-size: var(--form-text-md);
+  font-weight: var(--form-weight-bold);
+  color: #fff;
+  margin-top: 2px;
+}
+
+.qf-header-center {
+  text-align: center;
+}
+
+.qf-header-title-en {
+  font-size: var(--form-text-xl);
+  font-weight: var(--form-weight-bold);
+  letter-spacing: var(--form-tracking-tight);
+  line-height: var(--form-leading-tight);
+  color: #fff;
+}
+
+.qf-header-title-vi {
+  font-size: var(--form-text-base);
+  color: rgba(255,255,255,0.65);
+  margin-top: 4px;
+  font-weight: var(--form-weight-medium);
+}
+
+.qf-header-right {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: var(--form-space-2);
+  align-items: flex-end;
+}
+
+.qf-doc-code {
+  font-family: var(--form-font-mono);
+  font-size: var(--form-text-sm);
+  font-weight: var(--form-weight-bold);
+  color: #fff;
+  background: rgba(255,255,255,0.12);
+  padding: 3px 12px;
+  border-radius: var(--form-radius-sm);
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+.qf-doc-rev {
+  font-size: var(--form-text-xs);
+  font-weight: var(--form-weight-semibold);
+  color: rgba(255,255,255,0.55);
+}
+
+.qf-record-id {
+  font-family: var(--form-font-mono);
+  font-size: var(--form-text-sm);
+  font-weight: var(--form-weight-bold);
+  color: #fbbf24;
+  background: rgba(251,191,36,0.1);
+  padding: 3px 12px;
+  border-radius: var(--form-radius-sm);
+  border: 1px solid rgba(251,191,36,0.2);
+}
+
+/* Status Stepper */
+.qf-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: var(--form-space-3) var(--form-space-8);
+  background: rgba(0,0,0,0.15);
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.qf-step {
+  display: flex;
+  align-items: center;
+  gap: var(--form-space-2);
+  padding: var(--form-space-2) var(--form-space-4);
+  font-size: var(--form-text-xs);
+  font-weight: var(--form-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--form-tracking-wider);
+  color: rgba(255,255,255,0.35);
+  position: relative;
+}
+
+.qf-step-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(255,255,255,0.1);
+  border: 1.5px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.4);
+}
+
+.qf-step.active { color: #fff; }
+.qf-step.active .qf-step-num {
+  background: #1565c0;
+  border-color: #1565c0;
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(21,101,192,0.3);
+}
+
+.qf-step.complete { color: rgba(255,255,255,0.55); }
+.qf-step.complete .qf-step-num {
+  background: #16a34a;
+  border-color: #16a34a;
+  color: #fff;
+}
+
+.qf-step-line {
+  width: 32px;
+  height: 2px;
+  background: rgba(255,255,255,0.12);
+  flex-shrink: 0;
+}
+
+.qf-step-line.done { background: rgba(22,163,74,0.5); }
+
+/* ════════════════════════════════════════════════════
+   SECTIONS
+   ════════════════════════════════════════════════════ */
+.qf-section {
+  background: var(--form-surface);
+  border: 1px solid var(--form-border-light);
+  border-radius: var(--form-radius-xl);
+  margin-bottom: var(--form-space-6);
+  box-shadow: var(--form-shadow-sm);
+  overflow: hidden;
+  transition: box-shadow var(--form-duration-slow) var(--form-easing-default);
+}
+
+.qf-section:hover {
+  box-shadow: var(--form-shadow-md);
+}
+
+.qf-section-header {
+  padding: var(--form-space-4) var(--form-space-6);
+  border-bottom: 1px solid var(--form-border-light);
+  background: var(--form-surface);
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.qf-section-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: var(--form-radius-xl) var(--form-radius-xl) 0 0;
+}
+
+.qf-section--blue .qf-section-header::before { background: var(--form-primary); }
+.qf-section--amber .qf-section-header::before { background: var(--form-warning); }
+.qf-section--red .qf-section-header::before { background: var(--form-error); }
+.qf-section--purple .qf-section-header::before { background: #7c3aed; }
+.qf-section--green .qf-section-header::before { background: var(--form-success); }
+
+.qf-section-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--form-space-3);
+}
+
+.qf-section-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: var(--form-text-xs);
+  font-weight: var(--form-weight-bold);
+  flex-shrink: 0;
+}
+
+.qf-section--blue .qf-section-num { background: var(--form-primary-light); color: var(--form-primary); }
+.qf-section--amber .qf-section-num { background: var(--form-warning-light); color: var(--form-warning); }
+.qf-section--red .qf-section-num { background: var(--form-error-light); color: var(--form-error); }
+.qf-section--purple .qf-section-num { background: #f3e8ff; color: #7c3aed; }
+.qf-section--green .qf-section-num { background: var(--form-success-light); color: var(--form-success); }
+
+.qf-section-title-text h3 {
+  font-size: var(--form-text-md);
+  font-weight: var(--form-weight-bold);
+  color: var(--form-brand);
+  margin: 0;
+  line-height: var(--form-leading-tight);
+}
+
+.qf-section-subtitle {
+  font-size: var(--form-text-sm);
+  color: var(--form-text-tertiary);
+  margin: 2px 0 0;
+}
+
+.qf-section-toggle {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--form-text-tertiary);
+  transition: transform var(--form-duration-normal) var(--form-easing-default);
+}
+
+.qf-section.collapsed .qf-section-toggle { transform: rotate(-90deg); }
+.qf-section.collapsed .qf-section-body { display: none; }
+
+.qf-section-body {
+  padding: var(--form-space-6);
+}
+
+/* ════════════════════════════════════════════════════
+   GRID LAYOUTS
+   ════════════════════════════════════════════════════ */
+.qf-grid {
+  display: grid;
+  gap: var(--form-field-gap) var(--form-space-4);
+}
+.qf-grid--2 { grid-template-columns: 1fr 1fr; }
+.qf-grid--3 { grid-template-columns: 1fr 1fr 1fr; }
+.qf-grid--2-1 { grid-template-columns: 2fr 1fr; }
+.qf-grid-full { grid-column: 1 / -1; }
+
+@media (max-width: 768px) {
+  .qf-grid--2, .qf-grid--3, .qf-grid--2-1 { grid-template-columns: 1fr; }
+  .qf-header-main { grid-template-columns: 1fr; text-align: center; }
+  .qf-header-logo { justify-content: center; }
+  .qf-header-right { align-items: center; text-align: center; }
+  .qf-status-bar { flex-wrap: wrap; gap: var(--form-space-1); }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .qf-grid--3 { grid-template-columns: 1fr 1fr; }
+}
+
+/* ════════════════════════════════════════════════════
+   FIELDS — Labels
+   ════════════════════════════════════════════════════ */
+.qf-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.qf-label {
+  display: flex;
+  align-items: baseline;
+  gap: var(--form-space-1);
+  font-size: var(--form-label-font-size);
+  font-weight: var(--form-label-weight);
+  color: var(--form-label-color);
+  letter-spacing: var(--form-tracking-wide);
+  text-transform: uppercase;
+  margin-bottom: var(--form-label-gap);
+  line-height: var(--form-leading-normal);
+}
+
+.qf-label-vi {
+  display: block;
+  font-size: var(--form-text-xs);
+  font-weight: var(--form-weight-normal);
+  color: var(--form-text-tertiary);
+  text-transform: none;
+  letter-spacing: normal;
+  margin-bottom: 4px;
+}
+
+.qf-required {
+  color: var(--form-error);
+  font-weight: var(--form-weight-bold);
+}
+
+/* ════════════════════════════════════════════════════
+   FIELDS — Inputs
+   ════════════════════════════════════════════════════ */
+.qf-input,
+.qf-select,
+.qf-textarea {
+  width: 100%;
+  height: var(--form-input-height-md);
+  padding: var(--form-input-padding-y) var(--form-input-padding-x);
+  font-family: var(--form-font-family);
+  font-size: var(--form-input-font-size);
+  color: var(--form-text);
+  background: var(--form-surface);
+  border: var(--form-input-border-width) solid var(--form-border);
+  border-radius: var(--form-input-radius);
+  box-shadow: var(--form-shadow-xs);
+  transition: border-color var(--form-duration-normal) var(--form-easing-default),
+              box-shadow var(--form-duration-normal) var(--form-easing-default);
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.qf-textarea {
+  height: auto;
+  min-height: 80px;
+  resize: vertical;
+  line-height: var(--form-leading-relaxed);
+}
+
+.qf-input::placeholder,
+.qf-textarea::placeholder {
+  color: var(--form-text-disabled);
+}
+
+.qf-input:focus,
+.qf-select:focus,
+.qf-textarea:focus {
+  outline: none;
+  border-color: var(--form-border-focus);
+  box-shadow: var(--form-shadow-focus);
+}
+
+.qf-input:hover:not(:focus):not(:disabled),
+.qf-select:hover:not(:focus):not(:disabled),
+.qf-textarea:hover:not(:focus):not(:disabled) {
+  border-color: var(--form-border-strong);
+}
+
+.qf-select {
+  padding-right: 2.5rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+  cursor: pointer;
+}
+
+/* Error state */
+.qf-field.is-error .qf-input,
+.qf-field.is-error .qf-select,
+.qf-field.is-error .qf-textarea {
+  border-color: var(--form-error);
+  background-color: var(--form-error-light);
+}
+.qf-field.is-error .qf-input:focus,
+.qf-field.is-error .qf-select:focus,
+.qf-field.is-error .qf-textarea:focus {
+  box-shadow: 0 0 0 3px rgba(220,38,38,0.12);
+}
+
+.qf-error-msg {
+  font-size: var(--form-helper-font-size);
+  color: var(--form-error);
+  font-weight: var(--form-weight-medium);
+  margin-top: var(--form-helper-gap);
+  display: none;
+  align-items: center;
+  gap: var(--form-space-1);
+}
+
+.qf-field.is-error .qf-error-msg { display: flex; }
+
+.qf-error-msg::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23dc2626'%3E%3Cpath d='M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2z'/%3E%3C/svg%3E") no-repeat center;
+  background-size: contain;
+  flex-shrink: 0;
+}
+
+.qf-helper {
+  font-size: var(--form-helper-font-size);
+  color: var(--form-text-tertiary);
+  margin-top: var(--form-helper-gap);
+}
+
+/* ════════════════════════════════════════════════════
+   COLOR-CODED SELECT OPTIONS
+   ════════════════════════════════════════════════════ */
+.qf-select option[data-color="blue"]   { color: #1565c0; }
+.qf-select option[data-color="amber"]  { color: #d97706; }
+.qf-select option[data-color="purple"] { color: #7c3aed; }
+.qf-select option[data-color="gray"]   { color: #64748b; }
+.qf-select option[data-color="orange"] { color: #ea580c; }
+.qf-select option[data-color="green"]  { color: #16a34a; }
+.qf-select option[data-color="red"]    { color: #dc2626; }
+
+/* Severity indicator dot next to select */
+.qf-severity-wrap {
+  position: relative;
+}
+
+.qf-severity-dot {
+  position: absolute;
+  right: 36px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  pointer-events: none;
+  transition: background var(--form-duration-normal);
+}
+
+.qf-severity-dot.sev-minor    { background: #16a34a; }
+.qf-severity-dot.sev-major    { background: #d97706; }
+.qf-severity-dot.sev-critical { background: #dc2626; box-shadow: 0 0 0 3px rgba(220,38,38,0.15); }
+
+/* ════════════════════════════════════════════════════
+   6M ROOT CAUSE RADIO CARDS
+   ════════════════════════════════════════════════════ */
+.qf-radio-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--form-space-3);
+}
+
+@media (max-width: 640px) {
+  .qf-radio-cards { grid-template-columns: repeat(2, 1fr); }
+}
+
+.qf-radio-card {
+  position: relative;
+  cursor: pointer;
+}
+
+.qf-radio-card input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.qf-radio-card-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--form-space-2);
+  padding: var(--form-space-4) var(--form-space-3);
+  border: 2px solid var(--form-border-light);
+  border-radius: var(--form-radius-lg);
+  background: var(--form-surface);
+  transition: all var(--form-duration-normal) var(--form-easing-default);
+  text-align: center;
+}
+
+.qf-radio-card-inner:hover {
+  border-color: var(--form-border-strong);
+  background: var(--form-surface-sunken);
+}
+
+.qf-radio-card input:checked + .qf-radio-card-inner {
+  border-color: var(--form-primary);
+  background: var(--form-primary-light);
+  box-shadow: 0 0 0 3px var(--form-primary-focus-ring);
+}
+
+.qf-radio-card input:focus-visible + .qf-radio-card-inner {
+  outline: 2px solid var(--form-primary);
+  outline-offset: 2px;
+}
+
+.qf-radio-card-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.qf-radio-card-label {
+  font-size: var(--form-text-sm);
+  font-weight: var(--form-weight-semibold);
+  color: var(--form-text);
+}
+
+.qf-radio-card-label-vi {
+  font-size: var(--form-text-xs);
+  color: var(--form-text-tertiary);
+  font-weight: var(--form-weight-normal);
+}
+
+/* ════════════════════════════════════════════════════
+   FILE DROP ZONE
+   ════════════════════════════════════════════════════ */
+.qf-file-drop {
+  border: 2px dashed var(--form-border);
+  border-radius: var(--form-radius-lg);
+  padding: var(--form-space-8) var(--form-space-4);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--form-duration-normal) var(--form-easing-default);
+  background: var(--form-surface);
+}
+
+.qf-file-drop:hover,
+.qf-file-drop.is-dragover {
+  border-color: var(--form-primary);
+  background: var(--form-primary-light);
+}
+
+.qf-file-drop-icon {
+  font-size: 2.5rem;
+  color: var(--form-text-tertiary);
+  margin-bottom: var(--form-space-2);
+}
+
+.qf-file-drop-text {
+  font-size: var(--form-text-base);
+  color: var(--form-text-secondary);
+  font-weight: var(--form-weight-medium);
+}
+
+.qf-file-drop-text a {
+  color: var(--form-primary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.qf-file-drop-hint {
+  font-size: var(--form-text-xs);
+  color: var(--form-text-tertiary);
+  margin-top: var(--form-space-1);
+}
+
+/* ════════════════════════════════════════════════════
+   SIGNATURE BLOCKS
+   ════════════════════════════════════════════════════ */
+.qf-signature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--form-space-4);
+}
+
+@media (max-width: 768px) {
+  .qf-signature-grid { grid-template-columns: 1fr; }
+}
+
+.qf-signature-block {
+  text-align: center;
+  padding: var(--form-space-5);
+  border: 1px dashed var(--form-border);
+  border-radius: var(--form-radius-lg);
+  background: var(--form-surface-sunken);
+}
+
+.qf-signature-title {
+  font-size: var(--form-text-xs);
+  font-weight: var(--form-weight-bold);
+  color: var(--form-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--form-tracking-wider);
+  margin-bottom: var(--form-space-3);
+}
+
+.qf-signature-pad {
+  width: 100%;
+  height: 64px;
+  border: 1px solid var(--form-border-light);
+  border-radius: var(--form-radius-md);
+  background: var(--form-surface);
+  margin-bottom: var(--form-space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--form-text-disabled);
+  font-size: var(--form-text-xs);
+}
+
+.qf-signature-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--form-space-2);
+}
+
+.qf-signature-fields input {
+  width: 100%;
+  height: 32px;
+  padding: 4px 10px;
+  font-family: var(--form-font-family);
+  font-size: var(--form-text-sm);
+  border: 1px solid var(--form-border-light);
+  border-radius: var(--form-radius-sm);
+  text-align: center;
+  background: var(--form-surface);
+}
+
+.qf-signature-fields input:focus {
+  outline: none;
+  border-color: var(--form-border-focus);
+  box-shadow: 0 0 0 2px var(--form-primary-focus-ring);
+}
+
+.qf-signature-fields input::placeholder {
+  color: var(--form-text-disabled);
+  font-size: var(--form-text-xs);
+}
+
+/* ════════════════════════════════════════════════════
+   LOOKUP INPUT
+   ════════════════════════════════════════════════════ */
+.qf-lookup-wrap {
+  position: relative;
+}
+
+.qf-lookup-wrap .qf-input {
+  padding-right: 40px;
+}
+
+.qf-lookup-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--form-text-tertiary);
+  pointer-events: none;
+  font-size: 16px;
+}
+
+/* ════════════════════════════════════════════════════
+   ACTION BAR (Sticky Bottom)
+   ════════════════════════════════════════════════════ */
+.qf-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: var(--form-space-3);
+  padding: var(--form-space-4) var(--form-space-6);
+  background: var(--form-surface);
+  border-top: 1px solid var(--form-border-light);
+  box-shadow: 0 -4px 16px rgba(15,23,42,0.08);
+}
+
+.qf-actions-inner {
+  max-width: 880px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--form-space-3);
+}
+
+.qf-actions-spacer { flex: 1; }
+
+.qf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--form-space-2);
+  height: var(--form-input-height-md);
+  padding: 0 var(--form-space-5);
+  font-family: var(--form-font-family);
+  font-size: var(--form-text-base);
+  font-weight: var(--form-weight-semibold);
+  line-height: 1;
+  border: none;
+  border-radius: var(--form-radius-md);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--form-duration-normal) var(--form-easing-default);
+}
+
+.qf-btn:focus-visible {
+  outline: 2px solid var(--form-primary);
+  outline-offset: 2px;
+}
+
+.qf-btn--primary {
+  background: #16a34a;
+  color: #fff;
+  min-width: 160px;
+}
+.qf-btn--primary:hover {
+  background: #15803d;
+  box-shadow: var(--form-shadow-md);
+  transform: translateY(-1px);
+}
+
+.qf-btn--secondary {
+  background: var(--form-surface);
+  color: var(--form-text);
+  border: 1px solid var(--form-border);
+}
+.qf-btn--secondary:hover {
+  background: var(--form-surface-sunken);
+  border-color: var(--form-border-strong);
+}
+
+.qf-btn--ghost {
+  background: transparent;
+  color: var(--form-text-secondary);
+}
+.qf-btn--ghost:hover {
+  background: var(--form-surface-sunken);
+  color: var(--form-text);
+}
+
+.qf-btn-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* ════════════════════════════════════════════════════
+   CALLOUT
+   ════════════════════════════════════════════════════ */
+.qf-callout {
+  display: flex;
+  gap: var(--form-space-3);
+  padding: var(--form-space-3) var(--form-space-4);
+  border-radius: var(--form-radius-lg);
+  font-size: var(--form-text-sm);
+  line-height: var(--form-leading-relaxed);
+  margin-bottom: var(--form-space-4);
+}
+
+.qf-callout--info {
+  background: var(--form-info-light);
+  border: 1px solid var(--form-info-border);
+  color: #1e40af;
+}
+
+.qf-callout-icon { font-size: 1.125rem; flex-shrink: 0; }
+
+/* ════════════════════════════════════════════════════
+   PRINT TOOLBAR
+   ════════════════════════════════════════════════════ */
+.qf-toolbar {
+  max-width: 880px;
+  margin: 0 auto var(--form-space-3);
+  padding: 0 var(--form-space-4);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--form-space-2);
+}
+
+.qf-toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: var(--form-text-sm);
+  font-weight: var(--form-weight-semibold);
+  color: var(--form-text-secondary);
+  background: var(--form-surface);
+  border: 1px solid var(--form-border-light);
+  border-radius: var(--form-radius-md);
+  cursor: pointer;
+  transition: all var(--form-duration-fast);
+}
+
+.qf-toolbar-btn:hover {
+  background: var(--form-surface-sunken);
+  border-color: var(--form-border-strong);
+}
+
+/* ════════════════════════════════════════════════════
+   DISPOSITION OPTION ICONS
+   ════════════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════════════
+   PRINT / PDF
+   ════════════════════════════════════════════════════ */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 10mm 16mm 10mm;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    font-size: 10pt;
+    background: #fff;
+    padding: 0;
+  }
+
+  .qf-actions,
+  .qf-toolbar,
+  .qf-file-drop,
+  .qf-section-toggle {
+    display: none !important;
+  }
+
+  .qf-section.collapsed .qf-section-body {
+    display: block !important;
+  }
+
+  .qf {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .qf-header {
+    break-after: avoid;
+  }
+
+  .qf-section {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ccc;
+    page-break-inside: avoid;
+  }
+
+  .qf-section:hover { box-shadow: none; }
+
+  .qf-signature-grid {
+    break-inside: avoid;
+  }
+
+  .qf-input,
+  .qf-select,
+  .qf-textarea {
+    box-shadow: none;
+    border: 1px solid #999;
+  }
+
+  .qf-radio-card-inner {
+    border: 1px solid #ccc;
+    box-shadow: none;
+  }
+
+  .qf-radio-card input:checked + .qf-radio-card-inner {
+    border: 2px solid #1565c0;
+    background: #dbeafe;
+  }
+}
+
+/* ════════════════════════════════════════════════════
+   UTILITY
+   ════════════════════════════════════════════════════ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Fade-in animation for page load */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.qf-section {
+  animation: fadeUp 0.4s var(--form-easing-default) both;
+}
+.qf-section:nth-child(2) { animation-delay: 0.05s; }
+.qf-section:nth-child(3) { animation-delay: 0.1s; }
+.qf-section:nth-child(4) { animation-delay: 0.15s; }
+.qf-section:nth-child(5) { animation-delay: 0.2s; }
+.qf-section:nth-child(6) { animation-delay: 0.25s; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     PRINT / UTILITY TOOLBAR
+     ═══════════════════════════════════════════════════ -->
+<div class="qf-toolbar" role="toolbar" aria-label="Form tools">
+  <button class="qf-toolbar-btn" onclick="window.print()" title="Print to PDF">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+    Print / PDF
+  </button>
+  <button class="qf-toolbar-btn" onclick="expandAll()" title="Expand all sections">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 15l5 5 5-5"/><path d="M7 9l5-5 5 5"/></svg>
+    Expand All
+  </button>
+</div>
+
+<form class="qf" id="ncrForm" novalidate>
+
+<!-- ═══════════════════════════════════════════════════
+     FORM HEADER
+     ═══════════════════════════════════════════════════ -->
+<div class="qf-header">
+  <div class="qf-header-main">
+    <!-- Left: Logo -->
+    <div class="qf-header-logo">
+      <div class="qf-logo-mark">
+        <svg viewBox="0 0 849 837" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#2099d5" d="M794 325c-28,-16 -60,-18 -88,-9l-36 -62 -96 -166 -191 0 -72 0c-10,-49 -54,-86 -107,-86 -60,0 -109,49 -109,109 0,32 14,61 36,81l-36 62 -96 166 96 166 36 62c-37,34 -48,90 -21,135 30,52 97,70 149,40 28,-16 46,-42 52,-72l72 0 191 0 96 -166 36 -62c48,16 102,-4 128,-49 30,-52 12,-119 -40,-149z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="qf-logo-text">HESEM ENGINEERING</div>
+        <div class="qf-logo-brand">HESEM QMS</div>
+      </div>
+    </div>
+
+    <!-- Center: Title -->
+    <div class="qf-header-center">
+      <div class="qf-header-title-en">NON-CONFORMITY REPORT</div>
+      <div class="qf-header-title-vi">BAO CAO KHONG PHU HOP</div>
+    </div>
+
+    <!-- Right: Doc Info -->
+    <div class="qf-header-right">
+      <span class="qf-doc-code">FRM-631</span>
+      <span class="qf-doc-rev">Revision V2.1</span>
+      <span class="qf-record-id">NCR-2026-___</span>
+    </div>
+  </div>
+
+  <!-- Status Stepper -->
+  <div class="qf-status-bar" role="navigation" aria-label="Form progress">
+    <div class="qf-step active">
+      <span class="qf-step-num">1</span>
+      <span>Draft</span>
+    </div>
+    <div class="qf-step-line"></div>
+    <div class="qf-step">
+      <span class="qf-step-num">2</span>
+      <span>In Review</span>
+    </div>
+    <div class="qf-step-line"></div>
+    <div class="qf-step">
+      <span class="qf-step-num">3</span>
+      <span>Approved</span>
+    </div>
+    <div class="qf-step-line"></div>
+    <div class="qf-step">
+      <span class="qf-step-num">4</span>
+      <span>Closed</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 1: IDENTIFICATION
+     ═══════════════════════════════════════════════════ -->
+<div class="qf-section qf-section--blue" data-section="1">
+  <div class="qf-section-header" onclick="toggleSection(this)" role="button" aria-expanded="true" tabindex="0">
+    <div class="qf-section-title-wrap">
+      <span class="qf-section-num">1</span>
+      <div class="qf-section-title-text">
+        <h3>Identification</h3>
+        <p class="qf-section-subtitle">Thong tin nhan dang</p>
+      </div>
+    </div>
+    <div class="qf-section-toggle" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+  </div>
+  <div class="qf-section-body">
+    <!-- Row 1: Date, Department, Shift -->
+    <div class="qf-grid qf-grid--3">
+      <div class="qf-field" data-required>
+        <label class="qf-label">NCR Date <span class="qf-required">*</span></label>
+        <span class="qf-label-vi">Ngay phat hien</span>
+        <input type="date" class="qf-input" name="ncr_date" required>
+        <span class="qf-error-msg">Required field</span>
+      </div>
+      <div class="qf-field" data-required>
+        <label class="qf-label">Department <span class="qf-required">*</span></label>
+        <span class="qf-label-vi">Phong ban phat hien</span>
+        <select class="qf-select" name="department" required>
+          <option value="">-- Select --</option>
+          <option value="PROD">San xuat (Production)</option>
+          <option value="ENG">Ky thuat (Engineering)</option>
+          <option value="QA">Chat luong (Quality)</option>
+          <option value="SCM">Chuoi cung ung (Supply Chain)</option>
+          <option value="WH">Kho van (Warehouse)</option>
+        </select>
+        <span class="qf-error-msg">Required field</span>
+      </div>
+      <div class="qf-field">
+        <label class="qf-label">Shift</label>
+        <span class="qf-label-vi">Ca lam viec</span>
+        <select class="qf-select" name="shift">
+          <option value="">-- Select --</option>
+          <option value="day">Day / Ca ngay</option>
+          <option value="night">Night / Ca dem</option>
+          <option value="ot">Overtime / Tang ca</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Row 2: Job, Work Order -->
+    <div class="qf-grid qf-grid--2" style="margin-top: var(--form-field-gap);">
+      <div class="qf-field" data-required>
+        <label class="qf-label">Job Number <span class="qf-required">*</span></label>
+        <span class="qf-label-vi">So Job</span>
+        <input type="text" class="qf-input" name="job_number" placeholder="VD: J-2026-0150" required>
+        <span class="qf-error-msg">Required field</span>
+      </div>
+      <div class="qf-field">
+        <label class="qf-label">Work Order</label>
+        <span class="qf-label-vi">Lenh san xuat</span>
+        <input type="text" class="qf-input" name="work_order" placeholder="VD: WO-2026-0088">
+      </div>
+    </div>
+
+    <!-- Row 3: Part, Revision -->
+    <div class="qf-grid qf-grid--2" style="margin-top: var(--form-field-gap);">
+      <div class="qf-field" data-required>
+        <label class="qf-label">Part Number <span class="qf-required">*</span></label>
+        <span class="qf-label-vi">Ma chi tiet</span>
+        <input type="text" class="qf-input" name="part_number" required>
+        <span class="qf-error-msg">Required field</span>
+      </div>
+      <div class="qf-field" data-required>
+        <label class="qf-label">Part Revision <span class="qf-required">*</span></label>
+        <span class="qf-label-vi">Revision</span>
+        <input type="text" class="qf-input" name="part_rev" placeholder="VD: Rev C" required>
+        <span class="qf-error-msg">Required field</span>
+      </div>
+    </div>
+
+    <!-- Row 4: Customer -->
+    <div class="qf-grid" style="margin-top: var(--form-field-gap);">
+      <div class="qf-field" data-required>
+        <label class="qf-label">Customer <span class="qf-required">*</span></label>
+        <span class="qf-label-vi">Khach hang</span>
+        <select class="qf-select" name="customer" required>
+          <option value="">-- Select --</option>
+          <option value="acme">ACME Industries</option>
+          <option value="globex">Globex Corporation</option>
+          <option value="initech">Initech Manufacturing</option>
+          <option value="umbrella">Umbrella Tech</option>
+          <option value="other">Other / Khac</option>
+        </select>
+        <span class="qf-error-msg">Required field</span>
+      </div>
+    </div>
+
+    <!-- Row 5: Operation, Machine -->
+    <div class="qf-grid qf-grid--2" style="margin-top: var(--form-field-gap);">
+      <div class="qf-field">
+        <label class="qf-label">Operation</label>
+        <span class="qf-label-vi">Cong doan phat hien</span>
+        <input type="text" class="qf-input" name="operation" placeholder="VD: OP20 -- Milling">
+      </div>
+      <div class="qf-field">
+        <label class="qf-label">Machine ID</label>
+        <span class="qf-label-vi">Ma may</span>
+        <input type="text" class="qf-input" name="machine_id" placeholder="VD: CNC-05">
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 2: DEFECT DESCRIPTION
+     ═══════════════════════════════════════════════════ -->
+<div class="qf-section qf-section--red" data-section="2">
+  <div class="qf-section-header" onclick="toggleSection(this)" role="button" aria-expanded="true" tabindex="0">
+    <div class="qf-section-title-wrap">
+      <span class="qf-section-num">2</span>
+      <div class="qf-section-title-text">
+        <h3>Defect Description</h3>
+        <p class="qf-section-subtitle">Mo ta khuyet tat</p>
+      </div>
+    </div>
+    <div class="qf-section-toggle" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+  </div>
+  <div class="qf-section-body">
+    <!-- Defect Type + Severity -->
+    <div class="qf-grid qf-grid--2">
+      <div class="qf-field" data-required>
+        <label class="qf-label">Defect Type <span class="qf-required">*</span></label>
+        <span class="qf-label-vi">Loai loi</span>
+        <select class="qf-select" name="defect_type" required onchange="styleDefectType(this)">
+          <option value="">-- Select --</option>
+          <option value="dimensional" data-color="blue">Kich thuoc (Dimensional)</option>
+          <option value="surface" data-color="amber">Be mat (Surface)</option>
+          <option value="material" data-color="purple">Vat lieu (Material)</option>
+          <option value="documentation" data-color="gray">Tai lieu (Documentation)</option>
+          <option value="process" data-color="orange">Quy trinh (Process)</option>
+          <option value="other" data-color="slate">Khac (Other)</option>
+        </select>
+        <span class="qf-error-msg">Required field</span>
+      </div>
+      <div class="qf-field" data-required>
+        <label class="qf-label">Severity <span class="qf-required">*</span></label>
+        <span class="qf-label-vi">Muc do nghiem trong</span>
+        <div class="qf-severity-wrap">
+          <select class="qf-select" name="severity" required onchange="updateSeverityDot(this)">
+            <option value="">-- Select --</option>
+            <option value="minor" data-color="green">Nhe (Minor)</option>
+            <option value="major" data-color="amber">Nang (Major)</option>
+            <option value="critical" data-color="red">Nghiem trong (Critical)</option>
+          </select>
+          <span class="qf-severity-dot" id="severityDot"></span>
+        </div>
+        <span class="qf-error-msg">Required field</span>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="qf-grid" style="margin-top: var(--form-field-gap);">
+      <div class="qf-field" data-required>
+        <label class="qf-label">Defect Description <span class="qf-required">*</span></label>
+        <span class="qf-label-vi">Mo ta loi</span>
+        <textarea class="qf-textarea" name="defect_description" rows="4" required placeholder="Mo ta chi tiet loi khong phu hop..."></textarea>
+        <span class="qf-error-msg">Required field</span>
+      </div>
+    </div>
+
+    <!-- Quantities -->
+    <div class="qf-grid qf-grid--3" style="margin-top: var(--form-field-gap);">
+      <div class="qf-field" data-required>
+        <label class="qf-label">Qty Inspected <span class="qf-required">*</span></label>
+        <span class="qf-label-vi">SL kiem tra</span>
+        <input type="number" class="qf-input" name="qty_inspected" min="1" required>
+        <span class="qf-error-msg">Required field</span>
+      </div>
+      <div class="qf-field" data-required>
+        <label class="qf-label">Qty Affected <span class="qf-required">*</span></label>
+        <span class="qf-label-vi">SL bi anh huong</span>
+        <input type="number" class="qf-input" name="qty_affected" min="1" required>
+        <span class="qf-error-msg">Required field</span>
+      </div>
+      <div class="qf-field" data-required>
+        <label class="qf-label">Qty Rejected <span class="qf-required">*</span></label>
+        <span class="qf-label-vi">SL loai bo</span>
+        <input type="number" class="qf-input" name="qty_rejected" min="0" required>
+        <span class="qf-error-msg">Required field</span>
+      </div>
+    </div>
+
+    <!-- File Upload -->
+    <div style="margin-top: var(--form-field-gap);">
+      <label class="qf-label">Attach Photos</label>
+      <span class="qf-label-vi">Dinh kem anh</span>
+      <div class="qf-file-drop" id="fileDrop" ondragover="event.preventDefault(); this.classList.add('is-dragover')" ondragleave="this.classList.remove('is-dragover')" ondrop="event.preventDefault(); this.classList.remove('is-dragover')">
+        <div class="qf-file-drop-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <div class="qf-file-drop-text">Drag photos here or <a onclick="document.getElementById('fileInput').click()">browse files</a></div>
+        <div class="qf-file-drop-hint">JPG, PNG up to 10MB each. Max 10 files.</div>
+        <input type="file" id="fileInput" class="sr-only" accept="image/*" multiple>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 3: CONTAINMENT
+     ═══════════════════════════════════════════════════ -->
+<div class="qf-section qf-section--amber" data-section="3">
+  <div class="qf-section-header" onclick="toggleSection(this)" role="button" aria-expanded="true" tabindex="0">
+    <div class="qf-section-title-wrap">
+      <span class="qf-section-num">3</span>
+      <div class="qf-section-title-text">
+        <h3>Containment Actions</h3>
+        <p class="qf-section-subtitle">Hanh dong ngan chan</p>
+      </div>
+    </div>
+    <div class="qf-section-toggle" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+  </div>
+  <div class="qf-section-body">
+    <div class="qf-callout qf-callout--info">
+      <span class="qf-callout-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+      </span>
+      <span>Describe immediate actions taken to isolate defective product and prevent further nonconformity.</span>
+    </div>
+
+    <div class="qf-field" data-required>
+      <label class="qf-label">Containment Action <span class="qf-required">*</span></label>
+      <span class="qf-label-vi">Hanh dong ngan chan tuc thoi</span>
+      <textarea class="qf-textarea" name="containment_action" rows="3" required placeholder="Hanh dong ngan chan tuc thoi de co lap san pham loi..."></textarea>
+      <span class="qf-error-msg">Required field</span>
+    </div>
+
+    <div class="qf-grid qf-grid--2" style="margin-top: var(--form-field-gap);">
+      <div class="qf-field" data-required>
+        <label class="qf-label">Disposition <span class="qf-required">*</span></label>
+        <span class="qf-label-vi">Quyet dinh xu ly</span>
+        <select class="qf-select" name="disposition" required>
+          <option value="">-- Select --</option>
+          <option value="rework">&#9881; Sua chua (Rework)</option>
+          <option value="scrap">&#128465; Phe pham (Scrap)</option>
+          <option value="use_as_is">&#9989; Su dung nguyen trang (Use As-Is)</option>
+          <option value="return_to_vendor">&#8617; Tra nha cung cap (Return to Vendor)</option>
+          <option value="mrb">&#128196; MRB (Material Review Board)</option>
+        </select>
+        <span class="qf-error-msg">Required field</span>
+      </div>
+      <div class="qf-field">
+        <label class="qf-label">Disposition Authority</label>
+        <span class="qf-label-vi">Nguoi co tham quyen xu ly</span>
+        <input type="text" class="qf-input" name="disposition_authority" placeholder="Name / Role">
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 4: ROOT CAUSE
+     ═══════════════════════════════════════════════════ -->
+<div class="qf-section qf-section--purple" data-section="4">
+  <div class="qf-section-header" onclick="toggleSection(this)" role="button" aria-expanded="true" tabindex="0">
+    <div class="qf-section-title-wrap">
+      <span class="qf-section-num">4</span>
+      <div class="qf-section-title-text">
+        <h3>Root Cause Analysis</h3>
+        <p class="qf-section-subtitle">Phan tich nguyen nhan goc</p>
+      </div>
+    </div>
+    <div class="qf-section-toggle" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+  </div>
+  <div class="qf-section-body">
+    <!-- 6M Radio Cards -->
+    <div class="qf-field">
+      <label class="qf-label">Root Cause Category (6M)</label>
+      <span class="qf-label-vi">Nhom nguyen nhan goc</span>
+    </div>
+    <div class="qf-radio-cards" style="margin-top: var(--form-space-2);">
+      <label class="qf-radio-card">
+        <input type="radio" name="root_cause_category" value="man">
+        <div class="qf-radio-card-inner">
+          <span class="qf-radio-card-icon">&#128100;</span>
+          <span class="qf-radio-card-label">Man</span>
+          <span class="qf-radio-card-label-vi">Con nguoi</span>
+        </div>
+      </label>
+      <label class="qf-radio-card">
+        <input type="radio" name="root_cause_category" value="machine">
+        <div class="qf-radio-card-inner">
+          <span class="qf-radio-card-icon">&#128295;</span>
+          <span class="qf-radio-card-label">Machine</span>
+          <span class="qf-radio-card-label-vi">May moc</span>
+        </div>
+      </label>
+      <label class="qf-radio-card">
+        <input type="radio" name="root_cause_category" value="method">
+        <div class="qf-radio-card-inner">
+          <span class="qf-radio-card-icon">&#128203;</span>
+          <span class="qf-radio-card-label">Method</span>
+          <span class="qf-radio-card-label-vi">Phuong phap</span>
+        </div>
+      </label>
+      <label class="qf-radio-card">
+        <input type="radio" name="root_cause_category" value="material">
+        <div class="qf-radio-card-inner">
+          <span class="qf-radio-card-icon">&#129521;</span>
+          <span class="qf-radio-card-label">Material</span>
+          <span class="qf-radio-card-label-vi">Vat lieu</span>
+        </div>
+      </label>
+      <label class="qf-radio-card">
+        <input type="radio" name="root_cause_category" value="measurement">
+        <div class="qf-radio-card-inner">
+          <span class="qf-radio-card-icon">&#128207;</span>
+          <span class="qf-radio-card-label">Measurement</span>
+          <span class="qf-radio-card-label-vi">Do luong</span>
+        </div>
+      </label>
+      <label class="qf-radio-card">
+        <input type="radio" name="root_cause_category" value="environment">
+        <div class="qf-radio-card-inner">
+          <span class="qf-radio-card-icon">&#127777;</span>
+          <span class="qf-radio-card-label">Environment</span>
+          <span class="qf-radio-card-label-vi">Moi truong</span>
+        </div>
+      </label>
+    </div>
+
+    <!-- Root Cause Description -->
+    <div class="qf-field" style="margin-top: var(--form-field-gap);">
+      <label class="qf-label">Root Cause Description</label>
+      <span class="qf-label-vi">Mo ta nguyen nhan goc</span>
+      <textarea class="qf-textarea" name="root_cause_description" rows="3" placeholder="Phan tich nguyen nhan goc..."></textarea>
+    </div>
+
+    <!-- Linked CAPA -->
+    <div class="qf-field" style="margin-top: var(--form-field-gap);">
+      <label class="qf-label">Linked CAPA Number</label>
+      <span class="qf-label-vi">CAPA lien ket</span>
+      <div class="qf-lookup-wrap">
+        <input type="text" class="qf-input" name="linked_capa" placeholder="VD: CAPA-2026-001">
+        <span class="qf-lookup-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </span>
+      </div>
+      <span class="qf-helper">Search or enter CAPA reference number</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 5: SIGNATURES
+     ═══════════════════════════════════════════════════ -->
+<div class="qf-section qf-section--green" data-section="5">
+  <div class="qf-section-header" onclick="toggleSection(this)" role="button" aria-expanded="true" tabindex="0">
+    <div class="qf-section-title-wrap">
+      <span class="qf-section-num">5</span>
+      <div class="qf-section-title-text">
+        <h3>Signatures</h3>
+        <p class="qf-section-subtitle">Chu ky</p>
+      </div>
+    </div>
+    <div class="qf-section-toggle" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+  </div>
+  <div class="qf-section-body">
+    <div class="qf-signature-grid">
+      <!-- Reported By -->
+      <div class="qf-signature-block">
+        <div class="qf-signature-title">Reported By / Nguoi bao cao</div>
+        <div class="qf-signature-pad">Signature area</div>
+        <div class="qf-signature-fields">
+          <input type="text" name="sig_reported_name" placeholder="Full Name">
+          <input type="text" name="sig_reported_role" placeholder="Role / Position">
+          <input type="date" name="sig_reported_date">
+        </div>
+      </div>
+
+      <!-- Inspector -->
+      <div class="qf-signature-block">
+        <div class="qf-signature-title">Inspector / QC Inspector</div>
+        <div class="qf-signature-pad">Signature area</div>
+        <div class="qf-signature-fields">
+          <input type="text" name="sig_inspector_name" placeholder="Full Name">
+          <input type="text" name="sig_inspector_role" placeholder="Role / Position">
+          <input type="date" name="sig_inspector_date">
+        </div>
+      </div>
+
+      <!-- Approved By -->
+      <div class="qf-signature-block">
+        <div class="qf-signature-title">Approved By / Nguoi phe duyet</div>
+        <div class="qf-signature-pad">Signature area</div>
+        <div class="qf-signature-fields">
+          <input type="text" name="sig_approved_name" placeholder="Full Name">
+          <input type="text" name="sig_approved_role" placeholder="Role / Position">
+          <input type="date" name="sig_approved_date">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</form>
+
+<!-- ═══════════════════════════════════════════════════
+     STICKY ACTION BAR
+     ═══════════════════════════════════════════════════ -->
+<div class="qf-actions">
+  <div class="qf-actions-inner">
+    <button type="button" class="qf-btn qf-btn--secondary" onclick="saveDraft()">
+      <span class="qf-btn-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      </span>
+      Save Draft / Luu nhap
+    </button>
+    <button type="button" class="qf-btn qf-btn--ghost" onclick="clearForm()">
+      <span class="qf-btn-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      </span>
+      Clear / Xoa
+    </button>
+    <div class="qf-actions-spacer"></div>
+    <button type="button" class="qf-btn qf-btn--primary" onclick="submitForm()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      Submit / Gui
+    </button>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     JAVASCRIPT
+     ═══════════════════════════════════════════════════ -->
+<script>
+/* Section collapse/expand */
+function toggleSection(header) {
+  var section = header.closest('.qf-section');
+  var expanded = !section.classList.contains('collapsed');
+  section.classList.toggle('collapsed');
+  header.setAttribute('aria-expanded', !expanded);
+}
+
+function expandAll() {
+  document.querySelectorAll('.qf-section.collapsed').forEach(function(s) {
+    s.classList.remove('collapsed');
+    s.querySelector('.qf-section-header').setAttribute('aria-expanded', 'true');
+  });
+}
+
+/* Severity dot update */
+function updateSeverityDot(select) {
+  var dot = document.getElementById('severityDot');
+  dot.className = 'qf-severity-dot';
+  if (select.value === 'minor')    dot.classList.add('sev-minor');
+  if (select.value === 'major')    dot.classList.add('sev-major');
+  if (select.value === 'critical') dot.classList.add('sev-critical');
+}
+
+/* Defect type color feedback */
+function styleDefectType(select) {
+  var opt = select.options[select.selectedIndex];
+  var color = opt ? opt.getAttribute('data-color') : '';
+  var colorMap = {
+    blue: '#1565c0', amber: '#d97706', purple: '#7c3aed',
+    gray: '#64748b', orange: '#ea580c', slate: '#475569'
+  };
+  select.style.color = colorMap[color] || '';
+}
+
+/* Form validation */
+function validateForm() {
+  var form = document.getElementById('ncrForm');
+  var valid = true;
+
+  /* Clear previous errors */
+  form.querySelectorAll('.qf-field.is-error').forEach(function(f) {
+    f.classList.remove('is-error');
+  });
+
+  /* Check required fields */
+  form.querySelectorAll('[data-required]').forEach(function(field) {
+    var input = field.querySelector('input[required], select[required], textarea[required]');
+    if (input && !input.value.trim()) {
+      field.classList.add('is-error');
+      valid = false;
+    }
+  });
+
+  if (!valid) {
+    /* Scroll to first error */
+    var first = form.querySelector('.qf-field.is-error');
+    if (first) {
+      var section = first.closest('.qf-section');
+      if (section && section.classList.contains('collapsed')) {
+        section.classList.remove('collapsed');
+      }
+      first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  return valid;
+}
+
+/* Submit */
+function submitForm() {
+  if (validateForm()) {
+    alert('Form validated successfully. Ready to submit.\n\nIn production this would POST to the API.');
+  }
+}
+
+/* Save Draft */
+function saveDraft() {
+  alert('Draft saved.\n\nIn production this would save to localStorage and API.');
+}
+
+/* Clear Form */
+function clearForm() {
+  if (confirm('Clear all fields? This cannot be undone.\nXoa tat ca cac truong? Hanh dong nay khong the hoan tac.')) {
+    document.getElementById('ncrForm').reset();
+    document.querySelectorAll('.qf-field.is-error').forEach(function(f) {
+      f.classList.remove('is-error');
+    });
+    var dot = document.getElementById('severityDot');
+    dot.className = 'qf-severity-dot';
+  }
+}
+
+/* Keyboard: Enter on section header toggles it */
+document.querySelectorAll('.qf-section-header').forEach(function(header) {
+  header.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleSection(header);
+    }
+  });
+});
+
+/* Set today's date as default */
+(function() {
+  var dateInputs = document.querySelectorAll('input[type="date"]');
+  var today = new Date().toISOString().split('T')[0];
+  if (dateInputs.length > 0 && !dateInputs[0].value) {
+    dateInputs[0].value = today;
+  }
+})();
+</script>
+
+</body>
+</html>
