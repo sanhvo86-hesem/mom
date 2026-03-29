@@ -9,8 +9,8 @@
   "online": true,
   "decision_score": 90,
   "sop_ref": "SOP-502",
-  "description": "Governed runtime for machine downtime capture with linked machine, WO, operator, root-cause categories, and recovery approval.",
-  "description_vi": "Biểu mẫu runtime để ghi nhận dừng máy với máy, WO, người vận hành, nhóm nguyên nhân gốc và bước xác nhận khôi phục được kéo trực tiếp từ dữ liệu đã quản lý.",
+  "description": "Governed runtime for machine downtime capture with linked machine, WO, operator, tooling, root-cause categories, and recovery approval.",
+  "description_vi": "Biểu mẫu runtime để ghi nhận dừng máy với máy, WO, người vận hành, tooling, nhóm nguyên nhân gốc và bước xác nhận khôi phục được kéo trực tiếp từ dữ liệu đã quản lý.",
   "roles_allowed": [
     "admin",
     "production_manager",
@@ -32,9 +32,9 @@
       "id": "context",
       "title": "Runtime Context",
       "title_vi": "Ngữ cảnh runtime",
-      "description": "Select the governed machine, work center, and work order before recording the downtime event.",
-      "description_vi": "Chọn máy, work center và work order đã được quản lý trước khi ghi nhận sự kiện dừng máy.",
-      "field_ids": ["event_date", "shift", "work_center_id", "machine_id", "wo_number", "operator_id"]
+      "description": "Select the governed machine, work center, work order, and the affected tooling before recording the downtime event.",
+      "description_vi": "Chọn máy, work center, work order và tooling liên quan đã được quản lý trước khi ghi nhận sự kiện dừng máy.",
+      "field_ids": ["event_date", "shift", "work_center_id", "machine_id", "wo_number", "operator_id", "affected_tool_id"]
     },
     {
       "id": "event",
@@ -145,6 +145,20 @@
       "display_fields": ["operator_id", "operator_name", "role"],
       "placeholder": "Search operator",
       "placeholder_vi": "Tìm người vận hành"
+    },
+    {
+      "id": "affected_tool_id",
+      "type": "lookup",
+      "label": "Affected Tool / Fixture",
+      "label_vi": "Tool / đồ gá liên quan",
+      "required": false,
+      "width": "third",
+      "lookup_source": "tooling_assets",
+      "strict_select": true,
+      "depends_on": ["machine_id", "work_center_id"],
+      "display_fields": ["tool_id", "tool_name", "tool_type"],
+      "placeholder": "Search affected tooling",
+      "placeholder_vi": "Tìm tooling liên quan"
     },
     {
       "id": "start_time",

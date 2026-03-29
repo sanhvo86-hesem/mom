@@ -1836,6 +1836,7 @@ function master_data_store_default(): array {
     'work_centers' => [],
     'machines' => [],
     'operators' => [],
+    'tooling_assets' => [],
   ];
 }
 
@@ -1867,13 +1868,14 @@ function save_master_data_store(array $data): void {
 function mes_runtime_default(): array {
   return [
     '_meta' => [
-      'version' => '1.0',
+      'version' => '1.1',
       'updated' => now_iso(),
-      'description' => 'MES runtime store for dispatch, machine state, downtime, maintenance, and progress reporting.',
+      'description' => 'MES runtime store for dispatch, machine state, downtime, maintenance, tooling, and progress reporting.',
     ],
     'downtime_events' => [],
     'maintenance_requests' => [],
     'progress_reports' => [],
+    'tooling_status' => [],
   ];
 }
 
@@ -1930,6 +1932,21 @@ function order_transition_allowed(string $entity, string $fromStatus, string $to
   $cfg = load_order_runtime_config();
   $flow = is_array($cfg['status_flow'][$entity]['transitions'] ?? null) ? $cfg['status_flow'][$entity]['transitions'] : [];
   $allowed = array_map('strtolower', array_values((array)($flow[$fromStatus] ?? [])));
+  return in_array(strtolower($toStatus), $allowed, true);
+}
+
+function mes_maintenance_transition_allowed(string $fromStatus, string $toStatus): bool {
+  if ($fromStatus === '' || $toStatus === '') return false;
+  if ($fromStatus === $toStatus) return true;
+  $flow = [
+    'open' => ['approved', 'in_progress', 'void'],
+    'approved' => ['in_progress', 'on_hold', 'void'],
+    'in_progress' => ['on_hold', 'completed', 'void'],
+    'on_hold' => ['approved', 'in_progress', 'void'],
+    'completed' => [],
+    'void' => [],
+  ];
+  $allowed = $flow[strtolower($fromStatus)] ?? [];
   return in_array(strtolower($toStatus), $allowed, true);
 }
 
@@ -2081,12 +2098,214 @@ function master_index_by(array $rows, string $key): array {
   return $index;
 }
 
+function mes_clamp_percent(float $value): float {
+  return round(max(0.0, min(100.0, $value)), 1);
+}
+
+function mes_percent(float $numerator, float $denominator, ?float $fallback = null): ?float {
+  if ($denominator <= 0) return $fallback;
+  return mes_clamp_percent(($numerator / $denominator) * 100);
+}
+
+function mes_minutes_between(string $startAt = '', string $endAt = '', ?DateTimeImmutable $now = null): float {
+  if ($startAt === '') return 0.0;
+  try {
+    $start = new DateTimeImmutable($startAt);
+    $end = $endAt !== '' ? new DateTimeImmutable($endAt) : ($now ?: new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon')));
+    $seconds = max(0, $end->getTimestamp() - $start->getTimestamp());
+    return round($seconds / 60, 1);
+  } catch (Throwable) {
+    return 0.0;
+  }
+}
+
+function load_mes_gate_rules(): array {
+  global $CONF_DIR;
+  $file = $CONF_DIR . '/mes_evidence_gate_rules.json';
+  $data = read_json_file($file);
+  if (is_array($data) && is_array($data['rules'] ?? null)) {
+    return array_values(array_filter($data['rules'], fn($row) => is_array($row)));
+  }
+  return [];
+}
+
+function mes_form_link_index(array $orders): array {
+  $index = ['so' => [], 'jo' => [], 'wo' => []];
+  foreach ((array)($orders['form_links'] ?? []) as $link) {
+    if (!is_array($link)) continue;
+    $type = strtolower(trim((string)($link['order_type'] ?? '')));
+    $id = trim((string)($link['order_id'] ?? ''));
+    if ($id === '' || !isset($index[$type])) continue;
+    $index[$type][$id][] = $link;
+  }
+  return $index;
+}
+
+function mes_gate_requirement_applies(array $rule, array $dispatchRow, array $jo, ?array $openDowntime, ?array $openMaintenance): bool {
+  $statuses = array_map('strtolower', array_values((array)($rule['wo_statuses'] ?? [])));
+  if (!empty($statuses) && !in_array(strtolower((string)($dispatchRow['status'] ?? '')), $statuses, true)) {
+    return false;
+  }
+  $workCenters = array_map('strtoupper', array_values((array)($rule['work_center_ids'] ?? [])));
+  if (!empty($workCenters) && !in_array(strtoupper((string)($dispatchRow['work_center_id'] ?? '')), $workCenters, true)) {
+    return false;
+  }
+  $trigger = strtolower(trim((string)($rule['trigger'] ?? 'always')));
+  return match ($trigger) {
+    'always' => true,
+    'open_downtime' => $openDowntime !== null,
+    'open_maintenance' => $openMaintenance !== null,
+    'fai_required' => (bool)($jo['fai_required'] ?? false),
+    default => true,
+  };
+}
+
+function mes_evidence_gate_summary(array $dispatchRow, array $jo, array $woLinks, ?array $openDowntime, ?array $openMaintenance, array $rules): array {
+  $required = [];
+  foreach ($rules as $rule) {
+    if (!is_array($rule) || !mes_gate_requirement_applies($rule, $dispatchRow, $jo, $openDowntime, $openMaintenance)) continue;
+    $required[] = [
+      'rule_id' => (string)($rule['rule_id'] ?? ''),
+      'label' => (string)($rule['label'] ?? ''),
+      'label_vi' => (string)($rule['label_vi'] ?? $rule['label'] ?? ''),
+      'required_form_codes' => array_values(array_filter(array_map('strtoupper', array_values((array)($rule['required_form_codes'] ?? []))))),
+    ];
+  }
+
+  $linkedCodes = [];
+  foreach ($woLinks as $link) {
+    if (!is_array($link)) continue;
+    $code = strtoupper(trim((string)($link['form_code'] ?? '')));
+    if ($code !== '') $linkedCodes[$code] = true;
+  }
+
+  $items = [];
+  $missingFormCodes = [];
+  foreach ($required as $gate) {
+    $codes = array_values((array)($gate['required_form_codes'] ?? []));
+    $missing = array_values(array_filter($codes, fn($code) => empty($linkedCodes[$code])));
+    $items[] = [
+      'rule_id' => $gate['rule_id'],
+      'label' => $gate['label'],
+      'label_vi' => $gate['label_vi'],
+      'required_form_codes' => $codes,
+      'missing_form_codes' => $missing,
+      'is_ready' => empty($missing),
+    ];
+    foreach ($missing as $code) $missingFormCodes[$code] = true;
+  }
+
+  $totalRequired = count($items);
+  $completedCount = count(array_filter($items, fn($row) => !empty($row['is_ready'])));
+  $status = 'not_required';
+  if ($totalRequired > 0) {
+    if ($completedCount === $totalRequired) $status = 'ready';
+    elseif ($completedCount > 0) $status = 'partial';
+    else $status = 'missing';
+  }
+
+  $summaryVi = match ($status) {
+    'ready' => 'Đủ gate vận hành',
+    'partial' => 'Thiếu một phần gate',
+    'missing' => 'Thiếu gate bắt buộc',
+    default => 'Không yêu cầu gate',
+  };
+  $summaryEn = match ($status) {
+    'ready' => 'Ready',
+    'partial' => 'Partial',
+    'missing' => 'Missing gates',
+    default => 'Not required',
+  };
+
+  return [
+    'status' => $status,
+    'total_required' => $totalRequired,
+    'completed_count' => $completedCount,
+    'items' => $items,
+    'missing_form_codes' => array_keys($missingFormCodes),
+    'linked_form_codes' => array_keys($linkedCodes),
+    'summary_vi' => $summaryVi,
+    'summary_en' => $summaryEn,
+  ];
+}
+
+function mes_tool_life_percent(array $row): ?float {
+  $values = [];
+  $limitMinutes = (float)($row['life_limit_minutes'] ?? 0);
+  $usedMinutes = (float)($row['life_used_minutes'] ?? 0);
+  if ($limitMinutes > 0) $values[] = ($usedMinutes / $limitMinutes) * 100;
+  $limitParts = (float)($row['life_limit_parts'] ?? 0);
+  $usedParts = (float)($row['life_used_parts'] ?? 0);
+  if ($limitParts > 0) $values[] = ($usedParts / $limitParts) * 100;
+  if (empty($values)) return null;
+  return mes_clamp_percent((float)max($values));
+}
+
+function mes_tool_alert_payload(array $row): array {
+  $lifePct = mes_tool_life_percent($row);
+  $warning = (float)($row['warning_pct'] ?? 80);
+  $critical = (float)($row['critical_pct'] ?? 95);
+  $toolStatus = strtolower(trim((string)($row['tool_status'] ?? 'loaded')));
+  $offsetStatus = strtolower(trim((string)($row['offset_status'] ?? 'verified')));
+
+  $level = 'healthy';
+  if (in_array($toolStatus, ['broken', 'quarantine', 'expired'], true)) {
+    $level = 'critical';
+  } elseif ($lifePct !== null && $lifePct >= $critical) {
+    $level = 'critical';
+  } elseif ($offsetStatus === 'out_of_control') {
+    $level = 'critical';
+  } elseif ($lifePct !== null && $lifePct >= $warning) {
+    $level = 'warning';
+  } elseif (in_array($offsetStatus, ['adjustment_required', 'adjusted'], true)) {
+    $level = 'warning';
+  } elseif ($lifePct === null && trim((string)($row['tool_id'] ?? '')) === '') {
+    $level = 'untracked';
+  }
+
+  $messageVi = 'Tool đang ổn định.';
+  $messageEn = 'Tool condition is stable.';
+  if ($level === 'critical') {
+    if (in_array($toolStatus, ['broken', 'quarantine', 'expired'], true)) {
+      $messageVi = 'Tool đã vượt ngưỡng an toàn hoặc bị cách ly.';
+      $messageEn = 'Tool is beyond safe operating condition or quarantined.';
+    } elseif ($offsetStatus === 'out_of_control') {
+      $messageVi = 'Offset vượt giới hạn kiểm soát.';
+      $messageEn = 'Offset is out of control.';
+    } else {
+      $messageVi = 'Tool đã chạm ngưỡng life tới hạn.';
+      $messageEn = 'Tool has reached the critical life threshold.';
+    }
+  } elseif ($level === 'warning') {
+    if (in_array($offsetStatus, ['adjustment_required', 'adjusted'], true)) {
+      $messageVi = 'Tool cần xác nhận lại offset trước khi chạy tiếp.';
+      $messageEn = 'Tool needs offset verification before the next run.';
+    } else {
+      $messageVi = 'Tool đang tiến gần ngưỡng thay dao.';
+      $messageEn = 'Tool is approaching the change threshold.';
+    }
+  } elseif ($level === 'untracked') {
+    $messageVi = 'WO chưa có tool-life runtime.';
+    $messageEn = 'No tool-life runtime is tracked for this WO.';
+  }
+
+  $row['life_used_pct'] = $lifePct;
+  $row['alert_level'] = $level;
+  $row['alert_message_vi'] = $messageVi;
+  $row['alert_message_en'] = $messageEn;
+  return $row;
+}
+
 function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $customers = master_index_by((array)($master['customers'] ?? []), 'customer_id');
   $parts = master_index_by((array)($master['parts'] ?? []), 'part_number');
   $workCenters = master_index_by((array)($master['work_centers'] ?? []), 'work_center_id');
   $machines = master_index_by((array)($master['machines'] ?? []), 'machine_id');
   $operators = master_index_by((array)($master['operators'] ?? []), 'operator_id');
+  $toolingAssets = master_index_by((array)($master['tooling_assets'] ?? []), 'tool_id');
+  $formLinksByOrder = mes_form_link_index($orders);
+  $gateRules = load_mes_gate_rules();
+  $now = new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
 
   $jos = master_index_by((array)($orders['job_orders'] ?? []), 'jo_number');
   $wos = master_index_by((array)($orders['work_orders'] ?? []), 'wo_number');
@@ -2109,6 +2328,34 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     if ($machineId === '') continue;
     $activeMaintenanceByMachine[$machineId] = $request;
   }
+
+  $toolingByMachine = [];
+  $toolingByWo = [];
+  $toolingAlerts = [];
+  foreach ((array)($mes['tooling_status'] ?? []) as $toolRow) {
+    if (!is_array($toolRow)) continue;
+    $toolId = trim((string)($toolRow['tool_id'] ?? ''));
+    $asset = $toolId !== '' ? ($toolingAssets[$toolId] ?? []) : [];
+    $merged = array_merge($asset, $toolRow);
+    $merged['tool_id'] = $toolId !== '' ? $toolId : (string)($asset['tool_id'] ?? '');
+    $merged['tool_name'] = (string)($merged['tool_name'] ?? $asset['tool_name'] ?? '');
+    $merged = mes_tool_alert_payload($merged);
+    $machineId = trim((string)($merged['machine_id'] ?? ''));
+    $woNumber = trim((string)($merged['wo_number'] ?? ''));
+    if ($machineId !== '') $toolingByMachine[$machineId][] = $merged;
+    if ($woNumber !== '') $toolingByWo[$woNumber][] = $merged;
+    if (in_array((string)($merged['alert_level'] ?? 'healthy'), ['warning', 'critical', 'untracked'], true)) {
+      $toolingAlerts[] = $merged;
+    }
+  }
+
+  usort($toolingAlerts, function ($a, $b) {
+    $priority = ['critical' => 0, 'warning' => 1, 'untracked' => 2, 'healthy' => 3];
+    $ap = $priority[(string)($a['alert_level'] ?? 'healthy')] ?? 9;
+    $bp = $priority[(string)($b['alert_level'] ?? 'healthy')] ?? 9;
+    if ($ap !== $bp) return $ap <=> $bp;
+    return (float)($b['life_used_pct'] ?? 0) <=> (float)($a['life_used_pct'] ?? 0);
+  });
 
   $dispatch = [];
   $workOrdersByMachine = [];
@@ -2152,7 +2399,31 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
       'setup_time_actual' => (float)($wo['setup_time_actual'] ?? 0),
       'run_time_actual' => (float)($wo['run_time_actual'] ?? 0),
       'fixture_id' => (string)($wo['fixture_id'] ?? ''),
+      'nc_program_id' => (string)($wo['nc_program_id'] ?? ''),
+      'fai_required' => (bool)($jo['fai_required'] ?? false),
       'priority' => (string)($so['priority'] ?? 'normal'),
+    ];
+
+    $woLinks = array_values((array)($formLinksByOrder['wo'][$woNumber] ?? []));
+    $openDowntime = $machineId !== '' ? ($activeDowntimeByMachine[$machineId] ?? null) : null;
+    $openMaintenance = $machineId !== '' ? ($activeMaintenanceByMachine[$machineId] ?? null) : null;
+    $dispatchRow['evidence_gate'] = mes_evidence_gate_summary($dispatchRow, $jo, $woLinks, $openDowntime, $openMaintenance, $gateRules);
+
+    $toolRows = !empty($toolingByWo[$woNumber]) ? array_values($toolingByWo[$woNumber]) : array_values((array)($toolingByMachine[$machineId] ?? []));
+    $toolAlertCount = count(array_filter($toolRows, fn($row) => in_array((string)($row['alert_level'] ?? 'healthy'), ['warning', 'critical', 'untracked'], true)));
+    $toolStatus = 'healthy';
+    if ($toolAlertCount > 0) {
+      $toolStatus = count(array_filter($toolRows, fn($row) => (string)($row['alert_level'] ?? '') === 'critical')) > 0 ? 'critical' : 'warning';
+    } elseif (empty($toolRows) && in_array((string)($dispatchRow['work_center_id'] ?? ''), ['WC-5AX', 'WC-3AX'], true)) {
+      $toolStatus = 'untracked';
+    }
+    $dispatchRow['tooling'] = [
+      'status' => $toolStatus,
+      'loaded_tool_count' => count($toolRows),
+      'alert_count' => $toolAlertCount,
+      'items' => $toolRows,
+      'summary_vi' => $toolStatus === 'critical' ? 'Có tool tới hạn' : ($toolStatus === 'warning' ? 'Có tool cần chú ý' : ($toolStatus === 'untracked' ? 'Chưa theo dõi tool-life' : 'Tooling ổn định')),
+      'summary_en' => $toolStatus === 'critical' ? 'Critical tool risk' : ($toolStatus === 'warning' ? 'Tool warning' : ($toolStatus === 'untracked' ? 'Tool-life not tracked' : 'Tooling stable')),
     ];
     $dispatch[] = $dispatchRow;
     if ($machineId !== '') $workOrdersByMachine[$machineId][] = $dispatchRow;
@@ -2163,6 +2434,7 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   });
 
   $machineWall = [];
+  $oeeRows = [];
   foreach ((array)($master['machines'] ?? []) as $machine) {
     if (!is_array($machine)) continue;
     $machineId = trim((string)($machine['machine_id'] ?? ''));
@@ -2188,6 +2460,42 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
       $status = 'scheduled';
     }
 
+    $machineToolRows = array_values((array)($toolingByMachine[$machineId] ?? []));
+    $machineAlertCount = count(array_filter($machineToolRows, fn($row) => in_array((string)($row['alert_level'] ?? 'healthy'), ['warning', 'critical', 'untracked'], true)));
+    $machineDowntimeMinutes = 0.0;
+    foreach ((array)($mes['downtime_events'] ?? []) as $event) {
+      if (!is_array($event) || (string)($event['machine_id'] ?? '') !== $machineId) continue;
+      $machineDowntimeMinutes += mes_minutes_between((string)($event['started_at'] ?? ''), strtolower((string)($event['status'] ?? 'open')) === 'resolved' ? (string)($event['resolved_at'] ?? '') : '', $now);
+    }
+    $plannedMinutes = array_reduce($queue, fn($carry, $row) => $carry + (float)($row['setup_time_est'] ?? 0) + (float)($row['run_time_est'] ?? 0), 0.0);
+    $actualMinutes = array_reduce($queue, function ($carry, $row) use ($now) {
+      $reported = (float)($row['setup_time_actual'] ?? 0) + (float)($row['run_time_actual'] ?? 0);
+      if ($reported > 0) return $carry + $reported;
+      $status = strtolower((string)($row['status'] ?? ''));
+      if (in_array($status, ['setup', 'running', 'inspection', 'on_hold'], true)) {
+        $start = (string)($row['actual_start'] ?? $row['scheduled_start'] ?? '');
+        return $carry + mes_minutes_between($start, (string)($row['actual_end'] ?? ''), $now);
+      }
+      return $carry;
+    }, 0.0);
+    $goodQty = array_reduce($queue, fn($carry, $row) => $carry + (int)($row['qty_completed'] ?? 0), 0);
+    $scrapQty = array_reduce($queue, fn($carry, $row) => $carry + (int)($row['qty_scrap'] ?? 0), 0);
+    $totalQty = $goodQty + $scrapQty;
+    $availability = mes_percent($actualMinutes, $actualMinutes + $machineDowntimeMinutes, null);
+    $performance = ($actualMinutes > 0 && $plannedMinutes > 0) ? mes_clamp_percent(($plannedMinutes / $actualMinutes) * 100) : null;
+    $quality = $totalQty > 0 ? mes_percent((float)$goodQty, (float)$totalQty, null) : 100.0;
+    $oee = ($availability !== null && $performance !== null && $quality !== null) ? mes_clamp_percent(($availability * $performance * $quality) / 10000) : null;
+    if ($availability !== null || $performance !== null || $quality !== null || $oee !== null) {
+      $oeeRows[] = [
+        'machine_id' => $machineId,
+        'availability_pct' => $availability,
+        'performance_pct' => $performance,
+        'quality_pct' => $quality,
+        'oee_pct' => $oee,
+      ];
+    }
+
+    $activeEvidenceGate = $activeWo['evidence_gate'] ?? ['status' => 'not_required', 'total_required' => 0, 'completed_count' => 0, 'missing_form_codes' => []];
     $machineWall[] = [
       'machine_id' => $machineId,
       'machine_name' => (string)($machine['machine_name'] ?? ''),
@@ -2204,6 +2512,14 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
       'open_maintenance' => $activeMaintenanceByMachine[$machineId] ?? null,
       'last_pm_date' => (string)($machine['last_pm_date'] ?? ''),
       'next_pm_date' => (string)($machine['next_pm_date'] ?? ''),
+      'loaded_tool_count' => count($machineToolRows),
+      'tool_alert_count' => $machineAlertCount,
+      'tooling_items' => $machineToolRows,
+      'availability_pct' => $availability,
+      'performance_pct' => $performance,
+      'quality_pct' => $quality,
+      'oee_pct' => $oee,
+      'evidence_gate' => $activeEvidenceGate,
     ];
   }
 
@@ -2221,7 +2537,6 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     return strcmp((string)($a['requested_at'] ?? ''), (string)($b['requested_at'] ?? ''));
   });
 
-  $now = new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
   $overdueWo = count(array_filter($dispatch, function ($row) use ($now) {
     $status = strtolower((string)($row['status'] ?? ''));
     if (in_array($status, ['completed', 'closed'], true)) return false;
@@ -2242,6 +2557,12 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     'downtime_open' => count($openDowntimes),
     'wo_active' => count(array_filter($dispatch, fn($row) => in_array((string)($row['status'] ?? ''), ['scheduled', 'setup', 'running', 'inspection', 'on_hold'], true))),
     'wo_overdue' => $overdueWo,
+    'tooling_alerts' => count($toolingAlerts),
+    'wo_gate_missing' => count(array_filter($dispatch, fn($row) => in_array((string)($row['evidence_gate']['status'] ?? 'not_required'), ['missing', 'partial'], true))),
+    'availability_pct' => count($oeeRows) ? round(array_sum(array_map(fn($row) => (float)($row['availability_pct'] ?? 0), $oeeRows)) / count($oeeRows), 1) : null,
+    'performance_pct' => count($oeeRows) ? round(array_sum(array_map(fn($row) => (float)($row['performance_pct'] ?? 0), $oeeRows)) / count($oeeRows), 1) : null,
+    'quality_pct' => count($oeeRows) ? round(array_sum(array_map(fn($row) => (float)($row['quality_pct'] ?? 0), $oeeRows)) / count($oeeRows), 1) : null,
+    'oee_pct' => count($oeeRows) ? round(array_sum(array_map(fn($row) => (float)($row['oee_pct'] ?? 0), $oeeRows)) / count($oeeRows), 1) : null,
   ];
 
   $workCenterSummary = [];
@@ -2259,8 +2580,30 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
       'wo_count' => count($centerOrders),
       'running_count' => count(array_filter($centerMachines, fn($row) => in_array((string)($row['status'] ?? ''), ['running', 'setup', 'inspection'], true))),
       'down_count' => count(array_filter($centerMachines, fn($row) => (string)($row['status'] ?? '') === 'down')),
+      'tooling_alert_count' => count(array_filter($centerMachines, fn($row) => (int)($row['tool_alert_count'] ?? 0) > 0)),
+      'gate_missing_count' => count(array_filter($centerOrders, fn($row) => in_array((string)($row['evidence_gate']['status'] ?? 'not_required'), ['missing', 'partial'], true))),
+      'oee_pct' => count($centerMachines) ? round(array_sum(array_map(fn($row) => (float)($row['oee_pct'] ?? 0), array_filter($centerMachines, fn($row) => $row['oee_pct'] !== null))) / max(1, count(array_filter($centerMachines, fn($row) => $row['oee_pct'] !== null))), 1) : null,
     ];
   }
+
+  $evidenceGateQueue = array_values(array_map(function ($row) {
+    return [
+      'wo_number' => (string)($row['wo_number'] ?? ''),
+      'jo_number' => (string)($row['jo_number'] ?? ''),
+      'machine_id' => (string)($row['machine_id'] ?? ''),
+      'machine_name' => (string)($row['machine_name'] ?? ''),
+      'work_center_id' => (string)($row['work_center_id'] ?? ''),
+      'customer_name' => (string)($row['customer_name'] ?? ''),
+      'part_number' => (string)($row['part_number'] ?? ''),
+      'part_revision' => (string)($row['part_revision'] ?? ''),
+      'status' => (string)($row['evidence_gate']['status'] ?? 'not_required'),
+      'total_required' => (int)($row['evidence_gate']['total_required'] ?? 0),
+      'completed_count' => (int)($row['evidence_gate']['completed_count'] ?? 0),
+      'missing_form_codes' => array_values((array)($row['evidence_gate']['missing_form_codes'] ?? [])),
+      'summary_vi' => (string)($row['evidence_gate']['summary_vi'] ?? ''),
+      'summary_en' => (string)($row['evidence_gate']['summary_en'] ?? ''),
+    ];
+  }, array_values(array_filter($dispatch, fn($row) => in_array((string)($row['evidence_gate']['status'] ?? 'not_required'), ['missing', 'partial'], true)))));
 
   return [
     'kpis' => $kpis,
@@ -2270,6 +2613,8 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     'maintenance_queue' => $maintenanceQueue,
     'progress_reports' => array_slice(array_values(array_reverse((array)($mes['progress_reports'] ?? []))), 0, 20),
     'work_center_summary' => $workCenterSummary,
+    'tooling_alerts' => array_slice($toolingAlerts, 0, 20),
+    'evidence_gate_queue' => array_slice($evidenceGateQueue, 0, 20),
   ];
 }
 
@@ -2283,6 +2628,7 @@ function upsert_master_data_item(array &$store, string $entity, array $item, str
     'work_centers' => 'work_center_id',
     'machines' => 'machine_id',
     'operators' => 'operator_id',
+    'tooling_assets' => 'tool_id',
   ];
   if (!isset($map[$entity])) throw new RuntimeException('invalid_master_entity');
   $idKey = $map[$entity];
@@ -8697,6 +9043,7 @@ if ($username === '') {
         'work_centers' => count($data['work_centers'] ?? []),
         'machines' => count($data['machines'] ?? []),
         'operators' => count($data['operators'] ?? []),
+        'tooling_assets' => count($data['tooling_assets'] ?? []),
       ],
     ]);
   }
@@ -8854,7 +9201,10 @@ if ($username === '') {
     $mes = load_mes_runtime_store();
     $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
     $machines = master_index_by((array)($master['machines'] ?? []), 'machine_id');
+    $toolAssets = master_index_by((array)($master['tooling_assets'] ?? []), 'tool_id');
     if (!isset($machines[$machineId])) api_json(['ok' => false, 'error' => 'machine_not_found'], 404);
+    $toolId = trim((string)($body['tool_id'] ?? ''));
+    if ($toolId !== '' && !isset($toolAssets[$toolId])) api_json(['ok' => false, 'error' => 'tool_not_found'], 404);
 
     $woNumber = trim((string)($body['wo_number'] ?? ''));
     $jo = [];
@@ -8873,6 +9223,8 @@ if ($username === '') {
       'wo_number' => $woNumber,
       'category' => $category,
       'severity' => strtolower(trim((string)($body['severity'] ?? 'major'))),
+      'tool_id' => $toolId,
+      'tool_name' => (string)($toolAssets[$toolId]['tool_name'] ?? ''),
       'reason' => trim((string)($body['reason'] ?? '')),
       'note' => trim((string)($body['note'] ?? '')),
       'started_at' => trim((string)($body['started_at'] ?? now_iso())),
@@ -8983,7 +9335,10 @@ if ($username === '') {
     $mes = load_mes_runtime_store();
     $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
     $machines = master_index_by((array)($master['machines'] ?? []), 'machine_id');
+    $toolAssets = master_index_by((array)($master['tooling_assets'] ?? []), 'tool_id');
     if (!isset($machines[$machineId])) api_json(['ok' => false, 'error' => 'machine_not_found'], 404);
+    $toolId = trim((string)($body['tool_id'] ?? ''));
+    if ($toolId !== '' && !isset($toolAssets[$toolId])) api_json(['ok' => false, 'error' => 'tool_not_found'], 404);
 
     $request = [
       'request_id' => mes_runtime_id('MNT'),
@@ -8999,7 +9354,16 @@ if ($username === '') {
       'requested_by' => $username,
       'assigned_to' => trim((string)($body['assigned_to'] ?? '')),
       'due_date' => trim((string)($body['due_date'] ?? '')),
+      'tool_id' => $toolId,
+      'tool_name' => (string)($toolAssets[$toolId]['tool_name'] ?? ''),
       'status' => 'open',
+      'status_history' => [[
+        'from' => '',
+        'to' => 'open',
+        'changed_at' => now_iso(),
+        'changed_by' => $username,
+        'note' => trim((string)($body['note'] ?? '')),
+      ]],
     ];
     $mes['maintenance_requests'][] = $request;
     save_mes_runtime_store($mes);
@@ -9022,7 +9386,24 @@ if ($username === '') {
     $updated = null;
     foreach ($mes['maintenance_requests'] as $idx => $row) {
       if (!is_array($row) || (string)($row['request_id'] ?? '') !== $requestId) continue;
+      $currentStatus = strtolower(trim((string)($row['status'] ?? 'open')));
+      if (!mes_maintenance_transition_allowed($currentStatus, $newStatus)) {
+        api_json([
+          'ok' => false,
+          'error' => 'invalid_maintenance_transition',
+          'from' => $currentStatus,
+          'to' => $newStatus,
+        ], 409);
+      }
       $mes['maintenance_requests'][$idx]['status'] = $newStatus;
+      $mes['maintenance_requests'][$idx]['status_history'] = array_values((array)($row['status_history'] ?? []));
+      $mes['maintenance_requests'][$idx]['status_history'][] = [
+        'from' => $currentStatus,
+        'to' => $newStatus,
+        'changed_at' => now_iso(),
+        'changed_by' => $username,
+        'note' => trim((string)($body['note'] ?? '')),
+      ];
       if (!empty($body['assigned_to'])) $mes['maintenance_requests'][$idx]['assigned_to'] = trim((string)$body['assigned_to']);
       if (!empty($body['note'])) $mes['maintenance_requests'][$idx]['note'] = trim((string)$body['note']);
       if (!empty($body['actual_start']) || $newStatus === 'in_progress') {
@@ -9055,6 +9436,123 @@ if ($username === '') {
 
     save_mes_runtime_store($mes);
     api_json(['ok' => true, 'maintenance' => $updated, 'data' => build_mes_snapshot($orders, $master, $mes)]);
+  }
+
+  case 'mes_tooling_upsert': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+
+    $machineId = trim((string)($body['machine_id'] ?? ''));
+    $toolId = trim((string)($body['tool_id'] ?? ''));
+    $toolRuntimeId = trim((string)($body['tool_runtime_id'] ?? ''));
+    if ($machineId === '' || $toolId === '') api_json(['ok' => false, 'error' => 'missing_required_fields'], 400);
+
+    $master = load_master_data_store();
+    $orders = load_orders_store();
+    $mes = load_mes_runtime_store();
+    $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
+    $machines = master_index_by((array)($master['machines'] ?? []), 'machine_id');
+    $toolAssets = master_index_by((array)($master['tooling_assets'] ?? []), 'tool_id');
+
+    if (!isset($machines[$machineId])) api_json(['ok' => false, 'error' => 'machine_not_found'], 404);
+    if (!isset($toolAssets[$toolId])) api_json(['ok' => false, 'error' => 'tool_not_found'], 404);
+
+    $machine = $machines[$machineId];
+    $asset = $toolAssets[$toolId];
+    $pocket = trim((string)($body['pocket'] ?? ''));
+    $woNumber = trim((string)($body['wo_number'] ?? ''));
+    $resetLife = (bool)($body['reset_life'] ?? false);
+    $updated = null;
+
+    foreach ($mes['tooling_status'] as $idx => $row) {
+      if (!is_array($row)) continue;
+      $sameRuntime = $toolRuntimeId !== '' && (string)($row['tool_runtime_id'] ?? '') === $toolRuntimeId;
+      $sameNaturalKey = $toolRuntimeId === ''
+        && (string)($row['machine_id'] ?? '') === $machineId
+        && (string)($row['tool_id'] ?? '') === $toolId
+        && (string)($row['pocket'] ?? '') === $pocket
+        && (string)($row['wo_number'] ?? '') === $woNumber;
+      if (!$sameRuntime && !$sameNaturalKey) continue;
+
+      $mes['tooling_status'][$idx] = array_merge($row, [
+        'tool_runtime_id' => (string)($row['tool_runtime_id'] ?? ($toolRuntimeId !== '' ? $toolRuntimeId : mes_runtime_id('TLR'))),
+        'tool_id' => $toolId,
+        'tool_name' => trim((string)($body['tool_name'] ?? $asset['tool_name'] ?? $row['tool_name'] ?? '')),
+        'tool_type' => trim((string)($body['tool_type'] ?? $asset['tool_type'] ?? $row['tool_type'] ?? '')),
+        'machine_id' => $machineId,
+        'machine_name' => (string)($machine['machine_name'] ?? ''),
+        'work_center_id' => trim((string)($body['work_center_id'] ?? $machine['work_center_id'] ?? $row['work_center_id'] ?? '')),
+        'wo_number' => $woNumber !== '' ? $woNumber : (string)($row['wo_number'] ?? ''),
+        'pocket' => $pocket !== '' ? $pocket : (string)($row['pocket'] ?? ''),
+        'offset_number' => trim((string)($body['offset_number'] ?? $row['offset_number'] ?? '')),
+        'tool_status' => strtolower(trim((string)($body['tool_status'] ?? $row['tool_status'] ?? 'loaded'))),
+        'offset_status' => strtolower(trim((string)($body['offset_status'] ?? $row['offset_status'] ?? 'verified'))),
+        'life_limit_minutes' => isset($body['life_limit_minutes']) ? (float)$body['life_limit_minutes'] : (float)($row['life_limit_minutes'] ?? $asset['life_limit_minutes'] ?? 0),
+        'life_limit_parts' => isset($body['life_limit_parts']) ? (float)$body['life_limit_parts'] : (float)($row['life_limit_parts'] ?? $asset['life_limit_parts'] ?? 0),
+        'warning_pct' => isset($body['warning_pct']) ? (float)$body['warning_pct'] : (float)($row['warning_pct'] ?? $asset['warning_pct'] ?? 80),
+        'critical_pct' => isset($body['critical_pct']) ? (float)$body['critical_pct'] : (float)($row['critical_pct'] ?? $asset['critical_pct'] ?? 95),
+        'life_used_minutes' => $resetLife ? 0 : (isset($body['life_used_minutes']) ? max(0, (float)$body['life_used_minutes']) : (float)($row['life_used_minutes'] ?? 0)),
+        'life_used_parts' => $resetLife ? 0 : (isset($body['life_used_parts']) ? max(0, (float)$body['life_used_parts']) : (float)($row['life_used_parts'] ?? 0)),
+        'offset_delta_mm' => isset($body['offset_delta_mm']) ? (float)$body['offset_delta_mm'] : (float)($row['offset_delta_mm'] ?? 0),
+        'note' => trim((string)($body['note'] ?? $row['note'] ?? '')),
+        'last_verified_at' => trim((string)($body['last_verified_at'] ?? now_iso())),
+        'last_change_at' => $resetLife ? now_iso() : (string)($row['last_change_at'] ?? now_iso()),
+        'updated_at' => now_iso(),
+        'updated_by' => $username,
+      ]);
+      $mes['tooling_status'][$idx]['history'] = array_values((array)($row['history'] ?? []));
+      $mes['tooling_status'][$idx]['history'][] = [
+        'timestamp' => now_iso(),
+        'user' => $username,
+        'event' => $resetLife ? 'tool_life_reset' : 'tooling_update',
+        'note' => trim((string)($body['note'] ?? '')),
+      ];
+      $updated = $mes['tooling_status'][$idx];
+      break;
+    }
+
+    if (!$updated) {
+      $updated = [
+        'tool_runtime_id' => $toolRuntimeId !== '' ? $toolRuntimeId : mes_runtime_id('TLR'),
+        'tool_id' => $toolId,
+        'tool_name' => trim((string)($body['tool_name'] ?? $asset['tool_name'] ?? '')),
+        'tool_type' => trim((string)($body['tool_type'] ?? $asset['tool_type'] ?? '')),
+        'machine_id' => $machineId,
+        'machine_name' => (string)($machine['machine_name'] ?? ''),
+        'work_center_id' => trim((string)($body['work_center_id'] ?? $machine['work_center_id'] ?? '')),
+        'wo_number' => $woNumber,
+        'pocket' => $pocket,
+        'offset_number' => trim((string)($body['offset_number'] ?? '')),
+        'tool_status' => strtolower(trim((string)($body['tool_status'] ?? 'loaded'))),
+        'offset_status' => strtolower(trim((string)($body['offset_status'] ?? 'verified'))),
+        'life_limit_minutes' => isset($body['life_limit_minutes']) ? (float)$body['life_limit_minutes'] : (float)($asset['life_limit_minutes'] ?? 0),
+        'life_limit_parts' => isset($body['life_limit_parts']) ? (float)$body['life_limit_parts'] : (float)($asset['life_limit_parts'] ?? 0),
+        'warning_pct' => isset($body['warning_pct']) ? (float)$body['warning_pct'] : (float)($asset['warning_pct'] ?? 80),
+        'critical_pct' => isset($body['critical_pct']) ? (float)$body['critical_pct'] : (float)($asset['critical_pct'] ?? 95),
+        'life_used_minutes' => $resetLife ? 0 : max(0, (float)($body['life_used_minutes'] ?? 0)),
+        'life_used_parts' => $resetLife ? 0 : max(0, (float)($body['life_used_parts'] ?? 0)),
+        'offset_delta_mm' => (float)($body['offset_delta_mm'] ?? 0),
+        'note' => trim((string)($body['note'] ?? '')),
+        'last_verified_at' => trim((string)($body['last_verified_at'] ?? now_iso())),
+        'last_change_at' => now_iso(),
+        'created_at' => now_iso(),
+        'created_by' => $username,
+        'updated_at' => now_iso(),
+        'updated_by' => $username,
+        'history' => [[
+          'timestamp' => now_iso(),
+          'user' => $username,
+          'event' => $resetLife ? 'tool_life_reset' : 'tooling_created',
+          'note' => trim((string)($body['note'] ?? '')),
+        ]],
+      ];
+      $mes['tooling_status'][] = $updated;
+    }
+
+    save_mes_runtime_store($mes);
+    api_json(['ok' => true, 'tooling' => $updated, 'data' => build_mes_snapshot($orders, $master, $mes)]);
   }
 
   case 'order_dashboard_stats': {
@@ -9719,22 +10217,9 @@ if ($username === '') {
     }
 
     // 5. WOs missing evidence gates
-    $woMissingEvidence = 0;
-    $formLinks = (array)($orders['form_links'] ?? []);
-    foreach ((array)($orders['work_orders'] ?? []) as $wo) {
-      if (!is_array($wo)) continue;
-      $st = strtolower(trim((string)($wo['status'] ?? '')));
-      if (!in_array($st, ['in_progress', 'running', 'started'], true)) continue;
-      $woId = (string)($wo['wo_number'] ?? '');
-      $hasEvidence = false;
-      foreach ($formLinks as $link) {
-        if (is_array($link) && (string)($link['order_type'] ?? '') === 'wo' && (string)($link['order_id'] ?? '') === $woId) {
-          $hasEvidence = true;
-          break;
-        }
-      }
-      if (!$hasEvidence) $woMissingEvidence++;
-    }
+    $mes = load_mes_runtime_store();
+    $mesSnapshot = build_mes_snapshot($orders, $master, $mes);
+    $woMissingEvidence = count((array)($mesSnapshot['evidence_gate_queue'] ?? []));
 
     // 6. Orphan record links (links pointing to non-existent orders)
     $orphanLinks = 0;
@@ -9850,29 +10335,23 @@ if ($username === '') {
       }
       case 'wo_missing_evidence': {
         $orders = load_orders_store();
-        $formLinks = (array)($orders['form_links'] ?? []);
-        foreach ((array)($orders['work_orders'] ?? []) as $wo) {
-          if (!is_array($wo)) continue;
-          $st = strtolower(trim((string)($wo['status'] ?? '')));
-          if (!in_array($st, ['in_progress', 'running', 'started'], true)) continue;
-          $woId = (string)($wo['wo_number'] ?? '');
-          $hasEvidence = false;
-          foreach ($formLinks as $link) {
-            if (is_array($link) && (string)($link['order_type'] ?? '') === 'wo' && (string)($link['order_id'] ?? '') === $woId) {
-              $hasEvidence = true;
-              break;
-            }
-          }
-          if (!$hasEvidence) {
-            $items[] = [
-              'id'         => $woId,
-              'type'       => 'WO',
-              'department' => (string)($wo['work_center_id'] ?? ''),
-              'date'       => (string)($wo['start_date'] ?? $wo['created_at'] ?? ''),
-              'responsible'=> (string)($wo['created_by'] ?? ''),
-              'detail'     => (string)($wo['operation_desc'] ?? ''),
-            ];
-          }
+        $master = load_master_data_store();
+        $mes = load_mes_runtime_store();
+        $snapshot = build_mes_snapshot($orders, $master, $mes);
+        foreach ((array)($snapshot['evidence_gate_queue'] ?? []) as $row) {
+          if (!is_array($row)) continue;
+          $items[] = [
+            'id'         => (string)($row['wo_number'] ?? ''),
+            'type'       => 'WO',
+            'department' => (string)($row['work_center_id'] ?? ''),
+            'date'       => '',
+            'responsible'=> (string)($row['machine_id'] ?? ''),
+            'detail'     => implode(' · ', array_filter([
+              (string)($row['customer_name'] ?? ''),
+              trim((string)($row['part_number'] ?? '') . ' ' . (string)($row['part_revision'] ?? '')),
+              !empty($row['missing_form_codes']) ? ('Thiếu: ' . implode(', ', (array)$row['missing_form_codes'])) : '',
+            ])),
+          ];
         }
         break;
       }

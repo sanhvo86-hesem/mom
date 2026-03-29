@@ -173,6 +173,30 @@ var ENTITY_CONFIG = {
       { key:'skills', type:'text', label:'Kỹ năng / chứng nhận', helper:'Nhập các kỹ năng chính, phân tách bằng dấu phẩy.' },
       { key:'status', type:'select', required:true, label:'Trạng thái', options:['active','inactive','training','blocked'] }
     ]
+  },
+  tooling_assets: {
+    key: 'tool_id',
+    labelVi: 'Dao / tooling',
+    labelEn: 'Tooling assets',
+    emptyVi: 'Chưa có dao hoặc tooling nào.',
+    listColumns: [
+      { key:'tool_id', label:'Mã tool' },
+      { key:'tool_name', label:'Tên tooling' },
+      { key:'status', label:'Trạng thái' }
+    ],
+    fields: [
+      { key:'tool_id', type:'text', required:true, label:'Mã tooling' },
+      { key:'tool_name', type:'text', required:true, label:'Tên tooling' },
+      { key:'tool_type', type:'select', required:true, label:'Loại tooling', options:['endmill','drill','insert','tap','reamer','probe','holder','fixture'] },
+      { key:'machine_type', type:'select', label:'Machine family', options:['5-axis','3-axis','turning','mill-turn','cmm','multi'] },
+      { key:'preferred_work_center_id', type:'lookup', entity:'work_centers', label:'Work center ưu tiên' },
+      { key:'life_limit_minutes', type:'number', label:'Giới hạn life (phút)' },
+      { key:'life_limit_parts', type:'number', label:'Giới hạn life (số chi tiết)' },
+      { key:'warning_pct', type:'number', label:'Ngưỡng cảnh báo (%)' },
+      { key:'critical_pct', type:'number', label:'Ngưỡng tới hạn (%)' },
+      { key:'default_offset_band_mm', type:'number', label:'Dải offset chuẩn (mm)' },
+      { key:'status', type:'select', required:true, label:'Trạng thái', options:['active','quarantine','retired'] }
+    ]
   }
 };
 
@@ -227,6 +251,7 @@ function _optionLabel(entity, row){
   if(entity === 'work_centers') return row.work_center_name || row.work_center_id || '';
   if(entity === 'machines') return row.machine_name || row.machine_id || '';
   if(entity === 'operators') return row.operator_name || row.operator_id || '';
+  if(entity === 'tooling_assets') return row.tool_name || row.tool_id || '';
   return '';
 }
 
@@ -248,6 +273,7 @@ function _defaultDraft(entity){
   if(entity === 'work_centers') draft.status = 'active';
   if(entity === 'machines') draft.status = 'active';
   if(entity === 'operators') draft.status = 'active';
+  if(entity === 'tooling_assets') { draft.status = 'active'; draft.warning_pct = '80'; draft.critical_pct = '95'; }
   return draft;
 }
 

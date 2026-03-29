@@ -1,9 +1,9 @@
 {
   "_meta": {
-    "version": "1.0",
+    "version": "1.1",
     "created": "2026-03-29T12:00:00+07:00",
-    "updated": "2026-03-29T12:00:00+07:00",
-    "description": "Master data seed for customer, supplier, part, revision, CAPA, work center, machine, and operator linkage used by Evidence Control, Order Management, and MES runtime."
+    "updated": "2026-03-29T21:10:00+07:00",
+    "description": "Master data seed for customer, supplier, part, revision, CAPA, work center, machine, operator, and tooling linkage used by Evidence Control, Order Management, and MES runtime."
   },
   "customers": [
     {
@@ -121,21 +121,24 @@
       "title": "Tooling wear on CNC-05",
       "status": "open",
       "customer_id": "CUS-LAM",
-      "part_number": "714-1101"
+      "part_number": "714-1101",
+      "opened_date": "2026-01-12"
     },
     {
       "capa_number": "CAPA-2026-002",
       "title": "Operator training gap - night shift",
       "status": "in_progress",
       "customer_id": "CUS-ACME",
-      "part_number": "P-1001"
+      "part_number": "P-1001",
+      "opened_date": "2026-02-19"
     },
     {
       "capa_number": "CAPA-2026-003",
       "title": "Raw material specification deviation",
       "status": "closed",
       "customer_id": "CUS-GLOBEX",
-      "part_number": "P-2003"
+      "part_number": "P-2003",
+      "opened_date": "2025-12-22"
     }
   ],
   "work_centers": [
@@ -242,6 +245,60 @@
       "work_center_id": "WC-MNT",
       "shift": "day",
       "skills": "PM, spindle, coolant, pneumatics",
+      "status": "active"
+    }
+  ],
+  "tooling_assets": [
+    {
+      "tool_id": "TL-EM12-5AX-001",
+      "tool_name": "Endmill Carbide Ø12 ALTiN",
+      "tool_type": "endmill",
+      "machine_type": "5-axis",
+      "preferred_work_center_id": "WC-5AX",
+      "life_limit_minutes": 180,
+      "life_limit_parts": 60,
+      "warning_pct": 80,
+      "critical_pct": 95,
+      "default_offset_band_mm": 0.02,
+      "status": "active"
+    },
+    {
+      "tool_id": "TL-DR06-3AX-014",
+      "tool_name": "Through Coolant Drill Ø6",
+      "tool_type": "drill",
+      "machine_type": "3-axis",
+      "preferred_work_center_id": "WC-3AX",
+      "life_limit_minutes": 90,
+      "life_limit_parts": 45,
+      "warning_pct": 75,
+      "critical_pct": 92,
+      "default_offset_band_mm": 0.015,
+      "status": "active"
+    },
+    {
+      "tool_id": "TL-PRB-CMM-001",
+      "tool_name": "CMM Probe Stylus Set",
+      "tool_type": "probe",
+      "machine_type": "cmm",
+      "preferred_work_center_id": "WC-QA",
+      "life_limit_minutes": 0,
+      "life_limit_parts": 0,
+      "warning_pct": 80,
+      "critical_pct": 95,
+      "default_offset_band_mm": 0.005,
+      "status": "active"
+    },
+    {
+      "tool_id": "TL-HLD-5AX-021",
+      "tool_name": "Shrink Holder HSK63A",
+      "tool_type": "holder",
+      "machine_type": "5-axis",
+      "preferred_work_center_id": "WC-5AX",
+      "life_limit_minutes": 0,
+      "life_limit_parts": 0,
+      "warning_pct": 80,
+      "critical_pct": 95,
+      "default_offset_band_mm": 0.01,
       "status": "active"
     }
   ]

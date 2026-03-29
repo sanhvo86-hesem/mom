@@ -9,8 +9,8 @@
   "online": true,
   "decision_score": 84,
   "sop_ref": "SOP-504",
-  "description": "Governed pre-run release for CNC work orders with machine, WO, operator, and setup-readiness confirmation before machining starts.",
-  "description_vi": "Biểu mẫu pre-run có kiểm soát cho WO CNC với máy, WO, người vận hành và xác nhận mức sẵn sàng setup trước khi chạy máy.",
+  "description": "Governed pre-run release for CNC work orders with machine, WO, operator, tooling, and setup-readiness confirmation before machining starts.",
+  "description_vi": "Biểu mẫu pre-run có kiểm soát cho WO CNC với máy, WO, người vận hành, tooling và xác nhận mức sẵn sàng setup trước khi chạy máy.",
   "roles_allowed": [
     "admin",
     "production_manager",
@@ -31,9 +31,9 @@
       "id": "context",
       "title": "Execution Context",
       "title_vi": "Ngữ cảnh thực thi",
-      "description": "Select the governed WO, machine, and operator to make sure pre-run evidence links to the exact job context.",
-      "description_vi": "Chọn WO, máy và người vận hành đã được quản lý để pre-run luôn bám đúng ngữ cảnh job.",
-      "field_ids": ["check_date", "shift", "work_center_id", "machine_id", "wo_number", "operator_id", "part_number", "part_revision"]
+      "description": "Select the governed WO, machine, operator, and the primary tooling package before machining starts.",
+      "description_vi": "Chọn WO, máy, người vận hành và bộ tooling chính đã được quản lý trước khi cho máy chạy.",
+      "field_ids": ["check_date", "shift", "work_center_id", "machine_id", "wo_number", "operator_id", "primary_tool_id", "part_number", "part_revision"]
     },
     {
       "id": "readiness",
@@ -41,7 +41,7 @@
       "title_vi": "Kiểm tra mức sẵn sàng",
       "description": "Verify the minimum release conditions before machining starts.",
       "description_vi": "Xác nhận các điều kiện tối thiểu trước khi cho máy chạy sản xuất.",
-      "field_ids": ["document_set_ok", "material_lot_ok", "tool_list_ok", "offset_probe_ok", "fixture_setup_ok", "coolant_chip_ok", "dry_run_ok", "risk_flags", "notes"]
+      "field_ids": ["document_set_ok", "material_lot_ok", "tool_list_ok", "offset_probe_ok", "fixture_setup_ok", "coolant_chip_ok", "dry_run_ok", "risk_flags", "tooling_note", "notes"]
     }
   ],
   "fields": [
@@ -138,6 +138,20 @@
       "placeholder_vi": "Tìm người vận hành"
     },
     {
+      "id": "primary_tool_id",
+      "type": "lookup",
+      "label": "Primary Tooling Package",
+      "label_vi": "Tooling / dao chính",
+      "required": false,
+      "width": "third",
+      "lookup_source": "tooling_assets",
+      "strict_select": true,
+      "depends_on": ["machine_id", "work_center_id"],
+      "display_fields": ["tool_id", "tool_name", "tool_type"],
+      "placeholder": "Search tooling",
+      "placeholder_vi": "Tìm tooling / dao"
+    },
+    {
       "id": "part_number",
       "type": "lookup",
       "label": "Part Number",
@@ -209,7 +223,7 @@
       "label": "Offset & Probe",
       "label_vi": "Offset & probe",
       "checkbox_label": "Offsets and probes have been verified",
-      "checkbox_label_vi": "Offsets và probe đã được xác nhận",
+      "checkbox_label_vi": "Offset và probe đã được xác nhận",
       "required": true,
       "default": false
     },
@@ -256,6 +270,17 @@
         { "value": "tight_tolerance", "label": "Tight tolerance", "label_vi": "Dung sai chặt" },
         { "value": "first_run_on_machine", "label": "First run on this machine", "label_vi": "Lần đầu chạy trên máy này" }
       ]
+    },
+    {
+      "id": "tooling_note",
+      "type": "textarea",
+      "label": "Tooling Note",
+      "label_vi": "Ghi chú tooling",
+      "required": false,
+      "rows": 3,
+      "width": "full",
+      "placeholder": "Probe offset, sister tool, holder, or pocket notes",
+      "placeholder_vi": "Ghi chú về probe offset, sister tool, holder hoặc pocket"
     },
     {
       "id": "notes",

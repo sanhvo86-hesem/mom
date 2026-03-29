@@ -1,6 +1,8 @@
 /* ===================================================================
    14-mes-control-center.js
    HESEM QMS Portal -- MES Control Center
+   Production control room for CNC dispatch, evidence gates, downtime,
+   maintenance, and tooling life.
    =================================================================== */
 
 (function(){
@@ -9,76 +11,67 @@
 var state = {
   container: null,
   snapshot: null,
-  exceptions: null,
   master: null,
+  exceptions: null,
   search: '',
   workCenter: '',
   dispatchStatus: '',
+  loading: false,
   modal: null,
-  refreshTimer: null,
-  loading: false
+  refreshTimer: null
 };
 
 var STATUS_META = {
-  scheduled:   { labelVi:'Đã lên lịch', labelEn:'Scheduled', color:'#64748b' },
-  setup:       { labelVi:'Đang setup', labelEn:'Setup', color:'#2563eb' },
-  running:     { labelVi:'Đang chạy', labelEn:'Running', color:'#0f9d58' },
-  inspection:  { labelVi:'Đang kiểm tra', labelEn:'Inspection', color:'#7c3aed' },
-  completed:   { labelVi:'Hoàn thành', labelEn:'Completed', color:'#059669' },
-  on_hold:     { labelVi:'Tạm dừng', labelEn:'On hold', color:'#dc2626' },
-  down:        { labelVi:'Dừng máy', labelEn:'Machine down', color:'#dc2626' },
-  maintenance: { labelVi:'Bảo trì', labelEn:'Maintenance', color:'#d97706' },
-  idle:        { labelVi:'Rảnh', labelEn:'Idle', color:'#475569' },
-  open:        { labelVi:'Mở', labelEn:'Open', color:'#dc2626' },
-  approved:    { labelVi:'Đã duyệt', labelEn:'Approved', color:'#2563eb' },
-  in_progress: { labelVi:'Đang xử lý', labelEn:'In progress', color:'#d97706' },
-  resolved:    { labelVi:'Đã khôi phục', labelEn:'Resolved', color:'#059669' },
-  cancelled:   { labelVi:'Đã hủy', labelEn:'Cancelled', color:'#6b7280' }
+  scheduled:   { vi:'Đã lên lịch', en:'Scheduled', color:'#64748b' },
+  setup:       { vi:'Đang setup', en:'Setup', color:'#2563eb' },
+  running:     { vi:'Đang chạy', en:'Running', color:'#0f9d58' },
+  inspection:  { vi:'Đang kiểm tra', en:'Inspection', color:'#7c3aed' },
+  completed:   { vi:'Hoàn thành', en:'Completed', color:'#059669' },
+  on_hold:     { vi:'Tạm dừng', en:'On hold', color:'#dc2626' },
+  down:        { vi:'Dừng máy', en:'Machine down', color:'#dc2626' },
+  maintenance: { vi:'Bảo trì', en:'Maintenance', color:'#d97706' },
+  idle:        { vi:'Rảnh', en:'Idle', color:'#475569' },
+  open:        { vi:'Mở', en:'Open', color:'#dc2626' },
+  approved:    { vi:'Đã duyệt', en:'Approved', color:'#2563eb' },
+  in_progress: { vi:'Đang xử lý', en:'In progress', color:'#d97706' },
+  resolved:    { vi:'Đã khôi phục', en:'Resolved', color:'#059669' },
+  cancelled:   { vi:'Đã hủy', en:'Cancelled', color:'#6b7280' }
+};
+
+var TOOL_META = {
+  healthy:   { vi:'Ổn định', en:'Stable', color:'#059669' },
+  warning:   { vi:'Cần chú ý', en:'Warning', color:'#d97706' },
+  critical:  { vi:'Tới hạn', en:'Critical', color:'#dc2626' },
+  untracked: { vi:'Chưa theo dõi', en:'Untracked', color:'#7c3aed' }
+};
+
+var GATE_META = {
+  ready:        { vi:'Đủ gate', en:'Ready', color:'#059669' },
+  partial:      { vi:'Thiếu một phần', en:'Partial', color:'#d97706' },
+  missing:      { vi:'Thiếu bắt buộc', en:'Missing', color:'#dc2626' },
+  not_required: { vi:'Không yêu cầu', en:'Not required', color:'#64748b' }
 };
 
 var EXCEPTION_META = {
-  overdue_allocations: {
-    labelVi:'Allocation quá hạn',
-    labelEn:'Overdue allocations',
-    noteVi:'Đã tải form nhưng quá hạn chưa nộp lại.',
-    noteEn:'Forms issued long ago but still not submitted.'
-  },
-  failed_uploads: {
-    labelVi:'Upload thất bại',
-    labelEn:'Failed uploads',
-    noteVi:'Đang nằm trong hàng đợi exception để xử lý.',
-    noteEn:'Files currently waiting in the exception queue.'
-  },
-  overdue_orders: {
-    labelVi:'Đơn hàng quá hạn',
-    labelEn:'Overdue orders',
-    noteVi:'SO / JO / WO đã vượt ngày giao hoặc ngày hoàn tất.',
-    noteEn:'SO / JO / WO past due date.'
-  },
-  overdue_capas: {
-    labelVi:'CAPA mở quá hạn',
-    labelEn:'Overdue CAPA',
-    noteVi:'Các CAPA mở quá lâu cần escalation.',
-    noteEn:'Long-open CAPA items that need escalation.'
-  },
-  wo_missing_evidence: {
-    labelVi:'WO thiếu chứng cứ',
-    labelEn:'WO missing evidence',
-    noteVi:'WO đang hoạt động nhưng chưa có liên kết hồ sơ.',
-    noteEn:'Active WO without linked evidence.'
-  },
-  orphan_links: {
-    labelVi:'Liên kết mồ côi',
-    labelEn:'Orphan links',
-    noteVi:'Link hồ sơ không còn tìm thấy SO / JO / WO gốc.',
-    noteEn:'Evidence links without valid SO / JO / WO parent.'
-  }
+  overdue_allocations: { vi:'Allocation quá hạn', en:'Overdue allocations', icon:'⏳' },
+  failed_uploads:      { vi:'Upload lỗi', en:'Failed uploads', icon:'📤' },
+  overdue_orders:      { vi:'Đơn hàng quá hạn', en:'Overdue orders', icon:'📦' },
+  overdue_capas:       { vi:'CAPA mở lâu', en:'Overdue CAPA', icon:'🧩' },
+  wo_missing_evidence: { vi:'WO thiếu chứng cứ', en:'WO missing evidence', icon:'🧾' },
+  orphan_links:        { vi:'Liên kết mồ côi', en:'Orphan links', icon:'🧷' }
 };
 
 function t(vi, en){ return (typeof lang !== 'undefined' && lang === 'en') ? en : vi; }
-function esc(value){ var d = document.createElement('div'); d.appendChild(document.createTextNode(String(value == null ? '' : value))); return d.innerHTML; }
+function esc(value){
+  var div = document.createElement('div');
+  div.appendChild(document.createTextNode(String(value == null ? '' : value)));
+  return div.innerHTML;
+}
 function jsonAttr(value){ return encodeURIComponent(JSON.stringify(value || {})); }
-function parseJsonAttr(value){ try { return JSON.parse(decodeURIComponent(String(value || ''))); } catch (_e) { return {}; } }
+function parseJsonAttr(value){
+  try { return JSON.parse(decodeURIComponent(String(value || ''))); }
+  catch (_error) { return {}; }
+}
 function nowInputValue(){
   var d = new Date();
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0') + 'T' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
@@ -93,19 +86,44 @@ function fmtDateTime(value){
   if(!value) return '—';
   var d = new Date(value);
   if(isNaN(d.getTime())) return String(value);
-  return fmtDate(value) + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  return fmtDate(value) + ' · ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+function fmtPercent(value){
+  if(value === null || value === undefined || value === '' || isNaN(Number(value))) return '—';
+  return Number(value).toFixed(1).replace(/\.0$/, '') + '%';
+}
+function fmtMinutes(value){
+  var num = Number(value || 0);
+  if(!isFinite(num) || num <= 0) return t('0 phút', '0 min');
+  if(num < 60) return Math.round(num) + ' ' + t('phút', 'min');
+  var hours = Math.floor(num / 60);
+  var minutes = Math.round(num % 60);
+  return hours + 'h ' + String(minutes).padStart(2, '0') + 'm';
+}
+function currentStamp(){
+  var d = new Date();
+  return d.toLocaleString((typeof lang !== 'undefined' && lang === 'en') ? 'en-GB' : 'vi-VN', {
+    year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'
+  });
 }
 function statusMeta(key){
-  var normalized = String(key || '').toLowerCase();
-  return STATUS_META[normalized] || { labelVi:key || '—', labelEn:key || '—', color:'#64748b' };
+  var meta = STATUS_META[String(key || '').toLowerCase()];
+  return meta || { vi:key || '—', en:key || '—', color:'#64748b' };
 }
-function statusBadge(key){
-  var meta = statusMeta(key);
-  return '<span class="mes-badge" style="--badge:' + meta.color + '">' + esc(t(meta.labelVi, meta.labelEn)) + '</span>';
+function toolMeta(key){
+  var meta = TOOL_META[String(key || '').toLowerCase()];
+  return meta || { vi:key || '—', en:key || '—', color:'#64748b' };
+}
+function gateMeta(key){
+  var meta = GATE_META[String(key || '').toLowerCase()];
+  return meta || { vi:key || '—', en:key || '—', color:'#64748b' };
+}
+function badge(meta){
+  return '<span class="mesx-pill" style="--pill:' + meta.color + '">' + esc(t(meta.vi, meta.en)) + '</span>';
 }
 function toast(message, type){
   if(typeof window._fhShowToast === 'function') return window._fhShowToast(message, type);
-  if(window.console) console.log('[MES]', type || 'info', message);
+  if(window.console) console.log('[mes]', type || 'info', message);
 }
 function api(action, payload, method){
   var callMethod = method || 'GET';
@@ -113,102 +131,269 @@ function api(action, payload, method){
   var url = 'api.php?action=' + encodeURIComponent(action);
   if(callMethod === 'GET' && payload){
     Object.keys(payload).forEach(function(key){
-      if(payload[key] === undefined || payload[key] === null || payload[key] === '') return;
-      url += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(String(payload[key]));
+      var value = payload[key];
+      if(value === undefined || value === null || value === '') return;
+      url += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(String(value));
     });
   }
-  var options = { method: callMethod, credentials:'include', headers:{} };
+  var options = { method:callMethod, credentials:'include', headers:{} };
   if(typeof csrfToken !== 'undefined' && csrfToken) options.headers['X-CSRF-Token'] = csrfToken;
   if(callMethod !== 'GET'){
     options.headers['Content-Type'] = 'application/json';
     options.body = JSON.stringify(payload || {});
   }
-  return fetch(url, options).then(function(resp){ return resp.json(); });
+  return fetch(url, options).then(function(response){ return response.json(); });
+}
+function defaultSnapshot(){
+  return {
+    kpis: {},
+    machine_wall: [],
+    dispatch: [],
+    open_downtimes: [],
+    maintenance_queue: [],
+    progress_reports: [],
+    work_center_summary: [],
+    tooling_alerts: [],
+    evidence_gate_queue: []
+  };
 }
 
 function ensureStyles(){
-  if(document.getElementById('mes-cc-styles')) return;
+  if(document.getElementById('mes-control-center-styles')) return;
   var style = document.createElement('style');
-  style.id = 'mes-cc-styles';
+  style.id = 'mes-control-center-styles';
   style.textContent = [
-    '.mes-wrap{padding:24px 24px 40px;max-width:1520px;margin:0 auto;color:#0f172a}',
-    '.mes-hero{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(340px,.88fr);gap:18px;align-items:stretch;margin-bottom:18px}',
-    '.mes-poster{position:relative;overflow:hidden;border-radius:28px;padding:26px 28px;background:linear-gradient(135deg,#0c2d48 0%,#15466f 52%,#1f6aa5 100%);color:#fff;box-shadow:0 24px 60px rgba(12,45,72,.24)}',
-    '.mes-poster::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,0) 40%)}',
-    '.mes-poster::after{content:"";position:absolute;right:-80px;top:-70px;width:240px;height:240px;border-radius:999px;background:radial-gradient(circle,rgba(249,168,37,.22) 0%,rgba(249,168,37,0) 68%)}',
-    '.mes-kicker{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.72);font-weight:800}.mes-poster-head{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;position:relative;z-index:1}.mes-brand{display:flex;gap:14px;align-items:center}.mes-brand-logo{width:54px;height:54px;border-radius:14px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)}.mes-brand-logo img{width:36px;height:36px;object-fit:contain}.mes-poster h1{margin:10px 0 10px;font-size:32px;line-height:1.08;letter-spacing:-.03em}.mes-poster p{margin:0;color:rgba(255,255,255,.82);max-width:760px;line-height:1.7;font-size:14px}.mes-poster-facts{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.mes-fact{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.10);font-size:12px;font-weight:700;color:#fff;border:1px solid rgba(255,255,255,.12)}',
-    '.mes-poster-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.mes-btn{height:42px;border:none;border-radius:14px;padding:0 16px;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:800;cursor:pointer;transition:transform .14s ease,box-shadow .14s ease,background .14s ease}.mes-btn:hover{transform:translateY(-1px)}.mes-btn.primary{background:#f9a825;color:#102133;box-shadow:0 12px 24px rgba(249,168,37,.26)}.mes-btn.secondary{background:rgba(255,255,255,.10);color:#fff;border:1px solid rgba(255,255,255,.16)}.mes-btn.ghost{background:#fff;color:#0c2d48;border:1px solid #dbe4ef}',
-    '.mes-side{display:grid;grid-template-rows:auto auto;gap:18px}.mes-card{background:#fff;border:1px solid #e2e8f0;border-radius:24px;box-shadow:0 16px 40px rgba(15,23,42,.06)}.mes-clock{padding:22px 22px 18px;background:linear-gradient(180deg,#f8fbff 0%,#ffffff 100%)}.mes-clock-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}.mes-clock strong{font-size:30px;line-height:1;color:#0c2d48;display:block;margin-top:10px}.mes-clock small{display:block;font-size:12px;color:#64748b;line-height:1.7}',
-    '.mes-kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:18px}.mes-kpi{border-radius:18px;padding:16px;background:#f8fafc;border:1px solid #e5edf6}.mes-kpi small{display:block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#64748b;margin-bottom:8px}.mes-kpi strong{display:block;font-size:28px;line-height:1;color:#0c2d48}.mes-kpi span{display:block;font-size:12px;color:#64748b;margin-top:8px}',
-    '.mes-summary{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}.mes-panel{background:#fff;border:1px solid #e2e8f0;border-radius:24px;box-shadow:0 16px 40px rgba(15,23,42,.05);padding:18px}.mes-panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}.mes-panel-head h2,.mes-panel-head h3{margin:0;font-size:18px;color:#0c2d48}.mes-panel-head p{margin:4px 0 0;font-size:12px;color:#64748b;line-height:1.7}.mes-chips{display:flex;flex-wrap:wrap;gap:10px}.mes-chip{padding:10px 12px;border-radius:999px;background:#f8fafc;border:1px solid #e2e8f0;font-size:12px;color:#334155;font-weight:700}',
-    '.mes-main{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(360px,.82fr);gap:18px;align-items:start}.mes-stack{display:grid;gap:18px}.mes-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}.mes-input,.mes-select,.mes-textarea{width:100%;border:1px solid #d7e1ec;border-radius:14px;padding:10px 12px;font-family:inherit;font-size:13px;box-sizing:border-box;background:#fff}.mes-input:focus,.mes-select:focus,.mes-textarea:focus{outline:none;border-color:#1565c0;box-shadow:0 0 0 3px rgba(21,101,192,.12)}.mes-input.search{max-width:320px}.mes-table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:18px}.mes-table{width:100%;border-collapse:collapse;min-width:940px}.mes-table th,.mes-table td{padding:12px 14px;border-bottom:1px solid #eef2f6;font-size:12px;text-align:left;vertical-align:top}.mes-table th{background:#f8fafc;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#64748b;font-weight:800;position:sticky;top:0;z-index:1}',
-    '.mes-code{font-family:Consolas,monospace;font-size:12px;font-weight:800;color:#0f172a}.mes-sub{display:block;margin-top:4px;color:#64748b;font-size:11px;line-height:1.5}.mes-row-actions,.mes-mini-actions{display:flex;gap:8px;flex-wrap:wrap}.mes-link-btn{border:none;background:#eef4fb;color:#0c2d48;padding:8px 10px;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer}.mes-link-btn.warning{background:#fff7ed;color:#c2410c}.mes-link-btn[disabled]{opacity:.45;cursor:not-allowed}',
-    '.mes-wall{display:grid;gap:12px}.mes-machine{border:1px solid #e2e8f0;border-radius:18px;padding:16px;background:linear-gradient(180deg,#ffffff 0%,#fbfdff 100%)}.mes-machine-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.mes-machine h4{margin:0;font-size:15px;color:#0f172a}.mes-machine p{margin:4px 0 0;font-size:12px;color:#64748b;line-height:1.55}.mes-machine-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.mes-cell{border:1px solid #edf2f7;border-radius:12px;padding:10px;background:#f8fafc}.mes-cell small{display:block;font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.08em;font-weight:800;margin-bottom:5px}.mes-cell strong{display:block;font-size:12px;color:#0f172a;line-height:1.45}',
-    '.mes-list{display:grid;gap:10px}.mes-list-item{border:1px solid #e2e8f0;border-radius:16px;padding:14px;background:#fff}.mes-list-item h4{margin:0;font-size:14px;color:#0f172a}.mes-list-item p{margin:6px 0 0;color:#64748b;font-size:12px;line-height:1.6}.mes-list-item .mes-meta-line{margin-top:8px;font-size:11px;color:#475569;line-height:1.6}.mes-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:color-mix(in srgb, var(--badge) 14%, white);color:var(--badge);font-size:11px;font-weight:800}',
-    '.mes-exc-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.mes-exc{border:none;width:100%;text-align:left;border-radius:16px;padding:14px;border:1px solid #e2e8f0;background:#f8fafc;cursor:pointer;transition:transform .14s ease,box-shadow .14s ease,border-color .14s ease}.mes-exc:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(21,101,192,.08);border-color:#93c5fd}.mes-exc strong{display:block;font-size:24px;line-height:1;color:#0c2d48;margin-bottom:6px}.mes-exc span{display:block;font-size:12px;color:#475569;font-weight:700}.mes-exc small{display:block;margin-top:6px;font-size:11px;color:#64748b;line-height:1.5}',
-    '.mes-modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.52);backdrop-filter:blur(6px);z-index:12000;display:flex;align-items:center;justify-content:center;padding:24px}.mes-modal{width:min(760px,96vw);max-height:90vh;overflow:auto;background:#fff;border-radius:24px;box-shadow:0 30px 80px rgba(15,23,42,.28)}.mes-modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:22px 24px 16px;border-bottom:1px solid #e2e8f0}.mes-modal-head h3{margin:0;font-size:20px;color:#0c2d48}.mes-modal-head p{margin:4px 0 0;font-size:12px;color:#64748b;line-height:1.7}.mes-x{border:none;background:#eef2f7;color:#334155;width:38px;height:38px;border-radius:12px;cursor:pointer;font-size:20px}.mes-modal-body{padding:20px 24px 24px}.mes-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.mes-form-grid .full{grid-column:1 / -1}.mes-field label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#64748b;font-weight:800;margin-bottom:6px}.mes-textarea{min-height:110px;resize:vertical}.mes-modal-foot{display:flex;justify-content:flex-end;gap:10px;padding-top:16px}.mes-detail-table{width:100%;border-collapse:collapse}.mes-detail-table th,.mes-detail-table td{padding:10px 12px;border-bottom:1px solid #eef2f6;font-size:12px;text-align:left;vertical-align:top}.mes-detail-table th{font-size:11px;text-transform:uppercase;color:#64748b;letter-spacing:.08em;font-weight:800;background:#f8fafc}',
-    '.mes-empty{padding:20px;border:1px dashed #cbd5e1;border-radius:16px;background:#f8fafc;text-align:center;font-size:12px;color:#64748b;line-height:1.6}.mes-empty strong{display:block;color:#0c2d48;margin-bottom:5px}',
-    '@media (max-width:1280px){.mes-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mes-main,.mes-summary,.mes-hero{grid-template-columns:1fr}}',
-    '@media (max-width:860px){.mes-exc-grid,.mes-machine-grid,.mes-form-grid{grid-template-columns:1fr}.mes-wrap{padding:18px 16px 28px}.mes-poster h1{font-size:26px}.mes-kpi-grid{grid-template-columns:1fr 1fr}.mes-table{min-width:760px}}'
+    '.mesx{padding:24px 24px 42px;max-width:1560px;margin:0 auto;color:#0f172a}',
+    '.mesx-hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(360px,.85fr);gap:18px;align-items:stretch;margin-bottom:18px}',
+    '.mesx-poster{position:relative;overflow:hidden;border-radius:30px;padding:28px 30px 26px;background:linear-gradient(140deg,#0c2d48 0%,#15466f 48%,#1f6aa5 100%);color:#fff;box-shadow:0 28px 70px rgba(12,45,72,.22)}',
+    '.mesx-poster::before{content:\"\";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0) 42%)}',
+    '.mesx-poster::after{content:\"\";position:absolute;right:-110px;top:-80px;width:280px;height:280px;border-radius:999px;background:radial-gradient(circle,rgba(249,168,37,.26) 0%,rgba(249,168,37,0) 70%)}',
+    '.mesx-brand{display:flex;align-items:center;justify-content:space-between;gap:18px;position:relative;z-index:1}',
+    '.mesx-brand-main{display:flex;align-items:center;gap:16px}',
+    '.mesx-logo{width:58px;height:58px;border-radius:16px;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}',
+    '.mesx-logo img{width:38px;height:38px;object-fit:contain}',
+    '.mesx-kicker{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.74);font-weight:800}',
+    '.mesx-poster h1{margin:10px 0 10px;font-size:34px;line-height:1.06;letter-spacing:-.03em}',
+    '.mesx-poster p{margin:0;max-width:780px;font-size:14px;line-height:1.72;color:rgba(255,255,255,.84)}',
+    '.mesx-facts{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}',
+    '.mesx-fact{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.14);font-size:12px;font-weight:800;color:#fff}',
+    '.mesx-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}',
+    '.mesx-btn{height:42px;border:none;border-radius:14px;padding:0 16px;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:800;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,background .15s ease}',
+    '.mesx-btn:hover{transform:translateY(-1px)}',
+    '.mesx-btn.primary{background:#f9a825;color:#12253a;box-shadow:0 14px 26px rgba(249,168,37,.28)}',
+    '.mesx-btn.secondary{background:rgba(255,255,255,.11);color:#fff;border:1px solid rgba(255,255,255,.14)}',
+    '.mesx-btn.ghost{background:#fff;color:#0c2d48;border:1px solid #dbe4ef}',
+    '.mesx-side{display:grid;grid-template-rows:auto auto;gap:18px}',
+    '.mesx-card{background:#fff;border:1px solid #e2e8f0;border-radius:26px;box-shadow:0 18px 44px rgba(15,23,42,.06)}',
+    '.mesx-clock{padding:22px 22px 18px;background:linear-gradient(180deg,#f8fbff 0%,#ffffff 100%)}',
+    '.mesx-clock strong{display:block;margin-top:10px;font-size:30px;line-height:1;color:#0c2d48}',
+    '.mesx-clock small{display:block;font-size:12px;color:#64748b;line-height:1.7;margin-top:8px}',
+    '.mesx-clock-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}',
+    '.mesx-kpi-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:18px}',
+    '.mesx-kpi{border-radius:18px;padding:16px;background:#f8fafc;border:1px solid #e5edf6}',
+    '.mesx-kpi small{display:block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#64748b;margin-bottom:8px}',
+    '.mesx-kpi strong{display:block;font-size:30px;line-height:1;color:#0c2d48}',
+    '.mesx-kpi span{display:block;font-size:12px;color:#64748b;margin-top:8px;line-height:1.55}',
+    '.mesx-band,.mesx-main{display:grid;gap:18px;margin-bottom:18px}',
+    '.mesx-band{grid-template-columns:1.1fr .9fr}',
+    '.mesx-main{grid-template-columns:minmax(0,1.18fr) minmax(360px,.82fr)}',
+    '.mesx-panel{background:#fff;border:1px solid #e2e8f0;border-radius:24px;box-shadow:0 16px 40px rgba(15,23,42,.05);padding:18px}',
+    '.mesx-panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}',
+    '.mesx-panel-head h2,.mesx-panel-head h3{margin:0;font-size:18px;color:#0c2d48}',
+    '.mesx-panel-head p{margin:4px 0 0;font-size:12px;color:#64748b;line-height:1.68}',
+    '.mesx-center-grid,.mesx-ex-grid,.mesx-machine-grid,.mesx-form-grid{display:grid;gap:12px}',
+    '.mesx-center-grid,.mesx-ex-grid{grid-template-columns:repeat(3,minmax(0,1fr))}',
+    '.mesx-machine-grid{grid-template-columns:repeat(2,minmax(0,1fr))}',
+    '.mesx-form-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}',
+    '.mesx-form-grid .full{grid-column:1 / -1}',
+    '.mesx-center{border:1px solid #e2e8f0;border-radius:18px;padding:14px;background:linear-gradient(180deg,#ffffff 0%,#fbfdff 100%)}',
+    '.mesx-center-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}',
+    '.mesx-center h4{margin:0;font-size:14px;color:#0f172a}',
+    '.mesx-center p{margin:4px 0 0;font-size:12px;color:#64748b}',
+    '.mesx-center-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}',
+    '.mesx-mini{padding:10px 12px;border-radius:14px;background:#f8fafc;border:1px solid #edf2f7}',
+    '.mesx-mini small{display:block;font-size:10px;font-weight:800;color:#64748b;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}',
+    '.mesx-mini strong{display:block;font-size:13px;color:#0f172a}',
+    '.mesx-stack,.mesx-list,.mesx-machine-wall{display:grid;gap:12px}',
+    '.mesx-input,.mesx-select,.mesx-textarea{width:100%;box-sizing:border-box;border:1px solid #d7e1ec;border-radius:14px;padding:10px 12px;font:inherit;font-size:13px;background:#fff;color:#0f172a}',
+    '.mesx-input.search{max-width:320px}',
+    '.mesx-input:focus,.mesx-select:focus,.mesx-textarea:focus{outline:none;border-color:#1565c0;box-shadow:0 0 0 3px rgba(21,101,192,.12)}',
+    '.mesx-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}',
+    '.mesx-table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:18px}',
+    '.mesx-table{width:100%;border-collapse:collapse;min-width:1180px}',
+    '.mesx-table th,.mesx-table td{padding:12px 14px;border-bottom:1px solid #eef2f6;font-size:12px;text-align:left;vertical-align:top}',
+    '.mesx-table th{background:#f8fafc;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#64748b;font-weight:800;position:sticky;top:0;z-index:1}',
+    '.mesx-code{font-family:Consolas,monospace;font-size:12px;font-weight:800;color:#0f172a}',
+    '.mesx-sub{display:block;margin-top:4px;color:#64748b;font-size:11px;line-height:1.55}',
+    '.mesx-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:color-mix(in srgb, var(--pill) 14%, white);color:var(--pill);font-size:11px;font-weight:800}',
+    '.mesx-alert-stack,.mesx-row-actions,.mesx-mini-actions{display:flex;flex-wrap:wrap;gap:8px}',
+    '.mesx-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:#eff6ff;border:1px solid #dbeafe;color:#1d4ed8;font-size:11px;font-weight:800}',
+    '.mesx-chip.stone{background:#f8fafc;border-color:#e2e8f0;color:#475569}',
+    '.mesx-link{border:none;background:#eef4fb;color:#0c2d48;padding:8px 10px;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;transition:transform .14s ease,background .14s ease}',
+    '.mesx-link:hover{transform:translateY(-1px);background:#e0edfd}',
+    '.mesx-link.warning{background:#fff7ed;color:#c2410c}',
+    '.mesx-link.danger{background:#fef2f2;color:#b91c1c}',
+    '.mesx-link[disabled]{opacity:.45;cursor:not-allowed;transform:none}',
+    '.mesx-machine{border:1px solid #e2e8f0;border-radius:20px;padding:16px;background:linear-gradient(180deg,#ffffff 0%,#fbfdff 100%)}',
+    '.mesx-machine-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}',
+    '.mesx-machine h4{margin:0;font-size:15px;color:#0f172a}',
+    '.mesx-machine p{margin:4px 0 0;font-size:12px;color:#64748b;line-height:1.55}',
+    '.mesx-section{margin-top:14px;padding-top:14px;border-top:1px solid #edf2f7}',
+    '.mesx-list-item{border:1px solid #e2e8f0;border-radius:18px;padding:14px;background:#fff}',
+    '.mesx-list-item h4{margin:0;font-size:14px;color:#0f172a}',
+    '.mesx-list-item p{margin:6px 0 0;font-size:12px;color:#64748b;line-height:1.6}',
+    '.mesx-meta{margin-top:8px;font-size:11px;color:#475569;line-height:1.6}',
+    '.mesx-empty{padding:20px;border:1px dashed #cbd5e1;border-radius:16px;background:#f8fafc;text-align:center;font-size:12px;color:#64748b;line-height:1.65}',
+    '.mesx-empty strong{display:block;color:#0c2d48;margin-bottom:5px}',
+    '.mesx-modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.52);backdrop-filter:blur(6px);z-index:12000;display:flex;align-items:center;justify-content:center;padding:24px}',
+    '.mesx-modal{width:min(820px,96vw);max-height:90vh;overflow:auto;background:#fff;border-radius:24px;box-shadow:0 30px 80px rgba(15,23,42,.28)}',
+    '.mesx-modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:22px 24px 16px;border-bottom:1px solid #e2e8f0}',
+    '.mesx-modal-head h3{margin:0;font-size:20px;color:#0c2d48}',
+    '.mesx-modal-head p{margin:4px 0 0;font-size:12px;color:#64748b;line-height:1.7}',
+    '.mesx-x{border:none;background:#eef2f7;color:#334155;width:38px;height:38px;border-radius:12px;cursor:pointer;font-size:20px}',
+    '.mesx-modal-body{padding:20px 24px 24px}',
+    '.mesx-field label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#64748b;font-weight:800;margin-bottom:6px}',
+    '.mesx-textarea{min-height:110px;resize:vertical}',
+    '.mesx-modal-foot{display:flex;justify-content:flex-end;gap:10px;padding-top:16px}',
+    '.mesx-detail-table{width:100%;border-collapse:collapse}',
+    '.mesx-detail-table th,.mesx-detail-table td{padding:10px 12px;border-bottom:1px solid #eef2f6;font-size:12px;text-align:left;vertical-align:top}',
+    '.mesx-detail-table th{font-size:11px;text-transform:uppercase;color:#64748b;letter-spacing:.08em;font-weight:800;background:#f8fafc}',
+    '@media (max-width:1280px){.mesx-hero,.mesx-band,.mesx-main{grid-template-columns:1fr}.mesx-kpi-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}',
+    '@media (max-width:980px){.mesx-kpi-grid,.mesx-center-grid,.mesx-ex-grid,.mesx-machine-grid,.mesx-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}',
+    '@media (max-width:720px){.mesx{padding:18px 16px 28px}.mesx-poster h1{font-size:28px}.mesx-kpi-grid,.mesx-center-grid,.mesx-ex-grid,.mesx-machine-grid,.mesx-form-grid{grid-template-columns:1fr}.mesx-table{min-width:960px}}'
   ].join('\n');
   document.head.appendChild(style);
 }
 
+function workCenters(){
+  return state.snapshot && Array.isArray(state.snapshot.work_center_summary) ? state.snapshot.work_center_summary : [];
+}
 function filteredDispatch(){
   var rows = state.snapshot && Array.isArray(state.snapshot.dispatch) ? state.snapshot.dispatch.slice() : [];
   var search = String(state.search || '').trim().toLowerCase();
-  if(state.workCenter) rows = rows.filter(function(row){ return String(row.work_center_id || '') === String(state.workCenter); });
-  if(state.dispatchStatus) rows = rows.filter(function(row){ return String(row.status || '') === String(state.dispatchStatus); });
+  if(state.workCenter){
+    rows = rows.filter(function(row){ return String(row.work_center_id || '') === String(state.workCenter); });
+  }
+  if(state.dispatchStatus){
+    rows = rows.filter(function(row){ return String(row.status || '') === String(state.dispatchStatus); });
+  }
   if(search){
     rows = rows.filter(function(row){
-      var hay = [row.wo_number, row.jo_number, row.so_number, row.customer_name, row.customer_id, row.part_number, row.part_revision, row.operation_desc, row.machine_id, row.machine_name, row.operator_name, row.operator_id, row.work_center_id, row.work_center_name].join(' ').toLowerCase();
+      var hay = [
+        row.wo_number, row.jo_number, row.so_number, row.customer_name, row.customer_id,
+        row.part_number, row.part_revision, row.operation_desc, row.machine_id, row.machine_name,
+        row.operator_name, row.operator_id, row.work_center_id, row.work_center_name
+      ].join(' ').toLowerCase();
       return hay.indexOf(search) >= 0;
     });
   }
   return rows;
 }
-
-function currentStamp(){ return fmtDateTime(new Date().toISOString()); }
+function machineById(machineId){
+  var rows = state.snapshot && Array.isArray(state.snapshot.machine_wall) ? state.snapshot.machine_wall : [];
+  for(var i = 0; i < rows.length; i += 1){
+    if(String(rows[i].machine_id || '') === String(machineId || '')) return rows[i];
+  }
+  return null;
+}
+function downtimeById(downtimeId){
+  var rows = state.snapshot && Array.isArray(state.snapshot.open_downtimes) ? state.snapshot.open_downtimes : [];
+  for(var i = 0; i < rows.length; i += 1){
+    if(String(rows[i].downtime_id || '') === String(downtimeId || '')) return rows[i];
+  }
+  return null;
+}
+function maintenanceById(requestId){
+  var rows = state.snapshot && Array.isArray(state.snapshot.maintenance_queue) ? state.snapshot.maintenance_queue : [];
+  for(var i = 0; i < rows.length; i += 1){
+    if(String(rows[i].request_id || '') === String(requestId || '')) return rows[i];
+  }
+  return null;
+}
+function dispatchByWo(woNumber){
+  var rows = state.snapshot && Array.isArray(state.snapshot.dispatch) ? state.snapshot.dispatch : [];
+  for(var i = 0; i < rows.length; i += 1){
+    if(String(rows[i].wo_number || '') === String(woNumber || '')) return rows[i];
+  }
+  return null;
+}
+function toolRuntimeById(runtimeId){
+  var alerts = state.snapshot && Array.isArray(state.snapshot.tooling_alerts) ? state.snapshot.tooling_alerts : [];
+  for(var i = 0; i < alerts.length; i += 1){
+    if(String(alerts[i].tool_runtime_id || '') === String(runtimeId || '')) return alerts[i];
+  }
+  var machines = state.snapshot && Array.isArray(state.snapshot.machine_wall) ? state.snapshot.machine_wall : [];
+  for(var m = 0; m < machines.length; m += 1){
+    var items = Array.isArray(machines[m].tooling_items) ? machines[m].tooling_items : [];
+    for(var j = 0; j < items.length; j += 1){
+      if(String(items[j].tool_runtime_id || '') === String(runtimeId || '')) return items[j];
+    }
+  }
+  return null;
+}
+function toolOptionsForMachine(machineId){
+  var master = state.master || {};
+  var machine = machineById(machineId) || {};
+  var machineType = String(machine.machine_type || '').toLowerCase();
+  var workCenterId = String(machine.work_center_id || '');
+  return (master.tooling_assets || []).filter(function(tool){
+    var preferredCenter = String(tool.preferred_work_center_id || '');
+    var toolMachineType = String(tool.machine_type || '').toLowerCase();
+    if(preferredCenter && workCenterId && preferredCenter !== workCenterId) return false;
+    if(toolMachineType && toolMachineType !== 'multi' && machineType && toolMachineType !== machineType) return false;
+    return String(tool.status || 'active') !== 'retired';
+  });
+}
+function operatorOptions(workCenterId){
+  var rows = state.master && Array.isArray(state.master.operators) ? state.master.operators : [];
+  return rows.filter(function(row){
+    if(!workCenterId) return true;
+    return !row.work_center_id || String(row.work_center_id) === String(workCenterId);
+  });
+}
+function workOrderOptions(machineId){
+  var rows = state.snapshot && Array.isArray(state.snapshot.dispatch) ? state.snapshot.dispatch : [];
+  return rows.filter(function(row){
+    if(!machineId) return true;
+    return String(row.machine_id || '') === String(machineId);
+  });
+}
+function renderSelectOptions(rows, valueKey, labelBuilder, selectedValue, placeholder){
+  var html = '<option value="">' + esc(placeholder || t('Chưa chọn', 'Not selected')) + '</option>';
+  rows.forEach(function(row){
+    var value = row[valueKey];
+    html += '<option value="' + esc(value || '') + '"' + (String(selectedValue || '') === String(value || '') ? ' selected' : '') + '>' + esc(labelBuilder(row)) + '</option>';
+  });
+  return html;
+}
 
 function loadData(){
   state.loading = true;
-  return Promise.all([api('mes_snapshot', {}, 'GET'), api('exception_dashboard', {}, 'GET'), api('master_data_snapshot', {}, 'GET')]).then(function(results){
-    state.snapshot = results[0] && results[0].data ? results[0].data : null;
-    state.exceptions = results[1] && results[1].ok ? results[1] : null;
-    state.master = results[2] && results[2].data ? results[2].data : {};
+  return Promise.all([
+    api('mes_snapshot', {}, 'GET'),
+    api('master_data_snapshot', {}, 'GET'),
+    api('exception_dashboard', {}, 'GET')
+  ]).then(function(results){
+    state.snapshot = results[0] && results[0].data ? results[0].data : defaultSnapshot();
+    state.master = results[1] && results[1].data ? results[1].data : {};
+    state.exceptions = results[2] && results[2].ok ? results[2] : {};
     state.loading = false;
     render();
   }).catch(function(error){
     state.loading = false;
     if(state.container){
-      state.container.innerHTML = '<div class="mes-wrap"><div class="mes-empty"><strong>' + esc(t('Không thể tải dữ liệu MES', 'Could not load MES data')) + '</strong>' + esc((error && error.message) || t('Vui lòng thử lại sau.', 'Please try again later.')) + '</div></div>';
+      state.container.innerHTML = '<div class="mesx"><div class="mesx-empty"><strong>' + esc(t('Không thể tải dữ liệu MES', 'Could not load MES data')) + '</strong>' + esc((error && error.message) || t('Vui lòng thử lại sau.', 'Please try again later.')) + '</div></div>';
     }
   });
 }
 
-function openEvidenceForm(formCode, context){
-  if(typeof window.renderOnlineForms !== 'function' || typeof navigateTo !== 'function') return;
-  if(window._fhState){
-    window._fhState.pendingContext = Object.assign({}, context || {});
-    window._fhState.pendingFillSelection = { formCode: formCode };
-    window._fhState.activeTab = 'fill-download';
-  }
-  navigateTo('forms');
-}
-
-function fieldDisplay(label, value){
-  return '<div class="mes-field"><label>' + esc(label) + '</label><div class="mes-cell" style="padding:12px"><strong>' + esc(value || '—') + '</strong></div></div>';
-}
-function editableField(id, label, controlHtml, full){
-  return '<div class="mes-field' + (full ? ' full' : '') + '" id="' + id + '"><label>' + esc(label) + '</label>' + controlHtml + '</div>';
-}
 function showModal(title, subtitle, bodyHtml, onSubmit){
   closeModal();
   var wrap = document.createElement('div');
-  wrap.className = 'mes-modal-backdrop';
-  wrap.innerHTML = '<div class="mes-modal"><div class="mes-modal-head"><div><h3>' + esc(title) + '</h3><p>' + esc(subtitle || '') + '</p></div><button type="button" class="mes-x" aria-label="Close">×</button></div><div class="mes-modal-body">' + bodyHtml + '</div></div>';
+  wrap.className = 'mesx-modal-backdrop';
+  wrap.innerHTML = '<div class="mesx-modal"><div class="mesx-modal-head"><div><h3>' + esc(title) + '</h3><p>' + esc(subtitle || '') + '</p></div><button type="button" class="mesx-x" aria-label="Close">×</button></div><div class="mesx-modal-body">' + bodyHtml + '</div></div>';
   document.body.appendChild(wrap);
-  wrap.querySelector('.mes-x').onclick = closeModal;
+  wrap.querySelector('.mesx-x').onclick = closeModal;
   wrap.onclick = function(event){ if(event.target === wrap) closeModal(); };
   var submit = wrap.querySelector('[data-modal-submit]');
   if(submit) submit.onclick = function(){ if(onSubmit) onSubmit(wrap, submit); };
@@ -223,123 +408,221 @@ function bindModalButtons(){
   var cancel = state.modal.querySelector('[data-modal-cancel]');
   if(cancel) cancel.onclick = closeModal;
 }
+function fieldDisplay(label, value){
+  return '<div class="mesx-field"><label>' + esc(label) + '</label><div class="mesx-mini"><strong>' + esc(value || '—') + '</strong></div></div>';
+}
+function editableField(id, label, controlHtml, full){
+  return '<div class="mesx-field' + (full ? ' full' : '') + '"><label for="' + esc(id) + '">' + esc(label) + '</label>' + controlHtml + '</div>';
+}
+function openEvidenceForm(formCode, context){
+  if(typeof window.renderOnlineForms !== 'function' || typeof navigateTo !== 'function') return;
+  if(window._fhState){
+    window._fhState.pendingContext = Object.assign({}, context || {});
+    window._fhState.pendingFillSelection = { formCode: formCode };
+    window._fhState.activeTab = 'fill-download';
+  }
+  navigateTo('forms');
+}
 
-function renderKpi(label, value, sub){
-  return '<div class="mes-kpi"><small>' + esc(label) + '</small><strong>' + esc(value) + '</strong><span>' + esc(sub) + '</span></div>';
+function renderKpiTile(label, value, sub){
+  return '<div class="mesx-kpi"><small>' + esc(label) + '</small><strong>' + esc(value) + '</strong><span>' + esc(sub) + '</span></div>';
 }
-function renderWorkCenterChip(center){
-  return '<div class="mes-chip">' + esc(center.work_center_id || '') + ' · ' + esc(center.work_center_name || '') + ' · ' + esc(center.running_count || 0) + '/' + esc(center.machine_count || 0) + ' ' + esc(t('máy đang chạy', 'machines running')) + '</div>';
+function renderWorkCenterCard(center){
+  return '<article class="mesx-center"><div class="mesx-center-top"><div><h4>' + esc(center.work_center_id || '') + '</h4><p>' + esc(center.work_center_name || '') + '</p></div>' + badge((center.down_count || 0) > 0 ? statusMeta('down') : statusMeta('running')) + '</div><div class="mesx-center-metrics"><div class="mesx-mini"><small>' + esc(t('Máy', 'Machines')) + '</small><strong>' + esc(center.machine_count || 0) + '</strong></div><div class="mesx-mini"><small>' + esc(t('WO', 'WO')) + '</small><strong>' + esc(center.wo_count || 0) + '</strong></div><div class="mesx-mini"><small>' + esc(t('OEE', 'OEE')) + '</small><strong>' + esc(fmtPercent(center.oee_pct)) + '</strong></div><div class="mesx-mini"><small>' + esc(t('Gate / Tool', 'Gate / Tool')) + '</small><strong>' + esc((center.gate_missing_count || 0) + ' / ' + (center.tooling_alert_count || 0)) + '</strong></div></div></article>';
 }
-function renderExceptionGrid(exceptions){
-  var items = Object.keys(EXCEPTION_META).map(function(key){ return Object.assign({ key:key, value:Number(exceptions && exceptions[key] || 0) }, EXCEPTION_META[key]); });
-  return '<div class="mes-exc-grid">' + items.map(function(item){
-    return '<button type="button" class="mes-exc" data-exception-type="' + esc(item.key) + '"><strong>' + esc(item.value) + '</strong><span>' + esc(t(item.labelVi, item.labelEn)) + '</span><small>' + esc(t(item.noteVi, item.noteEn)) + '</small></button>';
+function renderExceptionRail(){
+  var ex = state.exceptions || {};
+  var keys = Object.keys(EXCEPTION_META);
+  return '<div class="mesx-ex-grid">' + keys.map(function(key){
+    var meta = EXCEPTION_META[key];
+    var value = Number(ex[key] || 0);
+    return '<button type="button" class="mesx-ex" data-open-exception="' + esc(key) + '"><strong>' + esc(value) + '</strong><span>' + esc(meta.icon + ' ' + t(meta.vi, meta.en)) + '</span><small>' + esc(value > 0 ? t('Cần rà soát và xử lý theo hàng đợi chi tiết.', 'Requires review and action from the detailed queue.') : t('Hiện không có ngoại lệ trong nhóm này.', 'There is currently no exception in this group.')) + '</small></button>';
   }).join('') + '</div>';
+}
+
+function renderGateCell(gate, row){
+  var meta = gateMeta(gate.status || 'not_required');
+  var missing = Array.isArray(gate.missing_form_codes) ? gate.missing_form_codes : [];
+  var context = {
+    customer_id: row.customer_id || '',
+    so_number: row.so_number || '',
+    jo_number: row.jo_number || '',
+    wo_number: row.wo_number || '',
+    part_number: row.part_number || '',
+    part_revision: row.part_revision || '',
+    machine_id: row.machine_id || '',
+    work_center_id: row.work_center_id || '',
+    operator_id: row.operator_id || ''
+  };
+  return badge(meta) +
+    '<span class="mesx-sub">' + esc((gate.completed_count || 0) + '/' + (gate.total_required || 0) + ' ' + t('gate đã đủ', 'gates completed')) + '</span>' +
+    (missing.length ? '<div class="mesx-alert-stack">' + missing.map(function(code){ return '<button type="button" class="mesx-link warning" data-open-form="' + esc(code) + '" data-context="' + esc(jsonAttr(context)) + '">' + esc(code) + '</button>'; }).join('') + '</div>' : '');
+}
+function renderToolingCell(tooling, row){
+  var meta = toolMeta(tooling.status || 'healthy');
+  var items = Array.isArray(tooling.items) ? tooling.items : [];
+  var highlights = items.filter(function(item){
+    return ['warning', 'critical', 'untracked'].indexOf(String(item.alert_level || 'healthy')) >= 0;
+  }).slice(0, 2);
+  return badge(meta) +
+    '<span class="mesx-sub">' + esc((tooling.loaded_tool_count || 0) + ' ' + t('tool đang nạp', 'tools loaded') + ' · ' + (tooling.alert_count || 0) + ' ' + t('cảnh báo', 'alerts')) + '</span>' +
+    (highlights.length ? '<div class="mesx-alert-stack">' + highlights.map(function(item){
+      return '<button type="button" class="mesx-link ' + (item.alert_level === 'critical' ? 'danger' : 'warning') + '" data-edit-tooling="' + esc(row.machine_id || '') + '" data-tool-runtime="' + esc(item.tool_runtime_id || '') + '">' + esc(item.tool_id || 'TL') + '</button>';
+    }).join('') + '</div>' : '') +
+    '<div class="mesx-mini-actions" style="margin-top:8px"><button type="button" class="mesx-link" data-edit-tooling="' + esc(row.machine_id || '') + '">' + esc(t('Cập nhật tool', 'Update tooling')) + '</button></div>';
 }
 function renderDispatchTable(rows){
   if(!rows.length){
-    return '<div class="mes-empty"><strong>' + esc(t('Không có WO khớp bộ lọc', 'No WO matches the current filters')) + '</strong>' + esc(t('Thử bỏ bớt bộ lọc hoặc làm mới dữ liệu MES.', 'Try clearing filters or refreshing the MES snapshot.')) + '</div>';
+    return '<div class="mesx-empty"><strong>' + esc(t('Không có WO khớp bộ lọc', 'No WO matches the current filters')) + '</strong>' + esc(t('Thử bỏ bớt bộ lọc hoặc làm mới dữ liệu MES.', 'Try clearing filters or refreshing the MES snapshot.')) + '</div>';
   }
-  return '<div class="mes-table-wrap"><table class="mes-table"><thead><tr><th>' + esc(t('WO', 'WO')) + '</th><th>' + esc(t('Khách hàng / Part', 'Customer / Part')) + '</th><th>' + esc(t('Machine / WC', 'Machine / WC')) + '</th><th>' + esc(t('Tiến độ', 'Progress')) + '</th><th>' + esc(t('Lịch', 'Schedule')) + '</th><th>' + esc(t('Hành động', 'Actions')) + '</th></tr></thead><tbody>' + rows.map(function(row){
-    var progress = Number(row.qty_completed || 0) + '/' + Number(row.qty_ordered || 0);
-    var ctx = { customer_id:row.customer_id || '', so_number:row.so_number || '', jo_number:row.jo_number || '', wo_number:row.wo_number || '', part_number:row.part_number || '', part_revision:row.part_revision || '', machine_id:row.machine_id || '', work_center_id:row.work_center_id || '', operator_id:row.operator_id || '' };
-    return '<tr><td><span class="mes-code">' + esc(row.wo_number || '') + '</span><span class="mes-sub">' + esc(row.jo_number || '') + ' · ' + esc(t(statusMeta(row.status).labelVi, statusMeta(row.status).labelEn)) + '</span></td><td><strong>' + esc(row.customer_name || row.customer_id || '—') + '</strong><span class="mes-sub">' + esc([row.part_number || '', row.part_revision || '', row.operation_desc || ''].filter(Boolean).join(' · ')) + '</span></td><td><strong>' + esc(row.machine_id || '—') + '</strong><span class="mes-sub">' + esc([row.machine_name || '', row.work_center_id || '', row.operator_name || row.operator_id || ''].filter(Boolean).join(' · ')) + '</span></td><td>' + statusBadge(row.status || '') + '<span class="mes-sub">' + esc(progress + ' · Scrap ' + Number(row.qty_scrap || 0)) + '</span></td><td><strong>' + esc(fmtDateTime(row.scheduled_start || '')) + '</strong><span class="mes-sub">' + esc(fmtDateTime(row.scheduled_end || '')) + '</span></td><td><div class="mes-row-actions"><button type="button" class="mes-link-btn" data-progress="' + esc(row.wo_number || '') + '">' + esc(t('Báo tiến độ', 'Report progress')) + '</button><button type="button" class="mes-link-btn" data-form="FRM-519" data-context="' + esc(jsonAttr(ctx)) + '">' + esc(t('Mở pre-run', 'Open pre-run')) + '</button><button type="button" class="mes-link-btn warning" data-form="FRM-512" data-context="' + esc(jsonAttr(ctx)) + '">' + esc(t('Form downtime', 'Downtime form')) + '</button></div></td></tr>';
+  return '<div class="mesx-table-wrap"><table class="mesx-table"><thead><tr><th>' + esc(t('WO', 'WO')) + '</th><th>' + esc(t('Khách hàng / Part', 'Customer / Part')) + '</th><th>' + esc(t('Máy / WC', 'Machine / WC')) + '</th><th>' + esc(t('OEE / Tiến độ', 'OEE / Progress')) + '</th><th>' + esc(t('Gate chứng cứ', 'Evidence gate')) + '</th><th>' + esc(t('Tooling', 'Tooling')) + '</th><th>' + esc(t('Hành động', 'Actions')) + '</th></tr></thead><tbody>' + rows.map(function(row){
+    var woStatus = statusMeta(row.status);
+    var ctx = {
+      customer_id: row.customer_id || '',
+      so_number: row.so_number || '',
+      jo_number: row.jo_number || '',
+      wo_number: row.wo_number || '',
+      part_number: row.part_number || '',
+      part_revision: row.part_revision || '',
+      machine_id: row.machine_id || '',
+      work_center_id: row.work_center_id || '',
+      operator_id: row.operator_id || ''
+    };
+    var oeeText = row.machine_id ? fmtPercent((machineById(row.machine_id) || {}).oee_pct) : '—';
+    return '<tr><td><span class="mesx-code">' + esc(row.wo_number || '') + '</span><span class="mesx-sub">' + esc([row.jo_number || '', row.so_number || '', t(woStatus.vi, woStatus.en)].filter(Boolean).join(' · ')) + '</span></td><td><strong>' + esc(row.customer_name || row.customer_id || '—') + '</strong><span class="mesx-sub">' + esc([row.part_number || '', row.part_revision || '', row.operation_desc || ''].filter(Boolean).join(' · ')) + '</span></td><td><strong>' + esc(row.machine_id || '—') + '</strong><span class="mesx-sub">' + esc([row.machine_name || '', row.work_center_id || '', row.operator_name || row.operator_id || ''].filter(Boolean).join(' · ')) + '</span></td><td>' + badge(woStatus) + '<span class="mesx-sub">' + esc('OK ' + Number(row.qty_completed || 0) + ' / ' + Number(row.qty_ordered || 0) + ' · Scrap ' + Number(row.qty_scrap || 0) + ' · OEE ' + oeeText) + '</span><span class="mesx-sub">' + esc(fmtDateTime(row.scheduled_start || '') + ' → ' + fmtDateTime(row.scheduled_end || '')) + '</span></td><td>' + renderGateCell(row.evidence_gate || {}, row) + '</td><td>' + renderToolingCell(row.tooling || {}, row) + '</td><td><div class="mesx-row-actions"><button type="button" class="mesx-link" data-report-progress="' + esc(row.wo_number || '') + '">' + esc(t('Báo tiến độ', 'Report progress')) + '</button><button type="button" class="mesx-link" data-open-form="FRM-519" data-context="' + esc(jsonAttr(ctx)) + '">' + esc(t('Pre-run', 'Pre-run')) + '</button><button type="button" class="mesx-link warning" data-open-form="FRM-512" data-context="' + esc(jsonAttr(ctx)) + '">' + esc(t('Downtime', 'Downtime')) + '</button></div></td></tr>';
   }).join('') + '</tbody></table></div>';
 }
 function renderMachineCard(machine){
+  var status = statusMeta(machine.status);
+  var gate = machine.evidence_gate || {};
+  var toolingRows = Array.isArray(machine.tooling_items) ? machine.tooling_items : [];
   var active = machine.active_work_order || {};
-  var downtime = machine.open_downtime;
-  var maintenance = machine.open_maintenance;
-  var context = { wo_number:active.wo_number || '', jo_number:active.jo_number || '', so_number:active.so_number || '', customer_id:active.customer_id || '', part_number:active.part_number || '', part_revision:active.part_revision || '', machine_id:machine.machine_id || '', work_center_id:machine.work_center_id || '', operator_id:active.operator_id || machine.preferred_operator_id || '' };
-  return '<article class="mes-machine"><div class="mes-machine-head"><div><h4>' + esc(machine.machine_id || '') + ' · ' + esc(machine.machine_name || '') + '</h4><p>' + esc([machine.work_center_id || '', machine.machine_type || '', machine.location || ''].filter(Boolean).join(' · ')) + '</p></div>' + statusBadge(machine.status || '') + '</div><div class="mes-machine-grid"><div class="mes-cell"><small>' + esc(t('WO hiện tại', 'Active WO')) + '</small><strong>' + esc(active.wo_number || '—') + '</strong></div><div class="mes-cell"><small>' + esc(t('Queue', 'Queue')) + '</small><strong>' + esc(machine.queue_count || 0) + ' ' + esc(t('WO', 'WO')) + '</strong></div><div class="mes-cell"><small>' + esc(t('Operator ưu tiên', 'Preferred operator')) + '</small><strong>' + esc(machine.preferred_operator_name || machine.preferred_operator_id || '—') + '</strong></div><div class="mes-cell"><small>' + esc(t('PM kế tiếp', 'Next PM')) + '</small><strong>' + esc(fmtDate(machine.next_pm_date || '')) + '</strong></div></div>' + (downtime ? '<p class="mes-sub" style="margin-top:12px;color:#b91c1c"><strong>' + esc(t('Downtime mở', 'Open downtime')) + ':</strong> ' + esc((downtime.reason || '').slice(0, 120)) + '</p>' : '') + (maintenance ? '<p class="mes-sub" style="margin-top:8px;color:#b45309"><strong>' + esc(t('Maintenance mở', 'Open maintenance')) + ':</strong> ' + esc(maintenance.title || '') + '</p>' : '') + '<div class="mes-mini-actions" style="margin-top:14px"><button type="button" class="mes-link-btn" data-progress="' + esc(active.wo_number || '') + '"' + (!active.wo_number ? ' disabled' : '') + '>' + esc(t('Báo tiến độ', 'Report progress')) + '</button>' + (downtime ? '<button type="button" class="mes-link-btn warning" data-resolve-downtime="' + esc(downtime.downtime_id || '') + '">' + esc(t('Khôi phục', 'Resolve')) + '</button>' : '<button type="button" class="mes-link-btn warning" data-new-downtime="' + esc(machine.machine_id || '') + '">' + esc(t('Báo dừng máy', 'Log downtime')) + '</button>') + '<button type="button" class="mes-link-btn" data-new-maintenance="' + esc(machine.machine_id || '') + '">' + esc(t('Tạo bảo trì', 'New maintenance')) + '</button><button type="button" class="mes-link-btn" data-form="FRM-521" data-context="' + esc(jsonAttr(context)) + '">' + esc(t('Mở PM form', 'Open PM form')) + '</button></div></article>';
+  var context = {
+    customer_id: active.customer_id || '',
+    so_number: active.so_number || '',
+    jo_number: active.jo_number || '',
+    wo_number: active.wo_number || '',
+    part_number: active.part_number || '',
+    part_revision: active.part_revision || '',
+    machine_id: machine.machine_id || '',
+    work_center_id: machine.work_center_id || '',
+    operator_id: active.operator_id || machine.preferred_operator_id || ''
+  };
+  return '<article class="mesx-machine"><div class="mesx-machine-head"><div><h4>' + esc(machine.machine_id || '') + ' · ' + esc(machine.machine_name || '') + '</h4><p>' + esc([machine.work_center_id || '', machine.machine_type || '', machine.location || ''].filter(Boolean).join(' · ')) + '</p></div>' + badge(status) + '</div><div class="mesx-machine-grid"><div class="mesx-mini"><small>' + esc(t('WO hiện tại', 'Active WO')) + '</small><strong>' + esc(active.wo_number || '—') + '</strong></div><div class="mesx-mini"><small>' + esc(t('Queue', 'Queue')) + '</small><strong>' + esc((machine.queue_count || 0) + ' ' + t('WO', 'WO')) + '</strong></div><div class="mesx-mini"><small>' + esc(t('OEE', 'OEE')) + '</small><strong>' + esc(fmtPercent(machine.oee_pct)) + '</strong></div><div class="mesx-mini"><small>' + esc(t('Availability', 'Availability')) + '</small><strong>' + esc(fmtPercent(machine.availability_pct)) + '</strong></div><div class="mesx-mini"><small>' + esc(t('Performance', 'Performance')) + '</small><strong>' + esc(fmtPercent(machine.performance_pct)) + '</strong></div><div class="mesx-mini"><small>' + esc(t('Quality', 'Quality')) + '</small><strong>' + esc(fmtPercent(machine.quality_pct)) + '</strong></div></div><div class="mesx-section"><div class="mesx-mini"><small>' + esc(t('Gate chứng cứ', 'Evidence gate')) + '</small><strong>' + esc(t(gate.summary_vi || 'Không yêu cầu', gate.summary_en || 'Not required')) + '</strong></div><div class="mesx-alert-stack">' + (Array.isArray(gate.missing_form_codes) && gate.missing_form_codes.length ? gate.missing_form_codes.map(function(code){ return '<button type="button" class="mesx-link warning" data-open-form="' + esc(code) + '" data-context="' + esc(jsonAttr(context)) + '">' + esc(code) + '</button>'; }).join('') : '<span class="mesx-chip stone">' + esc(t('Không có gate còn thiếu', 'No missing gates')) + '</span>') + '</div></div><div class="mesx-section"><div class="mesx-mini"><small>' + esc(t('Tooling active', 'Active tooling')) + '</small><strong>' + esc((machine.loaded_tool_count || 0) + ' · ' + (machine.tool_alert_count || 0) + ' ' + t('cảnh báo', 'alerts')) + '</strong></div><div class="mesx-alert-stack">' + (toolingRows.length ? toolingRows.slice(0, 3).map(function(item){ return '<button type="button" class="mesx-link ' + ((item.alert_level || '') === 'critical' ? 'danger' : ((item.alert_level || '') === 'warning' ? 'warning' : '')) + '" data-edit-tooling="' + esc(machine.machine_id || '') + '" data-tool-runtime="' + esc(item.tool_runtime_id || '') + '">' + esc((item.tool_id || '') + ' · ' + (item.life_used_pct == null ? '—' : fmtPercent(item.life_used_pct))) + '</button>'; }).join('') : '<span class="mesx-chip stone">' + esc(t('Chưa có runtime tool-life', 'No tool-life runtime')) + '</span>') + '</div></div><div class="mesx-mini-actions" style="margin-top:14px"><button type="button" class="mesx-link" data-report-progress="' + esc(active.wo_number || '') + '"' + (!active.wo_number ? ' disabled' : '') + '>' + esc(t('Báo tiến độ', 'Report progress')) + '</button>' + (machine.open_downtime ? '<button type="button" class="mesx-link danger" data-resolve-downtime="' + esc(machine.open_downtime.downtime_id || '') + '">' + esc(t('Khôi phục downtime', 'Resolve downtime')) + '</button>' : '<button type="button" class="mesx-link warning" data-new-downtime="' + esc(machine.machine_id || '') + '">' + esc(t('Báo dừng máy', 'Log downtime')) + '</button>') + '<button type="button" class="mesx-link" data-new-maintenance="' + esc(machine.machine_id || '') + '">' + esc(t('Tạo bảo trì', 'New maintenance')) + '</button><button type="button" class="mesx-link" data-edit-tooling="' + esc(machine.machine_id || '') + '">' + esc(t('Cập nhật tooling', 'Update tooling')) + '</button><button type="button" class="mesx-link" data-open-form="FRM-521" data-context="' + esc(jsonAttr(context)) + '">' + esc(t('Mở PM form', 'Open PM form')) + '</button></div></article>';
+}
+function renderToolingWatchlist(rows){
+  if(!rows.length){
+    return '<div class="mesx-empty"><strong>' + esc(t('Tool-life đang ổn định', 'Tool-life is stable')) + '</strong>' + esc(t('Hiện chưa có tooling nào vượt ngưỡng cảnh báo trong runtime.', 'There are no tooling alerts above the warning threshold in the current runtime.')) + '</div>';
+  }
+  return rows.map(function(row){
+    var meta = toolMeta(row.alert_level);
+    return '<div class="mesx-list-item"><h4>' + esc(row.tool_id || '') + ' · ' + esc(row.tool_name || '') + '</h4><p>' + esc(t(row.alert_message_vi || 'Cần kiểm tra lại tooling.', row.alert_message_en || 'Tooling needs attention.')) + '</p><div class="mesx-meta">' + esc([row.machine_id || '', row.work_center_id || '', row.wo_number || '', row.pocket ? ('Pocket ' + row.pocket) : '', row.offset_status || '', row.life_used_pct == null ? '' : ('Life ' + fmtPercent(row.life_used_pct))].filter(Boolean).join(' · ')) + '</div><div class="mesx-mini-actions" style="margin-top:10px"><button type="button" class="mesx-link ' + ((row.alert_level || '') === 'critical' ? 'danger' : 'warning') + '" data-edit-tooling="' + esc(row.machine_id || '') + '" data-tool-runtime="' + esc(row.tool_runtime_id || '') + '">' + esc(t('Xử lý tool', 'Handle tool')) + '</button><span>' + badge(meta) + '</span></div></div>';
+  }).join('');
+}
+function renderGateQueue(rows){
+  if(!rows.length){
+    return '<div class="mesx-empty"><strong>' + esc(t('Không có WO thiếu gate', 'No WO is missing gates')) + '</strong>' + esc(t('Các WO đang theo dõi hiện đã đủ gate chứng cứ bắt buộc.', 'All tracked WO currently satisfy their required evidence gates.')) + '</div>';
+  }
+  return rows.map(function(row){
+    var meta = gateMeta(row.status);
+    var context = {
+      so_number: row.so_number || '',
+      jo_number: row.jo_number || '',
+      wo_number: row.wo_number || '',
+      part_number: row.part_number || '',
+      part_revision: row.part_revision || '',
+      machine_id: row.machine_id || '',
+      work_center_id: row.work_center_id || ''
+    };
+    return '<div class="mesx-list-item"><h4>' + esc(row.wo_number || '') + ' · ' + esc(row.machine_id || '—') + '</h4><p>' + esc([row.customer_name || '', row.part_number || '', row.part_revision || ''].filter(Boolean).join(' · ')) + '</p><div class="mesx-meta">' + esc((row.completed_count || 0) + '/' + (row.total_required || 0) + ' · ' + t(row.summary_vi || 'Thiếu gate', row.summary_en || 'Missing gates')) + '</div><div class="mesx-mini-actions" style="margin-top:10px"><span>' + badge(meta) + '</span>' + (Array.isArray(row.missing_form_codes) ? row.missing_form_codes.map(function(code){ return '<button type="button" class="mesx-link warning" data-open-form="' + esc(code) + '" data-context="' + esc(jsonAttr(context)) + '">' + esc(code) + '</button>'; }).join('') : '') + '</div></div>';
+  }).join('');
 }
 function renderDowntimeList(rows){
   if(!rows.length){
-    return '<div class="mes-empty"><strong>' + esc(t('Không có downtime mở', 'No open downtime')) + '</strong>' + esc(t('Tất cả máy đang hoạt động hoặc đã được xử lý.', 'All machines are running or already recovered.')) + '</div>';
+    return '<div class="mesx-empty"><strong>' + esc(t('Không có downtime mở', 'No open downtime')) + '</strong>' + esc(t('Tất cả máy đang hoạt động hoặc đã được khôi phục.', 'All machines are running or have already been recovered.')) + '</div>';
   }
   return rows.map(function(row){
-    var ctx = { wo_number:row.wo_number || '', machine_id:row.machine_id || '', work_center_id:row.work_center_id || '' };
-    return '<div class="mes-list-item"><h4>' + esc(row.machine_id || '') + ' · ' + esc(row.machine_name || '') + '</h4><p>' + esc(row.reason || '') + '</p><div class="mes-meta-line">' + esc([row.wo_number || '', row.category || '', row.severity || '', fmtDateTime(row.started_at || '')].filter(Boolean).join(' · ')) + '</div><div class="mes-mini-actions" style="margin-top:10px"><button type="button" class="mes-link-btn warning" data-resolve-downtime="' + esc(row.downtime_id || '') + '">' + esc(t('Khôi phục', 'Resolve')) + '</button><button type="button" class="mes-link-btn" data-form="FRM-512" data-context="' + esc(jsonAttr(ctx)) + '">' + esc(t('Mở form downtime', 'Open downtime form')) + '</button></div></div>';
+    var context = { machine_id: row.machine_id || '', work_center_id: row.work_center_id || '', wo_number: row.wo_number || '' };
+    return '<div class="mesx-list-item"><h4>' + esc(row.machine_id || '') + ' · ' + esc(row.machine_name || '') + '</h4><p>' + esc(row.reason || '') + '</p><div class="mesx-meta">' + esc([row.wo_number || '', row.category || '', row.severity || '', row.tool_id || '', fmtDateTime(row.started_at || '')].filter(Boolean).join(' · ')) + '</div><div class="mesx-mini-actions" style="margin-top:10px"><button type="button" class="mesx-link danger" data-resolve-downtime="' + esc(row.downtime_id || '') + '">' + esc(t('Khôi phục', 'Resolve')) + '</button><button type="button" class="mesx-link warning" data-open-form="FRM-512" data-context="' + esc(jsonAttr(context)) + '">' + esc(t('Mở form downtime', 'Open downtime form')) + '</button></div></div>';
   }).join('');
 }
 function renderMaintenanceList(rows){
   if(!rows.length){
-    return '<div class="mes-empty"><strong>' + esc(t('Không có maintenance mở', 'No open maintenance')) + '</strong>' + esc(t('Queue bảo trì hiện đang trống.', 'The maintenance queue is currently empty.')) + '</div>';
+    return '<div class="mesx-empty"><strong>' + esc(t('Không có maintenance mở', 'No open maintenance')) + '</strong>' + esc(t('Queue bảo trì hiện đang trống.', 'The maintenance queue is currently empty.')) + '</div>';
   }
   return rows.map(function(row){
-    var ctx = { machine_id:row.machine_id || '', work_center_id:row.work_center_id || '', wo_number:row.wo_number || '' };
-    return '<div class="mes-list-item"><h4>' + esc(row.machine_id || '') + ' · ' + esc(row.title || '') + '</h4><p>' + esc(row.description || '') + '</p><div class="mes-meta-line">' + esc([row.maintenance_type || '', row.priority || '', row.assigned_to || '', row.due_date || ''].filter(Boolean).join(' · ')) + '</div><div class="mes-mini-actions" style="margin-top:10px"><button type="button" class="mes-link-btn" data-maintenance-status="' + esc(row.request_id || '') + ':approved">' + esc(t('Duyệt', 'Approve')) + '</button><button type="button" class="mes-link-btn" data-maintenance-status="' + esc(row.request_id || '') + ':in_progress">' + esc(t('Bắt đầu', 'Start')) + '</button><button type="button" class="mes-link-btn" data-maintenance-status="' + esc(row.request_id || '') + ':completed">' + esc(t('Hoàn tất', 'Complete')) + '</button><button type="button" class="mes-link-btn" data-form="FRM-521" data-context="' + esc(jsonAttr(ctx)) + '">' + esc(t('Mở PM form', 'Open PM form')) + '</button></div></div>';
+    var context = { machine_id: row.machine_id || '', work_center_id: row.work_center_id || '', wo_number: row.wo_number || '' };
+    return '<div class="mesx-list-item"><h4>' + esc(row.machine_id || '') + ' · ' + esc(row.title || '') + '</h4><p>' + esc(row.description || '') + '</p><div class="mesx-meta">' + esc([row.maintenance_type || '', row.priority || '', row.assigned_to || '', row.due_date || '', row.tool_id || ''].filter(Boolean).join(' · ')) + '</div><div class="mesx-mini-actions" style="margin-top:10px"><button type="button" class="mesx-link" data-maintenance-status="' + esc(row.request_id || '') + ':approved">' + esc(t('Duyệt', 'Approve')) + '</button><button type="button" class="mesx-link" data-maintenance-status="' + esc(row.request_id || '') + ':in_progress">' + esc(t('Bắt đầu', 'Start')) + '</button><button type="button" class="mesx-link" data-maintenance-status="' + esc(row.request_id || '') + ':completed">' + esc(t('Hoàn tất', 'Complete')) + '</button><button type="button" class="mesx-link" data-open-form="FRM-521" data-context="' + esc(jsonAttr(context)) + '">' + esc(t('Mở PM form', 'Open PM form')) + '</button></div></div>';
   }).join('');
 }
 function renderProgressList(rows){
   if(!rows.length){
-    return '<div class="mes-empty"><strong>' + esc(t('Chưa có progress report', 'No progress report yet')) + '</strong>' + esc(t('Shop-floor chưa gửi báo tiến độ nào trong runtime này.', 'No shop-floor progress report has been submitted in this runtime.')) + '</div>';
+    return '<div class="mesx-empty"><strong>' + esc(t('Chưa có progress report', 'No progress report yet')) + '</strong>' + esc(t('Shop-floor chưa gửi bản ghi tiến độ nào trong runtime này.', 'No shop-floor progress report has been submitted in this runtime yet.')) + '</div>';
   }
   return rows.map(function(row){
-    return '<div class="mes-list-item"><h4>' + esc(row.wo_number || '') + ' · ' + esc(t(statusMeta(row.status || '').labelVi, statusMeta(row.status || '').labelEn)) + '</h4><p>' + esc(row.note || '') + '</p><div class="mes-meta-line">' + esc([row.machine_id || '', row.operator_id || '', 'OK ' + Number(row.qty_completed || 0), 'Scrap ' + Number(row.qty_scrap || 0), fmtDateTime(row.reported_at || '')].join(' · ')) + '</div></div>';
+    return '<div class="mesx-list-item"><h4>' + esc(row.wo_number || '') + ' · ' + esc(t(statusMeta(row.status || '').vi, statusMeta(row.status || '').en)) + '</h4><p>' + esc(row.note || t('Không có ghi chú bổ sung.', 'No additional note.')) + '</p><div class="mesx-meta">' + esc([row.machine_id || '', row.operator_id || '', 'OK ' + Number(row.qty_completed || 0), 'Scrap ' + Number(row.qty_scrap || 0), fmtMinutes(Number(row.setup_time_actual || 0) + Number(row.run_time_actual || 0)), fmtDateTime(row.reported_at || '')].filter(Boolean).join(' · ')) + '</div></div>';
   }).join('');
 }
 
 function render(){
   if(!state.container) return;
   if(state.loading && !state.snapshot){
-    state.container.innerHTML = '<div class="mes-wrap"><div class="mes-empty"><strong>' + esc(t('Đang tải trung tâm điều hành MES...', 'Loading the MES control center...')) + '</strong>' + esc(t('Vui lòng đợi trong giây lát.', 'Please wait a moment.')) + '</div></div>';
+    state.container.innerHTML = '<div class="mesx"><div class="mesx-empty"><strong>' + esc(t('Đang tải trung tâm điều hành MES...', 'Loading the MES control center...')) + '</strong>' + esc(t('Vui lòng đợi trong giây lát.', 'Please wait a moment.')) + '</div></div>';
     return;
   }
-  var snapshot = state.snapshot || { kpis:{}, machine_wall:[], dispatch:[], open_downtimes:[], maintenance_queue:[], progress_reports:[], work_center_summary:[] };
-  var dispatchRows = filteredDispatch();
-  var workCenters = snapshot.work_center_summary || [];
-  var exceptionData = state.exceptions || {};
-  var statusOptions = ['scheduled','setup','running','inspection','on_hold','completed'];
-  state.container.innerHTML = '<div class="mes-wrap">' +
-    '<section class="mes-hero">' +
-      '<article class="mes-poster">' +
-        '<div class="mes-poster-head">' +
-          '<div class="mes-brand"><div class="mes-brand-logo"><img src="./assets/hesem-logo.svg" alt="HESEM"></div><div><div class="mes-kicker">HESEM CNC MOM / MES</div><h1>' + esc(t('Trung tâm điều hành MES', 'MES control center')) + '</h1><p>' + esc(t('Điều độ WO, machine wall, downtime, maintenance và exception được gom về một màn hình để trưởng ca và quản lý xưởng ra quyết định nhanh theo ngữ cảnh thật.', 'Dispatch, machine wall, downtime, maintenance, and exceptions are unified in one operating screen so supervisors can react in real production context.')) + '</p><div class="mes-poster-facts"><span class="mes-fact">⏱ ' + esc(currentStamp()) + '</span><span class="mes-fact">🏭 ' + esc(snapshot.kpis.wo_active || 0) + ' ' + esc(t('WO đang hoạt động', 'active WO')) + '</span><span class="mes-fact">🛠 ' + esc(snapshot.kpis.machines_total || 0) + ' ' + esc(t('tài sản đang theo dõi', 'assets tracked')) + '</span></div></div></div>' +
-          '<div>' + statusBadge(snapshot.kpis.machines_down ? 'down' : 'running') + '</div>' +
-        '</div>' +
-        '<div class="mes-poster-actions">' +
-          '<button type="button" class="mes-btn primary" id="mes-refresh">⟳ ' + esc(t('Làm mới runtime', 'Refresh runtime')) + '</button>' +
-          '<button type="button" class="mes-btn secondary" id="mes-open-orders">📦 ' + esc(t('Mở quản lý đơn hàng', 'Open order management')) + '</button>' +
-          '<button type="button" class="mes-btn secondary" id="mes-open-master">🧭 ' + esc(t('Mở master data', 'Open master data')) + '</button>' +
-          '<button type="button" class="mes-btn secondary" id="mes-open-forms">📋 ' + esc(t('Mở kiểm soát chứng cứ', 'Open evidence control')) + '</button>' +
-        '</div>' +
+
+  var snapshot = state.snapshot || defaultSnapshot();
+  var rows = filteredDispatch();
+  var centers = workCenters();
+  var machineWall = Array.isArray(snapshot.machine_wall) ? snapshot.machine_wall : [];
+  var kpi = snapshot.kpis || {};
+
+  state.container.innerHTML = '<div class="mesx">' +
+    '<section class="mesx-hero">' +
+      '<article class="mesx-poster">' +
+        '<div class="mesx-brand"><div class="mesx-brand-main"><div class="mesx-logo"><img src="./assets/hesem-logo.svg" alt="HESEM"></div><div><div class="mesx-kicker">HESEM CNC MOM / MES</div><h1>' + esc(t('Trung tâm điều hành MES', 'MES Control Center')) + '</h1><p>' + esc(t('Một màn hình duy nhất để điều độ WO, đọc trạng thái máy, khóa gate chứng cứ, bắt cảnh báo tool-life và ra quyết định khôi phục xưởng nhanh theo ngữ cảnh thật.', 'One production surface to dispatch WO, read machine status, enforce evidence gates, catch tool-life alerts, and drive recovery decisions in real shop-floor context.')) + '</p><div class="mesx-facts"><span class="mesx-fact">⏱ ' + esc(currentStamp()) + '</span><span class="mesx-fact">📦 ' + esc((kpi.wo_active || 0) + ' ' + t('WO đang hoạt động', 'active WO')) + '</span><span class="mesx-fact">🏭 ' + esc((kpi.machines_total || 0) + ' ' + t('tài sản theo dõi', 'assets tracked')) + '</span><span class="mesx-fact">📊 OEE ' + esc(fmtPercent(kpi.oee_pct)) + '</span></div></div></div><div>' + badge((kpi.machines_down || 0) > 0 ? statusMeta('down') : statusMeta('running')) + '</div></div>' +
+        '<div class="mesx-actions"><button type="button" class="mesx-btn primary" id="mes-refresh">⟳ ' + esc(t('Làm mới runtime', 'Refresh runtime')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-orders">📦 ' + esc(t('Quản lý đơn hàng', 'Order management')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-master">🧭 ' + esc(t('Dữ liệu nền', 'Master data')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-forms">📋 ' + esc(t('Kiểm soát chứng cứ', 'Evidence control')) + '</button></div>' +
       '</article>' +
-      '<aside class="mes-side">' +
-        '<article class="mes-card mes-clock"><div class="mes-clock-top"><div><div class="mes-kicker">' + esc(t('Snapshot runtime', 'Runtime snapshot')) + '</div><strong>' + esc(currentStamp()) + '</strong><small>' + esc(t('Nguồn dữ liệu: Order Management + Master Data + MES runtime + Exception dashboard.', 'Data source: Order Management + Master Data + MES runtime + Exception dashboard.')) + '</small></div>' + statusBadge('approved') + '</div></article>' +
-        '<article class="mes-card"><div class="mes-kpi-grid">' +
-          renderKpi(t('Máy đang chạy', 'Machines running'), snapshot.kpis.machines_running || 0, t('Bao gồm chạy, setup và inspection', 'Running, setup, and inspection')) +
-          renderKpi(t('Máy dừng', 'Machines down'), snapshot.kpis.machines_down || 0, t('Downtime chưa khôi phục', 'Unresolved downtime')) +
-          renderKpi(t('Maintenance mở', 'Open maintenance'), snapshot.kpis.maintenance_open || 0, t('Request chưa đóng', 'Open requests')) +
-          renderKpi(t('WO quá hạn', 'Overdue WO'), snapshot.kpis.wo_overdue || 0, t('Cần điều độ hoặc escalation', 'Needs dispatching or escalation')) +
+      '<aside class="mesx-side">' +
+        '<article class="mesx-card mesx-clock"><div class="mesx-clock-top"><div><div class="mesx-kicker">' + esc(t('Snapshot runtime', 'Runtime snapshot')) + '</div><strong>' + esc(currentStamp()) + '</strong><small>' + esc(t('Nguồn dữ liệu: Order Management + Master Data + MES runtime + Exception dashboard.', 'Data source: Order Management + Master Data + MES runtime + Exception dashboard.')) + '</small></div>' + badge(statusMeta('approved')) + '</div></article>' +
+        '<article class="mesx-card"><div class="mesx-kpi-grid">' +
+          renderKpiTile(t('Máy đang chạy', 'Machines running'), kpi.machines_running || 0, t('Bao gồm chạy, setup và inspection', 'Running, setup, and inspection')) +
+          renderKpiTile(t('Máy dừng', 'Machines down'), kpi.machines_down || 0, t('Downtime chưa khôi phục', 'Unresolved downtime')) +
+          renderKpiTile(t('Tooling cảnh báo', 'Tooling alerts'), kpi.tooling_alerts || 0, t('Tool gần tới hạn hoặc lệch offset', 'Tool near limit or offset risk')) +
+          renderKpiTile(t('WO thiếu gate', 'WO missing gates'), kpi.wo_gate_missing || 0, t('Cần bổ sung chứng cứ bắt buộc', 'Evidence gate completion required')) +
+          renderKpiTile('Availability', fmtPercent(kpi.availability_pct), t('Thời gian sẵn sàng của máy', 'Machine readiness time')) +
+          renderKpiTile('Performance', fmtPercent(kpi.performance_pct), t('So với takt / runtime kế hoạch', 'Against planned runtime')) +
+          renderKpiTile('Quality', fmtPercent(kpi.quality_pct), t('Tỷ lệ chi tiết đạt', 'Good-part ratio')) +
+          renderKpiTile('OEE', fmtPercent(kpi.oee_pct), t('Trung bình toàn bộ machine wall', 'Average across machine wall')) +
         '</div></article>' +
       '</aside>' +
     '</section>' +
-    '<section class="mes-summary">' +
-      '<article class="mes-panel"><div class="mes-panel-head"><div><h2>' + esc(t('Toàn cảnh work center', 'Work center overview')) + '</h2><p>' + esc(t('Đếm máy, WO và tình trạng theo từng cell để trưởng ca nhìn ra bottleneck ngay.', 'See machines, WO, and status by cell to spot bottlenecks quickly.')) + '</p></div></div><div class="mes-chips">' + (workCenters.length ? workCenters.map(renderWorkCenterChip).join('') : '<div class="mes-empty"><strong>' + esc(t('Chưa có work center', 'No work center data')) + '</strong>' + esc(t('Kiểm tra lại master data hoặc cấu hình runtime.', 'Check the master data or runtime configuration.')) + '</div>') + '</div></article>' +
-      '<article class="mes-panel"><div class="mes-panel-head"><div><h2>' + esc(t('Exception cần xử lý', 'Operational exceptions')) + '</h2><p>' + esc(t('Nhấn vào từng nhóm để xem chi tiết và xử lý tận gốc các ngoại lệ ảnh hưởng tới truy xuất, giao hàng và kiểm soát chứng cứ.', 'Click any group to inspect details and resolve the exceptions that affect traceability, delivery, and evidence control.')) + '</p></div></div>' + renderExceptionGrid(exceptionData) + '</article>' +
+    '<section class="mesx-band">' +
+      '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Work center radar', 'Work center radar')) + '</h2><p>' + esc(t('Nhìn một hàng là biết cell nào đang nghẽn vì máy dừng, OEE thấp, thiếu gate hay tooling warning.', 'See at a glance which cell is blocked by downtime, low OEE, missing gates, or tooling warnings.')) + '</p></div></div><div class="mesx-center-grid">' + (centers.length ? centers.map(renderWorkCenterCard).join('') : '<div class="mesx-empty"><strong>' + esc(t('Chưa có work center', 'No work centers yet')) + '</strong>' + esc(t('Kiểm tra master data hoặc seed runtime.', 'Check the master data or runtime seed.')) + '</div>') + '</div></article>' +
+      '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Ngoại lệ cần xử lý', 'Exceptions to handle')) + '</h2><p>' + esc(t('Nhóm các ngoại lệ ảnh hưởng trực tiếp đến truy xuất, giao hàng, upload và evidence readiness.', 'Grouped exceptions that directly affect traceability, delivery, uploads, and evidence readiness.')) + '</p></div></div>' + renderExceptionRail() + '</article>' +
     '</section>' +
-    '<section class="mes-main">' +
-      '<article class="mes-panel"><div class="mes-panel-head"><div><h2>' + esc(t('Dispatch board theo Work Order', 'Work Order dispatch board')) + '</h2><p>' + esc(t('Lọc theo work center, trạng thái và tìm nhanh WO để báo tiến độ hoặc mở form chứng cứ đúng ngữ cảnh.', 'Filter by work center and status, then report progress or open the right evidence form with real context.')) + '</p></div></div><div class="mes-toolbar"><input class="mes-input search" id="mes-search" type="search" value="' + esc(state.search) + '" placeholder="' + esc(t('Tìm WO / Part / máy / khách hàng...', 'Search WO / part / machine / customer...')) + '"><select class="mes-select" id="mes-filter-center"><option value="">' + esc(t('Tất cả work center', 'All work centers')) + '</option>' + workCenters.map(function(center){ return '<option value="' + esc(center.work_center_id || '') + '"' + (state.workCenter === center.work_center_id ? ' selected' : '') + '>' + esc(center.work_center_id + ' · ' + center.work_center_name) + '</option>'; }).join('') + '</select><select class="mes-select" id="mes-filter-status"><option value="">' + esc(t('Tất cả trạng thái', 'All statuses')) + '</option>' + statusOptions.map(function(key){ return '<option value="' + esc(key) + '"' + (state.dispatchStatus === key ? ' selected' : '') + '>' + esc(t(statusMeta(key).labelVi, statusMeta(key).labelEn)) + '</option>'; }).join('') + '</select></div>' + renderDispatchTable(dispatchRows) + '</article>' +
-      '<div class="mes-stack">' +
-        '<article class="mes-panel"><div class="mes-panel-head"><div><h3>' + esc(t('Machine wall', 'Machine wall')) + '</h3><p>' + esc(t('Trạng thái từng máy, queue WO và nút tác vụ nhanh cho downtime / maintenance / form.', 'Per-machine status, WO queue, and quick actions for downtime, maintenance, and forms.')) + '</p></div></div><div class="mes-wall">' + ((snapshot.machine_wall || []).length ? snapshot.machine_wall.map(renderMachineCard).join('') : '<div class="mes-empty"><strong>' + esc(t('Chưa có machine wall', 'No machine wall data')) + '</strong>' + esc(t('Hãy khai báo máy trong master data.', 'Define machines in master data first.')) + '</div>') + '</div></article>' +
-        '<article class="mes-panel"><div class="mes-panel-head"><div><h3>' + esc(t('Downtime mở', 'Open downtime')) + '</h3><p>' + esc(t('Theo dõi máy đang dừng và khôi phục theo WO bị ảnh hưởng.', 'Track machines currently down and restore them in the affected WO context.')) + '</p></div></div><div class="mes-list">' + renderDowntimeList(snapshot.open_downtimes || []) + '</div></article>' +
-        '<article class="mes-panel"><div class="mes-panel-head"><div><h3>' + esc(t('Hàng đợi bảo trì', 'Maintenance queue')) + '</h3><p>' + esc(t('Quản lý request bảo trì, chuyển trạng thái và mở PM form từ cùng một màn hình.', 'Manage maintenance requests, transition status, and launch PM forms from the same screen.')) + '</p></div></div><div class="mes-list">' + renderMaintenanceList(snapshot.maintenance_queue || []) + '</div></article>' +
-        '<article class="mes-panel"><div class="mes-panel-head"><div><h3>' + esc(t('Báo tiến độ gần nhất', 'Recent progress reports')) + '</h3><p>' + esc(t('Nhật ký runtime gần nhất cho shop-floor reporting.', 'Most recent runtime log for shop-floor reporting.')) + '</p></div></div><div class="mes-list">' + renderProgressList(snapshot.progress_reports || []) + '</div></article>' +
-      '</div>' +
+    '<section class="mesx-main">' +
+      '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Dispatch board theo Work Order', 'Work Order dispatch board')) + '</h2><p>' + esc(t('Lọc theo work center và trạng thái, sau đó báo tiến độ hoặc mở đúng form chứng cứ mà không phải nhập tay context.', 'Filter by work center and status, then report progress or launch the correct evidence form without typing context by hand.')) + '</p></div></div><div class="mesx-toolbar"><input class="mesx-input search" id="mes-search" type="search" value="' + esc(state.search) + '" placeholder="' + esc(t('Tìm WO / Part / máy / khách hàng...', 'Search WO / part / machine / customer...')) + '"><select class="mesx-select" id="mes-filter-center"><option value="">' + esc(t('Tất cả work center', 'All work centers')) + '</option>' + centers.map(function(center){ return '<option value="' + esc(center.work_center_id || '') + '"' + (state.workCenter === center.work_center_id ? ' selected' : '') + '>' + esc((center.work_center_id || '') + ' · ' + (center.work_center_name || '')) + '</option>'; }).join('') + '</select><select class="mesx-select" id="mes-filter-status"><option value="">' + esc(t('Tất cả trạng thái', 'All statuses')) + '</option>' + ['scheduled','setup','running','inspection','on_hold','completed'].map(function(key){ return '<option value="' + esc(key) + '"' + (state.dispatchStatus === key ? ' selected' : '') + '>' + esc(t(statusMeta(key).vi, statusMeta(key).en)) + '</option>'; }).join('') + '</select></div>' + renderDispatchTable(rows) + '</article>' +
+      '<div class="mesx-stack"><article class="mesx-panel"><div class="mesx-panel-head"><div><h3>' + esc(t('Machine wall', 'Machine wall')) + '</h3><p>' + esc(t('Từng máy hiển thị tình trạng, OEE, gate chứng cứ và tool-life để trưởng ca xử lý ngay tại chỗ.', 'Each machine shows state, OEE, evidence gate, and tool-life so supervisors can act directly on the floor.')) + '</p></div></div><div class="mesx-machine-wall">' + (machineWall.length ? machineWall.map(renderMachineCard).join('') : '<div class="mesx-empty"><strong>' + esc(t('Chưa có machine wall', 'No machine wall data')) + '</strong>' + esc(t('Hãy khai báo máy trong master data trước.', 'Define machines in master data first.')) + '</div>') + '</div></article></div>' +
     '</section>' +
+    '<section class="mesx-band" style="margin-top:18px"><article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Tooling watchlist', 'Tooling watchlist')) + '</h2><p>' + esc(t('Tập trung vào các tool có life cao, offset bất ổn hoặc chưa được theo dõi đúng chuẩn.', 'Focus on tools with high life usage, unstable offsets, or missing governed tracking.')) + '</p></div></div><div class="mesx-list">' + renderToolingWatchlist(snapshot.tooling_alerts || []) + '</div></article><article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('WO risk về gate chứng cứ', 'Evidence gate risk queue')) + '</h2><p>' + esc(t('Danh sách WO còn thiếu form bắt buộc, mở trực tiếp form cần thiết từ cùng màn hình.', 'List of WO still missing required forms, with direct launch actions from the same screen.')) + '</p></div></div><div class="mesx-list">' + renderGateQueue(snapshot.evidence_gate_queue || []) + '</div></article></section>' +
+    '<section class="mesx-band" style="margin-top:18px"><article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Downtime đang mở', 'Open downtime')) + '</h2><p>' + esc(t('Theo dõi nhanh máy nào đang dừng, WO nào bị giữ và cần khôi phục theo hướng nào.', 'Track which machines are down, which WO are blocked, and how they should be recovered.')) + '</p></div></div><div class="mesx-list">' + renderDowntimeList(snapshot.open_downtimes || []) + '</div></article><article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Hàng đợi bảo trì', 'Maintenance queue')) + '</h2><p>' + esc(t('Điều phối maintenance request, đẩy trạng thái và mở PM verification ngay trong ngữ cảnh máy.', 'Dispatch maintenance requests, transition statuses, and open PM verification directly in machine context.')) + '</p></div></div><div class="mesx-list">' + renderMaintenanceList(snapshot.maintenance_queue || []) + '</div></article></section>' +
+    '<section class="mesx-band" style="margin-top:18px"><article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Nhật ký progress gần nhất', 'Recent progress activity')) + '</h2><p>' + esc(t('Log runtime gần nhất cho báo tiến độ shop-floor, useful để đối chiếu với order và evidence trail.', 'Recent runtime logs for shop-floor progress, useful for order and evidence trail reconciliation.')) + '</p></div></div><div class="mesx-list">' + renderProgressList(snapshot.progress_reports || []) + '</div></article><article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Bộ điều khiển nhanh', 'Quick control actions')) + '</h2><p>' + esc(t('Các hành động dùng nhiều nhất trong ca: mở dashboard đơn hàng, master data, evidence control hoặc tạo maintenance / downtime mới.', 'The most frequent shift actions: jump to order management, master data, evidence control, or create a new maintenance / downtime event.')) + '</p></div></div><div class="mesx-list"><div class="mesx-list-item"><h4>' + esc(t('Điều phối điều hành', 'Operations routing')) + '</h4><p>' + esc(t('Giữ người dùng trong cùng một nhịp làm việc: từ dispatch board sang evidence control hoặc order control mà không mất context.', 'Keep the operator in one working rhythm: from dispatch board to evidence control or order control without losing context.')) + '</p><div class="mesx-mini-actions" style="margin-top:10px"><button type="button" class="mesx-link" id="mes-side-orders">' + esc(t('Mở Quản lý đơn hàng', 'Open Order Management')) + '</button><button type="button" class="mesx-link" id="mes-side-master">' + esc(t('Mở Dữ liệu nền', 'Open Master Data')) + '</button><button type="button" class="mesx-link" id="mes-side-forms">' + esc(t('Mở Kiểm soát chứng cứ', 'Open Evidence Control')) + '</button></div></div><div class="mesx-list-item"><h4>' + esc(t('Khởi tạo nhanh', 'Quick starts')) + '</h4><p>' + esc(t('Khi chưa chọn máy cụ thể, có thể tạo maintenance hoặc log downtime từ dashboard order rồi gắn context sau.', 'When no specific machine is selected yet, start maintenance or downtime from the order dashboard and attach context afterward.')) + '</p><div class="mesx-mini-actions" style="margin-top:10px"><button type="button" class="mesx-link warning" id="mes-new-downtime-blank">' + esc(t('Tạo downtime mới', 'Create downtime')) + '</button><button type="button" class="mesx-link" id="mes-new-maintenance-blank">' + esc(t('Tạo maintenance mới', 'Create maintenance')) + '</button></div></div></div></article></section>' +
   '</div>';
+
   bind();
 }
 
 function bind(){
   if(!state.container) return;
+
   var search = document.getElementById('mes-search');
   if(search) search.oninput = function(){ state.search = search.value || ''; render(); };
   var center = document.getElementById('mes-filter-center');
   if(center) center.onchange = function(){ state.workCenter = center.value || ''; render(); };
   var status = document.getElementById('mes-filter-status');
   if(status) status.onchange = function(){ state.dispatchStatus = status.value || ''; render(); };
+
   var refresh = document.getElementById('mes-refresh');
   if(refresh) refresh.onclick = function(){ loadData(); };
   var openOrders = document.getElementById('mes-open-orders');
@@ -348,57 +631,61 @@ function bind(){
   if(openMaster) openMaster.onclick = function(){ if(typeof window._mdOpenControl === 'function') window._mdOpenControl(); };
   var openForms = document.getElementById('mes-open-forms');
   if(openForms) openForms.onclick = function(){ if(typeof navigateTo === 'function') navigateTo('forms'); };
+  var sideOrders = document.getElementById('mes-side-orders');
+  if(sideOrders) sideOrders.onclick = function(){ if(typeof navigateTo === 'function') navigateTo('orders'); };
+  var sideMaster = document.getElementById('mes-side-master');
+  if(sideMaster) sideMaster.onclick = function(){ if(typeof window._mdOpenControl === 'function') window._mdOpenControl(); };
+  var sideForms = document.getElementById('mes-side-forms');
+  if(sideForms) sideForms.onclick = function(){ if(typeof navigateTo === 'function') navigateTo('forms'); };
+  var blankDowntime = document.getElementById('mes-new-downtime-blank');
+  if(blankDowntime) blankDowntime.onclick = function(){ openDowntimeModal(''); };
+  var blankMaintenance = document.getElementById('mes-new-maintenance-blank');
+  if(blankMaintenance) blankMaintenance.onclick = function(){ openMaintenanceModal(''); };
 
-  Array.prototype.forEach.call(state.container.querySelectorAll('[data-form]'), function(node){ node.onclick = function(){ openEvidenceForm(node.getAttribute('data-form') || '', parseJsonAttr(node.getAttribute('data-context') || '')); }; });
-  Array.prototype.forEach.call(state.container.querySelectorAll('[data-progress]'), function(node){ node.onclick = function(){ var woNumber = node.getAttribute('data-progress') || ''; if(woNumber) openProgressModal(woNumber); }; });
-  Array.prototype.forEach.call(state.container.querySelectorAll('[data-new-downtime]'), function(node){ node.onclick = function(){ openDowntimeModal(node.getAttribute('data-new-downtime') || ''); }; });
-  Array.prototype.forEach.call(state.container.querySelectorAll('[data-resolve-downtime]'), function(node){ node.onclick = function(){ openResolveDowntimeModal(node.getAttribute('data-resolve-downtime') || ''); }; });
-  Array.prototype.forEach.call(state.container.querySelectorAll('[data-new-maintenance]'), function(node){ node.onclick = function(){ openMaintenanceModal(node.getAttribute('data-new-maintenance') || ''); }; });
-  Array.prototype.forEach.call(state.container.querySelectorAll('[data-maintenance-status]'), function(node){ node.onclick = function(){ var raw = String(node.getAttribute('data-maintenance-status') || ''); var parts = raw.split(':'); if(parts[0]) openMaintenanceStatusModal(parts[0], parts[1] || ''); }; });
-  Array.prototype.forEach.call(state.container.querySelectorAll('[data-exception-type]'), function(node){ node.onclick = function(){ openExceptionDetail(node.getAttribute('data-exception-type') || ''); }; });
-}
-
-function rowByWo(woNumber){
-  var rows = state.snapshot && Array.isArray(state.snapshot.dispatch) ? state.snapshot.dispatch : [];
-  return rows.find(function(row){ return String(row.wo_number || '') === String(woNumber || ''); }) || null;
-}
-function machineById(machineId){
-  var rows = state.snapshot && Array.isArray(state.snapshot.machine_wall) ? state.snapshot.machine_wall : [];
-  return rows.find(function(row){ return String(row.machine_id || '') === String(machineId || ''); }) || null;
-}
-function downtimeById(downtimeId){
-  var rows = state.snapshot && Array.isArray(state.snapshot.open_downtimes) ? state.snapshot.open_downtimes : [];
-  return rows.find(function(row){ return String(row.downtime_id || '') === String(downtimeId || ''); }) || null;
-}
-function maintenanceById(requestId){
-  var rows = state.snapshot && Array.isArray(state.snapshot.maintenance_queue) ? state.snapshot.maintenance_queue : [];
-  return rows.find(function(row){ return String(row.request_id || '') === String(requestId || ''); }) || null;
-}
-
-function operatorOptions(){
-  var rows = state.master && Array.isArray(state.master.operators) ? state.master.operators : [];
-  return rows.map(function(item){
-    return '<option value="' + esc(item.operator_id || '') + '">' + esc([item.operator_id || '', item.operator_name || '', item.role || ''].filter(Boolean).join(' · ')) + '</option>';
-  }).join('');
+  Array.prototype.forEach.call(state.container.querySelectorAll('[data-open-form]'), function(button){
+    button.onclick = function(){ openEvidenceForm(button.getAttribute('data-open-form') || '', parseJsonAttr(button.getAttribute('data-context'))); };
+  });
+  Array.prototype.forEach.call(state.container.querySelectorAll('[data-report-progress]'), function(button){
+    button.onclick = function(){ openProgressModal(button.getAttribute('data-report-progress') || ''); };
+  });
+  Array.prototype.forEach.call(state.container.querySelectorAll('[data-new-downtime]'), function(button){
+    button.onclick = function(){ openDowntimeModal(button.getAttribute('data-new-downtime') || ''); };
+  });
+  Array.prototype.forEach.call(state.container.querySelectorAll('[data-resolve-downtime]'), function(button){
+    button.onclick = function(){ openResolveDowntimeModal(button.getAttribute('data-resolve-downtime') || ''); };
+  });
+  Array.prototype.forEach.call(state.container.querySelectorAll('[data-new-maintenance]'), function(button){
+    button.onclick = function(){ openMaintenanceModal(button.getAttribute('data-new-maintenance') || ''); };
+  });
+  Array.prototype.forEach.call(state.container.querySelectorAll('[data-maintenance-status]'), function(button){
+    button.onclick = function(){ var payload = String(button.getAttribute('data-maintenance-status') || '').split(':'); openMaintenanceStatusModal(payload[0] || '', payload[1] || ''); };
+  });
+  Array.prototype.forEach.call(state.container.querySelectorAll('[data-edit-tooling]'), function(button){
+    button.onclick = function(){ openToolingModal(button.getAttribute('data-edit-tooling') || '', button.getAttribute('data-tool-runtime') || ''); };
+  });
+  Array.prototype.forEach.call(state.container.querySelectorAll('[data-open-exception]'), function(button){
+    button.onclick = function(){ openExceptionDetail(button.getAttribute('data-open-exception') || ''); };
+  });
 }
 
 function openProgressModal(woNumber){
-  var row = rowByWo(woNumber);
-  if(!row){ toast(t('Không tìm thấy WO trong snapshot hiện tại.', 'The work order was not found in the current snapshot.'), 'error'); return; }
+  var row = dispatchByWo(woNumber);
+  if(!row){ toast(t('Không tìm thấy WO để báo tiến độ.', 'Could not find the work order to report progress.'), 'error'); return; }
+  var operators = operatorOptions(row.work_center_id);
   showModal(
-    t('Báo tiến độ WO', 'Report WO progress'),
-    (row.wo_number || '') + ' · ' + (row.part_number || '') + ' · ' + (row.machine_id || ''),
-    '<div class="mes-form-grid">' +
-      fieldDisplay(t('Khách hàng', 'Customer'), row.customer_name || row.customer_id || '—') +
-      fieldDisplay(t('Work center', 'Work center'), row.work_center_name || row.work_center_id || '—') +
-      editableField('mes-progress-status', t('Trạng thái mới', 'New status'), '<select class="mes-select" id="mes-progress-status"><option value="setup"' + (row.status === 'setup' ? ' selected' : '') + '>Setup</option><option value="running"' + (row.status === 'running' ? ' selected' : '') + '>Running</option><option value="inspection"' + (row.status === 'inspection' ? ' selected' : '') + '>Inspection</option><option value="on_hold"' + (row.status === 'on_hold' ? ' selected' : '') + '>On Hold</option><option value="completed"' + (row.status === 'completed' ? ' selected' : '') + '>Completed</option></select>') +
-      editableField('mes-progress-operator', t('Người vận hành', 'Operator'), '<select class="mes-select" id="mes-progress-operator"><option value="">' + esc(t('Giữ nguyên', 'Keep current')) + '</option>' + operatorOptions() + '</select>') +
-      editableField('mes-progress-ok', t('Số lượng OK', 'Qty completed'), '<input class="mes-input" id="mes-progress-ok" type="number" min="0" value="' + esc(Number(row.qty_completed || 0)) + '">') +
-      editableField('mes-progress-scrap', t('Số lượng Scrap', 'Qty scrap'), '<input class="mes-input" id="mes-progress-scrap" type="number" min="0" value="' + esc(Number(row.qty_scrap || 0)) + '">') +
-      editableField('mes-progress-setup-min', t('Setup thực tế (phút)', 'Actual setup minutes'), '<input class="mes-input" id="mes-progress-setup-min" type="number" min="0" value="' + esc(Number(row.setup_time_actual || 0)) + '">') +
-      editableField('mes-progress-run-min', t('Run thực tế (phút)', 'Actual run minutes'), '<input class="mes-input" id="mes-progress-run-min" type="number" min="0" value="' + esc(Number(row.run_time_actual || 0)) + '">') +
-      editableField('mes-progress-note', t('Ghi chú shop-floor', 'Shop-floor note'), '<textarea class="mes-textarea" id="mes-progress-note" placeholder="' + esc(t('Ví dụ: hoàn tất prove-out, đang chuyển qua inspection...', 'Example: prove-out completed, moving to inspection...')) + '"></textarea>', true) +
-      '<div class="full mes-modal-foot"><button type="button" class="mes-btn ghost" data-modal-cancel>↩ ' + esc(t('Hủy', 'Cancel')) + '</button><button type="button" class="mes-btn primary" data-modal-submit>💾 ' + esc(t('Lưu tiến độ', 'Save progress')) + '</button></div>' +
+    t('Báo tiến độ Work Order', 'Report work-order progress'),
+    (row.wo_number || '') + ' · ' + (row.machine_id || '—') + ' · ' + (row.operation_desc || ''),
+    '<div class="mesx-form-grid">' +
+      fieldDisplay(t('Khách hàng / Part', 'Customer / Part'), [row.customer_name || row.customer_id || '', row.part_number || '', row.part_revision || ''].filter(Boolean).join(' · ')) +
+      fieldDisplay(t('Runtime kế hoạch', 'Planned runtime'), fmtMinutes(Number(row.setup_time_est || 0) + Number(row.run_time_est || 0))) +
+      editableField('mes-progress-status', t('Trạng thái mới', 'New status'), '<select class="mesx-select" id="mes-progress-status">' + ['setup','running','inspection','completed','on_hold'].map(function(key){ return '<option value="' + esc(key) + '"' + (String(row.status || '') === key ? ' selected' : '') + '>' + esc(t(statusMeta(key).vi, statusMeta(key).en)) + '</option>'; }).join('') + '</select>') +
+      editableField('mes-progress-operator', t('Người vận hành', 'Operator'), '<select class="mesx-select" id="mes-progress-operator">' + renderSelectOptions(operators, 'operator_id', function(item){ return [item.operator_id, item.operator_name].filter(Boolean).join(' · '); }, row.operator_id || '', t('Chọn người vận hành', 'Select operator')) + '</select>') +
+      editableField('mes-progress-ok', t('Số lượng đạt', 'Qty completed'), '<input class="mesx-input" id="mes-progress-ok" type="number" min="0" value="' + esc(Number(row.qty_completed || 0)) + '">') +
+      editableField('mes-progress-scrap', t('Số lượng scrap', 'Qty scrap'), '<input class="mesx-input" id="mes-progress-scrap" type="number" min="0" value="' + esc(Number(row.qty_scrap || 0)) + '">') +
+      editableField('mes-progress-setup-min', t('Setup thực tế (phút)', 'Actual setup minutes'), '<input class="mesx-input" id="mes-progress-setup-min" type="number" min="0" value="' + esc(Number(row.setup_time_actual || 0)) + '">') +
+      editableField('mes-progress-run-min', t('Run thực tế (phút)', 'Actual run minutes'), '<input class="mesx-input" id="mes-progress-run-min" type="number" min="0" value="' + esc(Number(row.run_time_actual || 0)) + '">') +
+      editableField('mes-progress-note', t('Ghi chú shop-floor', 'Shop-floor note'), '<textarea class="mesx-textarea" id="mes-progress-note" placeholder="' + esc(t('Ví dụ: hoàn tất prove-out, đang chuyển qua inspection...', 'Example: prove-out completed, moving to inspection...')) + '"></textarea>', true) +
+      '<div class="full mesx-modal-foot"><button type="button" class="mesx-btn ghost" data-modal-cancel>↩ ' + esc(t('Hủy', 'Cancel')) + '</button><button type="button" class="mesx-btn primary" data-modal-submit>💾 ' + esc(t('Lưu tiến độ', 'Save progress')) + '</button></div>' +
     '</div>',
     function(modal, submit){
       submit.disabled = true;
@@ -427,31 +714,34 @@ function openProgressModal(woNumber){
 }
 
 function openDowntimeModal(machineId){
-  var machine = machineById(machineId);
-  if(!machine){ toast(t('Không tìm thấy máy trong snapshot hiện tại.', 'The machine was not found in the current snapshot.'), 'error'); return; }
-  var active = machine.active_work_order || {};
+  var machine = machineId ? machineById(machineId) : null;
+  var workCenterId = machine ? machine.work_center_id : state.workCenter;
+  var woRows = workOrderOptions(machineId);
+  var toolRows = machineId ? toolOptionsForMachine(machineId) : [];
   showModal(
     t('Ghi nhận downtime', 'Create downtime event'),
-    (machine.machine_id || '') + ' · ' + (machine.machine_name || ''),
-    '<div class="mes-form-grid">' +
-      fieldDisplay(t('Work center', 'Work center'), machine.work_center_name || machine.work_center_id || '—') +
-      fieldDisplay(t('WO bị ảnh hưởng', 'Affected WO'), active.wo_number || '—') +
-      editableField('mes-dt-category', t('Phân loại', 'Category'), '<select class="mes-select" id="mes-dt-category"><option value="breakdown">Breakdown</option><option value="planned_pm">Planned PM</option><option value="setup">Setup / Changeover</option><option value="material_wait">Material wait</option><option value="quality_hold">Quality hold</option><option value="tool_change">Tool change</option><option value="utility">Utility / power</option><option value="other">Other</option></select>') +
-      editableField('mes-dt-severity', t('Mức độ', 'Severity'), '<select class="mes-select" id="mes-dt-severity"><option value="minor">' + esc(t('Nhẹ', 'Minor')) + '</option><option value="major" selected>' + esc(t('Lớn', 'Major')) + '</option><option value="critical">' + esc(t('Nghiêm trọng', 'Critical')) + '</option></select>') +
-      editableField('mes-dt-start', t('Bắt đầu dừng', 'Downtime start'), '<input class="mes-input" id="mes-dt-start" type="datetime-local" value="' + esc(nowInputValue()) + '">') +
-      editableField('mes-dt-wo', t('WO liên quan', 'Affected WO'), '<input class="mes-input" id="mes-dt-wo" type="text" value="' + esc(active.wo_number || '') + '" placeholder="' + esc(t('Ví dụ: WO-2026-00001', 'Example: WO-2026-00001')) + '">') +
-      editableField('mes-dt-reason', t('Lý do / triệu chứng', 'Reason / symptom'), '<textarea class="mes-textarea" id="mes-dt-reason" placeholder="' + esc(t('Mô tả điều gì đang xảy ra trên máy...', 'Describe what is happening on the machine...')) + '"></textarea>', true) +
-      editableField('mes-dt-note', t('Ghi chú thêm', 'Additional note'), '<textarea class="mes-textarea" id="mes-dt-note" placeholder="' + esc(t('Ai đã escalation, có ảnh hưởng giao hàng hay không...', 'Who escalated it, whether delivery is affected, etc.')) + '"></textarea>', true) +
-      '<div class="full mes-modal-foot"><button type="button" class="mes-btn ghost" data-modal-cancel>↩ ' + esc(t('Hủy', 'Cancel')) + '</button><button type="button" class="mes-btn primary" data-modal-submit>🚨 ' + esc(t('Tạo downtime', 'Create downtime')) + '</button></div>' +
+    machine ? ((machine.machine_id || '') + ' · ' + (machine.machine_name || '')) : t('Khởi tạo downtime mới', 'Start a new downtime event'),
+    '<div class="mesx-form-grid">' +
+      (machine ? fieldDisplay(t('Work center', 'Work center'), machine.work_center_name || machine.work_center_id || '—') : editableField('mes-dt-machine', t('Máy', 'Machine'), '<select class="mesx-select" id="mes-dt-machine">' + renderSelectOptions(state.snapshot.machine_wall || [], 'machine_id', function(item){ return [item.machine_id, item.machine_name].filter(Boolean).join(' · '); }, '', t('Chọn máy', 'Select machine')) + '</select>')) +
+      editableField('mes-dt-category', t('Phân loại', 'Category'), '<select class="mesx-select" id="mes-dt-category"><option value="breakdown">Breakdown</option><option value="planned_pm">Planned PM</option><option value="setup">Setup / Changeover</option><option value="material_wait">Material wait</option><option value="quality_hold">Quality hold</option><option value="tool_change">Tool change</option><option value="utility">Utility / power</option><option value="other">Other</option></select>') +
+      editableField('mes-dt-severity', t('Mức độ', 'Severity'), '<select class="mesx-select" id="mes-dt-severity"><option value="minor">' + esc(t('Nhẹ', 'Minor')) + '</option><option value="major" selected>' + esc(t('Lớn', 'Major')) + '</option><option value="critical">' + esc(t('Nghiêm trọng', 'Critical')) + '</option></select>') +
+      editableField('mes-dt-start', t('Bắt đầu dừng', 'Downtime start'), '<input class="mesx-input" id="mes-dt-start" type="datetime-local" value="' + esc(nowInputValue()) + '">') +
+      editableField('mes-dt-wo', t('WO liên quan', 'Affected WO'), '<select class="mesx-select" id="mes-dt-wo">' + renderSelectOptions(woRows, 'wo_number', function(item){ return [item.wo_number, item.operation_desc, item.part_number].filter(Boolean).join(' · '); }, machine && machine.active_work_order ? machine.active_work_order.wo_number : '', t('Chọn WO bị ảnh hưởng', 'Select affected WO')) + '</select>') +
+      editableField('mes-dt-tool', t('Tool liên quan', 'Affected tool'), '<select class="mesx-select" id="mes-dt-tool">' + renderSelectOptions(toolRows, 'tool_id', function(item){ return [item.tool_id, item.tool_name].filter(Boolean).join(' · '); }, '', t('Không chọn tool', 'No tool selected')) + '</select>') +
+      editableField('mes-dt-reason', t('Lý do / triệu chứng', 'Reason / symptom'), '<textarea class="mesx-textarea" id="mes-dt-reason" placeholder="' + esc(t('Mô tả điều gì đang xảy ra trên máy...', 'Describe what is happening on the machine...')) + '"></textarea>', true) +
+      editableField('mes-dt-note', t('Ghi chú thêm', 'Additional note'), '<textarea class="mesx-textarea" id="mes-dt-note" placeholder="' + esc(t('Ai đã escalation, có ảnh hưởng giao hàng hay không...', 'Who escalated it, whether delivery is affected, etc.')) + '"></textarea>', true) +
+      '<div class="full mesx-modal-foot"><button type="button" class="mesx-btn ghost" data-modal-cancel>↩ ' + esc(t('Hủy', 'Cancel')) + '</button><button type="button" class="mesx-btn primary" data-modal-submit>🚨 ' + esc(t('Tạo downtime', 'Create downtime')) + '</button></div>' +
     '</div>',
     function(modal, submit){
       submit.disabled = true;
+      var selectedMachineId = machine ? (machine.machine_id || '') : ((modal.querySelector('#mes-dt-machine') || {}).value || '');
       api('mes_downtime_create', {
-        machine_id: machine.machine_id || '',
-        work_center_id: machine.work_center_id || '',
+        machine_id: selectedMachineId,
+        work_center_id: machine ? machine.work_center_id || '' : workCenterId || '',
         wo_number: (modal.querySelector('#mes-dt-wo') || {}).value || '',
         category: (modal.querySelector('#mes-dt-category') || {}).value || 'breakdown',
         severity: (modal.querySelector('#mes-dt-severity') || {}).value || 'major',
+        tool_id: (modal.querySelector('#mes-dt-tool') || {}).value || '',
         started_at: (modal.querySelector('#mes-dt-start') || {}).value || '',
         reason: (modal.querySelector('#mes-dt-reason') || {}).value || '',
         note: (modal.querySelector('#mes-dt-note') || {}).value || ''
@@ -476,14 +766,14 @@ function openResolveDowntimeModal(downtimeId){
   showModal(
     t('Khôi phục downtime', 'Resolve downtime'),
     (row.machine_id || '') + ' · ' + (row.wo_number || t('Không có WO', 'No WO')),
-    '<div class="mes-form-grid">' +
+    '<div class="mesx-form-grid">' +
       fieldDisplay(t('Lý do gốc', 'Root reason'), row.reason || '—') +
       fieldDisplay(t('Bắt đầu dừng', 'Downtime start'), fmtDateTime(row.started_at || '')) +
-      editableField('mes-dt-resume', t('Trạng thái WO sau khôi phục', 'WO status after recovery'), '<select class="mes-select" id="mes-dt-resume"><option value="setup">Setup</option><option value="running" selected>Running</option><option value="inspection">Inspection</option><option value="on_hold">On Hold</option></select>') +
-      editableField('mes-dt-code', t('Mã khôi phục', 'Resolution code'), '<select class="mes-select" id="mes-dt-code"><option value="resolved">' + esc(t('Đã khôi phục', 'Resolved')) + '</option><option value="temporary_fix">' + esc(t('Khắc phục tạm', 'Temporary fix')) + '</option><option value="awaiting_parts">' + esc(t('Chờ phụ tùng', 'Awaiting parts')) + '</option></select>') +
-      editableField('mes-dt-resolved-at', t('Thời điểm khôi phục', 'Resolved at'), '<input class="mes-input" id="mes-dt-resolved-at" type="datetime-local" value="' + esc(nowInputValue()) + '">') +
-      editableField('mes-dt-action', t('Hành động khắc phục', 'Corrective action'), '<textarea class="mes-textarea" id="mes-dt-action" placeholder="' + esc(t('Mô tả hành động khắc phục đã thực hiện...', 'Describe the corrective action applied...')) + '"></textarea>', true) +
-      '<div class="full mes-modal-foot"><button type="button" class="mes-btn ghost" data-modal-cancel>↩ ' + esc(t('Hủy', 'Cancel')) + '</button><button type="button" class="mes-btn primary" data-modal-submit>✅ ' + esc(t('Khôi phục và đóng downtime', 'Resolve and close downtime')) + '</button></div>' +
+      editableField('mes-dt-resume', t('Trạng thái WO sau khôi phục', 'WO status after recovery'), '<select class="mesx-select" id="mes-dt-resume"><option value="setup">Setup</option><option value="running" selected>Running</option><option value="inspection">Inspection</option><option value="on_hold">On Hold</option></select>') +
+      editableField('mes-dt-code', t('Mã khôi phục', 'Resolution code'), '<select class="mesx-select" id="mes-dt-code"><option value="resolved">' + esc(t('Đã khôi phục', 'Resolved')) + '</option><option value="temporary_fix">' + esc(t('Khắc phục tạm', 'Temporary fix')) + '</option><option value="awaiting_parts">' + esc(t('Chờ phụ tùng', 'Awaiting parts')) + '</option></select>') +
+      editableField('mes-dt-resolved-at', t('Thời điểm khôi phục', 'Resolved at'), '<input class="mesx-input" id="mes-dt-resolved-at" type="datetime-local" value="' + esc(nowInputValue()) + '">') +
+      editableField('mes-dt-action', t('Hành động khắc phục', 'Corrective action'), '<textarea class="mesx-textarea" id="mes-dt-action" placeholder="' + esc(t('Mô tả hành động khắc phục đã thực hiện...', 'Describe the corrective action applied...')) + '"></textarea>', true) +
+      '<div class="full mesx-modal-foot"><button type="button" class="mesx-btn ghost" data-modal-cancel>↩ ' + esc(t('Hủy', 'Cancel')) + '</button><button type="button" class="mesx-btn primary" data-modal-submit>✅ ' + esc(t('Khôi phục và đóng downtime', 'Resolve and close downtime')) + '</button></div>' +
     '</div>',
     function(modal, submit){
       submit.disabled = true;
@@ -509,32 +799,34 @@ function openResolveDowntimeModal(downtimeId){
 }
 
 function openMaintenanceModal(machineId){
-  var machine = machineById(machineId);
-  if(!machine){ toast(t('Không tìm thấy máy cần tạo bảo trì.', 'Could not find the machine for the maintenance request.'), 'error'); return; }
+  var machine = machineId ? machineById(machineId) : null;
+  var toolRows = machineId ? toolOptionsForMachine(machineId) : [];
   showModal(
     t('Tạo yêu cầu bảo trì', 'Create maintenance request'),
-    (machine.machine_id || '') + ' · ' + (machine.machine_name || ''),
-    '<div class="mes-form-grid">' +
-      fieldDisplay(t('Work center', 'Work center'), machine.work_center_name || machine.work_center_id || '—') +
-      fieldDisplay(t('PM kế tiếp', 'Next PM'), fmtDate(machine.next_pm_date || '')) +
-      editableField('mes-mnt-type', t('Loại bảo trì', 'Maintenance type'), '<select class="mes-select" id="mes-mnt-type"><option value="corrective">' + esc(t('Khắc phục', 'Corrective')) + '</option><option value="preventive">' + esc(t('Phòng ngừa', 'Preventive')) + '</option><option value="inspection">' + esc(t('Kiểm tra', 'Inspection')) + '</option></select>') +
-      editableField('mes-mnt-priority', t('Ưu tiên', 'Priority'), '<select class="mes-select" id="mes-mnt-priority"><option value="low">' + esc(t('Thấp', 'Low')) + '</option><option value="medium" selected>' + esc(t('Trung bình', 'Medium')) + '</option><option value="high">' + esc(t('Cao', 'High')) + '</option><option value="critical">' + esc(t('Khẩn cấp', 'Critical')) + '</option></select>') +
-      editableField('mes-mnt-title', t('Tiêu đề', 'Title'), '<input class="mes-input" id="mes-mnt-title" type="text" placeholder="' + esc(t('Ví dụ: Rò rỉ coolant trục chính', 'Example: Spindle coolant leak')) + '">', true) +
-      editableField('mes-mnt-desc', t('Mô tả công việc', 'Work description'), '<textarea class="mes-textarea" id="mes-mnt-desc" placeholder="' + esc(t('Mô tả rõ triệu chứng, rủi ro và yêu cầu xử lý...', 'Describe the symptom, risk, and requested action...')) + '"></textarea>', true) +
-      editableField('mes-mnt-wo', t('WO liên quan', 'Related WO'), '<input class="mes-input" id="mes-mnt-wo" type="text" value="' + esc((machine.active_work_order || {}).wo_number || '') + '" placeholder="' + esc(t('Nếu ảnh hưởng WO cụ thể', 'If this affects a specific WO')) + '">') +
-      editableField('mes-mnt-assigned', t('Phân công', 'Assigned to'), '<select class="mes-select" id="mes-mnt-assigned"><option value="">' + esc(t('Chưa phân công', 'Unassigned')) + '</option>' + operatorOptions() + '</select>') +
-      editableField('mes-mnt-due', t('Ngày cần xong', 'Due date'), '<input class="mes-input" id="mes-mnt-due" type="date" value="' + esc((machine.next_pm_date || '').slice(0, 10)) + '">') +
-      '<div class="full mes-modal-foot"><button type="button" class="mes-btn ghost" data-modal-cancel>↩ ' + esc(t('Hủy', 'Cancel')) + '</button><button type="button" class="mes-btn primary" data-modal-submit>🛠 ' + esc(t('Tạo request', 'Create request')) + '</button></div>' +
+    machine ? ((machine.machine_id || '') + ' · ' + (machine.machine_name || '')) : t('Khởi tạo maintenance mới', 'Start a new maintenance request'),
+    '<div class="mesx-form-grid">' +
+      (machine ? fieldDisplay(t('Work center', 'Work center'), machine.work_center_name || machine.work_center_id || '—') : editableField('mes-mnt-machine', t('Máy', 'Machine'), '<select class="mesx-select" id="mes-mnt-machine">' + renderSelectOptions(state.snapshot.machine_wall || [], 'machine_id', function(item){ return [item.machine_id, item.machine_name].filter(Boolean).join(' · '); }, '', t('Chọn máy', 'Select machine')) + '</select>')) +
+      editableField('mes-mnt-type', t('Loại bảo trì', 'Maintenance type'), '<select class="mesx-select" id="mes-mnt-type"><option value="corrective">' + esc(t('Khắc phục', 'Corrective')) + '</option><option value="preventive">' + esc(t('Phòng ngừa', 'Preventive')) + '</option><option value="inspection">' + esc(t('Kiểm tra', 'Inspection')) + '</option></select>') +
+      editableField('mes-mnt-priority', t('Ưu tiên', 'Priority'), '<select class="mesx-select" id="mes-mnt-priority"><option value="low">' + esc(t('Thấp', 'Low')) + '</option><option value="medium" selected>' + esc(t('Trung bình', 'Medium')) + '</option><option value="high">' + esc(t('Cao', 'High')) + '</option><option value="critical">' + esc(t('Khẩn cấp', 'Critical')) + '</option></select>') +
+      editableField('mes-mnt-title', t('Tiêu đề', 'Title'), '<input class="mesx-input" id="mes-mnt-title" type="text" placeholder="' + esc(t('Ví dụ: Rò rỉ coolant trục chính', 'Example: Spindle coolant leak')) + '">', true) +
+      editableField('mes-mnt-desc', t('Mô tả công việc', 'Work description'), '<textarea class="mesx-textarea" id="mes-mnt-desc" placeholder="' + esc(t('Mô tả rõ triệu chứng, rủi ro và yêu cầu xử lý...', 'Describe the symptom, risk, and requested action...')) + '"></textarea>', true) +
+      editableField('mes-mnt-wo', t('WO liên quan', 'Related WO'), '<select class="mesx-select" id="mes-mnt-wo">' + renderSelectOptions(machine ? workOrderOptions(machine.machine_id) : (state.snapshot.dispatch || []), 'wo_number', function(item){ return [item.wo_number, item.operation_desc, item.part_number].filter(Boolean).join(' · '); }, machine && machine.active_work_order ? machine.active_work_order.wo_number : '', t('Không gắn WO cụ thể', 'No specific WO')) + '</select>') +
+      editableField('mes-mnt-tool', t('Tool / đồ gá liên quan', 'Related tool / fixture'), '<select class="mesx-select" id="mes-mnt-tool">' + renderSelectOptions(toolRows, 'tool_id', function(item){ return [item.tool_id, item.tool_name].filter(Boolean).join(' · '); }, '', t('Không chọn tooling', 'No tooling selected')) + '</select>') +
+      editableField('mes-mnt-assigned', t('Phân công', 'Assigned to'), '<select class="mesx-select" id="mes-mnt-assigned">' + renderSelectOptions(operatorOptions(machine ? machine.work_center_id : ''), 'operator_id', function(item){ return [item.operator_id, item.operator_name].filter(Boolean).join(' · '); }, '', t('Chưa phân công', 'Unassigned')) + '</select>') +
+      editableField('mes-mnt-due', t('Ngày cần xong', 'Due date'), '<input class="mesx-input" id="mes-mnt-due" type="date" value="' + esc(machine && machine.next_pm_date ? String(machine.next_pm_date).slice(0, 10) : '') + '">') +
+      '<div class="full mesx-modal-foot"><button type="button" class="mesx-btn ghost" data-modal-cancel>↩ ' + esc(t('Hủy', 'Cancel')) + '</button><button type="button" class="mesx-btn primary" data-modal-submit>🛠 ' + esc(t('Tạo request', 'Create request')) + '</button></div>' +
     '</div>',
     function(modal, submit){
       submit.disabled = true;
+      var selectedMachineId = machine ? (machine.machine_id || '') : ((modal.querySelector('#mes-mnt-machine') || {}).value || '');
       api('mes_maintenance_create', {
-        machine_id: machine.machine_id || '',
+        machine_id: selectedMachineId,
         maintenance_type: (modal.querySelector('#mes-mnt-type') || {}).value || 'corrective',
         priority: (modal.querySelector('#mes-mnt-priority') || {}).value || 'medium',
         title: (modal.querySelector('#mes-mnt-title') || {}).value || '',
         description: (modal.querySelector('#mes-mnt-desc') || {}).value || '',
         wo_number: (modal.querySelector('#mes-mnt-wo') || {}).value || '',
+        tool_id: (modal.querySelector('#mes-mnt-tool') || {}).value || '',
         assigned_to: (modal.querySelector('#mes-mnt-assigned') || {}).value || '',
         due_date: (modal.querySelector('#mes-mnt-due') || {}).value || ''
       }, 'POST').then(function(resp){
@@ -558,14 +850,14 @@ function openMaintenanceStatusModal(requestId, suggestedStatus){
   showModal(
     t('Cập nhật trạng thái bảo trì', 'Update maintenance status'),
     (row.machine_id || '') + ' · ' + (row.title || ''),
-    '<div class="mes-form-grid">' +
+    '<div class="mesx-form-grid">' +
       fieldDisplay(t('Request ID', 'Request ID'), row.request_id || '—') +
       fieldDisplay(t('Loại bảo trì', 'Maintenance type'), row.maintenance_type || '—') +
-      editableField('mes-mu-status', t('Trạng thái mới', 'New status'), '<select class="mes-select" id="mes-mu-status"><option value="approved"' + (suggestedStatus === 'approved' ? ' selected' : '') + '>' + esc(t('Đã duyệt', 'Approved')) + '</option><option value="in_progress"' + (suggestedStatus === 'in_progress' ? ' selected' : '') + '>' + esc(t('Đang thực hiện', 'In progress')) + '</option><option value="completed"' + (suggestedStatus === 'completed' ? ' selected' : '') + '>' + esc(t('Hoàn tất', 'Completed')) + '</option><option value="cancelled"' + (suggestedStatus === 'cancelled' ? ' selected' : '') + '>' + esc(t('Đã hủy', 'Cancelled')) + '</option></select>') +
-      editableField('mes-mu-assigned', t('Phân công', 'Assigned to'), '<select class="mes-select" id="mes-mu-assigned"><option value="">' + esc(t('Giữ nguyên', 'Keep current')) + '</option>' + operatorOptions() + '</select>') +
-      editableField('mes-mu-next-pm', t('Ngày PM kế tiếp', 'Next PM date'), '<input class="mes-input" id="mes-mu-next-pm" type="date" value="">') +
-      editableField('mes-mu-note', t('Ghi chú kỹ thuật', 'Technical note'), '<textarea class="mes-textarea" id="mes-mu-note" placeholder="' + esc(t('Mô tả xử lý, linh kiện thay thế, rủi ro còn lại...', 'Describe the fix, replaced parts, and remaining risk...')) + '"></textarea>', true) +
-      '<div class="full mes-modal-foot"><button type="button" class="mes-btn ghost" data-modal-cancel>↩ ' + esc(t('Hủy', 'Cancel')) + '</button><button type="button" class="mes-btn primary" data-modal-submit>💾 ' + esc(t('Cập nhật trạng thái', 'Update status')) + '</button></div>' +
+      editableField('mes-mu-status', t('Trạng thái mới', 'New status'), '<select class="mesx-select" id="mes-mu-status"><option value="approved"' + (suggestedStatus === 'approved' ? ' selected' : '') + '>' + esc(t('Đã duyệt', 'Approved')) + '</option><option value="in_progress"' + (suggestedStatus === 'in_progress' ? ' selected' : '') + '>' + esc(t('Đang thực hiện', 'In progress')) + '</option><option value="completed"' + (suggestedStatus === 'completed' ? ' selected' : '') + '>' + esc(t('Hoàn tất', 'Completed')) + '</option><option value="cancelled"' + (suggestedStatus === 'cancelled' ? ' selected' : '') + '>' + esc(t('Đã hủy', 'Cancelled')) + '</option></select>') +
+      editableField('mes-mu-assigned', t('Phân công', 'Assigned to'), '<select class="mesx-select" id="mes-mu-assigned">' + renderSelectOptions(operatorOptions(row.work_center_id || ''), 'operator_id', function(item){ return [item.operator_id, item.operator_name].filter(Boolean).join(' · '); }, row.assigned_to || '', t('Giữ nguyên', 'Keep current')) + '</select>') +
+      editableField('mes-mu-next-pm', t('Ngày PM kế tiếp', 'Next PM date'), '<input class="mesx-input" id="mes-mu-next-pm" type="date" value="' + esc((row.next_pm_date || '').slice(0, 10)) + '">') +
+      editableField('mes-mu-note', t('Ghi chú kỹ thuật', 'Technical note'), '<textarea class="mesx-textarea" id="mes-mu-note" placeholder="' + esc(t('Mô tả xử lý, linh kiện thay thế, rủi ro còn lại...', 'Describe the fix, replaced parts, and remaining risk...')) + '"></textarea>', true) +
+      '<div class="full mesx-modal-foot"><button type="button" class="mesx-btn ghost" data-modal-cancel>↩ ' + esc(t('Hủy', 'Cancel')) + '</button><button type="button" class="mesx-btn primary" data-modal-submit>💾 ' + esc(t('Cập nhật trạng thái', 'Update status')) + '</button></div>' +
     '</div>',
     function(modal, submit){
       submit.disabled = true;
@@ -590,13 +882,71 @@ function openMaintenanceStatusModal(requestId, suggestedStatus){
   bindModalButtons();
 }
 
+function openToolingModal(machineId, toolRuntimeId){
+  var machine = machineById(machineId);
+  if(!machine){ toast(t('Không tìm thấy máy cần cập nhật tooling.', 'Could not find the machine for tooling update.'), 'error'); return; }
+  var existing = toolRuntimeId ? toolRuntimeById(toolRuntimeId) : null;
+  var toolRows = toolOptionsForMachine(machineId);
+  var woRows = workOrderOptions(machineId);
+  showModal(
+    existing ? t('Cập nhật runtime tooling', 'Update tooling runtime') : t('Nạp / cập nhật tooling', 'Load or update tooling'),
+    (machine.machine_id || '') + ' · ' + (machine.machine_name || ''),
+    '<div class="mesx-form-grid">' +
+      fieldDisplay(t('Work center', 'Work center'), machine.work_center_name || machine.work_center_id || '—') +
+      fieldDisplay(t('Tool runtime ID', 'Tool runtime ID'), existing ? (existing.tool_runtime_id || '—') : t('Sẽ tự cấp', 'Will be generated')) +
+      editableField('mes-tool-id', t('Tool / đồ gá', 'Tool / fixture'), '<select class="mesx-select" id="mes-tool-id">' + renderSelectOptions(toolRows, 'tool_id', function(item){ return [item.tool_id, item.tool_name, item.tool_type].filter(Boolean).join(' · '); }, existing ? (existing.tool_id || '') : '', t('Chọn tool', 'Select tool')) + '</select>') +
+      editableField('mes-tool-wo', t('WO đang dùng', 'Current WO'), '<select class="mesx-select" id="mes-tool-wo">' + renderSelectOptions(woRows, 'wo_number', function(item){ return [item.wo_number, item.operation_desc, item.part_number].filter(Boolean).join(' · '); }, existing ? (existing.wo_number || '') : (machine.active_work_order ? machine.active_work_order.wo_number : ''), t('Không gắn WO', 'No WO linked')) + '</select>') +
+      editableField('mes-tool-pocket', t('Pocket / station', 'Pocket / station'), '<input class="mesx-input" id="mes-tool-pocket" type="text" value="' + esc(existing ? (existing.pocket || '') : '') + '" placeholder="' + esc(t('Ví dụ: T12', 'Example: T12')) + '">') +
+      editableField('mes-tool-offset-no', t('Offset number', 'Offset number'), '<input class="mesx-input" id="mes-tool-offset-no" type="text" value="' + esc(existing ? (existing.offset_number || '') : '') + '" placeholder="' + esc(t('Ví dụ: H12 / D12', 'Example: H12 / D12')) + '">') +
+      editableField('mes-tool-status', t('Trạng thái tool', 'Tool status'), '<select class="mesx-select" id="mes-tool-status"><option value="loaded"' + ((existing ? existing.tool_status : 'loaded') === 'loaded' ? ' selected' : '') + '>Loaded</option><option value="standby"' + ((existing ? existing.tool_status : '') === 'standby' ? ' selected' : '') + '>Standby</option><option value="expired"' + ((existing ? existing.tool_status : '') === 'expired' ? ' selected' : '') + '>Expired</option><option value="broken"' + ((existing ? existing.tool_status : '') === 'broken' ? ' selected' : '') + '>Broken</option><option value="quarantine"' + ((existing ? existing.tool_status : '') === 'quarantine' ? ' selected' : '') + '>Quarantine</option></select>') +
+      editableField('mes-tool-offset-status', t('Trạng thái offset', 'Offset status'), '<select class="mesx-select" id="mes-tool-offset-status"><option value="verified"' + ((existing ? existing.offset_status : 'verified') === 'verified' ? ' selected' : '') + '>Verified</option><option value="adjusted"' + ((existing ? existing.offset_status : '') === 'adjusted' ? ' selected' : '') + '>Adjusted</option><option value="adjustment_required"' + ((existing ? existing.offset_status : '') === 'adjustment_required' ? ' selected' : '') + '>Adjustment required</option><option value="out_of_control"' + ((existing ? existing.offset_status : '') === 'out_of_control' ? ' selected' : '') + '>Out of control</option></select>') +
+      editableField('mes-tool-life-min', t('Life đã dùng (phút)', 'Life used (minutes)'), '<input class="mesx-input" id="mes-tool-life-min" type="number" min="0" value="' + esc(existing ? Number(existing.life_used_minutes || 0) : 0) + '">') +
+      editableField('mes-tool-life-parts', t('Life đã dùng (chi tiết)', 'Life used (parts)'), '<input class="mesx-input" id="mes-tool-life-parts" type="number" min="0" value="' + esc(existing ? Number(existing.life_used_parts || 0) : 0) + '">') +
+      editableField('mes-tool-offset-delta', t('Offset delta (mm)', 'Offset delta (mm)'), '<input class="mesx-input" id="mes-tool-offset-delta" type="number" step="0.001" value="' + esc(existing ? Number(existing.offset_delta_mm || 0) : 0) + '">') +
+      editableField('mes-tool-reset', t('Reset life', 'Reset life'), '<label class="mesx-link" style="display:flex;justify-content:flex-start;align-items:center;gap:8px;background:#f8fafc;border:1px solid #e2e8f0;cursor:pointer"><input id="mes-tool-reset" type="checkbox"> ' + esc(t('Đặt lại tool-life về 0 sau khi thay dao / setup lại.', 'Reset tool life to zero after replacing or reloading the tool.')) + '</label>', true) +
+      editableField('mes-tool-note', t('Ghi chú kỹ thuật', 'Technical note'), '<textarea class="mesx-textarea" id="mes-tool-note" placeholder="' + esc(t('Ví dụ: offset trôi 0.02mm, thay insert mới, probe lại...', 'Example: offset drift 0.02mm, insert replaced, re-probed...')) + '">' + esc(existing ? (existing.note || '') : '') + '</textarea>', true) +
+      '<div class="full mesx-modal-foot"><button type="button" class="mesx-btn ghost" data-modal-cancel>↩ ' + esc(t('Hủy', 'Cancel')) + '</button><button type="button" class="mesx-btn primary" data-modal-submit>🛠 ' + esc(existing ? t('Cập nhật tooling', 'Update tooling') : t('Nạp tooling', 'Load tooling')) + '</button></div>' +
+    '</div>',
+    function(modal, submit){
+      submit.disabled = true;
+      api('mes_tooling_upsert', {
+        tool_runtime_id: existing ? (existing.tool_runtime_id || '') : '',
+        machine_id: machine.machine_id || '',
+        work_center_id: machine.work_center_id || '',
+        tool_id: (modal.querySelector('#mes-tool-id') || {}).value || '',
+        wo_number: (modal.querySelector('#mes-tool-wo') || {}).value || '',
+        pocket: (modal.querySelector('#mes-tool-pocket') || {}).value || '',
+        offset_number: (modal.querySelector('#mes-tool-offset-no') || {}).value || '',
+        tool_status: (modal.querySelector('#mes-tool-status') || {}).value || 'loaded',
+        offset_status: (modal.querySelector('#mes-tool-offset-status') || {}).value || 'verified',
+        life_used_minutes: Number((modal.querySelector('#mes-tool-life-min') || {}).value || 0),
+        life_used_parts: Number((modal.querySelector('#mes-tool-life-parts') || {}).value || 0),
+        offset_delta_mm: Number((modal.querySelector('#mes-tool-offset-delta') || {}).value || 0),
+        reset_life: !!((modal.querySelector('#mes-tool-reset') || {}).checked),
+        note: (modal.querySelector('#mes-tool-note') || {}).value || '',
+        last_verified_at: new Date().toISOString()
+      }, 'POST').then(function(resp){
+        if(!resp || !resp.ok) throw new Error((resp && resp.error) || 'tooling_failed');
+        state.snapshot = resp.data || state.snapshot;
+        toast(t('Đã cập nhật runtime tooling.', 'Tooling runtime updated.'), 'success');
+        closeModal();
+        render();
+      }).catch(function(error){
+        toast(t('Không thể cập nhật tooling.', 'Could not update tooling.'), 'error');
+        if(window.console) console.error(error);
+      }).finally(function(){ submit.disabled = false; });
+    }
+  );
+  bindModalButtons();
+}
+
 function openExceptionDetail(type){
   if(!type) return;
   api('exception_detail', { type:type, page:1, per_page:25 }, 'GET').then(function(resp){
     var rows = resp && Array.isArray(resp.items) ? resp.items : [];
-    var meta = EXCEPTION_META[type] || { labelVi:type, labelEn:type, noteVi:'', noteEn:'' };
-    var body = rows.length ? '<table class="mes-detail-table"><thead><tr><th>' + esc(t('Mã', 'ID')) + '</th><th>' + esc(t('Ngày', 'Date')) + '</th><th>' + esc(t('Phụ trách', 'Responsible')) + '</th><th>' + esc(t('Chi tiết', 'Detail')) + '</th></tr></thead><tbody>' + rows.map(function(item){ return '<tr><td class="mes-code">' + esc(item.id || '') + '</td><td>' + esc(item.date || '—') + '</td><td>' + esc(item.responsible || '—') + '</td><td>' + esc(item.detail || '—') + '</td></tr>'; }).join('') + '</tbody></table>' : '<div class="mes-empty"><strong>' + esc(t('Không có bản ghi exception', 'No exception records')) + '</strong>' + esc(t('Snapshot hiện tại không ghi nhận mục chi tiết nào trong nhóm này.', 'The current snapshot has no detail rows in this exception group.')) + '</div>';
-    showModal(t(meta.labelVi, meta.labelEn), t(meta.noteVi, meta.noteEn), body + '<div class="mes-modal-foot"><button type="button" class="mes-btn ghost" data-modal-cancel>↩ ' + esc(t('Đóng', 'Close')) + '</button></div>');
+    var meta = EXCEPTION_META[type] || { vi:type, en:type, icon:'•' };
+    var body = rows.length ? '<table class="mesx-detail-table"><thead><tr><th>' + esc(t('Mã', 'ID')) + '</th><th>' + esc(t('Ngày', 'Date')) + '</th><th>' + esc(t('Phụ trách', 'Responsible')) + '</th><th>' + esc(t('Chi tiết', 'Detail')) + '</th></tr></thead><tbody>' + rows.map(function(item){ return '<tr><td class="mesx-code">' + esc(item.id || '') + '</td><td>' + esc(item.date || '—') + '</td><td>' + esc(item.responsible || '—') + '</td><td>' + esc(item.detail || '—') + '</td></tr>'; }).join('') + '</tbody></table>' : '<div class="mesx-empty"><strong>' + esc(t('Không có bản ghi exception', 'No exception records')) + '</strong>' + esc(t('Snapshot hiện tại không ghi nhận mục chi tiết nào trong nhóm này.', 'The current snapshot has no detail rows in this exception group.')) + '</div>';
+    showModal(t(meta.vi, meta.en), t('Hàng đợi chi tiết để trưởng ca / quản lý xử lý dứt điểm.', 'Detailed queue for supervisors and managers to close out.'), body + '<div class="mesx-modal-foot"><button type="button" class="mesx-btn ghost" data-modal-cancel>↩ ' + esc(t('Đóng', 'Close')) + '</button></div>');
     bindModalButtons();
   }).catch(function(error){
     toast(t('Không thể tải chi tiết exception.', 'Could not load the exception detail.'), 'error');
@@ -609,7 +959,9 @@ window._renderMesControlCenter = function(container){
   ensureStyles();
   loadData();
   if(state.refreshTimer) clearInterval(state.refreshTimer);
-  state.refreshTimer = setInterval(function(){ if(state.container && !state.modal) loadData(); }, 60000);
+  state.refreshTimer = setInterval(function(){
+    if(state.container && !state.modal) loadData();
+  }, 60000);
 };
 
 })();

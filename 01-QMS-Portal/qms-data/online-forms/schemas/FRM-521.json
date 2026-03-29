@@ -9,8 +9,8 @@
   "online": true,
   "decision_score": 74,
   "sop_ref": "SOP-503",
-  "description": "Lean online maintenance form for PM / corrective verification, machine condition capture, and governed machine assignment.",
-  "description_vi": "Biểu mẫu bảo trì online tinh gọn cho PM / corrective verification, ghi nhận tình trạng máy và gán máy đã được quản lý.",
+  "description": "Lean online maintenance form for PM and corrective verification, machine condition capture, and governed machine and tooling assignment.",
+  "description_vi": "Biểu mẫu bảo trì online tinh gọn cho PM và xác nhận khắc phục, ghi nhận tình trạng máy và gán máy cùng tooling đã được quản lý.",
   "roles_allowed": [
     "admin",
     "production_manager",
@@ -31,9 +31,9 @@
       "id": "asset",
       "title": "Asset Context",
       "title_vi": "Ngữ cảnh thiết bị",
-      "description": "Select the governed machine and work center, then declare the maintenance type and WO impact if any.",
-      "description_vi": "Chọn máy và work center đã quản lý, sau đó khai báo loại bảo trì và WO bị ảnh hưởng nếu có.",
-      "field_ids": ["pm_date", "maintenance_type", "work_center_id", "machine_id", "wo_number", "assigned_to"]
+      "description": "Select the governed machine, work center, maintenance type, and related work order if any.",
+      "description_vi": "Chọn máy, work center, loại bảo trì và work order liên quan nếu có.",
+      "field_ids": ["pm_date", "maintenance_type", "work_center_id", "machine_id", "wo_number", "related_tool_id", "assigned_to"]
     },
     {
       "id": "execution",
@@ -128,6 +128,20 @@
       },
       "placeholder": "Search affected WO",
       "placeholder_vi": "Tìm WO bị ảnh hưởng"
+    },
+    {
+      "id": "related_tool_id",
+      "type": "lookup",
+      "label": "Related Tool / Fixture",
+      "label_vi": "Tool / đồ gá liên quan",
+      "required": false,
+      "width": "third",
+      "lookup_source": "tooling_assets",
+      "strict_select": true,
+      "depends_on": ["machine_id", "work_center_id"],
+      "display_fields": ["tool_id", "tool_name", "tool_type"],
+      "placeholder": "Search related tooling",
+      "placeholder_vi": "Tìm tooling liên quan"
     },
     {
       "id": "assigned_to",

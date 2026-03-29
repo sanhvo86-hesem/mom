@@ -413,6 +413,8 @@ function buildLookupItems(field){
   var currentMachine = state.fieldValues.machine_id || '';
   var currentWorkCenter = state.fieldValues.work_center_id || '';
   var master = state.master || {};
+  var currentMachineRow = (master.machines || []).find(function(item){ return String(item.machine_id || '') === String(currentMachine); }) || null;
+  var currentMachineType = currentMachineRow ? String(currentMachineRow.machine_type || '') : '';
   if(source === 'customers') return (master.customers || []).map(function(item){ return { value:item.customer_id, label:item.customer_id, sub:item.customer_name || '', customer_id:item.customer_id, customer_name:item.customer_name || '' }; });
   if(source === 'suppliers') return (master.suppliers || []).map(function(item){ return { value:item.supplier_id, label:item.supplier_id, sub:item.supplier_name || '', supplier_id:item.supplier_id, supplier_name:item.supplier_name || '' }; });
   if(source === 'parts') return (master.parts || []).filter(function(item){ return !currentCustomer || String(item.customer_id || '') === String(currentCustomer); }).map(function(item){ return { value:item.part_number, label:item.part_number, sub:item.part_description || '', part_number:item.part_number, part_description:item.part_description || '', customer_id:item.customer_id || '' }; });
@@ -421,6 +423,22 @@ function buildLookupItems(field){
   if(source === 'work_centers') return (master.work_centers || []).map(function(item){ return { value:item.work_center_id, label:item.work_center_id, sub:[item.work_center_name || '', item.department || '', item.process_family || ''].filter(Boolean).join(' · '), work_center_id:item.work_center_id || '', work_center_name:item.work_center_name || '', department:item.department || '' }; });
   if(source === 'machines') return (master.machines || []).filter(function(item){ return !currentWorkCenter || String(item.work_center_id || '') === String(currentWorkCenter); }).map(function(item){ return { value:item.machine_id, label:item.machine_id, sub:[item.machine_name || '', item.work_center_id || '', item.machine_type || ''].filter(Boolean).join(' · '), machine_id:item.machine_id || '', machine_name:item.machine_name || '', work_center_id:item.work_center_id || '', machine_type:item.machine_type || '', location:item.location || '', preferred_operator_id:item.preferred_operator_id || '' }; });
   if(source === 'operators') return (master.operators || []).filter(function(item){ return !currentWorkCenter || String(item.work_center_id || '') === String(currentWorkCenter); }).map(function(item){ return { value:item.operator_id, label:item.operator_id, sub:[item.operator_name || '', item.role || '', item.work_center_id || ''].filter(Boolean).join(' · '), operator_id:item.operator_id || '', operator_name:item.operator_name || '', work_center_id:item.work_center_id || '', role:item.role || '' }; });
+  if(source === 'tooling_assets') return (master.tooling_assets || []).filter(function(item){
+    if(currentWorkCenter && String(item.preferred_work_center_id || '') !== '' && String(item.preferred_work_center_id || '') !== String(currentWorkCenter)) return false;
+    if(currentMachineType && String(item.machine_type || '') !== '' && !['multi', currentMachineType].includes(String(item.machine_type || ''))) return false;
+    return true;
+  }).map(function(item){
+    return {
+      value:item.tool_id,
+      label:item.tool_id,
+      sub:[item.tool_name || '', item.tool_type || '', item.machine_type || ''].filter(Boolean).join(' · '),
+      tool_id:item.tool_id || '',
+      tool_name:item.tool_name || '',
+      tool_type:item.tool_type || '',
+      machine_type:item.machine_type || '',
+      preferred_work_center_id:item.preferred_work_center_id || ''
+    };
+  });
   if(source === 'sales_orders') return (state.orders.sales_orders || []).filter(function(item){ return !currentCustomer || String(item.customer_id || '') === String(currentCustomer); });
   if(source === 'job_orders') return (state.orders.job_orders || []).filter(function(item){ return !currentSo || String(item.so_number || '') === String(currentSo); });
   if(source === 'work_orders') return (state.orders.work_orders || []).filter(function(item){ if(currentJo && String(item.jo_number || '') !== String(currentJo)) return false; if(currentMachine && String(item.machine_id || '') !== String(currentMachine)) return false; return true; });
