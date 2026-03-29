@@ -70,7 +70,7 @@ td,th{}
 <div class="form-sheet">
 <div class="iso-map"><div class="iso-title">Chuẩn mực áp dụng / nguyên tắc bắt buộc</div>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi khiếu nại, phản hồi tiêu cực, field thoát / bỏ qua, lỗi chứng từ/nhãn/giao thiếu, bảo hành vấn đề và RMA phải được log và có xác nhận / biên nhận trong vòng <b>24 giờ làm việc</b> hoặc nhanh hơn theo cam kết khách hàng. <span class="iso-clause">§8.7</span></div></div>
-<div class="req"><span class="req-tag shall">PHẢI</span><div>Ngăn chặn phải bao phủ <b>hàng đã giao</b>, <b>hàng tồn</b>, <b>WIP</b>, <b>hàng đang outsource</b> và <b>các lô cùng phả hệ truy xuất hoặc cùng điều kiện tạo lỗi</b> khi có nguy cơ lan rộng. Không được chỉ chặn phần hàng khách đã chỉ ra. <span class="iso-clause">§8.7</span></div></div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Ngăn chặn phải bao phủ <b>hàng đã giao</b>, <b>hàng tồn</b>, <b>WIP</b>, <b>hàng đang gia công ngoài</b> và <b>các lô cùng phả hệ truy xuất hoặc cùng điều kiện tạo lỗi</b> khi có nguy cơ lan rộng. Không được chỉ chặn phần hàng khách đã chỉ ra. <span class="iso-clause">§8.7</span></div></div>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi khiếu nại có bản chất chất lượng phải nối sang <a href="../06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> để mở NCR/CAPA nội bộ. SOP-202 sở hữu tình huống đối ngoại với khách hàng và điều phối toàn bộ dòng khiếu nại/RMA/thoát / bỏ qua. <span class="iso-clause">§8.7</span></div></div>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Không phát hành kết luận nguyên nhân gốc, concession, thay thế, tín dụng / ghi có hoặc Ngày giao lại khi chưa có bằng chứng và thẩm quyền đúng. Mọi phản hồi khách hàng phải có hồ sơ và nhịp độ / chu kỳ họp cập nhật rõ ràng. <span class="iso-clause">§8.7</span></div></div>
 <div class="req"><span class="req-tag shall">PHẢI</span><div>Khi khiếu nại hoặc thoát / bỏ qua chạm tới <b>sản phẩm an toàn</b>, <b>nghi ngờ hàng giả / hàng nhái</b>, <b>cấu hình / phiên bản không khớp</b>, <b>đặc biệt yêu cầu</b> hoặc <b>khách hàng hàng không vũ trụ/không gian/phòng thủ / bảo vệ</b>, tình huống PHẢI chuyển sang mức nghiêm trọng cao, ngăn chặn phải thực hiện trong Ngày và tuyến truyền đạt / giao tiếp phải do người chịu trách nhiệm được ủy quyền kiểm soát. <span class="iso-clause">§8.7</span></div></div></div>
@@ -102,7 +102,7 @@ td,th{}
 <ul class="tight">
 <li>Chặn lan rộng lỗi ra khách hàng hoặc tái phát trong cùng điều kiện sản xuất.</li>
 <li>Giữ một người chịu trách nhiệm đối ngoại duy nhất cho mỗi tình huống để tránh trả lời mâu thuẫn.</li>
-<li>Liên kết khiếu nại với phả hệ truy xuất, bộ hồ sơ phê duyệt giao hàng (gói phê duyệt giao hàng), chất lượng hồ sơ và hàng tồn kho/WIP/outsource trạng thái.</li>
+<li>Liên kết khiếu nại với phả hệ truy xuất, bộ hồ sơ phê duyệt giao hàng (gói phê duyệt giao hàng), chất lượng hồ sơ và hàng tồn kho/WIP/gia công ngoài trạng thái.</li>
 <li>Khóa chu trình bảo hành/RMA/tín dụng / ghi có/thay thế/làm lại để không thất thoát thông tin và chi phí.</li>
 </ul>
 <h2 class="h2" id="p2">2. Phạm vi</h2>
@@ -111,7 +111,7 @@ td,th{}
 <ul class="tight">
 <li>Khiếu nại chính thức, phản hồi tiêu cực, CAR/SCAR từ khách hàng, khiếu nại về chất lượng, nhiễm bẩn, label/doc lỗi, giao thiếu, sai phiên bản, trễ gây thiệt hại, hư hỏng, truy xuất nguồn gốc gap.</li>
 <li>Field thoát / bỏ qua, nghi ngờ thoát / bỏ qua, bảo hành khiếu nại / yêu cầu bồi thường, trả lại yêu cầu, RMA, thay thế, trả lại-to-tồn kho, trả lại-to-nhà cung cấp, field sort hoặc khách hàng ngăn chặn.</li>
-<li>Tình huống hàng đã giao, hàng đang đi đường, hàng tồn, WIP, hàng outsource và các lô liên quan theo phả hệ truy xuất hoặc điều kiện rủi ro tương tự.</li>
+<li>Tình huống hàng đã giao, hàng đang đi đường, hàng tồn, WIP, hàng gia công ngoài và các lô liên quan theo phả hệ truy xuất hoặc điều kiện rủi ro tương tự.</li>
 </ul>
 </div>
 <div class="callout-card"><h3>Không thay thế</h3>
