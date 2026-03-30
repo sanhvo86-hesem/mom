@@ -10,10 +10,10 @@
 
 | Ten | Hex | CSS Variable | Cong dung |
 |---|---|---|---|
-| Navy | `#0c2d48` | `--navy` | Tieu de (h1, h2), badge chinh, fh-company, card-title, vnum bg, table header text |
+| Navy | `#0c2d48` | `--navy` | Tieu de (h1, h2), title header, badge chinh, card-title, vnum bg, table header text |
 | Blue | `#1565c0` | `--blue` | Link, accent chinh, border-left note, chip text, gate-card border, org-card border-top |
 | Blue Light | `#e3f2fd` | `--blue-l` | Nen note, chip bg, iso-ref bg, badge-soft bg, kpi-pill bg, box.core bg |
-| Gold | `#f9a825` | `--gold` | Border vang form-header title, callout border, box.sup border, phase-card border |
+| Gold | `#f9a825` | `--gold` | Vien cam hang meta cua form-header, callout border, box.sup border, phase-card border |
 | Gold Light | `#fff8e1` | `--gold-l` | Nen callout, nen box.sup |
 
 ### 1.2 Mau bang

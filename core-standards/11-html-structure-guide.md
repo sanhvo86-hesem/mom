@@ -84,7 +84,7 @@
 | `03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/10-ANNEX-100-xxx/` | `../../../..` |
 | `10-Training-Academy/01-Competency/02-Levels/01-C01/` | `../../../..` |
 
-### 2.2 FORM HEADER — Logo + Title cùng hàng
+### 2.2 FORM HEADER — Logo trái, title + chú thích bên phải, meta hàng dưới
 
 ```html
 <div class="form-header">
@@ -92,13 +92,8 @@
     <a class="brand-logo" href="{{RELATIVE_PATH}}/01-QMS-Portal/portal.html">
       <img alt="HESEM Logo" src="{{RELATIVE_PATH}}/assets/hesem-logo.svg"/>
     </a>
-    <div class="fh-company">
-      <a href="{{RELATIVE_PATH}}/01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-      <span>{{DOC_TYPE_LABEL}}</span>
-    </div>
   </div>
   <div class="title">
-    <span class="doc-code">{{CODE}}</span>
     <strong class="doc-name">{{TITLE}}</strong>
     <span class="sub-vn">{{SUBTITLE}}</span>
   </div>
@@ -113,12 +108,12 @@
 ```
 
 **Lưu ý:**
-- `doc-code` và `doc-name` là 2 node tách riêng; không được render chung thành `CODE — TITLE` trong một text node.
-- Portal/catalog/runtime không được thay `doc-code` hoặc `doc-name` bằng filename slug; nếu metadata runtime không sạch thì phải đọc lại từ header published của HTML.
-- `{{DOC_TYPE_LABEL}}` theo loại: SOP → "Tài liệu kiểm soát", WI → "Tài liệu vận hành • Hướng dẫn công việc", ANNEX → "Tài liệu vận hành • Phụ lục", JD → "Tài liệu hệ thống"
+- Khối title trên header chỉ hiển thị `doc-name` và `sub-vn`; mã tài liệu hiển thị ở hàng meta.
+- Portal/catalog/runtime không được ghép mã và tên thành một text node. Nếu metadata runtime không sạch thì phải đọc lại `doc-name` từ header published và `doc-code` từ meta/header hook sạch.
+- `fh-company` là legacy node; template mới không render node này và CSS dùng chung phải ẩn hoàn toàn nếu file cũ còn giữ lại.
 - Meta labels hiển thị tiếng Việt: `Mã`, `Phiên bản`, `Ngày hiệu lực`, `Chủ sở hữu`, `Phê duyệt`
 - Với tài liệu chưa phát hành lần đầu, `Version` trong header luôn là `V0`
-- **Viền cam** header: mảnh 1px (border-bottom của .meta)
+- **Viền cam** header: mảnh 1px ở đầu hàng meta
 - **KHÔNG** thay đổi cấu trúc header — mọi file PHẢI giống nhau
 - `{{OWNER_ROLE_HTML}}` và `{{APPROVER_ROLE_HTML}}` phải là role chips link trực tiếp tới JD
 - Header không dùng text dài kiểu `QA Manager / Supply Chain Manager`; phải dùng role code gọn như `QA / SCM`

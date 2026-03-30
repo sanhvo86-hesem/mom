@@ -187,6 +187,100 @@ function renderAllocateError(){
 }
 
 /* ── Draft management ── */
+function normalizeOfflineTemplatePath(value){
+  try{
+    return String(value || '')
+      .trim()
+      .replace(/\\/g, '/')
+      .replace(/^\/+/, '')
+      .replace(/^\.\//, '');
+  }catch(_err){
+    return '';
+  }
+}
+
+function linkedOfflineTemplateDoc(form){
+  var docs = Array.isArray(window.DOCS) ? window.DOCS : [];
+  var code = String(form && form.form_code || '').trim().toUpperCase();
+  var path = normalizeOfflineTemplatePath(form && form.blank_path || '');
+  if(path){
+    var byPath = docs.find(function(doc){
+      return normalizeOfflineTemplatePath(doc && doc.path || '') === path;
+    }) || null;
+    if(byPath) return byPath;
+  }
+  if(!code) return null;
+  return docs.find(function(doc){
+    return String(doc && doc.code || '').trim().toUpperCase() === code;
+  }) || null;
+}
+
+function buildOfflineTemplateDownloadUrl(form){
+  var path = normalizeOfflineTemplatePath(form && form.blank_path || '');
+  var code = String(form && form.form_code || '').trim().toUpperCase();
+  var linkedDoc = linkedOfflineTemplateDoc(form);
+  if(typeof buildPathStreamUrl === 'function' && path){
+    return buildPathStreamUrl(path, true, code || String(linkedDoc && linkedDoc.code || '').trim().toUpperCase());
+  }
+  if(typeof buildDocStreamUrl === 'function'){
+    return buildDocStreamUrl(linkedDoc || { code: code, path: path }, true, path);
+  }
+  if(!path) return '';
+  var qs = new URLSearchParams();
+  qs.set('action', 'doc_stream');
+  qs.set('path', path);
+  if(code) qs.set('code', code);
+  qs.set('download', '1');
+  return 'api.php?' + qs.toString();
+}
+
+function openControlledDocument(code, preferredFilter){
+  var normalized = String(code || '').trim().toUpperCase();
+  if(!normalized) return false;
+  if(typeof openDoc === 'function'){
+    try{
+      openDoc(normalized);
+      return true;
+    }catch(_err){}
+  }
+  if(typeof navigateTo === 'function'){
+    try{
+      currentFolderPath = [];
+      if(typeof searchQuery !== 'undefined') searchQuery = normalized;
+      navigateTo('documents', preferredFilter || 'ALL');
+      if(typeof renderDocuments === 'function') renderDocuments();
+      if(typeof renderSidebar === 'function') renderSidebar();
+      return true;
+    }catch(_err){}
+  }
+  return false;
+}
+
+function renderOfflineTemplateReference(form, options){
+  options = options || {};
+  var blankFile = form.blank_filename || normalizeOfflineTemplatePath(form.blank_path || '');
+  var downloadUrl = buildOfflineTemplateDownloadUrl(form);
+  var checksum = String(options.checksum || form.template_checksum || '').trim();
+  var sopRef = String(options.sopRef || '').trim();
+  var version = String(options.version || form.version || 'V0').trim() || 'V0';
+  var note = String(options.note || '').trim();
+  if(!blankFile && !downloadUrl && !sopRef && !version && !checksum) return '';
+  return '<div class="ec-doc-ref">' +
+    '<div class="ec-doc-ref-title">' + esc(t('Biểu mẫu Excel liên kết', 'Linked Excel template')) + '</div>' +
+    '<div class="ec-doc-ref-grid">' +
+      (sopRef ? '<div class="ec-doc-ref-item"><small>' + esc(t('Quy trình SOP', 'SOP reference')) + '</small><a href="#" data-navigate-doc="' + esc(sopRef) + '">' + esc(sopRef) + '</a></div>' : '') +
+      (blankFile ? '<div class="ec-doc-ref-item"><small>' + esc(t('Biểu mẫu Excel gốc', 'Original Excel template')) + '</small>' + (downloadUrl ? '<a href="' + esc(downloadUrl) + '" download>' + esc(blankFile) + '</a>' : '<span>' + esc(blankFile) + '</span>') + '</div>' : '') +
+      '<div class="ec-doc-ref-item"><small>' + esc(t('Phiên bản kiểm soát', 'Controlled revision')) + '</small><span>' + esc(version) + '</span></div>' +
+      (checksum ? '<div class="ec-doc-ref-item"><small>SHA-256</small><span class="ec-mono-sm">' + esc(checksum.substring(0, 16) + '...') + '</span></div>' : '') +
+    '</div>' +
+    (note ? '<div class="ec-doc-ref-note">' + esc(note) + '</div>' : '') +
+    '<div class="ec-doc-ref-actions">' +
+      (downloadUrl ? '<a class="ec-btn secondary" href="' + esc(downloadUrl) + '" download>' + esc(t('Tải Excel gốc', 'Download original Excel')) + '</a>' : '') +
+      '<button type="button" class="ec-btn ghost" data-open-template-doc="1">' + esc(t('Mở trong Biểu mẫu (Forms)', 'Open in Forms library')) + '</button>' +
+    '</div>' +
+  '</div>';
+}
+
 function resetWorkspaceForForm(form){
   var code = form && form.form_code ? form.form_code : '';
   if(!code || ws.lastFormCode === code) return;
@@ -974,6 +1068,11 @@ function renderAllocateStep(form){
   var isOffline = form.online === false;
   var busy = ws.allocBusy;
   var trace = traceSummary(activeTraceContext(null));
+  var offlineTemplateHtml = isOffline
+    ? renderOfflineTemplateReference(form, {
+        note: t('Đây là workbook baseline trong thư viện Biểu mẫu. Sau khi cấp mã, hệ thống sẽ phát hành một gói Excel governed riêng với tên tệp chuẩn và metadata truy xuất ẩn.', 'This is the baseline workbook from the Forms library. After allocation, the system issues a separate governed Excel package with the controlled filename and hidden traceability metadata.')
+      })
+    : '';
 
   return '<div class="ec-allocate-intro">' +
     '<strong>' + esc(t('Cấp mã ngay trong workspace này', 'Issue the record ID directly in this workspace')) + '</strong>' +
@@ -1007,6 +1106,49 @@ function fieldById(schema, fieldId){
   return (schema && Array.isArray(schema.fields) ? schema.fields : []).find(function(field){
     return field && field.id === fieldId;
   }) || null;
+}
+
+function renderAllocateStep(form){
+  var rt = detectRecordType(form);
+  var st = window._ecState || {};
+  var rtCfg = rt ? (st.recordTypes[rt] || {}) : {};
+  var defaultDept = ws.allocDept || detectDepartment(form) || 'QA';
+  var isOffline = form.online === false;
+  var busy = ws.allocBusy;
+  var trace = traceSummary(activeTraceContext(null));
+  var offlineTemplateHtml = isOffline
+    ? renderOfflineTemplateReference(form, {
+        note: t('Đây là workbook baseline trong thư viện Biểu mẫu. Sau khi cấp mã, hệ thống sẽ phát hành một gói Excel governed riêng với tên tệp chuẩn và metadata truy xuất ẩn.', 'This is the baseline workbook from the Forms library. After allocation, the system issues a separate governed Excel package with the controlled filename and hidden traceability metadata.')
+      })
+    : '';
+
+  return '<div class="ec-allocate-intro">' +
+    '<strong>' + esc(t('Cấp mã ngay trong workspace này', 'Issue the record ID directly in this workspace')) + '</strong>' +
+    '<span>' + esc(isOffline ? t('Hệ thống sẽ cấp mã, tạo tên tệp chuẩn, rồi tải ngay gói biểu mẫu ngoại tuyến có kiểm soát.', 'The system will issue the ID, generate the governed filename, and immediately download the controlled offline package.') : t('Hệ thống sẽ cấp mã, khóa ngữ cảnh truy xuất, rồi mở luôn phần điền và ký mà không cần đổi tab.', 'The system will issue the ID, lock the traceability context, and continue directly into fill and sign without tab switching.')) + '</span>' +
+  '</div>' +
+  offlineTemplateHtml +
+  (trace ? '<div class="ec-trace-card"><small>' + esc(t('Ngữ cảnh truy xuất dự kiến', 'Projected traceability context')) + '</small><strong>' + esc(trace) + '</strong></div>' : '') +
+  renderAllocateError() +
+  '<div class="ec-allocate-grid">' +
+    '<div><label class="ec-label">' + esc(t('Loại hồ sơ', 'Record type')) + '</label>' +
+      '<input class="ec-input" value="' + esc(rt ? (rt + ' · ' + (rtCfg.label || rt)) : t('Không xác định', 'Unknown')) + '" readonly style="background:var(--ec-bg);cursor:default">' +
+    '</div>' +
+    '<div><label class="ec-label">' + esc(t('Phòng ban', 'Department')) + '</label>' +
+      '<select class="ec-select" id="ec-alloc-dept">' + DEPARTMENTS.map(function(d){
+        return '<option value="'+d.v+'"'+(d.v===defaultDept?' selected':'')+'>'+esc(t(d.l,d.e))+'</option>';
+      }).join('') + '</select>' +
+    '</div>' +
+    '<div><label class="ec-label">' + esc(t('Ghi chú', 'Note')) + '</label>' +
+      '<input class="ec-input" id="ec-alloc-notes" type="text" value="'+esc(ws.allocNotes||'')+'" placeholder="'+esc(t('Tùy chọn','Optional'))+'">' +
+    '</div>' +
+  '</div>' +
+  '<div style="display:flex;justify-content:flex-end;gap:8px">' +
+    (!rt ? '<span style="font-size:11px;color:var(--ec-danger);margin-right:auto">'+esc(t('Không tìm thấy loại hồ sơ liên kết','No linked record type found'))+'</span>' : '') +
+    '<span class="ec-step-help">' + esc(t('Nếu máy chủ vừa đổi phiên hoặc CSRF, hệ thống sẽ tự thử đồng bộ lại trước khi báo lỗi.', 'If the server rotated the session or CSRF token, the client will attempt a recovery before showing an error.')) + '</span>' +
+    '<button class="ec-btn primary lg" id="ec-alloc-btn"'+(busy||!rt?' disabled':'')+' style="min-width:200px">' +
+      (busy ? esc(t('Đang xử lý...','Processing...')) : esc(isOffline ? t('Cấp mã & tải form','Allocate & download') : t('Cấp mã & tiếp tục','Allocate & continue'))) +
+    '</button>' +
+  '</div>';
 }
 
 function primeFieldDefaults(schema, allocation){
@@ -1166,13 +1308,9 @@ function renderDocumentHeader(form, allocation, schema){
   return '<div class="form-header ec-doc-header">' +
     '<div class="fh-left">' +
       '<a class="brand-logo" href="./portal.html"><img alt="HESEM Logo" src="./assets/hesem-logo.svg"></a>' +
-      '<div class="fh-company">' +
-        '<a href="./portal.html">HESEM kỹ thuật</a>' +
-        '<span>Tài liệu kiểm soát</span>' +
-      '</div>' +
     '</div>' +
     '<div class="title">' +
-      '<strong>' + esc(form.form_code + ' · ' + title) + '</strong>' +
+      '<strong class="doc-name">' + esc(title) + '</strong>' +
       (description ? '<span class="sub-vn">' + esc(description) + '</span>' : '') +
       (extra ? '<span class="muted">' + esc(extra) + '</span>' : '') +
     '</div>' +
@@ -1386,13 +1524,8 @@ function renderDocumentHeader(form, allocation, schema){
   return '<div class="form-header ec-doc-header">' +
     '<div class="fh-left">' +
       '<a class="brand-logo" href="./portal.html"><img alt="HESEM Logo" src="./assets/hesem-logo.svg"></a>' +
-      '<div class="fh-company">' +
-        '<a href="./portal.html">HESEM ENGINEERING</a>' +
-        '<span>' + esc(t('\u0054\u00e0\u0069\u0020\u006c\u0069\u1ec7\u0075\u0020\u006b\u0069\u1ec3\u006d\u0020\u0073\u006f\u00e1\u0074', 'Controlled document')) + '</span>' +
-      '</div>' +
     '</div>' +
     '<div class="title">' +
-      '<span class="doc-code">' + esc(form.form_code || '\u2014') + '</span>' +
       '<strong class="doc-name">' + esc(title) + '</strong>' +
       (description ? '<span class="sub-vn">' + esc(description) + '</span>' : '') +
       (extra ? '<span class="muted">' + esc(extra) + '</span>' : '') +
@@ -2592,6 +2725,7 @@ function bindWorkspace(form, allocation, container){
   if(printBtn) printBtn.onclick=function(){ window.print(); };
   var reloadBtn=document.getElementById('ec-reload-record');
   if(reloadBtn) reloadBtn.onclick=function(){ reloadCurrentFormWorkspace(form.form_code || '', allocation && allocation.allocation_id || ''); };
+  bindOfflineTemplateLinks(form, container);
 
   /* online form */
   if(allocation && form.online !== false){
@@ -3065,6 +3199,24 @@ function bindApprovalDialogs(form, allocation){
   void allocation;
 }
 
+function bindOfflineTemplateLinks(form, container){
+  Array.prototype.forEach.call(container.querySelectorAll('[data-open-template-doc]'), function(btn){
+    btn.onclick = function(){
+      if(openControlledDocument(form.form_code || '', 'FRM')) return;
+      toast(t('Không thể mở thư viện Biểu mẫu cho biểu mẫu này.', 'Could not open the Forms library for this template.'), 'warn');
+    };
+  });
+
+  Array.prototype.forEach.call(container.querySelectorAll('[data-navigate-doc]'), function(link){
+    link.onclick = function(e){
+      e.preventDefault();
+      var docCode = link.getAttribute('data-navigate-doc') || '';
+      if(openControlledDocument(docCode, 'ALL')) return;
+      if(docCode) toast(t('Mở tài liệu: ', 'Open document: ') + docCode, 'info');
+    };
+  });
+}
+
 function bindOffline(form,allocation,container){
   var dlBtn=document.getElementById('ec-download-offline');
   if(dlBtn&&window.AllocationTracker) dlBtn.onclick=function(){
@@ -3108,6 +3260,64 @@ function bindOffline(form,allocation,container){
   });
 
   /* dropzone */
+  var dropzone=document.getElementById('ec-dropzone');
+  var fileInput=document.getElementById('ec-file-input');
+  if(dropzone&&fileInput){
+    dropzone.onclick=function(e){if(e.target!==fileInput) fileInput.click();};
+    fileInput.onchange=function(){if(fileInput.files&&fileInput.files.length) inspectFiles(fileInput.files,allocation,container,form);fileInput.value='';};
+    dropzone.ondragover=function(e){e.preventDefault();dropzone.classList.add('drag');};
+    dropzone.ondragleave=function(){dropzone.classList.remove('drag');};
+    dropzone.ondrop=function(e){e.preventDefault();dropzone.classList.remove('drag');if(e.dataTransfer&&e.dataTransfer.files) inspectFiles(e.dataTransfer.files,allocation,container,form);};
+  }
+
+  var clearBtn=document.getElementById('ec-clear-queue');
+  if(clearBtn) clearBtn.onclick=function(){ws.uploadFiles=[];renderWorkspace(form,allocation,container);bindWorkspace(form,allocation,container);};
+
+  var receiveAll=document.getElementById('ec-receive-all');
+  if(receiveAll) receiveAll.onclick=function(){
+    var valid=ws.uploadFiles.filter(function(i){return i.inspect&&i.inspect.ok&&i.inspect.verification&&i.inspect.verification.status!=='rejected';});
+    if(!valid.length){toast(t('Không có tệp hợp lệ.','No valid files.'),'warn');return;}
+    receiveAll.disabled=true;
+    Promise.all(valid.map(function(item){
+      var aid=(item.inspect&&item.inspect.allocation&&item.inspect.allocation.allocation_id)||allocation.allocation_id||'';
+      return window.AllocationTracker.receiveUpload(aid,item.file).then(function(r){item.receive=r;return r;});
+    })).then(function(){
+      toast(t('Đã tiếp nhận.','Files received.'),'success');
+      ws.uploadFiles=[];
+      if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);
+    }).finally(function(){receiveAll.disabled=false;});
+  };
+}
+
+function bindOffline(form,allocation,container){
+  var dlBtn=document.getElementById('ec-download-offline');
+  if(dlBtn&&window.AllocationTracker) dlBtn.onclick=function(){
+    dlBtn.disabled=true;
+    window.AllocationTracker.downloadForm(allocation.allocation_id,form.form_code,{master_context:allocation.master_context||{}}).then(function(r){
+      if(r&&r.ok) toast(t('Đã tải gói Excel.','Excel package downloaded.'),'success');
+      else toast(t('Không thể tải.','Could not download.'),'error');
+    }).finally(function(){dlBtn.disabled=false;});
+  };
+
+  var receivedBtn=document.getElementById('ec-download-received');
+  if(receivedBtn) receivedBtn.onclick=function(){
+    var url='api.php?action=form_fill_download_received&allocation_id='+encodeURIComponent(allocation.allocation_id||'');
+    var link=document.createElement('a');
+    link.href=url;
+    link.target='_blank';
+    link.rel='noopener';
+    document.body.appendChild(link);
+    link.click();
+    if(link.parentNode) link.parentNode.removeChild(link);
+  };
+
+  var copyBtn=document.getElementById('ec-copy-filename');
+  if(copyBtn) copyBtn.onclick=function(){
+    var fname=(allocation.offline_package&&allocation.offline_package.filename)||allocation.suggested_filename||'';
+    if(window.AllocationTracker) window.AllocationTracker.copyToClipboard(fname);
+    toast(t('Đã sao chép.','Copied.'),'success');
+  };
+
   var dropzone=document.getElementById('ec-dropzone');
   var fileInput=document.getElementById('ec-file-input');
   if(dropzone&&fileInput){

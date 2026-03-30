@@ -28,7 +28,7 @@ Muc tieu:
    - subtitle bat buoc: `Tài liệu vận hành • Annex`;
    - meta labels bat buoc: `Mã`, `Phiên bản`, `Ngày hiệu lực`, `Chủ sở hữu`, `Phê duyệt`;
    - archetype nhu `Method`, `Rule-Pack`, `Dictionary`, `Specification` chi o core standard, decision log va working notes.
-7. Header ANNEX phai tach rieng hai node: `<span class="doc-code">ANNEX-xxx</span>` va `<strong class="doc-name">Ten tai lieu</strong>`; portal runtime khong duoc ghep lai thanh mot chuoi plain text.
+7. Header ANNEX phai giu ma tai lieu va ten tai lieu thanh hai truong rieng trong runtime; title block chi hien `doc-name` va `sub-vn`, con ma tai lieu hien o hang meta. Portal runtime khong duoc ghep `ANNEX-xxx` voi ten tai lieu thanh mot chuoi plain text.
 
 ---
 

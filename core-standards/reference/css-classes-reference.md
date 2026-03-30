@@ -61,17 +61,15 @@
 | Class | Chuc nang | Vi du HTML |
 |---|---|---|
 | `.form-header` | Wrapper header tai lieu, border, radius 12px | `<div class="form-header">...</div>` |
-| `.fh-left` | Hang tren: logo + ten cong ty, flex, gap 16px | `<div class="fh-left">...</div>` |
+| `.fh-left` | O header ben trai, chua logo tai lieu | `<div class="fh-left">...</div>` |
 | `.brand-logo` | Link logo, chua img | `<a class="brand-logo" href="..."><img .../></a>` |
 | `.brand-logo img` | Logo, width 140px, object-fit contain | (tu dong) |
-| `.fh-company` | Ten cong ty + phu de, flex column | `<div class="fh-company"><a>HESEM</a><span>Tai lieu</span></div>` |
-| `.fh-company a` | Ten cong ty, 16px bold navy uppercase | (tu dong) |
-| `.fh-company span` | Phu de, 10.5px ink3 uppercase | (tu dong) |
-| `.form-header .title` | Khoi tieu de, padding, border-bottom gold 2px | `<div class="title"><strong>...</strong></div>` |
-| `.form-header .title strong` | Tieu de chinh, 15px bold navy | (tu dong) |
+| `.fh-company` | Legacy node; neu file cu con ton tai thi phai bi CSS an hoan toan | `<div class="fh-company">...</div>` |
+| `.form-header .title` | Khoi tieu de ben phai logo, chua title + chu thich | `<div class="title"><strong>...</strong></div>` |
+| `.form-header .title strong` | Tieu de chinh, 17px bold navy | (tu dong) |
 | `.form-header .title .sub-vn` | Phu de tieng Viet, 12.5px ink2 | `<span class="sub-vn">...</span>` |
 | `.form-header .title .muted` | Ghi chu mo, 11px ink3 | `<span class="muted">...</span>` |
-| `.form-header .meta` | Hang meta (Code, Version...), flex wrap, bg bg2 | `<div class="meta">...</div>` |
+| `.form-header .meta` | Hang meta (Code, Version...), nam duoi title va co vien cam 1px phia tren | `<div class="meta">...</div>` |
 | `.form-header .meta .row` | O meta, flex, padding 6px 16px, border-right | `<div class="row"><span><b>Code:</b></span><span>SOP-101</span></div>` |
 
 ---
