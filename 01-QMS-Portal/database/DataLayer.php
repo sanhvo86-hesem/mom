@@ -39,6 +39,13 @@ class DataLayer
     private array $config;
     private string $mode;
     private ?RuntimeShadowSync $runtimeShadow = null;
+    private array $lastReadMeta = [
+        'source' => 'json',
+        'fallback' => false,
+        'error' => '',
+        'mode' => 'JSON_ONLY',
+        'timestamp' => '',
+    ];
 
     /** Base path for QMS data files (e.g. .../01-QMS-Portal/qms-data). */
     private string $dataDir;
@@ -74,6 +81,8 @@ class DataLayer
         if ($this->mode !== self::MODE_JSON_ONLY) {
             $this->db = Connection::getInstance($this->config);
         }
+
+        $this->setReadMeta('json');
     }
 
     /**
@@ -116,6 +125,14 @@ class DataLayer
             'postgres_reachable' => $reachable,
             'postgres_error' => $error,
         ];
+    }
+
+    /**
+     * Return metadata about the most recent read path decision.
+     */
+    public function getLastReadMeta(): array
+    {
+        return $this->lastReadMeta;
     }
 
     /**
@@ -180,6 +197,39 @@ class DataLayer
             }
             throw $e;
         }
+    }
+
+    /**
+     * Read the governed runtime master-data store using the active migration mode.
+     */
+    public function getRuntimeMasterDataStore(): array
+    {
+        return $this->read(
+            jsonReader: fn(): array => $this->readJson($this->dataDir . '/master-data/master-data.json'),
+            pgReader: fn(): array => $this->loadRuntimeMasterDataFromPg(),
+        );
+    }
+
+    /**
+     * Read the governed runtime orders store using the active migration mode.
+     */
+    public function getRuntimeOrdersStore(): array
+    {
+        return $this->read(
+            jsonReader: fn(): array => $this->readJson($this->dataDir . '/orders/orders.json'),
+            pgReader: fn(): array => $this->loadRuntimeOrdersFromPg(),
+        );
+    }
+
+    /**
+     * Read the governed MES runtime overlay using the active migration mode.
+     */
+    public function getRuntimeMesRuntimeStore(): array
+    {
+        return $this->read(
+            jsonReader: fn(): array => $this->readJson($this->dataDir . '/mes/mes-runtime.json'),
+            pgReader: fn(): array => $this->loadRuntimeMesRuntimeFromPg(),
+        );
     }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -1631,11 +1681,11 @@ class DataLayer
     {
         return match ($this->mode) {
             self::MODE_JSON_ONLY,
-            self::MODE_SHADOW_WRITE => $jsonReader(),
+            self::MODE_SHADOW_WRITE => $this->jsonRead($jsonReader),
 
             self::MODE_POSTGRES_PRIMARY => $this->pgWithFallback($pgReader, $jsonReader),
 
-            self::MODE_POSTGRES_ONLY => $pgReader(),
+            self::MODE_POSTGRES_ONLY => $this->pgRead($pgReader),
         };
     }
 
@@ -1689,11 +1739,49 @@ class DataLayer
     private function pgWithFallback(callable $pgReader, callable $jsonReader): mixed
     {
         try {
-            return $pgReader();
+            $result = $pgReader();
+            $this->setReadMeta('postgres');
+            return $result;
         } catch (\Throwable $e) {
             @error_log('[DataLayer] PG read failed, falling back to JSON: ' . $e->getMessage());
-            return $jsonReader();
+            $result = $jsonReader();
+            $this->setReadMeta('json_fallback', true, $e->getMessage());
+            return $result;
         }
+    }
+
+    /**
+     * Execute a read against the JSON store and capture source metadata.
+     */
+    private function jsonRead(callable $jsonReader): mixed
+    {
+        $result = $jsonReader();
+        $this->setReadMeta('json');
+        return $result;
+    }
+
+    /**
+     * Execute a read against PostgreSQL and capture source metadata.
+     */
+    private function pgRead(callable $pgReader): mixed
+    {
+        $result = $pgReader();
+        $this->setReadMeta('postgres');
+        return $result;
+    }
+
+    /**
+     * Persist the metadata for the most recent read decision.
+     */
+    private function setReadMeta(string $source, bool $fallback = false, string $error = ''): void
+    {
+        $this->lastReadMeta = [
+            'source' => $source,
+            'fallback' => $fallback,
+            'error' => $error,
+            'mode' => $this->mode,
+            'timestamp' => date(DATE_ATOM),
+        ];
     }
 
     /**
@@ -1716,6 +1804,366 @@ class DataLayer
             $this->runtimeShadow = new RuntimeShadowSync($this->db);
         }
         return $this->runtimeShadow;
+    }
+
+    /**
+     * Rebuild the governed runtime master-data JSON shape from PostgreSQL mirrors.
+     */
+    private function loadRuntimeMasterDataFromPg(): array
+    {
+        $customerRows = $this->db->query('SELECT metadata, updated_at FROM customers ORDER BY customer_id');
+        $supplierRows = $this->db->query('SELECT metadata, updated_at FROM vendors ORDER BY vendor_id');
+        $partRows = $this->db->query('SELECT metadata, updated_at FROM items ORDER BY item_id');
+        $revisionRows = $this->db->query('SELECT metadata, valid_from FROM item_revisions ORDER BY item_id, rev');
+        $workCenterRows = $this->db->query('SELECT metadata, updated_at FROM work_centers ORDER BY work_center_id');
+        $machineRows = $this->db->query('SELECT metadata, updated_at FROM equipment ORDER BY equipment_id');
+        $toolingRows = $this->db->query("SELECT metadata, updated_at FROM tools WHERE COALESCE(metadata->>'shadow_source', '') <> 'mes_runtime' ORDER BY tool_id");
+        $capaRows = $this->db->query("SELECT data, updated_at FROM records WHERE record_type = 'CAPA' ORDER BY record_id");
+        $employeeRows = $this->db->query('SELECT metadata, updated_at FROM employees ORDER BY employee_id');
+        $programRows = $this->db->query('SELECT metadata, updated_at FROM mes_nc_release_packages ORDER BY package_id');
+        $adapterRows = $this->db->query('SELECT metadata, updated_at FROM mes_connectivity_adapters ORDER BY adapter_id');
+        $alarmCatalogRows = $this->db->query('SELECT metadata, updated_at FROM mes_alarm_catalog ORDER BY alarm_code');
+        $alarmPlaybookRows = $this->db->query('SELECT metadata, updated_at FROM mes_alarm_playbooks ORDER BY playbook_id');
+        $toolAssemblyRows = $this->db->query('SELECT metadata, updated_at FROM mes_tool_assemblies ORDER BY assembly_id');
+        $reasonRows = $this->db->query("SELECT key, label, label_vi, example FROM variable_registry WHERE category = 'runtime_downtime_reason' ORDER BY key");
+        $resolutionRows = $this->db->query("SELECT key, label, label_vi, example FROM variable_registry WHERE category = 'runtime_downtime_resolution' ORDER BY key");
+
+        $store = [
+            '_meta' => $this->buildRuntimeStoreMeta('master_data', [
+                $customerRows,
+                $supplierRows,
+                $partRows,
+                $revisionRows,
+                $workCenterRows,
+                $machineRows,
+                $toolingRows,
+                $capaRows,
+                $employeeRows,
+                $programRows,
+                $adapterRows,
+                $alarmCatalogRows,
+                $alarmPlaybookRows,
+                $toolAssemblyRows,
+            ]),
+            'customers' => $this->extractMetadataRows($customerRows),
+            'suppliers' => $this->extractMetadataRows($supplierRows),
+            'parts' => $this->extractMetadataRows($partRows),
+            'revisions' => $this->extractMetadataRows($revisionRows),
+            'work_centers' => $this->extractMetadataRows($workCenterRows),
+            'machines' => $this->extractMetadataRows($machineRows),
+            'tooling_assets' => $this->extractMetadataRows($toolingRows),
+            'capas' => $this->extractMetadataRows($capaRows, 'data'),
+            'operators' => $this->extractMetadataRows($employeeRows),
+            'nc_program_releases' => $this->extractMetadataRows($programRows),
+            'downtime_reason_codes' => $this->extractVariableMirrorRows($reasonRows, 'reason_code', 'reason_name', 'reason_name_vi'),
+            'downtime_resolution_codes' => $this->extractVariableMirrorRows($resolutionRows, 'resolution_code', 'resolution_name', 'resolution_name_vi'),
+            'mes_connectivity_adapters' => $this->extractMetadataRows($adapterRows),
+            'mes_alarm_catalog' => $this->extractMetadataRows($alarmCatalogRows),
+            'mes_alarm_playbooks' => $this->extractMetadataRows($alarmPlaybookRows),
+            'tool_assemblies' => $this->extractMetadataRows($toolAssemblyRows),
+        ];
+
+        if ($this->storeCollectionCount($store, ['customers', 'parts', 'machines']) === 0) {
+            throw new RuntimeException('runtime_master_pg_empty');
+        }
+
+        return $store;
+    }
+
+    /**
+     * Rebuild the governed runtime order store from PostgreSQL mirrors.
+     */
+    private function loadRuntimeOrdersFromPg(): array
+    {
+        $salesRows = $this->db->query('SELECT metadata, updated_at FROM sales_orders ORDER BY sales_order_number');
+        $jobRows = $this->db->query('SELECT metadata, updated_at FROM job_orders ORDER BY job_number');
+        $workRows = $this->db->query('SELECT metadata, updated_at FROM job_operations ORDER BY updated_at, operation_seq');
+
+        $salesOrders = $this->extractMetadataRows($salesRows);
+        $jobOrders = $this->extractMetadataRows($jobRows);
+        $workOrders = $this->extractMetadataRows($workRows);
+
+        $store = [
+            '_meta' => $this->buildRuntimeStoreMeta('orders', [$salesRows, $jobRows, $workRows]),
+            'sales_orders' => $salesOrders,
+            'job_orders' => $jobOrders,
+            'work_orders' => $workOrders,
+            'form_links' => $this->collectRuntimeFormLinks($salesOrders, $jobOrders, $workOrders),
+        ];
+
+        if ($this->storeCollectionCount($store, ['sales_orders', 'job_orders', 'work_orders']) === 0) {
+            throw new RuntimeException('runtime_orders_pg_empty');
+        }
+
+        return $store;
+    }
+
+    /**
+     * Rebuild the governed MES runtime overlay from PostgreSQL mirrors.
+     */
+    private function loadRuntimeMesRuntimeFromPg(): array
+    {
+        $toolRows = $this->db->query("SELECT metadata, updated_at FROM tools WHERE COALESCE(metadata->>'shadow_source', '') = 'mes_runtime' ORDER BY updated_at DESC");
+        $equipmentRuntimeRows = $this->db->query('SELECT equipment_id, work_center_id, mtconnect_agent_url, opc_ua_endpoint, controller_type, current_e10_state, current_program, current_job_number, current_operator_id, last_heartbeat_at, metadata, updated_at FROM mes_equipment_extended ORDER BY equipment_id');
+        $progressRows = $this->db->query('SELECT metadata, updated_at FROM mes_operation_execution ORDER BY updated_at DESC');
+        $downtimeRows = $this->db->query('SELECT metadata, start_time FROM mes_downtime_events ORDER BY start_time DESC');
+        $maintenanceRows = $this->db->query('SELECT metadata, updated_at FROM maintenance_work_orders ORDER BY updated_at DESC');
+        $connectivityEventRows = $this->db->query('SELECT metadata, recorded_at FROM mes_connectivity_events ORDER BY recorded_at DESC');
+        $alarmRows = $this->db->query('SELECT metadata, alarm_time FROM mes_machine_alarms ORDER BY alarm_time DESC');
+        $receiptRows = $this->db->query('SELECT metadata, updated_at FROM mes_nc_download_receipts ORDER BY updated_at DESC');
+        $offsetRows = $this->db->query('SELECT metadata, updated_at FROM mes_tool_preset_offsets ORDER BY updated_at DESC');
+
+        [$connectorFeeds, $machineSignals] = $this->extractEquipmentRuntimeRows($equipmentRuntimeRows);
+
+        $store = [
+            '_meta' => $this->buildRuntimeStoreMeta('mes', [
+                $toolRows,
+                $equipmentRuntimeRows,
+                $progressRows,
+                $downtimeRows,
+                $maintenanceRows,
+                $connectivityEventRows,
+                $alarmRows,
+                $receiptRows,
+                $offsetRows,
+            ]),
+            'downtime_events' => $this->extractMetadataRows($downtimeRows),
+            'maintenance_requests' => $this->extractMetadataRows($maintenanceRows),
+            'progress_reports' => $this->extractMetadataRows($progressRows),
+            'tooling_status' => $this->extractMetadataRows($toolRows),
+            'connector_feeds' => $connectorFeeds,
+            'machine_signals' => $machineSignals,
+            'mes_connectivity_events' => $this->extractMetadataRows($connectivityEventRows),
+            'machine_alarm_events' => $this->extractMetadataRows($alarmRows),
+            'nc_download_receipts' => $this->extractMetadataRows($receiptRows),
+            'mes_tool_preset_offsets' => $this->extractMetadataRows($offsetRows),
+        ];
+
+        if ($this->storeCollectionCount($store, ['connector_feeds', 'machine_signals', 'progress_reports', 'tooling_status']) === 0) {
+            throw new RuntimeException('runtime_mes_pg_empty');
+        }
+
+        return $store;
+    }
+
+    /**
+     * Build a consistent _meta block for a mirrored runtime store.
+     *
+     * @param string $domain Runtime store domain name.
+     * @param array<int, array<int, array<string, mixed>>> $rowSets
+     */
+    private function buildRuntimeStoreMeta(string $domain, array $rowSets): array
+    {
+        return [
+            'version' => 'pg-shadow-v1',
+            'updated' => $this->latestTimestampFromRowSets($rowSets) ?: date(DATE_ATOM),
+            'source' => 'postgres_primary_pilot',
+            'description' => 'Governed runtime ' . $domain . ' rebuilt from PostgreSQL mirror tables.',
+        ];
+    }
+
+    /**
+     * Extract decoded metadata rows from result rows.
+     *
+     * @param array<int, array<string, mixed>> $rows
+     * @return array<int, array<string, mixed>>
+     */
+    private function extractMetadataRows(array $rows, string $column = 'metadata'): array
+    {
+        $items = [];
+        foreach ($rows as $row) {
+            $item = $this->decodeJsonArray($row[$column] ?? null);
+            if ($item !== []) {
+                $items[] = $item;
+            }
+        }
+        return $items;
+    }
+
+    /**
+     * Extract mirrored variable-registry rows back into runtime list items.
+     *
+     * @param array<int, array<string, mixed>> $rows
+     * @return array<int, array<string, mixed>>
+     */
+    private function extractVariableMirrorRows(array $rows, string $keyField, string $labelField, string $labelViField): array
+    {
+        $items = [];
+        foreach ($rows as $row) {
+            $item = $this->decodeJsonArray($row['example'] ?? null);
+            if ($item === []) {
+                $item = [
+                    $keyField => (string)($row['key'] ?? ''),
+                    $labelField => (string)($row['label'] ?? $row['key'] ?? ''),
+                    $labelViField => (string)($row['label_vi'] ?? $row['label'] ?? $row['key'] ?? ''),
+                ];
+            }
+            $items[] = $item;
+        }
+        return $items;
+    }
+
+    /**
+     * Rebuild connector feed + machine signal arrays from MES equipment runtime rows.
+     *
+     * @param array<int, array<string, mixed>> $rows
+     * @return array{0: array<int, array<string, mixed>>, 1: array<int, array<string, mixed>>}
+     */
+    private function extractEquipmentRuntimeRows(array $rows): array
+    {
+        $feeds = [];
+        $signals = [];
+
+        foreach ($rows as $row) {
+            $meta = $this->decodeJsonArray($row['metadata'] ?? null);
+            $machine = is_array($meta['machine'] ?? null) ? $meta['machine'] : $meta;
+            $feed = is_array($meta['connector_feed'] ?? null) ? $meta['connector_feed'] : [];
+            $signal = is_array($meta['machine_signal'] ?? null) ? $meta['machine_signal'] : [];
+
+            $machineId = trim((string)($row['equipment_id'] ?? $machine['machine_id'] ?? ''));
+            if ($machineId === '') {
+                continue;
+            }
+
+            if ($feed === []) {
+                $connectorType = trim((string)($machine['connector_type'] ?? ($row['mtconnect_agent_url'] ? 'mtconnect' : ($row['opc_ua_endpoint'] ? 'opcua' : 'manual_bridge'))));
+                $feed = [
+                    'machine_id' => $machineId,
+                    'machine_name' => (string)($machine['machine_name'] ?? ''),
+                    'work_center_id' => (string)($row['work_center_id'] ?? $machine['work_center_id'] ?? ''),
+                    'connector_type' => $connectorType,
+                    'connector_name' => (string)($row['controller_type'] ?? $machine['connector_name'] ?? ''),
+                    'connector_endpoint' => (string)($row['mtconnect_agent_url'] ?? $row['opc_ua_endpoint'] ?? $machine['connector_endpoint'] ?? ''),
+                    'telemetry_mode' => (string)($machine['telemetry_mode'] ?? ($connectorType === 'manual_bridge' ? 'manual' : 'machine')),
+                    'heartbeat_sla_seconds' => (int)($machine['heartbeat_sla_seconds'] ?? 120),
+                    'last_heartbeat_at' => (string)($row['last_heartbeat_at'] ?? ''),
+                    'last_signal_at' => (string)($row['last_heartbeat_at'] ?? ''),
+                    'connection_status' => (string)($row['current_e10_state'] ?? ''),
+                    'enabled' => true,
+                    'updated_at' => (string)($row['updated_at'] ?? ''),
+                    'updated_by' => 'postgres-primary',
+                ];
+            }
+            if ($signal === []) {
+                $signal = [
+                    'machine_id' => $machineId,
+                    'machine_name' => (string)($machine['machine_name'] ?? ''),
+                    'work_center_id' => (string)($row['work_center_id'] ?? $machine['work_center_id'] ?? ''),
+                    'source' => (string)($feed['connector_type'] ?? 'manual_bridge'),
+                    'connector_type' => (string)($feed['connector_type'] ?? 'manual_bridge'),
+                    'machine_state' => (string)($row['current_e10_state'] ?? ''),
+                    'signal_at' => (string)($row['last_heartbeat_at'] ?? ''),
+                    'last_heartbeat_at' => (string)($row['last_heartbeat_at'] ?? ''),
+                    'wo_number' => (string)($row['current_job_number'] ?? ''),
+                    'operator_id' => (string)($row['current_operator_id'] ?? ''),
+                    'current_program_id' => (string)($row['current_program'] ?? ''),
+                    'updated_at' => (string)($row['updated_at'] ?? ''),
+                    'updated_by' => 'postgres-primary',
+                ];
+            }
+
+            $feeds[] = $feed;
+            $signals[] = $signal;
+        }
+
+        return [$feeds, $signals];
+    }
+
+    /**
+     * Collect and de-duplicate order-linked evidence records.
+     *
+     * @param array<int, array<string, mixed>> $salesOrders
+     * @param array<int, array<string, mixed>> $jobOrders
+     * @param array<int, array<string, mixed>> $workOrders
+     * @return array<int, array<string, mixed>>
+     */
+    private function collectRuntimeFormLinks(array $salesOrders, array $jobOrders, array $workOrders): array
+    {
+        $unique = [];
+        $lists = [
+            'so' => $salesOrders,
+            'jo' => $jobOrders,
+            'wo' => $workOrders,
+        ];
+
+        foreach ($lists as $orderType => $rows) {
+            $idKey = $orderType === 'so' ? 'so_number' : ($orderType === 'jo' ? 'jo_number' : 'wo_number');
+            foreach ($rows as $row) {
+                if (!is_array($row)) {
+                    continue;
+                }
+                $orderId = trim((string)($row[$idKey] ?? ''));
+                foreach ((array)($row['linked_forms'] ?? []) as $link) {
+                    if (!is_array($link)) {
+                        continue;
+                    }
+                    $normalized = $link;
+                    $normalized['order_type'] = $orderType;
+                    $normalized['order_id'] = $orderId;
+                    $signature = implode('|', [
+                        $orderType,
+                        $orderId,
+                        (string)($normalized['record_id'] ?? ''),
+                        (string)($normalized['form_code'] ?? ''),
+                        (string)($normalized['allocation_id'] ?? ''),
+                    ]);
+                    $unique[$signature] = $normalized;
+                }
+            }
+        }
+
+        return array_values($unique);
+    }
+
+    /**
+     * Decode a JSON/JSONB field that may already be returned as an array.
+     */
+    private function decodeJsonArray(mixed $value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+        if (!is_string($value) || trim($value) === '') {
+            return [];
+        }
+        $decoded = json_decode($value, true);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * Count items across the named collections in a runtime store.
+     *
+     * @param array<string, mixed> $store
+     * @param array<int, string>   $collections
+     */
+    private function storeCollectionCount(array $store, array $collections): int
+    {
+        $count = 0;
+        foreach ($collections as $collection) {
+            $count += count((array)($store[$collection] ?? []));
+        }
+        return $count;
+    }
+
+    /**
+     * Find the latest ISO timestamp across multiple query row sets.
+     *
+     * @param array<int, array<int, array<string, mixed>>> $rowSets
+     */
+    private function latestTimestampFromRowSets(array $rowSets): string
+    {
+        $latest = '';
+        foreach ($rowSets as $rows) {
+            foreach ($rows as $row) {
+                foreach (['updated_at', 'recorded_at', 'event_time', 'alarm_time', 'start_time', 'valid_from', 'measured_at', 'downloaded_at'] as $field) {
+                    $value = trim((string)($row[$field] ?? ''));
+                    if ($value !== '' && ($latest === '' || strcmp($value, $latest) > 0)) {
+                        $latest = $value;
+                    }
+                }
+            }
+        }
+        return $latest;
     }
 
     /**

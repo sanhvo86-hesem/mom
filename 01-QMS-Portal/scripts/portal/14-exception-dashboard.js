@@ -242,6 +242,18 @@ var EXCEPTION_TYPES = [
     page: 'mes'
   },
   {
+    key: 'primary_read_fallbacks',
+    icon: '\ud83d\udee0\ufe0f',
+    accent: '#2563eb',
+    surface: '#eff6ff',
+    border: '#93c5fd',
+    labelVi: 'Primary read đang fallback',
+    labelEn: 'Primary-read fallbacks',
+    descVi: 'Read model đang phải quay về JSON thay vì đọc PostgreSQL mirror nên cần rà lại health của shadow layer.',
+    descEn: 'Read models are falling back to JSON instead of PostgreSQL mirror reads and the shadow layer should be reviewed.',
+    page: 'mes'
+  },
+  {
     key: 'downtime_governance_gaps',
     icon: '\ud83e\udde0',
     accent: '#be185d',
@@ -439,7 +451,7 @@ function renderSummary(){
     total += count;
     if (count > 0) activeGroups += 1;
   });
-  highPriority = Number(state.summary.overdue_allocations || 0) + Number(state.summary.wo_missing_evidence || 0) + Number(state.summary.program_mismatches || 0) + Number(state.summary.program_release_risk || 0) + Number(state.summary.tool_readiness_risk || 0) + Number(state.summary.operator_qualification_gaps || 0) + Number(state.summary.material_trace_gaps || 0) + Number(state.summary.connector_governance_gaps || 0) + Number(state.summary.adapter_governance_risk || 0) + Number(state.summary.alarm_hotspots || 0) + Number(state.summary.nc_download_mismatches || 0) + Number(state.summary.tool_offset_risk || 0) + Number(state.summary.launch_blocker_hotspots || 0) + Number(state.summary.shadow_sync_failures || 0) + Number(state.summary.downtime_governance_gaps || 0) + Number(state.summary.overdue_orders || 0);
+  highPriority = Number(state.summary.overdue_allocations || 0) + Number(state.summary.wo_missing_evidence || 0) + Number(state.summary.program_mismatches || 0) + Number(state.summary.program_release_risk || 0) + Number(state.summary.tool_readiness_risk || 0) + Number(state.summary.operator_qualification_gaps || 0) + Number(state.summary.material_trace_gaps || 0) + Number(state.summary.connector_governance_gaps || 0) + Number(state.summary.adapter_governance_risk || 0) + Number(state.summary.alarm_hotspots || 0) + Number(state.summary.nc_download_mismatches || 0) + Number(state.summary.tool_offset_risk || 0) + Number(state.summary.launch_blocker_hotspots || 0) + Number(state.summary.shadow_sync_failures || 0) + Number(state.summary.primary_read_fallbacks || 0) + Number(state.summary.downtime_governance_gaps || 0) + Number(state.summary.overdue_orders || 0);
   var nextPage = highPriority > 0 ? t('MES / Chứng cứ', 'MES / Evidence') : (activeGroups > 0 ? t('Đơn hàng', 'Orders') : t('Ổn định', 'Stable'));
   var totalEl = state.container.querySelector('#excx-total');
   var groupsEl = state.container.querySelector('#excx-groups');

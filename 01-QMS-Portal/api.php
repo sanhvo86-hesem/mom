@@ -2073,6 +2073,11 @@ function runtime_observability_default(): array {
       'orders' => ['last_status' => 'never', 'last_success_at' => '', 'last_error_at' => '', 'last_skipped_at' => '', 'last_message' => '', 'success_count' => 0, 'failure_count' => 0, 'skipped_count' => 0, 'last_duration_ms' => null, 'last_item_count' => 0, 'last_mode' => '', 'last_context' => [], 'recent' => []],
       'mes' => ['last_status' => 'never', 'last_success_at' => '', 'last_error_at' => '', 'last_skipped_at' => '', 'last_message' => '', 'success_count' => 0, 'failure_count' => 0, 'skipped_count' => 0, 'last_duration_ms' => null, 'last_item_count' => 0, 'last_mode' => '', 'last_context' => [], 'recent' => []],
     ],
+    'primary_reads' => [
+      'master_data' => ['last_source' => 'never', 'last_read_at' => '', 'last_error' => '', 'last_mode' => '', 'postgres_count' => 0, 'json_count' => 0, 'fallback_count' => 0, 'last_context' => [], 'recent' => []],
+      'orders' => ['last_source' => 'never', 'last_read_at' => '', 'last_error' => '', 'last_mode' => '', 'postgres_count' => 0, 'json_count' => 0, 'fallback_count' => 0, 'last_context' => [], 'recent' => []],
+      'mes' => ['last_source' => 'never', 'last_read_at' => '', 'last_error' => '', 'last_mode' => '', 'postgres_count' => 0, 'json_count' => 0, 'fallback_count' => 0, 'last_context' => [], 'recent' => []],
+    ],
     'connector_ingest' => [
       'totals' => ['success' => 0, 'failure' => 0],
       'machines' => [],
@@ -2110,6 +2115,11 @@ function load_runtime_observability_store(): array {
   foreach (['master_data', 'orders', 'mes'] as $key) {
     $data['shadow_sync'][$key] = array_merge($defaults['shadow_sync'][$key], is_array($data['shadow_sync'][$key] ?? null) ? $data['shadow_sync'][$key] : []);
     $data['shadow_sync'][$key]['recent'] = array_values(is_array($data['shadow_sync'][$key]['recent'] ?? null) ? $data['shadow_sync'][$key]['recent'] : []);
+  }
+  $data['primary_reads'] = is_array($data['primary_reads'] ?? null) ? $data['primary_reads'] : $defaults['primary_reads'];
+  foreach (['master_data', 'orders', 'mes'] as $key) {
+    $data['primary_reads'][$key] = array_merge($defaults['primary_reads'][$key], is_array($data['primary_reads'][$key] ?? null) ? $data['primary_reads'][$key] : []);
+    $data['primary_reads'][$key]['recent'] = array_values(is_array($data['primary_reads'][$key]['recent'] ?? null) ? $data['primary_reads'][$key]['recent'] : []);
   }
   $data['connector_ingest'] = is_array($data['connector_ingest'] ?? null) ? $data['connector_ingest'] : $defaults['connector_ingest'];
   $data['connector_ingest']['totals'] = array_merge($defaults['connector_ingest']['totals'], is_array($data['connector_ingest']['totals'] ?? null) ? $data['connector_ingest']['totals'] : []);
@@ -2196,6 +2206,54 @@ function observe_shadow_sync(string $storeKey, $ok, string $message, array $cont
   save_runtime_observability_store($store);
   append_jsonl_line(runtime_observability_log_file('shadow-sync.jsonl'), $entry);
   runtime_data_log_event('runtime.shadow_sync.' . $entry['status'], 'runtime_shadow', $storeKey, $entry);
+}
+
+function observe_primary_read(string $storeKey, array $readMeta, array $context = []): void {
+  $store = load_runtime_observability_store();
+  $source = strtolower(trim((string)($readMeta['source'] ?? 'json')));
+  if (!in_array($source, ['postgres', 'json', 'json_fallback', 'never'], true)) {
+    $source = 'json';
+  }
+  $entry = [
+    'store_key' => $storeKey,
+    'source' => $source,
+    'fallback' => (bool)($readMeta['fallback'] ?? false),
+    'error' => trim((string)($readMeta['error'] ?? '')),
+    'mode' => trim((string)($readMeta['mode'] ?? '')),
+    'timestamp' => trim((string)($readMeta['timestamp'] ?? now_iso())) ?: now_iso(),
+    'context' => $context,
+  ];
+  $bucket = array_merge([
+    'last_source' => 'never',
+    'last_read_at' => '',
+    'last_error' => '',
+    'last_mode' => '',
+    'postgres_count' => 0,
+    'json_count' => 0,
+    'fallback_count' => 0,
+    'last_context' => [],
+    'recent' => [],
+  ], is_array($store['primary_reads'][$storeKey] ?? null) ? $store['primary_reads'][$storeKey] : []);
+  $bucket['last_source'] = $source;
+  $bucket['last_read_at'] = $entry['timestamp'];
+  $bucket['last_error'] = $entry['error'];
+  $bucket['last_mode'] = $entry['mode'];
+  $bucket['last_context'] = $context;
+  if ($source === 'postgres') {
+    $bucket['postgres_count'] = (int)($bucket['postgres_count'] ?? 0) + 1;
+  } else {
+    $bucket['json_count'] = (int)($bucket['json_count'] ?? 0) + 1;
+    if ($source === 'json_fallback' || $entry['fallback']) {
+      $bucket['fallback_count'] = (int)($bucket['fallback_count'] ?? 0) + 1;
+    }
+  }
+  $recent = array_values((array)($bucket['recent'] ?? []));
+  array_unshift($recent, $entry);
+  $bucket['recent'] = array_slice($recent, 0, 15);
+  $store['primary_reads'][$storeKey] = $bucket;
+  save_runtime_observability_store($store);
+  append_jsonl_line(runtime_observability_log_file('primary-reads.jsonl'), $entry);
+  runtime_data_log_event('runtime.primary_read.' . $source, 'runtime_read_model', $storeKey, $entry);
 }
 
 function observe_connector_ingest(string $machineId, bool $ok, string $message, array $context = []): void {
@@ -2305,6 +2363,102 @@ function mes_launch_blocker_rows(array $observability): array {
     return strcmp((string)($b['blocked_at'] ?? ''), (string)($a['blocked_at'] ?? ''));
   });
   return $rows;
+}
+
+function mes_primary_read_rows(array $observability): array {
+  $rows = [];
+  foreach ((array)($observability['primary_reads'] ?? []) as $storeKey => $node) {
+    if (!is_array($node)) continue;
+    $source = strtolower(trim((string)($node['last_source'] ?? 'never')));
+    $mode = strtoupper(trim((string)($node['last_mode'] ?? '')));
+    $severity = 'ready';
+    if ($source === 'json_fallback') {
+      $severity = 'warning';
+    } elseif ($source === 'json' && in_array($mode, ['POSTGRES_PRIMARY', 'POSTGRES_ONLY'], true)) {
+      $severity = 'warning';
+    } elseif ($source !== 'postgres' && $mode === 'POSTGRES_ONLY') {
+      $severity = 'critical';
+    }
+    if ($severity === 'ready') {
+      continue;
+    }
+    $rows[] = [
+      'store_key' => (string)$storeKey,
+      'severity' => $severity,
+      'source' => $source,
+      'runtime_mode' => $mode,
+      'read_at' => (string)($node['last_read_at'] ?? ''),
+      'fallback_count' => (int)($node['fallback_count'] ?? 0),
+      'postgres_count' => (int)($node['postgres_count'] ?? 0),
+      'json_count' => (int)($node['json_count'] ?? 0),
+      'error' => (string)($node['last_error'] ?? ''),
+      'message_vi' => 'Runtime Ä‘Ã£ pháº£i fallback vá» JSON thay vÃ¬ Ä‘á»c PostgreSQL mirror cho read model nÃ y.',
+      'message_en' => 'Runtime had to fall back to JSON instead of reading the PostgreSQL mirror for this read model.',
+      'recent' => array_values((array)($node['recent'] ?? [])),
+    ];
+  }
+  usort($rows, static function ($a, $b) {
+    return strcmp((string)($b['read_at'] ?? ''), (string)($a['read_at'] ?? ''));
+  });
+  return $rows;
+}
+
+function runtime_store_item_count(array $store): int {
+  $total = 0;
+  foreach ($store as $key => $value) {
+    if ($key === '_meta') continue;
+    if (is_array($value)) {
+      $total += count($value);
+    }
+  }
+  return $total;
+}
+
+function runtime_read_model_bundle(bool $includeMes = true): array {
+  $layer = runtime_data_layer();
+
+  $master = $layer->getRuntimeMasterDataStore();
+  $masterRead = $layer->getLastReadMeta();
+  observe_primary_read('master_data', $masterRead, [
+    'item_count' => runtime_store_item_count($master),
+    'scope' => $includeMes ? 'mes_bundle' : 'runtime_bundle',
+  ]);
+
+  $orders = $layer->getRuntimeOrdersStore();
+  $ordersRead = $layer->getLastReadMeta();
+  observe_primary_read('orders', $ordersRead, [
+    'item_count' => runtime_store_item_count($orders),
+    'scope' => $includeMes ? 'mes_bundle' : 'runtime_bundle',
+  ]);
+
+  $mes = [];
+  $mesRead = [
+    'source' => 'json',
+    'fallback' => false,
+    'error' => '',
+    'mode' => (string)($layer->getModeSummary()['mode'] ?? 'JSON_ONLY'),
+    'timestamp' => now_iso(),
+  ];
+  if ($includeMes) {
+    $mes = $layer->getRuntimeMesRuntimeStore();
+    $mesRead = $layer->getLastReadMeta();
+    observe_primary_read('mes', $mesRead, [
+      'item_count' => runtime_store_item_count($mes),
+      'scope' => 'mes_bundle',
+    ]);
+  }
+
+  return [
+    'master' => $master,
+    'orders' => $orders,
+    'mes' => $mes,
+    'sources' => [
+      'master_data' => $masterRead,
+      'orders' => $ordersRead,
+      'mes' => $mesRead,
+    ],
+    'runtime_mode' => runtime_data_layer_summary(),
+  ];
 }
 
 function mes_latest_signal_timestamp(array $mes, string $machineId): string {
@@ -5139,6 +5293,7 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $runtimeMode = runtime_data_layer_summary();
   $shadowSyncFailures = mes_shadow_failure_rows($observability);
   $launchBlockerQueue = mes_launch_blocker_rows($observability);
+  $primaryReadQueue = mes_primary_read_rows($observability);
 
   $kpis['program_mismatches'] = count($programHandshakeQueue);
   $kpis['program_release_risk'] = count($programReleaseQueue);
@@ -5149,6 +5304,7 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $kpis['alarm_hotspots'] = count($alarmHotspotQueue);
   $kpis['shadow_sync_failures'] = count($shadowSyncFailures);
   $kpis['launch_blocker_hotspots'] = count($launchBlockerQueue);
+  $kpis['primary_read_fallbacks'] = count($primaryReadQueue);
 
   return [
     'kpis' => $kpis,
@@ -5173,7 +5329,9 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     'alarm_hotspot_queue' => array_slice($alarmHotspotQueue, 0, 20),
     'shadow_sync_failures' => array_slice($shadowSyncFailures, 0, 20),
     'launch_blocker_queue' => array_slice($launchBlockerQueue, 0, 20),
+    'primary_read_queue' => array_slice($primaryReadQueue, 0, 20),
     'shadow_status' => $observability['shadow_sync'] ?? [],
+    'primary_read_status' => $observability['primary_reads'] ?? [],
     'connector_ingest_status' => $observability['connector_ingest'] ?? [],
     'launch_blocker_status' => $observability['launch_blockers'] ?? [],
     'runtime_mode' => $runtimeMode,
@@ -11592,10 +11750,14 @@ if ($username === '') {
   // ── Master Data Runtime ────────────────────────────────────────────────
   case 'master_data_snapshot': {
     require_logged_in($store);
-    $data = load_master_data_store();
+    $bundle = runtime_read_model_bundle(false);
+    $data = $bundle['master'];
     api_json([
       'ok' => true,
       'data' => $data,
+      'source' => (string)($bundle['sources']['master_data']['source'] ?? 'json'),
+      'read_sources' => $bundle['sources'],
+      'runtime_mode' => $bundle['runtime_mode'],
       'summary' => [
         'customers' => count($data['customers'] ?? []),
         'suppliers' => count($data['suppliers'] ?? []),
@@ -11746,12 +11908,15 @@ if ($username === '') {
   // ── Order Management Runtime ───────────────────────────────────────────
   case 'mes_snapshot': {
     require_logged_in($store);
-    $orders = load_orders_store();
-    $master = load_master_data_store();
-    $mes = load_mes_runtime_store();
+    $bundle = runtime_read_model_bundle(true);
+    $orders = $bundle['orders'];
+    $master = $bundle['master'];
+    $mes = $bundle['mes'];
     api_json([
       'ok' => true,
       'data' => build_mes_snapshot($orders, $master, $mes),
+      'read_sources' => $bundle['sources'],
+      'runtime_mode' => $bundle['runtime_mode'],
       'orders_updated' => (string)($orders['_meta']['updated'] ?? ''),
       'master_updated' => (string)($master['_meta']['updated'] ?? ''),
       'mes_updated' => (string)($mes['_meta']['updated'] ?? ''),
@@ -11760,9 +11925,10 @@ if ($username === '') {
 
   case 'mes_connector_snapshot': {
     require_logged_in($store);
-    $orders = load_orders_store();
-    $master = load_master_data_store();
-    $mes = load_mes_runtime_store();
+    $bundle = runtime_read_model_bundle(true);
+    $orders = $bundle['orders'];
+    $master = $bundle['master'];
+    $mes = $bundle['mes'];
     $snapshot = build_mes_snapshot($orders, $master, $mes);
     $observability = load_runtime_observability_store();
     api_json([
@@ -11778,15 +11944,18 @@ if ($username === '') {
       'connector_ingest_status' => (array)($snapshot['connector_ingest_status'] ?? []),
       'recent_connector_failures' => mes_recent_connector_ingest_failures($observability),
       'data' => $snapshot,
+      'read_sources' => $bundle['sources'],
+      'runtime_mode' => $bundle['runtime_mode'],
       'updated' => (string)($mes['_meta']['updated'] ?? ''),
     ]);
   }
 
   case 'mes_foundation_snapshot': {
     require_logged_in($store);
-    $orders = load_orders_store();
-    $master = load_master_data_store();
-    $mes = load_mes_runtime_store();
+    $bundle = runtime_read_model_bundle(true);
+    $orders = $bundle['orders'];
+    $master = $bundle['master'];
+    $mes = $bundle['mes'];
     $snapshot = build_mes_snapshot($orders, $master, $mes);
     api_json([
       'ok' => true,
@@ -11808,14 +11977,17 @@ if ($username === '') {
         'master' => (string)($master['_meta']['updated'] ?? ''),
         'mes' => (string)($mes['_meta']['updated'] ?? ''),
       ],
+      'read_sources' => $bundle['sources'],
+      'runtime_mode' => $bundle['runtime_mode'],
     ]);
   }
 
   case 'mes_alarm_snapshot': {
     require_logged_in($store);
-    $orders = load_orders_store();
-    $master = load_master_data_store();
-    $mes = load_mes_runtime_store();
+    $bundle = runtime_read_model_bundle(true);
+    $orders = $bundle['orders'];
+    $master = $bundle['master'];
+    $mes = $bundle['mes'];
     $snapshot = build_mes_snapshot($orders, $master, $mes);
     api_json([
       'ok' => true,
@@ -11824,14 +11996,17 @@ if ($username === '') {
       'runtime' => array_values((array)($mes['machine_alarm_events'] ?? [])),
       'queue' => array_values((array)($snapshot['alarm_hotspot_queue'] ?? [])),
       'count' => (int)($snapshot['kpis']['alarm_hotspots'] ?? 0),
+      'read_sources' => $bundle['sources'],
+      'runtime_mode' => $bundle['runtime_mode'],
     ]);
   }
 
   case 'mes_nc_release_snapshot': {
     require_logged_in($store);
-    $orders = load_orders_store();
-    $master = load_master_data_store();
-    $mes = load_mes_runtime_store();
+    $bundle = runtime_read_model_bundle(true);
+    $orders = $bundle['orders'];
+    $master = $bundle['master'];
+    $mes = $bundle['mes'];
     $snapshot = build_mes_snapshot($orders, $master, $mes);
     api_json([
       'ok' => true,
@@ -11839,14 +12014,17 @@ if ($username === '') {
       'download_receipts' => array_values((array)($mes['nc_download_receipts'] ?? [])),
       'queue' => array_values((array)($snapshot['nc_download_mismatch_queue'] ?? [])),
       'count' => (int)($snapshot['kpis']['nc_download_mismatches'] ?? 0),
+      'read_sources' => $bundle['sources'],
+      'runtime_mode' => $bundle['runtime_mode'],
     ]);
   }
 
   case 'mes_tool_offset_snapshot': {
     require_logged_in($store);
-    $orders = load_orders_store();
-    $master = load_master_data_store();
-    $mes = load_mes_runtime_store();
+    $bundle = runtime_read_model_bundle(true);
+    $orders = $bundle['orders'];
+    $master = $bundle['master'];
+    $mes = $bundle['mes'];
     $snapshot = build_mes_snapshot($orders, $master, $mes);
     api_json([
       'ok' => true,
@@ -11854,6 +12032,8 @@ if ($username === '') {
       'tool_assemblies' => array_values((array)($master['tool_assemblies'] ?? [])),
       'queue' => array_values((array)($snapshot['tool_offset_queue'] ?? [])),
       'count' => (int)($snapshot['kpis']['tool_offset_risk'] ?? 0),
+      'read_sources' => $bundle['sources'],
+      'runtime_mode' => $bundle['runtime_mode'],
     ]);
   }
 
@@ -11863,8 +12043,10 @@ if ($username === '') {
     api_json([
       'ok' => true,
       'shadow_sync' => (array)($observability['shadow_sync'] ?? []),
+      'primary_reads' => (array)($observability['primary_reads'] ?? []),
       'connector_ingest' => (array)($observability['connector_ingest'] ?? []),
       'shadow_sync_failures' => mes_shadow_failure_rows($observability),
+      'primary_read_fallbacks' => mes_primary_read_rows($observability),
       'recent_connector_failures' => mes_recent_connector_ingest_failures($observability),
       'launch_blockers' => mes_launch_blocker_rows($observability),
       'runtime_mode' => runtime_data_layer_summary(),
@@ -12679,17 +12861,19 @@ if ($username === '') {
   case 'order_dashboard_stats': {
     $me = require_logged_in($store);
     require_order_permission($me, 'so', 'view');
-    $stats = compute_order_dashboard_stats(load_orders_store());
-    api_json(['ok' => true, 'data' => $stats]);
+    $bundle = runtime_read_model_bundle(false);
+    $stats = compute_order_dashboard_stats($bundle['orders']);
+    api_json(['ok' => true, 'data' => $stats, 'read_sources' => $bundle['sources'], 'runtime_mode' => $bundle['runtime_mode']]);
   }
 
   case 'order_hierarchy': {
     $me = require_logged_in($store);
     require_order_permission($me, 'so', 'view');
-    $orders = load_orders_store();
-    $master = load_master_data_store();
+    $bundle = runtime_read_model_bundle(false);
+    $orders = $bundle['orders'];
+    $master = $bundle['master'];
     $hierarchy = build_order_hierarchy($orders, $master);
-    api_json(['ok' => true, 'data' => $hierarchy, 'hierarchy' => $hierarchy]);
+    api_json(['ok' => true, 'data' => $hierarchy, 'hierarchy' => $hierarchy, 'read_sources' => $bundle['sources'], 'runtime_mode' => $bundle['runtime_mode']]);
   }
 
   case 'order_detail': {
@@ -12702,8 +12886,9 @@ if ($username === '') {
     }
     require_order_permission($me, $orderType, 'view');
 
-    $orders = load_orders_store();
-    $master = load_master_data_store();
+    $bundle = runtime_read_model_bundle(false);
+    $orders = $bundle['orders'];
+    $master = $bundle['master'];
     $record = find_order_record($orders, $orderType, $orderId);
     if (!$record) api_json(['ok' => false, 'error' => 'not_found'], 404);
 
@@ -12728,6 +12913,7 @@ if ($username === '') {
       'part_number' => (string)($record['part_number'] ?? ''),
       'part_revision' => (string)($record['part_revision'] ?? ''),
     ];
+    $record['_read_sources'] = $bundle['sources'];
     api_json(['ok' => true, 'data' => $record]);
   }
 
@@ -13434,7 +13620,8 @@ if ($username === '') {
     $failedUploads = count($uploadSvc->getExceptionQueue(30));
 
     // 3. Overdue orders (due_date < today)
-    $orders = load_orders_store();
+    $bundle = runtime_read_model_bundle(true);
+    $orders = $bundle['orders'];
     $today = date('Y-m-d');
     $overdueOrders = 0;
     foreach (['sales_orders', 'job_orders', 'work_orders'] as $key) {
@@ -13448,7 +13635,7 @@ if ($username === '') {
     }
 
     // 4. Open CAPAs > 60 days
-    $master = load_master_data_store();
+    $master = $bundle['master'];
     $cutoff60 = date('Y-m-d', strtotime('-60 days'));
     $overdueCapas = 0;
     foreach ((array)($master['capas'] ?? []) as $capa) {
@@ -13460,7 +13647,7 @@ if ($username === '') {
     }
 
     // 5. WOs missing evidence gates
-    $mes = load_mes_runtime_store();
+    $mes = $bundle['mes'];
     $mesSnapshot = build_mes_snapshot($orders, $master, $mes);
     $woMissingEvidence = count((array)($mesSnapshot['evidence_gate_queue'] ?? []));
     $programMismatches = count((array)($mesSnapshot['program_handshake_queue'] ?? []));
@@ -13475,6 +13662,7 @@ if ($username === '') {
     $toolOffsetRisk = count((array)($mesSnapshot['tool_offset_queue'] ?? []));
     $shadowSyncFailures = count((array)($mesSnapshot['shadow_sync_failures'] ?? []));
     $launchBlockerHotspots = count((array)($mesSnapshot['launch_blocker_queue'] ?? []));
+    $primaryReadFallbacks = count((array)($mesSnapshot['primary_read_queue'] ?? []));
     $downtimeGovernanceGaps = count(mes_downtime_governance_gap_rows($mes, $master));
 
     // 6. Orphan record links (links pointing to non-existent orders)
@@ -13507,8 +13695,11 @@ if ($username === '') {
       'tool_offset_risk' => $toolOffsetRisk,
       'shadow_sync_failures' => $shadowSyncFailures,
       'launch_blocker_hotspots' => $launchBlockerHotspots,
+      'primary_read_fallbacks' => $primaryReadFallbacks,
       'downtime_governance_gaps' => $downtimeGovernanceGaps,
       'orphan_links'        => $orphanLinks,
+      'read_sources'        => $bundle['sources'],
+      'runtime_mode'        => $bundle['runtime_mode'],
     ]);
   }
 
@@ -13522,6 +13713,7 @@ if ($username === '') {
     $today = date('Y-m-d');
     $cutoff30 = date('c', strtotime('-30 days'));
     $cutoff60 = date('Y-m-d', strtotime('-60 days'));
+    $bundle = runtime_read_model_bundle(true);
 
     switch ($type) {
       case 'overdue_allocations': {
@@ -13560,7 +13752,7 @@ if ($username === '') {
         break;
       }
       case 'overdue_orders': {
-        $orders = load_orders_store();
+        $orders = $bundle['orders'];
         foreach (['sales_orders' => 'SO', 'job_orders' => 'JO', 'work_orders' => 'WO'] as $key => $label) {
           foreach ((array)($orders[$key] ?? []) as $ord) {
             if (!is_array($ord)) continue;
@@ -13583,7 +13775,7 @@ if ($username === '') {
         break;
       }
       case 'overdue_capas': {
-        $master = load_master_data_store();
+        $master = $bundle['master'];
         foreach ((array)($master['capas'] ?? []) as $capa) {
           if (!is_array($capa)) continue;
           $st = strtolower(trim((string)($capa['status'] ?? '')));
@@ -13603,9 +13795,9 @@ if ($username === '') {
         break;
       }
       case 'wo_missing_evidence': {
-        $orders = load_orders_store();
-        $master = load_master_data_store();
-        $mes = load_mes_runtime_store();
+        $orders = $bundle['orders'];
+        $master = $bundle['master'];
+        $mes = $bundle['mes'];
         $snapshot = build_mes_snapshot($orders, $master, $mes);
         foreach ((array)($snapshot['evidence_gate_queue'] ?? []) as $row) {
           if (!is_array($row)) continue;
@@ -13625,9 +13817,9 @@ if ($username === '') {
         break;
       }
       case 'program_mismatches': {
-        $orders = load_orders_store();
-        $master = load_master_data_store();
-        $mes = load_mes_runtime_store();
+        $orders = $bundle['orders'];
+        $master = $bundle['master'];
+        $mes = $bundle['mes'];
         $snapshot = build_mes_snapshot($orders, $master, $mes);
         foreach ((array)($snapshot['program_handshake_queue'] ?? []) as $row) {
           if (!is_array($row)) continue;
@@ -13648,9 +13840,9 @@ if ($username === '') {
         break;
       }
       case 'program_release_risk': {
-        $orders = load_orders_store();
-        $master = load_master_data_store();
-        $mes = load_mes_runtime_store();
+        $orders = $bundle['orders'];
+        $master = $bundle['master'];
+        $mes = $bundle['mes'];
         $snapshot = build_mes_snapshot($orders, $master, $mes);
         foreach ((array)($snapshot['program_release_queue'] ?? []) as $row) {
           if (!is_array($row)) continue;
@@ -13672,9 +13864,9 @@ if ($username === '') {
         break;
       }
       case 'tool_readiness_risk': {
-        $orders = load_orders_store();
-        $master = load_master_data_store();
-        $mes = load_mes_runtime_store();
+        $orders = $bundle['orders'];
+        $master = $bundle['master'];
+        $mes = $bundle['mes'];
         $snapshot = build_mes_snapshot($orders, $master, $mes);
         foreach ((array)($snapshot['tool_readiness_queue'] ?? []) as $row) {
           if (!is_array($row)) continue;
@@ -13696,9 +13888,9 @@ if ($username === '') {
         break;
       }
       case 'operator_qualification_gaps': {
-        $orders = load_orders_store();
-        $master = load_master_data_store();
-        $mes = load_mes_runtime_store();
+        $orders = $bundle['orders'];
+        $master = $bundle['master'];
+        $mes = $bundle['mes'];
         $snapshot = build_mes_snapshot($orders, $master, $mes);
         foreach ((array)($snapshot['operator_qualification_queue'] ?? []) as $row) {
           if (!is_array($row)) continue;
@@ -13720,9 +13912,9 @@ if ($username === '') {
         break;
       }
       case 'material_trace_gaps': {
-        $orders = load_orders_store();
-        $master = load_master_data_store();
-        $mes = load_mes_runtime_store();
+        $orders = $bundle['orders'];
+        $master = $bundle['master'];
+        $mes = $bundle['mes'];
         $snapshot = build_mes_snapshot($orders, $master, $mes);
         foreach ((array)($snapshot['material_trace_queue'] ?? []) as $row) {
           if (!is_array($row)) continue;
@@ -13744,9 +13936,9 @@ if ($username === '') {
         break;
       }
       case 'connector_governance_gaps': {
-        $orders = load_orders_store();
-        $master = load_master_data_store();
-        $mes = load_mes_runtime_store();
+        $orders = $bundle['orders'];
+        $master = $bundle['master'];
+        $mes = $bundle['mes'];
         $snapshot = build_mes_snapshot($orders, $master, $mes);
         foreach ((array)($snapshot['connector_guard_queue'] ?? []) as $row) {
           if (!is_array($row)) continue;
@@ -13768,9 +13960,9 @@ if ($username === '') {
         break;
       }
       case 'adapter_governance_risk': {
-        $orders = load_orders_store();
-        $master = load_master_data_store();
-        $mes = load_mes_runtime_store();
+        $orders = $bundle['orders'];
+        $master = $bundle['master'];
+        $mes = $bundle['mes'];
         $snapshot = build_mes_snapshot($orders, $master, $mes);
         foreach ((array)($snapshot['adapter_governance_queue'] ?? []) as $row) {
           if (!is_array($row)) continue;
@@ -13791,9 +13983,9 @@ if ($username === '') {
         break;
       }
       case 'alarm_hotspots': {
-        $orders = load_orders_store();
-        $master = load_master_data_store();
-        $mes = load_mes_runtime_store();
+        $orders = $bundle['orders'];
+        $master = $bundle['master'];
+        $mes = $bundle['mes'];
         $snapshot = build_mes_snapshot($orders, $master, $mes);
         foreach ((array)($snapshot['alarm_hotspot_queue'] ?? []) as $row) {
           if (!is_array($row)) continue;
@@ -13817,9 +14009,9 @@ if ($username === '') {
         break;
       }
       case 'nc_download_mismatches': {
-        $orders = load_orders_store();
-        $master = load_master_data_store();
-        $mes = load_mes_runtime_store();
+        $orders = $bundle['orders'];
+        $master = $bundle['master'];
+        $mes = $bundle['mes'];
         $snapshot = build_mes_snapshot($orders, $master, $mes);
         foreach ((array)($snapshot['nc_download_mismatch_queue'] ?? []) as $row) {
           if (!is_array($row)) continue;
@@ -13842,9 +14034,9 @@ if ($username === '') {
         break;
       }
       case 'tool_offset_risk': {
-        $orders = load_orders_store();
-        $master = load_master_data_store();
-        $mes = load_mes_runtime_store();
+        $orders = $bundle['orders'];
+        $master = $bundle['master'];
+        $mes = $bundle['mes'];
         $snapshot = build_mes_snapshot($orders, $master, $mes);
         foreach ((array)($snapshot['tool_offset_queue'] ?? []) as $row) {
           if (!is_array($row)) continue;
@@ -13867,9 +14059,9 @@ if ($username === '') {
         break;
       }
       case 'shadow_sync_failures': {
-        $orders = load_orders_store();
-        $master = load_master_data_store();
-        $mes = load_mes_runtime_store();
+        $orders = $bundle['orders'];
+        $master = $bundle['master'];
+        $mes = $bundle['mes'];
         $snapshot = build_mes_snapshot($orders, $master, $mes);
         foreach ((array)($snapshot['shadow_sync_failures'] ?? []) as $row) {
           if (!is_array($row)) continue;
@@ -13889,9 +14081,9 @@ if ($username === '') {
         break;
       }
       case 'launch_blocker_hotspots': {
-        $orders = load_orders_store();
-        $master = load_master_data_store();
-        $mes = load_mes_runtime_store();
+        $orders = $bundle['orders'];
+        $master = $bundle['master'];
+        $mes = $bundle['mes'];
         $snapshot = build_mes_snapshot($orders, $master, $mes);
         foreach ((array)($snapshot['launch_blocker_queue'] ?? []) as $row) {
           $items[] = [
@@ -13910,8 +14102,8 @@ if ($username === '') {
         break;
       }
       case 'downtime_governance_gaps': {
-        $master = load_master_data_store();
-        $mes = load_mes_runtime_store();
+        $master = $bundle['master'];
+        $mes = $bundle['mes'];
         foreach (mes_downtime_governance_gap_rows($mes, $master) as $row) {
           $items[] = [
             'id' => (string)($row['downtime_id'] ?? ''),
@@ -13931,7 +14123,7 @@ if ($username === '') {
         break;
       }
       case 'orphan_links': {
-        $orders = load_orders_store();
+        $orders = $bundle['orders'];
         foreach ((array)($orders['form_links'] ?? []) as $link) {
           if (!is_array($link)) continue;
           $ot = (string)($link['order_type'] ?? '');
@@ -13947,6 +14139,23 @@ if ($username === '') {
               'detail'     => "Liên kết mồ côi: {$ot}/{$oid} -> " . (string)($link['form_code'] ?? ''),
             ];
           }
+        }
+        break;
+      }
+      case 'primary_read_fallbacks': {
+        $orders = $bundle['orders'];
+        $master = $bundle['master'];
+        $mes = $bundle['mes'];
+        $snapshot = build_mes_snapshot($orders, $master, $mes);
+        foreach ((array)($snapshot['primary_read_queue'] ?? []) as $row) {
+          $items[] = [
+            'id'         => (string)($row['store_key'] ?? ''),
+            'type'       => 'runtime_read_model',
+            'department' => 'IT / Digital',
+            'date'       => substr((string)($row['read_at'] ?? ''), 0, 10),
+            'responsible'=> (string)($row['runtime_mode'] ?? ''),
+            'detail'     => (string)($row['source'] ?? '') . ' / ' . (string)($row['error'] ?? ''),
+          ];
         }
         break;
       }

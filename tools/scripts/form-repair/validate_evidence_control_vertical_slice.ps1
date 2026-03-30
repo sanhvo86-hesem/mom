@@ -167,6 +167,8 @@ Invoke-Step "Governance services wired into api.php" {
     'master_data_service()',
     'order_workflow_service()',
     'runtime_data_layer()',
+    'runtime_read_model_bundle(',
+    'observe_primary_read(',
     'shadow_sync_master_data_store(',
     'shadow_sync_orders_store(',
     'shadow_sync_mes_runtime_store('
@@ -180,6 +182,10 @@ Invoke-Step "Governance services wired into api.php" {
 Invoke-Step "Runtime shadow sync surface exists" {
   $dataLayerText = Get-Content -LiteralPath $dataLayerFile -Raw
   foreach ($token in @(
+    'getRuntimeMasterDataStore',
+    'getRuntimeOrdersStore',
+    'getRuntimeMesRuntimeStore',
+    'getLastReadMeta',
     'syncMasterDataStore',
     'syncOrdersStore',
     'syncMesRuntimeStore',
