@@ -1,7 +1,7 @@
 {
     "_meta": {
         "version": "1.0",
-        "updated": "2026-03-30T06:17:10+00:00",
+        "updated": "2026-03-30T06:20:12+00:00",
         "description": "Structured observability for runtime shadow sync, connector ingest, and MES governance telemetry."
     },
     "shadow_sync": {
@@ -77,17 +77,41 @@
     "primary_reads": {
         "master_data": {
             "last_source": "json",
-            "last_read_at": "2026-03-30T13:17:10+07:00",
+            "last_read_at": "2026-03-30T13:20:12+07:00",
             "last_error": "",
             "last_mode": "JSON_ONLY",
             "postgres_count": 0,
-            "json_count": 133,
+            "json_count": 135,
             "fallback_count": 0,
             "last_context": {
                 "item_count": 56,
-                "scope": "mes_bundle"
+                "scope": "runtime_bundle"
             },
             "recent": [
+                {
+                    "store_key": "master_data",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-30T13:20:12+07:00",
+                    "context": {
+                        "item_count": 56,
+                        "scope": "runtime_bundle"
+                    }
+                },
+                {
+                    "store_key": "master_data",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-30T13:20:12+07:00",
+                    "context": {
+                        "item_count": 56,
+                        "scope": "runtime_bundle"
+                    }
+                },
                 {
                     "store_key": "master_data",
                     "source": "json",
@@ -239,30 +263,6 @@
                     "error": "",
                     "mode": "JSON_ONLY",
                     "timestamp": "2026-03-30T13:16:04+07:00",
-                    "context": {
-                        "item_count": 56,
-                        "scope": "runtime_bundle"
-                    }
-                },
-                {
-                    "store_key": "master_data",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-30T13:15:48+07:00",
-                    "context": {
-                        "item_count": 56,
-                        "scope": "runtime_bundle"
-                    }
-                },
-                {
-                    "store_key": "master_data",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-30T13:15:48+07:00",
                     "context": {
                         "item_count": 56,
                         "scope": "runtime_bundle"
@@ -272,17 +272,41 @@
         },
         "orders": {
             "last_source": "json",
-            "last_read_at": "2026-03-30T13:17:10+07:00",
+            "last_read_at": "2026-03-30T13:20:12+07:00",
             "last_error": "",
             "last_mode": "JSON_ONLY",
             "postgres_count": 0,
-            "json_count": 133,
+            "json_count": 135,
             "fallback_count": 0,
             "last_context": {
                 "item_count": 8,
-                "scope": "mes_bundle"
+                "scope": "runtime_bundle"
             },
             "recent": [
+                {
+                    "store_key": "orders",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-30T13:20:12+07:00",
+                    "context": {
+                        "item_count": 8,
+                        "scope": "runtime_bundle"
+                    }
+                },
+                {
+                    "store_key": "orders",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-30T13:20:12+07:00",
+                    "context": {
+                        "item_count": 8,
+                        "scope": "runtime_bundle"
+                    }
+                },
                 {
                     "store_key": "orders",
                     "source": "json",
@@ -434,30 +458,6 @@
                     "error": "",
                     "mode": "JSON_ONLY",
                     "timestamp": "2026-03-30T13:16:04+07:00",
-                    "context": {
-                        "item_count": 8,
-                        "scope": "runtime_bundle"
-                    }
-                },
-                {
-                    "store_key": "orders",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-30T13:15:48+07:00",
-                    "context": {
-                        "item_count": 8,
-                        "scope": "runtime_bundle"
-                    }
-                },
-                {
-                    "store_key": "orders",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-30T13:15:48+07:00",
                     "context": {
                         "item_count": 8,
                         "scope": "runtime_bundle"
