@@ -1,13 +1,13 @@
 {
   "name": "HESEM QMS Portal",
   "short_name": "QMS",
-  "description": "Quality Management System for CNC Precision Machining — ISO 9001 controlled documents, forms, NCR tracking, and shop floor operations.",
+  "description": "Hệ thống Quản lý Chất lượng HESEM cho tài liệu có kiểm soát, biểu mẫu, NCR, CAPA và vận hành hiện trường.",
   "start_url": "/01-QMS-Portal/portal.html",
   "scope": "/01-QMS-Portal/",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#1a1a2e",
-  "theme_color": "#e94560",
+  "background_color": "#0b1f34",
+  "theme_color": "#0c2d48",
   "lang": "vi",
   "dir": "ltr",
   "id": "hesem-qms-portal",
@@ -67,8 +67,8 @@
   "shortcuts": [
     {
       "name": "Tài liệu kiểm soát",
-      "short_name": "Documents",
-      "description": "Truy cập tài liệu SOP, WI, và Annex",
+      "short_name": "Tài liệu",
+      "description": "Truy cập SOP, WI, ANNEX và tài liệu đang hiệu lực",
       "url": "/01-QMS-Portal/portal.html?page=documents",
       "icons": [
         {
@@ -79,9 +79,9 @@
       ]
     },
     {
-      "name": "Bieu mau / Forms",
-      "short_name": "Forms",
-      "description": "Mo bieu mau truc tuyen va nop du lieu",
+      "name": "Biểu mẫu trực tuyến",
+      "short_name": "Biểu mẫu",
+      "description": "Mở biểu mẫu, cấp mã hồ sơ và nộp dữ liệu có kiểm soát",
       "url": "/01-QMS-Portal/portal.html?page=forms",
       "icons": [
         {
@@ -93,8 +93,8 @@
     },
     {
       "name": "NCR / CAPA",
-      "short_name": "NCR",
-      "description": "Bao cao NCR va theo doi CAPA",
+      "short_name": "NCR/CAPA",
+      "description": "Báo cáo NCR và theo dõi CAPA trong cùng phân hệ",
       "url": "/01-QMS-Portal/portal.html?page=ncr",
       "icons": [
         {
@@ -105,9 +105,9 @@
       ]
     },
     {
-      "name": "Dashboard",
-      "short_name": "Dashboard",
-      "description": "KPI va bao cao tong hop",
+      "name": "Bảng điều hành",
+      "short_name": "Điều hành",
+      "description": "KPI, cảnh báo và báo cáo tổng hợp",
       "url": "/01-QMS-Portal/portal.html?page=dashboard",
       "icons": [
         {
@@ -125,14 +125,14 @@
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "HESEM QMS Portal - Desktop View"
+      "label": "HESEM QMS Portal - Giao diện máy tính"
     },
     {
       "src": "assets/icons/screenshot-narrow.png",
       "sizes": "375x812",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "HESEM QMS Portal - Mobile View"
+      "label": "HESEM QMS Portal - Giao diện di động"
     }
   ],
 

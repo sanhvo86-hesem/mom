@@ -98,8 +98,7 @@ var AllocationTracker = {
       record_type: recordType,
       department:  department
     }, options || {});
-    return this._apiCall('allocation_allocate', payload, 'POST')
-      .catch(function(){ return AllocationTracker._apiCall('record_id_generate', payload, 'POST'); })
+    return this._callWithLegacyFallback('allocation_allocate', 'record_id_generate', payload, 'POST')
       .then(this._normalizeAllocationResponse.bind(this))
       .then(function(resp){
         if(resp.ok) AllocationTracker._emit('allocated', resp);
@@ -110,22 +109,25 @@ var AllocationTracker = {
   /* ================================================================
      getHistory -- retrieve paginated allocation history
      POST api.php?action=allocation_history
-     Body: {type, department, status, search, page, page_size, date_from, date_to}
-     Returns: {ok, allocations:[], total, page, pages}
+     Body: {record_type, form_code, department, delivery_mode, status, search, page, page_size, date_from, date_to}
+     Returns: {ok, entries:[], allocations:[], total, page, total_pages}
      ================================================================ */
   getHistory: function(filters){
     var payload = {};
     var f = filters || {};
-    if(f.type)        payload.type        = f.type;
-    if(f.department)  payload.department  = f.department;
-    if(f.status)      payload.status      = f.status;
-    if(f.search)      payload.search      = f.search;
-    if(f.page)        payload.page        = f.page;
-    if(f.page_size)   payload.page_size   = f.page_size;
-    if(f.date_from)   payload.date_from   = f.date_from;
-    if(f.date_to)     payload.date_to     = f.date_to;
-    return this._apiCall('allocation_history', payload, 'POST')
-      .catch(function(){ return AllocationTracker._apiCall('record_id_history', payload, 'POST'); });
+    if(f.type && !f.record_type) payload.record_type = f.type;
+    if(f.record_type)            payload.record_type = f.record_type;
+    if(f.form_code)              payload.form_code   = f.form_code;
+    if(f.department)             payload.department  = f.department;
+    if(f.delivery_mode)          payload.delivery_mode = f.delivery_mode;
+    if(f.status)                 payload.status      = f.status;
+    if(f.search)                 payload.search      = f.search;
+    if(f.page)                   payload.page        = f.page;
+    if(f.page_size)              payload.page_size   = f.page_size;
+    if(f.date_from)              payload.date_from   = f.date_from;
+    if(f.date_to)                payload.date_to     = f.date_to;
+    return this._callWithLegacyFallback('allocation_history', 'record_id_history', payload, 'POST')
+      .then(this._normalizeHistoryResponse.bind(this));
   },
 
   /* ================================================================
@@ -138,11 +140,10 @@ var AllocationTracker = {
     if(!allocationId) return Promise.reject(new Error('allocation_id bắt buộc'));
     if(!reason || !reason.trim()) return Promise.reject(new Error('Lý do hủy không được để trống'));
     var self = this;
-    return this._apiCall('allocation_void', {
+    return this._callWithLegacyFallback('allocation_void', 'record_id_void', {
       allocation_id: allocationId,
       reason:        reason.trim()
     }, 'POST')
-      .catch(function(){ return AllocationTracker._apiCall('record_id_void', { allocation_id: allocationId, reason: reason.trim() }, 'POST'); })
       .then(function(resp){
         var normalized = self._normalizeAllocationResponse(resp);
         if(normalized.ok) self._emit('void', normalized);
@@ -161,8 +162,7 @@ var AllocationTracker = {
     var fd = new FormData();
     fd.append('file', file);
     if(allocationId) fd.append('allocation_id', allocationId);
-    return this._apiFormData('upload_inspect', fd)
-      .catch(function(){ return AllocationTracker._apiFormData('upload_read_hidden_sheet', fd); });
+    return this._formDataWithLegacyFallback('upload_inspect', 'upload_read_hidden_sheet', fd);
   },
 
   /* ================================================================
@@ -178,8 +178,7 @@ var AllocationTracker = {
     var fd = new FormData();
     fd.append('allocation_id', allocationId);
     fd.append('file', file);
-    return this._apiFormData('upload_receive', fd)
-      .catch(function(){ return AllocationTracker._apiFormData('upload_submit', fd); })
+    return this._formDataWithLegacyFallback('upload_receive', 'upload_submit', fd)
       .then(function(resp){
         var normalized = self._normalizeAllocationResponse(resp);
         if(normalized.ok) self._emit('received', normalized);
@@ -231,6 +230,35 @@ var AllocationTracker = {
      ================================================================ */
   checkDuplicate: function(recordId){
     return this._apiCall('record_id_check_duplicate', { record_id: recordId }, 'POST');
+  },
+
+  describeError: function(resp, context){
+    var code = String(resp && resp.error || '').trim().toLowerCase();
+    var detail = String(resp && (resp.message || resp.hint || resp.current_status || '') || '').trim();
+    var contextLabel = context === 'upload'
+      ? _t('tệp biểu mẫu', 'the workbook')
+      : context === 'history'
+        ? _t('lịch sử cấp mã', 'allocation history')
+        : _t('mã hồ sơ', 'the record ID');
+    var map = {
+      unauthorized: _t('Phiên đăng nhập không còn hợp lệ. Vui lòng đăng nhập lại rồi thử lại.', 'Your login session is no longer valid. Please sign in again.'),
+      session_expired: _t('Phiên đăng nhập đã hết hạn do không hoạt động. Vui lòng đăng nhập lại.', 'Your session expired due to inactivity. Please sign in again.'),
+      csrf_failed: _t('Mã xác thực thao tác đã thay đổi. Hệ thống đã thử đồng bộ lại phiên; vui lòng bấm lại lần nữa.', 'The action token changed. The session was refreshed; please try once more.'),
+      mfa_required: _t('Tài khoản này cần hoàn tất xác thực 2 lớp trước khi thao tác.', 'This account must complete MFA before continuing.'),
+      missing_record_type_or_department: _t('Thiếu loại hồ sơ hoặc phòng ban để cấp mã.', 'Record type or department is missing.'),
+      write_failed: _t('Máy chủ không ghi được dữ liệu cấp mã. Cần kiểm tra quyền ghi thư mục dữ liệu.', 'The server could not write the allocation data. Check data-directory permissions.'),
+      system_not_initialized: _t('Kho dữ liệu QMS chưa sẵn sàng trên máy chủ.', 'The QMS data store is not initialized on the server.'),
+      allocation_not_found: _t('Không tìm thấy mã cấp phát tương ứng trên máy chủ.', 'The allocation could not be found on the server.'),
+      blank_form_not_found: _t('Không tìm thấy biểu mẫu gốc để phát hành.', 'The blank form template could not be found.'),
+      blank_form_missing_on_disk: _t('Biểu mẫu gốc chưa có trên ổ đĩa máy chủ.', 'The blank form template is missing on disk.'),
+      form_not_offline: _t('Biểu mẫu này không thuộc luồng ngoại tuyến.', 'This form is not configured for the offline flow.'),
+      unknown_action: _t('Máy chủ chưa bật action frontend đang gọi. Hệ thống sẽ dùng đường dẫn tương thích cũ nếu có.', 'The server route is not available. The client will use the legacy-compatible route when possible.')
+    };
+    return {
+      code: code,
+      message: map[code] || (_t('Không thể xử lý yêu cầu cho ', 'Could not complete the request for ') + contextLabel + '.'),
+      detail: detail
+    };
   },
 
   /* ================================================================
@@ -304,13 +332,13 @@ var AllocationTracker = {
       var createdBy = entry.created_by || entry.allocated_by || '';
 
       html += '<tr class="at-row" data-allocation-id="' + _escHtml(allocId) + '">' +
-        '<td><code class="at-record-id">' + _escHtml(recId) + '</code></td>' +
-        '<td><span class="at-type-badge">' + _escHtml(entry.record_type || '') + '</span></td>' +
-        '<td>' + _escHtml(entry.department || '') + '</td>' +
-        '<td>' + self.renderStatusBadge(status) + '</td>' +
-        '<td>' + _escHtml(createdBy) + '</td>' +
-        '<td>' + _escHtml(self._formatDate(entry.created_at || '')) + '</td>' +
-        '<td>' + _escHtml(ctxBits.join(' \u00B7 ') || '\u2014') + '</td>' +
+        '<td data-sort-value="' + _escHtml(recId) + '"><code class="at-record-id">' + _escHtml(recId) + '</code></td>' +
+        '<td data-sort-value="' + _escHtml(entry.record_type || '') + '"><span class="at-type-badge">' + _escHtml(entry.record_type || '') + '</span></td>' +
+        '<td data-sort-value="' + _escHtml(entry.department || '') + '">' + _escHtml(entry.department || '') + '</td>' +
+        '<td data-sort-value="' + _escHtml(status) + '">' + self.renderStatusBadge(status) + '</td>' +
+        '<td data-sort-value="' + _escHtml(createdBy) + '">' + _escHtml(createdBy) + '</td>' +
+        '<td data-sort-value="' + _escHtml(entry.created_at || '') + '">' + _escHtml(self._formatDate(entry.created_at || '')) + '</td>' +
+        '<td data-sort-value="' + _escHtml(ctxBits.join(' \u00B7 ') || '\u2014') + '">' + _escHtml(ctxBits.join(' \u00B7 ') || '\u2014') + '</td>' +
         '<td class="at-cell-actions">' +
           '<button type="button" class="at-copy-btn" data-copy="' + _escHtml(recId) + '" title="' + _escHtml(_t('Sao ch\u00E9p m\u00E3', 'Copy ID')) + '">\u29C9</button>' +
           '<button type="button" class="at-action-btn at-btn-download" data-action="download_txt" data-record-id="' + _escHtml(recId) + '" title="' + _escHtml(_t('T\u1EA3i .txt', 'Download .txt')) + '">\u2913</button>' +
@@ -427,7 +455,20 @@ var AllocationTracker = {
 
   /* ── private: API transport ────────────────────────────────────── */
 
-  _apiCall: function(action, payload, method){
+  _apiCall: function(action, payload, method, runtime){
+    var self = this;
+    return this._rawApiCall(action, payload, method).then(function(resp){
+      if(self._isAuthRecoveryCandidate(resp) && !(runtime && runtime.authRefreshed)){
+        return self._refreshAuthStatus().then(function(refreshed){
+          if(refreshed) return self._apiCall(action, payload, method, { authRefreshed:true });
+          return resp;
+        });
+      }
+      return resp;
+    });
+  },
+
+  _rawApiCall: function(action, payload, method){
     if(typeof apiCall === 'function') return apiCall(action, payload || {}, method || 'POST');
     var opts = {
       method:      method || 'POST',
@@ -442,13 +483,89 @@ var AllocationTracker = {
     });
   },
 
-  _apiFormData: function(action, formData){
+  _apiFormData: function(action, formData, runtime){
+    var self = this;
+    return this._rawApiFormData(action, formData).then(function(resp){
+      if(self._isAuthRecoveryCandidate(resp) && !(runtime && runtime.authRefreshed)){
+        return self._refreshAuthStatus().then(function(refreshed){
+          if(refreshed) return self._apiFormData(action, formData, { authRefreshed:true });
+          return resp;
+        });
+      }
+      return resp;
+    });
+  },
+
+  _rawApiFormData: function(action, formData){
     if(typeof apiCallFormData === 'function') return apiCallFormData(action, formData);
     var opts = { method:'POST', credentials:'include', body:formData, headers:{} };
     if(typeof csrfToken !== 'undefined' && csrfToken) opts.headers['X-CSRF-Token'] = csrfToken;
     return fetch('api.php?action=' + encodeURIComponent(action), opts).then(function(r){
       if(!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();
+    });
+  },
+
+  _callWithLegacyFallback: function(primaryAction, fallbackAction, payload, method){
+    return this._apiCall(primaryAction, payload, method).then(function(resp){
+      if(AllocationTracker._isLegacyFallbackResponse(resp)) return AllocationTracker._apiCall(fallbackAction, payload, method);
+      return resp;
+    }).catch(function(err){
+      if(AllocationTracker._isLegacyFallbackError(err)) return AllocationTracker._apiCall(fallbackAction, payload, method);
+      throw err;
+    });
+  },
+
+  _formDataWithLegacyFallback: function(primaryAction, fallbackAction, formData){
+    return this._apiFormData(primaryAction, formData).then(function(resp){
+      if(AllocationTracker._isLegacyFallbackResponse(resp)) return AllocationTracker._apiFormData(fallbackAction, formData);
+      return resp;
+    }).catch(function(err){
+      if(AllocationTracker._isLegacyFallbackError(err)) return AllocationTracker._apiFormData(fallbackAction, formData);
+      throw err;
+    });
+  },
+
+  _isLegacyFallbackResponse: function(resp){
+    var code = String(resp && resp.error || '').trim().toLowerCase();
+    return !!resp && resp.ok === false && (
+      code === 'unknown_action' ||
+      code === 'method_not_allowed' ||
+      code === 'unsupported_action'
+    );
+  },
+
+  _isLegacyFallbackError: function(err){
+    var msg = String(err && err.message || '');
+    return /^HTTP (400|404|405)$/.test(msg);
+  },
+
+  _isAuthRecoveryCandidate: function(resp){
+    var code = String(resp && resp.error || '').trim().toLowerCase();
+    return !!resp && resp.ok === false && (
+      code === 'csrf_failed' ||
+      code === 'unauthorized' ||
+      code === 'session_expired'
+    );
+  },
+
+  _refreshAuthStatus: function(){
+    var runner;
+    if(typeof apiCall === 'function'){
+      runner = apiCall('status', null, 'GET', 8000);
+    } else {
+      runner = fetch('api.php?action=status', { method:'GET', credentials:'include' }).then(function(r){
+        if(!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      });
+    }
+    return runner.then(function(status){
+      if(!status || status.logged_in !== true) return false;
+      if(typeof csrfToken !== 'undefined' && status.csrf_token) csrfToken = status.csrf_token;
+      if(typeof currentUser !== 'undefined' && status.user) currentUser = status.user;
+      return true;
+    }).catch(function(){
+      return false;
     });
   },
 
@@ -461,6 +578,27 @@ var AllocationTracker = {
     if(resp.allocation && !resp.status)         resp.status         = resp.allocation.status;
     if(resp.status)                             resp.status         = this._normalizeStatus(resp.status);
     if(resp.allocation && resp.allocation.status) resp.allocation.status = this._normalizeStatus(resp.allocation.status);
+    return resp;
+  },
+
+  _normalizeHistoryResponse: function(resp){
+    if(!resp) return { ok:false, error:'empty_response', entries:[], allocations:[] };
+    var rows = Array.isArray(resp.entries)
+      ? resp.entries.slice()
+      : Array.isArray(resp.allocations)
+        ? resp.allocations.slice()
+        : [];
+    rows = rows.map(function(row){
+      if(!row || typeof row !== 'object') return row;
+      var copy = Object.assign({}, row);
+      copy.status = AllocationTracker._normalizeStatus(copy.status);
+      return copy;
+    });
+    resp.entries = rows;
+    resp.allocations = rows;
+    if(resp.total_pages == null && resp.pages != null) resp.total_pages = resp.pages;
+    if(resp.pages == null && resp.total_pages != null) resp.pages = resp.total_pages;
+    if(resp.page_size == null && resp.per_page != null) resp.page_size = resp.per_page;
     return resp;
   },
 
@@ -558,16 +696,39 @@ var AllocationTracker = {
       var rowArr = Array.prototype.slice.call(tbody.querySelectorAll('tr.at-row'));
       var colIndex = Array.prototype.indexOf.call(th.parentNode.children, th);
 
-      rowArr.sort(function(a, b){
-        var aText = (a.children[colIndex] ? a.children[colIndex].textContent : '').trim().toLowerCase();
-        var bText = (b.children[colIndex] ? b.children[colIndex].textContent : '').trim().toLowerCase();
-        if(aText < bText) return sortState.asc ? -1 : 1;
-        if(aText > bText) return sortState.asc ? 1 : -1;
-        return 0;
+      requestAnimationFrame(function(){
+        rowArr.sort(function(a, b){
+          var aCell = a.children[colIndex] || null;
+          var bCell = b.children[colIndex] || null;
+          var aValue = AllocationTracker._sortValueFromCell(aCell);
+          var bValue = AllocationTracker._sortValueFromCell(bCell);
+          return AllocationTracker._compareSortValues(aValue, bValue, sortState.asc);
+        });
+        rowArr.forEach(function(row){ tbody.appendChild(row); });
       });
-
-      rowArr.forEach(function(row){ tbody.appendChild(row); });
     });
+  },
+
+  _sortValueFromCell: function(cell){
+    if(!cell) return '';
+    var raw = String(cell.getAttribute('data-sort-value') || cell.textContent || '').trim();
+    if(!raw) return '';
+    var stamp = Date.parse(raw);
+    if(!isNaN(stamp)) return { kind:'date', value:stamp };
+    if(/^-?\d+(?:\.\d+)?$/.test(raw)) return { kind:'number', value:Number(raw) };
+    return { kind:'text', value:raw.toLowerCase() };
+  },
+
+  _compareSortValues: function(aValue, bValue, asc){
+    var left = aValue || { kind:'text', value:'' };
+    var right = bValue || { kind:'text', value:'' };
+    if(left.kind === right.kind && left.value < right.value) return asc ? -1 : 1;
+    if(left.kind === right.kind && left.value > right.value) return asc ? 1 : -1;
+    var leftText = String(left.value || '');
+    var rightText = String(right.value || '');
+    if(leftText < rightText) return asc ? -1 : 1;
+    if(leftText > rightText) return asc ? 1 : -1;
+    return 0;
   },
 
   /* ── private: void confirmation dialog ─────────────────────────── */
@@ -646,11 +807,16 @@ var AllocationTracker = {
     if(!value) return '';
     var d = new Date(value);
     if(isNaN(d.getTime())) return String(value);
-    return String(d.getDate()).padStart(2, '0') + '/' +
-           String(d.getMonth() + 1).padStart(2, '0') + '/' +
-           d.getFullYear() + ' ' +
-           String(d.getHours()).padStart(2, '0') + ':' +
-           String(d.getMinutes()).padStart(2, '0');
+    try {
+      var locale = (typeof lang !== 'undefined' && lang === 'en') ? 'en-US' : 'vi-VN';
+      return new Intl.DateTimeFormat(locale, { dateStyle:'medium', timeStyle:'short' }).format(d);
+    } catch(_err){
+      return String(d.getDate()).padStart(2, '0') + '/' +
+             String(d.getMonth() + 1).padStart(2, '0') + '/' +
+             d.getFullYear() + ' ' +
+             String(d.getHours()).padStart(2, '0') + ':' +
+             String(d.getMinutes()).padStart(2, '0');
+    }
   },
 
   /* ── private: clipboard fallback ───────────────────────────────── */

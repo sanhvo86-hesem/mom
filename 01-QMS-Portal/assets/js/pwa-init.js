@@ -23,6 +23,7 @@
   // ── Configuration ───────────────────────────────────────────────────────
 
   const SW_PATH      = '/01-QMS-Portal/sw.js';
+  const SW_VERSION   = '1.2.0';
   const SW_SCOPE     = '/01-QMS-Portal/';
   const UPDATE_CHECK_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
 
@@ -51,8 +52,12 @@
     }
 
     try {
-      swRegistration = await navigator.serviceWorker.register(SW_PATH, { scope: SW_SCOPE });
+      swRegistration = await navigator.serviceWorker.register(`${SW_PATH}?v=${encodeURIComponent(SW_VERSION)}`, { scope: SW_SCOPE });
       console.log('[PWA] Service worker registered, scope:', swRegistration.scope);
+
+      if (swRegistration.waiting) {
+        showUpdateNotification();
+      }
 
       // Listen for update events.
       swRegistration.addEventListener('updatefound', () => {
@@ -82,6 +87,10 @@
       // Handle controller change (new SW took over).
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         console.log('[PWA] Controller changed, new service worker active');
+      });
+
+      swRegistration.update().catch((err) => {
+        console.warn('[PWA] Initial update check failed:', err);
       });
 
     } catch (err) {
@@ -159,9 +168,9 @@
     banner.id = 'qms-update-banner';
     banner.setAttribute('role', 'alert');
     banner.innerHTML = `
-      <span>Phien ban moi da san sang.</span>
-      <button id="qms-update-btn">Cap nhat ngay</button>
-      <button id="qms-update-dismiss" aria-label="Dong">&times;</button>
+      <span>Phiên bản mới đã sẵn sàng.</span>
+      <button id="qms-update-btn">Cập nhật ngay</button>
+      <button id="qms-update-dismiss" aria-label="Đóng">&times;</button>
     `;
 
     // Inline styles to avoid dependency on mobile.css being loaded.
@@ -193,6 +202,7 @@
 
   function showInstallBanner() {
     if (isInstalled) return;
+    if (sessionStorage.getItem('qms_install_dismissed') === '1') return;
 
     const existing = document.getElementById('qms-install-banner');
     if (existing) return; // Already shown.
@@ -201,9 +211,9 @@
     banner.id = 'qms-install-banner';
     banner.innerHTML = `
       <div class="qms-install-inner">
-        <span>Cai dat HESEM QMS de truy cap nhanh hon va dung offline.</span>
-        <button id="qms-install-btn">Cai dat</button>
-        <button id="qms-install-dismiss" aria-label="Dong">&times;</button>
+        <span>Cài đặt HESEM QMS để truy cập nhanh hơn và dùng offline.</span>
+        <button id="qms-install-btn">Cài đặt</button>
+        <button id="qms-install-dismiss" aria-label="Đóng">&times;</button>
       </div>
     `;
     banner.style.cssText = `
@@ -319,7 +329,7 @@
     bar.id = 'qms-offline-bar';
     bar.setAttribute('role', 'alert');
     bar.setAttribute('aria-live', 'assertive');
-    bar.textContent = 'Ban dang offline. Du lieu da luu van co the truy cap.';
+    bar.textContent = 'Bạn đang offline. Dữ liệu đã lưu vẫn có thể truy cập.';
     bar.style.cssText = `
       position:fixed;top:0;left:0;right:0;z-index:9999;
       padding:8px 16px;text-align:center;

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>HESEM QMS Portal — Hệ thống Quản lý Quality</title>
+<title>HESEM QMS Portal — Hệ thống Quản lý Chất lượng</title>
 <link rel="stylesheet" href="../assets/style_scoped.css">
 <link rel="stylesheet" href="./styles/portal.main.css">
 <link rel="stylesheet" href="./styles/deploy-dashboard.css">
@@ -14,7 +14,12 @@
 <link rel="stylesheet" href="./styles/FORM-DESIGN-SYSTEM-SPEC.css">
 <link rel="stylesheet" href="./assets/css/mobile.css">
 <link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="./assets/hesem-logo.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/icon-192x192.png">
+<link rel="shortcut icon" href="./favicon.ico">
+<link rel="apple-touch-icon" href="./assets/icons/icon-192x192.png">
 <meta name="theme-color" content="#0c2d48">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
@@ -77,6 +82,7 @@
  </div>
  <h2>Đăng nhập</h2>
  <p class="subtitle">Nhập tài khoản để truy cập hệ thống tài liệu</p>
+ <form id="login-form" onsubmit="event.preventDefault(); doLogin();">
  <label for="inp-user">Tài khoản</label>
  <input type="text" id="inp-user" placeholder="vd: binh.tran" autocomplete="off">
  <label for="inp-pin">Mật khẩu</label>
@@ -112,7 +118,8 @@
  <input type="text" id="inp-recovery" placeholder="ABCDE-FGHIJ" autocomplete="off">
  </div>
  </div>
- <button class="btn-login" id="btn-login" onclick="doLogin()">Đăng nhập</button>
+ <button class="btn-login" id="btn-login" type="submit">Đăng nhập</button>
+ </form>
  <div class="demo-section" style="display:none">
  <h4>CHỌN NHANH TÀI KHOẢN DEMO</h4>
  <div class="demo-grid" id="demo-grid"></div>

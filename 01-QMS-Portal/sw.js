@@ -21,7 +21,7 @@
 
 // ── Cache Configuration ─────────────────────────────────────────────────────
 
-const CACHE_VERSION = 'v1.0.0';
+const CACHE_VERSION = 'v1.2.0';
 const CACHE_PREFIX  = 'hesem-qms';
 
 /** Named caches with version stamps. */
@@ -157,6 +157,8 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(cacheFirst(request, CACHES.fonts));
   } else if (isImageRequest(url)) {
     event.respondWith(cacheFirst(request, CACHES.images));
+  } else if (isAppShellRequest(url)) {
+    event.respondWith(networkFirst(request, CACHES.static));
   } else {
     event.respondWith(cacheFirst(request, CACHES.static));
   }
@@ -206,6 +208,16 @@ function isFontRequest(url) {
  */
 function isImageRequest(url) {
   return /\.(png|jpe?g|gif|svg|webp|ico|avif)(\?.*)?$/i.test(url.pathname);
+}
+
+function isAppShellRequest(url) {
+  return /\.(?:html|css|js)(\?.*)?$/i.test(url.pathname) ||
+         url.pathname.endsWith('/manifest.json') ||
+         url.pathname.endsWith('/favicon.ico') ||
+         url.pathname.endsWith('/portal.html') ||
+         url.pathname.includes('/scripts/portal/') ||
+         url.pathname.includes('/assets/js/') ||
+         url.pathname.includes('/styles/');
 }
 
 
@@ -312,7 +324,7 @@ function offlineFallback(request) {
       JSON.stringify({
         success: false,
         error: 'offline',
-        error_vi: 'Khong co ket noi mang. Du lieu da duoc luu cuc bo de dong bo sau.',
+        error_vi: 'Không có kết nối mạng. Dữ liệu đã được lưu cục bộ để đồng bộ sau.',
         offline: true,
         timestamp: new Date().toISOString(),
       }),
@@ -329,7 +341,7 @@ function offlineFallback(request) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HESEM QMS - Offline</title>
+  <title>HESEM QMS - Mất kết nối</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:-apple-system,'Segoe UI',Tahoma,Arial,sans-serif;
@@ -349,11 +361,11 @@ function offlineFallback(request) {
 <body>
   <div class="offline-card">
     <div class="offline-icon">&#9888;&#65039;</div>
-    <h1>Khong co ket noi mang</h1>
-    <p>Ban dang o che do offline. Du lieu da luu van co the truy cap duoc.
-       Kiem tra lai ket noi Wi-Fi hoac mang va thu lai.</p>
-    <button class="btn-retry" onclick="window.location.reload()">Thu lai</button>
-    <div class="status">HESEM QMS Portal &mdash; Offline Mode</div>
+    <h1>Không có kết nối mạng</h1>
+    <p>Bạn đang ở chế độ offline. Dữ liệu đã lưu vẫn có thể truy cập được.
+       Kiểm tra lại kết nối Wi‑Fi hoặc mạng rồi thử lại.</p>
+    <button class="btn-retry" onclick="window.location.reload()">Thử lại</button>
+    <div class="status">HESEM QMS Portal &mdash; Chế độ ngoại tuyến</div>
   </div>
 </body>
 </html>`;
