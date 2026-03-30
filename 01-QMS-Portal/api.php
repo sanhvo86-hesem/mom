@@ -67,6 +67,7 @@ $DICT_JS_FILE   = $ROOT_DIR . '/11-Glossary/dict-data.js';
 @ini_set('error_log', $LOG_FILE);
 
 require_once __DIR__ . '/form_workflow.php';
+require_once __DIR__ . '/online_schema_workflow.php';
 
 // ---------- Hard fail safe handlers ----------
 register_shutdown_function(function () {
@@ -14851,6 +14852,241 @@ if ($username === '') {
     api_json(['ok' => true, 'schema' => $schema]);
   }
 
+  case 'form_schema_history': {
+    require_logged_in($store);
+    $code = trim((string)($_GET['form_code'] ?? $_GET['code'] ?? ''));
+    if ($code === '') api_json(['ok' => false, 'error' => 'missing_form_code'], 400);
+    if (!preg_match('/^[A-Za-z0-9._-]+$/', $code)) api_json(['ok' => false, 'error' => 'invalid_form_code'], 400);
+    try {
+      $boot = online_schema_bootstrap($DATA_DIR, $code);
+    } catch (RuntimeException $e) {
+      if ($e->getMessage() === 'schema_not_found') api_json(['ok' => false, 'error' => 'schema_not_found'], 404);
+      throw $e;
+    }
+    $state = is_array($boot['state'] ?? null) ? $boot['state'] : [];
+    $manifest = is_array($boot['manifest'] ?? null) ? $boot['manifest'] : ['versions' => []];
+    api_json([
+      'ok' => true,
+      'code' => strtoupper($code),
+      'state' => $state,
+      'versions' => online_schema_public_versions($manifest, $state),
+      'live_schema' => $boot['live_schema'] ?? null,
+      'draft_schema' => online_schema_load_working_draft_schema($DATA_DIR, $manifest),
+      'server_time' => now_iso(),
+    ]);
+  }
+
+  case 'form_schema_version': {
+    require_logged_in($store);
+    $code = trim((string)($_GET['form_code'] ?? $_GET['code'] ?? ''));
+    $versionId = trim((string)($_GET['version_id'] ?? $_GET['id'] ?? ''));
+    if ($code === '' || $versionId === '') api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
+    if (!preg_match('/^[A-Za-z0-9._-]+$/', $code)) api_json(['ok' => false, 'error' => 'invalid_form_code'], 400);
+    try {
+      $detail = online_schema_version_detail($DATA_DIR, $code, $versionId);
+    } catch (RuntimeException $e) {
+      $message = $e->getMessage();
+      if ($message === 'schema_not_found') api_json(['ok' => false, 'error' => 'schema_not_found'], 404);
+      if ($message === 'version_not_found') api_json(['ok' => false, 'error' => 'version_not_found'], 404);
+      throw $e;
+    }
+    api_json([
+      'ok' => true,
+      'code' => strtoupper($code),
+      'state' => $detail['state'] ?? [],
+      'version' => $detail['version'] ?? null,
+      'schema' => $detail['schema'] ?? null,
+      'live_schema' => $detail['live_schema'] ?? null,
+      'server_time' => now_iso(),
+    ]);
+  }
+
+  case 'form_schema_save_draft': {
+    if ($method !== 'POST') api_json(['ok' => false, 'error' => 'method_not_allowed'], 405);
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $role = migrate_role((string)($me['role'] ?? ''));
+    $allowedRoles = array_values(array_unique(array_merge(admin_roles(), ['quality_manager', 'qms_engineer', 'engineering_manager'])));
+    if (!in_array($role, $allowedRoles, true)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
+
+    $body = read_json_body();
+    $code = trim((string)($body['form_code'] ?? ''));
+    $schema = is_array($body['schema'] ?? null) ? $body['schema'] : null;
+    $changeNote = trim((string)($body['change_note'] ?? ''));
+    if ($code === '' || $schema === null) api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
+    if (!preg_match('/^[A-Za-z0-9._-]+$/', $code)) api_json(['ok' => false, 'error' => 'invalid_form_code'], 400);
+
+    $actorName = trim((string)($me['name'] ?? $me['username'] ?? $_SESSION['user'] ?? 'anonymous'));
+    $actorRole = trim((string)($me['role'] ?? '')) ?: 'Author';
+    try {
+      $result = online_schema_save_draft_working_copy($DATA_DIR, $code, $schema, $actorName, $changeNote, $actorRole);
+    } catch (RuntimeException $e) {
+      if ($e->getMessage() === 'schema_not_found') api_json(['ok' => false, 'error' => 'schema_not_found'], 404);
+      throw $e;
+    }
+    api_json([
+      'ok' => true,
+      'code' => strtoupper($code),
+      'state' => $result['state'] ?? [],
+      'versions' => $result['versions'] ?? [],
+      'draft_schema' => $result['draft_schema'] ?? null,
+      'live_schema' => $result['live_schema'] ?? null,
+      'server_time' => now_iso(),
+    ]);
+  }
+
+  case 'form_schema_submit_review': {
+    if ($method !== 'POST') api_json(['ok' => false, 'error' => 'method_not_allowed'], 405);
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $role = migrate_role((string)($me['role'] ?? ''));
+    $allowedRoles = array_values(array_unique(array_merge(admin_roles(), ['quality_manager', 'qms_engineer', 'engineering_manager'])));
+    if (!in_array($role, $allowedRoles, true)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
+
+    $body = read_json_body();
+    $code = trim((string)($body['form_code'] ?? ''));
+    $changeNote = trim((string)($body['change_note'] ?? ''));
+    $updateType = (string)($body['update_type'] ?? $body['updateType'] ?? 'minor');
+    if ($code === '') api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
+    if (!preg_match('/^[A-Za-z0-9._-]+$/', $code)) api_json(['ok' => false, 'error' => 'invalid_form_code'], 400);
+
+    $actorName = trim((string)($me['name'] ?? $me['username'] ?? $_SESSION['user'] ?? 'anonymous'));
+    $actorRole = trim((string)($me['role'] ?? '')) ?: 'Author';
+    try {
+      $result = online_schema_submit_review_working_copy($DATA_DIR, $code, $actorName, $changeNote, $updateType, $actorRole);
+    } catch (RuntimeException $e) {
+      $message = $e->getMessage();
+      if ($message === 'schema_not_found') api_json(['ok' => false, 'error' => 'schema_not_found'], 404);
+      if ($message === 'missing_draft_schema') api_json(['ok' => false, 'error' => 'missing_draft_schema'], 400);
+      throw $e;
+    }
+
+    api_json([
+      'ok' => true,
+      'code' => strtoupper($code),
+      'state' => $result['state'] ?? [],
+      'versions' => $result['versions'] ?? [],
+      'draft_schema' => $result['draft_schema'] ?? null,
+      'live_schema' => $result['live_schema'] ?? null,
+      'server_time' => now_iso(),
+    ]);
+  }
+
+  case 'form_schema_publish': {
+    if ($method !== 'POST') api_json(['ok' => false, 'error' => 'method_not_allowed'], 405);
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    require_doc_workflow_approver($me);
+
+    $body = read_json_body();
+    $code = trim((string)($body['form_code'] ?? ''));
+    $changeNote = trim((string)($body['change_note'] ?? ''));
+    $updateType = (string)($body['update_type'] ?? $body['updateType'] ?? 'major');
+    $revision = (string)($body['revision'] ?? '');
+    $effectiveDate = trim((string)($body['effective_date'] ?? ''));
+    if ($code === '') api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
+    if (!preg_match('/^[A-Za-z0-9._-]+$/', $code)) api_json(['ok' => false, 'error' => 'invalid_form_code'], 400);
+
+    $actorName = trim((string)($me['name'] ?? $me['username'] ?? $_SESSION['user'] ?? 'anonymous'));
+    $actorRole = trim((string)($me['role'] ?? '')) ?: 'Approver';
+    try {
+      $result = online_schema_publish_release($DATA_DIR, $code, $actorName, $changeNote, $updateType, $actorRole, $revision, $effectiveDate);
+    } catch (RuntimeException $e) {
+      $message = $e->getMessage();
+      if ($message === 'schema_not_found') api_json(['ok' => false, 'error' => 'schema_not_found'], 404);
+      if ($message === 'missing_review_schema') api_json(['ok' => false, 'error' => 'missing_review_schema'], 400);
+      if ($message === 'approve_revision_mismatch') api_json(['ok' => false, 'error' => 'approve_revision_mismatch'], 409);
+      throw $e;
+    }
+
+    api_json([
+      'ok' => true,
+      'code' => strtoupper($code),
+      'state' => $result['state'] ?? [],
+      'versions' => $result['versions'] ?? [],
+      'draft_schema' => $result['draft_schema'] ?? null,
+      'live_schema' => $result['live_schema'] ?? null,
+      'server_time' => now_iso(),
+    ]);
+  }
+
+  case 'form_schema_reject': {
+    if ($method !== 'POST') api_json(['ok' => false, 'error' => 'method_not_allowed'], 405);
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    require_doc_workflow_approver($me);
+
+    $body = read_json_body();
+    $code = trim((string)($body['form_code'] ?? ''));
+    $reason = trim((string)($body['reason'] ?? $body['change_note'] ?? ''));
+    if ($code === '') api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
+    if (!preg_match('/^[A-Za-z0-9._-]+$/', $code)) api_json(['ok' => false, 'error' => 'invalid_form_code'], 400);
+
+    $actorName = trim((string)($me['name'] ?? $me['username'] ?? $_SESSION['user'] ?? 'anonymous'));
+    $actorRole = trim((string)($me['role'] ?? '')) ?: 'Approver';
+    try {
+      $result = online_schema_reject_review($DATA_DIR, $code, $actorName, $reason, $actorRole);
+    } catch (RuntimeException $e) {
+      $message = $e->getMessage();
+      if ($message === 'schema_not_found') api_json(['ok' => false, 'error' => 'schema_not_found'], 404);
+      if ($message === 'nothing_to_reject') api_json(['ok' => false, 'error' => 'nothing_to_reject'], 400);
+      throw $e;
+    }
+
+    api_json([
+      'ok' => true,
+      'code' => strtoupper($code),
+      'state' => $result['state'] ?? [],
+      'versions' => $result['versions'] ?? [],
+      'draft_schema' => $result['draft_schema'] ?? null,
+      'live_schema' => $result['live_schema'] ?? null,
+      'server_time' => now_iso(),
+    ]);
+  }
+
+  case 'form_schema_rollback': {
+    if ($method !== 'POST') api_json(['ok' => false, 'error' => 'method_not_allowed'], 405);
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $role = migrate_role((string)($me['role'] ?? ''));
+    $allowedRoles = array_values(array_unique(array_merge(admin_roles(), ['quality_manager', 'qms_engineer', 'engineering_manager'])));
+    if (!in_array($role, $allowedRoles, true)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
+
+    $body = read_json_body();
+    $code = trim((string)($body['form_code'] ?? ''));
+    $versionId = trim((string)($body['version_id'] ?? $body['id'] ?? ''));
+    $revision = trim((string)($body['revision'] ?? ''));
+    $changeNote = trim((string)($body['change_note'] ?? ''));
+    if ($code === '' || ($versionId === '' && $revision === '')) api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
+    if (!preg_match('/^[A-Za-z0-9._-]+$/', $code)) api_json(['ok' => false, 'error' => 'invalid_form_code'], 400);
+
+    $actorName = trim((string)($me['name'] ?? $me['username'] ?? $_SESSION['user'] ?? 'anonymous'));
+    $actorRole = trim((string)($me['role'] ?? '')) ?: 'Author';
+    try {
+      $result = online_schema_rollback_to_draft($DATA_DIR, $code, $actorName, $versionId, $revision, $changeNote, $actorRole);
+    } catch (RuntimeException $e) {
+      $message = $e->getMessage();
+      if ($message === 'schema_not_found') api_json(['ok' => false, 'error' => 'schema_not_found'], 404);
+      if ($message === 'version_not_found') api_json(['ok' => false, 'error' => 'version_not_found'], 404);
+      throw $e;
+    }
+
+    api_json([
+      'ok' => true,
+      'code' => strtoupper($code),
+      'state' => $result['state'] ?? [],
+      'versions' => $result['versions'] ?? [],
+      'draft_schema' => $result['draft_schema'] ?? null,
+      'live_schema' => $result['live_schema'] ?? null,
+      'server_time' => now_iso(),
+    ]);
+  }
+
   case 'online_form_submit': {
     $input = json_decode(file_get_contents('php://input'), true);
     if (!$input || empty($input['form_code']) || empty($input['data'])) {
@@ -18141,7 +18377,7 @@ if ($username === '') {
 
     // Only managers can reopen
     $userRoles = is_array($me['roles'] ?? null) ? $me['roles'] : [(string)($me['role'] ?? '')];
-    $managerRoles = ['admin', 'qa_manager', 'quality_manager', 'production_manager', 'engineering_manager'];
+    $managerRoles = ['admin', 'qa_manager', 'quality_manager', 'production_manager', 'engineering_manager', 'production_director', 'engineering_lead', 'qms_engineer'];
     $isManager = false;
     foreach ($userRoles as $userRole) {
       if (in_array(strtolower(trim((string)$userRole)), $managerRoles, true)) {

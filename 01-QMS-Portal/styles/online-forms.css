@@ -2840,3 +2840,137 @@ textarea.ec-dialog-input {
 @media (max-width: 480px) {
   .ec-signatures { grid-template-columns: 1fr; }
 }
+
+.ec-print-disclaimer {
+  display: none;
+}
+
+@media print {
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+  .ec-shell,
+  .ec-workspace,
+  .ec-form-frame,
+  .ec-form-sheet,
+  .ec-step-body {
+    background: #fff !important;
+    box-shadow: none !important;
+  }
+  .ec-sidebar,
+  .ec-sidebar-toggle,
+  .ec-header,
+  .ec-step-head,
+  .ec-form-nav-wrap,
+  .ec-form-appendix,
+  .ec-approval,
+  .ec-history,
+  #ec-save-draft,
+  #ec-reset-form,
+  #ec-submit-online,
+  #ec-reload-record,
+  #ec-print-form {
+    display: none !important;
+  }
+  .ec-shell,
+  .ec-workspace,
+  .ec-step-body,
+  .ec-form-frame,
+  .ec-form-sheet {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    overflow: visible !important;
+  }
+  .ec-form-ribbon,
+  .ec-form-control-strip,
+  .ec-form-canvas {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .ec-form-canvas {
+    display: block !important;
+  }
+  .ec-form-main,
+  .ec-form-aside {
+    width: 100% !important;
+    max-width: none !important;
+  }
+  .ec-form-aside {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    padding: 18px 0 0 !important;
+  }
+  .ec-form-section,
+  .ec-form-aside-block,
+  .ec-form-footer,
+  .ec-sign,
+  .ec-form-sheet .form-header {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    box-shadow: none !important;
+  }
+  .ec-form-sheet .form-header,
+  .ec-form-ribbon,
+  .ec-form-section-head,
+  .ec-form-footer,
+  .ec-form-aside-block,
+  .ec-field-panel,
+  .ec-sign {
+    background: #fff !important;
+  }
+  .ec-form-sheet .form-header,
+  .ec-form-ribbon,
+  .ec-form-control-strip,
+  .ec-form-section,
+  .ec-form-aside-block,
+  .ec-field-panel,
+  .ec-sign,
+  .ec-form-footer {
+    border-color: #d7dee7 !important;
+  }
+  .ec-field-panel,
+  .ec-sign,
+  .ec-form-aside-block {
+    margin-bottom: 12px;
+  }
+  .ec-form-control-strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .ec-form-footer {
+    padding: 14px 0 0 !important;
+  }
+  .ec-print-disclaimer {
+    display: block;
+    margin-top: 10px;
+    font-size: 11px;
+    line-height: 1.7;
+    color: #475569;
+  }
+  .ec-input,
+  .ec-select,
+  .ec-textarea,
+  .ec-table-input,
+  .ec-table-textarea {
+    color: #0f172a !important;
+    background: #fff !important;
+    border-color: #cbd5e1 !important;
+  }
+  .ec-textarea,
+  .ec-table-textarea {
+    min-height: 96px;
+  }
+  a[href]::after {
+    content: none !important;
+  }
+}

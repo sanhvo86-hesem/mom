@@ -1633,6 +1633,65 @@ function renderOnlineStep(form, allocation){
 }
 
 /* ── Step 2: Offline form ── */
+function renderOnlineStep(form, allocation){
+  if(standaloneOnlinePath(form)) return renderStandaloneOnlineStep(form, allocation);
+  var schema = form.schema || ws.schema || {};
+  var readOnly = isRecordReadOnly(allocation);
+  var footerTitle = readOnly
+    ? t('\u0042\u1ea3n ghi \u0111\u00e3 kh\u00f3a \u0111\u1ec3 truy xu\u1ea5t v\u00e0 in \u1ea5n', 'Record locked for traceability and printing')
+    : t('\u0053\u1eb5n s\u00e0ng g\u1eedi bi\u1ec3u m\u1eabu', 'Ready to submit');
+  var footerNote = readOnly
+    ? t('\u0042\u1ea3n \u0111\u00e3 n\u1ed9p m\u1edf l\u1ea1i b\u1eb1ng c\u00f9ng layout \u0111i\u1ec1n form, nh\u01b0ng \u0111\u01b0\u1ee3c kh\u00f3a \u0111\u1ec3 b\u1ea3o to\u00e0n n\u1ed9i dung \u0111\u00e3 l\u01b0u v\u00e0 in ra nh\u01b0 bi\u1ec3u m\u1eabu SOP HTML.', 'Submitted records reopen in the same form layout, but stay locked so the saved content remains stable for controlled printing.')
+    : t('\u004c\u01b0u nh\u00e1p b\u1ea5t c\u1ee9 l\u00fac n\u00e0o. Khi g\u1eedi, h\u1ec7 th\u1ed1ng s\u1ebd ki\u1ec3m tra checklist, ch\u1eef k\u00fd v\u00e0 quy t\u1eafc review \u0111ang \u00e1p d\u1ee5ng cho h\u1ed3 s\u01a1 n\u00e0y.', 'You can save a draft anytime. On submit, the system validates checklist, signatures, and the active review rules for this record.');
+  var footerActions = '<button class="ec-btn secondary" id="ec-print-form">' + esc(t('\u0049n bi\u1ec3u m\u1eabu', 'Print form')) + '</button>' +
+    (readOnly
+      ? '<button class="ec-btn ghost" id="ec-reload-record">' + esc(t('\u0054\u1ea3i l\u1ea1i h\u1ed3 s\u01a1', 'Reload record')) + '</button>'
+      : '<button class="ec-btn secondary" id="ec-save-draft">' + esc(t('\u004c\u01b0u nh\u00e1p','Save draft')) + '</button>' +
+        '<button class="ec-btn ghost" id="ec-reset-form">' + esc(t('\u0058\u00f3a d\u1eef li\u1ec7u','Reset')) + '</button>' +
+        '<button class="ec-btn primary" id="ec-submit-online">' + esc(t('\u0047\u1eedi bi\u1ec3u m\u1eabu','Submit form')) + '</button>');
+  primeFieldDefaults(schema, allocation);
+  var sections = normalizeOnlineSections(schema);
+  return '<div class="ec-step" id="ec-step-fill">' +
+    '<div class="ec-step-head" data-toggle="ec-step-fill">' +
+      '<div class="ec-step-num">2</div>' +
+      '<div class="ec-step-title">' + esc(t('\u0110i\u1ec1n bi\u1ec3u m\u1eabu tr\u1ef1c tuy\u1ebfn', 'Fill online form')) + '</div>' +
+    '</div>' +
+    '<div class="ec-step-body">' +
+      '<div class="ec-form-frame">' +
+        '<div class="ec-form-sheet">' +
+          renderDocumentHeader(form, allocation, schema) +
+          renderFormSummaryStrip(form, allocation, schema) +
+          renderSectionNavigator(sections, schema) +
+          '<div class="ec-form-canvas">' +
+            '<div class="ec-form-main">' +
+              sections.map(function(section){ return renderOnlineSection(section, schema); }).join('') +
+              renderSignaturesPanel(schema) +
+              '<div class="ec-form-footer">' +
+                '<div class="ec-form-footer-copy">' +
+                  '<strong>' + esc(footerTitle) + '</strong>' +
+                  '<span>' + esc(footerNote) + '</span>' +
+                  '<div class="ec-print-disclaimer">' + esc(t('\u0042\u1ea3n in kh\u00f4ng c\u00f3 d\u1ea5u ki\u1ec3m so\u00e1t phi\u00ean b\u1ea3n th\u00ec h\u1ed3 s\u01a1 n\u00e0y kh\u00f4ng c\u00f3 gi\u00e1 tr\u1ecb. Ch\u1ec9 s\u1eed d\u1ee5ng b\u1ea3n hi\u1ec7n h\u00e0nh tr\u00ean h\u1ec7 th\u1ed1ng HESEM.', 'A printed copy without version control marking is uncontrolled. Use the current record in HESEM as the authoritative source.')) + '</div>' +
+                '</div>' +
+                '<div class="ec-actions ec-form-actions">' + footerActions + '</div>' +
+              '</div>' +
+            '</div>' +
+            renderFormAside(form, allocation, schema, sections) +
+          '</div>' +
+        '</div>' +
+        '<div class="ec-form-appendix">' +
+          renderChecklist(allocation) +
+          renderCapaEffectivenessCard(form, allocation) +
+          renderRelatedRecords(allocation) +
+          renderRetentionCard(form, allocation) +
+          renderSlaCard(form, allocation) +
+          renderEvidenceActions(allocation) +
+          renderApprovalBar(form, allocation) +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
 function renderOfflineNavigator(){
   return '<div class="ec-form-nav">' +
     '<button type="button" class="ec-form-nav-btn" data-scroll-section="ec-offline-section-package">' +
@@ -1939,15 +1998,28 @@ function renderTableField(field, locked){
   '</div>';
 }
 
+function lookupDisplayValue(field, value){
+  var current = value === undefined || value === null ? '' : String(value);
+  if(!current) return '';
+  var items = buildLookupItems(field);
+  var match = (items || []).find(function(item){
+    return String(item && item.value || '') === current;
+  }) || null;
+  if(!match) return current;
+  return [match.label || current, match.sub || ''].filter(Boolean).join(' - ');
+}
+
 function renderField(field){
   var cls='ec-field';
   if(field.width==='full'||field.type==='textarea'||field.type==='multi_select'||field.type==='table') cls+=' full';
   else if(field.width==='third') cls+=' third';
   var allocation = selectedAllocation();
-  var locked = isLockedContextField(field.id, allocation);
+  var contextLocked = isLockedContextField(field.id, allocation);
+  var recordLocked = isRecordReadOnly(allocation);
+  var locked = contextLocked || recordLocked;
   var label=t(field.label_vi||field.label||field.id,field.label_en||field.label||field.id);
   var req=field.required?'<span class="req">*</span>':'';
-  var lockHint=locked?'<span class="ec-lock-badge" aria-hidden="true">'+esc(t('Khóa ngữ cảnh','Context locked'))+'</span>':'';
+  var lockHint=contextLocked?'<span class="ec-lock-badge" aria-hidden="true">'+esc(t('Khóa ngữ cảnh','Context locked'))+'</span>':(recordLocked?'<span class="ec-lock-badge" aria-hidden="true">'+esc(t('Bản ghi đã khóa','Locked record'))+'</span>':'');
   var state = fieldStateMeta(field);
   var note=field.helper_vi||field.helper||field.note_vi||field.note||'';
   var val=ws.fieldValues[field.id];
@@ -1957,7 +2029,8 @@ function renderField(field){
   var lockReadOnly = locked ? ' readonly aria-disabled="true"' : '';
   var h='<div class="'+cls+(locked?' ec-field-locked':'')+'"><div class="ec-field-panel"><div class="ec-field-head"><label class="ec-label" for="ec-f-'+esc(field.id)+'">'+esc(label)+req+lockHint+'</label><span class="ec-field-state '+esc(state.tone)+'">'+esc(state.label)+'</span></div><div class="ec-field-control">';
   if(field.type==='lookup'){
-    h+='<div id="ec-f-'+esc(field.id)+'"'+(locked?' data-locked="1"':'')+'></div>';
+    if(locked) h+='<input class="ec-input" id="ec-f-'+esc(field.id)+'" type="text"'+lockReadOnly+' value="'+esc(lookupDisplayValue(field, val))+'" placeholder="'+esc(t(field.placeholder_vi||'',field.placeholder_en||''))+'">';
+    else h+='<div id="ec-f-'+esc(field.id)+'"></div>';
   } else if(field.type==='table'){
     h+=renderTableField(field, locked);
   } else if(field.type==='select'){
@@ -2515,6 +2588,11 @@ function bindWorkspace(form, allocation, container){
   bindRetentionActions(form, allocation, container);
   bindSlaActions(form, allocation, container);
 
+  var printBtn=document.getElementById('ec-print-form');
+  if(printBtn) printBtn.onclick=function(){ window.print(); };
+  var reloadBtn=document.getElementById('ec-reload-record');
+  if(reloadBtn) reloadBtn.onclick=function(){ reloadCurrentFormWorkspace(form.form_code || '', allocation && allocation.allocation_id || ''); };
+
   /* online form */
   if(allocation && form.online !== false){
     if(standaloneOnlinePath(form)){
@@ -2656,8 +2734,10 @@ function doAllocate(form, container){
 
 function bindFormFields(form,allocation){
   var schema=form.schema||ws.schema||{};
+  var readOnly = isRecordReadOnly(allocation);
   /* hydrate defaults */
   primeFieldDefaults(schema, allocation);
+  if(readOnly) return;
 
   /* bind simple fields */
   (schema.fields||[]).forEach(function(field){
@@ -2800,6 +2880,7 @@ function buildLookupItems(field){
 
 function bindSignatures(form){
   var schema=form.schema||ws.schema||{};
+  var readOnly = isRecordReadOnly(selectedAllocation());
   /* mount stored sigs */
   if(typeof window.ESignature==='function'){
     var esig=new window.ESignature({lang:(typeof lang!=='undefined'&&lang==='en')?'en':'vi'});
@@ -2808,6 +2889,11 @@ function bindSignatures(form){
   /* sign buttons */
   Array.prototype.forEach.call(document.querySelectorAll('[data-sign]'),function(btn){
     if(typeof window.ESignature!=='function'){
+      btn.disabled=true;
+      btn.setAttribute('aria-disabled','true');
+      return;
+    }
+    if(readOnly){
       btn.disabled=true;
       btn.setAttribute('aria-disabled','true');
       return;
@@ -2826,6 +2912,11 @@ function bindSignatures(form){
     };
   });
   Array.prototype.forEach.call(document.querySelectorAll('[data-sign-clear]'),function(btn){
+    if(readOnly){
+      btn.disabled=true;
+      btn.setAttribute('aria-disabled','true');
+      return;
+    }
     btn.onclick=function(){delete ws.signatures[btn.getAttribute('data-sign-clear')];var container=document.getElementById('ec-workspace');if(container){var alloc=selectedAllocation();renderWorkspace(form,alloc,container);bindWorkspace(form,alloc,container);}};
   });
 }
@@ -3138,7 +3229,7 @@ function userHasApproveRole(schema){
   var cfg = reviewConfig(schema || {});
   var approveRoles = Array.isArray(cfg.rolesAllowed) && cfg.rolesAllowed.length
     ? cfg.rolesAllowed
-    : ['admin','qa_manager','quality_manager','production_manager','engineering_manager','quality_engineer'];
+    : ['admin','qa_manager','quality_manager','production_manager','engineering_manager','production_director','engineering_lead','quality_engineer','qms_engineer'];
   for(var i = 0; i < roles.length; i++){
     if(approveRoles.indexOf(String(roles[i]).toLowerCase()) >= 0) return true;
   }
