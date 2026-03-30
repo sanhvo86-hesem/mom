@@ -116,17 +116,42 @@ function _flatten(h){ var rows=[]; (h||[]).forEach(function(so){ rows.push(Objec
 function _sortValue(item,key){ if(key==='order_number') return String(item.so_number||item.jo_number||item.wo_number||'').toLowerCase(); if(key==='type') return String(item._type||''); if(key==='subject') return String(item.customer_name||item.customer_id||item.part_number||item.operation_desc||'').toLowerCase(); if(key==='status') return String(item.status||''); if(key==='due_date') return String(item.due_date||item.scheduled_end||''); if(key==='qty') return Number(item.total_qty||item.qty_ordered||item.qty_completed||0); return ''; }
 function _sortRows(rows,key,dir){ return rows.slice().sort(function(a,b){ var va=_sortValue(a,key), vb=_sortValue(b,key); var cmp=va<vb?-1:(va>vb?1:0); return dir==='asc'?cmp:-cmp; }); }
 function _filterRows(rows,q){ if(!q) return rows; q=q.toLowerCase(); return rows.filter(function(r){ return [r.so_number,r.jo_number,r.wo_number,r.customer_name,r.customer_id,r.customer_po,r.part_number,r.part_revision,r.operation_desc,r.machine_id,r.status].filter(Boolean).join(' ').toLowerCase().indexOf(q)>=0; }); }
-function _lookupRows(kind){
+var _selectedPartForRev = '';
+function _lookupRows(kind, filterContext){
   var m=_master();
   if(kind==='customers') return (m.customers||[]).map(function(x){ return { value:x.customer_id, label:x.customer_id, sub:x.customer_name||'' }; });
   if(kind==='parts') return (m.parts||[]).map(function(x){ return { value:x.part_number, label:x.part_number, sub:x.part_description||'', description:x.part_description||'' }; });
-  if(kind==='revisions') return (m.revisions||[]).map(function(x){ return { value:x.revision, label:x.revision, sub:(x.part_number||'') + (x.status ? ' · ' + x.status : '') }; });
+  if(kind==='revisions'){
+    var partFilter = (filterContext && filterContext.part_number) ? filterContext.part_number : _selectedPartForRev;
+    return (m.revisions||[]).filter(function(x){
+      if(partFilter && x.part_number !== partFilter) return false;
+      return true;
+    }).map(function(x){
+      var statusTag = x.status || '';
+      var warn = (statusTag === 'superseded' || statusTag === 'draft') ? ' ⚠' : '';
+      return { value:x.revision, label:x.revision + warn, sub:(x.part_number||'') + (statusTag ? ' · ' + statusTag : ''), status:statusTag };
+    });
+  }
   if(kind==='work_centers') return (m.work_centers||[]).map(function(x){ return { value:x.work_center_id, label:x.work_center_id, sub:x.work_center_name||'' }; });
   if(kind==='machines') return (m.machines||[]).map(function(x){ return { value:x.machine_id, label:x.machine_id, sub:(x.machine_name||'') + (x.work_center_id ? ' · ' + x.work_center_id : '') }; });
   if(kind==='operators') return (m.operators||[]).map(function(x){ return { value:x.operator_id, label:x.operator_id, sub:(x.operator_name||'') + (x.role ? ' · ' + x.role : '') }; });
   if(kind==='so') return _flat.filter(function(x){ return x._type==='so'; }).map(function(x){ return { value:x.so_number, label:x.so_number, sub:(x.customer_name||x.customer_id||'') + (x.customer_po ? ' · PO ' + x.customer_po : '') }; });
   if(kind==='jo') return _flat.filter(function(x){ return x._type==='jo'; }).map(function(x){ return { value:x.jo_number, label:x.jo_number, sub:(x.part_number||'') + (x.part_revision ? ' · Rev.' + x.part_revision : '') }; });
   return [];
+}
+function _partRev(part, rev){ if(!part) return '-'; return part + (rev ? ' Rev.' + rev : ''); }
+function _reloadRevisionDropdown(type, form, selectedPart){
+  _selectedPartForRev = selectedPart || '';
+  var revTarget = document.getElementById(_id+'-'+type+'-part_revision');
+  if(!revTarget) return;
+  var filteredRevs = _lookupRows('revisions', { part_number: selectedPart });
+  if(typeof SearchableInput==='function'){
+    new SearchableInput({ containerId:revTarget.id, fieldId:revTarget.id+'-si', name:'part_revision', dataSource:filteredRevs, displayField:'label', valueField:'value', subField:'sub', placeholderVi:_t('Tìm và chọn revision','Search and select revision'), placeholder:'Search and select revision', strictSelect:true, storeValueInHiddenField:true });
+    var latestReleased = filteredRevs.find(function(r){ return r.status === 'released'; });
+    if(latestReleased){ setTimeout(function(){ var si = SearchableInput.get(revTarget.id+'-si'); if(si) si.setValue(latestReleased.value); }, 50); }
+  } else {
+    revTarget.innerHTML='<select class="sj-input" name="part_revision"><option value="">'+_t('Chọn','Select')+'</option>'+filteredRevs.map(function(x){ return '<option value="'+_esc(x.value)+'">'+_esc(x.label+(x.sub?' · '+x.sub:''))+'</option>'; }).join('')+'</select>';
+  }
 }
 function _pipelineCol(status){ return ({ draft:'planned', quoted:'planned', confirmed:'active', in_production:'active', shipped:'completed', closed:'completed', cancelled:'cancelled', planned:'planned', released:'planned', active:'active', on_hold:'on_hold', scheduled:'planned', setup:'active', running:'active', inspection:'active', completed:'completed' })[status] || 'planned'; }
 function _pipelineStatus(type,col){ var map={ so:{planned:'draft',active:'in_production',completed:'shipped',cancelled:'cancelled'}, jo:{planned:'planned',active:'active',on_hold:'on_hold',completed:'completed'}, wo:{planned:'scheduled',active:'running',on_hold:'on_hold',completed:'completed'} }; return map[type]?map[type][col]:null; }
@@ -150,7 +175,7 @@ function _renderView(){
     var rows=_sortRows(_filterRows(_flat,_tableSearch.trim().toLowerCase()),_tableSort.key,_tableSort.dir);
     var h='<div class="sj-panel"><div class="sj-panel-head"><input id="'+_id+'-table-search" class="sj-input" value="'+_esc(_tableSearch)+'" placeholder="'+_t('Tìm SO / JO / WO, khách hàng, part...','Search SO / JO / WO, customer, part...')+'"></div><div class="sj-table-wrap"><table class="sj-table"><thead><tr><th data-sort="order_number">'+_t('Mã đơn','Order #')+'</th><th data-sort="type">'+_t('Loại','Type')+'</th><th data-sort="subject">'+_t('Khách hàng / Chi tiết','Customer / Part')+'</th><th data-sort="status">'+_t('Trạng thái','Status')+'</th><th data-sort="due_date">'+_t('Hạn','Due')+'</th><th data-sort="qty">'+_t('SL','Qty')+'</th></tr></thead><tbody>';
     if(!rows.length) h+='<tr><td colspan="6" class="sj-empty-row">'+_t('Không có dữ liệu','No data')+'</td></tr>';
-    rows.forEach(function(r){ var type=r._type||'so', id=r.so_number||r.jo_number||r.wo_number||'', st=_status(type,r.status||''), subject=type==='so'?(r.customer_name||r.customer_id||'-'):type==='jo'?((r.part_number||'-')+(r.part_revision?' / Rev.'+r.part_revision:'')):(r.operation_desc||'-'); h+='<tr class="sj-row" data-id="'+_esc(id)+'" data-type="'+type+'"><td><code>'+_esc(id)+'</code></td><td>'+type.toUpperCase()+'</td><td>'+_esc(subject)+'</td><td><span class="sj-status" style="color:'+st.color+';background:'+_rgba(st.color,.12)+'">'+_esc(st.text)+'</span></td><td>'+_esc(_fmtDate(r.due_date||r.scheduled_end||''))+'</td><td>'+_esc(r.total_qty||r.qty_ordered||r.qty_completed||'-')+'</td></tr>'; });
+    rows.forEach(function(r){ var type=r._type||'so', id=r.so_number||r.jo_number||r.wo_number||'', st=_status(type,r.status||''), subject=type==='so'?(r.customer_name||r.customer_id||'-'):type==='jo'?_partRev(r.part_number,r.part_revision):(r.operation_desc||'-')+(r.part_number?' · '+_partRev(r.part_number,r.part_revision):''); h+='<tr class="sj-row" data-id="'+_esc(id)+'" data-type="'+type+'"><td><code>'+_esc(id)+'</code></td><td>'+type.toUpperCase()+'</td><td>'+_esc(subject)+'</td><td><span class="sj-status" style="color:'+st.color+';background:'+_rgba(st.color,.12)+'">'+_esc(st.text)+'</span></td><td>'+_esc(_fmtDate(r.due_date||r.scheduled_end||''))+'</td><td>'+_esc(r.total_qty||r.qty_ordered||r.qty_completed||'-')+'</td></tr>'; });
     return h+'</tbody></table></div></div>';
   }
   if(_view==='pipeline'){
@@ -394,9 +419,18 @@ function _hydrateCreateForm(type,form){
     var target=document.getElementById(_id+'-'+type+'-'+field.key);
     if(!target) return;
     if(typeof SearchableInput==='function'){
-      new SearchableInput({ containerId:target.id, fieldId:target.id+'-si', name:field.key, dataSource:_lookupRows(field.lookup), displayField:'label', valueField:'value', subField:'sub', placeholderVi:_t('Tìm và chọn','Search and select'), placeholder:'Search and select', strictSelect:true, storeValueInHiddenField:true, onSelect:function(item){ if(type==='jo' && field.key==='part_number'){ var desc=form.querySelector('[name="part_description"]'); if(desc) desc.value=item.description||''; } } });
+      new SearchableInput({ containerId:target.id, fieldId:target.id+'-si', name:field.key, dataSource:_lookupRows(field.lookup), displayField:'label', valueField:'value', subField:'sub', placeholderVi:_t('Tìm và chọn','Search and select'), placeholder:'Search and select', strictSelect:true, storeValueInHiddenField:true, onSelect:function(item){
+        if(type==='jo' && field.key==='part_number'){
+          var desc=form.querySelector('[name="part_description"]'); if(desc) desc.value=item.description||'';
+          _reloadRevisionDropdown(type, form, item.value);
+        }
+      } });
     } else {
       target.innerHTML='<select class="sj-input" name="'+field.key+'"><option value="">'+_t('Chọn','Select')+'</option>'+_lookupRows(field.lookup).map(function(x){ return '<option value="'+_esc(x.value)+'">'+_esc(x.label+(x.sub?' · '+x.sub:''))+'</option>'; }).join('')+'</select>';
+      if(type==='jo' && field.key==='part_number'){
+        var sel=target.querySelector('select');
+        if(sel) sel.onchange=function(){ _reloadRevisionDropdown(type, form, sel.value); var desc=form.querySelector('[name="part_description"]'); if(desc){ var m=_master(); var p=(m.parts||[]).find(function(x){ return x.part_number===sel.value; }); desc.value=p?p.part_description||'':''; } };
+      }
     }
   });
   ['order_date','start_date','due_date'].forEach(function(k){ var el=form.querySelector('[name="'+k+'"]'); if(el&&!el.value) el.value=_today(); });
@@ -424,13 +458,22 @@ function _hydrateEditForm(type, form, data){
         target.innerHTML = '<input class="sj-input" name="'+field.key+'" value="'+_esc(value==null?'':value)+'" readonly style="background:#f1f5f9">';
         return;
       }
+      if(type==='jo' && field.key==='part_number') _selectedPartForRev = value || '';
       if(typeof SearchableInput==='function'){
-        new SearchableInput({ containerId:target.id, fieldId:target.id+'-si', name:field.key, dataSource:_lookupRows(field.lookup), displayField:'label', valueField:'value', subField:'sub', placeholderVi:_t('Tìm và chọn','Search and select'), placeholder:'Search and select', strictSelect:true, storeValueInHiddenField:true, onSelect:function(item){ if(type==='jo' && field.key==='part_number'){ var desc=form.querySelector('[name="part_description"]'); if(desc) desc.value=item.description||''; } } });
+        new SearchableInput({ containerId:target.id, fieldId:target.id+'-si', name:field.key, dataSource:_lookupRows(field.lookup), displayField:'label', valueField:'value', subField:'sub', placeholderVi:_t('Tìm và chọn','Search and select'), placeholder:'Search and select', strictSelect:true, storeValueInHiddenField:true, onSelect:function(item){
+          if(type==='jo' && field.key==='part_number'){
+            var desc=form.querySelector('[name="part_description"]'); if(desc) desc.value=item.description||'';
+            _reloadRevisionDropdown(type, form, item.value);
+          }
+        } });
         setTimeout(function(){ var si = SearchableInput.get(target.id+'-si'); if(si && value!=null && value!=='') si.setValue(value); }, 0);
       } else {
         target.innerHTML='<select class="sj-input" name="'+field.key+'"><option value="">'+_t('Chọn','Select')+'</option>'+_lookupRows(field.lookup).map(function(x){ return '<option value="'+_esc(x.value)+'">'+_esc(x.label+(x.sub?' · '+x.sub:''))+'</option>'; }).join('')+'</select>';
         var sel = target.querySelector('select');
         if(sel) sel.value = value || '';
+        if(type==='jo' && field.key==='part_number' && sel){
+          sel.onchange=function(){ _reloadRevisionDropdown(type, form, sel.value); var desc=form.querySelector('[name="part_description"]'); if(desc){ var m=_master(); var p=(m.parts||[]).find(function(x){ return x.part_number===sel.value; }); desc.value=p?p.part_description||'':''; } };
+        }
       }
       return;
     }
@@ -461,13 +504,30 @@ function _showEdit(type, data){
   _hydrateEditForm(type, form, data||{});
   var submitBtn=modal.querySelector('#'+_id+'-submit-edit');
   submitBtn.onclick=function(){
-    var fd=new FormData(form), changes={};
-    fd.forEach(function(v,k){ var def=FIELDS[type].find(function(x){ return x.key===k; }); if(!def) return; if(def.type==='integer') changes[k]=parseInt(v,10); else if(def.type==='number') changes[k]=parseFloat(v); else if(def.type==='boolean') changes[k]=(v==='true'); else changes[k]=v; });
+    var fd=new FormData(form), changes={}, original=data||{};
+    fd.forEach(function(v,k){ var def=FIELDS[type].find(function(x){ return x.key===k; }); if(!def) return;
+      var parsed; if(def.type==='integer') parsed=parseInt(v,10); else if(def.type==='number') parsed=parseFloat(v); else if(def.type==='boolean') parsed=(v==='true'); else parsed=v;
+      // Only include actually changed fields
+      if(String(parsed) !== String(original[k] ?? '')) changes[k]=parsed;
+    });
+    if(!Object.keys(changes).length){ _toast(_t('Không có thay đổi nào.','No changes detected.'),'info'); return; }
+    // ECR warning: part_revision, material_spec, routing_id on post-release JO
+    var ECR_FIELDS = ['part_revision','material_spec','routing_id'];
+    var POST_RELEASE = ['released','active','on_hold','completed'];
+    if(type==='jo' && POST_RELEASE.indexOf(original.status||'')>=0){
+      var ecrChanged = ECR_FIELDS.filter(function(f){ return changes[f] !== undefined; });
+      if(ecrChanged.length && !confirm(_t('Cảnh báo ECR: Bạn đang thay đổi ' + ecrChanged.join(', ') + ' trên JO đã phát hành. Thay đổi này yêu cầu Engineering Change Request (ECR). Tiếp tục?','ECR Warning: You are changing ' + ecrChanged.join(', ') + ' on a post-release JO. This requires an Engineering Change Request (ECR). Continue?'))){ return; }
+    }
     _setSubmitLoading(submitBtn, true);
     _api('order_update_fields',{ order_type:type, order_id:data[type==='so'?'so_number':type==='jo'?'jo_number':'wo_number'], changes:changes }).then(function(r){
       _setSubmitLoading(submitBtn, false);
       if(r&&r.ok){ close(); _toast(_t('Đã cập nhật đơn hàng.','Order updated successfully.'),'success'); _refresh(); }
-      else { _toast(_t('Không thể cập nhật đơn hàng.','Unable to update order.'),'error'); }
+      else {
+        var msg = (r&&r.message) ? r.message : _t('Không thể cập nhật đơn hàng.','Unable to update order.');
+        if(r&&r.error==='revision_not_released') msg = _t('Revision chưa được phát hành. Chỉ revision đã released mới được sử dụng.','Revision is not released. Only released revisions are allowed.');
+        if(r&&r.error==='ecr_required') msg = _t('Yêu cầu ECR trước khi thay đổi trường này.','ECR is required before changing this field.');
+        _toast(msg,'error');
+      }
     }).catch(function(){ _setSubmitLoading(submitBtn, false); _toast(_t('Lỗi kết nối.','Connection error.'),'error'); });
   };
 }

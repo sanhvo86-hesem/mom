@@ -36,6 +36,16 @@ function repairMojibake(text){
   }
 }
 
+var EXCEPTION_CATEGORIES = [
+  { key: 'all', labelVi: 'Tất cả', labelEn: 'All' },
+  { key: 'production', labelVi: 'Sản xuất', labelEn: 'Production' },
+  { key: 'orders', labelVi: 'Đơn hàng', labelEn: 'Orders' },
+  { key: 'evidence', labelVi: 'Hồ sơ', labelEn: 'Evidence' },
+  { key: 'system', labelVi: 'Hệ thống', labelEn: 'System' }
+];
+var _excFilterCategory = 'all';
+var _excShowZero = false;
+
 var EXCEPTION_TYPES = [
   {
     key: 'overdue_allocations',
@@ -47,7 +57,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Overdue allocations',
     descVi: 'Bi\u1ec3u m\u1eabu \u0111\u00e3 c\u1ea5p ph\u00e1t nh\u01b0ng qu\u00e1 h\u1ea1n n\u1ed9p l\u1ea1i.',
     descEn: 'Forms were issued but have passed the expected return window.',
-    page: 'forms'
+    page: 'forms',
+    category: 'evidence',
+    severity: 'critical'
   },
   {
     key: 'failed_uploads',
@@ -59,7 +71,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Failed uploads',
     descVi: 'T\u1ec7p b\u1ecb t\u1eeb ch\u1ed1i ho\u1eb7c kh\u00f4ng qua b\u01b0\u1edbc x\u00e1c minh.',
     descEn: 'Files were rejected or did not pass verification.',
-    page: 'forms'
+    page: 'forms',
+    category: 'evidence',
+    severity: 'warning'
   },
   {
     key: 'overdue_orders',
@@ -71,7 +85,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Overdue orders',
     descVi: 'SO / JO / WO \u0111\u00e3 qu\u00e1 ng\u00e0y giao ho\u1eb7c m\u1ed1c ho\u00e0n th\u00e0nh.',
     descEn: 'SO / JO / WO have passed committed due dates.',
-    page: 'orders'
+    page: 'orders',
+    category: 'orders',
+    severity: 'critical'
   },
   {
     key: 'overdue_capas',
@@ -83,7 +99,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Overdue CAPA',
     descVi: 'CAPA \u0111ang m\u1edf qu\u00e1 l\u00e2u, c\u1ea7n escalation.',
     descEn: 'Open CAPAs have exceeded their expected action window.',
-    page: 'forms'
+    page: 'forms',
+    category: 'evidence',
+    severity: 'warning'
   },
   {
     key: 'review_sla_gaps',
@@ -95,7 +113,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Review SLA gaps',
     descVi: 'Hồ sơ đang in-review nhưng đã sắp đến hạn, quá hạn hoặc đã escalation theo chính sách review SLA.',
     descEn: 'Records in review are due soon, overdue, or already escalated under the review SLA policy.',
-    page: 'forms'
+    page: 'forms',
+    category: 'evidence',
+    severity: 'warning'
   },
   {
     key: 'wo_missing_evidence',
@@ -107,7 +127,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'WO missing evidence',
     descVi: 'L\u1ec7nh \u0111ang ch\u1ea1y nh\u01b0ng ch\u01b0a \u0111\u1ee7 form / b\u1eb1ng ch\u1ee9ng gate.',
     descEn: 'Work orders are active without the required gate evidence.',
-    page: 'mes'
+    page: 'mes',
+    category: 'production',
+    severity: 'critical'
   },
   {
     key: 'program_mismatches',
@@ -119,7 +141,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Program mismatch',
     descVi: 'Chương trình máy đang báo về không khớp với WO đã phát hành.',
     descEn: 'The machine-reported NC program does not match the released WO.',
-    page: 'mes'
+    page: 'mes',
+    category: 'production',
+    severity: 'critical'
   },
   {
     key: 'program_release_risk',
@@ -131,7 +155,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'NC release risk',
     descVi: 'WO chưa có bản phát hành NC hợp lệ theo part, revision, operation hoặc machine context.',
     descEn: 'The WO does not yet have a valid governed NC release for its part, revision, operation, or machine context.',
-    page: 'mes'
+    page: 'mes',
+    category: 'production',
+    severity: 'critical'
   },
   {
     key: 'tool_readiness_risk',
@@ -143,7 +169,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Tool readiness risk',
     descVi: 'WO đang bị chặn bởi tool-life, offset hoặc dữ liệu runtime tooling chưa đủ.',
     descEn: 'The WO is blocked by tool-life, offset drift, or incomplete tooling runtime.',
-    page: 'mes'
+    page: 'mes',
+    category: 'production',
+    severity: 'warning'
   },
   {
     key: 'operator_qualification_gaps',
@@ -155,7 +183,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Operator qualification gaps',
     descVi: 'WO \u0111ang g\u00e1n ng\u01b0\u1eddi v\u1eadn h\u00e0nh ch\u01b0a \u0111\u1ee7 \u0111i\u1ec1u ki\u1ec7n theo machine, work center ho\u1eb7c hi\u1ec7u l\u1ef1c n\u0103ng l\u1ef1c.',
     descEn: 'The WO is assigned to an operator who is not fully qualified for the machine, work center, or validity window.',
-    page: 'mes'
+    page: 'mes',
+    category: 'production',
+    severity: 'critical'
   },
   {
     key: 'material_trace_gaps',
@@ -167,7 +197,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Material trace gaps',
     descVi: 'WO ch\u01b0a \u0111\u1ee7 lot, heat, traveler ho\u1eb7c tr\u1ea1ng th\u00e1i ch\u1ee9ng ch\u1ec9 v\u1eadt li\u1ec7u \u0111\u1ec3 kh\u00f3a traceability.',
     descEn: 'The WO is missing lot, heat, traveler, or material certificate status required for governed traceability.',
-    page: 'mes'
+    page: 'mes',
+    category: 'production',
+    severity: 'critical'
   },
   {
     key: 'material_genealogy_gaps',
@@ -179,7 +211,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Material genealogy gaps',
     descVi: 'Bản ghi issue vật liệu hoặc genealogy thành phẩm chưa khép kín theo WO đã hoàn thành.',
     descEn: 'Material issue and finished-part genealogy records are not yet closed for completed WO.',
-    page: 'mes'
+    page: 'mes',
+    category: 'production',
+    severity: 'warning'
   },
   {
     key: 'shift_handover_gaps',
@@ -191,7 +225,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Shift handover gaps',
     descVi: 'Máy hoặc WO đang hoạt động nhưng chưa có bàn giao ca hợp lệ hoặc chưa được xác nhận đúng hạn.',
     descEn: 'Active machines or WO still need a valid shift handover or overdue acknowledgement.',
-    page: 'mes'
+    page: 'mes',
+    category: 'production',
+    severity: 'warning'
   },
   {
     key: 'connector_governance_gaps',
@@ -203,7 +239,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Connector governance gaps',
     descVi: 'Heartbeat, telemetry mode ho\u1eb7c ch\u00ednh s\u00e1ch connector c\u1ee7a m\u00e1y ch\u01b0a \u0111\u1ea1t \u0111i\u1ec1u ki\u1ec7n \u0111\u1ec3 m\u1edf WO.',
     descEn: 'Heartbeat, telemetry mode, or machine connector policy does not yet satisfy WO launch conditions.',
-    page: 'mes'
+    page: 'mes',
+    category: 'production',
+    severity: 'warning'
   },
   {
     key: 'adapter_governance_risk',
@@ -215,7 +253,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Adapter governance risk',
     descVi: 'Adapter MTConnect / OPC UA / bridge còn lệch cấu hình hoặc chưa đạt chính sách vận hành cần thiết.',
     descEn: 'MTConnect / OPC UA / bridge adapters still violate governed runtime policy or required configuration.',
-    page: 'mes'
+    page: 'mes',
+    category: 'production',
+    severity: 'warning'
   },
   {
     key: 'alarm_hotspots',
@@ -227,7 +267,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Active machine alarms',
     descVi: 'Máy đang giữ alarm nóng cần xử lý theo playbook trước khi tiếp tục chạy WO.',
     descEn: 'Machines currently hold active alarms that should be worked through governed playbooks before WO execution continues.',
-    page: 'mes'
+    page: 'mes',
+    category: 'production',
+    severity: 'critical'
   },
   {
     key: 'alarm_ack_gaps',
@@ -239,7 +281,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Alarm acknowledgement gaps',
     descVi: 'Alarm đã lên nhưng chưa được acknowledge, escalation hoặc clear đúng hạn theo playbook.',
     descEn: 'Raised alarms still need acknowledgement, escalation, or governed clearing within the playbook window.',
-    page: 'mes'
+    page: 'mes',
+    category: 'production',
+    severity: 'warning'
   },
   {
     key: 'nc_download_mismatches',
@@ -251,7 +295,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'NC download mismatches',
     descVi: 'Biên nhận tải NC từ máy không khớp release package, revision hoặc controller-side verification.',
     descEn: 'Controller-side NC download receipts do not match the released package, revision, or verification signature.',
-    page: 'mes'
+    page: 'mes',
+    category: 'production',
+    severity: 'warning'
   },
   {
     key: 'tool_offset_risk',
@@ -263,7 +309,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Tool offset risk',
     descVi: 'Preset, offset hoặc lineage của bộ dao chưa đủ điều kiện để mở chạy WO an toàn.',
     descEn: 'Tool preset, offset, or assembly lineage is not yet ready for safe WO execution.',
-    page: 'mes'
+    page: 'mes',
+    category: 'production',
+    severity: 'warning'
   },
   {
     key: 'launch_blocker_hotspots',
@@ -275,7 +323,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'WO launch blockers',
     descVi: 'WO đã bị MES chặn chuyển sang setup hoặc running vì chưa đạt điều kiện release, tooling, trace hoặc connector.',
     descEn: 'Work orders were blocked by MES from moving into setup or running because mandatory release, tooling, trace, or connector conditions were not met.',
-    page: 'mes'
+    page: 'mes',
+    category: 'production',
+    severity: 'critical'
   },
   {
     key: 'shadow_sync_failures',
@@ -287,7 +337,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Shadow sync failures',
     descVi: 'Mirror JSON -> PostgreSQL b\u1ecb l\u1ed7i, c\u1ea7n kh\u00f4i ph\u1ee5c \u0111\u1ec3 analytics v\u00e0 audit kh\u00f4ng l\u1ec7ch.',
     descEn: 'JSON -> PostgreSQL shadow sync has failed and should be recovered before analytics and audit diverge.',
-    page: 'mes'
+    page: 'mes',
+    category: 'system',
+    severity: 'warning'
   },
   {
     key: 'primary_read_fallbacks',
@@ -299,7 +351,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Primary-read fallbacks',
     descVi: 'Read model đang phải quay về JSON thay vì đọc PostgreSQL mirror nên cần rà lại health của shadow layer.',
     descEn: 'Read models are falling back to JSON instead of PostgreSQL mirror reads and the shadow layer should be reviewed.',
-    page: 'mes'
+    page: 'mes',
+    category: 'system',
+    severity: 'info'
   },
   {
     key: 'epicor_sync_status',
@@ -311,7 +365,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Epicor sync gaps',
     descVi: 'Đồng bộ, đối soát hoặc outbox giữa MES và Epicor đang có miền dữ liệu xuống cấp.',
     descEn: 'Synchronization, reconciliation, or outbox health between MES and Epicor is degraded.',
-    page: 'mes'
+    page: 'mes',
+    category: 'system',
+    severity: 'warning'
   },
   {
     key: 'downtime_governance_gaps',
@@ -323,7 +379,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Ungoverned downtime',
     descVi: 'Sự kiện downtime chưa có mã lý do hoặc mã khôi phục hợp lệ nên sẽ làm bẩn analytics.',
     descEn: 'Downtime records are missing governed reason or resolution codes and will contaminate analytics.',
-    page: 'mes'
+    page: 'mes',
+    category: 'production',
+    severity: 'warning'
   },
   {
     key: 'dpp_readiness_gaps',
@@ -335,7 +393,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'DPP readiness gaps',
     descVi: 'WO hoặc genealogy chưa đủ passport số, vật liệu, carbon, năng lượng hoặc đường dẫn truy xuất theo mức công bố bên ngoài.',
     descEn: 'The WO or genealogy is still missing digital product passport, material, carbon, energy, or trace-link coverage for external disclosure.',
-    page: 'mes'
+    page: 'mes',
+    category: 'system',
+    severity: 'info'
   },
   {
     key: 'energy_tracking_gaps',
@@ -347,7 +407,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Energy tracking gaps',
     descVi: 'Máy đang chạy nhưng thiếu power telemetry, thiếu snapshot năng lượng hoặc vượt mục tiêu kWh trên mỗi sản phẩm.',
     descEn: 'Running machines are missing power telemetry, missing governed energy snapshots, or exceeding the kWh-per-unit target.',
-    page: 'mes'
+    page: 'mes',
+    category: 'system',
+    severity: 'info'
   },
   {
     key: 'cost_variance_risk',
@@ -359,7 +421,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Cost variance risk',
     descVi: 'WO đang thiếu snapshot costing hoặc actual cost đang vượt ngưỡng variance đã quản trị.',
     descEn: 'The WO is missing governed costing snapshots or its actual cost is above the allowed variance threshold.',
-    page: 'mes'
+    page: 'mes',
+    category: 'orders',
+    severity: 'warning'
   },
   {
     key: 'orphan_links',
@@ -371,7 +435,9 @@ var EXCEPTION_TYPES = [
     labelEn: 'Orphan links',
     descVi: 'B\u1ea3n ghi \u0111\u00e3 link nh\u01b0ng kh\u00f4ng c\u00f2n \u0111\u01a1n h\u00e0ng h\u1ee3p l\u1ec7.',
     descEn: 'Evidence links point to orders that no longer exist.',
-    page: 'orders'
+    page: 'orders',
+    category: 'evidence',
+    severity: 'info'
   }
 ];
 
@@ -449,6 +515,17 @@ function ensureStyles(){
     '.excx-link:hover{transform:translateY(-1px);background:#e0edfd}',
     '.excx-pagination{display:flex;justify-content:center;align-items:center;gap:10px;padding-top:4px}',
     '.excx-muted{font-size:12px;color:#64748b;line-height:1.6}',
+    '.excx-filter-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:14px;padding:10px 0}',
+    '.excx-filter-btn{border:1px solid #e2e8f0;background:#f8fafc;color:#64748b;padding:7px 14px;border-radius:999px;font-size:12px;font-weight:800;cursor:pointer;transition:all .16s ease}',
+    '.excx-filter-btn:hover{background:#eef4fb;color:#0c2d48;border-color:#93c5fd}',
+    '.excx-filter-btn.active{background:#0c2d48;color:#fff;border-color:#0c2d48}',
+    '.excx-toggle-zero{display:flex;align-items:center;gap:6px;margin-left:auto;font-size:11px;font-weight:700;color:#64748b;cursor:pointer;user-select:none}',
+    '.excx-toggle-zero input{accent-color:#0c2d48}',
+    '.excx-sev{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:800;vertical-align:middle;letter-spacing:.04em}',
+    '.excx-sev-crit{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}',
+    '.excx-sev-warn{background:#fffbeb;color:#d97706;border:1px solid #fde68a}',
+    '.excx-card-zero{opacity:.5;filter:grayscale(.3)}',
+    '.excx-card-zero:hover{opacity:.8;filter:none}',
     '@media (max-width: 1200px){.excx-hero,.excx-main{grid-template-columns:1fr}.excx-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}',
     '@media (max-width: 820px){.excx{padding:18px 16px 32px}.excx-grid,.excx-kpi-grid{grid-template-columns:1fr}.excx-poster,.excx-card,.excx-panel{border-radius:22px}.excx-poster h1{font-size:28px}}'
   ].join('');
@@ -524,6 +601,7 @@ function buildShell(){
     '      <div class="excx-panel-head">',
     '        <div><h2>' + esc(t('Các nhóm ngoại lệ', 'Exception groups')) + '</h2><p>' + esc(t('Mỗi nhóm đại diện cho một hàng đợi cần trưởng ca, điều phối hoặc quản lý xử lý nhanh.', 'Each group represents a queue that needs quick action from supervisors, planners, or managers.')) + '</p></div>',
     '      </div>',
+    '      <div class="excx-filter-bar" id="excx-filters">' + EXCEPTION_CATEGORIES.map(function(cat){ return '<button type="button" class="excx-filter-btn' + (_excFilterCategory === cat.key ? ' active' : '') + '" data-exc-filter="' + esc(cat.key) + '">' + esc(t(cat.labelVi, cat.labelEn)) + '</button>'; }).join('') + '<label class="excx-toggle-zero"><input type="checkbox" id="excx-show-zero"' + (_excShowZero ? ' checked' : '') + '> ' + esc(t('Hiện nhóm = 0', 'Show zero')) + '</label></div>',
     '      <div id="excx-grid" class="excx-grid"><div class="excx-empty" style="grid-column:1/-1"><strong>' + esc(t('Đang tải dữ liệu', 'Loading data')) + '</strong>' + esc(t('Hệ thống đang tổng hợp snapshot ngoại lệ mới nhất.', 'The system is compiling the latest exception snapshot.')) + '</div></div>',
     '    </article>',
     '    <article class="excx-panel">',
@@ -547,7 +625,15 @@ function renderSummary(){
     total += count;
     if (count > 0) activeGroups += 1;
   });
-  highPriority = Number(state.summary.overdue_allocations || 0) + Number(state.summary.review_sla_gaps || 0) + Number(state.summary.wo_missing_evidence || 0) + Number(state.summary.program_mismatches || 0) + Number(state.summary.program_release_risk || 0) + Number(state.summary.tool_readiness_risk || 0) + Number(state.summary.alarm_ack_gaps || 0) + Number(state.summary.operator_qualification_gaps || 0) + Number(state.summary.material_trace_gaps || 0) + Number(state.summary.material_genealogy_gaps || 0) + Number(state.summary.shift_handover_gaps || 0) + Number(state.summary.connector_governance_gaps || 0) + Number(state.summary.adapter_governance_risk || 0) + Number(state.summary.alarm_hotspots || 0) + Number(state.summary.nc_download_mismatches || 0) + Number(state.summary.tool_offset_risk || 0) + Number(state.summary.launch_blocker_hotspots || 0) + Number(state.summary.shadow_sync_failures || 0) + Number(state.summary.primary_read_fallbacks || 0) + Number(state.summary.epicor_sync_status || 0) + Number(state.summary.downtime_governance_gaps || 0) + Number(state.summary.dpp_readiness_gaps || 0) + Number(state.summary.energy_tracking_gaps || 0) + Number(state.summary.cost_variance_risk || 0) + Number(state.summary.overdue_orders || 0);
+  // High-priority: only truly critical exception types (safety, production blocking, overdue)
+  highPriority = Number(state.summary.overdue_allocations || 0)
+    + Number(state.summary.overdue_orders || 0)
+    + Number(state.summary.wo_missing_evidence || 0)
+    + Number(state.summary.program_mismatches || 0)
+    + Number(state.summary.alarm_hotspots || 0)
+    + Number(state.summary.launch_blocker_hotspots || 0)
+    + Number(state.summary.operator_qualification_gaps || 0)
+    + Number(state.summary.material_trace_gaps || 0);
   var nextPage = highPriority > 0 ? t('MES / Chứng cứ', 'MES / Evidence') : (activeGroups > 0 ? t('Đơn hàng', 'Orders') : t('Ổn định', 'Stable'));
   var totalEl = state.container.querySelector('#excx-total');
   var groupsEl = state.container.querySelector('#excx-groups');
@@ -564,13 +650,27 @@ function renderSummary(){
 function renderCards(){
   var grid = state.container && state.container.querySelector('#excx-grid');
   if (!grid || !state.summary) return;
-  grid.innerHTML = EXCEPTION_TYPES.map(function(item){
+  // Filter by category and sort by count descending (actionable items first)
+  var filtered = EXCEPTION_TYPES.filter(function(item){
+    if (_excFilterCategory !== 'all' && item.category !== _excFilterCategory) return false;
+    var count = Number(state.summary[item.key] || 0);
+    if (!_excShowZero && count === 0) return false;
+    return true;
+  }).slice().sort(function(a, b){
+    return Number(state.summary[b.key] || 0) - Number(state.summary[a.key] || 0);
+  });
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="excx-empty" style="grid-column:1/-1"><strong>' + esc(t('Không có ngoại lệ nào', 'No exceptions')) + '</strong>' + esc(t(_excFilterCategory !== 'all' ? 'Không có ngoại lệ trong nhóm đã chọn.' : 'Tất cả các hàng đợi đều trống.', _excFilterCategory !== 'all' ? 'No exceptions in the selected category.' : 'All exception queues are empty.')) + '</div>';
+    return;
+  }
+  grid.innerHTML = filtered.map(function(item){
     var count = Number(state.summary[item.key] || 0);
     var active = state.expandedType === item.key;
+    var sevBadge = item.severity === 'critical' ? '<span class="excx-sev excx-sev-crit">' + esc(t('Nghiêm trọng', 'Critical')) + '</span>' : (item.severity === 'warning' ? '<span class="excx-sev excx-sev-warn">' + esc(t('Cảnh báo', 'Warning')) + '</span>' : '');
     return [
-      '<button type="button" class="excx-card-button' + (active ? ' active' : '') + '" data-exception-card="' + esc(item.key) + '" style="--card-accent:' + item.accent + ';--card-border:' + (active ? item.accent : item.border) + ';--card-bg:' + item.surface + '">',
+      '<button type="button" class="excx-card-button' + (active ? ' active' : '') + (count === 0 ? ' excx-card-zero' : '') + '" data-exception-card="' + esc(item.key) + '" style="--card-accent:' + item.accent + ';--card-border:' + (active ? item.accent : item.border) + ';--card-bg:' + item.surface + '">',
       '  <div class="excx-card-top"><div class="excx-icon">' + item.icon + '</div><div class="excx-count">' + esc(count) + '</div></div>',
-      '  <h3>' + esc(t(item.labelVi, item.labelEn)) + '</h3>',
+      '  <h3>' + esc(t(item.labelVi, item.labelEn)) + sevBadge + '</h3>',
       '  <p>' + esc(t(item.descVi, item.descEn)) + '</p>',
       '  <div class="excx-go">' + esc(t('Mở hàng đợi chi tiết', 'Open detailed queue')) + ' \u2192</div>',
       '</button>'
@@ -600,7 +700,7 @@ function renderDetailPanel(){
     return;
   }
 
-  var rows = state.detailItems.map(function(item){
+  var rows = state.detailItems.map(function(item, idx){
     return [
       '<tr>',
       '  <td class="excx-code">' + esc(item.id || '\u2014') + '</td>',
@@ -609,7 +709,7 @@ function renderDetailPanel(){
       '  <td>' + esc(item.date || '\u2014') + '</td>',
       '  <td>' + esc(item.responsible || '\u2014') + '</td>',
       '  <td>' + esc(item.detail || '\u2014') + '</td>',
-      '  <td><div class="excx-row-actions"><button type="button" class="excx-link" data-exception-route="' + esc(cfg.page || '') + '">' + esc(t('Mở workspace', 'Open workspace')) + '</button></div></td>',
+      '  <td><div class="excx-row-actions"><button type="button" class="excx-link" data-exception-route="' + esc(cfg.page || '') + '" data-highlight-id="' + esc(item.id || '') + '">' + esc(t('Mở', 'Open')) + '</button></div></td>',
       '</tr>'
     ].join('');
   }).join('');
@@ -640,6 +740,19 @@ function renderDetailPanel(){
 
 function bindEvents(){
   if (!state.container) return;
+  // Category filter buttons
+  Array.prototype.forEach.call(state.container.querySelectorAll('[data-exc-filter]'), function(btn){
+    btn.onclick = function(){
+      _excFilterCategory = btn.getAttribute('data-exc-filter') || 'all';
+      Array.prototype.forEach.call(state.container.querySelectorAll('[data-exc-filter]'), function(b){ b.classList.toggle('active', b.getAttribute('data-exc-filter') === _excFilterCategory); });
+      renderCards();
+      bindEvents();
+    };
+  });
+  var zeroToggle = state.container.querySelector('#excx-show-zero');
+  if (zeroToggle) {
+    zeroToggle.onchange = function(){ _excShowZero = zeroToggle.checked; renderCards(); bindEvents(); };
+  }
   Array.prototype.forEach.call(state.container.querySelectorAll('[data-exception-card]'), function(button){
     button.onclick = function(){
       var key = button.getAttribute('data-exception-card') || '';
@@ -666,7 +779,8 @@ function bindEvents(){
   Array.prototype.forEach.call(state.container.querySelectorAll('[data-exception-route]'), function(button){
     button.onclick = function(){
       var page = button.getAttribute('data-exception-route') || '';
-      window._excNavigate(page);
+      var highlightId = button.getAttribute('data-highlight-id') || '';
+      window._excNavigate(page, highlightId);
     };
   });
 }
@@ -737,9 +851,9 @@ function stopAutoRefresh(){
   }
 }
 
-window._excNavigate = function(page){
+window._excNavigate = function(page, highlightId){
   if (!page) return;
-  if (typeof navigateTo === 'function') navigateTo(page);
+  if (typeof navigateTo === 'function') navigateTo(page, highlightId ? { highlight: highlightId } : undefined);
 };
 
 window._excRefreshNow = function(){
@@ -751,7 +865,7 @@ window._excRefreshNow = function(){
 window._excExportExcel = function(type){
   var cfg = cfgFor(type);
   if (!cfg) return;
-  api('exception_detail', { type: type, page: 1, per_page: 1000 }, 'GET').then(function(resp){
+  api('exception_detail', { type: type, page: 1, per_page: 2000, export: 1 }, 'GET').then(function(resp){
     var items = resp && Array.isArray(resp.items) ? resp.items : [];
     if (!items.length) {
       if (typeof window._fhShowToast === 'function') window._fhShowToast(t('Không có dữ liệu để xuất.', 'No data available to export.'), 'info');

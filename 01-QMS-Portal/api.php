@@ -1959,7 +1959,20 @@ function save_orders_store(array $data): void {
   ensure_dir(dirname($ORDERS_FILE));
   $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : [];
   $data['_meta']['updated'] = now_iso();
-  write_json_file($ORDERS_FILE, $data);
+  // File locking to prevent concurrent-write data loss (BUG-ORD-04)
+  $lockFile = $ORDERS_FILE . '.lock';
+  $fp = @fopen($lockFile, 'c');
+  if ($fp) {
+    if (flock($fp, LOCK_EX)) {
+      write_json_file($ORDERS_FILE, $data);
+      flock($fp, LOCK_UN);
+    } else {
+      write_json_file($ORDERS_FILE, $data);
+    }
+    fclose($fp);
+  } else {
+    write_json_file($ORDERS_FILE, $data);
+  }
   shadow_sync_orders_store($data);
 }
 
@@ -17324,6 +17337,12 @@ if ($username === '') {
       }
       $parentJo = find_order_record($orders, 'jo', $joNumber);
       if (!$parentJo) api_json(['ok' => false, 'error' => 'parent_jo_not_found'], 404);
+      // Inherit traceability context from parent JO (AS9100D 8.5.2)
+      if (($record['part_number'] ?? '') === '') $record['part_number'] = (string)($parentJo['part_number'] ?? '');
+      if (($record['part_revision'] ?? '') === '') $record['part_revision'] = (string)($parentJo['part_revision'] ?? '');
+      if (($record['customer_id'] ?? '') === '') $record['customer_id'] = (string)($parentJo['customer_id'] ?? '');
+      if (($record['part_description'] ?? '') === '') $record['part_description'] = (string)($parentJo['part_description'] ?? '');
+      if (($record['material_spec'] ?? '') === '') $record['material_spec'] = (string)($parentJo['material_spec'] ?? '');
       $orders['work_orders'][] = $record;
       $launchGuard = mes_wo_transition_guard($orders, $master, load_mes_runtime_store(), (string)($record['wo_number'] ?? ''), (string)($record['status'] ?? 'scheduled'));
       if ($launchGuard) api_json($launchGuard, 409);
@@ -17454,16 +17473,21 @@ if ($username === '') {
     if ($entity === 'jo') {
       $partNumber = trim((string)($preview['part_number'] ?? ''));
       $partRevision = trim((string)($preview['part_revision'] ?? ''));
-      $hasRevision = false;
+      $matchedRev = null;
       foreach ($revisions as $revision) {
         if (!is_array($revision)) continue;
         if ((string)($revision['part_number'] ?? '') === $partNumber && (string)($revision['revision'] ?? '') === $partRevision) {
-          $hasRevision = true;
+          $matchedRev = $revision;
           break;
         }
       }
-      if (!$hasRevision) {
-        api_json(['ok' => false, 'error' => 'revision_not_found_for_part'], 422);
+      if (!$matchedRev) {
+        api_json(['ok' => false, 'error' => 'revision_not_found_for_part', 'message' => "Revision {$partRevision} not found for part {$partNumber}."], 422);
+      }
+      // REV-02: Only released revisions may be used on job orders
+      $revStatus = strtolower(trim((string)($matchedRev['status'] ?? '')));
+      if ($revStatus !== '' && $revStatus !== 'released') {
+        api_json(['ok' => false, 'error' => 'revision_not_released', 'message' => "Revision {$partRevision} has status '{$revStatus}'. Only released revisions are allowed."], 422);
       }
     }
 
@@ -18636,7 +18660,8 @@ if ($username === '') {
     $me = require_logged_in($store);
     $type = trim((string)($_GET['type'] ?? ''));
     $page = max(1, (int)($_GET['page'] ?? 1));
-    $perPage = min(100, max(10, (int)($_GET['per_page'] ?? 25)));
+    $isExport = !empty($_GET['export']);
+    $perPage = min($isExport ? 2000 : 100, max(10, (int)($_GET['per_page'] ?? 25)));
 
     $items = [];
     $today = date('Y-m-d');
@@ -18687,8 +18712,8 @@ if ($username === '') {
             if (!is_array($ord)) continue;
             $status = strtolower(trim((string)($ord['status'] ?? '')));
             if (in_array($status, ['closed', 'completed', 'cancelled', 'shipped'], true)) continue;
-            $due = (string)($ord['due_date'] ?? '');
-            if ($due !== '' && $due < $today) {
+            $due = (string)($ord['due_date'] ?? $ord['scheduled_end'] ?? '');
+            if ($due !== '' && substr($due, 0, 10) < $today) {
               $numKey = $key === 'sales_orders' ? 'so_number' : ($key === 'job_orders' ? 'jo_number' : 'wo_number');
               $items[] = [
                 'id'         => (string)($ord[$numKey] ?? ''),

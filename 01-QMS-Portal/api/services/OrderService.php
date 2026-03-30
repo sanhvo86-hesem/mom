@@ -20,14 +20,14 @@ use RuntimeException;
  */
 final class OrderService
 {
-    /** Valid SO statuses. */
-    private const SO_STATUSES = ['OPEN', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'ON_HOLD'];
+    /** Valid SO statuses (aligned with OrderWorkflowService & frontend). */
+    private const SO_STATUSES = ['draft', 'quoted', 'confirmed', 'in_production', 'shipped', 'closed', 'cancelled'];
 
-    /** Valid JO statuses. */
-    private const JO_STATUSES = ['PLANNED', 'RELEASED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'ON_HOLD'];
+    /** Valid JO statuses (aligned with OrderWorkflowService & frontend). */
+    private const JO_STATUSES = ['planned', 'released', 'active', 'on_hold', 'completed', 'closed'];
 
-    /** Valid WO statuses. */
-    private const WO_STATUSES = ['PENDING', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'];
+    /** Valid WO statuses (aligned with OrderWorkflowService & frontend). */
+    private const WO_STATUSES = ['scheduled', 'setup', 'running', 'inspection', 'completed', 'on_hold'];
 
     /** @var string Absolute path to qms-data directory. */
     private readonly string $dataDir;
@@ -90,9 +90,9 @@ final class OrderService
                 continue;
             }
 
-            // Status filter
+            // Status filter (case-insensitive, stored as lowercase)
             if (isset($filters['status']) && $filters['status'] !== '') {
-                if (strtoupper($so['status'] ?? '') !== strtoupper($filters['status'])) {
+                if (strtolower($so['status'] ?? '') !== strtolower($filters['status'])) {
                     continue;
                 }
             }
@@ -394,20 +394,20 @@ final class OrderService
         $now = date('Y-m-d');
 
         foreach ($salesOrders as $so) {
-            $status = strtoupper($so['status'] ?? '');
-            if (!in_array($status, ['COMPLETED', 'CANCELLED'], true)) {
+            $status = strtolower($so['status'] ?? '');
+            if (!in_array($status, ['closed', 'shipped', 'cancelled'], true)) {
                 $activeSoCount++;
             }
         }
 
         foreach ($jobOrders as $jo) {
-            $status  = strtoupper($jo['status'] ?? '');
+            $status  = strtolower($jo['status'] ?? '');
             $dueDate = $jo['due_date'] ?? '';
 
             // Count by status
             $byStatus[$status] = ($byStatus[$status] ?? 0) + 1;
 
-            if (!in_array($status, ['COMPLETED', 'CANCELLED'], true)) {
+            if (!in_array($status, ['completed', 'closed', 'cancelled'], true)) {
                 $activeJoCount++;
 
                 // Check overdue
@@ -416,7 +416,7 @@ final class OrderService
                 }
             }
 
-            if ($status === 'COMPLETED') {
+            if ($status === 'completed') {
                 $completedTotal++;
 
                 $completedAt = $jo['completed_at'] ?? $jo['updated_at'] ?? '';
@@ -574,6 +574,10 @@ final class OrderService
             throw new RuntimeException('Failed to write form links file.');
         }
 
+        // On Windows, rename() fails if destination exists; unlink first
+        if (file_exists($this->linksFile)) {
+            @unlink($this->linksFile);
+        }
         if (!@rename($tmpFile, $this->linksFile)) {
             @unlink($tmpFile);
             throw new RuntimeException('Failed to atomically replace form links file.');
