@@ -1,260 +1,272 @@
-﻿(function(){
+/* ═══════════════════════════════════════════════════
+   09-online-forms.js — Evidence Control Orchestrator
+   HESEM QMS Portal — Single-page workspace design
+   ═══════════════════════════════════════════════════ */
+
+(function(){
 'use strict';
+
+var FORM_COLORS = {
+  production:  { bg:'#fef3c7', icon:'\uD83C\uDFED' },
+  quality:     { bg:'#dcfce7', icon:'\uD83D\uDD0E' },
+  maintenance: { bg:'#fff9db', icon:'\uD83D\uDD27' },
+  hr:          { bg:'#f3e8ff', icon:'\uD83D\uDC65' },
+  logistics:   { bg:'#fff4e6', icon:'\uD83D\uDCE6' },
+  safety:      { bg:'#fee2e2', icon:'\u26A0' },
+  other:       { bg:'#f1f5f9', icon:'\uD83D\uDDC2' }
+};
 
 var state = {
   forms: [],
-  formsByCode: {},
-  activeTab: 'catalog',
-  activeFilter: 'all',
-  searchQuery: '',
-  pendingFillSelection: null,
-  pendingContext: null
+  formMap: {},
+  recordTypes: {},
+  formToRecordType: {},
+  selectedFormCode: '',
+  selectedAllocationId: '',
+  allocations: [],
+  filter: 'all',
+  search: '',
+  ready: false
 };
 
-var FORM_COLORS = {
-  production:  { bg:'#e7f5ff', border:'#1971c2', icon:'🏭', label:'Sản xuất', labelEn:'Production' },
-  quality:     { bg:'#ebfbee', border:'#2f9e44', icon:'🔎', label:'Chất lượng', labelEn:'Quality' },
-  maintenance: { bg:'#fff9db', border:'#e67700', icon:'🔧', label:'Bảo trì', labelEn:'Maintenance' },
-  hr:          { bg:'#f3f0ff', border:'#7950f2', icon:'👥', label:'Nhân sự & Đào tạo', labelEn:'HR & Training' },
-  logistics:   { bg:'#fff4e6', border:'#d9480f', icon:'📦', label:'Kho vận', labelEn:'Logistics' },
-  safety:      { bg:'#fff5f5', border:'#e03131', icon:'⚠', label:'An toàn', labelEn:'Safety' },
-  other:       { bg:'#f8fafc', border:'#64748b', icon:'🗂', label:'Khác', labelEn:'Other' }
-};
-
-var TABS = [
-  { id:'catalog',       icon:'📋', labelVi:'Danh mục form',          labelEn:'Form catalog' },
-  { id:'fill-download', icon:'✍', labelVi:'Điền & Tải form',        labelEn:'Fill & Download' },
-  { id:'record-id',     icon:'🔢', labelVi:'Trợ lý tạo mã',         labelEn:'Record ID Assistant' },
-  { id:'upload',        icon:'📤', labelVi:'Tải lên & Kiểm tra',    labelEn:'Upload & Verify' }
-];
+window._ecState = state;
 
 function t(vi, en){ return (typeof lang !== 'undefined' && lang === 'en') ? en : vi; }
-function esc(value){ var d=document.createElement('div'); d.appendChild(document.createTextNode(String(value == null ? '' : value))); return d.innerHTML; }
+function esc(v){ var d=document.createElement('div'); d.appendChild(document.createTextNode(String(v==null?'':v))); return d.innerHTML; }
+
 function showToast(message, type){
-  if(typeof window._fhShowToast === 'function' && window._fhShowToast !== showToast){
-    return window._fhShowToast(message, type);
-  }
-  var toast = document.createElement('div');
-  toast.className = 'form-toast form-toast-' + (type || 'info');
-  toast.textContent = message;
-  document.body.appendChild(toast);
-  setTimeout(function(){ toast.classList.add('show'); }, 10);
-  setTimeout(function(){ toast.classList.remove('show'); setTimeout(function(){ if(toast.parentNode) toast.remove(); }, 240); }, 2800);
+  var existing = document.querySelector('.ec-toast');
+  if(existing) existing.remove();
+  var el = document.createElement('div');
+  el.className = 'ec-toast ' + (type || 'info');
+  el.textContent = message;
+  document.body.appendChild(el);
+  setTimeout(function(){ el.classList.add('show'); }, 10);
+  setTimeout(function(){ el.classList.remove('show'); setTimeout(function(){ if(el.parentNode) el.remove(); }, 300); }, 3000);
 }
 
-window._fhState = state;
-window._fhT = t;
-window._fhEscHtml = esc;
-window._fhShowToast = showToast;
-window._fhFormColors = FORM_COLORS;
+window._ecShowToast = showToast;
+window._ecT = t;
+window._ecEsc = esc;
+
+function api(action, payload, method){
+  if(typeof apiCall === 'function') return apiCall(action, payload || {}, method || 'GET', 30000);
+  var opts = { method: method || 'GET', credentials:'include', headers:{} };
+  if(typeof csrfToken !== 'undefined' && csrfToken) opts.headers['X-CSRF-Token'] = csrfToken;
+  if((method || 'GET') !== 'GET'){ opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(payload || {}); }
+  return fetch('api.php?action=' + encodeURIComponent(action), opts).then(function(r){ return r.json(); });
+}
+
+window._ecApi = api;
+
+/* ── Data loading ── */
+
+function loadAll(){
+  return Promise.all([
+    api('form_catalog_snapshot', {}, 'GET').then(function(resp){
+      state.forms = (resp && Array.isArray(resp.forms)) ? resp.forms : [];
+      state.formMap = {};
+      state.forms.forEach(function(f){
+        if(!f.category) f.category = 'other';
+        if(f.online !== false) f.online = true;
+        state.formMap[f.form_code] = f;
+      });
+    }).catch(function(){ state.forms = []; }),
+    api('config_record_types', {}, 'GET').then(function(resp){
+      state.recordTypes = resp && resp.record_types ? resp.record_types : {};
+      state.formToRecordType = {};
+      Object.keys(state.recordTypes).forEach(function(code){
+        var linked = (state.recordTypes[code] || {}).linked_form;
+        if(linked) state.formToRecordType[linked] = code;
+      });
+    }).catch(function(){ state.recordTypes = {}; state.formToRecordType = {}; })
+  ]);
+}
+
+function loadAllocations(){
+  if(!state.selectedFormCode || !window.AllocationTracker) { state.allocations = []; return Promise.resolve([]); }
+  return window.AllocationTracker.getHistory({ form_code: state.selectedFormCode, page_size: 50 }).then(function(resp){
+    state.allocations = (resp && Array.isArray(resp.entries)) ? resp.entries.filter(function(r){ return String(r.form_code || '') === String(state.selectedFormCode); }) : [];
+    if(!state.selectedAllocationId && state.allocations.length) state.selectedAllocationId = state.allocations[0].allocation_id || '';
+    if(state.selectedAllocationId && !state.allocations.some(function(r){ return r.allocation_id === state.selectedAllocationId; })){
+      state.selectedAllocationId = state.allocations.length ? state.allocations[0].allocation_id : '';
+    }
+    return state.allocations;
+  }).catch(function(){ state.allocations = []; return []; });
+}
+
+/* ── Rendering ── */
+
+function render(container){
+  container.innerHTML = '<div class="ec-shell">' + renderSidebar() + '<div class="ec-workspace" id="ec-workspace"></div></div>';
+  bindSidebar(container);
+  renderWorkspace();
+}
+
+function renderSidebar(){
+  var forms = filterForms();
+  var categories = {};
+  forms.forEach(function(f){ var c = f.category || 'other'; if(!categories[c]) categories[c] = []; categories[c].push(f); });
+
+  var formListHtml = '';
+  if(!forms.length){
+    formListHtml = '<div style="padding:24px;text-align:center;color:var(--ec-text-muted);font-size:12px">' + esc(t('Không tìm thấy form nào', 'No forms found')) + '</div>';
+  } else {
+    Object.keys(categories).sort().forEach(function(cat){
+      var meta = FORM_COLORS[cat] || FORM_COLORS.other;
+      formListHtml += categories[cat].map(function(f){
+        var isActive = state.selectedFormCode === f.form_code;
+        return '<div class="ec-form-item' + (isActive ? ' active' : '') + '" data-form="' + esc(f.form_code) + '">' +
+          '<div class="ec-form-icon" style="background:' + meta.bg + '">' + meta.icon + '</div>' +
+          '<div class="ec-form-info"><div class="ec-form-code">' + esc(f.form_code) + '</div><div class="ec-form-name">' + esc(f.title_vi || f.title || f.form_code) + '</div></div>' +
+          '<span class="ec-mode-badge ' + (f.online === false ? 'offline' : 'online') + '">' + (f.online === false ? 'Offline' : 'Online') + '</span>' +
+        '</div>';
+      }).join('');
+    });
+  }
+
+  var allocHtml = '';
+  if(state.selectedFormCode && state.allocations.length){
+    allocHtml = state.allocations.map(function(a){
+      var isActive = state.selectedAllocationId === a.allocation_id;
+      return '<div class="ec-alloc-item' + (isActive ? ' active' : '') + '" data-alloc="' + esc(a.allocation_id) + '">' +
+        '<div style="flex:1;min-width:0"><div class="ec-alloc-id">' + esc(a.record_id || '') + '</div><div class="ec-alloc-meta">' + esc(a.department || '') + ' · ' + esc(a.status || 'allocated') + '</div></div>' +
+        (window.AllocationTracker ? window.AllocationTracker.renderStatusBadge(a.status || 'allocated') : '') +
+      '</div>';
+    }).join('');
+  }
+
+  var cats = ['all','quality','production','maintenance','hr','logistics','safety','other'];
+  var catLabels = { all: t('Tất cả','All'), quality: t('Chất lượng','Quality'), production: t('Sản xuất','Production'), maintenance: t('Bảo trì','Maintenance'), hr: t('Nhân sự','HR'), logistics: t('Kho vận','Logistics'), safety: t('An toàn','Safety'), other: t('Khác','Other') };
+
+  return '<aside class="ec-sidebar">' +
+    '<div class="ec-sidebar-header">' +
+      '<div class="ec-sidebar-title">' + esc(t('Danh mục biểu mẫu', 'Form catalog')) + '</div>' +
+      '<input class="ec-search" id="ec-search" type="search" value="' + esc(state.search) + '" placeholder="' + esc(t('Tìm form...', 'Search forms...')) + '">' +
+    '</div>' +
+    '<div class="ec-filters" id="ec-filters">' + cats.map(function(c){
+      return '<button type="button" class="ec-chip' + (state.filter === c ? ' active' : '') + '" data-filter="' + c + '">' + esc(catLabels[c] || c) + '</button>';
+    }).join('') + '</div>' +
+    '<div class="ec-form-list" id="ec-form-list">' + formListHtml + '</div>' +
+    (state.selectedFormCode ? '<div class="ec-alloc-section"><div class="ec-alloc-section-head"><span>' + esc(t('Mã đã cấp', 'Allocations')) + ' (' + state.allocations.length + ')</span></div>' + (allocHtml || '<div style="padding:8px 16px;font-size:11px;color:var(--ec-text-muted)">' + esc(t('Chưa có mã', 'None yet')) + '</div>') + '</div>' : '') +
+  '</aside>';
+}
+
+function filterForms(){
+  return state.forms.filter(function(f){
+    if(state.filter !== 'all' && (f.category || 'other') !== state.filter) return false;
+    if(state.search){
+      var q = state.search.toLowerCase();
+      var hay = [f.form_code, f.title, f.title_vi, f.description, f.description_vi, f.sop_ref, f.category].join(' ').toLowerCase();
+      if(hay.indexOf(q) < 0) return false;
+    }
+    return true;
+  });
+}
+
+function renderWorkspace(){
+  var ws = document.getElementById('ec-workspace');
+  if(!ws) return;
+  var form = state.formMap[state.selectedFormCode] || null;
+  if(!form){
+    ws.innerHTML = '<div class="ec-empty"><div class="ec-empty-icon">\uD83D\uDCCB</div><h3>' + esc(t('Chọn biểu mẫu để bắt đầu', 'Select a form to begin')) + '</h3><p>' + esc(t('Chọn form từ danh mục bên trái. Hệ thống sẽ hướng dẫn bạn qua từng bước: cấp mã → điền/tải → ký & gửi.', 'Pick a form from the catalog. The system will guide you through each step: allocate → fill/download → sign & submit.')) + '</p></div>';
+    return;
+  }
+  var allocation = state.allocations.find(function(a){ return a.allocation_id === state.selectedAllocationId; }) || null;
+  if(typeof window._renderWorkspace === 'function'){
+    window._renderWorkspace(form, allocation, ws);
+  } else {
+    ws.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Module workspace chưa sẵn sàng', 'Workspace module not ready')) + '</h3></div>';
+  }
+}
+
+/* ── Event binding ── */
+
+function bindSidebar(container){
+  var searchEl = document.getElementById('ec-search');
+  if(searchEl) searchEl.oninput = function(){ state.search = searchEl.value; refreshFormList(container); };
+
+  container.addEventListener('click', function(e){
+    var filterBtn = e.target.closest('[data-filter]');
+    if(filterBtn){
+      state.filter = filterBtn.getAttribute('data-filter') || 'all';
+      refreshFormList(container);
+      return;
+    }
+    var formItem = e.target.closest('[data-form]');
+    if(formItem){
+      var code = formItem.getAttribute('data-form');
+      if(code === state.selectedFormCode) return;
+      state.selectedFormCode = code;
+      state.selectedAllocationId = '';
+      state.allocations = [];
+      loadAllocations().then(function(){ render(container); });
+      return;
+    }
+    var allocItem = e.target.closest('[data-alloc]');
+    if(allocItem){
+      state.selectedAllocationId = allocItem.getAttribute('data-alloc') || '';
+      render(container);
+    }
+  });
+}
+
+function refreshFormList(container){
+  var listEl = document.getElementById('ec-form-list');
+  var filtersEl = document.getElementById('ec-filters');
+  if(!listEl) return;
+
+  var forms = filterForms();
+  var categories = {};
+  forms.forEach(function(f){ var c = f.category || 'other'; if(!categories[c]) categories[c] = []; categories[c].push(f); });
+
+  var html = '';
+  if(!forms.length){
+    html = '<div style="padding:24px;text-align:center;color:var(--ec-text-muted);font-size:12px">' + esc(t('Không tìm thấy form nào', 'No forms found')) + '</div>';
+  } else {
+    Object.keys(categories).sort().forEach(function(cat){
+      var meta = FORM_COLORS[cat] || FORM_COLORS.other;
+      html += categories[cat].map(function(f){
+        return '<div class="ec-form-item' + (state.selectedFormCode === f.form_code ? ' active' : '') + '" data-form="' + esc(f.form_code) + '">' +
+          '<div class="ec-form-icon" style="background:' + meta.bg + '">' + meta.icon + '</div>' +
+          '<div class="ec-form-info"><div class="ec-form-code">' + esc(f.form_code) + '</div><div class="ec-form-name">' + esc(f.title_vi || f.title || f.form_code) + '</div></div>' +
+          '<span class="ec-mode-badge ' + (f.online === false ? 'offline' : 'online') + '">' + (f.online === false ? 'Offline' : 'Online') + '</span>' +
+        '</div>';
+      }).join('');
+    });
+  }
+  listEl.innerHTML = html;
+
+  if(filtersEl){
+    Array.prototype.forEach.call(filtersEl.querySelectorAll('.ec-chip'), function(btn){
+      btn.classList.toggle('active', btn.getAttribute('data-filter') === state.filter);
+    });
+  }
+}
+
+/* ── Public entry point ── */
 
 window.renderOnlineForms = function(formCode){
   var page = document.getElementById('page-forms');
   if(!page) return;
-  if(formCode){
-    state.pendingFillSelection = { formCode: formCode };
-    state.activeTab = 'fill-download';
-  }
-  loadCatalog().then(function(){
-    renderHub(page);
+  if(formCode) state.selectedFormCode = formCode;
+  page.innerHTML = '<div class="ec-empty" style="min-height:300px"><div style="font-size:14px;color:var(--ec-text-muted)">' + esc(t('Đang tải...', 'Loading...')) + '</div></div>';
+  loadAll().then(function(){
+    if(!state.selectedFormCode && state.forms.length) state.selectedFormCode = state.forms[0].form_code;
+    return loadAllocations();
+  }).then(function(){
+    state.ready = true;
+    render(page);
   }).catch(function(){
-    page.innerHTML = '<div class="fh"><div class="fh-section"><div class="fh-section-head"><h2>' + esc(t('Không thể tải danh mục form', 'Could not load form catalog')) + '</h2><span>' + esc(t('Vui lòng thử lại sau.', 'Please try again later.')) + '</span></div></div></div>';
+    page.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Không thể tải dữ liệu', 'Could not load data')) + '</h3><p>' + esc(t('Vui lòng kiểm tra kết nối và thử lại.', 'Please check your connection and try again.')) + '</p></div>';
   });
 };
 
-window._fhSwitchTab = function(tabId){
-  state.activeTab = tabId;
-  renderActiveTab();
-};
-
-function api(action, payload, method){
-  if(typeof apiCall === 'function') return apiCall(action, payload || {}, method || 'GET', 30000);
-  var options = { method: method || 'GET', credentials:'include', headers:{} };
-  if(typeof csrfToken !== 'undefined' && csrfToken) options.headers['X-CSRF-Token'] = csrfToken;
-  if((method || 'GET') !== 'GET'){
-    options.headers['Content-Type'] = 'application/json';
-    options.body = JSON.stringify(payload || {});
-  }
-  return fetch('api.php?action=' + encodeURIComponent(action), options).then(function(r){ return r.json(); });
-}
-
-function loadCatalog(){
-  return api('form_catalog_snapshot', {}, 'GET').then(function(resp){
-    var forms = (resp && Array.isArray(resp.forms)) ? resp.forms.slice() : [];
-    forms.forEach(function(form){
-      if(!form.category) form.category = 'other';
-      if(!form.delivery_mode) form.delivery_mode = form.online === false ? 'offline' : 'online';
-      if(form.online !== false) form.online = true;
-      state.formsByCode[form.form_code] = form;
-    });
-    state.forms = forms;
-    return forms;
-  });
-}
-
-function renderHub(page){
-  var totalForms = state.forms.length;
-  var onlineForms = state.forms.filter(function(form){ return form.online !== false; }).length;
-  var offlineForms = totalForms - onlineForms;
-
-  page.innerHTML = '' +
-    '<div class="fh">' +
-      '<div class="fh-hero">' +
-        '<div>' +
-          '<div class="fh-hero-kicker">HESEM QMS · Evidence Control Runtime</div>' +
-          '<h1>' + esc(t('Kiểm soát chứng cứ — Trung tâm quản lý biểu mẫu', 'Evidence Control — Central form runtime')) + '</h1>' +
-          '<p>' + esc(t('Danh mục form, cấp phát mã, điền online, tải Excel và kiểm tra upload được điều phối trong một runtime thống nhất.', 'Catalog, record allocation, online entry, Excel download, and upload verification are orchestrated in one governed runtime.')) + '</p>' +
-        '</div>' +
-        '<div class="fh-hero-side">' +
-          '<div class="fh-side-card"><span class="fh-side-label">' + esc(t('Tổng form', 'Total forms')) + '</span><strong>' + totalForms + '</strong><div>' + esc(t('Đang khả dụng', 'Available')) + '</div></div>' +
-          '<div class="fh-side-card"><span class="fh-side-label">' + esc(t('Online', 'Online')) + '</span><strong>' + onlineForms + '</strong><div>' + esc(t('Trực tuyến', 'Live')) + '</div></div>' +
-          '<div class="fh-side-card"><span class="fh-side-label">' + esc(t('Offline', 'Offline')) + '</span><strong>' + offlineForms + '</strong><div>' + esc(t('Excel kiểm soát', 'Excel governed')) + '</div></div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="fh-summary">' +
-        kpiCard('blue', totalForms, t('Tổng form', 'Total forms'), t('Danh mục dùng chung', 'Shared catalog')) +
-        kpiCard('green', onlineForms, t('Form online', 'Online forms'), t('Điền trực tiếp', 'Live entry')) +
-        kpiCard('amber', offlineForms, t('Form offline', 'Offline forms'), t('Cấp phát & tải Excel', 'Issued Excel')) +
-        kpiCard('purple', state.pendingFillSelection && state.pendingFillSelection.recordId ? 1 : 0, t('Đang xử lý', 'In context'), t('Ngữ cảnh đang mở', 'Working context')) +
-        kpiCard('red', 1, t('Runtime', 'Runtime'), t('Compatibility layer', 'Compatibility layer')) +
-      '</div>' +
-      '<div class="fh-tabs">' + TABS.map(function(tab){
-        return '<button type="button" class="fh-tab' + (state.activeTab === tab.id ? ' active' : '') + '" data-tab="' + tab.id + '" onclick="_fhSwitchTab(\'' + tab.id + '\')">' +
-          '<span class="fh-tab-icon">' + tab.icon + '</span>' + esc(t(tab.labelVi, tab.labelEn)) + (tab.id === 'catalog' ? ' <span class="fh-tab-count">' + totalForms + '</span>' : '') +
-        '</button>';
-      }).join('') + '</div>' +
-      '<div id="fh-tab-catalog" class="fh-panel"></div>' +
-      '<div id="fh-tab-fill-download" class="fh-panel"></div>' +
-      '<div id="fh-tab-record-id" class="fh-panel"></div>' +
-      '<div id="fh-tab-upload" class="fh-panel"></div>' +
-    '</div>';
-
-  renderActiveTab();
-}
-
-function kpiCard(color, value, label, sub){
-  return '<div class="fh-kpi fh-kpi-' + color + '"><div class="fh-kpi-label">' + esc(label) + '</div><strong>' + value + '</strong><span>' + esc(sub) + '</span></div>';
-}
-
-function renderActiveTab(){
-  Array.prototype.forEach.call(document.querySelectorAll('.fh-tab'), function(tab){
-    tab.classList.toggle('active', tab.getAttribute('data-tab') === state.activeTab);
-  });
-  Array.prototype.forEach.call(document.querySelectorAll('.fh-panel'), function(panel){
-    panel.classList.remove('active');
-  });
-  var panel = document.getElementById('fh-tab-' + state.activeTab);
-  if(!panel) return;
-  panel.classList.add('active');
-
-  if(state.activeTab === 'catalog') return renderCatalog(panel);
-  if(state.activeTab === 'fill-download'){
-    if(typeof window._renderFillDownload === 'function') return window._renderFillDownload(state.forms, {}, panel);
-    panel.innerHTML = emptyBlock(t('Module Điền & Tải form chưa sẵn sàng.', 'Fill & Download module is not ready yet.'));
-    return;
-  }
-  if(state.activeTab === 'record-id'){
-    if(typeof window._renderRecordIdGenerator === 'function') return window._renderRecordIdGenerator(state.forms, {}, panel);
-    panel.innerHTML = emptyBlock(t('Module Trợ lý tạo mã chưa sẵn sàng.', 'Record ID Assistant is not ready yet.'));
-    return;
-  }
-  if(state.activeTab === 'upload'){
-    if(typeof window._renderUploadVerify === 'function') return window._renderUploadVerify(state.forms, {}, panel);
-    panel.innerHTML = emptyBlock(t('Module Tải lên & Kiểm tra chưa sẵn sàng.', 'Upload & Verify module is not ready yet.'));
-  }
-}
-
-function emptyBlock(message){
-  return '<div class="fh-section"><div class="fh-section-head"><h2>' + esc(message) + '</h2></div></div>';
-}
-
-function renderCatalog(container){
-  var forms = state.forms.slice();
-  var query = String(state.searchQuery || '').trim().toLowerCase();
-  var filter = state.activeFilter || 'all';
-  if(filter !== 'all') forms = forms.filter(function(form){ return String(form.category || 'other') === filter; });
-  if(query){
-    forms = forms.filter(function(form){
-      var hay = [form.form_code, form.title, form.title_vi, form.description, form.description_vi, form.sop_ref, form.category].join(' ').toLowerCase();
-      return hay.indexOf(query) >= 0;
-    });
-  }
-
-  var html = '' +
-    '<section class="fh-section">' +
-      '<div class="fh-section-head"><h2>' + esc(t('Danh mục form được kiểm soát', 'Governed form catalog')) + '</h2><span>' + esc(t('Chọn form để chuyển sang luồng điền online hoặc tải Excel đã kiểm soát.', 'Pick a form to continue to online runtime or governed Excel issuance.')) + '</span></div>' +
-      '<div class="fh-filter-bar">' +
-        '<input id="fh-catalog-search" class="fh-search" type="search" value="' + esc(state.searchQuery || '') + '" placeholder="' + esc(t('Tìm theo mã form, tiêu đề, SOP...', 'Search by form code, title, SOP...')) + '">' +
-        '<div class="fh-filter-chips">' + ['all','quality','production','maintenance','hr','logistics','safety','other'].map(function(key){
-          var meta = FORM_COLORS[key] || FORM_COLORS.other;
-          var label = key === 'all' ? t('Tất cả', 'All') : t(meta.label, meta.labelEn);
-          return '<button type="button" class="fh-chip' + (state.activeFilter === key ? ' active' : '') + '" data-filter="' + key + '">' + esc(label) + '</button>';
-        }).join('') + '</div>' +
-      '</div>' +
-    '</section>';
-
-  if(!forms.length){
-    html += '<div class="fh-section"><div class="forms-page"><div class="forms-stat-card"><div class="stat-value">0</div><div class="stat-label">' + esc(t('Không có kết quả', 'No results')) + '</div></div></div></div>';
-    container.innerHTML = html;
-    bindCatalogEvents(container);
-    return;
-  }
-
-  var grouped = {};
-  forms.forEach(function(form){
-    var group = form.category || 'other';
-    if(!grouped[group]) grouped[group] = [];
-    grouped[group].push(form);
-  });
-
-  Object.keys(grouped).sort(function(a, b){ return String(a).localeCompare(String(b)); }).forEach(function(groupKey){
-    var meta = FORM_COLORS[groupKey] || FORM_COLORS.other;
-    html += '<section class="forms-group">' +
-      '<h3 class="forms-group-title"><span class="forms-group-icon">' + meta.icon + '</span>' + esc(t(meta.label, meta.labelEn)) + ' <span class="fh-tab-count">' + grouped[groupKey].length + '</span></h3>' +
-      '<div class="forms-grid">';
-    grouped[groupKey].forEach(function(form){
-      var modeClass = form.online === false ? 'form-card-excel' : 'form-card-online';
-      var modeLabel = form.online === false ? t('Offline', 'Offline') : t('Online', 'Online');
-      var actionLabel = form.online === false ? t('Mở luồng tải form', 'Open download flow') : t('Mở form online', 'Open online form');
-      html += '' +
-        '<article class="form-card" data-open-form="' + esc(form.form_code) + '">' +
-          '<div class="form-card-type ' + modeClass + '">' + esc(modeLabel) + '</div>' +
-          '<div class="form-card-header">' +
-            '<span class="form-card-code">' + esc(form.form_code || '') + '</span>' +
-            '<span class="form-card-freq">' + esc(form.version || 'V1') + '</span>' +
-          '</div>' +
-          '<div class="form-card-title">' + esc(form.title_vi || form.title || form.form_code) + '</div>' +
-          '<div class="form-card-desc">' + esc(t(form.description_vi || form.description || 'Chưa có mô tả chi tiết cho form này.', form.description || 'No detailed description available for this form yet.')) + '</div>' +
-          '<div class="form-card-footer">' +
-            '<span class="form-card-ref">' + esc(form.sop_ref || '—') + '</span>' +
-            '<button type="button" class="form-card-btn">' + esc(actionLabel) + '</button>' +
-          '</div>' +
-        '</article>';
-    });
-    html += '</div></section>';
-  });
-
-  container.innerHTML = html;
-  bindCatalogEvents(container);
-}
-
-function bindCatalogEvents(container){
-  var search = container.querySelector('#fh-catalog-search');
-  if(search){
-    search.oninput = function(){ state.searchQuery = search.value || ''; renderCatalog(container); };
-  }
-  Array.prototype.forEach.call(container.querySelectorAll('[data-filter]'), function(btn){
-    btn.onclick = function(){ state.activeFilter = btn.getAttribute('data-filter') || 'all'; renderCatalog(container); };
-  });
-  Array.prototype.forEach.call(container.querySelectorAll('[data-open-form]'), function(card){
-    card.addEventListener('click', function(){
-      var formCode = card.getAttribute('data-open-form') || '';
-      if(!formCode) return;
-      state.pendingFillSelection = { formCode: formCode };
-      state.activeTab = 'fill-download';
-      renderActiveTab();
-    });
-  });
-}
+/* backward compat */
+window._fhSwitchTab = function(){};
+window._fhState = state;
+window._fhShowToast = showToast;
+window._fhT = t;
+window._fhEscHtml = esc;
 
 })();
