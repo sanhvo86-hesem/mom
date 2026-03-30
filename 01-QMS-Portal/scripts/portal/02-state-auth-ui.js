@@ -4043,20 +4043,22 @@ function gitSyncRenderPresyncSection(presync){
   const pushed = !!presync.pushed;
   const files = Array.isArray(presync.files) ? presync.files : [];
   const statusEntries = Array.isArray(presync.status_entries) ? presync.status_entries : [];
+  const sectionTitle = lang==='en'
+    ? 'Auto pre-sync before pull (server-side only)'
+    : 'Auto pre-sync tr\u01b0\u1edbc khi pull (ch\u1ec9 ph\u00eda server)';
+  const callout = pushed
+    ? (lang==='en'
+      ? 'Portal detected meaningful cPanel/server changes, committed them, and pushed them to GitHub before pulling.'
+      : 'Portal ph\u00e1t hi\u1ec7n thay \u0111\u1ed5i meaningful tr\u00ean cPanel/server, \u0111\u00e3 commit v\u00e0 \u0111\u1ea9y ch\u00fang l\u00ean GitHub tr\u01b0\u1edbc khi pull.')
+    : (lang==='en'
+      ? 'No meaningful cPanel/server change needed a pre-sync commit before pull.'
+      : 'Kh\u00f4ng c\u00f3 thay \u0111\u1ed5i meaningful tr\u00ean cPanel/server c\u1ea7n pre-sync commit tr\u01b0\u1edbc khi pull.');
   const hasAnything = pushed || files.length || statusEntries.length || String(presync.commit_output||'').trim() || String(presync.push_output||'').trim();
   if(!hasAnything) return '';
   return `
     <section class="git-sync-section">
-      <div class="git-sync-section-title">${lang==='en'?'Auto pre-sync before pull':'Auto pre-sync trước khi pull'}</div>
-      <div class="git-sync-callout">
-        ${pushed
-          ? (lang==='en'
-            ? 'Portal detected meaningful local server changes, committed them, and pushed them to GitHub before pulling.'
-            : 'Portal phát hiện thay đổi meaningful trên server, đã commit và đẩy chúng lên GitHub trước khi pull.')
-          : (lang==='en'
-            ? 'No meaningful local server change needed a pre-sync commit before pull.'
-            : 'Không có thay đổi meaningful trên server cần pre-sync commit trước khi pull.')}
-      </div>
+      <div class="git-sync-section-title">${sectionTitle}</div>
+      <div class="git-sync-callout">${callout}</div>
       <div class="git-sync-summary-grid git-sync-summary-grid--compact">
         ${gitSyncRenderSummaryCard(lang==='en'?'Branch':'Nhánh', String(presync.branch || 'main'))}
         ${gitSyncRenderSummaryCard(lang==='en'?'Files':'Số file', String(files.length))}
@@ -4076,6 +4078,7 @@ function openGitSyncReportModal(kind, res){
   const files = Array.isArray(res && res.files) ? res.files : [];
   const statusEntries = Array.isArray(res && res.status_entries) ? res.status_entries : [];
   const changedFiles = Array.isArray(res && res.changed_files) ? res.changed_files : [];
+  const presync = res && typeof res.presync === 'object' ? res.presync : null;
   const pushed = !!(res && res.pushed);
   const pulled = !!(res && res.pulled);
   const beforeHead = String((res && (res.before_head || res.head_before)) || '');
@@ -4098,13 +4101,23 @@ function openGitSyncReportModal(kind, res){
         gitSyncRenderSummaryCard(lang==='en'?'After':'Sau', gitSyncShortHash(afterHead)),
       ].join('');
 
+  const pullSummaryMessage = (() => {
+    const base = String(res && res.message || (pulled ? 'Portal updated.' : 'Already up to date.'));
+    if(!pulled && presync && presync.pushed){
+      return `${base} ${lang==='en'
+        ? 'The pre-sync section below shows server-side changes only; workstation edits appear here only after they are pushed to GitHub.'
+        : 'Phần pre-sync bên dưới chỉ hiển thị thay đổi phía server; thay đổi trên máy local chỉ xuất hiện ở đây sau khi đã đẩy lên GitHub.'}`;
+    }
+    return base;
+  })();
+
   const bodySections = isPull
     ? `
       <section class="git-sync-section">
         <div class="git-sync-section-title">${lang==='en'?'Pull summary':'Tóm tắt pull'}</div>
-        <div class="git-sync-callout">${escapeHtml(String(res && res.message || (pulled ? 'Portal updated.' : 'Already up to date.')))}</div>
+        <div class="git-sync-callout">${escapeHtml(pullSummaryMessage)}</div>
       </section>
-      ${gitSyncRenderPresyncSection(res && res.presync)}
+      ${gitSyncRenderPresyncSection(presync)}
       <section class="git-sync-section">
         <div class="git-sync-section-title">${lang==='en'?'Files applied to portal':'Danh sách file áp dụng xuống portal'}</div>
         ${gitSyncRenderChangedFileTable(changedFiles, lang==='en'?'No remote file change was applied in this pull.':'Không có file remote nào được áp xuống trong lần pull này.')}

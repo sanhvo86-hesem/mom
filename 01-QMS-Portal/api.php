@@ -9292,26 +9292,33 @@ function git_is_runtime_noise_path(string $path): bool {
   return false;
 }
 
-function git_filter_non_runtime_status_lines(array $statusLines): array {
+function git_is_presync_telemetry_path(string $path): bool {
+  $p = ltrim(str_replace('\\', '/', trim($path)), '/');
+  if ($p === '') return false;
+  if (str_starts_with($p, '01-QMS-Portal/qms-data/runtime-shadow/')) return true;
+  return (bool)preg_match('#^01-QMS-Portal/qms-data/audit/audit_\d{4}-\d{2}\.jsonl$#', $p);
+}
+
+function git_filter_non_runtime_status_lines(array $statusLines, bool $excludePresyncTelemetry = false): array {
   $kept = [];
   foreach ($statusLines as $line) {
     if (!is_string($line) || trim($line) === '') continue;
     $path = git_status_entry_path($line);
-    if (!git_is_runtime_noise_path($path)) {
-      $kept[] = $line;
-    }
+    if (git_is_runtime_noise_path($path)) continue;
+    if ($excludePresyncTelemetry && git_is_presync_telemetry_path($path)) continue;
+    $kept[] = $line;
   }
   return $kept;
 }
 
-function git_filter_non_runtime_paths(array $paths): array {
+function git_filter_non_runtime_paths(array $paths, bool $excludePresyncTelemetry = false): array {
   $kept = [];
   foreach ($paths as $path) {
     if (!is_string($path) || trim($path) === '') continue;
     $norm = str_replace('\\', '/', trim($path));
-    if (!git_is_runtime_noise_path($norm)) {
-      $kept[] = $norm;
-    }
+    if (git_is_runtime_noise_path($norm)) continue;
+    if ($excludePresyncTelemetry && git_is_presync_telemetry_path($norm)) continue;
+    $kept[] = $norm;
   }
   return $kept;
 }
@@ -9422,6 +9429,20 @@ function git_cleanup_runtime_noise(string $repoReal): void {
   git_command(['restore', '--', '01-QMS-Portal/qms-data/config/users.json'], $repoReal, $usersRestoreCode);
 }
 
+function git_unstage_paths(string $repoReal, array $paths): void {
+  $clean = array_values(array_unique(array_filter(array_map(static function($path){
+    if (!is_string($path) || trim($path) === '') return '';
+    return str_replace('\\', '/', trim($path));
+  }, $paths), static fn($path) => $path !== '')));
+  if (empty($clean)) return;
+
+  $restoreCode = 0;
+  $restoreOut = git_command(['restore', '--staged', '--', ...$clean], $repoReal, $restoreCode);
+  if ($restoreCode !== 0) {
+    throw new RuntimeException('git_restore_staged_failed' . ($restoreOut !== '' ? ': ' . $restoreOut : ''));
+  }
+}
+
 function git_sync_commit_author(array $me): array {
   $name = trim((string)($me['name'] ?? $me['username'] ?? 'Portal Sync'));
   if ($name === '') $name = 'Portal Sync';
@@ -9440,11 +9461,12 @@ function git_sync_commit_author(array $me): array {
   ];
 }
 
-function git_sync_documents(array $me, string $repoDir): array {
+function git_sync_documents(array $me, string $repoDir, array $options = []): array {
   $repoReal = realpath($repoDir);
   if ($repoReal === false || !is_dir($repoReal)) {
     throw new RuntimeException('repo_not_found');
   }
+  $excludePresyncTelemetry = !empty($options['exclude_presync_telemetry']);
 
   $checkCode = 0;
   $checkOut = git_command(['rev-parse', '--is-inside-work-tree'], $repoReal, $checkCode);
@@ -9463,7 +9485,7 @@ function git_sync_documents(array $me, string $repoDir): array {
   if ($statusCode !== 0) {
     throw new RuntimeException('git_status_failed');
   }
-  $statusLines = git_filter_non_runtime_status_lines(split_nonempty_lines($statusOut));
+  $statusLines = git_filter_non_runtime_status_lines(split_nonempty_lines($statusOut), $excludePresyncTelemetry);
   $statusEntries = git_parse_status_entries($statusLines);
   if (empty($statusLines)) {
     $aheadCode = 0;
@@ -9525,12 +9547,24 @@ function git_sync_documents(array $me, string $repoDir): array {
   // Ensure runtime files never get committed even after add -A.
   git_cleanup_runtime_noise($repoReal);
 
+  if ($excludePresyncTelemetry) {
+    $cachedNamesCode = 0;
+    $cachedNamesOut = git_command(['diff', '--cached', '--name-only', '--'], $repoReal, $cachedNamesCode);
+    if ($cachedNamesCode !== 0) {
+      throw new RuntimeException('git_diff_cached_failed');
+    }
+    $telemetryPaths = array_values(array_filter(split_nonempty_lines($cachedNamesOut), 'git_is_presync_telemetry_path'));
+    if (!empty($telemetryPaths)) {
+      git_unstage_paths($repoReal, $telemetryPaths);
+    }
+  }
+
   $filesCode = 0;
   $filesOut = git_command(['diff', '--cached', '--name-only', '--'], $repoReal, $filesCode);
   if ($filesCode !== 0) {
     throw new RuntimeException('git_diff_cached_failed');
   }
-  $files = git_filter_non_runtime_paths(split_nonempty_lines($filesOut));
+  $files = git_filter_non_runtime_paths(split_nonempty_lines($filesOut), $excludePresyncTelemetry);
   if (empty($files)) {
     return [
       'pushed' => false,
@@ -9611,7 +9645,7 @@ function git_pull_portal(string $repoDir, ?array $me = null): array {
   $presyncResult = null;
   if (is_array($me)) {
     try {
-      $presyncResult = git_sync_documents($me, $repoReal);
+      $presyncResult = git_sync_documents($me, $repoReal, ['exclude_presync_telemetry' => true]);
       git_cleanup_runtime_noise($repoReal);
     } catch (Throwable $syncError) {
       $syncMsg = (string)$syncError->getMessage();
@@ -9627,7 +9661,7 @@ function git_pull_portal(string $repoDir, ?array $me = null): array {
     throw new RuntimeException('git_index_check_failed');
   }
   $stagedFiles = split_nonempty_lines($stagedOut);
-  $stagedMeaningful = git_filter_non_runtime_paths($stagedFiles);
+  $stagedMeaningful = git_filter_non_runtime_paths($stagedFiles, true);
   if (!empty($stagedMeaningful)) {
     throw new RuntimeException('staged_changes_present: ' . git_join_paths_for_error($stagedMeaningful));
   }
@@ -9637,7 +9671,7 @@ function git_pull_portal(string $repoDir, ?array $me = null): array {
   if ($statusCode !== 0) {
     throw new RuntimeException('git_status_failed');
   }
-  $dirtyLines = git_filter_non_runtime_status_lines(split_nonempty_lines($statusOut));
+  $dirtyLines = git_filter_non_runtime_status_lines(split_nonempty_lines($statusOut), true);
   if (!empty($dirtyLines)) {
     $dirtyPaths = git_collect_paths_from_status_lines($dirtyLines);
     throw new RuntimeException('working_tree_dirty: ' . git_join_paths_for_error($dirtyPaths));
@@ -9658,10 +9692,14 @@ function git_pull_portal(string $repoDir, ?array $me = null): array {
   $behindOut = git_command(['rev-list', '--count', $branch . '..origin/' . $branch], $repoReal, $behindCode);
   $behindCount = $behindCode === 0 ? (int)trim($behindOut) : 0;
   if ($behindCount <= 0) {
+    $message = 'Portal is already up to date with origin/' . $branch;
+    if (is_array($presyncResult) && !empty($presyncResult['pushed'])) {
+      $message = 'No new commit was available on origin/' . $branch . '; only server-side pre-sync changes were handled before pull.';
+    }
     return [
       'pulled' => false,
       'branch' => $branch,
-      'message' => 'Portal is already up to date with origin/' . $branch,
+      'message' => $message,
       'before_head' => $headBefore,
       'after_head' => $headBefore,
       'changed_files' => [],
@@ -10135,6 +10173,7 @@ switch ($action) {
         str_starts_with($message, 'git_status_failed') => 'git_status_failed',
         str_starts_with($message, 'git_index_check_failed') => 'git_index_check_failed',
         str_starts_with($message, 'git_diff_cached_failed') => 'git_diff_cached_failed',
+        str_starts_with($message, 'git_restore_staged_failed') => 'git_restore_staged_failed',
         default => 'git_sync_failed',
       };
       api_json([
