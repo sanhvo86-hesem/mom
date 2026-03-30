@@ -39,7 +39,7 @@ foreach ($file in @($configFile, $dataLayerFile, $apiFile, $migrationFile, $jsFi
 }
 
 Write-Step "Cutover tokens present"
-rg -n "read_retry_count|read_retry_delay_ms|MODE_POSTGRES_PRIMARY|pgWithFallback|setReadMeta|mes_stream|build_exception_dashboard_data|EventSource|connectStream|timescaledb\\.continuous|create_hypertable|add_retention_policy|add_compression_policy" $configFile $dataLayerFile $apiFile $migrationFile $jsFile
+rg -n "read_retry_count|read_retry_delay_ms|MODE_POSTGRES_PRIMARY|pgWithFallback|setReadMeta|mes_stream|stream_mode|polling_fallback|mes_mtconnect_poll_once|mes_mtconnect_poll_url|mes_http_fetch_text|build_exception_dashboard_data|EventSource|connectStream|streamEligible|data-poll-mtconnect|timescaledb\\.continuous|create_hypertable|add_retention_policy|add_compression_policy" $configFile $dataLayerFile $apiFile $migrationFile $jsFile
 if ($LASTEXITCODE -ne 0) {
   throw "Missing one or more cutover tokens."
 }

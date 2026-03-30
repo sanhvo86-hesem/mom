@@ -2035,6 +2035,12 @@ function runtime_data_layer_summary(): array {
   }
 }
 
+function mes_runtime_supports_live_stream(array $mode): bool {
+  return (bool)($mode['use_postgres'] ?? false)
+    && (bool)($mode['postgres_path_active'] ?? false)
+    && (bool)($mode['postgres_reachable'] ?? false);
+}
+
 function edge_connector_service(): \HESEM\QMS\Services\EdgeConnectorService {
   require_once __DIR__ . '/api/services/EdgeConnectorService.php';
   static $service = null;
@@ -4639,6 +4645,88 @@ function mes_upsert_connector_runtime(array &$mes, array $machine, array $normal
     'connector_health' => $connectorHealth,
     'ingest_warnings' => $ingestWarnings,
   ];
+}
+
+function mes_mtconnect_poll_url(string $endpoint): string {
+  $url = trim($endpoint);
+  if ($url === '') {
+    throw new RuntimeException('missing_connector_endpoint');
+  }
+  if (!preg_match('~^https?://~i', $url)) {
+    throw new RuntimeException('invalid_connector_endpoint');
+  }
+  if (preg_match('~/current(?:\?.*)?$~i', $url)) {
+    return $url;
+  }
+  return rtrim($url, '/') . '/current';
+}
+
+function mes_http_fetch_text(string $url, int $timeoutSeconds = 10): string {
+  if (function_exists('curl_init')) {
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_FOLLOWLOCATION => true,
+      CURLOPT_CONNECTTIMEOUT => max(1, $timeoutSeconds),
+      CURLOPT_TIMEOUT => max(2, $timeoutSeconds),
+      CURLOPT_HTTPHEADER => ['Accept: application/xml, text/xml, */*'],
+    ]);
+    $body = curl_exec($ch);
+    $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+    $error = curl_error($ch);
+    curl_close($ch);
+    if ($body === false) {
+      throw new RuntimeException('connector_http_failed: ' . ($error !== '' ? $error : 'unknown_error'));
+    }
+    if ($status >= 400) {
+      throw new RuntimeException('connector_http_status_' . $status);
+    }
+    return (string)$body;
+  }
+
+  $context = stream_context_create([
+    'http' => [
+      'method' => 'GET',
+      'timeout' => max(2, $timeoutSeconds),
+      'ignore_errors' => true,
+      'header' => "Accept: application/xml, text/xml, */*\r\n",
+    ],
+  ]);
+  $body = @file_get_contents($url, false, $context);
+  if ($body === false) {
+    throw new RuntimeException('connector_http_failed');
+  }
+  return (string)$body;
+}
+
+function mes_append_connectivity_event(array &$mes, array $event): array {
+  $rows = array_values((array)($mes['mes_connectivity_events'] ?? []));
+  $saved = array_merge([
+    'adapter_event_id' => mes_runtime_id('ADP-EVT'),
+    'adapter_id' => '',
+    'machine_id' => '',
+    'event_time' => now_iso(),
+    'event_type' => 'adapter_event',
+    'severity' => 'INFO',
+    'status' => 'closed',
+    'message' => '',
+    'payload_excerpt' => [],
+    'recorded_by' => 'system',
+    'recorded_at' => now_iso(),
+  ], $event);
+  $saved['payload_excerpt'] = is_array($saved['payload_excerpt'] ?? null) ? $saved['payload_excerpt'] : [];
+
+  foreach ($rows as $idx => $row) {
+    if (!is_array($row) || (string)($row['adapter_event_id'] ?? '') !== (string)$saved['adapter_event_id']) continue;
+    $rows[$idx] = array_merge($row, $saved);
+    $saved = $rows[$idx];
+    $mes['mes_connectivity_events'] = $rows;
+    return $saved;
+  }
+
+  array_unshift($rows, $saved);
+  $mes['mes_connectivity_events'] = array_slice($rows, 0, 400);
+  return $saved;
 }
 
 function mes_governance_blockers_for_dispatch(array $dispatchRow): array {
@@ -13772,15 +13860,40 @@ if ($username === '') {
     $tickCount = min(30, max(5, (int)($_GET['ticks'] ?? 20)));
     $intervalMs = min(10000, max(1000, (int)($_GET['interval_ms'] ?? 2000)));
     $lastHash = '';
+    $runtimeMode = runtime_data_layer_summary();
+    $streamMode = mes_runtime_supports_live_stream($runtimeMode) ? 'live' : 'polling_fallback';
 
     api_stream_event('ready', [
       'ok' => true,
       'stream' => 'mes_stream',
+      'stream_mode' => $streamMode,
       'interval_ms' => $intervalMs,
       'ticks' => $tickCount,
-      'runtime_mode' => runtime_data_layer_summary(),
+      'recommended_interval_ms' => $streamMode === 'live' ? $intervalMs : 30000,
+      'runtime_mode' => $runtimeMode,
       'started_at' => now_iso(),
     ]);
+
+    if ($streamMode !== 'live') {
+      $bundle = runtime_read_model_bundle(true);
+      $orders = $bundle['orders'];
+      $master = $bundle['master'];
+      $mes = $bundle['mes'];
+      $snapshot = build_mes_snapshot($orders, $master, $mes);
+      $exceptions = build_exception_dashboard_data($bundle, $snapshot);
+      api_stream_event('mes_snapshot', [
+        'ok' => true,
+        'stream_mode' => 'polling_fallback',
+        'recommended_interval_ms' => 30000,
+        'snapshot' => $snapshot,
+        'master' => $master,
+        'exceptions' => $exceptions,
+        'read_sources' => $bundle['sources'],
+        'runtime_mode' => $bundle['runtime_mode'],
+        'streamed_at' => now_iso(),
+      ]);
+      exit;
+    }
 
     for ($tick = 0; $tick < $tickCount; $tick++) {
       if (connection_aborted()) {
@@ -14261,6 +14374,191 @@ if ($username === '') {
     ]);
   }
 
+  case 'mes_mtconnect_poll_once': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+
+    $orders = load_orders_store();
+    $master = load_master_data_store();
+    $mes = load_mes_runtime_store();
+    $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
+
+    $machineId = trim((string)($body['machine_id'] ?? ''));
+    $adapterId = trim((string)($body['adapter_id'] ?? ''));
+    $machines = master_index_by((array)($master['machines'] ?? []), 'machine_id');
+    $operators = master_index_by((array)($master['operators'] ?? []), 'operator_id');
+    $adapter = null;
+
+    if ($adapterId !== '') {
+      foreach ((array)($master['mes_connectivity_adapters'] ?? []) as $row) {
+        if (!is_array($row) || (string)($row['adapter_id'] ?? '') !== $adapterId) continue;
+        $adapter = $row;
+        break;
+      }
+      if (is_array($adapter) && $machineId === '') {
+        $machineId = trim((string)($adapter['machine_id'] ?? ''));
+      }
+    }
+
+    if ($machineId === '') {
+      api_json(['ok' => false, 'error' => 'missing_machine_id'], 400);
+    }
+    if (!isset($machines[$machineId])) {
+      observe_connector_ingest($machineId, false, 'machine_not_found', ['action' => 'mes_mtconnect_poll_once']);
+      api_json(['ok' => false, 'error' => 'machine_not_found'], 404);
+    }
+    $machine = $machines[$machineId];
+
+    if (!is_array($adapter)) {
+      foreach ((array)($master['mes_connectivity_adapters'] ?? []) as $row) {
+        if (!is_array($row) || (string)($row['machine_id'] ?? '') !== $machineId) continue;
+        if (strtolower(trim((string)($row['adapter_type'] ?? ''))) !== 'mtconnect') continue;
+        $adapter = $row;
+        break;
+      }
+    }
+    if (!is_array($adapter)) {
+      observe_connector_ingest($machineId, false, 'adapter_not_found', ['action' => 'mes_mtconnect_poll_once']);
+      api_json(['ok' => false, 'error' => 'adapter_not_found'], 404);
+    }
+
+    $adapterType = strtolower(trim((string)($adapter['adapter_type'] ?? $machine['connector_type'] ?? '')));
+    if ($adapterType !== 'mtconnect') {
+      observe_connector_ingest($machineId, false, 'adapter_type_not_supported', [
+        'action' => 'mes_mtconnect_poll_once',
+        'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
+        'adapter_type' => $adapterType,
+      ]);
+      api_json(['ok' => false, 'error' => 'adapter_type_not_supported'], 422);
+    }
+    if (strtolower(trim((string)($adapter['status'] ?? 'active'))) !== 'active') {
+      observe_connector_ingest($machineId, false, 'adapter_not_active', [
+        'action' => 'mes_mtconnect_poll_once',
+        'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
+      ]);
+      api_json(['ok' => false, 'error' => 'adapter_not_active'], 409);
+    }
+
+    $pollUrl = '';
+    try {
+      $pollUrl = mes_mtconnect_poll_url((string)($body['endpoint_url'] ?? $adapter['endpoint_url'] ?? $machine['connector_endpoint'] ?? ''));
+      $timeoutSeconds = min(30, max(3, (int)($body['timeout_seconds'] ?? 10)));
+      $xml = mes_http_fetch_text($pollUrl, $timeoutSeconds);
+      $normalized = edge_connector_service()->normalize([
+        'machine_id' => $machineId,
+        'connector_type' => 'mtconnect',
+        'connector_name' => (string)($adapter['adapter_name'] ?? $machine['connector_name'] ?? 'MTConnect Adapter'),
+        'connector_endpoint' => $pollUrl,
+        'telemetry_mode' => (string)($machine['telemetry_mode'] ?? 'machine'),
+        'source' => 'mtconnect',
+        'heartbeat_sla_seconds' => (int)($adapter['heartbeat_sla_seconds'] ?? $machine['heartbeat_sla_seconds'] ?? 120),
+        'wo_number' => trim((string)($body['wo_number'] ?? '')),
+        'operator_id' => trim((string)($body['operator_id'] ?? '')),
+        'note' => trim((string)($body['note'] ?? 'Polled once from MTConnect adapter.')),
+        'mtconnect_xml' => $xml,
+      ], $machine, $username);
+    } catch (Throwable $e) {
+      $savedEvent = mes_append_connectivity_event($mes, [
+        'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
+        'machine_id' => $machineId,
+        'event_time' => now_iso(),
+        'event_type' => 'mtconnect_poll_failed',
+        'severity' => 'WARNING',
+        'status' => 'open',
+        'message' => 'MTConnect poll failed: ' . $e->getMessage(),
+        'payload_excerpt' => [
+          'endpoint_url' => $pollUrl !== '' ? $pollUrl : (string)($adapter['endpoint_url'] ?? ''),
+        ],
+        'recorded_by' => $username,
+        'recorded_at' => now_iso(),
+      ]);
+      save_mes_runtime_store($mes);
+      observe_connector_ingest($machineId, false, $e->getMessage(), [
+        'action' => 'mes_mtconnect_poll_once',
+        'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
+        'poll_url' => $pollUrl,
+      ]);
+      $code = str_starts_with($e->getMessage(), 'connector_http_') ? 502 : 422;
+      api_json([
+        'ok' => false,
+        'error' => $e->getMessage(),
+        'poll_url' => $pollUrl,
+        'event' => $savedEvent,
+      ], $code);
+    }
+
+    $woNumber = trim((string)($normalized['wo_number'] ?? ''));
+    if ($woNumber !== '') {
+      $wo = find_order_record($orders, 'wo', $woNumber);
+      if (!$wo) {
+        observe_connector_ingest($machineId, false, 'work_order_not_found', ['action' => 'mes_mtconnect_poll_once', 'wo_number' => $woNumber]);
+        api_json(['ok' => false, 'error' => 'work_order_not_found'], 404);
+      }
+      $woMachineId = trim((string)($wo['machine_id'] ?? ''));
+      if ($woMachineId !== '' && $woMachineId !== $machineId) {
+        observe_connector_ingest($machineId, false, 'wo_machine_mismatch', ['action' => 'mes_mtconnect_poll_once', 'wo_number' => $woNumber, 'wo_machine_id' => $woMachineId]);
+        api_json(['ok' => false, 'error' => 'wo_machine_mismatch'], 409);
+      }
+    }
+
+    $operatorId = trim((string)($normalized['operator_id'] ?? ''));
+    if ($operatorId !== '' && !isset($operators[$operatorId])) {
+      observe_connector_ingest($machineId, false, 'operator_not_found', ['action' => 'mes_mtconnect_poll_once', 'operator_id' => $operatorId]);
+      api_json(['ok' => false, 'error' => 'operator_not_found'], 404);
+    }
+
+    $signalGuard = mes_signal_replay_guard($mes, $machine, $normalized);
+    if ($signalGuard) {
+      observe_connector_ingest($machineId, false, 'stale_signal_timestamp', [
+        'action' => 'mes_mtconnect_poll_once',
+        'incoming_signal_at' => (string)($signalGuard['incoming_signal_at'] ?? ''),
+        'latest_signal_at' => (string)($signalGuard['latest_signal_at'] ?? ''),
+        'connector_type' => (string)($signalGuard['connector_type'] ?? ''),
+        'wo_number' => $woNumber,
+      ]);
+      api_json($signalGuard, 409);
+    }
+
+    $saved = mes_upsert_connector_runtime($mes, $machine, $normalized, $username);
+    $savedEvent = mes_append_connectivity_event($mes, [
+      'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
+      'machine_id' => $machineId,
+      'event_time' => now_iso(),
+      'event_type' => 'mtconnect_poll_ok',
+      'severity' => 'INFO',
+      'status' => 'closed',
+      'message' => 'MTConnect payload polled and ingested successfully.',
+      'payload_excerpt' => [
+        'endpoint_url' => $pollUrl,
+        'signal_at' => (string)($saved['signal']['signal_at'] ?? ''),
+        'program_id' => (string)($saved['signal']['current_program_id'] ?? ''),
+      ],
+      'recorded_by' => $username,
+      'recorded_at' => now_iso(),
+    ]);
+    save_mes_runtime_store($mes);
+    observe_connector_ingest($machineId, true, 'MTConnect poll completed.', [
+      'action' => 'mes_mtconnect_poll_once',
+      'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
+      'connector_type' => (string)($saved['feed']['connector_type'] ?? ''),
+      'wo_number' => $woNumber,
+      'warning_count' => count((array)($saved['ingest_warnings'] ?? [])),
+      'source_payload_type' => (string)($normalized['_ingest']['source_payload_type'] ?? ''),
+    ]);
+
+    api_json([
+      'ok' => true,
+      'poll_url' => $pollUrl,
+      'signal' => $saved['signal'],
+      'feed' => $saved['feed'],
+      'event' => $savedEvent,
+      'ingest_warnings' => array_values((array)($saved['ingest_warnings'] ?? [])),
+      'data' => build_mes_snapshot($orders, $master, $mes),
+    ]);
+  }
+
   case 'mes_adapter_event_append': {
     if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
     $me = require_logged_in($store);
@@ -14279,19 +14577,7 @@ if ($username === '') {
     if (!is_array($adapter)) api_json(['ok' => false, 'error' => 'adapter_not_found'], 404);
     $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
     $event = mes_adapter_service()->normalizeEvent($body, $adapter, $username);
-    $rows = array_values((array)($mes['mes_connectivity_events'] ?? []));
-    $saved = null;
-    foreach ($rows as $idx => $row) {
-      if (!is_array($row) || (string)($row['adapter_event_id'] ?? '') !== (string)$event['adapter_event_id']) continue;
-      $rows[$idx] = array_merge($row, $event);
-      $saved = $rows[$idx];
-      break;
-    }
-    if ($saved === null) {
-      $rows[] = $event;
-      $saved = $event;
-    }
-    $mes['mes_connectivity_events'] = $rows;
+    $saved = mes_append_connectivity_event($mes, $event);
     save_mes_runtime_store($mes);
     api_json(['ok' => true, 'event' => $saved, 'data' => build_mes_snapshot(load_orders_store(), $master, $mes)]);
   }

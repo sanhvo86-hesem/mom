@@ -22,7 +22,8 @@ var state = {
   stream: null,
   streamStatus: 'polling',
   streamLastMessageAt: '',
-  streamRetryTimer: null
+  streamRetryTimer: null,
+  pollIntervalMs: 60000
 };
 
 function repairMojibake(text){
@@ -290,6 +291,10 @@ function defaultSnapshot(){
     current_shift: {},
     runtime_mode: {}
   };
+}
+
+function streamEligible(runtimeMode){
+  return !!(runtimeMode && runtimeMode.use_postgres && runtimeMode.postgres_path_active && runtimeMode.postgres_reachable);
 }
 
 function ensureStyles(){
@@ -619,9 +624,16 @@ function renderSelectOptions(rows, valueKey, labelBuilder, selectedValue, placeh
 function mergeRuntimePayload(payload){
   if(!payload || typeof payload !== 'object') return;
   if(payload.snapshot) state.snapshot = payload.snapshot;
+  if(payload.runtime_mode){
+    state.snapshot = state.snapshot || defaultSnapshot();
+    state.snapshot.runtime_mode = payload.runtime_mode;
+  }
   if(payload.master) state.master = payload.master;
   if(payload.exceptions) state.exceptions = payload.exceptions;
   if(payload.streamed_at) state.streamLastMessageAt = payload.streamed_at;
+  if(payload.recommended_interval_ms){
+    state.pollIntervalMs = Math.max(15000, Number(payload.recommended_interval_ms) || 30000);
+  }
 }
 
 function stopPolling(){
@@ -636,7 +648,7 @@ function startPolling(){
   state.streamStatus = state.streamStatus === 'live' ? 'live' : 'polling';
   state.refreshTimer = setInterval(function(){
     if(state.container && !state.modal) loadData();
-  }, 60000);
+  }, Math.max(15000, Number(state.pollIntervalMs || 60000)));
 }
 
 function disconnectStream(){
@@ -653,6 +665,16 @@ function disconnectStream(){
 function connectStream(){
   if(typeof window.EventSource !== 'function' || !state.container) {
     state.streamStatus = 'polling';
+    state.pollIntervalMs = 30000;
+    render();
+    startPolling();
+    return;
+  }
+
+  if(!streamEligible((state.snapshot || {}).runtime_mode || {})) {
+    state.streamStatus = 'polling';
+    state.pollIntervalMs = 30000;
+    render();
     startPolling();
     return;
   }
@@ -666,10 +688,24 @@ function connectStream(){
   state.stream = source;
 
   source.addEventListener('ready', function(event){
-    state.streamStatus = 'connecting';
-    state.streamLastMessageAt = '';
-    if(window.console) console.debug('MES stream ready', event.data);
-    render();
+    try {
+      var payload = JSON.parse(event.data || '{}');
+      mergeRuntimePayload(payload);
+      if(payload.stream_mode === 'polling_fallback'){
+        disconnectStream();
+        state.streamStatus = 'polling';
+        render();
+        startPolling();
+        return;
+      }
+      state.streamStatus = 'connecting';
+      state.streamLastMessageAt = '';
+      if(window.console) console.debug('MES stream ready', event.data);
+      render();
+    } catch (_error) {
+      state.streamStatus = 'connecting';
+      render();
+    }
   });
 
   source.addEventListener('mes_snapshot', function(event){
@@ -716,11 +752,13 @@ function loadData(){
     state.snapshot = results[0] && results[0].data ? results[0].data : defaultSnapshot();
     state.master = results[1] && results[1].data ? results[1].data : {};
     state.exceptions = results[2] && results[2].ok ? results[2] : {};
+    state.pollIntervalMs = streamEligible((state.snapshot || {}).runtime_mode || {}) ? 60000 : 30000;
     state.loading = false;
     render();
   }).catch(function(error){
     state.loading = false;
     state.streamStatus = 'polling';
+    state.pollIntervalMs = 30000;
     if(state.container){
       state.container.innerHTML = '<div class="mesx"><div class="mesx-empty"><strong>' + esc(t('Không thể tải dữ liệu MES', 'Could not load MES data')) + '</strong>' + esc((error && error.message) || t('Vui lòng thử lại sau.', 'Please try again later.')) + '</div></div>';
     }
@@ -774,6 +812,7 @@ function renderConnectorCard(row){
   var meta = connectorMeta(row.connector_health || 'offline');
   var status = statusMeta(row.status || 'idle');
   var adapter = adapterForMachine(row.machine_id || '');
+  var canPollMtconnect = String(row.connector_type || '').toLowerCase() === 'mtconnect' && !!((adapter && adapter.endpoint_url) || row.connector_endpoint);
   return '<article class="mesx-connector">' +
     '<div class="mesx-connector-top"><div><h4>' + esc(row.machine_id || '') + ' · ' + esc(row.machine_name || '') + '</h4><p>' + esc([connectorTypeLabel(row.connector_type), row.connector_name || '', row.work_center_id || ''].filter(Boolean).join(' · ')) + '</p></div>' + badge(meta) + '</div>' +
     '<div class="mesx-connector-meta">' +
@@ -782,7 +821,7 @@ function renderConnectorCard(row){
       '<div class="mesx-mini"><small>' + esc(t('WO / chương trình', 'WO / program')) + '</small><strong>' + esc([row.current_program_id || '', row.part_count == null ? '' : ('Parts ' + row.part_count)].filter(Boolean).join(' · ') || '—') + '</strong></div>' +
       '<div class="mesx-mini"><small>' + esc(t('Spindle / override', 'Spindle / override')) + '</small><strong>' + esc([(row.spindle_load_pct == null ? '' : (Number(row.spindle_load_pct).toFixed(0) + '%')), (row.feed_override_pct == null ? '' : (Number(row.feed_override_pct).toFixed(0) + '%'))].filter(Boolean).join(' · ') || '—') + '</strong></div>' +
     '</div>' +
-    '<div class="mesx-connector-actions"><span>' + badge(status) + '</span><button type="button" class="mesx-link" data-open-signal-bridge="' + esc(row.machine_id || '') + '">' + esc(t('Cập nhật tín hiệu', 'Update signal')) + '</button><button type="button" class="mesx-link warning" data-open-adapter-event="' + esc(row.machine_id || '') + '"' + (adapter ? '' : ' disabled') + '>' + esc(t('Log adapter', 'Log adapter')) + '</button></div>' +
+    '<div class="mesx-connector-actions"><span>' + badge(status) + '</span><button type="button" class="mesx-link" data-open-signal-bridge="' + esc(row.machine_id || '') + '">' + esc(t('Cập nhật tín hiệu', 'Update signal')) + '</button><button type="button" class="mesx-link" data-poll-mtconnect="' + esc(row.machine_id || '') + '"' + (canPollMtconnect ? '' : ' disabled') + '>' + esc(t('Đọc MTConnect', 'Poll MTConnect')) + '</button><button type="button" class="mesx-link warning" data-open-adapter-event="' + esc(row.machine_id || '') + '"' + (adapter ? '' : ' disabled') + '>' + esc(t('Log adapter', 'Log adapter')) + '</button></div>' +
   '</article>';
 }
 function renderExceptionRail(){
@@ -1223,7 +1262,9 @@ function render(){
     ? (t('SSE trực tiếp', 'SSE live') + (state.streamLastMessageAt ? (' · ' + fmtDateTime(state.streamLastMessageAt)) : ''))
     : (state.streamStatus === 'connecting'
       ? t('Đang nối luồng', 'Connecting stream')
-      : t('Polling 60 giây', '60-second polling'));
+      : (streamEligible((snapshot.runtime_mode || {}))
+        ? t('Polling dự phòng 60 giây', '60-second fallback polling')
+        : t('JSON polling 30 giây', '30-second JSON polling')));
   var readinessBand = '';
   var analyticsBand =
     '<section class="mesx-band" style="margin-top:18px">' +
@@ -1377,6 +1418,9 @@ function bind(){
   Array.prototype.forEach.call(state.container.querySelectorAll('[data-open-signal-bridge]'), function(button){
     button.onclick = function(){ openSignalBridgeModal(button.getAttribute('data-open-signal-bridge') || ''); };
   });
+  Array.prototype.forEach.call(state.container.querySelectorAll('[data-poll-mtconnect]'), function(button){
+    button.onclick = function(){ pollMtconnect(button.getAttribute('data-poll-mtconnect') || ''); };
+  });
   Array.prototype.forEach.call(state.container.querySelectorAll('[data-open-exception]'), function(button){
     button.onclick = function(){ openExceptionDetail(button.getAttribute('data-open-exception') || ''); };
   });
@@ -1466,6 +1510,30 @@ function openSignalBridgeModal(machineId){
     }
   );
   bindModalButtons();
+}
+
+function pollMtconnect(machineId){
+  var machine = machineById(machineId);
+  if(!machine){
+    toast(t('Không tìm thấy máy để đọc MTConnect.', 'Could not find the machine for MTConnect polling.'), 'error');
+    return;
+  }
+  toast(t('Đang đọc một nhịp MTConnect từ máy pilot...', 'Polling a single MTConnect sample from the pilot machine...'), 'info');
+  api('mes_mtconnect_poll_once', { machine_id: machineId }, 'POST').then(function(resp){
+    if(!resp || !resp.ok){
+      throw new Error((resp && resp.error) ? String(resp.error) : t('Không thể đọc MTConnect.', 'Could not poll MTConnect.'));
+    }
+    mergeRuntimePayload({
+      snapshot: resp.data || defaultSnapshot(),
+      streamed_at: new Date().toISOString()
+    });
+    state.loading = false;
+    render();
+    toast(t('Đã đồng bộ một nhịp MTConnect vào runtime MES.', 'One MTConnect sample has been synchronized into the MES runtime.'), 'success');
+  }).catch(function(error){
+    toast((error && error.message) || t('Không thể đọc MTConnect từ adapter.', 'Could not poll MTConnect from the adapter.'), 'error');
+    if(window.console) console.error(error);
+  });
 }
 
 function openAlarmGovernanceModal(action, row){
@@ -2165,11 +2233,17 @@ window._renderMesControlCenter = function(container){
   ensureStyles();
   disconnectStream();
   stopPolling();
-  loadData();
-  connectStream();
-  if(state.streamStatus !== 'live' && state.streamStatus !== 'connecting'){
-    startPolling();
-  }
+  loadData().finally(function(){
+    if(streamEligible((state.snapshot || {}).runtime_mode || {})){
+      connectStream();
+      if(state.streamStatus !== 'live' && state.streamStatus !== 'connecting'){
+        startPolling();
+      }
+    } else {
+      state.streamStatus = 'polling';
+      startPolling();
+    }
+  });
 };
 
 })();
