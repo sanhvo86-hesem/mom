@@ -68,6 +68,9 @@ final class RuntimeShadowSync
             $this->syncMaterialConsumption((array)($store['material_consumption'] ?? []));
             $this->syncPartGenealogy((array)($store['part_genealogy'] ?? []));
             $this->syncShiftHandover((array)($store['shift_handover'] ?? []));
+            $this->syncDppPassports((array)($store['dpp_passports'] ?? []));
+            $this->syncEnergySnapshots((array)($store['energy_snapshots'] ?? []));
+            $this->syncCostTracking((array)($store['cost_tracking'] ?? []));
             $this->syncProgressReports((array)($store['progress_reports'] ?? []), (array)($orders['work_orders'] ?? []));
             $this->syncDowntimeEvents((array)($store['downtime_events'] ?? []));
             $this->syncMaintenanceRequests((array)($store['maintenance_requests'] ?? []));
@@ -1082,6 +1085,120 @@ final class RuntimeShadowSync
                 'metadata' => $row,
                 'created_at' => $this->parseTimestamp((string)($row['created_at'] ?? '')) ?? date(DATE_ATOM),
             ], ['handover_id'], ['metadata']);
+        }
+    }
+
+    private function syncDppPassports(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $dppId = trim((string)($row['dpp_id'] ?? ''));
+            $jobNumber = trim((string)($row['wo_number'] ?? $row['job_number'] ?? ''));
+            $itemId = trim((string)($row['part_number'] ?? $row['item_id'] ?? ''));
+            if ($dppId === '' || $jobNumber === '' || $itemId === '') {
+                continue;
+            }
+            $materialComposition = $row['material_composition'] ?? [];
+            if (is_string($materialComposition) && $materialComposition !== '') {
+                $decoded = json_decode($materialComposition, true);
+                if (is_array($decoded)) {
+                    $materialComposition = $decoded;
+                }
+            }
+            $this->upsert('mes_dpp_passports', [
+                'dpp_id' => $dppId,
+                'genealogy_id' => trim((string)($row['genealogy_id'] ?? '')) ?: null,
+                'job_number' => $jobNumber,
+                'item_id' => $itemId,
+                'part_rev' => trim((string)($row['part_revision'] ?? '')) ?: null,
+                'serial_number' => trim((string)($row['serial_number'] ?? '')) ?: null,
+                'lot_number' => trim((string)($row['lot_number'] ?? '')) ?: null,
+                'passport_status' => trim((string)($row['status'] ?? 'draft')) ?: 'draft',
+                'qr_code' => trim((string)($row['qr_code'] ?? '')) ?: null,
+                'passport_url' => trim((string)($row['passport_url'] ?? '')) ?: null,
+                'origin_country' => trim((string)($row['origin_country'] ?? '')) ?: null,
+                'material_composition' => is_array($materialComposition) ? $materialComposition : [],
+                'recycled_content_pct' => isset($row['recycled_content_pct']) ? (float)$row['recycled_content_pct'] : null,
+                'carbon_footprint_kg_co2e' => isset($row['carbon_footprint_kg_co2e']) ? (float)$row['carbon_footprint_kg_co2e'] : null,
+                'energy_consumption_kwh' => isset($row['energy_consumption_kwh']) ? (float)$row['energy_consumption_kwh'] : null,
+                'recycling_info' => trim((string)($row['recycling_info'] ?? '')) ?: null,
+                'metadata' => $row,
+                'created_at' => $this->parseTimestamp((string)($row['created_at'] ?? $row['published_at'] ?? $row['updated_at'] ?? '')) ?? date(DATE_ATOM),
+                'updated_at' => $this->parseTimestamp((string)($row['updated_at'] ?? $row['published_at'] ?? '')) ?? date(DATE_ATOM),
+            ], ['dpp_id'], ['material_composition', 'metadata']);
+        }
+    }
+
+    private function syncEnergySnapshots(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $snapshotId = trim((string)($row['energy_snapshot_id'] ?? ''));
+            $equipmentId = trim((string)($row['machine_id'] ?? $row['equipment_id'] ?? ''));
+            if ($snapshotId === '' || $equipmentId === '') {
+                continue;
+            }
+            $this->upsert('mes_energy_snapshots', [
+                'energy_snapshot_id' => $snapshotId,
+                'equipment_id' => $equipmentId,
+                'work_center_id' => trim((string)($row['work_center_id'] ?? '')) ?: null,
+                'work_order_number' => trim((string)($row['wo_number'] ?? $row['work_order_number'] ?? '')) ?: null,
+                'shift_code' => trim((string)($row['shift_code'] ?? '')) ?: null,
+                'captured_at' => $this->parseTimestamp((string)($row['captured_at'] ?? '')) ?? date(DATE_ATOM),
+                'power_kw' => isset($row['power_kw']) ? (float)$row['power_kw'] : null,
+                'energy_kwh' => isset($row['energy_kwh']) ? (float)$row['energy_kwh'] : null,
+                'good_qty' => isset($row['good_qty']) ? (int)$row['good_qty'] : 0,
+                'scrap_qty' => isset($row['scrap_qty']) ? (int)$row['scrap_qty'] : 0,
+                'energy_per_unit_kwh' => isset($row['energy_per_unit_kwh']) ? (float)$row['energy_per_unit_kwh'] : null,
+                'target_energy_per_unit_kwh' => isset($row['target_energy_per_unit_kwh']) ? (float)$row['target_energy_per_unit_kwh'] : null,
+                'source_type' => trim((string)($row['source'] ?? $row['source_type'] ?? 'manual_bridge')) ?: 'manual_bridge',
+                'metadata' => $row,
+                'created_at' => $this->parseTimestamp((string)($row['created_at'] ?? $row['captured_at'] ?? $row['updated_at'] ?? '')) ?? date(DATE_ATOM),
+                'updated_at' => $this->parseTimestamp((string)($row['updated_at'] ?? $row['captured_at'] ?? '')) ?? date(DATE_ATOM),
+            ], ['energy_snapshot_id'], ['metadata']);
+        }
+    }
+
+    private function syncCostTracking(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $costId = trim((string)($row['cost_id'] ?? ''));
+            $workOrderNumber = trim((string)($row['wo_number'] ?? $row['work_order_number'] ?? ''));
+            if ($costId === '' || $workOrderNumber === '') {
+                continue;
+            }
+            $this->upsert('mes_cost_tracking', [
+                'cost_id' => $costId,
+                'work_order_number' => $workOrderNumber,
+                'job_number' => trim((string)($row['jo_number'] ?? $row['job_number'] ?? '')) ?: null,
+                'equipment_id' => trim((string)($row['machine_id'] ?? $row['equipment_id'] ?? '')) ?: null,
+                'work_center_id' => trim((string)($row['work_center_id'] ?? '')) ?: null,
+                'item_id' => trim((string)($row['part_number'] ?? $row['item_id'] ?? '')) ?: null,
+                'part_rev' => trim((string)($row['part_revision'] ?? '')) ?: null,
+                'captured_at' => $this->parseTimestamp((string)($row['captured_at'] ?? '')) ?? date(DATE_ATOM),
+                'cost_status' => trim((string)($row['cost_status'] ?? 'draft')) ?: 'draft',
+                'standard_cost_total' => isset($row['standard_cost_total']) ? (float)$row['standard_cost_total'] : null,
+                'actual_cost_total' => isset($row['actual_cost_total']) ? (float)$row['actual_cost_total'] : null,
+                'material_cost' => isset($row['material_cost']) ? (float)$row['material_cost'] : null,
+                'labor_cost' => isset($row['labor_cost']) ? (float)$row['labor_cost'] : null,
+                'energy_cost' => isset($row['energy_cost']) ? (float)$row['energy_cost'] : null,
+                'overhead_cost' => isset($row['overhead_cost']) ? (float)$row['overhead_cost'] : null,
+                'good_qty' => isset($row['good_qty']) ? (int)$row['good_qty'] : 0,
+                'scrap_qty' => isset($row['scrap_qty']) ? (int)$row['scrap_qty'] : 0,
+                'cost_per_good_unit' => isset($row['cost_per_good_unit']) ? (float)$row['cost_per_good_unit'] : null,
+                'variance_pct' => isset($row['variance_pct']) ? (float)$row['variance_pct'] : null,
+                'variance_threshold_pct' => isset($row['variance_threshold_pct']) ? (float)$row['variance_threshold_pct'] : 15.0,
+                'metadata' => $row,
+                'created_at' => $this->parseTimestamp((string)($row['created_at'] ?? $row['captured_at'] ?? $row['updated_at'] ?? '')) ?? date(DATE_ATOM),
+                'updated_at' => $this->parseTimestamp((string)($row['updated_at'] ?? $row['captured_at'] ?? '')) ?? date(DATE_ATOM),
+            ], ['cost_id'], ['metadata']);
         }
     }
 

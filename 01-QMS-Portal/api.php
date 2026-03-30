@@ -2547,6 +2547,9 @@ function runtime_cutover_postgres_counts(array $runtimeMode): array {
       'shift_handover' => "SELECT COUNT(*) AS c FROM mes_shift_handover WHERE metadata ? 'handover_id'",
       'machine_alarm_events' => "SELECT COUNT(*) AS c FROM mes_machine_alarms WHERE metadata ? 'alarm_event_id'",
       'nc_download_receipts' => "SELECT COUNT(*) AS c FROM mes_nc_download_receipts WHERE metadata ? 'receipt_id'",
+      'dpp_passports' => "SELECT COUNT(*) AS c FROM mes_dpp_passports WHERE COALESCE(metadata->>'dpp_id', '') <> ''",
+      'energy_snapshots' => "SELECT COUNT(*) AS c FROM mes_energy_snapshots WHERE COALESCE(metadata->>'energy_snapshot_id', '') <> ''",
+      'cost_tracking' => "SELECT COUNT(*) AS c FROM mes_cost_tracking WHERE COALESCE(metadata->>'cost_id', '') <> ''",
     ],
     'epicor' => [
       'sync_runs' => "SELECT COUNT(*) AS c FROM mes_erp_sync_runs",
@@ -2608,6 +2611,9 @@ function build_runtime_cutover_audit(?array $bundle = null): array {
       'shift_handover' => count((array)($mes['shift_handover'] ?? [])),
       'machine_alarm_events' => count((array)($mes['machine_alarm_events'] ?? [])),
       'nc_download_receipts' => count((array)($mes['nc_download_receipts'] ?? [])),
+      'dpp_passports' => count((array)($mes['dpp_passports'] ?? [])),
+      'energy_snapshots' => count((array)($mes['energy_snapshots'] ?? [])),
+      'cost_tracking' => count((array)($mes['cost_tracking'] ?? [])),
     ],
     'epicor' => runtime_store_entity_counts($epicor, [
       'sync_runs' => 'sync_runs',
@@ -2784,6 +2790,9 @@ function build_exception_dashboard_data(array $bundle, ?array $mesSnapshot = nul
   $cutoverDriftEntities = (int)($mesSnapshot['kpis']['cutover_drift_entities'] ?? 0);
   $epicorSyncStatus = count((array)($mesSnapshot['epicor_sync_queue'] ?? []));
   $downtimeGovernanceGaps = count(mes_downtime_governance_gap_rows($mes, $master));
+  $dppReadinessGaps = count((array)($mesSnapshot['dpp_queue'] ?? []));
+  $energyTrackingGaps = count((array)($mesSnapshot['energy_queue'] ?? []));
+  $costVarianceRisk = count((array)($mesSnapshot['cost_variance_queue'] ?? []));
 
   $orphanLinks = 0;
   foreach ((array)($orders['form_links'] ?? []) as $link) {
@@ -2824,6 +2833,9 @@ function build_exception_dashboard_data(array $bundle, ?array $mesSnapshot = nul
     'cutover_drift_entities' => $cutoverDriftEntities,
     'epicor_sync_status' => $epicorSyncStatus,
     'downtime_governance_gaps' => $downtimeGovernanceGaps,
+    'dpp_readiness_gaps' => $dppReadinessGaps,
+    'energy_tracking_gaps' => $energyTrackingGaps,
+    'cost_variance_risk' => $costVarianceRisk,
     'orphan_links' => $orphanLinks,
     'read_sources' => $bundle['sources'],
     'runtime_mode' => $bundle['runtime_mode'],
@@ -3025,9 +3037,9 @@ function shadow_sync_epicor_runtime_store(array $data): void {
 function mes_runtime_default(): array {
   return [
     '_meta' => [
-      'version' => '1.2',
+      'version' => '1.3',
       'updated' => now_iso(),
-      'description' => 'MES runtime store for dispatch, machine state, downtime, maintenance, tooling, connectivity, and progress reporting.',
+      'description' => 'MES runtime store for dispatch, machine state, downtime, maintenance, tooling, connectivity, progress reporting, DPP, energy, and costing.',
     ],
     'downtime_events' => [],
     'maintenance_requests' => [],
@@ -3039,6 +3051,12 @@ function mes_runtime_default(): array {
     'machine_alarm_events' => [],
     'nc_download_receipts' => [],
     'mes_tool_preset_offsets' => [],
+    'material_consumption' => [],
+    'part_genealogy' => [],
+    'shift_handover' => [],
+    'dpp_passports' => [],
+    'energy_snapshots' => [],
+    'cost_tracking' => [],
   ];
 }
 
@@ -3462,6 +3480,34 @@ function mes_latest_rows_by_machine(array $rows, string $timeKey = 'updated_at')
     $currentTs = trim((string)($current[$timeKey] ?? $current['last_heartbeat_at'] ?? $current['signal_at'] ?? ''));
     if ($candidateTs !== '' && strcmp($candidateTs, $currentTs) >= 0) {
       $indexed[$machineId] = $row;
+    }
+  }
+  return $indexed;
+}
+
+function mes_latest_rows_by_key(array $rows, string $key, array $timeKeys = ['updated_at', 'recorded_at', 'created_at']): array {
+  $indexed = [];
+  foreach ($rows as $row) {
+    if (!is_array($row)) continue;
+    $value = trim((string)($row[$key] ?? ''));
+    if ($value === '') continue;
+    $candidateTs = '';
+    foreach ($timeKeys as $timeKey) {
+      $candidateTs = trim((string)($row[$timeKey] ?? ''));
+      if ($candidateTs !== '') break;
+    }
+    if (!isset($indexed[$value])) {
+      $indexed[$value] = $row;
+      continue;
+    }
+    $current = $indexed[$value];
+    $currentTs = '';
+    foreach ($timeKeys as $timeKey) {
+      $currentTs = trim((string)($current[$timeKey] ?? ''));
+      if ($currentTs !== '') break;
+    }
+    if ($candidateTs !== '' && strcmp($candidateTs, $currentTs) >= 0) {
+      $indexed[$value] = $row;
     }
   }
   return $indexed;
@@ -4658,6 +4704,8 @@ function mes_upsert_connector_runtime(array &$mes, array $machine, array $normal
     'operator_id' => trim((string)($normalized['operator_id'] ?? '')),
     'current_program_id' => trim((string)($normalized['current_program_id'] ?? '')),
     'spindle_load_pct' => array_key_exists('spindle_load_pct', $normalized) && $normalized['spindle_load_pct'] !== '' ? max(0, min(100, (float)$normalized['spindle_load_pct'])) : null,
+    'spindle_power_kw' => array_key_exists('spindle_power_kw', $normalized) && $normalized['spindle_power_kw'] !== '' ? max(0, (float)$normalized['spindle_power_kw']) : null,
+    'total_power_kw' => array_key_exists('total_power_kw', $normalized) && $normalized['total_power_kw'] !== '' ? max(0, (float)$normalized['total_power_kw']) : null,
     'feed_override_pct' => array_key_exists('feed_override_pct', $normalized) && $normalized['feed_override_pct'] !== '' ? max(0, min(200, (float)$normalized['feed_override_pct'])) : null,
     'part_count' => array_key_exists('part_count', $normalized) && $normalized['part_count'] !== '' ? max(0, (int)$normalized['part_count']) : null,
     'note' => trim((string)($normalized['note'] ?? '')),
@@ -6259,6 +6307,189 @@ function mes_build_tool_offset_queue(array $dispatch): array {
   return $rows;
 }
 
+function mes_build_dpp_queue(array $dispatch, array $genealogyRows, array $dppRows): array {
+  $rows = [];
+  $genealogyByWo = mes_latest_rows_by_key($genealogyRows, 'wo_number', ['recorded_at', 'updated_at', 'created_at']);
+  $passportByWo = mes_latest_rows_by_key($dppRows, 'wo_number', ['updated_at', 'published_at', 'created_at']);
+
+  foreach ($dispatch as $row) {
+    if (!is_array($row)) continue;
+    $status = strtolower(trim((string)($row['status'] ?? 'scheduled')));
+    $completedQty = (int)($row['qty_completed'] ?? 0);
+    if (!in_array($status, ['inspection', 'completed'], true) && $completedQty <= 0) continue;
+
+    $woNumber = (string)($row['wo_number'] ?? '');
+    $genealogy = (array)($genealogyByWo[$woNumber] ?? []);
+    $passport = (array)($passportByWo[$woNumber] ?? []);
+    $issueCodes = [];
+    $warningCodes = [];
+
+    if ($genealogy === []) {
+      $issueCodes[] = 'missing_genealogy';
+    }
+    if ($passport === []) {
+      $issueCodes[] = 'missing_dpp_passport';
+    } else {
+      if (trim((string)($passport['origin_country'] ?? '')) === '') $issueCodes[] = 'missing_origin_country';
+      if (!isset($passport['carbon_footprint_kg_co2e']) || $passport['carbon_footprint_kg_co2e'] === '' || $passport['carbon_footprint_kg_co2e'] === null) $issueCodes[] = 'missing_carbon_footprint';
+      if (!isset($passport['energy_consumption_kwh']) || $passport['energy_consumption_kwh'] === '' || $passport['energy_consumption_kwh'] === null) $issueCodes[] = 'missing_energy_consumption';
+      if (trim((string)($passport['qr_code'] ?? '')) === '' && trim((string)($passport['passport_url'] ?? '')) === '') $warningCodes[] = 'missing_dpp_access_link';
+      if (trim((string)($passport['quality_certificate_status'] ?? $genealogy['certificate_of_conformance'] ?? '')) === '') $warningCodes[] = 'missing_quality_certificate';
+    }
+
+    if ($issueCodes === [] && $warningCodes === []) continue;
+    $band = $issueCodes !== [] ? 'critical' : 'warning';
+    $rows[] = [
+      'wo_number' => $woNumber,
+      'machine_id' => (string)($row['machine_id'] ?? ''),
+      'work_center_id' => (string)($row['work_center_id'] ?? ''),
+      'customer_name' => (string)($row['customer_name'] ?? ''),
+      'part_number' => (string)($row['part_number'] ?? ''),
+      'part_revision' => (string)($row['part_revision'] ?? ''),
+      'genealogy_id' => (string)($genealogy['genealogy_id'] ?? ''),
+      'dpp_id' => (string)($passport['dpp_id'] ?? ''),
+      'serial_number' => (string)($passport['serial_number'] ?? $genealogy['serial_number'] ?? ''),
+      'lot_number' => (string)($passport['lot_number'] ?? $genealogy['lot_number'] ?? ''),
+      'dpp_status' => (string)($passport['status'] ?? 'missing'),
+      'origin_country' => (string)($passport['origin_country'] ?? ''),
+      'carbon_footprint_kg_co2e' => isset($passport['carbon_footprint_kg_co2e']) ? (float)$passport['carbon_footprint_kg_co2e'] : null,
+      'energy_consumption_kwh' => isset($passport['energy_consumption_kwh']) ? (float)$passport['energy_consumption_kwh'] : null,
+      'issue_codes' => $issueCodes,
+      'warning_codes' => $warningCodes,
+      'severity' => $band,
+      'message_vi' => $band === 'critical'
+        ? 'DPP cua WO chua du du lieu de cong bo passport va truy xuat ben ngoai.'
+        : 'DPP da co khung nhung van con metadata can bo sung de dat muc world-class.',
+      'message_en' => $band === 'critical'
+        ? 'The WO digital product passport is not complete enough for governed external traceability.'
+        : 'The passport frame exists but still needs additional metadata to reach world-class readiness.',
+    ];
+  }
+
+  return $rows;
+}
+
+function mes_build_energy_queue(array $machineWall, array $energySnapshots): array {
+  $rows = [];
+  $snapshotByMachine = mes_latest_rows_by_key($energySnapshots, 'machine_id', ['updated_at', 'captured_at', 'created_at']);
+
+  foreach ($machineWall as $row) {
+    if (!is_array($row)) continue;
+    $machineId = (string)($row['machine_id'] ?? '');
+    if ($machineId === '') continue;
+    $snapshot = (array)($snapshotByMachine[$machineId] ?? []);
+    $powerKw = isset($row['total_power_kw']) && $row['total_power_kw'] !== null
+      ? (float)$row['total_power_kw']
+      : (isset($row['spindle_power_kw']) && $row['spindle_power_kw'] !== null ? (float)$row['spindle_power_kw'] : null);
+    $status = strtolower(trim((string)($row['status'] ?? 'idle')));
+    $issueCodes = [];
+    $warningCodes = [];
+
+    if (in_array($status, ['running', 'setup', 'inspection'], true) && $powerKw === null) {
+      $issueCodes[] = 'missing_power_signal';
+    }
+    if (in_array($status, ['idle', 'on_hold'], true) && $powerKw !== null && $powerKw >= 2.5) {
+      $warningCodes[] = 'idle_energy_draw';
+    }
+    $energyPerUnit = isset($snapshot['energy_per_unit_kwh']) && $snapshot['energy_per_unit_kwh'] !== '' ? (float)$snapshot['energy_per_unit_kwh'] : null;
+    $target = isset($snapshot['target_energy_per_unit_kwh']) && $snapshot['target_energy_per_unit_kwh'] !== '' ? (float)$snapshot['target_energy_per_unit_kwh'] : 1.5;
+    if ($energyPerUnit !== null && $energyPerUnit > $target) {
+      $issueCodes[] = 'high_energy_intensity';
+    } elseif ($powerKw !== null && $energyPerUnit === null && in_array($status, ['running', 'setup', 'inspection'], true)) {
+      $warningCodes[] = 'missing_energy_snapshot';
+    }
+
+    if ($issueCodes === [] && $warningCodes === []) continue;
+    $band = $issueCodes !== [] ? 'critical' : 'warning';
+    $rows[] = [
+      'machine_id' => $machineId,
+      'machine_name' => (string)($row['machine_name'] ?? ''),
+      'work_center_id' => (string)($row['work_center_id'] ?? ''),
+      'wo_number' => (string)($row['active_work_order']['wo_number'] ?? ''),
+      'power_kw' => $powerKw,
+      'energy_snapshot_id' => (string)($snapshot['energy_snapshot_id'] ?? ''),
+      'energy_kwh' => isset($snapshot['energy_kwh']) ? (float)$snapshot['energy_kwh'] : null,
+      'good_qty' => isset($snapshot['good_qty']) ? (int)$snapshot['good_qty'] : null,
+      'energy_per_unit_kwh' => $energyPerUnit,
+      'target_energy_per_unit_kwh' => $target,
+      'issue_codes' => $issueCodes,
+      'warning_codes' => $warningCodes,
+      'severity' => $band,
+      'message_vi' => $band === 'critical'
+        ? 'May dang co dau hieu vuot nguong nang luong hoac thieu tin hieu power can thiet cho governance ISO 50001.'
+        : 'Can bo sung snapshot nang luong hoac giam hao phi khi may khong cat nhưng van tieu thu dien.',
+      'message_en' => $band === 'critical'
+        ? 'The machine is exceeding the governed energy threshold or missing required power telemetry for ISO 50001-style control.'
+        : 'Add governed energy snapshots or reduce wasted draw while the machine is not actively cutting.',
+    ];
+  }
+
+  return $rows;
+}
+
+function mes_build_cost_variance_queue(array $dispatch, array $costRows): array {
+  $rows = [];
+  $costByWo = mes_latest_rows_by_key($costRows, 'wo_number', ['updated_at', 'captured_at', 'created_at']);
+
+  foreach ($dispatch as $row) {
+    if (!is_array($row)) continue;
+    $status = strtolower(trim((string)($row['status'] ?? 'scheduled')));
+    $woNumber = (string)($row['wo_number'] ?? '');
+    if ($woNumber === '') continue;
+    if (!in_array($status, ['running', 'inspection', 'completed'], true) && (int)($row['qty_completed'] ?? 0) <= 0) continue;
+
+    $cost = (array)($costByWo[$woNumber] ?? []);
+    $issueCodes = [];
+    $warningCodes = [];
+    $standard = isset($cost['standard_cost_total']) ? (float)$cost['standard_cost_total'] : null;
+    $actual = isset($cost['actual_cost_total']) ? (float)$cost['actual_cost_total'] : null;
+    $threshold = isset($cost['variance_threshold_pct']) && $cost['variance_threshold_pct'] !== '' ? (float)$cost['variance_threshold_pct'] : 15.0;
+    $variance = isset($cost['variance_pct']) && $cost['variance_pct'] !== '' ? (float)$cost['variance_pct'] : null;
+
+    if ($cost === []) {
+      $warningCodes[] = 'missing_cost_snapshot';
+    } else {
+      if ($variance === null && $standard !== null && $standard > 0 && $actual !== null) {
+        $variance = round((($actual - $standard) / $standard) * 100, 2);
+      }
+      if ($variance !== null && $variance > $threshold) {
+        $issueCodes[] = 'cost_variance_high';
+      }
+      if (($cost['cost_per_good_unit'] ?? null) === null && (int)($row['qty_completed'] ?? 0) > 0) {
+        $warningCodes[] = 'missing_unit_cost';
+      }
+    }
+
+    if ($issueCodes === [] && $warningCodes === []) continue;
+    $band = $issueCodes !== [] ? 'critical' : 'warning';
+    $rows[] = [
+      'wo_number' => $woNumber,
+      'machine_id' => (string)($row['machine_id'] ?? ''),
+      'work_center_id' => (string)($row['work_center_id'] ?? ''),
+      'customer_name' => (string)($row['customer_name'] ?? ''),
+      'part_number' => (string)($row['part_number'] ?? ''),
+      'part_revision' => (string)($row['part_revision'] ?? ''),
+      'cost_id' => (string)($cost['cost_id'] ?? ''),
+      'standard_cost_total' => $standard,
+      'actual_cost_total' => $actual,
+      'variance_pct' => $variance,
+      'cost_per_good_unit' => isset($cost['cost_per_good_unit']) ? (float)$cost['cost_per_good_unit'] : null,
+      'variance_threshold_pct' => $threshold,
+      'issue_codes' => $issueCodes,
+      'warning_codes' => $warningCodes,
+      'severity' => $band,
+      'message_vi' => $band === 'critical'
+        ? 'WO dang vuot nguong chi phi thuc te so voi muc ke hoach va can dieu do xem lai ngay.'
+        : 'WO can duoc cap nhat snapshot costing de dashboard va doi soat khong bi mu thong tin.',
+      'message_en' => $band === 'critical'
+        ? 'The WO is exceeding its governed actual-versus-standard cost threshold and needs immediate review.'
+        : 'The WO still needs a governed costing snapshot so dashboards and reconciliation stay trustworthy.',
+    ];
+  }
+
+  return $rows;
+}
+
 function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $customers = master_index_by((array)($master['customers'] ?? []), 'customer_id');
   $parts = master_index_by((array)($master['parts'] ?? []), 'part_number');
@@ -6285,6 +6516,12 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $materialConsumptionRows = array_values((array)($mes['material_consumption'] ?? []));
   $genealogyRows = array_values((array)($mes['part_genealogy'] ?? []));
   $shiftHandoverRows = array_values((array)($mes['shift_handover'] ?? []));
+  $dppRows = array_values((array)($mes['dpp_passports'] ?? []));
+  $energySnapshotRows = array_values((array)($mes['energy_snapshots'] ?? []));
+  $costTrackingRows = array_values((array)($mes['cost_tracking'] ?? []));
+  $dppByWo = mes_latest_rows_by_key($dppRows, 'wo_number', ['updated_at', 'published_at', 'created_at']);
+  $costByWo = mes_latest_rows_by_key($costTrackingRows, 'wo_number', ['updated_at', 'captured_at', 'created_at']);
+  $energyByMachine = mes_latest_rows_by_machine($energySnapshotRows, 'captured_at');
 
   $jos = master_index_by((array)($orders['job_orders'] ?? []), 'jo_number');
   $wos = master_index_by((array)($orders['work_orders'] ?? []), 'wo_number');
@@ -6411,6 +6648,8 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
       'signal_freshness_seconds' => $signalAgeSeconds,
       'current_program_id' => (string)($signal['current_program_id'] ?? $wo['nc_program_id'] ?? ''),
       'spindle_load_pct' => isset($signal['spindle_load_pct']) ? (float)$signal['spindle_load_pct'] : null,
+      'spindle_power_kw' => isset($signal['spindle_power_kw']) ? (float)$signal['spindle_power_kw'] : null,
+      'total_power_kw' => isset($signal['total_power_kw']) ? (float)$signal['total_power_kw'] : null,
       'feed_override_pct' => isset($signal['feed_override_pct']) ? (float)$signal['feed_override_pct'] : null,
       'part_count' => isset($signal['part_count']) ? (int)$signal['part_count'] : null,
       'telemetry_mode' => (string)($machineMeta['telemetry_mode'] ?? ($connectorType === 'manual_bridge' ? 'manual' : 'machine')),
@@ -6450,6 +6689,8 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
       $dispatchRow['material_trace'],
       mes_material_genealogy_overlay($dispatchRow, $partMeta, $materialConsumptionRows, $genealogyRows)
     );
+    $dispatchRow['dpp_passport'] = (array)($dppByWo[$woNumber] ?? []);
+    $dispatchRow['cost_tracking'] = (array)($costByWo[$woNumber] ?? []);
     $dispatchRow['connector_guard'] = mes_connector_guard_summary($dispatchRow, $machineMeta);
     $dispatchRow['adapter_governance'] = mes_adapter_governance_summary(
       $machineMeta,
@@ -6571,6 +6812,7 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
       $alarmPlaybooks,
       $now
     );
+    $energySnapshot = (array)($energyByMachine[$machineId] ?? []);
     $machineWall[] = [
       'machine_id' => $machineId,
       'machine_name' => (string)($machine['machine_name'] ?? ''),
@@ -6591,8 +6833,12 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
       'signal_freshness_seconds' => $signalAgeSeconds,
       'current_program_id' => (string)($signal['current_program_id'] ?? $activeWo['nc_program_id'] ?? ''),
       'spindle_load_pct' => isset($signal['spindle_load_pct']) ? (float)$signal['spindle_load_pct'] : null,
+      'spindle_power_kw' => isset($signal['spindle_power_kw']) ? (float)$signal['spindle_power_kw'] : null,
+      'total_power_kw' => isset($signal['total_power_kw']) ? (float)$signal['total_power_kw'] : null,
       'feed_override_pct' => isset($signal['feed_override_pct']) ? (float)$signal['feed_override_pct'] : null,
       'part_count' => isset($signal['part_count']) ? (int)$signal['part_count'] : null,
+      'energy_snapshot' => $energySnapshot,
+      'energy_per_unit_kwh' => isset($energySnapshot['energy_per_unit_kwh']) ? (float)$energySnapshot['energy_per_unit_kwh'] : null,
       'preferred_operator_id' => (string)($machine['preferred_operator_id'] ?? ''),
       'preferred_operator_name' => (string)($operators[(string)($machine['preferred_operator_id'] ?? '')]['operator_name'] ?? ''),
       'adapter_governance' => $adapterGovernance,
@@ -6610,6 +6856,8 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
       'nc_download' => (array)($activeWo['nc_download'] ?? []),
       'tool_readiness' => (array)($activeWo['tool_readiness'] ?? []),
       'tool_offset' => (array)($activeWo['tool_offset'] ?? []),
+      'dpp_passport' => (array)($activeWo['dpp_passport'] ?? []),
+      'cost_tracking' => (array)($activeWo['cost_tracking'] ?? []),
       'operator_governance' => (array)($activeWo['operator_governance'] ?? []),
       'material_trace' => (array)($activeWo['material_trace'] ?? []),
       'connector_guard' => (array)($activeWo['connector_guard'] ?? []),
@@ -6714,6 +6962,8 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
       'telemetry_mode' => (string)($row['telemetry_mode'] ?? ''),
       'current_program_id' => (string)($row['current_program_id'] ?? ''),
       'spindle_load_pct' => $row['spindle_load_pct'] ?? null,
+      'spindle_power_kw' => $row['spindle_power_kw'] ?? null,
+      'total_power_kw' => $row['total_power_kw'] ?? null,
       'feed_override_pct' => $row['feed_override_pct'] ?? null,
       'part_count' => $row['part_count'] ?? null,
       'status' => (string)($row['status'] ?? 'idle'),
@@ -6761,6 +7011,9 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $connectorGuardQueue = mes_build_connector_guard_queue($dispatch);
   $adapterGovernanceQueue = mes_build_adapter_governance_queue($machineWall);
   $alarmHotspotQueue = mes_build_alarm_hotspot_queue($machineWall);
+  $dppQueue = mes_build_dpp_queue($dispatch, $genealogyRows, $dppRows);
+  $energyQueue = mes_build_energy_queue($machineWall, $energySnapshotRows);
+  $costVarianceQueue = mes_build_cost_variance_queue($dispatch, $costTrackingRows);
   $reviewSlaQueue = evidence_review_sla_queue_rows();
   $shiftHandoverQueue = mes_build_shift_handover_queue($machineWall, $latestShiftHandoverByMachine, $shiftPatterns, $currentShift, $now);
   $epicorPolicy = load_epicor_integration_policy();
@@ -6794,6 +7047,13 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $launchBlockerQueue = mes_launch_blocker_rows($observability);
   $primaryReadQueue = mes_primary_read_rows($observability);
   $epicorSyncQueue = array_values((array)($epicorSnapshot['exception_queue'] ?? []));
+  $energyIntensitySamples = array_values(array_filter(array_map(static function ($row) {
+    if (!is_array($row)) return null;
+    $value = $row['energy_per_unit_kwh'] ?? null;
+    if ($value === null || $value === '') return null;
+    return (float)$value;
+  }, $energySnapshotRows), static fn($value) => $value !== null));
+  $avgEnergyPerUnit = $energyIntensitySamples ? round(array_sum($energyIntensitySamples) / count($energyIntensitySamples), 3) : null;
 
   $kpis['program_mismatches'] = count($programHandshakeQueue);
   $kpis['program_release_risk'] = count($programReleaseQueue);
@@ -6813,6 +7073,10 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $kpis['epicor_sync_status'] = count($epicorSyncQueue);
   $kpis['epicor_reconciliation_open'] = (int)($epicorSnapshot['kpis']['reconciliation_open'] ?? 0);
   $kpis['epicor_outbox_pending'] = (int)($epicorSnapshot['kpis']['outbox_pending'] ?? 0);
+  $kpis['dpp_readiness_gaps'] = count($dppQueue);
+  $kpis['energy_tracking_gaps'] = count($energyQueue);
+  $kpis['cost_variance_risk'] = count($costVarianceQueue);
+  $kpis['energy_per_unit_kwh'] = $avgEnergyPerUnit;
 
   return [
     'kpis' => $kpis,
@@ -6832,6 +7096,9 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     'review_sla_queue' => array_slice($reviewSlaQueue, 0, 20),
     'nc_download_mismatch_queue' => array_slice($ncDownloadMismatchQueue, 0, 20),
     'tool_offset_queue' => array_slice($toolOffsetQueue, 0, 20),
+    'dpp_queue' => array_slice($dppQueue, 0, 20),
+    'energy_queue' => array_slice($energyQueue, 0, 20),
+    'cost_variance_queue' => array_slice($costVarianceQueue, 0, 20),
     'operator_qualification_queue' => array_slice($operatorQualificationQueue, 0, 20),
     'material_trace_queue' => array_slice($materialTraceQueue, 0, 20),
     'material_genealogy_queue' => array_slice($materialGenealogyQueue, 0, 20),
@@ -6853,6 +7120,9 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     'current_shift' => $currentShift,
     'tooling_alerts' => array_slice($toolingAlerts, 0, 20),
     'evidence_gate_queue' => array_slice($evidenceGateQueue, 0, 20),
+    'dpp_passports' => array_slice($dppRows, 0, 50),
+    'energy_snapshots' => array_slice($energySnapshotRows, 0, 50),
+    'cost_tracking' => array_slice($costTrackingRows, 0, 50),
   ];
 }
 
@@ -14961,6 +15231,9 @@ if ($username === '') {
         'alarm_hotspots' => (int)($snapshot['kpis']['alarm_hotspots'] ?? 0),
         'nc_download_mismatches' => (int)($snapshot['kpis']['nc_download_mismatches'] ?? 0),
         'tool_offset_risk' => (int)($snapshot['kpis']['tool_offset_risk'] ?? 0),
+        'dpp_readiness_gaps' => (int)($snapshot['kpis']['dpp_readiness_gaps'] ?? 0),
+        'energy_tracking_gaps' => (int)($snapshot['kpis']['energy_tracking_gaps'] ?? 0),
+        'cost_variance_risk' => (int)($snapshot['kpis']['cost_variance_risk'] ?? 0),
       ],
       'adapters' => array_values((array)($master['mes_connectivity_adapters'] ?? [])),
       'alarm_catalog' => array_values((array)($master['mes_alarm_catalog'] ?? [])),
@@ -14971,6 +15244,9 @@ if ($username === '') {
       'alarm_ack_queue' => array_values((array)($snapshot['alarm_ack_queue'] ?? [])),
       'nc_download_mismatch_queue' => array_values((array)($snapshot['nc_download_mismatch_queue'] ?? [])),
       'tool_offset_queue' => array_values((array)($snapshot['tool_offset_queue'] ?? [])),
+      'dpp_queue' => array_values((array)($snapshot['dpp_queue'] ?? [])),
+      'energy_queue' => array_values((array)($snapshot['energy_queue'] ?? [])),
+      'cost_variance_queue' => array_values((array)($snapshot['cost_variance_queue'] ?? [])),
       'material_genealogy_queue' => array_values((array)($snapshot['material_genealogy_queue'] ?? [])),
       'shift_handover_queue' => array_values((array)($snapshot['shift_handover_queue'] ?? [])),
       'current_shift' => (array)($snapshot['current_shift'] ?? []),
@@ -15033,6 +15309,58 @@ if ($username === '') {
       'tool_assemblies' => array_values((array)($master['tool_assemblies'] ?? [])),
       'queue' => array_values((array)($snapshot['tool_offset_queue'] ?? [])),
       'count' => (int)($snapshot['kpis']['tool_offset_risk'] ?? 0),
+      'read_sources' => $bundle['sources'],
+      'runtime_mode' => $bundle['runtime_mode'],
+    ]);
+  }
+
+  case 'mes_dpp_snapshot': {
+    require_logged_in($store);
+    $bundle = runtime_read_model_bundle(true);
+    $orders = $bundle['orders'];
+    $master = $bundle['master'];
+    $mes = $bundle['mes'];
+    $snapshot = build_mes_snapshot($orders, $master, $mes);
+    api_json([
+      'ok' => true,
+      'passports' => array_values((array)($mes['dpp_passports'] ?? [])),
+      'queue' => array_values((array)($snapshot['dpp_queue'] ?? [])),
+      'count' => (int)($snapshot['kpis']['dpp_readiness_gaps'] ?? 0),
+      'read_sources' => $bundle['sources'],
+      'runtime_mode' => $bundle['runtime_mode'],
+    ]);
+  }
+
+  case 'mes_energy_snapshot': {
+    require_logged_in($store);
+    $bundle = runtime_read_model_bundle(true);
+    $orders = $bundle['orders'];
+    $master = $bundle['master'];
+    $mes = $bundle['mes'];
+    $snapshot = build_mes_snapshot($orders, $master, $mes);
+    api_json([
+      'ok' => true,
+      'energy_snapshots' => array_values((array)($mes['energy_snapshots'] ?? [])),
+      'queue' => array_values((array)($snapshot['energy_queue'] ?? [])),
+      'average_energy_per_unit_kwh' => $snapshot['kpis']['energy_per_unit_kwh'] ?? null,
+      'count' => (int)($snapshot['kpis']['energy_tracking_gaps'] ?? 0),
+      'read_sources' => $bundle['sources'],
+      'runtime_mode' => $bundle['runtime_mode'],
+    ]);
+  }
+
+  case 'mes_cost_snapshot': {
+    require_logged_in($store);
+    $bundle = runtime_read_model_bundle(true);
+    $orders = $bundle['orders'];
+    $master = $bundle['master'];
+    $mes = $bundle['mes'];
+    $snapshot = build_mes_snapshot($orders, $master, $mes);
+    api_json([
+      'ok' => true,
+      'cost_tracking' => array_values((array)($mes['cost_tracking'] ?? [])),
+      'queue' => array_values((array)($snapshot['cost_variance_queue'] ?? [])),
+      'count' => (int)($snapshot['kpis']['cost_variance_risk'] ?? 0),
       'read_sources' => $bundle['sources'],
       'runtime_mode' => $bundle['runtime_mode'],
     ]);
@@ -15274,6 +15602,8 @@ if ($username === '') {
       'heartbeat_sla_seconds' => (int)($body['heartbeat_sla_seconds'] ?? $machine['heartbeat_sla_seconds'] ?? 120),
       'current_program_id' => trim((string)($body['current_program_id'] ?? '')),
       'spindle_load_pct' => $body['spindle_load_pct'] ?? null,
+      'spindle_power_kw' => $body['spindle_power_kw'] ?? null,
+      'total_power_kw' => $body['total_power_kw'] ?? null,
       'feed_override_pct' => $body['feed_override_pct'] ?? null,
       'part_count' => $body['part_count'] ?? null,
       'enabled' => array_key_exists('enabled', $body) ? (bool)$body['enabled'] : true,
@@ -15859,6 +16189,187 @@ if ($username === '') {
     $mes['shift_handover'] = $rows;
     save_mes_runtime_store($mes);
     api_json(['ok' => true, 'handover' => $saved, 'current_shift' => $currentShift, 'data' => build_mes_snapshot($orders, $master, $mes)]);
+  }
+
+  case 'mes_dpp_upsert': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $woNumber = trim((string)($body['wo_number'] ?? ''));
+    if ($woNumber === '') api_json(['ok' => false, 'error' => 'missing_wo_number'], 400);
+
+    $orders = load_orders_store();
+    $master = load_master_data_store();
+    $mes = load_mes_runtime_store();
+    $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
+    $wo = find_order_record($orders, 'wo', $woNumber) ?? [];
+    if (!$wo) api_json(['ok' => false, 'error' => 'work_order_not_found'], 404);
+    $jo = find_order_record($orders, 'jo', (string)($wo['jo_number'] ?? '')) ?? [];
+
+    $dppId = trim((string)($body['dpp_id'] ?? mes_runtime_id('DPP')));
+    $saved = [
+      'dpp_id' => $dppId,
+      'wo_number' => $woNumber,
+      'jo_number' => (string)($jo['jo_number'] ?? ''),
+      'machine_id' => trim((string)($body['machine_id'] ?? $wo['machine_id'] ?? '')),
+      'genealogy_id' => trim((string)($body['genealogy_id'] ?? '')),
+      'part_number' => trim((string)($body['part_number'] ?? $jo['part_number'] ?? '')),
+      'part_revision' => trim((string)($body['part_revision'] ?? $jo['part_revision'] ?? '')),
+      'serial_number' => trim((string)($body['serial_number'] ?? '')),
+      'lot_number' => trim((string)($body['lot_number'] ?? '')),
+      'origin_country' => strtoupper(trim((string)($body['origin_country'] ?? ''))),
+      'material_composition' => trim((string)($body['material_composition'] ?? '')),
+      'recycled_content_pct' => array_key_exists('recycled_content_pct', $body) && $body['recycled_content_pct'] !== '' ? max(0, (float)$body['recycled_content_pct']) : null,
+      'carbon_footprint_kg_co2e' => array_key_exists('carbon_footprint_kg_co2e', $body) && $body['carbon_footprint_kg_co2e'] !== '' ? max(0, (float)$body['carbon_footprint_kg_co2e']) : null,
+      'energy_consumption_kwh' => array_key_exists('energy_consumption_kwh', $body) && $body['energy_consumption_kwh'] !== '' ? max(0, (float)$body['energy_consumption_kwh']) : null,
+      'quality_certificate_status' => trim((string)($body['quality_certificate_status'] ?? '')),
+      'qr_code' => trim((string)($body['qr_code'] ?? '')),
+      'passport_url' => trim((string)($body['passport_url'] ?? '')),
+      'status' => trim((string)($body['status'] ?? 'draft')) ?: 'draft',
+      'published_at' => trim((string)($body['published_at'] ?? '')),
+      'updated_at' => now_iso(),
+      'updated_by' => $username,
+    ];
+
+    $rows = array_values((array)($mes['dpp_passports'] ?? []));
+    $replaced = false;
+    foreach ($rows as $idx => $row) {
+      if (!is_array($row) || (string)($row['dpp_id'] ?? '') !== $dppId) continue;
+      $rows[$idx] = array_merge($row, $saved);
+      $saved = $rows[$idx];
+      $replaced = true;
+      break;
+    }
+    if (!$replaced) $rows[] = $saved;
+    $mes['dpp_passports'] = $rows;
+    save_mes_runtime_store($mes);
+    api_json(['ok' => true, 'passport' => $saved, 'data' => build_mes_snapshot($orders, $master, $mes)]);
+  }
+
+  case 'mes_energy_snapshot_upsert': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $machineId = trim((string)($body['machine_id'] ?? ''));
+    if ($machineId === '') api_json(['ok' => false, 'error' => 'missing_machine_id'], 400);
+
+    $orders = load_orders_store();
+    $master = load_master_data_store();
+    $mes = load_mes_runtime_store();
+    $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
+    $machines = master_index_by((array)($master['machines'] ?? []), 'machine_id');
+    if (!isset($machines[$machineId])) api_json(['ok' => false, 'error' => 'machine_not_found'], 404);
+
+    $snapshotId = trim((string)($body['energy_snapshot_id'] ?? mes_runtime_id('ENG')));
+    $energyKwh = array_key_exists('energy_kwh', $body) && $body['energy_kwh'] !== '' ? max(0, (float)$body['energy_kwh']) : null;
+    $goodQty = array_key_exists('good_qty', $body) && $body['good_qty'] !== '' ? max(0, (int)$body['good_qty']) : 0;
+    $energyPerUnit = array_key_exists('energy_per_unit_kwh', $body) && $body['energy_per_unit_kwh'] !== ''
+      ? max(0, (float)$body['energy_per_unit_kwh'])
+      : ($energyKwh !== null && $goodQty > 0 ? round($energyKwh / $goodQty, 4) : null);
+
+    $saved = [
+      'energy_snapshot_id' => $snapshotId,
+      'machine_id' => $machineId,
+      'machine_name' => (string)($machines[$machineId]['machine_name'] ?? ''),
+      'work_center_id' => (string)($machines[$machineId]['work_center_id'] ?? ''),
+      'wo_number' => trim((string)($body['wo_number'] ?? '')),
+      'shift_code' => trim((string)($body['shift_code'] ?? '')),
+      'captured_at' => trim((string)($body['captured_at'] ?? now_iso())),
+      'power_kw' => array_key_exists('power_kw', $body) && $body['power_kw'] !== '' ? max(0, (float)$body['power_kw']) : null,
+      'energy_kwh' => $energyKwh,
+      'good_qty' => $goodQty,
+      'scrap_qty' => array_key_exists('scrap_qty', $body) && $body['scrap_qty'] !== '' ? max(0, (int)$body['scrap_qty']) : 0,
+      'energy_per_unit_kwh' => $energyPerUnit,
+      'target_energy_per_unit_kwh' => array_key_exists('target_energy_per_unit_kwh', $body) && $body['target_energy_per_unit_kwh'] !== '' ? max(0, (float)$body['target_energy_per_unit_kwh']) : 1.5,
+      'source' => trim((string)($body['source'] ?? 'manual_bridge')),
+      'updated_at' => now_iso(),
+      'updated_by' => $username,
+    ];
+
+    $rows = array_values((array)($mes['energy_snapshots'] ?? []));
+    $replaced = false;
+    foreach ($rows as $idx => $row) {
+      if (!is_array($row) || (string)($row['energy_snapshot_id'] ?? '') !== $snapshotId) continue;
+      $rows[$idx] = array_merge($row, $saved);
+      $saved = $rows[$idx];
+      $replaced = true;
+      break;
+    }
+    if (!$replaced) $rows[] = $saved;
+    $mes['energy_snapshots'] = $rows;
+    save_mes_runtime_store($mes);
+    api_json(['ok' => true, 'energy_snapshot' => $saved, 'data' => build_mes_snapshot($orders, $master, $mes)]);
+  }
+
+  case 'mes_cost_tracking_upsert': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $woNumber = trim((string)($body['wo_number'] ?? ''));
+    if ($woNumber === '') api_json(['ok' => false, 'error' => 'missing_wo_number'], 400);
+
+    $orders = load_orders_store();
+    $master = load_master_data_store();
+    $mes = load_mes_runtime_store();
+    $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
+    $wo = find_order_record($orders, 'wo', $woNumber) ?? [];
+    if (!$wo) api_json(['ok' => false, 'error' => 'work_order_not_found'], 404);
+    $jo = find_order_record($orders, 'jo', (string)($wo['jo_number'] ?? '')) ?? [];
+
+    $costId = trim((string)($body['cost_id'] ?? mes_runtime_id('CST')));
+    $standardTotal = array_key_exists('standard_cost_total', $body) && $body['standard_cost_total'] !== '' ? max(0, (float)$body['standard_cost_total']) : null;
+    $actualTotal = array_key_exists('actual_cost_total', $body) && $body['actual_cost_total'] !== '' ? max(0, (float)$body['actual_cost_total']) : null;
+    $variancePct = array_key_exists('variance_pct', $body) && $body['variance_pct'] !== ''
+      ? (float)$body['variance_pct']
+      : (($standardTotal !== null && $standardTotal > 0 && $actualTotal !== null)
+          ? round((($actualTotal - $standardTotal) / $standardTotal) * 100, 2)
+          : null);
+    $goodQty = array_key_exists('good_qty', $body) && $body['good_qty'] !== '' ? max(0, (int)$body['good_qty']) : max(0, (int)($wo['qty_completed'] ?? 0));
+    $costPerGoodUnit = array_key_exists('cost_per_good_unit', $body) && $body['cost_per_good_unit'] !== ''
+      ? max(0, (float)$body['cost_per_good_unit'])
+      : (($actualTotal !== null && $goodQty > 0) ? round($actualTotal / $goodQty, 4) : null);
+
+    $saved = [
+      'cost_id' => $costId,
+      'wo_number' => $woNumber,
+      'jo_number' => (string)($jo['jo_number'] ?? ''),
+      'machine_id' => trim((string)($body['machine_id'] ?? $wo['machine_id'] ?? '')),
+      'work_center_id' => trim((string)($body['work_center_id'] ?? $wo['work_center_id'] ?? '')),
+      'part_number' => trim((string)($body['part_number'] ?? $jo['part_number'] ?? '')),
+      'part_revision' => trim((string)($body['part_revision'] ?? $jo['part_revision'] ?? '')),
+      'captured_at' => trim((string)($body['captured_at'] ?? now_iso())),
+      'standard_cost_total' => $standardTotal,
+      'actual_cost_total' => $actualTotal,
+      'material_cost' => array_key_exists('material_cost', $body) && $body['material_cost'] !== '' ? max(0, (float)$body['material_cost']) : null,
+      'labor_cost' => array_key_exists('labor_cost', $body) && $body['labor_cost'] !== '' ? max(0, (float)$body['labor_cost']) : null,
+      'energy_cost' => array_key_exists('energy_cost', $body) && $body['energy_cost'] !== '' ? max(0, (float)$body['energy_cost']) : null,
+      'overhead_cost' => array_key_exists('overhead_cost', $body) && $body['overhead_cost'] !== '' ? max(0, (float)$body['overhead_cost']) : null,
+      'good_qty' => $goodQty,
+      'scrap_qty' => array_key_exists('scrap_qty', $body) && $body['scrap_qty'] !== '' ? max(0, (int)$body['scrap_qty']) : max(0, (int)($wo['qty_scrap'] ?? 0)),
+      'variance_pct' => $variancePct,
+      'variance_threshold_pct' => array_key_exists('variance_threshold_pct', $body) && $body['variance_threshold_pct'] !== '' ? max(0, (float)$body['variance_threshold_pct']) : 15.0,
+      'cost_per_good_unit' => $costPerGoodUnit,
+      'cost_status' => trim((string)($body['cost_status'] ?? 'draft')) ?: 'draft',
+      'updated_at' => now_iso(),
+      'updated_by' => $username,
+    ];
+
+    $rows = array_values((array)($mes['cost_tracking'] ?? []));
+    $replaced = false;
+    foreach ($rows as $idx => $row) {
+      if (!is_array($row) || (string)($row['cost_id'] ?? '') !== $costId) continue;
+      $rows[$idx] = array_merge($row, $saved);
+      $saved = $rows[$idx];
+      $replaced = true;
+      break;
+    }
+    if (!$replaced) $rows[] = $saved;
+    $mes['cost_tracking'] = $rows;
+    save_mes_runtime_store($mes);
+    api_json(['ok' => true, 'cost_tracking' => $saved, 'data' => build_mes_snapshot($orders, $master, $mes)]);
   }
 
   case 'mes_wo_report_progress': {
@@ -18292,6 +18803,81 @@ if ($username === '') {
               (string)($row['reason_name_vi'] ?? $row['reason_name'] ?? ''),
               !empty($row['resolution_code']) ? ('RES ' . (string)$row['resolution_code']) : '',
               !empty($row['issues']) ? ('Issues: ' . implode(', ', (array)$row['issues'])) : '',
+            ])),
+          ];
+        }
+        break;
+      }
+      case 'dpp_readiness_gaps': {
+        $orders = $bundle['orders'];
+        $master = $bundle['master'];
+        $mes = $bundle['mes'];
+        $snapshot = build_mes_snapshot($orders, $master, $mes);
+        foreach ((array)($snapshot['dpp_queue'] ?? []) as $row) {
+          if (!is_array($row)) continue;
+          $items[] = [
+            'id' => (string)($row['dpp_id'] ?? $row['genealogy_id'] ?? $row['wo_number'] ?? ''),
+            'type' => 'dpp_readiness',
+            'department' => (string)($row['work_center_id'] ?? ''),
+            'date' => '',
+            'responsible' => (string)($row['machine_id'] ?? ''),
+            'detail' => implode(' · ', array_filter([
+              (string)($row['customer_name'] ?? ''),
+              trim((string)($row['part_number'] ?? '') . ' ' . (string)($row['part_revision'] ?? '')),
+              (string)($row['lot_number'] ?? ''),
+              !empty($row['issue_codes']) ? ('Issues: ' . implode(', ', (array)$row['issue_codes'])) : '',
+              !empty($row['warning_codes']) ? ('Warnings: ' . implode(', ', (array)$row['warning_codes'])) : '',
+            ])),
+          ];
+        }
+        break;
+      }
+      case 'energy_tracking_gaps': {
+        $orders = $bundle['orders'];
+        $master = $bundle['master'];
+        $mes = $bundle['mes'];
+        $snapshot = build_mes_snapshot($orders, $master, $mes);
+        foreach ((array)($snapshot['energy_queue'] ?? []) as $row) {
+          if (!is_array($row)) continue;
+          $items[] = [
+            'id' => (string)($row['energy_snapshot_id'] ?? $row['machine_id'] ?? ''),
+            'type' => 'energy_tracking',
+            'department' => (string)($row['work_center_id'] ?? ''),
+            'date' => '',
+            'responsible' => (string)($row['machine_id'] ?? ''),
+            'detail' => implode(' · ', array_filter([
+              (string)($row['machine_name'] ?? ''),
+              (string)($row['wo_number'] ?? ''),
+              $row['power_kw'] === null ? '' : ('Power ' . round((float)$row['power_kw'], 2) . ' kW'),
+              $row['energy_per_unit_kwh'] === null ? '' : ('kWh/unit ' . round((float)$row['energy_per_unit_kwh'], 3)),
+              !empty($row['issue_codes']) ? ('Issues: ' . implode(', ', (array)$row['issue_codes'])) : '',
+              !empty($row['warning_codes']) ? ('Warnings: ' . implode(', ', (array)$row['warning_codes'])) : '',
+            ])),
+          ];
+        }
+        break;
+      }
+      case 'cost_variance_risk': {
+        $orders = $bundle['orders'];
+        $master = $bundle['master'];
+        $mes = $bundle['mes'];
+        $snapshot = build_mes_snapshot($orders, $master, $mes);
+        foreach ((array)($snapshot['cost_variance_queue'] ?? []) as $row) {
+          if (!is_array($row)) continue;
+          $items[] = [
+            'id' => (string)($row['cost_id'] ?? $row['wo_number'] ?? ''),
+            'type' => 'cost_variance',
+            'department' => (string)($row['work_center_id'] ?? ''),
+            'date' => '',
+            'responsible' => (string)($row['machine_id'] ?? ''),
+            'detail' => implode(' · ', array_filter([
+              (string)($row['customer_name'] ?? ''),
+              trim((string)($row['part_number'] ?? '') . ' ' . (string)($row['part_revision'] ?? '')),
+              $row['standard_cost_total'] === null ? '' : ('Std ' . round((float)$row['standard_cost_total'], 2)),
+              $row['actual_cost_total'] === null ? '' : ('Act ' . round((float)$row['actual_cost_total'], 2)),
+              $row['variance_pct'] === null ? '' : ('Var ' . round((float)$row['variance_pct'], 2) . '%'),
+              !empty($row['issue_codes']) ? ('Issues: ' . implode(', ', (array)$row['issue_codes'])) : '',
+              !empty($row['warning_codes']) ? ('Warnings: ' . implode(', ', (array)$row['warning_codes'])) : '',
             ])),
           ];
         }

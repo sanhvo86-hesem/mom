@@ -17348,6 +17348,159 @@
           "description": "Epicor site or plant code governing the transaction context."
         }
       }
+    },
+    "mes_digital_product_passport": {
+      "title": "MES Digital Product Passport",
+      "description": "Governed variables for digital product passport readiness, sustainability disclosure, and shipment-grade traceability.",
+      "variables": {
+        "dpp_id_mes": {
+          "label": "DPP ID",
+          "label_vi": "Ma DPP",
+          "type": "string",
+          "required": true,
+          "source": "generated",
+          "used_in": ["mes_digital_product_passport"],
+          "description": "Unique identifier for a governed digital product passport record."
+        },
+        "dpp_origin_country_mes": {
+          "label": "Origin Country",
+          "label_vi": "Quoc gia xuat xu",
+          "type": "string",
+          "required": false,
+          "source": "master",
+          "used_in": ["mes_digital_product_passport"],
+          "description": "ISO country code describing the origin country disclosed on the passport."
+        },
+        "dpp_carbon_footprint_mes": {
+          "label": "Carbon Footprint",
+          "label_vi": "Dau chan carbon",
+          "type": "number",
+          "required": false,
+          "source": "calculated",
+          "used_in": ["mes_digital_product_passport"],
+          "description": "Total product carbon footprint in kg CO2e captured for DPP disclosure."
+        },
+        "dpp_energy_kwh_mes": {
+          "label": "Passport Energy",
+          "label_vi": "Nang luong tren DPP",
+          "type": "number",
+          "required": false,
+          "source": "calculated",
+          "used_in": ["mes_digital_product_passport"],
+          "description": "Energy consumption in kWh published into the digital product passport."
+        },
+        "dpp_qr_code_mes": {
+          "label": "DPP QR Code",
+          "label_vi": "Ma QR DPP",
+          "type": "string",
+          "required": false,
+          "source": "generated",
+          "used_in": ["mes_digital_product_passport"],
+          "description": "QR code or access token used to retrieve the passport record externally."
+        }
+      }
+    },
+    "mes_energy_management": {
+      "title": "MES Energy Management",
+      "description": "Governed variables for machine power, kWh intensity, and ISO 50001-style energy monitoring.",
+      "variables": {
+        "energy_snapshot_id_mes": {
+          "label": "Energy Snapshot ID",
+          "label_vi": "Ma snapshot nang luong",
+          "type": "string",
+          "required": true,
+          "source": "generated",
+          "used_in": ["mes_energy_management"],
+          "description": "Unique identifier for a governed machine or shift energy snapshot."
+        },
+        "machine_power_kw_mes": {
+          "label": "Machine Power",
+          "label_vi": "Cong suat may",
+          "type": "number",
+          "required": false,
+          "source": "machine",
+          "used_in": ["mes_energy_management"],
+          "description": "Instantaneous machine power draw in kW."
+        },
+        "energy_kwh_mes": {
+          "label": "Energy kWh",
+          "label_vi": "Dien nang kWh",
+          "type": "number",
+          "required": false,
+          "source": "calculated",
+          "used_in": ["mes_energy_management"],
+          "description": "Accumulated energy consumption in kWh over the governed capture window."
+        },
+        "energy_per_unit_kwh_mes": {
+          "label": "Energy per Unit",
+          "label_vi": "kWh tren moi san pham",
+          "type": "number",
+          "required": false,
+          "source": "calculated",
+          "used_in": ["mes_energy_management"],
+          "description": "Energy intensity expressed as kWh per good unit produced."
+        },
+        "energy_target_per_unit_kwh_mes": {
+          "label": "Energy Target per Unit",
+          "label_vi": "Muc tieu kWh tren moi san pham",
+          "type": "number",
+          "required": false,
+          "source": "policy",
+          "used_in": ["mes_energy_management"],
+          "description": "Governed target threshold for acceptable energy intensity per unit."
+        }
+      }
+    },
+    "mes_cost_governance": {
+      "title": "MES Cost Governance",
+      "description": "Governed variables for actual versus standard costing on work orders in real time.",
+      "variables": {
+        "cost_tracking_id_mes": {
+          "label": "Cost Tracking ID",
+          "label_vi": "Ma costing runtime",
+          "type": "string",
+          "required": true,
+          "source": "generated",
+          "used_in": ["mes_cost_governance"],
+          "description": "Unique identifier for the governed work-order costing snapshot."
+        },
+        "standard_cost_total_mes": {
+          "label": "Standard Cost Total",
+          "label_vi": "Tong chi phi ke hoach",
+          "type": "number",
+          "required": false,
+          "source": "erp",
+          "used_in": ["mes_cost_governance"],
+          "description": "Planned total cost imported or derived for the work order."
+        },
+        "actual_cost_total_mes": {
+          "label": "Actual Cost Total",
+          "label_vi": "Tong chi phi thuc te",
+          "type": "number",
+          "required": false,
+          "source": "calculated",
+          "used_in": ["mes_cost_governance"],
+          "description": "Actual accumulated cost observed by MES for the work order."
+        },
+        "cost_variance_pct_mes": {
+          "label": "Cost Variance Percent",
+          "label_vi": "Phan tram lech chi phi",
+          "type": "number",
+          "required": false,
+          "source": "calculated",
+          "used_in": ["mes_cost_governance"],
+          "description": "Percentage variance between actual and standard total cost."
+        },
+        "cost_per_good_unit_mes": {
+          "label": "Cost per Good Unit",
+          "label_vi": "Chi phi tren moi san pham tot",
+          "type": "number",
+          "required": false,
+          "source": "calculated",
+          "used_in": ["mes_cost_governance"],
+          "description": "Actual cost allocated to each conforming good unit."
+        }
+      }
     }
   }
 }

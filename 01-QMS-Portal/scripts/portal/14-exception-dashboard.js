@@ -326,6 +326,42 @@ var EXCEPTION_TYPES = [
     page: 'mes'
   },
   {
+    key: 'dpp_readiness_gaps',
+    icon: '🪪',
+    accent: '#1d4ed8',
+    surface: '#eff6ff',
+    border: '#93c5fd',
+    labelVi: 'DPP chưa sẵn sàng',
+    labelEn: 'DPP readiness gaps',
+    descVi: 'WO hoặc genealogy chưa đủ passport số, vật liệu, carbon, năng lượng hoặc đường dẫn truy xuất theo mức công bố bên ngoài.',
+    descEn: 'The WO or genealogy is still missing digital product passport, material, carbon, energy, or trace-link coverage for external disclosure.',
+    page: 'mes'
+  },
+  {
+    key: 'energy_tracking_gaps',
+    icon: '⚡',
+    accent: '#ca8a04',
+    surface: '#fefce8',
+    border: '#fde68a',
+    labelVi: 'Theo dõi năng lượng còn hở',
+    labelEn: 'Energy tracking gaps',
+    descVi: 'Máy đang chạy nhưng thiếu power telemetry, thiếu snapshot năng lượng hoặc vượt mục tiêu kWh trên mỗi sản phẩm.',
+    descEn: 'Running machines are missing power telemetry, missing governed energy snapshots, or exceeding the kWh-per-unit target.',
+    page: 'mes'
+  },
+  {
+    key: 'cost_variance_risk',
+    icon: '💸',
+    accent: '#b45309',
+    surface: '#fff7ed',
+    border: '#fdba74',
+    labelVi: 'Cost variance vượt ngưỡng',
+    labelEn: 'Cost variance risk',
+    descVi: 'WO đang thiếu snapshot costing hoặc actual cost đang vượt ngưỡng variance đã quản trị.',
+    descEn: 'The WO is missing governed costing snapshots or its actual cost is above the allowed variance threshold.',
+    page: 'mes'
+  },
+  {
     key: 'orphan_links',
     icon: '\ud83e\uddf7',
     accent: '#2563eb',
@@ -511,7 +547,7 @@ function renderSummary(){
     total += count;
     if (count > 0) activeGroups += 1;
   });
-  highPriority = Number(state.summary.overdue_allocations || 0) + Number(state.summary.review_sla_gaps || 0) + Number(state.summary.wo_missing_evidence || 0) + Number(state.summary.program_mismatches || 0) + Number(state.summary.program_release_risk || 0) + Number(state.summary.tool_readiness_risk || 0) + Number(state.summary.alarm_ack_gaps || 0) + Number(state.summary.operator_qualification_gaps || 0) + Number(state.summary.material_trace_gaps || 0) + Number(state.summary.material_genealogy_gaps || 0) + Number(state.summary.shift_handover_gaps || 0) + Number(state.summary.connector_governance_gaps || 0) + Number(state.summary.adapter_governance_risk || 0) + Number(state.summary.alarm_hotspots || 0) + Number(state.summary.nc_download_mismatches || 0) + Number(state.summary.tool_offset_risk || 0) + Number(state.summary.launch_blocker_hotspots || 0) + Number(state.summary.shadow_sync_failures || 0) + Number(state.summary.primary_read_fallbacks || 0) + Number(state.summary.epicor_sync_status || 0) + Number(state.summary.downtime_governance_gaps || 0) + Number(state.summary.overdue_orders || 0);
+  highPriority = Number(state.summary.overdue_allocations || 0) + Number(state.summary.review_sla_gaps || 0) + Number(state.summary.wo_missing_evidence || 0) + Number(state.summary.program_mismatches || 0) + Number(state.summary.program_release_risk || 0) + Number(state.summary.tool_readiness_risk || 0) + Number(state.summary.alarm_ack_gaps || 0) + Number(state.summary.operator_qualification_gaps || 0) + Number(state.summary.material_trace_gaps || 0) + Number(state.summary.material_genealogy_gaps || 0) + Number(state.summary.shift_handover_gaps || 0) + Number(state.summary.connector_governance_gaps || 0) + Number(state.summary.adapter_governance_risk || 0) + Number(state.summary.alarm_hotspots || 0) + Number(state.summary.nc_download_mismatches || 0) + Number(state.summary.tool_offset_risk || 0) + Number(state.summary.launch_blocker_hotspots || 0) + Number(state.summary.shadow_sync_failures || 0) + Number(state.summary.primary_read_fallbacks || 0) + Number(state.summary.epicor_sync_status || 0) + Number(state.summary.downtime_governance_gaps || 0) + Number(state.summary.dpp_readiness_gaps || 0) + Number(state.summary.energy_tracking_gaps || 0) + Number(state.summary.cost_variance_risk || 0) + Number(state.summary.overdue_orders || 0);
   var nextPage = highPriority > 0 ? t('MES / Chứng cứ', 'MES / Evidence') : (activeGroups > 0 ? t('Đơn hàng', 'Orders') : t('Ổn định', 'Stable'));
   var totalEl = state.container.querySelector('#excx-total');
   var groupsEl = state.container.querySelector('#excx-groups');

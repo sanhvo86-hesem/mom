@@ -104,6 +104,17 @@ final class EdgeConnectorService
                 $sourceData['load'] ?? null,
                 $payload['spindle_load_pct'] ?? null,
             ]), 100),
+            'spindle_power_kw' => $this->normalizeNumber($this->firstNonEmpty([
+                $sourceData['spindle_power_kw'] ?? null,
+                $sourceData['spindle_power'] ?? null,
+                $payload['spindle_power_kw'] ?? null,
+            ])),
+            'total_power_kw' => $this->normalizeNumber($this->firstNonEmpty([
+                $sourceData['total_power_kw'] ?? null,
+                $sourceData['total_power'] ?? null,
+                $sourceData['power_kw'] ?? null,
+                $payload['total_power_kw'] ?? null,
+            ])),
             'feed_override_pct' => $this->normalizePercent($this->firstNonEmpty([
                 $sourceData['feed_override_pct'] ?? null,
                 $sourceData['feed_override'] ?? null,
@@ -222,6 +233,8 @@ final class EdgeConnectorService
             $execution = $doc->xpath('//*[local-name()="Execution"]');
             $program = $doc->xpath('//*[local-name()="Program"]');
             $load = $doc->xpath('//*[local-name()="SpindleLoad"]');
+            $spindlePower = $doc->xpath('//*[local-name()="SpindlePower"]');
+            $totalPower = $doc->xpath('//*[local-name()="TotalPower" or local-name()="Power"]');
             $override = $doc->xpath('//*[local-name()="PathFeedrateOverride"]');
             $partCount = $doc->xpath('//*[local-name()="PartCount"]');
 
@@ -229,6 +242,8 @@ final class EdgeConnectorService
                 'execution' => isset($execution[0]) ? trim((string)$execution[0]) : null,
                 'program' => isset($program[0]) ? trim((string)$program[0]) : null,
                 'load' => isset($load[0]) ? trim((string)$load[0]) : null,
+                'spindle_power' => isset($spindlePower[0]) ? trim((string)$spindlePower[0]) : null,
+                'total_power' => isset($totalPower[0]) ? trim((string)$totalPower[0]) : null,
                 'feed_override' => isset($override[0]) ? trim((string)$override[0]) : null,
                 'part_count' => isset($partCount[0]) ? trim((string)$partCount[0]) : null,
                 'timestamp' => trim((string)($doc['creationTime'] ?? '')) ?: null,
@@ -283,6 +298,18 @@ final class EdgeConnectorService
             $number = (float)$max;
         }
         return $number;
+    }
+
+    private function normalizeNumber(mixed $value): ?float
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (!is_numeric((string)$value)) {
+            return null;
+        }
+        $number = (float)$value;
+        return $number < 0 ? 0.0 : $number;
     }
 
     private function normalizeInt(mixed $value): ?int

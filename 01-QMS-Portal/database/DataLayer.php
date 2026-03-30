@@ -1983,6 +1983,9 @@ class DataLayer
         $materialRows = $this->db->query('SELECT metadata, created_at FROM mes_material_consumption ORDER BY created_at DESC');
         $genealogyRows = $this->db->query('SELECT metadata, updated_at FROM mes_part_genealogy ORDER BY updated_at DESC');
         $handoverRows = $this->db->query('SELECT metadata, created_at FROM mes_shift_handover ORDER BY created_at DESC');
+        $dppRows = $this->db->query('SELECT metadata, updated_at FROM mes_dpp_passports ORDER BY updated_at DESC');
+        $energyRows = $this->db->query('SELECT metadata, updated_at FROM mes_energy_snapshots ORDER BY updated_at DESC');
+        $costRows = $this->db->query('SELECT metadata, updated_at FROM mes_cost_tracking ORDER BY updated_at DESC');
 
         [$connectorFeeds, $machineSignals] = $this->extractEquipmentRuntimeRows($equipmentRuntimeRows);
 
@@ -2000,6 +2003,9 @@ class DataLayer
                 $materialRows,
                 $genealogyRows,
                 $handoverRows,
+                $dppRows,
+                $energyRows,
+                $costRows,
             ]),
             'downtime_events' => $this->extractMetadataRows($downtimeRows),
             'maintenance_requests' => $this->extractMetadataRows($maintenanceRows),
@@ -2014,9 +2020,12 @@ class DataLayer
             'material_consumption' => $this->extractMetadataRows($materialRows),
             'part_genealogy' => $this->extractMetadataRows($genealogyRows),
             'shift_handover' => $this->extractMetadataRows($handoverRows),
+            'dpp_passports' => $this->extractMetadataRows($dppRows),
+            'energy_snapshots' => $this->extractMetadataRows($energyRows),
+            'cost_tracking' => $this->extractMetadataRows($costRows),
         ];
 
-        if ($this->storeCollectionCount($store, ['connector_feeds', 'machine_signals', 'progress_reports', 'tooling_status', 'material_consumption', 'part_genealogy', 'shift_handover']) === 0) {
+        if ($this->storeCollectionCount($store, ['connector_feeds', 'machine_signals', 'progress_reports', 'tooling_status', 'material_consumption', 'part_genealogy', 'shift_handover', 'dpp_passports', 'energy_snapshots', 'cost_tracking']) === 0) {
             throw new RuntimeException('runtime_mes_pg_empty');
         }
 
