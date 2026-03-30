@@ -493,7 +493,10 @@ function _generate(){
     linked_order_id: masterContext.wo_number || masterContext.jo_number || masterContext.so_number || ''
   }).then(function(resp){
     if(!resp || !resp.ok){
-      _showInlineMessage(_t('Không thể cấp mã hồ sơ.', 'Could not issue the record ID.'), 'error');
+      var errMeta = window.AllocationTracker && typeof window.AllocationTracker.describeError === 'function'
+        ? window.AllocationTracker.describeError(resp, 'allocate')
+        : { message:_t('Không thể cấp mã hồ sơ.', 'Could not issue the record ID.') };
+      _showInlineMessage(errMeta.message || _t('Không thể cấp mã hồ sơ.', 'Could not issue the record ID.'), 'error');
       return;
     }
     _showResult(resp);
