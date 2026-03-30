@@ -1173,17 +1173,10 @@ function save_dict_items(string $jsonFile, string $jsFile, array $items): void {
   $clean = [];
   foreach ($items as $it) {
     if (!is_array($it)) continue;
-    $term = trim((string)($it['term'] ?? ''));
+    $normalized = dict_prepare_item($it);
+    $term = $normalized['term'];
     if ($term === '') continue;
-    $clean[] = [
-      'term'    => $term,
-      'meaning' => (string)($it['meaning'] ?? ''),
-      'vi'      => (string)($it['vi'] ?? ''),
-      'def'     => (string)($it['def'] ?? ''),
-      'ctx'     => (string)($it['ctx'] ?? ''),
-      'rec'     => (string)($it['rec'] ?? ''),
-      'cat'     => (string)($it['cat'] ?? 'General'),
-    ];
+    $clean[] = $normalized;
   }
   usort($clean, function($a,$b){
     return strcasecmp((string)$a['term'], (string)$b['term']);
@@ -1196,6 +1189,85 @@ function save_dict_items(string $jsonFile, string $jsFile, array $items): void {
   $js = "window.HESEM_GLOSSARY = " . $payload . ";\n"
       . "window.DICT_DATA = window.HESEM_GLOSSARY;\n";
   @file_put_contents($jsFile, $js, LOCK_EX);
+}
+
+function dict_status_terms(): array {
+  return ['PASS', 'FAIL', 'REJECT', 'REWORK'];
+}
+
+function dict_trim_single_line(string $value): string {
+  $value = preg_replace('/\s+/u', ' ', $value);
+  return trim((string)$value);
+}
+
+function dict_extract_alias_term(string $term): ?array {
+  if (preg_match('/^(.*?)\s*\(([A-Z0-9][A-Z0-9\/&+.\-]{1,})\)$/', $term, $matches) !== 1) {
+    return null;
+  }
+  return [
+    'phrase' => trim((string)($matches[1] ?? '')),
+    'abbr' => trim((string)($matches[2] ?? '')),
+  ];
+}
+
+function dict_is_status_term(string $term): bool {
+  return in_array(strtoupper(trim($term)), dict_status_terms(), true);
+}
+
+function dict_is_abbreviation_term(string $term): bool {
+  $term = trim($term);
+  if ($term === '' || str_contains($term, ' ') || dict_is_status_term($term)) {
+    return false;
+  }
+  if (preg_match('/^[A-Z]{2,}-\d{2,}$/', $term) === 1) {
+    return true;
+  }
+  return preg_match('/^[A-Z0-9][A-Z0-9\/&+.\-]{1,}$/', $term) === 1;
+}
+
+function dict_sanitize_meaning(string $term, string $meaning): string {
+  $meaning = dict_trim_single_line($meaning);
+  if ($meaning === '') return '';
+  $meaning = preg_replace('/\s*\/\s*/u', ' / ', $meaning);
+  if (dict_is_abbreviation_term($term)) {
+    $quoted = preg_quote($term, '/');
+    $meaning = preg_replace('/\s*\(' . $quoted . '\)\s*$/iu', '', $meaning);
+  }
+  return dict_trim_single_line((string)$meaning);
+}
+
+function dict_prepare_item(array $item): array {
+  $term = dict_trim_single_line((string)($item['term'] ?? ''));
+  return [
+    'term'    => $term,
+    'meaning' => dict_sanitize_meaning($term, (string)($item['meaning'] ?? '')),
+    'vi'      => trim((string)($item['vi'] ?? '')),
+    'def'     => trim((string)($item['def'] ?? '')),
+    'ctx'     => trim((string)($item['ctx'] ?? '')),
+    'rec'     => trim((string)($item['rec'] ?? '')),
+    'cat'     => dict_trim_single_line((string)($item['cat'] ?? 'General')) ?: 'General',
+  ];
+}
+
+function dict_validate_item(array $item, string $originalTerm = ''): ?string {
+  $term = dict_trim_single_line((string)($item['term'] ?? ''));
+  $meaning = dict_sanitize_meaning($term, (string)($item['meaning'] ?? ''));
+  $def = trim((string)($item['def'] ?? ''));
+  $originalTerm = dict_trim_single_line($originalTerm);
+
+  if ($term === '') return 'missing_term';
+  if ($meaning === '') return 'missing_meaning';
+  if ($def === '') return 'missing_definition';
+
+  $alias = dict_extract_alias_term($term);
+  if ($alias && ($originalTerm === '' || strcasecmp($originalTerm, $term) !== 0)) {
+    return 'use_abbreviation_canonical_term';
+  }
+  if (dict_is_abbreviation_term($term) && strcasecmp($meaning, $term) === 0) {
+    return 'meaning_must_expand_abbreviation';
+  }
+
+  return null;
 }
 
 function slugify(string $text): string {
@@ -5513,19 +5585,10 @@ switch ($action) {
     $original = trim((string)($data['originalTerm'] ?? ''));
     if ($original === '') $original = $term;
 
-    if ($term === '') api_json(['ok' => false, 'error' => 'missing_term'], 400);
-    $def = trim((string)($data['def'] ?? ''));
-    if ($def === '') api_json(['ok' => false, 'error' => 'missing_definition'], 400);
+    $validationError = dict_validate_item($data, $original);
+    if ($validationError !== null) api_json(['ok' => false, 'error' => $validationError], 400);
 
-    $newItem = [
-      'term'    => $term,
-      'meaning' => (string)($data['meaning'] ?? ''),
-      'vi'      => (string)($data['vi'] ?? ''),
-      'def'     => $def,
-      'ctx'     => (string)($data['ctx'] ?? ''),
-      'rec'     => (string)($data['rec'] ?? ''),
-      'cat'     => (string)($data['cat'] ?? 'General'),
-    ];
+    $newItem = dict_prepare_item($data);
 
     $items = is_file($DICT_JSON_FILE) ? load_dict_items($DICT_JSON_FILE) : [];
     $found = false;

@@ -82,6 +82,18 @@ FIFO, FEFO, PDCA, SCAR, SBAR, TIMWOODS, SSCC
 **Mã tài liệu:**
 SOP-101, WI-201, FRM-301, ANNEX-111 — toàn bộ mã tài liệu giữ nguyên dạng gốc
 
+### B1a. Glossary canonical cho viết tắt — KHÓA CỨNG
+
+Khi một viết tắt xuất hiện trong glossary/từ điển thuật ngữ:
+
+- `term` PHẢI là khóa tra cứu canonical;
+- `meaning` PHẢI là tên đầy đủ tiếng Anh của viết tắt;
+- không được tạo mới record canonical theo dạng `Full Term (ABBR)`;
+- với cặp `ABBR` và `Full Term (ABBR)`, `ABBR` là mục từ chính;
+- role/JD code như `QA-01`, `PUR-02`, `EXE-01` vẫn được phép ở glossary, nhưng `meaning` PHẢI là chức danh tiếng Anh đầy đủ.
+
+Chuẩn chi tiết: xem `25-glossary-canonical-abbreviation-standard.md`.
+
 ### B2. Thuật ngữ ngành — giữ nguyên tiếng Anh
 
 Các thuật ngữ ngành sau giữ nguyên tiếng Anh khi dùng trong văn bản tiếng Việt:

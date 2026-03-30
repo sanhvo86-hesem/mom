@@ -53,20 +53,12 @@ class DictController extends BaseController
         $original = trim((string)($data['originalTerm'] ?? ''));
         if ($original === '') $original = $term;
 
-        if ($term === '') $this->error('missing_term', 400);
+        $validationError = dict_validate_item($data, $original);
+        if ($validationError !== null) {
+            $this->error($validationError, 400);
+        }
 
-        $def = trim((string)($data['def'] ?? ''));
-        if ($def === '') $this->error('missing_definition', 400);
-
-        $newItem = [
-            'term'    => $term,
-            'meaning' => (string)($data['meaning'] ?? ''),
-            'vi'      => (string)($data['vi'] ?? ''),
-            'def'     => $def,
-            'ctx'     => (string)($data['ctx'] ?? ''),
-            'rec'     => (string)($data['rec'] ?? ''),
-            'cat'     => (string)($data['cat'] ?? 'General'),
-        ];
+        $newItem = dict_prepare_item($data);
 
         $jsonFile = $this->rootDir . '/11-Glossary/dict-data.json';
         $jsFile   = $this->rootDir . '/11-Glossary/dict-data.js';

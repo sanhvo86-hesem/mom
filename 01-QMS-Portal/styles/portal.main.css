@@ -301,6 +301,7 @@ button{cursor:pointer;border:none;background:none}
 .dict-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.05);border-color:#bbdefb}
 .dict-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .dict-term{font-size:15px;font-weight:700;color:var(--text);letter-spacing:.2px}
+.dict-meaning{font-size:13px;color:var(--text);font-weight:600;margin-top:4px;line-height:1.5}
 .dict-vi{font-size:12px;color:var(--brand-2);font-weight:600;margin-top:2px}
 .dict-cat-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;border:1px solid var(--border);background:#f8f9fa;color:var(--text-2);white-space:nowrap;flex-shrink:0}
 .dict-cat-badge .dot{width:7px;height:7px;border-radius:50%;display:inline-block}

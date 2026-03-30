@@ -15,6 +15,15 @@
 - Không viết hàn lâm, không viết dài dòng — mỗi câu phục vụ vận hành thật
 - Mọi nội dung hiển thị trong SOP/WI/ANNEX/JD PHẢI ưu tiên tiếng Việt, trừ các ngoại lệ đã khóa tại mục C, D và A4
 
+### A1a. Quy tắc glossary khi giữ viết tắt tiếng Anh
+
+- Trong glossary, `meaning` PHẢI chứa tên đầy đủ tiếng Anh của term.
+- Nếu `term` là viết tắt, không được để `meaning` chỉ lặp lại chính viết tắt đó.
+- Nếu query hoặc tài liệu dùng dạng `Full Term (ABBR)`, glossary canonical vẫn phải trả về `ABBR`.
+- Khi một role code/JD code được đưa vào glossary, `meaning` vẫn phải là English title đầy đủ, còn `vi` là nhãn tiếng Việt chuẩn hóa.
+
+Chuẩn canonical đầy đủ: xem `25-glossary-canonical-abbreviation-standard.md`.
+
 ### A4. Ngoại lệ khóa cứng đã được xác nhận
 
 - Giữ nguyên toàn bộ viết tắt chuẩn ở mục C.

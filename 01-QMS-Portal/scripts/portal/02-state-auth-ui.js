@@ -3520,6 +3520,81 @@ function normalizeDictionarySearchText(text){
     .replace(/\s+/g, ' ');
 }
 
+const DICT_STATUS_TERMS = new Set(['PASS', 'FAIL', 'REJECT', 'REWORK']);
+
+function normalizeDictionarySingleLineText(text){
+  return String(text || '').replace(/\s+/g, ' ').trim();
+}
+
+function getDictionaryAliasMatch(term){
+  const match = normalizeDictionarySingleLineText(term).match(/^(.*?)\s*\(([A-Z0-9][A-Z0-9/&+.\-]{1,})\)$/);
+  if(!match) return null;
+  return {
+    phrase: normalizeDictionarySingleLineText(match[1]),
+    abbr: normalizeDictionarySingleLineText(match[2])
+  };
+}
+
+function isDictionaryStatusTerm(term){
+  return DICT_STATUS_TERMS.has(normalizeDictionarySingleLineText(term).toUpperCase());
+}
+
+function isDictionaryAbbreviationTerm(term){
+  const value = normalizeDictionarySingleLineText(term);
+  if(!value || value.includes(' ') || isDictionaryStatusTerm(value)) return false;
+  if(/^[A-Z]{2,}-\d{2,}$/.test(value)) return true;
+  return /^[A-Z0-9][A-Z0-9/&+.\-]{1,}$/.test(value);
+}
+
+function sanitizeDictionaryMeaning(term, meaning){
+  const cleanTerm = normalizeDictionarySingleLineText(term);
+  let cleanMeaning = normalizeDictionarySingleLineText(meaning).replace(/\s*\/\s*/g, ' / ');
+  if(!cleanMeaning) return '';
+  if(isDictionaryAbbreviationTerm(cleanTerm)){
+    const escaped = cleanTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    cleanMeaning = cleanMeaning.replace(new RegExp(`\\s*\\(${escaped}\\)\\s*$`, 'i'), '').trim();
+  }
+  return cleanMeaning;
+}
+
+function getDictionaryValidationError(term, meaning, def, originalTerm){
+  const cleanTerm = normalizeDictionarySingleLineText(term);
+  const cleanMeaning = sanitizeDictionaryMeaning(cleanTerm, meaning);
+  const cleanDef = String(def || '').trim();
+  const cleanOriginal = normalizeDictionarySingleLineText(originalTerm || cleanTerm);
+  const aliasMatch = getDictionaryAliasMatch(cleanTerm);
+
+  if(!cleanTerm) return 'missing_term';
+  if(!cleanMeaning) return 'missing_meaning';
+  if(!cleanDef) return 'missing_definition';
+  if(aliasMatch && (!originalTerm || cleanOriginal.toLowerCase() !== cleanTerm.toLowerCase())){
+    return 'use_abbreviation_canonical_term';
+  }
+  if(isDictionaryAbbreviationTerm(cleanTerm) && cleanMeaning.toLowerCase() === cleanTerm.toLowerCase()){
+    return 'meaning_must_expand_abbreviation';
+  }
+  return '';
+}
+
+function getDictionarySaveErrorMessage(errorCode){
+  const viMessages = {
+    missing_term: 'Cần nhập thuật ngữ',
+    missing_meaning: 'Cần nhập tên đầy đủ tiếng Anh',
+    missing_definition: 'Cần nhập định nghĩa',
+    use_abbreviation_canonical_term: 'Dùng mã viết tắt làm term chính và điền tên đầy đủ tiếng Anh vào trường Meaning',
+    meaning_must_expand_abbreviation: 'Tên đầy đủ tiếng Anh phải khai triển mã viết tắt, không được lặp lại chính mã đó'
+  };
+  const enMessages = {
+    missing_term: 'Term is required',
+    missing_meaning: 'Full English is required',
+    missing_definition: 'Definition is required',
+    use_abbreviation_canonical_term: 'Use the abbreviation as the canonical term and put the full English in Meaning',
+    meaning_must_expand_abbreviation: 'Meaning must expand the abbreviation instead of repeating the code'
+  };
+  const messages = lang === 'en' ? enMessages : viMessages;
+  return messages[errorCode] || errorCode || (lang === 'en' ? 'Save failed' : 'Lưu thất bại');
+}
+
 function isDictionaryWordStart(text, index){
   return index === 0 || text.charAt(index - 1) === ' ';
 }
@@ -3558,9 +3633,11 @@ function scoreDictionaryField(text, query, fieldWeight){
 function getDictionarySearchMatch(item, rawQuery){
   const query = normalizeDictionarySearchText(rawQuery);
   if(!query) return { item, score: 0 };
+  const aliasComposite = item.meaning && item.term ? `${item.meaning} (${item.term})` : '';
 
   const fields = [
     { key: 'term', value: normalizeDictionarySearchText(item.term), weight: 1200 },
+    { key: 'alias', value: normalizeDictionarySearchText(aliasComposite), weight: 1140 },
     { key: 'vi', value: normalizeDictionarySearchText(item.vi), weight: 1120 },
     { key: 'meaning', value: normalizeDictionarySearchText(item.meaning), weight: 720 },
     { key: 'def', value: normalizeDictionarySearchText(item.def), weight: 220 }
@@ -3653,7 +3730,8 @@ function renderDictBody(){
           <div class="dict-card-header">
             <div>
               <div class="dict-term">${highlightMatch(d.term, dictQuery)}</div>
-              ${d.vi && d.vi !== d.term ? `<div class="dict-vi">${highlightMatch(d.vi, dictQuery)}</div>` : ''}
+              ${d.meaning ? `<div class="dict-meaning">${highlightMatch(d.meaning, dictQuery)}</div>` : ''}
+              ${d.vi && d.vi !== d.term && d.vi !== d.meaning ? `<div class="dict-vi">${highlightMatch(d.vi, dictQuery)}</div>` : ''}
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
               <div class="dict-cat-badge"><span class="dot" style="background:${DICT_CAT_COLORS[d.cat]||'#94a3b8'}"></span>${d.cat}</div>
@@ -3708,7 +3786,7 @@ function openDictTermModal(term){
 
     <div class="modal-field"><label>${lang==='en'?'Term (EN)':'Thuật ngữ (EN)'}</label><input id="dm-term" value="${existing?escapeHtml(existing.term):''}" ${isEdit?'disabled':''}></div>
     <div class="modal-field"><label>${lang==='en'?'Vietnamese':'Tiếng Việt'}</label><input id="dm-vi" value="${existing?escapeHtml(existing.vi||''):''}"></div>
-    <div class="modal-field"><label>${lang==='en'?'Meaning / short':'Ý nghĩa / ngắn gọn'}</label><input id="dm-meaning" value="${existing?escapeHtml(existing.meaning||''):''}"></div>
+    <div class="modal-field"><label>${lang==='en'?'Full English (required)':'Tên đầy đủ tiếng Anh (bắt buộc)'}</label><input id="dm-meaning" value="${existing?escapeHtml(existing.meaning||''):''}"></div>
     <div class="modal-field"><label>${lang==='en'?'Category':'Nhóm'}</label>
       <select id="dm-cat">${catOptions || '<option value="General">General</option>'}</select>
     </div>
@@ -3729,19 +3807,22 @@ async function saveDictTerm(originalTerm){
   if(!isAdmin()) return;
   const term = (document.getElementById('dm-term').value||'').trim();
   const vi = (document.getElementById('dm-vi').value||'').trim();
-  const meaning = (document.getElementById('dm-meaning').value||'').trim();
+  const meaning = sanitizeDictionaryMeaning(term, document.getElementById('dm-meaning').value||'');
   const cat = (document.getElementById('dm-cat').value||'General').trim();
   const def = (document.getElementById('dm-def').value||'').trim();
   const ctx = (document.getElementById('dm-ctx').value||'').trim();
   const rec = (document.getElementById('dm-rec').value||'').trim();
 
-  if(!term){ alert(lang==='en'?'Term is required':'Cần nhập thuật ngữ'); return; }
-  if(!def){ alert(lang==='en'?'Definition is required':'Cần nhập định nghĩa'); return; }
+  const validationError = getDictionaryValidationError(term, meaning, def, originalTerm);
+  if(validationError){
+    alert(getDictionarySaveErrorMessage(validationError));
+    return;
+  }
 
   try{
     const res = await apiCall('dict_upsert',{term,vi,meaning,cat,def,ctx,rec,originalTerm});
     if(!(res && res.ok)){
-      showToast((res && res.error)?('⚠ '+res.error):(lang==='en'?'⚠ Save failed':'⚠ Lưu thất bại'));
+      showToast('⚠ ' + getDictionarySaveErrorMessage(res && res.error));
       return;
     }
     dictData = res.items || dictData;

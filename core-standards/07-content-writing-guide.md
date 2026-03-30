@@ -157,6 +157,7 @@ Bảng 2 cột:
 - Thuật ngữ chỉ được giữ lại khi thật sự cần để hiểu gate, step, hold, release hoặc exception của SOP đó.
 - KHÔNG viết kiểu nửa Anh nửa Việt như `mixed source kiểm soát`, `job close tài chính`, `trace gap`, `first-piece release` nếu SOP đã có bản Việt chuẩn.
 - Chỉ giữ nguyên chữ viết tắt hoặc mã chuẩn khi đây là ngôn ngữ vận hành phổ biến và không làm mờ nghĩa, ví dụ `FAI`, `SPC`, `Cpk`, `NCR`.
+- Nếu tác giả bổ sung glossary term mới, phải điền `meaning` là tên đầy đủ tiếng Anh trước khi viết `vi` và `def`; không được tạo canonical row dạng `Full Term (ABBR)`.
 - Các ngoại lệ đã được chốt cứng cho toàn hệ thống là: toàn bộ viết tắt chuẩn; `Setup`, `Traveler`, `Balloon`; `Kaizen`, `Dreyfus`, `Pareto`, `Kolb`, `Poka-yoke`; và proper noun hệ thống/brand ở `03-language-and-translation.md`.
 - Ngoài các ngoại lệ trên, câu văn hiển thị trong SOP phải dùng tiếng Việt vận hành, không để tiếng Anh tồn dư chỉ vì quen dùng nội bộ.
 - Không thêm note giải thích quy tắc viết thuật ngữ ngay trong thân SOP; quy tắc thuộc `core-standard`, không thuộc tài liệu vận hành.

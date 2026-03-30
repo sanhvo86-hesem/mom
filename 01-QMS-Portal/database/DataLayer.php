@@ -1309,6 +1309,33 @@ class DataLayer
         if ($term === '') {
             return false;
         }
+        $originalTerm = trim((string)($data['originalTerm'] ?? $term));
+
+        if (function_exists('dict_validate_item')) {
+            $validationError = dict_validate_item($data, $originalTerm);
+            if ($validationError !== null) {
+                return false;
+            }
+            $data = dict_prepare_item($data);
+            $term = $data['term'];
+        } else {
+            $meaning = trim((string)($data['meaning'] ?? ''));
+            $def = trim((string)($data['def'] ?? ''));
+            if ($meaning === '' || $def === '') {
+                return false;
+            }
+            $isStatus = in_array(strtoupper($term), ['PASS', 'FAIL', 'REJECT', 'REWORK'], true);
+            $isAbbreviation = !$isStatus
+                && !str_contains($term, ' ')
+                && preg_match('/^[A-Z0-9][A-Z0-9\/&+.\-]{1,}$/', $term) === 1;
+            $isAlias = preg_match('/^(.*?)\s*\(([A-Z0-9][A-Z0-9\/&+.\-]{1,})\)$/', $term) === 1;
+            if ($isAlias && strcasecmp($originalTerm, $term) !== 0) {
+                return false;
+            }
+            if ($isAbbreviation && strcasecmp($meaning, $term) === 0) {
+                return false;
+            }
+        }
 
         return $this->write(
             jsonWriter: function () use ($data, $term): bool {
