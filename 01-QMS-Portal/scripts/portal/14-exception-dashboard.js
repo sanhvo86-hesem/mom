@@ -1,4 +1,4 @@
-/* ===================================================================
+﻿/* ===================================================================
    14-exception-dashboard.js
    HESEM QMS Portal - Exception Dashboard
    Standalone workspace for overdue allocations, upload failures,
@@ -22,6 +22,19 @@ var state = {
   refreshTimer: null,
   loading: false
 };
+
+function repairMojibake(text){
+  if(typeof text !== 'string') return text;
+  if(!/[ÃÄÂÆáºá»]/.test(text)) return text;
+  if(typeof TextDecoder === 'undefined') return text;
+  try {
+    var bytes = new Uint8Array(Array.prototype.map.call(text, function(ch){ return ch.charCodeAt(0) & 255; }));
+    var decoded = new TextDecoder('utf-8').decode(bytes);
+    return decoded.indexOf('\uFFFD') >= 0 ? text : decoded;
+  } catch (_error) {
+    return text;
+  }
+}
 
 var EXCEPTION_TYPES = [
   {
@@ -157,6 +170,54 @@ var EXCEPTION_TYPES = [
     page: 'mes'
   },
   {
+    key: 'adapter_governance_risk',
+    icon: '\ud83d\udd0b',
+    accent: '#2563eb',
+    surface: '#eff6ff',
+    border: '#93c5fd',
+    labelVi: 'Adapter kết nối chưa đạt chuẩn',
+    labelEn: 'Adapter governance risk',
+    descVi: 'Adapter MTConnect / OPC UA / bridge còn lệch cấu hình hoặc chưa đạt chính sách vận hành cần thiết.',
+    descEn: 'MTConnect / OPC UA / bridge adapters still violate governed runtime policy or required configuration.',
+    page: 'mes'
+  },
+  {
+    key: 'alarm_hotspots',
+    icon: '\ud83d\udea8',
+    accent: '#dc2626',
+    surface: '#fef2f2',
+    border: '#fecaca',
+    labelVi: 'Alarm máy đang hoạt động',
+    labelEn: 'Active machine alarms',
+    descVi: 'Máy đang giữ alarm nóng cần xử lý theo playbook trước khi tiếp tục chạy WO.',
+    descEn: 'Machines currently hold active alarms that should be worked through governed playbooks before WO execution continues.',
+    page: 'mes'
+  },
+  {
+    key: 'nc_download_mismatches',
+    icon: '\ud83d\udcbe',
+    accent: '#7c3aed',
+    surface: '#f5f3ff',
+    border: '#c4b5fd',
+    labelVi: 'Biên nhận tải NC không khớp',
+    labelEn: 'NC download mismatches',
+    descVi: 'Biên nhận tải NC từ máy không khớp release package, revision hoặc controller-side verification.',
+    descEn: 'Controller-side NC download receipts do not match the released package, revision, or verification signature.',
+    page: 'mes'
+  },
+  {
+    key: 'tool_offset_risk',
+    icon: '\ud83d\udccf',
+    accent: '#0f766e',
+    surface: '#ecfeff',
+    border: '#99f6e4',
+    labelVi: 'Preset và offset chưa đạt',
+    labelEn: 'Tool offset risk',
+    descVi: 'Preset, offset hoặc lineage của bộ dao chưa đủ điều kiện để mở chạy WO an toàn.',
+    descEn: 'Tool preset, offset, or assembly lineage is not yet ready for safe WO execution.',
+    page: 'mes'
+  },
+  {
     key: 'shadow_sync_failures',
     icon: '\ud83c\udf10',
     accent: '#7c3aed',
@@ -195,15 +256,14 @@ var EXCEPTION_TYPES = [
 ];
 
 function t(vi, en){
-  return (typeof lang !== 'undefined' && lang === 'en') ? en : vi;
+  var value = (typeof lang !== 'undefined' && lang === 'en') ? en : vi;
+  return repairMojibake(value);
 }
-
 function esc(value){
   var div = document.createElement('div');
-  div.textContent = String(value == null ? '' : value);
+  div.textContent = String(repairMojibake(value == null ? '' : value));
   return div.innerHTML;
 }
-
 function cfgFor(type){
   return EXCEPTION_TYPES.find(function(item){ return item.key === type; }) || null;
 }
@@ -367,7 +427,7 @@ function renderSummary(){
     total += count;
     if (count > 0) activeGroups += 1;
   });
-  highPriority = Number(state.summary.overdue_allocations || 0) + Number(state.summary.wo_missing_evidence || 0) + Number(state.summary.program_mismatches || 0) + Number(state.summary.program_release_risk || 0) + Number(state.summary.tool_readiness_risk || 0) + Number(state.summary.operator_qualification_gaps || 0) + Number(state.summary.material_trace_gaps || 0) + Number(state.summary.connector_governance_gaps || 0) + Number(state.summary.shadow_sync_failures || 0) + Number(state.summary.downtime_governance_gaps || 0) + Number(state.summary.overdue_orders || 0);
+  highPriority = Number(state.summary.overdue_allocations || 0) + Number(state.summary.wo_missing_evidence || 0) + Number(state.summary.program_mismatches || 0) + Number(state.summary.program_release_risk || 0) + Number(state.summary.tool_readiness_risk || 0) + Number(state.summary.operator_qualification_gaps || 0) + Number(state.summary.material_trace_gaps || 0) + Number(state.summary.connector_governance_gaps || 0) + Number(state.summary.adapter_governance_risk || 0) + Number(state.summary.alarm_hotspots || 0) + Number(state.summary.nc_download_mismatches || 0) + Number(state.summary.tool_offset_risk || 0) + Number(state.summary.shadow_sync_failures || 0) + Number(state.summary.downtime_governance_gaps || 0) + Number(state.summary.overdue_orders || 0);
   var nextPage = highPriority > 0 ? t('MES / Chứng cứ', 'MES / Evidence') : (activeGroups > 0 ? t('Đơn hàng', 'Orders') : t('Ổn định', 'Stable'));
   var totalEl = state.container.querySelector('#excx-total');
   var groupsEl = state.container.querySelector('#excx-groups');
@@ -626,3 +686,4 @@ window._renderExceptionDashboard = function(container){
 };
 
 })();
+

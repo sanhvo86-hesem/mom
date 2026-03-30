@@ -87,6 +87,38 @@ class DataLayer
     }
 
     /**
+     * Return a runtime summary of the active storage mode and PostgreSQL reachability.
+     *
+     * This is safe to call from JSON_ONLY mode and useful for runtime observability.
+     */
+    public function getModeSummary(): array
+    {
+        $usesPostgres = $this->usesPostgres();
+        $reachable = false;
+        $error = '';
+
+        if ($usesPostgres) {
+            try {
+                $probe = $this->db->queryOne('SELECT 1 AS ok');
+                $reachable = ((int)($probe['ok'] ?? 0) === 1);
+            } catch (\Throwable $e) {
+                $reachable = false;
+                $error = $e->getMessage();
+            }
+        }
+
+        return [
+            'mode' => $this->mode,
+            'use_postgres' => (bool)($this->config['use_postgres'] ?? false),
+            'shadow_write' => (bool)($this->config['shadow_write'] ?? false),
+            'json_fallback' => (bool)($this->config['json_fallback'] ?? false),
+            'postgres_path_active' => $usesPostgres,
+            'postgres_reachable' => $reachable,
+            'postgres_error' => $error,
+        ];
+    }
+
+    /**
      * Mirror governed runtime master data into PostgreSQL without changing the
      * operational JSON-first flow.
      */

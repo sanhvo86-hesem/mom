@@ -17,6 +17,15 @@ declare(strict_types=1);
  * @since   1.0.0
  */
 
+$envBool = static function (string $name, bool $default): bool {
+    $raw = getenv($name);
+    if ($raw === false || $raw === null || $raw === '') {
+        return $default;
+    }
+    $parsed = filter_var($raw, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+    return $parsed ?? $default;
+};
+
 return [
     // ── Connection ──────────────────────────────────────────────────────────
     'driver'   => 'pgsql',
@@ -34,12 +43,12 @@ return [
     'statement_timeout' => (int)(getenv('DB_STATEMENT_TIMEOUT') ?: 30000), // ms
 
     // ── Feature Flags ───────────────────────────────────────────────────────
-    'use_postgres'  => (bool)(getenv('USE_POSTGRES') ?: false),
-    'shadow_write'  => (bool)(getenv('SHADOW_WRITE') ?: true),
-    'json_fallback' => (bool)(getenv('JSON_FALLBACK') ?: true),
+    'use_postgres'  => $envBool('USE_POSTGRES', false),
+    'shadow_write'  => $envBool('SHADOW_WRITE', true),
+    'json_fallback' => $envBool('JSON_FALLBACK', true),
 
     // ── Logging ─────────────────────────────────────────────────────────────
-    'log_queries'  => (bool)(getenv('DB_LOG_QUERIES') ?: false),
+    'log_queries'  => $envBool('DB_LOG_QUERIES', false),
     'log_file'     => getenv('DB_LOG_FILE') ?: __DIR__ . '/../qms-data/db_queries.log',
     'slow_query_ms' => (int)(getenv('DB_SLOW_QUERY_MS') ?: 500),
 ];

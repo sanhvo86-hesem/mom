@@ -2000,6 +2000,22 @@ function runtime_data_layer(): \HESEM\QMS\Database\DataLayer {
   return $layer;
 }
 
+function runtime_data_layer_summary(): array {
+  try {
+    return runtime_data_layer()->getModeSummary();
+  } catch (Throwable $e) {
+    return [
+      'mode' => 'UNKNOWN',
+      'use_postgres' => false,
+      'shadow_write' => false,
+      'json_fallback' => false,
+      'postgres_path_active' => false,
+      'postgres_reachable' => false,
+      'postgres_error' => $e->getMessage(),
+    ];
+  }
+}
+
 function edge_connector_service(): \HESEM\QMS\Services\EdgeConnectorService {
   require_once __DIR__ . '/api/services/EdgeConnectorService.php';
   static $service = null;
@@ -2053,9 +2069,9 @@ function runtime_observability_default(): array {
       'description' => 'Structured observability for runtime shadow sync, connector ingest, and MES governance telemetry.',
     ],
     'shadow_sync' => [
-      'master_data' => ['last_status' => 'never', 'last_success_at' => '', 'last_error_at' => '', 'last_message' => '', 'success_count' => 0, 'failure_count' => 0, 'recent' => []],
-      'orders' => ['last_status' => 'never', 'last_success_at' => '', 'last_error_at' => '', 'last_message' => '', 'success_count' => 0, 'failure_count' => 0, 'recent' => []],
-      'mes' => ['last_status' => 'never', 'last_success_at' => '', 'last_error_at' => '', 'last_message' => '', 'success_count' => 0, 'failure_count' => 0, 'recent' => []],
+      'master_data' => ['last_status' => 'never', 'last_success_at' => '', 'last_error_at' => '', 'last_skipped_at' => '', 'last_message' => '', 'success_count' => 0, 'failure_count' => 0, 'skipped_count' => 0, 'last_duration_ms' => null, 'last_item_count' => 0, 'last_mode' => '', 'last_context' => [], 'recent' => []],
+      'orders' => ['last_status' => 'never', 'last_success_at' => '', 'last_error_at' => '', 'last_skipped_at' => '', 'last_message' => '', 'success_count' => 0, 'failure_count' => 0, 'skipped_count' => 0, 'last_duration_ms' => null, 'last_item_count' => 0, 'last_mode' => '', 'last_context' => [], 'recent' => []],
+      'mes' => ['last_status' => 'never', 'last_success_at' => '', 'last_error_at' => '', 'last_skipped_at' => '', 'last_message' => '', 'success_count' => 0, 'failure_count' => 0, 'skipped_count' => 0, 'last_duration_ms' => null, 'last_item_count' => 0, 'last_mode' => '', 'last_context' => [], 'recent' => []],
     ],
     'connector_ingest' => [
       'totals' => ['success' => 0, 'failure' => 0],
@@ -2122,11 +2138,13 @@ function runtime_data_log_event(string $eventType, string $aggregateType, string
   }
 }
 
-function observe_shadow_sync(string $storeKey, bool $ok, string $message, array $context = []): void {
+function observe_shadow_sync(string $storeKey, $ok, string $message, array $context = []): void {
   $store = load_runtime_observability_store();
+  $status = is_bool($ok) ? ($ok ? 'success' : 'failure') : strtolower(trim((string)$ok));
+  if (!in_array($status, ['success', 'failure', 'skipped'], true)) $status = 'failure';
   $entry = [
     'store_key' => $storeKey,
-    'status' => $ok ? 'success' : 'failure',
+    'status' => $status,
     'message' => $message,
     'timestamp' => now_iso(),
     'context' => $context,
@@ -2135,16 +2153,29 @@ function observe_shadow_sync(string $storeKey, bool $ok, string $message, array 
     'last_status' => 'never',
     'last_success_at' => '',
     'last_error_at' => '',
+    'last_skipped_at' => '',
     'last_message' => '',
     'success_count' => 0,
     'failure_count' => 0,
+    'skipped_count' => 0,
+    'last_duration_ms' => null,
+    'last_item_count' => 0,
+    'last_mode' => '',
+    'last_context' => [],
     'recent' => [],
   ], is_array($store['shadow_sync'][$storeKey] ?? null) ? $store['shadow_sync'][$storeKey] : []);
   $bucket['last_status'] = $entry['status'];
   $bucket['last_message'] = $message;
-  if ($ok) {
+  $bucket['last_duration_ms'] = isset($context['duration_ms']) ? (float)$context['duration_ms'] : ($bucket['last_duration_ms'] ?? null);
+  $bucket['last_item_count'] = isset($context['item_count']) ? (int)$context['item_count'] : (int)($bucket['last_item_count'] ?? 0);
+  $bucket['last_mode'] = (string)($context['runtime_mode'] ?? $bucket['last_mode'] ?? '');
+  $bucket['last_context'] = $context;
+  if ($status === 'success') {
     $bucket['last_success_at'] = $entry['timestamp'];
     $bucket['success_count'] = (int)($bucket['success_count'] ?? 0) + 1;
+  } elseif ($status === 'skipped') {
+    $bucket['last_skipped_at'] = $entry['timestamp'];
+    $bucket['skipped_count'] = (int)($bucket['skipped_count'] ?? 0) + 1;
   } else {
     $bucket['last_error_at'] = $entry['timestamp'];
     $bucket['failure_count'] = (int)($bucket['failure_count'] ?? 0) + 1;
@@ -2203,26 +2234,66 @@ function observe_connector_ingest(string $machineId, bool $ok, string $message, 
 }
 
 function shadow_sync_master_data_store(array $data): void {
+  $started = microtime(true);
+  $itemCount = count((array)($data['customers'] ?? []))
+    + count((array)($data['suppliers'] ?? []))
+    + count((array)($data['parts'] ?? []))
+    + count((array)($data['revisions'] ?? []))
+    + count((array)($data['machines'] ?? []))
+    + count((array)($data['work_centers'] ?? []));
   try {
-    runtime_data_layer()->syncMasterDataStore($data);
+    $layer = runtime_data_layer();
+    $mode = $layer->getMode();
+    if ($mode === \HESEM\QMS\Database\DataLayer::MODE_JSON_ONLY) {
+      observe_shadow_sync('master_data', 'skipped', 'Shadow sync skipped because runtime is in JSON_ONLY mode.', [
+        'runtime_mode' => $mode,
+        'duration_ms' => round((microtime(true) - $started) * 1000, 2),
+        'item_count' => $itemCount,
+      ]);
+      return;
+    }
+    $layer->syncMasterDataStore($data);
     observe_shadow_sync('master_data', true, 'Shadow sync completed.', [
+      'runtime_mode' => $mode,
+      'duration_ms' => round((microtime(true) - $started) * 1000, 2),
+      'item_count' => $itemCount,
       'customers' => count((array)($data['customers'] ?? [])),
       'parts' => count((array)($data['parts'] ?? [])),
       'machines' => count((array)($data['machines'] ?? [])),
     ]);
   } catch (Throwable $e) {
     @error_log('[runtime-shadow] master_data sync failed: ' . $e->getMessage());
-    observe_shadow_sync('master_data', false, $e->getMessage());
+    observe_shadow_sync('master_data', false, $e->getMessage(), [
+      'duration_ms' => round((microtime(true) - $started) * 1000, 2),
+      'item_count' => $itemCount,
+    ]);
   }
 }
 
 function shadow_sync_orders_store(array $data): void {
+  $started = microtime(true);
+  $itemCount = count((array)($data['sales_orders'] ?? []))
+    + count((array)($data['job_orders'] ?? []))
+    + count((array)($data['work_orders'] ?? []))
+    + count((array)($data['form_links'] ?? []));
   try {
     $master = load_master_data_store();
     $layer = runtime_data_layer();
+    $mode = $layer->getMode();
+    if ($mode === \HESEM\QMS\Database\DataLayer::MODE_JSON_ONLY) {
+      observe_shadow_sync('orders', 'skipped', 'Shadow sync skipped because runtime is in JSON_ONLY mode.', [
+        'runtime_mode' => $mode,
+        'duration_ms' => round((microtime(true) - $started) * 1000, 2),
+        'item_count' => $itemCount,
+      ]);
+      return;
+    }
     $layer->syncMasterDataStore($master);
     $layer->syncOrdersStore($data);
     observe_shadow_sync('orders', true, 'Shadow sync completed.', [
+      'runtime_mode' => $mode,
+      'duration_ms' => round((microtime(true) - $started) * 1000, 2),
+      'item_count' => $itemCount,
       'sales_orders' => count((array)($data['sales_orders'] ?? [])),
       'job_orders' => count((array)($data['job_orders'] ?? [])),
       'work_orders' => count((array)($data['work_orders'] ?? [])),
@@ -2230,19 +2301,45 @@ function shadow_sync_orders_store(array $data): void {
     ]);
   } catch (Throwable $e) {
     @error_log('[runtime-shadow] orders sync failed: ' . $e->getMessage());
-    observe_shadow_sync('orders', false, $e->getMessage());
+    observe_shadow_sync('orders', false, $e->getMessage(), [
+      'duration_ms' => round((microtime(true) - $started) * 1000, 2),
+      'item_count' => $itemCount,
+    ]);
   }
 }
 
 function shadow_sync_mes_runtime_store(array $data, ?array $orders = null, ?array $master = null): void {
+  $started = microtime(true);
+  $itemCount = count((array)($data['downtime_events'] ?? []))
+    + count((array)($data['maintenance_requests'] ?? []))
+    + count((array)($data['progress_reports'] ?? []))
+    + count((array)($data['tooling_status'] ?? []))
+    + count((array)($data['connector_feeds'] ?? []))
+    + count((array)($data['machine_signals'] ?? []))
+    + count((array)($data['mes_connectivity_events'] ?? []))
+    + count((array)($data['machine_alarm_events'] ?? []))
+    + count((array)($data['nc_download_receipts'] ?? []))
+    + count((array)($data['mes_tool_preset_offsets'] ?? []));
   try {
     $orders = is_array($orders) ? $orders : load_orders_store();
     $master = is_array($master) ? $master : load_master_data_store();
     $layer = runtime_data_layer();
+    $mode = $layer->getMode();
+    if ($mode === \HESEM\QMS\Database\DataLayer::MODE_JSON_ONLY) {
+      observe_shadow_sync('mes', 'skipped', 'Shadow sync skipped because runtime is in JSON_ONLY mode.', [
+        'runtime_mode' => $mode,
+        'duration_ms' => round((microtime(true) - $started) * 1000, 2),
+        'item_count' => $itemCount,
+      ]);
+      return;
+    }
     $layer->syncMasterDataStore($master);
     $layer->syncOrdersStore($orders);
     $layer->syncMesRuntimeStore($data, $orders, $master);
     observe_shadow_sync('mes', true, 'Shadow sync completed.', [
+      'runtime_mode' => $mode,
+      'duration_ms' => round((microtime(true) - $started) * 1000, 2),
+      'item_count' => $itemCount,
       'downtime_events' => count((array)($data['downtime_events'] ?? [])),
       'maintenance_requests' => count((array)($data['maintenance_requests'] ?? [])),
       'progress_reports' => count((array)($data['progress_reports'] ?? [])),
@@ -2252,7 +2349,10 @@ function shadow_sync_mes_runtime_store(array $data, ?array $orders = null, ?arra
     ]);
   } catch (Throwable $e) {
     @error_log('[runtime-shadow] mes sync failed: ' . $e->getMessage());
-    observe_shadow_sync('mes', false, $e->getMessage());
+    observe_shadow_sync('mes', false, $e->getMessage(), [
+      'duration_ms' => round((microtime(true) - $started) * 1000, 2),
+      'item_count' => $itemCount,
+    ]);
   }
 }
 
@@ -3732,6 +3832,50 @@ function mes_governance_blockers_for_dispatch(array $dispatchRow): array {
     ];
   }
 
+  $adapter = (array)($dispatchRow['adapter_governance'] ?? []);
+  if (!empty($adapter['blocker'])) {
+    $blockers[] = [
+      'code' => 'adapter_governance_failed',
+      'severity' => (string)($adapter['band'] ?? 'critical'),
+      'message_vi' => (string)($adapter['message_vi'] ?? 'Adapter hoặc chính sách kết nối chưa đạt điều kiện MES.'),
+      'message_en' => (string)($adapter['message_en'] ?? 'The adapter or its governance policy does not satisfy MES conditions.'),
+      'detail' => $adapter,
+    ];
+  }
+
+  $alarm = (array)($dispatchRow['alarm_runtime'] ?? []);
+  if (!empty($alarm['blocker'])) {
+    $blockers[] = [
+      'code' => 'machine_alarm_active',
+      'severity' => (string)($alarm['band'] ?? 'critical'),
+      'message_vi' => (string)($alarm['message_vi'] ?? 'Có alarm nóng trên máy và phải khóa chạy.'),
+      'message_en' => (string)($alarm['message_en'] ?? 'There is an active machine alarm and execution must be locked.'),
+      'detail' => $alarm,
+    ];
+  }
+
+  $download = (array)($dispatchRow['nc_download'] ?? []);
+  if (!empty($download['blocker'])) {
+    $blockers[] = [
+      'code' => 'nc_download_not_ready',
+      'severity' => (string)($download['band'] ?? 'critical'),
+      'message_vi' => (string)($download['message_vi'] ?? 'Download NC hoặc xác minh trên máy chưa đạt điều kiện mở chạy.'),
+      'message_en' => (string)($download['message_en'] ?? 'NC download or machine-side verification does not satisfy launch conditions.'),
+      'detail' => $download,
+    ];
+  }
+
+  $offset = (array)($dispatchRow['tool_offset'] ?? []);
+  if (!empty($offset['blocker'])) {
+    $blockers[] = [
+      'code' => 'tool_offset_not_ready',
+      'severity' => (string)($offset['band'] ?? 'critical'),
+      'message_vi' => (string)($offset['message_vi'] ?? 'Preset/offset của tool chưa đạt điều kiện mở chạy.'),
+      'message_en' => (string)($offset['message_en'] ?? 'Tool preset/offset does not satisfy the launch conditions.'),
+      'detail' => $offset,
+    ];
+  }
+
   return $blockers;
 }
 
@@ -3762,6 +3906,10 @@ function mes_wo_transition_guard(array $orders, array $master, array $mes, strin
       'operator_governance' => (array)($dispatchRow['operator_governance'] ?? []),
       'material_trace' => (array)($dispatchRow['material_trace'] ?? []),
       'connector_guard' => (array)($dispatchRow['connector_guard'] ?? []),
+      'adapter_governance' => (array)($dispatchRow['adapter_governance'] ?? []),
+      'alarm_runtime' => (array)($dispatchRow['alarm_runtime'] ?? []),
+      'nc_download' => (array)($dispatchRow['nc_download'] ?? []),
+      'tool_offset' => (array)($dispatchRow['tool_offset'] ?? []),
     ],
   ];
 }
@@ -4571,6 +4719,22 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     );
     $dispatchRow['material_trace'] = mes_material_trace_summary($dispatchRow, $partMeta);
     $dispatchRow['connector_guard'] = mes_connector_guard_summary($dispatchRow, $machineMeta);
+    $dispatchRow['adapter_governance'] = mes_adapter_governance_summary(
+      $machineMeta,
+      is_array($connectivityAdaptersByMachine[$machineId] ?? null) ? $connectivityAdaptersByMachine[$machineId] : null,
+      [
+        'connector_type' => $connectorType,
+        'connector_health' => $connectorHealth,
+      ],
+      (array)($connectivityEventsByMachine[$machineId] ?? []),
+      $now
+    );
+    $dispatchRow['alarm_runtime'] = mes_alarm_runtime_summary(
+      $machineMeta,
+      (array)($machineAlarmEventsByMachine[$machineId] ?? []),
+      $alarmCatalog,
+      $alarmPlaybooks
+    );
     $dispatchRow['nc_download'] = mes_nc_download_summary($dispatchRow, $programReleases, $ncDownloadReceipts);
     $dispatchRow['tool_offset'] = mes_tool_offset_summary($dispatchRow, $toolPresetOffsets, $toolRows, $toolAssembliesByParent, $now);
     $dispatch[] = $dispatchRow;
@@ -4860,6 +5024,7 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $adapterGovernanceQueue = mes_build_adapter_governance_queue($machineWall);
   $alarmHotspotQueue = mes_build_alarm_hotspot_queue($machineWall);
   $observability = load_runtime_observability_store();
+  $runtimeMode = runtime_data_layer_summary();
   $shadowSyncFailures = mes_shadow_failure_rows($observability);
 
   $kpis['program_mismatches'] = count($programHandshakeQueue);
@@ -4895,6 +5060,7 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     'shadow_sync_failures' => array_slice($shadowSyncFailures, 0, 20),
     'shadow_status' => $observability['shadow_sync'] ?? [],
     'connector_ingest_status' => $observability['connector_ingest'] ?? [],
+    'runtime_mode' => $runtimeMode,
     'tooling_alerts' => array_slice($toolingAlerts, 0, 20),
     'evidence_gate_queue' => array_slice($evidenceGateQueue, 0, 20),
   ];
@@ -11584,6 +11750,7 @@ if ($username === '') {
       'connector_ingest' => (array)($observability['connector_ingest'] ?? []),
       'shadow_sync_failures' => mes_shadow_failure_rows($observability),
       'recent_connector_failures' => mes_recent_connector_ingest_failures($observability),
+      'runtime_mode' => runtime_data_layer_summary(),
       'updated' => (string)($observability['_meta']['updated'] ?? ''),
     ]);
   }

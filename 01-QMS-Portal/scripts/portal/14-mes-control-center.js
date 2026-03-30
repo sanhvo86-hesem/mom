@@ -1,4 +1,4 @@
-/* ===================================================================
+﻿/* ===================================================================
    14-mes-control-center.js
    HESEM QMS Portal -- MES Control Center
    Production control room for CNC dispatch, evidence gates, downtime,
@@ -20,6 +20,19 @@ var state = {
   modal: null,
   refreshTimer: null
 };
+
+function repairMojibake(text){
+  if(typeof text !== 'string') return text;
+  if(!/[ÃÄÂÆáºá»]/.test(text)) return text;
+  if(typeof TextDecoder === 'undefined') return text;
+  try {
+    var bytes = new Uint8Array(Array.prototype.map.call(text, function(ch){ return ch.charCodeAt(0) & 255; }));
+    var decoded = new TextDecoder('utf-8').decode(bytes);
+    return decoded.indexOf('\uFFFD') >= 0 ? text : decoded;
+  } catch (_error) {
+    return text;
+  }
+}
 
 var STATUS_META = {
   scheduled:   { vi:'Đã lên lịch', en:'Scheduled', color:'#64748b' },
@@ -100,10 +113,13 @@ var DOWNTIME_CATEGORY_META = {
   other: { vi:'Khác', en:'Other' }
 };
 
-function t(vi, en){ return (typeof lang !== 'undefined' && lang === 'en') ? en : vi; }
+function t(vi, en){
+  var value = (typeof lang !== 'undefined' && lang === 'en') ? en : vi;
+  return repairMojibake(value);
+}
 function esc(value){
   var div = document.createElement('div');
-  div.appendChild(document.createTextNode(String(value == null ? '' : value)));
+  div.appendChild(document.createTextNode(String(repairMojibake(value == null ? '' : value))));
   return div.innerHTML;
 }
 function jsonAttr(value){ return encodeURIComponent(JSON.stringify(value || {})); }
@@ -252,7 +268,8 @@ function defaultSnapshot(){
     evidence_gate_queue: [],
     shadow_sync_failures: [],
     shadow_status: {},
-    connector_ingest_status: {}
+    connector_ingest_status: {},
+    runtime_mode: {}
   };
 }
 
@@ -916,7 +933,29 @@ function renderGovernanceQueue(rows, options){
 }
 
 function renderShadowSyncQueue(rows){
-  return renderGovernanceQueue(rows, {
+  var snapshot = state.snapshot || defaultSnapshot();
+  var shadowStatus = snapshot.shadow_status || {};
+  var connectorIngestStatus = snapshot.connector_ingest_status || {};
+  var runtimeMode = snapshot.runtime_mode || {};
+  var buckets = ['master_data', 'orders', 'mes'];
+  var overview = '<div class="mesx-mini" style="margin-bottom:10px"><small>' + esc(t('Shadow sync health', 'Shadow sync health')) + '</small><strong>' + esc([
+    String(runtimeMode.mode || 'JSON_ONLY'),
+    runtimeMode.postgres_path_active ? (runtimeMode.postgres_reachable ? t('PostgreSQL sẵn sàng', 'PostgreSQL reachable') : t('PostgreSQL chưa tới được', 'PostgreSQL unreachable')) : t('Đang chạy thuần JSON', 'Running JSON only'),
+    runtimeMode.json_fallback ? t('Có JSON fallback', 'JSON fallback enabled') : t('Không có JSON fallback', 'JSON fallback disabled')
+  ].join(' · ')) + '</strong><span class="mesx-sub">' + esc([
+    (((connectorIngestStatus.totals || {}).success || 0) + ' ok'),
+    (((connectorIngestStatus.totals || {}).failure || 0) + ' fail')
+  ].join(' · ')) + '</span></div>' +
+  buckets.map(function(key){
+    var bucket = shadowStatus[key] || {};
+    return '<div class="mesx-mini" style="margin-bottom:10px"><small>' + esc(key) + '</small><strong>' + esc(String(bucket.last_status || 'never')) + '</strong><span class="mesx-sub">' + esc([
+      bucket.success_count != null ? ('OK ' + bucket.success_count) : '',
+      bucket.failure_count != null ? ('Fail ' + bucket.failure_count) : '',
+      bucket.skipped_count != null ? ('Skip ' + bucket.skipped_count) : '',
+      bucket.last_mode || ''
+    ].filter(Boolean).join(' · ')) + '</span></div>';
+  }).join('');
+  return overview + renderGovernanceQueue(rows, {
     emptyTitle: t('Shadow sync đang ổn định', 'Shadow sync is healthy'),
     emptyText: t('Chưa có lỗi mirror JSON -> PostgreSQL nào đang mở.', 'There is no active JSON -> PostgreSQL mirror failure.'),
     detail: function(row){
@@ -1586,3 +1625,4 @@ window._renderMesControlCenter = function(container){
 };
 
 })();
+
