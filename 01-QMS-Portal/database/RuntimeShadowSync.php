@@ -65,6 +65,9 @@ final class RuntimeShadowSync
             $this->syncMachineAlarmRuntime((array)($store['machine_alarm_events'] ?? []));
             $this->syncNcDownloadReceipts((array)($store['nc_download_receipts'] ?? []));
             $this->syncToolPresetOffsets((array)($store['mes_tool_preset_offsets'] ?? []));
+            $this->syncMaterialConsumption((array)($store['material_consumption'] ?? []));
+            $this->syncPartGenealogy((array)($store['part_genealogy'] ?? []));
+            $this->syncShiftHandover((array)($store['shift_handover'] ?? []));
             $this->syncProgressReports((array)($store['progress_reports'] ?? []), (array)($orders['work_orders'] ?? []));
             $this->syncDowntimeEvents((array)($store['downtime_events'] ?? []));
             $this->syncMaintenanceRequests((array)($store['maintenance_requests'] ?? []));
@@ -906,6 +909,11 @@ final class RuntimeShadowSync
                 'is_acknowledged' => trim((string)($row['acknowledged_by'] ?? '')) !== '',
                 'acknowledged_by' => trim((string)($row['acknowledged_by'] ?? '')) ?: null,
                 'acknowledged_at' => $this->parseTimestamp((string)($row['acknowledged_at'] ?? '')),
+                'escalation_status' => trim((string)($row['escalation_status'] ?? '')) ?: null,
+                'escalated_by' => trim((string)($row['escalated_by'] ?? '')) ?: null,
+                'escalated_at' => $this->parseTimestamp((string)($row['escalated_at'] ?? '')),
+                'cleared_at' => $this->parseTimestamp((string)($row['cleared_at'] ?? '')),
+                'cleared_by' => trim((string)($row['cleared_by'] ?? '')) ?: null,
                 'related_job_number' => trim((string)($row['wo_number'] ?? '')) ?: null,
                 'metadata' => $row,
             ], ['alarm_time', 'equipment_id', 'alarm_code'], ['metadata']);
@@ -968,6 +976,103 @@ final class RuntimeShadowSync
                 'metadata' => $row,
                 'updated_at' => $this->parseTimestamp((string)($row['updated_at'] ?? '')) ?? date(DATE_ATOM),
             ], ['preset_id'], ['metadata']);
+        }
+    }
+
+    private function syncMaterialConsumption(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $consumptionId = trim((string)($row['consumption_id'] ?? ''));
+            $jobNumber = trim((string)($row['wo_number'] ?? '')) ?: trim((string)($row['job_number'] ?? ''));
+            $itemId = trim((string)($row['part_number'] ?? $row['item_id'] ?? ''));
+            if ($consumptionId === '' || $jobNumber === '' || $itemId === '') {
+                continue;
+            }
+            $this->upsert('mes_material_consumption', [
+                'consumption_id' => $consumptionId,
+                'consumed_at' => $this->parseTimestamp((string)($row['consumed_at'] ?? '')) ?? date(DATE_ATOM),
+                'job_number' => $jobNumber,
+                'operation_seq' => (int)($row['operation_number'] ?? $row['operation_seq'] ?? 0),
+                'equipment_id' => trim((string)($row['machine_id'] ?? '')) ?: null,
+                'item_id' => $itemId,
+                'lot_number' => trim((string)($row['lot_number'] ?? '')) ?: null,
+                'heat_number' => trim((string)($row['heat_number'] ?? '')) ?: null,
+                'material_cert_number' => trim((string)($row['material_cert_number'] ?? '')) ?: null,
+                'consumption_type' => strtoupper(trim((string)($row['consumption_type'] ?? 'CONSUMED'))),
+                'qty_consumed' => isset($row['qty_consumed']) ? (float)$row['qty_consumed'] : 0,
+                'qty_uom' => trim((string)($row['qty_uom'] ?? 'EA')) ?: 'EA',
+                'operator_id' => trim((string)($row['verified_by'] ?? $row['issued_by'] ?? '')) ?: null,
+                'metadata' => $row,
+                'created_at' => $this->parseTimestamp((string)($row['updated_at'] ?? $row['consumed_at'] ?? '')) ?? date(DATE_ATOM),
+            ], ['consumption_id'], ['metadata']);
+        }
+    }
+
+    private function syncPartGenealogy(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $genealogyId = trim((string)($row['genealogy_id'] ?? ''));
+            $jobNumber = trim((string)($row['wo_number'] ?? ''));
+            $itemId = trim((string)($row['part_number'] ?? ''));
+            if ($genealogyId === '' || $jobNumber === '' || $itemId === '') {
+                continue;
+            }
+            $this->upsert('mes_part_genealogy', [
+                'genealogy_id' => $genealogyId,
+                'job_number' => $jobNumber,
+                'item_id' => $itemId,
+                'part_rev' => trim((string)($row['part_revision'] ?? '')) ?: null,
+                'serial_number' => trim((string)($row['serial_number'] ?? '')) ?: null,
+                'lot_number' => trim((string)($row['lot_number'] ?? '')) ?: null,
+                'raw_material_lot' => trim((string)($row['material_lot_number'] ?? '')) ?: null,
+                'raw_material_heat' => trim((string)($row['raw_material_heat'] ?? '')) ?: null,
+                'operations_completed' => isset($row['completed_qty']) ? (int)$row['completed_qty'] : null,
+                'metadata' => $row,
+                'updated_at' => $this->parseTimestamp((string)($row['recorded_at'] ?? $row['updated_at'] ?? '')) ?? date(DATE_ATOM),
+            ], ['genealogy_id'], ['metadata']);
+        }
+    }
+
+    private function syncShiftHandover(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $handoverId = trim((string)($row['handover_id'] ?? ''));
+            $equipmentId = trim((string)($row['machine_id'] ?? ''));
+            $shiftFrom = trim((string)($row['shift_from'] ?? ''));
+            $shiftTo = trim((string)($row['shift_to'] ?? ''));
+            $operatorFrom = trim((string)($row['operator_from'] ?? ''));
+            if ($handoverId === '' || $equipmentId === '' || $shiftFrom === '' || $shiftTo === '' || $operatorFrom === '') {
+                continue;
+            }
+            $this->upsert('mes_shift_handover', [
+                'handover_id' => $handoverId,
+                'equipment_id' => $equipmentId,
+                'handover_date' => $this->parseDate((string)($row['handover_date'] ?? '')),
+                'shift_from' => $shiftFrom,
+                'shift_to' => $shiftTo,
+                'operator_from' => $operatorFrom,
+                'operator_to' => trim((string)($row['operator_to'] ?? '')) ?: null,
+                'job_in_progress' => trim((string)($row['wo_number'] ?? '')) ?: null,
+                'operation_in_progress' => isset($row['operation_number']) ? (int)$row['operation_number'] : null,
+                'parts_completed' => isset($row['parts_completed']) ? (float)$row['parts_completed'] : null,
+                'machine_state' => trim((string)($row['machine_state'] ?? '')) ?: null,
+                'issues_noted' => trim((string)($row['issues_noted'] ?? '')) ?: null,
+                'pending_actions' => trim((string)($row['pending_actions'] ?? '')) ?: null,
+                'quality_alerts' => trim((string)($row['quality_alerts'] ?? '')) ?: null,
+                'tooling_status' => trim((string)($row['tooling_status'] ?? '')) ?: null,
+                'acknowledged_at' => $this->parseTimestamp((string)($row['acknowledged_at'] ?? '')),
+                'metadata' => $row,
+                'created_at' => $this->parseTimestamp((string)($row['created_at'] ?? '')) ?? date(DATE_ATOM),
+            ], ['handover_id'], ['metadata']);
         }
     }
 

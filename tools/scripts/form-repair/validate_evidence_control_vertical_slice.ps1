@@ -169,6 +169,12 @@ Invoke-Step "Governance services wired into api.php" {
     'runtime_data_layer()',
     'runtime_read_model_bundle(',
     'observe_primary_read(',
+    'load_mes_shift_patterns(',
+    'mes_build_alarm_ack_queue(',
+    'mes_material_genealogy_overlay(',
+    'mes_merge_material_trace_with_genealogy(',
+    'mes_build_material_genealogy_queue(',
+    'mes_build_shift_handover_queue(',
     'shadow_sync_master_data_store(',
     'shadow_sync_orders_store(',
     'shadow_sync_mes_runtime_store('

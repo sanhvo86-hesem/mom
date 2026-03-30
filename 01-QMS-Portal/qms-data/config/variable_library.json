@@ -17129,6 +17129,128 @@
           "description": "Measured drift between expected and actual preset or offset."
         }
       }
+    },
+    "mes_material_genealogy_governance": {
+      "label": "MES Material Genealogy Governance Variables",
+      "label_vi": "Biến quản trị genealogy vật liệu MES",
+      "description": "Material issue, lot, heat, and finished-part genealogy variables for CNC traceability closure.",
+      "variables": {
+        "material_issue_id_mes": {
+          "label": "MES Material Issue ID",
+          "label_vi": "Mã issue vật liệu MES",
+          "type": "string",
+          "required": true,
+          "source": "generated",
+          "used_in": ["mes_material_genealogy_governance"],
+          "description": "Unique identifier for governed material issue runtime records."
+        },
+        "material_lot_number_mes": {
+          "label": "Material Lot Number",
+          "label_vi": "Số lot vật liệu",
+          "type": "string",
+          "required": false,
+          "source": "machine-or-user-input",
+          "used_in": ["mes_material_genealogy_governance"],
+          "description": "Lot number consumed against the WO or operation."
+        },
+        "material_heat_number_mes": {
+          "label": "Material Heat Number",
+          "label_vi": "Số heat vật liệu",
+          "type": "string",
+          "required": false,
+          "source": "machine-or-user-input",
+          "used_in": ["mes_material_genealogy_governance"],
+          "description": "Heat or melt number tied to the consumed material."
+        },
+        "traveler_number_mes": {
+          "label": "Traveler Number",
+          "label_vi": "Số traveler",
+          "type": "string",
+          "required": false,
+          "source": "user-input",
+          "used_in": ["mes_material_genealogy_governance"],
+          "description": "Traveler or routing number associated with the issued material."
+        },
+        "genealogy_snapshot_id_mes": {
+          "label": "MES Genealogy Snapshot ID",
+          "label_vi": "Mã snapshot genealogy MES",
+          "type": "string",
+          "required": true,
+          "source": "generated",
+          "used_in": ["mes_material_genealogy_governance"],
+          "description": "Unique ID for the finished-part genealogy runtime snapshot."
+        },
+        "serial_number_mes": {
+          "label": "Serial Number",
+          "label_vi": "Số serial",
+          "type": "string",
+          "required": false,
+          "source": "user-input",
+          "used_in": ["mes_material_genealogy_governance"],
+          "description": "Finished part or subassembly serial captured in genealogy."
+        }
+      }
+    },
+    "mes_shift_handover_governance": {
+      "label": "MES Shift Handover Governance Variables",
+      "label_vi": "Biến quản trị bàn giao ca MES",
+      "description": "Shift, operator, and carry-over variables used to govern shop-floor handover between crews.",
+      "variables": {
+        "shift_handover_id_mes": {
+          "label": "MES Shift Handover ID",
+          "label_vi": "Mã bàn giao ca MES",
+          "type": "string",
+          "required": true,
+          "source": "generated",
+          "used_in": ["mes_shift_handover_governance"],
+          "description": "Unique identifier for the governed shift handover record."
+        },
+        "shift_from_mes": {
+          "label": "Shift From",
+          "label_vi": "Ca giao",
+          "type": "string",
+          "required": false,
+          "source": "user-input",
+          "used_in": ["mes_shift_handover_governance"],
+          "description": "The outgoing shift code."
+        },
+        "shift_to_mes": {
+          "label": "Shift To",
+          "label_vi": "Ca nhận",
+          "type": "string",
+          "required": false,
+          "source": "calculated",
+          "used_in": ["mes_shift_handover_governance"],
+          "description": "The incoming or current governed shift code."
+        },
+        "handover_issue_note_mes": {
+          "label": "Shift Handover Issues",
+          "label_vi": "Vấn đề tồn ca",
+          "type": "string",
+          "required": false,
+          "source": "user-input",
+          "used_in": ["mes_shift_handover_governance"],
+          "description": "Carry-over machine or WO issues noted during handover."
+        },
+        "handover_pending_action_mes": {
+          "label": "Shift Pending Action",
+          "label_vi": "Hành động cần tiếp tục",
+          "type": "string",
+          "required": false,
+          "source": "user-input",
+          "used_in": ["mes_shift_handover_governance"],
+          "description": "Actions the next shift must continue or close."
+        },
+        "handover_acknowledged_at_mes": {
+          "label": "Shift Handover Acknowledged At",
+          "label_vi": "Thời điểm xác nhận bàn giao ca",
+          "type": "timestamp",
+          "required": false,
+          "source": "generated",
+          "used_in": ["mes_shift_handover_governance"],
+          "description": "Timestamp when the incoming shift formally acknowledged the handover."
+        }
+      }
     }
   }
 }

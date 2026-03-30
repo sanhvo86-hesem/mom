@@ -598,42 +598,51 @@
       "controller_family": "makino-pro",
       "alarm_group": "spindle",
       "title": "Spindle overload",
-      "title_vi": "Quá tải trục chính",
+      "title_vi": "Qu? t?i tr?c ch?nh",
       "severity_default": "CRITICAL",
       "downtime_category_default": "breakdown",
       "response_owner_role": "maintenance_manager",
       "response_target_minutes": 10,
       "requires_lockout": true,
       "requires_maintenance": true,
-      "status": "active"
+      "status": "active",
+      "ack_required": true,
+      "ack_sla_minutes": 5,
+      "escalation_sla_minutes": 10
     },
     {
       "alarm_code": "AXIS_SERVO_FAULT",
       "controller_family": "brother-cnc-c00",
       "alarm_group": "axis",
       "title": "Axis servo fault",
-      "title_vi": "Lỗi servo trục",
+      "title_vi": "L?i servo tr?c",
       "severity_default": "ALARM",
       "downtime_category_default": "breakdown",
       "response_owner_role": "maintenance_technician",
       "response_target_minutes": 15,
       "requires_lockout": false,
       "requires_maintenance": true,
-      "status": "active"
+      "status": "active",
+      "ack_required": true,
+      "ack_sla_minutes": 7,
+      "escalation_sla_minutes": 15
     },
     {
       "alarm_code": "PROBE_CAL_WARN",
       "controller_family": "mitutoyo-cmm",
       "alarm_group": "metrology",
       "title": "Probe calibration warning",
-      "title_vi": "Cảnh báo hiệu chuẩn đầu dò",
+      "title_vi": "C?nh b?o hi?u chu?n ??u d?",
       "severity_default": "WARNING",
       "downtime_category_default": "quality_hold",
       "response_owner_role": "qa_manager",
       "response_target_minutes": 20,
       "requires_lockout": false,
       "requires_maintenance": false,
-      "status": "active"
+      "status": "active",
+      "ack_required": true,
+      "ack_sla_minutes": 10,
+      "escalation_sla_minutes": 20
     }
   ],
   "mes_alarm_playbooks": [
@@ -641,7 +650,7 @@
       "playbook_id": "PB-SPINDLE-001",
       "alarm_code": "SPINDLE_OVERLOAD",
       "title": "Spindle overload response",
-      "title_vi": "Ứng phó quá tải trục chính",
+      "title_vi": "?ng ph? qu? t?i tr?c ch?nh",
       "response_steps": [
         "Pause work order immediately.",
         "Apply LOTO if spindle cannot be reset safely.",
@@ -650,13 +659,15 @@
       ],
       "escalation_role": "maintenance_manager",
       "response_target_minutes": 10,
-      "status": "active"
+      "status": "active",
+      "acknowledge_within_minutes": 5,
+      "lockout_release_required": true
     },
     {
       "playbook_id": "PB-AXIS-001",
       "alarm_code": "AXIS_SERVO_FAULT",
       "title": "Axis servo fault response",
-      "title_vi": "Ứng phó lỗi servo trục",
+      "title_vi": "?ng ph? l?i servo tr?c",
       "response_steps": [
         "Hold the machine and secure the part.",
         "Capture axis alarm code and active program state.",
@@ -665,13 +676,15 @@
       ],
       "escalation_role": "maintenance_technician",
       "response_target_minutes": 15,
-      "status": "active"
+      "status": "active",
+      "acknowledge_within_minutes": 7,
+      "lockout_release_required": false
     },
     {
       "playbook_id": "PB-PROBE-001",
       "alarm_code": "PROBE_CAL_WARN",
       "title": "Probe warning response",
-      "title_vi": "Ứng phó cảnh báo đầu dò",
+      "title_vi": "?ng ph? c?nh b?o ??u d?",
       "response_steps": [
         "Stop measurement release for the affected WO.",
         "Run probe health verification and check calibration due date.",
@@ -679,7 +692,9 @@
       ],
       "escalation_role": "qa_manager",
       "response_target_minutes": 20,
-      "status": "active"
+      "status": "active",
+      "acknowledge_within_minutes": 10,
+      "lockout_release_required": false
     }
   ],
   "tool_assemblies": [

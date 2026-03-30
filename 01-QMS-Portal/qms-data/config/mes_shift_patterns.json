@@ -1,0 +1,36 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "updated_at": "2026-03-30T18:30:00+07:00",
+    "description": "Governed MES shift definitions for cockpit, handover, and exception logic."
+  },
+  "timezone": "Asia/Saigon",
+  "shift_handover_grace_minutes": 45,
+  "stale_progress_minutes": 90,
+  "shifts": [
+    {
+      "shift_code": "A",
+      "label": "Ca A",
+      "label_en": "Shift A",
+      "start": "06:00",
+      "end": "14:00",
+      "work_centers": ["WC-5AX", "WC-3AX", "WC-QA", "WC-MNT"]
+    },
+    {
+      "shift_code": "B",
+      "label": "Ca B",
+      "label_en": "Shift B",
+      "start": "14:00",
+      "end": "22:00",
+      "work_centers": ["WC-5AX", "WC-3AX", "WC-QA", "WC-MNT"]
+    },
+    {
+      "shift_code": "C",
+      "label": "Ca C",
+      "label_en": "Shift C",
+      "start": "22:00",
+      "end": "06:00",
+      "work_centers": ["WC-5AX", "WC-3AX", "WC-MNT"]
+    }
+  ]
+}

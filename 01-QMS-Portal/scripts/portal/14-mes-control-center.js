@@ -78,8 +78,11 @@ var EXCEPTION_META = {
 Object.assign(EXCEPTION_META, {
   program_release_risk: { vi:'Thiếu release NC', en:'NC release risk', icon:'🗜️' },
   tool_readiness_risk: { vi:'Tooling chưa sẵn sàng', en:'Tool readiness risk', icon:'🧰' },
+  alarm_ack_gaps: { vi:'Alarm chờ xác nhận', en:'Alarm acknowledgement gaps', icon:'🧯' },
   operator_qualification_gaps: { vi:'Thiếu năng lực vận hành', en:'Operator qualification gaps', icon:'👷' },
   material_trace_gaps: { vi:'Thiếu truy xuất vật liệu', en:'Material trace gaps', icon:'🧪' },
+  material_genealogy_gaps: { vi:'Genealogy vật liệu chưa kín', en:'Material genealogy gaps', icon:'🧬' },
+  shift_handover_gaps: { vi:'Bàn giao ca chưa hoàn tất', en:'Shift handover gaps', icon:'🔄' },
   connector_governance_gaps: { vi:'Kết nối máy chưa đạt điều kiện', en:'Connector governance gaps', icon:'🔌' },
   shadow_sync_failures: { vi:'Lỗi shadow sync', en:'Shadow sync failures', icon:'🌐' },
   primary_read_fallbacks: { vi:'Primary-read fallback', en:'Primary-read fallbacks', icon:'🛠️' },
@@ -262,8 +265,11 @@ function defaultSnapshot(){
     program_handshake_queue: [],
     program_release_queue: [],
     tool_readiness_queue: [],
+    alarm_ack_queue: [],
     operator_qualification_queue: [],
     material_trace_queue: [],
+    material_genealogy_queue: [],
+    shift_handover_queue: [],
     connector_guard_queue: [],
     launch_blocker_queue: [],
     primary_read_queue: [],
@@ -274,6 +280,7 @@ function defaultSnapshot(){
     primary_read_status: {},
     connector_ingest_status: {},
     launch_blocker_status: {},
+    current_shift: {},
     runtime_mode: {}
   };
 }
@@ -479,6 +486,9 @@ function toolRuntimeById(runtimeId){
     }
   }
   return null;
+}
+function masterRows(entity){
+  return state.master && Array.isArray(state.master[entity]) ? state.master[entity] : [];
 }
 function toolOptionsForMachine(machineId){
   var master = state.master || {};
@@ -1032,14 +1042,18 @@ function render(){
   var programHandshake = Array.isArray(snapshot.program_handshake_queue) ? snapshot.program_handshake_queue : [];
   var programReleaseQueue = Array.isArray(snapshot.program_release_queue) ? snapshot.program_release_queue : [];
   var toolReadinessQueue = Array.isArray(snapshot.tool_readiness_queue) ? snapshot.tool_readiness_queue : [];
+  var alarmAckQueue = Array.isArray(snapshot.alarm_ack_queue) ? snapshot.alarm_ack_queue : [];
   var operatorQualificationQueue = Array.isArray(snapshot.operator_qualification_queue) ? snapshot.operator_qualification_queue : [];
   var materialTraceQueue = Array.isArray(snapshot.material_trace_queue) ? snapshot.material_trace_queue : [];
+  var materialGenealogyQueue = Array.isArray(snapshot.material_genealogy_queue) ? snapshot.material_genealogy_queue : [];
+  var shiftHandoverQueue = Array.isArray(snapshot.shift_handover_queue) ? snapshot.shift_handover_queue : [];
   var connectorGuardQueue = Array.isArray(snapshot.connector_guard_queue) ? snapshot.connector_guard_queue : [];
   var launchBlockerQueue = Array.isArray(snapshot.launch_blocker_queue) ? snapshot.launch_blocker_queue : [];
   var primaryReadQueue = Array.isArray(snapshot.primary_read_queue) ? snapshot.primary_read_queue : [];
   var shadowSyncFailures = Array.isArray(snapshot.shadow_sync_failures) ? snapshot.shadow_sync_failures : [];
   var shadowStatus = snapshot.shadow_status || {};
   var connectorIngestStatus = snapshot.connector_ingest_status || {};
+  var currentShift = snapshot.current_shift || {};
   var kpi = snapshot.kpis || {};
   var readinessBand = '';
   var analyticsBand =
@@ -1053,6 +1067,12 @@ function render(){
       '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Tool readiness governance', 'Tool readiness governance')) + '</h2><p>' + esc(t('Nhìn ngay WO nào đang bị chặn bởi tool-life, offset, hoặc runtime tooling chưa đủ để trưởng ca xử lý trước khi mở cắt.', 'See immediately which WO are blocked by tool-life, offset drift, or incomplete tooling runtime so the shift leader can resolve them before cutting starts.')) + '</p></div></div><div class="mesx-list">' + renderToolReadinessQueue(toolReadinessQueue) + '</div></article>' +
     '</section>';
 
+  var alarmAndShiftBand =
+    '<section class="mesx-band" style="margin-top:18px">' +
+      '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Alarm governance', 'Alarm governance')) + '</h2><p>' + esc(t('Theo dõi các alarm còn chờ acknowledge, escalation hoặc clear theo đúng SLA playbook trước khi tiếp tục chạy máy.', 'Track alarms that still need acknowledgement, escalation, or governed clearing before machine execution continues.')) + '</p></div></div><div class="mesx-list">' + renderGovernanceQueue(alarmAckQueue, { emptyTitle:t('Alarm đang được kiểm soát', 'Alarm acknowledgement is clear'), emptyText:t('Chưa có alarm nào đang trễ acknowledge hoặc escalation theo playbook.', 'There are no alarms currently overdue for acknowledgement or escalation.'), detail:function(row){ return [row.machine_id || '', row.alarm_code || '', row.alarm_text || ''].filter(Boolean).join(' · '); }, sub:function(row){ return [row.wo_number || '', row.ack_due_at ? ('ACK ' + fmtDateTime(row.ack_due_at)) : '', row.escalation_due_at ? ('ESC ' + fmtDateTime(row.escalation_due_at)) : '', row.playbook_id || ''].filter(Boolean).join(' · '); }, actions:function(row){ var context = esc(jsonAttr(row)); var buttons = []; if(row.ack_required && String(row.ack_status || '').toLowerCase() !== 'acknowledged'){ buttons.push('<button type="button" class="mesx-link" data-alarm-action="ack" data-alarm-context="' + context + '">' + esc(t('Xác nhận', 'Acknowledge')) + '</button>'); } if(row.escalation_due_at && String(row.escalation_status || '').toLowerCase() !== 'escalated'){ buttons.push('<button type="button" class="mesx-link warning" data-alarm-action="escalate" data-alarm-context="' + context + '">' + esc(t('Escalate', 'Escalate')) + '</button>'); } buttons.push('<button type="button" class="mesx-link danger" data-alarm-action="clear" data-alarm-context="' + context + '">' + esc(t('Clear', 'Clear')) + '</button>'); return buttons.join(''); }, fallbackVi:'Alarm đang chờ acknowledge, escalation hoặc clear theo playbook.', fallbackEn:'The alarm still requires acknowledgement, escalation, or governed clearing.' }) + '</div></article>' +
+      '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Bàn giao ca và genealogy', 'Shift handover and genealogy')) + '</h2><p>' + esc(t('Khóa khoảng trống giữa các ca và giữa vật tư với thành phẩm để truy xuất không bị đứt mạch khi WO chuyển người hoặc chuyển lô.', 'Close the gaps between shifts and between material issue and finished genealogy so traceability stays intact when WO change operators or batches.')) + '</p></div></div><div class="mesx-list">' + renderGovernanceQueue(shiftHandoverQueue, { emptyTitle:t('Bàn giao ca đang ổn', 'Shift handover is current'), emptyText:t('Máy đang chạy đã có bàn giao ca hợp lệ và được xác nhận trong khung thời gian quy định.', 'Running machines already have valid, timely shift handovers.'), detail:function(row){ return [row.machine_id || '', row.current_shift ? ('Ca ' + row.current_shift) : '', row.wo_number || ''].filter(Boolean).join(' · '); }, sub:function(row){ return [row.operator_from || '', row.operator_to || '', row.acknowledged_at ? ('ACK ' + fmtDateTime(row.acknowledged_at)) : '', Array.isArray(row.issue_codes) && row.issue_codes.length ? ('Issues: ' + row.issue_codes.join(', ')) : ''].filter(Boolean).join(' · '); }, actions:function(row){ return '<button type="button" class="mesx-link" data-shift-handover="' + esc(jsonAttr(row)) + '">' + esc(t('Bàn giao ca', 'Shift handover')) + '</button>'; }, fallbackVi:'Máy chưa có bàn giao ca hợp lệ hoặc chưa được xác nhận đúng hạn.', fallbackEn:'The machine does not yet have a valid or timely acknowledged shift handover.' }) + '</div><div class="mesx-section"><div class="mesx-mini" style="margin-bottom:10px"><small>' + esc(t('Genealogy queue', 'Genealogy queue')) + '</small><strong>' + esc(t('Các WO đã issue vật liệu nhưng chưa khép genealogy hoặc đang lệch lot / heat sẽ hiện ở đây.', 'WO with open material issue / genealogy gaps or lot / heat mismatches appear here.')) + '</strong></div>' + renderGovernanceQueue(materialGenealogyQueue, { emptyTitle:t('Genealogy vật liệu đang kín', 'Material genealogy is closed'), emptyText:t('Các WO đang theo dõi đã khép issue vật liệu và genealogy thành phẩm theo yêu cầu.', 'Tracked WO already have closed material issue and part genealogy records.'), detail:function(row){ return [row.customer_name || '', row.part_number || '', row.part_revision || '', row.machine_id || ''].filter(Boolean).join(' · '); }, sub:function(row){ return [row.issued_qty != null ? ('Issued ' + row.issued_qty) : '', row.consumption_count != null ? ('Issue ' + row.consumption_count) : '', row.genealogy_count != null ? ('GEN ' + row.genealogy_count) : '', Array.isArray(row.issue_codes) && row.issue_codes.length ? ('Issues: ' + row.issue_codes.join(', ')) : ''].filter(Boolean).join(' · '); }, actions:function(row){ var context = esc(jsonAttr(row)); return '<button type="button" class="mesx-link" data-material-issue="' + context + '">' + esc(t('Issue vật liệu', 'Material issue')) + '</button><button type="button" class="mesx-link warning" data-genealogy-snapshot="' + context + '">' + esc(t('Chốt genealogy', 'Capture genealogy')) + '</button>'; }, fallbackVi:'WO chưa khép genealogy vật liệu / thành phẩm theo chuẩn MES.', fallbackEn:'The WO has not yet closed material or finished-part genealogy to the MES standard.' }) + '</div></article>' +
+    '</section>';
+
   readinessBand =
     '<section class="mesx-band" style="margin-top:18px">' +
       '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Nhân lực và truy xuất vật liệu', 'Operator and material governance')) + '</h2><p>' + esc(t('Khóa các WO đang thiếu năng lực vận hành hoặc chưa đủ dữ liệu lot / heat / traveler trước khi tiếp tục sản xuất.', 'Block WO that still have operator qualification gaps or incomplete lot / heat / traveler data before production continues.')) + '</p></div></div><div class="mesx-list">' + renderGovernanceQueue(operatorQualificationQueue, { emptyTitle:t('Nhân lực vận hành đang đạt chuẩn', 'Operator qualification is clear'), emptyText:t('Chưa có WO nào bị chặn bởi năng lực, machine match hoặc hiệu lực chứng nhận.', 'No WO is currently blocked by qualification, machine match, or certification validity.'), detail:function(row){ return [row.operator_id || '', row.operator_name || '', row.customer_name || '', row.part_number || '', row.part_revision || ''].filter(Boolean).join(' · '); }, sub:function(row){ return [row.qualification_expiry ? ('Hết hạn ' + fmtDate(row.qualification_expiry)) : '', Array.isArray(row.issue_codes) && row.issue_codes.length ? ('Issues: ' + row.issue_codes.join(', ')) : '', Array.isArray(row.warning_codes) && row.warning_codes.length ? ('Warnings: ' + row.warning_codes.join(', ')) : ''].filter(Boolean).join(' · '); }, fallbackVi:'Người vận hành chưa đủ điều kiện hoặc không khớp machine / work center cho WO này.', fallbackEn:'The operator is not fully qualified or does not match the machine / work center for this WO.' }) + '</div><div class="mesx-section"><div class="mesx-mini" style="margin-bottom:10px"><small>' + esc(t('Traceability queue', 'Traceability queue')) + '</small><strong>' + esc(t('Các WO còn thiếu dữ liệu lot, heat hoặc traveler sẽ hiện ở đây.', 'WO missing lot, heat, or traveler data appear here.')) + '</strong></div>' + renderGovernanceQueue(materialTraceQueue, { emptyTitle:t('Trace vật liệu đang đủ', 'Material trace is complete'), emptyText:t('Các WO đang theo dõi hiện đã có lot, traveler và trạng thái chứng chỉ cần thiết.', 'Tracked WO already have the required lot, traveler, and certificate status.'), detail:function(row){ return [row.customer_name || '', row.part_number || '', row.part_revision || '', row.machine_id || ''].filter(Boolean).join(' · '); }, sub:function(row){ return [row.material_lot_number || '', row.heat_number || '', row.traveler_number || '', Array.isArray(row.missing_fields) && row.missing_fields.length ? ('Missing: ' + row.missing_fields.join(', ')) : ''].filter(Boolean).join(' · '); }, fallbackVi:'WO chưa đủ dữ liệu lot, heat hoặc traveler để khóa trace vật liệu.', fallbackEn:'The WO does not yet have enough lot, heat, or traveler data for governed material trace.' }) + '</div></article>' +
@@ -1062,7 +1082,7 @@ function render(){
   state.container.innerHTML = '<div class="mesx">' +
     '<section class="mesx-hero">' +
       '<article class="mesx-poster">' +
-        '<div class="mesx-brand"><div class="mesx-brand-main"><div class="mesx-logo"><img src="./assets/hesem-logo.svg" alt="HESEM"></div><div><div class="mesx-kicker">HESEM CNC MOM / MES</div><h1>' + esc(t('Trung tâm điều hành MES', 'MES Control Center')) + '</h1><p>' + esc(t('Một màn hình duy nhất để điều độ WO, đọc trạng thái máy, khóa gate chứng cứ, bắt cảnh báo tool-life và ra quyết định khôi phục xưởng nhanh theo ngữ cảnh thật.', 'One production surface to dispatch WO, read machine status, enforce evidence gates, catch tool-life alerts, and drive recovery decisions in real shop-floor context.')) + '</p><div class="mesx-facts"><span class="mesx-fact">⏱ ' + esc(currentStamp()) + '</span><span class="mesx-fact">📦 ' + esc((kpi.wo_active || 0) + ' ' + t('WO đang hoạt động', 'active WO')) + '</span><span class="mesx-fact">🏭 ' + esc((kpi.machines_total || 0) + ' ' + t('tài sản theo dõi', 'assets tracked')) + '</span><span class="mesx-fact">🔌 ' + esc((kpi.connectors_healthy || 0) + '/' + (kpi.connectors_total || 0) + ' ' + t('kết nối ổn', 'healthy links')) + '</span><span class="mesx-fact">📊 OEE ' + esc(fmtPercent(kpi.oee_pct)) + '</span></div></div></div><div>' + badge((kpi.machines_down || 0) > 0 ? statusMeta('down') : statusMeta('running')) + '</div></div>' +
+        '<div class="mesx-brand"><div class="mesx-brand-main"><div class="mesx-logo"><img src="./assets/hesem-logo.svg" alt="HESEM"></div><div><div class="mesx-kicker">HESEM CNC MOM / MES</div><h1>' + esc(t('Trung tâm điều hành MES', 'MES Control Center')) + '</h1><p>' + esc(t('Một màn hình duy nhất để điều độ WO, đọc trạng thái máy, khóa gate chứng cứ, bắt cảnh báo tool-life và ra quyết định khôi phục xưởng nhanh theo ngữ cảnh thật.', 'One production surface to dispatch WO, read machine status, enforce evidence gates, catch tool-life alerts, and drive recovery decisions in real shop-floor context.')) + '</p><div class="mesx-facts"><span class="mesx-fact">⏱ ' + esc(currentStamp()) + '</span><span class="mesx-fact">🕒 ' + esc((currentShift.shift_code || '—') + ' · ' + (currentShift.shift_name_vi || currentShift.shift_name_en || t('Chưa xác định ca', 'Unresolved shift'))) + '</span><span class="mesx-fact">📦 ' + esc((kpi.wo_active || 0) + ' ' + t('WO đang hoạt động', 'active WO')) + '</span><span class="mesx-fact">🏭 ' + esc((kpi.machines_total || 0) + ' ' + t('tài sản theo dõi', 'assets tracked')) + '</span><span class="mesx-fact">🔌 ' + esc((kpi.connectors_healthy || 0) + '/' + (kpi.connectors_total || 0) + ' ' + t('kết nối ổn', 'healthy links')) + '</span><span class="mesx-fact">📊 OEE ' + esc(fmtPercent(kpi.oee_pct)) + '</span></div></div></div><div>' + badge((kpi.machines_down || 0) > 0 ? statusMeta('down') : statusMeta('running')) + '</div></div>' +
         '<div class="mesx-actions"><button type="button" class="mesx-btn primary" id="mes-refresh">⟳ ' + esc(t('Làm mới runtime', 'Refresh runtime')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-orders">📦 ' + esc(t('Quản lý đơn hàng', 'Order management')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-master">🧭 ' + esc(t('Dữ liệu nền', 'Master data')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-forms">📋 ' + esc(t('Kiểm soát chứng cứ', 'Evidence control')) + '</button></div>' +
       '</article>' +
       '<aside class="mesx-side">' +
@@ -1078,8 +1098,11 @@ function render(){
           renderKpiTile(t('Lệch chương trình NC', 'Program mismatches'), kpi.program_mismatches || 0, t('Máy đang báo sai hoặc thiếu chương trình so với WO', 'Machine-reported program is missing or mismatched against the WO')) +
           renderKpiTile(t('Rủi ro release NC', 'NC release risk'), kpi.program_release_risk || 0, t('WO chưa có release NC hợp lệ để mở cắt', 'WO still missing a valid governed NC release')) +
           renderKpiTile(t('Rủi ro tooling', 'Tool readiness risk'), kpi.tool_readiness_risk || 0, t('WO bị chặn bởi tool-life, offset hoặc runtime tooling chưa đủ', 'WO blocked by tool-life, offset drift, or incomplete tooling runtime')) +
+          renderKpiTile(t('Alarm chờ ACK', 'Alarm acknowledgement gaps'), kpi.alarm_ack_gaps || 0, t('Alarm còn chờ acknowledge hoặc escalation theo SLA playbook', 'Alarms still pending acknowledgement or escalation within the playbook SLA')) +
           renderKpiTile(t('Thiếu năng lực', 'Qualification gaps'), kpi.operator_qualification_gaps || 0, t('Người vận hành chưa đủ điều kiện theo machine, work center hoặc chứng nhận', 'Operators missing machine, work-center, or certification coverage')) +
           renderKpiTile(t('Thiếu trace vật liệu', 'Material trace gaps'), kpi.material_trace_gaps || 0, t('WO còn thiếu lot, heat, traveler hoặc chứng chỉ vật liệu bắt buộc', 'WO still missing lot, heat, traveler, or required material certificates')) +
+          renderKpiTile(t('Genealogy chưa kín', 'Material genealogy gaps'), kpi.material_genealogy_gaps || 0, t('WO đã issue vật liệu nhưng genealogy thành phẩm hoặc lot/heat verification chưa khép kín', 'WO already issued material but finished-part genealogy or lot/heat verification is still open')) +
+          renderKpiTile(t('Bàn giao ca thiếu', 'Shift handover gaps'), kpi.shift_handover_gaps || 0, t('Máy hoặc WO đang chạy nhưng chưa có bàn giao ca hợp lệ hoặc chưa được xác nhận đúng hạn', 'Running machines or WO still need valid, timely shift handover acknowledgement')) +
           renderKpiTile(t('Rủi ro connector', 'Connector governance gaps'), kpi.connector_guard_gaps || 0, t('Connector policy, heartbeat hoặc telemetry mode chưa đủ điều kiện mở WO', 'Connector policy, heartbeat, or telemetry mode still blocks WO launch')) +
           renderKpiTile(t('Lỗi shadow sync', 'Shadow sync failures'), kpi.shadow_sync_failures || 0, t('JSON runtime chưa mirror sạch sang PostgreSQL shadow layer', 'JSON runtime is not mirroring cleanly into the PostgreSQL shadow layer')) +
           renderKpiTile(t('Primary read fallback', 'Primary-read fallbacks'), kpi.primary_read_fallbacks || 0, t('Read model pilot vừa phải quay về JSON thay vì đọc PostgreSQL', 'The read-model pilot recently had to fall back to JSON instead of reading PostgreSQL')) +
@@ -1098,6 +1121,7 @@ function render(){
     '<section class="mesx-band" style="margin-top:18px"><article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Giám sát kết nối máy', 'Machine connectivity overview')) + '</h2><p>' + esc(t('Theo dõi từng máy đang lấy trạng thái từ MTConnect, OPC UA hay cầu nối nhập tay; nhịp heartbeat nào stale sẽ nổi lên trước để không bị mù dữ liệu shop-floor.', 'Track whether each machine is reading state from MTConnect, OPC UA, or a manual bridge; stale heartbeats rise to the top so the shop floor never goes blind.')) + '</p></div></div><div class="mesx-connector-grid">' + (connectors.length ? connectors.map(renderConnectorCard).join('') : '<div class="mesx-empty"><strong>' + esc(t('Chưa có connector runtime', 'No connector runtime yet')) + '</strong>' + esc(t('Hãy bơm tín hiệu pilot hoặc khai báo metadata kết nối cho máy.', 'Seed a pilot signal or declare connector metadata for the machine first.')) + '</div>') + '</div></article><article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Điểm rơi vận hành', 'Runtime guidance')) + '</h2><p>' + esc(t('Luôn ưu tiên xử lý theo thứ tự: stale connector -> downtime -> gate chứng cứ -> tooling alert. Điều này giúp OEE và traceability không lệch nhau.', 'Always triage in this order: stale connector -> downtime -> evidence gate -> tooling alert. This keeps OEE and traceability aligned.')) + '</p></div></div><div class="mesx-list"><div class="mesx-list-item"><h4>' + esc(t('Heartbeat stale là blocker ẩn', 'Stale heartbeat is a hidden blocker')) + '</h4><p>' + esc(t('Nếu máy vẫn chạy nhưng connector stale, OEE và dispatch có thể đẹp giả. Hãy cập nhật tín hiệu hoặc khôi phục adapter trước khi tin vào số liệu.', 'If the machine keeps running while the connector is stale, OEE and dispatch can look falsely healthy. Update the signal or restore the adapter before trusting the numbers.')) + '</p></div><div class="mesx-list-item"><h4>' + esc(t('Cầu nối tay là chế độ chuyển tiếp', 'Manual bridge is a transition mode')) + '</h4><p>' + esc(t('Dùng manual bridge cho CMM hoặc pilot machine là hợp lý, nhưng phải nhìn rõ máy nào còn đang phụ thuộc nhập tay để ưu tiên tự động hóa tiếp.', 'Using the manual bridge for a CMM or a pilot machine is acceptable, but operators must clearly see which assets still depend on manual input so automation can be prioritized next.')) + '</p></div></div></article></section>' +
     analyticsBand +
     governanceBand +
+    alarmAndShiftBand +
     readinessBand +
     '<section class="mesx-main">' +
       '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Dispatch board theo Work Order', 'Work Order dispatch board')) + '</h2><p>' + esc(t('Lọc theo work center và trạng thái, sau đó báo tiến độ hoặc mở đúng form chứng cứ mà không phải nhập tay context.', 'Filter by work center and status, then report progress or launch the correct evidence form without typing context by hand.')) + '</p></div></div><div class="mesx-toolbar"><input class="mesx-input search" id="mes-search" type="search" value="' + esc(state.search) + '" placeholder="' + esc(t('Tìm WO / Part / máy / khách hàng...', 'Search WO / part / machine / customer...')) + '"><select class="mesx-select" id="mes-filter-center"><option value="">' + esc(t('Tất cả work center', 'All work centers')) + '</option>' + centers.map(function(center){ return '<option value="' + esc(center.work_center_id || '') + '"' + (state.workCenter === center.work_center_id ? ' selected' : '') + '>' + esc((center.work_center_id || '') + ' · ' + (center.work_center_name || '')) + '</option>'; }).join('') + '</select><select class="mesx-select" id="mes-filter-status"><option value="">' + esc(t('Tất cả trạng thái', 'All statuses')) + '</option>' + ['scheduled','setup','running','inspection','on_hold','completed'].map(function(key){ return '<option value="' + esc(key) + '"' + (state.dispatchStatus === key ? ' selected' : '') + '>' + esc(t(statusMeta(key).vi, statusMeta(key).en)) + '</option>'; }).join('') + '</select></div>' + renderDispatchTable(rows) + '</article>' +
@@ -1167,6 +1191,26 @@ function bind(){
   Array.prototype.forEach.call(state.container.querySelectorAll('[data-open-exception]'), function(button){
     button.onclick = function(){ openExceptionDetail(button.getAttribute('data-open-exception') || ''); };
   });
+  Array.prototype.forEach.call(state.container.querySelectorAll('[data-alarm-action]'), function(button){
+    button.onclick = function(){
+      openAlarmGovernanceModal(button.getAttribute('data-alarm-action') || '', parseJsonAttr(button.getAttribute('data-alarm-context')));
+    };
+  });
+  Array.prototype.forEach.call(state.container.querySelectorAll('[data-shift-handover]'), function(button){
+    button.onclick = function(){
+      openShiftHandoverModal(parseJsonAttr(button.getAttribute('data-shift-handover')));
+    };
+  });
+  Array.prototype.forEach.call(state.container.querySelectorAll('[data-material-issue]'), function(button){
+    button.onclick = function(){
+      openMaterialIssueModal(parseJsonAttr(button.getAttribute('data-material-issue')));
+    };
+  });
+  Array.prototype.forEach.call(state.container.querySelectorAll('[data-genealogy-snapshot]'), function(button){
+    button.onclick = function(){
+      openGenealogySnapshotModal(parseJsonAttr(button.getAttribute('data-genealogy-snapshot')));
+    };
+  });
 }
 
 function openSignalBridgeModal(machineId){
@@ -1223,6 +1267,215 @@ function openSignalBridgeModal(machineId){
         render();
       }).catch(function(error){
         toast(t('Không thể cập nhật tín hiệu máy.', 'Could not update the machine signal.'), 'error');
+        if(window.console) console.error(error);
+      }).finally(function(){ submit.disabled = false; });
+    }
+  );
+  bindModalButtons();
+}
+
+function openAlarmGovernanceModal(action, row){
+  var alarm = row && typeof row === 'object' ? row : {};
+  var alarmAction = String(action || '').toLowerCase();
+  if(!alarm.alarm_event_id){
+    toast(t('Không tìm thấy alarm để xử lý.', 'Could not find the alarm event to process.'), 'error');
+    return;
+  }
+  var titleMap = {
+    ack: [t('Xác nhận alarm', 'Acknowledge alarm'), 'mes_alarm_acknowledge', 'acknowledged_at', 'acknowledge_note', t('Xác nhận', 'Acknowledge')],
+    escalate: [t('Escalate alarm', 'Escalate alarm'), 'mes_alarm_escalate', 'escalated_at', 'escalation_note', t('Escalate', 'Escalate')],
+    clear: [t('Clear alarm', 'Clear alarm'), 'mes_alarm_clear', 'cleared_at', '', t('Clear', 'Clear')]
+  };
+  var tuple = titleMap[alarmAction];
+  if(!tuple){
+    toast(t('Hành động alarm không hợp lệ.', 'Invalid alarm action.'), 'error');
+    return;
+  }
+  var noteField = tuple[3];
+  var body = '<div class="mesx-form-grid">' +
+    fieldDisplay(t('Alarm', 'Alarm'), [alarm.machine_id || '', alarm.alarm_code || '', alarm.alarm_text || ''].filter(Boolean).join(' · ')) +
+    fieldDisplay(t('WO / playbook', 'WO / playbook'), [alarm.wo_number || t('Không gắn WO', 'No WO linked'), alarm.playbook_id || t('Không có playbook', 'No playbook')].join(' · ')) +
+    editableField('mes-alarm-time', t('Thời điểm ghi nhận', 'Action time'), '<input class="mesx-input" id="mes-alarm-time" type="datetime-local" value="' + esc(nowInputValue()) + '">') +
+    (noteField ? editableField('mes-alarm-note', t('Ghi chú xử lý', 'Governance note'), '<textarea class="mesx-textarea" id="mes-alarm-note" placeholder="' + esc(t('Mô tả người nhận, quyết định escalation hoặc tình trạng lockout hiện tại...', 'Describe the responder, escalation decision, or current lockout condition...')) + '"></textarea>', true) : '') +
+    '<div class="full mesx-modal-foot"><button type="button" class="mesx-btn ghost" data-modal-cancel>↩ ' + esc(t('Hủy', 'Cancel')) + '</button><button type="button" class="mesx-btn primary" data-modal-submit>🧯 ' + esc(tuple[4]) + '</button></div>' +
+  '</div>';
+  showModal(tuple[0], [alarm.machine_id || '', alarm.wo_number || '', alarm.alarm_code || ''].filter(Boolean).join(' · '), body, function(modal, submit){
+    submit.disabled = true;
+    var payload = { alarm_event_id: alarm.alarm_event_id || '' };
+    payload[tuple[2]] = (modal.querySelector('#mes-alarm-time') || {}).value || '';
+    if(noteField) payload[noteField] = (modal.querySelector('#mes-alarm-note') || {}).value || '';
+    api(tuple[1], payload, 'POST').then(function(resp){
+      if(!resp || !resp.ok) throw new Error((resp && resp.error) || 'alarm_governance_failed');
+      state.snapshot = resp.data || state.snapshot;
+      toast(t('Đã cập nhật governance cho alarm.', 'Alarm governance updated.'), 'success');
+      closeModal();
+      render();
+    }).catch(function(error){
+      toast(t('Không thể cập nhật alarm.', 'Could not update the alarm.'), 'error');
+      if(window.console) console.error(error);
+    }).finally(function(){ submit.disabled = false; });
+  });
+  bindModalButtons();
+}
+
+function openShiftHandoverModal(context){
+  var row = context && typeof context === 'object' ? context : {};
+  var machine = machineById(row.machine_id || '');
+  if(!machine){
+    toast(t('Không tìm thấy máy để bàn giao ca.', 'Could not find the machine for shift handover.'), 'error');
+    return;
+  }
+  var dispatch = dispatchByWo(row.wo_number || '') || machine.active_work_order || {};
+  var operators = operatorOptions(machine.work_center_id || '');
+  var currentShift = (state.snapshot && state.snapshot.current_shift) || {};
+  var shiftTo = row.current_shift || currentShift.shift_code || '';
+  var shiftFrom = row.shift_to || row.shift_from || '';
+  showModal(
+    t('Bàn giao ca', 'Shift handover'),
+    [machine.machine_id || '', machine.machine_name || '', shiftTo ? ('Ca ' + shiftTo) : ''].filter(Boolean).join(' · '),
+    '<div class="mesx-form-grid">' +
+      fieldDisplay(t('Work center', 'Work center'), machine.work_center_name || machine.work_center_id || '—') +
+      fieldDisplay(t('WO hiện hành', 'Current WO'), [dispatch.wo_number || row.wo_number || '', dispatch.part_number || row.part_number || '', dispatch.part_revision || row.part_revision || ''].filter(Boolean).join(' · ')) +
+      editableField('mes-shift-from', t('Ca giao', 'Shift from'), '<input class="mesx-input" id="mes-shift-from" type="text" value="' + esc(shiftFrom) + '" placeholder="' + esc(t('Ví dụ: B', 'Example: B')) + '">') +
+      editableField('mes-shift-to', t('Ca nhận', 'Shift to'), '<input class="mesx-input" id="mes-shift-to" type="text" value="' + esc(shiftTo) + '" placeholder="' + esc(t('Ví dụ: C', 'Example: C')) + '">') +
+      editableField('mes-shift-operator-from', t('Người bàn giao', 'Operator from'), '<select class="mesx-select" id="mes-shift-operator-from">' + renderSelectOptions(operators, 'operator_id', function(item){ return [item.operator_id, item.operator_name].filter(Boolean).join(' · '); }, row.operator_to || row.operator_from || dispatch.operator_id || '', t('Chọn người bàn giao', 'Select operator from')) + '</select>') +
+      editableField('mes-shift-operator-to', t('Người nhận ca', 'Operator to'), '<select class="mesx-select" id="mes-shift-operator-to">' + renderSelectOptions(operators, 'operator_id', function(item){ return [item.operator_id, item.operator_name].filter(Boolean).join(' · '); }, dispatch.operator_id || row.operator_to || '', t('Chọn người nhận ca', 'Select operator to')) + '</select>') +
+      editableField('mes-shift-machine-state', t('Trạng thái máy', 'Machine state'), '<select class="mesx-select" id="mes-shift-machine-state"><option value="running"' + ((machine.status || '') === 'running' ? ' selected' : '') + '>' + esc(t('Đang chạy', 'Running')) + '</option><option value="setup"' + ((machine.status || '') === 'setup' ? ' selected' : '') + '>' + esc(t('Đang setup', 'Setup')) + '</option><option value="inspection"' + ((machine.status || '') === 'inspection' ? ' selected' : '') + '>' + esc(t('Đang kiểm tra', 'Inspection')) + '</option><option value="on_hold"' + ((machine.status || '') === 'on_hold' ? ' selected' : '') + '>' + esc(t('Tạm dừng', 'On hold')) + '</option><option value="down"' + ((machine.status || '') === 'down' ? ' selected' : '') + '>' + esc(t('Dừng máy', 'Down')) + '</option></select>') +
+      editableField('mes-shift-parts', t('Số lượng đã hoàn thành', 'Parts completed'), '<input class="mesx-input" id="mes-shift-parts" type="number" min="0" value="' + esc(Number(dispatch.qty_completed || 0)) + '">') +
+      editableField('mes-shift-issues', t('Vấn đề tồn ca', 'Issues noted'), '<textarea class="mesx-textarea" id="mes-shift-issues" placeholder="' + esc(t('Ví dụ: alarm tạm thời, rung nhẹ, offset đang theo dõi...', 'Example: temporary alarm, mild chatter, offset under observation...')) + '">' + esc(row.issues_noted || '') + '</textarea>', true) +
+      editableField('mes-shift-pending', t('Hành động cần tiếp tục', 'Pending actions'), '<textarea class="mesx-textarea" id="mes-shift-pending" placeholder="' + esc(t('Ví dụ: xác nhận lại preset dao T12, chờ QC mở FAI, hoàn tất warm-up spindle...', 'Example: reconfirm tool T12 preset, wait for QC to open FAI, complete spindle warm-up...')) + '">' + esc(row.pending_actions || '') + '</textarea>', true) +
+      editableField('mes-shift-quality', t('Cảnh báo chất lượng', 'Quality alerts'), '<textarea class="mesx-textarea" id="mes-shift-quality" placeholder="' + esc(t('Nêu rõ lô nào đang hold, CTQ nào cần theo dõi hoặc NCR/CAPA liên quan...', 'State which lot is on hold, which CTQ needs watching, or related NCR/CAPA...')) + '">' + esc(row.quality_alerts || '') + '</textarea>', true) +
+      editableField('mes-shift-tooling', t('Tình trạng tooling', 'Tooling status'), '<textarea class="mesx-textarea" id="mes-shift-tooling" placeholder="' + esc(t('Ví dụ: dao OP20 còn 18%, offset D12 vừa chỉnh +0.01mm...', 'Example: OP20 tool has 18% life left, D12 offset adjusted +0.01mm...')) + '">' + esc(row.tooling_status || '') + '</textarea>', true) +
+      '<div class="full mesx-modal-foot"><button type="button" class="mesx-btn ghost" data-modal-cancel>↩ ' + esc(t('Hủy', 'Cancel')) + '</button><button type="button" class="mesx-btn primary" data-modal-submit>🔄 ' + esc(t('Lưu bàn giao ca', 'Save handover')) + '</button></div>' +
+    '</div>',
+    function(modal, submit){
+      submit.disabled = true;
+      api('mes_shift_handover_submit', {
+        handover_id: row.handover_id || '',
+        machine_id: machine.machine_id || '',
+        wo_number: dispatch.wo_number || row.wo_number || '',
+        shift_from: (modal.querySelector('#mes-shift-from') || {}).value || '',
+        shift_to: (modal.querySelector('#mes-shift-to') || {}).value || '',
+        operator_from: (modal.querySelector('#mes-shift-operator-from') || {}).value || '',
+        operator_to: (modal.querySelector('#mes-shift-operator-to') || {}).value || '',
+        machine_state: (modal.querySelector('#mes-shift-machine-state') || {}).value || machine.status || 'running',
+        parts_completed: Number((modal.querySelector('#mes-shift-parts') || {}).value || 0),
+        issues_noted: (modal.querySelector('#mes-shift-issues') || {}).value || '',
+        pending_actions: (modal.querySelector('#mes-shift-pending') || {}).value || '',
+        quality_alerts: (modal.querySelector('#mes-shift-quality') || {}).value || '',
+        tooling_status: (modal.querySelector('#mes-shift-tooling') || {}).value || ''
+      }, 'POST').then(function(resp){
+        if(!resp || !resp.ok) throw new Error((resp && resp.error) || 'shift_handover_failed');
+        state.snapshot = resp.data || state.snapshot;
+        toast(t('Đã lưu bàn giao ca.', 'Shift handover saved.'), 'success');
+        closeModal();
+        render();
+      }).catch(function(error){
+        toast(t('Không thể lưu bàn giao ca.', 'Could not save the shift handover.'), 'error');
+        if(window.console) console.error(error);
+      }).finally(function(){ submit.disabled = false; });
+    }
+  );
+  bindModalButtons();
+}
+
+function openMaterialIssueModal(context){
+  var row = context && typeof context === 'object' ? context : {};
+  var dispatch = dispatchByWo(row.wo_number || '');
+  if(!dispatch){
+    toast(t('Không tìm thấy WO để issue vật liệu.', 'Could not find the WO for material issue.'), 'error');
+    return;
+  }
+  showModal(
+    t('Ghi issue vật liệu', 'Record material issue'),
+    [dispatch.wo_number || '', dispatch.part_number || '', dispatch.part_revision || ''].filter(Boolean).join(' · '),
+    '<div class="mesx-form-grid">' +
+      fieldDisplay(t('Khách hàng / máy', 'Customer / machine'), [dispatch.customer_name || dispatch.customer_id || '', dispatch.machine_id || ''].filter(Boolean).join(' · ')) +
+      fieldDisplay(t('Traveler hiện hành', 'Current traveler'), dispatch.traveler_number || t('Chưa có', 'Not set')) +
+      editableField('mes-mat-lot', t('Material lot', 'Material lot'), '<input class="mesx-input" id="mes-mat-lot" type="text" value="' + esc(row.material_lot_number || dispatch.material_lot_number || '') + '">') +
+      editableField('mes-mat-heat', t('Heat number', 'Heat number'), '<input class="mesx-input" id="mes-mat-heat" type="text" value="' + esc(row.heat_number || dispatch.heat_number || '') + '">') +
+      editableField('mes-mat-traveler', t('Traveler number', 'Traveler number'), '<input class="mesx-input" id="mes-mat-traveler" type="text" value="' + esc(dispatch.traveler_number || '') + '">') +
+      editableField('mes-mat-cert', t('Material cert', 'Material cert'), '<input class="mesx-input" id="mes-mat-cert" type="text" value="">') +
+      editableField('mes-mat-qty', t('Số lượng issue', 'Issued quantity'), '<input class="mesx-input" id="mes-mat-qty" type="number" min="0" step="0.001" value="' + esc(Number(row.issued_qty || 0) || Number(dispatch.qty_planned || 0) || 0) + '">') +
+      editableField('mes-mat-uom', t('Đơn vị', 'UOM'), '<input class="mesx-input" id="mes-mat-uom" type="text" value="EA">') +
+      editableField('mes-mat-verified', t('Người xác nhận', 'Verified by'), '<input class="mesx-input" id="mes-mat-verified" type="text" value="' + esc(dispatch.operator_id || '') + '">') +
+      '<div class="full mesx-modal-foot"><button type="button" class="mesx-btn ghost" data-modal-cancel>↩ ' + esc(t('Hủy', 'Cancel')) + '</button><button type="button" class="mesx-btn primary" data-modal-submit>🧪 ' + esc(t('Lưu issue vật liệu', 'Save material issue')) + '</button></div>' +
+    '</div>',
+    function(modal, submit){
+      submit.disabled = true;
+      api('mes_material_issue', {
+        wo_number: dispatch.wo_number || '',
+        machine_id: dispatch.machine_id || '',
+        operation_number: dispatch.operation_number || 0,
+        part_number: dispatch.part_number || '',
+        part_revision: dispatch.part_revision || '',
+        lot_number: (modal.querySelector('#mes-mat-lot') || {}).value || '',
+        heat_number: (modal.querySelector('#mes-mat-heat') || {}).value || '',
+        traveler_number: (modal.querySelector('#mes-mat-traveler') || {}).value || '',
+        material_cert_number: (modal.querySelector('#mes-mat-cert') || {}).value || '',
+        qty_consumed: Number((modal.querySelector('#mes-mat-qty') || {}).value || 0),
+        qty_uom: (modal.querySelector('#mes-mat-uom') || {}).value || 'EA',
+        verified_by: (modal.querySelector('#mes-mat-verified') || {}).value || ''
+      }, 'POST').then(function(resp){
+        if(!resp || !resp.ok) throw new Error((resp && resp.error) || 'material_issue_failed');
+        state.snapshot = resp.data || state.snapshot;
+        toast(t('Đã lưu issue vật liệu.', 'Material issue saved.'), 'success');
+        closeModal();
+        render();
+      }).catch(function(error){
+        toast(t('Không thể lưu issue vật liệu.', 'Could not save the material issue.'), 'error');
+        if(window.console) console.error(error);
+      }).finally(function(){ submit.disabled = false; });
+    }
+  );
+  bindModalButtons();
+}
+
+function openGenealogySnapshotModal(context){
+  var row = context && typeof context === 'object' ? context : {};
+  var dispatch = dispatchByWo(row.wo_number || '');
+  if(!dispatch){
+    toast(t('Không tìm thấy WO để chốt genealogy.', 'Could not find the WO for genealogy capture.'), 'error');
+    return;
+  }
+  var operators = operatorOptions(dispatch.work_center_id || '');
+  showModal(
+    t('Chốt genealogy', 'Capture genealogy'),
+    [dispatch.wo_number || '', dispatch.part_number || '', dispatch.part_revision || '', dispatch.machine_id || ''].filter(Boolean).join(' · '),
+    '<div class="mesx-form-grid">' +
+      fieldDisplay(t('Khách hàng', 'Customer'), dispatch.customer_name || dispatch.customer_id || '—') +
+      fieldDisplay(t('NC / chương trình', 'NC / program'), dispatch.nc_program_id || t('Chưa có', 'Not set')) +
+      editableField('mes-gen-serial', t('Serial number', 'Serial number'), '<input class="mesx-input" id="mes-gen-serial" type="text" value="">') +
+      editableField('mes-gen-lot', t('Material lot', 'Material lot'), '<input class="mesx-input" id="mes-gen-lot" type="text" value="' + esc(row.material_lot_number || dispatch.material_lot_number || '') + '">') +
+      editableField('mes-gen-heat', t('Raw material heat', 'Raw material heat'), '<input class="mesx-input" id="mes-gen-heat" type="text" value="' + esc(row.heat_number || dispatch.heat_number || '') + '">') +
+      editableField('mes-gen-operator', t('Người ghi nhận', 'Recorded operator'), '<select class="mesx-select" id="mes-gen-operator">' + renderSelectOptions(operators, 'operator_id', function(item){ return [item.operator_id, item.operator_name].filter(Boolean).join(' · '); }, dispatch.operator_id || '', t('Chọn người vận hành', 'Select operator')) + '</select>') +
+      editableField('mes-gen-ok', t('Số lượng đạt', 'Completed qty'), '<input class="mesx-input" id="mes-gen-ok" type="number" min="0" value="' + esc(Number(dispatch.qty_completed || 0)) + '">') +
+      editableField('mes-gen-scrap', t('Số lượng scrap', 'Scrap qty'), '<input class="mesx-input" id="mes-gen-scrap" type="number" min="0" value="' + esc(Number(dispatch.qty_scrap || 0)) + '">') +
+      '<div class="full mesx-modal-foot"><button type="button" class="mesx-btn ghost" data-modal-cancel>↩ ' + esc(t('Hủy', 'Cancel')) + '</button><button type="button" class="mesx-btn primary" data-modal-submit>🧬 ' + esc(t('Lưu genealogy', 'Save genealogy')) + '</button></div>' +
+    '</div>',
+    function(modal, submit){
+      submit.disabled = true;
+      api('mes_genealogy_snapshot', {
+        wo_number: dispatch.wo_number || '',
+        machine_id: dispatch.machine_id || '',
+        part_number: dispatch.part_number || '',
+        part_revision: dispatch.part_revision || '',
+        lot_number: (modal.querySelector('#mes-gen-lot') || {}).value || '',
+        material_lot_number: (modal.querySelector('#mes-gen-lot') || {}).value || '',
+        raw_material_heat: (modal.querySelector('#mes-gen-heat') || {}).value || '',
+        serial_number: (modal.querySelector('#mes-gen-serial') || {}).value || '',
+        nc_program_id: dispatch.nc_program_id || '',
+        operator_id: (modal.querySelector('#mes-gen-operator') || {}).value || '',
+        completed_qty: Number((modal.querySelector('#mes-gen-ok') || {}).value || 0),
+        scrap_qty: Number((modal.querySelector('#mes-gen-scrap') || {}).value || 0)
+      }, 'POST').then(function(resp){
+        if(!resp || !resp.ok) throw new Error((resp && resp.error) || 'genealogy_failed');
+        state.snapshot = resp.data || state.snapshot;
+        toast(t('Đã lưu genealogy.', 'Genealogy saved.'), 'success');
+        closeModal();
+        render();
+      }).catch(function(error){
+        toast(t('Không thể lưu genealogy.', 'Could not save genealogy.'), 'error');
         if(window.console) console.error(error);
       }).finally(function(){ submit.disabled = false; });
     }

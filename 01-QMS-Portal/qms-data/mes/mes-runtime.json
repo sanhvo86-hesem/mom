@@ -2,7 +2,7 @@
   "_meta": {
     "version": "1.2",
     "created": "2026-03-29T17:00:00+07:00",
-    "updated": "2026-03-29T23:20:00+07:00",
+    "updated": "2026-03-30T18:45:00+07:00",
     "description": "MES runtime seed for dispatch, machine state, downtime, maintenance, tooling, connectivity, and progress reporting."
   },
   "downtime_events": [
@@ -318,7 +318,20 @@
       "acknowledged_by": "",
       "alarm_time": "2026-03-30T14:20:00+07:00",
       "updated_at": "2026-03-30T14:20:00+07:00",
-      "updated_by": "system"
+      "updated_by": "system",
+      "ack_required": true,
+      "ack_sla_minutes": 7,
+      "ack_status": "pending",
+      "ack_due_at": "2026-03-30T14:27:00+07:00",
+      "acknowledged_at": "",
+      "acknowledge_note": "",
+      "escalation_status": "pending",
+      "escalation_due_at": "2026-03-30T14:35:00+07:00",
+      "escalated_at": "",
+      "escalated_by": "",
+      "escalation_note": "",
+      "cleared_at": "",
+      "cleared_by": ""
     }
   ],
   "nc_download_receipts": [
@@ -404,9 +417,9 @@
       "machine_name": "Mitutoyo Crysta-Apex",
       "wo_number": "WO-2026-00002",
       "offset_number": "PRB-A",
-      "preset_length_mm": 82.440,
+      "preset_length_mm": 82.44,
       "preset_diameter_mm": 1.998,
-      "wear_offset_mm": 0.000,
+      "wear_offset_mm": 0,
       "offset_drift_mm": 0.001,
       "measurement_source": "manual_bridge",
       "measured_at": "2026-03-30T12:40:00+07:00",
@@ -414,6 +427,91 @@
       "verified_status": "verified",
       "updated_at": "2026-03-30T12:40:00+07:00",
       "updated_by": "qa.manager"
+    }
+  ],
+  "material_consumption": [
+    {
+      "consumption_id": "MAT-202603301010-01",
+      "consumed_at": "2026-03-30T10:10:00+07:00",
+      "wo_number": "WO-2026-00001",
+      "jo_number": "JO-2026-00001",
+      "operation_number": 10,
+      "machine_id": "MC-5AX-01",
+      "part_number": "714-1101",
+      "part_revision": "REV-C",
+      "lot_number": "LOT-AL7075-240328-A",
+      "heat_number": "HEAT-7075-3321",
+      "traveler_number": "TRV-2026-00001",
+      "material_cert_number": "MTC-7075-3321",
+      "consumption_type": "CONSUMED",
+      "qty_consumed": 24,
+      "qty_uom": "EA",
+      "issued_by": "store.clerk",
+      "verified_by": "qa.manager",
+      "updated_at": "2026-03-30T10:10:00+07:00",
+      "updated_by": "store.clerk"
+    },
+    {
+      "consumption_id": "MAT-202603301115-02",
+      "consumed_at": "2026-03-30T11:15:00+07:00",
+      "wo_number": "WO-2026-00002",
+      "jo_number": "JO-2026-00002",
+      "operation_number": 90,
+      "machine_id": "CMM-01",
+      "part_number": "714-1101",
+      "part_revision": "REV-C",
+      "lot_number": "LOT-AL7075-240328-A",
+      "heat_number": "HEAT-7075-3321",
+      "traveler_number": "TRV-2026-00002",
+      "material_cert_number": "MTC-7075-3321",
+      "consumption_type": "VERIFY",
+      "qty_consumed": 24,
+      "qty_uom": "EA",
+      "issued_by": "qa.manager",
+      "verified_by": "qa.manager",
+      "updated_at": "2026-03-30T11:15:00+07:00",
+      "updated_by": "qa.manager"
+    }
+  ],
+  "part_genealogy": [
+    {
+      "genealogy_id": "GEN-202603301255-01",
+      "wo_number": "WO-2026-00001",
+      "jo_number": "JO-2026-00001",
+      "machine_id": "MC-5AX-01",
+      "part_number": "714-1101",
+      "part_revision": "REV-C",
+      "lot_number": "LOT-FG-7141101-01",
+      "serial_number": "",
+      "material_lot_number": "LOT-AL7075-240328-A",
+      "raw_material_heat": "HEAT-7075-3321",
+      "nc_program_id": "NC_714-1101_REVC_OP10_5AX_V3",
+      "operator_id": "OPR-001",
+      "completed_qty": 24,
+      "scrap_qty": 1,
+      "recorded_at": "2026-03-30T12:55:00+07:00",
+      "recorded_by": "qa.manager"
+    }
+  ],
+  "shift_handover": [
+    {
+      "handover_id": "SH-202603301355-01",
+      "machine_id": "MC-5AX-01",
+      "handover_date": "2026-03-30",
+      "shift_from": "A",
+      "shift_to": "B",
+      "operator_from": "OPR-001",
+      "operator_to": "OPR-004",
+      "wo_number": "WO-2026-00001",
+      "operation_number": 10,
+      "parts_completed": 24,
+      "machine_state": "running",
+      "issues_noted": "Theo dõi tool-life dao roughing và xác nhận handshake V3 đã verified.",
+      "pending_actions": "Ca B tiếp tục batch 2 và theo dõi wear offset mỗi 10 chi tiết.",
+      "quality_alerts": "FAI đã pass, SPC tiếp tục theo dõi đường kính OD.",
+      "tooling_status": "Tool TL-EM12-5AX-001 đang ở ngưỡng warning 80%.",
+      "acknowledged_at": "2026-03-30T14:02:00+07:00",
+      "created_at": "2026-03-30T13:55:00+07:00"
     }
   ]
 }

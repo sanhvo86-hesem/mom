@@ -3937,11 +3937,18 @@ CREATE TABLE mes_machine_alarms (
     alarm_group         VARCHAR(50),
     axis_name           VARCHAR(10),
     is_active           BOOLEAN         NOT NULL DEFAULT TRUE,
+    is_acknowledged     BOOLEAN         NOT NULL DEFAULT FALSE,
+    acknowledged_by     VARCHAR(20),
+    acknowledged_at     TIMESTAMPTZ,
+    escalation_status   VARCHAR(20),
+    escalated_by        VARCHAR(20),
+    escalated_at        TIMESTAMPTZ,
     cleared_at          TIMESTAMPTZ,
     cleared_by          VARCHAR(20),
     duration_seconds    NUMERIC(10,2),
     caused_downtime     BOOLEAN         DEFAULT FALSE,
     job_number          VARCHAR(50),
+    related_job_number  VARCHAR(50),
     program_name        VARCHAR(200),
     operator_id         VARCHAR(20),
     source              VARCHAR(30)     DEFAULT 'MTConnect',
@@ -3955,6 +3962,9 @@ CREATE INDEX idx_malm_equip ON mes_machine_alarms (equipment_id, alarm_time DESC
 CREATE INDEX idx_malm_code ON mes_machine_alarms (alarm_code, alarm_time DESC);
 CREATE INDEX idx_malm_active ON mes_machine_alarms (equipment_id)
     WHERE is_active = TRUE;
+CREATE INDEX idx_malm_ack ON mes_machine_alarms (equipment_id, acknowledged_at DESC);
+CREATE INDEX idx_malm_job ON mes_machine_alarms (related_job_number, alarm_time DESC)
+    WHERE related_job_number IS NOT NULL;
 
 -- ---------------------------------------------------------------------------
 -- MES-2.6 mes_program_events / Su kien chuong trinh NC

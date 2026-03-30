@@ -125,6 +125,83 @@ var ENTITY_CONFIG = {
       { key:'notes', type:'textarea', label:'Ghi chú release', helper:'Ghi rõ phạm vi áp dụng, risk note hoặc handshake cần khóa tại máy.' }
     ]
   },
+  mes_connectivity_adapters: {
+    key: 'adapter_id',
+    labelVi: 'Adapter kết nối MES',
+    labelEn: 'MES connectivity adapters',
+    emptyVi: 'Chưa có adapter kết nối MES nào.',
+    listColumns: [
+      { key:'adapter_id', label:'Adapter ID' },
+      { key:'machine_id', label:'Máy' },
+      { key:'status', label:'Trạng thái' }
+    ],
+    fields: [
+      { key:'adapter_id', type:'text', required:true, label:'Adapter ID' },
+      { key:'machine_id', type:'lookup', entity:'machines', required:true, label:'Máy áp dụng' },
+      { key:'adapter_name', type:'text', required:true, label:'Tên adapter' },
+      { key:'adapter_type', type:'select', required:true, label:'Loại adapter', options:['mtconnect','opcua','dnc','manual_bridge'] },
+      { key:'transport_protocol', type:'text', label:'Giao thức' },
+      { key:'endpoint_url', type:'text', label:'Endpoint / URL' },
+      { key:'heartbeat_sla_seconds', type:'number', label:'Heartbeat SLA (giây)' },
+      { key:'stale_after_seconds', type:'number', label:'Ngưỡng stale (giây)' },
+      { key:'auth_mode', type:'select', label:'Cơ chế xác thực', options:['service_account','certificate','session_user','none'] },
+      { key:'store_and_forward_enabled', type:'select', label:'Store-and-forward', options:['true','false'] },
+      { key:'payload_schema_version', type:'text', label:'Schema version' },
+      { key:'status', type:'select', required:true, label:'Trạng thái', options:['active','paused','retired'] },
+      { key:'last_validated_at', type:'datetime-local', label:'Lần xác nhận gần nhất' }
+    ]
+  },
+  mes_alarm_catalog: {
+    key: 'alarm_code',
+    labelVi: 'Danh mục alarm MES',
+    labelEn: 'MES alarm catalog',
+    emptyVi: 'Chưa có alarm catalog nào.',
+    listColumns: [
+      { key:'alarm_code', label:'Alarm code' },
+      { key:'title_vi', label:'Tiêu đề' },
+      { key:'severity_default', label:'Severity' }
+    ],
+    fields: [
+      { key:'alarm_code', type:'text', required:true, label:'Alarm code' },
+      { key:'controller_family', type:'text', required:true, label:'Controller family' },
+      { key:'alarm_group', type:'text', required:true, label:'Alarm group' },
+      { key:'title', type:'text', required:true, label:'Tiêu đề tiếng Anh' },
+      { key:'title_vi', type:'text', required:true, label:'Tiêu đề tiếng Việt' },
+      { key:'severity_default', type:'select', required:true, label:'Mức độ mặc định', options:['WARNING','ALARM','CRITICAL','EMERGENCY'] },
+      { key:'downtime_category_default', type:'select', label:'Nhóm downtime mặc định', options:['breakdown','planned_pm','setup','material_wait','quality_hold','tool_change','utility','other'] },
+      { key:'response_owner_role', type:'text', label:'Vai trò chịu trách nhiệm' },
+      { key:'response_target_minutes', type:'number', label:'Mục tiêu phản ứng (phút)' },
+      { key:'ack_required', type:'select', label:'Bắt buộc acknowledge', options:['true','false'] },
+      { key:'ack_sla_minutes', type:'number', label:'SLA acknowledge (phút)' },
+      { key:'escalation_sla_minutes', type:'number', label:'SLA escalation (phút)' },
+      { key:'requires_lockout', type:'select', label:'Bắt buộc lockout', options:['true','false'] },
+      { key:'requires_maintenance', type:'select', label:'Bắt buộc maintenance', options:['true','false'] },
+      { key:'status', type:'select', required:true, label:'Trạng thái', options:['active','inactive'] }
+    ]
+  },
+  mes_alarm_playbooks: {
+    key: 'playbook_id',
+    labelVi: 'Playbook alarm',
+    labelEn: 'Alarm playbooks',
+    emptyVi: 'Chưa có playbook alarm nào.',
+    listColumns: [
+      { key:'playbook_id', label:'Playbook ID' },
+      { key:'alarm_code', label:'Alarm code' },
+      { key:'status', label:'Trạng thái' }
+    ],
+    fields: [
+      { key:'playbook_id', type:'text', required:true, label:'Playbook ID' },
+      { key:'alarm_code', type:'lookup', entity:'mes_alarm_catalog', required:true, label:'Alarm code' },
+      { key:'title', type:'text', required:true, label:'Tiêu đề tiếng Anh' },
+      { key:'title_vi', type:'text', required:true, label:'Tiêu đề tiếng Việt' },
+      { key:'response_steps', type:'textarea', label:'Các bước phản ứng', helper:'Nhập mỗi bước trên một dòng; runtime sẽ tách thành danh sách.' },
+      { key:'escalation_role', type:'text', label:'Vai trò escalatation' },
+      { key:'acknowledge_within_minutes', type:'number', label:'Acknowledge trong (phút)' },
+      { key:'response_target_minutes', type:'number', label:'Hoàn tất phản ứng trong (phút)' },
+      { key:'lockout_release_required', type:'select', label:'Cần xác nhận release lockout', options:['true','false'] },
+      { key:'status', type:'select', required:true, label:'Trạng thái', options:['active','inactive'] }
+    ]
+  },
   capas: {
     key: 'capa_number',
     labelVi: 'CAPA',

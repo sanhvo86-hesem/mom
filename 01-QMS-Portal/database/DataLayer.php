@@ -1912,6 +1912,9 @@ class DataLayer
         $alarmRows = $this->db->query('SELECT metadata, alarm_time FROM mes_machine_alarms ORDER BY alarm_time DESC');
         $receiptRows = $this->db->query('SELECT metadata, updated_at FROM mes_nc_download_receipts ORDER BY updated_at DESC');
         $offsetRows = $this->db->query('SELECT metadata, updated_at FROM mes_tool_preset_offsets ORDER BY updated_at DESC');
+        $materialRows = $this->db->query('SELECT metadata, created_at FROM mes_material_consumption ORDER BY created_at DESC');
+        $genealogyRows = $this->db->query('SELECT metadata, updated_at FROM mes_part_genealogy ORDER BY updated_at DESC');
+        $handoverRows = $this->db->query('SELECT metadata, created_at FROM mes_shift_handover ORDER BY created_at DESC');
 
         [$connectorFeeds, $machineSignals] = $this->extractEquipmentRuntimeRows($equipmentRuntimeRows);
 
@@ -1926,6 +1929,9 @@ class DataLayer
                 $alarmRows,
                 $receiptRows,
                 $offsetRows,
+                $materialRows,
+                $genealogyRows,
+                $handoverRows,
             ]),
             'downtime_events' => $this->extractMetadataRows($downtimeRows),
             'maintenance_requests' => $this->extractMetadataRows($maintenanceRows),
@@ -1937,9 +1943,12 @@ class DataLayer
             'machine_alarm_events' => $this->extractMetadataRows($alarmRows),
             'nc_download_receipts' => $this->extractMetadataRows($receiptRows),
             'mes_tool_preset_offsets' => $this->extractMetadataRows($offsetRows),
+            'material_consumption' => $this->extractMetadataRows($materialRows),
+            'part_genealogy' => $this->extractMetadataRows($genealogyRows),
+            'shift_handover' => $this->extractMetadataRows($handoverRows),
         ];
 
-        if ($this->storeCollectionCount($store, ['connector_feeds', 'machine_signals', 'progress_reports', 'tooling_status']) === 0) {
+        if ($this->storeCollectionCount($store, ['connector_feeds', 'machine_signals', 'progress_reports', 'tooling_status', 'material_consumption', 'part_genealogy', 'shift_handover']) === 0) {
             throw new RuntimeException('runtime_mes_pg_empty');
         }
 

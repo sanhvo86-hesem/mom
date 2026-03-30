@@ -158,6 +158,30 @@ var EXCEPTION_TYPES = [
     page: 'mes'
   },
   {
+    key: 'material_genealogy_gaps',
+    icon: '🧬',
+    accent: '#ea580c',
+    surface: '#fff7ed',
+    border: '#fdba74',
+    labelVi: 'Genealogy vật liệu chưa kín',
+    labelEn: 'Material genealogy gaps',
+    descVi: 'Bản ghi issue vật liệu hoặc genealogy thành phẩm chưa khép kín theo WO đã hoàn thành.',
+    descEn: 'Material issue and finished-part genealogy records are not yet closed for completed WO.',
+    page: 'mes'
+  },
+  {
+    key: 'shift_handover_gaps',
+    icon: '🔄',
+    accent: '#0f766e',
+    surface: '#ecfeff',
+    border: '#99f6e4',
+    labelVi: 'Bàn giao ca chưa hoàn tất',
+    labelEn: 'Shift handover gaps',
+    descVi: 'Máy hoặc WO đang hoạt động nhưng chưa có bàn giao ca hợp lệ hoặc chưa được xác nhận đúng hạn.',
+    descEn: 'Active machines or WO still need a valid shift handover or overdue acknowledgement.',
+    page: 'mes'
+  },
+  {
     key: 'connector_governance_gaps',
     icon: '\ud83d\udd0c',
     accent: '#2563eb',
@@ -191,6 +215,18 @@ var EXCEPTION_TYPES = [
     labelEn: 'Active machine alarms',
     descVi: 'Máy đang giữ alarm nóng cần xử lý theo playbook trước khi tiếp tục chạy WO.',
     descEn: 'Machines currently hold active alarms that should be worked through governed playbooks before WO execution continues.',
+    page: 'mes'
+  },
+  {
+    key: 'alarm_ack_gaps',
+    icon: '🧯',
+    accent: '#be123c',
+    surface: '#fff1f2',
+    border: '#fda4af',
+    labelVi: 'Alarm chờ xác nhận',
+    labelEn: 'Alarm acknowledgement gaps',
+    descVi: 'Alarm đã lên nhưng chưa được acknowledge, escalation hoặc clear đúng hạn theo playbook.',
+    descEn: 'Raised alarms still need acknowledgement, escalation, or governed clearing within the playbook window.',
     page: 'mes'
   },
   {
@@ -400,7 +436,7 @@ function buildShell(){
     '        <button type="button" class="excx-btn secondary" onclick="window._excRefreshNow()">\ud83d\udd04 ' + esc(t('Làm mới', 'Refresh')) + '</button>',
     '      </div>',
     '      <div class="excx-facts">',
-    '        <span class="excx-fact">\u26a0\ufe0f ' + esc(t('7 nhóm ngoại lệ chuẩn', '7 governed exception groups')) + '</span>',
+    '        <span class="excx-fact">\u26a0\ufe0f ' + esc(EXCEPTION_TYPES.length + ' ' + t('nhóm ngoại lệ chuẩn', 'governed exception groups')) + '</span>',
     '        <span class="excx-fact">\ud83d\udce5 ' + esc(t('Xuất CSV tức thời', 'Instant CSV export')) + '</span>',
     '        <span class="excx-fact">\ud83d\udd01 ' + esc(t('Tự làm mới mỗi 5 phút', 'Auto refresh every 5 minutes')) + '</span>',
     '      </div>',
@@ -451,7 +487,7 @@ function renderSummary(){
     total += count;
     if (count > 0) activeGroups += 1;
   });
-  highPriority = Number(state.summary.overdue_allocations || 0) + Number(state.summary.wo_missing_evidence || 0) + Number(state.summary.program_mismatches || 0) + Number(state.summary.program_release_risk || 0) + Number(state.summary.tool_readiness_risk || 0) + Number(state.summary.operator_qualification_gaps || 0) + Number(state.summary.material_trace_gaps || 0) + Number(state.summary.connector_governance_gaps || 0) + Number(state.summary.adapter_governance_risk || 0) + Number(state.summary.alarm_hotspots || 0) + Number(state.summary.nc_download_mismatches || 0) + Number(state.summary.tool_offset_risk || 0) + Number(state.summary.launch_blocker_hotspots || 0) + Number(state.summary.shadow_sync_failures || 0) + Number(state.summary.primary_read_fallbacks || 0) + Number(state.summary.downtime_governance_gaps || 0) + Number(state.summary.overdue_orders || 0);
+  highPriority = Number(state.summary.overdue_allocations || 0) + Number(state.summary.wo_missing_evidence || 0) + Number(state.summary.program_mismatches || 0) + Number(state.summary.program_release_risk || 0) + Number(state.summary.tool_readiness_risk || 0) + Number(state.summary.alarm_ack_gaps || 0) + Number(state.summary.operator_qualification_gaps || 0) + Number(state.summary.material_trace_gaps || 0) + Number(state.summary.material_genealogy_gaps || 0) + Number(state.summary.shift_handover_gaps || 0) + Number(state.summary.connector_governance_gaps || 0) + Number(state.summary.adapter_governance_risk || 0) + Number(state.summary.alarm_hotspots || 0) + Number(state.summary.nc_download_mismatches || 0) + Number(state.summary.tool_offset_risk || 0) + Number(state.summary.launch_blocker_hotspots || 0) + Number(state.summary.shadow_sync_failures || 0) + Number(state.summary.primary_read_fallbacks || 0) + Number(state.summary.downtime_governance_gaps || 0) + Number(state.summary.overdue_orders || 0);
   var nextPage = highPriority > 0 ? t('MES / Chứng cứ', 'MES / Evidence') : (activeGroups > 0 ? t('Đơn hàng', 'Orders') : t('Ổn định', 'Stable'));
   var totalEl = state.container.querySelector('#excx-total');
   var groupsEl = state.container.querySelector('#excx-groups');
