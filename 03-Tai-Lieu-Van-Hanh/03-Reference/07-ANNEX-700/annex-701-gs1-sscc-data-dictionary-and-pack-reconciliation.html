@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANNEX-701 — Từ điển dữ liệu GS1/SSCC, quy tắc cấp mã và đối soát kiện hàng | HESEM QMS</title>
+<title>ANNEX-701 — Từ điển dữ liệu GS1/SSCC và điều kiện đối soát kiện hàng | HESEM QMS</title>
 <link rel="stylesheet" href="../../../assets/style.css">
 <style>
 
@@ -51,25 +51,25 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
  <span>Tài liệu vận hành • Annex</span>
  </div>
  </div>
- <div class="title"><strong>ANNEX-701 — Từ điển dữ liệu GS1/SSCC, quy tắc cấp mã và đối soát kiện hàng</strong></div>
+ <div class="title"><strong>ANNEX-701 — Từ điển dữ liệu GS1/SSCC và điều kiện đối soát kiện hàng</strong></div>
  <div class="meta">
- <div class="row"><span><b>Code:</b></span><span>ANNEX-701</span></div>
- <div class="row"><span><b>Version:</b></span><span>V1</span></div>
- <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
- <div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Logistics and Shipping Function (Bo phan Logistics va Giao van)"><span class="entity-code dept-code">D-LOG</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div>
- <div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
+ <div class="row"><span><b>Mã:</b></span><span>ANNEX-701</span></div>
+ <div class="row"><span><b>Phiên bản:</b></span><span>V1</span></div>
+ <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+ <div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Logistics and Shipping Function (Bo phan Logistics va Giao van)"><span class="entity-code dept-code">D-LOG</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div>
+ <div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
  </div>
  </div>
  <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi cấp PackID/SSCC, in nhãn hậu cần, tách / chia/gộp / hợp nhất kiện, in lại/void nhãn, và đối soát trước xác nhận giao hàng (xác nhận giao hàng).</div>
- <h1>ANNEX-701 — Từ điển dữ liệu GS1/SSCC, quy tắc cấp mã và đối soát kiện hàng</h1>
+ <h1>ANNEX-701 — Từ điển dữ liệu GS1/SSCC và điều kiện đối soát kiện hàng</h1>
  
 <div class="section"><h2>1. Mục đích và nguyên tắc điều khiển dữ liệu</h2>
-<p>ANNEX này giữ toàn bộ quy tắc dữ liệu cho PackID và SSCC. Mọi vận hành in nhãn, quét, in lại, void, tách / chia/gộp / hợp nhất và đối soát kiện hàng phải bám đúng Annex này. Dữ liệu hậu cần không được tự chế ngoài hệ thống.</p>
+<p>ANNEX này giữ toàn bộ định nghĩa dữ liệu, trạng thái và điều kiện chuyển tiếp cho PackID và SSCC. Tài liệu này khóa nghĩa dữ liệu hậu cần và điều kiện đối soát; thao tác hiện trường để in nhãn, quét, in lại, void, tách / chia/gộp / hợp nhất và phát hành giao hàng phải theo WI đã ban hành. Dữ liệu hậu cần không được tự chế ngoài hệ thống.</p>
 <p>SSCC (AI 00) là chuỗi 18 chữ số duy nhất cho từng đơn vị hậu cần. Nhãn logistic HESEM hiện dùng GS1-128; vị trí dán nhãn và xác minh chất lượng mã phải bám guideline GS1, spec nhãn đã phát hành và quy trình phê duyệt nội bộ, không suy đoán limit ngoài nguồn đã khóa.</p>
 <div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Duy trì SSCC duy nhất cho từng pack, chỉ giao hàng khi ReconciliationStatus không ở trạng thái ĐÃ CHẶN và chỉnh PackID hoặc SSCC bằng dữ liệu hệ thống đã kiểm soát, không sửa tay trên nhãn.</div></div>
 
 <div class="section"><h2>2. Từ điển dữ liệu bắt buộc</h2>
-<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Field</th><th>Bắt buộc</th><th>Nguồn dữ liệu chuẩn</th><th>Quy tắc</th></tr></thead><tbody>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trường dữ liệu</th><th>Bắt buộc</th><th>Nguồn dữ liệu chuẩn</th><th>Quy tắc</th></tr></thead><tbody>
 <tr><td>PackID</td><td>Có</td><td>Epicor/WHS giao dịch</td><td>Duy nhất trong lô giao hàng scope; không đổi sau xác nhận giao hàng.</td></tr>
 <tr><td>SSCC (AI 00)</td><td>Có khi dùng hậu cần label</td><td>Dịch vụ cấp mã được kiểm soát</td><td>18 số, kiểm tra chữ số hợp lệ, duy nhất toàn cục trong vòng đời quản lý của công ty.</td></tr>
 <tr><td>Lô giao hàng / Đơn hàng / Phát hành</td><td>Có</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-epicor-handbook.html" title="ERP Administration Function (Bo phan quan tri ERP)"><span class="entity-code dept-code">D-ERP</span></a></span></td><td>Phải khớp ship-to, hóa đơn / bảng kê-to, điều kiện giao hàng.</td></tr>
@@ -82,7 +82,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>ReconciliationStatus</td><td>Có</td><td>Người xác nhận logic</td><td>PASS / FAIL / ĐÃ CHẶN. ĐÃ CHẶN chặn xác nhận giao hàng.</td></tr>
 </tbody></table></div></div>
 
-<div class="section"><h2>3. Trạng thái và sự kiện vòng đời PackID / SSCC</h2>
+<div class="section"><h2>3. Từ điển trạng thái và sự kiện vòng đời PackID / SSCC</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Sự kiện dữ liệu</th><th>Trạng thái tạo ra</th><th>Quy tắc dictionary bắt buộc</th><th>Chặn chuyển tiếp khi</th></tr></thead><tbody>
 <tr><td>Cấp mã</td><td>PackID/SSCC đã phát sinh</td><td>PackID được tạo trong giao dịch đã phê duyệt. SSCC chỉ được cấp cho đơn vị hậu cần thực sự tồn tại; không cấp mã dự trữ để dán sau.</td><td>Thiếu giao dịch gốc, thiếu đơn vị vật lý hoặc số kiểm tra SSCC không hợp lệ.</td></tr>
 <tr><td>In và quét xác nhận</td><td>Nhãn sẵn sàng dùng</td><td>Sau in phải có xác nhận cú pháp AI, đúng PackID và đúng bối cảnh lô giao hàng.</td><td>Nhãn không đọc được, đọc sai AI, sai PackID hoặc sai lô giao hàng.</td></tr>
@@ -90,7 +90,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>In lại / void</td><td>Log thay thế nhãn</td><td>Mỗi in lại/void phải có lý do code, approver và dấu vết tới nhãn cũ.</td><td>Không có lý do code, thiếu approver hoặc thay đổi dữ liệu gốc chưa được phê duyệt.</td></tr>
 <tr><td>Xác nhận giao hàng</td><td>Pack được phép ship</td><td>Chỉ cho phép khi PacketComplete = PASS, ReconciliationStatus = PASS và không còn hold mở.</td><td>Thiếu hồ sơ, còn hold hoặc trạng thái đối soát chưa PASS.</td></tr>
 </tbody></table></div>
-<p>Thao tác hiện trường để in, quét, khóa pack và phát hành ship thực hiện theo WI đã phát hành cho tuyến giao hàng tương ứng. ANNEX này chỉ giữ nghĩa dữ liệu, trạng thái và điều kiện chuyển tiếp.</p></div>
+<p>Thao tác hiện trường để in, quét, khóa pack và phát hành ship thực hiện theo <a href="../../02-Work-Instructions/02-WI-200/wi-205-barcode-labeling-and-scan-to-action.html">WI-205</a>, <a href="../../02-Work-Instructions/02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a> hoặc WI đã phát hành cho tuyến giao hàng tương ứng. ANNEX này chỉ giữ nghĩa dữ liệu, trạng thái và điều kiện chuyển tiếp.</p></div>
 
 <div class="section"><h2>4. Quy tắc đối soát kiện hàng</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hạng mục đối soát</th><th>đạt khi</th><th>CHẶN khi</th></tr></thead><tbody>
@@ -100,7 +100,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Evidence đối soát</td><td>CoC/cert/đóng gói bảng kiểm/ảnh kiện đầy đủ khi áp dụng</td><td>Thiếu hồ sơ bắt buộc hoặc link hỏng</td></tr>
 <tr><td>Trạng thái đối soát</td><td>Không còn hold, không còn nghi ngờ chưa xử lý</td><td>Có hold mở hoặc vấn đề chưa disposition</td></tr>
 </tbody></table></div>
-<p>Chi tiết đóng gói vật lý và label layout xem <a href="annex-702-packaging-labeling-spec.html">ANNEX-702</a>. Hướng dẫn vận hành tại Point-of-use sẽ theo WI phê duyệt giao hàng (ship phát hành) tương ứng.</p></div>
+<p>Chi tiết đóng gói vật lý và label layout xem <a href="annex-702-packaging-labeling-spec.html">ANNEX-702</a>. Hướng dẫn vận hành tại Point-of-use sẽ theo <a href="../../02-Work-Instructions/02-WI-200/wi-205-barcode-labeling-and-scan-to-action.html">WI-205</a>, <a href="../../02-Work-Instructions/02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a> hoặc WI phê duyệt giao hàng tương ứng.</p></div>
 
 <div class="section"><h2>5. Ngoại lệ bắt buộc phải có phê duyệt</h2>
 <ul class="tight" style="padding-left:20px; margin:8px 0;">
@@ -114,7 +114,8 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="annex-702-packaging-labeling-spec.html">ANNEX-702</a></td><td>Đóng gói spec, label layout, clean pack và bảo quản.</td></tr>
 <tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-205-barcode-labeling-and-scan-to-action.html">WI-205</a></td><td>mã vạch nội bộ, scan-to-hành động và quản lý label trong phân xưởng.</td></tr>
-<tr><td><a href="../01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></td><td>Field sơ đồ ánh xạ của hệ thống số.</td></tr>
+<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a></td><td>Thao tác phát hành giao hàng, dán nhãn SSCC và đối soát kiện hàng trước ship.</td></tr>
+<tr><td><a href="../01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></td><td>Sơ đồ trường dữ liệu của hệ thống số.</td></tr>
 <tr><td><a href="../01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a></td><td>Offline phương án dự phòng kit.</td></tr>
 <tr><td><a href="../06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a></td><td>Mức hồ sơ bắt buộc theo QPL.</td></tr>
 </tbody></table></div></div>

@@ -59,6 +59,22 @@ Sources:
 - https://store-us.semi.org/products/f10500-semi-f105-guide-for-metallic-material-compatibility-in-gas-distribution-systems
 - https://www.semi.org/sites/semi.org/files/2023-12/CompilationTerms1023.pdf
 
+10. IAQG official forms page still points organizations to the controlled AS9102 form set, reinforcing that FAI packages should preserve the 3-form logic even when a company adapts its own released template.
+Sources:
+- https://iaqg.org/standards/forms/
+
+11. GS1 official support guidance confirms GS1-128 remains the main barcode carrier used in transport and logistics because it can encode SSCC and other logistics AIs in one scannable label.
+Source:
+- https://support.gs1.org/support/solutions/articles/43000734407-what-is-the-main-use-of-gs1-128-barcode-in-gs1-transport-logistics-sector-
+
+12. Balanced Scorecard Institute public KPI guidance reinforces that KPI dictionaries should define ownership, formula, target, data source and review cadence explicitly instead of stopping at a KPI name list.
+Source:
+- https://balancedscorecard.org/wp-content/uploads/2023/06/Overview-KPI-Essentials-Webinar-for-Summit-Handouts.pdf
+
+13. ISO/IAF Auditing Practices Group guidance on policy, objectives and management review reinforces that management-review inputs must be traceable to objectives, performance trends and action follow-up; dashboard packs therefore need owner, source and decision-ready commentary rather than charts alone.
+Source:
+- https://committee.iso.org/files/live/sites/tc176/files/documents/ISO%209001%20Auditing%20Practices%20Group%20docs/Auditing%20to%20ISO%209001%202015/APG-PolicyObjectivesManagementReview2015.pdf
+
 ## Repo-level implications
 
 - WI phai chia ro theo user va context, khong lap lai SOP governance.
