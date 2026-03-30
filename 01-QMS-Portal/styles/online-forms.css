@@ -1223,6 +1223,74 @@ textarea.ec-dialog-input {
   background: var(--ec-bg);
 }
 
+.ec-retention {
+  margin-top: 18px;
+  border: 1px solid var(--ec-border);
+  border-radius: 20px;
+  background: linear-gradient(180deg, #fff 0%, #fbfdff 100%);
+  overflow: hidden;
+}
+.ec-retention-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--ec-border);
+  background: #f8fafc;
+}
+.ec-retention-head strong {
+  display: block;
+  font-size: 14px;
+  color: var(--ec-text);
+}
+.ec-retention-head p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--ec-text-muted);
+}
+.ec-retention-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 14px 16px 16px;
+}
+.ec-retention-grid.editor {
+  padding: 0;
+}
+.ec-retention-cell {
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--ec-border);
+  background: var(--ec-bg);
+}
+.ec-retention-cell.full {
+  grid-column: 1 / -1;
+}
+.ec-retention-cell small {
+  display: block;
+  font-size: 11px;
+  color: var(--ec-text-muted);
+}
+.ec-retention-cell strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ec-text);
+}
+.ec-retention-editor {
+  padding: 0 16px 16px;
+  border-top: 1px solid var(--ec-border);
+}
+.ec-retention-actions {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .ec-field-locked .ec-input,
 .ec-field-locked .ec-select,
 .ec-field-locked .ec-textarea {
@@ -1279,6 +1347,7 @@ textarea.ec-dialog-input {
   .ec-board-hero,
   .ec-board-grid,
   .ec-board-toolbar,
+  .ec-retention-grid,
   .ec-related-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
@@ -1294,7 +1363,9 @@ textarea.ec-dialog-input {
   .ec-allocate-grid { grid-template-columns: 1fr; }
   .ec-related-head,
   .ec-related-top,
-  .ec-related-actions { flex-direction: column; }
+  .ec-related-actions,
+  .ec-retention-head,
+  .ec-retention-actions { flex-direction: column; }
 }
 @media (max-width: 480px) {
   .ec-signatures { grid-template-columns: 1fr; }

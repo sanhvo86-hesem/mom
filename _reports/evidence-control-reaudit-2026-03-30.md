@@ -75,6 +75,11 @@ Primary affected files in the DOCX backlog:
   - completion evidence check
   - effectiveness review window check
   - status gate for closeout
+- Added retention card directly in the workspace:
+  - retention period by record type
+  - retention trigger and due date
+  - legal hold state and reason
+  - manager-side policy editing for the current record type
 - Added export action for evidence pack directly in workspace.
 - Strengthened context lock:
   - locked fields now render with read-only/disabled attributes
@@ -107,6 +112,8 @@ Primary affected files in the DOCX backlog:
 - Added persisted `evidence_links` storage in allocation data with bidirectional enrichment.
 - Added audit-log entries that do not mutate workflow status.
 - Added CAPA effectiveness evaluation helper + explicit `capa_effectiveness_evaluate` endpoint.
+- Added server-backed retention policy store and evaluation helpers.
+- Added `evidence_retention_status`, `evidence_retention_policy_save`, and `evidence_retention_hold`.
 - `upload_exception_queue` now supports:
   - `status`
   - `date_from`
@@ -137,6 +144,8 @@ Implemented or materially addressed from the 75-task DOCX:
   - still not auto-linked from business rules
 - `#5` CAPA effectiveness verification
   - approval-stage checklist + workspace visibility done
+- `#6` Retention policy management
+  - server-backed retention policy, workspace card, legal hold, and per-record-type policy edit done
 - `#7` Quarantine resolution UI
 - `#8` Duplicate check UI before allocation
 - `#11` Context fields locked after allocation
@@ -181,6 +190,7 @@ Implemented or materially addressed from the 75-task DOCX:
 - Baseline evidence pack export
 - Bidirectional related-record linking across allocations
 - CAPA effectiveness closeout gate
+- Retention policy and legal-hold control inside evidence workspace
 - Draft persistence to local + server
 - Order linking
 - Quarantine verification / accept / reject UI
@@ -195,8 +205,8 @@ Implemented or materially addressed from the 75-task DOCX:
   manual bidirectional linking exists, but no rule-based auto-linking from shared customer/order/part/CAPA context yet
 - CAPA effectiveness orchestration:
   approval gate exists, but there is no separate due-date scheduler, reminder, or management dashboard for overdue effectiveness review
-- Retention/disposition:
-  no record-type retention clock, legal hold, or disposition workflow
+- Retention/disposition automation:
+  retention policy and legal hold now exist, but there is still no automated purge queue, disposition approval workflow, or notification engine
 - Training auto-link:
   no document-revision-triggered training assignment
 - Parallel approval / bulk actions:
@@ -216,17 +226,17 @@ From the official and market references above, advanced systems consistently req
 
 - Audit v1 baseline: approximately `2/10`
 - Claude v2 checkpoint: approximately `6/10`
-- Current implemented HESEM state: approximately `8/10`
+- Current implemented HESEM state: approximately `8.5/10`
 
 Reasoning:
 
 - The operational frontend/backoffice loop is now substantially more usable.
 - The most important governance features now exist in some form.
-- The largest remaining gap is now the backend operating model for SLA, retention, automated training linkage, and a true PDF dossier/export pipeline.
+- The largest remaining gap is now the backend operating model for SLA escalation, automated training linkage, parallel approval, and a true PDF dossier/export pipeline.
 
 ## Recommended Next Steps
 
 1. Build persisted SLA policy + overdue/escalation backend.
-2. Add retention/disposition policy by record type.
+2. Add parallel approval mode for the forms that need multiple approvers.
 3. Upgrade evidence pack export from ZIP baseline to compiled PDF dossier / release packet.
 4. Add rule-based auto-linking and training-trigger integration on top of the new `evidence_links` model.

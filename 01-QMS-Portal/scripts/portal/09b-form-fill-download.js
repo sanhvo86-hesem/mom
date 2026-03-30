@@ -64,7 +64,10 @@ var ws = {
   checklistLoading: {},
   relatedCache: {},
   relatedLoading: {},
-  relatedSearch: {}
+  relatedSearch: {},
+  retentionCache: {},
+  retentionLoading: {},
+  retentionEditor: {}
 };
 
 /* ── Data helpers ── */
@@ -375,6 +378,150 @@ function renderRelatedRecords(allocation){
   '</section>';
 }
 
+function retentionEditorState(allocation){
+  var key = allocation && allocation.allocation_id ? allocation.allocation_id : '__none__';
+  if(!ws.retentionEditor[key]){
+    ws.retentionEditor[key] = {
+      years: 5,
+      trigger: 'approved',
+      disposition: 'review_before_disposal'
+    };
+  }
+  return ws.retentionEditor[key];
+}
+
+function retentionData(allocation){
+  if(!allocation || !allocation.allocation_id) return null;
+  return ws.retentionCache[allocation.allocation_id] || null;
+}
+
+function formatLocalDateTime(value, includeTime){
+  if(!value) return '—';
+  try{
+    var locale = (typeof lang !== 'undefined' && lang === 'en') ? 'en-US' : 'vi-VN';
+    var options = includeTime === false ? { dateStyle:'medium' } : { dateStyle:'medium', timeStyle:'short' };
+    return new Intl.DateTimeFormat(locale, options).format(new Date(value));
+  }catch(_err){
+    return String(value || '—');
+  }
+}
+
+function retentionTriggerLabel(trigger){
+  var map = {
+    approved: t('Ngày phê duyệt', 'Approval date'),
+    received: t('Ngày tiếp nhận', 'Receipt date'),
+    submitted: t('Ngày nộp', 'Submission date'),
+    created: t('Ngày tạo', 'Created date'),
+    updated: t('Ngày cập nhật', 'Updated date')
+  };
+  return map[String(trigger || '').toLowerCase()] || String(trigger || '—');
+}
+
+function retentionDispositionLabel(action){
+  var map = {
+    review_before_disposal: t('Xem xét trước khi tiêu hủy', 'Review before disposal'),
+    archive_only: t('Chỉ lưu archive, không tiêu hủy tự động', 'Archive only')
+  };
+  return map[String(action || '').toLowerCase()] || String(action || '—');
+}
+
+function retentionStatusMeta(retention){
+  var state = String(retention && retention.state || '').toLowerCase();
+  if(state === 'on_hold') return { tone:'info', label:t('Đang legal hold', 'On legal hold') };
+  if(state === 'due_for_disposition') return { tone:'fail', label:t('Đến hạn xử lý', 'Due for disposition') };
+  if(state === 'due_soon') return { tone:'warn', label:t('Sắp đến hạn', 'Due soon') };
+  return { tone:'pass', label:t('Đang lưu giữ', 'Active retention') };
+}
+
+function loadRetentionStatus(allocation, force){
+  if(!allocation || !allocation.allocation_id) return Promise.resolve(null);
+  var key = allocation.allocation_id;
+  if(!force && ws.retentionCache[key]) return Promise.resolve(ws.retentionCache[key]);
+  if(ws.retentionLoading[key]) return ws.retentionLoading[key];
+  ws.retentionLoading[key] = api('evidence_retention_status', { allocation_id:key }, 'GET').then(function(resp){
+    var cached = {
+      retention: resp && resp.ok ? (resp.retention || null) : null,
+      canManage: !!(resp && resp.can_manage),
+      error: resp && resp.ok ? '' : t('Không thể tải trạng thái lưu giữ.', 'Could not load retention status.')
+    };
+    ws.retentionCache[key] = cached;
+    if(cached.retention && cached.retention.policy){
+      var editor = retentionEditorState(allocation);
+      editor.years = Number(cached.retention.policy.retention_years || 5) || 5;
+      editor.trigger = cached.retention.policy.retention_trigger || 'approved';
+      editor.disposition = cached.retention.policy.disposition_action || 'review_before_disposal';
+    }
+    return cached;
+  }).catch(function(){
+    ws.retentionCache[key] = {
+      retention: null,
+      canManage: false,
+      error: t('Không thể tải trạng thái lưu giữ.', 'Could not load retention status.')
+    };
+    return ws.retentionCache[key];
+  }).finally(function(){
+    delete ws.retentionLoading[key];
+  });
+  return ws.retentionLoading[key];
+}
+
+function renderRetentionCard(form, allocation){
+  void form;
+  if(!allocation || !allocation.allocation_id) return '';
+  var data = retentionData(allocation);
+  if(!data){
+    return '<section class="ec-retention"><div class="ec-retention-head"><strong>' + esc(t('Lưu giữ hồ sơ', 'Record retention')) + '</strong><span>' + esc(t('Đang tải...', 'Loading...')) + '</span></div></section>';
+  }
+  if(data.error){
+    return '<section class="ec-retention"><div class="ec-retention-head"><strong>' + esc(t('Lưu giữ hồ sơ', 'Record retention')) + '</strong></div><div class="ec-inline-alert">' + esc(data.error) + '</div></section>';
+  }
+
+  var retention = data.retention || {};
+  var policy = retention.policy || {};
+  var editor = retentionEditorState(allocation);
+  var meta = retentionStatusMeta(retention);
+  var daysRemaining = retention.days_remaining;
+  var daysText = daysRemaining === null || daysRemaining === undefined
+    ? '—'
+    : (daysRemaining >= 0 ? (daysRemaining + ' ' + t('ngày', 'days')) : (Math.abs(daysRemaining) + ' ' + t('ngày quá hạn', 'days overdue')));
+
+  return '<section class="ec-retention">' +
+    '<div class="ec-retention-head">' +
+      '<div><strong>' + esc(t('Lưu giữ hồ sơ', 'Record retention')) + '</strong><p>' + esc(t('Chính sách lưu giữ và legal hold của hồ sơ này được áp dụng theo loại hồ sơ.', 'Retention policy and legal hold for this record are applied by record type.')) + '</p></div>' +
+      '<span class="ec-badge ' + meta.tone + '">' + esc(meta.label) + '</span>' +
+    '</div>' +
+    '<div class="ec-retention-grid">' +
+      '<div class="ec-retention-cell"><small>' + esc(t('Loại hồ sơ', 'Record type')) + '</small><strong>' + esc(retention.record_type || allocation.record_type || '—') + '</strong></div>' +
+      '<div class="ec-retention-cell"><small>' + esc(t('Thời hạn lưu giữ', 'Retention period')) + '</small><strong>' + esc((policy.retention_years || 0) + ' ' + t('năm', 'years')) + '</strong></div>' +
+      '<div class="ec-retention-cell"><small>' + esc(t('Mốc bắt đầu', 'Trigger event')) + '</small><strong>' + esc(retentionTriggerLabel(policy.retention_trigger || 'approved')) + '</strong></div>' +
+      '<div class="ec-retention-cell"><small>' + esc(t('Bắt đầu tính từ', 'Retention start')) + '</small><strong>' + esc(formatLocalDateTime(retention.start_at, false)) + '</strong></div>' +
+      '<div class="ec-retention-cell"><small>' + esc(t('Đến hạn xử lý', 'Disposition due')) + '</small><strong>' + esc(formatLocalDateTime(retention.due_at, false)) + '</strong></div>' +
+      '<div class="ec-retention-cell"><small>' + esc(t('Khoảng còn lại', 'Time remaining')) + '</small><strong>' + esc(daysText) + '</strong></div>' +
+      '<div class="ec-retention-cell full"><small>' + esc(t('Hướng xử lý', 'Disposition path')) + '</small><strong>' + esc(retentionDispositionLabel(policy.disposition_action || 'review_before_disposal')) + '</strong></div>' +
+      '<div class="ec-retention-cell full"><small>' + esc(t('Legal hold', 'Legal hold')) + '</small><strong>' + esc(retention.legal_hold && retention.legal_hold.active ? t('Đang giữ: ', 'On hold: ') + (retention.legal_hold.reason || '—') : t('Không có legal hold đang hoạt động', 'No active legal hold')) + '</strong></div>' +
+    '</div>' +
+    (data.canManage ? '<div class="ec-retention-editor">' +
+      '<div class="ec-retention-grid editor">' +
+        '<div><label class="ec-label" for="ec-retention-years">' + esc(t('Số năm lưu giữ', 'Retention years')) + '</label><input class="ec-input" id="ec-retention-years" type="number" min="1" max="50" value="' + esc(editor.years) + '"></div>' +
+        '<div><label class="ec-label" for="ec-retention-trigger">' + esc(t('Mốc bắt đầu tính', 'Retention trigger')) + '</label><select class="ec-select" id="ec-retention-trigger">' +
+          ['approved','received','submitted','created','updated'].map(function(option){
+            return '<option value="' + esc(option) + '"' + (editor.trigger === option ? ' selected' : '') + '>' + esc(retentionTriggerLabel(option)) + '</option>';
+          }).join('') +
+        '</select></div>' +
+        '<div><label class="ec-label" for="ec-retention-disposition">' + esc(t('Hướng xử lý', 'Disposition path')) + '</label><select class="ec-select" id="ec-retention-disposition">' +
+          ['review_before_disposal','archive_only'].map(function(option){
+            return '<option value="' + esc(option) + '"' + (editor.disposition === option ? ' selected' : '') + '>' + esc(retentionDispositionLabel(option)) + '</option>';
+          }).join('') +
+        '</select></div>' +
+      '</div>' +
+      '<div class="ec-retention-actions">' +
+        '<button type="button" class="ec-btn secondary" id="ec-retention-save">' + esc(t('Lưu chính sách', 'Save policy')) + '</button>' +
+        '<button type="button" class="ec-btn ghost" id="ec-retention-hold" data-hold-action="' + esc(retention.legal_hold && retention.legal_hold.active ? 'release' : 'set') + '">' + esc(retention.legal_hold && retention.legal_hold.active ? t('Gỡ legal hold', 'Release legal hold') : t('Đặt legal hold', 'Set legal hold')) + '</button>' +
+      '</div>' +
+    '</div>' : '') +
+  '</section>';
+}
+
 function renderEvidenceActions(allocation){
   if(!allocation || !allocation.allocation_id) return '';
   return '<div class="ec-actions"><button class="ec-btn ghost" id="ec-export-pack">' + esc(t('Xuất bộ chứng cứ', 'Export evidence pack')) + '</button></div>';
@@ -440,7 +587,7 @@ window._renderWorkspace = function(form, allocation, container){
     return preloadSelectedOnlineEntry(form, allocation);
   }).then(function(){
     renderWorkspace(form, allocation, container);
-    return Promise.all([loadChecklist(allocation), loadRelatedRecords(allocation)]);
+    return Promise.all([loadChecklist(allocation), loadRelatedRecords(allocation), loadRetentionStatus(allocation)]);
   }).then(function(){
     if(allocation) renderWorkspace(form, allocation, container);
   }).catch(function(){
@@ -588,6 +735,7 @@ function renderOnlineStep(form, allocation){
   html += renderChecklist(allocation);
   html += renderCapaEffectivenessCard(form, allocation);
   html += renderRelatedRecords(allocation);
+  html += renderRetentionCard(form, allocation);
   html += renderEvidenceActions(allocation);
 
   /* actions */
@@ -648,6 +796,7 @@ function renderOfflineStep(form, allocation){
   html += renderChecklist(allocation);
   html += renderCapaEffectivenessCard(form, allocation);
   html += renderRelatedRecords(allocation);
+  html += renderRetentionCard(form, allocation);
   html += renderEvidenceActions(allocation);
   html += renderApprovalBar(allocation);
   html += '</div></div>';
@@ -934,6 +1083,81 @@ function bindRelatedActions(form, allocation, container){
   });
 }
 
+function bindRetentionActions(form, allocation, container){
+  if(!allocation) return;
+  var data = retentionData(allocation);
+  if(!data || !data.canManage) return;
+  var state = retentionEditorState(allocation);
+
+  var yearsEl = document.getElementById('ec-retention-years');
+  if(yearsEl) yearsEl.oninput = function(){ state.years = Math.max(1, Number(yearsEl.value || 1) || 1); };
+
+  var triggerEl = document.getElementById('ec-retention-trigger');
+  if(triggerEl) triggerEl.onchange = function(){ state.trigger = triggerEl.value || 'approved'; };
+
+  var dispositionEl = document.getElementById('ec-retention-disposition');
+  if(dispositionEl) dispositionEl.onchange = function(){ state.disposition = dispositionEl.value || 'review_before_disposal'; };
+
+  var saveBtn = document.getElementById('ec-retention-save');
+  if(saveBtn) saveBtn.onclick = function(){
+    saveBtn.disabled = true;
+    api('evidence_retention_policy_save', {
+      record_type: allocation.record_type || detectRecordType(form),
+      retention_years: state.years,
+      retention_trigger: state.trigger,
+      disposition_action: state.disposition
+    }, 'POST').then(function(resp){
+      if(resp && resp.ok){
+        delete ws.retentionCache[allocation.allocation_id];
+        return loadRetentionStatus(allocation, true).then(function(){
+          toast(t('Đã lưu chính sách lưu giữ.', 'Retention policy saved.'), 'success');
+        });
+      }
+      toast(t('Không thể lưu chính sách lưu giữ.', 'Could not save retention policy.'), 'error');
+      return null;
+    }).catch(function(){
+      toast(t('Không thể lưu chính sách lưu giữ.', 'Could not save retention policy.'), 'error');
+    }).finally(function(){
+      renderWorkspace(form, allocation, container);
+      bindWorkspace(form, allocation, container);
+    });
+  };
+
+  var holdBtn = document.getElementById('ec-retention-hold');
+  if(holdBtn) holdBtn.onclick = function(){
+    var action = holdBtn.getAttribute('data-hold-action') || 'set';
+    askTextDialog({
+      title: action === 'set' ? t('Lý do legal hold', 'Legal hold reason') : t('Lý do gỡ legal hold', 'Legal hold release reason'),
+      message: action === 'set'
+        ? t('Nhập lý do giữ hồ sơ này khỏi quy trình tiêu hủy hoặc disposition.', 'Enter the reason for placing this record on legal hold.')
+        : t('Nhập lý do gỡ legal hold khỏi hồ sơ này.', 'Enter the reason for releasing legal hold for this record.'),
+      required: true,
+      multiline: true,
+      confirmLabel: action === 'set' ? t('Đặt hold', 'Set hold') : t('Gỡ hold', 'Release hold')
+    }).then(function(reason){
+      if(!reason) return null;
+      holdBtn.disabled = true;
+      return api('evidence_retention_hold', {
+        allocation_id: allocation.allocation_id,
+        action: action,
+        reason: reason
+      }, 'POST').then(function(resp){
+        if(resp && resp.ok){
+          ws.retentionCache[allocation.allocation_id] = { retention: resp.retention || null, canManage: true, error: '' };
+          toast(action === 'set' ? t('Đã đặt legal hold.', 'Legal hold set.') : t('Đã gỡ legal hold.', 'Legal hold released.'), 'success');
+        } else {
+          toast(t('Không thể cập nhật legal hold.', 'Could not update legal hold.'), 'error');
+        }
+      }).catch(function(){
+        toast(t('Không thể cập nhật legal hold.', 'Could not update legal hold.'), 'error');
+      }).finally(function(){
+        renderWorkspace(form, allocation, container);
+        bindWorkspace(form, allocation, container);
+      });
+    });
+  };
+}
+
 function bindWorkspace(form, allocation, container){
   /* step toggles */
   if(!container._ecToggleBound){
@@ -967,6 +1191,7 @@ function bindWorkspace(form, allocation, container){
     if(link.parentNode) link.parentNode.removeChild(link);
   };
   bindRelatedActions(form, allocation, container);
+  bindRetentionActions(form, allocation, container);
 
   /* online form */
   if(allocation && form.online !== false){

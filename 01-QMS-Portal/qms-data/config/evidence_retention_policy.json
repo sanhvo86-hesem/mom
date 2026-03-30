@@ -1,0 +1,65 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "updated_at": "2026-03-30T00:00:00+07:00",
+    "updated_by": "system"
+  },
+  "defaults": {
+    "retention_years": 5,
+    "retention_trigger": "approved",
+    "disposition_action": "review_before_disposal",
+    "legal_hold_allowed": true
+  },
+  "record_types": {
+    "NCR": {
+      "retention_years": 5,
+      "retention_trigger": "approved",
+      "disposition_action": "review_before_disposal"
+    },
+    "CAPA": {
+      "retention_years": 5,
+      "retention_trigger": "approved",
+      "disposition_action": "review_before_disposal"
+    },
+    "FAI": {
+      "retention_years": 10,
+      "retention_trigger": "approved",
+      "disposition_action": "review_before_disposal"
+    },
+    "TRN": {
+      "retention_years": 5,
+      "retention_trigger": "approved",
+      "disposition_action": "review_before_disposal"
+    },
+    "AUD": {
+      "retention_years": 5,
+      "retention_trigger": "approved",
+      "disposition_action": "review_before_disposal"
+    },
+    "ECR": {
+      "retention_years": 10,
+      "retention_trigger": "approved",
+      "disposition_action": "archive_only"
+    },
+    "MR": {
+      "retention_years": 10,
+      "retention_trigger": "approved",
+      "disposition_action": "archive_only"
+    },
+    "RISK": {
+      "retention_years": 5,
+      "retention_trigger": "approved",
+      "disposition_action": "review_before_disposal"
+    },
+    "CAL": {
+      "retention_years": 5,
+      "retention_trigger": "approved",
+      "disposition_action": "review_before_disposal"
+    },
+    "SCAR": {
+      "retention_years": 7,
+      "retention_trigger": "approved",
+      "disposition_action": "review_before_disposal"
+    }
+  }
+}

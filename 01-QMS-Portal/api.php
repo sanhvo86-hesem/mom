@@ -44,6 +44,7 @@ $CUSTOM_DOCS_FILE  = $CONF_DIR . '/docs_custom.json';
 $DOC_VIS_FILE     = $CONF_DIR . '/docs_visibility.json';
 $PORTAL_DISPLAY_CONFIG_FILE = $CONF_DIR . '/portal_display_config.json';
 $FORM_CONTROL_REGISTRY_FILE = $CONF_DIR . '/form_control_registry.json';
+$EVIDENCE_RETENTION_POLICY_FILE = $CONF_DIR . '/evidence_retention_policy.json';
 $ORDERS_FILE = $DATA_DIR . '/orders/orders.json';
 $MASTER_DATA_FILE = $DATA_DIR . '/master-data/master-data.json';
 $MES_RUNTIME_FILE = $DATA_DIR . '/mes/mes-runtime.json';
@@ -172,6 +173,15 @@ function admin_roles(): array {
   return ['it_admin', 'ceo', 'qa_manager',
           // Legacy names (pre-v10)
           'general_director', 'qms_supervisor', 'doc_controller'];
+}
+
+function user_has_any_role(array $user, array $roles): bool {
+  $normalized = array_map(static fn($role) => strtolower(trim((string)$role)), $roles);
+  $userRoles = is_array($user['roles'] ?? null) ? $user['roles'] : [(string)($user['role'] ?? '')];
+  foreach ($userRoles as $userRole) {
+    if (in_array(strtolower(trim((string)$userRole)), $normalized, true)) return true;
+  }
+  return false;
 }
 
 function safe_rel_path(string $p): string {
@@ -6396,7 +6406,157 @@ function load_record_type_registry(): array {
   $file = $DATA_DIR . '/config/record_type_expanded.json';
   if (!is_file($file)) return [];
   $data = json_decode((string)file_get_contents($file), true);
-  return is_array($data['record_types'] ?? null) ? $data['record_types'] : [];
+  $recordTypes = is_array($data['record_types'] ?? null) ? $data['record_types'] : [];
+  foreach ($recordTypes as $code => &$recordType) {
+    if (!is_array($recordType)) continue;
+    $recordType['retention_policy'] = evidence_retention_policy_for_type((string)$code, $recordTypes);
+  }
+  unset($recordType);
+  return $recordTypes;
+}
+
+function evidence_retention_default_store(array $recordTypes = []): array {
+  $defaults = [
+    'retention_years' => 5,
+    'retention_trigger' => 'approved',
+    'disposition_action' => 'review_before_disposal',
+    'legal_hold_allowed' => true,
+  ];
+  $overrides = [
+    'NCR' => ['retention_years' => 5, 'retention_trigger' => 'approved'],
+    'CAPA' => ['retention_years' => 5, 'retention_trigger' => 'approved'],
+    'FAI' => ['retention_years' => 10, 'retention_trigger' => 'approved'],
+    'TRN' => ['retention_years' => 5, 'retention_trigger' => 'approved'],
+    'AUD' => ['retention_years' => 5, 'retention_trigger' => 'approved'],
+    'ECR' => ['retention_years' => 10, 'retention_trigger' => 'approved'],
+    'MR' => ['retention_years' => 10, 'retention_trigger' => 'approved'],
+    'RISK' => ['retention_years' => 5, 'retention_trigger' => 'approved'],
+    'CAL' => ['retention_years' => 5, 'retention_trigger' => 'approved'],
+    'SCAR' => ['retention_years' => 7, 'retention_trigger' => 'approved'],
+  ];
+
+  if (!$recordTypes) {
+    global $DATA_DIR;
+    $file = $DATA_DIR . '/config/record_type_expanded.json';
+    if (is_file($file)) {
+      $data = json_decode((string)file_get_contents($file), true);
+      $recordTypes = is_array($data['record_types'] ?? null) ? $data['record_types'] : [];
+    }
+  }
+
+  $recordTypePolicies = [];
+  foreach ($recordTypes as $code => $recordType) {
+    $category = strtolower(trim((string)($recordType['category'] ?? '')));
+    $categoryDefaults = [];
+    if ($category === 'admin') $categoryDefaults = ['retention_years' => 10];
+    if ($category === 'engineering') $categoryDefaults = ['retention_years' => 10];
+    if ($category === 'hr') $categoryDefaults = ['retention_years' => 5];
+    $recordTypePolicies[$code] = array_merge($defaults, $categoryDefaults, $overrides[$code] ?? []);
+  }
+
+  return [
+    '_meta' => [
+      'version' => '1.0',
+      'updated_at' => now_iso(),
+      'updated_by' => 'system',
+    ],
+    'defaults' => $defaults,
+    'record_types' => $recordTypePolicies,
+  ];
+}
+
+function load_evidence_retention_policy_store(array $recordTypes = []): array {
+  global $EVIDENCE_RETENTION_POLICY_FILE;
+  if (!is_file($EVIDENCE_RETENTION_POLICY_FILE)) {
+    return evidence_retention_default_store($recordTypes);
+  }
+  $data = json_decode((string)file_get_contents($EVIDENCE_RETENTION_POLICY_FILE), true);
+  if (!is_array($data)) return evidence_retention_default_store($recordTypes);
+  $defaults = is_array($data['defaults'] ?? null) ? $data['defaults'] : [];
+  $recordTypePolicies = is_array($data['record_types'] ?? null) ? $data['record_types'] : [];
+  return [
+    '_meta' => is_array($data['_meta'] ?? null) ? $data['_meta'] : ['version' => '1.0', 'updated_at' => now_iso(), 'updated_by' => 'system'],
+    'defaults' => array_merge(evidence_retention_default_store($recordTypes)['defaults'], $defaults),
+    'record_types' => $recordTypePolicies,
+  ];
+}
+
+function save_evidence_retention_policy_store(array $store): void {
+  global $EVIDENCE_RETENTION_POLICY_FILE;
+  $store['_meta']['updated_at'] = now_iso();
+  file_put_contents($EVIDENCE_RETENTION_POLICY_FILE, json_encode($store, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), LOCK_EX);
+}
+
+function evidence_retention_policy_for_type(string $recordType, array $recordTypes = []): array {
+  $recordType = strtoupper(trim($recordType));
+  $defaultStore = evidence_retention_default_store($recordTypes);
+  $store = load_evidence_retention_policy_store($recordTypes);
+  $defaults = is_array($defaultStore['defaults'] ?? null) ? $defaultStore['defaults'] : [];
+  $baseByType = is_array($defaultStore['record_types'][$recordType] ?? null) ? $defaultStore['record_types'][$recordType] : [];
+  $savedByType = is_array($store['record_types'][$recordType] ?? null) ? $store['record_types'][$recordType] : [];
+  return array_merge($defaults, $baseByType, $savedByType, ['record_type' => $recordType]);
+}
+
+function evidence_retention_management_roles(): array {
+  return ['admin', 'it_admin', 'ceo', 'qa_manager', 'quality_manager', 'engineering_manager', 'production_manager', 'qms_engineer'];
+}
+
+function evidence_retention_can_manage(array $user): bool {
+  return user_has_any_role($user, evidence_retention_management_roles());
+}
+
+function evidence_retention_trigger_value(array $allocation, string $trigger): string {
+  $trigger = strtolower(trim($trigger));
+  $map = [
+    'approved' => (string)($allocation['approved_at'] ?? ''),
+    'received' => (string)($allocation['latest_upload_timestamp'] ?? $allocation['received_at'] ?? ''),
+    'submitted' => (string)($allocation['online_submission']['submitted_at'] ?? $allocation['submitted_at'] ?? ''),
+    'created' => (string)($allocation['created_at'] ?? ''),
+    'updated' => (string)($allocation['updated_at'] ?? ''),
+  ];
+  $candidate = trim((string)($map[$trigger] ?? ''));
+  if ($candidate !== '') return $candidate;
+  foreach (['approved', 'received', 'submitted', 'updated', 'created'] as $fallback) {
+    $value = trim((string)($map[$fallback] ?? ''));
+    if ($value !== '') return $value;
+  }
+  return '';
+}
+
+function evidence_retention_evaluate(array $allocation, array $recordTypes = []): array {
+  $recordType = strtoupper(trim((string)($allocation['record_type'] ?? '')));
+  $policy = evidence_retention_policy_for_type($recordType, $recordTypes);
+  $trigger = strtolower(trim((string)($policy['retention_trigger'] ?? 'approved')));
+  $years = max(1, (int)($policy['retention_years'] ?? 5));
+  $startRaw = evidence_retention_trigger_value($allocation, $trigger);
+  $startAt = evidence_parse_date_value($startRaw);
+  $dueAt = $startAt ? $startAt->modify('+' . $years . ' years') : null;
+  $hold = is_array($allocation['retention_hold'] ?? null) ? $allocation['retention_hold'] : [];
+  $holdActive = !empty($hold['active']);
+  $daysRemaining = null;
+  if ($dueAt) {
+    $daysRemaining = (int)floor(($dueAt->getTimestamp() - time()) / 86400);
+  }
+
+  $state = 'active';
+  if ($holdActive) $state = 'on_hold';
+  elseif ($dueAt && $daysRemaining !== null && $daysRemaining < 0) $state = 'due_for_disposition';
+  elseif ($dueAt && $daysRemaining !== null && $daysRemaining <= 90) $state = 'due_soon';
+
+  return [
+    'record_type' => $recordType,
+    'policy' => $policy,
+    'start_at' => $startAt ? $startAt->format(DateTimeInterface::ATOM) : '',
+    'due_at' => $dueAt ? $dueAt->format(DateTimeInterface::ATOM) : '',
+    'state' => $state,
+    'days_remaining' => $daysRemaining,
+    'legal_hold' => [
+      'active' => $holdActive,
+      'reason' => trim((string)($hold['reason'] ?? '')),
+      'set_at' => trim((string)($hold['set_at'] ?? '')),
+      'set_by' => trim((string)($hold['set_by'] ?? '')),
+    ],
+  ];
 }
 
 function load_form_schema_by_code(string $formCode): ?array {
@@ -15645,6 +15805,108 @@ if ($username === '') {
     ]);
   }
 
+  case 'evidence_retention_status': {
+    $me = require_logged_in($store);
+    $allocationId = trim((string)($_GET['allocation_id'] ?? $_POST['allocation_id'] ?? ''));
+    if ($allocationId === '') api_json(['ok' => false, 'error' => 'missing_allocation_id'], 400);
+
+    $recordTypes = load_record_type_registry();
+    $allocation = allocation_find(load_allocation_store(), $allocationId);
+    if (!$allocation) api_json(['ok' => false, 'error' => 'allocation_not_found'], 404);
+
+    api_json([
+      'ok' => true,
+      'allocation' => allocation_summary($allocation),
+      'retention' => evidence_retention_evaluate($allocation, $recordTypes),
+      'can_manage' => evidence_retention_can_manage($me),
+    ]);
+  }
+
+  case 'evidence_retention_policy_save': {
+    $me = require_logged_in($store);
+    require_csrf();
+    if (!evidence_retention_can_manage($me)) api_json(['ok' => false, 'error' => 'insufficient_role'], 403);
+
+    $body = read_json_body();
+    $recordType = strtoupper(trim((string)($body['record_type'] ?? '')));
+    $retentionYears = max(1, min(50, (int)($body['retention_years'] ?? 5)));
+    $retentionTrigger = strtolower(trim((string)($body['retention_trigger'] ?? 'approved')));
+    $dispositionAction = strtolower(trim((string)($body['disposition_action'] ?? 'review_before_disposal')));
+
+    if ($recordType === '') api_json(['ok' => false, 'error' => 'missing_record_type'], 400);
+    if (!in_array($retentionTrigger, ['approved', 'received', 'submitted', 'created', 'updated'], true)) {
+      api_json(['ok' => false, 'error' => 'invalid_retention_trigger'], 400);
+    }
+    if (!in_array($dispositionAction, ['review_before_disposal', 'archive_only'], true)) {
+      api_json(['ok' => false, 'error' => 'invalid_disposition_action'], 400);
+    }
+
+    $recordTypes = load_record_type_registry();
+    if (!isset($recordTypes[$recordType])) api_json(['ok' => false, 'error' => 'record_type_not_found'], 404);
+
+    $store = load_evidence_retention_policy_store($recordTypes);
+    $store['record_types'][$recordType] = array_merge(
+      evidence_retention_policy_for_type($recordType, $recordTypes),
+      [
+        'retention_years' => $retentionYears,
+        'retention_trigger' => $retentionTrigger,
+        'disposition_action' => $dispositionAction,
+      ]
+    );
+    $store['_meta']['updated_by'] = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+    save_evidence_retention_policy_store($store);
+
+    api_json([
+      'ok' => true,
+      'record_type' => $recordType,
+      'policy' => evidence_retention_policy_for_type($recordType, $recordTypes),
+    ]);
+  }
+
+  case 'evidence_retention_hold': {
+    $me = require_logged_in($store);
+    require_csrf();
+    if (!evidence_retention_can_manage($me)) api_json(['ok' => false, 'error' => 'insufficient_role'], 403);
+
+    $body = read_json_body();
+    $allocationId = trim((string)($body['allocation_id'] ?? ''));
+    $holdAction = strtolower(trim((string)($body['action'] ?? 'set')));
+    $reason = trim((string)($body['reason'] ?? ''));
+    if ($allocationId === '') api_json(['ok' => false, 'error' => 'missing_allocation_id'], 400);
+    if (!in_array($holdAction, ['set', 'release'], true)) api_json(['ok' => false, 'error' => 'invalid_action'], 400);
+    if ($reason === '') api_json(['ok' => false, 'error' => 'reason_required'], 400);
+
+    $allocationStore = load_allocation_store();
+    $allocation =& allocation_find_ref($allocationStore, $allocationId);
+    if (!is_array($allocation)) api_json(['ok' => false, 'error' => 'allocation_not_found'], 404);
+
+    $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+    if ($holdAction === 'set') {
+      $allocation['retention_hold'] = [
+        'active' => true,
+        'reason' => $reason,
+        'set_at' => now_iso(),
+        'set_by' => $username,
+      ];
+      allocation_append_audit_log($allocation, 'retention_hold_set', $username, $reason, ['hold_action' => 'set']);
+    } else {
+      $allocation['retention_hold'] = [
+        'active' => false,
+        'reason' => $reason,
+        'set_at' => now_iso(),
+        'set_by' => $username,
+      ];
+      allocation_append_audit_log($allocation, 'retention_hold_released', $username, $reason, ['hold_action' => 'release']);
+    }
+    save_allocation_store($allocationStore);
+
+    api_json([
+      'ok' => true,
+      'allocation' => $allocation,
+      'retention' => evidence_retention_evaluate($allocation, load_record_type_registry()),
+    ]);
+  }
+
   case 'evidence_pack_export': {
     require_logged_in($store);
     $allocationId = trim((string)($_GET['allocation_id'] ?? $_POST['allocation_id'] ?? ''));
@@ -15671,6 +15933,7 @@ if ($username === '') {
       'allocation_id' => $allocationId,
       'allocation' => $allocation,
       'related_records' => evidence_links_for_allocation(load_allocation_store(), $allocationId),
+      'retention' => evidence_retention_evaluate($allocation, load_record_type_registry()),
       'review_checklist' => evidence_evaluate_checklist($allocation, 'review'),
       'approval_checklist' => evidence_evaluate_checklist($allocation, 'approval'),
     ];
