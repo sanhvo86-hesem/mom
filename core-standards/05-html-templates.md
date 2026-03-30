@@ -96,11 +96,12 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </div>
 </div>
 <div class="title">
-<strong>{{CODE}} — {{TITLE}}</strong>
+<span class="doc-code">{{CODE}}</span>
+<strong class="doc-name">{{TITLE}}</strong>
 <span class="sub-vn">{{SUBTITLE}}</span>
 </div>
 <div class="meta">
-<div class="row"><span><b>Code:</b></span><span>{{CODE}}</span></div>
+<div class="row"><span><b>Code:</b></span><span class="doc-code">{{CODE}}</span></div>
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
 <div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
 <div class="row"><span><b>Chủ sở hữu:</b></span><span>{{OWNER_ROLE_HTML}}</span></div>
@@ -402,7 +403,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <span>Tài liệu vận hành &bull; Công việc Hướng dẫn</span>
 </div>
 </div>
-<div class="title"><strong>{{CODE}} — {{TITLE}}</strong></div>
+<div class="title"><span class="doc-code">{{CODE}}</span><strong class="doc-name">{{TITLE}}</strong></div>
 <div class="meta">
 <div class="row"><span><b>Code:</b></span><span>{{CODE}}</span></div>
 <div class="row"><span><b>Version:</b></span><span>V0</span></div>
@@ -544,7 +545,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </div>
 </div>
 <div class="title">
-<strong>{{CODE}} — {{TITLE}}</strong>
+<span class="doc-code">{{CODE}}</span>
+<strong class="doc-name">{{TITLE}}</strong>
 <span class="sub-vn">{{SUBTITLE}}</span>
 </div>
 <div class="meta">
@@ -853,7 +855,8 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 </div>
 </div>
 <div class="title">
-<strong>{{CODE}} — {{TITLE}}</strong>
+<span class="doc-code">{{CODE}}</span>
+<strong class="doc-name">{{TITLE}}</strong>
 <span class="sub-vn">{{SUBTITLE}}</span>
 </div>
 <div class="meta">

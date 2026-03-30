@@ -42,7 +42,7 @@ Muc tieu thuc chien:
    - subtitle bat buoc: `Tài liệu vận hành • Công việc hướng dẫn`;
    - meta labels bat buoc: `Mã`, `Phiên bản`, `Ngày hiệu lực`, `Chủ sở hữu`, `Phê duyệt`;
    - archetype `POU-WI`, `Gate-Execution WI`, `Control-Tower WI`, `Digital-Operation WI` chi o core standard, decision log va working notes.
-7. Ma tai lieu trong header phai dung hook `.doc-code` va giu chung font mono cua stylesheet dung chung; khong duoc de code tron vao title text thuong.
+7. Header WI phai tach rieng hai node: `<span class="doc-code">WI-xxx</span>` va `<strong class="doc-name">Ten tai lieu</strong>`; portal runtime khong duoc ghep lai thanh mot chuoi plain text.
 
 ---
 

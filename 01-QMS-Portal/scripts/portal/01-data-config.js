@@ -1297,7 +1297,7 @@ function refreshPortalDocsUiAfterSync(){
 
 function applyDocsTreeResponse(res, options={}){
   if(!(res && res.ok && Array.isArray(res.docs))) return null;
-  const nextDocs = Array.isArray(res.docs) ? res.docs : [];
+  const nextDocs = (Array.isArray(res.docs) ? res.docs : []).map(normalizeDocCatalogEntry);
   const nextTree = Array.isArray(res.tree) ? res.tree : [];
   const nextFingerprint = buildDocsSyncFingerprint(nextDocs, nextTree);
   let configChanged = false;
@@ -1562,19 +1562,79 @@ function deriveDocTitleFromPath(doc){
     .trim();
 }
 
+function deriveDocCodeFromPath(doc){
+  const relPath = String(doc?.path || '').split(/[?#]/)[0];
+  const base = (relPath.split('/').pop() || '').replace(/\.[^.]+$/, '');
+  if(!base) return '';
+  const match = base.match(/^((?:WI|ANNEX)-\d{3})(?:[-_]|$)/i);
+  return match ? String(match[1] || '').toUpperCase() : '';
+}
+
+function looksLikeFilenameSlugTitle(text){
+  const value = String(text || '').trim();
+  if(!value) return false;
+  if(/^(?:WI|ANNEX)-\d{3}(?:[-_\s]+[A-Z0-9]+){2,}$/i.test(value)) return true;
+  if(/^(?:WI|ANNEX)\s+\d{3}(?:[-_\s]+[A-Z0-9]+){2,}$/i.test(value)) return true;
+  if(value.includes('_')) return true;
+  return /^[A-Z0-9]+(?:[- ][A-Z0-9]+){4,}$/.test(value) && !looksLikeVietnameseText(value);
+}
+
+function normalizeDocCatalogEntry(doc){
+  const next = Object.assign({}, doc || {});
+  const originalCode = String(next.code || '').trim();
+  const normalizedCode = deriveDocCodeFromPath(next);
+  if(normalizedCode){
+    if(originalCode && originalCode.toUpperCase() !== normalizedCode){
+      next.__rawCode = originalCode;
+    }
+    next.code = normalizedCode;
+  }
+
+  const rawTitle = String(next.title || '').trim();
+  const derivedTitle = deriveDocTitleFromPath(next);
+  if(!rawTitle){
+    if(derivedTitle) next.title = derivedTitle;
+    return next;
+  }
+
+  const originalCodeForTitle = String((next.__rawCode || originalCode || next.code || '')).trim();
+  const rawTitleUpper = rawTitle.toUpperCase();
+  if(
+    looksLikeFilenameSlugTitle(rawTitle) ||
+    (originalCodeForTitle && rawTitleUpper === originalCodeForTitle.toUpperCase())
+  ){
+    next.__rawTitle = rawTitle;
+    if(derivedTitle) next.title = derivedTitle;
+  }
+
+  return next;
+}
+
+function getDocDisplayCode(doc){
+  if(!doc) return '';
+  const runtimeCode = String(doc.__displayCode || '').trim();
+  if(runtimeCode) return runtimeCode;
+  return String(doc.code || '').trim();
+}
+
 function getDocDisplayTitle(doc){
   if(!doc) return '';
+  const runtimeTitle = String(doc.__displayTitle || '').trim();
+  if(runtimeTitle) return runtimeTitle;
   const rawTitle = String(doc.title || '').trim();
-  const code = String(doc.code || '').trim();
-  const derivedTitle = deriveDocTitleFromPath(doc);
-  // SSOT rule: standard title shown in portal follows physical filename (English).
-  if(derivedTitle) return derivedTitle;
+  const code = getDocDisplayCode(doc);
   if(rawTitle && rawTitle.toUpperCase() !== code.toUpperCase()) return rawTitle;
+  const derivedTitle = deriveDocTitleFromPath(doc);
+  // Filename-derived English title is only a last-resort fallback for legacy docs
+  // that still have no controlled title metadata from the published HTML.
+  if(derivedTitle) return derivedTitle;
   return rawTitle || code;
 }
 
 function getDocDisplayDescription(doc){
   if(!doc) return '';
+  const runtimeDesc = String(doc.__displayDesc || '').trim();
+  if(runtimeDesc) return runtimeDesc;
   const explicitDesc = String(getDocDesc(doc.code) || '').trim();
   if(explicitDesc) return explicitDesc;
 

@@ -1,6 +1,6 @@
 # 11 — Hướng dẫn cấu trúc HTML chi tiết (Khi tạo mới hoặc chỉnh sửa tài liệu)
 
-> Phiên bản: v2 | Cập nhật: 2026-03-27
+> Phiên bản: v3 | Cập nhật: 2026-03-30
 > Đây là ghi chú BẮT BUỘC đọc trước khi tạo mới hoặc chỉnh sửa bất kỳ file HTML nào trong hệ thống QMS.
 
 ---
@@ -32,6 +32,13 @@
 </body>
 </html>
 ```
+
+**Rule khóa shell trang:**
+- `.page-body` phải mở ngay sau `.page` và phải chứa toàn bộ nội dung hiển thị của tài liệu, không chỉ chứa `form-header`.
+- Không được đóng `.page-body` ngay sau `form-header`. Nếu đóng sớm, các block như `note`, `h1`, `section`, `table-card`, `annex-block`, `data-operating-rule` sẽ rơi ra ngoài vùng padding chuẩn và gây tràn trang hoặc vỡ bố cục.
+- `print-disclaimer` có thể đặt sau `</div></div></div>` của `container > page > page-body`, nhưng mọi block hiển thị cho người dùng phải nằm bên trong `.page-body`.
+- `print-disclaimer` không được là con trực tiếp của `.container`. Nếu `container` còn mở tới disclaimer thì vẫn bị xem là shell lỗi và phải đóng `container` trước disclaimer.
+- Thứ tự đúng ở cuối file là: `...</nội dung> </div><!-- page-body --> </div><!-- page --> </div><!-- container --> [print-disclaimer] [script] </body>`.
 
 ---
 
@@ -91,11 +98,12 @@
     </div>
   </div>
   <div class="title">
-    <strong>{{CODE}} — {{TITLE}}</strong>
+    <span class="doc-code">{{CODE}}</span>
+    <strong class="doc-name">{{TITLE}}</strong>
     <span class="sub-vn">{{SUBTITLE}}</span>
   </div>
   <div class="meta">
-    <div class="row"><span><b>Mã:</b></span><span>{{CODE}}</span></div>
+    <div class="row"><span><b>Mã:</b></span><span class="doc-code">{{CODE}}</span></div>
     <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
     <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
     <div class="row"><span><b>Chủ sở hữu:</b></span><span>{{OWNER_ROLE_HTML}}</span></div>
@@ -105,7 +113,8 @@
 ```
 
 **Lưu ý:**
-- Logo và Title nằm **CÙNG HÀNG NGANG** (không phải stacked)
+- `doc-code` và `doc-name` là 2 node tách riêng; không được render chung thành `CODE — TITLE` trong một text node.
+- Portal/catalog/runtime không được thay `doc-code` hoặc `doc-name` bằng filename slug; nếu metadata runtime không sạch thì phải đọc lại từ header published của HTML.
 - `{{DOC_TYPE_LABEL}}` theo loại: SOP → "Tài liệu kiểm soát", WI → "Tài liệu vận hành • Hướng dẫn công việc", ANNEX → "Tài liệu vận hành • Phụ lục", JD → "Tài liệu hệ thống"
 - Meta labels hiển thị tiếng Việt: `Mã`, `Phiên bản`, `Ngày hiệu lực`, `Chủ sở hữu`, `Phê duyệt`
 - Với tài liệu chưa phát hành lần đầu, `Version` trong header luôn là `V0`

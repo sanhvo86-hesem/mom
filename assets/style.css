@@ -36,38 +36,84 @@ b, strong { font-weight: 700; }
 .page.landscape { max-width: 1160px; }
 .page-body { padding: 32px 40px 48px; }
 
-/* FORM HEADER — Logo trái + Title phải cùng hàng (CSS grid, không đổi HTML) */
+/* FORM HEADER — stable published layout for WI/ANNEX and portal sync */
 .form-header {
-  margin-bottom: 32px; border: 1px solid var(--ln); border-radius: var(--r-lg);
-  overflow: hidden; background: var(--bg);
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-rows: auto auto;
+  margin-bottom: 32px;
+  border: 1px solid var(--ln);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: var(--bg);
 }
 .fh-left {
-  grid-column: 1; grid-row: 1;
-  display: flex; align-items: center; gap: 16px;
-  padding: 18px 24px; background: var(--bg);
-  border-bottom: none; border-right: none;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 24px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--ln2);
 }
-.brand-logo img { width: 120px; height: auto; object-fit: contain; flex-shrink: 0; }
-.fh-company { display: none; }
+.brand-logo img { width: 140px; height: auto; object-fit: contain; flex-shrink: 0; }
+.fh-company { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.fh-company a {
+  color: var(--navy);
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.fh-company span {
+  color: var(--ink3);
+  font-size: 10.5px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
 .form-header .title {
-  grid-column: 2; grid-row: 1;
-  display: flex; flex-direction: column; justify-content: center;
-  padding: 14px 24px 12px 0; background: none;
-  border-bottom: none;
+  padding: 14px 24px 12px;
+  background: var(--bg);
+  border-bottom: 2px solid var(--gold);
 }
-.form-header .title strong { display: block; font-size: 17px; font-weight: 700; color: var(--navy); line-height: 1.35; }
-.form-header .title .doc-code { font-family: var(--mono); font-weight: 700; letter-spacing: .02em; white-space: nowrap; }
-.form-header .title br { display: none; }
-.form-header .title .sub-vn { display: block; font-size: 12.5px; color: var(--ink2); margin-top: 3px; }
+.form-header .title .doc-code {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--bg3);
+  border: 1px solid var(--ln);
+  color: var(--navy);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.form-header .title .doc-name {
+  display: block;
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.35;
+}
+.form-header .title .sub-vn {
+  display: block;
+  font-size: 12.5px;
+  color: var(--ink2);
+  margin-top: 4px;
+}
 .form-header .title .sub-vn:empty { display: none; }
-.form-header .title .muted { display: block; font-size: 11px; color: var(--ink3); margin-top: 4px; line-height: 1.4; }
+.form-header .title .muted {
+  display: block;
+  font-size: 11px;
+  color: var(--ink3);
+  margin-top: 4px;
+  line-height: 1.4;
+}
 .form-header .meta {
-  grid-column: 1 / -1; grid-row: 2;
-  display: flex; flex-wrap: wrap; background: var(--bg2);
-  border-top: 1px solid var(--gold);
+  display: flex;
+  flex-wrap: wrap;
+  background: var(--bg2);
 }
 .form-header .meta .row { display: flex; align-items: center; padding: 6px 16px; border-right: 1px solid var(--ln2); font-size: 11px; }
 .form-header .meta .row:last-child { border-right: none; }
@@ -75,10 +121,10 @@ b, strong { font-weight: 700; }
 .form-header .meta .row span:last-child { color: var(--ink); font-weight: 600; white-space: nowrap; }
 .form-header .meta .row .doc-code { font-family: var(--mono); font-weight: 700; letter-spacing: .02em; }
 @media screen and (max-width: 600px) {
-  .form-header { grid-template-columns: 1fr; }
-  .fh-left { grid-column: 1; justify-content: center; }
-  .form-header .title { grid-column: 1; grid-row: 2; padding: 12px 16px; text-align: center; }
-  .form-header .meta { grid-row: 3; }
+  .fh-left { justify-content: center; flex-wrap: wrap; text-align: center; }
+  .fh-company { align-items: center; }
+  .form-header .title { padding: 12px 16px; text-align: center; }
+  .form-header .title .doc-code { justify-content: center; }
 }
 
 /* TYPOGRAPHY */

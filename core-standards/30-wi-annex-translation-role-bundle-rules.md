@@ -27,7 +27,7 @@ Tai lieu nay khoa:
    - `Ngày hiệu lực`
    - `Chủ sở hữu`
    - `Phê duyệt`
-7. Ma tai lieu o header duoc giu dang code goc nhung phai render qua `.doc-code`; ten tai lieu giu font body/header chu, khong tron cung mot font code.
+7. Ma tai lieu o header duoc giu dang code goc va phai render qua `<span class="doc-code">`; ten tai lieu render qua `<strong class="doc-name">`. Khong duoc gop ma va ten vao cung mot text node.
 
 ---
 

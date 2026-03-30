@@ -1620,7 +1620,8 @@ async function openDoc(code){
 
   // Track document view
   const displayTitle = getDocDisplayTitle(doc);
-  trackPageView('doc/'+code, (isDownloadOnlyDoc(doc)?'📊 ':'📄 ')+code+' — '+displayTitle.substring(0,60));
+  const displayCode = (typeof getDocDisplayCode === 'function') ? getDocDisplayCode(doc) : String(doc.code || '').trim();
+  trackPageView('doc/'+code, (isDownloadOnlyDoc(doc)?'📊 ':'📄 ')+displayCode+' — '+displayTitle.substring(0,60));
   editMode=false;
   editingDoc=null;
   currentDoc=code;
@@ -1650,7 +1651,12 @@ async function openDoc(code){
       bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span>`;
       bcHtml += `<span style="cursor:pointer;color:var(--accent);font-weight:600" onclick="currentFolderPath=currentFolderPath.slice(0,${i+1});navigateTo('documents')">${label}</span>`;
     }
-    bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span><span style="font-weight:700">${doc.code}</span>`;
+    const safeCode = (typeof escapeHtml === 'function') ? escapeHtml(displayCode) : displayCode;
+    const safeTitle = (typeof escapeHtml === 'function') ? escapeHtml(displayTitle) : displayTitle;
+    bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span><span style="font-weight:700">${safeCode}</span>`;
+    if(displayTitle && displayTitle.toUpperCase() !== displayCode.toUpperCase()){
+      bcHtml += `<span style="color:var(--text-3);margin:0 6px">•</span><span class="current">${safeTitle}</span>`;
+    }
     bc.innerHTML = bcHtml;
     bc.style.display = 'flex';
     bc.style.alignItems = 'center';
@@ -1793,6 +1799,47 @@ function buildDocHeaderActions(doc){
   return '';
 }
 
+function applyRuntimeDocDisplayMetadata(doc, meta){
+  if(!doc || !meta) return;
+  const code = String(meta.code || '').trim().toUpperCase();
+  const title = String(meta.title || '').trim();
+  const desc = String(meta.desc || '').trim();
+  if(code) doc.__displayCode = code;
+  if(title) doc.__displayTitle = title;
+  if(desc) doc.__displayDesc = desc;
+
+  if(String(currentDoc || '') !== String(doc.code || '')) return;
+
+  try{
+    const bc = document.getElementById('header-breadcrumb');
+    if(bc){
+      const displayCode = (typeof getDocDisplayCode === 'function') ? getDocDisplayCode(doc) : String(doc.code || '').trim();
+      const displayTitle = getDocDisplayTitle(doc);
+      let bcHtml = `<span style="cursor:pointer;font-size:16px" onclick="currentFilter='ALL';currentFolderPath=[];navigateTo('documents')">🏠</span>`;
+      if(currentFilter && currentFilter !== 'ALL'){
+        const cat = CATEGORIES.find(c=>c.id===currentFilter);
+        bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span>`;
+        bcHtml += `<span style="cursor:pointer;color:var(--accent);font-weight:600" onclick="currentFolderPath=[];navigateTo('documents','${currentFilter}')">${cat?cat.icon:''} ${cat?catLabel(cat).split('(')[0].trim():currentFilter}</span>`;
+      }
+      for(let i=0; i<currentFolderPath.length; i++){
+        const seg = currentFolderPath[i];
+        const label = getSubfolderLabel(seg);
+        bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span>`;
+        bcHtml += `<span style="cursor:pointer;color:var(--accent);font-weight:600" onclick="currentFolderPath=currentFolderPath.slice(0,${i+1});navigateTo('documents')">${label}</span>`;
+      }
+      const safeCode = (typeof escapeHtml === 'function') ? escapeHtml(displayCode) : displayCode;
+      const safeTitle = (typeof escapeHtml === 'function') ? escapeHtml(displayTitle) : displayTitle;
+      bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span><span style="font-weight:700">${safeCode}</span>`;
+      if(displayTitle && displayTitle.toUpperCase() !== displayCode.toUpperCase()){
+        bcHtml += `<span style="color:var(--text-3);margin:0 6px">•</span><span class="current">${safeTitle}</span>`;
+      }
+      bc.innerHTML = bcHtml;
+    }
+  }catch(e){}
+
+  try{ updateDocViewerHeader(doc); }catch(e){}
+}
+
 function updateDocViewerHeader(doc){
   if(!doc) return;
   const cat = getCatForDoc(doc);
@@ -1828,6 +1875,7 @@ function updateDocViewerHeader(doc){
   const headerActionsHtml = headerActions
     ? `<div class="dv-action-group dv-edit-actions">${headerActions}</div>`
     : '';
+  const displayCode = (typeof getDocDisplayCode === 'function') ? getDocDisplayCode(doc) : String(doc.code || '').trim();
   const displayTitle = getDocDisplayTitle(doc);
   const displayDesc = getDocDisplayDescription(doc);
   const isWorkbook = isDownloadOnlyDoc(doc);
@@ -1871,14 +1919,14 @@ function updateDocViewerHeader(doc){
   headerEl.innerHTML = `
     <div class="dv-top">
       <div class="dv-title-area">
-        <div class="dv-code" style="color:${cat.color}">${doc.code} <span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;background:${statusColor(status)}18;color:${statusColor(status)}">${statusLabel(status)}</span></div>
+        <div class="dv-code" style="color:${cat.color}">${displayCode} <span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;background:${statusColor(status)}18;color:${statusColor(status)}">${statusLabel(status)}</span></div>
         <div class="dv-name">${displayTitle}</div>
         ${displayDesc ? `<div class="dv-desc">${displayDesc}</div>` : ''}
       </div>
     </div>
     <div class="dv-meta${docHeaderMetaCollapsed ? ' is-collapsed' : ''}">
       <div class="dv-meta-grid">
-        <div class="dv-meta-item"><span class="dv-meta-label">${T('code_label')}</span><div class="dv-meta-value"><b>${doc.code}</b></div></div>
+        <div class="dv-meta-item"><span class="dv-meta-label">${T('code_label')}</span><div class="dv-meta-value"><b>${displayCode}</b></div></div>
         <div class="dv-meta-item"><span class="dv-meta-label">${T('revision_label')}</span><div class="dv-meta-value"><b style="color:${statusColor(status)}">v${rev}</b></div></div>
         <div class="dv-meta-item"><span class="dv-meta-label">${T('type')}</span><div class="dv-meta-value"><b>${catLabel(cat)}</b></div></div>
         <div class="dv-meta-item"><span class="dv-meta-label">${T('owner')}</span><div class="dv-meta-value"><b>${(state&&state.owner)?state.owner:doc.owner}</b>${ownerEditButton}</div></div>
@@ -4100,6 +4148,15 @@ function openGitSyncReportModal(kind, res){
         gitSyncRenderSummaryCard(lang==='en'?'Before':'Trước', gitSyncShortHash(beforeHead)),
         gitSyncRenderSummaryCard(lang==='en'?'After':'Sau', gitSyncShortHash(afterHead)),
       ].join('');
+  const pullSummaryMessageBase = (() => {
+    const base = String(res && res.message || (pulled ? 'Portal updated.' : 'Already up to date.'));
+    if(!pulled && presync && presync.pushed){
+      return `${base} ${lang==='en'
+        ? 'The pre-sync section below shows server-side changes only; workstation edits appear here only after they are pushed to GitHub.'
+        : 'Phần pre-sync bên dưới chỉ hiển thị thay đổi phía server; thay đổi trên máy local chỉ xuất hiện ở đây sau khi đã đẩy lên GitHub.'}`;
+    }
+    return base;
+  })();
 
   const pullSummaryMessage = (() => {
     const base = String(res && res.message || (pulled ? 'Portal updated.' : 'Already up to date.'));

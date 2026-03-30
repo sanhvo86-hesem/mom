@@ -10,11 +10,18 @@ Every controlled HTML document should include all three runtime markers below:
 2. `id="docContent"`
 3. `<script src="../../../assets/app.js"></script>`
 
+Inside `.form-header .title`, the controlled schema is:
+
+- `<span class="doc-code">...</span>`
+- `<strong class="doc-name">...</strong>`
+
 These markers are required so the portal viewer can:
 
 - render the controlled header consistently
+- re-read `.doc-code` / `.doc-name` from the published HTML when stale runtime metadata is detected
 - extract the document body through `docContent`
 - keep document-side runtime behaviors aligned with the viewer
+- preserve document code typography without collapsing code and title into one plain-text node
 
 ## What is excluded
 

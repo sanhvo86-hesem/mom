@@ -991,10 +991,10 @@ class DocumentController extends BaseController
             '<div class="fh-left"> <a class="brand-logo" href="' . $rootHref . '"><img alt="HESEM Logo" src="https://hesem.com.vn/wp-content/uploads/hesem-logo.svg"/></a>' . "\n" .
             '<div class="fh-company"> <a href="' . $rootHref . '">HESEM ENGINEERING</a> <span>T&agrave;i li&#7879;u ki&#7875;m so&aacute;t</span> </div>' . "\n" .
             '</div>' . "\n" .
-            '<div class="title"> <strong>' . $safeCode . ' - ' . $safeTitle . '</strong><br/>' . "\n" .
+            '<div class="title"> <span class="doc-code">' . $safeCode . '</span><strong class="doc-name">' . $safeTitle . '</strong>' . "\n" .
             '<span class="sub-vn">T&agrave;i li&#7879;u m&#7899;i (Draft)</span> <span class="muted">So&#7841;n th&#7843;o n&#7897;i dung theo y&ecirc;u c&#7847;u ISO/QMS.</span> </div>' . "\n" .
             '<div class="meta">' . "\n" .
-            '<div class="row"><span><b>M&atilde;:</b></span><span>' . $safeCode . '</span></div>' . "\n" .
+            '<div class="row"><span><b>M&atilde;:</b></span><span class="doc-code">' . $safeCode . '</span></div>' . "\n" .
             '<div class="row"><span><b>Phi&ecirc;n b&#7843;n:</b></span><span>V0</span></div>' . "\n" .
             '<div class="row"><span><b>Ng&agrave;y hi&#7879;u l&#7921;c:</b></span><span>Theo quy&#7871;t &#273;&#7883;nh ban h&agrave;nh</span></div>' . "\n" .
             '<div class="row"><span><b>Ch&#7911; s&#7903; h&#7919;u:</b></span><span>' . $safeOwner . '</span></div>' . "\n" .

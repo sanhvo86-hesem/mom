@@ -1612,30 +1612,94 @@ function attachIframeViewerZoom(iframe){
   resetIframeViewerScroll(idoc);
 }
 
+function extractIframePublishedDocMetadata(idoc){
+  const meta = {code:'', title:'', desc:''};
+  if(!idoc) return meta;
+  try{
+    const codeEl = idoc.querySelector('.form-header .title .doc-code, .form-header .meta .row .doc-code');
+    const nameEl = idoc.querySelector('.form-header .title .doc-name');
+    const descEl = idoc.querySelector('.form-header .title .sub-vn, .form-header .title .sub');
+    if(codeEl) meta.code = String(codeEl.textContent || '').trim().toUpperCase();
+    if(nameEl) meta.title = String(nameEl.textContent || '').trim();
+    if(descEl) meta.desc = String(descEl.textContent || '').trim();
+
+    if((!meta.code || !meta.title)){
+      const h1Text = String((idoc.querySelector('h1')?.textContent || '')).trim();
+      const h1Match = h1Text.match(/^((?:WI|ANNEX)-\d{3})\s*(?:—|-|:)\s*(.+)$/i);
+      if(h1Match){
+        if(!meta.code) meta.code = String(h1Match[1] || '').trim().toUpperCase();
+        if(!meta.title) meta.title = String(h1Match[2] || '').trim();
+      }
+    }
+  }catch(e){}
+  return meta;
+}
+
+function ensureIframeHeaderTitleStructure(idoc, titleWrap, code, title, desc){
+  if(!idoc || !titleWrap) return;
+
+  const normalizedDesc = String(desc || '').trim();
+  const preservedMuted = Array.from(titleWrap.querySelectorAll('.muted'))
+    .map((el)=>String(el.textContent || '').trim())
+    .find(Boolean) || '';
+
+  let codeEl = titleWrap.querySelector('.doc-code');
+  let nameEl = titleWrap.querySelector('.doc-name');
+  let subEl = titleWrap.querySelector('.sub-vn, .sub');
+
+  if(!codeEl || !nameEl){
+    titleWrap.innerHTML = '';
+
+    codeEl = idoc.createElement('span');
+    codeEl.className = 'doc-code';
+    titleWrap.appendChild(codeEl);
+
+    nameEl = idoc.createElement('strong');
+    nameEl.className = 'doc-name';
+    titleWrap.appendChild(nameEl);
+
+    if(normalizedDesc){
+      subEl = idoc.createElement('span');
+      subEl.className = 'sub-vn';
+      titleWrap.appendChild(subEl);
+    }
+
+    if(preservedMuted){
+      const mutedEl = idoc.createElement('span');
+      mutedEl.className = 'muted';
+      mutedEl.textContent = preservedMuted;
+      titleWrap.appendChild(mutedEl);
+    }
+  }
+
+  if(codeEl && code){
+    codeEl.textContent = code;
+  }
+  if(nameEl){
+    nameEl.textContent = title || code || '';
+  }
+
+  if(subEl){
+    subEl.textContent = normalizedDesc;
+  }else if(normalizedDesc){
+    subEl = idoc.createElement('span');
+    subEl.className = 'sub-vn';
+    subEl.textContent = normalizedDesc;
+    titleWrap.appendChild(subEl);
+  }
+}
+
 function syncIframeDocumentHeaderMetadata(idoc, doc){
   if(!idoc || !doc) return;
   try{
-    const code = String(doc.code || '').trim();
-    const title = String((typeof getDocDisplayTitle === 'function' ? getDocDisplayTitle(doc) : (doc.title || '')) || '').trim();
-    const desc = String((typeof getDocDisplayDescription === 'function' ? getDocDisplayDescription(doc) : '') || '').trim();
-    const combinedTitle = [code, title].filter(Boolean).join(' — ');
+    const publishedMeta = extractIframePublishedDocMetadata(idoc);
+    const code = String((publishedMeta.code || (typeof getDocDisplayCode === 'function' ? getDocDisplayCode(doc) : doc.code) || '')).trim();
+    const title = String((publishedMeta.title || (typeof getDocDisplayTitle === 'function' ? getDocDisplayTitle(doc) : (doc.title || '')) || '')).trim();
+    const desc = String((publishedMeta.desc || (typeof getDocDisplayDescription === 'function' ? getDocDisplayDescription(doc) : '') || '')).trim();
 
     const titleWrap = idoc.querySelector('.form-header .title');
     if(titleWrap){
-      const strongEl = titleWrap.querySelector('strong');
-      if(strongEl && combinedTitle){
-        strongEl.textContent = combinedTitle;
-      }
-
-      const subEl = titleWrap.querySelector('.sub-vn, .sub');
-      if(subEl){
-        subEl.textContent = desc;
-      }else if(desc){
-        const createdSub = idoc.createElement('span');
-        createdSub.className = 'sub-vn';
-        createdSub.textContent = desc;
-        titleWrap.appendChild(createdSub);
-      }
+      ensureIframeHeaderTitleStructure(idoc, titleWrap, code, title, desc);
     }
 
     const codeRows = idoc.querySelectorAll('.form-header .meta .row');
@@ -1643,12 +1707,17 @@ function syncIframeDocumentHeaderMetadata(idoc, doc){
       try{
         const labelEl = row.querySelector('b');
         const valueEl = row.querySelector('span:last-child');
-        const label = String(labelEl ? labelEl.textContent : '').toLowerCase();
-        if(valueEl && /code|mã/.test(label) && code){
+        const label = String(labelEl ? labelEl.textContent : '').trim();
+        if(valueEl && /\b(code|mã)\b/i.test(label) && code){
           valueEl.textContent = code;
+          if(valueEl.classList) valueEl.classList.add('doc-code');
         }
       }catch(_e){}
     });
+
+    if(typeof applyRuntimeDocDisplayMetadata === 'function'){
+      applyRuntimeDocDisplayMetadata(doc, {code, title, desc});
+    }
   }catch(e){}
 }
 

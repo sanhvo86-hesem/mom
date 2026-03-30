@@ -25,6 +25,7 @@ META_LABELS = [
     "Chủ sở hữu:",
     "Phê duyệt:",
 ]
+
 ROW_RE = re.compile(r"<div class=\"row\">.*?</div>", re.S)
 DIV_TOKEN_RE = re.compile(r"<div\b[^>]*>|</div>", re.I)
 
@@ -46,15 +47,8 @@ def strip_tags(value: str) -> str:
     return html.unescape(re.sub(r"<.*?>", "", value)).strip()
 
 
-def parse_code_name_from_header(text: str) -> tuple[str, str] | None:
-    match = re.search(r"<div class=\"title\"><strong>(.*?)</strong></div>", text, re.S)
-    if not match:
-        return None
-    plain = re.sub(r"\s+", " ", strip_tags(match.group(1)))
-    parsed = re.match(r"^((?:WI|ANNEX)-[A-Z0-9-]+)\s*(?:—|-)\s*(.+)$", plain)
-    if not parsed:
-        return None
-    return parsed.group(1).strip(), parsed.group(2).strip()
+def normalize_spaces(value: str) -> str:
+    return re.sub(r"\s+", " ", value).strip()
 
 
 def find_balanced_div(text: str, marker: str) -> tuple[int, int, str] | None:
@@ -77,17 +71,38 @@ def find_balanced_div(text: str, marker: str) -> tuple[int, int, str] | None:
     return start, end, text[start:end]
 
 
+def parse_header_title(text: str) -> tuple[str, str] | None:
+    title_block = find_balanced_div(text, '<div class="title">')
+    if not title_block:
+        return None
+    code_match = re.search(r"<span class=\"doc-code\">(.*?)</span>", title_block[2], re.S)
+    name_match = re.search(
+        r"<strong[^>]*class=\"[^\"]*\bdoc-name\b[^\"]*\"[^>]*>(.*?)</strong>",
+        title_block[2],
+        re.S,
+    )
+    if not code_match or not name_match:
+        return None
+    code = normalize_spaces(strip_tags(code_match.group(1)))
+    name = normalize_spaces(strip_tags(name_match.group(1)))
+    if not code or not name:
+        return None
+    return code, name
+
+
 def collect_findings(path: Path) -> list[dict[str, str]]:
     text = path.read_text(encoding="utf-8", errors="ignore")
     findings: list[dict[str, str]] = []
 
     subtitle_match = re.search(
-        r"<div class=\"fh-company\">.*?<span>(.*?)</span>", text, re.S
+        r"<div class=\"fh-company\">.*?<span>(.*?)</span>",
+        text,
+        re.S,
     )
     if not subtitle_match:
         findings.append({"finding": "MISSING_SUBTITLE", "detail": "fh-company span not found"})
     else:
-        actual = re.sub(r"\s+", " ", subtitle_match.group(1).strip())
+        actual = normalize_spaces(subtitle_match.group(1))
         expected = subtitle_for(path)
         if actual != expected:
             findings.append(
@@ -97,21 +112,31 @@ def collect_findings(path: Path) -> list[dict[str, str]]:
                 }
             )
 
-    if '<span class="doc-code">' not in text:
-        findings.append(
-            {
-                "finding": "MISSING_DOC_CODE_SPAN",
-                "detail": "header title does not wrap document code with .doc-code",
-            }
-        )
-
-    if '<span class="doc-code">WI-' not in text and '<span class="doc-code">ANNEX-' not in text:
-        findings.append(
-            {
-                "finding": "MISSING_META_CODE_CLASS",
-                "detail": "meta code row does not use .doc-code class",
-            }
-        )
+    title_block = find_balanced_div(text, '<div class="title">')
+    if not title_block:
+        findings.append({"finding": "MISSING_TITLE_BLOCK", "detail": "title block not found"})
+    else:
+        if '<span class="doc-code">' not in title_block[2]:
+            findings.append(
+                {
+                    "finding": "MISSING_DOC_CODE_SPAN",
+                    "detail": "title block must contain a dedicated .doc-code span",
+                }
+            )
+        if 'class="doc-name"' not in title_block[2]:
+            findings.append(
+                {
+                    "finding": "MISSING_DOC_NAME_STRONG",
+                    "detail": "title block must contain a dedicated .doc-name strong",
+                }
+            )
+        if re.search(r"<strong[^>]*>\s*<span class=\"doc-code\">", title_block[2], re.S):
+            findings.append(
+                {
+                    "finding": "MERGED_CODE_NAME_NODE",
+                    "detail": "title block still nests .doc-code inside strong instead of separating code and name",
+                }
+            )
 
     meta_block = find_balanced_div(text, '<div class="meta">')
     rows = ROW_RE.findall(meta_block[2]) if meta_block else []
@@ -122,12 +147,12 @@ def collect_findings(path: Path) -> list[dict[str, str]]:
                 "detail": f"expected {len(META_LABELS)} rows but found {len(rows)}",
             }
         )
-    labels = []
-    for row in rows[: len(META_LABELS)]:
-        match = re.search(r"<span><b>(.*?)</b></span>", row, re.S)
-        labels.append(re.sub(r"\s+", " ", match.group(1).strip()) if match else "")
-    for index, expected in enumerate(META_LABELS[: len(labels)]):
-        actual = labels[index]
+
+    for index, expected in enumerate(META_LABELS):
+        if index >= len(rows):
+            break
+        match = re.search(r"<span><b>(.*?)</b></span>", rows[index], re.S)
+        actual = normalize_spaces(match.group(1)) if match else ""
         if actual != expected:
             findings.append(
                 {
@@ -136,11 +161,21 @@ def collect_findings(path: Path) -> list[dict[str, str]]:
                 }
             )
 
-    parsed = parse_code_name_from_header(text)
+    if rows:
+        code_row = rows[0]
+        if '<span class="doc-code">' not in code_row:
+            findings.append(
+                {
+                    "finding": "MISSING_META_CODE_CLASS",
+                    "detail": "meta code row must use .doc-code on the value span",
+                }
+            )
+
+    parsed = parse_header_title(text)
     title_match = re.search(r"<title>(.*?)</title>", text, re.S)
     if parsed and title_match:
         expected_title = f"{parsed[0]} — {parsed[1]} | HESEM QMS"
-        actual_title = re.sub(r"\s+", " ", strip_tags(title_match.group(1)))
+        actual_title = normalize_spaces(strip_tags(title_match.group(1)))
         if actual_title != expected_title:
             findings.append(
                 {
