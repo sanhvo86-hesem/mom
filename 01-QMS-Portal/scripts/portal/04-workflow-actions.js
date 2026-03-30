@@ -1552,18 +1552,46 @@ function getDocIframeDocument(iframe){
   }
 }
 
+function resetIframeViewerScroll(idoc){
+  try{
+    if(!idoc) return;
+    const scroller = idoc.scrollingElement || idoc.documentElement || idoc.body;
+    if(scroller){
+      if(typeof scroller.scrollTo === 'function') scroller.scrollTo(0, 0);
+      scroller.scrollLeft = 0;
+      scroller.scrollTop = 0;
+    }
+    if(idoc.documentElement){
+      idoc.documentElement.scrollLeft = 0;
+      idoc.documentElement.scrollTop = 0;
+    }
+    if(idoc.body){
+      idoc.body.scrollLeft = 0;
+      idoc.body.scrollTop = 0;
+    }
+  }catch(e){}
+}
+
 function applyDocViewerZoomToDocument(idoc){
   try{
     if(!idoc) return;
-    const target = idoc.body || idoc.documentElement;
-    if(!target) return;
     let styleEl = idoc.getElementById('portal-doc-viewer-zoom-style');
     if(!styleEl){
       styleEl = idoc.createElement('style');
       styleEl.id = 'portal-doc-viewer-zoom-style';
-      (idoc.head || idoc.documentElement || target).appendChild(styleEl);
+      (idoc.head || idoc.documentElement || idoc.body).appendChild(styleEl);
     }
-    styleEl.textContent = `html{overflow:auto;}body{zoom:${viewerDocZoom}% !important;}`;
+    // Keep the iframe viewer in a stable fit-to-frame mode. Using CSS zoom on the
+    // published document body was distorting layouts and causing horizontal drift
+    // in Firefox even when the source HTML itself was valid.
+    viewerDocZoom = 100;
+    styleEl.textContent = [
+      'html{overflow:auto !important; overflow-x:hidden !important;}',
+      'body{zoom:100% !important; transform:none !important; margin:0 !important; min-width:0 !important;}',
+      'body>.container{margin-left:auto !important; margin-right:auto !important; min-width:0 !important;}',
+      'body>.container>.page, body>.container>.page>.page-body{min-width:0 !important;}'
+    ].join('');
+    resetIframeViewerScroll(idoc);
   }catch(e){}
 }
 
@@ -1578,20 +1606,10 @@ function attachIframeViewerZoom(iframe){
   const idoc = getDocIframeDocument(iframe);
   if(!idoc || !idoc.documentElement) return;
   applyDocViewerZoomToDocument(idoc);
-  if(idoc.__portalViewerZoomAttached) return;
-  const wheelHandler = function(event){
-    if(!event || !event.ctrlKey) return;
-    const delta = Number(event.deltaY || 0);
-    if(!Number.isFinite(delta) || delta === 0) return;
-    event.preventDefault();
-    event.stopPropagation();
-    const nextZoom = clampViewerDocZoom(viewerDocZoom + (delta < 0 ? VIEWER_DOC_ZOOM_STEP : -VIEWER_DOC_ZOOM_STEP));
-    if(nextZoom === viewerDocZoom) return;
-    viewerDocZoom = nextZoom;
-    applyDocViewerZoomToDocument(idoc);
-  };
-  idoc.addEventListener('wheel', wheelHandler, {capture:true, passive:false});
-  idoc.__portalViewerZoomAttached = true;
+  // Do not attach custom Ctrl+wheel zoom inside controlled-document iframes.
+  // Browser-level zoom remains available, but portal must preserve stable page
+  // geometry so WI/ANNEX graphics are not deformed or shifted off-frame.
+  resetIframeViewerScroll(idoc);
 }
 
 function syncIframeDocumentHeaderMetadata(idoc, doc){
@@ -1761,9 +1779,11 @@ function loadDocContent(code){
             // cannot push table width beyond page frame.
             setTimeout(function(){
               try{ edApplyGlobalTablePolicyToDocument(idoc, {force:true, source:'view-load-late-1'}); }catch(_e){}
+              try{ resetIframeViewerScroll(idoc); }catch(_e){}
             }, 220);
             setTimeout(function(){
               try{ edApplyGlobalTablePolicyToDocument(idoc, {force:true, source:'view-load-late-2'}); }catch(_e){}
+              try{ resetIframeViewerScroll(idoc); }catch(_e){}
             }, 1200);
           }
         }catch(e){}
@@ -1773,6 +1793,7 @@ function loadDocContent(code){
         try{ scheduleIframeDocumentLanguageSync(iframe, lang); }catch(e){}
         try{ if(typeof attachIframeLinkBridge==='function') attachIframeLinkBridge(iframe, doc, viewFile); }catch(e){}
         try{ attachIframeViewerZoom(iframe); }catch(e){}
+        try{ resetIframeViewerScroll(idoc); }catch(e){}
       }catch(e){}
       if(loading) loading.style.display='none';
       iframe.style.opacity='1';
