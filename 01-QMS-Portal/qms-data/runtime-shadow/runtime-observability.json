@@ -1,0 +1,44 @@
+{
+    "_meta": {
+        "version": "1.0",
+        "updated": "2026-03-30T02:04:31+00:00",
+        "description": "Structured observability for runtime shadow sync, connector ingest, and MES governance telemetry."
+    },
+    "shadow_sync": {
+        "master_data": {
+            "last_status": "never",
+            "last_success_at": "",
+            "last_error_at": "",
+            "last_message": "",
+            "success_count": 0,
+            "failure_count": 0,
+            "recent": []
+        },
+        "orders": {
+            "last_status": "never",
+            "last_success_at": "",
+            "last_error_at": "",
+            "last_message": "",
+            "success_count": 0,
+            "failure_count": 0,
+            "recent": []
+        },
+        "mes": {
+            "last_status": "never",
+            "last_success_at": "",
+            "last_error_at": "",
+            "last_message": "",
+            "success_count": 0,
+            "failure_count": 0,
+            "recent": []
+        }
+    },
+    "connector_ingest": {
+        "totals": {
+            "success": 0,
+            "failure": 0
+        },
+        "machines": [],
+        "recent": []
+    }
+}
