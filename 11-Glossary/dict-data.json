@@ -19974,9 +19974,9 @@
     "term": "RACI",
     "meaning": "Responsible - Accountable - Consulted - Informed",
     "vi": "Ma trận phân quyền RACI",
-    "def": "Ma trận phân quyền RACI xác định vai trò Responsible/Accountable/Consulted/Informed cho hoạt động hoặc quy trình. (Responsible–Accountable–Consulted–Informed - RACI)",
-    "ctx": "Tổ trưởng/Production Control dùng khi điều hành sản xuất tại hiện trường và cập nhật tình trạng công việc trên board/ERP/MES.",
-    "rec": "Applicable SOP/WI reference; Approval/decision record (nếu có); System transaction log (ERP/MES/WMS)",
+    "def": "Ma trận RACI (hay RACI Matrix) là công cụ phân công vai trò và trách nhiệm cho từng hoạt động/quy trình, gồm 4 vai trò: R – Responsible (Người thực hiện): Cá nhân hoặc nhóm trực tiếp thực hiện công việc, nhiệm vụ — là người 'làm' thực sự, có thể có nhiều người R cho một nhiệm vụ; A – Accountable (Người chịu trách nhiệm chính / Phê duyệt): Người duy nhất chịu trách nhiệm cuối cùng về kết quả, có quyền phê duyệt hoặc từ chối công việc — mỗi nhiệm vụ chỉ có đúng một người A; C – Consulted (Người được tham vấn): Chuyên gia hoặc bên liên quan cần được hỏi ý kiến trước khi ra quyết định hoặc thực hiện — giao tiếp hai chiều; I – Informed (Người được thông báo): Người cần được thông báo kết quả hoặc tiến độ sau khi công việc hoàn thành — giao tiếp một chiều. Nguyên tắc vàng: mỗi hàng (nhiệm vụ) phải có đúng 1 A, ít nhất 1 R; tránh gán quá nhiều C/I gây nghẽn quy trình.",
+    "ctx": "Dùng trong xây dựng SOP, phân công dự án, thiết kế quy trình ISO/IATF, điều hành sản xuất (Production Control), quản lý thay đổi (ECN/ECR), và mọi hoạt động cần làm rõ 'ai làm – ai duyệt – ai tham vấn – ai cần biết'. Tổ trưởng/Production Control dùng khi điều hành sản xuất tại hiện trường và cập nhật tình trạng công việc trên board/ERP/MES.",
+    "rec": "RACI matrix trong từng SOP; Approval/decision record; Organization chart; System transaction log (ERP/MES/WMS); Meeting minutes ghi nhận phân công",
     "cat": "Operations/Planning"
   },
   {
