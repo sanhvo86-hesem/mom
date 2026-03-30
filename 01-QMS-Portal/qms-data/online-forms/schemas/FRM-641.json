@@ -96,6 +96,32 @@
     {"id": "approved_by", "type": "text", "label": "Người phê duyệt", "label_en": "Approved By", "required": false}
   ],
   "auto_fields": ["submitted_by", "submitted_at", "entry_id"],
+  "evidence_requirements": [
+    {
+      "id": "capa_action_completion",
+      "kind": "fields_present",
+      "label": "CAPA completion evidence captured",
+      "label_vi": "Bằng chứng hoàn tất CAPA đã được ghi nhận",
+      "field_ids": ["completion_date", "verification_method", "verification_result"],
+      "required_stages": ["approval"]
+    },
+    {
+      "id": "capa_effectiveness_review",
+      "kind": "capa_effectiveness",
+      "label": "CAPA effectiveness verified",
+      "label_vi": "Hiệu lực CAPA đã được kiểm tra",
+      "completion_field": "completion_date",
+      "verification_method_field": "verification_method",
+      "verification_result_field": "verification_result",
+      "effectiveness_date_field": "effectiveness_check_date",
+      "effectiveness_result_field": "effectiveness_result",
+      "status_field": "status",
+      "allowed_statuses": ["closed"],
+      "min_days_after": 30,
+      "max_days_after": 90,
+      "required_stages": ["approval"]
+    }
+  ],
   "notifications": {
     "on_overdue": ["qa_manager", "responsible_person"],
     "on_submit": ["qa_manager"]

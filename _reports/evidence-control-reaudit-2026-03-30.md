@@ -66,6 +66,15 @@ Primary affected files in the DOCX backlog:
 ### Workspace / form runtime
 
 - Added evidence checklist rendering and backend gating for submit-for-review and approval.
+- Added related-records panel directly inside the workspace:
+  - search by record ID / context
+  - bidirectional record linking
+  - open linked record in-place
+  - unlink with audit trail
+- Added CAPA effectiveness visibility and approval-stage enforcement:
+  - completion evidence check
+  - effectiveness review window check
+  - status gate for closeout
 - Added export action for evidence pack directly in workspace.
 - Strengthened context lock:
   - locked fields now render with read-only/disabled attributes
@@ -94,6 +103,10 @@ Primary affected files in the DOCX backlog:
 
 ### Backend
 
+- Added `evidence_link_list`, `evidence_link_add`, and `evidence_link_remove`.
+- Added persisted `evidence_links` storage in allocation data with bidirectional enrichment.
+- Added audit-log entries that do not mutate workflow status.
+- Added CAPA effectiveness evaluation helper + explicit `capa_effectiveness_evaluate` endpoint.
 - `upload_exception_queue` now supports:
   - `status`
   - `date_from`
@@ -119,6 +132,11 @@ Implemented or materially addressed from the 75-task DOCX:
   - partial: ZIP evidence pack baseline, not full PDF dossier
 - `#3` SLA timer
   - partial: due/overdue badge in queue, not backend escalation
+- `#4` Cross-reference linking
+  - bidirectional link store + workspace UI done
+  - still not auto-linked from business rules
+- `#5` CAPA effectiveness verification
+  - approval-stage checklist + workspace visibility done
 - `#7` Quarantine resolution UI
 - `#8` Duplicate check UI before allocation
 - `#11` Context fields locked after allocation
@@ -161,6 +179,8 @@ Implemented or materially addressed from the 75-task DOCX:
 - Duplicate-aware next-ID preview
 - Evidence completeness gate
 - Baseline evidence pack export
+- Bidirectional related-record linking across allocations
+- CAPA effectiveness closeout gate
 - Draft persistence to local + server
 - Order linking
 - Quarantine verification / accept / reject UI
@@ -171,10 +191,10 @@ Implemented or materially addressed from the 75-task DOCX:
   no persisted deadline, no escalation policy, no notification routing, no reassignment logic
 - Evidence pack export:
   not yet compiled into a customer/audit-ready PDF dossier or merged release packet
-- Cross-reference model:
-  no dedicated bidirectional NCR/CAPA/AUD/TRN/Part/WO evidence link store yet
-- CAPA effectiveness:
-  no governed effectiveness verification step with due date and objective evidence
+- Cross-reference automation:
+  manual bidirectional linking exists, but no rule-based auto-linking from shared customer/order/part/CAPA context yet
+- CAPA effectiveness orchestration:
+  approval gate exists, but there is no separate due-date scheduler, reminder, or management dashboard for overdue effectiveness review
 - Retention/disposition:
   no record-type retention clock, legal hold, or disposition workflow
 - Training auto-link:
@@ -196,17 +216,17 @@ From the official and market references above, advanced systems consistently req
 
 - Audit v1 baseline: approximately `2/10`
 - Claude v2 checkpoint: approximately `6/10`
-- Current implemented HESEM state: approximately `7/10`
+- Current implemented HESEM state: approximately `8/10`
 
 Reasoning:
 
 - The operational frontend/backoffice loop is now substantially more usable.
 - The most important governance features now exist in some form.
-- The largest remaining gap is not UI anymore; it is the missing backend operating model for SLA, cross-links, retention, effectiveness, and PDF dossier generation.
+- The largest remaining gap is now the backend operating model for SLA, retention, automated training linkage, and a true PDF dossier/export pipeline.
 
 ## Recommended Next Steps
 
 1. Build persisted SLA policy + overdue/escalation backend.
-2. Add explicit `evidence_links` model and related-records workspace panel.
-3. Add CAPA effectiveness verification and closeout gate.
-4. Upgrade evidence pack export from ZIP baseline to compiled PDF dossier / release packet.
+2. Add retention/disposition policy by record type.
+3. Upgrade evidence pack export from ZIP baseline to compiled PDF dossier / release packet.
+4. Add rule-based auto-linking and training-trigger integration on top of the new `evidence_links` model.

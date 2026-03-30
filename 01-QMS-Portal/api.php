@@ -6171,12 +6171,41 @@ function evidence_signature_label(array $schema, string $signatureId, string $lo
   return $signatureId;
 }
 
+function evidence_find_field_definition(array $schema, string $fieldId): array {
+  foreach ((array)($schema['fields'] ?? []) as $field) {
+    if (!is_array($field)) continue;
+    if (trim((string)($field['id'] ?? '')) === $fieldId) return $field;
+  }
+  return ['id' => $fieldId, 'type' => 'text', 'label' => $fieldId, 'label_vi' => $fieldId];
+}
+
+function evidence_field_option_label(array $schema, string $fieldId, string $value, string $locale = 'vi'): string {
+  $field = evidence_find_field_definition($schema, $fieldId);
+  foreach ((array)($field['options'] ?? []) as $option) {
+    if (!is_array($option)) continue;
+    if (trim((string)($option['value'] ?? '')) !== $value) continue;
+    if ($locale === 'en') return trim((string)($option['label_en'] ?? $option['label'] ?? $value));
+    return trim((string)($option['label_vi'] ?? $option['label'] ?? $value));
+  }
+  return $value;
+}
+
 function evidence_entry_value_present(array $field, $value): bool {
   $type = strtolower(trim((string)($field['type'] ?? 'text')));
   if ($type === 'multi_select') return is_array($value) && !empty($value);
   if ($type === 'checkbox') return $value === true || $value === 1 || $value === '1' || $value === 'true';
   if (is_array($value)) return !empty($value);
   return trim((string)$value) !== '';
+}
+
+function evidence_parse_date_value($value): ?DateTimeImmutable {
+  $raw = trim((string)$value);
+  if ($raw === '') return null;
+  try {
+    return new DateTimeImmutable($raw);
+  } catch (Throwable $e) {
+    return null;
+  }
 }
 
 function evidence_find_online_entry(string $formCode, string $allocationId = '', string $entryId = ''): ?array {
@@ -6342,6 +6371,116 @@ function evidence_evaluate_requirement(array $requirement, array $allocation, ar
       break;
     }
 
+    case 'fields_present': {
+      $fieldIds = array_values(array_filter(array_map('trim', (array)($requirement['field_ids'] ?? []))));
+      $missing = [];
+      foreach ($fieldIds as $fieldId) {
+        $fieldDef = evidence_find_field_definition($schema, $fieldId);
+        $value = $entry[$fieldId] ?? null;
+        if (!evidence_entry_value_present($fieldDef, $value)) {
+          $missing[] = [
+            'key' => $fieldId,
+            'label' => evidence_field_label($schema, $fieldId, 'en'),
+            'label_vi' => evidence_field_label($schema, $fieldId, 'vi'),
+          ];
+        }
+      }
+      $item['ok'] = empty($missing) && $entry !== null;
+      $item['missing'] = $missing;
+      $item['detail_vi'] = $entry === null
+        ? 'Chưa có bản nộp online để kiểm tra các trường bắt buộc của CAPA.'
+        : ($item['ok'] ? 'Các trường bắt buộc cho CAPA đã đủ.' : 'Thiếu thông tin: ' . implode(', ', array_map(static fn($row) => (string)($row['label_vi'] ?? $row['key'] ?? ''), $missing)));
+      $item['detail_en'] = $entry === null
+        ? 'No online submission is available to validate the CAPA fields.'
+        : ($item['ok'] ? 'The required CAPA fields are complete.' : 'Missing fields: ' . implode(', ', array_map(static fn($row) => (string)($row['label'] ?? $row['key'] ?? ''), $missing)));
+      break;
+    }
+
+    case 'capa_effectiveness': {
+      $completionField = trim((string)($requirement['completion_field'] ?? 'completion_date'));
+      $verificationMethodField = trim((string)($requirement['verification_method_field'] ?? 'verification_method'));
+      $verificationResultField = trim((string)($requirement['verification_result_field'] ?? 'verification_result'));
+      $effectivenessDateField = trim((string)($requirement['effectiveness_date_field'] ?? 'effectiveness_check_date'));
+      $effectivenessResultField = trim((string)($requirement['effectiveness_result_field'] ?? 'effectiveness_result'));
+      $statusField = trim((string)($requirement['status_field'] ?? 'status'));
+      $allowedStatuses = array_values(array_filter(array_map(static fn($v) => strtolower(trim((string)$v)), (array)($requirement['allowed_statuses'] ?? ['closed']))));
+      $minDaysAfter = max(0, (int)($requirement['min_days_after'] ?? 30));
+      $maxDaysAfter = max($minDaysAfter, (int)($requirement['max_days_after'] ?? 90));
+
+      $missing = [];
+      $requiredFieldIds = array_values(array_filter([$completionField, $verificationMethodField, $verificationResultField, $effectivenessDateField, $effectivenessResultField, $statusField]));
+      foreach ($requiredFieldIds as $fieldId) {
+        $fieldDef = evidence_find_field_definition($schema, $fieldId);
+        $value = $entry[$fieldId] ?? null;
+        if (!evidence_entry_value_present($fieldDef, $value)) {
+          $missing[] = [
+            'key' => $fieldId,
+            'label' => evidence_field_label($schema, $fieldId, 'en'),
+            'label_vi' => evidence_field_label($schema, $fieldId, 'vi'),
+          ];
+        }
+      }
+
+      $completionDate = evidence_parse_date_value($entry[$completionField] ?? '');
+      $effectivenessDate = evidence_parse_date_value($entry[$effectivenessDateField] ?? '');
+      $statusValue = strtolower(trim((string)($entry[$statusField] ?? '')));
+      $windowOk = false;
+      $windowMessageVi = '';
+      $windowMessageEn = '';
+      if ($completionDate && $effectivenessDate) {
+        $diffDays = (int)$completionDate->diff($effectivenessDate)->format('%r%a');
+        $windowOk = $diffDays >= $minDaysAfter && $diffDays <= $maxDaysAfter;
+        if ($windowOk) {
+          $windowMessageVi = 'Ngày kiểm tra hiệu lực nằm trong cửa sổ ' . $minDaysAfter . '-' . $maxDaysAfter . ' ngày.';
+          $windowMessageEn = 'The effectiveness check date is within the ' . $minDaysAfter . '-' . $maxDaysAfter . ' day window.';
+        } else {
+          $windowMessageVi = 'Ngày kiểm tra hiệu lực phải nằm trong cửa sổ ' . $minDaysAfter . '-' . $maxDaysAfter . ' ngày kể từ ngày hoàn thành.';
+          $windowMessageEn = 'The effectiveness check date must fall within the ' . $minDaysAfter . '-' . $maxDaysAfter . ' day window after completion.';
+        }
+      } elseif ($entry !== null) {
+        $windowMessageVi = 'Chưa đủ ngày hoàn thành và ngày kiểm tra hiệu lực để đánh giá cửa sổ theo dõi.';
+        $windowMessageEn = 'Completion date and effectiveness date are required to evaluate the follow-up window.';
+      }
+
+      $statusOk = $statusValue !== '' && in_array($statusValue, $allowedStatuses, true);
+      $statusMessageVi = $statusOk
+        ? 'Trạng thái CAPA phù hợp để đóng hồ sơ.'
+        : 'Trạng thái CAPA phải là ' . implode(', ', array_map(static fn($v) => evidence_field_option_label($schema, $statusField, $v, 'vi'), $allowedStatuses)) . '.';
+      $statusMessageEn = $statusOk
+        ? 'The CAPA status is acceptable for closure.'
+        : 'CAPA status must be one of: ' . implode(', ', array_map(static fn($v) => evidence_field_option_label($schema, $statusField, $v, 'en'), $allowedStatuses)) . '.';
+
+      $item['meta'] = [
+        'completion_date' => (string)($entry[$completionField] ?? ''),
+        'effectiveness_check_date' => (string)($entry[$effectivenessDateField] ?? ''),
+        'status_value' => $statusValue,
+        'window_min_days' => $minDaysAfter,
+        'window_max_days' => $maxDaysAfter,
+        'window_ok' => $windowOk,
+        'status_ok' => $statusOk,
+      ];
+      $item['ok'] = $entry !== null && empty($missing) && $windowOk && $statusOk;
+      $item['missing'] = $missing;
+      if ($entry === null) {
+        $item['detail_vi'] = 'Chưa có bản nộp CAPA để đánh giá hiệu lực.';
+        $item['detail_en'] = 'No CAPA submission is available for effectiveness evaluation.';
+      } else {
+        $partsVi = [];
+        $partsEn = [];
+        if (!empty($missing)) {
+          $partsVi[] = 'Thiếu thông tin: ' . implode(', ', array_map(static fn($row) => (string)($row['label_vi'] ?? $row['key'] ?? ''), $missing));
+          $partsEn[] = 'Missing fields: ' . implode(', ', array_map(static fn($row) => (string)($row['label'] ?? $row['key'] ?? ''), $missing));
+        }
+        $partsVi[] = $windowMessageVi;
+        $partsEn[] = $windowMessageEn;
+        $partsVi[] = $statusMessageVi;
+        $partsEn[] = $statusMessageEn;
+        $item['detail_vi'] = implode(' ', array_filter($partsVi));
+        $item['detail_en'] = implode(' ', array_filter($partsEn));
+      }
+      break;
+    }
+
     case 'signatures': {
       $requiredIds = array_values(array_filter(array_map('trim', (array)($requirement['required_ids'] ?? []))));
       $signatures = is_array($allocation['signatures'] ?? null) ? $allocation['signatures'] : [];
@@ -6484,6 +6623,7 @@ function load_allocation_store(): array {
     return [
       '_meta' => ['version' => '1.0', 'created_at' => now_iso(), 'updated_at' => now_iso()],
       'allocations' => [],
+      'evidence_links' => [],
     ];
   }
   $data = json_decode((string)file_get_contents($file), true);
@@ -6491,9 +6631,11 @@ function load_allocation_store(): array {
     return [
       '_meta' => ['version' => '1.0', 'created_at' => now_iso(), 'updated_at' => now_iso()],
       'allocations' => [],
+      'evidence_links' => [],
     ];
   }
   if (!isset($data['allocations']) || !is_array($data['allocations'])) $data['allocations'] = [];
+  if (!isset($data['evidence_links']) || !is_array($data['evidence_links'])) $data['evidence_links'] = [];
   return $data;
 }
 
@@ -6533,6 +6675,20 @@ function allocation_append_event(array &$allocation, string $status, string $use
   $allocation['status'] = $status;
   $allocation['updated_at'] = now_iso();
   $allocation['updated_by'] = $user;
+  allocation_append_audit_log($allocation, 'status_change', $user, $note, array_merge(['status' => $status], $meta));
+}
+
+function allocation_append_audit_log(array &$allocation, string $action, string $user, string $note = '', array $meta = []): void {
+  $allocation['events'] = is_array($allocation['events'] ?? null) ? $allocation['events'] : [];
+  $allocation['events'][] = [
+    'action' => trim($action) !== '' ? trim($action) : 'note',
+    'at' => now_iso(),
+    'by' => $user,
+    'note' => $note,
+    'meta' => $meta,
+  ];
+  $allocation['updated_at'] = now_iso();
+  $allocation['updated_by'] = $user;
 }
 
 function &allocation_find_ref(array &$store, string $allocationId) {
@@ -6561,6 +6717,142 @@ function allocation_find_by_record_id(array $store, string $recordId): ?array {
     }
   }
   return null;
+}
+
+function evidence_link_catalog(): array {
+  return [
+    'related' => [
+      'label_vi' => 'Liên quan',
+      'label_en' => 'Related',
+      'inverse_label_vi' => 'Liên quan',
+      'inverse_label_en' => 'Related',
+    ],
+    'corrective_for' => [
+      'label_vi' => 'Khắc phục cho',
+      'label_en' => 'Corrective for',
+      'inverse_label_vi' => 'Được khắc phục bởi',
+      'inverse_label_en' => 'Corrected by',
+    ],
+    'caused_by' => [
+      'label_vi' => 'Phát sinh từ',
+      'label_en' => 'Caused by',
+      'inverse_label_vi' => 'Gây ra',
+      'inverse_label_en' => 'Causes',
+    ],
+    'verifies' => [
+      'label_vi' => 'Xác minh cho',
+      'label_en' => 'Verifies',
+      'inverse_label_vi' => 'Được xác minh bởi',
+      'inverse_label_en' => 'Verified by',
+    ],
+    'references' => [
+      'label_vi' => 'Tham chiếu',
+      'label_en' => 'References',
+      'inverse_label_vi' => 'Được tham chiếu bởi',
+      'inverse_label_en' => 'Referenced by',
+    ],
+    'supersedes' => [
+      'label_vi' => 'Thay thế',
+      'label_en' => 'Supersedes',
+      'inverse_label_vi' => 'Bị thay thế bởi',
+      'inverse_label_en' => 'Superseded by',
+    ],
+    'training_for' => [
+      'label_vi' => 'Đào tạo cho',
+      'label_en' => 'Training for',
+      'inverse_label_vi' => 'Được đào tạo bởi',
+      'inverse_label_en' => 'Trained by',
+    ],
+  ];
+}
+
+function evidence_link_type_normalize(string $type): string {
+  $type = strtolower(trim($type));
+  $catalog = evidence_link_catalog();
+  return isset($catalog[$type]) ? $type : 'related';
+}
+
+function evidence_link_label(string $type, bool $inverse = false, string $locale = 'vi'): string {
+  $catalog = evidence_link_catalog();
+  $entry = $catalog[evidence_link_type_normalize($type)] ?? $catalog['related'];
+  if ($inverse) {
+    return $locale === 'en'
+      ? (string)($entry['inverse_label_en'] ?? $entry['label_en'] ?? 'Related')
+      : (string)($entry['inverse_label_vi'] ?? $entry['label_vi'] ?? 'Liên quan');
+  }
+  return $locale === 'en'
+    ? (string)($entry['label_en'] ?? 'Related')
+    : (string)($entry['label_vi'] ?? 'Liên quan');
+}
+
+function allocation_trace_summary(array $allocation): string {
+  $ctx = is_array($allocation['master_context'] ?? null) ? $allocation['master_context'] : [];
+  $parts = [];
+  foreach (['customer_id', 'so_number', 'jo_number', 'wo_number'] as $key) {
+    $value = trim((string)($ctx[$key] ?? ''));
+    if ($value !== '') $parts[] = $value;
+  }
+  $part = trim((string)($ctx['part_number'] ?? ''));
+  $rev = trim((string)($ctx['part_revision'] ?? ''));
+  if ($part !== '' || $rev !== '') $parts[] = implode('/', array_filter([$part, $rev], fn($v) => $v !== ''));
+  $capa = trim((string)($ctx['capa_number'] ?? ''));
+  if ($capa !== '') $parts[] = $capa;
+  return implode(' · ', $parts);
+}
+
+function allocation_summary(array $allocation): array {
+  $formCode = trim((string)($allocation['form_code'] ?? ''));
+  $schema = $formCode !== '' ? load_form_schema_by_code($formCode) : null;
+  $registry = $formCode !== '' ? load_form_registry_entry($formCode) : null;
+  return [
+    'allocation_id' => (string)($allocation['allocation_id'] ?? ''),
+    'record_id' => (string)($allocation['record_id'] ?? ''),
+    'record_type' => (string)($allocation['record_type'] ?? ''),
+    'form_code' => $formCode,
+    'form_title_vi' => (string)($schema['title_vi'] ?? $schema['title'] ?? $registry['title_vi'] ?? $registry['title'] ?? ''),
+    'form_title_en' => (string)($schema['title_en'] ?? $schema['title'] ?? $registry['title_en'] ?? $registry['title'] ?? ''),
+    'status' => (string)($allocation['status'] ?? ''),
+    'delivery_mode' => (string)($allocation['delivery_mode'] ?? ''),
+    'department' => (string)($allocation['department'] ?? ''),
+    'updated_at' => (string)($allocation['updated_at'] ?? $allocation['created_at'] ?? ''),
+    'created_at' => (string)($allocation['created_at'] ?? ''),
+    'master_context' => is_array($allocation['master_context'] ?? null) ? $allocation['master_context'] : [],
+    'trace_summary' => allocation_trace_summary($allocation),
+  ];
+}
+
+function evidence_links_for_allocation(array $store, string $allocationId): array {
+  $links = [];
+  foreach ((array)($store['evidence_links'] ?? []) as $row) {
+    if (!is_array($row)) continue;
+    $sourceId = trim((string)($row['source_allocation_id'] ?? ''));
+    $targetId = trim((string)($row['target_allocation_id'] ?? ''));
+    if ($sourceId !== $allocationId && $targetId !== $allocationId) continue;
+
+    $incoming = $targetId === $allocationId;
+    $counterpartId = $incoming ? $sourceId : $targetId;
+    $counterpart = $counterpartId !== '' ? allocation_find($store, $counterpartId) : null;
+    $relationType = evidence_link_type_normalize((string)($row['relation_type'] ?? 'related'));
+
+    $links[] = [
+      'link_id' => (string)($row['link_id'] ?? ''),
+      'relation_type' => $relationType,
+      'direction' => $incoming ? 'incoming' : 'outgoing',
+      'relation_label_vi' => evidence_link_label($relationType, $incoming, 'vi'),
+      'relation_label_en' => evidence_link_label($relationType, $incoming, 'en'),
+      'created_at' => (string)($row['created_at'] ?? ''),
+      'created_by' => (string)($row['created_by'] ?? ''),
+      'notes' => (string)($row['notes'] ?? ''),
+      'source_allocation_id' => $sourceId,
+      'target_allocation_id' => $targetId,
+      'counterpart' => $counterpart ? allocation_summary($counterpart) : ['allocation_id' => $counterpartId],
+    ];
+  }
+
+  usort($links, function ($a, $b) {
+    return strcmp((string)($b['created_at'] ?? ''), (string)($a['created_at'] ?? ''));
+  });
+  return $links;
 }
 
 function allocation_resolve_received_file(array $allocation, int $version = 0): ?array {
@@ -14777,6 +15069,182 @@ if ($username === '') {
     api_json(['ok' => true, 'checklist' => $checklist, 'allocation' => $allocation]);
   }
 
+  case 'capa_effectiveness_evaluate': {
+    require_logged_in($store);
+    $body = read_json_body();
+    $allocationId = trim((string)($body['allocation_id'] ?? $_GET['allocation_id'] ?? ''));
+    if ($allocationId === '') api_json(['ok' => false, 'error' => 'missing_allocation_id'], 400);
+
+    $allocation = allocation_find(load_allocation_store(), $allocationId);
+    if (!$allocation) api_json(['ok' => false, 'error' => 'allocation_not_found'], 404);
+
+    $formCode = trim((string)($allocation['form_code'] ?? ''));
+    $schema = $formCode !== '' ? (load_form_schema_by_code($formCode) ?: []) : [];
+    if (empty($schema)) api_json(['ok' => false, 'error' => 'schema_not_found'], 404);
+
+    $requirement = null;
+    foreach ((array)($schema['evidence_requirements'] ?? []) as $candidate) {
+      if (!is_array($candidate)) continue;
+      $kind = strtolower(trim((string)($candidate['kind'] ?? '')));
+      $id = trim((string)($candidate['id'] ?? ''));
+      if ($kind === 'capa_effectiveness' || $id === 'capa_effectiveness_review') {
+        $requirement = $candidate;
+        break;
+      }
+    }
+    if (!$requirement) api_json(['ok' => false, 'error' => 'capa_effectiveness_requirement_not_configured'], 404);
+
+    $entry = evidence_find_online_entry(
+      $formCode,
+      trim((string)($allocation['allocation_id'] ?? '')),
+      trim((string)($allocation['online_submission']['entry_id'] ?? ''))
+    );
+    $evaluation = evidence_evaluate_requirement($requirement, $allocation, $schema, $entry);
+    $evaluation['required'] = evidence_requirement_applies($requirement, 'approval');
+
+    api_json([
+      'ok' => true,
+      'allocation' => $allocation,
+      'evaluation' => $evaluation,
+    ]);
+  }
+
+  case 'evidence_link_list': {
+    require_logged_in($store);
+    $allocationId = trim((string)($_GET['allocation_id'] ?? $_POST['allocation_id'] ?? ''));
+    if ($allocationId === '') api_json(['ok' => false, 'error' => 'missing_allocation_id'], 400);
+
+    $allocationStore = load_allocation_store();
+    $allocation = allocation_find($allocationStore, $allocationId);
+    if (!$allocation) api_json(['ok' => false, 'error' => 'allocation_not_found'], 404);
+
+    api_json([
+      'ok' => true,
+      'allocation' => allocation_summary($allocation),
+      'links' => evidence_links_for_allocation($allocationStore, $allocationId),
+    ]);
+  }
+
+  case 'evidence_link_add': {
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $allocationId = trim((string)($body['allocation_id'] ?? ''));
+    $targetAllocationId = trim((string)($body['target_allocation_id'] ?? ''));
+    $relationType = evidence_link_type_normalize((string)($body['relation_type'] ?? 'related'));
+    $notes = trim((string)($body['notes'] ?? ''));
+    if ($allocationId === '' || $targetAllocationId === '') api_json(['ok' => false, 'error' => 'missing_allocation_id'], 400);
+    if ($allocationId === $targetAllocationId) api_json(['ok' => false, 'error' => 'self_link_not_allowed'], 400);
+
+    $allocationStore = load_allocation_store();
+    $sourceAllocation =& allocation_find_ref($allocationStore, $allocationId);
+    if (!is_array($sourceAllocation)) api_json(['ok' => false, 'error' => 'allocation_not_found'], 404);
+    $targetAllocation =& allocation_find_ref($allocationStore, $targetAllocationId);
+    if (!is_array($targetAllocation)) api_json(['ok' => false, 'error' => 'target_allocation_not_found'], 404);
+
+    foreach ((array)($allocationStore['evidence_links'] ?? []) as $existing) {
+      if (!is_array($existing)) continue;
+      if ((string)($existing['source_allocation_id'] ?? '') === $allocationId
+        && (string)($existing['target_allocation_id'] ?? '') === $targetAllocationId
+        && evidence_link_type_normalize((string)($existing['relation_type'] ?? 'related')) === $relationType) {
+        api_json(['ok' => false, 'error' => 'link_exists'], 409);
+      }
+    }
+
+    $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+    $link = [
+      'link_id' => 'EVL-' . date('YmdHis') . '-' . substr(md5($allocationId . '|' . $targetAllocationId . '|' . $relationType), 0, 8),
+      'source_allocation_id' => $allocationId,
+      'target_allocation_id' => $targetAllocationId,
+      'relation_type' => $relationType,
+      'notes' => $notes,
+      'created_at' => now_iso(),
+      'created_by' => $username,
+    ];
+    $allocationStore['evidence_links'][] = $link;
+
+    $targetRecordId = trim((string)($targetAllocation['record_id'] ?? ''));
+    $sourceRecordId = trim((string)($sourceAllocation['record_id'] ?? ''));
+    allocation_append_audit_log($sourceAllocation, 'evidence_link_add', $username, 'linked_to_related_record', [
+      'link_id' => $link['link_id'],
+      'relation_type' => $relationType,
+      'relation_label_vi' => evidence_link_label($relationType, false, 'vi'),
+      'target_allocation_id' => $targetAllocationId,
+      'target_record_id' => $targetRecordId,
+      'notes' => $notes,
+    ]);
+    allocation_append_audit_log($targetAllocation, 'evidence_link_add', $username, 'linked_from_related_record', [
+      'link_id' => $link['link_id'],
+      'relation_type' => $relationType,
+      'relation_label_vi' => evidence_link_label($relationType, true, 'vi'),
+      'source_allocation_id' => $allocationId,
+      'source_record_id' => $sourceRecordId,
+      'notes' => $notes,
+    ]);
+
+    save_allocation_store($allocationStore);
+    api_json([
+      'ok' => true,
+      'link' => $link,
+      'links' => evidence_links_for_allocation($allocationStore, $allocationId),
+    ]);
+  }
+
+  case 'evidence_link_remove': {
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $allocationId = trim((string)($body['allocation_id'] ?? ''));
+    $linkId = trim((string)($body['link_id'] ?? ''));
+    if ($allocationId === '' || $linkId === '') api_json(['ok' => false, 'error' => 'missing_payload'], 400);
+
+    $allocationStore = load_allocation_store();
+    $index = null;
+    $link = null;
+    foreach ((array)($allocationStore['evidence_links'] ?? []) as $idx => $candidate) {
+      if (!is_array($candidate)) continue;
+      if ((string)($candidate['link_id'] ?? '') === $linkId) {
+        $index = $idx;
+        $link = $candidate;
+        break;
+      }
+    }
+    if ($index === null || !$link) api_json(['ok' => false, 'error' => 'link_not_found'], 404);
+
+    $sourceId = trim((string)($link['source_allocation_id'] ?? ''));
+    $targetId = trim((string)($link['target_allocation_id'] ?? ''));
+    if ($allocationId !== $sourceId && $allocationId !== $targetId) api_json(['ok' => false, 'error' => 'link_not_owned_by_allocation'], 403);
+
+    $sourceAllocation =& allocation_find_ref($allocationStore, $sourceId);
+    $targetAllocation =& allocation_find_ref($allocationStore, $targetId);
+    $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+    $relationType = evidence_link_type_normalize((string)($link['relation_type'] ?? 'related'));
+
+    if (is_array($sourceAllocation)) {
+      allocation_append_audit_log($sourceAllocation, 'evidence_link_remove', $username, 'unlinked_related_record', [
+        'link_id' => $linkId,
+        'relation_type' => $relationType,
+        'counterpart_record_id' => (string)($targetAllocation['record_id'] ?? ''),
+      ]);
+    }
+    if (is_array($targetAllocation)) {
+      allocation_append_audit_log($targetAllocation, 'evidence_link_remove', $username, 'unlinked_related_record', [
+        'link_id' => $linkId,
+        'relation_type' => $relationType,
+        'counterpart_record_id' => (string)($sourceAllocation['record_id'] ?? ''),
+      ]);
+    }
+
+    unset($allocationStore['evidence_links'][$index]);
+    $allocationStore['evidence_links'] = array_values($allocationStore['evidence_links']);
+    save_allocation_store($allocationStore);
+
+    api_json([
+      'ok' => true,
+      'links' => evidence_links_for_allocation($allocationStore, $allocationId),
+    ]);
+  }
+
   case 'evidence_pack_export': {
     require_logged_in($store);
     $allocationId = trim((string)($_GET['allocation_id'] ?? $_POST['allocation_id'] ?? ''));
@@ -14802,6 +15270,7 @@ if ($username === '') {
       'record_id' => (string)($allocation['record_id'] ?? ''),
       'allocation_id' => $allocationId,
       'allocation' => $allocation,
+      'related_records' => evidence_links_for_allocation(load_allocation_store(), $allocationId),
       'review_checklist' => evidence_evaluate_checklist($allocation, 'review'),
       'approval_checklist' => evidence_evaluate_checklist($allocation, 'approval'),
     ];

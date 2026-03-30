@@ -36,6 +36,16 @@ var DEPARTMENTS = [
   {v:'EHS',l:'An toàn & Môi trường',e:'EHS'}
 ];
 
+var RELATED_RELATIONS = [
+  { value:'related', labelVi:'Liên quan', labelEn:'Related' },
+  { value:'corrective_for', labelVi:'Khắc phục cho', labelEn:'Corrective for' },
+  { value:'caused_by', labelVi:'Phát sinh từ', labelEn:'Caused by' },
+  { value:'verifies', labelVi:'Xác minh cho', labelEn:'Verifies' },
+  { value:'references', labelVi:'Tham chiếu', labelEn:'References' },
+  { value:'supersedes', labelVi:'Thay thế', labelEn:'Supersedes' },
+  { value:'training_for', labelVi:'Đào tạo cho', labelEn:'Training for' }
+];
+
 /* ── Workspace state ── */
 var ws = {
   master: null,
@@ -51,7 +61,10 @@ var ws = {
   allocNotes: '',
   lastFormCode: '',
   checklistCache: {},
-  checklistLoading: {}
+  checklistLoading: {},
+  relatedCache: {},
+  relatedLoading: {},
+  relatedSearch: {}
 };
 
 /* ── Data helpers ── */
@@ -167,6 +180,201 @@ function renderChecklist(allocation){
   '</div>';
 }
 
+function checklistData(allocation){
+  if(!allocation || !allocation.allocation_id) return null;
+  return ws.checklistCache[checklistKey(allocation, checklistStage(allocation))] || null;
+}
+
+function fieldOptionLabel(schema, fieldId, value){
+  var fields = schema && Array.isArray(schema.fields) ? schema.fields : [];
+  var field = fields.find(function(row){ return row && row.id === fieldId; }) || null;
+  var options = field && Array.isArray(field.options) ? field.options : [];
+  var match = options.find(function(option){ return option && String(option.value || '') === String(value || ''); }) || null;
+  return match ? t(match.label_vi || match.label || value || '—', match.label_en || match.label || value || '—') : (value || '—');
+}
+
+function renderCapaEffectivenessCard(form, allocation){
+  if(!allocation || detectRecordType(form) !== 'CAPA') return '';
+  var checklist = checklistData(allocation);
+  if(!checklist){
+    return '<div class="ec-checklist loading"><div class="ec-checklist-head"><strong>' + esc(t('Kiểm tra hiệu lực CAPA', 'CAPA effectiveness review')) + '</strong><span>' + esc(t('Đang tải...', 'Loading...')) + '</span></div></div>';
+  }
+  var items = Array.isArray(checklist.items) ? checklist.items : [];
+  var completionItem = items.find(function(item){ return item && item.id === 'capa_action_completion'; }) || null;
+  var effectItem = items.find(function(item){ return item && item.id === 'capa_effectiveness_review'; }) || null;
+  if(!completionItem && !effectItem) return '';
+
+  var meta = effectItem && effectItem.meta ? effectItem.meta : {};
+  var schema = form.schema || ws.schema || {};
+  var summary = effectItem
+    ? (effectItem.required ? (effectItem.ok ? t('Đạt điều kiện duyệt', 'Ready for approval') : t('Chưa đủ điều kiện duyệt', 'Not ready for approval')) : t('Sẽ được kiểm tra khi duyệt', 'Will be checked during approval'))
+    : t('Đang theo dõi', 'Monitoring');
+  var tone = effectItem && effectItem.required ? (effectItem.ok ? 'ok' : 'fail') : 'ok';
+  var statusText = fieldOptionLabel(schema, 'status', meta.status_value || '');
+
+  return '<div class="ec-checklist ' + tone + '">' +
+    '<div class="ec-checklist-head"><strong>' + esc(t('Kiểm tra hiệu lực CAPA', 'CAPA effectiveness review')) + '</strong><span>' + esc(summary) + '</span></div>' +
+    '<div class="ec-checklist-list">' +
+      '<div class="ec-check-item ' + (completionItem ? (completionItem.required ? (completionItem.ok ? 'ok' : 'miss') : 'skip') : 'skip') + '">' +
+        '<div class="ec-check-item-title">' + esc(t('Xác nhận hoàn tất hành động', 'Action completion verification')) + '</div>' +
+        '<div class="ec-check-item-detail">' + esc(completionItem ? t(completionItem.detail_vi || '', completionItem.detail_en || '') : t('Chưa có dữ liệu xác nhận hoàn tất.', 'No completion verification data yet.')) + '</div>' +
+      '</div>' +
+      '<div class="ec-check-item ' + (effectItem ? (effectItem.required ? (effectItem.ok ? 'ok' : 'miss') : 'skip') : 'skip') + '">' +
+        '<div class="ec-check-item-title">' + esc(t('Hiệu lực sau thực hiện', 'Post-action effectiveness')) + '</div>' +
+        '<div class="ec-check-item-detail">' + esc(effectItem ? t(effectItem.detail_vi || '', effectItem.detail_en || '') : t('Chưa có dữ liệu đánh giá hiệu lực.', 'No effectiveness review data yet.')) + '</div>' +
+      '</div>' +
+      '<div class="ec-check-item skip">' +
+        '<div class="ec-check-item-title">' + esc(t('Tóm tắt CAPA', 'CAPA summary')) + '</div>' +
+        '<div class="ec-check-item-detail">' + esc(t('Trạng thái', 'Status')) + ': ' + esc(statusText) + ' · ' + esc(t('Ngày hoàn thành', 'Completion date')) + ': ' + esc(meta.completion_date || '—') + ' · ' + esc(t('Ngày kiểm tra hiệu lực', 'Effectiveness date')) + ': ' + esc(meta.effectiveness_check_date || '—') + '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function relatedState(allocation){
+  var key = allocation && allocation.allocation_id ? allocation.allocation_id : '__none__';
+  if(!ws.relatedSearch[key]){
+    ws.relatedSearch[key] = {
+      query: '',
+      relation: 'related',
+      note: '',
+      results: [],
+      loading: false,
+      error: ''
+    };
+  }
+  return ws.relatedSearch[key];
+}
+
+function relatedLinksData(allocation){
+  if(!allocation || !allocation.allocation_id) return null;
+  return ws.relatedCache[allocation.allocation_id] || null;
+}
+
+function loadRelatedRecords(allocation, force){
+  if(!allocation || !allocation.allocation_id) return Promise.resolve(null);
+  var key = allocation.allocation_id;
+  if(!force && ws.relatedCache[key]) return Promise.resolve(ws.relatedCache[key]);
+  if(ws.relatedLoading[key]) return ws.relatedLoading[key];
+  ws.relatedLoading[key] = api('evidence_link_list', { allocation_id: key }, 'GET').then(function(resp){
+    ws.relatedCache[key] = {
+      links: resp && resp.ok && Array.isArray(resp.links) ? resp.links : [],
+      error: resp && resp.ok ? '' : t('Không thể tải hồ sơ liên quan.', 'Could not load related records.')
+    };
+    return ws.relatedCache[key];
+  }).catch(function(){
+    ws.relatedCache[key] = {
+      links: [],
+      error: t('Không thể tải hồ sơ liên quan.', 'Could not load related records.')
+    };
+    return ws.relatedCache[key];
+  }).finally(function(){
+    delete ws.relatedLoading[key];
+  });
+  return ws.relatedLoading[key];
+}
+
+function relatedTraceSummary(ctx){
+  ctx = ctx || {};
+  var parts = [];
+  if(ctx.customer_id) parts.push(ctx.customer_id);
+  if(ctx.so_number) parts.push(ctx.so_number);
+  if(ctx.jo_number) parts.push(ctx.jo_number);
+  if(ctx.wo_number) parts.push(ctx.wo_number);
+  if(ctx.part_number || ctx.part_revision) parts.push([ctx.part_number || '', ctx.part_revision || ''].filter(Boolean).join('/'));
+  if(ctx.capa_number) parts.push(ctx.capa_number);
+  return parts.join(' · ');
+}
+
+function renderRelatedRecords(allocation){
+  if(!allocation || !allocation.allocation_id) return '';
+  var data = relatedLinksData(allocation);
+  var state = relatedState(allocation);
+
+  var linksHtml = '';
+  if(!data){
+    linksHtml = '<div class="ec-related-empty">' + esc(t('Đang tải hồ sơ liên quan...', 'Loading related records...')) + '</div>';
+  } else if(data.error){
+    linksHtml = '<div class="ec-inline-alert">' + esc(data.error) + '</div>';
+  } else if(Array.isArray(data.links) && data.links.length){
+    linksHtml = data.links.map(function(link){
+      var counterpart = link.counterpart || {};
+      var recordId = counterpart.record_id || '—';
+      var title = counterpart.form_title_vi || counterpart.form_code || counterpart.record_type || recordId;
+      var trace = relatedTraceSummary(counterpart.master_context || {});
+      return '<div class="ec-related-item">' +
+        '<div class="ec-related-top">' +
+          '<div>' +
+            '<div class="ec-related-id">' + esc(recordId) + '</div>' +
+            '<div class="ec-related-title">' + esc(title) + '</div>' +
+          '</div>' +
+          '<span class="ec-badge info">' + esc(t(link.relation_label_vi || '', link.relation_label_en || '')) + '</span>' +
+        '</div>' +
+        '<div class="ec-related-meta">' +
+          '<span>' + esc(counterpart.form_code || '—') + '</span>' +
+          '<span>' + esc(counterpart.status || '—') + '</span>' +
+          (trace ? '<span>' + esc(trace) + '</span>' : '') +
+        '</div>' +
+        (link.notes ? '<div class="ec-related-note">' + esc(link.notes) + '</div>' : '') +
+        '<div class="ec-related-actions">' +
+          '<button type="button" class="ec-btn secondary" data-related-open="' + esc(counterpart.allocation_id || '') + '" data-related-form="' + esc(counterpart.form_code || '') + '">' + esc(t('Mở hồ sơ', 'Open record')) + '</button>' +
+          '<button type="button" class="ec-btn ghost" data-related-remove="' + esc(link.link_id || '') + '">' + esc(t('Gỡ liên kết', 'Remove link')) + '</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  } else {
+    linksHtml = '<div class="ec-related-empty">' + esc(t('Chưa có hồ sơ liên quan. Hãy tìm mã hồ sơ để liên kết 2 chiều cho truy xuất audit.', 'No related records yet. Search a record ID below to create a bidirectional link.')) + '</div>';
+  }
+
+  var resultsHtml = '';
+  if(state.loading){
+    resultsHtml = '<div class="ec-related-empty">' + esc(t('Đang tìm hồ sơ...', 'Searching records...')) + '</div>';
+  } else if(state.error){
+    resultsHtml = '<div class="ec-inline-alert">' + esc(state.error) + '</div>';
+  } else if(Array.isArray(state.results) && state.results.length){
+    resultsHtml = '<div class="ec-related-results">' + state.results.map(function(item){
+      var trace = relatedTraceSummary(item.master_context || {});
+      return '<div class="ec-related-item result">' +
+        '<div class="ec-related-top">' +
+          '<div>' +
+            '<div class="ec-related-id">' + esc(item.record_id || '—') + '</div>' +
+            '<div class="ec-related-title">' + esc(item.form_code || item.record_type || '') + '</div>' +
+          '</div>' +
+          '<span class="ec-badge warn">' + esc(item.status || '—') + '</span>' +
+        '</div>' +
+        '<div class="ec-related-meta">' +
+          '<span>' + esc(item.department || '—') + '</span>' +
+          (trace ? '<span>' + esc(trace) + '</span>' : '') +
+        '</div>' +
+        '<div class="ec-related-actions">' +
+          '<button type="button" class="ec-btn primary" data-related-add="' + esc(item.allocation_id || '') + '">' + esc(t('Liên kết hồ sơ này', 'Link this record')) + '</button>' +
+        '</div>' +
+      '</div>';
+    }).join('') + '</div>';
+  }
+
+  return '<section class="ec-related">' +
+    '<div class="ec-related-head">' +
+      '<div><strong>' + esc(t('Hồ sơ liên quan', 'Related records')) + '</strong><p>' + esc(t('Thiết lập liên kết 2 chiều giữa NCR, CAPA, đào tạo, audit và các hồ sơ liên đới khác.', 'Create bidirectional links between NCR, CAPA, training, audit, and other related records.')) + '</p></div>' +
+      '<button type="button" class="ec-btn ghost" id="ec-related-refresh">' + esc(t('Làm mới', 'Refresh')) + '</button>' +
+    '</div>' +
+    '<div class="ec-related-list">' + linksHtml + '</div>' +
+    '<div class="ec-related-builder">' +
+      '<div class="ec-related-grid">' +
+        '<div><label class="ec-label" for="ec-related-query">' + esc(t('Tìm mã hồ sơ', 'Search record ID')) + '</label><input class="ec-input" id="ec-related-query" type="text" value="' + esc(state.query || '') + '" placeholder="' + esc(t('Ví dụ: NCR-2026-001 hoặc CAPA', 'Example: NCR-2026-001 or CAPA')) + '"></div>' +
+        '<div><label class="ec-label" for="ec-related-relation">' + esc(t('Quan hệ', 'Relation')) + '</label><select class="ec-select" id="ec-related-relation">' + RELATED_RELATIONS.map(function(option){
+          return '<option value="' + esc(option.value) + '"' + (option.value === state.relation ? ' selected' : '') + '>' + esc(t(option.labelVi, option.labelEn)) + '</option>';
+        }).join('') + '</select></div>' +
+        '<div><label class="ec-label" for="ec-related-note">' + esc(t('Ghi chú liên kết', 'Link note')) + '</label><input class="ec-input" id="ec-related-note" type="text" value="' + esc(state.note || '') + '" placeholder="' + esc(t('Tùy chọn', 'Optional')) + '"></div>' +
+      '</div>' +
+      '<div class="ec-related-builder-actions">' +
+        '<button type="button" class="ec-btn secondary" id="ec-related-search">' + esc(t('Tìm hồ sơ', 'Search records')) + '</button>' +
+      '</div>' +
+      (resultsHtml || '') +
+    '</div>' +
+  '</section>';
+}
+
 function renderEvidenceActions(allocation){
   if(!allocation || !allocation.allocation_id) return '';
   return '<div class="ec-actions"><button class="ec-btn ghost" id="ec-export-pack">' + esc(t('Xuất bộ chứng cứ', 'Export evidence pack')) + '</button></div>';
@@ -232,7 +440,7 @@ window._renderWorkspace = function(form, allocation, container){
     return preloadSelectedOnlineEntry(form, allocation);
   }).then(function(){
     renderWorkspace(form, allocation, container);
-    return loadChecklist(allocation);
+    return Promise.all([loadChecklist(allocation), loadRelatedRecords(allocation)]);
   }).then(function(){
     if(allocation) renderWorkspace(form, allocation, container);
   }).catch(function(){
@@ -378,6 +586,8 @@ function renderOnlineStep(form, allocation){
   }
 
   html += renderChecklist(allocation);
+  html += renderCapaEffectivenessCard(form, allocation);
+  html += renderRelatedRecords(allocation);
   html += renderEvidenceActions(allocation);
 
   /* actions */
@@ -436,6 +646,8 @@ function renderOfflineStep(form, allocation){
   '</div>';
 
   html += renderChecklist(allocation);
+  html += renderCapaEffectivenessCard(form, allocation);
+  html += renderRelatedRecords(allocation);
   html += renderEvidenceActions(allocation);
   html += renderApprovalBar(allocation);
   html += '</div></div>';
@@ -575,6 +787,153 @@ function loadHistory(form){
    EVENT BINDING
    ══════════════════════════════════════════════════════ */
 
+function searchRelatedAllocations(allocation){
+  var state = relatedState(allocation);
+  var query = String(state.query || '').trim();
+  if(query.length < 2){
+    state.error = t('Hãy nhập ít nhất 2 ký tự để tìm hồ sơ.', 'Enter at least 2 characters to search.');
+    state.results = [];
+    return Promise.resolve([]);
+  }
+  state.loading = true;
+  state.error = '';
+  state.results = [];
+  var req = window.AllocationTracker && typeof window.AllocationTracker.getHistory === 'function'
+    ? window.AllocationTracker.getHistory({ search: query, page_size: 12 })
+    : api('record_id_history', { search: query, page_size: 12 }, 'POST');
+  return req.then(function(resp){
+    var entries = resp && Array.isArray(resp.entries) ? resp.entries : [];
+    state.results = entries.filter(function(item){
+      return item && item.allocation_id && item.allocation_id !== allocation.allocation_id;
+    });
+    if(!state.results.length) state.error = t('Không tìm thấy hồ sơ phù hợp.', 'No matching records were found.');
+    return state.results;
+  }).catch(function(){
+    state.error = t('Không thể tìm hồ sơ liên quan.', 'Could not search related records.');
+    state.results = [];
+    return [];
+  }).finally(function(){
+    state.loading = false;
+  });
+}
+
+function openLinkedAllocation(formCode, allocationId){
+  if(!allocationId) return;
+  var st = window._fhState || window._ecState || null;
+  if(st){
+    st.pendingFillSelection = { formCode: formCode || '', allocationId: allocationId };
+    st.selectedFormCode = formCode || st.selectedFormCode || '';
+    st.selectedAllocationId = allocationId;
+  }
+  if(typeof window._fhSwitchTab === 'function'){
+    window._fhSwitchTab('fill-download');
+    return;
+  }
+  if(typeof window.renderOnlineForms === 'function') window.renderOnlineForms(formCode || '');
+}
+
+function bindRelatedActions(form, allocation, container){
+  if(!allocation) return;
+  var state = relatedState(allocation);
+
+  var refreshBtn = document.getElementById('ec-related-refresh');
+  if(refreshBtn) refreshBtn.onclick = function(){
+    loadRelatedRecords(allocation, true).then(function(){
+      renderWorkspace(form, allocation, container);
+      bindWorkspace(form, allocation, container);
+    });
+  };
+
+  var queryEl = document.getElementById('ec-related-query');
+  if(queryEl){
+    queryEl.oninput = function(){ state.query = queryEl.value; };
+    queryEl.onkeydown = function(event){
+      if(event.key === 'Enter'){
+        event.preventDefault();
+        searchRelatedAllocations(allocation).then(function(){
+          renderWorkspace(form, allocation, container);
+          bindWorkspace(form, allocation, container);
+        });
+      }
+    };
+  }
+
+  var relationEl = document.getElementById('ec-related-relation');
+  if(relationEl) relationEl.onchange = function(){ state.relation = relationEl.value || 'related'; };
+
+  var noteEl = document.getElementById('ec-related-note');
+  if(noteEl) noteEl.oninput = function(){ state.note = noteEl.value; };
+
+  var searchBtn = document.getElementById('ec-related-search');
+  if(searchBtn) searchBtn.onclick = function(){
+    searchBtn.disabled = true;
+    searchRelatedAllocations(allocation).then(function(){
+      renderWorkspace(form, allocation, container);
+      bindWorkspace(form, allocation, container);
+    }).finally(function(){
+      searchBtn.disabled = false;
+    });
+  };
+
+  Array.prototype.forEach.call(container.querySelectorAll('[data-related-open]'), function(btn){
+    btn.onclick = function(){
+      openLinkedAllocation(btn.getAttribute('data-related-form') || '', btn.getAttribute('data-related-open') || '');
+    };
+  });
+
+  Array.prototype.forEach.call(container.querySelectorAll('[data-related-add]'), function(btn){
+    btn.onclick = function(){
+      var targetId = btn.getAttribute('data-related-add') || '';
+      if(!targetId) return;
+      btn.disabled = true;
+      api('evidence_link_add', {
+        allocation_id: allocation.allocation_id,
+        target_allocation_id: targetId,
+        relation_type: state.relation || 'related',
+        notes: String(state.note || '').trim()
+      }, 'POST').then(function(resp){
+        if(resp && resp.ok){
+          ws.relatedCache[allocation.allocation_id] = { links: Array.isArray(resp.links) ? resp.links : [], error: '' };
+          state.results = state.results.filter(function(item){ return item.allocation_id !== targetId; });
+          toast(t('Đã liên kết hồ sơ liên quan.', 'Related record linked.'), 'success');
+        } else {
+          toast(t('Không thể liên kết hồ sơ.', 'Could not link the record.'), 'error');
+        }
+      }).catch(function(){
+        toast(t('Không thể liên kết hồ sơ.', 'Could not link the record.'), 'error');
+      }).finally(function(){
+        renderWorkspace(form, allocation, container);
+        bindWorkspace(form, allocation, container);
+      });
+    };
+  });
+
+  Array.prototype.forEach.call(container.querySelectorAll('[data-related-remove]'), function(btn){
+    btn.onclick = function(){
+      var linkId = btn.getAttribute('data-related-remove') || '';
+      if(!linkId) return;
+      if(!confirm(t('Gỡ liên kết hồ sơ này?', 'Remove this record link?'))) return;
+      btn.disabled = true;
+      api('evidence_link_remove', {
+        allocation_id: allocation.allocation_id,
+        link_id: linkId
+      }, 'POST').then(function(resp){
+        if(resp && resp.ok){
+          ws.relatedCache[allocation.allocation_id] = { links: Array.isArray(resp.links) ? resp.links : [], error: '' };
+          toast(t('Đã gỡ liên kết hồ sơ.', 'Record link removed.'), 'success');
+        } else {
+          toast(t('Không thể gỡ liên kết.', 'Could not remove the link.'), 'error');
+        }
+      }).catch(function(){
+        toast(t('Không thể gỡ liên kết.', 'Could not remove the link.'), 'error');
+      }).finally(function(){
+        renderWorkspace(form, allocation, container);
+        bindWorkspace(form, allocation, container);
+      });
+    };
+  });
+}
+
 function bindWorkspace(form, allocation, container){
   /* step toggles */
   if(!container._ecToggleBound){
@@ -607,6 +966,7 @@ function bindWorkspace(form, allocation, container){
     link.click();
     if(link.parentNode) link.parentNode.removeChild(link);
   };
+  bindRelatedActions(form, allocation, container);
 
   /* online form */
   if(allocation && form.online !== false){
