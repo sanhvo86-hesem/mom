@@ -75,6 +75,48 @@ function esc(value){
   return div.innerHTML;
 }
 
+function normalizeRecordTypeRegistry(recordTypes){
+  var normalized = {};
+  if(Array.isArray(recordTypes)){
+    recordTypes.forEach(function(item, index){
+      if(!item || typeof item !== 'object') return;
+      var code = String(item.code || item.record_type || item.id || index).trim().toUpperCase();
+      if(!code) return;
+      normalized[code] = Object.assign({}, item, { code: code });
+    });
+    return normalized;
+  }
+  Object.keys(recordTypes || {}).forEach(function(code){
+    var key = String(code || '').trim().toUpperCase();
+    var item = recordTypes[code];
+    if(!key || !item || typeof item !== 'object') return;
+    normalized[key] = Object.assign({}, item, { code: String(item.code || key).trim().toUpperCase() || key });
+  });
+  return normalized;
+}
+
+function buildFormToRecordTypeMap(forms, recordTypes){
+  var map = {};
+  Object.keys(recordTypes || {}).forEach(function(code){
+    var row = recordTypes[code] || {};
+    var linkedForm = String(row.linked_form || row.form_code || '').trim().toUpperCase();
+    if(linkedForm) map[linkedForm] = code;
+  });
+  (forms || []).forEach(function(form){
+    if(!form || typeof form !== 'object') return;
+    var formCode = String(form.form_code || '').trim().toUpperCase();
+    if(!formCode || map[formCode]) return;
+    var directRecordType = String(
+      form.record_type ||
+      (form.schema && form.schema.record_type) ||
+      (form.schema && form.schema.record_context && form.schema.record_context.record_type) ||
+      ''
+    ).trim().toUpperCase();
+    if(directRecordType && recordTypes[directRecordType]) map[formCode] = directRecordType;
+  });
+  return map;
+}
+
 function buildQuery(payload){
   var params = new URLSearchParams();
   Object.keys(payload || {}).forEach(function(key){
@@ -179,6 +221,47 @@ window._ecPromptDialog = openPromptDialog;
 
 function pageEl(){ return document.getElementById('page-forms'); }
 function requestRender(){ var page = pageEl(); if(page) render(page); }
+function renderWorkspaceSkeleton(){
+  return '<div class="ec-skeleton-shell">' +
+    '<div class="ec-skeleton-hero">' +
+      '<div class="ec-skeleton shimmer" style="height:20px;width:160px"></div>' +
+      '<div class="ec-skeleton shimmer" style="height:44px;width:320px"></div>' +
+      '<div class="ec-skeleton shimmer" style="height:14px;width:100%"></div>' +
+      '<div class="ec-skeleton shimmer" style="height:14px;width:78%"></div>' +
+    '</div>' +
+    '<div class="ec-skeleton-grid">' +
+      '<div class="ec-skeleton-card">' +
+        '<div class="ec-skeleton shimmer" style="height:16px;width:140px"></div>' +
+        '<div class="ec-skeleton shimmer" style="height:96px;width:100%"></div>' +
+      '</div>' +
+      '<div class="ec-skeleton-card">' +
+        '<div class="ec-skeleton shimmer" style="height:16px;width:120px"></div>' +
+        '<div class="ec-skeleton shimmer" style="height:22px;width:72%"></div>' +
+        '<div class="ec-skeleton shimmer" style="height:22px;width:88%"></div>' +
+        '<div class="ec-skeleton shimmer" style="height:22px;width:64%"></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="ec-skeleton-card">' +
+      '<div class="ec-skeleton shimmer" style="height:18px;width:180px"></div>' +
+      '<div class="ec-skeleton shimmer" style="height:140px;width:100%"></div>' +
+    '</div>' +
+  '</div>';
+}
+
+function renderLoadFailure(error){
+  var detail = '';
+  if(error && error.message) detail = String(error.message || '').trim();
+  return '<div class="ec-load-failure">' +
+    '<div class="ec-load-failure-mark">!</div>' +
+    '<div class="ec-load-failure-copy">' +
+      '<small>' + esc(t('Phân hệ chưa tải được', 'Workspace load failed')) + '</small>' +
+      '<h3>' + esc(t('Không thể mở Kiểm soát chứng cứ lúc này', 'Could not open Evidence Control right now')) + '</h3>' +
+      '<p>' + esc(t('Hãy kiểm tra phiên đăng nhập, kết nối mạng và quyền truy cập API rồi thử lại. Nếu lỗi vẫn lặp lại, hãy mở Trợ lý tạo mã để kiểm tra phản hồi máy chủ.', 'Check your session, network connection, and API access, then try again. If the issue persists, open the Record ID Assistant to inspect the server response.')) + '</p>' +
+      (detail ? '<div class="ec-inline-alert error"><strong>' + esc(t('Chi tiết kỹ thuật', 'Technical detail')) + '</strong><span>' + esc(detail) + '</span></div>' : '') +
+      '<div class="ec-load-failure-actions"><button type="button" class="ec-btn primary" id="ec-retry-load">' + esc(t('Thử tải lại', 'Retry loading')) + '</button></div>' +
+    '</div>' +
+  '</div>';
+}
 
 function stopWorkQueuePolling(){
   if(state.workQueue.pollTimer){
@@ -395,12 +478,8 @@ function loadAll(){
       state.formMap = {};
     }),
     api('config_record_types', {}, 'GET').then(function(resp){
-      state.recordTypes = resp && resp.record_types ? resp.record_types : {};
-      state.formToRecordType = {};
-      Object.keys(state.recordTypes).forEach(function(code){
-        var linkedForm = (state.recordTypes[code] || {}).linked_form;
-        if(linkedForm) state.formToRecordType[linkedForm] = code;
-      });
+      state.recordTypes = normalizeRecordTypeRegistry(resp && resp.record_types ? resp.record_types : {});
+      state.formToRecordType = buildFormToRecordTypeMap(state.forms, state.recordTypes);
     }).catch(function(){
       state.recordTypes = {};
       state.formToRecordType = {};
@@ -922,7 +1001,7 @@ function renderWorkspacePane(){
   if(!wsEl) return;
   if(state.workspaceMode !== 'work') stopWorkQueuePolling();
   if(state.workspaceLoading){
-    wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Đang tải dữ liệu hồ sơ', 'Loading record workspace')) + '</h3><p>' + esc(t('Hệ thống đang đồng bộ mã cấp phát, danh mục kiểm tra và lịch sử mới nhất.', 'The system is syncing allocations, checklist data, and the latest history.')) + '</p></div>';
+    wsEl.innerHTML = renderWorkspaceSkeleton();
     return;
   }
   if(state.workspaceMode === 'work'){
@@ -1027,7 +1106,7 @@ function refreshFormList(container){
   if(filtersEl) Array.prototype.forEach.call(filtersEl.querySelectorAll('.ec-chip'), function(btn){ btn.classList.toggle('active', btn.getAttribute('data-filter') === state.filter); });
 }
 
-window.renderOnlineForms = function(formCode){
+window._renderOnlineFormsLegacy = function(formCode){
   var page = pageEl();
   if(!page) return;
   if(!formCode && state.pendingFillSelection && state.pendingFillSelection.formCode){
@@ -1036,7 +1115,7 @@ window.renderOnlineForms = function(formCode){
     state.workspaceMode = 'form';
   }
   if(formCode) state.selectedFormCode = formCode;
-  page.innerHTML = '<div class="ec-empty" style="min-height:300px"><div style="font-size:14px;color:var(--ec-text-muted)">' + esc(t('Đang tải...', 'Loading...')) + '</div></div>';
+  page.innerHTML = renderWorkspaceSkeleton();
   loadAll().then(function(){
     if(state.pendingFillSelection && state.pendingFillSelection.formCode){
       state.selectedFormCode = state.pendingFillSelection.formCode;
@@ -1070,10 +1149,39 @@ window._fhSwitchTab = function(target){
   requestRender();
 };
 
+window.renderOnlineForms = function(formCode){
+  var page = pageEl();
+  if(!page) return;
+  if(!formCode && state.pendingFillSelection && state.pendingFillSelection.formCode){
+    formCode = state.pendingFillSelection.formCode;
+    if(state.pendingFillSelection.allocationId) state.selectedAllocationId = state.pendingFillSelection.allocationId;
+    state.workspaceMode = 'form';
+  }
+  if(formCode) state.selectedFormCode = formCode;
+  page.innerHTML = renderWorkspaceSkeleton();
+  loadAll().then(function(){
+    if(state.pendingFillSelection && state.pendingFillSelection.formCode){
+      state.selectedFormCode = state.pendingFillSelection.formCode;
+      if(state.pendingFillSelection.allocationId) state.selectedAllocationId = state.pendingFillSelection.allocationId;
+      state.pendingFillSelection = null;
+    }
+    if(!state.selectedFormCode && state.forms.length) state.selectedFormCode = state.forms[0].form_code;
+    return loadAllocations();
+  }).then(function(){
+    state.ready = true;
+    render(page);
+  }).catch(function(err){
+    page.innerHTML = renderLoadFailure(err);
+    var retry = page.querySelector('#ec-retry-load');
+    if(retry) retry.onclick = function(){ window.renderOnlineForms(state.selectedFormCode || formCode || ''); };
+  });
+};
+
 window._fhState = state;
 window._fhShowToast = showToast;
 window._fhT = t;
 window._fhEscHtml = esc;
+window._fhOpenFormWorkspace = openFormWorkspace;
 window.addEventListener('beforeunload', stopWorkQueuePolling);
 
 })();

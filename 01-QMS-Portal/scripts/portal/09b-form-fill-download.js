@@ -59,6 +59,7 @@ var ws = {
   allocBusy: false,
   allocDept: '',
   allocNotes: '',
+  allocError: null,
   lastFormCode: '',
   checklistCache: {},
   checklistLoading: {},
@@ -70,7 +71,8 @@ var ws = {
   retentionEditor: {},
   slaCache: {},
   slaLoading: {},
-  slaEditor: {}
+  slaEditor: {},
+  draftCleanupDone: false
 };
 
 /* ── Data helpers ── */
@@ -109,12 +111,25 @@ function loadSchema(code){
 
 function detectRecordType(form){
   var st=window._ecState||{};
-  return (st.formToRecordType&&st.formToRecordType[form.form_code])||'';
+  var code = String(form && form.form_code || '').trim().toUpperCase();
+  var direct = String(
+    (form && form.record_type) ||
+    (form && form.schema && form.schema.record_type) ||
+    (form && form.schema && form.schema.record_context && form.schema.record_context.record_type) ||
+    ''
+  ).trim().toUpperCase();
+  return (st.formToRecordType&&st.formToRecordType[code])||direct||'';
 }
 function detectDepartment(form){
   var st=window._ecState||{};
   var rt=detectRecordType(form);
-  return (rt&&st.recordTypes&&st.recordTypes[rt])?st.recordTypes[rt].department_owner||'':'';
+  var cfg = (rt&&st.recordTypes&&st.recordTypes[rt]) ? st.recordTypes[rt] : null;
+  return cfg ? (cfg.department_owner || cfg.department || '') : '';
+}
+function departmentLabel(code){
+  var key = String(code || '').trim().toUpperCase();
+  var match = DEPARTMENTS.find(function(item){ return String(item.v || '').trim().toUpperCase() === key; }) || null;
+  return match ? t(match.l, match.e) : key;
 }
 function selectedAllocation(){
   var st=window._ecState||{};
@@ -123,6 +138,46 @@ function selectedAllocation(){
     window.console.warn('[EvidenceControl] allocation not found for selectedAllocationId:', st.selectedAllocationId);
   }
   return allocation;
+}
+
+function activeTraceContext(allocation){
+  if(allocation && allocation.master_context) return allocation.master_context;
+  if(window._ecState && window._ecState.pendingContext) return window._ecState.pendingContext;
+  return {};
+}
+
+function traceSummary(ctx){
+  ctx = ctx || {};
+  var parts = [];
+  if(ctx.customer_id) parts.push(ctx.customer_id);
+  if(ctx.so_number) parts.push('SO ' + ctx.so_number);
+  if(ctx.jo_number) parts.push('JO ' + ctx.jo_number);
+  if(ctx.wo_number) parts.push('WO ' + ctx.wo_number);
+  if(ctx.part_number || ctx.part_revision) parts.push([ctx.part_number || '', ctx.part_revision || ''].filter(Boolean).join('/'));
+  if(ctx.capa_number) parts.push(ctx.capa_number);
+  return parts.join(' · ');
+}
+
+function renderWorkspaceOverview(form, allocation){
+  var rt = detectRecordType(form);
+  var st = window._ecState || {};
+  var rtCfg = rt ? (st.recordTypes[rt] || {}) : {};
+  var ownerDept = departmentLabel(detectDepartment(form) || rtCfg.department_owner || '');
+  var modeLabel = form.online === false ? t('Ngoại tuyến', 'Offline') : t('Trực tuyến', 'Online');
+  var statusText = allocation ? historyStatusLabel(allocation.status || 'allocated') : t('Sẵn sàng cấp mã', 'Ready to allocate');
+  var trace = traceSummary(activeTraceContext(allocation));
+  return '<div class="ec-overview">' +
+    '<div class="ec-overview-card"><small>' + esc(t('Loại hồ sơ', 'Record type')) + '</small><strong>' + esc(rt ? (rt + ' · ' + (rtCfg.label || rtCfg.label_vi || rt)) : t('Chưa ánh xạ', 'Not mapped')) + '</strong><span>' + esc(t('Form này bám theo loại hồ sơ đã cấu hình trong registry vận hành.', 'This form follows the record-type mapping from the operational registry.')) + '</span></div>' +
+    '<div class="ec-overview-card"><small>' + esc(t('Phòng ban sở hữu', 'Owning department')) + '</small><strong>' + esc(ownerDept || '—') + '</strong><span>' + esc(t('Phòng ban mặc định sẽ được đề xuất khi cấp mã, nhưng vẫn có thể đổi theo ca thực tế.', 'The default department is suggested during allocation and can still be adjusted for the actual case.')) + '</span></div>' +
+    '<div class="ec-overview-card"><small>' + esc(t('Chế độ thực hiện', 'Execution mode')) + '</small><strong>' + esc(modeLabel) + '</strong><span>' + esc(form.online === false ? t('Cấp mã xong sẽ phát hành gói Excel có kiểm soát để điền và nộp lại.', 'After allocation, the governed Excel package is issued for completion and resubmission.') : t('Cấp mã xong sẽ mở ngay phần điền biểu mẫu, ký số và gửi duyệt.', 'After allocation, the form opens directly for completion, signing, and review.')) + '</span></div>' +
+    '<div class="ec-overview-card"><small>' + esc(t('Trạng thái hiện tại', 'Current status')) + '</small><strong>' + esc(statusText) + '</strong><span>' + esc(allocation ? (t('Mã hồ sơ đang chọn: ', 'Selected record: ') + (allocation.record_id || '—')) : (t('Số mã đã cấp cho form này: ', 'Allocations already issued for this form: ') + String((st.allocations || []).length || 0))) + '</span></div>' +
+    (trace ? '<div class="ec-overview-trace"><small>' + esc(t('Ngữ cảnh truy xuất đang mang theo', 'Active traceability context')) + '</small><strong>' + esc(trace) + '</strong></div>' : '') +
+  '</div>';
+}
+
+function renderAllocateError(){
+  if(!ws.allocError || !ws.allocError.message) return '';
+  return '<div class="ec-inline-alert error"><strong>' + esc(t('Cấp mã chưa thành công', 'Allocation did not complete')) + '</strong><span>' + esc(ws.allocError.message || '') + '</span>' + (ws.allocError.detail ? '<small>' + esc(ws.allocError.detail) + '</small>' : '') + '</div>';
 }
 
 /* ── Draft management ── */
@@ -135,6 +190,10 @@ function resetWorkspaceForForm(form){
   ws.lookupInstances = {};
   ws.uploadFiles = [];
   ws.draftKey = '';
+  ws.allocBusy = false;
+  ws.allocDept = '';
+  ws.allocNotes = '';
+  ws.allocError = null;
 }
 
 function checklistStage(allocation){
@@ -708,14 +767,14 @@ function isLockedContextField(fieldId, allocation){
 }
 
 function draftKey(form,alloc){ return 'qms_ec_'+((form&&form.form_code)||'')+'_'+((alloc&&alloc.allocation_id)||''); }
-function loadDraft(form,alloc){
+function loadDraftLegacy(form,alloc){
   var key=draftKey(form,alloc);
   if(ws.draftKey===key) return;
   ws.draftKey=key; ws.fieldValues={}; ws.signatures={};
   try{ var raw=localStorage.getItem(key); if(raw){ var p=JSON.parse(raw); ws.fieldValues=p.fieldValues||{}; ws.signatures=p.signatures||{}; } }catch(e){}
   hydrateFromAlloc(alloc);
 }
-function saveDraft(form,alloc){
+function saveDraftLegacy(form,alloc){
   try{ localStorage.setItem(draftKey(form,alloc),JSON.stringify({fieldValues:ws.fieldValues,signatures:ws.signatures})); toast(t('Đã lưu nháp.','Draft saved.'),'success'); }catch(e){}
   saveDraftToServer(form, alloc);
 }
@@ -724,6 +783,72 @@ function hydrateFromAlloc(alloc){
   if(!alloc) return;
   var ctx=alloc.master_context||{};
   ['customer_id','supplier_id','so_number','jo_number','wo_number','part_number','part_revision','capa_number'].forEach(function(k){ if(!ws.fieldValues[k]&&ctx[k]) ws.fieldValues[k]=ctx[k]; });
+}
+
+function purgeOldDrafts(){
+  if(ws.draftCleanupDone || typeof localStorage === 'undefined') return;
+  ws.draftCleanupDone = true;
+  var now = Date.now();
+  var maxAge = 45 * 24 * 60 * 60 * 1000;
+  try {
+    for(var i = localStorage.length - 1; i >= 0; i--){
+      var key = localStorage.key(i);
+      if(!key || key.indexOf('qms_ec_') !== 0) continue;
+      var raw = localStorage.getItem(key);
+      if(!raw){ localStorage.removeItem(key); continue; }
+      var parsed = JSON.parse(raw);
+      var savedAt = parsed && parsed.savedAt ? new Date(parsed.savedAt).getTime() : 0;
+      if(!savedAt || !isFinite(savedAt) || (now - savedAt) > maxAge) localStorage.removeItem(key);
+    }
+  } catch(_err){}
+}
+
+function flashActionButton(button, temporaryLabel, fallbackLabel){
+  if(!button) return;
+  var original = button.getAttribute('data-label-original') || button.textContent || fallbackLabel || '';
+  button.setAttribute('data-label-original', original);
+  button.textContent = temporaryLabel || original;
+  button.disabled = true;
+  setTimeout(function(){
+    button.textContent = original;
+    button.disabled = false;
+  }, 1500);
+}
+
+function reloadCurrentFormWorkspace(formCode, allocationId){
+  if(typeof window._fhOpenFormWorkspace === 'function'){
+    window._fhOpenFormWorkspace(formCode || '', allocationId || '');
+    return;
+  }
+  if(typeof window.renderOnlineForms === 'function') window.renderOnlineForms(formCode || '');
+}
+
+function loadDraft(form,alloc){
+  var key=draftKey(form,alloc);
+  if(ws.draftKey===key) return;
+  purgeOldDrafts();
+  ws.draftKey=key; ws.fieldValues={}; ws.signatures={};
+  try{
+    var raw=localStorage.getItem(key);
+    if(raw){
+      var p=JSON.parse(raw);
+      ws.fieldValues=p.fieldValues||{};
+      ws.signatures=p.signatures||{};
+    }
+  }catch(e){}
+  hydrateFromAlloc(alloc);
+}
+
+function saveDraft(form,alloc){
+  try{
+    localStorage.setItem(draftKey(form,alloc),JSON.stringify({
+      fieldValues:ws.fieldValues,
+      signatures:ws.signatures,
+      savedAt:new Date().toISOString()
+    }));
+    toast(t('ÄÃ£ lÆ°u nhÃ¡p.','Draft saved.'),'success');
+  }catch(e){}
+  saveDraftToServer(form, alloc);
 }
 
 /* ══════════════════════════════════════════════════════
@@ -769,6 +894,7 @@ function renderWorkspace(form, allocation, container){
   '</div>';
 
   /* ── Step 1: Allocate ── */
+  html += renderWorkspaceOverview(form, allocation);
   var hasAlloc = !!allocation;
   html += '<div class="ec-step' + (hasAlloc ? ' collapsed' : '') + '" id="ec-step-alloc">' +
     '<div class="ec-step-head" data-toggle="ec-step-alloc">' +
@@ -812,8 +938,15 @@ function renderAllocateStep(form){
   var defaultDept = ws.allocDept || detectDepartment(form) || 'QA';
   var isOffline = form.online === false;
   var busy = ws.allocBusy;
+  var trace = traceSummary(activeTraceContext(null));
 
-  return '<div class="ec-allocate-grid">' +
+  return '<div class="ec-allocate-intro">' +
+    '<strong>' + esc(t('Cấp mã ngay trong workspace này', 'Issue the record ID directly in this workspace')) + '</strong>' +
+    '<span>' + esc(isOffline ? t('Hệ thống sẽ cấp mã, tạo tên tệp chuẩn, rồi tải ngay gói biểu mẫu ngoại tuyến có kiểm soát.', 'The system will issue the ID, generate the governed filename, and immediately download the controlled offline package.') : t('Hệ thống sẽ cấp mã, khóa ngữ cảnh truy xuất, rồi mở luôn phần điền và ký mà không cần đổi tab.', 'The system will issue the ID, lock the traceability context, and continue directly into fill and sign without tab switching.')) + '</span>' +
+  '</div>' +
+  (trace ? '<div class="ec-trace-card"><small>' + esc(t('Ngữ cảnh truy xuất dự kiến', 'Projected traceability context')) + '</small><strong>' + esc(trace) + '</strong></div>' : '') +
+  renderAllocateError() +
+  '<div class="ec-allocate-grid">' +
     '<div><label class="ec-label">' + esc(t('Loại hồ sơ', 'Record type')) + '</label>' +
       '<input class="ec-input" value="' + esc(rt ? (rt + ' · ' + (rtCfg.label || rt)) : t('Không xác định', 'Unknown')) + '" readonly style="background:var(--ec-bg);cursor:default">' +
     '</div>' +
@@ -828,6 +961,7 @@ function renderAllocateStep(form){
   '</div>' +
   '<div style="display:flex;justify-content:flex-end;gap:8px">' +
     (!rt ? '<span style="font-size:11px;color:var(--ec-danger);margin-right:auto">'+esc(t('Không tìm thấy loại hồ sơ liên kết','No linked record type found'))+'</span>' : '') +
+    '<span class="ec-step-help">' + esc(t('Nếu máy chủ vừa đổi phiên hoặc CSRF, hệ thống sẽ tự thử đồng bộ lại trước khi báo lỗi.', 'If the server rotated the session or CSRF token, the client will attempt a recovery before showing an error.')) + '</span>' +
     '<button class="ec-btn primary lg" id="ec-alloc-btn"'+(busy||!rt?' disabled':'')+' style="min-width:200px">' +
       (busy ? esc(t('Đang xử lý...','Processing...')) : esc(isOffline ? t('Cấp mã & tải form','Allocate & download') : t('Cấp mã & tiếp tục','Allocate & continue'))) +
     '</button>' +
@@ -1207,6 +1341,31 @@ function loadHistory(form){
    EVENT BINDING
    ══════════════════════════════════════════════════════ */
 
+function loadHistoryLegacy(form){
+  var el=document.getElementById('ec-history-content');
+  if(!el) return;
+  api('form_fill_history',{form_code:form.form_code,page:1,page_size:10},'GET').then(function(r){
+    var entries=(r&&r.ok&&Array.isArray(r.entries))?r.entries:[];
+    entries.sort(function(a,b){
+      var aTime = Date.parse(a.submitted_at || a.created_at || '') || 0;
+      var bTime = Date.parse(b.submitted_at || b.created_at || '') || 0;
+      return bTime - aTime;
+    });
+    if(!entries.length){
+      el.innerHTML='<div style="text-align:center;color:var(--ec-text-muted);font-size:12px;padding:16px">'+esc(t('ChÆ°a cÃ³ báº£n ná»™p nÃ o.','No submissions yet.'))+'</div>';
+      return;
+    }
+    el.innerHTML='<table class="ec-table"><thead><tr><th>'+esc(t('MÃ£ há»“ sÆ¡','Record ID'))+'</th><th>'+esc(t('NgÆ°á»i ná»™p','Submitted by'))+'</th><th>'+esc(t('NgÃ y','Date'))+'</th><th>'+esc(t('Tráº¡ng thÃ¡i','Status'))+'</th></tr></thead><tbody>'+entries.map(function(e){
+      var dt=e.submitted_at||e.created_at||'';
+      return '<tr><td class="mono">'+esc(e.record_id||'â€”')+'</td><td>'+esc(e.submitted_by||'â€”')+'</td><td>'+esc(dt?formatLocalDateTime(dt, true):'â€”')+'</td><td>'+renderHistoryStatusBadge(e._status||e.approval_state||'submitted')+'</td></tr>';
+    }).join('')+'</tbody></table>';
+  }).catch(function(){
+    el.innerHTML='<div class="ec-inline-alert error"><strong>' + esc(t('KhÃ´ng táº£i Ä‘Æ°á»£c lá»‹ch sá»­ ná»™p', 'Could not load submission history')) + '</strong><span>' + esc(t('HÃ£y thá»­ táº£i láº¡i Ä‘á»ƒ Ä‘á»“ng bá»™ dá»¯ liá»‡u má»›i nháº¥t tá»« mÃ¡y chá»§.', 'Try reloading to sync the latest data from the server.')) + '</span><small><button type="button" class="ec-btn secondary" id="ec-history-retry">' + esc(t('Táº£i láº¡i lá»‹ch sá»­', 'Reload history')) + '</button></small></div>';
+    var retry = document.getElementById('ec-history-retry');
+    if(retry) retry.onclick = function(){ loadHistory(form); };
+  });
+}
+
 function searchRelatedAllocations(allocation){
   var state = relatedState(allocation);
   var query = String(state.query || '').trim();
@@ -1239,6 +1398,10 @@ function searchRelatedAllocations(allocation){
 
 function openLinkedAllocation(formCode, allocationId){
   if(!allocationId) return;
+  if(typeof window._fhOpenFormWorkspace === 'function'){
+    window._fhOpenFormWorkspace(formCode || '', allocationId || '');
+    return;
+  }
   var st = window._fhState || window._ecState || null;
   if(st){
     st.pendingFillSelection = { formCode: formCode || '', allocationId: allocationId };
@@ -1541,23 +1704,34 @@ function doAllocate(form, container){
   var rt=detectRecordType(form);
   if(!rt){ toast(t('Không xác định loại hồ sơ.','Cannot determine record type.'),'error'); return; }
   var dept=ws.allocDept||detectDepartment(form)||'QA';
+  ws.allocError = null;
   ws.allocBusy=true;
   renderWorkspace(form,null,container);
   bindWorkspace(form,null,container);
 
   var masterCtx={};
+  var notesDraft=(ws.allocNotes||'').trim();
   if(window._ecState&&window._ecState.pendingContext) masterCtx=window._ecState.pendingContext;
 
   window.AllocationTracker.allocate(rt,dept,{
     year:new Date().getFullYear(),
     form_code:form.form_code,
-    notes:(ws.allocNotes||'').trim(),
+    notes:notesDraft,
     master_context:masterCtx,
     linked_order_id:masterCtx.wo_number||masterCtx.jo_number||masterCtx.so_number||''
   }).then(function(resp){
     ws.allocBusy=false;
-    ws.allocNotes='';
-    if(!resp||!resp.ok){ toast(t('Không thể cấp mã.','Could not allocate.'),'error'); renderWorkspace(form,null,container); bindWorkspace(form,null,container); return; }
+    if(resp&&resp.ok) ws.allocNotes='';
+    if(!resp||!resp.ok){
+      ws.allocError = window.AllocationTracker && typeof window.AllocationTracker.describeError === 'function'
+        ? window.AllocationTracker.describeError(resp, 'allocate')
+        : { code:'allocate_failed', message:t('Không thể cấp mã hồ sơ.', 'Could not allocate the record ID.'), detail:'' };
+      toast(ws.allocError.message || t('Không thể cấp mã hồ sơ.', 'Could not allocate the record ID.'),'error');
+      renderWorkspace(form,null,container);
+      bindWorkspace(form,null,container);
+      return;
+    }
+    ws.allocError = null;
     toast(t('Đã cấp mã: ','Allocated: ')+(resp.record_id||''),'success');
     var st=window._ecState;
     st.selectedAllocationId=resp.allocation_id||'';
@@ -1575,9 +1749,10 @@ function doAllocate(form, container){
     next.finally(function(){
       if(typeof window.renderOnlineForms === 'function') window.renderOnlineForms(form.form_code);
     });
-  }).catch(function(){
+  }).catch(function(err){
     ws.allocBusy=false;
-    toast(t('Lỗi kết nối.','Connection error.'),'error');
+    ws.allocError = { code:'transport_error', message:t('Không thể kết nối tới máy chủ cấp mã.', 'Could not reach the allocation server.'), detail:String(err && err.message || '') };
+    toast(ws.allocError.message,'error');
     renderWorkspace(form,null,container);
     bindWorkspace(form,null,container);
   });
