@@ -2078,6 +2078,11 @@ function runtime_observability_default(): array {
       'machines' => [],
       'recent' => [],
     ],
+    'launch_blockers' => [
+      'totals' => ['count' => 0],
+      'work_orders' => [],
+      'recent' => [],
+    ],
   ];
 }
 
@@ -2110,6 +2115,10 @@ function load_runtime_observability_store(): array {
   $data['connector_ingest']['totals'] = array_merge($defaults['connector_ingest']['totals'], is_array($data['connector_ingest']['totals'] ?? null) ? $data['connector_ingest']['totals'] : []);
   $data['connector_ingest']['machines'] = is_array($data['connector_ingest']['machines'] ?? null) ? $data['connector_ingest']['machines'] : [];
   $data['connector_ingest']['recent'] = array_values(is_array($data['connector_ingest']['recent'] ?? null) ? $data['connector_ingest']['recent'] : []);
+  $data['launch_blockers'] = is_array($data['launch_blockers'] ?? null) ? $data['launch_blockers'] : $defaults['launch_blockers'];
+  $data['launch_blockers']['totals'] = array_merge($defaults['launch_blockers']['totals'], is_array($data['launch_blockers']['totals'] ?? null) ? $data['launch_blockers']['totals'] : []);
+  $data['launch_blockers']['work_orders'] = is_array($data['launch_blockers']['work_orders'] ?? null) ? $data['launch_blockers']['work_orders'] : [];
+  $data['launch_blockers']['recent'] = array_values(is_array($data['launch_blockers']['recent'] ?? null) ? $data['launch_blockers']['recent'] : []);
   return $data;
 }
 
@@ -2231,6 +2240,106 @@ function observe_connector_ingest(string $machineId, bool $ok, string $message, 
   save_runtime_observability_store($store);
   append_jsonl_line(runtime_observability_log_file('connector-ingest.jsonl'), $entry);
   runtime_data_log_event('runtime.connector_ingest.' . $entry['status'], 'connector_feed', $machineId, $entry);
+}
+
+function observe_wo_launch_blocked(string $woNumber, string $targetStatus, array $blockers, array $snapshot = []): void {
+  $store = load_runtime_observability_store();
+  $timestamp = now_iso();
+  $entry = [
+    'wo_number' => $woNumber,
+    'target_status' => $targetStatus,
+    'timestamp' => $timestamp,
+    'blockers' => array_values($blockers),
+    'blocker_codes' => array_values(array_unique(array_filter(array_map(static fn($row) => is_array($row) ? (string)($row['code'] ?? '') : '', $blockers)))),
+    'context' => $snapshot,
+  ];
+
+  $byWo = is_array($store['launch_blockers']['work_orders'] ?? null) ? $store['launch_blockers']['work_orders'] : [];
+  $node = array_merge([
+    'wo_number' => $woNumber,
+    'last_blocked_at' => '',
+    'last_target_status' => '',
+    'count' => 0,
+    'latest_blockers' => [],
+    'latest_context' => [],
+    'recent' => [],
+  ], is_array($byWo[$woNumber] ?? null) ? $byWo[$woNumber] : []);
+  $node['last_blocked_at'] = $timestamp;
+  $node['last_target_status'] = $targetStatus;
+  $node['count'] = (int)($node['count'] ?? 0) + 1;
+  $node['latest_blockers'] = $entry['blockers'];
+  $node['latest_context'] = $snapshot;
+  $recentWo = array_values((array)($node['recent'] ?? []));
+  array_unshift($recentWo, $entry);
+  $node['recent'] = array_slice($recentWo, 0, 12);
+  $byWo[$woNumber] = $node;
+  $store['launch_blockers']['work_orders'] = $byWo;
+  $store['launch_blockers']['totals']['count'] = (int)($store['launch_blockers']['totals']['count'] ?? 0) + 1;
+  $recentGlobal = array_values((array)($store['launch_blockers']['recent'] ?? []));
+  array_unshift($recentGlobal, $entry);
+  $store['launch_blockers']['recent'] = array_slice($recentGlobal, 0, 40);
+  save_runtime_observability_store($store);
+  append_jsonl_line(runtime_observability_log_file('launch-blockers.jsonl'), $entry);
+  runtime_data_log_event('runtime.wo_launch_blocked', 'work_order', $woNumber, $entry);
+}
+
+function mes_launch_blocker_rows(array $observability): array {
+  $rows = [];
+  foreach ((array)($observability['launch_blockers']['work_orders'] ?? []) as $woNumber => $node) {
+    if (!is_array($node)) continue;
+    $rows[] = [
+      'wo_number' => (string)($node['wo_number'] ?? $woNumber),
+      'target_status' => (string)($node['last_target_status'] ?? ''),
+      'blocked_at' => (string)($node['last_blocked_at'] ?? ''),
+      'count' => (int)($node['count'] ?? 0),
+      'severity' => 'critical',
+      'issue_codes' => array_values(array_unique(array_filter(array_map(static fn($row) => is_array($row) ? (string)($row['code'] ?? '') : '', (array)($node['latest_blockers'] ?? []))))),
+      'message_vi' => 'WO đã bị chặn mở chạy do chưa đạt đủ điều kiện MES bắt buộc.',
+      'message_en' => 'The WO was blocked from launch because mandatory MES conditions were not satisfied.',
+      'latest_blockers' => array_values((array)($node['latest_blockers'] ?? [])),
+      'context' => is_array($node['latest_context'] ?? null) ? $node['latest_context'] : [],
+      'recent' => array_values((array)($node['recent'] ?? [])),
+    ];
+  }
+  usort($rows, static function ($a, $b) {
+    return strcmp((string)($b['blocked_at'] ?? ''), (string)($a['blocked_at'] ?? ''));
+  });
+  return $rows;
+}
+
+function mes_latest_signal_timestamp(array $mes, string $machineId): string {
+  $latest = '';
+  foreach ((array)($mes['machine_signals'] ?? []) as $row) {
+    if (!is_array($row) || (string)($row['machine_id'] ?? '') !== $machineId) continue;
+    $candidate = trim((string)($row['signal_at'] ?? ''));
+    if ($candidate !== '' && $candidate > $latest) $latest = $candidate;
+  }
+  foreach ((array)($mes['connector_feeds'] ?? []) as $row) {
+    if (!is_array($row) || (string)($row['machine_id'] ?? '') !== $machineId) continue;
+    $candidate = trim((string)($row['last_signal_at'] ?? $row['last_heartbeat_at'] ?? ''));
+    if ($candidate !== '' && $candidate > $latest) $latest = $candidate;
+  }
+  return $latest;
+}
+
+function mes_signal_replay_guard(array $mes, array $machine, array $normalized): ?array {
+  $machineId = trim((string)($normalized['machine_id'] ?? $machine['machine_id'] ?? ''));
+  if ($machineId === '') return null;
+  $connectorType = strtolower(trim((string)($normalized['connector_type'] ?? $machine['connector_type'] ?? 'manual_bridge')));
+  if (in_array($connectorType, ['manual_bridge', 'disabled'], true)) return null;
+  $incoming = trim((string)($normalized['signal_at'] ?? ''));
+  if ($incoming === '') return null;
+  $latest = mes_latest_signal_timestamp($mes, $machineId);
+  if ($latest === '' || $incoming >= $latest) return null;
+  return [
+    'ok' => false,
+    'error' => 'stale_signal_timestamp',
+    'message' => 'Incoming signal timestamp is older than the latest accepted machine signal.',
+    'machine_id' => $machineId,
+    'connector_type' => $connectorType,
+    'incoming_signal_at' => $incoming,
+    'latest_signal_at' => $latest,
+  ];
 }
 
 function shadow_sync_master_data_store(array $data): void {
@@ -3893,24 +4002,27 @@ function mes_wo_transition_guard(array $orders, array $master, array $mes, strin
   $blockers = mes_governance_blockers_for_dispatch($dispatchRow);
   if (!$blockers) return null;
 
+  $snapshotContext = [
+    'evidence_gate' => (array)($dispatchRow['evidence_gate'] ?? []),
+    'program_release' => (array)($dispatchRow['program_release'] ?? []),
+    'tool_readiness' => (array)($dispatchRow['tool_readiness'] ?? []),
+    'operator_governance' => (array)($dispatchRow['operator_governance'] ?? []),
+    'material_trace' => (array)($dispatchRow['material_trace'] ?? []),
+    'connector_guard' => (array)($dispatchRow['connector_guard'] ?? []),
+    'adapter_governance' => (array)($dispatchRow['adapter_governance'] ?? []),
+    'alarm_runtime' => (array)($dispatchRow['alarm_runtime'] ?? []),
+    'nc_download' => (array)($dispatchRow['nc_download'] ?? []),
+    'tool_offset' => (array)($dispatchRow['tool_offset'] ?? []),
+  ];
+  observe_wo_launch_blocked($woNumber, $targetStatus, $blockers, $snapshotContext);
+
   return [
     'ok' => false,
     'error' => 'wo_launch_blocked',
     'target_status' => $targetStatus,
     'wo_number' => $woNumber,
     'blockers' => $blockers,
-    'snapshot' => [
-      'evidence_gate' => (array)($dispatchRow['evidence_gate'] ?? []),
-      'program_release' => (array)($dispatchRow['program_release'] ?? []),
-      'tool_readiness' => (array)($dispatchRow['tool_readiness'] ?? []),
-      'operator_governance' => (array)($dispatchRow['operator_governance'] ?? []),
-      'material_trace' => (array)($dispatchRow['material_trace'] ?? []),
-      'connector_guard' => (array)($dispatchRow['connector_guard'] ?? []),
-      'adapter_governance' => (array)($dispatchRow['adapter_governance'] ?? []),
-      'alarm_runtime' => (array)($dispatchRow['alarm_runtime'] ?? []),
-      'nc_download' => (array)($dispatchRow['nc_download'] ?? []),
-      'tool_offset' => (array)($dispatchRow['tool_offset'] ?? []),
-    ],
+    'snapshot' => $snapshotContext,
   ];
 }
 
@@ -5026,6 +5138,7 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $observability = load_runtime_observability_store();
   $runtimeMode = runtime_data_layer_summary();
   $shadowSyncFailures = mes_shadow_failure_rows($observability);
+  $launchBlockerQueue = mes_launch_blocker_rows($observability);
 
   $kpis['program_mismatches'] = count($programHandshakeQueue);
   $kpis['program_release_risk'] = count($programReleaseQueue);
@@ -5035,6 +5148,7 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $kpis['adapter_governance_risk'] = count($adapterGovernanceQueue);
   $kpis['alarm_hotspots'] = count($alarmHotspotQueue);
   $kpis['shadow_sync_failures'] = count($shadowSyncFailures);
+  $kpis['launch_blocker_hotspots'] = count($launchBlockerQueue);
 
   return [
     'kpis' => $kpis,
@@ -5058,8 +5172,10 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     'adapter_governance_queue' => array_slice($adapterGovernanceQueue, 0, 20),
     'alarm_hotspot_queue' => array_slice($alarmHotspotQueue, 0, 20),
     'shadow_sync_failures' => array_slice($shadowSyncFailures, 0, 20),
+    'launch_blocker_queue' => array_slice($launchBlockerQueue, 0, 20),
     'shadow_status' => $observability['shadow_sync'] ?? [],
     'connector_ingest_status' => $observability['connector_ingest'] ?? [],
+    'launch_blocker_status' => $observability['launch_blockers'] ?? [],
     'runtime_mode' => $runtimeMode,
     'tooling_alerts' => array_slice($toolingAlerts, 0, 20),
     'evidence_gate_queue' => array_slice($evidenceGateQueue, 0, 20),
@@ -11750,6 +11866,7 @@ if ($username === '') {
       'connector_ingest' => (array)($observability['connector_ingest'] ?? []),
       'shadow_sync_failures' => mes_shadow_failure_rows($observability),
       'recent_connector_failures' => mes_recent_connector_ingest_failures($observability),
+      'launch_blockers' => mes_launch_blocker_rows($observability),
       'runtime_mode' => runtime_data_layer_summary(),
       'updated' => (string)($observability['_meta']['updated'] ?? ''),
     ]);
@@ -11823,6 +11940,16 @@ if ($username === '') {
         'warnings' => [],
       ],
     ];
+    $signalGuard = mes_signal_replay_guard($mes, $machine, $normalized);
+    if ($signalGuard) {
+      observe_connector_ingest($machineId, false, 'stale_signal_timestamp', [
+        'action' => 'mes_machine_signal_upsert',
+        'incoming_signal_at' => (string)($signalGuard['incoming_signal_at'] ?? ''),
+        'latest_signal_at' => (string)($signalGuard['latest_signal_at'] ?? ''),
+        'connector_type' => (string)($signalGuard['connector_type'] ?? ''),
+      ]);
+      api_json($signalGuard, 409);
+    }
     $saved = mes_upsert_connector_runtime($mes, $machine, $normalized, $username);
 
     save_mes_runtime_store($mes);
@@ -11898,6 +12025,17 @@ if ($username === '') {
     if ($operatorId !== '' && !isset($operators[$operatorId])) {
       observe_connector_ingest($machineId, false, 'operator_not_found', ['action' => 'mes_connector_ingest', 'operator_id' => $operatorId]);
       api_json(['ok' => false, 'error' => 'operator_not_found'], 404);
+    }
+    $signalGuard = mes_signal_replay_guard($mes, $machine, $normalized);
+    if ($signalGuard) {
+      observe_connector_ingest($machineId, false, 'stale_signal_timestamp', [
+        'action' => 'mes_connector_ingest',
+        'incoming_signal_at' => (string)($signalGuard['incoming_signal_at'] ?? ''),
+        'latest_signal_at' => (string)($signalGuard['latest_signal_at'] ?? ''),
+        'connector_type' => (string)($signalGuard['connector_type'] ?? ''),
+        'wo_number' => $woNumber,
+      ]);
+      api_json($signalGuard, 409);
     }
 
     $saved = mes_upsert_connector_runtime($mes, $machine, $normalized, $username);
@@ -13336,6 +13474,7 @@ if ($username === '') {
     $ncDownloadMismatches = count((array)($mesSnapshot['nc_download_mismatch_queue'] ?? []));
     $toolOffsetRisk = count((array)($mesSnapshot['tool_offset_queue'] ?? []));
     $shadowSyncFailures = count((array)($mesSnapshot['shadow_sync_failures'] ?? []));
+    $launchBlockerHotspots = count((array)($mesSnapshot['launch_blocker_queue'] ?? []));
     $downtimeGovernanceGaps = count(mes_downtime_governance_gap_rows($mes, $master));
 
     // 6. Orphan record links (links pointing to non-existent orders)
@@ -13367,6 +13506,7 @@ if ($username === '') {
       'nc_download_mismatches' => $ncDownloadMismatches,
       'tool_offset_risk' => $toolOffsetRisk,
       'shadow_sync_failures' => $shadowSyncFailures,
+      'launch_blocker_hotspots' => $launchBlockerHotspots,
       'downtime_governance_gaps' => $downtimeGovernanceGaps,
       'orphan_links'        => $orphanLinks,
     ]);
@@ -13743,6 +13883,27 @@ if ($username === '') {
               (string)($row['store_key'] ?? ''),
               'Failures ' . (int)($row['failure_count'] ?? 0),
               (string)($row['message'] ?? ''),
+            ])),
+          ];
+        }
+        break;
+      }
+      case 'launch_blocker_hotspots': {
+        $orders = load_orders_store();
+        $master = load_master_data_store();
+        $mes = load_mes_runtime_store();
+        $snapshot = build_mes_snapshot($orders, $master, $mes);
+        foreach ((array)($snapshot['launch_blocker_queue'] ?? []) as $row) {
+          $items[] = [
+            'id' => (string)($row['wo_number'] ?? ''),
+            'type' => 'wo_launch_blocked',
+            'department' => 'MES',
+            'date' => substr((string)($row['blocked_at'] ?? ''), 0, 10),
+            'responsible' => (string)($row['target_status'] ?? ''),
+            'detail' => implode(' · ', array_filter([
+              (string)($row['wo_number'] ?? ''),
+              !empty($row['issue_codes']) ? ('Issues: ' . implode(', ', (array)$row['issue_codes'])) : '',
+              (string)($row['message_en'] ?? ''),
             ])),
           ];
         }

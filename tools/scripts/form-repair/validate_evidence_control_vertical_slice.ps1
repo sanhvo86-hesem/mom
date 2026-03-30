@@ -1,9 +1,14 @@
 [CmdletBinding()]
 param(
-  [string]$RepoRoot = "C:\Users\TEST4\qms.hesem.com.vn"
+  [string]$RepoRoot = ""
 )
 
 $ErrorActionPreference = "Stop"
+
+if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
+  $RepoRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
+}
+$RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
 
 function Invoke-Step {
   param(

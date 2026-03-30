@@ -1,9 +1,14 @@
 [CmdletBinding()]
 param(
-  [string]$RepoRoot = "C:\Users\TEST4\qms.hesem.com.vn"
+  [string]$RepoRoot = ""
 )
 
 $ErrorActionPreference = "Stop"
+
+if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
+  $RepoRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
+}
+$RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
 
 function Write-Step($message) {
   Write-Host ""
@@ -121,7 +126,7 @@ Invoke-Checked "MES schema foundation lookup" $schemaCommand
 
 Write-Step "MES wiring"
 $wiringCommand = @"
-rg -n 'page-mes|page-exceptions|14-mes-control-center|14-exception-dashboard|_renderMesControlCenter|_renderExceptionDashboard|navigateTo\(''exceptions''\)|data-page=\"mes\"|mes_snapshot|mes_foundation_snapshot|mes_alarm_snapshot|mes_nc_release_snapshot|mes_tool_offset_snapshot|mes_connector_snapshot|mes_machine_signal_upsert|mes_connector_ingest|mes_adapter_event_append|mes_alarm_runtime_upsert|mes_nc_download_receipt|mes_tool_offset_upsert|mes_shadow_status|exception_dashboard|exception_detail|program_mismatches|program_handshake_queue|program_release_queue|tool_readiness_queue|program_release_risk|tool_readiness_risk|adapter_governance_risk|alarm_hotspots|nc_download_mismatches|tool_offset_risk|adapter_governance_queue|alarm_hotspot_queue|nc_download_mismatch_queue|tool_offset_queue|operator_qualification_gaps|material_trace_gaps|connector_governance_gaps|shadow_sync_failures|operator_qualification_queue|material_trace_queue|connector_guard_queue|shadow_status|connector_ingest_status|runtime_mode|skipped_count|last_skipped_at|downtime_governance_gaps|wo_launch_blocked|adapter_governance_failed|machine_alarm_active|nc_download_not_ready|tool_offset_not_ready|mes_wo_transition_guard|oee_timeline|downtime_pareto|mes_wo_report_progress|mes_downtime_create|mes_maintenance_create|mes_tooling_upsert|data-open-signal-bridge|nc_program_releases|mes_connectivity_adapters|mes_alarm_catalog|mes_alarm_playbooks|tool_assemblies|mes_connectivity_events|machine_alarm_events|nc_download_receipts|mes_tool_preset_offsets|downtime_reason_codes|downtime_resolution_codes|reason_code|resolution_code|runtime_data_layer|shadow_sync_master_data_store|shadow_sync_orders_store|shadow_sync_mes_runtime_store' "$($wiringFiles -join '" "')"
+rg -n 'page-mes|page-exceptions|14-mes-control-center|14-exception-dashboard|_renderMesControlCenter|_renderExceptionDashboard|navigateTo\(''exceptions''\)|data-page=\"mes\"|mes_snapshot|mes_foundation_snapshot|mes_alarm_snapshot|mes_nc_release_snapshot|mes_tool_offset_snapshot|mes_connector_snapshot|mes_machine_signal_upsert|mes_connector_ingest|mes_adapter_event_append|mes_alarm_runtime_upsert|mes_nc_download_receipt|mes_tool_offset_upsert|mes_shadow_status|exception_dashboard|exception_detail|program_mismatches|program_handshake_queue|program_release_queue|tool_readiness_queue|program_release_risk|tool_readiness_risk|adapter_governance_risk|alarm_hotspots|nc_download_mismatches|tool_offset_risk|launch_blocker_hotspots|launch_blocker_queue|launch_blockers|adapter_governance_queue|alarm_hotspot_queue|nc_download_mismatch_queue|tool_offset_queue|operator_qualification_gaps|material_trace_gaps|connector_governance_gaps|shadow_sync_failures|operator_qualification_queue|material_trace_queue|connector_guard_queue|shadow_status|connector_ingest_status|runtime_mode|skipped_count|last_skipped_at|downtime_governance_gaps|wo_launch_blocked|adapter_governance_failed|machine_alarm_active|nc_download_not_ready|tool_offset_not_ready|stale_signal_timestamp|mes_wo_transition_guard|oee_timeline|downtime_pareto|mes_wo_report_progress|mes_downtime_create|mes_maintenance_create|mes_tooling_upsert|data-open-signal-bridge|nc_program_releases|mes_connectivity_adapters|mes_alarm_catalog|mes_alarm_playbooks|tool_assemblies|mes_connectivity_events|machine_alarm_events|nc_download_receipts|mes_tool_preset_offsets|downtime_reason_codes|downtime_resolution_codes|reason_code|resolution_code|runtime_data_layer|shadow_sync_master_data_store|shadow_sync_orders_store|shadow_sync_mes_runtime_store|observe_wo_launch_blocked|mes_signal_replay_guard' "$($wiringFiles -join '" "')"
 "@
 Invoke-Checked "MES wiring lookup" $wiringCommand
 
