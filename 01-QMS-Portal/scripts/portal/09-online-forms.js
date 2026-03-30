@@ -61,6 +61,7 @@ var state = {
     days: 30,
     lastLoaded: '',
     promise: null,
+    pollTimer: null,
     quarantine: {}
   }
 };
@@ -178,6 +179,30 @@ window._ecPromptDialog = openPromptDialog;
 
 function pageEl(){ return document.getElementById('page-forms'); }
 function requestRender(){ var page = pageEl(); if(page) render(page); }
+
+function stopWorkQueuePolling(){
+  if(state.workQueue.pollTimer){
+    clearInterval(state.workQueue.pollTimer);
+    state.workQueue.pollTimer = null;
+  }
+}
+
+function ensureWorkQueuePolling(){
+  if(state.workspaceMode !== 'work'){
+    stopWorkQueuePolling();
+    return;
+  }
+  if(state.workQueue.pollTimer) return;
+  state.workQueue.pollTimer = setInterval(function(){
+    if(state.workspaceMode !== 'work'){
+      stopWorkQueuePolling();
+      return;
+    }
+    loadWorkQueue(true).then(function(){
+      if(state.workspaceMode === 'work') requestRender();
+    });
+  }, 60000);
+}
 
 function roleList(){
   var user = (typeof currentUser !== 'undefined' && currentUser) ? currentUser : {};
@@ -489,10 +514,15 @@ function renderPendingItem(item){
   var ctx = item.master_context || {};
   var summary = [item.form_code || '', item.department || '', traceSummary(ctx)].filter(Boolean).join(' · ');
   var statusHtml = renderStatusPill(item.status || 'in_review');
+  var approvalSummary = item.approval_summary || {};
+  var approvalBadge = '';
+  if(String(approvalSummary.approval_mode || '') === 'parallel'){
+    approvalBadge = '<span class="ec-badge info">' + esc(String(approvalSummary.collected_approvals || 0) + '/' + String(approvalSummary.minimum_approvals || 0) + ' ' + t('phê duyệt', 'approvals')) + '</span>';
+  }
   return '<article class="ec-work-card">' +
     '<div class="ec-work-card-top">' +
       '<div><div class="ec-work-id">' + esc(item.record_id || item.allocation_id || '-') + '</div><div class="ec-work-sub">' + esc(summary || t('Chưa có ngữ cảnh truy xuất', 'Traceability context not available')) + '</div></div>' +
-      '<div class="ec-work-status">' + renderSlaBadge(item) + renderAgeBadge(item.submitted_at || item.updated_at || item.created_at || '') + statusHtml + '</div>' +
+      '<div class="ec-work-status">' + approvalBadge + renderSlaBadge(item) + renderAgeBadge(item.submitted_at || item.updated_at || item.created_at || '') + statusHtml + '</div>' +
     '</div>' +
     '<div class="ec-work-grid">' +
       renderMiniField(t('Người gửi', 'Submitted by'), item.submitted_by || item.updated_by || '-') +
@@ -819,11 +849,13 @@ function renderSidebar(){
 function renderWorkspacePane(){
   var wsEl = document.getElementById('ec-workspace');
   if(!wsEl) return;
+  if(state.workspaceMode !== 'work') stopWorkQueuePolling();
   if(state.workspaceLoading){
     wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Đang tải dữ liệu hồ sơ', 'Loading record workspace')) + '</h3><p>' + esc(t('Hệ thống đang đồng bộ mã cấp phát, danh mục kiểm tra và lịch sử mới nhất.', 'The system is syncing allocations, checklist data, and the latest history.')) + '</p></div>';
     return;
   }
   if(state.workspaceMode === 'work'){
+    ensureWorkQueuePolling();
     renderWorkQueue(wsEl);
     if(!state.workQueue.loaded && !state.workQueue.loading) loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); });
     return;
@@ -971,5 +1003,6 @@ window._fhState = state;
 window._fhShowToast = showToast;
 window._fhT = t;
 window._fhEscHtml = esc;
+window.addEventListener('beforeunload', stopWorkQueuePolling);
 
 })();

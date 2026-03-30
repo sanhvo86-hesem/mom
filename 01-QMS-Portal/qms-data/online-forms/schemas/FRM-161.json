@@ -85,6 +85,13 @@
     {"id": "production_review", "type": "textarea", "label": "Xem xét sản xuất", "label_en": "Production Review", "rows": 2, "placeholder": "Ý kiến của phòng Sản xuất..."},
     {"id": "customer_notification_required", "type": "checkbox", "label": "Cần thông báo khách hàng", "label_en": "Customer Notification Required", "default": false}
   ],
+  "evidence_review": {
+    "approval_mode": "parallel",
+    "minimum_approvals": 2,
+    "roles_allowed": ["admin", "engineering_manager", "qa_manager", "production_manager"],
+    "label_vi": "Phê duyệt liên phòng ban",
+    "label_en": "Cross-functional approval"
+  },
   "auto_fields": ["submitted_by", "submitted_at", "entry_id"],
   "notifications": {
     "on_submit": ["engineering_manager", "qa_manager"],

@@ -23,10 +23,18 @@ Workspace: `C:\Users\TEST4\qms.hesem.com.vn`
   https://health.ec.europa.eu/medicinal-products/eudralex/eudralex-volume-4_en
 - MasterControl eProcess:
   https://www.mastercontrol.com/eprocess-automation/
+- MasterControl workflow builder / parallel step reference:
+  https://currentcloud.onlinehelp.mastercontrol.com/2024.1/en_us/Content/Documents/Manage_a_Document_Workflow.htm
 - Veeva Batch Release:
   https://www.veeva.com/products/veeva-batch-release/
+- Veeva Batch Release features brief:
+  https://www.veeva.com/wp-content/uploads/2025/02/Veeva-Batch-Release-Features-Brief.pdf
 - Octave Reliance:
   https://www.octave.com/products/asset-performance-management/reliance
+- Octave / ETQ document control landing:
+  https://www.etq.com/document-control/
+- Veeva quality + training product sheet reference:
+  https://www.veeva.com/medtech/wp-content/uploads/2025/09/MedTech-Quality-Cloud-Simple-Product-Sheet-PDF-Version-2.pdf
 
 ## DOCX Backlog Snapshot
 
@@ -61,6 +69,7 @@ Primary affected files in the DOCX backlog:
 - Added workspace loading state when switching forms or opening a record from queue.
 - Added search debounce for form catalog to reduce re-render churn.
 - Added SLA-style due/overdue badge in pending review queue.
+- Added 60-second auto-refresh while the `Việc của tôi` queue is open.
 - Removed raw filename exposure from exception card scope summary.
 
 ### Workspace / form runtime
@@ -81,6 +90,11 @@ Primary affected files in the DOCX backlog:
   - legal hold state and reason
   - manager-side policy editing for the current record type
 - Added export action for evidence pack directly in workspace.
+- Added schema-driven parallel approval rendering in the workspace:
+  - minimum approval quorum
+  - progress badge
+  - approver chip list
+  - per-user approval action copy (`Ghi nhận phê duyệt của tôi` / `Cập nhật phê duyệt của tôi`)
 - Strengthened context lock:
   - locked fields now render with read-only/disabled attributes
   - lock badge is visible on governed fields
@@ -112,6 +126,10 @@ Primary affected files in the DOCX backlog:
 - Added persisted `evidence_links` storage in allocation data with bidirectional enrichment.
 - Added audit-log entries that do not mutate workflow status.
 - Added CAPA effectiveness evaluation helper + explicit `capa_effectiveness_evaluate` endpoint.
+- Added schema-driven review workflow helpers:
+  - serial/parallel review configuration
+  - approval record capture per approver
+  - approval summary persistence for queue/workspace rendering
 - Added server-backed retention policy store and evaluation helpers.
 - Added `evidence_retention_status`, `evidence_retention_policy_save`, and `evidence_retention_hold`.
 - `upload_exception_queue` now supports:
@@ -119,6 +137,15 @@ Primary affected files in the DOCX backlog:
   - `date_from`
   - `date_to`
 - `evidence_pack_export` now includes full received workbook history when present, not only the latest receipt.
+- `evidence_pack_export` now also includes approval summary and approval-record payloads when available.
+
+### Strict corrections applied in this re-audit
+
+- `Training auto-linking` is still **not** implemented.
+  - The current system supports manual related-record linking with relation type `training_for`.
+  - It does **not** yet auto-create training assignments when a controlled document or governed form revision changes.
+- `Evidence pack export` is still **ZIP baseline**, not a compiled PDF dossier / customer-ready release packet.
+- `Retention` is implemented at the policy and legal-hold level, but not yet as a fully automated disposition queue with notifications and approval routing.
 
 ## Claude Audit Status Update
 
@@ -146,6 +173,10 @@ Implemented or materially addressed from the 75-task DOCX:
   - approval-stage checklist + workspace visibility done
 - `#6` Retention policy management
   - server-backed retention policy, workspace card, legal hold, and per-record-type policy edit done
+- `#12` Parallel approval mode
+  - backend review model now supports schema-driven serial or parallel approval
+  - approval progress is persisted and rendered in both workspace and work queue
+  - `FRM-161` (ECR) is enabled as the first live parallel-approval form
 - `#7` Quarantine resolution UI
 - `#8` Duplicate check UI before allocation
 - `#11` Context fields locked after allocation
@@ -184,7 +215,9 @@ Implemented or materially addressed from the 75-task DOCX:
 - Online schema-driven form entry
 - Offline issued workbook download and governed upload receipt
 - Approval workflow with e-signature and password re-auth
+- Parallel approval for schema-enabled forms with minimum-approval quorum and progress tracking
 - Work queue / pending evidence / upload exception queue
+- Work queue auto-refresh while the queue is open
 - Duplicate-aware next-ID preview
 - Evidence completeness gate
 - Baseline evidence pack export
@@ -209,8 +242,8 @@ Implemented or materially addressed from the 75-task DOCX:
   retention policy and legal hold now exist, but there is still no automated purge queue, disposition approval workflow, or notification engine
 - Training auto-link:
   no document-revision-triggered training assignment
-- Parallel approval / bulk actions:
-  not implemented
+- Bulk actions and queue ergonomics:
+  no batch approve/export, no skeleton loaders, and some older tables still need deeper sort/performance cleanup
 
 ## World-Class Criteria Reconfirmed
 
@@ -222,21 +255,32 @@ From the official and market references above, advanced systems consistently req
 - evidence bundle / release packet compilation across multiple evidence sources
 - overdue visibility, escalation, and management review traceability
 
+Additional concrete benchmarks from official sources used for this re-audit:
+
+- FDA Part 11 guidance still expects controls such as authorized access, authority checks, training/competency, accountability for electronic signatures, and secure, reliable records.
+- ICH Q10 explicitly calls for timely communication and escalation to management, plus management review of the effectiveness of changes arising from CAPA.
+- ISO 15489 and ISO/TS 7538 reinforce that retention and disposition need a documented plan integrated into normal business activity, not handled ad hoc.
+- MasterControl officially supports approval, collaboration, escalation, and parallel workflow steps, including one/majority/all sign-off patterns.
+- Veeva Batch Release positions world-class release/evidence operations as centralized aggregation of data and content across QMS, QualityDocs, LIMS, ERP, and related systems with automated checks, reviews, and traceability.
+- Octave/ETQ positions modern eQMS as a connected stack spanning document control, CAPA, audits, and training with audit trails, electronic signatures, configurable workflows, and enterprise integrations.
+- Veeva and ETQ both treat document/training coupling as a mature expectation, reinforcing that HESEM still has a meaningful gap in automatic training linkage.
+
 ## Practical Scorecard After This Cycle
 
 - Audit v1 baseline: approximately `2/10`
 - Claude v2 checkpoint: approximately `6/10`
-- Current implemented HESEM state: approximately `8.5/10`
+- Current implemented HESEM state: approximately `9.0/10`
 
 Reasoning:
 
 - The operational frontend/backoffice loop is now substantially more usable.
 - The most important governance features now exist in some form.
-- The largest remaining gap is now the backend operating model for SLA escalation, automated training linkage, parallel approval, and a true PDF dossier/export pipeline.
+- The largest remaining gap is now the backend operating model for SLA escalation, automatic training linkage, automated disposition, and a true PDF dossier/export pipeline.
 
 ## Recommended Next Steps
 
 1. Build persisted SLA policy + overdue/escalation backend.
-2. Add parallel approval mode for the forms that need multiple approvers.
-3. Upgrade evidence pack export from ZIP baseline to compiled PDF dossier / release packet.
-4. Add rule-based auto-linking and training-trigger integration on top of the new `evidence_links` model.
+2. Upgrade evidence pack export from ZIP baseline to compiled PDF dossier / release packet.
+3. Add rule-based auto-linking and training-trigger integration on top of the new `evidence_links` model.
+4. Add disposition queue, approval workflow, and notifications on top of the current retention policy model.
+5. Add batch actions and remaining UX/performance cleanup (`09h` table sort, skeleton loaders, draft cleanup, lookup refactor).

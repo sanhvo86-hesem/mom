@@ -746,7 +746,7 @@ function renderOnlineStep(form, allocation){
   '</div>';
 
   /* approval bar */
-  html += renderApprovalBar(allocation);
+  html += renderApprovalBar(form, allocation);
   html += '</div></div>';
   return html;
 }
@@ -798,7 +798,7 @@ function renderOfflineStep(form, allocation){
   html += renderRelatedRecords(allocation);
   html += renderRetentionCard(form, allocation);
   html += renderEvidenceActions(allocation);
-  html += renderApprovalBar(allocation);
+  html += renderApprovalBar(form, allocation);
   html += '</div></div>';
   return html;
 }
@@ -869,9 +869,67 @@ function renderContextChip(label,value){
 }
 
 /* ── Signature helpers ── */
+function reviewConfig(schema){
+  var cfg = schema && typeof schema.evidence_review === 'object' && schema.evidence_review ? schema.evidence_review : {};
+  var mode = String(cfg.approval_mode || 'serial').toLowerCase() === 'parallel' ? 'parallel' : 'serial';
+  var rolesAllowed = Array.isArray(cfg.roles_allowed) && cfg.roles_allowed.length
+    ? cfg.roles_allowed
+    : (Array.isArray(schema && schema.roles_allowed) ? schema.roles_allowed : []);
+  rolesAllowed = rolesAllowed.map(function(role){ return String(role || '').trim().toLowerCase(); }).filter(Boolean);
+  rolesAllowed = rolesAllowed.filter(function(role, idx){ return rolesAllowed.indexOf(role) === idx; });
+  var minimumApprovals = Number(cfg.minimum_approvals || cfg.min_approvals || 0);
+  if(mode === 'parallel'){
+    if(minimumApprovals < 1) minimumApprovals = 2;
+    if(rolesAllowed.length) minimumApprovals = Math.min(minimumApprovals, rolesAllowed.length);
+    if(minimumApprovals < 1) minimumApprovals = 1;
+  } else {
+    minimumApprovals = 1;
+  }
+  return {
+    approvalMode: mode,
+    minimumApprovals: minimumApprovals,
+    rolesAllowed: rolesAllowed,
+    labelVi: String(cfg.label_vi || (mode === 'parallel' ? 'Phê duyệt song song' : 'Phê duyệt tuần tự')),
+    labelEn: String(cfg.label_en || (mode === 'parallel' ? 'Parallel approval' : 'Serial approval'))
+  };
+}
+function approvalSummary(allocation, schema){
+  var cfg = reviewConfig(schema || {});
+  var raw = allocation && allocation.approval_summary && typeof allocation.approval_summary === 'object' ? allocation.approval_summary : {};
+  var approvers = Array.isArray(raw.approvers) ? raw.approvers.slice() : [];
+  if(!approvers.length && allocation && allocation.approved_by){
+    approvers = [{
+      username: allocation.approved_by,
+      display_name: allocation.approved_by,
+      approved_at: allocation.approved_at || '',
+      reason: allocation.approval_reason || '',
+      roles: []
+    }];
+  }
+  var required = Number(raw.minimum_approvals || cfg.minimumApprovals || 1);
+  if(String(raw.approval_mode || cfg.approvalMode || 'serial') === 'parallel' && required < 1) required = 2;
+  if(required < 1) required = 1;
+  var collected = Number(raw.collected_approvals);
+  if(!(collected > 0) && approvers.length) collected = approvers.length;
+  var currentUsername = String(user().username || '').trim().toLowerCase();
+  return {
+    approvalMode: String(raw.approval_mode || cfg.approvalMode || 'serial'),
+    labelVi: String(raw.label_vi || cfg.labelVi),
+    labelEn: String(raw.label_en || cfg.labelEn),
+    rolesAllowed: Array.isArray(raw.roles_allowed) && raw.roles_allowed.length ? raw.roles_allowed : cfg.rolesAllowed,
+    minimumApprovals: required,
+    collectedApprovals: collected,
+    remainingApprovals: Math.max(0, required - collected),
+    isComplete: raw.is_complete === true || collected >= required,
+    approvers: approvers,
+    currentUserApproved: approvers.some(function(item){
+      return String(item && item.username || '').trim().toLowerCase() === currentUsername;
+    })
+  };
+}
 function approvalSteps(schema){
-  if(Array.isArray(schema.approval_flow)&&schema.approval_flow.length) return schema.approval_flow.filter(function(s){return s&&(s.signature_block_id||s.id);}).map(function(s){return {id:String(s.signature_block_id||s.id),requiredOnSubmit:s.required_on_submit===true};});
-  return (schema.signature_blocks||[]).filter(function(b){return b&&b.id;}).map(function(b){return {id:String(b.id),requiredOnSubmit:b.required_on_submit===true};});
+  if(Array.isArray(schema.approval_flow)&&schema.approval_flow.length) return schema.approval_flow.filter(function(s){return s&&(s.signature_block_id||s.id);}).map(function(s){return {id:String(s.signature_block_id||s.id),requiredOnSubmit:s.required_on_submit===true||s.requiredOnSubmit===true};});
+  return (schema.signature_blocks||[]).filter(function(b){return b&&b.id;}).map(function(b){return {id:String(b.id),requiredOnSubmit:b.required_on_submit===true||b.requiredOnSubmit===true};});
 }
 function canSignBlock(schema,blockId){
   var flow=approvalSteps(schema);
@@ -888,7 +946,7 @@ function currentApprovalState(schema){
 }
 
 /* ── Approval bar ── */
-function renderApprovalBar(allocation){
+function renderApprovalBarLegacy(allocation){
   if(!allocation) return '';
   var status=String(allocation.status||'').toLowerCase();
   if(status!=='submitted'&&status!=='received'&&status!=='in_review'&&status!=='approved'&&status!=='rejected') return '';
@@ -919,6 +977,65 @@ function renderApprovalBar(allocation){
 }
 
 /* ── History ── */
+function renderApprovalBar(form, allocation){
+  if(arguments.length < 2 || (form && form.allocation_id && !allocation)){
+    allocation = form || null;
+    var st = window._ecState || {};
+    form = st.formMap && st.selectedFormCode ? st.formMap[st.selectedFormCode] : null;
+  }
+  if(!allocation) return '';
+  var schema = form && form.schema ? form.schema : (ws.schema || {});
+  var status=String(allocation.status||'').toLowerCase();
+  if(status!=='submitted'&&status!=='received'&&status!=='in_review'&&status!=='approved'&&status!=='rejected') return '';
+  var canApprove=userHasApproveRole(schema);
+  var review = approvalSummary(allocation, schema);
+  var isParallel = review.approvalMode === 'parallel';
+  var progressBadges = '';
+  var approverList = '';
+  if(isParallel){
+    progressBadges =
+      '<div class="ec-approval-meta">' +
+        '<span class="ec-badge ' + (review.isComplete ? 'pass' : 'info') + '">' + esc(review.collectedApprovals + '/' + review.minimumApprovals + ' ' + t('phê duyệt', 'approvals')) + '</span>' +
+        '<span class="ec-badge neutral">' + esc(t(review.labelVi, review.labelEn)) + '</span>' +
+      '</div>';
+    if(review.approvers.length){
+      approverList = '<div class="ec-approval-approvers">' + review.approvers.map(function(item){
+        var name = item.display_name || item.username || '—';
+        var stamp = item.approved_at ? formatLocalDateTime(item.approved_at, true) : '';
+        return '<span class="ec-approval-chip">' + esc(name) + (stamp ? '<small>' + esc(stamp) + '</small>' : '') + '</span>';
+      }).join('') + '</div>';
+    }
+  }
+
+  var html='<div class="ec-approval '+status+'"><div class="ec-approval-copy">';
+
+  if(status==='submitted' || status==='received'){
+    html+='<div class="ec-approval-text" style="color:var(--ec-warning)">'+esc(isParallel ? t('Chứng cứ đã nộp — sẵn sàng mở vòng phê duyệt song song','Evidence submitted — ready to start parallel approval') : t('Chứng cứ đã nộp — sẵn sàng gửi duyệt','Evidence submitted — ready for review'))+'</div>';
+    html+=progressBadges+approverList+'</div>';
+    html+='<button class="ec-btn primary" id="ec-submit-review" style="background:var(--ec-warning)">'+esc(t('Gửi duyệt','Submit for review'))+'</button>';
+  } else if(status==='in_review'){
+    html+='<div class="ec-approval-text" style="color:#c2410c">'+esc(isParallel ? (review.remainingApprovals > 0 ? t('Đang chờ đủ số phê duyệt bắt buộc để hoàn tất hồ sơ','Waiting for the required approvals to complete the record') : t('Đã đủ số phê duyệt, hệ thống đang chốt hồ sơ','Required approvals collected, finalizing the record')) : t('Đang chờ xem xét và phê duyệt','Pending review and approval'))+'</div>';
+    html+=progressBadges+approverList+'</div>';
+    if(canApprove){
+      html+='<button class="ec-btn danger" id="ec-reject">'+esc(t('Từ chối','Reject'))+'</button>';
+      html+='<button class="ec-btn success" id="ec-approve">'+esc(isParallel ? (review.currentUserApproved ? t('Cập nhật phê duyệt của tôi','Update my approval') : t('Ghi nhận phê duyệt của tôi','Record my approval')) : t('Duyệt','Approve'))+'</button>';
+    } else {
+      html+='<span style="font-size:11px;color:var(--ec-text-muted)">'+esc(t('Bạn không có quyền duyệt.','You do not have approval authority.'))+'</span>';
+    }
+  } else if(status==='approved'){
+    html+='<div class="ec-approval-text" style="color:var(--ec-success)">\u2713 '+esc(isParallel ? t('Đã hoàn tất phê duyệt song song','Parallel approval completed') : t('Đã phê duyệt','Approved'))+(allocation.approved_by?' — '+esc(allocation.approved_by):'')+(allocation.approved_at?' · '+esc(formatLocalDateTime(allocation.approved_at, true)):'')+'</div>';
+    html+=progressBadges+approverList+'</div>';
+    if(canApprove) html+='<button class="ec-btn ghost" id="ec-reopen">'+esc(t('Mở lại','Reopen'))+'</button>';
+  } else if(status==='rejected'){
+    html+='<div class="ec-approval-text" style="color:var(--ec-danger)">\u2717 '+esc(t('Bị từ chối','Rejected'))+(allocation.rejected_by?' — '+esc(allocation.rejected_by):'')+(allocation.rejection_reason?': '+esc(allocation.rejection_reason):'')+'</div>';
+    html+=progressBadges+approverList+'</div>';
+    if(canApprove) html+='<button class="ec-btn ghost" id="ec-reopen">'+esc(t('Mở lại','Reopen'))+'</button>';
+  }
+
+  html+='</div>';
+  return html;
+}
+
 function loadHistory(form){
   var el=document.getElementById('ec-history-content');
   if(!el) return;
@@ -1436,7 +1553,15 @@ function bindApprovalActions(form,allocation,container){
         if(!pw){toast(t('Đã hủy.','Cancelled.'),'warn');return;}
         approveBtn.disabled=true;
         api('evidence_review',{allocation_id:allocation.allocation_id,action:'approve',reason:sigData.reason||'',signature_data:sigData,password:pw},'POST').then(function(r){
-          if(r&&r.ok){toast(t('Đã phê duyệt.','Approved.'),'success');if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);}
+          if(r&&r.ok){
+            var summary = r.approval_summary || null;
+            if(summary && String(summary.approval_mode || '') === 'parallel' && summary.is_complete !== true){
+              toast(t('Đã ghi nhận phê duyệt của bạn. Còn ','Your approval has been recorded. ') + String(summary.remaining_approvals || 0) + t(' phê duyệt nữa.',' approvals remaining.'),'success');
+            } else {
+              toast(t('Đã phê duyệt.','Approved.'),'success');
+            }
+            if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);
+          }
           else toast(t('Lỗi: ','Error: ')+(r&&r.error||''),'error');
         }).finally(function(){approveBtn.disabled=false;});
       });
@@ -1609,10 +1734,13 @@ function saveDraftToServer(form, allocation){
 }
 
 /* ── approval role check ── */
-function userHasApproveRole(){
+function userHasApproveRole(schema){
   var u = (typeof currentUser !== 'undefined' && currentUser) ? currentUser : {};
   var roles = Array.isArray(u.roles) ? u.roles : [String(u.role || '')];
-  var approveRoles = ['admin','qa_manager','quality_manager','production_manager','engineering_manager','quality_engineer'];
+  var cfg = reviewConfig(schema || {});
+  var approveRoles = Array.isArray(cfg.rolesAllowed) && cfg.rolesAllowed.length
+    ? cfg.rolesAllowed
+    : ['admin','qa_manager','quality_manager','production_manager','engineering_manager','quality_engineer'];
   for(var i = 0; i < roles.length; i++){
     if(approveRoles.indexOf(String(roles[i]).toLowerCase()) >= 0) return true;
   }

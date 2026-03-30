@@ -6768,6 +6768,144 @@ function evidence_find_online_entry(string $formCode, string $allocationId = '',
   return $idx >= 0 && is_array($entries[$idx] ?? null) ? $entries[$idx] : null;
 }
 
+function evidence_review_config(array $schema): array {
+  $config = is_array($schema['evidence_review'] ?? null) ? $schema['evidence_review'] : [];
+  $mode = strtolower(trim((string)($config['approval_mode'] ?? 'serial')));
+  if ($mode !== 'parallel') $mode = 'serial';
+
+  $rolesAllowed = $config['roles_allowed'] ?? $schema['roles_allowed'] ?? [];
+  $rolesAllowed = array_values(array_unique(array_values(array_filter(array_map(
+    static fn($role) => strtolower(trim((string)$role)),
+    is_array($rolesAllowed) ? $rolesAllowed : []
+  )))));
+
+  $minimumApprovals = (int)($config['minimum_approvals'] ?? ($config['min_approvals'] ?? 0));
+  if ($mode === 'parallel') {
+    if ($minimumApprovals < 1) $minimumApprovals = 2;
+    if (!empty($rolesAllowed)) $minimumApprovals = min($minimumApprovals, count($rolesAllowed));
+    if ($minimumApprovals < 1) $minimumApprovals = 1;
+  } else {
+    $minimumApprovals = 1;
+  }
+
+  return [
+    'approval_mode' => $mode,
+    'minimum_approvals' => $minimumApprovals,
+    'roles_allowed' => $rolesAllowed,
+    'label_vi' => trim((string)($config['label_vi'] ?? ($mode === 'parallel' ? 'Phê duyệt song song' : 'Phê duyệt tuần tự'))),
+    'label_en' => trim((string)($config['label_en'] ?? ($mode === 'parallel' ? 'Parallel approval' : 'Serial approval'))),
+  ];
+}
+
+function evidence_user_roles(array $user): array {
+  $roles = is_array($user['roles'] ?? null) ? $user['roles'] : [(string)($user['role'] ?? '')];
+  return array_values(array_unique(array_values(array_filter(array_map(
+    static fn($role) => strtolower(trim((string)$role)),
+    $roles
+  )))));
+}
+
+function evidence_user_can_review(array $schema, array $user): bool {
+  $config = evidence_review_config($schema);
+  $rolesAllowed = $config['roles_allowed'];
+  if (empty($rolesAllowed)) return true;
+  foreach (evidence_user_roles($user) as $userRole) {
+    if (in_array($userRole, $rolesAllowed, true)) return true;
+  }
+  return false;
+}
+
+function evidence_normalize_approval_records(array $allocation): array {
+  $records = is_array($allocation['approval_records'] ?? null) ? $allocation['approval_records'] : [];
+  if (empty($records) && trim((string)($allocation['approved_by'] ?? '')) !== '') {
+    $records[] = [
+      'username' => (string)($allocation['approved_by'] ?? ''),
+      'display_name' => (string)($allocation['approved_by'] ?? ''),
+      'approved_at' => (string)($allocation['approved_at'] ?? ''),
+      'reason' => (string)($allocation['approval_reason'] ?? ''),
+      'roles' => [],
+      'signature' => is_array($allocation['approval_signature'] ?? null) ? $allocation['approval_signature'] : null,
+    ];
+  }
+
+  $normalized = [];
+  foreach ($records as $record) {
+    if (!is_array($record)) continue;
+    $username = strtolower(trim((string)($record['username'] ?? $record['approved_by'] ?? $record['user'] ?? '')));
+    if ($username === '') continue;
+
+    $normalized[$username] = [
+      'username' => $username,
+      'display_name' => trim((string)($record['display_name'] ?? $record['signer_name'] ?? $record['username'] ?? $username)),
+      'approved_at' => trim((string)($record['approved_at'] ?? $record['signed_at'] ?? $allocation['approved_at'] ?? '')),
+      'reason' => trim((string)($record['reason'] ?? '')),
+      'roles' => array_values(array_unique(array_values(array_filter(array_map(
+        static fn($role) => strtolower(trim((string)$role)),
+        is_array($record['roles'] ?? null) ? $record['roles'] : []
+      ))))),
+      'signature' => is_array($record['signature'] ?? null)
+        ? $record['signature']
+        : (is_array($record['signature_data'] ?? null) ? $record['signature_data'] : null),
+    ];
+  }
+
+  uasort($normalized, static function (array $left, array $right): int {
+    $leftAt = trim((string)($left['approved_at'] ?? ''));
+    $rightAt = trim((string)($right['approved_at'] ?? ''));
+    if ($leftAt === $rightAt) return strcmp((string)($left['username'] ?? ''), (string)($right['username'] ?? ''));
+    if ($leftAt === '') return 1;
+    if ($rightAt === '') return -1;
+    return strcmp($leftAt, $rightAt);
+  });
+
+  return array_values($normalized);
+}
+
+function evidence_approval_summary(array $allocation, array $schema): array {
+  $config = evidence_review_config($schema);
+  $records = evidence_normalize_approval_records($allocation);
+  $required = $config['minimum_approvals'];
+  $collected = count($records);
+
+  return [
+    'approval_mode' => $config['approval_mode'],
+    'label_vi' => $config['label_vi'],
+    'label_en' => $config['label_en'],
+    'roles_allowed' => $config['roles_allowed'],
+    'minimum_approvals' => $required,
+    'collected_approvals' => $collected,
+    'remaining_approvals' => max(0, $required - $collected),
+    'is_complete' => $collected >= $required,
+    'approvers' => array_map(static function (array $record): array {
+      return [
+        'username' => (string)($record['username'] ?? ''),
+        'display_name' => (string)($record['display_name'] ?? ''),
+        'approved_at' => (string)($record['approved_at'] ?? ''),
+        'reason' => (string)($record['reason'] ?? ''),
+        'roles' => array_values((array)($record['roles'] ?? [])),
+      ];
+    }, $records),
+  ];
+}
+
+function evidence_refresh_approval_summary(array &$allocation, array $schema): array {
+  $records = evidence_normalize_approval_records($allocation);
+  if (!empty($records)) {
+    $allocation['approval_records'] = $records;
+  } else {
+    unset($allocation['approval_records']);
+  }
+  $summary = evidence_approval_summary($allocation, $schema);
+  $allocation['approval_summary'] = $summary;
+  return $summary;
+}
+
+function evidence_clear_review_outcome(array &$allocation): void {
+  unset($allocation['approval_signature'], $allocation['approved_at'], $allocation['approved_by'], $allocation['approval_reason']);
+  unset($allocation['rejected_at'], $allocation['rejected_by'], $allocation['rejection_reason']);
+  unset($allocation['approval_records'], $allocation['approval_summary']);
+}
+
 function evidence_default_requirements(array $allocation, array $schema): array {
   $deliveryMode = strtolower(trim((string)($allocation['delivery_mode'] ?? (($schema['online'] ?? true) !== false ? 'online' : 'offline'))));
   $requiredContext = array_values(array_filter(array_map('trim', (array)($schema['record_context']['required'] ?? []))));
@@ -16213,11 +16351,16 @@ if ($username === '') {
       api_json(['ok' => false, 'error' => 'zip_open_failed'], 500);
     }
 
+    $formCode = trim((string)($allocation['form_code'] ?? ''));
+    $schema = $formCode !== '' ? (load_form_schema_by_code($formCode) ?: []) : [];
+    $approvalSummary = evidence_refresh_approval_summary($allocation, $schema);
+
     $manifest = [
       'generated_at' => now_iso(),
       'record_id' => (string)($allocation['record_id'] ?? ''),
       'allocation_id' => $allocationId,
       'allocation' => $allocation,
+      'approval_summary' => $approvalSummary,
       'related_records' => evidence_links_for_allocation(load_allocation_store(), $allocationId),
       'retention' => evidence_retention_evaluate($allocation, load_record_type_registry()),
       'review_checklist' => evidence_evaluate_checklist($allocation, 'review'),
@@ -16231,8 +16374,13 @@ if ($username === '') {
     if (!empty($allocation['approval_signature']) && is_array($allocation['approval_signature'])) {
       $zip->addFromString('approval-signature.json', json_encode($allocation['approval_signature'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
     }
+    if (!empty($allocation['approval_records']) && is_array($allocation['approval_records'])) {
+      $zip->addFromString('approval-records.json', json_encode($allocation['approval_records'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    }
+    if (!empty($allocation['approval_summary']) && is_array($allocation['approval_summary'])) {
+      $zip->addFromString('approval-summary.json', json_encode($allocation['approval_summary'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    }
 
-    $formCode = trim((string)($allocation['form_code'] ?? ''));
     $entryId = trim((string)($allocation['online_submission']['entry_id'] ?? ''));
     if ($formCode !== '') {
       $entry = evidence_find_online_entry($formCode, $allocationId, $entryId);
@@ -16284,16 +16432,25 @@ if ($username === '') {
       api_json(['ok' => false, 'error' => 'invalid_status_for_review', 'current_status' => $currentStatus], 409);
     }
 
+    $formCode = trim((string)($allocation['form_code'] ?? ''));
+    $schema = $formCode !== '' ? (load_form_schema_by_code($formCode) ?: []) : [];
     $checklist = evidence_evaluate_checklist($allocation, 'review');
     if (!($checklist['ok'] ?? false)) {
       api_json(['ok' => false, 'error' => 'evidence_incomplete', 'checklist' => $checklist], 422);
     }
 
     $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+    evidence_clear_review_outcome($allocation);
+    evidence_refresh_approval_summary($allocation, $schema);
     allocation_append_event($allocation, 'in_review', $username, 'evidence_submitted_for_review');
     save_allocation_store($allocationStore);
 
-    api_json(['ok' => true, 'allocation' => $allocation, 'checklist' => $checklist]);
+    api_json([
+      'ok' => true,
+      'allocation' => $allocation,
+      'checklist' => $checklist,
+      'approval_summary' => evidence_approval_summary($allocation, $schema),
+    ]);
   }
 
   case 'evidence_review': {
@@ -16319,23 +16476,11 @@ if ($username === '') {
       api_json(['ok' => false, 'error' => 'allocation_not_in_review', 'current_status' => $currentStatus], 409);
     }
 
-    // Validate reviewer role against form schema roles_allowed
     $formCode = trim((string)($allocation['form_code'] ?? ''));
-    if ($formCode !== '') {
-      $schema = load_form_schema_by_code($formCode);
-      if (is_array($schema) && !empty($schema['roles_allowed'])) {
-        $userRoles = is_array($me['roles'] ?? null) ? $me['roles'] : [(string)($me['role'] ?? '')];
-        $hasRole = false;
-        foreach ($userRoles as $userRole) {
-          if (in_array(strtolower(trim((string)$userRole)), array_map('strtolower', $schema['roles_allowed']), true)) {
-            $hasRole = true;
-            break;
-          }
-        }
-        if (!$hasRole) {
-          api_json(['ok' => false, 'error' => 'insufficient_role', 'required' => $schema['roles_allowed']], 403);
-        }
-      }
+    $schema = $formCode !== '' ? (load_form_schema_by_code($formCode) ?: []) : [];
+    $reviewConfig = evidence_review_config($schema);
+    if ($formCode !== '' && !evidence_user_can_review($schema, $me)) {
+      api_json(['ok' => false, 'error' => 'insufficient_role', 'required' => $reviewConfig['roles_allowed']], 403);
     }
 
     $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
@@ -16361,17 +16506,73 @@ if ($username === '') {
         api_json(['ok' => false, 'error' => 'invalid_password'], 403);
       }
 
-      // Store signature data and approve
-      if ($signatureData !== null) {
-        $allocation['approval_signature'] = $signatureData;
+      if (($reviewConfig['approval_mode'] ?? 'serial') === 'parallel') {
+        $records = evidence_normalize_approval_records($allocation);
+        $userRoles = evidence_user_roles($me);
+        $record = [
+          'username' => $username,
+          'display_name' => trim((string)($me['display_name'] ?? $me['name'] ?? $username)),
+          'approved_at' => now_iso(),
+          'reason' => $reason,
+          'roles' => $userRoles,
+          'signature' => $signatureData,
+        ];
+        $updatedExisting = false;
+        foreach ($records as $idx => $existingRecord) {
+          if (!is_array($existingRecord) || strtolower(trim((string)($existingRecord['username'] ?? ''))) !== $username) continue;
+          $records[$idx] = $record;
+          $updatedExisting = true;
+          break;
+        }
+        if (!$updatedExisting) $records[] = $record;
+        $allocation['approval_records'] = $records;
+
+        $approvalSummary = evidence_refresh_approval_summary($allocation, $schema);
+        if ($approvalSummary['is_complete'] ?? false) {
+          if ($signatureData !== null) {
+            $allocation['approval_signature'] = $signatureData;
+          }
+          $allocation['approved_at'] = now_iso();
+          $allocation['approved_by'] = $username;
+          $allocation['approval_reason'] = $reason;
+          allocation_append_event($allocation, 'approved', $username, $reason ?: 'evidence_approved_parallel', [
+            'approval_mode' => 'parallel',
+            'collected_approvals' => (int)($approvalSummary['collected_approvals'] ?? 0),
+            'required_approvals' => (int)($approvalSummary['minimum_approvals'] ?? 1),
+            'signature_hash' => is_array($signatureData) ? (string)($signatureData['hash'] ?? '') : '',
+            'signature_signer' => is_array($signatureData) ? (string)($signatureData['signerName'] ?? '') : '',
+          ]);
+        } else {
+          allocation_append_event($allocation, 'in_review', $username, $reason ?: ($updatedExisting ? 'evidence_parallel_approval_updated' : 'evidence_parallel_approval_recorded'), [
+            'approval_mode' => 'parallel',
+            'collected_approvals' => (int)($approvalSummary['collected_approvals'] ?? 0),
+            'required_approvals' => (int)($approvalSummary['minimum_approvals'] ?? 1),
+            'signature_hash' => is_array($signatureData) ? (string)($signatureData['hash'] ?? '') : '',
+            'signature_signer' => is_array($signatureData) ? (string)($signatureData['signerName'] ?? '') : '',
+          ]);
+        }
+      } else {
+        if ($signatureData !== null) {
+          $allocation['approval_signature'] = $signatureData;
+        }
+        $allocation['approval_records'] = [[
+          'username' => $username,
+          'display_name' => trim((string)($me['display_name'] ?? $me['name'] ?? $username)),
+          'approved_at' => now_iso(),
+          'reason' => $reason,
+          'roles' => evidence_user_roles($me),
+          'signature' => $signatureData,
+        ]];
+        evidence_refresh_approval_summary($allocation, $schema);
+        $allocation['approved_at'] = now_iso();
+        $allocation['approved_by'] = $username;
+        $allocation['approval_reason'] = $reason;
+        allocation_append_event($allocation, 'approved', $username, $reason ?: 'evidence_approved', [
+          'approval_mode' => 'serial',
+          'signature_hash' => is_array($signatureData) ? (string)($signatureData['hash'] ?? '') : '',
+          'signature_signer' => is_array($signatureData) ? (string)($signatureData['signerName'] ?? '') : '',
+        ]);
       }
-      $allocation['approved_at'] = now_iso();
-      $allocation['approved_by'] = $username;
-      $allocation['approval_reason'] = $reason;
-      allocation_append_event($allocation, 'approved', $username, $reason ?: 'evidence_approved', [
-        'signature_hash' => is_array($signatureData) ? (string)($signatureData['hash'] ?? '') : '',
-        'signature_signer' => is_array($signatureData) ? (string)($signatureData['signerName'] ?? '') : '',
-      ]);
     } else {
       // Reject
       if ($reason === '') {
@@ -16382,9 +16583,11 @@ if ($username === '') {
       $allocation['rejection_reason'] = $reason;
       allocation_append_event($allocation, 'rejected', $username, $reason, [
         'review_action' => 'reject',
+        'approval_mode' => $reviewConfig['approval_mode'] ?? 'serial',
       ]);
     }
 
+    $approvalSummary = evidence_refresh_approval_summary($allocation, $schema);
     save_allocation_store($allocationStore);
 
     $newStatus = allocation_status_normalize((string)($allocation['status'] ?? ''));
@@ -16392,6 +16595,7 @@ if ($username === '') {
       'ok' => true,
       'status' => $newStatus,
       'allocation' => $allocation,
+      'approval_summary' => $approvalSummary,
       'checklist' => evidence_evaluate_checklist($allocation, $newStatus === 'approved' ? 'approval' : 'review'),
     ]);
   }
@@ -16431,8 +16635,7 @@ if ($username === '') {
 
     $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
     // Clear previous approval/rejection metadata
-    unset($allocation['approval_signature'], $allocation['approved_at'], $allocation['approved_by'], $allocation['approval_reason']);
-    unset($allocation['rejected_at'], $allocation['rejected_by'], $allocation['rejection_reason']);
+    evidence_clear_review_outcome($allocation);
     allocation_append_event($allocation, 'submitted', $username, $reason, [
       'review_action' => 'reopen',
       'reopened_from' => $currentStatus,
@@ -16455,6 +16658,18 @@ if ($username === '') {
       if ($formCode !== '' && trim((string)($row['form_code'] ?? '')) !== $formCode) return false;
       return true;
     }));
+
+    $schemaCache = [];
+    foreach ($pending as &$row) {
+      if (!is_array($row)) continue;
+      $rowFormCode = trim((string)($row['form_code'] ?? ''));
+      if ($rowFormCode === '') continue;
+      if (!array_key_exists($rowFormCode, $schemaCache)) {
+        $schemaCache[$rowFormCode] = load_form_schema_by_code($rowFormCode) ?: [];
+      }
+      $row['approval_summary'] = evidence_approval_summary($row, $schemaCache[$rowFormCode]);
+    }
+    unset($row);
 
     api_json(['ok' => true, 'pending' => $pending, 'count' => count($pending)]);
   }
