@@ -79,8 +79,9 @@ Bo benchmark toi thieu cho repo nay:
 |---|---|---|
 | QMS flexibility | ISO 9001:2015 official page | Xac nhan ISO yeu cau QMS controls va documented information, khong ep tao WI cho moi viec |
 | Standardized work | IATF public OEM CSR documents | Xac nhan `what-how-why`, operator instruction, visual standard |
+| Acceptance sampling | ISO 2859-1 official page + released internal controlled table | Khoa boundary AQL method vs WI execution va khong sao chep bang tra co ban quyen vao ANNEX |
 | FAI | SAE AS9102 + IAQG official FAQ/forms | Khoa boundary cho WI-302 va form stack |
-| Logistic label | GS1 Logistic Label Guideline + GS1 General Specifications | Khoa SSCC, GS1-128, placement, print quality logic |
+| Logistic label | GS1 Logistic Label Guideline + GS1 General Specifications + ISO/IEC 15416 official page | Khoa SSCC, GS1-128, placement, print quality logic va verification method cho linear symbol |
 | Digital resilience | NIST SP 800-34 Rev.1 | Khoa BIA, contingency, recovery priorities, offline fallback logic |
 | Media sanitization | NIST SP 800-88 Rev.2 | Khoa sanitization program, validation, storage media handling |
 | Semiconductor safety/cleanliness | SEMI public standard pages, standard notices, customer specs | Khoa S2, purity/particle/surface/material context, khong tu doan acceptance limits |
@@ -127,6 +128,9 @@ Nguoi sua phai luu ngoai than tai lieu:
 - yeu to benchmark da dung;
 - cho nao la fact;
 - cho nao la suy luan noi bo.
+
+Mau de nghi:
+- `templates/wi-annex-research-working-notes-template.md`
 
 Khong dua note bien tap va reasoning nay vao than WI/ANNEX phat hanh.
 
@@ -176,3 +180,4 @@ Khong duoc suy luan:
 - `27-annex-archetypes-and-qa-guide.md`
 - `28-pou-visual-and-machine-side-rules.md`
 - `30-wi-annex-translation-role-bundle-rules.md`
+- `templates/wi-annex-research-working-notes-template.md`

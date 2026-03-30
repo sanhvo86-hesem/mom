@@ -62,10 +62,15 @@ MANUAL_DECISIONS = {
         "priority": "P2",
         "reason": "Pilot rewrite completed; keep as the canonical CNC operating-model and role-boundary annex.",
     },
+    "ANNEX-116": {
+        "recommended_action": "KEEP_CANONICAL",
+        "priority": "P2",
+        "reason": "Canonical subfolder relocation completed; keep as the controlled M365 folder-structure blueprint annex.",
+    },
     "ANNEX-601": {
-        "recommended_action": "KEEP_AND_TIGHTEN",
-        "priority": "P1",
-        "reason": "Method annex is correct, but must stay separate from WI execution steps.",
+        "recommended_action": "KEEP_CANONICAL",
+        "priority": "P2",
+        "reason": "Method boundary tightened; keep AQL logic and decision rules here while WI-603 owns execution steps.",
     },
     "ANNEX-608": {
         "recommended_action": "KEEP_CANONICAL",
@@ -73,14 +78,14 @@ MANUAL_DECISIONS = {
         "reason": "Wave 1 rewrite completed; keep as the canonical specification annex for semiconductor, vacuum and CSR source control.",
     },
     "ANNEX-701": {
-        "recommended_action": "KEEP_AND_TIGHTEN",
-        "priority": "P1",
-        "reason": "Keep as dictionary/specification support; do not let lifecycle procedure drift into the annex.",
+        "recommended_action": "KEEP_CANONICAL",
+        "priority": "P2",
+        "reason": "Dictionary/specification boundary tightened; keep data states and transition rules here while WI owns ship-floor execution.",
     },
     "ANNEX-122": {
         "recommended_action": "KEEP_CANONICAL",
-        "priority": "P1",
-        "reason": "KPI cascade dictionary is a core foundation and should remain a clean dictionary annex.",
+        "priority": "P2",
+        "reason": "KPI cascade dictionary remains the canonical lookup source after link and evidence-reference cleanup.",
     },
 }
 
@@ -173,6 +178,27 @@ def write_csv(path: Path, rows: list[dict[str, str | bool | int]]) -> None:
         writer.writerows(rows)
 
 
+def build_decision_log_rows(rows: list[dict[str, str | bool | int]]) -> list[dict[str, str]]:
+    decision_rows: list[dict[str, str]] = []
+    for row in rows:
+        duplicate_status = str(row["duplicate_status"]).strip()
+        decision_rows.append(
+            {
+                "code": str(row["code"]),
+                "family": str(row["family"]),
+                "series": str(row["series"]),
+                "target_archetype": str(row["target_archetype"]),
+                "recommended_action": str(row["recommended_action"]),
+                "priority": str(row["priority"]),
+                "canonical_status": duplicate_status or "CANONICAL",
+                "path": str(row["path"]),
+                "reason": str(row["reason"]),
+            }
+        )
+
+    return sorted(decision_rows, key=lambda item: (item["family"], item["code"], item["path"]))
+
+
 def build_summary(rows: list[dict[str, str | bool | int]]) -> str:
     total = len(rows)
     wi_total = sum(1 for row in rows if row["family"] == "WI")
@@ -237,7 +263,7 @@ def build_summary(rows: list[dict[str, str | bool | int]]) -> str:
     if phase_rows:
         next_steps.append("- Then clean remaining phase residue and tighten any canonical WI/ANNEX that still drift from the locked core-standard skeleton.")
     else:
-        next_steps.append("- Then focus on boundary-heavy documents such as WI-201, ANNEX-601 and ANNEX-701 where structure is clean but content discipline still matters.")
+        next_steps.append("- Then move the pilot set into execution depth, led by WI-715, WI-701, WI-517, WI-302 and WI-201.")
 
     next_steps.append("")
     lines.extend(next_steps)
@@ -252,15 +278,18 @@ def main() -> int:
     rows = build_rows(root)
     csv_path = report_dir / "wi-annex-inventory.csv"
     json_path = report_dir / "wi-annex-inventory.json"
+    decision_log_path = report_dir / "wi-annex-decision-log.csv"
     summary_path = report_dir / "wi-annex-foundation-summary.md"
 
     write_csv(csv_path, rows)
+    write_csv(decision_log_path, build_decision_log_rows(rows))
     json_path.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
     summary_path.write_text(build_summary(rows) + "\n", encoding="utf-8")
 
     print(f"docs={len(rows)}")
     print(f"csv={csv_path.relative_to(root).as_posix()}")
     print(f"json={json_path.relative_to(root).as_posix()}")
+    print(f"decision_log={decision_log_path.relative_to(root).as_posix()}")
     print(f"summary={summary_path.relative_to(root).as_posix()}")
     return 0
 

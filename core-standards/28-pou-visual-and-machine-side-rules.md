@@ -74,6 +74,21 @@ Dung mau/callout khac nhau cho:
 
 Khong dung mot kieu note cho moi muc.
 
+### 4.4 Template copy-paste
+
+Template mac dinh cho POU-WI:
+- `templates/wi-pou-template.html`
+
+Template nay khoa:
+- section `wi-s1` -> `wi-s7`;
+- `step-block`;
+- cue `Ly do`, `PASS khi`, `FAIL thi`, `Evidence`.
+
+Template nay khong thay cho:
+- quyet dinh archetype;
+- nghien cuu user that;
+- tach matrix/spec/governance sai layer.
+
 ---
 
 ## 5. Hinh anh, so do, minh hoa
@@ -189,6 +204,7 @@ Phai uu tien hien:
 - evidence after operation.
 
 Acceptance criteria goc phai o `Specification Annex` hoac drawing/spec/PO.
+Neu cue acceptance tham chieu chuan ben ngoai thi phai khoa nguon da release ro rang, vi du customer CSR hoac standard nhu SEMI F20 / SEMI S2 khi co ap dung. Khong tu dien so limit vao POU-WI.
 
 ---
 
@@ -217,3 +233,4 @@ Acceptance criteria goc phai o `Specification Annex` hoac drawing/spec/PO.
 - `26-wi-archetypes-and-qa-guide.md`
 - `29-wi-annex-research-redraft-method.md`
 - `30-wi-annex-translation-role-bundle-rules.md`
+- `templates/wi-pou-template.html`

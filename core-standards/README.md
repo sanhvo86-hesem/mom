@@ -75,8 +75,10 @@ Thư mục `core-standards/` chứa các quy tắc bất biến, quy ước đ�
 | `../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html` | Glossary công bố cho mọi bundle role/department/mixed actor được phép rút gọn trong tài liệu phát hành |
 | `templates/sop-template.html` | Template SOP copy-paste |
 | `templates/wi-template.html` | Template WI copy-paste |
+| `templates/wi-pou-template.html` | Template POU-WI copy-paste cho machine-side va visual-first execution |
 | `templates/jd-template.html` | Template JD chuẩn hóa role-code, header và wrapper HTML |
 | `templates/department-handbook-template.html` | Template handbook phòng ban chuẩn hóa department code, role chips và section boundary |
+| `templates/wi-annex-research-working-notes-template.md` | Mau working notes cho nghien cuu, benchmark va boundary log truoc khi rewrite WI/ANNEX |
 
 ---
 

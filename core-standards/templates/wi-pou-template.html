@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{CODE}} - {{TITLE}} | HESEM QMS</title>
+<link rel="stylesheet" href="{{RELATIVE_PATH}}/assets/style.css">
+<style>
+.wi-section { margin: 18px 0; }
+.step-block { border: 1px solid var(--ln); border-radius: var(--r); padding: 14px; margin: 12px 0; background: #fff; }
+.step-block h3 { margin: 0 0 8px; font-size: 16px; line-height: 1.4; }
+.step-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; margin-top: 10px; }
+.step-meta div { border: 1px solid var(--ln); border-radius: var(--r); padding: 10px 12px; background: #f8fafc; }
+.note-soft { border-left: 4px solid #eab308; background: #fffbeb; padding: 12px 14px; border-radius: 8px; margin: 10px 0; }
+.callout-stop { border-left: 4px solid #dc2626; background: #fef2f2; padding: 12px 14px; border-radius: 8px; margin: 10px 0; }
+.doc-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.doc-link { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--ln); background: #f8fafc; font-size: 12px; font-weight: 600; text-decoration: none; color: inherit; }
+@media (max-width: 960px) { .step-meta { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <!-- Doc template nay chi sau khi da doc core-standards 26, 28, 29 va 30. -->
+      <!-- Template nay khoa khung POU-WI. Khong duoc dung de bo qua decision test, user research hoac split boundary. -->
+
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="{{RELATIVE_PATH}}/01-QMS-Portal/portal.html"><img src="{{RELATIVE_PATH}}/assets/hesem-logo.svg" alt="HESEM Logo"></a>
+          <div class="fh-company">
+            <a href="{{RELATIVE_PATH}}/01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Tai lieu van hanh - POU-WI</span>
+          </div>
+        </div>
+        <div class="title"><strong>{{CODE}} - {{TITLE}}</strong></div>
+        <div class="meta">
+          <div class="row"><span><b>Ma:</b></span><span>{{CODE}}</span></div>
+          <div class="row"><span><b>Phien ban:</b></span><span>V0</span></div>
+          <div class="row"><span><b>Ngay hieu luc:</b></span><span>Theo quyet dinh ban hanh</span></div>
+          <div class="row"><span><b>Chu so huu:</b></span><span>{{OWNER_ROLE_CHIP}}</span></div>
+          <div class="row"><span><b>Phe duyet:</b></span><span>{{APPROVER_ROLE_CHIP}}</span></div>
+        </div>
+      </div>
+
+      <section id="wi-s1" class="wi-section">
+        <h2>1. Muc dich</h2>
+        <p>{{MO_TA_1_CAU_TRA_LOI_LAM_GI}}</p>
+      </section>
+
+      <section id="wi-s2" class="wi-section">
+        <h2>2. Ap dung khi nao, o dau, ai dung</h2>
+        <ul>
+          <li>Ai dung: {{USER_THAT}}</li>
+          <li>O dau: {{DIEM_SU_DUNG}}</li>
+          <li>Ap dung khi: {{TRIGGER}}</li>
+          <li>Khong dung de thay cho: {{SOP_OR_ANNEX_BOUNDARY}}</li>
+        </ul>
+        <div class="doc-links">
+          <a class="doc-link" href="{{SOP_LINK}}">{{SOP_CODE}}</a>
+          <a class="doc-link" href="{{ANNEX_LINK}}">{{ANNEX_CODE}}</a>
+          <a class="doc-link" href="{{FRM_LINK}}">{{FRM_CODE}}</a>
+        </div>
+      </section>
+
+      <section id="wi-s3" class="wi-section">
+        <h2>3. Cong cu, vat tu, tai lieu can co</h2>
+        <ul>
+          <li>{{TOOL_OR_DOC_1}}</li>
+          <li>{{TOOL_OR_DOC_2}}</li>
+          <li>{{TOOL_OR_DOC_3}}</li>
+        </ul>
+      </section>
+
+      <section id="wi-s4" class="wi-section">
+        <h2>4. Dieu kien truoc khi bat dau</h2>
+        <ul>
+          <li>{{PRECONDITION_1}}</li>
+          <li>{{PRECONDITION_2}}</li>
+          <li>{{PRECONDITION_3}}</li>
+        </ul>
+        <div class="callout-stop"><strong>STOP:</strong> {{STOP_CUE_TRUOC_KHI_BAT_DAU}}</div>
+      </section>
+
+      <section id="wi-s5" class="wi-section">
+        <h2>5. Cac buoc thuc hien</h2>
+
+        <!-- Muc tieu: toi da 12 step cho 1 flow chinh, 1 action/step, 2 dong text ngan/step. -->
+
+        <div class="step-block">
+          <h3>Buoc 1 - {{TEN_BUOC}}</h3>
+          <p>{{HANH_DONG_1_CAU}}</p>
+          <div class="note-soft"><strong>Ly do:</strong> {{RISK_CUE_12_15_TU}}</div>
+          <div class="step-meta">
+            <div><strong>PASS khi</strong><br>{{PASS_CUE}}</div>
+            <div><strong>FAIL thi</strong><br>{{FAIL_REACTION}}</div>
+            <div><strong>Evidence</strong><br>{{RECORD_OR_VISUAL_CUE}}</div>
+            <div><strong>Lien ket</strong><br>{{SPEC_OR_ANNEX_REFERENCE}}</div>
+          </div>
+        </div>
+
+        <div class="step-block">
+          <h3>Buoc 2 - {{TEN_BUOC}}</h3>
+          <p>{{HANH_DONG_1_CAU}}</p>
+          <div class="note-soft"><strong>Ly do:</strong> {{RISK_CUE_12_15_TU}}</div>
+          <div class="step-meta">
+            <div><strong>PASS khi</strong><br>{{PASS_CUE}}</div>
+            <div><strong>FAIL thi</strong><br>{{FAIL_REACTION}}</div>
+            <div><strong>Evidence</strong><br>{{RECORD_OR_VISUAL_CUE}}</div>
+            <div><strong>Lien ket</strong><br>{{SPEC_OR_ANNEX_REFERENCE}}</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="wi-s6" class="wi-section">
+        <h2>6. Ho so va bang chung</h2>
+        <ul>
+          <li>{{RECORD_1}}</li>
+          <li>{{RECORD_2}}</li>
+        </ul>
+      </section>
+
+      <section id="wi-s7" class="wi-section">
+        <h2>7. Tai lieu lien quan</h2>
+        <ul>
+          <li><a href="{{RELATED_DOC_LINK_1}}">{{RELATED_DOC_CODE_1}}</a> - {{RELATED_DOC_TITLE_1}}</li>
+          <li><a href="{{RELATED_DOC_LINK_2}}">{{RELATED_DOC_CODE_2}}</a> - {{RELATED_DOC_TITLE_2}}</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</div>
+</body>
+</html>

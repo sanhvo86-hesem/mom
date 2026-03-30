@@ -93,6 +93,11 @@ Van giu 7 section cua `08-document-types.md`, nhung Section 5 phai obey:
 - moi step co evidence hoac dau hieu PASS/FAIL;
 - dung duoc khi in A4 va khi xem mobile.
 
+Template copy-paste mac dinh cho POU-WI:
+- `templates/wi-pou-template.html`
+- Template nay chi khoa khung section, `step-block`, PASS/FAIL/EVIDENCE va wrapper.
+- Khong duoc dung template de bo qua decision test, user research hoac split boundary.
+
 ### 5.4 QA checklist
 
 - Co dung tai diem su dung that khong?
@@ -234,3 +239,4 @@ Phai co:
 - `28-pou-visual-and-machine-side-rules.md`
 - `29-wi-annex-research-redraft-method.md`
 - `30-wi-annex-translation-role-bundle-rules.md`
+- `templates/wi-pou-template.html`

@@ -315,10 +315,10 @@
     "family": "ANNEX",
     "code": "ANNEX-116",
     "series": "ANNEX-100",
-    "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-116-m365-folder-structure-blueprint.html",
+    "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-116-m365-folder-structure-blueprint.html",
     "title": "ANNEX-116 — Blueprint cấu trúc thư mục M365, quyền thư mục và quy tắc lưu hồ sơ | HESEM QMS",
     "target_archetype": "Map/Topology Annex",
-    "recommended_action": "KEEP",
+    "recommended_action": "KEEP_CANONICAL",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -333,7 +333,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Canonical subfolder relocation completed; keep as the controlled M365 folder-structure blueprint annex."
   },
   {
     "family": "ANNEX",
@@ -463,7 +463,7 @@
     "title": "ANNEX-122 — KPI Phân tầng Từ điển | HESEM QMS",
     "target_archetype": "Dictionary Annex",
     "recommended_action": "KEEP_CANONICAL",
-    "priority": "P1",
+    "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
     "has_head_tag": true,
@@ -477,7 +477,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "KPI cascade dictionary is a core foundation and should remain a clean dictionary annex."
+    "reason": "KPI cascade dictionary remains the canonical lookup source after link and evidence-reference cleanup."
   },
   {
     "family": "ANNEX",
@@ -1014,8 +1014,8 @@
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/06-ANNEX-600/annex-601-aql-method-reference.html",
     "title": "ANNEX-601 — Quy tắc áp dụng AQL, cỡ mẫu và chuyển chế độ kiểm | HESEM QMS",
     "target_archetype": "Method Annex",
-    "recommended_action": "KEEP_AND_TIGHTEN",
-    "priority": "P1",
+    "recommended_action": "KEEP_CANONICAL",
+    "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
     "has_head_tag": true,
@@ -1029,7 +1029,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Method annex is correct, but must stay separate from WI execution steps."
+    "reason": "Method boundary tightened; keep AQL logic and decision rules here while WI-603 owns execution steps."
   },
   {
     "family": "ANNEX",
@@ -1206,8 +1206,8 @@
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html",
     "title": "ANNEX-701 — Từ điển dữ liệu GS1/SSCC, quy tắc cấp mã và đối soát kiện hàng | HESEM QMS",
     "target_archetype": "Dictionary Annex",
-    "recommended_action": "KEEP_AND_TIGHTEN",
-    "priority": "P1",
+    "recommended_action": "KEEP_CANONICAL",
+    "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
     "has_head_tag": true,
@@ -1221,7 +1221,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Keep as dictionary/specification support; do not let lifecycle procedure drift into the annex."
+    "reason": "Dictionary/specification boundary tightened; keep data states and transition rules here while WI owns ship-floor execution."
   },
   {
     "family": "ANNEX",
