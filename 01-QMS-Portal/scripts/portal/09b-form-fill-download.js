@@ -2542,6 +2542,9 @@ function bindStandaloneRuntime(form, allocation, container){
   var frameId = standaloneRuntimeFrameId(form, allocation);
   var iframe = document.getElementById(frameId);
   if(!iframe) return;
+  iframe.style.display = 'block';
+  iframe.style.width = '100%';
+  iframe.style.maxWidth = '100%';
 
   if(typeof container._ecRuntimeBridge === 'function'){
     window.removeEventListener('message', container._ecRuntimeBridge);

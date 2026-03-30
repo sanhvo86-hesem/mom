@@ -11,356 +11,338 @@
 </head>
 <body>
 <div class="scar-runtime">
-  <div class="scar-shell">
-    <div class="form-header">
-      <div class="fh-left">
-        <a class="brand-logo" href="../portal.html">
-          <img alt="Biểu trưng HESEM" src="../assets/hesem-logo.svg"/>
-        </a>
-        <div class="fh-company">
-          <a href="../portal.html">HESEM ENGINEERING</a>
-          <span>Tài liệu kiểm soát</span>
+  <div class="page scar-page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../portal.html">
+            <img alt="HESEM Logo" src="../../assets/hesem-logo.svg"/>
+          </a>
+          <div class="fh-company">
+            <a href="../portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu kiểm soát</span>
+          </div>
+        </div>
+        <div class="title">
+          <span class="doc-code">FRM-403</span>
+          <strong class="doc-name">Supplier Corrective Action Request (SCAR)</strong>
+          <span class="sub-vn">Yêu cầu hành động khắc phục nhà cung cấp</span>
+        </div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span class="doc-code">FRM-403</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span id="metaVersion">V1</span></div>
+          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+          <div class="row">
+            <span><b>Chủ sở hữu:</b></span>
+            <span>
+              <span class="entity-cluster role-cluster">
+                <a class="entity-link role-link" href="../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)">
+                  <span class="entity-code role-code">QA</span>
+                </a>
+                <span class="entity-sep role-sep">/</span>
+                <a class="entity-link role-link" href="../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)">
+                  <span class="entity-code role-code">SCM</span>
+                </a>
+              </span>
+            </span>
+          </div>
+          <div class="row">
+            <span><b>Phê duyệt:</b></span>
+            <span>
+              <span class="entity-cluster role-cluster">
+                <a class="entity-link role-link" href="../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)">
+                  <span class="entity-code role-code">QA</span>
+                </a>
+                <span class="entity-sep role-sep">/</span>
+                <a class="entity-link role-link" href="../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)">
+                  <span class="entity-code role-code">SCM</span>
+                </a>
+              </span>
+            </span>
+          </div>
         </div>
       </div>
-      <div class="title">
-        <strong>FRM-403 - Supplier Corrective Action Request (SCAR)</strong>
-        <span class="sub-vn">Yêu cầu hành động khắc phục nhà cung cấp</span>
-      </div>
-      <div class="meta">
-        <div class="row"><span><b>Mã:</b></span><span>FRM-403</span></div>
-        <div class="row"><span><b>Phiên bản:</b></span><span id="metaVersion">V1</span></div>
-        <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-        <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA / SCM</span></div>
-        <div class="row"><span><b>Phê duyệt:</b></span><span>QA / SCM</span></div>
-      </div>
-    </div>
 
-    <div class="scar-topbar">
-      <div class="scar-hero">
-        <small>Supplier corrective case</small>
-        <strong id="heroSupplier">Chưa xác định nhà cung cấp</strong>
-        <p>Biểu mẫu này dùng để phát hành yêu cầu chính thức tới nhà cung cấp, khóa dữ liệu sự cố, theo dõi containment, thu nhận phản hồi nguyên nhân gốc và xác nhận hiệu lực trước khi đóng hồ sơ.</p>
-        <div class="scar-hero-grid">
-          <div class="scar-hero-item"><span>Mã hồ sơ</span><strong id="heroRecordId">Chưa cấp mã</strong></div>
-          <div class="scar-hero-item"><span>PO / Part</span><strong id="heroPoPart">Chưa có ngữ cảnh</strong></div>
-          <div class="scar-hero-item"><span>Lô bị ảnh hưởng</span><strong id="heroLot">Chưa xác định</strong></div>
-          <div class="scar-hero-item"><span>Người phát hành</span><strong id="heroIssuedBy">Chưa ghi nhận</strong></div>
+      <div class="scar-record-strip" aria-label="Tóm tắt hồ sơ SCAR">
+        <div class="scar-record-item">
+          <small>Mã hồ sơ</small>
+          <strong id="sideRecordId">Chưa cấp mã</strong>
         </div>
-      </div>
-
-      <div class="scar-metric-grid">
-        <div class="scar-metric info" id="metricSeverity">
-          <small>Mức độ</small>
-          <strong id="metricSeverityValue">Chưa chọn</strong>
-          <span id="metricSeverityNote">Chọn đúng mức độ để điều phối phản hồi và review phù hợp.</span>
+        <div class="scar-record-item">
+          <small>Nhà cung cấp</small>
+          <strong id="heroSupplier">Chưa xác định nhà cung cấp</strong>
         </div>
-        <div class="scar-metric warning" id="metricDue">
-          <small>Hạn phản hồi</small>
-          <strong id="metricDueValue">Chưa thiết lập</strong>
-          <span id="metricDueNote">Thiết lập hạn phản hồi để theo dõi nhà cung cấp và escalations.</span>
+        <div class="scar-record-item">
+          <small>PO / Part</small>
+          <strong id="heroPoPart">Chưa có ngữ cảnh</strong>
         </div>
-        <div class="scar-metric danger" id="metricRejectRate">
-          <small>Tỷ lệ loại bỏ</small>
-          <strong id="metricRejectRateValue">0%</strong>
-          <span id="metricRejectRateNote">0 / 0 chi tiết bị loại bỏ.</span>
+        <div class="scar-record-item">
+          <small>Lô bị ảnh hưởng</small>
+          <strong id="heroLot">Chưa xác định</strong>
         </div>
-        <div class="scar-metric success" id="metricStatus">
+        <div class="scar-record-item">
           <small>Trạng thái SCAR</small>
-          <strong id="metricStatusValue">Mở</strong>
-          <span id="metricStatusNote">Trạng thái hồ sơ sẽ thay đổi theo vòng phản hồi và xác nhận.</span>
+          <strong id="sideStatus">Mở</strong>
+        </div>
+        <div class="scar-record-item">
+          <small>Mức độ</small>
+          <strong id="sideSeverity">Chưa chọn</strong>
+        </div>
+        <div class="scar-record-item">
+          <small>Hạn phản hồi</small>
+          <strong id="sideDue">Chưa thiết lập</strong>
+        </div>
+        <div class="scar-record-item">
+          <small>Tỷ lệ loại bỏ</small>
+          <strong id="sideRejectRate">0%</strong>
+        </div>
+        <div class="scar-record-item">
+          <small>Người phát hành</small>
+          <strong id="heroIssuedBy">Chưa ghi nhận</strong>
         </div>
       </div>
-    </div>
 
-    <div class="scar-alert info" id="runtimeAlert">
-      <div>
-        <strong id="runtimeAlertTitle">Đang khởi tạo biểu mẫu</strong>
-        <span id="runtimeAlertText">Hệ thống đang tải thông tin hồ sơ, nháp gần nhất và dữ liệu nền nhà cung cấp.</span>
-      </div>
-      <span class="scar-alert-pill" id="runtimeAlertPill">Khởi tạo</span>
-    </div>
-
-    <div class="scar-layout">
-      <div class="scar-main">
-        <form class="qf" id="scarForm" novalidate>
-          <section class="qf-section qf-section--info">
-            <div class="qf-section-header">
-              <div>
-                <div class="qf-section-title"><span class="qf-section-num">1</span> Nhận diện hồ sơ và nhà cung cấp</div>
-                <div class="qf-section-subtitle">Khóa đủ ngữ cảnh phát hành, nhà cung cấp, đầu mối liên hệ và lô bị ảnh hưởng.</div>
-              </div>
-            </div>
-            <div class="qf-section-body">
-              <div class="qf-grid qf-grid--3">
-                <div class="qf-field">
-                  <label class="qf-label" for="scar_date">SCAR Date <span class="qf-required">*</span><span class="qf-label-vi">Ngày phát hành SCAR</span></label>
-                  <input class="qf-input" id="scar_date" name="scar_date" required type="date"/>
-                  <div class="qf-helper">Ngày chính thức phát hành yêu cầu tới nhà cung cấp.</div>
-                  <div class="qf-error-msg scar-hidden" data-error-for="scar_date"></div>
-                </div>
-                <div class="qf-field">
-                  <label class="qf-label" for="supplier_response_due_date">Supplier Response Due Date <span class="qf-required">*</span><span class="qf-label-vi">Hạn phản hồi nhà cung cấp</span></label>
-                  <input class="qf-input" id="supplier_response_due_date" name="supplier_response_due_date" required type="date"/>
-                  <div class="qf-helper">Dùng để theo dõi quá hạn và escalations.</div>
-                  <div class="qf-error-msg scar-hidden" data-error-for="supplier_response_due_date"></div>
-                </div>
-                <div class="qf-field">
-                  <label class="qf-label" for="scar_status">SCAR Status <span class="qf-required">*</span><span class="qf-label-vi">Trạng thái SCAR</span></label>
-                  <select class="qf-select" id="scar_status" name="scar_status" required>
-                    <option value="open">Mở</option>
-                    <option value="awaiting_response">Chờ phản hồi nhà cung cấp</option>
-                    <option value="under_review">Đang xem xét</option>
-                    <option value="verification">Đang xác nhận</option>
-                    <option value="closed">Đã đóng</option>
-                  </select>
-                  <div class="qf-error-msg scar-hidden" data-error-for="scar_status"></div>
-                </div>
-              </div>
-
-              <div class="qf-grid qf-grid--2">
-                <div class="qf-field">
-                  <label class="qf-label" for="supplier_name">Supplier Name <span class="qf-required">*</span><span class="qf-label-vi">Tên nhà cung cấp</span></label>
-                  <input class="qf-input" id="supplier_name" list="supplierList" name="supplier_name" required placeholder="Nhập hoặc chọn nhà cung cấp"/>
-                  <datalist id="supplierList"></datalist>
-                  <div class="qf-helper">Có thể gõ tên hoặc chọn từ danh sách nhà cung cấp đã quản lý.</div>
-                  <div class="qf-error-msg scar-hidden" data-error-for="supplier_name"></div>
-                </div>
-                <div class="qf-field">
-                  <label class="qf-label" for="supplier_id">Supplier ID <span class="qf-required">*</span><span class="qf-label-vi">Mã nhà cung cấp</span></label>
-                  <input class="qf-input" id="supplier_id" name="supplier_id" required placeholder="Ví dụ: SUP-001"/>
-                  <div class="qf-error-msg scar-hidden" data-error-for="supplier_id"></div>
-                </div>
-              </div>
-
-              <div class="qf-grid qf-grid--2">
-                <div class="qf-field">
-                  <label class="qf-label" for="supplier_contact">Supplier Contact<span class="qf-label-vi">Liên hệ nhà cung cấp</span></label>
-                  <input class="qf-input" id="supplier_contact" name="supplier_contact" placeholder="Tên, email, số điện thoại người phụ trách"/>
-                </div>
-                <div class="qf-field">
-                  <label class="qf-label" for="po_number">PO Number <span class="qf-required">*</span><span class="qf-label-vi">Số PO</span></label>
-                  <input class="qf-input" id="po_number" name="po_number" required placeholder="Nhập số PO liên quan"/>
-                  <div class="qf-error-msg scar-hidden" data-error-for="po_number"></div>
-                </div>
-              </div>
-
-              <div class="qf-grid qf-grid--3">
-                <div class="qf-field">
-                  <label class="qf-label" for="part_number">Part Number <span class="qf-required">*</span><span class="qf-label-vi">Mã chi tiết</span></label>
-                  <input class="qf-input" id="part_number" name="part_number" required placeholder="Ví dụ: PN-1001"/>
-                  <div class="qf-error-msg scar-hidden" data-error-for="part_number"></div>
-                </div>
-                <div class="qf-field">
-                  <label class="qf-label" for="part_rev">Part Revision<span class="qf-label-vi">Revision</span></label>
-                  <input class="qf-input" id="part_rev" name="part_rev" placeholder="Ví dụ: B"/>
-                </div>
-                <div class="qf-field">
-                  <label class="qf-label" for="lot_number">Lot Number<span class="qf-label-vi">Số lô</span></label>
-                  <input class="qf-input" id="lot_number" name="lot_number" placeholder="Số lô / heat number"/>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section class="qf-section qf-section--error">
-            <div class="qf-section-header">
-              <div>
-                <div class="qf-section-title"><span class="qf-section-num">2</span> Sự cố chất lượng và định lượng ảnh hưởng</div>
-                <div class="qf-section-subtitle">Mô tả lỗi rõ ràng, lượng hàng bị ảnh hưởng và mức độ nghiêm trọng để đưa ra yêu cầu xử lý tương xứng.</div>
-              </div>
-            </div>
-            <div class="qf-section-body">
-              <div class="scar-kpi-strip">
-                <div class="scar-kpi info"><small>Số lượng nhận</small><strong id="kpiReceived">0</strong><span>Tổng số lượng nhà cung cấp giao trong lô bị ảnh hưởng.</span></div>
-                <div class="scar-kpi danger"><small>Số lượng loại bỏ</small><strong id="kpiRejected">0</strong><span>Số lượng không đạt và cần xử lý trong SCAR này.</span></div>
-                <div class="scar-kpi success"><small>Số lượng chấp nhận</small><strong id="kpiAccepted">0</strong><span>Tự động tính từ số lượng nhận trừ số lượng loại bỏ.</span></div>
-                <div class="scar-kpi warning"><small>Tỷ lệ loại bỏ</small><strong id="kpiRejectRate">0%</strong><span>Dùng để nhìn nhanh độ lan rộng của vấn đề chất lượng.</span></div>
-              </div>
-
-              <div class="qf-grid qf-grid--3">
-                <div class="qf-field">
-                  <label class="qf-label" for="quantity_received">Quantity Received <span class="qf-required">*</span><span class="qf-label-vi">Số lượng nhận</span></label>
-                  <input class="qf-input" id="quantity_received" min="1" name="quantity_received" required step="1" type="number"/>
-                  <div class="qf-error-msg scar-hidden" data-error-for="quantity_received"></div>
-                </div>
-                <div class="qf-field">
-                  <label class="qf-label" for="quantity_rejected">Quantity Rejected <span class="qf-required">*</span><span class="qf-label-vi">Số lượng loại bỏ</span></label>
-                  <input class="qf-input" id="quantity_rejected" min="0" name="quantity_rejected" required step="1" type="number"/>
-                  <div class="qf-helper">Không được lớn hơn số lượng nhận.</div>
-                  <div class="qf-error-msg scar-hidden" data-error-for="quantity_rejected"></div>
-                </div>
-                <div class="qf-field" data-readonly="true">
-                  <label class="qf-label" for="quantity_accepted_calc">Quantity Accepted<span class="qf-label-vi">Số lượng chấp nhận</span></label>
-                  <input class="qf-input" id="quantity_accepted_calc" readonly type="text" value="0"/>
-                </div>
-              </div>
-
-              <div class="qf-grid qf-grid--2">
-                <div class="qf-field">
-                  <label class="qf-label" for="defect_type">Defect Type <span class="qf-required">*</span><span class="qf-label-vi">Loại lỗi</span></label>
-                  <input class="qf-input" id="defect_type" list="defectTypeList" name="defect_type" required placeholder="Ví dụ: Dimensional, Surface, Packaging"/>
-                  <datalist id="defectTypeList">
-                    <option value="Dimensional"></option>
-                    <option value="Surface"></option>
-                    <option value="Packaging"></option>
-                    <option value="Documentation"></option>
-                    <option value="Material"></option>
-                    <option value="Traceability"></option>
-                  </datalist>
-                  <div class="qf-error-msg scar-hidden" data-error-for="defect_type"></div>
-                </div>
-                <div class="qf-field">
-                  <label class="qf-label" for="severity">Severity <span class="qf-required">*</span><span class="qf-label-vi">Mức độ nghiêm trọng</span></label>
-                  <select class="qf-select" id="severity" name="severity" required>
-                    <option value="">Chọn mức độ</option>
-                    <option value="minor">Nhẹ</option>
-                    <option value="major">Nặng</option>
-                    <option value="critical">Nghiêm trọng</option>
-                  </select>
-                  <div class="qf-error-msg scar-hidden" data-error-for="severity"></div>
-                </div>
-              </div>
-
-              <div class="qf-field">
-                <label class="qf-label" for="defect_description">Defect Description <span class="qf-required">*</span><span class="qf-label-vi">Mô tả lỗi</span></label>
-                <textarea class="qf-textarea" id="defect_description" name="defect_description" required placeholder="Mô tả chi tiết hiện tượng lỗi, vị trí phát hiện, triệu chứng và ảnh hưởng thực tế..." rows="5"></textarea>
-                <div class="qf-error-msg scar-hidden" data-error-for="defect_description"></div>
-              </div>
-            </div>
-          </section>
-
-          <section class="qf-section qf-section--warning">
-            <div class="qf-section-header">
-              <div>
-                <div class="qf-section-title"><span class="qf-section-num">3</span> Containment, hạn phản hồi và phát hành yêu cầu</div>
-                <div class="qf-section-subtitle">Ghi nhận hành động chặn lan rộng, chế độ phản hồi bắt buộc và trách nhiệm phát hành.</div>
-              </div>
-            </div>
-            <div class="qf-section-body">
-              <div class="scar-inline-status" id="containmentHint">
-                <strong>Yêu cầu phản hồi đầy đủ</strong>
-                <span>Nhà cung cấp phải nộp nguyên nhân gốc, hành động khắc phục và hành động phòng ngừa trước khi xem xét đóng hồ sơ.</span>
-              </div>
-
-              <div class="qf-field">
-                <label class="qf-label" for="containment_action">Containment Action <span class="qf-required">*</span><span class="qf-label-vi">Hành động ngăn chặn</span></label>
-                <textarea class="qf-textarea" id="containment_action" name="containment_action" required placeholder="Ghi rõ cách cô lập hàng, xử lý tồn kho, chặn lô tiếp theo, thông báo nội bộ..." rows="4"></textarea>
-                <div class="qf-error-msg scar-hidden" data-error-for="containment_action"></div>
-              </div>
-
-              <div class="qf-grid qf-grid--3">
-                <div class="qf-field">
-                  <label class="qf-check-label" for="root_cause_required">
-                    <input checked id="root_cause_required" name="root_cause_required" type="checkbox"/>
-                    <span><span class="qf-label">Root Cause Required<span class="qf-label-vi">Yêu cầu phân tích nguyên nhân gốc</span></span></span>
-                  </label>
-                  <div class="qf-helper">Bỏ chọn chỉ khi QA quyết định containment-only hoặc xử lý rút gọn.</div>
-                </div>
-                <div class="qf-field">
-                  <label class="qf-label" for="issued_by">Issued By <span class="qf-required">*</span><span class="qf-label-vi">Người phát hành</span></label>
-                  <input class="qf-input" id="issued_by" name="issued_by" required placeholder="Người phát hành SCAR"/>
-                  <div class="qf-error-msg scar-hidden" data-error-for="issued_by"></div>
-                </div>
-                <div class="qf-field">
-                  <label class="qf-label" for="approved_by">Approved By<span class="qf-label-vi">Người phê duyệt</span></label>
-                  <input class="qf-input" id="approved_by" name="approved_by" placeholder="Người phê duyệt nội bộ"/>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section class="qf-section qf-section--info" id="supplierResponseSection">
-            <div class="qf-section-header">
-              <div>
-                <div class="qf-section-title"><span class="qf-section-num">4</span> Phản hồi và cam kết từ nhà cung cấp</div>
-                <div class="qf-section-subtitle">Thu thập nguyên nhân gốc, hành động khắc phục và hành động phòng ngừa từ phía nhà cung cấp.</div>
-              </div>
-            </div>
-            <div class="qf-section-body">
-              <div class="qf-field">
-                <label class="qf-label" for="supplier_root_cause">Supplier Root Cause<span class="qf-label-vi">Nguyên nhân gốc từ nhà cung cấp</span></label>
-                <textarea class="qf-textarea" id="supplier_root_cause" name="supplier_root_cause" placeholder="Nhà cung cấp giải thích nguyên nhân gốc của lỗi..." rows="4"></textarea>
-                <div class="qf-error-msg scar-hidden" data-error-for="supplier_root_cause"></div>
-              </div>
-              <div class="qf-grid qf-grid--2">
-                <div class="qf-field">
-                  <label class="qf-label" for="supplier_corrective_action">Supplier Corrective Action<span class="qf-label-vi">Hành động khắc phục của nhà cung cấp</span></label>
-                  <textarea class="qf-textarea" id="supplier_corrective_action" name="supplier_corrective_action" placeholder="Nêu rõ hành động khắc phục, người chịu trách nhiệm, thời điểm hoàn tất..." rows="4"></textarea>
-                  <div class="qf-error-msg scar-hidden" data-error-for="supplier_corrective_action"></div>
-                </div>
-                <div class="qf-field">
-                  <label class="qf-label" for="supplier_preventive_action">Supplier Preventive Action<span class="qf-label-vi">Hành động phòng ngừa của nhà cung cấp</span></label>
-                  <textarea class="qf-textarea" id="supplier_preventive_action" name="supplier_preventive_action" placeholder="Nêu hành động phòng ngừa để không tái diễn..." rows="4"></textarea>
-                  <div class="qf-error-msg scar-hidden" data-error-for="supplier_preventive_action"></div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section class="qf-section qf-section--success">
-            <div class="qf-section-header">
-              <div>
-                <div class="qf-section-title"><span class="qf-section-num">5</span> Xác nhận hiệu lực và đóng hồ sơ</div>
-                <div class="qf-section-subtitle">Ghi phương pháp xác nhận, kết quả và căn cứ đóng SCAR sau khi phản hồi được đánh giá.</div>
-              </div>
-            </div>
-            <div class="qf-section-body">
-              <div class="qf-grid qf-grid--2-1">
-                <div class="qf-field">
-                  <label class="qf-label" for="verification_method">Verification Method<span class="qf-label-vi">Phương pháp xác nhận</span></label>
-                  <input class="qf-input" id="verification_method" name="verification_method" placeholder="Ví dụ: IQC lô tiếp theo, audit tại chỗ, xác nhận bằng báo cáo đo"/>
-                  <div class="qf-error-msg scar-hidden" data-error-for="verification_method"></div>
-                </div>
-                <div class="qf-field" data-readonly="true">
-                  <label class="qf-label" for="closeout_ready">Closeout Readiness<span class="qf-label-vi">Mức sẵn sàng đóng hồ sơ</span></label>
-                  <input class="qf-input" id="closeout_ready" readonly type="text" value="Chưa sẵn sàng"/>
-                </div>
-              </div>
-              <div class="qf-field">
-                <label class="qf-label" for="verification_result">Verification Result<span class="qf-label-vi">Kết quả xác nhận</span></label>
-                <textarea class="qf-textarea" id="verification_result" name="verification_result" placeholder="Ghi rõ bằng chứng xác nhận, kết quả kiểm tra lại và quyết định đóng / giữ mở SCAR..." rows="4"></textarea>
-                <div class="qf-error-msg scar-hidden" data-error-for="verification_result"></div>
-              </div>
-            </div>
-          </section>
-
-          <div class="qf-actions qf-actions--sticky">
+      <form class="qf" id="scarForm" novalidate>
+        <section class="qf-section qf-section--info">
+          <div class="qf-section-header">
             <div>
-              <div class="qf-helper" id="saveMeta">Chưa có lượt lưu nào trong phiên này.</div>
-              <div class="qf-helper" id="entryMeta">Biểu mẫu sẽ tự ghi nhận revision khi gửi lại cùng một mã hồ sơ.</div>
+              <div class="qf-section-title"><span class="qf-section-num">1</span> Nhận diện hồ sơ và nhà cung cấp</div>
+              <div class="qf-section-subtitle">Khóa đủ ngữ cảnh phát hành, nhà cung cấp, đầu mối liên hệ và lô bị ảnh hưởng để tạo truy xuất sử dụng được ngay.</div>
             </div>
-            <div class="qf-actions-spacer"></div>
-            <button class="qf-btn secondary" id="btnSaveDraft" type="button">Lưu nháp</button>
-            <button class="qf-btn ghost" id="btnReset" type="button">Khôi phục dữ liệu</button>
-            <button class="qf-btn primary" id="btnSubmit" type="submit">Gửi SCAR</button>
           </div>
-        </form>
-      </div>
+          <div class="qf-section-body">
+            <div class="qf-grid qf-grid--3">
+              <div class="qf-field">
+                <label class="qf-label" for="scar_date">SCAR Date <span class="qf-required">*</span><span class="qf-label-vi">Ngày phát hành SCAR</span></label>
+                <input class="qf-input" id="scar_date" name="scar_date" required type="date"/>
+                <div class="qf-helper">Ngày chính thức phát hành yêu cầu tới nhà cung cấp.</div>
+                <div class="qf-error-msg scar-hidden" data-error-for="scar_date"></div>
+              </div>
+              <div class="qf-field">
+                <label class="qf-label" for="supplier_response_due_date">Supplier Response Due Date <span class="qf-required">*</span><span class="qf-label-vi">Hạn phản hồi nhà cung cấp</span></label>
+                <input class="qf-input" id="supplier_response_due_date" name="supplier_response_due_date" required type="date"/>
+                <div class="qf-helper">Dùng để theo dõi quá hạn và escalations.</div>
+                <div class="qf-error-msg scar-hidden" data-error-for="supplier_response_due_date"></div>
+              </div>
+              <div class="qf-field">
+                <label class="qf-label" for="scar_status">SCAR Status <span class="qf-required">*</span><span class="qf-label-vi">Trạng thái SCAR</span></label>
+                <select class="qf-select" id="scar_status" name="scar_status" required>
+                  <option value="open">Mở</option>
+                  <option value="awaiting_response">Chờ phản hồi nhà cung cấp</option>
+                  <option value="under_review">Đang xem xét</option>
+                  <option value="verification">Đang xác nhận</option>
+                  <option value="closed">Đã đóng</option>
+                </select>
+                <div class="qf-error-msg scar-hidden" data-error-for="scar_status"></div>
+              </div>
+            </div>
 
-      <aside class="scar-side">
-        <div class="scar-side-card">
-          <small>Tiến độ hồ sơ</small>
-          <strong id="sideProgressValue">0%</strong>
-          <span id="sideProgressText">Hệ thống sẽ tính tỷ lệ hoàn tất theo các trường bắt buộc của biểu mẫu.</span>
-          <div class="scar-progress" id="sideProgressBar" style="--scar-progress:0%"><i></i></div>
-        </div>
-        <div class="scar-side-card">
-          <small>Điểm điều hành chính</small>
-          <div class="scar-fact-list">
-            <div class="scar-fact"><span>Mã hồ sơ</span><strong id="sideRecordId">Chưa cấp mã</strong></div>
-            <div class="scar-fact"><span>Trạng thái</span><strong id="sideStatus">Mở</strong></div>
-            <div class="scar-fact"><span>Mức độ</span><strong id="sideSeverity">Chưa chọn</strong></div>
-            <div class="scar-fact"><span>Hạn phản hồi</span><strong id="sideDue">Chưa thiết lập</strong></div>
-            <div class="scar-fact"><span>Tỷ lệ loại bỏ</span><strong id="sideRejectRate">0%</strong></div>
+            <div class="qf-grid qf-grid--2">
+              <div class="qf-field">
+                <label class="qf-label" for="supplier_name">Supplier Name <span class="qf-required">*</span><span class="qf-label-vi">Tên nhà cung cấp</span></label>
+                <input class="qf-input" id="supplier_name" list="supplierList" name="supplier_name" required placeholder="Nhập hoặc chọn nhà cung cấp"/>
+                <datalist id="supplierList"></datalist>
+                <div class="qf-helper">Có thể gõ tên hoặc chọn từ danh sách nhà cung cấp đã quản lý.</div>
+                <div class="qf-error-msg scar-hidden" data-error-for="supplier_name"></div>
+              </div>
+              <div class="qf-field">
+                <label class="qf-label" for="supplier_id">Supplier ID <span class="qf-required">*</span><span class="qf-label-vi">Mã nhà cung cấp</span></label>
+                <input class="qf-input" id="supplier_id" name="supplier_id" required placeholder="Ví dụ: SUP-001"/>
+                <div class="qf-error-msg scar-hidden" data-error-for="supplier_id"></div>
+              </div>
+            </div>
+
+            <div class="qf-grid qf-grid--2">
+              <div class="qf-field">
+                <label class="qf-label" for="supplier_contact">Supplier Contact<span class="qf-label-vi">Liên hệ nhà cung cấp</span></label>
+                <input class="qf-input" id="supplier_contact" name="supplier_contact" placeholder="Tên, email, số điện thoại người phụ trách"/>
+              </div>
+              <div class="qf-field">
+                <label class="qf-label" for="po_number">PO Number <span class="qf-required">*</span><span class="qf-label-vi">Số PO</span></label>
+                <input class="qf-input" id="po_number" name="po_number" required placeholder="Nhập số PO liên quan"/>
+                <div class="qf-error-msg scar-hidden" data-error-for="po_number"></div>
+              </div>
+            </div>
+
+            <div class="qf-grid qf-grid--3">
+              <div class="qf-field">
+                <label class="qf-label" for="part_number">Part Number <span class="qf-required">*</span><span class="qf-label-vi">Mã chi tiết</span></label>
+                <input class="qf-input" id="part_number" name="part_number" required placeholder="Ví dụ: PN-1001"/>
+                <div class="qf-error-msg scar-hidden" data-error-for="part_number"></div>
+              </div>
+              <div class="qf-field">
+                <label class="qf-label" for="part_rev">Part Revision<span class="qf-label-vi">Revision</span></label>
+                <input class="qf-input" id="part_rev" name="part_rev" placeholder="Ví dụ: B"/>
+              </div>
+              <div class="qf-field">
+                <label class="qf-label" for="lot_number">Lot Number<span class="qf-label-vi">Số lô</span></label>
+                <input class="qf-input" id="lot_number" name="lot_number" placeholder="Số lô / heat number"/>
+              </div>
+            </div>
           </div>
+        </section>
+
+        <section class="qf-section qf-section--error">
+          <div class="qf-section-header">
+            <div>
+              <div class="qf-section-title"><span class="qf-section-num">2</span> Sự cố chất lượng và định lượng ảnh hưởng</div>
+              <div class="qf-section-subtitle">Mô tả lỗi rõ ràng, lượng hàng bị ảnh hưởng và mức độ nghiêm trọng để hành động containment và phản hồi được đặt đúng trọng tâm.</div>
+            </div>
+          </div>
+          <div class="qf-section-body">
+            <div class="qf-grid qf-grid--3">
+              <div class="qf-field">
+                <label class="qf-label" for="quantity_received">Quantity Received <span class="qf-required">*</span><span class="qf-label-vi">Số lượng nhận</span></label>
+                <input class="qf-input" id="quantity_received" min="1" name="quantity_received" required step="1" type="number"/>
+                <div class="qf-error-msg scar-hidden" data-error-for="quantity_received"></div>
+              </div>
+              <div class="qf-field">
+                <label class="qf-label" for="quantity_rejected">Quantity Rejected <span class="qf-required">*</span><span class="qf-label-vi">Số lượng loại bỏ</span></label>
+                <input class="qf-input" id="quantity_rejected" min="0" name="quantity_rejected" required step="1" type="number"/>
+                <div class="qf-helper">Không được lớn hơn số lượng nhận.</div>
+                <div class="qf-error-msg scar-hidden" data-error-for="quantity_rejected"></div>
+              </div>
+              <div class="qf-field" data-readonly="true">
+                <label class="qf-label" for="quantity_accepted_calc">Quantity Accepted<span class="qf-label-vi">Số lượng chấp nhận</span></label>
+                <input class="qf-input" id="quantity_accepted_calc" readonly type="text" value="0"/>
+              </div>
+            </div>
+
+            <div class="qf-grid qf-grid--2">
+              <div class="qf-field">
+                <label class="qf-label" for="defect_type">Defect Type <span class="qf-required">*</span><span class="qf-label-vi">Loại lỗi</span></label>
+                <input class="qf-input" id="defect_type" list="defectTypeList" name="defect_type" required placeholder="Ví dụ: Dimensional, Surface, Packaging"/>
+                <datalist id="defectTypeList">
+                  <option value="Dimensional"></option>
+                  <option value="Surface"></option>
+                  <option value="Packaging"></option>
+                  <option value="Documentation"></option>
+                  <option value="Material"></option>
+                  <option value="Traceability"></option>
+                </datalist>
+                <div class="qf-error-msg scar-hidden" data-error-for="defect_type"></div>
+              </div>
+              <div class="qf-field">
+                <label class="qf-label" for="severity">Severity <span class="qf-required">*</span><span class="qf-label-vi">Mức độ nghiêm trọng</span></label>
+                <select class="qf-select" id="severity" name="severity" required>
+                  <option value="">Chọn mức độ</option>
+                  <option value="minor">Nhẹ</option>
+                  <option value="major">Nặng</option>
+                  <option value="critical">Nghiêm trọng</option>
+                </select>
+                <div class="qf-error-msg scar-hidden" data-error-for="severity"></div>
+              </div>
+            </div>
+
+            <div class="qf-field">
+              <label class="qf-label" for="defect_description">Defect Description <span class="qf-required">*</span><span class="qf-label-vi">Mô tả lỗi</span></label>
+              <textarea class="qf-textarea" id="defect_description" name="defect_description" required placeholder="Mô tả chi tiết hiện tượng lỗi, vị trí phát hiện, triệu chứng và ảnh hưởng thực tế..." rows="5"></textarea>
+              <div class="qf-error-msg scar-hidden" data-error-for="defect_description"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="qf-section qf-section--warning">
+          <div class="qf-section-header">
+            <div>
+              <div class="qf-section-title"><span class="qf-section-num">3</span> Containment, hạn phản hồi và phát hành yêu cầu</div>
+              <div class="qf-section-subtitle">Ghi nhận hành động chặn lan rộng, chế độ phản hồi bắt buộc và trách nhiệm phát hành để kiểm soát vòng phản hồi nhà cung cấp.</div>
+            </div>
+          </div>
+          <div class="qf-section-body">
+            <div class="qf-field">
+              <label class="qf-label" for="containment_action">Containment Action <span class="qf-required">*</span><span class="qf-label-vi">Hành động ngăn chặn</span></label>
+              <textarea class="qf-textarea" id="containment_action" name="containment_action" required placeholder="Ghi rõ cách cô lập hàng, xử lý tồn kho, chặn lô tiếp theo, thông báo nội bộ..." rows="4"></textarea>
+              <div class="qf-error-msg scar-hidden" data-error-for="containment_action"></div>
+            </div>
+
+            <div class="qf-grid qf-grid--3">
+              <div class="qf-field">
+                <label class="qf-check-label" for="root_cause_required">
+                  <input checked id="root_cause_required" name="root_cause_required" type="checkbox"/>
+                  <span><span class="qf-label">Root Cause Required<span class="qf-label-vi">Yêu cầu phân tích nguyên nhân gốc</span></span></span>
+                </label>
+                <div class="qf-helper">Bỏ chọn chỉ khi QA quyết định containment-only hoặc xử lý rút gọn.</div>
+              </div>
+              <div class="qf-field">
+                <label class="qf-label" for="issued_by">Issued By <span class="qf-required">*</span><span class="qf-label-vi">Người phát hành</span></label>
+                <input class="qf-input" id="issued_by" name="issued_by" required placeholder="Người phát hành SCAR"/>
+                <div class="qf-error-msg scar-hidden" data-error-for="issued_by"></div>
+              </div>
+              <div class="qf-field">
+                <label class="qf-label" for="approved_by">Approved By<span class="qf-label-vi">Người phê duyệt</span></label>
+                <input class="qf-input" id="approved_by" name="approved_by" placeholder="Người phê duyệt nội bộ"/>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="qf-section qf-section--info" id="supplierResponseSection">
+          <div class="qf-section-header">
+            <div>
+              <div class="qf-section-title"><span class="qf-section-num">4</span> Phản hồi và cam kết từ nhà cung cấp</div>
+              <div class="qf-section-subtitle">Thu thập nguyên nhân gốc, hành động khắc phục và hành động phòng ngừa từ phía nhà cung cấp để đánh giá khả năng đóng hồ sơ.</div>
+            </div>
+          </div>
+          <div class="qf-section-body">
+            <div class="qf-field">
+              <label class="qf-label" for="supplier_root_cause">Supplier Root Cause<span class="qf-label-vi">Nguyên nhân gốc từ nhà cung cấp</span></label>
+              <textarea class="qf-textarea" id="supplier_root_cause" name="supplier_root_cause" placeholder="Nhà cung cấp giải thích nguyên nhân gốc của lỗi..." rows="4"></textarea>
+              <div class="qf-error-msg scar-hidden" data-error-for="supplier_root_cause"></div>
+            </div>
+            <div class="qf-grid qf-grid--2">
+              <div class="qf-field">
+                <label class="qf-label" for="supplier_corrective_action">Supplier Corrective Action<span class="qf-label-vi">Hành động khắc phục của nhà cung cấp</span></label>
+                <textarea class="qf-textarea" id="supplier_corrective_action" name="supplier_corrective_action" placeholder="Nêu rõ hành động khắc phục, người chịu trách nhiệm, thời điểm hoàn tất..." rows="4"></textarea>
+                <div class="qf-error-msg scar-hidden" data-error-for="supplier_corrective_action"></div>
+              </div>
+              <div class="qf-field">
+                <label class="qf-label" for="supplier_preventive_action">Supplier Preventive Action<span class="qf-label-vi">Hành động phòng ngừa của nhà cung cấp</span></label>
+                <textarea class="qf-textarea" id="supplier_preventive_action" name="supplier_preventive_action" placeholder="Nêu hành động phòng ngừa để không tái diễn..." rows="4"></textarea>
+                <div class="qf-error-msg scar-hidden" data-error-for="supplier_preventive_action"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="qf-section qf-section--success">
+          <div class="qf-section-header">
+            <div>
+              <div class="qf-section-title"><span class="qf-section-num">5</span> Xác nhận hiệu lực và đóng hồ sơ</div>
+              <div class="qf-section-subtitle">Ghi phương pháp xác nhận, kết quả và căn cứ đóng SCAR sau khi phản hồi được đánh giá đầy đủ.</div>
+            </div>
+          </div>
+          <div class="qf-section-body">
+            <div class="qf-grid qf-grid--2-1">
+              <div class="qf-field">
+                <label class="qf-label" for="verification_method">Verification Method<span class="qf-label-vi">Phương pháp xác nhận</span></label>
+                <input class="qf-input" id="verification_method" name="verification_method" placeholder="Ví dụ: IQC lô tiếp theo, audit tại chỗ, xác nhận bằng báo cáo đo"/>
+                <div class="qf-error-msg scar-hidden" data-error-for="verification_method"></div>
+              </div>
+              <div class="qf-field" data-readonly="true">
+                <label class="qf-label" for="closeout_ready">Closeout Readiness<span class="qf-label-vi">Mức sẵn sàng đóng hồ sơ</span></label>
+                <input class="qf-input" id="closeout_ready" readonly type="text" value="Chưa sẵn sàng"/>
+              </div>
+            </div>
+            <div class="qf-field">
+              <label class="qf-label" for="verification_result">Verification Result<span class="qf-label-vi">Kết quả xác nhận</span></label>
+              <textarea class="qf-textarea" id="verification_result" name="verification_result" placeholder="Ghi rõ bằng chứng xác nhận, kết quả kiểm tra lại và quyết định đóng / giữ mở SCAR..." rows="4"></textarea>
+              <div class="qf-error-msg scar-hidden" data-error-for="verification_result"></div>
+            </div>
+          </div>
+        </section>
+
+        <div class="qf-actions qf-actions--sticky no-print">
+          <div>
+            <div class="qf-helper" id="saveMeta">Chưa có lượt lưu nào trong phiên này.</div>
+            <div class="qf-helper" id="entryMeta">Biểu mẫu sẽ tự ghi nhận revision khi gửi lại cùng một mã hồ sơ.</div>
+          </div>
+          <div class="qf-actions-spacer"></div>
+          <button class="qf-btn secondary" id="btnSaveDraft" type="button">Lưu nháp</button>
+          <button class="qf-btn ghost" id="btnReset" type="button">Khôi phục dữ liệu</button>
+          <button class="qf-btn primary" id="btnSubmit" type="submit">Gửi SCAR</button>
         </div>
-        <div class="scar-side-card">
-          <small>Đầu mối nhà cung cấp</small>
-          <strong id="sideSupplierName">Chưa xác định</strong>
-          <span id="sideSupplierContact">Chưa có liên hệ phản hồi.</span>
-          <div class="scar-supplier-list" id="supplierHints"></div>
-        </div>
-      </aside>
+      </form>
     </div>
   </div>
 </div>
