@@ -121,6 +121,54 @@ var EXCEPTION_TYPES = [
     page: 'mes'
   },
   {
+    key: 'operator_qualification_gaps',
+    icon: '\ud83d\udc77',
+    accent: '#dc2626',
+    surface: '#fef2f2',
+    border: '#fecaca',
+    labelVi: 'Thi\u1ebfu n\u0103ng l\u1ef1c v\u1eadn h\u00e0nh',
+    labelEn: 'Operator qualification gaps',
+    descVi: 'WO \u0111ang g\u00e1n ng\u01b0\u1eddi v\u1eadn h\u00e0nh ch\u01b0a \u0111\u1ee7 \u0111i\u1ec1u ki\u1ec7n theo machine, work center ho\u1eb7c hi\u1ec7u l\u1ef1c n\u0103ng l\u1ef1c.',
+    descEn: 'The WO is assigned to an operator who is not fully qualified for the machine, work center, or validity window.',
+    page: 'mes'
+  },
+  {
+    key: 'material_trace_gaps',
+    icon: '\ud83e\uddea',
+    accent: '#ea580c',
+    surface: '#fff7ed',
+    border: '#fdba74',
+    labelVi: 'Thi\u1ebfu truy xu\u1ea5t v\u1eadt li\u1ec7u',
+    labelEn: 'Material trace gaps',
+    descVi: 'WO ch\u01b0a \u0111\u1ee7 lot, heat, traveler ho\u1eb7c tr\u1ea1ng th\u00e1i ch\u1ee9ng ch\u1ec9 v\u1eadt li\u1ec7u \u0111\u1ec3 kh\u00f3a traceability.',
+    descEn: 'The WO is missing lot, heat, traveler, or material certificate status required for governed traceability.',
+    page: 'mes'
+  },
+  {
+    key: 'connector_governance_gaps',
+    icon: '\ud83d\udd0c',
+    accent: '#2563eb',
+    surface: '#eff6ff',
+    border: '#93c5fd',
+    labelVi: 'Thi\u1ebfu \u0111i\u1ec1u ki\u1ec7n k\u1ebft n\u1ed1i m\u00e1y',
+    labelEn: 'Connector governance gaps',
+    descVi: 'Heartbeat, telemetry mode ho\u1eb7c ch\u00ednh s\u00e1ch connector c\u1ee7a m\u00e1y ch\u01b0a \u0111\u1ea1t \u0111i\u1ec1u ki\u1ec7n \u0111\u1ec3 m\u1edf WO.',
+    descEn: 'Heartbeat, telemetry mode, or machine connector policy does not yet satisfy WO launch conditions.',
+    page: 'mes'
+  },
+  {
+    key: 'shadow_sync_failures',
+    icon: '\ud83c\udf10',
+    accent: '#7c3aed',
+    surface: '#f5f3ff',
+    border: '#c4b5fd',
+    labelVi: 'L\u1ed7i \u0111\u1ed3ng b\u1ed9 shadow sync',
+    labelEn: 'Shadow sync failures',
+    descVi: 'Mirror JSON -> PostgreSQL b\u1ecb l\u1ed7i, c\u1ea7n kh\u00f4i ph\u1ee5c \u0111\u1ec3 analytics v\u00e0 audit kh\u00f4ng l\u1ec7ch.',
+    descEn: 'JSON -> PostgreSQL shadow sync has failed and should be recovered before analytics and audit diverge.',
+    page: 'mes'
+  },
+  {
     key: 'downtime_governance_gaps',
     icon: '\ud83e\udde0',
     accent: '#be185d',
@@ -319,7 +367,7 @@ function renderSummary(){
     total += count;
     if (count > 0) activeGroups += 1;
   });
-  highPriority = Number(state.summary.overdue_allocations || 0) + Number(state.summary.wo_missing_evidence || 0) + Number(state.summary.program_mismatches || 0) + Number(state.summary.program_release_risk || 0) + Number(state.summary.tool_readiness_risk || 0) + Number(state.summary.downtime_governance_gaps || 0) + Number(state.summary.overdue_orders || 0);
+  highPriority = Number(state.summary.overdue_allocations || 0) + Number(state.summary.wo_missing_evidence || 0) + Number(state.summary.program_mismatches || 0) + Number(state.summary.program_release_risk || 0) + Number(state.summary.tool_readiness_risk || 0) + Number(state.summary.operator_qualification_gaps || 0) + Number(state.summary.material_trace_gaps || 0) + Number(state.summary.connector_governance_gaps || 0) + Number(state.summary.shadow_sync_failures || 0) + Number(state.summary.downtime_governance_gaps || 0) + Number(state.summary.overdue_orders || 0);
   var nextPage = highPriority > 0 ? t('MES / Chứng cứ', 'MES / Evidence') : (activeGroups > 0 ? t('Đơn hàng', 'Orders') : t('Ổn định', 'Stable'));
   var totalEl = state.container.querySelector('#excx-total');
   var groupsEl = state.container.querySelector('#excx-groups');

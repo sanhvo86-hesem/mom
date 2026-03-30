@@ -2,7 +2,7 @@
   "_meta": {
     "version": "1.1",
     "created": "2026-03-28",
-    "updated": "2026-03-29T21:10:00+07:00",
+    "updated": "2026-03-30T16:25:00+07:00",
     "description": "Sales Order -> Job Order -> Work Order hierarchy. Seed runtime used before Epicor integration goes live.",
     "counters": {
       "last_so": "SO-2026-00002",
@@ -90,6 +90,11 @@
       "qty_completed": 24,
       "qty_scrap": 1,
       "fixture_id": "FIX-001",
+      "material_lot_number": "MATL-174PH-20260318-A",
+      "heat_number": "H900-24-173",
+      "traveler_number": "TRV-7141101-0001",
+      "traveler_status": "verified",
+      "material_cert_status": "approved",
       "status": "running"
     },
     {
@@ -111,6 +116,11 @@
       "qty_completed": 24,
       "qty_scrap": 1,
       "fixture_id": "GAGE-CMM-002",
+      "material_lot_number": "MATL-174PH-20260318-A",
+      "heat_number": "H900-24-173",
+      "traveler_number": "TRV-7141101-0001",
+      "traveler_status": "attached",
+      "material_cert_status": "approved",
       "status": "inspection"
     },
     {
@@ -132,6 +142,11 @@
       "qty_completed": 18,
       "qty_scrap": 2,
       "fixture_id": "FIX-014",
+      "material_lot_number": "MATL-AL6061-20260324-B",
+      "heat_number": "",
+      "traveler_number": "",
+      "traveler_status": "pending",
+      "material_cert_status": "on_hold",
       "status": "on_hold"
     }
   ],

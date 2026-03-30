@@ -2,7 +2,7 @@
   "_meta": {
     "version": "1.2",
     "created": "2026-03-29T12:00:00+07:00",
-    "updated": "2026-03-29T23:59:00+07:00",
+    "updated": "2026-03-30T16:20:00+07:00",
     "description": "Master data seed for customer, supplier, part, revision, NC program release, CAPA, work center, machine, operator, tooling linkage, and governed MES reason codes used by Evidence Control, Order Management, and MES runtime."
   },
   "customers": [
@@ -83,21 +83,30 @@
       "part_description": "Valve Housing, 17-4PH",
       "customer_id": "CUS-LAM",
       "status": "active",
-      "preferred_supplier_id": "SUP-ACOAT"
+      "preferred_supplier_id": "SUP-ACOAT",
+      "traceability_level": "lot_heat",
+      "material_trace_required": "yes",
+      "required_trace_fields": "material_lot_number, heat_number, traveler_number, traveler_status, material_cert_status"
     },
     {
       "part_number": "P-1001",
       "part_description": "Mounting Bracket, AL6061",
       "customer_id": "CUS-ACME",
       "status": "active",
-      "preferred_supplier_id": "SUP-KIMLONG"
+      "preferred_supplier_id": "SUP-KIMLONG",
+      "traceability_level": "lot",
+      "material_trace_required": "yes",
+      "required_trace_fields": "material_lot_number, traveler_number, traveler_status, material_cert_status"
     },
     {
       "part_number": "P-2003",
       "part_description": "Drive Shaft, 316SS",
       "customer_id": "CUS-GLOBEX",
       "status": "active",
-      "preferred_supplier_id": "SUP-KIMLONG"
+      "preferred_supplier_id": "SUP-KIMLONG",
+      "traceability_level": "lot_heat",
+      "material_trace_required": "yes",
+      "required_trace_fields": "material_lot_number, heat_number, traveler_number, traveler_status, material_cert_status"
     }
   ],
   "revisions": [
@@ -245,6 +254,8 @@
       "connector_name": "Makino MTConnect Adapter",
       "connector_endpoint": "https://mes.hesem.local/mtconnect/mc-5ax-01/current",
       "heartbeat_sla_seconds": 90,
+      "connector_required_for_release": "yes",
+      "manual_bridge_allowed": "no",
       "preferred_operator_id": "OPR-001",
       "status": "active",
       "last_pm_date": "2026-03-21",
@@ -261,6 +272,8 @@
       "connector_name": "Brother OPC UA Bridge",
       "connector_endpoint": "opc.tcp://192.168.10.44:4840",
       "heartbeat_sla_seconds": 120,
+      "connector_required_for_release": "yes",
+      "manual_bridge_allowed": "no",
       "preferred_operator_id": "OPR-014",
       "status": "active",
       "last_pm_date": "2026-03-14",
@@ -277,6 +290,8 @@
       "connector_name": "CMM Manual Bridge",
       "connector_endpoint": "manual://cmm-01",
       "heartbeat_sla_seconds": 180,
+      "connector_required_for_release": "yes",
+      "manual_bridge_allowed": "yes",
       "preferred_operator_id": "QC-002",
       "status": "active",
       "last_pm_date": "2026-03-05",
@@ -291,6 +306,12 @@
       "work_center_id": "WC-5AX",
       "shift": "1",
       "skills": "5-axis, setup, prove-out",
+      "qualification_status": "active",
+      "qualification_expiry": "2026-12-31",
+      "qualified_machine_types": "5-axis",
+      "qualified_machine_ids": "MC-5AX-01",
+      "qualified_work_centers": "WC-5AX",
+      "certified_processes": "5-axis machining, prove-out, setup",
       "status": "active"
     },
     {
@@ -300,6 +321,12 @@
       "work_center_id": "WC-3AX",
       "shift": "2",
       "skills": "3-axis, VMC, tool offsets",
+      "qualification_status": "expired",
+      "qualification_expiry": "2026-03-15",
+      "qualified_machine_types": "3-axis",
+      "qualified_machine_ids": "",
+      "qualified_work_centers": "WC-3AX",
+      "certified_processes": "3-axis machining, setup",
       "status": "active"
     },
     {
@@ -309,6 +336,12 @@
       "work_center_id": "WC-QA",
       "shift": "day",
       "skills": "CMM, FAI, final inspection",
+      "qualification_status": "active",
+      "qualification_expiry": "2026-11-30",
+      "qualified_machine_types": "cmm",
+      "qualified_machine_ids": "CMM-01",
+      "qualified_work_centers": "WC-QA",
+      "certified_processes": "CMM, FAI, final inspection",
       "status": "active"
     },
     {
@@ -318,6 +351,12 @@
       "work_center_id": "WC-MNT",
       "shift": "day",
       "skills": "PM, spindle, coolant, pneumatics",
+      "qualification_status": "active",
+      "qualification_expiry": "2026-10-31",
+      "qualified_machine_types": "5-axis,3-axis,cmm",
+      "qualified_machine_ids": "MC-5AX-01,MC-3AX-04,CMM-01",
+      "qualified_work_centers": "WC-MNT,WC-5AX,WC-3AX,WC-QA",
+      "certified_processes": "maintenance, PM, spindle, coolant, pneumatics",
       "status": "active"
     }
   ],

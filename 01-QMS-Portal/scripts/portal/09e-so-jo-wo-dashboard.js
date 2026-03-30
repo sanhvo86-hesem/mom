@@ -85,14 +85,19 @@ var FIELDS = {
     { key:'run_time_est', labelVi:'Run kế hoạch (phút)', labelEn:'Estimated Run (min)', type:'number' },
     { key:'scheduled_start', labelVi:'Bắt đầu kế hoạch', labelEn:'Scheduled Start', type:'datetime' },
     { key:'scheduled_end', labelVi:'Kết thúc kế hoạch', labelEn:'Scheduled End', type:'datetime' },
-    { key:'fixture_id', labelVi:'Mã đồ gá', labelEn:'Fixture ID' }
+    { key:'fixture_id', labelVi:'Mã đồ gá', labelEn:'Fixture ID' },
+    { key:'material_lot_number', labelVi:'Số lô vật liệu', labelEn:'Material Lot Number' },
+    { key:'heat_number', labelVi:'Số heat / melt', labelEn:'Heat Number' },
+    { key:'traveler_number', labelVi:'Mã traveler', labelEn:'Traveler Number' },
+    { key:'traveler_status', labelVi:'Trạng thái traveler', labelEn:'Traveler Status', type:'select', options:['pending','released','verified','attached','blocked'] },
+    { key:'material_cert_status', labelVi:'Trạng thái chứng chỉ vật liệu', labelEn:'Material Certificate Status', type:'select', options:['pending','verified','approved','on_hold','rejected'] }
   ]
 };
 
 var EDITABLE_FIELDS = {
   so: ['customer_po','order_date','due_date','total_qty','priority','contract_review','special_requirements'],
   jo: ['part_revision','part_description','material_spec','qty_ordered','start_date','due_date','routing_id','fai_required','customer_source_inspection','special_process'],
-  wo: ['operation_desc','machine_id','work_center_id','operator_id','nc_program_id','setup_time_est','run_time_est','scheduled_start','scheduled_end','fixture_id']
+  wo: ['operation_desc','machine_id','work_center_id','operator_id','nc_program_id','setup_time_est','run_time_est','scheduled_start','scheduled_end','fixture_id','material_lot_number','heat_number','traveler_number','traveler_status','material_cert_status']
 };
 
 function _t(vi, en){ return (typeof lang !== 'undefined' && lang === 'en') ? en : vi; }

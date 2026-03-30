@@ -74,7 +74,10 @@ var ENTITY_CONFIG = {
       { key:'part_description', type:'text', required:true, label:'Mô tả chi tiết' },
       { key:'customer_id', type:'lookup', entity:'customers', required:true, label:'Khách hàng' },
       { key:'status', type:'select', required:true, label:'Trạng thái', options:['active','inactive','obsolete'] },
-      { key:'preferred_supplier_id', type:'lookup', entity:'suppliers', label:'Nhà cung cấp ưu tiên' }
+      { key:'preferred_supplier_id', type:'lookup', entity:'suppliers', label:'Nhà cung cấp ưu tiên' },
+      { key:'traceability_level', type:'select', label:'Mức truy xuất vật liệu', options:['not_required','lot','lot_heat'] },
+      { key:'material_trace_required', type:'select', label:'Bắt buộc trace vật liệu', options:['yes','no'] },
+      { key:'required_trace_fields', type:'text', label:'Trường trace bắt buộc', helper:'Ví dụ: material_lot_number, heat_number, traveler_number, traveler_status, material_cert_status' }
     ]
   },
   revisions: {
@@ -180,6 +183,8 @@ var ENTITY_CONFIG = {
       { key:'connector_name', type:'text', label:'Tên connector' },
       { key:'connector_endpoint', type:'text', label:'Endpoint / adapter' },
       { key:'heartbeat_sla_seconds', type:'number', label:'Heartbeat SLA (giây)' },
+      { key:'connector_required_for_release', type:'select', label:'Yêu cầu connector để release', options:['yes','no'] },
+      { key:'manual_bridge_allowed', type:'select', label:'Cho phép manual bridge', options:['yes','no'] },
       { key:'preferred_operator_id', type:'lookup', entity:'operators', label:'Người vận hành ưu tiên' },
       { key:'status', type:'select', required:true, label:'Trạng thái', options:['active','idle','maintenance','down','blocked','retired'] },
       { key:'last_pm_date', type:'date', label:'Ngày PM gần nhất' },
@@ -203,6 +208,12 @@ var ENTITY_CONFIG = {
       { key:'work_center_id', type:'lookup', entity:'work_centers', label:'Work center chính' },
       { key:'shift', type:'select', label:'Ca làm việc', options:['1','2','3','day','night','office'] },
       { key:'skills', type:'text', label:'Kỹ năng / chứng nhận', helper:'Nhập các kỹ năng chính, phân tách bằng dấu phẩy.' },
+      { key:'qualification_status', type:'select', label:'Trạng thái năng lực', options:['active','expiring','expired','blocked','suspended'] },
+      { key:'qualification_expiry', type:'date', label:'Ngày hết hạn năng lực' },
+      { key:'qualified_machine_types', type:'text', label:'Machine family đủ chuẩn', helper:'Ví dụ: 5-axis, 3-axis, cmm' },
+      { key:'qualified_machine_ids', type:'text', label:'Machine ID đủ chuẩn', helper:'Ví dụ: MC-5AX-01, CMM-01' },
+      { key:'qualified_work_centers', type:'text', label:'Work center đủ chuẩn', helper:'Ví dụ: WC-5AX, WC-QA' },
+      { key:'certified_processes', type:'text', label:'Quy trình đã chứng nhận', helper:'Ví dụ: setup, prove-out, final inspection' },
       { key:'status', type:'select', required:true, label:'Trạng thái', options:['active','inactive','training','blocked'] }
     ]
   },
@@ -343,6 +354,10 @@ function _defaultDraft(entity){
   if(entity === 'customers') draft.status = 'active';
   if(entity === 'suppliers') draft.status = 'approved';
   if(entity === 'parts') draft.status = 'active';
+  if(entity === 'parts') {
+    draft.traceability_level = 'lot';
+    draft.material_trace_required = 'yes';
+  }
   if(entity === 'revisions') draft.status = 'released';
   if(entity === 'nc_program_releases') draft.status = 'draft';
   if(entity === 'capas') draft.status = 'open';
@@ -352,8 +367,13 @@ function _defaultDraft(entity){
     draft.telemetry_mode = 'machine';
     draft.connector_type = 'mtconnect';
     draft.heartbeat_sla_seconds = '120';
+    draft.connector_required_for_release = 'yes';
+    draft.manual_bridge_allowed = 'no';
   }
-  if(entity === 'operators') draft.status = 'active';
+  if(entity === 'operators') {
+    draft.status = 'active';
+    draft.qualification_status = 'active';
+  }
   if(entity === 'tooling_assets') { draft.status = 'active'; draft.warning_pct = '80'; draft.critical_pct = '95'; }
   if(entity === 'downtime_reason_codes') { draft.status = 'active'; draft.default_severity = 'major'; draft.planned_flag = 'no'; draft.escalation_sla_minutes = '30'; }
   if(entity === 'downtime_resolution_codes') draft.status = 'active';

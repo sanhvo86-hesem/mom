@@ -62,6 +62,16 @@ var EXCEPTION_META = {
   orphan_links:        { vi:'Liên kết mồ côi', en:'Orphan links', icon:'🧷' }
 };
 
+Object.assign(EXCEPTION_META, {
+  program_release_risk: { vi:'Thiếu release NC', en:'NC release risk', icon:'🗜️' },
+  tool_readiness_risk: { vi:'Tooling chưa sẵn sàng', en:'Tool readiness risk', icon:'🧰' },
+  operator_qualification_gaps: { vi:'Thiếu năng lực vận hành', en:'Operator qualification gaps', icon:'👷' },
+  material_trace_gaps: { vi:'Thiếu truy xuất vật liệu', en:'Material trace gaps', icon:'🧪' },
+  connector_governance_gaps: { vi:'Kết nối máy chưa đạt điều kiện', en:'Connector governance gaps', icon:'🔌' },
+  shadow_sync_failures: { vi:'Lỗi shadow sync', en:'Shadow sync failures', icon:'🌐' },
+  downtime_governance_gaps: { vi:'Downtime thiếu mã quản trị', en:'Downtime governance gaps', icon:'🧠' }
+});
+
 var CONNECTOR_META = {
   healthy:     { vi:'Kết nối tốt', en:'Healthy', color:'#059669' },
   delayed:     { vi:'Trễ heartbeat', en:'Delayed', color:'#d97706' },
@@ -235,8 +245,14 @@ function defaultSnapshot(){
     program_handshake_queue: [],
     program_release_queue: [],
     tool_readiness_queue: [],
+    operator_qualification_queue: [],
+    material_trace_queue: [],
+    connector_guard_queue: [],
     tooling_alerts: [],
-    evidence_gate_queue: []
+    evidence_gate_queue: [],
+    shadow_sync_failures: [],
+    shadow_status: {},
+    connector_ingest_status: {}
   };
 }
 
@@ -883,6 +899,37 @@ function renderToolReadinessQueue(rows){
   }).join('') + '</div>';
 }
 
+function renderGovernanceQueue(rows, options){
+  var emptyTitle = options.emptyTitle || t('Không có mục nào cần xử lý', 'No action needed');
+  var emptyText = options.emptyText || t('Hàng đợi hiện đang sạch.', 'The queue is currently clear.');
+  if(!rows.length){
+    return '<div class="mesx-empty"><strong>' + esc(emptyTitle) + '</strong>' + esc(emptyText) + '</div>';
+  }
+  return '<div class="mesx-list">' + rows.slice(0, 8).map(function(row){
+    var meta = governanceMeta(row.severity === 'critical' ? 'critical' : (row.severity === 'warning' ? 'warning' : 'ready'));
+    var detail = typeof options.detail === 'function' ? options.detail(row) : '';
+    var sub = typeof options.sub === 'function' ? options.sub(row) : '';
+    var actions = typeof options.actions === 'function' ? options.actions(row) : '';
+    var message = t(row.message_vi || options.fallbackVi || 'Cần rà soát lại mục này trước khi tiếp tục WO.', row.message_en || options.fallbackEn || 'Review this item before the WO continues.');
+    return '<div class="mesx-list-item"><h4>' + esc((row.wo_number || row.machine_id || row.store_key || '—') + (row.machine_id && row.wo_number ? ' · ' + row.machine_id : '')) + '</h4><p>' + esc(detail) + '</p>' + (sub ? '<div class="mesx-meta">' + esc(sub) + '</div>' : '') + '<p>' + esc(message) + '</p><div class="mesx-mini-actions" style="margin-top:10px"><span>' + badge(meta) + '</span>' + actions + '</div></div>';
+  }).join('') + '</div>';
+}
+
+function renderShadowSyncQueue(rows){
+  return renderGovernanceQueue(rows, {
+    emptyTitle: t('Shadow sync đang ổn định', 'Shadow sync is healthy'),
+    emptyText: t('Chưa có lỗi mirror JSON -> PostgreSQL nào đang mở.', 'There is no active JSON -> PostgreSQL mirror failure.'),
+    detail: function(row){
+      return [row.store_key || '', row.message || ''].filter(Boolean).join(' · ');
+    },
+    sub: function(row){
+      return [row.last_error_at ? fmtDateTime(row.last_error_at) : '', row.failure_count != null ? ('Fail ' + row.failure_count) : ''].filter(Boolean).join(' · ');
+    },
+    fallbackVi: 'Shadow sync cần được khôi phục để analytics và audit không lệch khỏi runtime.',
+    fallbackEn: 'Shadow sync must be recovered so analytics and audit stay aligned with runtime.'
+  });
+}
+
 function render(){
   if(!state.container) return;
   if(state.loading && !state.snapshot){
@@ -900,7 +947,14 @@ function render(){
   var programHandshake = Array.isArray(snapshot.program_handshake_queue) ? snapshot.program_handshake_queue : [];
   var programReleaseQueue = Array.isArray(snapshot.program_release_queue) ? snapshot.program_release_queue : [];
   var toolReadinessQueue = Array.isArray(snapshot.tool_readiness_queue) ? snapshot.tool_readiness_queue : [];
+  var operatorQualificationQueue = Array.isArray(snapshot.operator_qualification_queue) ? snapshot.operator_qualification_queue : [];
+  var materialTraceQueue = Array.isArray(snapshot.material_trace_queue) ? snapshot.material_trace_queue : [];
+  var connectorGuardQueue = Array.isArray(snapshot.connector_guard_queue) ? snapshot.connector_guard_queue : [];
+  var shadowSyncFailures = Array.isArray(snapshot.shadow_sync_failures) ? snapshot.shadow_sync_failures : [];
+  var shadowStatus = snapshot.shadow_status || {};
+  var connectorIngestStatus = snapshot.connector_ingest_status || {};
   var kpi = snapshot.kpis || {};
+  var readinessBand = '';
   var analyticsBand =
     '<section class="mesx-band" style="margin-top:18px">' +
       '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Xung OEE và pareto downtime', 'OEE pulse and downtime pareto')) + '</h2><p>' + esc(t('Đọc nhanh máy nào đang kéo OEE xuống và loại downtime nào đang nuốt nhiều phút mất nhất để ra phản ứng đúng thứ tự.', 'See which machines are pulling OEE down and which downtime category is consuming the most lost minutes so action follows the right order.')) + '</p></div></div><div class="mesx-analytics"><div class="mesx-section" style="margin-top:0;padding-top:0;border-top:none"><div class="mesx-mini" style="margin-bottom:10px"><small>' + esc(t('OEE theo máy', 'Machine OEE pulse')) + '</small><strong>' + esc(t('Ưu tiên dải đỏ trước, sau đó xử lý nút thắt availability / performance / quality.', 'Work the red band first, then the dominant availability / performance / quality loss.')) + '</strong></div>' + renderOeeTimeline(oeeTimeline) + '</div><div class="mesx-section"><div class="mesx-mini" style="margin-bottom:10px"><small>' + esc(t('Pareto downtime', 'Downtime pareto')) + '</small><strong>' + esc(t('Nhìn loại tổn thất lớn nhất trước khi đổ nguồn lực xử lý rải rác.', 'Look at the dominant loss mode before spreading recovery effort across too many categories.')) + '</strong></div>' + renderDowntimePareto(downtimePareto) + '</div></div></article>' +
@@ -910,6 +964,12 @@ function render(){
     '<section class="mesx-band" style="margin-top:18px">' +
       '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('NC program release governance', 'NC program release governance')) + '</h2><p>' + esc(t('Khóa các WO chưa có release NC đúng part, revision, operation hoặc machine context trước khi cho phép pre-run và release chạy máy.', 'Block WO that do not yet have the correct governed NC release for the part, revision, operation, and machine context before allowing pre-run and machine release.')) + '</p></div></div><div class="mesx-list">' + renderProgramReleaseQueue(programReleaseQueue) + '</div></article>' +
       '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Tool readiness governance', 'Tool readiness governance')) + '</h2><p>' + esc(t('Nhìn ngay WO nào đang bị chặn bởi tool-life, offset, hoặc runtime tooling chưa đủ để trưởng ca xử lý trước khi mở cắt.', 'See immediately which WO are blocked by tool-life, offset drift, or incomplete tooling runtime so the shift leader can resolve them before cutting starts.')) + '</p></div></div><div class="mesx-list">' + renderToolReadinessQueue(toolReadinessQueue) + '</div></article>' +
+    '</section>';
+
+  readinessBand =
+    '<section class="mesx-band" style="margin-top:18px">' +
+      '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Nhân lực và truy xuất vật liệu', 'Operator and material governance')) + '</h2><p>' + esc(t('Khóa các WO đang thiếu năng lực vận hành hoặc chưa đủ dữ liệu lot / heat / traveler trước khi tiếp tục sản xuất.', 'Block WO that still have operator qualification gaps or incomplete lot / heat / traveler data before production continues.')) + '</p></div></div><div class="mesx-list">' + renderGovernanceQueue(operatorQualificationQueue, { emptyTitle:t('Nhân lực vận hành đang đạt chuẩn', 'Operator qualification is clear'), emptyText:t('Chưa có WO nào bị chặn bởi năng lực, machine match hoặc hiệu lực chứng nhận.', 'No WO is currently blocked by qualification, machine match, or certification validity.'), detail:function(row){ return [row.operator_id || '', row.operator_name || '', row.customer_name || '', row.part_number || '', row.part_revision || ''].filter(Boolean).join(' · '); }, sub:function(row){ return [row.qualification_expiry ? ('Hết hạn ' + fmtDate(row.qualification_expiry)) : '', Array.isArray(row.issue_codes) && row.issue_codes.length ? ('Issues: ' + row.issue_codes.join(', ')) : '', Array.isArray(row.warning_codes) && row.warning_codes.length ? ('Warnings: ' + row.warning_codes.join(', ')) : ''].filter(Boolean).join(' · '); }, fallbackVi:'Người vận hành chưa đủ điều kiện hoặc không khớp machine / work center cho WO này.', fallbackEn:'The operator is not fully qualified or does not match the machine / work center for this WO.' }) + '</div><div class="mesx-section"><div class="mesx-mini" style="margin-bottom:10px"><small>' + esc(t('Traceability queue', 'Traceability queue')) + '</small><strong>' + esc(t('Các WO còn thiếu dữ liệu lot, heat hoặc traveler sẽ hiện ở đây.', 'WO missing lot, heat, or traveler data appear here.')) + '</strong></div>' + renderGovernanceQueue(materialTraceQueue, { emptyTitle:t('Trace vật liệu đang đủ', 'Material trace is complete'), emptyText:t('Các WO đang theo dõi hiện đã có lot, traveler và trạng thái chứng chỉ cần thiết.', 'Tracked WO already have the required lot, traveler, and certificate status.'), detail:function(row){ return [row.customer_name || '', row.part_number || '', row.part_revision || '', row.machine_id || ''].filter(Boolean).join(' · '); }, sub:function(row){ return [row.material_lot_number || '', row.heat_number || '', row.traveler_number || '', Array.isArray(row.missing_fields) && row.missing_fields.length ? ('Missing: ' + row.missing_fields.join(', ')) : ''].filter(Boolean).join(' · '); }, fallbackVi:'WO chưa đủ dữ liệu lot, heat hoặc traveler để khóa trace vật liệu.', fallbackEn:'The WO does not yet have enough lot, heat, or traveler data for governed material trace.' }) + '</div></article>' +
+      '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Kết nối máy và shadow observability', 'Connector and shadow observability')) + '</h2><p>' + esc(t('Theo dõi các WO bị chặn bởi connector policy và giám sát shadow sync để dữ liệu runtime không lệch khỏi PostgreSQL.', 'Track WO blocked by connector policy and monitor shadow sync so runtime does not drift away from PostgreSQL.')) + '</p></div></div><div class="mesx-list">' + renderGovernanceQueue(connectorGuardQueue, { emptyTitle:t('Kết nối máy đang đạt điều kiện', 'Connector governance is clear'), emptyText:t('Không có WO nào đang bị chặn bởi heartbeat, telemetry mode hoặc connector policy.', 'No WO is currently blocked by heartbeat, telemetry mode, or connector policy.'), detail:function(row){ return [row.customer_name || '', row.part_number || '', row.part_revision || '', row.machine_id || ''].filter(Boolean).join(' · '); }, sub:function(row){ return [row.connector_type || '', row.connector_health || '', row.telemetry_mode || '', row.signal_freshness_seconds == null ? '' : ('Freshness ' + row.signal_freshness_seconds + 's')].filter(Boolean).join(' · '); }, fallbackVi:'Heartbeat hoặc connector mode hiện tại chưa đáp ứng điều kiện mở WO.', fallbackEn:'The current heartbeat or connector mode does not satisfy WO launch conditions.' }) + '</div><div class="mesx-section"><div class="mesx-mini" style="margin-bottom:10px"><small>' + esc(t('Shadow sync health', 'Shadow sync health')) + '</small><strong>' + esc(((shadowStatus.master_data && shadowStatus.master_data.last_status) || 'never') + ' · ' + (((connectorIngestStatus.totals || {}).success || 0) + ' ok / ' + (((connectorIngestStatus.totals || {}).failure || 0) + ' fail'))) + '</strong><span class="mesx-sub">' + esc(t('Nguồn truth vẫn là runtime JSON, nhưng mirror sang PostgreSQL phải luôn được theo dõi để chuẩn bị chuyển primary read.', 'JSON runtime is still the source of truth, but the PostgreSQL mirror must be watched continuously to prepare primary reads.')) + '</span></div>' + renderShadowSyncQueue(shadowSyncFailures) + '</div></article>' +
     '</section>';
 
   state.container.innerHTML = '<div class="mesx">' +
@@ -930,6 +990,10 @@ function render(){
           renderKpiTile(t('Lệch chương trình NC', 'Program mismatches'), kpi.program_mismatches || 0, t('Máy đang báo sai hoặc thiếu chương trình so với WO', 'Machine-reported program is missing or mismatched against the WO')) +
           renderKpiTile(t('Rủi ro release NC', 'NC release risk'), kpi.program_release_risk || 0, t('WO chưa có release NC hợp lệ để mở cắt', 'WO still missing a valid governed NC release')) +
           renderKpiTile(t('Rủi ro tooling', 'Tool readiness risk'), kpi.tool_readiness_risk || 0, t('WO bị chặn bởi tool-life, offset hoặc runtime tooling chưa đủ', 'WO blocked by tool-life, offset drift, or incomplete tooling runtime')) +
+          renderKpiTile(t('Thiếu năng lực', 'Qualification gaps'), kpi.operator_qualification_gaps || 0, t('Người vận hành chưa đủ điều kiện theo machine, work center hoặc chứng nhận', 'Operators missing machine, work-center, or certification coverage')) +
+          renderKpiTile(t('Thiếu trace vật liệu', 'Material trace gaps'), kpi.material_trace_gaps || 0, t('WO còn thiếu lot, heat, traveler hoặc chứng chỉ vật liệu bắt buộc', 'WO still missing lot, heat, traveler, or required material certificates')) +
+          renderKpiTile(t('Rủi ro connector', 'Connector governance gaps'), kpi.connector_guard_gaps || 0, t('Connector policy, heartbeat hoặc telemetry mode chưa đủ điều kiện mở WO', 'Connector policy, heartbeat, or telemetry mode still blocks WO launch')) +
+          renderKpiTile(t('Lỗi shadow sync', 'Shadow sync failures'), kpi.shadow_sync_failures || 0, t('JSON runtime chưa mirror sạch sang PostgreSQL shadow layer', 'JSON runtime is not mirroring cleanly into the PostgreSQL shadow layer')) +
           renderKpiTile(t('Cầu nối tay', 'Manual bridges'), kpi.manual_bridges || 0, t('Máy đang cập nhật bằng manual bridge', 'Machines currently updated through the manual bridge')) +
           renderKpiTile('Availability', fmtPercent(kpi.availability_pct), t('Thời gian sẵn sàng của máy', 'Machine readiness time')) +
           renderKpiTile('Performance', fmtPercent(kpi.performance_pct), t('So với takt / runtime kế hoạch', 'Against planned runtime')) +
@@ -945,6 +1009,7 @@ function render(){
     '<section class="mesx-band" style="margin-top:18px"><article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Giám sát kết nối máy', 'Machine connectivity overview')) + '</h2><p>' + esc(t('Theo dõi từng máy đang lấy trạng thái từ MTConnect, OPC UA hay cầu nối nhập tay; nhịp heartbeat nào stale sẽ nổi lên trước để không bị mù dữ liệu shop-floor.', 'Track whether each machine is reading state from MTConnect, OPC UA, or a manual bridge; stale heartbeats rise to the top so the shop floor never goes blind.')) + '</p></div></div><div class="mesx-connector-grid">' + (connectors.length ? connectors.map(renderConnectorCard).join('') : '<div class="mesx-empty"><strong>' + esc(t('Chưa có connector runtime', 'No connector runtime yet')) + '</strong>' + esc(t('Hãy bơm tín hiệu pilot hoặc khai báo metadata kết nối cho máy.', 'Seed a pilot signal or declare connector metadata for the machine first.')) + '</div>') + '</div></article><article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Điểm rơi vận hành', 'Runtime guidance')) + '</h2><p>' + esc(t('Luôn ưu tiên xử lý theo thứ tự: stale connector -> downtime -> gate chứng cứ -> tooling alert. Điều này giúp OEE và traceability không lệch nhau.', 'Always triage in this order: stale connector -> downtime -> evidence gate -> tooling alert. This keeps OEE and traceability aligned.')) + '</p></div></div><div class="mesx-list"><div class="mesx-list-item"><h4>' + esc(t('Heartbeat stale là blocker ẩn', 'Stale heartbeat is a hidden blocker')) + '</h4><p>' + esc(t('Nếu máy vẫn chạy nhưng connector stale, OEE và dispatch có thể đẹp giả. Hãy cập nhật tín hiệu hoặc khôi phục adapter trước khi tin vào số liệu.', 'If the machine keeps running while the connector is stale, OEE and dispatch can look falsely healthy. Update the signal or restore the adapter before trusting the numbers.')) + '</p></div><div class="mesx-list-item"><h4>' + esc(t('Cầu nối tay là chế độ chuyển tiếp', 'Manual bridge is a transition mode')) + '</h4><p>' + esc(t('Dùng manual bridge cho CMM hoặc pilot machine là hợp lý, nhưng phải nhìn rõ máy nào còn đang phụ thuộc nhập tay để ưu tiên tự động hóa tiếp.', 'Using the manual bridge for a CMM or a pilot machine is acceptable, but operators must clearly see which assets still depend on manual input so automation can be prioritized next.')) + '</p></div></div></article></section>' +
     analyticsBand +
     governanceBand +
+    readinessBand +
     '<section class="mesx-main">' +
       '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Dispatch board theo Work Order', 'Work Order dispatch board')) + '</h2><p>' + esc(t('Lọc theo work center và trạng thái, sau đó báo tiến độ hoặc mở đúng form chứng cứ mà không phải nhập tay context.', 'Filter by work center and status, then report progress or launch the correct evidence form without typing context by hand.')) + '</p></div></div><div class="mesx-toolbar"><input class="mesx-input search" id="mes-search" type="search" value="' + esc(state.search) + '" placeholder="' + esc(t('Tìm WO / Part / máy / khách hàng...', 'Search WO / part / machine / customer...')) + '"><select class="mesx-select" id="mes-filter-center"><option value="">' + esc(t('Tất cả work center', 'All work centers')) + '</option>' + centers.map(function(center){ return '<option value="' + esc(center.work_center_id || '') + '"' + (state.workCenter === center.work_center_id ? ' selected' : '') + '>' + esc((center.work_center_id || '') + ' · ' + (center.work_center_name || '')) + '</option>'; }).join('') + '</select><select class="mesx-select" id="mes-filter-status"><option value="">' + esc(t('Tất cả trạng thái', 'All statuses')) + '</option>' + ['scheduled','setup','running','inspection','on_hold','completed'].map(function(key){ return '<option value="' + esc(key) + '"' + (state.dispatchStatus === key ? ' selected' : '') + '>' + esc(t(statusMeta(key).vi, statusMeta(key).en)) + '</option>'; }).join('') + '</select></div>' + renderDispatchTable(rows) + '</article>' +
       '<div class="mesx-stack"><article class="mesx-panel"><div class="mesx-panel-head"><div><h3>' + esc(t('Machine wall', 'Machine wall')) + '</h3><p>' + esc(t('Từng máy hiển thị tình trạng, OEE, gate chứng cứ và tool-life để trưởng ca xử lý ngay tại chỗ.', 'Each machine shows state, OEE, evidence gate, and tool-life so supervisors can act directly on the floor.')) + '</p></div></div><div class="mesx-machine-wall">' + (machineWall.length ? machineWall.map(renderMachineCard).join('') : '<div class="mesx-empty"><strong>' + esc(t('Chưa có machine wall', 'No machine wall data')) + '</strong>' + esc(t('Hãy khai báo máy trong master data trước.', 'Define machines in master data first.')) + '</div>') + '</div></article></div>' +
@@ -1044,7 +1109,7 @@ function openSignalBridgeModal(machineId){
       var connectorType = (modal.querySelector('#mes-sig-connector-type') || {}).value || machine.connector_type || 'manual_bridge';
       var connectorName = connectorType === (machine.connector_type || '') ? (machine.connector_name || '') : ((machine.machine_name || machine.machine_id || 'Machine') + ' ' + connectorTypeLabel(connectorType));
       var connectorEndpoint = connectorType === (machine.connector_type || '') ? (machine.connector_endpoint || '') : (connectorType === 'manual_bridge' ? ('manual://' + String(machine.machine_id || '').toLowerCase()) : '');
-      api('mes_machine_signal_upsert', {
+      api('mes_connector_ingest', {
         machine_id: machine.machine_id || '',
         connector_type: connectorType,
         connector_name: connectorName,
@@ -1125,7 +1190,7 @@ function openProgressModal(woNumber){
   bindModalButtons();
 }
 
-function openDowntimeModal(machineId){
+function openDowntimeModalLegacy(machineId){
   var machine = machineId ? machineById(machineId) : null;
   var workCenterId = machine ? machine.work_center_id : state.workCenter;
   var woRows = workOrderOptions(machineId);
@@ -1172,7 +1237,7 @@ function openDowntimeModal(machineId){
   bindModalButtons();
 }
 
-function openResolveDowntimeModal(downtimeId){
+function openResolveDowntimeModalLegacy(downtimeId){
   var row = downtimeById(downtimeId);
   if(!row){ toast(t('Không tìm thấy downtime cần khôi phục.', 'Could not find the downtime event to resolve.'), 'error'); return; }
   showModal(

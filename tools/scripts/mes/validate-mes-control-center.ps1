@@ -35,6 +35,7 @@ Assert-Command rg
 
 $phpFiles = @(
   (Join-Path $RepoRoot "01-QMS-Portal\api.php"),
+  (Join-Path $RepoRoot "01-QMS-Portal\api\services\EdgeConnectorService.php"),
   (Join-Path $RepoRoot "01-QMS-Portal\database\DataLayer.php"),
   (Join-Path $RepoRoot "01-QMS-Portal\database\RuntimeShadowSync.php")
 )
@@ -103,7 +104,7 @@ foreach ($file in $jsonFiles) {
 
 Write-Step "MES wiring"
 $wiringCommand = @"
-rg -n 'page-mes|page-exceptions|14-mes-control-center|14-exception-dashboard|_renderMesControlCenter|_renderExceptionDashboard|navigateTo\(''exceptions''\)|data-page=\"mes\"|mes_snapshot|mes_connector_snapshot|mes_machine_signal_upsert|exception_dashboard|exception_detail|program_mismatches|program_handshake_queue|program_release_queue|tool_readiness_queue|program_release_risk|tool_readiness_risk|downtime_governance_gaps|wo_launch_blocked|mes_wo_transition_guard|oee_timeline|downtime_pareto|mes_wo_report_progress|mes_downtime_create|mes_maintenance_create|mes_tooling_upsert|data-open-signal-bridge|nc_program_releases|downtime_reason_codes|downtime_resolution_codes|reason_code|resolution_code|runtime_data_layer|shadow_sync_orders_store|shadow_sync_mes_runtime_store' "$($wiringFiles -join '" "')"
+rg -n 'page-mes|page-exceptions|14-mes-control-center|14-exception-dashboard|_renderMesControlCenter|_renderExceptionDashboard|navigateTo\(''exceptions''\)|data-page=\"mes\"|mes_snapshot|mes_connector_snapshot|mes_machine_signal_upsert|mes_connector_ingest|mes_shadow_status|exception_dashboard|exception_detail|program_mismatches|program_handshake_queue|program_release_queue|tool_readiness_queue|program_release_risk|tool_readiness_risk|operator_qualification_gaps|material_trace_gaps|connector_governance_gaps|shadow_sync_failures|operator_qualification_queue|material_trace_queue|connector_guard_queue|shadow_status|connector_ingest_status|downtime_governance_gaps|wo_launch_blocked|mes_wo_transition_guard|oee_timeline|downtime_pareto|mes_wo_report_progress|mes_downtime_create|mes_maintenance_create|mes_tooling_upsert|data-open-signal-bridge|nc_program_releases|downtime_reason_codes|downtime_resolution_codes|reason_code|resolution_code|runtime_data_layer|shadow_sync_orders_store|shadow_sync_mes_runtime_store' "$($wiringFiles -join '" "')"
 "@
 Invoke-Checked "MES wiring lookup" $wiringCommand
 
