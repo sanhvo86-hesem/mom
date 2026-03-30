@@ -1,7 +1,7 @@
 {
     "_meta": {
         "version": "1.0",
-        "updated": "2026-03-30T02:04:31+00:00",
+        "updated": "2026-03-30T03:26:24+00:00",
         "description": "Structured observability for runtime shadow sync, connector ingest, and MES governance telemetry."
     },
     "shadow_sync": {
@@ -9,27 +9,45 @@
             "last_status": "never",
             "last_success_at": "",
             "last_error_at": "",
+            "last_skipped_at": "",
             "last_message": "",
             "success_count": 0,
             "failure_count": 0,
+            "skipped_count": 0,
+            "last_duration_ms": null,
+            "last_item_count": 0,
+            "last_mode": "",
+            "last_context": [],
             "recent": []
         },
         "orders": {
             "last_status": "never",
             "last_success_at": "",
             "last_error_at": "",
+            "last_skipped_at": "",
             "last_message": "",
             "success_count": 0,
             "failure_count": 0,
+            "skipped_count": 0,
+            "last_duration_ms": null,
+            "last_item_count": 0,
+            "last_mode": "",
+            "last_context": [],
             "recent": []
         },
         "mes": {
             "last_status": "never",
             "last_success_at": "",
             "last_error_at": "",
+            "last_skipped_at": "",
             "last_message": "",
             "success_count": 0,
             "failure_count": 0,
+            "skipped_count": 0,
+            "last_duration_ms": null,
+            "last_item_count": 0,
+            "last_mode": "",
+            "last_context": [],
             "recent": []
         }
     },
@@ -39,6 +57,104 @@
             "failure": 0
         },
         "machines": [],
+        "recent": []
+    },
+    "primary_reads": {
+        "master_data": {
+            "last_source": "json",
+            "last_read_at": "2026-03-30T10:26:24+07:00",
+            "last_error": "",
+            "last_mode": "JSON_ONLY",
+            "postgres_count": 0,
+            "json_count": 2,
+            "fallback_count": 0,
+            "last_context": {
+                "item_count": 56,
+                "scope": "runtime_bundle"
+            },
+            "recent": [
+                {
+                    "store_key": "master_data",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-30T10:26:24+07:00",
+                    "context": {
+                        "item_count": 56,
+                        "scope": "runtime_bundle"
+                    }
+                },
+                {
+                    "store_key": "master_data",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-30T10:26:24+07:00",
+                    "context": {
+                        "item_count": 56,
+                        "scope": "runtime_bundle"
+                    }
+                }
+            ]
+        },
+        "orders": {
+            "last_source": "json",
+            "last_read_at": "2026-03-30T10:26:24+07:00",
+            "last_error": "",
+            "last_mode": "JSON_ONLY",
+            "postgres_count": 0,
+            "json_count": 2,
+            "fallback_count": 0,
+            "last_context": {
+                "item_count": 8,
+                "scope": "runtime_bundle"
+            },
+            "recent": [
+                {
+                    "store_key": "orders",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-30T10:26:24+07:00",
+                    "context": {
+                        "item_count": 8,
+                        "scope": "runtime_bundle"
+                    }
+                },
+                {
+                    "store_key": "orders",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-30T10:26:24+07:00",
+                    "context": {
+                        "item_count": 8,
+                        "scope": "runtime_bundle"
+                    }
+                }
+            ]
+        },
+        "mes": {
+            "last_source": "never",
+            "last_read_at": "",
+            "last_error": "",
+            "last_mode": "",
+            "postgres_count": 0,
+            "json_count": 0,
+            "fallback_count": 0,
+            "last_context": [],
+            "recent": []
+        }
+    },
+    "launch_blockers": {
+        "totals": {
+            "count": 0
+        },
+        "work_orders": [],
         "recent": []
     }
 }
