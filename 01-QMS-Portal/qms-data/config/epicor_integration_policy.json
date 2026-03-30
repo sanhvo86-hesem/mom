@@ -1,8 +1,8 @@
 {
   "_meta": {
-    "version": "1.0",
-    "updated": "2026-03-30T22:15:00+07:00",
-    "description": "Governed Epicor Kinetic integration policy for MES synchronization, reconciliation, and outbox escalation."
+    "version": "1.1",
+    "updated": "2026-03-30T23:40:00+07:00",
+    "description": "Governed Epicor Kinetic integration policy for MES synchronization, reconciliation, transport security, and outbox escalation."
   },
   "system_name": "Epicor Kinetic",
   "domains": {
@@ -77,6 +77,28 @@
       "stale_after_minutes": 30,
       "reconciliation_threshold_qty": 0,
       "reconciliation_threshold_minutes": 60
+    }
+  },
+  "transport": {
+    "auth_mode": "oauth2_client_credentials",
+    "base_url": "",
+    "token_url": "",
+    "scope": "",
+    "api_key_header": "X-API-Key",
+    "timeout_seconds": 20,
+    "verify_tls": true,
+    "dry_run_when_unconfigured": true,
+    "company": "",
+    "plant": "",
+    "api_paths": {
+      "sales_orders": "api/v2/Erp.BO.SalesOrderSvc/List",
+      "job_orders": "api/v2/Erp.BO.JobEntrySvc/List",
+      "work_orders": "api/v2/Erp.BO.JobOperSvc/List",
+      "master_data": "api/v2/Erp.BO.PartSvc/List",
+      "labor": "api/v2/Erp.BO.LaborSvc/Update",
+      "material": "api/v2/Erp.BO.IssueMaterialSvc/IssueMaterial",
+      "completions": "api/v2/Erp.BO.ReceiptSvc/ReceiveJob",
+      "quality": "api/v2/Erp.BO.InspResultsSvc/Update"
     }
   },
   "outbound_targets": {

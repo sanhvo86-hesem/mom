@@ -2106,6 +2106,36 @@ function epicor_integration_service(): \HESEM\QMS\Services\EpicorIntegrationServ
   return $service;
 }
 
+function epicor_transport_adapter(): \HESEM\QMS\Services\EpicorTransportAdapter {
+  global $DATA_DIR;
+  require_once __DIR__ . '/api/services/EpicorTransportAdapter.php';
+  static $service = null;
+  if ($service === null) {
+    $service = new \HESEM\QMS\Services\EpicorTransportAdapter($DATA_DIR);
+  }
+  return $service;
+}
+
+function epicor_outbox_worker(): \HESEM\QMS\Services\OutboxWorker {
+  global $DATA_DIR;
+  require_once __DIR__ . '/api/services/OutboxWorker.php';
+  static $service = null;
+  if ($service === null) {
+    $service = new \HESEM\QMS\Services\OutboxWorker($DATA_DIR);
+  }
+  return $service;
+}
+
+function epicor_inbound_worker(): \HESEM\QMS\Services\EpicorInboundWorker {
+  global $DATA_DIR;
+  require_once __DIR__ . '/api/services/EpicorInboundWorker.php';
+  static $service = null;
+  if ($service === null) {
+    $service = new \HESEM\QMS\Services\EpicorInboundWorker($DATA_DIR);
+  }
+  return $service;
+}
+
 function runtime_observability_default(): array {
   return [
     '_meta' => [
@@ -2732,6 +2762,7 @@ function build_exception_dashboard_data(array $bundle, ?array $mesSnapshot = nul
     if ($opened !== '' && substr($opened, 0, 10) < $cutoff60) $overdueCapas++;
   }
 
+  $reviewSlaGaps = count(evidence_review_sla_queue_rows());
   $mesSnapshot = is_array($mesSnapshot) ? $mesSnapshot : build_mes_snapshot($orders, $master, $mes);
   $woMissingEvidence = count((array)($mesSnapshot['evidence_gate_queue'] ?? []));
   $programMismatches = count((array)($mesSnapshot['program_handshake_queue'] ?? []));
@@ -2772,6 +2803,7 @@ function build_exception_dashboard_data(array $bundle, ?array $mesSnapshot = nul
     'failed_uploads' => $failedUploads,
     'overdue_orders' => $overdueOrders,
     'overdue_capas' => $overdueCapas,
+    'review_sla_gaps' => $reviewSlaGaps,
     'wo_missing_evidence' => $woMissingEvidence,
     'program_mismatches' => $programMismatches,
     'program_release_risk' => $programReleaseRisk,
@@ -6729,6 +6761,7 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $connectorGuardQueue = mes_build_connector_guard_queue($dispatch);
   $adapterGovernanceQueue = mes_build_adapter_governance_queue($machineWall);
   $alarmHotspotQueue = mes_build_alarm_hotspot_queue($machineWall);
+  $reviewSlaQueue = evidence_review_sla_queue_rows();
   $shiftHandoverQueue = mes_build_shift_handover_queue($machineWall, $latestShiftHandoverByMachine, $shiftPatterns, $currentShift, $now);
   $epicorPolicy = load_epicor_integration_policy();
   $epicorStore = load_epicor_runtime_store();
@@ -6770,6 +6803,7 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $kpis['adapter_governance_risk'] = count($adapterGovernanceQueue);
   $kpis['alarm_hotspots'] = count($alarmHotspotQueue);
   $kpis['alarm_ack_gaps'] = count($alarmAckQueue);
+  $kpis['review_sla_gaps'] = count($reviewSlaQueue);
   $kpis['material_genealogy_gaps'] = count($materialGenealogyQueue);
   $kpis['shift_handover_gaps'] = count($shiftHandoverQueue);
   $kpis['shadow_sync_failures'] = count($shadowSyncFailures);
@@ -6795,6 +6829,7 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     'program_release_queue' => array_slice($programReleaseQueue, 0, 20),
     'tool_readiness_queue' => array_slice($toolReadinessQueue, 0, 20),
     'alarm_ack_queue' => array_slice($alarmAckQueue, 0, 20),
+    'review_sla_queue' => array_slice($reviewSlaQueue, 0, 20),
     'nc_download_mismatch_queue' => array_slice($ncDownloadMismatchQueue, 0, 20),
     'tool_offset_queue' => array_slice($toolOffsetQueue, 0, 20),
     'operator_qualification_queue' => array_slice($operatorQualificationQueue, 0, 20),
@@ -7334,6 +7369,85 @@ function evidence_review_sla_materialize(array &$allocation, array $recordTypes 
     'overdue_hours' => $evaluated['overdue_hours'],
     'hours_to_escalation' => $evaluated['hours_to_escalation'],
   ]);
+}
+
+function evidence_review_sla_queue_rows(): array {
+  $allocationStore = load_allocation_store();
+  $recordTypes = load_record_type_registry();
+  $schemaCache = [];
+  $rows = [];
+
+  foreach ((array)($allocationStore['allocations'] ?? []) as $allocation) {
+    if (!is_array($allocation)) continue;
+    if (allocation_status_normalize((string)($allocation['status'] ?? 'allocated')) !== 'in_review') continue;
+
+    $formCode = trim((string)($allocation['form_code'] ?? ''));
+    if ($formCode !== '' && !array_key_exists($formCode, $schemaCache)) {
+      $schemaCache[$formCode] = load_form_schema_by_code($formCode) ?: [];
+    }
+    $schema = is_array($schemaCache[$formCode] ?? null) ? $schemaCache[$formCode] : [];
+    $reviewConfig = evidence_review_config($schema);
+    $reviewSla = evidence_review_sla_evaluate($allocation, $recordTypes, $schema);
+    $state = strtolower(trim((string)($reviewSla['state'] ?? 'not_started')));
+    if (!in_array($state, ['due_soon', 'overdue', 'escalated'], true)) continue;
+
+    $notifications = is_array($allocation['review_sla']['notifications'] ?? null)
+      ? $allocation['review_sla']['notifications']
+      : [];
+    $reviewRoles = array_values((array)($reviewConfig['roles_allowed'] ?? []));
+    $escalationRoles = array_values((array)($reviewSla['escalation_roles'] ?? []));
+    $recordId = trim((string)($allocation['record_id'] ?? $allocation['allocation_id'] ?? ''));
+
+    $summaryVi = match ($state) {
+      'escalated' => 'Hồ sơ duyệt đã bị escalation và cần xử lý ngay.',
+      'overdue' => 'Hồ sơ duyệt đã quá hạn SLA.',
+      default => 'Hồ sơ duyệt sắp đến hạn và cần xử lý trước khi quá hạn.',
+    };
+    $summaryEn = match ($state) {
+      'escalated' => 'The review has escalated and needs immediate action.',
+      'overdue' => 'The review is already outside the SLA window.',
+      default => 'The review is approaching its SLA due time and should be handled early.',
+    };
+
+    $rows[] = [
+      'allocation_id' => (string)($allocation['allocation_id'] ?? ''),
+      'record_id' => $recordId,
+      'record_type' => (string)($reviewSla['record_type'] ?? $allocation['record_type'] ?? ''),
+      'form_code' => $formCode,
+      'department' => (string)($allocation['department'] ?? ''),
+      'allocated_to' => (string)($allocation['allocated_to'] ?? ''),
+      'downloaded_by' => (string)($allocation['downloaded_by'] ?? ''),
+      'state' => $state,
+      'band' => $state === 'due_soon' ? 'warning' : 'critical',
+      'started_at' => (string)($reviewSla['started_at'] ?? ''),
+      'due_at' => (string)($reviewSla['due_at'] ?? ''),
+      'escalation_due_at' => (string)($reviewSla['escalation_due_at'] ?? ''),
+      'remaining_hours' => $reviewSla['remaining_hours'] ?? null,
+      'overdue_hours' => $reviewSla['overdue_hours'] ?? null,
+      'hours_to_escalation' => $reviewSla['hours_to_escalation'] ?? null,
+      'review_roles' => $reviewRoles,
+      'escalation_roles' => $escalationRoles,
+      'notifications' => [
+        'warn_sent_at' => (string)($notifications['warn_sent_at'] ?? ''),
+        'overdue_sent_at' => (string)($notifications['overdue_sent_at'] ?? ''),
+        'escalated_sent_at' => (string)($notifications['escalated_sent_at'] ?? ''),
+      ],
+      'summary_vi' => $summaryVi,
+      'summary_en' => $summaryEn,
+    ];
+  }
+
+  usort($rows, static function ($a, $b) {
+    $priority = ['escalated' => 0, 'overdue' => 1, 'due_soon' => 2];
+    $ap = $priority[(string)($a['state'] ?? 'due_soon')] ?? 9;
+    $bp = $priority[(string)($b['state'] ?? 'due_soon')] ?? 9;
+    if ($ap !== $bp) return $ap <=> $bp;
+    $ad = (string)($a['due_at'] ?? $a['escalation_due_at'] ?? '');
+    $bd = (string)($b['due_at'] ?? $b['escalation_due_at'] ?? '');
+    return strcmp($ad, $bd);
+  });
+
+  return $rows;
 }
 
 function load_form_schema_by_code(string $formCode): ?array {
@@ -14944,6 +15058,16 @@ if ($username === '') {
     ]);
   }
 
+  case 'epicor_transport_health': {
+    require_logged_in($store);
+    api_json([
+      'ok' => true,
+      'health' => epicor_transport_adapter()->healthSnapshot(),
+      'runtime_mode' => runtime_data_layer_summary(),
+      'updated_at' => now_iso(),
+    ]);
+  }
+
   case 'epicor_sync_run_upsert': {
     if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
     $me = require_logged_in($store);
@@ -15016,6 +15140,55 @@ if ($username === '') {
       'snapshot' => $snapshot,
       'updated' => (string)($runtime['_meta']['updated'] ?? ''),
     ]);
+  }
+
+  case 'epicor_outbox_process': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $limit = max(1, min(100, (int)($body['limit'] ?? 25)));
+    $result = epicor_outbox_worker()->processPending([
+      'limit' => $limit,
+      'user_id' => (string)($_SESSION['user'] ?? $me['username'] ?? 'system'),
+    ]);
+    $bundle = runtime_read_model_bundle(true);
+    $policy = load_epicor_integration_policy();
+    $runtime = load_epicor_runtime_store();
+    $snapshot = epicor_integration_service()->buildSnapshot($runtime, $bundle['orders'], $bundle['master'], $bundle['mes'], $policy);
+    api_json([
+      'ok' => (bool)($result['ok'] ?? false),
+      'result' => $result,
+      'data' => build_mes_snapshot($bundle['orders'], $bundle['master'], $bundle['mes']),
+      'snapshot' => $snapshot,
+      'updated' => (string)($runtime['_meta']['updated'] ?? ''),
+    ], (int)($result['dead_letter'] ?? 0) > 0 ? 207 : 200);
+  }
+
+  case 'epicor_inbound_process': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $domains = array_values(array_filter(array_map(
+      static fn($value) => strtolower(trim((string)$value)),
+      is_array($body['domains'] ?? null) ? $body['domains'] : []
+    )));
+    $result = epicor_inbound_worker()->processInbound([
+      'domains' => $domains,
+      'user_id' => (string)($_SESSION['user'] ?? $me['username'] ?? 'system'),
+    ]);
+    $bundle = runtime_read_model_bundle(true);
+    $policy = load_epicor_integration_policy();
+    $runtime = load_epicor_runtime_store();
+    $snapshot = epicor_integration_service()->buildSnapshot($runtime, $bundle['orders'], $bundle['master'], $bundle['mes'], $policy);
+    api_json([
+      'ok' => (bool)($result['ok'] ?? false),
+      'result' => $result,
+      'data' => build_mes_snapshot($bundle['orders'], $bundle['master'], $bundle['mes']),
+      'snapshot' => $snapshot,
+      'updated' => (string)($runtime['_meta']['updated'] ?? ''),
+    ], (int)($result['failed'] ?? 0) > 0 ? 207 : 200);
   }
 
   case 'mes_shadow_status': {
@@ -17020,6 +17193,25 @@ if ($username === '') {
     ]);
   }
 
+  case 'evidence_sla_notifications_run': {
+    $me = require_logged_in($store);
+    require_csrf();
+    if (!evidence_review_sla_can_manage($me)) api_json(['ok' => false, 'error' => 'insufficient_role'], 403);
+
+    require_once __DIR__ . '/api/services/ScheduledJobs.php';
+    $jobs = new \HESEM\QMS\Services\ScheduledJobs($DATA_DIR);
+    $result = $jobs->runEvidenceReviewSlaNotifications();
+    $bundle = runtime_read_model_bundle(true);
+
+    api_json([
+      'ok' => true,
+      'result' => $result,
+      'data' => build_mes_snapshot($bundle['orders'], $bundle['master'], $bundle['mes']),
+      'exceptions' => build_exception_dashboard_data($bundle),
+      'updated_at' => now_iso(),
+    ]);
+  }
+
   case 'evidence_pack_export': {
     require_logged_in($store);
     $allocationId = trim((string)($_GET['allocation_id'] ?? $_POST['allocation_id'] ?? ''));
@@ -17670,6 +17862,39 @@ if ($username === '') {
               'detail'     => (string)($capa['title'] ?? $capa['description'] ?? ''),
             ];
           }
+        }
+        break;
+      }
+      case 'review_sla_gaps': {
+        foreach (evidence_review_sla_queue_rows() as $row) {
+          if (!is_array($row)) continue;
+          $state = (string)($row['state'] ?? '');
+          $roles = $state === 'escalated'
+            ? array_values((array)($row['escalation_roles'] ?? []))
+            : array_values((array)($row['review_roles'] ?? []));
+          $timing = '';
+          if ($state === 'due_soon' && isset($row['remaining_hours']) && $row['remaining_hours'] !== null) {
+            $timing = 'Còn ' . (int)$row['remaining_hours'] . ' giờ';
+          } elseif ($state === 'overdue' && isset($row['overdue_hours']) && $row['overdue_hours'] !== null) {
+            $timing = 'Quá hạn ' . (int)$row['overdue_hours'] . ' giờ';
+          } elseif ($state === 'escalated' && isset($row['hours_to_escalation']) && $row['hours_to_escalation'] !== null) {
+            $timing = 'Escalation ' . (int)$row['hours_to_escalation'] . ' giờ';
+          }
+          $items[] = [
+            'id' => (string)($row['allocation_id'] ?? ''),
+            'type' => 'review_sla',
+            'department' => (string)($row['department'] ?? ''),
+            'date' => substr((string)($row['due_at'] ?? $row['escalation_due_at'] ?? ''), 0, 10),
+            'responsible' => implode(', ', $roles),
+            'detail' => implode(' · ', array_filter([
+              (string)($row['record_type'] ?? ''),
+              (string)($row['record_id'] ?? ''),
+              (string)($row['form_code'] ?? ''),
+              strtoupper($state),
+              $timing,
+              (string)($row['summary_vi'] ?? ''),
+            ])),
+          ];
         }
         break;
       }

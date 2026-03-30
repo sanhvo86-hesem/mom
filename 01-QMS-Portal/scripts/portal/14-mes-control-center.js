@@ -73,6 +73,7 @@ var GATE_META = {
 var EXCEPTION_META = {
   program_mismatches:  { vi:'Lệch chương trình NC', en:'Program mismatch', icon:'💾' },
   overdue_allocations: { vi:'Allocation quá hạn', en:'Overdue allocations', icon:'⏳' },
+  review_sla_gaps:     { vi:'Review SLA cần xử lý', en:'Review SLA gaps', icon:'🕰️' },
   failed_uploads:      { vi:'Upload lỗi', en:'Failed uploads', icon:'📤' },
   overdue_orders:      { vi:'Đơn hàng quá hạn', en:'Overdue orders', icon:'📦' },
   overdue_capas:       { vi:'CAPA mở lâu', en:'Overdue CAPA', icon:'🧩' },
@@ -1247,6 +1248,7 @@ function render(){
   var programReleaseQueue = Array.isArray(snapshot.program_release_queue) ? snapshot.program_release_queue : [];
   var toolReadinessQueue = Array.isArray(snapshot.tool_readiness_queue) ? snapshot.tool_readiness_queue : [];
   var alarmAckQueue = Array.isArray(snapshot.alarm_ack_queue) ? snapshot.alarm_ack_queue : [];
+  var reviewSlaQueue = Array.isArray(snapshot.review_sla_queue) ? snapshot.review_sla_queue : [];
   var operatorQualificationQueue = Array.isArray(snapshot.operator_qualification_queue) ? snapshot.operator_qualification_queue : [];
   var materialTraceQueue = Array.isArray(snapshot.material_trace_queue) ? snapshot.material_trace_queue : [];
   var materialGenealogyQueue = Array.isArray(snapshot.material_genealogy_queue) ? snapshot.material_genealogy_queue : [];
@@ -1298,6 +1300,11 @@ function render(){
       '</div></article>' +
     '</section>';
 
+  var evidenceGovernanceBand =
+    '<section class="mesx-band" style="margin-top:18px">' +
+      '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Evidence review SLA', 'Evidence review SLA')) + '</h2><p>' + esc(t('Giữ hàng đợi review của NCR, CAPA và các hồ sơ quan trọng luôn nhìn thấy được để không bị trễ review, trễ escalation hoặc chậm phản hồi audit.', 'Keep the review queue for NCR, CAPA, and other critical records visible so review due dates, escalations, and audit responses never slip quietly.')) + '</p></div></div><div class="mesx-section"><div class="mesx-mini" style="margin-bottom:10px"><small>' + esc(t('Review governance', 'Review governance')) + '</small><strong>' + esc((kpi.review_sla_gaps || 0) + ' ' + t('hồ sơ cần xử lý', 'records require action')) + '</strong><span class="mesx-sub">' + esc(t('Hàng chờ này gom các hồ sơ in-review đang sắp đến hạn, quá hạn hoặc đã escalation theo policy để QA và owner cùng nhìn một nguồn truth.', 'This queue brings together in-review records that are due soon, overdue, or escalated so QA and process owners share one source of truth.')) + '</span></div><div class="mesx-mini-actions" style="margin-bottom:12px"><button type="button" class="mesx-link warning" id="mes-run-sla">⏰ ' + esc(t('Chạy vòng nhắc SLA', 'Run SLA notification cycle')) + '</button><button type="button" class="mesx-link" id="mes-open-forms-review">📋 ' + esc(t('Mở Evidence Control', 'Open Evidence Control')) + '</button></div>' + renderGovernanceQueue(reviewSlaQueue, { emptyTitle:t('Review SLA đang ổn', 'Review SLA is under control'), emptyText:t('Chưa có hồ sơ in-review nào sắp quá hạn, quá hạn hoặc đã escalation ở thời điểm hiện tại.', 'No in-review records are currently due soon, overdue, or escalated.'), detail:function(row){ return [row.record_type || '', row.record_id || '', row.form_code || ''].filter(Boolean).join(' · '); }, sub:function(row){ return [row.due_at ? ('Due ' + fmtDateTime(row.due_at)) : '', row.escalation_due_at ? ('ESC ' + fmtDateTime(row.escalation_due_at)) : '', Array.isArray(row.review_roles) && row.review_roles.length ? ('Review ' + row.review_roles.join(', ')) : '', Array.isArray(row.escalation_roles) && row.escalation_roles.length ? ('Esc ' + row.escalation_roles.join(', ')) : ''].filter(Boolean).join(' · '); }, actions:function(){ return '<button type="button" class="mesx-link" data-open-forms-review="1">' + esc(t('Mở workspace', 'Open workspace')) + '</button>'; }, fallbackVi:'Hồ sơ đang in-review cần được xử lý theo SLA.', fallbackEn:'The record is in review and needs SLA-driven follow-up.' }) + '</div></article>' +
+    '</section>';
+
   readinessBand =
     '<section class="mesx-band" style="margin-top:18px">' +
       '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Nhân lực và truy xuất vật liệu', 'Operator and material governance')) + '</h2><p>' + esc(t('Khóa các WO đang thiếu năng lực vận hành hoặc chưa đủ dữ liệu lot / heat / traveler trước khi tiếp tục sản xuất.', 'Block WO that still have operator qualification gaps or incomplete lot / heat / traveler data before production continues.')) + '</p></div></div><div class="mesx-list">' + renderGovernanceQueue(operatorQualificationQueue, { emptyTitle:t('Nhân lực vận hành đang đạt chuẩn', 'Operator qualification is clear'), emptyText:t('Chưa có WO nào bị chặn bởi năng lực, machine match hoặc hiệu lực chứng nhận.', 'No WO is currently blocked by qualification, machine match, or certification validity.'), detail:function(row){ return [row.operator_id || '', row.operator_name || '', row.customer_name || '', row.part_number || '', row.part_revision || ''].filter(Boolean).join(' · '); }, sub:function(row){ return [row.qualification_expiry ? ('Hết hạn ' + fmtDate(row.qualification_expiry)) : '', Array.isArray(row.issue_codes) && row.issue_codes.length ? ('Issues: ' + row.issue_codes.join(', ')) : '', Array.isArray(row.warning_codes) && row.warning_codes.length ? ('Warnings: ' + row.warning_codes.join(', ')) : ''].filter(Boolean).join(' · '); }, fallbackVi:'Người vận hành chưa đủ điều kiện hoặc không khớp machine / work center cho WO này.', fallbackEn:'The operator is not fully qualified or does not match the machine / work center for this WO.' }) + '</div><div class="mesx-section"><div class="mesx-mini" style="margin-bottom:10px"><small>' + esc(t('Traceability queue', 'Traceability queue')) + '</small><strong>' + esc(t('Các WO còn thiếu dữ liệu lot, heat hoặc traveler sẽ hiện ở đây.', 'WO missing lot, heat, or traveler data appear here.')) + '</strong></div>' + renderGovernanceQueue(materialTraceQueue, { emptyTitle:t('Trace vật liệu đang đủ', 'Material trace is complete'), emptyText:t('Các WO đang theo dõi hiện đã có lot, traveler và trạng thái chứng chỉ cần thiết.', 'Tracked WO already have the required lot, traveler, and certificate status.'), detail:function(row){ return [row.customer_name || '', row.part_number || '', row.part_revision || '', row.machine_id || ''].filter(Boolean).join(' · '); }, sub:function(row){ return [row.material_lot_number || '', row.heat_number || '', row.traveler_number || '', Array.isArray(row.missing_fields) && row.missing_fields.length ? ('Missing: ' + row.missing_fields.join(', ')) : ''].filter(Boolean).join(' · '); }, fallbackVi:'WO chưa đủ dữ liệu lot, heat hoặc traveler để khóa trace vật liệu.', fallbackEn:'The WO does not yet have enough lot, heat, or traveler data for governed material trace.' }) + '</div></article>' +
@@ -1308,7 +1315,7 @@ function render(){
     '<section class="mesx-hero">' +
       '<article class="mesx-poster">' +
         '<div class="mesx-brand"><div class="mesx-brand-main"><div class="mesx-logo"><img src="./assets/hesem-logo.svg" alt="HESEM"></div><div><div class="mesx-kicker">HESEM CNC MOM / MES</div><h1>' + esc(t('Trung tâm điều hành MES', 'MES Control Center')) + '</h1><p>' + esc(t('Một màn hình duy nhất để điều độ WO, đọc trạng thái máy, khóa gate chứng cứ, bắt cảnh báo tool-life và ra quyết định khôi phục xưởng nhanh theo ngữ cảnh thật.', 'One production surface to dispatch WO, read machine status, enforce evidence gates, catch tool-life alerts, and drive recovery decisions in real shop-floor context.')) + '</p><div class="mesx-facts"><span class="mesx-fact">⏱ ' + esc(currentStamp()) + '</span><span class="mesx-fact">📡 ' + esc(streamFact) + '</span><span class="mesx-fact">🕒 ' + esc((currentShift.shift_code || '—') + ' · ' + (currentShift.shift_name_vi || currentShift.shift_name_en || t('Chưa xác định ca', 'Unresolved shift'))) + '</span><span class="mesx-fact">📦 ' + esc((kpi.wo_active || 0) + ' ' + t('WO đang hoạt động', 'active WO')) + '</span><span class="mesx-fact">🏭 ' + esc((kpi.machines_total || 0) + ' ' + t('tài sản theo dõi', 'assets tracked')) + '</span><span class="mesx-fact">🔌 ' + esc((kpi.connectors_healthy || 0) + '/' + (kpi.connectors_total || 0) + ' ' + t('kết nối ổn', 'healthy links')) + '</span><span class="mesx-fact">📊 OEE ' + esc(fmtPercent(kpi.oee_pct)) + '</span></div></div></div><div>' + badge((kpi.machines_down || 0) > 0 ? statusMeta('down') : statusMeta('running')) + '</div></div>' +
-        '<div class="mesx-actions"><button type="button" class="mesx-btn primary" id="mes-refresh">⟳ ' + esc(t('Làm mới runtime', 'Refresh runtime')) + '</button><button type="button" class="mesx-btn secondary" id="mes-poll-batch"' + (batchPollReady ? '' : ' disabled') + '>📡 ' + esc(t('Poll MTConnect batch', 'Poll MTConnect batch')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-orders">📦 ' + esc(t('Quản lý đơn hàng', 'Order management')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-master">🧭 ' + esc(t('Dữ liệu nền', 'Master data')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-forms">📋 ' + esc(t('Kiểm soát chứng cứ', 'Evidence control')) + '</button></div>' +
+        '<div class="mesx-actions"><button type="button" class="mesx-btn primary" id="mes-refresh">⟳ ' + esc(t('Làm mới runtime', 'Refresh runtime')) + '</button><button type="button" class="mesx-btn secondary" id="mes-poll-batch"' + (batchPollReady ? '' : ' disabled') + '>📡 ' + esc(t('Poll MTConnect batch', 'Poll MTConnect batch')) + '</button><button type="button" class="mesx-btn secondary" id="mes-pull-epicor">⇣ ' + esc(t('Kéo Epicor inbound', 'Pull Epicor inbound')) + '</button><button type="button" class="mesx-btn secondary" id="mes-push-epicor">⇆ ' + esc(t('Đẩy Epicor outbox', 'Process Epicor outbox')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-orders">📦 ' + esc(t('Quản lý đơn hàng', 'Order management')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-master">🧭 ' + esc(t('Dữ liệu nền', 'Master data')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-forms">📋 ' + esc(t('Kiểm soát chứng cứ', 'Evidence control')) + '</button></div>' +
       '</article>' +
       '<aside class="mesx-side">' +
         '<article class="mesx-card mesx-clock"><div class="mesx-clock-top"><div><div class="mesx-kicker">' + esc(t('Snapshot runtime', 'Runtime snapshot')) + '</div><strong>' + esc(currentStamp()) + '</strong><small>' + esc(t('Nguồn dữ liệu: Order Management + Master Data + MES runtime + Exception dashboard.', 'Data source: Order Management + Master Data + MES runtime + Exception dashboard.')) + '</small></div>' + badge(statusMeta('approved')) + '</div></article>' +
@@ -1320,6 +1327,7 @@ function render(){
           renderKpiTile(t('Tooling cảnh báo', 'Tooling alerts'), kpi.tooling_alerts || 0, t('Tool gần tới hạn hoặc lệch offset', 'Tool near limit or offset risk')) +
           renderKpiTile(t('WO bị chặn', 'WO launch blockers'), kpi.launch_blocker_hotspots || 0, t('Các lần MES chặn setup / running vì chưa đạt điều kiện bắt buộc', 'Recent MES blocks that prevented setup / running because mandatory launch conditions were not met')) +
           renderKpiTile(t('WO thiếu gate', 'WO missing gates'), kpi.wo_gate_missing || 0, t('Cần bổ sung chứng cứ bắt buộc', 'Evidence gate completion required')) +
+          renderKpiTile(t('Review SLA', 'Review SLA gaps'), kpi.review_sla_gaps || 0, t('Hồ sơ in-review đang sắp đến hạn, quá hạn hoặc đã escalation theo SLA review', 'Records in review are due soon, overdue, or already escalated under the review SLA')) +
           renderKpiTile(t('Lệch chương trình NC', 'Program mismatches'), kpi.program_mismatches || 0, t('Máy đang báo sai hoặc thiếu chương trình so với WO', 'Machine-reported program is missing or mismatched against the WO')) +
           renderKpiTile(t('Rủi ro release NC', 'NC release risk'), kpi.program_release_risk || 0, t('WO chưa có release NC hợp lệ để mở cắt', 'WO still missing a valid governed NC release')) +
           renderKpiTile(t('Rủi ro tooling', 'Tool readiness risk'), kpi.tool_readiness_risk || 0, t('WO bị chặn bởi tool-life, offset hoặc runtime tooling chưa đủ', 'WO blocked by tool-life, offset drift, or incomplete tooling runtime')) +
@@ -1352,6 +1360,7 @@ function render(){
     governanceBand +
     alarmAndShiftBand +
     integrationBand +
+    evidenceGovernanceBand +
     readinessBand +
     '<section class="mesx-main">' +
       '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Dispatch board theo Work Order', 'Work Order dispatch board')) + '</h2><p>' + esc(t('Lọc theo work center và trạng thái, sau đó báo tiến độ hoặc mở đúng form chứng cứ mà không phải nhập tay context.', 'Filter by work center and status, then report progress or launch the correct evidence form without typing context by hand.')) + '</p></div></div><div class="mesx-toolbar"><input class="mesx-input search" id="mes-search" type="search" value="' + esc(state.search) + '" placeholder="' + esc(t('Tìm WO / Part / máy / khách hàng...', 'Search WO / part / machine / customer...')) + '"><select class="mesx-select" id="mes-filter-center"><option value="">' + esc(t('Tất cả work center', 'All work centers')) + '</option>' + centers.map(function(center){ return '<option value="' + esc(center.work_center_id || '') + '"' + (state.workCenter === center.work_center_id ? ' selected' : '') + '>' + esc((center.work_center_id || '') + ' · ' + (center.work_center_name || '')) + '</option>'; }).join('') + '</select><select class="mesx-select" id="mes-filter-status"><option value="">' + esc(t('Tất cả trạng thái', 'All statuses')) + '</option>' + ['scheduled','setup','running','inspection','on_hold','completed'].map(function(key){ return '<option value="' + esc(key) + '"' + (state.dispatchStatus === key ? ' selected' : '') + '>' + esc(t(statusMeta(key).vi, statusMeta(key).en)) + '</option>'; }).join('') + '</select></div>' + renderDispatchTable(rows) + '</article>' +
@@ -1382,12 +1391,20 @@ function bind(){
   };
   var pollBatch = document.getElementById('mes-poll-batch');
   if(pollBatch) pollBatch.onclick = function(){ pollMtconnectBatch(); };
+  var pullEpicor = document.getElementById('mes-pull-epicor');
+  if(pullEpicor) pullEpicor.onclick = function(){ processEpicorInbound(); };
+  var pushEpicor = document.getElementById('mes-push-epicor');
+  if(pushEpicor) pushEpicor.onclick = function(){ processEpicorOutbox(); };
+  var runSla = document.getElementById('mes-run-sla');
+  if(runSla) runSla.onclick = function(){ runEvidenceSlaNotifications(); };
   var openOrders = document.getElementById('mes-open-orders');
   if(openOrders) openOrders.onclick = function(){ if(typeof navigateTo === 'function') navigateTo('orders'); };
   var openMaster = document.getElementById('mes-open-master');
   if(openMaster) openMaster.onclick = function(){ if(typeof window._mdOpenControl === 'function') window._mdOpenControl(); };
   var openForms = document.getElementById('mes-open-forms');
   if(openForms) openForms.onclick = function(){ if(typeof navigateTo === 'function') navigateTo('forms'); };
+  var openFormsReview = document.getElementById('mes-open-forms-review');
+  if(openFormsReview) openFormsReview.onclick = function(){ if(typeof navigateTo === 'function') navigateTo('forms'); };
   var sideOrders = document.getElementById('mes-side-orders');
   if(sideOrders) sideOrders.onclick = function(){ if(typeof navigateTo === 'function') navigateTo('orders'); };
   var sideMaster = document.getElementById('mes-side-master');
@@ -1428,6 +1445,9 @@ function bind(){
   });
   Array.prototype.forEach.call(state.container.querySelectorAll('[data-open-exception]'), function(button){
     button.onclick = function(){ openExceptionDetail(button.getAttribute('data-open-exception') || ''); };
+  });
+  Array.prototype.forEach.call(state.container.querySelectorAll('[data-open-forms-review]'), function(button){
+    button.onclick = function(){ if(typeof navigateTo === 'function') navigateTo('forms'); };
   });
   Array.prototype.forEach.call(state.container.querySelectorAll('[data-open-adapter-event]'), function(button){
     button.onclick = function(){
@@ -1568,6 +1588,78 @@ function pollMtconnectBatch(){
     toast(message, failed > 0 ? 'warning' : 'success');
   }).catch(function(error){
     toast((error && error.message) || t('Không thể chạy batch poll MTConnect.', 'Could not run the MTConnect batch poll.'), 'error');
+    if(window.console) console.error(error);
+  });
+}
+
+function processEpicorInbound(){
+  toast(t('Đang kéo delta inbound từ Epicor theo checkpoint hiện tại...', 'Pulling inbound deltas from Epicor using the current governed checkpoints...'), 'info');
+  api('epicor_inbound_process', { domains: ['sales_orders', 'job_orders', 'work_orders', 'master_data'] }, 'POST').then(function(resp){
+    if(!resp || !resp.snapshot){
+      throw new Error((resp && resp.error) ? String(resp.error) : t('Không thể chạy Epicor inbound sync.', 'Could not run the Epicor inbound sync.'));
+    }
+    mergeRuntimePayload({
+      snapshot: resp.data || defaultSnapshot(),
+      streamed_at: new Date().toISOString()
+    });
+    state.loading = false;
+    render();
+    var result = resp.result || {};
+    toast(t(
+      'Epicor inbound: ' + Number(result.succeeded || 0) + ' thành công, ' + Number(result.skipped || 0) + ' bỏ qua, ' + Number(result.failed || 0) + ' lỗi.',
+      'Epicor inbound: ' + Number(result.succeeded || 0) + ' succeeded, ' + Number(result.skipped || 0) + ' skipped, ' + Number(result.failed || 0) + ' failed.'
+    ), Number(result.failed || 0) > 0 ? 'warning' : 'success');
+  }).catch(function(error){
+    toast((error && error.message) || t('Không thể chạy Epicor inbound sync.', 'Could not run the Epicor inbound sync.'), 'error');
+    if(window.console) console.error(error);
+  });
+}
+
+function processEpicorOutbox(){
+  toast(t('Đang xử lý Epicor outbox cho các giao dịch đang chờ...', 'Processing the Epicor outbox for queued MES transactions...'), 'info');
+  api('epicor_outbox_process', { limit: 20 }, 'POST').then(function(resp){
+    if(!resp || !resp.ok && !resp.snapshot){
+      throw new Error((resp && resp.error) ? String(resp.error) : t('Không thể xử lý Epicor outbox.', 'Could not process the Epicor outbox.'));
+    }
+    mergeRuntimePayload({
+      snapshot: resp.data || defaultSnapshot(),
+      streamed_at: new Date().toISOString()
+    });
+    state.loading = false;
+    render();
+    var result = resp.result || {};
+    toast(t(
+      'Epicor outbox: ' + Number(result.delivered || 0) + ' đã nhận, ' + Number(result.retried || 0) + ' retry, ' + Number(result.dead_letter || 0) + ' dead-letter, ' + Number(result.skipped || 0) + ' bỏ qua.',
+      'Epicor outbox: ' + Number(result.delivered || 0) + ' delivered, ' + Number(result.retried || 0) + ' retried, ' + Number(result.dead_letter || 0) + ' dead-letter, ' + Number(result.skipped || 0) + ' skipped.'
+    ), Number(result.dead_letter || 0) > 0 ? 'warning' : 'success');
+  }).catch(function(error){
+    toast((error && error.message) || t('Không thể xử lý Epicor outbox.', 'Could not process the Epicor outbox.'), 'error');
+    if(window.console) console.error(error);
+  });
+}
+
+function runEvidenceSlaNotifications(){
+  toast(t('Đang chạy vòng nhắc SLA review cho Evidence Control...', 'Running the review SLA notification cycle for Evidence Control...'), 'info');
+  api('evidence_sla_notifications_run', {}, 'POST').then(function(resp){
+    if(!resp || !resp.ok){
+      throw new Error((resp && resp.error) ? String(resp.error) : t('Không thể chạy vòng nhắc SLA review.', 'Could not run the review SLA notification cycle.'));
+    }
+    mergeRuntimePayload({
+      snapshot: resp.data || defaultSnapshot(),
+      streamed_at: new Date().toISOString()
+    });
+    if(resp.exceptions){
+      state.exceptions = resp.exceptions;
+    }
+    state.loading = false;
+    render();
+    var result = resp.result || {};
+    toast(t(
+      'SLA review: ' + Number(result.warned || 0) + ' sắp đến hạn, ' + Number(result.overdue || 0) + ' quá hạn, ' + Number(result.escalated || 0) + ' escalation.',
+      'Review SLA: ' + Number(result.warned || 0) + ' due soon, ' + Number(result.overdue || 0) + ' overdue, ' + Number(result.escalated || 0) + ' escalated.'
+    ), Number(result.escalated || 0) > 0 ? 'warning' : 'success');
+  }).catch(function(error){
+    toast((error && error.message) || t('Không thể chạy vòng nhắc SLA review.', 'Could not run the review SLA notification cycle.'), 'error');
     if(window.console) console.error(error);
   });
 }

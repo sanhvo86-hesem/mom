@@ -86,6 +86,18 @@ var EXCEPTION_TYPES = [
     page: 'forms'
   },
   {
+    key: 'review_sla_gaps',
+    icon: '🕰️',
+    accent: '#be123c',
+    surface: '#fff1f2',
+    border: '#fda4af',
+    labelVi: 'Review SLA cần xử lý',
+    labelEn: 'Review SLA gaps',
+    descVi: 'Hồ sơ đang in-review nhưng đã sắp đến hạn, quá hạn hoặc đã escalation theo chính sách review SLA.',
+    descEn: 'Records in review are due soon, overdue, or already escalated under the review SLA policy.',
+    page: 'forms'
+  },
+  {
     key: 'wo_missing_evidence',
     icon: '\ud83e\uddfe',
     accent: '#ea580c',
@@ -499,7 +511,7 @@ function renderSummary(){
     total += count;
     if (count > 0) activeGroups += 1;
   });
-  highPriority = Number(state.summary.overdue_allocations || 0) + Number(state.summary.wo_missing_evidence || 0) + Number(state.summary.program_mismatches || 0) + Number(state.summary.program_release_risk || 0) + Number(state.summary.tool_readiness_risk || 0) + Number(state.summary.alarm_ack_gaps || 0) + Number(state.summary.operator_qualification_gaps || 0) + Number(state.summary.material_trace_gaps || 0) + Number(state.summary.material_genealogy_gaps || 0) + Number(state.summary.shift_handover_gaps || 0) + Number(state.summary.connector_governance_gaps || 0) + Number(state.summary.adapter_governance_risk || 0) + Number(state.summary.alarm_hotspots || 0) + Number(state.summary.nc_download_mismatches || 0) + Number(state.summary.tool_offset_risk || 0) + Number(state.summary.launch_blocker_hotspots || 0) + Number(state.summary.shadow_sync_failures || 0) + Number(state.summary.primary_read_fallbacks || 0) + Number(state.summary.epicor_sync_status || 0) + Number(state.summary.downtime_governance_gaps || 0) + Number(state.summary.overdue_orders || 0);
+  highPriority = Number(state.summary.overdue_allocations || 0) + Number(state.summary.review_sla_gaps || 0) + Number(state.summary.wo_missing_evidence || 0) + Number(state.summary.program_mismatches || 0) + Number(state.summary.program_release_risk || 0) + Number(state.summary.tool_readiness_risk || 0) + Number(state.summary.alarm_ack_gaps || 0) + Number(state.summary.operator_qualification_gaps || 0) + Number(state.summary.material_trace_gaps || 0) + Number(state.summary.material_genealogy_gaps || 0) + Number(state.summary.shift_handover_gaps || 0) + Number(state.summary.connector_governance_gaps || 0) + Number(state.summary.adapter_governance_risk || 0) + Number(state.summary.alarm_hotspots || 0) + Number(state.summary.nc_download_mismatches || 0) + Number(state.summary.tool_offset_risk || 0) + Number(state.summary.launch_blocker_hotspots || 0) + Number(state.summary.shadow_sync_failures || 0) + Number(state.summary.primary_read_fallbacks || 0) + Number(state.summary.epicor_sync_status || 0) + Number(state.summary.downtime_governance_gaps || 0) + Number(state.summary.overdue_orders || 0);
   var nextPage = highPriority > 0 ? t('MES / Chứng cứ', 'MES / Evidence') : (activeGroups > 0 ? t('Đơn hàng', 'Orders') : t('Ổn định', 'Stable'));
   var totalEl = state.container.querySelector('#excx-total');
   var groupsEl = state.container.querySelector('#excx-groups');

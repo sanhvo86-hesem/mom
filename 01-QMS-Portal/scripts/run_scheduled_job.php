@@ -47,6 +47,8 @@ $dispatch = [
     'data_purge' => static fn() => $jobs->runDataPurge(),
     'mtconnect_poll_cycle' => static fn() => $jobs->runMtconnectPollingCycle($force, $limit),
     'evidence_review_sla_notifications' => static fn() => $jobs->runEvidenceReviewSlaNotifications(),
+    'epicor_inbound_sync' => static fn() => $jobs->runEpicorInboundSync(),
+    'epicor_outbox_worker' => static fn() => $jobs->runEpicorOutboxWorker($limit),
 ];
 
 if (!isset($dispatch[$jobName])) {

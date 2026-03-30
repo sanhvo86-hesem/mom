@@ -731,6 +731,64 @@ final class ScheduledJobs
     }
 
     /**
+     * Epicor outbox worker: deliver queued MES transactions to Epicor REST.
+     *
+     * Schedule: Every 1 minute.
+     *
+     * @return array{job: string, processed: int, delivered: int, retried: int, dead_letter: int, skipped: int, duration_ms: float}
+     */
+    public function runEpicorOutboxWorker(int $limit = 25): array
+    {
+        return $this->executeJob('epicor_outbox_worker', function () use ($limit): array {
+            require_once __DIR__ . '/EpicorTransportAdapter.php';
+            require_once __DIR__ . '/OutboxWorker.php';
+
+            $worker = new OutboxWorker($this->dataDir, new EpicorTransportAdapter($this->dataDir));
+            $result = $worker->processPending([
+                'limit' => $limit,
+                'user_id' => 'scheduled_job',
+            ]);
+
+            return [
+                'processed' => (int)($result['processed'] ?? 0),
+                'delivered' => (int)($result['delivered'] ?? 0),
+                'retried' => (int)($result['retried'] ?? 0),
+                'dead_letter' => (int)($result['dead_letter'] ?? 0),
+                'skipped' => (int)($result['skipped'] ?? 0),
+            ];
+        });
+    }
+
+    /**
+     * Epicor inbound worker: pull governed inbound deltas from Epicor REST.
+     *
+     * Schedule: Every 5 minutes.
+     *
+     * @param array<int, string> $domains
+     * @return array{job: string, processed: int, succeeded: int, skipped: int, failed: int, duration_ms: float}
+     */
+    public function runEpicorInboundSync(array $domains = []): array
+    {
+        return $this->executeJob('epicor_inbound_sync', function () use ($domains): array {
+            require_once __DIR__ . '/EpicorTransportAdapter.php';
+            require_once __DIR__ . '/EpicorInboundWorker.php';
+
+            $worker = new EpicorInboundWorker($this->dataDir, new EpicorTransportAdapter($this->dataDir));
+            $result = $worker->processInbound([
+                'domains' => $domains,
+                'user_id' => 'scheduled_job',
+            ]);
+
+            return [
+                'processed' => (int)($result['processed'] ?? 0),
+                'succeeded' => (int)($result['succeeded'] ?? 0),
+                'skipped' => (int)($result['skipped'] ?? 0),
+                'failed' => (int)($result['failed'] ?? 0),
+            ];
+        });
+    }
+
+    /**
      * Data Purge: archive old audit logs, expire notifications.
      *
      * Removes notifications older than 90 days (already read) and
