@@ -222,15 +222,23 @@ def build_summary(rows: list[dict[str, str | bool | int]]) -> str:
             lines.append(f"- {row['code']} | {row['recommended_action']} | {row['target_archetype']} | {row['path']}")
         lines.append("")
 
-    lines.extend(
-        [
-            "## Practical next step",
-            "",
-            "- Continue Phase 0 cleanup on duplicate ANNEX aliases and malformed HTML wrappers that still block canonical paths.",
-            "- Then clean remaining phase residue and tighten any canonical WI/ANNEX that still drift from the locked core-standard skeleton.",
-            "",
-        ]
-    )
+    duplicate_count = len({row["canonical_duplicate"] for row in duplicates if row["canonical_duplicate"]})
+    next_steps = ["## Practical next step", ""]
+
+    if duplicate_count:
+        next_steps.append("- Continue Phase 0 cleanup on duplicate ANNEX aliases until every live link points only to canonical folder paths.")
+    elif html_rows:
+        next_steps.append("- Continue Phase 0 cleanup on malformed HTML wrappers that still block canonical anchors and structural compliance.")
+    else:
+        next_steps.append("- Phase 0 duplicate and wrapper cleanup is stable; move the next tranche to phase residue and archetype-boundary tightening.")
+
+    if phase_rows:
+        next_steps.append("- Then clean remaining phase residue and tighten any canonical WI/ANNEX that still drift from the locked core-standard skeleton.")
+    else:
+        next_steps.append("- Then continue wrapper/archetype refines only where audit gaps remain; phase residue is already clean.")
+
+    next_steps.append("")
+    lines.extend(next_steps)
     return "\n".join(lines)
 
 
