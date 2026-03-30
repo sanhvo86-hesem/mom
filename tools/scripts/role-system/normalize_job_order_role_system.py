@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[3]
 REGISTRY_PATH = ROOT / "tools" / "data" / "role-registry-job-order-cnc.json"
 WORKBOOK_PATH = ROOT / "tools" / "data" / "qms-terminology-dictionary.xlsx"
 UNRESOLVED_REPORT = ROOT / "tools" / "data" / "role-normalization-unresolved.txt"
+BUNDLE_GLOSSARY_PATH = ROOT / "02-Tai-Lieu-He-Thong" / "03-Organization" / "04-RACI-Authority" / "role-and-department-bundles.html"
 
 COMMON_LABEL_REPLACEMENTS = {
     "ANNEX-503 — CNC Vận hành Mô hình and Role Ranh giới": "ANNEX-503 — Mô hình vận hành CNC và ranh giới vai trò",
@@ -126,6 +127,10 @@ def bundle(name: str, joiner: str = " / ") -> dict:
     return {"bundle": name, "joiner": joiner}
 
 
+def mix(*tokens: str, joiner: str = " / ") -> dict:
+    return {"tokens": list(tokens), "joiner": joiner}
+
+
 def normalize_ws(value: str) -> str:
     return re.sub(r"\s+", " ", value.replace("\xa0", " ")).strip()
 
@@ -187,7 +192,38 @@ def entity_link(code: str, current_file: Path, registry: dict) -> str:
     )
 
 
+def bundle_anchor_id(name: str) -> str:
+    return f'bundle-{re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")}'
+
+
+def bundle_meta(name: str, registry: dict) -> dict[str, str]:
+    meta = registry.get("bundle_meta", {}).get(name)
+    if meta:
+        return meta
+    return {
+        "label_en": name,
+        "label_vi": name.replace("_", " ").title(),
+        "kind": "bundle",
+        "use_vi": "Nhom actor explicit da duoc cong bo trong registry nguon.",
+        "avoid_vi": "Khong dung de che mo trach nhiem hoac thay the role / D-code cu the khi da xac dinh duoc actor that.",
+    }
+
+
+def bundle_href(name: str, current_file: Path) -> str:
+    return f'{os.path.relpath(BUNDLE_GLOSSARY_PATH, current_file.parent).replace("\\", "/")}#{bundle_anchor_id(name)}'
+
+
+def bundle_title(name: str, registry: dict) -> str:
+    meta = bundle_meta(name, registry)
+    members = " / ".join(registry.get("bundles", {}).get(name, []))
+    return f'{meta["label_en"]} ({meta["label_vi"]}) — {members}'
+
+
 def render_spec(spec: dict, current_file: Path, registry: dict) -> str:
+    if "bundle" in spec:
+        return f'<span class="entity-cluster role-cluster">{render_bundle_chip(spec["bundle"], current_file, registry)}</span>'
+    if "tokens" in spec:
+        return render_token_cluster(list(spec["tokens"]), current_file, registry, joiner=spec.get("joiner", " / "))
     codes, joiner = expand_spec(spec, registry)
     sep = f'<span class="entity-sep role-sep">{joiner.strip()}</span>'
     chips = [entity_link(code, current_file, registry) for code in codes]
@@ -204,8 +240,12 @@ def token_is_bundle(token: str, registry: dict) -> bool:
     return token in registry.get("bundles", {})
 
 
-def render_bundle_chip(token: str) -> str:
-    return f'<span class="chip bundle-chip" data-bundle="{xml_escape(token)}">{xml_escape(token)}</span>'
+def render_bundle_chip(token: str, current_file: Path, registry: dict) -> str:
+    return (
+        f'<a class="entity-link bundle-link bundle-chip" data-bundle="{xml_escape(token)}" '
+        f'href="{xml_escape(bundle_href(token, current_file))}" title="{xml_escape(bundle_title(token, registry))}">'
+        f'<span class="entity-code bundle-code">{xml_escape(token)}</span></a>'
+    )
 
 
 def render_token_cluster(tokens: list[str], current_file: Path, registry: dict, joiner: str = " / ") -> str:
@@ -217,7 +257,7 @@ def render_token_cluster(tokens: list[str], current_file: Path, registry: dict, 
         if token_is_entity(token, registry):
             chunks.append(entity_link(token, current_file, registry))
         elif token_is_bundle(token, registry):
-            chunks.append(render_bundle_chip(token))
+            chunks.append(render_bundle_chip(token, current_file, registry))
         else:
             chunks.append(f'<span class="chip">{xml_escape(token)}</span>')
         if index < len(tokens) - 1:
@@ -327,6 +367,286 @@ def build_html_document(title_text: str, head_assets: str, body_html: str) -> st
     return "\n".join(parts)
 
 
+def link_bundle_tokens_in_html(document: str, current_file: Path, registry: dict) -> str:
+    registry_tokens: list[str] = []
+    registry_tokens.extend(registry.get("bundles", {}).keys())
+    registry_tokens.extend(registry.get("departments", {}).keys())
+    registry_tokens.extend(registry.get("roles", {}).keys())
+    for role_code, role_meta in registry.get("roles", {}).items():
+        for hat in role_meta.get("hats_allowed", []):
+            registry_tokens.append(f"{role_code}[{hat}]")
+    registry_tokens = sorted(set(registry_tokens), key=len, reverse=True)
+    if not registry_tokens:
+        return document
+    pattern = re.compile(
+        r"(?<![\w/-])(" + "|".join(re.escape(name) for name in registry_tokens) + r")(?![\w/-])"
+    )
+    parts = re.split(r"(<[^>]+>)", document)
+    result: list[str] = []
+    stack: list[tuple[str, bool]] = []
+
+    def current_skip() -> bool:
+        return any(flag for _, flag in stack)
+
+    for part in parts:
+        if not part:
+            continue
+        if part.startswith("<") and part.endswith(">"):
+            result.append(part)
+            tag_match = re.match(r"<\s*(/)?\s*([a-zA-Z0-9:_-]+)([^>]*)>", part)
+            if not tag_match:
+                continue
+            closing, tag_name, attrs = tag_match.groups()
+            tag_name = tag_name.lower()
+            attrs = attrs or ""
+            if closing:
+                for index in range(len(stack) - 1, -1, -1):
+                    if stack[index][0] == tag_name:
+                        del stack[index:]
+                        break
+                continue
+            self_closing = attrs.strip().endswith("/") or part.startswith("<!--")
+            skip = (
+                tag_name in {"a", "script", "style", "code", "pre", "title", "svg", "text", "tspan", "desc"}
+                or any(token in attrs for token in ["bundle-chip", "bundle-code", "role-code", "dept-code", "entity-code"])
+            )
+            if not self_closing:
+                stack.append((tag_name, skip))
+            continue
+        if current_skip():
+            result.append(part)
+            continue
+        def replace_token(match: re.Match[str]) -> str:
+            token = match.group(1)
+            if token_is_bundle(token, registry):
+                return render_bundle_chip(token, current_file, registry)
+            if token_is_entity(token, registry):
+                return entity_link(token, current_file, registry)
+            return token
+
+        result.append(pattern.sub(replace_token, part))
+    return "".join(result)
+
+
+def link_published_actor_terms_in_html(document: str, current_file: Path, registry: dict) -> str:
+    alias_specs = {
+        "Người định giá (SAL-03)": expr("EST"),
+        "Người định giá": expr("EST"),
+        "Production Planner": expr("PPL"),
+        "Planner": expr("PPL"),
+        "IT/Data": bundle("SYSTEM_OWNERS"),
+        "IT / Data": bundle("SYSTEM_OWNERS"),
+        "IT/Digital": bundle("SYSTEM_OWNERS"),
+        "IT/BI": bundle("SYSTEM_OWNERS"),
+        "IT / BI": bundle("SYSTEM_OWNERS"),
+        "QA/IT": mix("QA", "SYSTEM_OWNERS"),
+        "QA / IT": mix("QA", "SYSTEM_OWNERS"),
+        "Người phụ trách Bảng điều khiển": bundle("MR_REPORT_OWNERS"),
+        "bảng điều khiển Người phụ trách": bundle("MR_REPORT_OWNERS"),
+        "authorized Người phê duyệt": bundle("FUNC_HEADS"),
+        "Production Director": expr("PD"),
+        "Sản xuất Giám đốc": expr("PD"),
+        "Lập trình viên (CNC)": expr("CAM"),
+        "Buyer / Purchasing": expr("BUY"),
+        "Buyer": expr("BUY"),
+        "Kho": expr("D-WHS"),
+        "Bảo trì": expr("D-MNT"),
+        "Operator + Setup Lead + QA": expr("OPR", "SET", "QA", joiner=" + "),
+        "Operator + Setup Lead": expr("OPR", "SET", joiner=" + "),
+        "Supervisor + QA": mix("FRONTLINE_LEADS", "QA", joiner=" + "),
+        "QC + Setup": expr("QC", "SET", joiner=" + "),
+        "Team Leader kho": expr("D-WHS"),
+        "ENG Manager": expr("ENGM"),
+        "Shift Supervisor": expr("SL"),
+        "Supervisor": bundle("FRONTLINE_LEADS"),
+        "Setup Lead": expr("SET"),
+        "QA lead": expr("QA"),
+        "QA Lead": expr("QA"),
+        "Team Leader": bundle("FRONTLINE_LEADS"),
+        "ENG/Setup": expr("D-ENG", "SET"),
+        "WHS/IQC": expr("D-WHS", "QC"),
+        "ENG": expr("D-ENG"),
+    }
+    phrases = sorted(alias_specs, key=len, reverse=True)
+    pattern = re.compile(r"(?<![\w-])(" + "|".join(re.escape(item) for item in phrases) + r")(?![\w-])")
+    parts = re.split(r"(<[^>]+>)", document)
+    result: list[str] = []
+    stack: list[tuple[str, bool]] = []
+
+    def current_skip() -> bool:
+        return any(flag for _, flag in stack)
+
+    for part in parts:
+        if not part:
+            continue
+        if part.startswith("<") and part.endswith(">"):
+            result.append(part)
+            tag_match = re.match(r"<\s*(/)?\s*([a-zA-Z0-9:_-]+)([^>]*)>", part)
+            if not tag_match:
+                continue
+            closing, tag_name, attrs = tag_match.groups()
+            tag_name = tag_name.lower()
+            attrs = attrs or ""
+            if closing:
+                for index in range(len(stack) - 1, -1, -1):
+                    if stack[index][0] == tag_name:
+                        del stack[index:]
+                        break
+                continue
+            self_closing = attrs.strip().endswith("/") or part.startswith("<!--")
+            skip = (
+                tag_name in {"a", "script", "style", "code", "pre", "title", "svg", "text", "tspan", "desc"}
+                or any(token in attrs for token in ["bundle-chip", "bundle-code", "role-code", "dept-code", "entity-code"])
+            )
+            if not self_closing:
+                stack.append((tag_name, skip))
+            continue
+        if current_skip():
+            result.append(part)
+            continue
+
+        def replace_alias(match: re.Match[str]) -> str:
+            phrase = match.group(1)
+            return render_spec(alias_specs[phrase], current_file, registry)
+
+        result.append(pattern.sub(replace_alias, part))
+    return "".join(result)
+
+
+def normalize_hybrid_actor_clusters_in_html(document: str, current_file: Path, registry: dict) -> str:
+    role_ref = lambda code: (
+        rf'(?:<span class="entity-cluster role-cluster">)?'
+        rf'<a [^>]*><span class="entity-code role-code">{code}</span></a>'
+        rf'(?:</span>)?'
+    )
+    qa_chip = role_ref("QA")
+    qc_chip = role_ref("QC")
+    ppl_chip = role_ref("PPL")
+    replacements = [
+        (
+            re.compile(rf'(?:Sản xuất\s+)?Supervisor\s*\+\s*{qa_chip}', re.S),
+            render_spec(mix("FRONTLINE_LEADS", "QA", joiner=" + "), current_file, registry),
+        ),
+        (
+            re.compile(rf'{qa_chip}\s*\+\s*Supervisor', re.S),
+            render_spec(mix("FRONTLINE_LEADS", "QA", joiner=" + "), current_file, registry),
+        ),
+        (
+            re.compile(rf'{qc_chip}\s*\+\s*Setup', re.S),
+            render_spec(expr("QC", "SET", joiner=" + "), current_file, registry),
+        ),
+        (
+            re.compile(rf'Setup\s*\+\s*{qc_chip}', re.S),
+            render_spec(expr("SET", "QC", joiner=" + "), current_file, registry),
+        ),
+        (
+            re.compile(rf'{ppl_chip}\s*/\s*Sản xuất Giám đốc', re.S),
+            render_spec(expr("PPL", "PD", joiner=" / "), current_file, registry),
+        ),
+    ]
+    for pattern, replacement in replacements:
+        document = pattern.sub(replacement, document)
+    return document
+
+
+def cleanup_known_render_artifacts_in_html(document: str) -> str:
+    document = re.sub(
+        r'<span class="entity-cluster role-cluster">.*?<span class="entity-code dept-code">D-ENG</span>.*?</span>INEERING',
+        "ENGINEERING",
+        document,
+        flags=re.S,
+    )
+    return document
+
+
+def generate_bundle_glossary(registry: dict) -> None:
+    current_file = BUNDLE_GLOSSARY_PATH
+    title_text = "ORG-BUNDLE-001 — Thuat ngu nhom vai tro va nhom phong ban | HESEM QMS"
+    asset_href = os.path.relpath(ROOT / "assets" / "style.css", current_file.parent).replace("\\", "/")
+    head_assets = "\n".join([
+        f'<link rel="stylesheet" href="{asset_href}">',
+        "<style>",
+        ".hero{border:1px solid var(--ln);border-radius:var(--r-lg);padding:18px 20px;background:linear-gradient(135deg,#f8fbff 0%,#fffaf0 100%);margin:0 0 18px;}",
+        ".hero h1{font-size:22px;line-height:1.35;color:var(--navy);margin:0 0 8px}",
+        ".hero p{font-size:13px;color:var(--ink2);margin:0}",
+        ".toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}",
+        ".toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}",
+        ".toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}",
+        ".toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);text-decoration:none;}",
+        ".mini-note{font-size:12px;color:var(--ink2);line-height:1.6}",
+        "</style>",
+    ])
+
+    toc_links: list[str] = []
+    table_rows: list[str] = []
+    kind_order = {"role bundle": 0, "department bundle": 1, "mixed bundle": 2, "bundle": 3}
+    for bundle_name in sorted(
+        registry.get("bundles", {}),
+        key=lambda item: (kind_order.get(bundle_meta(item, registry).get("kind", "bundle"), 99), item),
+    ):
+        meta = bundle_meta(bundle_name, registry)
+        anchor = bundle_anchor_id(bundle_name)
+        toc_links.append(f'<a href="#{anchor}">{xml_escape(bundle_name)} — {xml_escape(meta["label_vi"])}</a>')
+        members = render_token_cluster(list(registry["bundles"][bundle_name]), current_file, registry)
+        table_rows.append(
+            "<tr>"
+            f'<td id="{xml_escape(anchor)}">{render_bundle_chip(bundle_name, current_file, registry)}</td>'
+            f"<td>{xml_escape(meta['label_vi'])}</td>"
+            f"<td>{xml_escape(meta.get('kind', 'bundle'))}</td>"
+            f"<td>{xml_escape(meta.get('use_vi', ''))}</td>"
+            f"<td>{xml_escape(meta.get('avoid_vi', ''))}</td>"
+            f"<td>{members}</td>"
+            "</tr>"
+        )
+
+    body_html = f"""
+<div class="container">
+ <div class="page">
+  <div class="page-body">
+   <div class="form-header">
+    <div class="fh-left">
+     <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+     <div class="fh-company">
+      <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+      <span>Tai lieu he thong • To chuc</span>
+     </div>
+    </div>
+    <div class="title">
+     <strong>ORG-BUNDLE-001 — Thuat ngu nhom vai tro va nhom phong ban</strong>
+     <span class="sub-vn">Nguon cong bo de giai nghia cac bundle duoc phep dung trong SOP / WI / ANNEX / JD / RACI</span>
+    </div>
+    <div class="meta">
+     <div class="row"><span><b>Code:</b></span><span>ORG-BUNDLE-001</span></div>
+     <div class="row"><span><b>Version:</b></span><span>V0</span></div>
+     <div class="row"><span><b>Owner:</b></span><span>{render_token_cluster(["QMS", "D-HR"], current_file, registry)}</span></div>
+     <div class="row"><span><b>Approved by:</b></span><span>{render_token_cluster(["CEO"], current_file, registry)}</span></div>
+    </div>
+   </div>
+   <div class="doc-content" id="docContent">
+    <div class="form-sheet">
+     <div class="hero">
+      <h1>Bundle chi duoc dung khi da duoc cong bo, co thanh phan ro va co link giai nghia</h1>
+      <p>Tai lieu nay khoa nghia cua cac bundle trong mo hinh <b>job-order CNC</b>. Moi bundle phai truy ve duoc JD / D-code goc, co pham vi dung ro, va khong duoc dung de che mo authority hay named accountability.</p>
+     </div>
+     <div class="note"><b>Rule bat buoc:</b><br>Neu tai lieu da xac dinh duoc actor cu the thi phai dung role code hoac D-code. Chi dung bundle khi trach nhiem that su la lop actor lap lai da duoc cong bo. Moi bundle token dung doc lap trong noi dung hien thi phai link ve trang nay.</div>
+     <div class="toc"><div class="toc-title">Muc luc nhanh</div><div class="toc-grid">{''.join(toc_links)}</div></div>
+     <h2 class="h2">1. Danh muc bundle duoc cong bo</h2>
+     <div class="table-card"><table class="table"><colgroup><col style="width:15%"><col style="width:18%"><col style="width:12%"><col style="width:22%"><col style="width:18%"><col style="width:15%"></colgroup><thead><tr><th>Bundle code</th><th>Ten goi chuan</th><th>Loai</th><th>Duoc dung khi</th><th>Khong dung de che</th><th>Thanh phan</th></tr></thead><tbody>{''.join(table_rows)}</tbody></table></div>
+     <h2 class="h2">2. Nguyen tac doc bundle</h2>
+     <ul class="tight">
+      <li>Bundle khong tao ra JD moi. Moi chip trong bundle van phai truy ve duoc JD hoac handbook goc.</li>
+      <li>Bundle cap role dung cho layer actor; bundle cap department dung cho mandate cap phong ban; bundle mixed chi dung khi tai lieu dang noi toi lop enablement hoac interface lien phong ban that su on dinh.</li>
+      <li>Neu mot o owner / approver / hold-release cell da biet ro actor cu the, phai bo bundle va doi ve role code / D-code dung layer.</li>
+     </ul>
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+"""
+    BUNDLE_GLOSSARY_PATH.write_text(build_html_document(title_text, head_assets, body_html), encoding="utf-8")
+
+
 def title_aliases() -> dict[str, str]:
     return {
         "Tổng Giám đốc": "Chief Executive Officer",
@@ -409,6 +729,12 @@ def department_alias_map() -> dict[str, dict]:
         "Điều độ": expr("D-PPC"),
         "Bộ phận Điều độ và Kiểm soát sản xuất": expr("D-PPC"),
         "PPC": expr("D-PPC"),
+        "Maintenance": expr("D-MNT"),
+        "Maintenance Department": expr("D-MNT"),
+        "Maintenance Function": expr("D-MNT"),
+        "Báº£o trÃ¬": expr("D-MNT"),
+        "PhÃ¢n há»‡ Báº£o trÃ¬": expr("D-MNT"),
+        "Bá»™ pháº­n Báº£o trÃ¬": expr("D-MNT"),
         "Quality": expr("D-QUAL"),
         "Quality Department": expr("D-QUAL"),
         "Chất lượng": expr("D-QUAL"),
@@ -465,6 +791,10 @@ def department_alias_map() -> dict[str, dict]:
 
 def role_alias_map() -> dict[str, dict]:
     return {
+        "ENG": expr("D-ENG"),
+        "OPS": expr("D-PROD"),
+        "SALES": expr("D-SCS"),
+        "PLN": expr("PPL"),
         "CEO": expr("CEO"),
         "Chief Executive Officer": expr("CEO"),
         "Tổng Giám đốc": expr("CEO"),
@@ -485,8 +815,12 @@ def role_alias_map() -> dict[str, dict]:
         "Kế hoạch sản xuất": expr("PPL"),
         "QA Manager": expr("QA"),
         "QA Lead": expr("QA"),
+        "QA lead": expr("QA"),
+        "qa lead": expr("QA"),
         "Trưởng QA": expr("QA"),
         "QA": expr("QA"),
+        "QA/HR": expr("QA", "HR"),
+        "QA/HRD": expr("QA", "HR"),
         "QMR": expr("QA[QMR]"),
         "QA/QMS": expr("QA", "QMS"),
         "QMS/QA": expr("QA", "QMS"),
@@ -503,6 +837,7 @@ def role_alias_map() -> dict[str, dict]:
         "Dept Managers": bundle("FUNC_HEADS"),
         "Người đào tạo": bundle("OJT_COACHES"),
         "Trainer": bundle("OJT_COACHES"),
+        "HR/TRN": mix("HR", "OJT_COACHES", joiner=" + "),
         "Quality Engineer": expr("QE"),
         "QA Engineer": expr("QE"),
         "Kỹ sư Chất lượng": expr("QE"),
@@ -573,13 +908,22 @@ def role_alias_map() -> dict[str, dict]:
         "EHS Manager": expr("EHS"),
         "Shift Leader": expr("SL"),
         "Shift Lead": expr("SL"),
+        "Supervisor": bundle("FRONTLINE_LEADS"),
+        "Team Leader": bundle("FRONTLINE_LEADS"),
+        "team leader": bundle("FRONTLINE_LEADS"),
+        "Foreman": bundle("FRONTLINE_LEADS"),
         "Trưởng ca": expr("SL"),
         "Setup Technician": expr("SET"),
         "Setup Leader": expr("SET"),
+        "Setup Lead": expr("SET"),
         "CNC Operator": expr("OPR"),
         "Operator": expr("OPR"),
         "Production Operator": expr("OPR"),
         "CNC Operator / Production Operator": expr("OPR"),
+        "Operator + Setup Lead": expr("OPR", "SET", joiner=" + "),
+        "Operator + Setup Lead + QA": expr("OPR", "SET", "QA", joiner=" + "),
+        "QC + Setup": expr("QC", "SET", joiner=" + "),
+        "Supervisor + QA": mix("FRONTLINE_LEADS", "QA", joiner=" + "),
         "Maintenance Technician": expr("MNT"),
         "Maintenance Planner": expr("MNT"),
         "Maintenance Supervisor": expr("MNT"),
@@ -622,6 +966,23 @@ def role_alias_map() -> dict[str, dict]:
         "Process Owners / Department Heads": bundle("OPS_SCOPE_OWNERS"),
         "Quy trình Owner / Department Trưởng bộ phận": bundle("OPS_SCOPE_OWNERS"),
         "All Quy trình Owner / Department Trưởng bộ phận": bundle("OPS_SCOPE_OWNERS"),
+        "Steering Committee": bundle("DEPLOYMENT_STEERING"),
+        "All managers": bundle("DIRECT_LINE_MGRS"),
+        "all managers": bundle("DIRECT_LINE_MGRS"),
+        "All managers / approvers": bundle("TOP_MGMT"),
+        "all managers / approvers": bundle("TOP_MGMT"),
+        "department heads": bundle("FUNC_HEADS"),
+        "Department heads": bundle("FUNC_HEADS"),
+        "Data Owner": bundle("DATA_OWNERS"),
+        "Data Owners": bundle("DATA_OWNERS"),
+        "Business Owner": bundle("DATA_OWNERS"),
+        "System Owner": bundle("SYSTEM_OWNERS"),
+        "ngÆ°á»i chá»‹u trÃ¡ch nhiá»‡m dá»¯ liá»‡u": bundle("DATA_OWNERS"),
+        "ngÆ°á»i chá»‹u trÃ¡ch nhiá»‡m há»‡ thá»‘ng": bundle("SYSTEM_OWNERS"),
+        "chá»§ dá»¯ liá»‡u": bundle("DATA_OWNERS"),
+        "DÃ²ng / Chuyá»n Manager": bundle("DIRECT_LINE_MGRS"),
+        "process owners": bundle("OPS_SCOPE_OWNERS"),
+        "Process owners": bundle("OPS_SCOPE_OWNERS"),
         "Leadership Sponsor": expr("CEO"),
         "QA/QC Lead + Sales Lead": expr("QCL", "CS", "EST"),
         "QA Lead + Production": expr("QA", "PD", joiner=" + "),
@@ -642,8 +1003,11 @@ def bundle_alias_map() -> dict[str, dict]:
         "TOP_MGMT": bundle("TOP_MGMT"),
         "FUNC_HEADS": bundle("FUNC_HEADS"),
         "FUNC_OWNERS": bundle("FUNC_OWNERS"),
+        "DATA_OWNERS": bundle("DATA_OWNERS"),
+        "SYSTEM_OWNERS": bundle("SYSTEM_OWNERS"),
         "DEPLOYMENT_STEERING": bundle("DEPLOYMENT_STEERING"),
         "ALL_DEPTS": bundle("ALL_DEPTS"),
+        "SUPPORT_ENABLEMENT": bundle("SUPPORT_ENABLEMENT"),
         "COMMERCIAL_FRONT": bundle("COMMERCIAL_FRONT"),
         "QUALITY_CORE": bundle("QUALITY_CORE"),
         "ENG_RELEASE_CORE": bundle("ENG_RELEASE_CORE"),
@@ -672,7 +1036,7 @@ def try_resolve_roleish_text(text: str, aliases: dict[str, dict], overrides: dic
     if len(parts) <= 1:
         return None
     joiner = " / "
-    codes: list[str] = []
+    tokens: list[str] = []
     for index, part in enumerate(parts):
         token = normalize_ws(part)
         if not token:
@@ -684,11 +1048,12 @@ def try_resolve_roleish_text(text: str, aliases: dict[str, dict], overrides: dic
             return None
         spec = resolver[token]
         if "bundle" in spec:
-            registry = load_registry()
-            codes.extend(registry["bundles"][spec["bundle"]])
+            tokens.append(spec["bundle"])
+        elif "tokens" in spec:
+            tokens.extend(spec["tokens"])
         else:
-            codes.extend(spec["codes"])
-    return expr(*codes, joiner=joiner) if codes else None
+            tokens.extend(spec["codes"])
+    return mix(*tokens, joiner=joiner) if tokens else None
 
 
 def find_department_for_handbook(current_file: Path, registry: dict) -> tuple[str, dict] | None:
@@ -788,7 +1153,9 @@ def normalize_organization_shortlinks(doc: etree._Element, current_file: Path) -
         "../03-Organization/03-Job-Descriptions/": ROOT / "02-Tai-Lieu-He-Thong" / "03-Organization" / "03-Job-Descriptions",
     }
     for anchor in doc.xpath('//a[@href]'):
-        href = (anchor.get("href") or "").strip()
+        href = ((anchor.get("href") or "").strip()).replace("\\", "/")
+        if href != (anchor.get("href") or "").strip():
+            anchor.set("href", href)
         for prefix, target_dir in shortcuts.items():
             if not href.startswith(prefix):
                 continue
@@ -808,10 +1175,12 @@ def normalize_reference_links(doc: etree._Element, current_file: Path, registry:
     target_labels.update(canonical_department_labels(registry))
 
     for anchor in doc.xpath('//a[@href]'):
+        href = ((anchor.get("href") or "").strip()).replace("\\", "/")
+        if href != (anchor.get("href") or "").strip():
+            anchor.set("href", href)
         classes = (anchor.get("class") or "").split()
         if any(token in classes for token in ["role-link", "dept-link", "entity-link"]):
             continue
-        href = (anchor.get("href") or "").strip()
         if not href or href.startswith(("#", "http://", "https://", "mailto:", "javascript:")):
             continue
         try:
@@ -824,6 +1193,17 @@ def normalize_reference_links(doc: etree._Element, current_file: Path, registry:
         for child in list(anchor):
             anchor.remove(child)
         anchor.text = label
+
+
+def normalize_local_link_separators(doc: etree._Element) -> None:
+    for element in doc.xpath('//*[@href or @src]'):
+        for attr in ("href", "src"):
+            value = element.get(attr)
+            if not value:
+                continue
+            cleaned = value.replace("\\", "/")
+            if cleaned != value:
+                element.set(attr, cleaned)
 
 
 def normalize_jd_structured_rows(
@@ -1266,10 +1646,27 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
         set_row_cell_html(doc, "Deputy / backup activation", 1, f'{chips(expr("HR"))} + {chips(bundle("FUNC_HEADS"))}')
 
     if current_file.name == "raci-master-matrix.html":
+        set_row_cell_html(doc, "Operations", 0, chips(expr("D-PROD")))
+        set_row_cell_html(doc, "Support", 0, chips(bundle("SUPPORT_ENABLEMENT")))
         set_row_cell_html(doc, "D-ENG", 1, render_token_cluster(["ENGM", "PE", "CAM"], current_file, registry, joiner=" · "))
         set_row_cell_html(doc, "D-QUAL", 1, render_token_cluster(["QA", "QE", "QCL", "QMS"], current_file, registry, joiner=" · "))
         set_row_cell_html(doc, "ANNEX-123", 2, chips(bundle("FUNC_HEADS")))
         set_row_cell_html(doc, "ANNEX-123", 5, chips(bundle("DIRECT_LINE_MGRS")))
+        replace_text_fragments(
+            doc,
+            {
+                "Vai trò cluster": "Nhóm actor / bundle",
+                "RFQ, order data, customer communications, commercial commitments.": "RFQ, dữ liệu đơn hàng, trao đổi khách hàng và cam kết thương mại.",
+                "Technical mức sẵn sàng, kiểm soát thay đổi, bộ hồ sơ phát hành.": "Mức sẵn sàng kỹ thuật, kiểm soát thay đổi và bộ hồ sơ phát hành.",
+                "Capacity, dispatch, recovery, execution control.": "Năng lực, điều độ, khôi phục và kiểm soát thực thi.",
+                "Containment, release, CAPA, document discipline.": "Ngăn chặn, nhả giữ, CAPA và kỷ luật tài liệu.",
+                "Materials, money, people, safety, systems and continuity.": "Vật tư, tài chính, nhân sự, an toàn, hệ thống và tính liên tục.",
+                "Ready job pack, material/tool mức sẵn sàng, schedule priority, cổng kiểm soát trạng thái.": "Gói việc sẵn sàng, mức sẵn sàng vật tư/dụng cụ, ưu tiên lịch và trạng thái cổng kiểm soát.",
+                "Genealogy, kiểm tra bằng chứng, release trạng thái, pack/ship requirements.": "Phả hệ lô, bằng chứng kiểm tra, trạng thái nhả giữ và yêu cầu đóng gói/giao hàng.",
+                "Final release + ship bằng chứng + billing trigger + AR theo dõi tiếp.": "Nhả giữ cuối + bằng chứng giao hàng + điểm kích hoạt lập hóa đơn + theo dõi AR.",
+                "Authorized-to-work, access lifecycle, deputy activation, fallback rules.": "Điều kiện được phép làm việc, vòng đời quyền truy cập, kích hoạt phó và quy tắc dự phòng.",
+            },
+        )
 
     if current_file.name == "annex-103-org-raci-matrix.html":
         set_row_cell_html(doc, "RFQ / báo giá", 1, chips(expr("CS", "EST", "CEO")))
@@ -1285,16 +1682,18 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
         )
 
     if current_file.name == "annex-115-epicor-transaction-and-interface-map.html":
-        set_row_cell_html(doc, "Báo giá / order / job creation", 2, chips(expr("CS", "EST", "PPL")))
-        set_row_cell_html(doc, "G0 Contract", 2, chips(expr("CS", "EST")))
-        set_row_cell_html(doc, "Daily operational scoreboards", 2, chips(expr("PPL", "WKM", "QA")))
+        set_row_cell_html(doc, "Finance / billing packs", 2, chips(expr("FIN", "APAR")))
+        set_row_cell_html(doc, "Ph\u00e1t h\u00e0nh k\u1ef9 thu\u1eadt / routing / revision", 2, chips(expr("ENGM", "DFM", "PE", "CAM")))
+        set_row_cell_html(doc, "Labor / machine / WIP / completion", 2, f'{chips(expr("PPL"))} / {chips(bundle("FRONTLINE_LEADS"))}')
+        set_row_cell_html(doc, "Shipment / x\u00e1c nh\u1eadn giao h\u00e0ng (ship confirm)", 2, f'{chips(expr("D-WHS"))} / {chips(expr("LOG"))} / {chips(expr("QA"))}')
+        set_row_cell_html(doc, "Invoice / AR / job close", 2, chips(expr("FIN", "APAR")))
         replace_text_fragments(
             doc,
             {
-                "người chịu trách nhiệm nghiệp vụ": "FUNC_OWNERS",
-                "chủ nghiệp vụ": "FUNC_OWNERS",
-                "người chịu trách nhiệm dữ liệu": "role xác nhận nguồn dữ liệu",
-                "nguồn đã khóa người chịu trách nhiệm": "nguồn đã khóa role xác nhận nguồn dữ liệu",
+                "Ng\u01b0\u1eddi ph\u1ee5 tr\u00e1ch Engineering": "ENGM / ENG_RELEASE_CORE",
+                "Ng\u01b0\u1eddi ph\u1ee5 tr\u00e1ch Production / PPL": "PPL / FRONTLINE_LEADS",
+                "Warehouse / Logistics + QA release th\u1ea9m quy\u1ec1n": "D-WHS / LOG / QA",
+                "Ng\u01b0\u1eddi ph\u1ee5 tr\u00e1ch Finance": "FIN / APAR",
             },
         )
 
@@ -1399,8 +1798,13 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
                 "chủ tài liệu": "QMS[DC]",
                 "All quản lý / approvers": "TOP_MGMT / FUNC_HEADS / QMS",
                 "QMS / QMS": "QMS",
+                "HR / all managers": "HR / DIRECT_LINE_MGRS",
+                "All managers / approvers": "TOP_MGMT",
             },
         )
+
+    if current_file.name == "annex-114-go-live-runbook-and-cutover-control.html":
+        set_row_cell_html(doc, "Support", 0, chips(bundle("SUPPORT_ENABLEMENT")))
 
     if current_file.name == "annex-123-deputy-backup-matrix.html":
         set_row_cell_html(doc, "JD-CPS", 4, "CPS vắng mặt hoặc tuyến clean-pack cần duy trì handoff sang LOG.")
@@ -1446,6 +1850,21 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
             },
         )
 
+        set_row_cell_html(doc, "Freeze-date pack", 2, f'{chips(bundle("MR_REPORT_OWNERS"))} + {chips(expr("QMS"))}')
+        set_row_cell_html(doc, "Freeze-date pack", 3, f'{chips(bundle("TOP_MGMT"))} / {chips(bundle("OPS_SCOPE_OWNERS"))}')
+        set_row_cell_html(doc, "Exception-note pack", 2, f'{chips(bundle("MR_REPORT_OWNERS"))} + {chips(bundle("FUNC_OWNERS"))} / {chips(bundle("SYSTEM_OWNERS"))}')
+        set_row_cell_html(doc, "Exception-note pack", 3, f'{chips(bundle("MR_REPORT_OWNERS"))} / {chips(expr("QMS"))} / {chips(bundle("FUNC_HEADS"))}')
+        set_row_cell_html(doc, "Quarterly access-bộ hồ sơ rà soát", 2, f'{chips(bundle("SYSTEM_OWNERS"))} / {chips(expr("QMS"))}')
+        set_row_cell_html(doc, "Quarterly access-bộ hồ sơ rà soát", 3, f'{chips(bundle("SYSTEM_OWNERS"))} / {chips(expr("QMS"))} / {chips(bundle("TOP_MGMT"))}')
+        set_row_cell_html(doc, "Management-bộ hồ sơ rà soát", 2, f'{chips(expr("QMS"))} + {chips(bundle("MR_REPORT_OWNERS"))}')
+        set_row_cell_html(doc, "Management-bộ hồ sơ rà soát", 3, chips(bundle("TOP_MGMT")))
+
+    if current_file.name == "annex-110-dashboard-kpi-dictionary-and-data-model.html":
+        set_row_cell_html(doc, "T1/T2 board trong ng\u00e0y", 1, f'{chips(expr("PPL"))} / {chips(bundle("FRONTLINE_LEADS"))} / {chips(expr("QA"))}')
+        set_row_cell_html(doc, "T3 tu\u1ea7n / th\u00e1ng", 1, f'{chips(bundle("MR_REPORT_OWNERS"))} + {chips(bundle("OPS_SCOPE_OWNERS"))}')
+        set_row_cell_html(doc, "T4 / xem x\u00e9t c\u1ee7a l\u00e3nh \u0111\u1ea1o", 1, f'{chips(expr("QMS"))} / {chips(bundle("MR_REPORT_OWNERS"))} / {chips(bundle("OPS_SCOPE_OWNERS"))}')
+        set_row_cell_html(doc, "Customer / external disclosure pack", 1, f'{chips(bundle("COMMERCIAL_FRONT"))} / {chips(bundle("OPS_SCOPE_OWNERS"))} / {chips(bundle("FUNC_HEADS"))}')
+
     if current_file.name == "annex-403-approved-processor-list.html":
         replace_text_fragments(
             doc,
@@ -1459,6 +1878,7 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
         set_row_cell_html(doc, "Program ID â‰  Phát hành chương trình (program phát hành) list", 3, chips(expr("WKM", "SL", "D-ENG", "QA")))
 
     if current_file.name == "annex-503-cnc-operating-model-and-role-boundary.html":
+        set_row_first_cell_html(doc, "Foreman / Workshop Mgr", chips(expr("WKM")))
         set_row_cell_html(doc, "1. RFQ intake & sàng lọc hợp đồng", 3, f'{chips(expr("CS", "CEO"))} theo ANNEX-120')
         set_row_cell_html(doc, "1. RFQ intake & sàng lọc hợp đồng", 4, f'{chips(expr("CS"))} / {chips(bundle("FUNC_OWNERS"))} khi dữ liệu thiếu')
         set_row_cell_html(doc, "2. Technical feasibility & cost build", 2, chips(expr("ENGM", "PE", "CAM", "QE", "SCM")))
@@ -1480,8 +1900,340 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
     if current_file.name == "annex-603-quality-package-levels-qpl.html":
         set_row_cell_html(doc, "Hạ QPL", 2, f'{chips(expr("QA", "ENGM"))} + {chips(expr("D-SCS"))} / khách hàng nếu yêu cầu khách hàng chi phối')
 
+    if current_file.name == "annex-105-process-map-detailed.html":
+        replace_text_fragments(
+            doc,
+            {
+                "S05 IT/Data": "S05 D-IT / D-ERP",
+            },
+        )
+
+    if current_file.name == "annex-115-epicor-transaction-and-interface-map.html":
+        set_row_cell_html(doc, "Finance / billing packs", 2, chips(expr("FIN", "APAR")))
+        replace_text_fragments(
+            doc,
+            {
+                "NgÆ°á»i phá»¥ trÃ¡ch Finance": "FIN / APAR",
+            },
+        )
+
+    if current_file.name == "annex-115-epicor-transaction-and-interface-map.html":
+        set_row_cell_html(doc, "Ph\u00e1t h\u00e0nh k\u1ef9 thu\u1eadt / routing / revision", 2, chips(expr("ENGM", "DFM", "PE", "CAM")))
+        set_row_cell_html(doc, "Labor / machine / WIP / completion", 2, f'{chips(expr("PPL"))} / {chips(bundle("FRONTLINE_LEADS"))}')
+        set_row_cell_html(doc, "Shipment / x\u00e1c nh\u1eadn giao h\u00e0ng (ship confirm)", 2, f'{chips(expr("D-WHS"))} / {chips(expr("LOG"))} / {chips(expr("QA"))}')
+        set_row_cell_html(doc, "Invoice / AR / job close", 2, chips(expr("FIN", "APAR")))
+        replace_text_fragments(
+            doc,
+            {
+                "Người phụ trách Engineering": "ENGM / ENG_RELEASE_CORE",
+                "Người phụ trách Production / PPL": "PPL / FRONTLINE_LEADS",
+                "Warehouse / Logistics + QA release thẩm quyền": "D-WHS / LOG / QA",
+                "Người phụ trách Finance": "FIN / APAR",
+            },
+        )
+
     if current_file.name == "wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html":
         set_row_cell_html(doc, "2. Chọn champion theo phòng ban và shift", 1, chips(bundle("DEPLOYMENT_LEADS")))
+
+    if current_file.name in {"C01-L4.html", "C02-L4.html", "C03-L4.html", "C04-L4.html", "C05-L4.html"}:
+        replace_text_fragments(
+            doc,
+            {
+                "Foreman/Department Manager/": "DIRECT_LINE_MGRS / ",
+                "/QA lead": " / QUALITY_CORE",
+            },
+        )
+
+    if current_file.name in {"C01-L3.html", "C02-L3.html", "C04-L3.html"}:
+        replace_text_fragments(
+            doc,
+            {
+                "Team Leader/lead/nhân sự chủ chốt": "FRONTLINE_LEADS / KNOWLEDGE_SMES",
+            },
+        )
+
+    if current_file.name == "C01-L2.html":
+        replace_exact_block_text(
+            doc,
+            "//td",
+            "01 JSA đã phê duyệt bởi Team Leader/Foreman.",
+            f'01 JSA đã được phê duyệt bởi {chips(bundle("FRONTLINE_LEADS"))}.',
+        )
+
+    if current_file.name == "C01-L3.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Team Leader – Foreman – QA/HSE": "FRONTLINE_LEADS – QA / EHS",
+                "Team Leader/Foreman/QA": "FRONTLINE_LEADS / QA",
+            },
+        )
+
+    if current_file.name == "C04-L4.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Team Leader/Foreman": "FRONTLINE_LEADS",
+                "mặt bằng xưởng, Foreman, Quản lý Bảng.": "mặt bằng xưởng, FRONTLINE_LEADS, Quản lý Bảng.",
+            },
+        )
+
+    if current_file.name == "C01-L4.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Team Leader hằng ngày, Foreman hằng tuần, QA/HSE hằng tháng;": "FRONTLINE_LEADS hằng ngày, WKM hằng tuần, QA / EHS hằng tháng;",
+            },
+        )
+
+    if current_file.name == "assessment-matrix.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Báo ngay cho Team Leader khi thấy nguy cơ": "Báo ngay cho FRONTLINE_LEADS khi thấy nguy cơ",
+                "báo QC/Team Leader": "báo QC / FRONTLINE_LEADS",
+                "báo cáo vượt cấp cho Team Leader/quản lý": "báo cáo vượt cấp cho FRONTLINE_LEADS / DIRECT_LINE_MGRS",
+            },
+        )
+
+    if current_file.name == "SYS-OPS-08.html":
+        replace_text_fragments(
+            doc,
+            {
+                "/Mua h\u00e0ng:": "/BUY:",
+                "IT/BI:": "SYSTEM_OWNERS:",
+            },
+        )
+
+    if current_file.name == "SYS-OPS-12.html":
+        replace_text_fragments(
+            doc,
+            {
+                "QA / QMS + IT/Data": "QA / QMS + SYSTEM_OWNERS",
+            },
+        )
+
+    if current_file.name == "SYS-OPS-22.html":
+        replace_text_fragments(
+            doc,
+            {
+                "QA/IT b\u1eaft bu\u1ed9c \u0111\u1ea1t L3\u2013L4": "QA / SYSTEM_OWNERS b\u1eaft bu\u1ed9c \u0111\u1ea1t L3\u2013L4",
+            },
+        )
+
+    if current_file.name == "SYS-OPS-28.html":
+        replace_text_fragments(
+            doc,
+            {
+                "IT/Data + FRONTLINE_LEADS": "SYSTEM_OWNERS + FRONTLINE_LEADS",
+                "FRONTLINE_LEADS/QA/IT": "FRONTLINE_LEADS / QA / SYSTEM_OWNERS",
+                "IT (khi li\u00ean quan quy\u1ec1n/h\u1ec7 th\u1ed1ng)": "SYSTEM_OWNERS (khi li\u00ean quan quy\u1ec1n/h\u1ec7 th\u1ed1ng)",
+                "Mua h\u00e0ng (khi li\u00ean quan outsource/cert)": "BUY (khi li\u00ean quan thu\u00ea ngo\u00e0i/ch\u1ee9ng ch\u1ec9)",
+                "EST/Mua h\u00e0ng:": "EST / BUY:",
+                "IT/Data:": "SYSTEM_OWNERS:",
+            },
+        )
+
+    if current_file.name == "C01-L1.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Báo Team Leader/trưởng nhóm": "Báo FRONTLINE_LEADS",
+            },
+        )
+
+    if current_file.name == "C04-L1.html":
+        replace_text_fragments(
+            doc,
+            {
+                "báo Team Leader.": "báo FRONTLINE_LEADS.",
+            },
+        )
+
+    if current_file.name == "C08-L3.html":
+        replace_text_fragments(
+            doc,
+            {
+                "QA/QC Team Leader, Planner lead, Supervisor, Engineer, Người định giá (SAL-03) lead": "QUALITY_CORE / PPL / FRONTLINE_LEADS / D-ENG / EST",
+            },
+        )
+
+    if current_file.name == "C09-L2.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Operator cao cấp, Setup trưởng nhóm, QC cao cấp, Team Leader kho": "OPR / SET / QC / D-WHS",
+                "Supervisor": "FRONTLINE_LEADS",
+                "người chịu trách nhiệm Cell": "FRONTLINE_LEADS",
+            },
+        )
+
+    if current_file.name == "C09-L3.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Supervisor, Trưởng nhóm Điều độ, Team Leader": "FRONTLINE_LEADS / PPL",
+                "Nhân viên điều phối/Supervisor": "PPL / FRONTLINE_LEADS",
+                "Supervisor/Ops Mgr": "FRONTLINE_LEADS / PD",
+                "Team Leader": "FRONTLINE_LEADS",
+                "Supervisor": "FRONTLINE_LEADS",
+            },
+        )
+
+    if current_file.name == "C10-L2.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Trưởng nhóm/Team Leader, Kế hoạch/Nhân viên điều phối, Mua hàng theo dõi tiếp, Team Leader kho / IQC, QC Team Leader, CS điều phối viên": "FRONTLINE_LEADS / PPL / D-PUR / D-WHS / QCL / CS",
+                "Team Leader": "FRONTLINE_LEADS",
+                "Planner/Trưởng nhóm": "PPL / FRONTLINE_LEADS",
+                "Operator/Trưởng nhóm": "OPR / FRONTLINE_LEADS",
+                "QC/Trưởng nhóm": "QC / FRONTLINE_LEADS",
+                "All vai trò": "Mọi vai trò liên quan",
+                "Performer": "Người thực hiện",
+            },
+        )
+
+    if current_file.name == "C10-L3.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Kế hoạch Team Leader, Sản xuất supervisor, Trưởng nhóm QA, Kỹ thuật lead, Người định giá (SAL-03) lead": "PPL / WKM / SL / QA / QCL / ENGM / EST",
+                "Trưởng nhóm QA": "QA / QCL",
+                "báo Supervisor + QA": "báo FRONTLINE_LEADS + QA",
+            },
+        )
+
+    if current_file.name == "C13-L2.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Team Leader, QC Team Leader, Engineer, Planner, Mua hàng theo dõi tiếp": "FRONTLINE_LEADS / QCL / D-ENG / PPL / D-PUR",
+            },
+        )
+
+    if current_file.name in {"C19-L1.html", "C19-L2.html", "C19-L3.html", "C19-L4.html"}:
+        replace_text_fragments(
+            doc,
+            {
+                "Team Leader/ca trưởng/dòng / chuyền trưởng nhóm": "FRONTLINE_LEADS",
+            },
+        )
+
+    if current_file.name == "SYS-OPS-05.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Team Leader kho/QA": "D-WHS / QA",
+                "Supervisor/OPS Lead": "FRONTLINE_LEADS / PPL",
+                "Supervisor + QA + WHS": "FRONTLINE_LEADS + QA + D-WHS",
+                "Team Leader kho + QA": "D-WHS + QA",
+                "Chỉ Team Leader kho hoặc QA thực hiện": "Chỉ D-WHS hoặc QA thực hiện",
+                "Team Leader kho + Supervisor + QA": "D-WHS + FRONTLINE_LEADS + QA",
+                "Team Leader kho": "D-WHS",
+                "All vai trò": "Mọi vai trò liên quan",
+                "Supervisor": "FRONTLINE_LEADS",
+            },
+        )
+
+    if current_file.name == "SYS-OPS-12.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Operator + Supervisor": "OPR + FRONTLINE_LEADS",
+                "Supervisor/Trưởng nhóm": "FRONTLINE_LEADS",
+                "Supervisor + QA": "FRONTLINE_LEADS + QA",
+                "QA / QMS + Supervisor": "QA / QMS + FRONTLINE_LEADS",
+                "Supervisor/QC": "FRONTLINE_LEADS / QC",
+                "báo Supervisor và QC": "báo FRONTLINE_LEADS và QC",
+                "Supervisor ca đêm": "FRONTLINE_LEADS ca đêm",
+                "D. Supervisor": "D. FRONTLINE_LEADS",
+                "HR + Supervisor": "HR + FRONTLINE_LEADS",
+                "Operator/Setup/QC/Supervisor/QA / QMS": "OPR / SET / QC / FRONTLINE_LEADS / QA / QMS",
+                "Supervisor": "FRONTLINE_LEADS",
+            },
+        )
+
+    if current_file.name == "SYS-OPS-13.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Operator, QC/QA, Planner, Kinh doanh, Sản xuất Trưởng nhóm, Supervisor, Manager/Trưởng / Đầu.": "OPR, QC / QA, PPL, D-SCS, FRONTLINE_LEADS, FUNC_HEADS.",
+                "Sản xuất Trưởng nhóm / Supervisor": "FRONTLINE_LEADS",
+                "QMR/Planner/Trưởng nhóm": "QA[QMR] / PPL / FRONTLINE_LEADS",
+                "Supervisor": "FRONTLINE_LEADS",
+            },
+        )
+
+    if current_file.name == "SYS-OPS-17.html":
+        replace_text_fragments(
+            doc,
+            {
+                "báo Supervisor+QC": "báo FRONTLINE_LEADS + QC",
+                "QA+Supervisor+Người định giá (SAL-03)": "QA + FRONTLINE_LEADS + EST",
+                "Supervisor/Lập trình viên (CNC)": "FRONTLINE_LEADS / CAM",
+                "QA+Supervisor+Planner": "QA + FRONTLINE_LEADS + PPL",
+                "QA+Supervisor": "QA + FRONTLINE_LEADS",
+                "Supervisor kích hoạt escalation": "FRONTLINE_LEADS kích hoạt escalation",
+                "Supervisor L4": "FRONTLINE_LEADS L4",
+                "Supervisor escalation": "FRONTLINE_LEADS escalation",
+                "Supervisor": "FRONTLINE_LEADS",
+            },
+        )
+
+    if current_file.name == "authorization-library.html":
+        replace_text_fragments(
+            doc,
+            {
+                "phó Team Leader kho.": "phó đầu mối D-WHS.",
+            },
+        )
+
+    if current_file.name == "competency-framework.html":
+        replace_exact_block_text(
+            doc,
+            "//td",
+            "Department Manager / Người hướng dẫn Level 3–4 + HR (quản hồ sơ) + QA (khi liên quan chất lượng)",
+            f'{chips(bundle("DIRECT_LINE_MGRS"))} / {chips(bundle("OJT_COACHES"))} / {chips(expr("HR"))} / {chips(expr("QA"))} khi liên quan chất lượng',
+        )
+
+    if current_file.name == "C19.html":
+        replace_exact_block_text(
+            doc,
+            "//li",
+            "Đối tượng: Team Leader/Trưởng nhóm, Department Manager, HR đào tạo",
+            f'<strong>Đối tượng:</strong> {chips(bundle("DIRECT_LINE_MGRS"))} / {chips(expr("HR"))}',
+        )
+
+    if current_file.name == "annex-114-go-live-runbook-and-cutover-control.html":
+        replace_text_fragments(
+            doc,
+            {
+                "support tăng cường": "SUPPORT_ENABLEMENT tăng cường",
+            },
+        )
+        replace_exact_block_text(
+            doc,
+            "//span",
+            "Support tăng cường",
+            f'{chips(bundle("SUPPORT_ENABLEMENT"))} tăng cường',
+        )
+
+    if current_file.name == "SYS-OPS-07.html":
+        replace_text_fragments(
+            doc,
+            {
+                "QC/QA lead:": "QA / QCL:",
+            },
+        )
+
+    if current_file.name == "annex-802-collective-bargaining-agreement.html":
+        replace_text_fragments(
+            doc,
+            {
+                "HR/Department Manager": "HR / DIRECT_LINE_MGRS",
+            },
+        )
 
     if current_file.name == "wi-517-setup-changeover-smed-standard-work.html":
         set_row_cell_html(doc, "nhận dạng", 2, chips(expr("SET")))
@@ -2986,6 +3738,77 @@ def apply_file_specific_tweaks(doc: etree._Element, current_file: Path, registry
         )
 
 
+    if current_file.name == "ojt-tracker.html":
+        replace_text_fragments(
+            doc,
+            {
+                " / WHS / PUR / ": " / D-WHS / D-PUR / ",
+                "? Production Planner": "? PPL",
+                "? Kho / Nh?n h?ng": "? WAR / D-WHS",
+                "? Mua h?ng / Gia c?ng ngo?i": "? BUY / D-PUR",
+            },
+        )
+
+    if current_file.name == "role-roadmaps.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Production Engineer / IE": "PIE",
+                "Chu?i cung ?ng Manager": "SCM",
+                "OJT Planner": "OJT PPL",
+                "OJT Mua h?ng": "OJT BUY / D-PUR",
+                "OJT Kho": "OJT WAR / D-WHS",
+                "D-WHS / Nh?n h?ng; H?u c?n": "D-WHS / Nh?n h?ng; D-LOG",
+            },
+        )
+
+    if current_file.name == "index.html" and "10-Training-Academy\01-Competency-System" in str(current_file):
+        replace_text_fragments(
+            doc,
+            {
+                "S?n xu?t matrix": "D-PROD matrix",
+                "Quality matrix": "D-QUAL matrix",
+                "Kho matrix": "D-WHS matrix",
+            },
+        )
+
+    if current_file.name == "training-matrix.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Kho / Giao v?n": "D-WHS / D-LOG",
+                "TRN-MTX-07 ? Training Matrix ? B?o tr? | HESEM OS": "TRN-MTX-07 ? Training Matrix ? D-MNT | HESEM OS",
+            },
+        )
+
+    if current_file.name == "skill-matrix-bonus.html":
+        replace_text_fragments(
+            doc,
+            {
+                "D-WHS & Giao v?n": "D-WHS & D-LOG",
+                "Kho/H?u c?n": "D-WHS / D-LOG",
+            },
+        )
+
+    if current_file.name == "C15-L2.html":
+        replace_text_fragments(
+            doc,
+            {
+                "Mua h?ng ? ": "D-PUR ? ",
+                " ? K? ho?ch": " ? PPL",
+            },
+        )
+
+    if current_file.name == "sop-201-order-fulfillment-rfq-to-cash.html":
+        replace_text_fragments(
+            doc,
+            {
+                "B?o gi?, K? thu?t, ho?ch ??nh, Mua h?ng, s?n xu?t, QA/QC, ": "EST, D-ENG, PPL, D-PUR, D-PROD, QA / QC, ",
+                " v? t?i ch?nh ??u c?": " v? D-FIN ??u c?",
+            },
+        )
+
+
 def normalize_jd_file(
     doc_path: Path,
     registry: dict,
@@ -3097,6 +3920,7 @@ def normalize_jd_file(
     update_role_cells(doc, doc_path, registry, aliases, {})
     normalize_organization_shortlinks(doc, doc_path)
     normalize_reference_links(doc, doc_path, registry)
+    normalize_local_link_separators(doc)
     normalize_jd_purpose_intro(doc, role_code, role)
     replace_text_fragments_filtered(doc, COMMON_PROSE_REPLACEMENTS, {"a"})
     replace_text_fragments_filtered(doc, JD_PROSE_REPLACEMENTS, {"a"})
@@ -3108,6 +3932,10 @@ def normalize_jd_file(
     body_html = html.tostring(container[0] if container else doc, encoding="unicode", method="html")
     head_assets = extract_jd_head_assets(source_text, doc_path)
     document = build_html_document(title_text, head_assets, body_html)
+    document = link_bundle_tokens_in_html(document, doc_path, registry)
+    document = link_published_actor_terms_in_html(document, doc_path, registry)
+    document = normalize_hybrid_actor_clusters_in_html(document, doc_path, registry)
+    document = cleanup_known_render_artifacts_in_html(document)
     doc_path.write_text(document, encoding="utf-8")
 
 
@@ -3136,7 +3964,13 @@ def normalize_controlled_file(
     update_role_cells(doc, doc_path, registry, aliases, local_overrides)
     normalize_organization_shortlinks(doc, doc_path)
     normalize_reference_links(doc, doc_path, registry)
-    doc_path.write_text(serialize_html_document(doc), encoding="utf-8")
+    normalize_local_link_separators(doc)
+    document = serialize_html_document(doc)
+    document = link_bundle_tokens_in_html(document, doc_path, registry)
+    document = link_published_actor_terms_in_html(document, doc_path, registry)
+    document = normalize_hybrid_actor_clusters_in_html(document, doc_path, registry)
+    document = cleanup_known_render_artifacts_in_html(document)
+    doc_path.write_text(document, encoding="utf-8")
 
 
 def jd_role_replacements(role_code: str, role_meta: dict) -> dict[str, str]:
@@ -3492,6 +4326,35 @@ def refresh_workbook(registry: dict, profiles: dict[str, dict[str, object]]) -> 
         depts.cell(row=index + 1, column=7).value = dept["handbook_path"]
         depts.cell(row=index + 1, column=8).value = ", ".join(dept.get("lead_roles", []))
 
+    bundle_name = "Bundle glossary"
+    if bundle_name in wb.sheetnames:
+        del wb[bundle_name]
+    bundles_ws = wb.create_sheet(bundle_name)
+    bundle_headers = [
+        "STT",
+        "Bundle code",
+        "Label English",
+        "Ten / dien giai tieng Viet",
+        "Loai",
+        "Thanh phan",
+        "Duoc dung khi",
+        "Khong dung de che",
+        "Glossary path",
+    ]
+    for col, header in enumerate(bundle_headers, 1):
+        bundles_ws.cell(row=1, column=col).value = header
+    for index, code in enumerate(sorted(registry.get("bundles", {})), start=1):
+        meta = bundle_meta(code, registry)
+        bundles_ws.cell(row=index + 1, column=1).value = index
+        bundles_ws.cell(row=index + 1, column=2).value = code
+        bundles_ws.cell(row=index + 1, column=3).value = meta.get("label_en")
+        bundles_ws.cell(row=index + 1, column=4).value = meta.get("label_vi")
+        bundles_ws.cell(row=index + 1, column=5).value = meta.get("kind")
+        bundles_ws.cell(row=index + 1, column=6).value = ", ".join(registry["bundles"][code])
+        bundles_ws.cell(row=index + 1, column=7).value = meta.get("use_vi")
+        bundles_ws.cell(row=index + 1, column=8).value = meta.get("avoid_vi")
+        bundles_ws.cell(row=index + 1, column=9).value = str(BUNDLE_GLOSSARY_PATH.relative_to(ROOT)).replace("\\", "/")
+
     wb.save(WORKBOOK_PATH)
 
 
@@ -3499,8 +4362,8 @@ def scan_unresolved(paths: list[Path]) -> str:
     hints = [
         "All Process Owners / Department Heads",
         "Process Owners / Department Heads",
-        "All Quy trình Owner / Department Trưởng bộ phận",
-        "Quy trình Owner / Department Trưởng bộ phận",
+        "All Quy tr??nh Owner / Department Tr?????ng b??? ph???n",
+        "Quy tr??nh Owner / Department Tr?????ng b??? ph???n",
         "Process Owner",
         "Department Head",
         "Department head",
@@ -3541,11 +4404,11 @@ def scan_unresolved(paths: list[Path]) -> str:
         "Publisher / IT",
         "QA Final",
         "QMS-Owners / QMS-IT-Administrators",
-        "QMS + Lãnh đạo",
-        "Lãnh đạo + QMS",
-        "Dòng / Chuyền Manager",
-        "HR / Người đào tạo",
-        "HR + Dept Trưởng / Đầu",
+        "QMS + L??nh ?????o",
+        "L??nh ?????o + QMS",
+        "D??ng / Chuy???n Manager",
+        "HR / Ng?????i ????o t???o",
+        "HR + Dept Tr?????ng / ?????u",
         "SAL",
         "ENG",
         "PRO/QA",
@@ -3556,25 +4419,40 @@ def scan_unresolved(paths: list[Path]) -> str:
         "Approval Board",
         "Engineering Configuration Lead",
         "Maintenance / Engineering",
-        "người chịu trách nhiệm KPI",
-        "người chịu trách nhiệm chức năng",
-        "người chịu trách nhiệm dữ liệu",
-        "người chịu trách nhiệm nghiệp vụ",
-        "người chịu trách nhiệm hệ thống",
-        "chủ dữ liệu",
+        "ng?????i ch???u tr??ch nhi???m KPI",
+        "ng?????i ch???u tr??ch nhi???m ch???c n??ng",
+        "ng?????i ch???u tr??ch nhi???m d??? li???u",
+        "ng?????i ch???u tr??ch nhi???m nghi???p v???",
+        "ng?????i ch???u tr??ch nhi???m h??? th???ng",
+        "ch??? d??? li???u",
         "Finance team",
-        "All site nhân sự",
-        "All chủ dữ liệu",
-        "QMS Engineer / doc điều phối viên",
+        "All site nh??n s???",
+        "All ch??? d??? li???u",
+        "QMS Engineer / doc ??i???u ph???i vi??n",
         "QA/HR",
-        "QA/Trưởng bộ phận",
-        "Trưởng bộ phận và QA/HR",
-        "Shift Leader / Trưởng bộ phận trực tiếp",
-        "Lãnh đạo / Quy trình Owner",
-        "Dept Trưởng bộ phận",
-        "Reviewer độc lập",
+        "QA/HRD",
+        "QA/Tr?????ng b??? ph???n",
+        "Tr?????ng b??? ph???n v?? QA/HR",
+        "Shift Leader / Tr?????ng b??? ph???n tr???c ti???p",
+        "L??nh ?????o / Quy tr??nh Owner",
+        "Dept Tr?????ng b??? ph???n",
+        "Reviewer ?????c l???p",
         "Supervisor / Lead",
-        "Request đầu mối phụ trách",
+        "Request ?????u m???i ph??? tr??ch",
+        "Foreman",
+        "Department Manager",
+        "QA lead",
+        "QA Lead",
+        "Team Leader/Foreman",
+        "Department Manager / Foreman",
+        "HR/TRN",
+        "SALES/PLN",
+        "OPS/QA",
+        "Setup Lead",
+        "Operator + Setup Lead",
+        "Operator + Setup Lead + QA",
+        "Supervisor + QA",
+        "QC + Setup",
     ]
     lines: list[str] = []
     parser = html.HTMLParser(encoding="utf-8")
@@ -3619,45 +4497,54 @@ def main() -> None:
         aliases.setdefault(code, expr(code))
     titles = title_aliases()
     phrase_replacements = {
-        "Responsible Person": "người chịu trách nhiệm",
-        "Top Management": "Ban lãnh đạo",
-        "Top Quản lý": "Ban lãnh đạo",
+        "Responsible Person": "ng?????i ch???u tr??ch nhi???m",
+        "Top Management": "Ban l??nh ?????o",
+        "Top Qu???n l??": "Ban l??nh ?????o",
         "QA/QMS": "QA / QMS",
         "QMS/QA": "QA / QMS",
         "QMS Manager": "QMS",
         "IT Manager": "ITA",
         "IT System Administrator": "ITA",
-        "IT System Governance viên": "ITA",
+        "IT System Governance vi??n": "ITA",
         "Engineering Manager": "ENGM",
         "QA Lead": "QA",
         "QC Lead": "QCL",
         "QA Engineer": "QE",
-        "Department Trưởng bộ phận": "FUNC_HEADS",
-        "Dept Trưởng bộ phận": "FUNC_HEADS",
-        "Quy trình Owner": "OPS_SCOPE_OWNERS",
-        "chủ quá trình": "OPS_SCOPE_OWNERS",
-        "người chịu trách nhiệm KPI": "MR_REPORT_OWNERS",
-        "người chịu trách nhiệm chức năng": "FUNC_OWNERS",
-        "Department Quáº£n lÃ½": "FUNC_HEADS",
-        "ngÆ°á»i chá»‹u trÃ¡ch nhiá»‡m nghiá»‡p vá»¥": "FUNC_OWNERS",
-        "ngÆ°á»i chá»‹u trÃ¡ch nhiá»‡m há»‡ thá»‘ng": "ITA / ESA",
-        "ngÆ°á»i chá»‹u trÃ¡ch nhiá»‡m dá»¯ liá»‡u": "role xÃ¡c nháº­n nguá»“n dá»¯ liá»‡u",
-        "HR / Department Quản lý / QA": "HR + FUNC_HEADS + QA",
-        "QA / QMS + Ops xuất sắc": "QA + QMS + PIE[CI]",
+        "Department Tr?????ng b??? ph???n": "FUNC_HEADS",
+        "Dept Tr?????ng b??? ph???n": "FUNC_HEADS",
+        "Quy tr??nh Owner": "OPS_SCOPE_OWNERS",
+        "ch??? qu?? tr??nh": "OPS_SCOPE_OWNERS",
+        "ng?????i ch???u tr??ch nhi???m KPI": "MR_REPORT_OWNERS",
+        "ng?????i ch???u tr??ch nhi???m ch???c n??ng": "FUNC_OWNERS",
+        "Data Owner": "DATA_OWNERS",
+        "Data Owners": "DATA_OWNERS",
+        "Business Owner": "DATA_OWNERS",
+        "System Owner": "SYSTEM_OWNERS",
+        "Department Qu??????n l????": "FUNC_HEADS",
+        "ng??????????i ch???????u tr????ch nhi???????m nghi???????p v??????": "FUNC_OWNERS",
+        "ng??????????i ch???????u tr????ch nhi???????m h??????? th???????ng": "SYSTEM_OWNERS",
+        "ng??????????i ch???????u tr????ch nhi???????m d?????? li???????u": "DATA_OWNERS",
+        "HR / Department Qu???n l?? / QA": "HR + FUNC_HEADS + QA",
+        "QA / QMS + Ops xu???t s???c": "QA + QMS + PIE[CI]",
         "OPS + WHS + QA / QMS + IT": "D-PROD + D-WHS + QA + QMS + D-IT",
         "Finance team": "D-FIN",
-        "Trưởng nhóm Kế hoạch": "PPL",
-        "QMS Engineer / doc điều phối viên": "QMS[DC]",
-        "All site nhân sự": "toàn bộ nhân sự nhà máy",
-        "All chủ dữ liệu": "OPS_SCOPE_OWNERS",
+        "Tr?????ng nh??m K??? ho???ch": "PPL",
+        "QMS Engineer / doc ??i???u ph???i vi??n": "QMS[DC]",
+        "All site nh??n s???": "to??n b??? nh??n s??? nh?? m??y",
+        "All ch??? d??? li???u": "DATA_OWNERS",
+        "QA/HR": "QA + HR",
+        "QA/HRD": "QA + HR",
+        "HR/TRN": "HR + OJT_COACHES",
+        "SALES/PLN": "D-SCS / PPL",
+        "OPS/QA": "D-PROD / QA",
         "Epicor Kinetic (Epicor) (Epicor) (Epicor)": "Epicor Kinetic / Epicor ERP",
     }
     overrides = {
         "QMS Engineer / QA Lead": expr("QMS[DC]", "QA[QMR]", joiner=" + "),
         "QA Lead / Quality Engineer": expr("QA", "QE", joiner=" + "),
-        "IT Administrator / Governance viên hệ thống Epicor": expr("ITA", "ESA", joiner=" + "),
+        "IT Administrator / Governance vi??n h??? th???ng Epicor": expr("ITA", "ESA", joiner=" + "),
         "QMS Engineer / HR Lead": expr("QMS[DC]", "HR", joiner=" + "),
-        "Kỹ thuật Lead / QA Lead": expr("ENGM", "QA", joiner=" + "),
+        "K??? thu???t Lead / QA Lead": expr("ENGM", "QA", joiner=" + "),
         "CS / QA Lead": expr("CS", "QA", joiner=" + "),
         "Engineering Lead / Estimator": expr("ENGM", "EST", joiner=" + "),
         "Quality Engineer / QA Manager": expr("QE", "QA", joiner=" + "),
@@ -3688,21 +4575,26 @@ def main() -> None:
         "Continuous Improvement Lead": expr("PIE[CI]"),
         "Incident Commander": expr("PD[IC-PROD]"),
         "Engineering Lead/Manager": expr("ENGM"),
-        "Maintenance / Engineering": expr("MNT", "ENGM"),
-        "Engineering / Maintenance": expr("ENGM", "MNT"),
+        "Maintenance / Engineering": expr("D-MNT", "D-ENG"),
+        "Engineering / Maintenance": expr("D-ENG", "D-MNT"),
+        "SALES/PLN": expr("D-SCS", "PPL"),
         "PRO/QA": expr("D-PROD", "QA"),
+        "OPS/QA": expr("D-PROD", "QA"),
         "WHS/SAL": expr("D-WHS", "D-SCS"),
+        "QA/HR": expr("QA", "HR"),
+        "QA/HRD": expr("QA", "HR"),
+        "HR/TRN": mix("HR", "OJT_COACHES", joiner=" + "),
         "WHS Supervisor": expr("D-WHS"),
         "Warehouse Manager": expr("D-WHS"),
         "Kho Manager": expr("D-WHS"),
-        "Giao vận Lead": expr("D-LOG"),
+        "Giao v???n Lead": expr("D-LOG"),
         "Shipping Lead": expr("D-LOG"),
-        "Mua hàng Lead": expr("D-PUR"),
+        "Mua h??ng Lead": expr("D-PUR"),
         "Kinh doanh Manager": expr("D-SCS"),
-        "Kinh doanh-Customer Dịch vụ Manager": expr("D-SCS"),
-        "Program / Kế hoạch": expr("PD", "PPL"),
-        "QMS + Lãnh đạo": expr("QMS", "CEO", joiner=" + "),
-        "Lãnh đạo + QMS": expr("CEO", "QMS", joiner=" + "),
+        "Kinh doanh-Customer D???ch v??? Manager": expr("D-SCS"),
+        "Program / K??? ho???ch": expr("PD", "PPL"),
+        "QMS + L??nh ?????o": expr("QMS", "CEO", joiner=" + "),
+        "L??nh ?????o + QMS": expr("CEO", "QMS", joiner=" + "),
         "QMS-Owners / QMS-IT-Administrators": expr("QMS", "ITA"),
         "Publisher / IT": expr("QMS", "ITA"),
         "Executive Sponsor": expr("CEO"),
@@ -3725,6 +4617,49 @@ def main() -> None:
             "Approval Board": expr("CEO", "QA", "PD", "ENGM", "ITA"),
             "Change Owner + QA Manager": expr("ENGM", "QA", "PD", "ITA", "ESA"),
             "Engineering Configuration Lead": expr("ENGM", "QMS[DC]", "ESA"),
+        },
+        "competency-assessment-guide.html": {
+            "Department Manager / Foreman": bundle("DIRECT_LINE_MGRS"),
+            "Ng?????i h?????ng d???n L3???L4": bundle("OJT_COACHES"),
+            "HR/Training": expr("HR"),
+        },
+        "training-matrix-production.html": {
+            "Foreman": expr("WKM"),
+            "S???n xu???t Tr?????ng nh??m": expr("SL"),
+            "M??i bavia/Ho??n thi???n": expr("DBL", "DBT", "CPS", "CPT"),
+        },
+        "training-matrix-planning-purchasing.html": {
+            "Department Manager Chu???i cung ???ng": expr("SCM"),
+            "Planner/b??? l???p l???ch": expr("PPL"),
+        },
+        "training-matrix-warehouse.html": {
+            "Team Leader kho": expr("D-WHS"),
+            "H???u c???n / Giao v???n Nh??n vi??n": expr("LOG"),
+        },
+        "drill-setup-firstarticle-ir.html": {
+            "Setup/Operator": expr("SET", "OPR", joiner=" + "),
+            "Setup": expr("SET"),
+            "QC + Setup": expr("QC", "SET", joiner=" + "),
+            "Supervisor + QA": mix("FRONTLINE_LEADS", "QA", joiner=" + "),
+            "Setup/QC": expr("SET", "QC", joiner=" + "),
+        },
+        "drill-safety-5s-hazards.html": {
+            "Supervisor": bundle("FRONTLINE_LEADS"),
+            "Team": bundle("FRONTLINE_LEADS"),
+        },
+        "drill-ncr-capa-response.html": {
+            "Supervisor + QC": mix("FRONTLINE_LEADS", "QC", joiner=" + "),
+            "QA/ENG/OPS": expr("QA", "D-ENG", "D-PROD", joiner=" / "),
+        },
+        "wi-519-job-packet-quick-check-and-pre-run-verification.html": {
+            "Operator + Setup Lead": expr("OPR", "SET", joiner=" + "),
+            "Setup Lead": expr("SET"),
+            "Operator + Setup Lead + QA": expr("OPR", "SET", "QA", joiner=" + "),
+        },
+        "annex-135-m365-operational-records-file-plan-by-department-role-and-job.html": {
+            "Setup Technician, CNC Workshop Manager, Production Engineer/IE": expr("SET", "WKM", "PIE[CI]"),
+            "Shift Leader, CNC Operator, Deburr/Clean-Pack supervisors": expr("SL", "OPR", "DBL", "CPS"),
+            "Deburr Team Lead, Cleaning and Packaging Supervisor, technicians": expr("DBL", "DBT", "CPS", "CPT"),
         },
     }
 
@@ -3752,9 +4687,9 @@ def main() -> None:
                 continue
             normalize_controlled_file(path, registry, aliases, titles, overrides, file_overrides, phrase_replacements)
 
+    generate_bundle_glossary(registry)
     refresh_workbook(registry, profiles)
-    audit_files = [path for path in all_html_files if "10-Training-Academy" not in path.as_posix()]
-    report = scan_unresolved(sorted(set(audit_files + jd_files + controlled_files)))
+    report = scan_unresolved(sorted(set(all_html_files + jd_files + controlled_files)))
     print("UPDATED ROLE SYSTEM")
     print("UNRESOLVED: 0" if not report else f"UNRESOLVED: see {UNRESOLVED_REPORT.relative_to(ROOT)}")
 

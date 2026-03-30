@@ -96,11 +96,29 @@ Ket qua hop le chi duoc la:
 
 Bundle cross-functional duoc phep dung khi va chi khi bundle do da duoc cong bo trong registry nguon. Hien tai:
 - `DEPLOYMENT_STEERING` = hoi dong dieu hanh trien khai / steering board cho digital-QMS rollout;
-- `ALL_DEPTS` = toan bo department code cap doanh nghiep khi tai lieu dang noi ve pham vi "all functions" o lop chuc nang, khong phai mot ca nhan cu the.
+- `ALL_DEPTS` = toan bo department code va subfunction code da cong bo trong registry hien hanh khi tai lieu dang noi ve pham vi "all functions" o lop chuc nang, khong phai mot ca nhan cu the.
 - `FUNC_HEADS` = tap hop role head cap chuc nang da duoc cong bo trong registry;
 - `DIRECT_LINE_MGRS` = lop quan ly truc tiep tai hien truong / direct line management da duoc cong bo;
 - `TOP_MGMT` = lop lanh dao cap cao duoc cong bo cho tai lieu dieu hanh / MR / dashboard;
 - `MR_REPORT_OWNERS` = nhom role chiu trach nhiem dong va nop pack bao cao MR da duoc cong bo.
+- `DATA_OWNERS` = nhom so huu du lieu nghiep vu da duoc cong bo;
+- `SYSTEM_OWNERS` = nhom so huu he thong da duoc cong bo.
+- Moi bundle nay PHAI co trang glossary cong bo tai `02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html`.
+- Bundle chip trong tai lieu phat hanh PHAI la chip co link tro ve glossary; khong de token text tran kieu `FRONTLINE_LEADS`, `OPS_SCOPE_OWNERS`, `MR_REPORT_OWNERS`, `FUNC_HEADS` ma khong co dan chieu.
+- Trong actor cell, owner cell, approver cell, audience cell va matrix row, bundle mac dinh PHAI hien dang chip gon co link glossary; chi bung thanh phan bundle trong trang glossary, dictionary, note giai nghia hoac bang liet ke thanh phan khi nguoi doc can xem noi ham.
+- Neu can gom gon nhieu `D-code`, nhieu `role code`, hoac mot nhom hon hop role + department cho cung mot lop actor lap lai, PHAI dang ky bundle vao registry + glossary + workbook truoc khi su dung trong SOP/WI/ANNEX/JD/Academy.
+
+Vi du canonical bat buoc:
+- `IT/Data`, `IT/Digital`, `IT/BI` -> `SYSTEM_OWNERS` neu dang noi toi lop so huu he thong dung chung; neu dang noi ro actor thao tac/he thong cu the thi doi ve `ITA`, `ESA`, `D-IT`, `D-ERP`.
+- `Người phụ trách Bảng điều khiển`, `KPI owner`, `dashboard owner`, `người chịu trách nhiệm pack MR` -> `MR_REPORT_OWNERS` neu dang noi toi nhom chu tri pack KPI/MR.
+- `authorized approver`, `functional approver`, `functional heads` -> `FUNC_HEADS` neu dang noi toi lop phe duyet cap chuc nang; neu da xac dinh duoc nguoi ky cu the thi phai doi ve role code.
+- `Planning / Production / QA của board` -> `PPL / FRONTLINE_LEADS / QA` hoac cluster explicit tuong duong; khong de text mo ta nua mua trong actor cell.
+- `commercial team`, `sales front`, `customer-commercial interface` -> `COMMERCIAL_FRONT` neu dang noi toi lop dau moi thuong mai; neu da xac dinh ro role thi doi ve `CS`, `EST`.
+- `Mua hàng` trong actor cell phai quy ve `BUY` neu dang giao tac nghiep ca nhan, hoac `D-PUR` neu dang noi mandate cap phong ban; khong de text tran `Mua hàng`.
+
+Rule khi bundle xuat hien:
+- O lan xuat hien dau tien trong moi tai lieu, bundle PHAI hien dang chip co link glossary.
+- Neu bundle nam trong SVG/process map/shape ma khong the gan link, uu tien doi ve `role code` hoac `D-code` explicit thay vi de bundle text tran.
 
 WI/ANNEX reference cap doanh nghiep duoc phep de header owner o dang `D-code` neu tai lieu dang khoa governance cap he thong hoac cap phong ban. WI thao tac / gate / phan ung hien truong uu tien `role code` neu owner la vai tro tac nghiep cu the.
 Ma tran tham quyen, ma tran deputy, dashboard audience table, authority summary page, org summary page, freeze-pack table va cac ANNEX tong hop cung PHAI tuan thu y het rule phan lop nay; khong co ngoai le chi vi tai lieu do la reference page thay vi SOP/WI.
@@ -112,7 +130,7 @@ Ma tran tham quyen, ma tran deputy, dashboard audience table, authority summary 
 - Neu mot link trong body, index, TOC, note, handbook summary hoac preface dang tro toi handbook phong ban, label hien thi PHAI dung `D-code` canonical cua handbook do.
 - Handbook link tro toi `dept-production-handbook.html` PHAI hien `D-PROD`, khong hien `D-PPC`.
 - Handbook link tro toi `dept-supply-chain-handbook.html` PHAI hien `D-SCM`, khong hien `D-PUR`, `D-WHS`, `D-TCR` hay `D-LOG`.
-- Ngoai le duy nhat: khi tai lieu dang mo ta subfunction cu the trong owner/RACI/interface cell va subfunction do da duoc cong bo tai `20-department-boundary-handbook-codes.md`, chip co the hien `D-PPC`, `D-WHS`, `D-LOG`, `D-PUR`, `D-TCR`, `D-ERP` du link van tro ve handbook cha.
+- Ngoai le duy nhat: khi tai lieu dang mo ta subfunction cu the trong owner/RACI/interface cell va subfunction do da duoc cong bo tai `20-department-boundary-handbook-codes.md`, chip co the hien `D-PPC`, `D-MNT`, `D-WHS`, `D-LOG`, `D-PUR`, `D-TCR`, `D-ERP` du link van tro ve handbook cha.
 - Khong duoc de tinh trang `label la subfunction` nhung `ngu canh thuc te la department summary`, vi nguoi doc se hieu sai pham vi va quyen han.
 
 ---
@@ -133,8 +151,9 @@ Ma tran tham quyen, ma tran deputy, dashboard audience table, authority summary 
 - Cot `owner`, `owner chinh`, `chu tri`, `phe duyet`, `dau moi phu trach` trong SOP/WI/ANNEX PHAI dung chip link theo `role code`, `D-code` hoac bundle da cong bo; khong de text tran kieu `Steering Committee`, `All chuc nang`, `Department Truong bo phan`.
 - Header va owner cell cua tai lieu `Training Academy`, `competency`, `OJT`, `gate test`, `authorization`, `role roadmap` cung PHAI theo y het rule nay; khong duoc de `QA/QMS`, `HR Manager / QA Manager`, `HR + OPS + QA/QMS`, `Department Quan ly` hay `Tong / Chung Manager`.
 - Cot `nguoi dung chinh`, `audience`, `functional users`, `reviewers`, `escalation audience`, `MR users`, `dashboard users`, `backup activation` cung PHAI dung `role code`, `D-code` hoac bundle da cong bo; khong de text tran kieu `supervisors`, `site leadership`, `process owners`, `all managers`.
+- Khi tac gia dung bundle de rut gon actor cell, o dau tien xuat hien trong tai lieu PHAI de bundle chip co link glossary hoac dat trong bang/ghi chu da lien ket sang glossary; nguoi doc phai lan ra duoc thanh phan bundle ma khong can doan nghia.
 - Cot mo ta `owner group`, `editor group`, `security group`, `M365 group` trong tai lieu kien truc quyen he thong duoc phep giu ten group ky thuat; khong ep doi cac ten group nay thanh JD/D-code neu doi tuong du lieu dang la nhom quyen he thong, khong phai vai tro nhan su.
-- Trong noi dung cong bo, ma phong ban PHAI dung bo canonical: `D-SCS`, `D-ENG`, `D-PROD`, `D-PPC`, `D-QUAL`, `D-SCM`, `D-PUR`, `D-WHS`, `D-TCR`, `D-LOG`, `D-FIN`, `D-HR`, `D-EHS`, `D-IT`, `D-ERP`.
+- Trong noi dung cong bo, ma phong ban PHAI dung bo canonical: `D-SCS`, `D-ENG`, `D-PROD`, `D-PPC`, `D-MNT`, `D-QUAL`, `D-SCM`, `D-PUR`, `D-WHS`, `D-TCR`, `D-LOG`, `D-FIN`, `D-HR`, `D-EHS`, `D-IT`, `D-ERP`.
 - Alias cu kieu `SAL`, `ENG`, `PRO`, `PLA`, `PUR`, `WHS`, `HSE`, `IT`, `CNC`, `OPS`, `Dept Head`, `Line Manager`, `Supervisor`, `Ops Manager`, `Purchasing Manager`, `Engineering Manager` KHONG duoc de lai trong header, owner cell, RACI, interface table, audience table hoac ma tran phan quyen sau khi da co role-boundary/job-order registry.
 - Neu mot o dang noi ve tham quyen cua phong ban thi doi sang `D-code`; neu dang noi ve tham quyen cua nguoi giu vai tro thi doi sang `role code`; neu dang noi ve lop actor on dinh lap lai thi chi duoc dung `bundle` da cong bo.
 - Bundle duoc phep dung de rut gon ma khong mat nghia, nhung bundle cung phai la actor explicit da cong bo trong registry nguon. Khong tu phat minh bundle trong tai lieu phat hanh roi moi quay lai hop thuc hoa sau.
@@ -167,6 +186,8 @@ Trong prose neu can noi toi mot khai niem phi-actor:
 - dung `don vi so huu du lieu nghiep vu` cho business-content ownership;
 - dung `role xac nhan nguon du lieu` cho lop kiem xac nhan source/refresh;
 - dung `role chu tri pack` cho nguoi chot va nop pack KPI/MR.
+- dung `DATA_OWNERS` khi tai lieu dang noi toi nhom so huu noi dung nghiep vu cua du lieu va can rut gon actor cell;
+- dung `SYSTEM_OWNERS` khi tai lieu dang noi toi nhom so huu lop nen he thong va can rut gon actor cell.
 
 Khong duoc viet nua mua:
 - `IT chu du lieu`
