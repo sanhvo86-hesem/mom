@@ -9338,27 +9338,48 @@ function git_status_entry_path(string $line): string {
   return str_replace('\\', '/', $raw);
 }
 
-function git_is_runtime_noise_path(string $path): bool {
+function git_qms_data_relative_path(string $path): string {
   $p = ltrim(str_replace('\\', '/', trim($path)), '/');
+  if ($p === '') return '';
+  $marker = 'qms-data/';
+  $pos = strpos($p, $marker);
+  if ($pos !== false) {
+    return substr($p, $pos);
+  }
+  return $p;
+}
+
+function git_qms_data_path_variants(string $suffix): array {
+  $clean = ltrim(str_replace('\\', '/', trim($suffix)), '/');
+  if ($clean === '') return [];
+  return array_values(array_unique([
+    $clean,
+    '01-QMS-Portal/' . $clean,
+    '1-QMS-Portal/' . $clean,
+  ]));
+}
+
+function git_is_runtime_noise_path(string $path): bool {
+  $p = git_qms_data_relative_path($path);
   if ($p === '') return false;
-  if ($p === '01-QMS-Portal/qms-data/config/users.json') return true;
-  if ($p === '01-QMS-Portal/qms-data/php_error.log') return true;
-  if ($p === '01-QMS-Portal/qms-data/scan_cache.json') return true;
-  if (str_starts_with($p, '01-QMS-Portal/qms-data/sessions/')) {
+  if ($p === 'qms-data/config/users.json') return true;
+  if ($p === 'qms-data/php_error.log') return true;
+  if ($p === 'qms-data/scan_cache.json') return true;
+  if (str_starts_with($p, 'qms-data/sessions/')) {
     return basename($p) !== 'README.md';
   }
-  if (str_starts_with($p, '01-QMS-Portal/qms-data/ratelimit/')) {
+  if (str_starts_with($p, 'qms-data/ratelimit/')) {
     return basename($p) !== 'README.md';
   }
-  if (str_starts_with($p, '01-QMS-Portal/qms-data/form-workflow/')) return true;
+  if (str_starts_with($p, 'qms-data/form-workflow/')) return true;
   return false;
 }
 
 function git_is_presync_telemetry_path(string $path): bool {
-  $p = ltrim(str_replace('\\', '/', trim($path)), '/');
+  $p = git_qms_data_relative_path($path);
   if ($p === '') return false;
-  if (str_starts_with($p, '01-QMS-Portal/qms-data/runtime-shadow/')) return true;
-  return (bool)preg_match('#^01-QMS-Portal/qms-data/audit/audit_\d{4}-\d{2}\.jsonl$#', $p);
+  if (str_starts_with($p, 'qms-data/runtime-shadow/')) return true;
+  return (bool)preg_match('#^qms-data/audit/audit_\d{4}-\d{2}\.jsonl$#', $p);
 }
 
 function git_filter_non_runtime_status_lines(array $statusLines, bool $excludePresyncTelemetry = false): array {
@@ -9475,20 +9496,24 @@ function git_cleanup_runtime_noise(string $repoReal): void {
 
   // Clean untracked runtime files/dirs in known noisy locations.
   $cleanTargets = [
-    '01-QMS-Portal/qms-data/form-workflow',
-    '01-QMS-Portal/qms-data/sessions',
-    '01-QMS-Portal/qms-data/ratelimit',
-    '01-QMS-Portal/qms-data/php_error.log',
-    '01-QMS-Portal/qms-data/scan_cache.json',
+    'qms-data/form-workflow',
+    'qms-data/sessions',
+    'qms-data/ratelimit',
+    'qms-data/php_error.log',
+    'qms-data/scan_cache.json',
   ];
   foreach ($cleanTargets as $target) {
-    $cleanCode = 0;
-    git_command(['clean', '-fd', '--', $target], $repoReal, $cleanCode);
+    foreach (git_qms_data_path_variants($target) as $variant) {
+      $cleanCode = 0;
+      git_command(['clean', '-fd', '--', $variant], $repoReal, $cleanCode);
+    }
   }
 
   // Ensure tracked runtime file returns to HEAD state.
-  $usersRestoreCode = 0;
-  git_command(['restore', '--', '01-QMS-Portal/qms-data/config/users.json'], $repoReal, $usersRestoreCode);
+  foreach (git_qms_data_path_variants('qms-data/config/users.json') as $variant) {
+    $usersRestoreCode = 0;
+    git_command(['restore', '--', $variant], $repoReal, $usersRestoreCode);
+  }
 }
 
 function git_unstage_paths(string $repoReal, array $paths): void {
