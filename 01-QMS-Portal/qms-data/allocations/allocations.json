@@ -3,7 +3,7 @@
         "version": "1.0",
         "created": "2026-03-29",
         "description": "Form allocation tracking log",
-        "updated_at": "2026-03-30T09:53:48+00:00"
+        "updated_at": "2026-03-30T10:19:55+00:00"
     },
     "allocations": [
         {
@@ -186,6 +186,53 @@
                 {
                     "action": "status_change",
                     "at": "2026-03-30T09:53:48+00:00",
+                    "by": "sanh.vo",
+                    "note": "record_id_allocated",
+                    "meta": {
+                        "status": "allocated"
+                    }
+                }
+            ]
+        },
+        {
+            "allocation_id": "0500dcf6-fe11-4446-85ff-ddbb7e618422",
+            "record_id": "ECR-2026-001",
+            "record_type": "ECR",
+            "department": "ENG",
+            "year": "2026",
+            "seq": 1,
+            "form_code": "FRM-161",
+            "form_revision": "V1",
+            "delivery_mode": "online",
+            "status": "allocated",
+            "priority": "normal",
+            "notes": "",
+            "master_context": [],
+            "linked_order_id": "",
+            "blank_form_path": "",
+            "blank_form_filename": "",
+            "template_checksum": "",
+            "expected_filename_pattern": "^FRM\\-161_V1_ECR\\-2026\\-001_\\d{8}_\\d{4}-[A-Z0-9]{2,6}\\.pdf$",
+            "receipt_version": 0,
+            "receipts": [],
+            "history": [
+                {
+                    "status": "allocated",
+                    "at": "2026-03-30T10:19:55+00:00",
+                    "by": "sanh.vo",
+                    "note": "record_id_allocated",
+                    "meta": []
+                }
+            ],
+            "created_at": "2026-03-30T10:19:55+00:00",
+            "created_by": "sanh.vo",
+            "updated_at": "2026-03-30T10:19:55+00:00",
+            "updated_by": "sanh.vo",
+            "suggested_filename": "FRM-161_V1_ECR-2026-001_20260330_1719-SV.pdf",
+            "events": [
+                {
+                    "action": "status_change",
+                    "at": "2026-03-30T10:19:55+00:00",
                     "by": "sanh.vo",
                     "note": "record_id_allocated",
                     "meta": {
