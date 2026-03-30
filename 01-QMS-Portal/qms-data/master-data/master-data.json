@@ -144,6 +144,11 @@
       "cam_source_rev": "CAM-7141101-OP10-R7",
       "post_processor_rev": "PP-MAKINO-5AX-R3",
       "checksum": "sha256:7ad4e091c6f8",
+      "package_id": "PKG-7141101-OP10-V3",
+      "controller_program_name": "O7141101V3",
+      "release_manifest_version": "RM-3.2",
+      "approved_machine_ids": "MC-5AX-01",
+      "download_required_before_run": "yes",
       "status": "released",
       "released_at": "2026-03-29T07:40:00+07:00",
       "released_by": "eng.manager",
@@ -160,6 +165,11 @@
       "cam_source_rev": "CAM-P1001-OP10-R4",
       "post_processor_rev": "PP-BROTHER-3AX-R2",
       "checksum": "sha256:58bc101a0f2e",
+      "package_id": "PKG-P1001-OP10-V2",
+      "controller_program_name": "P1001C-OP10-V2",
+      "release_manifest_version": "RM-2.8",
+      "approved_machine_ids": "MC-3AX-04",
+      "download_required_before_run": "yes",
       "status": "draft",
       "released_at": "",
       "released_by": "",
@@ -176,6 +186,11 @@
       "cam_source_rev": "CMM-7141101-FAI-R2",
       "post_processor_rev": "MITUTOYO-CMM-R1",
       "checksum": "sha256:4ef0b1f90c44",
+      "package_id": "PKG-7141101-FAI-V2",
+      "controller_program_name": "CMM-7141101-FAI-V2",
+      "release_manifest_version": "RM-1.9",
+      "approved_machine_ids": "CMM-01",
+      "download_required_before_run": "yes",
       "status": "released",
       "released_at": "2026-03-28T16:10:00+07:00",
       "released_by": "qe.lead",
@@ -527,6 +542,161 @@
       "resolution_name": "Program reloaded and verified",
       "resolution_name_vi": "Đã nạp lại chương trình và xác nhận",
       "resolution_group": "program",
+      "status": "active"
+    }
+  ],
+  "mes_connectivity_adapters": [
+    {
+      "adapter_id": "ADP-MC-5AX-01-MTC",
+      "machine_id": "MC-5AX-01",
+      "adapter_name": "Makino MTConnect Adapter",
+      "adapter_type": "mtconnect",
+      "transport_protocol": "https",
+      "endpoint_url": "https://mes.hesem.local/mtconnect/mc-5ax-01/current",
+      "heartbeat_sla_seconds": 90,
+      "stale_after_seconds": 150,
+      "auth_mode": "service_account",
+      "store_and_forward_enabled": true,
+      "payload_schema_version": "1.3",
+      "status": "active",
+      "last_validated_at": "2026-03-30T07:10:00+07:00"
+    },
+    {
+      "adapter_id": "ADP-MC-3AX-04-OPCUA",
+      "machine_id": "MC-3AX-04",
+      "adapter_name": "Brother OPC UA Bridge",
+      "adapter_type": "opcua",
+      "transport_protocol": "opc.tcp",
+      "endpoint_url": "opc.tcp://192.168.10.44:4840",
+      "heartbeat_sla_seconds": 120,
+      "stale_after_seconds": 180,
+      "auth_mode": "certificate",
+      "store_and_forward_enabled": true,
+      "payload_schema_version": "1.0",
+      "status": "active",
+      "last_validated_at": "2026-03-29T18:20:00+07:00"
+    },
+    {
+      "adapter_id": "ADP-CMM-01-MANUAL",
+      "machine_id": "CMM-01",
+      "adapter_name": "CMM Manual Bridge",
+      "adapter_type": "manual_bridge",
+      "transport_protocol": "manual",
+      "endpoint_url": "manual://cmm-01",
+      "heartbeat_sla_seconds": 180,
+      "stale_after_seconds": 240,
+      "auth_mode": "session_user",
+      "store_and_forward_enabled": false,
+      "payload_schema_version": "1.0",
+      "status": "active",
+      "last_validated_at": "2026-03-29T13:05:00+07:00"
+    }
+  ],
+  "mes_alarm_catalog": [
+    {
+      "alarm_code": "SPINDLE_OVERLOAD",
+      "controller_family": "makino-pro",
+      "alarm_group": "spindle",
+      "title": "Spindle overload",
+      "title_vi": "Quá tải trục chính",
+      "severity_default": "CRITICAL",
+      "downtime_category_default": "breakdown",
+      "response_owner_role": "maintenance_manager",
+      "response_target_minutes": 10,
+      "requires_lockout": true,
+      "requires_maintenance": true,
+      "status": "active"
+    },
+    {
+      "alarm_code": "AXIS_SERVO_FAULT",
+      "controller_family": "brother-cnc-c00",
+      "alarm_group": "axis",
+      "title": "Axis servo fault",
+      "title_vi": "Lỗi servo trục",
+      "severity_default": "ALARM",
+      "downtime_category_default": "breakdown",
+      "response_owner_role": "maintenance_technician",
+      "response_target_minutes": 15,
+      "requires_lockout": false,
+      "requires_maintenance": true,
+      "status": "active"
+    },
+    {
+      "alarm_code": "PROBE_CAL_WARN",
+      "controller_family": "mitutoyo-cmm",
+      "alarm_group": "metrology",
+      "title": "Probe calibration warning",
+      "title_vi": "Cảnh báo hiệu chuẩn đầu dò",
+      "severity_default": "WARNING",
+      "downtime_category_default": "quality_hold",
+      "response_owner_role": "qa_manager",
+      "response_target_minutes": 20,
+      "requires_lockout": false,
+      "requires_maintenance": false,
+      "status": "active"
+    }
+  ],
+  "mes_alarm_playbooks": [
+    {
+      "playbook_id": "PB-SPINDLE-001",
+      "alarm_code": "SPINDLE_OVERLOAD",
+      "title": "Spindle overload response",
+      "title_vi": "Ứng phó quá tải trục chính",
+      "response_steps": [
+        "Pause work order immediately.",
+        "Apply LOTO if spindle cannot be reset safely.",
+        "Check tooling, holder balance, and spindle alarm history.",
+        "Escalate to maintenance manager if not cleared within 10 minutes."
+      ],
+      "escalation_role": "maintenance_manager",
+      "response_target_minutes": 10,
+      "status": "active"
+    },
+    {
+      "playbook_id": "PB-AXIS-001",
+      "alarm_code": "AXIS_SERVO_FAULT",
+      "title": "Axis servo fault response",
+      "title_vi": "Ứng phó lỗi servo trục",
+      "response_steps": [
+        "Hold the machine and secure the part.",
+        "Capture axis alarm code and active program state.",
+        "Check mechanical obstruction and lubrication status.",
+        "Re-home only after maintenance confirmation."
+      ],
+      "escalation_role": "maintenance_technician",
+      "response_target_minutes": 15,
+      "status": "active"
+    },
+    {
+      "playbook_id": "PB-PROBE-001",
+      "alarm_code": "PROBE_CAL_WARN",
+      "title": "Probe warning response",
+      "title_vi": "Ứng phó cảnh báo đầu dò",
+      "response_steps": [
+        "Stop measurement release for the affected WO.",
+        "Run probe health verification and check calibration due date.",
+        "Notify QA manager before resuming FAI or final inspection."
+      ],
+      "escalation_role": "qa_manager",
+      "response_target_minutes": 20,
+      "status": "active"
+    }
+  ],
+  "tool_assemblies": [
+    {
+      "assembly_id": "ASM-5AX-ROUGH-001",
+      "parent_tool_id": "TL-HLD-5AX-021",
+      "component_tool_id": "TL-EM12-5AX-001",
+      "component_role": "cutter",
+      "quantity_required": 1,
+      "status": "active"
+    },
+    {
+      "assembly_id": "ASM-QA-PROBE-001",
+      "parent_tool_id": "TL-PRB-CMM-001",
+      "component_tool_id": "TL-PRB-CMM-001",
+      "component_role": "probe",
+      "quantity_required": 1,
       "status": "active"
     }
   ]

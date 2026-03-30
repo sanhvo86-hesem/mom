@@ -31,6 +31,11 @@ final class RuntimeShadowSync
             $this->syncTools((array)($store['tooling_assets'] ?? []));
             $this->syncCapaRegistry((array)($store['capas'] ?? []));
             $this->syncEmployees((array)($store['operators'] ?? []));
+            $this->syncNcReleasePackages((array)($store['nc_program_releases'] ?? []));
+            $this->syncConnectivityAdapters((array)($store['mes_connectivity_adapters'] ?? []));
+            $this->syncAlarmCatalog((array)($store['mes_alarm_catalog'] ?? []));
+            $this->syncAlarmPlaybooks((array)($store['mes_alarm_playbooks'] ?? []));
+            $this->syncToolAssemblies((array)($store['tool_assemblies'] ?? []));
             $this->syncVariableMirror('runtime_nc_program_release', (array)($store['nc_program_releases'] ?? []), 'program_id', 'release_title');
             $this->syncVariableMirror('runtime_downtime_reason', (array)($store['downtime_reason_codes'] ?? []), 'reason_code', 'reason_name');
             $this->syncVariableMirror('runtime_downtime_resolution', (array)($store['downtime_resolution_codes'] ?? []), 'resolution_code', 'resolution_name');
@@ -56,6 +61,10 @@ final class RuntimeShadowSync
                 (array)($store['machine_signals'] ?? []),
                 (array)($master['machines'] ?? [])
             );
+            $this->syncConnectivityEvents((array)($store['mes_connectivity_events'] ?? []));
+            $this->syncMachineAlarmRuntime((array)($store['machine_alarm_events'] ?? []));
+            $this->syncNcDownloadReceipts((array)($store['nc_download_receipts'] ?? []));
+            $this->syncToolPresetOffsets((array)($store['mes_tool_preset_offsets'] ?? []));
             $this->syncProgressReports((array)($store['progress_reports'] ?? []), (array)($orders['work_orders'] ?? []));
             $this->syncDowntimeEvents((array)($store['downtime_events'] ?? []));
             $this->syncMaintenanceRequests((array)($store['maintenance_requests'] ?? []));
@@ -316,6 +325,147 @@ final class RuntimeShadowSync
                 'metadata' => $row,
                 'updated_at' => $this->parseTimestamp((string)($row['updated_at'] ?? '')) ?? date(DATE_ATOM),
             ], ['employee_id'], ['metadata']);
+        }
+    }
+
+    private function syncNcReleasePackages(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $programId = trim((string)($row['program_id'] ?? ''));
+            if ($programId === '') {
+                continue;
+            }
+            $packageId = trim((string)($row['package_id'] ?? $programId));
+            $this->upsert('mes_nc_release_packages', [
+                'package_id' => $packageId,
+                'program_id' => $programId,
+                'item_id' => trim((string)($row['part_number'] ?? '')) ?: null,
+                'revision_code' => trim((string)($row['part_revision'] ?? '')) ?: null,
+                'operation_seq' => isset($row['operation_number']) ? (int)$row['operation_number'] : null,
+                'machine_family' => trim((string)($row['machine_type'] ?? '')) ?: null,
+                'work_center_id' => trim((string)($row['work_center_id'] ?? '')) ?: null,
+                'controller_program_name' => trim((string)($row['controller_program_name'] ?? $programId)) ?: null,
+                'checksum_sha256' => trim((string)($row['checksum_sha256'] ?? $row['checksum'] ?? '')) ?: null,
+                'release_manifest_version' => trim((string)($row['release_manifest_version'] ?? '')) ?: null,
+                'released_by' => trim((string)($row['released_by'] ?? '')) ?: null,
+                'released_at' => $this->parseTimestamp((string)($row['released_at'] ?? '')),
+                'package_status' => strtolower(trim((string)($row['status'] ?? 'draft'))),
+                'metadata' => $row,
+                'updated_at' => $this->parseTimestamp((string)($row['updated_at'] ?? '')) ?? date(DATE_ATOM),
+            ], ['package_id'], ['metadata']);
+        }
+    }
+
+    private function syncConnectivityAdapters(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $adapterId = trim((string)($row['adapter_id'] ?? ''));
+            if ($adapterId === '') {
+                continue;
+            }
+            $this->upsert('mes_connectivity_adapters', [
+                'adapter_id' => $adapterId,
+                'equipment_id' => trim((string)($row['machine_id'] ?? '')) ?: null,
+                'adapter_name' => trim((string)($row['adapter_name'] ?? $adapterId)),
+                'adapter_type' => strtolower(trim((string)($row['adapter_type'] ?? 'manual_bridge'))),
+                'transport_protocol' => strtolower(trim((string)($row['transport_protocol'] ?? 'manual'))),
+                'endpoint_url' => trim((string)($row['endpoint_url'] ?? '')) ?: null,
+                'heartbeat_sla_seconds' => max(30, (int)($row['heartbeat_sla_seconds'] ?? 120)),
+                'stale_after_seconds' => max(30, (int)($row['stale_after_seconds'] ?? $row['heartbeat_sla_seconds'] ?? 180)),
+                'auth_mode' => trim((string)($row['auth_mode'] ?? 'service_account')) ?: null,
+                'store_and_forward_enabled' => $this->safeBool($row['store_and_forward_enabled'] ?? true),
+                'payload_schema_version' => trim((string)($row['payload_schema_version'] ?? '1.0')) ?: null,
+                'adapter_status' => strtolower(trim((string)($row['status'] ?? 'active'))),
+                'last_validated_at' => $this->parseTimestamp((string)($row['last_validated_at'] ?? '')),
+                'metadata' => $row,
+                'updated_at' => $this->parseTimestamp((string)($row['updated_at'] ?? '')) ?? date(DATE_ATOM),
+            ], ['adapter_id'], ['metadata']);
+        }
+    }
+
+    private function syncAlarmCatalog(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $alarmCode = trim((string)($row['alarm_code'] ?? ''));
+            if ($alarmCode === '') {
+                continue;
+            }
+            $this->upsert('mes_alarm_catalog', [
+                'alarm_code' => $alarmCode,
+                'controller_family' => trim((string)($row['controller_family'] ?? 'generic')) ?: 'generic',
+                'alarm_group' => trim((string)($row['alarm_group'] ?? 'general')) ?: null,
+                'alarm_title' => trim((string)($row['title'] ?? $alarmCode)),
+                'alarm_title_vi' => trim((string)($row['title_vi'] ?? '')) ?: null,
+                'default_severity' => strtoupper(trim((string)($row['severity_default'] ?? 'ALARM'))),
+                'downtime_category_default' => trim((string)($row['downtime_category_default'] ?? '')) ?: null,
+                'response_owner_role' => trim((string)($row['response_owner_role'] ?? '')) ?: null,
+                'response_target_minutes' => isset($row['response_target_minutes']) ? (int)$row['response_target_minutes'] : null,
+                'requires_lockout' => $this->safeBool($row['requires_lockout'] ?? false),
+                'requires_maintenance' => $this->safeBool($row['requires_maintenance'] ?? true),
+                'catalog_status' => strtolower(trim((string)($row['status'] ?? 'active'))),
+                'metadata' => $row,
+                'updated_at' => $this->parseTimestamp((string)($row['updated_at'] ?? '')) ?? date(DATE_ATOM),
+            ], ['alarm_code'], ['metadata']);
+        }
+    }
+
+    private function syncAlarmPlaybooks(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $playbookId = trim((string)($row['playbook_id'] ?? ''));
+            if ($playbookId === '') {
+                continue;
+            }
+            $steps = is_array($row['response_steps'] ?? null) ? array_values($row['response_steps']) : [];
+            $this->upsert('mes_alarm_playbooks', [
+                'playbook_id' => $playbookId,
+                'alarm_code' => trim((string)($row['alarm_code'] ?? '')) ?: null,
+                'playbook_title' => trim((string)($row['title'] ?? $playbookId)),
+                'playbook_title_vi' => trim((string)($row['title_vi'] ?? '')) ?: null,
+                'response_steps' => $steps,
+                'escalation_role' => trim((string)($row['escalation_role'] ?? '')) ?: null,
+                'response_target_minutes' => isset($row['response_target_minutes']) ? (int)$row['response_target_minutes'] : null,
+                'playbook_status' => strtolower(trim((string)($row['status'] ?? 'active'))),
+                'metadata' => $row,
+                'updated_at' => $this->parseTimestamp((string)($row['updated_at'] ?? '')) ?? date(DATE_ATOM),
+            ], ['playbook_id'], ['response_steps', 'metadata']);
+        }
+    }
+
+    private function syncToolAssemblies(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $assemblyId = trim((string)($row['assembly_id'] ?? ''));
+            if ($assemblyId === '') {
+                continue;
+            }
+            $this->upsert('mes_tool_assemblies', [
+                'assembly_id' => $assemblyId,
+                'parent_tool_id' => trim((string)($row['parent_tool_id'] ?? '')) ?: null,
+                'component_tool_id' => trim((string)($row['component_tool_id'] ?? '')) ?: null,
+                'component_role' => trim((string)($row['component_role'] ?? 'component')) ?: 'component',
+                'quantity_required' => isset($row['quantity_required']) ? (float)$row['quantity_required'] : 1,
+                'effective_from' => $this->parseTimestamp((string)($row['effective_from'] ?? '')) ?? date(DATE_ATOM),
+                'effective_to' => $this->parseTimestamp((string)($row['effective_to'] ?? '')),
+                'assembly_status' => strtolower(trim((string)($row['status'] ?? 'active'))),
+                'metadata' => $row,
+                'updated_at' => $this->parseTimestamp((string)($row['updated_at'] ?? '')) ?? date(DATE_ATOM),
+            ], ['assembly_id'], ['metadata']);
         }
     }
 
@@ -704,6 +854,123 @@ final class RuntimeShadowSync
         }
     }
 
+    private function syncConnectivityEvents(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $eventId = trim((string)($row['adapter_event_id'] ?? ''));
+            if ($eventId === '') {
+                continue;
+            }
+            $this->upsert('mes_connectivity_events', [
+                'adapter_event_id' => $eventId,
+                'adapter_id' => trim((string)($row['adapter_id'] ?? '')) ?: null,
+                'equipment_id' => trim((string)($row['machine_id'] ?? '')) ?: null,
+                'event_time' => $this->parseTimestamp((string)($row['event_time'] ?? '')) ?? date(DATE_ATOM),
+                'event_type' => trim((string)($row['event_type'] ?? 'heartbeat')) ?: 'heartbeat',
+                'severity' => strtoupper(trim((string)($row['severity'] ?? 'WARNING'))),
+                'event_status' => strtolower(trim((string)($row['status'] ?? 'open'))),
+                'message' => trim((string)($row['message'] ?? '')),
+                'payload_excerpt' => is_array($row['payload_excerpt'] ?? null) ? $row['payload_excerpt'] : [],
+                'acknowledged_by' => trim((string)($row['acknowledged_by'] ?? '')) ?: null,
+                'acknowledged_at' => $this->parseTimestamp((string)($row['acknowledged_at'] ?? '')),
+                'metadata' => $row,
+                'recorded_by' => trim((string)($row['recorded_by'] ?? '')) ?: null,
+                'recorded_at' => $this->parseTimestamp((string)($row['recorded_at'] ?? '')) ?? date(DATE_ATOM),
+            ], ['adapter_event_id'], ['payload_excerpt', 'metadata']);
+        }
+    }
+
+    private function syncMachineAlarmRuntime(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $alarmTime = $this->parseTimestamp((string)($row['alarm_time'] ?? ''));
+            $equipmentId = trim((string)($row['machine_id'] ?? ''));
+            $alarmCode = trim((string)($row['alarm_code'] ?? ''));
+            if ($alarmTime === null || $equipmentId === '' || $alarmCode === '') {
+                continue;
+            }
+            $this->upsert('mes_machine_alarms', [
+                'alarm_time' => $alarmTime,
+                'equipment_id' => $equipmentId,
+                'alarm_code' => $alarmCode,
+                'alarm_text' => trim((string)($row['alarm_text'] ?? '')) ?: null,
+                'alarm_severity' => strtoupper(trim((string)($row['severity'] ?? 'ALARM'))),
+                'alarm_group' => trim((string)($row['alarm_group'] ?? '')) ?: null,
+                'is_active' => $this->safeBool($row['active_flag'] ?? true),
+                'is_acknowledged' => trim((string)($row['acknowledged_by'] ?? '')) !== '',
+                'acknowledged_by' => trim((string)($row['acknowledged_by'] ?? '')) ?: null,
+                'acknowledged_at' => $this->parseTimestamp((string)($row['acknowledged_at'] ?? '')),
+                'related_job_number' => trim((string)($row['wo_number'] ?? '')) ?: null,
+                'metadata' => $row,
+            ], ['alarm_time', 'equipment_id', 'alarm_code'], ['metadata']);
+        }
+    }
+
+    private function syncNcDownloadReceipts(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $receiptId = trim((string)($row['receipt_id'] ?? ''));
+            if ($receiptId === '') {
+                continue;
+            }
+            $this->upsert('mes_nc_download_receipts', [
+                'receipt_id' => $receiptId,
+                'package_id' => trim((string)($row['package_id'] ?? $row['program_id'] ?? '')) ?: null,
+                'program_id' => trim((string)($row['program_id'] ?? '')) ?: null,
+                'equipment_id' => trim((string)($row['machine_id'] ?? '')) ?: null,
+                'work_order_number' => trim((string)($row['wo_number'] ?? '')) ?: null,
+                'downloaded_at' => $this->parseTimestamp((string)($row['downloaded_at'] ?? '')) ?? date(DATE_ATOM),
+                'controller_program_name' => trim((string)($row['controller_program_name'] ?? '')) ?: null,
+                'controller_checksum' => trim((string)($row['controller_checksum'] ?? '')) ?: null,
+                'expected_checksum' => trim((string)($row['expected_checksum'] ?? '')) ?: null,
+                'verified_match' => $this->safeBool($row['verified_match'] ?? false),
+                'receipt_status' => strtolower(trim((string)($row['receipt_status'] ?? 'pending'))),
+                'acknowledged_by' => trim((string)($row['acknowledged_by'] ?? '')) ?: null,
+                'metadata' => $row,
+                'updated_at' => $this->parseTimestamp((string)($row['updated_at'] ?? '')) ?? date(DATE_ATOM),
+            ], ['receipt_id'], ['metadata']);
+        }
+    }
+
+    private function syncToolPresetOffsets(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $presetId = trim((string)($row['preset_id'] ?? ''));
+            if ($presetId === '') {
+                continue;
+            }
+            $this->upsert('mes_tool_preset_offsets', [
+                'preset_id' => $presetId,
+                'tool_id' => trim((string)($row['tool_id'] ?? '')) ?: null,
+                'equipment_id' => trim((string)($row['machine_id'] ?? '')) ?: null,
+                'work_order_number' => trim((string)($row['wo_number'] ?? '')) ?: null,
+                'offset_number' => trim((string)($row['offset_number'] ?? '')) ?: null,
+                'preset_length_mm' => isset($row['preset_length_mm']) ? (float)$row['preset_length_mm'] : null,
+                'preset_diameter_mm' => isset($row['preset_diameter_mm']) ? (float)$row['preset_diameter_mm'] : null,
+                'wear_offset_mm' => isset($row['wear_offset_mm']) ? (float)$row['wear_offset_mm'] : null,
+                'offset_drift_mm' => isset($row['offset_drift_mm']) ? (float)$row['offset_drift_mm'] : null,
+                'measurement_source' => trim((string)($row['measurement_source'] ?? 'presetter')) ?: 'presetter',
+                'measured_at' => $this->parseTimestamp((string)($row['measured_at'] ?? '')) ?? date(DATE_ATOM),
+                'measured_by' => trim((string)($row['measured_by'] ?? '')) ?: null,
+                'verified_status' => strtolower(trim((string)($row['verified_status'] ?? 'verified'))),
+                'metadata' => $row,
+                'updated_at' => $this->parseTimestamp((string)($row['updated_at'] ?? '')) ?? date(DATE_ATOM),
+            ], ['preset_id'], ['metadata']);
+        }
+    }
+
     private function syncVariableMirror(string $category, array $rows, string $keyField, string $labelField): void
     {
         foreach ($rows as $row) {
@@ -909,6 +1176,11 @@ final class RuntimeShadowSync
             return false;
         }
         return $default;
+    }
+
+    private function safeBool(mixed $value, bool $default = false): bool
+    {
+        return $this->boolish($value, $default);
     }
 
     private function safeArray(mixed $value): array

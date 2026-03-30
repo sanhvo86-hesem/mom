@@ -265,5 +265,155 @@
       "updated_at": "2026-03-29T13:05:00+07:00",
       "updated_by": "qa.manager"
     }
+  ],
+  "mes_connectivity_events": [
+    {
+      "adapter_event_id": "ADP-EVT-202603301500-01",
+      "adapter_id": "ADP-MC-3AX-04-OPCUA",
+      "machine_id": "MC-3AX-04",
+      "event_time": "2026-03-30T15:00:00+07:00",
+      "event_type": "heartbeat_stale",
+      "severity": "WARNING",
+      "status": "open",
+      "message": "OPC UA adapter heartbeat exceeded stale threshold for MC-3AX-04.",
+      "payload_excerpt": {
+        "last_heartbeat_at": "2026-03-30T14:56:00+07:00",
+        "stale_after_seconds": 180
+      },
+      "recorded_by": "system",
+      "recorded_at": "2026-03-30T15:00:00+07:00"
+    },
+    {
+      "adapter_event_id": "ADP-EVT-202603301505-02",
+      "adapter_id": "ADP-MC-5AX-01-MTC",
+      "machine_id": "MC-5AX-01",
+      "event_time": "2026-03-30T15:05:00+07:00",
+      "event_type": "ingest_ok",
+      "severity": "INFO",
+      "status": "closed",
+      "message": "MTConnect payload ingested successfully for MC-5AX-01.",
+      "payload_excerpt": {
+        "program_id": "NC_714-1101_REVC_OP10_5AX_V3"
+      },
+      "recorded_by": "system",
+      "recorded_at": "2026-03-30T15:05:00+07:00"
+    }
+  ],
+  "machine_alarm_events": [
+    {
+      "alarm_event_id": "ALM-EVT-202603301420-01",
+      "machine_id": "MC-3AX-04",
+      "machine_name": "Brother S700X2",
+      "work_center_id": "WC-3AX",
+      "wo_number": "WO-2026-00003",
+      "alarm_code": "AXIS_SERVO_FAULT",
+      "alarm_text": "Axis servo fault on Y-axis",
+      "controller_family": "brother-cnc-c00",
+      "alarm_group": "axis",
+      "severity": "ALARM",
+      "requires_lockout": false,
+      "requires_maintenance": true,
+      "playbook_id": "PB-AXIS-001",
+      "active_flag": true,
+      "acknowledged_by": "",
+      "alarm_time": "2026-03-30T14:20:00+07:00",
+      "updated_at": "2026-03-30T14:20:00+07:00",
+      "updated_by": "system"
+    }
+  ],
+  "nc_download_receipts": [
+    {
+      "receipt_id": "NCDL-202603301310-01",
+      "program_id": "NC_714-1101_REVC_OP10_5AX_V3",
+      "package_id": "PKG-7141101-OP10-V3",
+      "machine_id": "MC-5AX-01",
+      "machine_name": "Makino DA300",
+      "wo_number": "WO-2026-00001",
+      "downloaded_at": "2026-03-30T13:10:00+07:00",
+      "controller_program_name": "O7141101V3",
+      "controller_checksum": "sha256:7ad4e091c6f8",
+      "expected_checksum": "sha256:7ad4e091c6f8",
+      "verified_match": true,
+      "receipt_status": "verified",
+      "acknowledged_by": "setup.tech",
+      "updated_at": "2026-03-30T13:10:00+07:00",
+      "updated_by": "setup.tech"
+    },
+    {
+      "receipt_id": "NCDL-202603301315-02",
+      "program_id": "NC_P-1001_REVC_OP10_3AX_V2",
+      "package_id": "PKG-P1001-OP10-V2",
+      "machine_id": "MC-3AX-04",
+      "machine_name": "Brother S700X2",
+      "wo_number": "WO-2026-00003",
+      "downloaded_at": "2026-03-30T13:15:00+07:00",
+      "controller_program_name": "P1001C-OP10-V1",
+      "controller_checksum": "sha256:legacy-v1",
+      "expected_checksum": "sha256:58bc101a0f2e",
+      "verified_match": false,
+      "receipt_status": "mismatch",
+      "acknowledged_by": "shift.leader",
+      "updated_at": "2026-03-30T13:15:00+07:00",
+      "updated_by": "shift.leader"
+    }
+  ],
+  "mes_tool_preset_offsets": [
+    {
+      "preset_id": "TOP-202603300740-01",
+      "tool_id": "TL-EM12-5AX-001",
+      "tool_name": "Endmill Carbide Ø12 ALTiN",
+      "machine_id": "MC-5AX-01",
+      "machine_name": "Makino DA300",
+      "wo_number": "WO-2026-00001",
+      "offset_number": "H12/D12",
+      "preset_length_mm": 156.248,
+      "preset_diameter_mm": 11.998,
+      "wear_offset_mm": 0.004,
+      "offset_drift_mm": 0.006,
+      "measurement_source": "presetter",
+      "measured_at": "2026-03-30T07:40:00+07:00",
+      "measured_by": "setup.tech",
+      "verified_status": "verified",
+      "updated_at": "2026-03-30T07:40:00+07:00",
+      "updated_by": "setup.tech"
+    },
+    {
+      "preset_id": "TOP-202603301025-02",
+      "tool_id": "TL-DR06-3AX-014",
+      "tool_name": "Through Coolant Drill Ø6",
+      "machine_id": "MC-3AX-04",
+      "machine_name": "Brother S700X2",
+      "wo_number": "WO-2026-00003",
+      "offset_number": "H06/D06",
+      "preset_length_mm": 132.102,
+      "preset_diameter_mm": 6.002,
+      "wear_offset_mm": 0.018,
+      "offset_drift_mm": 0.021,
+      "measurement_source": "machine_probe",
+      "measured_at": "2026-03-30T10:25:00+07:00",
+      "measured_by": "shift.leader",
+      "verified_status": "adjustment_required",
+      "updated_at": "2026-03-30T10:25:00+07:00",
+      "updated_by": "shift.leader"
+    },
+    {
+      "preset_id": "TOP-202603301240-03",
+      "tool_id": "TL-PRB-CMM-001",
+      "tool_name": "CMM Probe Stylus Set",
+      "machine_id": "CMM-01",
+      "machine_name": "Mitutoyo Crysta-Apex",
+      "wo_number": "WO-2026-00002",
+      "offset_number": "PRB-A",
+      "preset_length_mm": 82.440,
+      "preset_diameter_mm": 1.998,
+      "wear_offset_mm": 0.000,
+      "offset_drift_mm": 0.001,
+      "measurement_source": "manual_bridge",
+      "measured_at": "2026-03-30T12:40:00+07:00",
+      "measured_by": "qa.manager",
+      "verified_status": "verified",
+      "updated_at": "2026-03-30T12:40:00+07:00",
+      "updated_by": "qa.manager"
+    }
   ]
 }

@@ -65,6 +65,10 @@ final class MasterDataService
         'tooling_assets'            => 'tool_id',
         'downtime_reason_codes'     => 'reason_code',
         'downtime_resolution_codes' => 'resolution_code',
+        'mes_connectivity_adapters' => 'adapter_id',
+        'mes_alarm_catalog'         => 'alarm_code',
+        'mes_alarm_playbooks'       => 'playbook_id',
+        'tool_assemblies'           => 'assembly_id',
     ];
 
     /**
@@ -83,6 +87,10 @@ final class MasterDataService
         'tooling_assets'            => 'tool_id',
         'downtime_reason_codes'     => 'reason_code',
         'downtime_resolution_codes' => 'resolution_code',
+        'mes_connectivity_adapters' => 'adapter_id',
+        'mes_alarm_catalog'         => 'alarm_code',
+        'mes_alarm_playbooks'       => 'playbook_id',
+        'tool_assemblies'           => 'assembly_id',
     ];
 
     /**
@@ -102,6 +110,10 @@ final class MasterDataService
         'tooling_assets'            => ['draft', 'active', 'quarantine', 'retired', 'obsolete'],
         'downtime_reason_codes'     => ['draft', 'active', 'inactive', 'obsolete'],
         'downtime_resolution_codes' => ['draft', 'active', 'inactive', 'obsolete'],
+        'mes_connectivity_adapters' => ['draft', 'active', 'inactive', 'blocked', 'obsolete'],
+        'mes_alarm_catalog'         => ['draft', 'active', 'inactive', 'obsolete'],
+        'mes_alarm_playbooks'       => ['draft', 'active', 'inactive', 'obsolete'],
+        'tool_assemblies'           => ['draft', 'active', 'inactive', 'obsolete'],
     ];
 
     /**
@@ -143,6 +155,7 @@ final class MasterDataService
     private readonly string $pendingFile;
     private readonly string $archiveFile;
     private readonly string $ordersDir;
+    private readonly string $mesRuntimeFile;
 
     // ── Construction ────────────────────────────────────────────────────────
 
@@ -158,7 +171,8 @@ final class MasterDataService
         $this->historyFile = $mdDir . '/master-data-history.json';
         $this->pendingFile = $mdDir . '/master-data-pending.json';
         $this->archiveFile = $mdDir . '/master-data-archive.json';
-        $this->ordersDir   = $base . '/orders';
+        $this->ordersDir      = $base . '/orders';
+        $this->mesRuntimeFile = $base . '/mes/mes-runtime.json';
 
         if (!is_dir($mdDir)) {
             @mkdir($mdDir, 0775, true);
@@ -488,6 +502,8 @@ final class MasterDataService
         $refs = [];
 
         $orders = $this->loadOrders();
+        $store = $this->loadStore();
+        $runtime = $this->loadMesRuntime();
 
         switch ($entityType) {
             case 'customers':
@@ -516,11 +532,30 @@ final class MasterDataService
                         ];
                     }
                 }
+                foreach (($store['revisions'] ?? []) as $revision) {
+                    if (!is_array($revision)) continue;
+                    if ((string)($revision['part_number'] ?? '') === $entityId) {
+                        $refs[] = [
+                            'type'  => 'revision',
+                            'id'    => (string)($revision['revision_id'] ?? ''),
+                            'field' => 'part_number',
+                        ];
+                    }
+                }
+                foreach (($store['nc_program_releases'] ?? []) as $release) {
+                    if (!is_array($release)) continue;
+                    if ((string)($release['part_number'] ?? '') === $entityId) {
+                        $refs[] = [
+                            'type'  => 'nc_program_release',
+                            'id'    => (string)($release['program_id'] ?? ''),
+                            'field' => 'part_number',
+                        ];
+                    }
+                }
                 break;
 
             case 'suppliers':
                 // Check parts referencing this supplier
-                $store = $this->loadStore();
                 foreach (($store['parts'] ?? []) as $part) {
                     if (!is_array($part)) continue;
                     if ((string)($part['preferred_supplier_id'] ?? '') === $entityId) {
@@ -528,6 +563,16 @@ final class MasterDataService
                             'type'  => 'part',
                             'id'    => (string)($part['part_number'] ?? ''),
                             'field' => 'preferred_supplier_id',
+                        ];
+                    }
+                }
+                foreach (($store['tooling_assets'] ?? []) as $tool) {
+                    if (!is_array($tool)) continue;
+                    if ((string)($tool['supplier_id'] ?? '') === $entityId) {
+                        $refs[] = [
+                            'type'  => 'tooling_asset',
+                            'id'    => (string)($tool['tool_id'] ?? ''),
+                            'field' => 'supplier_id',
                         ];
                     }
                 }
@@ -542,6 +587,258 @@ final class MasterDataService
                             'type'  => 'job_order',
                             'id'    => (string)($jo['jo_number'] ?? ''),
                             'field' => 'part_revision',
+                        ];
+                    }
+                }
+                break;
+
+            case 'nc_program_releases':
+                foreach (($orders['work_orders'] ?? []) as $wo) {
+                    if (!is_array($wo)) continue;
+                    if ((string)($wo['nc_program_id'] ?? '') === $entityId) {
+                        $refs[] = [
+                            'type'  => 'work_order',
+                            'id'    => (string)($wo['wo_number'] ?? ''),
+                            'field' => 'nc_program_id',
+                        ];
+                    }
+                }
+                foreach (($runtime['nc_download_receipts'] ?? []) as $receipt) {
+                    if (!is_array($receipt)) continue;
+                    if ((string)($receipt['program_id'] ?? '') === $entityId) {
+                        $refs[] = [
+                            'type'  => 'nc_download_receipt',
+                            'id'    => (string)($receipt['receipt_id'] ?? ''),
+                            'field' => 'program_id',
+                        ];
+                    }
+                }
+                break;
+
+            case 'work_centers':
+                foreach (($store['machines'] ?? []) as $machine) {
+                    if (!is_array($machine)) continue;
+                    if ((string)($machine['work_center_id'] ?? '') === $entityId) {
+                        $refs[] = [
+                            'type'  => 'machine',
+                            'id'    => (string)($machine['machine_id'] ?? ''),
+                            'field' => 'work_center_id',
+                        ];
+                    }
+                }
+                foreach (($store['nc_program_releases'] ?? []) as $release) {
+                    if (!is_array($release)) continue;
+                    if ((string)($release['work_center_id'] ?? '') === $entityId) {
+                        $refs[] = [
+                            'type'  => 'nc_program_release',
+                            'id'    => (string)($release['program_id'] ?? ''),
+                            'field' => 'work_center_id',
+                        ];
+                    }
+                }
+                foreach (($orders['work_orders'] ?? []) as $wo) {
+                    if (!is_array($wo)) continue;
+                    if ((string)($wo['work_center_id'] ?? '') === $entityId) {
+                        $refs[] = [
+                            'type'  => 'work_order',
+                            'id'    => (string)($wo['wo_number'] ?? ''),
+                            'field' => 'work_center_id',
+                        ];
+                    }
+                }
+                break;
+
+            case 'machines':
+                foreach (($orders['work_orders'] ?? []) as $wo) {
+                    if (!is_array($wo)) continue;
+                    if ((string)($wo['machine_id'] ?? '') === $entityId) {
+                        $refs[] = [
+                            'type'  => 'work_order',
+                            'id'    => (string)($wo['wo_number'] ?? ''),
+                            'field' => 'machine_id',
+                        ];
+                    }
+                }
+                foreach (($store['mes_connectivity_adapters'] ?? []) as $adapter) {
+                    if (!is_array($adapter)) continue;
+                    if ((string)($adapter['machine_id'] ?? '') === $entityId) {
+                        $refs[] = [
+                            'type'  => 'mes_connectivity_adapter',
+                            'id'    => (string)($adapter['adapter_id'] ?? ''),
+                            'field' => 'machine_id',
+                        ];
+                    }
+                }
+                $machineRuntimeTypes = [
+                    'downtime_events' => 'downtime_event',
+                    'maintenance_requests' => 'maintenance_request',
+                    'progress_reports' => 'progress_report',
+                    'tooling_status' => 'tooling_status',
+                    'connector_feeds' => 'connector_feed',
+                    'machine_signals' => 'machine_signal',
+                    'machine_alarm_events' => 'machine_alarm_event',
+                    'nc_download_receipts' => 'nc_download_receipt',
+                    'mes_tool_preset_offsets' => 'tool_preset_offset',
+                ];
+                foreach ($machineRuntimeTypes as $collection => $referenceType) {
+                    foreach (($runtime[$collection] ?? []) as $row) {
+                        if (!is_array($row)) continue;
+                        if ((string)($row['machine_id'] ?? '') === $entityId) {
+                            $refs[] = [
+                                'type'  => $referenceType,
+                                'id'    => (string)($row['downtime_id'] ?? $row['request_id'] ?? $row['progress_id'] ?? $row['tool_runtime_id'] ?? $row['feed_id'] ?? $row['signal_id'] ?? $row['alarm_event_id'] ?? $row['receipt_id'] ?? $row['preset_id'] ?? ''),
+                                'field' => 'machine_id',
+                            ];
+                        }
+                    }
+                }
+                break;
+
+            case 'operators':
+                foreach (($orders['work_orders'] ?? []) as $wo) {
+                    if (!is_array($wo)) continue;
+                    if ((string)($wo['operator_id'] ?? '') === $entityId) {
+                        $refs[] = [
+                            'type'  => 'work_order',
+                            'id'    => (string)($wo['wo_number'] ?? ''),
+                            'field' => 'operator_id',
+                        ];
+                    }
+                }
+                $operatorRuntimeTypes = [
+                    'progress_reports' => 'progress_report',
+                    'machine_signals' => 'machine_signal',
+                ];
+                foreach ($operatorRuntimeTypes as $collection => $referenceType) {
+                    foreach (($runtime[$collection] ?? []) as $row) {
+                        if (!is_array($row)) continue;
+                        if ((string)($row['operator_id'] ?? '') === $entityId) {
+                            $refs[] = [
+                                'type'  => $referenceType,
+                                'id'    => (string)($row['progress_id'] ?? $row['signal_id'] ?? ''),
+                                'field' => 'operator_id',
+                            ];
+                        }
+                    }
+                }
+                break;
+
+            case 'tooling_assets':
+                foreach (($store['tool_assemblies'] ?? []) as $assembly) {
+                    if (!is_array($assembly)) continue;
+                    if ((string)($assembly['parent_tool_id'] ?? '') === $entityId || (string)($assembly['component_tool_id'] ?? '') === $entityId) {
+                        $refs[] = [
+                            'type'  => 'tool_assembly',
+                            'id'    => (string)($assembly['assembly_id'] ?? ''),
+                            'field' => (string)($assembly['parent_tool_id'] ?? '') === $entityId ? 'parent_tool_id' : 'component_tool_id',
+                        ];
+                    }
+                }
+                foreach (($runtime['tooling_status'] ?? []) as $row) {
+                    if (!is_array($row)) continue;
+                    if ((string)($row['tool_id'] ?? '') === $entityId) {
+                        $refs[] = [
+                            'type'  => 'tooling_status',
+                            'id'    => (string)($row['tool_runtime_id'] ?? ''),
+                            'field' => 'tool_id',
+                        ];
+                    }
+                }
+                foreach (($runtime['mes_tool_preset_offsets'] ?? []) as $row) {
+                    if (!is_array($row)) continue;
+                    if ((string)($row['tool_id'] ?? '') === $entityId) {
+                        $refs[] = [
+                            'type'  => 'tool_preset_offset',
+                            'id'    => (string)($row['preset_id'] ?? ''),
+                            'field' => 'tool_id',
+                        ];
+                    }
+                }
+                break;
+
+            case 'downtime_reason_codes':
+                foreach (($runtime['downtime_events'] ?? []) as $row) {
+                    if (!is_array($row)) continue;
+                    if ((string)($row['reason_code'] ?? '') === $entityId) {
+                        $refs[] = [
+                            'type'  => 'downtime_event',
+                            'id'    => (string)($row['downtime_id'] ?? ''),
+                            'field' => 'reason_code',
+                        ];
+                    }
+                }
+                break;
+
+            case 'downtime_resolution_codes':
+                foreach (($runtime['downtime_events'] ?? []) as $row) {
+                    if (!is_array($row)) continue;
+                    if ((string)($row['resolution_code'] ?? '') === $entityId) {
+                        $refs[] = [
+                            'type'  => 'downtime_event',
+                            'id'    => (string)($row['downtime_id'] ?? ''),
+                            'field' => 'resolution_code',
+                        ];
+                    }
+                }
+                break;
+
+            case 'mes_connectivity_adapters':
+                foreach (($runtime['mes_connectivity_events'] ?? []) as $row) {
+                    if (!is_array($row)) continue;
+                    if ((string)($row['adapter_id'] ?? '') === $entityId) {
+                        $refs[] = [
+                            'type'  => 'mes_connectivity_event',
+                            'id'    => (string)($row['event_id'] ?? ''),
+                            'field' => 'adapter_id',
+                        ];
+                    }
+                }
+                break;
+
+            case 'mes_alarm_catalog':
+                foreach (($store['mes_alarm_playbooks'] ?? []) as $row) {
+                    if (!is_array($row)) continue;
+                    if ((string)($row['alarm_code'] ?? '') === $entityId) {
+                        $refs[] = [
+                            'type'  => 'mes_alarm_playbook',
+                            'id'    => (string)($row['playbook_id'] ?? ''),
+                            'field' => 'alarm_code',
+                        ];
+                    }
+                }
+                foreach (($runtime['machine_alarm_events'] ?? []) as $row) {
+                    if (!is_array($row)) continue;
+                    if ((string)($row['alarm_code'] ?? '') === $entityId) {
+                        $refs[] = [
+                            'type'  => 'machine_alarm_event',
+                            'id'    => (string)($row['alarm_event_id'] ?? ''),
+                            'field' => 'alarm_code',
+                        ];
+                    }
+                }
+                break;
+
+            case 'mes_alarm_playbooks':
+                foreach (($runtime['machine_alarm_events'] ?? []) as $row) {
+                    if (!is_array($row)) continue;
+                    if ((string)($row['playbook_id'] ?? '') === $entityId) {
+                        $refs[] = [
+                            'type'  => 'machine_alarm_event',
+                            'id'    => (string)($row['alarm_event_id'] ?? ''),
+                            'field' => 'playbook_id',
+                        ];
+                    }
+                }
+                break;
+
+            case 'tool_assemblies':
+                foreach (($runtime['mes_tool_preset_offsets'] ?? []) as $row) {
+                    if (!is_array($row)) continue;
+                    if ((string)($row['assembly_id'] ?? '') === $entityId) {
+                        $refs[] = [
+                            'type'  => 'tool_preset_offset',
+                            'id'    => (string)($row['preset_id'] ?? ''),
+                            'field' => 'assembly_id',
                         ];
                     }
                 }
@@ -858,6 +1155,22 @@ final class MasterDataService
         return $this->readJson($file) ?? ['sales_orders' => [], 'job_orders' => [], 'work_orders' => []];
     }
 
+    private function loadMesRuntime(): array
+    {
+        return $this->readJson($this->mesRuntimeFile) ?? [
+            'downtime_events' => [],
+            'maintenance_requests' => [],
+            'progress_reports' => [],
+            'tooling_status' => [],
+            'connector_feeds' => [],
+            'machine_signals' => [],
+            'mes_connectivity_events' => [],
+            'machine_alarm_events' => [],
+            'nc_download_receipts' => [],
+            'mes_tool_preset_offsets' => [],
+        ];
+    }
+
     private function defaultStore(): array
     {
         return [
@@ -874,6 +1187,10 @@ final class MasterDataService
             'tooling_assets' => [],
             'downtime_reason_codes' => [],
             'downtime_resolution_codes' => [],
+            'mes_connectivity_adapters' => [],
+            'mes_alarm_catalog' => [],
+            'mes_alarm_playbooks' => [],
+            'tool_assemblies' => [],
         ];
     }
 

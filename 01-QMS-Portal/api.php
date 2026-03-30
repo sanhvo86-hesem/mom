@@ -1913,6 +1913,10 @@ function master_data_store_default(): array {
     'tooling_assets' => [],
     'downtime_reason_codes' => [],
     'downtime_resolution_codes' => [],
+    'mes_connectivity_adapters' => [],
+    'mes_alarm_catalog' => [],
+    'mes_alarm_playbooks' => [],
+    'tool_assemblies' => [],
   ];
 }
 
@@ -1956,6 +1960,10 @@ function master_data_entity_key(string $entity): ?string {
     'tooling_assets' => 'tool_id',
     'downtime_reason_codes' => 'reason_code',
     'downtime_resolution_codes' => 'resolution_code',
+    'mes_connectivity_adapters' => 'adapter_id',
+    'mes_alarm_catalog' => 'alarm_code',
+    'mes_alarm_playbooks' => 'playbook_id',
+    'tool_assemblies' => 'assembly_id',
   ];
   return $map[$entity] ?? null;
 }
@@ -1997,6 +2005,42 @@ function edge_connector_service(): \HESEM\QMS\Services\EdgeConnectorService {
   static $service = null;
   if ($service === null) {
     $service = new \HESEM\QMS\Services\EdgeConnectorService();
+  }
+  return $service;
+}
+
+function mes_adapter_service(): \HESEM\QMS\Services\MesAdapterService {
+  require_once __DIR__ . '/api/services/MesAdapterService.php';
+  static $service = null;
+  if ($service === null) {
+    $service = new \HESEM\QMS\Services\MesAdapterService();
+  }
+  return $service;
+}
+
+function mes_alarm_service(): \HESEM\QMS\Services\MesAlarmService {
+  require_once __DIR__ . '/api/services/MesAlarmService.php';
+  static $service = null;
+  if ($service === null) {
+    $service = new \HESEM\QMS\Services\MesAlarmService();
+  }
+  return $service;
+}
+
+function mes_nc_release_service(): \HESEM\QMS\Services\MesNcReleaseService {
+  require_once __DIR__ . '/api/services/MesNcReleaseService.php';
+  static $service = null;
+  if ($service === null) {
+    $service = new \HESEM\QMS\Services\MesNcReleaseService();
+  }
+  return $service;
+}
+
+function mes_tool_offset_service(): \HESEM\QMS\Services\MesToolOffsetService {
+  require_once __DIR__ . '/api/services/MesToolOffsetService.php';
+  static $service = null;
+  if ($service === null) {
+    $service = new \HESEM\QMS\Services\MesToolOffsetService();
   }
   return $service;
 }
@@ -2225,6 +2269,10 @@ function mes_runtime_default(): array {
     'tooling_status' => [],
     'connector_feeds' => [],
     'machine_signals' => [],
+    'mes_connectivity_events' => [],
+    'machine_alarm_events' => [],
+    'nc_download_receipts' => [],
+    'mes_tool_preset_offsets' => [],
   ];
 }
 
@@ -3954,6 +4002,392 @@ function mes_build_program_handshake_queue(array $dispatch): array {
   return $rows;
 }
 
+function mes_group_rows_by(array $rows, string $field): array {
+  $grouped = [];
+  foreach ($rows as $row) {
+    if (!is_array($row)) continue;
+    $key = trim((string)($row[$field] ?? ''));
+    if ($key === '') continue;
+    $grouped[$key][] = $row;
+  }
+  return $grouped;
+}
+
+function mes_latest_runtime_receipts(array $rows): array {
+  usort($rows, function ($a, $b) {
+    return strcmp((string)($b['downloaded_at'] ?? ''), (string)($a['downloaded_at'] ?? ''));
+  });
+  return $rows;
+}
+
+function mes_alarm_playbook_index(array $rows): array {
+  $index = [];
+  foreach ($rows as $row) {
+    if (!is_array($row)) continue;
+    $alarmCode = strtoupper(trim((string)($row['alarm_code'] ?? '')));
+    if ($alarmCode === '') continue;
+    if (!isset($index[$alarmCode])) {
+      $index[$alarmCode] = $row;
+    }
+  }
+  return $index;
+}
+
+function mes_adapter_governance_summary(array $machine, ?array $adapter, array $telemetry, array $events, DateTimeImmutable $now): array {
+  $issues = [];
+  $warnings = [];
+  $recentOpenEvents = [];
+
+  foreach ($events as $event) {
+    if (!is_array($event)) continue;
+    $eventTime = trim((string)($event['event_time'] ?? $event['recorded_at'] ?? ''));
+    $ageSeconds = mes_timestamp_age_seconds($eventTime, $now);
+    if ($ageSeconds !== null && $ageSeconds <= 86400 && strtolower(trim((string)($event['status'] ?? 'open'))) !== 'closed') {
+      $recentOpenEvents[] = $event;
+    }
+  }
+
+  $requiresConnector = mes_truthy($machine['connector_required_for_release'] ?? '') || strtolower(trim((string)($machine['telemetry_mode'] ?? 'machine'))) === 'machine';
+  if ($requiresConnector && !$adapter) {
+    $issues[] = 'adapter_missing';
+  } elseif ($adapter) {
+    $status = strtolower(trim((string)($adapter['status'] ?? 'active')));
+    if (!in_array($status, ['active', 'approved', 'released'], true)) {
+      $issues[] = 'adapter_not_active';
+    }
+    if (trim((string)($adapter['endpoint_url'] ?? '')) === '' && !in_array(strtolower(trim((string)($adapter['adapter_type'] ?? ''))), ['manual', 'manual_bridge'], true)) {
+      $issues[] = 'endpoint_missing';
+    }
+    if ((int)($adapter['heartbeat_sla_seconds'] ?? 0) < 30) {
+      $warnings[] = 'heartbeat_sla_invalid';
+    }
+    $lastValidatedAt = trim((string)($adapter['last_validated_at'] ?? ''));
+    $validationAge = mes_timestamp_age_seconds($lastValidatedAt, $now);
+    if ($lastValidatedAt === '') {
+      $warnings[] = 'validation_missing';
+    } elseif ($validationAge !== null && $validationAge > 86400 * 30) {
+      $warnings[] = 'validation_stale';
+    }
+  }
+
+  foreach ($recentOpenEvents as $event) {
+    $severity = strtoupper(trim((string)($event['severity'] ?? 'WARNING')));
+    if (in_array($severity, ['CRITICAL', 'EMERGENCY'], true)) {
+      $issues[] = 'critical_adapter_event';
+      break;
+    }
+    if ($severity === 'ALARM') {
+      $warnings[] = 'alarm_adapter_event';
+    }
+  }
+
+  $band = $issues ? 'critical' : ($warnings ? 'warning' : 'ready');
+  return [
+    'band' => $band,
+    'blocker' => !empty($issues),
+    'issue_codes' => array_values(array_unique($issues)),
+    'warning_codes' => array_values(array_unique($warnings)),
+    'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
+    'adapter_type' => (string)($adapter['adapter_type'] ?? $telemetry['connector_type'] ?? ''),
+    'status' => (string)($adapter['status'] ?? ''),
+    'open_event_count' => count($recentOpenEvents),
+    'message_vi' => $issues
+      ? 'Adapter hoặc chính sách kết nối chưa đạt điều kiện MES.'
+      : ($warnings ? 'Adapter đang chạy nhưng có điểm cần rà soát.' : 'Adapter đang đáp ứng điều kiện MES.'),
+    'message_en' => $issues
+      ? 'The adapter or its governance policy does not satisfy MES conditions.'
+      : ($warnings ? 'The adapter is operating but requires governance review.' : 'The adapter satisfies MES governance conditions.'),
+  ];
+}
+
+function mes_alarm_runtime_summary(array $machine, array $rows, array $catalogIndex, array $playbookIndex): array {
+  $activeRows = array_values(array_filter($rows, fn($row) => is_array($row) && mes_truthy($row['active_flag'] ?? true)));
+  $issues = [];
+  $warnings = [];
+  $highestSeverity = 'INFO';
+  $severityPriority = ['INFO' => 0, 'WARNING' => 1, 'ALARM' => 2, 'CRITICAL' => 3, 'EMERGENCY' => 4];
+
+  foreach ($activeRows as &$row) {
+    $alarmCode = strtoupper(trim((string)($row['alarm_code'] ?? '')));
+    $catalog = is_array($catalogIndex[$alarmCode] ?? null) ? $catalogIndex[$alarmCode] : [];
+    $playbook = is_array($playbookIndex[$alarmCode] ?? null) ? $playbookIndex[$alarmCode] : [];
+    $severity = strtoupper(trim((string)($row['severity'] ?? $catalog['severity_default'] ?? 'ALARM')));
+    if (($severityPriority[$severity] ?? 0) > ($severityPriority[$highestSeverity] ?? 0)) {
+      $highestSeverity = $severity;
+    }
+    $row['catalog_found'] = !empty($catalog);
+    $row['playbook_found'] = !empty($playbook);
+    $row['playbook_id'] = (string)($row['playbook_id'] ?? $playbook['playbook_id'] ?? '');
+    if (!$row['catalog_found']) $issues[] = 'alarm_missing_catalog';
+    if (!$row['playbook_found']) $warnings[] = 'alarm_missing_playbook';
+  }
+  unset($row);
+
+  if (in_array($highestSeverity, ['CRITICAL', 'EMERGENCY'], true)) {
+    $issues[] = 'critical_active_alarm';
+  } elseif ($highestSeverity === 'ALARM') {
+    $warnings[] = 'active_alarm';
+  }
+
+  $band = $issues ? 'critical' : ($warnings ? 'warning' : 'ready');
+  return [
+    'band' => $band,
+    'blocker' => !empty($issues),
+    'active_count' => count($activeRows),
+    'highest_severity' => $highestSeverity,
+    'issue_codes' => array_values(array_unique($issues)),
+    'warning_codes' => array_values(array_unique($warnings)),
+    'hot_alarms' => array_slice($activeRows, 0, 5),
+    'message_vi' => $issues
+      ? 'Có alarm đang hoạt động cần khóa/ứng phó ngay.'
+      : ($warnings ? 'Có alarm cần theo dõi và chuẩn hóa phản ứng.' : 'Không có alarm nóng trên máy này.'),
+    'message_en' => $issues
+      ? 'Active machine alarms require immediate response or lockout.'
+      : ($warnings ? 'There are alarms that need monitoring or governed response.' : 'No active alarm hotspots on this machine.'),
+  ];
+}
+
+function mes_nc_download_summary(array $dispatchRow, array $releaseIndex, array $receiptRows): array {
+  $expectedProgramId = trim((string)($dispatchRow['nc_program_id'] ?? ''));
+  $machineId = trim((string)($dispatchRow['machine_id'] ?? ''));
+  $woNumber = trim((string)($dispatchRow['wo_number'] ?? ''));
+  $issues = [];
+  $warnings = [];
+  $release = is_array($releaseIndex[$expectedProgramId] ?? null) ? $releaseIndex[$expectedProgramId] : [];
+  $receipt = [];
+
+  foreach ($receiptRows as $row) {
+    if (!is_array($row)) continue;
+    if ((string)($row['wo_number'] ?? '') === $woNumber && (string)($row['machine_id'] ?? '') === $machineId) {
+      $receipt = $row;
+      break;
+    }
+  }
+  if ($receipt === []) {
+    foreach ($receiptRows as $row) {
+      if (!is_array($row)) continue;
+      if ((string)($row['program_id'] ?? '') === $expectedProgramId && (string)($row['machine_id'] ?? '') === $machineId) {
+        $receipt = $row;
+        break;
+      }
+    }
+  }
+
+  if ($expectedProgramId === '') {
+    return [
+      'band' => 'not_required',
+      'blocker' => false,
+      'issue_codes' => [],
+      'warning_codes' => [],
+      'message_vi' => 'WO này chưa khai báo yêu cầu download NC.',
+      'message_en' => 'No governed NC download is declared for this WO.',
+    ];
+  }
+
+  if ($release === []) {
+    $issues[] = 'release_package_missing';
+  }
+  if ($receipt === []) {
+    $issues[] = 'download_receipt_missing';
+  } else {
+    if (!mes_truthy($receipt['verified_match'] ?? false)) {
+      $issues[] = 'download_verification_failed';
+    }
+    $expectedControllerName = trim((string)($release['controller_program_name'] ?? $expectedProgramId));
+    $actualControllerName = trim((string)($receipt['controller_program_name'] ?? ''));
+    if ($expectedControllerName !== '' && $actualControllerName !== '' && strcasecmp($expectedControllerName, $actualControllerName) !== 0) {
+      $issues[] = 'controller_program_name_mismatch';
+    }
+  }
+
+  if ($release !== [] && strtolower(trim((string)($release['status'] ?? 'released'))) !== 'released') {
+    $warnings[] = 'release_not_released';
+  }
+
+  $band = $issues ? 'critical' : ($warnings ? 'warning' : 'ready');
+  return [
+    'band' => $band,
+    'blocker' => !empty($issues),
+    'issue_codes' => array_values(array_unique($issues)),
+    'warning_codes' => array_values(array_unique($warnings)),
+    'expected_program_id' => $expectedProgramId,
+    'package_id' => (string)($release['package_id'] ?? ''),
+    'controller_program_name' => (string)($release['controller_program_name'] ?? $expectedProgramId),
+    'checksum_sha256' => (string)($release['checksum_sha256'] ?? $release['checksum'] ?? ''),
+    'release_status' => (string)($release['status'] ?? ''),
+    'receipt' => $receipt,
+    'message_vi' => $issues
+      ? 'Download NC hoặc xác minh trên máy chưa đạt điều kiện mở chạy.'
+      : ($warnings ? 'Download NC có cảnh báo cần xác nhận thêm.' : 'Download NC và xác minh trên máy đã đạt điều kiện.'),
+    'message_en' => $issues
+      ? 'NC download or machine-side verification does not satisfy launch conditions.'
+      : ($warnings ? 'NC download is available but requires additional confirmation.' : 'NC download and machine-side verification satisfy the launch conditions.'),
+  ];
+}
+
+function mes_tool_offset_summary(array $dispatchRow, array $offsetRows, array $toolRows, array $toolAssemblyIndex, DateTimeImmutable $now): array {
+  $issues = [];
+  $warnings = [];
+  $machineId = trim((string)($dispatchRow['machine_id'] ?? ''));
+  $woNumber = trim((string)($dispatchRow['wo_number'] ?? ''));
+  $loadedTools = array_values(array_filter($toolRows, fn($row) => is_array($row) && trim((string)($row['tool_id'] ?? '')) !== ''));
+  $selectedOffsets = [];
+
+  foreach ($loadedTools as $tool) {
+    $toolId = trim((string)($tool['tool_id'] ?? ''));
+    $candidate = null;
+    foreach ($offsetRows as $row) {
+      if (!is_array($row)) continue;
+      if ((string)($row['tool_id'] ?? '') !== $toolId) continue;
+      if ((string)($row['machine_id'] ?? '') !== $machineId) continue;
+      if ($woNumber !== '' && (string)($row['wo_number'] ?? '') !== '' && (string)($row['wo_number'] ?? '') !== $woNumber) continue;
+      if ($candidate === null || strcmp((string)($row['measured_at'] ?? ''), (string)($candidate['measured_at'] ?? '')) > 0) {
+        $candidate = $row;
+      }
+    }
+    if ($candidate === null) {
+      $issues[] = 'offset_missing';
+      continue;
+    }
+    $selectedOffsets[] = $candidate;
+    $verifiedStatus = strtolower(trim((string)($candidate['verified_status'] ?? 'verified')));
+    if (!in_array($verifiedStatus, ['verified', 'ok', 'released'], true)) {
+      $issues[] = 'offset_not_verified';
+    }
+    $drift = isset($candidate['offset_drift_mm']) ? abs((float)$candidate['offset_drift_mm']) : 0.0;
+    $band = (float)($tool['default_offset_band_mm'] ?? 0.02);
+    if ($drift > $band) {
+      $issues[] = 'offset_drift_exceeded';
+    }
+    $measuredAt = trim((string)($candidate['measured_at'] ?? ''));
+    $measuredAge = mes_timestamp_age_seconds($measuredAt, $now);
+    if ($measuredAge !== null && $measuredAge > 86400) {
+      $warnings[] = 'offset_measurement_stale';
+    }
+    $lastChangeAt = trim((string)($tool['last_change_at'] ?? ''));
+    if ($lastChangeAt !== '' && $measuredAt !== '' && strcmp($measuredAt, $lastChangeAt) < 0) {
+      $issues[] = 'offset_before_tool_change';
+    }
+    if (!empty($toolAssemblyIndex[$toolId]) && count((array)$toolAssemblyIndex[$toolId]) === 0) {
+      $warnings[] = 'assembly_not_governed';
+    }
+  }
+
+  $band = $issues ? 'critical' : ($warnings ? 'warning' : 'ready');
+  $topOffset = $selectedOffsets[0] ?? [];
+  return [
+    'band' => $band,
+    'blocker' => !empty($issues),
+    'issue_codes' => array_values(array_unique($issues)),
+    'warning_codes' => array_values(array_unique($warnings)),
+    'loaded_tool_count' => count($loadedTools),
+    'verified_offset_count' => count($selectedOffsets),
+    'top_tool_id' => (string)($topOffset['tool_id'] ?? ''),
+    'top_offset_number' => (string)($topOffset['offset_number'] ?? ''),
+    'top_drift_mm' => isset($topOffset['offset_drift_mm']) ? (float)$topOffset['offset_drift_mm'] : null,
+    'message_vi' => $issues
+      ? 'Preset/offset của tool chưa đạt điều kiện để mở chạy.'
+      : ($warnings ? 'Preset/offset có cảnh báo cần rà soát trước khi chạy tiếp.' : 'Preset/offset của tool đang đạt điều kiện vận hành.'),
+    'message_en' => $issues
+      ? 'Tool preset/offset does not satisfy the launch conditions.'
+      : ($warnings ? 'Tool preset/offset requires review before continued execution.' : 'Tool preset/offset satisfies the operating conditions.'),
+  ];
+}
+
+function mes_build_adapter_governance_queue(array $machineWall): array {
+  $rows = [];
+  foreach ($machineWall as $row) {
+    $summary = (array)($row['adapter_governance'] ?? []);
+    if (!in_array((string)($summary['band'] ?? 'ready'), ['critical', 'warning'], true)) continue;
+    $rows[] = [
+      'machine_id' => (string)($row['machine_id'] ?? ''),
+      'machine_name' => (string)($row['machine_name'] ?? ''),
+      'work_center_id' => (string)($row['work_center_id'] ?? ''),
+      'adapter_id' => (string)($summary['adapter_id'] ?? ''),
+      'adapter_type' => (string)($summary['adapter_type'] ?? ''),
+      'band' => (string)($summary['band'] ?? 'warning'),
+      'issue_codes' => array_values((array)($summary['issue_codes'] ?? [])),
+      'warning_codes' => array_values((array)($summary['warning_codes'] ?? [])),
+      'open_event_count' => (int)($summary['open_event_count'] ?? 0),
+      'message_vi' => (string)($summary['message_vi'] ?? ''),
+      'message_en' => (string)($summary['message_en'] ?? ''),
+    ];
+  }
+  return $rows;
+}
+
+function mes_build_alarm_hotspot_queue(array $machineWall): array {
+  $rows = [];
+  foreach ($machineWall as $row) {
+    $summary = (array)($row['alarm_runtime'] ?? []);
+    if ((int)($summary['active_count'] ?? 0) <= 0 && !in_array((string)($summary['band'] ?? 'ready'), ['critical', 'warning'], true)) continue;
+    $rows[] = [
+      'machine_id' => (string)($row['machine_id'] ?? ''),
+      'machine_name' => (string)($row['machine_name'] ?? ''),
+      'work_center_id' => (string)($row['work_center_id'] ?? ''),
+      'band' => (string)($summary['band'] ?? 'warning'),
+      'active_count' => (int)($summary['active_count'] ?? 0),
+      'highest_severity' => (string)($summary['highest_severity'] ?? 'INFO'),
+      'issue_codes' => array_values((array)($summary['issue_codes'] ?? [])),
+      'warning_codes' => array_values((array)($summary['warning_codes'] ?? [])),
+      'hot_alarms' => array_values((array)($summary['hot_alarms'] ?? [])),
+      'message_vi' => (string)($summary['message_vi'] ?? ''),
+      'message_en' => (string)($summary['message_en'] ?? ''),
+    ];
+  }
+  return $rows;
+}
+
+function mes_build_nc_download_mismatch_queue(array $dispatch): array {
+  $rows = [];
+  foreach ($dispatch as $row) {
+    $summary = (array)($row['nc_download'] ?? []);
+    if (!in_array((string)($summary['band'] ?? 'ready'), ['critical', 'warning'], true)) continue;
+    $rows[] = [
+      'wo_number' => (string)($row['wo_number'] ?? ''),
+      'machine_id' => (string)($row['machine_id'] ?? ''),
+      'work_center_id' => (string)($row['work_center_id'] ?? ''),
+      'customer_name' => (string)($row['customer_name'] ?? ''),
+      'part_number' => (string)($row['part_number'] ?? ''),
+      'part_revision' => (string)($row['part_revision'] ?? ''),
+      'expected_program_id' => (string)($summary['expected_program_id'] ?? ''),
+      'package_id' => (string)($summary['package_id'] ?? ''),
+      'band' => (string)($summary['band'] ?? 'warning'),
+      'issue_codes' => array_values((array)($summary['issue_codes'] ?? [])),
+      'warning_codes' => array_values((array)($summary['warning_codes'] ?? [])),
+      'receipt' => (array)($summary['receipt'] ?? []),
+      'message_vi' => (string)($summary['message_vi'] ?? ''),
+      'message_en' => (string)($summary['message_en'] ?? ''),
+    ];
+  }
+  return $rows;
+}
+
+function mes_build_tool_offset_queue(array $dispatch): array {
+  $rows = [];
+  foreach ($dispatch as $row) {
+    $summary = (array)($row['tool_offset'] ?? []);
+    if (!in_array((string)($summary['band'] ?? 'ready'), ['critical', 'warning'], true)) continue;
+    $rows[] = [
+      'wo_number' => (string)($row['wo_number'] ?? ''),
+      'machine_id' => (string)($row['machine_id'] ?? ''),
+      'work_center_id' => (string)($row['work_center_id'] ?? ''),
+      'customer_name' => (string)($row['customer_name'] ?? ''),
+      'part_number' => (string)($row['part_number'] ?? ''),
+      'part_revision' => (string)($row['part_revision'] ?? ''),
+      'top_tool_id' => (string)($summary['top_tool_id'] ?? ''),
+      'top_offset_number' => (string)($summary['top_offset_number'] ?? ''),
+      'top_drift_mm' => $summary['top_drift_mm'] ?? null,
+      'band' => (string)($summary['band'] ?? 'warning'),
+      'issue_codes' => array_values((array)($summary['issue_codes'] ?? [])),
+      'warning_codes' => array_values((array)($summary['warning_codes'] ?? [])),
+      'message_vi' => (string)($summary['message_vi'] ?? ''),
+      'message_en' => (string)($summary['message_en'] ?? ''),
+    ];
+  }
+  return $rows;
+}
+
 function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $customers = master_index_by((array)($master['customers'] ?? []), 'customer_id');
   $parts = master_index_by((array)($master['parts'] ?? []), 'part_number');
@@ -3962,11 +4396,19 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $machines = master_index_by((array)($master['machines'] ?? []), 'machine_id');
   $operators = master_index_by((array)($master['operators'] ?? []), 'operator_id');
   $toolingAssets = master_index_by((array)($master['tooling_assets'] ?? []), 'tool_id');
+  $connectivityAdaptersByMachine = master_index_by((array)($master['mes_connectivity_adapters'] ?? []), 'machine_id');
+  $alarmCatalog = master_index_by((array)($master['mes_alarm_catalog'] ?? []), 'alarm_code');
+  $alarmPlaybooks = mes_alarm_playbook_index((array)($master['mes_alarm_playbooks'] ?? []));
+  $toolAssembliesByParent = mes_group_rows_by((array)($master['tool_assemblies'] ?? []), 'parent_tool_id');
   $formLinksByOrder = mes_form_link_index($orders);
   $gateRules = load_mes_gate_rules();
   $now = new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
   $connectorFeeds = mes_latest_rows_by_machine((array)($mes['connector_feeds'] ?? []), 'updated_at');
   $machineSignals = mes_latest_rows_by_machine((array)($mes['machine_signals'] ?? []), 'signal_at');
+  $connectivityEventsByMachine = mes_group_rows_by((array)($mes['mes_connectivity_events'] ?? []), 'machine_id');
+  $machineAlarmEventsByMachine = mes_group_rows_by((array)($mes['machine_alarm_events'] ?? []), 'machine_id');
+  $ncDownloadReceipts = mes_latest_runtime_receipts((array)($mes['nc_download_receipts'] ?? []));
+  $toolPresetOffsets = (array)($mes['mes_tool_preset_offsets'] ?? []);
 
   $jos = master_index_by((array)($orders['job_orders'] ?? []), 'jo_number');
   $wos = master_index_by((array)($orders['work_orders'] ?? []), 'wo_number');
@@ -4129,6 +4571,8 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     );
     $dispatchRow['material_trace'] = mes_material_trace_summary($dispatchRow, $partMeta);
     $dispatchRow['connector_guard'] = mes_connector_guard_summary($dispatchRow, $machineMeta);
+    $dispatchRow['nc_download'] = mes_nc_download_summary($dispatchRow, $programReleases, $ncDownloadReceipts);
+    $dispatchRow['tool_offset'] = mes_tool_offset_summary($dispatchRow, $toolPresetOffsets, $toolRows, $toolAssembliesByParent, $now);
     $dispatch[] = $dispatchRow;
     if ($machineId !== '') $workOrdersByMachine[$machineId][] = $dispatchRow;
   }
@@ -4212,6 +4656,23 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     }
 
     $activeEvidenceGate = $activeWo['evidence_gate'] ?? ['status' => 'not_required', 'total_required' => 0, 'completed_count' => 0, 'missing_form_codes' => []];
+    $adapterMeta = $connectivityAdaptersByMachine[$machineId] ?? null;
+    $adapterGovernance = mes_adapter_governance_summary(
+      $machine,
+      is_array($adapterMeta) ? $adapterMeta : null,
+      [
+        'connector_type' => $connectorType,
+        'connector_health' => $connectorHealth,
+      ],
+      (array)($connectivityEventsByMachine[$machineId] ?? []),
+      $now
+    );
+    $alarmRuntime = mes_alarm_runtime_summary(
+      $machine,
+      (array)($machineAlarmEventsByMachine[$machineId] ?? []),
+      $alarmCatalog,
+      $alarmPlaybooks
+    );
     $machineWall[] = [
       'machine_id' => $machineId,
       'machine_name' => (string)($machine['machine_name'] ?? ''),
@@ -4236,6 +4697,8 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
       'part_count' => isset($signal['part_count']) ? (int)$signal['part_count'] : null,
       'preferred_operator_id' => (string)($machine['preferred_operator_id'] ?? ''),
       'preferred_operator_name' => (string)($operators[(string)($machine['preferred_operator_id'] ?? '')]['operator_name'] ?? ''),
+      'adapter_governance' => $adapterGovernance,
+      'alarm_runtime' => $alarmRuntime,
       'queue_count' => count($queue),
       'active_work_order' => $activeWo,
       'open_downtime' => $activeDowntimeByMachine[$machineId] ?? null,
@@ -4246,7 +4709,9 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
       'tool_alert_count' => $machineAlertCount,
       'tooling_items' => $machineToolRows,
       'program_release' => (array)($activeWo['program_release'] ?? []),
+      'nc_download' => (array)($activeWo['nc_download'] ?? []),
       'tool_readiness' => (array)($activeWo['tool_readiness'] ?? []),
+      'tool_offset' => (array)($activeWo['tool_offset'] ?? []),
       'operator_governance' => (array)($activeWo['operator_governance'] ?? []),
       'material_trace' => (array)($activeWo['material_trace'] ?? []),
       'connector_guard' => (array)($activeWo['connector_guard'] ?? []),
@@ -4301,6 +4766,8 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     'operator_qualification_gaps' => count(array_filter($dispatch, fn($row) => in_array((string)($row['operator_governance']['band'] ?? 'ready'), ['critical', 'warning'], true))),
     'material_trace_gaps' => count(array_filter($dispatch, fn($row) => in_array((string)($row['material_trace']['band'] ?? 'ready'), ['critical', 'warning'], true))),
     'connector_guard_gaps' => count(array_filter($dispatch, fn($row) => in_array((string)($row['connector_guard']['band'] ?? 'ready'), ['critical', 'warning'], true))),
+    'adapter_governance_gaps' => count(array_filter($machineWall, fn($row) => in_array((string)($row['adapter_governance']['band'] ?? 'ready'), ['critical', 'warning'], true))),
+    'active_alarm_hotspots' => count(array_filter($machineWall, fn($row) => (int)($row['alarm_runtime']['active_count'] ?? 0) > 0)),
     'availability_pct' => count($oeeRows) ? round(array_sum(array_map(fn($row) => (float)($row['availability_pct'] ?? 0), $oeeRows)) / count($oeeRows), 1) : null,
     'performance_pct' => count($oeeRows) ? round(array_sum(array_map(fn($row) => (float)($row['performance_pct'] ?? 0), $oeeRows)) / count($oeeRows), 1) : null,
     'quality_pct' => count($oeeRows) ? round(array_sum(array_map(fn($row) => (float)($row['quality_pct'] ?? 0), $oeeRows)) / count($oeeRows), 1) : null,
@@ -4385,15 +4852,23 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $programHandshakeQueue = mes_build_program_handshake_queue($dispatch);
   $programReleaseQueue = mes_build_program_release_queue($dispatch);
   $toolReadinessQueue = mes_build_tool_readiness_queue($dispatch);
+  $ncDownloadMismatchQueue = mes_build_nc_download_mismatch_queue($dispatch);
+  $toolOffsetQueue = mes_build_tool_offset_queue($dispatch);
   $operatorQualificationQueue = mes_build_operator_qualification_queue($dispatch);
   $materialTraceQueue = mes_build_material_trace_queue($dispatch);
   $connectorGuardQueue = mes_build_connector_guard_queue($dispatch);
+  $adapterGovernanceQueue = mes_build_adapter_governance_queue($machineWall);
+  $alarmHotspotQueue = mes_build_alarm_hotspot_queue($machineWall);
   $observability = load_runtime_observability_store();
   $shadowSyncFailures = mes_shadow_failure_rows($observability);
 
   $kpis['program_mismatches'] = count($programHandshakeQueue);
   $kpis['program_release_risk'] = count($programReleaseQueue);
   $kpis['tool_readiness_risk'] = count($toolReadinessQueue);
+  $kpis['nc_download_mismatches'] = count($ncDownloadMismatchQueue);
+  $kpis['tool_offset_risk'] = count($toolOffsetQueue);
+  $kpis['adapter_governance_risk'] = count($adapterGovernanceQueue);
+  $kpis['alarm_hotspots'] = count($alarmHotspotQueue);
   $kpis['shadow_sync_failures'] = count($shadowSyncFailures);
 
   return [
@@ -4410,9 +4885,13 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     'program_handshake_queue' => array_slice($programHandshakeQueue, 0, 20),
     'program_release_queue' => array_slice($programReleaseQueue, 0, 20),
     'tool_readiness_queue' => array_slice($toolReadinessQueue, 0, 20),
+    'nc_download_mismatch_queue' => array_slice($ncDownloadMismatchQueue, 0, 20),
+    'tool_offset_queue' => array_slice($toolOffsetQueue, 0, 20),
     'operator_qualification_queue' => array_slice($operatorQualificationQueue, 0, 20),
     'material_trace_queue' => array_slice($materialTraceQueue, 0, 20),
     'connector_guard_queue' => array_slice($connectorGuardQueue, 0, 20),
+    'adapter_governance_queue' => array_slice($adapterGovernanceQueue, 0, 20),
+    'alarm_hotspot_queue' => array_slice($alarmHotspotQueue, 0, 20),
     'shadow_sync_failures' => array_slice($shadowSyncFailures, 0, 20),
     'shadow_status' => $observability['shadow_sync'] ?? [],
     'connector_ingest_status' => $observability['connector_ingest'] ?? [],
@@ -4435,6 +4914,10 @@ function upsert_master_data_item(array &$store, string $entity, array $item, str
     'tooling_assets' => 'tool_id',
     'downtime_reason_codes' => 'reason_code',
     'downtime_resolution_codes' => 'resolution_code',
+    'mes_connectivity_adapters' => 'adapter_id',
+    'mes_alarm_catalog' => 'alarm_code',
+    'mes_alarm_playbooks' => 'playbook_id',
+    'tool_assemblies' => 'assembly_id',
   ];
   if (!isset($map[$entity])) throw new RuntimeException('invalid_master_entity');
   $idKey = $map[$entity];
@@ -10844,6 +11327,10 @@ if ($username === '') {
         'tooling_assets' => count($data['tooling_assets'] ?? []),
         'downtime_reason_codes' => count($data['downtime_reason_codes'] ?? []),
         'downtime_resolution_codes' => count($data['downtime_resolution_codes'] ?? []),
+        'mes_connectivity_adapters' => count($data['mes_connectivity_adapters'] ?? []),
+        'mes_alarm_catalog' => count($data['mes_alarm_catalog'] ?? []),
+        'mes_alarm_playbooks' => count($data['mes_alarm_playbooks'] ?? []),
+        'tool_assemblies' => count($data['tool_assemblies'] ?? []),
       ],
     ]);
   }
@@ -11010,6 +11497,81 @@ if ($username === '') {
       'recent_connector_failures' => mes_recent_connector_ingest_failures($observability),
       'data' => $snapshot,
       'updated' => (string)($mes['_meta']['updated'] ?? ''),
+    ]);
+  }
+
+  case 'mes_foundation_snapshot': {
+    require_logged_in($store);
+    $orders = load_orders_store();
+    $master = load_master_data_store();
+    $mes = load_mes_runtime_store();
+    $snapshot = build_mes_snapshot($orders, $master, $mes);
+    api_json([
+      'ok' => true,
+      'kpis' => [
+        'adapter_governance_risk' => (int)($snapshot['kpis']['adapter_governance_risk'] ?? 0),
+        'alarm_hotspots' => (int)($snapshot['kpis']['alarm_hotspots'] ?? 0),
+        'nc_download_mismatches' => (int)($snapshot['kpis']['nc_download_mismatches'] ?? 0),
+        'tool_offset_risk' => (int)($snapshot['kpis']['tool_offset_risk'] ?? 0),
+      ],
+      'adapters' => array_values((array)($master['mes_connectivity_adapters'] ?? [])),
+      'alarm_catalog' => array_values((array)($master['mes_alarm_catalog'] ?? [])),
+      'alarm_playbooks' => array_values((array)($master['mes_alarm_playbooks'] ?? [])),
+      'tool_assemblies' => array_values((array)($master['tool_assemblies'] ?? [])),
+      'adapter_governance_queue' => array_values((array)($snapshot['adapter_governance_queue'] ?? [])),
+      'alarm_hotspot_queue' => array_values((array)($snapshot['alarm_hotspot_queue'] ?? [])),
+      'nc_download_mismatch_queue' => array_values((array)($snapshot['nc_download_mismatch_queue'] ?? [])),
+      'tool_offset_queue' => array_values((array)($snapshot['tool_offset_queue'] ?? [])),
+      'updated' => [
+        'master' => (string)($master['_meta']['updated'] ?? ''),
+        'mes' => (string)($mes['_meta']['updated'] ?? ''),
+      ],
+    ]);
+  }
+
+  case 'mes_alarm_snapshot': {
+    require_logged_in($store);
+    $orders = load_orders_store();
+    $master = load_master_data_store();
+    $mes = load_mes_runtime_store();
+    $snapshot = build_mes_snapshot($orders, $master, $mes);
+    api_json([
+      'ok' => true,
+      'catalog' => array_values((array)($master['mes_alarm_catalog'] ?? [])),
+      'playbooks' => array_values((array)($master['mes_alarm_playbooks'] ?? [])),
+      'runtime' => array_values((array)($mes['machine_alarm_events'] ?? [])),
+      'queue' => array_values((array)($snapshot['alarm_hotspot_queue'] ?? [])),
+      'count' => (int)($snapshot['kpis']['alarm_hotspots'] ?? 0),
+    ]);
+  }
+
+  case 'mes_nc_release_snapshot': {
+    require_logged_in($store);
+    $orders = load_orders_store();
+    $master = load_master_data_store();
+    $mes = load_mes_runtime_store();
+    $snapshot = build_mes_snapshot($orders, $master, $mes);
+    api_json([
+      'ok' => true,
+      'release_packages' => array_values((array)($master['nc_program_releases'] ?? [])),
+      'download_receipts' => array_values((array)($mes['nc_download_receipts'] ?? [])),
+      'queue' => array_values((array)($snapshot['nc_download_mismatch_queue'] ?? [])),
+      'count' => (int)($snapshot['kpis']['nc_download_mismatches'] ?? 0),
+    ]);
+  }
+
+  case 'mes_tool_offset_snapshot': {
+    require_logged_in($store);
+    $orders = load_orders_store();
+    $master = load_master_data_store();
+    $mes = load_mes_runtime_store();
+    $snapshot = build_mes_snapshot($orders, $master, $mes);
+    api_json([
+      'ok' => true,
+      'tool_offsets' => array_values((array)($mes['mes_tool_preset_offsets'] ?? [])),
+      'tool_assemblies' => array_values((array)($master['tool_assemblies'] ?? [])),
+      'queue' => array_values((array)($snapshot['tool_offset_queue'] ?? [])),
+      'count' => (int)($snapshot['kpis']['tool_offset_risk'] ?? 0),
     ]);
   }
 
@@ -11188,6 +11750,123 @@ if ($username === '') {
       'ingest_warnings' => array_values((array)($saved['ingest_warnings'] ?? [])),
       'data' => build_mes_snapshot($orders, $master, $mes),
     ]);
+  }
+
+  case 'mes_adapter_event_append': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $master = load_master_data_store();
+    $mes = load_mes_runtime_store();
+    $adapterId = trim((string)($body['adapter_id'] ?? ''));
+    $adapter = null;
+    foreach ((array)($master['mes_connectivity_adapters'] ?? []) as $row) {
+      if (is_array($row) && (string)($row['adapter_id'] ?? '') === $adapterId) {
+        $adapter = $row;
+        break;
+      }
+    }
+    if (!is_array($adapter)) api_json(['ok' => false, 'error' => 'adapter_not_found'], 404);
+    $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
+    $event = mes_adapter_service()->normalizeEvent($body, $adapter, $username);
+    $rows = array_values((array)($mes['mes_connectivity_events'] ?? []));
+    $saved = null;
+    foreach ($rows as $idx => $row) {
+      if (!is_array($row) || (string)($row['adapter_event_id'] ?? '') !== (string)$event['adapter_event_id']) continue;
+      $rows[$idx] = array_merge($row, $event);
+      $saved = $rows[$idx];
+      break;
+    }
+    if ($saved === null) {
+      $rows[] = $event;
+      $saved = $event;
+    }
+    $mes['mes_connectivity_events'] = $rows;
+    save_mes_runtime_store($mes);
+    api_json(['ok' => true, 'event' => $saved, 'data' => build_mes_snapshot(load_orders_store(), $master, $mes)]);
+  }
+
+  case 'mes_alarm_runtime_upsert': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $master = load_master_data_store();
+    $mes = load_mes_runtime_store();
+    $catalogIndex = master_index_by((array)($master['mes_alarm_catalog'] ?? []), 'alarm_code');
+    $playbookIndex = mes_alarm_playbook_index((array)($master['mes_alarm_playbooks'] ?? []));
+    $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
+    $alarm = mes_alarm_service()->normalizeRuntimeAlarm($body, $catalogIndex, $playbookIndex, $username);
+    $rows = array_values((array)($mes['machine_alarm_events'] ?? []));
+    $saved = null;
+    foreach ($rows as $idx => $row) {
+      if (!is_array($row) || (string)($row['alarm_event_id'] ?? '') !== (string)$alarm['alarm_event_id']) continue;
+      $rows[$idx] = array_merge($row, $alarm);
+      $saved = $rows[$idx];
+      break;
+    }
+    if ($saved === null) {
+      $rows[] = $alarm;
+      $saved = $alarm;
+    }
+    $mes['machine_alarm_events'] = $rows;
+    save_mes_runtime_store($mes);
+    api_json(['ok' => true, 'alarm' => $saved, 'data' => build_mes_snapshot(load_orders_store(), $master, $mes)]);
+  }
+
+  case 'mes_nc_download_receipt': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $master = load_master_data_store();
+    $mes = load_mes_runtime_store();
+    $releaseIndex = master_index_by((array)($master['nc_program_releases'] ?? []), 'program_id');
+    $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
+    $receipt = mes_nc_release_service()->normalizeDownloadReceipt($body, $releaseIndex, $username);
+    $rows = array_values((array)($mes['nc_download_receipts'] ?? []));
+    $saved = null;
+    foreach ($rows as $idx => $row) {
+      if (!is_array($row) || (string)($row['receipt_id'] ?? '') !== (string)$receipt['receipt_id']) continue;
+      $rows[$idx] = array_merge($row, $receipt);
+      $saved = $rows[$idx];
+      break;
+    }
+    if ($saved === null) {
+      $rows[] = $receipt;
+      $saved = $receipt;
+    }
+    $mes['nc_download_receipts'] = $rows;
+    save_mes_runtime_store($mes);
+    api_json(['ok' => true, 'receipt' => $saved, 'data' => build_mes_snapshot(load_orders_store(), $master, $mes)]);
+  }
+
+  case 'mes_tool_offset_upsert': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $master = load_master_data_store();
+    $mes = load_mes_runtime_store();
+    $toolIndex = master_index_by((array)($master['tooling_assets'] ?? []), 'tool_id');
+    $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
+    $offset = mes_tool_offset_service()->normalizeOffsetSnapshot($body, $toolIndex, $username);
+    $rows = array_values((array)($mes['mes_tool_preset_offsets'] ?? []));
+    $saved = null;
+    foreach ($rows as $idx => $row) {
+      if (!is_array($row) || (string)($row['preset_id'] ?? '') !== (string)$offset['preset_id']) continue;
+      $rows[$idx] = array_merge($row, $offset);
+      $saved = $rows[$idx];
+      break;
+    }
+    if ($saved === null) {
+      $rows[] = $offset;
+      $saved = $offset;
+    }
+    $mes['mes_tool_preset_offsets'] = $rows;
+    save_mes_runtime_store($mes);
+    api_json(['ok' => true, 'offset' => $saved, 'data' => build_mes_snapshot(load_orders_store(), $master, $mes)]);
   }
 
   case 'mes_wo_report_progress': {
@@ -12485,6 +13164,10 @@ if ($username === '') {
     $operatorQualificationGaps = count((array)($mesSnapshot['operator_qualification_queue'] ?? []));
     $materialTraceGaps = count((array)($mesSnapshot['material_trace_queue'] ?? []));
     $connectorGovernanceGaps = count((array)($mesSnapshot['connector_guard_queue'] ?? []));
+    $adapterGovernanceRisk = count((array)($mesSnapshot['adapter_governance_queue'] ?? []));
+    $alarmHotspots = count((array)($mesSnapshot['alarm_hotspot_queue'] ?? []));
+    $ncDownloadMismatches = count((array)($mesSnapshot['nc_download_mismatch_queue'] ?? []));
+    $toolOffsetRisk = count((array)($mesSnapshot['tool_offset_queue'] ?? []));
     $shadowSyncFailures = count((array)($mesSnapshot['shadow_sync_failures'] ?? []));
     $downtimeGovernanceGaps = count(mes_downtime_governance_gap_rows($mes, $master));
 
@@ -12512,6 +13195,10 @@ if ($username === '') {
       'operator_qualification_gaps' => $operatorQualificationGaps,
       'material_trace_gaps' => $materialTraceGaps,
       'connector_governance_gaps' => $connectorGovernanceGaps,
+      'adapter_governance_risk' => $adapterGovernanceRisk,
+      'alarm_hotspots' => $alarmHotspots,
+      'nc_download_mismatches' => $ncDownloadMismatches,
+      'tool_offset_risk' => $toolOffsetRisk,
       'shadow_sync_failures' => $shadowSyncFailures,
       'downtime_governance_gaps' => $downtimeGovernanceGaps,
       'orphan_links'        => $orphanLinks,
@@ -12768,6 +13455,105 @@ if ($username === '') {
               (string)($row['connector_type'] ?? ''),
               (string)($row['connector_health'] ?? ''),
               (string)($row['telemetry_mode'] ?? ''),
+            ])),
+          ];
+        }
+        break;
+      }
+      case 'adapter_governance_risk': {
+        $orders = load_orders_store();
+        $master = load_master_data_store();
+        $mes = load_mes_runtime_store();
+        $snapshot = build_mes_snapshot($orders, $master, $mes);
+        foreach ((array)($snapshot['adapter_governance_queue'] ?? []) as $row) {
+          if (!is_array($row)) continue;
+          $items[] = [
+            'id' => (string)($row['adapter_id'] ?? $row['machine_id'] ?? ''),
+            'type' => 'adapter_governance',
+            'department' => (string)($row['work_center_id'] ?? ''),
+            'date' => '',
+            'responsible' => (string)($row['machine_id'] ?? ''),
+            'detail' => implode(' · ', array_filter([
+              (string)($row['machine_name'] ?? ''),
+              (string)($row['adapter_type'] ?? ''),
+              !empty($row['issue_codes']) ? ('Issues: ' . implode(', ', (array)$row['issue_codes'])) : '',
+              !empty($row['warning_codes']) ? ('Warnings: ' . implode(', ', (array)$row['warning_codes'])) : '',
+            ])),
+          ];
+        }
+        break;
+      }
+      case 'alarm_hotspots': {
+        $orders = load_orders_store();
+        $master = load_master_data_store();
+        $mes = load_mes_runtime_store();
+        $snapshot = build_mes_snapshot($orders, $master, $mes);
+        foreach ((array)($snapshot['alarm_hotspot_queue'] ?? []) as $row) {
+          if (!is_array($row)) continue;
+          $hot = array_values((array)($row['hot_alarms'] ?? []));
+          $first = $hot[0] ?? [];
+          $items[] = [
+            'id' => (string)($row['machine_id'] ?? ''),
+            'type' => 'alarm_hotspot',
+            'department' => (string)($row['work_center_id'] ?? ''),
+            'date' => substr((string)($first['alarm_time'] ?? ''), 0, 10),
+            'responsible' => (string)($row['machine_id'] ?? ''),
+            'detail' => implode(' · ', array_filter([
+              (string)($row['machine_name'] ?? ''),
+              'Active ' . (int)($row['active_count'] ?? 0),
+              (string)($row['highest_severity'] ?? ''),
+              (string)($first['alarm_code'] ?? ''),
+              (string)($first['alarm_text'] ?? ''),
+            ])),
+          ];
+        }
+        break;
+      }
+      case 'nc_download_mismatches': {
+        $orders = load_orders_store();
+        $master = load_master_data_store();
+        $mes = load_mes_runtime_store();
+        $snapshot = build_mes_snapshot($orders, $master, $mes);
+        foreach ((array)($snapshot['nc_download_mismatch_queue'] ?? []) as $row) {
+          if (!is_array($row)) continue;
+          $receipt = (array)($row['receipt'] ?? []);
+          $items[] = [
+            'id' => (string)($row['wo_number'] ?? ''),
+            'type' => 'nc_download',
+            'department' => (string)($row['work_center_id'] ?? ''),
+            'date' => substr((string)($receipt['downloaded_at'] ?? ''), 0, 10),
+            'responsible' => (string)($row['machine_id'] ?? ''),
+            'detail' => implode(' · ', array_filter([
+              (string)($row['customer_name'] ?? ''),
+              trim((string)($row['part_number'] ?? '') . ' ' . (string)($row['part_revision'] ?? '')),
+              'EXP ' . (string)($row['expected_program_id'] ?? ''),
+              !empty($receipt['controller_program_name']) ? ('ACT ' . (string)$receipt['controller_program_name']) : 'ACT missing',
+              !empty($row['issue_codes']) ? ('Issues: ' . implode(', ', (array)$row['issue_codes'])) : '',
+            ])),
+          ];
+        }
+        break;
+      }
+      case 'tool_offset_risk': {
+        $orders = load_orders_store();
+        $master = load_master_data_store();
+        $mes = load_mes_runtime_store();
+        $snapshot = build_mes_snapshot($orders, $master, $mes);
+        foreach ((array)($snapshot['tool_offset_queue'] ?? []) as $row) {
+          if (!is_array($row)) continue;
+          $items[] = [
+            'id' => (string)($row['wo_number'] ?? ''),
+            'type' => 'tool_offset',
+            'department' => (string)($row['work_center_id'] ?? ''),
+            'date' => '',
+            'responsible' => (string)($row['machine_id'] ?? ''),
+            'detail' => implode(' · ', array_filter([
+              (string)($row['customer_name'] ?? ''),
+              trim((string)($row['part_number'] ?? '') . ' ' . (string)($row['part_revision'] ?? '')),
+              (string)($row['top_tool_id'] ?? ''),
+              (string)($row['top_offset_number'] ?? ''),
+              $row['top_drift_mm'] === null ? '' : ('Drift ' . (string)$row['top_drift_mm'] . ' mm'),
+              !empty($row['issue_codes']) ? ('Issues: ' . implode(', ', (array)$row['issue_codes'])) : '',
             ])),
           ];
         }

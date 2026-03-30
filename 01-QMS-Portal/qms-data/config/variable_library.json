@@ -16857,6 +16857,278 @@
           "description": "Actual turnaround time in days"
         }
       }
+    },
+    "mes_connectivity_adapter": {
+      "label": "MES Connectivity Adapter Variables",
+      "label_vi": "Biến quản trị bộ kết nối MES",
+      "description": "Governed adapter, heartbeat, and edge-ingest variables for machine connectivity control.",
+      "variables": {
+        "adapter_id": {
+          "key": "adapter_id",
+          "label": "Adapter ID",
+          "label_vi": "Mã bộ kết nối",
+          "type": "string",
+          "format": "{ADAPTER-ID}",
+          "example": "ADP-MC-5AX-01-MTC",
+          "required": true,
+          "source": "user-input",
+          "used_in": ["mes_connectivity_adapter"],
+          "description": "Unique connectivity adapter identifier."
+        },
+        "adapter_type": {
+          "key": "adapter_type",
+          "label": "Adapter Type",
+          "label_vi": "Loại bộ kết nối",
+          "type": "enum",
+          "enum_values": ["mtconnect", "opcua", "dnc", "manual_bridge", "custom"],
+          "required": true,
+          "source": "user-input",
+          "used_in": ["mes_connectivity_adapter"],
+          "description": "Machine connectivity adapter type."
+        },
+        "transport_protocol": {
+          "key": "transport_protocol",
+          "label": "Transport Protocol",
+          "label_vi": "Giao thức truyền tải",
+          "type": "enum",
+          "enum_values": ["http", "https", "opc.tcp", "tcp", "mqtt", "manual"],
+          "required": true,
+          "source": "user-input",
+          "used_in": ["mes_connectivity_adapter"],
+          "description": "Primary transport used by the adapter."
+        },
+        "heartbeat_sla_seconds": {
+          "key": "heartbeat_sla_seconds",
+          "label": "Heartbeat SLA (Seconds)",
+          "label_vi": "SLA heartbeat (giây)",
+          "type": "number",
+          "required": true,
+          "source": "user-input",
+          "used_in": ["mes_connectivity_adapter"],
+          "description": "Maximum expected interval between valid heartbeats."
+        },
+        "stale_after_seconds": {
+          "key": "stale_after_seconds",
+          "label": "Stale After (Seconds)",
+          "label_vi": "Ngưỡng stale (giây)",
+          "type": "number",
+          "required": true,
+          "source": "user-input",
+          "used_in": ["mes_connectivity_adapter"],
+          "description": "Threshold after which the connector is considered stale."
+        },
+        "store_and_forward_enabled": {
+          "key": "store_and_forward_enabled",
+          "label": "Store and Forward Enabled",
+          "label_vi": "Cho phép store-and-forward",
+          "type": "boolean",
+          "required": false,
+          "source": "user-input",
+          "used_in": ["mes_connectivity_adapter"],
+          "description": "Whether the adapter may buffer payloads when offline."
+        }
+      }
+    },
+    "mes_alarm_management": {
+      "label": "MES Alarm Management Variables",
+      "label_vi": "Biến quản trị cảnh báo MES",
+      "description": "Catalog, playbook, and alarm response governance variables for machine alarms.",
+      "variables": {
+        "alarm_code_mes": {
+          "key": "alarm_code_mes",
+          "label": "Alarm Code",
+          "label_vi": "Mã cảnh báo",
+          "type": "string",
+          "required": true,
+          "source": "machine-or-user-input",
+          "used_in": ["mes_alarm_management"],
+          "description": "Governed alarm code from machine or alarm catalog."
+        },
+        "controller_family": {
+          "key": "controller_family",
+          "label": "Controller Family",
+          "label_vi": "Dòng điều khiển",
+          "type": "string",
+          "required": false,
+          "source": "user-input",
+          "used_in": ["mes_alarm_management"],
+          "description": "Controller family or OEM control platform."
+        },
+        "alarm_group_mes": {
+          "key": "alarm_group_mes",
+          "label": "Alarm Group",
+          "label_vi": "Nhóm cảnh báo",
+          "type": "string",
+          "required": false,
+          "source": "catalog",
+          "used_in": ["mes_alarm_management"],
+          "description": "Functional alarm grouping for response governance."
+        },
+        "playbook_id": {
+          "key": "playbook_id",
+          "label": "Playbook ID",
+          "label_vi": "Mã playbook",
+          "type": "string",
+          "required": false,
+          "source": "catalog",
+          "used_in": ["mes_alarm_management"],
+          "description": "Response playbook linked to the alarm code."
+        },
+        "response_target_minutes": {
+          "key": "response_target_minutes",
+          "label": "Target Response Minutes",
+          "label_vi": "Mục tiêu phản ứng (phút)",
+          "type": "number",
+          "required": false,
+          "source": "catalog",
+          "used_in": ["mes_alarm_management"],
+          "description": "Target reaction time for the alarm or playbook."
+        },
+        "requires_lockout": {
+          "key": "requires_lockout",
+          "label": "Requires Lockout",
+          "label_vi": "Yêu cầu lockout",
+          "type": "boolean",
+          "required": false,
+          "source": "catalog",
+          "used_in": ["mes_alarm_management"],
+          "description": "Whether this alarm requires lockout-tagout before intervention."
+        }
+      }
+    },
+    "mes_nc_release_governance": {
+      "label": "MES NC Release Governance Variables",
+      "label_vi": "Biến quản trị release NC MES",
+      "description": "Release package, checksum, and download receipt variables for CNC digital thread control.",
+      "variables": {
+        "package_id": {
+          "key": "package_id",
+          "label": "Release Package ID",
+          "label_vi": "Mã gói release",
+          "type": "string",
+          "required": true,
+          "source": "user-input",
+          "used_in": ["mes_nc_release_governance"],
+          "description": "Unique release package identifier."
+        },
+        "program_checksum_sha256": {
+          "key": "program_checksum_sha256",
+          "label": "Program Checksum SHA-256",
+          "label_vi": "Checksum chương trình SHA-256",
+          "type": "string",
+          "required": false,
+          "source": "generated",
+          "used_in": ["mes_nc_release_governance"],
+          "description": "Checksum used to verify program integrity and match."
+        },
+        "controller_program_name": {
+          "key": "controller_program_name",
+          "label": "Controller Program Name",
+          "label_vi": "Tên chương trình trên máy",
+          "type": "string",
+          "required": false,
+          "source": "machine-or-user-input",
+          "used_in": ["mes_nc_release_governance"],
+          "description": "Program name reported by the machine controller."
+        },
+        "download_receipt_id": {
+          "key": "download_receipt_id",
+          "label": "Download Receipt ID",
+          "label_vi": "Mã biên nhận download",
+          "type": "string",
+          "required": false,
+          "source": "generated",
+          "used_in": ["mes_nc_release_governance"],
+          "description": "Unique receipt for machine-side NC download verification."
+        },
+        "download_verified_flag": {
+          "key": "download_verified_flag",
+          "label": "Download Verified",
+          "label_vi": "Đã xác minh download",
+          "type": "boolean",
+          "required": false,
+          "source": "calculated",
+          "used_in": ["mes_nc_release_governance"],
+          "description": "Whether the machine-reported program matches the released package."
+        },
+        "release_manifest_version": {
+          "key": "release_manifest_version",
+          "label": "Release Manifest Version",
+          "label_vi": "Phiên bản manifest release",
+          "type": "string",
+          "required": false,
+          "source": "user-input",
+          "used_in": ["mes_nc_release_governance"],
+          "description": "Version of the NC release manifest package."
+        }
+      }
+    },
+    "mes_tool_offset_governance": {
+      "label": "MES Tool Offset Governance Variables",
+      "label_vi": "Biến quản trị preset-offset MES",
+      "description": "Preset, wear, and offset lineage variables for shop-floor tooling governance.",
+      "variables": {
+        "preset_id_mes": {
+          "key": "preset_id_mes",
+          "label": "Preset Record ID",
+          "label_vi": "Mã bản ghi preset",
+          "type": "string",
+          "required": true,
+          "source": "generated",
+          "used_in": ["mes_tool_offset_governance"],
+          "description": "Unique preset and offset verification record ID."
+        },
+        "offset_number_mes": {
+          "key": "offset_number_mes",
+          "label": "Offset Number",
+          "label_vi": "Số offset",
+          "type": "string",
+          "required": false,
+          "source": "machine-or-user-input",
+          "used_in": ["mes_tool_offset_governance"],
+          "description": "Offset identifier reported by machine or setup sheet."
+        },
+        "preset_length_mm": {
+          "key": "preset_length_mm",
+          "label": "Preset Length (mm)",
+          "label_vi": "Chiều dài preset (mm)",
+          "type": "number",
+          "required": false,
+          "source": "measurement",
+          "used_in": ["mes_tool_offset_governance"],
+          "description": "Measured tool preset length."
+        },
+        "preset_diameter_mm": {
+          "key": "preset_diameter_mm",
+          "label": "Preset Diameter (mm)",
+          "label_vi": "Đường kính preset (mm)",
+          "type": "number",
+          "required": false,
+          "source": "measurement",
+          "used_in": ["mes_tool_offset_governance"],
+          "description": "Measured tool preset diameter."
+        },
+        "wear_offset_mm": {
+          "key": "wear_offset_mm",
+          "label": "Wear Offset (mm)",
+          "label_vi": "Offset bù mòn (mm)",
+          "type": "number",
+          "required": false,
+          "source": "measurement",
+          "used_in": ["mes_tool_offset_governance"],
+          "description": "Wear offset applied or verified for the tool."
+        },
+        "offset_drift_mm": {
+          "key": "offset_drift_mm",
+          "label": "Offset Drift (mm)",
+          "label_vi": "Độ lệch offset (mm)",
+          "type": "number",
+          "required": false,
+          "source": "calculated",
+          "used_in": ["mes_tool_offset_governance"],
+          "description": "Measured drift between expected and actual preset or offset."
+        }
+      }
     }
   }
 }
