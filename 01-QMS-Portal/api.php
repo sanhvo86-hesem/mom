@@ -45,6 +45,7 @@ $DOC_VIS_FILE     = $CONF_DIR . '/docs_visibility.json';
 $PORTAL_DISPLAY_CONFIG_FILE = $CONF_DIR . '/portal_display_config.json';
 $FORM_CONTROL_REGISTRY_FILE = $CONF_DIR . '/form_control_registry.json';
 $EVIDENCE_RETENTION_POLICY_FILE = $CONF_DIR . '/evidence_retention_policy.json';
+$EVIDENCE_REVIEW_SLA_POLICY_FILE = $CONF_DIR . '/evidence_review_sla_policy.json';
 $ORDERS_FILE = $DATA_DIR . '/orders/orders.json';
 $MASTER_DATA_FILE = $DATA_DIR . '/master-data/master-data.json';
 $MES_RUNTIME_FILE = $DATA_DIR . '/mes/mes-runtime.json';
@@ -6498,6 +6499,7 @@ function load_record_type_registry(): array {
   foreach ($recordTypes as $code => &$recordType) {
     if (!is_array($recordType)) continue;
     $recordType['retention_policy'] = evidence_retention_policy_for_type((string)$code, $recordTypes);
+    $recordType['review_sla_policy'] = evidence_review_sla_policy_for_type((string)$code, $recordTypes);
   }
   unset($recordType);
   return $recordTypes;
@@ -6645,6 +6647,315 @@ function evidence_retention_evaluate(array $allocation, array $recordTypes = [])
       'set_by' => trim((string)($hold['set_by'] ?? '')),
     ],
   ];
+}
+
+function evidence_review_sla_default_roles(string $departmentOwner, string $category = ''): array {
+  $departmentOwner = strtoupper(trim($departmentOwner));
+  $category = strtolower(trim($category));
+  if ($departmentOwner === 'QA') return ['qa_manager', 'quality_manager'];
+  if ($departmentOwner === 'ENG') return ['engineering_manager', 'qa_manager'];
+  if ($departmentOwner === 'PRO') return ['production_manager', 'qa_manager'];
+  if ($departmentOwner === 'HR') return ['admin', 'ceo'];
+  if ($departmentOwner === 'EXE') return ['ceo', 'admin'];
+  if ($departmentOwner === 'IT') return ['it_admin', 'admin'];
+  if ($departmentOwner === 'SCM' || $departmentOwner === 'WH') return ['production_manager', 'qa_manager'];
+  if ($category === 'engineering') return ['engineering_manager', 'qa_manager'];
+  if ($category === 'quality') return ['qa_manager', 'quality_manager'];
+  return ['admin', 'ceo'];
+}
+
+function evidence_review_sla_default_store(array $recordTypes = []): array {
+  $defaults = [
+    'review_hours' => 72,
+    'warn_hours_before_due' => 12,
+    'escalate_hours_after_due' => 24,
+    'escalation_roles' => ['qa_manager', 'quality_manager'],
+  ];
+  $overrides = [
+    'NCR' => ['review_hours' => 48, 'warn_hours_before_due' => 12, 'escalate_hours_after_due' => 12, 'escalation_roles' => ['qa_manager', 'quality_manager']],
+    'CAPA' => ['review_hours' => 48, 'warn_hours_before_due' => 12, 'escalate_hours_after_due' => 12, 'escalation_roles' => ['qa_manager', 'quality_manager']],
+    'AUD' => ['review_hours' => 48, 'warn_hours_before_due' => 12, 'escalate_hours_after_due' => 12, 'escalation_roles' => ['qa_manager', 'quality_manager']],
+    'FAI' => ['review_hours' => 72, 'warn_hours_before_due' => 24, 'escalate_hours_after_due' => 12, 'escalation_roles' => ['qa_manager', 'production_manager']],
+    'SCAR' => ['review_hours' => 72, 'warn_hours_before_due' => 24, 'escalate_hours_after_due' => 12, 'escalation_roles' => ['qa_manager', 'quality_manager']],
+    'ECR' => ['review_hours' => 72, 'warn_hours_before_due' => 24, 'escalate_hours_after_due' => 24, 'escalation_roles' => ['engineering_manager', 'qa_manager']],
+    'MR' => ['review_hours' => 72, 'warn_hours_before_due' => 24, 'escalate_hours_after_due' => 24, 'escalation_roles' => ['ceo', 'admin']],
+    'RISK' => ['review_hours' => 48, 'warn_hours_before_due' => 12, 'escalate_hours_after_due' => 24, 'escalation_roles' => ['ceo', 'qa_manager']],
+    'TRN' => ['review_hours' => 72, 'warn_hours_before_due' => 24, 'escalate_hours_after_due' => 24, 'escalation_roles' => ['admin', 'ceo']],
+    'CAL' => ['review_hours' => 72, 'warn_hours_before_due' => 24, 'escalate_hours_after_due' => 24, 'escalation_roles' => ['qa_manager', 'quality_manager']],
+  ];
+
+  if (!$recordTypes) {
+    global $DATA_DIR;
+    $file = $DATA_DIR . '/config/record_type_expanded.json';
+    if (is_file($file)) {
+      $data = json_decode((string)file_get_contents($file), true);
+      $recordTypes = is_array($data['record_types'] ?? null) ? $data['record_types'] : [];
+    }
+  }
+
+  $recordTypePolicies = [];
+  foreach ($recordTypes as $code => $recordType) {
+    $category = strtolower(trim((string)($recordType['category'] ?? '')));
+    $departmentOwner = strtoupper(trim((string)($recordType['department_owner'] ?? '')));
+    $categoryDefaults = [];
+    if ($category === 'quality') $categoryDefaults = ['review_hours' => 48, 'warn_hours_before_due' => 12, 'escalate_hours_after_due' => 12];
+    if ($category === 'engineering') $categoryDefaults = ['review_hours' => 72, 'warn_hours_before_due' => 24, 'escalate_hours_after_due' => 24];
+    if ($category === 'admin') $categoryDefaults = ['review_hours' => 72, 'warn_hours_before_due' => 24, 'escalate_hours_after_due' => 24];
+    if ($category === 'hr') $categoryDefaults = ['review_hours' => 72, 'warn_hours_before_due' => 24, 'escalate_hours_after_due' => 24];
+    if ($category === 'maintenance') $categoryDefaults = ['review_hours' => 72, 'warn_hours_before_due' => 24, 'escalate_hours_after_due' => 24];
+    $recordTypePolicies[$code] = array_merge(
+      $defaults,
+      $categoryDefaults,
+      ['escalation_roles' => evidence_review_sla_default_roles($departmentOwner, $category)],
+      $overrides[$code] ?? []
+    );
+  }
+
+  return [
+    '_meta' => [
+      'version' => '1.0',
+      'updated_at' => now_iso(),
+      'updated_by' => 'system',
+    ],
+    'defaults' => $defaults,
+    'record_types' => $recordTypePolicies,
+  ];
+}
+
+function load_evidence_review_sla_policy_store(array $recordTypes = []): array {
+  global $EVIDENCE_REVIEW_SLA_POLICY_FILE;
+  if (!is_file($EVIDENCE_REVIEW_SLA_POLICY_FILE)) {
+    return evidence_review_sla_default_store($recordTypes);
+  }
+  $data = json_decode((string)file_get_contents($EVIDENCE_REVIEW_SLA_POLICY_FILE), true);
+  if (!is_array($data)) return evidence_review_sla_default_store($recordTypes);
+  $defaults = is_array($data['defaults'] ?? null) ? $data['defaults'] : [];
+  $recordTypePolicies = is_array($data['record_types'] ?? null) ? $data['record_types'] : [];
+  return [
+    '_meta' => is_array($data['_meta'] ?? null) ? $data['_meta'] : ['version' => '1.0', 'updated_at' => now_iso(), 'updated_by' => 'system'],
+    'defaults' => array_merge(evidence_review_sla_default_store($recordTypes)['defaults'], $defaults),
+    'record_types' => $recordTypePolicies,
+  ];
+}
+
+function save_evidence_review_sla_policy_store(array $store): void {
+  global $EVIDENCE_REVIEW_SLA_POLICY_FILE;
+  $store['_meta']['updated_at'] = now_iso();
+  file_put_contents($EVIDENCE_REVIEW_SLA_POLICY_FILE, json_encode($store, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), LOCK_EX);
+}
+
+function evidence_review_sla_policy_for_type(string $recordType, array $recordTypes = []): array {
+  $recordType = strtoupper(trim($recordType));
+  $defaultStore = evidence_review_sla_default_store($recordTypes);
+  $store = load_evidence_review_sla_policy_store($recordTypes);
+  $defaults = is_array($defaultStore['defaults'] ?? null) ? $defaultStore['defaults'] : [];
+  $baseByType = is_array($defaultStore['record_types'][$recordType] ?? null) ? $defaultStore['record_types'][$recordType] : [];
+  $savedByType = is_array($store['record_types'][$recordType] ?? null) ? $store['record_types'][$recordType] : [];
+  $policy = array_merge($defaults, $baseByType, $savedByType, ['record_type' => $recordType]);
+  $policy['escalation_roles'] = array_values(array_unique(array_values(array_filter(array_map(
+    static fn($role) => strtolower(trim((string)$role)),
+    is_array($policy['escalation_roles'] ?? null) ? $policy['escalation_roles'] : []
+  )))));
+  return $policy;
+}
+
+function evidence_review_sla_management_roles(): array {
+  return ['admin', 'it_admin', 'ceo', 'qa_manager', 'quality_manager', 'engineering_manager', 'production_manager', 'qms_engineer'];
+}
+
+function evidence_review_sla_can_manage(array $user): bool {
+  return user_has_any_role($user, evidence_review_sla_management_roles());
+}
+
+function evidence_review_sla_schema_patch(array $schema): array {
+  $reviewCfg = is_array($schema['evidence_review'] ?? null) ? $schema['evidence_review'] : [];
+  $patch = [];
+  $reviewHours = (int)($reviewCfg['review_hours'] ?? ($reviewCfg['sla_review_hours'] ?? ($reviewCfg['sla_hours'] ?? 0)));
+  if ($reviewHours > 0) $patch['review_hours'] = $reviewHours;
+  $warnHours = (int)($reviewCfg['warn_hours_before_due'] ?? ($reviewCfg['warning_hours_before_due'] ?? 0));
+  if ($warnHours > 0) $patch['warn_hours_before_due'] = $warnHours;
+  $escalateHours = (int)($reviewCfg['escalate_hours_after_due'] ?? ($reviewCfg['escalation_hours_after_due'] ?? 0));
+  if ($escalateHours > 0) $patch['escalate_hours_after_due'] = $escalateHours;
+  $roles = is_array($reviewCfg['escalation_roles'] ?? null) ? $reviewCfg['escalation_roles'] : [];
+  $roles = array_values(array_unique(array_values(array_filter(array_map(
+    static fn($role) => strtolower(trim((string)$role)),
+    $roles
+  )))));
+  if (!empty($roles)) $patch['escalation_roles'] = $roles;
+  return $patch;
+}
+
+function evidence_review_sla_policy_for_allocation(array $allocation, array $recordTypes = [], array $schema = []): array {
+  $snapshot = is_array($allocation['review_sla']['policy_snapshot'] ?? null) ? $allocation['review_sla']['policy_snapshot'] : [];
+  if (!empty($snapshot)) {
+    $snapshot['record_type'] = strtoupper(trim((string)($snapshot['record_type'] ?? $allocation['record_type'] ?? '')));
+    $snapshot['escalation_roles'] = array_values(array_unique(array_values(array_filter(array_map(
+      static fn($role) => strtolower(trim((string)$role)),
+      is_array($snapshot['escalation_roles'] ?? null) ? $snapshot['escalation_roles'] : []
+    )))));
+    return $snapshot;
+  }
+  $recordType = strtoupper(trim((string)($allocation['record_type'] ?? '')));
+  return array_merge(
+    evidence_review_sla_policy_for_type($recordType, $recordTypes),
+    evidence_review_sla_schema_patch($schema),
+    ['record_type' => $recordType]
+  );
+}
+
+function evidence_review_started_at(array $allocation): string {
+  $candidate = trim((string)($allocation['review_started_at'] ?? ''));
+  if ($candidate !== '') return $candidate;
+  $history = is_array($allocation['history'] ?? null) ? array_reverse($allocation['history']) : [];
+  foreach ($history as $event) {
+    if (!is_array($event)) continue;
+    if (allocation_status_normalize((string)($event['status'] ?? '')) !== 'in_review') continue;
+    $at = trim((string)($event['at'] ?? ''));
+    if ($at !== '') return $at;
+  }
+  foreach (['submitted_at', 'received_at', 'updated_at', 'created_at'] as $field) {
+    $value = trim((string)($allocation[$field] ?? ''));
+    if ($value !== '') return $value;
+  }
+  return '';
+}
+
+function evidence_review_closed_at(array $allocation): string {
+  foreach (['review_closed_at', 'approved_at', 'rejected_at'] as $field) {
+    $value = trim((string)($allocation[$field] ?? ''));
+    if ($value !== '') return $value;
+  }
+  $history = is_array($allocation['history'] ?? null) ? array_reverse($allocation['history']) : [];
+  foreach ($history as $event) {
+    if (!is_array($event)) continue;
+    $status = allocation_status_normalize((string)($event['status'] ?? ''));
+    if (!in_array($status, ['approved', 'rejected'], true)) continue;
+    $at = trim((string)($event['at'] ?? ''));
+    if ($at !== '') return $at;
+  }
+  return '';
+}
+
+function evidence_review_sla_reset(array &$allocation): void {
+  unset($allocation['review_started_at'], $allocation['review_closed_at'], $allocation['review_sla']);
+}
+
+function evidence_review_sla_evaluate(array $allocation, array $recordTypes = [], array $schema = []): array {
+  $policy = evidence_review_sla_policy_for_allocation($allocation, $recordTypes, $schema);
+  $reviewHours = max(1, (int)($policy['review_hours'] ?? 72));
+  $warnHours = max(1, (int)($policy['warn_hours_before_due'] ?? 12));
+  $warnHours = min($reviewHours, $warnHours);
+  $escalateHours = max(1, (int)($policy['escalate_hours_after_due'] ?? 24));
+  $startedRaw = evidence_review_started_at($allocation);
+  $completedRaw = evidence_review_closed_at($allocation);
+  $startedAt = evidence_parse_date_value($startedRaw);
+  $completedAt = evidence_parse_date_value($completedRaw);
+  $dueAt = $startedAt ? $startedAt->modify('+' . $reviewHours . ' hours') : null;
+  $escalationDueAt = $dueAt ? $dueAt->modify('+' . $escalateHours . ' hours') : null;
+  $status = allocation_status_normalize((string)($allocation['status'] ?? 'allocated'));
+  $now = new DateTimeImmutable(now_iso());
+
+  $remainingHours = null;
+  $overdueHours = null;
+  $hoursToEscalation = null;
+  if ($dueAt) {
+    $remainingHours = (int)floor(($dueAt->getTimestamp() - $now->getTimestamp()) / 3600);
+    if ($remainingHours < 0) $overdueHours = (int)ceil(($now->getTimestamp() - $dueAt->getTimestamp()) / 3600);
+  }
+  if ($escalationDueAt) {
+    $hoursToEscalation = (int)floor(($escalationDueAt->getTimestamp() - $now->getTimestamp()) / 3600);
+  }
+
+  $state = 'not_started';
+  if (in_array($status, ['approved', 'rejected'], true)) {
+    if ($completedAt && $escalationDueAt && $completedAt->getTimestamp() >= $escalationDueAt->getTimestamp()) {
+      $state = 'closed_after_escalation';
+    } elseif ($completedAt && $dueAt && $completedAt->getTimestamp() > $dueAt->getTimestamp()) {
+      $state = 'closed_late';
+    } else {
+      $state = 'closed_on_time';
+    }
+  } elseif ($status === 'in_review') {
+    if ($escalationDueAt && $now->getTimestamp() >= $escalationDueAt->getTimestamp()) {
+      $state = 'escalated';
+    } elseif ($dueAt && $now->getTimestamp() > $dueAt->getTimestamp()) {
+      $state = 'overdue';
+    } elseif ($dueAt && $remainingHours !== null && $remainingHours <= $warnHours) {
+      $state = 'due_soon';
+    } else {
+      $state = 'tracking';
+    }
+  }
+
+  return [
+    'record_type' => strtoupper(trim((string)($allocation['record_type'] ?? $policy['record_type'] ?? ''))),
+    'status' => $status,
+    'state' => $state,
+    'policy_snapshot' => [
+      'record_type' => strtoupper(trim((string)($policy['record_type'] ?? $allocation['record_type'] ?? ''))),
+      'review_hours' => $reviewHours,
+      'warn_hours_before_due' => $warnHours,
+      'escalate_hours_after_due' => $escalateHours,
+      'escalation_roles' => array_values((array)($policy['escalation_roles'] ?? [])),
+    ],
+    'started_at' => $startedAt ? $startedAt->format(DateTimeInterface::ATOM) : '',
+    'due_at' => $dueAt ? $dueAt->format(DateTimeInterface::ATOM) : '',
+    'escalation_due_at' => $escalationDueAt ? $escalationDueAt->format(DateTimeInterface::ATOM) : '',
+    'completed_at' => $completedAt ? $completedAt->format(DateTimeInterface::ATOM) : '',
+    'remaining_hours' => $remainingHours,
+    'overdue_hours' => $overdueHours,
+    'hours_to_escalation' => $hoursToEscalation,
+    'escalated' => in_array($state, ['escalated', 'closed_after_escalation'], true),
+    'escalation_roles' => array_values((array)($policy['escalation_roles'] ?? [])),
+  ];
+}
+
+function evidence_review_sla_materialize(array &$allocation, array $recordTypes = [], array $schema = []): array {
+  $previous = is_array($allocation['review_sla'] ?? null) ? $allocation['review_sla'] : [];
+  $evaluated = evidence_review_sla_evaluate($allocation, $recordTypes, $schema);
+  $username = strtolower(trim((string)($allocation['updated_by'] ?? $allocation['created_by'] ?? 'system')));
+  $now = now_iso();
+
+  if ($evaluated['state'] === 'overdue' && trim((string)($previous['overdue_logged_at'] ?? '')) === '') {
+    $previous['overdue_logged_at'] = $now;
+    allocation_append_audit_log($allocation, 'review_sla_overdue', $username, 'review_sla_overdue', [
+      'record_type' => (string)($evaluated['record_type'] ?? ''),
+      'due_at' => (string)($evaluated['due_at'] ?? ''),
+      'remaining_hours' => (int)($evaluated['remaining_hours'] ?? 0),
+    ]);
+  }
+  if ($evaluated['escalated'] && trim((string)($previous['escalated_at'] ?? '')) === '') {
+    $previous['escalated_at'] = $now;
+    allocation_append_audit_log($allocation, 'review_sla_escalated', $username, 'review_sla_escalated', [
+      'record_type' => (string)($evaluated['record_type'] ?? ''),
+      'due_at' => (string)($evaluated['due_at'] ?? ''),
+      'escalation_due_at' => (string)($evaluated['escalation_due_at'] ?? ''),
+      'escalation_roles' => array_values((array)($evaluated['escalation_roles'] ?? [])),
+    ]);
+  }
+  if (in_array($evaluated['state'], ['closed_on_time', 'closed_late', 'closed_after_escalation'], true) && trim((string)($previous['closed_logged_at'] ?? '')) === '') {
+    $previous['closed_logged_at'] = $now;
+  }
+
+  $stored = array_merge($previous, [
+    'record_type' => $evaluated['record_type'],
+    'status' => $evaluated['status'],
+    'state' => $evaluated['state'],
+    'policy_snapshot' => is_array($previous['policy_snapshot'] ?? null) ? $previous['policy_snapshot'] : $evaluated['policy_snapshot'],
+    'started_at' => $evaluated['started_at'],
+    'due_at' => $evaluated['due_at'],
+    'escalation_due_at' => $evaluated['escalation_due_at'],
+    'completed_at' => $evaluated['completed_at'],
+    'escalated' => $evaluated['escalated'],
+    'escalation_roles' => $evaluated['escalation_roles'],
+    'last_transition_at' => (($previous['state'] ?? '') !== $evaluated['state']) ? $now : (string)($previous['last_transition_at'] ?? $now),
+  ]);
+  $allocation['review_sla'] = $stored;
+  return array_merge($stored, [
+    'remaining_hours' => $evaluated['remaining_hours'],
+    'overdue_hours' => $evaluated['overdue_hours'],
+    'hours_to_escalation' => $evaluated['hours_to_escalation'],
+  ]);
 }
 
 function load_form_schema_by_code(string $formCode): ?array {
@@ -16331,6 +16642,74 @@ if ($username === '') {
     ]);
   }
 
+  case 'evidence_sla_status': {
+    $me = require_logged_in($store);
+    $allocationId = trim((string)($_GET['allocation_id'] ?? $_POST['allocation_id'] ?? ''));
+    if ($allocationId === '') api_json(['ok' => false, 'error' => 'missing_allocation_id'], 400);
+
+    $recordTypes = load_record_type_registry();
+    $allocationStore = load_allocation_store();
+    $allocation =& allocation_find_ref($allocationStore, $allocationId);
+    if (!is_array($allocation)) api_json(['ok' => false, 'error' => 'allocation_not_found'], 404);
+    $formCode = trim((string)($allocation['form_code'] ?? ''));
+    $schema = $formCode !== '' ? (load_form_schema_by_code($formCode) ?: []) : [];
+    $beforeStored = is_array($allocation['review_sla'] ?? null) ? $allocation['review_sla'] : [];
+    $reviewSla = evidence_review_sla_materialize($allocation, $recordTypes, $schema);
+    $afterStored = is_array($allocation['review_sla'] ?? null) ? $allocation['review_sla'] : [];
+    if ($beforeStored !== $afterStored) save_allocation_store($allocationStore);
+
+    api_json([
+      'ok' => true,
+      'allocation' => allocation_summary($allocation),
+      'review_sla' => $reviewSla,
+      'current_policy' => evidence_review_sla_policy_for_type((string)($allocation['record_type'] ?? ''), $recordTypes),
+      'can_manage' => evidence_review_sla_can_manage($me),
+    ]);
+  }
+
+  case 'evidence_sla_policy_save': {
+    $me = require_logged_in($store);
+    require_csrf();
+    if (!evidence_review_sla_can_manage($me)) api_json(['ok' => false, 'error' => 'insufficient_role'], 403);
+
+    $body = read_json_body();
+    $recordType = strtoupper(trim((string)($body['record_type'] ?? '')));
+    $reviewHours = max(1, min(240, (int)($body['review_hours'] ?? 72)));
+    $warnHours = max(1, min($reviewHours, (int)($body['warn_hours_before_due'] ?? 12)));
+    $escalateHours = max(1, min(240, (int)($body['escalate_hours_after_due'] ?? 24)));
+    $rolesRaw = $body['escalation_roles'] ?? [];
+    if (!is_array($rolesRaw)) {
+      $rolesRaw = preg_split('/[\s,;]+/', trim((string)$rolesRaw)) ?: [];
+    }
+    $escalationRoles = array_values(array_unique(array_values(array_filter(array_map(
+      static fn($role) => strtolower(trim((string)$role)),
+      $rolesRaw
+    )))));
+
+    if ($recordType === '') api_json(['ok' => false, 'error' => 'missing_record_type'], 400);
+    $recordTypes = load_record_type_registry();
+    if (!isset($recordTypes[$recordType])) api_json(['ok' => false, 'error' => 'record_type_not_found'], 404);
+
+    $store = load_evidence_review_sla_policy_store($recordTypes);
+    $store['record_types'][$recordType] = array_merge(
+      evidence_review_sla_policy_for_type($recordType, $recordTypes),
+      [
+        'review_hours' => $reviewHours,
+        'warn_hours_before_due' => $warnHours,
+        'escalate_hours_after_due' => $escalateHours,
+        'escalation_roles' => $escalationRoles,
+      ]
+    );
+    $store['_meta']['updated_by'] = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+    save_evidence_review_sla_policy_store($store);
+
+    api_json([
+      'ok' => true,
+      'record_type' => $recordType,
+      'policy' => evidence_review_sla_policy_for_type($recordType, $recordTypes),
+    ]);
+  }
+
   case 'evidence_pack_export': {
     require_logged_in($store);
     $allocationId = trim((string)($_GET['allocation_id'] ?? $_POST['allocation_id'] ?? ''));
@@ -16353,7 +16732,9 @@ if ($username === '') {
 
     $formCode = trim((string)($allocation['form_code'] ?? ''));
     $schema = $formCode !== '' ? (load_form_schema_by_code($formCode) ?: []) : [];
+    $recordTypes = load_record_type_registry();
     $approvalSummary = evidence_refresh_approval_summary($allocation, $schema);
+    $reviewSla = evidence_review_sla_materialize($allocation, $recordTypes, $schema);
 
     $manifest = [
       'generated_at' => now_iso(),
@@ -16362,7 +16743,8 @@ if ($username === '') {
       'allocation' => $allocation,
       'approval_summary' => $approvalSummary,
       'related_records' => evidence_links_for_allocation(load_allocation_store(), $allocationId),
-      'retention' => evidence_retention_evaluate($allocation, load_record_type_registry()),
+      'retention' => evidence_retention_evaluate($allocation, $recordTypes),
+      'review_sla' => $reviewSla,
       'review_checklist' => evidence_evaluate_checklist($allocation, 'review'),
       'approval_checklist' => evidence_evaluate_checklist($allocation, 'approval'),
     ];
@@ -16379,6 +16761,9 @@ if ($username === '') {
     }
     if (!empty($allocation['approval_summary']) && is_array($allocation['approval_summary'])) {
       $zip->addFromString('approval-summary.json', json_encode($allocation['approval_summary'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    }
+    if (!empty($allocation['review_sla']) && is_array($allocation['review_sla'])) {
+      $zip->addFromString('review-sla.json', json_encode($allocation['review_sla'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
     }
 
     $entryId = trim((string)($allocation['online_submission']['entry_id'] ?? ''));
@@ -16434,6 +16819,7 @@ if ($username === '') {
 
     $formCode = trim((string)($allocation['form_code'] ?? ''));
     $schema = $formCode !== '' ? (load_form_schema_by_code($formCode) ?: []) : [];
+    $recordTypes = load_record_type_registry();
     $checklist = evidence_evaluate_checklist($allocation, 'review');
     if (!($checklist['ok'] ?? false)) {
       api_json(['ok' => false, 'error' => 'evidence_incomplete', 'checklist' => $checklist], 422);
@@ -16442,7 +16828,10 @@ if ($username === '') {
     $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
     evidence_clear_review_outcome($allocation);
     evidence_refresh_approval_summary($allocation, $schema);
+    $allocation['review_started_at'] = now_iso();
+    unset($allocation['review_closed_at']);
     allocation_append_event($allocation, 'in_review', $username, 'evidence_submitted_for_review');
+    $reviewSla = evidence_review_sla_materialize($allocation, $recordTypes, $schema);
     save_allocation_store($allocationStore);
 
     api_json([
@@ -16450,6 +16839,7 @@ if ($username === '') {
       'allocation' => $allocation,
       'checklist' => $checklist,
       'approval_summary' => evidence_approval_summary($allocation, $schema),
+      'review_sla' => $reviewSla,
     ]);
   }
 
@@ -16478,6 +16868,7 @@ if ($username === '') {
 
     $formCode = trim((string)($allocation['form_code'] ?? ''));
     $schema = $formCode !== '' ? (load_form_schema_by_code($formCode) ?: []) : [];
+    $recordTypes = load_record_type_registry();
     $reviewConfig = evidence_review_config($schema);
     if ($formCode !== '' && !evidence_user_can_review($schema, $me)) {
       api_json(['ok' => false, 'error' => 'insufficient_role', 'required' => $reviewConfig['roles_allowed']], 403);
@@ -16535,6 +16926,7 @@ if ($username === '') {
           $allocation['approved_at'] = now_iso();
           $allocation['approved_by'] = $username;
           $allocation['approval_reason'] = $reason;
+          $allocation['review_closed_at'] = now_iso();
           allocation_append_event($allocation, 'approved', $username, $reason ?: 'evidence_approved_parallel', [
             'approval_mode' => 'parallel',
             'collected_approvals' => (int)($approvalSummary['collected_approvals'] ?? 0),
@@ -16567,6 +16959,7 @@ if ($username === '') {
         $allocation['approved_at'] = now_iso();
         $allocation['approved_by'] = $username;
         $allocation['approval_reason'] = $reason;
+        $allocation['review_closed_at'] = now_iso();
         allocation_append_event($allocation, 'approved', $username, $reason ?: 'evidence_approved', [
           'approval_mode' => 'serial',
           'signature_hash' => is_array($signatureData) ? (string)($signatureData['hash'] ?? '') : '',
@@ -16581,6 +16974,7 @@ if ($username === '') {
       $allocation['rejected_at'] = now_iso();
       $allocation['rejected_by'] = $username;
       $allocation['rejection_reason'] = $reason;
+      $allocation['review_closed_at'] = now_iso();
       allocation_append_event($allocation, 'rejected', $username, $reason, [
         'review_action' => 'reject',
         'approval_mode' => $reviewConfig['approval_mode'] ?? 'serial',
@@ -16588,6 +16982,7 @@ if ($username === '') {
     }
 
     $approvalSummary = evidence_refresh_approval_summary($allocation, $schema);
+    $reviewSla = evidence_review_sla_materialize($allocation, $recordTypes, $schema);
     save_allocation_store($allocationStore);
 
     $newStatus = allocation_status_normalize((string)($allocation['status'] ?? ''));
@@ -16596,6 +16991,7 @@ if ($username === '') {
       'status' => $newStatus,
       'allocation' => $allocation,
       'approval_summary' => $approvalSummary,
+      'review_sla' => $reviewSla,
       'checklist' => evidence_evaluate_checklist($allocation, $newStatus === 'approved' ? 'approval' : 'review'),
     ]);
   }
@@ -16636,6 +17032,7 @@ if ($username === '') {
     $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
     // Clear previous approval/rejection metadata
     evidence_clear_review_outcome($allocation);
+    evidence_review_sla_reset($allocation);
     allocation_append_event($allocation, 'submitted', $username, $reason, [
       'review_action' => 'reopen',
       'reopened_from' => $currentStatus,
@@ -16651,6 +17048,7 @@ if ($username === '') {
     $formCode = trim((string)($_GET['form_code'] ?? ''));
 
     $allocationStore = load_allocation_store();
+    $recordTypes = load_record_type_registry();
     $pending = array_values(array_filter((array)($allocationStore['allocations'] ?? []), function ($row) use ($department, $formCode) {
       if (!is_array($row)) return false;
       if (allocation_status_normalize((string)($row['status'] ?? '')) !== 'in_review') return false;
@@ -16660,16 +17058,37 @@ if ($username === '') {
     }));
 
     $schemaCache = [];
+    $dirty = false;
     foreach ($pending as &$row) {
       if (!is_array($row)) continue;
       $rowFormCode = trim((string)($row['form_code'] ?? ''));
-      if ($rowFormCode === '') continue;
-      if (!array_key_exists($rowFormCode, $schemaCache)) {
-        $schemaCache[$rowFormCode] = load_form_schema_by_code($rowFormCode) ?: [];
+      $schema = [];
+      if ($rowFormCode !== '') {
+        if (!array_key_exists($rowFormCode, $schemaCache)) {
+          $schemaCache[$rowFormCode] = load_form_schema_by_code($rowFormCode) ?: [];
+        }
+        $schema = $schemaCache[$rowFormCode];
       }
-      $row['approval_summary'] = evidence_approval_summary($row, $schemaCache[$rowFormCode]);
+      $allocationId = trim((string)($row['allocation_id'] ?? ''));
+      $row['approval_summary'] = evidence_approval_summary($row, $schema);
+      if ($allocationId !== '') {
+        $actualRow =& allocation_find_ref($allocationStore, $allocationId);
+        if (is_array($actualRow)) {
+          $beforeStored = is_array($actualRow['review_sla'] ?? null) ? $actualRow['review_sla'] : [];
+          $actualRow['approval_summary'] = evidence_approval_summary($actualRow, $schema);
+          $row['approval_summary'] = $actualRow['approval_summary'];
+          $row['review_sla'] = evidence_review_sla_materialize($actualRow, $recordTypes, $schema);
+          $afterStored = is_array($actualRow['review_sla'] ?? null) ? $actualRow['review_sla'] : [];
+          if ($beforeStored !== $afterStored) $dirty = true;
+        } else {
+          $row['review_sla'] = evidence_review_sla_evaluate($row, $recordTypes, $schema);
+        }
+      } else {
+        $row['review_sla'] = evidence_review_sla_evaluate($row, $recordTypes, $schema);
+      }
     }
     unset($row);
+    if ($dirty) save_allocation_store($allocationStore);
 
     api_json(['ok' => true, 'pending' => $pending, 'count' => count($pending)]);
   }

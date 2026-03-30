@@ -68,9 +68,14 @@ Primary affected files in the DOCX backlog:
   - rolling window (7/30/90 days)
 - Added workspace loading state when switching forms or opening a record from queue.
 - Added search debounce for form catalog to reduce re-render churn.
-- Added SLA-style due/overdue badge in pending review queue.
+- Replaced the temporary frontend-only SLA badge with server-backed SLA badges in pending review queue:
+  - due soon
+  - overdue
+  - escalates in
+  - escalated
 - Added 60-second auto-refresh while the `Việc của tôi` queue is open.
 - Removed raw filename exposure from exception card scope summary.
+- Localized queue date/time and age-badge rendering for Vietnamese UI consistency.
 
 ### Workspace / form runtime
 
@@ -89,6 +94,11 @@ Primary affected files in the DOCX backlog:
   - retention trigger and due date
   - legal hold state and reason
   - manager-side policy editing for the current record type
+- Added review SLA card directly in the workspace:
+  - applied SLA snapshot for the current review cycle
+  - review start, due, and escalation thresholds
+  - overdue / escalated state rendering
+  - manager-side policy editing for future review cycles of the current record type
 - Added export action for evidence pack directly in workspace.
 - Added schema-driven parallel approval rendering in the workspace:
   - minimum approval quorum
@@ -132,12 +142,21 @@ Primary affected files in the DOCX backlog:
   - approval summary persistence for queue/workspace rendering
 - Added server-backed retention policy store and evaluation helpers.
 - Added `evidence_retention_status`, `evidence_retention_policy_save`, and `evidence_retention_hold`.
+- Added server-backed review SLA policy store and evaluation helpers.
+- Added `evidence_sla_status` and `evidence_sla_policy_save`.
+- Added persisted review-SLA snapshot on submit-for-review and state transition handling for:
+  - in review
+  - overdue
+  - escalated
+  - closed on time / late / after escalation
+- Added review-SLA audit events for first overdue and first escalation transitions.
 - `upload_exception_queue` now supports:
   - `status`
   - `date_from`
   - `date_to`
 - `evidence_pack_export` now includes full received workbook history when present, not only the latest receipt.
 - `evidence_pack_export` now also includes approval summary and approval-record payloads when available.
+- `evidence_pack_export` now also includes `review-sla.json`.
 
 ### Strict corrections applied in this re-audit
 
@@ -165,7 +184,7 @@ Implemented or materially addressed from the 75-task DOCX:
 - `#2` Evidence pack export
   - partial: ZIP evidence pack baseline, not full PDF dossier
 - `#3` SLA timer
-  - partial: due/overdue badge in queue, not backend escalation
+  - server-backed policy, snapshot, due date, escalation threshold, queue rendering, workspace card, and audit transitions now implemented
 - `#4` Cross-reference linking
   - bidirectional link store + workspace UI done
   - still not auto-linked from business rules
@@ -224,14 +243,15 @@ Implemented or materially addressed from the 75-task DOCX:
 - Bidirectional related-record linking across allocations
 - CAPA effectiveness closeout gate
 - Retention policy and legal-hold control inside evidence workspace
+- Server-backed review SLA policy, escalation thresholding, and workspace visibility
 - Draft persistence to local + server
 - Order linking
 - Quarantine verification / accept / reject UI
 
 ### Still below world-class target
 
-- True SLA engine:
-  no persisted deadline, no escalation policy, no notification routing, no reassignment logic
+- SLA orchestration:
+  server-backed deadline and escalation thresholds now exist, but there is still no notification dispatch, assignee-based reroute, or escalation inbox/acknowledgement workflow
 - Evidence pack export:
   not yet compiled into a customer/audit-ready PDF dossier or merged release packet
 - Cross-reference automation:
@@ -269,18 +289,18 @@ Additional concrete benchmarks from official sources used for this re-audit:
 
 - Audit v1 baseline: approximately `2/10`
 - Claude v2 checkpoint: approximately `6/10`
-- Current implemented HESEM state: approximately `9.0/10`
+- Current implemented HESEM state: approximately `9.2/10`
 
 Reasoning:
 
 - The operational frontend/backoffice loop is now substantially more usable.
 - The most important governance features now exist in some form.
-- The largest remaining gap is now the backend operating model for SLA escalation, automatic training linkage, automated disposition, and a true PDF dossier/export pipeline.
+- The largest remaining gap is now notification-grade escalation routing, automatic training linkage, automated disposition, and a true PDF dossier/export pipeline.
 
 ## Recommended Next Steps
 
-1. Build persisted SLA policy + overdue/escalation backend.
-2. Upgrade evidence pack export from ZIP baseline to compiled PDF dossier / release packet.
-3. Add rule-based auto-linking and training-trigger integration on top of the new `evidence_links` model.
-4. Add disposition queue, approval workflow, and notifications on top of the current retention policy model.
+1. Upgrade evidence pack export from ZIP baseline to compiled PDF dossier / release packet.
+2. Add rule-based auto-linking and training-trigger integration on top of the new `evidence_links` model.
+3. Add disposition queue, approval workflow, and notifications on top of the current retention policy model.
+4. Extend the new SLA engine with notification dispatch, escalation acknowledgement, and manager inbox routing.
 5. Add batch actions and remaining UX/performance cleanup (`09h` table sort, skeleton loaders, draft cleanup, lookup refactor).

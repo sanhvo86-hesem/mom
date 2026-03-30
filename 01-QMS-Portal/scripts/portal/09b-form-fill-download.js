@@ -67,7 +67,10 @@ var ws = {
   relatedSearch: {},
   retentionCache: {},
   retentionLoading: {},
-  retentionEditor: {}
+  retentionEditor: {},
+  slaCache: {},
+  slaLoading: {},
+  slaEditor: {}
 };
 
 /* ── Data helpers ── */
@@ -395,6 +398,24 @@ function retentionData(allocation){
   return ws.retentionCache[allocation.allocation_id] || null;
 }
 
+function slaEditorState(allocation){
+  var key = allocation && allocation.allocation_id ? allocation.allocation_id : '__none__';
+  if(!ws.slaEditor[key]){
+    ws.slaEditor[key] = {
+      reviewHours: 72,
+      warnHours: 12,
+      escalateHours: 24,
+      escalationRoles: ''
+    };
+  }
+  return ws.slaEditor[key];
+}
+
+function slaData(allocation){
+  if(!allocation || !allocation.allocation_id) return null;
+  return ws.slaCache[allocation.allocation_id] || null;
+}
+
 function formatLocalDateTime(value, includeTime){
   if(!value) return '—';
   try{
@@ -404,6 +425,72 @@ function formatLocalDateTime(value, includeTime){
   }catch(_err){
     return String(value || '—');
   }
+}
+
+function formatHourSpan(hours){
+  hours = Number(hours);
+  if(!isFinite(hours)) return '—';
+  var abs = Math.abs(hours);
+  if(abs >= 24){
+    var days = Math.round((abs / 24) * 10) / 10;
+    return String(days).replace(/\.0$/, '') + ' ' + t('ngày', 'days');
+  }
+  return Math.round(abs) + ' ' + t('giờ', 'hours');
+}
+
+function formatRoleList(roles){
+  if(!Array.isArray(roles) || !roles.length) return '—';
+  return roles.map(function(role){
+    return String(role || '')
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, function(ch){ return ch.toUpperCase(); });
+  }).join(', ');
+}
+
+function reviewSlaStatusMeta(reviewSla){
+  var state = String(reviewSla && reviewSla.state || '').toLowerCase();
+  if(state === 'escalated') return { tone:'fail', label:t('Đã leo cấp', 'Escalated') };
+  if(state === 'overdue') return { tone:'fail', label:t('Quá hạn SLA', 'SLA overdue') };
+  if(state === 'due_soon') return { tone:'warn', label:t('Sắp đến hạn', 'Due soon') };
+  if(state === 'closed_after_escalation') return { tone:'fail', label:t('Đóng sau leo cấp', 'Closed after escalation') };
+  if(state === 'closed_late') return { tone:'warn', label:t('Đóng trễ SLA', 'Closed late') };
+  if(state === 'closed_on_time') return { tone:'pass', label:t('Đóng trong SLA', 'Closed in SLA') };
+  if(state === 'not_started') return { tone:'info', label:t('Chưa bắt đầu SLA', 'SLA not started') };
+  return { tone:'pass', label:t('Đang trong SLA', 'Within SLA') };
+}
+
+function loadSlaStatus(allocation, force){
+  if(!allocation || !allocation.allocation_id) return Promise.resolve(null);
+  var key = allocation.allocation_id;
+  if(!force && ws.slaCache[key]) return Promise.resolve(ws.slaCache[key]);
+  if(ws.slaLoading[key]) return ws.slaLoading[key];
+  ws.slaLoading[key] = api('evidence_sla_status', { allocation_id:key }, 'GET').then(function(resp){
+    var cached = {
+      reviewSla: resp && resp.ok ? (resp.review_sla || null) : null,
+      currentPolicy: resp && resp.ok ? (resp.current_policy || null) : null,
+      canManage: !!(resp && resp.can_manage),
+      error: resp && resp.ok ? '' : t('Không thể tải trạng thái SLA duyệt.', 'Could not load review SLA status.')
+    };
+    ws.slaCache[key] = cached;
+    var editor = slaEditorState(allocation);
+    var policy = cached.currentPolicy || (cached.reviewSla && cached.reviewSla.policy_snapshot) || {};
+    editor.reviewHours = Number(policy.review_hours || 72) || 72;
+    editor.warnHours = Number(policy.warn_hours_before_due || 12) || 12;
+    editor.escalateHours = Number(policy.escalate_hours_after_due || 24) || 24;
+    editor.escalationRoles = Array.isArray(policy.escalation_roles) ? policy.escalation_roles.join(', ') : '';
+    return cached;
+  }).catch(function(){
+    ws.slaCache[key] = {
+      reviewSla: null,
+      currentPolicy: null,
+      canManage: false,
+      error: t('Không thể tải trạng thái SLA duyệt.', 'Could not load review SLA status.')
+    };
+    return ws.slaCache[key];
+  }).finally(function(){
+    delete ws.slaLoading[key];
+  });
+  return ws.slaLoading[key];
 }
 
 function retentionTriggerLabel(trigger){
@@ -522,6 +609,71 @@ function renderRetentionCard(form, allocation){
   '</section>';
 }
 
+function renderSlaCard(form, allocation){
+  void form;
+  if(!allocation || !allocation.allocation_id) return '';
+  var data = slaData(allocation);
+  if(!data){
+    return '<section class="ec-retention ec-sla"><div class="ec-retention-head"><strong>' + esc(t('SLA duyệt hồ sơ', 'Review SLA')) + '</strong><span>' + esc(t('Đang tải...', 'Loading...')) + '</span></div></section>';
+  }
+  if(data.error){
+    return '<section class="ec-retention ec-sla"><div class="ec-retention-head"><strong>' + esc(t('SLA duyệt hồ sơ', 'Review SLA')) + '</strong></div><div class="ec-inline-alert">' + esc(data.error) + '</div></section>';
+  }
+
+  var reviewSla = data.reviewSla || {};
+  var appliedPolicy = reviewSla.policy_snapshot || data.currentPolicy || {};
+  var editor = slaEditorState(allocation);
+  var meta = reviewSlaStatusMeta(reviewSla);
+  var remainingText = '—';
+  if(reviewSla.state === 'overdue' || reviewSla.state === 'escalated' || reviewSla.state === 'closed_late' || reviewSla.state === 'closed_after_escalation'){
+    remainingText = formatHourSpan(reviewSla.overdue_hours != null ? reviewSla.overdue_hours : reviewSla.remaining_hours) + ' ' + t('quá hạn', 'overdue');
+  } else if(reviewSla.state === 'not_started'){
+    remainingText = t('Sẽ bắt đầu khi gửi duyệt', 'Starts when submitted for review');
+  } else if(reviewSla.remaining_hours !== null && reviewSla.remaining_hours !== undefined){
+    remainingText = formatHourSpan(reviewSla.remaining_hours) + ' ' + t('còn lại', 'remaining');
+  }
+  var escalationText = reviewSla.state === 'escalated' || reviewSla.state === 'closed_after_escalation'
+    ? t('Đã vượt mốc leo cấp', 'Escalation threshold reached')
+    : (reviewSla.hours_to_escalation !== null && reviewSla.hours_to_escalation !== undefined && isFinite(Number(reviewSla.hours_to_escalation))
+      ? (Number(reviewSla.hours_to_escalation) > 0
+        ? formatHourSpan(reviewSla.hours_to_escalation) + ' ' + t('nữa sẽ leo cấp', 'until escalation')
+        : t('Đã vượt mốc leo cấp', 'Escalation threshold reached'))
+      : '—');
+  var note = reviewSla.started_at
+    ? t('Chu kỳ SLA này đã được chốt tại thời điểm gửi duyệt để bảo toàn dấu vết audit.', 'This SLA cycle was snapshotted when the record entered review.')
+    : t('Chính sách hiện tại sẽ được chụp lại khi hồ sơ được gửi duyệt.', 'The current policy will be snapshotted when the record enters review.');
+
+  return '<section class="ec-retention ec-sla">' +
+    '<div class="ec-retention-head">' +
+      '<div><strong>' + esc(t('SLA duyệt hồ sơ', 'Review SLA')) + '</strong><p>' + esc(note) + '</p></div>' +
+      '<span class="ec-badge ' + meta.tone + '">' + esc(meta.label) + '</span>' +
+    '</div>' +
+    '<div class="ec-retention-grid">' +
+      '<div class="ec-retention-cell"><small>' + esc(t('Loại hồ sơ', 'Record type')) + '</small><strong>' + esc(reviewSla.record_type || allocation.record_type || '—') + '</strong></div>' +
+      '<div class="ec-retention-cell"><small>' + esc(t('Chu kỳ duyệt', 'Review window')) + '</small><strong>' + esc(formatHourSpan(appliedPolicy.review_hours || 0)) + '</strong></div>' +
+      '<div class="ec-retention-cell"><small>' + esc(t('Cảnh báo trước hạn', 'Warning before due')) + '</small><strong>' + esc(formatHourSpan(appliedPolicy.warn_hours_before_due || 0)) + '</strong></div>' +
+      '<div class="ec-retention-cell"><small>' + esc(t('Bắt đầu theo dõi', 'Review started')) + '</small><strong>' + esc(formatLocalDateTime(reviewSla.started_at, false)) + '</strong></div>' +
+      '<div class="ec-retention-cell"><small>' + esc(t('Hạn duyệt', 'Review due')) + '</small><strong>' + esc(formatLocalDateTime(reviewSla.due_at, false)) + '</strong></div>' +
+      '<div class="ec-retention-cell"><small>' + esc(t('Khoảng còn lại', 'Time remaining')) + '</small><strong>' + esc(remainingText) + '</strong></div>' +
+      '<div class="ec-retention-cell"><small>' + esc(t('Mốc leo cấp', 'Escalation point')) + '</small><strong>' + esc(formatLocalDateTime(reviewSla.escalation_due_at, false)) + '</strong></div>' +
+      '<div class="ec-retention-cell"><small>' + esc(t('Khoảng đến leo cấp', 'Time to escalation')) + '</small><strong>' + esc(escalationText) + '</strong></div>' +
+      '<div class="ec-retention-cell"><small>' + esc(t('Đích leo cấp', 'Escalation roles')) + '</small><strong>' + esc(formatRoleList(appliedPolicy.escalation_roles || [])) + '</strong></div>' +
+    '</div>' +
+    (data.canManage ? '<div class="ec-retention-editor">' +
+      '<div class="ec-retention-grid editor">' +
+        '<div><label class="ec-label" for="ec-sla-review-hours">' + esc(t('Số giờ duyệt', 'Review hours')) + '</label><input class="ec-input" id="ec-sla-review-hours" type="number" min="1" max="240" value="' + esc(editor.reviewHours) + '"></div>' +
+        '<div><label class="ec-label" for="ec-sla-warn-hours">' + esc(t('Cảnh báo trước hạn (giờ)', 'Warn before due (hours)')) + '</label><input class="ec-input" id="ec-sla-warn-hours" type="number" min="1" max="240" value="' + esc(editor.warnHours) + '"></div>' +
+        '<div><label class="ec-label" for="ec-sla-escalate-hours">' + esc(t('Leo cấp sau quá hạn (giờ)', 'Escalate after due (hours)')) + '</label><input class="ec-input" id="ec-sla-escalate-hours" type="number" min="1" max="240" value="' + esc(editor.escalateHours) + '"></div>' +
+        '<div class="ec-retention-cell full ec-sla-note"><small>' + esc(t('Vai trò nhận leo cấp', 'Escalation roles')) + '</small><strong>' + esc(t('Danh sách cách nhau bằng dấu phẩy. Thay đổi này áp dụng cho các chu kỳ duyệt mới của loại hồ sơ này.', 'Use comma-separated roles. Changes apply to new review cycles for this record type.')) + '</strong></div>' +
+        '<div class="ec-retention-cell full"><label class="ec-label" for="ec-sla-roles">' + esc(t('Vai trò leo cấp', 'Escalation roles')) + '</label><input class="ec-input" id="ec-sla-roles" type="text" value="' + esc(editor.escalationRoles) + '" placeholder="' + esc(t('Ví dụ: qa_manager, engineering_manager', 'Example: qa_manager, engineering_manager')) + '"></div>' +
+      '</div>' +
+      '<div class="ec-retention-actions">' +
+        '<button type="button" class="ec-btn secondary" id="ec-sla-save">' + esc(t('Lưu chính sách SLA', 'Save SLA policy')) + '</button>' +
+      '</div>' +
+    '</div>' : '') +
+  '</section>';
+}
+
 function renderEvidenceActions(allocation){
   if(!allocation || !allocation.allocation_id) return '';
   return '<div class="ec-actions"><button class="ec-btn ghost" id="ec-export-pack">' + esc(t('Xuất bộ chứng cứ', 'Export evidence pack')) + '</button></div>';
@@ -587,7 +739,7 @@ window._renderWorkspace = function(form, allocation, container){
     return preloadSelectedOnlineEntry(form, allocation);
   }).then(function(){
     renderWorkspace(form, allocation, container);
-    return Promise.all([loadChecklist(allocation), loadRelatedRecords(allocation), loadRetentionStatus(allocation)]);
+    return Promise.all([loadChecklist(allocation), loadRelatedRecords(allocation), loadRetentionStatus(allocation), loadSlaStatus(allocation)]);
   }).then(function(){
     if(allocation) renderWorkspace(form, allocation, container);
   }).catch(function(){
@@ -736,6 +888,7 @@ function renderOnlineStep(form, allocation){
   html += renderCapaEffectivenessCard(form, allocation);
   html += renderRelatedRecords(allocation);
   html += renderRetentionCard(form, allocation);
+  html += renderSlaCard(form, allocation);
   html += renderEvidenceActions(allocation);
 
   /* actions */
@@ -797,6 +950,7 @@ function renderOfflineStep(form, allocation){
   html += renderCapaEffectivenessCard(form, allocation);
   html += renderRelatedRecords(allocation);
   html += renderRetentionCard(form, allocation);
+  html += renderSlaCard(form, allocation);
   html += renderEvidenceActions(allocation);
   html += renderApprovalBar(form, allocation);
   html += '</div></div>';
@@ -1275,6 +1429,58 @@ function bindRetentionActions(form, allocation, container){
   };
 }
 
+function bindSlaActions(form, allocation, container){
+  if(!allocation) return;
+  var data = slaData(allocation);
+  if(!data || !data.canManage) return;
+  var state = slaEditorState(allocation);
+
+  var reviewEl = document.getElementById('ec-sla-review-hours');
+  if(reviewEl) reviewEl.oninput = function(){
+    state.reviewHours = Math.max(1, Number(reviewEl.value || 1) || 1);
+    if(state.warnHours > state.reviewHours) state.warnHours = state.reviewHours;
+  };
+
+  var warnEl = document.getElementById('ec-sla-warn-hours');
+  if(warnEl) warnEl.oninput = function(){
+    state.warnHours = Math.max(1, Math.min(Number(reviewEl && reviewEl.value || state.reviewHours || 72) || 72, Number(warnEl.value || 1) || 1));
+  };
+
+  var escalateEl = document.getElementById('ec-sla-escalate-hours');
+  if(escalateEl) escalateEl.oninput = function(){
+    state.escalateHours = Math.max(1, Number(escalateEl.value || 1) || 1);
+  };
+
+  var rolesEl = document.getElementById('ec-sla-roles');
+  if(rolesEl) rolesEl.oninput = function(){ state.escalationRoles = rolesEl.value || ''; };
+
+  var saveBtn = document.getElementById('ec-sla-save');
+  if(saveBtn) saveBtn.onclick = function(){
+    saveBtn.disabled = true;
+    api('evidence_sla_policy_save', {
+      record_type: allocation.record_type || detectRecordType(form),
+      review_hours: state.reviewHours,
+      warn_hours_before_due: state.warnHours,
+      escalate_hours_after_due: state.escalateHours,
+      escalation_roles: String(state.escalationRoles || '').split(',').map(function(role){ return role.trim(); }).filter(Boolean)
+    }, 'POST').then(function(resp){
+      if(resp && resp.ok){
+        delete ws.slaCache[allocation.allocation_id];
+        return loadSlaStatus(allocation, true).then(function(){
+          toast(t('Đã lưu chính sách SLA duyệt.', 'Review SLA policy saved.'), 'success');
+        });
+      }
+      toast(t('Không thể lưu chính sách SLA duyệt.', 'Could not save review SLA policy.'), 'error');
+      return null;
+    }).catch(function(){
+      toast(t('Không thể lưu chính sách SLA duyệt.', 'Could not save review SLA policy.'), 'error');
+    }).finally(function(){
+      renderWorkspace(form, allocation, container);
+      bindWorkspace(form, allocation, container);
+    });
+  };
+}
+
 function bindWorkspace(form, allocation, container){
   /* step toggles */
   if(!container._ecToggleBound){
@@ -1309,6 +1515,7 @@ function bindWorkspace(form, allocation, container){
   };
   bindRelatedActions(form, allocation, container);
   bindRetentionActions(form, allocation, container);
+  bindSlaActions(form, allocation, container);
 
   /* online form */
   if(allocation && form.online !== false){

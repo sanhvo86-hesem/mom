@@ -1323,6 +1323,15 @@ textarea.ec-dialog-input {
   flex-wrap: wrap;
   gap: 8px;
 }
+.ec-sla-note {
+  background: linear-gradient(180deg, #eff6ff 0%, #f8fbff 100%);
+  border-color: #bfdbfe;
+}
+.ec-sla-note strong {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ec-text-secondary);
+}
 
 .ec-field-locked .ec-input,
 .ec-field-locked .ec-select,

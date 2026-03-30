@@ -228,7 +228,12 @@ function ensureWorkQueueDefaults(){
 
 function fmtDateTime(value){
   if(!value) return '-';
-  try { return new Date(value).toLocaleString(); } catch(_err){ return String(value); }
+  try {
+    var locale = (typeof lang !== 'undefined' && lang === 'en') ? 'en-US' : 'vi-VN';
+    return new Intl.DateTimeFormat(locale, { dateStyle:'medium', timeStyle:'short' }).format(new Date(value));
+  } catch(_err){
+    return String(value);
+  }
 }
 
 function renderAgeBadge(value){
@@ -236,7 +241,9 @@ function renderAgeBadge(value){
   var hours = Math.floor((Date.now() - new Date(value).getTime()) / 3600000);
   if(!isFinite(hours) || hours < 0) return '';
   var tone = hours >= 120 ? 'fail' : (hours >= 48 ? 'warn' : 'info');
-  var label = hours >= 24 ? (Math.floor(hours / 24) + 'd') : (hours + 'h');
+  var label = hours >= 24
+    ? (Math.floor(hours / 24) + ' ' + t('ngày', 'days'))
+    : (hours + ' ' + t('giờ', 'hours'));
   return '<span class="ec-badge ' + tone + '">' + esc(label) + '</span>';
 }
 
@@ -252,24 +259,87 @@ function recordTypeForItem(item){
 function reviewSlaHours(item){
   var recordType = recordTypeForItem(item);
   var cfg = (state.recordTypes && state.recordTypes[recordType]) ? state.recordTypes[recordType] : {};
-  var configured = Number(cfg.sla_review_hours || cfg.sla_hours || 0);
+  var policy = cfg.review_sla_policy || {};
+  var configured = Number(policy.review_hours || cfg.sla_review_hours || cfg.sla_hours || 0);
   if(isFinite(configured) && configured > 0) return configured;
   if(recordType === 'NCR' || recordType === 'CAPA' || recordType === 'AUD') return 48;
   if(recordType === 'FAI' || recordType === 'SCAR') return 72;
   return 72;
 }
 
-function renderSlaBadge(item){
+function formatSlaDistance(hours){
+  hours = Math.abs(Number(hours || 0));
+  if(!isFinite(hours) || hours <= 0) return t('0 giờ', '0h');
+  if(hours >= 24){
+    var days = Math.round((hours / 24) * 10) / 10;
+    var clean = String(days).replace(/\.0$/, '');
+    return clean + ' ' + t('ngày', 'd');
+  }
+  return Math.round(hours) + ' ' + t('giờ', 'h');
+}
+
+function reviewSlaMeta(item){
+  var reviewSla = item && item.review_sla ? item.review_sla : null;
+  if(reviewSla && reviewSla.state){
+    return {
+      state: String(reviewSla.state || '').trim().toLowerCase(),
+      remainingHours: Number(reviewSla.remaining_hours),
+      overdueHours: Number(reviewSla.overdue_hours),
+      hoursToEscalation: Number(reviewSla.hours_to_escalation),
+      escalated: !!reviewSla.escalated,
+      dueAt: String(reviewSla.due_at || ''),
+      escalationDueAt: String(reviewSla.escalation_due_at || '')
+    };
+  }
   var stamp = new Date((item && (item.submitted_at || item.updated_at || item.created_at)) || '').getTime();
-  if(!stamp) return '';
+  if(!stamp) return null;
   var dueAt = stamp + (reviewSlaHours(item) * 3600000);
   var diff = dueAt - Date.now();
-  var hours = Math.round(Math.abs(diff) / 3600000);
-  var tone = diff < 0 ? 'fail' : (hours <= 12 ? 'warn' : 'info');
-  var label = diff < 0
-    ? t('Quá hạn ', 'Overdue ') + (hours >= 24 ? Math.floor(hours / 24) + 'd' : hours + 'h')
-    : t('Còn ', 'Due in ') + (hours >= 24 ? Math.floor(hours / 24) + 'd' : hours + 'h');
+  return {
+    state: diff < 0 ? 'overdue' : (Math.round(diff / 3600000) <= 12 ? 'due_soon' : 'tracking'),
+    remainingHours: Math.floor(diff / 3600000),
+    overdueHours: diff < 0 ? Math.ceil(Math.abs(diff) / 3600000) : 0,
+    hoursToEscalation: NaN,
+    escalated: false,
+    dueAt: new Date(dueAt).toISOString(),
+    escalationDueAt: ''
+  };
+}
+
+function renderSlaBadge(item){
+  var meta = reviewSlaMeta(item);
+  if(!meta) return '';
+  var tone = 'info';
+  var label = t('Trong SLA', 'Within SLA');
+  if(meta.state === 'escalated' || meta.state === 'closed_after_escalation'){
+    tone = 'fail';
+    label = t('Đã leo cấp ', 'Escalated ') + formatSlaDistance(meta.overdueHours || meta.remainingHours || 0);
+  } else if(meta.state === 'overdue' || meta.state === 'closed_late'){
+    tone = 'fail';
+    label = t('Quá hạn ', 'Overdue ') + formatSlaDistance(meta.overdueHours || meta.remainingHours || 0);
+  } else if(meta.state === 'due_soon'){
+    tone = 'warn';
+    label = t('Sắp đến hạn ', 'Due soon ') + formatSlaDistance(meta.remainingHours || 0);
+  } else if(meta.state === 'closed_on_time'){
+    tone = 'pass';
+    label = t('Đóng trong SLA', 'Closed in SLA');
+  } else if(isFinite(meta.remainingHours)){
+    tone = 'info';
+    label = t('Còn ', 'Due in ') + formatSlaDistance(meta.remainingHours);
+  }
   return '<span class="ec-badge ' + tone + '">' + esc(label) + '</span>';
+}
+
+function renderEscalationBadge(item){
+  var meta = reviewSlaMeta(item);
+  if(!meta) return '';
+  if(meta.state === 'overdue' && isFinite(meta.hoursToEscalation) && meta.hoursToEscalation > 0){
+    return '<span class="ec-badge warn">' + esc(t('Leo cấp sau ', 'Escalates in ') + formatSlaDistance(meta.hoursToEscalation)) + '</span>';
+  }
+  if(meta.state === 'escalated' || meta.state === 'closed_after_escalation'){
+    return '<span class="ec-badge warn">' + esc(t('Đã chuyển leo cấp', 'Escalated')) + '</span>';
+  }
+  return '';
 }
 
 function statusLabel(status){
@@ -519,10 +589,11 @@ function renderPendingItem(item){
   if(String(approvalSummary.approval_mode || '') === 'parallel'){
     approvalBadge = '<span class="ec-badge info">' + esc(String(approvalSummary.collected_approvals || 0) + '/' + String(approvalSummary.minimum_approvals || 0) + ' ' + t('phê duyệt', 'approvals')) + '</span>';
   }
+  var escalationBadge = renderEscalationBadge(item);
   return '<article class="ec-work-card">' +
     '<div class="ec-work-card-top">' +
       '<div><div class="ec-work-id">' + esc(item.record_id || item.allocation_id || '-') + '</div><div class="ec-work-sub">' + esc(summary || t('Chưa có ngữ cảnh truy xuất', 'Traceability context not available')) + '</div></div>' +
-      '<div class="ec-work-status">' + approvalBadge + renderSlaBadge(item) + renderAgeBadge(item.submitted_at || item.updated_at || item.created_at || '') + statusHtml + '</div>' +
+      '<div class="ec-work-status">' + approvalBadge + renderSlaBadge(item) + escalationBadge + renderAgeBadge(item.submitted_at || item.updated_at || item.created_at || '') + statusHtml + '</div>' +
     '</div>' +
     '<div class="ec-work-grid">' +
       renderMiniField(t('Người gửi', 'Submitted by'), item.submitted_by || item.updated_by || '-') +
