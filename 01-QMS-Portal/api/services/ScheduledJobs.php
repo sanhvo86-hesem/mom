@@ -641,6 +641,40 @@ final class ScheduledJobs
     // ── Job Execution Framework ─────────────────────────────────────────────
 
     /**
+     * MTConnect polling cycle for all active MTConnect adapters.
+     *
+     * Runs a governed polling pass across every active MTConnect adapter in
+     * master data, updates runtime machine signals, appends connectivity
+     * events, and mirrors the new state to the PostgreSQL shadow layer when
+     * available.
+     *
+     * Schedule: Every 1 minute by cron or a Windows scheduled task.
+     *
+     * @return array{job: string, processed: int, success: int, failed: int, skipped: int, duration_ms: float}
+     */
+    public function runMtconnectPollingCycle(): array
+    {
+        return $this->executeJob('mtconnect_poll_cycle', function (): array {
+            require_once __DIR__ . '/MtconnectPollingService.php';
+
+            $service = new MtconnectPollingService($this->dataDir, dirname($this->dataDir, 2));
+            $result = $service->pollAll([
+                'user_id' => 'system.mtconnect',
+                'note' => 'Scheduled MTConnect polling cycle.',
+                'force' => false,
+                'timeout_seconds' => 8,
+            ]);
+
+            return [
+                'processed' => (int)($result['processed'] ?? 0),
+                'success' => (int)($result['success'] ?? 0),
+                'failed' => (int)($result['failed'] ?? 0),
+                'skipped' => (int)($result['skipped'] ?? 0),
+            ];
+        });
+    }
+
+    /**
      * Execute a job with timing, error handling, and logging.
      *
      * @param string   $jobName Job identifier.

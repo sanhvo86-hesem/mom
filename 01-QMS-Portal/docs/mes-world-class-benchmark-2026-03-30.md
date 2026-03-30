@@ -54,3 +54,11 @@ This cycle adds the missing Level 3/4 governance foundation for:
 3. Promote connector feeds from pilot/manual to real MTConnect/OPC UA adapters.
 4. Add TimescaleDB hypertables and aggregates when live machine and ERP cadence justify them.
 5. Add formal B2MML payload generation for governed Level 3/4 transactions.
+
+## Delta After The Latest Connectivity Upgrade
+
+1. The MES runtime now has a cron-ready MTConnect polling service instead of relying only on single manual polling actions.
+2. The control-center UI can trigger a governed MTConnect batch poll while still respecting runtime-mode gating.
+3. A PostgreSQL `LISTEN/NOTIFY` migration now exists for telemetry, alarms, and downtime so the live-stream path can shift from polling to event-driven updates after cutover.
+4. Cutover audits now verify that batch connectivity plumbing exists before a team promotes PostgreSQL-backed live streaming.
+5. The remaining blockers are no longer architectural uncertainty; they are deployment readiness and external-system connectivity.

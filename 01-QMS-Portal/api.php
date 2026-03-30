@@ -2051,6 +2051,16 @@ function edge_connector_service(): \HESEM\QMS\Services\EdgeConnectorService {
   return $service;
 }
 
+function mtconnect_polling_service(): \HESEM\QMS\Services\MtconnectPollingService {
+  global $DATA_DIR;
+  require_once __DIR__ . '/api/services/MtconnectPollingService.php';
+  static $service = null;
+  if ($service === null) {
+    $service = new \HESEM\QMS\Services\MtconnectPollingService($DATA_DIR, dirname(__DIR__));
+  }
+  return $service;
+}
+
 function mes_adapter_service(): \HESEM\QMS\Services\MesAdapterService {
   require_once __DIR__ . '/api/services/MesAdapterService.php';
   static $service = null;
@@ -14823,187 +14833,91 @@ if ($username === '') {
     ]);
   }
 
+  case 'mes_mtconnect_poll_batch': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
+
+    $result = mtconnect_polling_service()->pollAll([
+      'user_id' => $username,
+      'timeout_seconds' => (int)($body['timeout_seconds'] ?? 10),
+      'force' => (bool)($body['force'] ?? false),
+      'note' => trim((string)($body['note'] ?? 'Batch poll from MES control center.')),
+    ]);
+
+    $master = is_array($result['master'] ?? null) ? $result['master'] : load_master_data_store();
+    $orders = is_array($result['orders'] ?? null) ? $result['orders'] : load_orders_store();
+    $mes = is_array($result['mes'] ?? null) ? $result['mes'] : load_mes_runtime_store();
+
+    api_json([
+      'ok' => (bool)($result['ok'] ?? false),
+      'processed' => (int)($result['processed'] ?? 0),
+      'success' => (int)($result['success'] ?? 0),
+      'failed' => (int)($result['failed'] ?? 0),
+      'skipped' => (int)($result['skipped'] ?? 0),
+      'results' => array_values((array)($result['results'] ?? [])),
+      'data' => build_mes_snapshot($orders, $master, $mes),
+    ], (int)($result['failed'] ?? 0) > 0 ? 207 : 200);
+  }
+
   case 'mes_mtconnect_poll_once': {
     if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
     $me = require_logged_in($store);
     require_csrf();
     $body = read_json_body();
-
-    $orders = load_orders_store();
-    $master = load_master_data_store();
-    $mes = load_mes_runtime_store();
     $username = (string)($_SESSION['user'] ?? $me['username'] ?? 'system');
-
     $machineId = trim((string)($body['machine_id'] ?? ''));
-    $adapterId = trim((string)($body['adapter_id'] ?? ''));
-    $machines = master_index_by((array)($master['machines'] ?? []), 'machine_id');
-    $operators = master_index_by((array)($master['operators'] ?? []), 'operator_id');
-    $adapter = null;
+    if ($machineId === '') api_json(['ok' => false, 'error' => 'missing_machine_id'], 400);
 
-    if ($adapterId !== '') {
-      foreach ((array)($master['mes_connectivity_adapters'] ?? []) as $row) {
-        if (!is_array($row) || (string)($row['adapter_id'] ?? '') !== $adapterId) continue;
-        $adapter = $row;
-        break;
+    $result = mtconnect_polling_service()->pollMachine($machineId, [
+      'user_id' => $username,
+      'adapter_id' => trim((string)($body['adapter_id'] ?? '')),
+      'endpoint_url' => trim((string)($body['endpoint_url'] ?? '')),
+      'wo_number' => trim((string)($body['wo_number'] ?? '')),
+      'operator_id' => trim((string)($body['operator_id'] ?? '')),
+      'timeout_seconds' => (int)($body['timeout_seconds'] ?? 10),
+      'force' => (bool)($body['force'] ?? false),
+      'note' => trim((string)($body['note'] ?? 'Polled once from MTConnect adapter.')),
+    ]);
+
+    $master = is_array($result['master'] ?? null) ? $result['master'] : load_master_data_store();
+    $orders = is_array($result['orders'] ?? null) ? $result['orders'] : load_orders_store();
+    $mes = is_array($result['mes'] ?? null) ? $result['mes'] : load_mes_runtime_store();
+    $error = trim((string)($result['error'] ?? ''));
+
+    if (($result['ok'] ?? false) !== true) {
+      $statusCode = 422;
+      if ($error === 'machine_not_found' || $error === 'adapter_not_found' || $error === 'work_order_not_found' || $error === 'operator_not_found') {
+        $statusCode = 404;
+      } elseif ($error === 'wo_machine_mismatch' || $error === 'stale_signal_timestamp') {
+        $statusCode = 409;
+      } elseif (str_starts_with($error, 'connector_http_')) {
+        $statusCode = 502;
       }
-      if (is_array($adapter) && $machineId === '') {
-        $machineId = trim((string)($adapter['machine_id'] ?? ''));
-      }
-    }
 
-    if ($machineId === '') {
-      api_json(['ok' => false, 'error' => 'missing_machine_id'], 400);
-    }
-    if (!isset($machines[$machineId])) {
-      observe_connector_ingest($machineId, false, 'machine_not_found', ['action' => 'mes_mtconnect_poll_once']);
-      api_json(['ok' => false, 'error' => 'machine_not_found'], 404);
-    }
-    $machine = $machines[$machineId];
-
-    if (!is_array($adapter)) {
-      foreach ((array)($master['mes_connectivity_adapters'] ?? []) as $row) {
-        if (!is_array($row) || (string)($row['machine_id'] ?? '') !== $machineId) continue;
-        if (strtolower(trim((string)($row['adapter_type'] ?? ''))) !== 'mtconnect') continue;
-        $adapter = $row;
-        break;
-      }
-    }
-    if (!is_array($adapter)) {
-      observe_connector_ingest($machineId, false, 'adapter_not_found', ['action' => 'mes_mtconnect_poll_once']);
-      api_json(['ok' => false, 'error' => 'adapter_not_found'], 404);
-    }
-
-    $adapterType = strtolower(trim((string)($adapter['adapter_type'] ?? $machine['connector_type'] ?? '')));
-    if ($adapterType !== 'mtconnect') {
-      observe_connector_ingest($machineId, false, 'adapter_type_not_supported', [
-        'action' => 'mes_mtconnect_poll_once',
-        'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
-        'adapter_type' => $adapterType,
-      ]);
-      api_json(['ok' => false, 'error' => 'adapter_type_not_supported'], 422);
-    }
-    if (strtolower(trim((string)($adapter['status'] ?? 'active'))) !== 'active') {
-      observe_connector_ingest($machineId, false, 'adapter_not_active', [
-        'action' => 'mes_mtconnect_poll_once',
-        'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
-      ]);
-      api_json(['ok' => false, 'error' => 'adapter_not_active'], 409);
-    }
-
-    $pollUrl = '';
-    try {
-      $pollUrl = mes_mtconnect_poll_url((string)($body['endpoint_url'] ?? $adapter['endpoint_url'] ?? $machine['connector_endpoint'] ?? ''));
-      $timeoutSeconds = min(30, max(3, (int)($body['timeout_seconds'] ?? 10)));
-      $xml = mes_http_fetch_text($pollUrl, $timeoutSeconds);
-      $normalized = edge_connector_service()->normalize([
-        'machine_id' => $machineId,
-        'connector_type' => 'mtconnect',
-        'connector_name' => (string)($adapter['adapter_name'] ?? $machine['connector_name'] ?? 'MTConnect Adapter'),
-        'connector_endpoint' => $pollUrl,
-        'telemetry_mode' => (string)($machine['telemetry_mode'] ?? 'machine'),
-        'source' => 'mtconnect',
-        'heartbeat_sla_seconds' => (int)($adapter['heartbeat_sla_seconds'] ?? $machine['heartbeat_sla_seconds'] ?? 120),
-        'wo_number' => trim((string)($body['wo_number'] ?? '')),
-        'operator_id' => trim((string)($body['operator_id'] ?? '')),
-        'note' => trim((string)($body['note'] ?? 'Polled once from MTConnect adapter.')),
-        'mtconnect_xml' => $xml,
-      ], $machine, $username);
-    } catch (Throwable $e) {
-      $savedEvent = mes_append_connectivity_event($mes, [
-        'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
-        'machine_id' => $machineId,
-        'event_time' => now_iso(),
-        'event_type' => 'mtconnect_poll_failed',
-        'severity' => 'WARNING',
-        'status' => 'open',
-        'message' => 'MTConnect poll failed: ' . $e->getMessage(),
-        'payload_excerpt' => [
-          'endpoint_url' => $pollUrl !== '' ? $pollUrl : (string)($adapter['endpoint_url'] ?? ''),
-        ],
-        'recorded_by' => $username,
-        'recorded_at' => now_iso(),
-      ]);
-      save_mes_runtime_store($mes);
-      observe_connector_ingest($machineId, false, $e->getMessage(), [
-        'action' => 'mes_mtconnect_poll_once',
-        'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
-        'poll_url' => $pollUrl,
-      ]);
-      $code = str_starts_with($e->getMessage(), 'connector_http_') ? 502 : 422;
       api_json([
         'ok' => false,
-        'error' => $e->getMessage(),
-        'poll_url' => $pollUrl,
-        'event' => $savedEvent,
-      ], $code);
+        'error' => $error !== '' ? $error : 'mtconnect_poll_failed',
+        'message' => (string)($result['message'] ?? ''),
+        'machine_id' => (string)($result['machine_id'] ?? $machineId),
+        'adapter_id' => (string)($result['adapter_id'] ?? ''),
+        'poll_url' => (string)($result['poll_url'] ?? ''),
+        'event' => is_array($result['event'] ?? null) ? $result['event'] : null,
+        'data' => build_mes_snapshot($orders, $master, $mes),
+      ], $statusCode);
     }
-
-    $woNumber = trim((string)($normalized['wo_number'] ?? ''));
-    if ($woNumber !== '') {
-      $wo = find_order_record($orders, 'wo', $woNumber);
-      if (!$wo) {
-        observe_connector_ingest($machineId, false, 'work_order_not_found', ['action' => 'mes_mtconnect_poll_once', 'wo_number' => $woNumber]);
-        api_json(['ok' => false, 'error' => 'work_order_not_found'], 404);
-      }
-      $woMachineId = trim((string)($wo['machine_id'] ?? ''));
-      if ($woMachineId !== '' && $woMachineId !== $machineId) {
-        observe_connector_ingest($machineId, false, 'wo_machine_mismatch', ['action' => 'mes_mtconnect_poll_once', 'wo_number' => $woNumber, 'wo_machine_id' => $woMachineId]);
-        api_json(['ok' => false, 'error' => 'wo_machine_mismatch'], 409);
-      }
-    }
-
-    $operatorId = trim((string)($normalized['operator_id'] ?? ''));
-    if ($operatorId !== '' && !isset($operators[$operatorId])) {
-      observe_connector_ingest($machineId, false, 'operator_not_found', ['action' => 'mes_mtconnect_poll_once', 'operator_id' => $operatorId]);
-      api_json(['ok' => false, 'error' => 'operator_not_found'], 404);
-    }
-
-    $signalGuard = mes_signal_replay_guard($mes, $machine, $normalized);
-    if ($signalGuard) {
-      observe_connector_ingest($machineId, false, 'stale_signal_timestamp', [
-        'action' => 'mes_mtconnect_poll_once',
-        'incoming_signal_at' => (string)($signalGuard['incoming_signal_at'] ?? ''),
-        'latest_signal_at' => (string)($signalGuard['latest_signal_at'] ?? ''),
-        'connector_type' => (string)($signalGuard['connector_type'] ?? ''),
-        'wo_number' => $woNumber,
-      ]);
-      api_json($signalGuard, 409);
-    }
-
-    $saved = mes_upsert_connector_runtime($mes, $machine, $normalized, $username);
-    $savedEvent = mes_append_connectivity_event($mes, [
-      'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
-      'machine_id' => $machineId,
-      'event_time' => now_iso(),
-      'event_type' => 'mtconnect_poll_ok',
-      'severity' => 'INFO',
-      'status' => 'closed',
-      'message' => 'MTConnect payload polled and ingested successfully.',
-      'payload_excerpt' => [
-        'endpoint_url' => $pollUrl,
-        'signal_at' => (string)($saved['signal']['signal_at'] ?? ''),
-        'program_id' => (string)($saved['signal']['current_program_id'] ?? ''),
-      ],
-      'recorded_by' => $username,
-      'recorded_at' => now_iso(),
-    ]);
-    save_mes_runtime_store($mes);
-    observe_connector_ingest($machineId, true, 'MTConnect poll completed.', [
-      'action' => 'mes_mtconnect_poll_once',
-      'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
-      'connector_type' => (string)($saved['feed']['connector_type'] ?? ''),
-      'wo_number' => $woNumber,
-      'warning_count' => count((array)($saved['ingest_warnings'] ?? [])),
-      'source_payload_type' => (string)($normalized['_ingest']['source_payload_type'] ?? ''),
-    ]);
 
     api_json([
       'ok' => true,
-      'poll_url' => $pollUrl,
-      'signal' => $saved['signal'],
-      'feed' => $saved['feed'],
-      'event' => $savedEvent,
-      'ingest_warnings' => array_values((array)($saved['ingest_warnings'] ?? [])),
+      'status' => (string)($result['status'] ?? 'ok'),
+      'message' => (string)($result['message'] ?? ''),
+      'poll_url' => (string)($result['poll_url'] ?? ''),
+      'signal' => is_array($result['signal'] ?? null) ? $result['signal'] : null,
+      'feed' => is_array($result['feed'] ?? null) ? $result['feed'] : null,
+      'event' => is_array($result['event'] ?? null) ? $result['event'] : null,
+      'ingest_warnings' => array_values((array)($result['ingest_warnings'] ?? [])),
       'data' => build_mes_snapshot($orders, $master, $mes),
     ]);
   }

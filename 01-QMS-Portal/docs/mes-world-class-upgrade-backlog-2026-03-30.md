@@ -77,6 +77,20 @@ The HESEM portal should evolve from a strong QMS + pilot MES runtime into a gove
 - Shift handover runtime and queue
 - Shift governance visibility in MES and exceptions
 
+### Cycle 4
+
+- MTConnect batch polling service for active adapters
+- Scheduled job entrypoint for cron / Windows Task Scheduler
+- SSE runtime gating aligned to PostgreSQL readiness instead of fake live mode
+- Runtime cutover audit extended to verify batch connectivity plumbing
+
+## Immediate Next Upgrade After This Cycle
+
+1. Activate PostgreSQL shadow-write in deployment once the database path is reachable and migrations are confirmed.
+2. Run MTConnect polling on a live pilot CNC through the scheduled poll cycle instead of manual-only polling.
+3. Add PostgreSQL `LISTEN/NOTIFY` triggers so SSE can consume true live events after the Postgres path is active.
+4. Build the missing Epicor transport adapter and outbox worker so Level 4 integration is no longer governance-only.
+
 ## Completion Criteria
 
 - All new runtime actions lint and audit clean.

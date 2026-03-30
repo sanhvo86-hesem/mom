@@ -1238,6 +1238,9 @@ function render(){
   var centers = workCenters();
   var machineWall = Array.isArray(snapshot.machine_wall) ? snapshot.machine_wall : [];
   var connectors = Array.isArray(snapshot.connector_summary) ? snapshot.connector_summary : [];
+  var batchPollReady = connectors.some(function(row){
+    return String(row && row.connector_type || '').toLowerCase() === 'mtconnect';
+  });
   var oeeTimeline = Array.isArray(snapshot.oee_timeline) ? snapshot.oee_timeline : [];
   var downtimePareto = Array.isArray(snapshot.downtime_pareto) ? snapshot.downtime_pareto : [];
   var programHandshake = Array.isArray(snapshot.program_handshake_queue) ? snapshot.program_handshake_queue : [];
@@ -1305,7 +1308,7 @@ function render(){
     '<section class="mesx-hero">' +
       '<article class="mesx-poster">' +
         '<div class="mesx-brand"><div class="mesx-brand-main"><div class="mesx-logo"><img src="./assets/hesem-logo.svg" alt="HESEM"></div><div><div class="mesx-kicker">HESEM CNC MOM / MES</div><h1>' + esc(t('Trung tâm điều hành MES', 'MES Control Center')) + '</h1><p>' + esc(t('Một màn hình duy nhất để điều độ WO, đọc trạng thái máy, khóa gate chứng cứ, bắt cảnh báo tool-life và ra quyết định khôi phục xưởng nhanh theo ngữ cảnh thật.', 'One production surface to dispatch WO, read machine status, enforce evidence gates, catch tool-life alerts, and drive recovery decisions in real shop-floor context.')) + '</p><div class="mesx-facts"><span class="mesx-fact">⏱ ' + esc(currentStamp()) + '</span><span class="mesx-fact">📡 ' + esc(streamFact) + '</span><span class="mesx-fact">🕒 ' + esc((currentShift.shift_code || '—') + ' · ' + (currentShift.shift_name_vi || currentShift.shift_name_en || t('Chưa xác định ca', 'Unresolved shift'))) + '</span><span class="mesx-fact">📦 ' + esc((kpi.wo_active || 0) + ' ' + t('WO đang hoạt động', 'active WO')) + '</span><span class="mesx-fact">🏭 ' + esc((kpi.machines_total || 0) + ' ' + t('tài sản theo dõi', 'assets tracked')) + '</span><span class="mesx-fact">🔌 ' + esc((kpi.connectors_healthy || 0) + '/' + (kpi.connectors_total || 0) + ' ' + t('kết nối ổn', 'healthy links')) + '</span><span class="mesx-fact">📊 OEE ' + esc(fmtPercent(kpi.oee_pct)) + '</span></div></div></div><div>' + badge((kpi.machines_down || 0) > 0 ? statusMeta('down') : statusMeta('running')) + '</div></div>' +
-        '<div class="mesx-actions"><button type="button" class="mesx-btn primary" id="mes-refresh">⟳ ' + esc(t('Làm mới runtime', 'Refresh runtime')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-orders">📦 ' + esc(t('Quản lý đơn hàng', 'Order management')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-master">🧭 ' + esc(t('Dữ liệu nền', 'Master data')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-forms">📋 ' + esc(t('Kiểm soát chứng cứ', 'Evidence control')) + '</button></div>' +
+        '<div class="mesx-actions"><button type="button" class="mesx-btn primary" id="mes-refresh">⟳ ' + esc(t('Làm mới runtime', 'Refresh runtime')) + '</button><button type="button" class="mesx-btn secondary" id="mes-poll-batch"' + (batchPollReady ? '' : ' disabled') + '>📡 ' + esc(t('Poll MTConnect batch', 'Poll MTConnect batch')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-orders">📦 ' + esc(t('Quản lý đơn hàng', 'Order management')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-master">🧭 ' + esc(t('Dữ liệu nền', 'Master data')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-forms">📋 ' + esc(t('Kiểm soát chứng cứ', 'Evidence control')) + '</button></div>' +
       '</article>' +
       '<aside class="mesx-side">' +
         '<article class="mesx-card mesx-clock"><div class="mesx-clock-top"><div><div class="mesx-kicker">' + esc(t('Snapshot runtime', 'Runtime snapshot')) + '</div><strong>' + esc(currentStamp()) + '</strong><small>' + esc(t('Nguồn dữ liệu: Order Management + Master Data + MES runtime + Exception dashboard.', 'Data source: Order Management + Master Data + MES runtime + Exception dashboard.')) + '</small></div>' + badge(statusMeta('approved')) + '</div></article>' +
@@ -1377,6 +1380,8 @@ function bind(){
     loadData();
     if(state.streamStatus !== 'live') connectStream();
   };
+  var pollBatch = document.getElementById('mes-poll-batch');
+  if(pollBatch) pollBatch.onclick = function(){ pollMtconnectBatch(); };
   var openOrders = document.getElementById('mes-open-orders');
   if(openOrders) openOrders.onclick = function(){ if(typeof navigateTo === 'function') navigateTo('orders'); };
   var openMaster = document.getElementById('mes-open-master');
@@ -1528,10 +1533,41 @@ function pollMtconnect(machineId){
       streamed_at: new Date().toISOString()
     });
     state.loading = false;
-    render();
-    toast(t('Đã đồng bộ một nhịp MTConnect vào runtime MES.', 'One MTConnect sample has been synchronized into the MES runtime.'), 'success');
+      render();
+      toast(t('Đã đồng bộ một nhịp MTConnect vào runtime MES.', 'One MTConnect sample has been synchronized into the MES runtime.'), 'success');
   }).catch(function(error){
     toast((error && error.message) || t('Không thể đọc MTConnect từ adapter.', 'Could not poll MTConnect from the adapter.'), 'error');
+    if(window.console) console.error(error);
+  });
+}
+
+function pollMtconnectBatch(){
+  toast(t('Đang chạy batch poll cho toàn bộ adapter MTConnect đang active...', 'Running a batch poll across all active MTConnect adapters...'), 'info');
+  api('mes_mtconnect_poll_batch', {}, 'POST').then(function(resp){
+    if(!resp){
+      throw new Error(t('Không nhận được phản hồi từ batch poll.', 'No response received from the batch poll.'));
+    }
+    if(!resp.ok && !resp.data){
+      throw new Error(String(resp.error || t('Batch poll MTConnect thất bại.', 'The MTConnect batch poll failed.')));
+    }
+    mergeRuntimePayload({
+      snapshot: resp.data || defaultSnapshot(),
+      streamed_at: new Date().toISOString()
+    });
+    state.loading = false;
+    render();
+    var processed = Number(resp.processed || 0);
+    var success = Number(resp.success || 0);
+    var failed = Number(resp.failed || 0);
+    var skipped = Number(resp.skipped || 0);
+    var message = t('Batch poll xong', 'Batch poll complete') + ': '
+      + processed + ' ' + t('adapter', 'adapters')
+      + ' · OK ' + success
+      + ' · ' + t('Lỗi', 'Fail') + ' ' + failed
+      + ' · ' + t('Bỏ qua', 'Skip') + ' ' + skipped;
+    toast(message, failed > 0 ? 'warning' : 'success');
+  }).catch(function(error){
+    toast((error && error.message) || t('Không thể chạy batch poll MTConnect.', 'Could not run the MTConnect batch poll.'), 'error');
     if(window.console) console.error(error);
   });
 }
