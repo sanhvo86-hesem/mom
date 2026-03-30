@@ -23,29 +23,29 @@ from common import (
 
 MANUAL_DECISIONS = {
     "WI-201": {
-        "recommended_action": "SPLIT",
-        "priority": "P0",
-        "reason": "Gate matrix and hold architecture belong in SOP; WI should keep only execution checklist.",
+        "recommended_action": "KEEP_CANONICAL",
+        "priority": "P2",
+        "reason": "Pilot rewrite completed; keep as the canonical gate-execution WI while gate architecture stays in SOP/ANNEX.",
     },
     "WI-517": {
-        "recommended_action": "SPLIT",
-        "priority": "P0",
-        "reason": "Machine-family setup content belongs in ANNEX; keep point-of-use setup steps in WI.",
+        "recommended_action": "KEEP_CANONICAL",
+        "priority": "P2",
+        "reason": "Pilot rewrite completed; keep as the canonical point-of-use setup and changeover WI.",
     },
     "WI-519": {
-        "recommended_action": "REBUILD",
-        "priority": "P0",
-        "reason": "Pre-run decision matrix is overloaded; rebuild as gate-execution checklist.",
+        "recommended_action": "KEEP_CANONICAL",
+        "priority": "P2",
+        "reason": "Pilot rewrite completed; keep as the canonical pre-run gate-execution WI.",
     },
     "WI-701": {
-        "recommended_action": "REBUILD",
-        "priority": "P0",
-        "reason": "Receiving route matrix and workbook migration notes overload point-of-use content.",
+        "recommended_action": "KEEP_CANONICAL",
+        "priority": "P2",
+        "reason": "Wave 1 rewrite completed; keep as the canonical point-of-use receiving WI and monitor linked ANNEX-700 controls.",
     },
     "WI-715": {
-        "recommended_action": "KEEP_AND_ALIGN",
-        "priority": "P1",
-        "reason": "High practical value for semiconductor/vacuum flow; keep method in WI and move master acceptance limits to specification annex.",
+        "recommended_action": "KEEP_CANONICAL",
+        "priority": "P2",
+        "reason": "Wave 1 alignment completed; keep as the execution WI while master source hierarchy stays in ANNEX-608.",
     },
     "WI-801": {
         "recommended_action": "RECLASSIFY",
@@ -58,9 +58,9 @@ MANUAL_DECISIONS = {
         "reason": "May remain control-tower WI, but governance-heavy content must not overlap SOP-900 management review logic.",
     },
     "ANNEX-503": {
-        "recommended_action": "REBUILD",
-        "priority": "P1",
-        "reason": "Current file is a malformed fragment and should become the canonical map/topology annex for CNC operating model.",
+        "recommended_action": "KEEP_CANONICAL",
+        "priority": "P2",
+        "reason": "Pilot rewrite completed; keep as the canonical CNC operating-model and role-boundary annex.",
     },
     "ANNEX-601": {
         "recommended_action": "KEEP_AND_TIGHTEN",
@@ -68,9 +68,9 @@ MANUAL_DECISIONS = {
         "reason": "Method annex is correct, but must stay separate from WI execution steps.",
     },
     "ANNEX-608": {
-        "recommended_action": "REBUILD",
-        "priority": "P1",
-        "reason": "Semiconductor requirement matrix is strategically important but current HTML wrapper is broken and the source mapping needs tightening.",
+        "recommended_action": "KEEP_CANONICAL",
+        "priority": "P2",
+        "reason": "Wave 1 rewrite completed; keep as the canonical specification annex for semiconductor, vacuum and CSR source control.",
     },
     "ANNEX-701": {
         "recommended_action": "KEEP_AND_TIGHTEN",
@@ -226,8 +226,8 @@ def build_summary(rows: list[dict[str, str | bool | int]]) -> str:
         [
             "## Practical next step",
             "",
-            "- Run Phase 0 cleanup on duplicate basenames and malformed HTML wrappers first.",
-            "- Then pilot rewrite WI-201, WI-517, WI-519, WI-701 and WI-715 against the new archetype standards.",
+            "- Continue Phase 0 cleanup on duplicate ANNEX aliases and malformed HTML wrappers that still block canonical paths.",
+            "- Then clean remaining phase residue and tighten any canonical WI/ANNEX that still drift from the locked core-standard skeleton.",
             "",
         ]
     )
