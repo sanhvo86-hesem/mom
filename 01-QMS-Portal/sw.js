@@ -21,7 +21,7 @@
 
 // ── Cache Configuration ─────────────────────────────────────────────────────
 
-const CACHE_VERSION = 'v1.3.0';
+const CACHE_VERSION = 'v1.3.1';
 const CACHE_PREFIX  = 'hesem-qms';
 
 /** Named caches with version stamps. */

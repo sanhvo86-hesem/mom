@@ -9,6 +9,12 @@
 /* ── Shared refs ── */
 var t = function(vi,en){ return (typeof lang !== 'undefined' && lang === 'en') ? en : vi; };
 var esc = function(v){ var d=document.createElement('div'); d.appendChild(document.createTextNode(String(v==null?'':v))); return d.innerHTML; };
+function slugify(v){
+  var text = String(v == null ? '' : v).trim().toLowerCase();
+  try { text = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\u0111/g, 'd'); } catch(_err){}
+  text = text.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  return text || 'item';
+}
 function api(action,payload,method){
   if(typeof window._ecApi === 'function') return window._ecApi(action,payload,method);
   if(typeof apiCall === 'function') return apiCall(action, payload || {}, method || 'GET', 30000);
@@ -880,6 +886,7 @@ window._renderWorkspace = function(form, allocation, container){
 };
 
 function renderWorkspace(form, allocation, container){
+  try {
   var isOnline = form.online !== false;
   var meta = { quality:{bg:'#dcfce7',icon:'\uD83D\uDD0E'}, production:{bg:'#fef3c7',icon:'\uD83C\uDFED'}, maintenance:{bg:'#fff9db',icon:'\uD83D\uDD27'}, hr:{bg:'#f3e8ff',icon:'\uD83D\uDC65'}, other:{bg:'#f1f5f9',icon:'\uD83D\uDDC2'} };
   var catMeta = meta[form.category] || meta.other;
@@ -935,6 +942,27 @@ function renderWorkspace(form, allocation, container){
   container.innerHTML = html;
   bindWorkspace(form, allocation, container);
   if(hasAlloc) loadHistory(form);
+  } catch(err){
+    console.error(err);
+    var detail = String(err && err.message || '').trim();
+    var standaloneUrl = '';
+    try {
+      standaloneUrl = (allocation && form && form.online !== false && standaloneOnlinePath(form)) ? standaloneRuntimeSrc(form, allocation) : '';
+    } catch(_runtimeErr){}
+    container.innerHTML = '<div class="ec-empty">' +
+      '<div class="ec-empty-icon">\u26A0\uFE0F</div>' +
+      '<h3>' + esc(t('\u004b\u0068\u00f4\u006e\u0067\u0020\u0074\u0068\u1ec3\u0020\u0068\u0069\u1ec3\u006e\u0020\u0074\u0068\u1ecb\u0020\u0062\u0069\u1ec3\u0075\u0020\u006d\u1eabu', 'Could not render the form')) + '</h3>' +
+      '<p>' + esc(t('\u0057\u006f\u0072\u006b\u0073\u0070\u0061\u0063\u0065\u0020\u0111\u00e3\u0020\u0067\u1eb7\u0070\u0020\u006c\u1ed7\u0069\u0020\u0074\u0072\u006f\u006e\u0067\u0020\u006b\u0068\u0069\u0020\u0064\u1ef1\u006e\u0067\u0020\u0067\u0069\u0061\u006f\u0020\u0064\u0069\u1ec7\u006e\u002e\u0020\u0041\u006e\u0068\u0020\u0063\u00f3\u0020\u0074\u0068\u1ec3\u0020\u0074\u1ea3\u0069\u0020\u006c\u1ea1\u0069\u0020\u0068\u1ed3\u0020\u0073\u01a1\u0020\u0068\u006f\u1eb7\u0063\u0020\u006d\u1edf\u0020\u0062\u0069\u1ec3\u0075\u0020\u006d\u1eabu\u0020\u1edf\u0020\u0074\u0061\u0062\u0020\u0072\u0069\u00ea\u006e\u0067\u0020\u0111\u1ec3\u0020\u0074\u0069\u1ebf\u0070\u0020\u0074\u1ee5\u0063\u0020\u006c\u00e0\u006d\u0020\u0076\u0069\u1ec7\u0063\u002e', 'The workspace hit an error while building the form. You can reload the record or open the form in a separate tab.')) + '</p>' +
+      (detail ? '<p><code>' + esc(detail) + '</code></p>' : '') +
+      '<div class="ec-actions" style="margin-top:16px;justify-content:center">' +
+        '<button class="ec-btn primary" type="button" id="ec-render-retry">' + esc(t('\u0054\u1ea3\u0069\u0020\u006c\u1ea1\u0069\u0020\u0068\u1ed3\u0020\u0073\u01a1', 'Reload record')) + '</button>' +
+        (standaloneUrl ? '<a class="ec-btn secondary" href="' + esc(standaloneUrl) + '" target="_blank" rel="noopener">' + esc(t('\u004d\u1edf\u0020\u0062\u0069\u1ec3\u0075\u0020\u006d\u1eabu\u0020\u1edf\u0020\u0074\u0061\u0062\u0020\u0072\u0069\u00ea\u006e\u0067', 'Open form in new tab')) + '</a>' : '') +
+      '</div>' +
+    '</div>';
+    var retryBtn = document.getElementById('ec-render-retry');
+    if(retryBtn) retryBtn.onclick = function(){ reloadCurrentFormWorkspace(form.form_code || '', allocation && allocation.allocation_id || ''); };
+    toast(t('\u004b\u0068\u00f4\u006e\u0067\u0020\u0074\u0068\u1ec3\u0020\u0068\u0069\u1ec3\u006e\u0020\u0074\u0068\u1ecb\u0020\u0062\u0069\u1ec3\u0075\u0020\u006d\u1eabu\u0020\u006e\u00e0\u0079\u002e', 'Could not render this form.'), 'error');
+  }
 }
 
 /* ── Step 1: Allocate ── */

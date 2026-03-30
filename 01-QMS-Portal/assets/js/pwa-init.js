@@ -23,7 +23,7 @@
   // ── Configuration ───────────────────────────────────────────────────────
 
   const SW_PATH      = '/01-QMS-Portal/sw.js';
-  const SW_VERSION   = '1.3.0';
+  const SW_VERSION   = '1.3.1';
   const SW_SCOPE     = '/01-QMS-Portal/';
   const UPDATE_CHECK_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
 
