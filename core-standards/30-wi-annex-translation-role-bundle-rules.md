@@ -20,6 +20,14 @@ Tai lieu nay khoa:
 2. Uu tien tieng Viet van hanh ngan, ro.
 3. Khong viet nua Anh nua Viet neu khong nam trong list ngoai le.
 4. Ma, code, AI, application identifier, symbology, doi tuong ky thuat co the giu nguyen neu do la dang nhan dang chuan.
+5. Header published cua WI/ANNEX khong duoc tron family voi archetype, domain hoac series code trong dong subtitle.
+6. Meta labels cua WI/ANNEX phai dong nhat bang tieng Viet da khoa:
+   - `Mã`
+   - `Phiên bản`
+   - `Ngày hiệu lực`
+   - `Chủ sở hữu`
+   - `Phê duyệt`
+7. Ma tai lieu o header duoc giu dang code goc nhung phai render qua `.doc-code`; ten tai lieu giu font body/header chu, khong tron cung mot font code.
 
 ---
 

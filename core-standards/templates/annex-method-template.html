@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{CODE}} — {{TITLE}} | HESEM QMS</title>
+<link rel="stylesheet" href="{{RELATIVE_PATH}}/assets/style.css">
+<style>
+.annex-section { margin: 18px 0; }
+.card, .formula-box { border: 1px solid var(--ln); border-radius: var(--r); padding: 14px; margin: 12px 0; background: #fff; }
+.card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; }
+.callout-note { border-left: 4px solid #1d4ed8; background: #eff6ff; padding: 12px 14px; border-radius: 8px; margin: 10px 0; }
+@media (max-width: 960px) { .card-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <!-- Doc core-standards 27, 29 va 30 truoc khi dung template nay. -->
+      <!-- Method Annex chi giu logic phuong phap, bang tra, formula va decision rule. -->
+      <!-- Khong dua thao tac hien truong tung buoc vao ANNEX nay. -->
+
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="{{RELATIVE_PATH}}/01-QMS-Portal/portal.html"><img src="{{RELATIVE_PATH}}/assets/hesem-logo.svg" alt="HESEM Logo"></a>
+          <div class="fh-company">
+            <a href="{{RELATIVE_PATH}}/01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu vận hành • Annex</span>
+          </div>
+        </div>
+        <div class="title"><strong><span class="doc-code">{{CODE}}</span> — {{TITLE}}</strong></div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span class="doc-code">{{CODE}}</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span>{{OWNER_ROLE_CHIP}}</span></div>
+          <div class="row"><span><b>Phê duyệt:</b></span><span>{{APPROVER_ROLE_CHIP}}</span></div>
+        </div>
+      </div>
+
+      <section class="annex-section">
+        <h2>1. Muc dich va ranh gioi</h2>
+        <p>{{PURPOSE}}</p>
+        <ul>
+          <li>Ap dung khi: {{WHEN_TO_USE}}</li>
+          <li>Khong thay cho WI: {{WI_BOUNDARY}}</li>
+          <li>Nguon chinh: {{SOURCE_CONTROLLED_REFERENCE}}</li>
+        </ul>
+      </section>
+
+      <section class="annex-section">
+        <h2>2. Logic phuong phap</h2>
+        <div class="card">{{METHOD_LOGIC_TABLE}}</div>
+      </section>
+
+      <section class="annex-section">
+        <h2>3. Formula, bang tra va decision rule</h2>
+        <div class="formula-box">{{FORMULA_OR_LOOKUP}}</div>
+        <div class="callout-note"><strong>Decision rule:</strong> {{DECISION_RULE}}</div>
+      </section>
+
+      <section class="annex-section">
+        <h2>4. Vi du input-output ngan</h2>
+        <div class="card-grid">
+          <div class="card"><strong>Input</strong><br>{{SAMPLE_INPUT}}</div>
+          <div class="card"><strong>Output</strong><br>{{SAMPLE_OUTPUT}}</div>
+        </div>
+      </section>
+
+      <section class="annex-section">
+        <h2>5. Khi nao quay ve WI/SOP</h2>
+        <ul>
+          <li>{{RETURN_TO_WI_1}}</li>
+          <li>{{RETURN_TO_WI_2}}</li>
+        </ul>
+      </section>
+
+      <section class="annex-section">
+        <h2>6. Tai lieu lien quan</h2>
+        <ul>
+          <li><a href="{{RELATED_DOC_LINK_1}}">{{RELATED_DOC_CODE_1}}</a> - {{RELATED_DOC_TITLE_1}}</li>
+          <li><a href="{{RELATED_DOC_LINK_2}}">{{RELATED_DOC_CODE_2}}</a> - {{RELATED_DOC_TITLE_2}}</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</div>
+</body>
+</html>

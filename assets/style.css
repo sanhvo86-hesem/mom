@@ -59,6 +59,7 @@ b, strong { font-weight: 700; }
   border-bottom: none;
 }
 .form-header .title strong { display: block; font-size: 17px; font-weight: 700; color: var(--navy); line-height: 1.35; }
+.form-header .title .doc-code { font-family: var(--mono); font-weight: 700; letter-spacing: .02em; white-space: nowrap; }
 .form-header .title br { display: none; }
 .form-header .title .sub-vn { display: block; font-size: 12.5px; color: var(--ink2); margin-top: 3px; }
 .form-header .title .sub-vn:empty { display: none; }
@@ -72,6 +73,7 @@ b, strong { font-weight: 700; }
 .form-header .meta .row:last-child { border-right: none; }
 .form-header .meta .row b { color: var(--ink3); font-weight: 600; font-size: 9.5px; text-transform: uppercase; letter-spacing: .3px; margin-right: 6px; white-space: nowrap; }
 .form-header .meta .row span:last-child { color: var(--ink); font-weight: 600; white-space: nowrap; }
+.form-header .meta .row .doc-code { font-family: var(--mono); font-weight: 700; letter-spacing: .02em; }
 @media screen and (max-width: 600px) {
   .form-header { grid-template-columns: 1fr; }
   .fh-left { grid-column: 1; justify-content: center; }

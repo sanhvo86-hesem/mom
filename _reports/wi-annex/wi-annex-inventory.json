@@ -5,7 +5,7 @@
     "series": "ANNEX-100",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html",
     "title": "ANNEX-101 — Bản đồ phân quyền truy cập theo vai trò| HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Matrix Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -21,7 +21,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Matrix Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -29,7 +29,7 @@
     "series": "ANNEX-100",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-102-access-request-field-dictionary.html",
     "title": "ANNEX-102 — Từ điển trường dữ liệu cho yêu cầu cấp quyền, đổi quyền và thu hồi quyền | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Dictionary Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -45,7 +45,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Dictionary Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -69,7 +69,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Matrix Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -77,7 +77,7 @@
     "series": "ANNEX-100",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-104-org-chart-fullpage.html",
     "title": "ANNEX-104 — Cơ cấu tổ chức, luồng bàn giao và từ điển vai trò nhóm sản phẩm | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Map/Topology Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -93,7 +93,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Map/Topology Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -101,7 +101,7 @@
     "series": "ANNEX-100",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-105-process-map-detailed.html",
     "title": "ANNEX-105 — Bản đồ quá trình chi tiết và điểm giao diện | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Map/Topology Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -117,7 +117,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Map/Topology Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -125,7 +125,7 @@
     "series": "ANNEX-100",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-106-iso9001-matrix-full.html",
     "title": "ANNEX-106 — Ma trận điều khoản ISO 9001 tới tài liệu và bằng chứng | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Matrix Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -141,7 +141,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Matrix Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -165,7 +165,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Map/Topology Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -173,7 +173,7 @@
     "series": "ANNEX-100",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-110-dashboard-kpi-dictionary-and-data-model.html",
     "title": "ANNEX-110 — Từ điển KPI, công thức, mô hình dữ liệu và quy tắc cập nhật bảng điều hành | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Dictionary Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -189,7 +189,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Dictionary Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -197,7 +197,7 @@
     "series": "ANNEX-100",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-111-document-writing-and-cross-reference-rules.html",
     "title": "ANNEX-111 — Tài liệu viết and chéo-Reference Quy tắc | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Rule-Pack Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -213,7 +213,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Rule-Pack Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -221,7 +221,7 @@
     "series": "ANNEX-100",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-112-climate-context-and-resilience-assessment.html",
     "title": "ANNEX-112 — môi trường / bầu không khí bối cảnh and khả năng phục hồi Đánh giá | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Matrix Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -237,7 +237,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Matrix Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -245,7 +245,7 @@
     "series": "ANNEX-100",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-113-dashboard-deployment-access-and-refresh-control.html",
     "title": "ANNEX-113 — Governance dashboard triển khai vận hành, truy cập, refresh và publish control | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Rule-Pack Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -261,7 +261,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Rule-Pack Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -269,7 +269,7 @@
     "series": "ANNEX-100",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html",
     "title": "ANNEX-114 — Go-Live runbook, cutover control và hypercare command center | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Rule-Pack Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -285,7 +285,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Rule-Pack Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -293,7 +293,7 @@
     "series": "ANNEX-100",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html",
     "title": "ANNEX-115 — Bản đồ giao dịch và giao diện Epicor| HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Map/Topology Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -309,7 +309,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Map/Topology Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -341,7 +341,7 @@
     "series": "ANNEX-100",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html",
     "title": "ANNEX-117 — Ma trận escalation, SLA phản ứng, liên lạc theo cấp và quyền quyết định | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Matrix Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -357,7 +357,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Matrix Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -365,7 +365,7 @@
     "series": "ANNEX-100",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html",
     "title": "ANNEX-118 — Offline phương án dự phòng Kit| HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Rule-Pack Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -381,7 +381,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Rule-Pack Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -405,7 +405,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Map/Topology Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -429,7 +429,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Matrix Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -453,7 +453,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Matrix Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -501,7 +501,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Matrix Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -525,7 +525,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Worked Example Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -533,7 +533,7 @@
     "series": "ANNEX-100",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html",
     "title": "ANNEX-131 - M365 hồ sơ siêu dữ liệu, list sơ đồ cấu trúc, value bộ / tập hợp and sổ đăng ký danh mục | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Dictionary Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -549,7 +549,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Dictionary Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -557,7 +557,7 @@
     "series": "ANNEX-100",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-132-m365-records-flow-approval-sharing-and-exception-control.html",
     "title": "ANNEX-132 - M365 records flow, approval, source promotion and exception control | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Rule-Pack Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -573,7 +573,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Rule-Pack Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -581,7 +581,7 @@
     "series": "ANNEX-100",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html",
     "title": "ANNEX-133 - Cấu trúc site, thư viện và thư mục hồ sơ M365 | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Map/Topology Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -597,7 +597,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Map/Topology Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -605,7 +605,7 @@
     "series": "ANNEX-100",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-134-m365-records-provisioning-permissions-and-automation-architecture.html",
     "title": "ANNEX-134 - M365 hồ sơ cung cấp / cấp phát, quyền truy cập and tự động hóa kiến trúc | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Map/Topology Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -621,7 +621,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Map/Topology Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -629,7 +629,7 @@
     "series": "ANNEX-100",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html",
     "title": "ANNEX-135 - File plan hồ sơ vận hành M365 theo phòng ban, vai trò và công việc | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Map/Topology Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -645,7 +645,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Map/Topology Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -653,7 +653,7 @@
     "series": "ANNEX-100",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html",
     "title": "ANNEX-136 - M365 SharePoint, Git và server source sync, promotion và runtime boundary | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Map/Topology Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -669,7 +669,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Map/Topology Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -677,7 +677,7 @@
     "series": "ANNEX-100",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-137-evidence-and-records-naming-convention.html",
     "title": "ANNEX-137 - Quy tắc đặt tên hồ sơ, evidence và form đã điền | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Rule-Pack Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -693,7 +693,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Rule-Pack Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -717,7 +717,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Map/Topology Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -725,7 +725,7 @@
     "series": "ANNEX-300",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-300/annex-301-setup-sheet-and-tool-list-standard.html",
     "title": "ANNEX-301 — Chuẩn Setup Sheet và Tool List CNC | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Dictionary Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -741,7 +741,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Dictionary Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -765,7 +765,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Rule-Pack Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -773,7 +773,7 @@
     "series": "ANNEX-400",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/04-ANNEX-400/annex-401-supplier-risk-model-and-scorecard-method.html",
     "title": "ANNEX-401 — Mô hình rủi ro nhà cung cấp và phương pháp thẻ điểm (bảng điểm) | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Method Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -789,7 +789,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Method Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -797,7 +797,7 @@
     "series": "ANNEX-400",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/04-ANNEX-400/annex-402-outsource-special-process-pack.html",
     "title": "ANNEX-402 — Gói kiểm soát outsource / công đoạn đặc biệt / cert luồng-xuống / Từng | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Rule-Pack Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -813,7 +813,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Rule-Pack Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -837,7 +837,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Rule-Pack Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -845,7 +845,7 @@
     "series": "ANNEX-500",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html",
     "title": "ANNEX-501 — Quy tắc điều độ, rà soát năng lực, cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) và giới hạn WIP | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Rule-Pack Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -861,7 +861,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Rule-Pack Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -885,7 +885,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Rule-Pack Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -933,7 +933,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Rule-Pack Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -941,7 +941,7 @@
     "series": "ANNEX-500",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/05-ANNEX-500/annex-505-put-thru-index.html",
     "title": "ANNEX-505 — Chỉ mục put-xuyên qua (thru) / pass-xuyên suốt / tuyến đặc biệt và yêu cầu hồ sơ đi kèm | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Rule-Pack Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -957,7 +957,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Rule-Pack Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -965,7 +965,7 @@
     "series": "ANNEX-500",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/05-ANNEX-500/annex-506-fod-prevention-program.html",
     "title": "ANNEX-506 — Chương trình phòng ngừa FOD | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Rule-Pack Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -981,7 +981,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Rule-Pack Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -989,7 +989,7 @@
     "series": "ANNEX-500",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/05-ANNEX-500/annex-507-poka-yoke-cnc-examples.html",
     "title": "ANNEX-507 — Thư viện ví dụ poka (chống sai) (chống sai)-giá đỡ (yoke) CNC, chống-mix, chống-rev, chống-tooling lỗi | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Worked Example Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -1005,7 +1005,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Worked Example Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -1037,7 +1037,7 @@
     "series": "ANNEX-600",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/06-ANNEX-600/annex-602-msa-acceptance-criteria.html",
     "title": "ANNEX-602 — Tiêu chí chấp nhận MSA, GRR, sai lệch hệ thống, độ tuyến tính, độ ổn định và thuộc tính thỏa thuận | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Specification Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -1053,7 +1053,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Specification Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -1061,7 +1061,7 @@
     "series": "ANNEX-600",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html",
     "title": "ANNEX-603 — QPL-1 đến QPL-4, bộ bằng chứng bắt buộc và quy tắc nâng/hạ cấp | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Rule-Pack Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -1077,7 +1077,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Rule-Pack Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -1085,7 +1085,7 @@
     "series": "ANNEX-600",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/06-ANNEX-600/annex-604-control-plan-guide.html",
     "title": "ANNEX-604 — Chuẩn lập Control Plan cho Lệnh sản xuất CNC | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Method Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -1101,7 +1101,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Method Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -1109,7 +1109,7 @@
     "series": "ANNEX-600",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/06-ANNEX-600/annex-605-spc-lite-and-reaction-plan.html",
     "title": "ANNEX-605 — Thông số SPC, chọn biểu đồ, năng lực / khả năng và phản ứng plan | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Method Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -1125,7 +1125,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Method Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -1149,7 +1149,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Specification Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -1157,7 +1157,7 @@
     "series": "ANNEX-600",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/06-ANNEX-600/annex-607-quality-culture-and-ethics-rules.html",
     "title": "ANNEX-607 — Văn hóa chất lượng và quy tắc đạo đức | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Rule-Pack Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -1173,7 +1173,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Rule-Pack Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -1230,7 +1230,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/07-ANNEX-700/annex-702-packaging-labeling-spec.html",
     "title": "ANNEX-702 — Quy cách đóng gói, nhãn, bảo quản và bằng chứng gói hàng | HESEM QMS",
     "target_archetype": "Specification Annex",
-    "recommended_action": "KEEP",
+    "recommended_action": "KEEP_CANONICAL",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -1245,7 +1245,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Wave 1 specification tightening completed; keep as the canonical source for packaging, labeling, evidence and preservation requirements."
   },
   {
     "family": "ANNEX",
@@ -1254,7 +1254,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html",
     "title": "ANNEX-703 — Quy tắc vị trí kho, phân vùng, FIFO/FEFO, khu vực chuẩn bị / sắp xếp và cycle count | HESEM QMS",
     "target_archetype": "Rule-Pack Annex",
-    "recommended_action": "KEEP",
+    "recommended_action": "KEEP_CANONICAL",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -1269,7 +1269,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Wave 1 rule-pack tightening completed; keep as the canonical zoning, FIFO/FEFO, overflow and cycle-count rule annex."
   },
   {
     "family": "ANNEX",
@@ -1277,7 +1277,7 @@
     "series": "ANNEX-800",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/08-ANNEX-800/annex-801-competency-levels-and-certification-rules.html",
     "title": "ANNEX-801 — Cấp độ năng lực, quy tắc chứng nhận / tái chứng nhận và được ủy quyền-to-công việc | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Matrix Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -1293,7 +1293,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Matrix Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -1301,7 +1301,7 @@
     "series": "ANNEX-800",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/08-ANNEX-800/annex-802-collective-bargaining-agreement.html",
     "title": "ANNEX-802 — tập thể thương lượng thỏa thuận | HESEM OS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Rule-Pack Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -1317,7 +1317,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Rule-Pack Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "ANNEX",
@@ -1325,7 +1325,7 @@
     "series": "ANNEX-800",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/08-ANNEX-800/annex-803-ppe-and-hazard-matrix.html",
     "title": "ANNEX-803 — Ma trận mối nguy, PPE và kích hoạt giấy phép theo công việc/khu vực | HESEM QMS",
-    "target_archetype": "Review Needed",
+    "target_archetype": "Matrix Annex",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -1341,7 +1341,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; dominant structure fits Matrix Annex and should stay as an ANNEX lookup/control support document."
   },
   {
     "family": "WI",
@@ -1365,7 +1365,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits Digital-Operation WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1389,7 +1389,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits Digital-Operation WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1413,7 +1413,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits Digital-Operation WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1437,7 +1437,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits Digital-Operation WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1461,7 +1461,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits Digital-Operation WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1485,7 +1485,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits Digital-Operation WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1509,7 +1509,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits Digital-Operation WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1557,7 +1557,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits Control-Tower WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1581,7 +1581,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits Gate-Execution WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1605,7 +1605,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits POU-WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1629,7 +1629,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits Gate-Execution WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1653,7 +1653,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits Control-Tower WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1677,7 +1677,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits Gate-Execution WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1701,7 +1701,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits Control-Tower WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1725,7 +1725,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits POU-WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1749,7 +1749,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits POU-WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1773,7 +1773,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits POU-WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1797,7 +1797,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits POU-WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1821,7 +1821,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits POU-WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1845,7 +1845,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits POU-WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1893,7 +1893,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits Gate-Execution WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1941,7 +1941,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits POU-WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1965,7 +1965,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits POU-WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -1989,7 +1989,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits POU-WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -2013,7 +2013,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits POU-WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -2037,7 +2037,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits POU-WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -2061,7 +2061,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Baseline review required; current dominant use fits POU-WI and should stay inside the locked WI boundary."
   },
   {
     "family": "WI",
@@ -2094,7 +2094,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-702-storage-environment-location-and-fifo-control.html",
     "title": "WI-702 — Bảo quản, môi trường kho/phân xưởng, vị trí, FIFO/FEFO và kiểm soát chạm hỏng | HESEM QMS",
     "target_archetype": "POU-WI",
-    "recommended_action": "KEEP",
+    "recommended_action": "KEEP_CANONICAL",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -2109,7 +2109,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Wave 1 structure and boundary pass completed; keep as the canonical storage and preservation WI while ANNEX-703 owns zoning, FIFO and cycle-count rules."
   },
   {
     "family": "WI",
@@ -2118,7 +2118,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-711-cleanroom-entry-and-gowning.html",
     "title": "WI-711 — Vào phòng sạch, thay đồ, hành vi trong khu sạch, rời khu và tái nhập đúng cách | HESEM QMS",
     "target_archetype": "POU-WI",
-    "recommended_action": "KEEP",
+    "recommended_action": "KEEP_CANONICAL",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -2133,7 +2133,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Wave 1 rewrite completed; keep as the canonical cleanroom-entry and gowning WI linked to WI-713 environment control and SOP-702 cleanliness governance."
   },
   {
     "family": "WI",
@@ -2142,7 +2142,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-712-ultrasonic-cleaning-standard-work.html",
     "title": "WI-712 — Làm sạch siêu âm: chọn công thức / chương trình gia công, chuẩn bị bể, chạy mẻ, rửa cuối, sấy khô và xác nhận | HESEM QMS",
     "target_archetype": "POU-WI",
-    "recommended_action": "KEEP",
+    "recommended_action": "KEEP_CANONICAL",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -2157,7 +2157,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Wave 1 rewrite completed; keep ultrasonic-cleaning execution here while released program logic and acceptance sources stay outside the WI boundary."
   },
   {
     "family": "WI",
@@ -2166,7 +2166,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-713-environmental-monitoring-and-response.html",
     "title": "WI-713 — Theo dõi môi trường, lấy mẫu, đọc kết quả và phản ứng khi lệch chuẩn | HESEM QMS",
     "target_archetype": "POU-WI",
-    "recommended_action": "KEEP",
+    "recommended_action": "KEEP_CANONICAL",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -2181,7 +2181,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Wave 1 rewrite completed; keep as the canonical environmental-monitoring WI while zone rules and broader governance remain in ANNEX and SOP layers."
   },
   {
     "family": "WI",
@@ -2190,7 +2190,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-714-clean-packaging-handling-and-preservation.html",
     "title": "WI-714 — Đóng gói sạch, vận hành sạch, bảo quản và bảo toàn tình trạng sản phẩm | HESEM QMS",
     "target_archetype": "POU-WI",
-    "recommended_action": "KEEP",
+    "recommended_action": "KEEP_CANONICAL",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -2205,7 +2205,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Wave 1 rewrite completed; keep clean-pack execution here while ANNEX-702 remains the specification source for packaging, labeling and preservation rules."
   },
   {
     "family": "WI",
@@ -2238,7 +2238,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-716-vacuum-compatible-clean-build-and-bagging.html",
     "title": "WI-716 — Lắp sạch, tương thích chân không, đóng túi và bảo quản cho Job đặc biệt | HESEM QMS",
     "target_archetype": "POU-WI",
-    "recommended_action": "KEEP",
+    "recommended_action": "KEEP_CANONICAL",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -2253,7 +2253,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
+    "reason": "Wave 1 rewrite completed; keep vacuum-compatible build and bagging execution here while ANNEX-603, ANNEX-606 and ANNEX-702 hold source requirements."
   },
   {
     "family": "WI",
@@ -2262,6 +2262,30 @@
     "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-721-fod-prevention-line-clearance-and-tool-accountability.html",
     "title": "WI-721 — Chống FOD, dòng / chuyền thông quan / giải phóng, kiểm tool/vật lạ và xác nhận khu vực sạch | HESEM QMS",
     "target_archetype": "POU-WI",
+    "recommended_action": "KEEP_CANONICAL",
+    "priority": "P2",
+    "has_doctype": true,
+    "has_html_tag": true,
+    "has_head_tag": true,
+    "has_body_tag": true,
+    "has_lang": true,
+    "has_charset": true,
+    "has_viewport": true,
+    "has_style_css": true,
+    "h2_count": 7,
+    "proc_num_count": 0,
+    "duplicate_status": "",
+    "canonical_duplicate": "",
+    "phase_hits": "",
+    "reason": "Wave 1 rewrite completed; keep as the canonical FOD and line-clearance WI while program-level rule packs stay in linked ANNEX and SOP documents."
+  },
+  {
+    "family": "WI",
+    "code": "WI-801",
+    "series": "WI-800",
+    "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/08-WI-800/wi-801-cnc-poka-yoke-examples.html",
+    "title": "WI-801 — Triển khai poka (chống sai) (chống sai)-giá đỡ (yoke) tại công đoạn và xác nhận hiệu lực | HESEM QMS",
+    "target_archetype": "Gate-Execution WI",
     "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
@@ -2277,31 +2301,7 @@
     "duplicate_status": "",
     "canonical_duplicate": "",
     "phase_hits": "",
-    "reason": "Baseline review required by archetype."
-  },
-  {
-    "family": "WI",
-    "code": "WI-801",
-    "series": "WI-800",
-    "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/08-WI-800/wi-801-cnc-poka-yoke-examples.html",
-    "title": "WI-801 — Triển khai poka (chống sai) (chống sai)-giá đỡ (yoke) tại công đoạn và xác nhận hiệu lực | HESEM QMS",
-    "target_archetype": "Worked-Example Candidate",
-    "recommended_action": "RECLASSIFY",
-    "priority": "P3",
-    "has_doctype": true,
-    "has_html_tag": true,
-    "has_head_tag": true,
-    "has_body_tag": true,
-    "has_lang": true,
-    "has_charset": true,
-    "has_viewport": true,
-    "has_style_css": true,
-    "h2_count": 7,
-    "proc_num_count": 0,
-    "duplicate_status": "",
-    "canonical_duplicate": "",
-    "phase_hits": "",
-    "reason": "Worked examples belong in ANNEX, not in WI."
+    "reason": "Boundary confirmed; WI-801 owns poka-yoke deployment and effectiveness confirmation while ANNEX-507 remains the example library."
   },
   {
     "family": "WI",

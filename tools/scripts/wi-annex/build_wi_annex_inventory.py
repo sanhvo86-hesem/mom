@@ -47,10 +47,45 @@ MANUAL_DECISIONS = {
         "priority": "P2",
         "reason": "Wave 1 alignment completed; keep as the execution WI while master source hierarchy stays in ANNEX-608.",
     },
+    "WI-702": {
+        "recommended_action": "KEEP_CANONICAL",
+        "priority": "P2",
+        "reason": "Wave 1 structure and boundary pass completed; keep as the canonical storage and preservation WI while ANNEX-703 owns zoning, FIFO and cycle-count rules.",
+    },
+    "WI-711": {
+        "recommended_action": "KEEP_CANONICAL",
+        "priority": "P2",
+        "reason": "Wave 1 rewrite completed; keep as the canonical cleanroom-entry and gowning WI linked to WI-713 environment control and SOP-702 cleanliness governance.",
+    },
+    "WI-712": {
+        "recommended_action": "KEEP_CANONICAL",
+        "priority": "P2",
+        "reason": "Wave 1 rewrite completed; keep ultrasonic-cleaning execution here while released program logic and acceptance sources stay outside the WI boundary.",
+    },
+    "WI-713": {
+        "recommended_action": "KEEP_CANONICAL",
+        "priority": "P2",
+        "reason": "Wave 1 rewrite completed; keep as the canonical environmental-monitoring WI while zone rules and broader governance remain in ANNEX and SOP layers.",
+    },
+    "WI-714": {
+        "recommended_action": "KEEP_CANONICAL",
+        "priority": "P2",
+        "reason": "Wave 1 rewrite completed; keep clean-pack execution here while ANNEX-702 remains the specification source for packaging, labeling and preservation rules.",
+    },
+    "WI-716": {
+        "recommended_action": "KEEP_CANONICAL",
+        "priority": "P2",
+        "reason": "Wave 1 rewrite completed; keep vacuum-compatible build and bagging execution here while ANNEX-603, ANNEX-606 and ANNEX-702 hold source requirements.",
+    },
+    "WI-721": {
+        "recommended_action": "KEEP_CANONICAL",
+        "priority": "P2",
+        "reason": "Wave 1 rewrite completed; keep as the canonical FOD and line-clearance WI while program-level rule packs stay in linked ANNEX and SOP documents.",
+    },
     "WI-801": {
-        "recommended_action": "RECLASSIFY",
-        "priority": "P3",
-        "reason": "Worked examples belong in ANNEX, not in WI.",
+        "recommended_action": "KEEP",
+        "priority": "P2",
+        "reason": "Boundary confirmed; WI-801 owns poka-yoke deployment and effectiveness confirmation while ANNEX-507 remains the example library.",
     },
     "WI-901": {
         "recommended_action": "REVIEW_GOVERNANCE_BOUNDARY",
@@ -77,6 +112,16 @@ MANUAL_DECISIONS = {
         "priority": "P2",
         "reason": "Wave 1 rewrite completed; keep as the canonical specification annex for semiconductor, vacuum and CSR source control.",
     },
+    "ANNEX-702": {
+        "recommended_action": "KEEP_CANONICAL",
+        "priority": "P2",
+        "reason": "Wave 1 specification tightening completed; keep as the canonical source for packaging, labeling, evidence and preservation requirements.",
+    },
+    "ANNEX-703": {
+        "recommended_action": "KEEP_CANONICAL",
+        "priority": "P2",
+        "reason": "Wave 1 rule-pack tightening completed; keep as the canonical zoning, FIFO/FEFO, overflow and cycle-count rule annex.",
+    },
     "ANNEX-701": {
         "recommended_action": "KEEP_CANONICAL",
         "priority": "P2",
@@ -90,8 +135,18 @@ MANUAL_DECISIONS = {
 }
 
 
-def default_action() -> tuple[str, str, str]:
-    return "KEEP", "P2", "Baseline review required by archetype."
+def default_action(family: str, archetype: str) -> tuple[str, str, str]:
+    if family == "WI":
+        return (
+            "KEEP",
+            "P2",
+            f"Baseline review required; current dominant use fits {archetype} and should stay inside the locked WI boundary.",
+        )
+    return (
+        "KEEP",
+        "P2",
+        f"Baseline review required; dominant structure fits {archetype} and should stay as an ANNEX lookup/control support document.",
+    )
 
 
 def wave_assignment(series: str) -> str:
@@ -103,15 +158,15 @@ def wave_assignment(series: str) -> str:
         "WI-600": "Wave 3",
         "ANNEX-600": "Wave 3",
         "WI-200": "Wave 4",
+        "WI-300": "Wave 4",
         "ANNEX-300": "Wave 4",
+        "ANNEX-400": "Wave 4",
         "WI-100": "Wave 5",
         "ANNEX-100": "Wave 5",
         "WI-800": "Wave 6",
         "WI-900": "Wave 6",
         "ANNEX-800": "Wave 6",
     }
-    if series == "ANNEX-400":
-        return "Wave TBD"
     return mapping.get(series, "Wave TBD")
 
 
@@ -141,7 +196,7 @@ def build_rows(root: Path) -> list[dict[str, str | bool | int]]:
                 guess_wi_archetype(code_num, title) if family == "WI" else guess_annex_archetype(code_num, title)
             )
 
-            recommended_action, priority, reason = default_action()
+            recommended_action, priority, reason = default_action(family, target_archetype)
             if code in MANUAL_DECISIONS:
                 decision = MANUAL_DECISIONS[code]
                 recommended_action = decision["recommended_action"]
@@ -244,6 +299,26 @@ def build_summary(rows: list[dict[str, str | bool | int]]) -> str:
             ]
         )
     ]
+    canonical_codes = {
+        str(row["code"])
+        for row in rows
+        if str(row["recommended_action"]) == "KEEP_CANONICAL"
+    }
+    wave1_codes = {
+        "WI-701",
+        "WI-702",
+        "WI-711",
+        "WI-712",
+        "WI-713",
+        "WI-714",
+        "WI-715",
+        "WI-716",
+        "WI-721",
+        "ANNEX-701",
+        "ANNEX-702",
+        "ANNEX-703",
+    }
+    wave1_complete = wave1_codes.issubset(canonical_codes)
 
     lines = [
         "# WI-ANNEX foundation summary",
@@ -279,11 +354,15 @@ def build_summary(rows: list[dict[str, str | bool | int]]) -> str:
         next_steps.append("- Continue Phase 0 cleanup on malformed HTML wrappers that still block canonical anchors and structural compliance.")
     elif phase_rows:
         next_steps.append("- Phase 0 duplicate and wrapper cleanup is stable; move the next tranche to phase residue and archetype-boundary tightening.")
+    elif wave1_complete:
+        next_steps.append("- Phase 0 foundation cleanup and Wave 1 canonical pass are stable; move the next tranche to Wave 2 for WI-500 and ANNEX-500 execution depth.")
     else:
         next_steps.append("- Phase 0 foundation cleanup is stable; move the next tranche to archetype-boundary tightening on canonical WI/ANNEX only.")
 
     if phase_rows:
         next_steps.append("- Then clean remaining phase residue and tighten any canonical WI/ANNEX that still drift from the locked core-standard skeleton.")
+    elif wave1_complete:
+        next_steps.append("- Then keep section-id migration wave-based and avoid batch-fixing the remaining 26 non-compliant WI files without content review.")
     else:
         next_steps.append("- Then move the pilot set into execution depth, led by WI-715, WI-701, WI-517, WI-302 and WI-201.")
 

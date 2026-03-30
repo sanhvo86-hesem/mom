@@ -24,6 +24,11 @@ Muc tieu:
 3. ANNEX khong duoc dung de che mot SOP/WI chua viet xong.
 4. Neu nguoi doc can lam theo tung buoc tai diem su dung, do la WI.
 5. Neu tai lieu dang dinh nghia gate, role authority, boundary quy trinh cap he thong, do la SOP.
+6. Published ANNEX header phai khoa o muc family, khong duoc chen archetype, series hoac domain vao subtitle:
+   - subtitle bat buoc: `Tài liệu vận hành • Annex`;
+   - meta labels bat buoc: `Mã`, `Phiên bản`, `Ngày hiệu lực`, `Chủ sở hữu`, `Phê duyệt`;
+   - archetype nhu `Method`, `Rule-Pack`, `Dictionary`, `Specification` chi o core standard, decision log va working notes.
+7. Ma tai lieu trong header phai dung hook `.doc-code` va giu chung font mono cua stylesheet dung chung; khong duoc de code tron vao title text thuong.
 
 ---
 
@@ -70,6 +75,11 @@ Muc tieu:
 - AQL, MSA, SPC-lite, calculation rule, method decision tree.
 - Phuong phap do/phan loai can cong thuc, bang tra, rule phan ung.
 
+Template copy-paste mac dinh:
+- `templates/annex-method-template.html`
+- Template nay khoa method logic, formula/table, decision rule, vi du ngan va note quay ve WI/SOP khi can thao tac.
+- Header published cua template van phai dung subtitle family-level, khong doi thanh `Method Annex`.
+
 ### Khong dung khi
 
 - Step thao tac tai may/do ban.
@@ -96,6 +106,11 @@ Moi rule nen co:
 - action;
 - owner hoac enforcing actor;
 - consequence neu vi pham.
+
+Template copy-paste mac dinh:
+- `templates/annex-rule-pack-template.html`
+- Template nay khoa `Rule ID`, `Condition`, `Action`, `Owner`, `Consequence`, khong cho ANNEX tro thanh procedure step-by-step.
+- Header published cua template van phai dung subtitle family-level, khong doi thanh `Rule-Pack Annex`.
 
 ### QA checklist
 
@@ -170,6 +185,11 @@ Moi rule nen co:
 2. Neu so lieu goc nam trong customer spec, drawing, PO, paid standard hoac processor cert, ANNEX phai dan nguon do, khong duoc tu doan so.
 3. WI chi nhac lai nguong toi thieu can thao tac, khong duoc tro thanh noi chua master acceptance criteria.
 
+Template copy-paste mac dinh:
+- `templates/annex-specification-template.html`
+- Template nay khoa bang `parameter-target-tolerance-unit-method-source` va note `source-controlled requirement` khi so lieu goc chua duoc release vao he thong.
+- Header published cua template van phai dung subtitle family-level, khong doi thanh `Specification Annex`.
+
 ### QA checklist
 
 - Co bang parameter-target-method-source khong?
@@ -223,3 +243,6 @@ Truoc khi release ANNEX, phai tra loi duoc:
 - `26-wi-archetypes-and-qa-guide.md`
 - `29-wi-annex-research-redraft-method.md`
 - `30-wi-annex-translation-role-bundle-rules.md`
+- `templates/annex-method-template.html`
+- `templates/annex-rule-pack-template.html`
+- `templates/annex-specification-template.html`

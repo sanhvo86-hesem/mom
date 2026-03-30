@@ -38,6 +38,11 @@ Muc tieu thuc chien:
    - dung o dau;
    - dung khi nao;
    - khong duoc dung de thay cho gi.
+6. Published WI header phai khoa o muc family, khong duoc chen archetype, series hoac domain vao subtitle:
+   - subtitle bat buoc: `Tài liệu vận hành • Công việc hướng dẫn`;
+   - meta labels bat buoc: `Mã`, `Phiên bản`, `Ngày hiệu lực`, `Chủ sở hữu`, `Phê duyệt`;
+   - archetype `POU-WI`, `Gate-Execution WI`, `Control-Tower WI`, `Digital-Operation WI` chi o core standard, decision log va working notes.
+7. Ma tai lieu trong header phai dung hook `.doc-code` va giu chung font mono cua stylesheet dung chung; khong duoc de code tron vao title text thuong.
 
 ---
 
@@ -96,6 +101,7 @@ Van giu 7 section cua `08-document-types.md`, nhung Section 5 phai obey:
 Template copy-paste mac dinh cho POU-WI:
 - `templates/wi-pou-template.html`
 - Template nay chi khoa khung section, `step-block`, PASS/FAIL/EVIDENCE va wrapper.
+- Header published cua template van phai dung subtitle family-level, khong doi thanh `POU-WI`.
 - Khong duoc dung template de bo qua decision test, user research hoac split boundary.
 
 ### 5.4 QA checklist
@@ -132,6 +138,12 @@ Section 4 va 5 phai tra loi duoc 4 diem:
 - Stop condition: khi nao buoc vao hold.
 - Release authority: ai ky hoac ai duoc phep dong checkpoint.
 
+Template copy-paste mac dinh cho Gate-Execution WI:
+- `templates/wi-gate-execution-template.html`
+- Template nay khoa bang trigger/evidence, input criteria, step thuc thi, stop/release va record of decision.
+- Header published cua template van phai dung subtitle family-level, khong doi thanh `Gate-Execution WI`.
+- Khong duoc dung template de chen gate architecture, QPL matrix hay authority matrix cap he thong vao body WI.
+
 ### 6.4 QA checklist
 
 - Co lap lai gate architecture trong SOP khong?
@@ -163,6 +175,12 @@ Phai co:
 - review inputs;
 - escalation path;
 - records sau review.
+
+Template copy-paste mac dinh cho Control-Tower WI:
+- `templates/wi-control-tower-template.html`
+- Template nay khoa audience/cadence, review input, review flow, escalation va record sau review.
+- Header published cua template van phai dung subtitle family-level, khong doi thanh `Control-Tower WI`.
+- Khong duoc dung template de bien WI thanh management review SOP, KPI dictionary hoac dashboard example pack.
 
 ### 7.4 QA checklist
 
@@ -240,3 +258,5 @@ Phai co:
 - `29-wi-annex-research-redraft-method.md`
 - `30-wi-annex-translation-role-bundle-rules.md`
 - `templates/wi-pou-template.html`
+- `templates/wi-gate-execution-template.html`
+- `templates/wi-control-tower-template.html`

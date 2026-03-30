@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{CODE}} — {{TITLE}} | HESEM QMS</title>
+<link rel="stylesheet" href="{{RELATIVE_PATH}}/assets/style.css">
+<style>
+.wi-section { margin: 18px 0; }
+.gate-card, .step-block, .record-block { border: 1px solid var(--ln); border-radius: var(--r); padding: 14px; margin: 12px 0; background: #fff; }
+.gate-grid, .doc-links, .step-meta { display: grid; gap: 10px 14px; }
+.gate-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.step-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 10px; }
+.step-meta div, .gate-card .box { border: 1px solid var(--ln); border-radius: var(--r); padding: 10px 12px; background: #f8fafc; }
+.doc-links { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.doc-link { display: block; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--ln); background: #f8fafc; text-decoration: none; color: inherit; font-weight: 600; }
+.callout-stop { border-left: 4px solid #dc2626; background: #fef2f2; padding: 12px 14px; border-radius: 8px; margin: 10px 0; }
+.callout-warn { border-left: 4px solid #d97706; background: #fffbeb; padding: 12px 14px; border-radius: 8px; margin: 10px 0; }
+@media (max-width: 960px) { .gate-grid, .doc-links, .step-meta { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <!-- Doc core-standards 26, 29 va 30 truoc khi dung template nay. -->
+      <!-- Gate-Execution WI chi khoa trigger, input criteria, execution, hold va release. -->
+      <!-- Khong chen gate architecture, QPL matrix, KPI dictionary hay authority matrix cap he thong vao body WI. -->
+
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="{{RELATIVE_PATH}}/01-QMS-Portal/portal.html"><img src="{{RELATIVE_PATH}}/assets/hesem-logo.svg" alt="HESEM Logo"></a>
+          <div class="fh-company">
+            <a href="{{RELATIVE_PATH}}/01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu vận hành • Công việc hướng dẫn</span>
+          </div>
+        </div>
+        <div class="title"><strong><span class="doc-code">{{CODE}}</span> — {{TITLE}}</strong></div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span class="doc-code">{{CODE}}</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span>{{OWNER_ROLE_CHIP}}</span></div>
+          <div class="row"><span><b>Phê duyệt:</b></span><span>{{APPROVER_ROLE_CHIP}}</span></div>
+        </div>
+      </div>
+
+      <section id="wi-s1" class="wi-section">
+        <h2>1. Muc dich va ranh gioi</h2>
+        <p>{{MUC_DICH_1_CAU}}</p>
+        <ul>
+          <li>Ap dung cho gate/checkpoint: {{CHECKPOINT_SCOPE}}</li>
+          <li>Khong thay cho SOP/ANNEX: {{BOUNDARY_NOTE}}</li>
+        </ul>
+      </section>
+
+      <section id="wi-s2" class="wi-section">
+        <h2>2. Trigger va pham vi mo WI</h2>
+        <div class="gate-grid">
+          <div class="gate-card">
+            <strong>Mo WI khi</strong>
+            <ul>
+              <li>{{TRIGGER_1}}</li>
+              <li>{{TRIGGER_2}}</li>
+            </ul>
+          </div>
+          <div class="gate-card">
+            <strong>Khong mo WI khi</strong>
+            <ul>
+              <li>{{NON_TRIGGER_1}}</li>
+              <li>{{NON_TRIGGER_2}}</li>
+            </ul>
+          </div>
+        </div>
+        <div class="doc-links">
+          <a class="doc-link" href="{{SOP_LINK}}">{{SOP_CODE}}</a>
+          <a class="doc-link" href="{{ANNEX_LINK}}">{{ANNEX_CODE}}</a>
+          <a class="doc-link" href="{{FRM_LINK}}">{{FRM_CODE}}</a>
+        </div>
+      </section>
+
+      <section id="wi-s3" class="wi-section">
+        <h2>3. Ho so dau vao va dieu kien vao gate</h2>
+        <div class="gate-grid">
+          <div class="gate-card">
+            <strong>Input criteria</strong>
+            <ul>
+              <li>{{INPUT_1}}</li>
+              <li>{{INPUT_2}}</li>
+              <li>{{INPUT_3}}</li>
+            </ul>
+          </div>
+          <div class="gate-card">
+            <strong>Evidence toi thieu</strong>
+            <ul>
+              <li>{{EVIDENCE_1}}</li>
+              <li>{{EVIDENCE_2}}</li>
+              <li>{{EVIDENCE_3}}</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout-stop"><strong>STOP:</strong> {{STOP_BEFORE_ENTRY}}</div>
+      </section>
+
+      <section id="wi-s4" class="wi-section">
+        <h2>4. Tham quyen HOLD va release</h2>
+        <div class="gate-grid">
+          <div class="gate-card">
+            <div class="box"><strong>Hold khi</strong><br>{{HOLD_CONDITION}}</div>
+            <div class="box"><strong>Ai duoc dat HOLD</strong><br>{{HOLD_ACTOR}}</div>
+          </div>
+          <div class="gate-card">
+            <div class="box"><strong>Release authority</strong><br>{{RELEASE_ACTOR}}</div>
+            <div class="box"><strong>Record of decision</strong><br>{{RELEASE_RECORD}}</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="wi-s5" class="wi-section">
+        <h2>5. Cac buoc thuc thi gate</h2>
+
+        <div class="step-block">
+          <h3>Buoc 1 - {{STEP_TITLE}}</h3>
+          <p>{{STEP_ACTION}}</p>
+          <div class="step-meta">
+            <div><strong>Check</strong><br>{{CHECK_CUE}}</div>
+            <div><strong>Evidence</strong><br>{{EVIDENCE_CUE}}</div>
+            <div><strong>PASS khi</strong><br>{{PASS_CUE}}</div>
+            <div><strong>FAIL thi</strong><br>{{FAIL_REACTION}}</div>
+          </div>
+        </div>
+
+        <div class="step-block">
+          <h3>Buoc 2 - {{STEP_TITLE}}</h3>
+          <p>{{STEP_ACTION}}</p>
+          <div class="step-meta">
+            <div><strong>Check</strong><br>{{CHECK_CUE}}</div>
+            <div><strong>Evidence</strong><br>{{EVIDENCE_CUE}}</div>
+            <div><strong>PASS khi</strong><br>{{PASS_CUE}}</div>
+            <div><strong>FAIL thi</strong><br>{{FAIL_REACTION}}</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="wi-s6" class="wi-section">
+        <h2>6. Ho so, log va bang chung</h2>
+        <div class="record-block">
+          <ul>
+            <li>{{RECORD_1}}</li>
+            <li>{{RECORD_2}}</li>
+            <li>{{RECORD_3}}</li>
+          </ul>
+        </div>
+        <div class="callout-warn"><strong>Luu y:</strong> {{NO_VERBAL_RELEASE_NOTE}}</div>
+      </section>
+
+      <section id="wi-s7" class="wi-section">
+        <h2>7. Tai lieu lien quan</h2>
+        <ul>
+          <li><a href="{{RELATED_DOC_LINK_1}}">{{RELATED_DOC_CODE_1}}</a> - {{RELATED_DOC_TITLE_1}}</li>
+          <li><a href="{{RELATED_DOC_LINK_2}}">{{RELATED_DOC_CODE_2}}</a> - {{RELATED_DOC_TITLE_2}}</li>
+          <li><a href="{{RELATED_DOC_LINK_3}}">{{RELATED_DOC_CODE_3}}</a> - {{RELATED_DOC_TITLE_3}}</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -27,6 +27,13 @@ Muc tieu la chan 5 loi:
    - archetype QA;
    - visual rules;
    - role/bundle rule.
+   Header normalization chi duoc dong vao:
+   - title tag;
+   - family subtitle;
+   - meta labels;
+   - `.doc-code` hook cho ma tai lieu;
+   - UTF-8-safe text handling.
+   Khong duoc nhan co hoi sua header de chen archetype, series hoac domain vao published subtitle.
 4. Noi dung van hanh phai chot theo user, risk va evidence cua tung tai lieu.
 5. Neu acceptance criteria khong co nguon chinh thuc, khong duoc tu dien so.
 

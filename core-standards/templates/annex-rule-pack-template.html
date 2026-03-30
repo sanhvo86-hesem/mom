@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{CODE}} — {{TITLE}} | HESEM QMS</title>
+<link rel="stylesheet" href="{{RELATIVE_PATH}}/assets/style.css">
+<style>
+.annex-section { margin: 18px 0; }
+.card { border: 1px solid var(--ln); border-radius: var(--r); padding: 14px; margin: 12px 0; background: #fff; }
+.callout-alert { border-left: 4px solid #dc2626; background: #fef2f2; padding: 12px 14px; border-radius: 8px; margin: 10px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <!-- Doc core-standards 27, 29 va 30 truoc khi dung template nay. -->
+      <!-- Rule-Pack Annex la noi dat quy tac domain: condition, action, owner, consequence. -->
+      <!-- Khong viet thanh huong dan step-by-step tai diem su dung. -->
+
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="{{RELATIVE_PATH}}/01-QMS-Portal/portal.html"><img src="{{RELATIVE_PATH}}/assets/hesem-logo.svg" alt="HESEM Logo"></a>
+          <div class="fh-company">
+            <a href="{{RELATIVE_PATH}}/01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu vận hành • Annex</span>
+          </div>
+        </div>
+        <div class="title"><strong><span class="doc-code">{{CODE}}</span> — {{TITLE}}</strong></div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span class="doc-code">{{CODE}}</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span>{{OWNER_ROLE_CHIP}}</span></div>
+          <div class="row"><span><b>Phê duyệt:</b></span><span>{{APPROVER_ROLE_CHIP}}</span></div>
+        </div>
+      </div>
+
+      <section class="annex-section">
+        <h2>1. Muc dich va ranh gioi</h2>
+        <p>{{PURPOSE}}</p>
+        <ul>
+          <li>Domain rule: {{DOMAIN_SCOPE}}</li>
+          <li>Actor enforcing: {{ENFORCING_ACTOR}}</li>
+          <li>Khong thay cho WI: {{BOUNDARY_NOTE}}</li>
+        </ul>
+      </section>
+
+      <section class="annex-section">
+        <h2>2. Bang quy tac</h2>
+        <div class="card">{{RULE_TABLE_WITH_RULEID_CONDITION_ACTION_OWNER_CONSEQUENCE}}</div>
+      </section>
+
+      <section class="annex-section">
+        <h2>3. Ngoai le, escalation va record</h2>
+        <div class="card">{{EXCEPTION_AND_RECORD_TABLE}}</div>
+        <div class="callout-alert"><strong>Khong chap nhan:</strong> {{NO_STEP_BY_STEP_NOTE}}</div>
+      </section>
+
+      <section class="annex-section">
+        <h2>4. Tai lieu lien quan</h2>
+        <ul>
+          <li><a href="{{RELATED_DOC_LINK_1}}">{{RELATED_DOC_CODE_1}}</a> - {{RELATED_DOC_TITLE_1}}</li>
+          <li><a href="{{RELATED_DOC_LINK_2}}">{{RELATED_DOC_CODE_2}}</a> - {{RELATED_DOC_TITLE_2}}</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</div>
+</body>
+</html>

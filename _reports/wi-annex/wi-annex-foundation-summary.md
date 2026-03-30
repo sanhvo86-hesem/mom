@@ -19,6 +19,6 @@
 
 ## Practical next step
 
-- Phase 0 foundation cleanup is stable; move the next tranche to archetype-boundary tightening on canonical WI/ANNEX only.
-- Then move the pilot set into execution depth, led by WI-715, WI-701, WI-517, WI-302 and WI-201.
+- Phase 0 foundation cleanup and Wave 1 canonical pass are stable; move the next tranche to Wave 2 for WI-500 and ANNEX-500 execution depth.
+- Then keep section-id migration wave-based and avoid batch-fixing the remaining 26 non-compliant WI files without content review.
 

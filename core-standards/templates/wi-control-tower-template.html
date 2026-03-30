@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{CODE}} — {{TITLE}} | HESEM QMS</title>
+<link rel="stylesheet" href="{{RELATIVE_PATH}}/assets/style.css">
+<style>
+.wi-section { margin: 18px 0; }
+.panel, .review-step { border: 1px solid var(--ln); border-radius: var(--r); padding: 14px; margin: 12px 0; background: #fff; }
+.panel-grid, .doc-links, .review-meta { display: grid; gap: 10px 14px; }
+.panel-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.doc-links { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.review-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 10px; }
+.review-meta div, .panel .box { border: 1px solid var(--ln); border-radius: var(--r); padding: 10px 12px; background: #f8fafc; }
+.doc-link { display: block; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--ln); background: #f8fafc; text-decoration: none; color: inherit; font-weight: 600; }
+.callout-alert { border-left: 4px solid #d97706; background: #fffbeb; padding: 12px 14px; border-radius: 8px; margin: 10px 0; }
+.callout-stop { border-left: 4px solid #dc2626; background: #fef2f2; padding: 12px 14px; border-radius: 8px; margin: 10px 0; }
+@media (max-width: 960px) { .panel-grid, .doc-links, .review-meta { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <!-- Doc core-standards 26, 29 va 30 truoc khi dung template nay. -->
+      <!-- Control-Tower WI chi khoa nhip review, input, escalation va record. -->
+      <!-- Khong chen KPI dictionary, management review governance cap he thong hay dashboard example pack vao body WI. -->
+
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="{{RELATIVE_PATH}}/01-QMS-Portal/portal.html"><img src="{{RELATIVE_PATH}}/assets/hesem-logo.svg" alt="HESEM Logo"></a>
+          <div class="fh-company">
+            <a href="{{RELATIVE_PATH}}/01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu vận hành • Công việc hướng dẫn</span>
+          </div>
+        </div>
+        <div class="title"><strong><span class="doc-code">{{CODE}}</span> — {{TITLE}}</strong></div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span class="doc-code">{{CODE}}</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span>{{OWNER_ROLE_CHIP}}</span></div>
+          <div class="row"><span><b>Phê duyệt:</b></span><span>{{APPROVER_ROLE_CHIP}}</span></div>
+        </div>
+      </div>
+
+      <section id="wi-s1" class="wi-section">
+        <h2>1. Muc dich va ranh gioi</h2>
+        <p>{{MUC_DICH_1_CAU}}</p>
+        <ul>
+          <li>Audience chinh: {{AUDIENCE}}</li>
+          <li>Khong thay cho: {{BOUNDARY_NOTE}}</li>
+        </ul>
+      </section>
+
+      <section id="wi-s2" class="wi-section">
+        <h2>2. Cadence, trigger va dau vao review</h2>
+        <div class="panel-grid">
+          <div class="panel">
+            <div class="box"><strong>Cadence</strong><br>{{CADENCE}}</div>
+            <div class="box"><strong>Trigger mo WI</strong><br>{{TRIGGER}}</div>
+          </div>
+          <div class="panel">
+            <div class="box"><strong>Cut-off du lieu</strong><br>{{DATA_CUTOFF}}</div>
+            <div class="box"><strong>Nguoi chu tri</strong><br>{{MEETING_OWNER}}</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="wi-s3" class="wi-section">
+        <h2>3. Data source va review inputs</h2>
+        <div class="panel-grid">
+          <div class="panel">
+            <strong>Data source</strong>
+            <ul>
+              <li>{{DATA_SOURCE_1}}</li>
+              <li>{{DATA_SOURCE_2}}</li>
+            </ul>
+          </div>
+          <div class="panel">
+            <strong>Review inputs</strong>
+            <ul>
+              <li>{{REVIEW_INPUT_1}}</li>
+              <li>{{REVIEW_INPUT_2}}</li>
+            </ul>
+          </div>
+        </div>
+        <div class="doc-links">
+          <a class="doc-link" href="{{SOP_LINK}}">{{SOP_CODE}}</a>
+          <a class="doc-link" href="{{ANNEX_LINK}}">{{ANNEX_CODE}}</a>
+          <a class="doc-link" href="{{FRM_LINK}}">{{FRM_CODE}}</a>
+        </div>
+      </section>
+
+      <section id="wi-s4" class="wi-section">
+        <h2>4. Chuan bi bang dieu hanh va pack review</h2>
+        <ul>
+          <li>{{PREP_RULE_1}}</li>
+          <li>{{PREP_RULE_2}}</li>
+          <li>{{PREP_RULE_3}}</li>
+        </ul>
+        <div class="callout-alert"><strong>Canh bao:</strong> {{STALE_DATA_WARNING}}</div>
+      </section>
+
+      <section id="wi-s5" class="wi-section">
+        <h2>5. Luong review va quyet dinh</h2>
+
+        <div class="review-step">
+          <h3>Buoc 1 - {{STEP_TITLE}}</h3>
+          <p>{{STEP_ACTION}}</p>
+          <div class="review-meta">
+            <div><strong>Input phai co</strong><br>{{STEP_INPUT}}</div>
+            <div><strong>Quyet dinh phai chot</strong><br>{{DECISION_OUTPUT}}</div>
+            <div><strong>Escalate khi</strong><br>{{ESCALATE_TRIGGER}}</div>
+            <div><strong>Record</strong><br>{{RECORD_CUE}}</div>
+          </div>
+        </div>
+
+        <div class="review-step">
+          <h3>Buoc 2 - {{STEP_TITLE}}</h3>
+          <p>{{STEP_ACTION}}</p>
+          <div class="review-meta">
+            <div><strong>Input phai co</strong><br>{{STEP_INPUT}}</div>
+            <div><strong>Quyet dinh phai chot</strong><br>{{DECISION_OUTPUT}}</div>
+            <div><strong>Escalate khi</strong><br>{{ESCALATE_TRIGGER}}</div>
+            <div><strong>Record</strong><br>{{RECORD_CUE}}</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="wi-s6" class="wi-section">
+        <h2>6. Escalation va record sau review</h2>
+        <div class="panel-grid">
+          <div class="panel">
+            <strong>Escalation path</strong>
+            <ul>
+              <li>{{ESCALATION_1}}</li>
+              <li>{{ESCALATION_2}}</li>
+            </ul>
+          </div>
+          <div class="panel">
+            <strong>Records sau review</strong>
+            <ul>
+              <li>{{RECORD_1}}</li>
+              <li>{{RECORD_2}}</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout-stop"><strong>STOP:</strong> {{NO_DECISION_NO_CLOSE}}</div>
+      </section>
+
+      <section id="wi-s7" class="wi-section">
+        <h2>7. Tai lieu lien quan</h2>
+        <ul>
+          <li><a href="{{RELATED_DOC_LINK_1}}">{{RELATED_DOC_CODE_1}}</a> - {{RELATED_DOC_TITLE_1}}</li>
+          <li><a href="{{RELATED_DOC_LINK_2}}">{{RELATED_DOC_CODE_2}}</a> - {{RELATED_DOC_TITLE_2}}</li>
+          <li><a href="{{RELATED_DOC_LINK_3}}">{{RELATED_DOC_CODE_3}}</a> - {{RELATED_DOC_TITLE_3}}</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</div>
+</body>
+</html>
