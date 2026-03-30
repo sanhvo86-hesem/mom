@@ -9434,6 +9434,113 @@ function git_head_commit(string $repoReal, string $ref = 'HEAD'): string {
   return $code === 0 ? $out : '';
 }
 
+function git_commit_overview(string $repoReal, string $ref = 'HEAD'): array {
+  $code = 0;
+  $out = trim((string)git_command([
+    'show',
+    '-s',
+    '--format=%H%x1f%h%x1f%s%x1f%an%x1f%ae%x1f%cI',
+    $ref
+  ], $repoReal, $code));
+  if ($code !== 0 || $out === '') {
+    return [
+      'hash' => '',
+      'short_hash' => '',
+      'subject' => '',
+      'author_name' => '',
+      'author_email' => '',
+      'committed_at' => '',
+    ];
+  }
+  $parts = explode("\x1f", $out);
+  return [
+    'hash' => (string)($parts[0] ?? ''),
+    'short_hash' => (string)($parts[1] ?? ''),
+    'subject' => (string)($parts[2] ?? ''),
+    'author_name' => (string)($parts[3] ?? ''),
+    'author_email' => (string)($parts[4] ?? ''),
+    'committed_at' => (string)($parts[5] ?? ''),
+  ];
+}
+
+function git_remote_url(string $repoReal, string $remote = 'origin'): string {
+  $code = 0;
+  $out = trim((string)git_command(['config', '--get', 'remote.' . $remote . '.url'], $repoReal, $code));
+  return $code === 0 ? $out : '';
+}
+
+function git_repository_status(string $repoDir, bool $fetchRemote = false): array {
+  $repoReal = realpath($repoDir);
+  if ($repoReal === false || !is_dir($repoReal)) {
+    throw new RuntimeException('repo_not_found');
+  }
+
+  $checkCode = 0;
+  $checkOut = git_command(['rev-parse', '--is-inside-work-tree'], $repoReal, $checkCode);
+  if ($checkCode !== 0 || trim($checkOut) !== 'true') {
+    throw new RuntimeException('not_a_git_repo');
+  }
+
+  $branchCode = 0;
+  $branch = trim((string)git_command(['branch', '--show-current'], $repoReal, $branchCode));
+  if ($branchCode !== 0 || $branch === '') $branch = 'main';
+  $remoteBranch = 'origin/' . $branch;
+  $remoteUrl = git_remote_url($repoReal);
+
+  $fetchError = '';
+  if ($fetchRemote && $remoteUrl !== '' && $branch !== '') {
+    $fetchCode = 0;
+    $fetchOut = git_command(['fetch', 'origin', $branch], $repoReal, $fetchCode);
+    if ($fetchCode !== 0) {
+      $fetchError = 'git_fetch_failed' . ($fetchOut !== '' ? ': ' . $fetchOut : '');
+    }
+  }
+
+  $head = git_commit_overview($repoReal, 'HEAD');
+  $remoteHead = git_commit_overview($repoReal, $remoteBranch);
+
+  $aheadCount = 0;
+  $behindCount = 0;
+  if ((string)($remoteHead['hash'] ?? '') !== '') {
+    $aheadCode = 0;
+    $aheadOut = git_command(['rev-list', '--count', $remoteBranch . '..' . $branch], $repoReal, $aheadCode);
+    if ($aheadCode === 0) $aheadCount = (int)trim($aheadOut);
+
+    $behindCode = 0;
+    $behindOut = git_command(['rev-list', '--count', $branch . '..' . $remoteBranch], $repoReal, $behindCode);
+    if ($behindCode === 0) $behindCount = (int)trim($behindOut);
+  }
+
+  $statusCode = 0;
+  $statusOut = git_command(['status', '--porcelain', '--untracked-files=all'], $repoReal, $statusCode);
+  if ($statusCode !== 0) {
+    throw new RuntimeException('git_status_failed');
+  }
+  $statusLines = split_nonempty_lines($statusOut);
+  $meaningfulLines = git_filter_non_runtime_status_lines($statusLines, true);
+  $meaningfulEntries = git_parse_status_entries($meaningfulLines);
+  $meaningfulPaths = git_collect_paths_from_status_lines($meaningfulLines);
+  $cpanelYmlExists = is_file($repoReal . DIRECTORY_SEPARATOR . 'cpanel.yml');
+
+  return [
+    'repo_path' => str_replace('\\', '/', $repoReal),
+    'remote_url' => $remoteUrl,
+    'branch' => $branch,
+    'remote_branch' => $remoteBranch,
+    'head' => $head,
+    'remote_head' => $remoteHead,
+    'ahead_count' => $aheadCount,
+    'behind_count' => $behindCount,
+    'working_tree_clean' => empty($meaningfulLines),
+    'meaningful_dirty_count' => count($meaningfulEntries),
+    'meaningful_dirty_paths' => $meaningfulPaths,
+    'meaningful_dirty_entries' => $meaningfulEntries,
+    'cpanel_yml_exists' => $cpanelYmlExists,
+    'deploy_ready' => $cpanelYmlExists && empty($meaningfulLines),
+    'fetch_error' => $fetchError,
+  ];
+}
+
 function git_parse_status_entries(array $statusLines): array {
   $entries = [];
   foreach ($statusLines as $line) {
@@ -9727,21 +9834,6 @@ function git_pull_portal(string $repoDir, ?array $me = null): array {
   // manual cleanup in cPanel Terminal.
   git_cleanup_runtime_noise($repoReal);
 
-  // Auto-sync meaningful local changes before pulling so admin does not need
-  // to switch between Push and Pull manually for routine edits.
-  $presyncResult = null;
-  if (is_array($me)) {
-    try {
-      $presyncResult = git_sync_documents($me, $repoReal, ['exclude_presync_telemetry' => true]);
-      git_cleanup_runtime_noise($repoReal);
-    } catch (Throwable $syncError) {
-      $syncMsg = (string)$syncError->getMessage();
-      if (!(str_starts_with($syncMsg, 'git_status_failed') || str_starts_with($syncMsg, 'git_diff_cached_failed'))) {
-        throw new RuntimeException('git_presync_failed: ' . $syncMsg);
-      }
-    }
-  }
-
   $stagedCode = 0;
   $stagedOut = git_command(['diff', '--cached', '--name-only'], $repoReal, $stagedCode);
   if ($stagedCode !== 0) {
@@ -9779,18 +9871,14 @@ function git_pull_portal(string $repoDir, ?array $me = null): array {
   $behindOut = git_command(['rev-list', '--count', $branch . '..origin/' . $branch], $repoReal, $behindCode);
   $behindCount = $behindCode === 0 ? (int)trim($behindOut) : 0;
   if ($behindCount <= 0) {
-    $message = 'Portal is already up to date with origin/' . $branch;
-    if (is_array($presyncResult) && !empty($presyncResult['pushed'])) {
-      $message = 'No new commit was available on origin/' . $branch . '; only server-side pre-sync changes were handled before pull.';
-    }
     return [
       'pulled' => false,
       'branch' => $branch,
-      'message' => $message,
+      'message' => 'Repository is already up to date with origin/' . $branch,
       'before_head' => $headBefore,
       'after_head' => $headBefore,
       'changed_files' => [],
-      'presync' => $presyncResult,
+      'presync' => null,
       'fetch_output' => $fetchOut,
       'pull_output' => $fetchOut,
     ];
@@ -9815,11 +9903,11 @@ function git_pull_portal(string $repoDir, ?array $me = null): array {
   return [
     'pulled' => true,
     'branch' => $branch,
-    'message' => 'Portal updated from origin/' . $branch,
+    'message' => 'Repository updated from origin/' . $branch,
     'before_head' => $headBefore,
     'after_head' => $headAfter,
     'changed_files' => $changedFiles,
-    'presync' => $presyncResult,
+    'presync' => null,
     'fetch_output' => $fetchOut,
     'pull_output' => trim($fetchOut . ($fetchOut !== '' && $pullOut !== '' ? "\n" : '') . $pullOut),
   ];
@@ -10262,6 +10350,70 @@ switch ($action) {
         str_starts_with($message, 'git_diff_cached_failed') => 'git_diff_cached_failed',
         str_starts_with($message, 'git_restore_staged_failed') => 'git_restore_staged_failed',
         default => 'git_sync_failed',
+      };
+      api_json([
+        'ok' => false,
+        'error' => $error,
+        'detail' => $message,
+        'server_time' => now_iso(),
+      ], 500);
+    }
+  }
+
+  case 'admin_git_status': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    if (!user_is_admin($me)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
+
+    try {
+      $result = git_repository_status($ROOT_DIR, true);
+      api_json([
+        'ok' => true,
+        'repo_path' => (string)($result['repo_path'] ?? ''),
+        'remote_url' => (string)($result['remote_url'] ?? ''),
+        'branch' => (string)($result['branch'] ?? 'main'),
+        'remote_branch' => (string)($result['remote_branch'] ?? ''),
+        'head' => is_array($result['head'] ?? null) ? [
+          'hash' => (string)($result['head']['hash'] ?? ''),
+          'short_hash' => (string)($result['head']['short_hash'] ?? ''),
+          'subject' => (string)($result['head']['subject'] ?? ''),
+          'author_name' => (string)($result['head']['author_name'] ?? ''),
+          'author_email' => (string)($result['head']['author_email'] ?? ''),
+          'committed_at' => (string)($result['head']['committed_at'] ?? ''),
+        ] : null,
+        'remote_head' => is_array($result['remote_head'] ?? null) ? [
+          'hash' => (string)($result['remote_head']['hash'] ?? ''),
+          'short_hash' => (string)($result['remote_head']['short_hash'] ?? ''),
+          'subject' => (string)($result['remote_head']['subject'] ?? ''),
+          'author_name' => (string)($result['remote_head']['author_name'] ?? ''),
+          'author_email' => (string)($result['remote_head']['author_email'] ?? ''),
+          'committed_at' => (string)($result['remote_head']['committed_at'] ?? ''),
+        ] : null,
+        'ahead_count' => (int)($result['ahead_count'] ?? 0),
+        'behind_count' => (int)($result['behind_count'] ?? 0),
+        'working_tree_clean' => (bool)($result['working_tree_clean'] ?? false),
+        'meaningful_dirty_count' => (int)($result['meaningful_dirty_count'] ?? 0),
+        'meaningful_dirty_paths' => array_values(array_map('strval', $result['meaningful_dirty_paths'] ?? [])),
+        'meaningful_dirty_entries' => array_values(array_map(static function($row){
+          return [
+            'xy' => (string)($row['xy'] ?? ''),
+            'path' => (string)($row['path'] ?? ''),
+          ];
+        }, $result['meaningful_dirty_entries'] ?? [])),
+        'cpanel_yml_exists' => (bool)($result['cpanel_yml_exists'] ?? false),
+        'deploy_ready' => (bool)($result['deploy_ready'] ?? false),
+        'fetch_error' => (string)($result['fetch_error'] ?? ''),
+        'server_time' => now_iso(),
+      ]);
+    } catch (Throwable $e) {
+      @error_log('[API] admin_git_status failed: ' . $e->getMessage());
+      $message = $e->getMessage();
+      $error = match (true) {
+        str_starts_with($message, 'exec_unavailable') => 'exec_unavailable',
+        str_starts_with($message, 'repo_not_found') => 'repo_not_found',
+        str_starts_with($message, 'not_a_git_repo') => 'not_a_git_repo',
+        str_starts_with($message, 'git_status_failed') => 'git_status_failed',
+        default => 'git_status_failed',
       };
       api_json([
         'ok' => false,

@@ -4283,9 +4283,120 @@ async function adminSaveAll(){
 }
 
 let gitSyncBusyMode = '';
+let gitRepoStatusState = {loading:false, loaded:false, error:'', data:null};
 
 function isGitSyncBusy(){
   return gitSyncBusyMode === 'pull' || gitSyncBusyMode === 'push';
+}
+
+function getGitRepoStatus(){
+  return gitRepoStatusState && gitRepoStatusState.data && gitRepoStatusState.data.ok
+    ? gitRepoStatusState.data
+    : null;
+}
+
+function gitRepoFormatTime(value){
+  const text = String(value||'').trim();
+  if(!text) return '';
+  const date = new Date(text);
+  if(Number.isNaN(date.getTime())) return text;
+  return date.toLocaleString(lang==='en' ? 'en-US' : 'vi-VN');
+}
+
+function gitRepoCommitHeadline(commit){
+  if(!commit || typeof commit !== 'object') return '—';
+  const hash = String(commit.short_hash || commit.hash || '').trim();
+  const subject = String(commit.subject || '').trim();
+  if(!hash && !subject) return '—';
+  return `${hash}${subject ? ` ${subject}` : ''}`.trim();
+}
+
+function gitRepoCommitMeta(commit){
+  if(!commit || typeof commit !== 'object') return '';
+  const author = String(commit.author_name || '').trim();
+  const committedAt = gitRepoFormatTime(commit.committed_at);
+  return [author, committedAt].filter(Boolean).join(' • ');
+}
+
+function gitRepoRelativeState(status){
+  if(!status) return {label:'—', tone:'neutral'};
+  const ahead = Number(status.ahead_count || 0);
+  const behind = Number(status.behind_count || 0);
+  if(ahead > 0 && behind > 0){
+    return {
+      label: lang==='en' ? `Diverged (+${ahead} / -${behind})` : `Phân kỳ (+${ahead} / -${behind})`,
+      tone: 'warn'
+    };
+  }
+  if(behind > 0){
+    return {
+      label: lang==='en' ? `Behind ${behind}` : `Chậm ${behind} commit`,
+      tone: 'info'
+    };
+  }
+  if(ahead > 0){
+    return {
+      label: lang==='en' ? `Ahead ${ahead}` : `Đi trước ${ahead} commit`,
+      tone: 'good'
+    };
+  }
+  return {
+    label: lang==='en' ? 'Up to date' : 'Đã đồng bộ',
+    tone: 'good'
+  };
+}
+
+function gitRepoWorkingTreeState(status){
+  if(!status) return {label:'—', tone:'neutral'};
+  const dirtyCount = Number(status.meaningful_dirty_count || 0);
+  if(dirtyCount > 0){
+    return {
+      label: lang==='en' ? `${dirtyCount} local change(s)` : `${dirtyCount} thay đổi local`,
+      tone: 'warn'
+    };
+  }
+  return {
+    label: lang==='en' ? 'Working tree clean' : 'Working tree sạch',
+    tone: 'good'
+  };
+}
+
+function gitRepoStatusPill(label, tone='neutral'){
+  return `<span class="admin-sync-status-pill is-${escapeHtml(tone)}">${escapeHtml(label)}</span>`;
+}
+
+async function loadGitRepoStatus(options={}){
+  const force = !!options.force;
+  if(gitRepoStatusState.loading && !force) return;
+  if(gitRepoStatusState.loaded && !force) return;
+  gitRepoStatusState.loading = true;
+  if(!options.silent && currentPage === 'admin') renderAdmin();
+  try{
+    const res = await apiCall('admin_git_status', null, 'GET');
+    if(res && res.ok){
+      gitRepoStatusState = {loading:false, loaded:true, error:'', data:res};
+    }else{
+      gitRepoStatusState = {
+        loading:false,
+        loaded:false,
+        error:(res && (res.detail || res.error)) ? String(res.detail || res.error) : 'git_status_failed',
+        data:null
+      };
+    }
+  }catch(e){
+    gitRepoStatusState = {
+      loading:false,
+      loaded:false,
+      error:(e && e.message) ? String(e.message) : 'git_status_failed',
+      data:null
+    };
+  }finally{
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+function adminRefreshGitRepoStatus(){
+  loadGitRepoStatus({force:true});
 }
 
 function adminGitSyncIcon(kind){
@@ -4564,6 +4675,336 @@ function renderAdminSyncPanel(){
     </section>`;
 }
 
+function openRemoteUpdateReportModal(res){
+  closeGitSyncModal();
+  const branch = String((res && res.branch) || 'main');
+  const changedFiles = Array.isArray(res && res.changed_files) ? res.changed_files : [];
+  const pulled = !!(res && res.pulled);
+  const beforeHead = String((res && (res.before_head || res.head_before)) || '');
+  const afterHead = String((res && (res.after_head || res.head_after)) || '');
+  const summary = String(res && res.message || (pulled ? 'Repository updated from remote.' : 'Repository is already up to date.'));
+  const modal = document.createElement('div');
+  modal.id = 'git-sync-modal';
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal git-sync-modal">
+      <div class="git-sync-modal-head">
+        <div>
+          <div class="git-sync-modal-kicker">${escapeHtml(lang==='en' ? 'Update from Remote' : 'C\u1eadp nh\u1eadt t\u1eeb remote')}</div>
+          <h3>${escapeHtml(lang==='en' ? 'Remote Update Detail' : 'Chi ti\u1ebft c\u1eadp nh\u1eadt remote')}</h3>
+        </div>
+        <button class="icon-btn" onclick="closeGitSyncModal()" aria-label="Close">x</button>
+      </div>
+      <div class="git-sync-modal-body">
+        <div class="git-sync-summary-grid">
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'Branch' : 'Nh\u00e1nh', branch)}
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'Changed files' : 'File thay \u0111\u1ed5i', String(changedFiles.length))}
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'From' : 'T\u1eeb commit', gitSyncShortHash(beforeHead))}
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'To' : '\u0110\u1ebfn commit', gitSyncShortHash(afterHead))}
+        </div>
+        <section class="git-sync-section">
+          <div class="git-sync-section-title">${lang==='en' ? 'Remote update summary' : 'T\u00f3m t\u1eaft c\u1eadp nh\u1eadt remote'}</div>
+          <div class="git-sync-callout">${escapeHtml(summary)}</div>
+        </section>
+        <section class="git-sync-section">
+          <div class="git-sync-section-title">${lang==='en' ? 'Files updated in cPanel' : 'Danh s\u00e1ch file \u0111\u01b0\u1ee3c c\u1eadp nh\u1eadt tr\u00ean cPanel'}</div>
+          ${gitSyncRenderChangedFileTable(changedFiles, lang==='en' ? 'No remote file change was applied in this update.' : 'Kh\u00f4ng c\u00f3 file remote n\u00e0o \u0111\u01b0\u1ee3c \u00e1p xu\u1ed1ng trong l\u1ea7n c\u1eadp nh\u1eadt n\u00e0y.')}
+        </section>
+        ${gitSyncRenderOutputBlock(lang==='en' ? 'Fetch output' : 'Log fetch', res && res.fetch_output)}
+        ${gitSyncRenderOutputBlock(lang==='en' ? 'Update output' : 'Log c\u1eadp nh\u1eadt', res && res.pull_output)}
+      </div>
+      <div class="modal-actions git-sync-modal-actions">
+        <button class="btn-admin secondary" onclick="closeGitSyncModal()">${lang==='en' ? 'Close' : '\u0110\u00f3ng'}</button>
+        <button class="btn-admin primary" onclick="adminReloadLatestPortal()">${lang==='en' ? (pulled ? 'OK - reload latest portal' : 'OK - refresh portal') : (pulled ? 'OK - t\u1ea3i l\u1ea1i portal m\u1edbi nh\u1ea5t' : 'OK - l\u00e0m m\u1edbi portal')}</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e=>{ if(e.target === modal) closeGitSyncModal(); });
+}
+
+function remoteUpdateErrorMessage(res){
+  const error = (res && res.error) ? String(res.error) : 'git_pull_failed';
+  const detail = (res && res.detail) ? String(res.detail) : '';
+  if(error === 'working_tree_dirty' || error === 'staged_changes_present'){
+    return lang==='en'
+      ? 'The checked-out branch still has local repository changes. Clean or publish those changes before updating from remote.'
+      : 'Nh\u00e1nh \u0111ang checkout v\u1eabn c\u00f2n thay \u0111\u1ed5i local. H\u00e3y l\u00e0m s\u1ea1ch ho\u1eb7c xu\u1ea5t b\u1ea3n c\u00e1c thay \u0111\u1ed5i \u0111\u00f3 tr\u01b0\u1edbc khi c\u1eadp nh\u1eadt t\u1eeb remote.';
+  }
+  if(error === 'exec_unavailable'){
+    return lang==='en'
+      ? 'PHP exec is disabled on hosting, so the portal cannot run git commands.'
+      : 'Hosting \u0111ang ch\u1eb7n PHP exec n\u00ean portal kh\u00f4ng th\u1ec3 ch\u1ea1y l\u1ec7nh git.';
+  }
+  if(error === 'git_fetch_failed' || error === 'git_pull_failed'){
+    return lang==='en'
+      ? 'Remote update failed. Verify the cPanel server can access the remote repository and branch.'
+      : 'C\u1eadp nh\u1eadt t\u1eeb remote th\u1ea5t b\u1ea1i. H\u00e3y ki\u1ec3m tra server cPanel c\u00f3 quy\u1ec1n truy c\u1eadp remote repository v\u00e0 nh\u00e1nh \u0111ang theo d\u00f5i.';
+  }
+  if(error === 'not_a_git_repo' || error === 'repo_not_found'){
+    return lang==='en'
+      ? 'The portal root on this server is not available as a git repository.'
+      : 'Th\u01b0 m\u1ee5c portal tr\u00ean server n\u00e0y kh\u00f4ng s\u1eb5n s\u00e0ng nh\u01b0 m\u1ed9t repo git.';
+  }
+  return detail || (lang==='en' ? 'Remote update failed' : 'C\u1eadp nh\u1eadt t\u1eeb remote th\u1ea5t b\u1ea1i');
+}
+
+function remoteUpdateGuidance(res){
+  const error = (res && res.error) ? String(res.error) : '';
+  if(error === 'working_tree_dirty' || error === 'staged_changes_present'){
+    return lang==='en'
+      ? 'This works like cPanel Version Control: update from remote expects a clean checked-out branch. Review the listed files, then push them, commit them in Terminal, or discard them before updating again.'
+      : 'Ph\u1ea7n n\u00e0y ho\u1ea1t \u0111\u1ed9ng gi\u1ed1ng cPanel Version Control: c\u1eadp nh\u1eadt t\u1eeb remote y\u00eau c\u1ea7u nh\u00e1nh \u0111ang checkout ph\u1ea3i s\u1ea1ch. H\u00e3y r\u00e0 so\u00e1t c\u00e1c file b\u00ean d\u01b0\u1edbi, r\u1ed3i push, commit trong Terminal, ho\u1eb7c b\u1ecf ch\u00fang tr\u01b0\u1edbc khi c\u1eadp nh\u1eadt l\u1ea1i.';
+  }
+  if(error === 'git_fetch_failed' || error === 'git_pull_failed'){
+    return lang==='en'
+      ? 'The server could not fetch or pull from origin. Verify network access, SSH key or token, and the remote branch state.'
+      : 'Server kh\u00f4ng th\u1ec3 fetch ho\u1eb7c pull t\u1eeb origin. H\u00e3y ki\u1ec3m tra k\u1ebft n\u1ed1i m\u1ea1ng, SSH key ho\u1eb7c token, v\u00e0 tr\u1ea1ng th\u00e1i nh\u00e1nh remote.';
+  }
+  return lang==='en'
+    ? 'Review the raw server detail below to determine whether this is a repository state issue, a remote access issue, or a branch/path mismatch.'
+    : 'H\u00e3y xem log chi ti\u1ebft b\u00ean d\u01b0\u1edbi \u0111\u1ec3 x\u00e1c \u0111\u1ecbnh \u0111\u00e2y l\u00e0 l\u1ed7i tr\u1ea1ng th\u00e1i repo, l\u1ed7i truy c\u1eadp remote, hay l\u1ed7i kh\u00f4ng kh\u1edbp nh\u00e1nh/\u0111\u01b0\u1eddng d\u1eabn.';
+}
+
+function openRemoteUpdateErrorModal(res){
+  closeGitSyncModal();
+  const branch = String((res && res.branch) || 'main');
+  const detail = String((res && res.detail) || '').trim();
+  const errorCode = String((res && res.error) || 'git_pull_failed').trim();
+  const paths = adminGitExtractDetailPaths(detail);
+  const modal = document.createElement('div');
+  modal.id = 'git-sync-modal';
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal git-sync-modal is-error">
+      <div class="git-sync-modal-head">
+        <div>
+          <div class="git-sync-modal-kicker">${escapeHtml(lang==='en' ? 'Update from Remote' : 'C\u1eadp nh\u1eadt t\u1eeb remote')}</div>
+          <h3>${escapeHtml(lang==='en' ? 'Remote Update Failed' : 'C\u1eadp nh\u1eadt t\u1eeb remote th\u1ea5t b\u1ea1i')}</h3>
+        </div>
+        <button class="icon-btn" onclick="closeGitSyncModal()" aria-label="Close">x</button>
+      </div>
+      <div class="git-sync-modal-body">
+        <div class="git-sync-summary-grid git-sync-summary-grid--compact">
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'Branch' : 'Nh\u00e1nh', branch)}
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'Error code' : 'M\u00e3 l\u1ed7i', errorCode || '--')}
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'Detected paths' : 'S\u1ed1 path', String(paths.length))}
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'Server time' : 'Th\u1eddi gian server', gitRepoFormatTime(res && res.server_time) || '--')}
+        </div>
+        <section class="git-sync-section">
+          <div class="git-sync-section-title">${lang==='en' ? 'Readable summary' : 'T\u00f3m t\u1eaft d\u1ec5 hi\u1ec3u'}</div>
+          <div class="git-sync-callout is-error">${escapeHtml(remoteUpdateErrorMessage(res))}</div>
+        </section>
+        <section class="git-sync-section">
+          <div class="git-sync-section-title">${lang==='en' ? 'Recommended handling' : 'H\u01b0\u1edbng x\u1eed l\u00fd \u0111\u1ec1 ngh\u1ecb'}</div>
+          <div class="git-sync-callout">${escapeHtml(remoteUpdateGuidance(res))}</div>
+        </section>
+        ${paths.length ? `
+          <section class="git-sync-section">
+            <div class="git-sync-section-title">${lang==='en' ? 'Detected paths from server log' : 'C\u00e1c path nh\u1eadn di\u1ec7n t\u1eeb log server'}</div>
+            ${gitSyncRenderSimpleFileTable(paths.map(path=>({status:'PATH', path})), lang==='en' ? 'No file path was extracted from the raw server detail.' : 'Kh\u00f4ng tr\u00edch xu\u1ea5t \u0111\u01b0\u1ee3c path n\u00e0o t\u1eeb log l\u1ed7i server.')}
+          </section>
+        ` : ''}
+        ${gitSyncRenderOutputBlock(lang==='en' ? 'Raw server detail' : 'Chi ti\u1ebft l\u1ed7i g\u1ed1c t\u1eeb server', detail)}
+      </div>
+      <div class="modal-actions git-sync-modal-actions">
+        <button class="btn-admin secondary" onclick="closeGitSyncModal()">${lang==='en' ? 'Close' : '\u0110\u00f3ng'}</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e=>{ if(e.target === modal) closeGitSyncModal(); });
+}
+
+async function adminPublishRepoChanges(){
+  if(!isAdmin() || isGitSyncBusy()) return;
+  const msg = lang==='en'
+    ? 'Publish meaningful repository changes from this cPanel server back to Git now? Runtime noise will still be ignored.'
+    : 'Xu\u1ea5t b\u1ea3n c\u00e1c thay \u0111\u1ed5i meaningful t\u1eeb server cPanel n\u00e0y l\u00ean Git ngay b\u00e2y gi\u1edd? C\u00e1c file runtime v\u1eabn s\u1ebd b\u1ecb b\u1ecf qua.';
+  if(!confirm(msg)) return;
+
+  gitSyncBusyMode = 'push';
+  renderAdmin();
+  try{
+    const res = await apiCall('admin_git_sync', {});
+    if(!(res && res.ok)){
+      openGitSyncErrorModal('push', res || {error:'git_sync_failed', detail:''});
+      return;
+    }
+    openGitSyncReportModal('push', res);
+  }catch(e){
+    openGitSyncErrorModal('push', {
+      error:'git_sync_failed',
+      detail:(e && e.message) ? String(e.message) : '',
+      server_time:new Date().toISOString()
+    });
+  }finally{
+    gitSyncBusyMode = '';
+    adminRefreshGitRepoStatus();
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+async function adminUpdateFromRemote(){
+  if(!isAdmin() || isGitSyncBusy()) return;
+  const msg = lang==='en'
+    ? 'Update the checked-out branch from origin now? This follows cPanel Version Control behavior and will not auto-commit server-side runtime changes before pulling.'
+    : 'C\u1eadp nh\u1eadt nh\u00e1nh \u0111ang checkout t\u1eeb origin ngay b\u00e2y gi\u1edd? C\u00e1ch n\u00e0y b\u00e1m theo h\u00e0nh vi cPanel Version Control v\u00e0 s\u1ebd kh\u00f4ng auto-commit c\u00e1c thay \u0111\u1ed5i runtime ph\u00eda server tr\u01b0\u1edbc khi pull.';
+  if(!confirm(msg)) return;
+
+  gitSyncBusyMode = 'pull';
+  renderAdmin();
+  try{
+    const res = await apiCall('admin_git_pull', {});
+    if(!(res && res.ok)){
+      openRemoteUpdateErrorModal(res || {error:'git_pull_failed', detail:''});
+      return;
+    }
+    openRemoteUpdateReportModal(res);
+  }catch(e){
+    openRemoteUpdateErrorModal({
+      error:'git_pull_failed',
+      detail:(e && e.message) ? String(e.message) : '',
+      server_time:new Date().toISOString()
+    });
+  }finally{
+    gitSyncBusyMode = '';
+    adminRefreshGitRepoStatus();
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+function renderAdminSyncPanelV2(){
+  const pullBusy = gitSyncBusyMode === 'pull';
+  const pushBusy = gitSyncBusyMode === 'push';
+  const disablePull = (isGitSyncBusy() && !pullBusy) || (gitRepoStatusState.loading && !gitRepoStatusState.loaded);
+  const disablePush = (isGitSyncBusy() && !pushBusy) || (gitRepoStatusState.loading && !gitRepoStatusState.loaded);
+  const status = gitRepoStatusState.data && typeof gitRepoStatusState.data === 'object' ? gitRepoStatusState.data : null;
+  const statusError = String(gitRepoStatusState.error || '').trim();
+  const relativeState = gitRepoRelativeState(status);
+  const workingTreeState = gitRepoWorkingTreeState(status);
+  const dirtyEntries = Array.isArray(status && status.meaningful_dirty_entries) ? status.meaningful_dirty_entries : [];
+  const fetchError = String((status && status.fetch_error) || '').trim();
+  const deployState = !status
+    ? {label:'--', tone:'neutral'}
+    : status.deploy_ready
+      ? {label:(lang==='en' ? 'Deploy-ready' : 'S\u1eb5n s\u00e0ng deploy'), tone:'good'}
+      : status.cpanel_yml_exists
+        ? {label:(lang==='en' ? 'Deploy blocked' : 'Deploy b\u1ecb ch\u1eb7n'), tone:'warn'}
+        : {label:(lang==='en' ? 'No cpanel.yml' : 'Thi\u1ebfu cpanel.yml'), tone:'neutral'};
+  const branch = String((status && status.branch) || 'main');
+  const remoteBranch = String((status && status.remote_branch) || `origin/${branch}`);
+  const repoPath = String((status && status.repo_path) || '--');
+  const remoteUrl = String((status && status.remote_url) || '--');
+  const headMeta = gitRepoCommitMeta(status && status.head) || (lang==='en' ? 'No local commit metadata available.' : 'Ch\u01b0a \u0111\u1ecdc \u0111\u01b0\u1ee3c metadata commit local.');
+  const remoteMeta = gitRepoCommitMeta(status && status.remote_head) || (lang==='en' ? 'No remote commit metadata available.' : 'Ch\u01b0a \u0111\u1ecdc \u0111\u01b0\u1ee3c metadata commit remote.');
+  const metaRow = (label, value, code=false) => `
+    <div class="admin-sync-meta-row">
+      <div class="admin-sync-meta-label">${escapeHtml(label)}</div>
+      <div class="admin-sync-meta-value">${code ? `<code>${escapeHtml(value || '--')}</code>` : escapeHtml(value || '--')}</div>
+    </div>`;
+  const notice = (() => {
+    if(gitRepoStatusState.loading && !status){
+      return `<div class="admin-sync-callout-bar is-info">${escapeHtml(lang==='en' ? 'Refreshing repository status from the cPanel server...' : '\u0110ang l\u00e0m m\u1edbi tr\u1ea1ng th\u00e1i repo t\u1eeb server cPanel...')}</div>`;
+    }
+    if(statusError){
+      return `<div class="admin-sync-callout-bar is-error">${escapeHtml((lang==='en' ? 'Could not read repository status. ' : 'Kh\u00f4ng \u0111\u1ecdc \u0111\u01b0\u1ee3c tr\u1ea1ng th\u00e1i repo. ') + statusError)}</div>`;
+    }
+    if(fetchError){
+      return `<div class="admin-sync-callout-bar is-warn">${escapeHtml((lang==='en' ? 'Origin fetch returned a warning. Showing the best status available from the server: ' : 'L\u1ec7nh fetch origin tr\u1ea3 v\u1ec1 c\u1ea3nh b\u00e1o. Portal \u0111ang hi\u1ec3n th\u1ecb tr\u1ea1ng th\u00e1i t\u1ed1t nh\u1ea5t \u0111\u1ecdc \u0111\u01b0\u1ee3c t\u1eeb server: ') + fetchError)}</div>`;
+    }
+    if(status && Number(status.meaningful_dirty_count || 0) > 0){
+      return `<div class="admin-sync-callout-bar is-warn">${escapeHtml(lang==='en' ? 'The checked-out branch currently has local repository changes. Update from Remote now behaves like cPanel and expects this working tree to be clean first.' : 'Nh\u00e1nh \u0111ang checkout hi\u1ec7n c\u00f2n thay \u0111\u1ed5i local. N\u00fat C\u1eadp nh\u1eadt t\u1eeb remote gi\u1edd s\u1ebd ho\u1ea1t \u0111\u1ed9ng gi\u1ed1ng cPanel v\u00e0 y\u00eau c\u1ea7u working tree ph\u1ea3i s\u1ea1ch tr\u01b0\u1edbc.')}</div>`;
+    }
+    if(status && Number(status.behind_count || 0) > 0){
+      return `<div class="admin-sync-callout-bar is-good">${escapeHtml(lang==='en' ? `Origin has ${Number(status.behind_count || 0)} newer commit(s) ready for this server.` : `Origin \u0111ang c\u00f3 ${Number(status.behind_count || 0)} commit m\u1edbi h\u01a1n s\u1eb5n s\u00e0ng \u00e1p xu\u1ed1ng server n\u00e0y.`)}</div>`;
+    }
+    return `<div class="admin-sync-callout-bar is-info">${escapeHtml(lang==='en' ? 'This repository is currently aligned with its tracked remote branch.' : 'Repo n\u00e0y hi\u1ec7n \u0111ang kh\u1edbp v\u1edbi nh\u00e1nh remote \u0111\u01b0\u1ee3c theo d\u00f5i.')}</div>`;
+  })();
+
+  return `
+    <section class="admin-sync-strip admin-sync-strip--cpanel">
+      <div class="admin-sync-head admin-sync-head--cpanel">
+        <div class="admin-sync-title-wrap">
+          <div class="admin-sync-kicker">${lang==='en' ? 'Version control' : '\u0110i\u1ec1u khi\u1ec3n phi\u00ean b\u1ea3n'}</div>
+          <h3>${lang==='en' ? 'Repository Update Like cPanel' : 'C\u1eadp nh\u1eadt repo gi\u1ed1ng cPanel'}</h3>
+          <p>${lang==='en'
+            ? 'This panel follows the checked-out branch on the cPanel server. Update from Remote only pulls from origin and never auto-commits runtime or telemetry files before updating.'
+            : 'B\u1ea3ng n\u00e0y b\u00e1m theo nh\u00e1nh \u0111ang checkout tr\u00ean server cPanel. C\u1eadp nh\u1eadt t\u1eeb remote ch\u1ec9 k\u00e9o t\u1eeb origin v\u00e0 kh\u00f4ng bao gi\u1edd auto-commit c\u00e1c file runtime ho\u1eb7c telemetry tr\u01b0\u1edbc khi c\u1eadp nh\u1eadt.'}</p>
+        </div>
+        <div class="admin-sync-head-actions">
+          <button class="admin-sync-mini" onclick="adminRefreshGitRepoStatus()">
+            <span class="admin-sync-mini-ico">${adminGitSyncIcon('sync')}</span>
+            <span>${lang==='en' ? 'Refresh status' : 'L\u00e0m m\u1edbi tr\u1ea1ng th\u00e1i'}</span>
+          </button>
+          <button class="admin-sync-mini" onclick="rescanDocs().then(n=>{showToast('Scanned: '+n+' docs');renderAdmin()})">
+            <span class="admin-sync-mini-ico">${adminGitSyncIcon('sync')}</span>
+            <span>${lang==='en' ? 'Rescan folders' : 'Qu\u00e9t l\u1ea1i th\u01b0 m\u1ee5c'}</span>
+          </button>
+        </div>
+      </div>
+      ${notice}
+      <div class="admin-sync-cpanel-grid">
+        <article class="admin-sync-cpanel-card">
+          <div class="admin-sync-panel-title">${lang==='en' ? 'Basic Information' : 'Th\u00f4ng tin c\u01a1 b\u1ea3n'}</div>
+          <div class="admin-sync-meta-list">
+            ${metaRow(lang==='en' ? 'Repository path' : '\u0110\u01b0\u1eddng d\u1eabn repo', repoPath, true)}
+            ${metaRow(lang==='en' ? 'Remote URL' : 'Remote URL', remoteUrl, true)}
+            ${metaRow(lang==='en' ? 'Checked-out branch' : 'Nh\u00e1nh \u0111ang checkout', branch)}
+            ${metaRow(lang==='en' ? 'Tracked remote branch' : 'Nh\u00e1nh remote \u0111ang theo d\u00f5i', remoteBranch)}
+            ${metaRow(lang==='en' ? 'Server time' : 'Th\u1eddi gian server', gitRepoFormatTime(status && status.server_time) || '--')}
+          </div>
+        </article>
+        <article class="admin-sync-cpanel-card">
+          <div class="admin-sync-panel-title">${lang==='en' ? 'Remote State' : 'Tr\u1ea1ng th\u00e1i remote'}</div>
+          <div class="admin-sync-pill-row">
+            ${gitRepoStatusPill(relativeState.label, relativeState.tone)}
+            ${gitRepoStatusPill(workingTreeState.label, workingTreeState.tone)}
+            ${gitRepoStatusPill(deployState.label, deployState.tone)}
+          </div>
+          <div class="admin-sync-commit-stack">
+            <div class="admin-sync-commit-card">
+              <div class="admin-sync-commit-kicker">${lang==='en' ? 'HEAD commit' : 'Commit HEAD'}</div>
+              <strong>${escapeHtml(gitRepoCommitHeadline(status && status.head))}</strong>
+              <span>${escapeHtml(headMeta)}</span>
+            </div>
+            <div class="admin-sync-commit-card is-remote">
+              <div class="admin-sync-commit-kicker">${lang==='en' ? 'Remote HEAD' : 'HEAD remote'}</div>
+              <strong>${escapeHtml(gitRepoCommitHeadline(status && status.remote_head))}</strong>
+              <span>${escapeHtml(remoteMeta)}</span>
+            </div>
+          </div>
+        </article>
+      </div>
+      ${dirtyEntries.length ? `
+        <div class="admin-sync-cpanel-card admin-sync-cpanel-card--full">
+          <div class="admin-sync-panel-title">${lang==='en' ? 'Local changes blocking remote update' : 'C\u00e1c thay \u0111\u1ed5i local \u0111ang ch\u1eb7n c\u1eadp nh\u1eadt remote'}</div>
+          ${gitSyncRenderSimpleFileTable(dirtyEntries, lang==='en' ? 'The checked-out branch is clean.' : 'Nh\u00e1nh \u0111ang checkout \u0111ang s\u1ea1ch.')}
+        </div>
+      ` : ''}
+      <div class="admin-sync-action-row">
+        <button class="admin-sync-action is-primary ${pullBusy?'is-busy':''}" onclick="adminUpdateFromRemote()" ${(pullBusy || disablePull)?'disabled':''}>
+          <span class="admin-sync-action-icon">${adminGitSyncIcon('pull')}</span>
+          <span class="admin-sync-action-copy">
+            <b>${lang==='en' ? 'Update from Remote' : 'C\u1eadp nh\u1eadt t\u1eeb remote'}</b>
+            <small>${lang==='en'
+              ? 'Works like cPanel Version Control on the checked-out branch and never auto-commits server runtime noise.'
+              : 'Ho\u1ea1t \u0111\u1ed9ng gi\u1ed1ng cPanel Version Control tr\u00ean nh\u00e1nh \u0111ang checkout v\u00e0 kh\u00f4ng auto-commit runtime noise ph\u00eda server.'}</small>
+          </span>
+          <span class="admin-sync-action-arrow">${pullBusy ? (lang==='en' ? 'Running...' : '\u0110ang ch\u1ea1y...') : (lang==='en' ? 'Update now' : 'C\u1eadp nh\u1eadt ngay')}</span>
+        </button>
+        <button class="admin-sync-action ${pushBusy?'is-busy':''}" onclick="adminPublishRepoChanges()" ${(pushBusy || disablePush)?'disabled':''}>
+          <span class="admin-sync-action-icon">${adminGitSyncIcon('push')}</span>
+          <span class="admin-sync-action-copy">
+            <b>${lang==='en' ? 'Publish Local Changes' : 'Xu\u1ea5t b\u1ea3n thay \u0111\u1ed5i local'}</b>
+            <small>${lang==='en'
+              ? 'Commit meaningful repository edits from cPanel back to GitHub when you intentionally changed the live repo.'
+              : 'Commit c\u00e1c thay \u0111\u1ed5i meaningful trong repo tr\u00ean cPanel l\u00ean GitHub khi b\u1ea1n c\u1ed1 \u00fd s\u1eeda tr\u1ef1c ti\u1ebfp repo \u0111ang ch\u1ea1y.'}</small>
+          </span>
+          <span class="admin-sync-action-arrow">${pushBusy ? (lang==='en' ? 'Running...' : '\u0110ang ch\u1ea1y...') : (lang==='en' ? 'Push now' : 'Push ngay')}</span>
+        </button>
+      </div>
+    </section>`;
+}
+
 function markUnsaved(){
   adminUnsaved = true;
   const bar = document.getElementById('admin-save-bar');
@@ -4586,7 +5027,7 @@ function renderAdmin(){
       <div class="admin-stat"><div class="val">${DOCS.length}</div><div class="lbl">${T('admin_total_docs')} <span style="font-size:9px;color:#10b981">● LIVE</span></div></div>
       <div class="admin-stat"><div class="val">${activeUsers}</div><div class="lbl">Active</div></div>
     </div>
-    ${renderAdminSyncPanel()}
+    ${renderAdminSyncPanelV2()}
     <div class="admin-tabs-v2">
       <button class="admin-tab-v2 ${adminTab==='users'?'active':''}" onclick="adminTab='users';renderAdmin()">👥 ${T('admin_users')} <span class="tab-badge">${USERS.length}</span></button>
       <button class="admin-tab-v2 ${adminTab==='dept_title'?'active':''}" onclick="adminTab='dept_title';renderAdmin()">🏢 ${lang==='en'?'Dept & Titles':'Phòng ban & Chức danh'}</button>
@@ -4599,6 +5040,9 @@ function renderAdmin(){
       <button class="admin-tab-v2 ${adminTab==='retention'?'active':''}" onclick="adminTab='retention';renderAdmin()">📋 ${lang==='en'?'Retention':'Lưu giữ'}</button>
     </div>
     <div class="admin-panel" id="admin-content"></div>`;
+  if(!gitRepoStatusState.loaded && !gitRepoStatusState.loading && !gitRepoStatusState.error){
+    loadGitRepoStatus({silent:true});
+  }
   if(adminTab==='users') renderAdminUsers();
   if(adminTab==='dept_title') renderAdminDeptTitle();
   if(adminTab==='perms') renderAdminPerms();
