@@ -5011,6 +5011,14 @@ function markUnsaved(){
   if(bar) bar.style.display = 'flex';
 }
 
+function renderAdminVersionControl(){
+  const el = document.getElementById('admin-content');
+  if(!gitRepoStatusState.loaded && !gitRepoStatusState.loading && !gitRepoStatusState.error){
+    loadGitRepoStatus({silent:true});
+  }
+  el.innerHTML = renderAdminSyncPanelV2();
+}
+
 function renderAdmin(){
   if(!isAdmin()){
     document.getElementById('page-admin').innerHTML='<div style="text-align:center;padding:60px;color:var(--text-3)">\u26A0 '+T('no_docs')+'</div>';
@@ -5027,7 +5035,6 @@ function renderAdmin(){
       <div class="admin-stat"><div class="val">${DOCS.length}</div><div class="lbl">${T('admin_total_docs')} <span style="font-size:9px;color:#10b981">● LIVE</span></div></div>
       <div class="admin-stat"><div class="val">${activeUsers}</div><div class="lbl">Active</div></div>
     </div>
-    ${renderAdminSyncPanelV2()}
     <div class="admin-tabs-v2">
       <button class="admin-tab-v2 ${adminTab==='users'?'active':''}" onclick="adminTab='users';renderAdmin()">👥 ${T('admin_users')} <span class="tab-badge">${USERS.length}</span></button>
       <button class="admin-tab-v2 ${adminTab==='dept_title'?'active':''}" onclick="adminTab='dept_title';renderAdmin()">🏢 ${lang==='en'?'Dept & Titles':'Phòng ban & Chức danh'}</button>
@@ -5036,11 +5043,12 @@ function renderAdmin(){
       <button class="admin-tab-v2 ${adminTab==='perms'?'active':''}" onclick="adminTab='perms';renderAdmin()">🔐 ${T('admin_perms')}</button>
       <button class="admin-tab-v2 ${adminTab==='activity'?'active':''}" onclick="adminTab='activity';renderAdmin()" ${canViewActivityLog()?'':'style="display:none"'}>📊 ${lang==='en'?'Activity Log':'Kiểm soát hành vi'} <span class="tab-badge">${ACTIVITY_LOG.length}</span></button>
       <button class="admin-tab-v2 ${adminTab==='docs'?'active':''}" onclick="adminTab='docs';renderAdmin()">📄 ${T('admin_effective_docs')}</button>
+      <button class="admin-tab-v2 ${adminTab==='version_control'?'active':''}" onclick="adminTab='version_control';renderAdmin()">🔄 ${lang==='en'?'Version Control':'Điều khiển phiên bản'}</button>
       <button class="admin-tab-v2 ${adminTab==='portal_display'?'active':''}" onclick="adminTab='portal_display';renderAdmin()">🧭 ${lang==='en'?'Portal display':'Hiển thị portal'}</button>
       <button class="admin-tab-v2 ${adminTab==='retention'?'active':''}" onclick="adminTab='retention';renderAdmin()">📋 ${lang==='en'?'Retention':'Lưu giữ'}</button>
     </div>
     <div class="admin-panel" id="admin-content"></div>`;
-  if(!gitRepoStatusState.loaded && !gitRepoStatusState.loading && !gitRepoStatusState.error){
+  if(adminTab==='version_control' && !gitRepoStatusState.loaded && !gitRepoStatusState.loading && !gitRepoStatusState.error){
     loadGitRepoStatus({silent:true});
   }
   if(adminTab==='users') renderAdminUsers();
@@ -5050,6 +5058,7 @@ function renderAdmin(){
   if(adminTab==='orgchart') renderAdminOrgChart();
   if(adminTab==='activity') renderAdminActivity();
   if(adminTab==='docs') renderAdminEffectiveDocs();
+  if(adminTab==='version_control') renderAdminVersionControl();
   if(adminTab==='portal_display'){
     renderAdminPortalDisplay();
     loadPortalDisplayConfigFromServer({silent:true});
