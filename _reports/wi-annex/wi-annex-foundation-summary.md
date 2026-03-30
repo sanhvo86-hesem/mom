@@ -5,7 +5,7 @@
 - ANNEX docs: 56
 - Duplicate ANNEX basenames: 0
 - Files with missing HTML wrapper signals: 0
-- Files with phase residue markers: 19
+- Files with phase residue markers: 0
 
 ## Highest-priority docs
 
@@ -21,6 +21,6 @@
 
 ## Practical next step
 
-- Phase 0 duplicate and wrapper cleanup is stable; move the next tranche to phase residue and archetype-boundary tightening.
-- Then clean remaining phase residue and tighten any canonical WI/ANNEX that still drift from the locked core-standard skeleton.
+- Phase 0 foundation cleanup is stable; move the next tranche to archetype-boundary tightening on canonical WI/ANNEX only.
+- Then focus on boundary-heavy documents such as WI-201, ANNEX-601 and ANNEX-701 where structure is clean but content discipline still matters.
 

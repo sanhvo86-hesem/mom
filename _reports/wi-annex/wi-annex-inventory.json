@@ -54,7 +54,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-103-org-raci-matrix.html",
     "title": "ANNEX-103 — RACI Matrix &amp; SLA (RFQ → Tiền mặt) | HESEM QMS",
     "target_archetype": "Matrix Annex",
-    "recommended_action": "CLEAN_PHASE_RESIDUE",
+    "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -68,7 +68,7 @@
     "proc_num_count": 0,
     "duplicate_status": "",
     "canonical_duplicate": "",
-    "phase_hits": "phase-card",
+    "phase_hits": "",
     "reason": "Baseline review required by archetype."
   },
   {
@@ -414,7 +414,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html",
     "title": "ANNEX-120 — Thẩm quyền Matrix | HESEM QMS",
     "target_archetype": "Matrix Annex",
-    "recommended_action": "CLEAN_PHASE_RESIDUE",
+    "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -428,7 +428,7 @@
     "proc_num_count": 0,
     "duplicate_status": "",
     "canonical_duplicate": "",
-    "phase_hits": "phase-card",
+    "phase_hits": "",
     "reason": "Baseline review required by archetype."
   },
   {
@@ -438,7 +438,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html",
     "title": "ANNEX-121 — RACI Bản gốc Matrix | HESEM QMS",
     "target_archetype": "Matrix Annex",
-    "recommended_action": "CLEAN_PHASE_RESIDUE",
+    "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -452,7 +452,7 @@
     "proc_num_count": 0,
     "duplicate_status": "",
     "canonical_duplicate": "",
-    "phase_hits": "phase-card",
+    "phase_hits": "",
     "reason": "Baseline review required by archetype."
   },
   {
@@ -476,7 +476,7 @@
     "proc_num_count": 0,
     "duplicate_status": "",
     "canonical_duplicate": "",
-    "phase_hits": "phase-card",
+    "phase_hits": "",
     "reason": "KPI cascade dictionary is a core foundation and should remain a clean dictionary annex."
   },
   {
@@ -486,7 +486,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html",
     "title": "ANNEX-123 — Phó Backup Matrix | HESEM QMS",
     "target_archetype": "Matrix Annex",
-    "recommended_action": "CLEAN_PHASE_RESIDUE",
+    "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -500,7 +500,7 @@
     "proc_num_count": 0,
     "duplicate_status": "",
     "canonical_duplicate": "",
-    "phase_hits": "phase-card",
+    "phase_hits": "",
     "reason": "Baseline review required by archetype."
   },
   {
@@ -510,7 +510,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-124-dashboard-evidence-pack-worked-examples.html",
     "title": "ANNEX-124 — Bảng điều khiển Bộ bằng chứng Đã thực hiện ví dụ | HESEM QMS",
     "target_archetype": "Worked Example Annex",
-    "recommended_action": "CLEAN_PHASE_RESIDUE",
+    "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -524,7 +524,7 @@
     "proc_num_count": 0,
     "duplicate_status": "",
     "canonical_duplicate": "",
-    "phase_hits": "data-phase2i; phase2i",
+    "phase_hits": "",
     "reason": "Baseline review required by archetype."
   },
   {
@@ -750,7 +750,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-300/annex-302-approved-materials-list.html",
     "title": "ANNEX-302 — Đã phê duyệt materials list, source hạn chế và rule thay thế | HESEM QMS",
     "target_archetype": "Rule-Pack Annex",
-    "recommended_action": "CLEAN_PHASE_RESIDUE",
+    "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -764,7 +764,7 @@
     "proc_num_count": 0,
     "duplicate_status": "",
     "canonical_duplicate": "",
-    "phase_hits": "phase3a",
+    "phase_hits": "",
     "reason": "Baseline review required by archetype."
   },
   {
@@ -774,7 +774,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/04-ANNEX-400/annex-401-supplier-risk-model-and-scorecard-method.html",
     "title": "ANNEX-401 — Mô hình rủi ro nhà cung cấp và phương pháp thẻ điểm (bảng điểm) | HESEM QMS",
     "target_archetype": "Review Needed",
-    "recommended_action": "CLEAN_PHASE_RESIDUE",
+    "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -788,7 +788,7 @@
     "proc_num_count": 0,
     "duplicate_status": "",
     "canonical_duplicate": "",
-    "phase_hits": "data-phase2f; data-phase2i; phase2f; phase2i; phase3a",
+    "phase_hits": "",
     "reason": "Baseline review required by archetype."
   },
   {
@@ -822,7 +822,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/04-ANNEX-400/annex-403-approved-processor-list.html",
     "title": "ANNEX-403 — Đã phê duyệt Người xử lý list, scope phê duyệt và rule tạm ngưng | HESEM QMS",
     "target_archetype": "Rule-Pack Annex",
-    "recommended_action": "CLEAN_PHASE_RESIDUE",
+    "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -836,7 +836,7 @@
     "proc_num_count": 0,
     "duplicate_status": "",
     "canonical_duplicate": "",
-    "phase_hits": "phase3a",
+    "phase_hits": "",
     "reason": "Baseline review required by archetype."
   },
   {
@@ -1038,7 +1038,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/06-ANNEX-600/annex-602-msa-acceptance-criteria.html",
     "title": "ANNEX-602 — Tiêu chí chấp nhận MSA, GRR, sai lệch hệ thống, độ tuyến tính, độ ổn định và thuộc tính thỏa thuận | HESEM QMS",
     "target_archetype": "Review Needed",
-    "recommended_action": "CLEAN_PHASE_RESIDUE",
+    "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -1052,7 +1052,7 @@
     "proc_num_count": 0,
     "duplicate_status": "",
     "canonical_duplicate": "",
-    "phase_hits": "data-phase2f; phase2f",
+    "phase_hits": "",
     "reason": "Baseline review required by archetype."
   },
   {
@@ -1230,7 +1230,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/07-ANNEX-700/annex-702-packaging-labeling-spec.html",
     "title": "ANNEX-702 — Quy cách đóng gói, nhãn, bảo quản và bằng chứng gói hàng | HESEM QMS",
     "target_archetype": "Specification Annex",
-    "recommended_action": "CLEAN_PHASE_RESIDUE",
+    "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -1244,7 +1244,7 @@
     "proc_num_count": 0,
     "duplicate_status": "",
     "canonical_duplicate": "",
-    "phase_hits": "data-phase2f; phase2f",
+    "phase_hits": "",
     "reason": "Baseline review required by archetype."
   },
   {
@@ -1254,7 +1254,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html",
     "title": "ANNEX-703 — Quy tắc vị trí kho, phân vùng, FIFO/FEFO, khu vực chuẩn bị / sắp xếp và cycle count | HESEM QMS",
     "target_archetype": "Rule-Pack Annex",
-    "recommended_action": "CLEAN_PHASE_RESIDUE",
+    "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -1268,7 +1268,7 @@
     "proc_num_count": 0,
     "duplicate_status": "",
     "canonical_duplicate": "",
-    "phase_hits": "data-phase2i; phase2i",
+    "phase_hits": "",
     "reason": "Baseline review required by archetype."
   },
   {
@@ -1470,7 +1470,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html",
     "title": "WI-106 — Master plan triển khai vận hành hệ thống Job Order và QMS điều hành | HESEM QMS",
     "target_archetype": "Digital-Operation WI",
-    "recommended_action": "CLEAN_PHASE_RESIDUE",
+    "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -1484,7 +1484,7 @@
     "proc_num_count": 0,
     "duplicate_status": "",
     "canonical_duplicate": "",
-    "phase_hits": "phase-card",
+    "phase_hits": "",
     "reason": "Baseline review required by archetype."
   },
   {
@@ -1638,7 +1638,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/02-WI-200/wi-207-high-risk-job-readiness-control-tower.html",
     "title": "WI-207 — cao-Rủi ro Job sẵn sàng Control tháp / cột | HESEM QMS",
     "target_archetype": "Control-Tower WI",
-    "recommended_action": "CLEAN_PHASE_RESIDUE",
+    "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -1652,7 +1652,7 @@
     "proc_num_count": 0,
     "duplicate_status": "",
     "canonical_duplicate": "",
-    "phase_hits": "phase3a",
+    "phase_hits": "",
     "reason": "Baseline review required by archetype."
   },
   {
@@ -1950,7 +1950,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/06-WI-600/wi-602-gage-pre-use-verification-and-status-control.html",
     "title": "WI-602 — Kiểm trước khi dùng dụng cụ đo, trạng thái CAL và xử lý nghi ngờ | HESEM QMS",
     "target_archetype": "POU-WI",
-    "recommended_action": "CLEAN_PHASE_RESIDUE",
+    "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -1964,7 +1964,7 @@
     "proc_num_count": 0,
     "duplicate_status": "",
     "canonical_duplicate": "",
-    "phase_hits": "data-phase2f; phase2f",
+    "phase_hits": "",
     "reason": "Baseline review required by archetype."
   },
   {
@@ -2094,7 +2094,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-702-storage-environment-location-and-fifo-control.html",
     "title": "WI-702 — Bảo quản, môi trường kho/phân xưởng, vị trí, FIFO/FEFO và kiểm soát chạm hỏng | HESEM QMS",
     "target_archetype": "POU-WI",
-    "recommended_action": "CLEAN_PHASE_RESIDUE",
+    "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -2108,7 +2108,7 @@
     "proc_num_count": 0,
     "duplicate_status": "",
     "canonical_duplicate": "",
-    "phase_hits": "data-phase2i; phase2i",
+    "phase_hits": "",
     "reason": "Baseline review required by archetype."
   },
   {
@@ -2166,7 +2166,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-713-environmental-monitoring-and-response.html",
     "title": "WI-713 — Theo dõi môi trường, lấy mẫu, đọc kết quả và phản ứng khi lệch chuẩn | HESEM QMS",
     "target_archetype": "POU-WI",
-    "recommended_action": "CLEAN_PHASE_RESIDUE",
+    "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -2180,7 +2180,7 @@
     "proc_num_count": 0,
     "duplicate_status": "",
     "canonical_duplicate": "",
-    "phase_hits": "data-phase2i; phase2i; phase3a",
+    "phase_hits": "",
     "reason": "Baseline review required by archetype."
   },
   {
@@ -2190,7 +2190,7 @@
     "path": "03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-714-clean-packaging-handling-and-preservation.html",
     "title": "WI-714 — Đóng gói sạch, vận hành sạch, bảo quản và bảo toàn tình trạng sản phẩm | HESEM QMS",
     "target_archetype": "POU-WI",
-    "recommended_action": "CLEAN_PHASE_RESIDUE",
+    "recommended_action": "KEEP",
     "priority": "P2",
     "has_doctype": true,
     "has_html_tag": true,
@@ -2204,7 +2204,7 @@
     "proc_num_count": 0,
     "duplicate_status": "",
     "canonical_duplicate": "",
-    "phase_hits": "data-phase2f; phase2f",
+    "phase_hits": "",
     "reason": "Baseline review required by archetype."
   },
   {
@@ -2324,7 +2324,7 @@
     "proc_num_count": 0,
     "duplicate_status": "",
     "canonical_duplicate": "",
-    "phase_hits": "data-phase2i; phase2i",
+    "phase_hits": "",
     "reason": "May remain control-tower WI, but governance-heavy content must not overlap SOP-900 management review logic."
   }
 ]
