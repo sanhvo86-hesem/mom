@@ -26,6 +26,7 @@
   const SW_VERSION   = '1.3.1';
   const SW_SCOPE     = '/01-QMS-Portal/';
   const UPDATE_CHECK_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
+  const SW_RELOAD_MARKER = `qms_sw_reloaded_${SW_VERSION}`;
 
 
   // ── State ───────────────────────────────────────────────────────────────
@@ -56,7 +57,7 @@
       console.log('[PWA] Service worker registered, scope:', swRegistration.scope);
 
       if (swRegistration.waiting) {
-        showUpdateNotification();
+        activateWaitingWorker(swRegistration);
       }
 
       // Listen for update events.
@@ -66,8 +67,9 @@
 
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            // A new service worker is available; prompt the user.
-            showUpdateNotification();
+            // A new service worker is available; activate it immediately so
+            // portal/runtime fixes are not blocked behind a stale cached shell.
+            activateWaitingWorker(swRegistration);
           }
         });
       });
@@ -87,6 +89,14 @@
       // Handle controller change (new SW took over).
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         console.log('[PWA] Controller changed, new service worker active');
+        try {
+          if (sessionStorage.getItem(SW_RELOAD_MARKER) !== '1') {
+            sessionStorage.setItem(SW_RELOAD_MARKER, '1');
+            window.location.reload();
+          }
+        } catch (err) {
+          window.location.reload();
+        }
       });
 
       swRegistration.update().catch((err) => {
@@ -95,6 +105,17 @@
 
     } catch (err) {
       console.error('[PWA] Service worker registration failed:', err);
+    }
+  }
+
+  function activateWaitingWorker(registration) {
+    try {
+      if (registration && registration.waiting) {
+        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+    } catch (err) {
+      console.warn('[PWA] Failed to activate waiting service worker:', err);
+      showUpdateNotification();
     }
   }
 
