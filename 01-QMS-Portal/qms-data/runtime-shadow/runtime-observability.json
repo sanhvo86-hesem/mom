@@ -1,7 +1,7 @@
 {
     "_meta": {
         "version": "1.0",
-        "updated": "2026-03-30T12:05:41+00:00",
+        "updated": "2026-03-30T12:17:38+00:00",
         "description": "Structured observability for runtime shadow sync, connector ingest, and MES governance telemetry."
     },
     "shadow_sync": {
@@ -77,11 +77,11 @@
     "primary_reads": {
         "master_data": {
             "last_source": "json",
-            "last_read_at": "2026-03-30T19:05:41+07:00",
+            "last_read_at": "2026-03-30T19:17:38+07:00",
             "last_error": "",
             "last_mode": "JSON_ONLY",
             "postgres_count": 0,
-            "json_count": 1230,
+            "json_count": 1235,
             "fallback_count": 0,
             "last_context": {
                 "item_count": 56,
@@ -94,6 +94,66 @@
                     "fallback": false,
                     "error": "",
                     "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-30T19:17:38+07:00",
+                    "context": {
+                        "item_count": 56,
+                        "scope": "runtime_bundle"
+                    }
+                },
+                {
+                    "store_key": "master_data",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-30T19:17:38+07:00",
+                    "context": {
+                        "item_count": 56,
+                        "scope": "runtime_bundle"
+                    }
+                },
+                {
+                    "store_key": "master_data",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-30T19:17:38+07:00",
+                    "context": {
+                        "item_count": 56,
+                        "scope": "runtime_bundle"
+                    }
+                },
+                {
+                    "store_key": "master_data",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-30T19:17:29+07:00",
+                    "context": {
+                        "item_count": 56,
+                        "scope": "runtime_bundle"
+                    }
+                },
+                {
+                    "store_key": "master_data",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-30T19:17:29+07:00",
+                    "context": {
+                        "item_count": 56,
+                        "scope": "runtime_bundle"
+                    }
+                },
+                {
+                    "store_key": "master_data",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
                     "timestamp": "2026-03-30T19:05:41+07:00",
                     "context": {
                         "item_count": 56,
@@ -207,76 +267,16 @@
                         "item_count": 56,
                         "scope": "runtime_bundle"
                     }
-                },
-                {
-                    "store_key": "master_data",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-30T18:37:28+07:00",
-                    "context": {
-                        "item_count": 56,
-                        "scope": "mes_bundle"
-                    }
-                },
-                {
-                    "store_key": "master_data",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-30T18:37:28+07:00",
-                    "context": {
-                        "item_count": 56,
-                        "scope": "runtime_bundle"
-                    }
-                },
-                {
-                    "store_key": "master_data",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-30T18:37:28+07:00",
-                    "context": {
-                        "item_count": 56,
-                        "scope": "mes_bundle"
-                    }
-                },
-                {
-                    "store_key": "master_data",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-30T18:36:58+07:00",
-                    "context": {
-                        "item_count": 56,
-                        "scope": "mes_bundle"
-                    }
-                },
-                {
-                    "store_key": "master_data",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-30T18:36:58+07:00",
-                    "context": {
-                        "item_count": 56,
-                        "scope": "mes_bundle"
-                    }
                 }
             ]
         },
         "orders": {
             "last_source": "json",
-            "last_read_at": "2026-03-30T19:05:41+07:00",
+            "last_read_at": "2026-03-30T19:17:38+07:00",
             "last_error": "",
             "last_mode": "JSON_ONLY",
             "postgres_count": 0,
-            "json_count": 1230,
+            "json_count": 1235,
             "fallback_count": 0,
             "last_context": {
                 "item_count": 8,
@@ -289,6 +289,66 @@
                     "fallback": false,
                     "error": "",
                     "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-30T19:17:38+07:00",
+                    "context": {
+                        "item_count": 8,
+                        "scope": "runtime_bundle"
+                    }
+                },
+                {
+                    "store_key": "orders",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-30T19:17:38+07:00",
+                    "context": {
+                        "item_count": 8,
+                        "scope": "runtime_bundle"
+                    }
+                },
+                {
+                    "store_key": "orders",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-30T19:17:38+07:00",
+                    "context": {
+                        "item_count": 8,
+                        "scope": "runtime_bundle"
+                    }
+                },
+                {
+                    "store_key": "orders",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-30T19:17:29+07:00",
+                    "context": {
+                        "item_count": 8,
+                        "scope": "runtime_bundle"
+                    }
+                },
+                {
+                    "store_key": "orders",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-30T19:17:29+07:00",
+                    "context": {
+                        "item_count": 8,
+                        "scope": "runtime_bundle"
+                    }
+                },
+                {
+                    "store_key": "orders",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
                     "timestamp": "2026-03-30T19:05:41+07:00",
                     "context": {
                         "item_count": 8,
@@ -401,66 +461,6 @@
                     "context": {
                         "item_count": 8,
                         "scope": "runtime_bundle"
-                    }
-                },
-                {
-                    "store_key": "orders",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-30T18:37:28+07:00",
-                    "context": {
-                        "item_count": 8,
-                        "scope": "mes_bundle"
-                    }
-                },
-                {
-                    "store_key": "orders",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-30T18:37:28+07:00",
-                    "context": {
-                        "item_count": 8,
-                        "scope": "runtime_bundle"
-                    }
-                },
-                {
-                    "store_key": "orders",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-30T18:37:28+07:00",
-                    "context": {
-                        "item_count": 8,
-                        "scope": "mes_bundle"
-                    }
-                },
-                {
-                    "store_key": "orders",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-30T18:36:58+07:00",
-                    "context": {
-                        "item_count": 8,
-                        "scope": "mes_bundle"
-                    }
-                },
-                {
-                    "store_key": "orders",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-30T18:36:58+07:00",
-                    "context": {
-                        "item_count": 8,
-                        "scope": "mes_bundle"
                     }
                 }
             ]
