@@ -74,6 +74,15 @@ final class RuntimeShadowSync
         });
     }
 
+    public function syncEpicorRuntimeStore(array $store): void
+    {
+        $this->db->transactional(function () use ($store): void {
+            $this->syncEpicorSyncRuns((array)($store['sync_runs'] ?? []));
+            $this->syncEpicorReconciliation((array)($store['reconciliation_exceptions'] ?? []));
+            $this->syncEpicorOutbox((array)($store['outbox_events'] ?? []));
+        });
+    }
+
     private function syncCustomers(array $rows): void
     {
         foreach ($rows as $row) {
@@ -1073,6 +1082,124 @@ final class RuntimeShadowSync
                 'metadata' => $row,
                 'created_at' => $this->parseTimestamp((string)($row['created_at'] ?? '')) ?? date(DATE_ATOM),
             ], ['handover_id'], ['metadata']);
+        }
+    }
+
+    private function syncEpicorSyncRuns(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $syncRunId = trim((string)($row['sync_run_id'] ?? ''));
+            $syncDomain = trim((string)($row['sync_domain'] ?? ''));
+            $direction = strtolower(trim((string)($row['sync_direction'] ?? $row['direction'] ?? 'inbound')));
+            if ($syncRunId === '' || $syncDomain === '') {
+                continue;
+            }
+            $this->upsert('mes_erp_sync_runs', [
+                'sync_run_id' => $syncRunId,
+                'integration_system' => trim((string)($row['integration_system'] ?? $row['erp_system'] ?? 'Epicor Kinetic')) ?: 'Epicor Kinetic',
+                'sync_direction' => in_array($direction, ['outbound', 'inbound'], true) ? $direction : 'inbound',
+                'sync_domain' => $syncDomain,
+                'transport_mode' => strtolower(trim((string)($row['transport_mode'] ?? 'rest'))) ?: 'rest',
+                'sync_status' => strtolower(trim((string)($row['sync_status'] ?? $row['status'] ?? 'success'))) ?: 'success',
+                'started_at' => $this->parseTimestamp((string)($row['started_at'] ?? '')) ?? date(DATE_ATOM),
+                'completed_at' => $this->parseTimestamp((string)($row['completed_at'] ?? $row['finished_at'] ?? '')),
+                'latency_ms' => isset($row['latency_ms']) ? (int)$row['latency_ms'] : (isset($row['duration_ms']) ? (int)$row['duration_ms'] : 0),
+                'records_received' => isset($row['records_received']) ? (int)$row['records_received'] : (isset($row['records_seen']) ? (int)$row['records_seen'] : 0),
+                'records_processed' => isset($row['records_processed']) ? (int)$row['records_processed'] : (isset($row['records_applied']) ? (int)$row['records_applied'] : 0),
+                'records_failed' => isset($row['records_failed']) ? (int)$row['records_failed'] : 0,
+                'checkpoint_key' => trim((string)($row['checkpoint_key'] ?? '')) ?: null,
+                'checkpoint_value' => trim((string)($row['checkpoint_value'] ?? '')) ?: null,
+                'summary' => trim((string)($row['summary'] ?? $row['error_message'] ?? '')) ?: null,
+                'metadata' => $row,
+                'updated_at' => $this->parseTimestamp((string)($row['updated_at'] ?? $row['completed_at'] ?? $row['finished_at'] ?? $row['started_at'] ?? '')) ?? date(DATE_ATOM),
+                'updated_by' => trim((string)($row['updated_by'] ?? '')) ?: null,
+            ], ['sync_run_id'], ['metadata']);
+        }
+    }
+
+    private function syncEpicorReconciliation(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $reconciliationId = trim((string)($row['reconciliation_id'] ?? ''));
+            if ($reconciliationId === '') {
+                continue;
+            }
+            $this->upsert('mes_erp_reconciliation_exceptions', [
+                'reconciliation_id' => $reconciliationId,
+                'sync_domain' => trim((string)($row['sync_domain'] ?? 'general')) ?: 'general',
+                'entity_type' => trim((string)($row['entity_type'] ?? 'runtime')) ?: 'runtime',
+                'entity_id' => trim((string)($row['entity_id'] ?? $reconciliationId)) ?: $reconciliationId,
+                'discrepancy_type' => trim((string)($row['discrepancy_type'] ?? 'mismatch')) ?: 'mismatch',
+                'severity' => strtolower(trim((string)($row['severity'] ?? 'warning'))) ?: 'warning',
+                'expected_value' => (array)($row['expected_value'] ?? []),
+                'actual_value' => (array)($row['actual_value'] ?? []),
+                'difference_summary' => trim((string)($row['difference_summary'] ?? '')) ?: null,
+                'detected_at' => $this->parseTimestamp((string)($row['detected_at'] ?? '')) ?? date(DATE_ATOM),
+                'resolved_at' => $this->parseTimestamp((string)($row['resolved_at'] ?? '')),
+                'owner_role' => trim((string)($row['owner_role'] ?? '')) ?: null,
+                'exception_status' => strtolower(trim((string)($row['exception_status'] ?? $row['status'] ?? 'open'))) ?: 'open',
+                'metadata' => $row,
+                'updated_at' => $this->parseTimestamp((string)($row['updated_at'] ?? $row['resolved_at'] ?? $row['detected_at'] ?? '')) ?? date(DATE_ATOM),
+                'updated_by' => trim((string)($row['updated_by'] ?? '')) ?: null,
+            ], ['reconciliation_id'], ['metadata']);
+        }
+    }
+
+    private function syncEpicorOutbox(array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $outboxEventId = trim((string)($row['outbox_event_id'] ?? ''));
+            if ($outboxEventId === '') {
+                continue;
+            }
+            $payload = $row;
+            $existing = $this->db->queryOne(
+                "SELECT queue_id FROM mes_erp_outbound_queue WHERE payload->>'outbox_event_id' = :outbox_event_id LIMIT 1",
+                [':outbox_event_id' => $outboxEventId],
+            );
+            $data = [
+                ':entity_type' => trim((string)($row['entity_type'] ?? 'runtime')) ?: 'runtime',
+                ':entity_id' => trim((string)($row['entity_id'] ?? '')) ?: $outboxEventId,
+                ':payload' => json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                ':created_at' => $this->parseTimestamp((string)($row['created_at'] ?? $row['first_queued_at'] ?? '')) ?? date(DATE_ATOM),
+                ':sent_at' => $this->parseTimestamp((string)($row['sent_at'] ?? $row['last_attempt_at'] ?? $row['acked_at'] ?? '')),
+                ':send_status' => strtolower(trim((string)($row['send_status'] ?? $row['publish_status'] ?? 'queued'))) ?: 'queued',
+                ':erp_response' => json_encode((array)($row['erp_response'] ?? []), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                ':error_message' => trim((string)($row['error_message'] ?? $row['summary'] ?? '')) ?: null,
+                ':retry_count' => isset($row['retry_count']) ? (int)$row['retry_count'] : 0,
+            ];
+            if (is_array($existing) && isset($existing['queue_id'])) {
+                $data[':queue_id'] = (int)$existing['queue_id'];
+                $this->db->execute(
+                    'UPDATE mes_erp_outbound_queue
+                     SET entity_type = :entity_type,
+                         entity_id = :entity_id,
+                         payload = :payload::jsonb,
+                         created_at = :created_at,
+                         sent_at = :sent_at,
+                         send_status = :send_status,
+                         erp_response = :erp_response::jsonb,
+                         error_message = :error_message,
+                         retry_count = :retry_count
+                     WHERE queue_id = :queue_id',
+                    $data,
+                );
+                continue;
+            }
+            $this->db->execute(
+                'INSERT INTO mes_erp_outbound_queue (entity_type, entity_id, payload, created_at, sent_at, send_status, erp_response, error_message, retry_count)
+                 VALUES (:entity_type, :entity_id, :payload::jsonb, :created_at, :sent_at, :send_status, :erp_response::jsonb, :error_message, :retry_count)',
+                $data,
+            );
         }
     }
 

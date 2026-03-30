@@ -47,6 +47,8 @@ $FORM_CONTROL_REGISTRY_FILE = $CONF_DIR . '/form_control_registry.json';
 $ORDERS_FILE = $DATA_DIR . '/orders/orders.json';
 $MASTER_DATA_FILE = $DATA_DIR . '/master-data/master-data.json';
 $MES_RUNTIME_FILE = $DATA_DIR . '/mes/mes-runtime.json';
+$EPICOR_RUNTIME_FILE = $DATA_DIR . '/erp/epicor-runtime.json';
+$EPICOR_POLICY_FILE = $CONF_DIR . '/epicor_integration_policy.json';
 $PORTAL_CONFIG_JS_FILE = $BASE_DIR . '/scripts/portal/01-data-config.js';
 $LOG_FILE   = $DATA_DIR . '/php_error.log';
 $RL_DIR     = $DATA_DIR . '/ratelimit';
@@ -2061,6 +2063,15 @@ function mes_tool_offset_service(): \HESEM\QMS\Services\MesToolOffsetService {
   return $service;
 }
 
+function epicor_integration_service(): \HESEM\QMS\Services\EpicorIntegrationService {
+  require_once __DIR__ . '/api/services/EpicorIntegrationService.php';
+  static $service = null;
+  if ($service === null) {
+    $service = new \HESEM\QMS\Services\EpicorIntegrationService();
+  }
+  return $service;
+}
+
 function runtime_observability_default(): array {
   return [
     '_meta' => [
@@ -2072,11 +2083,13 @@ function runtime_observability_default(): array {
       'master_data' => ['last_status' => 'never', 'last_success_at' => '', 'last_error_at' => '', 'last_skipped_at' => '', 'last_message' => '', 'success_count' => 0, 'failure_count' => 0, 'skipped_count' => 0, 'last_duration_ms' => null, 'last_item_count' => 0, 'last_mode' => '', 'last_context' => [], 'recent' => []],
       'orders' => ['last_status' => 'never', 'last_success_at' => '', 'last_error_at' => '', 'last_skipped_at' => '', 'last_message' => '', 'success_count' => 0, 'failure_count' => 0, 'skipped_count' => 0, 'last_duration_ms' => null, 'last_item_count' => 0, 'last_mode' => '', 'last_context' => [], 'recent' => []],
       'mes' => ['last_status' => 'never', 'last_success_at' => '', 'last_error_at' => '', 'last_skipped_at' => '', 'last_message' => '', 'success_count' => 0, 'failure_count' => 0, 'skipped_count' => 0, 'last_duration_ms' => null, 'last_item_count' => 0, 'last_mode' => '', 'last_context' => [], 'recent' => []],
+      'epicor' => ['last_status' => 'never', 'last_success_at' => '', 'last_error_at' => '', 'last_skipped_at' => '', 'last_message' => '', 'success_count' => 0, 'failure_count' => 0, 'skipped_count' => 0, 'last_duration_ms' => null, 'last_item_count' => 0, 'last_mode' => '', 'last_context' => [], 'recent' => []],
     ],
     'primary_reads' => [
       'master_data' => ['last_source' => 'never', 'last_read_at' => '', 'last_error' => '', 'last_mode' => '', 'postgres_count' => 0, 'json_count' => 0, 'fallback_count' => 0, 'last_context' => [], 'recent' => []],
       'orders' => ['last_source' => 'never', 'last_read_at' => '', 'last_error' => '', 'last_mode' => '', 'postgres_count' => 0, 'json_count' => 0, 'fallback_count' => 0, 'last_context' => [], 'recent' => []],
       'mes' => ['last_source' => 'never', 'last_read_at' => '', 'last_error' => '', 'last_mode' => '', 'postgres_count' => 0, 'json_count' => 0, 'fallback_count' => 0, 'last_context' => [], 'recent' => []],
+      'epicor' => ['last_source' => 'never', 'last_read_at' => '', 'last_error' => '', 'last_mode' => '', 'postgres_count' => 0, 'json_count' => 0, 'fallback_count' => 0, 'last_context' => [], 'recent' => []],
     ],
     'connector_ingest' => [
       'totals' => ['success' => 0, 'failure' => 0],
@@ -2112,12 +2125,12 @@ function load_runtime_observability_store(): array {
   $defaults = runtime_observability_default();
   $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : $defaults['_meta'];
   $data['shadow_sync'] = is_array($data['shadow_sync'] ?? null) ? $data['shadow_sync'] : $defaults['shadow_sync'];
-  foreach (['master_data', 'orders', 'mes'] as $key) {
+  foreach (['master_data', 'orders', 'mes', 'epicor'] as $key) {
     $data['shadow_sync'][$key] = array_merge($defaults['shadow_sync'][$key], is_array($data['shadow_sync'][$key] ?? null) ? $data['shadow_sync'][$key] : []);
     $data['shadow_sync'][$key]['recent'] = array_values(is_array($data['shadow_sync'][$key]['recent'] ?? null) ? $data['shadow_sync'][$key]['recent'] : []);
   }
   $data['primary_reads'] = is_array($data['primary_reads'] ?? null) ? $data['primary_reads'] : $defaults['primary_reads'];
-  foreach (['master_data', 'orders', 'mes'] as $key) {
+  foreach (['master_data', 'orders', 'mes', 'epicor'] as $key) {
     $data['primary_reads'][$key] = array_merge($defaults['primary_reads'][$key], is_array($data['primary_reads'][$key] ?? null) ? $data['primary_reads'][$key] : []);
     $data['primary_reads'][$key]['recent'] = array_values(is_array($data['primary_reads'][$key]['recent'] ?? null) ? $data['primary_reads'][$key]['recent'] : []);
   }
@@ -2619,6 +2632,40 @@ function shadow_sync_mes_runtime_store(array $data, ?array $orders = null, ?arra
   }
 }
 
+function shadow_sync_epicor_runtime_store(array $data): void {
+  $started = microtime(true);
+  $itemCount = count((array)($data['sync_runs'] ?? []))
+    + count((array)($data['reconciliation_exceptions'] ?? []))
+    + count((array)($data['outbox_events'] ?? []));
+  try {
+    $layer = runtime_data_layer();
+    $mode = $layer->getMode();
+    if ($mode === \HESEM\QMS\Database\DataLayer::MODE_JSON_ONLY) {
+      observe_shadow_sync('epicor', 'skipped', 'Shadow sync skipped because runtime is in JSON_ONLY mode.', [
+        'runtime_mode' => $mode,
+        'duration_ms' => round((microtime(true) - $started) * 1000, 2),
+        'item_count' => $itemCount,
+      ]);
+      return;
+    }
+    $layer->syncEpicorRuntimeStore($data);
+    observe_shadow_sync('epicor', true, 'Shadow sync completed.', [
+      'runtime_mode' => $mode,
+      'duration_ms' => round((microtime(true) - $started) * 1000, 2),
+      'item_count' => $itemCount,
+      'sync_runs' => count((array)($data['sync_runs'] ?? [])),
+      'reconciliation_exceptions' => count((array)($data['reconciliation_exceptions'] ?? [])),
+      'outbox_events' => count((array)($data['outbox_events'] ?? [])),
+    ]);
+  } catch (Throwable $e) {
+    @error_log('[runtime-shadow] epicor sync failed: ' . $e->getMessage());
+    observe_shadow_sync('epicor', false, $e->getMessage(), [
+      'duration_ms' => round((microtime(true) - $started) * 1000, 2),
+      'item_count' => $itemCount,
+    ]);
+  }
+}
+
 function mes_runtime_default(): array {
   return [
     '_meta' => [
@@ -2663,6 +2710,95 @@ function save_mes_runtime_store(array $data): void {
   $data['_meta']['updated'] = now_iso();
   write_json_file($MES_RUNTIME_FILE, $data);
   shadow_sync_mes_runtime_store($data);
+}
+
+function epicor_runtime_default(): array {
+  return [
+    '_meta' => [
+      'version' => '1.0',
+      'updated' => now_iso(),
+      'description' => 'Epicor Kinetic integration runtime for sync health, reconciliation, and outbound queue governance.',
+    ],
+    'sync_runs' => [],
+    'reconciliation_exceptions' => [],
+    'outbox_events' => [],
+    'checkpoints' => [],
+    'health' => [],
+  ];
+}
+
+function load_epicor_integration_policy(): array {
+  global $EPICOR_POLICY_FILE;
+  $data = read_json_file($EPICOR_POLICY_FILE);
+  if (is_array($data)) return $data;
+  return [
+    'system_name' => 'Epicor Kinetic',
+    'domains' => [],
+    'reconciliation_rules' => [],
+    'alerts' => [],
+  ];
+}
+
+function load_epicor_runtime_store(): array {
+  global $EPICOR_RUNTIME_FILE;
+  ensure_dir(dirname($EPICOR_RUNTIME_FILE));
+  $defaults = epicor_runtime_default();
+  try {
+    $layer = runtime_data_layer();
+    $data = $layer->getRuntimeEpicorIntegrationStore();
+    $readMeta = $layer->getLastReadMeta();
+    observe_primary_read('epicor', $readMeta, [
+      'item_count' => runtime_store_item_count($data),
+      'scope' => 'epicor_runtime',
+    ]);
+  } catch (Throwable $e) {
+    $data = read_json_file($EPICOR_RUNTIME_FILE);
+    $readMeta = [
+      'source' => 'json_fallback',
+      'fallback' => true,
+      'error' => $e->getMessage(),
+      'mode' => (string)(runtime_data_layer_summary()['mode'] ?? 'JSON_ONLY'),
+      'timestamp' => now_iso(),
+    ];
+    observe_primary_read('epicor', $readMeta, [
+      'item_count' => runtime_store_item_count(is_array($data) ? $data : []),
+      'scope' => 'epicor_runtime',
+    ]);
+  }
+  if (!is_array($data)) {
+    $data = $defaults;
+    write_json_file($EPICOR_RUNTIME_FILE, $data);
+  }
+  foreach ($defaults as $key => $value) {
+    if ($key === '_meta') continue;
+    $data[$key] = array_values(is_array($data[$key] ?? null) ? $data[$key] : []);
+  }
+  $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : $defaults['_meta'];
+  return $data;
+}
+
+function save_epicor_runtime_store(array $data): void {
+  global $EPICOR_RUNTIME_FILE;
+  ensure_dir(dirname($EPICOR_RUNTIME_FILE));
+  $data['_meta'] = is_array($data['_meta'] ?? null) ? $data['_meta'] : [];
+  $data['_meta']['updated'] = now_iso();
+  write_json_file($EPICOR_RUNTIME_FILE, $data);
+  shadow_sync_epicor_runtime_store($data);
+}
+
+function upsert_epicor_runtime_item(array &$rows, string $idKey, array $item): array {
+  $id = trim((string)($item[$idKey] ?? ''));
+  if ($id === '') {
+    throw new RuntimeException('missing_epicor_runtime_id');
+  }
+  foreach ($rows as $idx => $row) {
+    if (!is_array($row)) continue;
+    if ((string)($row[$idKey] ?? '') !== $id) continue;
+    $rows[$idx] = array_merge($row, $item);
+    return $rows[$idx];
+  }
+  array_unshift($rows, $item);
+  return $item;
 }
 
 function mes_runtime_id(string $prefix): string {
@@ -5820,6 +5956,9 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $adapterGovernanceQueue = mes_build_adapter_governance_queue($machineWall);
   $alarmHotspotQueue = mes_build_alarm_hotspot_queue($machineWall);
   $shiftHandoverQueue = mes_build_shift_handover_queue($machineWall, $latestShiftHandoverByMachine, $shiftPatterns, $currentShift, $now);
+  $epicorPolicy = load_epicor_integration_policy();
+  $epicorStore = load_epicor_runtime_store();
+  $epicorSnapshot = epicor_integration_service()->buildSnapshot($epicorStore, $orders, $master, $mes, $epicorPolicy);
   $materialGenealogyByWo = master_index_by($materialGenealogyQueue, 'wo_number');
   $shiftHandoverByMachineQueue = master_index_by($shiftHandoverQueue, 'machine_id');
   foreach ($dispatch as &$dispatchRow) {
@@ -5841,6 +5980,7 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $shadowSyncFailures = mes_shadow_failure_rows($observability);
   $launchBlockerQueue = mes_launch_blocker_rows($observability);
   $primaryReadQueue = mes_primary_read_rows($observability);
+  $epicorSyncQueue = array_values((array)($epicorSnapshot['exception_queue'] ?? []));
 
   $kpis['program_mismatches'] = count($programHandshakeQueue);
   $kpis['program_release_risk'] = count($programReleaseQueue);
@@ -5855,6 +5995,9 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $kpis['shadow_sync_failures'] = count($shadowSyncFailures);
   $kpis['launch_blocker_hotspots'] = count($launchBlockerQueue);
   $kpis['primary_read_fallbacks'] = count($primaryReadQueue);
+  $kpis['epicor_sync_status'] = count($epicorSyncQueue);
+  $kpis['epicor_reconciliation_open'] = (int)($epicorSnapshot['kpis']['reconciliation_open'] ?? 0);
+  $kpis['epicor_outbox_pending'] = (int)($epicorSnapshot['kpis']['outbox_pending'] ?? 0);
 
   return [
     'kpis' => $kpis,
@@ -5883,6 +6026,8 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     'shadow_sync_failures' => array_slice($shadowSyncFailures, 0, 20),
     'launch_blocker_queue' => array_slice($launchBlockerQueue, 0, 20),
     'primary_read_queue' => array_slice($primaryReadQueue, 0, 20),
+    'epicor_sync' => $epicorSnapshot,
+    'epicor_sync_queue' => array_slice($epicorSyncQueue, 0, 20),
     'shadow_status' => $observability['shadow_sync'] ?? [],
     'primary_read_status' => $observability['primary_reads'] ?? [],
     'connector_ingest_status' => $observability['connector_ingest'] ?? [],
@@ -12968,6 +13113,100 @@ if ($username === '') {
     ]);
   }
 
+  case 'epicor_sync_snapshot': {
+    require_logged_in($store);
+    $bundle = runtime_read_model_bundle(true);
+    $orders = $bundle['orders'];
+    $master = $bundle['master'];
+    $mes = $bundle['mes'];
+    $policy = load_epicor_integration_policy();
+    $runtime = load_epicor_runtime_store();
+    $snapshot = epicor_integration_service()->buildSnapshot($runtime, $orders, $master, $mes, $policy);
+    api_json([
+      'ok' => true,
+      'policy' => $policy,
+      'runtime' => $runtime,
+      'snapshot' => $snapshot,
+      'read_sources' => $bundle['sources'],
+      'runtime_mode' => $bundle['runtime_mode'],
+      'updated' => (string)($runtime['_meta']['updated'] ?? ''),
+    ]);
+  }
+
+  case 'epicor_sync_run_upsert': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $policy = load_epicor_integration_policy();
+    $runtime = load_epicor_runtime_store();
+    $normalized = epicor_integration_service()->normalizeSyncRun($body, (string)($_SESSION['user'] ?? $me['username'] ?? 'system'), $policy);
+    $runtime['sync_runs'] = array_values((array)($runtime['sync_runs'] ?? []));
+    $saved = upsert_epicor_runtime_item($runtime['sync_runs'], 'sync_run_id', $normalized);
+    if (trim((string)($saved['checkpoint_key'] ?? '')) !== '' && trim((string)($saved['checkpoint_value'] ?? '')) !== '') {
+      $checkpoint = [
+        'checkpoint_key' => (string)$saved['checkpoint_key'],
+        'checkpoint_value' => (string)$saved['checkpoint_value'],
+        'updated_at' => (string)($saved['completed_at'] ?? $saved['updated_at'] ?? now_iso()),
+        'sync_run_id' => (string)($saved['sync_run_id'] ?? ''),
+        'sync_domain' => (string)($saved['sync_domain'] ?? ''),
+      ];
+      $runtime['checkpoints'] = array_values((array)($runtime['checkpoints'] ?? []));
+      upsert_epicor_runtime_item($runtime['checkpoints'], 'checkpoint_key', $checkpoint);
+    }
+    save_epicor_runtime_store($runtime);
+    $bundle = runtime_read_model_bundle(true);
+    $snapshot = epicor_integration_service()->buildSnapshot($runtime, $bundle['orders'], $bundle['master'], $bundle['mes'], $policy);
+    api_json([
+      'ok' => true,
+      'item' => $saved,
+      'snapshot' => $snapshot,
+      'updated' => (string)($runtime['_meta']['updated'] ?? ''),
+    ]);
+  }
+
+  case 'epicor_reconciliation_upsert': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $policy = load_epicor_integration_policy();
+    $runtime = load_epicor_runtime_store();
+    $normalized = epicor_integration_service()->normalizeReconciliationException($body, (string)($_SESSION['user'] ?? $me['username'] ?? 'system'), $policy);
+    $runtime['reconciliation_exceptions'] = array_values((array)($runtime['reconciliation_exceptions'] ?? []));
+    $saved = upsert_epicor_runtime_item($runtime['reconciliation_exceptions'], 'reconciliation_id', $normalized);
+    save_epicor_runtime_store($runtime);
+    $bundle = runtime_read_model_bundle(true);
+    $snapshot = epicor_integration_service()->buildSnapshot($runtime, $bundle['orders'], $bundle['master'], $bundle['mes'], $policy);
+    api_json([
+      'ok' => true,
+      'item' => $saved,
+      'snapshot' => $snapshot,
+      'updated' => (string)($runtime['_meta']['updated'] ?? ''),
+    ]);
+  }
+
+  case 'epicor_outbox_upsert': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $policy = load_epicor_integration_policy();
+    $runtime = load_epicor_runtime_store();
+    $normalized = epicor_integration_service()->normalizeOutboxEvent($body, (string)($_SESSION['user'] ?? $me['username'] ?? 'system'), $policy);
+    $runtime['outbox_events'] = array_values((array)($runtime['outbox_events'] ?? []));
+    $saved = upsert_epicor_runtime_item($runtime['outbox_events'], 'outbox_event_id', $normalized);
+    save_epicor_runtime_store($runtime);
+    $bundle = runtime_read_model_bundle(true);
+    $snapshot = epicor_integration_service()->buildSnapshot($runtime, $bundle['orders'], $bundle['master'], $bundle['mes'], $policy);
+    api_json([
+      'ok' => true,
+      'item' => $saved,
+      'snapshot' => $snapshot,
+      'updated' => (string)($runtime['_meta']['updated'] ?? ''),
+    ]);
+  }
+
   case 'mes_shadow_status': {
     require_logged_in($store);
     $observability = load_runtime_observability_store();
@@ -15031,6 +15270,7 @@ if ($username === '') {
     $shadowSyncFailures = count((array)($mesSnapshot['shadow_sync_failures'] ?? []));
     $launchBlockerHotspots = count((array)($mesSnapshot['launch_blocker_queue'] ?? []));
     $primaryReadFallbacks = count((array)($mesSnapshot['primary_read_queue'] ?? []));
+    $epicorSyncStatus = count((array)($mesSnapshot['epicor_sync_queue'] ?? []));
     $downtimeGovernanceGaps = count(mes_downtime_governance_gap_rows($mes, $master));
 
     // 6. Orphan record links (links pointing to non-existent orders)
@@ -15067,6 +15307,7 @@ if ($username === '') {
       'shadow_sync_failures' => $shadowSyncFailures,
       'launch_blocker_hotspots' => $launchBlockerHotspots,
       'primary_read_fallbacks' => $primaryReadFallbacks,
+      'epicor_sync_status' => $epicorSyncStatus,
       'downtime_governance_gaps' => $downtimeGovernanceGaps,
       'orphan_links'        => $orphanLinks,
       'read_sources'        => $bundle['sources'],
@@ -15597,6 +15838,29 @@ if ($username === '') {
             'date'       => substr((string)($row['read_at'] ?? ''), 0, 10),
             'responsible'=> (string)($row['runtime_mode'] ?? ''),
             'detail'     => (string)($row['source'] ?? '') . ' / ' . (string)($row['error'] ?? ''),
+          ];
+        }
+        break;
+      }
+      case 'epicor_sync_status': {
+        $orders = $bundle['orders'];
+        $master = $bundle['master'];
+        $mes = $bundle['mes'];
+        $snapshot = build_mes_snapshot($orders, $master, $mes);
+        foreach ((array)($snapshot['epicor_sync_queue'] ?? []) as $row) {
+          if (!is_array($row)) continue;
+          $items[] = [
+            'id'         => (string)($row['exception_id'] ?? $row['sync_run_id'] ?? $row['outbox_event_id'] ?? ''),
+            'type'       => (string)($row['type'] ?? 'epicor_sync'),
+            'department' => (string)($row['sync_domain'] ?? ''),
+            'date'       => substr((string)($row['updated_at'] ?? $row['detected_at'] ?? $row['created_at'] ?? ''), 0, 10),
+            'responsible'=> (string)($row['owner_role'] ?? $row['direction'] ?? ''),
+            'detail'     => implode(' · ', array_filter([
+              (string)($row['sync_domain'] ?? ''),
+              (string)($row['status'] ?? ''),
+              (string)($row['message_vi'] ?? $row['message_en'] ?? ''),
+              (string)($row['difference_summary'] ?? ''),
+            ])),
           ];
         }
         break;

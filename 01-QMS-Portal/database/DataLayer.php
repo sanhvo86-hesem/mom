@@ -200,6 +200,27 @@ class DataLayer
     }
 
     /**
+     * Mirror Epicor integration runtime overlays into PostgreSQL.
+     */
+    public function syncEpicorRuntimeStore(array $store): bool
+    {
+        if (!$this->usesPostgres()) {
+            return true;
+        }
+
+        try {
+            $this->runtimeShadow()->syncEpicorRuntimeStore($store);
+            return true;
+        } catch (\Throwable $e) {
+            @error_log('[DataLayer] runtime Epicor shadow sync failed: ' . $e->getMessage());
+            if ($this->mode === self::MODE_SHADOW_WRITE) {
+                return false;
+            }
+            throw $e;
+        }
+    }
+
+    /**
      * Read the governed runtime master-data store using the active migration mode.
      */
     public function getRuntimeMasterDataStore(): array
@@ -229,6 +250,17 @@ class DataLayer
         return $this->read(
             jsonReader: fn(): array => $this->readJson($this->dataDir . '/mes/mes-runtime.json'),
             pgReader: fn(): array => $this->loadRuntimeMesRuntimeFromPg(),
+        );
+    }
+
+    /**
+     * Read the governed Epicor integration runtime overlay using the active migration mode.
+     */
+    public function getRuntimeEpicorIntegrationStore(): array
+    {
+        return $this->read(
+            jsonReader: fn(): array => $this->readJson($this->dataDir . '/erp/epicor-runtime.json'),
+            pgReader: fn(): array => $this->loadRuntimeEpicorIntegrationFromPg(),
         );
     }
 
@@ -1956,6 +1988,63 @@ class DataLayer
     }
 
     /**
+     * Rebuild the governed Epicor integration runtime overlay from PostgreSQL mirrors.
+     */
+    private function loadRuntimeEpicorIntegrationFromPg(): array
+    {
+        $syncRunRows = $this->db->query('SELECT metadata, updated_at FROM mes_erp_sync_runs ORDER BY started_at DESC');
+        $reconciliationRows = $this->db->query('SELECT metadata, updated_at FROM mes_erp_reconciliation_exceptions ORDER BY detected_at DESC');
+        $outboxRows = $this->db->query('SELECT payload, erp_response, entity_type, entity_id, created_at, sent_at, send_status, error_message, retry_count FROM mes_erp_outbound_queue ORDER BY created_at DESC');
+
+        $syncRuns = $this->extractMetadataRows($syncRunRows);
+        $reconciliation = $this->extractMetadataRows($reconciliationRows);
+        $outbox = $this->extractEpicorOutboxRows($outboxRows);
+
+        $checkpoints = [];
+        foreach ($syncRuns as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $checkpointKey = trim((string)($row['checkpoint_key'] ?? ''));
+            $checkpointValue = trim((string)($row['checkpoint_value'] ?? ''));
+            if ($checkpointKey === '' || $checkpointValue === '') {
+                continue;
+            }
+            $status = strtolower(trim((string)($row['status'] ?? '')));
+            if (!in_array($status, ['success', 'ok', 'completed'], true)) {
+                continue;
+            }
+            $candidate = trim((string)($row['finished_at'] ?? $row['updated_at'] ?? $row['started_at'] ?? ''));
+            $current = trim((string)($checkpoints[$checkpointKey]['updated_at'] ?? ''));
+            if ($current !== '' && $candidate < $current) {
+                continue;
+            }
+            $checkpoints[$checkpointKey] = [
+                'checkpoint_key' => $checkpointKey,
+                'checkpoint_value' => $checkpointValue,
+                'updated_at' => $candidate,
+                'sync_run_id' => (string)($row['sync_run_id'] ?? ''),
+                'sync_domain' => (string)($row['sync_domain'] ?? ''),
+            ];
+        }
+
+        $store = [
+            '_meta' => $this->buildRuntimeStoreMeta('epicor', [$syncRunRows, $reconciliationRows, $outboxRows]),
+            'sync_runs' => $syncRuns,
+            'reconciliation_exceptions' => $reconciliation,
+            'outbox_events' => $outbox,
+            'checkpoints' => array_values($checkpoints),
+            'health' => [],
+        ];
+
+        if ($this->storeCollectionCount($store, ['sync_runs', 'reconciliation_exceptions', 'outbox_events']) === 0) {
+            throw new RuntimeException('runtime_epicor_pg_empty');
+        }
+
+        return $store;
+    }
+
+    /**
      * Build a consistent _meta block for a mirrored runtime store.
      *
      * @param string $domain Runtime store domain name.
@@ -2137,6 +2226,36 @@ class DataLayer
         }
         $decoded = json_decode($value, true);
         return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * Rebuild Epicor outbox rows from PostgreSQL queue mirrors.
+     *
+     * @param array<int, array<string, mixed>> $rows
+     * @return array<int, array<string, mixed>>
+     */
+    private function extractEpicorOutboxRows(array $rows): array
+    {
+        $items = [];
+        foreach ($rows as $row) {
+            $payload = $this->decodeJsonArray($row['payload'] ?? null);
+            $erpResponse = $this->decodeJsonArray($row['erp_response'] ?? null);
+            $payload['entity_type'] = (string)($row['entity_type'] ?? ($payload['entity_type'] ?? ''));
+            $payload['entity_id'] = (string)($row['entity_id'] ?? ($payload['entity_id'] ?? ''));
+            $payload['created_at'] = (string)($row['created_at'] ?? ($payload['created_at'] ?? $payload['first_queued_at'] ?? ''));
+            $payload['first_queued_at'] = (string)($payload['first_queued_at'] ?? $payload['created_at'] ?? ($row['created_at'] ?? ''));
+            $payload['sent_at'] = (string)($row['sent_at'] ?? ($payload['sent_at'] ?? $payload['last_attempt_at'] ?? ''));
+            $payload['last_attempt_at'] = (string)($payload['last_attempt_at'] ?? $payload['sent_at'] ?? ($row['sent_at'] ?? ''));
+            $payload['send_status'] = (string)($row['send_status'] ?? ($payload['send_status'] ?? $payload['publish_status'] ?? ''));
+            $payload['publish_status'] = (string)($payload['publish_status'] ?? $payload['send_status'] ?? ($row['send_status'] ?? ''));
+            $payload['error_message'] = (string)($row['error_message'] ?? ($payload['error_message'] ?? ''));
+            $payload['retry_count'] = (int)($row['retry_count'] ?? ($payload['retry_count'] ?? 0));
+            $payload['erp_response'] = $erpResponse;
+            if ($payload !== []) {
+                $items[] = $payload;
+            }
+        }
+        return $items;
     }
 
     /**

@@ -17251,6 +17251,103 @@
           "description": "Timestamp when the incoming shift formally acknowledged the handover."
         }
       }
+    },
+    "erp_mes_integration_governance": {
+      "label": "ERP MES Integration Governance Variables",
+      "label_vi": "Biến quản trị tích hợp ERP và MES",
+      "description": "Governed variables for Epicor sync cycles, reconciliation exceptions, and outbound transaction queues.",
+      "variables": {
+        "epicor_sync_run_id_erp": {
+          "label": "Epicor Sync Run ID",
+          "label_vi": "Mã chu kỳ đồng bộ Epicor",
+          "type": "string",
+          "required": true,
+          "source": "generated",
+          "used_in": ["erp_mes_integration_governance"],
+          "description": "Unique identifier for each governed Epicor synchronization run."
+        },
+        "epicor_sync_direction_erp": {
+          "label": "Epicor Sync Direction",
+          "label_vi": "Hướng đồng bộ Epicor",
+          "type": "string",
+          "required": true,
+          "source": "system",
+          "used_in": ["erp_mes_integration_governance"],
+          "description": "Inbound, outbound, bidirectional, or reconciliation direction of the integration run."
+        },
+        "epicor_sync_domain_erp": {
+          "label": "Epicor Sync Domain",
+          "label_vi": "Miền đồng bộ Epicor",
+          "type": "string",
+          "required": true,
+          "source": "system",
+          "used_in": ["erp_mes_integration_governance"],
+          "description": "Domain being synchronized such as sales orders, work orders, labor, or quality."
+        },
+        "epicor_sync_status_erp": {
+          "label": "Epicor Sync Status",
+          "label_vi": "Trạng thái đồng bộ Epicor",
+          "type": "string",
+          "required": true,
+          "source": "system",
+          "used_in": ["erp_mes_integration_governance"],
+          "description": "Governed run status such as queued, running, success, partial, or failed."
+        },
+        "epicor_last_success_at_erp": {
+          "label": "Epicor Last Success At",
+          "label_vi": "Thời điểm đồng bộ Epicor thành công gần nhất",
+          "type": "timestamp",
+          "required": false,
+          "source": "system",
+          "used_in": ["erp_mes_integration_governance"],
+          "description": "Timestamp of the most recent successful governed synchronization checkpoint."
+        },
+        "epicor_reconciliation_gap_qty_erp": {
+          "label": "Epicor Reconciliation Quantity Gap",
+          "label_vi": "Độ lệch số lượng khi đối soát Epicor",
+          "type": "number",
+          "required": false,
+          "source": "calculated",
+          "used_in": ["erp_mes_integration_governance"],
+          "description": "Quantity difference detected during MES/Epicor reconciliation."
+        },
+        "epicor_reconciliation_gap_minutes_erp": {
+          "label": "Epicor Reconciliation Delay Minutes",
+          "label_vi": "Số phút trễ khi đối soát Epicor",
+          "type": "number",
+          "required": false,
+          "source": "calculated",
+          "used_in": ["erp_mes_integration_governance"],
+          "description": "Elapsed minutes between the expected and acknowledged transaction state."
+        },
+        "epicor_outbox_event_id_erp": {
+          "label": "Epicor Outbox Event ID",
+          "label_vi": "Mã outbox Epicor",
+          "type": "string",
+          "required": true,
+          "source": "generated",
+          "used_in": ["erp_mes_integration_governance"],
+          "description": "Unique identifier for a governed outbound ERP transaction event."
+        },
+        "epicor_transaction_type_erp": {
+          "label": "Epicor Transaction Type",
+          "label_vi": "Loại giao dịch Epicor",
+          "type": "string",
+          "required": false,
+          "source": "system",
+          "used_in": ["erp_mes_integration_governance"],
+          "description": "Type of labor, material, completion, or quality transaction being published to Epicor."
+        },
+        "epicor_site_id_erp": {
+          "label": "Epicor Site ID",
+          "label_vi": "Mã site Epicor",
+          "type": "string",
+          "required": false,
+          "source": "system",
+          "used_in": ["erp_mes_integration_governance"],
+          "description": "Epicor site or plant code governing the transaction context."
+        }
+      }
     }
   }
 }
