@@ -1,0 +1,259 @@
+from __future__ import annotations
+
+import csv
+import json
+from pathlib import Path
+
+from common import (
+    ANNEX_ROOT,
+    WI_ROOT,
+    canonical_duplicate_path,
+    duplicate_basename_map,
+    extract_code,
+    extract_title,
+    guess_annex_archetype,
+    guess_wi_archetype,
+    html_signals,
+    phase_residue_matches,
+    read_text,
+    repo_root,
+    walk_html_files,
+)
+
+
+MANUAL_DECISIONS = {
+    "WI-201": {
+        "recommended_action": "SPLIT",
+        "priority": "P0",
+        "reason": "Gate matrix and hold architecture belong in SOP; WI should keep only execution checklist.",
+    },
+    "WI-517": {
+        "recommended_action": "SPLIT",
+        "priority": "P0",
+        "reason": "Machine-family setup content belongs in ANNEX; keep point-of-use setup steps in WI.",
+    },
+    "WI-519": {
+        "recommended_action": "REBUILD",
+        "priority": "P0",
+        "reason": "Pre-run decision matrix is overloaded; rebuild as gate-execution checklist.",
+    },
+    "WI-701": {
+        "recommended_action": "REBUILD",
+        "priority": "P0",
+        "reason": "Receiving route matrix and workbook migration notes overload point-of-use content.",
+    },
+    "WI-715": {
+        "recommended_action": "KEEP_AND_ALIGN",
+        "priority": "P1",
+        "reason": "High practical value for semiconductor/vacuum flow; keep method in WI and move master acceptance limits to specification annex.",
+    },
+    "WI-801": {
+        "recommended_action": "RECLASSIFY",
+        "priority": "P3",
+        "reason": "Worked examples belong in ANNEX, not in WI.",
+    },
+    "WI-901": {
+        "recommended_action": "REVIEW_GOVERNANCE_BOUNDARY",
+        "priority": "P2",
+        "reason": "May remain control-tower WI, but governance-heavy content must not overlap SOP-900 management review logic.",
+    },
+    "ANNEX-503": {
+        "recommended_action": "REBUILD",
+        "priority": "P1",
+        "reason": "Current file is a malformed fragment and should become the canonical map/topology annex for CNC operating model.",
+    },
+    "ANNEX-601": {
+        "recommended_action": "KEEP_AND_TIGHTEN",
+        "priority": "P1",
+        "reason": "Method annex is correct, but must stay separate from WI execution steps.",
+    },
+    "ANNEX-608": {
+        "recommended_action": "REBUILD",
+        "priority": "P1",
+        "reason": "Semiconductor requirement matrix is strategically important but current HTML wrapper is broken and the source mapping needs tightening.",
+    },
+    "ANNEX-701": {
+        "recommended_action": "KEEP_AND_TIGHTEN",
+        "priority": "P1",
+        "reason": "Keep as dictionary/specification support; do not let lifecycle procedure drift into the annex.",
+    },
+    "ANNEX-122": {
+        "recommended_action": "KEEP_CANONICAL",
+        "priority": "P1",
+        "reason": "KPI cascade dictionary is a core foundation and should remain a clean dictionary annex.",
+    },
+}
+
+
+def default_action() -> tuple[str, str, str]:
+    return "KEEP", "P2", "Baseline review required by archetype."
+
+
+def build_rows(root: Path) -> list[dict[str, str | bool | int]]:
+    wi_files = walk_html_files(root / WI_ROOT)
+    annex_files = walk_html_files(root / ANNEX_ROOT)
+    duplicate_map = duplicate_basename_map(annex_files)
+    rows = []
+
+    for family, files in (("WI", wi_files), ("ANNEX", annex_files)):
+        for path in files:
+            text = read_text(path)
+            _, code_num = extract_code(path, text)
+            code = f"{family}-{code_num}"
+            title = extract_title(text)
+            signals = html_signals(text)
+            phase_hits = phase_residue_matches(text)
+            duplicate_paths = duplicate_map.get(path.name.lower(), [])
+            canonical_duplicate = ""
+            duplicate_status = ""
+            if duplicate_paths:
+                canonical_path = canonical_duplicate_path(duplicate_paths)
+                canonical_duplicate = canonical_path.relative_to(root).as_posix()
+                duplicate_status = "CANONICAL" if canonical_path == path else "ALIAS"
+
+            target_archetype = (
+                guess_wi_archetype(code_num, title) if family == "WI" else guess_annex_archetype(code_num, title)
+            )
+
+            recommended_action, priority, reason = default_action()
+            if code in MANUAL_DECISIONS:
+                decision = MANUAL_DECISIONS[code]
+                recommended_action = decision["recommended_action"]
+                priority = decision["priority"]
+                reason = decision["reason"]
+
+            if duplicate_status == "ALIAS" and family == "ANNEX":
+                recommended_action = "DEPRECATE_ALIAS"
+                priority = "P0"
+                reason = "Duplicate basename exists; migrate links to canonical subfolder path and retire alias."
+
+            if not signals["has_doctype"] or not signals["has_html_tag"] or not signals["has_head_tag"] or not signals["has_body_tag"]:
+                if priority not in {"P0", "P1"}:
+                    priority = "P1"
+                if recommended_action == "KEEP":
+                    recommended_action = "REBUILD_WRAPPER"
+
+            if phase_hits and recommended_action == "KEEP":
+                recommended_action = "CLEAN_PHASE_RESIDUE"
+
+            rows.append(
+                {
+                    "family": family,
+                    "code": code,
+                    "series": f"{family}-{code_num[0]}00",
+                    "path": path.relative_to(root).as_posix(),
+                    "title": title,
+                    "target_archetype": target_archetype,
+                    "recommended_action": recommended_action,
+                    "priority": priority,
+                    "has_doctype": signals["has_doctype"],
+                    "has_html_tag": signals["has_html_tag"],
+                    "has_head_tag": signals["has_head_tag"],
+                    "has_body_tag": signals["has_body_tag"],
+                    "has_lang": signals["has_lang"],
+                    "has_charset": signals["has_charset"],
+                    "has_viewport": signals["has_viewport"],
+                    "has_style_css": signals["has_style_css"],
+                    "h2_count": signals["h2_count"],
+                    "proc_num_count": signals["proc_num_count"],
+                    "duplicate_status": duplicate_status,
+                    "canonical_duplicate": canonical_duplicate,
+                    "phase_hits": "; ".join(phase_hits),
+                    "reason": reason,
+                }
+            )
+
+    return sorted(rows, key=lambda item: (item["family"], item["code"], item["path"]))
+
+
+def write_csv(path: Path, rows: list[dict[str, str | bool | int]]) -> None:
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0].keys()))
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def build_summary(rows: list[dict[str, str | bool | int]]) -> str:
+    total = len(rows)
+    wi_total = sum(1 for row in rows if row["family"] == "WI")
+    annex_total = total - wi_total
+    p0 = [row for row in rows if row["priority"] == "P0"]
+    p1 = [row for row in rows if row["priority"] == "P1"]
+    duplicates = [row for row in rows if row["duplicate_status"]]
+    phase_rows = [row for row in rows if row["phase_hits"]]
+    html_rows = [
+        row
+        for row in rows
+        if not all(
+            [
+                row["has_doctype"],
+                row["has_html_tag"],
+                row["has_head_tag"],
+                row["has_body_tag"],
+                row["has_lang"],
+                row["has_charset"],
+                row["has_viewport"],
+            ]
+        )
+    ]
+
+    lines = [
+        "# WI-ANNEX foundation summary",
+        "",
+        f"- Total docs scanned: {total}",
+        f"- WI docs: {wi_total}",
+        f"- ANNEX docs: {annex_total}",
+        f"- Duplicate ANNEX basenames: {len({row['canonical_duplicate'] for row in duplicates if row['canonical_duplicate']})}",
+        f"- Files with missing HTML wrapper signals: {len(html_rows)}",
+        f"- Files with phase residue markers: {len(phase_rows)}",
+        "",
+        "## Highest-priority docs",
+        "",
+    ]
+
+    for bucket_name, bucket_rows in (("P0", p0), ("P1", p1)):
+        lines.append(f"### {bucket_name}")
+        lines.append("")
+        if not bucket_rows:
+            lines.append("- None")
+            lines.append("")
+            continue
+        for row in bucket_rows:
+            lines.append(f"- {row['code']} | {row['recommended_action']} | {row['target_archetype']} | {row['path']}")
+        lines.append("")
+
+    lines.extend(
+        [
+            "## Practical next step",
+            "",
+            "- Run Phase 0 cleanup on duplicate basenames and malformed HTML wrappers first.",
+            "- Then pilot rewrite WI-201, WI-517, WI-519, WI-701 and WI-715 against the new archetype standards.",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def main() -> int:
+    root = repo_root()
+    report_dir = root / "_reports" / "wi-annex"
+    report_dir.mkdir(parents=True, exist_ok=True)
+
+    rows = build_rows(root)
+    csv_path = report_dir / "wi-annex-inventory.csv"
+    json_path = report_dir / "wi-annex-inventory.json"
+    summary_path = report_dir / "wi-annex-foundation-summary.md"
+
+    write_csv(csv_path, rows)
+    json_path.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
+    summary_path.write_text(build_summary(rows) + "\n", encoding="utf-8")
+
+    print(f"docs={len(rows)}")
+    print(f"csv={csv_path.relative_to(root).as_posix()}")
+    print(f"json={json_path.relative_to(root).as_posix()}")
+    print(f"summary={summary_path.relative_to(root).as_posix()}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

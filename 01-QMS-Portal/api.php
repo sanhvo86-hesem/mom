@@ -5948,6 +5948,307 @@ function form_is_online_runtime(string $formCode): bool {
   return ($schema['online'] ?? true) !== false;
 }
 
+function evidence_schema_field_map(array $schema): array {
+  $map = [];
+  foreach ((array)($schema['fields'] ?? []) as $field) {
+    if (!is_array($field)) continue;
+    $fieldId = trim((string)($field['id'] ?? ''));
+    if ($fieldId === '') continue;
+    $map[$fieldId] = $field;
+  }
+  return $map;
+}
+
+function evidence_field_label(array $schema, string $fieldId, string $locale = 'vi'): string {
+  $field = evidence_schema_field_map($schema)[$fieldId] ?? null;
+  if (!is_array($field)) return $fieldId;
+  if ($locale === 'en') return trim((string)($field['label_en'] ?? $field['label'] ?? $fieldId));
+  return trim((string)($field['label_vi'] ?? $field['label'] ?? $fieldId));
+}
+
+function evidence_signature_label(array $schema, string $signatureId, string $locale = 'vi'): string {
+  foreach ((array)($schema['signature_blocks'] ?? []) as $block) {
+    if (!is_array($block)) continue;
+    if (trim((string)($block['id'] ?? '')) !== $signatureId) continue;
+    if ($locale === 'en') return trim((string)($block['label_en'] ?? $block['label'] ?? $signatureId));
+    return trim((string)($block['label_vi'] ?? $block['label'] ?? $signatureId));
+  }
+  return $signatureId;
+}
+
+function evidence_entry_value_present(array $field, $value): bool {
+  $type = strtolower(trim((string)($field['type'] ?? 'text')));
+  if ($type === 'multi_select') return is_array($value) && !empty($value);
+  if ($type === 'checkbox') return $value === true || $value === 1 || $value === '1' || $value === 'true';
+  if (is_array($value)) return !empty($value);
+  return trim((string)$value) !== '';
+}
+
+function evidence_find_online_entry(string $formCode, string $allocationId = '', string $entryId = ''): ?array {
+  if ($formCode === '' || ($allocationId === '' && $entryId === '')) return null;
+  $entries = load_online_form_entries_store($formCode);
+  $idx = find_online_form_entry_index($entries, $entryId, $allocationId);
+  return $idx >= 0 && is_array($entries[$idx] ?? null) ? $entries[$idx] : null;
+}
+
+function evidence_default_requirements(array $allocation, array $schema): array {
+  $deliveryMode = strtolower(trim((string)($allocation['delivery_mode'] ?? (($schema['online'] ?? true) !== false ? 'online' : 'offline'))));
+  $requiredContext = array_values(array_filter(array_map('trim', (array)($schema['record_context']['required'] ?? []))));
+  $requirements = [];
+
+  if (!empty($requiredContext)) {
+    $requirements[] = [
+      'id' => 'context_required',
+      'kind' => 'record_context',
+      'label' => 'Governed traceability context',
+      'label_vi' => 'Ngữ cảnh truy xuất bắt buộc',
+      'required_keys' => $requiredContext,
+      'required_stages' => ['review', 'approval'],
+    ];
+  }
+
+  if ($deliveryMode === 'online') {
+    $requirements[] = [
+      'id' => 'required_fields_complete',
+      'kind' => 'required_fields',
+      'label' => 'Required form fields completed',
+      'label_vi' => 'Trường bắt buộc đã hoàn tất',
+      'required_stages' => ['review', 'approval'],
+    ];
+    $requiredSignatures = [];
+    foreach ((array)($schema['signature_blocks'] ?? []) as $block) {
+      if (!is_array($block) || empty($block['required_on_submit'])) continue;
+      $signatureId = trim((string)($block['id'] ?? ''));
+      if ($signatureId !== '') $requiredSignatures[] = $signatureId;
+    }
+    if (!empty($requiredSignatures)) {
+      $requirements[] = [
+        'id' => 'signatures_required',
+        'kind' => 'signatures',
+        'label' => 'Required signatures captured',
+        'label_vi' => 'Chữ ký bắt buộc đã có',
+        'required_ids' => $requiredSignatures,
+        'required_stages' => ['review', 'approval'],
+      ];
+    }
+    $requirements[] = [
+      'id' => 'online_submission',
+      'kind' => 'online_submission',
+      'label' => 'Online submission saved',
+      'label_vi' => 'Bản nộp online đã được lưu',
+      'required_stages' => ['review', 'approval'],
+    ];
+  } else {
+    $requirements[] = [
+      'id' => 'offline_package_issued',
+      'kind' => 'offline_package',
+      'label' => 'Governed workbook issued',
+      'label_vi' => 'Workbook kiểm soát đã được cấp phát',
+      'required_stages' => ['review', 'approval'],
+    ];
+    $requirements[] = [
+      'id' => 'received_workbook',
+      'kind' => 'received_workbook',
+      'label' => 'Completed workbook received',
+      'label_vi' => 'Workbook đã điền đã được tiếp nhận',
+      'required_stages' => ['review', 'approval'],
+    ];
+  }
+
+  foreach ((array)($schema['evidence_requirements'] ?? []) as $custom) {
+    if (!is_array($custom)) continue;
+    $customId = trim((string)($custom['id'] ?? ''));
+    if ($customId === '') continue;
+    $merged = false;
+    foreach ($requirements as $idx => $existing) {
+      if (($existing['id'] ?? '') !== $customId) continue;
+      $requirements[$idx] = array_merge($existing, $custom);
+      $merged = true;
+      break;
+    }
+    if (!$merged) $requirements[] = $custom;
+  }
+
+  return $requirements;
+}
+
+function evidence_requirement_applies(array $requirement, string $stage): bool {
+  $stage = strtolower(trim($stage));
+  $stages = array_values(array_filter(array_map(static fn($v) => strtolower(trim((string)$v)), (array)($requirement['required_stages'] ?? []))));
+  if (!empty($stages)) return in_array($stage, $stages, true);
+  if ($stage === 'approval' && array_key_exists('required_for_approval', $requirement)) return !empty($requirement['required_for_approval']);
+  if ($stage === 'review' && array_key_exists('required_for_review', $requirement)) return !empty($requirement['required_for_review']);
+  return true;
+}
+
+function evidence_evaluate_requirement(array $requirement, array $allocation, array $schema, ?array $entry = null): array {
+  $kind = strtolower(trim((string)($requirement['kind'] ?? '')));
+  $item = [
+    'id' => trim((string)($requirement['id'] ?? $kind)),
+    'kind' => $kind,
+    'label' => trim((string)($requirement['label'] ?? $kind)),
+    'label_vi' => trim((string)($requirement['label_vi'] ?? $requirement['label'] ?? $kind)),
+    'ok' => false,
+    'missing' => [],
+    'detail_en' => '',
+    'detail_vi' => '',
+  ];
+
+  $masterContext = normalize_master_context((array)($allocation['master_context'] ?? []));
+  $entry = is_array($entry) ? $entry : null;
+
+  switch ($kind) {
+    case 'record_context': {
+      $requiredKeys = array_values(array_filter(array_map('trim', (array)($requirement['required_keys'] ?? []))));
+      $missing = [];
+      foreach ($requiredKeys as $key) {
+        if (!array_key_exists($key, $masterContext) || trim((string)$masterContext[$key]) === '') {
+          $missing[] = [
+            'key' => $key,
+            'label' => evidence_field_label($schema, $key, 'en'),
+            'label_vi' => evidence_field_label($schema, $key, 'vi'),
+          ];
+        }
+      }
+      $item['ok'] = empty($missing);
+      $item['missing'] = $missing;
+      $item['detail_vi'] = $item['ok']
+        ? 'Đủ ngữ cảnh truy xuất bắt buộc.'
+        : 'Thiếu ngữ cảnh: ' . implode(', ', array_map(static fn($row) => (string)($row['label_vi'] ?? $row['key'] ?? ''), $missing));
+      $item['detail_en'] = $item['ok']
+        ? 'Required traceability context is complete.'
+        : 'Missing context: ' . implode(', ', array_map(static fn($row) => (string)($row['label'] ?? $row['key'] ?? ''), $missing));
+      break;
+    }
+
+    case 'required_fields': {
+      $missing = [];
+      foreach ((array)($schema['fields'] ?? []) as $field) {
+        if (!is_array($field) || empty($field['required'])) continue;
+        $fieldId = trim((string)($field['id'] ?? ''));
+        if ($fieldId === '') continue;
+        $value = $entry[$fieldId] ?? null;
+        if (!evidence_entry_value_present($field, $value)) {
+          $missing[] = [
+            'key' => $fieldId,
+            'label' => evidence_field_label($schema, $fieldId, 'en'),
+            'label_vi' => evidence_field_label($schema, $fieldId, 'vi'),
+          ];
+        }
+      }
+      $item['ok'] = empty($missing) && $entry !== null;
+      $item['missing'] = $missing;
+      $item['detail_vi'] = $entry === null
+        ? 'Chưa có bản nộp online để kiểm tra trường bắt buộc.'
+        : ($item['ok'] ? 'Tất cả trường bắt buộc đã được điền.' : 'Thiếu trường bắt buộc: ' . implode(', ', array_map(static fn($row) => (string)($row['label_vi'] ?? $row['key'] ?? ''), $missing)));
+      $item['detail_en'] = $entry === null
+        ? 'No online submission is available to validate required fields.'
+        : ($item['ok'] ? 'All required fields are complete.' : 'Missing required fields: ' . implode(', ', array_map(static fn($row) => (string)($row['label'] ?? $row['key'] ?? ''), $missing)));
+      break;
+    }
+
+    case 'signatures': {
+      $requiredIds = array_values(array_filter(array_map('trim', (array)($requirement['required_ids'] ?? []))));
+      $signatures = is_array($allocation['signatures'] ?? null) ? $allocation['signatures'] : [];
+      if ($entry && is_array($entry['signatures'] ?? null)) $signatures = array_merge($signatures, $entry['signatures']);
+      $missing = [];
+      foreach ($requiredIds as $signatureId) {
+        if (!is_array($signatures[$signatureId] ?? null)) {
+          $missing[] = [
+            'key' => $signatureId,
+            'label' => evidence_signature_label($schema, $signatureId, 'en'),
+            'label_vi' => evidence_signature_label($schema, $signatureId, 'vi'),
+          ];
+        }
+      }
+      $item['ok'] = empty($missing);
+      $item['missing'] = $missing;
+      $item['detail_vi'] = $item['ok']
+        ? 'Các chữ ký bắt buộc đã được ghi nhận.'
+        : 'Thiếu chữ ký: ' . implode(', ', array_map(static fn($row) => (string)($row['label_vi'] ?? $row['key'] ?? ''), $missing));
+      $item['detail_en'] = $item['ok']
+        ? 'Required signatures are present.'
+        : 'Missing signatures: ' . implode(', ', array_map(static fn($row) => (string)($row['label'] ?? $row['key'] ?? ''), $missing));
+      break;
+    }
+
+    case 'online_submission': {
+      $entryId = trim((string)($allocation['online_submission']['entry_id'] ?? ''));
+      $item['ok'] = $entryId !== '' && $entry !== null;
+      $item['detail_vi'] = $item['ok'] ? 'Bản nộp online đã được lưu trên hệ thống.' : 'Chưa có bản nộp online hợp lệ trên hệ thống.';
+      $item['detail_en'] = $item['ok'] ? 'The online submission is stored on the server.' : 'No valid online submission is stored on the server.';
+      break;
+    }
+
+    case 'offline_package': {
+      $issued = trim((string)($allocation['offline_package']['filename'] ?? '')) !== '' || trim((string)($allocation['downloaded_at'] ?? '')) !== '';
+      $item['ok'] = $issued;
+      $item['detail_vi'] = $item['ok'] ? 'Workbook kiểm soát đã được cấp phát.' : 'Chưa cấp phát workbook kiểm soát cho allocation này.';
+      $item['detail_en'] = $item['ok'] ? 'A governed workbook has been issued.' : 'No governed workbook has been issued for this allocation.';
+      break;
+    }
+
+    case 'received_workbook': {
+      $receiptCount = count((array)($allocation['receipts'] ?? []));
+      $item['ok'] = $receiptCount > 0 && trim((string)($allocation['latest_stored_filename'] ?? '')) !== '';
+      $item['detail_vi'] = $item['ok']
+        ? 'Workbook đã điền đã được tiếp nhận. Phiên bản mới nhất: ' . (string)($allocation['latest_stored_filename'] ?? '')
+        : 'Chưa có workbook đã điền nào được tiếp nhận.';
+      $item['detail_en'] = $item['ok']
+        ? 'A completed workbook has been received. Latest file: ' . (string)($allocation['latest_stored_filename'] ?? '')
+        : 'No completed workbook has been received yet.';
+      break;
+    }
+  }
+
+  return $item;
+}
+
+function evidence_evaluate_checklist(array $allocation, string $stage = 'review'): array {
+  $stage = strtolower(trim($stage));
+  if (!in_array($stage, ['review', 'approval'], true)) $stage = 'review';
+
+  $formCode = trim((string)($allocation['form_code'] ?? ''));
+  $schema = $formCode !== '' ? (load_form_schema_by_code($formCode) ?: []) : [];
+  $entry = null;
+  if ($formCode !== '' && (($allocation['delivery_mode'] ?? '') === 'online' || ($schema['online'] ?? true) !== false)) {
+    $entry = evidence_find_online_entry(
+      $formCode,
+      trim((string)($allocation['allocation_id'] ?? '')),
+      trim((string)($allocation['online_submission']['entry_id'] ?? ''))
+    );
+  }
+
+  $items = [];
+  $requiredCount = 0;
+  $completeCount = 0;
+  foreach (evidence_default_requirements($allocation, $schema) as $requirement) {
+    $required = evidence_requirement_applies($requirement, $stage);
+    $item = evidence_evaluate_requirement($requirement, $allocation, $schema, $entry);
+    $item['required'] = $required;
+    if ($required) {
+      $requiredCount++;
+      if (!empty($item['ok'])) $completeCount++;
+    }
+    $items[] = $item;
+  }
+
+  $missingIds = [];
+  foreach ($items as $item) {
+    if (!empty($item['required']) && empty($item['ok'])) $missingIds[] = (string)($item['id'] ?? '');
+  }
+
+  return [
+    'ok' => empty($missingIds),
+    'stage' => $stage,
+    'evaluated_at' => now_iso(),
+    'required_count' => $requiredCount,
+    'complete_count' => $completeCount,
+    'missing_ids' => $missingIds,
+    'items' => $items,
+  ];
+}
+
 function build_user_initials(string $username): string {
   $parts = preg_split('/[\.\-_@\s]+/', strtoupper(trim($username)));
   $initials = '';
@@ -6065,6 +6366,55 @@ function allocation_find_by_record_id(array $store, string $recordId): ?array {
     }
   }
   return null;
+}
+
+function allocation_resolve_received_file(array $allocation, int $version = 0): ?array {
+  $allocationId = trim((string)($allocation['allocation_id'] ?? ''));
+  if ($allocationId === '') return null;
+
+  $receipts = array_values(array_filter((array)($allocation['receipts'] ?? []), fn($row) => is_array($row)));
+  if (!$receipts) {
+    $filename = trim((string)($allocation['latest_stored_filename'] ?? ''));
+    if ($filename === '') return null;
+    $path = allocation_base_dir() . '/uploads/' . $allocationId . '/' . $filename;
+    if (!is_file($path)) return null;
+    return [
+      'version' => (int)($allocation['receipt_version'] ?? 0),
+      'stored_filename' => $filename,
+      'server_path' => $path,
+      'uploaded_at' => (string)($allocation['latest_upload_timestamp'] ?? ''),
+      'uploaded_by' => '',
+    ];
+  }
+
+  $selected = null;
+  if ($version > 0) {
+    foreach ($receipts as $row) {
+      if ((int)($row['version'] ?? 0) === $version) {
+        $selected = $row;
+        break;
+      }
+    }
+  }
+  if (!$selected) {
+    usort($receipts, fn($a, $b) => (int)($b['version'] ?? 0) <=> (int)($a['version'] ?? 0));
+    $selected = $receipts[0] ?? null;
+  }
+  if (!is_array($selected)) return null;
+
+  $filename = trim((string)($selected['stored_filename'] ?? ''));
+  if ($filename === '') return null;
+  $path = trim((string)($selected['server_path'] ?? ''));
+  if ($path === '') $path = allocation_base_dir() . '/uploads/' . $allocationId . '/' . $filename;
+  if (!is_file($path)) return null;
+
+  return [
+    'version' => (int)($selected['version'] ?? 0),
+    'stored_filename' => $filename,
+    'server_path' => $path,
+    'uploaded_at' => (string)($selected['uploaded_at'] ?? ''),
+    'uploaded_by' => (string)($selected['uploaded_by'] ?? ''),
+  ];
 }
 
 function next_record_id_value(string $recordType, string $year): array {
@@ -11613,6 +11963,21 @@ if ($username === '') {
     ]);
   }
 
+  case 'form_fill_download_received': {
+    require_logged_in($store);
+    $allocationId = trim((string)($_GET['allocation_id'] ?? $_POST['allocation_id'] ?? ''));
+    $version = max(0, (int)($_GET['version'] ?? $_POST['version'] ?? 0));
+    if ($allocationId === '') api_json(['ok' => false, 'error' => 'missing_allocation_id'], 400);
+
+    $allocation = allocation_find(load_allocation_store(), $allocationId);
+    if (!$allocation) api_json(['ok' => false, 'error' => 'allocation_not_found'], 404);
+
+    $receipt = allocation_resolve_received_file($allocation, $version);
+    if (!$receipt) api_json(['ok' => false, 'error' => 'received_file_not_found'], 404);
+
+    stream_download_file((string)$receipt['server_path'], (string)$receipt['stored_filename']);
+  }
+
   case 'form_fill_submit_online': {
     $me = require_logged_in($store);
     require_csrf();
@@ -11711,7 +12076,12 @@ if ($username === '') {
     ]);
     save_allocation_store($allocationStore);
 
-    api_json(['ok' => true, 'entry_id' => $entryId, 'allocation' => $allocation]);
+    api_json([
+      'ok' => true,
+      'entry_id' => $entryId,
+      'allocation' => $allocation,
+      'checklist' => evidence_evaluate_checklist($allocation, 'review'),
+    ]);
   }
 
   case 'upload_read_hidden_sheet': {
@@ -11830,6 +12200,8 @@ if ($username === '') {
         'verification' => $verification,
         'receipt_version' => $receiptVersion,
         'stored_filename' => $storedFilename,
+        'download_url' => 'api.php?action=form_fill_download_received&allocation_id=' . rawurlencode($allocationId) . '&version=' . $receiptVersion,
+        'checklist' => evidence_evaluate_checklist($allocation, 'review'),
         'warning' => ($verification['warnings'] ?? []) ? 'filename_warning' : null,
       ]);
     } finally {
@@ -14097,6 +14469,93 @@ if ($username === '') {
 
   // ── Evidence Approval Engine (G3 P1-02) ─────────────────────────────────
 
+  case 'evidence_checklist': {
+    require_logged_in($store);
+    $body = read_json_body();
+    $allocationId = trim((string)($body['allocation_id'] ?? $_GET['allocation_id'] ?? ''));
+    $stage = trim((string)($body['stage'] ?? $_GET['stage'] ?? 'review'));
+    if ($allocationId === '') api_json(['ok' => false, 'error' => 'missing_allocation_id'], 400);
+
+    $allocation = allocation_find(load_allocation_store(), $allocationId);
+    if (!$allocation) api_json(['ok' => false, 'error' => 'allocation_not_found'], 404);
+
+    $checklist = evidence_evaluate_checklist($allocation, $stage);
+    api_json(['ok' => true, 'checklist' => $checklist, 'allocation' => $allocation]);
+  }
+
+  case 'evidence_pack_export': {
+    require_logged_in($store);
+    $allocationId = trim((string)($_GET['allocation_id'] ?? $_POST['allocation_id'] ?? ''));
+    if ($allocationId === '') api_json(['ok' => false, 'error' => 'missing_allocation_id'], 400);
+    if (!class_exists('ZipArchive')) api_json(['ok' => false, 'error' => 'zip_archive_not_available'], 500);
+
+    $allocation = allocation_find(load_allocation_store(), $allocationId);
+    if (!$allocation) api_json(['ok' => false, 'error' => 'allocation_not_found'], 404);
+
+    $tmpDir = allocation_base_dir() . '/tmp';
+    ensure_dir($tmpDir);
+    $safeBase = preg_replace('/[^A-Za-z0-9._-]/', '-', (string)($allocation['record_id'] ?? $allocationId));
+    $downloadName = ($safeBase !== '' ? $safeBase : $allocationId) . '-evidence-pack.zip';
+    $tmpFile = $tmpDir . '/evidence-pack-' . $allocationId . '-' . date('YmdHis') . '.zip';
+
+    $zip = new ZipArchive();
+    if ($zip->open($tmpFile, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+      api_json(['ok' => false, 'error' => 'zip_open_failed'], 500);
+    }
+
+    $manifest = [
+      'generated_at' => now_iso(),
+      'record_id' => (string)($allocation['record_id'] ?? ''),
+      'allocation_id' => $allocationId,
+      'allocation' => $allocation,
+      'review_checklist' => evidence_evaluate_checklist($allocation, 'review'),
+      'approval_checklist' => evidence_evaluate_checklist($allocation, 'approval'),
+    ];
+    $zip->addFromString('manifest.json', json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+
+    if (!empty($allocation['events']) && is_array($allocation['events'])) {
+      $zip->addFromString('audit-trail.json', json_encode($allocation['events'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    }
+    if (!empty($allocation['approval_signature']) && is_array($allocation['approval_signature'])) {
+      $zip->addFromString('approval-signature.json', json_encode($allocation['approval_signature'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    }
+
+    $formCode = trim((string)($allocation['form_code'] ?? ''));
+    $entryId = trim((string)($allocation['online_submission']['entry_id'] ?? ''));
+    if ($formCode !== '') {
+      $entry = evidence_find_online_entry($formCode, $allocationId, $entryId);
+      if ($entry) {
+        $zip->addFromString('online-submission.json', json_encode($entry, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+      }
+    }
+
+    $issuedPath = trim((string)($allocation['offline_package']['issued_path'] ?? ''));
+    $issuedName = trim((string)($allocation['offline_package']['filename'] ?? ''));
+    if ($issuedPath !== '' && is_file($issuedPath)) {
+      $zip->addFile($issuedPath, 'issued/' . ($issuedName !== '' ? $issuedName : basename($issuedPath)));
+    }
+
+    $receipts = array_values(array_filter((array)($allocation['receipts'] ?? []), fn($row) => is_array($row)));
+    if ($receipts) {
+      foreach ($receipts as $receipt) {
+        $serverPath = trim((string)($receipt['server_path'] ?? ''));
+        if ($serverPath === '' || !is_file($serverPath)) continue;
+        $version = (int)($receipt['version'] ?? 0);
+        $storedFilename = trim((string)($receipt['stored_filename'] ?? basename($serverPath)));
+        $entryName = 'received/' . ($version > 0 ? ('R' . $version . '_') : '') . $storedFilename;
+        $zip->addFile($serverPath, $entryName);
+      }
+    } else {
+      $receipt = allocation_resolve_received_file($allocation, 0);
+      if ($receipt && is_file((string)($receipt['server_path'] ?? ''))) {
+        $zip->addFile((string)$receipt['server_path'], 'received/' . (string)($receipt['stored_filename'] ?? basename((string)$receipt['server_path'])));
+      }
+    }
+
+    $zip->close();
+    stream_download_file($tmpFile, $downloadName);
+  }
+
   case 'evidence_submit_for_review': {
     $me = require_logged_in($store);
     require_csrf();
@@ -14109,15 +14568,20 @@ if ($username === '') {
     if (!is_array($allocation)) api_json(['ok' => false, 'error' => 'allocation_not_found'], 404);
 
     $currentStatus = allocation_status_normalize((string)($allocation['status'] ?? 'allocated'));
-    if ($currentStatus !== 'submitted') {
+    if (!in_array($currentStatus, ['submitted', 'received'], true)) {
       api_json(['ok' => false, 'error' => 'invalid_status_for_review', 'current_status' => $currentStatus], 409);
+    }
+
+    $checklist = evidence_evaluate_checklist($allocation, 'review');
+    if (!($checklist['ok'] ?? false)) {
+      api_json(['ok' => false, 'error' => 'evidence_incomplete', 'checklist' => $checklist], 422);
     }
 
     $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
     allocation_append_event($allocation, 'in_review', $username, 'evidence_submitted_for_review');
     save_allocation_store($allocationStore);
 
-    api_json(['ok' => true, 'allocation' => $allocation]);
+    api_json(['ok' => true, 'allocation' => $allocation, 'checklist' => $checklist]);
   }
 
   case 'evidence_review': {
@@ -14165,6 +14629,11 @@ if ($username === '') {
     $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
 
     if ($reviewAction === 'approve') {
+      $checklist = evidence_evaluate_checklist($allocation, 'approval');
+      if (!($checklist['ok'] ?? false)) {
+        api_json(['ok' => false, 'error' => 'evidence_incomplete', 'checklist' => $checklist], 422);
+      }
+
       // Step-up re-auth: verify password
       $password = trim((string)($body['password'] ?? ''));
       if ($password === '') {
@@ -14207,7 +14676,12 @@ if ($username === '') {
     save_allocation_store($allocationStore);
 
     $newStatus = allocation_status_normalize((string)($allocation['status'] ?? ''));
-    api_json(['ok' => true, 'status' => $newStatus, 'allocation' => $allocation]);
+    api_json([
+      'ok' => true,
+      'status' => $newStatus,
+      'allocation' => $allocation,
+      'checklist' => evidence_evaluate_checklist($allocation, $newStatus === 'approved' ? 'approval' : 'review'),
+    ]);
   }
 
   case 'evidence_reopen': {
@@ -14305,7 +14779,9 @@ if ($username === '') {
     require_once __DIR__ . '/api/services/UploadHardeningService.php';
     $svc = new UploadHardeningService($DATA_DIR);
     $vr = $svc->verifyQuarantinedFile($quarantineId);
-    api_json(['ok' => $vr->ok, 'status' => $vr->status, 'message' => $vr->message, 'checks' => $vr->checks]);
+    $sidecarPath = $DATA_DIR . '/uploads/quarantine/' . $quarantineId . '.json';
+    $metadata = is_file($sidecarPath) ? (json_decode((string)file_get_contents($sidecarPath), true) ?: null) : null;
+    api_json(['ok' => $vr->ok, 'status' => $vr->status, 'message' => $vr->message, 'checks' => $vr->checks, 'metadata' => $metadata]);
   }
 
   case 'upload_accept': {
@@ -14318,9 +14794,15 @@ if ($username === '') {
 
     require_once __DIR__ . '/api/services/UploadHardeningService.php';
     $svc = new UploadHardeningService($DATA_DIR);
+    $sidecarPath = $DATA_DIR . '/uploads/quarantine/' . $quarantineId . '.json';
+    $metadata = is_file($sidecarPath) ? (json_decode((string)file_get_contents($sidecarPath), true) ?: null) : null;
+    if (!is_array($metadata)) api_json(['ok' => false, 'error' => 'quarantine_metadata_not_found'], 404);
+    if ((string)($metadata['status'] ?? 'quarantined') !== 'verified') {
+      api_json(['ok' => false, 'error' => 'quarantine_not_verified', 'metadata' => $metadata], 409);
+    }
     try {
       $path = $svc->acceptFile($quarantineId, $targetDir);
-      api_json(['ok' => true, 'accepted_path' => $path]);
+      api_json(['ok' => true, 'accepted_path' => $path, 'metadata' => $metadata]);
     } catch (Throwable $e) {
       api_json(['ok' => false, 'error' => $e->getMessage()], 500);
     }
@@ -14349,7 +14831,66 @@ if ($username === '') {
     require_once __DIR__ . '/api/services/UploadHardeningService.php';
     $svc = new UploadHardeningService($DATA_DIR);
     $days = max(1, min(365, (int)($_GET['days'] ?? 30)));
+    $department = strtoupper(trim((string)($_GET['department'] ?? '')));
+    $formCode = trim((string)($_GET['form_code'] ?? ''));
+    $statusFilter = trim((string)($_GET['status'] ?? ''));
+    $dateFrom = trim((string)($_GET['date_from'] ?? ''));
+    $dateTo = trim((string)($_GET['date_to'] ?? ''));
     $exceptions = $svc->getExceptionQueue($days);
+    $allocationStore = load_allocation_store();
+    $allocationIndex = [];
+    foreach ((array)($allocationStore['allocations'] ?? []) as $allocationRow) {
+      if (!is_array($allocationRow)) continue;
+      $aid = trim((string)($allocationRow['allocation_id'] ?? ''));
+      if ($aid === '') continue;
+      $allocationIndex[$aid] = $allocationRow;
+    }
+
+    $exceptions = array_values(array_filter(array_map(function ($row) use ($allocationIndex) {
+      if (!is_array($row)) return null;
+      $extra = is_array($row['extra'] ?? null) ? $row['extra'] : [];
+      $allocationId = trim((string)($extra['allocation_id'] ?? ''));
+      $allocation = $allocationId !== '' ? ($allocationIndex[$allocationId] ?? null) : null;
+
+      if ($allocation) {
+        $row['allocation_id'] = $allocationId;
+        $row['record_id'] = (string)($allocation['record_id'] ?? '');
+        $row['department'] = (string)($allocation['department'] ?? '');
+        $row['form_code'] = trim((string)($extra['form_code'] ?? $allocation['form_code'] ?? ''));
+        $row['delivery_mode'] = (string)($allocation['delivery_mode'] ?? '');
+        $row['master_context'] = is_array($allocation['master_context'] ?? null) ? $allocation['master_context'] : [];
+        $row['allocation_status'] = (string)($allocation['status'] ?? '');
+      } else {
+        $row['allocation_id'] = $allocationId;
+        $row['record_id'] = '';
+        $row['department'] = trim((string)($extra['department'] ?? ''));
+        $row['form_code'] = trim((string)($extra['form_code'] ?? ''));
+        $row['delivery_mode'] = '';
+        $row['master_context'] = [];
+        $row['allocation_status'] = '';
+      }
+
+      $row['quarantine_id'] = trim((string)($extra['quarantine_id'] ?? ''));
+      return $row;
+    }, $exceptions), function ($row) use ($department, $formCode, $statusFilter, $dateFrom, $dateTo) {
+      if (!is_array($row)) return false;
+      $rowDept = strtoupper(trim((string)($row['department'] ?? '')));
+      $rowForm = trim((string)($row['form_code'] ?? ''));
+      $rowType = trim((string)($row['type'] ?? ''));
+      $rowTime = strtotime((string)($row['timestamp'] ?? ''));
+      if ($department !== '' && $rowDept !== $department) return false;
+      if ($formCode !== '' && $rowForm !== $formCode) return false;
+      if ($statusFilter !== '' && $rowType !== $statusFilter) return false;
+      if ($dateFrom !== '') {
+        $fromTs = strtotime($dateFrom . ' 00:00:00');
+        if ($fromTs !== false && ($rowTime === false || $rowTime < $fromTs)) return false;
+      }
+      if ($dateTo !== '') {
+        $toTs = strtotime($dateTo . ' 23:59:59');
+        if ($toTs !== false && ($rowTime === false || $rowTime > $toTs)) return false;
+      }
+      return true;
+    }));
     api_json(['ok' => true, 'exceptions' => $exceptions, 'count' => count($exceptions)]);
   }
 

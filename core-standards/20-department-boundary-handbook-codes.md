@@ -49,7 +49,7 @@ Chỉ dùng `role code` khi tài liệu cần:
 
 `Department code` có dạng `D-XXX`, là mandate cấp phòng ban hoặc phân hệ ổn định, ví dụ:
 - `D-SCS`, `D-ENG`, `D-PROD`, `D-QUAL`, `D-SCM`, `D-FIN`, `D-HR`, `D-EHS`, `D-IT`
-- `D-PPC`, `D-PUR`, `D-WHS`, `D-TCR`, `D-LOG`, `D-ERP`
+- `D-PPC`, `D-MNT`, `D-PUR`, `D-WHS`, `D-TCR`, `D-LOG`, `D-ERP`
 
 Chỉ dùng `department code` khi tài liệu đang nói tới:
 - phạm vi trách nhiệm tập thể của cả phòng ban;
@@ -82,7 +82,7 @@ Bundle chỉ dùng khi trách nhiệm thực sự là lớp actor chung nhiều 
 - tài liệu đang chỉ ra đơn vị phải tham gia hoặc phải cung cấp đầu vào;
 - đó là handbook phòng ban hoặc bảng mô tả ranh giới chức năng;
 - một nhiệm vụ là responsibility chung của cả phòng ban, không phải quyết định ký duyệt;
-- phân hệ ổn định cần được nhìn thấy độc lập với JD, ví dụ `D-PPC`, `D-WHS`, `D-LOG`, `D-ERP`.
+- phân hệ ổn định cần được nhìn thấy độc lập với JD, ví dụ `D-PPC`, `D-MNT`, `D-WHS`, `D-LOG`, `D-ERP`.
 
 ### 3.3 Không được dùng department code để thay cho role code khi
 
@@ -131,6 +131,7 @@ Rule resolve:
 ### 4.2 Subfunctions
 
 - `D-PPC` — Production Planning and Control Function
+- `D-MNT` — Maintenance Function
 - `D-PUR` — Purchasing Function
 - `D-WHS` — Warehouse Function
 - `D-TCR` — Tool Crib Function
@@ -142,6 +143,7 @@ Rule resolve:
 Trong cac tai lieu so hoa / KPI / ERP / M365, phai tach ro:
 - `D-IT` = ha tang CNTT nen, endpoint, network, backup, access lifecycle.
 - `D-ERP` = quan tri ERP, workflow, transaction integrity, BAQ/reporting governance.
+- `D-MNT` = phạm vi bảo trì lặp lại cấp chức năng trong `D-PROD`: PM, breakdown response, machine health evidence, readiness hỗ trợ restart; không tự động đồng nghĩa với một JD quản lý bảo trì riêng.
 - cac `D-code` chuc nang nhu `D-SCS`, `D-ENG`, `D-PROD`, `D-QUAL`, `D-SCM`, `D-FIN`, `D-HR`, `D-EHS` = noi so huu noi dung nghiep vu, quy tac giao dich va quy tac dung du lieu trong pham vi minh.
 
 Vi vay:
@@ -211,6 +213,11 @@ Khong duoc giu text nua mua kieu:
 - `truong bo phan`, `line manager`, `supervisor`, `team lead`;
 - `phong lien quan`, `cac phong chuc nang`, `bo phan chuyen mon`.
 
+Neu can gom mot nhom `D-code` de rut gon:
+- phai tao thanh `department bundle` hoac `mixed bundle` cong bo trong registry;
+- phai co ten bundle, thanh phan, pham vi dung va canh bao khong duoc lam thay ro tai `02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html`;
+- khong duoc de text tran kieu `Support`, `Operations`, `all functions`, `back office`, `site support` trong actor cell, owner cell, audience cell, matrix row hoac org summary.
+
 Khi mot tu khoa phong ban cu xuat hien trong body SOP/WI/ANNEX/JD, nguoi sua phai tra loi ro no dang noi ve:
 1. mot department/subfunction;
 2. mot role co JD that;
@@ -277,8 +284,9 @@ Ngoài danh mục trên, handbook PHẢI thể hiện rõ:
 - Không để placeholder như `các phòng liên quan`, `các phòng chức năng`, `line manager`, `line owner`, `bộ phận chuyên môn` trong handbook phát hành.
 - Không đưa note biên tập, note migration, note “bản này thay bản trước” vào handbook.
 - Link handbook trong index, TOC, preface, note, legend hoặc reference list PHẢI hiển `D-code` canonical của handbook đích.
-- Subfunction code như `D-PPC`, `D-WHS`, `D-LOG`, `D-PUR`, `D-TCR`, `D-ERP` chỉ hiển trong owner/RACI/interface khi ngữ cảnh thật sự là subfunction.
+- Subfunction code như `D-PPC`, `D-MNT`, `D-WHS`, `D-LOG`, `D-PUR`, `D-TCR`, `D-ERP` chỉ hiển trong owner/RACI/interface khi ngữ cảnh thật sự là subfunction.
 - Không dùng `D-PPC` làm nhãn cho department-summary link tới production handbook và không dùng `D-LOG` làm nhãn cho supply-chain handbook summary.
+- `ALL_DEPTS` khi được dùng như bundle phạm vi doanh nghiệp PHẢI bao gồm toàn bộ `department code` và `subfunction code` đã công bố trong registry hiện hành; không được bỏ sót subfunction đã phát hành như `D-PPC`, `D-MNT`, `D-PUR`, `D-WHS`, `D-TCR`, `D-LOG`, `D-ERP`.
 
 ---
 

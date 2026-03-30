@@ -48,7 +48,10 @@ var ws = {
   uploadFiles: [],
   allocBusy: false,
   allocDept: '',
-  allocNotes: ''
+  allocNotes: '',
+  lastFormCode: '',
+  checklistCache: {},
+  checklistLoading: {}
 };
 
 /* ── Data helpers ── */
@@ -96,10 +99,85 @@ function detectDepartment(form){
 }
 function selectedAllocation(){
   var st=window._ecState||{};
-  return (st.allocations||[]).find(function(a){ return a.allocation_id===st.selectedAllocationId; })||null;
+  var allocation=(st.allocations||[]).find(function(a){ return a.allocation_id===st.selectedAllocationId; })||null;
+  if(!allocation && st.selectedAllocationId && window.console && typeof window.console.warn === 'function'){
+    window.console.warn('[EvidenceControl] allocation not found for selectedAllocationId:', st.selectedAllocationId);
+  }
+  return allocation;
 }
 
 /* ── Draft management ── */
+function resetWorkspaceForForm(form){
+  var code = form && form.form_code ? form.form_code : '';
+  if(!code || ws.lastFormCode === code) return;
+  ws.lastFormCode = code;
+  ws.fieldValues = {};
+  ws.signatures = {};
+  ws.lookupInstances = {};
+  ws.uploadFiles = [];
+  ws.draftKey = '';
+}
+
+function checklistStage(allocation){
+  var status = String((allocation && allocation.status) || '').toLowerCase();
+  return (status === 'in_review' || status === 'approved') ? 'approval' : 'review';
+}
+
+function checklistKey(allocation, stage){
+  return ((allocation && allocation.allocation_id) || '') + '::' + (stage || 'review');
+}
+
+function loadChecklist(allocation, stage){
+  if(!allocation || !allocation.allocation_id) return Promise.resolve(null);
+  stage = stage || checklistStage(allocation);
+  var key = checklistKey(allocation, stage);
+  if(ws.checklistCache[key]) return Promise.resolve(ws.checklistCache[key]);
+  if(ws.checklistLoading[key]) return ws.checklistLoading[key];
+  ws.checklistLoading[key] = api('evidence_checklist', { allocation_id: allocation.allocation_id, stage: stage }, 'GET').then(function(resp){
+    if(resp && resp.ok && resp.checklist) ws.checklistCache[key] = resp.checklist;
+    return ws.checklistCache[key] || null;
+  }).catch(function(){ return null; }).finally(function(){ delete ws.checklistLoading[key]; });
+  return ws.checklistLoading[key];
+}
+
+function cacheChecklist(allocation, stage, checklist){
+  if(!allocation || !allocation.allocation_id || !checklist) return;
+  ws.checklistCache[checklistKey(allocation, stage || checklistStage(allocation))] = checklist;
+}
+
+function renderChecklist(allocation){
+  if(!allocation || !allocation.allocation_id) return '';
+  var stage = checklistStage(allocation);
+  var key = checklistKey(allocation, stage);
+  var checklist = ws.checklistCache[key] || null;
+  if(!checklist){
+    return '<div class="ec-checklist loading"><div class="ec-checklist-head"><strong>' + esc(t('Evidence checklist', 'Evidence checklist')) + '</strong><span>' + esc(t('Dang tai...', 'Loading...')) + '</span></div></div>';
+  }
+  var items = Array.isArray(checklist.items) ? checklist.items : [];
+  return '<div class="ec-checklist ' + (checklist.ok ? 'ok' : 'fail') + '">' +
+    '<div class="ec-checklist-head"><strong>' + esc(t('Evidence checklist', 'Evidence checklist')) + '</strong><span>' + esc((checklist.complete_count || 0) + '/' + (checklist.required_count || 0)) + '</span></div>' +
+    '<div class="ec-checklist-list">' + items.map(function(item){
+      var statusClass = item.required ? (item.ok ? 'ok' : 'miss') : 'skip';
+      var detail = t(item.detail_vi || '', item.detail_en || item.detail_vi || '');
+      return '<div class="ec-check-item ' + statusClass + '">' +
+        '<div class="ec-check-item-title">' + esc(t(item.label_vi || item.label || item.id, item.label_en || item.label || item.id)) + '</div>' +
+        (detail ? '<div class="ec-check-item-detail">' + esc(detail) + '</div>' : '') +
+      '</div>';
+    }).join('') + '</div>' +
+  '</div>';
+}
+
+function renderEvidenceActions(allocation){
+  if(!allocation || !allocation.allocation_id) return '';
+  return '<div class="ec-actions"><button class="ec-btn ghost" id="ec-export-pack">' + esc(t('Xuat evidence pack', 'Export evidence pack')) + '</button></div>';
+}
+
+function isLockedContextField(fieldId, allocation){
+  var ctx = allocation && allocation.master_context ? allocation.master_context : null;
+  if(!ctx) return false;
+  return Object.prototype.hasOwnProperty.call(ctx, fieldId) && ctx[fieldId] !== '' && ctx[fieldId] !== null && ctx[fieldId] !== undefined;
+}
+
 function draftKey(form,alloc){ return 'qms_ec_'+((form&&form.form_code)||'')+'_'+((alloc&&alloc.allocation_id)||''); }
 function loadDraft(form,alloc){
   var key=draftKey(form,alloc);
@@ -124,6 +202,7 @@ function hydrateFromAlloc(alloc){
    ══════════════════════════════════════════════════════ */
 
 window._renderWorkspace = function(form, allocation, container){
+  resetWorkspaceForForm(form);
   Promise.all([ensureMaster(), ensureOrders(), loadSchema(form.form_code)]).then(function(){
     ws.schema = form.schema || ws.schema;
     if(!ws.allocDept) ws.allocDept = detectDepartment(form);
@@ -131,6 +210,9 @@ window._renderWorkspace = function(form, allocation, container){
     return preloadSelectedOnlineEntry(form, allocation);
   }).then(function(){
     renderWorkspace(form, allocation, container);
+    return loadChecklist(allocation);
+  }).then(function(){
+    if(allocation) renderWorkspace(form, allocation, container);
   }).catch(function(){
     renderWorkspace(form, allocation, container);
   });
@@ -273,6 +355,9 @@ function renderOnlineStep(form, allocation){
     }).join('') + '</div></div>';
   }
 
+  html += renderChecklist(allocation);
+  html += renderEvidenceActions(allocation);
+
   /* actions */
   html += '<div class="ec-actions">' +
     '<button class="ec-btn secondary" id="ec-save-draft">' + esc(t('Lưu nháp','Save draft')) + '</button>' +
@@ -282,7 +367,6 @@ function renderOnlineStep(form, allocation){
 
   /* approval bar */
   html += renderApprovalBar(allocation);
-
   html += '</div></div>';
   return html;
 }
@@ -313,6 +397,10 @@ function renderOfflineStep(form, allocation){
     (fname ? '<button class="ec-btn secondary" id="ec-copy-filename">' + esc(t('Sao chép tên file','Copy filename')) + '</button>' : '') +
   '</div>';
 
+  if(allocation.latest_stored_filename){
+    html += '<div style="margin:-8px 0 16px"><button class="ec-btn secondary" id="ec-download-received">' + esc(t('Download latest submitted workbook', 'Download latest submitted workbook')) + '</button></div>';
+  }
+
   /* upload section */
   html += '<div style="border-top:1px solid var(--ec-border);padding-top:16px">' +
     '<div style="font-size:13px;font-weight:700;color:var(--ec-text);margin-bottom:10px">' + esc(t('Nộp workbook đã điền', 'Submit completed workbook')) + '</div>' +
@@ -325,6 +413,9 @@ function renderOfflineStep(form, allocation){
     (ws.uploadFiles.length ? '<div class="ec-actions"><button class="ec-btn secondary" id="ec-clear-queue">' + esc(t('Xóa danh sách','Clear')) + '</button><button class="ec-btn success" id="ec-receive-all">' + esc(t('Tiếp nhận file hợp lệ','Receive valid files')) + '</button></div>' : '') +
   '</div>';
 
+  html += renderChecklist(allocation);
+  html += renderEvidenceActions(allocation);
+  html += renderApprovalBar(allocation);
   html += '</div></div>';
   return html;
 }
@@ -358,27 +449,32 @@ function renderField(field){
   var cls='ec-field';
   if(field.width==='full'||field.type==='textarea'||field.type==='multi_select') cls+=' full';
   else if(field.width==='third') cls+=' third';
+  var allocation = selectedAllocation();
+  var locked = isLockedContextField(field.id, allocation);
   var label=t(field.label_vi||field.label||field.id,field.label_en||field.label||field.id);
   var req=field.required?'<span class="req">*</span>':'';
+  var lockHint=locked?'<span class="ec-lock-badge" aria-hidden="true">Locked</span>':'';
   var note=field.helper_vi||field.helper||field.note_vi||field.note||'';
   var val=ws.fieldValues[field.id];
   if(val===undefined||val===null) val='';
 
-  var h='<div class="'+cls+'"><label class="ec-label" for="ec-f-'+esc(field.id)+'">'+esc(label)+req+'</label>';
+  var lockAttrs = locked ? ' disabled aria-disabled="true"' : '';
+  var lockReadOnly = locked ? ' readonly aria-disabled="true"' : '';
+  var h='<div class="'+cls+(locked?' ec-field-locked':'')+'"><label class="ec-label" for="ec-f-'+esc(field.id)+'">'+esc(label)+req+lockHint+'</label>';
   if(field.type==='lookup'){
-    h+='<div id="ec-f-'+esc(field.id)+'"></div>';
+    h+='<div id="ec-f-'+esc(field.id)+'"'+(locked?' data-locked="1"':'')+'></div>';
   } else if(field.type==='select'){
-    h+='<select class="ec-select" id="ec-f-'+esc(field.id)+'"><option value="">'+esc(t('Chọn','Select'))+'</option>'+(field.options||[]).map(function(o){var v=typeof o==='string'?o:o.value;var txt=typeof o==='string'?o:(o.label_vi||o.label||o.value);return '<option value="'+esc(v)+'"'+(String(val)===String(v)?' selected':'')+'>'+esc(t(txt,o.label_en||o.label||v))+'</option>';}).join('')+'</select>';
+    h+='<select class="ec-select" id="ec-f-'+esc(field.id)+'"'+lockAttrs+'><option value="">'+esc(t('Chọn','Select'))+'</option>'+(field.options||[]).map(function(o){var v=typeof o==='string'?o:o.value;var txt=typeof o==='string'?o:(o.label_vi||o.label||o.value);return '<option value="'+esc(v)+'"'+(String(val)===String(v)?' selected':'')+'>'+esc(t(txt,o.label_en||o.label||v))+'</option>';}).join('')+'</select>';
   } else if(field.type==='multi_select'){
     var cur=Array.isArray(val)?val:[];
-    h+='<div class="ec-multi">'+(field.options||[]).map(function(o){var v=typeof o==='string'?o:o.value;var txt=typeof o==='string'?o:(o.label_vi||o.label||o.value);return '<label class="ec-check"><input type="checkbox" data-multi="'+esc(field.id)+'" value="'+esc(v)+'"'+(cur.indexOf(v)>=0?' checked':'')+'><span>'+esc(t(txt,o.label_en||o.label||v))+'</span></label>';}).join('')+'</div>';
+    h+='<div class="ec-multi">'+(field.options||[]).map(function(o){var v=typeof o==='string'?o:o.value;var txt=typeof o==='string'?o:(o.label_vi||o.label||o.value);return '<label class="ec-check"><input type="checkbox" data-multi="'+esc(field.id)+'" value="'+esc(v)+'"'+(cur.indexOf(v)>=0?' checked':'')+lockAttrs+'><span>'+esc(t(txt,o.label_en||o.label||v))+'</span></label>';}).join('')+'</div>';
   } else if(field.type==='checkbox'){
-    h+='<label class="ec-check"><input id="ec-f-'+esc(field.id)+'" type="checkbox"'+(val===true||val==='true'||val===1?' checked':'')+'><span>'+esc(t(field.checkbox_label_vi||field.label_vi||field.id,field.checkbox_label_en||field.label_en||field.id))+'</span></label>';
+    h+='<label class="ec-check"><input id="ec-f-'+esc(field.id)+'" type="checkbox"'+(val===true||val==='true'||val===1?' checked':'')+lockAttrs+'><span>'+esc(t(field.checkbox_label_vi||field.label_vi||field.id,field.checkbox_label_en||field.label_en||field.id))+'</span></label>';
   } else if(field.type==='textarea'){
-    h+='<textarea class="ec-textarea" id="ec-f-'+esc(field.id)+'" placeholder="'+esc(t(field.placeholder_vi||'',field.placeholder_en||''))+'">'+esc(val)+'</textarea>';
+    h+='<textarea class="ec-textarea" id="ec-f-'+esc(field.id)+'"'+lockReadOnly+' placeholder="'+esc(t(field.placeholder_vi||'',field.placeholder_en||''))+'">'+esc(val)+'</textarea>';
   } else {
     var type=field.type==='date'?'date':field.type==='time'?'time':field.type==='number'?'number':'text';
-    h+='<input class="ec-input" id="ec-f-'+esc(field.id)+'" type="'+type+'" value="'+esc(val)+'" placeholder="'+esc(t(field.placeholder_vi||'',field.placeholder_en||''))+'">';
+    h+='<input class="ec-input" id="ec-f-'+esc(field.id)+'" type="'+type+'"'+lockReadOnly+' value="'+esc(val)+'" placeholder="'+esc(t(field.placeholder_vi||'',field.placeholder_en||''))+'">';
   }
   if(note) h+='<div class="ec-note">'+esc(t(note,field.helper_en||field.note_en||note))+'</div>';
   h+='</div>';
@@ -412,11 +508,11 @@ function currentApprovalState(schema){
 function renderApprovalBar(allocation){
   if(!allocation) return '';
   var status=String(allocation.status||'').toLowerCase();
-  if(status!=='submitted'&&status!=='in_review'&&status!=='approved'&&status!=='rejected') return '';
+  if(status!=='submitted'&&status!=='received'&&status!=='in_review'&&status!=='approved'&&status!=='rejected') return '';
   var canApprove=userHasApproveRole();
   var html='<div class="ec-approval '+status+'">';
 
-  if(status==='submitted'){
+  if(status==='submitted' || status==='received'){
     html+='<div class="ec-approval-text" style="color:var(--ec-warning)">'+esc(t('Chứng cứ đã nộp — sẵn sàng gửi duyệt','Evidence submitted — ready for review'))+'</div>';
     html+='<button class="ec-btn primary" id="ec-submit-review" style="background:var(--ec-warning)">'+esc(t('Gửi duyệt','Submit for review'))+'</button>';
   } else if(status==='in_review'){
@@ -459,13 +555,16 @@ function loadHistory(form){
 
 function bindWorkspace(form, allocation, container){
   /* step toggles */
-  container.addEventListener('click', function(e){
-    var toggle=e.target.closest('[data-toggle]');
-    if(toggle){
-      var stepEl=document.getElementById(toggle.getAttribute('data-toggle'));
-      if(stepEl) stepEl.classList.toggle('collapsed');
-    }
-  });
+  if(!container._ecToggleBound){
+    container.addEventListener('click', function(e){
+      var toggle=e.target.closest('[data-toggle]');
+      if(toggle){
+        var stepEl=document.getElementById(toggle.getAttribute('data-toggle'));
+        if(stepEl) stepEl.classList.toggle('collapsed');
+      }
+    });
+    container._ecToggleBound = true;
+  }
 
   /* allocate */
   var deptEl=document.getElementById('ec-alloc-dept');
@@ -474,6 +573,18 @@ function bindWorkspace(form, allocation, container){
   if(notesEl) notesEl.oninput=function(){ws.allocNotes=notesEl.value;};
   var allocBtn=document.getElementById('ec-alloc-btn');
   if(allocBtn) allocBtn.onclick=function(){ doAllocate(form, container); };
+
+  var exportBtn=document.getElementById('ec-export-pack');
+  if(exportBtn && allocation) exportBtn.onclick=function(){
+    var url='api.php?action=evidence_pack_export&allocation_id='+encodeURIComponent(allocation.allocation_id||'');
+    var link=document.createElement('a');
+    link.href=url;
+    link.target='_blank';
+    link.rel='noopener';
+    document.body.appendChild(link);
+    link.click();
+    if(link.parentNode) link.parentNode.removeChild(link);
+  };
 
   /* online form */
   if(allocation && form.online !== false){
@@ -486,6 +597,7 @@ function bindWorkspace(form, allocation, container){
     var submitBtn=document.getElementById('ec-submit-online');
     if(submitBtn) submitBtn.onclick=function(){ doSubmitOnline(form,allocation,submitBtn,container); };
     bindApprovalActions(form,allocation,container);
+    bindApprovalDialogs(form,allocation);
   }
 
   /* offline form */
@@ -520,26 +632,19 @@ function doAllocate(form, container){
     var st=window._ecState;
     st.selectedAllocationId=resp.allocation_id||'';
 
-    /* reload allocations and re-render the entire page */
-    var page=document.getElementById('page-forms');
-    if(page && typeof window.renderOnlineForms === 'function'){
-      /* quick reload: just refresh allocations and re-render */
-      window.AllocationTracker.getHistory({form_code:form.form_code,page_size:50}).then(function(r){
-        st.allocations=(r&&Array.isArray(r.entries))?r.entries.filter(function(a){return String(a.form_code||'')===form.form_code;}):[];
-        if(!st.selectedAllocationId&&st.allocations.length) st.selectedAllocationId=st.allocations[0].allocation_id;
-        /* re-render full page */
-        var renderFn=window.renderOnlineForms;
-        renderFn(form.form_code);
-
-        /* auto-trigger download for offline */
-        if(form.online===false){
-          setTimeout(function(){
-            var dlBtn=document.getElementById('ec-download-offline');
-            if(dlBtn) dlBtn.click();
-          },500);
-        }
+    var next = Promise.resolve(resp);
+    if(form.online===false){
+      next = window.AllocationTracker.downloadForm(resp.allocation_id,form.form_code,{master_context:masterCtx}).then(function(downloadResp){
+        if(downloadResp&&downloadResp.ok) toast(t('ÄÃ£ táº£i gÃ³i Excel.','Excel package downloaded.'),'success');
+        return downloadResp || resp;
+      }).catch(function(){
+        toast(t('KhÃ´ng thá»ƒ táº£i form offline ngay sau khi cáº¥p mÃ£.','Could not auto-download the offline form after allocation.'),'warn');
+        return resp;
       });
     }
+    next.finally(function(){
+      if(typeof window.renderOnlineForms === 'function') window.renderOnlineForms(form.form_code);
+    });
   }).catch(function(){
     ws.allocBusy=false;
     toast(t('Lỗi kết nối.','Connection error.'),'error');
@@ -560,6 +665,14 @@ function bindFormFields(form,allocation){
 
   /* bind simple fields */
   (schema.fields||[]).forEach(function(field){
+    if(isLockedContextField(field.id, allocation)){
+      var lockedEl=document.getElementById('ec-f-'+field.id);
+      if(lockedEl){
+        lockedEl.setAttribute('disabled', 'disabled');
+        lockedEl.setAttribute('aria-disabled', 'true');
+      }
+      return;
+    }
     if(field.type==='lookup') return;
     if(field.type==='multi_select'){
       var cur=Array.isArray(ws.fieldValues[field.id])?ws.fieldValues[field.id]:[];
@@ -580,6 +693,7 @@ function bindFormFields(form,allocation){
   ws.lookupInstances={};
   (schema.fields||[]).filter(function(f){return f.type==='lookup';}).forEach(function(field){
     var hostId='ec-f-'+field.id; if(!document.getElementById(hostId)) return;
+    if(isLockedContextField(field.id, allocation)) return;
     var items=buildLookupItems(field);
     if(typeof window.SearchableInput==='function'){
       var inst=new window.SearchableInput({containerId:hostId,fieldId:'ec-si-'+field.id,name:field.id,dataSource:items,displayField:'label',valueField:'value',subField:'sub',strictSelect:field.strict_select!==false,storeValueInHiddenField:true,placeholderVi:field.placeholder_vi||t('Tìm và chọn','Search and select'),placeholder:field.placeholder_en||'Search and select',onSelect:function(item){ ws.fieldValues[field.id]=item?item.value:''; if(item&&field.autofill_map) Object.keys(field.autofill_map).forEach(function(target){var src=field.autofill_map[target];if(item[src]!==undefined) ws.fieldValues[target]=item[src];}); }});
@@ -625,6 +739,15 @@ function bindSignatures(form){
   }
   /* sign buttons */
   Array.prototype.forEach.call(document.querySelectorAll('[data-sign]'),function(btn){
+    if(typeof window.ESignature!=='function'){
+      btn.disabled=true;
+      btn.setAttribute('aria-disabled','true');
+      return;
+    }
+    var blockIdAttr=btn.getAttribute('data-sign');
+    var canSignNow=canSignBlock(schema,blockIdAttr);
+    btn.disabled=!canSignNow;
+    btn.setAttribute('aria-disabled', canSignNow ? 'false' : 'true');
     btn.onclick=function(){
       var blockId=btn.getAttribute('data-sign');
       if(typeof window.ESignature!=='function'){toast(t('Chữ ký điện tử chưa sẵn sàng.','E-signature not available.'),'error');return;}
@@ -667,11 +790,19 @@ function doSubmitOnline(form,allocation,button,container){
   window.AllocationTracker.submitOnline(allocation.allocation_id,form.form_code,payload).then(function(resp){
     if(resp&&resp.ok){
       clearDraft(form,allocation);
-      linkOrderIfPossible(allocation);
-      toast(t('Đã gửi biểu mẫu thành công.','Form submitted successfully.'),'success');
-      if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);
+      return linkOrderIfPossible(allocation).then(function(linked){
+        toast(t('Đã gửi biểu mẫu thành công.','Form submitted successfully.'),'success');
+        if(linked===false) toast(t('Đã gửi biểu mẫu nhưng chưa liên kết được với đơn hàng.','Form submitted, but order linking did not complete.'),'warn');
+        if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);
+      });
     } else toast(t('Không thể gửi.','Could not submit.'),'error');
   }).catch(function(){toast(t('Lỗi kết nối.','Connection error.'),'error');}).finally(function(){button.disabled=false;});
+}
+
+function askTextDialog(options){
+  if(typeof window._ecPromptDialog === 'function') return window._ecPromptDialog(options || {});
+  var fallback = window.prompt((options && options.message) || '', (options && options.value) || '');
+  return Promise.resolve(fallback ? String(fallback).trim() : '');
 }
 
 function bindApprovalActions(form,allocation,container){
@@ -722,6 +853,50 @@ function bindApprovalActions(form,allocation,container){
 }
 
 /* ── Offline binding ── */
+function bindApprovalDialogs(form, allocation){
+  if(typeof window._ecPromptDialog !== 'function') return;
+
+  var approveBtn=document.getElementById('ec-approve');
+  if(approveBtn) approveBtn.onclick=function(){
+    if(typeof window.ESignature!=='function'){toast(t('Chá»¯ kÃ½ chÆ°a sáºµn sÃ ng.','Signature not available.'),'error');return;}
+    var u=user();
+    new window.ESignature({lang:(typeof lang!=='undefined'&&lang==='en')?'en':'vi',requireReason:true,requirePin:false}).show({signerId:u.signerId,signerName:u.name,signerRole:u.title||u.dept,signatureMeaning:t('PhÃª duyá»‡t chá»©ng cá»©','Evidence approval'),appliedTo:(allocation.record_id||'')+':approval',onSign:function(sigData){
+      askTextDialog({ title:'Password confirmation', message:'Enter your password to confirm approval.', type:'password', required:true, confirmLabel:t('Duyá»‡t','Approve') }).then(function(pw){
+        if(!pw){toast(t('ÄÃ£ há»§y.','Cancelled.'),'warn');return;}
+        approveBtn.disabled=true;
+        api('evidence_review',{allocation_id:allocation.allocation_id,action:'approve',reason:sigData.reason||'',signature_data:sigData,password:pw},'POST').then(function(r){
+          if(r&&r.ok){toast(t('ÄÃ£ phÃª duyá»‡t.','Approved.'),'success');if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);}
+          else toast(t('Lá»—i: ','Error: ')+(r&&r.error||''),'error');
+        }).finally(function(){approveBtn.disabled=false;});
+      });
+    }});
+  };
+
+  var rejectBtn=document.getElementById('ec-reject');
+  if(rejectBtn) rejectBtn.onclick=function(){
+    askTextDialog({ title:'Rejection reason', message:'Enter the reason for rejecting this record.', required:true, multiline:true, confirmLabel:t('Tá»« chá»‘i','Reject') }).then(function(reason){
+      if(!reason){toast(t('Pháº£i nháº­p lÃ½ do.','Reason required.'),'warn');return;}
+      rejectBtn.disabled=true;
+      api('evidence_review',{allocation_id:allocation.allocation_id,action:'reject',reason:reason.trim()},'POST').then(function(r){
+        if(r&&r.ok){toast(t('ÄÃ£ tá»« chá»‘i.','Rejected.'),'success');if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);}
+        else toast(t('Lá»—i.','Error.'),'error');
+      }).finally(function(){rejectBtn.disabled=false;});
+    });
+  };
+
+  var reopenBtn=document.getElementById('ec-reopen');
+  if(reopenBtn) reopenBtn.onclick=function(){
+    askTextDialog({ title:'Reopen reason', message:'Enter the reason for reopening this record.', required:true, multiline:true, confirmLabel:t('Má»Ÿ láº¡i','Reopen') }).then(function(reason){
+      if(!reason){toast(t('Pháº£i nháº­p lÃ½ do.','Reason required.'),'warn');return;}
+      reopenBtn.disabled=true;
+      api('evidence_reopen',{allocation_id:allocation.allocation_id,reason:reason.trim()},'POST').then(function(r){
+        if(r&&r.ok){toast(t('ÄÃ£ má»Ÿ láº¡i.','Reopened.'),'success');if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);}
+        else toast(t('Lá»—i.','Error.'),'error');
+      }).finally(function(){reopenBtn.disabled=false;});
+    });
+  };
+}
+
 function bindOffline(form,allocation,container){
   var dlBtn=document.getElementById('ec-download-offline');
   if(dlBtn&&window.AllocationTracker) dlBtn.onclick=function(){
@@ -730,6 +905,18 @@ function bindOffline(form,allocation,container){
       if(r&&r.ok) toast(t('Đã tải gói Excel.','Excel package downloaded.'),'success');
       else toast(t('Không thể tải.','Could not download.'),'error');
     }).finally(function(){dlBtn.disabled=false;});
+  };
+
+  var receivedBtn=document.getElementById('ec-download-received');
+  if(receivedBtn) receivedBtn.onclick=function(){
+    var url='api.php?action=form_fill_download_received&allocation_id='+encodeURIComponent(allocation.allocation_id||'');
+    var link=document.createElement('a');
+    link.href=url;
+    link.target='_blank';
+    link.rel='noopener';
+    document.body.appendChild(link);
+    link.click();
+    if(link.parentNode) link.parentNode.removeChild(link);
   };
 
   var copyBtn=document.getElementById('ec-copy-filename');
@@ -813,8 +1000,12 @@ function linkOrderIfPossible(allocation){
   var ctx = allocation && allocation.master_context ? allocation.master_context : {};
   var orderType = ctx.wo_number ? 'wo' : (ctx.jo_number ? 'jo' : (ctx.so_number ? 'so' : ''));
   var orderId = ctx.wo_number || ctx.jo_number || ctx.so_number || '';
-  if(!orderType || !orderId || !allocation.record_id) return;
-  api('order_link_form', { order_type: orderType, order_id: orderId, record_id: allocation.record_id }, 'POST').catch(function(){});
+  if(!orderType || !orderId || !allocation.record_id) return Promise.resolve(null);
+  return api('order_link_form', { order_type: orderType, order_id: orderId, record_id: allocation.record_id }, 'POST').then(function(resp){
+    return !!(resp && resp.ok);
+  }).catch(function(){
+    return false;
+  });
 }
 
 /* ── server draft persistence ── */
@@ -824,7 +1015,9 @@ function saveDraftToServer(form, allocation){
     allocation_id: allocation.allocation_id,
     form_code: form.form_code,
     data: { fieldValues: ws.fieldValues, signatures: ws.signatures }
-  }, 'POST').catch(function(){});
+  }, 'POST').catch(function(){
+    toast(t('Không lưu được nháp lên máy chủ. Bản cục bộ vẫn còn.','Draft was not saved to the server. The local copy is still available.'),'warn');
+  });
 }
 
 /* ── approval role check ── */

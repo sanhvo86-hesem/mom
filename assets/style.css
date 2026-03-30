@@ -529,16 +529,25 @@ pre, code { overflow-wrap: anywhere; word-break: break-word; }
   color: #166534;
 }
 
+.bundle-code {
+  border-color: #cbd5e1;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
 .entity-link,
 .role-link,
-.dept-link {
+.dept-link,
+.bundle-link {
   text-decoration: none;
 }
 
 .role-link:hover .role-code,
 .role-link:focus-visible .role-code,
 .dept-link:hover .dept-code,
-.dept-link:focus-visible .dept-code {
+.dept-link:focus-visible .dept-code,
+.bundle-link:hover .bundle-code,
+.bundle-link:focus-visible .bundle-code {
   border-color: #1d4ed8;
   background: #eef6ff;
 }

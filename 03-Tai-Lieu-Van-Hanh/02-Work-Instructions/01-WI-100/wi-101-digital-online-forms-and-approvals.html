@@ -71,10 +71,10 @@ Chi tiết đầy đủ: <a href="../../../core-standards/18-online-vs-offline-f
 <li>Trường "EvidenceUrl" bắt buộc cho các trạng thái Hold/Phát hành/Ship.</li>
 </ul>
 </li>
-<li><b>Phải</b> tạo Power App giao diện ki-ốt theo vai trò (OPS/QA/WHS/QMS):
+<li><b>Phải</b> tạo Power App giao diện ki-ốt theo vai trò (<a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a> / QA/WHS/QMS):
  <ul>
 <li>Scan mã → tự điền JobNum/PackNum (nếu có) → chọn biểu mẫu → nhập dữ liệu → gửi.</li>
-<li><b>Không được</b> cho phép Người dùng sửa bản ghi sau khi đã "Đã phê duyệt/Released", trừ vai trò QA / QMS được phân quyền.</li>
+<li><b>Không được</b> cho phép Người dùng sửa bản ghi sau khi đã "Đã phê duyệt/Released", trừ vai trò <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> được phân quyền.</li>
 </ul>
 </li>
 <li><b>Phải</b> cấu hình Power Automate:
@@ -101,8 +101,8 @@ Chi tiết đầy đủ: <a href="../../../core-standards/18-online-vs-offline-f
 </ol><h3 class="h3">3.3 Phê duyệt điện tử và điểm dừng</h3><ol>
 <li><b>Phải</b> thiết lập Cổng kiểm soát theo loại nghiệp vụ:
  <ul>
-<li>Cổng kiểm soát chất lượng: QA phê duyệt phát hành cho Hold/NCR/IR fail.</li>
-<li>Cổng kiểm soát giao hàng: WHS + QA phê duyệt phê duyệt giao hàng theo WI-OPS-010.</li>
+<li>Cổng kiểm soát chất lượng: <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> phê duyệt phát hành cho Hold/NCR/IR fail.</li>
+<li>Cổng kiểm soát giao hàng: WHS + <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> phê duyệt phê duyệt giao hàng theo WI-OPS-010.</li>
 </ul>
 </li>
 <li><b>Điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm chặn))):</b> Khi thiếu EvidenceUrl hoặc bằng chứng không truy cập được → <b>phải</b> giữ trạng thái "TẠM GIỮ" và <b>không được</b> chuyển sang "PHÁT HÀNH/SHIP".</li>
@@ -127,7 +127,7 @@ Chi tiết đầy đủ: <a href="../../../core-standards/18-online-vs-offline-f
 <td>CP-101.1 — Trường bắt buộc</td>
 <td>100% trường bắt buộc có dữ liệu hợp lệ</td>
 <td>Thiếu/không hợp lệ → không cho Submit</td>
-<td>Hệ thống (xác nhận) + Chủ biểu mẫu (OPS/QA/WHS/QMS)</td>
+<td>Hệ thống (xác nhận) + Chủ biểu mẫu (<a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a> / QA/WHS/QMS)</td>
 <td>Bản ghi List (RecordID)</td>
 </tr>
 <tr>
@@ -148,7 +148,7 @@ Chi tiết đầy đủ: <a href="../../../core-standards/18-online-vs-offline-f
 <td>CP-101.4 — Lưu giữ/Hồ sơ</td>
 <td>Nhãn lưu giữ áp đúng theo <a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a></td>
 <td>Chưa áp nhãn → TẠM GIỮ cho các cổng kiểm soát Tier‑1</td>
-<td>QA / QMS (Tài liệu Control)</td>
+<td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> (Tài liệu Control)</td>
 <td>Lưu giữ label log (Phạm vi quản lý)</td>
 </tr>
 </tbody>
@@ -191,7 +191,7 @@ Chi tiết đầy đủ: <a href="../../../core-standards/18-online-vs-offline-f
 <td>Hàng Ngày Ảnh chụp trạng thái Sổ đăng ký</td>
 <td><b>M365: CNC-IMS-HUB/QMS-Hồ sơ/OPS/Photos trạng thái/&lt;YYYY&gt;/&lt;MM&gt;/</b></td>
 <td>Khi tháng kết thúc + 3 năm (trừ hồ sơ gắn Hồ sơ công việc)</td>
-<td>OPS</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a></span></td>
 </tr>
 </tbody>
 </table>
@@ -236,7 +236,7 @@ Chi tiết đầy đủ: <a href="../../../core-standards/18-online-vs-offline-f
 <li>Phải dùng đúng vai trò được cấp quyền. Không được mượn tài khoản của Người khác để gửi, duyệt, bổ sung / thay thế hoặc mở hold.</li>
 <li>Hồ sơ ở trạng thái <b>Đã phê duyệt / Released / Closed</b> chỉ được sửa khi có quyền ghi đè / bỏ qua theo <b><a href="../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></b> và phải tạo log lý do.</li>
 <li>Mọi file bằng chứng phải mở được từ SSOT; không nhúng link cá nhân, link nội bộ / tại chỗ path hoặc link email tạm.</li>
-<li>Khi yêu cầu khách hàng đòi chữ ký điện tử hoặc log phê duyệt mức cao hơn, OPS_SCOPE_OWNERS phải cấu hình luồng duyệt trước khi biểu mẫu được phép dùng tại hiện trường.</li>
+<li>Khi yêu cầu khách hàng đòi chữ ký điện tử hoặc log phê duyệt mức cao hơn, <a class="entity-link bundle-link bundle-chip" data-bundle="OPS_SCOPE_OWNERS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-ops-scope-owners" title="Operational Scope Owners (Nhom dau moi so huu pham vi van hanh) — CS / EST / PPL / PD / ENGM / QA[QMR] / QMS / SCM / FIN / HR / EHS / ITA / WKM / SL / QCL / LOG"><span class="entity-code bundle-code">OPS_SCOPE_OWNERS</span></a> phải cấu hình luồng duyệt trước khi biểu mẫu được phép dùng tại hiện trường.</li>
 </ul>
 <h2 class="h2">9. Chỉ số theo dõi bắt buộc</h2>
 <div class="kpi-grid">
@@ -247,13 +247,13 @@ Chi tiết đầy đủ: <a href="../../../core-standards/18-online-vs-offline-f
 </div>
 </div><h2 class="h2 phase3a-workbook-alignment" id="phase3a-workbook-usage">11. Biểu mẫu Excel đang hiệu lực — Cách dùng biểu mẫu khi biểu mẫu active đã chuyển hoàn toàn sang sổ tay thực hành Excel</h2><div class="note phase3a-workbook-alignment"><b>Vận hành chuẩn</b><br>Người dùng mở FRM qua portal hoặc link tài liệu hệ thống phải được tải trực tiếp sổ tay thực hành hiện hành. Không dùng HTML biểu mẫu cũ để nhập liệu hoặc xác nhận phê duyệt; nếu cần xem trạng thái ĐÃ PHÁT HÀNH / mã không phát hành trong danh mục hiện hành, phiên bản, người chịu trách nhiệm hoặc phạm vi mã / phạm vi quy trình thì dùng và <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html">Biểu mẫu Control Sổ đăng ký</a>.</div><h3 class="h3 phase3a-workbook-alignment">11.1 Xin mã hồ sơ (Record-ID) cho biểu mẫu Excel</h3>
 <ol class="tight phase3a-workbook-alignment">
-<li>Người dùng vào <b>QMS Portal</b> → chọn <b>"Xin mã hồ sơ mới"</b> → chọn loại hồ sơ (NCR / CAPA / FAI / …) → server trả về mã duy nhất (unique Record-ID) từ atomic counter.</li>
+<li>Người dùng vào <b><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> Portal</b> → chọn <b>"Xin mã hồ sơ mới"</b> → chọn loại hồ sơ (NCR / CAPA / FAI / …) → server trả về mã duy nhất (unique Record-ID) từ atomic counter.</li>
 <li>Người dùng <b>phải</b> dùng mã này trong tên file khi lưu biểu mẫu Excel đã điền: <span class="code">FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.xlsx</span></li>
 <li>Chi tiết cơ chế cấp mã, phạm vi counter và quy tắc đặt tên: xem <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-137-evidence-and-records-naming-convention.html">ANNEX-137</a> Mục 7.</li>
 </ol>
 <h3 class="h3 phase3a-workbook-alignment">11.2 Mở và sử dụng sổ tay thực hành Excel</h3>
 <ol class="tight phase3a-workbook-alignment"><li>Mở trực tiếp sổ tay thực hành của mã FRM đang ĐÃ PHÁT HÀNH từ portal hoặc từ link trong SOP/WI/sổ tay/JD.</li><li>Nếu cần kiểm phiên bản, người chịu trách nhiệm, đường dẫn phát hành, tổng kiểm tra hoặc bảng kê, tra <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html">Biểu mẫu Control Sổ đăng ký</a>.</li><li>Nếu mã FRM không phát hành trong danh mục hiện hành, không tạo hồ sơ mới dưới mã đó; tra phạm vi mã / phạm vi quy trình trong .</li><li>Ví dụ: <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html#FRM-412">FRM-412</a> không phát hành trong danh mục hiện hành; Người dùng phải tải và dùng <a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> sổ tay thực hành cho phiếu nhận / biên nhận/IQC cổng kiểm soát và <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> cho TẠM GIỮ/disposition.</li></ol></div></div></div></div>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
 <script src="../../../assets/app.js"></script>
 
 </div>

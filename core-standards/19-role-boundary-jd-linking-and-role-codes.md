@@ -140,10 +140,19 @@ Quy tac:
 
 Role bundle khong phai JD moi. Day la nhom explicit cua nhieu base role that, dung khi mot trach nhiem thuc su la lop actor chung nhung van phai truy ve JD goc cua tung nguoi.
 
+Moi bundle duoc cong bo PHAI co du 4 lop nguon:
+- registry nguon tai `tools/data/role-registry-job-order-cnc.json`;
+- trang glossary cong bo tai `02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html`;
+- link bundle render duoc trong HTML;
+- workbook `tools/data/qms-terminology-dictionary.xlsx` sheet `Bundle glossary`.
+
 Bundle chuan hien hanh:
 - `TOP_MGMT`
 - `FUNC_HEADS`
 - `FUNC_OWNERS`
+- `DATA_OWNERS`
+- `SYSTEM_OWNERS`
+- `SUPPORT_ENABLEMENT`
 - `COMMERCIAL_FRONT`
 - `QUALITY_CORE`
 - `ENG_RELEASE_CORE`
@@ -160,6 +169,10 @@ Bundle chuan hien hanh:
 Y nghia bat buoc:
 - `FUNC_HEADS` = `PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA`
 - `FUNC_OWNERS` = `CS / EST / PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA`
+- `DATA_OWNERS` = `CS / EST / PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA`
+- `SYSTEM_OWNERS` = `ITA / ESA`
+- `ALL_DEPTS` = `D-SCS / D-ENG / D-PROD / D-PPC / D-MNT / D-QUAL / D-SCM / D-PUR / D-WHS / D-TCR / D-LOG / D-FIN / D-HR / D-EHS / D-IT / D-ERP`
+- `SUPPORT_ENABLEMENT` = `SCM / D-FIN / D-HR / D-EHS / D-IT / D-ERP`
 - `AREA_LEADS` = `SL / WKM / CPS / QCL`
 - `POU_LEADS` = `WKM / SL / QCL / SCM`
 - `OPS_SCOPE_OWNERS` = `CS / EST / PPL / PD / ENGM / QA[QMR] / QMS / SCM / FIN / HR / EHS / ITA / WKM / SL / QCL / LOG`
@@ -173,7 +186,10 @@ Y nghia bat buoc:
 Quy tac bundle:
 - khong tao bundle de che mo trach nhiem;
 - bundle chi dung khi trach nhiem thuc su la lop actor chung, khong phai mot JD don le;
-- neu SOP chi ap cho mot pham vi hep, phai dung subset explicit hoac base role cu the, khong lay bundle rong cho tien.
+- neu SOP chi ap cho mot pham vi hep, phai dung subset explicit hoac base role cu the, khong lay bundle rong cho tien;
+- moi bundle token dung doc lap trong HTML PHAI render thanh chip/link tro ve glossary bundle, khong de text tran bat nguoi doc tu doan nghia;
+- trong actor cell va owner cell, bundle mac dinh phai hien dang 1 chip gon co link glossary; khong bung toan bo thanh phan bundle ngay trong cell tru khi dang lam glossary, dictionary hoac bang giai nghia thanh phan;
+- neu gom nhom phong ban hoac nhom JD moi, phai bo sung bundle vao registry + glossary + workbook truoc khi dua vao tai lieu phat hanh.
 
 ### 4.4 Boundary bat buoc cho he role digital va frontline
 
@@ -185,10 +201,17 @@ Khi sua JD theo benchmark `job-order CNC`, phai giu ro 4 ranh gioi sau:
 
 Trong tai lieu digital / KPI / authority:
 - `MR_REPORT_OWNERS` = nhom role chot va nop pack KPI/MR.
-- `FUNC_OWNERS` hoac `OPS_SCOPE_OWNERS` = nhom role/chuc nang so huu noi dung nghiep vu cua du lieu.
-- `ITA / ESA` = nhom role so huu lop nen he thong, access, refresh logic, backup, workflow va truy vet ky thuat.
+- `DATA_OWNERS` = nhom role/chuc nang so huu noi dung nghiep vu cua du lieu.
+- `SYSTEM_OWNERS` = nhom role so huu lop nen he thong, access, refresh logic, backup, workflow va truy vet ky thuat.
+- `FUNC_OWNERS` hoac `OPS_SCOPE_OWNERS` = nhom role/chuc nang so huu pham vi van hanh va noi dung lien phong ban khi tai lieu dang noi toi scope rong hon business-data ownership.
 
 Khong duoc gop 3 lop nay thanh mot cum mo ho nhu `data owner`, `business owner`, `system owner`, `process owner`.
+
+Neu can gom gon mot nhom JD hay mot nhom phong ban moi cho tai lieu phat hanh:
+- PHAI dang ky thanh `bundle` chinh thuc trong registry;
+- PHAI co trang glossary cong bo va workbook;
+- PHAI render thanh chip co link tro ve glossary;
+- KHONG duoc de text tran roi bat nguoi doc tu doan nghia.
 
 ---
 

@@ -1,304 +1,948 @@
-/* ═══════════════════════════════════════════════════
-   09-online-forms.js — Evidence Control Orchestrator
-   HESEM QMS Portal — Single-page workspace design
-   ═══════════════════════════════════════════════════ */
+/* ==========================================================================
+   09-online-forms.js - Evidence Control orchestrator
+   ========================================================================== */
 
 (function(){
 'use strict';
 
 var FORM_COLORS = {
-  production:  { bg:'#fef3c7', icon:'\uD83C\uDFED' },
-  quality:     { bg:'#dcfce7', icon:'\uD83D\uDD0E' },
-  maintenance: { bg:'#fff9db', icon:'\uD83D\uDD27' },
-  hr:          { bg:'#f3e8ff', icon:'\uD83D\uDC65' },
-  logistics:   { bg:'#fff4e6', icon:'\uD83D\uDCE6' },
-  safety:      { bg:'#fee2e2', icon:'\u26A0' },
-  other:       { bg:'#f1f5f9', icon:'\uD83D\uDDC2' }
+  production:  { bg:'#fef3c7', icon:'PR' },
+  quality:     { bg:'#dcfce7', icon:'QA' },
+  maintenance: { bg:'#fff9db', icon:'MT' },
+  hr:          { bg:'#f3e8ff', icon:'HR' },
+  logistics:   { bg:'#fff4e6', icon:'LG' },
+  safety:      { bg:'#fee2e2', icon:'HS' },
+  other:       { bg:'#f1f5f9', icon:'EC' }
 };
+
+var DEPARTMENTS = [
+  { value:'QA',  label:'Dam bao chat luong', labelEn:'Quality Assurance' },
+  { value:'PRO', label:'San xuat', labelEn:'Production' },
+  { value:'ENG', label:'Ky thuat', labelEn:'Engineering' },
+  { value:'SCM', label:'Chuoi cung ung', labelEn:'Supply Chain' },
+  { value:'HR',  label:'Nhan su va Dao tao', labelEn:'HR & Training' },
+  { value:'EXE', label:'Ban giam doc', labelEn:'Executive / Management' },
+  { value:'SAL', label:'Kinh doanh', labelEn:'Sales' },
+  { value:'WH',  label:'Kho van', labelEn:'Warehouse / Logistics' },
+  { value:'IT',  label:'Cong nghe thong tin', labelEn:'IT / Digital' },
+  { value:'EHS', label:'An toan va Moi truong', labelEn:'EHS / Safety' }
+];
 
 var state = {
   forms: [],
   formMap: {},
   recordTypes: {},
   formToRecordType: {},
+  allocations: [],
   selectedFormCode: '',
   selectedAllocationId: '',
-  allocations: [],
   filter: 'all',
   search: '',
+  searchTimer: null,
+  workspaceMode: 'form',
+  workspaceLoading: false,
   ready: false,
-  workspaceMode: 'form'  /* 'form' | 'record-id' | 'upload' */
+  activeTab: 'form',
+  pendingFillSelection: null,
+  pendingUploadSelection: null,
+  pendingContext: null,
+  workQueue: {
+    pending: [],
+    exceptions: [],
+    loading: false,
+    loaded: false,
+    partial: false,
+    error: '',
+    department: '',
+    formCode: '',
+    exceptionType: '',
+    dateFrom: '',
+    dateTo: '',
+    days: 30,
+    lastLoaded: '',
+    promise: null,
+    quarantine: {}
+  }
 };
 
 window._ecState = state;
 
 function t(vi, en){ return (typeof lang !== 'undefined' && lang === 'en') ? en : vi; }
-function esc(v){ var d=document.createElement('div'); d.appendChild(document.createTextNode(String(v==null?'':v))); return d.innerHTML; }
+function esc(value){
+  var div = document.createElement('div');
+  div.appendChild(document.createTextNode(String(value == null ? '' : value)));
+  return div.innerHTML;
+}
+
+function buildQuery(payload){
+  var params = new URLSearchParams();
+  Object.keys(payload || {}).forEach(function(key){
+    var value = payload[key];
+    if(value === undefined || value === null || value === '') return;
+    params.set(key, String(value));
+  });
+  return params.toString();
+}
+
+function api(action, payload, method){
+  var httpMethod = method || 'GET';
+  if(typeof apiCall === 'function') return apiCall(action, payload || {}, httpMethod, 30000);
+  var query = httpMethod === 'GET' ? buildQuery(payload || {}) : '';
+  var url = 'api.php?action=' + encodeURIComponent(action) + (query ? '&' + query : '');
+  var opts = { method:httpMethod, credentials:'include', headers:{} };
+  if(typeof csrfToken !== 'undefined' && csrfToken) opts.headers['X-CSRF-Token'] = csrfToken;
+  if(httpMethod !== 'GET'){
+    opts.headers['Content-Type'] = 'application/json';
+    opts.body = JSON.stringify(payload || {});
+  }
+  return fetch(url, opts).then(function(resp){ return resp.json(); });
+}
 
 function showToast(message, type){
   var existing = document.querySelector('.ec-toast');
   if(existing) existing.remove();
   var el = document.createElement('div');
   el.className = 'ec-toast ' + (type || 'info');
-  el.textContent = message;
+  el.textContent = String(message || '');
   document.body.appendChild(el);
   setTimeout(function(){ el.classList.add('show'); }, 10);
-  setTimeout(function(){ el.classList.remove('show'); setTimeout(function(){ if(el.parentNode) el.remove(); }, 300); }, 3000);
+  setTimeout(function(){
+    el.classList.remove('show');
+    setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 250);
+  }, 2800);
 }
 
-window._ecShowToast = showToast;
-window._ecT = t;
-window._ecEsc = esc;
+function openPromptDialog(options){
+  options = options || {};
+  return new Promise(function(resolve){
+    var existing = document.querySelector('.ec-dialog-backdrop');
+    if(existing) existing.remove();
+    var backdrop = document.createElement('div');
+    var tag = options.multiline ? 'textarea' : 'input';
+    var typeAttr = options.multiline ? '' : ' type="' + esc(options.type || 'text') + '"';
+    backdrop.className = 'ec-dialog-backdrop';
+    backdrop.innerHTML =
+      '<div class="ec-dialog" role="dialog" aria-modal="true" aria-labelledby="ec-dialog-title">' +
+        '<div class="ec-dialog-head">' +
+          '<h3 id="ec-dialog-title">' + esc(options.title || t('Xac nhan', 'Confirm')) + '</h3>' +
+          '<button type="button" class="ec-dialog-close" data-close-dialog="1" aria-label="' + esc(t('Dong', 'Close')) + '">x</button>' +
+        '</div>' +
+        (options.message ? '<p class="ec-dialog-copy">' + esc(options.message) + '</p>' : '') +
+        '<' + tag + typeAttr + ' class="ec-dialog-input" id="ec-dialog-input" placeholder="' + esc(options.placeholder || '') + '">' +
+          esc(options.multiline ? (options.value || '') : '') +
+        '</' + tag + '>' +
+        '<div class="ec-dialog-actions">' +
+          '<button type="button" class="ec-btn ghost" data-close-dialog="1">' + esc(options.cancelLabel || t('Huy', 'Cancel')) + '</button>' +
+          '<button type="button" class="ec-btn primary" id="ec-dialog-confirm">' + esc(options.confirmLabel || t('Xac nhan', 'Confirm')) + '</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(backdrop);
 
-function api(action, payload, method){
-  if(typeof apiCall === 'function') return apiCall(action, payload || {}, method || 'GET', 30000);
-  var opts = { method: method || 'GET', credentials:'include', headers:{} };
-  if(typeof csrfToken !== 'undefined' && csrfToken) opts.headers['X-CSRF-Token'] = csrfToken;
-  if((method || 'GET') !== 'GET'){ opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(payload || {}); }
-  return fetch('api.php?action=' + encodeURIComponent(action), opts).then(function(r){ return r.json(); });
+    var input = document.getElementById('ec-dialog-input');
+    if(input && !options.multiline) input.value = options.value || '';
+    if(input) input.focus();
+
+    function cleanup(value){
+      document.removeEventListener('keydown', onKeyDown, true);
+      if(backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+      resolve(value);
+    }
+
+    function confirm(){
+      var value = input ? String(input.value || '') : '';
+      if(options.required && !value.trim()){
+        if(input) input.focus();
+        return;
+      }
+      cleanup(options.trim === false ? value : value.trim());
+    }
+
+    function onKeyDown(event){
+      if(event.key === 'Escape'){ event.preventDefault(); cleanup(null); }
+      if(event.key === 'Enter' && !options.multiline){ event.preventDefault(); confirm(); }
+    }
+
+    backdrop.addEventListener('click', function(event){
+      if(event.target === backdrop || event.target.getAttribute('data-close-dialog') === '1') cleanup(null);
+    });
+    document.addEventListener('keydown', onKeyDown, true);
+    document.getElementById('ec-dialog-confirm').onclick = confirm;
+  });
 }
 
 window._ecApi = api;
+window._ecShowToast = showToast;
+window._ecT = t;
+window._ecEsc = esc;
+window._ecPromptDialog = openPromptDialog;
 
-/* ── Data loading ── */
+function pageEl(){ return document.getElementById('page-forms'); }
+function requestRender(){ var page = pageEl(); if(page) render(page); }
+
+function roleList(){
+  var user = (typeof currentUser !== 'undefined' && currentUser) ? currentUser : {};
+  var roles = Array.isArray(user.roles) ? user.roles : [user.role || ''];
+  return roles.map(function(role){ return String(role || '').trim().toLowerCase(); }).filter(Boolean);
+}
+
+function currentDept(){
+  var user = (typeof currentUser !== 'undefined' && currentUser) ? currentUser : {};
+  return String(user.dept || '').trim().toUpperCase();
+}
+
+function canSeeAllWorkQueue(){
+  var roles = roleList();
+  if(!roles.length) return true;
+  var elevated = ['admin','it_admin','ceo','production_director','qa_manager','quality_manager','production_manager','engineering_manager','qms_engineer'];
+  return roles.some(function(role){ return elevated.indexOf(role) >= 0; });
+}
+
+function ensureWorkQueueDefaults(){
+  if(!state.workQueue.department && currentDept()) state.workQueue.department = currentDept();
+}
+
+function fmtDateTime(value){
+  if(!value) return '-';
+  try { return new Date(value).toLocaleString(); } catch(_err){ return String(value); }
+}
+
+function renderAgeBadge(value){
+  if(!value) return '';
+  var hours = Math.floor((Date.now() - new Date(value).getTime()) / 3600000);
+  if(!isFinite(hours) || hours < 0) return '';
+  var tone = hours >= 120 ? 'fail' : (hours >= 48 ? 'warn' : 'info');
+  var label = hours >= 24 ? (Math.floor(hours / 24) + 'd') : (hours + 'h');
+  return '<span class="ec-badge ' + tone + '">' + esc(label) + '</span>';
+}
+
+function recordTypeForItem(item){
+  if(item && item.record_type) return String(item.record_type || '').trim().toUpperCase();
+  var formCode = String((item && item.form_code) || '').trim();
+  if(formCode && state.formToRecordType && state.formToRecordType[formCode]) return String(state.formToRecordType[formCode] || '').trim().toUpperCase();
+  var recordId = String((item && item.record_id) || '').trim();
+  var prefix = recordId.split('-')[0] || '';
+  return prefix.toUpperCase();
+}
+
+function reviewSlaHours(item){
+  var recordType = recordTypeForItem(item);
+  var cfg = (state.recordTypes && state.recordTypes[recordType]) ? state.recordTypes[recordType] : {};
+  var configured = Number(cfg.sla_review_hours || cfg.sla_hours || 0);
+  if(isFinite(configured) && configured > 0) return configured;
+  if(recordType === 'NCR' || recordType === 'CAPA' || recordType === 'AUD') return 48;
+  if(recordType === 'FAI' || recordType === 'SCAR') return 72;
+  return 72;
+}
+
+function renderSlaBadge(item){
+  var stamp = new Date((item && (item.submitted_at || item.updated_at || item.created_at)) || '').getTime();
+  if(!stamp) return '';
+  var dueAt = stamp + (reviewSlaHours(item) * 3600000);
+  var diff = dueAt - Date.now();
+  var hours = Math.round(Math.abs(diff) / 3600000);
+  var tone = diff < 0 ? 'fail' : (hours <= 12 ? 'warn' : 'info');
+  var label = diff < 0
+    ? t('Qua han ', 'Overdue ') + (hours >= 24 ? Math.floor(hours / 24) + 'd' : hours + 'h')
+    : t('Con ', 'Due in ') + (hours >= 24 ? Math.floor(hours / 24) + 'd' : hours + 'h');
+  return '<span class="ec-badge ' + tone + '">' + esc(label) + '</span>';
+}
+
+function traceSummary(ctx){
+  ctx = ctx || {};
+  var parts = [];
+  if(ctx.customer_id) parts.push(ctx.customer_id);
+  if(ctx.so_number) parts.push(ctx.so_number);
+  if(ctx.jo_number) parts.push(ctx.jo_number);
+  if(ctx.wo_number) parts.push(ctx.wo_number);
+  if(ctx.part_number || ctx.part_revision) parts.push([ctx.part_number || '', ctx.part_revision || ''].filter(Boolean).join('/'));
+  if(ctx.capa_number) parts.push(ctx.capa_number);
+  return parts.join(' · ');
+}
 
 function loadAll(){
   return Promise.all([
     api('form_catalog_snapshot', {}, 'GET').then(function(resp){
       state.forms = (resp && Array.isArray(resp.forms)) ? resp.forms : [];
       state.formMap = {};
-      state.forms.forEach(function(f){
-        if(!f.category) f.category = 'other';
-        if(f.online !== false) f.online = true;
-        state.formMap[f.form_code] = f;
+      state.forms.forEach(function(form){
+        if(!form.category) form.category = 'other';
+        if(form.online !== false) form.online = true;
+        state.formMap[form.form_code] = form;
       });
-    }).catch(function(){ state.forms = []; }),
+    }).catch(function(){
+      state.forms = [];
+      state.formMap = {};
+    }),
     api('config_record_types', {}, 'GET').then(function(resp){
       state.recordTypes = resp && resp.record_types ? resp.record_types : {};
       state.formToRecordType = {};
       Object.keys(state.recordTypes).forEach(function(code){
-        var linked = (state.recordTypes[code] || {}).linked_form;
-        if(linked) state.formToRecordType[linked] = code;
+        var linkedForm = (state.recordTypes[code] || {}).linked_form;
+        if(linkedForm) state.formToRecordType[linkedForm] = code;
       });
-    }).catch(function(){ state.recordTypes = {}; state.formToRecordType = {}; })
+    }).catch(function(){
+      state.recordTypes = {};
+      state.formToRecordType = {};
+    })
   ]);
 }
 
 function loadAllocations(){
-  if(!state.selectedFormCode || !window.AllocationTracker) { state.allocations = []; return Promise.resolve([]); }
+  if(!state.selectedFormCode || !window.AllocationTracker){
+    state.allocations = [];
+    return Promise.resolve([]);
+  }
   return window.AllocationTracker.getHistory({ form_code: state.selectedFormCode, page_size: 50 }).then(function(resp){
-    state.allocations = (resp && Array.isArray(resp.entries)) ? resp.entries.filter(function(r){ return String(r.form_code || '') === String(state.selectedFormCode); }) : [];
-    if(!state.selectedAllocationId && state.allocations.length) state.selectedAllocationId = state.allocations[0].allocation_id || '';
-    if(state.selectedAllocationId && !state.allocations.some(function(r){ return r.allocation_id === state.selectedAllocationId; })){
-      state.selectedAllocationId = state.allocations.length ? state.allocations[0].allocation_id : '';
+    var rows = (resp && Array.isArray(resp.entries)) ? resp.entries : [];
+    state.allocations = rows.filter(function(row){
+      return String(row.form_code || '') === String(state.selectedFormCode);
+    });
+    if(state.selectedAllocationId && !state.allocations.some(function(row){ return row.allocation_id === state.selectedAllocationId; })){
+      state.selectedAllocationId = '';
+    }
+    if(!state.selectedAllocationId && state.allocations.length){
+      state.selectedAllocationId = state.allocations[0].allocation_id || '';
     }
     return state.allocations;
-  }).catch(function(){ state.allocations = []; return []; });
+  }).catch(function(){
+    state.allocations = [];
+    return [];
+  });
 }
 
-/* ── Rendering ── */
+function openFormWorkspace(formCode, allocationId){
+  if(formCode) state.selectedFormCode = formCode;
+  if(allocationId !== undefined && allocationId !== null) state.selectedAllocationId = allocationId || '';
+  state.workspaceMode = 'form';
+  state.workspaceLoading = true;
+  requestRender();
+  loadAllocations().then(function(){
+    state.workspaceLoading = false;
+    requestRender();
+  }).catch(function(){
+    state.workspaceLoading = false;
+    requestRender();
+  });
+}
+
+function openUploadWorkspace(allocationId, formCode){
+  if(formCode) state.selectedFormCode = formCode;
+  if(allocationId) state.selectedAllocationId = allocationId;
+  state.pendingUploadSelection = allocationId ? { allocationId: allocationId, formCode: formCode || state.selectedFormCode || '' } : null;
+  state.workspaceMode = 'upload';
+  requestRender();
+}
+
+function loadWorkQueue(force){
+  ensureWorkQueueDefaults();
+  if(state.workQueue.loading) return state.workQueue.promise || Promise.resolve(state.workQueue);
+  if(!force && state.workQueue.loaded && !state.workQueue.partial) return Promise.resolve(state.workQueue);
+
+  state.workQueue.department = canSeeAllWorkQueue() ? String(state.workQueue.department || '').trim().toUpperCase() : currentDept();
+  state.workQueue.formCode = String(state.workQueue.formCode || '').trim();
+  state.workQueue.days = Math.max(1, Number(state.workQueue.days || 30) || 30);
+  state.workQueue.loading = true;
+  state.workQueue.error = '';
+  state.workQueue.partial = false;
+
+  var pendingReq = api('evidence_get_pending', {
+    department: state.workQueue.department,
+    form_code: state.workQueue.formCode
+  }, 'GET').catch(function(){
+    return { ok:false, error:'pending_failed', pending:[] };
+  });
+
+  var exceptionReq = api('upload_exception_queue', {
+    department: state.workQueue.department,
+    form_code: state.workQueue.formCode,
+    status: state.workQueue.exceptionType,
+    date_from: state.workQueue.dateFrom,
+    date_to: state.workQueue.dateTo,
+    days: state.workQueue.days
+  }, 'GET').catch(function(){
+    return { ok:false, error:'exception_queue_failed', exceptions:[] };
+  });
+
+  state.workQueue.promise = Promise.all([pendingReq, exceptionReq]).then(function(results){
+    var pendingResp = results[0] || {};
+    var exceptionResp = results[1] || {};
+    var pendingOk = pendingResp.ok !== false;
+    var exceptionOk = exceptionResp.ok !== false;
+
+    state.workQueue.pending = Array.isArray(pendingResp.pending) ? pendingResp.pending.slice().sort(function(a, b){
+      var left = new Date((a && (a.submitted_at || a.updated_at || a.created_at)) || 0).getTime();
+      var right = new Date((b && (b.submitted_at || b.updated_at || b.created_at)) || 0).getTime();
+      return left - right;
+    }) : [];
+    state.workQueue.exceptions = Array.isArray(exceptionResp.exceptions) ? exceptionResp.exceptions.slice() : [];
+    state.workQueue.loaded = pendingOk || exceptionOk;
+    state.workQueue.partial = state.workQueue.loaded && (!pendingOk || !exceptionOk);
+    state.workQueue.lastLoaded = state.workQueue.loaded ? new Date().toISOString() : '';
+
+    if(!state.workQueue.loaded){
+      state.workQueue.error = t('Khong the tai hang cho xu ly.', 'Could not load the work queue.');
+      showToast(state.workQueue.error, 'error');
+    } else if(state.workQueue.partial){
+      state.workQueue.error = t('Mot phan hang cho chua tai duoc.', 'Part of the work queue could not be loaded.');
+      showToast(state.workQueue.error, 'warn');
+    }
+    return state.workQueue;
+  }).finally(function(){
+    state.workQueue.loading = false;
+    state.workQueue.promise = null;
+  });
+
+  return state.workQueue.promise;
+}
+
+function filterForms(){
+  return state.forms.filter(function(form){
+    if(state.filter !== 'all' && (form.category || 'other') !== state.filter) return false;
+    if(state.search){
+      var q = state.search.toLowerCase();
+      var haystack = [form.form_code, form.title, form.title_vi, form.description, form.description_vi, form.sop_ref, form.category].join(' ').toLowerCase();
+      if(haystack.indexOf(q) < 0) return false;
+    }
+    return true;
+  });
+}
+
+function filteredExceptions(){
+  var formCode = String(state.workQueue.formCode || '').trim();
+  var typeFilter = String(state.workQueue.exceptionType || '').trim();
+  var fromDate = state.workQueue.dateFrom ? new Date(state.workQueue.dateFrom + 'T00:00:00').getTime() : 0;
+  var toDate = state.workQueue.dateTo ? new Date(state.workQueue.dateTo + 'T23:59:59').getTime() : 0;
+  return (state.workQueue.exceptions || []).filter(function(item){
+    var extra = item && item.extra ? item.extra : {};
+    if(formCode && String(item.form_code || extra.form_code || '').trim() !== formCode) return false;
+    if(typeFilter && String(item.type || '').trim() !== typeFilter) return false;
+    if(fromDate || toDate){
+      var stamp = new Date((item && item.timestamp) || '').getTime();
+      if(fromDate && (!stamp || stamp < fromDate)) return false;
+      if(toDate && (!stamp || stamp > toDate)) return false;
+    }
+    return true;
+  });
+}
+
+function quarantineIdOf(item){
+  var extra = item && item.extra ? item.extra : {};
+  return String((item && item.quarantine_id) || extra.quarantine_id || '').trim();
+}
+
+function quarantineState(id){
+  if(!id) return {};
+  if(!state.workQueue.quarantine[id]) state.workQueue.quarantine[id] = {};
+  return state.workQueue.quarantine[id];
+}
+
+function updateQuarantineState(id, patch){
+  if(!id) return {};
+  state.workQueue.quarantine[id] = Object.assign({}, quarantineState(id), patch || {});
+  return state.workQueue.quarantine[id];
+}
+
+function renderMiniField(label, value){
+  return '<div class="ec-mini"><small>' + esc(label) + '</small><strong>' + esc(value || '-') + '</strong></div>';
+}
+
+function exceptionTypeLabel(type){
+  var labels = {
+    upload_error: t('Loi tai len', 'Upload error'),
+    blocked_extension: t('Phan mo rong bi chan', 'Blocked extension'),
+    file_too_large: t('Tep qua lon', 'File too large'),
+    mime_rejected: t('MIME bi tu choi', 'MIME rejected'),
+    move_failed: t('Khong di chuyen duoc tep', 'File move failed'),
+    verification_failed: t('Xac minh that bai', 'Verification failed'),
+    rejected: t('Tu choi thu cong', 'Rejected manually')
+  };
+  return labels[type] || String(type || 'exception');
+}
+
+function renderPendingItem(item){
+  var ctx = item.master_context || {};
+  var summary = [item.form_code || '', item.department || '', traceSummary(ctx)].filter(Boolean).join(' · ');
+  var statusHtml = window.AllocationTracker
+    ? window.AllocationTracker.renderStatusBadge(item.status || 'in_review')
+    : '<span class="ec-badge info">' + esc(item.status || 'in_review') + '</span>';
+  return '<article class="ec-work-card">' +
+    '<div class="ec-work-card-top">' +
+      '<div><div class="ec-work-id">' + esc(item.record_id || item.allocation_id || '-') + '</div><div class="ec-work-sub">' + esc(summary || t('Chua co ngu canh truy xuat', 'Traceability context not available')) + '</div></div>' +
+      '<div class="ec-work-status">' + renderSlaBadge(item) + renderAgeBadge(item.submitted_at || item.updated_at || item.created_at || '') + statusHtml + '</div>' +
+    '</div>' +
+    '<div class="ec-work-grid">' +
+      renderMiniField(t('Nguoi gui', 'Submitted by'), item.submitted_by || item.updated_by || '-') +
+      renderMiniField(t('Thoi diem', 'Timestamp'), fmtDateTime(item.submitted_at || item.updated_at || item.created_at || '')) +
+      renderMiniField(t('Ghi chu', 'Notes'), item.notes || '-') +
+    '</div>' +
+    '<div class="ec-work-actions">' +
+      '<button type="button" class="ec-btn primary" data-open-allocation="' + esc(item.allocation_id || '') + '" data-open-form="' + esc(item.form_code || '') + '">' + esc(t('Mo ho so', 'Open record')) + '</button>' +
+    '</div>' +
+  '</article>';
+}
+
+function renderExceptionItem(item){
+  var extra = item && item.extra ? item.extra : {};
+  var quarantineId = quarantineIdOf(item);
+  var qState = quarantineState(quarantineId);
+  var formCode = item.form_code || extra.form_code || '';
+  var allocationId = item.allocation_id || extra.allocation_id || '';
+  var scope = [formCode, item.record_id || '', quarantineId].filter(Boolean).join(' · ');
+  var hasUploadTarget = !!allocationId;
+  var hasFormTarget = !!formCode;
+  var verifyTone = qState.status === 'passed' ? 'pass' : (qState.status === 'failed' ? 'fail' : 'neutral');
+  var verifySummary = '';
+
+  if(quarantineId && qState.status){
+    verifySummary = '<div class="ec-work-review ' + verifyTone + '">' +
+      esc(qState.status === 'passed'
+        ? t('Quarantine da verify an toan.', 'Quarantine verified successfully.')
+        : t('Quarantine chua dat. Hay reject hoac ra soat lai.', 'Quarantine verification failed. Reject or investigate before accepting.')) +
+    '</div>';
+  } else if(quarantineId){
+    verifySummary = '<div class="ec-work-review neutral">' +
+      esc(t('File nay dang o quarantine. Hay verify truoc khi accept.', 'This file is in quarantine. Verify it before acceptance.')) +
+    '</div>';
+  }
+
+  return '<article class="ec-work-card warn">' +
+    '<div class="ec-work-card-top">' +
+      '<div><div class="ec-work-id">' + esc(exceptionTypeLabel(item.type)) + '</div><div class="ec-work-sub">' + esc(item.message || '') + '</div></div>' +
+      '<span class="ec-badge fail">' + esc(t('Can xu ly', 'Needs action')) + '</span>' +
+    '</div>' +
+    '<div class="ec-work-grid">' +
+      renderMiniField(t('Nguoi tai', 'Uploaded by'), item.uploaded_by || '-') +
+      renderMiniField(t('Pham vi', 'Scope'), scope || '-') +
+      renderMiniField(t('Thoi diem', 'Timestamp'), fmtDateTime(item.timestamp || '')) +
+    '</div>' +
+    verifySummary +
+    '<div class="ec-work-actions">' +
+      (quarantineId ? '<button type="button" class="ec-btn ghost" data-verify-quarantine="' + esc(quarantineId) + '"' + (qState.busy ? ' disabled' : '') + '>' + esc(qState.busy ? t('Dang verify...', 'Verifying...') : t('Verify quarantine', 'Verify quarantine')) + '</button>' : '') +
+      (quarantineId ? '<button type="button" class="ec-btn secondary" data-accept-quarantine="' + esc(quarantineId) + '" data-accept-target="' + esc(allocationId) + '"' + ((qState.busy || qState.status !== 'passed') ? ' disabled' : '') + '>' + esc(t('Accept file', 'Accept file')) + '</button>' : '') +
+      (quarantineId ? '<button type="button" class="ec-btn danger" data-reject-quarantine="' + esc(quarantineId) + '"' + (qState.busy ? ' disabled' : '') + '>' + esc(t('Reject file', 'Reject file')) + '</button>' : '') +
+      (hasUploadTarget ? '<button type="button" class="ec-btn secondary" data-open-upload="' + esc(allocationId) + '" data-open-upload-form="' + esc(formCode) + '">' + esc(t('Mo Upload & Kiem tra', 'Open Upload & Verify')) + '</button>' : '') +
+      (!hasUploadTarget && hasFormTarget ? '<button type="button" class="ec-btn ghost" data-open-form-only="' + esc(formCode) + '">' + esc(t('Mo form lien quan', 'Open related form')) + '</button>' : '') +
+    '</div>' +
+  '</article>';
+}
+
+function renderWorkQueue(container){
+  ensureWorkQueueDefaults();
+  var work = state.workQueue;
+  var exceptions = filteredExceptions();
+  var selectedDept = canSeeAllWorkQueue() ? String(work.department || '') : currentDept();
+  var totalOpen = (work.pending || []).length + exceptions.length;
+
+  var deptControl = canSeeAllWorkQueue()
+    ? '<div class="ec-filter-field"><label>' + esc(t('Phong ban', 'Department')) + '</label><select id="ec-wq-dept" class="ec-select"><option value="">' + esc(t('Tat ca phong ban', 'All departments')) + '</option>' + DEPARTMENTS.map(function(dept){
+        return '<option value="' + esc(dept.value) + '"' + (String(dept.value) === String(selectedDept) ? ' selected' : '') + '>' + esc(t(dept.label, dept.labelEn)) + '</option>';
+      }).join('') + '</select></div>'
+    : '<div class="ec-filter-field readonly"><label>' + esc(t('Phong ban', 'Department')) + '</label><div class="ec-filter-value">' + esc(selectedDept || '-') + '</div></div>';
+
+  var formOptions = '<option value="">' + esc(t('Tat ca form', 'All forms')) + '</option>' +
+    state.forms.slice().sort(function(a, b){
+      return String(a.form_code || '').localeCompare(String(b.form_code || ''));
+    }).map(function(form){
+      return '<option value="' + esc(form.form_code || '') + '"' + (String(form.form_code || '') === String(work.formCode || '') ? ' selected' : '') + '>' + esc((form.form_code || '') + ' · ' + (form.title_vi || form.title || form.form_code || '')) + '</option>';
+    }).join('');
+  var exceptionTypeOptions = [
+    ['', t('Tat ca exception', 'All exception types')],
+    ['upload_error', t('Loi tai len', 'Upload error')],
+    ['blocked_extension', t('Phan mo rong bi chan', 'Blocked extension')],
+    ['file_too_large', t('Tep qua lon', 'File too large')],
+    ['mime_rejected', t('MIME bi tu choi', 'MIME rejected')],
+    ['move_failed', t('Move failed', 'Move failed')],
+    ['verification_failed', t('Xac minh that bai', 'Verification failed')],
+    ['rejected', t('Tu choi thu cong', 'Rejected manually')]
+  ].map(function(row){
+    return '<option value="' + esc(row[0]) + '"' + (String(row[0]) === String(work.exceptionType || '') ? ' selected' : '') + '>' + esc(row[1]) + '</option>';
+  }).join('');
+
+  var pendingHtml = work.loading && !work.loaded
+    ? '<div class="ec-work-empty"><strong>' + esc(t('Dang tai hang cho duyet', 'Loading pending queue')) + '</strong>' + esc(t('He thong dang lay cac ho so dang cho review.', 'The system is fetching records currently waiting for review.')) + '</div>'
+    : ((work.pending || []).length ? work.pending.map(renderPendingItem).join('') : '<div class="ec-work-empty"><strong>' + esc(t('Khong co ho so cho duyet', 'No pending evidence')) + '</strong>' + esc(t('Hang cho hien rong voi bo loc dang chon.', 'The queue is empty for the current filters.')) + '</div>');
+
+  var exceptionHtml = work.loading && !work.loaded
+    ? '<div class="ec-work-empty"><strong>' + esc(t('Dang tai hang doi upload', 'Loading upload queue')) + '</strong>' + esc(t('He thong dang lay cac file bi chan hoac khong qua kiem tra.', 'The system is fetching files that were blocked or failed verification.')) + '</div>'
+    : (exceptions.length ? exceptions.map(renderExceptionItem).join('') : '<div class="ec-work-empty"><strong>' + esc(t('Khong co upload exception', 'No upload exception')) + '</strong>' + esc(t('Khong co file nao can ra soat trong khoang thoi gian dang chon.', 'There are no uploads to investigate in the selected time window.')) + '</div>');
+
+  container.innerHTML =
+    '<div class="ec-board">' +
+      '<section class="ec-board-hero">' +
+        '<div class="ec-board-copy">' +
+          '<div class="ec-board-kicker">' + esc(t('Viec cua toi', 'My Work')) + '</div>' +
+          '<h2>' + esc(t('Hang cho xu ly cho ho so va upload', 'Action queue for evidence and uploads')) + '</h2>' +
+          '<p>' + esc(t('Mo thang ho so cho review va xu ly quarantine ngay trong cung module.', 'Open records for review and resolve quarantined uploads directly inside the same module.')) + '</p>' +
+          (work.error ? '<div class="ec-inline-alert">' + esc(work.error) + '</div>' : '') +
+        '</div>' +
+        '<div class="ec-kpi-grid">' +
+          '<div class="ec-kpi-card primary"><small>' + esc(t('Tong viec mo', 'Open actions')) + '</small><strong>' + esc(totalOpen) + '</strong><span>' + esc(t('Tong so muc can xu ly trong pham vi dang loc.', 'Total items that need attention in the current scope.')) + '</span></div>' +
+          '<div class="ec-kpi-card warning"><small>' + esc(t('Cho duyet', 'Pending review')) + '</small><strong>' + esc((work.pending || []).length) + '</strong><span>' + esc(t('Ho so dang o trang thai in-review.', 'Evidence records currently in review.')) + '</span></div>' +
+          '<div class="ec-kpi-card danger"><small>' + esc(t('Upload exception', 'Upload exceptions')) + '</small><strong>' + esc(exceptions.length) + '</strong><span>' + esc(t('File bi chan hoac xac minh that bai.', 'Files that were blocked or failed verification.')) + '</span></div>' +
+          '<div class="ec-kpi-card neutral"><small>' + esc(t('Lan tai gan nhat', 'Last refresh')) + '</small><strong>' + esc(work.lastLoaded ? fmtDateTime(work.lastLoaded) : t('Chua tai', 'Not loaded')) + '</strong><span>' + esc(t('Ban co the refresh bat cu luc nao.', 'You can refresh manually at any time.')) + '</span></div>' +
+        '</div>' +
+      '</section>' +
+      '<section class="ec-board-toolbar">' +
+        deptControl +
+        '<div class="ec-filter-field"><label>' + esc(t('Form', 'Form')) + '</label><select id="ec-wq-form" class="ec-select">' + formOptions + '</select></div>' +
+        '<div class="ec-filter-field"><label>' + esc(t('Loai exception', 'Exception type')) + '</label><select id="ec-wq-type" class="ec-select">' + exceptionTypeOptions + '</select></div>' +
+        '<div class="ec-filter-field"><label>' + esc(t('Tu ngay', 'From date')) + '</label><input id="ec-wq-from" class="ec-input" type="date" value="' + esc(work.dateFrom || '') + '"></div>' +
+        '<div class="ec-filter-field"><label>' + esc(t('Den ngay', 'To date')) + '</label><input id="ec-wq-to" class="ec-input" type="date" value="' + esc(work.dateTo || '') + '"></div>' +
+        '<div class="ec-filter-field"><label>' + esc(t('Khoang exception', 'Exception window')) + '</label><select id="ec-wq-days" class="ec-select">' + [7, 30, 90].map(function(days){
+          return '<option value="' + days + '"' + (Number(work.days) === Number(days) ? ' selected' : '') + '>' + esc(days + ' ' + t('ngay', 'days')) + '</option>';
+        }).join('') + '</select></div>' +
+        '<div class="ec-toolbar-actions"><button type="button" class="ec-btn secondary" id="ec-wq-refresh">' + esc(work.loading ? t('Dang tai...', 'Refreshing...') : t('Lam moi', 'Refresh')) + '</button></div>' +
+      '</section>' +
+      '<section class="ec-board-grid">' +
+        '<article class="ec-panel"><div class="ec-panel-head"><div><h3>' + esc(t('Ho so cho duyet', 'Pending evidence')) + '</h3><p>' + esc(t('Mo thang workspace cua ho so de review, reject hoac reopen.', 'Jump straight into the record workspace to review, reject, or reopen.')) + '</p></div><span class="ec-badge info">' + esc((work.pending || []).length) + '</span></div><div class="ec-work-list">' + pendingHtml + '</div></article>' +
+        '<article class="ec-panel"><div class="ec-panel-head"><div><h3>' + esc(t('Upload hardening queue', 'Upload hardening queue')) + '</h3><p>' + esc(t('Queue nay bam theo bo loc phong ban va form khi backend resolve duoc allocation. Ban co the verify, accept, hoac reject truc tiep ngay tai day.', 'This queue follows the selected department and form whenever the backend can resolve the allocation. You can verify, accept, or reject directly from here.')) + '</p></div><span class="ec-badge warn">' + esc(exceptions.length) + '</span></div><div class="ec-work-list">' + exceptionHtml + '</div></article>' +
+      '</section>' +
+    '</div>';
+  bindWorkQueue(container);
+}
+
+function verifyQuarantine(quarantineId){
+  if(!quarantineId) return Promise.resolve(null);
+  updateQuarantineState(quarantineId, { busy:true });
+  requestRender();
+  return api('upload_verify_quarantine', { quarantine_id: quarantineId }, 'POST').then(function(resp){
+    updateQuarantineState(quarantineId, {
+      busy:false,
+      status:(resp && resp.status === 'verified') ? 'passed' : ((resp && resp.ok) ? 'passed' : 'failed'),
+      checks:(resp && resp.checks) || [],
+      metadata:(resp && resp.metadata) || null
+    });
+    showToast(resp && resp.ok ? t('Quarantine da verify an toan.', 'Quarantine verified successfully.') : t('Quarantine khong dat.', 'Quarantine verification failed.'), resp && resp.ok ? 'success' : 'warn');
+    if(state.workspaceMode === 'work') requestRender();
+    return resp;
+  }).catch(function(){
+    updateQuarantineState(quarantineId, { busy:false, status:'failed' });
+    showToast(t('Khong the verify quarantine.', 'Could not verify quarantine.'), 'error');
+    if(state.workspaceMode === 'work') requestRender();
+    return null;
+  });
+}
+
+function acceptQuarantine(quarantineId, targetDir){
+  if(!quarantineId) return Promise.resolve(null);
+  updateQuarantineState(quarantineId, { busy:true });
+  requestRender();
+  return api('upload_accept', { quarantine_id: quarantineId, target_dir: targetDir || '' }, 'POST').then(function(resp){
+    updateQuarantineState(quarantineId, { busy:false, accepted:!!(resp && resp.ok) });
+    showToast(resp && resp.ok ? t('Da accept file quarantine.', 'Quarantine file accepted.') : t('Khong the accept file.', 'Could not accept the file.'), resp && resp.ok ? 'success' : 'error');
+    return loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); return resp; });
+  }).catch(function(){
+    updateQuarantineState(quarantineId, { busy:false });
+    showToast(t('Khong the accept file.', 'Could not accept the file.'), 'error');
+    if(state.workspaceMode === 'work') requestRender();
+    return null;
+  });
+}
+
+function rejectQuarantine(quarantineId){
+  if(!quarantineId) return Promise.resolve(null);
+  return openPromptDialog({
+    title:t('Reject quarantine file', 'Reject quarantine file'),
+    message:t('Nhap ly do tu choi file nay.', 'Enter a reason for rejecting this file.'),
+    confirmLabel:t('Reject', 'Reject'),
+    cancelLabel:t('Huy', 'Cancel'),
+    required:true,
+    multiline:true
+  }).then(function(reason){
+    if(!reason) return null;
+    updateQuarantineState(quarantineId, { busy:true });
+    requestRender();
+    return api('upload_reject', { quarantine_id: quarantineId, reason: reason }, 'POST').then(function(resp){
+      updateQuarantineState(quarantineId, { busy:false, rejected:!!(resp && resp.ok) });
+      showToast(resp && resp.ok ? t('Da reject file quarantine.', 'Quarantine file rejected.') : t('Khong the reject file.', 'Could not reject the file.'), resp && resp.ok ? 'success' : 'error');
+      return loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); return resp; });
+    }).catch(function(){
+      updateQuarantineState(quarantineId, { busy:false });
+      showToast(t('Khong the reject file.', 'Could not reject the file.'), 'error');
+      if(state.workspaceMode === 'work') requestRender();
+      return null;
+    });
+  });
+}
+
+function bindWorkQueue(container){
+  var deptEl = document.getElementById('ec-wq-dept');
+  if(deptEl) deptEl.onchange = function(){
+    state.workQueue.department = deptEl.value || '';
+    loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); });
+  };
+
+  var formEl = document.getElementById('ec-wq-form');
+  if(formEl) formEl.onchange = function(){
+    state.workQueue.formCode = formEl.value || '';
+    loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); });
+  };
+
+  var typeEl = document.getElementById('ec-wq-type');
+  if(typeEl) typeEl.onchange = function(){
+    state.workQueue.exceptionType = typeEl.value || '';
+    loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); });
+  };
+
+  var fromEl = document.getElementById('ec-wq-from');
+  if(fromEl) fromEl.onchange = function(){
+    state.workQueue.dateFrom = fromEl.value || '';
+    loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); });
+  };
+
+  var toEl = document.getElementById('ec-wq-to');
+  if(toEl) toEl.onchange = function(){
+    state.workQueue.dateTo = toEl.value || '';
+    loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); });
+  };
+
+  var daysEl = document.getElementById('ec-wq-days');
+  if(daysEl) daysEl.onchange = function(){
+    state.workQueue.days = Number(daysEl.value || 30) || 30;
+    loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); });
+  };
+
+  var refreshBtn = document.getElementById('ec-wq-refresh');
+  if(refreshBtn) refreshBtn.onclick = function(){
+    loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); });
+  };
+
+  Array.prototype.forEach.call(container.querySelectorAll('[data-open-allocation]'), function(btn){
+    btn.onclick = function(){ openFormWorkspace(btn.getAttribute('data-open-form') || '', btn.getAttribute('data-open-allocation') || ''); };
+  });
+  Array.prototype.forEach.call(container.querySelectorAll('[data-open-upload]'), function(btn){
+    btn.onclick = function(){ openUploadWorkspace(btn.getAttribute('data-open-upload') || '', btn.getAttribute('data-open-upload-form') || ''); };
+  });
+  Array.prototype.forEach.call(container.querySelectorAll('[data-open-form-only]'), function(btn){
+    btn.onclick = function(){ openFormWorkspace(btn.getAttribute('data-open-form-only') || '', ''); };
+  });
+  Array.prototype.forEach.call(container.querySelectorAll('[data-verify-quarantine]'), function(btn){
+    btn.onclick = function(){ verifyQuarantine(btn.getAttribute('data-verify-quarantine') || ''); };
+  });
+  Array.prototype.forEach.call(container.querySelectorAll('[data-accept-quarantine]'), function(btn){
+    btn.onclick = function(){ acceptQuarantine(btn.getAttribute('data-accept-quarantine') || '', btn.getAttribute('data-accept-target') || ''); };
+  });
+  Array.prototype.forEach.call(container.querySelectorAll('[data-reject-quarantine]'), function(btn){
+    btn.onclick = function(){ rejectQuarantine(btn.getAttribute('data-reject-quarantine') || ''); };
+  });
+}
 
 function render(container){
   container.innerHTML = '<div class="ec-shell">' + renderSidebar() + '<div class="ec-workspace" id="ec-workspace"></div></div>';
   bindSidebar(container);
-  renderWorkspace();
+  renderWorkspacePane();
 }
 
 function renderSidebar(){
   var forms = filterForms();
   var categories = {};
-  forms.forEach(function(f){ var c = f.category || 'other'; if(!categories[c]) categories[c] = []; categories[c].push(f); });
+  var cats = ['all','quality','production','maintenance','hr','logistics','safety','other'];
+  var catLabels = { all:t('Tat ca','All'), quality:t('Chat luong','Quality'), production:t('San xuat','Production'), maintenance:t('Bao tri','Maintenance'), hr:t('Nhan su','HR'), logistics:t('Kho van','Logistics'), safety:t('An toan','Safety'), other:t('Khac','Other') };
+  var workCount = state.workQueue.loaded ? ((state.workQueue.pending || []).length + (state.workQueue.exceptions || []).length) : 0;
+
+  forms.forEach(function(form){
+    var category = form.category || 'other';
+    if(!categories[category]) categories[category] = [];
+    categories[category].push(form);
+  });
 
   var formListHtml = '';
   if(!forms.length){
-    formListHtml = '<div style="padding:24px;text-align:center;color:var(--ec-text-muted);font-size:12px">' + esc(t('Không tìm thấy form nào', 'No forms found')) + '</div>';
+    formListHtml = '<div style="padding:24px;text-align:center;color:var(--ec-text-muted);font-size:12px">' + esc(t('Khong tim thay form nao', 'No forms found')) + '</div>';
   } else {
-    Object.keys(categories).sort().forEach(function(cat){
-      var meta = FORM_COLORS[cat] || FORM_COLORS.other;
-      formListHtml += categories[cat].map(function(f){
-        var isActive = state.selectedFormCode === f.form_code;
-        return '<div class="ec-form-item' + (isActive ? ' active' : '') + '" data-form="' + esc(f.form_code) + '">' +
-          '<div class="ec-form-icon" style="background:' + meta.bg + '">' + meta.icon + '</div>' +
-          '<div class="ec-form-info"><div class="ec-form-code">' + esc(f.form_code) + '</div><div class="ec-form-name">' + esc(f.title_vi || f.title || f.form_code) + '</div></div>' +
-          '<span class="ec-mode-badge ' + (f.online === false ? 'offline' : 'online') + '">' + (f.online === false ? 'Offline' : 'Online') + '</span>' +
+    Object.keys(categories).sort().forEach(function(category){
+      var meta = FORM_COLORS[category] || FORM_COLORS.other;
+      formListHtml += categories[category].map(function(form){
+        var isActive = state.selectedFormCode === form.form_code;
+        return '<div class="ec-form-item' + (isActive ? ' active' : '') + '" data-form="' + esc(form.form_code) + '">' +
+          '<div class="ec-form-icon" style="background:' + meta.bg + '">' + esc(meta.icon) + '</div>' +
+          '<div class="ec-form-info"><div class="ec-form-code">' + esc(form.form_code) + '</div><div class="ec-form-name">' + esc(form.title_vi || form.title || form.form_code) + '</div></div>' +
+          '<span class="ec-mode-badge ' + (form.online === false ? 'offline' : 'online') + '">' + (form.online === false ? 'Offline' : 'Online') + '</span>' +
         '</div>';
       }).join('');
     });
   }
 
   var allocHtml = '';
-  if(state.selectedFormCode && state.allocations.length){
-    allocHtml = state.allocations.map(function(a){
-      var isActive = state.selectedAllocationId === a.allocation_id;
-      return '<div class="ec-alloc-item' + (isActive ? ' active' : '') + '" data-alloc="' + esc(a.allocation_id) + '">' +
-        '<div style="flex:1;min-width:0"><div class="ec-alloc-id">' + esc(a.record_id || '') + '</div><div class="ec-alloc-meta">' + esc(a.department || '') + ' · ' + esc(a.status || 'allocated') + '</div></div>' +
-        (window.AllocationTracker ? window.AllocationTracker.renderStatusBadge(a.status || 'allocated') : '') +
+  if(state.selectedFormCode && state.workspaceMode === 'form' && state.allocations.length){
+    allocHtml = state.allocations.map(function(allocation){
+      var isActive = state.selectedAllocationId === allocation.allocation_id;
+      return '<div class="ec-alloc-item' + (isActive ? ' active' : '') + '" data-alloc="' + esc(allocation.allocation_id) + '">' +
+        '<div style="flex:1;min-width:0"><div class="ec-alloc-id">' + esc(allocation.record_id || '') + '</div><div class="ec-alloc-meta">' + esc(allocation.department || '') + ' · ' + esc(allocation.status || 'allocated') + '</div></div>' +
+        (window.AllocationTracker ? window.AllocationTracker.renderStatusBadge(allocation.status || 'allocated') : '') +
       '</div>';
     }).join('');
   }
 
-  var cats = ['all','quality','production','maintenance','hr','logistics','safety','other'];
-  var catLabels = { all: t('Tất cả','All'), quality: t('Chất lượng','Quality'), production: t('Sản xuất','Production'), maintenance: t('Bảo trì','Maintenance'), hr: t('Nhân sự','HR'), logistics: t('Kho vận','Logistics'), safety: t('An toàn','Safety'), other: t('Khác','Other') };
-
-  return '<aside class="ec-sidebar">' +
+  return '<aside class="ec-sidebar" role="navigation" aria-label="' + esc(t('Danh muc bieu mau', 'Form catalog')) + '">' +
     '<div class="ec-sidebar-header">' +
-      '<div class="ec-sidebar-title">' + esc(t('Danh mục biểu mẫu', 'Form catalog')) + '</div>' +
-      '<input class="ec-search" id="ec-search" type="search" value="' + esc(state.search) + '" placeholder="' + esc(t('Tìm form...', 'Search forms...')) + '">' +
+      '<div class="ec-sidebar-title">' + esc(t('Danh muc bieu mau', 'Form catalog')) + '</div>' +
+      '<input class="ec-search" id="ec-search" type="search" value="' + esc(state.search) + '" placeholder="' + esc(t('Tim form...', 'Search forms...')) + '">' +
     '</div>' +
-    '<div class="ec-filters" id="ec-filters">' + cats.map(function(c){
-      return '<button type="button" class="ec-chip' + (state.filter === c ? ' active' : '') + '" data-filter="' + c + '">' + esc(catLabels[c] || c) + '</button>';
+    '<div class="ec-filters" id="ec-filters">' + cats.map(function(cat){
+      return '<button type="button" class="ec-chip' + (state.filter === cat ? ' active' : '') + '" data-filter="' + cat + '">' + esc(catLabels[cat] || cat) + '</button>';
     }).join('') + '</div>' +
     '<div class="ec-form-list" id="ec-form-list">' + formListHtml + '</div>' +
-    (state.selectedFormCode && state.workspaceMode === 'form' ? '<div class="ec-alloc-section"><div class="ec-alloc-section-head"><span>' + esc(t('Mã đã cấp', 'Allocations')) + ' (' + state.allocations.length + ')</span></div>' + (allocHtml || '<div style="padding:8px 16px;font-size:11px;color:var(--ec-text-muted)">' + esc(t('Chưa có mã', 'None yet')) + '</div>') + '</div>' : '') +
+    (state.selectedFormCode && state.workspaceMode === 'form' ? '<div class="ec-alloc-section"><div class="ec-alloc-section-head"><span>' + esc(t('Ma da cap', 'Allocations')) + ' (' + state.allocations.length + ')</span></div>' + (allocHtml || '<div style="padding:8px 16px;font-size:11px;color:var(--ec-text-muted)">' + esc(t('Chua co ma', 'None yet')) + '</div>') + '</div>' : '') +
     '<div class="ec-sidebar-tools">' +
-      '<button type="button" class="ec-tool-btn' + (state.workspaceMode === 'record-id' ? ' active' : '') + '" data-tool="record-id">\uD83D\uDD22 ' + esc(t('Trợ lý tạo mã', 'Record ID Assistant')) + '</button>' +
-      '<button type="button" class="ec-tool-btn' + (state.workspaceMode === 'upload' ? ' active' : '') + '" data-tool="upload">\uD83D\uDCE4 ' + esc(t('Tải lên & Kiểm tra', 'Upload & Verify')) + '</button>' +
+      '<button type="button" class="ec-tool-btn' + (state.workspaceMode === 'work' ? ' active' : '') + '" data-tool="work">' + esc(t('Viec cua toi', 'My Work')) + (workCount ? '<span class="ec-tool-pill">' + esc(workCount) + '</span>' : '') + '</button>' +
+      '<button type="button" class="ec-tool-btn' + (state.workspaceMode === 'record-id' ? ' active' : '') + '" data-tool="record-id">' + esc(t('Tro ly tao ma', 'Record ID Assistant')) + '</button>' +
+      '<button type="button" class="ec-tool-btn' + (state.workspaceMode === 'upload' ? ' active' : '') + '" data-tool="upload">' + esc(t('Tai len & Kiem tra', 'Upload & Verify')) + '</button>' +
     '</div>' +
   '</aside>';
 }
 
-function filterForms(){
-  return state.forms.filter(function(f){
-    if(state.filter !== 'all' && (f.category || 'other') !== state.filter) return false;
-    if(state.search){
-      var q = state.search.toLowerCase();
-      var hay = [f.form_code, f.title, f.title_vi, f.description, f.description_vi, f.sop_ref, f.category].join(' ').toLowerCase();
-      if(hay.indexOf(q) < 0) return false;
-    }
-    return true;
-  });
-}
-
-function renderWorkspace(){
+function renderWorkspacePane(){
   var wsEl = document.getElementById('ec-workspace');
   if(!wsEl) return;
-
-  /* Record ID Assistant mode */
+  if(state.workspaceLoading){
+    wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Dang tai du lieu ho so', 'Loading record workspace')) + '</h3><p>' + esc(t('He thong dang dong bo allocation, checklist va lich su moi nhat.', 'The system is syncing allocations, checklist data, and the latest history.')) + '</p></div>';
+    return;
+  }
+  if(state.workspaceMode === 'work'){
+    renderWorkQueue(wsEl);
+    if(!state.workQueue.loaded && !state.workQueue.loading) loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); });
+    return;
+  }
   if(state.workspaceMode === 'record-id'){
-    if(typeof window._renderRecordIdGenerator === 'function'){
-      window._renderRecordIdGenerator(state.forms, {}, wsEl);
-    } else {
-      wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Module Trợ lý tạo mã chưa sẵn sàng', 'Record ID Assistant not ready')) + '</h3></div>';
-    }
+    if(typeof window._renderRecordIdGenerator === 'function') window._renderRecordIdGenerator(state.forms, {}, wsEl);
+    else wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Module Tro ly tao ma chua san sang', 'Record ID Assistant not ready')) + '</h3></div>';
     return;
   }
-
-  /* Upload & Verify mode */
   if(state.workspaceMode === 'upload'){
-    if(typeof window._renderUploadVerify === 'function'){
-      window._renderUploadVerify(state.forms, {}, wsEl);
-    } else {
-      wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Module Tải lên & Kiểm tra chưa sẵn sàng', 'Upload & Verify not ready')) + '</h3></div>';
-    }
+    if(typeof window._renderUploadVerify === 'function') window._renderUploadVerify(state.forms, {}, wsEl);
+    else wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Module Tai len & Kiem tra chua san sang', 'Upload & Verify not ready')) + '</h3></div>';
     return;
   }
 
-  /* Form workspace mode */
   var form = state.formMap[state.selectedFormCode] || null;
   if(!form){
-    wsEl.innerHTML = '<div class="ec-empty"><div class="ec-empty-icon">\uD83D\uDCCB</div><h3>' + esc(t('Chọn biểu mẫu để bắt đầu', 'Select a form to begin')) + '</h3><p>' + esc(t('Chọn form từ danh mục bên trái. Hệ thống sẽ hướng dẫn bạn qua từng bước: cấp mã → điền/tải → ký & gửi.', 'Pick a form from the catalog. The system will guide you through each step: allocate → fill/download → sign & submit.')) + '</p></div>';
+    wsEl.innerHTML = '<div class="ec-empty"><div class="ec-empty-icon">EC</div><h3>' + esc(t('Chon bieu mau de bat dau', 'Select a form to begin')) + '</h3><p>' + esc(t('Chon form tu danh muc ben trai. He thong se huong dan qua tung buoc: cap ma -> dien/tai -> ky va gui.', 'Pick a form from the catalog. The system will guide you through each step: allocate -> fill/download -> sign and submit.')) + '</p></div>';
     return;
   }
-  var allocation = state.allocations.find(function(a){ return a.allocation_id === state.selectedAllocationId; }) || null;
-  if(typeof window._renderWorkspace === 'function'){
-    window._renderWorkspace(form, allocation, wsEl);
-  } else {
-    wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Module workspace chưa sẵn sàng', 'Workspace module not ready')) + '</h3></div>';
-  }
+  var allocation = state.allocations.find(function(row){ return row.allocation_id === state.selectedAllocationId; }) || null;
+  if(typeof window._renderWorkspace === 'function') window._renderWorkspace(form, allocation, wsEl);
+  else wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Module workspace chua san sang', 'Workspace module not ready')) + '</h3></div>';
 }
-
-/* ── Event binding ── */
 
 function bindSidebar(container){
   var searchEl = document.getElementById('ec-search');
-  if(searchEl) searchEl.oninput = function(){ state.search = searchEl.value; refreshFormList(container); };
-
-  container.addEventListener('click', function(e){
-    var filterBtn = e.target.closest('[data-filter]');
-    if(filterBtn){
-      state.filter = filterBtn.getAttribute('data-filter') || 'all';
+  if(searchEl) searchEl.oninput = function(){
+    state.search = searchEl.value;
+    if(state.searchTimer) clearTimeout(state.searchTimer);
+    state.searchTimer = setTimeout(function(){
+      state.searchTimer = null;
       refreshFormList(container);
-      return;
-    }
-    var formItem = e.target.closest('[data-form]');
+    }, 250);
+  };
+
+  container.onclick = function(event){
+    var filterBtn = event.target.closest('[data-filter]');
+    if(filterBtn){ state.filter = filterBtn.getAttribute('data-filter') || 'all'; refreshFormList(container); return; }
+
+    var formItem = event.target.closest('[data-form]');
     if(formItem){
-      var code = formItem.getAttribute('data-form');
+      var code = formItem.getAttribute('data-form') || '';
       if(code === state.selectedFormCode && state.workspaceMode === 'form') return;
       state.selectedFormCode = code;
       state.selectedAllocationId = '';
       state.allocations = [];
       state.workspaceMode = 'form';
-      loadAllocations().then(function(){ render(container); });
-      return;
-    }
-    var allocItem = e.target.closest('[data-alloc]');
-    if(allocItem){
-      state.selectedAllocationId = allocItem.getAttribute('data-alloc') || '';
+      state.workspaceLoading = true;
       render(container);
+      loadAllocations().then(function(){
+        state.workspaceLoading = false;
+        render(container);
+      }).catch(function(){
+        state.workspaceLoading = false;
+        render(container);
+      });
       return;
     }
-    var toolBtn = e.target.closest('[data-tool]');
+
+    var allocItem = event.target.closest('[data-alloc]');
+    if(allocItem){ state.selectedAllocationId = allocItem.getAttribute('data-alloc') || ''; render(container); return; }
+
+    var toolBtn = event.target.closest('[data-tool]');
     if(toolBtn){
-      var mode = toolBtn.getAttribute('data-tool');
+      var mode = toolBtn.getAttribute('data-tool') || 'form';
       state.workspaceMode = (state.workspaceMode === mode) ? 'form' : mode;
       render(container);
+      if(state.workspaceMode === 'work') loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') render(container); });
     }
-  });
+  };
 }
 
 function refreshFormList(container){
   var listEl = document.getElementById('ec-form-list');
   var filtersEl = document.getElementById('ec-filters');
   if(!listEl) return;
-
   var forms = filterForms();
   var categories = {};
-  forms.forEach(function(f){ var c = f.category || 'other'; if(!categories[c]) categories[c] = []; categories[c].push(f); });
+  forms.forEach(function(form){ var category = form.category || 'other'; if(!categories[category]) categories[category] = []; categories[category].push(form); });
 
   var html = '';
   if(!forms.length){
-    html = '<div style="padding:24px;text-align:center;color:var(--ec-text-muted);font-size:12px">' + esc(t('Không tìm thấy form nào', 'No forms found')) + '</div>';
+    html = '<div style="padding:24px;text-align:center;color:var(--ec-text-muted);font-size:12px">' + esc(t('Khong tim thay form nao', 'No forms found')) + '</div>';
   } else {
-    Object.keys(categories).sort().forEach(function(cat){
-      var meta = FORM_COLORS[cat] || FORM_COLORS.other;
-      html += categories[cat].map(function(f){
-        return '<div class="ec-form-item' + (state.selectedFormCode === f.form_code ? ' active' : '') + '" data-form="' + esc(f.form_code) + '">' +
-          '<div class="ec-form-icon" style="background:' + meta.bg + '">' + meta.icon + '</div>' +
-          '<div class="ec-form-info"><div class="ec-form-code">' + esc(f.form_code) + '</div><div class="ec-form-name">' + esc(f.title_vi || f.title || f.form_code) + '</div></div>' +
-          '<span class="ec-mode-badge ' + (f.online === false ? 'offline' : 'online') + '">' + (f.online === false ? 'Offline' : 'Online') + '</span>' +
+    Object.keys(categories).sort().forEach(function(category){
+      var meta = FORM_COLORS[category] || FORM_COLORS.other;
+      html += categories[category].map(function(form){
+        return '<div class="ec-form-item' + (state.selectedFormCode === form.form_code ? ' active' : '') + '" data-form="' + esc(form.form_code) + '">' +
+          '<div class="ec-form-icon" style="background:' + meta.bg + '">' + esc(meta.icon) + '</div>' +
+          '<div class="ec-form-info"><div class="ec-form-code">' + esc(form.form_code) + '</div><div class="ec-form-name">' + esc(form.title_vi || form.title || form.form_code) + '</div></div>' +
+          '<span class="ec-mode-badge ' + (form.online === false ? 'offline' : 'online') + '">' + (form.online === false ? 'Offline' : 'Online') + '</span>' +
         '</div>';
       }).join('');
     });
   }
   listEl.innerHTML = html;
-
-  if(filtersEl){
-    Array.prototype.forEach.call(filtersEl.querySelectorAll('.ec-chip'), function(btn){
-      btn.classList.toggle('active', btn.getAttribute('data-filter') === state.filter);
-    });
-  }
+  if(filtersEl) Array.prototype.forEach.call(filtersEl.querySelectorAll('.ec-chip'), function(btn){ btn.classList.toggle('active', btn.getAttribute('data-filter') === state.filter); });
 }
 
-/* ── Public entry point ── */
-
 window.renderOnlineForms = function(formCode){
-  var page = document.getElementById('page-forms');
+  var page = pageEl();
   if(!page) return;
+  if(!formCode && state.pendingFillSelection && state.pendingFillSelection.formCode){
+    formCode = state.pendingFillSelection.formCode;
+    if(state.pendingFillSelection.allocationId) state.selectedAllocationId = state.pendingFillSelection.allocationId;
+    state.workspaceMode = 'form';
+  }
   if(formCode) state.selectedFormCode = formCode;
-  page.innerHTML = '<div class="ec-empty" style="min-height:300px"><div style="font-size:14px;color:var(--ec-text-muted)">' + esc(t('Đang tải...', 'Loading...')) + '</div></div>';
+  page.innerHTML = '<div class="ec-empty" style="min-height:300px"><div style="font-size:14px;color:var(--ec-text-muted)">' + esc(t('Dang tai...', 'Loading...')) + '</div></div>';
   loadAll().then(function(){
+    if(state.pendingFillSelection && state.pendingFillSelection.formCode){
+      state.selectedFormCode = state.pendingFillSelection.formCode;
+      if(state.pendingFillSelection.allocationId) state.selectedAllocationId = state.pendingFillSelection.allocationId;
+      state.pendingFillSelection = null;
+    }
     if(!state.selectedFormCode && state.forms.length) state.selectedFormCode = state.forms[0].form_code;
     return loadAllocations();
   }).then(function(){
     state.ready = true;
     render(page);
   }).catch(function(){
-    page.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Không thể tải dữ liệu', 'Could not load data')) + '</h3><p>' + esc(t('Vui lòng kiểm tra kết nối và thử lại.', 'Please check your connection and try again.')) + '</p></div>';
+    page.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Khong the tai du lieu', 'Could not load data')) + '</h3><p>' + esc(t('Vui long kiem tra ket noi va thu lai.', 'Please check your connection and try again.')) + '</p></div>';
   });
 };
 
-/* backward compat */
-window._fhSwitchTab = function(){};
+window._fhSwitchTab = function(target){
+  state.activeTab = target || '';
+  if(target === 'record-id'){ state.workspaceMode = 'record-id'; requestRender(); return; }
+  if(target === 'upload' || target === 'upload-verify'){ state.workspaceMode = 'upload'; requestRender(); return; }
+  if(target === 'work' || target === 'my-work'){ state.workspaceMode = 'work'; requestRender(); loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); }); return; }
+  if(target === 'fill' || target === 'fill-download'){
+    var pending = state.pendingFillSelection || {};
+    if(pending.formCode || state.selectedFormCode){
+      openFormWorkspace(pending.formCode || state.selectedFormCode, pending.allocationId || state.selectedAllocationId || '');
+      state.pendingFillSelection = null;
+      return;
+    }
+  }
+  state.workspaceMode = 'form';
+  requestRender();
+};
+
 window._fhState = state;
 window._fhShowToast = showToast;
 window._fhT = t;

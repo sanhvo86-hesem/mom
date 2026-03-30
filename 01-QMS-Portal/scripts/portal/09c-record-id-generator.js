@@ -23,6 +23,18 @@ var _masterData = null;
 var _orderData = { sales_orders: [], job_orders: [], work_orders: [] };
 var _lookupInstances = {};
 var _contextValues = {};
+var _previewState = { loading:false, nextId:'', duplicate:null, error:'' };
+
+function _resetRenderState(){
+  _moduleId = _uid();
+  _selectedDept = '';
+  _selectedType = '';
+  _selectedYear = new Date().getFullYear();
+  _historyFilters = { recordType:'', department:'', status:'', search:'', page:1, pageSize:20 };
+  _notesDraft = '';
+  _lookupInstances = {};
+  _previewState = { loading:false, nextId:'', duplicate:null, error:'' };
+}
 
 var DEPARTMENTS = [
   { value:'QA',  label:'Đảm bảo chất lượng', labelEn:'Quality Assurance' },
@@ -58,12 +70,24 @@ var RECORD_TYPE_LABELS_VI = {
 
 window._renderRecordIdGenerator = function(schemas, entries, container){
   if(!container) return;
+  _resetRenderState();
   _container = container;
+  if(typeof currentUser !== 'undefined' && currentUser && currentUser.dept){
+    _selectedDept = String(currentUser.dept || '').trim().toUpperCase();
+    _historyFilters.department = _selectedDept;
+  }
+  _contextValues = {};
   if(window._fhState && window._fhState.pendingContext && typeof window._fhState.pendingContext === 'object'){
     _contextValues = Object.assign({}, window._fhState.pendingContext);
   }
   Promise.all([_ensureRecordTypes(), _ensureLookupSources()]).then(function(){
+    if(!Object.keys(_recordTypes || {}).length && !_hasLookupData()){
+      _showInlineMessage(_t('Không tải được loại hồ sơ hoặc master data. Hãy kiểm tra phiên đăng nhập và kết nối.', 'Could not load record types or master data. Check your session and connection.'), 'error');
+    }
     _rerender(true);
+  }).catch(function(){
+    _showInlineMessage(_t('Không khởi tạo được Trợ lý tạo mã.', 'Could not initialize the Record ID Assistant.'), 'error');
+    _rerender(false);
   });
 };
 
@@ -98,6 +122,18 @@ function _api(action, payload, method){
     opts.body = JSON.stringify(payload || {});
   }
   return fetch('api.php?action=' + encodeURIComponent(action), opts).then(function(r){ return r.json(); });
+}
+
+function _apiGet(action, payload){
+  if(typeof apiCall === 'function') return apiCall(action, payload || {}, 'GET', 30000);
+  var params = new URLSearchParams();
+  Object.keys(payload || {}).forEach(function(key){
+    var value = payload[key];
+    if(value === undefined || value === null || value === '') return;
+    params.set(key, String(value));
+  });
+  var url = 'api.php?action=' + encodeURIComponent(action) + (params.toString() ? '&' + params.toString() : '');
+  return fetch(url, { credentials:'include' }).then(function(r){ return r.json(); });
 }
 
 function _flattenOrders(list){
@@ -162,6 +198,13 @@ function _normalizeContext(){
   return cleaned;
 }
 
+function _hasLookupData(){
+  return !!(
+    (_masterData && Object.keys(_masterData).length) ||
+    (_orderData.sales_orders.length || _orderData.job_orders.length || _orderData.work_orders.length)
+  );
+}
+
 function _applyContextSelection(fieldId, item){
   var next = Object.assign({}, _contextValues);
   if(!item){
@@ -173,9 +216,10 @@ function _applyContextSelection(fieldId, item){
     });
   }
   if(fieldId === 'customer_id'){ delete next.so_number; delete next.jo_number; delete next.wo_number; delete next.part_number; delete next.part_revision; delete next.capa_number; }
-  if(fieldId === 'so_number'){ delete next.jo_number; delete next.wo_number; }
-  if(fieldId === 'jo_number'){ delete next.wo_number; }
+  if(fieldId === 'so_number'){ delete next.jo_number; delete next.wo_number; delete next.part_number; delete next.part_revision; delete next.capa_number; }
+  if(fieldId === 'jo_number'){ delete next.wo_number; delete next.part_number; delete next.part_revision; delete next.capa_number; }
   if(fieldId === 'part_number'){ delete next.part_revision; delete next.capa_number; }
+  if(fieldId === 'part_revision'){ delete next.capa_number; }
   _contextValues = next;
   _normalizeContext();
   _rerender(false);
@@ -196,10 +240,10 @@ function _render(container){
     '<section class="rid-shell">' +
       '<div class="rid-issue-card">' +
         '<div class="rid-grid">' +
-          '<div class="rid-field"><label>' + _t('Phòng ban', 'Department') + '</label><select id="' + _moduleId + '-dept"></select></div>' +
-          '<div class="rid-field"><label>' + _t('Loại hồ sơ', 'Record Type') + '</label><select id="' + _moduleId + '-type"><option value="">' + _t('Chọn loại hồ sơ', 'Select record type') + '</option></select></div>' +
-          '<div class="rid-field"><label>' + _t('Năm', 'Year') + '</label><select id="' + _moduleId + '-year"></select></div>' +
-          '<div class="rid-field rid-field-wide"><label>' + _t('Ghi chú cấp phát', 'Allocation note') + '</label><input id="' + _moduleId + '-notes" type="text" value="' + _escHtml(_notesDraft) + '" placeholder="' + _escHtml(_t('Ví dụ: NCR cho WO-2026-0012', 'Example: NCR for WO-2026-0012')) + '"></div>' +
+          '<div class="rid-field"><label for="' + _moduleId + '-dept">' + _t('Phòng ban', 'Department') + '</label><select id="' + _moduleId + '-dept"></select></div>' +
+          '<div class="rid-field"><label for="' + _moduleId + '-type">' + _t('Loại hồ sơ', 'Record Type') + '</label><select id="' + _moduleId + '-type"><option value="">' + _t('Chọn loại hồ sơ', 'Select record type') + '</option></select></div>' +
+          '<div class="rid-field"><label for="' + _moduleId + '-year">' + _t('Năm', 'Year') + '</label><select id="' + _moduleId + '-year"></select></div>' +
+          '<div class="rid-field rid-field-wide"><label for="' + _moduleId + '-notes">' + _t('Ghi chú cấp phát', 'Allocation note') + '</label><input id="' + _moduleId + '-notes" type="text" value="' + _escHtml(_notesDraft) + '" placeholder="' + _escHtml(_t('Ví dụ: NCR cho WO-2026-0012', 'Example: NCR for WO-2026-0012')) + '"></div>' +
         '</div>' +
         _renderContextCard() +
         '<div class="rid-preview-card" id="' + _moduleId + '-preview-card">' +
@@ -244,7 +288,7 @@ function _renderContextCard(){
         '<div><h3>' + _t('Ngữ cảnh master data bắt buộc', 'Required governed context') + '</h3><p>' + _t('Chọn trực tiếp từ Customer / SO / JO / WO / Part / Revision / CAPA đã được quản lý. Runtime sẽ dùng cùng context này cho cấp mã, điền form và upload kiểm tra.', 'Select from governed Customer / SO / JO / WO / Part / Revision / CAPA data. The runtime will reuse the same context for allocation, form entry, and upload verification.') + '</p></div>' +
       '</div>' +
       '<div class="rid-context-grid">' + _contextFields().map(function(field){
-        return '<div class="rid-field"><label>' + _escHtml(_t(field.labelVi, field.labelEn)) + '</label><div id="' + _moduleId + '-ctx-' + field.id + '"></div></div>';
+        return '<div class="rid-field"><label for="' + _moduleId + '-lookup-' + field.id + '">' + _escHtml(_t(field.labelVi, field.labelEn)) + '</label><div id="' + _moduleId + '-ctx-' + field.id + '"></div></div>';
       }).join('') + '</div>' +
       '<div class="rid-context-note">' + _escHtml(_contextSummary() || _t('Chưa chọn ngữ cảnh nào. Nếu hồ sơ có liên quan đơn hàng hoặc part, hãy chọn trước khi cấp mã để tránh mất truy xuất.', 'No governed context selected yet. Choose the order/part context before issuing the record ID when traceability is required.')) + '</div>' +
     '</div>';
@@ -335,18 +379,69 @@ function _renderTypeFilters(){
   el.innerHTML = html;
 }
 
+function _previewFilename(nextId, cfg){
+  cfg = cfg || {};
+  if(!nextId) return '';
+  if(cfg.linked_form){
+    return [cfg.linked_form, nextId].filter(Boolean).join('_') + '.xlsx';
+  }
+  return nextId + '.txt';
+}
+
 function _refreshPreview(){
   var previewId = document.getElementById(_moduleId + '-preview-id');
   var previewMeta = document.getElementById(_moduleId + '-preview-meta');
+  var generateBtn = document.getElementById(_moduleId + '-generate');
   if(!previewId || !previewMeta) return;
   if(!_selectedType){
+    _previewState = { loading:false, nextId:'', duplicate:null, error:'' };
     previewId.textContent = _t('Chọn loại hồ sơ để xem mã dự kiến', 'Select a record type to preview the next ID');
     previewMeta.textContent = '';
+    if(generateBtn) generateBtn.disabled = true;
     return;
   }
   var cfg = _recordTypes[_selectedType] || {};
-  previewId.textContent = String(cfg.format_pattern || (_selectedType + '-{YYYY}-{NNN}')).replace('{YYYY}', _selectedYear).replace('{NNN}', '###');
+  _previewState.loading = true;
+  _previewState.error = '';
+  _previewState.nextId = '';
+  _previewState.duplicate = null;
+  previewId.textContent = _t('Đang xem mã kế tiếp...', 'Checking next ID...');
   previewMeta.innerHTML = '<span>' + _escHtml((cfg.department_owner || '—') + ' · ' + (cfg.linked_form || '—')) + '</span>' + (_contextSummary() ? '<br><span>' + _escHtml(_contextSummary()) + '</span>' : '');
+  if(generateBtn) generateBtn.disabled = true;
+
+  _apiGet('record_id_peek', { prefix:_selectedType, year:_selectedYear }).then(function(resp){
+    if(!resp || !resp.ok){
+      _previewState.loading = false;
+      _previewState.error = 'peek_failed';
+      previewId.textContent = _t('Không xem được mã kế tiếp', 'Could not preview the next ID');
+      previewMeta.innerHTML = '<span>' + _escHtml((cfg.department_owner || '—') + ' · ' + (cfg.linked_form || '—')) + '</span>';
+      return;
+    }
+
+    _previewState.nextId = String(resp.next_id || '');
+    previewId.textContent = _previewState.nextId || String(cfg.format_pattern || (_selectedType + '-{YYYY}-{NNN}')).replace('{YYYY}', _selectedYear).replace('{NNN}', '###');
+
+    var duplicateReq = window.AllocationTracker && _previewState.nextId
+      ? window.AllocationTracker.checkDuplicate(_previewState.nextId)
+      : Promise.resolve({ ok:true, duplicate:false });
+
+    return duplicateReq.then(function(dupResp){
+      _previewState.loading = false;
+      _previewState.duplicate = !!(dupResp && dupResp.duplicate);
+      var filenameHint = _previewFilename(_previewState.nextId, cfg);
+      previewMeta.innerHTML =
+        '<span>' + _escHtml((cfg.department_owner || '—') + ' · ' + (cfg.linked_form || '—')) + '</span>' +
+        (_contextSummary() ? '<br><span>' + _escHtml(_contextSummary()) + '</span>' : '') +
+        (filenameHint ? '<br><span>' + _escHtml(_t('Tên file gợi ý: ', 'Suggested filename: ') + filenameHint) + '</span>' : '') +
+        '<br><span>' + _escHtml(_previewState.duplicate ? _t('Cảnh báo: mã dự kiến đang bị trùng.', 'Warning: the next ID appears to be duplicated.') : _t('Mã dự kiến đang an toàn để cấp.', 'The previewed ID is clear to issue.')) + '</span>';
+      if(generateBtn) generateBtn.disabled = _previewState.duplicate;
+    });
+  }).catch(function(){
+    _previewState.loading = false;
+    _previewState.error = 'preview_failed';
+    previewId.textContent = _t('Không xem được mã kế tiếp', 'Could not preview the next ID');
+    previewMeta.innerHTML = '<span>' + _escHtml((cfg.department_owner || '—') + ' · ' + (cfg.linked_form || '—')) + '</span>';
+  });
 }
 
 function _mountContextLookups(){
@@ -377,6 +472,14 @@ function _mountContextLookups(){
 function _generate(){
   if(!_selectedDept || !_selectedType){
     _showInlineMessage(_t('Vui lòng chọn phòng ban và loại hồ sơ.', 'Please select a department and record type.'), 'warn');
+    return;
+  }
+  if(_previewState.loading){
+    _showInlineMessage(_t('Hãy chờ hệ thống kiểm tra mã kế tiếp.', 'Please wait for the preview check to finish.'), 'warn');
+    return;
+  }
+  if(_previewState.duplicate){
+    _showInlineMessage(_t('Mã dự kiến đang bị trùng. Hãy kiểm tra lại counter trước khi cấp.', 'The previewed ID appears duplicated. Check the counter before issuing.'), 'error');
     return;
   }
   var cfg = _recordTypes[_selectedType] || {};
