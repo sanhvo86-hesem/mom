@@ -1003,7 +1003,7 @@ function renderSidebar(){
     '<div class="ec-form-list" id="ec-form-list">' + formListHtml + '</div>' +
     (state.selectedFormCode && state.workspaceMode === 'form' ? '<div class="ec-alloc-section"><div class="ec-alloc-section-head"><span>' + esc(t('Mã đã cấp', 'Allocations')) + ' (' + state.allocations.length + ')</span></div>' + (allocHtml || '<div style="padding:8px 16px;font-size:11px;color:var(--ec-text-muted)">' + esc(t('Chưa có mã', 'None yet')) + '</div>') + '</div>' : '') +
     '<div class="ec-sidebar-tools">' +
-      '<button type="button" class="ec-tool-btn' + (state.workspaceMode === 'builder' ? ' active' : '') + '" data-tool="builder">' + esc(t('Form Control', 'Form Control')) + '</button>' +
+      '<button type="button" class="ec-tool-btn' + (state.workspaceMode === 'builder' ? ' active' : '') + '" data-tool="builder">' + esc(t('Thiết kế biểu mẫu', 'Form Builder')) + '</button>' +
       '<button type="button" class="ec-tool-btn' + (state.workspaceMode === 'work' ? ' active' : '') + '" data-tool="work">' + esc(t('Việc của tôi', 'My Work')) + (workCount ? '<span class="ec-tool-pill">' + esc(workCount) + '</span>' : '') + '</button>' +
       '<button type="button" class="ec-tool-btn' + (state.workspaceMode === 'record-id' ? ' active' : '') + '" data-tool="record-id">' + esc(t('Trợ lý tạo mã', 'Record ID Assistant')) + '</button>' +
       '<button type="button" class="ec-tool-btn' + (state.workspaceMode === 'upload' ? ' active' : '') + '" data-tool="upload">' + esc(t('Tải lên & Kiểm tra', 'Upload & Verify')) + '</button>' +

@@ -14826,6 +14826,9 @@ if ($username === '') {
           'sop_ref' => (string)($schema['sop_ref'] ?? ''),
           'online' => ($schema['online'] ?? true) !== false,
           'version' => (string)($schema['version'] ?? 'V1'),
+          'standalone_html' => (string)($schema['standalone_html'] ?? ''),
+          'record_type' => (string)($schema['record_type'] ?? ''),
+          'roles_allowed' => is_array($schema['roles_allowed'] ?? null) ? $schema['roles_allowed'] : [],
           'schema' => $schema,
         ];
         $catalogMap[$code] = $onlineMap[$code];
