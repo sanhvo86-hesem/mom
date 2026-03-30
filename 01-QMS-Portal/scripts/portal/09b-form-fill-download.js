@@ -1058,6 +1058,20 @@ function renderOfflineStep(form, allocation){
   if(fname) html += renderContextChip(t('Tên tệp','Filename'), fname);
   html += '</div>';
 
+  /* document reference */
+  var sopRef = form.sop_ref || '';
+  var blankFile = form.blank_filename || form.blank_path || '';
+  if(sopRef || blankFile){
+    html += '<div class="ec-doc-ref">' +
+      '<div class="ec-doc-ref-title">' + esc(t('Tài liệu liên kết', 'Linked documents')) + '</div>' +
+      '<div class="ec-doc-ref-grid">';
+    if(sopRef) html += '<div class="ec-doc-ref-item"><small>' + esc(t('Quy trình SOP', 'SOP Reference')) + '</small><a href="#" data-navigate-doc="' + esc(sopRef) + '">' + esc(sopRef) + '</a></div>';
+    if(blankFile) html += '<div class="ec-doc-ref-item"><small>' + esc(t('Mẫu biểu mẫu gốc', 'Original template')) + '</small><span>' + esc(blankFile) + '</span></div>';
+    html += '<div class="ec-doc-ref-item"><small>' + esc(t('Phiên bản kiểm soát', 'Controlled version')) + '</small><span>' + esc(form.version || 'V0') + '</span></div>';
+    if(allocation.template_checksum) html += '<div class="ec-doc-ref-item"><small>SHA-256</small><span class="ec-mono-sm">' + esc(String(allocation.template_checksum).substring(0, 16) + '...') + '</span></div>';
+    html += '</div></div>';
+  }
+
   /* download section */
   html += '<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">' +
     '<button class="ec-btn primary lg" id="ec-download-offline">' + esc(t('Tải gói Excel đã kiểm soát','Download governed Excel package')) + '</button>' +
@@ -2020,6 +2034,19 @@ function bindOffline(form,allocation,container){
     if(window.AllocationTracker) window.AllocationTracker.copyToClipboard(fname);
     toast(t('Đã sao chép.','Copied.'),'success');
   };
+
+  /* SOP document navigation */
+  Array.prototype.forEach.call(container.querySelectorAll('[data-navigate-doc]'), function(link){
+    link.onclick = function(e){
+      e.preventDefault();
+      var docCode = link.getAttribute('data-navigate-doc') || '';
+      if(docCode && typeof navigateTo === 'function'){
+        navigateTo('documents', { search: docCode });
+      } else if(docCode) {
+        toast(t('Mở tài liệu: ', 'Open document: ') + docCode, 'info');
+      }
+    };
+  });
 
   /* dropzone */
   var dropzone=document.getElementById('ec-dropzone');

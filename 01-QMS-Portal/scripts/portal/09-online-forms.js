@@ -138,7 +138,15 @@ function api(action, payload, method){
     opts.headers['Content-Type'] = 'application/json';
     opts.body = JSON.stringify(payload || {});
   }
-  return fetch(url, opts).then(function(resp){ return resp.json(); });
+  return fetch(url, opts).then(function(resp){
+    if(!resp.ok) return resp.json().catch(function(){ return {}; }).then(function(body){
+      var err = new Error('HTTP ' + resp.status);
+      err.status = resp.status;
+      err.body = body;
+      throw err;
+    });
+    return resp.json();
+  });
 }
 
 function showToast(message, type){
@@ -464,6 +472,7 @@ function traceSummary(ctx){
 }
 
 function loadAll(){
+  var catalogError = '';
   return Promise.all([
     api('form_catalog_snapshot', {}, 'GET').then(function(resp){
       state.forms = (resp && Array.isArray(resp.forms)) ? resp.forms : [];
@@ -473,9 +482,10 @@ function loadAll(){
         if(form.online !== false) form.online = true;
         state.formMap[form.form_code] = form;
       });
-    }).catch(function(){
+    }).catch(function(err){
       state.forms = [];
       state.formMap = {};
+      catalogError = (err && err.status === 401) ? t('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'Session expired. Please log in again.') : t('Không thể tải danh mục form.', 'Could not load form catalog.');
     }),
     api('config_record_types', {}, 'GET').then(function(resp){
       state.recordTypes = normalizeRecordTypeRegistry(resp && resp.record_types ? resp.record_types : {});
@@ -484,7 +494,10 @@ function loadAll(){
       state.recordTypes = {};
       state.formToRecordType = {};
     })
-  ]);
+  ]).then(function(){
+    state._loadError = catalogError;
+    if(catalogError && !state.forms.length) throw new Error(catalogError);
+  });
 }
 
 function loadAllocations(){
@@ -932,7 +945,8 @@ function bindWorkQueue(container){
 }
 
 function render(container){
-  container.innerHTML = '<div class="ec-shell">' + renderSidebar() + '<div class="ec-workspace" id="ec-workspace"></div></div>';
+  container.innerHTML = '<div class="ec-shell">' + renderSidebar() + '<div class="ec-workspace" id="ec-workspace"></div></div>' +
+    '<button type="button" class="ec-sidebar-toggle" id="ec-sidebar-toggle" aria-label="' + esc(t('Mở/đóng danh mục','Toggle catalog')) + '">\u2630</button>';
   bindSidebar(container);
   renderWorkspacePane();
 }
@@ -1076,6 +1090,12 @@ function bindSidebar(container){
       render(container);
       if(state.workspaceMode === 'work') loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') render(container); });
     }
+  };
+
+  var sidebarToggle = document.getElementById('ec-sidebar-toggle');
+  if(sidebarToggle) sidebarToggle.onclick = function(){
+    var sb = container.querySelector('.ec-sidebar');
+    if(sb) sb.classList.toggle('collapsed');
   };
 }
 

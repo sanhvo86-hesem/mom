@@ -55,7 +55,24 @@
   height: calc(100vh - 60px);
   position: sticky;
   top: 60px;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.ec-sidebar-toggle {
+  display: none;
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  z-index: 999;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: var(--ec-primary);
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: var(--ec-shadow-lg);
 }
 .ec-sidebar-header {
   padding: 16px 16px 12px;
@@ -1519,17 +1536,68 @@ textarea.ec-dialog-input {
   100% { background-position: -200% 0; }
 }
 
+/* ── Document reference (offline forms) ── */
+.ec-doc-ref {
+  border: 1px solid var(--ec-border);
+  border-radius: var(--ec-radius-lg);
+  padding: 14px;
+  margin-bottom: 16px;
+  background: var(--ec-bg);
+}
+.ec-doc-ref-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--ec-text-secondary);
+  margin-bottom: 10px;
+}
+.ec-doc-ref-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+}
+.ec-doc-ref-item {
+  padding: 8px 10px;
+  background: var(--ec-surface);
+  border-radius: var(--ec-radius);
+  border: 1px solid var(--ec-border);
+}
+.ec-doc-ref-item small {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--ec-text-muted);
+  margin-bottom: 3px;
+}
+.ec-doc-ref-item a {
+  color: var(--ec-primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 13px;
+}
+.ec-doc-ref-item a:hover { text-decoration: underline; }
+.ec-doc-ref-item span { font-size: 13px; color: var(--ec-text); }
+.ec-mono-sm { font-family: var(--ec-mono); font-size: 11px; }
+
 /* ── Responsive ── */
 @media (max-width: 1024px) {
   .ec-shell { grid-template-columns: 1fr; }
   .ec-sidebar {
     position: static;
     height: auto;
-    max-height: 320px;
+    max-height: none;
     border-right: none;
     border-bottom: 1px solid var(--ec-border);
+    overflow-y: visible;
   }
-  .ec-workspace { height: auto; padding: 16px; }
+  .ec-sidebar.collapsed { display: none; }
+  .ec-sidebar-toggle { display: block; }
+  .ec-form-list { max-height: 260px; overflow-y: auto; }
+  .ec-alloc-section { max-height: 160px; }
+  .ec-workspace { height: auto; min-height: 60vh; padding: 16px; overflow-y: auto; }
   .ec-allocate-grid { grid-template-columns: 1fr 1fr; }
   .ec-fields { grid-template-columns: 1fr; }
   .ec-field, .ec-field.third, .ec-field.full { grid-column: 1 / -1; }
