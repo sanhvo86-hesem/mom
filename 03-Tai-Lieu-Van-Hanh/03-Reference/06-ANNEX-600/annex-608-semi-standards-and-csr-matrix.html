@@ -1,115 +1,369 @@
-<div><p>thead { display: table-header-group; }
- tfoot { display: table-footer-group; }
- p { orphans: 3; widows: 3; }
- 
-}
-.page-body { overflow-x: hidden; }
-.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
-table { max-width: 100%; table-layout: auto; }
-td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
-
-<style>
-.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px}
-.toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
-.toc-grid a,.toc-grid span{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink)}
-.mini-note{font-size:12px;color:var(--ink2);line-height:1.6}
-.tight li{margin:4px 0}
-.callout-strong{border-left: 3px solid var(--blue);padding:12px 14px;background:var(--blue-l);border-radius:0 var(--r-sm) var(--r-sm) 0;margin:12px 0}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-.kpi-card,.rule-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg)}
-.kpi-card h3,.rule-card h3{margin:0 0 6px;font-size:14px;color:var(--navy)}
-.doc-link-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.doc-link{display:inline-block;padding:6px 10px;border:1px solid var(--ln);border-radius:999px;background:var(--bg2);font-size:12px;font-weight:600;color:var(--navy)}
-.small-table td,.small-table th{font-size:12px}
-.matrix-wrap{overflow:auto;max-width:100%}
-.matrix-wrap table{min-width:100%}
-.section-rule{height:1px;background:var(--ln);margin:18px 0}
-.note-list li{margin:6px 0}
-</style>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANNEX-608 — Ma trận SEMI, vacuum và CSR source control | HESEM QMS</title>
 <link rel="stylesheet" href="../../../assets/style.css">
+<style>
+.page-body h1 { font-size: 24px; line-height: 1.35; margin: 0 0 10px; }
+.page-body h2 { font-size: 18px; line-height: 1.4; margin: 18px 0 10px; color: var(--navy); }
+.page-body h3 { font-size: 14px; line-height: 1.5; margin: 12px 0 6px; color: var(--ink); }
+.meta .row { display: grid; grid-template-columns: 150px 1fr; gap: 10px; margin: 4px 0; }
+.table-card { overflow-x: auto; }
+.callout-danger, .callout-warning, .callout-ok { padding: 12px 14px; border-radius: var(--r); margin: 10px 0; border: 1px solid var(--ln); background: #fff; }
+.callout-danger { background: #fff5f5; border-color: #ffc9c9; }
+.callout-warning { background: #fff9db; border-color: #ffe066; }
+.callout-ok { background: #ebfbee; border-color: #b2f2bb; }
+@media (max-width: 960px) { .page-body { padding: 24px 18px 36px; } .meta .row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+          <div class="fh-company">
+            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu vận hành • Annex</span>
+          </div>
+        </div>
+        <div class="title"><strong>ANNEX-608 — Ma trận SEMI, vacuum và CSR source control</strong></div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>ANNEX-608</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V2</span></div>
+          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></span></div>
+          <div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
+        </div>
+      </div>
 
-</p>
-<div class="container"><div class="page"><div class="page-body"><div class="form-header">
-<div class="fh-left"> <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
-<div class="fh-company"> <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a> <span>Tài liệu kiểm soát</span> </div>
-</div>
-<div class="title"> <strong>ANNEX-608 — Ma trận chuẩn SEMI, CSR và điều kiện đặc biệt</strong><br>
-<span class="sub-vn">Ma trận dùng để xác định khi nào phải kích hoạt yêu cầu bán dẫn, chân không, vệ sinh / sạch sẽ và khách hàng-cụ thể yêu cầu</span> </div>
-<div class="meta">
-<div class="row"><span><b>Code:</b></span><span>ANNEX-608</span></div>
-<div class="row"><span><b>Version:</b></span><span>V0</span></div>
-<div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></span></div>
-<div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
-</div>
-</div><div class="doc-content" id="docContent"><div class="form-sheet">
-<div class="card">
-<div class="badge"><span class="dot"></span>ANNEX-608</div>
-<h1 class="h1" style="margin-top:10px">ANNEX-608 — Ma trận chuẩn SEMI, CSR và điều kiện đặc biệt</h1>
-<p class="lead">
- Ma trận tham chiếu chéo (chéo-tham chiếu matrix) giữa <b>ISO 9001:2026</b> (tài liệu có kiểm soát) và các tiêu chuẩn <b>SEMI</b> áp dụng cho bán dẫn sản xuất.
- Bao gồm sơ đồ ánh xạ đến khách hàng-cụ thể yêu cầu (CSR) phổ biến trong ngành.
- </p>
-</div>
-<h2 class="h2">1. SEMI Tiêu chuẩn áp dụng</h2>
-<div class="table-card"><table class="table">
-<colgroup><col style="width:15%"><col style="width:35%"><col style="width:50%"></colgroup>
-<thead><tr><th>SEMI Std</th><th>Tên đầy đủ</th><th>Phạm vi liên quan HESEM</th></tr></thead>
-<tbody>
-<tr><td><b>SEMI S2</b></td><td>An toàn hướng dẫn for bán dẫn sản xuất Thiết bị</td><td>An toàn design, mối nguy phân tích, dán nhãn — ảnh hưởng sản phẩm an toàn SOP.</td></tr>
-<tr><td><b>SEMI S8</b></td><td>An toàn hướng dẫn for Công thái học / con Người yếu tố</td><td>công thái học design — liên quan con Người yếu tố <a href="../../01-SOPs/08-SOP-800/sop-804-human-factors-and-error-proofing.html">SOP-804</a>.</td></tr>
-<tr><td><b>SEMI F57</b></td><td>Test Phương pháp for xác định of hạt / phần tử Nhiễm bẩn</td><td>LPC phương pháp, hạt / phần tử count tiêu chí — cốt lõi cho vệ sinh / sạch sẽ xác minh.</td></tr>
-<tr><td><b>SEMI F19</b></td><td>Specification for Bề mặt điều kiện of không gỉ thép linh kiện</td><td>EP bề mặt hoàn thành, Cr/Fe tỷ lệ — liên quan <a href="annex-606-surface-finish-vacuum-compatibility.html">ANNEX-606</a>.</td></tr>
-<tr><td><b>SEMI E10</b></td><td>tổng thể Thiết bị Effectiveness (OEE)</td><td>OEE đo lường phương pháp luận — KPI bảng điều khiển.</td></tr>
-<tr><td><b>SEMI E79</b></td><td>Standard for định nghĩa and Đo lường of Thiết bị độ tin cậy</td><td>Thiết bị độ tin cậy chỉ số — bảo trì KPI.</td></tr>
-</tbody>
-</table></div>
-<h2 class="h2">2. ISO 9001 ↔ SEMI Sơ đồ ánh xạ Matrix</h2>
-<div class="table-card"><table class="table iso-matrix">
-<colgroup><col style="width:12%"><col style="width:25%"><col style="width:15%"><col style="width:48%"></colgroup>
-<thead><tr><th>ISO điều khoản</th><th>Yêu cầu ISO</th><th>SEMI Ref</th><th>Triển khai tại HESEM</th></tr></thead>
-<tbody>
-<tr><td>4.1 / 4.2</td><td>bối cảnh &amp; Quan tâm bên liên quan</td><td>SEMI S2 §1</td><td>bán dẫn khách hàng yêu cầu → FRM-QMS-027 bối cảnh; FRM-QMS-023 CSR Register</td></tr>
-<tr><td>6.1</td><td>Rủi ro &amp; Cơ hội</td><td>SEMI S2 §5 (Mối nguy Phân tích)</td><td><a href="../../01-SOPs/01-SOP-100/sop-103-risk-opportunity-fmea-and-control-plan.html">SOP-103</a> Rủi ro; PFMEA; nhiễm bẩn rủi ro đánh giá</td></tr>
-<tr><td>7.1.4</td><td>Môi trường for vận hành</td><td>SEMI S2 §9, F57</td><td>Clean khu vực kiểm soát; hạt / phần tử giám sát; WI-OPS-014 Env giám sát</td></tr>
-<tr><td>7.1.5</td><td>Giám sát &amp; đo lường nguồn lực</td><td>SEMI F57 (LPC phương pháp)</td><td><a href="../../01-SOPs/06-SOP-600/sop-601-calibration-and-gage-control.html">SOP-601</a> Hiệu chuẩn; LPC thiết bị; PROC-QA-007</td></tr>
-<tr><td>8.4</td><td>External nhà cung cấp dịch vụ</td><td>SEMI F19 (EP/thụ động hóa (passivation)</td><td><a href="../../01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a>; PROC-QA-008 Bề mặt Xử lý đánh giá năng lực</td></tr>
-<tr><td>8.5.1</td><td>Sản xuất &amp; dịch vụ dự phòng</td><td>SEMI S2 §6, S8, E10</td><td>PROC-CNC-001; <a href="../../01-SOPs/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">SOP-702</a> Nhiễm bẩn; WI-OPS-019 siêu âm</td></tr>
-<tr><td>8.5.2</td><td>nhận dạng &amp; truy xuất nguồn gốc</td><td>SEMI F57 (lot truy xuất nguồn gốc)</td><td>PROC-QA-006 Nguyên vật liệu truy vết; FRM-ENG-005 Part Phân loại</td></tr>
-<tr><td>8.5.4</td><td>bảo quản</td><td>SEMI S2 §8</td><td>WI-OPS-018 Clean Đóng gói; FRM-WHS-009 Bảng kiểm; N₂ thanh lọc / loại bỏ</td></tr>
-<tr><td>8.6</td><td>Phát hành of sản phẩm</td><td>SEMI F57 (acceptance)</td><td>PROC-QA-007 Vệ sinh Kiểm tra; FRM-QA-019 Hồ sơ</td></tr>
-<tr><td>8.7</td><td>Không phù hợp đầu ra</td><td>—</td><td><a href="../../01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> NC/CAPA; hạt / phần tử count NCR</td></tr>
-<tr><td>9.1</td><td>Giám sát &amp; đo lường</td><td>SEMI E10, E79</td><td>KPI: OEE, Vệ sinh Pass Tỷ lệ, hạt / phần tử NCR Tỷ lệ</td></tr>
-<tr><td>10.2</td><td>khắc phục hành động</td><td>—</td><td><a href="../../01-SOPs/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a>; <a href="../../01-SOPs/09-SOP-900/sop-903-continual-improvement-and-kaizen.html">SOP-903</a> Liên tục Improvement</td></tr>
-</tbody>
-</table></div>
-<h2 class="h2">3. Customer-cụ thể Yêu cầu (CSR) — Chung mục / hạng mục</h2>
-<div class="table-card"><table class="table">
-<colgroup><col style="width:25%"><col style="width:35%"><col style="width:40%"></colgroup>
-<thead><tr><th>CSR Category</th><th>Yêu cầu phổ biến</th><th>Tài liệu HESEM đáp ứng</th></tr></thead>
-<tbody>
-<tr><td>Vệ sinh chứng nhận</td><td>hạt / phần tử count báo cáo per part/lot; làm sạch quy trình xác nhận</td><td>FRM-QA-019; PROC-QA-007; <a href="../../01-SOPs/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">SOP-702</a></td></tr>
-<tr><td>Bề mặt hoàn thành</td><td>Ra/Rz chứng nhận; EP chứng chỉ / giấy chứng nhận; Cr/Fe tỷ lệ báo cáo</td><td><a href="annex-606-surface-finish-vacuum-compatibility.html">ANNEX-606</a>; Kiểm tra Báo cáo; NCC EP cert</td></tr>
-<tr><td>Nguyên vật liệu truy xuất nguồn gốc</td><td>phay cert → part → lô giao hàng; 100% lot truy vết</td><td>PROC-QA-006; FRM-ENG-005</td></tr>
-<tr><td>Đóng gói &amp; giao vận</td><td>kép / Cấp đôi-bag, N₂ thanh lọc / loại bỏ, ESD, chất hút ẩm; clean phòng đóng gói</td><td>WI-OPS-018; FRM-WHS-009</td></tr>
-<tr><td>Thay đổi thông báo</td><td>30-day tạm ứng / nâng cao thông báo for quy trình/nguyên vật liệu/vị trí thay đổi</td><td><a href="../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a> Thay đổi Quản lý</td></tr>
-<tr><td>Supplier quản lý</td><td>Đã phê duyệt Người xử lý list; truyền đạt yêu cầu of vệ sinh / sạch sẽ yêu cầu</td><td><a href="../../01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a>; <a href="../04-ANNEX-400/annex-403-approved-processor-list.html">ANNEX-403</a> APL</td></tr>
-</tbody>
-</table></div>
-<p class="callout"><b>Điểm bắt buộc:</b> Mọi CSR cụ thể theo khách hàng phải được chuyển thành điều kiện thực thi tại rà soát hợp đồng, bộ hồ sơ chuẩn (mốc chuẩn gói hàng), đóng gói/vệ sinh / sạch sẽ plan và bộ hồ sơ phê duyệt giao hàng (gói phê duyệt giao hàng). Không để CSR chỉ nằm ở level tham khảo.</p>
-<h2 class="h2">Tài liệu điều hành liên kết</h2><div class="doc-link-row"><span class="doc-link"><a href="../../01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></span><span class="doc-link"><a href="../../01-SOPs/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a></span><span class="doc-link"><a href="../../01-SOPs/05-SOP-500/sop-505-finishing-deburr-and-secondary-operations-control.html">SOP-505</a></span><span class="doc-link"><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></span><span class="doc-link"><a href="../../01-SOPs/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">SOP-702</a></span><span class="doc-link"><a href="../../02-Work-Instructions/07-WI-700/wi-715-helium-leak-test-standard-work.html">WI-715</a></span><span class="doc-link"><a href="../../02-Work-Instructions/07-WI-700/wi-716-vacuum-compatible-clean-build-and-bagging.html">WI-716</a></span><span class="doc-link"><a href="annex-606-surface-finish-vacuum-compatibility.html">ANNEX-606</a></span></div>
-<h2 class="h2">4. Điều kiện kích hoạt bắt buộc tại HESEM</h2>
-<div class="table-card"><table class="table small-table"><thead><tr><th>Tình huống</th><th>Phải kích hoạt thêm kiểm soát nào</th><th>Tài liệu điều khiển</th><th>Evidence bắt buộc</th></tr></thead><tbody>
-<tr><td>Job có yêu cầu vệ sinh / sạch sẽ / hạt / phần tử-nhạy cảm</td><td>Mức sẵn sàng rà soát, kiểm soát vệ sinh, giám sát, clean pack, gói phát hành phù hợp.</td><td><a href="../../01-SOPs/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">SOP-702</a>; <a href="../../02-Work-Instructions/07-WI-700/wi-711-cleanroom-entry-and-gowning.html">WI-711</a>~716; <a href="annex-606-surface-finish-vacuum-compatibility.html">ANNEX-606</a>; <a href="../07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a></td><td>Làm sạch log, hạt / phần tử data, clean pack bằng chứng, label đúng yêu cầu.</td></tr>
-<tr><td>Job có yêu cầu chân không / UHV / bề mặt-nhạy cảm</td><td>Kiểm soát bề mặt, thụ động hóa (passivation)/EP, đóng gói sạch và chứng chỉ xử lý.</td><td><a href="../../01-SOPs/05-SOP-500/sop-505-finishing-deburr-and-secondary-operations-control.html">SOP-505</a>; <a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a>; <a href="annex-606-surface-finish-vacuum-compatibility.html">ANNEX-606</a>; <a href="../04-ANNEX-400/annex-403-approved-processor-list.html">ANNEX-403</a></td><td>Người xử lý cert, kiểm tra hồ sơ, pack bằng chứng.</td></tr>
-<tr><td>Job có CSR về thay đổi quy trình / vật liệu / địa điểm</td><td>Không thay đổi khi chưa có thông báo và phê duyệt theo yêu cầu khách hàng.</td><td><a href="../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a>; <a href="../../01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a>; <a href="../../01-SOPs/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a></td><td>Thay đổi thông báo, khách hàng phê duyệt, đã cập nhật mốc chuẩn.</td></tr>
-<tr><td>Job có QPL cao hoặc mẫu đầu (tiên chi tiết / sản phẩm)/FAI bắt buộc</td><td>Kích hoạt <a href="../../02-Work-Instructions/03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a>, QPL tương ứng, hồ sơ bộ bằng chứng đầy đủ.</td><td><a href="../../01-SOPs/03-SOP-300/sop-302-first-article-inspection-fai.html">SOP-302</a>; <a href="../../02-Work-Instructions/03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a>; <a href="annex-603-quality-package-levels-qpl.html">ANNEX-603</a>; <a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Balloon drawing, kiểm tra/CMM, phê duyệt log, hồ sơ đầy đủ.</td></tr>
-</tbody></table></div>
-</div></div></div></div></div>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">
-⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.
-</div>
-<script src="../../../assets/app.js"></script>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng để xác định Job nào phải kích hoạt kiểm soát semiconductor, vacuum, clean-build, helium leak hoặc CSR đặc biệt, và để khóa nguồn yêu cầu vào hồ sơ Job trước khi release. Đây là `Specification Annex`; không thay cho WI thao tác hiện trường.</div>
+      <h1>ANNEX-608 — Ma trận SEMI, vacuum và CSR source control</h1>
 
+      <section id="annex-iso-map" class="annex-section">
+        <h2>Liên kết ISO</h2>
+        <div class="table-card">
+          <table class="table iso-map" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+            <thead>
+              <tr>
+                <th>Clause</th>
+                <th>Yêu cầu</th>
+                <th>Tài liệu liên quan</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ISO 9001 8.2.2</td>
+                <td>Khóa yêu cầu sản phẩm và customer-specific requirement trước khi release.</td>
+                <td>SOP-201, SOP-303, ANNEX-608</td>
+              </tr>
+              <tr>
+                <td>ISO 9001 8.3.5</td>
+                <td>Khóa đầu ra thiết kế hoặc engineering release làm cơ sở cho sản xuất và kiểm tra.</td>
+                <td>SOP-303, ANNEX-606, ANNEX-608</td>
+              </tr>
+              <tr>
+                <td>ISO 9001 8.5.1</td>
+                <td>Điều kiện kiểm soát sản xuất và cung cấp dịch vụ phải rõ tại point of use.</td>
+                <td>WI-712, WI-715, WI-716, ANNEX-608</td>
+              </tr>
+              <tr>
+                <td>ISO 9001 8.5.2</td>
+                <td>Nhận diện và truy xuất nguồn gốc theo yêu cầu sản phẩm.</td>
+                <td>WI-701, WI-715, ANNEX-608</td>
+              </tr>
+              <tr>
+                <td>ISO 9001 8.5.4</td>
+                <td>Bảo quản, clean-build, clean-pack và handling theo yêu cầu khách hàng.</td>
+                <td>SOP-702, WI-714, WI-716, ANNEX-608</td>
+              </tr>
+              <tr>
+                <td>ISO 9001 8.6</td>
+                <td>Chỉ release sản phẩm khi bằng chứng phù hợp với yêu cầu đã khóa.</td>
+                <td>WI-201, WI-605, WI-715, ANNEX-608</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="annex-s1" class="annex-section">
+        <h2>1. Mục đích và ranh giới</h2>
+        <div class="table-card">
+          <table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+            <thead>
+              <tr>
+                <th>Mục</th>
+                <th>Quy định</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Loại annex</td>
+                <td>Specification Annex.</td>
+              </tr>
+              <tr>
+                <td>Mục đích</td>
+                <td>Khóa nguồn yêu cầu, điểm kích hoạt kiểm soát và dữ liệu bắt buộc phải có trong hồ sơ Job cho semiconductor, vacuum và CSR đặc biệt.</td>
+              </tr>
+              <tr>
+                <td>Đầu ra bắt buộc</td>
+                <td>Job có source hierarchy rõ, parameter cần khóa rõ và route tới WI/SOP phù hợp rõ.</td>
+              </tr>
+              <tr>
+                <td>Không bao gồm</td>
+                <td>Không mô tả cách làm sạch, cách test rò, cách clean-pack hoặc cách clean-build; các thao tác đó thuộc WI hiện trường.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout-danger"><strong>Nguyên tắc khóa</strong><br>Không được tự suy đoán leak limit, surface finish, cleanliness level, packaging level hoặc storage condition. Nếu nguồn yêu cầu chưa được trích xuất vào hồ sơ Job thì Job chưa đủ điều kiện release.</div>
+      </section>
+
+      <section id="annex-s2" class="annex-section">
+        <h2>2. Thứ tự ưu tiên nguồn yêu cầu</h2>
+        <div class="table-card">
+          <table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+            <thead>
+              <tr>
+                <th>Thứ tự</th>
+                <th>Nguồn</th>
+                <th>Khi áp dụng</th>
+                <th>Hành động bắt buộc</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Drawing, 3D PMI, technical note hoặc released specification đi cùng Job</td>
+                <td>Khi nguồn kỹ thuật đã ghi rõ parameter, limit hoặc cleanliness requirement.</td>
+                <td>Trích đúng giá trị, đơn vị, zone áp dụng và revision vào hồ sơ Job.</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>PO, contract review, CSR hoặc customer quality note</td>
+                <td>Khi yêu cầu nằm ngoài drawing nhưng đã ràng buộc thương mại hoặc chất lượng.</td>
+                <td>Khóa đúng tài liệu nguồn và ghi rõ điểm nào ghi đè lên chuẩn nội bộ.</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>Chuẩn khách hàng hoặc chuẩn ngành đã mua và được quản lý bản quyền</td>
+                <td>Khi PO hoặc CSR chỉ viện dẫn tiêu chuẩn mà không chép hết số liệu.</td>
+                <td>Engineering hoặc Quality phải trích phần áp dụng thành dữ liệu làm việc có kiểm soát cho Job.</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>ANNEX nội bộ liên quan</td>
+                <td>Khi cần xác định lớp kiểm soát nội bộ, rule lưu hồ sơ hoặc mapping tới WI hiện trường.</td>
+                <td>Chỉ dùng để hỗ trợ thực thi; không dùng để hạ chuẩn nếu nguồn trên nghiêm hơn.</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>Email rời, chat, trao đổi miệng</td>
+                <td>Chỉ là tín hiệu cảnh báo.</td>
+                <td>Phải quy đổi thành tài liệu kiểm soát trước khi release Job.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="annex-s3" class="annex-section">
+        <h2>3. Ma trận kích hoạt kiểm soát đặc biệt</h2>
+        <div class="table-card">
+          <table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+            <thead>
+              <tr>
+                <th>Dấu hiệu trên Job</th>
+                <th>Kiểm soát phải kích hoạt</th>
+                <th>Parameter phải khóa</th>
+                <th>Tài liệu điều hành bắt buộc</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Part cho semiconductor tool, gas path, chamber, vacuum enclosure, clean sub-assembly hoặc PO ghi semiconductor/vacuum/UHP/clean</td>
+                <td>Kích hoạt special-control path cho bề mặt, cleanliness, handling và packaging.</td>
+                <td>Surface requirement, cleanliness class hoặc level, packaging level, storage condition.</td>
+                <td>ANNEX-606, SOP-702, WI-714, WI-716</td>
+              </tr>
+              <tr>
+                <td>Drawing hoặc spec yêu cầu helium leak, leak integrity, vacuum integrity hoặc leak-rate acceptance</td>
+                <td>Kích hoạt leak-test path.</td>
+                <td>Leak limit, mode test, dwell time, fixture/configuration, pass-fail rule.</td>
+                <td>ANNEX-608, WI-715</td>
+              </tr>
+              <tr>
+                <td>CSR yêu cầu particle cleanliness, residue control, clean-build hoặc clean-pack</td>
+                <td>Kích hoạt clean-control path.</td>
+                <td>Cleaning method, environment class, gowning requirement, bagging rule, seal rule.</td>
+                <td>WI-711, WI-712, WI-714, WI-716</td>
+              </tr>
+              <tr>
+                <td>Có yêu cầu vật liệu, treatment, plating, EP, passivation hoặc vacuum compatibility đặc biệt</td>
+                <td>Kích hoạt material and finish compatibility control.</td>
+                <td>Material spec, finish spec, approved source, acceptance evidence.</td>
+                <td>ANNEX-606, SOP-303</td>
+              </tr>
+              <tr>
+                <td>CSR viện dẫn tiêu chuẩn mua bản quyền nhưng traveler chưa có dữ liệu làm việc</td>
+                <td>Chặn release Job cho đến khi source được trích xuất.</td>
+                <td>Revision nguồn, phần trích áp dụng, owner và ngày khóa dữ liệu.</td>
+                <td>ANNEX-608, SOP-201, SOP-303</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="annex-s4" class="annex-section">
+        <h2>4. Dữ liệu specification bắt buộc phải khóa trong hồ sơ Job</h2>
+        <div class="table-card">
+          <table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+            <thead>
+              <tr>
+                <th>Parameter</th>
+                <th>Nội dung phải khóa</th>
+                <th>Method hoặc nguồn khóa</th>
+                <th>Owner</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Source requirement</td>
+                <td>Mã tài liệu nguồn, revision, vùng áp dụng và customer note liên quan.</td>
+                <td>Contract review hoặc engineering release pack.</td>
+                <td>ENGM / QA</td>
+              </tr>
+              <tr>
+                <td>Leak acceptance</td>
+                <td>Leak limit, đơn vị, mode test, dwell time, condition before test.</td>
+                <td>Drawing/spec/CSR đã trích xuất vào Job.</td>
+                <td>QE / QA</td>
+              </tr>
+              <tr>
+                <td>Cleanliness and handling</td>
+                <td>Clean level, gowning level, bagging rule, environment rule, contamination cautions.</td>
+                <td>CSR, clean spec hoặc matrix nội bộ được phê duyệt.</td>
+                <td>QA / ENGM</td>
+              </tr>
+              <tr>
+                <td>Material and finish compatibility</td>
+                <td>Material spec, finish spec, vacuum compatibility rule, approved processor source.</td>
+                <td>Drawing/spec, ANNEX-606, approved source pack.</td>
+                <td>ENGM / SCM / QA</td>
+              </tr>
+              <tr>
+                <td>Downstream execution route</td>
+                <td>WI nào sẽ được mở ở shopfloor hoặc lab và record nào sẽ sinh ra.</td>
+                <td>Traveler và release checklist.</td>
+                <td>PPL / QCL</td>
+              </tr>
+              <tr>
+                <td>Release block</td>
+                <td>Điều kiện không được release nếu dữ liệu còn thiếu, mâu thuẫn hoặc chưa có năng lực thực hiện.</td>
+                <td>Gate checklist và WI-201.</td>
+                <td>QA / WKM</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="annex-s5" class="annex-section">
+        <h2>5. Quy tắc chặn release</h2>
+        <div class="table-card">
+          <table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+            <thead>
+              <tr>
+                <th>Tình huống</th>
+                <th>Hành động bắt buộc</th>
+                <th>Hệ quả</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Drawing có yêu cầu leak test nhưng traveler hoặc record sheet chưa có leak limit</td>
+                <td>Chặn release Job và yêu cầu bổ sung source acceptance từ nguồn gốc.</td>
+                <td>Không được test và không được mở gate tiếp theo.</td>
+              </tr>
+              <tr>
+                <td>CSR yêu cầu cleanliness hoặc packaging cao hơn chuẩn nội bộ</td>
+                <td>Áp dụng mức cao hơn và ghi rõ điểm ghi đè vào hồ sơ Job.</td>
+                <td>Không được dùng chuẩn nội bộ thấp hơn để release.</td>
+              </tr>
+              <tr>
+                <td>Part đã clean nhưng bị mở bao hoặc mất kiểm soát môi trường</td>
+                <td>Đánh giá lại trạng thái clean và route lại qua WI phù hợp trước khi release.</td>
+                <td>Trạng thái clean trước đó không còn giá trị mặc định.</td>
+              </tr>
+              <tr>
+                <td>Hiện trường muốn thay helium bằng phương pháp khác</td>
+                <td>Chặn thay đổi cho đến khi có cập nhật phát hành từ nguồn yêu cầu hoặc quyết định kiểm soát chính thức.</td>
+                <td>Kết quả test thay thế không có giá trị release.</td>
+              </tr>
+              <tr>
+                <td>Source requirement bị mâu thuẫn giữa drawing, PO và CSR</td>
+                <td>Mở review liên phòng ban và khóa quyết định ưu tiên trước khi phát hành xuống hiện trường.</td>
+                <td>Job không được xuống shopfloor hoặc lab ở trạng thái mơ hồ.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout-ok"><strong>Kết quả mong đợi</strong><br>Mọi Job semiconductor hoặc vacuum vào sản xuất đều có source hierarchy rõ, parameter cần khóa rõ, WI downstream rõ và release-block rõ ngay từ đầu tuyến.</div>
+      </section>
+
+      <section id="annex-s6" class="annex-section">
+        <h2>6. Tài liệu liên quan</h2>
+        <div class="table-card">
+          <table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+            <thead>
+              <tr>
+                <th>Mã</th>
+                <th>Tên tài liệu</th>
+                <th>Liên kết</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ANNEX-606</td>
+                <td>Surface finish and vacuum compatibility</td>
+                <td><a href="annex-606-surface-finish-vacuum-compatibility.html">Mở ANNEX-606</a></td>
+              </tr>
+              <tr>
+                <td>SOP-201</td>
+                <td>Order fulfillment RFQ to cash</td>
+                <td><a href="../../01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">Mở SOP-201</a></td>
+              </tr>
+              <tr>
+                <td>SOP-303</td>
+                <td>Engineering release, baseline package and job snapshot control</td>
+                <td><a href="../../01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">Mở SOP-303</a></td>
+              </tr>
+              <tr>
+                <td>SOP-702</td>
+                <td>Contamination control and cleanliness</td>
+                <td><a href="../../01-SOPs/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">Mở SOP-702</a></td>
+              </tr>
+              <tr>
+                <td>WI-715</td>
+                <td>Helium leak test standard work</td>
+                <td><a href="../../02-Work-Instructions/07-WI-700/wi-715-helium-leak-test-standard-work.html">Mở WI-715</a></td>
+              </tr>
+              <tr>
+                <td>WI-716</td>
+                <td>Vacuum compatible clean-build and bagging</td>
+                <td><a href="../../02-Work-Instructions/07-WI-700/wi-716-vacuum-compatible-clean-build-and-bagging.html">Mở WI-716</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
 </div>
+</body>
+</html>

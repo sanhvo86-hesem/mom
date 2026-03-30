@@ -1,259 +1,299 @@
-<div><p>thead { display: table-header-group; }
- tfoot { display: table-footer-group; }
- p { orphans: 3; widows: 3; }
- 
-}
-.page-body { overflow-x: hidden; }
-.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
-table { max-width: 100%; table-layout: auto; }
-td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
-
-<style>
-.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px}
-.toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
-.toc-grid a,.toc-grid span{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink)}
-.mini-note{font-size:12px;color:var(--ink2);line-height:1.6}
-.tight li{margin:4px 0}
-.callout-strong{border-left: 3px solid var(--blue);padding:12px 14px;background:var(--blue-l);border-radius:0 var(--r-sm) var(--r-sm) 0;margin:12px 0}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-.kpi-card,.rule-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg)}
-.kpi-card h3,.rule-card h3{margin:0 0 6px;font-size:14px;color:var(--navy)}
-.doc-link-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.doc-link{display:inline-block;padding:6px 10px;border:1px solid var(--ln);border-radius:999px;background:var(--bg2);font-size:12px;font-weight:600;color:var(--navy)}
-.small-table td,.small-table th{font-size:12px}
-.matrix-wrap{overflow:auto;max-width:100%}
-.matrix-wrap table{min-width:100%}
-.section-rule{height:1px;background:var(--ln);margin:18px 0}
-.note-list li{margin:6px 0}
-</style>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WI-101 — Biểu mẫu số, phê duyệt điện tử và bằng chứng điện tử | HESEM QMS</title>
 <link rel="stylesheet" href="../../../assets/style.css">
-
-</p>
+<style>
+.page-body h1 { font-size: 24px; line-height: 1.35; margin: 0 0 10px; }
+.page-body h2 { font-size: 18px; line-height: 1.4; margin: 18px 0 10px; color: var(--navy); }
+.page-body h3 { font-size: 14px; line-height: 1.5; margin: 12px 0 6px; color: var(--ink); }
+.meta .row { display: grid; grid-template-columns: 150px 1fr; gap: 10px; margin: 4px 0; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.card { border: 1px solid var(--ln); border-radius: var(--r); padding: 12px; background: #fff; }
+.table-card { overflow-x: auto; }
+.step-block { border: 1px solid var(--ln); border-radius: var(--r); padding: 14px; margin: 10px 0; background: #fff; }
+.note-soft, .callout-danger, .callout-warning, .callout-ok { padding: 12px 14px; border-radius: var(--r); margin: 10px 0; border: 1px solid var(--ln); background: #fff; }
+.note-soft { background: var(--bg2); }
+.callout-danger { background: #fff5f5; border-color: #ffc9c9; }
+.callout-warning { background: #fff9db; border-color: #ffe066; }
+.callout-ok { background: #ebfbee; border-color: #b2f2bb; }
+ul.tight li { margin: 4px 0; }
+@media (max-width: 960px) { .two-col { grid-template-columns: 1fr; } .page-body { padding: 24px 18px 36px; } .meta .row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
 <div class="container">
-<div class="page">
-<div class="page-body">
-<div class="form-header">
-<div class="fh-left">
-<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
-<div class="fh-company">
-<a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-<span>Tài liệu vận hành • Phân xưởng CNC</span>
-</div>
-</div>
-<div class="title">
-<strong>WI-101 — Biểu mẫu số, phê duyệt điện tử và bằng chứng điện tử</strong>
-</div><div class="meta"><div class="row"><span><b>Mã:</b></span><span>WI-101</span></div><div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a></span></span></div><div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
-</div><div class="doc-content" id="docContent"><div class="form-sheet"><div class="preface-block"><h2 class="h2">Điều kiện áp dụng và kiểm soát</h2><div class="grid-2"><div><p><b>ÁP DỤNG KHI</b></p><ul class="list"><li>Khi tài liệu được viện dẫn trong Job/Quy trình/Forms liên quan.</li><li>Khi phát sinh thay đổi ảnh hưởng chất lượng hoặc yêu cầu khách hàng.</li><li>Khi cần xác định tạm giữ/phê duyệt hoặc yêu cầu bằng chứng bắt buộc.</li></ul></div><div><p><b>Đầu vào / Đầu ra</b></p><ul class="list"><li><b>Đầu vào:</b> Epicor Kinetic (giao dịch)</li><li><b>Đầu vào:</b> M365/SharePoint (SSOT hồ sơ)</li><li><b>Đầu vào:</b> 10-QMS-Source-Control + Git (source definitions / released schemas / source templates)</li><li><b>Đầu ra:</b> Hồ sơ/Nhật ký đầy đủ tại SSOT</li><li><b>Đầu ra:</b> Trạng thái cổng kiểm soát được mở hoặc giữ theo tiêu chí</li></ul></div></div><p class="callout"><b>Hold/Release:</b> Thiếu bằng chứng bắt buộc: áp dụng HOLD theo tiêu chí của tài liệu; không chuyển bước cho đến khi đủ bằng chứng.</p><p class="muted"><b>Cưỡng chế hệ thống:</b> Trạng thái chỉ được chuyển khi đủ trường bắt buộc và có liên kết hồ sơ SSOT.</p></div><div class="card"><span class="badge"><span class="dot"></span>WI-101</span><h1 class="h1" style="margin-top:12px;">WI-101 — Biểu mẫu số, phê duyệt điện tử và bằng chứng điện tử</h1><p class="lead">Tài liệu này quy định cách triển khai và sử dụng biểu mẫu số hoá trên M365 (SharePoint Lists/Power Apps/Power Automate) và cách lưu bằng chứng theo SSOT. Mọi giao dịch vận hành (time entry, trạng thái job, PO, xuất/nhập kho, xác nhận giao hàng (ship confirm) <b>chỉ</b> được ghi nhận trong <b>Epicor Kinetic</b>.</p><p class="callout"><b>Ranh giới source bắt buộc:</b> form definition, released schema, source template và source code hỗ trợ phải nằm trong <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> tại <span class="code">10-QMS-Source-Control</span> và đi theo Git. Submission, approval payload, runtime archive và dữ liệu vận hành phát sinh không được đưa vào Git/source library.</p></div><div class="card"><h2 class="h2" style="margin-top:0;">1. Khi áp dụng</h2><ul>
-<li><b>Phải</b> áp dụng khi thay thế biểu mẫu giấy bằng biểu mẫu số hoá để ghi nhận vận hành tại xưởng CNC: kiểm tra công đoạn, nhật ký hold, bảng kiểm đóng gói, nhật ký giao ca, yêu cầu hỗ trợ máy/tooling.</li>
-<li><b>Phải</b> áp dụng khi cần <b>phê duyệt điện tử</b> (Power Automate Approvals) cho các điểm dừng chất lượng/ship-release.</li>
-<li><b>Không được</b> dùng M365 để tạo "sổ" thay thế Epicor cho các giao dịch: time entry, xác nhận hoàn thành công đoạn, xuất kho, xác nhận giao hàng, cập nhật PO.</li>
-<li><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Ghi nhận trực tiếp trên hệ thống đã chỉ định; không dùng file Excel làm nguồn ghi nhận vận hành.</li>
-</ul></div><div class="card"><h2 class="h2" style="margin-top:0;">2. Công cụ / vật tư</h2><ul>
-<li>M365: SharePoint Site <b>CNC-IMS-HUB</b>; SharePoint Danh sách; Tài liệu thư viện; Teams; Power ứng dụng; Power Automate Approvals; Microsoft Phạm vi quản lý (Lưu giữ/Giữ pháp lý).</li>
-<li>Thiết bị: PC/ki-ốt tại phân xưởng; máy quét mã vạch 1D/2D (USB bàn phím-nêm); mạng nội bộ ổn định; máy in nhãn (nếu biểu mẫu có nhãn).</li>
-<li>Hệ thống SoR: <b>Epicor Kinetic (Epicor) (Epicor)</b> (Job, Vận hành, Hàng tồn kho, PO, Lô giao hàng, Pack, Xác nhận giao hàng).</li>
-</ul></div><div class="card"><h2 class="h2" style="margin-top:0;">3. Các bước thực hiện</h2><h3 class="h3">3.1 Khởi tạo biểu mẫu số hoá (bắt buộc theo kiểm soát tài liệu)</h3>
-<div class="callout-strong"><b>Online hay Offline? — Khung quyết định bắt buộc</b><br>Trước khi khởi tạo, <b>phải</b> xác định kênh điền (Online trên portal hay Offline bằng Excel) theo bảng chấm điểm 7 tiêu chí (tần suất, số fields, nơi điền, dashboard, workflow, attachments, formula). <b>Tổng &gt; 60 → Online; Tổng ≤ 60 → Offline (Excel).</b>
-<br><br><b>Quy tắc nhanh:</b>
-<ul class="tight" style="margin:6px 0 4px">
-<li>Form điền <b>≥ 2 lần/ngày</b> hoặc điền <b>tại máy sản xuất</b> → <b>Online</b>.</li>
-<li>Form <b>multi-tab Excel có công thức VLOOKUP/matrix</b> → <b>Offline</b>.</li>
-<li>Form KHÔNG được vừa Online vừa Offline cho cùng 1 lần điền (hybrid = antipattern).</li>
-</ul>
-Chi tiết đầy đủ: <a href="../../../core-standards/18-online-vs-offline-form-decision-framework.md">core-standards/18 — Khung quyết định Form Online vs Offline</a>. Quy tắc đặt tên file hồ sơ: <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-137-evidence-and-records-naming-convention.html">ANNEX-137</a>.</div>
-<ol>
-<li><b>Phải</b> sử dụng FRM/ WI bản HTML trong Document Library kiểm soát làm <b>mẫu chuẩn</b> (được kiểm soát template). <b>Không được</b> tạo mẫu Excel.</li>
-<li><b>Phải</b> tạo SharePoint List tương ứng với biểu mẫu, bao gồm:
- <ul>
-<li>Trường bắt buộc, kiểu dữ liệu, danh mục mã (lựa chọn mã) và quy tắc kiểm tra.</li>
-<li>Trường tham chiếu Epicor: JobNum/PartNum/PackNum/ShipmentNum… <b>chỉ</b> là tham chiếu, <b>không</b> là nơi chốt giao dịch.</li>
-<li>Trường "EvidenceUrl" bắt buộc cho các trạng thái Hold/Phát hành/Ship.</li>
-</ul>
-</li>
-<li><b>Phải</b> tạo Power App giao diện ki-ốt theo vai trò (<a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a> / QA/WHS/QMS):
- <ul>
-<li>Scan mã → tự điền JobNum/PackNum (nếu có) → chọn biểu mẫu → nhập dữ liệu → gửi.</li>
-<li><b>Không được</b> cho phép Người dùng sửa bản ghi sau khi đã "Đã phê duyệt/Released", trừ vai trò <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> được phân quyền.</li>
-</ul>
-</li>
-<li><b>Phải</b> cấu hình Power Automate:
- <ul>
-<li>Luồng phê duyệt cho từng Cổng kiểm soát (Hold Phát hành, phê duyệt giao hàng (phê duyệt giao hàng)…).</li>
-<li>Ghi kết quả phê duyệt vào "ApprovalHistory" (List) và khoá trạng thái bản ghi theo kết quả.</li>
-<li>Gắn nhãn lưu giữ/hồ sơ theo <a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> cho các thư mục bằng chứng Tier-1.</li>
-</ul>
-</li>
-</ol><h3 class="h3">3.2 Ghi nhận tại hiện trường (ki-ốt/PC)</h3><ol>
-<li><b>Phải</b> scan mã Job Theo dõi Sheet/WIP Tag để mở đúng màn hình theo "scan-to-hành động".</li>
-<li><b>Phải</b> điền đủ trường bắt buộc; <b>không được</b> dùng ký hiệu "—/N/A" cho trường bắt buộc nếu chưa có dữ liệu.</li>
-<li><b>Phải</b> gắn liên kết bằng chứng (EvidenceUrl) trỏ tới thư mục/tệp trên M365 theo SSOT; <b>không được</b> đính kèm bản sao phân tán ngoài SSOT.</li>
-<li><b>Phải</b> bấm "Gửi/Submit" để tạo bản ghi; hệ thống tự cấp mã RecordID.</li>
-<li><b>Luồng đồng bộ sau Submit (online form):</b>
- <ol style="list-style-type:lower-alpha">
-<li>Server lưu JSON (bản gốc chính — primary record).</li>
-<li>Server tạo PDF snapshot tự động với tên: <span class="code">FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.pdf</span></li>
-<li>Server đồng bộ dữ liệu cấu trúc sang <b>SharePoint List</b> (Graph API) — phục vụ dashboard / Power BI.</li>
-<li>Server upload PDF sang <b>SharePoint Document Library</b> — bằng chứng kiểm toán (audit evidence).</li>
-<li>Nếu biểu mẫu cần Record-ID chuyên biệt (NCR, CAPA, FAI): server tự cấp mã từ <b>atomic counter</b> — xem chi tiết tại <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-137-evidence-and-records-naming-convention.html">ANNEX-137</a> Mục 7.</li>
-</ol>
-</li>
-</ol><h3 class="h3">3.3 Phê duyệt điện tử và điểm dừng</h3><ol>
-<li><b>Phải</b> thiết lập Cổng kiểm soát theo loại nghiệp vụ:
- <ul>
-<li>Cổng kiểm soát chất lượng: <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> phê duyệt phát hành cho Hold/NCR/IR fail.</li>
-<li>Cổng kiểm soát giao hàng: WHS + <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> phê duyệt phê duyệt giao hàng theo WI-OPS-010.</li>
-</ul>
-</li>
-<li><b>Điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm giữ (điểm chặn))):</b> Khi thiếu EvidenceUrl hoặc bằng chứng không truy cập được → <b>phải</b> giữ trạng thái "TẠM GIỮ" và <b>không được</b> chuyển sang "PHÁT HÀNH/SHIP".</li>
-<li><b>Phải</b> lưu dấu vết phê duyệt (Approver, thời gian, nội dung, quyết định) trong ApprovalHistory.</li>
-</ol><h3 class="h3">3.4 Kiểm soát thay đổi biểu mẫu số hoá</h3><ul>
-<li><b>Không được</b> tự ý thêm/xoá/sửa cột SharePoint List khi chưa có phê duyệt kiểm soát tài liệu.</li>
-<li><b>Phải</b> cập nhật WI/FRM/ANNEX liên quan trước khi triển khai thay đổi; <b>phải</b> ghi nhận Phiên bản và Ngày hiệu lực.</li>
-<li><b>Phải</b> lưu DCR hồ sơ cấu hình (Power App/Luồng) tại: <b>M365: CNC-IMS-HUB/QMS-Hồ sơ/IT-OPS/cấu hình-Thay đổi-Log/</b>.</li>
-</ul></div><div class="card"><h2 class="h2" style="margin-top:0;">4. điểm kiểm tra &amp; Điểm giữ</h2><div class="table-card">
-<table class="table">
-<colgroup><col style="width:13.68%;"><col style="width:23.16%;"><col style="width:20.53%;"><col style="width:23.68%;"><col style="width:18.95%;"></colgroup><thead>
-<tr>
-<th>Mốc kiểm soát</th>
-<th>Tiêu chí chấp nhận</th>
-<th>Điểm dừng (TẠM GIỮ)</th>
-<th>Quyền mở (PHÁT HÀNH)</th>
-<th>Hồ sơ bắt buộc</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>CP-101.1 — Trường bắt buộc</td>
-<td>100% trường bắt buộc có dữ liệu hợp lệ</td>
-<td>Thiếu/không hợp lệ → không cho Submit</td>
-<td>Hệ thống (xác nhận) + Chủ biểu mẫu (<a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a> / QA/WHS/QMS)</td>
-<td>Bản ghi List (RecordID)</td>
-</tr>
-<tr>
-<td>CP-101.2 — Evidence</td>
-<td>EvidenceUrl trỏ đúng SSOT, truy cập được</td>
-<td>Thiếu link/đường dẫn sai → TẠM GIỮ</td>
-<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="entity-code role-code">CS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA[QMR]</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quan ly tai chinh)"><span class="entity-code role-code">FIN</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a></span></td>
-<td>Link thư mục/tệp trong Hồ sơ công việc (hồ sơ công việc)</td>
-</tr>
-<tr>
-<td>CỔNG KIỂM SOÁT-101.3 — Phê duyệt</td>
-<td>Kết quả phê duyệt có log trong ApprovalHistory</td>
-<td>Không có log/Từ chối → TẠM GIỮ</td>
-<td>Approver được phân quyền</td>
-<td>ApprovalHistory + bản ghi trạng thái</td>
-</tr>
-<tr>
-<td>CP-101.4 — Lưu giữ/Hồ sơ</td>
-<td>Nhãn lưu giữ áp đúng theo <a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a></td>
-<td>Chưa áp nhãn → TẠM GIỮ cho các cổng kiểm soát Tier‑1</td>
-<td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> (Tài liệu Control)</td>
-<td>Lưu giữ label log (Phạm vi quản lý)</td>
-</tr>
-</tbody>
-</table>
-</div></div><div class="card"><h2 class="h2" style="margin-top:0;">5. Đầu ra &amp; hồ sơ (Hồ sơ)</h2><div class="table-card">
-<table class="table">
-<colgroup><col style="width:13.88%;"><col style="width:12.24%;"><col style="width:22.86%;"><col style="width:32.65%;"><col style="width:18.37%;"></colgroup><thead>
-<tr>
-<th>Hồ sơ</th>
-<th>Sổ đăng ký/List</th>
-<th>Nơi lưu SSOT</th>
-<th>Lưu giữ (sự kiện-dựa trên)</th>
-<th>người chịu trách nhiệm</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Bản ghi biểu mẫu số hoá (RecordID)</td>
-<td>SharePoint List theo từng biểu mẫu</td>
-<td><b>M365: CNC-IMS-HUB/QMS-Hồ sơ/OPS/Online-Biểu mẫu/</b></td>
-<td>Khi Job đóng trong Epicor <b>hoặc</b> khi Lô giao hàng xác nhận giao hàng (tuỳ loại hồ sơ) + 10 năm</td>
-<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="entity-code role-code">CS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA[QMR]</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quan ly tai chinh)"><span class="entity-code role-code">FIN</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a></span></td>
-</tr>
-<tr>
-<td>Log phê duyệt</td>
-<td>ApprovalHistory</td>
-<td><b>M365: CNC-IMS-HUB/QMS-Hồ sơ/QMS/Approvals/</b></td>
-<td>Khi hồ sơ được đóng (Closed) + 10 năm</td>
-<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td>
-</tr>
-<tr>
-<td>Thư mục bằng chứng theo Job</td>
-<td>Hồ sơ công việc Index</td>
-<td><b>M365: CNC-IMS-HUB/QMS-Hồ sơ/OPS/Job-Hồ sơ/&lt;JobNum&gt;/</b></td>
-<td>Khi Lô giao hàng xác nhận giao hàng trong Epicor + 10 năm</td>
-<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td>
-</tr>
-<tr>
-<td>Bản xuất PDF Photos trạng thái (nếu xuất)</td>
-<td>Hàng Ngày Ảnh chụp trạng thái Sổ đăng ký</td>
-<td><b>M365: CNC-IMS-HUB/QMS-Hồ sơ/OPS/Photos trạng thái/&lt;YYYY&gt;/&lt;MM&gt;/</b></td>
-<td>Khi tháng kết thúc + 3 năm (trừ hồ sơ gắn Hồ sơ công việc)</td>
-<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a></span></td>
-</tr>
-</tbody>
-</table>
-</div><p><b>Giữ pháp lý:</b> Khi có giữ pháp lý theo <a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a>, hồ sơ thuộc phạm vi hold <b>phải</b> được giữ nguyên trạng cho tới khi được gỡ hold.</p></div><div class="card"><h2 class="h2" style="margin-top:0;">6. An toàn / ESD / FOD</h2><ul>
-<li><b>Phải</b> bố trí ki-ốt không cản lối đi và không nằm trong vùng nguy hiểm máy đang chạy.</li>
-<li><b>Phải</b> giữ sạch khu vực scan/ghi nhận và giữ mã vạch luôn nhìn thấy rõ, không bị giấy vụn hoặc bụi phoi che khuất (FOD).</li>
-<li><b>Phải</b> tuân thủ quy định ESD khi ghi nhận tại khu vực có linh kiện nhạy ESD; <b>không được</b> đặt thiết bị cá nhân lên bàn vận hành.</li>
-</ul></div><div class="card"><h2 class="h2" style="margin-top:0;">7. Hệ thống áp dụng (SoR / SSOT)</h2><div class="table-card">
-<table class="table">
-<colgroup><col style="width:27.38%;"><col style="width:25.00%;"><col style="width:47.62%;"></colgroup><thead>
-<tr><th>Hệ thống</th><th>Vai trò</th><th>Quy định bắt buộc</th></tr>
-</thead>
-<tbody>
-<tr>
-<td><b>Epicor Kinetic (Epicor) (Epicor)</b></td>
-<td>Nguồn chuẩn (SoR) cho mọi giao dịch</td>
-<td>Time mục nhập, trạng thái job/công đoạn, PO, hàng tồn kho giao dịch, pack/lô giao hàng, xác nhận giao hàng <b>phải</b> vận hành trong Epicor.</td>
-</tr>
-<tr>
-<td><b>M365 (SharePoint/Teams/Power nền tảng/Phạm vi quản lý)</b></td>
-<td>Evidence/Hồ sơ SSOT</td>
-<td>Hồ sơ và bằng chứng <b>phải</b> lưu tại SSOT như một nguồn chuẩn duy nhất; lưu giữ sự kiện-dựa trên và giữ pháp lý theo <a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a>.</td>
-</tr>
-<tr>
-<td><b>10-QMS-Source-Control + Git + server</b></td>
-<td>Controlled source / promotion / deploy boundary</td>
-<td>Source docs, released form definitions và source template đi qua SharePoint local sync → Git → server. Manifest, deploy receipt và reverse-sync log phải lưu tại <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a>; không dùng khu này để giữ submission payload.</td>
-</tr>
-<tr>
-<td>Power BI</td>
-<td>Bảng điều khiển</td>
-<td><b>Chỉ</b> dùng để theo dõi; <b>không</b> là SoR.</td>
-</tr>
-</tbody>
-</table>
-</div></div><h2 class="h2">Tài liệu điều hành liên kết</h2><div class="doc-link-row"><span class="doc-link"><a href="../../01-SOPs/01-SOP-100/sop-101-document-and-data-control.html">SOP-101</a></span><span class="doc-link"><a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a></span><span class="doc-link"><a href="../../01-SOPs/01-SOP-100/sop-107-communication-management.html">SOP-107</a></span><span class="doc-link"><a href="../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></span><span class="doc-link"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></span><span class="doc-link"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a></span><span class="doc-link"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></span><span class="doc-link"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a></span><span class="doc-link"><a href="../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a></span><span class="doc-link"><a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a></span><span class="doc-link"><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-137-evidence-and-records-naming-convention.html">ANNEX-137</a></span><span class="doc-link"><a href="../../../core-standards/18-online-vs-offline-form-decision-framework.md">core-standards/18</a></span></div>
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+          <div class="fh-company">
+            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu vận hành • Công việc hướng dẫn</span>
+          </div>
+        </div>
+        <div class="title"><strong>WI-101 — Biểu mẫu số, phê duyệt điện tử và bằng chứng điện tử</strong></div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>WI-101</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V1</span></div>
+          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a></span></span></div>
+          <div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
+        </div>
+      </div>
 
-<div class="callout-strong"><b>Điểm vào và nơi lưu bắt buộc:</b> End User bắt đầu từ <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/index.html">Department Handbooks Index</a> và <a href="wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html">WI-105</a> để biết khi nào phải mở WI-101. Mô hình site/thư viện/quyền / sự cho phép cho M365 hồ sơ nằm tại <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a>. Vị trí lưu hồ sơ, bằng chứng và grammar thư mục thực thi theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>. Source definitions, released schemas, deploy receipts và reverse-sync boundary nằm tại <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> và thao tác theo <a href="wi-107-sharefile-git-cpanel-sync.html">WI-107</a>.</div>
-<h2 class="h2">8. Kiểm soát tài khoản, chữ ký điện tử và quyền sửa dữ liệu</h2>
-<div class="callout-strong"><b>Nguyên tắc bắt buộc:</b> Phải dùng đúng tài khoản cá nhân đã được cấp quyền. Người tạo bản ghi không được tự phê duyệt bản ghi của chính mình tại các cổng kiểm soát cần phê duyệt độc lập. Mọi sửa đổi sau khi phê duyệt phải để lại dấu vết kiểm toán gồm Người sửa, thời điểm sửa, nội dung trước/sau và lý do sửa.</div>
-<ul class="tight note-list">
-<li>Phải dùng đúng vai trò được cấp quyền. Không được mượn tài khoản của Người khác để gửi, duyệt, bổ sung / thay thế hoặc mở hold.</li>
-<li>Hồ sơ ở trạng thái <b>Đã phê duyệt / Released / Closed</b> chỉ được sửa khi có quyền ghi đè / bỏ qua theo <b><a href="../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></b> và phải tạo log lý do.</li>
-<li>Mọi file bằng chứng phải mở được từ SSOT; không nhúng link cá nhân, link nội bộ / tại chỗ path hoặc link email tạm.</li>
-<li>Khi yêu cầu khách hàng đòi chữ ký điện tử hoặc log phê duyệt mức cao hơn, <a class="entity-link bundle-link bundle-chip" data-bundle="OPS_SCOPE_OWNERS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-ops-scope-owners" title="Operational Scope Owners (Nhom dau moi so huu pham vi van hanh) — CS / EST / PPL / PD / ENGM / QA[QMR] / QMS / SCM / FIN / HR / EHS / ITA / WKM / SL / QCL / LOG"><span class="entity-code bundle-code">OPS_SCOPE_OWNERS</span></a> phải cấu hình luồng duyệt trước khi biểu mẫu được phép dùng tại hiện trường.</li>
-</ul>
-<h2 class="h2">9. Chỉ số theo dõi bắt buộc</h2>
-<div class="kpi-grid">
-<div class="kpi-card"><h3>KPI-DIG-01 — Tỷ lệ submit hợp lệ ngay lần đầu</h3><div class="mini-note">Số bản ghi submit không lỗi kiểm tra hợp lệ ÷ tổng submit. Mục tiêu vận hành: ≥ 98%.</div></div>
-<div class="kpi-card"><h3>KPI-DIG-02 — Tỷ lệ bản ghi có bằng chứng truy cập được</h3><div class="mini-note">Số hồ sơ có EvidenceUrl mở được và đúng hồ sơ ÷ tổng hồ sơ có yêu cầu bằng chứng. Mục tiêu: 100%.</div></div>
-<div class="kpi-card"><h3>KPI-DIG-03 — Tỷ lệ bổ sung / thay thế đóng trong hạn</h3><div class="mini-note">Số hồ sơ offline được bổ sung / thay thế đúng thời hạn ÷ tổng hồ sơ offline. Mục tiêu: ≥ 95% trong cùng ca hoặc ca kế tiếp theo rule đã duyệt.</div></div>
-<div class="kpi-card"><h3>KPI-DIG-04 — Tỷ lệ phê duyệt có log đầy đủ</h3><div class="mini-note">Số quyết định Phát hành/Từ chối có đủ Người duyệt, mốc thời gian, nhận xét và trạng thái cuối ÷ tổng quyết định cần duyệt. Mục tiêu: 100%.</div></div>
-</div>
-</div><h2 class="h2 phase3a-workbook-alignment" id="phase3a-workbook-usage">11. Biểu mẫu Excel đang hiệu lực — Cách dùng biểu mẫu khi biểu mẫu active đã chuyển hoàn toàn sang sổ tay thực hành Excel</h2><div class="note phase3a-workbook-alignment"><b>Vận hành chuẩn</b><br>Người dùng mở FRM qua portal hoặc link tài liệu hệ thống phải được tải trực tiếp sổ tay thực hành hiện hành. Không dùng HTML biểu mẫu cũ để nhập liệu hoặc xác nhận phê duyệt; nếu cần xem trạng thái ĐÃ PHÁT HÀNH / mã không phát hành trong danh mục hiện hành, phiên bản, người chịu trách nhiệm hoặc phạm vi mã / phạm vi quy trình thì dùng và <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html">Biểu mẫu Control Sổ đăng ký</a>.</div><h3 class="h3 phase3a-workbook-alignment">11.1 Xin mã hồ sơ (Record-ID) cho biểu mẫu Excel</h3>
-<ol class="tight phase3a-workbook-alignment">
-<li>Người dùng vào <b><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> Portal</b> → chọn <b>"Xin mã hồ sơ mới"</b> → chọn loại hồ sơ (NCR / CAPA / FAI / …) → server trả về mã duy nhất (unique Record-ID) từ atomic counter.</li>
-<li>Người dùng <b>phải</b> dùng mã này trong tên file khi lưu biểu mẫu Excel đã điền: <span class="code">FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.xlsx</span></li>
-<li>Chi tiết cơ chế cấp mã, phạm vi counter và quy tắc đặt tên: xem <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-137-evidence-and-records-naming-convention.html">ANNEX-137</a> Mục 7.</li>
-</ol>
-<h3 class="h3 phase3a-workbook-alignment">11.2 Mở và sử dụng sổ tay thực hành Excel</h3>
-<ol class="tight phase3a-workbook-alignment"><li>Mở trực tiếp sổ tay thực hành của mã FRM đang ĐÃ PHÁT HÀNH từ portal hoặc từ link trong SOP/WI/sổ tay/JD.</li><li>Nếu cần kiểm phiên bản, người chịu trách nhiệm, đường dẫn phát hành, tổng kiểm tra hoặc bảng kê, tra <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html">Biểu mẫu Control Sổ đăng ký</a>.</li><li>Nếu mã FRM không phát hành trong danh mục hiện hành, không tạo hồ sơ mới dưới mã đó; tra phạm vi mã / phạm vi quy trình trong .</li><li>Ví dụ: <a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html#FRM-412">FRM-412</a> không phát hành trong danh mục hiện hành; Người dùng phải tải và dùng <a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> sổ tay thực hành cho phiếu nhận / biên nhận/IQC cổng kiểm soát và <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> cho TẠM GIỮ/disposition.</li></ol></div></div></div></div>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
-<script src="../../../assets/app.js"></script>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi tạo, điền, gửi, phê duyệt hoặc lưu bằng chứng cho biểu mẫu số trên M365 hoặc cổng QMS. Đây là Digital-Operation WI; giao dịch sản xuất, kho, PO và shipment vẫn phải ghi trên Epicor theo SoR đã khóa.</div>
+      <h1>WI-101 — Biểu mẫu số, phê duyệt điện tử và bằng chứng điện tử</h1>
 
+      <section id="wi-s1" class="wi-section">
+        <h2>1. Mục đích</h2>
+        <ul class="tight">
+          <li>Giữ đúng ranh giới giữa SoR giao dịch, SSOT hồ sơ và source-controlled form definition.</li>
+          <li>Chặn việc dùng file cục bộ, form nháp hoặc link rời thay cho biểu mẫu số đã phát hành.</li>
+          <li>Để mọi quyết định submit, approve, hold hoặc release trên form số đều có bằng chứng truy lại được.</li>
+        </ul>
+        <div class="callout-danger"><strong>STOP</strong><br>Không dùng M365 để thay Epicor cho time entry, inventory transaction, PO, job completion hoặc shipment confirm. Không dùng file Excel cục bộ, bản chụp màn hình hay link cá nhân làm nguồn hồ sơ vận hành chính.</div>
+      </section>
+
+      <section id="wi-s2" class="wi-section">
+        <h2>2. Phạm vi & đối tượng áp dụng</h2>
+        <div class="two-col">
+          <div class="card">
+            <h3>Áp dụng cho</h3>
+            <ul class="tight">
+              <li>Người tạo, điền, duyệt hoặc quản trị biểu mẫu số trên M365, SharePoint, Power Apps hoặc luồng duyệt điện tử.</li>
+              <li>Các biểu mẫu vận hành dùng để ghi nhận hồ sơ, checklist, evidence pack, approval history và trạng thái kiểm soát.</li>
+              <li>Tình huống online bình thường và tình huống phải chuyển sang fallback kit khi hệ thống gián đoạn.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Không thay cho</h3>
+            <ul class="tight">
+              <li>Giao dịch chuẩn trên Epicor như job status, inventory movement, PO, pack hoặc shipment confirm.</li>
+              <li>Rule kiến trúc M365, source control và deploy boundary tại các annex M365 chuyên biệt.</li>
+              <li>WI kỹ thuật khác như sync Git hoặc offline recovery chi tiết ngoài phạm vi thao tác biểu mẫu.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="wi-s3" class="wi-section">
+        <h2>3. Công cụ, vật tư & tài liệu cần thiết</h2>
+        <div class="table-card">
+          <table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+            <thead>
+              <tr>
+                <th>Hạng mục</th>
+                <th>Mô tả</th>
+                <th>Ghi chú</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Nền tảng số</td>
+                <td>M365, SharePoint, Power Apps, Power Automate, portal QMS và Epicor.</td>
+                <td>Epicor là SoR giao dịch; M365 là SSOT hồ sơ.</td>
+              </tr>
+              <tr>
+                <td>Thiết bị người dùng</td>
+                <td>PC, kiosk, thiết bị quét mã và kết nối mạng ổn định.</td>
+                <td>Thiết bị phải đăng nhập bằng tài khoản cá nhân đã cấp quyền.</td>
+              </tr>
+              <tr>
+                <td>Tài liệu điều hành</td>
+                <td><a href="../../../core-standards/18-online-vs-offline-form-decision-framework.md">core-standards/18</a>, <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a>, <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> và <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-137-evidence-and-records-naming-convention.html">ANNEX-137</a>.</td>
+                <td>Phải tra rule tại nguồn chính thức, không dùng hướng dẫn copy rời.</td>
+              </tr>
+              <tr>
+                <td>Fallback kit</td>
+                <td><a href="../../03-Reference/01-ANNEX-100/annex-118-offline-fallback-kit.html">ANNEX-118</a> và biểu mẫu giấy hoặc offline được phê duyệt.</td>
+                <td>Chỉ dùng khi hệ thống số gián đoạn thật.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="wi-s4" class="wi-section">
+        <h2>4. Điều kiện tiên quyết</h2>
+        <ul class="tight">
+          <li>Biểu mẫu số đã được phát hành và mở từ portal hoặc thư viện tài liệu đang hiệu lực.</li>
+          <li>Người dùng đăng nhập bằng đúng tài khoản cá nhân đã cấp quyền theo vai trò.</li>
+          <li>Người dùng biết rõ biểu mẫu đó là online hay offline theo core-standards/18.</li>
+          <li>Đường dẫn EvidenceUrl hoặc thư mục SSOT đích đã xác định trước khi submit.</li>
+          <li>Luồng duyệt và người có quyền approve đã được cấu hình trước khi đưa form ra hiện trường.</li>
+        </ul>
+        <div class="callout-warning"><strong>HOLD</strong><br>Nếu biểu mẫu chưa phát hành, chưa có luồng duyệt đúng hoặc chưa có đường dẫn SSOT hợp lệ, không được cho người dùng điền live tại hiện trường.</div>
+      </section>
+
+      <section id="wi-s5" class="wi-section">
+        <h2>5. Các bước thực hiện</h2>
+
+        <div class="step-block">
+          <h3>Bước 1: Chọn đúng mode biểu mẫu</h3>
+          <p>Chọn online hoặc offline cho biểu mẫu theo core-standards/18 trước khi mở biểu mẫu để dùng.</p>
+          <div class="note-soft">Lý do: form online và offline có route hồ sơ, approve và recovery khác nhau.</div>
+        </div>
+
+        <div class="step-block">
+          <h3>Bước 2: Mở đúng biểu mẫu đã phát hành</h3>
+          <p>Mở biểu mẫu từ portal hoặc thư viện phát hành đang hiệu lực thay vì dùng bản tải cục bộ hoặc link chia sẻ cá nhân.</p>
+          <div class="note-soft">Lý do: chỉ biểu mẫu đã phát hành mới bảo đảm schema, field và workflow đúng.</div>
+        </div>
+
+        <div class="step-block">
+          <h3>Bước 3: Xác nhận ranh giới dữ liệu</h3>
+          <p>Xác nhận dữ liệu nào phải ghi ở Epicor, dữ liệu nào là evidence trên M365 và dữ liệu nào chỉ là definition trong source-controlled library.</p>
+          <div class="note-soft">Lý do: ranh giới sai sẽ tạo hai nguồn sự thật cho cùng một nghiệp vụ.</div>
+        </div>
+
+        <div class="step-block">
+          <h3>Bước 4: Điền đầy đủ trường bắt buộc</h3>
+          <p>Điền đầy đủ trường bắt buộc và không dùng ký hiệu thay thế khi dữ liệu thật chưa có.</p>
+          <div class="note-soft">Lý do: dữ liệu thiếu hoặc mơ hồ sẽ làm hỏng validation và approval sau đó.</div>
+        </div>
+
+        <div class="step-block">
+          <h3>Bước 5: Gắn EvidenceUrl đúng SSOT</h3>
+          <p>Gắn đường dẫn evidence về đúng SSOT hoặc thư mục hồ sơ đã kiểm soát trước khi submit các bước có evidence bắt buộc.</p>
+          <div class="note-soft">Lý do: evidence nằm ngoài SSOT sẽ không đủ giá trị audit.</div>
+        </div>
+
+        <div class="step-block">
+          <h3>Bước 6: Gửi biểu mẫu</h3>
+          <p>Gửi biểu mẫu bằng hành động submit chính thức để hệ thống tạo record, timestamp và lịch sử thay đổi.</p>
+          <div class="note-soft">Lý do: ảnh chụp màn hình hoặc email không thay cho record submit hợp lệ.</div>
+        </div>
+
+        <div class="step-block">
+          <h3>Bước 7: Kích hoạt phê duyệt điện tử</h3>
+          <p>Kích hoạt luồng approve điện tử đúng tuyến cho các điểm hold, release hoặc shipment approval cần duyệt độc lập.</p>
+          <div class="note-soft">Lý do: approval chỉ có giá trị khi đúng người, đúng luồng và có approval history.</div>
+        </div>
+
+        <div class="step-block">
+          <h3>Bước 8: Khóa record sau duyệt</h3>
+          <p>Khóa record sau khi đã approved hoặc released và chỉ sửa bằng change path được kiểm soát.</p>
+          <div class="note-soft">Lý do: hồ sơ đóng phải giữ nguyên dấu vết trước và sau khi sửa.</div>
+        </div>
+
+        <div class="step-block">
+          <h3>Bước 9: Backfill sau offline</h3>
+          <p>Nếu phải dùng fallback offline, backfill đầy đủ record và evidence lên hệ thống ngay khi nền tảng số phục hồi.</p>
+          <div class="note-soft">Lý do: offline chỉ là chế độ tạm, không được trở thành nguồn hồ sơ song song lâu dài.</div>
+        </div>
+
+        <div class="callout-ok"><strong>Kết quả mong đợi</strong><br>Kết thúc WI-101, mỗi biểu mẫu số có record hợp lệ, approval history đúng tuyến và evidence truy lại được trong SSOT mà không lẫn với giao dịch SoR trên Epicor.</div>
+      </section>
+
+      <section id="wi-s6" class="wi-section">
+        <h2>6. Hồ sơ & bằng chứng</h2>
+        <div class="table-card">
+          <table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+            <thead>
+              <tr>
+                <th>Hồ sơ</th>
+                <th>Nội dung</th>
+                <th>Lưu trữ</th>
+                <th>Trách nhiệm</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Form record</td>
+                <td>Dữ liệu submit, timestamp, người tạo và trạng thái record.</td>
+                <td>SharePoint List hoặc hệ thống form đang hiệu lực.</td>
+                <td>Owner của form</td>
+              </tr>
+              <tr>
+                <td>Approval history</td>
+                <td>Người duyệt, thời gian duyệt, quyết định và bình luận.</td>
+                <td>Approval log hoặc SSOT của workflow.</td>
+                <td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> / form owner</td>
+              </tr>
+              <tr>
+                <td>Evidence pack</td>
+                <td>EvidenceUrl, file scan, ảnh, PDF snapshot hoặc hồ sơ đính kèm đúng SSOT.</td>
+                <td>Thư mục evidence trên M365 theo naming convention.</td>
+                <td>Người submit</td>
+              </tr>
+              <tr>
+                <td>Change log</td>
+                <td>Lý do sửa, trước-sau, người sửa và thời điểm sửa sau khi record đã đóng.</td>
+                <td>Log thay đổi có kiểm soát.</td>
+                <td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a> / <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="wi-s7" class="wi-section">
+        <h2>7. Tài liệu liên quan</h2>
+        <div class="table-card">
+          <table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+            <thead>
+              <tr>
+                <th>Mã</th>
+                <th>Tên tài liệu</th>
+                <th>Liên kết</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>SOP-101</td>
+                <td>Document and data control</td>
+                <td><a href="../../01-SOPs/01-SOP-100/sop-101-document-and-data-control.html">Mở SOP-101</a></td>
+              </tr>
+              <tr>
+                <td>SOP-104</td>
+                <td>Data governance, records security and IP protection</td>
+                <td><a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">Mở SOP-104</a></td>
+              </tr>
+              <tr>
+                <td>SOP-108</td>
+                <td>Operational contingency plan</td>
+                <td><a href="../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">Mở SOP-108</a></td>
+              </tr>
+              <tr>
+                <td>ANNEX-131</td>
+                <td>M365 records metadata list schema and register catalog</td>
+                <td><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">Mở ANNEX-131</a></td>
+              </tr>
+              <tr>
+                <td>ANNEX-136</td>
+                <td>M365 SharePoint Git server source sync promotion and runtime boundary</td>
+                <td><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">Mở ANNEX-136</a></td>
+              </tr>
+              <tr>
+                <td>ANNEX-137</td>
+                <td>Evidence and records naming convention</td>
+                <td><a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-137-evidence-and-records-naming-convention.html">Mở ANNEX-137</a></td>
+              </tr>
+              <tr>
+                <td>WI-107</td>
+                <td>ShareFile Git cPanel sync</td>
+                <td><a href="wi-107-sharefile-git-cpanel-sync.html">Mở WI-107</a></td>
+              </tr>
+              <tr>
+                <td>ANNEX-118</td>
+                <td>Offline fallback kit</td>
+                <td><a href="../../03-Reference/01-ANNEX-100/annex-118-offline-fallback-kit.html">Mở ANNEX-118</a></td>
+              </tr>
+              <tr>
+                <td>core-standards/18</td>
+                <td>Online vs offline form decision framework</td>
+                <td><a href="../../../core-standards/18-online-vs-offline-form-decision-framework.md">Mở core-standards/18</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
 </div>
+</body>
+</html>

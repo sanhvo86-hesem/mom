@@ -2,163 +2,267 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>WI-701 — Nhận hàng, IQC đầu vào, truy vết, dán nhãn và nhập vị trí | HESEM QMS</title>
-<link href="../../../assets/style.css" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WI-701 — Nhận hàng, IQC đầu vào, truy vết và nhập vị trí | HESEM QMS</title>
+<link rel="stylesheet" href="../../../assets/style.css">
 <style>
- h1, h2, h3 { break-after: avoid; page-break-after: avoid; } tr, td, th { break-inside: avoid; page-break-inside: avoid; }
-.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
-.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
-.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
-.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
-.small {font-size:12px;}
-.tiny {font-size:11px; color: var(--ink2);} .kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
-.kpi-box {border:1px solid var(--ln); border-left: 3px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
-.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
-.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
-.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
-.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
-.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
-.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
-.step-list {display:grid; gap:10px;}
-.step-item {border:1px solid var(--ln); border-left: 3px solid var(--blue); padding:10px 12px; border-radius: var(--r); background:#fff;}
-.two-col {display:grid; grid-template-columns:1fr 1fr; gap:12px;}
-.section {margin-top:16px;}
-ul.tight li {margin:4px 0;}
-.code {font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background:#f8f9fa; border:1px solid var(--ln); border-radius:6px; padding:0 6px;}
-.callout-danger,.callout-warning,.callout-info,.callout-success {padding:10px 12px; border-radius:10px; margin:10px 0; border:1px solid var(--ln);}
-
-.callout-warning{background:#fff9db;border-color:#ffe066;}
-
-.callout-success{background:#ebfbee;border-color:#b2f2bb;}
+.page-body h1 { font-size: 24px; line-height: 1.35; margin: 0 0 10px; }
+.page-body h2 { font-size: 18px; line-height: 1.4; margin: 18px 0 10px; color: var(--navy); }
+.page-body h3 { font-size: 14px; line-height: 1.5; margin: 12px 0 6px; color: var(--ink); }
+.meta .row { display: grid; grid-template-columns: 150px 1fr; gap: 10px; margin: 4px 0; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.card { border: 1px solid var(--ln); border-radius: var(--r); padding: 12px; background: #fff; }
+.table-card { overflow-x: auto; }
+.step-block { border: 1px solid var(--ln); border-radius: var(--r); padding: 14px; margin: 10px 0; background: #fff; }
+.note-soft, .callout-danger, .callout-warning, .callout-ok { padding: 12px 14px; border-radius: var(--r); margin: 10px 0; border: 1px solid var(--ln); background: #fff; }
+.note-soft { background: var(--bg2); }
+.callout-danger { background: #fff5f5; border-color: #ffc9c9; }
+.callout-warning { background: #fff9db; border-color: #ffe066; }
+.callout-ok { background: #ebfbee; border-color: #b2f2bb; }
+ul.tight li { margin: 4px 0; }
+@media (max-width: 960px) { .two-col { grid-template-columns: 1fr; } .page-body { padding: 24px 18px 36px; } .meta .row { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 <div class="container">
-<div class="page">
-<div class="page-body">
-<div class="form-header">
-<div class="fh-left">
-<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
-<div class="fh-company">
-<a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-<span>Tài liệu vận hành • Công việc Hướng dẫn</span>
-</div>
-</div>
-<div class="title"><strong>WI-701 — Nhận hàng, IQC đầu vào, truy vết, dán nhãn và nhập vị trí</strong></div>
-<div class="meta">
-<div class="row"><span><b>Code:</b></span><span>WI-701</span></div>
-<div class="row"><span><b>Version:</b></span><span>V0</span></div>
-<div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-warehouse-clerk.html" title="Warehouse Clerk (Nhan vien kho)"><span class="entity-code role-code">WAR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (To truong QC)"><span class="entity-code role-code">QCL</span></a></span></span></div>
-<div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
-</div>
-</div>
-<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng cho mọi phiếu nhận / biên nhận vật tư, vật tư gia công ngoài, khách hàng thuộc tính / tài sản, tooling nhận về và mọi trường hợp cần nhập vị trí có kiểm soát trước khi cấp phát cho Job.</div>
-<h1>WI-701 — Nhận hàng, IQC đầu vào, truy vết, dán nhãn và nhập vị trí</h1><div class="section">
-<h2>1. Mục đích, quyền dừng và ba lỗi gốc phải chặn</h2>
-<p>WI này điều khiển toàn bộ hoạt động nhận hàng từ lúc xe tới bến xuất nhập hàng cho đến khi hàng được gắn trạng thái, tạo phiếu nhận / biên nhận, kiểm chứng IQC, dán nhãn truy vết và nhập vị trí chính thức. Mục tiêu là chặn ba lỗi gốc gây hold cuối tuyến và khách hàng thoát / bỏ qua: <strong>nhận sai hàng hoặc sai phiên bản</strong>, <strong>đứt chuỗi truy vết lot/mẻ nấu (heat)/batch</strong>, và <strong>đưa hàng chưa phát hành vào kho có thể sử dụng hoặc cấp phát cho Job</strong>.</p>
-<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Chỉ mở có thể sử dụng, cấp phát, tách lô hoặc nhập vị trí sau khi đã xác minh đúng chứng từ, đúng lot hoặc mẻ nấu (heat), đúng trạng thái IQC và đúng nhãn truy vết. Mọi giao dịch phiếu nhận / biên nhận, hold, phát hành và di chuyển vị trí phải nằm trên Epicor; hồ sơ ảnh, cert, MTC, biên bản IQC và bằng chứng ngoại lệ phải lưu SSOT trên M365 bằng link-not-copy.</div>
-<div class="kpi-grid">
-<div class="kpi-box"><strong>KPI-WI701-01</strong><br>Phiếu nhận Quyền / Đúng-Đầu tiên-Time = số phiếu nhận / biên nhận PASS ngay lần đầu / tổng phiếu nhận / biên nhận có kiểm.</div>
-<div class="kpi-box"><strong>KPI-WI701-02</strong><br>Tỷ lệ phiếu nhận / biên nhận bị TẠM GIỮ do thiếu cert / sai lot / sai source / sai phiên bản.</div>
-</div>
-</div><div class="section">
-<h2>2. Chuẩn bị bắt buộc trước khi mở kiện hoặc tháo phôi / dỡ hàng</h2>
-<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hạng mục chuẩn bị</th><th>Yêu cầu bắt buộc</th><th>PASS</th><th>TẠM GIỮ / STOP</th></tr></thead><tbody>
-<tr><td>Danh sách chờ nhận</td><td>WHS mở PO/ASN/kỳ vọng list, xác định phiếu nhận / biên nhận nào là raw nguyên vật liệu, gia công ngoài trả lại, khách hàng thuộc tính / tài sản, tooling hoặc vật tư tiêu hao.</td><td>Phiếu nhận dự kiến đã rõ PO, part, qty, Người xử lý hoặc nhà cung cấp.</td><td>Xe tới nhưng không xác định được PO/nguồn gốc hoặc phiếu nhận / biên nhận không có Người nhận trách nhiệm.</td></tr>
-<tr><td>Khu bến xuất nhập hàng / tháo phôi / dỡ hàng</td><td>Lối đi, bến xuất nhập hàng, pallet kích, cân, xe nâng, thùng/cách ly / biệt trữ pallet, tem nhãn, camera chụp ảnh phải sẵn sàng.</td><td>bến xuất nhập hàng sạch, có chỗ tách riêng hàng TẠM GIỮ/NG.</td><td>bến xuất nhập hàng lẫn WIP/FG, thiếu khu cách ly / biệt trữ hoặc lối đi bị cản trở.</td></tr>
-<tr><td>Phương tiện bảo vệ</td><td>Chuẩn bị pallet, góc chèn, vật tư chống ẩm, khay chống trầy, bìa phân lô, niêm phong bag và nhãn trạng thái phù hợp với loại hàng.</td><td>Vật tư bảo vệ phù hợp với khối lượng, hình dạng và độ nhạy bề mặt.</td><td>Không đủ vật tư bảo vệ cho hàng dài, hàng nặng, bề mặt sạch hoặc hàng chân không.</td></tr>
-<tr><td>Hệ thống / biểu mẫu</td><td>Mở sẵn <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx" download="">FRM-701</a>; với hàng gia công ngoài phải chuẩn bị thêm <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-411_Outsourced_Process_Incoming_Verification.xlsx" download="">FRM-411</a>.</td><td>Biểu mẫu mở đúng job/phiếu nhận / biên nhận và có Người ghi.</td><td>Nhận hàng rồi mới đi tìm biểu mẫu hoặc ghi nháp ngoài hệ thống.</td></tr>
-</tbody></table></div>
-<div class="callout-warning"><strong>Bắt buộc:</strong> kiện rách, thùng ướt, pallet nghiêng, niêm phong mở, bao gói sai hướng, dấu hiệu va đập hoặc dầu/dung dịch làm mát (dung dịch làm nguội) rò rỉ phải được chụp ảnh ngay tại bến xuất nhập hàng trước khi mở kiện. Trường hợp nghi có nguy cơ nhiễm bẩn, nhầm lô hoặc hư hại cơ học, dán <span class="code">TẠM GIỮ</span> ngay tại điểm nhận và không đưa vào khu put-cách xa / rời.</div>
-</div><div class="section">
-<h2>3. Phân tuyến phiếu nhận / biên nhận theo loại hàng và mức kiểm đầu vào</h2>
-<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Loại phiếu nhận / biên nhận</th><th>Điểm nhận diện bắt buộc</th><th>Đường đi bắt buộc</th><th>Điểm dừng bắt buộc</th></tr></thead><tbody>
-<tr><td>Raw nguyên vật liệu bar / tấm / bản / ống / phôi thỏi</td><td>PO, nhà cung cấp, nguyên vật liệu cấp / hạng/spec, mẻ nấu (heat)/lot, size, điều kiện, MTC/phay Cert, đã phê duyệt source.</td><td>bến xuất nhập hàng → tài liệu kiểm tra → IQC / cert xác minh → label truy vết → put-cách xa / rời theo <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703</a>.</td><td>Thiếu mẻ nấu (heat) truy vết, sai cấp / hạng/spec, source không có trong <a href="../../03-Reference/03-ANNEX-300/annex-302-approved-materials-list.html">ANNEX-302</a>, hoặc có dấu hiệu hàng giả / hàng nhái.</td></tr>
-<tr><td>Công đoạn đặc biệt / outsource trả lại</td><td>Part no, rev, qty, lot, Người xử lý, cert quy trình, scope, date, job tham chiếu, pack tính toàn vẹn.</td><td>bến xuất nhập hàng → cách ly / biệt trữ → cert/scope kiểm tra → IQC theo <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-411_Outsourced_Process_Incoming_Verification.xlsx">FRM-411</a> → PASS/TẠM GIỮ → nhập kho hoặc trả <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a>.</td><td>Người xử lý không nằm trong <a href="../../03-Reference/04-ANNEX-400/annex-403-approved-processor-list.html">ANNEX-403</a>, cert sai lot/part/rev, thiếu báo cáo bắt buộc.</td></tr>
-<tr><td>Customer thuộc tính / tài sản / ký gửi nguyên vật liệu</td><td>Customer tag, phiếu kê đóng gói, số sê-ri/lot, điều kiện dựa trên phiếu nhận / biên nhận, số kiện, niêm phong tình trạng.</td><td>bến xuất nhập hàng → xác minh với chứng từ khách → nhãn khách hàng thuộc tính / tài sản riêng → khu lưu riêng → vấn đề theo job.</td><td>Không rõ quyền sở hữu, thiếu nhận diện khách, số kiện lệch hoặc điều kiện bất thường.</td></tr>
-<tr><td>Tooling / gage / fixture / mảnh dao (insert) đặc thù</td><td>ID tooling/gage, số sê-ri, hiệu chuẩn trạng thái khi áp dụng, người chịu trách nhiệm, dự kiến / có chủ đích machine/job.</td><td>bến xuất nhập hàng → xác minh ID → trạng thái có thể sử dụng / hiệu chuẩn / hold → nhập vị trí tooling.</td><td>Thiếu ID, hiệu chuẩn hết hạn, tooling không rõ người chịu trách nhiệm hoặc nghi va chạm.</td></tr>
-<tr><td>vật tư tiêu hao / MRO / hàng không đi vào sản phẩm</td><td>PO, qty, tình trạng bao gói, date code / kệ-tuổi thọ / vòng đời nếu có, SDS hoặc yêu cầu lưu trữ nếu là hoá chất.</td><td>bến xuất nhập hàng → tài liệu/cơ bản kiểm tra → nhãn / vị trí → put-cách xa / rời theo môi trường yêu cầu.</td><td>kệ-tuổi thọ / vòng đời hết hạn, nhãn không đọc được, vật chứa rò rỉ hoặc quy cách lưu trữ chưa sẵn sàng.</td></tr>
-</tbody></table></div>
-</div><div class="section">
-<h2>4. Kiểm chứng từ, nhận diện vật lý và khóa chuỗi truy vết</h2>
-<p>Phiếu nhận chỉ được xem là "có thể đánh giá PASS" khi chuỗi chứng cứ từ nhà cung cấp/Người xử lý đến phiếu nhận / biên nhận dòng / chuyền không bị đứt. Chuỗi này tối thiểu phải nối được: <strong>nhà cung cấp/Người xử lý → PO/Gia công ngoài PO → phiếu kê đóng gói/cert → phiếu nhận / biên nhận dòng / chuyền → lot/mẻ nấu (heat)/batch → vị trí put-cách xa / rời</strong>.</p>
-<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Điểm kiểm</th><th>Phải đối chiếu với</th><th>đạt khi</th><th>hold khi</th></tr></thead><tbody>
-<tr><td>Part số / phiên bản</td><td>PO, drawing/spec, gia công ngoài pack, cert và nhãn kiện.</td><td>Part/Rev đồng nhất trên mọi nguồn.</td><td>Sai rev, cert ghi rev cũ, nhãn kiện ghi part khác, hoặc file đính kèm không khóa đúng phiên bản.</td></tr>
-<tr><td>Nguyên vật liệu cấp / hạng / ram (temper) / điều kiện</td><td>MTC/phay Cert, đã phê duyệt nguyên vật liệu list, drawing note.</td><td>cấp / hạng, ram (temper)/điều kiện, biểu mẫu yếu tố và spec khớp yêu cầu job.</td><td>Sai cấp / hạng, sai ram (temper), thiếu chứng cứ source, hoặc dùng nguyên vật liệu thay thế chưa được chấp thuận.</td></tr>
-<tr><td>Mẻ nấu (mẻ nấu (heat) / lot / batch truy vết</td><td>MTC, phiếu kê đóng gói, cert công đoạn đặc biệt, traveler, nhãn từng kiện.</td><td>Mẻ nấu (mẻ nấu (heat)/lot rõ ràng, không đứt chuỗi khi phiếu nhận / biên nhận có nhiều kiện hoặc nhiều lot.</td><td>Mẻ nấu (mẻ nấu (heat) không đọc được, hỗn hợp / lẫn lộn lot không tách riêng, hoặc không xác định được kiện nào thuộc lot nào.</td></tr>
-<tr><td>kệ-tuổi thọ / vòng đời / date code</td><td>Nhãn nhà cung cấp, CoC, yêu cầu lưu trữ.</td><td>Ngày còn hạn, thời gian còn lại đạt yêu cầu sử dụng.</td><td>Hết hạn, không có date code, hoặc không xác minh được còn lại kệ-tuổi thọ / vòng đời.</td></tr>
-<tr><td>Cert công đoạn đặc biệt / báo cáo</td><td><a href="../../03-Reference/04-ANNEX-400/annex-402-outsource-special-process-pack.html">ANNEX-402</a>, PO note, khách hàng/spec, đã phê duyệt Người xử lý list.</td><td>Cert đúng quy trình nhóm sản phẩm, đúng lot/part/rev, đúng scope và có báo cáo bắt buộc.</td><td>Thiếu cert, thiếu data độ dày/độ cứng/test kết quả, Người xử lý ngoài scope hoặc hết hiệu lực.</td></tr>
-<tr><td>Tình trạng vật lý / bao gói</td><td>Thực tế kiện hàng, đóng gói rule, nhãn hướng đặt.</td><td>Không có dấu hiệu va đập, ẩm, bẩn, niêm phong mở, rách bag, trầy nghiêm trọng hoặc trộn lô.</td><td>Bao gói hỏng, niêm phong mở, dấu hiệu nhiễm bẩn, phoi kim loại, dầu lạ, hoặc hàng xếp trái hướng bảo vệ.</td></tr>
-</tbody></table></div>
-<div class="callout-info"><strong>Quy tắc tách / chia lot / vật liệu thừa:</strong> khi phiếu nhận / biên nhận được cắt cây, chia khay hoặc tách một phần để cấp phát, WHS <strong>PHẢI</strong> tạo nhãn mới cho từng phần và giữ liên kết về lot/mẻ nấu (heat) gốc. PHẢI ghi rõ lot gốc trên nhãn; không ghi tay mơ hồ kiểu "cùng lô với kiện kia". vật liệu thừa chỉ được trả lại kho khi còn nguyên nhãn gốc hoặc có nhãn tái tạo do WHS/QA xác nhận.</div>
-</div><div class="section">
-<h2>5. IQC, lấy mẫu và quyết định PASS / TẠM GIỮ / NG</h2>
-<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tuyến kiểm</th><th>Áp dụng khi</th><th>Việc phải làm</th><th>Điều kiện phát hành</th></tr></thead><tbody>
-<tr><td>Tài liệu xác minh chỉ / duy nhất</td><td>Hàng chuẩn, source ổn định, không có CTQ đầu vào đặc biệt và không nằm trong kích hoạt tăng mức kiểm.</td><td>Kiểm đầy đủ chứng từ, truy vết, nhãn, điều kiện; ghi lý do miễn đo.</td><td>QA/WHS xác nhận lý do miễn kiểm và phiếu nhận / biên nhận không có bất thường.</td></tr>
-<tr><td>AQL đầu vào / nhận hàng</td><td>Part/phiếu nhận / biên nhận có yêu cầu lấy mẫu, trực quan/bao gói/ngoại quan hoặc đặc tính đầu vào có thể đánh giá theo lot.</td><td>Chạy theo <a href="../06-WI-600/wi-603-aql-sampling-inspection-execution.html">WI-603</a>, ghi size code, mẫu size, khuyết tật count, chấp nhận/từ chối.</td><td>Lot đạt tiêu chí chấp nhận; hồ sơ AQL gắn với phiếu nhận / biên nhận dòng / chuyền.</td></tr>
-<tr><td>100% xác minh</td><td>Nguyên vật liệu mới, nhà cung cấp mới, lot rủi ro, cert có tiền sử sai, part chiến lược hoặc khách hàng yêu cầu.</td><td>Kiểm 100% các điểm được nêu trên pack / kế hoạch kiểm soát / đầu vào / nhận hàng plan.</td><td>Hoàn tất 100% và không có NG.</td></tr>
-<tr><td>Công đoạn đặc biệt xác minh đầu vào</td><td>Hàng outsource / công đoạn đặc biệt / cert-nhạy cảm.</td><td>Dùng <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-411_Outsourced_Process_Incoming_Verification.xlsx">FRM-411</a>; kiểm cert, báo cáo, scope, lot, trực quan, tình trạng bề mặt, vệ sinh / sạch sẽ / đóng gói note khi áp dụng.</td><td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> phát hành sau khi đủ bộ bằng chứng; nếu thiếu, giữ TẠM GIỮ kể cả khi trực quan đẹp.</td></tr>
-</tbody></table></div>
-<div class="callout-warning"><strong>Kích hoạt tăng mức kiểm:</strong> nhà cung cấp mới; Người xử lý mới; lịch sử phiếu nhận / biên nhận lỗi trong 3 lô Cần nhất; cert thiếu/sai; bao gói hỏng; nguồn hàng thay đổi; hàng nhạy clean/chân không; hoặc có yêu cầu đặc biệt từ khách hàng. Khi kích hoạt xuất hiện, phiếu nhận / biên nhận không được đi theo tuyến miễn kiểm.</div>
-</div><div class="section">
-<h2>6. Dán nhãn trạng thái, put-cách xa / rời và quản lý vị trí</h2>
-<div class="two-col">
-<div class="card"><h3>Nhãn tối thiểu bắt buộc</h3><ul class="tight" style="padding-left:18px;">
-<li>Part số / mô tả ngắn.</li>
-<li>Phiên bản khi job kiểm soát theo rev.</li>
-<li>Phiếu nhận ID hoặc PO/dòng / chuyền liên kết rõ.</li>
-<li>Lot / mẻ nấu (heat) / batch / số sê-ri theo loại hàng.</li>
-<li>Qty thực nhận / UOM.</li>
-<li>Trạng thái: PASS / TẠM GIỮ / cách ly / biệt trữ / khách hàng thuộc tính / tài sản / dao cụ.</li>
-<li>Vị trí hoặc vị trí tạm.</li>
-</ul></div>
-<div class="card"><h3>Put-cách xa / rời bắt buộc</h3><ul class="tight" style="padding-left:18px;">
-<li>PASS mới được vào khu vực có thể sử dụng; TẠM GIỮ/NG phải vào cách ly / biệt trữ tách biệt.</li>
-<li>Customer thuộc tính / tài sản phải vào khu vực riêng, không trộn với tồn HESEM.</li>
-<li>Hỗn hợp lot PHẢI tách riêng bằng khay/kệ/vị trí, ngăn tách và nhãn riêng cho từng lot.</li>
-<li>Vật liệu dài, nặng, bề mặt nhạy và hàng sạch phải theo rule vị trí / bảo vệ của <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703</a>.</li>
-</ul></div>
-</div>
-<p>Sau khi put-cách xa / rời, WHS <strong>PHẢI</strong> đóng vòng truy vết bằng cách bảo đảm phiếu nhận / biên nhận dòng / chuyền, vị trí, nhãn vật lý và hồ sơ chứng từ đều chỉ về cùng một lot/mẻ nấu (heat). PHẢI đưa hàng vào vị trí hợp lệ ngay; không để "tạm đặt ngoài lối đi", "đợi lát nhập vị trí" hoặc "để Cần máy cho tiện".</p>
-</div><div class="section">
-<h2>7. Quy trình xử lý sai lệch, nhà cung cấp nghi ngờ và escalation</h2>
-<div class="step-list">
-<div class="step-item"><strong>Bước 1 — Chặn ngay tại điểm nhận.</strong><br>Dán TẠM GIỮ, chụp ảnh, dừng put-cách xa / rời và dừng cấp phát. Không được tiếp tục mở các kiện còn lại nếu nghi ngờ hệ thống như sai cert hàng loạt, nhầm part hoặc hỗn hợp / lẫn lộn lot.</div>
-<div class="step-item"><strong>Bước 2 — Xác định loại sai lệch.</strong><br>Phân loại: trên / vượt quá/ngắn / thiếu; cert thiếu; cert sai spec/rev; source không đã phê duyệt; Người xử lý ngoài scope; đóng gói vi phạm; nghi hàng giả / hàng nhái; nhầm khách hàng thuộc tính / tài sản; label không đọc được; hỗn hợp / lẫn lộn mẻ nấu (heat) / hỗn hợp / lẫn lộn batch.</div>
-<div class="step-item"><strong>Bước 3 — Khoanh phạm vi ảnh hưởng.</strong><br>Rà toàn bộ kiện cùng phiếu nhận / biên nhận, cùng PO, cùng nhà cung cấp lô giao hàng, cùng Người xử lý batch hoặc cùng mẻ nấu (heat). Nếu không xác định được biên, mặc định <strong>TẠM GIỮ toàn bộ lô giao hàng</strong>.</div>
-<div class="step-item"><strong>Bước 4 — Gọi đúng người chịu trách nhiệm trong cùng ca.</strong><br>Báo Mua hàng khi liên quan nhà cung cấp/Người xử lý; báo <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> khi liên quan cert, chất lượng, truy vết, nghi ngờ hàng giả / hàng nhái; báo Kế hoạch khi ảnh hưởng Ngày đến hạn hoặc job đang chờ vật tư. Trường hợp nghi hàng đã vấn đề hoặc đã vào WIP, xử lý tiếp theo <a href="../06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a>.</div>
-<div class="step-item"><strong>Bước 5 — Mở hồ sơ bắt buộc.</strong><br>Phiếu nhận chênh lệch / phương sai, <a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a>, <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-411_Outsourced_Process_Incoming_Verification.xlsx">FRM-411</a> (nếu có), NCR/SCAR khi phát hiện NG từ nhà cung cấp/Người xử lý, và giữ link ảnh + cert + trao đổi với nhà cung cấp trong cùng hồ sơ.</div>
-</div>
-<div class="callout-danger"><strong>Kích hoạt nhà cung cấp/Người xử lý nghi ngờ:</strong> lặp lỗi cert/truy vết trong 3 lô Cần nhất; không khớp part/rev/lot; Người xử lý thay đổi vị trí/scope mà không luồng-xuống / Từng; dấu hiệu sửa cert bằng tay; bao gói tái sử dụng có nguy cơ trộn lẫn. Khi có kích hoạt này, phiếu nhận / biên nhận kế tiếp từ cùng nguồn <strong>PHẢI</strong> tăng mức kiểm cho đến khi được Mua hàng + <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> giải tỏa.</div>
-</div><div class="section">
-<h2>8. Hồ sơ, KPI và tài liệu liên kết</h2>
-<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm hồ sơ / KPI</th><th>Yêu cầu bắt buộc</th></tr></thead><tbody>
-<tr><td>Hồ sơ chính</td><td><a href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx" download="">FRM-701</a>, phiếu nhận / biên nhận giao dịch, ảnh kiện bất thường, cert/MTC scan hoặc link SSOT, <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-411_Outsourced_Process_Incoming_Verification.xlsx">FRM-411</a> cho outsource trả lại, label lịch sử khi tách / chia lot/vật liệu thừa.</td></tr>
-<tr><td>KPI vận hành</td><td>KPI-WI701-01 Quyền / Đúng-Đầu tiên-Time phiếu nhận / biên nhận; KPI-WI701-02 cert sai khác tỷ lệ; KPI-WI701-03 bến xuất nhập hàng-to-phát hành thời gian dẫn (lead time); KPI-WI701-04 truy xuất nguồn gốc ngắt / nghỉ incidents; KPI-WI701-05 phiếu nhận / biên nhận put-cách xa / rời quá hạn cuối ca.</td></tr>
-<tr><td>Liên kết bắt buộc</td><td><a href="../../01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a>, <a href="../../01-SOPs/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html">SOP-402</a>, <a href="../../01-SOPs/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html">SOP-701</a>, <a href="../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a>, <a href="../../03-Reference/03-ANNEX-300/annex-302-approved-materials-list.html">ANNEX-302</a>, <a href="../../03-Reference/04-ANNEX-400/annex-403-approved-processor-list.html">ANNEX-403</a>, <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703</a>, <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>, <a href="../02-WI-200/wi-205-barcode-labeling-and-scan-to-action.html">WI-205</a>, <a href="../06-WI-600/wi-603-aql-sampling-inspection-execution.html">WI-603</a>, <a href="../06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a>, <a href="../01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html">WI-105</a>.</td></tr>
-</tbody></table></div>
+  <div class="page">
+    <div class="page-body">
+      <div class="form-header">
+        <div class="fh-left">
+          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+          <div class="fh-company">
+            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+            <span>Tài liệu vận hành • Công việc hướng dẫn</span>
+          </div>
+        </div>
+        <div class="title"><strong>WI-701 — Nhận hàng, IQC đầu vào, truy vết và nhập vị trí</strong></div>
+        <div class="meta">
+          <div class="row"><span><b>Mã:</b></span><span>WI-701</span></div>
+          <div class="row"><span><b>Phiên bản:</b></span><span>V2</span></div>
+          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+          <div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-warehouse-clerk.html" title="Warehouse Clerk (Nhan vien kho)"><span class="entity-code role-code">WAR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (To truong QC)"><span class="entity-code role-code">QCL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></span></div>
+          <div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
+        </div>
+      </div>
 
-<div class="callout-info"><strong>SoR / SSOT bắt buộc:</strong> Epicor giữ giao dịch phiếu nhận, hold, phát hành và vị trí di chuyển / dịch chuyển. Ảnh kiện hàng, cert, MTC, biên bản IQC và bằng chứng ngoại lệ lưu trên M365/SharePoint theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>. Người dùng tìm đúng thư mục qua <a href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/index.html">Department Handbooks Index</a> và <a href="../01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html">WI-105</a>.</div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng tại khu receiving và IQC cho nguyên vật liệu, bán thành phẩm outsource trả về, vật tư khách hàng cấp, tooling hoặc phụ kiện phải kiểm soát trước khi nhập vị trí sử dụng. Đây là POU-WI tại điểm nhận hàng; rule về SSCC, vị trí kho và FIFO tra tại annex liên quan.</div>
+      <h1>WI-701 — Nhận hàng, IQC đầu vào, truy vết và nhập vị trí</h1>
+
+      <section id="wi-s1" class="wi-section">
+        <h2>1. Mục đích</h2>
+        <ul class="tight">
+          <li>Chặn sai nguồn, sai Part/Rev, sai số lượng và mất lot hoặc heat ngay từ đầu tuyến.</li>
+          <li>Giữ một trạng thái duy nhất giữa hàng thực tế, nhãn vật lý và dữ liệu hệ thống trước khi cấp phát cho Job.</li>
+          <li>Để người lấy hàng hoặc auditor truy lại được nguồn gốc lô trong một lần mở hồ sơ.</li>
+        </ul>
+        <div class="callout-danger"><strong>STOP</strong><br>Dừng ngay và đưa vào khu giữ nếu thiếu cert bắt buộc, không đọc được lot hoặc heat, có dấu hiệu trộn lô, bao gói hư hỏng ảnh hưởng chất lượng hoặc chưa xác định được trạng thái IQC. Không được put-away vào vị trí dùng cho lô chưa sạch trạng thái.</div>
+      </section>
+
+      <section id="wi-s2" class="wi-section">
+        <h2>2. Phạm vi & đối tượng áp dụng</h2>
+        <div class="two-col">
+          <div class="card">
+            <h3>Áp dụng cho</h3>
+            <ul class="tight">
+              <li><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-warehouse-clerk.html" title="Warehouse Clerk (Nhan vien kho)"><span class="entity-code role-code">WAR</span></a>, <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (To truong QC)"><span class="entity-code role-code">QCL</span></a>, <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> và người được giao nhận hàng/IQC đầu vào.</li>
+              <li>Tất cả lô nguyên vật liệu, outsource return, khách hàng cấp và vật tư phải có truy vết trước khi đưa vào kho sử dụng.</li>
+              <li>Trường hợp online bình thường và cả tình huống phải dùng bộ offline được kiểm soát.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Không thay cho</h3>
+            <ul class="tight">
+              <li>Rule SSCC, pack reconciliation và data dictionary tại <a href="../../03-Reference/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">ANNEX-701</a>.</li>
+              <li>Rule vị trí kho, FIFO và movement control tại <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703</a>.</li>
+              <li>Gate HOLD hoặc release ở cấp hệ thống tại <a href="../02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html">WI-201</a>.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="wi-s3" class="wi-section">
+        <h2>3. Công cụ, vật tư & tài liệu cần thiết</h2>
+        <div class="table-card">
+          <table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+            <thead>
+              <tr>
+                <th>Hạng mục</th>
+                <th>Mô tả</th>
+                <th>Ghi chú</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Chứng từ nhận hàng</td>
+                <td>PO, ASN, packing list, phiếu giao hàng, biên bản bàn giao và cert hoặc CoC khi áp dụng.</td>
+                <td>Phải mở được đúng lô trước khi bóc kiện.</td>
+              </tr>
+              <tr>
+                <td>Biểu mẫu</td>
+                <td><a href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx" download>FRM-701</a> và <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx" download>FRM-413</a> khi lô bị giữ.</td>
+                <td>Chỉ dùng biểu mẫu đúng revision đang hiệu lực.</td>
+              </tr>
+              <tr>
+                <td>Thiết bị tại receiving</td>
+                <td>Máy in nhãn, máy quét, cân, pallet jack hoặc phương tiện di chuyển và thiết bị chụp ảnh công việc.</td>
+                <td>Thiết bị phải sẵn sàng trước khi mở lô.</td>
+              </tr>
+              <tr>
+                <td>Tài liệu tham chiếu</td>
+                <td><a href="../../03-Reference/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">ANNEX-701</a>, <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703</a> và <a href="../../01-SOPs/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html">SOP-701</a>.</td>
+                <td>Dùng để tra rule, không chép lại vào nhãn tay.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="wi-s4" class="wi-section">
+        <h2>4. Điều kiện tiên quyết</h2>
+        <ul class="tight">
+          <li>Khu receiving sạch, có khu giữ riêng, có nhãn trạng thái và có chỗ tách lô.</li>
+          <li>Danh sách chờ nhận hoặc chứng từ nhận hàng đã mở trước khi xe hoặc kiện vào bàn nhận.</li>
+          <li>Người thao tác biết lô nào cần cert, MTC, CoC, lot, heat, serial hoặc yêu cầu IQC đặc biệt.</li>
+          <li>Hệ thống hoặc fallback kit sẵn sàng để ghi nhận ngay tại thời điểm nhận lô.</li>
+          <li>Máy in nhãn và quyền nhập trạng thái sẵn sàng trước khi bắt đầu put-away.</li>
+        </ul>
+        <div class="callout-warning"><strong>HOLD</strong><br>Nếu chưa có đủ khu giữ, chưa có biểu mẫu hoặc chưa xác định được yêu cầu truy vết của lô, chỉ được giữ ở trạng thái chờ xác minh. Không được bỏ qua bước tách lô để tiết kiệm thời gian dock.</div>
+      </section>
+
+      <section id="wi-s5" class="wi-section">
+        <h2>5. Các bước thực hiện</h2>
+
+        <div class="step-block">
+          <h3>Bước 1: Tách lô tại điểm nhận</h3>
+          <p>Tách lô theo từng chứng từ nhận hàng và gắn trạng thái chờ xác minh ngay khi đưa vào khu receiving.</p>
+          <div class="note-soft">Lý do: trộn lô ngay từ dock sẽ làm hỏng toàn bộ chuỗi truy vết sau đó.</div>
+        </div>
+
+        <div class="step-block">
+          <h3>Bước 2: Đối chiếu chứng từ nguồn</h3>
+          <p>Đối chiếu nhà cung cấp, Part number, revision, số kiện và số lượng với PO hoặc danh sách chờ nhận trước khi mở kiện.</p>
+          <div class="note-soft">Lý do: sai nguồn hoặc sai revision phải bị chặn trước khi đi sâu vào IQC.</div>
+        </div>
+
+        <div class="step-block">
+          <h3>Bước 3: Kiểm tra tình trạng bao gói ngoài</h3>
+          <p>Kiểm tra kiện hàng, niêm phong, dấu hiệu đập móp, ướt, rách hoặc contamination và chụp ảnh khi có bất thường.</p>
+          <div class="note-soft">Lý do: hư hỏng ban đầu phải được khóa trách nhiệm trước khi bóc kiện.</div>
+        </div>
+
+        <div class="step-block">
+          <h3>Bước 4: Kiểm tra truy vết gốc</h3>
+          <p>Kiểm tra lot, heat, batch, serial hoặc mã trace trên vật tư và đối chiếu với cert hoặc chứng từ nguồn.</p>
+          <div class="note-soft">Lý do: thiếu trace từ bước này sẽ lan sang toàn bộ Job dùng lô đó.</div>
+        </div>
+
+        <div class="step-block">
+          <h3>Bước 5: Thực hiện IQC đầu vào</h3>
+          <p>Thực hiện kiểm tra đầu vào theo mức đã chỉ định và giữ lô nếu chưa có đủ tiêu chí hoặc chưa đủ chứng từ bắt buộc.</p>
+          <div class="note-soft">Lý do: chỉ lô đã sạch trạng thái IQC mới được vào kho sử dụng.</div>
+        </div>
+
+        <div class="step-block">
+          <h3>Bước 6: Dán nhãn trạng thái</h3>
+          <p>Dán nhãn trạng thái đúng cho từng lô sau khi có kết quả IQC hoặc quyết định giữ lô.</p>
+          <div class="note-soft">Lý do: người cấp phát phải nhìn thấy trạng thái thật ngay trên vật lý.</div>
+        </div>
+
+        <div class="step-block">
+          <h3>Bước 7: Nhập vị trí hệ thống</h3>
+          <p>Nhập trạng thái nhận hàng, kết quả IQC và vị trí lưu trữ vào hệ thống hoặc fallback record ngay sau khi dán nhãn.</p>
+          <div class="note-soft">Lý do: trạng thái hệ thống phải theo kịp trạng thái vật lý của lô.</div>
+        </div>
+
+        <div class="step-block">
+          <h3>Bước 8: Lưu bằng chứng và bàn giao</h3>
+          <p>Lưu ảnh, cert, record IQC và liên kết chứng từ trước khi bàn giao lô sang kho dùng hoặc khu giữ.</p>
+          <div class="note-soft">Lý do: người lấy hàng sau đó phải truy được nguồn gốc lô mà không cần hỏi lại người nhận.</div>
+        </div>
+
+        <div class="callout-ok"><strong>Kết quả mong đợi</strong><br>Kết thúc WI-701, mỗi lô đầu vào có một trạng thái duy nhất, một vị trí rõ ràng và một bộ truy vết đủ để cấp phát hoặc giữ lô mà không cần suy đoán.</div>
+      </section>
+
+      <section id="wi-s6" class="wi-section">
+        <h2>6. Hồ sơ & bằng chứng</h2>
+        <div class="table-card">
+          <table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+            <thead>
+              <tr>
+                <th>Hồ sơ</th>
+                <th>Nội dung</th>
+                <th>Lưu trữ</th>
+                <th>Trách nhiệm</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx" download>FRM-701</a></td>
+                <td>Kết quả nhận hàng, IQC, traceability, trạng thái và vị trí lưu.</td>
+                <td>Hồ sơ receiving hoặc Job dossier có kiểm soát.</td>
+                <td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-warehouse-clerk.html" title="Warehouse Clerk (Nhan vien kho)"><span class="entity-code role-code">WAR</span></a> / <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (To truong QC)"><span class="entity-code role-code">QCL</span></a></td>
+              </tr>
+              <tr>
+                <td>Ảnh và cert gốc</td>
+                <td>Ảnh kiện hàng, ảnh nhãn gốc, cert, MTC, CoC hoặc chứng từ nguồn.</td>
+                <td>SSOT của lô hoặc thư mục receiving được kiểm soát.</td>
+                <td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-warehouse-clerk.html" title="Warehouse Clerk (Nhan vien kho)"><span class="entity-code role-code">WAR</span></a></td>
+              </tr>
+              <tr>
+                <td><a href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx" download>FRM-413</a></td>
+                <td>Lý do giữ lô, phạm vi ảnh hưởng, điều kiện gỡ hold và quyết định xử lý.</td>
+                <td>Hold log có link về lô liên quan.</td>
+                <td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></td>
+              </tr>
+              <tr>
+                <td>Giao dịch hệ thống</td>
+                <td>Nhận hàng, trạng thái IQC, nhãn và put-away location.</td>
+                <td>SoR và SSOT của receiving.</td>
+                <td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-warehouse-clerk.html" title="Warehouse Clerk (Nhan vien kho)"><span class="entity-code role-code">WAR</span></a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="wi-s7" class="wi-section">
+        <h2>7. Tài liệu liên quan</h2>
+        <div class="table-card">
+          <table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+            <thead>
+              <tr>
+                <th>Mã</th>
+                <th>Tên tài liệu</th>
+                <th>Liên kết</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>SOP-701</td>
+                <td>Receiving, packaging, handling and storage</td>
+                <td><a href="../../01-SOPs/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html">Mở SOP-701</a></td>
+              </tr>
+              <tr>
+                <td>ANNEX-701</td>
+                <td>GS1 SSCC data dictionary and pack reconciliation</td>
+                <td><a href="../../03-Reference/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">Mở ANNEX-701</a></td>
+              </tr>
+              <tr>
+                <td>ANNEX-703</td>
+                <td>Warehouse location and FIFO rules</td>
+                <td><a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">Mở ANNEX-703</a></td>
+              </tr>
+              <tr>
+                <td>WI-201</td>
+                <td>Gate execution, HOLD và release tại hiện trường</td>
+                <td><a href="../02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html">Mở WI-201</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
 </div>
-<div data-phase2f="true"> </div>
-<h2>9. Matrix sử dụng <a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> sổ tay thực hành sau di chuyển / chuyển đổi</h2>
-<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống tại bến xuất nhập hàng / kho</th><th>Sổ tay thực hành / biểu mẫu chính</th><th>Rule dùng thật</th></tr></thead><tbody>
-<tr><td>Phiếu nhận bình thường; source, cert và điều kiện rõ; có thể lộ trình gia công ngay</td><td><a href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx" download="">FRM-701</a></td><td><a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> là sổ tay thực hành hiện hành để khóa phiếu nhận / biên nhận header, truy xuất nguồn gốc, PASS/TẠM GIỮ/TỪ CHỐI lộ trình gia công, put-cách xa / rời hướng dẫn và lưu kho / lưu trữ bàn giao trên cùng hồ sơ.</td></tr>
-<tr><td>Cert muộn, nghi hỗn hợp / lẫn lộn lot, gói hàng hư hỏng, source nghi ngờ hoặc cần hạn chế lưu kho / lưu trữ</td><td><a href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx" download="">FRM-701</a> + <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx" download="">FRM-413</a></td><td><a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> giữ phiếu nhận / biên nhận/IQC header và lộ trình gia công ban đầu; <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> giữ hold/disposition/phát hành thẩm quyền và kiểm soát tồn kho bị ảnh hưởng.</td></tr>
-<tr><td>Outsource trả lại cần xác minh yêu cầu → điều phối xuất hàng → trả lại chuỗi</td><td><a href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx" download="">FRM-701</a> + <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-411_Outsourced_Process_Incoming_Verification.xlsx" download="">FRM-411</a></td><td><a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-411_Outsourced_Process_Incoming_Verification.xlsx">FRM-411</a> tiếp tục xác nhận vòng lặp outsource; phiếu nhận / biên nhận lộ trình gia công, tồn kho bàn giao và vị trí hướng dẫn vẫn đi trên <a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> sổ tay thực hành.</td></tr>
-<tr><td>Cần xem lại phạm vi lịch sử / di chuyển / chuyển đổi của biểu mẫu cũ</td><td></td><td><a href="../../../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/form-control-register.html#FRM-412">FRM-412</a> không mở hồ sơ active mới; chỉ dùng để tra phạm vi mã / phạm vi quy trình cũ đã cổng sang <a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a>.</td></tr>
-</tbody></table></div>
-<h2>10. Chuỗi bằng chứng tối thiểu cho inbound / outsource / warehouse</h2>
-<div class="check-grid"><div class="check-item"><span class="chk"></span>Receipt cổng kiểm soát decision tồn tại trước giao dịch kho</div><div class="check-item"><span class="chk"></span>Lot/heat/serial header được carry-forward qua label và location</div><div class="check-item"><span class="chk"></span>Movement nhật ký không xóa dấu vết hold / restriction / conditional use</div><div class="check-item"><span class="chk"></span>Warehouse bàn giao truy về được bộ chứng từ chứng nhận hoặc quy trình return pack</div></div>
-<h2 class="h2 phase3a-workbook-alignment" id="phase3a-wi701-unified-model">11. Biểu mẫu Excel đang hiệu lực — Mô hình thống nhất FRM-701 workbook</h2><div class="note phase3a-workbook-alignment"><b>Override điều hành</b><br>Kể từ bộ form Excel mới, <a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> là workbook hiện hành thống nhất cho receipt/IQC cổng kiểm soát, route PASS/HOLD/REJECT, put-away và storage bàn giao. không còn nằm trong luồng công việc hiện hành; phạm vi mã / phạm vi quy trình của mã cũ chỉ được quản tại . <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> tiếp tục giữ hold/disposition/release thẩm quyền sau cổng kiểm soát.</div><div class="table-card phase3a-workbook-alignment"><table class="table matrix-small"><colgroup><col style="width:28%"><col style="width:28%"><col style="width:44%"></colgroup><thead><tr><th>Tình huống</th><th>Workbook / form dùng</th><th>Quy tắc ra quyết định</th></tr></thead><tbody>
-<tr><td>Nhận hàng bình thường, cert/source sạch, route kiểm rõ</td><td><a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a></td><td>Ghi traceability header, route PASS/HOLD/REJECT, put-away instruction và bàn giao trên cùng workbook.</td></tr>
-<tr><td>Nghi mixed lot, cert muộn, package damage, source doubt</td><td><a download="" href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx">FRM-701</a> + <a download="" href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a></td><td>Cổng kiểm soát decision và traceability header ở FRM-701; hold/disposition/release thẩm quyền và suspect-stock control ở FRM-413.</td></tr>
-<tr><td>Outsource return xác minh</td><td>FRM-701 + FRM-411</td><td>FRM-411 vẫn dùng cho return-from-outsource xác minh; receipt route và stock bàn giao vẫn đi qua FRM-701 workbook.</td></tr>
-</tbody></table></div></div>
-</div>
-</div>
-<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
 </body>
 </html>
