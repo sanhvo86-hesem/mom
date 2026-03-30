@@ -110,7 +110,7 @@ function loadDraft(form,alloc){
 }
 function saveDraft(form,alloc){
   try{ localStorage.setItem(draftKey(form,alloc),JSON.stringify({fieldValues:ws.fieldValues,signatures:ws.signatures})); toast(t('Đã lưu nháp.','Draft saved.'),'success'); }catch(e){}
-  api('form_fill_save_draft',{allocation_id:(alloc&&alloc.allocation_id)||'',form_code:(form&&form.form_code)||'',data:{fieldValues:ws.fieldValues,signatures:ws.signatures}},'POST').catch(function(){});
+  saveDraftToServer(form, alloc);
 }
 function clearDraft(form,alloc){ try{localStorage.removeItem(draftKey(form,alloc));}catch(e){} }
 function hydrateFromAlloc(alloc){
@@ -128,6 +128,8 @@ window._renderWorkspace = function(form, allocation, container){
     ws.schema = form.schema || ws.schema;
     if(!ws.allocDept) ws.allocDept = detectDepartment(form);
     loadDraft(form, allocation);
+    return preloadSelectedOnlineEntry(form, allocation);
+  }).then(function(){
     renderWorkspace(form, allocation, container);
   }).catch(function(){
     renderWorkspace(form, allocation, container);
@@ -411,12 +413,28 @@ function renderApprovalBar(allocation){
   if(!allocation) return '';
   var status=String(allocation.status||'').toLowerCase();
   if(status!=='submitted'&&status!=='in_review'&&status!=='approved'&&status!=='rejected') return '';
-  var cls=status.replace('_','-');
+  var canApprove=userHasApproveRole();
   var html='<div class="ec-approval '+status+'">';
-  if(status==='submitted') html+='<div class="ec-approval-text" style="color:var(--ec-warning)">'+esc(t('Chứng cứ đã nộp — sẵn sàng gửi duyệt','Evidence submitted — ready for review'))+'</div><button class="ec-btn primary" id="ec-submit-review" style="background:var(--ec-warning)">'+esc(t('Gửi duyệt','Submit for review'))+'</button>';
-  else if(status==='in_review') html+='<div class="ec-approval-text" style="color:#c2410c">'+esc(t('Đang chờ xem xét','Pending review'))+'</div><button class="ec-btn danger" id="ec-reject">'+esc(t('Từ chối','Reject'))+'</button><button class="ec-btn success" id="ec-approve">'+esc(t('Duyệt','Approve'))+'</button>';
-  else if(status==='approved') html+='<div class="ec-approval-text" style="color:var(--ec-success)">\u2713 '+esc(t('Đã phê duyệt','Approved'))+(allocation.approved_by?' — '+esc(allocation.approved_by):'')+'</div>';
-  else if(status==='rejected') html+='<div class="ec-approval-text" style="color:var(--ec-danger)">\u2717 '+esc(t('Bị từ chối','Rejected'))+(allocation.rejection_reason?': '+esc(allocation.rejection_reason):'')+'</div>';
+
+  if(status==='submitted'){
+    html+='<div class="ec-approval-text" style="color:var(--ec-warning)">'+esc(t('Chứng cứ đã nộp — sẵn sàng gửi duyệt','Evidence submitted — ready for review'))+'</div>';
+    html+='<button class="ec-btn primary" id="ec-submit-review" style="background:var(--ec-warning)">'+esc(t('Gửi duyệt','Submit for review'))+'</button>';
+  } else if(status==='in_review'){
+    html+='<div class="ec-approval-text" style="color:#c2410c">'+esc(t('Đang chờ xem xét và phê duyệt','Pending review and approval'))+'</div>';
+    if(canApprove){
+      html+='<button class="ec-btn danger" id="ec-reject">'+esc(t('Từ chối','Reject'))+'</button>';
+      html+='<button class="ec-btn success" id="ec-approve">'+esc(t('Duyệt','Approve'))+'</button>';
+    } else {
+      html+='<span style="font-size:11px;color:var(--ec-text-muted)">'+esc(t('Bạn không có quyền duyệt.','You do not have approval authority.'))+'</span>';
+    }
+  } else if(status==='approved'){
+    html+='<div class="ec-approval-text" style="color:var(--ec-success)">\u2713 '+esc(t('Đã phê duyệt','Approved'))+(allocation.approved_by?' — '+esc(allocation.approved_by):'')+(allocation.approved_at?' · '+esc(new Date(allocation.approved_at).toLocaleString()):'')+'</div>';
+    if(canApprove) html+='<button class="ec-btn ghost" id="ec-reopen">'+esc(t('Mở lại','Reopen'))+'</button>';
+  } else if(status==='rejected'){
+    html+='<div class="ec-approval-text" style="color:var(--ec-danger)">\u2717 '+esc(t('Bị từ chối','Rejected'))+(allocation.rejected_by?' — '+esc(allocation.rejected_by):'')+(allocation.rejection_reason?': '+esc(allocation.rejection_reason):'')+'</div>';
+    if(canApprove) html+='<button class="ec-btn ghost" id="ec-reopen">'+esc(t('Mở lại','Reopen'))+'</button>';
+  }
+
   html+='</div>';
   return html;
 }
@@ -581,13 +599,20 @@ function buildLookupItems(field){
   if(src==='revisions') return (master.revisions||[]).filter(function(i){return !cv.part_number||String(i.part_number||'')===String(cv.part_number);}).map(function(i){return {value:i.revision,label:i.revision,sub:i.part_number||'',part_number:i.part_number||''};});
   if(src==='capas') return (master.capas||[]).map(function(i){return {value:i.capa_number,label:i.capa_number,sub:i.title||''};});
   if(src==='work_centers') return (master.work_centers||[]).map(function(i){return {value:i.work_center_id,label:i.work_center_id,sub:i.work_center_name||''};});
-  if(src==='machines') return (master.machines||[]).filter(function(i){return !cv.work_center_id||String(i.work_center_id||'')===String(cv.work_center_id);}).map(function(i){return {value:i.machine_id,label:i.machine_id,sub:i.machine_name||''};});
-  if(src==='operators') return (master.operators||[]).map(function(i){return {value:i.operator_id,label:i.operator_id,sub:i.operator_name||''};});
+  if(src==='machines') return (master.machines||[]).filter(function(i){return !cv.work_center_id||String(i.work_center_id||'')===String(cv.work_center_id);}).map(function(i){return {value:i.machine_id,label:i.machine_id,sub:[i.machine_name||'',i.work_center_id||'',i.machine_type||''].filter(Boolean).join(' · '),machine_id:i.machine_id||'',machine_name:i.machine_name||'',work_center_id:i.work_center_id||'',machine_type:i.machine_type||''};});
+  if(src==='operators') return (master.operators||[]).filter(function(i){return !cv.work_center_id||String(i.work_center_id||'')===String(cv.work_center_id);}).map(function(i){return {value:i.operator_id,label:i.operator_id,sub:[i.operator_name||'',i.role||'',i.work_center_id||''].filter(Boolean).join(' · '),operator_id:i.operator_id||'',operator_name:i.operator_name||'',work_center_id:i.work_center_id||''};});
   if(src==='sales_orders') return (ws.orders.sales_orders||[]).filter(function(i){return !cv.customer_id||String(i.customer_id||'')===String(cv.customer_id);});
   if(src==='job_orders') return (ws.orders.job_orders||[]).filter(function(i){return !cv.so_number||String(i.so_number||'')===String(cv.so_number);});
-  if(src==='work_orders') return (ws.orders.work_orders||[]).filter(function(i){return !cv.jo_number||String(i.jo_number||'')===String(cv.jo_number);});
-  if(src==='nc_program_releases') return (master.nc_program_releases||[]).map(function(i){return {value:i.program_id,label:i.program_id,sub:i.release_title||''};});
-  if(src==='tooling_assets') return (master.tooling_assets||[]).map(function(i){return {value:i.tool_id,label:i.tool_id,sub:i.tool_name||''};});
+  if(src==='work_orders') return (ws.orders.work_orders||[]).filter(function(i){if(cv.jo_number&&String(i.jo_number||'')!==String(cv.jo_number)) return false; if(cv.machine_id&&String(i.machine_id||'')!==String(cv.machine_id)) return false; return true;});
+  if(src==='nc_program_releases') return (master.nc_program_releases||[]).filter(function(i){
+    if(cv.part_number&&String(i.part_number||'')!==String(cv.part_number)) return false;
+    if(cv.part_revision&&String(i.part_revision||'')!==String(cv.part_revision)) return false;
+    return true;
+  }).map(function(i){return {value:i.program_id,label:i.program_id,sub:[i.release_title||'',i.part_number||'',i.part_revision||'',i.status||''].filter(Boolean).join(' · '),program_id:i.program_id||'',part_number:i.part_number||'',part_revision:i.part_revision||'',status:i.status||'',checksum:i.checksum||''};});
+  if(src==='tooling_assets') return (master.tooling_assets||[]).filter(function(i){
+    if(cv.work_center_id&&String(i.preferred_work_center_id||'')!==''&&String(i.preferred_work_center_id||'')!==String(cv.work_center_id)) return false;
+    return true;
+  }).map(function(i){return {value:i.tool_id,label:i.tool_id,sub:[i.tool_name||'',i.tool_type||'',i.machine_type||''].filter(Boolean).join(' · '),tool_id:i.tool_id||'',tool_name:i.tool_name||'',tool_type:i.tool_type||''};});
   return [];
 }
 
@@ -642,6 +667,7 @@ function doSubmitOnline(form,allocation,button,container){
   window.AllocationTracker.submitOnline(allocation.allocation_id,form.form_code,payload).then(function(resp){
     if(resp&&resp.ok){
       clearDraft(form,allocation);
+      linkOrderIfPossible(allocation);
       toast(t('Đã gửi biểu mẫu thành công.','Form submitted successfully.'),'success');
       if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);
     } else toast(t('Không thể gửi.','Could not submit.'),'error');
@@ -681,6 +707,17 @@ function bindApprovalActions(form,allocation,container){
       if(r&&r.ok){toast(t('Đã từ chối.','Rejected.'),'success');if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);}
       else toast(t('Lỗi.','Error.'),'error');
     }).finally(function(){rejectBtn.disabled=false;});
+  };
+
+  var reopenBtn=document.getElementById('ec-reopen');
+  if(reopenBtn) reopenBtn.onclick=function(){
+    var reason=prompt(t('Lý do mở lại:','Reopen reason:'));
+    if(!reason||!reason.trim()){toast(t('Phải nhập lý do.','Reason required.'),'warn');return;}
+    reopenBtn.disabled=true;
+    api('evidence_reopen',{allocation_id:allocation.allocation_id,reason:reason.trim()},'POST').then(function(r){
+      if(r&&r.ok){toast(t('Đã mở lại.','Reopened.'),'success');if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);}
+      else toast(t('Lỗi.','Error.'),'error');
+    }).finally(function(){reopenBtn.disabled=false;});
   };
 }
 
@@ -752,11 +789,53 @@ function inspectFiles(files,allocation,container,form){
   });
 }
 
-/* backward compat */
-window._renderFillDownload = function(forms, entries, container){
-  /* no-op: old orchestrator calls this, but new one uses _renderWorkspace */
-};
-window._renderRecordIdGenerator = function(){};
-window._renderUploadVerify = function(){};
+/* ── preload server entry for online forms ── */
+function preloadSelectedOnlineEntry(form, allocation){
+  if(!form || form.online === false || !allocation) return Promise.resolve(null);
+  if(ws.draftKey && localStorage.getItem(ws.draftKey)) return Promise.resolve(null);
+  return api('online_form_entry_get',{
+    form_code: form.form_code,
+    allocation_id: allocation.allocation_id || '',
+    entry_id: (allocation.online_submission && allocation.online_submission.entry_id) || ''
+  },'POST').then(function(resp){
+    if(resp && resp.ok && resp.entry){
+      var skip = {form_code:1,form_version:1,record_id:1,allocation_id:1,master_context:1,signatures:1,approval_state:1,runtime_mode:1,_display:1,submitted_at:1,submitted_by:1,updated_at:1,updated_by:1,_server_time:1,_status:1,_ip:1,_session_user:1,online_submission:1};
+      Object.keys(resp.entry).forEach(function(k){ if(!skip[k]) ws.fieldValues[k] = resp.entry[k]; });
+      if(resp.entry.signatures && typeof resp.entry.signatures === 'object') ws.signatures = resp.entry.signatures;
+      hydrateFromAlloc(allocation);
+    }
+    return resp;
+  }).catch(function(){ return null; });
+}
+
+/* ── link form to order when submitting ── */
+function linkOrderIfPossible(allocation){
+  var ctx = allocation && allocation.master_context ? allocation.master_context : {};
+  var orderType = ctx.wo_number ? 'wo' : (ctx.jo_number ? 'jo' : (ctx.so_number ? 'so' : ''));
+  var orderId = ctx.wo_number || ctx.jo_number || ctx.so_number || '';
+  if(!orderType || !orderId || !allocation.record_id) return;
+  api('order_link_form', { order_type: orderType, order_id: orderId, record_id: allocation.record_id }, 'POST').catch(function(){});
+}
+
+/* ── server draft persistence ── */
+function saveDraftToServer(form, allocation){
+  if(!form || !allocation || !allocation.allocation_id) return;
+  api('form_fill_save_draft', {
+    allocation_id: allocation.allocation_id,
+    form_code: form.form_code,
+    data: { fieldValues: ws.fieldValues, signatures: ws.signatures }
+  }, 'POST').catch(function(){});
+}
+
+/* ── approval role check ── */
+function userHasApproveRole(){
+  var u = (typeof currentUser !== 'undefined' && currentUser) ? currentUser : {};
+  var roles = Array.isArray(u.roles) ? u.roles : [String(u.role || '')];
+  var approveRoles = ['admin','qa_manager','quality_manager','production_manager','engineering_manager','quality_engineer'];
+  for(var i = 0; i < roles.length; i++){
+    if(approveRoles.indexOf(String(roles[i]).toLowerCase()) >= 0) return true;
+  }
+  return false;
+}
 
 })();

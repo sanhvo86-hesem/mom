@@ -26,7 +26,8 @@ var state = {
   allocations: [],
   filter: 'all',
   search: '',
-  ready: false
+  ready: false,
+  workspaceMode: 'form'  /* 'form' | 'record-id' | 'upload' */
 };
 
 window._ecState = state;
@@ -148,7 +149,11 @@ function renderSidebar(){
       return '<button type="button" class="ec-chip' + (state.filter === c ? ' active' : '') + '" data-filter="' + c + '">' + esc(catLabels[c] || c) + '</button>';
     }).join('') + '</div>' +
     '<div class="ec-form-list" id="ec-form-list">' + formListHtml + '</div>' +
-    (state.selectedFormCode ? '<div class="ec-alloc-section"><div class="ec-alloc-section-head"><span>' + esc(t('Mã đã cấp', 'Allocations')) + ' (' + state.allocations.length + ')</span></div>' + (allocHtml || '<div style="padding:8px 16px;font-size:11px;color:var(--ec-text-muted)">' + esc(t('Chưa có mã', 'None yet')) + '</div>') + '</div>' : '') +
+    (state.selectedFormCode && state.workspaceMode === 'form' ? '<div class="ec-alloc-section"><div class="ec-alloc-section-head"><span>' + esc(t('Mã đã cấp', 'Allocations')) + ' (' + state.allocations.length + ')</span></div>' + (allocHtml || '<div style="padding:8px 16px;font-size:11px;color:var(--ec-text-muted)">' + esc(t('Chưa có mã', 'None yet')) + '</div>') + '</div>' : '') +
+    '<div class="ec-sidebar-tools">' +
+      '<button type="button" class="ec-tool-btn' + (state.workspaceMode === 'record-id' ? ' active' : '') + '" data-tool="record-id">\uD83D\uDD22 ' + esc(t('Trợ lý tạo mã', 'Record ID Assistant')) + '</button>' +
+      '<button type="button" class="ec-tool-btn' + (state.workspaceMode === 'upload' ? ' active' : '') + '" data-tool="upload">\uD83D\uDCE4 ' + esc(t('Tải lên & Kiểm tra', 'Upload & Verify')) + '</button>' +
+    '</div>' +
   '</aside>';
 }
 
@@ -165,18 +170,40 @@ function filterForms(){
 }
 
 function renderWorkspace(){
-  var ws = document.getElementById('ec-workspace');
-  if(!ws) return;
+  var wsEl = document.getElementById('ec-workspace');
+  if(!wsEl) return;
+
+  /* Record ID Assistant mode */
+  if(state.workspaceMode === 'record-id'){
+    if(typeof window._renderRecordIdGenerator === 'function'){
+      window._renderRecordIdGenerator(state.forms, {}, wsEl);
+    } else {
+      wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Module Trợ lý tạo mã chưa sẵn sàng', 'Record ID Assistant not ready')) + '</h3></div>';
+    }
+    return;
+  }
+
+  /* Upload & Verify mode */
+  if(state.workspaceMode === 'upload'){
+    if(typeof window._renderUploadVerify === 'function'){
+      window._renderUploadVerify(state.forms, {}, wsEl);
+    } else {
+      wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Module Tải lên & Kiểm tra chưa sẵn sàng', 'Upload & Verify not ready')) + '</h3></div>';
+    }
+    return;
+  }
+
+  /* Form workspace mode */
   var form = state.formMap[state.selectedFormCode] || null;
   if(!form){
-    ws.innerHTML = '<div class="ec-empty"><div class="ec-empty-icon">\uD83D\uDCCB</div><h3>' + esc(t('Chọn biểu mẫu để bắt đầu', 'Select a form to begin')) + '</h3><p>' + esc(t('Chọn form từ danh mục bên trái. Hệ thống sẽ hướng dẫn bạn qua từng bước: cấp mã → điền/tải → ký & gửi.', 'Pick a form from the catalog. The system will guide you through each step: allocate → fill/download → sign & submit.')) + '</p></div>';
+    wsEl.innerHTML = '<div class="ec-empty"><div class="ec-empty-icon">\uD83D\uDCCB</div><h3>' + esc(t('Chọn biểu mẫu để bắt đầu', 'Select a form to begin')) + '</h3><p>' + esc(t('Chọn form từ danh mục bên trái. Hệ thống sẽ hướng dẫn bạn qua từng bước: cấp mã → điền/tải → ký & gửi.', 'Pick a form from the catalog. The system will guide you through each step: allocate → fill/download → sign & submit.')) + '</p></div>';
     return;
   }
   var allocation = state.allocations.find(function(a){ return a.allocation_id === state.selectedAllocationId; }) || null;
   if(typeof window._renderWorkspace === 'function'){
-    window._renderWorkspace(form, allocation, ws);
+    window._renderWorkspace(form, allocation, wsEl);
   } else {
-    ws.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Module workspace chưa sẵn sàng', 'Workspace module not ready')) + '</h3></div>';
+    wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Module workspace chưa sẵn sàng', 'Workspace module not ready')) + '</h3></div>';
   }
 }
 
@@ -196,16 +223,24 @@ function bindSidebar(container){
     var formItem = e.target.closest('[data-form]');
     if(formItem){
       var code = formItem.getAttribute('data-form');
-      if(code === state.selectedFormCode) return;
+      if(code === state.selectedFormCode && state.workspaceMode === 'form') return;
       state.selectedFormCode = code;
       state.selectedAllocationId = '';
       state.allocations = [];
+      state.workspaceMode = 'form';
       loadAllocations().then(function(){ render(container); });
       return;
     }
     var allocItem = e.target.closest('[data-alloc]');
     if(allocItem){
       state.selectedAllocationId = allocItem.getAttribute('data-alloc') || '';
+      render(container);
+      return;
+    }
+    var toolBtn = e.target.closest('[data-tool]');
+    if(toolBtn){
+      var mode = toolBtn.getAttribute('data-tool');
+      state.workspaceMode = (state.workspaceMode === mode) ? 'form' : mode;
       render(container);
     }
   });

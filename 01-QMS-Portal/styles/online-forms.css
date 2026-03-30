@@ -91,10 +91,11 @@
 .ec-filters {
   display: flex;
   gap: 4px;
-  padding: 8px 16px;
+  padding: 8px 12px;
   border-bottom: 1px solid var(--ec-border);
   overflow-x: auto;
   flex-shrink: 0;
+  flex-wrap: wrap;
 }
 .ec-chip {
   padding: 4px 10px;
@@ -655,6 +656,47 @@
   font-size: 12px;
   font-weight: 700;
 }
+
+/* ── Sidebar tool buttons ── */
+.ec-sidebar-tools {
+  border-top: 1px solid var(--ec-border);
+  padding: 8px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ec-tool-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--ec-border);
+  border-radius: var(--ec-radius);
+  background: var(--ec-surface);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ec-text-secondary);
+  cursor: pointer;
+  transition: all var(--ec-transition);
+  font-family: var(--ec-font);
+  text-align: left;
+}
+.ec-tool-btn:hover { background: var(--ec-bg); border-color: var(--ec-border-focus); }
+.ec-tool-btn.active {
+  background: var(--ec-primary-bg);
+  border-color: var(--ec-primary);
+  color: var(--ec-primary);
+  font-weight: 700;
+}
+
+/* ── Legacy module compat (09c, 09d render inside workspace) ── */
+.ec-workspace .rid-shell,
+.ec-workspace .uv2-shell { margin: 0; }
+.ec-workspace .rid-issue-card,
+.ec-workspace .rid-history-card,
+.ec-workspace .uv2-card { border-radius: var(--ec-radius-lg); }
 
 /* ── Toast ── */
 .ec-toast {
