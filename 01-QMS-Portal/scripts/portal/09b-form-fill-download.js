@@ -151,11 +151,11 @@ function renderChecklist(allocation){
   var key = checklistKey(allocation, stage);
   var checklist = ws.checklistCache[key] || null;
   if(!checklist){
-    return '<div class="ec-checklist loading"><div class="ec-checklist-head"><strong>' + esc(t('Evidence checklist', 'Evidence checklist')) + '</strong><span>' + esc(t('Dang tai...', 'Loading...')) + '</span></div></div>';
+    return '<div class="ec-checklist loading"><div class="ec-checklist-head"><strong>' + esc(t('Danh mục kiểm tra chứng cứ', 'Evidence checklist')) + '</strong><span>' + esc(t('Đang tải...', 'Loading...')) + '</span></div></div>';
   }
   var items = Array.isArray(checklist.items) ? checklist.items : [];
   return '<div class="ec-checklist ' + (checklist.ok ? 'ok' : 'fail') + '">' +
-    '<div class="ec-checklist-head"><strong>' + esc(t('Evidence checklist', 'Evidence checklist')) + '</strong><span>' + esc((checklist.complete_count || 0) + '/' + (checklist.required_count || 0)) + '</span></div>' +
+    '<div class="ec-checklist-head"><strong>' + esc(t('Danh mục kiểm tra chứng cứ', 'Evidence checklist')) + '</strong><span>' + esc((checklist.complete_count || 0) + '/' + (checklist.required_count || 0)) + '</span></div>' +
     '<div class="ec-checklist-list">' + items.map(function(item){
       var statusClass = item.required ? (item.ok ? 'ok' : 'miss') : 'skip';
       var detail = t(item.detail_vi || '', item.detail_en || item.detail_vi || '');
@@ -169,7 +169,29 @@ function renderChecklist(allocation){
 
 function renderEvidenceActions(allocation){
   if(!allocation || !allocation.allocation_id) return '';
-  return '<div class="ec-actions"><button class="ec-btn ghost" id="ec-export-pack">' + esc(t('Xuat evidence pack', 'Export evidence pack')) + '</button></div>';
+  return '<div class="ec-actions"><button class="ec-btn ghost" id="ec-export-pack">' + esc(t('Xuất bộ chứng cứ', 'Export evidence pack')) + '</button></div>';
+}
+
+function historyStatusLabel(status){
+  var key = String(status || '').trim().toLowerCase();
+  var labels = {
+    allocated: t('Đã cấp mã', 'Allocated'),
+    downloaded: t('Đã tải biểu mẫu', 'Downloaded'),
+    submitted: t('Đã nộp', 'Submitted'),
+    received: t('Đã tiếp nhận', 'Received'),
+    in_review: t('Đang xem xét', 'In review'),
+    approved: t('Đã phê duyệt', 'Approved'),
+    rejected: t('Bị từ chối', 'Rejected'),
+    voided: t('Đã hủy', 'Voided'),
+    void: t('Đã hủy', 'Voided')
+  };
+  return labels[key] || String(status || '-');
+}
+
+function renderHistoryStatusBadge(status){
+  var key = String(status || '').trim().toLowerCase();
+  var tone = key === 'approved' ? 'pass' : (key === 'rejected' || key === 'voided' || key === 'void' ? 'fail' : (key === 'submitted' || key === 'received' || key === 'in_review' ? 'warn' : 'info'));
+  return '<span class="ec-badge ' + tone + '">' + esc(historyStatusLabel(status)) + '</span>';
 }
 
 function isLockedContextField(fieldId, allocation){
@@ -234,7 +256,7 @@ function renderWorkspace(form, allocation, container){
       '<p class="ec-header-desc">' + esc(t(form.description_vi || form.description || '', form.description || '')) + '</p>' +
     '</div>' +
     '<div class="ec-header-tags">' +
-      '<span class="ec-tag">' + (isOnline ? 'Online' : 'Offline') + '</span>' +
+      '<span class="ec-tag">' + esc(isOnline ? t('Trực tuyến', 'Online') : t('Ngoại tuyến', 'Offline')) + '</span>' +
       (allocation ? '<span class="ec-tag done">' + esc(allocation.record_id || '') + '</span>' : '') +
     '</div>' +
   '</div>';
@@ -314,7 +336,7 @@ function renderOnlineStep(form, allocation){
   var html = '<div class="ec-step" id="ec-step-fill">' +
     '<div class="ec-step-head" data-toggle="ec-step-fill">' +
       '<div class="ec-step-num">2</div>' +
-      '<div class="ec-step-title">' + esc(t('Điền biểu mẫu online', 'Fill online form')) + '</div>' +
+      '<div class="ec-step-title">' + esc(t('Điền biểu mẫu trực tuyến', 'Fill online form')) + '</div>' +
     '</div>' +
     '<div class="ec-step-body">';
 
@@ -388,29 +410,29 @@ function renderOfflineStep(form, allocation){
   if(ctx.so_number||ctx.jo_number||ctx.wo_number) html += renderContextChip('SO/JO/WO', [ctx.so_number,ctx.jo_number,ctx.wo_number].filter(Boolean).join(' · '));
   if(ctx.part_number) html += renderContextChip('Part/Rev', [ctx.part_number,ctx.part_revision].filter(Boolean).join(' · '));
   var fname = (allocation.offline_package && allocation.offline_package.filename) || allocation.suggested_filename || '';
-  if(fname) html += renderContextChip(t('Tên file','Filename'), fname);
+  if(fname) html += renderContextChip(t('Tên tệp','Filename'), fname);
   html += '</div>';
 
   /* download section */
   html += '<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">' +
     '<button class="ec-btn primary lg" id="ec-download-offline">' + esc(t('Tải gói Excel đã kiểm soát','Download governed Excel package')) + '</button>' +
-    (fname ? '<button class="ec-btn secondary" id="ec-copy-filename">' + esc(t('Sao chép tên file','Copy filename')) + '</button>' : '') +
+    (fname ? '<button class="ec-btn secondary" id="ec-copy-filename">' + esc(t('Sao chép tên tệp','Copy filename')) + '</button>' : '') +
   '</div>';
 
   if(allocation.latest_stored_filename){
-    html += '<div style="margin:-8px 0 16px"><button class="ec-btn secondary" id="ec-download-received">' + esc(t('Download latest submitted workbook', 'Download latest submitted workbook')) + '</button></div>';
+    html += '<div style="margin:-8px 0 16px"><button class="ec-btn secondary" id="ec-download-received">' + esc(t('Tải bản Excel đã nộp gần nhất', 'Download latest submitted workbook')) + '</button></div>';
   }
 
   /* upload section */
   html += '<div style="border-top:1px solid var(--ec-border);padding-top:16px">' +
-    '<div style="font-size:13px;font-weight:700;color:var(--ec-text);margin-bottom:10px">' + esc(t('Nộp workbook đã điền', 'Submit completed workbook')) + '</div>' +
+    '<div style="font-size:13px;font-weight:700;color:var(--ec-text);margin-bottom:10px">' + esc(t('Nộp tệp Excel đã điền', 'Submit completed workbook')) + '</div>' +
     '<label class="ec-dropzone" id="ec-dropzone"><input id="ec-file-input" type="file" accept=".xlsx,.xlsm" multiple style="display:none">' +
       '<div class="ec-dropzone-icon">\uD83D\uDCE4</div>' +
-      '<strong>' + esc(t('Kéo thả workbook vào đây hoặc nhấn để chọn','Drop workbook here or click to browse')) + '</strong>' +
+      '<strong>' + esc(t('Kéo thả tệp Excel vào đây hoặc nhấn để chọn','Drop workbook here or click to browse')) + '</strong>' +
       '<p>' + esc(t('Chỉ nhận .xlsx/.xlsm đã được hệ thống cấp phát.','Only .xlsx/.xlsm files issued by the system.')) + '</p>' +
     '</label>' +
     '<div id="ec-upload-queue">' + renderUploadQueue() + '</div>' +
-    (ws.uploadFiles.length ? '<div class="ec-actions"><button class="ec-btn secondary" id="ec-clear-queue">' + esc(t('Xóa danh sách','Clear')) + '</button><button class="ec-btn success" id="ec-receive-all">' + esc(t('Tiếp nhận file hợp lệ','Receive valid files')) + '</button></div>' : '') +
+    (ws.uploadFiles.length ? '<div class="ec-actions"><button class="ec-btn secondary" id="ec-clear-queue">' + esc(t('Xóa danh sách','Clear')) + '</button><button class="ec-btn success" id="ec-receive-all">' + esc(t('Tiếp nhận tệp hợp lệ','Receive valid files')) + '</button></div>' : '') +
   '</div>';
 
   html += renderChecklist(allocation);
@@ -434,9 +456,9 @@ function renderUploadQueue(){
         '<span class="ec-badge '+badgeClass+'">'+esc(status==='verified'?t('Hợp lệ','Valid'):status==='warning'?t('Cảnh báo','Warning'):status==='rejected'?t('Từ chối','Rejected'):t('Đang kiểm tra','Inspecting'))+'</span>' +
       '</div>' +
       '<div class="ec-file-grid">' +
-        '<div class="ec-file-cell"><small>Record ID</small><strong>'+esc((alloc&&alloc.record_id)||md.issued_record_id||'—')+'</strong></div>' +
-        '<div class="ec-file-cell"><small>Form</small><strong>'+esc(md.form_code||(alloc&&alloc.form_code)||'—')+'</strong></div>' +
-        '<div class="ec-file-cell"><small>Version</small><strong>'+esc(md.form_version||'—')+'</strong></div>' +
+        '<div class="ec-file-cell"><small>'+esc(t('Mã hồ sơ','Record ID'))+'</small><strong>'+esc((alloc&&alloc.record_id)||md.issued_record_id||'—')+'</strong></div>' +
+        '<div class="ec-file-cell"><small>'+esc(t('Biểu mẫu','Form'))+'</small><strong>'+esc(md.form_code||(alloc&&alloc.form_code)||'—')+'</strong></div>' +
+        '<div class="ec-file-cell"><small>'+esc(t('Phiên bản','Version'))+'</small><strong>'+esc(md.form_version||'—')+'</strong></div>' +
       '</div>' +
       ((v.warnings||[]).length?'<div class="ec-file-meta" style="color:var(--ec-warning);margin-top:6px">'+esc(v.warnings.join(', '))+'</div>':'') +
       ((v.issues||[]).length?'<div class="ec-file-meta" style="color:var(--ec-danger);margin-top:4px">'+esc(v.issues.join(', '))+'</div>':'') +
@@ -544,7 +566,7 @@ function loadHistory(form){
     if(!entries.length){ el.innerHTML='<div style="text-align:center;color:var(--ec-text-muted);font-size:12px;padding:16px">'+esc(t('Chưa có bản nộp nào.','No submissions yet.'))+'</div>'; return; }
     el.innerHTML='<table class="ec-table"><thead><tr><th>'+esc(t('Mã hồ sơ','Record ID'))+'</th><th>'+esc(t('Người nộp','Submitted by'))+'</th><th>'+esc(t('Ngày','Date'))+'</th><th>'+esc(t('Trạng thái','Status'))+'</th></tr></thead><tbody>'+entries.map(function(e){
       var dt=e.submitted_at||e.created_at||'';
-      return '<tr><td class="mono">'+esc(e.record_id||'—')+'</td><td>'+esc(e.submitted_by||'—')+'</td><td>'+esc(dt?new Date(dt).toLocaleString():'—')+'</td><td>'+(window.AllocationTracker?window.AllocationTracker.renderStatusBadge(e._status||e.approval_state||'submitted'):esc(e._status||'submitted'))+'</td></tr>';
+      return '<tr><td class="mono">'+esc(e.record_id||'—')+'</td><td>'+esc(e.submitted_by||'—')+'</td><td>'+esc(dt?new Date(dt).toLocaleString():'—')+'</td><td>'+renderHistoryStatusBadge(e._status||e.approval_state||'submitted')+'</td></tr>';
     }).join('')+'</tbody></table>';
   }).catch(function(){ el.innerHTML='<div style="color:var(--ec-text-muted);font-size:12px">'+esc(t('Không thể tải lịch sử.','Could not load history.'))+'</div>'; });
 }
@@ -597,7 +619,6 @@ function bindWorkspace(form, allocation, container){
     var submitBtn=document.getElementById('ec-submit-online');
     if(submitBtn) submitBtn.onclick=function(){ doSubmitOnline(form,allocation,submitBtn,container); };
     bindApprovalActions(form,allocation,container);
-    bindApprovalDialogs(form,allocation);
   }
 
   /* offline form */
@@ -635,10 +656,10 @@ function doAllocate(form, container){
     var next = Promise.resolve(resp);
     if(form.online===false){
       next = window.AllocationTracker.downloadForm(resp.allocation_id,form.form_code,{master_context:masterCtx}).then(function(downloadResp){
-        if(downloadResp&&downloadResp.ok) toast(t('ÄÃ£ táº£i gÃ³i Excel.','Excel package downloaded.'),'success');
+        if(downloadResp&&downloadResp.ok) toast(t('Đã tải gói Excel.','Excel package downloaded.'),'success');
         return downloadResp || resp;
       }).catch(function(){
-        toast(t('KhÃ´ng thá»ƒ táº£i form offline ngay sau khi cáº¥p mÃ£.','Could not auto-download the offline form after allocation.'),'warn');
+        toast(t('Không thể tự tải biểu mẫu ngoại tuyến ngay sau khi cấp mã.','Could not auto-download the offline form after allocation.'),'warn');
         return resp;
       });
     }
@@ -820,81 +841,63 @@ function bindApprovalActions(form,allocation,container){
     if(typeof window.ESignature!=='function'){toast(t('Chữ ký chưa sẵn sàng.','Signature not available.'),'error');return;}
     var u=user();
     new window.ESignature({lang:(typeof lang!=='undefined'&&lang==='en')?'en':'vi',requireReason:true,requirePin:false}).show({signerId:u.signerId,signerName:u.name,signerRole:u.title||u.dept,signatureMeaning:t('Phê duyệt chứng cứ','Evidence approval'),appliedTo:(allocation.record_id||'')+':approval',onSign:function(sigData){
-      var pw=prompt(t('Nhập mật khẩu xác nhận:','Enter password to confirm:'));
-      if(!pw){toast(t('Đã hủy.','Cancelled.'),'warn');return;}
-      approveBtn.disabled=true;
-      api('evidence_review',{allocation_id:allocation.allocation_id,action:'approve',reason:sigData.reason||'',signature_data:sigData,password:pw},'POST').then(function(r){
-        if(r&&r.ok){toast(t('Đã phê duyệt.','Approved.'),'success');if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);}
-        else toast(t('Lỗi: ','Error: ')+(r&&r.error||''),'error');
-      }).finally(function(){approveBtn.disabled=false;});
-    }});
-  };
-  var rejectBtn=document.getElementById('ec-reject');
-  if(rejectBtn) rejectBtn.onclick=function(){
-    var reason=prompt(t('Lý do từ chối:','Rejection reason:'));
-    if(!reason||!reason.trim()){toast(t('Phải nhập lý do.','Reason required.'),'warn');return;}
-    rejectBtn.disabled=true;
-    api('evidence_review',{allocation_id:allocation.allocation_id,action:'reject',reason:reason.trim()},'POST').then(function(r){
-      if(r&&r.ok){toast(t('Đã từ chối.','Rejected.'),'success');if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);}
-      else toast(t('Lỗi.','Error.'),'error');
-    }).finally(function(){rejectBtn.disabled=false;});
-  };
-
-  var reopenBtn=document.getElementById('ec-reopen');
-  if(reopenBtn) reopenBtn.onclick=function(){
-    var reason=prompt(t('Lý do mở lại:','Reopen reason:'));
-    if(!reason||!reason.trim()){toast(t('Phải nhập lý do.','Reason required.'),'warn');return;}
-    reopenBtn.disabled=true;
-    api('evidence_reopen',{allocation_id:allocation.allocation_id,reason:reason.trim()},'POST').then(function(r){
-      if(r&&r.ok){toast(t('Đã mở lại.','Reopened.'),'success');if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);}
-      else toast(t('Lỗi.','Error.'),'error');
-    }).finally(function(){reopenBtn.disabled=false;});
-  };
-}
-
-/* ── Offline binding ── */
-function bindApprovalDialogs(form, allocation){
-  if(typeof window._ecPromptDialog !== 'function') return;
-
-  var approveBtn=document.getElementById('ec-approve');
-  if(approveBtn) approveBtn.onclick=function(){
-    if(typeof window.ESignature!=='function'){toast(t('Chá»¯ kÃ½ chÆ°a sáºµn sÃ ng.','Signature not available.'),'error');return;}
-    var u=user();
-    new window.ESignature({lang:(typeof lang!=='undefined'&&lang==='en')?'en':'vi',requireReason:true,requirePin:false}).show({signerId:u.signerId,signerName:u.name,signerRole:u.title||u.dept,signatureMeaning:t('PhÃª duyá»‡t chá»©ng cá»©','Evidence approval'),appliedTo:(allocation.record_id||'')+':approval',onSign:function(sigData){
-      askTextDialog({ title:'Password confirmation', message:'Enter your password to confirm approval.', type:'password', required:true, confirmLabel:t('Duyá»‡t','Approve') }).then(function(pw){
-        if(!pw){toast(t('ÄÃ£ há»§y.','Cancelled.'),'warn');return;}
+      askTextDialog({
+        title:t('Xác nhận mật khẩu','Password confirmation'),
+        message:t('Nhập mật khẩu để xác nhận phê duyệt hồ sơ này.','Enter your password to confirm approval of this record.'),
+        type:'password',
+        required:true,
+        confirmLabel:t('Duyệt','Approve')
+      }).then(function(pw){
+        if(!pw){toast(t('Đã hủy.','Cancelled.'),'warn');return;}
         approveBtn.disabled=true;
         api('evidence_review',{allocation_id:allocation.allocation_id,action:'approve',reason:sigData.reason||'',signature_data:sigData,password:pw},'POST').then(function(r){
-          if(r&&r.ok){toast(t('ÄÃ£ phÃª duyá»‡t.','Approved.'),'success');if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);}
-          else toast(t('Lá»—i: ','Error: ')+(r&&r.error||''),'error');
+          if(r&&r.ok){toast(t('Đã phê duyệt.','Approved.'),'success');if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);}
+          else toast(t('Lỗi: ','Error: ')+(r&&r.error||''),'error');
         }).finally(function(){approveBtn.disabled=false;});
       });
     }});
   };
-
   var rejectBtn=document.getElementById('ec-reject');
   if(rejectBtn) rejectBtn.onclick=function(){
-    askTextDialog({ title:'Rejection reason', message:'Enter the reason for rejecting this record.', required:true, multiline:true, confirmLabel:t('Tá»« chá»‘i','Reject') }).then(function(reason){
-      if(!reason){toast(t('Pháº£i nháº­p lÃ½ do.','Reason required.'),'warn');return;}
+    askTextDialog({
+      title:t('Lý do từ chối','Rejection reason'),
+      message:t('Nhập lý do từ chối hồ sơ này.','Enter the reason for rejecting this record.'),
+      required:true,
+      multiline:true,
+      confirmLabel:t('Từ chối','Reject')
+    }).then(function(reason){
+      if(!reason||!reason.trim()){toast(t('Phải nhập lý do.','Reason required.'),'warn');return;}
       rejectBtn.disabled=true;
       api('evidence_review',{allocation_id:allocation.allocation_id,action:'reject',reason:reason.trim()},'POST').then(function(r){
-        if(r&&r.ok){toast(t('ÄÃ£ tá»« chá»‘i.','Rejected.'),'success');if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);}
-        else toast(t('Lá»—i.','Error.'),'error');
+        if(r&&r.ok){toast(t('Đã từ chối.','Rejected.'),'success');if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);}
+        else toast(t('Lỗi.','Error.'),'error');
       }).finally(function(){rejectBtn.disabled=false;});
     });
   };
 
   var reopenBtn=document.getElementById('ec-reopen');
   if(reopenBtn) reopenBtn.onclick=function(){
-    askTextDialog({ title:'Reopen reason', message:'Enter the reason for reopening this record.', required:true, multiline:true, confirmLabel:t('Má»Ÿ láº¡i','Reopen') }).then(function(reason){
-      if(!reason){toast(t('Pháº£i nháº­p lÃ½ do.','Reason required.'),'warn');return;}
+    askTextDialog({
+      title:t('Lý do mở lại','Reopen reason'),
+      message:t('Nhập lý do mở lại hồ sơ này.','Enter the reason for reopening this record.'),
+      required:true,
+      multiline:true,
+      confirmLabel:t('Mở lại','Reopen')
+    }).then(function(reason){
+      if(!reason||!reason.trim()){toast(t('Phải nhập lý do.','Reason required.'),'warn');return;}
       reopenBtn.disabled=true;
       api('evidence_reopen',{allocation_id:allocation.allocation_id,reason:reason.trim()},'POST').then(function(r){
-        if(r&&r.ok){toast(t('ÄÃ£ má»Ÿ láº¡i.','Reopened.'),'success');if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);}
-        else toast(t('Lá»—i.','Error.'),'error');
+        if(r&&r.ok){toast(t('Đã mở lại.','Reopened.'),'success');if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);}
+        else toast(t('Lỗi.','Error.'),'error');
       }).finally(function(){reopenBtn.disabled=false;});
     });
   };
+}
+
+/* Giữ hàm này để tương thích với các nhánh cũ đã từng gọi tên cũ. */
+function bindApprovalDialogs(form, allocation){
+  void form;
+  void allocation;
 }
 
 function bindOffline(form,allocation,container){
@@ -943,7 +946,7 @@ function bindOffline(form,allocation,container){
   var receiveAll=document.getElementById('ec-receive-all');
   if(receiveAll) receiveAll.onclick=function(){
     var valid=ws.uploadFiles.filter(function(i){return i.inspect&&i.inspect.ok&&i.inspect.verification&&i.inspect.verification.status!=='rejected';});
-    if(!valid.length){toast(t('Không có file hợp lệ.','No valid files.'),'warn');return;}
+    if(!valid.length){toast(t('Không có tệp hợp lệ.','No valid files.'),'warn');return;}
     receiveAll.disabled=true;
     Promise.all(valid.map(function(item){
       var aid=(item.inspect&&item.inspect.allocation&&item.inspect.allocation.allocation_id)||allocation.allocation_id||'';

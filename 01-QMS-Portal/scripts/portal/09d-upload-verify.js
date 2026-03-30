@@ -33,6 +33,26 @@ function withTimeout(promise, ms){
     });
   });
 }
+function statusLabel(status){
+  var key = String(status || '').trim().toLowerCase();
+  var labels = {
+    allocated: t('Đã cấp mã', 'Allocated'),
+    downloaded: t('Đã tải biểu mẫu', 'Downloaded'),
+    submitted: t('Đã nộp', 'Submitted'),
+    received: t('Đã tiếp nhận', 'Received'),
+    in_review: t('Đang xem xét', 'In review'),
+    approved: t('Đã phê duyệt', 'Approved'),
+    rejected: t('Bị từ chối', 'Rejected'),
+    voided: t('Đã hủy', 'Voided'),
+    void: t('Đã hủy', 'Voided')
+  };
+  return labels[key] || String(status || '-');
+}
+function renderStatusBadge(status){
+  var key = String(status || '').trim().toLowerCase();
+  var tone = key === 'approved' ? 'pass' : (key === 'rejected' || key === 'voided' || key === 'void' ? 'fail' : (key === 'submitted' || key === 'received' || key === 'in_review' ? 'warn' : 'pending'));
+  return '<span class="uv2-badge ' + tone + '">' + esc(statusLabel(status)) + '</span>';
+}
 function ensureStyles(){
   if(document.getElementById('uv2-styles')) return;
   var style = document.createElement('style'); style.id = 'uv2-styles';
@@ -54,7 +74,7 @@ function ensureStyles(){
 
 function renderAllocation(allocation){
   var ctx = allocation.master_context || {};
-  return '<article class="uv2-row' + (String(allocation.allocation_id || '') === String(state.selectedAllocationId || '') ? ' active' : '') + '" data-allocation-id="' + esc(allocation.allocation_id || '') + '"><div class="uv2-record">' + esc(allocation.record_id || '') + '</div><div class="uv2-meta">' + esc([allocation.form_code || '', allocation.department || '', ctx.customer_id || '', ctx.so_number || '', ctx.jo_number || '', ctx.wo_number || '', ctx.part_number || '', ctx.part_revision || ''].filter(Boolean).join(' · ')) + '</div><div class="uv2-meta">' + (window.AllocationTracker ? window.AllocationTracker.renderStatusBadge(allocation.status || 'allocated') : esc(allocation.status || 'allocated')) + '</div></article>';
+  return '<article class="uv2-row' + (String(allocation.allocation_id || '') === String(state.selectedAllocationId || '') ? ' active' : '') + '" data-allocation-id="' + esc(allocation.allocation_id || '') + '"><div class="uv2-record">' + esc(allocation.record_id || '') + '</div><div class="uv2-meta">' + esc([allocation.form_code || '', allocation.department || '', ctx.customer_id || '', ctx.so_number || '', ctx.jo_number || '', ctx.wo_number || '', ctx.part_number || '', ctx.part_revision || ''].filter(Boolean).join(' · ')) + '</div><div class="uv2-meta">' + renderStatusBadge(allocation.status || 'allocated') + '</div></article>';
 }
 
 function renderFileItem(item){
@@ -63,20 +83,20 @@ function renderFileItem(item){
   var badgeClass = status === 'verified' ? 'pass' : (status === 'warning' ? 'warn' : (status === 'rejected' ? 'fail' : 'pending'));
   var allocation = item.inspect && item.inspect.allocation ? item.inspect.allocation : null;
   var metadata = item.inspect && item.inspect.metadata ? item.inspect.metadata : {};
-  return '<div class="uv2-file" data-file-id="' + esc(item.id) + '"><div class="uv2-file-head"><div><div class="uv2-file-name">' + esc(item.file.name) + '</div><div class="uv2-file-meta">' + esc(formatSize(item.file.size)) + '</div></div><span class="uv2-badge ' + badgeClass + '">' + esc(status === 'verified' ? t('Hợp lệ', 'Verified') : status === 'warning' ? t('Cảnh báo', 'Warning') : status === 'rejected' ? t('Từ chối', 'Rejected') : t('Đang kiểm tra', 'Inspecting')) + '</span></div><div class="uv2-grid"><div class="uv2-cell"><small>' + esc(t('Mã hồ sơ', 'Record ID')) + '</small><strong>' + esc((allocation && allocation.record_id) || metadata.issued_record_id || '—') + '</strong></div><div class="uv2-cell"><small>' + esc(t('Form', 'Form')) + '</small><strong>' + esc(metadata.form_code || (allocation && allocation.form_code) || '—') + '</strong></div><div class="uv2-cell"><small>' + esc(t('Phiên bản mẫu', 'Template version')) + '</small><strong>' + esc(metadata.form_version || metadata.form_revision || (allocation && allocation.form_revision) || '—') + '</strong></div><div class="uv2-cell"><small>' + esc(t('Receipt hiện tại', 'Current receipt')) + '</small><strong>' + esc(allocation && allocation.receipt_version ? ('R' + allocation.receipt_version) : t('Chưa có', 'None')) + '</strong></div></div>' + ((verification.warnings || []).length ? '<div class="uv2-file-meta" style="color:#c2410c">' + esc((verification.warnings || []).join(', ')) + '</div>' : '') + ((verification.issues || []).length ? '<div class="uv2-file-meta" style="color:#b91c1c">' + esc((verification.issues || []).join(', ')) + '</div>' : '') + '</div>';
+  return '<div class="uv2-file" data-file-id="' + esc(item.id) + '"><div class="uv2-file-head"><div><div class="uv2-file-name">' + esc(item.file.name) + '</div><div class="uv2-file-meta">' + esc(formatSize(item.file.size)) + '</div></div><span class="uv2-badge ' + badgeClass + '">' + esc(status === 'verified' ? t('Hợp lệ', 'Verified') : status === 'warning' ? t('Cảnh báo', 'Warning') : status === 'rejected' ? t('Từ chối', 'Rejected') : t('Đang kiểm tra', 'Inspecting')) + '</span></div><div class="uv2-grid"><div class="uv2-cell"><small>' + esc(t('Mã hồ sơ', 'Record ID')) + '</small><strong>' + esc((allocation && allocation.record_id) || metadata.issued_record_id || '—') + '</strong></div><div class="uv2-cell"><small>' + esc(t('Biểu mẫu', 'Form')) + '</small><strong>' + esc(metadata.form_code || (allocation && allocation.form_code) || '—') + '</strong></div><div class="uv2-cell"><small>' + esc(t('Phiên bản mẫu', 'Template version')) + '</small><strong>' + esc(metadata.form_version || metadata.form_revision || (allocation && allocation.form_revision) || '—') + '</strong></div><div class="uv2-cell"><small>' + esc(t('Phiên nhận hiện tại', 'Current receipt')) + '</small><strong>' + esc(allocation && allocation.receipt_version ? ('R' + allocation.receipt_version) : t('Chưa có', 'None')) + '</strong></div></div>' + ((verification.warnings || []).length ? '<div class="uv2-file-meta" style="color:#c2410c">' + esc((verification.warnings || []).join(', ')) + '</div>' : '') + ((verification.issues || []).length ? '<div class="uv2-file-meta" style="color:#b91c1c">' + esc((verification.issues || []).join(', ')) + '</div>' : '') + '</div>';
 }
 
 function inspectFiles(files){
   Array.prototype.forEach.call(files, function(file){
-    if(!/\.(xlsx|xlsm)$/i.test(file.name)){ toast(t('Upload verification hiện chỉ nhận workbook .xlsx hoặc .xlsm.', 'Upload verification currently accepts only .xlsx or .xlsm workbooks.'), 'warn'); return; }
+    if(!/\.(xlsx|xlsm)$/i.test(file.name)){ toast(t('Màn hình kiểm tra tải lên chỉ nhận tệp Excel .xlsx hoặc .xlsm.', 'Upload verification currently accepts only .xlsx or .xlsm workbooks.'), 'warn'); return; }
     if(Number(file.size || 0) > MAX_UPLOAD_BYTES){
-      toast(t('File quá lớn. Giới hạn hiện tại là 50 MB.', 'File too large. Current limit is 50 MB.'), 'warn');
+      toast(t('Tệp quá lớn. Giới hạn hiện tại là 50 MB.', 'File too large. Current limit is 50 MB.'), 'warn');
       return;
     }
     var item = { id:'uv-' + Math.random().toString(36).slice(2, 10), file:file, inspect:null, status:'pending' };
     state.files.push(item); render(state.container);
     var allocationId = state.selectedAllocationId || '';
-    withTimeout(window.AllocationTracker.inspectUpload(file, allocationId), REQUEST_TIMEOUT_MS).then(function(resp){ item.inspect = resp; item.status = resp && resp.ok && resp.verification ? resp.verification.status : 'rejected'; if(resp && resp.allocation && resp.allocation.allocation_id && !state.selectedAllocationId){ state.selectedAllocationId = resp.allocation.allocation_id; } render(state.container); }).catch(function(err){ item.status = 'rejected'; if(err && err.message === 'timeout') toast(t('Kiểm tra file bị timeout. Hãy thử lại.', 'File inspection timed out. Please try again.'), 'error'); render(state.container); });
+    withTimeout(window.AllocationTracker.inspectUpload(file, allocationId), REQUEST_TIMEOUT_MS).then(function(resp){ item.inspect = resp; item.status = resp && resp.ok && resp.verification ? resp.verification.status : 'rejected'; if(resp && resp.allocation && resp.allocation.allocation_id && !state.selectedAllocationId){ state.selectedAllocationId = resp.allocation.allocation_id; } render(state.container); }).catch(function(err){ item.status = 'rejected'; if(err && err.message === 'timeout') toast(t('Kiểm tra tệp bị timeout. Hãy thử lại.', 'File inspection timed out. Please try again.'), 'error'); render(state.container); });
   });
 }
 
@@ -94,7 +114,7 @@ window._renderUploadVerify = function(schemas, entries, container){
   }).catch(function(){ state.rows = []; render(); });
 
   function render(){
-    container.innerHTML = '<div class="uv2-shell"><aside class="uv2-card"><div class="uv2-head"><div><h2>' + esc(t('Tải lên & Kiểm tra', 'Upload & Verify')) + '</h2><p>' + esc(t('Tab này chỉ tiếp nhận workbook offline đã được runtime cấp phát. Hệ thống kiểm tra hidden sheet, checksum, allocation log và receipt history trước khi nhận.', 'This tab accepts only offline workbooks issued by the runtime. It verifies the hidden sheet, checksum, allocation log, and receipt history before receiving the file.')) + '</p></div></div><div class="uv2-list">' + (state.rows.length ? state.rows.map(renderAllocation).join('') : '<div class="uv2-empty"><strong>' + esc(t('Chưa có allocation offline', 'No offline allocation yet')) + '</strong>' + esc(t('Hãy cấp mã và tải form offline trước khi upload workbook đã điền.', 'Allocate a record ID and download the offline form before uploading the completed workbook.')) + '</div>') + '</div></aside><section class="uv2-card"><div class="uv2-head"><div><h2>' + esc(t('Tiếp nhận workbook đã điền', 'Receive completed workbook')) + '</h2><p>' + esc(t('Workbook phải do hệ thống cấp phát. Việc chỉ đổi tên file bằng tay sẽ không vượt qua hidden-sheet verification.', 'The workbook must be issued by the system. Renaming a file manually is not enough to pass hidden-sheet verification.')) + '</p></div></div><label class="uv2-dropzone" id="uv2-dropzone" tabindex="0" role="button" aria-label="' + esc(t('Chọn workbook offline để kiểm tra và tiếp nhận', 'Choose an offline workbook to inspect and receive')) + '"><input id="uv2-file-input" type="file" accept=".xlsx,.xlsm" multiple style="display:none"><strong>' + esc(t('Kéo thả workbook vào đây hoặc nhấn để chọn', 'Drop the workbook here or click to browse')) + '</strong><p>' + esc(t('Chỉ nhận .xlsx / .xlsm đã được runtime cấp phát với hidden metadata HESEM.', 'Only .xlsx / .xlsm files issued by the runtime with HESEM hidden metadata are accepted.')) + '</p></label><div class="uv2-queue">' + (state.files.length ? state.files.map(renderFileItem).join('') : '<div class="uv2-empty"><strong>' + esc(t('Chưa có file nào được kiểm tra', 'No file has been inspected yet')) + '</strong>' + esc(t('Sau khi chọn file, hệ thống sẽ kiểm tra hidden sheet và trạng thái allocation trước khi cho phép tiếp nhận.', 'After you select a file, the runtime verifies the hidden sheet and allocation state before allowing receipt.')) + '</div>') + '</div><div class="uv2-actions"><button type="button" class="uv2-btn secondary" id="uv2-clear">🧹 ' + esc(t('Xóa danh sách', 'Clear queue')) + '</button><button type="button" class="uv2-btn primary" id="uv2-submit-all">📥 ' + esc(t('Tiếp nhận các file hợp lệ', 'Receive valid files')) + '</button></div></section></div>';
+    container.innerHTML = '<div class="uv2-shell"><aside class="uv2-card"><div class="uv2-head"><div><h2>' + esc(t('Tải lên & Kiểm tra', 'Upload & Verify')) + '</h2><p>' + esc(t('Tab này chỉ tiếp nhận tệp Excel ngoại tuyến đã được hệ thống cấp phát. Hệ thống kiểm tra sheet ẩn, checksum, nhật ký cấp phát và lịch sử phiên nhận trước khi tiếp nhận.', 'This tab accepts only offline workbooks issued by the runtime. It verifies the hidden sheet, checksum, allocation log, and receipt history before receiving the file.')) + '</p></div></div><div class="uv2-list">' + (state.rows.length ? state.rows.map(renderAllocation).join('') : '<div class="uv2-empty"><strong>' + esc(t('Chưa có mã cấp phát ngoại tuyến', 'No offline allocation yet')) + '</strong>' + esc(t('Hãy cấp mã và tải biểu mẫu ngoại tuyến trước khi tải lên tệp Excel đã điền.', 'Allocate a record ID and download the offline form before uploading the completed workbook.')) + '</div>') + '</div></aside><section class="uv2-card"><div class="uv2-head"><div><h2>' + esc(t('Tiếp nhận tệp Excel đã điền', 'Receive completed workbook')) + '</h2><p>' + esc(t('Tệp Excel phải do hệ thống cấp phát. Việc chỉ đổi tên tệp bằng tay sẽ không vượt qua bước xác minh sheet ẩn.', 'The workbook must be issued by the system. Renaming a file manually is not enough to pass hidden-sheet verification.')) + '</p></div></div><label class="uv2-dropzone" id="uv2-dropzone" tabindex="0" role="button" aria-label="' + esc(t('Chọn tệp Excel ngoại tuyến để kiểm tra và tiếp nhận', 'Choose an offline workbook to inspect and receive')) + '"><input id="uv2-file-input" type="file" accept=".xlsx,.xlsm" multiple style="display:none"><strong>' + esc(t('Kéo thả tệp Excel vào đây hoặc nhấn để chọn', 'Drop the workbook here or click to browse')) + '</strong><p>' + esc(t('Chỉ nhận .xlsx / .xlsm đã được hệ thống cấp phát với siêu dữ liệu ẩn của HESEM.', 'Only .xlsx / .xlsm files issued by the runtime with HESEM hidden metadata are accepted.')) + '</p></label><div class="uv2-queue">' + (state.files.length ? state.files.map(renderFileItem).join('') : '<div class="uv2-empty"><strong>' + esc(t('Chưa có tệp nào được kiểm tra', 'No file has been inspected yet')) + '</strong>' + esc(t('Sau khi chọn tệp, hệ thống sẽ kiểm tra sheet ẩn và trạng thái mã cấp phát trước khi cho phép tiếp nhận.', 'After you select a file, the runtime verifies the hidden sheet and allocation state before allowing receipt.')) + '</div>') + '</div><div class="uv2-actions"><button type="button" class="uv2-btn secondary" id="uv2-clear">🧹 ' + esc(t('Xóa danh sách', 'Clear queue')) + '</button><button type="button" class="uv2-btn primary" id="uv2-submit-all">📥 ' + esc(t('Tiếp nhận các tệp hợp lệ', 'Receive valid files')) + '</button></div></section></div>';
     bind();
   }
 
@@ -112,12 +132,12 @@ window._renderUploadVerify = function(schemas, entries, container){
     var clearBtn = document.getElementById('uv2-clear'); if(clearBtn) clearBtn.onclick = function(){ state.files = []; render(); };
     var submitAll = document.getElementById('uv2-submit-all'); if(submitAll) submitAll.onclick = function(){
       var valid = state.files.filter(function(item){ return item.inspect && item.inspect.ok && item.inspect.verification && item.inspect.verification.status !== 'rejected'; });
-      if(!valid.length){ toast(t('Không có workbook hợp lệ để tiếp nhận.', 'There is no valid workbook to receive.'), 'warn'); return; }
+      if(!valid.length){ toast(t('Không có tệp Excel hợp lệ để tiếp nhận.', 'There is no valid workbook to receive.'), 'warn'); return; }
       submitAll.disabled = true;
       Promise.all(valid.map(function(item){
         var allocationId = (item.inspect && item.inspect.allocation && item.inspect.allocation.allocation_id) || state.selectedAllocationId || '';
         return withTimeout(window.AllocationTracker.receiveUpload(allocationId, item.file), REQUEST_TIMEOUT_MS).then(function(resp){ if(resp && resp.ok && resp.allocation) linkOrderIfPossible(resp.allocation); item.receive = resp; return resp; });
-      })).then(function(){ toast(t('Đã tiếp nhận xong các workbook hợp lệ.', 'All valid workbooks were received.'), 'success'); return window.AllocationTracker.getHistory({ delivery_mode:'offline', page_size:50 }); }).then(function(resp){ state.rows = (resp && Array.isArray(resp.entries)) ? resp.entries : state.rows; state.files = []; render(); }).catch(function(err){ toast(err && err.message === 'timeout' ? t('Tiếp nhận workbook bị timeout. Hãy thử lại.', 'Workbook receipt timed out. Please retry.') : t('Không thể tiếp nhận workbook.', 'Could not receive the workbook.'), 'error'); }).finally(function(){ submitAll.disabled = false; });
+      })).then(function(){ toast(t('Đã tiếp nhận xong các tệp Excel hợp lệ.', 'All valid workbooks were received.'), 'success'); return window.AllocationTracker.getHistory({ delivery_mode:'offline', page_size:50 }); }).then(function(resp){ state.rows = (resp && Array.isArray(resp.entries)) ? resp.entries : state.rows; state.files = []; render(); }).catch(function(err){ toast(err && err.message === 'timeout' ? t('Tiếp nhận tệp Excel bị timeout. Hãy thử lại.', 'Workbook receipt timed out. Please retry.') : t('Không thể tiếp nhận tệp Excel.', 'Could not receive the workbook.'), 'error'); }).finally(function(){ submitAll.disabled = false; });
     };
   }
 };
