@@ -18,7 +18,11 @@ var state = {
   dispatchStatus: '',
   loading: false,
   modal: null,
-  refreshTimer: null
+  refreshTimer: null,
+  stream: null,
+  streamStatus: 'polling',
+  streamLastMessageAt: '',
+  streamRetryTimer: null
 };
 
 function repairMojibake(text){
@@ -612,6 +616,96 @@ function renderSelectOptions(rows, valueKey, labelBuilder, selectedValue, placeh
   return html;
 }
 
+function mergeRuntimePayload(payload){
+  if(!payload || typeof payload !== 'object') return;
+  if(payload.snapshot) state.snapshot = payload.snapshot;
+  if(payload.master) state.master = payload.master;
+  if(payload.exceptions) state.exceptions = payload.exceptions;
+  if(payload.streamed_at) state.streamLastMessageAt = payload.streamed_at;
+}
+
+function stopPolling(){
+  if(state.refreshTimer){
+    clearInterval(state.refreshTimer);
+    state.refreshTimer = null;
+  }
+}
+
+function startPolling(){
+  if(state.refreshTimer) return;
+  state.streamStatus = state.streamStatus === 'live' ? 'live' : 'polling';
+  state.refreshTimer = setInterval(function(){
+    if(state.container && !state.modal) loadData();
+  }, 60000);
+}
+
+function disconnectStream(){
+  if(state.stream){
+    try { state.stream.close(); } catch(_error) {}
+    state.stream = null;
+  }
+  if(state.streamRetryTimer){
+    clearTimeout(state.streamRetryTimer);
+    state.streamRetryTimer = null;
+  }
+}
+
+function connectStream(){
+  if(typeof window.EventSource !== 'function' || !state.container) {
+    state.streamStatus = 'polling';
+    startPolling();
+    return;
+  }
+
+  disconnectStream();
+  stopPolling();
+  state.streamStatus = 'connecting';
+  render();
+
+  var source = new window.EventSource('./api.php?action=mes_stream&interval_ms=2000&ticks=20');
+  state.stream = source;
+
+  source.addEventListener('ready', function(event){
+    state.streamStatus = 'connecting';
+    state.streamLastMessageAt = '';
+    if(window.console) console.debug('MES stream ready', event.data);
+    render();
+  });
+
+  source.addEventListener('mes_snapshot', function(event){
+    try {
+      var payload = JSON.parse(event.data || '{}');
+      mergeRuntimePayload(payload);
+      state.loading = false;
+      state.streamStatus = 'live';
+      stopPolling();
+      render();
+    } catch (error) {
+      state.streamStatus = 'polling';
+      if(window.console) console.error(error);
+    }
+  });
+
+  source.addEventListener('heartbeat', function(event){
+    try {
+      var payload = JSON.parse(event.data || '{}');
+      state.streamLastMessageAt = payload.streamed_at || state.streamLastMessageAt;
+      state.streamStatus = 'live';
+      render();
+    } catch (_error) {}
+  });
+
+  source.onerror = function(){
+    disconnectStream();
+    state.streamStatus = 'polling';
+    render();
+    startPolling();
+    state.streamRetryTimer = setTimeout(function(){
+      if(state.container) connectStream();
+    }, 15000);
+  };
+}
+
 function loadData(){
   state.loading = true;
   return Promise.all([
@@ -626,6 +720,7 @@ function loadData(){
     render();
   }).catch(function(error){
     state.loading = false;
+    state.streamStatus = 'polling';
     if(state.container){
       state.container.innerHTML = '<div class="mesx"><div class="mesx-empty"><strong>' + esc(t('Không thể tải dữ liệu MES', 'Could not load MES data')) + '</strong>' + esc((error && error.message) || t('Vui lòng thử lại sau.', 'Please try again later.')) + '</div></div>';
     }
@@ -958,6 +1053,61 @@ function renderGovernanceQueue(rows, options){
   }).join('') + '</div>';
 }
 
+function renderCutoverAudit(audit){
+  audit = audit || {};
+  var status = String(audit.status || 'json_only').toLowerCase();
+  var meta = governanceMeta(
+    status === 'aligned'
+      ? 'ready'
+      : (status === 'postgres_unreachable' ? 'critical' : 'warning')
+  );
+  var groups = audit.groups || {};
+  var rows = [];
+  Object.keys(groups).forEach(function(groupKey){
+    var group = groups[groupKey] || {};
+    var entities = Array.isArray(group.entities) ? group.entities : [];
+    entities.forEach(function(row){
+      if((row && row.drift) || status === 'postgres_unreachable' || status === 'json_only'){
+        rows.push({
+          group_key: groupKey,
+          entity_key: row.entity_key || '',
+          json_count: row.json_count,
+          postgres_count: row.postgres_count,
+          drift: row.drift,
+          group_status: group.status || '',
+          status: row.status || 'unavailable'
+        });
+      }
+    });
+  });
+
+  var header = '<div class="mesx-mini" style="margin:14px 0 10px"><small>' + esc(t('Cutover parity audit', 'Cutover parity audit')) + '</small><strong>' + esc([
+    String(audit.status || 'json_only'),
+    t('Entity drift', 'Entity drift') + ': ' + String(audit.drift_entities || 0),
+    t('Total drift', 'Total drift') + ': ' + String(audit.drift_total || 0)
+  ].join(' · ')) + '</strong><span class="mesx-sub">' + esc(t('So khớp số lượng JSON runtime với PostgreSQL shadow để biết domain nào đã đủ sạch cho việc chuyển primary-read.', 'Compare JSON runtime counts with the PostgreSQL shadow so you know which domains are clean enough for primary-read promotion.')) + '</span></div>';
+
+  if(!rows.length){
+    return header + '<div class="mesx-list"><div class="mesx-list-item"><h4>' + badge(meta) + '</h4><p>' + esc(status === 'aligned'
+      ? t('JSON và PostgreSQL đang cân bằng trên các domain đã theo dõi.', 'JSON and PostgreSQL are aligned across the tracked domains.')
+      : (status === 'postgres_unreachable'
+        ? t('PostgreSQL chưa reachable nên chưa thể chứng minh parity cutover.', 'PostgreSQL is not reachable yet, so cutover parity cannot be proven.')
+        : t('Runtime vẫn đang thiên về JSON; bật PostgreSQL path để bắt đầu parity audit đầy đủ.', 'Runtime is still JSON-led; enable the PostgreSQL path to begin full parity auditing.'))) + '</p></div></div>';
+  }
+
+  return header + '<div class="mesx-list">' + rows.slice(0, 12).map(function(row){
+    var driftMeta = governanceMeta(row.status === 'aligned' ? 'ready' : (row.status === 'unavailable' ? 'critical' : 'warning'));
+    var driftText = row.postgres_count == null
+      ? t('Chưa có dữ liệu PostgreSQL', 'PostgreSQL data unavailable')
+      : ('Δ ' + String(row.drift || 0));
+    return '<div class="mesx-list-item"><div class="mesx-inline-head"><h4>' + esc((row.group_key || 'runtime') + ' · ' + (row.entity_key || 'entity')) + '</h4>' + badge(driftMeta) + '</div><p>' + esc([
+      'JSON ' + String(row.json_count == null ? 0 : row.json_count),
+      row.postgres_count == null ? 'PG —' : ('PG ' + String(row.postgres_count)),
+      driftText
+    ].join(' · ')) + '</p></div>';
+  }).join('') + '</div>';
+}
+
 function renderShadowSyncQueue(rows){
   var snapshot = state.snapshot || defaultSnapshot();
   var shadowStatus = snapshot.shadow_status || {};
@@ -965,6 +1115,7 @@ function renderShadowSyncQueue(rows){
   var primaryReadQueue = Array.isArray(snapshot.primary_read_queue) ? snapshot.primary_read_queue : [];
   var connectorIngestStatus = snapshot.connector_ingest_status || {};
   var runtimeMode = snapshot.runtime_mode || {};
+  var cutoverAudit = snapshot.cutover_audit || {};
   var buckets = ['master_data', 'orders', 'mes'];
   var overview = '<div class="mesx-mini" style="margin-bottom:10px"><small>' + esc(t('Shadow sync health', 'Shadow sync health')) + '</small><strong>' + esc([
     String(runtimeMode.mode || 'JSON_ONLY'),
@@ -1018,7 +1169,7 @@ function renderShadowSyncQueue(rows){
     },
     fallbackVi: 'Read model vừa phải fallback về JSON thay vì dùng PostgreSQL mirror.',
     fallbackEn: 'The read model just fell back to JSON instead of using the PostgreSQL mirror.'
-  }) + '</div>';
+  }) + '</div><div class="mesx-section">' + renderCutoverAudit(cutoverAudit) + '</div>';
 }
 
 function renderLaunchBlockerQueue(rows){
@@ -1068,6 +1219,11 @@ function render(){
   var connectorIngestStatus = snapshot.connector_ingest_status || {};
   var currentShift = snapshot.current_shift || {};
   var kpi = snapshot.kpis || {};
+  var streamFact = state.streamStatus === 'live'
+    ? (t('SSE trực tiếp', 'SSE live') + (state.streamLastMessageAt ? (' · ' + fmtDateTime(state.streamLastMessageAt)) : ''))
+    : (state.streamStatus === 'connecting'
+      ? t('Đang nối luồng', 'Connecting stream')
+      : t('Polling 60 giây', '60-second polling'));
   var readinessBand = '';
   var analyticsBand =
     '<section class="mesx-band" style="margin-top:18px">' +
@@ -1107,7 +1263,7 @@ function render(){
   state.container.innerHTML = '<div class="mesx">' +
     '<section class="mesx-hero">' +
       '<article class="mesx-poster">' +
-        '<div class="mesx-brand"><div class="mesx-brand-main"><div class="mesx-logo"><img src="./assets/hesem-logo.svg" alt="HESEM"></div><div><div class="mesx-kicker">HESEM CNC MOM / MES</div><h1>' + esc(t('Trung tâm điều hành MES', 'MES Control Center')) + '</h1><p>' + esc(t('Một màn hình duy nhất để điều độ WO, đọc trạng thái máy, khóa gate chứng cứ, bắt cảnh báo tool-life và ra quyết định khôi phục xưởng nhanh theo ngữ cảnh thật.', 'One production surface to dispatch WO, read machine status, enforce evidence gates, catch tool-life alerts, and drive recovery decisions in real shop-floor context.')) + '</p><div class="mesx-facts"><span class="mesx-fact">⏱ ' + esc(currentStamp()) + '</span><span class="mesx-fact">🕒 ' + esc((currentShift.shift_code || '—') + ' · ' + (currentShift.shift_name_vi || currentShift.shift_name_en || t('Chưa xác định ca', 'Unresolved shift'))) + '</span><span class="mesx-fact">📦 ' + esc((kpi.wo_active || 0) + ' ' + t('WO đang hoạt động', 'active WO')) + '</span><span class="mesx-fact">🏭 ' + esc((kpi.machines_total || 0) + ' ' + t('tài sản theo dõi', 'assets tracked')) + '</span><span class="mesx-fact">🔌 ' + esc((kpi.connectors_healthy || 0) + '/' + (kpi.connectors_total || 0) + ' ' + t('kết nối ổn', 'healthy links')) + '</span><span class="mesx-fact">📊 OEE ' + esc(fmtPercent(kpi.oee_pct)) + '</span></div></div></div><div>' + badge((kpi.machines_down || 0) > 0 ? statusMeta('down') : statusMeta('running')) + '</div></div>' +
+        '<div class="mesx-brand"><div class="mesx-brand-main"><div class="mesx-logo"><img src="./assets/hesem-logo.svg" alt="HESEM"></div><div><div class="mesx-kicker">HESEM CNC MOM / MES</div><h1>' + esc(t('Trung tâm điều hành MES', 'MES Control Center')) + '</h1><p>' + esc(t('Một màn hình duy nhất để điều độ WO, đọc trạng thái máy, khóa gate chứng cứ, bắt cảnh báo tool-life và ra quyết định khôi phục xưởng nhanh theo ngữ cảnh thật.', 'One production surface to dispatch WO, read machine status, enforce evidence gates, catch tool-life alerts, and drive recovery decisions in real shop-floor context.')) + '</p><div class="mesx-facts"><span class="mesx-fact">⏱ ' + esc(currentStamp()) + '</span><span class="mesx-fact">📡 ' + esc(streamFact) + '</span><span class="mesx-fact">🕒 ' + esc((currentShift.shift_code || '—') + ' · ' + (currentShift.shift_name_vi || currentShift.shift_name_en || t('Chưa xác định ca', 'Unresolved shift'))) + '</span><span class="mesx-fact">📦 ' + esc((kpi.wo_active || 0) + ' ' + t('WO đang hoạt động', 'active WO')) + '</span><span class="mesx-fact">🏭 ' + esc((kpi.machines_total || 0) + ' ' + t('tài sản theo dõi', 'assets tracked')) + '</span><span class="mesx-fact">🔌 ' + esc((kpi.connectors_healthy || 0) + '/' + (kpi.connectors_total || 0) + ' ' + t('kết nối ổn', 'healthy links')) + '</span><span class="mesx-fact">📊 OEE ' + esc(fmtPercent(kpi.oee_pct)) + '</span></div></div></div><div>' + badge((kpi.machines_down || 0) > 0 ? statusMeta('down') : statusMeta('running')) + '</div></div>' +
         '<div class="mesx-actions"><button type="button" class="mesx-btn primary" id="mes-refresh">⟳ ' + esc(t('Làm mới runtime', 'Refresh runtime')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-orders">📦 ' + esc(t('Quản lý đơn hàng', 'Order management')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-master">🧭 ' + esc(t('Dữ liệu nền', 'Master data')) + '</button><button type="button" class="mesx-btn secondary" id="mes-open-forms">📋 ' + esc(t('Kiểm soát chứng cứ', 'Evidence control')) + '</button></div>' +
       '</article>' +
       '<aside class="mesx-side">' +
@@ -1131,6 +1287,7 @@ function render(){
           renderKpiTile(t('Rủi ro connector', 'Connector governance gaps'), kpi.connector_guard_gaps || 0, t('Connector policy, heartbeat hoặc telemetry mode chưa đủ điều kiện mở WO', 'Connector policy, heartbeat, or telemetry mode still blocks WO launch')) +
           renderKpiTile(t('Lỗi shadow sync', 'Shadow sync failures'), kpi.shadow_sync_failures || 0, t('JSON runtime chưa mirror sạch sang PostgreSQL shadow layer', 'JSON runtime is not mirroring cleanly into the PostgreSQL shadow layer')) +
           renderKpiTile(t('Primary read fallback', 'Primary-read fallbacks'), kpi.primary_read_fallbacks || 0, t('Read model pilot vừa phải quay về JSON thay vì đọc PostgreSQL', 'The read-model pilot recently had to fall back to JSON instead of reading PostgreSQL')) +
+          renderKpiTile(t('Drift JSON↔PG', 'JSON↔PG drift'), kpi.cutover_drift_entities || 0, t('Số entity group còn lệch giữa runtime JSON và PostgreSQL shadow', 'Entity groups that still drift between JSON runtime and the PostgreSQL shadow')) +
           renderKpiTile(t('Epicor sync gaps', 'Epicor sync gaps'), kpi.epicor_sync_status || 0, t('Sync, reconciliation hoặc outbox giữa MES và Epicor đang cần xử lý', 'Synchronization, reconciliation, or outbox between MES and Epicor needs attention')) +
           renderKpiTile(t('Đối soát mở', 'Open reconciliation'), kpi.epicor_reconciliation_open || 0, t('Các lệch nhịp MES ↔ Epicor chưa được chốt', 'MES ↔ Epicor reconciliation gaps still open')) +
           renderKpiTile(t('Outbox chờ', 'Pending outbox'), kpi.epicor_outbox_pending || 0, t('Giao dịch chờ đẩy sang Epicor hoặc đang retry', 'Transactions waiting to be sent to Epicor or retrying')) +
@@ -1175,7 +1332,10 @@ function bind(){
   if(status) status.onchange = function(){ state.dispatchStatus = status.value || ''; render(); };
 
   var refresh = document.getElementById('mes-refresh');
-  if(refresh) refresh.onclick = function(){ loadData(); };
+  if(refresh) refresh.onclick = function(){
+    loadData();
+    if(state.streamStatus !== 'live') connectStream();
+  };
   var openOrders = document.getElementById('mes-open-orders');
   if(openOrders) openOrders.onclick = function(){ if(typeof navigateTo === 'function') navigateTo('orders'); };
   var openMaster = document.getElementById('mes-open-master');
@@ -2003,11 +2163,13 @@ function openExceptionDetail(type){
 window._renderMesControlCenter = function(container){
   state.container = container || document.getElementById('page-mes');
   ensureStyles();
+  disconnectStream();
+  stopPolling();
   loadData();
-  if(state.refreshTimer) clearInterval(state.refreshTimer);
-  state.refreshTimer = setInterval(function(){
-    if(state.container && !state.modal) loadData();
-  }, 60000);
+  connectStream();
+  if(state.streamStatus !== 'live' && state.streamStatus !== 'connecting'){
+    startPolling();
+  }
 };
 
 })();

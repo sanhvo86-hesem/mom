@@ -27,7 +27,7 @@ $envBool = static function (string $name, bool $default): bool {
 };
 
 return [
-    // ── Connection ──────────────────────────────────────────────────────────
+    // Connection
     'driver'   => 'pgsql',
     'host'     => getenv('DB_HOST') ?: 'localhost',
     'port'     => (int)(getenv('DB_PORT') ?: 5432),
@@ -38,16 +38,18 @@ return [
     'schema'   => 'public',
     'sslmode'  => getenv('DB_SSL') ?: 'prefer',
 
-    // ── Connection Pool ─────────────────────────────────────────────────────
+    // Connection Pool
     'connect_timeout' => (int)(getenv('DB_CONNECT_TIMEOUT') ?: 5),
     'statement_timeout' => (int)(getenv('DB_STATEMENT_TIMEOUT') ?: 30000), // ms
+    'read_retry_count' => max(1, (int)(getenv('DB_READ_RETRY_COUNT') ?: 3)),
+    'read_retry_delay_ms' => max(0, (int)(getenv('DB_READ_RETRY_DELAY_MS') ?: 150)),
 
-    // ── Feature Flags ───────────────────────────────────────────────────────
+    // Feature Flags
     'use_postgres'  => $envBool('USE_POSTGRES', false),
     'shadow_write'  => $envBool('SHADOW_WRITE', true),
     'json_fallback' => $envBool('JSON_FALLBACK', true),
 
-    // ── Logging ─────────────────────────────────────────────────────────────
+    // Logging
     'log_queries'  => $envBool('DB_LOG_QUERIES', false),
     'log_file'     => getenv('DB_LOG_FILE') ?: __DIR__ . '/../qms-data/db_queries.log',
     'slow_query_ms' => (int)(getenv('DB_SLOW_QUERY_MS') ?: 500),

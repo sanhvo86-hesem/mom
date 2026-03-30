@@ -45,6 +45,7 @@ class DataLayer
         'error' => '',
         'mode' => 'JSON_ONLY',
         'timestamp' => '',
+        'attempts' => 1,
     ];
 
     /** Base path for QMS data files (e.g. .../01-QMS-Portal/qms-data). */
@@ -121,6 +122,8 @@ class DataLayer
             'use_postgres' => (bool)($this->config['use_postgres'] ?? false),
             'shadow_write' => (bool)($this->config['shadow_write'] ?? false),
             'json_fallback' => (bool)($this->config['json_fallback'] ?? false),
+            'read_retry_count' => $this->getReadRetryCount(),
+            'read_retry_delay_ms' => $this->getReadRetryDelayMs(),
             'postgres_path_active' => $usesPostgres,
             'postgres_reachable' => $reachable,
             'postgres_error' => $error,
@@ -1770,16 +1773,35 @@ class DataLayer
      */
     private function pgWithFallback(callable $pgReader, callable $jsonReader): mixed
     {
-        try {
-            $result = $pgReader();
-            $this->setReadMeta('postgres');
-            return $result;
-        } catch (\Throwable $e) {
-            @error_log('[DataLayer] PG read failed, falling back to JSON: ' . $e->getMessage());
-            $result = $jsonReader();
-            $this->setReadMeta('json_fallback', true, $e->getMessage());
-            return $result;
+        $attempts = max(1, $this->getReadRetryCount());
+        $delayMs = max(0, $this->getReadRetryDelayMs());
+        $lastError = null;
+
+        for ($attempt = 1; $attempt <= $attempts; $attempt++) {
+            try {
+                $result = $pgReader();
+                $this->setReadMeta('postgres', false, '', ['attempts' => $attempt]);
+                return $result;
+            } catch (\Throwable $e) {
+                $lastError = $e;
+                if ($attempt < $attempts && $delayMs > 0) {
+                    usleep($delayMs * 1000);
+                }
+            }
         }
+
+        if ($lastError !== null) {
+            @error_log('[DataLayer] PG read failed after retries, falling back to JSON: ' . $lastError->getMessage());
+        }
+
+        $result = $jsonReader();
+        $this->setReadMeta(
+            'json_fallback',
+            true,
+            $lastError?->getMessage() ?? 'postgres_read_failed',
+            ['attempts' => $attempts]
+        );
+        return $result;
     }
 
     /**
@@ -1788,7 +1810,7 @@ class DataLayer
     private function jsonRead(callable $jsonReader): mixed
     {
         $result = $jsonReader();
-        $this->setReadMeta('json');
+        $this->setReadMeta('json', false, '', ['attempts' => 1]);
         return $result;
     }
 
@@ -1798,14 +1820,14 @@ class DataLayer
     private function pgRead(callable $pgReader): mixed
     {
         $result = $pgReader();
-        $this->setReadMeta('postgres');
+        $this->setReadMeta('postgres', false, '', ['attempts' => 1]);
         return $result;
     }
 
     /**
      * Persist the metadata for the most recent read decision.
      */
-    private function setReadMeta(string $source, bool $fallback = false, string $error = ''): void
+    private function setReadMeta(string $source, bool $fallback = false, string $error = '', array $extra = []): void
     {
         $this->lastReadMeta = [
             'source' => $source,
@@ -1813,7 +1835,21 @@ class DataLayer
             'error' => $error,
             'mode' => $this->mode,
             'timestamp' => date(DATE_ATOM),
+            'attempts' => 1,
         ];
+        foreach ($extra as $key => $value) {
+            $this->lastReadMeta[$key] = $value;
+        }
+    }
+
+    private function getReadRetryCount(): int
+    {
+        return max(1, (int)($this->config['read_retry_count'] ?? 3));
+    }
+
+    private function getReadRetryDelayMs(): int
+    {
+        return max(0, (int)($this->config['read_retry_delay_ms'] ?? 150));
     }
 
     /**

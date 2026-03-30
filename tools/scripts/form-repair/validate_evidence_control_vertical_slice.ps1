@@ -33,7 +33,10 @@ $portalRoot = Join-Path $RepoRoot "01-QMS-Portal"
 $apiFile = Join-Path $portalRoot "api.php"
 $dataLayerFile = Join-Path $portalRoot "database\DataLayer.php"
 $runtimeShadowFile = Join-Path $portalRoot "database\RuntimeShadowSync.php"
+$uploadHardeningFile = Join-Path $portalRoot "api\services\UploadHardeningService.php"
 $schemaFile = Join-Path $portalRoot "qms-data\online-forms\schemas\FRM-631.json"
+$allocationRulesFile = Join-Path $portalRoot "qms-data\config\allocation_rules.json"
+$orderConfigFile = Join-Path $portalRoot "qms-data\config\so_jo_wo_config.json"
 $jsFiles = @(
   (Join-Path $portalRoot "scripts\portal\09-online-forms.js"),
   (Join-Path $portalRoot "scripts\portal\09b-form-fill-download.js"),
@@ -55,25 +58,28 @@ $requiredApiActions = @(
   "form_fill_submit_online",
   "upload_read_hidden_sheet",
   "upload_submit",
-  "online_form_entry_get"
+  "online_form_entry_get",
+  "mes_stream",
+  "mes_cutover_audit"
 )
 
 Invoke-Step "Required files exist" {
   Assert-PathExists $apiFile
   Assert-PathExists $dataLayerFile
   Assert-PathExists $runtimeShadowFile
+  Assert-PathExists $uploadHardeningFile
   Assert-PathExists $schemaFile
+  Assert-PathExists $allocationRulesFile
+  Assert-PathExists $orderConfigFile
   foreach ($file in $jsFiles) { Assert-PathExists $file }
   Assert-PathExists (Join-Path $portalRoot "tools\excel_hidden_sheet_runtime.py")
 }
 
 Invoke-Step "PHP syntax check" {
-  & php -l $apiFile | Out-Host
-  if ($LASTEXITCODE -ne 0) { throw "php -l failed" }
-  & php -l $dataLayerFile | Out-Host
-  if ($LASTEXITCODE -ne 0) { throw "php -l failed for DataLayer" }
-  & php -l $runtimeShadowFile | Out-Host
-  if ($LASTEXITCODE -ne 0) { throw "php -l failed for RuntimeShadowSync" }
+  foreach ($file in @($apiFile, $dataLayerFile, $runtimeShadowFile, $uploadHardeningFile)) {
+    & php -l $file | Out-Host
+    if ($LASTEXITCODE -ne 0) { throw "php -l failed: $file" }
+  }
 }
 
 Invoke-Step "JavaScript parse check" {
@@ -103,6 +109,14 @@ Invoke-Step "No forbidden mojibake identifiers remain" {
   $matches = rg -n "Đạte|formĐạta|apiCallFormĐạta|getĐạte|_formatĐạte" @jsFiles
   if ($LASTEXITCODE -eq 0 -and $matches) {
     throw "Forbidden mojibake identifiers still exist.`n$matches"
+  }
+}
+
+Invoke-Step "No mojibake remains in governed evidence configs" {
+  $targets = @($schemaFile, $allocationRulesFile, $orderConfigFile)
+  $matches = rg -n "Ãƒ|Ã†Â°|PhÃƒ|XÃ†|Ã„â€˜|Ã¡Âº|Ã¡Â»" @targets
+  if ($LASTEXITCODE -eq 0 -and $matches) {
+    throw "Detected possible mojibake in governed evidence configs.`n$matches"
   }
 }
 
@@ -169,6 +183,9 @@ Invoke-Step "Governance services wired into api.php" {
     'runtime_data_layer()',
     'runtime_read_model_bundle(',
     'observe_primary_read(',
+    'build_exception_dashboard_data(',
+    'build_runtime_cutover_audit(',
+    'mes_stream',
     'load_mes_shift_patterns(',
     'mes_build_alarm_ack_queue(',
     'mes_material_genealogy_overlay(',
@@ -195,10 +212,26 @@ Invoke-Step "Runtime shadow sync surface exists" {
     'syncMasterDataStore',
     'syncOrdersStore',
     'syncMesRuntimeStore',
+    'read_retry_count',
+    'read_retry_delay_ms',
     'RuntimeShadowSync'
   )) {
     if ($dataLayerText -notmatch [regex]::Escape($token)) {
-      throw "Missing DataLayer runtime shadow token: $token"
+      throw "Missing DataLayer runtime token: $token"
+    }
+  }
+}
+
+Invoke-Step "Upload hardening UTF-8 validation is wired" {
+  $uploadText = Get-Content -LiteralPath $uploadHardeningFile -Raw
+  foreach ($token in @(
+    'UTF8_VALIDATED_EXTENSIONS',
+    'inspectUtf8Encoding(',
+    'utf8_encoding',
+    'encoding_rejected'
+  )) {
+    if ($uploadText -notmatch [regex]::Escape($token)) {
+      throw "Missing upload hardening token: $token"
     }
   }
 }

@@ -98,6 +98,13 @@ function api_json(array $payload, int $code = 200): void {
   exit;
 }
 
+function api_stream_event(string $event, array $payload): void {
+  echo 'event: ' . $event . "\n";
+  echo 'data: ' . json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n\n";
+  @ob_flush();
+  @flush();
+}
+
 function ensure_dir(string $dir): void {
   if (!is_dir($dir)) {
     @mkdir($dir, 0775, true);
@@ -2427,6 +2434,186 @@ function runtime_store_item_count(array $store): int {
   return $total;
 }
 
+function runtime_store_entity_counts(array $store, array $entityMap): array {
+  $counts = [];
+  foreach ($entityMap as $entityKey => $storeKey) {
+    $counts[$entityKey] = count((array)($store[$storeKey] ?? []));
+  }
+  return $counts;
+}
+
+function runtime_cutover_postgres_counts(array $runtimeMode): array {
+  $result = [
+    'available' => false,
+    'reason' => 'postgres_path_inactive',
+    'error' => '',
+    'groups' => [],
+  ];
+
+  if (!(bool)($runtimeMode['postgres_path_active'] ?? false)) {
+    return $result;
+  }
+
+  if (!(bool)($runtimeMode['postgres_reachable'] ?? false)) {
+    $result['reason'] = 'postgres_unreachable';
+    $result['error'] = trim((string)($runtimeMode['postgres_error'] ?? '')) ?: 'postgres_unreachable';
+    return $result;
+  }
+
+  require_once __DIR__ . '/database/Connection.php';
+  $connection = \HESEM\QMS\Database\Connection::getInstance((array)(require __DIR__ . '/database/config.php'));
+
+  $sqlMap = [
+    'master_data' => [
+      'customers' => "SELECT COUNT(*) AS c FROM customers WHERE COALESCE(metadata->>'customer_id', '') <> ''",
+      'suppliers' => "SELECT COUNT(*) AS c FROM vendors WHERE COALESCE(metadata->>'supplier_id', '') <> ''",
+      'parts' => "SELECT COUNT(*) AS c FROM items WHERE COALESCE(metadata->>'part_number', '') <> ''",
+      'revisions' => "SELECT COUNT(*) AS c FROM item_revisions WHERE COALESCE(metadata->>'revision', '') <> ''",
+      'work_centers' => "SELECT COUNT(*) AS c FROM work_centers WHERE COALESCE(metadata->>'work_center_id', '') <> ''",
+      'machines' => "SELECT COUNT(*) AS c FROM equipment WHERE COALESCE(metadata->>'machine_id', '') <> ''",
+      'operators' => "SELECT COUNT(*) AS c FROM employees WHERE COALESCE(metadata->>'operator_id', '') <> ''",
+      'tooling_assets' => "SELECT COUNT(*) AS c FROM tools WHERE COALESCE(metadata->>'shadow_source', '') <> 'mes_runtime'",
+      'capas' => "SELECT COUNT(*) AS c FROM records WHERE record_type = 'CAPA'",
+    ],
+    'orders' => [
+      'sales_orders' => "SELECT COUNT(*) AS c FROM sales_orders WHERE COALESCE(metadata->>'so_number', '') <> ''",
+      'job_orders' => "SELECT COUNT(*) AS c FROM job_orders WHERE COALESCE(metadata->>'jo_number', '') <> ''",
+      'work_orders' => "SELECT COUNT(*) AS c FROM job_operations WHERE COALESCE(metadata->>'wo_number', '') <> ''",
+    ],
+    'mes' => [
+      'runtime_machine_context' => "SELECT COUNT(*) AS c FROM mes_equipment_extended WHERE metadata ? 'machine_signal' OR metadata ? 'connector_feed'",
+      'progress_reports' => "SELECT COUNT(*) AS c FROM mes_operation_execution WHERE metadata ? 'wo_number'",
+      'downtime_events' => "SELECT COUNT(*) AS c FROM mes_downtime_events WHERE metadata ? 'shadow_id'",
+      'maintenance_requests' => "SELECT COUNT(*) AS c FROM maintenance_work_orders WHERE COALESCE(metadata->>'request_id', '') <> ''",
+      'material_consumption' => "SELECT COUNT(*) AS c FROM mes_material_consumption WHERE metadata ? 'consumption_id'",
+      'part_genealogy' => "SELECT COUNT(*) AS c FROM mes_part_genealogy WHERE metadata ? 'genealogy_id'",
+      'shift_handover' => "SELECT COUNT(*) AS c FROM mes_shift_handover WHERE metadata ? 'handover_id'",
+      'machine_alarm_events' => "SELECT COUNT(*) AS c FROM mes_machine_alarms WHERE metadata ? 'alarm_event_id'",
+      'nc_download_receipts' => "SELECT COUNT(*) AS c FROM mes_nc_download_receipts WHERE metadata ? 'receipt_id'",
+    ],
+    'epicor' => [
+      'sync_runs' => "SELECT COUNT(*) AS c FROM mes_erp_sync_runs",
+      'reconciliation_exceptions' => "SELECT COUNT(*) AS c FROM mes_erp_reconciliation_exceptions",
+      'outbox_events' => "SELECT COUNT(*) AS c FROM mes_erp_outbound_queue",
+    ],
+  ];
+
+  $groups = [];
+  foreach ($sqlMap as $groupKey => $queries) {
+    $groups[$groupKey] = [];
+    foreach ($queries as $entityKey => $sql) {
+      $row = $connection->queryOne($sql);
+      $groups[$groupKey][$entityKey] = (int)($row['c'] ?? 0);
+    }
+  }
+
+  $result['available'] = true;
+  $result['reason'] = 'ok';
+  $result['groups'] = $groups;
+  return $result;
+}
+
+function build_runtime_cutover_audit(?array $bundle = null): array {
+  $bundle = is_array($bundle) ? $bundle : runtime_read_model_bundle(true);
+  $runtimeMode = is_array($bundle['runtime_mode'] ?? null) ? $bundle['runtime_mode'] : runtime_data_layer_summary();
+  $master = is_array($bundle['master'] ?? null) ? $bundle['master'] : load_master_data_store();
+  $orders = is_array($bundle['orders'] ?? null) ? $bundle['orders'] : load_orders_store();
+  $mes = is_array($bundle['mes'] ?? null) ? $bundle['mes'] : load_mes_runtime_store();
+  $epicor = load_epicor_runtime_store();
+
+  $jsonGroups = [
+    'master_data' => runtime_store_entity_counts($master, [
+      'customers' => 'customers',
+      'suppliers' => 'suppliers',
+      'parts' => 'parts',
+      'revisions' => 'revisions',
+      'work_centers' => 'work_centers',
+      'machines' => 'machines',
+      'operators' => 'operators',
+      'tooling_assets' => 'tooling_assets',
+      'capas' => 'capas',
+    ]),
+    'orders' => runtime_store_entity_counts($orders, [
+      'sales_orders' => 'sales_orders',
+      'job_orders' => 'job_orders',
+      'work_orders' => 'work_orders',
+    ]),
+    'mes' => [
+      'runtime_machine_context' => count(array_unique(array_filter(array_merge(
+        array_map(static fn($row): string => trim((string)($row['machine_id'] ?? '')), (array)($mes['connector_feeds'] ?? [])),
+        array_map(static fn($row): string => trim((string)($row['machine_id'] ?? '')), (array)($mes['machine_signals'] ?? []))
+      )))),
+      'progress_reports' => count((array)($mes['progress_reports'] ?? [])),
+      'downtime_events' => count((array)($mes['downtime_events'] ?? [])),
+      'maintenance_requests' => count((array)($mes['maintenance_requests'] ?? [])),
+      'material_consumption' => count((array)($mes['material_consumption'] ?? [])),
+      'part_genealogy' => count((array)($mes['part_genealogy'] ?? [])),
+      'shift_handover' => count((array)($mes['shift_handover'] ?? [])),
+      'machine_alarm_events' => count((array)($mes['machine_alarm_events'] ?? [])),
+      'nc_download_receipts' => count((array)($mes['nc_download_receipts'] ?? [])),
+    ],
+    'epicor' => runtime_store_entity_counts($epicor, [
+      'sync_runs' => 'sync_runs',
+      'reconciliation_exceptions' => 'reconciliation_exceptions',
+      'outbox_events' => 'outbox_events',
+    ]),
+  ];
+
+  $pgData = runtime_cutover_postgres_counts($runtimeMode);
+  $groups = [];
+  $driftEntities = 0;
+  $driftTotal = 0;
+
+  foreach ($jsonGroups as $groupKey => $jsonCounts) {
+    $pgCounts = is_array($pgData['groups'][$groupKey] ?? null) ? $pgData['groups'][$groupKey] : [];
+    $rows = [];
+    $groupJsonTotal = 0;
+    $groupPgTotal = 0;
+    foreach ($jsonCounts as $entityKey => $jsonCount) {
+      $jsonValue = (int)$jsonCount;
+      $pgValue = $pgData['available'] ? (int)($pgCounts[$entityKey] ?? 0) : null;
+      $drift = $pgValue === null ? null : ($pgValue - $jsonValue);
+      if ($drift !== null && $drift !== 0) {
+        $driftEntities++;
+        $driftTotal += abs($drift);
+      }
+      $groupJsonTotal += $jsonValue;
+      $groupPgTotal += (int)($pgValue ?? 0);
+      $rows[] = [
+        'entity_key' => $entityKey,
+        'json_count' => $jsonValue,
+        'postgres_count' => $pgValue,
+        'drift' => $drift,
+        'status' => $pgValue === null ? 'unavailable' : ($drift === 0 ? 'aligned' : 'drift'),
+      ];
+    }
+    $groups[$groupKey] = [
+      'status' => !$pgData['available']
+        ? ($pgData['reason'] === 'postgres_unreachable' ? 'postgres_unreachable' : 'json_only')
+        : ($groupJsonTotal === $groupPgTotal && !array_filter($rows, static fn($row): bool => (int)($row['drift'] ?? 0) !== 0) ? 'aligned' : 'drift'),
+      'json_total' => $groupJsonTotal,
+      'postgres_total' => $pgData['available'] ? $groupPgTotal : null,
+      'drift_total' => $pgData['available'] ? ($groupPgTotal - $groupJsonTotal) : null,
+      'entities' => $rows,
+    ];
+  }
+
+  $status = !$pgData['available']
+    ? ($pgData['reason'] === 'postgres_unreachable' ? 'postgres_unreachable' : 'json_only')
+    : ($driftEntities > 0 ? 'drift_detected' : 'aligned');
+
+  return [
+    'status' => $status,
+    'reason' => (string)($pgData['reason'] ?? 'ok'),
+    'error' => (string)($pgData['error'] ?? ''),
+    'drift_entities' => $driftEntities,
+    'drift_total' => $driftTotal,
+    'groups' => $groups,
+    'runtime_mode' => $runtimeMode,
+    'updated_at' => now_iso(),
+  ];
+}
+
 function runtime_read_model_bundle(bool $includeMes = true): array {
   $layer = runtime_data_layer();
 
@@ -2471,6 +2658,116 @@ function runtime_read_model_bundle(bool $includeMes = true): array {
       'mes' => $mesRead,
     ],
     'runtime_mode' => runtime_data_layer_summary(),
+  ];
+}
+
+function build_exception_dashboard_data(array $bundle, ?array $mesSnapshot = null): array {
+  global $DATA_DIR;
+
+  $allocationStore = load_allocation_store();
+  $allocations = (array)($allocationStore['allocations'] ?? []);
+  $cutoff30 = date('c', strtotime('-30 days'));
+  $overdueAllocations = 0;
+  foreach ($allocations as $alloc) {
+    if (!is_array($alloc)) continue;
+    $st = allocation_status_normalize((string)($alloc['status'] ?? ''));
+    if (!in_array($st, ['allocated', 'downloaded'], true)) continue;
+    $dl = (string)($alloc['downloaded_at'] ?? '');
+    if ($dl !== '' && $dl < $cutoff30) $overdueAllocations++;
+  }
+
+  require_once __DIR__ . '/api/services/UploadHardeningService.php';
+  $uploadSvc = new UploadHardeningService($DATA_DIR);
+  $failedUploads = count($uploadSvc->getExceptionQueue(30));
+
+  $orders = $bundle['orders'];
+  $master = $bundle['master'];
+  $mes = $bundle['mes'];
+  $today = date('Y-m-d');
+  $overdueOrders = 0;
+  foreach (['sales_orders', 'job_orders', 'work_orders'] as $key) {
+    foreach ((array)($orders[$key] ?? []) as $ord) {
+      if (!is_array($ord)) continue;
+      $status = strtolower(trim((string)($ord['status'] ?? '')));
+      if (in_array($status, ['closed', 'completed', 'cancelled', 'shipped'], true)) continue;
+      $due = (string)($ord['due_date'] ?? '');
+      if ($due !== '' && $due < $today) $overdueOrders++;
+    }
+  }
+
+  $cutoff60 = date('Y-m-d', strtotime('-60 days'));
+  $overdueCapas = 0;
+  foreach ((array)($master['capas'] ?? []) as $capa) {
+    if (!is_array($capa)) continue;
+    $st = strtolower(trim((string)($capa['status'] ?? '')));
+    if (in_array($st, ['closed', 'completed', 'cancelled'], true)) continue;
+    $opened = (string)($capa['opened_date'] ?? $capa['created_at'] ?? '');
+    if ($opened !== '' && substr($opened, 0, 10) < $cutoff60) $overdueCapas++;
+  }
+
+  $mesSnapshot = is_array($mesSnapshot) ? $mesSnapshot : build_mes_snapshot($orders, $master, $mes);
+  $woMissingEvidence = count((array)($mesSnapshot['evidence_gate_queue'] ?? []));
+  $programMismatches = count((array)($mesSnapshot['program_handshake_queue'] ?? []));
+  $programReleaseRisk = count((array)($mesSnapshot['program_release_queue'] ?? []));
+  $toolReadinessRisk = count((array)($mesSnapshot['tool_readiness_queue'] ?? []));
+  $alarmAckGaps = count((array)($mesSnapshot['alarm_ack_queue'] ?? []));
+  $operatorQualificationGaps = count((array)($mesSnapshot['operator_qualification_queue'] ?? []));
+  $materialTraceGaps = count((array)($mesSnapshot['material_trace_queue'] ?? []));
+  $materialGenealogyGaps = count((array)($mesSnapshot['material_genealogy_queue'] ?? []));
+  $shiftHandoverGaps = count((array)($mesSnapshot['shift_handover_queue'] ?? []));
+  $connectorGovernanceGaps = count((array)($mesSnapshot['connector_guard_queue'] ?? []));
+  $adapterGovernanceRisk = count((array)($mesSnapshot['adapter_governance_queue'] ?? []));
+  $alarmHotspots = count((array)($mesSnapshot['alarm_hotspot_queue'] ?? []));
+  $ncDownloadMismatches = count((array)($mesSnapshot['nc_download_mismatch_queue'] ?? []));
+  $toolOffsetRisk = count((array)($mesSnapshot['tool_offset_queue'] ?? []));
+  $shadowSyncFailures = count((array)($mesSnapshot['shadow_sync_failures'] ?? []));
+  $launchBlockerHotspots = count((array)($mesSnapshot['launch_blocker_queue'] ?? []));
+  $primaryReadFallbacks = count((array)($mesSnapshot['primary_read_queue'] ?? []));
+  $cutoverDriftEntities = (int)($mesSnapshot['kpis']['cutover_drift_entities'] ?? 0);
+  $epicorSyncStatus = count((array)($mesSnapshot['epicor_sync_queue'] ?? []));
+  $downtimeGovernanceGaps = count(mes_downtime_governance_gap_rows($mes, $master));
+
+  $orphanLinks = 0;
+  foreach ((array)($orders['form_links'] ?? []) as $link) {
+    if (!is_array($link)) continue;
+    $ot = (string)($link['order_type'] ?? '');
+    $oid = (string)($link['order_id'] ?? '');
+    if ($ot === '' || $oid === '') {
+      $orphanLinks++;
+      continue;
+    }
+    $found = find_order_record($orders, $ot, $oid);
+    if (!$found) $orphanLinks++;
+  }
+
+  return [
+    'overdue_allocations' => $overdueAllocations,
+    'failed_uploads' => $failedUploads,
+    'overdue_orders' => $overdueOrders,
+    'overdue_capas' => $overdueCapas,
+    'wo_missing_evidence' => $woMissingEvidence,
+    'program_mismatches' => $programMismatches,
+    'program_release_risk' => $programReleaseRisk,
+    'tool_readiness_risk' => $toolReadinessRisk,
+    'alarm_ack_gaps' => $alarmAckGaps,
+    'operator_qualification_gaps' => $operatorQualificationGaps,
+    'material_trace_gaps' => $materialTraceGaps,
+    'material_genealogy_gaps' => $materialGenealogyGaps,
+    'shift_handover_gaps' => $shiftHandoverGaps,
+    'connector_governance_gaps' => $connectorGovernanceGaps,
+    'adapter_governance_risk' => $adapterGovernanceRisk,
+    'alarm_hotspots' => $alarmHotspots,
+    'nc_download_mismatches' => $ncDownloadMismatches,
+    'tool_offset_risk' => $toolOffsetRisk,
+    'shadow_sync_failures' => $shadowSyncFailures,
+    'launch_blocker_hotspots' => $launchBlockerHotspots,
+    'primary_read_fallbacks' => $primaryReadFallbacks,
+    'cutover_drift_entities' => $cutoverDriftEntities,
+    'epicor_sync_status' => $epicorSyncStatus,
+    'downtime_governance_gaps' => $downtimeGovernanceGaps,
+    'orphan_links' => $orphanLinks,
+    'read_sources' => $bundle['sources'],
+    'runtime_mode' => $bundle['runtime_mode'],
   ];
 }
 
@@ -5977,6 +6274,12 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   unset($machineRow);
   $observability = load_runtime_observability_store();
   $runtimeMode = runtime_data_layer_summary();
+  $cutoverAudit = build_runtime_cutover_audit([
+    'master' => $master,
+    'orders' => $orders,
+    'mes' => $mes,
+    'runtime_mode' => $runtimeMode,
+  ]);
   $shadowSyncFailures = mes_shadow_failure_rows($observability);
   $launchBlockerQueue = mes_launch_blocker_rows($observability);
   $primaryReadQueue = mes_primary_read_rows($observability);
@@ -5995,6 +6298,7 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $kpis['shadow_sync_failures'] = count($shadowSyncFailures);
   $kpis['launch_blocker_hotspots'] = count($launchBlockerQueue);
   $kpis['primary_read_fallbacks'] = count($primaryReadQueue);
+  $kpis['cutover_drift_entities'] = (int)($cutoverAudit['drift_entities'] ?? 0);
   $kpis['epicor_sync_status'] = count($epicorSyncQueue);
   $kpis['epicor_reconciliation_open'] = (int)($epicorSnapshot['kpis']['reconciliation_open'] ?? 0);
   $kpis['epicor_outbox_pending'] = (int)($epicorSnapshot['kpis']['outbox_pending'] ?? 0);
@@ -6026,6 +6330,7 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     'shadow_sync_failures' => array_slice($shadowSyncFailures, 0, 20),
     'launch_blocker_queue' => array_slice($launchBlockerQueue, 0, 20),
     'primary_read_queue' => array_slice($primaryReadQueue, 0, 20),
+    'cutover_audit' => $cutoverAudit,
     'epicor_sync' => $epicorSnapshot,
     'epicor_sync_queue' => array_slice($epicorSyncQueue, 0, 20),
     'shadow_status' => $observability['shadow_sync'] ?? [],
@@ -13286,6 +13591,92 @@ if ($username === '') {
     ]);
   }
 
+  case 'mes_stream': {
+    require_logged_in($store);
+    if (session_status() === PHP_SESSION_ACTIVE) {
+      @session_write_close();
+    }
+
+    @set_time_limit(0);
+    @ignore_user_abort(true);
+    @ini_set('zlib.output_compression', '0');
+    while (ob_get_level() > 0) {
+      @ob_end_flush();
+    }
+
+    header('Content-Type: text/event-stream; charset=utf-8');
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('X-Accel-Buffering: no');
+    header('Connection: keep-alive');
+
+    $tickCount = min(30, max(5, (int)($_GET['ticks'] ?? 20)));
+    $intervalMs = min(10000, max(1000, (int)($_GET['interval_ms'] ?? 2000)));
+    $lastHash = '';
+
+    api_stream_event('ready', [
+      'ok' => true,
+      'stream' => 'mes_stream',
+      'interval_ms' => $intervalMs,
+      'ticks' => $tickCount,
+      'runtime_mode' => runtime_data_layer_summary(),
+      'started_at' => now_iso(),
+    ]);
+
+    for ($tick = 0; $tick < $tickCount; $tick++) {
+      if (connection_aborted()) {
+        break;
+      }
+
+      $bundle = runtime_read_model_bundle(true);
+      $orders = $bundle['orders'];
+      $master = $bundle['master'];
+      $mes = $bundle['mes'];
+      $snapshot = build_mes_snapshot($orders, $master, $mes);
+      $exceptions = build_exception_dashboard_data($bundle, $snapshot);
+
+      $payload = [
+        'ok' => true,
+        'snapshot' => $snapshot,
+        'master' => $master,
+        'exceptions' => $exceptions,
+        'read_sources' => $bundle['sources'],
+        'runtime_mode' => $bundle['runtime_mode'],
+        'streamed_at' => now_iso(),
+      ];
+
+      $hash = hash('sha256', json_encode([
+        'snapshot_meta' => [
+          'mes_updated' => (string)($mes['_meta']['updated'] ?? ''),
+          'orders_updated' => (string)($orders['_meta']['updated'] ?? ''),
+          'master_updated' => (string)($master['_meta']['updated'] ?? ''),
+        ],
+        'counts' => [
+          'launch_blockers' => (int)($snapshot['kpis']['launch_blocker_hotspots'] ?? 0),
+          'connector_risk' => (int)($snapshot['kpis']['connectors_stale'] ?? 0),
+          'cutover_drift_entities' => (int)($snapshot['kpis']['cutover_drift_entities'] ?? 0),
+          'exceptions' => $exceptions,
+        ],
+      ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+
+      if ($hash !== $lastHash || $tick === 0) {
+        api_stream_event('mes_snapshot', $payload);
+        $lastHash = $hash;
+      } else {
+        api_stream_event('heartbeat', [
+          'ok' => true,
+          'streamed_at' => now_iso(),
+          'runtime_mode' => $bundle['runtime_mode'],
+          'read_sources' => $bundle['sources'],
+        ]);
+      }
+
+      if ($tick < ($tickCount - 1)) {
+        usleep($intervalMs * 1000);
+      }
+    }
+    exit;
+  }
+
   case 'mes_connector_snapshot': {
     require_logged_in($store);
     $bundle = runtime_read_model_bundle(true);
@@ -13513,6 +13904,15 @@ if ($username === '') {
       'launch_blockers' => mes_launch_blocker_rows($observability),
       'runtime_mode' => runtime_data_layer_summary(),
       'updated' => (string)($observability['_meta']['updated'] ?? ''),
+    ]);
+  }
+
+  case 'mes_cutover_audit': {
+    require_logged_in($store);
+    $bundle = runtime_read_model_bundle(true);
+    api_json([
+      'ok' => true,
+      'audit' => build_runtime_cutover_audit($bundle),
     ]);
   }
 
@@ -15672,116 +16072,12 @@ if ($username === '') {
 
   // ── G6 P1-06: Exception Dashboard ─────────────────────────────────────
   case 'exception_dashboard': {
-    $me = require_logged_in($store);
-
-    // 1. Overdue allocations: downloaded > 30 days ago, not yet submitted
-    $allocationStore = load_allocation_store();
-    $allocations = (array)($allocationStore['allocations'] ?? []);
-    $cutoff30 = date('c', strtotime('-30 days'));
-    $overdueAllocations = 0;
-    foreach ($allocations as $alloc) {
-      if (!is_array($alloc)) continue;
-      $st = allocation_status_normalize((string)($alloc['status'] ?? ''));
-      if (!in_array($st, ['allocated', 'downloaded'], true)) continue;
-      $dl = (string)($alloc['downloaded_at'] ?? '');
-      if ($dl !== '' && $dl < $cutoff30) $overdueAllocations++;
-    }
-
-    // 2. Failed uploads in last 30 days
-    require_once __DIR__ . '/api/services/UploadHardeningService.php';
-    $uploadSvc = new UploadHardeningService($DATA_DIR);
-    $failedUploads = count($uploadSvc->getExceptionQueue(30));
-
-    // 3. Overdue orders (due_date < today)
+    require_logged_in($store);
     $bundle = runtime_read_model_bundle(true);
-    $orders = $bundle['orders'];
-    $today = date('Y-m-d');
-    $overdueOrders = 0;
-    foreach (['sales_orders', 'job_orders', 'work_orders'] as $key) {
-      foreach ((array)($orders[$key] ?? []) as $ord) {
-        if (!is_array($ord)) continue;
-        $status = strtolower(trim((string)($ord['status'] ?? '')));
-        if (in_array($status, ['closed', 'completed', 'cancelled', 'shipped'], true)) continue;
-        $due = (string)($ord['due_date'] ?? '');
-        if ($due !== '' && $due < $today) $overdueOrders++;
-      }
-    }
-
-    // 4. Open CAPAs > 60 days
-    $master = $bundle['master'];
-    $cutoff60 = date('Y-m-d', strtotime('-60 days'));
-    $overdueCapas = 0;
-    foreach ((array)($master['capas'] ?? []) as $capa) {
-      if (!is_array($capa)) continue;
-      $st = strtolower(trim((string)($capa['status'] ?? '')));
-      if (in_array($st, ['closed', 'completed', 'cancelled'], true)) continue;
-      $opened = (string)($capa['opened_date'] ?? $capa['created_at'] ?? '');
-      if ($opened !== '' && substr($opened, 0, 10) < $cutoff60) $overdueCapas++;
-    }
-
-    // 5. WOs missing evidence gates
-    $mes = $bundle['mes'];
-    $mesSnapshot = build_mes_snapshot($orders, $master, $mes);
-    $woMissingEvidence = count((array)($mesSnapshot['evidence_gate_queue'] ?? []));
-    $programMismatches = count((array)($mesSnapshot['program_handshake_queue'] ?? []));
-    $programReleaseRisk = count((array)($mesSnapshot['program_release_queue'] ?? []));
-    $toolReadinessRisk = count((array)($mesSnapshot['tool_readiness_queue'] ?? []));
-    $alarmAckGaps = count((array)($mesSnapshot['alarm_ack_queue'] ?? []));
-    $operatorQualificationGaps = count((array)($mesSnapshot['operator_qualification_queue'] ?? []));
-    $materialTraceGaps = count((array)($mesSnapshot['material_trace_queue'] ?? []));
-    $materialGenealogyGaps = count((array)($mesSnapshot['material_genealogy_queue'] ?? []));
-    $shiftHandoverGaps = count((array)($mesSnapshot['shift_handover_queue'] ?? []));
-    $connectorGovernanceGaps = count((array)($mesSnapshot['connector_guard_queue'] ?? []));
-    $adapterGovernanceRisk = count((array)($mesSnapshot['adapter_governance_queue'] ?? []));
-    $alarmHotspots = count((array)($mesSnapshot['alarm_hotspot_queue'] ?? []));
-    $ncDownloadMismatches = count((array)($mesSnapshot['nc_download_mismatch_queue'] ?? []));
-    $toolOffsetRisk = count((array)($mesSnapshot['tool_offset_queue'] ?? []));
-    $shadowSyncFailures = count((array)($mesSnapshot['shadow_sync_failures'] ?? []));
-    $launchBlockerHotspots = count((array)($mesSnapshot['launch_blocker_queue'] ?? []));
-    $primaryReadFallbacks = count((array)($mesSnapshot['primary_read_queue'] ?? []));
-    $epicorSyncStatus = count((array)($mesSnapshot['epicor_sync_queue'] ?? []));
-    $downtimeGovernanceGaps = count(mes_downtime_governance_gap_rows($mes, $master));
-
-    // 6. Orphan record links (links pointing to non-existent orders)
-    $orphanLinks = 0;
-    foreach ((array)($orders['form_links'] ?? []) as $link) {
-      if (!is_array($link)) continue;
-      $ot = (string)($link['order_type'] ?? '');
-      $oid = (string)($link['order_id'] ?? '');
-      if ($ot === '' || $oid === '') { $orphanLinks++; continue; }
-      $found = find_order_record($orders, $ot, $oid);
-      if (!$found) $orphanLinks++;
-    }
-
-    api_json([
-      'ok' => true,
-      'overdue_allocations' => $overdueAllocations,
-      'failed_uploads'      => $failedUploads,
-      'overdue_orders'      => $overdueOrders,
-      'overdue_capas'       => $overdueCapas,
-      'wo_missing_evidence' => $woMissingEvidence,
-      'program_mismatches'  => $programMismatches,
-      'program_release_risk'=> $programReleaseRisk,
-      'tool_readiness_risk' => $toolReadinessRisk,
-      'alarm_ack_gaps' => $alarmAckGaps,
-      'operator_qualification_gaps' => $operatorQualificationGaps,
-      'material_trace_gaps' => $materialTraceGaps,
-      'material_genealogy_gaps' => $materialGenealogyGaps,
-      'shift_handover_gaps' => $shiftHandoverGaps,
-      'connector_governance_gaps' => $connectorGovernanceGaps,
-      'adapter_governance_risk' => $adapterGovernanceRisk,
-      'alarm_hotspots' => $alarmHotspots,
-      'nc_download_mismatches' => $ncDownloadMismatches,
-      'tool_offset_risk' => $toolOffsetRisk,
-      'shadow_sync_failures' => $shadowSyncFailures,
-      'launch_blocker_hotspots' => $launchBlockerHotspots,
-      'primary_read_fallbacks' => $primaryReadFallbacks,
-      'epicor_sync_status' => $epicorSyncStatus,
-      'downtime_governance_gaps' => $downtimeGovernanceGaps,
-      'orphan_links'        => $orphanLinks,
-      'read_sources'        => $bundle['sources'],
-      'runtime_mode'        => $bundle['runtime_mode'],
-    ]);
+    api_json(array_merge(
+      ['ok' => true],
+      build_exception_dashboard_data($bundle)
+    ));
   }
 
   case 'exception_detail': {
