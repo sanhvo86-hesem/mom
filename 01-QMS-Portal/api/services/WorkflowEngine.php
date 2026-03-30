@@ -544,6 +544,7 @@ final class WorkflowEngine
      * @param string      $recordId   Record identifier.
      * @param string      $approverId Approver user ID.
      * @param bool        $approved   True = approved, false = rejected.
+     * @param string|null $meaning    Optional signature meaning (approved/reviewed/rejected/witnessed).
      * @param string|null $comment    Optional comment.
      * @return array{approved_count: int, required_count: int, complete: bool}
      */
@@ -551,6 +552,7 @@ final class WorkflowEngine
         string $recordId,
         string $approverId,
         bool $approved,
+        ?string $meaning = null,
         ?string $comment = null,
     ): array {
         $record = $this->loadRecordState($recordId);
@@ -558,9 +560,16 @@ final class WorkflowEngine
             throw new RuntimeException("Record not found: {$recordId}");
         }
 
+        $decision = $approved ? 'approved' : 'rejected';
+        $normalizedMeaning = strtolower(trim((string)($meaning ?? $decision)));
+        if (!in_array($normalizedMeaning, ['approved', 'reviewed', 'rejected', 'witnessed'], true)) {
+            $normalizedMeaning = $decision;
+        }
+
         $record['approvals'][] = [
             'approver'  => $approverId,
-            'decision'  => $approved ? 'approved' : 'rejected',
+            'decision'  => $decision,
+            'meaning'   => $normalizedMeaning,
             'comment'   => $comment,
             'timestamp' => gmdate('Y-m-d\TH:i:s\Z'),
         ];

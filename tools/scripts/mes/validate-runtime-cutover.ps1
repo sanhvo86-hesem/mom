@@ -33,16 +33,17 @@ $notifyMigrationFile = Join-Path $portalRoot "database\migrations\030_mes_realti
 $jsFile = Join-Path $portalRoot "scripts\portal\14-mes-control-center.js"
 $pollingServiceFile = Join-Path $portalRoot "api\services\MtconnectPollingService.php"
 $pollingCliFile = Join-Path $portalRoot "scripts\run_mtconnect_poll_cycle.php"
+$runnerFile = Join-Path $portalRoot "scripts\run_scheduled_job.php"
 
 Write-Step "Core files exist"
-foreach ($file in @($configFile, $dataLayerFile, $apiFile, $migrationFile, $notifyMigrationFile, $jsFile, $pollingServiceFile, $pollingCliFile)) {
+foreach ($file in @($configFile, $dataLayerFile, $apiFile, $migrationFile, $notifyMigrationFile, $jsFile, $pollingServiceFile, $pollingCliFile, $runnerFile)) {
   if (-not (Test-Path -LiteralPath $file)) {
     throw "Missing required file: $file"
   }
 }
 
 Write-Step "Cutover tokens present"
-rg -n "read_retry_count|read_retry_delay_ms|MODE_POSTGRES_PRIMARY|pgWithFallback|setReadMeta|mes_stream|stream_mode|polling_fallback|mes_mtconnect_poll_once|mes_mtconnect_poll_batch|mes_mtconnect_poll_url|mes_http_fetch_text|build_exception_dashboard_data|EventSource|connectStream|streamEligible|data-poll-mtconnect|mes-poll-batch|pollMtconnectBatch|MtconnectPollingService|run_mtconnect_poll_cycle|timescaledb\\.continuous|create_hypertable|add_retention_policy|add_compression_policy|pg_notify|notify_mes_machine_telemetry|notify_mes_machine_alarm|notify_mes_downtime_event" $configFile $dataLayerFile $apiFile $migrationFile $notifyMigrationFile $jsFile $pollingServiceFile $pollingCliFile
+rg -n "read_retry_count|read_retry_delay_ms|MODE_POSTGRES_PRIMARY|pgWithFallback|setReadMeta|mes_stream|stream_mode|polling_fallback|live_event_source|mes_pg_open_notify_stream|mes_pg_wait_for_notify|mes_mtconnect_poll_once|mes_mtconnect_poll_batch|mes_mtconnect_poll_batch_runtime|mes_mtconnect_poll_url|mes_http_fetch_text|MtconnectPollingService|runMtconnectPollingCycle|run_mtconnect_poll_cycle|run_scheduled_job|build_exception_dashboard_data|EventSource|connectStream|streamEligible|data-poll-mtconnect|mes-poll-batch|pollMtconnectBatch|timescaledb\\.continuous|create_hypertable|add_retention_policy|add_compression_policy|pg_notify|notify_mes_telemetry|notify_mes_alarm|notify_mes_downtime" $configFile $dataLayerFile $apiFile $migrationFile $notifyMigrationFile $jsFile $pollingServiceFile $pollingCliFile $runnerFile
 if ($LASTEXITCODE -ne 0) {
   throw "Missing one or more cutover tokens."
 }

@@ -46,6 +46,11 @@ final class ScheduledJobs
      */
     public function __construct(string $dataDir, ?Connection $db = null)
     {
+        require_once __DIR__ . '/KpiEngine.php';
+        require_once __DIR__ . '/SpcEngine.php';
+        require_once __DIR__ . '/DashboardService.php';
+        require_once __DIR__ . '/NotificationService.php';
+
         $this->dataDir = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->logDir  = $this->dataDir . '/job-logs';
 
@@ -566,6 +571,166 @@ final class ScheduledJobs
     }
 
     /**
+     * Evidence review SLA notifications: warn reviewers and escalate overdue items.
+     *
+     * The Evidence Control module already materializes SLA state and audit events.
+     * This job adds the missing operational loop by sending governed in-app notifications
+     * and queueing emails when user preferences allow it.
+     *
+     * Schedule: Every 15 minutes.
+     *
+     * @return array{job: string, warned: int, overdue: int, escalated: int, allocations_scanned: int, duration_ms: float}
+     */
+    public function runEvidenceReviewSlaNotifications(): array
+    {
+        return $this->executeJob('evidence_review_sla_notifications', function (): array {
+            $this->ensureApiHelpersLoaded();
+
+            $notificationService = new NotificationService($this->dataDir, $this->db);
+            $allocationStore = \load_allocation_store();
+            $recordTypes = \load_record_type_registry();
+            $schemaCache = [];
+            $roleIndex = $this->buildActiveUserRoleIndex();
+
+            $warned = 0;
+            $overdue = 0;
+            $escalated = 0;
+            $dirty = false;
+            $allocationsScanned = 0;
+
+            foreach ($allocationStore['allocations'] as $idx => $allocation) {
+                if (!is_array($allocation)) {
+                    continue;
+                }
+                $status = \allocation_status_normalize((string)($allocation['status'] ?? 'allocated'));
+                if ($status !== 'in_review') {
+                    continue;
+                }
+
+                $allocationsScanned++;
+                $formCode = trim((string)($allocation['form_code'] ?? ''));
+                if ($formCode !== '' && !array_key_exists($formCode, $schemaCache)) {
+                    $schemaCache[$formCode] = \load_form_schema_by_code($formCode) ?: [];
+                }
+                $schema = is_array($schemaCache[$formCode] ?? null) ? $schemaCache[$formCode] : [];
+                $reviewConfig = \evidence_review_config($schema);
+                $allocationStore['allocations'][$idx]['approval_summary'] = \evidence_approval_summary($allocationStore['allocations'][$idx], $schema);
+                $reviewSla = \evidence_review_sla_materialize($allocationStore['allocations'][$idx], $recordTypes, $schema);
+
+                $notificationLog = is_array($allocationStore['allocations'][$idx]['review_sla']['notifications'] ?? null)
+                    ? $allocationStore['allocations'][$idx]['review_sla']['notifications']
+                    : [];
+                $rowDirty = false;
+
+                $recordId = trim((string)($allocationStore['allocations'][$idx]['record_id'] ?? $allocationStore['allocations'][$idx]['allocation_id'] ?? ''));
+                $recordType = trim((string)($reviewSla['record_type'] ?? $allocationStore['allocations'][$idx]['record_type'] ?? 'record'));
+                $detailPath = '/portal.html?page=forms';
+                $data = [
+                    'allocation_id' => (string)($allocationStore['allocations'][$idx]['allocation_id'] ?? ''),
+                    'record_id' => $recordId,
+                    'record_type' => $recordType,
+                    'form_code' => $formCode,
+                    'review_sla_state' => (string)($reviewSla['state'] ?? ''),
+                    'due_at' => (string)($reviewSla['due_at'] ?? ''),
+                    'escalation_due_at' => (string)($reviewSla['escalation_due_at'] ?? ''),
+                    'link' => $detailPath,
+                ];
+
+                $state = strtolower(trim((string)($reviewSla['state'] ?? 'not_started')));
+
+                if ($state === 'due_soon' && trim((string)($notificationLog['warn_sent_at'] ?? '')) === '') {
+                    $recipients = $this->resolveUsersForRoles((array)($reviewConfig['roles_allowed'] ?? []), $roleIndex);
+                    $sent = $this->notifyUsers(
+                        $notificationService,
+                        array_keys($recipients),
+                        NotificationType::TASK_ASSIGNED,
+                        "Evidence review due soon for {$recordType} {$recordId}",
+                        "Sắp quá hạn review cho {$recordType} {$recordId}",
+                        $data,
+                        NotificationPriority::NORMAL,
+                    );
+                    if ($sent > 0) {
+                        $notificationLog['warn_sent_at'] = gmdate('c');
+                        $notificationLog['warn_recipients'] = array_keys($recipients);
+                        \allocation_append_audit_log($allocationStore['allocations'][$idx], 'review_sla_due_soon_notified', 'scheduled_job', 'review_sla_due_soon_notified', [
+                            'recipients' => array_keys($recipients),
+                            'due_at' => (string)($reviewSla['due_at'] ?? ''),
+                        ]);
+                        $warned += $sent;
+                        $dirty = true;
+                        $rowDirty = true;
+                    }
+                }
+
+                if ($state === 'overdue' && trim((string)($notificationLog['overdue_sent_at'] ?? '')) === '') {
+                    $recipients = $this->resolveUsersForRoles((array)($reviewConfig['roles_allowed'] ?? []), $roleIndex);
+                    $sent = $this->notifyUsers(
+                        $notificationService,
+                        array_keys($recipients),
+                        NotificationType::OVERDUE_ALERT,
+                        "Evidence review overdue for {$recordType} {$recordId}",
+                        "Quá hạn review cho {$recordType} {$recordId}",
+                        $data,
+                        NotificationPriority::URGENT,
+                    );
+                    if ($sent > 0) {
+                        $notificationLog['overdue_sent_at'] = gmdate('c');
+                        $notificationLog['overdue_recipients'] = array_keys($recipients);
+                        \allocation_append_audit_log($allocationStore['allocations'][$idx], 'review_sla_overdue_notified', 'scheduled_job', 'review_sla_overdue_notified', [
+                            'recipients' => array_keys($recipients),
+                            'due_at' => (string)($reviewSla['due_at'] ?? ''),
+                            'overdue_hours' => (int)($reviewSla['overdue_hours'] ?? 0),
+                        ]);
+                        $overdue += $sent;
+                        $dirty = true;
+                        $rowDirty = true;
+                    }
+                }
+
+                if ($state === 'escalated' && trim((string)($notificationLog['escalated_sent_at'] ?? '')) === '') {
+                    $recipients = $this->resolveUsersForRoles((array)($reviewSla['escalation_roles'] ?? []), $roleIndex);
+                    $sent = $this->notifyUsers(
+                        $notificationService,
+                        array_keys($recipients),
+                        NotificationType::OVERDUE_ALERT,
+                        "Evidence review escalated for {$recordType} {$recordId}",
+                        "Review đã bị escalation cho {$recordType} {$recordId}",
+                        $data,
+                        NotificationPriority::URGENT,
+                    );
+                    if ($sent > 0) {
+                        $notificationLog['escalated_sent_at'] = gmdate('c');
+                        $notificationLog['escalated_recipients'] = array_keys($recipients);
+                        \allocation_append_audit_log($allocationStore['allocations'][$idx], 'review_sla_escalation_notified', 'scheduled_job', 'review_sla_escalation_notified', [
+                            'recipients' => array_keys($recipients),
+                            'escalation_roles' => array_values((array)($reviewSla['escalation_roles'] ?? [])),
+                            'escalation_due_at' => (string)($reviewSla['escalation_due_at'] ?? ''),
+                        ]);
+                        $escalated += $sent;
+                        $dirty = true;
+                        $rowDirty = true;
+                    }
+                }
+
+                if ($rowDirty) {
+                    $allocationStore['allocations'][$idx]['review_sla']['notifications'] = $notificationLog;
+                }
+            }
+
+            if ($dirty) {
+                \save_allocation_store($allocationStore);
+            }
+
+            return [
+                'warned' => $warned,
+                'overdue' => $overdue,
+                'escalated' => $escalated,
+                'allocations_scanned' => $allocationsScanned,
+            ];
+        });
+    }
+
+    /**
      * Data Purge: archive old audit logs, expire notifications.
      *
      * Removes notifications older than 90 days (already read) and
@@ -652,16 +817,17 @@ final class ScheduledJobs
      *
      * @return array{job: string, processed: int, success: int, failed: int, skipped: int, duration_ms: float}
      */
-    public function runMtconnectPollingCycle(): array
+    public function runMtconnectPollingCycle(bool $force = false, int $limit = 20): array
     {
-        return $this->executeJob('mtconnect_poll_cycle', function (): array {
+        return $this->executeJob('mtconnect_poll_cycle', function () use ($force, $limit): array {
             require_once __DIR__ . '/MtconnectPollingService.php';
 
             $service = new MtconnectPollingService($this->dataDir, dirname($this->dataDir, 2));
             $result = $service->pollAll([
                 'user_id' => 'system.mtconnect',
                 'note' => 'Scheduled MTConnect polling cycle.',
-                'force' => false,
+                'force' => $force,
+                'limit' => $limit,
                 'timeout_seconds' => 8,
             ]);
 
@@ -716,6 +882,103 @@ final class ScheduledJobs
 
             return $logEntry;
         }
+    }
+
+    /**
+     * Load API helper functions in library-only mode for cron-safe jobs.
+     */
+    private function ensureApiHelpersLoaded(): void
+    {
+        if (\function_exists('load_allocation_store') && \function_exists('mes_mtconnect_poll_batch_runtime')) {
+            return;
+        }
+        if (!\defined('API_HELPERS_ONLY')) {
+            \define('API_HELPERS_ONLY', true);
+        }
+        require_once dirname(__DIR__, 2) . '/api.php';
+    }
+
+    /**
+     * Build an index of active usernames by normalized role.
+     *
+     * @return array<string, array<int, string>>
+     */
+    private function buildActiveUserRoleIndex(): array
+    {
+        $file = $this->dataDir . '/config/users.json';
+        if (!is_file($file)) {
+            return [];
+        }
+        $raw = file_get_contents($file);
+        $data = is_string($raw) ? json_decode($raw, true) : null;
+        $index = [];
+        foreach ((array)($data['users'] ?? []) as $user) {
+            if (!is_array($user) || empty($user['active'])) {
+                continue;
+            }
+            $username = strtolower(trim((string)($user['username'] ?? '')));
+            if ($username === '') {
+                continue;
+            }
+            $roles = is_array($user['roles'] ?? null) ? $user['roles'] : [(string)($user['role'] ?? '')];
+            foreach ($roles as $role) {
+                $normalizedRole = strtolower(trim((string)$role));
+                if ($normalizedRole === '') {
+                    continue;
+                }
+                $index[$normalizedRole] = $index[$normalizedRole] ?? [];
+                if (!in_array($username, $index[$normalizedRole], true)) {
+                    $index[$normalizedRole][] = $username;
+                }
+            }
+        }
+        return $index;
+    }
+
+    /**
+     * Resolve unique usernames for a set of allowed roles.
+     *
+     * @param array<int, string> $roles
+     * @param array<string, array<int, string>> $roleIndex
+     * @return array<string, string>
+     */
+    private function resolveUsersForRoles(array $roles, array $roleIndex): array
+    {
+        $recipients = [];
+        foreach ($roles as $role) {
+            $normalizedRole = strtolower(trim((string)$role));
+            foreach ((array)($roleIndex[$normalizedRole] ?? []) as $username) {
+                $recipients[$username] = $username;
+            }
+        }
+        return $recipients;
+    }
+
+    /**
+     * Send one notification payload to many users.
+     *
+     * @param array<int, string> $usernames
+     * @param array<string, mixed> $data
+     */
+    private function notifyUsers(
+        NotificationService $notificationService,
+        array $usernames,
+        NotificationType $type,
+        string $message,
+        string $messageVi,
+        array $data,
+        NotificationPriority $priority,
+    ): int {
+        $count = 0;
+        foreach ($usernames as $username) {
+            $username = strtolower(trim((string)$username));
+            if ($username === '') {
+                continue;
+            }
+            $notificationService->notify($username, $type, $message, $data, $priority, $messageVi);
+            $count++;
+        }
+        return $count;
     }
 
     /**

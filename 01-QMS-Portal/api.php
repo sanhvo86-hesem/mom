@@ -4740,6 +4740,374 @@ function mes_append_connectivity_event(array &$mes, array $event): array {
   return $saved;
 }
 
+function mes_find_mtconnect_adapter(array $master, string $machineId = '', string $adapterId = ''): array {
+  $machineId = trim($machineId);
+  $adapterId = trim($adapterId);
+  $machines = master_index_by((array)($master['machines'] ?? []), 'machine_id');
+  $adapter = null;
+
+  if ($adapterId !== '') {
+    foreach ((array)($master['mes_connectivity_adapters'] ?? []) as $row) {
+      if (!is_array($row) || (string)($row['adapter_id'] ?? '') !== $adapterId) continue;
+      $adapter = $row;
+      break;
+    }
+    if (is_array($adapter) && $machineId === '') {
+      $machineId = trim((string)($adapter['machine_id'] ?? ''));
+    }
+  }
+
+  $machine = $machines[$machineId] ?? null;
+  if (!is_array($adapter) && $machineId !== '') {
+    foreach ((array)($master['mes_connectivity_adapters'] ?? []) as $row) {
+      if (!is_array($row) || (string)($row['machine_id'] ?? '') !== $machineId) continue;
+      if (strtolower(trim((string)($row['adapter_type'] ?? ''))) !== 'mtconnect') continue;
+      $adapter = $row;
+      break;
+    }
+  }
+
+  return [
+    'machine_id' => $machineId,
+    'machine' => is_array($machine) ? $machine : null,
+    'adapter' => is_array($adapter) ? $adapter : null,
+    'machines' => $machines,
+  ];
+}
+
+function mes_mtconnect_poll_interval_seconds(array $adapter, array $machine = []): int {
+  $candidate = (int)($adapter['poll_interval_seconds'] ?? $machine['poll_interval_seconds'] ?? 0);
+  if ($candidate <= 0) {
+    $candidate = max(30, min(300, (int)($adapter['heartbeat_sla_seconds'] ?? $machine['heartbeat_sla_seconds'] ?? 120)));
+  }
+  return max(15, min(3600, $candidate));
+}
+
+function mes_mtconnect_latest_event(array $mes, string $machineId, string $adapterId = ''): ?array {
+  $latest = null;
+  foreach ((array)($mes['mes_connectivity_events'] ?? []) as $row) {
+    if (!is_array($row)) continue;
+    if ($machineId !== '' && (string)($row['machine_id'] ?? '') !== $machineId) continue;
+    if ($adapterId !== '' && (string)($row['adapter_id'] ?? '') !== $adapterId) continue;
+    $eventType = strtolower(trim((string)($row['event_type'] ?? '')));
+    if ($eventType !== '' && !str_contains($eventType, 'poll')) continue;
+    if ($latest === null || strcmp((string)($row['event_time'] ?? ''), (string)($latest['event_time'] ?? '')) > 0) {
+      $latest = $row;
+    }
+  }
+  return $latest;
+}
+
+function mes_mtconnect_poll_due_state(array $mes, array $adapter, array $machine, bool $force = false): array {
+  $intervalSeconds = mes_mtconnect_poll_interval_seconds($adapter, $machine);
+  $machineId = trim((string)($machine['machine_id'] ?? $adapter['machine_id'] ?? ''));
+  $adapterId = trim((string)($adapter['adapter_id'] ?? ''));
+  $latestEvent = mes_mtconnect_latest_event($mes, $machineId, $adapterId);
+  $lastPolledAt = trim((string)($latestEvent['event_time'] ?? ''));
+  $nowTs = time();
+
+  if ($force || $lastPolledAt === '') {
+    return [
+      'due' => true,
+      'reason' => $lastPolledAt === '' ? 'never_polled' : 'forced',
+      'interval_seconds' => $intervalSeconds,
+      'last_polled_at' => $lastPolledAt,
+      'next_due_at' => $lastPolledAt === '' ? now_iso() : $lastPolledAt,
+    ];
+  }
+
+  $lastTs = strtotime($lastPolledAt);
+  if ($lastTs === false) {
+    return [
+      'due' => true,
+      'reason' => 'invalid_last_poll_timestamp',
+      'interval_seconds' => $intervalSeconds,
+      'last_polled_at' => $lastPolledAt,
+      'next_due_at' => now_iso(),
+    ];
+  }
+
+  $nextDueTs = $lastTs + $intervalSeconds;
+  return [
+    'due' => $nextDueTs <= $nowTs,
+    'reason' => $nextDueTs <= $nowTs ? 'interval_elapsed' : 'interval_not_elapsed',
+    'interval_seconds' => $intervalSeconds,
+    'last_polled_at' => $lastPolledAt,
+    'next_due_at' => gmdate('c', $nextDueTs),
+  ];
+}
+
+function mes_mtconnect_poll_machine(array &$orders, array &$master, array &$mes, string $username, array $body = []): array {
+  $machineId = trim((string)($body['machine_id'] ?? ''));
+  $adapterId = trim((string)($body['adapter_id'] ?? ''));
+  $operators = master_index_by((array)($master['operators'] ?? []), 'operator_id');
+  $bundle = mes_find_mtconnect_adapter($master, $machineId, $adapterId);
+  $machineId = trim((string)($bundle['machine_id'] ?? $machineId));
+  $machine = is_array($bundle['machine'] ?? null) ? $bundle['machine'] : null;
+  $adapter = is_array($bundle['adapter'] ?? null) ? $bundle['adapter'] : null;
+
+  if ($machineId === '') {
+    return ['ok' => false, 'status_code' => 400, 'error' => 'missing_machine_id'];
+  }
+  if (!is_array($machine)) {
+    observe_connector_ingest($machineId, false, 'machine_not_found', ['action' => 'mes_mtconnect_poll_once']);
+    return ['ok' => false, 'status_code' => 404, 'error' => 'machine_not_found'];
+  }
+  if (!is_array($adapter)) {
+    observe_connector_ingest($machineId, false, 'adapter_not_found', ['action' => 'mes_mtconnect_poll_once']);
+    return ['ok' => false, 'status_code' => 404, 'error' => 'adapter_not_found'];
+  }
+
+  $adapterType = strtolower(trim((string)($adapter['adapter_type'] ?? $machine['connector_type'] ?? '')));
+  if ($adapterType !== 'mtconnect') {
+    observe_connector_ingest($machineId, false, 'adapter_type_not_supported', [
+      'action' => 'mes_mtconnect_poll_once',
+      'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
+      'adapter_type' => $adapterType,
+    ]);
+    return ['ok' => false, 'status_code' => 422, 'error' => 'adapter_type_not_supported'];
+  }
+  if (strtolower(trim((string)($adapter['status'] ?? 'active'))) !== 'active') {
+    observe_connector_ingest($machineId, false, 'adapter_not_active', [
+      'action' => 'mes_mtconnect_poll_once',
+      'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
+    ]);
+    return ['ok' => false, 'status_code' => 409, 'error' => 'adapter_not_active'];
+  }
+
+  $pollUrl = '';
+  try {
+    $pollUrl = mes_mtconnect_poll_url((string)($body['endpoint_url'] ?? $adapter['endpoint_url'] ?? $machine['connector_endpoint'] ?? ''));
+    $timeoutSeconds = min(30, max(3, (int)($body['timeout_seconds'] ?? $adapter['timeout_seconds'] ?? 10)));
+    $xml = mes_http_fetch_text($pollUrl, $timeoutSeconds);
+    $normalized = edge_connector_service()->normalize([
+      'machine_id' => $machineId,
+      'connector_type' => 'mtconnect',
+      'connector_name' => (string)($adapter['adapter_name'] ?? $machine['connector_name'] ?? 'MTConnect Adapter'),
+      'connector_endpoint' => $pollUrl,
+      'telemetry_mode' => (string)($machine['telemetry_mode'] ?? 'machine'),
+      'source' => 'mtconnect',
+      'heartbeat_sla_seconds' => (int)($adapter['heartbeat_sla_seconds'] ?? $machine['heartbeat_sla_seconds'] ?? 120),
+      'wo_number' => trim((string)($body['wo_number'] ?? '')),
+      'operator_id' => trim((string)($body['operator_id'] ?? '')),
+      'note' => trim((string)($body['note'] ?? 'Polled once from MTConnect adapter.')),
+      'mtconnect_xml' => $xml,
+    ], $machine, $username);
+  } catch (Throwable $e) {
+    $savedEvent = mes_append_connectivity_event($mes, [
+      'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
+      'machine_id' => $machineId,
+      'event_time' => now_iso(),
+      'event_type' => 'mtconnect_poll_failed',
+      'severity' => 'WARNING',
+      'status' => 'open',
+      'message' => 'MTConnect poll failed: ' . $e->getMessage(),
+      'payload_excerpt' => [
+        'endpoint_url' => $pollUrl !== '' ? $pollUrl : (string)($adapter['endpoint_url'] ?? ''),
+      ],
+      'recorded_by' => $username,
+      'recorded_at' => now_iso(),
+    ]);
+    observe_connector_ingest($machineId, false, $e->getMessage(), [
+      'action' => 'mes_mtconnect_poll_once',
+      'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
+      'poll_url' => $pollUrl,
+    ]);
+    $code = str_starts_with($e->getMessage(), 'connector_http_') ? 502 : 422;
+    return [
+      'ok' => false,
+      'status_code' => $code,
+      'error' => $e->getMessage(),
+      'poll_url' => $pollUrl,
+      'event' => $savedEvent,
+    ];
+  }
+
+  $woNumber = trim((string)($normalized['wo_number'] ?? ''));
+  if ($woNumber !== '') {
+    $wo = find_order_record($orders, 'wo', $woNumber);
+    if (!$wo) {
+      observe_connector_ingest($machineId, false, 'work_order_not_found', ['action' => 'mes_mtconnect_poll_once', 'wo_number' => $woNumber]);
+      return ['ok' => false, 'status_code' => 404, 'error' => 'work_order_not_found'];
+    }
+    $woMachineId = trim((string)($wo['machine_id'] ?? ''));
+    if ($woMachineId !== '' && $woMachineId !== $machineId) {
+      observe_connector_ingest($machineId, false, 'wo_machine_mismatch', ['action' => 'mes_mtconnect_poll_once', 'wo_number' => $woNumber, 'wo_machine_id' => $woMachineId]);
+      return ['ok' => false, 'status_code' => 409, 'error' => 'wo_machine_mismatch'];
+    }
+  }
+
+  $operatorId = trim((string)($normalized['operator_id'] ?? ''));
+  if ($operatorId !== '' && !isset($operators[$operatorId])) {
+    observe_connector_ingest($machineId, false, 'operator_not_found', ['action' => 'mes_mtconnect_poll_once', 'operator_id' => $operatorId]);
+    return ['ok' => false, 'status_code' => 404, 'error' => 'operator_not_found'];
+  }
+
+  $signalGuard = mes_signal_replay_guard($mes, $machine, $normalized);
+  if ($signalGuard) {
+    observe_connector_ingest($machineId, false, 'stale_signal_timestamp', [
+      'action' => 'mes_mtconnect_poll_once',
+      'incoming_signal_at' => (string)($signalGuard['incoming_signal_at'] ?? ''),
+      'latest_signal_at' => (string)($signalGuard['latest_signal_at'] ?? ''),
+      'connector_type' => (string)($signalGuard['connector_type'] ?? ''),
+      'wo_number' => $woNumber,
+    ]);
+    $signalGuard['ok'] = false;
+    $signalGuard['status_code'] = 409;
+    return $signalGuard;
+  }
+
+  $saved = mes_upsert_connector_runtime($mes, $machine, $normalized, $username);
+  $savedEvent = mes_append_connectivity_event($mes, [
+    'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
+    'machine_id' => $machineId,
+    'event_time' => now_iso(),
+    'event_type' => 'mtconnect_poll_ok',
+    'severity' => 'INFO',
+    'status' => 'closed',
+    'message' => 'MTConnect payload polled and ingested successfully.',
+    'payload_excerpt' => [
+      'endpoint_url' => $pollUrl,
+      'signal_at' => (string)($saved['signal']['signal_at'] ?? ''),
+      'program_id' => (string)($saved['signal']['current_program_id'] ?? ''),
+    ],
+    'recorded_by' => $username,
+    'recorded_at' => now_iso(),
+  ]);
+  observe_connector_ingest($machineId, true, 'MTConnect poll completed.', [
+    'action' => 'mes_mtconnect_poll_once',
+    'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
+    'connector_type' => (string)($saved['feed']['connector_type'] ?? ''),
+    'wo_number' => $woNumber,
+    'warning_count' => count((array)($saved['ingest_warnings'] ?? [])),
+    'source_payload_type' => (string)($normalized['_ingest']['source_payload_type'] ?? ''),
+  ]);
+
+  return [
+    'ok' => true,
+    'poll_url' => $pollUrl,
+    'machine_id' => $machineId,
+    'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
+    'signal' => $saved['signal'],
+    'feed' => $saved['feed'],
+    'event' => $savedEvent,
+    'ingest_warnings' => array_values((array)($saved['ingest_warnings'] ?? [])),
+    'data' => build_mes_snapshot($orders, $master, $mes),
+  ];
+}
+
+function mes_mtconnect_poll_batch_runtime(array &$orders, array &$master, array &$mes, string $username, array $options = []): array {
+  $machineFilter = trim((string)($options['machine_id'] ?? ''));
+  $adapterFilter = trim((string)($options['adapter_id'] ?? ''));
+  $force = (bool)($options['force'] ?? false);
+  $dueOnly = array_key_exists('due_only', $options) ? (bool)$options['due_only'] : true;
+  $limit = max(1, min(50, (int)($options['limit'] ?? 20)));
+  $rows = [];
+  $successCount = 0;
+  $failedCount = 0;
+  $skippedCount = 0;
+  $processed = 0;
+
+  $machineIndex = master_index_by((array)($master['machines'] ?? []), 'machine_id');
+  foreach ((array)($master['mes_connectivity_adapters'] ?? []) as $adapter) {
+    if (!is_array($adapter)) continue;
+    if ($machineFilter !== '' && trim((string)($adapter['machine_id'] ?? '')) !== $machineFilter) continue;
+    if ($adapterFilter !== '' && trim((string)($adapter['adapter_id'] ?? '')) !== $adapterFilter) continue;
+    if (strtolower(trim((string)($adapter['adapter_type'] ?? ''))) !== 'mtconnect') continue;
+    if (strtolower(trim((string)($adapter['status'] ?? 'active'))) !== 'active') continue;
+
+    $machineId = trim((string)($adapter['machine_id'] ?? ''));
+    $machine = is_array($machineIndex[$machineId] ?? null) ? $machineIndex[$machineId] : [];
+    $dueState = mes_mtconnect_poll_due_state($mes, $adapter, $machine, $force);
+    if ($dueOnly && !($dueState['due'] ?? false)) {
+      $skippedCount++;
+      $rows[] = [
+        'machine_id' => $machineId,
+        'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
+        'ok' => true,
+        'skipped' => true,
+        'reason' => (string)($dueState['reason'] ?? 'interval_not_elapsed'),
+        'last_polled_at' => (string)($dueState['last_polled_at'] ?? ''),
+        'next_due_at' => (string)($dueState['next_due_at'] ?? ''),
+        'interval_seconds' => (int)($dueState['interval_seconds'] ?? 60),
+      ];
+      continue;
+    }
+
+    $processed++;
+    $result = mes_mtconnect_poll_machine($orders, $master, $mes, $username, [
+      'machine_id' => $machineId,
+      'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
+      'timeout_seconds' => (int)($options['timeout_seconds'] ?? 10),
+      'note' => trim((string)($options['note'] ?? 'Batch MTConnect polling cycle.')),
+    ]);
+
+    if ($result['ok'] ?? false) {
+      $successCount++;
+    } else {
+      $failedCount++;
+    }
+
+    $rows[] = array_merge([
+      'machine_id' => $machineId,
+      'adapter_id' => (string)($adapter['adapter_id'] ?? ''),
+      'skipped' => false,
+      'last_polled_at' => (string)($dueState['last_polled_at'] ?? ''),
+      'next_due_at' => (string)($dueState['next_due_at'] ?? ''),
+      'interval_seconds' => (int)($dueState['interval_seconds'] ?? 60),
+    ], $result);
+
+    if ($processed >= $limit) break;
+  }
+
+  return [
+    'ok' => true,
+    'processed_count' => $processed,
+    'success_count' => $successCount,
+    'failed_count' => $failedCount,
+    'skipped_count' => $skippedCount,
+    'rows' => $rows,
+    'data' => build_mes_snapshot($orders, $master, $mes),
+  ];
+}
+
+function mes_pg_notify_channels(): array {
+  return ['mes_telemetry', 'mes_alarm', 'mes_downtime'];
+}
+
+function mes_pg_open_notify_stream(): ?array {
+  try {
+    require_once __DIR__ . '/database/Connection.php';
+    $connection = \HESEM\QMS\Database\Connection::getInstance();
+    $pdo = $connection->getPdo();
+    if (!method_exists($pdo, 'pgsqlGetNotify')) {
+      return null;
+    }
+    foreach (mes_pg_notify_channels() as $channel) {
+      $pdo->exec('LISTEN ' . $channel);
+    }
+    return ['pdo' => $pdo, 'channels' => mes_pg_notify_channels()];
+  } catch (Throwable) {
+    return null;
+  }
+}
+
+function mes_pg_wait_for_notify($pdo, int $timeoutMs = 1000): ?array {
+  if (!is_object($pdo) || !method_exists($pdo, 'pgsqlGetNotify')) return null;
+  try {
+    $result = $pdo->pgsqlGetNotify(\PDO::FETCH_ASSOC, max(0, $timeoutMs));
+  } catch (Throwable) {
+    return null;
+  }
+  if (!is_array($result) || empty($result['message'])) return null;
+  $payload = json_decode((string)$result['message'], true);
+  return [
+    'channel' => (string)($result['channel'] ?? ''),
+    'pid' => (int)($result['pid'] ?? 0),
+    'payload' => is_array($payload) ? $payload : ['raw' => (string)$result['message']],
+  ];
+}
+
 function mes_governance_blockers_for_dispatch(array $dispatchRow): array {
   $blockers = [];
 
@@ -7136,6 +7504,17 @@ function evidence_user_can_review(array $schema, array $user): bool {
   return false;
 }
 
+function evidence_signature_meaning_normalize(string $meaning, string $fallback = 'approved'): string {
+  $normalized = strtolower(trim($meaning));
+  if (in_array($normalized, ['approved', 'reviewed', 'rejected', 'witnessed'], true)) {
+    return $normalized;
+  }
+  $fallbackNormalized = strtolower(trim($fallback));
+  return in_array($fallbackNormalized, ['approved', 'reviewed', 'rejected', 'witnessed'], true)
+    ? $fallbackNormalized
+    : 'approved';
+}
+
 function evidence_normalize_approval_records(array $allocation): array {
   $records = is_array($allocation['approval_records'] ?? null) ? $allocation['approval_records'] : [];
   if (empty($records) && trim((string)($allocation['approved_by'] ?? '')) !== '') {
@@ -7144,6 +7523,7 @@ function evidence_normalize_approval_records(array $allocation): array {
       'display_name' => (string)($allocation['approved_by'] ?? ''),
       'approved_at' => (string)($allocation['approved_at'] ?? ''),
       'reason' => (string)($allocation['approval_reason'] ?? ''),
+      'meaning' => 'approved',
       'roles' => [],
       'signature' => is_array($allocation['approval_signature'] ?? null) ? $allocation['approval_signature'] : null,
     ];
@@ -7160,6 +7540,7 @@ function evidence_normalize_approval_records(array $allocation): array {
       'display_name' => trim((string)($record['display_name'] ?? $record['signer_name'] ?? $record['username'] ?? $username)),
       'approved_at' => trim((string)($record['approved_at'] ?? $record['signed_at'] ?? $allocation['approved_at'] ?? '')),
       'reason' => trim((string)($record['reason'] ?? '')),
+      'meaning' => evidence_signature_meaning_normalize((string)($record['meaning'] ?? $record['decision'] ?? 'approved')),
       'roles' => array_values(array_unique(array_values(array_filter(array_map(
         static fn($role) => strtolower(trim((string)$role)),
         is_array($record['roles'] ?? null) ? $record['roles'] : []
@@ -7203,6 +7584,7 @@ function evidence_approval_summary(array $allocation, array $schema): array {
         'display_name' => (string)($record['display_name'] ?? ''),
         'approved_at' => (string)($record['approved_at'] ?? ''),
         'reason' => (string)($record['reason'] ?? ''),
+        'meaning' => evidence_signature_meaning_normalize((string)($record['meaning'] ?? 'approved')),
         'roles' => array_values((array)($record['roles'] ?? [])),
       ];
     }, $records),
@@ -14321,15 +14703,19 @@ if ($username === '') {
     $lastHash = '';
     $runtimeMode = runtime_data_layer_summary();
     $streamMode = mes_runtime_supports_live_stream($runtimeMode) ? 'live' : 'polling_fallback';
+    $notifyStream = $streamMode === 'live' ? mes_pg_open_notify_stream() : null;
+    $liveEventSource = $notifyStream ? 'postgres_notify' : 'snapshot_poll';
 
     api_stream_event('ready', [
       'ok' => true,
       'stream' => 'mes_stream',
       'stream_mode' => $streamMode,
+      'live_event_source' => $liveEventSource,
       'interval_ms' => $intervalMs,
       'ticks' => $tickCount,
       'recommended_interval_ms' => $streamMode === 'live' ? $intervalMs : 30000,
       'runtime_mode' => $runtimeMode,
+      'notify_channels' => $notifyStream ? array_values((array)($notifyStream['channels'] ?? [])) : [],
       'started_at' => now_iso(),
     ]);
 
@@ -14359,6 +14745,11 @@ if ($username === '') {
         break;
       }
 
+      $notify = null;
+      if ($notifyStream && isset($notifyStream['pdo'])) {
+        $notify = mes_pg_wait_for_notify($notifyStream['pdo'], $intervalMs);
+      }
+
       $bundle = runtime_read_model_bundle(true);
       $orders = $bundle['orders'];
       $master = $bundle['master'];
@@ -14373,6 +14764,9 @@ if ($username === '') {
         'exceptions' => $exceptions,
         'read_sources' => $bundle['sources'],
         'runtime_mode' => $bundle['runtime_mode'],
+        'live_event_source' => $liveEventSource,
+        'trigger' => $notify ? 'postgres_notify' : 'snapshot_refresh',
+        'notify' => $notify,
         'streamed_at' => now_iso(),
       ];
 
@@ -14399,10 +14793,12 @@ if ($username === '') {
           'streamed_at' => now_iso(),
           'runtime_mode' => $bundle['runtime_mode'],
           'read_sources' => $bundle['sources'],
+          'live_event_source' => $liveEventSource,
+          'notify' => $notify,
         ]);
       }
 
-      if ($tick < ($tickCount - 1)) {
+      if (!$notifyStream && $tick < ($tickCount - 1)) {
         usleep($intervalMs * 1000);
       }
     }
@@ -16765,6 +17161,10 @@ if ($username === '') {
     $reviewAction = strtolower(trim((string)($body['action'] ?? '')));
     $reason = trim((string)($body['reason'] ?? ''));
     $signatureData = is_array($body['signature_data'] ?? null) ? $body['signature_data'] : null;
+    $signatureMeaning = evidence_signature_meaning_normalize(
+      (string)($body['signature_meaning'] ?? ''),
+      $reviewAction === 'reject' ? 'rejected' : 'approved'
+    );
 
     if ($allocationId === '') api_json(['ok' => false, 'error' => 'missing_allocation_id'], 400);
     if (!in_array($reviewAction, ['approve', 'reject'], true)) {
@@ -16819,6 +17219,7 @@ if ($username === '') {
           'display_name' => trim((string)($me['display_name'] ?? $me['name'] ?? $username)),
           'approved_at' => now_iso(),
           'reason' => $reason,
+          'meaning' => $signatureMeaning,
           'roles' => $userRoles,
           'signature' => $signatureData,
         ];
@@ -16843,6 +17244,7 @@ if ($username === '') {
           $allocation['review_closed_at'] = now_iso();
           allocation_append_event($allocation, 'approved', $username, $reason ?: 'evidence_approved_parallel', [
             'approval_mode' => 'parallel',
+            'signature_meaning' => $signatureMeaning,
             'collected_approvals' => (int)($approvalSummary['collected_approvals'] ?? 0),
             'required_approvals' => (int)($approvalSummary['minimum_approvals'] ?? 1),
             'signature_hash' => is_array($signatureData) ? (string)($signatureData['hash'] ?? '') : '',
@@ -16851,6 +17253,7 @@ if ($username === '') {
         } else {
           allocation_append_event($allocation, 'in_review', $username, $reason ?: ($updatedExisting ? 'evidence_parallel_approval_updated' : 'evidence_parallel_approval_recorded'), [
             'approval_mode' => 'parallel',
+            'signature_meaning' => $signatureMeaning,
             'collected_approvals' => (int)($approvalSummary['collected_approvals'] ?? 0),
             'required_approvals' => (int)($approvalSummary['minimum_approvals'] ?? 1),
             'signature_hash' => is_array($signatureData) ? (string)($signatureData['hash'] ?? '') : '',
@@ -16866,6 +17269,7 @@ if ($username === '') {
           'display_name' => trim((string)($me['display_name'] ?? $me['name'] ?? $username)),
           'approved_at' => now_iso(),
           'reason' => $reason,
+          'meaning' => $signatureMeaning,
           'roles' => evidence_user_roles($me),
           'signature' => $signatureData,
         ]];
@@ -16876,6 +17280,7 @@ if ($username === '') {
         $allocation['review_closed_at'] = now_iso();
         allocation_append_event($allocation, 'approved', $username, $reason ?: 'evidence_approved', [
           'approval_mode' => 'serial',
+          'signature_meaning' => $signatureMeaning,
           'signature_hash' => is_array($signatureData) ? (string)($signatureData['hash'] ?? '') : '',
           'signature_signer' => is_array($signatureData) ? (string)($signatureData['signerName'] ?? '') : '',
         ]);
