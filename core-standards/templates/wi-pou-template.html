@@ -11,6 +11,8 @@
 .step-block h3 { margin: 0 0 8px; font-size: 16px; line-height: 1.4; }
 .step-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; margin-top: 10px; }
 .step-meta div { border: 1px solid var(--ln); border-radius: var(--r); padding: 10px 12px; background: #f8fafc; }
+.step-visual { border: 1px dashed #94a3b8; border-radius: 8px; padding: 12px; margin-top: 10px; background: #fcfdff; }
+.step-visual p { margin: 6px 0 0; font-size: 12px; color: var(--ink2); }
 .note-soft { border-left: 4px solid #eab308; background: #fffbeb; padding: 12px 14px; border-radius: 8px; margin: 10px 0; }
 .callout-stop { border-left: 4px solid #dc2626; background: #fef2f2; padding: 12px 14px; border-radius: 8px; margin: 10px 0; }
 .doc-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
@@ -86,11 +88,18 @@
         <h2>5. Cac buoc thuc hien</h2>
 
         <!-- Muc tieu: toi da 12 step cho 1 flow chinh, 1 action/step, 2 dong text ngan/step. -->
+        <!-- Neu vuot 12 step, tach WI hoac day matrix/spec/rule sang ANNEX thay vi keo dai thao tac. -->
+        <!-- Neu step co rui ro cao, phai chen anh/chup man hinh/so do tai cho trong .step-visual. -->
 
         <div class="step-block">
           <h3>Buoc 1 - {{TEN_BUOC}}</h3>
           <p>{{HANH_DONG_1_CAU}}</p>
           <div class="note-soft"><strong>Ly do:</strong> {{RISK_CUE_12_15_TU}}</div>
+          <div class="step-visual">
+            <strong>Visual neu step rui ro cao</strong><br>
+            {{PHOTO_OR_SKETCH_PLACEHOLDER}}
+            <p>Them anh, chup man hinh hoac so do co mui ten chi diem dung, diem sai va cue STOP neu co.</p>
+          </div>
           <div class="step-meta">
             <div><strong>PASS khi</strong><br>{{PASS_CUE}}</div>
             <div><strong>FAIL thi</strong><br>{{FAIL_REACTION}}</div>
@@ -103,6 +112,11 @@
           <h3>Buoc 2 - {{TEN_BUOC}}</h3>
           <p>{{HANH_DONG_1_CAU}}</p>
           <div class="note-soft"><strong>Ly do:</strong> {{RISK_CUE_12_15_TU}}</div>
+          <div class="step-visual">
+            <strong>Visual neu step rui ro cao</strong><br>
+            {{PHOTO_OR_SKETCH_PLACEHOLDER}}
+            <p>Bo placeholder nay neu step khong can visual, nhung khong duoc bo qua voi step de sai lot, sai nhan, sai chieu hoac gate stop.</p>
+          </div>
           <div class="step-meta">
             <div><strong>PASS khi</strong><br>{{PASS_CUE}}</div>
             <div><strong>FAIL thi</strong><br>{{FAIL_REACTION}}</div>

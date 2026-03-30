@@ -1204,7 +1204,7 @@
     "code": "ANNEX-701",
     "series": "ANNEX-700",
     "path": "03-Tai-Lieu-Van-Hanh/03-Reference/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html",
-    "title": "ANNEX-701 — Từ điển dữ liệu GS1/SSCC, quy tắc cấp mã và đối soát kiện hàng | HESEM QMS",
+    "title": "ANNEX-701 — Từ điển dữ liệu GS1/SSCC và điều kiện đối soát kiện hàng | HESEM QMS",
     "target_archetype": "Dictionary Annex",
     "recommended_action": "KEEP_CANONICAL",
     "priority": "P2",

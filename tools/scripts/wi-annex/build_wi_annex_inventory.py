@@ -94,6 +94,27 @@ def default_action() -> tuple[str, str, str]:
     return "KEEP", "P2", "Baseline review required by archetype."
 
 
+def wave_assignment(series: str) -> str:
+    mapping = {
+        "WI-700": "Wave 1",
+        "ANNEX-700": "Wave 1",
+        "WI-500": "Wave 2",
+        "ANNEX-500": "Wave 2",
+        "WI-600": "Wave 3",
+        "ANNEX-600": "Wave 3",
+        "WI-200": "Wave 4",
+        "ANNEX-300": "Wave 4",
+        "WI-100": "Wave 5",
+        "ANNEX-100": "Wave 5",
+        "WI-800": "Wave 6",
+        "WI-900": "Wave 6",
+        "ANNEX-800": "Wave 6",
+    }
+    if series == "ANNEX-400":
+        return "Wave TBD"
+    return mapping.get(series, "Wave TBD")
+
+
 def build_rows(root: Path) -> list[dict[str, str | bool | int]]:
     wi_files = walk_html_files(root / WI_ROOT)
     annex_files = walk_html_files(root / ANNEX_ROOT)
@@ -187,6 +208,7 @@ def build_decision_log_rows(rows: list[dict[str, str | bool | int]]) -> list[dic
                 "code": str(row["code"]),
                 "family": str(row["family"]),
                 "series": str(row["series"]),
+                "wave_assignment": wave_assignment(str(row["series"])),
                 "target_archetype": str(row["target_archetype"]),
                 "recommended_action": str(row["recommended_action"]),
                 "priority": str(row["priority"]),
