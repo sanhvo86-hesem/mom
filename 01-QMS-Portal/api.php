@@ -4278,6 +4278,22 @@ function mes_governance_blockers_for_dispatch(array $dispatchRow): array {
     ];
   }
 
+  $materialGenealogy = (array)($dispatchRow['material_genealogy'] ?? []);
+  if (empty($material['blocker']) && !empty($materialGenealogy)) {
+    $genealogySeverity = (string)($materialGenealogy['severity'] ?? '');
+    if ($genealogySeverity === '' && !empty($materialGenealogy['issue_codes'])) $genealogySeverity = 'critical';
+    elseif ($genealogySeverity === '' && !empty($materialGenealogy['warning_codes'])) $genealogySeverity = 'warning';
+    if ($genealogySeverity !== '') {
+      $blockers[] = [
+        'code' => 'material_genealogy_incomplete',
+        'severity' => $genealogySeverity,
+        'message_vi' => (string)($materialGenealogy['message_vi'] ?? 'Genealogy vật liệu hoặc thành phẩm chưa khép kín để mở WO này.'),
+        'message_en' => (string)($materialGenealogy['message_en'] ?? 'Material or finished-part genealogy is not closed for this WO.'),
+        'detail' => $materialGenealogy,
+      ];
+    }
+  }
+
   $connector = (array)($dispatchRow['connector_guard'] ?? []);
   if (!empty($connector['blocker'])) {
     $blockers[] = [
@@ -4333,6 +4349,22 @@ function mes_governance_blockers_for_dispatch(array $dispatchRow): array {
     ];
   }
 
+  $shiftHandover = (array)($dispatchRow['shift_handover'] ?? []);
+  if (!empty($shiftHandover)) {
+    $handoverSeverity = (string)($shiftHandover['severity'] ?? '');
+    if ($handoverSeverity === '' && !empty($shiftHandover['issue_codes'])) $handoverSeverity = 'critical';
+    elseif ($handoverSeverity === '' && !empty($shiftHandover['warning_codes'])) $handoverSeverity = 'warning';
+    if ($handoverSeverity !== '') {
+      $blockers[] = [
+        'code' => 'shift_handover_incomplete',
+        'severity' => $handoverSeverity,
+        'message_vi' => (string)($shiftHandover['message_vi'] ?? 'Bàn giao ca chưa hợp lệ hoặc chưa được xác nhận để mở WO này.'),
+        'message_en' => (string)($shiftHandover['message_en'] ?? 'Shift handover is not valid or not acknowledged for this WO.'),
+        'detail' => $shiftHandover,
+      ];
+    }
+  }
+
   return $blockers;
 }
 
@@ -4356,11 +4388,13 @@ function mes_wo_transition_guard(array $orders, array $master, array $mes, strin
     'tool_readiness' => (array)($dispatchRow['tool_readiness'] ?? []),
     'operator_governance' => (array)($dispatchRow['operator_governance'] ?? []),
     'material_trace' => (array)($dispatchRow['material_trace'] ?? []),
+    'material_genealogy' => (array)($dispatchRow['material_genealogy'] ?? []),
     'connector_guard' => (array)($dispatchRow['connector_guard'] ?? []),
     'adapter_governance' => (array)($dispatchRow['adapter_governance'] ?? []),
     'alarm_runtime' => (array)($dispatchRow['alarm_runtime'] ?? []),
     'nc_download' => (array)($dispatchRow['nc_download'] ?? []),
     'tool_offset' => (array)($dispatchRow['tool_offset'] ?? []),
+    'shift_handover' => (array)($dispatchRow['shift_handover'] ?? []),
   ];
   observe_wo_launch_blocked($woNumber, $targetStatus, $blockers, $snapshotContext);
 
@@ -5786,6 +5820,22 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $adapterGovernanceQueue = mes_build_adapter_governance_queue($machineWall);
   $alarmHotspotQueue = mes_build_alarm_hotspot_queue($machineWall);
   $shiftHandoverQueue = mes_build_shift_handover_queue($machineWall, $latestShiftHandoverByMachine, $shiftPatterns, $currentShift, $now);
+  $materialGenealogyByWo = master_index_by($materialGenealogyQueue, 'wo_number');
+  $shiftHandoverByMachineQueue = master_index_by($shiftHandoverQueue, 'machine_id');
+  foreach ($dispatch as &$dispatchRow) {
+    if (!is_array($dispatchRow)) continue;
+    $dispatchRow['material_genealogy'] = (array)($materialGenealogyByWo[(string)($dispatchRow['wo_number'] ?? '')] ?? []);
+    $dispatchRow['shift_handover'] = (array)($shiftHandoverByMachineQueue[(string)($dispatchRow['machine_id'] ?? '')] ?? []);
+  }
+  unset($dispatchRow);
+  foreach ($machineWall as &$machineRow) {
+    if (!is_array($machineRow)) continue;
+    $activeWoNumber = (string)($machineRow['active_work_order']['wo_number'] ?? '');
+    $machineId = (string)($machineRow['machine_id'] ?? '');
+    $machineRow['material_genealogy'] = (array)($materialGenealogyByWo[$activeWoNumber] ?? []);
+    $machineRow['shift_handover'] = (array)($shiftHandoverByMachineQueue[$machineId] ?? []);
+  }
+  unset($machineRow);
   $observability = load_runtime_observability_store();
   $runtimeMode = runtime_data_layer_summary();
   $shadowSyncFailures = mes_shadow_failure_rows($observability);
@@ -12818,6 +12868,7 @@ if ($username === '') {
       ],
       'shadow_status' => (array)($snapshot['shadow_status'] ?? []),
       'connector_ingest_status' => (array)($snapshot['connector_ingest_status'] ?? []),
+      'connectivity_events' => array_values((array)($mes['mes_connectivity_events'] ?? [])),
       'recent_connector_failures' => mes_recent_connector_ingest_failures($observability),
       'data' => $snapshot,
       'read_sources' => $bundle['sources'],
@@ -12847,8 +12898,12 @@ if ($username === '') {
       'tool_assemblies' => array_values((array)($master['tool_assemblies'] ?? [])),
       'adapter_governance_queue' => array_values((array)($snapshot['adapter_governance_queue'] ?? [])),
       'alarm_hotspot_queue' => array_values((array)($snapshot['alarm_hotspot_queue'] ?? [])),
+      'alarm_ack_queue' => array_values((array)($snapshot['alarm_ack_queue'] ?? [])),
       'nc_download_mismatch_queue' => array_values((array)($snapshot['nc_download_mismatch_queue'] ?? [])),
       'tool_offset_queue' => array_values((array)($snapshot['tool_offset_queue'] ?? [])),
+      'material_genealogy_queue' => array_values((array)($snapshot['material_genealogy_queue'] ?? [])),
+      'shift_handover_queue' => array_values((array)($snapshot['shift_handover_queue'] ?? [])),
+      'current_shift' => (array)($snapshot['current_shift'] ?? []),
       'updated' => [
         'master' => (string)($master['_meta']['updated'] ?? ''),
         'mes' => (string)($mes['_meta']['updated'] ?? ''),

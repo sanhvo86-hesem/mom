@@ -490,6 +490,13 @@ function toolRuntimeById(runtimeId){
 function masterRows(entity){
   return state.master && Array.isArray(state.master[entity]) ? state.master[entity] : [];
 }
+function adapterForMachine(machineId){
+  var rows = masterRows('mes_connectivity_adapters');
+  for(var i = 0; i < rows.length; i += 1){
+    if(String(rows[i].machine_id || '') === String(machineId || '')) return rows[i];
+  }
+  return null;
+}
 function toolOptionsForMachine(machineId){
   var master = state.master || {};
   var machine = machineById(machineId) || {};
@@ -668,6 +675,7 @@ function renderWorkCenterCard(center){
 function renderConnectorCard(row){
   var meta = connectorMeta(row.connector_health || 'offline');
   var status = statusMeta(row.status || 'idle');
+  var adapter = adapterForMachine(row.machine_id || '');
   return '<article class="mesx-connector">' +
     '<div class="mesx-connector-top"><div><h4>' + esc(row.machine_id || '') + ' · ' + esc(row.machine_name || '') + '</h4><p>' + esc([connectorTypeLabel(row.connector_type), row.connector_name || '', row.work_center_id || ''].filter(Boolean).join(' · ')) + '</p></div>' + badge(meta) + '</div>' +
     '<div class="mesx-connector-meta">' +
@@ -676,7 +684,7 @@ function renderConnectorCard(row){
       '<div class="mesx-mini"><small>' + esc(t('WO / chương trình', 'WO / program')) + '</small><strong>' + esc([row.current_program_id || '', row.part_count == null ? '' : ('Parts ' + row.part_count)].filter(Boolean).join(' · ') || '—') + '</strong></div>' +
       '<div class="mesx-mini"><small>' + esc(t('Spindle / override', 'Spindle / override')) + '</small><strong>' + esc([(row.spindle_load_pct == null ? '' : (Number(row.spindle_load_pct).toFixed(0) + '%')), (row.feed_override_pct == null ? '' : (Number(row.feed_override_pct).toFixed(0) + '%'))].filter(Boolean).join(' · ') || '—') + '</strong></div>' +
     '</div>' +
-    '<div class="mesx-connector-actions"><span>' + badge(status) + '</span><button type="button" class="mesx-link" data-open-signal-bridge="' + esc(row.machine_id || '') + '">' + esc(t('Cập nhật tín hiệu', 'Update signal')) + '</button></div>' +
+    '<div class="mesx-connector-actions"><span>' + badge(status) + '</span><button type="button" class="mesx-link" data-open-signal-bridge="' + esc(row.machine_id || '') + '">' + esc(t('Cập nhật tín hiệu', 'Update signal')) + '</button><button type="button" class="mesx-link warning" data-open-adapter-event="' + esc(row.machine_id || '') + '"' + (adapter ? '' : ' disabled') + '>' + esc(t('Log adapter', 'Log adapter')) + '</button></div>' +
   '</article>';
 }
 function renderExceptionRail(){
@@ -1191,6 +1199,11 @@ function bind(){
   Array.prototype.forEach.call(state.container.querySelectorAll('[data-open-exception]'), function(button){
     button.onclick = function(){ openExceptionDetail(button.getAttribute('data-open-exception') || ''); };
   });
+  Array.prototype.forEach.call(state.container.querySelectorAll('[data-open-adapter-event]'), function(button){
+    button.onclick = function(){
+      openAdapterEventModal(button.getAttribute('data-open-adapter-event') || '');
+    };
+  });
   Array.prototype.forEach.call(state.container.querySelectorAll('[data-alarm-action]'), function(button){
     button.onclick = function(){
       openAlarmGovernanceModal(button.getAttribute('data-alarm-action') || '', parseJsonAttr(button.getAttribute('data-alarm-context')));
@@ -1315,6 +1328,55 @@ function openAlarmGovernanceModal(action, row){
       if(window.console) console.error(error);
     }).finally(function(){ submit.disabled = false; });
   });
+  bindModalButtons();
+}
+
+function openAdapterEventModal(machineId){
+  var machine = machineById(machineId);
+  var adapter = adapterForMachine(machineId);
+  if(!machine){
+    toast(t('Không tìm thấy máy để ghi sự kiện adapter.', 'Could not find the machine for adapter event logging.'), 'error');
+    return;
+  }
+  if(!adapter){
+    toast(t('Máy này chưa có adapter được quản trị trong dữ liệu nền.', 'This machine does not yet have a governed adapter in master data.'), 'error');
+    return;
+  }
+  showModal(
+    t('Ghi sự kiện adapter', 'Log adapter event'),
+    [machine.machine_id || '', adapter.adapter_id || '', connectorTypeLabel(adapter.adapter_type || adapter.connector_type || '')].filter(Boolean).join(' · '),
+    '<div class="mesx-form-grid">' +
+      fieldDisplay(t('Adapter', 'Adapter'), [adapter.adapter_name || adapter.adapter_id || '', adapter.endpoint_url || adapter.connector_endpoint || ''].filter(Boolean).join(' · ')) +
+      fieldDisplay(t('Heartbeat SLA', 'Heartbeat SLA'), (adapter.heartbeat_sla_seconds || machine.heartbeat_sla_seconds || 120) + 's') +
+      editableField('mes-adp-type', t('Loại sự kiện', 'Event type'), '<select class="mesx-select" id="mes-adp-type"><option value="heartbeat">Heartbeat</option><option value="ingest_warning">Ingest warning</option><option value="ingest_failure">Ingest failure</option><option value="replay_blocked">Replay blocked</option><option value="stale_signal">Stale signal</option><option value="recovered">Recovered</option></select>') +
+      editableField('mes-adp-severity', t('Mức độ', 'Severity'), '<select class="mesx-select" id="mes-adp-severity"><option value="INFO">INFO</option><option value="WARNING" selected>WARNING</option><option value="ALARM">ALARM</option><option value="CRITICAL">CRITICAL</option><option value="EMERGENCY">EMERGENCY</option></select>') +
+      editableField('mes-adp-status', t('Trạng thái', 'Status'), '<select class="mesx-select" id="mes-adp-status"><option value="open">Open</option><option value="acknowledged">Acknowledged</option><option value="resolved">Resolved</option></select>') +
+      editableField('mes-adp-time', t('Thời điểm sự kiện', 'Event time'), '<input class="mesx-input" id="mes-adp-time" type="datetime-local" value="' + esc(nowInputValue()) + '">') +
+      editableField('mes-adp-message', t('Thông điệp', 'Message'), '<textarea class="mesx-textarea" id="mes-adp-message" placeholder="' + esc(t('Ví dụ: OPC UA stale heartbeat 265s, fallback sang manual bridge để tránh mù dữ liệu...', 'Example: OPC UA heartbeat stale at 265s, falling back to manual bridge to avoid blind runtime...')) + '"></textarea>', true) +
+      '<div class="full mesx-modal-foot"><button type="button" class="mesx-btn ghost" data-modal-cancel>↩ ' + esc(t('Hủy', 'Cancel')) + '</button><button type="button" class="mesx-btn primary" data-modal-submit>🛰️ ' + esc(t('Lưu sự kiện', 'Save event')) + '</button></div>' +
+    '</div>',
+    function(modal, submit){
+      submit.disabled = true;
+      api('mes_adapter_event_append', {
+        adapter_id: adapter.adapter_id || '',
+        machine_id: machine.machine_id || '',
+        event_type: (modal.querySelector('#mes-adp-type') || {}).value || 'heartbeat',
+        severity: (modal.querySelector('#mes-adp-severity') || {}).value || 'WARNING',
+        status: (modal.querySelector('#mes-adp-status') || {}).value || 'open',
+        event_time: (modal.querySelector('#mes-adp-time') || {}).value || '',
+        message: (modal.querySelector('#mes-adp-message') || {}).value || ''
+      }, 'POST').then(function(resp){
+        if(!resp || !resp.ok) throw new Error((resp && resp.error) || 'adapter_event_failed');
+        state.snapshot = resp.data || state.snapshot;
+        toast(t('Đã lưu sự kiện adapter.', 'Adapter event saved.'), 'success');
+        closeModal();
+        render();
+      }).catch(function(error){
+        toast(t('Không thể lưu sự kiện adapter.', 'Could not save the adapter event.'), 'error');
+        if(window.console) console.error(error);
+      }).finally(function(){ submit.disabled = false; });
+    }
+  );
   bindModalButtons();
 }
 
