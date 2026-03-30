@@ -244,53 +244,278 @@ body {
   }
 }
 
+/* ═══════════════════════════════════════════
+   VIEW / EDIT MODE SYSTEM
+   ═══════════════════════════════════════════ */
+
+/* Display value spans — always hidden in edit mode */
+body[data-mode="edit"] .qf-dv {
+  display: none !important;
+}
+
+/* Display value spans — shown in view mode */
+body[data-mode="view"] .qf-dv {
+  display: block;
+  min-height: 1.6em;
+  padding: 6px 0 2px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--scar-text);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+body[data-mode="view"] .qf-dv--empty {
+  color: var(--scar-text-muted);
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* In view mode: hide form controls */
+body[data-mode="view"] .qf-input,
+body[data-mode="view"] .qf-select,
+body[data-mode="view"] .qf-textarea {
+  display: none !important;
+}
+body[data-mode="view"] .qf-check-label {
+  display: none !important;
+}
+body[data-mode="view"] .qf-helper {
+  display: none !important;
+}
+body[data-mode="view"] .qf-error-msg {
+  display: none !important;
+}
+body[data-mode="view"] .qf-field[data-readonly="true"] .qf-dv {
+  color: var(--scar-text-muted);
+  font-weight: 500;
+}
+
+/* View mode: sections look like a printed document */
+body[data-mode="view"] .qf-section {
+  border-color: var(--scar-line);
+  background: #fafcfe;
+}
+body[data-mode="view"] .qf-section--error  { background: #fffafa; }
+body[data-mode="view"] .qf-section--warning { background: #fffcf5; }
+body[data-mode="view"] .qf-section--success { background: #f7fdf9; }
+
+/* View mode: reduce field padding (no input box) */
+body[data-mode="view"] .qf-field {
+  padding-bottom: 4px;
+}
+
+/* View mode label: muted, smaller */
+body[data-mode="view"] .qf-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--scar-text-muted);
+  margin-bottom: 2px;
+}
+body[data-mode="view"] .qf-label .qf-required { display: none; }
+
+/* View/Edit mode action bar buttons */
+body[data-mode="view"] .scar-edit-btn  { display: none !important; }
+body[data-mode="edit"] .scar-view-btn  { display: none !important; }
+
+/* Edit mode banner */
+body[data-mode="edit"] #qfActionsBar {
+  border-color: #1565c0;
+  background: #f0f7ff;
+}
+body[data-mode="edit"] #qfActionsBar::before {
+  content: '✎ Đang chỉnh sửa';
+  font-size: 11px;
+  font-weight: 700;
+  color: #1565c0;
+  letter-spacing: 0.04em;
+  margin-right: 8px;
+  padding: 2px 8px;
+  background: #dbeafe;
+  border-radius: 6px;
+  align-self: center;
+}
+
+/* View mode: no action bar bg change needed */
+body[data-mode="view"] #qfActionsBar {
+  background: #f8fafc;
+}
+
+/* ═══════════════════════════════════════════
+   PRINT — COMPLETE REWRITE FOR CLEAN OUTPUT
+   ═══════════════════════════════════════════ */
 @media print {
-  html,
-  body {
-    background: #ffffff;
+  /* Force view mode in print */
+  html, body {
+    background: #ffffff !important;
   }
 
+  /* Show display value spans */
+  .qf-dv {
+    display: block !important;
+    min-height: 1.4em;
+    padding: 4px 0 2px;
+    font-size: 12pt;
+    font-weight: 600;
+    color: #111827 !important;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+    border: none !important;
+    background: transparent !important;
+  }
+
+  .qf-dv--empty {
+    color: #9ca3af !important;
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  /* Hide all interactive form controls */
+  .qf-input,
+  .qf-select,
+  .qf-textarea,
+  .qf-check-label,
+  datalist {
+    display: none !important;
+  }
+
+  /* Hide helper text, errors, and action bar */
+  .qf-helper,
+  .qf-error-msg,
+  .qf-actions,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Page layout */
   .scar-runtime {
-    max-width: none;
-    padding: 0;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 
   .scar-page {
     border: none !important;
     box-shadow: none !important;
     border-radius: 0 !important;
+    background: #ffffff !important;
   }
 
   .scar-page .page-body {
-    padding: 0;
+    padding: 8mm 10mm !important;
   }
 
+  /* Record strip: fixed grid for print */
   .scar-record-strip {
-    border-color: #cbd5e1;
-    background: #cbd5e1;
-    box-shadow: none;
+    grid-template-columns: repeat(4, 1fr) !important;
+    border: 1px solid #cbd5e1 !important;
+    background: #cbd5e1 !important;
+    box-shadow: none !important;
+    margin-bottom: 12pt !important;
+    page-break-inside: avoid;
   }
 
   .scar-record-item {
-    min-height: auto;
-  }
-
-  .qf-section {
-    border-color: #d7dee7;
-    box-shadow: none;
-  }
-
-  .qf-input,
-  .qf-select,
-  .qf-textarea {
-    border-color: #d7dee7 !important;
     background: #ffffff !important;
-    color: #111827 !important;
-    box-shadow: none !important;
+    min-height: auto !important;
+    padding: 6pt 8pt !important;
   }
 
-  .qf-actions,
-  .no-print {
+  .scar-record-item small {
+    font-size: 7pt !important;
+    color: #6b7280 !important;
+  }
+
+  .scar-record-item strong {
+    font-size: 10pt !important;
+    margin-top: 3pt !important;
+  }
+
+  /* Form header */
+  .form-header {
+    margin-bottom: 12pt !important;
+  }
+
+  .scar-page .brand-logo img {
+    width: 100px !important;
+  }
+
+  /* Sections */
+  .qf-section {
+    border: 1px solid #d1d5db !important;
+    border-radius: 6pt !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    page-break-inside: avoid;
+    margin-top: 8pt !important;
+  }
+
+  .qf-section + .qf-section {
+    margin-top: 8pt !important;
+  }
+
+  .qf-section-header {
+    padding-bottom: 6pt !important;
+    margin-bottom: 8pt !important;
+  }
+
+  .qf-section-title {
+    font-size: 10pt !important;
+    font-weight: 700 !important;
+  }
+
+  .qf-section-subtitle {
     display: none !important;
+  }
+
+  .qf-section-body {
+    padding: 0 10pt 8pt !important;
+  }
+
+  /* Field layout */
+  .qf-field {
+    break-inside: avoid;
+  }
+
+  .qf-label {
+    font-size: 7.5pt !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+    color: #6b7280 !important;
+    margin-bottom: 1pt !important;
+  }
+
+  .qf-label .qf-required,
+  .qf-label .qf-label-vi {
+    display: none !important;
+  }
+
+  /* Grid: prevent overflow */
+  .qf-grid {
+    gap: 8pt !important;
+  }
+
+  .qf-grid--3 {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  .qf-grid--2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .qf-grid--2-1 {
+    grid-template-columns: 2fr 1fr !important;
+  }
+
+  /* Section num badge */
+  .qf-section-num {
+    width: 20pt !important;
+    height: 20pt !important;
+    font-size: 9pt !important;
   }
 }

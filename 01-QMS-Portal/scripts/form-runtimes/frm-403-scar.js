@@ -34,7 +34,8 @@ var state = {
   saveTimer: null,
   busySave: false,
   busySubmit: false,
-  localKey: ''
+  localKey: '',
+  editMode: true
 };
 var els = {};
 
@@ -57,6 +58,9 @@ function cacheElements(){
   els.btnSaveDraft = byId('btnSaveDraft');
   els.btnReset = byId('btnReset');
   els.btnSubmit = byId('btnSubmit');
+  els.btnEdit   = byId('btnEdit');
+  els.btnCancel = byId('btnCancel');
+  els.btnPrint  = byId('btnPrint');
 }
 
 function bindEvents(){
@@ -67,6 +71,9 @@ function bindEvents(){
   }
   if(els.btnSaveDraft) els.btnSaveDraft.addEventListener('click', handleSaveDraft);
   if(els.btnReset) els.btnReset.addEventListener('click', handleReset);
+  if(els.btnEdit)   els.btnEdit.addEventListener('click', handleEnterEdit);
+  if(els.btnCancel) els.btnCancel.addEventListener('click', handleCancelEdit);
+  if(els.btnPrint)  els.btnPrint.addEventListener('click', handlePrint);
   if(els.supplierHints){
     els.supplierHints.addEventListener('click', function(event){
       var button = event.target.closest('[data-supplier-id]');
@@ -89,6 +96,8 @@ function loadRuntime(){
     populateForm();
     renderAll();
     updateActionState();
+    var hasSubmitted = !!(state.entry && state.entry.entry_id);
+    setMode(hasSubmitted ? 'view' : 'edit');
     if(!state.loggedIn){
       updateRuntimeAlert('warning', 'Phiên đăng nhập chưa sẵn sàng', 'Biểu mẫu vẫn cho phép nhập và tính toán cục bộ, nhưng muốn lưu nháp máy chủ hoặc gửi hồ sơ thì cần đăng nhập QMS hợp lệ.', 'Khách');
     } else if(!state.allocationId){
@@ -302,6 +311,7 @@ function renderAll(){
   renderSupplierHints();
   updateMetaFootnotes();
   updateActionState();
+  renderDisplayValues();
   notifyHeight();
 }
 
@@ -420,6 +430,9 @@ function updateActionState(){
     els.btnSubmit.disabled = !!state.busySubmit || !state.loggedIn || !state.allocationId;
     els.btnSubmit.textContent = state.busySubmit ? 'Đang gửi SCAR...' : 'Gửi SCAR';
   }
+  var isView = !state.editMode;
+  // in view mode: disable submit (already disabled if not logged in)
+  if(els.btnSubmit && isView) els.btnSubmit.disabled = true;
 }
 
 function handleSaveDraft(){
@@ -467,6 +480,76 @@ function handleReset(){
   notifyParentToast('Đã khôi phục dữ liệu biểu mẫu SCAR.', 'info');
 }
 
+function setMode(mode){
+  state.editMode = (mode === 'edit');
+  document.body.setAttribute('data-mode', mode);
+  renderDisplayValues();
+  updateActionState();
+  notifyHeight();
+}
+
+function handleEnterEdit(){
+  setMode('edit');
+  notifyParentToast('Đang chỉnh sửa biểu mẫu SCAR.', 'info');
+}
+
+function handleCancelEdit(){
+  state.data = clone(state.resetSnapshot);
+  normalizeData(state.data);
+  populateForm();
+  renderDisplayValues();
+  setMode('view');
+  notifyParentToast('Đã hủy chỉnh sửa, khôi phục dữ liệu hiển thị.', 'info');
+}
+
+function handlePrint(){
+  var prev = document.body.getAttribute('data-mode') || 'edit';
+  document.body.setAttribute('data-mode', 'view');
+  renderDisplayValues();
+  window.print();
+  document.body.setAttribute('data-mode', prev);
+}
+
+var SEVERITY_DV_LABELS = { minor:'Nhẹ (Minor)', major:'Nặng (Major)', critical:'Nghiêm trọng (Critical)' };
+var STATUS_DV_LABELS = { open:'Mở (Open)', awaiting_response:'Chờ phản hồi NCC', under_review:'Đang xem xét', verification:'Đang xác nhận', closed:'Đã đóng (Closed)' };
+
+function formatDateDv(iso){
+  if(!iso) return '—';
+  var parts = String(iso).split('-');
+  if(parts.length === 3) return parts[2] + '/' + parts[1] + '/' + parts[0];
+  return iso;
+}
+
+function renderDisplayValues(){
+  var DV_MAP = {
+    scar_date: function(v){ return formatDateDv(v); },
+    supplier_response_due_date: function(v){ return formatDateDv(v); },
+    scar_status: function(v){ return STATUS_DV_LABELS[v] || v || '—'; },
+    severity: function(v){ return SEVERITY_DV_LABELS[v] || v || '—'; },
+    quantity_received: function(v){ return v || v === 0 ? String(parseNumber(v) || 0) : '—'; },
+    quantity_rejected: function(v){ return v || v === 0 ? String(parseNumber(v) || 0) : '—'; },
+    quantity_accepted_calc: function(v){ return v || '0'; },
+    root_cause_required: function(v){ return v ? '✓ Yêu cầu phân tích nguyên nhân gốc (RCA)' : '✗ Chế độ containment rút gọn'; },
+    closeout_ready: function(v){ return v || '—'; }
+  };
+  FIELD_IDS.forEach(function(fieldId){
+    var dv = byId(fieldId + '__dv');
+    if(!dv) return;
+    var value = state.data[fieldId];
+    var fmt = DV_MAP[fieldId];
+    var text = fmt ? fmt(value) : (String(value == null ? '' : value).trim() || '—');
+    dv.textContent = text;
+    dv.className = 'qf-dv' + (text === '—' || !String(value || '').trim() ? ' qf-dv--empty' : '');
+  });
+  // Also update the root_cause display span (special case - it's after the label, not an input)
+  var rcDv = byId('root_cause_required__dv');
+  if(rcDv){
+    var rcVal = state.data.root_cause_required;
+    rcDv.textContent = rcVal ? '✓ Yêu cầu phân tích nguyên nhân gốc (RCA)' : '✗ Chế độ containment rút gọn';
+    rcDv.className = 'qf-dv';
+  }
+}
+
 function handleSubmit(event){
   event.preventDefault();
   if(state.busySubmit) return;
@@ -500,6 +583,7 @@ function handleSubmit(event){
       notifyParentToast('Đã gửi SCAR thành công.', 'success');
       notifyParentRefresh();
       renderAll();
+      setMode('view');
     });
   }).catch(function(error){
     updateRuntimeAlert('danger', 'Không thể gửi SCAR', (error && error.message) || 'Hệ thống chưa ghi nhận được bản nộp trực tuyến.', 'Lỗi');
