@@ -766,6 +766,13 @@ function isLockedContextField(fieldId, allocation){
   return Object.prototype.hasOwnProperty.call(ctx, fieldId) && ctx[fieldId] !== '' && ctx[fieldId] !== null && ctx[fieldId] !== undefined;
 }
 
+function isRecordReadOnly(allocation){
+  if(!allocation) return false;
+  var status = String(allocation.status || '').trim().toLowerCase();
+  if((allocation.online_submission && allocation.online_submission.entry_id) || (allocation.online_submission && allocation.online_submission.submitted_at)) return true;
+  return ['submitted','received','in_review','approved','rejected'].indexOf(status) >= 0;
+}
+
 function draftKey(form,alloc){ return 'qms_ec_'+((form&&form.form_code)||'')+'_'+((alloc&&alloc.allocation_id)||''); }
 function loadDraftLegacy(form,alloc){
   var key=draftKey(form,alloc);
@@ -1237,6 +1244,7 @@ function renderOnlineSection(section, schema){
 function renderSignaturesPanel(schema){
   var blocks = Array.isArray(schema && schema.signature_blocks) ? schema.signature_blocks : [];
   if(!blocks.length) return '';
+  var recordLocked = isRecordReadOnly(selectedAllocation());
   return '<section class="ec-form-section" id="ec-online-section-signatures">' +
     '<div class="ec-form-section-head">' +
       '<div><small>' + esc(t('Xác nhận điện tử', 'Electronic attestations')) + '</small><h3>' + esc(t('Chữ ký điện tử', 'Electronic signatures')) + '</h3></div>' +
@@ -1244,7 +1252,7 @@ function renderSignaturesPanel(schema){
     '</div>' +
     '<div class="ec-signatures">' + blocks.map(function(block){
       var signed = !!ws.signatures[block.id];
-      var locked = !canSignBlock(schema, block.id);
+      var locked = recordLocked || !canSignBlock(schema, block.id);
       return '<div class="ec-sign'+(locked?' locked':'')+'">' +
         '<div class="ec-sign-title">' + esc(t(block.label_vi||block.label||block.id, block.label_en||block.label||block.id)) + '</div>' +
         '<div class="ec-sign-sub">' + esc(t(block.help_vi||block.help||'', block.help_en||block.help||'')) + '</div>' +
@@ -1258,8 +1266,296 @@ function renderSignaturesPanel(schema){
   '</section>';
 }
 
+var HEADER_ROLE_META = {
+  ceo: { code:'CEO', href:'../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html' },
+  production_director: { code:'PD', href:'../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html' },
+  cnc_workshop_manager: { code:'WKM', href:'../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html' },
+  production_planner: { code:'PPL', href:'../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html' },
+  shift_leader: { code:'SL', href:'../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html' },
+  engineering_lead: { code:'ENGM', href:'../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html' },
+  process_engineer: { code:'PE', href:'../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html' },
+  cam_nc_programmer: { code:'CAM', href:'../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html' },
+  qa_manager: { code:'QA', href:'../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html' },
+  quality_engineer: { code:'QE', href:'../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html' },
+  qms_engineer: { code:'QMS', href:'../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html' },
+  supply_chain_manager: { code:'SCM', href:'../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html' },
+  buyer: { code:'BUY', href:'../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html' },
+  customer_service: { code:'CS', href:'../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html' },
+  estimator: { code:'EST', href:'../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html' },
+  finance_manager: { code:'FIN', href:'../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html' },
+  hr_manager: { code:'HR', href:'../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html' },
+  ehs_specialist: { code:'EHS', href:'../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html' },
+  it_admin: { code:'ITA', href:'../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html' }
+};
+
+var HEADER_DEPARTMENT_META = {
+  EXE: { code:'D-EXE', href:'../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-executive-handbook.html' },
+  PRO: { code:'D-PROD', href:'../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html' },
+  ENG: { code:'D-ENG', href:'../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-engineering-handbook.html' },
+  QA: { code:'D-QUAL', href:'../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-quality-handbook.html' },
+  SCM: { code:'D-SCM', href:'../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html' },
+  SAL: { code:'D-SAL', href:'../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html' },
+  FIN: { code:'D-FIN', href:'../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-finance-handbook.html' },
+  HR: { code:'D-HR', href:'../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-hr-handbook.html' },
+  EHS: { code:'D-EHS', href:'../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-ehs-handbook.html' },
+  IT: { code:'D-IT', href:'../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html' }
+};
+
+function renderRoleToken(role){
+  var key = String(role || '').trim().toLowerCase();
+  if(!key) return '';
+  var meta = HEADER_ROLE_META[key] || null;
+  var ro = (typeof ROLES !== 'undefined' && ROLES && ROLES[key]) ? ROLES[key] : null;
+  var code = meta && meta.code ? meta.code : roleLabel(key);
+  var title = ro ? t(ro.label || roleLabel(key), ro.labelEn || roleLabel(key)) : roleLabel(key);
+  var inner = '<span class="entity-code role-code">' + esc(code) + '</span>';
+  if(meta && meta.href){
+    return '<a class="entity-link role-link ec-role-link" href="' + esc(meta.href) + '" title="' + esc(title) + '">' + inner + '</a>';
+  }
+  return '<span class="ec-role-chip" title="' + esc(title) + '">' + inner + '</span>';
+}
+
+function renderRoleCluster(roles){
+  var list = Array.isArray(roles) ? roles.map(function(role){
+    return String(role || '').trim().toLowerCase();
+  }).filter(Boolean) : [];
+  list = list.filter(function(role, index){ return list.indexOf(role) === index; });
+  if(!list.length) return esc(t('\u0054\u0068\u0065\u006f\u0020\u0063\u1ea5\u0075\u0020\u0068\u00ec\u006e\u0068\u0020\u0062\u0069\u1ec3\u0075\u0020\u006d\u1eabu', 'Per form configuration'));
+  return '<span class="entity-cluster role-cluster ec-role-cluster">' + list.map(renderRoleToken).join('<span class="entity-sep role-sep">/</span>') + '</span>';
+}
+
+function renderDepartmentToken(code){
+  var key = String(code || '').trim().toUpperCase();
+  if(!key) return esc(t('\u0054\u0068\u0065\u006f\u0020\u0070\u0068\u00e2\u006e\u0020\u0071\u0075\u0079\u1ec1\u006e', 'Per ownership rules'));
+  var meta = HEADER_DEPARTMENT_META[key] || null;
+  var label = departmentLabel(key) || key;
+  var codeLabel = meta && meta.code ? meta.code : key;
+  var inner = '<span class="entity-code dept-code">' + esc(codeLabel) + '</span>';
+  if(meta && meta.href){
+    return '<a class="entity-link dept-link ec-dept-link" href="' + esc(meta.href) + '" title="' + esc(label) + '">' + inner + '</a>';
+  }
+  return '<span class="ec-role-chip" title="' + esc(label) + '">' + inner + '</span>';
+}
+
+function nextRequiredSectionLabel(sections, schema){
+  var list = Array.isArray(sections) ? sections : [];
+  for(var i = 0; i < list.length; i++){
+    var stats = sectionCompletion(list[i], schema);
+    if(stats.required && stats.complete < stats.required){
+      return t(list[i].title_vi || list[i].title || list[i].id, list[i].title_en || list[i].title || list[i].id);
+    }
+  }
+  return '';
+}
+
+function renderDocumentHeader(form, allocation, schema){
+  var owner = renderDepartmentToken(detectDepartment(form) || user().dept || '');
+  var review = approvalSummary(allocation || {}, schema || {});
+  var approvalText = renderRoleCluster(review.rolesAllowed || []);
+  var title = t(form.title_vi || form.title || form.form_code, form.title_en || form.title || form.form_code);
+  var description = t(form.title_note_vi || form.description_vi || form.description || '', form.title_note_en || form.description_en || form.description || '');
+  var extra = [allocation.record_id || '', form.sop_ref || '', form.online === false ? t('\u004e\u0067\u006f\u1ea1\u0069\u0020\u0074\u0075\u0079\u1ebf\u006e', 'Offline') : t('\u0054\u0072\u1ef1\u0063\u0020\u0074\u0075\u0079\u1ebf\u006e', 'Online')].filter(Boolean).join(' / ');
+  return '<div class="form-header ec-doc-header">' +
+    '<div class="fh-left">' +
+      '<a class="brand-logo" href="./portal.html"><img alt="HESEM Logo" src="./assets/hesem-logo.svg"></a>' +
+      '<div class="fh-company">' +
+        '<a href="./portal.html">HESEM ENGINEERING</a>' +
+        '<span>' + esc(t('\u0054\u00e0\u0069\u0020\u006c\u0069\u1ec7\u0075\u0020\u006b\u0069\u1ec3\u006d\u0020\u0073\u006f\u00e1\u0074', 'Controlled document')) + '</span>' +
+      '</div>' +
+    '</div>' +
+    '<div class="title">' +
+      '<span class="doc-code">' + esc(form.form_code || '\u2014') + '</span>' +
+      '<strong class="doc-name">' + esc(title) + '</strong>' +
+      (description ? '<span class="sub-vn">' + esc(description) + '</span>' : '') +
+      (extra ? '<span class="muted">' + esc(extra) + '</span>' : '') +
+    '</div>' +
+    '<div class="meta">' +
+      '<div class="row"><span><b>' + esc(t('\u004d\u00e3', 'Code')) + ':</b></span><span class="doc-code">' + esc(form.form_code || '\u2014') + '</span></div>' +
+      '<div class="row"><span><b>' + esc(t('\u0050\u0068\u0069\u00ea\u006e\u0020\u0062\u1ea3\u006e', 'Version')) + ':</b></span><span>' + esc(form.version || 'V0') + '</span></div>' +
+      '<div class="row"><span><b>' + esc(t('\u004e\u0067\u00e0\u0079\u0020\u0068\u0069\u1ec7\u0075\u0020\u006c\u1ef1\u0063', 'Effective date')) + ':</b></span><span>' + esc(form.effective_date || t('\u0054\u0068\u0065\u006f\u0020\u0071\u0075\u0079\u1ebf\u0074\u0020\u0111\u1ecb\u006e\u0068\u0020\u0062\u0061\u006e\u0020\u0068\u00e0\u006e\u0068', 'Per release decision')) + '</span></div>' +
+      '<div class="row"><span><b>' + esc(t('\u0043\u0068\u1ee7\u0020\u0073\u1edf\u0020\u0068\u1eef\u0075', 'Owner')) + ':</b></span><span>' + owner + '</span></div>' +
+      '<div class="row"><span><b>' + esc(t('\u0050\u0068\u00ea\u0020\u0064\u0075\u0079\u1ec7\u0074', 'Approval')) + ':</b></span><span>' + approvalText + '</span></div>' +
+    '</div>' +
+  '</div>';
+}
+
+function renderFormSummaryStrip(form, allocation, schema){
+  var sections = normalizeOnlineSections(schema);
+  var ctx = allocation.master_context || {};
+  var progress = formProgressMeta(schema);
+  var review = approvalSummary(allocation, schema);
+  var trace = traceSummary(ctx);
+  var nextSection = nextRequiredSectionLabel(sections, schema);
+  var items = [
+    { label:t('\u004d\u00e3\u0020\u0068\u1ed3\u0020\u0073\u01a1', 'Record ID'), value: allocation.record_id || '\u2014' },
+    { label:t('\u0054\u0072\u1ea1\u006e\u0067\u0020\u0074\u0068\u00e1\u0069', 'Status'), value: historyStatusLabel(allocation.status || 'allocated') },
+    { label:t('\u004c\u006f\u1ea1\u0069\u0020\u0068\u1ed3\u0020\u0073\u01a1', 'Record type'), value: detectRecordType(form) || '\u2014' },
+    { label:t('\u0043\u01a1\u0020\u0063\u0068\u1ebf\u0020\u0064\u0075\u0079\u1ec7\u0074', 'Approval flow'), value: t(review.labelVi || '', review.labelEn || '') || '\u2014' },
+    { label:t('\u01afu\u0020\u0074\u0069\u00ea\u006e', 'Next focus'), value: nextSection || t('\u0053\u1eb5\u006e\u0020\u0073\u00e0\u006e\u0067\u0020\u0067\u1eedi', 'Ready to submit') },
+    { label:t('\u0043\u0068\u1eef\u0020\u006b\u00fd\u0020\u0111\u0069\u1ec7\u006e\u0020\u0074\u1eed', 'Electronic signatures'), value: progress.signed + '/' + progress.signatures }
+  ];
+  var tags = [
+    allocation.record_id || '',
+    form.sop_ref || '',
+    trace || '',
+    form.online === false ? t('\u004e\u0067\u006f\u1ea1\u0069\u0020\u0074\u0075\u0079\u1ebf\u006e', 'Offline') : t('\u0054\u0072\u1ef1\u0063\u0020\u0074\u0075\u0079\u1ebf\u006e', 'Online')
+  ].filter(Boolean);
+  if(ctx.customer_id) tags.push(ctx.customer_id);
+  if(ctx.part_number) tags.push([ctx.part_number, ctx.part_revision].filter(Boolean).join(' / '));
+  if(ctx.so_number || ctx.jo_number || ctx.wo_number) tags.push([ctx.so_number, ctx.jo_number, ctx.wo_number].filter(Boolean).join(' / '));
+  return '<div class="ec-form-ribbon">' +
+    '<div class="ec-form-brief-main">' +
+      '<small>' + esc(t('\u0110\u1ecb\u006e\u0068\u0020\u0068\u01b0\u1edb\u006e\u0067\u0020\u0074\u0068\u1ef1\u0063\u0020\u0074\u0068\u0069', 'Operational brief')) + '</small>' +
+      '<h2>' + esc(t(form.title_vi || form.title || form.form_code, form.title_en || form.title || form.form_code)) + '</h2>' +
+      '<p>' + esc(t(form.description_vi || form.description || '\u0047\u0068\u0069\u0020\u006e\u0068\u1ead\u006e\u0020\u0111\u1ee7\u0020\u0064\u1eef\u0020\u006c\u0069\u1ec7\u0075\u0020\u0074\u0072\u0075\u0079\u0020\u0078\u0075\u1ea5\u0074\u002c\u0020\u0062\u1eb1\u006e\u0067\u0020\u0063\u0068\u1ee9\u006e\u0067\u0020\u0076\u00e0\u0020\u0078\u00e1\u0063\u0020\u006e\u0068\u1ead\u006e\u0020\u0111\u1ec3\u0020\u0068\u1ed3\u0020\u0073\u01a1\u0020\u0111\u1ea1\u0074\u0020\u0074\u1ea7\u006d\u0020\u0064\u1ee5\u006e\u0067\u0020\u006e\u0067\u0061\u0079\u0020\u0074\u1ea1\u0069\u0020\u0111\u0069\u1ec3\u006d\u0020\u0073\u1eed\u0020\u0064\u1ee5\u006e\u0067\u002e', 'Capture traceability, evidence, and approvals in one governed sheet ready for operational use.'), form.description_en || form.description || 'Capture traceability, evidence, and approvals in one governed sheet ready for operational use.') + '</p>' +
+      '<div class="ec-form-tags">' + tags.map(function(tag){
+        return '<span class="ec-form-tag">' + esc(tag) + '</span>';
+      }).join('') + '</div>' +
+    '</div>' +
+    '<div class="ec-form-brief-side">' +
+      '<div class="ec-form-progress-card">' +
+        '<small>' + esc(t('\u0054\u0069\u1ebf\u006e\u0020\u0111\u1ed9\u0020\u0062\u0069\u1ec3\u0075\u0020\u006d\u1eabu', 'Form completion')) + '</small>' +
+        '<strong>' + esc(progress.completionPercent + '%') + '</strong>' +
+        '<span>' + esc(progress.complete + '/' + progress.required + ' ' + t('\u0074\u0072\u01b0\u1edd\u006e\u0067\u0020\u0062\u1ea5\u0074\u0020\u0062\u0075\u1ed9\u0063', 'required fields')) + '</span>' +
+        '<div class="ec-form-progress" style="--ec-progress:' + Math.max(0, Math.min(progress.completionPercent, 100)) + '%"><span></span></div>' +
+        '<div class="ec-form-progress-note">' + esc(nextSection ? (t('\u01afu\u0020\u0074\u0069\u00ea\u006e', 'Priority') + ': ' + nextSection) : t('\u0054\u1ea5\u0074\u0020\u0063\u1ea3\u0020\u0063\u00e1\u0063\u0020\u0074\u0072\u01b0\u1edd\u006e\u0067\u0020\u0062\u1ea5\u0074\u0020\u0062\u0075\u1ed9\u0063\u0020\u0111\u00e3\u0020\u0068\u006f\u00e0\u006e\u0020\u0074\u1ea5\u0074', 'All required fields are complete')) + '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>' +
+  '<div class="ec-form-control-strip">' + items.map(function(item){
+    return '<div class="ec-form-control-item"><small>' + esc(item.label) + '</small><strong>' + esc(item.value || '\u2014') + '</strong></div>';
+  }).join('') + '</div>';
+}
+
+function renderSectionNavigator(sections, schema){
+  if(!sections.length) return '';
+  return '<div class="ec-form-nav-wrap"><div class="ec-form-nav-head"><small>' + esc(t('\u0042\u1ea3\u006e\u0020\u0111\u1ed3\u0020\u0062\u0069\u1ec3\u0075\u0020\u006d\u1eabu', 'Form map')) + '</small><strong>' + esc(t('\u0044\u0069\u0020\u0063\u0068\u0075\u0079\u1ec3\u006e\u0020\u006e\u0068\u0061\u006e\u0068\u0020\u0111\u1ebf\u006e\u0020\u0111\u00fa\u006e\u0067\u0020\u0070\u0068\u1ea7\u006e\u0020\u0111\u0061\u006e\u0067\u0020\u0063\u1ea7\u006e\u0020\u0111\u0069\u1ec1\u006e', 'Jump directly to the section you need')) + '</strong></div><div class="ec-form-nav">' + sections.map(function(section, index){
+    var stats = sectionCompletion(section, schema);
+    var statusText = stats.required ? (stats.complete + '/' + stats.required + ' ' + t('\u0062\u1ea5\u0074\u0020\u0062\u0075\u1ed9\u0063', 'required')) : t('\u004e\u1ed9\u0069\u0020\u0064\u0075\u006e\u0067\u0020\u0062\u1ed5\u0020\u0074\u0072\u1ee3', 'Supporting content');
+    return '<button type="button" class="ec-form-nav-btn" data-scroll-section="' + esc(sectionDomId(section)) + '">' +
+      '<span class="ec-form-nav-num">' + esc(String(index + 1).padStart(2, '0')) + '</span>' +
+      '<span class="ec-form-nav-copy"><strong>' + esc(t(section.title_vi || section.title || section.id, section.title_en || section.title || section.id)) + '</strong><span>' + esc(statusText) + '</span></span>' +
+    '</button>';
+  }).join('') + '</div></div>';
+}
+
+function renderFormAside(form, allocation, schema, sections){
+  var ctx = allocation.master_context || {};
+  var progress = formProgressMeta(schema);
+  var trace = traceSummary(ctx);
+  var review = approvalSummary(allocation, schema);
+  var nextSection = nextRequiredSectionLabel(sections, schema);
+  var accent = 'style="--ec-progress:' + Math.max(0, Math.min(progress.completionPercent, 100)) + '%"';
+  return '<aside class="ec-form-aside">' +
+    '<div class="ec-form-aside-block ec-form-aside-primary">' +
+      '<small>' + esc(t('\u0054\u0069\u1ebf\u006e\u0020\u0111\u1ed9\u0020\u0062\u0069\u1ec3\u0075\u0020\u006d\u1eabu', 'Form completion')) + '</small>' +
+      '<strong>' + esc(progress.completionPercent + '%') + '</strong>' +
+      '<span>' + esc(progress.complete + '/' + progress.required + ' ' + t('\u0074\u0072\u01b0\u1edd\u006e\u0067\u0020\u0062\u1ea5\u0074\u0020\u0062\u0075\u1ed9\u0063\u0020\u0111\u00e3\u0020\u0068\u006f\u00e0\u006e\u0020\u0074\u1ea5\u0074', 'required fields completed')) + '</span>' +
+      '<div class="ec-form-progress" ' + accent + '><span></span></div>' +
+      '<div class="ec-form-side-note">' + esc(nextSection ? (t('\u004b\u1ebf\u0020\u0074\u0069\u1ebf\u0070', 'Next focus') + ': ' + nextSection) : t('\u0053\u1eb5\u006e\u0020\u0073\u00e0\u006e\u0067\u0020\u0063\u0068\u1ed1\u0074\u0020\u0062\u0069\u1ec3\u0075\u0020\u006d\u1eabu', 'Ready to finalize the form')) + '</div>' +
+    '</div>' +
+    '<div class="ec-form-aside-block">' +
+      '<small>' + esc(t('\u0110\u0069\u1ec1\u0075\u0020\u0070\u0068\u1ed1\u0069\u0020\u0074\u0068\u1ef1\u0063\u0020\u0074\u0068\u0069', 'Execution control')) + '</small>' +
+      '<ul class="ec-form-facts">' +
+        '<li><span>' + esc(t('SOP tham chi\u1ebfu', 'SOP reference')) + '</span><strong>' + esc(form.sop_ref || '\u2014') + '</strong></li>' +
+        '<li><span>' + esc(t('\u0043\u01a1\u0020\u0063\u0068\u1ebf\u0020\u0064\u0075\u0079\u1ec7\u0074', 'Approval mode')) + '</span><strong>' + esc(t(review.labelVi || '', review.labelEn || '') || '\u2014') + '</strong></li>' +
+        '<li><span>' + esc(t('\u0053\u1ed1\u0020\u0070\u0068\u1ea7\u006e\u0020\u0062\u0069\u1ec3\u0075\u0020\u006d\u1eabu', 'Sections')) + '</span><strong>' + esc(String(sections.length)) + '</strong></li>' +
+        '<li><span>' + esc(t('\u0043\u0068\u1eef\u0020\u006b\u00fd\u0020\u0111\u0069\u1ec7\u006e\u0020\u0074\u1eed', 'Electronic signatures')) + '</span><strong>' + esc(progress.signed + '/' + progress.signatures) + '</strong></li>' +
+      '</ul>' +
+    '</div>' +
+    '<div class="ec-form-aside-block">' +
+      '<small>' + esc(t('\u004e\u0067\u1eef\u0020\u0063\u1ea3\u006e\u0068\u0020\u0074\u0072\u0075\u0079\u0020\u0078\u0075\u1ea5\u0074', 'Traceability context')) + '</small>' +
+      (trace ? '<strong>' + esc(trace) + '</strong>' : '<strong>' + esc(t('\u0043\u0068\u01b0\u0061\u0020\u006d\u0061\u006e\u0067\u0020\u0074\u0068\u0065\u006f\u0020\u006e\u0067\u1eef\u0020\u0063\u1ea3\u006e\u0068\u0020\u006d\u1edf\u0020\u0072\u1ed9\u006e\u0067', 'No extended trace context')) + '</strong>') +
+      '<span>' + esc(t('\u004d\u1ecd\u0069\u0020\u0074\u0072\u01b0\u1edd\u006e\u0067\u0020\u0062\u1ecb\u0020\u006b\u0068\u00f3\u0061\u0020\u0073\u1ebd\u0020\u0062\u00e1\u006d\u0020\u0074\u0068\u0065\u006f\u0020\u006d\u00e3\u0020\u0068\u1ed3\u0020\u0073\u01a1\u0020\u0076\u00e0\u0020\u006e\u0067\u1eef\u0020\u0063\u1ea3\u006e\u0068\u0020\u0111\u00e3\u0020\u0063\u1ea5\u0070\u0020\u0111\u1ec3\u0020\u0067\u0069\u1eef\u0020\u0074\u00ed\u006e\u0068\u0020\u0074\u006f\u00e0\u006e\u0020\u0076\u1eb9\u006e\u0020\u0074\u0072\u0075\u0079\u0020\u0078\u0075\u1ea5\u0074\u002e', 'Locked fields follow the issued record context to preserve traceability integrity.')) + '</span>' +
+    '</div>' +
+  '</aside>';
+}
+
+function renderOnlineSection(section, schema){
+  var ids = visibleFieldIds(section, schema);
+  if(!ids.length) return '';
+  var stats = sectionCompletion(section, schema);
+  var order = normalizeOnlineSections(schema).findIndex(function(item){ return item && item.id === section.id; });
+  var statusText = stats.required ? (stats.complete + '/' + stats.required + ' ' + t('\u0062\u1ea5\u0074\u0020\u0062\u0075\u1ed9\u0063', 'required')) : t('\u004b\u0068\u00f4\u006e\u0067\u0020\u0063\u00f3\u0020\u0074\u0072\u01b0\u1edd\u006e\u0067\u0020\u0062\u1ea5\u0074\u0020\u0062\u0075\u1ed9\u0063', 'No required fields');
+  return '<section class="ec-form-section" id="' + esc(sectionDomId(section)) + '">' +
+    '<div class="ec-form-section-head">' +
+      '<div class="ec-form-section-lead">' +
+        '<span class="ec-form-section-index">' + esc(String((order >= 0 ? order : 0) + 1).padStart(2, '0')) + '</span>' +
+        '<div>' +
+          '<small>' + esc(t('\u0050\u0068\u1ea7\u006e\u0020\u0062\u0069\u1ec3\u0075\u0020\u006d\u1eabu', 'Form section')) + '</small>' +
+          '<h3>' + esc(t(section.title_vi || section.title || section.id, section.title_en || section.title || section.id)) + '</h3>' +
+          '<p>' + esc(t(section.description_vi || section.description || '', section.description_en || section.description || '') || t('\u0110\u0069\u1ec1\u006e\u0020\u0111\u1ea7\u0079\u0020\u0111\u1ee7\u0020\u0064\u1eef\u0020\u006c\u0069\u1ec7\u0075\u0020\u0076\u1ead\u006e\u0020\u0068\u00e0\u006e\u0068\u0020\u0076\u00e0\u0020\u0062\u1eb1\u006e\u0067\u0020\u0063\u0068\u1ee9\u006e\u0067\u0020\u006e\u1ec1\u006e\u0020\u0063\u0068\u006f\u0020\u0070\u0068\u1ea7\u006e\u0020\u006e\u1ed9\u0069\u0020\u0064\u0075\u006e\u0067\u0020\u006e\u00e0\u0079\u002e', 'Complete the operational data and supporting evidence for this section.')) + '</p>' +
+        '</div>' +
+      '</div>' +
+      '<div class="ec-form-section-state"><strong>' + esc(statusText) + '</strong><span>' + esc(stats.visible + ' ' + t('\u0074\u0072\u01b0\u1edd\u006e\u0067\u0020\u0068\u0069\u1ec3\u006e', 'visible fields')) + '</span></div>' +
+    '</div>' +
+    '<div class="ec-form-section-body ec-fields">' + ids.map(function(id){
+      var field = fieldById(schema, id);
+      return field ? renderField(field) : '';
+    }).join('') + '</div>' +
+  '</section>';
+}
+
+function standaloneOnlinePath(form){
+  var schema = form && form.schema ? form.schema : (ws.schema || {});
+  return String(
+    (form && form.standalone_html) ||
+    (schema && schema.standalone_html) ||
+    ''
+  ).trim();
+}
+
+function standaloneRuntimeFrameId(form, allocation){
+  return 'ec-runtime-frame-' + slugify((form && form.form_code) || 'form') + '-' + slugify((allocation && allocation.allocation_id) || 'allocation');
+}
+
+function standaloneRuntimeSrc(form, allocation){
+  var path = standaloneOnlinePath(form);
+  if(!path) return '';
+  var params = new URLSearchParams();
+  params.set('form_code', String(form && form.form_code || ''));
+  params.set('allocation_id', String(allocation && allocation.allocation_id || ''));
+  params.set('record_id', String(allocation && allocation.record_id || ''));
+  params.set('lang', (typeof lang !== 'undefined' && lang === 'en') ? 'en' : 'vi');
+  params.set('_runtime_ts', String(Date.now()));
+  return path + (path.indexOf('?') >= 0 ? '&' : '?') + params.toString();
+}
+
+function renderStandaloneOnlineStep(form, allocation){
+  var frameId = standaloneRuntimeFrameId(form, allocation);
+  var src = standaloneRuntimeSrc(form, allocation);
+  return '<div class="ec-step" id="ec-step-fill">' +
+    '<div class="ec-step-head" data-toggle="ec-step-fill">' +
+      '<div class="ec-step-num">2</div>' +
+      '<div class="ec-step-title">' + esc(t('Điền biểu mẫu trực tuyến', 'Fill online form')) + '</div>' +
+    '</div>' +
+    '<div class="ec-step-body">' +
+      '<div class="ec-runtime-shell">' +
+        '<div class="ec-runtime-head">' +
+          '<div>' +
+            '<strong>' + esc(t('Biểu mẫu HTML độc lập', 'Standalone HTML form')) + '</strong>' +
+            '<span>' + esc(t('Form này có cấu trúc HTML, điều khiển nhập liệu, phép tính, lưu nháp và gửi hồ sơ trong runtime riêng. Portal giữ checklist, approval và workflow ở ngoài.', 'This form owns its HTML layout, input logic, calculations, draft save, and submission in its own runtime. The portal keeps checklist, approval, and workflow outside.')) + '</span>' +
+          '</div>' +
+          '<a class="ec-btn secondary" href="' + esc(src) + '" target="_blank" rel="noopener">' + esc(t('Mở ở tab riêng', 'Open in new tab')) + '</a>' +
+        '</div>' +
+        '<iframe id="' + esc(frameId) + '" class="ec-runtime-frame" data-form-code="' + esc(form.form_code || '') + '" data-allocation-id="' + esc(allocation.allocation_id || '') + '" src="' + esc(src) + '" title="' + esc(t('Biểu mẫu trực tuyến độc lập', 'Standalone online form')) + '"></iframe>' +
+      '</div>' +
+      '<div class="ec-form-appendix">' +
+        renderChecklist(allocation) +
+        renderCapaEffectivenessCard(form, allocation) +
+        renderRelatedRecords(allocation) +
+        renderRetentionCard(form, allocation) +
+        renderSlaCard(form, allocation) +
+        renderEvidenceActions(allocation) +
+        renderApprovalBar(form, allocation) +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
 /* ── Step 2: Online form ── */
 function renderOnlineStep(form, allocation){
+  if(standaloneOnlinePath(form)) return renderStandaloneOnlineStep(form, allocation);
   var schema = form.schema || ws.schema || {};
   primeFieldDefaults(schema, allocation);
   var sections = normalizeOnlineSections(schema);
@@ -2193,14 +2489,18 @@ function bindWorkspace(form, allocation, container){
 
   /* online form */
   if(allocation && form.online !== false){
-    bindFormFields(form, allocation);
-    bindSignatures(form);
-    var saveDraftBtn=document.getElementById('ec-save-draft');
-    if(saveDraftBtn) saveDraftBtn.onclick=function(){ saveDraft(form,allocation); };
-    var resetBtn=document.getElementById('ec-reset-form');
-    if(resetBtn) resetBtn.onclick=function(){ if(!confirm(t('Xóa dữ liệu đang nhập?','Clear form data?'))) return; ws.fieldValues={}; ws.signatures={}; clearDraft(form,allocation); renderWorkspace(form,allocation,container); bindWorkspace(form,allocation,container); };
-    var submitBtn=document.getElementById('ec-submit-online');
-    if(submitBtn) submitBtn.onclick=function(){ doSubmitOnline(form,allocation,submitBtn,container); };
+    if(standaloneOnlinePath(form)){
+      bindStandaloneRuntime(form, allocation, container);
+    } else {
+      bindFormFields(form, allocation);
+      bindSignatures(form);
+      var saveDraftBtn=document.getElementById('ec-save-draft');
+      if(saveDraftBtn) saveDraftBtn.onclick=function(){ saveDraft(form,allocation); };
+      var resetBtn=document.getElementById('ec-reset-form');
+      if(resetBtn) resetBtn.onclick=function(){ if(!confirm(t('Xóa dữ liệu đang nhập?','Clear form data?'))) return; ws.fieldValues={}; ws.signatures={}; clearDraft(form,allocation); renderWorkspace(form,allocation,container); bindWorkspace(form,allocation,container); };
+      var submitBtn=document.getElementById('ec-submit-online');
+      if(submitBtn) submitBtn.onclick=function(){ doSubmitOnline(form,allocation,submitBtn,container); };
+    }
     bindApprovalActions(form,allocation,container);
   }
 
@@ -2208,6 +2508,60 @@ function bindWorkspace(form, allocation, container){
   if(allocation && form.online === false){
     bindOffline(form, allocation, container);
   }
+}
+
+function bindStandaloneRuntime(form, allocation, container){
+  var frameId = standaloneRuntimeFrameId(form, allocation);
+  var iframe = document.getElementById(frameId);
+  if(!iframe) return;
+
+  if(typeof container._ecRuntimeBridge === 'function'){
+    window.removeEventListener('message', container._ecRuntimeBridge);
+    container._ecRuntimeBridge = null;
+  }
+
+  var syncHeight = function(){
+    try {
+      if(!iframe.contentWindow || !iframe.contentWindow.document || !iframe.contentWindow.document.body) return;
+      var doc = iframe.contentWindow.document;
+      var body = doc.body;
+      var html = doc.documentElement;
+      var height = Math.max(
+        body ? body.scrollHeight : 0,
+        html ? html.scrollHeight : 0,
+        body ? body.offsetHeight : 0,
+        html ? html.offsetHeight : 0,
+        720
+      );
+      iframe.style.height = height + 'px';
+    } catch(_err){}
+  };
+
+  iframe.onload = function(){
+    setTimeout(syncHeight, 120);
+    setTimeout(syncHeight, 360);
+  };
+
+  var onMessage = function(event){
+    if(!iframe.contentWindow || event.source !== iframe.contentWindow) return;
+    var data = event.data || {};
+    if(!data || typeof data !== 'object') return;
+    if(data.type === 'ec-form-runtime-height'){
+      var nextHeight = Math.max(720, Number(data.height || 0) || 0);
+      iframe.style.height = nextHeight + 'px';
+      return;
+    }
+    if(data.type === 'ec-form-runtime-toast' && data.message){
+      toast(String(data.message || ''), String(data.level || 'info'));
+      return;
+    }
+    if(data.type === 'ec-form-runtime-refresh'){
+      reloadCurrentFormWorkspace(form.form_code || '', allocation && allocation.allocation_id || '');
+    }
+  };
+
+  window.addEventListener('message', onMessage);
+  container._ecRuntimeBridge = onMessage;
 }
 
 function doAllocate(form, container){
@@ -2685,19 +3039,40 @@ function inspectFiles(files,allocation,container,form){
 function preloadSelectedOnlineEntry(form, allocation){
   if(!form || form.online === false || !allocation) return Promise.resolve(null);
   if(ws.draftKey && localStorage.getItem(ws.draftKey)) return Promise.resolve(null);
-  return api('online_form_entry_get',{
-    form_code: form.form_code,
-    allocation_id: allocation.allocation_id || '',
-    entry_id: (allocation.online_submission && allocation.online_submission.entry_id) || ''
-  },'POST').then(function(resp){
-    if(resp && resp.ok && resp.entry){
-      var skip = {form_code:1,form_version:1,record_id:1,allocation_id:1,master_context:1,signatures:1,approval_state:1,runtime_mode:1,_display:1,submitted_at:1,submitted_by:1,updated_at:1,updated_by:1,_server_time:1,_status:1,_ip:1,_session_user:1,online_submission:1};
-      Object.keys(resp.entry).forEach(function(k){ if(!skip[k]) ws.fieldValues[k] = resp.entry[k]; });
-      if(resp.entry.signatures && typeof resp.entry.signatures === 'object') ws.signatures = resp.entry.signatures;
-      hydrateFromAlloc(allocation);
+  var loadEntry = function(){
+    return api('online_form_entry_get',{
+      form_code: form.form_code,
+      allocation_id: allocation.allocation_id || '',
+      entry_id: (allocation.online_submission && allocation.online_submission.entry_id) || ''
+    },'POST').then(function(resp){
+      if(resp && resp.ok && resp.entry) applyStoredOnlinePayload(resp.entry, allocation);
+      return resp;
+    });
+  };
+  if(isRecordReadOnly(allocation)){
+    return loadEntry().catch(function(){ return null; });
+  }
+  return api('form_fill_get_draft',{
+    allocation_id: allocation.allocation_id || ''
+  },'GET').then(function(resp){
+    if(resp && resp.ok && resp.draft && resp.draft.data){
+      applyStoredOnlinePayload(resp.draft.data, allocation);
+      return resp;
     }
-    return resp;
-  }).catch(function(){ return null; });
+    return loadEntry();
+  }).catch(function(){
+    return loadEntry().catch(function(){ return null; });
+  });
+}
+
+function applyStoredOnlinePayload(payload, allocation){
+  if(!payload || typeof payload !== 'object') return;
+  var skip = {form_code:1,form_version:1,record_id:1,allocation_id:1,master_context:1,signatures:1,approval_state:1,runtime_mode:1,_display:1,submitted_at:1,submitted_by:1,updated_at:1,updated_by:1,_server_time:1,_status:1,_ip:1,_session_user:1,online_submission:1};
+  Object.keys(payload).forEach(function(k){
+    if(!skip[k]) ws.fieldValues[k] = payload[k];
+  });
+  if(payload.signatures && typeof payload.signatures === 'object') ws.signatures = payload.signatures;
+  hydrateFromAlloc(allocation);
 }
 
 /* ── link form to order when submitting ── */

@@ -316,6 +316,7 @@ function scan_extract_code(string $fn): string {
   if (preg_match('/^(sop-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
   if (preg_match('/^(frm-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
   if (preg_match('/^(wi-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
+  if (preg_match('/^(annex-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
   if (preg_match('/^(ref-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
   if (preg_match('/^(jd-[a-z-]+)/i', $stem, $m)) return strtoupper(substr($m[1], 0, 30));
   if (preg_match('/^(dept-[a-z-]+)/i', $stem, $m)) return strtoupper(substr($m[1], 0, 30));
@@ -744,6 +745,7 @@ function portal_extract_doc_code(string $filename): string {
   if (preg_match('/^(sop-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
   if (preg_match('/^(frm-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
   if (preg_match('/^(wi-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
+  if (preg_match('/^(annex-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
   if (preg_match('/^(ref-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
   if (preg_match('/^(jd-[a-z-]+)/i', $stem, $m)) return strtoupper(substr($m[1], 0, 30));
   if (preg_match('/^(dept-[a-z-]+)/i', $stem, $m)) return strtoupper(substr($m[1], 0, 30));
@@ -1396,20 +1398,66 @@ function portal_title_has_non_ascii(string $title): bool {
   return preg_match('/[^\x20-\x7E]/', $title) === 1;
 }
 
+function portal_clean_doc_text(string $text): string {
+  $decoded = html_entity_decode(strip_tags($text), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+  return trim((string)preg_replace('/\s+/u', ' ', $decoded));
+}
+
+function portal_strip_doc_code_prefix(string $text, string $code = ''): string {
+  $clean = portal_clean_doc_text($text);
+  if ($clean === '') return '';
+  $codeNorm = strtoupper(trim($code));
+  if ($codeNorm !== '') {
+    $clean = preg_replace('/^' . preg_quote($codeNorm, '/') . '\s*(?:—|-|:)\s*/u', '', $clean, 1) ?? $clean;
+  }
+  $clean = preg_replace('/\|\s*HESEM QMS$/u', '', $clean, 1) ?? $clean;
+  return trim((string)$clean);
+}
+
+function portal_extract_title_from_html_content(string $html, string $code = ''): string {
+  $patterns = [
+    '/<div[^>]*class=["\'][^"\']*\btitle\b[^"\']*["\'][^>]*>.*?<strong[^>]*class=["\'][^"\']*\bdoc-name\b[^"\']*["\'][^>]*>(.*?)<\/strong>.*?<\/div>/isu',
+    '/<div[^>]*class=["\'][^"\']*\btitle\b[^"\']*["\'][^>]*>\s*<strong[^>]*>(.*?)<\/strong>.*?<\/div>/isu',
+    '/<h1[^>]*>(.*?)<\/h1>/isu',
+    '/<title[^>]*>(.*?)<\/title>/isu',
+  ];
+  foreach ($patterns as $pattern) {
+    if (!preg_match($pattern, $html, $m)) continue;
+    $candidate = portal_strip_doc_code_prefix((string)($m[1] ?? ''), $code);
+    if ($candidate !== '' && strtoupper($candidate) !== strtoupper(trim($code))) {
+      return $candidate;
+    }
+  }
+  return '';
+}
+
+function portal_extract_title_from_html_file(string $absFile, string $code = ''): string {
+  $html = @file_get_contents($absFile);
+  if (!is_string($html) || $html === '') return '';
+  return portal_extract_title_from_html_content($html, $code);
+}
+
 function portal_sync_doc_title_blocks(string $html, string $docCode, string $title): string {
   $docCode = strtoupper(trim($docCode));
   $title = trim($title);
   if ($docCode === '' || $title === '') return $html;
 
   $safeTitleTag = htmlspecialchars($docCode . ' - ' . $title . ' | HESEM QMS', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+  $safeCode = htmlspecialchars($docCode, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
   $safeDocLabel = htmlspecialchars($docCode . ' - ' . $title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+  $safeDocName = htmlspecialchars($title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
   $next = preg_replace('/<title[^>]*>.*?<\/title>/isu', '<title>' . $safeTitleTag . '</title>', $html, 1);
   if (is_string($next)) $html = $next;
 
   $next = preg_replace_callback(
-    '/(<div[^>]*class=["\'][^"\']*\btitle\b[^"\']*["\'][^>]*>\s*<strong>).*?(<\/strong>)/isu',
-    static fn(array $m): string => (string)($m[1] ?? '') . $safeDocLabel . (string)($m[2] ?? ''),
+    '/<div[^>]*class=["\'][^"\']*\btitle\b[^"\']*["\'][^>]*>(.*?)<\/div>/isu',
+    static function(array $m) use ($safeCode, $safeDocName): string {
+      $inner = (string)($m[1] ?? '');
+      preg_match('/<span[^>]*class=["\'][^"\']*\bsub-vn\b[^"\']*["\'][^>]*>.*?<\/span>/isu', $inner, $subMatch);
+      preg_match('/<span[^>]*class=["\'][^"\']*\bmuted\b[^"\']*["\'][^>]*>.*?<\/span>/isu', $inner, $mutedMatch);
+      return '<div class="title"><span class="doc-code">' . $safeCode . '</span><strong class="doc-name">' . $safeDocName . '</strong>' . ($subMatch[0] ?? '') . ($mutedMatch[0] ?? '') . '</div>';
+    },
     $html,
     1
   );
@@ -10585,10 +10633,10 @@ switch ($action) {
       '<div class="fh-left"> <a class="brand-logo" href="' . $rootHref . '"><img alt="HESEM Logo" src="https://hesem.com.vn/wp-content/uploads/hesem-logo.svg"/></a>' . "\n" .
       '<div class="fh-company"> <a href="' . $rootHref . '">HESEM ENGINEERING</a> <span>Tài liệu kiểm soát</span> </div>' . "\n" .
       '</div>' . "\n" .
-      '<div class="title"> <strong>' . $safeCode . ' — ' . $safeTitle . '</strong><br/>' . "\n" .
+      '<div class="title"> <span class="doc-code">' . $safeCode . '</span><strong class="doc-name">' . $safeTitle . '</strong>' . "\n" .
       '<span class="sub-vn">Tài liệu mới (Draft)</span> <span class="muted">Soạn thảo nội dung theo yêu cầu ISO/QMS.</span> </div>' . "\n" .
       '<div class="meta">' . "\n" .
-      '<div class="row"><span><b>Mã:</b></span><span>' . $safeCode . '</span></div>' . "\n" .
+      '<div class="row"><span><b>Mã:</b></span><span class="doc-code">' . $safeCode . '</span></div>' . "\n" .
       '<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>' . "\n" .
       '<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>' . "\n" .
       '<div class="row"><span><b>Chủ sở hữu:</b></span><span>' . $safeOwner . '</span></div>' . "\n" .
@@ -10625,10 +10673,10 @@ switch ($action) {
       '<div class="fh-left"> <a class="brand-logo" href="' . $rootHref . '"><img alt="HESEM Logo" src="https://hesem.com.vn/wp-content/uploads/hesem-logo.svg"/></a>' . "\n" .
       '<div class="fh-company"> <a href="' . $rootHref . '">HESEM ENGINEERING</a> <span>Tài liệu kiểm soát</span> </div>' . "\n" .
       '</div>' . "\n" .
-      '<div class="title"> <strong>' . $safeCode . ' - ' . $safeTitle . '</strong><br/>' . "\n" .
+      '<div class="title"> <span class="doc-code">' . $safeCode . '</span><strong class="doc-name">' . $safeTitle . '</strong>' . "\n" .
       '<span class="sub-vn">Tài liệu mới (Draft)</span> <span class="muted">Soạn thảo nội dung theo yêu cầu ISO/QMS.</span> </div>' . "\n" .
       '<div class="meta">' . "\n" .
-      '<div class="row"><span><b>Mã:</b></span><span>' . $safeCode . '</span></div>' . "\n" .
+      '<div class="row"><span><b>Mã:</b></span><span class="doc-code">' . $safeCode . '</span></div>' . "\n" .
       '<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>' . "\n" .
       '<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>' . "\n" .
       '<div class="row"><span><b>Chủ sở hữu:</b></span><span>' . $safeOwner . '</span></div>' . "\n" .
@@ -13165,6 +13213,7 @@ if ($username === '') {
       if (preg_match('/^(sop-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
       if (preg_match('/^(frm-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
       if (preg_match('/^(wi-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
+      if (preg_match('/^(annex-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
       if (preg_match('/^(ref-\d{3})/i', $stem, $m)) return strtoupper($m[1]);
       // V9 org patterns: jd-xxx, dept-xxx, raci-xxx, authority-xxx
       if (preg_match('/^(jd-[a-z-]+)/i', $stem, $m)) return strtoupper(substr($m[1], 0, 30));
@@ -13186,6 +13235,8 @@ if ($username === '') {
     // Helper: extract title from HTML <title> tag
     function extract_title(string $absFile, string $fallback): string {
       $code = scan_extract_code($fallback);
+      $htmlTitle = portal_extract_title_from_html_file($absFile, $code);
+      if ($htmlTitle !== '') return $htmlTitle;
       return portal_standard_title_from_filename($fallback, $code);
     }
 
@@ -17358,6 +17409,27 @@ if ($username === '') {
     ];
     file_put_contents($draftFile, json_encode($draftPayload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
     api_json(['ok' => true]);
+  }
+
+  case 'form_fill_get_draft': {
+    require_logged_in($store);
+    $allocationId = trim((string)($_GET['allocation_id'] ?? $_POST['allocation_id'] ?? ''));
+    if ($allocationId === '') {
+      api_json(['ok' => false, 'error' => 'missing_allocation_id'], 400);
+    }
+    if (!preg_match('/^[A-Za-z0-9._-]+$/', $allocationId)) {
+      api_json(['ok' => false, 'error' => 'invalid_allocation_id'], 400);
+    }
+    $draftFile = $DATA_DIR . '/online-forms/drafts/' . $allocationId . '.json';
+    if (!is_file($draftFile)) {
+      api_json(['ok' => true, 'draft' => null, 'server_time' => now_iso()]);
+    }
+    $raw = @file_get_contents($draftFile);
+    $draft = $raw ? json_decode($raw, true) : null;
+    if (!is_array($draft)) {
+      api_json(['ok' => true, 'draft' => null, 'server_time' => now_iso()]);
+    }
+    api_json(['ok' => true, 'draft' => $draft, 'server_time' => now_iso()]);
   }
 
   case 'form_fill_history': {

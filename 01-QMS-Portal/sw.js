@@ -21,7 +21,7 @@
 
 // ── Cache Configuration ─────────────────────────────────────────────────────
 
-const CACHE_VERSION = 'v1.2.0';
+const CACHE_VERSION = 'v1.3.0';
 const CACHE_PREFIX  = 'hesem-qms';
 
 /** Named caches with version stamps. */
@@ -48,6 +48,7 @@ const PRECACHE_URLS = [
   '/01-QMS-Portal/styles/portal.main.css',
   '/01-QMS-Portal/styles/deploy-dashboard.css',
   '/01-QMS-Portal/styles/online-forms.css',
+  '/01-QMS-Portal/styles/form-runtime-frm-403.css',
   '/01-QMS-Portal/styles/gateway-landing.css',
   '/01-QMS-Portal/assets/css/mobile.css',
   '/01-QMS-Portal/scripts/portal/01-data-config.js',
@@ -61,6 +62,8 @@ const PRECACHE_URLS = [
   '/01-QMS-Portal/scripts/portal/06-tiptap-pilot.js',
   '/01-QMS-Portal/scripts/portal/08-deploy-dashboard.js',
   '/01-QMS-Portal/scripts/portal/09-online-forms.js',
+  '/01-QMS-Portal/scripts/portal/09b-form-fill-download.js',
+  '/01-QMS-Portal/scripts/form-runtimes/frm-403-scar.js',
   '/01-QMS-Portal/scripts/portal/10-upload-validator.js',
   '/01-QMS-Portal/scripts/portal/90-qrcodegen.js',
   '/01-QMS-Portal/scripts/portal/99-bootstrap.js',
@@ -70,6 +73,7 @@ const PRECACHE_URLS = [
   '/01-QMS-Portal/assets/js/barcode-scanner.js',
   '/01-QMS-Portal/assets/js/pwa-init.js',
   '/01-QMS-Portal/manifest.json',
+  '/01-QMS-Portal/form-runtimes/frm-403-scar.html',
   '/assets/style_scoped.css',
   '/assets/style.css',
   '/assets/hesem-logo.svg',
