@@ -1415,7 +1415,7 @@ function navigateTo(page, filter){
 
   setDocHeaderToolbar('');
   if(page==='dashboard') renderDashboard();
-  if(page==='documents') renderDocuments();
+  if(page==='documents'){ _lastDocRenderTarget = 'page-documents'; renderDocuments(); }
   if(page==='search') renderSearch();
   if(page==='dictionary') renderDictionary();
   if(page==='access') renderAccessMatrix();
@@ -2176,8 +2176,10 @@ function renderDashboard(){
 /* OLD DASHBOARD CODE REMOVED — see git history for reference */
 }
 
+var _lastDocRenderTarget = 'page-documents';
 function renderDocuments(targetContainerId){
-  const el = document.getElementById(targetContainerId || 'page-documents');
+  if(targetContainerId) _lastDocRenderTarget = targetContainerId;
+  const el = document.getElementById(_lastDocRenderTarget || 'page-documents');
   const VDOCS = getVisibleDocs();
 
   // ═══ Update header breadcrumb ═══
