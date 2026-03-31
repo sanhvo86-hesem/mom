@@ -2585,7 +2585,11 @@ function bindWorkspace(form, allocation, container){
 
   var editBtn = document.getElementById('ec-edit-form-btn');
   if(editBtn) editBtn.onclick = function(){
-    toast(t('Trình chỉnh sửa biểu mẫu đang được phát triển.', 'Form editor is under development.'), 'info');
+    if(typeof window._renderFormBuilder === 'function'){
+      window._renderFormBuilder(form, container);
+    } else {
+      toast(t('Trình chỉnh sửa biểu mẫu chưa sẵn sàng.', 'Form editor is not ready yet.'), 'warn');
+    }
   };
 
   var printBtn = document.getElementById('ec-print-form-btn');

@@ -1003,7 +1003,6 @@ function renderSidebar(){
     '<div class="ec-form-list" id="ec-form-list">' + formListHtml + '</div>' +
     (state.selectedFormCode && state.workspaceMode === 'form' ? '<div class="ec-alloc-section"><div class="ec-alloc-section-head"><span>' + esc(t('Mã đã cấp', 'Allocations')) + ' (' + state.allocations.length + ')</span></div>' + (allocHtml || '<div style="padding:8px 16px;font-size:11px;color:var(--ec-text-muted)">' + esc(t('Chưa có mã', 'None yet')) + '</div>') + '</div>' : '') +
     '<div class="ec-sidebar-tools">' +
-      '<button type="button" class="ec-tool-btn' + (state.workspaceMode === 'builder' ? ' active' : '') + '" data-tool="builder">' + esc(t('Thiết kế biểu mẫu', 'Form Builder')) + '</button>' +
       '<button type="button" class="ec-tool-btn' + (state.workspaceMode === 'work' ? ' active' : '') + '" data-tool="work">' + esc(t('Việc của tôi', 'My Work')) + (workCount ? '<span class="ec-tool-pill">' + esc(workCount) + '</span>' : '') + '</button>' +
       '<button type="button" class="ec-tool-btn' + (state.workspaceMode === 'record-id' ? ' active' : '') + '" data-tool="record-id">' + esc(t('Trợ lý tạo mã', 'Record ID Assistant')) + '</button>' +
       '<button type="button" class="ec-tool-btn' + (state.workspaceMode === 'upload' ? ' active' : '') + '" data-tool="upload">' + esc(t('Tải lên & Kiểm tra', 'Upload & Verify')) + '</button>' +
@@ -1041,11 +1040,6 @@ function renderWorkspacePane(){
     wsEl.innerHTML = '<div class="ec-empty"><div class="ec-empty-icon">EC</div><h3>' + esc(t('Chọn biểu mẫu để bắt đầu', 'Select a form to begin')) + '</h3><p>' + esc(t('Chọn biểu mẫu từ danh mục bên trái. Hệ thống sẽ hướng dẫn qua từng bước: cấp mã -> điền/tải -> ký và gửi.', 'Pick a form from the catalog. The system will guide you through each step: allocate -> fill/download -> sign and submit.')) + '</p></div>';
     return;
   }
-  if(state.workspaceMode === 'builder'){
-    if(typeof window._renderFormBuilder === 'function') window._renderFormBuilder(form, wsEl);
-    else wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc('Form Control module not ready') + '</h3></div>';
-    return;
-  }
   var allocation = state.allocations.find(function(row){ return row.allocation_id === state.selectedAllocationId; }) || null;
   if(typeof window._renderWorkspace === 'function') window._renderWorkspace(form, allocation, wsEl);
   else wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Phân hệ xử lý hồ sơ chưa sẵn sàng', 'Workspace module not ready')) + '</h3></div>';
@@ -1069,23 +1063,20 @@ function bindSidebar(container){
     var formItem = event.target.closest('[data-form]');
     if(formItem){
       var code = formItem.getAttribute('data-form') || '';
-      var nextMode = state.workspaceMode === 'builder' ? 'builder' : 'form';
-      if(code === state.selectedFormCode && state.workspaceMode === nextMode) return;
+      if(code === state.selectedFormCode && state.workspaceMode === 'form') return;
       state.selectedFormCode = code;
       state.selectedAllocationId = '';
       state.allocations = [];
-      state.workspaceMode = nextMode;
-      state.workspaceLoading = nextMode === 'form';
+      state.workspaceMode = 'form';
+      state.workspaceLoading = true;
       render(container);
-      if(nextMode === 'form'){
-        loadAllocations().then(function(){
-          state.workspaceLoading = false;
-          render(container);
-        }).catch(function(){
-          state.workspaceLoading = false;
-          render(container);
-        });
-      }
+      loadAllocations().then(function(){
+        state.workspaceLoading = false;
+        render(container);
+      }).catch(function(){
+        state.workspaceLoading = false;
+        render(container);
+      });
       return;
     }
 
@@ -1163,7 +1154,6 @@ window._renderOnlineFormsLegacy = function(formCode){
 
 window._fhSwitchTab = function(target){
   state.activeTab = target || '';
-  if(target === 'builder' || target === 'form-control'){ state.workspaceMode = 'builder'; requestRender(); return; }
   if(target === 'record-id'){ state.workspaceMode = 'record-id'; requestRender(); return; }
   if(target === 'upload' || target === 'upload-verify'){ state.workspaceMode = 'upload'; requestRender(); return; }
   if(target === 'work' || target === 'my-work'){ state.workspaceMode = 'work'; requestRender(); loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); }); return; }
