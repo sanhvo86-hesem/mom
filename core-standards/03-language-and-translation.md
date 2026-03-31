@@ -33,21 +33,19 @@ Chuẩn canonical đầy đủ: xem `25-glossary-canonical-abbreviation-standard
 - Ngoài các nhóm ngoại lệ trên, phần văn xuôi hiển thị cho người đọc phải được Việt hóa theo đúng ngữ cảnh vận hành.
 - Không được vin vào ngoại lệ để giữ lại các cụm nửa Anh nửa Việt như `review plan`, `shipment pack`, `tool readiness`, `change logic`, `route control` nếu đã có bản Việt chuẩn trong mục E và F.
 
-### A5. Ngôn ngữ biểu mẫu eQMS (Online Form) — 100% tiếng Anh
+### A5. Ngôn ngữ biểu mẫu eQMS (Online Form) — Song ngữ, tiếng Việt có dấu
 
-- Tất cả biểu mẫu eQMS online form (FRM-xxx-SUFFIX) **PHẢI** sử dụng 100% tiếng Anh cho:
-  - Tên trường (field labels): English là chính, Vietnamese là subtitle phụ (italic, nhỏ hơn)
-  - Tên section: English
-  - Mô tả section: English
-  - Placeholder text: English
-  - Helper text: English
-  - Option labels trong dropdown: English (có thể kèm Vietnamese trong ngoặc)
-  - Signature block labels: English
-  - Validation messages: English
-  - PDF export: English
-- Lý do: Biểu mẫu phục vụ kiểm soát chứng cứ quốc tế, auditor quốc tế, khách hàng nước ngoài. Tiếng Anh đảm bảo tính phổ quát và tuân thủ AS9100D/ISO 9001.
-- Vietnamese subtitle (nếu cần) hiển thị bên cạnh label tiếng Anh với font nhỏ hơn, italic, màu nhạt.
-- Quy tắc này **KHÔNG** áp dụng cho tài liệu SOP/WI/ANNEX/JD — các tài liệu này vẫn tuân thủ A1 (tiếng Việt là chính).
+- Tất cả biểu mẫu eQMS online form (FRM-xxx-SUFFIX) hiển thị **song ngữ**:
+  - Tên trường (field labels): **English là chính** (in hoa, bold), Vietnamese có dấu là subtitle (italic, nhỏ hơn, màu nhạt)
+  - Tên section: **Tiếng Việt có dấu** là chính
+  - Mô tả section: **Tiếng Việt có dấu** là chính
+  - Placeholder text: **Tiếng Việt có dấu**
+  - Helper text: **Tiếng Việt có dấu**
+  - Option labels trong dropdown: Song ngữ — Tiếng Việt (English) — VD: "Nghiêm trọng (Critical)"
+  - Signature block labels: **Tiếng Việt có dấu**
+  - **Mọi chuỗi tiếng Việt PHẢI có dấu đầy đủ**, KHÔNG ĐƯỢC viết không dấu (VD: ❌ "Yeu cau" → ✅ "Yêu cầu")
+- Schema JSON **PHẢI** lưu chuỗi tiếng Việt với Unicode đầy đủ (UTF-8), không encode thành ASCII
+- Quy tắc này áp dụng cho cả frontend renderer (`10-eqms-form-runtime.js`) và PDF export
 
 ### A2. Quy tắc vàng
 

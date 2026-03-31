@@ -137,10 +137,10 @@ function saveAuditLog(){
 /* ── Field Rendering ── */
 function renderField(field, value, readOnly){
   var id = 'eqms-f-' + field.id;
-  /* Form labels always English-first with Vietnamese subtitle */
-  var labelEn = field.label_en || field.label || field.id;
-  var labelVi = field.label || '';
-  var label = labelEn + (labelVi && labelVi !== labelEn ? ' <span class="eqms-label-vi">' + esc(labelVi) + '</span>' : '');
+  /* Form labels: English primary + Vietnamese subtitle with diacritics */
+  var labelEn = field.label || field.label_en || field.id;
+  var labelVi = field.label_vi || '';
+  var label = esc(labelEn) + (labelVi ? '<span class="eqms-label-vi">' + esc(labelVi) + '</span>' : '');
   var required = field.required ? '<span style="color:#dc2626">*</span>' : '';
   var disabled = readOnly ? ' disabled' : '';
   var cls = 'eqms-field' + (field.width === 'full' || field.type === 'textarea' || field.type === 'table' ? ' full' : field.width === 'third' ? ' third' : '');
@@ -244,17 +244,21 @@ function renderForm(container){
 
   var html = '';
 
-  /* ── Form header (document-style) ── */
-  html += '<div class="eqms-doc-header">' +
-    '<div class="eqms-doc-logo"><img src="../../assets/hesem-logo.svg" alt="HESEM" onerror="this.style.display=\'none\'"></div>' +
-    '<div class="eqms-doc-title">' +
-      '<div class="eqms-doc-name">' + esc(schema.title_vi || schema.title || schema.form_code) + '</div>' +
-      '<div class="eqms-doc-subtitle">' + esc(schema.title || '') + '</div>' +
+  /* ── Form header — 100% identical to SOP .form-header ── */
+  var ownerHtml = esc(schema.owner || '');
+  var approverHtml = esc(schema.approver || '');
+  html += '<div class="form-header">' +
+    '<div class="fh-left"><a class="brand-logo" href="portal.html"><img alt="HESEM Logo" src="../../assets/hesem-logo.svg" onerror="this.src=\'assets/hesem-logo.svg\'"/></a></div>' +
+    '<div class="title">' +
+      '<strong class="doc-name">' + esc(schema.title || schema.form_code) + '</strong>' +
+      '<span class="sub-vn">' + esc(schema.description_vi || schema.title_vi || '') + '</span>' +
     '</div>' +
-    '<div class="eqms-doc-meta">' +
-      '<div class="eqms-doc-meta-row"><span>' + esc(t('Ma', 'Code')) + '</span><strong>' + esc(schema.form_code || '') + '</strong></div>' +
-      '<div class="eqms-doc-meta-row"><span>' + esc(t('Phien ban', 'Version')) + '</span><strong>' + esc(schema.version || 'V1') + '</strong></div>' +
-      '<div class="eqms-doc-meta-row"><span>' + esc(t('Ngay hieu luc', 'Effective')) + '</span><strong>' + esc(schema.effective_date || t('Theo quyet dinh', 'Per decision')) + '</strong></div>' +
+    '<div class="meta">' +
+      '<div class="row"><span><b>Mã:</b></span><span class="doc-code">' + esc(schema.form_code || '') + '</span></div>' +
+      '<div class="row"><span><b>Phiên bản:</b></span><span>' + esc(schema.version || 'V1') + '</span></div>' +
+      '<div class="row"><span><b>Ngày hiệu lực:</b></span><span>' + esc(schema.effective_date || 'Theo quyết định ban hành') + '</span></div>' +
+      '<div class="row"><span><b>Chủ sở hữu:</b></span><span>' + ownerHtml + '</span></div>' +
+      '<div class="row"><span><b>Phê duyệt:</b></span><span>' + approverHtml + '</span></div>' +
     '</div>' +
   '</div>';
 
@@ -287,8 +291,8 @@ function renderForm(container){
       '<div class="eqms-section-head">' +
         '<div class="eqms-section-num">' + (sIdx + 1) + '</div>' +
         '<div>' +
-          '<div class="eqms-section-title">' + esc(section.title_en || section.title || '') + '</div>' +
-          (section.description_en || section.description ? '<div class="eqms-section-desc">' + esc(section.description_en || section.description || '') + '</div>' : '') +
+          '<div class="eqms-section-title">' + esc(section.title || section.title_en || '') + '</div>' +
+          (section.description || section.description_en ? '<div class="eqms-section-desc">' + esc(section.description || section.description_en || '') + '</div>' : '') +
         '</div>' +
       '</div>' +
       '<div class="eqms-fields">';
@@ -305,7 +309,7 @@ function renderForm(container){
     html += '<div class="eqms-section">' +
       '<div class="eqms-section-head">' +
         '<div class="eqms-section-num">S</div>' +
-        '<div><div class="eqms-section-title">Electronic Signatures</div></div>' +
+        '<div><div class="eqms-section-title">Chữ ký điện tử (Electronic Signatures)</div></div>' +
       '</div>' +
       '<div class="eqms-sig-grid">';
     sigBlocks.forEach(function(block){
