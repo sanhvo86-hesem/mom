@@ -1,0 +1,519 @@
+@charset "UTF-8";
+
+/* ═══════════════════════════════════════════
+   EVIDENCE VAULT MODULE — ev- prefix
+   HESEM QMS Portal
+   ═══════════════════════════════════════════ */
+
+/* ─── Evidence Grid ─── */
+.ev-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.ev-card {
+  flex: 1 1 200px;
+  min-width: 180px;
+  max-width: 280px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+}
+
+.ev-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.ev-card.selected {
+  border-color: var(--brand-2);
+  box-shadow: 0 0 0 2px rgba(21, 101, 192, 0.15);
+}
+
+.ev-card-thumb {
+  height: 120px;
+  background: #f1f3f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.ev-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ev-card-thumb-placeholder {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+  opacity: 0.5;
+}
+
+.ev-card-type-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  backdrop-filter: blur(4px);
+}
+
+.ev-card-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.ev-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ev-card-meta {
+  font-size: 11px;
+  color: var(--text-3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ev-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.ev-card-tag {
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(21, 101, 192, 0.08);
+  color: var(--brand-2);
+}
+
+/* ─── Upload Zone ─── */
+.ev-upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: #fafbfc;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  text-align: center;
+}
+
+.ev-upload-zone:hover {
+  border-color: var(--brand-2);
+  background: rgba(21, 101, 192, 0.02);
+}
+
+.ev-upload-zone.dragover {
+  border-color: var(--brand-2);
+  background: rgba(21, 101, 192, 0.06);
+  border-style: solid;
+}
+
+.ev-upload-zone.dragover .ev-upload-icon {
+  transform: scale(1.1);
+}
+
+.ev-upload-icon {
+  width: 48px;
+  height: 48px;
+  color: var(--text-3);
+  opacity: 0.5;
+  transition: transform 0.2s ease;
+}
+
+.ev-upload-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.ev-upload-hint {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.ev-upload-progress {
+  width: 100%;
+  max-width: 320px;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.ev-upload-progress-fill {
+  height: 100%;
+  background: var(--brand-2);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.ev-upload-progress-fill.complete {
+  background: var(--green);
+}
+
+.ev-upload-file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  max-width: 400px;
+  margin-top: 8px;
+}
+
+.ev-upload-file-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.ev-upload-file-name {
+  flex: 1;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ev-upload-file-size {
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+
+/* ─── Chain of Custody Timeline ─── */
+.ev-custody-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  padding-left: 24px;
+}
+
+.ev-custody-timeline::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 12px;
+  bottom: 12px;
+  width: 2px;
+  background: var(--border);
+  border-radius: 1px;
+}
+
+.ev-custody-event {
+  position: relative;
+  padding: 10px 16px;
+  margin-bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ev-custody-event::before {
+  content: '';
+  position: absolute;
+  left: -19px;
+  top: 14px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--brand-2);
+  border: 2px solid var(--surface);
+  z-index: 1;
+}
+
+.ev-custody-event:first-child::before {
+  background: var(--green);
+}
+
+.ev-custody-event-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ev-custody-action {
+  display: inline-flex;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ev-custody-action.uploaded  { background: rgba(46, 125, 50, 0.1);  color: var(--green); }
+.ev-custody-action.viewed    { background: rgba(21, 101, 192, 0.1); color: var(--brand-2); }
+.ev-custody-action.linked    { background: rgba(249, 168, 37, 0.15); color: var(--amber); }
+.ev-custody-action.exported  { background: rgba(134, 142, 150, 0.12); color: var(--text-3); }
+.ev-custody-action.verified  { background: rgba(46, 125, 50, 0.1);  color: var(--green); }
+
+.ev-custody-actor {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ev-custody-time {
+  font-size: 11px;
+  color: var(--text-3);
+  font-family: var(--mono);
+}
+
+.ev-custody-detail {
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.4;
+}
+
+/* ─── Hash Chain Verification ─── */
+.ev-chain-verify {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.ev-chain-verify-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ev-chain-verify-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.ev-chain-verify-status {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.ev-chain-verify-status.valid  { background: rgba(46, 125, 50, 0.1);  color: var(--green); }
+.ev-chain-verify-status.broken { background: rgba(198, 40, 40, 0.1);  color: var(--red); }
+
+.ev-chain-links {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ev-chain-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: background 0.15s ease;
+}
+
+.ev-chain-link:hover {
+  background: #f8f9fa;
+}
+
+.ev-chain-link-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.ev-chain-link.valid .ev-chain-link-icon {
+  background: rgba(46, 125, 50, 0.12);
+  color: var(--green);
+}
+
+.ev-chain-link.broken .ev-chain-link-icon {
+  background: rgba(198, 40, 40, 0.12);
+  color: var(--red);
+}
+
+.ev-chain-link-hash {
+  flex: 1;
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ev-chain-link-time {
+  font-size: 10px;
+  color: var(--text-3);
+  font-family: var(--mono);
+  flex-shrink: 0;
+}
+
+.ev-chain-progress {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.ev-chain-progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+  background: var(--brand-2);
+}
+
+.ev-chain-progress-fill.complete {
+  background: var(--green);
+}
+
+.ev-chain-progress-fill.error {
+  background: var(--red);
+}
+
+/* ─── Type Icons (CSS-only shapes) ─── */
+.ev-type-icon-base {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.ev-type-photo       { background: rgba(21, 101, 192, 0.1); color: var(--brand-2); }
+.ev-type-video       { background: rgba(156, 39, 176, 0.1); color: #7b1fa2; }
+.ev-type-document    { background: rgba(245, 127, 23, 0.1);  color: var(--amber); }
+.ev-type-measurement { background: rgba(46, 125, 50, 0.1);  color: var(--green); }
+.ev-type-cert        { background: rgba(12, 45, 72, 0.1);   color: var(--brand); }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .ev-grid {
+    gap: 10px;
+  }
+
+  .ev-card {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .ev-card-thumb {
+    height: 100px;
+  }
+
+  .ev-upload-zone {
+    padding: 24px 16px;
+  }
+
+  .ev-upload-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .ev-upload-label {
+    font-size: 13px;
+  }
+
+  .ev-custody-timeline {
+    padding-left: 20px;
+  }
+
+  .ev-custody-event {
+    padding: 8px 12px;
+  }
+
+  .ev-chain-link {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .ev-chain-link-hash {
+    font-size: 10px;
+    white-space: normal;
+    word-break: break-all;
+  }
+
+  .ev-chain-link-time {
+    font-size: 9px;
+  }
+
+  .ev-card-tags {
+    gap: 3px;
+  }
+
+  .ev-card-tag {
+    font-size: 9px;
+  }
+
+  .ev-type-icon-base {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+}

@@ -99,6 +99,11 @@ use HESEM\QMS\Api\Controllers\UserController;
 use HESEM\QMS\Api\Controllers\AdminController;
 use HESEM\QMS\Api\Controllers\DictController;
 use HESEM\QMS\Api\Controllers\DashboardController;
+use HESEM\QMS\Api\Controllers\OrderController;
+use HESEM\QMS\Api\Controllers\ExceptionController;
+use HESEM\QMS\Api\Controllers\SupplierController;
+use HESEM\QMS\Api\Controllers\QuoteController;
+use HESEM\QMS\Api\Controllers\EvidenceController;
 use HESEM\QMS\Database\DataLayer;
 
 // ── Bootstrap DataLayer ─────────────────────────────────────────────────────
@@ -224,6 +229,95 @@ $router->actions([
     'spc_alerts'           => [DashboardController::class, 'spcAlerts'],
 ]);
 
+// Orders (SO/JO/WO)
+$router->actions([
+    'order_so_list'           => [OrderController::class, 'listSalesOrders'],
+    'order_so_detail'         => [OrderController::class, 'getSalesOrderDetail'],
+    'order_so_create'         => [OrderController::class, 'createSalesOrder'],
+    'order_so_update'         => [OrderController::class, 'updateSalesOrder'],
+    'order_jo_list'           => [OrderController::class, 'listJobOrders'],
+    'order_jo_detail'         => [OrderController::class, 'getJobOrderDetail'],
+    'order_jo_create'         => [OrderController::class, 'createJobOrder'],
+    'order_jo_update'         => [OrderController::class, 'updateJobOrder'],
+    'order_wo_create'         => [OrderController::class, 'createWorkOrder'],
+    'order_wo_update'         => [OrderController::class, 'updateWorkOrder'],
+    'order_transition'        => [OrderController::class, 'transition'],
+    'order_contract_review'   => [OrderController::class, 'contractReview'],
+    'order_hold_set'          => [OrderController::class, 'setHold'],
+    'order_hold_release'      => [OrderController::class, 'releaseHold'],
+    'order_note_add'          => [OrderController::class, 'addNote'],
+    'order_hierarchy'         => [OrderController::class, 'getHierarchy'],
+    'order_timeline'          => [OrderController::class, 'getTimeline'],
+    'order_dashboard_stats'   => [OrderController::class, 'getDashboardStats'],
+    'order_dashboard_kpi'     => [OrderController::class, 'getDashboardKpi'],
+    'order_search'            => [OrderController::class, 'search'],
+    'order_link_form'         => [OrderController::class, 'linkForm'],
+]);
+
+// Exception Management
+$router->actions([
+    'exception_dashboard'       => [ExceptionController::class, 'dashboard'],
+    'exception_list'            => [ExceptionController::class, 'listAll'],
+    'exception_detail'          => [ExceptionController::class, 'detail'],
+    'exception_complaint_create'=> [ExceptionController::class, 'createComplaint'],
+    'exception_complaint_update'=> [ExceptionController::class, 'updateComplaint'],
+    'exception_mrb_create'      => [ExceptionController::class, 'createMrb'],
+    'exception_mrb_update'      => [ExceptionController::class, 'updateMrb'],
+    'exception_deviation_create'=> [ExceptionController::class, 'createDeviation'],
+    'exception_deviation_update'=> [ExceptionController::class, 'updateDeviation'],
+    'exception_concession_create' => [ExceptionController::class, 'createConcession'],
+    'exception_concession_update' => [ExceptionController::class, 'updateConcession'],
+    'exception_transition'      => [ExceptionController::class, 'transition'],
+    'exception_copq_summary'    => [ExceptionController::class, 'copqSummary'],
+    'exception_trends'          => [ExceptionController::class, 'trends'],
+    'exception_escalate'        => [ExceptionController::class, 'escalate'],
+]);
+
+// Supplier Quality Management
+$router->actions([
+    'supplier_dashboard'        => [SupplierController::class, 'dashboard'],
+    'supplier_scorecard_list'   => [SupplierController::class, 'listScorecards'],
+    'supplier_scorecard_detail' => [SupplierController::class, 'scorecardDetail'],
+    'supplier_scorecard_calc'   => [SupplierController::class, 'calculateScorecard'],
+    'supplier_incoming_list'    => [SupplierController::class, 'listIncoming'],
+    'supplier_incoming_create'  => [SupplierController::class, 'createIncoming'],
+    'supplier_incoming_update'  => [SupplierController::class, 'updateIncoming'],
+    'supplier_skip_lot_status'  => [SupplierController::class, 'skipLotStatus'],
+    'supplier_skip_lot_update'  => [SupplierController::class, 'updateSkipLot'],
+    'supplier_asl_list'         => [SupplierController::class, 'listAsl'],
+    'supplier_asl_upsert'       => [SupplierController::class, 'upsertAsl'],
+    'supplier_scar_list'        => [SupplierController::class, 'listScar'],
+    'supplier_scar_create'      => [SupplierController::class, 'createScar'],
+    'supplier_scar_update'      => [SupplierController::class, 'updateScar'],
+    'supplier_scar_transition'  => [SupplierController::class, 'scarTransition'],
+    'supplier_audit_list'       => [SupplierController::class, 'listAudits'],
+    'supplier_audit_upsert'     => [SupplierController::class, 'upsertAudit'],
+]);
+
+// Quoting & Estimation
+$router->actions([
+    'quote_list'              => [QuoteController::class, 'listQuotes'],
+    'quote_detail'            => [QuoteController::class, 'detail'],
+    'quote_create'            => [QuoteController::class, 'create'],
+    'quote_update'            => [QuoteController::class, 'update'],
+    'quote_transition'        => [QuoteController::class, 'transition'],
+    'quote_convert_to_so'     => [QuoteController::class, 'convertToSo'],
+    'quote_estimate_cycle'    => [QuoteController::class, 'estimateCycleTime'],
+    'quote_estimate_material' => [QuoteController::class, 'estimateMaterial'],
+    'quote_dashboard'         => [QuoteController::class, 'dashboard'],
+]);
+
+// Evidence Vault
+$router->actions([
+    'evidence_list'           => [EvidenceController::class, 'listEvidence'],
+    'evidence_detail'         => [EvidenceController::class, 'detail'],
+    'evidence_upload'         => [EvidenceController::class, 'upload'],
+    'evidence_link'           => [EvidenceController::class, 'link'],
+    'evidence_chain_custody'  => [EvidenceController::class, 'chainOfCustody'],
+    'evidence_verify_chain'   => [EvidenceController::class, 'verifyChain'],
+    'evidence_search'         => [EvidenceController::class, 'search'],
+]);
+
 // ── Register RESTful Routes ─────────────────────────────────────────────────
 
 // Documents
@@ -292,6 +386,59 @@ $router->post('/api/spc/capability', DashboardController::class, 'spcCapability'
 $router->post('/api/spc/chart', DashboardController::class, 'spcChart');
 $router->get('/api/spc/alerts', DashboardController::class, 'spcAlerts');
 $router->get('/api/spc/summary', DashboardController::class, 'spcSummary');
+
+// Orders
+$router->get('/api/orders/sales', OrderController::class, 'listSalesOrders');
+$router->post('/api/orders/sales', OrderController::class, 'createSalesOrder');
+$router->get('/api/orders/sales/{soNumber}', OrderController::class, 'getSalesOrderDetail');
+$router->put('/api/orders/sales/{soNumber}', OrderController::class, 'updateSalesOrder');
+$router->get('/api/orders/jobs', OrderController::class, 'listJobOrders');
+$router->post('/api/orders/jobs', OrderController::class, 'createJobOrder');
+$router->get('/api/orders/jobs/{joNumber}', OrderController::class, 'getJobOrderDetail');
+$router->put('/api/orders/jobs/{joNumber}', OrderController::class, 'updateJobOrder');
+$router->post('/api/orders/work', OrderController::class, 'createWorkOrder');
+$router->put('/api/orders/work/{woNumber}', OrderController::class, 'updateWorkOrder');
+$router->post('/api/orders/transition', OrderController::class, 'transition');
+$router->get('/api/orders/hierarchy', OrderController::class, 'getHierarchy');
+$router->get('/api/orders/timeline', OrderController::class, 'getTimeline');
+$router->get('/api/orders/dashboard', OrderController::class, 'getDashboardKpi');
+$router->get('/api/orders/search', OrderController::class, 'search');
+
+// Exceptions
+$router->get('/api/exceptions/dashboard', ExceptionController::class, 'dashboard');
+$router->get('/api/exceptions', ExceptionController::class, 'listAll');
+$router->get('/api/exceptions/{id}', ExceptionController::class, 'detail');
+$router->post('/api/exceptions/complaints', ExceptionController::class, 'createComplaint');
+$router->post('/api/exceptions/mrb', ExceptionController::class, 'createMrb');
+$router->post('/api/exceptions/deviations', ExceptionController::class, 'createDeviation');
+$router->post('/api/exceptions/concessions', ExceptionController::class, 'createConcession');
+$router->get('/api/exceptions/copq', ExceptionController::class, 'copqSummary');
+$router->get('/api/exceptions/trends', ExceptionController::class, 'trends');
+
+// Supplier Quality
+$router->get('/api/suppliers/dashboard', SupplierController::class, 'dashboard');
+$router->get('/api/suppliers/scorecards', SupplierController::class, 'listScorecards');
+$router->get('/api/suppliers/incoming', SupplierController::class, 'listIncoming');
+$router->post('/api/suppliers/incoming', SupplierController::class, 'createIncoming');
+$router->get('/api/suppliers/asl', SupplierController::class, 'listAsl');
+$router->get('/api/suppliers/scar', SupplierController::class, 'listScar');
+$router->post('/api/suppliers/scar', SupplierController::class, 'createScar');
+
+// Quotes
+$router->get('/api/quotes', QuoteController::class, 'listQuotes');
+$router->post('/api/quotes', QuoteController::class, 'create');
+$router->get('/api/quotes/{id}', QuoteController::class, 'detail');
+$router->put('/api/quotes/{id}', QuoteController::class, 'update');
+$router->post('/api/quotes/{id}/convert', QuoteController::class, 'convertToSo');
+
+// Evidence
+$router->get('/api/evidence', EvidenceController::class, 'listEvidence');
+$router->post('/api/evidence', EvidenceController::class, 'upload');
+$router->get('/api/evidence/{id}', EvidenceController::class, 'detail');
+$router->post('/api/evidence/{id}/link', EvidenceController::class, 'link');
+$router->get('/api/evidence/{id}/custody', EvidenceController::class, 'chainOfCustody');
+$router->get('/api/evidence/verify', EvidenceController::class, 'verifyChain');
+$router->get('/api/evidence/search', EvidenceController::class, 'search');
 
 // ── Dispatch ────────────────────────────────────────────────────────────────
 

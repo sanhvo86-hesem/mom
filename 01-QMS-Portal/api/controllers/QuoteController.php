@@ -1,0 +1,481 @@
+<?php
+
+declare(strict_types=1);
+
+namespace HESEM\QMS\Api\Controllers;
+
+use HESEM\QMS\Api\Controllers\BaseController;
+use HESEM\QMS\Services\QuoteService;
+use Throwable;
+
+/**
+ * Quote controller for HESEM QMS Portal.
+ *
+ * Provides API endpoints for quoting and estimation including
+ * quote CRUD, status transitions, SO conversion, cycle-time
+ * estimation, material cost estimation, and pipeline KPIs.
+ *
+ * Data stored in `qms-data/quotes/` with quotes.json,
+ * rate-cards.json, and material-templates.json.
+ *
+ * @package HESEM\QMS\Api\Controllers
+ * @since   3.0.0
+ */
+class QuoteController extends BaseController
+{
+    /** @var QuoteService|null Lazy-loaded quote service. */
+    private ?QuoteService $quoteSvc = null;
+
+    /** @var array|null Cached quote access-control config. */
+    private ?array $quoteConfig = null;
+
+    // ── Service Access ──────────────────────────────────────────────────────
+
+    /**
+     * Get or create the QuoteService instance.
+     *
+     * @return QuoteService
+     */
+    private function quoteService(): QuoteService
+    {
+        if ($this->quoteSvc === null) {
+            $this->quoteSvc = new QuoteService($this->dataDir);
+        }
+        return $this->quoteSvc;
+    }
+
+    /**
+     * Load the quote access-control configuration.
+     *
+     * @return array<string, mixed>
+     */
+    private function loadQuoteConfig(): array
+    {
+        if ($this->quoteConfig !== null) {
+            return $this->quoteConfig;
+        }
+
+        $configFile = $this->confDir . '/quote_config.json';
+        $this->quoteConfig = $this->readJsonFile($configFile) ?? [
+            'roles' => [
+                'admin'          => ['qt_read', 'qt_write', 'qt_transition', 'qt_convert', 'qt_estimate'],
+                'doc_controller' => ['qt_read', 'qt_write', 'qt_transition'],
+                'sales'          => ['qt_read', 'qt_write', 'qt_transition', 'qt_convert', 'qt_estimate'],
+                'quality'        => ['qt_read'],
+                'production'     => ['qt_read', 'qt_estimate'],
+                'engineering'    => ['qt_read', 'qt_estimate'],
+                'viewer'         => ['qt_read'],
+            ],
+        ];
+
+        return $this->quoteConfig;
+    }
+
+    /**
+     * Check if the user has a specific quote permission.
+     *
+     * @param array  $user       User record.
+     * @param string $permission Permission key.
+     * @return bool
+     */
+    private function hasQuotePermission(array $user, string $permission): bool
+    {
+        $config = $this->loadQuoteConfig();
+        $roles  = $config['roles'] ?? [];
+        $role   = (string)($user['role'] ?? 'viewer');
+
+        $perms = $roles[$role] ?? $roles['viewer'] ?? [];
+
+        return in_array($permission, $perms, true);
+    }
+
+    /**
+     * Require a quote permission, terminating with 403 if missing.
+     *
+     * @param array  $user       User record.
+     * @param string $permission Permission key.
+     * @return void
+     */
+    private function requireQuotePermission(array $user, string $permission): void
+    {
+        if (!$this->hasQuotePermission($user, $permission)) {
+            $this->error('forbidden', 403, "Missing permission: {$permission}");
+        }
+    }
+
+    /**
+     * Extract the acting username from a user record.
+     *
+     * @param array $user User record.
+     * @return string
+     */
+    private function userId(array $user): string
+    {
+        return (string)($user['username'] ?? $user['user'] ?? 'unknown');
+    }
+
+    // ── Endpoints ───────────────────────────────────────────────────────────
+
+    /**
+     * GET listQuotes — List quotes with optional filters.
+     *
+     * Query params:
+     *   - status    (string, optional): draft, sent, accepted, rejected, expired.
+     *   - customer  (string, optional): Customer name (partial match).
+     *   - date_from (string, optional): YYYY-MM-DD.
+     *   - date_to   (string, optional): YYYY-MM-DD.
+     *   - offset    (int, optional)
+     *   - limit     (int, optional)
+     *
+     * @return never
+     */
+    public function listQuotes(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireQuotePermission($user, 'qt_read');
+
+        $filters = [];
+
+        $status = $this->query('status');
+        if ($status !== null && $status !== '') {
+            $filters['status'] = strtolower($status);
+        }
+
+        $customer = $this->query('customer');
+        if ($customer !== null && $customer !== '') {
+            $filters['customer'] = $customer;
+        }
+
+        $dateFrom = $this->query('date_from');
+        if ($dateFrom !== null && preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateFrom)) {
+            $filters['date_from'] = $dateFrom;
+        }
+
+        $dateTo = $this->query('date_to');
+        if ($dateTo !== null && preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateTo)) {
+            $filters['date_to'] = $dateTo;
+        }
+
+        $offset = max(0, (int)($this->query('offset', '0')));
+        $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
+
+        try {
+            $allItems = $this->quoteService()->listQuotes($filters);
+            $total    = count($allItems);
+            $items    = array_slice($allItems, $offset, $limit);
+
+            $this->paginated('quotes', array_values($items), $total, $offset, $limit);
+        } catch (Throwable $e) {
+            $this->error('quotes_list_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * GET detail — Single quote with line items.
+     *
+     * Query params:
+     *   - id (string, required): Quote record ID or quote number.
+     *
+     * @return never
+     */
+    public function detail(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireQuotePermission($user, 'qt_read');
+
+        $id = $this->query('id');
+        if ($id === null || trim($id) === '') {
+            $this->error('missing_id', 400);
+        }
+
+        $id = trim($id);
+
+        try {
+            $quote = $this->quoteService()->getDetail($id);
+            if ($quote === null) {
+                $this->error('not_found', 404, "Quote {$id} not found.");
+            }
+
+            $this->success(['quote' => $quote]);
+        } catch (Throwable $e) {
+            $this->error('quote_detail_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST create — Create a quote with header and line items.
+     *
+     * Body fields:
+     *   - customer_id   (string, required)
+     *   - customer_name (string, required)
+     *   - contact_name  (string, optional)
+     *   - contact_email (string, optional)
+     *   - rfq_number    (string, optional)
+     *   - valid_until   (string, optional, YYYY-MM-DD)
+     *   - currency      (string, optional, default "USD")
+     *   - notes         (string, optional)
+     *   - line_items    (array, required): Array of line item objects.
+     *     Each: part_id, description, qty, unit_price, material, operations[].
+     *
+     * @return never
+     */
+    public function create(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireQuotePermission($user, 'qt_write');
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['customer_id', 'customer_name', 'line_items']);
+
+        if (!is_array($body['line_items'] ?? null) || count($body['line_items']) === 0) {
+            $this->error('missing_line_items', 400, 'At least one line item is required.');
+        }
+
+        $userId = $this->userId($user);
+
+        try {
+            $quote = $this->quoteService()->create([
+                'customer_id'   => trim((string)($body['customer_id'] ?? '')),
+                'customer_name' => trim((string)($body['customer_name'] ?? '')),
+                'contact_name'  => trim((string)($body['contact_name'] ?? '')),
+                'contact_email' => trim((string)($body['contact_email'] ?? '')),
+                'rfq_number'    => trim((string)($body['rfq_number'] ?? '')),
+                'valid_until'   => trim((string)($body['valid_until'] ?? '')),
+                'currency'      => strtoupper(trim((string)($body['currency'] ?? 'USD'))),
+                'notes'         => trim((string)($body['notes'] ?? '')),
+                'line_items'    => (array)($body['line_items'] ?? []),
+                'created_by'    => $userId,
+            ]);
+
+            $this->auditLog('quote_create', [
+                'quote_number' => $quote['number'],
+                'customer_id'  => $body['customer_id'],
+                'line_count'   => count($body['line_items']),
+            ], $userId);
+
+            $this->success(['quote' => $quote], 201);
+        } catch (Throwable $e) {
+            $this->error('quote_create_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST update — Update quote header or line items.
+     *
+     * Body fields:
+     *   - id (string, required): Quote record ID.
+     *   - Any updatable header fields and/or line_items array.
+     *
+     * @return never
+     */
+    public function update(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireQuotePermission($user, 'qt_write');
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['id']);
+
+        $id     = trim((string)($body['id'] ?? ''));
+        $userId = $this->userId($user);
+
+        try {
+            $updated = $this->quoteService()->update($id, $body, $userId);
+            if ($updated === null) {
+                $this->error('not_found', 404, "Quote {$id} not found.");
+            }
+
+            $this->auditLog('quote_update', [
+                'quote_id' => $id,
+                'fields'   => array_keys($body),
+            ], $userId);
+
+            $this->success(['quote' => $updated]);
+        } catch (Throwable $e) {
+            $this->error('quote_update_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST transition — Quote status transition.
+     *
+     * Allowed transitions: draft -> sent -> accepted|rejected|expired.
+     *
+     * Body fields:
+     *   - id        (string, required)
+     *   - to_status (string, required)
+     *   - comment   (string, optional)
+     *
+     * @return never
+     */
+    public function transition(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireQuotePermission($user, 'qt_transition');
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['id', 'to_status']);
+
+        $id       = trim((string)($body['id'] ?? ''));
+        $toStatus = strtolower(trim((string)($body['to_status'] ?? '')));
+        $comment  = trim((string)($body['comment'] ?? ''));
+        $userId   = $this->userId($user);
+
+        try {
+            $updated = $this->quoteService()->transition($id, $toStatus, $userId, $comment);
+            if ($updated === null) {
+                $this->error('transition_failed', 400, "Cannot transition quote {$id} to {$toStatus}.");
+            }
+
+            $this->auditLog('quote_transition', [
+                'quote_id'  => $id,
+                'to_status' => $toStatus,
+                'comment'   => $comment,
+            ], $userId);
+
+            $this->success(['quote' => $updated]);
+        } catch (Throwable $e) {
+            $this->error('quote_transition_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST convertToSo — Convert an accepted quote to a Sales Order.
+     *
+     * Body fields:
+     *   - id (string, required): Quote record ID (must be in 'accepted' status).
+     *   - po_number (string, optional): Customer PO number.
+     *
+     * @return never
+     */
+    public function convertToSo(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireQuotePermission($user, 'qt_convert');
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['id']);
+
+        $id       = trim((string)($body['id'] ?? ''));
+        $poNumber = trim((string)($body['po_number'] ?? ''));
+        $userId   = $this->userId($user);
+
+        try {
+            $result = $this->quoteService()->convertToSalesOrder($id, $poNumber, $userId);
+            if ($result === null) {
+                $this->error('convert_failed', 400, "Quote {$id} cannot be converted. Must be in 'accepted' status.");
+            }
+
+            $this->auditLog('quote_convert_to_so', [
+                'quote_id'  => $id,
+                'so_number' => $result['so_number'] ?? '',
+            ], $userId);
+
+            $this->success([
+                'quote'     => $result['quote'],
+                'so_number' => $result['so_number'],
+            ]);
+        } catch (Throwable $e) {
+            $this->error('convert_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST estimateCycleTime — Estimate CNC cycle time from parameters.
+     *
+     * Body fields:
+     *   - material   (string, required): Material type (e.g. "6061-T6", "316SS").
+     *   - operations (array, required): List of operations with type and parameters.
+     *   - dimensions (object, optional): Part dimensions {length, width, height, diameter}.
+     *   - complexity (string, optional): low, medium, high.
+     *
+     * @return never
+     */
+    public function estimateCycleTime(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireQuotePermission($user, 'qt_estimate');
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['material', 'operations']);
+
+        if (!is_array($body['operations'] ?? null) || count($body['operations']) === 0) {
+            $this->error('missing_operations', 400, 'At least one operation is required.');
+        }
+
+        try {
+            $estimate = $this->quoteService()->estimateCycleTime([
+                'material'   => trim((string)($body['material'] ?? '')),
+                'operations' => (array)($body['operations'] ?? []),
+                'dimensions' => (array)($body['dimensions'] ?? []),
+                'complexity' => strtolower(trim((string)($body['complexity'] ?? 'medium'))),
+            ]);
+
+            $this->success(['estimate' => $estimate]);
+        } catch (Throwable $e) {
+            $this->error('cycle_time_estimate_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST estimateMaterial — Estimate material cost from parameters.
+     *
+     * Body fields:
+     *   - material_type (string, required): e.g. "6061-T6", "Ti-6Al-4V".
+     *   - dimensions    (object, required): {length, width, height} or {diameter, length} in mm.
+     *   - buy_to_fly    (float, optional): Buy-to-fly ratio (default 3.0).
+     *   - qty           (int, optional): Quantity for volume pricing (default 1).
+     *
+     * @return never
+     */
+    public function estimateMaterial(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireQuotePermission($user, 'qt_estimate');
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['material_type', 'dimensions']);
+
+        if (!is_array($body['dimensions'] ?? null)) {
+            $this->error('invalid_dimensions', 400, 'Dimensions must be an object.');
+        }
+
+        try {
+            $estimate = $this->quoteService()->estimateMaterial([
+                'material_type' => trim((string)($body['material_type'] ?? '')),
+                'dimensions'    => (array)($body['dimensions'] ?? []),
+                'buy_to_fly'    => (float)($body['buy_to_fly'] ?? 3.0),
+                'qty'           => max(1, (int)($body['qty'] ?? 1)),
+            ]);
+
+            $this->success(['estimate' => $estimate]);
+        } catch (Throwable $e) {
+            $this->error('material_estimate_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * GET dashboard — Quote pipeline KPIs.
+     *
+     * Returns win rate, avg quote value, pipeline value, avg response time.
+     *
+     * @return never
+     */
+    public function dashboard(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireQuotePermission($user, 'qt_read');
+
+        try {
+            $kpis = $this->quoteService()->getDashboardKpis();
+
+            $this->success(['kpis' => $kpis]);
+        } catch (Throwable $e) {
+            $this->error('quote_dashboard_failed', 500, $e->getMessage());
+        }
+    }
+}

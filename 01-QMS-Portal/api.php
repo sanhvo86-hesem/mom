@@ -8942,6 +8942,26 @@ function evidence_review_config(array $schema): array {
   if ($mode !== 'parallel') $mode = 'serial';
 
   $rolesAllowed = $config['roles_allowed'] ?? $schema['roles_allowed'] ?? [];
+  if (is_array($rolesAllowed)) {
+    $hasNested = false;
+    foreach ($rolesAllowed as $value) {
+      if (is_array($value)) { $hasNested = true; break; }
+    }
+    if ($hasNested) {
+      $flattened = [];
+      foreach (['review', 'approve'] as $bucket) {
+        if (is_array($rolesAllowed[$bucket] ?? null)) {
+          $flattened = array_merge($flattened, array_values($rolesAllowed[$bucket]));
+        }
+      }
+      if (empty($flattened)) {
+        foreach ($rolesAllowed as $value) {
+          if (is_array($value)) $flattened = array_merge($flattened, array_values($value));
+        }
+      }
+      $rolesAllowed = $flattened;
+    }
+  }
   $rolesAllowed = array_values(array_unique(array_values(array_filter(array_map(
     static fn($role) => strtolower(trim((string)$role)),
     is_array($rolesAllowed) ? $rolesAllowed : []

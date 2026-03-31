@@ -27,6 +27,10 @@ var state = {
   serverDraft: null,
   localDraft: null,
   master: null,
+  signatures: {},
+  resetSignaturesSnapshot: {},
+  approvalSummary: null,
+  reviewSla: null,
   data: {},
   resetSnapshot: {},
   loadedSource: 'Mặc định từ hồ sơ',
@@ -58,6 +62,7 @@ function cacheElements(){
   els.supplierHints = byId('supplierHints');
   els.saveMeta = byId('saveMeta');
   els.entryMeta = byId('entryMeta');
+  els.workflowPanel = byId('scarWorkflowPanel');
   els.btnSaveDraft = byId('btnSaveDraft');
   els.btnReset = byId('btnReset');
   els.btnSubmit = byId('btnSubmit');
@@ -94,8 +99,10 @@ function loadRuntime(){
     state.localDraft = loadLocalDraft();
     return loadEntry();
   }).then(function(){
+    state.signatures = buildMergedSignatures();
     state.data = buildMergedData();
     state.resetSnapshot = clone(state.data);
+    state.resetSignaturesSnapshot = clone(state.signatures);
     populateForm();
     renderAll();
     updateActionState();
@@ -139,6 +146,8 @@ function loadAllocation(){
   return callApi('upload_allocation_status', { allocation_id: state.allocationId }, 'GET').then(function(resp){
     state.allocation = resp && resp.ok ? (resp.allocation || null) : null;
     if(state.allocation && !state.recordId) state.recordId = String(state.allocation.record_id || '').trim();
+    state.approvalSummary = state.allocation && state.allocation.approval_summary ? clone(state.allocation.approval_summary) : null;
+    state.reviewSla = state.allocation && state.allocation.review_sla ? clone(state.allocation.review_sla) : null;
     return state.allocation;
   }).catch(function(){ state.allocation = null; return null; });
 }
@@ -259,6 +268,50 @@ function extractDraftValues(draft){
   return values;
 }
 
+function buildMergedSignatures(){
+  var merged = {};
+  mergeSignatureMap(merged, state.serverDraft && state.serverDraft.data ? state.serverDraft.data.signatures : null);
+  mergeSignatureMap(merged, state.serverDraft && state.serverDraft.signatures ? state.serverDraft.signatures : null);
+  mergeSignatureMap(merged, state.localDraft && state.localDraft.signatures ? state.localDraft.signatures : null);
+  mergeSignatureMap(merged, state.entry && state.entry.signatures ? state.entry.signatures : null);
+  mergeSignatureMap(merged, state.allocation && state.allocation.signatures ? state.allocation.signatures : null);
+  if(state.allocation && state.allocation.approval_signature && !merged.approver){
+    merged.approver = normalizeSignature(state.allocation.approval_signature, 'Approved');
+  }
+  var approvalRecords = Array.isArray(state.allocation && state.allocation.approval_records) ? state.allocation.approval_records : [];
+  approvalRecords.forEach(function(record){
+    if(!record || typeof record !== 'object' || !record.signature) return;
+    var normalized = normalizeSignature(record.signature, record.meaning || 'Approved');
+    if(record.meaning === 'reviewed' && !merged.qa_reviewer) merged.qa_reviewer = normalized;
+    if((record.meaning === 'approved' || !record.meaning) && !merged.approver) merged.approver = normalized;
+  });
+  return merged;
+}
+
+function mergeSignatureMap(target, source){
+  if(!source || typeof source !== 'object') return;
+  Object.keys(source).forEach(function(key){
+    var normalized = normalizeSignature(source[key], '');
+    if(normalized) target[key] = normalized;
+  });
+}
+
+function normalizeSignature(signature, fallbackMeaning){
+  if(!signature || typeof signature !== 'object') return null;
+  return {
+    signerName: String(signature.signerName || signature.printed_name || signature.signer_name || '').trim(),
+    signerRole: String(signature.signerRole || signature.signer_role || '').trim(),
+    signerId: String(signature.signerId || signature.signer_id || '').trim(),
+    meaning: String(signature.meaning || signature.signature_meaning || fallbackMeaning || '').trim(),
+    timestamp: String(signature.timestamp || signature.signed_at || '').trim(),
+    hash: String(signature.hash || '').trim(),
+    reason: String(signature.reason || '').trim(),
+    typed_name: String(signature.typed_name || '').trim(),
+    image_data: String(signature.image_data || signature.data_url || '').trim(),
+    mode: String(signature.mode || '').trim()
+  };
+}
+
 function normalizeData(data){
   FIELD_IDS.forEach(function(fieldId){
     if(fieldId === 'root_cause_required'){
@@ -309,7 +362,8 @@ function snapshotData(data){
 }
 
 function hasDirtyChanges(){
-  return snapshotData(state.data) !== snapshotData(state.resetSnapshot);
+  return snapshotData(state.data) !== snapshotData(state.resetSnapshot) ||
+    JSON.stringify(state.signatures || {}) !== JSON.stringify(state.resetSignaturesSnapshot || {});
 }
 
 function publishDirtyState(source){
@@ -331,6 +385,7 @@ function publishDirtyState(source){
 
 function markCurrentStateSaved(){
   state.resetSnapshot = clone(state.data);
+  state.resetSignaturesSnapshot = clone(state.signatures);
   publishDirtyState('saved');
 }
 
@@ -410,6 +465,7 @@ function handleParentRuntimeCommand(event){
   }
   if(data.command === 'discard'){
     state.data = clone(state.resetSnapshot);
+    state.signatures = clone(state.resetSignaturesSnapshot);
     normalizeData(state.data);
     populateForm();
     renderAll();
@@ -429,6 +485,7 @@ function renderAll(){
   renderCloseout();
   renderSidebar();
   renderSupplierHints();
+  renderWorkflowPanel();
   updateMetaFootnotes();
   updateActionState();
   renderDisplayValues();
@@ -529,6 +586,404 @@ function renderSupplierHints(){
   });
 }
 
+function renderWorkflowPanel(){
+  if(!els.workflowPanel) return;
+  var workflowState = currentWorkflowState();
+  var summary = currentApprovalSummary();
+  var reviewSla = currentReviewSla();
+  var submissionRevision = currentSubmissionRevision();
+  var resubmissions = Math.max(0, submissionRevision - 1);
+  var signatureBlocks = Array.isArray(state.schema && state.schema.signature_blocks) ? state.schema.signature_blocks : [];
+  var html = '' +
+    '<div class="scar-workflow-summary">' +
+      summaryCard('Trạng thái workflow', workflowStateLabel(workflowState), workflowStateNote(workflowState)) +
+      summaryCard('Bản nộp hiện tại', submissionRevision > 0 ? ('R' + submissionRevision) : 'Chưa nộp', resubmissions > 0 ? ('Đã nộp lại ' + resubmissions + ' lần.') : 'Chưa phát sinh nộp lại có kiểm soát.') +
+      summaryCard('Phê duyệt', approvalHeadline(summary), approvalSubline(summary)) +
+      summaryCard('SLA review', reviewSlaHeadline(reviewSla), reviewSlaSubline(reviewSla)) +
+    '</div>';
+
+  if(signatureBlocks.length){
+    html += '<div class="scar-signature-grid">';
+    signatureBlocks.forEach(function(block){
+      html += renderSignatureCard(block, state.signatures[block.id]);
+    });
+    html += '</div>';
+  }
+
+  html += '<div class="scar-workflow-actions">' + renderWorkflowActions(workflowState) + '</div>' +
+    '<div class="scar-workflow-note">Workflow review, chữ ký điện tử và hành động reopen đều chạy trên cùng HTML SCAR này để tránh tách bề mặt hiển thị khỏi bề mặt vận hành.</div>';
+
+  els.workflowPanel.innerHTML = html;
+  bindWorkflowActions();
+}
+
+function summaryCard(label, value, note){
+  return '<div class="scar-summary-card"><small>' + esc(label) + '</small><strong>' + esc(value) + '</strong><span>' + esc(note) + '</span></div>';
+}
+
+function renderSignatureCard(block, signatureData){
+  var normalized = normalizeSignature(signatureData, String(block.meaning || '').trim());
+  var canSign = canSignBlock(block);
+  var signed = !!(normalized && (normalized.signerName || normalized.timestamp || normalized.hash));
+  var title = String(block.label_en || block.label || block.id || '').trim();
+  var subtitle = String(block.label || '').trim();
+  var meaning = String(block.meaning || '').trim() || 'Signed';
+  var html = '<div class="scar-signature-card' + (signed ? ' signed' : '') + '">' +
+    '<div class="scar-signature-head">' +
+      '<div><strong>' + esc(title) + '</strong>' + (subtitle && subtitle !== title ? '<span>' + esc(subtitle) + '</span>' : '') + '</div>' +
+      '<span class="scar-signature-meaning">' + esc(meaning) + '</span>' +
+    '</div>' +
+    '<div class="scar-signature-pad">';
+  if(signed){
+    html += '<div><strong>' + esc(normalized.signerName || 'Đã ký') + '</strong></div>' +
+      '<div>' + esc(normalized.signerRole || 'Vai trò chưa ghi nhận') + '</div>' +
+      '<div>' + esc(normalized.reason || 'Đã xác nhận điện tử trên hệ thống.') + '</div>';
+  } else {
+    html += '<div class="scar-signature-empty">Chưa ký</div><div>Khối chữ ký này sẽ được kích hoạt đúng thời điểm trong workflow.</div>';
+  }
+  html += '</div>';
+  if(signed){
+    html += '<div class="scar-signature-meta">' +
+      '<span>' + esc(normalized.timestamp ? formatDateTime(normalized.timestamp) : 'Chưa có thời điểm') + '</span>' +
+      '<span>' + esc(normalized.signerId || meaning) + '</span>' +
+    '</div>';
+  }
+  html += '<div class="scar-signature-actions">';
+  if(canSign && !signed){
+    html += '<button type="button" class="qf-btn secondary" data-sign-block="' + esc(block.id) + '">Ký</button>';
+  }
+  if(canClearSignature(block, signed)){
+    html += '<button type="button" class="qf-btn ghost" data-sign-clear="' + esc(block.id) + '">Xóa chữ ký</button>';
+  }
+  html += '</div></div>';
+  return html;
+}
+
+function renderWorkflowActions(workflowState){
+  var actions = [];
+  if(canSubmitForReview(workflowState)){
+    actions.push('<button type="button" class="qf-btn secondary" data-workflow-action="submit-review">Gửi xem xét</button>');
+  }
+  if(canReject(workflowState)){
+    actions.push('<button type="button" class="qf-btn ghost" data-workflow-action="reject">Từ chối</button>');
+  }
+  if(canApprove(workflowState)){
+    actions.push('<button type="button" class="qf-btn primary" data-workflow-action="approve">Phê duyệt</button>');
+  }
+  if(canReopen(workflowState)){
+    actions.push('<button type="button" class="qf-btn ghost" data-workflow-action="reopen">Mở lại hồ sơ</button>');
+  }
+  if(!actions.length) actions.push('<button type="button" class="qf-btn ghost" disabled>Chưa có thao tác workflow phù hợp ở trạng thái hiện tại</button>');
+  return actions.join('');
+}
+
+function bindWorkflowActions(){
+  if(!els.workflowPanel) return;
+  Array.prototype.forEach.call(els.workflowPanel.querySelectorAll('[data-sign-block]'), function(btn){
+    btn.onclick = function(){
+      captureSignature(btn.getAttribute('data-sign-block') || '');
+    };
+  });
+  Array.prototype.forEach.call(els.workflowPanel.querySelectorAll('[data-sign-clear]'), function(btn){
+    btn.onclick = function(){
+      var blockId = btn.getAttribute('data-sign-clear') || '';
+      if(!blockId) return;
+      delete state.signatures[blockId];
+      saveLocalDraft('signature_clear');
+      renderAll();
+    };
+  });
+  Array.prototype.forEach.call(els.workflowPanel.querySelectorAll('[data-workflow-action]'), function(btn){
+    btn.onclick = function(){
+      var action = btn.getAttribute('data-workflow-action') || '';
+      if(action === 'submit-review') doSubmitForReview();
+      else if(action === 'approve') doReviewAction('approve');
+      else if(action === 'reject') doReviewAction('reject');
+      else if(action === 'reopen') doReopen();
+    };
+  });
+}
+
+function currentWorkflowState(){
+  return String((state.allocation && state.allocation.status) || (state.entry && state.entry.workflow_state) || 'draft').trim().toLowerCase();
+}
+
+function currentApprovalSummary(){
+  if(state.approvalSummary && typeof state.approvalSummary === 'object') return state.approvalSummary;
+  if(state.allocation && state.allocation.approval_summary && typeof state.allocation.approval_summary === 'object') return state.allocation.approval_summary;
+  return {};
+}
+
+function currentReviewSla(){
+  if(state.reviewSla && typeof state.reviewSla === 'object') return state.reviewSla;
+  if(state.allocation && state.allocation.review_sla && typeof state.allocation.review_sla === 'object') return state.allocation.review_sla;
+  return {};
+}
+
+function currentSubmissionRevision(){
+  if(state.entry && state.entry.submission_revision) return Number(state.entry.submission_revision || 0);
+  if(state.allocation && state.allocation.online_submission && state.allocation.online_submission.submission_revision) return Number(state.allocation.online_submission.submission_revision || 0);
+  return 0;
+}
+
+function workflowStateLabel(stateKey){
+  var map = {
+    draft: 'Draft',
+    allocated: 'Allocated',
+    submitted: 'Submitted',
+    received: 'Received',
+    in_review: 'In Review',
+    approved: 'Approved',
+    rejected: 'Rejected',
+    closed: 'Closed',
+    voided: 'Voided'
+  };
+  return map[stateKey] || (stateKey || 'Draft');
+}
+
+function workflowStateNote(stateKey){
+  if(stateKey === 'submitted') return 'Biểu mẫu đã gửi dữ liệu online và đang chờ chuyển sang bước xem xét.';
+  if(stateKey === 'in_review') return 'Hồ sơ đang ở hàng chờ review/phê duyệt và có thể thao tác ngay tại section này.';
+  if(stateKey === 'approved') return 'Hồ sơ đã được phê duyệt. Có thể mở lại nếu cần controlled edit.';
+  if(stateKey === 'rejected') return 'Hồ sơ đã bị từ chối và cần chỉnh sửa/nộp lại có kiểm soát.';
+  if(stateKey === 'closed') return 'Hồ sơ đã đóng vòng đời hiện hành.';
+  return 'Hoàn thiện biểu mẫu, ký phát hành và gửi xem xét trên cùng bề mặt HTML.';
+}
+
+function approvalHeadline(summary){
+  var complete = !!summary.is_complete;
+  var collected = Number(summary.collected_approvals || 0);
+  var required = Number(summary.minimum_approvals || 1);
+  if(complete) return 'Đã đủ phê duyệt';
+  return collected + '/' + required + ' phê duyệt';
+}
+
+function approvalSubline(summary){
+  if(summary.status_label_vi) return String(summary.status_label_vi);
+  if(summary.status_label) return String(summary.status_label);
+  return 'Theo dõi số chữ ký/phê duyệt đã thu thập trên allocation hiện hành.';
+}
+
+function reviewSlaHeadline(reviewSla){
+  if(!reviewSla || typeof reviewSla !== 'object') return 'Chưa kích hoạt';
+  if(reviewSla.overdue) return 'Quá hạn review';
+  if(reviewSla.deadline_at) return reviewSla.status_label_vi || reviewSla.status_label || 'Đang theo SLA';
+  return 'Chưa khởi tạo';
+}
+
+function reviewSlaSubline(reviewSla){
+  if(!reviewSla || typeof reviewSla !== 'object') return 'SLA sẽ bắt đầu khi hồ sơ được gửi vào bước xem xét.';
+  if(reviewSla.deadline_at) return 'Hạn: ' + formatDateTime(reviewSla.deadline_at);
+  return 'SLA review sẽ được vật liệu hóa sau khi gửi xem xét.';
+}
+
+function userRoles(){
+  var user = state.currentUser || {};
+  var roles = Array.isArray(user.roles) ? user.roles : [user.role];
+  return roles.map(function(role){ return String(role || '').trim().toLowerCase(); }).filter(Boolean);
+}
+
+function schemaRoles(bucket){
+  var rolesAllowed = state.schema && state.schema.roles_allowed ? state.schema.roles_allowed : {};
+  if(Array.isArray(rolesAllowed)) return rolesAllowed.map(function(role){ return String(role || '').trim().toLowerCase(); }).filter(Boolean);
+  var bucketRoles = Array.isArray(rolesAllowed[bucket]) ? rolesAllowed[bucket] : [];
+  return bucketRoles.map(function(role){ return String(role || '').trim().toLowerCase(); }).filter(Boolean);
+}
+
+function userHasSchemaRole(bucket){
+  var allowed = schemaRoles(bucket);
+  if(!allowed.length) return true;
+  var mine = userRoles();
+  return allowed.some(function(role){ return mine.indexOf(role) >= 0 || role === 'all'; });
+}
+
+function canSignBlock(block){
+  if(!state.loggedIn || !state.editMode || !block) return false;
+  if(block.id === 'originator') return currentWorkflowState() !== 'approved' && currentWorkflowState() !== 'closed' && userHasSchemaRole('fill');
+  if(block.id === 'qa_reviewer') return currentWorkflowState() === 'in_review' && (userHasSchemaRole('review') || userHasSchemaRole('approve'));
+  if(block.id === 'approver') return currentWorkflowState() === 'in_review' && userHasSchemaRole('approve');
+  return false;
+}
+
+function canClearSignature(block, signed){
+  if(!signed || !block || !state.editMode) return false;
+  if(block.id !== 'originator') return false;
+  return ['draft', 'allocated', 'submitted', 'received', 'rejected'].indexOf(currentWorkflowState()) >= 0;
+}
+
+function canSubmitForReview(workflowState){
+  return !!state.loggedIn && !!state.allocationId && ['submitted', 'received'].indexOf(workflowState) >= 0 && (userHasSchemaRole('fill') || userHasSchemaRole('review') || userHasSchemaRole('approve'));
+}
+
+function canApprove(workflowState){
+  return !!state.loggedIn && !!state.allocationId && workflowState === 'in_review' && userHasSchemaRole('approve');
+}
+
+function canReject(workflowState){
+  return !!state.loggedIn && !!state.allocationId && workflowState === 'in_review' && (userHasSchemaRole('review') || userHasSchemaRole('approve'));
+}
+
+function canReopen(workflowState){
+  return !!state.loggedIn && !!state.allocationId && ['approved', 'rejected', 'closed'].indexOf(workflowState) >= 0 && userHasSchemaRole('approve');
+}
+
+function captureSignature(blockId){
+  var block = ((state.schema && state.schema.signature_blocks) || []).find(function(item){ return item && item.id === blockId; }) || null;
+  if(!block){
+    notifyParentToast('Không tìm thấy cấu hình chữ ký cho bước này.', 'warn');
+    return Promise.resolve(null);
+  }
+  if(typeof window.ESignature !== 'function'){
+    notifyParentToast('Module chữ ký điện tử chưa sẵn sàng.', 'error');
+    return Promise.resolve(null);
+  }
+  var me = state.currentUser || {};
+  return new Promise(function(resolve){
+    new window.ESignature({
+      lang: 'vi',
+      requireReason: true,
+      requirePin: false
+    }).show({
+      signerId: String(me.username || '').trim(),
+      signerName: String(me.display_name || me.name || me.username || '').trim(),
+      signerRole: String(me.title || me.role || '').trim(),
+      reason: 'Xác nhận bước ' + (block.label || block.label_en || block.id),
+      signatureMeaning: String(block.meaning || 'Approved'),
+      appliedTo: currentRecordId() + ':' + blockId,
+      onSign: function(sigData){
+        state.signatures[blockId] = normalizeSignature(sigData, block.meaning || '');
+        saveLocalDraft('signature_capture');
+        renderAll();
+        resolve(state.signatures[blockId]);
+      },
+      onCancel: function(){ resolve(null); }
+    });
+  });
+}
+
+function doSubmitForReview(){
+  if(!state.allocationId) return;
+  callApi('evidence_submit_for_review', { allocation_id: state.allocationId }, 'POST').then(function(resp){
+    if(!resp || !resp.ok) throw new Error(serverErrorMessage(resp) || 'Máy chủ chưa nhận chuyển bước xem xét.');
+    state.allocation = resp.allocation || state.allocation;
+    state.approvalSummary = resp.approval_summary || state.approvalSummary;
+    state.reviewSla = resp.review_sla || state.reviewSla;
+    updateRuntimeAlert('success', 'Đã chuyển sang bước xem xét', 'Hồ sơ SCAR đã vào workflow review. Chữ ký và trạng thái ở section 6 đã được làm mới.', 'Review');
+    notifyParentToast('Đã gửi hồ sơ sang bước xem xét.', 'success');
+    notifyParentRefresh();
+    return refreshRuntimeState();
+  }).catch(function(error){
+    updateRuntimeAlert('danger', 'Không thể gửi xem xét', (error && error.message) || 'Máy chủ chưa chấp nhận chuyển bước xem xét.', 'Lỗi');
+    notifyParentToast('Không thể gửi hồ sơ sang bước xem xét.', 'error');
+  });
+}
+
+function doReviewAction(action){
+  if(!state.allocationId) return;
+  if(action === 'approve'){
+    var proceed = (state.signatures.approver && state.signatures.approver.hash)
+      ? Promise.resolve(state.signatures.approver)
+      : captureSignature('approver');
+    proceed.then(function(signature){
+      if(!signature) return null;
+      return askTextDialog({
+        title: 'Xác thực phê duyệt',
+        message: 'Nhập mật khẩu hiện tại để hoàn tất phê duyệt hồ sơ SCAR này.',
+        placeholder: 'Mật khẩu tài khoản QMS',
+        password: true
+      }).then(function(password){
+        if(!password) return null;
+        return callApi('evidence_review', {
+          allocation_id: state.allocationId,
+          action: 'approve',
+          password: password,
+          signature_data: signature,
+          signature_meaning: 'approved',
+          reason: 'Phê duyệt hồ sơ SCAR trên HTML runtime'
+        }, 'POST');
+      });
+    }).then(function(resp){
+      if(!resp) return;
+      if(!resp.ok) throw new Error(serverErrorMessage(resp) || 'Máy chủ chưa xác nhận phê duyệt.');
+      state.allocation = resp.allocation || state.allocation;
+      state.approvalSummary = resp.approval_summary || state.approvalSummary;
+      state.reviewSla = resp.review_sla || state.reviewSla;
+      if(state.allocation && state.allocation.approval_signature) state.signatures.approver = normalizeSignature(state.allocation.approval_signature, 'Approved');
+      updateRuntimeAlert('success', 'Đã phê duyệt hồ sơ', 'SCAR đã được phê duyệt trong workflow và lưu dấu vết điện tử đầy đủ.', 'Approved');
+      notifyParentToast('Đã phê duyệt SCAR.', 'success');
+      notifyParentRefresh();
+      return refreshRuntimeState();
+    }).catch(function(error){
+      updateRuntimeAlert('danger', 'Không thể phê duyệt', (error && error.message) || 'Máy chủ chưa chấp nhận phê duyệt.', 'Lỗi');
+      notifyParentToast('Không thể phê duyệt SCAR.', 'error');
+    });
+    return;
+  }
+  askTextDialog({
+    title: 'Lý do từ chối',
+    message: 'Nhập lý do từ chối để trả hồ sơ về bước chỉnh sửa có kiểm soát.',
+    placeholder: 'Lý do từ chối'
+  }).then(function(reason){
+    if(!reason) return null;
+    return callApi('evidence_review', {
+      allocation_id: state.allocationId,
+      action: 'reject',
+      reason: reason
+    }, 'POST');
+  }).then(function(resp){
+    if(!resp) return;
+    if(!resp.ok) throw new Error(serverErrorMessage(resp) || 'Máy chủ chưa chấp nhận từ chối.');
+    state.allocation = resp.allocation || state.allocation;
+    state.approvalSummary = resp.approval_summary || state.approvalSummary;
+    state.reviewSla = resp.review_sla || state.reviewSla;
+    updateRuntimeAlert('warning', 'Đã từ chối hồ sơ', 'SCAR đã bị trả về để chỉnh sửa và nộp lại có kiểm soát.', 'Rejected');
+    notifyParentToast('Đã từ chối SCAR.', 'warn');
+    notifyParentRefresh();
+    return refreshRuntimeState();
+  }).catch(function(error){
+    updateRuntimeAlert('danger', 'Không thể từ chối', (error && error.message) || 'Máy chủ chưa chấp nhận thao tác từ chối.', 'Lỗi');
+    notifyParentToast('Không thể từ chối SCAR.', 'error');
+  });
+}
+
+function doReopen(){
+  if(!state.allocationId) return;
+  askTextDialog({
+    title: 'Lý do mở lại',
+    message: 'Nhập lý do mở lại hồ sơ để hệ thống tạo controlled edit đúng chuẩn.',
+    placeholder: 'Lý do mở lại'
+  }).then(function(reason){
+    if(!reason) return null;
+    return callApi('evidence_reopen', { allocation_id: state.allocationId, reason: reason }, 'POST');
+  }).then(function(resp){
+    if(!resp) return;
+    if(!resp.ok) throw new Error(serverErrorMessage(resp) || 'Máy chủ chưa chấp nhận mở lại hồ sơ.');
+    state.allocation = resp.allocation || state.allocation;
+    state.approvalSummary = resp.approval_summary || null;
+    state.reviewSla = resp.review_sla || null;
+    updateRuntimeAlert('warning', 'Đã mở lại hồ sơ', 'SCAR đã quay về controlled edit. Anh có thể chỉnh sửa và nộp lại trên cùng HTML này.', 'Reopen');
+    notifyParentToast('Đã mở lại SCAR để controlled edit.', 'warn');
+    notifyParentRefresh();
+    return refreshRuntimeState();
+  }).catch(function(error){
+    updateRuntimeAlert('danger', 'Không thể mở lại hồ sơ', (error && error.message) || 'Máy chủ chưa chấp nhận mở lại.', 'Lỗi');
+    notifyParentToast('Không thể mở lại SCAR.', 'error');
+  });
+}
+
+function refreshRuntimeState(){
+  return Promise.all([loadAllocation(), loadEntry(), loadServerDraft()]).then(function(){
+    state.signatures = buildMergedSignatures();
+    state.resetSignaturesSnapshot = clone(state.signatures);
+    if(state.entry){
+      mergeFieldMap(state.data, extractEntryValues(state.entry));
+      normalizeData(state.data);
+      populateForm();
+    }
+    renderAll();
+  });
+}
+
 function updateMetaFootnotes(){
   if(els.saveMeta){
     if(state.lastServerSaveAt) els.saveMeta.textContent = 'Đã đồng bộ máy chủ lúc ' + formatDateTime(state.lastServerSaveAt) + '.';
@@ -608,7 +1063,7 @@ function saveDraftWorkflow(source){
   return callApi('form_fill_save_draft', {
     allocation_id: state.allocationId,
     form_code: FORM_CODE,
-    data: { fieldValues: clone(state.data), runtime_mode: 'standalone_html' }
+    data: { fieldValues: clone(state.data), signatures: clone(state.signatures), runtime_mode: 'standalone_html' }
   }, 'POST').then(function(resp){
     if(!resp || !resp.ok) throw new Error('Máy chủ không xác nhận lưu nháp.');
     state.lastServerSaveAt = new Date().toISOString();
@@ -632,6 +1087,7 @@ function saveDraftWorkflow(source){
 function handleReset(){
   clearFieldErrors();
   state.data = clone(state.resetSnapshot);
+  state.signatures = clone(state.resetSignaturesSnapshot);
   normalizeData(state.data);
   populateForm();
   renderAll();
@@ -656,6 +1112,7 @@ function handleEnterEdit(){
 
 function handleCancelEdit(){
   state.data = clone(state.resetSnapshot);
+  state.signatures = clone(state.resetSignaturesSnapshot);
   normalizeData(state.data);
   populateForm();
   renderDisplayValues();
@@ -723,6 +1180,13 @@ function handleSubmit(event){
     updateRuntimeAlert('danger', 'Biểu mẫu chưa đủ điều kiện gửi', 'Hãy hoàn thiện các trường bắt buộc, kiểm tra số lượng và xác nhận đủ phản hồi nhà cung cấp trước khi gửi SCAR.', 'Thiếu dữ liệu');
     focusFirstError(errors);
     notifyParentToast('SCAR chưa đủ điều kiện gửi.', 'warn');
+    return;
+  }
+  var missingSignatures = missingRequiredSubmitSignatures();
+  if(missingSignatures.length){
+    updateRuntimeAlert('warning', 'Thiếu chữ ký bắt buộc', 'Hãy ký các block bắt buộc trước khi gửi: ' + missingSignatures.join(', ') + '.', 'Thiếu chữ ký');
+    notifyParentToast('Thiếu chữ ký bắt buộc trước khi gửi SCAR.', 'warn');
+    if(els.workflowPanel && typeof els.workflowPanel.scrollIntoView === 'function') els.workflowPanel.scrollIntoView({ behavior:'smooth', block:'center' });
     return;
   }
   if(!state.loggedIn || !state.allocationId){
@@ -838,7 +1302,16 @@ function buildSubmitPayload(){
   payload.runtime_mode = 'standalone_html';
   payload.approval_state = state.entry && state.entry.approval_state ? state.entry.approval_state : 'draft';
   payload.master_context = buildMasterContext();
+  payload.signatures = clone(state.signatures);
   return payload;
+}
+
+function missingRequiredSubmitSignatures(){
+  return ((state.schema && state.schema.signature_blocks) || []).filter(function(block){
+    return block && block.required_on_submit && !state.signatures[block.id];
+  }).map(function(block){
+    return String(block.label || block.label_en || block.id || '').trim();
+  });
 }
 
 function buildMasterContext(){
@@ -860,6 +1333,8 @@ function mergeSubmittedEntry(payload, resp){
   entry.submitted_at = new Date().toISOString();
   entry.updated_at = entry.submitted_at;
   entry.submission_revision = state.allocation && state.allocation.online_submission ? Number(state.allocation.online_submission.submission_revision || 1) : 1;
+  entry.workflow_state = 'submitted';
+  entry.signatures = clone(state.signatures);
   return entry;
 }
 
@@ -883,6 +1358,9 @@ function saveLocalDraft(source){
     form_code: FORM_CODE,
     allocation_id: state.allocationId,
     fieldValues: clone(state.data),
+    signatures: clone(state.signatures),
+    entryId: state.entry && state.entry.entry_id ? String(state.entry.entry_id) : '',
+    recordId: currentRecordId(),
     saved_at: new Date().toISOString(),
     source: source || 'auto'
   };
@@ -1111,6 +1589,19 @@ function serverErrorMessage(resp){
   if(resp.error === 'missing_required_signature') return 'Máy chủ yêu cầu chữ ký bắt buộc trước khi gửi.';
   if(resp.error) return 'Máy chủ trả về lỗi: ' + String(resp.error);
   return '';
+}
+
+function askTextDialog(options){
+  if(typeof window._ecPromptDialog === 'function'){
+    return window._ecPromptDialog({
+      title: options && options.title || '',
+      message: options && options.message || '',
+      placeholder: options && options.placeholder || '',
+      type: options && options.type ? options.type : (options && options.password ? 'password' : 'text')
+    });
+  }
+  var fallback = window.prompt((options && options.message) || '', (options && options.value) || '');
+  return Promise.resolve(fallback ? String(fallback).trim() : '');
 }
 
 function callApi(action, payload, method){

@@ -204,6 +204,248 @@ body {
   color: #ffffff;
 }
 
+.scar-runtime-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border: 1px solid var(--scar-line);
+  border-left: 4px solid #1565c0;
+  border-radius: 16px;
+  background: #f7fbff;
+}
+
+.scar-runtime-alert.warning {
+  border-left-color: #d97706;
+  background: #fffbeb;
+}
+
+.scar-runtime-alert.danger {
+  border-left-color: #dc2626;
+  background: #fef2f2;
+}
+
+.scar-runtime-alert.success {
+  border-left-color: #15803d;
+  background: #f0fdf4;
+}
+
+.scar-runtime-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 84px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(21, 101, 192, 0.12);
+  color: #1565c0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.scar-runtime-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.scar-runtime-copy strong {
+  font-size: 14px;
+}
+
+.scar-runtime-copy span {
+  color: var(--scar-text-muted);
+  line-height: 1.6;
+}
+
+.scar-supplier-hints:empty {
+  display: none;
+}
+
+.scar-supplier-hints {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.scar-supplier-card {
+  width: 100%;
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--scar-line);
+  border-radius: 14px;
+  background: #f8fbff;
+  color: var(--scar-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.scar-supplier-card:hover {
+  border-color: #93c5fd;
+  box-shadow: 0 10px 24px rgba(21, 101, 192, 0.08);
+}
+
+.scar-supplier-card strong {
+  font-size: 13px;
+}
+
+.scar-supplier-card span {
+  font-size: 12px;
+  color: var(--scar-text-muted);
+  line-height: 1.55;
+}
+
+.scar-workflow-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.scar-workflow-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.scar-summary-card {
+  border: 1px solid var(--scar-line);
+  border-radius: 16px;
+  padding: 14px 16px;
+  background: #f8fafc;
+}
+
+.scar-summary-card small {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--scar-text-muted);
+}
+
+.scar-summary-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--scar-text);
+}
+
+.scar-summary-card span {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--scar-text-muted);
+}
+
+.scar-workflow-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.scar-workflow-actions .qf-btn {
+  min-width: 168px;
+}
+
+.scar-workflow-note {
+  padding: 14px 16px;
+  border: 1px dashed var(--scar-line-strong);
+  border-radius: 16px;
+  background: #fafcff;
+  color: var(--scar-text-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.scar-signature-card {
+  position: relative;
+  border: 1px dashed var(--scar-line-strong);
+  border-radius: 18px;
+  background: #fcfdff;
+  padding: 16px;
+}
+
+.scar-signature-card.signed {
+  border-style: solid;
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.scar-signature-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.scar-signature-head strong {
+  display: block;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.scar-signature-head small {
+  display: block;
+  margin-top: 4px;
+  color: var(--scar-text-muted);
+  line-height: 1.55;
+}
+
+.scar-signature-meaning {
+  display: inline-flex;
+  align-items: center;
+  height: fit-content;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(12, 45, 72, 0.08);
+  color: var(--scar-primary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.scar-signature-pad {
+  min-height: 112px;
+  margin-bottom: 12px;
+  border: 1px solid var(--scar-line);
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 10px;
+}
+
+.scar-signature-empty {
+  display: grid;
+  place-items: center;
+  min-height: 90px;
+  color: var(--scar-text-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.scar-signature-meta {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--scar-text-muted);
+  line-height: 1.6;
+}
+
+.scar-signature-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.scar-signature-actions .qf-btn {
+  min-width: 150px;
+}
+
 .scar-topbar,
 .scar-alert,
 .scar-side,
@@ -228,6 +470,10 @@ body {
   .scar-record-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .scar-runtime-alert {
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 640px) {
@@ -241,6 +487,16 @@ body {
 
   .scar-record-strip {
     grid-template-columns: 1fr;
+  }
+
+  .scar-workflow-actions .qf-btn,
+  .qf-actions .qf-btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .scar-signature-head {
+    flex-direction: column;
   }
 }
 

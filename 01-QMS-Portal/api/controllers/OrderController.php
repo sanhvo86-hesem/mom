@@ -6,6 +6,7 @@ namespace HESEM\QMS\Api\Controllers;
 
 use HESEM\QMS\Api\Controllers\BaseController;
 use HESEM\QMS\Services\OrderService;
+use HESEM\QMS\Services\OrderWorkflowService;
 use Throwable;
 
 /**
@@ -25,6 +26,9 @@ class OrderController extends BaseController
     /** @var OrderService|null Lazy-loaded order service. */
     private ?OrderService $orderService = null;
 
+    /** @var OrderWorkflowService|null Lazy-loaded workflow service. */
+    private ?OrderWorkflowService $workflowService = null;
+
     /** @var array|null Cached SO/JO/WO config. */
     private ?array $orderConfig = null;
 
@@ -41,6 +45,25 @@ class OrderController extends BaseController
             $this->orderService = new OrderService($this->dataDir);
         }
         return $this->orderService;
+    }
+
+    /**
+     * Get or create the OrderWorkflowService instance.
+     */
+    private function workflowService(): OrderWorkflowService
+    {
+        if ($this->workflowService === null) {
+            $this->workflowService = new OrderWorkflowService($this->dataDir);
+        }
+        return $this->workflowService;
+    }
+
+    /**
+     * Get user identifier string.
+     */
+    private function userId(array $user): string
+    {
+        return (string)($user['username'] ?? $user['user'] ?? 'unknown');
     }
 
     /**
@@ -379,6 +402,668 @@ class OrderController extends BaseController
             $this->success(['stats' => $stats]);
         } catch (Throwable $e) {
             $this->error('stats_failed', 500, $e->getMessage());
+        }
+    }
+
+    // ── CRUD: Sales Orders ─────────────────────────────────────────────────
+
+    /**
+     * POST createSalesOrder — Create a new Sales Order.
+     * Action: `order_so_create`
+     * @return never
+     */
+    public function createSalesOrder(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireOrderPermission($user, 'so_write');
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['customer_id', 'order_date', 'due_date']);
+
+        $now = $this->nowIso();
+        $uid = $this->userId($user);
+
+        $so = [
+            'so_number'      => $this->orderService()->generateOrderNumber('so'),
+            'customer_id'    => trim((string)($body['customer_id'] ?? '')),
+            'customer_name'  => trim((string)($body['customer_name'] ?? '')),
+            'customer_po'    => trim((string)($body['customer_po'] ?? '')),
+            'order_date'     => (string)($body['order_date'] ?? ''),
+            'requested_date' => (string)($body['requested_date'] ?? ''),
+            'promise_date'   => (string)($body['promise_date'] ?? ''),
+            'due_date'       => (string)($body['due_date'] ?? ''),
+            'total_qty'      => (int)($body['total_qty'] ?? 0),
+            'total_value'    => (float)($body['total_value'] ?? 0),
+            'priority'       => (string)($body['priority'] ?? 'normal'),
+            'incoterm_code'  => (string)($body['incoterm_code'] ?? ''),
+            'payment_term_code' => (string)($body['payment_term_code'] ?? ''),
+            'shipping_method_code' => (string)($body['shipping_method_code'] ?? ''),
+            'special_requirements' => (string)($body['special_requirements'] ?? ''),
+            'status'         => 'draft',
+            'lines'          => is_array($body['lines'] ?? null) ? $body['lines'] : [],
+            'created_by'     => $uid,
+            'created_at'     => $now,
+            'updated_at'     => $now,
+            'status_history' => [['status' => 'draft', 'from' => '', 'to' => 'draft', 'timestamp' => $now, 'user' => $uid]],
+            'change_history' => [],
+        ];
+
+        try {
+            $saved = $this->orderService()->createSalesOrder($so);
+            $this->auditLog('order_so_create', ['so_number' => $saved['so_number']], $uid);
+            $this->success(['sales_order' => $saved], 201);
+        } catch (Throwable $e) {
+            $this->error('so_create_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST updateSalesOrder — Update an existing Sales Order.
+     * Action: `order_so_update`
+     * @return never
+     */
+    public function updateSalesOrder(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireOrderPermission($user, 'so_write');
+
+        $body = $this->jsonBody();
+        $soNumber = trim((string)($body['so_number'] ?? $this->query('so_number') ?? ''));
+        if ($soNumber === '') {
+            $this->error('missing_so_number', 400);
+        }
+
+        $changes = $body['changes'] ?? $body;
+        unset($changes['so_number'], $changes['status'], $changes['created_at'], $changes['created_by']);
+
+        $uid = $this->userId($user);
+        $reason = trim((string)($body['reason'] ?? 'Field update'));
+
+        try {
+            $result = $this->workflowService()->executeFieldEdit('so', $soNumber, $changes, $uid, $reason);
+            if (!$result->ok) {
+                $this->error($result->errorCode ?? 'update_failed', 400, $result->message);
+            }
+            $this->auditLog('order_so_update', ['so_number' => $soNumber, 'fields' => array_keys($changes)], $uid);
+            $this->success(['sales_order' => $result->data]);
+        } catch (Throwable $e) {
+            $this->error('so_update_failed', 500, $e->getMessage());
+        }
+    }
+
+    // ── CRUD: Job Orders ───────────────────────────────────────────────────
+
+    /**
+     * POST createJobOrder — Create a new Job Order linked to an SO.
+     * Action: `order_jo_create`
+     * @return never
+     */
+    public function createJobOrder(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireOrderPermission($user, 'jo_write');
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['so_number', 'part_number', 'qty_ordered', 'due_date']);
+
+        $now = $this->nowIso();
+        $uid = $this->userId($user);
+
+        $jo = [
+            'jo_number'       => $this->orderService()->generateOrderNumber('jo'),
+            'so_number'       => trim((string)($body['so_number'] ?? '')),
+            'part_number'     => trim((string)($body['part_number'] ?? '')),
+            'part_revision'   => trim((string)($body['part_revision'] ?? '')),
+            'part_description'=> trim((string)($body['part_description'] ?? '')),
+            'material_spec'   => trim((string)($body['material_spec'] ?? '')),
+            'qty_ordered'     => (int)($body['qty_ordered'] ?? 0),
+            'start_date'      => (string)($body['start_date'] ?? ''),
+            'due_date'        => (string)($body['due_date'] ?? ''),
+            'routing_id'      => (string)($body['routing_id'] ?? ''),
+            'bom_id'          => (string)($body['bom_id'] ?? ''),
+            'control_plan_id' => (string)($body['control_plan_id'] ?? ''),
+            'inspection_plan_id' => (string)($body['inspection_plan_id'] ?? ''),
+            'fai_required'    => (bool)($body['fai_required'] ?? false),
+            'status'          => 'planned',
+            'created_by'      => $uid,
+            'created_at'      => $now,
+            'updated_at'      => $now,
+            'status_history'  => [['status' => 'planned', 'from' => '', 'to' => 'planned', 'timestamp' => $now, 'user' => $uid]],
+            'change_history'  => [],
+        ];
+
+        try {
+            $saved = $this->orderService()->createJobOrder($jo);
+            $this->auditLog('order_jo_create', ['jo_number' => $saved['jo_number'], 'so_number' => $jo['so_number']], $uid);
+            $this->success(['job_order' => $saved], 201);
+        } catch (Throwable $e) {
+            $this->error('jo_create_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST updateJobOrder — Update an existing Job Order.
+     * Action: `order_jo_update`
+     * @return never
+     */
+    public function updateJobOrder(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireOrderPermission($user, 'jo_write');
+
+        $body = $this->jsonBody();
+        $joNumber = trim((string)($body['jo_number'] ?? $this->query('jo_number') ?? ''));
+        if ($joNumber === '') {
+            $this->error('missing_jo_number', 400);
+        }
+
+        $changes = $body['changes'] ?? $body;
+        unset($changes['jo_number'], $changes['status'], $changes['created_at'], $changes['created_by']);
+
+        $uid = $this->userId($user);
+        $reason = trim((string)($body['reason'] ?? 'Field update'));
+
+        try {
+            $result = $this->workflowService()->executeFieldEdit('jo', $joNumber, $changes, $uid, $reason);
+            if (!$result->ok) {
+                $this->error($result->errorCode ?? 'update_failed', 400, $result->message);
+            }
+            $this->auditLog('order_jo_update', ['jo_number' => $joNumber, 'fields' => array_keys($changes)], $uid);
+            $this->success(['job_order' => $result->data]);
+        } catch (Throwable $e) {
+            $this->error('jo_update_failed', 500, $e->getMessage());
+        }
+    }
+
+    // ── CRUD: Work Orders ──────────────────────────────────────────────────
+
+    /**
+     * POST createWorkOrder — Create a new Work Order linked to a JO.
+     * Action: `order_wo_create`
+     * @return never
+     */
+    public function createWorkOrder(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireOrderPermission($user, 'wo_write');
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['jo_number', 'operation_number', 'machine_id', 'work_center_id']);
+
+        $now = $this->nowIso();
+        $uid = $this->userId($user);
+
+        $wo = [
+            'wo_number'        => $this->orderService()->generateOrderNumber('wo'),
+            'jo_number'        => trim((string)($body['jo_number'] ?? '')),
+            'operation_number' => (int)($body['operation_number'] ?? 10),
+            'operation_desc'   => trim((string)($body['operation_desc'] ?? '')),
+            'machine_id'       => trim((string)($body['machine_id'] ?? '')),
+            'work_center_id'   => trim((string)($body['work_center_id'] ?? '')),
+            'operator_id'      => (string)($body['operator_id'] ?? ''),
+            'nc_program_id'    => (string)($body['nc_program_id'] ?? ''),
+            'setup_time_est'   => (float)($body['setup_time_est'] ?? 0),
+            'run_time_est'     => (float)($body['run_time_est'] ?? 0),
+            'scheduled_start'  => (string)($body['scheduled_start'] ?? ''),
+            'scheduled_end'    => (string)($body['scheduled_end'] ?? ''),
+            'fixture_id'       => (string)($body['fixture_id'] ?? ''),
+            'dispatch_priority'=> (string)($body['dispatch_priority'] ?? 'normal'),
+            'status'           => 'scheduled',
+            'created_by'       => $uid,
+            'created_at'       => $now,
+            'updated_at'       => $now,
+            'status_history'   => [['status' => 'scheduled', 'from' => '', 'to' => 'scheduled', 'timestamp' => $now, 'user' => $uid]],
+            'change_history'   => [],
+        ];
+
+        try {
+            $saved = $this->orderService()->createWorkOrder($wo);
+            $this->auditLog('order_wo_create', ['wo_number' => $saved['wo_number'], 'jo_number' => $wo['jo_number']], $uid);
+            $this->success(['work_order' => $saved], 201);
+        } catch (Throwable $e) {
+            $this->error('wo_create_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST updateWorkOrder — Update an existing Work Order.
+     * Action: `order_wo_update`
+     * @return never
+     */
+    public function updateWorkOrder(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireOrderPermission($user, 'wo_write');
+
+        $body = $this->jsonBody();
+        $woNumber = trim((string)($body['wo_number'] ?? $this->query('wo_number') ?? ''));
+        if ($woNumber === '') {
+            $this->error('missing_wo_number', 400);
+        }
+
+        $changes = $body['changes'] ?? $body;
+        unset($changes['wo_number'], $changes['status'], $changes['created_at'], $changes['created_by']);
+
+        $uid = $this->userId($user);
+        $reason = trim((string)($body['reason'] ?? 'Field update'));
+
+        try {
+            $result = $this->workflowService()->executeFieldEdit('wo', $woNumber, $changes, $uid, $reason);
+            if (!$result->ok) {
+                $this->error($result->errorCode ?? 'update_failed', 400, $result->message);
+            }
+            $this->auditLog('order_wo_update', ['wo_number' => $woNumber, 'fields' => array_keys($changes)], $uid);
+            $this->success(['work_order' => $result->data]);
+        } catch (Throwable $e) {
+            $this->error('wo_update_failed', 500, $e->getMessage());
+        }
+    }
+
+    // ── Workflow ────────────────────────────────────────────────────────────
+
+    /**
+     * POST transition — Execute status transition on any order type.
+     * Action: `order_transition`
+     * @return never
+     */
+    public function transition(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['order_type', 'order_id', 'target_status']);
+
+        $orderType = strtolower(trim((string)($body['order_type'] ?? '')));
+        $orderId   = trim((string)($body['order_id'] ?? ''));
+        $target    = strtolower(trim((string)($body['target_status'] ?? '')));
+        $reason    = trim((string)($body['reason'] ?? ''));
+        $uid       = $this->userId($user);
+
+        if (!in_array($orderType, ['so', 'jo', 'wo'], true)) {
+            $this->error('invalid_order_type', 400);
+        }
+
+        $permKey = $orderType . '_write';
+        $this->requireOrderPermission($user, $permKey);
+
+        try {
+            $result = $this->workflowService()->executeTransition($orderType, $orderId, $target, $uid, $reason ?: null);
+            if (!$result->ok) {
+                $this->error($result->errorCode ?? 'transition_failed', 400, $result->message);
+            }
+            $this->auditLog('order_transition', [
+                'order_type' => $orderType,
+                'order_id'   => $orderId,
+                'target'     => $target,
+                'reason'     => $reason,
+            ], $uid);
+            $this->success(['transition' => $result->toArray()]);
+        } catch (Throwable $e) {
+            $this->error('transition_failed', 500, $e->getMessage());
+        }
+    }
+
+    // ── Contract Review ────────────────────────────────────────────────────
+
+    /**
+     * POST contractReview — Submit or update contract review for an SO.
+     * Action: `order_contract_review`
+     * @return never
+     */
+    public function contractReview(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireOrderPermission($user, 'so_write');
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['so_number']);
+
+        $soNumber = trim((string)($body['so_number'] ?? ''));
+        $items    = is_array($body['items'] ?? null) ? $body['items'] : [];
+        $uid      = $this->userId($user);
+        $now      = $this->nowIso();
+
+        try {
+            $reviewFile = $this->dataDir . '/orders/reviews/' . preg_replace('/[^A-Za-z0-9\-_]/', '_', $soNumber) . '.json';
+            $reviewDir  = dirname($reviewFile);
+            if (!is_dir($reviewDir)) {
+                @mkdir($reviewDir, 0775, true);
+            }
+
+            $existing = $this->readJsonFile($reviewFile) ?? ['so_number' => $soNumber, 'items' => [], 'history' => []];
+
+            foreach ($items as $item) {
+                $code   = (string)($item['code'] ?? '');
+                $result = (string)($item['result'] ?? 'pending');
+                $comment = (string)($item['comments'] ?? '');
+
+                $found = false;
+                foreach ($existing['items'] as &$ex) {
+                    if (($ex['code'] ?? '') === $code) {
+                        $ex['result']      = $result;
+                        $ex['comments']    = $comment;
+                        $ex['reviewer']    = $uid;
+                        $ex['reviewed_at'] = $now;
+                        $found = true;
+                        break;
+                    }
+                }
+                unset($ex);
+
+                if (!$found) {
+                    $existing['items'][] = [
+                        'code'        => $code,
+                        'result'      => $result,
+                        'comments'    => $comment,
+                        'reviewer'    => $uid,
+                        'reviewed_at' => $now,
+                    ];
+                }
+            }
+
+            $existing['history'][] = ['user' => $uid, 'timestamp' => $now, 'action' => 'review_updated', 'items_count' => count($items)];
+            $existing['updated_at'] = $now;
+
+            // Calculate completion
+            $total    = count($existing['items']);
+            $approved = 0;
+            foreach ($existing['items'] as $it) {
+                if (in_array($it['result'] ?? '', ['approved', 'not_applicable'], true)) {
+                    $approved++;
+                }
+            }
+            $existing['completion_pct'] = $total > 0 ? round(($approved / $total) * 100, 1) : 0;
+            $existing['all_approved']   = ($approved === $total && $total > 0);
+
+            $this->writeJsonFile($reviewFile, $existing);
+            $this->auditLog('order_contract_review', ['so_number' => $soNumber, 'completion' => $existing['completion_pct']], $uid);
+
+            $this->success(['review' => $existing]);
+        } catch (Throwable $e) {
+            $this->error('contract_review_failed', 500, $e->getMessage());
+        }
+    }
+
+    // ── Holds ──────────────────────────────────────────────────────────────
+
+    /**
+     * POST setHold — Set a hold on an order.
+     * Action: `order_hold_set`
+     * @return never
+     */
+    public function setHold(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['order_type', 'order_id', 'hold_type', 'reason']);
+
+        $orderType = strtolower(trim((string)($body['order_type'] ?? '')));
+        $orderId   = trim((string)($body['order_id'] ?? ''));
+        $holdType  = trim((string)($body['hold_type'] ?? ''));
+        $reason    = trim((string)($body['reason'] ?? ''));
+        $uid       = $this->userId($user);
+        $now       = $this->nowIso();
+
+        $permKey = $orderType . '_write';
+        $this->requireOrderPermission($user, $permKey);
+
+        try {
+            $holdsFile = $this->dataDir . '/orders/holds.json';
+            $holds = $this->readJsonFile($holdsFile) ?? [];
+
+            $holds[] = [
+                'hold_id'    => bin2hex(random_bytes(8)),
+                'order_type' => $orderType,
+                'order_id'   => $orderId,
+                'hold_type'  => $holdType,
+                'reason'     => $reason,
+                'set_by'     => $uid,
+                'set_at'     => $now,
+                'released'   => false,
+            ];
+
+            $this->writeJsonFile($holdsFile, $holds);
+            $this->auditLog('order_hold_set', ['order_id' => $orderId, 'hold_type' => $holdType], $uid);
+            $this->success(['hold_set' => true]);
+        } catch (Throwable $e) {
+            $this->error('hold_set_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST releaseHold — Release a hold on an order.
+     * Action: `order_hold_release`
+     * @return never
+     */
+    public function releaseHold(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['hold_id']);
+
+        $holdId = trim((string)($body['hold_id'] ?? ''));
+        $reason = trim((string)($body['release_reason'] ?? ''));
+        $uid    = $this->userId($user);
+        $now    = $this->nowIso();
+
+        try {
+            $holdsFile = $this->dataDir . '/orders/holds.json';
+            $holds = $this->readJsonFile($holdsFile) ?? [];
+            $found = false;
+
+            foreach ($holds as &$h) {
+                if (($h['hold_id'] ?? '') === $holdId && !($h['released'] ?? false)) {
+                    $h['released']       = true;
+                    $h['released_by']    = $uid;
+                    $h['released_at']    = $now;
+                    $h['release_reason'] = $reason;
+                    $found = true;
+                    break;
+                }
+            }
+            unset($h);
+
+            if (!$found) {
+                $this->error('hold_not_found', 404);
+            }
+
+            $this->writeJsonFile($holdsFile, $holds);
+            $this->auditLog('order_hold_release', ['hold_id' => $holdId], $uid);
+            $this->success(['released' => true]);
+        } catch (Throwable $e) {
+            $this->error('hold_release_failed', 500, $e->getMessage());
+        }
+    }
+
+    // ── Notes ──────────────────────────────────────────────────────────────
+
+    /**
+     * POST addNote — Add a note to an order.
+     * Action: `order_note_add`
+     * @return never
+     */
+    public function addNote(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['order_type', 'order_id', 'note_text']);
+
+        $uid = $this->userId($user);
+        $now = $this->nowIso();
+
+        $note = [
+            'note_id'      => bin2hex(random_bytes(8)),
+            'order_type'   => strtolower(trim((string)($body['order_type'] ?? ''))),
+            'order_number' => trim((string)($body['order_id'] ?? '')),
+            'note_type'    => (string)($body['note_type'] ?? 'internal'),
+            'note_text'    => trim((string)($body['note_text'] ?? '')),
+            'author'       => $uid,
+            'author_name'  => (string)($user['name'] ?? $uid),
+            'created_at'   => $now,
+        ];
+
+        try {
+            $notesFile = $this->dataDir . '/orders/notes.json';
+            $notes = $this->readJsonFile($notesFile) ?? [];
+            $notes[] = $note;
+            $this->writeJsonFile($notesFile, $notes);
+
+            $this->auditLog('order_note_add', ['order_id' => $note['order_number'], 'note_type' => $note['note_type']], $uid);
+            $this->success(['note' => $note]);
+        } catch (Throwable $e) {
+            $this->error('note_add_failed', 500, $e->getMessage());
+        }
+    }
+
+    // ── Timeline ───────────────────────────────────────────────────────────
+
+    /**
+     * GET getTimeline — Get timeline events for Gantt visualization.
+     * Action: `order_timeline`
+     * @return never
+     */
+    public function getTimeline(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireOrderPermission($user, 'so_read');
+
+        $soNumber = $this->query('so_number');
+
+        try {
+            $hierarchy = $this->orderService()->getHierarchy($soNumber);
+
+            $events = [];
+            foreach ($hierarchy as $so) {
+                $events[] = [
+                    'type'     => 'so',
+                    'id'       => $so['so_number'] ?? '',
+                    'label'    => ($so['customer_name'] ?? '') . ' / ' . ($so['so_number'] ?? ''),
+                    'start'    => $so['order_date'] ?? '',
+                    'end'      => $so['due_date'] ?? '',
+                    'status'   => $so['status'] ?? '',
+                    'children' => [],
+                ];
+
+                foreach (($so['job_orders'] ?? []) as $jo) {
+                    $joEvent = [
+                        'type'   => 'jo',
+                        'id'     => $jo['jo_number'] ?? '',
+                        'label'  => ($jo['jo_number'] ?? '') . ' - ' . ($jo['part_number'] ?? ''),
+                        'start'  => $jo['start_date'] ?? '',
+                        'end'    => $jo['due_date'] ?? '',
+                        'status' => $jo['status'] ?? '',
+                        'children' => [],
+                    ];
+
+                    foreach (($jo['work_orders'] ?? []) as $wo) {
+                        $joEvent['children'][] = [
+                            'type'   => 'wo',
+                            'id'     => $wo['wo_number'] ?? '',
+                            'label'  => 'OP' . ($wo['operation_number'] ?? '') . ' ' . ($wo['operation_desc'] ?? ''),
+                            'start'  => $wo['scheduled_start'] ?? '',
+                            'end'    => $wo['scheduled_end'] ?? '',
+                            'status' => $wo['status'] ?? '',
+                        ];
+                    }
+                    $events[count($events) - 1]['children'][] = $joEvent;
+                }
+            }
+
+            $this->success(['timeline' => $events]);
+        } catch (Throwable $e) {
+            $this->error('timeline_failed', 500, $e->getMessage());
+        }
+    }
+
+    // ── Dashboard KPI ──────────────────────────────────────────────────────
+
+    /**
+     * GET getDashboardKpi — Extended KPI aggregation.
+     * Action: `order_dashboard_kpi`
+     * @return never
+     */
+    public function getDashboardKpi(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireOrderPermission($user, 'so_read');
+
+        try {
+            $stats = $this->orderService()->getDashboardStats();
+
+            // Add hold count
+            $holdsFile = $this->dataDir . '/orders/holds.json';
+            $holds = $this->readJsonFile($holdsFile) ?? [];
+            $activeHolds = 0;
+            foreach ($holds as $h) {
+                if (!($h['released'] ?? false)) {
+                    $activeHolds++;
+                }
+            }
+            $stats['active_holds'] = $activeHolds;
+
+            $this->success(['kpi' => $stats]);
+        } catch (Throwable $e) {
+            $this->error('kpi_failed', 500, $e->getMessage());
+        }
+    }
+
+    // ── Search ─────────────────────────────────────────────────────────────
+
+    /**
+     * GET search — Full-text search across all orders.
+     * Action: `order_search`
+     * @return never
+     */
+    public function search(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireOrderPermission($user, 'so_read');
+
+        $q = strtolower(trim((string)($this->query('q') ?? '')));
+        if ($q === '' || strlen($q) < 2) {
+            $this->error('query_too_short', 400, 'Search query must be at least 2 characters.');
+        }
+
+        $offset = max(0, (int)($this->query('offset', '0')));
+        $limit  = min(100, max(1, (int)($this->query('limit', '25'))));
+
+        try {
+            $hierarchy = $this->orderService()->getHierarchy(null);
+            $results = [];
+
+            foreach ($hierarchy as $so) {
+                $soStr = strtolower(json_encode($so) ?: '');
+                if (strpos($soStr, $q) !== false) {
+                    $results[] = ['type' => 'so', 'id' => $so['so_number'] ?? '', 'label' => ($so['so_number'] ?? '') . ' - ' . ($so['customer_name'] ?? ''), 'status' => $so['status'] ?? ''];
+                }
+                foreach (($so['job_orders'] ?? []) as $jo) {
+                    $joStr = strtolower(json_encode($jo) ?: '');
+                    if (strpos($joStr, $q) !== false) {
+                        $results[] = ['type' => 'jo', 'id' => $jo['jo_number'] ?? '', 'label' => ($jo['jo_number'] ?? '') . ' - ' . ($jo['part_number'] ?? ''), 'status' => $jo['status'] ?? ''];
+                    }
+                }
+            }
+
+            $total = count($results);
+            $paged = array_slice($results, $offset, $limit);
+
+            $this->paginated('results', $paged, $total, $offset, $limit);
+        } catch (Throwable $e) {
+            $this->error('search_failed', 500, $e->getMessage());
         }
     }
 }

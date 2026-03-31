@@ -1,0 +1,226 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "created": "2026-03-31",
+    "description": "Evidence vault policy governing secure storage, integrity verification, chain-of-custody, retention, and access control for QMS evidence artifacts"
+  },
+  "allowed_file_types": {
+    "documents": {
+      "extensions": [".pdf", ".xlsx", ".xls", ".docx", ".doc", ".csv", ".txt", ".rtf"],
+      "max_size_mb": 50,
+      "label": "Documents",
+      "label_vi": "Tai lieu"
+    },
+    "images": {
+      "extensions": [".jpg", ".jpeg", ".png", ".tiff", ".tif", ".bmp", ".gif", ".webp"],
+      "max_size_mb": 25,
+      "label": "Images",
+      "label_vi": "Hinh anh"
+    },
+    "cad_drawings": {
+      "extensions": [".dxf", ".dwg", ".step", ".stp", ".iges", ".igs", ".stl", ".3mf"],
+      "max_size_mb": 100,
+      "label": "CAD / Drawings",
+      "label_vi": "CAD / Ban ve"
+    },
+    "inspection_data": {
+      "extensions": [".csv", ".xlsx", ".dmis", ".qif", ".pcm", ".xml", ".json"],
+      "max_size_mb": 50,
+      "label": "Inspection Data",
+      "label_vi": "Du lieu kiem tra"
+    },
+    "video": {
+      "extensions": [".mp4", ".avi", ".mov", ".mkv"],
+      "max_size_mb": 500,
+      "label": "Video Evidence",
+      "label_vi": "Video bang chung"
+    },
+    "audio": {
+      "extensions": [".mp3", ".wav", ".m4a", ".ogg"],
+      "max_size_mb": 100,
+      "label": "Audio Records",
+      "label_vi": "Ban ghi am"
+    },
+    "compressed": {
+      "extensions": [".zip", ".7z"],
+      "max_size_mb": 200,
+      "label": "Archives",
+      "label_vi": "Tap nen"
+    }
+  },
+  "blocked_extensions": [".exe", ".bat", ".cmd", ".ps1", ".sh", ".msi", ".dll", ".sys", ".vbs", ".js", ".wsf", ".scr", ".com", ".pif"],
+  "max_total_file_size_mb": 500,
+  "integrity": {
+    "hash_algorithm": "SHA-256",
+    "hash_on_upload": true,
+    "hash_on_download": true,
+    "periodic_verification_interval_days": 30,
+    "hash_chain_enabled": true,
+    "hash_chain_description": "Each evidence record includes the SHA-256 hash of its content concatenated with the previous record hash, forming an append-only chain",
+    "tamper_detection": {
+      "enabled": true,
+      "check_on_access": true,
+      "check_on_scheduled_scan": true,
+      "scan_frequency_hours": 24,
+      "alert_roles_on_mismatch": ["quality_manager", "admin", "ceo"],
+      "auto_quarantine_on_mismatch": true,
+      "quarantine_label": "INTEGRITY_VIOLATION",
+      "quarantine_label_vi": "VI_PHAM_TOAN_VEN"
+    }
+  },
+  "retention_periods": {
+    "ncr_evidence": {
+      "label": "NCR Evidence",
+      "label_vi": "Bang chung NCR",
+      "retention_years": 5,
+      "disposition": "review_before_disposal"
+    },
+    "capa_evidence": {
+      "label": "CAPA Evidence",
+      "label_vi": "Bang chung CAPA",
+      "retention_years": 7,
+      "disposition": "review_before_disposal"
+    },
+    "fai_evidence": {
+      "label": "FAI Evidence",
+      "label_vi": "Bang chung FAI",
+      "retention_years": 10,
+      "disposition": "archive_only"
+    },
+    "audit_evidence": {
+      "label": "Audit Evidence",
+      "label_vi": "Bang chung danh gia",
+      "retention_years": 5,
+      "disposition": "review_before_disposal"
+    },
+    "calibration_records": {
+      "label": "Calibration Records",
+      "label_vi": "Ho so hieu chuan",
+      "retention_years": 5,
+      "disposition": "review_before_disposal"
+    },
+    "training_evidence": {
+      "label": "Training Evidence",
+      "label_vi": "Bang chung dao tao",
+      "retention_years": 5,
+      "disposition": "review_before_disposal"
+    },
+    "customer_complaint_evidence": {
+      "label": "Customer Complaint Evidence",
+      "label_vi": "Bang chung khieu nai KH",
+      "retention_years": 7,
+      "disposition": "review_before_disposal"
+    },
+    "supplier_evidence": {
+      "label": "Supplier Evidence",
+      "label_vi": "Bang chung NCC",
+      "retention_years": 7,
+      "disposition": "review_before_disposal"
+    },
+    "engineering_change_evidence": {
+      "label": "Engineering Change Evidence",
+      "label_vi": "Bang chung thay doi ky thuat",
+      "retention_years": 10,
+      "disposition": "archive_only"
+    },
+    "material_certs": {
+      "label": "Material Certificates",
+      "label_vi": "Chung chi vat lieu",
+      "retention_years": 10,
+      "disposition": "archive_only"
+    },
+    "management_review_evidence": {
+      "label": "Management Review Evidence",
+      "label_vi": "Bang chung xem xet lanh dao",
+      "retention_years": 10,
+      "disposition": "archive_only"
+    }
+  },
+  "chain_of_custody": {
+    "enabled": true,
+    "tracked_events": [
+      { "event": "upload", "label": "Uploaded", "label_vi": "Da tai len" },
+      { "event": "view", "label": "Viewed", "label_vi": "Da xem" },
+      { "event": "download", "label": "Downloaded", "label_vi": "Da tai xuong" },
+      { "event": "link", "label": "Linked to Record", "label_vi": "Lien ket voi ho so" },
+      { "event": "unlink", "label": "Unlinked from Record", "label_vi": "Go lien ket khoi ho so" },
+      { "event": "annotate", "label": "Annotated", "label_vi": "Da ghi chu" },
+      { "event": "version", "label": "New Version Uploaded", "label_vi": "Tai len phien ban moi" },
+      { "event": "quarantine", "label": "Quarantined", "label_vi": "Da cach ly" },
+      { "event": "release", "label": "Released from Quarantine", "label_vi": "Da giai phong khoi cach ly" },
+      { "event": "archive", "label": "Archived", "label_vi": "Da luu tru" },
+      { "event": "delete_request", "label": "Deletion Requested", "label_vi": "Yeu cau xoa" },
+      { "event": "delete_approved", "label": "Deletion Approved", "label_vi": "Xoa da phe duyet" },
+      { "event": "delete_executed", "label": "Deleted", "label_vi": "Da xoa" }
+    ],
+    "event_record_fields": ["timestamp", "user_id", "user_role", "ip_address", "event_type", "record_ref", "notes"],
+    "immutable": true,
+    "export_format": "json"
+  },
+  "access_control": {
+    "roles": {
+      "admin": {
+        "label": "System Administrator",
+        "label_vi": "Quan tri he thong",
+        "permissions": ["upload", "view", "download", "link", "unlink", "annotate", "quarantine", "release", "archive", "delete_request", "delete_approve", "audit_log_view", "config_manage"]
+      },
+      "quality_manager": {
+        "label": "Quality Manager",
+        "label_vi": "Truong phong chat luong",
+        "permissions": ["upload", "view", "download", "link", "unlink", "annotate", "quarantine", "release", "archive", "delete_request", "delete_approve", "audit_log_view"]
+      },
+      "quality_engineer": {
+        "label": "Quality Engineer",
+        "label_vi": "Ky su chat luong",
+        "permissions": ["upload", "view", "download", "link", "annotate"]
+      },
+      "qc_inspector": {
+        "label": "QC Inspector",
+        "label_vi": "KCS",
+        "permissions": ["upload", "view", "download", "link"]
+      },
+      "production_manager": {
+        "label": "Production Manager",
+        "label_vi": "Truong phong san xuat",
+        "permissions": ["upload", "view", "download", "link", "annotate"]
+      },
+      "engineering_manager": {
+        "label": "Engineering Manager",
+        "label_vi": "Truong phong ky thuat",
+        "permissions": ["upload", "view", "download", "link", "annotate"]
+      },
+      "operator": {
+        "label": "Operator",
+        "label_vi": "Cong nhan van hanh",
+        "permissions": ["upload", "view"]
+      },
+      "sales_manager": {
+        "label": "Sales Manager",
+        "label_vi": "Truong phong kinh doanh",
+        "permissions": ["view", "download"]
+      },
+      "auditor_external": {
+        "label": "External Auditor",
+        "label_vi": "Danh gia vien ben ngoai",
+        "permissions": ["view"],
+        "time_limited": true,
+        "max_session_hours": 8
+      }
+    },
+    "deletion_policy": {
+      "soft_delete_only": true,
+      "hard_delete_requires": ["admin_approval", "quality_manager_approval"],
+      "retention_hold_override": false,
+      "legal_hold_respected": true
+    }
+  },
+  "storage": {
+    "primary": "azure_blob",
+    "redundancy": "geo_redundant",
+    "encryption_at_rest": "AES-256",
+    "encryption_in_transit": "TLS-1.2",
+    "virus_scan_on_upload": true,
+    "backup_frequency_hours": 24,
+    "backup_retention_days": 90
+  }
+}

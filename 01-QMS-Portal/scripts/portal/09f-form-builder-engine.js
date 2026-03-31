@@ -1184,6 +1184,15 @@ function ensureHotkeys(){
 }
 
 window._renderFormBuilder = function(form, container){
+  try{
+    if(typeof window._ecOpenEqmsTemplateEditor === 'function'){
+      var code = '';
+      if(typeof form === 'string') code = form;
+      else if(form && typeof form === 'object') code = form.form_code || form.code || form.html_runtime_form_code || '';
+      window._ecOpenEqmsTemplateEditor(code || 'FRM-403-SCAR');
+      return;
+    }
+  }catch(_err){}
   if(!form || !container) return;
   ensureHotkeys();
   var state = ensureState(form);

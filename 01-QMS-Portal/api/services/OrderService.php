@@ -456,6 +456,89 @@ final class OrderService
         ];
     }
 
+    // ── Create Operations ─────────────────────────────────────────────────
+
+    /**
+     * Generate the next order number for a given type.
+     *
+     * @param string $type 'so', 'jo', or 'wo'.
+     * @return string Generated order number.
+     */
+    public function generateOrderNumber(string $type): string
+    {
+        $prefixMap = ['so' => 'SO', 'jo' => 'JO', 'wo' => 'WO'];
+        $digitsMap = ['so' => 4, 'jo' => 4, 'wo' => 6];
+
+        $prefix = $prefixMap[$type] ?? 'ORD';
+        $digits = $digitsMap[$type] ?? 4;
+        $year   = date('Y');
+
+        $counterFile = $this->dataDir . '/counters/order_' . $type . '_' . $year . '.json';
+        $counterDir  = dirname($counterFile);
+        if (!is_dir($counterDir)) {
+            @mkdir($counterDir, 0775, true);
+        }
+
+        $counter = 0;
+        if (file_exists($counterFile)) {
+            $raw = @file_get_contents($counterFile);
+            $data = json_decode($raw ?: '', true);
+            $counter = (int)($data['counter'] ?? 0);
+        }
+        $counter++;
+
+        $this->writeJsonFileAtomic($counterFile, ['counter' => $counter, 'updated' => gmdate('c')]);
+
+        return $prefix . '-' . $year . '-' . str_pad((string)$counter, $digits, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Create a new Sales Order.
+     *
+     * @param array $so SO record data.
+     * @return array The saved SO record.
+     */
+    public function createSalesOrder(array $so): array
+    {
+        $index = $this->readIndex();
+        $index['sales_orders'][] = $so;
+        $this->writeIndex($index);
+
+        // Also save per-SO detail file
+        $detailFile = $this->ordersDir . '/so/' . $this->safeFilename($so['so_number'] ?? '') . '.json';
+        $this->writeJsonFileAtomic($detailFile, $so);
+
+        return $so;
+    }
+
+    /**
+     * Create a new Job Order.
+     *
+     * @param array $jo JO record data.
+     * @return array The saved JO record.
+     */
+    public function createJobOrder(array $jo): array
+    {
+        $index = $this->readIndex();
+        $index['job_orders'][] = $jo;
+        $this->writeIndex($index);
+        return $jo;
+    }
+
+    /**
+     * Create a new Work Order.
+     *
+     * @param array $wo WO record data.
+     * @return array The saved WO record.
+     */
+    public function createWorkOrder(array $wo): array
+    {
+        $index = $this->readIndex();
+        $index['work_orders'][] = $wo;
+        $this->writeIndex($index);
+        return $wo;
+    }
+
     // ── Private Helpers ─────────────────────────────────────────────────────
 
     /**
@@ -581,6 +664,51 @@ final class OrderService
         if (!@rename($tmpFile, $this->linksFile)) {
             @unlink($tmpFile);
             throw new RuntimeException('Failed to atomically replace form links file.');
+        }
+    }
+
+    /**
+     * Write the order index file atomically.
+     *
+     * @param array $data Index data.
+     * @return void
+     */
+    private function writeIndex(array $data): void
+    {
+        $this->writeJsonFileAtomic($this->indexFile, $data);
+    }
+
+    /**
+     * Write a JSON file atomically (tmp + rename).
+     *
+     * @param string $path File path.
+     * @param array  $data Data to encode.
+     * @return void
+     */
+    private function writeJsonFileAtomic(string $path, array $data): void
+    {
+        $dir = dirname($path);
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0775, true);
+        }
+
+        $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if ($json === false) {
+            throw new RuntimeException('Failed to encode JSON for ' . basename($path));
+        }
+
+        $tmpFile = $path . '.tmp.' . getmypid();
+        if (@file_put_contents($tmpFile, $json, LOCK_EX) === false) {
+            @unlink($tmpFile);
+            throw new RuntimeException('Failed to write ' . basename($path));
+        }
+
+        if (file_exists($path)) {
+            @unlink($path);
+        }
+        if (!@rename($tmpFile, $path)) {
+            @unlink($tmpFile);
+            throw new RuntimeException('Failed to atomically replace ' . basename($path));
         }
     }
 

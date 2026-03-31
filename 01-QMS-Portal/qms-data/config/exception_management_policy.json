@@ -1,0 +1,176 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "created": "2026-03-31",
+    "description": "Unified exception management policy governing NCR, CAPA, complaints, MRB, deviations, concessions"
+  },
+  "severity_matrix": {
+    "minor": {
+      "label": "Minor",
+      "label_vi": "Nhe",
+      "color": "#22c55e",
+      "max_age_days": 30,
+      "escalation_days": 20,
+      "notification_roles": ["quality_engineer"],
+      "description": "Non-conformance with no impact on form, fit, or function"
+    },
+    "major": {
+      "label": "Major",
+      "label_vi": "Lon",
+      "color": "#f59e0b",
+      "max_age_days": 14,
+      "escalation_days": 7,
+      "notification_roles": ["quality_engineer", "quality_manager"],
+      "description": "Non-conformance affecting product quality or delivery"
+    },
+    "critical": {
+      "label": "Critical",
+      "label_vi": "Nghiem trong",
+      "color": "#ef4444",
+      "max_age_days": 7,
+      "escalation_days": 3,
+      "notification_roles": ["quality_manager", "production_director", "ceo"],
+      "description": "Non-conformance with potential customer impact or regulatory violation"
+    },
+    "safety": {
+      "label": "Safety",
+      "label_vi": "An toan",
+      "color": "#000000",
+      "max_age_days": 3,
+      "escalation_days": 1,
+      "notification_roles": ["quality_manager", "production_director", "ceo", "sales_manager"],
+      "description": "Non-conformance with potential safety or airworthiness impact"
+    }
+  },
+  "auto_escalation_rules": [
+    {
+      "rule_id": "AGE_WARN",
+      "label": "Age Warning",
+      "label_vi": "Canh bao qua han",
+      "trigger": "age_exceeds_escalation_days",
+      "action": "notify_next_level",
+      "description": "Notify next management level when exception exceeds escalation threshold"
+    },
+    {
+      "rule_id": "AGE_OVERDUE",
+      "label": "Overdue Escalation",
+      "label_vi": "Leo thang qua han",
+      "trigger": "age_exceeds_max_age_days",
+      "action": "escalate_to_management_review",
+      "description": "Escalate to management review when exception exceeds max age"
+    },
+    {
+      "rule_id": "REPEAT_PATTERN",
+      "label": "Repeat Non-Conformance",
+      "label_vi": "Loi lap lai",
+      "trigger": "same_defect_code_3x_in_90_days",
+      "action": "auto_generate_capa",
+      "description": "Automatically generate CAPA when same defect code occurs 3 times within 90 days"
+    },
+    {
+      "rule_id": "SEVERITY_UPGRADE",
+      "label": "Severity Auto-Upgrade",
+      "label_vi": "Tu dong nang muc do",
+      "trigger": "customer_complaint_linked",
+      "action": "upgrade_severity_one_level",
+      "description": "Upgrade severity by one level when customer complaint is linked to NCR"
+    },
+    {
+      "rule_id": "COST_THRESHOLD",
+      "label": "Cost Threshold Escalation",
+      "label_vi": "Leo thang nguong chi phi",
+      "trigger": "copq_exceeds_threshold",
+      "threshold_usd": 5000,
+      "action": "notify_ceo_and_finance",
+      "description": "Notify CEO and finance when single exception COPQ exceeds threshold"
+    }
+  ],
+  "copq_categories": {
+    "prevention": {
+      "label": "Prevention Costs",
+      "label_vi": "Chi phi phong ngua",
+      "examples": ["training", "process_planning", "spc", "supplier_evaluation", "quality_planning", "design_review"],
+      "gl_prefix": "COPQ-PRV"
+    },
+    "appraisal": {
+      "label": "Appraisal Costs",
+      "label_vi": "Chi phi danh gia",
+      "examples": ["inspection", "testing", "calibration", "audit", "source_inspection", "receiving_inspection"],
+      "gl_prefix": "COPQ-APR"
+    },
+    "internal_failure": {
+      "label": "Internal Failure",
+      "label_vi": "Loi noi bo",
+      "examples": ["scrap", "rework", "reinspection", "downtime", "sorting", "retest", "material_waste"],
+      "gl_prefix": "COPQ-INT"
+    },
+    "external_failure": {
+      "label": "External Failure",
+      "label_vi": "Loi ben ngoai",
+      "examples": ["warranty", "returns", "penalties", "customer_complaints", "recall", "field_repair", "shipping_damage_claims"],
+      "gl_prefix": "COPQ-EXT"
+    }
+  },
+  "mrb_authority_matrix": {
+    "use_as_is": {
+      "label": "Use As-Is",
+      "label_vi": "Su dung nguyen trang",
+      "min_role": "qa_manager",
+      "requires_customer_approval": false,
+      "requires_engineering_justification": true,
+      "documentation": ["engineering_disposition", "dimensional_analysis"]
+    },
+    "rework": {
+      "label": "Rework",
+      "label_vi": "Sua chua lai",
+      "min_role": "production_manager",
+      "requires_customer_approval": false,
+      "requires_engineering_justification": false,
+      "documentation": ["rework_instruction", "reinspection_plan"]
+    },
+    "scrap": {
+      "label": "Scrap",
+      "label_vi": "Phe pham",
+      "min_role": "qa_manager",
+      "requires_customer_approval": false,
+      "requires_engineering_justification": false,
+      "documentation": ["scrap_report", "copq_entry"]
+    },
+    "return_to_supplier": {
+      "label": "Return to Supplier",
+      "label_vi": "Tra ve nha cung cap",
+      "min_role": "supply_chain_manager",
+      "requires_customer_approval": false,
+      "requires_engineering_justification": false,
+      "documentation": ["scar_reference", "supplier_notification"]
+    },
+    "concession_required": {
+      "label": "Concession Required",
+      "label_vi": "Can nhuong bo",
+      "min_role": "qa_manager",
+      "requires_customer_approval": true,
+      "requires_engineering_justification": true,
+      "documentation": ["concession_request", "customer_approval_record", "engineering_disposition"]
+    }
+  },
+  "sla_targets": {
+    "complaint_acknowledge_hours": 24,
+    "complaint_containment_hours": 48,
+    "complaint_close_days": 30,
+    "ncr_disposition_days": 5,
+    "capa_close_days": 60,
+    "deviation_review_days": 3,
+    "mrb_session_days": 2,
+    "concession_response_days": 5,
+    "scar_supplier_response_days": 10,
+    "effectiveness_review_days": 90
+  },
+  "exception_types": {
+    "NCR": { "label": "Non-Conformance Report", "label_vi": "Bao cao khong phu hop", "prefix": "NCR", "format": "NCR-{YYYY}-{NNNN}" },
+    "CAPA": { "label": "Corrective & Preventive Action", "label_vi": "Hanh dong khac phuc va phong ngua", "prefix": "CAPA", "format": "CAPA-{YYYY}-{NNNN}" },
+    "COMP": { "label": "Customer Complaint", "label_vi": "Khieu nai khach hang", "prefix": "COMP", "format": "COMP-{YYYY}-{NNNN}" },
+    "DEV": { "label": "Deviation Request", "label_vi": "Yeu cau sai lech", "prefix": "DEV", "format": "DEV-{YYYY}-{NNNN}" },
+    "CON": { "label": "Concession", "label_vi": "Nhuong bo", "prefix": "CON", "format": "CON-{YYYY}-{NNNN}" },
+    "MRB": { "label": "Material Review Board", "label_vi": "Hoi dong xem xet vat lieu", "prefix": "MRB", "format": "MRB-{YYYY}-{NNNN}" }
+  }
+}

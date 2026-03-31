@@ -70,7 +70,31 @@ function normalizeRelPath(path){
 function eqmsCatalogForm(formCode){
   var ecState = window._ecState || {};
   var formMap = ecState.formMap || {};
-  return formMap[formCode] || null;
+  var direct = formMap[formCode] || null;
+  if(!direct) return null;
+  var runtimeCode = String(direct.html_runtime_form_code || (direct.schema && direct.schema.html_runtime_form_code) || '').trim();
+  if(runtimeCode && formMap[runtimeCode]) direct = formMap[runtimeCode];
+  var targetPath = normalizeRelPath(direct.standalone_html || (direct.schema && direct.schema.standalone_html) || '');
+  if(!targetPath) return direct;
+  var forms = Array.isArray(ecState.forms) ? ecState.forms : [];
+  var matches = forms.filter(function(candidate){
+    return normalizeRelPath((candidate && candidate.standalone_html) || (candidate && candidate.schema && candidate.schema.standalone_html) || '') === targetPath;
+  });
+  if(!matches.length) return direct;
+  matches.sort(function(a, b){
+    function rank(form){
+      var code = String(form && form.form_code || '').trim().toUpperCase();
+      var score = 0;
+      if(normalizeRelPath((form && form.standalone_html) || (form && form.schema && form.schema.standalone_html) || '')) score += 10;
+      if(form && form.online !== false) score += 4;
+      if(form && (form.linked_excel_form || form.offline_form_code || form.blank_path || form.offline_fallback_available)) score += 3;
+      if(code && !/^FRM-\d+$/.test(code)) score += 2;
+      if(/-[A-Z0-9]+$/.test(code)) score += 1;
+      return score;
+    }
+    return rank(b) - rank(a) || String(a.form_code || '').localeCompare(String(b.form_code || ''));
+  });
+  return matches[0] || direct;
 }
 
 function docRegistry(){
@@ -82,12 +106,22 @@ function docRegistry(){
 
 function findStandaloneDoc(formCode, schema){
   var docs = docRegistry();
-  var targetPath = normalizeRelPath((schema && schema.standalone_html) || (eqmsCatalogForm(formCode) && eqmsCatalogForm(formCode).standalone_html) || '');
+  var targetForm = eqmsCatalogForm(formCode);
+  var runtimeCode = String((targetForm && (targetForm.html_runtime_form_code || (targetForm.schema && targetForm.schema.html_runtime_form_code))) || '').trim();
+  if(runtimeCode) targetForm = eqmsCatalogForm(runtimeCode) || targetForm;
+  var targetPath = normalizeRelPath((schema && schema.standalone_html) || (targetForm && targetForm.standalone_html) || '');
+  if(targetPath){
+    for(var i = 0; i < docs.length; i++){
+      var pathDoc = docs[i];
+      if(!pathDoc) continue;
+      if(normalizeRelPath(pathDoc.path || '') === targetPath) return pathDoc;
+    }
+  }
+  var targetCode = String((targetForm && targetForm.form_code) || formCode || '').trim().toUpperCase();
   for(var i = 0; i < docs.length; i++){
     var doc = docs[i];
     if(!doc) continue;
-    if(String(doc.code || '').trim().toUpperCase() === String(formCode || '').trim().toUpperCase()) return doc;
-    if(targetPath && normalizeRelPath(doc.path || '') === targetPath) return doc;
+    if(String(doc.code || '').trim().toUpperCase() === targetCode) return doc;
   }
   return null;
 }

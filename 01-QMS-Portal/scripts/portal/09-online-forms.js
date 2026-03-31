@@ -812,6 +812,33 @@ function eqmsStandalonePath(form){
   return normalizeEqmsPath((form && form.standalone_html) || (form && form.schema && form.schema.standalone_html) || '');
 }
 
+function canonicalEqmsForm(formOrCode){
+  var baseForm = null;
+  if(typeof formOrCode === 'string'){
+    baseForm = state.formMap[formOrCode] || null;
+  } else if(formOrCode && typeof formOrCode === 'object'){
+    baseForm = formOrCode;
+  }
+  if(!baseForm) return null;
+  var runtimeCode = String((baseForm.html_runtime_form_code || (baseForm.schema && baseForm.schema.html_runtime_form_code) || '')).trim();
+  if(runtimeCode && state.formMap[runtimeCode]) baseForm = state.formMap[runtimeCode];
+  var standalonePath = eqmsStandalonePath(baseForm);
+  if(!standalonePath) return baseForm;
+  var matches = (state.forms || []).filter(function(candidate){
+    return eqmsStandalonePath(candidate) === standalonePath;
+  });
+  if(!matches.length) return baseForm;
+  matches.sort(function(a, b){
+    return eqmsFormRank(b) - eqmsFormRank(a) || String(a.form_code || '').localeCompare(String(b.form_code || ''));
+  });
+  return matches[0] || baseForm;
+}
+
+function canonicalEqmsFormCode(formCode){
+  var canonical = canonicalEqmsForm(formCode);
+  return canonical ? String(canonical.form_code || formCode || '').trim() : String(formCode || '').trim();
+}
+
 function eqmsFormRank(form){
   var code = String(form && form.form_code || '').trim().toUpperCase();
   var rank = 0;
@@ -864,6 +891,7 @@ function openEqmsRuntime(formCode, options, bypassGuard){
     runWithRuntimeGuard(function(){ openEqmsRuntime(formCode, options, true); });
     return;
   }
+  formCode = canonicalEqmsFormCode(formCode);
   state.workspaceMode = 'eqms';
   state._eqmsOpenCode = formCode || '';
   state._eqmsOpenOptions = Object.assign({}, options || {});
@@ -890,22 +918,37 @@ function openEqmsHub(bypassGuard){
 }
 
 function resolveEqmsHtmlDocument(formCode){
-  var form = state.formMap[formCode] || null;
+  var form = canonicalEqmsForm(formCode) || state.formMap[formCode] || null;
+  var runtimeCode = String((form && (form.html_runtime_form_code || (form.schema && form.schema.html_runtime_form_code)) || '')).trim();
+  if(runtimeCode && state.formMap[runtimeCode]) form = canonicalEqmsForm(runtimeCode) || state.formMap[runtimeCode];
   var standalonePath = eqmsStandalonePath(form);
   var docs = docRegistry();
-  for(var i = 0; i < docs.length; i++){
-    var doc = docs[i];
+  if(standalonePath){
+    for(var i = 0; i < docs.length; i++){
+      var pathDoc = docs[i];
+      if(!pathDoc) continue;
+      if(normalizeEqmsPath(pathDoc.path || '') === standalonePath) return pathDoc;
+    }
+  }
+  var targetCode = String((form && form.form_code) || formCode || '').trim().toUpperCase();
+  for(var j = 0; j < docs.length; j++){
+    var doc = docs[j];
     if(!doc || !doc.code) continue;
-    if(String(doc.code || '').trim().toUpperCase() === String(formCode || '').trim().toUpperCase()) return doc;
-    if(standalonePath && normalizeEqmsPath(doc.path || '') === standalonePath) return doc;
+    if(String(doc.code || '').trim().toUpperCase() === targetCode) return doc;
   }
   if(typeof findDocByRelativePath === 'function' && standalonePath){
     var linkedDoc = findDocByRelativePath(standalonePath);
     if(linkedDoc) return linkedDoc;
   }
   if(form && standalonePath){
+    var syntheticCode = targetCode;
+    var fileMatch = standalonePath.match(/([^\/]+)\.html?$/i);
+    if(fileMatch && fileMatch[1]){
+      var fileCodeMatch = String(fileMatch[1]).trim().toUpperCase().match(/^(FRM-[A-Z0-9-]+)/);
+      if(fileCodeMatch && fileCodeMatch[1]) syntheticCode = fileCodeMatch[1];
+    }
     var synthetic = {
-      code: String(form.form_code || formCode || '').trim().toUpperCase(),
+      code: syntheticCode,
       title: form.title || form.form_code || formCode || 'HTML Form',
       title_vi: form.title_vi || form.description_vi || '',
       description: form.description || '',
@@ -956,6 +999,7 @@ function openEqmsTemplateEditor(formCode, bypassGuard){
     runWithRuntimeGuard(function(){ openEqmsTemplateEditor(formCode, true); });
     return;
   }
+  formCode = canonicalEqmsFormCode(formCode);
   var doc = resolveEqmsHtmlDocument(formCode);
   if(!doc || !doc.code){
     showToast(t('Chưa tìm thấy biểu mẫu HTML chuẩn để chỉnh sửa.', 'Could not find the governed HTML form template.'), 'warn');

@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="color-scheme" content="light"/>
 <title>FRM-403 - SCAR | HESEM QMS</title>
-<link rel="stylesheet" href="/assets/style.css"/>
-<link rel="stylesheet" href="/01-QMS-Portal/styles/FORM-DESIGN-SYSTEM-SPEC.css"/>
-<link rel="stylesheet" href="/01-QMS-Portal/styles/form-runtime-frm-403.css"/>
+<link rel="stylesheet" href="/assets/style.css?v=scar403-runtime-20260401"/>
+<link rel="stylesheet" href="/01-QMS-Portal/styles/FORM-DESIGN-SYSTEM-SPEC.css?v=scar403-runtime-20260401"/>
+<link rel="stylesheet" href="/01-QMS-Portal/styles/form-runtime-frm-403.css?v=scar403-runtime-20260401"/>
 </head>
 <body data-mode="edit">
 <div class="scar-runtime">
@@ -94,6 +94,14 @@
         <div class="scar-record-item">
           <small>Người phát hành</small>
           <strong id="heroIssuedBy">Chưa ghi nhận</strong>
+        </div>
+      </div>
+
+      <div class="scar-runtime-alert info" id="runtimeAlert" role="status" aria-live="polite">
+        <span class="scar-runtime-pill" id="runtimeAlertPill">Khá»Ÿi táº¡o</span>
+        <div class="scar-runtime-copy">
+          <strong id="runtimeAlertTitle">Äang khá»Ÿi táº¡o biá»ƒu máº«u</strong>
+          <span id="runtimeAlertText">Há»‡ thá»‘ng Ä‘ang táº£i thÃ´ng tin há»“ sÆ¡, nhÃ¡p gáº§n nháº¥t vÃ  dá»¯ liá»‡u ná»n nhÃ  cung cáº¥p.</span>
         </div>
       </div>
 
@@ -353,6 +361,19 @@
           </div>
         </section>
 
+        <section class="qf-section qf-section--info" id="workflowSection">
+          <div class="qf-section-header">
+            <div>
+              <div class="qf-section-title"><span class="qf-section-num">6</span> Workflow kÃ½ duyá»‡t vÃ  chá»¯ kÃ½ Ä‘iá»‡n tá»­</div>
+              <div class="qf-section-subtitle">Theo dÃµi tráº¡ng thÃ¡i review, sá»‘ láº§n ná»™p, báº£n kÃ½ Ä‘Ã£ thu tháº­p vÃ  thao tÃ¡c kÃ½ duyá»‡t ngay trÃªn cÃ¹ng bá» máº·t HTML cá»§a SCAR.</div>
+            </div>
+          </div>
+          <div class="qf-section-body">
+            <div id="supplierHints" class="scar-supplier-hints"></div>
+            <div id="scarWorkflowPanel" class="scar-workflow-panel"></div>
+          </div>
+        </section>
+
         <div class="qf-actions qf-actions--sticky no-print" id="qfActionsBar">
           <div id="actionsMetaBlock">
             <div class="qf-helper" id="saveMeta">Chưa có lượt lưu nào trong phiên này.</div>
@@ -371,6 +392,6 @@
   </div>
 </div>
 
-<script src="/01-QMS-Portal/scripts/form-runtimes/frm-403-scar.js"></script>
+<script src="/01-QMS-Portal/scripts/form-runtimes/frm-403-scar.js?v=scar403-runtime-20260401"></script>
 </body>
 </html>

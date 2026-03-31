@@ -5,8 +5,10 @@
   "version": "V1",
   "category": "quality",
   "frequency": "per_event",
+  "online": false,
+  "delivery_mode": "offline",
+  "html_runtime_form_code": "FRM-403-SCAR",
   "sop_ref": "SOP-401",
-  "standalone_html": "../../../../04-Bieu-Mau/04-FRM-400/FRM-403-SCAR_Supplier_Corrective_Action_Request.html",
   "description": "Ghi nhận yêu cầu hành động khắc phục đối với nhà cung cấp khi phát hiện lỗi chất lượng hoặc giao hàng.",
   "roles_allowed": ["admin", "qa_manager", "quality_engineer", "supply_chain_manager", "buyer"],
   "fields": [

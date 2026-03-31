@@ -1,0 +1,477 @@
+@charset "UTF-8";
+
+/* ═══════════════════════════════════════════
+   SUPPLIER QUALITY MODULE — sq- prefix
+   HESEM QMS Portal
+   ═══════════════════════════════════════════ */
+
+/* ─── Scorecard ─── */
+.sq-scorecard-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.sq-scorecard-card {
+  flex: 1 1 260px;
+  min-width: 240px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sq-scorecard-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.sq-scorecard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sq-scorecard-vendor {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sq-scorecard-body {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.sq-scorecard-metrics {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sq-scorecard-metric {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.sq-scorecard-metric-val {
+  font-weight: 700;
+}
+
+/* Score Circle — CSS-only conic-gradient gauge */
+.sq-score-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  /* Override --score-pct and --score-color via inline style */
+  background: conic-gradient(
+    var(--score-color, var(--brand-2)) 0%,
+    var(--score-color, var(--brand-2)) var(--score-pct, 0%),
+    var(--border) var(--score-pct, 0%),
+    var(--border) 100%
+  );
+}
+
+.sq-score-circle::after {
+  content: '';
+  position: absolute;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--surface);
+}
+
+.sq-score-circle-value {
+  position: relative;
+  z-index: 1;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+/* Grade Badge */
+.sq-grade-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.sq-grade-badge.grade-a { background: #16a34a; }
+.sq-grade-badge.grade-b { background: #2563eb; }
+.sq-grade-badge.grade-c { background: #d97706; }
+.sq-grade-badge.grade-d { background: #ea580c; }
+.sq-grade-badge.grade-f { background: #dc2626; }
+
+/* ─── Radar Chart (CSS Pentagon) ─── */
+.sq-radar {
+  width: 200px;
+  height: 200px;
+  position: relative;
+  margin: 0 auto;
+}
+
+.sq-radar-bg {
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+}
+
+.sq-radar-axis {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1px;
+  height: 50%;
+  background: var(--border);
+  transform-origin: top center;
+}
+
+.sq-radar-axis:nth-child(1) { transform: rotate(0deg); }
+.sq-radar-axis:nth-child(2) { transform: rotate(72deg); }
+.sq-radar-axis:nth-child(3) { transform: rotate(144deg); }
+.sq-radar-axis:nth-child(4) { transform: rotate(216deg); }
+.sq-radar-axis:nth-child(5) { transform: rotate(288deg); }
+
+.sq-radar-fill {
+  position: absolute;
+  inset: 0;
+  /* Use clip-path polygon via inline style for dynamic values */
+  background: rgba(21, 101, 192, 0.15);
+  border: 2px solid var(--brand-2);
+  transition: clip-path 0.4s ease;
+}
+
+.sq-radar-label {
+  position: absolute;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-2);
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+}
+
+/* ─── Incoming Inspection ─── */
+.sq-incoming-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sq-incoming-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  transition: background 0.15s ease;
+}
+
+.sq-incoming-row:hover {
+  background: #f8f9fa;
+}
+
+.sq-incoming-part {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.sq-incoming-po {
+  font-size: 12px;
+  color: var(--text-3);
+  flex: 0 0 100px;
+}
+
+.sq-incoming-result {
+  flex: 0 0 80px;
+  text-align: center;
+}
+
+.sq-measurement-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.sq-measurement-cell {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--mono);
+  text-align: center;
+  min-width: 56px;
+}
+
+.sq-pass { background: rgba(46, 125, 50, 0.1);  color: var(--green); }
+.sq-fail { background: rgba(198, 40, 40, 0.1);   color: var(--red); }
+
+/* ─── SCAR Timeline ─── */
+.sq-scar-timeline {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 16px 0;
+  position: relative;
+}
+
+.sq-scar-timeline::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  transform: translateY(-50%);
+}
+
+.sq-scar-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.sq-scar-step-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 3px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.sq-scar-step.completed .sq-scar-step-dot {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+.sq-scar-step.current .sq-scar-step-dot {
+  border-color: var(--brand-2);
+  background: var(--brand-2);
+  transform: scale(1.15);
+  box-shadow: 0 0 0 4px rgba(21, 101, 192, 0.15);
+}
+
+.sq-scar-step.overdue .sq-scar-step-dot {
+  border-color: var(--red);
+  background: var(--red);
+  animation: sq-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes sq-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(198, 40, 40, 0.3); }
+  50%      { box-shadow: 0 0 0 8px rgba(198, 40, 40, 0); }
+}
+
+.sq-scar-step-dot-icon {
+  width: 10px;
+  height: 10px;
+  color: #fff;
+}
+
+.sq-scar-step-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--text-3);
+  text-align: center;
+  max-width: 72px;
+  line-height: 1.3;
+}
+
+.sq-scar-step.current .sq-scar-step-label  { color: var(--brand-2); }
+.sq-scar-step.completed .sq-scar-step-label { color: var(--green); }
+.sq-scar-step.overdue .sq-scar-step-label   { color: var(--red); }
+
+.sq-scar-step-date {
+  font-size: 10px;
+  color: var(--text-3);
+  font-family: var(--mono);
+}
+
+/* Connector line between completed steps */
+.sq-scar-step.completed + .sq-scar-step::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  width: 100%;
+  height: 3px;
+  background: var(--green);
+  transform: translateY(-50%);
+  z-index: -1;
+}
+
+/* ─── Skip-Lot Indicator ─── */
+.sq-skip-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.sq-skip-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sq-skip-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.sq-skip-normal    .sq-skip-dot { background: var(--brand-2); }
+.sq-skip-normal    .sq-skip-label { color: var(--brand-2); }
+.sq-skip-tightened .sq-skip-dot { background: var(--red); }
+.sq-skip-tightened .sq-skip-label { color: var(--red); }
+.sq-skip-reduced   .sq-skip-dot { background: var(--green); }
+.sq-skip-reduced   .sq-skip-label { color: var(--green); }
+.sq-skip-skip      .sq-skip-dot { background: var(--text-3); }
+.sq-skip-skip      .sq-skip-label { color: var(--text-3); }
+
+.sq-skip-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.sq-skip-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.sq-skip-normal    .sq-skip-bar-fill { background: var(--brand-2); }
+.sq-skip-tightened .sq-skip-bar-fill { background: var(--red); }
+.sq-skip-reduced   .sq-skip-bar-fill { background: var(--green); }
+.sq-skip-skip      .sq-skip-bar-fill { background: var(--text-3); }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .sq-scorecard-grid {
+    flex-direction: column;
+  }
+
+  .sq-scorecard-card {
+    min-width: 100%;
+  }
+
+  .sq-score-circle {
+    width: 56px;
+    height: 56px;
+  }
+
+  .sq-score-circle::after {
+    width: 42px;
+    height: 42px;
+  }
+
+  .sq-score-circle-value {
+    font-size: 13px;
+  }
+
+  .sq-scar-timeline {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding-left: 24px;
+  }
+
+  .sq-scar-timeline::before {
+    top: 0;
+    bottom: 0;
+    left: 11px;
+    right: auto;
+    width: 3px;
+    height: auto;
+    transform: none;
+  }
+
+  .sq-scar-step {
+    flex-direction: row;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .sq-scar-step-label {
+    text-align: left;
+    max-width: none;
+  }
+
+  .sq-scar-step.completed + .sq-scar-step::before {
+    display: none;
+  }
+
+  .sq-incoming-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .sq-incoming-po {
+    flex: none;
+  }
+
+  .sq-radar {
+    width: 160px;
+    height: 160px;
+  }
+
+  .sq-measurement-grid {
+    gap: 2px;
+  }
+
+  .sq-measurement-cell {
+    font-size: 10px;
+    min-width: 44px;
+    padding: 3px 6px;
+  }
+}
