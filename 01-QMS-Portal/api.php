@@ -9406,6 +9406,18 @@ function git_is_runtime_noise_path(string $path): bool {
   if (str_starts_with($p, 'qms-data/ratelimit/')) {
     return basename($p) !== 'README.md';
   }
+  if (str_starts_with($p, 'qms-data/allocations/')) {
+    return !in_array(basename($p), ['.htaccess', 'README.md'], true);
+  }
+  if (str_starts_with($p, 'qms-data/counters/')) {
+    return !in_array(basename($p), ['_registry.json', '.htaccess', 'README.md'], true);
+  }
+  if (str_starts_with($p, 'qms-data/online-forms/drafts/')) {
+    return !in_array(basename($p), ['.htaccess', 'README.md'], true);
+  }
+  if (str_starts_with($p, 'qms-data/online-forms/audit/')) {
+    return !in_array(basename($p), ['.htaccess', 'README.md'], true);
+  }
   if (str_starts_with($p, 'qms-data/form-workflow/')) return true;
   return false;
 }
@@ -9641,6 +9653,10 @@ function git_cleanup_runtime_noise(string $repoReal): void {
     'qms-data/form-workflow',
     'qms-data/sessions',
     'qms-data/ratelimit',
+    'qms-data/allocations',
+    'qms-data/counters',
+    'qms-data/online-forms/drafts',
+    'qms-data/online-forms/audit',
     'qms-data/php_error.log',
     'qms-data/scan_cache.json',
   ];
