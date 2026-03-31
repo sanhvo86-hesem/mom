@@ -922,6 +922,38 @@ function flashActionButton(button, temporaryLabel, fallbackLabel){
   }, 1500);
 }
 
+function loadVersionHistory(form){
+  var el = document.getElementById('ec-version-timeline');
+  if(!el) return;
+  el.innerHTML = '<div style="padding:12px;text-align:center;color:var(--ec-text-muted);font-size:12px">' + esc(t('Đang tải...', 'Loading...')) + '</div>';
+  api('form_schema_history', { form_code: form.form_code }, 'GET').then(function(resp){
+    var versions = (resp && resp.ok && Array.isArray(resp.versions)) ? resp.versions : [];
+    if(!versions.length){
+      el.innerHTML = '<div style="padding:16px;text-align:center;color:var(--ec-text-muted);font-size:12px">' + esc(t('Chưa có lịch sử phiên bản.', 'No version history available.')) + '</div>';
+      return;
+    }
+    el.innerHTML = '<div class="ec-timeline">' + versions.map(function(v, i){
+      var isCurrent = i === 0;
+      var statusBadge = v.status === 'approved' ? 'pass' : v.status === 'draft' ? 'info' : v.status === 'superseded' ? 'neutral' : 'warn';
+      return '<div class="ec-timeline-item' + (isCurrent ? ' current' : '') + '">' +
+        '<div class="ec-timeline-dot"></div>' +
+        '<div class="ec-timeline-content">' +
+          '<div class="ec-timeline-head">' +
+            '<strong>' + esc(v.version || 'V?') + '</strong>' +
+            '<span class="ec-badge ' + statusBadge + '">' + esc(v.status || 'unknown') + '</span>' +
+          '</div>' +
+          '<div class="ec-timeline-meta">' +
+            esc(v.changed_by || '—') + ' · ' + esc(v.changed_at ? new Date(v.changed_at).toLocaleString() : '—') +
+          '</div>' +
+          (v.change_reason ? '<div class="ec-timeline-reason">' + esc(v.change_reason) + '</div>' : '') +
+        '</div>' +
+      '</div>';
+    }).join('') + '</div>';
+  }).catch(function(){
+    el.innerHTML = '<div style="padding:16px;text-align:center;color:var(--ec-text-muted);font-size:12px">' + esc(t('Không thể tải lịch sử.', 'Could not load history.')) + '</div>';
+  });
+}
+
 function reloadCurrentFormWorkspace(formCode, allocationId){
   if(typeof window._fhOpenFormWorkspace === 'function'){
     window._fhOpenFormWorkspace(formCode || '', allocationId || '');
@@ -986,20 +1018,58 @@ function renderWorkspace(form, allocation, container){
   var catMeta = meta[form.category] || meta.other;
 
   var html = '';
+  var isDual = !!(form.online !== false && (form.blank_path || form.blank_filename || form.offline_fallback_available));
+  var activeMode = ws.viewMode || (isOnline ? 'online' : 'offline');
+  if(!isDual && !isOnline) activeMode = 'offline';
+  if(!isDual && isOnline) activeMode = 'online';
 
-  /* ── Header ── */
-  html += '<div class="ec-header">' +
-    '<div class="ec-header-badge" style="background:rgba(255,255,255,.12)">' + catMeta.icon + '</div>' +
-    '<div class="ec-header-info">' +
-      '<div class="ec-header-kicker">' + esc(form.form_code + ' · ' + (form.version || 'V1') + (form.sop_ref ? ' · ' + form.sop_ref : '')) + '</div>' +
-      '<div class="ec-header-title">' + esc(form.title_vi || form.title || form.form_code) + '</div>' +
-      '<p class="ec-header-desc">' + esc(t(form.description_vi || form.description || '', form.description || '')) + '</p>' +
+  /* ── Document-style header ── */
+  var statusText = allocation ? statusLabel(allocation.status || 'allocated') : t('Chưa cấp mã', 'Not allocated');
+  var statusTone = allocation ? (allocation.status === 'approved' ? 'pass' : allocation.status === 'rejected' ? 'fail' : allocation.status === 'in_review' ? 'warn' : 'info') : 'neutral';
+
+  html += '<div class="ec-doc-bar">' +
+    '<div class="ec-doc-bar-left">' +
+      '<div class="ec-doc-bar-icon" style="background:' + catMeta.bg + '">' + catMeta.icon + '</div>' +
+      '<div class="ec-doc-bar-meta">' +
+        '<div class="ec-doc-bar-code">' + esc(form.form_code) + ' <span class="ec-doc-bar-rev">' + esc(form.version || 'V1') + '</span></div>' +
+        '<div class="ec-doc-bar-title">' + esc(form.title_vi || form.title || form.form_code) + '</div>' +
+      '</div>' +
     '</div>' +
-    '<div class="ec-header-tags">' +
-      '<span class="ec-tag">' + esc(isOnline ? t('Trực tuyến', 'Online') : t('Ngoại tuyến', 'Offline')) + '</span>' +
-      (allocation ? '<span class="ec-tag done">' + esc(allocation.record_id || '') + '</span>' : '') +
+    '<div class="ec-doc-bar-center">' +
+      '<span class="ec-badge ' + statusTone + '">' + esc(statusText) + '</span>' +
+      (form.sop_ref ? '<a class="ec-doc-bar-sop" href="#" data-navigate-doc="' + esc(form.sop_ref) + '">' + esc(form.sop_ref) + '</a>' : '') +
+      (allocation ? '<span class="ec-doc-bar-id">' + esc(allocation.record_id || '') + '</span>' : '') +
+    '</div>' +
+    '<div class="ec-doc-bar-actions">' +
+      '<button type="button" class="ec-doc-action" id="ec-version-history-btn" title="' + esc(t('Lịch sử phiên bản', 'Version history')) + '">\uD83D\uDCCB</button>' +
+      '<button type="button" class="ec-doc-action" id="ec-print-form-btn" title="' + esc(t('In biểu mẫu', 'Print form')) + '">\uD83D\uDDA8</button>' +
+      '<button type="button" class="ec-doc-action primary" id="ec-edit-form-btn" title="' + esc(t('Chỉnh sửa biểu mẫu', 'Edit form')) + '">\u270E ' + esc(t('Chỉnh sửa', 'Edit')) + '</button>' +
     '</div>' +
   '</div>';
+
+  /* ── Mode switch for dual-mode forms ── */
+  if(isDual){
+    html += '<div class="ec-mode-switch">' +
+      '<button type="button" class="ec-mode-tab' + (activeMode === 'online' ? ' active' : '') + '" data-mode="online">' + esc(t('Trực tuyến', 'Online')) + '</button>' +
+      '<button type="button" class="ec-mode-tab' + (activeMode === 'offline' ? ' active' : '') + '" data-mode="offline">' + esc(t('Ngoại tuyến (Excel)', 'Offline (Excel)')) + '</button>' +
+    '</div>';
+  }
+
+  /* ── Version history panel (hidden by default) ── */
+  html += '<div class="ec-version-panel" id="ec-version-panel" style="display:none">' +
+    '<div class="ec-version-panel-head">' +
+      '<strong>' + esc(t('Lịch sử phiên bản', 'Version history')) + '</strong>' +
+      '<button type="button" class="ec-btn ghost" data-close-version-panel>✕</button>' +
+    '</div>' +
+    '<div class="ec-version-panel-body" id="ec-version-timeline">' +
+      '<div class="ec-empty" style="padding:16px">' + esc(t('Đang tải...', 'Loading...')) + '</div>' +
+    '</div>' +
+  '</div>';
+
+  /* ── Description bar ── */
+  if(form.description_vi || form.description){
+    html += '<div class="ec-form-desc">' + esc(t(form.description_vi || form.description || '', form.description || '')) + '</div>';
+  }
 
   /* ── Step 1: Allocate ── */
   html += renderWorkspaceOverview(form, allocation);
@@ -1013,9 +1083,9 @@ function renderWorkspace(form, allocation, container){
     '<div class="ec-step-body">' + renderAllocateStep(form) + '</div>' +
   '</div>';
 
-  /* ── Step 2: Fill / Download ── */
+  /* ── Step 2: Fill / Download (respects activeMode for dual forms) ── */
   if(hasAlloc){
-    if(isOnline){
+    if(activeMode === 'online'){
       html += renderOnlineStep(form, allocation);
     } else {
       html += renderOfflineStepModern(form, allocation);
@@ -2492,6 +2562,43 @@ function bindWorkspace(form, allocation, container){
     });
     container._ecToggleBound = true;
   }
+
+  /* ── Document bar: mode switch, version history, edit, print ── */
+  Array.prototype.forEach.call(container.querySelectorAll('[data-mode]'), function(btn){
+    btn.onclick = function(){
+      ws.viewMode = btn.getAttribute('data-mode') || 'online';
+      renderWorkspace(form, allocation, container);
+    };
+  });
+
+  var versionBtn = document.getElementById('ec-version-history-btn');
+  var versionPanel = document.getElementById('ec-version-panel');
+  if(versionBtn && versionPanel){
+    versionBtn.onclick = function(){
+      var visible = versionPanel.style.display !== 'none';
+      versionPanel.style.display = visible ? 'none' : 'block';
+      if(!visible) loadVersionHistory(form);
+    };
+    var closeVp = versionPanel.querySelector('[data-close-version-panel]');
+    if(closeVp) closeVp.onclick = function(){ versionPanel.style.display = 'none'; };
+  }
+
+  var editBtn = document.getElementById('ec-edit-form-btn');
+  if(editBtn) editBtn.onclick = function(){
+    toast(t('Trình chỉnh sửa biểu mẫu đang được phát triển.', 'Form editor is under development.'), 'info');
+  };
+
+  var printBtn = document.getElementById('ec-print-form-btn');
+  if(printBtn) printBtn.onclick = function(){ window.print(); };
+
+  Array.prototype.forEach.call(container.querySelectorAll('[data-navigate-doc]'), function(link){
+    link.onclick = function(e){
+      e.preventDefault();
+      var docCode = link.getAttribute('data-navigate-doc') || '';
+      if(docCode && typeof navigateTo === 'function') navigateTo('documents', { search: docCode });
+      else if(docCode) toast(t('Mở tài liệu: ', 'Open document: ') + docCode, 'info');
+    };
+  });
 
   /* allocate */
   var deptEl=document.getElementById('ec-alloc-dept');
