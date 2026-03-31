@@ -964,7 +964,7 @@ function openEqmsHub(bypassGuard){
 }
 
 function resolveEqmsHtmlDocument(formCode){
-  var form = canonicalEqmsForm(formCode) || state.formMap[formCode] || null;
+  var form = canonicalEqmsForm(formCode) || state.formMap[formCode] || KNOWN_HTML_RUNTIME_FORMS[String(formCode || '').trim()] || null;
   var runtimeCode = String((form && (form.html_runtime_form_code || (form.schema && form.schema.html_runtime_form_code)) || '')).trim();
   if(runtimeCode){
     var runtimeForm = canonicalEqmsForm(runtimeCode) || state.formMap[runtimeCode] || KNOWN_HTML_RUNTIME_FORMS[runtimeCode] || null;
@@ -1079,8 +1079,9 @@ function openEqmsTemplateEditor(formCode, bypassGuard){
     try{ startEdit(doc); }catch(_err){}
     return new Promise(function(resolve, reject){
       setTimeout(function(){
-        var sameCode = (typeof editMode !== 'undefined' && editMode && typeof editingDoc !== 'undefined' && editingDoc === doc.code);
-        var samePath = normalizeEqmsPath(window.currentDocPath || '') === normalizeEqmsPath(doc.path || '');
+        var editorActive = (typeof editMode !== 'undefined' && editMode && typeof editingDoc !== 'undefined' && !!editingDoc);
+        var sameCode = editorActive && editingDoc === doc.code;
+        var samePath = editorActive && normalizeEqmsPath(window.currentDocPath || '') === normalizeEqmsPath(doc.path || '');
         if(sameCode || samePath){
           showToast(t('Đã mở mẫu HTML để chỉnh sửa bằng cùng bề mặt hiển thị.', 'Opened the HTML template in the same visual surface.'), 'success');
           resolve();
