@@ -592,6 +592,12 @@ function closeUnsavedDialog(){
   try{ document.querySelectorAll('.unsaved-modal-overlay').forEach(el=>el.remove()); }catch(e){}
 }
 
+function consumePendingPortalNavigate(){
+  var pending = window._ecPendingPortalNavigate || null;
+  window._ecPendingPortalNavigate = null;
+  return pending;
+}
+
 async function unsavedAction(action, editingCode, targetCode){
   closeUnsavedDialog();
   try{
@@ -600,15 +606,24 @@ async function unsavedAction(action, editingCode, targetCode){
       await saveDraftSilent(editingCode);
       cancelEdit();
       if(targetCode && targetCode !== 'null') openDoc(targetCode);
-      else { closeDocViewerForce(); }
+      else {
+        var pendingSaveNav = consumePendingPortalNavigate();
+        if(pendingSaveNav && typeof navigateTo === 'function') navigateTo(pendingSaveNav.page, pendingSaveNav.filter, true);
+        else closeDocViewerForce();
+      }
     } else if(action === 'discard'){
       // Discard changes and navigate
       try{ setEditedHtml(editingCode, ''); }catch(e){}
       cancelEdit();
       if(targetCode && targetCode !== 'null') openDoc(targetCode);
-      else { closeDocViewerForce(); }
+      else {
+        var pendingDiscardNav = consumePendingPortalNavigate();
+        if(pendingDiscardNav && typeof navigateTo === 'function') navigateTo(pendingDiscardNav.page, pendingDiscardNav.filter, true);
+        else closeDocViewerForce();
+      }
     } else if(action === 'review'){
       // Open submit for review modal (stay on current doc)
+      consumePendingPortalNavigate();
       submitForReview(editingCode);
     }
   }catch(err){

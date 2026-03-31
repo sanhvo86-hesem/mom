@@ -1,7 +1,7 @@
 {
     "_meta": {
         "version": "1.0",
-        "updated": "2026-03-31T09:27:32+00:00",
+        "updated": "2026-03-31T15:25:12+00:00",
         "description": "Structured observability for runtime shadow sync, connector ingest, and MES governance telemetry."
     },
     "shadow_sync": {
@@ -77,15 +77,15 @@
     "primary_reads": {
         "master_data": {
             "last_source": "json",
-            "last_read_at": "2026-03-31T16:27:32+07:00",
+            "last_read_at": "2026-03-31T15:25:12+00:00",
             "last_error": "",
             "last_mode": "JSON_ONLY",
             "postgres_count": 0,
-            "json_count": 4066,
+            "json_count": 4072,
             "fallback_count": 0,
             "last_context": {
-                "item_count": 56,
-                "scope": "runtime_bundle"
+                "item_count": 91,
+                "scope": "mes_bundle"
             },
             "recent": [
                 {
@@ -94,6 +94,78 @@
                     "fallback": false,
                     "error": "",
                     "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:25:12+00:00",
+                    "context": {
+                        "item_count": 91,
+                        "scope": "mes_bundle"
+                    }
+                },
+                {
+                    "store_key": "master_data",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:25:11+00:00",
+                    "context": {
+                        "item_count": 91,
+                        "scope": "mes_bundle"
+                    }
+                },
+                {
+                    "store_key": "master_data",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:25:11+00:00",
+                    "context": {
+                        "item_count": 91,
+                        "scope": "mes_bundle"
+                    }
+                },
+                {
+                    "store_key": "master_data",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:24:47+00:00",
+                    "context": {
+                        "item_count": 91,
+                        "scope": "mes_bundle"
+                    }
+                },
+                {
+                    "store_key": "master_data",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:24:46+00:00",
+                    "context": {
+                        "item_count": 91,
+                        "scope": "mes_bundle"
+                    }
+                },
+                {
+                    "store_key": "master_data",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:24:46+00:00",
+                    "context": {
+                        "item_count": 91,
+                        "scope": "mes_bundle"
+                    }
+                },
+                {
+                    "store_key": "master_data",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
                     "timestamp": "2026-03-31T16:27:32+07:00",
                     "context": {
                         "item_count": 56,
@@ -191,78 +263,6 @@
                     "error": "",
                     "mode": "JSON_ONLY",
                     "timestamp": "2026-03-31T16:26:32+07:00",
-                    "context": {
-                        "item_count": 56,
-                        "scope": "mes_bundle"
-                    }
-                },
-                {
-                    "store_key": "master_data",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:26:02+07:00",
-                    "context": {
-                        "item_count": 56,
-                        "scope": "mes_bundle"
-                    }
-                },
-                {
-                    "store_key": "master_data",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:26:02+07:00",
-                    "context": {
-                        "item_count": 56,
-                        "scope": "runtime_bundle"
-                    }
-                },
-                {
-                    "store_key": "master_data",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:26:02+07:00",
-                    "context": {
-                        "item_count": 56,
-                        "scope": "mes_bundle"
-                    }
-                },
-                {
-                    "store_key": "master_data",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:25:32+07:00",
-                    "context": {
-                        "item_count": 56,
-                        "scope": "runtime_bundle"
-                    }
-                },
-                {
-                    "store_key": "master_data",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:25:32+07:00",
-                    "context": {
-                        "item_count": 56,
-                        "scope": "mes_bundle"
-                    }
-                },
-                {
-                    "store_key": "master_data",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:25:32+07:00",
                     "context": {
                         "item_count": 56,
                         "scope": "mes_bundle"
@@ -272,15 +272,15 @@
         },
         "orders": {
             "last_source": "json",
-            "last_read_at": "2026-03-31T16:27:32+07:00",
+            "last_read_at": "2026-03-31T15:25:12+00:00",
             "last_error": "",
             "last_mode": "JSON_ONLY",
             "postgres_count": 0,
-            "json_count": 4066,
+            "json_count": 4072,
             "fallback_count": 0,
             "last_context": {
                 "item_count": 8,
-                "scope": "runtime_bundle"
+                "scope": "mes_bundle"
             },
             "recent": [
                 {
@@ -289,6 +289,78 @@
                     "fallback": false,
                     "error": "",
                     "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:25:12+00:00",
+                    "context": {
+                        "item_count": 8,
+                        "scope": "mes_bundle"
+                    }
+                },
+                {
+                    "store_key": "orders",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:25:11+00:00",
+                    "context": {
+                        "item_count": 8,
+                        "scope": "mes_bundle"
+                    }
+                },
+                {
+                    "store_key": "orders",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:25:11+00:00",
+                    "context": {
+                        "item_count": 8,
+                        "scope": "mes_bundle"
+                    }
+                },
+                {
+                    "store_key": "orders",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:24:47+00:00",
+                    "context": {
+                        "item_count": 8,
+                        "scope": "mes_bundle"
+                    }
+                },
+                {
+                    "store_key": "orders",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:24:46+00:00",
+                    "context": {
+                        "item_count": 8,
+                        "scope": "mes_bundle"
+                    }
+                },
+                {
+                    "store_key": "orders",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:24:46+00:00",
+                    "context": {
+                        "item_count": 8,
+                        "scope": "mes_bundle"
+                    }
+                },
+                {
+                    "store_key": "orders",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
                     "timestamp": "2026-03-31T16:27:32+07:00",
                     "context": {
                         "item_count": 8,
@@ -386,78 +458,6 @@
                     "error": "",
                     "mode": "JSON_ONLY",
                     "timestamp": "2026-03-31T16:26:32+07:00",
-                    "context": {
-                        "item_count": 8,
-                        "scope": "mes_bundle"
-                    }
-                },
-                {
-                    "store_key": "orders",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:26:02+07:00",
-                    "context": {
-                        "item_count": 8,
-                        "scope": "mes_bundle"
-                    }
-                },
-                {
-                    "store_key": "orders",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:26:02+07:00",
-                    "context": {
-                        "item_count": 8,
-                        "scope": "runtime_bundle"
-                    }
-                },
-                {
-                    "store_key": "orders",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:26:02+07:00",
-                    "context": {
-                        "item_count": 8,
-                        "scope": "mes_bundle"
-                    }
-                },
-                {
-                    "store_key": "orders",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:25:32+07:00",
-                    "context": {
-                        "item_count": 8,
-                        "scope": "runtime_bundle"
-                    }
-                },
-                {
-                    "store_key": "orders",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:25:32+07:00",
-                    "context": {
-                        "item_count": 8,
-                        "scope": "mes_bundle"
-                    }
-                },
-                {
-                    "store_key": "orders",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:25:32+07:00",
                     "context": {
                         "item_count": 8,
                         "scope": "mes_bundle"
@@ -467,11 +467,11 @@
         },
         "mes": {
             "last_source": "json",
-            "last_read_at": "2026-03-31T16:27:32+07:00",
+            "last_read_at": "2026-03-31T15:25:12+00:00",
             "last_error": "",
             "last_mode": "JSON_ONLY",
             "postgres_count": 0,
-            "json_count": 2531,
+            "json_count": 2537,
             "fallback_count": 0,
             "last_context": {
                 "item_count": 31,
@@ -484,6 +484,78 @@
                     "fallback": false,
                     "error": "",
                     "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:25:12+00:00",
+                    "context": {
+                        "item_count": 31,
+                        "scope": "mes_bundle"
+                    }
+                },
+                {
+                    "store_key": "mes",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:25:11+00:00",
+                    "context": {
+                        "item_count": 31,
+                        "scope": "mes_bundle"
+                    }
+                },
+                {
+                    "store_key": "mes",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:25:11+00:00",
+                    "context": {
+                        "item_count": 31,
+                        "scope": "mes_bundle"
+                    }
+                },
+                {
+                    "store_key": "mes",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:24:47+00:00",
+                    "context": {
+                        "item_count": 31,
+                        "scope": "mes_bundle"
+                    }
+                },
+                {
+                    "store_key": "mes",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:24:46+00:00",
+                    "context": {
+                        "item_count": 31,
+                        "scope": "mes_bundle"
+                    }
+                },
+                {
+                    "store_key": "mes",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:24:46+00:00",
+                    "context": {
+                        "item_count": 31,
+                        "scope": "mes_bundle"
+                    }
+                },
+                {
+                    "store_key": "mes",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
                     "timestamp": "2026-03-31T16:27:32+07:00",
                     "context": {
                         "item_count": 31,
@@ -581,78 +653,6 @@
                     "error": "",
                     "mode": "JSON_ONLY",
                     "timestamp": "2026-03-31T16:25:32+07:00",
-                    "context": {
-                        "item_count": 31,
-                        "scope": "mes_bundle"
-                    }
-                },
-                {
-                    "store_key": "mes",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:25:32+07:00",
-                    "context": {
-                        "item_count": 31,
-                        "scope": "mes_bundle"
-                    }
-                },
-                {
-                    "store_key": "mes",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:25:02+07:00",
-                    "context": {
-                        "item_count": 31,
-                        "scope": "mes_bundle"
-                    }
-                },
-                {
-                    "store_key": "mes",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:25:02+07:00",
-                    "context": {
-                        "item_count": 31,
-                        "scope": "mes_bundle"
-                    }
-                },
-                {
-                    "store_key": "mes",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:24:32+07:00",
-                    "context": {
-                        "item_count": 31,
-                        "scope": "mes_bundle"
-                    }
-                },
-                {
-                    "store_key": "mes",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:24:32+07:00",
-                    "context": {
-                        "item_count": 31,
-                        "scope": "mes_bundle"
-                    }
-                },
-                {
-                    "store_key": "mes",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:24:02+07:00",
                     "context": {
                         "item_count": 31,
                         "scope": "mes_bundle"
@@ -662,11 +662,11 @@
         },
         "epicor": {
             "last_source": "json",
-            "last_read_at": "2026-03-31T16:27:32+07:00",
+            "last_read_at": "2026-03-31T15:25:12+00:00",
             "last_error": "",
             "last_mode": "JSON_ONLY",
             "postgres_count": 0,
-            "json_count": 4982,
+            "json_count": 4994,
             "fallback_count": 0,
             "last_context": {
                 "item_count": 16,
@@ -679,7 +679,139 @@
                     "fallback": false,
                     "error": "",
                     "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:27:32+07:00",
+                    "timestamp": "2026-03-31T15:25:12+00:00",
+                    "context": {
+                        "item_count": 16,
+                        "scope": "epicor_runtime"
+                    }
+                },
+                {
+                    "store_key": "epicor",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:25:12+00:00",
+                    "context": {
+                        "item_count": 16,
+                        "scope": "epicor_runtime"
+                    }
+                },
+                {
+                    "store_key": "epicor",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:25:11+00:00",
+                    "context": {
+                        "item_count": 16,
+                        "scope": "epicor_runtime"
+                    }
+                },
+                {
+                    "store_key": "epicor",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:25:11+00:00",
+                    "context": {
+                        "item_count": 16,
+                        "scope": "epicor_runtime"
+                    }
+                },
+                {
+                    "store_key": "epicor",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:25:11+00:00",
+                    "context": {
+                        "item_count": 16,
+                        "scope": "epicor_runtime"
+                    }
+                },
+                {
+                    "store_key": "epicor",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:25:11+00:00",
+                    "context": {
+                        "item_count": 16,
+                        "scope": "epicor_runtime"
+                    }
+                },
+                {
+                    "store_key": "epicor",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:24:47+00:00",
+                    "context": {
+                        "item_count": 16,
+                        "scope": "epicor_runtime"
+                    }
+                },
+                {
+                    "store_key": "epicor",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:24:47+00:00",
+                    "context": {
+                        "item_count": 16,
+                        "scope": "epicor_runtime"
+                    }
+                },
+                {
+                    "store_key": "epicor",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:24:46+00:00",
+                    "context": {
+                        "item_count": 16,
+                        "scope": "epicor_runtime"
+                    }
+                },
+                {
+                    "store_key": "epicor",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:24:46+00:00",
+                    "context": {
+                        "item_count": 16,
+                        "scope": "epicor_runtime"
+                    }
+                },
+                {
+                    "store_key": "epicor",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:24:46+00:00",
+                    "context": {
+                        "item_count": 16,
+                        "scope": "epicor_runtime"
+                    }
+                },
+                {
+                    "store_key": "epicor",
+                    "source": "json",
+                    "fallback": false,
+                    "error": "",
+                    "mode": "JSON_ONLY",
+                    "timestamp": "2026-03-31T15:24:46+00:00",
                     "context": {
                         "item_count": 16,
                         "scope": "epicor_runtime"
@@ -716,138 +848,6 @@
                     "error": "",
                     "mode": "JSON_ONLY",
                     "timestamp": "2026-03-31T16:27:32+07:00",
-                    "context": {
-                        "item_count": 16,
-                        "scope": "epicor_runtime"
-                    }
-                },
-                {
-                    "store_key": "epicor",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:27:02+07:00",
-                    "context": {
-                        "item_count": 16,
-                        "scope": "epicor_runtime"
-                    }
-                },
-                {
-                    "store_key": "epicor",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:27:02+07:00",
-                    "context": {
-                        "item_count": 16,
-                        "scope": "epicor_runtime"
-                    }
-                },
-                {
-                    "store_key": "epicor",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:27:02+07:00",
-                    "context": {
-                        "item_count": 16,
-                        "scope": "epicor_runtime"
-                    }
-                },
-                {
-                    "store_key": "epicor",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:27:02+07:00",
-                    "context": {
-                        "item_count": 16,
-                        "scope": "epicor_runtime"
-                    }
-                },
-                {
-                    "store_key": "epicor",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:26:32+07:00",
-                    "context": {
-                        "item_count": 16,
-                        "scope": "epicor_runtime"
-                    }
-                },
-                {
-                    "store_key": "epicor",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:26:32+07:00",
-                    "context": {
-                        "item_count": 16,
-                        "scope": "epicor_runtime"
-                    }
-                },
-                {
-                    "store_key": "epicor",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:26:32+07:00",
-                    "context": {
-                        "item_count": 16,
-                        "scope": "epicor_runtime"
-                    }
-                },
-                {
-                    "store_key": "epicor",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:26:32+07:00",
-                    "context": {
-                        "item_count": 16,
-                        "scope": "epicor_runtime"
-                    }
-                },
-                {
-                    "store_key": "epicor",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:26:02+07:00",
-                    "context": {
-                        "item_count": 16,
-                        "scope": "epicor_runtime"
-                    }
-                },
-                {
-                    "store_key": "epicor",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:26:02+07:00",
-                    "context": {
-                        "item_count": 16,
-                        "scope": "epicor_runtime"
-                    }
-                },
-                {
-                    "store_key": "epicor",
-                    "source": "json",
-                    "fallback": false,
-                    "error": "",
-                    "mode": "JSON_ONLY",
-                    "timestamp": "2026-03-31T16:26:02+07:00",
                     "context": {
                         "item_count": 16,
                         "scope": "epicor_runtime"

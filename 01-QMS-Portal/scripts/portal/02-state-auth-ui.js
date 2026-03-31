@@ -1418,7 +1418,12 @@ function renderSidebar(){
 // ═══════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════
-function navigateTo(page, filter){
+function navigateTo(page, filter, bypassGuard){
+  if(!bypassGuard && typeof window._ecBeforePortalNavigate === 'function'){
+    try{
+      if(window._ecBeforePortalNavigate({ page:page, filter:filter })) return;
+    }catch(_guardErr){}
+  }
   // Auto-close sidebar on mobile
   if(window.innerWidth <= 900) closeMobileSidebar();
   currentPage = page;

@@ -2019,9 +2019,25 @@ function master_data_store_default(): array {
       'description' => 'Governed master data for lookups in orders, evidence forms, MES connectivity, and reason-code governance.',
     ],
     'customers' => [],
+    'customer_sites' => [],
+    'commercial_accounts' => [],
     'suppliers' => [],
     'parts' => [],
     'revisions' => [],
+    'incoterms' => [],
+    'payment_terms' => [],
+    'shipping_methods' => [],
+    'promise_policies' => [],
+    'routing_library' => [],
+    'bom_library' => [],
+    'control_plans' => [],
+    'inspection_plans' => [],
+    'traveler_templates' => [],
+    'quality_gate_profiles' => [],
+    'launch_gate_templates' => [],
+    'customer_item_approvals' => [],
+    'supplier_process_approvals' => [],
+    'warehouse_locations' => [],
     'nc_program_releases' => [],
     'capas' => [],
     'work_centers' => [],
@@ -2066,9 +2082,25 @@ function save_master_data_store(array $data): void {
 function master_data_entity_key(string $entity): ?string {
   static $map = [
     'customers' => 'customer_id',
+    'customer_sites' => 'site_id',
+    'commercial_accounts' => 'account_id',
     'suppliers' => 'supplier_id',
     'parts' => 'part_number',
     'revisions' => 'revision_id',
+    'incoterms' => 'incoterm_code',
+    'payment_terms' => 'payment_term_code',
+    'shipping_methods' => 'shipping_method_id',
+    'promise_policies' => 'promise_policy_id',
+    'routing_library' => 'routing_id',
+    'bom_library' => 'bom_id',
+    'control_plans' => 'control_plan_id',
+    'inspection_plans' => 'inspection_plan_id',
+    'traveler_templates' => 'traveler_template_id',
+    'quality_gate_profiles' => 'quality_gate_profile_id',
+    'launch_gate_templates' => 'gate_template_id',
+    'customer_item_approvals' => 'approval_id',
+    'supplier_process_approvals' => 'approval_id',
+    'warehouse_locations' => 'warehouse_id',
     'nc_program_releases' => 'program_id',
     'capas' => 'capa_number',
     'work_centers' => 'work_center_id',
@@ -3305,9 +3337,9 @@ function order_transition_allowed(string $entity, string $fromStatus, string $to
 
 function order_editable_fields(string $entity): array {
   $map = [
-    'so' => ['customer_po', 'order_date', 'due_date', 'total_qty', 'priority', 'contract_review', 'special_requirements'],
-    'jo' => ['part_revision', 'part_description', 'material_spec', 'qty_ordered', 'start_date', 'due_date', 'routing_id', 'fai_required', 'customer_source_inspection', 'special_process'],
-    'wo' => ['operation_desc', 'machine_id', 'work_center_id', 'operator_id', 'nc_program_id', 'setup_time_est', 'run_time_est', 'scheduled_start', 'scheduled_end', 'fixture_id', 'material_lot_number', 'heat_number', 'traveler_number', 'traveler_status', 'material_cert_status'],
+    'so' => ['customer_site_id', 'customer_po', 'order_date', 'requested_date', 'promise_date', 'commit_date', 'due_date', 'total_qty', 'priority', 'incoterm_code', 'shipping_method_id', 'payment_term_code', 'contract_review', 'contract_review_status', 'fulfillment_status', 'special_requirements'],
+    'jo' => ['part_revision', 'part_description', 'material_spec', 'qty_ordered', 'start_date', 'release_target_date', 'due_date', 'routing_id', 'bom_id', 'control_plan_id', 'inspection_plan_id', 'traveler_template_id', 'engineering_release_status', 'material_ready_status', 'quality_plan_status', 'source_inspection_status', 'outside_processing_status', 'fai_required', 'customer_source_inspection', 'special_process', 'special_process_supplier_id'],
+    'wo' => ['operation_desc', 'machine_id', 'work_center_id', 'operator_id', 'dispatch_priority', 'nc_program_id', 'setup_time_est', 'run_time_est', 'scheduled_start', 'scheduled_end', 'fixture_id', 'quality_gate_status', 'first_piece_status', 'handover_status', 'material_lot_number', 'heat_number', 'traveler_number', 'traveler_status', 'material_cert_status'],
   ];
   return $map[$entity] ?? [];
 }
@@ -3376,36 +3408,803 @@ function next_order_number(array &$store, string $entity): string {
   return $next;
 }
 
-function build_order_hierarchy(array $store, array $master): array {
-  $customers = [];
-  foreach (($master['customers'] ?? []) as $row) {
-    if (!is_array($row)) continue;
-    $customers[(string)($row['customer_id'] ?? '')] = $row;
+function order_band_rank(string $band = ''): int {
+  return match (strtolower(trim($band))) {
+    'critical', 'blocked' => 3,
+    'warning', 'attention' => 2,
+    'ready' => 1,
+    default => 0,
+  };
+}
+
+function order_band_score(string $band = ''): int {
+  return match (strtolower(trim($band))) {
+    'critical', 'blocked' => 0,
+    'warning', 'attention' => 55,
+    default => 100,
+  };
+}
+
+function order_worst_band(array $bands): string {
+  $worst = 'ready';
+  $rank = -1;
+  foreach ($bands as $band) {
+    $current = order_band_rank((string)$band);
+    if ($current > $rank) {
+      $rank = $current;
+      $worst = strtolower(trim((string)$band)) ?: 'ready';
+    }
   }
-  $parts = [];
-  foreach (($master['parts'] ?? []) as $row) {
-    if (!is_array($row)) continue;
-    $parts[(string)($row['part_number'] ?? '')] = $row;
+  return $rank < 0 ? 'ready' : $worst;
+}
+
+function order_status_to_band(string $status = ''): string {
+  $status = strtolower(trim($status));
+  if ($status === '' || $status === 'not_required') return 'not_required';
+  if (in_array($status, [
+    'ready', 'released', 'approved', 'verified', 'qualified', 'active', 'available',
+    'complete', 'completed', 'closed', 'shipped', 'fulfilled', 'acknowledged',
+    'confirmed', 'valid', 'attached', 'received'
+  ], true)) {
+    return 'ready';
   }
-  $revisions = [];
-  foreach (($master['revisions'] ?? []) as $row) {
+  if (in_array($status, [
+    'pending', 'planned', 'in_progress', 'in_review', 'review', 'draft', 'queued',
+    'scheduled', 'requested', 'submitted', 'staged', 'building'
+  ], true)) {
+    return 'warning';
+  }
+  if (in_array($status, [
+    'blocked', 'on_hold', 'hold', 'missing', 'rejected', 'expired', 'suspended',
+    'not_ready', 'failed', 'overdue', 'void', 'late', 'critical'
+  ], true)) {
+    return 'critical';
+  }
+  return 'warning';
+}
+
+function order_gate_card(string $key, string $labelVi, string $labelEn, array $summary = []): array {
+  $band = strtolower(trim((string)($summary['band'] ?? '')));
+  if ($band === '') $band = order_status_to_band((string)($summary['status'] ?? ''));
+  if ($band === '') $band = 'not_required';
+  $severity = strtolower(trim((string)($summary['severity'] ?? '')));
+  if ($severity === '') {
+    $severity = $band === 'critical' ? 'critical' : ($band === 'warning' ? 'warning' : 'info');
+  }
+  $blocker = array_key_exists('blocker', $summary) ? (bool)$summary['blocker'] : $band === 'critical';
+  return [
+    'key' => $key,
+    'label_vi' => $labelVi,
+    'label_en' => $labelEn,
+    'band' => $band,
+    'severity' => $severity,
+    'blocker' => $blocker,
+    'status' => (string)($summary['status'] ?? ''),
+    'summary_vi' => (string)($summary['summary_vi'] ?? ''),
+    'summary_en' => (string)($summary['summary_en'] ?? ''),
+    'message_vi' => (string)($summary['message_vi'] ?? ''),
+    'message_en' => (string)($summary['message_en'] ?? ''),
+    'context' => $summary,
+  ];
+}
+
+function order_simple_gate_card(
+  string $key,
+  string $labelVi,
+  string $labelEn,
+  string $status = '',
+  string $messageVi = '',
+  string $messageEn = '',
+  bool $blocker = false
+): array {
+  $band = order_status_to_band($status);
+  return order_gate_card($key, $labelVi, $labelEn, [
+    'status' => $status,
+    'band' => $band,
+    'severity' => $band === 'critical' ? 'critical' : ($band === 'warning' ? 'warning' : 'info'),
+    'blocker' => $blocker || $band === 'critical',
+    'summary_vi' => $messageVi !== '' ? $messageVi : $status,
+    'summary_en' => $messageEn !== '' ? $messageEn : $status,
+    'message_vi' => $messageVi,
+    'message_en' => $messageEn,
+  ]);
+}
+
+function order_late_days(string $plannedDate = '', string $actualDate = '', string $status = ''): int {
+  $plannedDate = trim($plannedDate);
+  if ($plannedDate === '') return 0;
+  try {
+    $planned = new DateTimeImmutable($plannedDate);
+  } catch (Throwable) {
+    return 0;
+  }
+  $terminal = in_array(strtolower(trim($status)), ['completed', 'closed', 'shipped', 'cancelled'], true);
+  try {
+    $compare = trim($actualDate) !== ''
+      ? new DateTimeImmutable($actualDate)
+      : new DateTimeImmutable('now', new DateTimeZone('Asia/Saigon'));
+  } catch (Throwable) {
+    return 0;
+  }
+  if (!$terminal && $compare <= $planned) return 0;
+  if ($terminal && trim($actualDate) === '') return 0;
+  return max(0, (int)$planned->diff($compare)->format('%r%a'));
+}
+
+function order_phase(string $entity, array $record): string {
+  $status = strtolower(trim((string)($record['status'] ?? '')));
+  return match ($entity) {
+    'so' => match ($status) {
+      'draft', 'quoted' => 'commercial',
+      'confirmed' => 'planning',
+      'in_production' => 'execution',
+      'shipped' => 'fulfillment',
+      'closed' => 'closed',
+      'cancelled' => 'cancelled',
+      default => 'commercial',
+    },
+    'jo' => match ($status) {
+      'planned' => 'engineering',
+      'released' => 'planning',
+      'active' => 'execution',
+      'on_hold' => 'exception',
+      'completed' => 'quality',
+      'closed' => 'closed',
+      default => 'engineering',
+    },
+    'wo' => match ($status) {
+      'scheduled' => 'planning',
+      'setup', 'running' => 'execution',
+      'inspection' => 'quality',
+      'completed' => 'fulfillment',
+      'on_hold' => 'exception',
+      default => 'planning',
+    },
+    default => 'planning',
+  };
+}
+
+function order_build_milestones(string $entity, array $record): array {
+  $existing = [];
+  foreach ((array)($record['milestones'] ?? []) as $row) {
     if (!is_array($row)) continue;
-    $revisions[(string)($row['revision_id'] ?? '')] = $row;
+    $existing[] = [
+      'code' => trim((string)($row['code'] ?? '')),
+      'title_vi' => trim((string)($row['title_vi'] ?? $row['title'] ?? $row['label_vi'] ?? 'Mốc')),
+      'title_en' => trim((string)($row['title_en'] ?? $row['title'] ?? $row['label_en'] ?? 'Milestone')),
+      'date' => trim((string)($row['date'] ?? $row['timestamp'] ?? '')),
+      'status' => trim((string)($row['status'] ?? 'planned')),
+      'owner' => trim((string)($row['owner'] ?? '')),
+    ];
+  }
+  if ($existing) return $existing;
+
+  $maps = match ($entity) {
+    'so' => [
+      ['order_received', 'Nhận đơn hàng', 'Order received', (string)($record['order_date'] ?? '')],
+      ['requested', 'Ngày khách cần', 'Customer need date', (string)($record['requested_date'] ?? '')],
+      ['promise', 'Ngày hứa', 'Promise date', (string)($record['promise_date'] ?? '')],
+      ['commit', 'Ngày cam kết nội bộ', 'Internal commit date', (string)($record['commit_date'] ?? '')],
+      ['due', 'Ngày giao', 'Due date', (string)($record['due_date'] ?? '')],
+      ['shipped', 'Ngày giao thực tế', 'Shipped date', (string)($record['shipped_date'] ?? $record['closed_date'] ?? '')],
+    ],
+    'jo' => [
+      ['planned_start', 'Bắt đầu kế hoạch', 'Planned start', (string)($record['start_date'] ?? '')],
+      ['release_target', 'Mốc phát hành', 'Release target', (string)($record['release_target_date'] ?? '')],
+      ['due', 'Hạn JO', 'JO due date', (string)($record['due_date'] ?? '')],
+      ['completed', 'Hoàn thành', 'Completed', (string)($record['completed_at'] ?? $record['closed_date'] ?? '')],
+    ],
+    default => [
+      ['scheduled_start', 'Bắt đầu kế hoạch', 'Scheduled start', (string)($record['scheduled_start'] ?? '')],
+      ['actual_start', 'Bắt đầu thực tế', 'Actual start', (string)($record['actual_start'] ?? '')],
+      ['scheduled_end', 'Kết thúc kế hoạch', 'Scheduled end', (string)($record['scheduled_end'] ?? '')],
+      ['actual_end', 'Kết thúc thực tế', 'Actual end', (string)($record['actual_end'] ?? '')],
+    ],
+  };
+
+  $rows = [];
+  foreach ($maps as [$code, $titleVi, $titleEn, $date]) {
+    if (trim($date) === '') continue;
+    $rows[] = [
+      'code' => $code,
+      'title_vi' => $titleVi,
+      'title_en' => $titleEn,
+      'date' => $date,
+      'status' => 'planned',
+      'owner' => '',
+    ];
+  }
+  return $rows;
+}
+
+function order_document_requirements(array $record): array {
+  $requirements = [];
+  foreach ((array)($record['document_requirements'] ?? []) as $row) {
+    if (!is_array($row)) continue;
+    $requirements[] = [
+      'code' => trim((string)($row['code'] ?? $row['document_code'] ?? 'DOC')),
+      'title_vi' => trim((string)($row['title_vi'] ?? $row['title'] ?? 'Chứng từ')),
+      'title_en' => trim((string)($row['title_en'] ?? $row['title'] ?? 'Document')),
+      'status' => strtolower(trim((string)($row['status'] ?? 'pending'))),
+      'required' => !array_key_exists('required', $row) || (bool)$row['required'],
+      'owner' => trim((string)($row['owner'] ?? '')),
+    ];
+  }
+  if ($requirements) return $requirements;
+
+  $defaults = [
+    'certificate_of_conformance_required' => ['COC', 'Chứng nhận phù hợp', 'Certificate of conformance'],
+    'certificate_of_analysis_required' => ['COA', 'Chứng nhận phân tích', 'Certificate of analysis'],
+    'export_control_required' => ['EXPORT', 'Hồ sơ xuất khẩu', 'Export documentation'],
+  ];
+  foreach ($defaults as $flag => [$code, $titleVi, $titleEn]) {
+    if (!mes_truthy($record[$flag] ?? false)) continue;
+    $requirements[] = [
+      'code' => $code,
+      'title_vi' => $titleVi,
+      'title_en' => $titleEn,
+      'status' => strtolower(trim((string)($record[strtolower($code) . '_status'] ?? 'pending'))),
+      'required' => true,
+      'owner' => 'QA/LOG',
+    ];
+  }
+  foreach ([
+    'packing_spec_code' => ['PACK', 'Quy cách đóng gói', 'Packing specification'],
+    'label_spec_code' => ['LABEL', 'Quy cách tem nhãn', 'Label specification'],
+  ] as $field => [$code, $titleVi, $titleEn]) {
+    if (trim((string)($record[$field] ?? '')) === '') continue;
+    $requirements[] = [
+      'code' => $code,
+      'title_vi' => $titleVi,
+      'title_en' => $titleEn,
+      'status' => strtolower(trim((string)($record['shipping_doc_status'] ?? 'pending'))),
+      'required' => true,
+      'owner' => 'LOG',
+    ];
+  }
+  return $requirements;
+}
+
+function order_document_pack_card(array $record): array {
+  $requirements = array_values(array_filter(order_document_requirements($record), fn($row) => (bool)($row['required'] ?? true)));
+  if (!$requirements) {
+    return order_gate_card('document_pack', 'Bộ chứng từ', 'Documentation pack', [
+      'band' => 'not_required',
+      'status' => 'not_required',
+      'summary_vi' => 'Không có bộ chứng từ bắt buộc',
+      'summary_en' => 'No mandatory documentation pack',
+      'message_vi' => 'Đơn hàng này không yêu cầu bộ chứng từ giao hàng đặc thù.',
+      'message_en' => 'This order does not require a special governed shipment document pack.',
+      'blocker' => false,
+    ]);
+  }
+  $pending = [];
+  $blocked = [];
+  foreach ($requirements as $item) {
+    $band = order_status_to_band((string)($item['status'] ?? 'pending'));
+    if ($band === 'critical') {
+      $blocked[] = (string)($item['title_vi'] ?? $item['code'] ?? 'Document');
+    } elseif ($band === 'warning') {
+      $pending[] = (string)($item['title_vi'] ?? $item['code'] ?? 'Document');
+    }
+  }
+  $band = $blocked ? 'critical' : ($pending ? 'warning' : 'ready');
+  return order_gate_card('document_pack', 'Bộ chứng từ', 'Documentation pack', [
+    'band' => $band,
+    'status' => $band,
+    'severity' => $band === 'critical' ? 'critical' : ($band === 'warning' ? 'warning' : 'info'),
+    'blocker' => !empty($blocked),
+    'summary_vi' => $blocked ? 'Bộ chứng từ còn chặn phát hành' : ($pending ? 'Bộ chứng từ đang chờ hoàn tất' : 'Bộ chứng từ đã sẵn sàng'),
+    'summary_en' => $blocked ? 'Documentation pack is blocked' : ($pending ? 'Documentation pack is still pending' : 'Documentation pack is ready'),
+    'message_vi' => $blocked
+      ? 'Các chứng từ bắt buộc chưa đạt: ' . implode(', ', $blocked) . '.'
+      : ($pending ? 'Các chứng từ đang chờ hoàn tất: ' . implode(', ', $pending) . '.' : 'Tất cả chứng từ bắt buộc đã ở trạng thái sẵn sàng.'),
+    'message_en' => $blocked
+      ? 'Mandatory shipment documents are still blocked.'
+      : ($pending ? 'Mandatory shipment documents are still being completed.' : 'All mandatory shipment documents are ready.'),
+    'requirements' => $requirements,
+  ]);
+}
+
+function order_hold_gate_card(array $record): array {
+  $holds = [];
+  foreach ([
+    'credit_hold' => 'Tín dụng',
+    'engineering_hold' => 'Kỹ thuật',
+    'quality_hold' => 'Chất lượng',
+    'shipping_hold' => 'Xuất hàng',
+  ] as $field => $labelVi) {
+    if (mes_truthy($record[$field] ?? false)) $holds[] = $labelVi;
+  }
+  if (!$holds) {
+    return order_gate_card('holds', 'Giữ lô / giữ đơn', 'Holds', [
+      'band' => 'ready',
+      'status' => 'clear',
+      'summary_vi' => 'Không có hold đang mở',
+      'summary_en' => 'No active hold',
+      'message_vi' => 'Đơn hàng hiện không có commercial / engineering / quality / shipping hold mở.',
+      'message_en' => 'The order currently has no active commercial, engineering, quality, or shipping hold.',
+      'blocker' => false,
+    ]);
+  }
+  return order_gate_card('holds', 'Giữ lô / giữ đơn', 'Holds', [
+    'band' => 'critical',
+    'status' => 'hold_open',
+    'severity' => 'critical',
+    'blocker' => true,
+    'summary_vi' => 'Có hold đang mở',
+    'summary_en' => 'Active hold exists',
+    'message_vi' => 'Các lớp hold đang mở: ' . implode(', ', $holds) . '.',
+    'message_en' => 'Active holds are still open on this order.',
+    'hold_labels' => $holds,
+  ]);
+}
+
+function order_promise_gate_card(array $record): array {
+  $requestedDate = trim((string)($record['requested_date'] ?? ''));
+  $promiseDate = trim((string)($record['promise_date'] ?? ''));
+  $commitDate = trim((string)($record['commit_date'] ?? ''));
+  $dueDate = trim((string)($record['due_date'] ?? ''));
+  $status = strtolower(trim((string)($record['status'] ?? '')));
+  $lateDays = order_late_days($dueDate, (string)($record['shipped_date'] ?? $record['actual_end'] ?? ''), $status);
+
+  if ($promiseDate === '' || $commitDate === '') {
+    return order_gate_card('promise', 'Cam kết giao hàng', 'Promise and commit', [
+      'band' => 'warning',
+      'status' => 'pending',
+      'severity' => 'warning',
+      'blocker' => false,
+      'summary_vi' => 'Thiếu promise hoặc commit nội bộ',
+      'summary_en' => 'Promise or internal commit is missing',
+      'message_vi' => 'Đơn hàng chưa được chốt đầy đủ ngày promise và commit nội bộ.',
+      'message_en' => 'The order is still missing a controlled promise date or internal commit date.',
+    ]);
   }
 
-  $wosByJo = [];
-  foreach (($store['work_orders'] ?? []) as $wo) {
-    if (!is_array($wo)) continue;
-    $wosByJo[(string)($wo['jo_number'] ?? '')][] = $wo;
+  if ($dueDate !== '' && $commitDate > $dueDate) {
+    return order_gate_card('promise', 'Cam kết giao hàng', 'Promise and commit', [
+      'band' => 'critical',
+      'status' => 'late',
+      'severity' => 'critical',
+      'blocker' => true,
+      'summary_vi' => 'Commit nội bộ trễ hơn due date',
+      'summary_en' => 'Internal commit is later than due date',
+      'message_vi' => 'Ngày commit nội bộ đang vượt ngày giao hàng yêu cầu.',
+      'message_en' => 'The internal commit date is later than the governed due date.',
+    ]);
   }
+
+  if ($requestedDate !== '' && $promiseDate > $requestedDate) {
+    return order_gate_card('promise', 'Cam kết giao hàng', 'Promise and commit', [
+      'band' => 'warning',
+      'status' => 'stretched',
+      'severity' => 'warning',
+      'blocker' => false,
+      'summary_vi' => 'Ngày promise giãn so với nhu cầu khách',
+      'summary_en' => 'Promise date is later than the customer need date',
+      'message_vi' => 'Ngày promise hiện đang muộn hơn ngày khách cần.',
+      'message_en' => 'The promise date is currently later than the requested customer need date.',
+    ]);
+  }
+
+  if ($lateDays > 0 && !in_array($status, ['shipped', 'closed', 'cancelled'], true)) {
+    return order_gate_card('promise', 'Cam kết giao hàng', 'Promise and commit', [
+      'band' => 'critical',
+      'status' => 'overdue',
+      'severity' => 'critical',
+      'blocker' => true,
+      'summary_vi' => 'Đơn hàng đã quá hạn giao',
+      'summary_en' => 'Order is overdue',
+      'message_vi' => 'Đơn hàng đã quá hạn ' . $lateDays . ' ngày so với cam kết hiện hành.',
+      'message_en' => 'The order is overdue against its governed commitment.',
+    ]);
+  }
+
+  return order_gate_card('promise', 'Cam kết giao hàng', 'Promise and commit', [
+    'band' => 'ready',
+    'status' => 'ready',
+    'summary_vi' => 'Promise và commit đã được chốt',
+    'summary_en' => 'Promise and internal commit are controlled',
+    'message_vi' => 'Ngày promise, commit nội bộ và due date đang đồng bộ để điều hành giao hàng.',
+    'message_en' => 'Promise date, internal commit, and due date are aligned for governed fulfillment.',
+    'blocker' => false,
+  ]);
+}
+
+function order_readiness_score(array $gateCards, array $childScores = []): ?int {
+  $scores = [];
+  foreach ($gateCards as $card) {
+    if (!is_array($card)) continue;
+    $band = (string)($card['band'] ?? 'not_required');
+    if ($band === 'not_required') continue;
+    $scores[] = order_band_score($band);
+  }
+  foreach ($childScores as $score) {
+    if ($score === null || $score === '') continue;
+    $scores[] = max(0, min(100, (int)$score));
+  }
+  if (!$scores) return null;
+  return (int)round(array_sum($scores) / count($scores));
+}
+
+function order_exception_cards_from_gates(array $gateCards, array $openActions = []): array {
+  $cards = [];
+  foreach ($gateCards as $gate) {
+    if (!is_array($gate)) continue;
+    $band = (string)($gate['band'] ?? 'ready');
+    if (!in_array($band, ['critical', 'warning'], true)) continue;
+    $cards[] = [
+      'key' => (string)($gate['key'] ?? ''),
+      'severity' => (string)($gate['severity'] ?? ($band === 'critical' ? 'critical' : 'warning')),
+      'title_vi' => (string)($gate['label_vi'] ?? ''),
+      'title_en' => (string)($gate['label_en'] ?? ''),
+      'message_vi' => (string)($gate['message_vi'] ?? $gate['summary_vi'] ?? ''),
+      'message_en' => (string)($gate['message_en'] ?? $gate['summary_en'] ?? ''),
+      'due_date' => '',
+      'owner' => '',
+      'source' => 'gate',
+    ];
+  }
+  foreach ($openActions as $row) {
+    if (!is_array($row)) continue;
+    $status = strtolower(trim((string)($row['status'] ?? 'open')));
+    if (in_array($status, ['closed', 'done', 'completed'], true)) continue;
+    $severity = strtolower(trim((string)($row['severity'] ?? 'warning')));
+    $cards[] = [
+      'key' => (string)($row['action_id'] ?? $row['code'] ?? 'action'),
+      'severity' => $severity === 'critical' ? 'critical' : 'warning',
+      'title_vi' => (string)($row['title_vi'] ?? $row['title'] ?? 'Hành động mở'),
+      'title_en' => (string)($row['title_en'] ?? $row['title'] ?? 'Open action'),
+      'message_vi' => (string)($row['message_vi'] ?? $row['note'] ?? ''),
+      'message_en' => (string)($row['message_en'] ?? $row['note'] ?? ''),
+      'due_date' => (string)($row['due_date'] ?? ''),
+      'owner' => (string)($row['owner'] ?? ''),
+      'source' => 'action',
+    ];
+  }
+  usort($cards, static function ($a, $b) {
+    $priority = ['critical' => 0, 'warning' => 1, 'info' => 2];
+    $ap = $priority[(string)($a['severity'] ?? 'warning')] ?? 9;
+    $bp = $priority[(string)($b['severity'] ?? 'warning')] ?? 9;
+    if ($ap !== $bp) return $ap <=> $bp;
+    return strcmp((string)($a['due_date'] ?? ''), (string)($b['due_date'] ?? ''));
+  });
+  return $cards;
+}
+
+function order_enrich_work_order(array $wo, array $dispatchRow = []): array {
+  $gateCards = [];
+  foreach ([
+    ['evidence', 'Chứng cứ MES', 'MES evidence', (array)($dispatchRow['evidence_gate'] ?? [])],
+    ['nc_release', 'NC release', 'NC release', (array)($dispatchRow['program_release'] ?? [])],
+    ['tooling', 'Tooling readiness', 'Tooling readiness', (array)($dispatchRow['tool_readiness'] ?? [])],
+    ['operator', 'Năng lực vận hành', 'Operator qualification', (array)($dispatchRow['operator_governance'] ?? [])],
+    ['material', 'Truy xuất vật liệu', 'Material traceability', (array)($dispatchRow['material_trace'] ?? [])],
+    ['connector', 'Kết nối máy', 'Machine connectivity', (array)($dispatchRow['connector_guard'] ?? [])],
+    ['download', 'Tải NC xuống máy', 'NC download handshake', (array)($dispatchRow['nc_download'] ?? [])],
+    ['offset', 'Tool offset', 'Tool offset governance', (array)($dispatchRow['tool_offset'] ?? [])],
+    ['alarm', 'Alarm runtime', 'Alarm runtime', (array)($dispatchRow['alarm_runtime'] ?? [])],
+  ] as [$key, $labelVi, $labelEn, $summary]) {
+    if (!$summary) continue;
+    $gateCards[] = order_gate_card($key, $labelVi, $labelEn, $summary);
+  }
+
+  foreach ([
+    ['quality_gate', 'Chốt chất lượng', 'Quality gate', (string)($wo['quality_gate_status'] ?? '')],
+    ['first_piece', 'First piece / FAI', 'First piece / FAI', (string)($wo['first_piece_status'] ?? '')],
+    ['handover', 'Bàn giao ca', 'Shift handover', (string)($wo['handover_status'] ?? '')],
+  ] as [$key, $labelVi, $labelEn, $status]) {
+    if ($status === '') continue;
+    $gateCards[] = order_simple_gate_card(
+      $key,
+      $labelVi,
+      $labelEn,
+      $status,
+      order_status_to_band($status) === 'ready'
+        ? $labelVi . ' đang đạt điều kiện.'
+        : $labelVi . ' đang chờ hoàn tất hoặc bị chặn.',
+      $labelEn . ' status: ' . $status,
+      order_status_to_band($status) === 'critical'
+    );
+  }
+
+  $scheduleLateDays = order_late_days(
+    (string)($wo['scheduled_end'] ?? ''),
+    (string)($wo['actual_end'] ?? ''),
+    (string)($wo['status'] ?? '')
+  );
+  if ((string)($wo['scheduled_end'] ?? '') !== '') {
+    $gateCards[] = order_gate_card('schedule', 'Cam kết công đoạn', 'Operation schedule', [
+      'band' => $scheduleLateDays > 0 ? 'critical' : 'ready',
+      'status' => $scheduleLateDays > 0 ? 'late' : 'ready',
+      'severity' => $scheduleLateDays > 0 ? 'critical' : 'info',
+      'blocker' => $scheduleLateDays > 0,
+      'summary_vi' => $scheduleLateDays > 0 ? 'WO đang trễ kế hoạch' : 'WO đang bám lịch',
+      'summary_en' => $scheduleLateDays > 0 ? 'WO is late against schedule' : 'WO is on schedule',
+      'message_vi' => $scheduleLateDays > 0
+        ? 'WO đang trễ ' . $scheduleLateDays . ' ngày so với lịch kế hoạch.'
+        : 'WO hiện vẫn bám lịch kế hoạch.',
+      'message_en' => $scheduleLateDays > 0
+        ? 'The WO is late against its governed schedule.'
+        : 'The WO is currently aligned with schedule.',
+    ]);
+  }
+
+  $qtyOrdered = max(0, (int)($dispatchRow['qty_ordered'] ?? $wo['qty_ordered'] ?? 0));
+  $qtyCompleted = max(0, (int)($wo['qty_completed'] ?? 0));
+  $completionPct = $qtyOrdered > 0 ? round(($qtyCompleted / $qtyOrdered) * 100, 1) : null;
+  $exceptionCards = order_exception_cards_from_gates($gateCards, (array)($wo['open_actions'] ?? []));
+  $healthBand = order_worst_band(array_map(static fn($gate) => (string)($gate['band'] ?? 'ready'), $gateCards));
+  $readinessScore = order_readiness_score($gateCards);
+  $blocked = count(array_filter($gateCards, static fn($gate) => (bool)($gate['blocker'] ?? false))) > 0;
+
+  $wo['milestones'] = order_build_milestones('wo', $wo);
+  $wo['document_requirements'] = array_values((array)($wo['document_requirements'] ?? []));
+  $wo['gate_cards'] = $gateCards;
+  $wo['exception_cards'] = $exceptionCards;
+  $wo['telemetry'] = (array)($dispatchRow['telemetry'] ?? []);
+  $wo['operating'] = [
+    'phase' => order_phase('wo', $wo),
+    'health_band' => $healthBand,
+    'readiness_score' => $readinessScore,
+    'completion_pct' => $completionPct,
+    'late_days' => $scheduleLateDays,
+    'blocked' => $blocked,
+    'exception_count' => count($exceptionCards),
+    'dispatch_priority' => (string)($wo['dispatch_priority'] ?? $dispatchRow['priority'] ?? 'standard'),
+  ];
+  return $wo;
+}
+
+function order_enrich_job_order(array $jo, array $workOrders): array {
+  $missingRefs = [];
+  foreach ([
+    'routing_id' => 'Routing',
+    'bom_id' => 'BOM',
+    'control_plan_id' => 'Control Plan',
+    'inspection_plan_id' => 'Inspection Plan',
+    'traveler_template_id' => 'Traveler',
+  ] as $field => $label) {
+    if (trim((string)($jo[$field] ?? '')) === '') $missingRefs[] = $label;
+  }
+  $refBand = !$missingRefs ? 'ready' : (in_array((string)($jo['status'] ?? ''), ['released', 'active', 'on_hold', 'completed'], true) ? 'critical' : 'warning');
+  $gateCards = [
+    order_simple_gate_card(
+      'engineering_release',
+      'Phát hành kỹ thuật',
+      'Engineering release',
+      (string)($jo['engineering_release_status'] ?? ((string)($jo['part_revision'] ?? '') !== '' ? 'released' : 'pending')),
+      'Trạng thái phát hành kỹ thuật của JO.',
+      'Engineering release status for the JO.',
+      in_array((string)($jo['engineering_release_status'] ?? ''), ['blocked', 'missing', 'expired'], true)
+    ),
+    order_gate_card('manufacturing_master', 'Dữ liệu chế tạo', 'Manufacturing master data', [
+      'band' => $refBand,
+      'status' => $refBand,
+      'severity' => $refBand === 'critical' ? 'critical' : ($refBand === 'warning' ? 'warning' : 'info'),
+      'blocker' => $refBand === 'critical',
+      'summary_vi' => !$missingRefs ? 'BOM/routing/control plan/traveler đã đủ' : 'Thiếu dữ liệu master chế tạo',
+      'summary_en' => !$missingRefs ? 'Manufacturing master is complete' : 'Manufacturing master data is missing',
+      'message_vi' => !$missingRefs ? 'JO đã có đầy đủ routing, BOM, control plan, inspection plan và traveler.' : 'JO còn thiếu: ' . implode(', ', $missingRefs) . '.',
+      'message_en' => !$missingRefs ? 'The JO has routing, BOM, control plan, inspection plan, and traveler ready.' : 'The JO is still missing required manufacturing master references.',
+    ]),
+    order_simple_gate_card('material', 'Sẵn sàng vật tư', 'Material readiness', (string)($jo['material_ready_status'] ?? 'pending'), 'Trạng thái sẵn sàng vật tư cho JO.', 'Material readiness for the JO.'),
+    order_simple_gate_card('quality_plan', 'Kế hoạch chất lượng', 'Quality plan', (string)($jo['quality_plan_status'] ?? 'pending'), 'Trạng thái control plan / inspection plan của JO.', 'Quality planning status for the JO.'),
+    order_simple_gate_card('source_inspection', 'Source inspection', 'Source inspection', (string)($jo['source_inspection_status'] ?? ($jo['customer_source_inspection'] ?? false ? 'pending' : 'not_required')), 'Trạng thái xác nhận source inspection.', 'Source inspection status for the JO.'),
+    order_simple_gate_card('outside_processing', 'Outside process', 'Outside processing', (string)($jo['outside_processing_status'] ?? (($jo['outside_processing_required'] ?? false) ? 'pending' : 'not_required')), 'Trạng thái công đoạn outsource / special process.', 'Outside processing readiness for the JO.'),
+  ];
+
+  $childCritical = count(array_filter($workOrders, static fn($wo) => (string)($wo['operating']['health_band'] ?? 'ready') === 'critical'));
+  $childWarning = count(array_filter($workOrders, static fn($wo) => (string)($wo['operating']['health_band'] ?? 'ready') === 'warning'));
+  $gateCards[] = order_gate_card('execution', 'Launch & dispatch', 'Launch and dispatch', [
+    'band' => $childCritical > 0 ? 'critical' : ($childWarning > 0 ? 'warning' : 'ready'),
+    'status' => $childCritical > 0 ? 'blocked' : ($childWarning > 0 ? 'pending' : 'ready'),
+    'severity' => $childCritical > 0 ? 'critical' : ($childWarning > 0 ? 'warning' : 'info'),
+    'blocker' => $childCritical > 0,
+    'summary_vi' => $childCritical > 0 ? 'Có WO bị chặn launch' : ($childWarning > 0 ? 'Có WO cần reconfirm' : 'WO con đang sẵn sàng'),
+    'summary_en' => $childCritical > 0 ? 'Some WOs are blocked' : ($childWarning > 0 ? 'Some WOs need reconfirmation' : 'Child WOs are ready'),
+    'message_vi' => $childCritical > 0
+      ? 'JO còn WO bị chặn bởi gate MES / quality / traceability.'
+      : ($childWarning > 0 ? 'JO có WO cần reconfirm trước khi chạy tiếp.' : 'Các WO con của JO đang ở trạng thái điều hành ổn định.'),
+    'message_en' => $childCritical > 0
+      ? 'The JO still contains WOs blocked by MES, quality, or traceability gates.'
+      : ($childWarning > 0 ? 'Some child WOs still need reconfirmation.' : 'Child WOs are currently in a stable operating condition.'),
+  ]);
+
+  $lateDays = order_late_days((string)($jo['due_date'] ?? ''), (string)($jo['completed_at'] ?? ''), (string)($jo['status'] ?? ''));
+  if ((string)($jo['due_date'] ?? '') !== '') {
+    $gateCards[] = order_gate_card('schedule', 'Tiến độ JO', 'JO schedule', [
+      'band' => $lateDays > 0 ? 'critical' : 'ready',
+      'status' => $lateDays > 0 ? 'late' : 'ready',
+      'severity' => $lateDays > 0 ? 'critical' : 'info',
+      'blocker' => false,
+      'summary_vi' => $lateDays > 0 ? 'JO đang trễ tiến độ' : 'JO đang bám tiến độ',
+      'summary_en' => $lateDays > 0 ? 'JO is late' : 'JO is on schedule',
+      'message_vi' => $lateDays > 0 ? 'JO đang trễ ' . $lateDays . ' ngày so với due date.' : 'JO hiện vẫn trong cam kết tiến độ.',
+      'message_en' => $lateDays > 0 ? 'The JO is late against its due date.' : 'The JO is currently within schedule.',
+    ]);
+  }
+
+  $childScores = array_values(array_filter(array_map(static fn($wo) => $wo['operating']['readiness_score'] ?? null, $workOrders), static fn($score) => $score !== null));
+  $readinessScore = order_readiness_score($gateCards, $childScores);
+  $healthBand = order_worst_band(array_merge(
+    array_map(static fn($gate) => (string)($gate['band'] ?? 'ready'), $gateCards),
+    array_map(static fn($wo) => (string)($wo['operating']['health_band'] ?? 'ready'), $workOrders)
+  ));
+  $blocked = count(array_filter($gateCards, static fn($gate) => (bool)($gate['blocker'] ?? false))) > 0
+    || count(array_filter($workOrders, static fn($wo) => (bool)($wo['operating']['blocked'] ?? false))) > 0;
+
+  $qtyOrdered = max(0, (int)($jo['qty_ordered'] ?? 0));
+  $qtyGood = max(0, (int)($jo['qty_good'] ?? 0));
+  if ($qtyGood <= 0 && $workOrders) {
+    $qtyGood = max(array_map(static fn($wo) => (int)($wo['qty_completed'] ?? 0), $workOrders));
+  }
+  $completionPct = $qtyOrdered > 0 ? round(($qtyGood / $qtyOrdered) * 100, 1) : null;
+  $exceptionCards = order_exception_cards_from_gates($gateCards, (array)($jo['open_actions'] ?? []));
+  foreach ($workOrders as $wo) {
+    foreach (array_slice((array)($wo['exception_cards'] ?? []), 0, 2) as $issue) {
+      $exceptionCards[] = array_merge($issue, [
+        'child_order_id' => (string)($wo['wo_number'] ?? ''),
+        'source' => 'wo',
+      ]);
+    }
+  }
+  usort($exceptionCards, static function ($a, $b) {
+    $priority = ['critical' => 0, 'warning' => 1, 'info' => 2];
+    $ap = $priority[(string)($a['severity'] ?? 'warning')] ?? 9;
+    $bp = $priority[(string)($b['severity'] ?? 'warning')] ?? 9;
+    if ($ap !== $bp) return $ap <=> $bp;
+    return strcmp((string)($a['due_date'] ?? ''), (string)($b['due_date'] ?? ''));
+  });
+
+  $jo['milestones'] = order_build_milestones('jo', $jo);
+  $jo['document_requirements'] = array_values((array)($jo['document_requirements'] ?? []));
+  $jo['work_orders'] = array_values($workOrders);
+  $jo['operations'] = array_values($workOrders);
+  $jo['gate_cards'] = $gateCards;
+  $jo['exception_cards'] = array_slice($exceptionCards, 0, 12);
+  $jo['operating'] = [
+    'phase' => order_phase('jo', $jo),
+    'health_band' => $healthBand,
+    'readiness_score' => $readinessScore,
+    'completion_pct' => $completionPct,
+    'late_days' => $lateDays,
+    'blocked' => $blocked,
+    'exception_count' => count($exceptionCards),
+    'child_work_order_count' => count($workOrders),
+  ];
+  return $jo;
+}
+
+function order_enrich_sales_order(array $so, array $jobOrders): array {
+  $contractReviewStatus = (string)($so['contract_review_status'] ?? ((string)($so['contract_review_ref'] ?? '') !== '' ? 'approved' : 'pending'));
+  $gateCards = [
+    order_simple_gate_card('contract_review', 'Xem xét hợp đồng', 'Contract review', $contractReviewStatus, 'Trạng thái xem xét hợp đồng của SO.', 'Contract review status for the SO.'),
+    order_promise_gate_card($so),
+    order_document_pack_card($so),
+    order_hold_gate_card($so),
+  ];
+
+  $childCritical = count(array_filter($jobOrders, static fn($jo) => (string)($jo['operating']['health_band'] ?? 'ready') === 'critical'));
+  $childWarning = count(array_filter($jobOrders, static fn($jo) => (string)($jo['operating']['health_band'] ?? 'ready') === 'warning'));
+  $gateCards[] = order_gate_card('release_pipeline', 'Pipeline phát hành', 'Release pipeline', [
+    'band' => $childCritical > 0 ? 'critical' : ($childWarning > 0 ? 'warning' : 'ready'),
+    'status' => $childCritical > 0 ? 'blocked' : ($childWarning > 0 ? 'pending' : 'ready'),
+    'severity' => $childCritical > 0 ? 'critical' : ($childWarning > 0 ? 'warning' : 'info'),
+    'blocker' => $childCritical > 0,
+    'summary_vi' => $childCritical > 0 ? 'Có JO chưa đạt điều kiện launch' : ($childWarning > 0 ? 'Có JO cần reconfirm' : 'JO đã sẵn sàng phát hành'),
+    'summary_en' => $childCritical > 0 ? 'Some JOs are not launch-ready' : ($childWarning > 0 ? 'Some JOs need reconfirmation' : 'JOs are ready for release'),
+    'message_vi' => $childCritical > 0
+      ? 'SO còn JO bị chặn bởi engineering / planning / MES readiness.'
+      : ($childWarning > 0 ? 'SO có JO cần chốt lại readiness trước khi commit giao hàng.' : 'Các JO con của SO đang đủ điều kiện để bám promise/commit.'),
+    'message_en' => $childCritical > 0
+      ? 'The SO still contains JOs blocked by engineering, planning, or MES readiness gaps.'
+      : ($childWarning > 0 ? 'Some child JOs still need readiness reconfirmation.' : 'Child JOs are ready to support the promise and commit.'),
+  ]);
+  $gateCards[] = order_simple_gate_card(
+    'fulfillment',
+    'Thực hiện giao hàng',
+    'Fulfillment',
+    (string)($so['fulfillment_status'] ?? ($so['status'] === 'shipped' ? 'completed' : 'pending')),
+    'Trạng thái fulfilment / shipping release của SO.',
+    'Fulfillment or shipping-release status for the SO.'
+  );
+
+  $lateDays = order_late_days((string)($so['due_date'] ?? ''), (string)($so['shipped_date'] ?? $so['closed_date'] ?? ''), (string)($so['status'] ?? ''));
+  if ((string)($so['due_date'] ?? '') !== '') {
+    $gateCards[] = order_gate_card('schedule', 'Cam kết SO', 'SO schedule', [
+      'band' => $lateDays > 0 ? 'critical' : 'ready',
+      'status' => $lateDays > 0 ? 'late' : 'ready',
+      'severity' => $lateDays > 0 ? 'critical' : 'info',
+      'blocker' => false,
+      'summary_vi' => $lateDays > 0 ? 'SO đã quá hạn' : 'SO đang bám lịch giao',
+      'summary_en' => $lateDays > 0 ? 'SO is overdue' : 'SO is on schedule',
+      'message_vi' => $lateDays > 0 ? 'SO đang quá hạn ' . $lateDays . ' ngày so với due date.' : 'SO hiện đang bám theo cam kết giao hàng.',
+      'message_en' => $lateDays > 0 ? 'The SO is overdue against its due date.' : 'The SO is currently aligned with delivery commitments.',
+    ]);
+  }
+
+  $childScores = array_values(array_filter(array_map(static fn($jo) => $jo['operating']['readiness_score'] ?? null, $jobOrders), static fn($score) => $score !== null));
+  $readinessScore = order_readiness_score($gateCards, $childScores);
+  $healthBand = order_worst_band(array_merge(
+    array_map(static fn($gate) => (string)($gate['band'] ?? 'ready'), $gateCards),
+    array_map(static fn($jo) => (string)($jo['operating']['health_band'] ?? 'ready'), $jobOrders)
+  ));
+  $blocked = count(array_filter($gateCards, static fn($gate) => (bool)($gate['blocker'] ?? false))) > 0
+    || count(array_filter($jobOrders, static fn($jo) => (bool)($jo['operating']['blocked'] ?? false))) > 0;
+
+  $completionCandidates = array_values(array_filter(array_map(static fn($jo) => $jo['operating']['completion_pct'] ?? null, $jobOrders), static fn($score) => $score !== null));
+  $completionPct = $completionCandidates ? round(array_sum($completionCandidates) / count($completionCandidates), 1) : null;
+  $exceptionCards = order_exception_cards_from_gates($gateCards, (array)($so['open_actions'] ?? []));
+  foreach ($jobOrders as $jo) {
+    foreach (array_slice((array)($jo['exception_cards'] ?? []), 0, 2) as $issue) {
+      $exceptionCards[] = array_merge($issue, [
+        'child_order_id' => (string)($jo['jo_number'] ?? ''),
+        'source' => 'jo',
+      ]);
+    }
+  }
+  usort($exceptionCards, static function ($a, $b) {
+    $priority = ['critical' => 0, 'warning' => 1, 'info' => 2];
+    $ap = $priority[(string)($a['severity'] ?? 'warning')] ?? 9;
+    $bp = $priority[(string)($b['severity'] ?? 'warning')] ?? 9;
+    if ($ap !== $bp) return $ap <=> $bp;
+    return strcmp((string)($a['due_date'] ?? ''), (string)($b['due_date'] ?? ''));
+  });
+
+  $so['milestones'] = order_build_milestones('so', $so);
+  $so['document_requirements'] = order_document_requirements($so);
+  $so['job_orders'] = array_values($jobOrders);
+  $so['gate_cards'] = $gateCards;
+  $so['exception_cards'] = array_slice($exceptionCards, 0, 12);
+  $so['operating'] = [
+    'phase' => order_phase('so', $so),
+    'health_band' => $healthBand,
+    'readiness_score' => $readinessScore,
+    'completion_pct' => $completionPct,
+    'late_days' => $lateDays,
+    'blocked' => $blocked,
+    'exception_count' => count($exceptionCards),
+    'child_job_order_count' => count($jobOrders),
+  ];
+  return $so;
+}
+
+function build_order_hierarchy(array $store, array $master, ?array $mesSnapshot = null): array {
+  $customers = master_index_by((array)($master['customers'] ?? []), 'customer_id');
+  $parts = master_index_by((array)($master['parts'] ?? []), 'part_number');
+  $customerSites = master_index_by((array)($master['customer_sites'] ?? []), 'site_id');
+  $shippingMethods = master_index_by((array)($master['shipping_methods'] ?? []), 'shipping_method_id');
+  $incoterms = master_index_by((array)($master['incoterms'] ?? []), 'incoterm_code');
+  $paymentTerms = master_index_by((array)($master['payment_terms'] ?? []), 'payment_term_code');
+  $routings = master_index_by((array)($master['routing_library'] ?? []), 'routing_id');
+  $boms = master_index_by((array)($master['bom_library'] ?? []), 'bom_id');
+  $controlPlans = master_index_by((array)($master['control_plans'] ?? []), 'control_plan_id');
+  $inspectionPlans = master_index_by((array)($master['inspection_plans'] ?? []), 'inspection_plan_id');
+  $travelerTemplates = master_index_by((array)($master['traveler_templates'] ?? []), 'traveler_template_id');
+  $dispatchByWo = master_index_by((array)($mesSnapshot['dispatch'] ?? []), 'wo_number');
+
   $linksByOrder = [];
-  foreach (($store['form_links'] ?? []) as $link) {
+  foreach ((array)($store['form_links'] ?? []) as $link) {
     if (!is_array($link)) continue;
     $key = (string)($link['order_type'] ?? '') . '|' . (string)($link['order_id'] ?? '');
     $linksByOrder[$key][] = $link;
   }
+
+  $wosByJo = [];
+  foreach ((array)($store['work_orders'] ?? []) as $wo) {
+    if (!is_array($wo)) continue;
+    $woNumber = (string)($wo['wo_number'] ?? '');
+    $wo['work_center_name'] = (string)($dispatchByWo[$woNumber]['work_center_name'] ?? '');
+    $wo['machine_name'] = (string)($dispatchByWo[$woNumber]['machine_name'] ?? '');
+    $wo['operator_name'] = (string)($dispatchByWo[$woNumber]['operator_name'] ?? '');
+    $wo['linked_forms'] = array_values($linksByOrder['wo|' . $woNumber] ?? []);
+    $wo = order_enrich_work_order($wo, (array)($dispatchByWo[$woNumber] ?? []));
+    $wosByJo[(string)($wo['jo_number'] ?? '')][] = $wo;
+  }
+
   $josBySo = [];
-  foreach (($store['job_orders'] ?? []) as $jo) {
+  foreach ((array)($store['job_orders'] ?? []) as $jo) {
     if (!is_array($jo)) continue;
     $joNumber = (string)($jo['jo_number'] ?? '');
     $partNumber = (string)($jo['part_number'] ?? '');
@@ -3418,27 +4217,102 @@ function build_order_hierarchy(array $store, array $master): array {
       $jo['part_description'] = (string)($parts[$partNumber]['part_description'] ?? '');
     }
     $jo['customer_name'] = (string)($customers[$customerId]['customer_name'] ?? '');
+    $jo['routing_name'] = (string)($routings[(string)($jo['routing_id'] ?? '')]['routing_name'] ?? $routings[(string)($jo['routing_id'] ?? '')]['description'] ?? '');
+    $jo['bom_name'] = (string)($boms[(string)($jo['bom_id'] ?? '')]['bom_name'] ?? $boms[(string)($jo['bom_id'] ?? '')]['description'] ?? '');
+    $jo['control_plan_name'] = (string)($controlPlans[(string)($jo['control_plan_id'] ?? '')]['control_plan_name'] ?? '');
+    $jo['inspection_plan_name'] = (string)($inspectionPlans[(string)($jo['inspection_plan_id'] ?? '')]['inspection_plan_name'] ?? '');
+    $jo['traveler_template_name'] = (string)($travelerTemplates[(string)($jo['traveler_template_id'] ?? '')]['traveler_template_name'] ?? '');
+    $jo['work_orders'] = array_values($wosByJo[$joNumber] ?? []);
     $jo['operations'] = array_values($wosByJo[$joNumber] ?? []);
     $jo['linked_forms'] = array_values($linksByOrder['jo|' . $joNumber] ?? []);
+    $jo = order_enrich_job_order($jo, $jo['work_orders']);
     $josBySo[(string)($jo['so_number'] ?? '')][] = $jo;
   }
 
   $tree = [];
-  foreach (($store['sales_orders'] ?? []) as $so) {
+  foreach ((array)($store['sales_orders'] ?? []) as $so) {
     if (!is_array($so)) continue;
     $customerId = (string)($so['customer_id'] ?? '');
     if (($so['customer_name'] ?? '') === '' && isset($customers[$customerId])) {
       $so['customer_name'] = (string)($customers[$customerId]['customer_name'] ?? '');
     }
+    $so['customer_site_name'] = (string)($customerSites[(string)($so['customer_site_id'] ?? '')]['site_name'] ?? '');
+    $so['shipping_method_name'] = (string)($shippingMethods[(string)($so['shipping_method_id'] ?? '')]['shipping_method_name'] ?? '');
+    $so['incoterm_name'] = (string)($incoterms[(string)($so['incoterm_code'] ?? '')]['incoterm_name'] ?? '');
+    $so['payment_term_name'] = (string)($paymentTerms[(string)($so['payment_term_code'] ?? '')]['payment_term_name'] ?? '');
     $soNumber = (string)($so['so_number'] ?? '');
     $so['job_orders'] = array_values($josBySo[$soNumber] ?? []);
     $so['linked_forms'] = array_values($linksByOrder['so|' . $soNumber] ?? []);
+    $so = order_enrich_sales_order($so, $so['job_orders']);
     $tree[] = $so;
   }
   return $tree;
 }
 
-function compute_order_dashboard_stats(array $store): array {
+function order_flatten_hierarchy(array $hierarchy): array {
+  $rows = [];
+  foreach ($hierarchy as $so) {
+    if (!is_array($so)) continue;
+    $rows[] = array_merge(['_type' => 'so'], $so);
+    foreach ((array)($so['job_orders'] ?? []) as $jo) {
+      if (!is_array($jo)) continue;
+      $rows[] = array_merge(['_type' => 'jo'], $jo);
+      foreach ((array)($jo['work_orders'] ?? []) as $wo) {
+        if (!is_array($wo)) continue;
+        $rows[] = array_merge(['_type' => 'wo'], $wo);
+      }
+    }
+  }
+  return $rows;
+}
+
+function order_collect_top_exceptions(array $hierarchy): array {
+  $rows = [];
+  foreach (order_flatten_hierarchy($hierarchy) as $row) {
+    $type = (string)($row['_type'] ?? 'so');
+    $orderId = (string)($row[$type === 'so' ? 'so_number' : ($type === 'jo' ? 'jo_number' : 'wo_number')] ?? '');
+    foreach (array_slice((array)($row['exception_cards'] ?? []), 0, 3) as $issue) {
+      if (!is_array($issue)) continue;
+      $rows[] = [
+        'order_type' => $type,
+        'order_id' => $orderId,
+        'severity' => (string)($issue['severity'] ?? 'warning'),
+        'title_vi' => (string)($issue['title_vi'] ?? 'Ngoại lệ vận hành'),
+        'title_en' => (string)($issue['title_en'] ?? 'Operational exception'),
+        'message_vi' => (string)($issue['message_vi'] ?? ''),
+        'message_en' => (string)($issue['message_en'] ?? ''),
+        'phase' => (string)($row['operating']['phase'] ?? ''),
+        'health_band' => (string)($row['operating']['health_band'] ?? 'ready'),
+      ];
+    }
+  }
+  usort($rows, static function ($a, $b) {
+    $priority = ['critical' => 0, 'warning' => 1, 'info' => 2];
+    $ap = $priority[(string)($a['severity'] ?? 'warning')] ?? 9;
+    $bp = $priority[(string)($b['severity'] ?? 'warning')] ?? 9;
+    if ($ap !== $bp) return $ap <=> $bp;
+    return strcmp((string)($a['order_id'] ?? ''), (string)($b['order_id'] ?? ''));
+  });
+  return array_slice($rows, 0, 12);
+}
+
+function order_find_enriched_record(array $hierarchy, string $entity, string $id): ?array {
+  foreach ($hierarchy as $so) {
+    if (!is_array($so)) continue;
+    if ($entity === 'so' && (string)($so['so_number'] ?? '') === $id) return $so;
+    foreach ((array)($so['job_orders'] ?? []) as $jo) {
+      if (!is_array($jo)) continue;
+      if ($entity === 'jo' && (string)($jo['jo_number'] ?? '') === $id) return $jo;
+      foreach ((array)($jo['work_orders'] ?? []) as $wo) {
+        if (!is_array($wo)) continue;
+        if ($entity === 'wo' && (string)($wo['wo_number'] ?? '') === $id) return $wo;
+      }
+    }
+  }
+  return null;
+}
+
+function compute_order_dashboard_stats(array $store, array $hierarchy = [], ?array $mesSnapshot = null): array {
   $salesOrders = array_values((array)($store['sales_orders'] ?? []));
   $jobOrders = array_values((array)($store['job_orders'] ?? []));
   $workOrders = array_values((array)($store['work_orders'] ?? []));
@@ -3460,12 +4334,48 @@ function compute_order_dashboard_stats(array $store): array {
   }
   $otd = count($closedSo) > 0 ? round(($onTime / count($closedSo)) * 100, 1) : null;
 
+  $hierarchy = $hierarchy ?: build_order_hierarchy($store, [], $mesSnapshot);
+  $flat = order_flatten_hierarchy($hierarchy);
+  $atRiskSo = count(array_filter($flat, fn($row) => ($row['_type'] ?? '') === 'so' && in_array((string)($row['operating']['health_band'] ?? 'ready'), ['critical', 'warning'], true)));
+  $releaseReadyJo = count(array_filter($flat, fn($row) => ($row['_type'] ?? '') === 'jo' && (($row['operating']['readiness_score'] ?? 0) >= 80) && !($row['operating']['blocked'] ?? false)));
+  $blockedWo = count(array_filter($flat, fn($row) => ($row['_type'] ?? '') === 'wo' && (bool)($row['operating']['blocked'] ?? false)));
+  $shippingDocsPending = count(array_filter($flat, fn($row) => ($row['_type'] ?? '') === 'so' && in_array((string)(($row['gate_cards'][2]['band'] ?? 'ready')), ['critical', 'warning'], true)));
+  $outsideProcessingOpen = count(array_filter($flat, fn($row) => ($row['_type'] ?? '') === 'jo' && strtolower(trim((string)($row['outside_processing_status'] ?? ''))) !== '' && !in_array(strtolower(trim((string)($row['outside_processing_status'] ?? ''))), ['completed', 'ready', 'not_required'], true)));
+
+  $mesSnapshot = is_array($mesSnapshot) ? $mesSnapshot : [];
+  $programReleaseRisk = count((array)($mesSnapshot['program_release_queue'] ?? []));
+  $toolReadinessRisk = count((array)($mesSnapshot['tool_readiness_queue'] ?? []));
+  $operatorQualificationGaps = count((array)($mesSnapshot['operator_qualification_queue'] ?? []));
+  $materialTraceGaps = count((array)($mesSnapshot['material_trace_queue'] ?? []));
+  $connectorGovernanceGaps = count((array)($mesSnapshot['connector_guard_queue'] ?? []));
+  $launchBlockers = count((array)($mesSnapshot['launch_blocker_queue'] ?? []));
+
+  $phaseCounts = [];
+  foreach ($flat as $row) {
+    $phase = (string)($row['operating']['phase'] ?? '');
+    if ($phase === '') continue;
+    $phaseCounts[$phase] = (int)($phaseCounts[$phase] ?? 0) + 1;
+  }
+
   return [
     'active_so' => $activeSo,
     'active_jo' => $activeJo,
     'active_wo' => $activeWo,
     'overdue_count' => $overdueCount,
     'otd_percent' => $otd,
+    'at_risk_so' => $atRiskSo,
+    'release_ready_jo' => $releaseReadyJo,
+    'blocked_wo' => $blockedWo,
+    'shipping_docs_pending' => $shippingDocsPending,
+    'outside_processing_open' => $outsideProcessingOpen,
+    'program_release_risk' => $programReleaseRisk,
+    'tool_readiness_risk' => $toolReadinessRisk,
+    'operator_qualification_gaps' => $operatorQualificationGaps,
+    'material_trace_gaps' => $materialTraceGaps,
+    'connector_governance_gaps' => $connectorGovernanceGaps,
+    'launch_blockers' => $launchBlockers,
+    'phase_counts' => $phaseCounts,
+    'top_exceptions' => order_collect_top_exceptions($hierarchy),
   ];
 }
 
@@ -17823,19 +18733,22 @@ if ($username === '') {
   case 'order_dashboard_stats': {
     $me = require_logged_in($store);
     require_order_permission($me, 'so', 'view');
-    $bundle = runtime_read_model_bundle(false);
-    $stats = compute_order_dashboard_stats($bundle['orders']);
+    $bundle = runtime_read_model_bundle(true);
+    $mesSnapshot = build_mes_snapshot($bundle['orders'], $bundle['master'], $bundle['mes']);
+    $hierarchy = build_order_hierarchy($bundle['orders'], $bundle['master'], $mesSnapshot);
+    $stats = compute_order_dashboard_stats($bundle['orders'], $hierarchy, $mesSnapshot);
     api_json(['ok' => true, 'data' => $stats, 'read_sources' => $bundle['sources'], 'runtime_mode' => $bundle['runtime_mode']]);
   }
 
   case 'order_hierarchy': {
     $me = require_logged_in($store);
     require_order_permission($me, 'so', 'view');
-    $bundle = runtime_read_model_bundle(false);
+    $bundle = runtime_read_model_bundle(true);
     $orders = $bundle['orders'];
     $master = $bundle['master'];
-    $hierarchy = build_order_hierarchy($orders, $master);
-    api_json(['ok' => true, 'data' => $hierarchy, 'hierarchy' => $hierarchy, 'read_sources' => $bundle['sources'], 'runtime_mode' => $bundle['runtime_mode']]);
+    $mesSnapshot = build_mes_snapshot($orders, $master, $bundle['mes']);
+    $hierarchy = build_order_hierarchy($orders, $master, $mesSnapshot);
+    api_json(['ok' => true, 'data' => $hierarchy, 'hierarchy' => $hierarchy, 'snapshot_kpis' => (array)($mesSnapshot['kpis'] ?? []), 'read_sources' => $bundle['sources'], 'runtime_mode' => $bundle['runtime_mode']]);
   }
 
   case 'order_detail': {
@@ -17848,24 +18761,20 @@ if ($username === '') {
     }
     require_order_permission($me, $orderType, 'view');
 
-    $bundle = runtime_read_model_bundle(false);
+    $bundle = runtime_read_model_bundle(true);
     $orders = $bundle['orders'];
     $master = $bundle['master'];
-    $record = find_order_record($orders, $orderType, $orderId);
+    $mesSnapshot = build_mes_snapshot($orders, $master, $bundle['mes']);
+    $hierarchy = build_order_hierarchy($orders, $master, $mesSnapshot);
+    $record = order_find_enriched_record($hierarchy, $orderType, $orderId);
     if (!$record) api_json(['ok' => false, 'error' => 'not_found'], 404);
 
     $links = array_values(array_filter((array)($orders['form_links'] ?? []), fn($row) => is_array($row) && (string)($row['order_type'] ?? '') === $orderType && (string)($row['order_id'] ?? '') === $orderId));
 
-    if ($orderType === 'jo') {
-      $record['operations'] = array_values(array_filter((array)($orders['work_orders'] ?? []), fn($row) => is_array($row) && (string)($row['jo_number'] ?? '') === $orderId));
-    }
-    if ($orderType === 'so') {
-      $record['job_orders'] = array_values(array_filter((array)($orders['job_orders'] ?? []), fn($row) => is_array($row) && (string)($row['so_number'] ?? '') === $orderId));
-    }
     if ($orderType === 'wo') {
       $parentJo = (string)($record['jo_number'] ?? '');
       if ($parentJo !== '') {
-        $record['job_order'] = find_order_record($orders, 'jo', $parentJo);
+        $record['job_order'] = order_find_enriched_record($hierarchy, 'jo', $parentJo);
       }
     }
 
@@ -17875,6 +18784,7 @@ if ($username === '') {
       'part_number' => (string)($record['part_number'] ?? ''),
       'part_revision' => (string)($record['part_revision'] ?? ''),
     ];
+    $record['_mes_kpis'] = (array)($mesSnapshot['kpis'] ?? []);
     $record['_read_sources'] = $bundle['sources'];
     api_json(['ok' => true, 'data' => $record]);
   }
@@ -17915,12 +18825,40 @@ if ($username === '') {
       if ($customerId === '' || trim((string)($record['customer_po'] ?? '')) === '' || trim((string)($record['order_date'] ?? '')) === '' || trim((string)($record['due_date'] ?? '')) === '') {
         api_json(['ok' => false, 'error' => 'missing_required_fields'], 400);
       }
+      $customerMeta = [];
       foreach (($master['customers'] ?? []) as $customer) {
         if (is_array($customer) && (string)($customer['customer_id'] ?? '') === $customerId) {
+          $customerMeta = $customer;
           $record['customer_name'] = (string)($customer['customer_name'] ?? '');
           break;
         }
       }
+      if (($record['customer_site_id'] ?? '') === '') {
+        foreach (($master['customer_sites'] ?? []) as $site) {
+          if (!is_array($site) || (string)($site['customer_id'] ?? '') !== $customerId) continue;
+          $record['customer_site_id'] = (string)($site['site_id'] ?? '');
+          if (($record['ship_to_site_id'] ?? '') === '') $record['ship_to_site_id'] = (string)($site['site_id'] ?? '');
+          if (($record['packing_spec_code'] ?? '') === '') $record['packing_spec_code'] = (string)($site['packing_spec_code'] ?? '');
+          if (($record['label_spec_code'] ?? '') === '') $record['label_spec_code'] = (string)($site['label_spec_code'] ?? '');
+          if (($record['shipping_method_id'] ?? '') === '') $record['shipping_method_id'] = (string)($site['default_shipping_method_id'] ?? '');
+          if (($record['incoterm_code'] ?? '') === '') $record['incoterm_code'] = (string)($site['default_incoterm_code'] ?? '');
+          if (($record['payment_term_code'] ?? '') === '') $record['payment_term_code'] = (string)($site['default_payment_term_code'] ?? '');
+          if (($record['certificate_of_conformance_required'] ?? null) === null) $record['certificate_of_conformance_required'] = mes_truthy($site['certificate_of_conformance_required'] ?? false);
+          if (($record['certificate_of_analysis_required'] ?? null) === null) $record['certificate_of_analysis_required'] = mes_truthy($site['certificate_of_analysis_required'] ?? false);
+          if (($record['export_control_required'] ?? null) === null) $record['export_control_required'] = mes_truthy($site['export_control_required'] ?? false);
+          break;
+        }
+      }
+      $record['requested_date'] = trim((string)($record['requested_date'] ?? $record['due_date'] ?? ''));
+      $record['promise_date'] = trim((string)($record['promise_date'] ?? $record['due_date'] ?? ''));
+      $record['commit_date'] = trim((string)($record['commit_date'] ?? $record['promise_date'] ?? $record['due_date'] ?? ''));
+      if (($record['incoterm_code'] ?? '') === '') $record['incoterm_code'] = (string)($customerMeta['default_incoterm_code'] ?? 'FCA');
+      if (($record['payment_term_code'] ?? '') === '') $record['payment_term_code'] = (string)($customerMeta['default_payment_term_code'] ?? 'NET30');
+      if (($record['shipping_method_id'] ?? '') === '') $record['shipping_method_id'] = (string)($customerMeta['default_shipping_method_id'] ?? '');
+      $record['contract_review_status'] = trim((string)($record['contract_review_status'] ?? (($record['contract_review'] ?? '') !== '' ? 'approved' : 'pending')));
+      $record['fulfillment_status'] = trim((string)($record['fulfillment_status'] ?? 'pending'));
+      $record['document_requirements'] = array_values((array)($record['document_requirements'] ?? order_document_requirements($record)));
+      $record['milestones'] = array_values((array)($record['milestones'] ?? order_build_milestones('so', $record)));
       $orders['sales_orders'][] = $record;
     } elseif ($entity === 'jo') {
       $soNumber = trim((string)($record['so_number'] ?? ''));
@@ -17931,11 +18869,50 @@ if ($username === '') {
       $parentSo = find_order_record($orders, 'so', $soNumber);
       if (!$parentSo) api_json(['ok' => false, 'error' => 'parent_so_not_found'], 404);
       $record['customer_id'] = (string)($parentSo['customer_id'] ?? '');
+      $partMeta = [];
       foreach (($master['parts'] ?? []) as $part) {
         if (!is_array($part) || (string)($part['part_number'] ?? '') !== $partNumber) continue;
+        $partMeta = $part;
         if (($record['part_description'] ?? '') === '') $record['part_description'] = (string)($part['part_description'] ?? '');
         break;
       }
+      foreach ([
+        'routing_library' => 'routing_id',
+        'bom_library' => 'bom_id',
+        'control_plans' => 'control_plan_id',
+        'inspection_plans' => 'inspection_plan_id',
+        'traveler_templates' => 'traveler_template_id',
+      ] as $entityKey => $fieldKey) {
+        if (($record[$fieldKey] ?? '') !== '') continue;
+        foreach (($master[$entityKey] ?? []) as $row) {
+          if (!is_array($row) || (string)($row['part_number'] ?? '') !== $partNumber) continue;
+          $rowRevision = trim((string)($row['part_revision'] ?? $row['revision'] ?? ''));
+          if ($rowRevision !== '' && $rowRevision !== trim((string)($record['part_revision'] ?? ''))) continue;
+          $candidateKey = $fieldKey === 'routing_id' ? 'routing_id'
+            : ($fieldKey === 'bom_id' ? 'bom_id'
+            : ($fieldKey === 'control_plan_id' ? 'control_plan_id'
+            : ($fieldKey === 'inspection_plan_id' ? 'inspection_plan_id' : 'traveler_template_id')));
+          $record[$fieldKey] = (string)($row[$candidateKey] ?? '');
+          break;
+        }
+      }
+      $releaseStatus = 'pending';
+      foreach (($master['revisions'] ?? []) as $revision) {
+        if (!is_array($revision)) continue;
+        if ((string)($revision['part_number'] ?? '') !== $partNumber) continue;
+        if ((string)($revision['revision'] ?? '') !== (string)($record['part_revision'] ?? '')) continue;
+        $releaseStatus = strtolower(trim((string)($revision['status'] ?? 'pending')));
+        break;
+      }
+      $record['release_target_date'] = trim((string)($record['release_target_date'] ?? $record['start_date'] ?? ''));
+      $record['engineering_release_status'] = trim((string)($record['engineering_release_status'] ?? ($releaseStatus === 'released' ? 'released' : 'pending')));
+      $record['material_ready_status'] = trim((string)($record['material_ready_status'] ?? 'pending'));
+      $record['quality_plan_status'] = trim((string)($record['quality_plan_status'] ?? ((($record['control_plan_id'] ?? '') !== '' || ($record['inspection_plan_id'] ?? '') !== '') ? 'planned' : 'pending')));
+      $record['source_inspection_status'] = trim((string)($record['source_inspection_status'] ?? (($record['customer_source_inspection'] ?? false) ? 'pending' : 'not_required')));
+      $record['traceability_level'] = trim((string)($record['traceability_level'] ?? $partMeta['traceability_level'] ?? ''));
+      $record['outside_processing_required'] = (($record['special_process'] ?? '') !== '') || (($record['special_process_supplier_id'] ?? '') !== '');
+      $record['outside_processing_status'] = trim((string)($record['outside_processing_status'] ?? ($record['outside_processing_required'] ? 'pending' : 'not_required')));
+      $record['milestones'] = array_values((array)($record['milestones'] ?? order_build_milestones('jo', $record)));
       $orders['job_orders'][] = $record;
     } else {
       $joNumber = trim((string)($record['jo_number'] ?? ''));
@@ -17950,6 +18927,12 @@ if ($username === '') {
       if (($record['customer_id'] ?? '') === '') $record['customer_id'] = (string)($parentJo['customer_id'] ?? '');
       if (($record['part_description'] ?? '') === '') $record['part_description'] = (string)($parentJo['part_description'] ?? '');
       if (($record['material_spec'] ?? '') === '') $record['material_spec'] = (string)($parentJo['material_spec'] ?? '');
+      $parentSo = find_order_record($orders, 'so', (string)($parentJo['so_number'] ?? ''));
+      $record['dispatch_priority'] = trim((string)($record['dispatch_priority'] ?? strtolower((string)($parentSo['priority'] ?? 'standard'))));
+      $record['quality_gate_status'] = trim((string)($record['quality_gate_status'] ?? 'pending'));
+      $record['first_piece_status'] = trim((string)($record['first_piece_status'] ?? (($parentJo['fai_required'] ?? false) ? 'pending' : 'not_required')));
+      $record['handover_status'] = trim((string)($record['handover_status'] ?? 'pending'));
+      $record['milestones'] = array_values((array)($record['milestones'] ?? order_build_milestones('wo', $record)));
       $orders['work_orders'][] = $record;
       $launchGuard = mes_wo_transition_guard($orders, $master, load_mes_runtime_store(), (string)($record['wo_number'] ?? ''), (string)($record['status'] ?? 'scheduled'));
       if ($launchGuard) api_json($launchGuard, 409);

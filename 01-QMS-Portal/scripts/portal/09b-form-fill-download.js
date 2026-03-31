@@ -2721,8 +2721,8 @@ function bindWorkspace(form, allocation, container){
       return;
     }
     /* Schema-based forms: open the form builder engine */
-    if(typeof window._renderFormBuilder === 'function'){
-      window._renderFormBuilder(form, container);
+    if(typeof window._ecOpenEqmsTemplateEditor === 'function'){
+      window._ecOpenEqmsTemplateEditor(form && form.form_code ? form.form_code : '');
     } else {
       toast(t('Trình chỉnh sửa biểu mẫu chưa sẵn sàng.', 'Form editor is not ready yet.'), 'warn');
     }

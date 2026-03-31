@@ -1,9 +1,9 @@
 {
   "_meta": {
-    "version": "1.2",
+    "version": "1.3",
     "created": "2026-03-29T12:00:00+07:00",
-    "updated": "2026-03-30T16:20:00+07:00",
-    "description": "Master data seed for customer, supplier, part, revision, NC program release, CAPA, work center, machine, operator, tooling linkage, and governed MES reason codes used by Evidence Control, Order Management, and MES runtime."
+    "updated": "2026-03-31T22:10:00+07:00",
+    "description": "Master data seed for customer, commercial, engineering, quality, fulfillment, and MES governance used by Evidence Control, Order Management, and the CNC runtime."
   },
   "customers": [
     {
@@ -35,6 +35,73 @@
       "contact_name": "Jane Doe",
       "contact_email": "jane.doe@globex.example",
       "site_code": "GLOBEX-VN"
+    }
+  ],
+  "customer_sites": [
+    {
+      "site_id": "LAM-US-FREMONT",
+      "customer_id": "CUS-LAM",
+      "site_name": "Lam Research Fremont",
+      "country_code": "US",
+      "default_incoterm_code": "FCA",
+      "default_shipping_method_id": "AIR-PRIORITY",
+      "default_payment_term_code": "NET30",
+      "certificate_of_conformance_required": true,
+      "certificate_of_analysis_required": true,
+      "export_control_required": true,
+      "packing_spec_code": "PK-LAM-AERO",
+      "label_spec_code": "LBL-LAM-CLEAN",
+      "status": "active"
+    },
+    {
+      "site_id": "ACME-SG-PLANT2",
+      "customer_id": "CUS-ACME",
+      "site_name": "ACME Singapore Plant 2",
+      "country_code": "SG",
+      "default_incoterm_code": "DAP",
+      "default_shipping_method_id": "COURIER-DHL",
+      "default_payment_term_code": "NET45",
+      "certificate_of_conformance_required": true,
+      "certificate_of_analysis_required": false,
+      "export_control_required": false,
+      "packing_spec_code": "PK-ACME-STD",
+      "label_spec_code": "LBL-ACME-BLUE",
+      "status": "active"
+    },
+    {
+      "site_id": "GLOBEX-VN-ASM",
+      "customer_id": "CUS-GLOBEX",
+      "site_name": "Globex Vietnam Assembly",
+      "country_code": "VN",
+      "default_incoterm_code": "EXW",
+      "default_shipping_method_id": "TRUCK-DOMESTIC",
+      "default_payment_term_code": "NET30",
+      "certificate_of_conformance_required": true,
+      "certificate_of_analysis_required": false,
+      "export_control_required": false,
+      "packing_spec_code": "PK-GLOBEX-HEAVY",
+      "label_spec_code": "LBL-GLOBEX-STD",
+      "status": "active"
+    }
+  ],
+  "commercial_accounts": [
+    {
+      "account_id": "ACC-LAM-US",
+      "customer_id": "CUS-LAM",
+      "account_owner": "son.phan",
+      "order_coordinator_role": "customer_service",
+      "promise_policy_id": "PROM-CRIT-AERO",
+      "currency_code": "USD",
+      "status": "active"
+    },
+    {
+      "account_id": "ACC-ACME-SG",
+      "customer_id": "CUS-ACME",
+      "account_owner": "ngoc.pham",
+      "order_coordinator_role": "estimator",
+      "promise_policy_id": "PROM-STD-GLOBAL",
+      "currency_code": "USD",
+      "status": "active"
     }
   ],
   "suppliers": [
@@ -130,6 +197,231 @@
       "revision": "REV-B",
       "status": "released",
       "release_date": "2026-01-21"
+    }
+  ],
+  "incoterms": [
+    {
+      "incoterm_code": "FCA",
+      "incoterm_name": "Free Carrier",
+      "status": "active"
+    },
+    {
+      "incoterm_code": "DAP",
+      "incoterm_name": "Delivered At Place",
+      "status": "active"
+    },
+    {
+      "incoterm_code": "EXW",
+      "incoterm_name": "Ex Works",
+      "status": "active"
+    }
+  ],
+  "payment_terms": [
+    {
+      "payment_term_code": "NET30",
+      "payment_term_name": "Net 30 days",
+      "status": "active"
+    },
+    {
+      "payment_term_code": "NET45",
+      "payment_term_name": "Net 45 days",
+      "status": "active"
+    }
+  ],
+  "shipping_methods": [
+    {
+      "shipping_method_id": "AIR-PRIORITY",
+      "shipping_method_name": "Priority air freight",
+      "mode": "air",
+      "status": "active"
+    },
+    {
+      "shipping_method_id": "COURIER-DHL",
+      "shipping_method_name": "Courier DHL Express",
+      "mode": "courier",
+      "status": "active"
+    },
+    {
+      "shipping_method_id": "TRUCK-DOMESTIC",
+      "shipping_method_name": "Domestic truck",
+      "mode": "road",
+      "status": "active"
+    }
+  ],
+  "promise_policies": [
+    {
+      "promise_policy_id": "PROM-CRIT-AERO",
+      "policy_name": "Critical aerospace controlled promise",
+      "target_otd_percent": 98.0,
+      "review_frequency": "daily",
+      "status": "active"
+    },
+    {
+      "promise_policy_id": "PROM-STD-GLOBAL",
+      "policy_name": "Standard global make-to-order",
+      "target_otd_percent": 95.0,
+      "review_frequency": "weekly",
+      "status": "active"
+    }
+  ],
+  "routing_library": [
+    {
+      "routing_id": "ROUT-714-1101-C",
+      "part_number": "714-1101",
+      "part_revision": "REV-C",
+      "routing_name": "714-1101 REV-C production routing",
+      "work_center_path": "WC-5AX > WC-QA > WC-OUT",
+      "status": "released"
+    },
+    {
+      "routing_id": "ROUT-P1001-C",
+      "part_number": "P-1001",
+      "part_revision": "REV-C",
+      "routing_name": "P-1001 REV-C standard routing",
+      "work_center_path": "WC-3AX > WC-QA",
+      "status": "released"
+    }
+  ],
+  "bom_library": [
+    {
+      "bom_id": "BOM-714-1101-C",
+      "part_number": "714-1101",
+      "part_revision": "REV-C",
+      "bom_name": "Valve Housing raw + special process BOM",
+      "status": "released"
+    },
+    {
+      "bom_id": "BOM-P1001-C",
+      "part_number": "P-1001",
+      "part_revision": "REV-C",
+      "bom_name": "Mounting Bracket standard BOM",
+      "status": "released"
+    }
+  ],
+  "control_plans": [
+    {
+      "control_plan_id": "CP-714-1101-C",
+      "part_number": "714-1101",
+      "part_revision": "REV-C",
+      "control_plan_name": "Valve Housing control plan",
+      "status": "released"
+    },
+    {
+      "control_plan_id": "CP-P1001-C",
+      "part_number": "P-1001",
+      "part_revision": "REV-C",
+      "control_plan_name": "Mounting Bracket control plan",
+      "status": "released"
+    }
+  ],
+  "inspection_plans": [
+    {
+      "inspection_plan_id": "IP-714-1101-C",
+      "part_number": "714-1101",
+      "part_revision": "REV-C",
+      "inspection_plan_name": "714-1101 FAI + final inspection",
+      "status": "released"
+    },
+    {
+      "inspection_plan_id": "IP-P1001-C",
+      "part_number": "P-1001",
+      "part_revision": "REV-C",
+      "inspection_plan_name": "P-1001 final inspection",
+      "status": "released"
+    }
+  ],
+  "traveler_templates": [
+    {
+      "traveler_template_id": "TRV-714-1101-C",
+      "part_number": "714-1101",
+      "part_revision": "REV-C",
+      "traveler_template_name": "Valve Housing router / traveler",
+      "status": "released"
+    },
+    {
+      "traveler_template_id": "TRV-P1001-C",
+      "part_number": "P-1001",
+      "part_revision": "REV-C",
+      "traveler_template_name": "Mounting Bracket router / traveler",
+      "status": "released"
+    }
+  ],
+  "quality_gate_profiles": [
+    {
+      "quality_gate_profile_id": "QG-AERO-FAI",
+      "profile_name": "Aerospace CNC FAI release gates",
+      "required_gates": "contract_review, engineering_release, material_trace, nc_release, first_piece, coc",
+      "status": "active"
+    },
+    {
+      "quality_gate_profile_id": "QG-STD-CNC",
+      "profile_name": "Standard CNC delivery gates",
+      "required_gates": "engineering_release, material_trace, final_inspection, coc",
+      "status": "active"
+    }
+  ],
+  "launch_gate_templates": [
+    {
+      "gate_template_id": "LGT-5AX-AERO",
+      "work_center_id": "WC-5AX",
+      "gate_name": "5-axis aerospace launch template",
+      "required_gates": "connector_guard, nc_release, tool_readiness, operator_governance, material_trace, evidence_gate",
+      "status": "active"
+    },
+    {
+      "gate_template_id": "LGT-3AX-STD",
+      "work_center_id": "WC-3AX",
+      "gate_name": "3-axis production launch template",
+      "required_gates": "connector_guard, nc_release, tool_readiness, material_trace, evidence_gate",
+      "status": "active"
+    }
+  ],
+  "customer_item_approvals": [
+    {
+      "approval_id": "CIA-LAM-714-1101",
+      "customer_id": "CUS-LAM",
+      "part_number": "714-1101",
+      "part_revision": "REV-C",
+      "approved_for_production": true,
+      "status": "active"
+    },
+    {
+      "approval_id": "CIA-ACME-P1001",
+      "customer_id": "CUS-ACME",
+      "part_number": "P-1001",
+      "part_revision": "REV-C",
+      "approved_for_production": true,
+      "status": "active"
+    }
+  ],
+  "supplier_process_approvals": [
+    {
+      "approval_id": "SPA-LAM-PASS",
+      "supplier_id": "SUP-ACOAT",
+      "customer_id": "CUS-LAM",
+      "special_process": "Passivation",
+      "status": "approved"
+    },
+    {
+      "approval_id": "SPA-ACME-ANOD",
+      "supplier_id": "SUP-ACOAT",
+      "customer_id": "CUS-ACME",
+      "special_process": "Clear anodize",
+      "status": "approved"
+    }
+  ],
+  "warehouse_locations": [
+    {
+      "warehouse_id": "WH-FG-01",
+      "warehouse_name": "Finished goods warehouse",
+      "warehouse_type": "fg",
+      "status": "active"
+    },
+    {
+      "warehouse_id": "WH-RM-01",
+      "warehouse_name": "Raw material supermarket",
+      "warehouse_type": "rm",
+      "status": "active"
     }
   ],
   "nc_program_releases": [

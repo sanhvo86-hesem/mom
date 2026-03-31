@@ -35,7 +35,8 @@ var state = {
   busySave: false,
   busySubmit: false,
   localKey: '',
-  editMode: true
+  editMode: true,
+  isDirty: false
 };
 var els = {};
 
@@ -45,6 +46,7 @@ function init(){
   cacheElements();
   state.localKey = localDraftKey();
   bindEvents();
+  bindRuntimeGuards();
   updateActionState();
   updateRuntimeAlert('info', 'Đang khởi tạo biểu mẫu', 'Hệ thống đang tải thông tin hồ sơ, nháp gần nhất và dữ liệu nền nhà cung cấp.', 'Khởi tạo');
   loadRuntime();
@@ -299,6 +301,123 @@ function syncDataFromDom(){
   normalizeData(state.data);
 }
 
+function snapshotData(data){
+  var copy = clone(data || {});
+  normalizeData(copy);
+  return JSON.stringify(copy);
+}
+
+function hasDirtyChanges(){
+  return snapshotData(state.data) !== snapshotData(state.resetSnapshot);
+}
+
+function publishDirtyState(source){
+  var dirty = hasDirtyChanges();
+  state.isDirty = dirty;
+  postParentMessage({
+    type: 'ec-form-runtime-dirty',
+    form_code: FORM_CODE,
+    allocation_id: state.allocationId,
+    record_id: currentRecordId(),
+    dirty: dirty,
+    source: source || '',
+    last_saved_at: state.lastServerSaveAt || state.lastLocalSaveAt || '',
+    last_dirty_at: dirty ? new Date().toISOString() : '',
+    summary: dirty ? 'Biểu mẫu đang có thay đổi chưa được chốt thành bản nháp an toàn.' : ''
+  });
+  return dirty;
+}
+
+function markCurrentStateSaved(){
+  state.resetSnapshot = clone(state.data);
+  publishDirtyState('saved');
+}
+
+function bindRuntimeGuards(){
+  window.addEventListener('beforeunload', function(event){
+    try{ syncDataFromDom(); }catch(_err){}
+    if(!publishDirtyState('beforeunload')) return;
+    try{ saveLocalDraft('beforeunload'); }catch(_err){}
+    var msg = 'Biểu mẫu đang có dữ liệu dang dở. Hãy lưu nháp trước khi mở liên kết khác hoặc làm mới hệ thống.';
+    event.preventDefault();
+    event.returnValue = msg;
+    return msg;
+  });
+  window.addEventListener('pagehide', function(){
+    try{
+      syncDataFromDom();
+      if(hasDirtyChanges()) saveLocalDraft('pagehide');
+      publishDirtyState('pagehide');
+    }catch(_err){}
+  });
+  document.addEventListener('visibilitychange', function(){
+    if(!document.hidden) return;
+    try{
+      syncDataFromDom();
+      if(hasDirtyChanges()) saveLocalDraft('visibilitychange');
+      publishDirtyState('visibilitychange');
+    }catch(_err){}
+  });
+  document.addEventListener('click', function(event){
+    var link = event.target && event.target.closest ? event.target.closest('a[href]') : null;
+    if(!link) return;
+    var href = String(link.getAttribute('href') || '').trim();
+    if(!href || href.charAt(0) === '#') return;
+    try{ syncDataFromDom(); }catch(_err){}
+    if(!publishDirtyState('link-intent')) return;
+    var leave = window.confirm('Biểu mẫu đang có dữ liệu dang dở. Hãy lưu nháp trước khi mở liên kết khác. Nhấn OK để rời đi không lưu, hoặc Cancel để ở lại biểu mẫu.');
+    if(!leave){
+      event.preventDefault();
+      event.stopPropagation();
+      notifyParentToast('Hãy lưu nháp trước khi rời biểu mẫu nếu muốn giữ dữ liệu đang làm dở.', 'warn');
+      return;
+    }
+    try{ saveLocalDraft('link-leave'); }catch(_ignore){}
+  }, true);
+  window.addEventListener('message', handleParentRuntimeCommand);
+}
+
+function handleParentRuntimeCommand(event){
+  var data = event.data || {};
+  if(!data || typeof data !== 'object' || data.type !== 'ec-form-runtime-command') return;
+  if(event.source !== window.parent) return;
+  var requestId = String(data.request_id || '').trim();
+  function reply(payload){
+    postParentMessage(Object.assign({
+      type: 'ec-form-runtime-command-result',
+      request_id: requestId,
+      command: data.command,
+      form_code: FORM_CODE,
+      allocation_id: state.allocationId,
+      record_id: currentRecordId()
+    }, payload || {}));
+  }
+  if(data.command === 'query-dirty'){
+    try{ syncDataFromDom(); }catch(_err){}
+    reply({ ok:true, dirty: publishDirtyState('query-dirty') });
+    return;
+  }
+  if(data.command === 'save-draft'){
+    saveDraftWorkflow('guard').then(function(result){
+      reply({
+        ok: !!(result && result.ok),
+        dirty: publishDirtyState('command-save'),
+        scope: result && result.scope ? result.scope : ''
+      });
+    });
+    return;
+  }
+  if(data.command === 'discard'){
+    state.data = clone(state.resetSnapshot);
+    normalizeData(state.data);
+    populateForm();
+    renderAll();
+    reply({ ok:true, dirty: publishDirtyState('command-discard') });
+    return;
+  }
+  reply({ ok:false, error:'unknown_command', dirty: publishDirtyState('unknown-command') });
+}
+
 function renderAll(){
   syncDataFromDom();
   renderHero();
@@ -312,6 +431,7 @@ function renderAll(){
   updateMetaFootnotes();
   updateActionState();
   renderDisplayValues();
+  publishDirtyState('render');
   notifyHeight();
 }
 
@@ -436,6 +556,7 @@ function updateActionState(){
 }
 
 function handleSaveDraft(){
+  return saveDraftWorkflow('manual');
   if(state.busySave || state.busySubmit) return;
   syncDataFromDom();
   clearFieldErrors();
@@ -469,6 +590,44 @@ function handleSaveDraft(){
   });
 }
 
+function saveDraftWorkflow(source){
+  if(state.busySave || state.busySubmit) return Promise.resolve({ ok:false, error:'busy' });
+  syncDataFromDom();
+  clearFieldErrors();
+  saveLocalDraft(source || 'manual');
+  markCurrentStateSaved();
+  if(!state.loggedIn || !state.allocationId){
+    updateRuntimeAlert('warning', 'Đã lưu cục bộ', 'Phiên hiện tại chưa có mã hồ sơ hoặc chưa đăng nhập, nên bản lưu này chỉ nằm trên trình duyệt hiện tại.', 'Cục bộ');
+    notifyParentToast('Đã lưu cục bộ biểu mẫu SCAR.', 'info');
+    updateMetaFootnotes();
+    return Promise.resolve({ ok:true, scope:'local' });
+  }
+  state.busySave = true;
+  updateActionState();
+  return callApi('form_fill_save_draft', {
+    allocation_id: state.allocationId,
+    form_code: FORM_CODE,
+    data: { fieldValues: clone(state.data), runtime_mode: 'standalone_html' }
+  }, 'POST').then(function(resp){
+    if(!resp || !resp.ok) throw new Error('Máy chủ không xác nhận lưu nháp.');
+    state.lastServerSaveAt = new Date().toISOString();
+    markCurrentStateSaved();
+    updateRuntimeAlert('success', 'Đã lưu nháp máy chủ', 'Biểu mẫu SCAR đã được đồng bộ nháp lên máy chủ. Anh có thể tiếp tục làm việc hoặc quay lại sau mà không mất dữ liệu.', 'Đã lưu');
+    notifyParentToast('Đã lưu nháp SCAR lên máy chủ.', 'success');
+    return { ok:true, scope:'server' };
+  }).catch(function(error){
+    updateRuntimeAlert('warning', 'Máy chủ chưa lưu được nháp', (error && error.message) || 'Bản cục bộ vẫn còn trên trình duyệt này.', 'Cảnh báo');
+    notifyParentToast('Không thể lưu nháp SCAR lên máy chủ.', 'warn');
+    markCurrentStateSaved();
+    return { ok:true, scope:'local', warning:true };
+  }).finally(function(){
+    state.busySave = false;
+    updateMetaFootnotes();
+    updateActionState();
+    notifyHeight();
+  });
+}
+
 function handleReset(){
   clearFieldErrors();
   state.data = clone(state.resetSnapshot);
@@ -476,6 +635,7 @@ function handleReset(){
   populateForm();
   renderAll();
   saveLocalDraft('reset');
+  publishDirtyState('reset');
   updateRuntimeAlert('info', 'Đã khôi phục dữ liệu', 'Biểu mẫu đã quay về ảnh chụp dữ liệu gần nhất được tải hoặc lưu thủ công.', 'Khôi phục');
   notifyParentToast('Đã khôi phục dữ liệu biểu mẫu SCAR.', 'info');
 }
@@ -499,6 +659,7 @@ function handleCancelEdit(){
   populateForm();
   renderDisplayValues();
   setMode('view');
+  publishDirtyState('cancel-edit');
   notifyParentToast('Đã hủy chỉnh sửa, khôi phục dữ liệu hiển thị.', 'info');
 }
 

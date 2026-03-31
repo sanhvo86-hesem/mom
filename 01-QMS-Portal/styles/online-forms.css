@@ -2485,6 +2485,51 @@ textarea.ec-dialog-input {
   gap: 10px;
   margin-top: 16px;
 }
+.ec-choice-dialog {
+  width: min(640px, 100%);
+}
+.ec-choice-stack {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+.ec-choice-btn {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  padding: 16px 18px;
+  text-align: left;
+  border-radius: 18px;
+  border: 1px solid var(--ec-border);
+  background: #fff;
+  color: var(--ec-text);
+  cursor: pointer;
+  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+}
+.ec-choice-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 32px rgba(15, 23, 42, .08);
+}
+.ec-choice-btn strong {
+  font-size: 14px;
+}
+.ec-choice-btn span {
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--ec-text-secondary);
+}
+.ec-choice-btn.save {
+  border-color: rgba(37, 99, 235, .22);
+  background: linear-gradient(180deg, rgba(239, 246, 255, .96) 0%, #fff 100%);
+}
+.ec-choice-btn.discard {
+  border-color: rgba(220, 38, 38, .18);
+  background: linear-gradient(180deg, rgba(254, 242, 242, .92) 0%, #fff 100%);
+}
+.ec-choice-btn.stay {
+  border-color: rgba(148, 163, 184, .28);
+  background: linear-gradient(180deg, rgba(248, 250, 252, .96) 0%, #fff 100%);
+}
 
 .ec-checklist {
   margin-top: 18px;

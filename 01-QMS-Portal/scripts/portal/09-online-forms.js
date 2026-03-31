@@ -50,6 +50,15 @@ var state = {
   _eqmsOpenOptions: null,
   _eqmsBuilderFormCode: '',
   _eqmsBuilderOptions: null,
+  runtimeGuard: {
+    dirty: false,
+    formCode: '',
+    recordId: '',
+    allocationId: '',
+    lastSavedAt: '',
+    lastDirtyAt: '',
+    summary: ''
+  },
   workQueue: {
     pending: [],
     exceptions: [],
@@ -93,6 +102,151 @@ function esc(value){
   var div = document.createElement('div');
   div.appendChild(document.createTextNode(String(value == null ? '' : value)));
   return div.innerHTML;
+}
+
+function resetRuntimeGuard(){
+  state.runtimeGuard = {
+    dirty: false,
+    formCode: '',
+    recordId: '',
+    allocationId: '',
+    lastSavedAt: '',
+    lastDirtyAt: '',
+    summary: ''
+  };
+}
+
+function setRuntimeGuard(payload){
+  payload = payload || {};
+  state.runtimeGuard.dirty = !!payload.dirty;
+  state.runtimeGuard.formCode = String(payload.form_code || payload.formCode || state.runtimeGuard.formCode || '').trim();
+  state.runtimeGuard.recordId = String(payload.record_id || payload.recordId || state.runtimeGuard.recordId || '').trim();
+  state.runtimeGuard.allocationId = String(payload.allocation_id || payload.allocationId || state.runtimeGuard.allocationId || '').trim();
+  state.runtimeGuard.lastSavedAt = String(payload.last_saved_at || payload.lastSavedAt || state.runtimeGuard.lastSavedAt || '').trim();
+  state.runtimeGuard.lastDirtyAt = String(payload.last_dirty_at || payload.lastDirtyAt || state.runtimeGuard.lastDirtyAt || '').trim();
+  state.runtimeGuard.summary = String(payload.summary || state.runtimeGuard.summary || '').trim();
+  if(!state.runtimeGuard.dirty){
+    state.runtimeGuard.summary = '';
+    state.runtimeGuard.lastDirtyAt = '';
+  }
+}
+
+function hasRuntimeDirtySession(){
+  return !!(state.runtimeGuard && state.runtimeGuard.dirty);
+}
+
+function runtimeFrame(){
+  return document.getElementById('eqms-standalone-frame');
+}
+
+function runtimeGuardMessage(){
+  var label = state.runtimeGuard.recordId || state.runtimeGuard.formCode || t('biểu mẫu hiện tại', 'the current form');
+  return t(
+    'Biểu mẫu ' + label + ' đang có dữ liệu dang dở. Trước khi mở liên kết khác, chuyển tab hoặc làm mới hệ thống/pull dữ liệu, hãy chọn cách xử lý để tránh treo phiên và mất ngữ cảnh.',
+    'The form ' + label + ' has unfinished data. Before opening another link, switching tabs, or refreshing the system/pulling new data, choose how to handle the in-progress work.'
+  );
+}
+
+function openRuntimeGuardDialog(){
+  return new Promise(function(resolve){
+    var existing = document.getElementById('ec-runtime-guard-backdrop');
+    if(existing) existing.remove();
+    var backdrop = document.createElement('div');
+    backdrop.className = 'ec-dialog-backdrop';
+    backdrop.id = 'ec-runtime-guard-backdrop';
+    backdrop.innerHTML =
+      '<div class="ec-dialog ec-choice-dialog" role="dialog" aria-modal="true" aria-labelledby="ec-runtime-guard-title">' +
+        '<div class="ec-dialog-head">' +
+          '<h3 id="ec-runtime-guard-title">' + esc(t('Dữ liệu đang làm dở chưa được xử lý', 'Unfinished data needs a decision')) + '</h3>' +
+          '<button type="button" class="ec-dialog-close" data-close-runtime-guard="1" aria-label="' + esc(t('Đóng', 'Close')) + '">x</button>' +
+        '</div>' +
+        '<p class="ec-dialog-copy">' + esc(runtimeGuardMessage()) + '</p>' +
+        '<div class="ec-choice-stack">' +
+          '<button type="button" class="ec-choice-btn save" data-runtime-choice="save">' +
+            '<strong>' + esc(t('Lưu nháp rồi tiếp tục', 'Save draft and continue')) + '</strong>' +
+            '<span>' + esc(t('Lưu trạng thái hiện tại thành bản nháp an toàn trước khi rời khỏi màn hình này.', 'Store the current state as a safe draft before leaving this screen.')) + '</span>' +
+          '</button>' +
+          '<button type="button" class="ec-choice-btn discard" data-runtime-choice="discard">' +
+            '<strong>' + esc(t('Rời đi không lưu', 'Leave without saving')) + '</strong>' +
+            '<span>' + esc(t('Bỏ phần dữ liệu dang dở của phiên hiện tại và tiếp tục sang nơi khác.', 'Drop the unfinished edits in this session and continue elsewhere.')) + '</span>' +
+          '</button>' +
+          '<button type="button" class="ec-choice-btn stay" data-runtime-choice="stay">' +
+            '<strong>' + esc(t('Ở lại để xử lý tiếp', 'Stay on this form')) + '</strong>' +
+            '<span>' + esc(t('Tiếp tục làm việc tại chỗ, không thay đổi màn hình và không làm mới hệ thống lúc này.', 'Keep working here without changing the screen or refreshing the system right now.')) + '</span>' +
+          '</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(backdrop);
+
+    function cleanup(value){
+      document.removeEventListener('keydown', onKeyDown, true);
+      if(backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+      resolve(value);
+    }
+    function onKeyDown(event){
+      if(event.key === 'Escape'){
+        event.preventDefault();
+        cleanup('stay');
+      }
+    }
+    backdrop.addEventListener('click', function(event){
+      var choice = event.target.getAttribute('data-runtime-choice');
+      if(choice){ cleanup(choice); return; }
+      if(event.target === backdrop || event.target.getAttribute('data-close-runtime-guard') === '1') cleanup('stay');
+    });
+    document.addEventListener('keydown', onKeyDown, true);
+  });
+}
+
+function sendRuntimeCommand(command){
+  var frame = runtimeFrame();
+  if(!frame || !frame.contentWindow){
+    return Promise.resolve({ ok:false, error:'runtime_unavailable' });
+  }
+  var requestId = 'rt-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+  window._ecRuntimePendingCommands = window._ecRuntimePendingCommands || {};
+  return new Promise(function(resolve){
+    var timer = window.setTimeout(function(){
+      try{ delete window._ecRuntimePendingCommands[requestId]; }catch(_err){}
+      resolve({ ok:false, error:'runtime_timeout', command:command });
+    }, 12000);
+    window._ecRuntimePendingCommands[requestId] = function(payload){
+      window.clearTimeout(timer);
+      try{ delete window._ecRuntimePendingCommands[requestId]; }catch(_err){}
+      resolve(payload || { ok:false, error:'runtime_empty', command:command });
+    };
+    frame.contentWindow.postMessage({
+      type: 'ec-form-runtime-command',
+      command: command,
+      request_id: requestId
+    }, window.location.origin || '*');
+  });
+}
+
+function runWithRuntimeGuard(action){
+  if(!hasRuntimeDirtySession()){
+    action();
+    return true;
+  }
+  openRuntimeGuardDialog().then(function(choice){
+    if(choice === 'stay' || !choice) return;
+    if(choice === 'save'){
+      sendRuntimeCommand('save-draft').then(function(resp){
+        if(!(resp && resp.ok)){
+          toast(t('Không thể lưu nháp an toàn từ runtime lúc này. Hãy ở lại màn hình hiện tại hoặc thử lưu lại thủ công.', 'Could not save the draft safely from the runtime. Stay on the current screen or save manually first.'), 'warn');
+          return;
+        }
+        resetRuntimeGuard();
+        action();
+      });
+      return;
+    }
+    sendRuntimeCommand('discard').finally(function(){
+      resetRuntimeGuard();
+      action();
+    });
+  });
+  return false;
 }
 
 function normalizeRecordTypeRegistry(recordTypes){
@@ -249,6 +403,62 @@ window._ecPromptDialog = openPromptDialog;
 window._ecOpenEqmsHub = openEqmsHub;
 window._ecOpenEqmsBuilder = openEqmsTemplateEditor;
 window._ecOpenEqmsTemplateEditor = openEqmsTemplateEditor;
+window._ecSetRuntimeDirty = setRuntimeGuard;
+window._ecHasPendingRuntimeChanges = hasRuntimeDirtySession;
+window._renderFormBuilder = function(formOrCode){
+  var code = '';
+  if(typeof formOrCode === 'string') code = formOrCode;
+  else if(formOrCode && typeof formOrCode === 'object') code = formOrCode.form_code || formOrCode.code || '';
+  openEqmsTemplateEditor(code || 'FRM-403-SCAR');
+};
+
+window.addEventListener('message', function(event){
+  var data = event.data || {};
+  if(!data || typeof data !== 'object') return;
+  if(data.type === 'ec-form-runtime-dirty'){
+    setRuntimeGuard(data);
+    return;
+  }
+  if(data.type === 'ec-form-runtime-command-result' && data.request_id && window._ecRuntimePendingCommands){
+    var resolver = window._ecRuntimePendingCommands[data.request_id];
+    if(typeof resolver === 'function') resolver(data);
+  }
+});
+
+window.addEventListener('beforeunload', function(event){
+  if(!hasRuntimeDirtySession()) return;
+  var msg = runtimeGuardMessage();
+  event.preventDefault();
+  event.returnValue = msg;
+  return msg;
+});
+
+window._ecPendingPortalNavigate = null;
+window._ecBeforePortalNavigate = function(target){
+  target = target || {};
+  if(hasRuntimeDirtySession()){
+    runWithRuntimeGuard(function(){
+      if(typeof navigateTo === 'function') navigateTo(target.page, target.filter, true);
+    });
+    return true;
+  }
+  if(typeof editMode !== 'undefined' && editMode && typeof editingDoc !== 'undefined' && editingDoc){
+    var hasUnsaved = true;
+    try{
+      hasUnsaved = (typeof edHasUnsavedChanges === 'function')
+        ? edHasUnsavedChanges(editingDoc)
+        : (!!getEditedHtml(editingDoc) || !!edModified);
+    }catch(_err){
+      hasUnsaved = true;
+    }
+    if(hasUnsaved && typeof showUnsavedDialog === 'function'){
+      window._ecPendingPortalNavigate = { page:target.page || '', filter:target.filter };
+      showUnsavedDialog(editingDoc, null);
+      return true;
+    }
+  }
+  return false;
+};
 
 function pageEl(){ return document.getElementById('page-forms'); }
 function requestRender(){ var page = pageEl(); if(page) render(page); }
@@ -549,9 +759,14 @@ function loadAllocations(){
   });
 }
 
-function openFormWorkspace(formCode, allocationId){
+function openFormWorkspace(formCode, allocationId, bypassGuard){
+  if(!bypassGuard && hasRuntimeDirtySession()){
+    runWithRuntimeGuard(function(){ openFormWorkspace(formCode, allocationId, true); });
+    return;
+  }
   if(formCode) state.selectedFormCode = formCode;
   if(allocationId !== undefined && allocationId !== null) state.selectedAllocationId = allocationId || '';
+  resetRuntimeGuard();
   state.workspaceMode = 'form';
   state.workspaceLoading = true;
   requestRender();
@@ -564,10 +779,15 @@ function openFormWorkspace(formCode, allocationId){
   });
 }
 
-function openUploadWorkspace(allocationId, formCode){
+function openUploadWorkspace(allocationId, formCode, bypassGuard){
+  if(!bypassGuard && hasRuntimeDirtySession()){
+    runWithRuntimeGuard(function(){ openUploadWorkspace(allocationId, formCode, true); });
+    return;
+  }
   if(formCode) state.selectedFormCode = formCode;
   if(allocationId) state.selectedAllocationId = allocationId;
   state.pendingUploadSelection = allocationId ? { allocationId: allocationId, formCode: formCode || state.selectedFormCode || '' } : null;
+  resetRuntimeGuard();
   state.workspaceMode = 'upload';
   requestRender();
 }
@@ -605,7 +825,11 @@ function resolveRecordTypeForForm(form){
   return String(state.formToRecordType[base] || '').trim().toUpperCase();
 }
 
-function openEqmsRuntime(formCode, options){
+function openEqmsRuntime(formCode, options, bypassGuard){
+  if(!bypassGuard && hasRuntimeDirtySession()){
+    runWithRuntimeGuard(function(){ openEqmsRuntime(formCode, options, true); });
+    return;
+  }
   state.workspaceMode = 'eqms';
   state._eqmsOpenCode = formCode || '';
   state._eqmsOpenOptions = Object.assign({}, options || {});
@@ -614,12 +838,17 @@ function openEqmsRuntime(formCode, options){
   requestRender();
 }
 
-function openEqmsHub(){
+function openEqmsHub(bypassGuard){
+  if(!bypassGuard && hasRuntimeDirtySession()){
+    runWithRuntimeGuard(function(){ openEqmsHub(true); });
+    return;
+  }
   state.workspaceMode = 'eqms';
   state._eqmsOpenCode = '';
   state._eqmsOpenOptions = null;
   state._eqmsBuilderFormCode = '';
   state._eqmsBuilderOptions = null;
+  resetRuntimeGuard();
   requestRender();
   loadRegistry(false).then(function(){
     if(state.workspaceMode === 'eqms' && !state._eqmsOpenCode) requestRender();
@@ -665,7 +894,11 @@ function waitForDocViewerReady(docCode){
   });
 }
 
-function openEqmsTemplateEditor(formCode){
+function openEqmsTemplateEditor(formCode, bypassGuard){
+  if(!bypassGuard && hasRuntimeDirtySession()){
+    runWithRuntimeGuard(function(){ openEqmsTemplateEditor(formCode, true); });
+    return;
+  }
   var doc = resolveEqmsHtmlDocument(formCode);
   if(!doc || !doc.code){
     showToast(t('Chưa tìm thấy biểu mẫu HTML chuẩn để chỉnh sửa.', 'Could not find the governed HTML form template.'), 'warn');
@@ -1759,7 +1992,16 @@ function bindSidebar(container){
     var toolBtn = event.target.closest('[data-tool]');
     if(toolBtn){
       var mode = toolBtn.getAttribute('data-tool') || 'form';
-      state.workspaceMode = (state.workspaceMode === mode) ? 'form' : mode;
+      var nextMode = (state.workspaceMode === mode) ? 'form' : mode;
+      if(nextMode !== state.workspaceMode && hasRuntimeDirtySession()){
+        runWithRuntimeGuard(function(){
+          state.workspaceMode = nextMode;
+          render(container);
+          if(state.workspaceMode === 'work') loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') render(container); });
+        });
+        return;
+      }
+      state.workspaceMode = nextMode;
       render(container);
       if(state.workspaceMode === 'work') loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') render(container); });
       return;
@@ -1768,17 +2010,25 @@ function bindSidebar(container){
     var tabBtn = event.target.closest('[data-tab]');
     if(tabBtn){
       var tabMode = tabBtn.getAttribute('data-tab') || 'form';
-      if(tabMode !== state.workspaceMode){
-        state._formFolderInited = false;
-        state._eqmsOpenCode = '';
-        state._eqmsOpenOptions = null;
-        state._eqmsBuilderFormCode = '';
-        state._eqmsBuilderOptions = null;
+      var applyTabSwitch = function(){
+        if(tabMode !== state.workspaceMode){
+          state._formFolderInited = false;
+          state._eqmsOpenCode = '';
+          state._eqmsOpenOptions = null;
+          state._eqmsBuilderFormCode = '';
+          state._eqmsBuilderOptions = null;
+          resetRuntimeGuard();
+        }
+        state.workspaceMode = tabMode;
+        render(container);
+        if(tabMode === 'work') loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') render(container); });
+        if(tabMode === 'registry') loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') render(container); });
+      };
+      if(tabMode !== state.workspaceMode && hasRuntimeDirtySession()){
+        runWithRuntimeGuard(applyTabSwitch);
+        return;
       }
-      state.workspaceMode = tabMode;
-      render(container);
-      if(tabMode === 'work') loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') render(container); });
-      if(tabMode === 'registry') loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') render(container); });
+      applyTabSwitch();
     }
   };
 
@@ -1843,6 +2093,10 @@ window._renderOnlineFormsLegacy = function(formCode){
 };
 
 window._fhSwitchTab = function(target){
+  if(hasRuntimeDirtySession()){
+    runWithRuntimeGuard(function(){ window._fhSwitchTab(target); });
+    return;
+  }
   state.activeTab = target || '';
   if(target === 'record-id'){ state.workspaceMode = 'record-id'; requestRender(); return; }
   if(target === 'upload' || target === 'upload-verify'){ state.workspaceMode = 'upload'; requestRender(); return; }

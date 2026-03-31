@@ -1,8 +1,8 @@
 {
   "_meta": {
-    "version": "1.0",
+    "version": "1.1",
     "created": "2026-03-29",
-    "description": "Configuration for the 3-level order hierarchy: Sales Order (SO) > Job Order (JO) > Work Order (WO). Defines numbering formats, fields, role-based access, and status flows for aerospace CNC job shop operations."
+    "description": "Configuration for the 3-level order hierarchy: Sales Order (SO) > Job Order (JO) > Work Order (WO). Expanded to align promise management, engineering readiness, launch governance, and modern portal role mappings."
   },
   "levels": [
     "sales_order",
@@ -103,16 +103,23 @@
       "estimator",
       "customer_service",
       "quality_manager",
-      "planning_manager"
+      "planning_manager",
+      "production_planner",
+      "cnc_workshop_manager",
+      "engineering_manager",
+      "supply_chain_manager",
+      "admin"
     ],
     "roles_edit": [
       "sales_manager",
       "estimator",
-      "customer_service"
+      "customer_service",
+      "supply_chain_manager"
     ],
     "roles_create": [
       "sales_manager",
-      "estimator"
+      "estimator",
+      "customer_service"
     ],
     "roles_delete": [
       "sales_manager"
@@ -227,19 +234,32 @@
       "production_director",
       "production_manager",
       "planning_manager",
+      "production_planner",
       "supervisor",
+      "shift_leader",
       "quality_manager",
       "quality_engineer",
-      "sales_manager"
+      "sales_manager",
+      "engineering_manager",
+      "cnc_workshop_manager",
+      "supply_chain_manager",
+      "admin"
     ],
     "roles_edit": [
       "production_manager",
       "planning_manager",
-      "quality_manager"
+      "quality_manager",
+      "engineering_manager",
+      "production_planner",
+      "cnc_workshop_manager",
+      "supply_chain_manager"
     ],
     "roles_create": [
       "production_manager",
-      "planning_manager"
+      "planning_manager",
+      "engineering_manager",
+      "production_planner",
+      "cnc_workshop_manager"
     ],
     "roles_delete": [
       "production_manager"
@@ -384,20 +404,37 @@
       "production_director",
       "production_manager",
       "planning_manager",
+      "production_planner",
       "supervisor",
+      "shift_leader",
       "operator",
+      "cnc_operator",
+      "setup_technician",
       "quality_manager",
-      "quality_engineer"
+      "quality_engineer",
+      "qc_inspector",
+      "cnc_workshop_manager",
+      "admin"
     ],
     "roles_edit": [
       "production_manager",
       "planning_manager",
+      "production_planner",
       "supervisor",
-      "operator"
+      "shift_leader",
+      "operator",
+      "cnc_operator",
+      "setup_technician",
+      "quality_engineer",
+      "qc_inspector",
+      "cnc_workshop_manager"
     ],
     "roles_create": [
       "production_manager",
-      "planning_manager"
+      "planning_manager",
+      "production_planner",
+      "shift_leader",
+      "cnc_workshop_manager"
     ],
     "roles_delete": [
       "production_manager"

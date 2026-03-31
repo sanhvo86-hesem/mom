@@ -117,6 +117,9 @@ Mandatory behavior:
 2. `Hủy tạo form` must require a reason and must not hard-delete the issued record number.
 3. `Lưu nháp` stores the working payload without changing the issued number.
 4. `Gửi biểu mẫu` is the only action that creates the first official submission revision.
+5. If the user attempts to open another link, switch tab, or refresh the portal while the form has unfinished changes, the system must block the transition and present three explicit choices: `Lưu nháp rồi tiếp tục`, `Rời đi không lưu`, `Ở lại để xử lý tiếp`.
+6. The unsaved-data warning copy must explicitly instruct the user to save the draft before portal refresh, deployment reload, or any operation that may reload assets or pull updated content from Git.
+7. Runtime HTML forms and template HTML editing sessions must both implement the same unsaved-data guard policy; no path may silently drop in-progress changes.
 
 ---
 
