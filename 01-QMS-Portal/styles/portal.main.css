@@ -1411,3 +1411,6 @@ html,body{top:0 !important;margin-top:0 !important;padding-top:0 !important;}
 table { max-width: 100%; table-layout: auto; }
 td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 
+/* Hide sync indicator and offline bar */
+#qms-sync-indicator, #qms-offline-bar { display: none !important; }
+

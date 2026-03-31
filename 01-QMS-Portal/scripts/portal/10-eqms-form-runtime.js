@@ -20,10 +20,19 @@ var esc = function(v){ var d=document.createElement('div'); d.appendChild(docume
 
 function api(action, payload, method){
   if(typeof apiCall === 'function') return apiCall(action, payload || {}, method || 'GET', 30000);
-  var opts = { method: method || 'GET', credentials:'include', headers:{} };
+  var httpMethod = method || 'GET';
+  var url = 'api.php?action=' + encodeURIComponent(action);
+  /* Append payload as query params for GET requests */
+  if(httpMethod === 'GET' && payload){
+    Object.keys(payload).forEach(function(k){
+      if(payload[k] !== undefined && payload[k] !== null && payload[k] !== '')
+        url += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(payload[k]);
+    });
+  }
+  var opts = { method: httpMethod, credentials:'include', headers:{} };
   if(typeof csrfToken !== 'undefined' && csrfToken) opts.headers['X-CSRF-Token'] = csrfToken;
-  if((method||'GET')!=='GET'){ opts.headers['Content-Type']='application/json'; opts.body=JSON.stringify(payload||{}); }
-  return fetch('api.php?action='+encodeURIComponent(action),opts).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); });
+  if(httpMethod !== 'GET'){ opts.headers['Content-Type']='application/json'; opts.body=JSON.stringify(payload||{}); }
+  return fetch(url, opts).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); });
 }
 
 function toast(msg, type){
@@ -66,20 +75,25 @@ var state = {
 
 /* ── Schema Loading ── */
 function loadSchema(formCode){
-  /* Try form_fill_load_schema first, fallback to online_form_schema */
+  /* Try all 3 methods in sequence until one succeeds */
   return api('form_fill_load_schema', { form_code: formCode }, 'GET').then(function(resp){
     if(resp && resp.ok && resp.schema) return resp.schema;
-    return null;
+    /* apiCall returned ok:false — try direct fetch */
+    throw new Error('api_returned_not_ok');
   }).catch(function(){
-    /* Fallback: try online_form_schema endpoint */
-    return api('online_form_schema', { code: formCode }, 'GET').then(function(resp){
-      if(resp && resp.ok && resp.schema) return resp.schema;
-      /* Last fallback: try direct fetch of schema JSON */
-      return fetch('qms-data/online-forms/schemas/' + encodeURIComponent(formCode) + '.json', { credentials:'include' })
-        .then(function(r){ return r.ok ? r.json() : null; })
-        .catch(function(){ return null; });
-    }).catch(function(){ return null; });
-  });
+    /* Direct fetch with proper query params */
+    return fetch('api.php?action=form_fill_load_schema&form_code=' + encodeURIComponent(formCode), { credentials:'include' })
+      .then(function(r){ return r.json(); })
+      .then(function(resp){
+        if(resp && resp.ok && resp.schema) return resp.schema;
+        throw new Error('direct_fetch_not_ok');
+      });
+  }).catch(function(){
+    /* Last resort: fetch JSON file directly */
+    return fetch('qms-data/online-forms/schemas/' + encodeURIComponent(formCode) + '.json', { credentials:'include' })
+      .then(function(r){ if(!r.ok) throw new Error('file_not_found'); return r.json(); })
+      .then(function(schema){ return (schema && schema.form_code) ? schema : null; });
+  }).catch(function(){ return null; });
 }
 
 function loadEntry(formCode, allocationId, entryId){
@@ -291,7 +305,7 @@ function renderForm(container){
     html += '<div class="eqms-section">' +
       '<div class="eqms-section-head">' +
         '<div class="eqms-section-num">S</div>' +
-        '<div><div class="eqms-section-title">' + esc(t('Chu ky dien tu', 'Electronic signatures')) + '</div></div>' +
+        '<div><div class="eqms-section-title">Electronic Signatures</div></div>' +
       '</div>' +
       '<div class="eqms-sig-grid">';
     sigBlocks.forEach(function(block){
