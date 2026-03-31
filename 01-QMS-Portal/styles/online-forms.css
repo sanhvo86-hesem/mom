@@ -2870,6 +2870,68 @@ textarea.ec-dialog-input {
   border-left: 3px solid var(--ec-primary-light);
 }
 
+/* ── Standalone form edit toolbar ── */
+.ec-edit-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  background: #fffbeb;
+  border: 1px solid #fbbf24;
+  border-radius: var(--ec-radius) var(--ec-radius) 0 0;
+  margin-bottom: -1px;
+  gap: 12px;
+}
+.ec-edit-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ec-edit-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ec-edit-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  background: #f59e0b;
+  color: #fff;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.ec-edit-indicator::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  animation: ec-pulse 1.5s infinite;
+}
+@keyframes ec-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .3; }
+}
+.ec-edit-form-code {
+  font-family: var(--ec-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: #92400e;
+}
+.ec-doc-action.editing {
+  background: #f59e0b;
+  border-color: #f59e0b;
+  color: #fff;
+}
+.ec-doc-action.editing:hover {
+  background: #d97706;
+}
+
 /* ── Form description bar ── */
 .ec-form-desc {
   font-size: 12px;

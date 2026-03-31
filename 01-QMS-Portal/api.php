@@ -15089,6 +15089,47 @@ if ($username === '') {
     api_json(['ok' => true, 'schema' => $schema]);
   }
 
+  case 'form_standalone_save': {
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $formCode = trim((string)($body['form_code'] ?? ''));
+    $html = (string)($body['html'] ?? '');
+    if ($formCode === '' || strlen($html) < 100) api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
+    if (!preg_match('/^[A-Za-z0-9._-]+$/', $formCode)) api_json(['ok' => false, 'error' => 'invalid_form_code'], 400);
+
+    $runtimeDir = $ROOT_DIR . '/form-runtimes';
+    $target = $runtimeDir . '/frm-' . strtolower(str_replace(['FRM-','frm-'], '', $formCode)) . '-*.html';
+    $candidates = glob($target);
+    if (empty($candidates)) {
+      $safeName = 'frm-' . strtolower(preg_replace('/[^a-z0-9-]/i', '', str_replace('FRM-', '', $formCode))) . '.html';
+      $targetFile = $runtimeDir . '/' . $safeName;
+    } else {
+      $targetFile = $candidates[0];
+    }
+
+    $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+
+    /* Backup current version */
+    if (is_file($targetFile)) {
+      $backupDir = $runtimeDir . '/_archive';
+      ensure_dir($backupDir);
+      $backupName = basename($targetFile, '.html') . '_' . date('YmdHis') . '.html';
+      copy($targetFile, $backupDir . '/' . $backupName);
+    }
+
+    /* Write new version */
+    file_put_contents($targetFile, $html);
+
+    api_json([
+      'ok' => true,
+      'file' => basename($targetFile),
+      'size' => strlen($html),
+      'saved_by' => $username,
+      'saved_at' => now_iso(),
+    ]);
+  }
+
   case 'form_schema_history': {
     require_logged_in($store);
     $code = trim((string)($_GET['form_code'] ?? $_GET['code'] ?? ''));

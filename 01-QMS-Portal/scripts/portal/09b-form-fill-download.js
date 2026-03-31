@@ -62,6 +62,7 @@ var ws = {
   lookupInstances: {},
   draftKey: '',
   uploadFiles: [],
+  standaloneEditMode: false,
   allocBusy: false,
   allocDept: '',
   allocNotes: '',
@@ -294,6 +295,7 @@ function resetWorkspaceForForm(form){
   ws.allocDept = '';
   ws.allocNotes = '';
   ws.allocError = null;
+  ws.standaloneEditMode = false;
 }
 
 function checklistStage(allocation){
@@ -920,6 +922,111 @@ function flashActionButton(button, temporaryLabel, fallbackLabel){
     button.textContent = original;
     button.disabled = false;
   }, 1500);
+}
+
+/* ── Standalone HTML edit mode ────────────────────────────────────
+   For standalone HTML forms (like FRM-403), Edit doesn't open a
+   separate builder — it switches the SAME iframe to edit mode so
+   View, Edit, and Print all share identical layout.
+   ──────────────────────────────────────────────────────────────── */
+
+function toggleStandaloneEditMode(form, allocation, container){
+  var iframe = container.querySelector('.ec-runtime-frame');
+  if(!iframe){ toast(t('Không tìm thấy biểu mẫu.','Form not found.'),'error'); return; }
+
+  var isEditing = ws.standaloneEditMode;
+  ws.standaloneEditMode = !isEditing;
+
+  /* Toggle iframe data-mode */
+  try {
+    var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    if(iframeDoc && iframeDoc.body){
+      iframeDoc.body.setAttribute('data-mode', ws.standaloneEditMode ? 'edit' : 'view');
+    }
+  } catch(e){
+    /* cross-origin: reload with mode param */
+    var src = iframe.src || '';
+    src = src.replace(/[&?]_mode=[^&]*/g, '');
+    iframe.src = src + (src.indexOf('?') >= 0 ? '&' : '?') + '_mode=' + (ws.standaloneEditMode ? 'edit' : 'view');
+  }
+
+  /* Update edit button appearance */
+  var editBtn = document.getElementById('ec-edit-form-btn');
+  if(editBtn){
+    if(ws.standaloneEditMode){
+      editBtn.innerHTML = '\u2713 ' + esc(t('Xong chỉnh sửa', 'Done editing'));
+      editBtn.classList.add('editing');
+    } else {
+      editBtn.innerHTML = '\u270E ' + esc(t('Chỉnh sửa', 'Edit'));
+      editBtn.classList.remove('editing');
+    }
+  }
+
+  /* Show/hide the edit toolbar above iframe */
+  var existingToolbar = container.querySelector('.ec-edit-toolbar');
+  if(ws.standaloneEditMode && !existingToolbar){
+    var toolbar = document.createElement('div');
+    toolbar.className = 'ec-edit-toolbar';
+    toolbar.innerHTML = '<div class="ec-edit-toolbar-left">' +
+      '<span class="ec-edit-indicator">' + esc(t('Đang chỉnh sửa', 'Editing')) + '</span>' +
+      '<span class="ec-edit-form-code">' + esc(form.form_code || '') + '</span>' +
+    '</div>' +
+    '<div class="ec-edit-toolbar-right">' +
+      '<button type="button" class="ec-btn secondary" data-action="save-form-html">' + esc(t('Lưu thay đổi', 'Save changes')) + '</button>' +
+      '<button type="button" class="ec-btn ghost" data-action="discard-form-html">' + esc(t('Hủy', 'Discard')) + '</button>' +
+    '</div>';
+    var shell = container.querySelector('.ec-runtime-shell');
+    if(shell) shell.insertBefore(toolbar, shell.querySelector('.ec-runtime-frame'));
+
+    /* Bind toolbar actions */
+    toolbar.querySelector('[data-action="save-form-html"]').onclick = function(){
+      saveStandaloneFormHtml(form, iframe);
+    };
+    toolbar.querySelector('[data-action="discard-form-html"]').onclick = function(){
+      ws.standaloneEditMode = false;
+      renderWorkspace(form, allocation, container);
+    };
+  } else if(!ws.standaloneEditMode && existingToolbar){
+    existingToolbar.remove();
+  }
+
+  toast(ws.standaloneEditMode
+    ? t('Chế độ chỉnh sửa đã bật. Thay đổi trực tiếp trên biểu mẫu.', 'Edit mode enabled. Make changes directly on the form.')
+    : t('Đã thoát chế độ chỉnh sửa.', 'Exited edit mode.'),
+    'info');
+}
+
+function saveStandaloneFormHtml(form, iframe){
+  var html = '';
+  try {
+    var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    html = iframeDoc.documentElement.outerHTML;
+  } catch(e){
+    toast(t('Không thể đọc nội dung biểu mẫu.', 'Could not read form content.'), 'error');
+    return;
+  }
+  if(!html || html.length < 100){
+    toast(t('Nội dung biểu mẫu trống.', 'Form content is empty.'), 'error');
+    return;
+  }
+
+  var saveBtn = document.querySelector('[data-action="save-form-html"]');
+  if(saveBtn) saveBtn.disabled = true;
+
+  api('form_standalone_save', {
+    form_code: form.form_code,
+    html: html
+  }, 'POST').then(function(resp){
+    if(resp && resp.ok){
+      toast(t('Đã lưu biểu mẫu thành công.', 'Form saved successfully.'), 'success');
+    } else {
+      toast(t('Không thể lưu: ', 'Could not save: ') + (resp && resp.error || ''), 'error');
+    }
+  }).catch(function(){
+    toast(t('Lỗi kết nối khi lưu.', 'Connection error while saving.'), 'error');
+  }).finally(function(){
+    if(saveBtn) saveBtn.disabled = false;
+  });
 }
 
 function loadVersionHistory(form){
@@ -2585,6 +2692,12 @@ function bindWorkspace(form, allocation, container){
 
   var editBtn = document.getElementById('ec-edit-form-btn');
   if(editBtn) editBtn.onclick = function(){
+    /* Standalone HTML forms: open the same HTML in edit mode inside the iframe */
+    if(standaloneOnlinePath(form)){
+      toggleStandaloneEditMode(form, allocation, container);
+      return;
+    }
+    /* Schema-based forms: open the form builder engine */
     if(typeof window._renderFormBuilder === 'function'){
       window._renderFormBuilder(form, container);
     } else {
@@ -2593,7 +2706,14 @@ function bindWorkspace(form, allocation, container){
   };
 
   var printBtn = document.getElementById('ec-print-form-btn');
-  if(printBtn) printBtn.onclick = function(){ window.print(); };
+  if(printBtn) printBtn.onclick = function(){
+    /* For standalone forms: print the iframe content */
+    var iframe = container.querySelector('.ec-runtime-frame');
+    if(iframe && iframe.contentWindow){
+      try { iframe.contentWindow.print(); return; } catch(e){}
+    }
+    window.print();
+  };
 
   Array.prototype.forEach.call(container.querySelectorAll('[data-navigate-doc]'), function(link){
     link.onclick = function(e){
