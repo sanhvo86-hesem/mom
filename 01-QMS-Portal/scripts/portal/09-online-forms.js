@@ -948,12 +948,12 @@ function render(container){
   var workCount = state.workQueue.loaded ? ((state.workQueue.pending || []).length + (state.workQueue.exceptions || []).length) : 0;
   container.innerHTML =
     '<div class="ec-tabs" id="ec-tabs">' +
-      '<button type="button" class="ec-tab' + (state.workspaceMode === 'form' ? ' active' : '') + '" data-tab="form">' + esc(t('Biểu mẫu', 'Forms')) + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'work' ? ' active' : '') + '" data-tab="work">' + esc(t('Việc của tôi', 'My Work')) + (workCount ? '<span class="ec-tab-badge">' + workCount + '</span>' : '') + '</button>' +
+      '<button type="button" class="ec-tab' + (state.workspaceMode === 'form' ? ' active' : '') + '" data-tab="form">' + esc(t('Biểu mẫu', 'Forms')) + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'upload' ? ' active' : '') + '" data-tab="upload">' + esc(t('Tải lên', 'Upload')) + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'record-id' ? ' active' : '') + '" data-tab="record-id">' + esc(t('Tạo mã', 'Record ID')) + '</button>' +
     '</div>' +
-    '<div class="ec-shell">' + renderSidebar() + '<div class="ec-workspace" id="ec-workspace"></div></div>' +
+    '<div class="ec-shell">' + (state.workspaceMode === 'form' ? renderSidebar() : '') + '<div class="ec-workspace' + (state.workspaceMode !== 'form' ? ' ec-workspace-full' : '') + '" id="ec-workspace"></div></div>' +
     '<button type="button" class="ec-sidebar-toggle" id="ec-sidebar-toggle" aria-label="' + esc(t('Mở/đóng danh mục','Toggle catalog')) + '">\u2630</button>';
   bindSidebar(container);
   renderWorkspacePane();

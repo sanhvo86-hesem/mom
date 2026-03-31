@@ -1,0 +1,57 @@
+{
+  "form_code": "FRM-514",
+  "title": "Quick Changeover Record (SMED)",
+  "title_vi": "Phiếu chuyển đổi nhanh SMED",
+  "version": "V1",
+  "category": "production",
+  "frequency": "per_event",
+  "sop_ref": "SOP-504",
+  "description": "Ghi nhận thời gian và các bước chuyển đổi nhanh (SMED) giữa các công việc, phân tích nội bộ/ngoại bộ để cải tiến.",
+  "roles_allowed": ["admin", "production_manager", "shift_leader", "cnc_operator", "process_engineer"],
+  "fields": [
+    {"id": "date", "type": "date", "label": "Ngày", "label_en": "Date", "required": true, "default": "today"},
+    {"id": "machine_id", "type": "text", "label": "Mã máy", "label_en": "Machine ID", "required": true, "placeholder": "VD: CNC-01"},
+    {"id": "from_job", "type": "text", "label": "Từ Job", "label_en": "From Job", "required": true},
+    {"id": "to_job", "type": "text", "label": "Đến Job", "label_en": "To Job", "required": true},
+    {"id": "from_part", "type": "text", "label": "Từ chi tiết", "label_en": "From Part", "required": true},
+    {"id": "to_part", "type": "text", "label": "Đến chi tiết", "label_en": "To Part", "required": true},
+    {"id": "changeover_start", "type": "time", "label": "Giờ bắt đầu chuyển đổi", "label_en": "Changeover Start", "required": true},
+    {"id": "changeover_end", "type": "time", "label": "Giờ kết thúc chuyển đổi", "label_en": "Changeover End", "required": true},
+    {
+      "id": "internal_tasks",
+      "type": "table",
+      "label": "Công việc nội bộ (máy dừng)",
+      "label_en": "Internal Tasks (Machine Stopped)",
+      "min_rows": 1,
+      "max_rows": 20,
+      "columns": [
+        {"id": "task", "type": "text", "label": "Công việc", "width": "70%", "required": true},
+        {"id": "time_minutes", "type": "number", "label": "Thời gian (phút)", "width": "30%", "required": true, "min": 0}
+      ]
+    },
+    {
+      "id": "external_tasks",
+      "type": "table",
+      "label": "Công việc ngoại bộ (máy đang chạy)",
+      "label_en": "External Tasks (Machine Running)",
+      "min_rows": 0,
+      "max_rows": 20,
+      "columns": [
+        {"id": "task", "type": "text", "label": "Công việc", "width": "70%", "required": true},
+        {"id": "time_minutes", "type": "number", "label": "Thời gian (phút)", "width": "30%", "required": true, "min": 0}
+      ]
+    },
+    {"id": "total_internal", "type": "number", "label": "Tổng thời gian nội bộ (phút)", "label_en": "Total Internal (min)", "required": true, "min": 0},
+    {"id": "total_external", "type": "number", "label": "Tổng thời gian ngoại bộ (phút)", "label_en": "Total External (min)", "required": true, "min": 0},
+    {"id": "target_time", "type": "number", "label": "Thời gian mục tiêu (phút)", "label_en": "Target Time (min)", "required": true, "min": 0},
+    {"id": "improvement_notes", "type": "textarea", "label": "Ghi chú cải tiến", "label_en": "Improvement Notes", "rows": 3, "placeholder": "Đề xuất cải tiến để giảm thời gian chuyển đổi..."},
+    {"id": "operator_id", "type": "text", "label": "Người vận hành", "label_en": "Operator", "required": true}
+  ],
+  "auto_fields": ["submitted_by", "submitted_at", "entry_id"],
+  "computed_fields": [
+    {"id": "duration_minutes", "formula": "time_diff(changeover_start, changeover_end)", "label": "Tổng thời gian chuyển đổi (phút)"}
+  ],
+  "notifications": {
+    "on_submit": ["production_manager", "process_engineer"]
+  }
+}

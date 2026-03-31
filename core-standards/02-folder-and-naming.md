@@ -64,18 +64,17 @@ qms.hesem.com.vn/
 │   └── 03-Reference/                       → Tài liệu tham chiếu (ANNEX)
 │       ├── 00-LEGACY-REF/                  → Tài liệu tham chiếu cũ (legacy)
 │       ├── 01-ANNEX-100/                   → Series 100: Nền tảng & kiểm soát
-│       │   ├── 10-ANNEX-100-Foundation-Maps-and-Control/
-│       │   ├── 11-ANNEX-110-Digital-Control-and-Resilience/
-│       │   ├── 12-ANNEX-120-Authority-KPI-and-Deputy-Control/
-│       │   └── 13-ANNEX-130-M365-Records-Control/
-│       ├── 02-ANNEX-200/                   → Series 200: Thương mại
-│       ├── 03-ANNEX-300/                   → Series 300: Kỹ thuật
-│       ├── 04-ANNEX-400/                   → Series 400: Chuỗi cung ứng
-│       ├── 05-ANNEX-500/                   → Series 500: Sản xuất
-│       ├── 06-ANNEX-600/                   → Series 600: Chất lượng
-│       ├── 07-ANNEX-700/                   → Series 700: Kho & logistics
-│       ├── 08-ANNEX-800/                   → Series 800: Nhân sự & EHS
-│       └── 09-ANNEX-900/                   → Series 900: Cải tiến
+│       │   ├── 10-ANNEX-100-Foundation-Maps-and-Control/  → Sơ đồ truy cập, org chart, process map, ISO matrix, audit pack, KPI dictionary
+│       │   ├── 11-ANNEX-110-Digital-Control-and-Resilience/  → Climate context, go-live runbook, Epicor interface, escalation matrix, offline fallback, change roadmap
+│       │   ├── 12-ANNEX-120-Authority-KPI-and-Deputy-Control/  → Authority matrix, RACI master, KPI cascade, deputy backup, dashboard evidence
+│       │   └── 13-ANNEX-130-M365-Records-Control/  → Metadata schema, workflow approval, SharePoint topology, permissions architecture, file plan, source sync, naming convention
+│       ├── 03-ANNEX-300/                   → Series 300: Kỹ thuật — Setup sheet standard, approved materials list
+│       ├── 04-ANNEX-400/                   → Series 400: Chuỗi cung ứng — Supplier risk model, outsource process pack, approved processor list
+│       ├── 05-ANNEX-500/                   → Series 500: Sản xuất — Dispatch capacity, gate MRR, CNC operating model, tier meeting, put-thru index, FOD prevention, poka-yoke
+│       ├── 06-ANNEX-600/                   → Series 600: Chất lượng — AQL method, MSA criteria, quality package levels, control plan, SPC, surface finish, quality culture, SEMI standards
+│       ├── 07-ANNEX-700/                   → Series 700: Kho & logistics — SSCC data dictionary, packaging labeling spec, warehouse FIFO rules
+│       ├── 08-ANNEX-800/                   → Series 800: Nhân sự & EHS — Competency levels, collective bargaining, PPE & hazard matrix
+│       └── 09-ANNEX-900/                   → Series 900: Cải tiến (chưa có tài liệu)
 │
 ├── 04-Bieu-Mau/                            → Biểu mẫu (Forms — Excel .xlsx)
 │   ├── 00-FORM-DESIGN-SYSTEM/              → Hệ thống thiết kế form
@@ -355,6 +354,25 @@ Mọi thư mục dùng prefix 2 chữ số:
 | `.` (period — chỉ cho đuôi file) | Unicode ngoài ASCII |
 
 **Quy tắc tuyệt đối:** Tên file và thư mục **KHÔNG BAO GIỜ** chứa dấu tiếng Việt hoặc ký tự Unicode ngoài ASCII.
+
+### C4. Ghi chú nội dung thư mục (BẮT BUỘC)
+
+Mỗi thư mục chứa tài liệu **PHẢI** có ghi chú nội dung mô tả tài liệu bên trong. Có 2 cách thực hiện:
+
+**Cách 1 — Ghi chú inline trong cây thư mục (core-standards/02-folder-and-naming.md):**
+Sử dụng ký hiệu `→` sau tên thư mục để mô tả nội dung chính:
+```
+├── 06-ANNEX-600/  → Series 600: Chất lượng — AQL method, MSA criteria, quality package levels, control plan, SPC, surface finish
+```
+
+**Cách 2 — File `index.html` trong thư mục:**
+Tạo file `index.html` liệt kê các tài liệu trong thư mục kèm mô tả ngắn.
+
+**Quy tắc:**
+- Mọi thư mục series (SOP, WI, ANNEX, FRM) **PHẢI** có ghi chú nội dung bằng ít nhất 1 trong 2 cách trên
+- Ghi chú phải liệt kê tên viết tắt hoặc chủ đề chính của các tài liệu bên trong
+- Khi thêm hoặc xóa tài liệu khỏi thư mục, ghi chú **PHẢI** được cập nhật tương ứng
+- Ghi chú sử dụng tiếng Anh hoặc song ngữ, không dùng tiếng Việt thuần
 
 ---
 

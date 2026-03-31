@@ -6,7 +6,7 @@
   "category": "quality",
   "frequency": "per_event",
   "sop_ref": "SOP-401",
-  "standalone_html": "./form-runtimes/frm-403-scar.html",
+  "standalone_html": "../../../../04-Bieu-Mau/04-FRM-400/frm-403-scar.html",
   "description": "Ghi nhận yêu cầu hành động khắc phục đối với nhà cung cấp khi phát hiện lỗi chất lượng hoặc giao hàng.",
   "roles_allowed": ["admin", "qa_manager", "quality_engineer", "supply_chain_manager", "buyer"],
   "fields": [

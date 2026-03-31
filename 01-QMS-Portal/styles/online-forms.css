@@ -144,10 +144,12 @@
   display: grid;
   grid-template-columns: var(--ec-sidebar-w) minmax(0, 1fr);
   gap: 0;
-  min-height: calc(100vh - 60px);
+  min-height: calc(100vh - 100px);
   background: var(--ec-bg);
   font-family: var(--ec-font);
 }
+.ec-workspace-full { grid-column: 1 / -1; }
+.ec-shell:not(:has(.ec-sidebar)) { grid-template-columns: 1fr; }
 
 /* ── Sidebar ── */
 .ec-sidebar {
