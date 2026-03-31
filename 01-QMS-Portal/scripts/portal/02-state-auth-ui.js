@@ -2468,8 +2468,8 @@ function openCreateDocModalQuick(){
         <input id="qc-code" type="text" placeholder="VD: PROC-CNC-003" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px" autofocus>
       </div>
       <div class="modal-field" style="margin-top:8px">
-        <label>${lang==='en'?'Title':'Tiêu đề'}</label>
-        <input id="qc-title" type="text" placeholder="${lang==='en'?'Document title':'Tên tài liệu'}" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px">
+        <label>${lang==='en'?'English standard title / file name':'Tên file / tiêu đề chuẩn'}</label>
+        <input id="qc-title" type="text" placeholder="${lang==='en'?'English standard title':'Tên file / tiêu đề chuẩn tiếng Anh'}" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px">
       </div>
       <div class="modal-field" style="margin-top:8px">
         <label>${lang==='en'?'Owner':'Chủ sở hữu'}</label>
@@ -2564,7 +2564,7 @@ function openDocEditMenu(event, code){
   event.stopPropagation();
   document.querySelectorAll('.fm-context-menu').forEach(m=>m.remove());
   const doc = DOCS.find(d=>d.code===code) || {};
-  const standardTitle = getDocDisplayTitle(doc) || String(doc.title || '').trim() || code;
+  const standardTitle = getDocStandardTitle(doc) || String(doc.title || '').trim() || code;
   const menu = document.createElement('div');
   menu.className = 'fm-context-menu';
   menu.style.cssText = `position:fixed;top:${event.clientY}px;left:${event.clientX}px;z-index:9999;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.15);padding:6px 0;min-width:180px`;
@@ -2694,8 +2694,8 @@ function ensureEnglishStandardTitle(title){
 function openDocEditDialog(code){
   document.querySelectorAll('.fm-context-menu').forEach(m=>m.remove());
   const doc = DOCS.find(d=>d.code===code) || {};
-  const standardTitle = getDocDisplayTitle(doc) || String(doc.title || '').trim() || code;
-  const desc = getDocDesc(code);
+  const standardTitle = getDocStandardTitle(doc) || String(doc.title || '').trim() || code;
+  const desc = String(getDocDesc(code) || getDocDisplayDescription(doc) || '').trim();
   const curIcon = getDocIcon(code);
   const modal = document.createElement('div');
   modal.className = 'modal-overlay';
@@ -2721,7 +2721,7 @@ function openDocEditDialog(code){
         </div>
 
         <div class="modal-field" style="margin-top:10px">
-          <label>${lang==='en'?'English standard title / file name':'Tên file chuẩn tiếng Anh'}</label>
+          <label>${lang==='en'?'English standard title / file name':'Tên file / tiêu đề chuẩn'}</label>
           <input id="de-title" data-original="${escapeHtml(standardTitle)}" type="text" value="${escapeHtml(standardTitle)}" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px">
         </div>
 
@@ -2730,7 +2730,7 @@ function openDocEditDialog(code){
           <textarea id="de-desc" rows="2" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;resize:vertical;font-size:13px" placeholder="${lang==='en'?'Brief Vietnamese description':'Mô tả ngắn bằng tiếng Việt'}">${escapeHtml(desc)}</textarea>
         </div>
 
-        <div style="margin-top:8px;font-size:10px;color:var(--text-3)">⚠️ ${lang==='en'?'Code + English standard title are SSOT. Changing this field renames the physical file and updates cross-references automatically.':'Mã + tên file chuẩn tiếng Anh là SSOT. Đổi trường này sẽ đổi tên file thật và cập nhật liên kết chéo tự động.'}</div>
+        <div style="margin-top:8px;font-size:10px;color:var(--text-3)">⚠️ ${lang==='en'?'Document code + English standard title are SSOT for filename and header title. Vietnamese description syncs to the header note.':'Mã tài liệu + tên file / tiêu đề chuẩn là SSOT cho filename và title header. Mô tả tiếng Việt đồng bộ vào ghi chú trên header.'}</div>
       </div>
       <div class="modal-actions">
         <button class="btn-admin" onclick="document.getElementById('doc-edit-modal')?.remove()">${lang==='en'?'Cancel':'Hủy'}</button>
@@ -2747,25 +2747,22 @@ async function doSaveDocEdit(oldCode){
   const newTitle = (titleEl?.value||'').trim();
   const originalTitle = (titleEl?.dataset?.original||'').trim();
   const desc = (document.getElementById('de-desc')?.value||'').trim();
+  const currentDocMeta = DOCS.find(d=>d.code===oldCode) || {};
+  const originalDesc = String(getDocDesc(oldCode) || getDocDisplayDescription(currentDocMeta) || '').trim();
   if(!newCode){
     showToast(lang==='en'?'⚠ Missing document code':'⚠ Thiếu mã tài liệu');
     return;
   }
   if(!ensureEnglishStandardTitle(newTitle)) return;
 
-  // Save doc description
-  if(desc !== getDocDesc(oldCode)){
-    DOC_DESCS[oldCode] = desc;
-    try{ await apiCall('save_doc_description', {code: oldCode, description: desc}); }catch(e){}
-  }
-
   const codeChanged = newCode !== oldCode;
   const titleChanged = newTitle !== originalTitle;
+  const descChanged = desc !== originalDesc;
 
-  // Rename file + sync header title when code or standard title changes
-  if(codeChanged || titleChanged){
+  // Rename file + sync header title when code, standard title, or header note changes
+  if(codeChanged || titleChanged || descChanged){
     try {
-      const res = await apiCall('rename_doc', {old_code: oldCode, new_code: newCode, new_title: newTitle});
+      const res = await apiCall('rename_doc', {old_code: oldCode, new_code: newCode, new_title: newTitle, new_desc: desc});
       if(res && res.ok){
         showToast(`✅ ${lang==='en'?'Saved':'Đã lưu'}`);
         document.getElementById('doc-edit-modal')?.remove();

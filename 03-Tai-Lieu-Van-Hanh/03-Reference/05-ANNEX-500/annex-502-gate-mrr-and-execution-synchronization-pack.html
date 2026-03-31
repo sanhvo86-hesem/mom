@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANNEX-502 — MRR theo cổng kiểm soát, điều kiện đồng bộ thực thi và rule bàn giao G0–G7 | HESEM QMS</title>
+<title>ANNEX-502 - Gate MRR and Execution Synchronization Pack | HESEM QMS</title>
 <link rel="stylesheet" href="../../../assets/style.css">
 
 <style>
@@ -57,8 +57,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
  </div>
  </div>
  <div class="title">
-<span class="doc-code">ANNEX-502</span>
-<strong class="doc-name">MRR theo cổng kiểm soát, điều kiện đồng bộ thực thi và rule bàn giao G0–G7</strong>
+<strong class="doc-name">Gate MRR and Execution Synchronization Pack</strong>
 </div>
  <div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">ANNEX-502</span></div>
 <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
@@ -68,7 +67,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
  </div>
  
  <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng để tra matrix cổng kiểm soát và MRR cho mọi lệnh sản xuất CNC từ RFQ đến giao hàng. <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span>, Kỹ thuật, <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a>, Sản xuất, <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span> và Người đánh giá phải dùng cùng một matrix này khi kiểm cổng kiểm soát và khi bàn giao hồ sơ.</div>
- <h1>ANNEX-502 — MRR theo cổng kiểm soát, điều kiện đồng bộ thực thi và rule bàn giao G0–G7</h1>
+ <h1>ANNEX-502 - Gate MRR and Execution Synchronization Pack</h1>
  
 <div class="section"><h2>1. Mục đích, cách dùng và ranh giới</h2>
 <p>ANNEX này là bộ matrix dùng chung để đồng bộ <strong>cổng kiểm soát, MRR, bàn giao field, vai trò quyền sở hữu và điều kiện đồng bộ dữ liệu</strong> từ G0 đến G7. ANNEX này <strong>không thay</strong> WI vận hành tại Point-of-use. Người sử dụng tra ANNEX này để biết mỗi cổng kiểm soát cần bộ hồ sơ nào, ai được quyền mở/giữ/nhả cổng kiểm soát, phải bàn giao trường dữ liệu nào và khi nào phải dừng vì lệch phiên bản hoặc lệch nguồn dữ liệu.</p>

@@ -970,13 +970,16 @@ class DocumentController extends BaseController
     {
         $safeTitle = htmlspecialchars($title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $safeCode  = htmlspecialchars($code, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        $safeOwner = htmlspecialchars($owner !== '' ? $owner : 'QA/QMS', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         $folderTrim = trim($folder, '/');
         $depth = ($folderTrim === '') ? 0 : count(array_filter(explode('/', $folderTrim)));
-        $rootHref  = str_repeat('../', $depth) . '01-QMS-Portal/portal.html';
-        $assetsCss = str_repeat('../', $depth) . 'assets/style.css';
-        $assetsJs  = str_repeat('../', $depth) . 'assets/app.js';
+        $rootBase  = str_repeat('../', $depth);
+        $rootHref  = $rootBase . '01-QMS-Portal/portal.html';
+        $assetsCss = $rootBase . 'assets/style.css';
+        $assetsJs  = $rootBase . 'assets/app.js';
+        $logoHref  = $rootBase . 'assets/hesem-logo.svg';
+        $ownerHtml = $this->buildHeaderActorClusterHtml($rootBase, $owner !== '' ? $owner : 'QA/QMS', true);
+        $approverHtml = $this->buildHeaderActorClusterHtml($rootBase, 'CEO', false);
 
         return '<!DOCTYPE html>' . "\n" .
             '<html lang="vi">' . "\n" .
@@ -988,17 +991,16 @@ class DocumentController extends BaseController
             '</head>' . "\n" .
             '<body>' . "\n" .
             '<div class="container"><div class="page"><div class="page-body"><div class="form-header">' . "\n" .
-            '<div class="fh-left"> <a class="brand-logo" href="' . $rootHref . '"><img alt="HESEM Logo" src="https://hesem.com.vn/wp-content/uploads/hesem-logo.svg"/></a>' . "\n" .
-            '<div class="fh-company"> <a href="' . $rootHref . '">HESEM ENGINEERING</a> <span>T&agrave;i li&#7879;u ki&#7875;m so&aacute;t</span> </div>' . "\n" .
+            '<div class="fh-left"> <a class="brand-logo" href="' . $rootHref . '"><img alt="HESEM Logo" src="' . $logoHref . '"/></a>' . "\n" .
             '</div>' . "\n" .
-            '<div class="title"> <span class="doc-code">' . $safeCode . '</span><strong class="doc-name">' . $safeTitle . '</strong>' . "\n" .
+            '<div class="title"> <strong class="doc-name">' . $safeTitle . '</strong>' . "\n" .
             '<span class="sub-vn">T&agrave;i li&#7879;u m&#7899;i (Draft)</span> <span class="muted">So&#7841;n th&#7843;o n&#7897;i dung theo y&ecirc;u c&#7847;u ISO/QMS.</span> </div>' . "\n" .
             '<div class="meta">' . "\n" .
             '<div class="row"><span><b>M&atilde;:</b></span><span class="doc-code">' . $safeCode . '</span></div>' . "\n" .
             '<div class="row"><span><b>Phi&ecirc;n b&#7843;n:</b></span><span>V0</span></div>' . "\n" .
             '<div class="row"><span><b>Ng&agrave;y hi&#7879;u l&#7921;c:</b></span><span>Theo quy&#7871;t &#273;&#7883;nh ban h&agrave;nh</span></div>' . "\n" .
-            '<div class="row"><span><b>Ch&#7911; s&#7903; h&#7919;u:</b></span><span>' . $safeOwner . '</span></div>' . "\n" .
-            '<div class="row"><span><b>Ph&ecirc; duy&#7879;t:</b></span><span>T&#7893;ng Gi&aacute;m &#272;&#7889;c</span></div>' . "\n" .
+            '<div class="row"><span><b>Ch&#7911; s&#7903; h&#7919;u:</b></span><span>' . $ownerHtml . '</span></div>' . "\n" .
+            '<div class="row"><span><b>Ph&ecirc; duy&#7879;t:</b></span><span>' . $approverHtml . '</span></div>' . "\n" .
             '</div>' . "\n" .
             '</div><div class="doc-content" id="docContent"><div class="form-sheet">' . "\n" .
             '<div class="card">' . "\n" .
@@ -1016,6 +1018,57 @@ class DocumentController extends BaseController
             '<script src="' . $assetsJs . '"></script>' . "\n" .
             '</body>' . "\n" .
             '</html>';
+    }
+
+    private function buildHeaderActorClusterHtml(string $rootBase, string $rawValue, bool $allowFallbackCluster): string
+    {
+        $map = [
+            'QA' => ['kind' => 'role', 'code' => 'QA', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html', 'title' => 'QA Manager (Truong bo phan dam bao chat luong)'],
+            'QMS' => ['kind' => 'role', 'code' => 'QMS', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html', 'title' => 'QMS Engineer (Ky su he thong QMS)'],
+            'CEO' => ['kind' => 'role', 'code' => 'CEO', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html', 'title' => 'Chief Executive Officer (Tong Giam doc)'],
+            'PD' => ['kind' => 'role', 'code' => 'PD', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html', 'title' => 'Production Director (Giam doc san xuat)'],
+            'ENGM' => ['kind' => 'role', 'code' => 'ENGM', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html', 'title' => 'Engineering Lead / Manager (Truong nhom / quan ly ky thuat)'],
+            'SCM' => ['kind' => 'role', 'code' => 'SCM', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html', 'title' => 'Supply Chain Manager (Quan ly chuoi cung ung)'],
+            'FIN' => ['kind' => 'role', 'code' => 'FIN', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html', 'title' => 'Finance Manager (Quan ly tai chinh)'],
+            'HR' => ['kind' => 'role', 'code' => 'HR', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html', 'title' => 'HR Manager (Quan ly nhan su)'],
+            'EHS' => ['kind' => 'role', 'code' => 'EHS', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html', 'title' => 'EHS Specialist (Chuyen vien EHS)'],
+            'QC' => ['kind' => 'role', 'code' => 'QC', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html', 'title' => 'QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)'],
+            'CS' => ['kind' => 'role', 'code' => 'CS', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html', 'title' => 'Customer Service (Nhan vien dich vu khach hang)'],
+            'EST' => ['kind' => 'role', 'code' => 'EST', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html', 'title' => 'Estimator (Nhan vien bao gia)'],
+            'D-ENG' => ['kind' => 'dept', 'code' => 'D-ENG', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-engineering-handbook.html', 'title' => 'Engineering Department (Phong Ky thuat)'],
+            'D-HR' => ['kind' => 'dept', 'code' => 'D-HR', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-hr-handbook.html', 'title' => 'Human Resources Department (Phong Nhan su)'],
+            'D-SCS' => ['kind' => 'dept', 'code' => 'D-SCS', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html', 'title' => 'Sales and Customer Service Department (Phong Kinh doanh va Dich vu khach hang)'],
+            'D-SCM' => ['kind' => 'dept', 'code' => 'D-SCM', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html', 'title' => 'Supply Chain Department (Phong Chuoi cung ung)'],
+            'D-WHS' => ['kind' => 'dept', 'code' => 'D-WHS', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html', 'title' => 'Warehouse Function (Bo phan Kho)'],
+            'D-FIN' => ['kind' => 'dept', 'code' => 'D-FIN', 'path' => '02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-finance-handbook.html', 'title' => 'Finance Department (Phong Tai chinh)'],
+        ];
+
+        $normalized = strtoupper(trim($rawValue));
+        $normalized = preg_replace('/\s+/', '', $normalized);
+        $tokens = preg_split('/[+,\/|]+/', (string)$normalized) ?: [];
+        $chips = [];
+
+        foreach ($tokens as $token) {
+            if ($token === '' || !isset($map[$token])) {
+                continue;
+            }
+            $entry = $map[$token];
+            $href = htmlspecialchars($rootBase . $entry['path'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $title = htmlspecialchars($entry['title'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $code = htmlspecialchars($entry['code'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $linkClass = $entry['kind'] === 'dept' ? 'entity-link dept-link' : 'entity-link role-link';
+            $codeClass = $entry['kind'] === 'dept' ? 'entity-code dept-code' : 'entity-code role-code';
+            $chips[] = '<a class="' . $linkClass . '" href="' . $href . '" title="' . $title . '"><span class="' . $codeClass . '">' . $code . '</span></a>';
+        }
+
+        if (!$chips && $allowFallbackCluster) {
+            return $this->buildHeaderActorClusterHtml($rootBase, 'QA/QMS', false);
+        }
+        if (!$chips) {
+            $chips[] = '<a class="entity-link role-link" href="' . htmlspecialchars($rootBase . '02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a>';
+        }
+
+        return '<span class="entity-cluster role-cluster">' . implode('<span class="entity-sep role-sep">/</span>', $chips) . '</span>';
     }
 
     /**

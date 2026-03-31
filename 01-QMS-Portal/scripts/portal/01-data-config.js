@@ -1566,7 +1566,7 @@ function deriveDocCodeFromPath(doc){
   const relPath = String(doc?.path || '').split(/[?#]/)[0];
   const base = (relPath.split('/').pop() || '').replace(/\.[^.]+$/, '');
   if(!base) return '';
-  const match = base.match(/^((?:WI|ANNEX)-\d{3})(?:[-_]|$)/i);
+  const match = base.match(/^((?:SOP|FRM|WI|ANNEX)-\d{3}|(?:JD|DEPT|RACI|AUTHORITY|POL|QMS|TRN|SYS|LAB|FORM|MRR)(?:-[A-Z0-9]+)+)(?:[-_]|$)/i);
   return match ? String(match[1] || '').toUpperCase() : '';
 }
 
@@ -1601,7 +1601,8 @@ function normalizeDocCatalogEntry(doc){
   const rawTitleUpper = rawTitle.toUpperCase();
   if(
     looksLikeFilenameSlugTitle(rawTitle) ||
-    (originalCodeForTitle && rawTitleUpper === originalCodeForTitle.toUpperCase())
+    (originalCodeForTitle && rawTitleUpper === originalCodeForTitle.toUpperCase()) ||
+    looksLikeVietnameseText(rawTitle)
   ){
     next.__rawTitle = rawTitle;
     if(derivedTitle) next.title = derivedTitle;
@@ -1619,16 +1620,38 @@ function getDocDisplayCode(doc){
 
 function getDocDisplayTitle(doc){
   if(!doc) return '';
-  const runtimeTitle = String(doc.__displayTitle || '').trim();
-  if(runtimeTitle) return runtimeTitle;
-  const rawTitle = String(doc.title || '').trim();
   const code = getDocDisplayCode(doc);
-  if(rawTitle && rawTitle.toUpperCase() !== code.toUpperCase()) return rawTitle;
+  const explicitStandard = String(doc.standard_title || doc.standardTitle || '').trim();
+  if(explicitStandard) return explicitStandard;
   const derivedTitle = deriveDocTitleFromPath(doc);
-  // Filename-derived English title is only a last-resort fallback for legacy docs
-  // that still have no controlled title metadata from the published HTML.
   if(derivedTitle) return derivedTitle;
-  return rawTitle || code;
+  const runtimeTitle = String(doc.__displayTitle || '').trim();
+  if(runtimeTitle && runtimeTitle.toUpperCase() !== code.toUpperCase() && !looksLikeVietnameseText(runtimeTitle) && !/[^\x20-\x7E]/.test(runtimeTitle)) return runtimeTitle;
+  const rawTitle = String(doc.title || '').trim();
+  if(rawTitle && rawTitle.toUpperCase() !== code.toUpperCase() && !looksLikeVietnameseText(rawTitle) && !/[^\x20-\x7E]/.test(rawTitle)) return rawTitle;
+  return code;
+}
+
+function getDocStandardTitle(doc){
+  if(!doc) return '';
+  const explicitStandard = String(doc.standard_title || doc.standardTitle || '').trim();
+  if(explicitStandard) return explicitStandard;
+
+  const derivedTitle = deriveDocTitleFromPath(doc);
+  if(derivedTitle) return derivedTitle;
+
+  const runtimeTitle = String(doc.__displayTitle || '').trim();
+  const code = getDocDisplayCode(doc);
+  if(runtimeTitle && runtimeTitle.toUpperCase() !== code.toUpperCase() && !looksLikeVietnameseText(runtimeTitle) && !/[^\x20-\x7E]/.test(runtimeTitle)){
+    return runtimeTitle;
+  }
+
+  const rawTitle = String(doc.title || '').trim();
+  if(rawTitle && rawTitle.toUpperCase() !== code.toUpperCase() && !looksLikeVietnameseText(rawTitle) && !/[^\x20-\x7E]/.test(rawTitle)){
+    return rawTitle;
+  }
+
+  return code;
 }
 
 function getDocDisplayDescription(doc){
@@ -1638,7 +1661,7 @@ function getDocDisplayDescription(doc){
   const explicitDesc = String(getDocDesc(doc.code) || '').trim();
   if(explicitDesc) return explicitDesc;
 
-  const rawTitle = String(doc.title || '').trim();
+  const rawTitle = String(doc.__rawTitle || doc.title || '').trim();
   const displayTitle = getDocDisplayTitle(doc);
   if(rawTitle && rawTitle !== displayTitle && looksLikeVietnameseText(rawTitle)) return rawTitle;
 

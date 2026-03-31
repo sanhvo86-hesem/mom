@@ -88,22 +88,15 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <div class="form-header">
 <div class="fh-left">
 <a class="brand-logo" href="{{RELATIVE_PATH}}/01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="{{RELATIVE_PATH}}/assets/hesem-logo.svg"/></a>
-<div class="fh-company">
-<a href="{{RELATIVE_PATH}}/01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-<span>Tài liệu kiểm soát</span>
-<!-- SOP: "Tài liệu kiểm soát" | WI: "Tài liệu vận hành • Công việc Hướng dẫn"
-     ANNEX: "Tài liệu vận hành • Annex số hóa" | JD: "Tài liệu hệ thống" -->
-</div>
 </div>
 <div class="title">
-<span class="doc-code">{{CODE}}</span>
 <strong class="doc-name">{{TITLE}}</strong>
 <span class="sub-vn">{{SUBTITLE}}</span>
 </div>
 <div class="meta">
-<div class="row"><span><b>Code:</b></span><span class="doc-code">{{CODE}}</span></div>
-<div class="row"><span><b>Version:</b></span><span>V0</span></div>
-<div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Mã:</b></span><span class="doc-code">{{CODE}}</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
 <div class="row"><span><b>Chủ sở hữu:</b></span><span>{{OWNER_ROLE_HTML}}</span></div>
 <div class="row"><span><b>Phê duyệt:</b></span><span>{{APPROVER_ROLE_HTML}}</span></div>
 </div>

@@ -1438,7 +1438,17 @@ function portal_extract_title_from_html_file(string $absFile, string $code = '')
   return portal_extract_title_from_html_content($html, $code);
 }
 
-function portal_sync_doc_title_blocks(string $html, string $docCode, string $title): string {
+function portal_extract_subtitle_from_html_content(string $html): string {
+  if (preg_match('/<span[^>]*class=["\'][^"\']*\bsub-vn\b[^"\']*["\'][^>]*>(.*?)<\/span>/isu', $html, $m)) {
+    return portal_clean_doc_text((string)($m[1] ?? ''));
+  }
+  if (preg_match('/<span[^>]*class=["\'][^"\']*\bsub\b[^"\']*["\'][^>]*>(.*?)<\/span>/isu', $html, $m)) {
+    return portal_clean_doc_text((string)($m[1] ?? ''));
+  }
+  return '';
+}
+
+function portal_sync_doc_title_blocks(string $html, string $docCode, string $title, ?string $subtitle = null): string {
   $docCode = strtoupper(trim($docCode));
   $title = trim($title);
   if ($docCode === '' || $title === '') return $html;
@@ -1447,17 +1457,24 @@ function portal_sync_doc_title_blocks(string $html, string $docCode, string $tit
   $safeCode = htmlspecialchars($docCode, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
   $safeDocLabel = htmlspecialchars($docCode . ' - ' . $title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
   $safeDocName = htmlspecialchars($title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+  $subtitleText = $subtitle === null ? null : trim($subtitle);
 
   $next = preg_replace('/<title[^>]*>.*?<\/title>/isu', '<title>' . $safeTitleTag . '</title>', $html, 1);
   if (is_string($next)) $html = $next;
 
   $next = preg_replace_callback(
     '/<div[^>]*class=["\'][^"\']*\btitle\b[^"\']*["\'][^>]*>(.*?)<\/div>/isu',
-    static function(array $m) use ($safeCode, $safeDocName): string {
+    static function(array $m) use ($safeDocName, $subtitleText): string {
       $inner = (string)($m[1] ?? '');
-      preg_match('/<span[^>]*class=["\'][^"\']*\bsub-vn\b[^"\']*["\'][^>]*>.*?<\/span>/isu', $inner, $subMatch);
       preg_match('/<span[^>]*class=["\'][^"\']*\bmuted\b[^"\']*["\'][^>]*>.*?<\/span>/isu', $inner, $mutedMatch);
-      return '<div class="title"><span class="doc-code">' . $safeCode . '</span><strong class="doc-name">' . $safeDocName . '</strong>' . ($subMatch[0] ?? '') . ($mutedMatch[0] ?? '') . '</div>';
+      $subtitleHtml = '';
+      if ($subtitleText === null) {
+        preg_match('/<span[^>]*class=["\'][^"\']*\bsub-vn\b[^"\']*["\'][^>]*>.*?<\/span>/isu', $inner, $subMatch);
+        $subtitleHtml = $subMatch[0] ?? '';
+      } elseif ($subtitleText !== '') {
+        $subtitleHtml = '<span class="sub-vn">' . htmlspecialchars($subtitleText, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</span>';
+      }
+      return '<div class="title"><strong class="doc-name">' . $safeDocName . '</strong>' . $subtitleHtml . ($mutedMatch[0] ?? '') . '</div>';
     },
     $html,
     1
@@ -1465,12 +1482,30 @@ function portal_sync_doc_title_blocks(string $html, string $docCode, string $tit
   if (is_string($next)) $html = $next;
 
   $next = preg_replace_callback(
-    '/(<h1[^>]*class=["\'][^"\']*\bh1\b[^"\']*["\'][^>]*>).*?(<\/h1>)/isu',
+    '/(<h1\b[^>]*>).*?(<\/h1>)/isu',
     static fn(array $m): string => (string)($m[1] ?? '') . $safeDocLabel . (string)($m[2] ?? ''),
     $html,
     1
   );
   if (is_string($next)) $html = $next;
+
+  $next = preg_replace(
+    '/(<div[^>]*class=["\'][^"\']*\bmeta\b[^"\']*["\'][^>]*>.*?<span[^>]*class=["\'][^"\']*\bdoc-code\b[^"\']*["\'][^>]*>).*?(<\/span>)/isu',
+    '$1' . $safeCode . '$2',
+    $html,
+    1
+  );
+  if (is_string($next) && $next !== $html) {
+    $html = $next;
+  } else {
+    $next = preg_replace_callback(
+      '/(<div[^>]*class=["\'][^"\']*\bmeta\b[^"\']*["\'][^>]*>\s*<div[^>]*class=["\'][^"\']*\brow\b[^"\']*["\'][^>]*>\s*<span[^>]*>.*?<\/span>\s*<span[^>]*>).*?(<\/span>\s*<\/div>)/isu',
+      static fn(array $m): string => (string)($m[1] ?? '') . $safeCode . (string)($m[2] ?? ''),
+      $html,
+      1
+    );
+    if (is_string($next)) $html = $next;
+  }
 
   return $html;
 }
@@ -10822,9 +10857,8 @@ switch ($action) {
       '<body>' . "\n" .
       '<div class="container"><div class="page"><div class="page-body"><div class="form-header">' . "\n" .
       '<div class="fh-left"> <a class="brand-logo" href="' . $rootHref . '"><img alt="HESEM Logo" src="https://hesem.com.vn/wp-content/uploads/hesem-logo.svg"/></a>' . "\n" .
-      '<div class="fh-company"> <a href="' . $rootHref . '">HESEM ENGINEERING</a> <span>Tài liệu kiểm soát</span> </div>' . "\n" .
       '</div>' . "\n" .
-      '<div class="title"> <span class="doc-code">' . $safeCode . '</span><strong class="doc-name">' . $safeTitle . '</strong>' . "\n" .
+      '<div class="title"> <strong class="doc-name">' . $safeTitle . '</strong>' . "\n" .
       '<span class="sub-vn">Tài liệu mới (Draft)</span> <span class="muted">Soạn thảo nội dung theo yêu cầu ISO/QMS.</span> </div>' . "\n" .
       '<div class="meta">' . "\n" .
       '<div class="row"><span><b>Mã:</b></span><span class="doc-code">' . $safeCode . '</span></div>' . "\n" .
@@ -10862,9 +10896,8 @@ switch ($action) {
       '<body>' . "\n" .
       '<div class="container"><div class="page"><div class="page-body"><div class="form-header">' . "\n" .
       '<div class="fh-left"> <a class="brand-logo" href="' . $rootHref . '"><img alt="HESEM Logo" src="https://hesem.com.vn/wp-content/uploads/hesem-logo.svg"/></a>' . "\n" .
-      '<div class="fh-company"> <a href="' . $rootHref . '">HESEM ENGINEERING</a> <span>Tài liệu kiểm soát</span> </div>' . "\n" .
       '</div>' . "\n" .
-      '<div class="title"> <span class="doc-code">' . $safeCode . '</span><strong class="doc-name">' . $safeTitle . '</strong>' . "\n" .
+      '<div class="title"> <strong class="doc-name">' . $safeTitle . '</strong>' . "\n" .
       '<span class="sub-vn">Tài liệu mới (Draft)</span> <span class="muted">Soạn thảo nội dung theo yêu cầu ISO/QMS.</span> </div>' . "\n" .
       '<div class="meta">' . "\n" .
       '<div class="row"><span><b>Mã:</b></span><span class="doc-code">' . $safeCode . '</span></div>' . "\n" .
@@ -14095,6 +14128,8 @@ if ($username === '') {
       $oldCode = strtoupper(trim((string)($data['old_code'] ?? '')));
       $newCode = strtoupper(trim((string)($data['new_code'] ?? '')));
       $newTitle = trim((string)($data['new_title'] ?? ''));
+      $descProvided = is_array($data) && array_key_exists('new_desc', $data);
+      $newDesc = trim((string)($data['new_desc'] ?? ''));
       if ($oldCode === '') api_json(['ok' => false, 'error' => 'missing_old_code'], 400);
       if ($newCode !== '' && !preg_match('/^[A-Z0-9_-]{3,40}$/', $newCode)) api_json(['ok' => false, 'error' => 'bad_new_code'], 400);
       if ($newTitle !== '' && portal_title_has_non_ascii($newTitle)) api_json(['ok' => false, 'error' => 'title_must_be_english_ascii'], 400);
@@ -14183,12 +14218,14 @@ if ($username === '') {
       $effectiveCode = $newCode !== '' ? $newCode : $oldCode;
       if ($newTitle === '') $newTitle = $currentTitle;
       if ($newTitle === '') $newTitle = $effectiveCode;
+      $currentDesc = '';
 
       // ── Update title in HTML content ──
       if (portal_get_doc_extension($foundFile) === 'html') {
         $content = @file_get_contents($foundFile);
         if ($content !== false) {
-          $content = portal_sync_doc_title_blocks((string)$content, $effectiveCode, $newTitle);
+          $currentDesc = portal_extract_subtitle_from_html_content((string)$content);
+          $content = portal_sync_doc_title_blocks((string)$content, $effectiveCode, $newTitle, $descProvided ? $newDesc : $currentDesc);
           @file_put_contents($foundFile, $content);
         }
       }
@@ -14248,6 +14285,7 @@ if ($username === '') {
         if (strtoupper((string)($cd['code'] ?? '')) === $oldCode) {
           if ($newCode !== '') { $cd['code'] = $newCode; $changed = true; }
           if (($cd['title'] ?? null) !== $newTitle) { $cd['title'] = $newTitle; $changed = true; }
+          if ($descProvided && (($cd['description'] ?? null) !== $newDesc)) { $cd['description'] = $newDesc; $changed = true; }
           $cd['path'] = $renamedRel; $changed = true;
           break;
         }
@@ -14255,17 +14293,23 @@ if ($username === '') {
       unset($cd);
       if ($changed) save_custom_docs($CUSTOM_DOCS_FILE, $custom);
 
-      // Move description key when document code changes.
-      if ($newCode !== '' && $newCode !== $oldCode) {
-        $descFile = $DATA_DIR . '/config/doc_descriptions.json';
-        if (is_file($descFile)) {
-          $descs = @json_decode(@file_get_contents($descFile), true) ?: [];
-          if (is_array($descs) && array_key_exists($oldCode, $descs) && !array_key_exists($newCode, $descs)) {
-            $descs[$newCode] = $descs[$oldCode];
-            unset($descs[$oldCode]);
-            @file_put_contents($descFile, json_encode($descs, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), LOCK_EX);
-          }
+      // Move or update description key because modal description now syncs to header subtitle.
+      $descFile = $DATA_DIR . '/config/doc_descriptions.json';
+      if (is_file($descFile) || $descProvided || ($newCode !== '' && $newCode !== $oldCode)) {
+        $descs = is_file($descFile) ? (@json_decode(@file_get_contents($descFile), true) ?: []) : [];
+        if (!is_array($descs)) $descs = [];
+        $effectiveDescCode = $newCode !== '' ? $newCode : $oldCode;
+        if ($newCode !== '' && $newCode !== $oldCode && array_key_exists($oldCode, $descs) && !array_key_exists($newCode, $descs)) {
+          $descs[$newCode] = $descs[$oldCode];
+          unset($descs[$oldCode]);
+        } elseif ($newCode !== '' && $newCode !== $oldCode) {
+          unset($descs[$oldCode]);
         }
+        if ($descProvided) {
+          if ($newDesc === '') unset($descs[$effectiveDescCode]);
+          else $descs[$effectiveDescCode] = $newDesc;
+        }
+        @file_put_contents($descFile, json_encode($descs, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), LOCK_EX);
       }
       invalidate_scan_cache($DATA_DIR);
 

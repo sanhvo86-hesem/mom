@@ -109,9 +109,12 @@
 
 **Lưu ý:**
 - Khối title trên header chỉ hiển thị `doc-name` và `sub-vn`; mã tài liệu hiển thị ở hàng meta.
+- `doc-name` luôn là English SSOT title theo filename/path controlled; không dịch title này sang tiếng Việt và không gộp mã tài liệu vào cùng node hiển thị.
 - Portal/catalog/runtime không được ghép mã và tên thành một text node. Nếu metadata runtime không sạch thì phải đọc lại `doc-name` từ header published và `doc-code` từ meta/header hook sạch.
 - `fh-company` là legacy node; template mới không render node này và CSS dùng chung phải ẩn hoàn toàn nếu file cũ còn giữ lại.
 - Meta labels hiển thị tiếng Việt: `Mã`, `Phiên bản`, `Ngày hiệu lực`, `Chủ sở hữu`, `Phê duyệt`
+- Hàng `Chủ sở hữu` và `Phê duyệt` phải dùng chip links tới JD hoặc department handbook tương ứng; không để plain text kiểu `QA Manager`, `Engineering`, `Tổng Giám Đốc`.
+- Quy tắc header này áp dụng cho toàn bộ tài liệu phát hành và cả form online/runtime trong `01-QMS-Portal`.
 - Với tài liệu chưa phát hành lần đầu, `Version` trong header luôn là `V0`
 - **Viền cam** header: mảnh 1px ở đầu hàng meta
 - **KHÔNG** thay đổi cấu trúc header — mọi file PHẢI giống nhau
