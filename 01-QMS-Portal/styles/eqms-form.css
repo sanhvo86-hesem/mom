@@ -195,6 +195,7 @@
   margin-bottom: 8px;
 }
 .eqms-sig-header strong { font-size: 13px; color: var(--eqms-text); }
+.eqms-sig-label-vi { font-size: 11px; color: var(--eqms-text-3); font-style: italic; margin-top: 1px; }
 .eqms-sig-meaning {
   font-size: 10px; font-weight: 700; text-transform: uppercase;
   padding: 2px 8px; border-radius: 999px;
@@ -251,9 +252,16 @@
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
-  .eqms-runtime { padding: 12px; }
-  .eqms-doc-header { grid-template-columns: 1fr; text-align: center; }
-  .eqms-doc-meta { text-align: center; }
+  .eqms-runtime { padding: 8px; }
+  .eqms-runtime .form-header { flex-direction: column; }
+  .eqms-runtime .form-header .meta { flex-direction: column; font-size: 11px; }
   .eqms-fields { grid-template-columns: 1fr; }
+  .eqms-field, .eqms-field.full { grid-column: 1 / -1; }
   .eqms-sig-grid { grid-template-columns: 1fr; }
+  .eqms-record-bar { flex-direction: column; }
+  .eqms-section-head { flex-direction: column; gap: 8px; }
+  .eqms-actions { flex-direction: column; }
+  .eqms-actions .eqms-btn { width: 100%; }
+  .eqms-label { font-size: 10px; }
+  .eqms-label-vi { display: block; margin-left: 0; margin-top: 1px; }
 }

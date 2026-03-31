@@ -274,21 +274,23 @@
     },
     {
       "id": "issued_by",
-      "type": "text",
+      "type": "lookup",
+      "lookup_source": "operators",
       "label": "Issued By",
       "label_vi": "Người phát hành",
       "required": true,
-      "placeholder": "Người phát hành SCAR",
-      "placeholder_en": "SCAR issuer name",
+      "placeholder": "Chọn người phát hành SCAR từ danh sách nhân sự",
+      "placeholder_en": "Select SCAR issuer from personnel list",
       "audit_tracked": true
     },
     {
       "id": "approved_by",
-      "type": "text",
+      "type": "lookup",
+      "lookup_source": "operators",
       "label": "Approved By",
       "label_vi": "Người phê duyệt",
-      "placeholder": "Người phê duyệt nội bộ",
-      "placeholder_en": "Internal approver"
+      "placeholder": "Chọn người phê duyệt từ danh sách nhân sự",
+      "placeholder_en": "Select approver from personnel list"
     },
     {
       "id": "supplier_root_cause",

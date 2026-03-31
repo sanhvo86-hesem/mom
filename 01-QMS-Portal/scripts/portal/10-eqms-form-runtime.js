@@ -105,6 +105,9 @@ function buildLookupItems(source){
   if(source === 'customers') return (md.customers || []).map(function(c){
     return { value: c.customer_id, label: c.customer_id, sub: c.customer_name || '', customer_id: c.customer_id, customer_name: c.customer_name || '' };
   });
+  if(source === 'operators') return (md.operators || []).map(function(o){
+    return { value: o.operator_id, label: o.operator_id, sub: [o.operator_name || '', o.role || ''].filter(Boolean).join(' · '), operator_id: o.operator_id || '', operator_name: o.operator_name || '', role: o.role || '' };
+  });
   return [];
 }
 
@@ -216,7 +219,7 @@ function renderField(field, value, readOnly){
       html += '<input class="eqms-input" id="' + esc(id) + '" type="datetime-local" value="' + esc(val) + '"' + disabled + '>';
       break;
     case 'select':
-      html += '<select class="eqms-input" id="' + esc(id) + '"' + disabled + '><option value="">' + esc(t('Chon', 'Select')) + '</option>';
+      html += '<select class="eqms-input" id="' + esc(id) + '"' + disabled + '><option value="">' + esc(t('Chọn', 'Select')) + '</option>';
       (field.options || []).forEach(function(opt){
         var ov = typeof opt === 'string' ? opt : (opt.value || '');
         var ol = typeof opt === 'string' ? opt : t(opt.label || opt.value, opt.label_en || opt.label || opt.value);
@@ -269,17 +272,21 @@ function renderField(field, value, readOnly){
 function renderSignatureBlock(block, signatureData, canSign){
   var signed = !!signatureData;
   var meaning = block.meaning || 'Approved';
+  var labelEn = block.label_en || block.label || block.id;
+  var labelVi = block.label || '';
   return '<div class="eqms-sig-block' + (signed ? ' signed' : '') + '">' +
     '<div class="eqms-sig-header">' +
-      '<strong>' + esc(t(block.label || block.id, block.label_en || block.label || block.id)) + '</strong>' +
+      '<div><strong>' + esc(labelEn) + '</strong>' +
+        (labelVi && labelVi !== labelEn ? '<div class="eqms-sig-label-vi">' + esc(labelVi) + '</div>' : '') +
+      '</div>' +
       '<span class="eqms-sig-meaning">' + esc(meaning) + '</span>' +
     '</div>' +
     (signed ? '<div class="eqms-sig-data">' +
-      '<div>' + esc(t('Ten', 'Name')) + ': <strong>' + esc(signatureData.printed_name || signatureData.signerName || '') + '</strong></div>' +
-      '<div>' + esc(t('Thoi gian', 'Time')) + ': ' + esc(fmtDate(signatureData.timestamp || signatureData.signed_at || '')) + '</div>' +
-      '<div>' + esc(t('Y nghia', 'Meaning')) + ': ' + esc(signatureData.meaning || meaning) + '</div>' +
-    '</div>' : '<div class="eqms-sig-empty">' + esc(t('Chua ky', 'Not signed')) + '</div>') +
-    (canSign && !signed ? '<button class="eqms-btn primary" data-sign-block="' + esc(block.id) + '">' + esc(t('Ky', 'Sign')) + '</button>' : '') +
+      '<div>Name: <strong>' + esc(signatureData.printed_name || signatureData.signerName || '') + '</strong></div>' +
+      '<div>Date: ' + esc(fmtDate(signatureData.timestamp || signatureData.signed_at || '')) + '</div>' +
+      '<div>Meaning: ' + esc(signatureData.meaning || meaning) + '</div>' +
+    '</div>' : '<div class="eqms-sig-empty">Chưa ký</div>') +
+    (canSign && !signed ? '<button class="eqms-btn primary" data-sign-block="' + esc(block.id) + '">Ký</button>' : '') +
   '</div>';
 }
 

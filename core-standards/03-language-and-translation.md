@@ -33,19 +33,34 @@ Chuẩn canonical đầy đủ: xem `25-glossary-canonical-abbreviation-standard
 - Ngoài các nhóm ngoại lệ trên, phần văn xuôi hiển thị cho người đọc phải được Việt hóa theo đúng ngữ cảnh vận hành.
 - Không được vin vào ngoại lệ để giữ lại các cụm nửa Anh nửa Việt như `review plan`, `shipment pack`, `tool readiness`, `change logic`, `route control` nếu đã có bản Việt chuẩn trong mục E và F.
 
-### A5. Ngôn ngữ biểu mẫu eQMS (Online Form) — Song ngữ, tiếng Việt có dấu
+### A5. Ngôn ngữ biểu mẫu eQMS (Online Form) — Song ngữ chuẩn
 
-- Tất cả biểu mẫu eQMS online form (FRM-xxx-SUFFIX) hiển thị **song ngữ**:
-  - Tên trường (field labels): **English là chính** (in hoa, bold), Vietnamese có dấu là subtitle (italic, nhỏ hơn, màu nhạt)
-  - Tên section: **Tiếng Việt có dấu** là chính
-  - Mô tả section: **Tiếng Việt có dấu** là chính
-  - Placeholder text: **Tiếng Việt có dấu**
-  - Helper text: **Tiếng Việt có dấu**
-  - Option labels trong dropdown: Song ngữ — Tiếng Việt (English) — VD: "Nghiêm trọng (Critical)"
-  - Signature block labels: **Tiếng Việt có dấu**
-  - **Mọi chuỗi tiếng Việt PHẢI có dấu đầy đủ**, KHÔNG ĐƯỢC viết không dấu (VD: ❌ "Yeu cau" → ✅ "Yêu cầu")
-- Schema JSON **PHẢI** lưu chuỗi tiếng Việt với Unicode đầy đủ (UTF-8), không encode thành ASCII
-- Quy tắc này áp dụng cho cả frontend renderer (`10-eqms-form-runtime.js`) và PDF export
+Mọi biểu mẫu eQMS online form (FRM-xxx-SUFFIX) hiển thị **song ngữ** theo pattern thống nhất:
+
+**Pattern chung:** Tiếng Anh chính (bold, in hoa) + Tiếng Việt có dấu phụ (italic, nhỏ hơn, màu nhạt)
+
+| Thành phần | Ngôn ngữ chính | Ngôn ngữ phụ | Ví dụ |
+|------------|---------------|-------------|-------|
+| **Field label** | English (in hoa, bold) | Tiếng Việt có dấu (italic, nhỏ) | `SCAR DATE` *Ngày phát hành SCAR* |
+| **Section title** | Tiếng Việt có dấu | — | `Nhận diện hồ sơ và nhà cung cấp` |
+| **Section description** | Tiếng Việt có dấu | — | `Khóa đủ ngữ cảnh phát hành...` |
+| **Placeholder** | Tiếng Việt có dấu | — | `Chọn người phát hành SCAR` |
+| **Helper text** | Tiếng Việt có dấu | — | `Có thể gõ tên hoặc chọn từ danh sách` |
+| **Dropdown options** | Song ngữ Việt (English) | — | `Nghiêm trọng (Critical)` |
+| **Signature label** | English chính | Tiếng Việt phụ bên dưới | `Originator` / *Người phát hành* |
+| **Signature status** | Tiếng Việt | — | `Chưa ký`, `Ký` |
+| **Header .doc-name** | English (SSOT) | — | `Supplier Corrective Action Request (SCAR)` |
+| **Header .sub-vn** | Tiếng Việt có dấu | — | `Ghi nhận yêu cầu hành động khắc phục...` |
+
+**Quy tắc bắt buộc:**
+- **Mọi chuỗi tiếng Việt PHẢI có dấu đầy đủ** — KHÔNG ĐƯỢC viết không dấu
+  - ❌ `"Yeu cau"` → ✅ `"Yêu cầu"`
+  - ❌ `"Chua ky"` → ✅ `"Chưa ký"`
+- Schema JSON lưu chuỗi tiếng Việt với Unicode đầy đủ (UTF-8)
+- Các trường chọn từ dữ liệu nền (supplier, part, operator) dùng `type: "lookup"` với `lookup_source`
+- Người phát hành và phê duyệt PHẢI chọn từ danh sách nhân sự, không nhập tay
+- Header form tuân thủ core standard 23 (`.doc-name` = English SSOT, `.sub-vn` = Vietnamese)
+- Quy tắc áp dụng cho `10-eqms-form-runtime.js`, PDF export, và mọi form renderer tương lai
 
 ### A2. Quy tắc vàng
 
