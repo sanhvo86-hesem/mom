@@ -1,0 +1,272 @@
+/* ==========================================================================
+   eQMS Web Form Runtime Styles
+   HESEM QMS Portal — ISO 9001 / AS9100D / 21 CFR Part 11
+   ========================================================================== */
+
+:root {
+  --eqms-bg: #f8fafc;
+  --eqms-surface: #ffffff;
+  --eqms-border: #e2e8f0;
+  --eqms-text: #0f172a;
+  --eqms-text-2: #475569;
+  --eqms-text-3: #94a3b8;
+  --eqms-primary: #1565c0;
+  --eqms-primary-light: #dbeafe;
+  --eqms-success: #16a34a;
+  --eqms-success-light: #dcfce7;
+  --eqms-warning: #d97706;
+  --eqms-warning-light: #fef3c7;
+  --eqms-danger: #dc2626;
+  --eqms-danger-light: #fee2e2;
+  --eqms-radius: 8px;
+  --eqms-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --eqms-mono: 'Consolas', 'SF Mono', monospace;
+}
+
+/* ── Runtime container ── */
+.eqms-runtime {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+  font-family: var(--eqms-font);
+  color: var(--eqms-text);
+  background: var(--eqms-bg);
+}
+
+.eqms-loading, .eqms-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--eqms-text-3);
+  font-size: 14px;
+}
+
+/* ── Document header (matches SOP print header) ── */
+.eqms-doc-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 20px;
+  border: 1px solid var(--eqms-border);
+  border-radius: 12px;
+  background: var(--eqms-surface);
+  margin-bottom: 16px;
+}
+.eqms-doc-logo { width: 60px; height: 60px; }
+.eqms-doc-logo img { width: 100%; height: 100%; object-fit: contain; }
+.eqms-doc-name { font-size: 18px; font-weight: 800; color: var(--eqms-text); }
+.eqms-doc-subtitle { font-size: 12px; color: var(--eqms-text-2); margin-top: 2px; }
+.eqms-doc-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: right;
+}
+.eqms-doc-meta-row { font-size: 11px; }
+.eqms-doc-meta-row span { color: var(--eqms-text-3); margin-right: 4px; }
+.eqms-doc-meta-row strong { color: var(--eqms-text); font-family: var(--eqms-mono); font-size: 12px; }
+
+/* ── Record context bar ── */
+.eqms-record-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.eqms-record-chip {
+  padding: 6px 12px;
+  background: var(--eqms-surface);
+  border: 1px solid var(--eqms-border);
+  border-radius: var(--eqms-radius);
+}
+.eqms-record-chip small { display: block; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--eqms-text-3); }
+.eqms-record-chip strong { font-size: 13px; color: var(--eqms-text); }
+
+/* ── Status bar ── */
+.eqms-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--eqms-radius);
+  margin-bottom: 16px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.eqms-status-bar.editing {
+  background: var(--eqms-warning-light);
+  color: #92400e;
+  border: 1px solid #fbbf24;
+}
+.eqms-status-indicator {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #f59e0b;
+  animation: eqms-pulse 1.5s infinite;
+}
+@keyframes eqms-pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ── Section ── */
+.eqms-section {
+  background: var(--eqms-surface);
+  border: 1px solid var(--eqms-border);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.eqms-section-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--eqms-border);
+  background: #f8fafc;
+}
+.eqms-section-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--eqms-primary);
+  color: #fff;
+  font-size: 13px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.eqms-section-title { font-size: 14px; font-weight: 700; color: var(--eqms-text); }
+.eqms-section-desc { font-size: 12px; color: var(--eqms-text-2); margin-top: 2px; line-height: 1.5; }
+
+/* ── Fields grid ── */
+.eqms-fields {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  padding: 16px 18px;
+}
+.eqms-field { display: flex; flex-direction: column; gap: 4px; }
+.eqms-field.full { grid-column: 1 / -1; }
+.eqms-field.third { /* stays in grid flow */ }
+
+.eqms-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--eqms-text-2);
+}
+
+.eqms-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--eqms-border);
+  border-radius: var(--eqms-radius);
+  font-size: 13px;
+  font-family: var(--eqms-font);
+  color: var(--eqms-text);
+  background: var(--eqms-surface);
+  box-sizing: border-box;
+  transition: border-color .15s, box-shadow .15s;
+}
+.eqms-input:focus { outline: none; border-color: var(--eqms-primary); box-shadow: 0 0 0 3px rgba(21,101,192,.1); }
+.eqms-input:disabled { background: #f1f5f9; color: var(--eqms-text-2); cursor: not-allowed; }
+.eqms-textarea { min-height: 80px; resize: vertical; }
+
+.eqms-helper { font-size: 11px; color: var(--eqms-text-3); line-height: 1.5; }
+
+.eqms-multi { display: flex; flex-wrap: wrap; gap: 8px; }
+.eqms-check {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid var(--eqms-border);
+  border-radius: var(--eqms-radius);
+  font-size: 13px; cursor: pointer;
+  background: var(--eqms-surface);
+  transition: border-color .15s;
+}
+.eqms-check:hover { border-color: var(--eqms-primary); }
+.eqms-check input { accent-color: var(--eqms-primary); }
+
+.eqms-heading { font-size: 15px; font-weight: 700; color: var(--eqms-text); padding: 8px 0; }
+.eqms-section-divider { height: 1px; background: var(--eqms-border); margin: 8px 0; }
+
+/* ── Signature blocks ── */
+.eqms-sig-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  padding: 16px 18px;
+}
+.eqms-sig-block {
+  border: 1px dashed var(--eqms-border);
+  border-radius: 10px;
+  padding: 14px;
+  background: #fcfdff;
+}
+.eqms-sig-block.signed {
+  border-style: solid;
+  border-color: var(--eqms-success);
+  background: var(--eqms-success-light);
+}
+.eqms-sig-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 8px;
+}
+.eqms-sig-header strong { font-size: 13px; color: var(--eqms-text); }
+.eqms-sig-meaning {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 999px;
+  background: var(--eqms-primary-light); color: var(--eqms-primary);
+}
+.eqms-sig-data { font-size: 12px; color: var(--eqms-text-2); line-height: 1.6; }
+.eqms-sig-empty { font-size: 12px; color: var(--eqms-text-3); text-align: center; padding: 16px 0; }
+
+/* ── Action bar ── */
+.eqms-actions {
+  display: flex; justify-content: flex-end; gap: 8px;
+  padding: 16px 0;
+  border-top: 1px solid var(--eqms-border);
+  margin-top: 8px;
+}
+
+.eqms-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 38px; padding: 0 18px;
+  border: none; border-radius: var(--eqms-radius);
+  font-size: 13px; font-weight: 700; font-family: var(--eqms-font);
+  cursor: pointer; transition: all .15s;
+}
+.eqms-btn:disabled { opacity: .5; cursor: not-allowed; }
+.eqms-btn.primary { background: var(--eqms-primary); color: #fff; }
+.eqms-btn.primary:hover:not(:disabled) { background: #1255a1; }
+.eqms-btn.secondary { background: #f1f5f9; color: var(--eqms-text-2); border: 1px solid var(--eqms-border); }
+.eqms-btn.secondary:hover:not(:disabled) { background: #e2e8f0; }
+.eqms-btn.success { background: var(--eqms-success); color: #fff; }
+.eqms-btn.danger { background: var(--eqms-danger); color: #fff; }
+
+/* ── Audit trail ── */
+.eqms-audit-section { margin-top: 8px; }
+.eqms-audit-list { padding: 8px 18px 16px; }
+.eqms-audit-item {
+  display: flex; gap: 8px; align-items: baseline;
+  padding: 6px 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 11px;
+}
+.eqms-audit-time { color: var(--eqms-text-3); font-family: var(--eqms-mono); min-width: 120px; }
+.eqms-audit-user { color: var(--eqms-primary); font-weight: 600; min-width: 80px; }
+.eqms-audit-action { color: var(--eqms-text-2); }
+.eqms-audit-detail { color: var(--eqms-text-3); font-family: var(--eqms-mono); font-size: 10px; }
+
+/* ── Print styles ── */
+@media print {
+  .eqms-runtime { max-width: none; padding: 0; background: #fff; }
+  .eqms-status-bar, .eqms-actions, .eqms-btn { display: none !important; }
+  .eqms-section { break-inside: avoid; }
+  .eqms-doc-header { border: 2px solid #000; }
+  .eqms-input:disabled { background: transparent; border-color: #ccc; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .eqms-runtime { padding: 12px; }
+  .eqms-doc-header { grid-template-columns: 1fr; text-align: center; }
+  .eqms-doc-meta { text-align: center; }
+  .eqms-fields { grid-template-columns: 1fr; }
+  .eqms-sig-grid { grid-template-columns: 1fr; }
+}

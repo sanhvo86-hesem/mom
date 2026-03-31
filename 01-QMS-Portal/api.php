@@ -15089,6 +15089,36 @@ if ($username === '') {
     api_json(['ok' => true, 'schema' => $schema]);
   }
 
+  case 'eqms_audit_log': {
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $formCode = trim((string)($body['form_code'] ?? ''));
+    $entryId = trim((string)($body['entry_id'] ?? ''));
+    $events = is_array($body['events'] ?? null) ? $body['events'] : [];
+    if ($formCode === '' || empty($events)) api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
+
+    $auditDir = $DATA_DIR . '/online-forms/audit/' . preg_replace('/[^A-Za-z0-9._-]/', '', $formCode);
+    ensure_dir($auditDir);
+    $logFile = $auditDir . '/' . date('Y-m') . '.jsonl';
+    $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+
+    $lines = [];
+    foreach ($events as $evt) {
+      if (!is_array($evt)) continue;
+      $evt['_server_time'] = now_iso();
+      $evt['_server_user'] = $username;
+      $evt['_ip'] = $_SERVER['REMOTE_ADDR'] ?? '';
+      $evt['form_code'] = $formCode;
+      $evt['entry_id'] = $entryId;
+      $lines[] = json_encode($evt, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+    if ($lines) {
+      file_put_contents($logFile, implode("\n", $lines) . "\n", FILE_APPEND | LOCK_EX);
+    }
+    api_json(['ok' => true, 'logged' => count($lines)]);
+  }
+
   case 'form_standalone_save': {
     $me = require_logged_in($store);
     require_csrf();
