@@ -21,12 +21,8 @@
         "hidden_core_items": [
             "documents"
         ],
-        "hidden_sections": [
-            "train"
-        ],
-        "hidden_categories": [
-            "TRN"
-        ]
+        "hidden_sections": [],
+        "hidden_categories": []
     },
-    "updated_at": "2026-03-25T08:05:39+00:00"
+    "updated_at": "2026-03-31T09:03:50+00:00"
 }
