@@ -947,18 +947,10 @@ function bindWorkQueue(container){
 function render(container){
   var workCount = state.workQueue.loaded ? ((state.workQueue.pending || []).length + (state.workQueue.exceptions || []).length) : 0;
 
-  /* Form tab: navigate to document browser with FRM category */
-  if(state.workspaceMode === 'form'){
-    if(typeof navigateTo === 'function'){
-      navigateTo('documents', 'FRM');
-    }
-    return;
-  }
-
   container.innerHTML =
     '<div class="ec-tabs" id="ec-tabs">' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'work' ? ' active' : '') + '" data-tab="work">' + esc(t('Việc của tôi', 'My Work')) + (workCount ? '<span class="ec-tab-badge">' + workCount + '</span>' : '') + '</button>' +
-      '<button type="button" class="ec-tab" data-tab="form">' + esc(t('Biểu mẫu', 'Forms')) + '</button>' +
+      '<button type="button" class="ec-tab' + (state.workspaceMode === 'form' ? ' active' : '') + '" data-tab="form">' + esc(t('Biểu mẫu', 'Forms')) + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'upload' ? ' active' : '') + '" data-tab="upload">' + esc(t('Tải lên', 'Upload')) + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'record-id' ? ' active' : '') + '" data-tab="record-id">' + esc(t('Tạo mã', 'Record ID')) + '</button>' +
     '</div>' +
@@ -1048,7 +1040,23 @@ function renderWorkspacePane(){
     return;
   }
 
-  /* Form mode: should not reach here (redirected to document browser in render()) */
+  /* Form tab: embed the document file explorer for FRM category */
+  if(state.workspaceMode === 'form'){
+    /* Set document browser state to show FRM category */
+    if(typeof currentFilter !== 'undefined') currentFilter = 'FRM';
+    if(typeof currentFolderPath !== 'undefined' && !state._formFolderInited){
+      currentFolderPath = [];
+      state._formFolderInited = true;
+    }
+    /* Render document explorer into our workspace container */
+    if(typeof renderDocuments === 'function'){
+      renderDocuments('ec-workspace');
+    } else {
+      wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Trình duyệt tài liệu chưa sẵn sàng', 'Document browser not ready')) + '</h3></div>';
+    }
+    return;
+  }
+
   wsEl.innerHTML = '<div class="ec-empty"><div class="ec-empty-icon">EC</div><h3>' + esc(t('Chọn tab để bắt đầu', 'Select a tab to begin')) + '</h3></div>';
 }
 
@@ -1102,6 +1110,7 @@ function bindSidebar(container){
     var tabBtn = event.target.closest('[data-tab]');
     if(tabBtn){
       var tabMode = tabBtn.getAttribute('data-tab') || 'form';
+      if(tabMode !== state.workspaceMode) state._formFolderInited = false;
       state.workspaceMode = tabMode;
       render(container);
       if(tabMode === 'work') loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') render(container); });

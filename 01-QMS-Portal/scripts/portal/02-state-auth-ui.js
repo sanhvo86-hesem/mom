@@ -2176,8 +2176,8 @@ function renderDashboard(){
 /* OLD DASHBOARD CODE REMOVED — see git history for reference */
 }
 
-function renderDocuments(){
-  const el = document.getElementById('page-documents');
+function renderDocuments(targetContainerId){
+  const el = document.getElementById(targetContainerId || 'page-documents');
   const VDOCS = getVisibleDocs();
 
   // ═══ Update header breadcrumb ═══
