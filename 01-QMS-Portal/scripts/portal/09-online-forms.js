@@ -946,15 +946,23 @@ function bindWorkQueue(container){
 
 function render(container){
   var workCount = state.workQueue.loaded ? ((state.workQueue.pending || []).length + (state.workQueue.exceptions || []).length) : 0;
+
+  /* Form tab: navigate to document browser with FRM category */
+  if(state.workspaceMode === 'form'){
+    if(typeof navigateTo === 'function'){
+      navigateTo('documents', 'FRM');
+    }
+    return;
+  }
+
   container.innerHTML =
     '<div class="ec-tabs" id="ec-tabs">' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'work' ? ' active' : '') + '" data-tab="work">' + esc(t('Việc của tôi', 'My Work')) + (workCount ? '<span class="ec-tab-badge">' + workCount + '</span>' : '') + '</button>' +
-      '<button type="button" class="ec-tab' + (state.workspaceMode === 'form' ? ' active' : '') + '" data-tab="form">' + esc(t('Biểu mẫu', 'Forms')) + '</button>' +
+      '<button type="button" class="ec-tab" data-tab="form">' + esc(t('Biểu mẫu', 'Forms')) + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'upload' ? ' active' : '') + '" data-tab="upload">' + esc(t('Tải lên', 'Upload')) + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'record-id' ? ' active' : '') + '" data-tab="record-id">' + esc(t('Tạo mã', 'Record ID')) + '</button>' +
     '</div>' +
-    '<div class="ec-shell">' + (state.workspaceMode === 'form' ? renderSidebar() : '') + '<div class="ec-workspace' + (state.workspaceMode !== 'form' ? ' ec-workspace-full' : '') + '" id="ec-workspace"></div></div>' +
-    '<button type="button" class="ec-sidebar-toggle" id="ec-sidebar-toggle" aria-label="' + esc(t('Mở/đóng danh mục','Toggle catalog')) + '">\u2630</button>';
+    '<div class="ec-shell"><div class="ec-workspace ec-workspace-full" id="ec-workspace"></div></div>';
   bindSidebar(container);
   renderWorkspacePane();
 }
@@ -1040,14 +1048,8 @@ function renderWorkspacePane(){
     return;
   }
 
-  var form = state.formMap[state.selectedFormCode] || null;
-  if(!form){
-    wsEl.innerHTML = '<div class="ec-empty"><div class="ec-empty-icon">EC</div><h3>' + esc(t('Chọn biểu mẫu để bắt đầu', 'Select a form to begin')) + '</h3><p>' + esc(t('Chọn biểu mẫu từ danh mục bên trái. Hệ thống sẽ hướng dẫn qua từng bước: cấp mã -> điền/tải -> ký và gửi.', 'Pick a form from the catalog. The system will guide you through each step: allocate -> fill/download -> sign and submit.')) + '</p></div>';
-    return;
-  }
-  var allocation = state.allocations.find(function(row){ return row.allocation_id === state.selectedAllocationId; }) || null;
-  if(typeof window._renderWorkspace === 'function') window._renderWorkspace(form, allocation, wsEl);
-  else wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Phân hệ xử lý hồ sơ chưa sẵn sàng', 'Workspace module not ready')) + '</h3></div>';
+  /* Form mode: should not reach here (redirected to document browser in render()) */
+  wsEl.innerHTML = '<div class="ec-empty"><div class="ec-empty-icon">EC</div><h3>' + esc(t('Chọn tab để bắt đầu', 'Select a tab to begin')) + '</h3></div>';
 }
 
 function bindSidebar(container){
@@ -1186,28 +1188,29 @@ window._fhSwitchTab = function(target){
 window.renderOnlineForms = function(formCode){
   var page = pageEl();
   if(!page) return;
-  if(!formCode && state.pendingFillSelection && state.pendingFillSelection.formCode){
-    formCode = state.pendingFillSelection.formCode;
-    if(state.pendingFillSelection.allocationId) state.selectedAllocationId = state.pendingFillSelection.allocationId;
-    state.workspaceMode = 'form';
+
+  /* If a specific form is requested, navigate to document browser to open it */
+  if(formCode){
+    if(typeof navigateTo === 'function'){
+      navigateTo('documents', 'FRM');
+      /* After navigating, try to open the specific document */
+      setTimeout(function(){
+        if(typeof openDoc === 'function') openDoc(formCode);
+      }, 500);
+    }
+    return;
   }
-  if(formCode) state.selectedFormCode = formCode;
+
+  /* Default: show work queue (Việc của tôi) */
+  if(!state.workspaceMode || state.workspaceMode === 'form') state.workspaceMode = 'work';
   page.innerHTML = renderWorkspaceSkeleton();
   loadAll().then(function(){
-    if(state.pendingFillSelection && state.pendingFillSelection.formCode){
-      state.selectedFormCode = state.pendingFillSelection.formCode;
-      if(state.pendingFillSelection.allocationId) state.selectedAllocationId = state.pendingFillSelection.allocationId;
-      state.pendingFillSelection = null;
-    }
-    if(!state.selectedFormCode && state.forms.length) state.selectedFormCode = state.forms[0].form_code;
-    return loadAllocations();
-  }).then(function(){
     state.ready = true;
     render(page);
   }).catch(function(err){
     page.innerHTML = renderLoadFailure(err);
     var retry = page.querySelector('#ec-retry-load');
-    if(retry) retry.onclick = function(){ window.renderOnlineForms(state.selectedFormCode || formCode || ''); };
+    if(retry) retry.onclick = function(){ window.renderOnlineForms(); };
   });
 };
 
