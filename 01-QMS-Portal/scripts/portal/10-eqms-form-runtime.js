@@ -58,6 +58,56 @@ function fmtDate(v){
 }
 
 /* ── State ── */
+var masterData = null;
+
+function ensureMasterData(){
+  if(masterData) return Promise.resolve(masterData);
+  if(typeof window._mdEnsureSnapshot === 'function'){
+    return window._mdEnsureSnapshot(true).then(function(s){
+      masterData = s || (typeof window._mdGetSnapshot === 'function' ? window._mdGetSnapshot() : {}) || {};
+      mergeParts();
+      return masterData;
+    });
+  }
+  return api('master_data_snapshot', {}, 'GET').then(function(r){
+    masterData = (r && r.data) ? r.data : {};
+    mergeParts();
+    return masterData;
+  }).catch(function(){ masterData = {}; return masterData; });
+}
+
+function mergeParts(){
+  /* Merge revisions into parts: each part gets latest revision appended */
+  if(!masterData || !masterData.parts || !masterData.revisions) return;
+  var revMap = {};
+  (masterData.revisions || []).forEach(function(r){
+    var pn = r.part_number || '';
+    if(!revMap[pn] || r.status === 'released') revMap[pn] = r;
+  });
+  masterData.parts.forEach(function(p){
+    var rev = revMap[p.part_number];
+    if(rev){
+      p.revision = rev.revision || '';
+      p.revision_status = rev.status || '';
+    }
+  });
+}
+
+function buildLookupItems(source){
+  var md = masterData || {};
+  if(source === 'suppliers') return (md.suppliers || []).map(function(s){
+    return { value: s.supplier_id, label: s.supplier_id, sub: s.supplier_name || '', supplier_id: s.supplier_id, supplier_name: s.supplier_name || '', contact_name: s.contact_name || '', contact_email: s.contact_email || '', supplier_type: s.supplier_type || '' };
+  });
+  if(source === 'parts') return (md.parts || []).map(function(p){
+    var label = p.part_number + (p.revision ? ' ' + p.revision : '');
+    return { value: p.part_number, label: label, sub: p.part_description || '', part_number: p.part_number, part_description: p.part_description || '', revision: p.revision || '', customer_id: p.customer_id || '' };
+  });
+  if(source === 'customers') return (md.customers || []).map(function(c){
+    return { value: c.customer_id, label: c.customer_id, sub: c.customer_name || '', customer_id: c.customer_id, customer_name: c.customer_name || '' };
+  });
+  return [];
+}
+
 var state = {
   formCode: '',
   schema: null,
@@ -193,8 +243,13 @@ function renderField(field, value, readOnly){
     case 'file':
       html += '<input class="eqms-input" id="' + esc(id) + '" type="file" accept="' + esc((field.accept || '.pdf,.jpg,.png,.xlsx').replace(/\s/g, '')) + '"' + disabled + '>';
       break;
+    case 'lookup':
+      /* Lookup field — renders as searchable dropdown from master data */
+      html += '<div id="' + esc(id) + '-host" class="eqms-lookup-host" data-lookup-source="' + esc(field.lookup_source || '') + '" data-field-id="' + esc(field.id) + '"></div>';
+      if(val) html += '<input type="hidden" id="' + esc(id) + '" value="' + esc(val) + '">';
+      break;
     case 'heading':
-      html += '<div class="eqms-heading">' + esc(label) + '</div>';
+      html += '<div class="eqms-heading">' + esc(labelEn) + '</div>';
       break;
     case 'section':
       html += '<div class="eqms-section-divider"></div>';
@@ -355,6 +410,47 @@ function bindFields(container){
   var schema = state.schema;
   if(!schema || !state.editMode) return;
   var fields = schema.fields || [];
+
+  /* Mount lookup fields from master data */
+  Array.prototype.forEach.call(container.querySelectorAll('.eqms-lookup-host'), function(host){
+    var source = host.getAttribute('data-lookup-source') || '';
+    var fieldId = host.getAttribute('data-field-id') || '';
+    var field = fields.find(function(f){ return f.id === fieldId; });
+    if(!source || !fieldId || typeof window.SearchableInput !== 'function') return;
+    var items = buildLookupItems(source);
+    var instance = new window.SearchableInput({
+      containerId: host.id,
+      fieldId: 'eqms-si-' + fieldId,
+      name: fieldId,
+      dataSource: items,
+      displayField: 'label',
+      valueField: 'value',
+      subField: 'sub',
+      strictSelect: true,
+      storeValueInHiddenField: true,
+      placeholderVi: (field && field.placeholder) || 'Tìm và chọn',
+      placeholder: (field && field.placeholder_en) || 'Search and select',
+      onSelect: function(item){
+        var old = state.fieldValues[fieldId] || '';
+        state.fieldValues[fieldId] = item ? item.value : '';
+        logFieldChange(fieldId, old, item ? item.value : '');
+        /* Autofill related fields from lookup item */
+        if(item && field && field.autofill){
+          Object.keys(field.autofill).forEach(function(target){
+            var src = field.autofill[target];
+            if(item[src] !== undefined && item[src] !== ''){
+              var oldTarget = state.fieldValues[target] || '';
+              state.fieldValues[target] = item[src];
+              logFieldChange(target, oldTarget, item[src], 'Autofill from ' + fieldId);
+              var targetEl = document.getElementById('eqms-f-' + target);
+              if(targetEl) targetEl.value = item[src];
+            }
+          });
+        }
+      }
+    });
+    if(state.fieldValues[fieldId]) instance.setValue(state.fieldValues[fieldId]);
+  });
 
   fields.forEach(function(field){
     if(field.type === 'multi_select'){
@@ -530,7 +626,8 @@ window.openEqmsForm = function(formCode, container, options){
   container.innerHTML = '<div class="eqms-runtime" id="eqms-form-container"><div class="eqms-loading">' + esc(t('Dang tai bieu mau...', 'Loading form...')) + '</div></div>';
   var runtime = container.querySelector('.eqms-runtime');
 
-  loadSchema(formCode).then(function(schema){
+  Promise.all([loadSchema(formCode), ensureMasterData()]).then(function(results){
+    var schema = results[0];
     if(!schema){
       runtime.innerHTML = '<div class="eqms-empty">' + esc(t('Khong tim thay schema cho form nay.', 'Schema not found for this form.')) + '</div>';
       return;

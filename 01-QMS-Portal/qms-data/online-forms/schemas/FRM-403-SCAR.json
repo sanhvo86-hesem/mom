@@ -48,7 +48,7 @@
       "description": "Khóa đủ ngữ cảnh phát hành, nhà cung cấp, đầu mối liên hệ và lô bị ảnh hưởng để tạo truy xuất sử dụng được ngay.",
       "description_en": "Lock context, supplier, contact, and affected lot for immediate traceability.",
       "color": "#1971c2",
-      "field_ids": ["scar_date", "supplier_response_due_date", "scar_status", "supplier_name", "supplier_id", "supplier_contact", "po_number", "part_number", "part_rev", "lot_number"]
+      "field_ids": ["scar_date", "supplier_response_due_date", "scar_status", "supplier_id", "supplier_name", "supplier_contact", "po_number", "part_number", "lot_number"]
     },
     {
       "id": "quality_issue",
@@ -127,25 +127,30 @@
       "audit_tracked": true
     },
     {
+      "id": "supplier_id",
+      "type": "lookup",
+      "lookup_source": "suppliers",
+      "label": "Supplier",
+      "label_vi": "Nhà cung cấp",
+      "required": true,
+      "placeholder": "Tìm và chọn nhà cung cấp từ dữ liệu nền",
+      "placeholder_en": "Search and select supplier from master data",
+      "helper": "Chọn nhà cung cấp — tên và liên hệ sẽ tự động điền.",
+      "helper_en": "Select supplier — name and contact will auto-fill.",
+      "autofill": {
+        "supplier_name": "supplier_name",
+        "supplier_contact": "contact_name"
+      },
+      "audit_tracked": true
+    },
+    {
       "id": "supplier_name",
       "type": "text",
       "label": "Supplier Name",
       "label_vi": "Tên nhà cung cấp",
       "required": true,
-      "placeholder": "Nhập hoặc chọn nhà cung cấp",
-      "placeholder_en": "Type or select supplier",
-      "helper": "Có thể gõ tên hoặc chọn từ danh sách nhà cung cấp đã quản lý.",
-      "helper_en": "You may type the name or pick from the governed supplier list.",
-      "audit_tracked": true
-    },
-    {
-      "id": "supplier_id",
-      "type": "text",
-      "label": "Supplier ID",
-      "label_vi": "Mã nhà cung cấp",
-      "required": true,
-      "placeholder": "Ví dụ: SUP-001",
-      "placeholder_en": "e.g., SUP-001",
+      "placeholder": "Tự động điền khi chọn nhà cung cấp",
+      "placeholder_en": "Auto-filled from supplier selection",
       "audit_tracked": true
     },
     {
@@ -153,8 +158,8 @@
       "type": "text",
       "label": "Supplier Contact",
       "label_vi": "Liên hệ nhà cung cấp",
-      "placeholder": "Tên, email, số điện thoại người phụ trách",
-      "placeholder_en": "Name, email, phone of responsible person"
+      "placeholder": "Tự động điền hoặc nhập tay",
+      "placeholder_en": "Auto-filled or enter manually"
     },
     {
       "id": "po_number",
@@ -168,21 +173,20 @@
     },
     {
       "id": "part_number",
-      "type": "text",
-      "label": "Part Number",
-      "label_vi": "Mã chi tiết",
+      "type": "lookup",
+      "lookup_source": "parts",
+      "label": "Part Number / Revision",
+      "label_vi": "Mã chi tiết / Revision",
       "required": true,
-      "placeholder": "Ví dụ: PN-1001",
-      "placeholder_en": "e.g., PN-1001",
+      "placeholder": "Tìm và chọn chi tiết từ dữ liệu nền (bao gồm REV)",
+      "placeholder_en": "Search and select part from master data (includes REV)",
+      "helper": "Chọn chi tiết — revision mới nhất sẽ tự động gắn.",
+      "helper_en": "Select part — latest revision is auto-attached.",
+      "autofill": {
+        "part_description": "part_description",
+        "part_rev": "revision"
+      },
       "audit_tracked": true
-    },
-    {
-      "id": "part_rev",
-      "type": "text",
-      "label": "Part Revision",
-      "label_vi": "Revision",
-      "placeholder": "Ví dụ: B",
-      "placeholder_en": "e.g., B"
     },
     {
       "id": "lot_number",
