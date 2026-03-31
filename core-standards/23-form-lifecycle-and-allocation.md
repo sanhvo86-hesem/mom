@@ -123,6 +123,23 @@ Quy định bắt buộc:
 3. Registry phải cho biết số lần nộp và số lần nộp lại của từng hồ sơ.
 4. Registry phải mở lại đúng hồ sơ hiện hành, không tạo bản mới khi người dùng chọn `Mở` hoặc `Chỉnh sửa`.
 
+### 2.6 Cancel Creation / Withdraw Before First Submission
+
+| Tình huống | Cách xử lý bắt buộc |
+|-----------|---------------------|
+| Người dùng bấm `Hủy tạo form` trước khi submit lần đầu | Hệ thống phải **xóa draft payload**, giữ nguyên `allocation_id` / `record_id`, và chuyển allocation sang trạng thái `void` |
+| Đã cấp mã nhưng chưa nộp | **Không được tái sử dụng mã** cho hồ sơ khác |
+| Hủy tạo form | Bắt buộc nhập **lý do hủy** |
+| Registry | Phải hiển thị bản ghi đã hủy với `void_reason`, `voided_by`, `voided_at` |
+| Hồ sơ đã submit / approved / closed | Không được dùng `Hủy tạo form`; chỉ được đi theo `Controlled Edit / Resubmission` |
+
+Quy tắc bắt buộc:
+
+1. `Hủy tạo form` là hành động nghiệp vụ kiểu `withdraw before first submission`, không phải xóa cứng.
+2. Mọi số đã cấp phải còn truy vết trong registry để audit không thấy "mất số".
+3. Nếu draft có trên server hoặc local browser, hệ thống phải dọn draft đó khi hủy.
+4. Nếu người dùng mở lại một business case mới sau khi đã hủy, hệ thống phải cấp **mã mới**, không được tái kích hoạt mã đã void.
+
 ---
 
 ## 3. Version Control Rules
@@ -206,6 +223,13 @@ Quy tắc bắt buộc:
 | Obsolete form | `doc_controller`, `admin` | Không |
 | Chỉnh sửa form ACTIVE | KHÔNG AI — phải tạo version mới | N/A |
 | Xóa form | `admin` only, chỉ khi DRAFT | Không |
+
+### 4.3 Form Template Editing Rules
+
+1. Nút `Chỉnh sửa mẫu form` phải mở **builder có version control**, không sửa trực tiếp live schema đang ACTIVE.
+2. Builder của form phải nằm ngay trong phân hệ `Online Form`, không nhảy sang một module tách rời.
+3. `Tạo mẫu form online` phải sinh schema draft mới, sau đó đi theo chu trình `Save Draft -> Submit Review -> Approve / Publish`.
+4. Bất kỳ chỉnh sửa nào với form template đang ACTIVE phải tạo working draft mới và giữ nguyên revision đã phát hành cho đến khi publish.
 
 ### 4.2 Form Code Assignment
 

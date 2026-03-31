@@ -18285,6 +18285,21 @@ if ($username === '') {
     api_json(['ok' => true]);
   }
 
+  case 'form_fill_discard_draft': {
+    require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $allocationId = trim((string)($body['allocation_id'] ?? ''));
+    if ($allocationId === '') {
+      api_json(['ok' => false, 'error' => 'missing_allocation_id'], 400);
+    }
+    if (!preg_match('/^[A-Za-z0-9._-]+$/', $allocationId)) {
+      api_json(['ok' => false, 'error' => 'invalid_allocation_id'], 400);
+    }
+    delete_online_form_draft($allocationId);
+    api_json(['ok' => true, 'allocation_id' => $allocationId, 'server_time' => now_iso()]);
+  }
+
   case 'form_fill_get_draft': {
     require_logged_in($store);
     $allocationId = trim((string)($_GET['allocation_id'] ?? $_POST['allocation_id'] ?? ''));

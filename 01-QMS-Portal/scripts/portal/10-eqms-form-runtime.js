@@ -41,7 +41,8 @@ function toast(msg, type){
 }
 
 function currentUser(){
-  var u = (typeof window.currentUser !== 'undefined' && window.currentUser) ? window.currentUser : {};
+  var w = (typeof window !== 'undefined') ? window : {};
+  var u = w.currentUser || w.__currentUser || {};
   return {
     username: String(u.username || '').trim(),
     name: String(u.display_name || u.name || u.username || '').trim(),
@@ -171,7 +172,13 @@ function resolveCurrentUserLookupItem(field){
   if(!u.username && !u.name) return null;
   var items = buildLookupItems(field.lookup_source || '');
   var matched = items.find(function(item){
-    return String(item.username || '').toLowerCase() === String(u.username || '').toLowerCase();
+    var itemUsername = String(item.username || item.value || '').trim().toLowerCase();
+    var itemName = String(item.person_name || item.label || '').trim().toLowerCase();
+    var sessionUsername = String(u.username || '').trim().toLowerCase();
+    var sessionName = String(u.name || '').trim().toLowerCase();
+    return (itemUsername && sessionUsername && itemUsername === sessionUsername) ||
+      (itemName && sessionName && itemName === sessionName) ||
+      (itemUsername && sessionName && itemUsername === sessionName);
   });
   if(matched) return matched;
   return {
@@ -230,6 +237,12 @@ var state = {
   auditLog: [],
   originalValues: {}
 };
+
+function openPrompt(options){
+  if(typeof window._ecPromptDialog === 'function') return window._ecPromptDialog(options || {});
+  var fallback = window.prompt((options && options.message) || '', (options && options.value) || '');
+  return Promise.resolve(fallback == null ? null : String(fallback));
+}
 
 /* ── Schema Loading ── */
 function loadSchema(formCode){
@@ -532,12 +545,14 @@ function renderForm(container){
         '</div>';
     } else {
       html += '<div class="eqms-actions">' +
+        '<button class="eqms-btn ghost" id="eqms-cancel-create">' + esc(t('Hủy tạo form', 'Cancel form creation')) + '</button>' +
         '<button class="eqms-btn secondary" id="eqms-save-draft">' + esc(t('Lưu nháp', 'Save draft')) + '</button>' +
         '<button class="eqms-btn primary" id="eqms-submit">' + esc(t('Gửi biểu mẫu', 'Submit form')) + '</button>' +
       '</div>';
     }
   } else if(state.entry || state.allocationId){
     html += '<div class="eqms-actions">' +
+      '<button class="eqms-btn ghost" id="eqms-edit-template">' + esc(t('Chỉnh sửa mẫu form', 'Edit form template')) + '</button>' +
       '<button class="eqms-btn secondary" id="eqms-enter-edit">' + esc(t('Chỉnh sửa có kiểm soát', 'Controlled edit')) + '</button>' +
     '</div>';
   }
@@ -680,6 +695,12 @@ function bindFields(container){
     };
   });
 
+  var cancelBtn = document.getElementById('eqms-cancel-create');
+  if(cancelBtn) cancelBtn.onclick = function(){
+    cancelBtn.disabled = true;
+    cancelFormCreation().finally(function(){ cancelBtn.disabled = false; });
+  };
+
   /* Save draft */
   var saveBtn = document.getElementById('eqms-save-draft');
   if(saveBtn) saveBtn.onclick = function(){
@@ -732,6 +753,15 @@ function bindFields(container){
     state.editOrigin = 'controlled_edit';
     state.originalValues = JSON.parse(JSON.stringify(state.fieldValues || {}));
     renderForm(container);
+  };
+
+  var editTemplateBtn = document.getElementById('eqms-edit-template');
+  if(editTemplateBtn) editTemplateBtn.onclick = function(){
+    if(typeof window._ecOpenEqmsBuilder === 'function'){
+      window._ecOpenEqmsBuilder(state.formCode || '');
+      return;
+    }
+    toast('Trình chỉnh sửa mẫu form chưa sẵn sàng.', 'warn');
   };
 
   /* Signature blocks */
@@ -821,6 +851,57 @@ function clearLocalDraft(){
     localStorage.removeItem(draftStorageKey());
     localStorage.removeItem(legacyDraftStorageKey());
   } catch(e){}
+}
+
+function discardServerDraft(){
+  if(!state.allocationId) return Promise.resolve({ ok:true, source:'local_only' });
+  return api('form_fill_discard_draft', {
+    allocation_id: state.allocationId,
+    entry_id: state.entryId,
+    form_code: state.formCode
+  }, 'POST').then(function(resp){
+    if(resp && resp.ok === false) throw new Error(resp.error || 'discard_failed');
+    return resp || { ok:true };
+  }).catch(function(){
+    return { ok:false, source:'server_unavailable' };
+  });
+}
+
+function cancelFormCreation(){
+  var workflowState = String((state.entry && state.entry.workflow_state) || '').trim().toLowerCase();
+  if(state.editOrigin === 'controlled_edit' || ['submitted','approved','closed','received'].indexOf(workflowState) >= 0){
+    toast('Hồ sơ này đã vào luồng kiểm soát chính thức. Muốn sửa tiếp phải dùng chỉnh sửa có kiểm soát, không được hủy tạo.', 'warn');
+    return Promise.resolve(false);
+  }
+  return openPrompt({
+    title: 'Hủy tạo form',
+    message: 'Nhập lý do hủy tạo form. Mã đã cấp sẽ được giữ trong sổ quản lý và chuyển sang trạng thái hủy.',
+    multiline: true,
+    required: true,
+    confirmLabel: 'Xác nhận hủy',
+    cancelLabel: 'Quay lại'
+  }).then(function(reason){
+    if(reason == null) return false;
+    var tasks = [discardServerDraft()];
+    if(state.allocationId){
+      tasks.push(api('record_id_void', {
+        allocation_id: state.allocationId,
+        reason: reason
+      }, 'POST').then(function(resp){
+        if(resp && resp.ok === false) throw new Error(resp.error || 'void_failed');
+        return resp;
+      }));
+    }
+    return Promise.all(tasks).then(function(){
+      clearLocalDraft();
+      toast('Đã hủy tạo form và giữ lại lịch sử cấp mã.', 'success');
+      if(typeof window._ecOpenEqmsHub === 'function') window._ecOpenEqmsHub();
+      return true;
+    }).catch(function(err){
+      toast('Không thể hủy tạo form: ' + String((err && err.message) || ''), 'error');
+      return false;
+    });
+  });
 }
 
 function listUserDrafts(){

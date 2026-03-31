@@ -10,6 +10,17 @@ let docHeaderMetaCollapsed = true;
 const PENDING_AUTH_TTL_MS = 10 * 60 * 1000;
 let pendingAuthTimer = null;
 
+function syncCurrentUserRef(user){
+  currentUser = user || null;
+  try{
+    window.currentUser = currentUser;
+    window.__currentUser = currentUser;
+  }catch(e){}
+  return currentUser;
+}
+
+syncCurrentUserRef(null);
+
 function clearPendingAuthTimer(){
   if(pendingAuthTimer){
     clearTimeout(pendingAuthTimer);
@@ -49,7 +60,7 @@ function resetPortalToLogin(options={}){
 
   clearPendingAuthTimer();
   try{ if(typeof stopLiveDocsSync==='function') stopLiveDocsSync(); }catch(e){}
-  currentUser = null;
+  syncCurrentUserRef(null);
   csrfToken = null;
   enrollInfo = null;
 
@@ -818,13 +829,13 @@ async function doLogin(){
 
 async function onLoggedIn(res){
   csrfToken = res.csrf_token || csrfToken;
-  currentUser = res.user || currentUser;
+  syncCurrentUserRef(res.user || currentUser);
 
   if(!currentUser){
     // fallback: check status
     try{
       const s = await apiCall('status', null, 'GET');
-      if(s.logged_in){ currentUser = s.user; csrfToken = s.csrf_token || csrfToken; }
+      if(s.logged_in){ syncCurrentUserRef(s.user); csrfToken = s.csrf_token || csrfToken; }
     }catch(e){}
   }
   // V10 Role migration: map old role keys to new JD-based keys
@@ -853,7 +864,7 @@ async function onLoggedIn(res){
     const accepted = await showConsentDialog();
     if(!accepted){
       showToast(lang==='en'?'Access denied — consent required':'Truy cập bị từ chối — cần đồng ý điều khoản');
-      currentUser = null; csrfToken = null;
+      syncCurrentUserRef(null); csrfToken = null;
       try{ await apiCall('auth_logout', {}, 'POST'); }catch(e){}
       setLoginStage('password');
       return;
@@ -873,7 +884,7 @@ async function onLoggedIn(res){
         not_supported: lang==='en'?'Browser does not support geolocation.':'Trình duyệt không hỗ trợ định vị.'
       };
       alert('⚠ ' + (reasons[geo.reason] || reasons.denied) + '\n\n' + (lang==='en'?'Session will be terminated.':'Phiên sẽ kết thúc.'));
-      currentUser = null; csrfToken = null;
+      syncCurrentUserRef(null); csrfToken = null;
       try{ await apiCall('auth_logout', {}, 'POST'); }catch(e){}
       setLoginStage('password');
       return;
@@ -890,7 +901,7 @@ async function doLogout(){
   try{ await apiCall('auth_logout', {}, 'POST'); }catch(e){}
 
   csrfToken = null;
-  currentUser = null;
+  syncCurrentUserRef(null);
   try{ if(typeof stopLiveDocsSync==='function') stopLiveDocsSync(); }catch(e){}
 
   document.getElementById('app').classList.remove('active');
@@ -930,7 +941,7 @@ async function checkSession(){
       const s = await apiCall('status', null, 'GET', 8000);
       if(s && s.logged_in){
         csrfToken = s.csrf_token || null;
-        currentUser = s.user;
+        syncCurrentUserRef(s.user);
         setLoginChecking(false, '');
         // Resume tracking with geolocation
         const geo = await requireGeolocation().catch(()=>({ok:false}));
@@ -1220,7 +1231,7 @@ async function doLogout(){
   try{ await apiCall('auth_logout', {}, 'POST'); }catch(e){}
 
   csrfToken = null;
-  currentUser = null;
+  syncCurrentUserRef(null);
 
   document.getElementById('app').classList.remove('active');
   document.getElementById('login-screen').style.display = 'flex';
@@ -1246,7 +1257,7 @@ async function checkSession(){
       if(s && s.logged_in){
         clearPendingAuthTimer();
         csrfToken = s.csrf_token || null;
-        currentUser = s.user;
+        syncCurrentUserRef(s.user);
         setLoginChecking(false, '');
         const geo = await requireGeolocation().catch(()=>({ok:false}));
         startActivityTracking(geo);

@@ -48,6 +48,8 @@ var state = {
   pendingContext: null,
   _eqmsOpenCode: '',
   _eqmsOpenOptions: null,
+  _eqmsBuilderFormCode: '',
+  _eqmsBuilderOptions: null,
   workQueue: {
     pending: [],
     exceptions: [],
@@ -244,6 +246,8 @@ window._ecShowToast = showToast;
 window._ecT = t;
 window._ecEsc = esc;
 window._ecPromptDialog = openPromptDialog;
+window._ecOpenEqmsHub = openEqmsHub;
+window._ecOpenEqmsBuilder = openEqmsBuilder;
 
 function pageEl(){ return document.getElementById('page-forms'); }
 function requestRender(){ var page = pageEl(); if(page) render(page); }
@@ -604,6 +608,29 @@ function openEqmsRuntime(formCode, options){
   state.workspaceMode = 'eqms';
   state._eqmsOpenCode = formCode || '';
   state._eqmsOpenOptions = Object.assign({}, options || {});
+  state._eqmsBuilderFormCode = '';
+  state._eqmsBuilderOptions = null;
+  requestRender();
+}
+
+function openEqmsHub(){
+  state.workspaceMode = 'eqms';
+  state._eqmsOpenCode = '';
+  state._eqmsOpenOptions = null;
+  state._eqmsBuilderFormCode = '';
+  state._eqmsBuilderOptions = null;
+  requestRender();
+  loadRegistry(false).then(function(){
+    if(state.workspaceMode === 'eqms' && !state._eqmsOpenCode) requestRender();
+  });
+}
+
+function openEqmsBuilder(formCode, options){
+  state.workspaceMode = 'eqms-builder';
+  state._eqmsBuilderFormCode = formCode || '';
+  state._eqmsBuilderOptions = Object.assign({}, options || {});
+  state._eqmsOpenCode = '';
+  state._eqmsOpenOptions = null;
   requestRender();
 }
 
@@ -1247,7 +1274,7 @@ function render(container){
     '<div class="ec-tabs" id="ec-tabs">' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'work' ? ' active' : '') + '" data-tab="work">' + esc(t('Việc của tôi', 'My Work')) + (workCount ? '<span class="ec-tab-badge">' + workCount + '</span>' : '') + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'form' ? ' active' : '') + '" data-tab="form">' + esc(t('Biểu mẫu', 'Forms')) + '</button>' +
-      '<button type="button" class="ec-tab' + (state.workspaceMode === 'eqms' ? ' active' : '') + '" data-tab="eqms">' + esc(t('Online Form', 'Online Form')) + '</button>' +
+      '<button type="button" class="ec-tab' + ((state.workspaceMode === 'eqms' || state.workspaceMode === 'eqms-builder') ? ' active' : '') + '" data-tab="eqms">' + esc(t('Online Form', 'Online Form')) + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'registry' ? ' active' : '') + '" data-tab="registry">' + esc(t('Quản lý mã', 'Code Registry')) + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'upload' ? ' active' : '') + '" data-tab="upload">' + esc(t('Tải lên', 'Upload')) + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'record-id' ? ' active' : '') + '" data-tab="record-id">' + esc(t('Tạo mã', 'Record ID')) + '</button>' +
@@ -1367,6 +1394,9 @@ function renderEqmsHub(container){
           '<h2>' + esc(t('Trung tâm vận hành eQMS form', 'eQMS form operations hub')) + '</h2>' +
           '<p>' + esc(t('Tạo mới hồ sơ online hoặc offline từ cùng một form, tiếp tục bản nháp đang dở, và chuyển sang sổ quản lý mã đã cấp để theo dõi toàn bộ vòng đời.', 'Start online or offline records from the same form, resume in-progress drafts, and jump into the issued-code registry to track the full lifecycle.')) + '</p>' +
         '</div>' +
+        '<div class="ec-toolbar-actions">' +
+          '<button type="button" class="ec-btn ghost" id="ec-eqms-builder-new">' + esc(t('Tạo mẫu form online', 'Create online form template')) + '</button>' +
+        '</div>' +
         '<div class="ec-kpi-grid">' +
           '<div class="ec-kpi-card primary"><small>' + esc(t('Form eQMS', 'eQMS forms')) + '</small><strong>' + esc(forms.length) + '</strong><span>' + esc(t('Biểu mẫu có thể vận hành theo luồng điện tử hoặc kết hợp điện tử/Excel.', 'Forms available in electronic or hybrid electronic/Excel mode.')) + '</span></div>' +
           '<div class="ec-kpi-card neutral"><small>' + esc(t('Bản nháp cục bộ', 'Local drafts')) + '</small><strong>' + esc((typeof window.listUserDrafts === 'function' ? (window.listUserDrafts() || []).length : 0)) + '</strong><span>' + esc(t('Các bản nháp đang lưu trên trình duyệt này để tiếp tục điền.', 'Drafts saved in this browser and ready to resume.')) + '</span></div>' +
@@ -1396,6 +1426,7 @@ function renderEqmsHub(container){
           (hasOnline ? '<button type="button" class="ec-btn primary" data-eqms-new-online="' + esc(form.form_code || '') + '">' + esc(t('Tạo mới online', 'New online record')) + '</button>' : '') +
           (hasOffline ? '<button type="button" class="ec-btn secondary" data-eqms-new-offline="' + esc(form.form_code || '') + '">' + esc(t('Tạo mới offline', 'New offline record')) + '</button>' : '') +
           (draft ? '<button type="button" class="ec-btn ghost" data-eqms-resume="' + esc(form.form_code || '') + '" data-eqms-resume-alloc="' + esc(draft.allocationId || '') + '" data-eqms-resume-record="' + esc(draft.recordId || '') + '" data-eqms-resume-entry="' + esc(draft.entryId || '') + '">' + esc(t('Tiếp tục bản nháp', 'Resume draft')) + '</button>' : '') +
+          '<button type="button" class="ec-btn ghost" data-eqms-edit-template="' + esc(form.form_code || '') + '">' + esc(t('Chỉnh sửa mẫu', 'Edit template')) + '</button>' +
           '<button type="button" class="ec-btn ghost" data-eqms-open-registry="' + esc(form.form_code || '') + '">' + esc(t('Quản lý mã đã cấp', 'Manage issued codes')) + '</button>' +
         '</div>' +
       '</article>';
@@ -1431,6 +1462,23 @@ function renderEqmsHub(container){
       loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') requestRender(); });
     };
   });
+  Array.prototype.forEach.call(container.querySelectorAll('[data-eqms-edit-template]'), function(btn){
+    btn.onclick = function(){ openEqmsBuilder(btn.getAttribute('data-eqms-edit-template') || ''); };
+  });
+  var newBuilderBtn = document.getElementById('ec-eqms-builder-new');
+  if(newBuilderBtn) newBuilderBtn.onclick = function(){
+    openEqmsBuilder('FRM-NEW', {
+      seedForm: {
+        form_code: 'FRM-NEW',
+        title: 'New eQMS Form',
+        title_vi: 'Biểu mẫu eQMS mới',
+        version: 'V1.0',
+        category: 'other',
+        description: '',
+        description_vi: 'Khởi tạo biểu mẫu mới theo chuẩn eQMS.'
+      }
+    });
+  };
 }
 
 function renderEqmsRegistry(container){
@@ -1594,6 +1642,19 @@ function renderWorkspacePane(){
     return;
   }
 
+  if(state.workspaceMode === 'eqms-builder'){
+    var builderForm = (state._eqmsBuilderFormCode && state.formMap[state._eqmsBuilderFormCode]) || null;
+    if(!builderForm && state._eqmsBuilderOptions && state._eqmsBuilderOptions.seedForm){
+      builderForm = state._eqmsBuilderOptions.seedForm;
+    }
+    if(typeof window._renderFormBuilder === 'function' && builderForm){
+      window._renderFormBuilder(builderForm, wsEl);
+    } else {
+      wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Trình chỉnh sửa mẫu form chưa sẵn sàng', 'Form template editor not ready')) + '</h3></div>';
+    }
+    return;
+  }
+
   /* Form tab: embed the document file explorer for FRM category */
   if(state.workspaceMode === 'form'){
     /* Set document browser state to show FRM category */
@@ -1664,7 +1725,13 @@ function bindSidebar(container){
     var tabBtn = event.target.closest('[data-tab]');
     if(tabBtn){
       var tabMode = tabBtn.getAttribute('data-tab') || 'form';
-      if(tabMode !== state.workspaceMode){ state._formFolderInited = false; state._eqmsOpenCode = ''; state._eqmsOpenOptions = null; }
+      if(tabMode !== state.workspaceMode){
+        state._formFolderInited = false;
+        state._eqmsOpenCode = '';
+        state._eqmsOpenOptions = null;
+        state._eqmsBuilderFormCode = '';
+        state._eqmsBuilderOptions = null;
+      }
       state.workspaceMode = tabMode;
       render(container);
       if(tabMode === 'work') loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') render(container); });

@@ -105,6 +105,19 @@ Action Bar (sticky bottom)
 
 The form container class is `.qf`, max-width 860px, centered.
 
+### 4.1 Runtime Action Bar Rules
+
+For draft-capable eQMS forms, the runtime action bar must follow this order:
+
+`[Ghost] Hủy tạo form` -> `[Secondary] Lưu nháp` -> `[Primary] Gửi biểu mẫu`
+
+Mandatory behavior:
+
+1. `Hủy tạo form` is only available before first official submission.
+2. `Hủy tạo form` must require a reason and must not hard-delete the issued record number.
+3. `Lưu nháp` stores the working payload without changing the issued number.
+4. `Gửi biểu mẫu` is the only action that creates the first official submission revision.
+
 ---
 
 ## 5. Header Design
@@ -232,6 +245,14 @@ Visual alternative to plain radio buttons for categorical selections:
 - Helper text below explains the lookup behavior
 - For `lookup_source: "company_users"`, the control must include a secondary shortcut button: `Dùng người đăng nhập`
 - Person-selection fields for issuer/reviewer/approver must use company directory lookup, not free text and not workshop-only `operators`
+
+### 7.11 Form Template Editing Entry Point
+
+- Every eQMS form view must provide a visible `Chỉnh sửa mẫu form` entry point for authorized template editors.
+- This action must open the version-controlled form builder inside the `Online Form` workspace, not redirect users to an unrelated module.
+- Template editing and record editing are distinct actions:
+  - `Chỉnh sửa mẫu form` = edit schema/template
+  - `Chỉnh sửa có kiểm soát` = amend an issued record instance
 
 ---
 
