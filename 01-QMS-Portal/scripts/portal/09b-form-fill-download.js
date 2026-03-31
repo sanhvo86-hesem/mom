@@ -24,6 +24,13 @@ function api(action,payload,method){
   return fetch('api.php?action='+encodeURIComponent(action),opts).then(function(r){return r.json();});
 }
 function toast(msg,type){ if(typeof window._ecShowToast==='function') window._ecShowToast(msg,type); }
+function dvBtn(label,icon,tone,onClick,extraAttrs){
+  if(typeof renderDocHeaderButton==='function') return renderDocHeaderButton(label,icon,tone,onClick||'','',(extraAttrs||''));
+  var cls='dv-btn'+(tone?' dv-btn-'+tone:'');
+  var ico=typeof getDocHeaderIcon==='function'?getDocHeaderIcon(icon):'';
+  return '<button class="'+cls+'"'+(extraAttrs?' '+extraAttrs:'')+' onclick="'+(onClick||'')+'">' +
+    '<span class="dv-btn-ico">'+ico+'</span><span class="dv-btn-label">'+esc(label)+'</span></button>';
+}
 function user(){
   var u=(typeof currentUser!=='undefined'&&currentUser)?currentUser:{};
   return { username:String(u.username||'').trim(), name:String(u.display_name||u.name||u.username||'').trim(), title:String(u.title||u.role||'').trim(), dept:String(u.dept||'').trim(), signerId:String(u.username||'').trim().toUpperCase() };
@@ -1130,27 +1137,43 @@ function renderWorkspace(form, allocation, container){
   if(!isDual && !isOnline) activeMode = 'offline';
   if(!isDual && isOnline) activeMode = 'online';
 
-  /* ── Document-style header ── */
+  /* ── Standard toolbar in main header (same as SOP/WI) ── */
+  var toolbarHtml = '<div class="doc-toolbar-shell">' +
+    '<div class="dv-action-group dv-edit-actions">' +
+      dvBtn(t('Chỉnh sửa', 'Edit'), 'edit', 'primary', '', 'id="ec-edit-form-btn"') +
+    '</div>' +
+    '<div class="dv-action-group dv-nav-actions">' +
+      dvBtn(t('Hiện chi tiết', 'Show details'), 'expand', '', '', 'id="ec-version-history-btn"') +
+      dvBtn(t('Quay lại', 'Back'), 'back', '', '', 'id="ec-back-btn"') +
+      dvBtn(t('Mở tab mới', 'Open in new tab'), 'external', '', '', 'id="ec-newtab-btn"') +
+    '</div>' +
+  '</div>';
+  if(typeof setDocHeaderToolbar === 'function') setDocHeaderToolbar(toolbarHtml);
+
+  /* ── Breadcrumb in main header ── */
+  var breadcrumbEl = document.getElementById('header-breadcrumb');
+  if(breadcrumbEl){
+    breadcrumbEl.innerHTML = '<a href="#" onclick="navigateTo(\'forms\');return false;" style="text-decoration:none;color:inherit">\uD83C\uDFE0</a>' +
+      ' <span class="sep">\u203A</span> ' +
+      '<span>' + esc(t('Kiểm soát chứng cứ', 'Evidence Control')) + '</span>' +
+      ' <span class="sep">\u203A</span> ' +
+      '<span class="current">' + esc(form.form_code + ' · ' + (form.title_vi || form.title || '')) + '</span>';
+  }
+
+  /* ── Document info header (inside workspace) ── */
   var statusText = allocation ? statusLabel(allocation.status || 'allocated') : t('Chưa cấp mã', 'Not allocated');
   var statusTone = allocation ? (allocation.status === 'approved' ? 'pass' : allocation.status === 'rejected' ? 'fail' : allocation.status === 'in_review' ? 'warn' : 'info') : 'neutral';
 
-  html += '<div class="ec-doc-bar">' +
-    '<div class="ec-doc-bar-left">' +
-      '<div class="ec-doc-bar-icon" style="background:' + catMeta.bg + '">' + catMeta.icon + '</div>' +
-      '<div class="ec-doc-bar-meta">' +
-        '<div class="ec-doc-bar-code">' + esc(form.form_code) + ' <span class="ec-doc-bar-rev">' + esc(form.version || 'V1') + '</span></div>' +
-        '<div class="ec-doc-bar-title">' + esc(form.title_vi || form.title || form.form_code) + '</div>' +
+  html += '<div class="ec-doc-info">' +
+    '<div class="ec-doc-info-main">' +
+      '<div class="ec-doc-info-icon" style="background:' + catMeta.bg + '">' + catMeta.icon + '</div>' +
+      '<div class="ec-doc-info-text">' +
+        '<div class="ec-doc-info-code">' + esc(form.form_code) + ' <span class="ec-doc-info-rev">' + esc(form.version || 'V1') + '</span></div>' +
+        '<div class="ec-doc-info-title">' + esc(form.title_vi || form.title || form.form_code) + '</div>' +
       '</div>' +
-    '</div>' +
-    '<div class="ec-doc-bar-center">' +
       '<span class="ec-badge ' + statusTone + '">' + esc(statusText) + '</span>' +
-      (form.sop_ref ? '<a class="ec-doc-bar-sop" href="#" data-navigate-doc="' + esc(form.sop_ref) + '">' + esc(form.sop_ref) + '</a>' : '') +
-      (allocation ? '<span class="ec-doc-bar-id">' + esc(allocation.record_id || '') + '</span>' : '') +
-    '</div>' +
-    '<div class="ec-doc-bar-actions">' +
-      '<button type="button" class="ec-doc-action" id="ec-version-history-btn" title="' + esc(t('Lịch sử phiên bản', 'Version history')) + '">\uD83D\uDCCB</button>' +
-      '<button type="button" class="ec-doc-action" id="ec-print-form-btn" title="' + esc(t('In biểu mẫu', 'Print form')) + '">\uD83D\uDDA8</button>' +
-      '<button type="button" class="ec-doc-action primary" id="ec-edit-form-btn" title="' + esc(t('Chỉnh sửa biểu mẫu', 'Edit form')) + '">\u270E ' + esc(t('Chỉnh sửa', 'Edit')) + '</button>' +
+      (form.sop_ref ? '<a class="ec-doc-info-sop" href="#" data-navigate-doc="' + esc(form.sop_ref) + '">' + esc(form.sop_ref) + '</a>' : '') +
+      (allocation ? '<span class="ec-doc-info-record">' + esc(allocation.record_id || '') + '</span>' : '') +
     '</div>' +
   '</div>';
 
@@ -2723,6 +2746,26 @@ function bindWorkspace(form, allocation, container){
       else if(docCode) toast(t('Mở tài liệu: ', 'Open document: ') + docCode, 'info');
     };
   });
+
+  /* Back button — clear selection, return to form list */
+  var backBtn = document.getElementById('ec-back-btn');
+  if(backBtn) backBtn.onclick = function(){
+    if(typeof setDocHeaderToolbar === 'function') setDocHeaderToolbar('');
+    var st = window._ecState;
+    if(st){ st.selectedFormCode = ''; st.selectedAllocationId = ''; st.allocations = []; }
+    if(typeof window.renderOnlineForms === 'function') window.renderOnlineForms();
+  };
+
+  /* New tab button — open standalone form or form runtime in new tab */
+  var newtabBtn = document.getElementById('ec-newtab-btn');
+  if(newtabBtn) newtabBtn.onclick = function(){
+    if(standaloneOnlinePath(form)){
+      var src = standaloneRuntimeSrc(form, allocation);
+      window.open(src, '_blank');
+    } else {
+      toast(t('Form này không có trang HTML riêng.', 'This form does not have a standalone HTML page.'), 'info');
+    }
+  };
 
   /* allocate */
   var deptEl=document.getElementById('ec-alloc-dept');

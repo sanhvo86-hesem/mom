@@ -945,7 +945,15 @@ function bindWorkQueue(container){
 }
 
 function render(container){
-  container.innerHTML = '<div class="ec-shell">' + renderSidebar() + '<div class="ec-workspace" id="ec-workspace"></div></div>' +
+  var workCount = state.workQueue.loaded ? ((state.workQueue.pending || []).length + (state.workQueue.exceptions || []).length) : 0;
+  container.innerHTML =
+    '<div class="ec-tabs" id="ec-tabs">' +
+      '<button type="button" class="ec-tab' + (state.workspaceMode === 'form' ? ' active' : '') + '" data-tab="form">' + esc(t('Biểu mẫu', 'Forms')) + '</button>' +
+      '<button type="button" class="ec-tab' + (state.workspaceMode === 'work' ? ' active' : '') + '" data-tab="work">' + esc(t('Việc của tôi', 'My Work')) + (workCount ? '<span class="ec-tab-badge">' + workCount + '</span>' : '') + '</button>' +
+      '<button type="button" class="ec-tab' + (state.workspaceMode === 'upload' ? ' active' : '') + '" data-tab="upload">' + esc(t('Tải lên', 'Upload')) + '</button>' +
+      '<button type="button" class="ec-tab' + (state.workspaceMode === 'record-id' ? ' active' : '') + '" data-tab="record-id">' + esc(t('Tạo mã', 'Record ID')) + '</button>' +
+    '</div>' +
+    '<div class="ec-shell">' + renderSidebar() + '<div class="ec-workspace" id="ec-workspace"></div></div>' +
     '<button type="button" class="ec-sidebar-toggle" id="ec-sidebar-toggle" aria-label="' + esc(t('Mở/đóng danh mục','Toggle catalog')) + '">\u2630</button>';
   bindSidebar(container);
   renderWorkspacePane();
@@ -1002,11 +1010,6 @@ function renderSidebar(){
     }).join('') + '</div>' +
     '<div class="ec-form-list" id="ec-form-list">' + formListHtml + '</div>' +
     (state.selectedFormCode && state.workspaceMode === 'form' ? '<div class="ec-alloc-section"><div class="ec-alloc-section-head"><span>' + esc(t('Mã đã cấp', 'Allocations')) + ' (' + state.allocations.length + ')</span></div>' + (allocHtml || '<div style="padding:8px 16px;font-size:11px;color:var(--ec-text-muted)">' + esc(t('Chưa có mã', 'None yet')) + '</div>') + '</div>' : '') +
-    '<div class="ec-sidebar-tools">' +
-      '<button type="button" class="ec-tool-btn' + (state.workspaceMode === 'work' ? ' active' : '') + '" data-tool="work">' + esc(t('Việc của tôi', 'My Work')) + (workCount ? '<span class="ec-tool-pill">' + esc(workCount) + '</span>' : '') + '</button>' +
-      '<button type="button" class="ec-tool-btn' + (state.workspaceMode === 'record-id' ? ' active' : '') + '" data-tool="record-id">' + esc(t('Trợ lý tạo mã', 'Record ID Assistant')) + '</button>' +
-      '<button type="button" class="ec-tool-btn' + (state.workspaceMode === 'upload' ? ' active' : '') + '" data-tool="upload">' + esc(t('Tải lên & Kiểm tra', 'Upload & Verify')) + '</button>' +
-    '</div>' +
   '</aside>';
 }
 
@@ -1014,6 +1017,8 @@ function renderWorkspacePane(){
   var wsEl = document.getElementById('ec-workspace');
   if(!wsEl) return;
   if(state.workspaceMode !== 'work') stopWorkQueuePolling();
+  /* Clear main header toolbar when not viewing a specific form */
+  if(state.workspaceMode !== 'form' && typeof setDocHeaderToolbar === 'function') setDocHeaderToolbar('');
   if(state.workspaceLoading){
     wsEl.innerHTML = renderWorkspaceSkeleton();
     return;
@@ -1089,6 +1094,15 @@ function bindSidebar(container){
       state.workspaceMode = (state.workspaceMode === mode) ? 'form' : mode;
       render(container);
       if(state.workspaceMode === 'work') loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') render(container); });
+      return;
+    }
+
+    var tabBtn = event.target.closest('[data-tab]');
+    if(tabBtn){
+      var tabMode = tabBtn.getAttribute('data-tab') || 'form';
+      state.workspaceMode = tabMode;
+      render(container);
+      if(tabMode === 'work') loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') render(container); });
     }
   };
 
