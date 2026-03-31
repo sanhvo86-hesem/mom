@@ -154,6 +154,31 @@ FIX-001_PHOTO_20260327_0830-SET1.jpg
 GAGE-CMM-005_CAL-CERT_20260327_0800-QC1.pdf
 ```
 
+### PATTERN 7 — Server-managed Received / Resubmitted Form Copy
+
+Áp dụng cho bản offline hệ thống **đã tiếp nhận** hoặc bản online/offline được hệ thống đóng gói lại để lưu vết revision nội bộ.
+
+**Template:**
+```
+FRM-{code}_V{ver}_{record_id}_{YYYYMMDD}_R{nn}.{ext}
+```
+
+| Segment | Bắt buộc | Mô tả | Ví dụ |
+|---------|---------|-------|-------|
+| `FRM-{code}` | Luôn | Mã form theo registry | FRM-403 |
+| `V{ver}` | Luôn | Version form blank đang hiệu lực khi hồ sơ được tạo | V1 |
+| `{record_id}` | Luôn | Record-ID của instance hồ sơ | SCAR-2026-012 |
+| `{YYYYMMDD}` | Luôn | Ngày hệ thống tiếp nhận / đóng gói | 20260331 |
+| `R{nn}` | Luôn | Lần tiếp nhận / resubmission nội bộ | R01 |
+| `.{ext}` | Luôn | .xlsx, .pdf, .zip... | .xlsx |
+
+**Ví dụ:**
+```
+FRM-403_V1_SCAR-2026-012_20260331_R01.xlsx
+FRM-403_V1_SCAR-2026-012_20260402_R02.xlsx
+FRM-631_V2.1_NCR-2026-043_20260327_R01.pdf
+```
+
 ---
 
 ## 3. RecordType Code Dictionary
@@ -333,7 +358,19 @@ qms-data/counters/
 
 **Cơ chế:** File lock (LOCK_EX) đảm bảo chỉ 1 process đọc/ghi tại 1 thời điểm → không race condition.
 
-### 6.3 Luồng lấy Record-ID
+---
+
+### 6.3 eQMS Record-ID Reuse Rules
+
+| # | Quy tắc | Chi tiết bắt buộc |
+|---|---------|-------------------|
+| 1 | **Draft không sinh tên/mã mới** | Khi mở lại draft, hệ thống phải tiếp tục dùng `record_id` và naming lineage đã có; không được sinh file name/mã mới chỉ vì người dùng lưu nháp rồi mở lại. |
+| 2 | **Resubmission giữ nguyên Record-ID** | Online controlled edit và offline resubmission phải giữ nguyên `record_id`; chỉ tăng `submission_count`, `resubmission_count` hoặc `receipt_version`. |
+| 3 | **Filled copy user-side dùng Pattern 1** | File người dùng tải xuống để điền hoặc snapshot PDF người dùng xuất ra dùng PATTERN 1. |
+| 4 | **Server-managed received copy dùng Pattern 7** | Bản hệ thống tiếp nhận và khóa vào hồ sơ dùng PATTERN 7 để phản ánh số lần nộp lại nội bộ. |
+| 5 | **Không đè tên cũ** | Mọi lần nộp lại phải sinh tên lưu trữ mới; tuyệt đối không ghi đè file receipt trước đó. |
+
+### 6.4 Luồng lấy Record-ID
 
 **Online form:** Server tự cấp khi submit → nhúng vào filename PDF.
 

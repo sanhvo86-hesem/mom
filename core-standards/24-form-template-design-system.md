@@ -222,12 +222,16 @@ Visual alternative to plain radio buttons for categorical selections:
 - Title label (uppercase, bold, smaller font)
 - Signature pad area (64-80px height, white background)
 - Name + Role + Date inputs below (compact 32px height, centered text)
+- Unsigned state must show the current logged-in account in Vietnamese, for example: `Người đăng nhập hiện tại: ...`
+- Primary signing CTA must explicitly indicate the signer source, for example: `Người đăng nhập ký`
 
 ### 7.10 Lookup Input
 
 - Standard text input with a search icon positioned at the right
 - Icon is non-interactive (purely visual indicator)
 - Helper text below explains the lookup behavior
+- For `lookup_source: "company_users"`, the control must include a secondary shortcut button: `Dùng người đăng nhập`
+- Person-selection fields for issuer/reviewer/approver must use company directory lookup, not free text and not workshop-only `operators`
 
 ---
 
@@ -353,6 +357,7 @@ For forms requiring tabular data entry (measurement tables, inspection rows):
 - Signature blocks must never break across print pages (`break-inside: avoid`)
 - All three roles must be present: Reporter, Inspector/Verifier, Approver
 - Date fields use native date input type
+- If the form schema defines issuer/reviewer/approver person fields, those fields and the signature blocks must stay logically aligned with the current authenticated user model
 
 ---
 

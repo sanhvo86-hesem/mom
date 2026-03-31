@@ -59,6 +59,9 @@ Mọi biểu mẫu eQMS online form (FRM-xxx-SUFFIX) hiển thị **song ngữ**
 - Schema JSON lưu chuỗi tiếng Việt với Unicode đầy đủ (UTF-8)
 - Các trường chọn từ dữ liệu nền (supplier, part, operator) dùng `type: "lookup"` với `lookup_source`
 - Người phát hành và phê duyệt PHẢI chọn từ danh sách nhân sự, không nhập tay
+- Các trường nhân sự cấp công ty như `issued_by`, `reviewed_by`, `approved_by`, `prepared_by`, `verified_by`, `owner_user` PHẢI dùng `lookup_source: "company_users"` thay vì `operators`
+- Với mọi trường `company_users`, frontend PHẢI có nút tắt `Dùng người đăng nhập` để người dùng áp dụng nhanh chính tài khoản đang đăng nhập
+- Với chữ ký điện tử, CTA mặc định PHẢI nêu rõ người ký là tài khoản hiện tại, ví dụ `Người đăng nhập ký`
 - Header form tuân thủ core standard 23 (`.doc-name` = English SSOT, `.sub-vn` = Vietnamese)
 - Quy tắc áp dụng cho `10-eqms-form-runtime.js`, PDF export, và mọi form renderer tương lai
 
@@ -76,6 +79,7 @@ Mọi biểu mẫu eQMS online form (FRM-xxx-SUFFIX) hiển thị **song ngữ**
 | Khách hàng | `customers` | customer_id, customer_name |
 | Chi tiết + Revision | `parts` | part_number, revision, part_description |
 | Nhân sự | `operators` | operator_id, operator_name, role |
+| Danh bạ công ty | `company_users` | username, name, role, dept, title |
 | Trung tâm gia công | `work_centers` | work_center_id, work_center_name |
 | Máy | `machines` | machine_id, machine_name, machine_type |
 | Dụng cụ | `tooling_assets` | tool_id, tool_name, tool_type |

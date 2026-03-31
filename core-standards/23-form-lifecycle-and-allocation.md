@@ -93,6 +93,36 @@ Mỗi allocation record PHẢI lưu:
 | `void_reason` | Tùy | Lý do void |
 | `status_history` | CÓ | Array các lần chuyển trạng thái |
 
+### 2.4 eQMS Record Instance Rules (Bắt buộc cho form online/offline)
+
+| # | Quy tắc | Chi tiết bắt buộc |
+|---|---------|-------------------|
+| 1 | **Một instance = một Record-ID** | Mỗi lần người dùng bấm `Tạo mới online` hoặc `Tạo mới offline`, hệ thống cấp **1** `allocation_id` + `record_id` duy nhất cho toàn bộ vòng đời hồ sơ đó. |
+| 2 | **Mở lại bản nháp không được cấp mã mới** | Nếu đã có `allocation_id`/`record_id`, mọi lần mở lại draft PHẢI tái sử dụng đúng mã cũ. `Save draft` tuyệt đối KHÔNG được tăng counter. |
+| 3 | **Tab Tạo mã không dùng cho form** | Form online/offline tự cấp mã trong runtime của form. Tab `Tạo mã` chỉ phục vụ thực thể ngoài form như ANNEX number, mã vật tư, phôi, tooling, tài sản hoặc các record tham khảo khác. |
+| 4 | **Online submit giữ nguyên Record-ID** | Form online khi submit lần đầu tạo `submission_count = 1`. Các lần nộp lại tiếp theo trên cùng hồ sơ vẫn giữ nguyên `record_id`, chỉ tăng `submission_count` / `resubmission_count`. |
+| 5 | **Controlled edit sau submit không tạo hồ sơ mới** | Khi hồ sơ online đã nộp và người dùng vào `Chỉnh sửa có kiểm soát`, hệ thống phải mở lại cùng `allocation_id`/`record_id`, tạo `submission_revision` mới và tăng `amendment_count` nếu đây là sửa sau submit/review/approve. |
+| 6 | **Offline resubmission giữ nguyên Record-ID** | Form offline sau khi được cấp mã và tải về phải upload lại theo đúng `allocation_id` cũ. Mỗi lần upload hợp lệ làm tăng `receipt_version`; không được cấp Record-ID mới chỉ vì nộp lại workbook. |
+| 7 | **Rejected / Reopen vẫn dùng cùng mã** | Nếu hồ sơ bị reject hoặc reopen, hệ thống giữ nguyên `record_id`; chỉ thay đổi trạng thái workflow và sinh revision/receipt mới. |
+| 8 | **Chỉ cấp mã mới khi là business case mới** | Chỉ tạo Record-ID mới khi người dùng chủ động `Tạo mới` hoặc hồ sơ cũ đã `VOIDED` và nghiệp vụ yêu cầu lập hồ sơ khác. |
+
+### 2.5 Mandatory Registry Fields (Sổ quản lý mã eQMS)
+
+Mọi hệ thống eQMS form PHẢI có một registry để theo dõi tối thiểu:
+
+```
+allocation_id | record_id | form_code | delivery_mode | workflow_state | created_by | created_at
+last_action_at | submission_count | resubmission_count | amendment_count | receipt_version
+draft_exists | latest_filename | latest_submission_ref | completed_flag
+```
+
+Quy định bắt buộc:
+
+1. Registry phải hiển thị được cả online và offline trong cùng một màn hình tra cứu.
+2. Registry phải phân biệt rõ `draft`, `allocated`, `submitted`, `approved`, `closed`, `received`, `rejected`, `void`.
+3. Registry phải cho biết số lần nộp và số lần nộp lại của từng hồ sơ.
+4. Registry phải mở lại đúng hồ sơ hiện hành, không tạo bản mới khi người dùng chọn `Mở` hoặc `Chỉnh sửa`.
+
 ---
 
 ## 3. Version Control Rules
@@ -143,6 +173,22 @@ Mỗi form Excel blank PHẢI có sheet ẩn `_QMS_CONTROL` với:
 6. Nếu không có _QMS_CONTROL → REJECT (không phải form HESEM)
 7. Nếu checksum không khớp → FLAG (form bị sửa structure)
 ```
+
+### 3.4 Controlled Edit / Resubmission Rules
+
+| Tình huống | Record-ID | Revision nội bộ | Yêu cầu audit trail |
+|-----------|-----------|-----------------|---------------------|
+| Lưu nháp online | Giữ nguyên | Không tăng submission revision | Ghi `draft_saved_at`, `saved_by` |
+| Submit lần đầu online | Giữ nguyên | `submission_revision = 1` | Ghi `submitted_by`, `submitted_at`, chữ ký |
+| Chỉnh sửa sau submit online | Giữ nguyên | `submission_revision + 1` | Ghi lý do sửa, người sửa, thời điểm sửa, source revision |
+| Upload offline lần đầu | Giữ nguyên | `receipt_version = 1` | Ghi `uploaded_by`, `uploaded_at`, tên file đã nhận |
+| Upload offline nộp lại | Giữ nguyên | `receipt_version + 1` | Ghi version mới, giữ lịch sử receipt cũ |
+
+Quy tắc bắt buộc:
+
+1. Bản cũ không được bị che khuất hoặc mất truy vết khi có controlled edit / resubmission.
+2. Hệ thống phải giữ đủ metadata để xác định `ai`, `khi nào`, `vì sao`, và `bản nào` bị thay thế.
+3. Nếu workflow yêu cầu reopen, hành động reopen phải được ghi riêng trong history và không được reset counter về 0.
 
 ---
 

@@ -57,8 +57,14 @@ function fmtDate(v){
   catch(e){ return String(v); }
 }
 
+function currentUserKey(){
+  var u = currentUser();
+  return String(u.username || 'anon').trim().toLowerCase() || 'anon';
+}
+
 /* ── State ── */
 var masterData = null;
+var companyDirectory = null;
 
 function ensureMasterData(){
   if(masterData) return Promise.resolve(masterData);
@@ -74,6 +80,17 @@ function ensureMasterData(){
     mergeParts();
     return masterData;
   }).catch(function(){ masterData = {}; return masterData; });
+}
+
+function ensureCompanyDirectory(){
+  if(companyDirectory) return Promise.resolve(companyDirectory);
+  return api('company_directory_list', {}, 'GET').then(function(resp){
+    companyDirectory = Array.isArray(resp && resp.users) ? resp.users : [];
+    return companyDirectory;
+  }).catch(function(){
+    companyDirectory = [];
+    return companyDirectory;
+  });
 }
 
 function mergeParts(){
@@ -95,6 +112,38 @@ function mergeParts(){
 
 function buildLookupItems(source){
   var md = masterData || {};
+  if(source === 'company_users') {
+    var rows = Array.isArray(companyDirectory) ? companyDirectory.slice() : [];
+    var u = currentUser();
+    if(u.username && !rows.some(function(person){
+      return String(person.username || '').toLowerCase() === String(u.username || '').toLowerCase();
+    })){
+      rows.unshift({
+        username: u.username,
+        name: u.name || u.username,
+        role: u.role || '',
+        dept: u.dept || '',
+        title: ''
+      });
+    }
+    return rows.map(function(person){
+      var fullName = person.name || person.display_name || person.username || '';
+      return {
+        value: person.username || fullName,
+        label: fullName,
+        sub: [
+          person.username ? '@' + person.username : '',
+          person.title || person.role || '',
+          person.dept || ''
+        ].filter(Boolean).join(' · '),
+        username: person.username || '',
+        person_name: fullName,
+        role: person.role || '',
+        dept: person.dept || '',
+        title: person.title || ''
+      };
+    });
+  }
   if(source === 'suppliers') return (md.suppliers || []).map(function(s){
     return { value: s.supplier_id, label: s.supplier_id, sub: s.supplier_name || '', supplier_id: s.supplier_id, supplier_name: s.supplier_name || '', contact_name: s.contact_name || '', contact_email: s.contact_email || '', supplier_type: s.supplier_type || '' };
   });
@@ -111,6 +160,59 @@ function buildLookupItems(source){
   return [];
 }
 
+function allowCurrentUserShortcut(field){
+  if(!field) return false;
+  return field.lookup_source === 'company_users' && field.allow_current_user !== false;
+}
+
+function resolveCurrentUserLookupItem(field){
+  if(!field || !allowCurrentUserShortcut(field)) return null;
+  var u = currentUser();
+  if(!u.username && !u.name) return null;
+  var items = buildLookupItems(field.lookup_source || '');
+  var matched = items.find(function(item){
+    return String(item.username || '').toLowerCase() === String(u.username || '').toLowerCase();
+  });
+  if(matched) return matched;
+  return {
+    value: u.username || u.name || '',
+    label: u.name || u.username || '',
+    sub: [
+      u.username ? '@' + u.username : '',
+      u.role || '',
+      u.dept || ''
+    ].filter(Boolean).join(' · '),
+    username: u.username || '',
+    person_name: u.name || u.username || '',
+    role: u.role || '',
+    dept: u.dept || ''
+  };
+}
+
+function applyLookupSelection(field, fieldId, item, reason){
+  var old = state.fieldValues[fieldId] || '';
+  var newValue = item ? item.value : '';
+  state.fieldValues[fieldId] = newValue;
+  logFieldChange(fieldId, old, newValue, reason || '');
+
+  if(item && field && field.autofill){
+    Object.keys(field.autofill).forEach(function(target){
+      var src = field.autofill[target];
+      if(item[src] === undefined || item[src] === '') return;
+      var oldTarget = state.fieldValues[target] || '';
+      state.fieldValues[target] = item[src];
+      logFieldChange(target, oldTarget, item[src], 'Autofill from ' + fieldId);
+      var targetEl = document.getElementById('eqms-f-' + target);
+      if(targetEl) targetEl.value = item[src];
+    });
+  }
+
+  if(typeof window.SearchableInput === 'function'){
+    var si = window.SearchableInput.get('eqms-si-' + fieldId);
+    if(si) si.setValue(newValue);
+  }
+}
+
 var state = {
   formCode: '',
   schema: null,
@@ -118,6 +220,9 @@ var state = {
   entryId: '',
   recordId: '',
   allocationId: '',
+  editOrigin: 'new',
+  sourceEntryId: '',
+  sourceSubmissionRevision: 0,
   fieldValues: {},
   signatures: {},
   editMode: false,
@@ -157,6 +262,13 @@ function loadEntry(formCode, allocationId, entryId){
   }, 'POST').then(function(resp){
     if(resp && resp.ok && resp.entry) return resp.entry;
     return null;
+  }).catch(function(){ return null; });
+}
+
+function loadServerDraft(allocationId){
+  if(!allocationId) return Promise.resolve(null);
+  return api('form_fill_get_draft', { allocation_id: allocationId }, 'GET').then(function(resp){
+    return (resp && resp.ok && resp.draft) ? resp.draft : null;
   }).catch(function(){ return null; });
 }
 
@@ -248,7 +360,12 @@ function renderField(field, value, readOnly){
       break;
     case 'lookup':
       /* Lookup field — renders as searchable dropdown from master data */
+      html += '<div class="eqms-lookup-shell">';
       html += '<div id="' + esc(id) + '-host" class="eqms-lookup-host" data-lookup-source="' + esc(field.lookup_source || '') + '" data-field-id="' + esc(field.id) + '"></div>';
+      if(!readOnly && allowCurrentUserShortcut(field)){
+        html += '<button type="button" class="eqms-lookup-self" data-use-current-user="' + esc(field.id) + '">Dùng người đăng nhập</button>';
+      }
+      html += '</div>';
       if(val) html += '<input type="hidden" id="' + esc(id) + '" value="' + esc(val) + '">';
       break;
     case 'heading':
@@ -269,11 +386,13 @@ function renderField(field, value, readOnly){
 }
 
 /* ── Signature Block ── */
-function renderSignatureBlock(block, signatureData, canSign){
+function renderSignatureBlockLegacy(block, signatureData, canSign){
   var signed = !!signatureData;
   var meaning = block.meaning || 'Approved';
   var labelEn = block.label_en || block.label || block.id;
   var labelVi = block.label || '';
+  var signer = currentUser();
+  var currentSigner = [signer.name || signer.username || '', signer.role || signer.dept || ''].filter(Boolean).join(' · ');
   return '<div class="eqms-sig-block' + (signed ? ' signed' : '') + '">' +
     '<div class="eqms-sig-header">' +
       '<div><strong>' + esc(labelEn) + '</strong>' +
@@ -282,11 +401,34 @@ function renderSignatureBlock(block, signatureData, canSign){
       '<span class="eqms-sig-meaning">' + esc(meaning) + '</span>' +
     '</div>' +
     (signed ? '<div class="eqms-sig-data">' +
-      '<div>Name: <strong>' + esc(signatureData.printed_name || signatureData.signerName || '') + '</strong></div>' +
-      '<div>Date: ' + esc(fmtDate(signatureData.timestamp || signatureData.signed_at || '')) + '</div>' +
-      '<div>Meaning: ' + esc(signatureData.meaning || meaning) + '</div>' +
+      '<div>Họ tên: <strong>' + esc(signatureData.printed_name || signatureData.signerName || '') + '</strong></div>' +
+      '<div>Ngày ký: ' + esc(fmtDate(signatureData.timestamp || signatureData.signed_at || '')) + '</div>' +
+      '<div>Ý nghĩa: ' + esc(signatureData.meaning || meaning) + '</div>' +
     '</div>' : '<div class="eqms-sig-empty">Chưa ký</div>') +
     (canSign && !signed ? '<button class="eqms-btn primary" data-sign-block="' + esc(block.id) + '">Ký</button>' : '') +
+  '</div>';
+}
+
+function renderSignatureBlockUi(block, signatureData, canSign){
+  var signed = !!signatureData;
+  var meaning = block.meaning || 'Approved';
+  var labelEn = block.label_en || block.label || block.id;
+  var labelVi = block.label || '';
+  var signer = currentUser();
+  var currentSigner = [signer.name || signer.username || '', signer.role || signer.dept || ''].filter(Boolean).join(' · ');
+  return '<div class="eqms-sig-block' + (signed ? ' signed' : '') + '">' +
+    '<div class="eqms-sig-header">' +
+      '<div><strong>' + esc(labelEn) + '</strong>' +
+        (labelVi && labelVi !== labelEn ? '<div class="eqms-sig-label-vi">' + esc(labelVi) + '</div>' : '') +
+      '</div>' +
+      '<span class="eqms-sig-meaning">' + esc(meaning) + '</span>' +
+    '</div>' +
+    (signed ? '<div class="eqms-sig-data">' +
+      '<div>Họ tên: <strong>' + esc(signatureData.printed_name || signatureData.signerName || '') + '</strong></div>' +
+      '<div>Ngày ký: ' + esc(fmtDate(signatureData.timestamp || signatureData.signed_at || '')) + '</div>' +
+      '<div>Ý nghĩa: ' + esc(signatureData.meaning || meaning) + '</div>' +
+    '</div>' : '<div class="eqms-sig-empty">Chưa ký</div>') +
+    (canSign && !signed ? '<div class="eqms-sig-current-user">Người đăng nhập hiện tại: <strong>' + esc(currentSigner || '—') + '</strong></div><button class="eqms-btn primary" data-sign-block="' + esc(block.id) + '">Người đăng nhập ký</button>' : '') +
   '</div>';
 }
 
@@ -294,7 +436,7 @@ function renderSignatureBlock(block, signatureData, canSign){
 function renderForm(container){
   var schema = state.schema;
   if(!schema){
-    container.innerHTML = '<div class="eqms-empty">' + esc(t('Khong co schema', 'No schema available')) + '</div>';
+    container.innerHTML = '<div class="eqms-empty">' + esc(t('Không có schema', 'No schema available')) + '</div>';
     return;
   }
 
@@ -376,16 +518,27 @@ function renderForm(container){
       '<div class="eqms-sig-grid">';
     sigBlocks.forEach(function(block){
       var canSign = !readOnly && block.roles && block.roles.some(function(r){ return u.roles.indexOf(r) >= 0 || r === 'fill'; });
-      html += renderSignatureBlock(block, state.signatures[block.id], canSign);
+      html += renderSignatureBlockUi(block, state.signatures[block.id], canSign);
     });
     html += '</div></div>';
   }
 
   /* ── Action bar ── */
   if(state.editMode){
+    if(!state.allocationId && !state.entry){
+      html += '<div class="eqms-inline-alert">' + esc(t('Biểu mẫu này chưa có mã hồ sơ. Hãy cấp mã trước khi lưu nháp hoặc gửi chính thức.', 'This form does not have a record code yet. Issue a code before saving or submitting.')) + '</div>' +
+        '<div class="eqms-actions">' +
+          '<button class="eqms-btn primary" id="eqms-issue-code">' + esc(t('Cấp mã hồ sơ để bắt đầu', 'Issue record code to start')) + '</button>' +
+        '</div>';
+    } else {
+      html += '<div class="eqms-actions">' +
+        '<button class="eqms-btn secondary" id="eqms-save-draft">' + esc(t('Lưu nháp', 'Save draft')) + '</button>' +
+        '<button class="eqms-btn primary" id="eqms-submit">' + esc(t('Gửi biểu mẫu', 'Submit form')) + '</button>' +
+      '</div>';
+    }
+  } else if(state.entry || state.allocationId){
     html += '<div class="eqms-actions">' +
-      '<button class="eqms-btn secondary" id="eqms-save-draft">' + esc(t('Luu nhap', 'Save draft')) + '</button>' +
-      '<button class="eqms-btn primary" id="eqms-submit">' + esc(t('Gui bieu mau', 'Submit form')) + '</button>' +
+      '<button class="eqms-btn secondary" id="eqms-enter-edit">' + esc(t('Chỉnh sửa có kiểm soát', 'Controlled edit')) + '</button>' +
     '</div>';
   }
 
@@ -418,6 +571,41 @@ function bindFields(container){
   if(!schema || !state.editMode) return;
   var fields = schema.fields || [];
 
+  var issueBtn = document.getElementById('eqms-issue-code');
+  if(issueBtn){
+    issueBtn.onclick = function(){
+      if(!window.AllocationTracker){
+        toast(t('Dịch vụ cấp mã chưa sẵn sàng.', 'Allocation service is not ready.'), 'error');
+        return;
+      }
+      var recordType = String(schema.record_type || '').trim().toUpperCase();
+      var dept = String((schema.owner || 'QA').split('/')[0] || 'QA').trim().toUpperCase();
+      if(!recordType){
+        toast(t('Schema chưa cấu hình record type.', 'The schema record type is not configured.'), 'error');
+        return;
+      }
+      issueBtn.disabled = true;
+      window.AllocationTracker.allocate(recordType, dept, {
+        year: new Date().getFullYear(),
+        form_code: state.formCode,
+        notes: 'eqms_runtime_issue_code'
+      }).then(function(resp){
+        if(!(resp && resp.ok)){
+          throw new Error('allocation_failed');
+        }
+        state.allocationId = resp.allocation_id || '';
+        state.recordId = resp.record_id || '';
+        state.editOrigin = 'new';
+        toast(t('Đã cấp mã hồ sơ: ', 'Issued record code: ') + (state.recordId || ''), 'success');
+        renderForm(container);
+      }).catch(function(){
+        toast(t('Không thể cấp mã hồ sơ cho biểu mẫu này.', 'Could not issue a record code for this form.'), 'error');
+      }).finally(function(){
+        issueBtn.disabled = false;
+      });
+    };
+  }
+
   /* Mount lookup fields from master data */
   Array.prototype.forEach.call(container.querySelectorAll('.eqms-lookup-host'), function(host){
     var source = host.getAttribute('data-lookup-source') || '';
@@ -438,25 +626,24 @@ function bindFields(container){
       placeholderVi: (field && field.placeholder) || 'Tìm và chọn',
       placeholder: (field && field.placeholder_en) || 'Search and select',
       onSelect: function(item){
-        var old = state.fieldValues[fieldId] || '';
-        state.fieldValues[fieldId] = item ? item.value : '';
-        logFieldChange(fieldId, old, item ? item.value : '');
-        /* Autofill related fields from lookup item */
-        if(item && field && field.autofill){
-          Object.keys(field.autofill).forEach(function(target){
-            var src = field.autofill[target];
-            if(item[src] !== undefined && item[src] !== ''){
-              var oldTarget = state.fieldValues[target] || '';
-              state.fieldValues[target] = item[src];
-              logFieldChange(target, oldTarget, item[src], 'Autofill from ' + fieldId);
-              var targetEl = document.getElementById('eqms-f-' + target);
-              if(targetEl) targetEl.value = item[src];
-            }
-          });
-        }
+        applyLookupSelection(field, fieldId, item, 'Manual lookup selection');
       }
     });
     if(state.fieldValues[fieldId]) instance.setValue(state.fieldValues[fieldId]);
+  });
+
+  Array.prototype.forEach.call(container.querySelectorAll('[data-use-current-user]'), function(btn){
+    btn.onclick = function(){
+      var fieldId = btn.getAttribute('data-use-current-user') || '';
+      var field = fields.find(function(f){ return f.id === fieldId; });
+      var item = resolveCurrentUserLookupItem(field);
+      if(!field || !item){
+        toast('Không tìm thấy người đăng nhập trong danh sách công ty.', 'warn');
+        return;
+      }
+      applyLookupSelection(field, fieldId, item, 'Selected logged-in user');
+      toast('Đã áp dụng người đăng nhập cho trường này.', 'success');
+    };
   });
 
   fields.forEach(function(field){
@@ -498,9 +685,9 @@ function bindFields(container){
   if(saveBtn) saveBtn.onclick = function(){
     saveBtn.disabled = true;
     saveDraft().then(function(){
-      toast(t('Da luu nhap.', 'Draft saved.'), 'success');
+      toast(t('Đã lưu nháp.', 'Draft saved.'), 'success');
     }).catch(function(){
-      toast(t('Khong the luu nhap.', 'Could not save draft.'), 'error');
+      toast(t('Không thể lưu nháp.', 'Could not save draft.'), 'error');
     }).finally(function(){ saveBtn.disabled = false; });
   };
 
@@ -515,16 +702,36 @@ function bindFields(container){
     submitBtn.disabled = true;
     submitForm().then(function(resp){
       if(resp && resp.ok){
-        toast(t('Da gui bieu mau thanh cong.', 'Form submitted successfully.'), 'success');
+        clearLocalDraft();
+        toast(t('Đã gửi biểu mẫu thành công.', 'Form submitted successfully.'), 'success');
         state.editMode = false;
-        if(state.entry) state.entry.workflow_state = 'submitted';
-        renderForm(submitBtn.closest('.eqms-runtime') || document.getElementById('eqms-form-container'));
+        state.editOrigin = 'controlled_edit';
+        loadEntry(state.formCode, state.allocationId, state.entryId).then(function(entry){
+          if(entry){
+            state.entry = entry;
+            state.entryId = entry.entry_id || state.entryId;
+          } else if(state.entry){
+            state.entry.workflow_state = 'submitted';
+          }
+          renderForm(submitBtn.closest('.eqms-runtime') || document.getElementById('eqms-form-container'));
+        }).catch(function(){
+          if(state.entry) state.entry.workflow_state = 'submitted';
+          renderForm(submitBtn.closest('.eqms-runtime') || document.getElementById('eqms-form-container'));
+        });
       } else {
-        toast(t('Khong the gui: ', 'Could not submit: ') + (resp && resp.error || ''), 'error');
+        toast(t('Không thể gửi: ', 'Could not submit: ') + (resp && resp.error || ''), 'error');
       }
     }).catch(function(){
       toast(t('Loi ket noi.', 'Connection error.'), 'error');
     }).finally(function(){ submitBtn.disabled = false; });
+  };
+
+  var editBtn = document.getElementById('eqms-enter-edit');
+  if(editBtn) editBtn.onclick = function(){
+    state.editMode = true;
+    state.editOrigin = 'controlled_edit';
+    state.originalValues = JSON.parse(JSON.stringify(state.fieldValues || {}));
+    renderForm(container);
   };
 
   /* Signature blocks */
@@ -553,6 +760,10 @@ function validateRequired(){
 
 /* ── Save/Submit ── */
 function draftStorageKey(){
+  return 'eqms_draft_' + (state.formCode || 'unknown') + '_' + (state.allocationId || 'noalloc') + '_' + currentUserKey();
+}
+
+function legacyDraftStorageKey(){
   var u = currentUser();
   return 'eqms_draft_' + (state.formCode || 'unknown') + '_' + (state.allocationId || u.username || 'anon');
 }
@@ -564,6 +775,10 @@ function saveDraft(){
     formCode: state.formCode,
     allocationId: state.allocationId,
     recordId: state.recordId,
+    entryId: state.entryId,
+    editOrigin: state.editOrigin || 'draft',
+    sourceEntryId: state.sourceEntryId || '',
+    sourceSubmissionRevision: state.sourceSubmissionRevision || 0,
     fieldValues: state.fieldValues,
     signatures: state.signatures,
     savedAt: new Date().toISOString(),
@@ -576,6 +791,11 @@ function saveDraft(){
     return api('form_fill_save_draft', {
       form_code: state.formCode,
       allocation_id: state.allocationId,
+      entry_id: state.entryId,
+      record_id: state.recordId,
+      edit_origin: state.editOrigin || 'draft',
+      source_entry_id: state.sourceEntryId || '',
+      source_submission_revision: state.sourceSubmissionRevision || 0,
       data: { fieldValues: state.fieldValues, signatures: state.signatures }
     }, 'POST').catch(function(){
       /* Server save failed — localStorage draft is the backup */
@@ -587,14 +807,25 @@ function saveDraft(){
 
 function loadLocalDraft(){
   try {
-    var raw = localStorage.getItem(draftStorageKey());
+    var raw = localStorage.getItem(draftStorageKey()) || localStorage.getItem(legacyDraftStorageKey());
     if(!raw) return null;
-    return JSON.parse(raw);
+    var draft = JSON.parse(raw);
+    var owner = String(draft && draft.savedBy || '').trim().toLowerCase();
+    if(owner && owner !== currentUserKey()) return null;
+    return draft;
   } catch(e){ return null; }
+}
+
+function clearLocalDraft(){
+  try {
+    localStorage.removeItem(draftStorageKey());
+    localStorage.removeItem(legacyDraftStorageKey());
+  } catch(e){}
 }
 
 function listUserDrafts(){
   var drafts = [];
+  var owner = currentUserKey();
   try {
     for(var i = 0; i < localStorage.length; i++){
       var key = localStorage.key(i);
@@ -602,7 +833,10 @@ function listUserDrafts(){
       var raw = localStorage.getItem(key);
       if(!raw) continue;
       var d = JSON.parse(raw);
-      if(d && d.formCode) drafts.push(d);
+      if(!d || !d.formCode) continue;
+      var savedBy = String(d.savedBy || '').trim().toLowerCase();
+      if(savedBy && savedBy !== owner) continue;
+      drafts.push(d);
     }
   } catch(e){}
   drafts.sort(function(a, b){ return (b.savedAt || '').localeCompare(a.savedAt || ''); });
@@ -618,6 +852,10 @@ function submitForm(){
   payload.record_id = state.recordId;
   payload.allocation_id = state.allocationId;
   payload.signatures = state.signatures;
+  payload.entry_id = state.entryId;
+  payload.edit_origin = state.editOrigin || 'new';
+  payload.source_entry_id = state.sourceEntryId || '';
+  payload.source_submission_revision = state.sourceSubmissionRevision || 0;
   payload.runtime_mode = 'eqms_web_form';
 
   if(window.AllocationTracker && state.allocationId){
@@ -671,6 +909,9 @@ window.openEqmsForm = function(formCode, container, options){
   state.allocationId = options.allocationId || '';
   state.recordId = options.recordId || '';
   state.entryId = options.entryId || '';
+  state.editOrigin = options.editOrigin || 'new';
+  state.sourceEntryId = options.sourceEntryId || '';
+  state.sourceSubmissionRevision = Number(options.sourceSubmissionRevision || 0) || 0;
   state.editMode = !!options.editMode;
   state.fieldValues = {};
   state.signatures = {};
@@ -681,7 +922,7 @@ window.openEqmsForm = function(formCode, container, options){
   container.innerHTML = '<div class="eqms-runtime" id="eqms-form-container"><div class="eqms-loading">Đang tải biểu mẫu...</div></div>';
   var runtime = container.querySelector('.eqms-runtime');
 
-  Promise.all([loadSchema(formCode), ensureMasterData()]).then(function(results){
+  Promise.all([loadSchema(formCode), ensureMasterData(), ensureCompanyDirectory()]).then(function(results){
     var schema = results[0];
     if(!schema){
       runtime.innerHTML = '<div class="eqms-empty">Không tìm thấy schema cho form này.</div>';
@@ -690,20 +931,20 @@ window.openEqmsForm = function(formCode, container, options){
     state.schema = schema;
 
     /* Auto-create allocation if none provided */
-    if(!state.allocationId && window.AllocationTracker){
+    if(!state.allocationId && options.createIfMissing && window.AllocationTracker){
       var rt = schema.record_type || '';
       var dept = (schema.owner || 'QA').split('/')[0].trim();
       if(rt){
         return window.AllocationTracker.allocate(rt, dept, {
           year: new Date().getFullYear(),
           form_code: formCode,
-          notes: 'Auto-allocated from eQMS form',
+          notes: options.forceNew ? 'New eQMS form instance' : 'eQMS form instance',
           master_context: {}
         }).then(function(resp){
           if(resp && resp.ok){
             state.allocationId = resp.allocation_id || '';
             state.recordId = resp.record_id || '';
-            toast('Đã tự động cấp mã: ' + (resp.record_id || ''), 'success');
+            toast('Đã cấp mã hồ sơ: ' + (resp.record_id || ''), 'success');
           }
           return schema;
         }).catch(function(){ return schema; });
@@ -732,6 +973,10 @@ window.openEqmsForm = function(formCode, container, options){
       if(localDraft.signatures) state.signatures = localDraft.signatures;
       if(localDraft.allocationId && !state.allocationId) state.allocationId = localDraft.allocationId;
       if(localDraft.recordId && !state.recordId) state.recordId = localDraft.recordId;
+      if(localDraft.entryId && !state.entryId) state.entryId = localDraft.entryId;
+      if(localDraft.editOrigin && state.editOrigin === 'new') state.editOrigin = localDraft.editOrigin;
+      if(localDraft.sourceEntryId && !state.sourceEntryId) state.sourceEntryId = localDraft.sourceEntryId;
+      if(localDraft.sourceSubmissionRevision && !state.sourceSubmissionRevision) state.sourceSubmissionRevision = Number(localDraft.sourceSubmissionRevision) || 0;
     }
 
     /* Load existing entry from server if available */
@@ -739,11 +984,16 @@ window.openEqmsForm = function(formCode, container, options){
       return loadEntry(formCode, state.allocationId, state.entryId).then(function(entry){
         if(entry){
           state.entry = entry;
+          state.entryId = entry.entry_id || state.entryId;
           state.recordId = entry.record_id || state.recordId;
+          if(!state.sourceEntryId) state.sourceEntryId = entry.entry_id || '';
+          if(!state.sourceSubmissionRevision) state.sourceSubmissionRevision = Number(entry.submission_revision || 0) || 0;
           /* Hydrate field values from entry */
           Object.keys(entry).forEach(function(k){
             if(['form_code','form_version','record_id','allocation_id','signatures','_status','_ip','_server_time','submitted_by','submitted_at','entry_id','master_context','history','workflow_state'].indexOf(k) < 0){
-              state.fieldValues[k] = entry[k];
+              if(state.fieldValues[k] === undefined || state.fieldValues[k] === null || state.fieldValues[k] === ''){
+                state.fieldValues[k] = entry[k];
+              }
             }
           });
           if(entry.signatures && typeof entry.signatures === 'object') state.signatures = entry.signatures;
@@ -752,7 +1002,27 @@ window.openEqmsForm = function(formCode, container, options){
             state.editMode = false;
           }
         }
-        renderForm(runtime);
+        if(!state.allocationId){
+          renderForm(runtime);
+          return null;
+        }
+        return loadServerDraft(state.allocationId).then(function(serverDraft){
+          if(serverDraft && serverDraft.data){
+            var serverFields = serverDraft.data.fieldValues || {};
+            Object.keys(serverFields).forEach(function(k){ state.fieldValues[k] = serverFields[k]; });
+            if(serverDraft.data.signatures) state.signatures = serverDraft.data.signatures;
+            if(serverDraft.entry_id && !state.entryId) state.entryId = serverDraft.entry_id;
+            if(serverDraft.record_id && !state.recordId) state.recordId = serverDraft.record_id;
+            if(serverDraft.edit_origin && state.editOrigin === 'new') state.editOrigin = serverDraft.edit_origin;
+            if(serverDraft.source_entry_id && !state.sourceEntryId) state.sourceEntryId = serverDraft.source_entry_id;
+            if(serverDraft.source_submission_revision && !state.sourceSubmissionRevision) state.sourceSubmissionRevision = Number(serverDraft.source_submission_revision) || 0;
+          }
+          renderForm(runtime);
+          return null;
+        }).catch(function(){
+          renderForm(runtime);
+          return null;
+        });
       });
     }
 

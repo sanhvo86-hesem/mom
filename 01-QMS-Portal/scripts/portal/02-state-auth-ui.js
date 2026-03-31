@@ -584,13 +584,29 @@ function getNextParam(){
 }
 
 async function apiCall(action, payload=null, method='POST', timeoutMs=45000){
-  const url = 'api.php?action=' + encodeURIComponent(action);
+  let url = 'api.php?action=' + encodeURIComponent(action);
   const controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
   const opts = {method, credentials:'include', headers:{}};
   if(controller) opts.signal = controller.signal;
   if(method !== 'GET') opts.headers['Content-Type'] = 'application/json';
   if(csrfToken) opts.headers['X-CSRF-Token'] = csrfToken;
-  if(payload && method !== 'GET') opts.body = JSON.stringify(payload);
+  if(payload && method !== 'GET') {
+    opts.body = JSON.stringify(payload);
+  } else if(payload && method === 'GET') {
+    const params = new URLSearchParams();
+    Object.keys(payload).forEach(key => {
+      const value = payload[key];
+      if(value === undefined || value === null || value === '') return;
+      params.append(
+        key,
+        (typeof value === 'object')
+          ? JSON.stringify(value)
+          : String(value)
+      );
+    });
+    const query = params.toString();
+    if(query) url += '&' + query;
+  }
 
   let timer = null;
   try{

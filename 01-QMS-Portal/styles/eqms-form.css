@@ -82,6 +82,17 @@
 }
 @keyframes eqms-pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 
+.eqms-inline-alert {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border: 1px solid #fbbf24;
+  border-radius: var(--eqms-radius);
+  background: var(--eqms-warning-light);
+  color: #92400e;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
 /* ── Section ── */
 .eqms-section {
   background: var(--eqms-surface);
@@ -157,7 +168,20 @@
 .eqms-helper { font-size: 11px; color: var(--eqms-text-3); line-height: 1.5; }
 
 /* Lookup dropdown must float above everything */
+.eqms-lookup-shell { display: flex; flex-direction: column; gap: 6px; }
 .eqms-lookup-host { position: relative; z-index: 10; }
+.eqms-lookup-self {
+  align-self: flex-start;
+  padding: 6px 10px;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.eqms-lookup-self:hover { background: #dbeafe; }
 .eqms-lookup-host .si-dropdown,
 .eqms-lookup-host .si-results,
 .eqms-lookup-host [class*="dropdown"],
@@ -219,6 +243,15 @@
 }
 .eqms-sig-data { font-size: 12px; color: var(--eqms-text-2); line-height: 1.6; }
 .eqms-sig-empty { font-size: 12px; color: var(--eqms-text-3); text-align: center; padding: 16px 0; }
+.eqms-sig-current-user {
+  margin: 10px 0 12px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #1e3a8a;
+  font-size: 11px;
+  line-height: 1.5;
+}
 
 /* ── Action bar ── */
 .eqms-actions {

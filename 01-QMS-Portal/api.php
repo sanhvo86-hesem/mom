@@ -7851,6 +7851,44 @@ function save_online_form_entries_store(string $formCode, array $entries): void 
   file_put_contents($entryFile, json_encode($entries, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), LOCK_EX);
 }
 
+function online_form_draft_file(string $allocationId): string {
+  global $DATA_DIR;
+  return $DATA_DIR . '/online-forms/drafts/' . basename($allocationId) . '.json';
+}
+
+function load_online_form_draft(string $allocationId): ?array {
+  if ($allocationId === '') return null;
+  $draftFile = online_form_draft_file($allocationId);
+  if (!is_file($draftFile)) return null;
+  $raw = @file_get_contents($draftFile);
+  $draft = $raw ? json_decode($raw, true) : null;
+  return is_array($draft) ? $draft : null;
+}
+
+function save_online_form_draft(string $allocationId, array $payload): void {
+  $draftFile = online_form_draft_file($allocationId);
+  ensure_dir(dirname($draftFile));
+  file_put_contents($draftFile, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), LOCK_EX);
+}
+
+function delete_online_form_draft(string $allocationId): void {
+  $draftFile = online_form_draft_file($allocationId);
+  if (is_file($draftFile)) @unlink($draftFile);
+}
+
+function list_online_form_drafts(): array {
+  global $DATA_DIR;
+  $dir = $DATA_DIR . '/online-forms/drafts';
+  if (!is_dir($dir)) return [];
+  $out = [];
+  foreach (glob($dir . '/*.json') ?: [] as $file) {
+    $raw = @file_get_contents($file);
+    $draft = $raw ? json_decode($raw, true) : null;
+    if (is_array($draft) && !empty($draft['allocation_id'])) $out[] = $draft;
+  }
+  return $out;
+}
+
 function find_online_form_entry_index(array $entries, string $entryId = '', string $allocationId = ''): int {
   foreach ($entries as $idx => $entry) {
     if (!is_array($entry)) continue;
@@ -7864,6 +7902,56 @@ function form_is_online_runtime(string $formCode): bool {
   $schema = load_form_schema_by_code($formCode);
   if (!$schema) return false;
   return ($schema['online'] ?? true) !== false;
+}
+
+function eqms_workflow_status_from_entry(?array $entry, ?array $allocation = null, ?array $draft = null): string {
+  if (is_array($draft)) return 'draft';
+  if (is_array($entry)) {
+    $workflow = strtolower(trim((string)($entry['workflow_state'] ?? '')));
+    if ($workflow !== '') return $workflow;
+  }
+  $allocationStatus = strtolower(trim((string)($allocation['status'] ?? '')));
+  return match ($allocationStatus) {
+    'received' => 'received',
+    'submitted' => 'submitted',
+    'rejected' => 'rejected',
+    'approved' => 'approved',
+    'void' => 'void',
+    default => 'allocated',
+  };
+}
+
+function eqms_record_title_for_form_code(string $formCode): string {
+  $schema = load_form_schema_by_code($formCode);
+  if (is_array($schema) && !empty($schema['title'])) return (string)$schema['title'];
+  $registry = load_form_registry_entry($formCode);
+  if (is_array($registry) && !empty($registry['title'])) return (string)$registry['title'];
+  return $formCode;
+}
+
+function eqms_latest_entries_by_allocation(): array {
+  global $DATA_DIR;
+  $schemasDir = $DATA_DIR . '/online-forms/entries';
+  if (!is_dir($schemasDir)) return [];
+  $map = [];
+  foreach (glob($schemasDir . '/*.json') ?: [] as $file) {
+    $formEntries = json_decode((string)@file_get_contents($file), true);
+    if (!is_array($formEntries)) continue;
+    foreach ($formEntries as $entry) {
+      if (!is_array($entry)) continue;
+      $allocationId = trim((string)($entry['allocation_id'] ?? ''));
+      if ($allocationId === '') continue;
+      $existing = $map[$allocationId] ?? null;
+      $candidateRevision = (int)($entry['submission_revision'] ?? $entry['submission_count'] ?? 0);
+      $existingRevision = is_array($existing) ? (int)($existing['submission_revision'] ?? $existing['submission_count'] ?? 0) : -1;
+      $candidateTime = (string)($entry['updated_at'] ?? $entry['submitted_at'] ?? $entry['created_at'] ?? '');
+      $existingTime = is_array($existing) ? (string)($existing['updated_at'] ?? $existing['submitted_at'] ?? $existing['created_at'] ?? '') : '';
+      if (!$existing || $candidateRevision > $existingRevision || ($candidateRevision === $existingRevision && $candidateTime >= $existingTime)) {
+        $map[$allocationId] = $entry;
+      }
+    }
+  }
+  return $map;
 }
 
 function evidence_schema_field_map(array $schema): array {
@@ -12377,6 +12465,30 @@ case 'doc_save_draft': {
   }
 
 
+  case 'company_directory_list': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    require_logged_in($store);
+
+    $out = [];
+    foreach (($store['users'] ?? []) as $u) {
+      if (!is_array($u)) continue;
+      if (!(bool)($u['active'] ?? true)) continue;
+      $out[] = [
+        'name' => (string)($u['name'] ?? $u['username'] ?? ''),
+        'username' => (string)($u['username'] ?? ''),
+        'role' => (string)($u['role'] ?? ''),
+        'dept' => (string)($u['dept'] ?? ''),
+        'title' => (string)($u['title'] ?? ''),
+      ];
+    }
+
+    usort($out, static function(array $a, array $b): int {
+      return strcasecmp((string)($a['name'] ?? ''), (string)($b['name'] ?? ''));
+    });
+
+    api_json(['ok' => true, 'users' => $out, 'server_time' => now_iso()]);
+  }
+
   case 'admin_users_list': {
     if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
     $me = require_logged_in($store);
@@ -14628,6 +14740,9 @@ if ($username === '') {
     }
 
     $entryId = trim((string)($formData['entry_id'] ?? $allocation['online_submission']['entry_id'] ?? ''));
+    $editOrigin = trim((string)($formData['edit_origin'] ?? ''));
+    $sourceEntryId = trim((string)($formData['source_entry_id'] ?? ''));
+    $sourceSubmissionRevision = (int)($formData['source_submission_revision'] ?? 0);
     if ($entryId === '') {
       $entryId = $formCode . '-' . date('YmdHis') . '-' . substr(bin2hex(random_bytes(4)), 0, 8);
     }
@@ -14645,6 +14760,14 @@ if ($username === '') {
     $existingIdx = find_online_form_entry_index($existing, $entryId, $allocationId);
     $previous = $existingIdx >= 0 && is_array($existing[$existingIdx] ?? null) ? $existing[$existingIdx] : null;
     $formData['submission_revision'] = ((int)($previous['submission_revision'] ?? 0)) + 1;
+    $formData['submission_count'] = max(1, ((int)($previous['submission_count'] ?? 0)) + 1);
+    $formData['resubmission_count'] = max(0, ((int)$formData['submission_count']) - 1);
+    $isControlledEdit = $previous && strtolower(trim((string)($previous['workflow_state'] ?? 'draft'))) !== 'draft';
+    $formData['amendment_count'] = max(0, (int)($previous['amendment_count'] ?? 0) + ($isControlledEdit ? 1 : 0));
+    $formData['workflow_state'] = 'submitted';
+    $formData['edit_origin'] = $editOrigin !== '' ? $editOrigin : ($isControlledEdit ? 'controlled_edit' : 'new');
+    $formData['source_entry_id'] = $sourceEntryId !== '' ? $sourceEntryId : (string)($previous['entry_id'] ?? '');
+    $formData['source_submission_revision'] = $sourceSubmissionRevision > 0 ? $sourceSubmissionRevision : (int)($previous['submission_revision'] ?? 0);
     if ($previous && !empty($previous['created_at'])) {
       $formData['created_at'] = (string)$previous['created_at'];
       $formData['created_by'] = (string)($previous['created_by'] ?? $formData['submitted_by']);
@@ -14652,6 +14775,20 @@ if ($username === '') {
       $formData['created_at'] = $formData['submitted_at'];
       $formData['created_by'] = $formData['submitted_by'];
     }
+    $history = is_array($previous['history'] ?? null) ? $previous['history'] : [];
+    if ($previous) {
+      array_unshift($history, [
+        'timestamp' => now_iso(),
+        'event' => $isControlledEdit ? 'controlled_edit_superseded_submission' : 'submission_superseded',
+        'user' => $formData['submitted_by'],
+        'entry_id' => (string)($previous['entry_id'] ?? ''),
+        'submission_revision' => (int)($previous['submission_revision'] ?? 0),
+        'workflow_state' => (string)($previous['workflow_state'] ?? 'submitted'),
+        'submitted_at' => (string)($previous['submitted_at'] ?? ''),
+      ]);
+      if (count($history) > 50) $history = array_slice($history, 0, 50);
+    }
+    $formData['history'] = $history;
     if ($previous && empty($formData['master_context']) && !empty($previous['master_context']) && is_array($previous['master_context'])) {
       $formData['master_context'] = $previous['master_context'];
     }
@@ -14669,14 +14806,23 @@ if ($username === '') {
       'updated_at' => $formData['updated_at'],
       'updated_by' => $formData['updated_by'],
       'submission_revision' => (int)$formData['submission_revision'],
+      'submission_count' => (int)($formData['submission_count'] ?? 1),
+      'resubmission_count' => (int)($formData['resubmission_count'] ?? 0),
+      'amendment_count' => (int)($formData['amendment_count'] ?? 0),
+      'workflow_state' => 'submitted',
       'approval_state' => (string)($formData['approval_state'] ?? 'draft'),
       'signature_count' => count((array)($signatureValidation['summary'] ?? [])),
       'signature_summary' => $signatureValidation['summary'] ?? [],
     ];
     $allocation['signatures'] = is_array($formData['signatures'] ?? null) ? $formData['signatures'] : [];
-    allocation_append_event($allocation, 'submitted', $formData['submitted_by'], 'online_form_submitted', [
+    delete_online_form_draft($allocationId);
+    allocation_append_event($allocation, 'submitted', $formData['submitted_by'], ((int)($formData['resubmission_count'] ?? 0) > 0 ? 'online_form_resubmitted' : 'online_form_submitted'), [
       'entry_id' => $entryId,
       'submission_revision' => (int)$formData['submission_revision'],
+      'submission_count' => (int)($formData['submission_count'] ?? 1),
+      'resubmission_count' => (int)($formData['resubmission_count'] ?? 0),
+      'amendment_count' => (int)($formData['amendment_count'] ?? 0),
+      'edit_origin' => (string)($formData['edit_origin'] ?? ''),
       'approval_state' => (string)($formData['approval_state'] ?? 'draft'),
       'signature_blocks' => array_keys((array)($signatureValidation['summary'] ?? [])),
     ]);
@@ -15052,16 +15198,25 @@ if ($username === '') {
       if (is_array($registry)) {
         foreach ($registry as $code => $entry) {
           if (!is_array($entry)) continue;
-          if (isset($onlineMap[$code])) {
-            $catalogMap[$code]['blank_path'] = (string)($entry['path'] ?? '');
-            $catalogMap[$code]['blank_filename'] = (string)($entry['filename'] ?? '');
-            $catalogMap[$code]['template_checksum'] = (string)($entry['sha256'] ?? '');
-            $catalogMap[$code]['offline_fallback_available'] = (string)($entry['path'] ?? '') !== '';
-            $catalogMap[$code]['delivery_mode'] = !empty($catalogMap[$code]['online'])
-              ? 'online'
-              : (string)($entry['delivery_mode'] ?? 'download');
-            continue;
+        if (isset($onlineMap[$code])) {
+          $catalogMap[$code]['blank_path'] = (string)($entry['path'] ?? '');
+          $catalogMap[$code]['blank_filename'] = (string)($entry['filename'] ?? '');
+          $catalogMap[$code]['template_checksum'] = (string)($entry['sha256'] ?? '');
+          $catalogMap[$code]['offline_fallback_available'] = (string)($entry['path'] ?? '') !== '';
+          $catalogMap[$code]['delivery_mode'] = !empty($catalogMap[$code]['online'])
+            ? 'online'
+            : (string)($entry['delivery_mode'] ?? 'download');
+          $catalogMap[$code]['linked_excel_form'] = (string)($entry['linked_excel_form'] ?? '');
+          if (!empty($entry['linked_excel_form']) && !empty($registry[(string)$entry['linked_excel_form']]) && is_array($registry[(string)$entry['linked_excel_form']])) {
+            $offlineEntry = $registry[(string)$entry['linked_excel_form']];
+            $catalogMap[$code]['offline_form_code'] = (string)($offlineEntry['code'] ?? $entry['linked_excel_form']);
+            $catalogMap[$code]['blank_path'] = (string)($offlineEntry['path'] ?? $catalogMap[$code]['blank_path']);
+            $catalogMap[$code]['blank_filename'] = (string)($offlineEntry['filename'] ?? $catalogMap[$code]['blank_filename']);
+            $catalogMap[$code]['template_checksum'] = (string)($offlineEntry['sha256'] ?? $catalogMap[$code]['template_checksum']);
+            $catalogMap[$code]['offline_fallback_available'] = (string)($offlineEntry['path'] ?? '') !== '';
           }
+          continue;
+        }
           $num = (int)preg_replace('/\D+/', '', (string)$code);
           $series = (int)floor($num / 100) * 100;
           $category = match (true) {
@@ -15505,6 +15660,147 @@ if ($username === '') {
     $entryIndex = find_online_form_entry_index($entries, $entryId, $allocationId);
     if ($entryIndex < 0 || !is_array($entries[$entryIndex] ?? null)) { api_json(['ok' => false, 'error' => 'entry_not_found'], 404); }
     api_json(['ok' => true, 'entry' => $entries[$entryIndex]]);
+  }
+
+  case 'eqms_record_registry': {
+    $me = require_logged_in($store);
+    $formCode = trim((string)($_GET['form_code'] ?? $_POST['form_code'] ?? ''));
+    $deliveryMode = trim((string)($_GET['delivery_mode'] ?? $_POST['delivery_mode'] ?? ''));
+    $stateFilter = strtolower(trim((string)($_GET['state'] ?? $_POST['state'] ?? '')));
+    $search = strtolower(trim((string)($_GET['search'] ?? $_POST['search'] ?? '')));
+    $mineOnly = filter_var($_GET['mine_only'] ?? $_POST['mine_only'] ?? false, FILTER_VALIDATE_BOOL);
+    $completedOnly = filter_var($_GET['completed_only'] ?? $_POST['completed_only'] ?? false, FILTER_VALIDATE_BOOL);
+    $page = max(1, (int)($_GET['page'] ?? $_POST['page'] ?? 1));
+    $pageSize = max(1, min(200, (int)($_GET['page_size'] ?? $_POST['page_size'] ?? 50)));
+
+    $allocationStore = load_allocation_store();
+    $allocations = array_values((array)($allocationStore['allocations'] ?? []));
+    $entryMap = eqms_latest_entries_by_allocation();
+    $draftMap = [];
+    foreach (list_online_form_drafts() as $draft) {
+      if (!is_array($draft)) continue;
+      $allocationId = trim((string)($draft['allocation_id'] ?? ''));
+      if ($allocationId === '') continue;
+      $existing = $draftMap[$allocationId] ?? null;
+      $candidateTime = (string)($draft['saved_at'] ?? '');
+      $existingTime = is_array($existing) ? (string)($existing['saved_at'] ?? '') : '';
+      if (!$existing || $candidateTime >= $existingTime) $draftMap[$allocationId] = $draft;
+    }
+
+    $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+    $rows = [];
+
+    foreach ($allocations as $allocation) {
+      if (!is_array($allocation)) continue;
+      $allocationId = trim((string)($allocation['allocation_id'] ?? ''));
+      if ($allocationId === '') continue;
+      $entry = is_array($entryMap[$allocationId] ?? null) ? $entryMap[$allocationId] : null;
+      $draft = is_array($draftMap[$allocationId] ?? null) ? $draftMap[$allocationId] : null;
+      $rowFormCode = trim((string)($allocation['form_code'] ?? ($draft['form_code'] ?? $entry['form_code'] ?? '')));
+      $rowDeliveryMode = trim((string)($allocation['delivery_mode'] ?? ''));
+      $workflowState = eqms_workflow_status_from_entry($entry, $allocation, $draft);
+      $submissionCount = $rowDeliveryMode === 'offline'
+        ? max((int)($allocation['receipt_version'] ?? 0), count((array)($allocation['receipts'] ?? [])))
+        : max((int)($entry['submission_count'] ?? 0), (int)($entry['submission_revision'] ?? 0), (int)($allocation['online_submission']['submission_count'] ?? 0), (int)($allocation['online_submission']['submission_revision'] ?? 0));
+      if ($submissionCount === 0 && ($entry || strtolower(trim((string)($allocation['status'] ?? ''))) === 'submitted')) $submissionCount = 1;
+      $resubmissionCount = max(0, $submissionCount - 1);
+      $amendmentCount = max((int)($entry['amendment_count'] ?? 0), (int)($allocation['online_submission']['amendment_count'] ?? 0));
+      $reopenCount = 0;
+      foreach ((array)($allocation['history'] ?? []) as $evt) {
+        if (!is_array($evt)) continue;
+        $note = strtolower(trim((string)($evt['note'] ?? '')));
+        if ($note === 'evidence_reopened' || $note === 'controlled_edit_started') $reopenCount++;
+      }
+      $latestReceipt = null;
+      $receipts = array_values((array)($allocation['receipts'] ?? []));
+      if ($receipts) $latestReceipt = $receipts[count($receipts) - 1];
+      $lastActionAt = (string)($draft['saved_at'] ?? $entry['updated_at'] ?? $entry['submitted_at'] ?? $allocation['updated_at'] ?? $allocation['created_at'] ?? '');
+      if (is_array($latestReceipt) && !empty($latestReceipt['received_at']) && (string)$latestReceipt['received_at'] > $lastActionAt) {
+        $lastActionAt = (string)$latestReceipt['received_at'];
+      }
+
+      $isMine = in_array($username, array_filter([
+        strtolower(trim((string)($allocation['created_by'] ?? ''))),
+        strtolower(trim((string)($entry['created_by'] ?? ''))),
+        strtolower(trim((string)($entry['submitted_by'] ?? ''))),
+        strtolower(trim((string)($draft['saved_by'] ?? ''))),
+      ]), true);
+
+      $isCompleted = in_array($workflowState, ['approved', 'closed', 'received'], true) || strtolower(trim((string)($allocation['status'] ?? ''))) === 'received';
+      if ($mineOnly && !$isMine) continue;
+      if ($completedOnly && !$isCompleted) continue;
+      if ($formCode !== '' && strcasecmp($rowFormCode, $formCode) !== 0) continue;
+      if ($deliveryMode !== '' && strcasecmp($rowDeliveryMode, $deliveryMode) !== 0) continue;
+      if ($stateFilter !== '' && $stateFilter !== strtolower($workflowState) && $stateFilter !== strtolower(trim((string)($allocation['status'] ?? '')))) continue;
+
+      $haystack = strtolower(implode(' ', array_filter([
+        $allocationId,
+        (string)($allocation['record_id'] ?? ''),
+        $rowFormCode,
+        eqms_record_title_for_form_code($rowFormCode),
+        (string)($allocation['suggested_filename'] ?? ''),
+        (string)($latestReceipt['stored_filename'] ?? ''),
+      ])));
+      if ($search !== '' && !str_contains($haystack, $search)) continue;
+
+      $rows[] = [
+        'allocation_id' => $allocationId,
+        'record_id' => (string)($allocation['record_id'] ?? ''),
+        'record_type' => (string)($allocation['record_type'] ?? ''),
+        'form_code' => $rowFormCode,
+        'form_title' => eqms_record_title_for_form_code($rowFormCode),
+        'delivery_mode' => $rowDeliveryMode,
+        'status' => (string)($allocation['status'] ?? ''),
+        'workflow_state' => $workflowState,
+        'created_at' => (string)($allocation['created_at'] ?? ''),
+        'created_by' => (string)($allocation['created_by'] ?? ''),
+        'updated_at' => (string)($allocation['updated_at'] ?? ''),
+        'last_action_at' => $lastActionAt,
+        'draft_exists' => (bool)$draft,
+        'draft_saved_at' => (string)($draft['saved_at'] ?? ''),
+        'entry_id' => (string)($entry['entry_id'] ?? $allocation['online_submission']['entry_id'] ?? ''),
+        'submitted_at' => (string)($entry['submitted_at'] ?? $allocation['online_submission']['submitted_at'] ?? ''),
+        'submitted_by' => (string)($entry['submitted_by'] ?? $allocation['online_submission']['submitted_by'] ?? ''),
+        'submission_count' => $submissionCount,
+        'resubmission_count' => $resubmissionCount,
+        'amendment_count' => $amendmentCount,
+        'reopen_count' => $reopenCount,
+        'receipt_version' => (int)($allocation['receipt_version'] ?? 0),
+        'latest_submission_ref' => ($rowDeliveryMode === 'offline'
+          ? ('R' . str_pad((string)max(0, (int)($allocation['receipt_version'] ?? 0)), 2, '0', STR_PAD_LEFT))
+          : ('S' . max(0, $submissionCount))),
+        'latest_filename' => (string)($latestReceipt['stored_filename'] ?? $allocation['offline_package']['filename'] ?? $allocation['suggested_filename'] ?? ''),
+        'latest_receipt_at' => (string)($latestReceipt['received_at'] ?? ''),
+        'mine' => $isMine,
+        'completed' => $isCompleted,
+      ];
+    }
+
+    usort($rows, static function($a, $b){
+      return strcmp((string)($b['last_action_at'] ?? ''), (string)($a['last_action_at'] ?? ''));
+    });
+
+    $summary = [
+      'issued_count' => count($rows),
+      'draft_count' => count(array_filter($rows, static fn($row) => !empty($row['draft_exists']))),
+      'submitted_count' => count(array_filter($rows, static fn($row) => (int)($row['submission_count'] ?? 0) > 0)),
+      'resubmitted_count' => count(array_filter($rows, static fn($row) => (int)($row['resubmission_count'] ?? 0) > 0)),
+      'completed_count' => count(array_filter($rows, static fn($row) => !empty($row['completed']))),
+    ];
+
+    $total = count($rows);
+    $pages = max(1, (int)ceil($total / $pageSize));
+    $offset = ($page - 1) * $pageSize;
+    $slice = array_slice($rows, $offset, $pageSize);
+
+    api_json([
+      'ok' => true,
+      'rows' => $slice,
+      'summary' => $summary,
+      'total' => $total,
+      'page' => $page,
+      'pages' => $pages,
+    ]);
   }
 
   // ── Dashboard, KPI & SPC Analytics ─────────────────────────────────────
@@ -17962,23 +18258,30 @@ if ($username === '') {
     $allocationId = trim((string)($body['allocation_id'] ?? ''));
     $formCode = trim((string)($body['form_code'] ?? ''));
     $data = is_array($body['data'] ?? null) ? $body['data'] : [];
+    $entryId = trim((string)($body['entry_id'] ?? ''));
+    $recordId = trim((string)($body['record_id'] ?? ''));
+    $editOrigin = trim((string)($body['edit_origin'] ?? 'draft'));
+    $sourceEntryId = trim((string)($body['source_entry_id'] ?? ''));
+    $sourceRevision = (int)($body['source_submission_revision'] ?? 0);
     if ($allocationId === '' || $formCode === '') {
       api_json(['ok' => false, 'error' => 'missing_allocation_id_or_form_code'], 400);
     }
     // Sanitise allocation_id
     if (!preg_match('/^[A-Za-z0-9._-]+$/', $allocationId)) api_json(['ok' => false, 'error' => 'invalid_allocation_id'], 400);
-    $draftsDir = $DATA_DIR . '/online-forms/drafts';
-    if (!is_dir($draftsDir)) @mkdir($draftsDir, 0755, true);
-    $draftFile = $draftsDir . '/' . $allocationId . '.json';
     $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
     $draftPayload = [
       'allocation_id' => $allocationId,
       'form_code' => $formCode,
+      'entry_id' => $entryId,
+      'record_id' => $recordId,
       'data' => $data,
+      'edit_origin' => $editOrigin !== '' ? $editOrigin : 'draft',
+      'source_entry_id' => $sourceEntryId,
+      'source_submission_revision' => $sourceRevision,
       'saved_at' => date('c'),
       'saved_by' => $username,
     ];
-    file_put_contents($draftFile, json_encode($draftPayload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX);
+    save_online_form_draft($allocationId, $draftPayload);
     api_json(['ok' => true]);
   }
 

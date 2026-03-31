@@ -1930,10 +1930,42 @@
   font-weight: 700;
 }
 .ec-badge.pass { background: var(--ec-success-light); color: var(--ec-success); }
+.ec-badge.success { background: var(--ec-success-light); color: var(--ec-success); }
 .ec-badge.warn { background: var(--ec-warning-light); color: var(--ec-warning); }
 .ec-badge.fail { background: var(--ec-danger-light); color: var(--ec-danger); }
 .ec-badge.info { background: var(--ec-primary-light); color: var(--ec-primary); }
 .ec-badge.neutral { background: var(--ec-bg); color: var(--ec-text-secondary); }
+
+.ec-eqms-card {
+  display: grid;
+  gap: 16px;
+}
+
+.ec-eqms-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.ec-eqms-actions,
+.ec-registry-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ec-registry-table td strong + span {
+  display: inline-block;
+  margin-top: 4px;
+  color: var(--ec-text-muted);
+  font-size: 12px;
+}
+
+.ec-registry-table td {
+  vertical-align: top;
+}
 
 /* ── Buttons ── */
 .ec-btn {

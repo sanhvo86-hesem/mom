@@ -46,6 +46,8 @@ var state = {
   pendingFillSelection: null,
   pendingUploadSelection: null,
   pendingContext: null,
+  _eqmsOpenCode: '',
+  _eqmsOpenOptions: null,
   workQueue: {
     pending: [],
     exceptions: [],
@@ -63,6 +65,22 @@ var state = {
     promise: null,
     pollTimer: null,
     quarantine: {}
+  },
+  registry: {
+    rows: [],
+    summary: { issued_count:0, draft_count:0, submitted_count:0, resubmitted_count:0, completed_count:0 },
+    loading: false,
+    loaded: false,
+    error: '',
+    page: 1,
+    pages: 1,
+    total: 0,
+    formCode: '',
+    deliveryMode: '',
+    state: '',
+    search: '',
+    mineOnly: true,
+    promise: null
   }
 };
 
@@ -436,12 +454,14 @@ function renderEscalationBadge(item){
 function statusLabel(status){
   var key = String(status || '').trim().toLowerCase();
   var labels = {
+    draft: t('Bản nháp', 'Draft'),
     allocated: t('Đã cấp mã', 'Allocated'),
     downloaded: t('Đã tải biểu mẫu', 'Downloaded'),
     submitted: t('Đã nộp', 'Submitted'),
     received: t('Đã tiếp nhận', 'Received'),
     in_review: t('Đang xem xét', 'In review'),
     approved: t('Đã phê duyệt', 'Approved'),
+    closed: t('Đã đóng', 'Closed'),
     rejected: t('Bị từ chối', 'Rejected'),
     voided: t('Đã hủy', 'Voided'),
     void: t('Đã hủy', 'Voided'),
@@ -453,7 +473,8 @@ function statusLabel(status){
 function renderStatusPill(status){
   var key = String(status || '').trim().toLowerCase();
   var tone = 'info';
-  if(key === 'approved') tone = 'pass';
+  if(key === 'approved' || key === 'closed') tone = 'pass';
+  else if(key === 'draft') tone = 'neutral';
   else if(key === 'rejected' || key === 'voided' || key === 'void') tone = 'fail';
   else if(key === 'submitted' || key === 'received' || key === 'in_review') tone = 'warn';
   return '<span class="ec-badge ' + tone + '">' + esc(statusLabel(status)) + '</span>';
@@ -544,6 +565,148 @@ function openUploadWorkspace(allocationId, formCode){
   state.pendingUploadSelection = allocationId ? { allocationId: allocationId, formCode: formCode || state.selectedFormCode || '' } : null;
   state.workspaceMode = 'upload';
   requestRender();
+}
+
+function eqmsForms(){
+  var seen = {};
+  return state.forms.filter(function(form){
+    if(!form || !form.form_code) return false;
+    if(!form.online && !form.offline_fallback_available && !form.blank_path && !form.linked_excel_form) return false;
+    if(seen[form.form_code]) return false;
+    seen[form.form_code] = true;
+    return true;
+  }).sort(function(a, b){
+    return String(a.form_code || '').localeCompare(String(b.form_code || ''));
+  });
+}
+
+function findLocalDraftForForm(formCode){
+  if(typeof window.listUserDrafts !== 'function') return null;
+  var drafts = window.listUserDrafts() || [];
+  for(var i = 0; i < drafts.length; i++){
+    var draft = drafts[i];
+    if(String(draft.formCode || '') === String(formCode || '')) return draft;
+  }
+  return null;
+}
+
+function resolveRecordTypeForForm(form){
+  if(!form) return '';
+  var direct = String(form.record_type || '').trim().toUpperCase();
+  if(direct) return direct;
+  var code = String(form.form_code || '').trim().toUpperCase();
+  if(state.formToRecordType[code]) return state.formToRecordType[code];
+  var base = code.replace(/-[A-Z0-9]+$/, '');
+  return String(state.formToRecordType[base] || '').trim().toUpperCase();
+}
+
+function openEqmsRuntime(formCode, options){
+  state.workspaceMode = 'eqms';
+  state._eqmsOpenCode = formCode || '';
+  state._eqmsOpenOptions = Object.assign({}, options || {});
+  requestRender();
+}
+
+function startNewEqmsOnline(formCode){
+  var form = state.formMap[formCode] || null;
+  if(!form || !window.AllocationTracker){
+    showToast(t('Biểu mẫu online chưa sẵn sàng.', 'Online form is not ready.'), 'warn');
+    return;
+  }
+  var recordType = resolveRecordTypeForForm(form);
+  if(!recordType){
+    showToast(t('Chưa cấu hình record type cho form này.', 'Record type is not configured for this form.'), 'error');
+    return;
+  }
+  var dept = String((form.owner || 'QA').split('/')[0] || 'QA').trim().toUpperCase();
+  showToast(t('Đang cấp mã cho biểu mẫu online...', 'Issuing a code for the online form...'), 'info');
+  window.AllocationTracker.allocate(recordType, dept, {
+    year: new Date().getFullYear(),
+    form_code: formCode,
+    notes: 'eqms_online_new_form'
+  }).then(function(resp){
+    if(!(resp && resp.ok)){
+      showToast(t('Không thể cấp mã mới.', 'Could not issue a new code.'), 'error');
+      return;
+    }
+    openEqmsRuntime(formCode, {
+      allocationId: resp.allocation_id || '',
+      recordId: resp.record_id || '',
+      editMode: true,
+      createIfMissing: false,
+      forceNew: true,
+      editOrigin: 'new'
+    });
+  }).catch(function(err){
+    showToast((window.AllocationTracker && window.AllocationTracker.describeError)
+      ? window.AllocationTracker.describeError(err && err.body ? err.body : {}, 'allocation').message
+      : t('Không thể cấp mã mới.', 'Could not issue a new code.'), 'error');
+  });
+}
+
+function startNewEqmsOffline(formCode){
+  var form = state.formMap[formCode] || null;
+  if(!form || !window.AllocationTracker){
+    showToast(t('Biểu mẫu offline chưa sẵn sàng.', 'Offline form is not ready.'), 'warn');
+    return;
+  }
+  var targetFormCode = String(form.offline_form_code || form.linked_excel_form || form.form_code || '');
+  var recordType = resolveRecordTypeForForm(form);
+  if(!recordType || !targetFormCode){
+    showToast(t('Chưa cấu hình luồng offline cho form này.', 'Offline flow is not configured for this form.'), 'error');
+    return;
+  }
+  var dept = String((form.owner || 'QA').split('/')[0] || 'QA').trim().toUpperCase();
+  showToast(t('Đang cấp mã và chuẩn bị file Excel kiểm soát...', 'Issuing the code and preparing the controlled Excel workbook...'), 'info');
+  window.AllocationTracker.allocate(recordType, dept, {
+    year: new Date().getFullYear(),
+    form_code: targetFormCode,
+    notes: 'eqms_offline_new_form'
+  }).then(function(resp){
+    if(!(resp && resp.ok)) throw new Error('allocation_failed');
+    return window.AllocationTracker.downloadForm(resp.allocation_id || '', targetFormCode, {}).then(function(downloadResp){
+      showToast(t('Đã cấp mã và tải file offline.', 'The offline file has been issued and downloaded.'), downloadResp && downloadResp.ok ? 'success' : 'warn');
+      loadRegistry(true);
+      return downloadResp;
+    });
+  }).catch(function(){
+    showToast(t('Không thể cấp mã hoặc tải file offline.', 'Could not issue the code or download the offline file.'), 'error');
+  });
+}
+
+function loadRegistry(force){
+  if(state.registry.loading) return state.registry.promise || Promise.resolve(state.registry);
+  if(!force && state.registry.loaded) return Promise.resolve(state.registry);
+
+  if(!canSeeAllWorkQueue()) state.registry.mineOnly = true;
+  state.registry.loading = true;
+  state.registry.error = '';
+  state.registry.promise = api('eqms_record_registry', {
+    form_code: state.registry.formCode,
+    delivery_mode: state.registry.deliveryMode,
+    state: state.registry.state,
+    search: state.registry.search,
+    mine_only: state.registry.mineOnly ? 1 : 0,
+    page: state.registry.page,
+    page_size: 50
+  }, 'GET').then(function(resp){
+    state.registry.rows = (resp && Array.isArray(resp.rows)) ? resp.rows : [];
+    state.registry.summary = (resp && resp.summary) ? resp.summary : state.registry.summary;
+    state.registry.total = Number(resp && resp.total || 0) || 0;
+    state.registry.page = Number(resp && resp.page || 1) || 1;
+    state.registry.pages = Number(resp && resp.pages || 1) || 1;
+    state.registry.loaded = true;
+    return state.registry;
+  }).catch(function(err){
+    state.registry.rows = [];
+    state.registry.loaded = false;
+    state.registry.error = (err && err.body && err.body.error) ? String(err.body.error) : t('Không thể tải sổ quản lý mã.', 'Could not load the record registry.');
+    return state.registry;
+  }).finally(function(){
+    state.registry.loading = false;
+    state.registry.promise = null;
+  });
+  return state.registry.promise;
 }
 
 function loadWorkQueue(force){
@@ -745,7 +908,7 @@ function renderExceptionItem(item){
 
 function renderMyDraftsPanel(){
   /* Get drafts from eQMS runtime if available */
-  var drafts = (typeof window.listUserDrafts === 'function') ? window.listUserDrafts() :
+  var localDrafts = (typeof window.listUserDrafts === 'function') ? window.listUserDrafts() :
     (function(){ /* inline localStorage scan */
       var out = [];
       try {
@@ -761,6 +924,37 @@ function renderMyDraftsPanel(){
       return out;
     })();
 
+  var drafts = [];
+  var seen = {};
+  localDrafts.forEach(function(d){
+    var key = String(d.allocationId || '') || ('local:' + String(d.formCode || '') + ':' + String(d.savedAt || ''));
+    if(seen[key]) return;
+    seen[key] = true;
+    drafts.push({
+      formCode: d.formCode || '',
+      allocationId: d.allocationId || '',
+      recordId: d.recordId || '',
+      entryId: d.entryId || '',
+      savedAt: d.savedAt || '',
+      source: 'local'
+    });
+  });
+  (state.registry.rows || []).forEach(function(row){
+    if(!row || !row.mine || !row.draft_exists || row.delivery_mode !== 'online') return;
+    var key = String(row.allocation_id || '');
+    if(!key || seen[key]) return;
+    seen[key] = true;
+    drafts.push({
+      formCode: row.form_code || '',
+      allocationId: row.allocation_id || '',
+      recordId: row.record_id || '',
+      entryId: row.entry_id || '',
+      savedAt: row.draft_saved_at || row.last_action_at || row.updated_at || row.created_at || '',
+      source: 'server'
+    });
+  });
+  drafts.sort(function(a, b){ return String(b.savedAt || '').localeCompare(String(a.savedAt || '')); });
+
   var draftsHtml = '';
   if(!drafts.length){
     draftsHtml = '<div class="ec-work-empty"><strong>' + esc(t('Không có bản nháp', 'No drafts')) + '</strong>' + esc(t('Khi bạn lưu nháp biểu mẫu online, chúng sẽ hiện ở đây.', 'Saved online form drafts will appear here.')) + '</div>';
@@ -770,17 +964,42 @@ function renderMyDraftsPanel(){
       draftsHtml += '<article class="ec-work-card">' +
         '<div class="ec-work-card-top">' +
           '<div><div class="ec-work-id">' + esc(d.formCode || '') + (d.recordId ? ' · ' + esc(d.recordId) : '') + '</div>' +
-          '<div class="ec-work-sub">' + esc(t('Lưu lúc', 'Saved at')) + ' ' + esc(ago) + '</div></div>' +
+          '<div class="ec-work-sub">' + esc(t('Lưu lúc', 'Saved at')) + ' ' + esc(ago) + ' · ' + esc(d.source === 'server' ? t('Nháp máy chủ', 'Server draft') : t('Nháp trình duyệt', 'Browser draft')) + '</div></div>' +
           '<span class="ec-badge neutral">' + esc(t('Bản nháp', 'Draft')) + '</span>' +
         '</div>' +
         '<div class="ec-work-actions">' +
-          '<button type="button" class="ec-btn primary" data-resume-draft="' + esc(d.formCode || '') + '" data-alloc="' + esc(d.allocationId || '') + '">' + esc(t('Tiếp tục điền', 'Resume filling')) + '</button>' +
+          '<button type="button" class="ec-btn primary" data-resume-draft="' + esc(d.formCode || '') + '" data-alloc="' + esc(d.allocationId || '') + '" data-record="' + esc(d.recordId || '') + '" data-entry="' + esc(d.entryId || '') + '">' + esc(t('Tiếp tục điền', 'Resume filling')) + '</button>' +
         '</div>' +
       '</article>';
     });
   }
 
   return '<article class="ec-panel"><div class="ec-panel-head"><div><h3>' + esc(t('Bản nháp của tôi', 'My Drafts')) + '</h3><p>' + esc(t('Các biểu mẫu online đang điền dở. Nhấn để tiếp tục.', 'Online forms in progress. Click to resume.')) + '</p></div><span class="ec-badge neutral">' + esc(drafts.length) + '</span></div><div class="ec-work-list">' + draftsHtml + '</div></article>';
+}
+
+function renderCompletedPanel(){
+  var rows = (state.registry.rows || []).filter(function(row){ return row && row.completed && row.mine; }).slice(0, 6);
+  var html = '';
+  if(state.registry.loading && !state.registry.loaded){
+    html = '<div class="ec-work-empty"><strong>' + esc(t('Đang tải hồ sơ hoàn thành', 'Loading completed records')) + '</strong>' + esc(t('Hệ thống đang lấy các hồ sơ form đã hoàn tất gần đây.', 'The system is fetching recently completed form records.')) + '</div>';
+  } else if(!rows.length){
+    html = '<div class="ec-work-empty"><strong>' + esc(t('Chưa có hồ sơ hoàn thành', 'No completed records yet')) + '</strong>' + esc(t('Các hồ sơ online/offline hoàn thành gần đây sẽ hiện ở đây để tra cứu nhanh.', 'Recently completed online/offline records will appear here for quick access.')) + '</div>';
+  } else {
+    html = rows.map(function(row){
+      return '<article class="ec-work-card">' +
+        '<div class="ec-work-card-top">' +
+          '<div><div class="ec-work-id">' + esc(row.record_id || '') + '</div><div class="ec-work-sub">' + esc(row.form_code || '') + ' · ' + esc(fmtDateTime(row.last_action_at || row.created_at || '')) + '</div></div>' +
+          renderStatusPill(row.workflow_state || row.status || 'received') +
+        '</div>' +
+        '<div class="ec-work-actions">' +
+          ((row.delivery_mode === 'online')
+            ? '<button type="button" class="ec-btn ghost" data-reg-open="' + esc(row.form_code || '') + '" data-reg-alloc="' + esc(row.allocation_id || '') + '" data-reg-record="' + esc(row.record_id || '') + '" data-reg-entry="' + esc(row.entry_id || '') + '">' + esc(t('Mở hồ sơ', 'Open record')) + '</button>'
+            : '<button type="button" class="ec-btn ghost" data-reg-download-received="' + esc(row.allocation_id || '') + '">' + esc(t('Tải bản đã nộp', 'Download received')) + '</button>') +
+        '</div>' +
+      '</article>';
+    }).join('');
+  }
+  return '<article class="ec-panel"><div class="ec-panel-head"><div><h3>' + esc(t('Đã hoàn thành gần đây', 'Recently completed')) + '</h3><p>' + esc(t('Tra cứu nhanh các hồ sơ form đã hoàn tất hoặc đã tiếp nhận.', 'Quick access to records that have been completed or formally received.')) + '</p></div><span class="ec-badge neutral">' + esc(rows.length) + '</span></div><div class="ec-work-list">' + html + '</div></article>';
 }
 
 function renderWorkQueue(container){
@@ -852,6 +1071,7 @@ function renderWorkQueue(container){
       '</section>' +
       '<section class="ec-board-grid">' +
         renderMyDraftsPanel() +
+        renderCompletedPanel() +
         '<article class="ec-panel"><div class="ec-panel-head"><div><h3>' + esc(t('Hồ sơ chờ duyệt', 'Pending evidence')) + '</h3><p>' + esc(t('Mở thẳng khu vực xử lý của hồ sơ để xem xét, từ chối hoặc mở lại.', 'Jump straight into the record workspace to review, reject, or reopen.')) + '</p></div><span class="ec-badge info">' + esc((work.pending || []).length) + '</span></div><div class="ec-work-list">' + pendingHtml + '</div></article>' +
         '<article class="ec-panel"><div class="ec-panel-head"><div><h3>' + esc(t('Hàng đợi kiểm soát tải lên', 'Upload hardening queue')) + '</h3><p>' + esc(t('Hàng đợi này bám theo bộ lọc phòng ban và biểu mẫu khi hệ thống xác định được mã cấp phát. Bạn có thể xác minh, chấp nhận hoặc từ chối trực tiếp ngay tại đây.', 'This queue follows the selected department and form whenever the backend can resolve the allocation. You can verify, accept, or reject directly from here.')) + '</p></div><span class="ec-badge warn">' + esc(exceptions.length) + '</span></div><div class="ec-work-list">' + exceptionHtml + '</div></article>' +
       '</section>' +
@@ -990,11 +1210,32 @@ function bindWorkQueue(container){
       var code = btn.getAttribute('data-resume-draft') || '';
       var alloc = btn.getAttribute('data-alloc') || '';
       if(code){
-        state.workspaceMode = 'eqms';
-        state._eqmsOpenCode = code;
-        var page = pageEl();
-        if(page) render(page);
+        openEqmsRuntime(code, {
+          allocationId: alloc,
+          recordId: btn.getAttribute('data-record') || '',
+          entryId: btn.getAttribute('data-entry') || '',
+          editMode: true,
+          editOrigin: 'draft_resume'
+        });
       }
+    };
+  });
+  Array.prototype.forEach.call(container.querySelectorAll('[data-reg-open]'), function(btn){
+    btn.onclick = function(){
+      openEqmsRuntime(btn.getAttribute('data-reg-open') || '', {
+        allocationId: btn.getAttribute('data-reg-alloc') || '',
+        recordId: btn.getAttribute('data-reg-record') || '',
+        entryId: btn.getAttribute('data-reg-entry') || '',
+        editMode: false,
+        editOrigin: 'view_existing'
+      });
+    };
+  });
+  Array.prototype.forEach.call(container.querySelectorAll('[data-reg-download-received]'), function(btn){
+    btn.onclick = function(){
+      var allocationId = btn.getAttribute('data-reg-download-received') || '';
+      if(!allocationId) return;
+      window.open('api.php?action=form_fill_download_received&allocation_id=' + encodeURIComponent(allocationId), '_blank');
     };
   });
 }
@@ -1007,6 +1248,7 @@ function render(container){
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'work' ? ' active' : '') + '" data-tab="work">' + esc(t('Việc của tôi', 'My Work')) + (workCount ? '<span class="ec-tab-badge">' + workCount + '</span>' : '') + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'form' ? ' active' : '') + '" data-tab="form">' + esc(t('Biểu mẫu', 'Forms')) + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'eqms' ? ' active' : '') + '" data-tab="eqms">' + esc(t('Online Form', 'Online Form')) + '</button>' +
+      '<button type="button" class="ec-tab' + (state.workspaceMode === 'registry' ? ' active' : '') + '" data-tab="registry">' + esc(t('Quản lý mã', 'Code Registry')) + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'upload' ? ' active' : '') + '" data-tab="upload">' + esc(t('Tải lên', 'Upload')) + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'record-id' ? ' active' : '') + '" data-tab="record-id">' + esc(t('Tạo mã', 'Record ID')) + '</button>' +
     '</div>' +
@@ -1115,6 +1357,195 @@ function renderEqmsFormList(container){
   });
 }
 
+function renderEqmsHub(container){
+  var forms = eqmsForms();
+  var html =
+    '<div class="ec-eqms-hub">' +
+      '<section class="ec-board-hero">' +
+        '<div class="ec-board-copy">' +
+          '<div class="ec-board-kicker">' + esc(t('Online Form', 'Online Form')) + '</div>' +
+          '<h2>' + esc(t('Trung tâm vận hành eQMS form', 'eQMS form operations hub')) + '</h2>' +
+          '<p>' + esc(t('Tạo mới hồ sơ online hoặc offline từ cùng một form, tiếp tục bản nháp đang dở, và chuyển sang sổ quản lý mã đã cấp để theo dõi toàn bộ vòng đời.', 'Start online or offline records from the same form, resume in-progress drafts, and jump into the issued-code registry to track the full lifecycle.')) + '</p>' +
+        '</div>' +
+        '<div class="ec-kpi-grid">' +
+          '<div class="ec-kpi-card primary"><small>' + esc(t('Form eQMS', 'eQMS forms')) + '</small><strong>' + esc(forms.length) + '</strong><span>' + esc(t('Biểu mẫu có thể vận hành theo luồng điện tử hoặc kết hợp điện tử/Excel.', 'Forms available in electronic or hybrid electronic/Excel mode.')) + '</span></div>' +
+          '<div class="ec-kpi-card neutral"><small>' + esc(t('Bản nháp cục bộ', 'Local drafts')) + '</small><strong>' + esc((typeof window.listUserDrafts === 'function' ? (window.listUserDrafts() || []).length : 0)) + '</strong><span>' + esc(t('Các bản nháp đang lưu trên trình duyệt này để tiếp tục điền.', 'Drafts saved in this browser and ready to resume.')) + '</span></div>' +
+          '<div class="ec-kpi-card warning"><small>' + esc(t('Mã đã cấp', 'Issued codes')) + '</small><strong>' + esc(state.registry.summary.issued_count || 0) + '</strong><span>' + esc(t('Tổng số hồ sơ form đang được hệ thống kiểm soát.', 'Total form records currently under system control.')) + '</span></div>' +
+        '</div>' +
+      '</section>' +
+      '<section class="ec-board-grid">';
+
+  if(!forms.length){
+    html += '<article class="ec-panel"><div class="ec-panel-head"><div><h3>' + esc(t('Chưa có form eQMS', 'No eQMS forms')) + '</h3><p>' + esc(t('Danh mục form chưa tải được hoặc chưa có schema online/offline tương ứng.', 'The form catalog is not loaded or there are no matching online/offline definitions yet.')) + '</p></div></div></article>';
+  } else {
+    forms.forEach(function(form){
+      var draft = findLocalDraftForForm(form.form_code);
+      var hasOnline = form.online !== false;
+      var hasOffline = !!(form.offline_fallback_available || form.blank_path || form.linked_excel_form || form.offline_form_code);
+      html += '<article class="ec-panel ec-eqms-card">' +
+        '<div class="ec-panel-head">' +
+          '<div><h3>' + esc((form.form_code || '') + ' · ' + (form.title || form.form_code || '')) + '</h3><p>' + esc(form.description_vi || form.description || '') + '</p></div>' +
+          '<div class="ec-eqms-meta">' +
+            '<span class="ec-badge info">' + esc(form.version || 'V1') + '</span>' +
+            (form.sop_ref ? '<span class="ec-badge neutral">' + esc(form.sop_ref) + '</span>' : '') +
+            (hasOnline ? '<span class="ec-badge success">' + esc(t('Online', 'Online')) + '</span>' : '') +
+            (hasOffline ? '<span class="ec-badge warn">' + esc(t('Offline', 'Offline')) + '</span>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="ec-eqms-actions">' +
+          (hasOnline ? '<button type="button" class="ec-btn primary" data-eqms-new-online="' + esc(form.form_code || '') + '">' + esc(t('Tạo mới online', 'New online record')) + '</button>' : '') +
+          (hasOffline ? '<button type="button" class="ec-btn secondary" data-eqms-new-offline="' + esc(form.form_code || '') + '">' + esc(t('Tạo mới offline', 'New offline record')) + '</button>' : '') +
+          (draft ? '<button type="button" class="ec-btn ghost" data-eqms-resume="' + esc(form.form_code || '') + '" data-eqms-resume-alloc="' + esc(draft.allocationId || '') + '" data-eqms-resume-record="' + esc(draft.recordId || '') + '" data-eqms-resume-entry="' + esc(draft.entryId || '') + '">' + esc(t('Tiếp tục bản nháp', 'Resume draft')) + '</button>' : '') +
+          '<button type="button" class="ec-btn ghost" data-eqms-open-registry="' + esc(form.form_code || '') + '">' + esc(t('Quản lý mã đã cấp', 'Manage issued codes')) + '</button>' +
+        '</div>' +
+      '</article>';
+    });
+  }
+
+  html += '</section></div>';
+  container.innerHTML = html;
+
+  Array.prototype.forEach.call(container.querySelectorAll('[data-eqms-new-online]'), function(btn){
+    btn.onclick = function(){ startNewEqmsOnline(btn.getAttribute('data-eqms-new-online') || ''); };
+  });
+  Array.prototype.forEach.call(container.querySelectorAll('[data-eqms-new-offline]'), function(btn){
+    btn.onclick = function(){ startNewEqmsOffline(btn.getAttribute('data-eqms-new-offline') || ''); };
+  });
+  Array.prototype.forEach.call(container.querySelectorAll('[data-eqms-resume]'), function(btn){
+    btn.onclick = function(){
+      openEqmsRuntime(btn.getAttribute('data-eqms-resume') || '', {
+        allocationId: btn.getAttribute('data-eqms-resume-alloc') || '',
+        recordId: btn.getAttribute('data-eqms-resume-record') || '',
+        entryId: btn.getAttribute('data-eqms-resume-entry') || '',
+        editMode: true,
+        editOrigin: 'draft_resume'
+      });
+    };
+  });
+  Array.prototype.forEach.call(container.querySelectorAll('[data-eqms-open-registry]'), function(btn){
+    btn.onclick = function(){
+      state.registry.formCode = btn.getAttribute('data-eqms-open-registry') || '';
+      state.registry.page = 1;
+      state.workspaceMode = 'registry';
+      requestRender();
+      loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') requestRender(); });
+    };
+  });
+}
+
+function renderEqmsRegistry(container){
+  var reg = state.registry;
+  var forms = eqmsForms();
+  var formOptions = '<option value="">' + esc(t('Tất cả form', 'All forms')) + '</option>' +
+    forms.map(function(form){
+      return '<option value="' + esc(form.form_code || '') + '"' + (String(form.form_code || '') === String(reg.formCode || '') ? ' selected' : '') + '>' + esc((form.form_code || '') + ' · ' + (form.title || form.form_code || '')) + '</option>';
+    }).join('');
+  var rowsHtml = '';
+  if(reg.loading && !reg.loaded){
+    rowsHtml = '<tr><td colspan="9">' + esc(t('Đang tải sổ quản lý mã...', 'Loading registry...')) + '</td></tr>';
+  } else if(!reg.rows.length){
+    rowsHtml = '<tr><td colspan="9">' + esc(t('Không có hồ sơ nào trong phạm vi lọc hiện tại.', 'No records match the current registry filters.')) + '</td></tr>';
+  } else {
+    rowsHtml = reg.rows.map(function(row){
+      return '<tr>' +
+        '<td class="mono">' + esc(row.record_id || '') + '</td>' +
+        '<td><strong>' + esc(row.form_code || '') + '</strong><br><span>' + esc(row.form_title || '') + '</span></td>' +
+        '<td>' + esc(row.delivery_mode || '-') + '</td>' +
+        '<td>' + renderStatusPill(row.workflow_state || row.status || 'allocated') + '</td>' +
+        '<td>' + esc(fmtDateTime(row.last_action_at || row.created_at || '')) + '</td>' +
+        '<td><strong>' + esc(String(row.submission_count || 0)) + '</strong><br><span>' + esc(row.latest_submission_ref || '—') + '</span></td>' +
+        '<td>' + esc(String(row.resubmission_count || 0)) + '</td>' +
+        '<td>' + esc(row.latest_filename || '—') + '</td>' +
+        '<td class="ec-registry-actions">' +
+          ((row.delivery_mode === 'online')
+            ? '<button type="button" class="ec-btn ghost" data-reg-open="' + esc(row.form_code || '') + '" data-reg-alloc="' + esc(row.allocation_id || '') + '" data-reg-record="' + esc(row.record_id || '') + '" data-reg-entry="' + esc(row.entry_id || '') + '">' + esc(t('Mở', 'Open')) + '</button>' +
+              '<button type="button" class="ec-btn secondary" data-reg-edit="' + esc(row.form_code || '') + '" data-reg-edit-alloc="' + esc(row.allocation_id || '') + '" data-reg-edit-record="' + esc(row.record_id || '') + '" data-reg-edit-entry="' + esc(row.entry_id || '') + '" data-reg-edit-source-entry="' + esc(row.entry_id || '') + '" data-reg-edit-revision="' + esc(String(row.submission_count || 0)) + '">' + esc(t('Chỉnh sửa', 'Edit')) + '</button>'
+            : '<button type="button" class="ec-btn ghost" data-reg-download-received="' + esc(row.allocation_id || '') + '">' + esc(t('Tải bản đã nộp', 'Download received')) + '</button>' +
+              '<button type="button" class="ec-btn secondary" data-reg-open-upload="' + esc(row.allocation_id || '') + '" data-reg-open-upload-form="' + esc(row.form_code || '') + '">' + esc(t('Mở tải lên', 'Open upload')) + '</button>') +
+        '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  container.innerHTML =
+    '<div class="ec-board">' +
+      '<section class="ec-board-hero">' +
+        '<div class="ec-board-copy">' +
+          '<div class="ec-board-kicker">' + esc(t('Quản lý mã', 'Code registry')) + '</div>' +
+          '<h2>' + esc(t('Sổ quản lý mã biểu mẫu eQMS', 'eQMS issued-code registry')) + '</h2>' +
+          '<p>' + esc(t('Theo dõi mã đã cấp, trạng thái hiện tại, số lần nộp, số lần nộp lại và file mới nhất cho cả online và offline forms.', 'Track issued codes, current state, submission counts, resubmissions, and the latest file for both online and offline forms.')) + '</p>' +
+          (reg.error ? '<div class="ec-inline-alert">' + esc(reg.error) + '</div>' : '') +
+        '</div>' +
+        '<div class="ec-kpi-grid">' +
+          '<div class="ec-kpi-card primary"><small>' + esc(t('Đã cấp mã', 'Issued')) + '</small><strong>' + esc(reg.summary.issued_count || 0) + '</strong><span>' + esc(t('Tất cả hồ sơ đã được tạo mã trong phạm vi hiện tại.', 'All records issued in the current scope.')) + '</span></div>' +
+          '<div class="ec-kpi-card warning"><small>' + esc(t('Đã nộp', 'Submitted')) + '</small><strong>' + esc(reg.summary.submitted_count || 0) + '</strong><span>' + esc(t('Hồ sơ đã có ít nhất một lần nộp dữ liệu hoặc workbook.', 'Records with at least one data or workbook submission.')) + '</span></div>' +
+          '<div class="ec-kpi-card danger"><small>' + esc(t('Nộp lại', 'Resubmitted')) + '</small><strong>' + esc(reg.summary.resubmitted_count || 0) + '</strong><span>' + esc(t('Hồ sơ đã phát sinh ít nhất một lần nộp lại có kiểm soát.', 'Records that already went through at least one controlled resubmission.')) + '</span></div>' +
+          '<div class="ec-kpi-card neutral"><small>' + esc(t('Hoàn thành', 'Completed')) + '</small><strong>' + esc(reg.summary.completed_count || 0) + '</strong><span>' + esc(t('Hồ sơ đã kết thúc vòng đời hiện hành.', 'Records that have reached their current end state.')) + '</span></div>' +
+        '</div>' +
+      '</section>' +
+      '<section class="ec-board-toolbar">' +
+        '<div class="ec-filter-field"><label>' + esc(t('Form', 'Form')) + '</label><select id="ec-reg-form" class="ec-select">' + formOptions + '</select></div>' +
+        '<div class="ec-filter-field"><label>' + esc(t('Luồng', 'Mode')) + '</label><select id="ec-reg-mode" class="ec-select"><option value="">' + esc(t('Tất cả', 'All')) + '</option><option value="online"' + (reg.deliveryMode === 'online' ? ' selected' : '') + '>online</option><option value="offline"' + (reg.deliveryMode === 'offline' ? ' selected' : '') + '>offline</option></select></div>' +
+        '<div class="ec-filter-field"><label>' + esc(t('Trạng thái', 'State')) + '</label><select id="ec-reg-state" class="ec-select"><option value="">' + esc(t('Tất cả trạng thái', 'All states')) + '</option>' + ['draft','allocated','submitted','approved','closed','received','rejected','void'].map(function(value){ return '<option value="' + value + '"' + (reg.state === value ? ' selected' : '') + '>' + esc(value) + '</option>'; }).join('') + '</select></div>' +
+        '<div class="ec-filter-field"><label>' + esc(t('Tìm kiếm', 'Search')) + '</label><input id="ec-reg-search" class="ec-input" type="search" value="' + esc(reg.search || '') + '" placeholder="' + esc(t('Mã, form, file...', 'Record, form, file...')) + '"></div>' +
+        '<div class="ec-filter-field"><label>' + esc(t('Phạm vi', 'Scope')) + '</label><select id="ec-reg-scope" class="ec-select"><option value="mine"' + (reg.mineOnly ? ' selected' : '') + '>' + esc(t('Của tôi', 'Mine')) + '</option>' + (canSeeAllWorkQueue() ? '<option value="all"' + (!reg.mineOnly ? ' selected' : '') + '>' + esc(t('Tất cả', 'All')) + '</option>' : '') + '</select></div>' +
+        '<div class="ec-toolbar-actions"><button type="button" class="ec-btn secondary" id="ec-reg-refresh">' + esc(reg.loading ? t('Đang tải...', 'Refreshing...') : t('Làm mới', 'Refresh')) + '</button></div>' +
+      '</section>' +
+      '<section class="ec-panel"><div class="ec-panel-head"><div><h3>' + esc(t('Danh sách hồ sơ', 'Record list')) + '</h3><p>' + esc(t('Mỗi dòng là một mã hồ sơ đã cấp cho form online hoặc offline.', 'Each row is one issued record for an online or offline form.')) + '</p></div><span class="ec-badge neutral">' + esc(reg.total || 0) + '</span></div><div class="ec-table-scroll"><table class="ec-table ec-registry-table"><thead><tr><th>' + esc(t('Mã hồ sơ', 'Record ID')) + '</th><th>' + esc(t('Form', 'Form')) + '</th><th>' + esc(t('Luồng', 'Mode')) + '</th><th>' + esc(t('Trạng thái', 'State')) + '</th><th>' + esc(t('Lần hoạt động gần nhất', 'Last activity')) + '</th><th>' + esc(t('Số lần nộp', 'Submissions')) + '</th><th>' + esc(t('Số lần nộp lại', 'Resubmissions')) + '</th><th>' + esc(t('Tệp mới nhất', 'Latest file')) + '</th><th>' + esc(t('Thao tác', 'Actions')) + '</th></tr></thead><tbody>' + rowsHtml + '</tbody></table></div></section>' +
+    '</div>';
+  bindEqmsRegistry(container);
+}
+
+function bindEqmsRegistry(container){
+  var formEl = document.getElementById('ec-reg-form');
+  if(formEl) formEl.onchange = function(){ state.registry.formCode = formEl.value || ''; state.registry.page = 1; loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') requestRender(); }); };
+  var modeEl = document.getElementById('ec-reg-mode');
+  if(modeEl) modeEl.onchange = function(){ state.registry.deliveryMode = modeEl.value || ''; state.registry.page = 1; loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') requestRender(); }); };
+  var stateEl = document.getElementById('ec-reg-state');
+  if(stateEl) stateEl.onchange = function(){ state.registry.state = stateEl.value || ''; state.registry.page = 1; loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') requestRender(); }); };
+  var searchEl = document.getElementById('ec-reg-search');
+  if(searchEl) searchEl.onchange = searchEl.onsearch = function(){ state.registry.search = searchEl.value || ''; state.registry.page = 1; loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') requestRender(); }); };
+  var scopeEl = document.getElementById('ec-reg-scope');
+  if(scopeEl) scopeEl.onchange = function(){ state.registry.mineOnly = scopeEl.value !== 'all'; state.registry.page = 1; loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') requestRender(); }); };
+  var refreshBtn = document.getElementById('ec-reg-refresh');
+  if(refreshBtn) refreshBtn.onclick = function(){ loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') requestRender(); }); };
+
+  Array.prototype.forEach.call(container.querySelectorAll('[data-reg-open]'), function(btn){
+    btn.onclick = function(){
+      openEqmsRuntime(btn.getAttribute('data-reg-open') || '', {
+        allocationId: btn.getAttribute('data-reg-alloc') || '',
+        recordId: btn.getAttribute('data-reg-record') || '',
+        entryId: btn.getAttribute('data-reg-entry') || '',
+        editMode: false,
+        editOrigin: 'view_existing'
+      });
+    };
+  });
+  Array.prototype.forEach.call(container.querySelectorAll('[data-reg-edit]'), function(btn){
+    btn.onclick = function(){
+      openEqmsRuntime(btn.getAttribute('data-reg-edit') || '', {
+        allocationId: btn.getAttribute('data-reg-edit-alloc') || '',
+        recordId: btn.getAttribute('data-reg-edit-record') || '',
+        entryId: btn.getAttribute('data-reg-edit-entry') || '',
+        editMode: true,
+        editOrigin: 'controlled_edit',
+        sourceEntryId: btn.getAttribute('data-reg-edit-source-entry') || '',
+        sourceSubmissionRevision: Number(btn.getAttribute('data-reg-edit-revision') || 0) || 0
+      });
+    };
+  });
+  Array.prototype.forEach.call(container.querySelectorAll('[data-reg-download-received]'), function(btn){
+    btn.onclick = function(){
+      var allocationId = btn.getAttribute('data-reg-download-received') || '';
+      if(!allocationId) return;
+      window.open('api.php?action=form_fill_download_received&allocation_id=' + encodeURIComponent(allocationId), '_blank');
+    };
+  });
+  Array.prototype.forEach.call(container.querySelectorAll('[data-reg-open-upload]'), function(btn){
+    btn.onclick = function(){ openUploadWorkspace(btn.getAttribute('data-reg-open-upload') || '', btn.getAttribute('data-reg-open-upload-form') || ''); };
+  });
+}
+
 function renderWorkspacePane(){
   var wsEl = document.getElementById('ec-workspace');
   if(!wsEl) return;
@@ -1129,11 +1560,17 @@ function renderWorkspacePane(){
     ensureWorkQueuePolling();
     renderWorkQueue(wsEl);
     if(!state.workQueue.loaded && !state.workQueue.loading) loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); });
+    if(!state.registry.loaded && !state.registry.loading) loadRegistry(false).then(function(){ if(state.workspaceMode === 'work') requestRender(); });
     return;
   }
   if(state.workspaceMode === 'record-id'){
     if(typeof window._renderRecordIdGenerator === 'function') window._renderRecordIdGenerator(state.forms, {}, wsEl);
     else wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Phân hệ Trợ lý tạo mã chưa sẵn sàng', 'Record ID Assistant not ready')) + '</h3></div>';
+    return;
+  }
+  if(state.workspaceMode === 'registry'){
+    renderEqmsRegistry(wsEl);
+    if(!state.registry.loaded && !state.registry.loading) loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') requestRender(); });
     return;
   }
   if(state.workspaceMode === 'upload'){
@@ -1147,11 +1584,12 @@ function renderWorkspacePane(){
     if(state._eqmsOpenCode){
       /* A specific form was selected — open it */
       if(typeof window.openEqmsForm === 'function'){
-        window.openEqmsForm(state._eqmsOpenCode, wsEl, { editMode: true });
+        window.openEqmsForm(state._eqmsOpenCode, wsEl, Object.assign({ editMode: true }, state._eqmsOpenOptions || {}));
       }
     } else {
       /* Show form list */
-      renderEqmsFormList(wsEl);
+      renderEqmsHub(wsEl);
+      if(!state.registry.loaded && !state.registry.loading) loadRegistry(false);
     }
     return;
   }
@@ -1226,10 +1664,11 @@ function bindSidebar(container){
     var tabBtn = event.target.closest('[data-tab]');
     if(tabBtn){
       var tabMode = tabBtn.getAttribute('data-tab') || 'form';
-      if(tabMode !== state.workspaceMode){ state._formFolderInited = false; state._eqmsOpenCode = ''; }
+      if(tabMode !== state.workspaceMode){ state._formFolderInited = false; state._eqmsOpenCode = ''; state._eqmsOpenOptions = null; }
       state.workspaceMode = tabMode;
       render(container);
       if(tabMode === 'work') loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') render(container); });
+      if(tabMode === 'registry') loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') render(container); });
     }
   };
 
@@ -1297,6 +1736,7 @@ window._fhSwitchTab = function(target){
   state.activeTab = target || '';
   if(target === 'record-id'){ state.workspaceMode = 'record-id'; requestRender(); return; }
   if(target === 'upload' || target === 'upload-verify'){ state.workspaceMode = 'upload'; requestRender(); return; }
+  if(target === 'registry'){ state.workspaceMode = 'registry'; requestRender(); loadRegistry(true).then(function(){ if(state.workspaceMode === 'registry') requestRender(); }); return; }
   if(target === 'work' || target === 'my-work'){ state.workspaceMode = 'work'; requestRender(); loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') requestRender(); }); return; }
   if(target === 'fill' || target === 'fill-download'){
     var pending = state.pendingFillSelection || {};
