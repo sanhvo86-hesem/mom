@@ -10672,6 +10672,109 @@ function git_cleanup_runtime_noise(string $repoReal): void {
   }
 }
 
+function git_is_tracked_path(string $repoReal, string $path): bool {
+  $clean = str_replace('\\', '/', trim($path));
+  if ($clean === '') return false;
+  $code = 0;
+  git_command(['ls-files', '--error-unmatch', '--', $clean], $repoReal, $code);
+  return $code === 0;
+}
+
+function git_discard_meaningful_local_changes(string $repoDir): array {
+  $repoReal = realpath($repoDir);
+  if ($repoReal === false || !is_dir($repoReal)) {
+    throw new RuntimeException('repo_not_found');
+  }
+
+  $checkCode = 0;
+  $checkOut = git_command(['rev-parse', '--is-inside-work-tree'], $repoReal, $checkCode);
+  if ($checkCode !== 0 || trim($checkOut) !== 'true') {
+    throw new RuntimeException('not_a_git_repo');
+  }
+
+  git_cleanup_runtime_noise($repoReal);
+
+  $branchCode = 0;
+  $branch = trim((string)git_command(['branch', '--show-current'], $repoReal, $branchCode));
+  if ($branchCode !== 0 || $branch === '') $branch = 'main';
+  $headBefore = git_head_commit($repoReal);
+
+  $statusCode = 0;
+  $statusOut = git_command(['status', '--porcelain', '--untracked-files=all'], $repoReal, $statusCode);
+  if ($statusCode !== 0) {
+    throw new RuntimeException('git_status_failed');
+  }
+
+  $statusLines = split_nonempty_lines($statusOut);
+  $meaningfulLines = git_filter_non_runtime_status_lines($statusLines, true);
+  $meaningfulPaths = git_filter_non_runtime_paths(git_collect_paths_from_status_lines($meaningfulLines), true);
+
+  if (empty($meaningfulPaths)) {
+    return [
+      'discarded' => false,
+      'branch' => $branch,
+      'message' => 'No meaningful local change needed to be discarded.',
+      'discarded_paths' => [],
+      'restored_paths' => [],
+      'removed_paths' => [],
+      'remaining_paths' => [],
+      'before_head' => $headBefore,
+      'after_head' => $headBefore,
+    ];
+  }
+
+  $tracked = [];
+  $untracked = [];
+  foreach ($meaningfulPaths as $path) {
+    if (git_is_tracked_path($repoReal, $path)) {
+      $tracked[] = $path;
+    } else {
+      $untracked[] = $path;
+    }
+  }
+  $tracked = array_values(array_unique($tracked));
+  $untracked = array_values(array_unique($untracked));
+
+  if (!empty($tracked)) {
+    $restoreCode = 0;
+    $restoreOut = git_command(['restore', '--source=HEAD', '--staged', '--worktree', '--', ...$tracked], $repoReal, $restoreCode);
+    if ($restoreCode !== 0) {
+      throw new RuntimeException('git_discard_failed' . ($restoreOut !== '' ? ': ' . $restoreOut : ''));
+    }
+  }
+
+  if (!empty($untracked)) {
+    $cleanCode = 0;
+    $cleanOut = git_command(['clean', '-fd', '--', ...$untracked], $repoReal, $cleanCode);
+    if ($cleanCode !== 0) {
+      throw new RuntimeException('git_discard_failed' . ($cleanOut !== '' ? ': ' . $cleanOut : ''));
+    }
+  }
+
+  $afterStatusCode = 0;
+  $afterStatusOut = git_command(['status', '--porcelain', '--untracked-files=all'], $repoReal, $afterStatusCode);
+  if ($afterStatusCode !== 0) {
+    throw new RuntimeException('git_status_failed');
+  }
+
+  $remainingLines = git_filter_non_runtime_status_lines(split_nonempty_lines($afterStatusOut), true);
+  $remainingPaths = git_filter_non_runtime_paths(git_collect_paths_from_status_lines($remainingLines), true);
+
+  return [
+    'discarded' => !empty($tracked) || !empty($untracked),
+    'branch' => $branch,
+    'message' => empty($remainingPaths)
+      ? 'Meaningful local repository changes were discarded. The branch is clean for remote update.'
+      : 'Some meaningful local repository changes remain after discard. Review them before updating from remote.',
+    'discarded_paths' => $meaningfulPaths,
+    'restored_paths' => $tracked,
+    'removed_paths' => $untracked,
+    'remaining_paths' => $remainingPaths,
+    'before_head' => $headBefore,
+    'after_head' => git_head_commit($repoReal),
+  ];
+}
+
 function git_unstage_paths(string $repoReal, array $paths): void {
   $clean = array_values(array_unique(array_filter(array_map(static function($path){
     if (!is_string($path) || trim($path) === '') return '';
@@ -11531,6 +11634,47 @@ switch ($action) {
         str_starts_with($message, 'git_status_failed') => 'git_status_failed',
         str_starts_with($message, 'git_index_check_failed') => 'git_index_check_failed',
         default => 'git_pull_failed',
+      };
+      api_json([
+        'ok' => false,
+        'error' => $error,
+        'detail' => $message,
+        'server_time' => now_iso(),
+      ], 500);
+    }
+  }
+
+  case 'admin_git_discard_local': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    require_csrf();
+    if (!user_is_admin($me)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
+
+    try {
+      $result = git_discard_meaningful_local_changes($ROOT_DIR);
+      api_json([
+        'ok' => true,
+        'discarded' => (bool)($result['discarded'] ?? false),
+        'branch' => (string)($result['branch'] ?? 'main'),
+        'message' => (string)($result['message'] ?? ''),
+        'discarded_paths' => array_values(array_map('strval', $result['discarded_paths'] ?? [])),
+        'restored_paths' => array_values(array_map('strval', $result['restored_paths'] ?? [])),
+        'removed_paths' => array_values(array_map('strval', $result['removed_paths'] ?? [])),
+        'remaining_paths' => array_values(array_map('strval', $result['remaining_paths'] ?? [])),
+        'before_head' => (string)($result['before_head'] ?? ''),
+        'after_head' => (string)($result['after_head'] ?? ''),
+        'server_time' => now_iso(),
+      ]);
+    } catch (Throwable $e) {
+      @error_log('[API] admin_git_discard_local failed: ' . $e->getMessage());
+      $message = $e->getMessage();
+      $error = match (true) {
+        str_starts_with($message, 'exec_unavailable') => 'exec_unavailable',
+        str_starts_with($message, 'repo_not_found') => 'repo_not_found',
+        str_starts_with($message, 'not_a_git_repo') => 'not_a_git_repo',
+        str_starts_with($message, 'git_status_failed') => 'git_status_failed',
+        str_starts_with($message, 'git_discard_failed') => 'git_discard_failed',
+        default => 'git_discard_failed',
       };
       api_json([
         'ok' => false,
