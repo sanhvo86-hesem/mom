@@ -43,8 +43,9 @@ function startEdit(code){
     if(window.edTiptapAdapter && typeof window.edTiptapAdapter.destroy==='function'){
       try{ window.edTiptapAdapter.destroy(true); }catch(_e){}
     }
-    const doc=DOCS.find(d=>d.code===code);
+    const doc=(typeof window._resolveDocRecord === 'function') ? window._resolveDocRecord(code) : DOCS.find(d=>d.code===code);
     if(!doc||!canEdit(doc)) return;
+    const resolvedCode = String(doc.code || '').trim();
     // Safety: do not allow editing while Google Translate is active (EN mode)
     // to avoid saving translated DOM back into the Vietnamese master HTML.
     if(lang==='en'){
@@ -52,7 +53,7 @@ function startEdit(code){
       try{ setLang('vi'); }catch(e){}
       return;
     }
-    editingDoc=code;
+    editingDoc=resolvedCode;
     editMode=true;
     edModified=false;
     
@@ -62,8 +63,8 @@ function startEdit(code){
       editMode=false; editingDoc=null;
       return;
     }
-    const saved=getEditedHtml(code);
-    const recovery=(!saved && typeof edGetRecoveryDraft==='function') ? edGetRecoveryDraft(code) : null;
+    const saved=getEditedHtml(resolvedCode);
+    const recovery=(!saved && typeof edGetRecoveryDraft==='function') ? edGetRecoveryDraft(resolvedCode) : null;
     
     // Build an editor shell from the currently loaded iframe so edit mode renders
     // the full document (header + correct HTML/CSS context) instead of only docContent.
@@ -207,7 +208,7 @@ function startEdit(code){
         showToast(lang==='en'?'Recovered local draft loaded':'\u0110\u00e3 t\u1ea3i b\u1ea3n nh\u00e1p kh\u00f4i ph\u1ee5c c\u1ee5c b\u1ed9');
         return;
       }
-      try{ if(typeof edClearRecoveryDraft==='function') edClearRecoveryDraft(code); }catch(e){}
+      try{ if(typeof edClearRecoveryDraft==='function') edClearRecoveryDraft(resolvedCode); }catch(e){}
     }
     
     // Try direct iframe access first
@@ -1762,9 +1763,9 @@ function syncIframeDocumentHeaderMetadata(idoc, doc){
   if(!idoc || !doc) return;
   try{
     const publishedMeta = extractIframePublishedDocMetadata(idoc);
-    const code = String((publishedMeta.code || (typeof getDocDisplayCode === 'function' ? getDocDisplayCode(doc) : doc.code) || '')).trim();
-    const title = String((publishedMeta.title || (typeof getDocDisplayTitle === 'function' ? getDocDisplayTitle(doc) : (doc.title || '')) || '')).trim();
-    const desc = String((publishedMeta.desc || (typeof getDocDisplayDescription === 'function' ? getDocDisplayDescription(doc) : '') || '')).trim();
+    const code = String(((typeof getDocDisplayCode === 'function' ? getDocDisplayCode(doc) : doc.code) || publishedMeta.code || '')).trim();
+    const title = String(((typeof getDocDisplayTitle === 'function' ? getDocDisplayTitle(doc) : (doc.title || '')) || publishedMeta.title || '')).trim();
+    const desc = String(((typeof getDocDisplayDescription === 'function' ? getDocDisplayDescription(doc) : '') || publishedMeta.desc || '')).trim();
 
     const titleWrap = idoc.querySelector('.form-header .title');
     if(titleWrap){
@@ -1791,10 +1792,11 @@ function syncIframeDocumentHeaderMetadata(idoc, doc){
 }
 
 function loadDocContent(code){
-  const doc=DOCS.find(d=>d.code===code);
+  const doc=(typeof window._resolveDocRecord === 'function') ? window._resolveDocRecord(code) : DOCS.find(d=>d.code===code);
   if(!doc) return;
+  const resolvedCode = String(doc.code || '').trim();
 
-  const edited=getEditedHtml(code);
+  const edited=getEditedHtml(resolvedCode);
   const iframe=document.getElementById('doc-iframe');
   const loading=document.getElementById('iframe-loading');
 
@@ -1812,8 +1814,8 @@ function loadDocContent(code){
   }catch(e){}
 
   if(typeof isDownloadOnlyDoc==='function' && isDownloadOnlyDoc(doc)){
-    const state=getDocState(code)||{};
-    const versions=getDocVersions(code)||[];
+    const state=getDocState(resolvedCode)||{};
+    const versions=getDocVersions(resolvedCode)||[];
     const currentEntry=versions.find(v=>isCurrentVersionEntry(doc,v)) || versions.find(v=>v && (v.status==='approved' || v.status==='initial_release')) || null;
     const workingEntry=versions.find(v=>v && (v.status==='draft' || v.status==='in_review')) || null;
     const currentUrl=currentEntry ? getVersionAccessUrl(doc,currentEntry) : buildDocStreamUrl(doc,true);

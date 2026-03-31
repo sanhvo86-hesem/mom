@@ -1670,6 +1670,12 @@ function postParentMessage(payload){
   if(window.parent && window.parent !== window) window.parent.postMessage(payload, window.location.origin || '*');
 }
 
+function esc(value){
+  var node = document.createElement('div');
+  node.appendChild(document.createTextNode(String(value == null ? '' : value)));
+  return node.innerHTML;
+}
+
 function byId(id){ return document.getElementById(id); }
 function byName(name){ return document.querySelector('[name="' + cssEscape(name) + '"]'); }
 function setText(id, value){ var node = byId(id); if(node) node.textContent = value; }

@@ -70,13 +70,19 @@ function normalizeRelPath(path){
 function eqmsCatalogForm(formCode){
   var ecState = window._ecState || {};
   var formMap = ecState.formMap || {};
-  var direct = formMap[formCode] || null;
+  var forms = Array.isArray(ecState.forms) ? ecState.forms : [];
+  var direct = formMap[formCode] || forms.find(function(item){
+    return String(item && item.form_code || '').trim() === String(formCode || '').trim();
+  }) || null;
   if(!direct) return null;
   var runtimeCode = String(direct.html_runtime_form_code || (direct.schema && direct.schema.html_runtime_form_code) || '').trim();
-  if(runtimeCode && formMap[runtimeCode]) direct = formMap[runtimeCode];
+  if(runtimeCode){
+    direct = formMap[runtimeCode] || forms.find(function(item){
+      return String(item && item.form_code || '').trim() === runtimeCode;
+    }) || direct;
+  }
   var targetPath = normalizeRelPath(direct.standalone_html || (direct.schema && direct.schema.standalone_html) || '');
   if(!targetPath) return direct;
-  var forms = Array.isArray(ecState.forms) ? ecState.forms : [];
   var matches = forms.filter(function(candidate){
     return normalizeRelPath((candidate && candidate.standalone_html) || (candidate && candidate.schema && candidate.schema.standalone_html) || '') === targetPath;
   });
@@ -108,7 +114,13 @@ function findStandaloneDoc(formCode, schema){
   var docs = docRegistry();
   var targetForm = eqmsCatalogForm(formCode);
   var runtimeCode = String((targetForm && (targetForm.html_runtime_form_code || (targetForm.schema && targetForm.schema.html_runtime_form_code))) || '').trim();
-  if(runtimeCode) targetForm = eqmsCatalogForm(runtimeCode) || targetForm;
+  if(runtimeCode){
+    for(var j = 0; j < docs.length; j++){
+      var runtimeDoc = docs[j];
+      if(runtimeDoc && String(runtimeDoc.code || '').trim().toUpperCase() === runtimeCode.toUpperCase()) return runtimeDoc;
+    }
+    targetForm = eqmsCatalogForm(runtimeCode) || targetForm;
+  }
   var targetPath = normalizeRelPath((schema && schema.standalone_html) || (targetForm && targetForm.standalone_html) || '');
   if(targetPath){
     for(var i = 0; i < docs.length; i++){

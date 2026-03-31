@@ -252,6 +252,7 @@ $router->actions([
     'order_dashboard_kpi'     => [OrderController::class, 'getDashboardKpi'],
     'order_search'            => [OrderController::class, 'search'],
     'order_link_form'         => [OrderController::class, 'linkForm'],
+    'order_shipment_gate'     => [OrderController::class, 'checkShipmentReadiness'],
 ]);
 
 // Exception Management

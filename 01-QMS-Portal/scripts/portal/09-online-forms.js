@@ -97,6 +97,28 @@ var state = {
 
 window._ecState = state;
 
+var KNOWN_HTML_RUNTIME_FORMS = {
+  'FRM-403-SCAR': {
+    form_code: 'FRM-403-SCAR',
+    title: 'Supplier Corrective Action Request (SCAR)',
+    title_vi: 'Yêu cầu hành động khắc phục nhà cung cấp (SCAR)',
+    version: 'V1',
+    category: 'quality',
+    frequency: 'per_event',
+    online: true,
+    delivery_mode: 'online',
+    standalone_html: '04-Bieu-Mau/04-FRM-400/FRM-403-SCAR_Supplier_Corrective_Action_Request.html',
+    sop_ref: 'SOP-401',
+    record_type: 'SCAR',
+    owner: 'QA / SCM',
+    approver: 'QA / SCM',
+    effective_date: '2026-03-31',
+    linked_excel: 'FRM-403',
+    description: 'SCAR form for supplier corrective actions. Covers identification, quality issue, containment, supplier response, and verification.',
+    description_vi: 'Ghi nhận yêu cầu hành động khắc phục đối với nhà cung cấp khi phát hiện lỗi chất lượng hoặc giao hàng.'
+  }
+};
+
 function t(vi, en){ return (typeof lang !== 'undefined' && lang === 'en') ? en : vi; }
 function esc(value){
   var div = document.createElement('div');
@@ -289,6 +311,20 @@ function buildFormToRecordTypeMap(forms, recordTypes){
     if(directRecordType && recordTypes[directRecordType]) map[formCode] = directRecordType;
   });
   return map;
+}
+
+function ensureKnownHtmlRuntimeForms(){
+  Object.keys(KNOWN_HTML_RUNTIME_FORMS).forEach(function(code){
+    if(state.formMap[code]) return;
+    var seed = Object.assign({}, KNOWN_HTML_RUNTIME_FORMS[code]);
+    state.forms.push(seed);
+    state.formMap[code] = seed;
+  });
+  var alias = state.formMap['FRM-403'];
+  if(alias){
+    if(!alias.html_runtime_form_code) alias.html_runtime_form_code = 'FRM-403-SCAR';
+    if(!alias.standalone_html) alias.standalone_html = KNOWN_HTML_RUNTIME_FORMS['FRM-403-SCAR'].standalone_html;
+  }
 }
 
 function buildQuery(payload){
@@ -731,6 +767,8 @@ function loadAll(){
       state.formToRecordType = {};
     })
   ]).then(function(){
+    ensureKnownHtmlRuntimeForms();
+    state.formToRecordType = buildFormToRecordTypeMap(state.forms, state.recordTypes);
     state._loadError = catalogError;
     if(catalogError && !state.forms.length) throw new Error(catalogError);
   });
@@ -815,13 +853,19 @@ function eqmsStandalonePath(form){
 function canonicalEqmsForm(formOrCode){
   var baseForm = null;
   if(typeof formOrCode === 'string'){
-    baseForm = state.formMap[formOrCode] || null;
+    baseForm = state.formMap[formOrCode] || (state.forms || []).find(function(item){
+      return String(item && item.form_code || '').trim() === String(formOrCode || '').trim();
+    }) || null;
   } else if(formOrCode && typeof formOrCode === 'object'){
     baseForm = formOrCode;
   }
   if(!baseForm) return null;
   var runtimeCode = String((baseForm.html_runtime_form_code || (baseForm.schema && baseForm.schema.html_runtime_form_code) || '')).trim();
-  if(runtimeCode && state.formMap[runtimeCode]) baseForm = state.formMap[runtimeCode];
+  if(runtimeCode){
+    baseForm = state.formMap[runtimeCode] || (state.forms || []).find(function(item){
+      return String(item && item.form_code || '').trim() === runtimeCode;
+    }) || KNOWN_HTML_RUNTIME_FORMS[runtimeCode] || baseForm;
+  }
   var standalonePath = eqmsStandalonePath(baseForm);
   if(!standalonePath) return baseForm;
   var matches = (state.forms || []).filter(function(candidate){
@@ -854,9 +898,11 @@ function eqmsForms(){
   var buckets = {};
   (state.forms || []).forEach(function(form){
     if(!form || !form.form_code) return;
+    var runtimeAlias = String(form.html_runtime_form_code || (form.schema && form.schema.html_runtime_form_code) || '').trim();
+    if(form.online === false && runtimeAlias) return;
     var standalonePath = eqmsStandalonePath(form);
     if(!standalonePath) return;
-    var bucketKey = standalonePath || String(form.form_code || '').trim().toUpperCase();
+    var bucketKey = standalonePath || runtimeAlias || String(form.form_code || '').trim().toUpperCase();
     if(!buckets[bucketKey] || eqmsFormRank(form) > eqmsFormRank(buckets[bucketKey])){
       buckets[bucketKey] = form;
     }
@@ -920,9 +966,19 @@ function openEqmsHub(bypassGuard){
 function resolveEqmsHtmlDocument(formCode){
   var form = canonicalEqmsForm(formCode) || state.formMap[formCode] || null;
   var runtimeCode = String((form && (form.html_runtime_form_code || (form.schema && form.schema.html_runtime_form_code)) || '')).trim();
-  if(runtimeCode && state.formMap[runtimeCode]) form = canonicalEqmsForm(runtimeCode) || state.formMap[runtimeCode];
+  if(runtimeCode){
+    var runtimeForm = canonicalEqmsForm(runtimeCode) || state.formMap[runtimeCode] || KNOWN_HTML_RUNTIME_FORMS[runtimeCode] || null;
+    if(runtimeForm) form = runtimeForm;
+  }
   var standalonePath = eqmsStandalonePath(form);
   var docs = docRegistry();
+  if(runtimeCode){
+    for(var r = 0; r < docs.length; r++){
+      var runtimeDoc = docs[r];
+      if(!runtimeDoc) continue;
+      if(String(runtimeDoc.code || '').trim().toUpperCase() === runtimeCode.toUpperCase()) return runtimeDoc;
+    }
+  }
   if(standalonePath){
     for(var i = 0; i < docs.length; i++){
       var pathDoc = docs[i];
@@ -969,15 +1025,23 @@ function resolveEqmsHtmlDocument(formCode){
   return null;
 }
 
-function waitForDocViewerReady(docCode){
-  return new Promise(function(resolve, reject){
+function waitForDocViewerReady(docRef){
+  var doc = (typeof docRef === 'object' && docRef) ? docRef : resolveEqmsHtmlDocument(docRef);
+  var expectedCode = String(doc && doc.code || docRef || '').trim();
+  var expectedPath = normalizeEqmsPath(doc && doc.path || '');
+  return new Promise(function(resolve){
     var startedAt = Date.now();
     (function poll(){
       var iframe = document.getElementById('doc-iframe');
       var viewer = document.getElementById('doc-viewer');
       var ready = false;
       try{
-        ready = !!(iframe && viewer && viewer.classList.contains('active') && window.currentDoc === docCode && iframe.contentDocument && iframe.contentDocument.readyState === 'complete');
+        var iframeDoc = iframe && iframe.contentDocument;
+        var readyState = !!(iframeDoc && iframeDoc.readyState === 'complete');
+        var sameCode = !!(expectedCode && window.currentDoc === expectedCode);
+        var samePath = !!(expectedPath && normalizeEqmsPath(window.currentDocPath || '') === expectedPath);
+        var srcMatches = !!(expectedPath && iframe && String(iframe.src || '').indexOf(expectedPath) >= 0);
+        ready = !!(iframe && viewer && viewer.classList.contains('active') && readyState && (sameCode || samePath || srcMatches));
       }catch(_err){
         ready = false;
       }
@@ -986,7 +1050,7 @@ function waitForDocViewerReady(docCode){
         return;
       }
       if(Date.now() - startedAt > 12000){
-        reject(new Error('viewer_timeout'));
+        resolve(false);
         return;
       }
       setTimeout(poll, 160);
@@ -1009,11 +1073,22 @@ function openEqmsTemplateEditor(formCode, bypassGuard){
     showToast(t('Trình chỉnh sửa tài liệu HTML chưa sẵn sàng.', 'The HTML document editor is not ready yet.'), 'warn');
     return;
   }
-  Promise.resolve(openDoc(doc.code)).then(function(){
-    return waitForDocViewerReady(doc.code);
+  Promise.resolve(openDoc(doc)).then(function(){
+    return waitForDocViewerReady(doc);
   }).then(function(){
-    startEdit(doc.code);
-    showToast(t('Đã mở mẫu HTML để chỉnh sửa bằng cùng bề mặt hiển thị.', 'Opened the HTML template in the same visual surface.'), 'success');
+    try{ startEdit(doc); }catch(_err){}
+    return new Promise(function(resolve, reject){
+      setTimeout(function(){
+        var sameCode = (typeof editMode !== 'undefined' && editMode && typeof editingDoc !== 'undefined' && editingDoc === doc.code);
+        var samePath = normalizeEqmsPath(window.currentDocPath || '') === normalizeEqmsPath(doc.path || '');
+        if(sameCode || samePath){
+          showToast(t('Đã mở mẫu HTML để chỉnh sửa bằng cùng bề mặt hiển thị.', 'Opened the HTML template in the same visual surface.'), 'success');
+          resolve();
+          return;
+        }
+        reject(new Error('editor_not_ready'));
+      }, 260);
+    });
   }).catch(function(){
     showToast(t('Không thể mở trình chỉnh sửa mẫu HTML lúc này.', 'Could not open the HTML template editor right now.'), 'error');
   });

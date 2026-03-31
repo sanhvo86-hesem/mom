@@ -7,6 +7,7 @@ namespace HESEM\QMS\Api\Controllers;
 use HESEM\QMS\Api\Controllers\BaseController;
 use HESEM\QMS\Services\OrderService;
 use HESEM\QMS\Services\OrderWorkflowService;
+use HESEM\QMS\Services\ShipmentGateService;
 use Throwable;
 
 /**
@@ -1064,6 +1065,33 @@ class OrderController extends BaseController
             $this->paginated('results', $paged, $total, $offset, $limit);
         } catch (Throwable $e) {
             $this->error('search_failed', 500, $e->getMessage());
+        }
+    }
+
+    // ── Shipment Readiness Gate ────────────────────────────────────────────
+
+    /**
+     * GET checkShipmentReadiness — Check if SO is ready to ship.
+     * Action: `order_shipment_gate`
+     * @return never
+     */
+    public function checkShipmentReadiness(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireOrderPermission($user, 'so_read');
+
+        $soNumber = $this->query('so_number');
+        if ($soNumber === null || trim($soNumber) === '') {
+            $this->error('missing_so_number', 400);
+        }
+
+        try {
+            $gateService = new ShipmentGateService($this->dataDir, $this->confDir);
+            $result = $gateService->checkReadiness(trim($soNumber));
+
+            $this->success(['shipment_gate' => $result]);
+        } catch (Throwable $e) {
+            $this->error('shipment_gate_failed', 500, $e->getMessage());
         }
     }
 }

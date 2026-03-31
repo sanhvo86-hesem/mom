@@ -1388,6 +1388,10 @@ function renderSidebar(){
       <button class="nav-item ${currentPage==='exceptions'?'active':''}" onclick="navigateTo('exceptions')"><span class="icon">\u26a0\ufe0f</span><span>${lang==='en'?'Exception Dashboard':'B\u1ea3ng ngo\u1ea1i l\u1ec7'}</span></button>
       <button class="nav-item ${currentPage==='orders'?'active':''}" onclick="navigateTo('orders')"><span class="icon">📦</span><span>${lang==='en'?'Order Management':'Quản lý đơn hàng'}</span></button>
       <button class="nav-item ${currentPage==='forms'?'active':''}" onclick="navigateTo('forms')"><span class="icon">📋</span><span>${lang==='en'?'Evidence Control':'Kiểm soát chứng cứ'}</span></button>
+      <button class="nav-item ${currentPage==='quality-exceptions'?'active':''}" onclick="navigateTo('quality-exceptions')"><span class="icon">🔴</span><span>${lang==='en'?'Quality Exceptions':'Ngoại lệ chất lượng'}</span></button>
+      <button class="nav-item ${currentPage==='supplier-quality'?'active':''}" onclick="navigateTo('supplier-quality')"><span class="icon">🏭</span><span>${lang==='en'?'Supplier Quality':'Chất lượng NCC'}</span></button>
+      <button class="nav-item ${currentPage==='quoting'?'active':''}" onclick="navigateTo('quoting')"><span class="icon">💰</span><span>${lang==='en'?'Quoting':'Báo giá'}</span></button>
+      <button class="nav-item ${currentPage==='evidence'?'active':''}" onclick="navigateTo('evidence')"><span class="icon">🔒</span><span>${lang==='en'?'Evidence Vault':'Kho chứng cứ'}</span></button>
     </div>`;
   }
   if(isAdmin() && isPortalSidebarCoreVisible('admin')){
@@ -1435,10 +1439,10 @@ function navigateTo(page, filter, bypassGuard){
   document.getElementById('user-dropdown').classList.remove('show');
   
   // Track page view for activity log
-  const pageTitles = {dashboard:'Tổng quan',documents:'Danh sách tài liệu',search:'Tìm kiếm',dictionary:'Từ điển thuật ngữ',access:'Ma trận truy cập',admin:'Quản trị hệ thống',deploy:'Triển khai vận hành',mes:'Trung tâm điều hành MES',exceptions:'B\u1ea3ng ngo\u1ea1i l\u1ec7',orders:'Quản lý đơn hàng',forms:'Kiểm soát chứng cứ'};
+  const pageTitles = {dashboard:'Tổng quan',documents:'Danh sách tài liệu',search:'Tìm kiếm',dictionary:'Từ điển thuật ngữ',access:'Ma trận truy cập',admin:'Quản trị hệ thống',deploy:'Triển khai vận hành',mes:'Trung tâm điều hành MES',exceptions:'Bảng ngoại lệ',orders:'Quản lý đơn hàng',forms:'Kiểm soát chứng cứ','quality-exceptions':'Quản lý ngoại lệ chất lượng','supplier-quality':'Quản lý chất lượng NCC','quoting':'Báo giá & Ước tính',evidence:'Kho chứng cứ'};
   trackPageView(page + (filter ? '/'+filter : ''), (pageTitles[page]||page) + (filter ? ' — '+filter : ''));
   
-  const titles = {dashboard:T('bc_dashboard'),documents:T('bc_documents'),search:T('bc_search'),dictionary:T('bc_dictionary'),access:T('bc_access'),deploy:lang==='en'?'Operations Deployment':'Triển khai vận hành',mes:lang==='en'?'MES Control Center':'Trung tâm điều hành MES',exceptions:lang==='en'?'Exception Dashboard':'B\u1ea3ng ngo\u1ea1i l\u1ec7',orders:lang==='en'?'Order Management':'Quản lý đơn hàng',forms:lang==='en'?'Evidence Control':'Kiểm soát chứng cứ'};
+  const titles = {dashboard:T('bc_dashboard'),documents:T('bc_documents'),search:T('bc_search'),dictionary:T('bc_dictionary'),access:T('bc_access'),deploy:lang==='en'?'Operations Deployment':'Triển khai vận hành',mes:lang==='en'?'MES Control Center':'Trung tâm điều hành MES',exceptions:lang==='en'?'Exception Dashboard':'Bảng ngoại lệ',orders:lang==='en'?'Order Management':'Quản lý đơn hàng',forms:lang==='en'?'Evidence Control':'Kiểm soát chứng cứ','quality-exceptions':lang==='en'?'Quality Exception Hub':'Quản lý ngoại lệ chất lượng','supplier-quality':lang==='en'?'Supplier Quality':'Quản lý chất lượng NCC',quoting:lang==='en'?'Quoting & Estimation':'Báo giá & Ước tính',evidence:lang==='en'?'Evidence Vault':'Kho chứng cứ'};
   // Reset header breadcrumb for non-documents pages
   if(page !== 'documents'){
     const bcEl = document.getElementById('header-breadcrumb');
@@ -1456,6 +1460,10 @@ function navigateTo(page, filter, bypassGuard){
   if(page==='exceptions' && typeof window._renderExceptionDashboard==='function'){ var xp=document.getElementById('page-exceptions'); if(xp) window._renderExceptionDashboard(xp); }
   if(page==='orders' && typeof window._renderSoJoWoDashboard==='function'){ var op=document.getElementById('page-orders'); if(op) window._renderSoJoWoDashboard(null,null,op); }
   if(page==='forms' && typeof renderOnlineForms==='function') renderOnlineForms();
+  if(page==='quality-exceptions' && typeof window._renderQualityExceptionHub==='function'){ var qep=document.getElementById('page-quality-exceptions'); if(qep) window._renderQualityExceptionHub(qep); }
+  if(page==='supplier-quality' && typeof window._renderSupplierQuality==='function'){ var sqp=document.getElementById('page-supplier-quality'); if(sqp) window._renderSupplierQuality(sqp); }
+  if(page==='quoting' && typeof window._renderQuotingEngine==='function'){ var qtp=document.getElementById('page-quoting'); if(qtp) window._renderQuotingEngine(qtp); }
+  if(page==='evidence' && typeof window._renderEvidenceVault==='function'){ var evp=document.getElementById('page-evidence'); if(evp) window._renderEvidenceVault(evp); }
   if(page==='admin'){ if(!isAdmin()){navigateTo('dashboard');return;} renderAdmin(); }
   
   document.getElementById('page-'+page).classList.add('active');
@@ -1511,6 +1519,46 @@ function findDocByRelativePath(relPath){
   }
 }
 
+function resolveDocRecord(docOrCode){
+  try{
+    if(!docOrCode) return null;
+    if(typeof docOrCode === 'object'){
+      if(docOrCode.path){
+        const byObjectPath = findDocByRelativePath(docOrCode.path);
+        if(byObjectPath) return byObjectPath;
+      }
+      if(docOrCode.code){
+        const rawObjectCode = String(docOrCode.code || '').trim();
+        if(rawObjectCode){
+          const currentPath = normalizeDocRelativePath(window.currentDocPath || '');
+          if(currentPath){
+            const currentMatch = DOCS.find(d => String(d && d.code || '').trim() === rawObjectCode && normalizeDocRelativePath(d && d.path) === currentPath);
+            if(currentMatch) return currentMatch;
+          }
+          const byObjectCode = DOCS.find(d => String(d && d.code || '').trim() === rawObjectCode);
+          if(byObjectCode) return byObjectCode;
+        }
+      }
+      return docOrCode.code || docOrCode.path ? docOrCode : null;
+    }
+    const raw = String(docOrCode || '').trim();
+    if(!raw) return null;
+    const byPath = findDocByRelativePath(raw);
+    if(byPath) return byPath;
+    const matches = DOCS.filter(d => String(d && d.code || '').trim() === raw);
+    if(!matches.length) return null;
+    const currentPath = normalizeDocRelativePath(window.currentDocPath || '');
+    if(currentPath){
+      const currentMatch = matches.find(d => normalizeDocRelativePath(d && d.path) === currentPath);
+      if(currentMatch) return currentMatch;
+    }
+    return matches[0] || null;
+  }catch(e){
+    return null;
+  }
+}
+window._resolveDocRecord = resolveDocRecord;
+
 function buildPathStreamUrl(relPath, download=true, code=''){
   try{
     const normalized = normalizeDocRelativePath(relPath);
@@ -1563,7 +1611,7 @@ function attachIframeLinkBridge(iframe, doc, baseDocPath=''){
       if(linkedDoc && /\.(html?)$/i.test(relPath) && typeof openDoc === 'function'){
         e.preventDefault();
         e.stopPropagation();
-        openDoc(linkedDoc.code);
+        openDoc(linkedDoc);
       }
     }, true);
     idoc.__hesemPortalLinkBridgeAttached = true;
@@ -1589,7 +1637,7 @@ function triggerDocDownload(doc){
 }
 
 function downloadCurrentDoc(code){
-  const doc = DOCS.find(d=>d.code===code);
+  const doc = resolveDocRecord(code);
   if(!doc) return;
   triggerDocDownload(doc);
 }
@@ -1622,8 +1670,9 @@ async function openDoc(code){
   // Ensure no stray overlay blocks the UI
   try{ document.querySelectorAll('.vp-overlay').forEach(el=>el.remove()); }catch(e){}
 
-  const doc = DOCS.find(d=>d.code===code);
+  const doc = resolveDocRecord(code);
   if(!doc) return;
+  const resolvedCode = String(doc.code || '').trim();
 
   // Block access to hidden documents for non-admins
   if(isDocHidden(doc.code) && !isAdmin()){
@@ -1633,7 +1682,7 @@ async function openDoc(code){
   if(!canAccessDoc(doc.code)) return;
 
   // ── Unsaved Changes Guard ──
-  if(editMode && editingDoc && editingDoc !== code){
+  if(editMode && editingDoc && editingDoc !== resolvedCode){
     let hasUnsaved=true;
     try{
       hasUnsaved=(typeof edHasUnsavedChanges==='function')
@@ -1641,7 +1690,7 @@ async function openDoc(code){
         : (!!getEditedHtml(editingDoc) || !!edModified);
     }catch(e){ hasUnsaved=true; }
     if(hasUnsaved){
-      showUnsavedDialog(editingDoc, code);
+      showUnsavedDialog(editingDoc, resolvedCode);
       return;
     }
     try{ cancelEdit(); }catch(e){
@@ -1653,10 +1702,11 @@ async function openDoc(code){
   // Track document view
   const displayTitle = getDocDisplayTitle(doc);
   const displayCode = (typeof getDocDisplayCode === 'function') ? getDocDisplayCode(doc) : String(doc.code || '').trim();
-  trackPageView('doc/'+code, (isDownloadOnlyDoc(doc)?'📊 ':'📄 ')+displayCode+' — '+displayTitle.substring(0,60));
+  trackPageView('doc/'+resolvedCode, (isDownloadOnlyDoc(doc)?'📊 ':'📄 ')+displayCode+' — '+displayTitle.substring(0,60));
   editMode=false;
   editingDoc=null;
-  currentDoc=code;
+  currentDoc=resolvedCode;
+  window.currentDocPath = String(doc.path || '');
   setDocHeaderMetaCollapsed(true);
   try{ if(typeof resetDocViewerZoom==='function') resetDocViewerZoom(); }catch(e){}
   edFullscreen=false;
@@ -1701,17 +1751,17 @@ async function openDoc(code){
   renderVersionHistory(doc);
 
   // Load current document HTML immediately
-  loadDocContent(code);
+  loadDocContent(doc);
 
   // Background: refresh server-backed state + versions, then re-render once
   try{
-    refreshDocFromServer(code).then(()=>{
+    refreshDocFromServer(resolvedCode).then(()=>{
       try{
         updateDocViewerHeader(doc);
         renderWorkflowPanel(doc);
         renderVersionHistory(doc);
         // Re-load iframe in case the resolved view file changed (draft / inreview / archive)
-        loadDocContent(code);
+        loadDocContent(doc);
       }catch(e){}
     }).catch(()=>{});
   }catch(e){}
@@ -1721,13 +1771,15 @@ async function openDoc(code){
 // without navigating away. This is used after server-side state changes (approve/new revision).
 async function openDocPreview(code){
   try{
-    const doc = DOCS.find(d=>d.code===code);
+    const doc = resolveDocRecord(code);
     if(!doc) return;
+    const resolvedCode = String(doc.code || '').trim();
     // Pull the latest server state/versions to keep folder-sync accurate
-    try{ await refreshDocFromServer(code); }catch(e){}
+    try{ await refreshDocFromServer(resolvedCode); }catch(e){}
 
     // Ensure doc viewer is active
-    currentDoc = code;
+    currentDoc = resolvedCode;
+    window.currentDocPath = String(doc.path || '');
     setDocHeaderMetaCollapsed(true);
     const viewer = document.getElementById('doc-viewer');
     if(viewer) viewer.classList.add('active');
@@ -1736,7 +1788,7 @@ async function openDocPreview(code){
     updateDocViewerHeader(doc);
     renderWorkflowPanel(doc);
     renderVersionHistory(doc);
-    loadDocContent(code);
+    loadDocContent(doc);
   }catch(err){
     console.error('openDocPreview error:', err);
   }
