@@ -7,6 +7,7 @@
   "version_int": 1,
   "category": "quality",
   "frequency": "per_event",
+  "online": true,
   "delivery_mode": "online",
   "sop_ref": "SOP-401",
   "record_type": "SCAR",

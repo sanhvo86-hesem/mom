@@ -33,6 +33,22 @@ Chuẩn canonical đầy đủ: xem `25-glossary-canonical-abbreviation-standard
 - Ngoài các nhóm ngoại lệ trên, phần văn xuôi hiển thị cho người đọc phải được Việt hóa theo đúng ngữ cảnh vận hành.
 - Không được vin vào ngoại lệ để giữ lại các cụm nửa Anh nửa Việt như `review plan`, `shipment pack`, `tool readiness`, `change logic`, `route control` nếu đã có bản Việt chuẩn trong mục E và F.
 
+### A5. Ngôn ngữ biểu mẫu eQMS (Online Form) — 100% tiếng Anh
+
+- Tất cả biểu mẫu eQMS online form (FRM-xxx-SUFFIX) **PHẢI** sử dụng 100% tiếng Anh cho:
+  - Tên trường (field labels): English là chính, Vietnamese là subtitle phụ (italic, nhỏ hơn)
+  - Tên section: English
+  - Mô tả section: English
+  - Placeholder text: English
+  - Helper text: English
+  - Option labels trong dropdown: English (có thể kèm Vietnamese trong ngoặc)
+  - Signature block labels: English
+  - Validation messages: English
+  - PDF export: English
+- Lý do: Biểu mẫu phục vụ kiểm soát chứng cứ quốc tế, auditor quốc tế, khách hàng nước ngoài. Tiếng Anh đảm bảo tính phổ quát và tuân thủ AS9100D/ISO 9001.
+- Vietnamese subtitle (nếu cần) hiển thị bên cạnh label tiếng Anh với font nhỏ hơn, italic, màu nhạt.
+- Quy tắc này **KHÔNG** áp dụng cho tài liệu SOP/WI/ANNEX/JD — các tài liệu này vẫn tuân thủ A1 (tiếng Việt là chính).
+
 ### A2. Quy tắc vàng
 
 | Phần tử | Dịch? | Lý do |
