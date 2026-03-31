@@ -1015,57 +1015,48 @@ function renderSidebar(){
 }
 
 function renderEqmsFormList(container){
-  /* Load available eQMS schemas from API */
-  api('form_catalog_snapshot', {}, 'GET').catch(function(){
-    /* Fallback if API fails — return hardcoded list */
-    return { ok: true, forms: [
-      { form_code:'FRM-403-SCAR', title:'Supplier Corrective Action Request (SCAR)', version:'V1', online:true, category:'quality', sop_ref:'SOP-401', description:'SCAR form for supplier quality issues.' }
-    ]};
-  }).then(function(resp){
-    var forms = (resp && Array.isArray(resp.forms)) ? resp.forms.filter(function(f){ return f.online !== false; }) : [];
-    /* Ensure FRM-403-SCAR is always in the list */
-    if(!forms.some(function(f){ return f.form_code === 'FRM-403-SCAR'; })){
-      forms.unshift({ form_code:'FRM-403-SCAR', title:'Supplier Corrective Action Request (SCAR)', version:'V1', online:true, category:'quality', sop_ref:'SOP-401', description:'SCAR form for supplier quality issues.' });
-    }
-    if(!forms.length){
-      container.innerHTML = '<div class="ec-empty"><h3>' + esc(t('No online forms available', 'No online forms available')) + '</h3><p>' + esc(t('Add form schemas to qms-data/online-forms/schemas/ to see them here.', 'Add form schemas to qms-data/online-forms/schemas/ to see them here.')) + '</p></div>';
-      return;
-    }
-    var html = '<div style="max-width:900px;margin:0 auto;padding:24px">' +
-      '<h2 style="font-size:18px;font-weight:800;color:#0f172a;margin:0 0 4px">Online Forms (eQMS)</h2>' +
-      '<p style="font-size:13px;color:#64748b;margin:0 0 20px;line-height:1.6">Select a form to open. Online forms are governed by the eQMS runtime with audit trail, e-signature, and version control.</p>' +
-      '<div style="display:grid;gap:12px">';
-    forms.forEach(function(f){
-      var isOnline = f.online !== false;
-      html += '<div class="eqms-form-card" data-open-eqms="' + esc(f.form_code) + '" style="cursor:pointer;padding:16px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;display:flex;align-items:center;gap:14px;transition:all .15s">' +
-        '<div style="width:44px;height:44px;border-radius:10px;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">\uD83D\uDCCB</div>' +
-        '<div style="flex:1;min-width:0">' +
-          '<div style="font-family:Consolas,monospace;font-size:13px;font-weight:800;color:#0f172a">' + esc(f.form_code) + ' <span style="font-size:11px;font-weight:600;color:#1565c0;background:#dbeafe;padding:1px 7px;border-radius:999px;margin-left:4px">' + esc(f.version || 'V1') + '</span></div>' +
-          '<div style="font-size:13px;color:#475569;margin-top:2px">' + esc(f.title || f.title_vi || f.form_code) + '</div>' +
-          (f.description || f.description_vi ? '<div style="font-size:11px;color:#94a3b8;margin-top:2px">' + esc(f.description || f.description_vi || '') + '</div>' : '') +
-        '</div>' +
-        '<div style="display:flex;gap:6px;flex-shrink:0">' +
-          (f.sop_ref ? '<span style="font-size:11px;color:#1565c0;font-weight:600">' + esc(f.sop_ref) + '</span>' : '') +
-          '<span style="font-size:10px;font-weight:700;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:#dcfce7;color:#16a34a">Online</span>' +
-        '</div>' +
-      '</div>';
-    });
-    html += '</div></div>';
-    container.innerHTML = html;
+  /* Known eQMS online forms — no API dependency */
+  var KNOWN_FORMS = [
+    { code:'FRM-403-SCAR', title:'Supplier Corrective Action Request (SCAR)', version:'V1', sop:'SOP-401', desc:'SCAR form for supplier corrective actions. Covers identification, quality issue, containment, supplier response, and verification.' }
+  ];
 
-    /* Bind click to open form */
-    Array.prototype.forEach.call(container.querySelectorAll('[data-open-eqms]'), function(card){
-      card.onmouseenter = function(){ card.style.borderColor = '#93c5fd'; card.style.boxShadow = '0 4px 12px rgba(0,0,0,.06)'; };
-      card.onmouseleave = function(){ card.style.borderColor = '#e2e8f0'; card.style.boxShadow = 'none'; };
-      card.onclick = function(){
-        var code = card.getAttribute('data-open-eqms');
-        if(code && typeof window.openEqmsForm === 'function'){
-          window.openEqmsForm(code, container, { editMode: true });
-        }
-      };
-    });
-  }).catch(function(){
-    container.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Could not load online forms', 'Could not load online forms')) + '</h3></div>';
+  var html = '<div style="max-width:900px;margin:0 auto;padding:24px">' +
+    '<h2 style="font-size:18px;font-weight:800;color:#0f172a;margin:0 0 4px">Online Forms (eQMS Web Form)</h2>' +
+    '<p style="font-size:13px;color:#64748b;margin:0 0 20px;line-height:1.6">Select a form to open. Online forms use the eQMS runtime with audit trail, e-signature, workflow, and version control.</p>' +
+    '<div style="display:grid;gap:12px">';
+
+  KNOWN_FORMS.forEach(function(f){
+    html += '<div data-open-eqms="' + esc(f.code) + '" style="cursor:pointer;padding:18px 20px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;display:flex;align-items:center;gap:16px;transition:border-color .15s,box-shadow .15s">' +
+      '<div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#dbeafe,#eff6ff);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">\uD83D\uDCCB</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-family:Consolas,monospace;font-size:14px;font-weight:800;color:#0f172a">' + esc(f.code) +
+          ' <span style="font-size:11px;font-weight:600;color:#1565c0;background:#dbeafe;padding:2px 8px;border-radius:999px;margin-left:6px">' + esc(f.version) + '</span>' +
+          ' <span style="font-size:11px;font-weight:600;color:#1565c0;margin-left:4px">' + esc(f.sop) + '</span>' +
+        '</div>' +
+        '<div style="font-size:14px;font-weight:600;color:#334155;margin-top:3px">' + esc(f.title) + '</div>' +
+        '<div style="font-size:12px;color:#94a3b8;margin-top:3px;line-height:1.5">' + esc(f.desc) + '</div>' +
+      '</div>' +
+      '<div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px">' +
+        '<span style="font-size:10px;font-weight:700;text-transform:uppercase;padding:3px 10px;border-radius:999px;background:#dcfce7;color:#16a34a;letter-spacing:.04em">eQMS Online</span>' +
+        '<span style="font-size:11px;color:#64748b">Click to open \u2192</span>' +
+      '</div>' +
+    '</div>';
+  });
+
+  html += '</div></div>';
+  container.innerHTML = html;
+
+  /* Bind click */
+  Array.prototype.forEach.call(container.querySelectorAll('[data-open-eqms]'), function(card){
+    card.onmouseenter = function(){ card.style.borderColor = '#93c5fd'; card.style.boxShadow = '0 4px 16px rgba(21,101,192,.1)'; };
+    card.onmouseleave = function(){ card.style.borderColor = '#e2e8f0'; card.style.boxShadow = 'none'; };
+    card.onclick = function(){
+      var code = card.getAttribute('data-open-eqms');
+      if(!code) return;
+      state._eqmsOpenCode = code;
+      var page = pageEl();
+      if(page) render(page);
+    };
   });
 }
 
@@ -1096,9 +1087,17 @@ function renderWorkspacePane(){
     return;
   }
 
-  /* eQMS Online Form tab: list available eQMS forms and open them */
+  /* eQMS Online Form tab */
   if(state.workspaceMode === 'eqms'){
-    renderEqmsFormList(wsEl);
+    if(state._eqmsOpenCode){
+      /* A specific form was selected — open it */
+      if(typeof window.openEqmsForm === 'function'){
+        window.openEqmsForm(state._eqmsOpenCode, wsEl, { editMode: true });
+      }
+    } else {
+      /* Show form list */
+      renderEqmsFormList(wsEl);
+    }
     return;
   }
 
@@ -1172,7 +1171,7 @@ function bindSidebar(container){
     var tabBtn = event.target.closest('[data-tab]');
     if(tabBtn){
       var tabMode = tabBtn.getAttribute('data-tab') || 'form';
-      if(tabMode !== state.workspaceMode) state._formFolderInited = false;
+      if(tabMode !== state.workspaceMode){ state._formFolderInited = false; state._eqmsOpenCode = ''; }
       state.workspaceMode = tabMode;
       render(container);
       if(tabMode === 'work') loadWorkQueue(true).then(function(){ if(state.workspaceMode === 'work') render(container); });
