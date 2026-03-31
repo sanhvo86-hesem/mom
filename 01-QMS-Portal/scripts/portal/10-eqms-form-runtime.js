@@ -113,13 +113,16 @@ function saveAuditLog(){
 /* ── Field Rendering ── */
 function renderField(field, value, readOnly){
   var id = 'eqms-f-' + field.id;
-  var label = t(field.label || field.id, field.label_en || field.label || field.id);
+  /* Form labels always English-first with Vietnamese subtitle */
+  var labelEn = field.label_en || field.label || field.id;
+  var labelVi = field.label || '';
+  var label = labelEn + (labelVi && labelVi !== labelEn ? ' <span class="eqms-label-vi">' + esc(labelVi) + '</span>' : '');
   var required = field.required ? '<span style="color:#dc2626">*</span>' : '';
   var disabled = readOnly ? ' disabled' : '';
   var cls = 'eqms-field' + (field.width === 'full' || field.type === 'textarea' || field.type === 'table' ? ' full' : field.width === 'third' ? ' third' : '');
 
   var html = '<div class="' + cls + '">' +
-    '<label class="eqms-label" for="' + esc(id) + '">' + esc(label) + ' ' + required + '</label>';
+    '<label class="eqms-label" for="' + esc(id) + '">' + label + ' ' + required + '</label>';
 
   var val = value !== undefined && value !== null ? value : '';
 
@@ -260,8 +263,8 @@ function renderForm(container){
       '<div class="eqms-section-head">' +
         '<div class="eqms-section-num">' + (sIdx + 1) + '</div>' +
         '<div>' +
-          '<div class="eqms-section-title">' + esc(t(section.title || section.title_vi || '', section.title_en || section.title || '')) + '</div>' +
-          (section.description ? '<div class="eqms-section-desc">' + esc(t(section.description || '', section.description_en || section.description || '')) + '</div>' : '') +
+          '<div class="eqms-section-title">' + esc(section.title_en || section.title || '') + '</div>' +
+          (section.description_en || section.description ? '<div class="eqms-section-desc">' + esc(section.description_en || section.description || '') + '</div>' : '') +
         '</div>' +
       '</div>' +
       '<div class="eqms-fields">';

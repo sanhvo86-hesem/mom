@@ -150,6 +150,16 @@
   letter-spacing: .04em;
   color: var(--eqms-text-2);
 }
+.eqms-label-vi {
+  display: inline;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--eqms-text-3);
+  font-style: italic;
+  margin-left: 4px;
+  font-size: 10px;
+}
 
 .eqms-input {
   width: 100%;

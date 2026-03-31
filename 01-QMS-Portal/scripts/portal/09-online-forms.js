@@ -951,6 +951,7 @@ function render(container){
     '<div class="ec-tabs" id="ec-tabs">' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'work' ? ' active' : '') + '" data-tab="work">' + esc(t('Việc của tôi', 'My Work')) + (workCount ? '<span class="ec-tab-badge">' + workCount + '</span>' : '') + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'form' ? ' active' : '') + '" data-tab="form">' + esc(t('Biểu mẫu', 'Forms')) + '</button>' +
+      '<button type="button" class="ec-tab' + (state.workspaceMode === 'eqms' ? ' active' : '') + '" data-tab="eqms">' + esc(t('Online Form', 'Online Form')) + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'upload' ? ' active' : '') + '" data-tab="upload">' + esc(t('Tải lên', 'Upload')) + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'record-id' ? ' active' : '') + '" data-tab="record-id">' + esc(t('Tạo mã', 'Record ID')) + '</button>' +
     '</div>' +
@@ -1013,6 +1014,52 @@ function renderSidebar(){
   '</aside>';
 }
 
+function renderEqmsFormList(container){
+  /* Load available eQMS schemas from API */
+  api('form_catalog_snapshot', {}, 'GET').then(function(resp){
+    var forms = (resp && Array.isArray(resp.forms)) ? resp.forms.filter(function(f){ return f.online !== false; }) : [];
+    if(!forms.length){
+      container.innerHTML = '<div class="ec-empty"><h3>' + esc(t('No online forms available', 'No online forms available')) + '</h3><p>' + esc(t('Add form schemas to qms-data/online-forms/schemas/ to see them here.', 'Add form schemas to qms-data/online-forms/schemas/ to see them here.')) + '</p></div>';
+      return;
+    }
+    var html = '<div style="max-width:900px;margin:0 auto;padding:24px">' +
+      '<h2 style="font-size:18px;font-weight:800;color:#0f172a;margin:0 0 4px">Online Forms (eQMS)</h2>' +
+      '<p style="font-size:13px;color:#64748b;margin:0 0 20px;line-height:1.6">Select a form to open. Online forms are governed by the eQMS runtime with audit trail, e-signature, and version control.</p>' +
+      '<div style="display:grid;gap:12px">';
+    forms.forEach(function(f){
+      var isOnline = f.online !== false;
+      html += '<div class="eqms-form-card" data-open-eqms="' + esc(f.form_code) + '" style="cursor:pointer;padding:16px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;display:flex;align-items:center;gap:14px;transition:all .15s">' +
+        '<div style="width:44px;height:44px;border-radius:10px;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">\uD83D\uDCCB</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-family:Consolas,monospace;font-size:13px;font-weight:800;color:#0f172a">' + esc(f.form_code) + ' <span style="font-size:11px;font-weight:600;color:#1565c0;background:#dbeafe;padding:1px 7px;border-radius:999px;margin-left:4px">' + esc(f.version || 'V1') + '</span></div>' +
+          '<div style="font-size:13px;color:#475569;margin-top:2px">' + esc(f.title || f.title_vi || f.form_code) + '</div>' +
+          (f.description || f.description_vi ? '<div style="font-size:11px;color:#94a3b8;margin-top:2px">' + esc(f.description || f.description_vi || '') + '</div>' : '') +
+        '</div>' +
+        '<div style="display:flex;gap:6px;flex-shrink:0">' +
+          (f.sop_ref ? '<span style="font-size:11px;color:#1565c0;font-weight:600">' + esc(f.sop_ref) + '</span>' : '') +
+          '<span style="font-size:10px;font-weight:700;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:#dcfce7;color:#16a34a">Online</span>' +
+        '</div>' +
+      '</div>';
+    });
+    html += '</div></div>';
+    container.innerHTML = html;
+
+    /* Bind click to open form */
+    Array.prototype.forEach.call(container.querySelectorAll('[data-open-eqms]'), function(card){
+      card.onmouseenter = function(){ card.style.borderColor = '#93c5fd'; card.style.boxShadow = '0 4px 12px rgba(0,0,0,.06)'; };
+      card.onmouseleave = function(){ card.style.borderColor = '#e2e8f0'; card.style.boxShadow = 'none'; };
+      card.onclick = function(){
+        var code = card.getAttribute('data-open-eqms');
+        if(code && typeof window.openEqmsForm === 'function'){
+          window.openEqmsForm(code, container, { editMode: true });
+        }
+      };
+    });
+  }).catch(function(){
+    container.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Could not load online forms', 'Could not load online forms')) + '</h3></div>';
+  });
+}
+
 function renderWorkspacePane(){
   var wsEl = document.getElementById('ec-workspace');
   if(!wsEl) return;
@@ -1037,6 +1084,12 @@ function renderWorkspacePane(){
   if(state.workspaceMode === 'upload'){
     if(typeof window._renderUploadVerify === 'function') window._renderUploadVerify(state.forms, {}, wsEl);
     else wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Phân hệ Tải lên & Kiểm tra chưa sẵn sàng', 'Upload & Verify not ready')) + '</h3></div>';
+    return;
+  }
+
+  /* eQMS Online Form tab: list available eQMS forms and open them */
+  if(state.workspaceMode === 'eqms'){
+    renderEqmsFormList(wsEl);
     return;
   }
 
