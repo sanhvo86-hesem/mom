@@ -247,7 +247,8 @@ window._ecT = t;
 window._ecEsc = esc;
 window._ecPromptDialog = openPromptDialog;
 window._ecOpenEqmsHub = openEqmsHub;
-window._ecOpenEqmsBuilder = openEqmsBuilder;
+window._ecOpenEqmsBuilder = openEqmsTemplateEditor;
+window._ecOpenEqmsTemplateEditor = openEqmsTemplateEditor;
 
 function pageEl(){ return document.getElementById('page-forms'); }
 function requestRender(){ var page = pageEl(); if(page) render(page); }
@@ -625,13 +626,70 @@ function openEqmsHub(){
   });
 }
 
+function resolveEqmsHtmlDocument(formCode){
+  var form = state.formMap[formCode] || null;
+  var standalonePath = String((form && form.standalone_html) || (form && form.schema && form.schema.standalone_html) || '').trim();
+  if(Array.isArray(window.DOCS)){
+    for(var i = 0; i < window.DOCS.length; i++){
+      var doc = window.DOCS[i];
+      if(!doc || !doc.code) continue;
+      if(String(doc.code || '').trim().toUpperCase() === String(formCode || '').trim().toUpperCase()) return doc;
+      if(standalonePath && String(doc.path || '').replace(/\\/g,'/') === standalonePath.replace(/\\/g,'/')) return doc;
+    }
+  }
+  return null;
+}
+
+function waitForDocViewerReady(docCode){
+  return new Promise(function(resolve, reject){
+    var startedAt = Date.now();
+    (function poll(){
+      var iframe = document.getElementById('doc-iframe');
+      var viewer = document.getElementById('doc-viewer');
+      var ready = false;
+      try{
+        ready = !!(iframe && viewer && viewer.classList.contains('active') && window.currentDoc === docCode && iframe.contentDocument && iframe.contentDocument.readyState === 'complete');
+      }catch(_err){
+        ready = false;
+      }
+      if(ready){
+        resolve();
+        return;
+      }
+      if(Date.now() - startedAt > 12000){
+        reject(new Error('viewer_timeout'));
+        return;
+      }
+      setTimeout(poll, 160);
+    })();
+  });
+}
+
+function openEqmsTemplateEditor(formCode){
+  var doc = resolveEqmsHtmlDocument(formCode);
+  if(!doc || !doc.code){
+    showToast(t('Chưa tìm thấy biểu mẫu HTML chuẩn để chỉnh sửa.', 'Could not find the governed HTML form template.'), 'warn');
+    return;
+  }
+  if(typeof openDoc !== 'function' || typeof startEdit !== 'function'){
+    showToast(t('Trình chỉnh sửa tài liệu HTML chưa sẵn sàng.', 'The HTML document editor is not ready yet.'), 'warn');
+    return;
+  }
+  Promise.resolve(openDoc(doc.code)).then(function(){
+    return waitForDocViewerReady(doc.code);
+  }).then(function(){
+    startEdit(doc.code);
+    showToast(t('Đã mở mẫu HTML để chỉnh sửa bằng cùng bề mặt hiển thị.', 'Opened the HTML template in the same visual surface.'), 'success');
+  }).catch(function(){
+    showToast(t('Không thể mở trình chỉnh sửa mẫu HTML lúc này.', 'Could not open the HTML template editor right now.'), 'error');
+  });
+}
+
 function openEqmsBuilder(formCode, options){
-  state.workspaceMode = 'eqms-builder';
-  state._eqmsBuilderFormCode = formCode || '';
-  state._eqmsBuilderOptions = Object.assign({}, options || {});
-  state._eqmsOpenCode = '';
-  state._eqmsOpenOptions = null;
-  requestRender();
+  if(options && options.seedForm){
+    showToast(t('Chế độ tạo mẫu mới sẽ đi qua editor HTML chuẩn. Hãy dùng mẫu HTML hiện có làm điểm bắt đầu.', 'New template creation will use the governed HTML editor. Use an existing HTML form as the starting point.'), 'info');
+  }
+  openEqmsTemplateEditor(formCode || 'FRM-403-SCAR');
 }
 
 function startNewEqmsOnline(formCode){
@@ -1274,7 +1332,7 @@ function render(container){
     '<div class="ec-tabs" id="ec-tabs">' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'work' ? ' active' : '') + '" data-tab="work">' + esc(t('Việc của tôi', 'My Work')) + (workCount ? '<span class="ec-tab-badge">' + workCount + '</span>' : '') + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'form' ? ' active' : '') + '" data-tab="form">' + esc(t('Biểu mẫu', 'Forms')) + '</button>' +
-      '<button type="button" class="ec-tab' + ((state.workspaceMode === 'eqms' || state.workspaceMode === 'eqms-builder') ? ' active' : '') + '" data-tab="eqms">' + esc(t('Online Form', 'Online Form')) + '</button>' +
+      '<button type="button" class="ec-tab' + (state.workspaceMode === 'eqms' ? ' active' : '') + '" data-tab="eqms">' + esc(t('Online Form', 'Online Form')) + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'registry' ? ' active' : '') + '" data-tab="registry">' + esc(t('Quản lý mã', 'Code Registry')) + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'upload' ? ' active' : '') + '" data-tab="upload">' + esc(t('Tải lên', 'Upload')) + '</button>' +
       '<button type="button" class="ec-tab' + (state.workspaceMode === 'record-id' ? ' active' : '') + '" data-tab="record-id">' + esc(t('Tạo mã', 'Record ID')) + '</button>' +
@@ -1395,7 +1453,7 @@ function renderEqmsHub(container){
           '<p>' + esc(t('Tạo mới hồ sơ online hoặc offline từ cùng một form, tiếp tục bản nháp đang dở, và chuyển sang sổ quản lý mã đã cấp để theo dõi toàn bộ vòng đời.', 'Start online or offline records from the same form, resume in-progress drafts, and jump into the issued-code registry to track the full lifecycle.')) + '</p>' +
         '</div>' +
         '<div class="ec-toolbar-actions">' +
-          '<button type="button" class="ec-btn ghost" id="ec-eqms-builder-new">' + esc(t('Tạo mẫu form online', 'Create online form template')) + '</button>' +
+          '<button type="button" class="ec-btn ghost" id="ec-eqms-builder-new">' + esc(t('Mở editor form HTML', 'Open HTML form editor')) + '</button>' +
         '</div>' +
         '<div class="ec-kpi-grid">' +
           '<div class="ec-kpi-card primary"><small>' + esc(t('Form eQMS', 'eQMS forms')) + '</small><strong>' + esc(forms.length) + '</strong><span>' + esc(t('Biểu mẫu có thể vận hành theo luồng điện tử hoặc kết hợp điện tử/Excel.', 'Forms available in electronic or hybrid electronic/Excel mode.')) + '</span></div>' +
@@ -1463,21 +1521,18 @@ function renderEqmsHub(container){
     };
   });
   Array.prototype.forEach.call(container.querySelectorAll('[data-eqms-edit-template]'), function(btn){
-    btn.onclick = function(){ openEqmsBuilder(btn.getAttribute('data-eqms-edit-template') || ''); };
+    btn.onclick = function(){ openEqmsTemplateEditor(btn.getAttribute('data-eqms-edit-template') || ''); };
   });
   var newBuilderBtn = document.getElementById('ec-eqms-builder-new');
   if(newBuilderBtn) newBuilderBtn.onclick = function(){
-    openEqmsBuilder('FRM-NEW', {
-      seedForm: {
-        form_code: 'FRM-NEW',
-        title: 'New eQMS Form',
-        title_vi: 'Biểu mẫu eQMS mới',
-        version: 'V1.0',
-        category: 'other',
-        description: '',
-        description_vi: 'Khởi tạo biểu mẫu mới theo chuẩn eQMS.'
-      }
+    var firstHtmlForm = forms.find(function(form){
+      return !!resolveEqmsHtmlDocument(form && form.form_code);
     });
+    if(firstHtmlForm){
+      openEqmsTemplateEditor(firstHtmlForm.form_code || '');
+      return;
+    }
+    showToast(t('Chưa có mẫu HTML nào sẵn sàng để mở editor.', 'No governed HTML form template is ready for editing yet.'), 'warn');
   };
 }
 
@@ -1597,6 +1652,7 @@ function bindEqmsRegistry(container){
 function renderWorkspacePane(){
   var wsEl = document.getElementById('ec-workspace');
   if(!wsEl) return;
+  if(state.workspaceMode === 'eqms-builder') state.workspaceMode = 'eqms';
   if(state.workspaceMode !== 'work') stopWorkQueuePolling();
   /* Clear main header toolbar when not viewing a specific form */
   if(state.workspaceMode !== 'form' && typeof setDocHeaderToolbar === 'function') setDocHeaderToolbar('');
@@ -1638,19 +1694,6 @@ function renderWorkspacePane(){
       /* Show form list */
       renderEqmsHub(wsEl);
       if(!state.registry.loaded && !state.registry.loading) loadRegistry(false);
-    }
-    return;
-  }
-
-  if(state.workspaceMode === 'eqms-builder'){
-    var builderForm = (state._eqmsBuilderFormCode && state.formMap[state._eqmsBuilderFormCode]) || null;
-    if(!builderForm && state._eqmsBuilderOptions && state._eqmsBuilderOptions.seedForm){
-      builderForm = state._eqmsBuilderOptions.seedForm;
-    }
-    if(typeof window._renderFormBuilder === 'function' && builderForm){
-      window._renderFormBuilder(builderForm, wsEl);
-    } else {
-      wsEl.innerHTML = '<div class="ec-empty"><h3>' + esc(t('Trình chỉnh sửa mẫu form chưa sẵn sàng', 'Form template editor not ready')) + '</h3></div>';
     }
     return;
   }

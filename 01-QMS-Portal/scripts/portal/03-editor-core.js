@@ -1173,6 +1173,13 @@ function edBuildQmsPanel(){
   const panel=document.getElementById('ed-qms-panel');
   const vi=lang!=='en';
   const items=[
+    {kind:'formRecordStrip', title:vi?'Record strip cho form':'Form record strip', desc:vi?'Thanh tóm tắt hồ sơ phía trên form':'Top record summary strip for forms'},
+    {kind:'formSection', title:vi?'Section form':'Form section', desc:vi?'Section chuẩn có số, tiêu đề tiếng Anh và giải thích tiếng Việt':'Standard numbered section with EN title and VI explanation'},
+    {kind:'formGrid2', title:vi?'Lưới field 2 cột':'2-column field grid', desc:vi?'Khung hàng field 2 cột đúng chuẩn form runtime':'Standard 2-column row for runtime forms'},
+    {kind:'formTextField', title:vi?'Field nhập 1 dòng':'Single-line form field', desc:vi?'Field text chuẩn với nhãn EN và ghi chú VI':'Standard text field with EN label and VI note'},
+    {kind:'formTextareaField', title:vi?'Field nhập nhiều dòng':'Textarea form field', desc:vi?'Field mô tả nhiều dòng đúng chuẩn form runtime':'Multi-line field for rich descriptions'},
+    {kind:'formSelectField', title:vi?'Field chọn dropdown':'Dropdown form field', desc:vi?'Field select dùng cho dữ liệu nền hoặc trạng thái':'Select field for master-data or state choices'},
+    {kind:'formSignatureRow', title:vi?'Dải chữ ký form':'Form signature row', desc:vi?'Khối chữ ký chuẩn cho người lập, xem xét, phê duyệt':'Signature row for originator, reviewer, approver'},
     {kind:'docControl', title:vi?'Khối kiểm soát tài liệu':'Document control', desc:vi?'Mã, phiên bản, owner, hiệu lực, phê duyệt':'Code, revision, owner, effective date, approval'},
     {kind:'revisionTable', title:vi?'Bảng lịch sử sửa đổi':'Revision history', desc:vi?'Bảng Rev / ngày / mô tả / người thực hiện':'Rev / date / description / owner table'},
     {kind:'approval', title:vi?'Khối ký duyệt':'Approval signatures', desc:vi?'Lập, rà soát, phê duyệt':'Prepared, reviewed, approved'},
@@ -1212,6 +1219,13 @@ function edInsertQmsTemplate(kind){
 function edQmsKindMeta(kind){
   const vi=lang!=='en';
   const map={
+    formRecordStrip:{title:vi?'Record strip cho form':'Form record strip'},
+    formSection:{title:vi?'Section form':'Form section'},
+    formGrid2:{title:vi?'Lưới field 2 cột':'2-column field grid'},
+    formTextField:{title:vi?'Field nhập 1 dòng':'Single-line field'},
+    formTextareaField:{title:vi?'Field nhập nhiều dòng':'Textarea field'},
+    formSelectField:{title:vi?'Field chọn dropdown':'Dropdown field'},
+    formSignatureRow:{title:vi?'Dải chữ ký form':'Form signature row'},
     docControl:{title:vi?'Kiểm soát tài liệu':'Document control'},
     revisionTable:{title:vi?'Lịch sử sửa đổi':'Revision history'},
     approval:{title:vi?'Ký duyệt':'Approval'},
@@ -1246,6 +1260,51 @@ function edBuildQmsTemplateHtml(kind){
   const blank=function(w,ph){return edQmsInlineField(w,ph);};
   const block=function(h,ph){return edQmsBlockField(h,ph);};
   const templates={
+    formRecordStrip:
+      '<div class="scar-record-strip">'
+      +'<div class="scar-record-item"><small>Record ID</small><strong>SCAR-2026-001</strong></div>'
+      +'<div class="scar-record-item"><small>Supplier</small><strong>Supplier name</strong></div>'
+      +'<div class="scar-record-item"><small>PO / Part</small><strong>PO-0001 / PART-001 REV-A</strong></div>'
+      +'<div class="scar-record-item"><small>Status</small><strong>Open</strong></div>'
+      +'</div>',
+    formSection:
+      '<section class="qf-section qf-section--info" data-form-edit-root="1">'
+      +'<div class="qf-section-header"><div><div class="qf-section-title"><span class="qf-section-num">1</span> Section Title</div><div class="qf-section-subtitle">Giải thích tiếng Việt có dấu cho section này để người dùng hiểu rõ mục đích.</div></div></div>'
+      +'<div class="qf-section-body"><div class="qf-grid qf-grid--2">'
+      +'<div class="qf-field"><label class="qf-label" for="field_code">FIELD LABEL <span class="qf-required">*</span><span class="qf-label-vi">Nhãn tiếng Việt</span></label><input class="qf-input" id="field_code" name="field_code" placeholder="Ghi chú tiếng Việt có dấu"/><div class="qf-helper">Giải thích tiếng Việt có dấu cho field này.</div></div>'
+      +'<div class="qf-field"><label class="qf-label" for="field_code_2">FIELD LABEL 2 <span class="qf-label-vi">Nhãn phụ tiếng Việt</span></label><input class="qf-input" id="field_code_2" name="field_code_2" placeholder="Nhập nội dung"/><div class="qf-helper">Ghi chú hướng dẫn hoàn toàn bằng tiếng Việt có dấu.</div></div>'
+      +'</div></div></section>',
+    formGrid2:
+      '<div class="qf-grid qf-grid--2">'
+      +'<div class="qf-field"><label class="qf-label" for="field_left">LEFT FIELD <span class="qf-required">*</span><span class="qf-label-vi">Trường bên trái</span></label><input class="qf-input" id="field_left" name="field_left" placeholder="Nhập dữ liệu"/><div class="qf-helper">Ghi chú tiếng Việt cho field bên trái.</div></div>'
+      +'<div class="qf-field"><label class="qf-label" for="field_right">RIGHT FIELD <span class="qf-label-vi">Trường bên phải</span></label><input class="qf-input" id="field_right" name="field_right" placeholder="Nhập dữ liệu"/><div class="qf-helper">Ghi chú tiếng Việt cho field bên phải.</div></div>'
+      +'</div>',
+    formTextField:
+      '<div class="qf-field">'
+      +'<label class="qf-label" for="field_text">FIELD LABEL <span class="qf-required">*</span><span class="qf-label-vi">Nhãn tiếng Việt</span></label>'
+      +'<input class="qf-input" id="field_text" name="field_text" placeholder="Ghi chú tiếng Việt có dấu"/>'
+      +'<div class="qf-helper">Giải thích tiếng Việt có dấu cho field nhập một dòng.</div>'
+      +'</div>',
+    formTextareaField:
+      '<div class="qf-field">'
+      +'<label class="qf-label" for="field_textarea">FIELD LABEL <span class="qf-required">*</span><span class="qf-label-vi">Nhãn tiếng Việt</span></label>'
+      +'<textarea class="qf-textarea" id="field_textarea" name="field_textarea" rows="5" placeholder="Mô tả bằng tiếng Việt có dấu..."></textarea>'
+      +'<div class="qf-helper">Giải thích tiếng Việt có dấu cho field nhập nhiều dòng.</div>'
+      +'</div>',
+    formSelectField:
+      '<div class="qf-field">'
+      +'<label class="qf-label" for="field_select">FIELD LABEL <span class="qf-required">*</span><span class="qf-label-vi">Nhãn tiếng Việt</span></label>'
+      +'<select class="qf-select" id="field_select" name="field_select"><option value="">Chọn</option><option>Option A</option><option>Option B</option><option>Option C</option></select>'
+      +'<div class="qf-helper">Nếu field gắn dữ liệu nền thì runtime sẽ tự thay bằng droplist tra cứu.</div>'
+      +'</div>',
+    formSignatureRow:
+      '<section class="qf-section qf-section--success">'
+      +'<div class="qf-section-header"><div><div class="qf-section-title"><span class="qf-section-num">S</span> Electronic Signatures</div><div class="qf-section-subtitle">Giải thích tiếng Việt có dấu cho quy tắc ký điện tử của biểu mẫu.</div></div></div>'
+      +'<div class="qf-section-body"><div class="qf-grid qf-grid--3">'
+      +'<div class="qf-field"><label class="qf-label">ORIGINATOR<span class="qf-label-vi">Người phát hành</span></label><div class="qf-input" style="min-height:44px;display:flex;align-items:center;color:#64748b">Chưa ký</div></div>'
+      +'<div class="qf-field"><label class="qf-label">REVIEWER<span class="qf-label-vi">Người xem xét</span></label><div class="qf-input" style="min-height:44px;display:flex;align-items:center;color:#64748b">Chưa ký</div></div>'
+      +'<div class="qf-field"><label class="qf-label">APPROVER<span class="qf-label-vi">Người phê duyệt</span></label><div class="qf-input" style="min-height:44px;display:flex;align-items:center;color:#64748b">Chưa ký</div></div>'
+      +'</div></div></section>',
     docControl:
       '<div class="card"><div class="card-title">'+(vi?'Thông tin kiểm soát tài liệu':'Document Control Information')+'</div><table class="form-table"><tbody>'
       +'<tr><th style="width:28%">'+(vi?'Mã tài liệu':'Document code')+'</th><td>'+blank(180,vi?'Nhập mã tài liệu':'Enter document code')+'</td><th style="width:22%">'+(vi?'Phiên bản':'Revision')+'</th><td>'+blank(120,vi?'Rev':'Rev')+'</td></tr>'

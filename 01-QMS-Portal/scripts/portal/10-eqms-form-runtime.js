@@ -63,6 +63,127 @@ function currentUserKey(){
   return String(u.username || 'anon').trim().toLowerCase() || 'anon';
 }
 
+function normalizeRelPath(path){
+  return String(path || '').trim().replace(/\\/g, '/').replace(/^\/+/, '').replace(/^\.\//, '');
+}
+
+function eqmsCatalogForm(formCode){
+  var ecState = window._ecState || {};
+  var formMap = ecState.formMap || {};
+  return formMap[formCode] || null;
+}
+
+function findStandaloneDoc(formCode, schema){
+  var docs = Array.isArray(window.DOCS) ? window.DOCS : [];
+  var targetPath = normalizeRelPath((schema && schema.standalone_html) || (eqmsCatalogForm(formCode) && eqmsCatalogForm(formCode).standalone_html) || '');
+  for(var i = 0; i < docs.length; i++){
+    var doc = docs[i];
+    if(!doc) continue;
+    if(String(doc.code || '').trim().toUpperCase() === String(formCode || '').trim().toUpperCase()) return doc;
+    if(targetPath && normalizeRelPath(doc.path || '') === targetPath) return doc;
+  }
+  return null;
+}
+
+function standaloneRuntimePath(formCode, schema){
+  var targetPath = normalizeRelPath((schema && schema.standalone_html) || (eqmsCatalogForm(formCode) && eqmsCatalogForm(formCode).standalone_html) || '');
+  if(targetPath) return targetPath;
+  var linkedDoc = findStandaloneDoc(formCode, schema);
+  return linkedDoc ? normalizeRelPath(linkedDoc.path || '') : '';
+}
+
+function buildStandaloneRuntimeSrc(formCode, schema, options){
+  var relPath = standaloneRuntimePath(formCode, schema);
+  if(!relPath) return '';
+  var qs = new URLSearchParams();
+  qs.set('form_code', String(formCode || ''));
+  if(options && options.allocationId) qs.set('allocation_id', String(options.allocationId || ''));
+  if(options && options.recordId) qs.set('record_id', String(options.recordId || ''));
+  if(options && options.entryId) qs.set('entry_id', String(options.entryId || ''));
+  qs.set('lang', (typeof lang !== 'undefined' && lang === 'en') ? 'en' : 'vi');
+  qs.set('_runtime_ts', String(Date.now()));
+  return '../' + relPath + '?' + qs.toString();
+}
+
+function bindStandaloneRuntimeBridge(frame){
+  if(!frame) return;
+  if(typeof frame._eqmsBridge === 'function'){
+    window.removeEventListener('message', frame._eqmsBridge);
+    frame._eqmsBridge = null;
+  }
+  var syncHeight = function(minHeight){
+    try{
+      var idoc = frame.contentDocument || (frame.contentWindow && frame.contentWindow.document);
+      if(!idoc || !idoc.body) return;
+      var body = idoc.body;
+      var html = idoc.documentElement;
+      var height = Math.max(
+        Number(minHeight || 0) || 0,
+        body.scrollHeight || 0,
+        html ? html.scrollHeight : 0,
+        body.offsetHeight || 0,
+        html ? html.offsetHeight : 0,
+        960
+      );
+      frame.style.height = height + 'px';
+    }catch(_err){}
+  };
+  frame.onload = function(){
+    setTimeout(syncHeight, 120);
+    setTimeout(syncHeight, 420);
+  };
+  var onMessage = function(event){
+    if(!frame.contentWindow || event.source !== frame.contentWindow) return;
+    var data = event.data || {};
+    if(!data || typeof data !== 'object') return;
+    if(data.type === 'ec-form-runtime-height'){
+      syncHeight(Number(data.height || 0) || 0);
+      return;
+    }
+    if(data.type === 'ec-form-runtime-toast' && data.message){
+      toast(String(data.message || ''), String(data.level || 'info'));
+      return;
+    }
+    if(data.type === 'ec-form-runtime-refresh'){
+      toast('Đã đồng bộ lại hồ sơ từ runtime HTML.', 'success');
+    }
+  };
+  window.addEventListener('message', onMessage);
+  frame._eqmsBridge = onMessage;
+}
+
+function renderStandaloneRuntime(container, schema, options){
+  var src = buildStandaloneRuntimeSrc(state.formCode, schema, options || {});
+  if(!src){
+    container.innerHTML = '<div class="eqms-empty">Không tìm thấy biểu mẫu HTML chuẩn cho form này.</div>';
+    return;
+  }
+  container.innerHTML =
+    '<div class="eqms-runtime eqms-runtime-shell">' +
+      '<div class="eqms-runtime-topbar">' +
+        '<div class="eqms-runtime-topbar-copy">' +
+          '<strong>' + esc((schema && (schema.title || schema.form_code)) || state.formCode || '') + '</strong>' +
+          '<span>' + esc('Runtime, chỉnh mẫu và in ấn cùng dùng một HTML gốc để không bị biến dạng.') + '</span>' +
+        '</div>' +
+        '<div class="eqms-runtime-topbar-actions">' +
+          '<button class="eqms-btn ghost" id="eqms-edit-template">' + esc('Chỉnh sửa mẫu form') + '</button>' +
+          '<a class="eqms-btn secondary" href="' + esc(src) + '" target="_blank" rel="noopener">Mở tab mới</a>' +
+        '</div>' +
+      '</div>' +
+      '<iframe class="eqms-standalone-frame" id="eqms-standalone-frame" src="' + esc(src) + '" title="' + esc(String((schema && schema.title) || state.formCode || '')) + '"></iframe>' +
+    '</div>';
+  var frame = document.getElementById('eqms-standalone-frame');
+  bindStandaloneRuntimeBridge(frame);
+  var editTemplateBtn = document.getElementById('eqms-edit-template');
+  if(editTemplateBtn) editTemplateBtn.onclick = function(){
+    if(typeof window._ecOpenEqmsTemplateEditor === 'function'){
+      window._ecOpenEqmsTemplateEditor(state.formCode || '');
+      return;
+    }
+    toast('Trình chỉnh sửa mẫu HTML chưa sẵn sàng.', 'warn');
+  };
+}
+
 /* ── State ── */
 var masterData = null;
 var companyDirectory = null;
@@ -757,8 +878,8 @@ function bindFields(container){
 
   var editTemplateBtn = document.getElementById('eqms-edit-template');
   if(editTemplateBtn) editTemplateBtn.onclick = function(){
-    if(typeof window._ecOpenEqmsBuilder === 'function'){
-      window._ecOpenEqmsBuilder(state.formCode || '');
+    if(typeof window._ecOpenEqmsTemplateEditor === 'function'){
+      window._ecOpenEqmsTemplateEditor(state.formCode || '');
       return;
     }
     toast('Trình chỉnh sửa mẫu form chưa sẵn sàng.', 'warn');
@@ -1035,6 +1156,11 @@ window.openEqmsForm = function(formCode, container, options){
   }).then(function(schema){
     if(!schema) return;
     state.schema = schema;
+
+    if(standaloneRuntimePath(formCode, schema)){
+      renderStandaloneRuntime(runtime, schema, options);
+      return null;
+    }
 
     /* Apply field defaults */
     (schema.fields || []).forEach(function(field){

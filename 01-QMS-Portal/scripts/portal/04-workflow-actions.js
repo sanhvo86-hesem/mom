@@ -1,5 +1,43 @@
 // WORKFLOW ACTIONS
 // ═══════════════════════════════════════════════════
+function edClearInjectedDocShellStyles(){
+  try{
+    document.querySelectorAll('[data-ed-doc-shell-style="1"]').forEach(function(node){ node.remove(); });
+  }catch(e){}
+}
+
+function edSyncDocShellStyles(iframeDoc){
+  try{
+    edClearInjectedDocShellStyles();
+    if(!iframeDoc || !iframeDoc.head) return;
+    var head = document.head || document.documentElement;
+    var existing = {};
+    document.querySelectorAll('link[rel="stylesheet"][href]').forEach(function(node){
+      existing[String(node.href || '').trim()] = true;
+    });
+    iframeDoc.querySelectorAll('link[rel="stylesheet"][href], style').forEach(function(node){
+      if(!node) return;
+      if(node.tagName === 'LINK'){
+        var href = String(node.href || '').trim();
+        if(!href || existing[href]) return;
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        link.setAttribute('data-ed-doc-shell-style', '1');
+        head.appendChild(link);
+        existing[href] = true;
+        return;
+      }
+      var css = String(node.textContent || '').trim();
+      if(!css) return;
+      var style = document.createElement('style');
+      style.setAttribute('data-ed-doc-shell-style', '1');
+      style.textContent = css;
+      head.appendChild(style);
+    });
+  }catch(e){}
+}
+
 function startEdit(code){
   try{
     if(window.edTiptapAdapter && typeof window.edTiptapAdapter.destroy==='function'){
@@ -33,6 +71,7 @@ function startEdit(code){
     try{
       var iframeDoc = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document);
       if(iframeDoc && iframeDoc.body){
+        edSyncDocShellStyles(iframeDoc);
         var bodyClone = iframeDoc.body.cloneNode(true);
         bodyClone.querySelectorAll('script').forEach(function(s){s.remove();});
         bodyClone.querySelectorAll('#goog-gt-tt,.goog-te-banner-frame,#google_translate_element').forEach(function(el){el.remove();});
@@ -73,7 +112,15 @@ function startEdit(code){
         _ea.classList.add('ed-doc-shell');
         _ea.innerHTML='<div class="qms-doc">'+shellHtml+'</div>';
         const wrap=_ea.querySelector('.qms-doc');
-        const dc=wrap ? wrap.querySelector('#docContent') : null;
+        const hasDocContent=!!(wrap && wrap.querySelector('#docContent'));
+        const dc=wrap
+          ? (wrap.querySelector('#docContent')
+            || wrap.querySelector('[data-form-edit-root]')
+            || wrap.querySelector('.page-body')
+            || wrap.querySelector('main')
+            || wrap.querySelector('form')
+            || wrap)
+          : null;
         // Don't set contenteditable=false on wrapper - it blocks execCommand on children
         // Instead, use CSS user-select:none and pointer-events:none on non-editable parts
         if(wrap){
@@ -82,15 +129,17 @@ function startEdit(code){
           // Some templates nest #docContent inside a wrapper (.container/.page/...),
           // so locking every direct child except #docContent can accidentally lock
           // the whole editable branch and break typing/find-replace inside tables.
-          wrap.querySelectorAll(':scope > *').forEach(el=>{
-            if(dc && (el===dc || el.contains(dc))) return;
-            el.setAttribute('contenteditable','false');
-            el.style.pointerEvents='none';
-            el.style.userSelect='none';
-          });
+          if(dc && dc !== wrap){
+            wrap.querySelectorAll(':scope > *').forEach(el=>{
+              if(el===dc || el.contains(dc)) return;
+              el.setAttribute('contenteditable','false');
+              el.style.pointerEvents='none';
+              el.style.userSelect='none';
+            });
+          }
         }
         if(dc){
-          dc.innerHTML=originalHtml;
+          if(hasDocContent || dc !== wrap) dc.innerHTML=originalHtml;
           dc.setAttribute('contenteditable','true');
           dc.setAttribute('spellcheck','true');
           dc.style.pointerEvents='auto';
@@ -110,8 +159,6 @@ function startEdit(code){
             ) return;
             el.removeAttribute('contenteditable');
           });
-        }else{
-          _ea.innerHTML=originalHtml;
         }
       }else{
         _ea.classList.remove('ed-doc-shell');
@@ -170,6 +217,11 @@ function startEdit(code){
         var docContent = iframeDoc.getElementById('docContent');
         if(docContent){
           _activateEditor(docContent.innerHTML);
+          return;
+        }
+        var formEditRoot = iframeDoc.querySelector('[data-form-edit-root], .page-body, main, form');
+        if(formEditRoot && formEditRoot.innerHTML && formEditRoot.innerHTML.length > 20){
+          _activateEditor(formEditRoot.innerHTML);
           return;
         }
         if(iframeDoc.body.innerHTML.length > 100){
@@ -570,6 +622,7 @@ function closeDocViewerForce(){
   editMode=false;
   editingDoc=null;
   currentDoc=null;
+  edClearInjectedDocShellStyles();
   try{ resetDocViewerZoom(); }catch(e){}
   var iframe=document.getElementById('doc-iframe');
   iframe.onload=null;
@@ -637,6 +690,7 @@ function cancelEdit(){
   edModified=false;
   edZoom=100;
   edCleanShellHtml=null;
+  edClearInjectedDocShellStyles();
   edDomActive=false; edDomSelected=null;
   var domPanel=document.getElementById('ed-dom-panel');if(domPanel)domPanel.style.display='none';
   document.querySelectorAll('.ed-dom-highlight').forEach(function(el){el.classList.remove('ed-dom-highlight');});

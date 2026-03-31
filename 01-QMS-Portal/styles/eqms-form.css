@@ -33,6 +33,59 @@
   background: var(--eqms-bg);
 }
 
+.eqms-runtime-shell {
+  max-width: 1180px;
+  background: transparent;
+  padding: 12px 0 24px;
+}
+
+.eqms-runtime-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+  padding: 14px 18px;
+  border: 1px solid var(--eqms-border);
+  border-radius: 14px;
+  background: rgba(255,255,255,.9);
+  backdrop-filter: blur(10px);
+}
+
+.eqms-runtime-topbar-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.eqms-runtime-topbar-copy strong {
+  font-size: 15px;
+  color: var(--eqms-text);
+}
+
+.eqms-runtime-topbar-copy span {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--eqms-text-2);
+}
+
+.eqms-runtime-topbar-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.eqms-standalone-frame {
+  display: block;
+  width: 100%;
+  min-height: 960px;
+  border: 1px solid var(--eqms-border);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 20px 50px rgba(15,23,42,.08);
+}
+
 .eqms-loading, .eqms-empty {
   text-align: center;
   padding: 60px 20px;
@@ -273,6 +326,8 @@
 .eqms-btn.primary:hover:not(:disabled) { background: #1255a1; }
 .eqms-btn.secondary { background: #f1f5f9; color: var(--eqms-text-2); border: 1px solid var(--eqms-border); }
 .eqms-btn.secondary:hover:not(:disabled) { background: #e2e8f0; }
+.eqms-btn.ghost { background: #fff; color: var(--eqms-primary); border: 1px solid #bfdbfe; text-decoration: none; }
+.eqms-btn.ghost:hover:not(:disabled) { background: #eff6ff; }
 .eqms-btn.success { background: var(--eqms-success); color: #fff; }
 .eqms-btn.danger { background: var(--eqms-danger); color: #fff; }
 
@@ -302,6 +357,11 @@
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .eqms-runtime { padding: 8px; }
+  .eqms-runtime-shell { padding: 8px 0 18px; }
+  .eqms-runtime-topbar { flex-direction: column; align-items: stretch; }
+  .eqms-runtime-topbar-actions { width: 100%; }
+  .eqms-runtime-topbar-actions .eqms-btn { width: 100%; }
+  .eqms-standalone-frame { min-height: 720px; border-radius: 12px; }
   .eqms-runtime .form-header { flex-direction: column; }
   .eqms-runtime .form-header .meta { flex-direction: column; font-size: 11px; }
   .eqms-fields { grid-template-columns: 1fr; }

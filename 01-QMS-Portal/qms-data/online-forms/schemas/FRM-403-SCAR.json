@@ -9,6 +9,7 @@
   "frequency": "per_event",
   "online": true,
   "delivery_mode": "online",
+  "standalone_html": "04-Bieu-Mau/04-FRM-400/FRM-403-SCAR_Supplier_Corrective_Action_Request.html",
   "sop_ref": "SOP-401",
   "record_type": "SCAR",
   "owner": "QA / SCM",
