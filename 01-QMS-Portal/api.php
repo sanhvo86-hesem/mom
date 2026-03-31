@@ -13229,7 +13229,7 @@ if ($username === '') {
 
     // Cache
     $cacheFile = $DATA_DIR . '/scan_cache.json';
-    $cacheMaxAge = 60;
+    $cacheMaxAge = 5;
     $bustCache = isset($_GET['bust']) || isset($_POST['bust']);
     if (!$bustCache && is_file($cacheFile)) {
       $cacheAge = time() - filemtime($cacheFile);
