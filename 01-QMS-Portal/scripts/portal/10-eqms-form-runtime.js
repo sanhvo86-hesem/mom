@@ -66,9 +66,19 @@ var state = {
 
 /* ── Schema Loading ── */
 function loadSchema(formCode){
+  /* Try form_fill_load_schema first, fallback to online_form_schema */
   return api('form_fill_load_schema', { form_code: formCode }, 'GET').then(function(resp){
     if(resp && resp.ok && resp.schema) return resp.schema;
     return null;
+  }).catch(function(){
+    /* Fallback: try online_form_schema endpoint */
+    return api('online_form_schema', { code: formCode }, 'GET').then(function(resp){
+      if(resp && resp.ok && resp.schema) return resp.schema;
+      /* Last fallback: try direct fetch of schema JSON */
+      return fetch('qms-data/online-forms/schemas/' + encodeURIComponent(formCode) + '.json', { credentials:'include' })
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .catch(function(){ return null; });
+    }).catch(function(){ return null; });
   });
 }
 
