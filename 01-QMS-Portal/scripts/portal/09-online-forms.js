@@ -743,6 +743,46 @@ function renderExceptionItem(item){
   '</article>';
 }
 
+function renderMyDraftsPanel(){
+  /* Get drafts from eQMS runtime if available */
+  var drafts = (typeof window.listUserDrafts === 'function') ? window.listUserDrafts() :
+    (function(){ /* inline localStorage scan */
+      var out = [];
+      try {
+        for(var i = 0; i < localStorage.length; i++){
+          var key = localStorage.key(i);
+          if(!key || key.indexOf('eqms_draft_') !== 0) continue;
+          var raw = localStorage.getItem(key);
+          if(!raw) continue;
+          try { var d = JSON.parse(raw); if(d && d.formCode) out.push(d); } catch(e){}
+        }
+      } catch(e){}
+      out.sort(function(a, b){ return (b.savedAt || '').localeCompare(a.savedAt || ''); });
+      return out;
+    })();
+
+  var draftsHtml = '';
+  if(!drafts.length){
+    draftsHtml = '<div class="ec-work-empty"><strong>' + esc(t('Không có bản nháp', 'No drafts')) + '</strong>' + esc(t('Khi bạn lưu nháp biểu mẫu online, chúng sẽ hiện ở đây.', 'Saved online form drafts will appear here.')) + '</div>';
+  } else {
+    drafts.forEach(function(d){
+      var ago = d.savedAt ? fmtDateTime(d.savedAt) : '—';
+      draftsHtml += '<article class="ec-work-card">' +
+        '<div class="ec-work-card-top">' +
+          '<div><div class="ec-work-id">' + esc(d.formCode || '') + (d.recordId ? ' · ' + esc(d.recordId) : '') + '</div>' +
+          '<div class="ec-work-sub">' + esc(t('Lưu lúc', 'Saved at')) + ' ' + esc(ago) + '</div></div>' +
+          '<span class="ec-badge neutral">' + esc(t('Bản nháp', 'Draft')) + '</span>' +
+        '</div>' +
+        '<div class="ec-work-actions">' +
+          '<button type="button" class="ec-btn primary" data-resume-draft="' + esc(d.formCode || '') + '" data-alloc="' + esc(d.allocationId || '') + '">' + esc(t('Tiếp tục điền', 'Resume filling')) + '</button>' +
+        '</div>' +
+      '</article>';
+    });
+  }
+
+  return '<article class="ec-panel"><div class="ec-panel-head"><div><h3>' + esc(t('Bản nháp của tôi', 'My Drafts')) + '</h3><p>' + esc(t('Các biểu mẫu online đang điền dở. Nhấn để tiếp tục.', 'Online forms in progress. Click to resume.')) + '</p></div><span class="ec-badge neutral">' + esc(drafts.length) + '</span></div><div class="ec-work-list">' + draftsHtml + '</div></article>';
+}
+
 function renderWorkQueue(container){
   ensureWorkQueueDefaults();
   var work = state.workQueue;
@@ -811,6 +851,7 @@ function renderWorkQueue(container){
         '<div class="ec-toolbar-actions"><button type="button" class="ec-btn secondary" id="ec-wq-refresh">' + esc(work.loading ? t('Đang tải...', 'Refreshing...') : t('Làm mới', 'Refresh')) + '</button></div>' +
       '</section>' +
       '<section class="ec-board-grid">' +
+        renderMyDraftsPanel() +
         '<article class="ec-panel"><div class="ec-panel-head"><div><h3>' + esc(t('Hồ sơ chờ duyệt', 'Pending evidence')) + '</h3><p>' + esc(t('Mở thẳng khu vực xử lý của hồ sơ để xem xét, từ chối hoặc mở lại.', 'Jump straight into the record workspace to review, reject, or reopen.')) + '</p></div><span class="ec-badge info">' + esc((work.pending || []).length) + '</span></div><div class="ec-work-list">' + pendingHtml + '</div></article>' +
         '<article class="ec-panel"><div class="ec-panel-head"><div><h3>' + esc(t('Hàng đợi kiểm soát tải lên', 'Upload hardening queue')) + '</h3><p>' + esc(t('Hàng đợi này bám theo bộ lọc phòng ban và biểu mẫu khi hệ thống xác định được mã cấp phát. Bạn có thể xác minh, chấp nhận hoặc từ chối trực tiếp ngay tại đây.', 'This queue follows the selected department and form whenever the backend can resolve the allocation. You can verify, accept, or reject directly from here.')) + '</p></div><span class="ec-badge warn">' + esc(exceptions.length) + '</span></div><div class="ec-work-list">' + exceptionHtml + '</div></article>' +
       '</section>' +
@@ -941,6 +982,20 @@ function bindWorkQueue(container){
   });
   Array.prototype.forEach.call(container.querySelectorAll('[data-reject-quarantine]'), function(btn){
     btn.onclick = function(){ rejectQuarantine(btn.getAttribute('data-reject-quarantine') || ''); };
+  });
+
+  /* Resume draft buttons */
+  Array.prototype.forEach.call(container.querySelectorAll('[data-resume-draft]'), function(btn){
+    btn.onclick = function(){
+      var code = btn.getAttribute('data-resume-draft') || '';
+      var alloc = btn.getAttribute('data-alloc') || '';
+      if(code){
+        state.workspaceMode = 'eqms';
+        state._eqmsOpenCode = code;
+        var page = pageEl();
+        if(page) render(page);
+      }
+    };
   });
 }
 

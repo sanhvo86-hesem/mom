@@ -552,13 +552,61 @@ function validateRequired(){
 }
 
 /* ── Save/Submit ── */
+function draftStorageKey(){
+  var u = currentUser();
+  return 'eqms_draft_' + (state.formCode || 'unknown') + '_' + (state.allocationId || u.username || 'anon');
+}
+
 function saveDraft(){
   saveAuditLog();
-  return api('form_fill_save_draft', {
-    form_code: state.formCode,
-    allocation_id: state.allocationId,
-    data: { fieldValues: state.fieldValues, signatures: state.signatures }
-  }, 'POST');
+  /* Always save to localStorage first (works without allocation) */
+  var draftData = {
+    formCode: state.formCode,
+    allocationId: state.allocationId,
+    recordId: state.recordId,
+    fieldValues: state.fieldValues,
+    signatures: state.signatures,
+    savedAt: new Date().toISOString(),
+    savedBy: currentUser().username
+  };
+  try { localStorage.setItem(draftStorageKey(), JSON.stringify(draftData)); } catch(e){}
+
+  /* Also save to server if allocation exists */
+  if(state.allocationId){
+    return api('form_fill_save_draft', {
+      form_code: state.formCode,
+      allocation_id: state.allocationId,
+      data: { fieldValues: state.fieldValues, signatures: state.signatures }
+    }, 'POST').catch(function(){
+      /* Server save failed — localStorage draft is the backup */
+      return { ok: true, source: 'local_only' };
+    });
+  }
+  return Promise.resolve({ ok: true, source: 'local_only' });
+}
+
+function loadLocalDraft(){
+  try {
+    var raw = localStorage.getItem(draftStorageKey());
+    if(!raw) return null;
+    return JSON.parse(raw);
+  } catch(e){ return null; }
+}
+
+function listUserDrafts(){
+  var drafts = [];
+  try {
+    for(var i = 0; i < localStorage.length; i++){
+      var key = localStorage.key(i);
+      if(!key || key.indexOf('eqms_draft_') !== 0) continue;
+      var raw = localStorage.getItem(key);
+      if(!raw) continue;
+      var d = JSON.parse(raw);
+      if(d && d.formCode) drafts.push(d);
+    }
+  } catch(e){}
+  drafts.sort(function(a, b){ return (b.savedAt || '').localeCompare(a.savedAt || ''); });
+  return drafts;
 }
 
 function submitForm(){
@@ -630,15 +678,40 @@ window.openEqmsForm = function(formCode, container, options){
   state.entry = null;
   state.schema = null;
 
-  container.innerHTML = '<div class="eqms-runtime" id="eqms-form-container"><div class="eqms-loading">' + esc(t('Dang tai bieu mau...', 'Loading form...')) + '</div></div>';
+  container.innerHTML = '<div class="eqms-runtime" id="eqms-form-container"><div class="eqms-loading">Đang tải biểu mẫu...</div></div>';
   var runtime = container.querySelector('.eqms-runtime');
 
   Promise.all([loadSchema(formCode), ensureMasterData()]).then(function(results){
     var schema = results[0];
     if(!schema){
-      runtime.innerHTML = '<div class="eqms-empty">' + esc(t('Khong tim thay schema cho form nay.', 'Schema not found for this form.')) + '</div>';
+      runtime.innerHTML = '<div class="eqms-empty">Không tìm thấy schema cho form này.</div>';
       return;
     }
+    state.schema = schema;
+
+    /* Auto-create allocation if none provided */
+    if(!state.allocationId && window.AllocationTracker){
+      var rt = schema.record_type || '';
+      var dept = (schema.owner || 'QA').split('/')[0].trim();
+      if(rt){
+        return window.AllocationTracker.allocate(rt, dept, {
+          year: new Date().getFullYear(),
+          form_code: formCode,
+          notes: 'Auto-allocated from eQMS form',
+          master_context: {}
+        }).then(function(resp){
+          if(resp && resp.ok){
+            state.allocationId = resp.allocation_id || '';
+            state.recordId = resp.record_id || '';
+            toast('Đã tự động cấp mã: ' + (resp.record_id || ''), 'success');
+          }
+          return schema;
+        }).catch(function(){ return schema; });
+      }
+    }
+    return schema;
+  }).then(function(schema){
+    if(!schema) return;
     state.schema = schema;
 
     /* Apply field defaults */
@@ -650,7 +723,18 @@ window.openEqmsForm = function(formCode, container, options){
       }
     });
 
-    /* Load existing entry if available */
+    /* Try loading local draft first */
+    var localDraft = loadLocalDraft();
+    if(localDraft && localDraft.fieldValues && Object.keys(localDraft.fieldValues).length){
+      Object.keys(localDraft.fieldValues).forEach(function(k){
+        state.fieldValues[k] = localDraft.fieldValues[k];
+      });
+      if(localDraft.signatures) state.signatures = localDraft.signatures;
+      if(localDraft.allocationId && !state.allocationId) state.allocationId = localDraft.allocationId;
+      if(localDraft.recordId && !state.recordId) state.recordId = localDraft.recordId;
+    }
+
+    /* Load existing entry from server if available */
     if(state.allocationId || state.entryId){
       return loadEntry(formCode, state.allocationId, state.entryId).then(function(entry){
         if(entry){
@@ -688,5 +772,7 @@ window.toggleEqmsEditMode = function(){
   if(container) renderForm(container);
   return state.editMode;
 };
+
+window.listUserDrafts = listUserDrafts;
 
 })();

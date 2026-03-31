@@ -62,6 +62,27 @@ Mọi biểu mẫu eQMS online form (FRM-xxx-SUFFIX) hiển thị **song ngữ**
 - Header form tuân thủ core standard 23 (`.doc-name` = English SSOT, `.sub-vn` = Vietnamese)
 - Quy tắc áp dụng cho `10-eqms-form-runtime.js`, PDF export, và mọi form renderer tương lai
 
+### A6. Ngôn ngữ thực thể dữ liệu nền (Master Data Entities)
+
+- Tất cả thực thể dữ liệu nền (suppliers, customers, parts, operators, work centers, machines, tooling assets, etc.) lưu trữ và hiển thị **100% tiếng Anh**
+- Tên thực thể, mã, mô tả trong master-data.json: English only
+- Khi hiện trong dropdown/lookup trên form: hiển thị tiếng Anh gốc từ dữ liệu nền
+- **Quy tắc auto-link dữ liệu nền:** Nếu một ô nhập liệu (input field) trên form có dữ liệu tương ứng trong master data, field đó **PHẢI** được chuyển thành `type: "lookup"` với `lookup_source` trỏ đến bảng dữ liệu nền tương ứng, thay vì để người dùng nhập tay
+- Danh sách bảng dữ liệu nền chuẩn:
+
+| Bảng | lookup_source | Nội dung |
+|------|--------------|----------|
+| Nhà cung cấp | `suppliers` | supplier_id, supplier_name, contact_name, contact_email |
+| Khách hàng | `customers` | customer_id, customer_name |
+| Chi tiết + Revision | `parts` | part_number, revision, part_description |
+| Nhân sự | `operators` | operator_id, operator_name, role |
+| Trung tâm gia công | `work_centers` | work_center_id, work_center_name |
+| Máy | `machines` | machine_id, machine_name, machine_type |
+| Dụng cụ | `tooling_assets` | tool_id, tool_name, tool_type |
+| Chương trình NC | `nc_program_releases` | program_id, release_title |
+
+- Khi tạo form mới, kiểm tra từng field: nếu field_id hoặc label match với bất kỳ bảng nào ở trên, bắt buộc dùng lookup
+
 ### A2. Quy tắc vàng
 
 | Phần tử | Dịch? | Lý do |

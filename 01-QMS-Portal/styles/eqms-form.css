@@ -88,7 +88,7 @@
   border: 1px solid var(--eqms-border);
   border-radius: 12px;
   margin-bottom: 16px;
-  overflow: hidden;
+  overflow: visible;
 }
 .eqms-section-head {
   display: flex;
@@ -155,6 +155,22 @@
 .eqms-textarea { min-height: 80px; resize: vertical; }
 
 .eqms-helper { font-size: 11px; color: var(--eqms-text-3); line-height: 1.5; }
+
+/* Lookup dropdown must float above everything */
+.eqms-lookup-host { position: relative; z-index: 10; }
+.eqms-lookup-host .si-dropdown,
+.eqms-lookup-host .si-results,
+.eqms-lookup-host [class*="dropdown"],
+.eqms-lookup-host [class*="results"] {
+  position: absolute;
+  z-index: 9999;
+  max-height: 240px;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+}
+.eqms-field { position: relative; }
+.eqms-section { position: relative; overflow: visible; }
+.eqms-section-body, .eqms-fields { overflow: visible; }
 
 .eqms-multi { display: flex; flex-wrap: wrap; gap: 8px; }
 .eqms-check {
