@@ -792,15 +792,49 @@ function openUploadWorkspace(allocationId, formCode, bypassGuard){
   requestRender();
 }
 
+function docRegistry(){
+  try{
+    if(typeof DOCS !== 'undefined' && Array.isArray(DOCS)) return DOCS;
+  }catch(_err){}
+  return Array.isArray(window.DOCS) ? window.DOCS : [];
+}
+
+function normalizeEqmsPath(path){
+  return String(path || '')
+    .trim()
+    .replace(/\\/g, '/')
+    .replace(/^(\.\.\/)+/, '')
+    .replace(/^\.\//, '')
+    .replace(/^\/+/, '');
+}
+
+function eqmsStandalonePath(form){
+  return normalizeEqmsPath((form && form.standalone_html) || (form && form.schema && form.schema.standalone_html) || '');
+}
+
+function eqmsFormRank(form){
+  var code = String(form && form.form_code || '').trim().toUpperCase();
+  var rank = 0;
+  if(eqmsStandalonePath(form)) rank += 10;
+  if(form && form.online !== false) rank += 4;
+  if(form && (form.linked_excel_form || form.offline_form_code || form.blank_path || form.offline_fallback_available)) rank += 3;
+  if(code && !/^FRM-\d+$/.test(code)) rank += 2;
+  if(/-[A-Z0-9]+$/.test(code)) rank += 1;
+  return rank;
+}
+
 function eqmsForms(){
-  var seen = {};
-  return state.forms.filter(function(form){
-    if(!form || !form.form_code) return false;
-    if(!form.online && !form.offline_fallback_available && !form.blank_path && !form.linked_excel_form) return false;
-    if(seen[form.form_code]) return false;
-    seen[form.form_code] = true;
-    return true;
-  }).sort(function(a, b){
+  var buckets = {};
+  (state.forms || []).forEach(function(form){
+    if(!form || !form.form_code) return;
+    var standalonePath = eqmsStandalonePath(form);
+    if(!standalonePath) return;
+    var bucketKey = standalonePath || String(form.form_code || '').trim().toUpperCase();
+    if(!buckets[bucketKey] || eqmsFormRank(form) > eqmsFormRank(buckets[bucketKey])){
+      buckets[bucketKey] = form;
+    }
+  });
+  return Object.keys(buckets).map(function(key){ return buckets[key]; }).sort(function(a, b){
     return String(a.form_code || '').localeCompare(String(b.form_code || ''));
   });
 }
@@ -857,14 +891,37 @@ function openEqmsHub(bypassGuard){
 
 function resolveEqmsHtmlDocument(formCode){
   var form = state.formMap[formCode] || null;
-  var standalonePath = String((form && form.standalone_html) || (form && form.schema && form.schema.standalone_html) || '').trim();
-  if(Array.isArray(window.DOCS)){
-    for(var i = 0; i < window.DOCS.length; i++){
-      var doc = window.DOCS[i];
-      if(!doc || !doc.code) continue;
-      if(String(doc.code || '').trim().toUpperCase() === String(formCode || '').trim().toUpperCase()) return doc;
-      if(standalonePath && String(doc.path || '').replace(/\\/g,'/') === standalonePath.replace(/\\/g,'/')) return doc;
-    }
+  var standalonePath = eqmsStandalonePath(form);
+  var docs = docRegistry();
+  for(var i = 0; i < docs.length; i++){
+    var doc = docs[i];
+    if(!doc || !doc.code) continue;
+    if(String(doc.code || '').trim().toUpperCase() === String(formCode || '').trim().toUpperCase()) return doc;
+    if(standalonePath && normalizeEqmsPath(doc.path || '') === standalonePath) return doc;
+  }
+  if(typeof findDocByRelativePath === 'function' && standalonePath){
+    var linkedDoc = findDocByRelativePath(standalonePath);
+    if(linkedDoc) return linkedDoc;
+  }
+  if(form && standalonePath){
+    var synthetic = {
+      code: String(form.form_code || formCode || '').trim().toUpperCase(),
+      title: form.title || form.form_code || formCode || 'HTML Form',
+      title_vi: form.title_vi || form.description_vi || '',
+      description: form.description || '',
+      path: standalonePath,
+      ext: 'html',
+      cat: 'FRM',
+      owner: form.owner || 'QA / SCM',
+      rev: form.version || 'V1',
+      status: 'approved',
+      control_status: 'RELEASED',
+      delivery_mode: 'browser',
+      portal_behavior: 'browser_open',
+      browser_open_enabled: true
+    };
+    docs.push(synthetic);
+    return synthetic;
   }
   return null;
 }

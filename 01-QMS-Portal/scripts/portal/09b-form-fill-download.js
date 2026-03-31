@@ -208,7 +208,11 @@ function normalizeOfflineTemplatePath(value){
 }
 
 function linkedOfflineTemplateDoc(form){
-  var docs = Array.isArray(window.DOCS) ? window.DOCS : [];
+  var docs = [];
+  try{
+    if(typeof DOCS !== 'undefined' && Array.isArray(DOCS)) docs = DOCS;
+  }catch(_err){}
+  if(!docs.length && Array.isArray(window.DOCS)) docs = window.DOCS;
   var code = String(form && form.form_code || '').trim().toUpperCase();
   var path = normalizeOfflineTemplatePath(form && form.blank_path || '');
   if(path){

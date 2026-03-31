@@ -21,7 +21,7 @@
 
 // ── Cache Configuration ─────────────────────────────────────────────────────
 
-const CACHE_VERSION = 'v1.3.1';
+const CACHE_VERSION = 'v1.3.2';
 const CACHE_PREFIX  = 'hesem-qms';
 
 /** Named caches with version stamps. */
@@ -63,6 +63,7 @@ const PRECACHE_URLS = [
   '/01-QMS-Portal/scripts/portal/08-deploy-dashboard.js',
   '/01-QMS-Portal/scripts/portal/09-online-forms.js',
   '/01-QMS-Portal/scripts/portal/09b-form-fill-download.js',
+  '/01-QMS-Portal/scripts/portal/10-eqms-form-runtime.js',
   '/01-QMS-Portal/scripts/form-runtimes/frm-403-scar.js',
   '/01-QMS-Portal/scripts/portal/10-upload-validator.js',
   '/01-QMS-Portal/scripts/portal/90-qrcodegen.js',
@@ -74,6 +75,7 @@ const PRECACHE_URLS = [
   '/01-QMS-Portal/assets/js/pwa-init.js',
   '/01-QMS-Portal/manifest.json',
   '/01-QMS-Portal/form-runtimes/frm-403-scar.html',
+  '/04-Bieu-Mau/04-FRM-400/FRM-403-SCAR_Supplier_Corrective_Action_Request.html',
   '/assets/style_scoped.css',
   '/assets/style.css',
   '/assets/hesem-logo.svg',

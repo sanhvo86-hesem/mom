@@ -2,6 +2,7 @@
 'use strict';
 
 var FORM_CODE = String((new URLSearchParams(window.location.search || '')).get('form_code') || 'FRM-403-SCAR').trim() || 'FRM-403-SCAR';
+var PORTAL_API_URL = '/01-QMS-Portal/api.php';
 var FIELD_IDS = ['scar_date','supplier_name','supplier_id','po_number','part_number','part_rev','lot_number','quantity_received','quantity_rejected','defect_type','defect_description','severity','containment_action','root_cause_required','supplier_response_due_date','supplier_root_cause','supplier_corrective_action','supplier_preventive_action','verification_method','verification_result','scar_status','issued_by','approved_by','supplier_contact'];
 var REQUIRED_FIELDS = ['scar_date','supplier_name','supplier_id','po_number','part_number','quantity_received','quantity_rejected','defect_type','defect_description','severity','containment_action','supplier_response_due_date','scar_status','issued_by'];
 var ROOT_CAUSE_FIELDS = ['supplier_root_cause','supplier_corrective_action','supplier_preventive_action'];
@@ -1123,7 +1124,7 @@ function callApi(action, payload, method){
 function callApiDirect(action, payload, method){
   method = String(method || 'GET').toUpperCase();
   if(hasParentApi()) return Promise.resolve(window.parent._ecApi(action, payload || {}, method));
-  var url = '../api.php?action=' + encodeURIComponent(action);
+  var url = PORTAL_API_URL + '?action=' + encodeURIComponent(action);
   var options = { method: method, credentials: 'include', headers: { 'Accept': 'application/json' } };
   if(method === 'GET'){
     var query = new URLSearchParams();

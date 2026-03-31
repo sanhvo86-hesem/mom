@@ -73,8 +73,15 @@ function eqmsCatalogForm(formCode){
   return formMap[formCode] || null;
 }
 
+function docRegistry(){
+  try{
+    if(typeof DOCS !== 'undefined' && Array.isArray(DOCS)) return DOCS;
+  }catch(_err){}
+  return Array.isArray(window.DOCS) ? window.DOCS : [];
+}
+
 function findStandaloneDoc(formCode, schema){
-  var docs = Array.isArray(window.DOCS) ? window.DOCS : [];
+  var docs = docRegistry();
   var targetPath = normalizeRelPath((schema && schema.standalone_html) || (eqmsCatalogForm(formCode) && eqmsCatalogForm(formCode).standalone_html) || '');
   for(var i = 0; i < docs.length; i++){
     var doc = docs[i];
