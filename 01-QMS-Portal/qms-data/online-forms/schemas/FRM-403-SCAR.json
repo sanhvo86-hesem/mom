@@ -1,0 +1,401 @@
+{
+  "$schema": "hesem-eqms-form/v1",
+  "form_code": "FRM-403-SCAR",
+  "title": "Supplier Corrective Action Request (SCAR)",
+  "title_vi": "Yeu cau hanh dong khac phuc nha cung cap (SCAR)",
+  "version": "V1",
+  "version_int": 1,
+  "category": "quality",
+  "frequency": "per_event",
+  "delivery_mode": "online",
+  "sop_ref": "SOP-401",
+  "record_type": "SCAR",
+  "owner": "QA / SCM",
+  "approver": "QA / SCM",
+  "effective_date": "2026-03-31",
+  "retention_years": 10,
+  "linked_excel": "FRM-403",
+  "description": "Ghi nhan yeu cau hanh dong khac phuc doi voi nha cung cap khi phat hien loi chat luong hoac giao hang.",
+  "description_en": "Record supplier corrective action requests when quality or delivery defects are identified.",
+
+  "roles_allowed": {
+    "create": ["qa_manager", "quality_engineer", "buyer", "supply_chain_manager"],
+    "fill": ["qa_manager", "quality_engineer", "buyer", "supply_chain_manager"],
+    "review": ["qa_manager", "supply_chain_manager"],
+    "approve": ["qa_manager"],
+    "view": ["all"]
+  },
+
+  "workflow": {
+    "type": "sequential",
+    "states": ["draft", "submitted", "in_review", "approved", "closed", "voided"],
+    "transitions": {
+      "draft": { "next": ["submitted"], "roles": ["fill"] },
+      "submitted": { "next": ["in_review"], "roles": ["review"] },
+      "in_review": { "next": ["approved", "draft"], "roles": ["approve"] },
+      "approved": { "next": ["closed", "voided"], "roles": ["approve"] },
+      "closed": { "next": [], "terminal": true },
+      "voided": { "next": [], "terminal": true }
+    }
+  },
+
+  "sections": [
+    {
+      "id": "identification",
+      "title": "Nhan dien ho so va nha cung cap",
+      "title_en": "Record identification and supplier",
+      "description": "Khoa du ngu canh phat hanh, nha cung cap, dau moi lien he va lo bi anh huong de tao truy xuat su dung duoc ngay.",
+      "description_en": "Lock context, supplier, contact, and affected lot for immediate traceability.",
+      "color": "#1971c2",
+      "field_ids": ["scar_date", "supplier_response_due_date", "scar_status", "supplier_name", "supplier_id", "supplier_contact", "po_number", "part_number", "part_rev", "lot_number"]
+    },
+    {
+      "id": "quality_issue",
+      "title": "Su co chat luong va dinh luong anh huong",
+      "title_en": "Quality issue and impact quantification",
+      "description": "Mo ta loi ro rang, luong hang bi anh huong va muc do nghiem trong de hanh dong containment va phan hoi duoc dat dung trong tam.",
+      "description_en": "Describe defect clearly, quantify affected goods and severity for focused containment and response.",
+      "color": "#e03131",
+      "field_ids": ["quantity_received", "quantity_rejected", "defect_type", "severity", "defect_description"]
+    },
+    {
+      "id": "containment",
+      "title": "Containment, han phan hoi va phat hanh yeu cau",
+      "title_en": "Containment, response deadline and issuance",
+      "description": "Ghi nhan hanh dong chan lan rong, che do phan hoi bat buoc va trach nhiem phat hanh de kiem soat vong phan hoi nha cung cap.",
+      "description_en": "Record containment actions, mandatory response mode and issuance responsibility.",
+      "color": "#d97706",
+      "field_ids": ["containment_action", "root_cause_required", "issued_by", "approved_by"]
+    },
+    {
+      "id": "supplier_response",
+      "title": "Phan hoi va cam ket tu nha cung cap",
+      "title_en": "Supplier response and commitment",
+      "description": "Thu thap nguyen nhan goc, hanh dong khac phuc va phong ngua tu phia nha cung cap.",
+      "description_en": "Collect root cause, corrective and preventive actions from supplier.",
+      "color": "#1971c2",
+      "field_ids": ["supplier_root_cause", "supplier_corrective_action", "supplier_preventive_action"]
+    },
+    {
+      "id": "verification",
+      "title": "Xac nhan hieu luc va dong ho so",
+      "title_en": "Effectiveness verification and closeout",
+      "description": "Ghi phuong phap xac nhan, ket qua va can cu dong SCAR sau khi phan hoi duoc danh gia day du.",
+      "description_en": "Record verification method, results and basis for SCAR closure after response evaluation.",
+      "color": "#2f9e44",
+      "field_ids": ["verification_method", "verification_result"]
+    }
+  ],
+
+  "fields": [
+    {
+      "id": "scar_date",
+      "type": "date",
+      "label": "Ngay phat hanh SCAR",
+      "label_en": "SCAR Date",
+      "required": true,
+      "default": "today",
+      "helper": "Ngay chinh thuc phat hanh yeu cau toi nha cung cap.",
+      "helper_en": "Official date the request is issued to the supplier.",
+      "audit_tracked": true
+    },
+    {
+      "id": "supplier_response_due_date",
+      "type": "date",
+      "label": "Han phan hoi nha cung cap",
+      "label_en": "Supplier Response Due Date",
+      "required": true,
+      "helper": "Dung de theo doi qua han va escalations.",
+      "helper_en": "Used to track overdue status and escalations.",
+      "audit_tracked": true
+    },
+    {
+      "id": "scar_status",
+      "type": "select",
+      "label": "Trang thai SCAR",
+      "label_en": "SCAR Status",
+      "required": true,
+      "default": "open",
+      "options": [
+        { "value": "open", "label": "Mo (Open)", "color": "#e03131" },
+        { "value": "awaiting_response", "label": "Cho phan hoi NCC (Awaiting Response)", "color": "#e67700" },
+        { "value": "under_review", "label": "Dang xem xet (Under Review)", "color": "#1971c2" },
+        { "value": "verification", "label": "Dang xac nhan (Verification)", "color": "#862e9c" },
+        { "value": "closed", "label": "Da dong (Closed)", "color": "#2f9e44" }
+      ],
+      "audit_tracked": true
+    },
+    {
+      "id": "supplier_name",
+      "type": "text",
+      "label": "Ten nha cung cap",
+      "label_en": "Supplier Name",
+      "required": true,
+      "placeholder": "Nhap hoac chon nha cung cap",
+      "placeholder_en": "Type or select supplier",
+      "helper": "Co the go ten hoac chon tu danh sach nha cung cap da quan ly.",
+      "helper_en": "You may type the name or pick from the governed supplier list.",
+      "audit_tracked": true
+    },
+    {
+      "id": "supplier_id",
+      "type": "text",
+      "label": "Ma nha cung cap",
+      "label_en": "Supplier ID",
+      "required": true,
+      "placeholder": "Vi du: SUP-001",
+      "placeholder_en": "e.g., SUP-001",
+      "audit_tracked": true
+    },
+    {
+      "id": "supplier_contact",
+      "type": "text",
+      "label": "Lien he nha cung cap",
+      "label_en": "Supplier Contact",
+      "placeholder": "Ten, email, so dien thoai nguoi phu trach",
+      "placeholder_en": "Name, email, phone of responsible person"
+    },
+    {
+      "id": "po_number",
+      "type": "text",
+      "label": "So PO",
+      "label_en": "PO Number",
+      "required": true,
+      "placeholder": "Nhap so PO lien quan",
+      "placeholder_en": "Enter related PO number",
+      "audit_tracked": true
+    },
+    {
+      "id": "part_number",
+      "type": "text",
+      "label": "Ma chi tiet",
+      "label_en": "Part Number",
+      "required": true,
+      "placeholder": "Vi du: PN-1001",
+      "placeholder_en": "e.g., PN-1001",
+      "audit_tracked": true
+    },
+    {
+      "id": "part_rev",
+      "type": "text",
+      "label": "Revision",
+      "label_en": "Part Revision",
+      "placeholder": "Vi du: B",
+      "placeholder_en": "e.g., B"
+    },
+    {
+      "id": "lot_number",
+      "type": "text",
+      "label": "So lo",
+      "label_en": "Lot Number",
+      "placeholder": "So lo / heat number",
+      "placeholder_en": "Lot number / heat number"
+    },
+    {
+      "id": "quantity_received",
+      "type": "number",
+      "label": "So luong nhan",
+      "label_en": "Quantity Received",
+      "required": true,
+      "min": 1,
+      "audit_tracked": true
+    },
+    {
+      "id": "quantity_rejected",
+      "type": "number",
+      "label": "So luong loai bo",
+      "label_en": "Quantity Rejected",
+      "required": true,
+      "min": 0,
+      "helper": "Khong duoc lon hon so luong nhan.",
+      "helper_en": "Must not exceed quantity received.",
+      "audit_tracked": true
+    },
+    {
+      "id": "defect_type",
+      "type": "text",
+      "label": "Loai loi",
+      "label_en": "Defect Type",
+      "required": true,
+      "placeholder": "VD: Dimensional, Surface, Packaging, Documentation",
+      "placeholder_en": "e.g., Dimensional, Surface, Packaging, Documentation",
+      "audit_tracked": true
+    },
+    {
+      "id": "severity",
+      "type": "select",
+      "label": "Muc do nghiem trong",
+      "label_en": "Severity",
+      "required": true,
+      "options": [
+        { "value": "minor", "label": "Nhe (Minor)", "color": "#2f9e44" },
+        { "value": "major", "label": "Nang (Major)", "color": "#e67700" },
+        { "value": "critical", "label": "Nghiem trong (Critical)", "color": "#e03131" }
+      ],
+      "audit_tracked": true
+    },
+    {
+      "id": "defect_description",
+      "type": "textarea",
+      "label": "Mo ta loi",
+      "label_en": "Defect Description",
+      "required": true,
+      "width": "full",
+      "placeholder": "Mo ta chi tiet hien tuong loi, vi tri phat hien, trieu chung va anh huong thuc te...",
+      "placeholder_en": "Describe the defect in detail: symptoms, location, and actual impact...",
+      "audit_tracked": true
+    },
+    {
+      "id": "containment_action",
+      "type": "textarea",
+      "label": "Hanh dong ngan chan",
+      "label_en": "Containment Action",
+      "required": true,
+      "width": "full",
+      "placeholder": "Ghi ro cach co lap hang, xu ly ton kho, chan lo tiep theo...",
+      "placeholder_en": "Describe how affected goods are isolated, inventory handled, next lots blocked...",
+      "audit_tracked": true
+    },
+    {
+      "id": "root_cause_required",
+      "type": "checkbox",
+      "label": "Yeu cau phan tich nguyen nhan goc",
+      "label_en": "Root Cause Required",
+      "checkbox_label": "Yeu cau NCC phan tich nguyen nhan goc (Root Cause Analysis)",
+      "checkbox_label_en": "Require supplier to perform Root Cause Analysis",
+      "default": true,
+      "helper": "Bo chon chi khi QA quyet dinh containment-only hoac xu ly rut gon.",
+      "helper_en": "Uncheck only if QA decides containment-only or reduced scope."
+    },
+    {
+      "id": "issued_by",
+      "type": "text",
+      "label": "Nguoi phat hanh",
+      "label_en": "Issued By",
+      "required": true,
+      "placeholder": "Nguoi phat hanh SCAR",
+      "placeholder_en": "SCAR issuer name",
+      "audit_tracked": true
+    },
+    {
+      "id": "approved_by",
+      "type": "text",
+      "label": "Nguoi phe duyet",
+      "label_en": "Approved By",
+      "placeholder": "Nguoi phe duyet noi bo",
+      "placeholder_en": "Internal approver"
+    },
+    {
+      "id": "supplier_root_cause",
+      "type": "textarea",
+      "label": "Nguyen nhan goc tu NCC",
+      "label_en": "Supplier Root Cause",
+      "width": "full",
+      "placeholder": "Nha cung cap giai thich nguyen nhan goc cua loi...",
+      "placeholder_en": "Supplier explains root cause of the defect...",
+      "audit_tracked": true
+    },
+    {
+      "id": "supplier_corrective_action",
+      "type": "textarea",
+      "label": "Hanh dong khac phuc NCC",
+      "label_en": "Supplier Corrective Action",
+      "placeholder": "Neu ro hanh dong khac phuc, nguoi chiu trach nhiem, thoi diem hoan tat...",
+      "placeholder_en": "Describe corrective action, responsible person, completion date...",
+      "audit_tracked": true
+    },
+    {
+      "id": "supplier_preventive_action",
+      "type": "textarea",
+      "label": "Hanh dong phong ngua NCC",
+      "label_en": "Supplier Preventive Action",
+      "placeholder": "Neu hanh dong phong ngua de khong tai dien...",
+      "placeholder_en": "Describe preventive action to avoid recurrence...",
+      "audit_tracked": true
+    },
+    {
+      "id": "verification_method",
+      "type": "text",
+      "label": "Phuong phap xac nhan",
+      "label_en": "Verification Method",
+      "width": "full",
+      "placeholder": "VD: IQC lo tiep theo, audit tai cho, xac nhan bang bao cao do",
+      "placeholder_en": "e.g., IQC next lot, on-site audit, measurement report confirmation"
+    },
+    {
+      "id": "verification_result",
+      "type": "textarea",
+      "label": "Ket qua xac nhan",
+      "label_en": "Verification Result",
+      "width": "full",
+      "placeholder": "Ghi ro bang chung xac nhan, ket qua kiem tra lai va quyet dinh dong / giu mo SCAR...",
+      "placeholder_en": "Record verification evidence, recheck results and decision to close/keep open...",
+      "audit_tracked": true
+    }
+  ],
+
+  "signature_blocks": [
+    {
+      "id": "originator",
+      "label": "Nguoi phat hanh",
+      "label_en": "Originator",
+      "meaning": "Authored",
+      "required_on_submit": true,
+      "roles": ["fill"],
+      "help": "Nguoi tao va phat hanh SCAR",
+      "help_en": "Person who creates and issues the SCAR"
+    },
+    {
+      "id": "qa_reviewer",
+      "label": "Nguoi xem xet QA",
+      "label_en": "QA Reviewer",
+      "meaning": "Reviewed",
+      "required_on_approve": true,
+      "roles": ["review"],
+      "help": "QA xem xet va danh gia phan hoi NCC",
+      "help_en": "QA reviews and evaluates supplier response"
+    },
+    {
+      "id": "approver",
+      "label": "Nguoi phe duyet",
+      "label_en": "Approver",
+      "meaning": "Approved",
+      "required_on_approve": true,
+      "roles": ["approve"],
+      "help": "Phe duyet dong ho so SCAR",
+      "help_en": "Approves SCAR closure"
+    }
+  ],
+
+  "computed_fields": [
+    {
+      "id": "reject_rate",
+      "formula": "quantity_rejected > 0 && quantity_received > 0 ? Math.round(quantity_rejected / quantity_received * 100) + '%' : '0%'",
+      "label": "Ty le loai bo",
+      "label_en": "Reject Rate"
+    },
+    {
+      "id": "days_overdue",
+      "formula": "supplier_response_due_date ? Math.max(0, Math.floor((Date.now() - new Date(supplier_response_due_date).getTime()) / 86400000)) : 0",
+      "label": "So ngay qua han",
+      "label_en": "Days Overdue"
+    }
+  ],
+
+  "auto_fields": ["record_id", "submitted_by", "submitted_at", "entry_id"],
+
+  "linked_record_types": ["NCR", "CAPA"],
+
+  "notifications": {
+    "on_submit": { "roles": ["review"], "template": "scar_submitted" },
+    "on_approve": { "roles": ["fill"], "template": "scar_approved" },
+    "on_overdue": { "roles": ["review", "approve"], "template": "scar_overdue" },
+    "on_critical": { "roles": ["qa_manager", "supply_chain_manager"], "template": "scar_critical" }
+  },
+
+  "pdf_template": {
+    "header": { "logo": true, "form_code": true, "version": true },
+    "footer": { "page_numbers": true, "uncontrolled_warning": true },
+    "watermark_on_draft": "DRAFT — NOT FOR PRODUCTION USE"
+  }
+}
