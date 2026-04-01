@@ -2,6 +2,7 @@
 01-QMS-Portal/qms-data/php_error.log
 01-QMS-Portal/qms-data/scan_cache.json
 01-QMS-Portal/qms-data/audit/audit_*.jsonl
+01-QMS-Portal/qms-data/config/docs_custom.local.json
 01-QMS-Portal/qms-data/form-workflow/**
 01-QMS-Portal/qms-data/ratelimit/**
 !01-QMS-Portal/qms-data/ratelimit/README.md

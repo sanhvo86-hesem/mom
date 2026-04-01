@@ -40,7 +40,7 @@ if (!is_dir($DATA_DIR)) @mkdir($DATA_DIR, 0775, true);
 $CONF_DIR   = $DATA_DIR . '/config';
 $USERS_FILE = $CONF_DIR . '/users.json';
 $ROLE_PERMS_FILE   = $CONF_DIR . '/role_permissions.json';
-$CUSTOM_DOCS_FILE  = $CONF_DIR . '/docs_custom.json';
+$CUSTOM_DOCS_FILE  = $CONF_DIR . '/docs_custom.local.json';
 $DOC_VIS_FILE     = $CONF_DIR . '/docs_visibility.json';
 $PORTAL_DISPLAY_CONFIG_FILE = $CONF_DIR . '/portal_display_config.json';
 $FORM_CONTROL_REGISTRY_FILE = $CONF_DIR . '/form_control_registry.json';
@@ -496,7 +496,9 @@ function require_doc_workflow_approver(array $user): void {
 }
 
 // ---------- Custom documents list (server-backed) ----------
-function load_custom_docs(string $file): array {
+function parse_custom_docs_payload(string $file, ?bool &$found = null): array {
+  $found = is_file($file);
+  if (!$found) return [];
   $j = read_json_file($file);
   if (is_array($j)) {
     if (isset($j['docs']) && is_array($j['docs'])) return $j['docs'];
@@ -510,6 +512,36 @@ function load_custom_docs(string $file): array {
     if ($isList) return $j;
   }
   return [];
+}
+
+function custom_docs_legacy_file(string $file): string {
+  $norm = str_replace('\\', '/', $file);
+  if (str_ends_with($norm, '/docs_custom.local.json')) {
+    return substr($norm, 0, -strlen('/docs_custom.local.json')) . '/docs_custom.json';
+  }
+  return $norm;
+}
+
+function load_custom_docs(string $file): array {
+  $primaryFound = false;
+  $docs = parse_custom_docs_payload($file, $primaryFound);
+  if ($primaryFound) return $docs;
+
+  $legacyFile = custom_docs_legacy_file($file);
+  if ($legacyFile === $file) return [];
+
+  $legacyFound = false;
+  $legacyDocs = parse_custom_docs_payload($legacyFile, $legacyFound);
+  if (!$legacyFound) return [];
+
+  // One-time migration path: preserve existing tracked docs_custom.json data by
+  // copying it into the ignored local override file as soon as new code runs.
+  try {
+    save_custom_docs($file, $legacyDocs);
+  } catch (Throwable $e) {
+    // Ignore migration write errors and still serve the legacy content.
+  }
+  return $legacyDocs;
 }
 
 function save_custom_docs(string $file, array $docs): void {
