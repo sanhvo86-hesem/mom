@@ -240,6 +240,56 @@ function renderStandaloneRuntime(container, schema, options){
 /* ── State ── */
 var masterData = null;
 var companyDirectory = null;
+var MASTER_LOOKUP_CONFIG = {
+  suppliers: { collection:'suppliers', valueKey:'supplier_id', labelKey:'supplier_name', subKeys:['supplier_id','supplier_type','status'] },
+  customers: { collection:'customers', valueKey:'customer_id', labelKey:'customer_name', subKeys:['customer_id','customer_type','status'] },
+  customer_sites: { collection:'customer_sites', valueKey:'site_id', labelKey:'site_name', subKeys:['customer_id','country_code','status'] },
+  commercial_accounts: { collection:'commercial_accounts', valueKey:'account_id', labelKey:'account_id', subKeys:['customer_id','currency_code','status'] },
+  parts: { collection:'parts', valueKey:'part_number', labelKey:'part_number', subKeys:['revision','part_description','status'] },
+  revisions: { collection:'revisions', valueKey:'revision_id', labelKey:'revision_id', subKeys:['part_number','revision','status'] },
+  incoterms: { collection:'incoterms', valueKey:'incoterm_code', labelKey:'incoterm_name', subKeys:['incoterm_code','status'] },
+  payment_terms: { collection:'payment_terms', valueKey:'payment_term_code', labelKey:'payment_term_name', subKeys:['payment_term_code','status'] },
+  shipping_methods: { collection:'shipping_methods', valueKey:'shipping_method_id', labelKey:'shipping_method_name', subKeys:['shipping_method_id','mode','status'] },
+  promise_policies: { collection:'promise_policies', valueKey:'promise_policy_id', labelKey:'policy_name', subKeys:['promise_policy_id','target_otd_percent','status'] },
+  routing_library: { collection:'routing_library', valueKey:'routing_id', labelKey:'routing_name', subKeys:['part_number','part_revision','status'] },
+  bom_library: { collection:'bom_library', valueKey:'bom_id', labelKey:'bom_name', subKeys:['part_number','part_revision','status'] },
+  control_plans: { collection:'control_plans', valueKey:'control_plan_id', labelKey:'control_plan_name', subKeys:['part_number','part_revision','status'] },
+  inspection_plans: { collection:'inspection_plans', valueKey:'inspection_plan_id', labelKey:'inspection_plan_name', subKeys:['part_number','part_revision','status'] },
+  traveler_templates: { collection:'traveler_templates', valueKey:'traveler_template_id', labelKey:'traveler_template_name', subKeys:['part_number','part_revision','status'] },
+  quality_gate_profiles: { collection:'quality_gate_profiles', valueKey:'quality_gate_profile_id', labelKey:'profile_name', subKeys:['required_gates','status'] },
+  launch_gate_templates: { collection:'launch_gate_templates', valueKey:'gate_template_id', labelKey:'gate_name', subKeys:['work_center_id','status'] },
+  customer_item_approvals: { collection:'customer_item_approvals', valueKey:'approval_id', labelKey:'approval_id', subKeys:['customer_id','part_number','status'] },
+  supplier_process_approvals: { collection:'supplier_process_approvals', valueKey:'approval_id', labelKey:'approval_id', subKeys:['supplier_id','special_process','status'] },
+  warehouse_locations: { collection:'warehouse_locations', valueKey:'warehouse_id', labelKey:'warehouse_name', subKeys:['warehouse_id','warehouse_type','status'] },
+  defect_catalog: { collection:'defect_catalog', valueKey:'defect_code', labelKey:'defect_name', subKeys:['defect_code','defect_group','severity_default','status'] },
+  capas: { collection:'capas', valueKey:'capa_number', labelKey:'title', subKeys:['capa_number','customer_id','status'] },
+  work_centers: { collection:'work_centers', valueKey:'work_center_id', labelKey:'work_center_name', subKeys:['work_center_id','department','status'] },
+  machines: { collection:'machines', valueKey:'machine_id', labelKey:'machine_name', subKeys:['machine_id','work_center_id','status'] },
+  operators: { collection:'operators', valueKey:'operator_id', labelKey:'operator_name', subKeys:['operator_id','role','status'] },
+  tooling_assets: { collection:'tooling_assets', valueKey:'tool_id', labelKey:'tool_name', subKeys:['tool_id','tool_type','status'] },
+  tool_assemblies: { collection:'tool_assemblies', valueKey:'assembly_id', labelKey:'assembly_id', subKeys:['parent_tool_id','component_tool_id','status'] },
+  downtime_reason_codes: { collection:'downtime_reason_codes', valueKey:'reason_code', labelKey:'reason_name', subKeys:['reason_code','category','status'] },
+  downtime_resolution_codes: { collection:'downtime_resolution_codes', valueKey:'resolution_code', labelKey:'resolution_name', subKeys:['resolution_code','resolution_group','status'] },
+  mes_connectivity_adapters: { collection:'mes_connectivity_adapters', valueKey:'adapter_id', labelKey:'adapter_name', subKeys:['machine_id','adapter_type','status'] },
+  mes_alarm_catalog: { collection:'mes_alarm_catalog', valueKey:'alarm_code', labelKey:'title', subKeys:['controller_family','severity_default','status'] },
+  mes_alarm_playbooks: { collection:'mes_alarm_playbooks', valueKey:'playbook_id', labelKey:'title', subKeys:['alarm_code','response_target_minutes','status'] },
+  nc_program_releases: { collection:'nc_program_releases', valueKey:'program_id', labelKey:'release_title', subKeys:['part_number','operation_number','status'] }
+};
+var FIELD_LOOKUP_HINTS = {
+  supplier_id:'suppliers', supplier_name:'suppliers',
+  customer_id:'customers', customer_site_id:'customer_sites', account_id:'commercial_accounts',
+  part_number:'parts', part_id:'parts', part_revision:'revisions', revision_id:'revisions', revision:'revisions',
+  incoterm_code:'incoterms', payment_term_code:'payment_terms', shipping_method_id:'shipping_methods',
+  promise_policy_id:'promise_policies', routing_id:'routing_library', bom_id:'bom_library',
+  control_plan_id:'control_plans', inspection_plan_id:'inspection_plans', traveler_template_id:'traveler_templates',
+  quality_gate_profile_id:'quality_gate_profiles', gate_template_id:'launch_gate_templates',
+  warehouse_id:'warehouse_locations', defect_type:'defect_catalog', defect_code:'defect_catalog',
+  capa_number:'capas', work_center_id:'work_centers', machine_id:'machines', operator_id:'operators',
+  issued_by:'company_users', approved_by:'company_users', reviewed_by:'company_users', prepared_by:'company_users',
+  verified_by:'company_users', owner_user:'company_users', tool_id:'tooling_assets', assembly_id:'tool_assemblies',
+  reason_code:'downtime_reason_codes', resolution_code:'downtime_resolution_codes', adapter_id:'mes_connectivity_adapters',
+  alarm_code:'mes_alarm_catalog', playbook_id:'mes_alarm_playbooks', program_id:'nc_program_releases'
+};
 
 function ensureMasterData(){
   if(masterData) return Promise.resolve(masterData);
@@ -286,7 +336,6 @@ function mergeParts(){
 }
 
 function buildLookupItems(source){
-  var md = masterData || {};
   if(source === 'company_users') {
     var rows = Array.isArray(companyDirectory) ? companyDirectory.slice() : [];
     var u = currentUser();
@@ -319,20 +368,7 @@ function buildLookupItems(source){
       };
     });
   }
-  if(source === 'suppliers') return (md.suppliers || []).map(function(s){
-    return { value: s.supplier_id, label: s.supplier_id, sub: s.supplier_name || '', supplier_id: s.supplier_id, supplier_name: s.supplier_name || '', contact_name: s.contact_name || '', contact_email: s.contact_email || '', supplier_type: s.supplier_type || '' };
-  });
-  if(source === 'parts') return (md.parts || []).map(function(p){
-    var label = p.part_number + (p.revision ? ' ' + p.revision : '');
-    return { value: p.part_number, label: label, sub: p.part_description || '', part_number: p.part_number, part_description: p.part_description || '', revision: p.revision || '', customer_id: p.customer_id || '' };
-  });
-  if(source === 'customers') return (md.customers || []).map(function(c){
-    return { value: c.customer_id, label: c.customer_id, sub: c.customer_name || '', customer_id: c.customer_id, customer_name: c.customer_name || '' };
-  });
-  if(source === 'operators') return (md.operators || []).map(function(o){
-    return { value: o.operator_id, label: o.operator_id, sub: [o.operator_name || '', o.role || ''].filter(Boolean).join(' · '), operator_id: o.operator_id || '', operator_name: o.operator_name || '', role: o.role || '' };
-  });
-  return [];
+  return mapMasterLookupItems(source);
 }
 
 function allowCurrentUserShortcut(field){
@@ -682,7 +718,7 @@ function renderForm(container){
       '<div class="eqms-section-head">' +
         '<div class="eqms-section-num">' + (sIdx + 1) + '</div>' +
         '<div>' +
-          '<div class="eqms-section-title">' + esc(section.title || section.title_en || '') + '</div>' +
+          '<div class="eqms-section-title">' + esc(section.title_en || section.title || '') + '</div>' +
           (section.description || section.description_en ? '<div class="eqms-section-desc">' + esc(section.description || section.description_en || '') + '</div>' : '') +
         '</div>' +
       '</div>' +
@@ -700,7 +736,7 @@ function renderForm(container){
     html += '<div class="eqms-section">' +
       '<div class="eqms-section-head">' +
         '<div class="eqms-section-num">S</div>' +
-        '<div><div class="eqms-section-title">Chữ ký điện tử (Electronic Signatures)</div></div>' +
+        '<div><div class="eqms-section-title">Electronic Signatures</div><div class="eqms-section-desc">Khối chữ ký kích hoạt theo workflow và ghi vết điện tử cho từng vai trò.</div></div>' +
       '</div>' +
       '<div class="eqms-sig-grid">';
     sigBlocks.forEach(function(block){
@@ -1041,6 +1077,75 @@ function discardServerDraft(){
   });
 }
 
+function joinLookupSubparts(parts){
+  return parts.filter(function(part){
+    return part !== undefined && part !== null && String(part).trim() !== '';
+  }).map(function(part){
+    return String(part).trim();
+  }).join(' · ');
+}
+
+function mapMasterLookupItems(source){
+  var cfg = MASTER_LOOKUP_CONFIG[source];
+  if(!cfg) return [];
+  var rows = Array.isArray((masterData || {})[cfg.collection]) ? (masterData || {})[cfg.collection] : [];
+  return rows.map(function(row){
+    var item = { value: row[cfg.valueKey] || '', label: row[cfg.labelKey] || row[cfg.valueKey] || '', sub: '' };
+    Object.keys(row || {}).forEach(function(key){ item[key] = row[key]; });
+    item.sub = joinLookupSubparts((cfg.subKeys || []).map(function(key){ return row[key]; }));
+    if(source === 'parts'){
+      item.value = row.part_number || '';
+      item.label = joinLookupSubparts([row.part_number || '', row.revision || '']);
+      item.sub = joinLookupSubparts([row.part_description || '', row.status || '']);
+    }
+    return item;
+  });
+}
+
+function inferLookupSource(field){
+  if(!field || typeof field !== 'object') return '';
+  if(field.lookup_source) return String(field.lookup_source).trim();
+  var direct = FIELD_LOOKUP_HINTS[field.id];
+  if(direct) return direct;
+  var key = String(field.id || '').trim().toLowerCase();
+  var label = String(field.label || field.label_en || '').trim().toLowerCase();
+  if(/supplier/.test(key) || /supplier/.test(label)) return 'suppliers';
+  if(/customer/.test(key) || /customer/.test(label)) return 'customers';
+  if(/part/.test(key) || /part/.test(label)) return 'parts';
+  if(/revision/.test(key) || /revision/.test(label)) return 'revisions';
+  if(/machine/.test(key) || /machine/.test(label)) return 'machines';
+  if(/work_center|workcenter/.test(key) || /work center/.test(label)) return 'work_centers';
+  if(/operator/.test(key) || /operator/.test(label)) return 'operators';
+  if(/capa/.test(key) || /capa/.test(label)) return 'capas';
+  if(/warehouse/.test(key) || /warehouse/.test(label)) return 'warehouse_locations';
+  if(/incoterm/.test(key) || /incoterm/.test(label)) return 'incoterms';
+  if(/payment_term|payment/.test(key) || /payment term/.test(label)) return 'payment_terms';
+  if(/shipping/.test(key) || /shipping/.test(label)) return 'shipping_methods';
+  if(/defect/.test(key) || /defect/.test(label)) return 'defect_catalog';
+  if(/issued_by|approved_by|reviewed_by|prepared_by|verified_by|owner_user/.test(key)) return 'company_users';
+  return '';
+}
+
+function normalizeSchemaLookups(schema){
+  if(!schema || !Array.isArray(schema.fields)) return schema;
+  schema.fields = schema.fields.map(function(field){
+    if(!field || typeof field !== 'object') return field;
+    var nextField = Object.assign({}, field);
+    var source = inferLookupSource(nextField);
+    if(source){
+      nextField.lookup_source = source;
+      if(nextField.type === 'text' || nextField.type === 'email' || nextField.type === 'tel' || !nextField.type){
+        nextField.type = 'lookup';
+      }
+      if(source === 'company_users' && nextField.allow_current_user === undefined){
+        nextField.allow_current_user = true;
+      }
+    }
+    return nextField;
+  });
+  return schema;
+}
+
 function cancelFormCreation(){
   var workflowState = String((state.entry && state.entry.workflow_state) || '').trim().toLowerCase();
   if(state.editOrigin === 'controlled_edit' || ['submitted','approved','closed','received'].indexOf(workflowState) >= 0){
@@ -1178,7 +1283,7 @@ window.openEqmsForm = function(formCode, container, options){
   var runtime = container.querySelector('.eqms-runtime');
 
   Promise.all([loadSchema(formCode), ensureMasterData(), ensureCompanyDirectory()]).then(function(results){
-    var schema = results[0];
+    var schema = normalizeSchemaLookups(results[0]);
     if(!schema){
       runtime.innerHTML = '<div class="eqms-empty">Không tìm thấy schema cho form này.</div>';
       return;
@@ -1208,10 +1313,10 @@ window.openEqmsForm = function(formCode, container, options){
     return schema;
   }).then(function(schema){
     if(!schema) return;
-    state.schema = schema;
+    state.schema = normalizeSchemaLookups(schema);
 
-    if(standaloneRuntimePath(formCode, schema)){
-      renderStandaloneRuntime(runtime, schema, options);
+    if(standaloneRuntimePath(formCode, state.schema)){
+      renderStandaloneRuntime(runtime, state.schema, options);
       return null;
     }
 

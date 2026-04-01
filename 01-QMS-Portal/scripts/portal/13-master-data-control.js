@@ -11,6 +11,7 @@ var _mdCache = null;
 var _mdPromise = null;
 var _mdState = {
   entity: 'customers',
+  entitySearch: '',
   search: '',
   selectedId: '',
   draft: null
@@ -158,7 +159,7 @@ var ENTITY_CONFIG = {
     emptyVi: 'Chưa có alarm catalog nào.',
     listColumns: [
       { key:'alarm_code', label:'Alarm code' },
-      { key:'title_vi', label:'Tiêu đề' },
+      { key:'title', label:'Alarm Title' },
       { key:'severity_default', label:'Severity' }
     ],
     fields: [
@@ -187,6 +188,7 @@ var ENTITY_CONFIG = {
     listColumns: [
       { key:'playbook_id', label:'Playbook ID' },
       { key:'alarm_code', label:'Alarm code' },
+      { key:'title', label:'Playbook Title' },
       { key:'status', label:'Trạng thái' }
     ],
     fields: [
@@ -325,7 +327,7 @@ var ENTITY_CONFIG = {
     emptyVi: 'Chưa có mã lý do downtime nào.',
     listColumns: [
       { key:'reason_code', label:'Mã lý do' },
-      { key:'reason_name_vi', label:'Tên tiếng Việt' },
+      { key:'reason_name', label:'Reason Name' },
       { key:'status', label:'Trạng thái' }
     ],
     fields: [
@@ -347,7 +349,7 @@ var ENTITY_CONFIG = {
     emptyVi: 'Chưa có mã khôi phục downtime nào.',
     listColumns: [
       { key:'resolution_code', label:'Mã khôi phục' },
-      { key:'resolution_name_vi', label:'Tên tiếng Việt' },
+      { key:'resolution_name', label:'Resolution Name' },
       { key:'status', label:'Trạng thái' }
     ],
     fields: [
@@ -358,6 +360,376 @@ var ENTITY_CONFIG = {
       { key:'status', type:'select', required:true, label:'Trạng thái', options:['active','inactive'] }
     ]
   }
+};
+
+Object.assign(ENTITY_CONFIG, {
+  customer_sites: {
+    key: 'site_id',
+    labelVi: 'Site khách hàng',
+    labelEn: 'Customer Sites',
+    emptyVi: 'Chưa có customer site nào.',
+    listColumns: [
+      { key:'site_id', label:'Site ID' },
+      { key:'site_name', label:'Site Name' },
+      { key:'status', label:'Status' }
+    ],
+    fields: [
+      { key:'site_id', type:'text', required:true, label:'Site ID' },
+      { key:'customer_id', type:'lookup', entity:'customers', required:true, label:'Customer' },
+      { key:'site_name', type:'text', required:true, label:'Site Name' },
+      { key:'country_code', type:'text', label:'Country Code' },
+      { key:'default_incoterm_code', type:'lookup', entity:'incoterms', label:'Default Incoterm' },
+      { key:'default_shipping_method_id', type:'lookup', entity:'shipping_methods', label:'Default Shipping Method' },
+      { key:'default_payment_term_code', type:'lookup', entity:'payment_terms', label:'Default Payment Term' },
+      { key:'certificate_of_conformance_required', type:'select', label:'Certificate of Conformance Required', options:['true','false'] },
+      { key:'certificate_of_analysis_required', type:'select', label:'Certificate of Analysis Required', options:['true','false'] },
+      { key:'export_control_required', type:'select', label:'Export Control Required', options:['true','false'] },
+      { key:'packing_spec_code', type:'text', label:'Packing Spec Code' },
+      { key:'label_spec_code', type:'text', label:'Label Spec Code' },
+      { key:'status', type:'select', required:true, label:'Status', options:['draft','active','inactive','blocked','obsolete'] }
+    ]
+  },
+  commercial_accounts: {
+    key: 'account_id',
+    labelVi: 'Tài khoản thương mại',
+    labelEn: 'Commercial Accounts',
+    emptyVi: 'Chưa có commercial account nào.',
+    listColumns: [
+      { key:'account_id', label:'Account ID' },
+      { key:'customer_id', label:'Customer' },
+      { key:'status', label:'Status' }
+    ],
+    fields: [
+      { key:'account_id', type:'text', required:true, label:'Account ID' },
+      { key:'customer_id', type:'lookup', entity:'customers', required:true, label:'Customer' },
+      { key:'account_owner', type:'lookup', entity:'operators', label:'Account Owner' },
+      { key:'order_coordinator_role', type:'text', label:'Order Coordinator Role' },
+      { key:'promise_policy_id', type:'lookup', entity:'promise_policies', label:'Promise Policy' },
+      { key:'currency_code', type:'text', label:'Currency Code' },
+      { key:'status', type:'select', required:true, label:'Status', options:['draft','active','inactive','blocked','obsolete'] }
+    ]
+  },
+  incoterms: {
+    key: 'incoterm_code',
+    labelVi: 'Incoterm',
+    labelEn: 'Incoterms',
+    emptyVi: 'Chưa có incoterm nào.',
+    listColumns: [
+      { key:'incoterm_code', label:'Code' },
+      { key:'incoterm_name', label:'Name' },
+      { key:'status', label:'Status' }
+    ],
+    fields: [
+      { key:'incoterm_code', type:'text', required:true, label:'Incoterm Code' },
+      { key:'incoterm_name', type:'text', required:true, label:'Incoterm Name' },
+      { key:'status', type:'select', required:true, label:'Status', options:['active','inactive','obsolete'] }
+    ]
+  },
+  payment_terms: {
+    key: 'payment_term_code',
+    labelVi: 'Điều khoản thanh toán',
+    labelEn: 'Payment Terms',
+    emptyVi: 'Chưa có payment term nào.',
+    listColumns: [
+      { key:'payment_term_code', label:'Code' },
+      { key:'payment_term_name', label:'Name' },
+      { key:'status', label:'Status' }
+    ],
+    fields: [
+      { key:'payment_term_code', type:'text', required:true, label:'Payment Term Code' },
+      { key:'payment_term_name', type:'text', required:true, label:'Payment Term Name' },
+      { key:'status', type:'select', required:true, label:'Status', options:['active','inactive','obsolete'] }
+    ]
+  },
+  shipping_methods: {
+    key: 'shipping_method_id',
+    labelVi: 'Phương thức giao hàng',
+    labelEn: 'Shipping Methods',
+    emptyVi: 'Chưa có shipping method nào.',
+    listColumns: [
+      { key:'shipping_method_id', label:'Method ID' },
+      { key:'shipping_method_name', label:'Method Name' },
+      { key:'status', label:'Status' }
+    ],
+    fields: [
+      { key:'shipping_method_id', type:'text', required:true, label:'Shipping Method ID' },
+      { key:'shipping_method_name', type:'text', required:true, label:'Shipping Method Name' },
+      { key:'mode', type:'select', label:'Mode', options:['air','sea','ground','courier','pickup'] },
+      { key:'status', type:'select', required:true, label:'Status', options:['active','inactive','obsolete'] }
+    ]
+  },
+  promise_policies: {
+    key: 'promise_policy_id',
+    labelVi: 'Chính sách cam kết',
+    labelEn: 'Promise Policies',
+    emptyVi: 'Chưa có promise policy nào.',
+    listColumns: [
+      { key:'promise_policy_id', label:'Policy ID' },
+      { key:'policy_name', label:'Policy Name' },
+      { key:'status', label:'Status' }
+    ],
+    fields: [
+      { key:'promise_policy_id', type:'text', required:true, label:'Promise Policy ID' },
+      { key:'policy_name', type:'text', required:true, label:'Policy Name' },
+      { key:'target_otd_percent', type:'number', label:'Target OTD %' },
+      { key:'review_frequency', type:'select', label:'Review Frequency', options:['daily','weekly','monthly','quarterly'] },
+      { key:'status', type:'select', required:true, label:'Status', options:['active','inactive','obsolete'] }
+    ]
+  },
+  routing_library: {
+    key: 'routing_id',
+    labelVi: 'Routing',
+    labelEn: 'Routing Library',
+    emptyVi: 'Chưa có routing nào.',
+    listColumns: [
+      { key:'routing_id', label:'Routing ID' },
+      { key:'part_number', label:'Part' },
+      { key:'status', label:'Status' }
+    ],
+    fields: [
+      { key:'routing_id', type:'text', required:true, label:'Routing ID' },
+      { key:'part_number', type:'lookup', entity:'parts', required:true, label:'Part Number' },
+      { key:'part_revision', type:'text', required:true, label:'Part Revision' },
+      { key:'routing_name', type:'text', required:true, label:'Routing Name' },
+      { key:'work_center_path', type:'text', label:'Work Center Path' },
+      { key:'status', type:'select', required:true, label:'Status', options:['draft','released','superseded','obsolete'] }
+    ]
+  },
+  bom_library: {
+    key: 'bom_id',
+    labelVi: 'BOM',
+    labelEn: 'BOM Library',
+    emptyVi: 'Chưa có BOM nào.',
+    listColumns: [
+      { key:'bom_id', label:'BOM ID' },
+      { key:'part_number', label:'Part' },
+      { key:'status', label:'Status' }
+    ],
+    fields: [
+      { key:'bom_id', type:'text', required:true, label:'BOM ID' },
+      { key:'part_number', type:'lookup', entity:'parts', required:true, label:'Part Number' },
+      { key:'part_revision', type:'text', required:true, label:'Part Revision' },
+      { key:'bom_name', type:'text', required:true, label:'BOM Name' },
+      { key:'status', type:'select', required:true, label:'Status', options:['draft','released','superseded','obsolete'] }
+    ]
+  },
+  control_plans: {
+    key: 'control_plan_id',
+    labelVi: 'Kế hoạch kiểm soát',
+    labelEn: 'Control Plans',
+    emptyVi: 'Chưa có control plan nào.',
+    listColumns: [
+      { key:'control_plan_id', label:'Control Plan ID' },
+      { key:'part_number', label:'Part' },
+      { key:'status', label:'Status' }
+    ],
+    fields: [
+      { key:'control_plan_id', type:'text', required:true, label:'Control Plan ID' },
+      { key:'part_number', type:'lookup', entity:'parts', required:true, label:'Part Number' },
+      { key:'part_revision', type:'text', required:true, label:'Part Revision' },
+      { key:'control_plan_name', type:'text', required:true, label:'Control Plan Name' },
+      { key:'status', type:'select', required:true, label:'Status', options:['draft','released','superseded','obsolete'] }
+    ]
+  },
+  inspection_plans: {
+    key: 'inspection_plan_id',
+    labelVi: 'Kế hoạch kiểm tra',
+    labelEn: 'Inspection Plans',
+    emptyVi: 'Chưa có inspection plan nào.',
+    listColumns: [
+      { key:'inspection_plan_id', label:'Inspection Plan ID' },
+      { key:'part_number', label:'Part' },
+      { key:'status', label:'Status' }
+    ],
+    fields: [
+      { key:'inspection_plan_id', type:'text', required:true, label:'Inspection Plan ID' },
+      { key:'part_number', type:'lookup', entity:'parts', required:true, label:'Part Number' },
+      { key:'part_revision', type:'text', required:true, label:'Part Revision' },
+      { key:'inspection_plan_name', type:'text', required:true, label:'Inspection Plan Name' },
+      { key:'status', type:'select', required:true, label:'Status', options:['draft','released','superseded','obsolete'] }
+    ]
+  },
+  traveler_templates: {
+    key: 'traveler_template_id',
+    labelVi: 'Mẫu traveler',
+    labelEn: 'Traveler Templates',
+    emptyVi: 'Chưa có traveler template nào.',
+    listColumns: [
+      { key:'traveler_template_id', label:'Traveler Template ID' },
+      { key:'part_number', label:'Part' },
+      { key:'status', label:'Status' }
+    ],
+    fields: [
+      { key:'traveler_template_id', type:'text', required:true, label:'Traveler Template ID' },
+      { key:'part_number', type:'lookup', entity:'parts', required:true, label:'Part Number' },
+      { key:'part_revision', type:'text', required:true, label:'Part Revision' },
+      { key:'traveler_template_name', type:'text', required:true, label:'Traveler Template Name' },
+      { key:'status', type:'select', required:true, label:'Status', options:['draft','released','superseded','obsolete'] }
+    ]
+  },
+  quality_gate_profiles: {
+    key: 'quality_gate_profile_id',
+    labelVi: 'Hồ sơ quality gate',
+    labelEn: 'Quality Gate Profiles',
+    emptyVi: 'Chưa có quality gate profile nào.',
+    listColumns: [
+      { key:'quality_gate_profile_id', label:'Profile ID' },
+      { key:'profile_name', label:'Profile Name' },
+      { key:'status', label:'Status' }
+    ],
+    fields: [
+      { key:'quality_gate_profile_id', type:'text', required:true, label:'Quality Gate Profile ID' },
+      { key:'profile_name', type:'text', required:true, label:'Profile Name' },
+      { key:'required_gates', type:'textarea', label:'Required Gates', helper:'Nhập danh sách gate, phân tách bằng dấu phẩy hoặc mỗi gate một dòng.' },
+      { key:'status', type:'select', required:true, label:'Status', options:['active','inactive','obsolete'] }
+    ]
+  },
+  launch_gate_templates: {
+    key: 'gate_template_id',
+    labelVi: 'Mẫu launch gate',
+    labelEn: 'Launch Gate Templates',
+    emptyVi: 'Chưa có launch gate template nào.',
+    listColumns: [
+      { key:'gate_template_id', label:'Gate Template ID' },
+      { key:'work_center_id', label:'Work Center' },
+      { key:'status', label:'Status' }
+    ],
+    fields: [
+      { key:'gate_template_id', type:'text', required:true, label:'Gate Template ID' },
+      { key:'work_center_id', type:'lookup', entity:'work_centers', required:true, label:'Work Center' },
+      { key:'gate_name', type:'text', required:true, label:'Gate Name' },
+      { key:'required_gates', type:'textarea', label:'Required Gates', helper:'Nhập danh sách gate, phân tách bằng dấu phẩy hoặc mỗi gate một dòng.' },
+      { key:'status', type:'select', required:true, label:'Status', options:['active','inactive','obsolete'] }
+    ]
+  },
+  customer_item_approvals: {
+    key: 'approval_id',
+    labelVi: 'Phê duyệt item khách hàng',
+    labelEn: 'Customer Item Approvals',
+    emptyVi: 'Chưa có customer item approval nào.',
+    listColumns: [
+      { key:'approval_id', label:'Approval ID' },
+      { key:'customer_id', label:'Customer' },
+      { key:'status', label:'Status' }
+    ],
+    fields: [
+      { key:'approval_id', type:'text', required:true, label:'Approval ID' },
+      { key:'customer_id', type:'lookup', entity:'customers', required:true, label:'Customer' },
+      { key:'part_number', type:'lookup', entity:'parts', required:true, label:'Part Number' },
+      { key:'part_revision', type:'text', required:true, label:'Part Revision' },
+      { key:'approved_for_production', type:'select', required:true, label:'Approved for Production', options:['true','false'] },
+      { key:'status', type:'select', required:true, label:'Status', options:['active','inactive','obsolete'] }
+    ]
+  },
+  supplier_process_approvals: {
+    key: 'approval_id',
+    labelVi: 'Phê duyệt quy trình NCC',
+    labelEn: 'Supplier Process Approvals',
+    emptyVi: 'Chưa có supplier process approval nào.',
+    listColumns: [
+      { key:'approval_id', label:'Approval ID' },
+      { key:'supplier_id', label:'Supplier' },
+      { key:'status', label:'Status' }
+    ],
+    fields: [
+      { key:'approval_id', type:'text', required:true, label:'Approval ID' },
+      { key:'supplier_id', type:'lookup', entity:'suppliers', required:true, label:'Supplier' },
+      { key:'customer_id', type:'lookup', entity:'customers', required:true, label:'Customer' },
+      { key:'special_process', type:'text', required:true, label:'Special Process' },
+      { key:'status', type:'select', required:true, label:'Status', options:['approved','conditional','blocked','inactive'] }
+    ]
+  },
+  warehouse_locations: {
+    key: 'warehouse_id',
+    labelVi: 'Kho / vị trí kho',
+    labelEn: 'Warehouse Locations',
+    emptyVi: 'Chưa có warehouse location nào.',
+    listColumns: [
+      { key:'warehouse_id', label:'Warehouse ID' },
+      { key:'warehouse_name', label:'Warehouse Name' },
+      { key:'status', label:'Status' }
+    ],
+    fields: [
+      { key:'warehouse_id', type:'text', required:true, label:'Warehouse ID' },
+      { key:'warehouse_name', type:'text', required:true, label:'Warehouse Name' },
+      { key:'warehouse_type', type:'select', label:'Warehouse Type', options:['rm','wip','fg','quarantine','tooling','consumable'] },
+      { key:'status', type:'select', required:true, label:'Status', options:['draft','active','inactive','obsolete'] }
+    ]
+  },
+  defect_catalog: {
+    key: 'defect_code',
+    labelVi: 'Danh mục lỗi',
+    labelEn: 'Defect Catalog',
+    emptyVi: 'Chưa có defect catalog nào.',
+    listColumns: [
+      { key:'defect_code', label:'Defect Code' },
+      { key:'defect_name', label:'Defect Name' },
+      { key:'status', label:'Status' }
+    ],
+    fields: [
+      { key:'defect_code', type:'text', required:true, label:'Defect Code' },
+      { key:'defect_name', type:'text', required:true, label:'Defect Name' },
+      { key:'defect_name_vi', type:'text', label:'Tên tiếng Việt' },
+      { key:'defect_group', type:'select', label:'Defect Group', options:['dimensional','surface','packaging','documentation','material','traceability','visual','other'] },
+      { key:'severity_default', type:'select', label:'Default Severity', options:['minor','major','critical'] },
+      { key:'status', type:'select', required:true, label:'Status', options:['draft','active','inactive','obsolete'] }
+    ]
+  }
+});
+
+var ENTITY_LABEL_FIELD = {
+  customers: 'customer_name',
+  customer_sites: 'site_name',
+  commercial_accounts: 'account_id',
+  suppliers: 'supplier_name',
+  parts: 'part_number',
+  revisions: 'revision_id',
+  incoterms: 'incoterm_name',
+  payment_terms: 'payment_term_name',
+  shipping_methods: 'shipping_method_name',
+  promise_policies: 'policy_name',
+  routing_library: 'routing_name',
+  bom_library: 'bom_name',
+  control_plans: 'control_plan_name',
+  inspection_plans: 'inspection_plan_name',
+  traveler_templates: 'traveler_template_name',
+  quality_gate_profiles: 'profile_name',
+  launch_gate_templates: 'gate_name',
+  customer_item_approvals: 'approval_id',
+  supplier_process_approvals: 'approval_id',
+  warehouse_locations: 'warehouse_name',
+  nc_program_releases: 'release_title',
+  capas: 'title',
+  work_centers: 'work_center_name',
+  machines: 'machine_name',
+  operators: 'operator_name',
+  tooling_assets: 'tool_name',
+  downtime_reason_codes: 'reason_name',
+  downtime_resolution_codes: 'resolution_name',
+  mes_connectivity_adapters: 'adapter_name',
+  mes_alarm_catalog: 'title',
+  mes_alarm_playbooks: 'title',
+  defect_catalog: 'defect_name'
+};
+
+var ENTITY_DEFAULTS = {
+  customer_sites: { status:'active', certificate_of_conformance_required:'true', certificate_of_analysis_required:'true', export_control_required:'false' },
+  commercial_accounts: { status:'active', currency_code:'USD' },
+  incoterms: { status:'active' },
+  payment_terms: { status:'active' },
+  shipping_methods: { status:'active', mode:'air' },
+  promise_policies: { status:'active', review_frequency:'weekly' },
+  routing_library: { status:'released' },
+  bom_library: { status:'released' },
+  control_plans: { status:'released' },
+  inspection_plans: { status:'released' },
+  traveler_templates: { status:'released' },
+  quality_gate_profiles: { status:'active' },
+  launch_gate_templates: { status:'active' },
+  customer_item_approvals: { status:'active', approved_for_production:'true' },
+  supplier_process_approvals: { status:'approved' },
+  warehouse_locations: { status:'active' },
+  defect_catalog: { status:'active', severity_default:'major' }
 };
 
 function _t(vi, en){ return (typeof lang !== 'undefined' && lang === 'en') ? en : vi; }
@@ -384,8 +756,8 @@ function _injectStyles(){
     '.mdc-header{display:flex;align-items:flex-end;justify-content:space-between;padding:24px 28px 18px;background:linear-gradient(135deg,#0c2d48 0%,#15466f 58%,#1d5e96 100%);color:#fff}',
     '.mdc-title{font-size:1.5rem;font-weight:700;letter-spacing:.01em}.mdc-subtitle{font-size:.9rem;color:rgba(255,255,255,.76);margin-top:4px}.mdc-close{border:none;background:rgba(255,255,255,.08);color:#fff;width:42px;height:42px;border-radius:12px;cursor:pointer;font-size:18px}',
     '.mdc-body{display:grid;grid-template-columns:220px minmax(0,1fr) 360px;min-height:0}.mdc-rail{border-right:1px solid #e2e8f0;background:#f8fafc;padding:18px 14px 18px 18px;overflow:auto}.mdc-list{padding:20px 22px;overflow:auto;background:#fff}.mdc-editor{border-left:1px solid #e2e8f0;background:#fcfdff;display:flex;flex-direction:column;min-height:0}',
-    '.mdc-rail-title{font-size:.73rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#64748b;margin-bottom:14px}.mdc-entity-btn{width:100%;text-align:left;border:none;background:transparent;border-radius:16px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all .16s ease;color:#1e293b}.mdc-entity-btn:hover{background:#eef4fb}.mdc-entity-btn.active{background:#e8f1fb;box-shadow:inset 0 0 0 1px rgba(21,101,192,.16)}.mdc-entity-name{display:block;font-weight:700;font-size:.95rem}.mdc-entity-meta{display:block;font-size:.76rem;color:#64748b;margin-top:4px}',
-    '.mdc-toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px}.mdc-search{flex:1;max-width:340px;height:42px;border:1px solid #d9e2ec;border-radius:14px;padding:0 14px;background:#fff}.mdc-search:focus,.mdc-input:focus,.mdc-select:focus,.mdc-textarea:focus{outline:none;border-color:#1565c0;box-shadow:0 0 0 3px rgba(21,101,192,.12)}',
+    '.mdc-rail-title{font-size:.73rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#64748b;margin-bottom:14px}.mdc-entity-search{width:100%;height:40px;border:1px solid #d9e2ec;border-radius:12px;padding:0 12px;background:#fff;margin-bottom:14px}.mdc-entity-btn{width:100%;text-align:left;border:none;background:transparent;border-radius:16px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all .16s ease;color:#1e293b}.mdc-entity-btn:hover{background:#eef4fb}.mdc-entity-btn.active{background:#e8f1fb;box-shadow:inset 0 0 0 1px rgba(21,101,192,.16)}.mdc-entity-name{display:block;font-weight:700;font-size:.95rem}.mdc-entity-meta{display:block;font-size:.76rem;color:#64748b;margin-top:4px}',
+    '.mdc-toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px}.mdc-search{flex:1;max-width:340px;height:42px;border:1px solid #d9e2ec;border-radius:14px;padding:0 14px;background:#fff}.mdc-search:focus,.mdc-input:focus,.mdc-select:focus,.mdc-textarea:focus,.mdc-entity-search:focus{outline:none;border-color:#1565c0;box-shadow:0 0 0 3px rgba(21,101,192,.12)}',
     '.mdc-btn{height:42px;border:none;border-radius:14px;padding:0 16px;cursor:pointer;font-weight:700}.mdc-btn-primary{background:#1565c0;color:#fff}.mdc-btn-ghost{background:#eef2f7;color:#334155}',
     '.mdc-grid{border:1px solid #e2e8f0;border-radius:18px;overflow:hidden}.mdc-grid-head,.mdc-grid-row{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.4fr) minmax(0,1fr);align-items:center}.mdc-grid-head{background:#f8fafc;font-size:.73rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#64748b}.mdc-grid-head>div,.mdc-grid-row>div{padding:12px 14px;border-bottom:1px solid #edf2f7;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mdc-grid-row{cursor:pointer;font-size:.9rem}.mdc-grid-row:hover{background:#f8fbff}.mdc-grid-row.active{background:#eef5ff}.mdc-empty{padding:26px 18px;color:#64748b;font-size:.92rem}',
     '.mdc-editor-head{padding:20px 22px 12px;border-bottom:1px solid #e2e8f0}.mdc-editor-title{font-size:1rem;font-weight:800;color:#0f172a}.mdc-editor-sub{font-size:.82rem;color:#64748b;margin-top:4px}.mdc-editor-body{padding:18px 22px 24px;overflow:auto}',
@@ -403,6 +775,8 @@ function _matchesSearch(item, query){ if(!query) return true; var hay = Object.k
 
 function _optionLabel(entity, row){
   if(!row) return '';
+  var configured = ENTITY_LABEL_FIELD[entity];
+  if(configured && row[configured]) return row[configured];
   if(entity === 'customers') return row.customer_name || row.customer_id || '';
   if(entity === 'suppliers') return row.supplier_name || row.supplier_id || '';
   if(entity === 'parts') return row.part_number || '';
@@ -419,8 +793,10 @@ function _optionLabel(entity, row){
 }
 
 function _lookupOptions(entity){
+  var cfg = ENTITY_CONFIG[entity];
+  if(!cfg) return [];
   return _getEntityRows(entity).map(function(row){
-    var value = row[ENTITY_CONFIG[entity].key];
+    var value = row[cfg.key];
     return { value:value, label:_optionLabel(entity, row) };
   });
 }
@@ -454,6 +830,9 @@ function _defaultDraft(entity){
   if(entity === 'tooling_assets') { draft.status = 'active'; draft.warning_pct = '80'; draft.critical_pct = '95'; }
   if(entity === 'downtime_reason_codes') { draft.status = 'active'; draft.default_severity = 'major'; draft.planned_flag = 'no'; draft.escalation_sla_minutes = '30'; }
   if(entity === 'downtime_resolution_codes') draft.status = 'active';
+  if(ENTITY_DEFAULTS[entity]){
+    Object.keys(ENTITY_DEFAULTS[entity]).forEach(function(key){ draft[key] = ENTITY_DEFAULTS[entity][key]; });
+  }
   return draft;
 }
 
@@ -480,6 +859,12 @@ function _renderModal(){
   document.getElementById('mdc-close').onclick = _removeModal;
   overlay.addEventListener('click', function(e){ if(e.target === overlay) _removeModal(); });
   document.getElementById('mdc-search').addEventListener('input', function(e){ _mdState.search = _normalizeText(e.target.value); _renderList(); });
+  overlay.addEventListener('input', function(e){
+    if(e.target && e.target.id === 'mdc-entity-search'){
+      _mdState.entitySearch = _normalizeText(e.target.value);
+      _renderRail();
+    }
+  });
   document.getElementById('mdc-create').addEventListener('click', function(){ _mdState.selectedId = ''; _mdState.draft = _defaultDraft(_mdState.entity); _renderList(); _renderEditor(); });
   _renderRail();
   _renderList();
@@ -489,13 +874,16 @@ function _renderModal(){
 function _renderRail(){
   var rail = document.getElementById('mdc-rail');
   if(!rail) return;
-  var html = '<div class="mdc-rail-title">' + _escHtml(_t('Thực thể dữ liệu', 'Data entities')) + '</div>';
+  var html = '<div class="mdc-rail-title">' + _escHtml(_t('Thực thể dữ liệu', 'Data entities')) + '</div>' +
+    '<input type="search" class="mdc-entity-search" id="mdc-entity-search" placeholder="' + _escHtml(_t('Tìm loại dữ liệu nền...', 'Search entity types...')) + '" value="' + _escHtml(_mdState.entitySearch || '') + '">';
   Object.keys(ENTITY_CONFIG).forEach(function(entity){
     var cfg = ENTITY_CONFIG[entity];
+    var hay = _normalizeText([cfg.labelEn || '', cfg.labelVi || '', entity].join(' '));
+    if(_mdState.entitySearch && hay.indexOf(_mdState.entitySearch) < 0) return;
     var active = entity === _mdState.entity ? ' active' : '';
     html += '<button type="button" class="mdc-entity-btn' + active + '" data-entity="' + entity + '">' +
-      '<span class="mdc-entity-name">' + _escHtml(cfg.labelVi) + '</span>' +
-      '<span class="mdc-entity-meta">' + _escHtml(String(_getEntityRows(entity).length)) + ' ' + _escHtml(_t('bản ghi', 'records')) + '</span>' +
+      '<span class="mdc-entity-name">' + _escHtml(cfg.labelEn || cfg.labelVi || entity) + '</span>' +
+      '<span class="mdc-entity-meta">' + _escHtml(cfg.labelVi || '') + ' · ' + _escHtml(String(_getEntityRows(entity).length)) + ' ' + _escHtml(_t('bản ghi', 'records')) + '</span>' +
     '</button>';
   });
   rail.innerHTML = html;

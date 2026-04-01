@@ -364,7 +364,7 @@ body {
 .scar-signature-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  gap: 12px;
 }
 
 .scar-signature-card {
@@ -372,7 +372,7 @@ body {
   border: 1px dashed var(--scar-line-strong);
   border-radius: 18px;
   background: #fcfdff;
-  padding: 14px;
+  padding: 12px;
 }
 
 .scar-signature-card.signed {
@@ -385,7 +385,7 @@ body {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .scar-signature-head strong {
@@ -417,18 +417,18 @@ body {
 }
 
 .scar-signature-pad {
-  min-height: 98px;
-  margin-bottom: 10px;
+  min-height: 82px;
+  margin-bottom: 8px;
   border: 1px solid var(--scar-line);
   border-radius: 14px;
   background: #ffffff;
-  padding: 10px 12px;
+  padding: 10px;
 }
 
 .scar-signature-empty {
   display: grid;
   place-items: center;
-  min-height: 74px;
+  min-height: 54px;
   color: var(--scar-text-muted);
   font-size: 13px;
   text-align: center;
@@ -437,7 +437,7 @@ body {
 .scar-signature-meta {
   display: grid;
   gap: 4px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   font-size: 12px;
   color: var(--scar-text-muted);
   line-height: 1.6;

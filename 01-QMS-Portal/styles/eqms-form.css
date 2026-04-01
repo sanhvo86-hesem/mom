@@ -268,14 +268,14 @@
 /* ── Signature blocks ── */
 .eqms-sig-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 14px;
-  padding: 16px 18px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 14px 18px;
 }
 .eqms-sig-block {
   border: 1px dashed var(--eqms-border);
   border-radius: 10px;
-  padding: 14px;
+  padding: 12px;
   background: #fcfdff;
 }
 .eqms-sig-block.signed {
@@ -355,6 +355,10 @@
 }
 
 /* ── Responsive ── */
+@media (max-width: 1120px) {
+  .eqms-sig-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 @media (max-width: 768px) {
   .eqms-runtime { padding: 8px; }
   .eqms-runtime-shell { padding: 8px 0 18px; }

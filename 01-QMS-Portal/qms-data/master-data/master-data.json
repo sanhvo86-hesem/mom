@@ -990,6 +990,56 @@
       "lockout_release_required": false
     }
   ],
+  "defect_catalog": [
+    {
+      "defect_code": "DEF-DIM",
+      "defect_name": "Dimensional",
+      "defect_name_vi": "Sai lệch kích thước",
+      "defect_group": "dimensional",
+      "severity_default": "major",
+      "status": "active"
+    },
+    {
+      "defect_code": "DEF-SURF",
+      "defect_name": "Surface",
+      "defect_name_vi": "Lỗi bề mặt",
+      "defect_group": "surface",
+      "severity_default": "major",
+      "status": "active"
+    },
+    {
+      "defect_code": "DEF-PACK",
+      "defect_name": "Packaging",
+      "defect_name_vi": "Lỗi đóng gói",
+      "defect_group": "packaging",
+      "severity_default": "minor",
+      "status": "active"
+    },
+    {
+      "defect_code": "DEF-DOC",
+      "defect_name": "Documentation",
+      "defect_name_vi": "Lỗi tài liệu",
+      "defect_group": "documentation",
+      "severity_default": "major",
+      "status": "active"
+    },
+    {
+      "defect_code": "DEF-MAT",
+      "defect_name": "Material",
+      "defect_name_vi": "Lỗi vật liệu",
+      "defect_group": "material",
+      "severity_default": "critical",
+      "status": "active"
+    },
+    {
+      "defect_code": "DEF-TRACE",
+      "defect_name": "Traceability",
+      "defect_name_vi": "Lỗi truy xuất",
+      "defect_group": "traceability",
+      "severity_default": "critical",
+      "status": "active"
+    }
+  ],
   "tool_assemblies": [
     {
       "assembly_id": "ASM-5AX-ROUGH-001",

@@ -160,10 +160,16 @@ Each form section is a white card with these characteristics:
 ### Section Header
 
 - **Number badge:** Circular, 28px diameter, colored per section category (blue/red/amber/purple/green)
-- **Title:** 15px bold in brand color
-- **Subtitle:** Vietnamese translation, 12px gray
+- **Title:** English primary, 15px bold in brand color
+- **Subtitle:** Vietnamese explanation / guidance, 12px gray
 - **Collapse toggle:** Chevron icon on the right, rotates 90 degrees when collapsed
 - **Keyboard accessible:** Enter/Space toggles collapse state
+
+Mandatory language rule for section headers:
+
+1. Section title line must be English primary.
+2. Section subtitle/description line must be Vietnamese with full diacritics.
+3. Inline warnings, helper notes, workflow hints, empty-state notes, and validation guidance below the section title must be Vietnamese with full diacritics.
 
 ### Section Accent Colors
 
@@ -248,6 +254,9 @@ Visual alternative to plain radio buttons for categorical selections:
 - Helper text below explains the lookup behavior
 - For `lookup_source: "company_users"`, the control must include a secondary shortcut button: `Dùng người đăng nhập`
 - Person-selection fields for issuer/reviewer/approver must use company directory lookup, not free text and not workshop-only `operators`
+- Any field that references a governed ERP/MES/eQMS entity must render as a searchable droplist / governed lookup, not a free-text input
+- The governed lookup catalog must cover, at minimum: `customers`, `customer_sites`, `commercial_accounts`, `suppliers`, `parts`, `revisions`, `incoterms`, `payment_terms`, `shipping_methods`, `promise_policies`, `routing_library`, `bom_library`, `control_plans`, `inspection_plans`, `traveler_templates`, `quality_gate_profiles`, `launch_gate_templates`, `customer_item_approvals`, `supplier_process_approvals`, `warehouse_locations`, `defect_catalog`, `company_users`, `operators`, `work_centers`, `machines`, `tooling_assets`, `tool_assemblies`, `downtime_reason_codes`, `downtime_resolution_codes`, `mes_connectivity_adapters`, `mes_alarm_catalog`, `mes_alarm_playbooks`, `nc_program_releases`, `capas`
+- When the schema omits `lookup_source` but the field id or label clearly maps to a governed entity, the runtime must infer the correct `lookup_source` and render the searchable lookup automatically
 
 ### 7.11 Form Template Editing Entry Point
 
@@ -295,11 +304,11 @@ Vietnamese translation (sentence case, normal weight, lighter gray)
 
 ### Rules
 
-1. **Vietnamese is the primary display language** -- it appears directly above the input
-2. **English label** is in uppercase, semibold, `--form-label-color`
-3. **Vietnamese sublabel** uses `--form-text-xs`, `--form-text-tertiary`, sentence case
-4. Required indicator (`*`) appears on the English label line in red
-5. Section titles follow the same pattern: English title (bold) + Vietnamese subtitle (muted)
+1. **English label** is the primary line for the field label.
+2. **Vietnamese sublabel** uses `--form-text-xs`, `--form-text-tertiary`, sentence case, and must keep full diacritics.
+3. Required indicator (`*`) appears on the English label line in red.
+4. Section titles follow the same pattern: English title (bold) + Vietnamese subtitle (muted).
+5. Helper text, placeholders, warnings, validation messages, and runtime notes are written in Vietnamese with full diacritics.
 
 ---
 
@@ -646,12 +655,16 @@ Avoid: Monospace fonts without Vietnamese support, custom fonts not tested with 
 
 ### 21.5 Bilingual Label Convention
 
-Vietnamese is the PRIMARY language (displayed larger/bolder). English is SECONDARY (smaller, gray).
+For eQMS forms:
+
+- English is the PRIMARY line for labels and section titles.
+- Vietnamese is the SECONDARY explanation line below.
+- Helper text, placeholders, notes, warnings, and workflow hints are Vietnamese with full diacritics.
 
 ```html
 <label class="qf-label">
+  <span class="qf-label-en">DEFECT DESCRIPTION</span>
   <span class="qf-label-vi">Mô tả khuyết tật</span>
-  <span class="qf-label-en">Defect Description</span>
 </label>
 ```
 

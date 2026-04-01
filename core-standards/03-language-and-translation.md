@@ -42,8 +42,8 @@ Mọi biểu mẫu eQMS online form (FRM-xxx-SUFFIX) hiển thị **song ngữ**
 | Thành phần | Ngôn ngữ chính | Ngôn ngữ phụ | Ví dụ |
 |------------|---------------|-------------|-------|
 | **Field label** | English (in hoa, bold) | Tiếng Việt có dấu (italic, nhỏ) | `SCAR DATE` *Ngày phát hành SCAR* |
-| **Section title** | Tiếng Việt có dấu | — | `Nhận diện hồ sơ và nhà cung cấp` |
-| **Section description** | Tiếng Việt có dấu | — | `Khóa đủ ngữ cảnh phát hành...` |
+| **Section title** | English chính | Tiếng Việt diễn giải bên dưới | `Record Identification & Supplier` + `Khóa đủ ngữ cảnh phát hành...` |
+| **Section description / note** | Tiếng Việt có dấu | — | `Khóa đủ ngữ cảnh phát hành...` |
 | **Placeholder** | Tiếng Việt có dấu | — | `Chọn người phát hành SCAR` |
 | **Helper text** | Tiếng Việt có dấu | — | `Có thể gõ tên hoặc chọn từ danh sách` |
 | **Dropdown options** | Song ngữ Việt (English) | — | `Nghiêm trọng (Critical)` |
@@ -63,6 +63,7 @@ Mọi biểu mẫu eQMS online form (FRM-xxx-SUFFIX) hiển thị **song ngữ**
 - Với mọi trường `company_users`, frontend PHẢI có nút tắt `Dùng người đăng nhập` để người dùng áp dụng nhanh chính tài khoản đang đăng nhập
 - Với chữ ký điện tử, CTA mặc định PHẢI nêu rõ người ký là tài khoản hiện tại, ví dụ `Người đăng nhập ký`
 - Header form tuân thủ core standard 23 (`.doc-name` = English SSOT, `.sub-vn` = Vietnamese)
+- Section title của eQMS form PHẢI là English chính; mọi subtitle, explanation, helper, placeholder, warning, note, workflow hint phía dưới PHẢI là tiếng Việt có dấu
 - Quy tắc áp dụng cho `10-eqms-form-runtime.js`, PDF export, và mọi form renderer tương lai
 
 ### A6. Ngôn ngữ thực thể dữ liệu nền (Master Data Entities)
@@ -75,17 +76,43 @@ Mọi biểu mẫu eQMS online form (FRM-xxx-SUFFIX) hiển thị **song ngữ**
 
 | Bảng | lookup_source | Nội dung |
 |------|--------------|----------|
-| Nhà cung cấp | `suppliers` | supplier_id, supplier_name, contact_name, contact_email |
-| Khách hàng | `customers` | customer_id, customer_name |
-| Chi tiết + Revision | `parts` | part_number, revision, part_description |
-| Nhân sự | `operators` | operator_id, operator_name, role |
-| Danh bạ công ty | `company_users` | username, name, role, dept, title |
-| Trung tâm gia công | `work_centers` | work_center_id, work_center_name |
-| Máy | `machines` | machine_id, machine_name, machine_type |
-| Dụng cụ | `tooling_assets` | tool_id, tool_name, tool_type |
-| Chương trình NC | `nc_program_releases` | program_id, release_title |
+| Customers | `customers` | customer_id, customer_name, customer_type |
+| Customer Sites | `customer_sites` | site_id, customer_id, site_name, country_code |
+| Commercial Accounts | `commercial_accounts` | account_id, customer_id, promise_policy_id |
+| Suppliers | `suppliers` | supplier_id, supplier_name, contact_name, contact_email |
+| Parts | `parts` | part_number, revision, part_description |
+| Revisions | `revisions` | revision_id, part_number, revision |
+| Incoterms | `incoterms` | incoterm_code, incoterm_name |
+| Payment Terms | `payment_terms` | payment_term_code, payment_term_name |
+| Shipping Methods | `shipping_methods` | shipping_method_id, shipping_method_name, mode |
+| Promise Policies | `promise_policies` | promise_policy_id, policy_name, target_otd_percent |
+| Routing Library | `routing_library` | routing_id, routing_name, part_number, part_revision |
+| BOM Library | `bom_library` | bom_id, bom_name, part_number, part_revision |
+| Control Plans | `control_plans` | control_plan_id, control_plan_name, part_number, part_revision |
+| Inspection Plans | `inspection_plans` | inspection_plan_id, inspection_plan_name |
+| Traveler Templates | `traveler_templates` | traveler_template_id, traveler_template_name |
+| Quality Gate Profiles | `quality_gate_profiles` | quality_gate_profile_id, profile_name |
+| Launch Gate Templates | `launch_gate_templates` | gate_template_id, gate_name, work_center_id |
+| Customer Item Approvals | `customer_item_approvals` | approval_id, customer_id, part_number |
+| Supplier Process Approvals | `supplier_process_approvals` | approval_id, supplier_id, special_process |
+| Warehouse Locations | `warehouse_locations` | warehouse_id, warehouse_name, warehouse_type |
+| Defect Catalog | `defect_catalog` | defect_code, defect_name, defect_group, severity_default |
+| Company Directory | `company_users` | username, name, role, dept, title |
+| Operators | `operators` | operator_id, operator_name, role |
+| Work Centers | `work_centers` | work_center_id, work_center_name, department |
+| Machines | `machines` | machine_id, machine_name, machine_type |
+| Tooling Assets | `tooling_assets` | tool_id, tool_name, tool_type |
+| Tool Assemblies | `tool_assemblies` | assembly_id, parent_tool_id, component_tool_id |
+| Downtime Reason Codes | `downtime_reason_codes` | reason_code, reason_name, category |
+| Downtime Resolution Codes | `downtime_resolution_codes` | resolution_code, resolution_name, resolution_group |
+| MES Connectivity Adapters | `mes_connectivity_adapters` | adapter_id, machine_id, adapter_type |
+| MES Alarm Catalog | `mes_alarm_catalog` | alarm_code, title, severity_default |
+| MES Alarm Playbooks | `mes_alarm_playbooks` | playbook_id, alarm_code, response_steps |
+| NC Program Releases | `nc_program_releases` | program_id, release_title, operation_number |
+| CAPA | `capas` | capa_number, title, status |
 
 - Khi tạo form mới, kiểm tra từng field: nếu field_id hoặc label match với bất kỳ bảng nào ở trên, bắt buộc dùng lookup
+- Lookup bắt buộc là searchable droplist có kiểm soát; không dùng `<select>` tĩnh nếu dữ liệu có thể tăng lớn hoặc cần tìm kiếm
 
 ### A2. Quy tắc vàng
 

@@ -219,12 +219,15 @@
     },
     {
       "id": "defect_type",
-      "type": "text",
+      "type": "lookup",
+      "lookup_source": "defect_catalog",
       "label": "Defect Type",
       "label_vi": "Loại lỗi",
       "required": true,
-      "placeholder": "VD: Dimensional, Surface, Packaging, Documentation",
-      "placeholder_en": "e.g., Dimensional, Surface, Packaging, Documentation",
+      "placeholder": "Tìm và chọn loại lỗi từ danh mục lỗi chuẩn",
+      "placeholder_en": "Search and select defect type from controlled defect catalog",
+      "helper": "Loại lỗi chuẩn hoá để hỗ trợ thống kê, Pareto và liên kết CAPA/evidence.",
+      "helper_en": "Controlled defect type for analytics, Pareto and CAPA/evidence linking.",
       "audit_tracked": true
     },
     {
