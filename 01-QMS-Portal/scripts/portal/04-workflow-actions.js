@@ -43,7 +43,11 @@ function edPrepareFormTemplateClone(bodyClone){
     if(!bodyClone || !bodyClone.querySelector) return false;
     var isFormDoc = !!bodyClone.querySelector('#scarForm,[data-form-edit-root],.qf-section,.scar-record-strip');
     if(!isFormDoc) return false;
+    bodyClone.setAttribute('data-mode', 'view');
     bodyClone.querySelectorAll('#runtimeAlert,.scar-runtime-alert,[data-sign-block],[data-sign-clear],[data-workflow-action],.scar-lookup-self').forEach(function(node){
+      if(node) node.remove();
+    });
+    bodyClone.querySelectorAll('#btnPrint,#btnEdit,#btnCancel,#btnSaveDraft,#btnReset,#btnSubmit,.scar-view-btn,.scar-edit-btn').forEach(function(node){
       if(node) node.remove();
     });
     var workflowPanel = bodyClone.querySelector('#scarWorkflowPanel');
@@ -64,6 +68,9 @@ function edPrepareFormTemplateClone(bodyClone){
         '<div class="qf-actions-spacer"></div>' +
         '<button class="qf-btn primary" type="button" disabled>Đang chỉnh bố cục mẫu HTML</button>';
     }
+    try{
+      if(typeof window.edRepairMojibake === 'function') window.edRepairMojibake(bodyClone);
+    }catch(_repairErr){}
     return true;
   }catch(_err){
     return false;

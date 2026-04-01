@@ -1915,6 +1915,7 @@ function edEditQmsBlockProperties(block){
       '<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">' + (vi ? 'Há»§y' : 'Cancel') + '</button>' +
       '<button class="ed-m-ok" onclick="edApplyQmsSectionProps()">' + (vi ? 'Ãp dá»¥ng' : 'Apply') + '</button></div></div></div>';
     root._qmsBlock = block;
+    edRepairMojibake(root);
     return;
   }
   if(isField){
@@ -1969,6 +1970,7 @@ function edEditQmsBlockProperties(block){
       '<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">' + (vi ? 'Hủy' : 'Cancel') + '</button>' +
       '<button class="ed-m-ok" onclick="edApplyQmsFieldProps()">' + (vi ? 'Áp dụng' : 'Apply') + '</button></div></div></div>';
     root._qmsBlock = block;
+    edRepairMojibake(root);
     var typeSel = document.getElementById('ed-qms-field-type');
     var sourceSel = document.getElementById('ed-qms-field-source');
     if(typeSel) typeSel.addEventListener('change', edRefreshQmsFieldTypeUi);

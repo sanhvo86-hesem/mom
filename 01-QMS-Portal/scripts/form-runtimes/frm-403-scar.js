@@ -1045,6 +1045,13 @@ function hashSignaturePayload(value){
   return Promise.resolve('fallback-' + Math.abs(hash));
 }
 
+function escAttr(value){
+  return String(value == null ? '' : value)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;');
+}
+
 function openScarSignatureDialog(block){
   cleanupBrokenSignatureOverlay();
   ensureScarSignatureStyles();
@@ -1063,8 +1070,8 @@ function openScarSignatureDialog(block){
         '</header>' +
         '<div class="scar-signature-body">' +
           '<div class="scar-signature-grid">' +
-            '<div class="scar-signature-field"><label>Người ký</label><input type="text" data-sign-name value="' + esc(signerName) + '"' + (signerName ? ' readonly' : '') + '></div>' +
-            '<div class="scar-signature-field"><label>Chức vụ</label><input type="text" data-sign-role value="' + esc(signerRole) + '"' + (signerRole ? ' readonly' : '') + '></div>' +
+            '<div class="scar-signature-field"><label>Người ký</label><input type="text" data-sign-name value="' + escAttr(signerName) + '"' + (signerName ? ' readonly' : '') + '></div>' +
+            '<div class="scar-signature-field"><label>Chức vụ</label><input type="text" data-sign-role value="' + escAttr(signerRole) + '"' + (signerRole ? ' readonly' : '') + '></div>' +
           '</div>' +
           '<div class="scar-signature-field"><label>Lý do ký</label><textarea data-sign-reason placeholder="Ví dụ: Xác nhận phát hành hồ sơ SCAR để gửi xem xét.">Xác nhận bước ' + esc(meaning) + '</textarea></div>' +
           '<div class="scar-signature-preview"><strong>' + esc(signerName || 'Người ký') + '</strong><span>Chữ ký điện tử sẽ lưu tên người ký, thời điểm ký và mã băm xác thực.</span></div>' +
