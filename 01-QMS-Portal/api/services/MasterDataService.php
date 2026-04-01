@@ -514,7 +514,7 @@ final class MasterDataService
             return null;
         }
 
-        $needle = mb_strtolower(trim((string)($data[$dupField] ?? '')));
+        $needle = strtolower(trim((string)($data[$dupField] ?? '')));
         if ($needle === '') {
             return null;
         }
@@ -526,7 +526,7 @@ final class MasterDataService
             if (!is_array($row)) {
                 continue;
             }
-            $existing = mb_strtolower(trim((string)($row[$dupField] ?? '')));
+            $existing = strtolower(trim((string)($row[$dupField] ?? '')));
             if ($existing === $needle) {
                 return (string)($row[$idKey] ?? '');
             }

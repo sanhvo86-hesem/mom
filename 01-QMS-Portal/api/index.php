@@ -108,6 +108,7 @@ use HESEM\QMS\Api\Controllers\EvidenceController;
 use HESEM\QMS\Api\Controllers\FmeaController;
 use HESEM\QMS\Api\Controllers\ApqpController;
 use HESEM\QMS\Api\Controllers\DispatchController;
+use HESEM\QMS\Api\Controllers\MasterDataController;
 use HESEM\QMS\Api\Controllers\MobileController;
 use HESEM\QMS\Api\Controllers\CncProgramController;
 use HESEM\QMS\Api\Controllers\ProductPassportController;
@@ -389,6 +390,26 @@ $router->actions([
     'mobile_resolve_conflict' => [MobileController::class, 'resolveConflict'],
     'mobile_shop_overview'    => [MobileController::class, 'getShopFloorOverview'],
     'mobile_dashboard'        => [MobileController::class, 'getOperatorDashboard'],
+]);
+
+// Master Data Management
+$router->actions([
+    'master_data_list'            => [MasterDataController::class, 'listRecords'],
+    'master_data_detail'          => [MasterDataController::class, 'getDetail'],
+    'master_data_create'          => [MasterDataController::class, 'createRecord'],
+    'master_data_update'          => [MasterDataController::class, 'updateRecord'],
+    'master_data_delete'          => [MasterDataController::class, 'deleteRecord'],
+    'master_data_status'          => [MasterDataController::class, 'changeStatus'],
+    'master_data_history'         => [MasterDataController::class, 'getHistory'],
+    'master_data_entities'        => [MasterDataController::class, 'listEntities'],
+    'master_data_snapshot'        => [MasterDataController::class, 'listRecords'],
+    // Shifts
+    'shift_list'                  => [MasterDataController::class, 'listShifts'],
+    'shift_save'                  => [MasterDataController::class, 'saveShift'],
+    'shift_assignments'           => [MasterDataController::class, 'listShiftAssignments'],
+    'shift_assign'                => [MasterDataController::class, 'saveShiftAssignment'],
+    'shift_holidays'              => [MasterDataController::class, 'listHolidays'],
+    'shift_holiday_save'          => [MasterDataController::class, 'saveHoliday'],
 ]);
 
 // Production Dispatch & Shift Targets
