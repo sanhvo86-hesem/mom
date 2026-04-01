@@ -162,6 +162,14 @@ body {
   background: var(--scar-surface-soft);
 }
 
+.qf-grid > .qf-field.qf-col-span-2 {
+  grid-column: span 2;
+}
+
+.qf-grid--3 > .qf-field.qf-col-span-3 {
+  grid-column: span 3;
+}
+
 .qf-input,
 .qf-select,
 .qf-textarea {

@@ -1024,6 +1024,22 @@ mark.ed-hl-active{outline:2px solid #f59e0b}
 #editor-area .ed-qms-body .level.l1{background:#dcfce7;color:#166534}
 #editor-area .ed-qms-body .level.l2{background:#fef3c7;color:#b45309}
 #editor-area .ed-qms-body .level.l3{background:#fee2e2;color:#b91c1c}
+#editor-area .qf-section[data-qms-kind],#editor-area .qf-field[data-qms-kind],#editor-area .scar-record-strip[data-qms-kind]{position:relative}
+#editor-area .qf-section.ed-qms-selected,#editor-area .qf-field.ed-qms-selected,#editor-area .scar-record-strip.ed-qms-selected{outline:2px solid rgba(37,99,235,.45);outline-offset:4px;border-radius:14px}
+#editor-area .qf-grid > .qf-field.qf-col-span-2{grid-column:span 2}
+#editor-area .qf-grid--3 > .qf-field.qf-col-span-3{grid-column:span 3}
+.ed-form-designer-dock{position:fixed;right:24px;top:164px;z-index:240;width:220px;padding:12px;border:1px solid #dbe4ee;border-radius:16px;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);box-shadow:0 16px 40px rgba(15,23,42,.14)}
+.ed-form-dock-head{display:grid;gap:3px;margin-bottom:10px}
+.ed-form-dock-head strong{font-size:13px;color:#0f172a}
+.ed-form-dock-head span{font-size:11px;color:#64748b;line-height:1.45}
+.ed-form-dock-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.ed-form-dock-grid button{padding:8px 9px;border:1px solid #dbe4ee;border-radius:10px;background:#fff;color:#0f172a;font-size:11px;font-weight:700;cursor:pointer;text-align:left}
+.ed-form-dock-grid button:hover{border-color:#93c5fd;background:#eff6ff;color:#1d4ed8}
+.ed-qms-prop-modal{width:520px;max-width:calc(100vw - 40px)}
+.ed-qms-prop-modal label{display:block;margin-top:10px;margin-bottom:6px;font-size:12px;font-weight:700;color:#0f172a}
+.ed-qms-prop-modal input,.ed-qms-prop-modal textarea,.ed-qms-prop-modal select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px;font-size:13px;outline:none}
+.ed-qms-prop-modal textarea{resize:vertical;min-height:92px}
+.ed-qms-prop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 /* Image alignment bar */
 .ed-img-bar{position:absolute;top:-34px;left:50%;transform:translateX(-50%);display:flex;gap:2px;background:#fff;border:1px solid #d1d5db;border-radius:6px;padding:2px;box-shadow:0 4px 12px rgba(0,0,0,.12);z-index:10}
 .ed-img-bar button{width:28px;height:26px;display:flex;align-items:center;justify-content:center;border:none;background:none;border-radius:4px;cursor:pointer;font-size:12px;color:#555}

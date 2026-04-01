@@ -743,6 +743,9 @@ function renderWorkflowActions(workflowState){
   if(canReopen(workflowState)){
     actions.push('<button type="button" class="qf-btn ghost" data-workflow-action="reopen">Mở lại hồ sơ</button>');
   }
+  if(!actions.length && ['draft', 'allocated', 'rejected'].indexOf(workflowState) >= 0){
+    actions.push('<button type="button" class="qf-btn ghost" disabled>Ký phát hành rồi dùng nút Gửi SCAR ở cuối form</button>');
+  }
   if(!actions.length) actions.push('<button type="button" class="qf-btn ghost" disabled>Chưa có thao tác workflow phù hợp ở trạng thái hiện tại</button>');
   return actions.join('');
 }
@@ -867,11 +870,53 @@ function userHasSchemaRole(bucket){
   return allowed.some(function(role){ return mine.indexOf(role) >= 0 || role === 'all'; });
 }
 
+function normalizeIdentity(value){
+  return String(value == null ? '' : value)
+    .trim()
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ');
+}
+
+function currentUserMatchesField(fieldId){
+  var user = state.currentUser || {};
+  var fieldValue = normalizeIdentity(state.data && state.data[fieldId]);
+  if(!fieldValue) return false;
+  var candidates = [
+    user.username,
+    user.display_name,
+    user.name,
+    user.full_name,
+    user.employee_name,
+    user.employee_code
+  ].map(normalizeIdentity).filter(Boolean);
+  return candidates.some(function(candidate){ return candidate === fieldValue; });
+}
+
+function userIsElevatedWorkflowActor(){
+  var roles = userRoles();
+  if(roles.some(function(role){
+    return ['admin', 'system_admin', 'super_admin', 'ceo', 'qa_manager', 'quality_manager'].indexOf(role) >= 0;
+  })) return true;
+  var user = state.currentUser || {};
+  var title = normalizeIdentity(user.title || user.job_title || '');
+  return ['ceo', 'chief executive officer', 'general director', 'system admin', 'quality manager', 'qa manager'].some(function(token){
+    return title.indexOf(token) >= 0;
+  });
+}
+
+function canAuthorCurrentScar(){
+  return userHasSchemaRole('fill') || currentUserMatchesField('issued_by') || userIsElevatedWorkflowActor();
+}
+
 function canSignBlock(block){
   if(!state.loggedIn || !state.editMode || !block) return false;
-  if(block.id === 'originator') return currentWorkflowState() !== 'approved' && currentWorkflowState() !== 'closed' && userHasSchemaRole('fill');
-  if(block.id === 'qa_reviewer') return currentWorkflowState() === 'in_review' && (userHasSchemaRole('review') || userHasSchemaRole('approve'));
-  if(block.id === 'approver') return currentWorkflowState() === 'in_review' && userHasSchemaRole('approve');
+  var workflowState = currentWorkflowState();
+  if(block.id === 'originator'){
+    return ['approved', 'closed', 'voided'].indexOf(workflowState) < 0 && canAuthorCurrentScar();
+  }
+  if(block.id === 'qa_reviewer') return workflowState === 'in_review' && (userHasSchemaRole('review') || userHasSchemaRole('approve') || currentUserMatchesField('approved_by') || userIsElevatedWorkflowActor());
+  if(block.id === 'approver') return workflowState === 'in_review' && (userHasSchemaRole('approve') || currentUserMatchesField('approved_by') || userIsElevatedWorkflowActor());
   return false;
 }
 
@@ -882,19 +927,29 @@ function canClearSignature(block, signed){
 }
 
 function canSubmitForReview(workflowState){
-  return !!state.loggedIn && !!state.allocationId && ['submitted', 'received'].indexOf(workflowState) >= 0 && (userHasSchemaRole('fill') || userHasSchemaRole('review') || userHasSchemaRole('approve'));
+  return !!state.loggedIn && !!state.allocationId && ['submitted', 'received'].indexOf(workflowState) >= 0 && (canAuthorCurrentScar() || userHasSchemaRole('review') || userHasSchemaRole('approve'));
 }
 
 function canApprove(workflowState){
-  return !!state.loggedIn && !!state.allocationId && workflowState === 'in_review' && userHasSchemaRole('approve');
+  return !!state.loggedIn && !!state.allocationId && workflowState === 'in_review' && (userHasSchemaRole('approve') || currentUserMatchesField('approved_by') || userIsElevatedWorkflowActor());
 }
 
 function canReject(workflowState){
-  return !!state.loggedIn && !!state.allocationId && workflowState === 'in_review' && (userHasSchemaRole('review') || userHasSchemaRole('approve'));
+  return !!state.loggedIn && !!state.allocationId && workflowState === 'in_review' && (userHasSchemaRole('review') || userHasSchemaRole('approve') || currentUserMatchesField('approved_by') || userIsElevatedWorkflowActor());
 }
 
 function canReopen(workflowState){
-  return !!state.loggedIn && !!state.allocationId && ['approved', 'rejected', 'closed'].indexOf(workflowState) >= 0 && userHasSchemaRole('approve');
+  return !!state.loggedIn && !!state.allocationId && ['approved', 'rejected', 'closed'].indexOf(workflowState) >= 0 && (userHasSchemaRole('approve') || currentUserMatchesField('approved_by') || userIsElevatedWorkflowActor());
+}
+
+function submitReadiness(){
+  var errors = validateBeforeSubmit();
+  var missingSignatures = missingRequiredSubmitSignatures();
+  return {
+    valid: !Object.keys(errors).length && !missingSignatures.length,
+    errors: errors,
+    missingSignatures: missingSignatures
+  };
 }
 
 function captureSignature(blockId){
@@ -1067,14 +1122,18 @@ function updateMetaFootnotes(){
 }
 
 function updateActionState(){
+  var readiness = submitReadiness();
   if(els.btnSaveDraft){
     els.btnSaveDraft.disabled = !!state.busySave || !!state.busySubmit;
     els.btnSaveDraft.textContent = state.busySave ? 'Đang lưu...' : (state.loggedIn && state.allocationId ? 'Lưu nháp' : 'Lưu cục bộ');
   }
   if(els.btnReset) els.btnReset.disabled = !!state.busySave || !!state.busySubmit;
   if(els.btnSubmit){
-    els.btnSubmit.disabled = !!state.busySubmit || !state.loggedIn || !state.allocationId;
-    els.btnSubmit.textContent = state.busySubmit ? 'Đang gửi SCAR...' : 'Gửi SCAR';
+    els.btnSubmit.disabled = !!state.busySubmit || !state.loggedIn || !state.allocationId || !readiness.valid;
+    if(state.busySubmit) els.btnSubmit.textContent = 'Đang gửi SCAR...';
+    else if(readiness.missingSignatures.length) els.btnSubmit.textContent = 'Ký phát hành trước';
+    else if(Object.keys(readiness.errors).length) els.btnSubmit.textContent = 'Hoàn thiện trường bắt buộc';
+    else els.btnSubmit.textContent = 'Gửi SCAR';
   }
   var isView = !state.editMode;
   // in view mode: disable submit (already disabled if not logged in)

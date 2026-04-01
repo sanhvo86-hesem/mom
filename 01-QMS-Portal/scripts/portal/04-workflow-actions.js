@@ -286,13 +286,13 @@ function edDomRefresh(){
   const tree = document.getElementById('ed-dom-tree');
   const area = document.getElementById('editor-area');
   if(!tree || !area) return;
-  const root = area.querySelector('#docContent') || area;
+  const root = area.querySelector('#docContent') || area.querySelector('[data-form-edit-root]') || area;
   tree.innerHTML = edDomBuildTree(root, '', 0);
 }
 
 function edDomNodeFromPath(path){
   const area = document.getElementById('editor-area');
-  const root = area ? (area.querySelector('#docContent') || area) : null;
+  const root = area ? (area.querySelector('#docContent') || area.querySelector('[data-form-edit-root]') || area) : null;
   if(!root) return null;
   if(!path) return root;
   const parts = path.split('.').filter(Boolean).map(Number);
@@ -370,7 +370,7 @@ function edDomSelect(nodeEl, event){
   edDomShowProps(target);
   document.querySelectorAll('.ed-dom-highlight').forEach(el=>el.classList.remove('ed-dom-highlight'));
   const area = document.getElementById('editor-area');
-  const root = area ? (area.querySelector('#docContent') || area) : null;
+  const root = area ? (area.querySelector('#docContent') || area.querySelector('[data-form-edit-root]') || area) : null;
   if(target && target.nodeType === 1 && target !== root){
     target.classList.add('ed-dom-highlight');
     target.scrollIntoView({behavior:'smooth', block:'center'});
