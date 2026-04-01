@@ -377,8 +377,7 @@ class SupplierController extends BaseController
                 'qty_received'    => (int)($body['qty_received'] ?? 0),
                 'lot_number'      => trim((string)($body['lot_number'] ?? '')),
                 'inspection_plan' => trim((string)($body['inspection_plan'] ?? '')),
-                'created_by'      => $userId,
-            ]);
+            ], $userId);
 
             $this->auditLog('supplier_create_incoming', [
                 'inspection_id' => $inspection['id'],
@@ -705,8 +704,7 @@ class SupplierController extends BaseController
                 'po_number'   => trim((string)($body['po_number'] ?? '')),
                 'part_id'     => trim((string)($body['part_id'] ?? '')),
                 'ncr_id'      => trim((string)($body['ncr_id'] ?? '')),
-                'created_by'  => $userId,
-            ]);
+            ], $userId);
 
             $this->auditLog('supplier_create_scar', [
                 'scar_number' => $scar['number'],

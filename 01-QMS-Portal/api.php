@@ -51,6 +51,7 @@ $MASTER_DATA_FILE = $DATA_DIR . '/master-data/master-data.json';
 $MES_RUNTIME_FILE = $DATA_DIR . '/mes/mes-runtime.json';
 $EPICOR_RUNTIME_FILE = $DATA_DIR . '/erp/epicor-runtime.json';
 $EPICOR_POLICY_FILE = $CONF_DIR . '/epicor_integration_policy.json';
+$RUNTIME_DATA_LAYER_OVERRIDE_FILE = $CONF_DIR . '/runtime_data_layer_overrides.json';
 $PORTAL_CONFIG_JS_FILE = $BASE_DIR . '/scripts/portal/01-data-config.js';
 $LOG_FILE   = $DATA_DIR . '/php_error.log';
 $RL_DIR     = $DATA_DIR . '/ratelimit';
@@ -2171,14 +2172,135 @@ function order_workflow_service(): \HESEM\QMS\Services\OrderWorkflowService {
   return $service;
 }
 
+function runtime_data_layer_override_file(): string {
+  global $RUNTIME_DATA_LAYER_OVERRIDE_FILE;
+  return $RUNTIME_DATA_LAYER_OVERRIDE_FILE;
+}
+
+function runtime_data_layer_base_config(): array {
+  static $base = null;
+  if ($base === null) {
+    $base = (array)(require __DIR__ . '/database/config.php');
+  }
+  return $base;
+}
+
+function runtime_data_layer_parse_bool($value, bool $default): bool {
+  $parsed = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+  return $parsed === null ? $default : $parsed;
+}
+
+function runtime_data_layer_sanitize_overrides(array $input): array {
+  $out = [];
+  if (array_key_exists('host', $input)) {
+    $host = trim((string)$input['host']);
+    if ($host !== '') $out['host'] = substr($host, 0, 128);
+  }
+  if (array_key_exists('port', $input)) {
+    $out['port'] = max(1, min(65535, (int)$input['port']));
+  }
+  if (array_key_exists('database', $input)) {
+    $db = trim((string)$input['database']);
+    if ($db !== '') $out['database'] = substr($db, 0, 128);
+  }
+  if (array_key_exists('username', $input)) {
+    $username = trim((string)$input['username']);
+    if ($username !== '') $out['username'] = substr($username, 0, 128);
+  }
+  if (array_key_exists('schema', $input)) {
+    $schema = trim((string)$input['schema']);
+    if ($schema !== '') $out['schema'] = substr($schema, 0, 64);
+  }
+  if (array_key_exists('sslmode', $input)) {
+    $allowed = ['disable', 'allow', 'prefer', 'require', 'verify-ca', 'verify-full'];
+    $sslmode = strtolower(trim((string)$input['sslmode']));
+    if (in_array($sslmode, $allowed, true)) $out['sslmode'] = $sslmode;
+  }
+  if (array_key_exists('connect_timeout', $input)) {
+    $out['connect_timeout'] = max(1, min(60, (int)$input['connect_timeout']));
+  }
+  if (array_key_exists('statement_timeout', $input)) {
+    $out['statement_timeout'] = max(1000, min(120000, (int)$input['statement_timeout']));
+  }
+  if (array_key_exists('read_retry_count', $input)) {
+    $out['read_retry_count'] = max(1, min(10, (int)$input['read_retry_count']));
+  }
+  if (array_key_exists('read_retry_delay_ms', $input)) {
+    $out['read_retry_delay_ms'] = max(0, min(5000, (int)$input['read_retry_delay_ms']));
+  }
+  if (array_key_exists('use_postgres', $input)) {
+    $out['use_postgres'] = runtime_data_layer_parse_bool($input['use_postgres'], false);
+  }
+  if (array_key_exists('shadow_write', $input)) {
+    $out['shadow_write'] = runtime_data_layer_parse_bool($input['shadow_write'], true);
+  }
+  if (array_key_exists('json_fallback', $input)) {
+    $out['json_fallback'] = runtime_data_layer_parse_bool($input['json_fallback'], true);
+  }
+  return $out;
+}
+
+function load_runtime_data_layer_overrides(): array {
+  $file = runtime_data_layer_override_file();
+  $data = read_json_file($file);
+  if (!is_array($data)) return [];
+  $config = is_array($data['config'] ?? null) ? $data['config'] : $data;
+  return runtime_data_layer_sanitize_overrides((array)$config);
+}
+
+function load_runtime_data_layer_override_meta(): array {
+  $file = runtime_data_layer_override_file();
+  $data = read_json_file($file);
+  return is_array($data['_meta'] ?? null) ? $data['_meta'] : [];
+}
+
+function save_runtime_data_layer_overrides(array $config, string $username = 'system'): void {
+  $file = runtime_data_layer_override_file();
+  ensure_dir(dirname($file));
+  write_json_file($file, [
+    '_meta' => [
+      'updated' => now_iso(),
+      'updated_by' => trim($username) !== '' ? $username : 'system',
+      'source' => 'admin_data_layer_config_save',
+    ],
+    'config' => runtime_data_layer_sanitize_overrides($config),
+  ]);
+}
+
+function runtime_data_layer_effective_config(): array {
+  return array_replace(runtime_data_layer_base_config(), load_runtime_data_layer_overrides());
+}
+
+function runtime_data_layer_admin_projection(array $config): array {
+  return [
+    'host' => trim((string)($config['host'] ?? 'localhost')),
+    'port' => max(1, (int)($config['port'] ?? 5432)),
+    'database' => trim((string)($config['database'] ?? 'hesem_qms')),
+    'username' => trim((string)($config['username'] ?? 'qms_app')),
+    'schema' => trim((string)($config['schema'] ?? 'public')),
+    'sslmode' => trim((string)($config['sslmode'] ?? 'prefer')),
+    'connect_timeout' => max(1, (int)($config['connect_timeout'] ?? 5)),
+    'statement_timeout' => max(1000, (int)($config['statement_timeout'] ?? 30000)),
+    'read_retry_count' => max(1, (int)($config['read_retry_count'] ?? 3)),
+    'read_retry_delay_ms' => max(0, (int)($config['read_retry_delay_ms'] ?? 150)),
+    'use_postgres' => (bool)($config['use_postgres'] ?? false),
+    'shadow_write' => (bool)($config['shadow_write'] ?? true),
+    'json_fallback' => (bool)($config['json_fallback'] ?? true),
+  ];
+}
+
 function runtime_data_layer(): \HESEM\QMS\Database\DataLayer {
   global $DATA_DIR;
   static $layer = null;
-  if ($layer === null) {
+  static $fingerprint = '';
+  $config = runtime_data_layer_effective_config();
+  $nextFingerprint = md5(json_encode($config, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+  if ($layer === null || $nextFingerprint !== $fingerprint) {
     require_once __DIR__ . '/database/Connection.php';
     require_once __DIR__ . '/database/RuntimeShadowSync.php';
     require_once __DIR__ . '/database/DataLayer.php';
-    $layer = new \HESEM\QMS\Database\DataLayer($DATA_DIR, dirname(__DIR__));
+    $layer = new \HESEM\QMS\Database\DataLayer($DATA_DIR, dirname(__DIR__), $config);
+    $fingerprint = $nextFingerprint;
   }
   return $layer;
 }
@@ -3440,6 +3562,36 @@ function next_order_number(array &$store, string $entity): string {
   $next = strtoupper($entity) . '-' . $year . '-' . str_pad((string)$seq, $meta['digits'], '0', STR_PAD_LEFT);
   $store['_meta']['counters'][$counterKey] = $next;
   return $next;
+}
+
+function order_number_pattern(string $entity): string {
+  $prefix = strtoupper($entity);
+  return '/^' . preg_quote($prefix, '/') . '-([0-9]{4})-([0-9]+)$/';
+}
+
+function order_sync_counter_with_manual_number(array &$store, string $entity, string $manualNumber): void {
+  $meta = order_entity_config($entity);
+  $counterKey = $meta['counter_key'];
+  $manualNumber = strtoupper(trim($manualNumber));
+  if ($manualNumber === '') return;
+
+  $pattern = order_number_pattern($entity);
+  if (!preg_match($pattern, $manualNumber, $manualMatch)) {
+    return;
+  }
+  $manualYear = (int)$manualMatch[1];
+  $manualSeq = (int)$manualMatch[2];
+
+  $current = (string)($store['_meta']['counters'][$counterKey] ?? '');
+  if (!preg_match($pattern, $current, $currentMatch)) {
+    $store['_meta']['counters'][$counterKey] = $manualNumber;
+    return;
+  }
+  $currentYear = (int)$currentMatch[1];
+  $currentSeq = (int)$currentMatch[2];
+  if ($manualYear > $currentYear || ($manualYear === $currentYear && $manualSeq > $currentSeq)) {
+    $store['_meta']['counters'][$counterKey] = $manualNumber;
+  }
 }
 
 function order_band_rank(string $band = ''): int {
@@ -10316,6 +10468,10 @@ function destroy_auth_session(): void {
 
 function session_requires_completed_mfa(array $user, array $settings = []): bool {
   $systemRequiresMfa = (bool)($settings['require_mfa'] ?? true);
+  // When system MFA is disabled globally, skip MFA for ALL users
+  if (!$systemRequiresMfa) {
+    return false;
+  }
   $userMfa = $user['mfa'] ?? [];
   $userHasMfa = is_array($userMfa) && (bool)($userMfa['enabled'] ?? false);
   return $systemRequiresMfa || $userHasMfa;
@@ -13844,6 +14000,21 @@ case 'auth_login': {
 
     $mfa = $user['mfa'] ?? [];
     $mfaEnabled = (bool)($mfa['enabled'] ?? false);
+
+    // When system MFA is globally disabled, skip MFA entirely — just log in
+    if (!$requireMfa) {
+      set_authenticated_session($username);
+      $user['last_login'] = now_iso();
+      $user['updated_at'] = now_iso();
+      update_user($store, $user);
+      try { users_save($USERS_FILE, $store); } catch (Throwable $e) {}
+      api_json([
+        'ok' => true,
+        'logged_in' => true,
+        'user' => sanitize_user_for_client($user),
+        'csrf_token' => csrf_token(),
+      ]);
+    }
 
     if ($mfaEnabled) {
   $secretB32 = (string)($mfa['secret_b32'] ?? '');
@@ -17456,6 +17627,47 @@ if ($username === '') {
     ]);
   }
 
+  case 'admin_data_layer_config_get': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    if (!user_is_admin($me)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
+
+    $base = runtime_data_layer_base_config();
+    $overrides = load_runtime_data_layer_overrides();
+    $effective = runtime_data_layer_effective_config();
+    api_json([
+      'ok' => true,
+      'base_config' => runtime_data_layer_admin_projection($base),
+      'overrides' => $overrides,
+      'override_meta' => load_runtime_data_layer_override_meta(),
+      'effective_config' => runtime_data_layer_admin_projection($effective),
+      'runtime_mode' => runtime_data_layer_summary(),
+      'updated_at' => now_iso(),
+    ]);
+  }
+
+  case 'admin_data_layer_config_save': {
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    if (!user_is_admin($me)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
+    require_csrf();
+
+    $body = read_json_body();
+    $incoming = is_array($body['config'] ?? null) ? $body['config'] : [];
+    $overrides = runtime_data_layer_sanitize_overrides($incoming);
+    save_runtime_data_layer_overrides($overrides, (string)($me['username'] ?? $_SESSION['user'] ?? 'system'));
+
+    $effective = runtime_data_layer_effective_config();
+    api_json([
+      'ok' => true,
+      'overrides' => $overrides,
+      'override_meta' => load_runtime_data_layer_override_meta(),
+      'effective_config' => runtime_data_layer_admin_projection($effective),
+      'runtime_mode' => runtime_data_layer_summary(),
+      'updated_at' => now_iso(),
+    ]);
+  }
+
   case 'epicor_sync_run_upsert': {
     if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
     $me = require_logged_in($store);
@@ -19011,7 +19223,19 @@ if ($username === '') {
     $username = (string)($_SESSION['user'] ?? 'system');
 
     $record = $body;
-    $record[$idKey] = next_order_number($orders, $entity);
+    $manualId = strtoupper(trim((string)($record[$idKey] ?? '')));
+    if ($manualId !== '') {
+      if (!preg_match('/^[A-Z0-9][A-Z0-9._-]{2,47}$/', $manualId)) {
+        api_json(['ok' => false, 'error' => 'invalid_manual_order_number', 'field' => $idKey], 400);
+      }
+      if (find_order_record($orders, $entity, $manualId)) {
+        api_json(['ok' => false, 'error' => 'duplicate_order_number', 'field' => $idKey, 'value' => $manualId], 409);
+      }
+      $record[$idKey] = $manualId;
+      order_sync_counter_with_manual_number($orders, $entity, $manualId);
+    } else {
+      $record[$idKey] = next_order_number($orders, $entity);
+    }
     $record['status'] = strtolower(trim((string)($record['status'] ?? $meta['default_status'])));
     $record['created_at'] = $now;
     $record['created_by'] = $username;

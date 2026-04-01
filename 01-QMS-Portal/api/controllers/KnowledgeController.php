@@ -200,6 +200,10 @@ class KnowledgeController extends BaseController
         $this->requireCsrf();
 
         $body = $this->jsonBody();
+        // Frontend sends 'description', accept both 'body' and 'description'
+        if (!isset($body['body']) && isset($body['description'])) {
+            $body['body'] = $body['description'];
+        }
         $this->requireFields($body, ['title', 'body', 'category']);
 
         $userId = $this->userId($user);

@@ -78,12 +78,13 @@ class FmeaController extends BaseController
      */
     private function hasFmeaPermission(array $user, string $permission): bool
     {
+        $role = (string)($user['role'] ?? 'viewer');
+        if (in_array($role, ['ceo', 'it_admin', 'qa_manager', 'production_director', 'engineering_manager'], true)) {
+            return true;
+        }
         $config = $this->loadFmeaConfig();
         $roles  = $config['roles'] ?? [];
-        $role   = (string)($user['role'] ?? 'viewer');
-
-        $perms = $roles[$role] ?? $roles['viewer'] ?? [];
-
+        $perms  = $roles[$role] ?? $roles['viewer'] ?? [];
         return in_array($permission, $perms, true);
     }
 
@@ -224,13 +225,12 @@ class FmeaController extends BaseController
                 'item_id'      => trim((string)($body['item_id'] ?? '')),
                 'process_name' => trim((string)($body['process_name'] ?? '')),
                 'team_lead'    => trim((string)($body['team_lead'] ?? '')),
-                'created_by'   => $userId,
-            ]);
+            ], $userId);
 
             $this->auditLog('fmea_create', [
-                'fmea_id' => $fmea['id'],
-                'type'    => $fmea['type'],
-                'title'   => $fmea['title'],
+                'fmea_id' => $fmea['fmea_id'] ?? $fmea['id'] ?? '',
+                'type'    => $fmea['type'] ?? '',
+                'title'   => $fmea['title'] ?? '',
             ], $userId);
 
             $this->success(['fmea' => $fmea], 201);

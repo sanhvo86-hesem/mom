@@ -175,6 +175,9 @@ class ProductPassportController extends BaseController
         $this->requireCsrf();
 
         $body = $this->jsonBody();
+        // Accept frontend field name variants
+        if (!isset($body['part_id']) && isset($body['item_id'])) $body['part_id'] = $body['item_id'];
+        if (!isset($body['serial']) && isset($body['serial_number'])) $body['serial'] = $body['serial_number'];
         $this->requireFields($body, ['part_id', 'serial']);
 
         $userId = $this->userId($user);

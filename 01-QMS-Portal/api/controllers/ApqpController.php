@@ -77,12 +77,13 @@ class ApqpController extends BaseController
      */
     private function hasApqpPermission(array $user, string $permission): bool
     {
+        $role = (string)($user['role'] ?? 'viewer');
+        if (in_array($role, ['ceo', 'it_admin', 'qa_manager', 'production_director', 'engineering_manager'], true)) {
+            return true;
+        }
         $config = $this->loadApqpConfig();
         $roles  = $config['roles'] ?? [];
-        $role   = (string)($user['role'] ?? 'viewer');
-
-        $perms = $roles[$role] ?? $roles['viewer'] ?? [];
-
+        $perms  = $roles[$role] ?? $roles['viewer'] ?? [];
         return in_array($permission, $perms, true);
     }
 
@@ -225,12 +226,11 @@ class ApqpController extends BaseController
                 'description'     => trim((string)($body['description'] ?? '')),
                 'target_ppap_date' => trim((string)($body['target_ppap_date'] ?? '')),
                 'team_members'    => (array)($body['team_members'] ?? []),
-                'created_by'      => $userId,
-            ]);
+            ], $userId);
 
             $this->auditLog('apqp_create_project', [
-                'apqp_id' => $project['id'],
-                'title'   => $project['title'],
+                'apqp_id' => $project['apqp_id'] ?? $project['id'] ?? '',
+                'title'   => $project['title'] ?? '',
             ], $userId);
 
             $this->success(['project' => $project], 201);

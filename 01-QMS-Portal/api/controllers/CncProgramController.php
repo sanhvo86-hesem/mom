@@ -168,6 +168,10 @@ class CncProgramController extends BaseController
         $this->requireCsrf();
 
         $body = $this->jsonBody();
+        // Accept frontend field name variants
+        if (!isset($body['name']) && isset($body['program_name'])) $body['name'] = $body['program_name'];
+        if (!isset($body['part_id']) && isset($body['item_id'])) $body['part_id'] = $body['item_id'];
+        if (!isset($body['machine']) && isset($body['machine_type'])) $body['machine'] = $body['machine_type'];
         $this->requireFields($body, ['name', 'part_id', 'machine']);
 
         $userId = $this->userId($user);

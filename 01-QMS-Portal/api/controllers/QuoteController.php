@@ -80,12 +80,13 @@ class QuoteController extends BaseController
      */
     private function hasQuotePermission(array $user, string $permission): bool
     {
+        $role = (string)($user['role'] ?? 'viewer');
+        if (in_array($role, ['ceo', 'it_admin', 'sales_manager', 'production_director'], true)) {
+            return true;
+        }
         $config = $this->loadQuoteConfig();
         $roles  = $config['roles'] ?? [];
-        $role   = (string)($user['role'] ?? 'viewer');
-
-        $perms = $roles[$role] ?? $roles['viewer'] ?? [];
-
+        $perms  = $roles[$role] ?? $roles['viewer'] ?? [];
         return in_array($permission, $perms, true);
     }
 
@@ -244,14 +245,13 @@ class QuoteController extends BaseController
                 'valid_until'   => trim((string)($body['valid_until'] ?? '')),
                 'currency'      => strtoupper(trim((string)($body['currency'] ?? 'USD'))),
                 'notes'         => trim((string)($body['notes'] ?? '')),
-                'line_items'    => (array)($body['line_items'] ?? []),
-                'created_by'    => $userId,
-            ]);
+                'lines'         => (array)($body['line_items'] ?? $body['lines'] ?? []),
+            ], $userId);
 
             $this->auditLog('quote_create', [
-                'quote_number' => $quote['number'],
-                'customer_id'  => $body['customer_id'],
-                'line_count'   => count($body['line_items']),
+                'quote_id'    => $quote['quote_id'] ?? '',
+                'customer_id' => $body['customer_id'] ?? '',
+                'line_count'  => count($body['line_items'] ?? []),
             ], $userId);
 
             $this->success(['quote' => $quote], 201);

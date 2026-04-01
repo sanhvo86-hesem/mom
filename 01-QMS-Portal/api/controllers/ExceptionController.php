@@ -80,11 +80,16 @@ class ExceptionController extends BaseController
      */
     private function hasExceptionPermission(array $user, string $permission): bool
     {
+        $role = (string)($user['role'] ?? 'viewer');
+
+        // Admin roles always pass
+        if (in_array($role, ['ceo', 'it_admin', 'qa_manager', 'production_director'], true)) {
+            return true;
+        }
+
         $config = $this->loadExceptionConfig();
         $roles  = $config['roles'] ?? [];
-        $role   = (string)($user['role'] ?? 'viewer');
-
-        $perms = $roles[$role] ?? $roles['viewer'] ?? [];
+        $perms  = $roles[$role] ?? $roles['viewer'] ?? [];
 
         return in_array($permission, $perms, true);
     }
