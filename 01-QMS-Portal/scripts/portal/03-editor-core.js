@@ -334,20 +334,20 @@ function buildEditorToolbar(){
   const v=lang!=='en';
   tb.innerHTML=`
     <div class="ed-toolbar-row">
-      ${btn(EI.undo,'undo',v?'HoÃ n tÃ¡c Â· Ctrl+Z':'Undo Â· Ctrl+Z')}
-      ${btn(EI.redo,'redo',v?'LÃ m láº¡i Â· Ctrl+Y':'Redo Â· Ctrl+Y')}
+      ${btn(EI.undo,'undo',v?'Hoàn tác · Ctrl+Z':'Undo · Ctrl+Z')}
+      ${btn(EI.redo,'redo',v?'Làm lại · Ctrl+Y':'Redo · Ctrl+Y')}
       <div class="ed-sep"></div>
-      ${btn(EI.painter,'_painter',v?'Sao chÃ©p Ä‘á»‹nh dáº¡ng':'Format Painter')}
-      ${btn(EI.pilcrow,'_pilcrow',v?'Hiá»‡n dáº¥u Ä‘oáº¡n Â¶':'Show Paragraph Marks')}
+      ${btn(EI.painter,'_painter',v?'Sao chép định dạng':'Format Painter')}
+      ${btn(EI.pilcrow,'_pilcrow',v?'Hiện dấu đoạn ¶':'Show Paragraph Marks')}
       <div class="ed-sep"></div>
-      <select class="ed-sel ed-sel-heading" id="ed-heading" onchange="edCmd('formatBlock',this.value);this.selectedIndex=0" title="${v?'Kiá»ƒu Ä‘oáº¡n':'Style'}">
-        <option value="">${v?'Â¶ Kiá»ƒu':'Â¶ Style'}</option>
-        <option value="h1">${v?'TiÃªu Ä‘á» 1':'Heading 1'}</option>
-        <option value="h2">${v?'TiÃªu Ä‘á» 2':'Heading 2'}</option>
-        <option value="h3">${v?'TiÃªu Ä‘á» 3':'Heading 3'}</option>
-        <option value="h4">${v?'TiÃªu Ä‘á» 4':'Heading 4'}</option>
-        <option value="p">${v?'Äoáº¡n vÄƒn':'Normal'}</option>
-        <option value="pre">${v?'MÃ£ nguá»“n':'Code Block'}</option>
+      <select class="ed-sel ed-sel-heading" id="ed-heading" onchange="edCmd('formatBlock',this.value);this.selectedIndex=0" title="${v?'Kiểu đoạn':'Style'}">
+        <option value="">${v?'¶ Kiểu':'¶ Style'}</option>
+        <option value="h1">${v?'Tiêu đề 1':'Heading 1'}</option>
+        <option value="h2">${v?'Tiêu đề 2':'Heading 2'}</option>
+        <option value="h3">${v?'Tiêu đề 3':'Heading 3'}</option>
+        <option value="h4">${v?'Tiêu đề 4':'Heading 4'}</option>
+        <option value="p">${v?'Đoạn văn':'Normal'}</option>
+        <option value="pre">${v?'Mã nguồn':'Code Block'}</option>
       </select>
       <select class="ed-sel ed-sel-font" id="ed-font" onchange="edApplyFont(this.value)" title="Font" style="width:130px">
         <option value="Arial" style="font-family:Arial">Arial</option>
@@ -369,21 +369,21 @@ function buildEditorToolbar(){
         <option value="Trebuchet MS" style="font-family:Trebuchet MS">Trebuchet MS</option>
         <option value="Verdana" style="font-family:Verdana">Verdana</option>
       </select>
-      <select class="ed-sel ed-sel-size" id="ed-size" onchange="edCmd('fontSize',this.value)" title="${v?'Cá»¡ chá»¯':'Size'}">
+      <select class="ed-sel ed-sel-size" id="ed-size" onchange="edCmd('fontSize',this.value)" title="${v?'Cỡ chữ':'Size'}">
         <option value="">â€”</option>
         <option value="1">8</option><option value="2">10</option><option value="3">12</option>
         <option value="4">14</option><option value="5">18</option><option value="6">24</option><option value="7">36</option>
       </select>
-      <select class="ed-sel ed-sel-spacing" id="ed-spacing" onchange="edLineSpacing(this.value)" title="${v?'Khoáº£ng cÃ¡ch dÃ²ng':'Line Spacing'}">
+      <select class="ed-sel ed-sel-spacing" id="ed-spacing" onchange="edLineSpacing(this.value)" title="${v?'Khoảng cách dòng':'Line Spacing'}">
         <option value="">â†•</option>
         <option value="1">1.0</option><option value="1.15">1.15</option><option value="1.5">1.5</option>
         <option value="2">2.0</option><option value="2.5">2.5</option><option value="3">3.0</option>
       </select>
       <div class="ed-sep"></div>
-      ${btn(EI.bold,'bold',v?'Äáº­m Â· Ctrl+B':'Bold Â· Ctrl+B')}
-      ${btn(EI.italic,'italic',v?'NghiÃªng Â· Ctrl+I':'Italic Â· Ctrl+I')}
-      ${btn(EI.underline,'underline',v?'Gáº¡ch chÃ¢n Â· Ctrl+U':'Underline Â· Ctrl+U')}
-      ${btn(EI.strike,'strikeThrough',v?'Gáº¡ch ngang':'Strikethrough')}
+      ${btn(EI.bold,'bold',v?'Đậm · Ctrl+B':'Bold · Ctrl+B')}
+      ${btn(EI.italic,'italic',v?'Nghiêng · Ctrl+I':'Italic · Ctrl+I')}
+      ${btn(EI.underline,'underline',v?'Gạch chân · Ctrl+U':'Underline · Ctrl+U')}
+      ${btn(EI.strike,'strikeThrough',v?'Gạch ngang':'Strikethrough')}
       <div class="ed-cpick" id="ed-cpick-fg">
         <button class="ed-cpick-main" onmousedown="edSaveSelection();event.preventDefault()" onclick="edApplyColor('fg')" title="${v?'MÃ u chá»¯':'Text Color'}">
           <span style="font-weight:700;font-size:15px;font-family:serif;color:var(--ed-fg-c,#c00)">A</span>
@@ -451,7 +451,9 @@ function buildEditorToolbar(){
 
       ${btn(EI.find,'_find',v?'TÃ¬m / Thay tháº¿ (Ctrl+F / Ctrl+H)':'Find / Replace (Ctrl+F / Ctrl+H)')}
       ${btn(EI.source,'_source',v?'HTML':'HTML')}
-      <button class="ed-btn" onclick="edDomToggle()" title="${v?'DOM Inspector (bá»‘ cá»¥c)':'DOM Inspector (layout)'}" style="font-size:11px;font-weight:700;letter-spacing:-.5px">ðŸ—ï¸</button>
+      <button class="ed-btn ed-btn-text" onclick="edDomToggle()" title="${v?'DOM Inspector (bố cục)':'DOM Inspector (layout)'}">DOM</button>
+      <button class="ed-btn ed-btn-text" onclick="edFormDockToggle()" title="${v?'Ẩn / hiện Form Blocks':'Toggle Form Blocks'}">BLK</button>
+      <button class="ed-btn ed-btn-text" onclick="if(window._mdOpenControl){window._mdOpenControl();}" title="${v?'Mở dữ liệu nền':'Open master data'}">DATA</button>
       ${btn(EI.print,'_print',v?'In':'Print')}
 
       <div class="ed-sep"></div>
@@ -1239,6 +1241,13 @@ function edMountFormDesignerDock(ctx){
     host.appendChild(dock);
   }
   dock.innerHTML=edBuildFormDesignerDock();
+  dock.classList.toggle('is-hidden', !!window._edFormDockHidden);
+}
+
+function edFormDockToggle(){
+  window._edFormDockHidden = !window._edFormDockHidden;
+  var dock = document.getElementById('ed-form-designer-dock');
+  if(dock) dock.classList.toggle('is-hidden', !!window._edFormDockHidden);
 }
 
 function edBuildFormDesignerDock(){
@@ -1252,11 +1261,15 @@ function edBuildFormDesignerDock(){
     {kind:'formSignatureRow', title:'Signatures'},
     {kind:'formRecordStrip', title:'Record strip'}
   ];
-  return '<div class="ed-form-dock-head"><strong>Form Blocks</strong><span>Insert FRM blocks into the live HTML canvas.</span></div>'
+  return '<div class="ed-form-dock-head"><strong>Form Blocks</strong><span>Chèn block vào canvas sống. Click phải lên block để chọn và mở menu thuộc tính.</span></div>'
+    + '<div class="ed-form-dock-actions">'
+    +   '<button type="button" class="ed-form-dock-ghost" onmousedown="event.preventDefault()" onclick="edFormDockToggle()">' + _edEscapeHtml((lang!=='en') ? 'Ẩn panel' : 'Hide panel') + '</button>'
+    +   '<button type="button" class="ed-form-dock-ghost" onmousedown="event.preventDefault()" onclick="if(window._mdOpenControl){window._mdOpenControl();}">' + _edEscapeHtml((lang!=='en') ? 'Dữ liệu nền' : 'Master data') + '</button>'
+    + '</div>'
     + '<div class="ed-form-dock-grid">' + items.map(function(item){
       return '<button type="button" onmousedown="event.preventDefault();edSaveSelection();" onclick="edInsertQmsTemplate(\'' + item.kind + '\');event.stopPropagation()" title="' + _edEscapeHtml(item.title) + '">' + _edEscapeHtml(item.title) + '</button>';
     }).join('') + '</div>'
-    + '<button type="button" class="ed-form-dock-manage" onmousedown="event.preventDefault()" onclick="if(window._mdOpenControl){window._mdOpenControl();}">' + _edEscapeHtml((lang!=='en') ? 'Má»Ÿ dá»¯ liá»‡u ná»n' : 'Open master data') + '</button>';
+    + '<button type="button" class="ed-form-dock-manage" onmousedown="event.preventDefault()" onclick="if(window._mdOpenControl){window._mdOpenControl();}">' + _edEscapeHtml((lang!=='en') ? 'Mở quản lý dữ liệu nền' : 'Open master data control') + '</button>';
 }
 
 function edQmsKindMeta(kind){
@@ -1644,11 +1657,22 @@ function edQmsFieldProps(block){
     fieldId: fieldId,
     fieldName: fieldName,
     placeholder: placeholder,
+    defaultValue: control && typeof control.value === 'string' ? String(control.value || '').trim() : '',
     required: !!(control && typeof control.hasAttribute === 'function' && control.hasAttribute('required')),
     type: lookupHost ? 'lookup' : (control ? String(control.tagName || '').toLowerCase() === 'textarea' ? 'textarea' : String(control.tagName || '').toLowerCase() === 'select' ? 'select' : String(control.type || 'text').toLowerCase() : 'text'),
     width: block.classList.contains('qf-col-span-3') ? '3' : (block.classList.contains('qf-col-span-2') ? '2' : '1'),
     lookupSource: String(block.dataset.lookupSource || '').trim(),
-    selectOptions: selectOptions
+    selectOptions: selectOptions,
+    formula: String(block.dataset.formula || '').trim(),
+    apiEndpoint: String(block.dataset.apiEndpoint || '').trim(),
+    apiMethod: String(block.dataset.apiMethod || '').trim() || 'GET',
+    dbEntity: String(block.dataset.dbEntity || '').trim(),
+    dbField: String(block.dataset.dbField || '').trim(),
+    relatedForm: String(block.dataset.relatedForm || '').trim(),
+    relatedField: String(block.dataset.relatedField || '').trim(),
+    visibilityRule: String(block.dataset.visibilityRule || '').trim(),
+    requiredWhen: String(block.dataset.requiredWhen || '').trim(),
+    readonly: !!((control && control.hasAttribute && control.hasAttribute('readonly')) || String(block.dataset.readonly || '').trim() === '1')
   };
 }
 
@@ -1750,13 +1774,15 @@ function edQmsReplaceFieldControl(block, cfg){
   var insertBefore = dv || helper || error || null;
   var type = String(cfg.type || 'text').trim();
   var requiredAttr = cfg.required ? ' required' : '';
+  var readonlyAttr = cfg.readonly ? ' readonly' : '';
   var placeholder = _edEscapeHtml(cfg.placeholder || '');
+  var defaultValue = _edEscapeHtml(cfg.defaultValue || '');
   var fieldId = _edEscapeHtml(cfg.fieldId || 'field_code');
   var fieldName = _edEscapeHtml(cfg.fieldName || cfg.fieldId || 'field_code');
   var options = Array.isArray(cfg.options) ? cfg.options : [];
   var html = '';
   if(type === 'textarea'){
-    html = '<textarea class="qf-textarea" id="' + fieldId + '" name="' + fieldName + '"' + requiredAttr + ' rows="4" placeholder="' + placeholder + '"></textarea>';
+    html = '<textarea class="qf-textarea" id="' + fieldId + '" name="' + fieldName + '"' + requiredAttr + readonlyAttr + ' rows="4" placeholder="' + placeholder + '">' + defaultValue + '</textarea>';
   }else if(type === 'select'){
     if(!options.length){
       options = [
@@ -1764,18 +1790,18 @@ function edQmsReplaceFieldControl(block, cfg){
         { value:'OPTION_B', label:'Option B' }
       ];
     }
-    html = '<select class="qf-select" id="' + fieldId + '" name="' + fieldName + '"' + requiredAttr + '><option value="">' + _edEscapeHtml(cfg.placeholder || 'Chá»n') + '</option>'
+    html = '<select class="qf-select" id="' + fieldId + '" name="' + fieldName + '"' + requiredAttr + readonlyAttr + '><option value="">' + _edEscapeHtml(cfg.placeholder || 'Chọn') + '</option>'
       + options.map(function(option){
         var value = String((option && option.value) || '').trim();
         var label = String((option && option.label) || value).trim();
-        return '<option value="' + _edEscapeHtml(value) + '">' + _edEscapeHtml(label) + '</option>';
+        return '<option value="' + _edEscapeHtml(value) + '"' + (defaultValue && defaultValue === value ? ' selected' : '') + '>' + _edEscapeHtml(label) + '</option>';
       }).join('')
       + '</select>';
   }else if(type === 'lookup'){
-    html = '<div class="scar-lookup-host" id="' + fieldId + '_lookup"></div><input class="qf-input scar-hidden" id="' + fieldId + '" name="' + fieldName + '"' + requiredAttr + ' placeholder="' + placeholder + '"/>';
+    html = '<div class="scar-lookup-host" id="' + fieldId + '_lookup"></div><input class="qf-input scar-hidden" id="' + fieldId + '" name="' + fieldName + '"' + requiredAttr + readonlyAttr + ' placeholder="' + placeholder + '" value="' + defaultValue + '"/>';
   }else{
     var inputType = ['date','number','email'].indexOf(type) >= 0 ? type : 'text';
-    html = '<input class="qf-input" id="' + fieldId + '" name="' + fieldName + '"' + requiredAttr + ' type="' + inputType + '" placeholder="' + placeholder + '"/>';
+    html = '<input class="qf-input" id="' + fieldId + '" name="' + fieldName + '"' + requiredAttr + readonlyAttr + ' type="' + inputType + '" placeholder="' + placeholder + '" value="' + defaultValue + '"/>';
   }
   var frag = document.createElement('template');
   frag.innerHTML = html;
@@ -1838,40 +1864,50 @@ function edEditQmsBlockProperties(block){
     }).join('');
     root.innerHTML =
       '<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal ed-qms-prop-modal">' +
-      '<h4>' + (vi ? 'âš™ Thuá»™c tÃ­nh field form' : 'âš™ Form field properties') + '</h4>' +
-      '<label>' + (vi ? 'NhÃ£n tiáº¿ng Anh' : 'English label') + '</label><input id="ed-qms-field-label" value="' + _edEscapeHtml(fp.label || '') + '">' +
-      '<label>' + (vi ? 'NhÃ£n tiáº¿ng Viá»‡t' : 'Vietnamese label') + '</label><input id="ed-qms-field-label-vi" value="' + _edEscapeHtml(fp.labelVi || '') + '">' +
-      '<label>' + (vi ? 'Giáº£i thÃ­ch tiáº¿ng Viá»‡t' : 'Vietnamese helper') + '</label><textarea id="ed-qms-field-helper" rows="3">' + _edEscapeHtml(fp.helper || '') + '</textarea>' +
-      '<div class="ed-qms-prop-grid"><div><label>ID</label><input id="ed-qms-field-id" value="' + _edEscapeHtml(fp.fieldId || '') + '"></div><div><label>' + (vi ? 'TÃªn field' : 'Field name') + '</label><input id="ed-qms-field-name" value="' + _edEscapeHtml(fp.fieldName || '') + '"></div></div>' +
-      '<div class="ed-qms-prop-grid"><div><label>' + (vi ? 'Loáº¡i field' : 'Field type') + '</label><select id="ed-qms-field-type">' +
+      '<h4>' + (vi ? '⚙ Thuộc tính field form' : '⚙ Form field properties') + '</h4>' +
+      '<label>' + (vi ? 'Nhãn tiếng Anh' : 'English label') + '</label><input id="ed-qms-field-label" value="' + _edEscapeHtml(fp.label || '') + '">' +
+      '<label>' + (vi ? 'Nhãn tiếng Việt' : 'Vietnamese label') + '</label><input id="ed-qms-field-label-vi" value="' + _edEscapeHtml(fp.labelVi || '') + '">' +
+      '<label>' + (vi ? 'Giải thích tiếng Việt' : 'Vietnamese helper') + '</label><textarea id="ed-qms-field-helper" rows="3">' + _edEscapeHtml(fp.helper || '') + '</textarea>' +
+      '<div class="ed-qms-prop-grid"><div><label>ID</label><input id="ed-qms-field-id" value="' + _edEscapeHtml(fp.fieldId || '') + '"></div><div><label>' + (vi ? 'Tên field' : 'Field name') + '</label><input id="ed-qms-field-name" value="' + _edEscapeHtml(fp.fieldName || '') + '"></div></div>' +
+      '<div class="ed-qms-prop-grid"><div><label>' + (vi ? 'Loại field' : 'Field type') + '</label><select id="ed-qms-field-type">' +
       [
-        ['text', vi ? 'Text 1 dÃ²ng' : 'Text'],
+        ['text', vi ? 'Text 1 dòng' : 'Text'],
         ['textarea', vi ? 'Textarea' : 'Textarea'],
         ['select', vi ? 'Dropdown' : 'Dropdown'],
-        ['lookup', vi ? 'Lookup dá»¯ liá»‡u ná»n' : 'Master-data lookup'],
-        ['date', vi ? 'NgÃ y' : 'Date'],
-        ['number', vi ? 'Sá»‘' : 'Number']
+        ['lookup', vi ? 'Lookup dữ liệu nền' : 'Master-data lookup'],
+        ['date', vi ? 'Ngày' : 'Date'],
+        ['number', vi ? 'Số' : 'Number']
       ].map(function(item){
         return '<option value="' + item[0] + '"' + (fp.type === item[0] ? ' selected' : '') + '>' + _edEscapeHtml(item[1]) + '</option>';
-      }).join('') + '</select></div><div><label>' + (vi ? 'Äá»™ rá»™ng' : 'Width') + '</label><select id="ed-qms-field-width">' +
-      [['1',vi?'1 cá»™t':'1 column'],['2',vi?'2 cá»™t':'2 columns'],['3',vi?'ToÃ n hÃ ng':'Full row']].map(function(item){
+      }).join('') + '</select></div><div><label>' + (vi ? 'Độ rộng' : 'Width') + '</label><select id="ed-qms-field-width">' +
+      [['1',vi?'1 cột':'1 column'],['2',vi?'2 cột':'2 columns'],['3',vi?'Toàn hàng':'Full row']].map(function(item){
         return '<option value="' + item[0] + '"' + (fp.width === item[0] ? ' selected' : '') + '>' + _edEscapeHtml(item[1]) + '</option>';
       }).join('') + '</select></div></div>' +
-      '<label>' + (vi ? 'Placeholder / ghi chÃº nháº­p liá»‡u' : 'Placeholder') + '</label><input id="ed-qms-field-placeholder" value="' + _edEscapeHtml(fp.placeholder || '') + '">' +
+      '<label>' + (vi ? 'Placeholder / ghi chú nhập liệu' : 'Placeholder') + '</label><input id="ed-qms-field-placeholder" value="' + _edEscapeHtml(fp.placeholder || '') + '">' +
+      '<label>' + (vi ? 'Giá trị mặc định' : 'Default value') + '</label><input id="ed-qms-field-default" value="' + _edEscapeHtml(fp.defaultValue || '') + '">' +
       '<div id="ed-qms-field-select-wrap">' +
-        '<label>' + (vi ? 'Ná»™i dung dropdown' : 'Dropdown items') + '</label>' +
-        '<textarea id="ed-qms-field-options" rows="6" placeholder="value | label&#10;open | Má»Ÿ&#10;closed | ÄÃ³ng">' + _edEscapeHtml(fp.selectOptions || '') + '</textarea>' +
-        '<div class="ed-qms-prop-note">' + (vi ? 'Má»—i dÃ²ng lÃ  má»™t lá»±a chá»n. CÃ³ thá»ƒ dÃ¹ng máº«u: value | label.' : 'Use one option per line. Format: value | label.') + '</div>' +
+        '<label>' + (vi ? 'Nội dung dropdown' : 'Dropdown items') + '</label>' +
+        '<textarea id="ed-qms-field-options" rows="6" placeholder="value | label&#10;open | Mở&#10;closed | Đóng">' + _edEscapeHtml(fp.selectOptions || '') + '</textarea>' +
+        '<div class="ed-qms-prop-note">' + (vi ? 'Mỗi dòng là một lựa chọn. Có thể dùng mẫu: value | label.' : 'Use one option per line. Format: value | label.') + '</div>' +
       '</div>' +
       '<div id="ed-qms-field-lookup-wrap">' +
-        '<label>' + (vi ? 'Nguá»“n lookup dá»¯ liá»‡u ná»n' : 'Lookup source') + '</label><select id="ed-qms-field-source"><option value="">' + (vi ? 'KhÃ´ng dÃ¹ng' : 'None') + '</option>' + sourceOptions + '</select>' +
-        '<div class="ed-qms-prop-actions"><button type="button" class="ed-qms-secondary" onclick="edOpenQmsLookupSource()">' + (vi ? 'Má»Ÿ quáº£n lÃ½ dá»¯ liá»‡u ná»n' : 'Open master data') + '</button></div>' +
-        '<div class="ed-qms-prop-note">' + (vi ? 'Xem nhanh ná»™i dung droplist Ä‘ang dÃ¹ng cho field lookup nÃ y.' : 'Preview the current lookup items for this field.') + '</div>' +
+        '<label>' + (vi ? 'Nguồn lookup dữ liệu nền' : 'Lookup source') + '</label><select id="ed-qms-field-source"><option value="">' + (vi ? 'Không dùng' : 'None') + '</option>' + sourceOptions + '</select>' +
+        '<div class="ed-qms-prop-actions"><button type="button" class="ed-qms-secondary" onclick="edOpenQmsLookupSource()">' + (vi ? 'Mở quản lý dữ liệu nền' : 'Open master data') + '</button></div>' +
+        '<div class="ed-qms-prop-note">' + (vi ? 'Xem nhanh nội dung droplist đang dùng cho field lookup này.' : 'Preview the current lookup items for this field.') + '</div>' +
         '<div class="ed-qms-lookup-preview" id="ed-qms-lookup-preview"></div>' +
       '</div>' +
-      '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="ed-qms-field-required"' + (fp.required ? ' checked' : '') + '> ' + (vi ? 'TrÆ°á»ng báº¯t buá»™c' : 'Required field') + '</label>' +
-      '<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">' + (vi ? 'Há»§y' : 'Cancel') + '</button>' +
-      '<button class="ed-m-ok" onclick="edApplyQmsFieldProps()">' + (vi ? 'Ãp dá»¥ng' : 'Apply') + '</button></div></div></div>';
+      '<div class="ed-qms-prop-divider">' + (vi ? 'Kết nối dữ liệu & logic' : 'Data binding & logic') + '</div>' +
+      '<div class="ed-qms-prop-grid"><div><label>API endpoint</label><input id="ed-qms-field-api" value="' + _edEscapeHtml(fp.apiEndpoint || '') + '" placeholder="/01-QMS-Portal/api.php?action=..."></div><div><label>' + (vi ? 'Phương thức API' : 'API method') + '</label><select id="ed-qms-field-api-method">' +
+      ['GET','POST','PUT'].map(function(method){ return '<option value="' + method + '"' + (fp.apiMethod === method ? ' selected' : '') + '>' + method + '</option>'; }).join('') + '</select></div></div>' +
+      '<div class="ed-qms-prop-grid"><div><label>Database entity</label><input id="ed-qms-field-db-entity" value="' + _edEscapeHtml(fp.dbEntity || '') + '" placeholder="supplier_approvals"></div><div><label>Database field</label><input id="ed-qms-field-db-field" value="' + _edEscapeHtml(fp.dbField || '') + '" placeholder="supplier_name"></div></div>' +
+      '<div class="ed-qms-prop-grid"><div><label>' + (vi ? 'Form liên kết' : 'Related form') + '</label><input id="ed-qms-field-related-form" value="' + _edEscapeHtml(fp.relatedForm || '') + '" placeholder="FRM-404"></div><div><label>' + (vi ? 'Field liên kết' : 'Related field') + '</label><input id="ed-qms-field-related-field" value="' + _edEscapeHtml(fp.relatedField || '') + '" placeholder="supplier_id"></div></div>' +
+      '<label>' + (vi ? 'Công thức / hàm tính' : 'Formula expression') + '</label><input id="ed-qms-field-formula" value="' + _edEscapeHtml(fp.formula || '') + '" placeholder="=[quantity_rejected]/[quantity_received]*100">' +
+      '<label>' + (vi ? 'Điều kiện hiển thị' : 'Visibility rule') + '</label><input id="ed-qms-field-visibility" value="' + _edEscapeHtml(fp.visibilityRule || '') + '" placeholder="[scar_status] = verification">' +
+      '<label>' + (vi ? 'Điều kiện bắt buộc' : 'Required rule') + '</label><input id="ed-qms-field-required-when" value="' + _edEscapeHtml(fp.requiredWhen || '') + '" placeholder="[root_cause_required] = true">' +
+      '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="ed-qms-field-required"' + (fp.required ? ' checked' : '') + '> ' + (vi ? 'Trường bắt buộc' : 'Required field') + '</label>' +
+      '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="ed-qms-field-readonly"' + (fp.readonly ? ' checked' : '') + '> ' + (vi ? 'Chỉ đọc ở runtime' : 'Readonly at runtime') + '</label>' +
+      '<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">' + (vi ? 'Hủy' : 'Cancel') + '</button>' +
+      '<button class="ed-m-ok" onclick="edApplyQmsFieldProps()">' + (vi ? 'Áp dụng' : 'Apply') + '</button></div></div></div>';
     root._qmsBlock = block;
     var typeSel = document.getElementById('ed-qms-field-type');
     var sourceSel = document.getElementById('ed-qms-field-source');
@@ -1902,9 +1938,20 @@ function edApplyQmsFieldProps(){
   var fieldType = String((document.getElementById('ed-qms-field-type') || {}).value || 'text').trim();
   var fieldWidth = String((document.getElementById('ed-qms-field-width') || {}).value || '1').trim();
   var placeholder = String((document.getElementById('ed-qms-field-placeholder') || {}).value || '').trim();
+  var defaultValue = String((document.getElementById('ed-qms-field-default') || {}).value || '').trim();
   var lookupSource = String((document.getElementById('ed-qms-field-source') || {}).value || '').trim();
   var selectOptions = edQmsParseSelectOptions(String((document.getElementById('ed-qms-field-options') || {}).value || ''));
+  var apiEndpoint = String((document.getElementById('ed-qms-field-api') || {}).value || '').trim();
+  var apiMethod = String((document.getElementById('ed-qms-field-api-method') || {}).value || 'GET').trim();
+  var dbEntity = String((document.getElementById('ed-qms-field-db-entity') || {}).value || '').trim();
+  var dbField = String((document.getElementById('ed-qms-field-db-field') || {}).value || '').trim();
+  var relatedForm = String((document.getElementById('ed-qms-field-related-form') || {}).value || '').trim();
+  var relatedField = String((document.getElementById('ed-qms-field-related-field') || {}).value || '').trim();
+  var formula = String((document.getElementById('ed-qms-field-formula') || {}).value || '').trim();
+  var visibilityRule = String((document.getElementById('ed-qms-field-visibility') || {}).value || '').trim();
+  var requiredWhen = String((document.getElementById('ed-qms-field-required-when') || {}).value || '').trim();
   var required = !!((document.getElementById('ed-qms-field-required') || {}).checked);
+  var readonly = !!((document.getElementById('ed-qms-field-readonly') || {}).checked);
   var label = block.querySelector('.qf-label');
   var helperEl = block.querySelector('.qf-helper');
   var dv = block.querySelector('.qf-dv');
@@ -1919,6 +1966,16 @@ function edApplyQmsFieldProps(){
   if(dv) dv.id = fieldId + '__dv';
   if(error) error.setAttribute('data-error-for', fieldId);
   block.dataset.lookupSource = fieldType === 'lookup' ? lookupSource : '';
+  block.dataset.apiEndpoint = apiEndpoint;
+  block.dataset.apiMethod = apiMethod;
+  block.dataset.dbEntity = dbEntity;
+  block.dataset.dbField = dbField;
+  block.dataset.relatedForm = relatedForm;
+  block.dataset.relatedField = relatedField;
+  block.dataset.formula = formula;
+  block.dataset.visibilityRule = visibilityRule;
+  block.dataset.requiredWhen = requiredWhen;
+  block.dataset.readonly = readonly ? '1' : '';
   block.dataset.qmsKind = fieldType === 'lookup' ? 'formLookupField' :
     (fieldType === 'textarea' ? 'formTextareaField' :
     (fieldType === 'select' ? 'formSelectField' : 'formTextField'));
@@ -1927,7 +1984,9 @@ function edApplyQmsFieldProps(){
     fieldId: fieldId,
     fieldName: fieldName,
     placeholder: placeholder,
+    defaultValue: defaultValue,
     required: required,
+    readonly: readonly,
     options: selectOptions
   });
   edQmsApplyFieldWidth(block, fieldWidth);
@@ -1954,17 +2013,17 @@ function edBuildQmsToolbar(block){
   bar.addEventListener('mousedown',function(ev){ev.preventDefault();ev.stopPropagation();});
   bar.addEventListener('click',function(ev){ev.stopPropagation();});
   [
-    {action:'settings',icon:'âš™',title:vi?'Thuá»™c tÃ­nh':'Properties',handler:function(){edEditQmsBlockProperties(block);}},
-    {action:'edit',icon:'âœŽ',title:vi?'Chá»‰nh sá»­a':'Edit',handler:function(){edFocusQmsBlock(block);}},
-    {action:'up',icon:'â†‘',title:vi?'ÄÆ°a lÃªn':'Move up',handler:function(){edQmsMoveBlock(block,'up');}},
-    {action:'down',icon:'â†“',title:vi?'ÄÆ°a xuá»‘ng':'Move down',handler:function(){edQmsMoveBlock(block,'down');}},
-    {action:'wide',icon:'â¤¢',title:vi?'Má»Ÿ rá»™ng':'Widen',handler:function(){edQmsApplyFieldWidth(block, block.classList.contains('qf-col-span-2') ? '3' : '2');}},
-    {action:'duplicate',icon:'â§‰',title:vi?'NhÃ¢n báº£n':'Duplicate',handler:function(){edDuplicateQmsBlock(block);}},
-    {action:'delete',icon:'ðŸ—‘',title:vi?'XÃ³a':'Delete',handler:function(){edDeleteQmsBlock(block);}}
+    {action:'settings',icon:'SET',title:vi?'Thuộc tính':'Properties',handler:function(){edEditQmsBlockProperties(block);}},
+    {action:'edit',icon:'EDIT',title:vi?'Chỉnh sửa':'Edit',handler:function(){edFocusQmsBlock(block);}},
+    {action:'up',icon:'UP',title:vi?'Đưa lên':'Move up',handler:function(){edQmsMoveBlock(block,'up');}},
+    {action:'down',icon:'DN',title:vi?'Đưa xuống':'Move down',handler:function(){edQmsMoveBlock(block,'down');}},
+    {action:'wide',icon:'W',title:vi?'Mở rộng':'Widen',handler:function(){edQmsApplyFieldWidth(block, block.classList.contains('qf-col-span-2') ? '3' : '2');}},
+    {action:'duplicate',icon:'COPY',title:vi?'Nhân bản':'Duplicate',handler:function(){edDuplicateQmsBlock(block);}},
+    {action:'delete',icon:'DEL',title:vi?'Xóa':'Delete',handler:function(){edDeleteQmsBlock(block);}}
   ].forEach(function(cfg){
     const btn=document.createElement('button');
     btn.type='button';
-    btn.className='ed-qms-toolbtn'+(cfg.action==='delete'?' is-danger':'');
+    btn.className='ed-qms-toolbtn'+(cfg.action==='delete'?' is-danger':'')+(cfg.icon.length>2?' is-text':'');
     btn.setAttribute('data-action',cfg.action);
     btn.setAttribute('title',cfg.title);
     btn.textContent=cfg.icon;
@@ -1999,6 +2058,68 @@ function edFocusQmsBlock(block){
     if(target.isContentEditable) _edPlaceCaretAtStart(target);
     edSaveSelection();
   }catch(e){}
+}
+
+function edCloseQmsContextMenu(){
+  var menu=document.getElementById('ed-qms-context-menu');
+  if(menu) menu.remove();
+}
+
+function edOpenQmsDropdownSettings(block){
+  edEditQmsBlockProperties(block);
+  setTimeout(function(){
+    var lookup=document.getElementById('ed-qms-field-lookup-source');
+    var dropdown=document.getElementById('ed-qms-field-dropdown');
+    var target=(lookup && lookup.value) ? lookup : dropdown;
+    if(target && typeof target.focus === 'function'){
+      target.focus();
+      if(typeof target.scrollIntoView === 'function') target.scrollIntoView({ behavior:'smooth', block:'center' });
+    }
+  }, 40);
+}
+
+function edOpenQmsContextMenu(block,x,y){
+  if(!block) return;
+  edCloseQmsContextMenu();
+  var isField=block.classList.contains('qf-field');
+  var menu=document.createElement('div');
+  menu.id='ed-qms-context-menu';
+  menu.className='ed-qms-context-menu';
+  menu.setAttribute('contenteditable','false');
+  var actions=[
+    {label:'Thuộc tính',handler:function(){edEditQmsBlockProperties(block);}},
+    {label:'Chỉnh droplist / lookup',handler:function(){edOpenQmsDropdownSettings(block);},show:isField},
+    {label:'Nhân bản block',handler:function(){edDuplicateQmsBlock(block);}},
+    {label:'Đưa lên',handler:function(){edQmsMoveBlock(block,'up');}},
+    {label:'Đưa xuống',handler:function(){edQmsMoveBlock(block,'down');}},
+    {label:'Mở rộng / thu gọn',handler:function(){edQmsApplyFieldWidth(block, block.classList.contains('qf-col-span-2') ? '3' : '2');},show:isField},
+    {label:'Xóa block',handler:function(){edDeleteQmsBlock(block);},danger:true}
+  ];
+  menu.innerHTML=actions.filter(function(item){ return item.show !== false; }).map(function(item){
+    return '<button type="button" class="' + (item.danger ? 'is-danger' : '') + '">' + _edEscapeHtml(item.label) + '</button>';
+  }).join('');
+  document.body.appendChild(menu);
+  var buttons=menu.querySelectorAll('button');
+  actions.filter(function(item){ return item.show !== false; }).forEach(function(item,index){
+    buttons[index].addEventListener('click',function(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+      edCloseQmsContextMenu();
+      item.handler();
+    });
+  });
+  var rect=menu.getBoundingClientRect();
+  var left=Math.min(x, Math.max(12, window.innerWidth - rect.width - 12));
+  var top=Math.min(y, Math.max(12, window.innerHeight - rect.height - 12));
+  menu.style.left=left+'px';
+  menu.style.top=top+'px';
+  setTimeout(function(){
+    document.addEventListener('mousedown', window._edQmsContextCloser=function(ev){
+      if(!menu.contains(ev.target)) edCloseQmsContextMenu();
+      document.removeEventListener('mousedown', window._edQmsContextCloser, true);
+      window._edQmsContextCloser=null;
+    }, true);
+  },0);
 }
 
 function edDeleteQmsBlock(block){
@@ -2074,6 +2195,13 @@ function edInitQmsBlocks(ctx){
       block.addEventListener('click',function(ev){
         if(ev.target.closest('.ed-qms-toolbar')) return;
         edSelectQmsBlock(block);
+      });
+      block.addEventListener('contextmenu',function(ev){
+        if(ev.target.closest('.ed-qms-toolbar')) return;
+        ev.preventDefault();
+        ev.stopPropagation();
+        edSelectQmsBlock(block);
+        edOpenQmsContextMenu(block, ev.clientX, ev.clientY);
       });
     }
   });

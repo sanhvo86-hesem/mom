@@ -984,6 +984,8 @@ mark.ed-hl-active{outline:2px solid #f59e0b}
 #editor-area .ed-qms-toolbtn{width:26px;height:24px;border:none;background:#fff;border-radius:999px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;color:#334155}
 #editor-area .ed-qms-toolbtn:hover{background:#eff6ff;color:#1d4ed8}
 #editor-area .ed-qms-toolbtn.is-danger:hover{background:#fef2f2;color:#dc2626}
+#editor-area .ed-qms-toolbtn.is-text{width:auto;min-width:36px;padding:0 8px;font-size:10px;font-weight:800;letter-spacing:.3px}
+.ed-btn-text{font-size:11px!important;font-weight:800!important;letter-spacing:.4px!important;min-width:38px}
 #editor-area .ed-qms-body .card,
 #editor-area .ed-qms-body .table-card{margin:0;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;box-shadow:none}
 #editor-area .ed-qms-body .table-card{overflow-x:auto}
@@ -1029,18 +1031,27 @@ mark.ed-hl-active{outline:2px solid #f59e0b}
 #editor-area .qf-grid > .qf-field.qf-col-span-2{grid-column:span 2}
 #editor-area .qf-grid--3 > .qf-field.qf-col-span-3{grid-column:span 3}
 .ed-form-designer-dock{position:fixed;right:24px;top:164px;z-index:240;width:220px;padding:12px;border:1px solid #dbe4ee;border-radius:16px;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);box-shadow:0 16px 40px rgba(15,23,42,.14)}
+.ed-form-designer-dock.is-hidden{display:none}
 .ed-form-dock-head{display:grid;gap:3px;margin-bottom:10px}
 .ed-form-dock-head strong{font-size:13px;color:#0f172a}
 .ed-form-dock-head span{font-size:11px;color:#64748b;line-height:1.45}
+.ed-form-dock-actions{display:flex;gap:6px;margin-bottom:8px}
+.ed-form-dock-actions .ed-form-dock-ghost{flex:1;padding:8px 9px;border:1px solid #dbe4ee;border-radius:10px;background:#f8fafc;color:#334155;font-size:11px;font-weight:700;cursor:pointer}
+.ed-form-dock-actions .ed-form-dock-ghost:hover{border-color:#93c5fd;background:#eff6ff;color:#1d4ed8}
 .ed-form-dock-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .ed-form-dock-grid button{padding:8px 9px;border:1px solid #dbe4ee;border-radius:10px;background:#fff;color:#0f172a;font-size:11px;font-weight:700;cursor:pointer;text-align:left}
 .ed-form-dock-grid button:hover{border-color:#93c5fd;background:#eff6ff;color:#1d4ed8}
 .ed-form-dock-manage{width:100%;margin-top:8px;padding:9px 10px;border:1px solid #cbd5e1;border-radius:12px;background:#0f172a;color:#fff;font-size:12px;font-weight:700;cursor:pointer}
 .ed-form-dock-manage:hover{background:#1d4ed8;border-color:#1d4ed8}
+.ed-qms-context-menu{position:fixed;z-index:320;min-width:220px;padding:8px;background:#fff;border:1px solid #dbe4ee;border-radius:14px;box-shadow:0 18px 48px rgba(15,23,42,.18);display:grid;gap:4px}
+.ed-qms-context-menu button{border:none;background:#fff;border-radius:10px;padding:10px 12px;text-align:left;font-size:13px;font-weight:700;color:#0f172a;cursor:pointer}
+.ed-qms-context-menu button:hover{background:#eff6ff;color:#1d4ed8}
+.ed-qms-context-menu button.is-danger:hover{background:#fef2f2;color:#dc2626}
 .ed-qms-prop-modal{width:520px;max-width:calc(100vw - 40px)}
 .ed-qms-prop-modal label{display:block;margin-top:10px;margin-bottom:6px;font-size:12px;font-weight:700;color:#0f172a}
 .ed-qms-prop-modal input,.ed-qms-prop-modal textarea,.ed-qms-prop-modal select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px;font-size:13px;outline:none}
 .ed-qms-prop-modal textarea{resize:vertical;min-height:92px}
+.ed-qms-prop-divider{margin-top:12px;padding-top:12px;border-top:1px solid #e2e8f0;font-size:12px;font-weight:800;color:#0f172a;text-transform:uppercase;letter-spacing:.04em}
 .ed-qms-prop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .ed-qms-prop-note{margin-top:6px;font-size:11px;line-height:1.5;color:#64748b}
 .ed-qms-prop-actions{display:flex;justify-content:flex-start;margin-top:8px}

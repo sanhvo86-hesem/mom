@@ -1,5 +1,5 @@
-// WORKFLOW ACTIONS
-// ═══════════════════════════════════════════════════
+﻿// WORKFLOW ACTIONS
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function edClearInjectedDocShellStyles(){
   try{
     document.querySelectorAll('[data-ed-doc-shell-style="1"]').forEach(function(node){ node.remove(); });
@@ -50,9 +50,9 @@ function edPrepareFormTemplateClone(bodyClone){
     if(workflowPanel){
       workflowPanel.innerHTML =
         '<div class="scar-signature-grid">' +
-          '<div class="scar-signature-card"><div class="scar-signature-head"><div><strong>Originator</strong><span>Người phát hành</span></div><span class="scar-signature-meaning">AUTHORED</span></div><div class="scar-signature-pad"><div class="scar-signature-empty">Block chữ ký mẫu</div><div>Chỉnh bố cục và thuộc tính. Chữ ký thật chỉ chạy khi mở hồ sơ runtime.</div></div></div>' +
-          '<div class="scar-signature-card"><div class="scar-signature-head"><div><strong>QA Reviewer</strong><span>Người xem xét QA</span></div><span class="scar-signature-meaning">REVIEWED</span></div><div class="scar-signature-pad"><div class="scar-signature-empty">Block chữ ký mẫu</div><div>Chỉnh bố cục và thuộc tính. Chữ ký thật chỉ chạy khi mở hồ sơ runtime.</div></div></div>' +
-          '<div class="scar-signature-card"><div class="scar-signature-head"><div><strong>Approver</strong><span>Người phê duyệt</span></div><span class="scar-signature-meaning">APPROVED</span></div><div class="scar-signature-pad"><div class="scar-signature-empty">Block chữ ký mẫu</div><div>Chỉnh bố cục và thuộc tính. Chữ ký thật chỉ chạy khi mở hồ sơ runtime.</div></div></div>' +
+          '<div class="scar-signature-card"><div class="scar-signature-head"><div><strong>Originator</strong><span>Người phát hành</span></div><span class="scar-signature-meaning">AUTHORED</span></div><div class="scar-signature-pad"><div class="scar-signature-empty">Block chữ ký mẫu</div><div>Chỉ chỉnh bố cục và thuộc tính. Chữ ký thật chỉ chạy khi mở hồ sơ runtime.</div></div></div>' +
+          '<div class="scar-signature-card"><div class="scar-signature-head"><div><strong>QA Reviewer</strong><span>Người xem xét QA</span></div><span class="scar-signature-meaning">REVIEWED</span></div><div class="scar-signature-pad"><div class="scar-signature-empty">Block chữ ký mẫu</div><div>Chỉ chỉnh bố cục và thuộc tính. Chữ ký thật chỉ chạy khi mở hồ sơ runtime.</div></div></div>' +
+          '<div class="scar-signature-card"><div class="scar-signature-head"><div><strong>Approver</strong><span>Người phê duyệt</span></div><span class="scar-signature-meaning">APPROVED</span></div><div class="scar-signature-pad"><div class="scar-signature-empty">Block chữ ký mẫu</div><div>Chỉ chỉnh bố cục và thuộc tính. Chữ ký thật chỉ chạy khi mở hồ sơ runtime.</div></div></div>' +
         '</div>' +
         '<div class="scar-workflow-note">Chế độ chỉnh mẫu: workflow, chữ ký điện tử, gửi xem xét và phê duyệt chỉ hoạt động khi mở hồ sơ thật. Tại đây anh chỉnh block, field, lookup và layout.</div>';
     }
@@ -70,6 +70,17 @@ function edPrepareFormTemplateClone(bodyClone){
   }
 }
 
+function edPrepareFormTemplateHtmlFragment(html){
+  try{
+    var shell = document.createElement('div');
+    shell.innerHTML = String(html || '');
+    edPrepareFormTemplateClone(shell);
+    return shell.innerHTML;
+  }catch(_err){
+    return String(html || '');
+  }
+}
+
 function startEdit(code){
   try{
     if(window.edTiptapAdapter && typeof window.edTiptapAdapter.destroy==='function'){
@@ -81,7 +92,7 @@ function startEdit(code){
     // Safety: do not allow editing while Google Translate is active (EN mode)
     // to avoid saving translated DOM back into the Vietnamese master HTML.
     if(lang==='en'){
-      showToast(lang==='en'?'↩ Switch to Vietnamese to edit':'↩ Vui lòng chuyển về tiếng Việt để chỉnh sửa');
+      showToast(lang==='en'?'â†© Switch to Vietnamese to edit':'â†© Vui lÃ²ng chuyá»ƒn vá» tiáº¿ng Viá»‡t Ä‘á»ƒ chá»‰nh sá»­a');
       try{ setLang('vi'); }catch(e){}
       return;
     }
@@ -91,7 +102,7 @@ function startEdit(code){
     
     const iframe=document.getElementById('doc-iframe');
     if(!iframe){
-      showToast(lang==='en'?'Document not loaded':'Chưa tải tài liệu');
+      showToast(lang==='en'?'Document not loaded':'ChÆ°a táº£i tÃ i liá»‡u');
       editMode=false; editingDoc=null;
       return;
     }
@@ -134,6 +145,7 @@ function startEdit(code){
           });
         }
       }catch(e){}
+      safeHtml = edPrepareFormTemplateHtmlFragment(safeHtml);
       originalHtml=safeHtml;
       iframe.style.display='none';
       var ec=document.getElementById('editor-container');
@@ -212,7 +224,7 @@ function startEdit(code){
       buildEditorToolbar();
       edUpdateWordCount();
       const st=document.getElementById('ed-status-save');
-      if(st){st.textContent=(lang==='en'?'Ready':'Sẵn sàng');st.className='';}
+      if(st){st.textContent=(lang==='en'?'Ready':'Sáºµn sÃ ng');st.className='';}
       renderWorkflowPanel(doc);
     }
     
@@ -282,7 +294,7 @@ function startEdit(code){
     // Timeout fallback after 1.5s
     _pmTimeout=setTimeout(function(){
       window.removeEventListener('message', _onMessage);
-      _activateEditor('<h2>'+doc.title+'</h2><p>'+doc.code+' — '+(lang==='en'?'Edit content here. If the document did not load, please open it first then try editing again.':'Chỉnh sửa nội dung tại đây. Nếu tài liệu chưa tải, hãy mở tài liệu trước rồi nhấn chỉnh sửa lại.')+'</p>');
+      _activateEditor('<h2>'+doc.title+'</h2><p>'+doc.code+' â€” '+(lang==='en'?'Edit content here. If the document did not load, please open it first then try editing again.':'Chá»‰nh sá»­a ná»™i dung táº¡i Ä‘Ã¢y. Náº¿u tÃ i liá»‡u chÆ°a táº£i, hÃ£y má»Ÿ tÃ i liá»‡u trÆ°á»›c rá»“i nháº¥n chá»‰nh sá»­a láº¡i.')+'</p>');
     },1500);
   }catch(err){
     console.error('startEdit error:', err);
@@ -291,9 +303,9 @@ function startEdit(code){
   }
 }
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // DOM INSPECTOR PANEL (Dreamweaver-style)
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 let edDomActive = false;
 let edDomSelected = null;
 let edDomDragPath = null;
@@ -366,7 +378,7 @@ function edDomBuildTree(node, parentPath, depth){
     else if(tag === 'ul' || tag === 'ol') preview = child.children.length + ' items';
     else if(tag === 'li') preview = (child.textContent||'').trim().substring(0,50);
     else preview = (child.textContent||'').trim().substring(0,40);
-    if(preview.length>55) preview=preview.substring(0,55)+'…';
+    if(preview.length>55) preview=preview.substring(0,55)+'â€¦';
     // Tag color class
     const tagCls = ['h1','h2','h3','h4','h5','h6','p','div','table','ul','ol','img','section'].includes(tag) ? 'tag-'+tag : 'tag-default';
     html += `<div class="dom-node dom-block" draggable="true" style="padding-left:${indent}px" data-dom-path="${path}" onclick="edDomSelect(this,event)" ondblclick="edDomFocus(this)" ondragstart="edDomDragStart(event,this)" ondragover="edDomDragOver(event,this)" ondragleave="edDomDragLeave(event,this)" ondrop="edDomDrop(event,this)" ondragend="edDomDragEnd(event,this)">`;
@@ -486,7 +498,7 @@ function edDomUpdateBreadcrumb(el){
     parts.unshift(`<span onclick="edDomJumpTo(this)" title="${tag}${id}${cls}">${tag}${id}</span>`);
     cur = cur.parentNode;
   }
-  bc.innerHTML = parts.join(' <span style="color:#45475a">›</span> ');
+  bc.innerHTML = parts.join(' <span style="color:#45475a">â€º</span> ');
 }
 
 function edDomJumpTo(){}
@@ -501,7 +513,7 @@ function edDomShowProps(el){
   const cs = window.getComputedStyle(el);
   
   propsDiv.innerHTML = `
-    <div style="font-weight:700;font-size:10px;color:#89b4fa;margin-bottom:6px">${tag}${el.id?'#'+el.id:''} — Properties</div>
+    <div style="font-weight:700;font-size:10px;color:#89b4fa;margin-bottom:6px">${tag}${el.id?'#'+el.id:''} â€” Properties</div>
     <div class="prop-row"><span class="prop-key">tag</span><div class="prop-val"><input value="${tag}" onchange="edDomChangeTag(this.value)"></div></div>
     <div class="prop-row"><span class="prop-key">id</span><div class="prop-val"><input value="${el.id||''}" onchange="if(edDomSelected)edDomSelected.id=this.value"></div></div>
     <div class="prop-row"><span class="prop-key">class</span><div class="prop-val"><input value="${el.className||''}" onchange="if(edDomSelected)edDomSelected.className=this.value"></div></div>
@@ -520,11 +532,11 @@ function edDomShowProps(el){
       <div class="prop-row"><span class="prop-key">border</span><div class="prop-val"><input value="${cs.border}" onchange="if(edDomSelected)edDomSelected.style.border=this.value"></div></div>
     </div>
     <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
-      <button onclick="edDomMoveUp()" style="font-size:9px;padding:2px 6px;background:#313244;border:1px solid #45475a;color:#cdd6f4;border-radius:4px;cursor:pointer" title="Move up">↑</button>
-      <button onclick="edDomMoveDown()" style="font-size:9px;padding:2px 6px;background:#313244;border:1px solid #45475a;color:#cdd6f4;border-radius:4px;cursor:pointer" title="Move down">↓</button>
-      <button onclick="edDomDuplicate()" style="font-size:9px;padding:2px 6px;background:#313244;border:1px solid #45475a;color:#cdd6f4;border-radius:4px;cursor:pointer" title="Duplicate">📋</button>
-      <button onclick="edDomDelete()" style="font-size:9px;padding:2px 6px;background:#45171a;border:1px solid #f38ba8;color:#f38ba8;border-radius:4px;cursor:pointer" title="Delete">🗑</button>
-      <button onclick="edDomWrap()" style="font-size:9px;padding:2px 6px;background:#313244;border:1px solid #45475a;color:#cdd6f4;border-radius:4px;cursor:pointer" title="Wrap in div">📦 Wrap</button>
+      <button onclick="edDomMoveUp()" style="font-size:9px;padding:2px 6px;background:#313244;border:1px solid #45475a;color:#cdd6f4;border-radius:4px;cursor:pointer" title="Move up">â†‘</button>
+      <button onclick="edDomMoveDown()" style="font-size:9px;padding:2px 6px;background:#313244;border:1px solid #45475a;color:#cdd6f4;border-radius:4px;cursor:pointer" title="Move down">â†“</button>
+      <button onclick="edDomDuplicate()" style="font-size:9px;padding:2px 6px;background:#313244;border:1px solid #45475a;color:#cdd6f4;border-radius:4px;cursor:pointer" title="Duplicate">ðŸ“‹</button>
+      <button onclick="edDomDelete()" style="font-size:9px;padding:2px 6px;background:#45171a;border:1px solid #f38ba8;color:#f38ba8;border-radius:4px;cursor:pointer" title="Delete">ðŸ—‘</button>
+      <button onclick="edDomWrap()" style="font-size:9px;padding:2px 6px;background:#313244;border:1px solid #45475a;color:#cdd6f4;border-radius:4px;cursor:pointer" title="Wrap in div">ðŸ“¦ Wrap</button>
     </div>`;
 }
 
@@ -556,7 +568,7 @@ function edDomDuplicate(){
 }
 function edDomDelete(){
   if(!edDomSelected) return;
-  if(!confirm(lang==='en'?'Delete this element?':'Xóa phần tử này?')) return;
+  if(!confirm(lang==='en'?'Delete this element?':'XÃ³a pháº§n tá»­ nÃ y?')) return;
   edDomSelected.parentNode.removeChild(edDomSelected);
   edDomSelected = null;
   edDomRefresh();
@@ -577,7 +589,7 @@ function rgbToHex(rgb){
   return '#'+(1<<24|m[0]<<16|m[1]<<8|+m[2]).toString(16).slice(1);
 }
 
-// ── Unsaved Changes Dialog ──
+// â”€â”€ Unsaved Changes Dialog â”€â”€
 function showUnsavedDialog(editingCode, targetCode){
   try{ document.querySelectorAll('.unsaved-modal-overlay').forEach(el=>el.remove()); }catch(e){}
   const editDoc = DOCS.find(d=>d.code===editingCode);
@@ -587,34 +599,34 @@ function showUnsavedDialog(editingCode, targetCode){
   overlay.innerHTML = `
     <div class="unsaved-modal">
       <div class="um-header">
-        <h3>${lang==='en'?'Unsaved Changes':'Thay đổi chưa lưu'}</h3>
-        <p>${lang==='en'?'You have unsaved changes in':'Bạn có thay đổi chưa lưu trong'} <b>${editingCode}</b>${editDoc?' — '+editDoc.title:''}</p>
+        <h3>${lang==='en'?'Unsaved Changes':'Thay Ä‘á»•i chÆ°a lÆ°u'}</h3>
+        <p>${lang==='en'?'You have unsaved changes in':'Báº¡n cÃ³ thay Ä‘á»•i chÆ°a lÆ°u trong'} <b>${editingCode}</b>${editDoc?' â€” '+editDoc.title:''}</p>
       </div>
       <div class="um-body">
         <button class="um-btn um-save" onclick="unsavedAction('save','${editingCode}','${targetCode}')">
-          <span class="um-icon">💾</span>
+          <span class="um-icon">ðŸ’¾</span>
           <div>
-            <div class="um-label">${lang==='en'?'Save Draft':'Lưu nháp'}</div>
-            <div class="um-desc">${lang==='en'?'Save current changes as draft, then navigate':'Lưu thay đổi hiện tại thành bản nháp, rồi chuyển trang'}</div>
+            <div class="um-label">${lang==='en'?'Save Draft':'LÆ°u nhÃ¡p'}</div>
+            <div class="um-desc">${lang==='en'?'Save current changes as draft, then navigate':'LÆ°u thay Ä‘á»•i hiá»‡n táº¡i thÃ nh báº£n nhÃ¡p, rá»“i chuyá»ƒn trang'}</div>
           </div>
         </button>
         <button class="um-btn um-discard" onclick="unsavedAction('discard','${editingCode}','${targetCode}')">
-          <span class="um-icon">🚫</span>
+          <span class="um-icon">ðŸš«</span>
           <div>
-            <div class="um-label">${lang==='en'?'Discard Changes':'Không lưu thay đổi'}</div>
-            <div class="um-desc">${lang==='en'?'Discard all unsaved edits and navigate':'Hủy tất cả chỉnh sửa chưa lưu và chuyển trang'}</div>
+            <div class="um-label">${lang==='en'?'Discard Changes':'KhÃ´ng lÆ°u thay Ä‘á»•i'}</div>
+            <div class="um-desc">${lang==='en'?'Discard all unsaved edits and navigate':'Há»§y táº¥t cáº£ chá»‰nh sá»­a chÆ°a lÆ°u vÃ  chuyá»ƒn trang'}</div>
           </div>
         </button>
         <button class="um-btn um-review" onclick="unsavedAction('review','${editingCode}','${targetCode}')">
-          <span class="um-icon">📤</span>
+          <span class="um-icon">ðŸ“¤</span>
           <div>
-            <div class="um-label">${lang==='en'?'Submit for Review':'Gửi xem xét'}</div>
-            <div class="um-desc">${lang==='en'?'Submit current changes for approval':'Gửi thay đổi hiện tại để xem xét duyệt'}</div>
+            <div class="um-label">${lang==='en'?'Submit for Review':'Gá»­i xem xÃ©t'}</div>
+            <div class="um-desc">${lang==='en'?'Submit current changes for approval':'Gá»­i thay Ä‘á»•i hiá»‡n táº¡i Ä‘á»ƒ xem xÃ©t duyá»‡t'}</div>
           </div>
         </button>
       </div>
       <div class="um-footer">
-        <button onclick="closeUnsavedDialog()">${lang==='en'?'Cancel':'Hủy'}</button>
+        <button onclick="closeUnsavedDialog()">${lang==='en'?'Cancel':'Há»§y'}</button>
       </div>
     </div>
   `;
@@ -705,14 +717,14 @@ async function saveDraftSilent(code){
           edMarkSaved(lang==='en'?'\u2713 Draft synced':'\u2713 \u0110\u00e3 \u0111\u1ed3ng b\u1ed9 b\u1ea3n nh\u00e1p');
         }
       }catch(e){}
-      showToast(lang==='en'?'💾 Draft auto-saved':'💾 Đã tự lưu nháp');
+      showToast(lang==='en'?'ðŸ’¾ Draft auto-saved':'ðŸ’¾ ÄÃ£ tá»± lÆ°u nhÃ¡p');
     }
   }catch(err){
     console.error('saveDraftSilent error:', err);
   }
 }
 
-// ── Collapsible Property Panel ──
+// â”€â”€ Collapsible Property Panel â”€â”€
 let edPropsCollapsed = false;
 function edTogglePropsPanel(){
   edPropsCollapsed = !edPropsCollapsed;
@@ -1126,7 +1138,7 @@ async function saveDraft(code){
     
     // Prevent saving while viewing translated EN to avoid capturing translated header/UI into master HTML
     if(lang==='en'){
-      showToast(lang==='en'?'↩ Switch to Vietnamese to save':'↩ Vui lòng chuyển về tiếng Việt trước khi lưu');
+      showToast(lang==='en'?'â†© Switch to Vietnamese to save':'â†© Vui lÃ²ng chuyá»ƒn vá» tiáº¿ng Viá»‡t trÆ°á»›c khi lÆ°u');
       try{ setLang('vi'); }catch(e){}
       return;
     }
@@ -1152,7 +1164,7 @@ const innerHtml = _getCurrentEditorInnerHtml();
           edMarkSaved(lang==='en'?('\u2713 Draft saved \u2014 v'+revision):('\u2713 \u0110\u00e3 l\u01b0u nh\u00e1p \u2014 v'+revision));
         }
       }catch(e){}
-      showToast(lang==='en'?'💾 Draft saved — v'+revision:'💾 Đã lưu nháp — v'+revision);
+      showToast(lang==='en'?'ðŸ’¾ Draft saved â€” v'+revision:'ðŸ’¾ ÄÃ£ lÆ°u nhÃ¡p â€” v'+revision);
       // refresh workflow panel/DCR record in preview
       try{ renderWorkflowPanel(doc); }catch(e){}
       try{ renderVersionHistory(doc); }catch(e){}
@@ -1160,9 +1172,9 @@ const innerHtml = _getCurrentEditorInnerHtml();
       if(res && res.error==='approve_revision_mismatch'){
         const exp = String(res.expected_revision||'').trim();
         const got = String(res.received_revision||'').trim();
-        showToast('⚠ ' + (lang==='en'
+        showToast('âš  ' + (lang==='en'
           ? `Revision mismatch. Server expects v${exp} but received v${got}. Please reload and approve again.`
-          : `Lệch phiên bản. Server yêu cầu v${exp} nhưng nhận v${got}. Vui lòng tải lại và duyệt lại.`));
+          : `Lá»‡ch phiÃªn báº£n. Server yÃªu cáº§u v${exp} nhÆ°ng nháº­n v${got}. Vui lÃ²ng táº£i láº¡i vÃ  duyá»‡t láº¡i.`));
         try{ await openDocPreview(doc.code); }catch(e){}
         return;
       }
@@ -1187,7 +1199,7 @@ function submitForReview(code){
     
     // Prevent submit while viewing translated EN to avoid capturing translated header/UI into archive HTML
     if(lang==='en'){
-      showToast(lang==='en'?'↩ Switch to Vietnamese to submit':'↩ Vui lòng chuyển về tiếng Việt trước khi gửi xem xét');
+      showToast(lang==='en'?'â†© Switch to Vietnamese to submit':'â†© Vui lÃ²ng chuyá»ƒn vá» tiáº¿ng Viá»‡t trÆ°á»›c khi gá»­i xem xÃ©t');
       try{ setLang('vi'); }catch(e){}
       return;
     }
@@ -1250,11 +1262,11 @@ function submitForReview(code){
         </div>
         <div class="sm-body">
           <div class="sm-submitter">
-            <div class="sm-avatar">${currentUser.avatar||'👤'}</div>
+            <div class="sm-avatar">${currentUser.avatar||'ðŸ‘¤'}</div>
             <div class="sm-info">
               <div class="sm-name">${currentUser.name}</div>
               <div class="sm-role">${ROLES[currentUser.role]?(lang==='en'?ROLES[currentUser.role].labelEn||ROLES[currentUser.role].label:ROLES[currentUser.role].label):currentUser.role}</div>
-              <div class="sm-date">📅 ${T('sm_submit_date')}: ${submitDate}</div>
+              <div class="sm-date">ðŸ“… ${T('sm_submit_date')}: ${submitDate}</div>
             </div>
           </div>
 
@@ -1262,17 +1274,17 @@ function submitForReview(code){
           <div class="sm-type-grid">
             <div class="sm-type-card" id="sm-card-minor" onclick="selectSubmitType('minor')">
               <div class="sm-check" id="sm-check-minor"></div>
-              <div class="sm-type-icon">📝</div>
+              <div class="sm-type-icon">ðŸ“</div>
               <div class="sm-type-title">${T('sm_minor')}</div>
-              <div class="sm-type-ver">v${baseRev} → v${minorPreview}</div>
+              <div class="sm-type-ver">v${baseRev} â†’ v${minorPreview}</div>
               <div class="sm-type-desc">${T('sm_minor_desc')}</div>
               <div class="sm-type-examples">${T('sm_minor_examples')}</div>
             </div>
             <div class="sm-type-card" id="sm-card-major" onclick="selectSubmitType('major')">
               <div class="sm-check" id="sm-check-major"></div>
-              <div class="sm-type-icon">🔄</div>
+              <div class="sm-type-icon">ðŸ”„</div>
               <div class="sm-type-title">${T('sm_major')}</div>
-              <div class="sm-type-ver">v${baseRev} → v${majorPreview}</div>
+              <div class="sm-type-ver">v${baseRev} â†’ v${majorPreview}</div>
               <div class="sm-type-desc">${T('sm_major_desc')}</div>
               <div class="sm-type-examples">${T('sm_major_examples')}</div>
             </div>
@@ -1315,14 +1327,14 @@ async function uploadFormDraft(code){
     if(!doc) return;
     const state = getDocState(code) || {revision:doc.rev||'0', status:'draft'};
     if(state.status === 'approved'){
-      showToast(lang==='en'?'Start a new revision first':'Hãy bắt đầu phiên bản mới trước');
+      showToast(lang==='en'?'Start a new revision first':'HÃ£y báº¯t Ä‘áº§u phiÃªn báº£n má»›i trÆ°á»›c');
       return;
     }
     const revision = String(state.revision || doc.rev || '0');
     const note = prompt(
       lang==='en'
         ? `Upload workbook draft for ${doc.code} (v${revision})\n\nAdd a short check-in comment:`
-        : `Upload workbook nháp cho ${doc.code} (v${revision})\n\nNhập ghi chú check-in ngắn:`,
+        : `Upload workbook nhÃ¡p cho ${doc.code} (v${revision})\n\nNháº­p ghi chÃº check-in ngáº¯n:`,
       ''
     );
     if(note === null) return;
@@ -1340,12 +1352,12 @@ async function uploadFormDraft(code){
         fd.append('revision', revision);
         fd.append('note', note || '');
         fd.append('file', file, file.name);
-        showToast(lang==='en'?'Uploading workbook draft...':'Đang upload workbook nháp...');
+        showToast(lang==='en'?'Uploading workbook draft...':'Äang upload workbook nhÃ¡p...');
         const res = await apiCallFormData('form_upload_draft', fd, 180000);
         if(res && res.ok){
           if(res.state) setDocState(code, res.state);
           if(res.versions) setDocVersions(code, res.versions);
-          showToast(lang==='en'?'✅ Workbook draft uploaded':'✅ Đã upload workbook nháp');
+          showToast(lang==='en'?'âœ… Workbook draft uploaded':'âœ… ÄÃ£ upload workbook nhÃ¡p');
           await openDocPreview(code);
           return;
         }
@@ -1374,13 +1386,13 @@ async function submitWorkbookForReview(code){
     const versions = getDocVersions(code) || [];
     const hasDraftUpload = versions.some(v=>v && v.status==='draft' && String(v.version||'').replace(/^v/i,'')===revision && versionHasAccess(doc, v));
     if(!hasDraftUpload){
-      showToast(lang==='en'?'Upload a draft workbook first':'Hãy upload workbook nháp trước');
+      showToast(lang==='en'?'Upload a draft workbook first':'HÃ£y upload workbook nhÃ¡p trÆ°á»›c');
       return;
     }
     const note = prompt(
       lang==='en'
         ? `Submit workbook ${doc.code} v${revision} for review\n\nChange note:`
-        : `Gửi workbook ${doc.code} v${revision} để xem xét\n\nGhi chú thay đổi:`,
+        : `Gá»­i workbook ${doc.code} v${revision} Ä‘á»ƒ xem xÃ©t\n\nGhi chÃº thay Ä‘á»•i:`,
       ''
     );
     if(note === null) return;
@@ -1389,7 +1401,7 @@ async function submitWorkbookForReview(code){
     if(res && res.ok){
       if(res.state) setDocState(code, res.state);
       if(res.versions) setDocVersions(code, res.versions);
-      showToast(lang==='en'?'📤 Workbook submitted for review':'📤 Đã gửi workbook để xem xét');
+      showToast(lang==='en'?'ðŸ“¤ Workbook submitted for review':'ðŸ“¤ ÄÃ£ gá»­i workbook Ä‘á»ƒ xem xÃ©t');
       await openDocPreview(code);
       return;
     }
@@ -1412,8 +1424,8 @@ function selectSubmitType(type){
   const majorCheck=document.getElementById('sm-check-major');
   minorCard.classList.toggle('selected', type==='minor');
   majorCard.classList.toggle('selected', type==='major');
-  minorCheck.textContent=type==='minor'?'✓':'';
-  majorCheck.textContent=type==='major'?'✓':'';
+  minorCheck.textContent=type==='minor'?'âœ“':'';
+  majorCheck.textContent=type==='major'?'âœ“':'';
   document.getElementById('sm-submit-btn').disabled=false;
 }
 
@@ -1445,7 +1457,7 @@ async function confirmSubmitForReview(code){
     
     // Final validation
     if(!fullHtml || fullHtml.trim().length < 30){
-      showToast(lang==='en'?'⚠ Cannot capture document content. Please try saving draft first.':'⚠ Không thể lấy nội dung tài liệu. Hãy thử lưu nháp trước.');
+      showToast(lang==='en'?'âš  Cannot capture document content. Please try saving draft first.':'âš  KhÃ´ng thá»ƒ láº¥y ná»™i dung tÃ i liá»‡u. HÃ£y thá»­ lÆ°u nhÃ¡p trÆ°á»›c.');
       return;
     }
 
@@ -1470,8 +1482,8 @@ async function confirmSubmitForReview(code){
 
       loadDocContent(code);
 
-      const toastType=updateType==='major'?'🔄 MAJOR':'📝 MINOR';
-      showToast(lang==='en'?'📤 Submitted for review ('+toastType+')':'📤 Đã gửi xem xét ('+toastType+')');
+      const toastType=updateType==='major'?'ðŸ”„ MAJOR':'ðŸ“ MINOR';
+      showToast(lang==='en'?'ðŸ“¤ Submitted for review ('+toastType+')':'ðŸ“¤ ÄÃ£ gá»­i xem xÃ©t ('+toastType+')');
       renderWorkflowPanel(doc);
       renderVersionHistory(doc);
       updateDocViewerHeader(doc);
@@ -1479,7 +1491,7 @@ async function confirmSubmitForReview(code){
     }
 
     // Show specific server error if available
-    const errMsg = (res && res.error) ? res.error : (lang==='en'?'Submit failed':'Gửi xem xét thất bại');
+    const errMsg = (res && res.error) ? res.error : (lang==='en'?'Submit failed':'Gá»­i xem xÃ©t tháº¥t báº¡i');
     showToast('\u26A0 ' + errMsg);
   }catch(err){
     console.error('confirmSubmitForReview error:', err);
@@ -1511,10 +1523,10 @@ async function approveDoc(code){
     const msg = isInitial
       ? (lang==='en'
           ? `Approve INITIAL RELEASE (v${newRevision})?`
-          : `Duyệt PHÁT HÀNH LẦN ĐẦU (v${newRevision})?`)
+          : `Duyá»‡t PHÃT HÃ€NH Láº¦N Äáº¦U (v${newRevision})?`)
       : (lang==='en'
-          ? `Approve ${doc.code}\n\n${prevRev===newRevision?`v${newRevision}`:`v${prevRev} → v${newRevision}`}\nType: ${String(updateType||'').toUpperCase()}`
-          : `Duyệt ${doc.code}\n\n${prevRev===newRevision?`v${newRevision}`:`v${prevRev} → v${newRevision}`}\nLoại: ${String(updateType||'').toUpperCase()}`);
+          ? `Approve ${doc.code}\n\n${prevRev===newRevision?`v${newRevision}`:`v${prevRev} â†’ v${newRevision}`}\nType: ${String(updateType||'').toUpperCase()}`
+          : `Duyá»‡t ${doc.code}\n\n${prevRev===newRevision?`v${newRevision}`:`v${prevRev} â†’ v${newRevision}`}\nLoáº¡i: ${String(updateType||'').toUpperCase()}`);
 
     if(!confirm(msg)) return;
 
@@ -1529,7 +1541,7 @@ async function approveDoc(code){
     if(res && res.ok){
       SERVER_DOC_STATE[doc.code] = res.state;
       if(res.versions) setDocVersions(doc.code, res.versions);
-      showToast(lang==='en'?'✅ Approved':'✅ Đã duyệt');
+      showToast(lang==='en'?'âœ… Approved':'âœ… ÄÃ£ duyá»‡t');
 
       // Refresh the preview + lists
       await openDocPreview(doc.code);
@@ -1557,7 +1569,7 @@ async function rejectDoc(code){
       if(res.state) setDocState(code, res.state);
       // Reload versions/state from server to keep folder-sync
       await refreshDocFromServer(code);
-      showToast(lang==='en'?'↩ Rejected — returned to author':'↩ Đã trả lại — về tác giả');
+      showToast(lang==='en'?'â†© Rejected â€” returned to author':'â†© ÄÃ£ tráº£ láº¡i â€” vá» tÃ¡c giáº£');
       renderWorkflowPanel(doc);
       renderVersionHistory(doc);
       updateDocViewerHeader(doc);
@@ -1565,7 +1577,7 @@ async function rejectDoc(code){
       refreshAllDocStatesFromServer().then(()=>{ try{ renderSidebar(); }catch(e){} });
       return;
     }
-    showToast(lang==='en'?'Reject failed':'Trả lại thất bại');
+    showToast(lang==='en'?'Reject failed':'Tráº£ láº¡i tháº¥t báº¡i');
   }catch(err){
     console.error('rejectDoc error:', err);
     showToast('Error: '+(err && err.message ? err.message : err));
@@ -1576,7 +1588,7 @@ async function restoreVersion(code, idx){
   const doc=DOCS.find(d=>d.code===code);
   if(!doc) return;
   if(typeof isDownloadOnlyDoc==='function' && isDownloadOnlyDoc(doc)){
-    showToast(lang==='en'?'Restore to draft is not available for workbook versions. Start a new revision and upload a workbook draft instead.':'Khôi phục thành nháp chưa áp dụng cho workbook. Hãy bắt đầu phiên bản mới rồi upload workbook nháp.');
+    showToast(lang==='en'?'Restore to draft is not available for workbook versions. Start a new revision and upload a workbook draft instead.':'KhÃ´i phá»¥c thÃ nh nhÃ¡p chÆ°a Ã¡p dá»¥ng cho workbook. HÃ£y báº¯t Ä‘áº§u phiÃªn báº£n má»›i rá»“i upload workbook nhÃ¡p.');
     return;
   }
   const versions=getDocVersions(code);
@@ -1586,14 +1598,14 @@ async function restoreVersion(code, idx){
 
   const msg = lang==='en'
     ? ('Restore ' + (v.version||'this version') + ' as a NEW draft?')
-    : ('Khôi phục ' + (v.version||'phiên bản này') + ' thành bản nháp MỚI?');
+    : ('KhÃ´i phá»¥c ' + (v.version||'phiÃªn báº£n nÃ y') + ' thÃ nh báº£n nhÃ¡p Má»šI?');
   if(!confirm(msg)) return;
 
   try{
     // Fetch the full HTML file of the selected version
     const html = await fetch(url + (url.indexOf('?')>=0 ? '&' : '?') + 't=' + Date.now(), {credentials:'include'}).then(r=>r.text());
     const rev = (v.version||'v0').replace(/^v/i,'') || '0';
-    const note = (lang==='en'?'Restored from ':'Khôi phục từ ') + (v.version||'');
+    const note = (lang==='en'?'Restored from ':'KhÃ´i phá»¥c tá»« ') + (v.version||'');
 
     const res = await apiCall('doc_save_draft', {code: code, base_path: doc.path, revision: rev, note: note, html: html});
     if(res && res.ok){
@@ -1601,7 +1613,7 @@ async function restoreVersion(code, idx){
       if(res.versions) setDocVersions(code, res.versions);
       try{ setEditedHtml(code, ''); }catch(e){}
       edCleanShellHtml=null;
-      showToast(lang==='en'?'↩ Restored as draft':'↩ Đã khôi phục thành bản nháp');
+      showToast(lang==='en'?'â†© Restored as draft':'â†© ÄÃ£ khÃ´i phá»¥c thÃ nh báº£n nhÃ¡p');
       openDoc(code);
       return;
     }
@@ -1609,7 +1621,7 @@ async function restoreVersion(code, idx){
     console.error('restoreVersion error:', err);
   }
 
-  showToast(lang==='en'?'Restore failed':'Khôi phục thất bại');
+  showToast(lang==='en'?'Restore failed':'KhÃ´i phá»¥c tháº¥t báº¡i');
 }
 
 // Pick the best file to show in the iframe:
@@ -1631,7 +1643,7 @@ function getLatestWorkingFile(code){
 
 function getDocViewFile(doc){
   if(!doc) return null;
-  // Master view must always point to the current released file (version history "Hiện tại")
+  // Master view must always point to the current released file (version history "Hiá»‡n táº¡i")
   // to keep sidebar/header/document metadata consistent.
   return doc.path;
 }
@@ -1728,7 +1740,7 @@ function extractIframePublishedDocMetadata(idoc){
 
     if((!meta.code || !meta.title)){
       const h1Text = String((idoc.querySelector('h1')?.textContent || '')).trim();
-      const h1Match = h1Text.match(/^((?:WI|ANNEX)-\d{3})\s*(?:—|-|:)\s*(.+)$/i);
+      const h1Match = h1Text.match(/^((?:WI|ANNEX)-\d{3})\s*(?:â€”|-|:)\s*(.+)$/i);
       if(h1Match){
         if(!meta.code) meta.code = String(h1Match[1] || '').trim().toUpperCase();
         if(!meta.title) meta.title = String(h1Match[2] || '').trim();
@@ -1811,7 +1823,7 @@ function syncIframeDocumentHeaderMetadata(idoc, doc){
         const labelEl = row.querySelector('b');
         const valueEl = row.querySelector('span:last-child');
         const label = String(labelEl ? labelEl.textContent : '').trim();
-        if(valueEl && /\b(code|mã)\b/i.test(label) && code){
+        if(valueEl && /\b(code|mÃ£)\b/i.test(label) && code){
           valueEl.textContent = code;
           if(valueEl.classList) valueEl.classList.add('doc-code');
         }
@@ -1903,13 +1915,13 @@ function loadDocContent(code){
         <div class="wrap">
           <div class="card">
             <div class="eyebrow">${docTypeLabel}</div>
-            <h1>${doc.code} — ${title}</h1>
+            <h1>${doc.code} â€” ${title}</h1>
             ${desc?`<div class="sub">${desc}</div>`:''}
             <div class="grid">
-              <div class="meta"><b>${lang==='en'?'Current revision':'Phiên bản hiện hành'}</b><span>v${revision}</span></div>
-              <div class="meta"><b>${lang==='en'?'Status':'Trạng thái'}</b><span>${status}</span></div>
-              <div class="meta"><b>${lang==='en'?'Owner':'Chủ sở hữu'}</b><span>${owner}</span></div>
-              <div class="meta"><b>${lang==='en'?'Delivery mode':'Cách phát hành'}</b><span>${lang==='en'?'Download only':'Chỉ tải về'}</span></div>
+              <div class="meta"><b>${lang==='en'?'Current revision':'PhiÃªn báº£n hiá»‡n hÃ nh'}</b><span>v${revision}</span></div>
+              <div class="meta"><b>${lang==='en'?'Status':'Tráº¡ng thÃ¡i'}</b><span>${status}</span></div>
+              <div class="meta"><b>${lang==='en'?'Owner':'Chá»§ sá»Ÿ há»¯u'}</b><span>${owner}</span></div>
+              <div class="meta"><b>${lang==='en'?'Delivery mode':'CÃ¡ch phÃ¡t hÃ nh'}</b><span>${lang==='en'?'Download only':'Chá»‰ táº£i vá»'}</span></div>
             </div>
             <div class="cta">
               <button class="btn primary" type="button" onclick='parent.triggerDownloadUrl(${JSON.stringify(currentUrl)})'>${currentFileLabel}</button>
@@ -1979,4 +1991,4 @@ function loadDocContent(code){
 }
 
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•

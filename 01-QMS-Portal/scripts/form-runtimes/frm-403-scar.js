@@ -1,4 +1,4 @@
-(function(){
+﻿(function(){
 'use strict';
 
 var FORM_CODE = String((new URLSearchParams(window.location.search || '')).get('form_code') || 'FRM-403-SCAR').trim() || 'FRM-403-SCAR';
@@ -10,8 +10,8 @@ var LOOKUP_FIELDS = {
   supplier_name: {
     hostId: 'supplier_name_lookup',
     source: 'suppliers',
-    placeholder: 'Tìm và chọn nhà cung cấp từ dữ liệu nền',
-    helper: 'Chọn nhà cung cấp để tự động điền mã và liên hệ.',
+    placeholder: 'TÃ¬m vÃ  chá»n nhÃ  cung cáº¥p tá»« dá»¯ liá»‡u ná»n',
+    helper: 'Chá»n nhÃ  cung cáº¥p Ä‘á»ƒ tá»± Ä‘á»™ng Ä‘iá»n mÃ£ vÃ  liÃªn há»‡.',
     onSelect: function(item){
       state.data.supplier_name = String(item.supplier_name || item.label || '').trim();
       state.data.supplier_id = String(item.supplier_id || item.value || '').trim();
@@ -21,8 +21,8 @@ var LOOKUP_FIELDS = {
   part_number: {
     hostId: 'part_number_lookup',
     source: 'parts',
-    placeholder: 'Tìm và chọn part / revision từ dữ liệu nền',
-    helper: 'Chọn part để tự động gắn revision hiện hành.',
+    placeholder: 'TÃ¬m vÃ  chá»n part / revision tá»« dá»¯ liá»‡u ná»n',
+    helper: 'Chá»n part Ä‘á»ƒ tá»± Ä‘á»™ng gáº¯n revision hiá»‡n hÃ nh.',
     onSelect: function(item){
       state.data.part_number = String(item.part_number || item.value || '').trim();
       state.data.part_rev = String(item.revision || '').trim();
@@ -34,8 +34,8 @@ var LOOKUP_FIELDS = {
   issued_by: {
     hostId: 'issued_by_lookup',
     source: 'company_users',
-    placeholder: 'Tìm và chọn người phát hành',
-    helper: 'Chọn từ danh sách công ty hoặc dùng người đăng nhập.',
+    placeholder: 'TÃ¬m vÃ  chá»n ngÆ°á»i phÃ¡t hÃ nh',
+    helper: 'Chá»n tá»« danh sÃ¡ch cÃ´ng ty hoáº·c dÃ¹ng ngÆ°á»i Ä‘Äƒng nháº­p.',
     allowCurrentUser: true,
     onSelect: function(item){
       state.data.issued_by = String(item.person_name || item.label || item.value || '').trim();
@@ -44,8 +44,8 @@ var LOOKUP_FIELDS = {
   approved_by: {
     hostId: 'approved_by_lookup',
     source: 'company_users',
-    placeholder: 'Tìm và chọn người phê duyệt',
-    helper: 'Chọn từ danh sách công ty hoặc dùng người đăng nhập.',
+    placeholder: 'TÃ¬m vÃ  chá»n ngÆ°á»i phÃª duyá»‡t',
+    helper: 'Chá»n tá»« danh sÃ¡ch cÃ´ng ty hoáº·c dÃ¹ng ngÆ°á»i Ä‘Äƒng nháº­p.',
     allowCurrentUser: true,
     onSelect: function(item){
       state.data.approved_by = String(item.person_name || item.label || item.value || '').trim();
@@ -54,18 +54,18 @@ var LOOKUP_FIELDS = {
   defect_type: {
     hostId: 'defect_type_lookup',
     source: 'defect_catalog',
-    placeholder: 'Tìm và chọn loại lỗi từ danh mục kiểm soát',
-    helper: 'Loại lỗi dùng chung giữa EQMS, ERP và MES.',
+    placeholder: 'TÃ¬m vÃ  chá»n loáº¡i lá»—i tá»« danh má»¥c kiá»ƒm soÃ¡t',
+    helper: 'Loáº¡i lá»—i dÃ¹ng chung giá»¯a EQMS, ERP vÃ  MES.',
     onSelect: function(item){
       state.data.defect_type = String(item.defect_name || item.label || item.value || '').trim();
     }
   }
 };
-var STATUS_LABELS = { open:'Mở', awaiting_response:'Chờ phản hồi nhà cung cấp', under_review:'Đang xem xét', verification:'Đang xác nhận', closed:'Đã đóng' };
+var STATUS_LABELS = { open:'Má»Ÿ', awaiting_response:'Chá» pháº£n há»“i nhÃ  cung cáº¥p', under_review:'Äang xem xÃ©t', verification:'Äang xÃ¡c nháº­n', closed:'ÄÃ£ Ä‘Ã³ng' };
 var SEVERITY_META = {
-  minor:{ label:'Nhẹ', note:'Theo dõi theo nhịp xử lý thông thường, không cần escalations tức thời.', className:'success' },
-  major:{ label:'Nặng', note:'Cần containment rõ ràng và phản hồi nguyên nhân gốc trong hạn ngắn.', className:'warning' },
-  critical:{ label:'Nghiêm trọng', note:'Cần điều phối khẩn, nhấn mạnh nguy cơ tái diễn và xác minh hiệu lực chặt chẽ.', className:'danger' }
+  minor:{ label:'Nháº¹', note:'Theo dÃµi theo nhá»‹p xá»­ lÃ½ thÃ´ng thÆ°á»ng, khÃ´ng cáº§n escalations tá»©c thá»i.', className:'success' },
+  major:{ label:'Náº·ng', note:'Cáº§n containment rÃµ rÃ ng vÃ  pháº£n há»“i nguyÃªn nhÃ¢n gá»‘c trong háº¡n ngáº¯n.', className:'warning' },
+  critical:{ label:'NghiÃªm trá»ng', note:'Cáº§n Ä‘iá»u phá»‘i kháº©n, nháº¥n máº¡nh nguy cÆ¡ tÃ¡i diá»…n vÃ  xÃ¡c minh hiá»‡u lá»±c cháº·t cháº½.', className:'danger' }
 };
 
 var params = new URLSearchParams(window.location.search || '');
@@ -89,7 +89,7 @@ var state = {
   reviewSla: null,
   data: {},
   resetSnapshot: {},
-  loadedSource: 'Mặc định từ hồ sơ',
+  loadedSource: 'Máº·c Ä‘á»‹nh tá»« há»“ sÆ¡',
   lastLocalSaveAt: '',
   lastServerSaveAt: '',
   saveTimer: null,
@@ -110,7 +110,7 @@ function init(){
   bindEvents();
   bindRuntimeGuards();
   updateActionState();
-  updateRuntimeAlert('info', 'Đang khởi tạo biểu mẫu', 'Hệ thống đang tải thông tin hồ sơ, nháp gần nhất và dữ liệu nền nhà cung cấp.', 'Khởi tạo');
+  updateRuntimeAlert('info', 'Äang khá»Ÿi táº¡o biá»ƒu máº«u', 'Há»‡ thá»‘ng Ä‘ang táº£i thÃ´ng tin há»“ sÆ¡, nhÃ¡p gáº§n nháº¥t vÃ  dá»¯ liá»‡u ná»n nhÃ  cung cáº¥p.', 'Khá»Ÿi táº¡o');
   loadRuntime();
 }
 
@@ -167,18 +167,18 @@ function loadRuntime(){
     var hasSubmitted = !!(state.entry && state.entry.entry_id);
     setMode(hasSubmitted ? 'view' : 'edit');
     if(!state.loggedIn){
-      updateRuntimeAlert('warning', 'Phiên đăng nhập chưa sẵn sàng', 'Biểu mẫu vẫn cho phép nhập và tính toán cục bộ, nhưng muốn lưu nháp máy chủ hoặc gửi hồ sơ thì cần đăng nhập QMS hợp lệ.', 'Khách');
+      updateRuntimeAlert('warning', 'PhiÃªn Ä‘Äƒng nháº­p chÆ°a sáºµn sÃ ng', 'Biá»ƒu máº«u váº«n cho phÃ©p nháº­p vÃ  tÃ­nh toÃ¡n cá»¥c bá»™, nhÆ°ng muá»‘n lÆ°u nhÃ¡p mÃ¡y chá»§ hoáº·c gá»­i há»“ sÆ¡ thÃ¬ cáº§n Ä‘Äƒng nháº­p QMS há»£p lá»‡.', 'KhÃ¡ch');
     } else if(!state.allocationId){
-      updateRuntimeAlert('warning', 'Biểu mẫu đang mở độc lập', 'Chưa có allocation_id nên anh chỉ có thể nhập thử và lưu cục bộ. Muốn gửi SCAR thật, hãy mở từ workspace đã cấp mã hồ sơ.', 'Chưa cấp mã');
+      updateRuntimeAlert('warning', 'Biá»ƒu máº«u Ä‘ang má»Ÿ Ä‘á»™c láº­p', 'ChÆ°a cÃ³ allocation_id nÃªn anh chá»‰ cÃ³ thá»ƒ nháº­p thá»­ vÃ  lÆ°u cá»¥c bá»™. Muá»‘n gá»­i SCAR tháº­t, hÃ£y má»Ÿ tá»« workspace Ä‘Ã£ cáº¥p mÃ£ há»“ sÆ¡.', 'ChÆ°a cáº¥p mÃ£');
     } else {
-      updateRuntimeAlert('success', 'Biểu mẫu đã sẵn sàng', 'Dữ liệu hồ sơ, nháp và ngữ cảnh truy xuất đã được đồng bộ. Anh có thể tiếp tục hoàn thiện SCAR ngay trên file HTML độc lập này.', 'Sẵn sàng');
+      updateRuntimeAlert('success', 'Biá»ƒu máº«u Ä‘Ã£ sáºµn sÃ ng', 'Dá»¯ liá»‡u há»“ sÆ¡, nhÃ¡p vÃ  ngá»¯ cáº£nh truy xuáº¥t Ä‘Ã£ Ä‘Æ°á»£c Ä‘á»“ng bá»™. Anh cÃ³ thá»ƒ tiáº¿p tá»¥c hoÃ n thiá»‡n SCAR ngay trÃªn file HTML Ä‘á»™c láº­p nÃ y.', 'Sáºµn sÃ ng');
     }
     notifyHeight();
   }).catch(function(error){
     console.error(error);
-    updateRuntimeAlert('danger', 'Không thể khởi tạo biểu mẫu', error && error.message ? error.message : 'Hệ thống không tải được dữ liệu cần thiết cho SCAR.', 'Lỗi');
+    updateRuntimeAlert('danger', 'KhÃ´ng thá»ƒ khá»Ÿi táº¡o biá»ƒu máº«u', error && error.message ? error.message : 'Há»‡ thá»‘ng khÃ´ng táº£i Ä‘Æ°á»£c dá»¯ liá»‡u cáº§n thiáº¿t cho SCAR.', 'Lá»—i');
     updateActionState();
-    notifyParentToast('Không thể khởi tạo biểu mẫu SCAR.', 'error');
+    notifyParentToast('KhÃ´ng thá»ƒ khá»Ÿi táº¡o biá»ƒu máº«u SCAR.', 'error');
   });
 }
 
@@ -254,9 +254,9 @@ function buildMergedData(){
   var base = defaultData();
   mergeFieldMap(base, allocationPrefill());
   [
-    { label:'Bản nộp gần nhất', timestamp:parseTimestamp(state.entry && (state.entry.updated_at || state.entry.submitted_at || state.entry.created_at)), values:extractEntryValues(state.entry), order:1 },
-    { label:'Nháp máy chủ', timestamp:parseTimestamp(state.serverDraft && state.serverDraft.saved_at), values:extractDraftValues(state.serverDraft), order:2 },
-    { label:'Nháp cục bộ', timestamp:parseTimestamp(state.localDraft && state.localDraft.saved_at), values:extractDraftValues(state.localDraft), order:3 }
+    { label:'Báº£n ná»™p gáº§n nháº¥t', timestamp:parseTimestamp(state.entry && (state.entry.updated_at || state.entry.submitted_at || state.entry.created_at)), values:extractEntryValues(state.entry), order:1 },
+    { label:'NhÃ¡p mÃ¡y chá»§', timestamp:parseTimestamp(state.serverDraft && state.serverDraft.saved_at), values:extractDraftValues(state.serverDraft), order:2 },
+    { label:'NhÃ¡p cá»¥c bá»™', timestamp:parseTimestamp(state.localDraft && state.localDraft.saved_at), values:extractDraftValues(state.localDraft), order:3 }
   ].filter(function(item){
     return item.values && Object.keys(item.values).length;
   }).sort(function(a, b){
@@ -448,7 +448,7 @@ function publishDirtyState(source){
     source: source || '',
     last_saved_at: state.lastServerSaveAt || state.lastLocalSaveAt || '',
     last_dirty_at: dirty ? new Date().toISOString() : '',
-    summary: dirty ? 'Biểu mẫu đang có thay đổi chưa được chốt thành bản nháp an toàn.' : ''
+    summary: dirty ? 'Biá»ƒu máº«u Ä‘ang cÃ³ thay Ä‘á»•i chÆ°a Ä‘Æ°á»£c chá»‘t thÃ nh báº£n nhÃ¡p an toÃ n.' : ''
   });
   return dirty;
 }
@@ -464,7 +464,7 @@ function bindRuntimeGuards(){
     try{ syncDataFromDom(); }catch(_err){}
     if(!publishDirtyState('beforeunload')) return;
     try{ saveLocalDraft('beforeunload'); }catch(_err){}
-    var msg = 'Biểu mẫu đang có dữ liệu dang dở. Hãy lưu nháp trước khi mở liên kết khác hoặc làm mới hệ thống.';
+    var msg = 'Biá»ƒu máº«u Ä‘ang cÃ³ dá»¯ liá»‡u dang dá»Ÿ. HÃ£y lÆ°u nhÃ¡p trÆ°á»›c khi má»Ÿ liÃªn káº¿t khÃ¡c hoáº·c lÃ m má»›i há»‡ thá»‘ng.';
     event.preventDefault();
     event.returnValue = msg;
     return msg;
@@ -491,11 +491,11 @@ function bindRuntimeGuards(){
     if(!href || href.charAt(0) === '#') return;
     try{ syncDataFromDom(); }catch(_err){}
     if(!publishDirtyState('link-intent')) return;
-    var leave = window.confirm('Biểu mẫu đang có dữ liệu dang dở. Hãy lưu nháp trước khi mở liên kết khác. Nhấn OK để rời đi không lưu, hoặc Cancel để ở lại biểu mẫu.');
+    var leave = window.confirm('Biá»ƒu máº«u Ä‘ang cÃ³ dá»¯ liá»‡u dang dá»Ÿ. HÃ£y lÆ°u nhÃ¡p trÆ°á»›c khi má»Ÿ liÃªn káº¿t khÃ¡c. Nháº¥n OK Ä‘á»ƒ rá»i Ä‘i khÃ´ng lÆ°u, hoáº·c Cancel Ä‘á»ƒ á»Ÿ láº¡i biá»ƒu máº«u.');
     if(!leave){
       event.preventDefault();
       event.stopPropagation();
-      notifyParentToast('Hãy lưu nháp trước khi rời biểu mẫu nếu muốn giữ dữ liệu đang làm dở.', 'warn');
+      notifyParentToast('HÃ£y lÆ°u nhÃ¡p trÆ°á»›c khi rá»i biá»ƒu máº«u náº¿u muá»‘n giá»¯ dá»¯ liá»‡u Ä‘ang lÃ m dá»Ÿ.', 'warn');
       return;
     }
     try{ saveLocalDraft('link-leave'); }catch(_ignore){}
@@ -564,19 +564,19 @@ function renderAll(){
 }
 
 function renderHero(){
-  var poPart = [state.data.po_number || '', compactPartLabel()].filter(Boolean).join(' · ') || 'Chưa có ngữ cảnh';
-  setText('heroSupplier', state.data.supplier_name || 'Chưa xác định nhà cung cấp');
-  setText('heroRecordId', currentRecordId() || 'Chưa cấp mã');
+  var poPart = [state.data.po_number || '', compactPartLabel()].filter(Boolean).join(' Â· ') || 'ChÆ°a cÃ³ ngá»¯ cáº£nh';
+  setText('heroSupplier', state.data.supplier_name || 'ChÆ°a xÃ¡c Ä‘á»‹nh nhÃ  cung cáº¥p');
+  setText('heroRecordId', currentRecordId() || 'ChÆ°a cáº¥p mÃ£');
   setText('heroPoPart', poPart);
-  setText('heroLot', state.data.lot_number || 'Chưa xác định');
-  setText('heroIssuedBy', state.data.issued_by || 'Chưa ghi nhận');
+  setText('heroLot', state.data.lot_number || 'ChÆ°a xÃ¡c Ä‘á»‹nh');
+  setText('heroIssuedBy', state.data.issued_by || 'ChÆ°a ghi nháº­n');
 }
 
 function renderMetrics(){
   var severity = severityMeta(state.data.severity);
   setMetricClass('metricSeverity', severity.className || 'info');
-  setText('metricSeverityValue', severity.label || 'Chưa chọn');
-  setText('metricSeverityNote', severity.note || 'Chọn đúng mức độ để điều phối phản hồi và review phù hợp.');
+  setText('metricSeverityValue', severity.label || 'ChÆ°a chá»n');
+  setText('metricSeverityNote', severity.note || 'Chá»n Ä‘Ãºng má»©c Ä‘á»™ Ä‘á»ƒ Ä‘iá»u phá»‘i pháº£n há»“i vÃ  review phÃ¹ há»£p.');
 
   var dueMeta = dueDateMeta();
   setMetricClass('metricDue', dueMeta.className);
@@ -588,7 +588,7 @@ function renderMetrics(){
   setText('metricRejectRateValue', rejectInfo.rateText);
   setText('metricRejectRateNote', rejectInfo.note);
 
-  var statusLabel = STATUS_LABELS[state.data.scar_status] || 'Mở';
+  var statusLabel = STATUS_LABELS[state.data.scar_status] || 'Má»Ÿ';
   setMetricClass('metricStatus', statusMetricClass());
   setText('metricStatusValue', statusLabel);
   setText('metricStatusNote', statusNote(statusLabel));
@@ -607,10 +607,10 @@ function renderKpis(){
 }
 
 function renderContainmentHint(){
-  var title = state.data.root_cause_required ? 'Yêu cầu phản hồi đầy đủ' : 'Chế độ containment rút gọn';
+  var title = state.data.root_cause_required ? 'YÃªu cáº§u pháº£n há»“i Ä‘áº§y Ä‘á»§' : 'Cháº¿ Ä‘á»™ containment rÃºt gá»n';
   var note = state.data.root_cause_required
-    ? 'Nhà cung cấp phải nộp nguyên nhân gốc, hành động khắc phục và hành động phòng ngừa trước khi xem xét đóng hồ sơ.'
-    : 'QA đã tắt yêu cầu nguyên nhân gốc. Phản hồi nhà cung cấp vẫn có thể nhập, nhưng hệ thống không ép đủ bộ RCA/CAPA/PAPA khi gửi.';
+    ? 'NhÃ  cung cáº¥p pháº£i ná»™p nguyÃªn nhÃ¢n gá»‘c, hÃ nh Ä‘á»™ng kháº¯c phá»¥c vÃ  hÃ nh Ä‘á»™ng phÃ²ng ngá»«a trÆ°á»›c khi xem xÃ©t Ä‘Ã³ng há»“ sÆ¡.'
+    : 'QA Ä‘Ã£ táº¯t yÃªu cáº§u nguyÃªn nhÃ¢n gá»‘c. Pháº£n há»“i nhÃ  cung cáº¥p váº«n cÃ³ thá»ƒ nháº­p, nhÆ°ng há»‡ thá»‘ng khÃ´ng Ã©p Ä‘á»§ bá»™ RCA/CAPA/PAPA khi gá»­i.';
   setTextInside('containmentHint', 'strong', title);
   setTextInside('containmentHint', 'span', note);
 }
@@ -629,13 +629,13 @@ function renderSidebar(){
   setText('sideProgressValue', formatPercent(progress.percent));
   setText('sideProgressText', progress.note);
   setProgressValue('sideProgressBar', progress.percent);
-  setText('sideRecordId', currentRecordId() || 'Chưa cấp mã');
-  setText('sideStatus', STATUS_LABELS[state.data.scar_status] || 'Mở');
-  setText('sideSeverity', severityMeta(state.data.severity).label || 'Chưa chọn');
+  setText('sideRecordId', currentRecordId() || 'ChÆ°a cáº¥p mÃ£');
+  setText('sideStatus', STATUS_LABELS[state.data.scar_status] || 'Má»Ÿ');
+  setText('sideSeverity', severityMeta(state.data.severity).label || 'ChÆ°a chá»n');
   setText('sideDue', dueDateMeta().shortTitle);
   setText('sideRejectRate', rejectMeta().rateText);
-  setText('sideSupplierName', state.data.supplier_name || 'Chưa xác định');
-  setText('sideSupplierContact', state.data.supplier_contact || 'Chưa có liên hệ phản hồi.');
+  setText('sideSupplierName', state.data.supplier_name || 'ChÆ°a xÃ¡c Ä‘á»‹nh');
+  setText('sideSupplierContact', state.data.supplier_contact || 'ChÆ°a cÃ³ liÃªn há»‡ pháº£n há»“i.');
 }
 
 function renderSupplierHints(){
@@ -647,7 +647,7 @@ function renderSupplierHints(){
     button.className = 'scar-supplier-card';
     button.setAttribute('data-supplier-id', item.supplier_id || '');
     var title = document.createElement('strong');
-    title.textContent = [item.supplier_id || '', item.supplier_name || ''].filter(Boolean).join(' · ');
+    title.textContent = [item.supplier_id || '', item.supplier_name || ''].filter(Boolean).join(' Â· ');
     var detail = document.createElement('span');
     detail.textContent = item.note;
     button.appendChild(title);
@@ -664,8 +664,7 @@ function renderWorkflowPanel(){
   var submissionRevision = currentSubmissionRevision();
   var resubmissions = Math.max(0, submissionRevision - 1);
   var signatureBlocks = Array.isArray(state.schema && state.schema.signature_blocks) ? state.schema.signature_blocks : [];
-  var html = '' +
-    '<div class="scar-workflow-summary">' +
+  var html = '<div class="scar-workflow-summary">' +
       summaryCard('Trạng thái workflow', workflowStateLabel(workflowState), workflowStateNote(workflowState)) +
       summaryCard('Bản nộp hiện tại', submissionRevision > 0 ? ('R' + submissionRevision) : 'Chưa nộp', resubmissions > 0 ? ('Đã nộp lại ' + resubmissions + ' lần.') : 'Chưa phát sinh nộp lại có kiểm soát.') +
       summaryCard('Phê duyệt', approvalHeadline(summary), approvalSubline(summary)) +
@@ -815,39 +814,39 @@ function workflowStateLabel(stateKey){
 }
 
 function workflowStateNote(stateKey){
-  if(stateKey === 'submitted') return 'Biểu mẫu đã gửi dữ liệu online và đang chờ chuyển sang bước xem xét.';
-  if(stateKey === 'in_review') return 'Hồ sơ đang ở hàng chờ review/phê duyệt và có thể thao tác ngay tại section này.';
-  if(stateKey === 'approved') return 'Hồ sơ đã được phê duyệt. Có thể mở lại nếu cần controlled edit.';
-  if(stateKey === 'rejected') return 'Hồ sơ đã bị từ chối và cần chỉnh sửa/nộp lại có kiểm soát.';
-  if(stateKey === 'closed') return 'Hồ sơ đã đóng vòng đời hiện hành.';
-  return 'Hoàn thiện biểu mẫu, ký phát hành và gửi xem xét trên cùng bề mặt HTML.';
+  if(stateKey === 'submitted') return 'Biá»ƒu máº«u Ä‘Ã£ gá»­i dá»¯ liá»‡u online vÃ  Ä‘ang chá» chuyá»ƒn sang bÆ°á»›c xem xÃ©t.';
+  if(stateKey === 'in_review') return 'Há»“ sÆ¡ Ä‘ang á»Ÿ hÃ ng chá» review/phÃª duyá»‡t vÃ  cÃ³ thá»ƒ thao tÃ¡c ngay táº¡i section nÃ y.';
+  if(stateKey === 'approved') return 'Há»“ sÆ¡ Ä‘Ã£ Ä‘Æ°á»£c phÃª duyá»‡t. CÃ³ thá»ƒ má»Ÿ láº¡i náº¿u cáº§n controlled edit.';
+  if(stateKey === 'rejected') return 'Há»“ sÆ¡ Ä‘Ã£ bá»‹ tá»« chá»‘i vÃ  cáº§n chá»‰nh sá»­a/ná»™p láº¡i cÃ³ kiá»ƒm soÃ¡t.';
+  if(stateKey === 'closed') return 'Há»“ sÆ¡ Ä‘Ã£ Ä‘Ã³ng vÃ²ng Ä‘á»i hiá»‡n hÃ nh.';
+  return 'HoÃ n thiá»‡n biá»ƒu máº«u, kÃ½ phÃ¡t hÃ nh vÃ  gá»­i xem xÃ©t trÃªn cÃ¹ng bá» máº·t HTML.';
 }
 
 function approvalHeadline(summary){
   var complete = !!summary.is_complete;
   var collected = Number(summary.collected_approvals || 0);
   var required = Number(summary.minimum_approvals || 1);
-  if(complete) return 'Đã đủ phê duyệt';
-  return collected + '/' + required + ' phê duyệt';
+  if(complete) return 'ÄÃ£ Ä‘á»§ phÃª duyá»‡t';
+  return collected + '/' + required + ' phÃª duyá»‡t';
 }
 
 function approvalSubline(summary){
   if(summary.status_label_vi) return String(summary.status_label_vi);
   if(summary.status_label) return String(summary.status_label);
-  return 'Theo dõi số chữ ký/phê duyệt đã thu thập trên allocation hiện hành.';
+  return 'Theo dÃµi sá»‘ chá»¯ kÃ½/phÃª duyá»‡t Ä‘Ã£ thu tháº­p trÃªn allocation hiá»‡n hÃ nh.';
 }
 
 function reviewSlaHeadline(reviewSla){
-  if(!reviewSla || typeof reviewSla !== 'object') return 'Chưa kích hoạt';
-  if(reviewSla.overdue) return 'Quá hạn review';
-  if(reviewSla.deadline_at) return reviewSla.status_label_vi || reviewSla.status_label || 'Đang theo SLA';
-  return 'Chưa khởi tạo';
+  if(!reviewSla || typeof reviewSla !== 'object') return 'ChÆ°a kÃ­ch hoáº¡t';
+  if(reviewSla.overdue) return 'QuÃ¡ háº¡n review';
+  if(reviewSla.deadline_at) return reviewSla.status_label_vi || reviewSla.status_label || 'Äang theo SLA';
+  return 'ChÆ°a khá»Ÿi táº¡o';
 }
 
 function reviewSlaSubline(reviewSla){
-  if(!reviewSla || typeof reviewSla !== 'object') return 'SLA sẽ bắt đầu khi hồ sơ được gửi vào bước xem xét.';
-  if(reviewSla.deadline_at) return 'Hạn: ' + formatDateTime(reviewSla.deadline_at);
-  return 'SLA review sẽ được vật liệu hóa sau khi gửi xem xét.';
+  if(!reviewSla || typeof reviewSla !== 'object') return 'SLA sáº½ báº¯t Ä‘áº§u khi há»“ sÆ¡ Ä‘Æ°á»£c gá»­i vÃ o bÆ°á»›c xem xÃ©t.';
+  if(reviewSla.deadline_at) return 'Háº¡n: ' + formatDateTime(reviewSla.deadline_at);
+  return 'SLA review sáº½ Ä‘Æ°á»£c váº­t liá»‡u hÃ³a sau khi gá»­i xem xÃ©t.';
 }
 
 function userRoles(){
@@ -951,6 +950,40 @@ function submitReadiness(){
     missingSignatures: missingSignatures
   };
 }
+function getESignatureCtor(){
+  if(typeof window.ESignature === 'function') return window.ESignature;
+  try{
+    if(window.parent && window.parent !== window && typeof window.parent.ESignature === 'function') return window.parent.ESignature;
+  }catch(_err){}
+  return null;
+}
+
+function ensureSignatureModuleReady(){
+  var existing = getESignatureCtor();
+  if(typeof existing === 'function') return Promise.resolve(existing);
+  if(window.__scarSignatureLoader) return window.__scarSignatureLoader;
+  window.__scarSignatureLoader = new Promise(function(resolve){
+    var src = '/01-QMS-Portal/scripts/portal/11-e-signature.js?v=scar403-runtime-20260401-6';
+    var script = document.querySelector('script[data-esignature-loader="scar-runtime"]');
+    if(!script){
+      script = document.createElement('script');
+      script.src = src;
+      script.async = true;
+      script.dataset.esignatureLoader = 'scar-runtime';
+      document.head.appendChild(script);
+    }
+    var done = function(){
+      var ctor = getESignatureCtor();
+      resolve(typeof ctor === 'function' ? ctor : null);
+    };
+    script.addEventListener('load', done, { once: true });
+    script.addEventListener('error', function(){ resolve(null); }, { once: true });
+    window.setTimeout(done, 300);
+  }).finally(function(){
+    window.__scarSignatureLoader = null;
+  });
+  return window.__scarSignatureLoader;
+}
 
 function captureSignature(blockId){
   var block = ((state.schema && state.schema.signature_blocks) || []).find(function(item){ return item && item.id === blockId; }) || null;
@@ -958,30 +991,32 @@ function captureSignature(blockId){
     notifyParentToast('Không tìm thấy cấu hình chữ ký cho bước này.', 'warn');
     return Promise.resolve(null);
   }
-  if(typeof window.ESignature !== 'function'){
-    notifyParentToast('Module chữ ký điện tử chưa sẵn sàng.', 'error');
-    return Promise.resolve(null);
-  }
-  var me = state.currentUser || {};
-  return new Promise(function(resolve){
-    new window.ESignature({
-      lang: 'vi',
-      requireReason: true,
-      requirePin: false
-    }).show({
-      signerId: String(me.username || '').trim(),
-      signerName: String(me.display_name || me.name || me.username || '').trim(),
-      signerRole: String(me.title || me.role || '').trim(),
-      reason: 'Xác nhận bước ' + (block.label || block.label_en || block.id),
-      signatureMeaning: String(block.meaning || 'Approved'),
-      appliedTo: currentRecordId() + ':' + blockId,
-      onSign: function(sigData){
-        state.signatures[blockId] = normalizeSignature(sigData, block.meaning || '');
-        saveLocalDraft('signature_capture');
-        renderAll();
-        resolve(state.signatures[blockId]);
-      },
-      onCancel: function(){ resolve(null); }
+  return ensureSignatureModuleReady().then(function(ESignatureCtor){
+    if(typeof ESignatureCtor !== 'function'){
+      notifyParentToast('Module chữ ký điện tử chưa sẵn sàng.', 'error');
+      return null;
+    }
+    var me = state.currentUser || {};
+    return new Promise(function(resolve){
+      new ESignatureCtor({
+        lang: 'vi',
+        requireReason: true,
+        requirePin: false
+      }).show({
+        signerId: String(me.username || '').trim(),
+        signerName: String(me.display_name || me.name || me.username || '').trim(),
+        signerRole: String(me.title || me.role || '').trim(),
+        reason: 'Xác nhận bước ' + (block.label || block.label_en || block.id),
+        signatureMeaning: String(block.meaning || 'Approved'),
+        appliedTo: currentRecordId() + ':' + blockId,
+        onSign: function(sigData){
+          state.signatures[blockId] = normalizeSignature(sigData, block.meaning || '');
+          saveLocalDraft('signature_capture');
+          renderAll();
+          resolve(state.signatures[blockId]);
+        },
+        onCancel: function(){ resolve(null); }
+      });
     });
   });
 }
@@ -1012,9 +1047,9 @@ function doReviewAction(action){
     proceed.then(function(signature){
       if(!signature) return null;
       return askTextDialog({
-        title: 'Xác thực phê duyệt',
-        message: 'Nhập mật khẩu hiện tại để hoàn tất phê duyệt hồ sơ SCAR này.',
-        placeholder: 'Mật khẩu tài khoản QMS',
+        title: 'XÃ¡c thá»±c phÃª duyá»‡t',
+        message: 'Nháº­p máº­t kháº©u hiá»‡n táº¡i Ä‘á»ƒ hoÃ n táº¥t phÃª duyá»‡t há»“ sÆ¡ SCAR nÃ y.',
+        placeholder: 'Máº­t kháº©u tÃ i khoáº£n QMS',
         password: true
       }).then(function(password){
         if(!password) return null;
@@ -1024,30 +1059,30 @@ function doReviewAction(action){
           password: password,
           signature_data: signature,
           signature_meaning: 'approved',
-          reason: 'Phê duyệt hồ sơ SCAR trên HTML runtime'
+          reason: 'PhÃª duyá»‡t há»“ sÆ¡ SCAR trÃªn HTML runtime'
         }, 'POST');
       });
     }).then(function(resp){
       if(!resp) return;
-      if(!resp.ok) throw new Error(serverErrorMessage(resp) || 'Máy chủ chưa xác nhận phê duyệt.');
+      if(!resp.ok) throw new Error(serverErrorMessage(resp) || 'MÃ¡y chá»§ chÆ°a xÃ¡c nháº­n phÃª duyá»‡t.');
       state.allocation = resp.allocation || state.allocation;
       state.approvalSummary = resp.approval_summary || state.approvalSummary;
       state.reviewSla = resp.review_sla || state.reviewSla;
       if(state.allocation && state.allocation.approval_signature) state.signatures.approver = normalizeSignature(state.allocation.approval_signature, 'Approved');
-      updateRuntimeAlert('success', 'Đã phê duyệt hồ sơ', 'SCAR đã được phê duyệt trong workflow và lưu dấu vết điện tử đầy đủ.', 'Approved');
-      notifyParentToast('Đã phê duyệt SCAR.', 'success');
+      updateRuntimeAlert('success', 'ÄÃ£ phÃª duyá»‡t há»“ sÆ¡', 'SCAR Ä‘Ã£ Ä‘Æ°á»£c phÃª duyá»‡t trong workflow vÃ  lÆ°u dáº¥u váº¿t Ä‘iá»‡n tá»­ Ä‘áº§y Ä‘á»§.', 'Approved');
+      notifyParentToast('ÄÃ£ phÃª duyá»‡t SCAR.', 'success');
       notifyParentRefresh();
       return refreshRuntimeState();
     }).catch(function(error){
-      updateRuntimeAlert('danger', 'Không thể phê duyệt', (error && error.message) || 'Máy chủ chưa chấp nhận phê duyệt.', 'Lỗi');
-      notifyParentToast('Không thể phê duyệt SCAR.', 'error');
+      updateRuntimeAlert('danger', 'KhÃ´ng thá»ƒ phÃª duyá»‡t', (error && error.message) || 'MÃ¡y chá»§ chÆ°a cháº¥p nháº­n phÃª duyá»‡t.', 'Lá»—i');
+      notifyParentToast('KhÃ´ng thá»ƒ phÃª duyá»‡t SCAR.', 'error');
     });
     return;
   }
   askTextDialog({
-    title: 'Lý do từ chối',
-    message: 'Nhập lý do từ chối để trả hồ sơ về bước chỉnh sửa có kiểm soát.',
-    placeholder: 'Lý do từ chối'
+    title: 'LÃ½ do tá»« chá»‘i',
+    message: 'Nháº­p lÃ½ do tá»« chá»‘i Ä‘á»ƒ tráº£ há»“ sÆ¡ vá» bÆ°á»›c chá»‰nh sá»­a cÃ³ kiá»ƒm soÃ¡t.',
+    placeholder: 'LÃ½ do tá»« chá»‘i'
   }).then(function(reason){
     if(!reason) return null;
     return callApi('evidence_review', {
@@ -1057,42 +1092,42 @@ function doReviewAction(action){
     }, 'POST');
   }).then(function(resp){
     if(!resp) return;
-    if(!resp.ok) throw new Error(serverErrorMessage(resp) || 'Máy chủ chưa chấp nhận từ chối.');
+    if(!resp.ok) throw new Error(serverErrorMessage(resp) || 'MÃ¡y chá»§ chÆ°a cháº¥p nháº­n tá»« chá»‘i.');
     state.allocation = resp.allocation || state.allocation;
     state.approvalSummary = resp.approval_summary || state.approvalSummary;
     state.reviewSla = resp.review_sla || state.reviewSla;
-    updateRuntimeAlert('warning', 'Đã từ chối hồ sơ', 'SCAR đã bị trả về để chỉnh sửa và nộp lại có kiểm soát.', 'Rejected');
-    notifyParentToast('Đã từ chối SCAR.', 'warn');
+    updateRuntimeAlert('warning', 'ÄÃ£ tá»« chá»‘i há»“ sÆ¡', 'SCAR Ä‘Ã£ bá»‹ tráº£ vá» Ä‘á»ƒ chá»‰nh sá»­a vÃ  ná»™p láº¡i cÃ³ kiá»ƒm soÃ¡t.', 'Rejected');
+    notifyParentToast('ÄÃ£ tá»« chá»‘i SCAR.', 'warn');
     notifyParentRefresh();
     return refreshRuntimeState();
   }).catch(function(error){
-    updateRuntimeAlert('danger', 'Không thể từ chối', (error && error.message) || 'Máy chủ chưa chấp nhận thao tác từ chối.', 'Lỗi');
-    notifyParentToast('Không thể từ chối SCAR.', 'error');
+    updateRuntimeAlert('danger', 'KhÃ´ng thá»ƒ tá»« chá»‘i', (error && error.message) || 'MÃ¡y chá»§ chÆ°a cháº¥p nháº­n thao tÃ¡c tá»« chá»‘i.', 'Lá»—i');
+    notifyParentToast('KhÃ´ng thá»ƒ tá»« chá»‘i SCAR.', 'error');
   });
 }
 
 function doReopen(){
   if(!state.allocationId) return;
   askTextDialog({
-    title: 'Lý do mở lại',
-    message: 'Nhập lý do mở lại hồ sơ để hệ thống tạo controlled edit đúng chuẩn.',
-    placeholder: 'Lý do mở lại'
+    title: 'LÃ½ do má»Ÿ láº¡i',
+    message: 'Nháº­p lÃ½ do má»Ÿ láº¡i há»“ sÆ¡ Ä‘á»ƒ há»‡ thá»‘ng táº¡o controlled edit Ä‘Ãºng chuáº©n.',
+    placeholder: 'LÃ½ do má»Ÿ láº¡i'
   }).then(function(reason){
     if(!reason) return null;
     return callApi('evidence_reopen', { allocation_id: state.allocationId, reason: reason }, 'POST');
   }).then(function(resp){
     if(!resp) return;
-    if(!resp.ok) throw new Error(serverErrorMessage(resp) || 'Máy chủ chưa chấp nhận mở lại hồ sơ.');
+    if(!resp.ok) throw new Error(serverErrorMessage(resp) || 'MÃ¡y chá»§ chÆ°a cháº¥p nháº­n má»Ÿ láº¡i há»“ sÆ¡.');
     state.allocation = resp.allocation || state.allocation;
     state.approvalSummary = resp.approval_summary || null;
     state.reviewSla = resp.review_sla || null;
-    updateRuntimeAlert('warning', 'Đã mở lại hồ sơ', 'SCAR đã quay về controlled edit. Anh có thể chỉnh sửa và nộp lại trên cùng HTML này.', 'Reopen');
-    notifyParentToast('Đã mở lại SCAR để controlled edit.', 'warn');
+    updateRuntimeAlert('warning', 'ÄÃ£ má»Ÿ láº¡i há»“ sÆ¡', 'SCAR Ä‘Ã£ quay vá» controlled edit. Anh cÃ³ thá»ƒ chá»‰nh sá»­a vÃ  ná»™p láº¡i trÃªn cÃ¹ng HTML nÃ y.', 'Reopen');
+    notifyParentToast('ÄÃ£ má»Ÿ láº¡i SCAR Ä‘á»ƒ controlled edit.', 'warn');
     notifyParentRefresh();
     return refreshRuntimeState();
   }).catch(function(error){
-    updateRuntimeAlert('danger', 'Không thể mở lại hồ sơ', (error && error.message) || 'Máy chủ chưa chấp nhận mở lại.', 'Lỗi');
-    notifyParentToast('Không thể mở lại SCAR.', 'error');
+    updateRuntimeAlert('danger', 'KhÃ´ng thá»ƒ má»Ÿ láº¡i há»“ sÆ¡', (error && error.message) || 'MÃ¡y chá»§ chÆ°a cháº¥p nháº­n má»Ÿ láº¡i.', 'Lá»—i');
+    notifyParentToast('KhÃ´ng thá»ƒ má»Ÿ láº¡i SCAR.', 'error');
   });
 }
 
@@ -1111,13 +1146,13 @@ function refreshRuntimeState(){
 
 function updateMetaFootnotes(){
   if(els.saveMeta){
-    if(state.lastServerSaveAt) els.saveMeta.textContent = 'Đã đồng bộ máy chủ lúc ' + formatDateTime(state.lastServerSaveAt) + '.';
-    else if(state.lastLocalSaveAt) els.saveMeta.textContent = 'Đã lưu cục bộ lúc ' + formatDateTime(state.lastLocalSaveAt) + '.';
-    else els.saveMeta.textContent = 'Chưa có lượt lưu nào trong phiên này.';
+    if(state.lastServerSaveAt) els.saveMeta.textContent = 'ÄÃ£ Ä‘á»“ng bá»™ mÃ¡y chá»§ lÃºc ' + formatDateTime(state.lastServerSaveAt) + '.';
+    else if(state.lastLocalSaveAt) els.saveMeta.textContent = 'ÄÃ£ lÆ°u cá»¥c bá»™ lÃºc ' + formatDateTime(state.lastLocalSaveAt) + '.';
+    else els.saveMeta.textContent = 'ChÆ°a cÃ³ lÆ°á»£t lÆ°u nÃ o trong phiÃªn nÃ y.';
   }
   if(els.entryMeta){
-    var revision = state.entry && state.entry.submission_revision ? ' · Revision nộp: R' + state.entry.submission_revision : '';
-    els.entryMeta.textContent = 'Nguồn dữ liệu khởi tạo: ' + state.loadedSource + revision + '.';
+    var revision = state.entry && state.entry.submission_revision ? ' Â· Revision ná»™p: R' + state.entry.submission_revision : '';
+    els.entryMeta.textContent = 'Nguá»“n dá»¯ liá»‡u khá»Ÿi táº¡o: ' + state.loadedSource + revision + '.';
   }
 }
 
@@ -1125,15 +1160,15 @@ function updateActionState(){
   var readiness = submitReadiness();
   if(els.btnSaveDraft){
     els.btnSaveDraft.disabled = !!state.busySave || !!state.busySubmit;
-    els.btnSaveDraft.textContent = state.busySave ? 'Đang lưu...' : (state.loggedIn && state.allocationId ? 'Lưu nháp' : 'Lưu cục bộ');
+    els.btnSaveDraft.textContent = state.busySave ? 'Äang lÆ°u...' : (state.loggedIn && state.allocationId ? 'LÆ°u nhÃ¡p' : 'LÆ°u cá»¥c bá»™');
   }
   if(els.btnReset) els.btnReset.disabled = !!state.busySave || !!state.busySubmit;
   if(els.btnSubmit){
     els.btnSubmit.disabled = !!state.busySubmit || !state.loggedIn || !state.allocationId || !readiness.valid;
-    if(state.busySubmit) els.btnSubmit.textContent = 'Đang gửi SCAR...';
-    else if(readiness.missingSignatures.length) els.btnSubmit.textContent = 'Ký phát hành trước';
-    else if(Object.keys(readiness.errors).length) els.btnSubmit.textContent = 'Hoàn thiện trường bắt buộc';
-    else els.btnSubmit.textContent = 'Gửi SCAR';
+    if(state.busySubmit) els.btnSubmit.textContent = 'Äang gá»­i SCAR...';
+    else if(readiness.missingSignatures.length) els.btnSubmit.textContent = 'KÃ½ phÃ¡t hÃ nh trÆ°á»›c';
+    else if(Object.keys(readiness.errors).length) els.btnSubmit.textContent = 'HoÃ n thiá»‡n trÆ°á»ng báº¯t buá»™c';
+    else els.btnSubmit.textContent = 'Gá»­i SCAR';
   }
   var isView = !state.editMode;
   // in view mode: disable submit (already disabled if not logged in)
@@ -1147,8 +1182,8 @@ function handleSaveDraft(){
   clearFieldErrors();
   saveLocalDraft('manual');
   if(!state.loggedIn || !state.allocationId){
-    updateRuntimeAlert('warning', 'Đã lưu cục bộ', 'Phiên hiện tại chưa có mã hồ sơ hoặc chưa đăng nhập, nên bản lưu này chỉ nằm trên trình duyệt hiện tại.', 'Cục bộ');
-    notifyParentToast('Đã lưu cục bộ biểu mẫu SCAR.', 'info');
+    updateRuntimeAlert('warning', 'ÄÃ£ lÆ°u cá»¥c bá»™', 'PhiÃªn hiá»‡n táº¡i chÆ°a cÃ³ mÃ£ há»“ sÆ¡ hoáº·c chÆ°a Ä‘Äƒng nháº­p, nÃªn báº£n lÆ°u nÃ y chá»‰ náº±m trÃªn trÃ¬nh duyá»‡t hiá»‡n táº¡i.', 'Cá»¥c bá»™');
+    notifyParentToast('ÄÃ£ lÆ°u cá»¥c bá»™ biá»ƒu máº«u SCAR.', 'info');
     updateMetaFootnotes();
     return;
   }
@@ -1159,14 +1194,14 @@ function handleSaveDraft(){
     form_code: FORM_CODE,
     data: { fieldValues: clone(state.data), runtime_mode: 'standalone_html' }
   }, 'POST').then(function(resp){
-    if(!resp || !resp.ok) throw new Error('Máy chủ không xác nhận lưu nháp.');
+    if(!resp || !resp.ok) throw new Error('MÃ¡y chá»§ khÃ´ng xÃ¡c nháº­n lÆ°u nhÃ¡p.');
     state.lastServerSaveAt = new Date().toISOString();
     state.resetSnapshot = clone(state.data);
-    updateRuntimeAlert('success', 'Đã lưu nháp máy chủ', 'Biểu mẫu SCAR đã được đồng bộ nháp lên máy chủ. Anh có thể tiếp tục làm việc hoặc quay lại sau mà không mất dữ liệu.', 'Đã lưu');
-    notifyParentToast('Đã lưu nháp SCAR lên máy chủ.', 'success');
+    updateRuntimeAlert('success', 'ÄÃ£ lÆ°u nhÃ¡p mÃ¡y chá»§', 'Biá»ƒu máº«u SCAR Ä‘Ã£ Ä‘Æ°á»£c Ä‘á»“ng bá»™ nhÃ¡p lÃªn mÃ¡y chá»§. Anh cÃ³ thá»ƒ tiáº¿p tá»¥c lÃ m viá»‡c hoáº·c quay láº¡i sau mÃ  khÃ´ng máº¥t dá»¯ liá»‡u.', 'ÄÃ£ lÆ°u');
+    notifyParentToast('ÄÃ£ lÆ°u nhÃ¡p SCAR lÃªn mÃ¡y chá»§.', 'success');
   }).catch(function(error){
-    updateRuntimeAlert('warning', 'Máy chủ chưa lưu được nháp', (error && error.message) || 'Bản cục bộ vẫn còn trên trình duyệt này.', 'Cảnh báo');
-    notifyParentToast('Không thể lưu nháp SCAR lên máy chủ.', 'warn');
+    updateRuntimeAlert('warning', 'MÃ¡y chá»§ chÆ°a lÆ°u Ä‘Æ°á»£c nhÃ¡p', (error && error.message) || 'Báº£n cá»¥c bá»™ váº«n cÃ²n trÃªn trÃ¬nh duyá»‡t nÃ y.', 'Cáº£nh bÃ¡o');
+    notifyParentToast('KhÃ´ng thá»ƒ lÆ°u nhÃ¡p SCAR lÃªn mÃ¡y chá»§.', 'warn');
   }).finally(function(){
     state.busySave = false;
     updateMetaFootnotes();
@@ -1182,8 +1217,8 @@ function saveDraftWorkflow(source){
   saveLocalDraft(source || 'manual');
   markCurrentStateSaved();
   if(!state.loggedIn || !state.allocationId){
-    updateRuntimeAlert('warning', 'Đã lưu cục bộ', 'Phiên hiện tại chưa có mã hồ sơ hoặc chưa đăng nhập, nên bản lưu này chỉ nằm trên trình duyệt hiện tại.', 'Cục bộ');
-    notifyParentToast('Đã lưu cục bộ biểu mẫu SCAR.', 'info');
+    updateRuntimeAlert('warning', 'ÄÃ£ lÆ°u cá»¥c bá»™', 'PhiÃªn hiá»‡n táº¡i chÆ°a cÃ³ mÃ£ há»“ sÆ¡ hoáº·c chÆ°a Ä‘Äƒng nháº­p, nÃªn báº£n lÆ°u nÃ y chá»‰ náº±m trÃªn trÃ¬nh duyá»‡t hiá»‡n táº¡i.', 'Cá»¥c bá»™');
+    notifyParentToast('ÄÃ£ lÆ°u cá»¥c bá»™ biá»ƒu máº«u SCAR.', 'info');
     updateMetaFootnotes();
     return Promise.resolve({ ok:true, scope:'local' });
   }
@@ -1194,15 +1229,15 @@ function saveDraftWorkflow(source){
     form_code: FORM_CODE,
     data: { fieldValues: clone(state.data), signatures: clone(state.signatures), runtime_mode: 'standalone_html' }
   }, 'POST').then(function(resp){
-    if(!resp || !resp.ok) throw new Error('Máy chủ không xác nhận lưu nháp.');
+    if(!resp || !resp.ok) throw new Error('MÃ¡y chá»§ khÃ´ng xÃ¡c nháº­n lÆ°u nhÃ¡p.');
     state.lastServerSaveAt = new Date().toISOString();
     markCurrentStateSaved();
-    updateRuntimeAlert('success', 'Đã lưu nháp máy chủ', 'Biểu mẫu SCAR đã được đồng bộ nháp lên máy chủ. Anh có thể tiếp tục làm việc hoặc quay lại sau mà không mất dữ liệu.', 'Đã lưu');
-    notifyParentToast('Đã lưu nháp SCAR lên máy chủ.', 'success');
+    updateRuntimeAlert('success', 'ÄÃ£ lÆ°u nhÃ¡p mÃ¡y chá»§', 'Biá»ƒu máº«u SCAR Ä‘Ã£ Ä‘Æ°á»£c Ä‘á»“ng bá»™ nhÃ¡p lÃªn mÃ¡y chá»§. Anh cÃ³ thá»ƒ tiáº¿p tá»¥c lÃ m viá»‡c hoáº·c quay láº¡i sau mÃ  khÃ´ng máº¥t dá»¯ liá»‡u.', 'ÄÃ£ lÆ°u');
+    notifyParentToast('ÄÃ£ lÆ°u nhÃ¡p SCAR lÃªn mÃ¡y chá»§.', 'success');
     return { ok:true, scope:'server' };
   }).catch(function(error){
-    updateRuntimeAlert('warning', 'Máy chủ chưa lưu được nháp', (error && error.message) || 'Bản cục bộ vẫn còn trên trình duyệt này.', 'Cảnh báo');
-    notifyParentToast('Không thể lưu nháp SCAR lên máy chủ.', 'warn');
+    updateRuntimeAlert('warning', 'MÃ¡y chá»§ chÆ°a lÆ°u Ä‘Æ°á»£c nhÃ¡p', (error && error.message) || 'Báº£n cá»¥c bá»™ váº«n cÃ²n trÃªn trÃ¬nh duyá»‡t nÃ y.', 'Cáº£nh bÃ¡o');
+    notifyParentToast('KhÃ´ng thá»ƒ lÆ°u nhÃ¡p SCAR lÃªn mÃ¡y chá»§.', 'warn');
     markCurrentStateSaved();
     return { ok:true, scope:'local', warning:true };
   }).finally(function(){
@@ -1222,8 +1257,8 @@ function handleReset(){
   renderAll();
   saveLocalDraft('reset');
   publishDirtyState('reset');
-  updateRuntimeAlert('info', 'Đã khôi phục dữ liệu', 'Biểu mẫu đã quay về ảnh chụp dữ liệu gần nhất được tải hoặc lưu thủ công.', 'Khôi phục');
-  notifyParentToast('Đã khôi phục dữ liệu biểu mẫu SCAR.', 'info');
+  updateRuntimeAlert('info', 'ÄÃ£ khÃ´i phá»¥c dá»¯ liá»‡u', 'Biá»ƒu máº«u Ä‘Ã£ quay vá» áº£nh chá»¥p dá»¯ liá»‡u gáº§n nháº¥t Ä‘Æ°á»£c táº£i hoáº·c lÆ°u thá»§ cÃ´ng.', 'KhÃ´i phá»¥c');
+  notifyParentToast('ÄÃ£ khÃ´i phá»¥c dá»¯ liá»‡u biá»ƒu máº«u SCAR.', 'info');
 }
 
 function setMode(mode){
@@ -1236,7 +1271,7 @@ function setMode(mode){
 
 function handleEnterEdit(){
   setMode('edit');
-  notifyParentToast('Đang chỉnh sửa biểu mẫu SCAR.', 'info');
+  notifyParentToast('Äang chá»‰nh sá»­a biá»ƒu máº«u SCAR.', 'info');
 }
 
 function handleCancelEdit(){
@@ -1247,7 +1282,7 @@ function handleCancelEdit(){
   renderDisplayValues();
   setMode('view');
   publishDirtyState('cancel-edit');
-  notifyParentToast('Đã hủy chỉnh sửa, khôi phục dữ liệu hiển thị.', 'info');
+  notifyParentToast('ÄÃ£ há»§y chá»‰nh sá»­a, khÃ´i phá»¥c dá»¯ liá»‡u hiá»ƒn thá»‹.', 'info');
 }
 
 function handlePrint(){
@@ -1258,11 +1293,11 @@ function handlePrint(){
   document.body.setAttribute('data-mode', prev);
 }
 
-var SEVERITY_DV_LABELS = { minor:'Nhẹ (Minor)', major:'Nặng (Major)', critical:'Nghiêm trọng (Critical)' };
-var STATUS_DV_LABELS = { open:'Mở (Open)', awaiting_response:'Chờ phản hồi NCC', under_review:'Đang xem xét', verification:'Đang xác nhận', closed:'Đã đóng (Closed)' };
+var SEVERITY_DV_LABELS = { minor:'Nháº¹ (Minor)', major:'Náº·ng (Major)', critical:'NghiÃªm trá»ng (Critical)' };
+var STATUS_DV_LABELS = { open:'Má»Ÿ (Open)', awaiting_response:'Chá» pháº£n há»“i NCC', under_review:'Äang xem xÃ©t', verification:'Äang xÃ¡c nháº­n', closed:'ÄÃ£ Ä‘Ã³ng (Closed)' };
 
 function formatDateDv(iso){
-  if(!iso) return '—';
+  if(!iso) return 'â€”';
   var parts = String(iso).split('-');
   if(parts.length === 3) return parts[2] + '/' + parts[1] + '/' + parts[0];
   return iso;
@@ -1272,28 +1307,28 @@ function renderDisplayValues(){
   var DV_MAP = {
     scar_date: function(v){ return formatDateDv(v); },
     supplier_response_due_date: function(v){ return formatDateDv(v); },
-    scar_status: function(v){ return STATUS_DV_LABELS[v] || v || '—'; },
-    severity: function(v){ return SEVERITY_DV_LABELS[v] || v || '—'; },
-    quantity_received: function(v){ return v || v === 0 ? String(parseNumber(v) || 0) : '—'; },
-    quantity_rejected: function(v){ return v || v === 0 ? String(parseNumber(v) || 0) : '—'; },
+    scar_status: function(v){ return STATUS_DV_LABELS[v] || v || 'â€”'; },
+    severity: function(v){ return SEVERITY_DV_LABELS[v] || v || 'â€”'; },
+    quantity_received: function(v){ return v || v === 0 ? String(parseNumber(v) || 0) : 'â€”'; },
+    quantity_rejected: function(v){ return v || v === 0 ? String(parseNumber(v) || 0) : 'â€”'; },
     quantity_accepted_calc: function(v){ return v || '0'; },
-    root_cause_required: function(v){ return v ? '✓ Yêu cầu phân tích nguyên nhân gốc (RCA)' : '✗ Chế độ containment rút gọn'; },
-    closeout_ready: function(v){ return v || '—'; }
+    root_cause_required: function(v){ return v ? 'âœ“ YÃªu cáº§u phÃ¢n tÃ­ch nguyÃªn nhÃ¢n gá»‘c (RCA)' : 'âœ— Cháº¿ Ä‘á»™ containment rÃºt gá»n'; },
+    closeout_ready: function(v){ return v || 'â€”'; }
   };
   FIELD_IDS.forEach(function(fieldId){
     var dv = byId(fieldId + '__dv');
     if(!dv) return;
     var value = state.data[fieldId];
     var fmt = DV_MAP[fieldId];
-    var text = fmt ? fmt(value) : (String(value == null ? '' : value).trim() || '—');
+    var text = fmt ? fmt(value) : (String(value == null ? '' : value).trim() || 'â€”');
     dv.textContent = text;
-    dv.className = 'qf-dv' + (text === '—' || !String(value || '').trim() ? ' qf-dv--empty' : '');
+    dv.className = 'qf-dv' + (text === 'â€”' || !String(value || '').trim() ? ' qf-dv--empty' : '');
   });
   // Also update the root_cause display span (special case - it's after the label, not an input)
   var rcDv = byId('root_cause_required__dv');
   if(rcDv){
     var rcVal = state.data.root_cause_required;
-    rcDv.textContent = rcVal ? '✓ Yêu cầu phân tích nguyên nhân gốc (RCA)' : '✗ Chế độ containment rút gọn';
+    rcDv.textContent = rcVal ? 'âœ“ YÃªu cáº§u phÃ¢n tÃ­ch nguyÃªn nhÃ¢n gá»‘c (RCA)' : 'âœ— Cháº¿ Ä‘á»™ containment rÃºt gá»n';
     rcDv.className = 'qf-dv';
   }
 }
@@ -1306,43 +1341,43 @@ function handleSubmit(event){
   var errors = validateBeforeSubmit();
   if(Object.keys(errors).length){
     applyFieldErrors(errors);
-    updateRuntimeAlert('danger', 'Biểu mẫu chưa đủ điều kiện gửi', 'Hãy hoàn thiện các trường bắt buộc, kiểm tra số lượng và xác nhận đủ phản hồi nhà cung cấp trước khi gửi SCAR.', 'Thiếu dữ liệu');
+    updateRuntimeAlert('danger', 'Biá»ƒu máº«u chÆ°a Ä‘á»§ Ä‘iá»u kiá»‡n gá»­i', 'HÃ£y hoÃ n thiá»‡n cÃ¡c trÆ°á»ng báº¯t buá»™c, kiá»ƒm tra sá»‘ lÆ°á»£ng vÃ  xÃ¡c nháº­n Ä‘á»§ pháº£n há»“i nhÃ  cung cáº¥p trÆ°á»›c khi gá»­i SCAR.', 'Thiáº¿u dá»¯ liá»‡u');
     focusFirstError(errors);
-    notifyParentToast('SCAR chưa đủ điều kiện gửi.', 'warn');
+    notifyParentToast('SCAR chÆ°a Ä‘á»§ Ä‘iá»u kiá»‡n gá»­i.', 'warn');
     return;
   }
   var missingSignatures = missingRequiredSubmitSignatures();
   if(missingSignatures.length){
-    updateRuntimeAlert('warning', 'Thiếu chữ ký bắt buộc', 'Hãy ký các block bắt buộc trước khi gửi: ' + missingSignatures.join(', ') + '.', 'Thiếu chữ ký');
-    notifyParentToast('Thiếu chữ ký bắt buộc trước khi gửi SCAR.', 'warn');
+    updateRuntimeAlert('warning', 'Thiáº¿u chá»¯ kÃ½ báº¯t buá»™c', 'HÃ£y kÃ½ cÃ¡c block báº¯t buá»™c trÆ°á»›c khi gá»­i: ' + missingSignatures.join(', ') + '.', 'Thiáº¿u chá»¯ kÃ½');
+    notifyParentToast('Thiáº¿u chá»¯ kÃ½ báº¯t buá»™c trÆ°á»›c khi gá»­i SCAR.', 'warn');
     if(els.workflowPanel && typeof els.workflowPanel.scrollIntoView === 'function') els.workflowPanel.scrollIntoView({ behavior:'smooth', block:'center' });
     return;
   }
   if(!state.loggedIn || !state.allocationId){
-    updateRuntimeAlert('warning', 'Chưa thể gửi SCAR', 'Biểu mẫu cần được mở từ workspace đã cấp mã hồ sơ và phiên QMS phải còn hiệu lực.', 'Chưa sẵn sàng');
-    notifyParentToast('Chưa có mã hồ sơ hoặc phiên đăng nhập để gửi SCAR.', 'warn');
+    updateRuntimeAlert('warning', 'ChÆ°a thá»ƒ gá»­i SCAR', 'Biá»ƒu máº«u cáº§n Ä‘Æ°á»£c má»Ÿ tá»« workspace Ä‘Ã£ cáº¥p mÃ£ há»“ sÆ¡ vÃ  phiÃªn QMS pháº£i cÃ²n hiá»‡u lá»±c.', 'ChÆ°a sáºµn sÃ ng');
+    notifyParentToast('ChÆ°a cÃ³ mÃ£ há»“ sÆ¡ hoáº·c phiÃªn Ä‘Äƒng nháº­p Ä‘á»ƒ gá»­i SCAR.', 'warn');
     return;
   }
   state.busySubmit = true;
   updateActionState();
   var payload = buildSubmitPayload();
   callApi('form_fill_submit_online', { allocation_id: state.allocationId, form_code: FORM_CODE, form_data: payload }, 'POST').then(function(resp){
-    if(!resp || !resp.ok) throw new Error(serverErrorMessage(resp) || 'Máy chủ không nhận được SCAR.');
+    if(!resp || !resp.ok) throw new Error(serverErrorMessage(resp) || 'MÃ¡y chá»§ khÃ´ng nháº­n Ä‘Æ°á»£c SCAR.');
     state.allocation = resp.allocation || state.allocation;
     state.entry = mergeSubmittedEntry(payload, resp);
     state.lastServerSaveAt = new Date().toISOString();
     state.resetSnapshot = clone(state.data);
     saveLocalDraft('submitted');
     return linkOrderIfPossible().catch(function(){ return false; }).then(function(){
-      updateRuntimeAlert('success', 'Đã gửi SCAR thành công', 'Máy chủ đã ghi nhận bản nộp trực tuyến của hồ sơ này. Workflow review và checklist ngoài portal sẽ được làm mới ngay sau đó.', 'Đã gửi');
-      notifyParentToast('Đã gửi SCAR thành công.', 'success');
+      updateRuntimeAlert('success', 'ÄÃ£ gá»­i SCAR thÃ nh cÃ´ng', 'MÃ¡y chá»§ Ä‘Ã£ ghi nháº­n báº£n ná»™p trá»±c tuyáº¿n cá»§a há»“ sÆ¡ nÃ y. Workflow review vÃ  checklist ngoÃ i portal sáº½ Ä‘Æ°á»£c lÃ m má»›i ngay sau Ä‘Ã³.', 'ÄÃ£ gá»­i');
+      notifyParentToast('ÄÃ£ gá»­i SCAR thÃ nh cÃ´ng.', 'success');
       notifyParentRefresh();
       renderAll();
       setMode('view');
     });
   }).catch(function(error){
-    updateRuntimeAlert('danger', 'Không thể gửi SCAR', (error && error.message) || 'Hệ thống chưa ghi nhận được bản nộp trực tuyến.', 'Lỗi');
-    notifyParentToast('Không thể gửi SCAR.', 'error');
+    updateRuntimeAlert('danger', 'KhÃ´ng thá»ƒ gá»­i SCAR', (error && error.message) || 'Há»‡ thá»‘ng chÆ°a ghi nháº­n Ä‘Æ°á»£c báº£n ná»™p trá»±c tuyáº¿n.', 'Lá»—i');
+    notifyParentToast('KhÃ´ng thá»ƒ gá»­i SCAR.', 'error');
   }).finally(function(){
     state.busySubmit = false;
     updateMetaFootnotes();
@@ -1354,28 +1389,28 @@ function handleSubmit(event){
 function validateBeforeSubmit(){
   var errors = {};
   REQUIRED_FIELDS.forEach(function(fieldId){
-    if(!hasMeaningfulValue(state.data[fieldId])) errors[fieldId] = 'Trường này là bắt buộc.';
+    if(!hasMeaningfulValue(state.data[fieldId])) errors[fieldId] = 'TrÆ°á»ng nÃ y lÃ  báº¯t buá»™c.';
   });
   var qtyReceived = parseNumber(state.data.quantity_received);
   var qtyRejected = parseNumber(state.data.quantity_rejected);
-  if(qtyReceived <= 0) errors.quantity_received = 'Số lượng nhận phải lớn hơn 0.';
-  if(qtyRejected < 0) errors.quantity_rejected = 'Số lượng loại bỏ không được âm.';
-  if(qtyRejected > qtyReceived && qtyReceived > 0) errors.quantity_rejected = 'Số lượng loại bỏ không được lớn hơn số lượng nhận.';
+  if(qtyReceived <= 0) errors.quantity_received = 'Sá»‘ lÆ°á»£ng nháº­n pháº£i lá»›n hÆ¡n 0.';
+  if(qtyRejected < 0) errors.quantity_rejected = 'Sá»‘ lÆ°á»£ng loáº¡i bá» khÃ´ng Ä‘Æ°á»£c Ã¢m.';
+  if(qtyRejected > qtyReceived && qtyReceived > 0) errors.quantity_rejected = 'Sá»‘ lÆ°á»£ng loáº¡i bá» khÃ´ng Ä‘Æ°á»£c lá»›n hÆ¡n sá»‘ lÆ°á»£ng nháº­n.';
   if(state.data.supplier_response_due_date && state.data.scar_date){
     var scarDate = Date.parse(state.data.scar_date);
     var dueDate = Date.parse(state.data.supplier_response_due_date);
     if(isFinite(scarDate) && isFinite(dueDate) && dueDate < scarDate){
-      errors.supplier_response_due_date = 'Hạn phản hồi không được sớm hơn ngày phát hành SCAR.';
+      errors.supplier_response_due_date = 'Háº¡n pháº£n há»“i khÃ´ng Ä‘Æ°á»£c sá»›m hÆ¡n ngÃ y phÃ¡t hÃ nh SCAR.';
     }
   }
   if(state.data.root_cause_required){
     ROOT_CAUSE_FIELDS.forEach(function(fieldId){
-      if(!hasMeaningfulValue(state.data[fieldId])) errors[fieldId] = 'Trường này bắt buộc khi yêu cầu phân tích nguyên nhân gốc.';
+      if(!hasMeaningfulValue(state.data[fieldId])) errors[fieldId] = 'TrÆ°á»ng nÃ y báº¯t buá»™c khi yÃªu cáº§u phÃ¢n tÃ­ch nguyÃªn nhÃ¢n gá»‘c.';
     });
   }
   if(String(state.data.scar_status || '') === 'closed'){
-    if(!hasMeaningfulValue(state.data.verification_method)) errors.verification_method = 'Cần nêu phương pháp xác nhận trước khi đóng SCAR.';
-    if(!hasMeaningfulValue(state.data.verification_result)) errors.verification_result = 'Cần có kết quả xác nhận trước khi đóng SCAR.';
+    if(!hasMeaningfulValue(state.data.verification_method)) errors.verification_method = 'Cáº§n nÃªu phÆ°Æ¡ng phÃ¡p xÃ¡c nháº­n trÆ°á»›c khi Ä‘Ã³ng SCAR.';
+    if(!hasMeaningfulValue(state.data.verification_result)) errors.verification_result = 'Cáº§n cÃ³ káº¿t quáº£ xÃ¡c nháº­n trÆ°á»›c khi Ä‘Ã³ng SCAR.';
   }
   return errors;
 }
@@ -1557,11 +1592,11 @@ function ensureCurrentUserShortcut(cfg, fieldId, host){
   button.type = 'button';
   button.className = 'qf-btn ghost scar-lookup-self';
   button.setAttribute('data-use-current-user', fieldId);
-  button.textContent = 'Dùng người đăng nhập';
+  button.textContent = 'DÃ¹ng ngÆ°á»i Ä‘Äƒng nháº­p';
   button.addEventListener('click', function(){
     var item = currentCompanyUserItem();
     if(!item){
-      notifyParentToast('Không tìm thấy người đăng nhập trong danh sách công ty.', 'warn');
+      notifyParentToast('KhÃ´ng tÃ¬m tháº¥y ngÆ°á»i Ä‘Äƒng nháº­p trong danh sÃ¡ch cÃ´ng ty.', 'warn');
       return;
     }
     applyLookupSelection(fieldId, item, cfg);
@@ -1592,7 +1627,7 @@ function buildLookupItems(source){
         return {
           value: String(row.defect_name || row.defect_code || '').trim(),
           label: String(row.defect_name || row.defect_code || '').trim(),
-          sub: [String(row.defect_code || '').trim(), String(row.defect_family || '').trim()].filter(Boolean).join(' · '),
+          sub: [String(row.defect_code || '').trim(), String(row.defect_family || '').trim()].filter(Boolean).join(' Â· '),
           defect_name: String(row.defect_name || row.defect_code || '').trim(),
           defect_code: String(row.defect_code || '').trim(),
           defect_family: String(row.defect_family || '').trim()
@@ -1606,7 +1641,7 @@ function buildLookupItems(source){
       return {
         value: String(supplier.supplier_name || '').trim(),
         label: String(supplier.supplier_name || '').trim(),
-        sub: [String(supplier.supplier_id || '').trim(), buildSupplierContact(supplier)].filter(Boolean).join(' · '),
+        sub: [String(supplier.supplier_id || '').trim(), buildSupplierContact(supplier)].filter(Boolean).join(' Â· '),
         supplier_id: String(supplier.supplier_id || '').trim(),
         supplier_name: String(supplier.supplier_name || '').trim(),
         contact_name: String(supplier.contact_name || '').trim(),
@@ -1621,7 +1656,7 @@ function buildLookupItems(source){
       return {
         value: String(part.part_number || '').trim(),
         label: [String(part.part_number || '').trim(), revision].filter(Boolean).join(' / '),
-        sub: [String(part.part_description || '').trim(), String(part.customer_id || '').trim()].filter(Boolean).join(' · '),
+        sub: [String(part.part_description || '').trim(), String(part.customer_id || '').trim()].filter(Boolean).join(' Â· '),
         part_number: String(part.part_number || '').trim(),
         revision: revision,
         preferred_supplier_id: String(part.preferred_supplier_id || '').trim(),
@@ -1645,7 +1680,7 @@ function companyDirectoryItems(){
     return {
       value: fullName,
       label: fullName,
-      sub: [String(person.username || '').trim() ? ('@' + String(person.username || '').trim()) : '', String(person.title || person.role || '').trim(), String(person.dept || '').trim()].filter(Boolean).join(' · '),
+      sub: [String(person.username || '').trim() ? ('@' + String(person.username || '').trim()) : '', String(person.title || person.role || '').trim(), String(person.dept || '').trim()].filter(Boolean).join(' Â· '),
       username: String(person.username || '').trim(),
       person_name: fullName,
       role: String(person.role || '').trim(),
@@ -1700,12 +1735,12 @@ function resolvePartRevision(part){
 
 function defaultDefectCatalogItems(){
   return [
-    { value:'Dimensional', label:'Dimensional', sub:'Kích thước / dung sai', defect_name:'Dimensional', defect_code:'DEF-DIM' },
-    { value:'Surface', label:'Surface', sub:'Bề mặt / xử lý bề mặt', defect_name:'Surface', defect_code:'DEF-SUR' },
-    { value:'Packaging', label:'Packaging', sub:'Đóng gói / bảo quản', defect_name:'Packaging', defect_code:'DEF-PKG' },
-    { value:'Documentation', label:'Documentation', sub:'Tài liệu / chứng từ', defect_name:'Documentation', defect_code:'DEF-DOC' },
-    { value:'Material', label:'Material', sub:'Vật liệu / heat / lot', defect_name:'Material', defect_code:'DEF-MAT' },
-    { value:'Traceability', label:'Traceability', sub:'Truy xuất / nhãn / marking', defect_name:'Traceability', defect_code:'DEF-TRC' }
+    { value:'Dimensional', label:'Dimensional', sub:'KÃ­ch thÆ°á»›c / dung sai', defect_name:'Dimensional', defect_code:'DEF-DIM' },
+    { value:'Surface', label:'Surface', sub:'Bá» máº·t / xá»­ lÃ½ bá» máº·t', defect_name:'Surface', defect_code:'DEF-SUR' },
+    { value:'Packaging', label:'Packaging', sub:'ÄÃ³ng gÃ³i / báº£o quáº£n', defect_name:'Packaging', defect_code:'DEF-PKG' },
+    { value:'Documentation', label:'Documentation', sub:'TÃ i liá»‡u / chá»©ng tá»«', defect_name:'Documentation', defect_code:'DEF-DOC' },
+    { value:'Material', label:'Material', sub:'Váº­t liá»‡u / heat / lot', defect_name:'Material', defect_code:'DEF-MAT' },
+    { value:'Traceability', label:'Traceability', sub:'Truy xuáº¥t / nhÃ£n / marking', defect_name:'Traceability', defect_code:'DEF-TRC' }
   ];
 }
 
@@ -1723,19 +1758,19 @@ function supplierSuggestions(){
     });
   }
   var preferred = preferredSupplierForPart(state.data.part_number);
-  if(preferred) pushSupplier(preferred, 'Nhà cung cấp ưu tiên theo mã chi tiết đang chọn.');
+  if(preferred) pushSupplier(preferred, 'NhÃ  cung cáº¥p Æ°u tiÃªn theo mÃ£ chi tiáº¿t Ä‘ang chá»n.');
   var typedId = String(state.data.supplier_id || '').trim().toUpperCase();
   var typedName = String(state.data.supplier_name || '').trim().toLowerCase();
   suppliers.forEach(function(item){
     var supplierId = String(item.supplier_id || '').trim().toUpperCase();
     var supplierName = String(item.supplier_name || '').trim().toLowerCase();
-    if(typedId && supplierId === typedId) pushSupplier(item, 'Khớp trực tiếp với mã nhà cung cấp đang nhập.');
-    else if(typedName && supplierName && supplierName.indexOf(typedName) >= 0) pushSupplier(item, 'Khớp với tên nhà cung cấp đang nhập.');
+    if(typedId && supplierId === typedId) pushSupplier(item, 'Khá»›p trá»±c tiáº¿p vá»›i mÃ£ nhÃ  cung cáº¥p Ä‘ang nháº­p.');
+    else if(typedName && supplierName && supplierName.indexOf(typedName) >= 0) pushSupplier(item, 'Khá»›p vá»›i tÃªn nhÃ  cung cáº¥p Ä‘ang nháº­p.');
   });
   suppliers.filter(function(item){
     return String(item.status || '').toLowerCase() === 'approved';
   }).slice(0, 2).forEach(function(item){
-    pushSupplier(item, 'Nhà cung cấp đã được phê duyệt trong danh mục nền.');
+    pushSupplier(item, 'NhÃ  cung cáº¥p Ä‘Ã£ Ä‘Æ°á»£c phÃª duyá»‡t trong danh má»¥c ná»n.');
   });
   return out.slice(0, 4);
 }
@@ -1811,7 +1846,7 @@ function preferredSupplierForPart(partNumber){
 
 function buildSupplierContact(supplier){
   if(!supplier || typeof supplier !== 'object') return '';
-  return [String(supplier.contact_name || '').trim(), String(supplier.contact_email || '').trim()].filter(Boolean).join(' · ');
+  return [String(supplier.contact_name || '').trim(), String(supplier.contact_email || '').trim()].filter(Boolean).join(' Â· ');
 }
 
 function hydrateSupplierDatalist(){
@@ -1821,7 +1856,7 @@ function hydrateSupplierDatalist(){
   (Array.isArray(state.master && state.master.suppliers) ? state.master.suppliers : []).forEach(function(supplier){
     var option = document.createElement('option');
     option.value = String(supplier.supplier_name || '');
-    option.label = [String(supplier.supplier_id || ''), buildSupplierContact(supplier)].filter(Boolean).join(' · ');
+    option.label = [String(supplier.supplier_id || ''), buildSupplierContact(supplier)].filter(Boolean).join(' Â· ');
     datalist.appendChild(option);
   });
 }
@@ -1836,38 +1871,38 @@ function progressMeta(){
   });
   return {
     percent: requiredIds.length ? (filled / requiredIds.length) * 100 : 0,
-    note: 'Hoàn tất ' + filled + '/' + requiredIds.length + ' trường bắt buộc đang áp dụng cho SCAR này.'
+    note: 'HoÃ n táº¥t ' + filled + '/' + requiredIds.length + ' trÆ°á»ng báº¯t buá»™c Ä‘ang Ã¡p dá»¥ng cho SCAR nÃ y.'
   };
 }
 
 function closeoutMeta(){
-  if(!hasMeaningfulValue(state.data.containment_action)) return { label:'Chưa sẵn sàng' };
+  if(!hasMeaningfulValue(state.data.containment_action)) return { label:'ChÆ°a sáºµn sÃ ng' };
   if(state.data.root_cause_required){
     var missingRoot = ROOT_CAUSE_FIELDS.some(function(fieldId){ return !hasMeaningfulValue(state.data[fieldId]); });
-    if(missingRoot) return { label:'Chờ phản hồi NCC' };
+    if(missingRoot) return { label:'Chá» pháº£n há»“i NCC' };
   }
   if(!hasMeaningfulValue(state.data.verification_method) || !hasMeaningfulValue(state.data.verification_result)){
-    return { label:'Chờ xác nhận hiệu lực' };
+    return { label:'Chá» xÃ¡c nháº­n hiá»‡u lá»±c' };
   }
-  if(String(state.data.scar_status || '') !== 'closed') return { label:'Đủ dữ liệu để xem xét đóng' };
-  return { label:'Sẵn sàng đóng hồ sơ' };
+  if(String(state.data.scar_status || '') !== 'closed') return { label:'Äá»§ dá»¯ liá»‡u Ä‘á»ƒ xem xÃ©t Ä‘Ã³ng' };
+  return { label:'Sáºµn sÃ ng Ä‘Ã³ng há»“ sÆ¡' };
 }
 
 function dueDateMeta(){
   if(!state.data.supplier_response_due_date){
-    return { className:'warning', title:'Chưa thiết lập', shortTitle:'Chưa thiết lập', note:'Thiết lập hạn phản hồi để theo dõi nhà cung cấp và escalations.' };
+    return { className:'warning', title:'ChÆ°a thiáº¿t láº­p', shortTitle:'ChÆ°a thiáº¿t láº­p', note:'Thiáº¿t láº­p háº¡n pháº£n há»“i Ä‘á»ƒ theo dÃµi nhÃ  cung cáº¥p vÃ  escalations.' };
   }
   var due = new Date(state.data.supplier_response_due_date + 'T23:59:59');
   var now = new Date();
   var diffHours = Math.round((due.getTime() - now.getTime()) / 3600000);
   if(diffHours < 0){
-    return { className:'danger', title:'Quá hạn ' + formatNumber(Math.abs(diffHours), 0) + ' giờ', shortTitle:'Quá hạn', note:'Nhà cung cấp đã vượt hạn phản hồi. Cần cập nhật trạng thái và escalations ngay.' };
+    return { className:'danger', title:'QuÃ¡ háº¡n ' + formatNumber(Math.abs(diffHours), 0) + ' giá»', shortTitle:'QuÃ¡ háº¡n', note:'NhÃ  cung cáº¥p Ä‘Ã£ vÆ°á»£t háº¡n pháº£n há»“i. Cáº§n cáº­p nháº­t tráº¡ng thÃ¡i vÃ  escalations ngay.' };
   }
   if(diffHours <= 24){
-    return { className:'warning', title:'Còn ' + formatNumber(diffHours, 0) + ' giờ', shortTitle:'Còn ' + formatNumber(diffHours, 0) + ' giờ', note:'SCAR đang gần hạn. Cần bám sát phản hồi của nhà cung cấp trong ngày.' };
+    return { className:'warning', title:'CÃ²n ' + formatNumber(diffHours, 0) + ' giá»', shortTitle:'CÃ²n ' + formatNumber(diffHours, 0) + ' giá»', note:'SCAR Ä‘ang gáº§n háº¡n. Cáº§n bÃ¡m sÃ¡t pháº£n há»“i cá»§a nhÃ  cung cáº¥p trong ngÃ y.' };
   }
   var diffDays = Math.ceil(diffHours / 24);
-  return { className: diffDays <= 3 ? 'warning' : 'info', title:'Còn ' + formatNumber(diffDays, 0) + ' ngày', shortTitle:'Còn ' + formatNumber(diffDays, 0) + ' ngày', note:'Còn thời gian để theo dõi phản hồi, nhưng vẫn nên giữ containment và cập nhật tiến độ đều đặn.' };
+  return { className: diffDays <= 3 ? 'warning' : 'info', title:'CÃ²n ' + formatNumber(diffDays, 0) + ' ngÃ y', shortTitle:'CÃ²n ' + formatNumber(diffDays, 0) + ' ngÃ y', note:'CÃ²n thá»i gian Ä‘á»ƒ theo dÃµi pháº£n há»“i, nhÆ°ng váº«n nÃªn giá»¯ containment vÃ  cáº­p nháº­t tiáº¿n Ä‘á»™ Ä‘á»u Ä‘áº·n.' };
 }
 
 function rejectMeta(){
@@ -1877,7 +1912,7 @@ function rejectMeta(){
   return {
     className: rate >= 20 ? 'danger' : (rate >= 5 ? 'warning' : 'success'),
     rateText: formatPercent(rate),
-    note: formatNumber(qtyRejected, 0) + ' / ' + formatNumber(qtyReceived, 0) + ' chi tiết bị loại bỏ.'
+    note: formatNumber(qtyRejected, 0) + ' / ' + formatNumber(qtyReceived, 0) + ' chi tiáº¿t bá»‹ loáº¡i bá».'
   };
 }
 
@@ -1890,15 +1925,15 @@ function statusMetricClass(){
 }
 
 function statusNote(statusLabel){
-  if(statusLabel === 'Đã đóng') return 'SCAR đã được đóng sau khi xác nhận hiệu lực và hoàn thiện hồ sơ.';
-  if(statusLabel === 'Đang xác nhận') return 'Đang kiểm tra hiệu lực của hành động khắc phục trước khi quyết định đóng.';
-  if(statusLabel === 'Chờ phản hồi nhà cung cấp') return 'Ưu tiên bám sát deadline và cập nhật ngay khi nhà cung cấp phản hồi.';
-  if(statusLabel === 'Đang xem xét') return 'Đang đánh giá chất lượng phản hồi, mức độ hiệu lực và bằng chứng hỗ trợ.';
-  return 'SCAR đang mở và chờ hoàn thiện dữ liệu hoặc phản hồi của nhà cung cấp.';
+  if(statusLabel === 'ÄÃ£ Ä‘Ã³ng') return 'SCAR Ä‘Ã£ Ä‘Æ°á»£c Ä‘Ã³ng sau khi xÃ¡c nháº­n hiá»‡u lá»±c vÃ  hoÃ n thiá»‡n há»“ sÆ¡.';
+  if(statusLabel === 'Äang xÃ¡c nháº­n') return 'Äang kiá»ƒm tra hiá»‡u lá»±c cá»§a hÃ nh Ä‘á»™ng kháº¯c phá»¥c trÆ°á»›c khi quyáº¿t Ä‘á»‹nh Ä‘Ã³ng.';
+  if(statusLabel === 'Chá» pháº£n há»“i nhÃ  cung cáº¥p') return 'Æ¯u tiÃªn bÃ¡m sÃ¡t deadline vÃ  cáº­p nháº­t ngay khi nhÃ  cung cáº¥p pháº£n há»“i.';
+  if(statusLabel === 'Äang xem xÃ©t') return 'Äang Ä‘Ã¡nh giÃ¡ cháº¥t lÆ°á»£ng pháº£n há»“i, má»©c Ä‘á»™ hiá»‡u lá»±c vÃ  báº±ng chá»©ng há»— trá»£.';
+  return 'SCAR Ä‘ang má»Ÿ vÃ  chá» hoÃ n thiá»‡n dá»¯ liá»‡u hoáº·c pháº£n há»“i cá»§a nhÃ  cung cáº¥p.';
 }
 
 function severityMeta(value){
-  return SEVERITY_META[String(value || '').trim().toLowerCase()] || { label:'Chưa chọn', note:'Chọn đúng mức độ để điều phối phản hồi và review phù hợp.', className:'info' };
+  return SEVERITY_META[String(value || '').trim().toLowerCase()] || { label:'ChÆ°a chá»n', note:'Chá»n Ä‘Ãºng má»©c Ä‘á»™ Ä‘á»ƒ Ä‘iá»u phá»‘i pháº£n há»“i vÃ  review phÃ¹ há»£p.', className:'info' };
 }
 
 function currentRecordId(){
@@ -1913,9 +1948,9 @@ function defaultIssuer(){
 function serverErrorMessage(resp){
   if(!resp || typeof resp !== 'object') return '';
   if(resp.message) return String(resp.message);
-  if(resp.error === 'missing_required_context' && resp.field) return 'Thiếu ngữ cảnh bắt buộc: ' + resp.field + '.';
-  if(resp.error === 'missing_required_signature') return 'Máy chủ yêu cầu chữ ký bắt buộc trước khi gửi.';
-  if(resp.error) return 'Máy chủ trả về lỗi: ' + String(resp.error);
+  if(resp.error === 'missing_required_context' && resp.field) return 'Thiáº¿u ngá»¯ cáº£nh báº¯t buá»™c: ' + resp.field + '.';
+  if(resp.error === 'missing_required_signature') return 'MÃ¡y chá»§ yÃªu cáº§u chá»¯ kÃ½ báº¯t buá»™c trÆ°á»›c khi gá»­i.';
+  if(resp.error) return 'MÃ¡y chá»§ tráº£ vá» lá»—i: ' + String(resp.error);
   return '';
 }
 
@@ -1962,7 +1997,7 @@ function callApiDirect(action, payload, method){
     var contentType = String(response.headers.get('content-type') || '').toLowerCase();
     if(contentType.indexOf('application/json') < 0){
       return response.text().then(function(){
-        throw new Error('API trả về nội dung không phải JSON hợp lệ.');
+        throw new Error('API tráº£ vá» ná»™i dung khÃ´ng pháº£i JSON há»£p lá»‡.');
       });
     }
     return response.json();
@@ -2032,7 +2067,7 @@ function compactPartLabel(){ var part = String(state.data.part_number || '').tri
 function formatNumber(value, digits){ return new Intl.NumberFormat(state.lang, { minimumFractionDigits:0, maximumFractionDigits:digits == null ? 1 : digits }).format(Number(value || 0)); }
 function formatPercent(value){ return formatNumber(value || 0, 1) + '%'; }
 function formatDateTime(value){
-  if(!value) return 'Chưa có';
+  if(!value) return 'ChÆ°a cÃ³';
   try {
     return new Intl.DateTimeFormat(state.lang, { dateStyle:'short', timeStyle:'short' }).format(new Date(value));
   } catch(_err){
