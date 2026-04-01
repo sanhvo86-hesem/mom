@@ -1,7 +1,7 @@
 {
   "version": "phase2f",
   "executed_against": "ROLE_DOCS + normalizeDocPattern + override logic + hidden-doc filter + custom-doc registry + canCreateDocs flags",
-  "generated_at": "2026-03-21T14:16:13.054Z",
+  "generated_at": "2026-04-01T06:30:35.986Z",
   "summary": {
     "total": 23,
     "pass": 23,

@@ -740,5 +740,16 @@ Sau khi dịch hoặc biên tập, kiểm tra:
 
 ---
 
-> **Cập nhật lần cuối:** 2026-03-24
+> **Cập nhật lần cuối:** 2026-04-01
 > **Áp dụng:** Toàn bộ tài liệu QMS — HESEM ENGINEERING
+
+---
+
+## J. Quy tắc khóa: Tiếng Việt frontend phải có dấu
+
+<!-- FRONTEND-VI-DIACRITICS-RULE -->
+
+- Áp dụng bắt buộc cho mọi chuỗi hiển thị trên frontend: `01-QMS-Portal/portal.html`, `01-QMS-Portal/index.html`, `01-QMS-Portal/scripts/portal/*.js`, form runtime, dashboard, modal, toast, tooltip, placeholder.
+- Nghiêm cấm đưa chuỗi tiếng Việt không dấu lên UI ở bất kỳ trạng thái nào (kể cả demo, fallback, seed data, hay bản nháp).
+- Nếu chuỗi là tiếng Việt thì phải viết đúng chính tả và đầy đủ dấu Unicode (UTF-8/NFC).
+- Chỉ ngoại lệ cho mã kỹ thuật, route, slug, biến, class/id, và các từ tiếng Anh thuộc danh sách giữ nguyên đã khóa.

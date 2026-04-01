@@ -401,5 +401,13 @@ Mỗi nhân viên được gán 1 UserID 3-4 ký tự (VD: NVA, TBH, LMC), đăn
 
 ---
 
-> **Cập nhật lần cuối:** 2026-03-27
+> **Cập nhật lần cuối:** 2026-04-01
 > **Áp dụng:** Toàn bộ tài liệu QMS — HESEM ENGINEERING
+
+## H. Khóa frontend tiếng Việt có dấu
+
+<!-- FRONTEND-VI-DIACRITICS-IMMUTABLE -->
+
+- Áp dụng cho portal/dashboard/form runtime và mọi chuỗi render từ JavaScript.
+- Cấm tuyệt đối chuỗi tiếng Việt không dấu trên giao diện, kể cả dữ liệu demo hoặc fallback.
+- Nếu buộc phải dùng tiếng Anh cho thuật ngữ kỹ thuật thì phải theo đúng danh sách ngoại lệ đã khóa ở core standards.
