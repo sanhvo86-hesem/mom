@@ -183,7 +183,7 @@ class FmeaController extends BaseController
         $fmeaId = trim($fmeaId);
 
         try {
-            $record = $this->fmeaService()->getFmeaDetail($fmeaId);
+            $record = $this->fmeaService()->getDetail($fmeaId);
             if ($record === null) {
                 $this->error('not_found', 404, "FMEA {$fmeaId} not found.");
             }
@@ -488,7 +488,7 @@ class FmeaController extends BaseController
         $userId = $this->userId($user);
 
         try {
-            $controlPlan = $this->fmeaService()->generateControlPlan($fmeaId, $userId);
+            $controlPlan = $this->fmeaService()->generateControlPlanFromFmea($fmeaId, $userId);
             if ($controlPlan === null) {
                 $this->error('not_found', 404, "FMEA {$fmeaId} not found.");
             }
@@ -536,9 +536,25 @@ class FmeaController extends BaseController
         $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
 
         try {
-            $allItems = $this->fmeaService()->listControlPlans($filters);
-            $total    = count($allItems);
-            $items    = array_slice($allItems, $offset, $limit);
+            $fmeaDir  = $this->dataDir . '/fmea';
+            $allItems = $this->readJsonFile($fmeaDir . '/control_plans.json') ?? [];
+
+            // Apply filters
+            if (!empty($filters)) {
+                $allItems = array_filter($allItems, function (array $cp) use ($filters) {
+                    if (isset($filters['status']) && ($cp['status'] ?? '') !== $filters['status']) {
+                        return false;
+                    }
+                    if (isset($filters['item']) && ($cp['item_id'] ?? '') !== $filters['item']) {
+                        return false;
+                    }
+                    return true;
+                });
+                $allItems = array_values($allItems);
+            }
+
+            $total = count($allItems);
+            $items = array_slice($allItems, $offset, $limit);
 
             $this->paginated('control_plans', array_values($items), $total, $offset, $limit);
         } catch (Throwable $e) {
@@ -567,7 +583,17 @@ class FmeaController extends BaseController
         $controlPlanId = trim($controlPlanId);
 
         try {
-            $record = $this->fmeaService()->getControlPlanDetail($controlPlanId);
+            $fmeaDir  = $this->dataDir . '/fmea';
+            $allPlans = $this->readJsonFile($fmeaDir . '/control_plans.json') ?? [];
+            $record   = null;
+
+            foreach ($allPlans as $cp) {
+                if (($cp['id'] ?? '') === $controlPlanId) {
+                    $record = $cp;
+                    break;
+                }
+            }
+
             if ($record === null) {
                 $this->error('not_found', 404, "Control plan {$controlPlanId} not found.");
             }
@@ -633,7 +659,7 @@ class FmeaController extends BaseController
         $userId        = $this->userId($user);
 
         try {
-            $link = $this->fmeaService()->linkNcrToFmea($ncrId, $failureModeId, $userId);
+            $link = $this->fmeaService()->linkToNcr($ncrId, $failureModeId, $userId);
             if ($link === null) {
                 $this->error('link_failed', 400, "Cannot link NCR {$ncrId} to failure mode {$failureModeId}.");
             }

@@ -304,9 +304,40 @@ class SupplierController extends BaseController
         $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
 
         try {
-            $allItems = $this->supplierService()->listIncoming($filters);
-            $total    = count($allItems);
-            $items    = array_slice($allItems, $offset, $limit);
+            $sqDir    = $this->dataDir . '/supplier-quality';
+            $allItems = $this->readJsonFile($sqDir . '/incoming.json') ?? [];
+
+            // Apply filters
+            if (!empty($filters)) {
+                $allItems = array_filter($allItems, function (array $insp) use ($filters) {
+                    if (isset($filters['vendor_id']) && ($insp['vendor_id'] ?? '') !== $filters['vendor_id']) {
+                        return false;
+                    }
+                    if (isset($filters['status']) && ($insp['status'] ?? '') !== $filters['status']) {
+                        return false;
+                    }
+                    if (isset($filters['part_id']) && ($insp['part_id'] ?? '') !== $filters['part_id']) {
+                        return false;
+                    }
+                    if (isset($filters['date_from'])) {
+                        $date = substr($insp['created_at'] ?? $insp['date'] ?? '', 0, 10);
+                        if ($date < $filters['date_from']) {
+                            return false;
+                        }
+                    }
+                    if (isset($filters['date_to'])) {
+                        $date = substr($insp['created_at'] ?? $insp['date'] ?? '', 0, 10);
+                        if ($date > $filters['date_to']) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+                $allItems = array_values($allItems);
+            }
+
+            $total = count($allItems);
+            $items = array_slice($allItems, $offset, $limit);
 
             $this->paginated('inspections', array_values($items), $total, $offset, $limit);
         } catch (Throwable $e) {
@@ -464,7 +495,7 @@ class SupplierController extends BaseController
         $userId   = $this->userId($user);
 
         try {
-            $status = $this->supplierService()->updateSkipLot($vendorId, $partId, $body, $userId);
+            $status = $this->supplierService()->updateSkipLotLevel($vendorId, $partId, $body, $userId);
 
             $this->auditLog('supplier_update_skip_lot', [
                 'vendor_id' => $vendorId,
@@ -611,9 +642,28 @@ class SupplierController extends BaseController
         $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
 
         try {
-            $allItems = $this->supplierService()->listScar($filters);
-            $total    = count($allItems);
-            $items    = array_slice($allItems, $offset, $limit);
+            $sqDir    = $this->dataDir . '/supplier-quality';
+            $allItems = $this->readJsonFile($sqDir . '/scar.json') ?? [];
+
+            // Apply filters
+            if (!empty($filters)) {
+                $allItems = array_filter($allItems, function (array $scar) use ($filters) {
+                    if (isset($filters['vendor_id']) && ($scar['vendor_id'] ?? '') !== $filters['vendor_id']) {
+                        return false;
+                    }
+                    if (isset($filters['status']) && ($scar['status'] ?? '') !== $filters['status']) {
+                        return false;
+                    }
+                    if (isset($filters['severity']) && ($scar['severity'] ?? '') !== $filters['severity']) {
+                        return false;
+                    }
+                    return true;
+                });
+                $allItems = array_values($allItems);
+            }
+
+            $total = count($allItems);
+            $items = array_slice($allItems, $offset, $limit);
 
             $this->paginated('scars', array_values($items), $total, $offset, $limit);
         } catch (Throwable $e) {
@@ -736,7 +786,7 @@ class SupplierController extends BaseController
         $userId   = $this->userId($user);
 
         try {
-            $updated = $this->supplierService()->scarTransition($id, $toStatus, $userId, $comment);
+            $updated = $this->supplierService()->transitionScar($id, $toStatus, $userId, $comment);
             if ($updated === null) {
                 $this->error('transition_failed', 400, "Cannot transition SCAR {$id} to {$toStatus}.");
             }

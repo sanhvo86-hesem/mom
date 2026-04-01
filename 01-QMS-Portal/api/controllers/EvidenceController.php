@@ -166,7 +166,7 @@ class EvidenceController extends BaseController
         $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
 
         try {
-            $allItems = $this->evidenceService()->listEvidence($filters);
+            $allItems = $this->evidenceService()->getAll($filters);
             $total    = count($allItems);
             $items    = array_slice($allItems, $offset, $limit);
 
@@ -203,7 +203,7 @@ class EvidenceController extends BaseController
             }
 
             // Include chain-of-custody timeline
-            $custody = $this->evidenceService()->getChainOfCustody($id);
+            $custody = $this->evidenceService()->getCustodyLog($id);
             $evidence['custody_timeline'] = $custody;
 
             $this->success(['evidence' => $evidence]);
@@ -266,7 +266,7 @@ class EvidenceController extends BaseController
         }
 
         try {
-            $evidence = $this->evidenceService()->upload(
+            $evidence = $this->evidenceService()->store(
                 $file,
                 [
                     'title'       => $title,
@@ -318,7 +318,7 @@ class EvidenceController extends BaseController
         $userId     = $this->userId($user);
 
         try {
-            $link = $this->evidenceService()->linkToEntity($evidenceId, $recordId, $recordType, $userId, $note);
+            $link = $this->evidenceService()->link($evidenceId, $recordId, $recordType, $userId, $note);
             if ($link === null) {
                 $this->error('link_failed', 400, "Evidence {$evidenceId} not found or link already exists.");
             }
@@ -356,7 +356,7 @@ class EvidenceController extends BaseController
         $id = trim($id);
 
         try {
-            $custody = $this->evidenceService()->getChainOfCustody($id);
+            $custody = $this->evidenceService()->getCustodyLog($id);
             if ($custody === null) {
                 $this->error('not_found', 404, "Evidence {$id} not found.");
             }

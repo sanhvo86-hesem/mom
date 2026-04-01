@@ -182,7 +182,7 @@ class ApqpController extends BaseController
         $apqpId = trim($apqpId);
 
         try {
-            $record = $this->apqpService()->getProjectDetail($apqpId);
+            $record = $this->apqpService()->getDetail($apqpId);
             if ($record === null) {
                 $this->error('not_found', 404, "APQP project {$apqpId} not found.");
             }

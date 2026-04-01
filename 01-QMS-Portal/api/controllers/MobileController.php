@@ -101,7 +101,7 @@ class MobileController extends BaseController
         $employeeId = $this->resolveEmployeeId($user);
 
         try {
-            $queue = $this->mobileService()->getMyQueue($employeeId);
+            $queue = $this->mobileService()->getOperatorQueue($employeeId);
 
             $this->success(['queue' => $queue, 'employee_id' => $employeeId]);
         } catch (Throwable $e) {
@@ -381,7 +381,7 @@ class MobileController extends BaseController
         $employeeId = $this->resolveEmployeeId($user);
 
         try {
-            $status = $this->mobileService()->getSyncStatus($employeeId);
+            $status = $this->mobileService()->getPendingSyncItems($employeeId);
 
             $this->success(['sync_status' => $status, 'employee_id' => $employeeId]);
         } catch (Throwable $e) {

@@ -445,7 +445,7 @@ class QuoteController extends BaseController
         }
 
         try {
-            $estimate = $this->quoteService()->estimateMaterial([
+            $estimate = $this->quoteService()->estimateMaterialCost([
                 'material_type' => trim((string)($body['material_type'] ?? '')),
                 'dimensions'    => (array)($body['dimensions'] ?? []),
                 'buy_to_fly'    => (float)($body['buy_to_fly'] ?? 3.0),

@@ -194,7 +194,7 @@ class ExceptionController extends BaseController
         $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
 
         try {
-            $allItems = $this->exceptionService()->listAll($filters);
+            $allItems = $this->exceptionService()->listAllExceptions($filters);
             $total    = count($allItems);
             $items    = array_slice($allItems, $offset, $limit);
 
@@ -318,10 +318,30 @@ class ExceptionController extends BaseController
         $userId = $this->userId($user);
 
         try {
-            $updated = $this->exceptionService()->updateComplaint($id, $body, $userId);
+            $filePath = $this->dataDir . '/exceptions/complaints.json';
+            $items    = $this->readJsonFile($filePath) ?? [];
+            $updated  = null;
+
+            foreach ($items as &$item) {
+                if (($item['id'] ?? '') === $id) {
+                    $updates = $body;
+                    unset($updates['id']);
+                    foreach ($updates as $key => $value) {
+                        $item[$key] = $value;
+                    }
+                    $item['updated_by'] = $userId;
+                    $item['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
+                    $updated = $item;
+                    break;
+                }
+            }
+            unset($item);
+
             if ($updated === null) {
                 $this->error('not_found', 404, "Complaint {$id} not found.");
             }
+
+            $this->writeJsonFile($filePath, $items);
 
             $this->auditLog('exception_update_complaint', [
                 'complaint_id' => $id,
@@ -401,10 +421,30 @@ class ExceptionController extends BaseController
         $userId = $this->userId($user);
 
         try {
-            $updated = $this->exceptionService()->updateMrb($id, $body, $userId);
+            $filePath = $this->dataDir . '/exceptions/mrb.json';
+            $items    = $this->readJsonFile($filePath) ?? [];
+            $updated  = null;
+
+            foreach ($items as &$item) {
+                if (($item['id'] ?? '') === $id) {
+                    $updates = $body;
+                    unset($updates['id']);
+                    foreach ($updates as $key => $value) {
+                        $item[$key] = $value;
+                    }
+                    $item['updated_by'] = $userId;
+                    $item['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
+                    $updated = $item;
+                    break;
+                }
+            }
+            unset($item);
+
             if ($updated === null) {
                 $this->error('not_found', 404, "MRB {$id} not found.");
             }
+
+            $this->writeJsonFile($filePath, $items);
 
             $this->auditLog('exception_update_mrb', [
                 'mrb_id' => $id,
@@ -484,10 +524,30 @@ class ExceptionController extends BaseController
         $userId = $this->userId($user);
 
         try {
-            $updated = $this->exceptionService()->updateDeviation($id, $body, $userId);
+            $filePath = $this->dataDir . '/exceptions/deviations.json';
+            $items    = $this->readJsonFile($filePath) ?? [];
+            $updated  = null;
+
+            foreach ($items as &$item) {
+                if (($item['id'] ?? '') === $id) {
+                    $updates = $body;
+                    unset($updates['id']);
+                    foreach ($updates as $key => $value) {
+                        $item[$key] = $value;
+                    }
+                    $item['updated_by'] = $userId;
+                    $item['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
+                    $updated = $item;
+                    break;
+                }
+            }
+            unset($item);
+
             if ($updated === null) {
                 $this->error('not_found', 404, "Deviation {$id} not found.");
             }
+
+            $this->writeJsonFile($filePath, $items);
 
             $this->auditLog('exception_update_deviation', [
                 'deviation_id' => $id,
@@ -569,10 +629,30 @@ class ExceptionController extends BaseController
         $userId = $this->userId($user);
 
         try {
-            $updated = $this->exceptionService()->updateConcession($id, $body, $userId);
+            $filePath = $this->dataDir . '/exceptions/concessions.json';
+            $items    = $this->readJsonFile($filePath) ?? [];
+            $updated  = null;
+
+            foreach ($items as &$item) {
+                if (($item['id'] ?? '') === $id) {
+                    $updates = $body;
+                    unset($updates['id']);
+                    foreach ($updates as $key => $value) {
+                        $item[$key] = $value;
+                    }
+                    $item['updated_by'] = $userId;
+                    $item['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
+                    $updated = $item;
+                    break;
+                }
+            }
+            unset($item);
+
             if ($updated === null) {
                 $this->error('not_found', 404, "Concession {$id} not found.");
             }
+
+            $this->writeJsonFile($filePath, $items);
 
             $this->auditLog('exception_update_concession', [
                 'concession_id' => $id,
@@ -612,7 +692,7 @@ class ExceptionController extends BaseController
         $userId   = $this->userId($user);
 
         try {
-            $updated = $this->exceptionService()->transition($type, $id, $toStatus, $userId, $comment);
+            $updated = $this->exceptionService()->transitionException($type, $id, $toStatus, $userId, $comment);
             if ($updated === null) {
                 $this->error('transition_failed', 400, "Cannot transition {$type}/{$id} to {$toStatus}.");
             }
@@ -661,7 +741,59 @@ class ExceptionController extends BaseController
         }
 
         try {
-            $summary = $this->exceptionService()->copqSummary($period, $from, $to);
+            $excDir = $this->dataDir . '/exceptions';
+            $files  = ['complaints.json', 'mrb.json', 'deviations.json', 'concessions.json'];
+            $all    = [];
+
+            foreach ($files as $f) {
+                $items = $this->readJsonFile($excDir . '/' . $f) ?? [];
+                foreach ($items as $item) {
+                    $all[] = $item;
+                }
+            }
+
+            // Filter by date range
+            $filtered = array_filter($all, function (array $item) use ($from, $to) {
+                $date = $item['created_at'] ?? $item['date'] ?? '';
+                if ($date === '') {
+                    return false;
+                }
+                $dateOnly = substr($date, 0, 10);
+                if ($from !== null && $dateOnly < $from) {
+                    return false;
+                }
+                if ($to !== null && $dateOnly > $to) {
+                    return false;
+                }
+                return true;
+            });
+
+            // Group by period bucket
+            $buckets = [];
+            foreach ($filtered as $item) {
+                $date = substr($item['created_at'] ?? $item['date'] ?? '', 0, 10);
+                if ($period === 'year') {
+                    $key = substr($date, 0, 4);
+                } elseif ($period === 'quarter') {
+                    $m = (int)substr($date, 5, 2);
+                    $q = (int)ceil($m / 3);
+                    $key = substr($date, 0, 4) . '-Q' . $q;
+                } else {
+                    $key = substr($date, 0, 7);
+                }
+
+                if (!isset($buckets[$key])) {
+                    $buckets[$key] = ['period' => $key, 'total_cost' => 0, 'count' => 0, 'categories' => []];
+                }
+                $cost = (float)($item['copq_cost'] ?? $item['cost'] ?? 0);
+                $cat  = $item['exception_type'] ?? $item['type'] ?? 'other';
+                $buckets[$key]['total_cost'] += $cost;
+                $buckets[$key]['count']++;
+                $buckets[$key]['categories'][$cat] = ($buckets[$key]['categories'][$cat] ?? 0) + $cost;
+            }
+
+            ksort($buckets);
+            $summary = array_values($buckets);
 
             $this->success(['copq' => $summary]);
         } catch (Throwable $e) {
@@ -691,7 +823,54 @@ class ExceptionController extends BaseController
         }
 
         try {
-            $trendData = $this->exceptionService()->trends($months, $type);
+            $excDir   = $this->dataDir . '/exceptions';
+            $files    = ['complaints.json', 'mrb.json', 'deviations.json', 'concessions.json'];
+            $typeMap  = ['complaints.json' => 'complaint', 'mrb.json' => 'mrb', 'deviations.json' => 'deviation', 'concessions.json' => 'concession'];
+            $cutoff   = gmdate('Y-m-d', strtotime("-{$months} months"));
+            $all      = [];
+
+            foreach ($files as $f) {
+                $excType = $typeMap[$f];
+                if ($type !== null && strtolower($type) !== $excType) {
+                    continue;
+                }
+                $items = $this->readJsonFile($excDir . '/' . $f) ?? [];
+                foreach ($items as $item) {
+                    $item['_exc_type'] = $excType;
+                    $all[] = $item;
+                }
+            }
+
+            // Filter by cutoff date
+            $filtered = array_filter($all, function (array $item) use ($cutoff) {
+                $date = substr($item['created_at'] ?? $item['date'] ?? '', 0, 10);
+                return $date >= $cutoff;
+            });
+
+            // Monthly trend
+            $monthly = [];
+            $categoryCounts = [];
+            foreach ($filtered as $item) {
+                $month   = substr($item['created_at'] ?? $item['date'] ?? '', 0, 7);
+                $excType = $item['_exc_type'];
+                $monthly[$month] = ($monthly[$month] ?? 0) + 1;
+                $categoryCounts[$excType] = ($categoryCounts[$excType] ?? 0) + 1;
+            }
+            ksort($monthly);
+
+            // Pareto: sort categories by count descending
+            arsort($categoryCounts);
+            $pareto = [];
+            foreach ($categoryCounts as $cat => $cnt) {
+                $pareto[] = ['category' => $cat, 'count' => $cnt];
+            }
+
+            $trendData = [
+                'months_back'   => $months,
+                'total_records' => count($filtered),
+                'monthly'       => $monthly,
+                'pareto'        => $pareto,
+            ];
 
             $this->success(['trends' => $trendData]);
         } catch (Throwable $e) {
@@ -726,10 +905,44 @@ class ExceptionController extends BaseController
         $userId     = $this->userId($user);
 
         try {
-            $result = $this->exceptionService()->escalate($type, $id, $userId, $reason, $escalateTo);
-            if ($result === null) {
+            // Map exception type to its JSON file
+            $typeFileMap = [
+                'complaint'  => 'complaints.json',
+                'mrb'        => 'mrb.json',
+                'deviation'  => 'deviations.json',
+                'concession' => 'concessions.json',
+            ];
+            $filename = $typeFileMap[$type] ?? null;
+            if ($filename === null) {
+                $this->error('escalation_failed', 400, "Unknown exception type: {$type}.");
+            }
+
+            $filePath = $this->dataDir . '/exceptions/' . $filename;
+            $items    = $this->readJsonFile($filePath) ?? [];
+            $found    = false;
+            $record   = null;
+
+            foreach ($items as &$item) {
+                if (($item['id'] ?? '') === $id) {
+                    $item['escalated']    = true;
+                    $item['escalated_by'] = $userId;
+                    $item['escalated_at'] = gmdate('Y-m-d\TH:i:s\Z');
+                    $item['escalation_reason'] = $reason;
+                    if ($escalateTo !== '') {
+                        $item['escalate_to'] = $escalateTo;
+                    }
+                    $record = $item;
+                    $found  = true;
+                    break;
+                }
+            }
+            unset($item);
+
+            if (!$found) {
                 $this->error('escalation_failed', 400, "Cannot escalate {$type}/{$id}.");
             }
+
+            $this->writeJsonFile($filePath, $items);
 
             $this->auditLog('exception_escalate', [
                 'type'        => $type,
@@ -738,7 +951,7 @@ class ExceptionController extends BaseController
                 'escalate_to' => $escalateTo,
             ], $userId);
 
-            $this->success(['escalation' => $result]);
+            $this->success(['escalation' => $record]);
         } catch (Throwable $e) {
             $this->error('escalation_failed', 500, $e->getMessage());
         }
