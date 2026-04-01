@@ -1,15 +1,15 @@
-# 01 — Quy tắc bất biến (Immutable Rules)
+# 01 — Immutable Rules
 
-> Các quy tắc trong file này **KHÔNG BAO GIỜ** được vi phạm, bất kể hoàn cảnh nào.
-> Vi phạm bất kỳ quy tắc nào dưới đây sẽ phá vỡ tính nhất quán của toàn bộ hệ thống QMS.
+> The rules in this file can **NEVER** be violated, no matter the circumstances.
+> Violation of any of the rules below will break the integrity of the entire QMS system.
 
 ---
 
-## A. Quy tắc tên file, đường dẫn, và mã nguồn
+## A. File name, path, and source code rules
 
-### A1. Tên file và thư mục — LUÔN LUÔN tiếng Anh
+### A1. File and folder names — ALWAYS English
 
-Tên file, tên thư mục, đường dẫn (path) **LUÔN LUÔN** là tiếng Anh — **KHÔNG BAO GIỜ** dịch sang tiếng Việt.
+File names, folder names, paths are **ALWAYS** in English — **NEVER** translated into Vietnamese.
 
 ```
 ✅ sop-101-document-and-data-control.html
@@ -20,17 +20,17 @@ Tên file, tên thư mục, đường dẫn (path) **LUÔN LUÔN** là tiếng A
 ❌ 03-Tai-Lieu-Van-Hanh/01-Quy-Trinh/
 ```
 
-### A2. Thuộc tính HTML — KHÔNG dịch
+### A2. HTML attributes — DO NOT translate
 
-Các thuộc tính HTML sau **KHÔNG BAO GIỜ** được dịch:
-- `href` — đường dẫn liên kết
-- `class` — tên class CSS
-- `id` — định danh phần tử
-- `src` — đường dẫn tài nguyên
-- `style` — thuộc tính CSS inline
-- `data-*` — thuộc tính dữ liệu
-- `name` — tên trường form
-- `value` — giá trị ẩn của trường form (value hiển thị có thể dịch)
+The following HTML attributes are **NEVER** translated:
+- `href` — link
+- `class` — CSS class name
+- `id` — element identifier
+- `src` — resource path
+- `style` — inline CSS property
+- `data-*` — data attribute
+- `name` — form field name
+- `value` — hidden value of form field (displayed value can be translated)
 
 ```html
 ✅ <a href="../sop-101-document-and-data-control.html" class="doc-link">
@@ -39,375 +39,375 @@ Các thuộc tính HTML sau **KHÔNG BAO GIỜ** được dịch:
 ❌ <a href="../sop-101-kiem-soat-tai-lieu.html" class="lien-ket-tai-lieu">
 ```
 
-### A3. CSS và JavaScript — giữ nguyên định danh kỹ thuật, Việt hóa chuỗi hiển thị
+### A3. CSS and JavaScript — retain technical identifiers, localize display strings
 
-Phần kỹ thuật trong thẻ `<style>` và `<script>` **KHÔNG BAO GIỜ** được dịch. Bao gồm:
-- Tên biến CSS (`--navy`, `--blue`, `--gold`)
-- Tên class (`.form-header`, `.doc-content`, `.callout`)
-- Tên hàm JavaScript
-- Biến, key kỹ thuật, selector, id, route, file path
-- Comment trong code (giữ nguyên tiếng Anh nếu là comment kỹ thuật)
+Technical sections in tags `<style>` and `<script>` **NEVER** are translated. Includes:
+- CSS variable names (`--navy`, `--blue`, `--gold`)
+- Class name (`.form-header`, `.doc-content`, `.callout`)
+- JavaScript function name
+- Variables, technical keys, selectors, ids, routes, file paths
+- Comment in code (remain in English if it is a technical comment)
 
-**Ngoại lệ bắt buộc:** mọi chuỗi tiếng Việt hiển thị cho người dùng trong HTML/JavaScript vẫn **PHẢI** được viết có dấu đầy đủ, chính xác. Áp dụng cho:
-- Tiêu đề dashboard, label, button, card, empty state
+**Mandatory exception:** any Vietnamese string displayed to the user in HTML/JavaScript still **MUST** be written with full, accurate accents. Applies to:
+- Dashboard title, label, button, card, empty state
 - Tooltip, placeholder, alert, confirm, toast, modal
-- Chuỗi trong template literal, object config, JSON dùng để render UI
+- String in template literal, object config, JSON used to render UI
 
 ---
 
-## B. Viết tắt và thuật ngữ giữ nguyên tiếng Anh
+## B. Abbreviations and terms remain in English
 
-### B1. Viết tắt — LUÔN giữ nguyên
+### B1. Abbreviations — ALWAYS stay the same
 
-Các viết tắt sau **LUÔN** giữ nguyên tiếng Anh trong mọi ngữ cảnh:
+The following abbreviations **ALWAYS** remain in English in all contexts:
 
-**Hệ thống quản lý:**
+**Management system:**
 QMS, QA, QC, NCR, CAPA, DCR, SOP, WI, FRM, ANNEX, REC, RPT, CERT, ISO, AS9100D, PDCA
 
-**Thương mại & chuỗi cung ứng:**
+**Trade & supply chain:**
 RFQ, PO, CSR, CoC, CoA, POD, BOM, Incoterms
 
-**Chất lượng & đo lường:**
+**Quality & measurement:**
 KPI, OTD, FPY, COPQ, MSA, SPC, IPQC, FAI, FMEA, PFMEA, CTQ, ALCOA, AQL
 
-**Kỹ thuật & sản xuất:**
+**Engineering & production:**
 CNC, NC, DFM, CAM, CMM, 3D, ASME, ASTM, SMED, LOTO, MTTR
 
-**Hệ thống thông tin:**
+**Information system:**
 SSOT, SoR, RACI, RBAC, ERP, MES, PDF, M365
 
-**Quản lý & vận hành:**
+**Management & operations:**
 FIFO, FEFO, PDCA, SCAR, SBAR, TIMWOODS, SSCC
 
-**Mã tài liệu:**
-SOP-101, WI-201, FRM-301, ANNEX-111 — toàn bộ mã tài liệu giữ nguyên dạng gốc
+**Document code:**
+SOP-101, WI-201, FRM-301, ANNEX-111 — all document codes remain in their original form
 
-### B1a. Glossary canonical cho viết tắt — KHÓA CỨNG
+### B1a. Glossary canonical for abbreviation — HARD LOCK
 
-Khi một viết tắt xuất hiện trong glossary/từ điển thuật ngữ:
+When an abbreviation appears in the glossary/term dictionary:
 
-- `term` PHẢI là khóa tra cứu canonical;
-- `meaning` PHẢI là tên đầy đủ tiếng Anh của viết tắt;
-- không được tạo mới record canonical theo dạng `Full Term (ABBR)`;
-- với cặp `ABBR` và `Full Term (ABBR)`, `ABBR` là mục từ chính;
-- role/JD code như `QA-01`, `PUR-02`, `EXE-01` vẫn được phép ở glossary, nhưng `meaning` PHẢI là chức danh tiếng Anh đầy đủ.
+- `term` MUST be a canonical lookup key;
+- `meaning` MUST be the full English name of the abbreviation;
+- Do not create new canonical records in the form `Full Term (ABBR)`;
+- with the pair `ABBR` and `Full Term (ABBR)`, `ABBR` is the main entry;
+- role/JD codes like `QA-01`, `PUR-02`, `EXE-01` are still allowed in glossary, but `meaning` MUST be the full English title.
 
-Chuẩn chi tiết: xem `25-glossary-canonical-abbreviation-standard.md`.
+Detailed standards: see `25-glossary-canonical-abbreviation-standard.md`.
 
-### B2. Thuật ngữ ngành — giữ nguyên tiếng Anh
+### B2. Industry terminology — stay in English
 
-Các thuật ngữ ngành sau giữ nguyên tiếng Anh khi dùng trong văn bản tiếng Việt:
-- **Sản xuất:** Setup, Traveler, Balloon
-- **Phần mềm:** Epicor, SharePoint, M365, Zalo
-- **Phương pháp:** Kaizen, Dreyfus, Pareto, Kolb
-- **Vật liệu:** PEEK, Vespel, PTFE
-- **Tiêu chuẩn:** SEMI
+The following industry terms remain in English when used in Vietnamese documents:
+- **Production:** Setup, Traveler, Balloon
+- **Software:** Epicor, SharePoint, M365, Zalo
+- **Methods:** Kaizen, Dreyfus, Pareto, Kolb
+- **Materials:** PEEK, Vespel, PTFE
+- **Standard:** SEMI
 
-### B3. Danh từ riêng nội bộ — KHÔNG BAO GIỜ dịch
+### B3. Internal proper nouns — NEVER translate
 
-Các tên sau là **danh từ riêng của hệ thống** (SharePoint, Epicor, M365). Nếu dịch sang tiếng Việt hoặc tiếng Anh sẽ **mất nghĩa** và **phá vỡ liên kết hệ thống**.
+The following names are **system proper nouns** (SharePoint, Epicor, M365). If translated into Vietnamese or English, it will **lose meaning** and **break system links**.
 
-#### B3.1 Tên SharePoint Site — giữ nguyên 100%
+#### B3.1 SharePoint Site name — keep 100%
 
-| Tên site | Chủ sở hữu | Mục đích |
+| Site name | Owner | Purpose |
 |----------|------------|---------|
-| `HESEM-Records` | `QMS-Owner` | Hồ sơ vận hành: Quality, QMS Governance, Training, Department |
-| `HESEM-Job-Evidence` | `QMS-Owner` | Job dossier + Part baseline + IP khách hàng (isolated) |
+| `HESEM-Records` | `QMS-Owner` | Operational profile: Quality, QMS Governance, Training, Department |
+| `HESEM-Job-Evidence` | `QMS-Owner` | Job dossier + Part baseline + Customer IP (isolated) |
 | `HESEM-People` | `QMS-Owner` | HR restricted |
-| `HESEM-Digital` | `QMS-Owner` | Source control (backup web) + IT governance |
+| `HESEM-Digital` | `QMS-Owner` | Source control (web backup) + IT governance |
 
-**Quy tắc:** Tên site, tên thư viện, tên danh sách SharePoint là danh từ riêng — **KHÔNG** dịch, **KHÔNG** chỉnh sửa bất kỳ ký tự nào. Chi tiết kiến trúc: xem `core-standards/14-m365-sharepoint-architecture.md`.
+**Rules:** Site names, library names, SharePoint list names are proper nouns — **DO NOT** translate, **DO NOT** edit any characters. Architectural details: see `core-standards/14-m365-sharepoint-architecture.md`.
 
-#### B3.2 Tên cột nội bộ (Internal Column Names) — giữ nguyên 100%
+#### B3.2 Internal Column Names — keep 100%
 
-Các tên cột sau là định danh kỹ thuật trong M365 Lists / Epicor. **KHÔNG BAO GIỜ** dịch:
+The following column names are technical identifiers in M365 Lists/Epicor. **NEVER** translate:
 
-| Tên cột | Mô tả | Ngôn ngữ gốc |
+| Column name | Description | Original language |
 |---------|--------|---------------|
-| `RecordType` | Loại hồ sơ | Tiếng Anh |
-| `RecordCode` | Mã hồ sơ | Tiếng Anh |
-| `StatusCode` | Mã trạng thái | Tiếng Anh |
-| `ResponsiblePerson` | Người phụ trách | Tiếng Anh |
-| `Người phê duyệt` | Người phê duyệt | Tiếng Việt (đặt sẵn) |
-| `EventDate` | Ngày sự kiện | Tiếng Anh |
-| `TriggerEventDate` | Ngày kích hoạt | Tiếng Anh |
-| `JobNum` | Số Job | Tiếng Anh |
-| `PartNum` | Số Part | Tiếng Anh |
-| `Phiên bản` | Phiên bản | Tiếng Việt (đặt sẵn) |
-| `CustomerID` | Mã khách hàng | Tiếng Anh |
-| `SupplierID` | Mã nhà cung cấp | Tiếng Anh |
-| `EvidenceUrl` | Đường dẫn bằng chứng | Tiếng Anh |
+| `RecordType` | Record type | English |
+| `RecordCode` | Profile code | English |
+| `StatusCode` | Status code | English |
+| `ResponsiblePerson` | Person in charge | English |
+| `Người phê duyệt` | Approver | Vietnamese (preset) |
+| `EventDate` | Event date | English |
+| `TriggerEventDate` | Activation date | English |
+| `JobNum` | Job Number | English |
+| `PartNum` | Part Number | English |
+| `Phiên bản` | Version | Vietnamese (preset) |
+| `CustomerID` | Customer code | English |
+| `SupplierID` | Supplier code | English |
+| `EvidenceUrl` | Evidence Path | English |
 
-**Nhận dạng nhanh tên cột nội bộ:** Bất kỳ từ nào viết dạng **CamelCase** (như `RecordType`, `JobNum`, `CustomerID`) đều là tên cột kỹ thuật — **KHÔNG dịch**.
+**Quick identification of internal column names:** Any words written in the form **CamelCase** (like `RecordType`, `JobNum`, `CustomerID`) are technical column names — **DO NOT translate**.
 
-#### B3.2b Nơi lưu trữ (Storage Locations) — giữ nguyên tiếng Anh 100%
+#### B3.2b Storage Locations — keep the English 100%
 
-| Tên tiếng Anh | Mô tả |
+| English name | Description |
 |---------------|--------|
-| `Quality-Records` | Library hồ sơ chất lượng (site HESEM-Records) |
-| `QMS-Governance` | Library hồ sơ quản trị QMS (site HESEM-Records) |
-| `Training-Records` | Library hồ sơ đào tạo (site HESEM-Records) |
-| `Department-Ops` | Library hồ sơ phòng ban (site HESEM-Records) |
+| `Quality-Records` | Library of quality records (site HESEM-Records) |
+| `QMS-Governance` | Library of QMS administrative records (site HESEM-Records) |
+| `Training-Records` | Library of training records (site HESEM-Records) |
+| `Department-Ops` | Library of department records (site HESEM-Records) |
 | `Part-REV-Master` | Library engineering baseline (site HESEM-Job-Evidence) |
-| `Job-Dossiers` | Library hồ sơ job (site HESEM-Job-Evidence) |
-| `Customer-Received` | Library tài liệu khách hàng (site HESEM-Job-Evidence) |
-| `Tooling-Fixture-Gage` | Library tài sản (site HESEM-Job-Evidence) |
+| `Job-Dossiers` | Job profile library (site HESEM-Job-Evidence) |
+| `Customer-Received` | Customer document library (site HESEM-Job-Evidence) |
+| `Tooling-Fixture-Gage` | Asset Library (site HESEM-Job-Evidence) |
 | `QMS-Source-Control` | Library backup web portal (site HESEM-Digital) |
-| `Point-of-use` / `Point-of-use Control` | Điểm sử dụng |
-| `Document Library` | Thư viện tài liệu |
-| `Record Library` | Thư viện hồ sơ |
+| `Point-of-use` / `Point-of-use Control` | Point of use |
+| `Document Library` | Document library |
+| `Record Library` | Profile Library |
 
-**Quy tắc:** Tên nơi lưu trữ là danh từ riêng M365/SharePoint — dịch sẽ gây nhầm lẫn khi tham chiếu.
+**Rule:** Repository names are M365/SharePoint proper nouns — translation will cause reference confusion.
 
-#### B3.2c Chức danh / Vai trò — chuẩn hóa theo JD và role code
+#### B3.2c Title / Role — standardized according to JD and role code
 
-| Tiếng Anh | Tiếng Việt (mô tả) |
+| English | Vietnamese (description) |
 |-----------|---------------------|
-| `Document Responsible Person` | Người phụ trách tài liệu |
-| `Lead Department` | Bộ phận chủ trì |
-| `IT Administrator` | Quản trị viên IT |
-| `Team Leader` | Tổ trưởng |
-| `Shift Leader` | Trưởng ca |
-| `Foreman` | Quản đốc |
-| `Approver` / `Reviewer` / `Author` | Người phê duyệt / rà soát / soạn |
-| `Performer` / `Inspector` / `Operator` | Người thực hiện / kiểm tra / vận hành |
-| `Specialist` / `Worker` / `End User` | Chuyên viên / Công nhân / Người dùng cuối |
+| `Document Responsible Person` | Document manager |
+| `Lead Department` | Presiding department |
+| `IT Administrator` | IT Administrator |
+| `Team Leader` | Team leader |
+| `Shift Leader` | Head of shift |
+| `Foreman` | Foreman |
+| `Approver` / `Reviewer` / `Author` | Approver / reviewer / editor |
+| `Performer` / `Inspector` / `Operator` | Implementer/inspector/operator |
+| `Specialist` / `Worker` / `End User` | Professional / Worker / End User |
 
-**Quy tắc thay thế:**
-- Chức danh JD chuẩn dùng tiếng Anh.
-- Header, RACI, bảng chủ trì, gate owner, hold/release authority và approver dùng `role code` rút gọn có link JD.
-- Governance hats phải gắn lên host role thật, ví dụ `QA[QMR]`, `QMS[DC]`, `QMS[LA]`.
-- Cấm dùng độc lập các placeholder như `Process Owner`, `Department Head`, `Responsible Person`, `Data Owner`, `Top Management` trong owner/RACI/authority cells.
-- Khi cần một nhóm vai trò, phải render thành explicit role bundle gồm nhiều role chips link JD, không viết nhóm mơ hồ.
+**Alternative rules:**
+- Standard JD title in English.
+- Header, RACI, host table, gate owner, hold/release authority and approver use shortened `role code` with JD link.
+- Governance hats must be attached to the actual host role, for example `QA[QMR]`, `QMS[DC]`, `QMS[LA]`.
+- Prohibit independent use of placeholders such as `Process Owner`, `Department Head`, `Responsible Person`, `Data Owner`, `Top Management` in owner/RACI/authority cells.
+- When a group of roles is needed, it must be rendered into an explicit role bundle consisting of multiple JD chip link roles, do not write ambiguous groups.
 
-#### B3.3 Tên SharePoint List — giữ nguyên 100%
+#### B3.3 SharePoint List name — keep 100%
 
-| Tên List gốc | Mô tả |
+| Original List name | Description |
 |---------------|--------|
-| `QMS-Document-Register` | Sổ đăng ký tài liệu |
-| `QMS-Change-Register` | Sổ đăng ký thay đổi |
-| `QMS-NCR-Register` | Sổ đăng ký NCR |
-| `QMS-CAPA-Register` | Sổ đăng ký CAPA |
-| `QMS-Training-Register` | Sổ đăng ký đào tạo |
-| `QMS-Competence-Matrix` | Ma trận năng lực |
-| `OPS-Job-Dossier-Index` | Danh mục hồ sơ Job |
-| `PUR-Supplier-Register` | Sổ đăng ký nhà cung cấp |
-| `M365-Record-Provisioning-Requests` | Yêu cầu cấp phát hồ sơ |
-| `M365-Record-Series-Catalog` | Danh mục chuỗi hồ sơ |
-| `Department-Zone-Catalog` | Danh mục phòng ban/khu vực |
-| `People-Dossier-Index` | Danh mục hồ sơ nhân sự |
-| `System-Record-Request-Log` | Nhật ký yêu cầu hồ sơ hệ thống |
-| `External-Share-Approval-Log` | Nhật ký duyệt chia sẻ bên ngoài |
-| `Automation-Run-Log` | Nhật ký chạy tự động |
-| `Archive-Lock-Register` | Sổ đăng ký khóa lưu trữ |
+| `QMS-Document-Register` | Document register |
+| `QMS-Change-Register` | Change register |
+| `QMS-NCR-Register` | NCR Registry |
+| `QMS-CAPA-Register` | CAPA Register |
+| `QMS-Training-Register` | Training register |
+| `QMS-Competence-Matrix` | Competency Matrix |
+| `OPS-Job-Dossier-Index` | Job profile list |
+| `PUR-Supplier-Register` | Supplier Register |
+| `M365-Record-Provisioning-Requests` | Request for issuance of documents |
+| `M365-Record-Series-Catalog` | List of records series |
+| `Department-Zone-Catalog` | Directory of departments/areas |
+| `People-Dossier-Index` | Personnel profile list |
+| `System-Record-Request-Log` | System profile request log |
+| `External-Share-Approval-Log` | External Shared Browsing Log |
+| `Automation-Run-Log` | Auto run log |
+| `Archive-Lock-Register` | Stored Key Registry |
 
-**Quy tắc:** Tên List là định danh hệ thống — dịch sẽ phá vỡ Power Automate flows và lookup columns.
+**Rule:** List names are system identifiers — translation will break Power Automate flows and lookup columns.
 
-#### B3.4 Tên chủ sở hữu SharePoint — giữ nguyên 100%
+#### B3.4 SharePoint owner name — keep 100%
 
-`QMS-Owner` là tên tài khoản/nhóm bảo mật trong M365 — **KHÔNG** dịch thành "QMS-Chủ sở hữu" hay bất kỳ dạng nào khác.
+`QMS-Owner` is the account/security group name in M365 — **NOT** translated to "QMS-Owner" or anything else.
 
 ---
 
-### B4. Nhãn metadata — tiếng Việt chuẩn hóa
+### B4. Metatag label — standardized Vietnamese
 
-Các nhãn metadata trong header tài liệu sử dụng tiếng Việt theo quy ước đã chuẩn hóa:
+Metatag labels in the document header use Vietnamese according to standardized conventions:
 
-| Nhãn hiển thị | Nội dung |
+| Display label | Content |
 |----------------|----------|
-| **Mã:** | Mã tài liệu (SOP-101, WI-201...) |
-| **Phiên bản:** | V0, V1, V2... |
-| **Ngày hiệu lực:** | Ngày hoặc "Theo quyết định ban hành" |
-| **Chủ sở hữu:** | Role code JD-linked chịu trách nhiệm |
-| **Phê duyệt:** | Role code JD-linked có quyền phê duyệt |
+| **Code:** | Document code (SOP-101, WI-201...) |
+| **Version:** | V0, V1, V2... |
+| **Effective date:** | Date or "By decision issued" |
+| **Owner:** | Role code JD-linked is responsible |
+| **Approval:** | Role code JD-linked has the right to approve |
 
-Mã tài liệu (SOP-101, WI-201, FRM-301, ANNEX-111) **LUÔN** giữ nguyên tiếng Anh.
-
----
-
-## C. 23 Quy tắc khóa (Locked Rules)
-
-Các quy tắc sau được khóa vĩnh viễn và áp dụng cho mọi tài liệu QMS:
-
-### Cấu trúc & tổ chức
-
-1. **Giữ cấu trúc thư viện hiện hành làm khung đích.** Không tự ý thay đổi cấu trúc thư mục đã thiết lập.
-
-2. **Không tự ý đổi tên file/slug/mã tài liệu.** Không đổi tên thủ công hoặc rename cục bộ ngoài luồng kiểm soát. Nếu cần đổi tên chuẩn, chỉ được thực hiện qua governed rename flow đã khóa ở `23-portal-standard-title-filename-ssot.md` để đồng bộ filename + SSOT title + header + link update.
-
-3. **Chỉ Việt hóa nội dung hiển thị cho người dùng.** Tên file, thuộc tính HTML, CSS selector, JS identifier/logic giữ nguyên tiếng Anh; nhưng mọi chuỗi UI tiếng Việt trong HTML/JS phải có dấu đầy đủ.
-
-4. **Chỉ giữ tên phòng ban, thuật ngữ, viết tắt khi thật sự cần.** Ưu tiên tiếng Việt cho nội dung, chỉ giữ tiếng Anh cho viết tắt và thuật ngữ không có tương đương chính xác.
-
-### Chất lượng ngôn ngữ
-
-5. **Tiếng Việt BẮT BUỘC có dấu đầy đủ, chính xác.** Không viết không dấu, thiếu dấu, hoặc sai dấu. Áp dụng mọi nơi hiển thị tiếng Việt: tiêu đề, nội dung, bảng, ghi chú, tooltip, alt text, placeholder, thông báo hệ thống, chuỗi dashboard và chuỗi UI render từ JavaScript.
-
-6. **Ngôn ngữ phải ngắn, rõ, dùng để thi hành.** Không viết dài dòng, hàn lâm, hoặc mơ hồ.
-
-7. **Không meta text, không "AI generated", không giải thích nguồn gốc tài liệu.** Tài liệu phải đọc như do chuyên gia QMS viết, không phải do máy sinh.
-
-8. **Mỗi câu phải phục vụ vận hành thật.** Không viết câu "cho có", không thêm nội dung chỉ để lấp chỗ trống.
-
-### Tính toàn vẹn nội dung
-
-9. **Không cắt xén logic vận hành.** Khi biên tập, giữ nguyên toàn bộ logic nghiệp vụ — chỉ cải thiện ngôn ngữ.
-
-10. **Form phải bám SOP/WI/ANNEX active, không tự bịa logic riêng.** Biểu mẫu là lớp ghi nhận dữ liệu cho quy trình đã định nghĩa.
-
-11. **Phần thiếu mới được bổ sung từ thực hành quốc tế, nhưng phải hòa vào ngôn ngữ HESEM.** Không copy nguyên văn từ tiêu chuẩn hoặc tài liệu bên ngoài.
-
-12. **Không để mất nội dung quan trọng do đơn giản hóa quá mức.** Đơn giản hóa ngôn ngữ, không đơn giản hóa nội dung.
-
-### Phân loại tài liệu
-
-13. **SOP là lớp điều hành; WI là hướng dẫn tại điểm dùng; ANNEX là rule-pack; FORM là nơi ghi dữ liệu/evidence/quyết định.**
-    - SOP: quy trình cấp quản lý, logic ra quyết định, trách nhiệm
-    - WI: hướng dẫn từng bước tại hiện trường, ai làm gì khi nào
-    - ANNEX: tiêu chí, bảng tra, quy tắc tham chiếu
-    - FORM: biểu mẫu ghi nhận dữ liệu, bằng chứng, quyết định
-
-14. **Không để form chồng lấn trách nhiệm hoặc duplicate dữ liệu vô ích.** Mỗi trường dữ liệu chỉ ghi một lần tại nguồn phù hợp nhất.
-
-15. **ANNEX thay REF cho tài liệu nội bộ hiệu lực.** Không dùng mã REF cho tài liệu tham chiếu nội bộ — dùng ANNEX.
-
-### Đồng bộ hệ thống
-
-16. **Đồ họa và logic phải đồng bộ toàn hệ thống.** Màu sắc, font, layout, mã tài liệu phải nhất quán từ SOP đến FORM.
-
-17. **Form phải thể hiện gate, hold point, release logic, KPI, owner, approver khi cần.** Form không chỉ là bảng trống — phải phản ánh quy trình kiểm soát.
-
-### Thực tiễn vận hành
-
-18. **Phải đúng mô hình nhà máy CNC job order, dùng được ngoài hiện trường.** Tài liệu phải phù hợp với quy mô và đặc thù HESEM, không phải nhà máy lý tưởng.
-
-19. **Ưu tiên chất lượng hơn số lượng.** Một tài liệu tốt hơn mười tài liệu hời hợt.
-
-20. **Tên file vẫn là English slug.** Mọi tên file dùng kebab-case tiếng Anh, không dấu, không khoảng trắng.
-
-21. **Không tạo mơ hồ khiến nhân viên không biết điền gì, ký gì, quyết gì.** Mỗi trường, mỗi ô ký phải rõ ràng: ai, gì, khi nào, tiêu chí gì.
-
-22. **"Bơm sâu" là tăng chiều sâu chuyên môn và tính thực chiến, không phải thêm chữ cho dày.** Giá trị nằm ở độ sâu nội dung, không phải độ dài.
-
-23. **Phải phù hợp mục tiêu ISO 9001:2026 và sẵn sàng cho AS9100D ở mức thực tế HESEM.** Không đặt thanh quá cao đến mức không triển khai nổi, cũng không hạ quá thấp.
-
-24. **Khi thiết kế form phải nhìn vào product safety, traceability, external providers, evidence discipline, human factors, operational risk nếu form đó liên quan.** Form là lớp cuối cùng bắt rủi ro — phải thiết kế có chủ đích.
+Document codes (SOP-101, WI-201, FRM-301, ANNEX-111) **ALWAYS** remain in English.
 
 ---
 
-## D. Thương hiệu và đồ họa
+## C. 23 Locked Rules
+
+The following rules are permanently locked in and apply to all QMS documents:
+
+### Structure & organization
+
+1. **Keep the current library structure as the target framework.** Do not arbitrarily change the established folder structure.
+
+2. **Do not arbitrarily rename files/slugs/document codes.** Do not rename manually or rename locally outside of control. If you need to change the standard name, it can only be done through the governments rename flow locked at `23-portal-standard-title-filename-ssot.md` to synchronize filename + SSOT title + header + link update.
+
+3. **Only Vietnameseize the content displayed to users.** File names, HTML attributes, CSS selectors, JS identifier/logic remain in English; but every Vietnamese UI string in HTML/JS must have full marks.
+
+4. **Only keep department names, terms, and abbreviations when absolutely necessary.** Prioritize Vietnamese for content, only keep English for abbreviations and terms that do not have exact equivalents.
+
+### Language quality
+
+5. **Vietnamese language MUST have complete and accurate diacritics.** Do not write without diacritics, missing diacritics, or with incorrect diacritics. Applies everywhere Vietnamese is displayed: title, content, table, notes, tooltip, alt text, placeholder, system notification, dashboard string and UI string rendered from JavaScript.
+
+6. **Language must be short, clear, and practical.** Do not write in lengthy, academic, or vague terms.
+
+7. **No meta text, no "AI generated", no explanation of document origin.** Documents must read as if written by a QMS expert, not machine-generated.
+
+8. **Each sentence must serve a real operation.** Do not write sentences "for the sake of it", do not add content just to fill in the blank space.
+
+### Content integrity
+
+9. **Do not trim operational logic.** When editing, keep all business logic intact — just improve the language.
+
+10. **Form must adhere to SOP/WI/ANNEX active, not make up your own logic.** Form is the class that records data for the defined process.
+
+11. **New missing parts are added from international practice, but must blend into the HESEM language.** Do not copy verbatim from standards or external documents.
+
+12. **Don't lose important content through oversimplification.** Simplify the language, not the content.
+
+### Classify documents
+
+13. **SOP is the executive layer; WI is point-of-use instructions; ANNEX is rule-pack; FORM is where data/evidence/decisions are recorded.**
+    - SOP: management level process, decision-making logic, responsibilities
+    - WI: step-by-step instructions at the scene, who does what when
+    - ANNEX: criteria, lookup tables, reference rules
+    - FORM: form for recording data, evidence, and decisions
+
+14. **Do not let forms overlap responsibilities or duplicate useless data.** Each data field is only recorded once at the most appropriate source.
+
+15. **ANNEX replaces REF for valid internal documents.** Do not use REF codes for internal reference documents — use ANNEX.
+
+### System synchronization
+
+16. **Graphics and logic must be consistent throughout the system.** Colors, fonts, layout, and document codes must be consistent from SOP to FORM.
+
+17. **Form must show gate, hold point, release logic, KPI, owner, approver as needed.** Form is not just a blank slate — it must reflect the control process.
+
+### Operating practices
+
+18. **Must be the correct CNC job order factory model, usable in the field.** Documents must be appropriate to the scale and characteristics of HESEM, not an ideal factory.
+
+19. **Prioritize quality over quantity.** One good document is better than ten superficial documents.
+
+20. **File names are still English slug.** All file names use English kebab-case, no accents, no spaces.
+
+21. **Do not create ambiguity so that employees do not know what to fill in, what to sign, what decisions to make.** Each field, each signature box must be clear: who, what, when, what criteria.
+
+22. **"Increasing depth" means increasing the depth of expertise and practicality, not adding words to make it thicker.** The value lies in the depth of the content, not the length.
+
+23. **Must be in line with ISO 9001:2026 targets and ready for AS9100D at a realistic HESEM level.** Do not set the bar so high that it cannot be implemented, nor set it too low.
+
+24. **When designing a form, you must look at product safety, traceability, external providers, evidence discipline, human factors, operational risk if the form is related.** Form is the last layer to capture risk — it must be designed intentionally.
+
+---
+
+## D. Branding and graphics
 
 ### D1. Brand Colors
 
-| Tên | Mã hex | Biến CSS | Dùng cho |
+| Name | Hex code | CSS Variables | Used for |
 |-----|--------|----------|----------|
-| Navy | `#0C2D48` | `--navy` | Tiêu đề, heading, header |
-| Blue | `#1565C0` | `--blue` | Link, accent chính |
-| Light Blue | `#E3F2FD` | `--blue-l` | Nền note, highlight nhẹ |
+| Navy | `#0C2D48` | `--navy` | Title, heading, header |
+| Blue | `#1565C0` | `--blue` | Link, main accent |
+| Light Blue | `#E3F2FD` | `--blue-l` | Note background, light highlight |
 | Gold | `#F9A825` | `--gold` | Border accent, callout |
-| Light Gold | `#FFF8E1` | `--gold-l` | Nền callout |
-| Ink | `#212529` | `--ink` | Text chính |
-| Red | `#E03131` | `--red` | Cảnh báo, lỗi |
-| Green | `#2F9E44` | `--green` | Thành công, approved |
+| Light Gold | `#FFF8E1` | `--gold-l` | Callout background |
+| Ink | `#212529` | `--ink` | Main text |
+| Red | `#E03131` | `--red` | Warning, error |
+| Green | `#2F9E44` | `--green` | Successful, approved |
 
-**Quy tắc:** Không dùng màu tùy ý ngoài bảng trên. Mọi tài liệu phải dùng đúng palette này.
+**Rules:** Do not use arbitrary colors other than the table above. All documents must use this exact palette.
 
 ### D2. Print Layout
 
-| Thuộc tính | Giá trị |
+| Attributes | Value |
 |------------|---------|
-| Khổ giấy | A4 (mặc định), A3 (bảng lớn) |
-| Font | Segoe UI hoặc tương đương |
-| Font size gốc | 14px |
+| Paper size | A4 (default), A3 (large table) |
+| Fonts | Segoe UI or equivalent |
+| Original font size | 14px |
 | Line height | 1.6 |
-| Tràn bảng | **KHÔNG** — mọi bảng phải vừa khổ giấy |
-| Màu loè loẹt | **KHÔNG** — chỉ dùng palette đã định nghĩa |
-| Page break | `page-break-inside: avoid` cho mọi block |
+| Table overflow | **NO** — all tables must fit paper size |
+| Flashy colors | **NO** — only use defined palettes |
+| Page break | `page-break-inside: avoid` for every block |
 
-### D3. Header tài liệu
+### D3. Document headers
 
-Mọi tài liệu HTML **PHẢI** có header chuẩn gồm:
-- **Brand row:** Logo HESEM + tên công ty
-- **Title block:** SSOT title (`.doc-name`) và subtitle tiếng Việt khi cần; mã tài liệu nằm ở meta row và có thể xuất hiện trong `<title>` / first `<h1>` theo chuẩn `23-portal-standard-title-filename-ssot.md`
-- **Meta box:** Mã, Phiên bản, Ngày hiệu lực, Chủ sở hữu, Phê duyệt
+Every HTML document **MUST** have a standard header that includes:
+- **Brand row:** HESEM logo + company name
+- **Title block:** SSOT title (`.doc-name`) and Vietnamese subtitles when needed; The document code is located in the meta row and can appear in `<title>` / first `<h1>` according to the `23-portal-standard-title-filename-ssot.md` standard
+- **Meta box:** Code, Version, Effective Date, Owner, Approval
 
-Footer phải có số trang và nhận diện tài liệu.
+Footer must have page number and document identification.
 
 ---
 
 ## E. Single Source of Truth (SSOT)
 
-### E1. Phân tầng hệ thống
+### E1. System stratification
 
-| Hệ thống | Vai trò | Loại dữ liệu |
+| System | Role | Data type |
 |-----------|---------|---------------|
-| **Epicor** | System of Record (SoR) | Giao dịch ERP: đơn hàng, sản xuất, kho, tài chính |
-| **M365 (SharePoint)** | Single Source of Truth (SSOT) | Tài liệu QMS, hồ sơ kiểm soát, chính sách |
-| **Excel (Forms)** | Gate / Evidence / Decision layer | Biểu mẫu ghi nhận, checklist, log quyết định |
+| **Epicor** | System of Record (SoR) | ERP transactions: orders, production, warehouse, finance |
+| **M365 (SharePoint)** | Single Source of Truth (SSOT) | QMS documents, control records, policies |
+| **Excel (Forms)** | Gate / Evidence / Decision layer | Recording form, checklist, decision log |
 
-### E2. Quy tắc không trùng lặp
+### E2. Rules are not duplicated
 
-- **Không duplicate dữ liệu giữa các hệ thống.** Mỗi data point chỉ có một nguồn chính thức.
-- Epicor là nguồn cho dữ liệu giao dịch — không copy vào SharePoint.
-- SharePoint là nguồn cho tài liệu — không lưu bản copy trên ổ cá nhân.
-- Form Excel chỉ ghi dữ liệu mà SOP/WI yêu cầu — không thêm trường ngoài phạm vi.
+- **Do not duplicate data between systems.** Each data point has only one official source.
+- Epicor is the source for transactional data — do not copy to SharePoint.
+- SharePoint is the source for documents — do not save copies on personal drives.
+- Excel form only records data required by SOP/WI — do not add fields outside the scope.
 
-### E3. Liên kết hệ thống
+### E3. System link
 
-- Tài liệu HTML trên web tham chiếu đến form bằng link download
-- Form Excel tham chiếu ngược về SOP/WI/ANNEX bằng mã tài liệu
-- Portal (`portal.html`) là điểm truy cập trung tâm cho toàn bộ hệ thống
+- HTML documents on the web refer to the form by download link
+- Excel form references back to SOP/WI/ANNEX by document code
+- Portal (`portal.html`) is the central access point for the entire system
 
 ---
 
-## F. Kiểm tra tuân thủ
+## F. Compliance testing
 
-Trước khi hoàn thành bất kỳ tài liệu nào, kiểm tra:
+Before completing any documentation, check:
 
-- [ ] Tên file là English slug, kebab-case, không dấu
-- [ ] Thuộc tính HTML (href, class, id, src) không bị dịch
-- [ ] CSS/JS nguyên bản, không dịch
-- [ ] Viết tắt giữ nguyên tiếng Anh
-- [ ] Mã tài liệu giữ nguyên (SOP-101, WI-201, FRM-301, ANNEX-111)
-- [ ] Brand colors đúng palette
-- [ ] In được A4/A3, không tràn bảng
+- [ ] File name is English slug, kebab-case, no accents
+- [ ] HTML attributes (href, class, id, src) are not translated
+- [ ] Original CSS/JS, not translated
+- [ ] Abbreviations remain in English
+- [ ] Document code remains the same (SOP-101, WI-201, FRM-301, ANNEX-111)
+- [ ] Brand colors in the correct palette
+- [ ] Can print A4/A3, no overflow
 - [ ] Font Segoe UI
-- [ ] Header đúng cấu trúc chuẩn
-- [ ] Không meta text, không "AI generated"
-- [ ] Mỗi câu phục vụ vận hành thật
-- [ ] Form bám SOP/WI/ANNEX, không tự bịa logic
-- [ ] Không duplicate dữ liệu giữa các hệ thống
+- [ ] Header has the correct structure
+- [ ] No meta text, no "AI generated"
+- [ ] Each sentence serves a real function
+- [ ] Form follows SOP/WI/ANNEX, does not make up logic
+- [ ] Do not duplicate data between systems
 
 ---
 
-## G. Quy tắc đặt tên hồ sơ vận hành — IMMUTABLE
+## G. Operational profile naming rules — IMMUTABLE
 
-### G1. Hồ sơ vận hành (form đã điền, evidence) PHẢI tuân theo 6 naming patterns
+### G1. Operational records (filled forms, evidence) MUST follow 6 naming patterns
 
-Chi tiết đầy đủ: xem `15-evidence-and-records-naming.md`. Tóm tắt:
+Full details: see `15-evidence-and-records-naming.md`. Summary:
 
-| # | Quy tắc | Vi phạm = |
+| # | Rules | Violation = |
 |---|---------|----------|
-| 1 | Filled form PHẢI có `V{ver}` trong tên (version form blank đã dùng) | REJECT upload |
-| 2 | Mọi file PHẢI có `{YYYYMMDD}` trong tên | REJECT upload |
-| 3 | Mọi file PHẢI có `{HHMM}-{UserID}` để tránh trùng tên khi nhiều người upload cùng lúc | REJECT upload |
-| 4 | Engineering baseline PHẢI có `V{ver}` và chỉ 1 người release (approval gate FRM-306) | REJECT release |
-| 5 | Formal records (NCR, CAPA, FAI, Audit...) PHẢI có Record-ID từ server atomic counter | REJECT submit |
-| 6 | KHÔNG file nào được lưu lên SharePoint với tên có dấu cách hoặc ký tự đặc biệt | REJECT upload |
+| 1 | Filled form MUST have `V{ver}` in the name (blank form version used) | REJECT upload |
+| 2 | Every file MUST have `{YYYYMMDD}` in the name | REJECT upload |
+| 3 | Every file MUST have `{HHMM}-{UserID}` to avoid duplicate names when multiple people upload at the same time | REJECT upload |
+| 4 | Engineering baseline MUST have `V{ver}` and only 1 release person (approval gate FRM-306) | REJECT release |
+| 5 | Formal records (NCR, CAPA, FAI, Audit...) MUST have a Record-ID from the server atomic counter | REJECT submit |
+| 6 | NO files will be saved to SharePoint with names containing spaces or special characters | REJECT upload |
 
-### G2. UserID PHẢI đăng ký duy nhất
+### G2. UserID MUST be registered uniquely
 
-Mỗi nhân viên được gán 1 UserID 3-4 ký tự (VD: NVA, TBH, LMC), đăng ký trong SharePoint List `Employee-Registry`. UserID KHÔNG thay đổi khi đổi phòng/chức vụ, KHÔNG tái sử dụng sau khi nghỉ việc.
+Each employee is assigned a 3-4 character UserID (eg: NVA, TBH, LMC), registered in SharePoint List `Employee-Registry`. UserID DOES NOT change when changing department/position, NOT reused after leaving job.
 
 ---
 
-> **Cập nhật lần cuối:** 2026-04-01
-> **Áp dụng:** Toàn bộ tài liệu QMS — HESEM ENGINEERING
+> **Last updated:** 2026-04-01
+> **Applies:** Complete QMS documentation — HESEM ENGINEERING
 
-## H. Khóa frontend tiếng Việt có dấu
+## H. Vietnamese frontend key with accents
 
 <!-- FRONTEND-VI-DIACRITICS-IMMUTABLE -->
 
-- Áp dụng cho portal/dashboard/form runtime và mọi chuỗi render từ JavaScript.
-- Cấm tuyệt đối chuỗi tiếng Việt không dấu trên giao diện, kể cả dữ liệu demo hoặc fallback.
-- Nếu buộc phải dùng tiếng Anh cho thuật ngữ kỹ thuật thì phải theo đúng danh sách ngoại lệ đã khóa ở core standards.
+- Applies to portal/dashboard/form runtime and all render strings from JavaScript.
+- Absolutely prohibit unsigned Vietnamese strings on the interface, including demo or fallback data.
+- If you must use English for technical terminology, you must follow the locked exception list in core standards.

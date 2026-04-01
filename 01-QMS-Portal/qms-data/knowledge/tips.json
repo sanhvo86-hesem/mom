@@ -1,0 +1,50 @@
+[
+    {
+        "id": "KB-ef0754cd92110a23",
+        "title": "Test tip",
+        "body": "Offset Z +0.002 on DMG-05",
+        "category": "machining",
+        "machine": "DMG-05",
+        "material": "",
+        "part": "",
+        "tags": "",
+        "helpful_count": 0,
+        "not_helpful_count": 0,
+        "comment_count": 0,
+        "created_by": "sanh.vo",
+        "created_at": "2026-04-01T09:45:24+00:00",
+        "updated_at": "2026-04-01T09:45:24+00:00"
+    },
+    {
+        "id": "KB-2e991b248b32daf4",
+        "title": "Inconel tip",
+        "body": "Add Z+0.002 offset on DMG-05 for Inconel",
+        "category": "machining",
+        "machine": "DMG-05",
+        "material": "",
+        "part": "",
+        "tags": "",
+        "helpful_count": 0,
+        "not_helpful_count": 0,
+        "comment_count": 0,
+        "created_by": "sanh.vo",
+        "created_at": "2026-04-01T09:49:46+00:00",
+        "updated_at": "2026-04-01T09:49:46+00:00"
+    },
+    {
+        "id": "KB-f41bb2341e777160",
+        "title": "Ti-6Al-4V cutting speed tip",
+        "body": "Use 45m/min cutting speed with TiAlN coated carbide for Ti-6Al-4V. Coolant through spindle mandatory.",
+        "category": "machining",
+        "machine": "DMG-MORI-05",
+        "material": "Ti-6Al-4V",
+        "part": "",
+        "tags": "",
+        "helpful_count": 0,
+        "not_helpful_count": 0,
+        "comment_count": 0,
+        "created_by": "sanh.vo",
+        "created_at": "2026-04-01T09:53:28+00:00",
+        "updated_at": "2026-04-01T09:53:28+00:00"
+    }
+]

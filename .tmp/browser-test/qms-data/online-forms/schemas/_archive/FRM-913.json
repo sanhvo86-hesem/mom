@@ -1,0 +1,99 @@
+{
+  "form_code": "FRM-913",
+  "title": "Audit Record",
+  "title_vi": "Hồ sơ đánh giá (Audit)",
+  "version": "V1",
+  "category": "quality",
+  "frequency": "per_event",
+  "sop_ref": "SOP-901",
+  "description": "Ghi nhận kết quả đánh giá nội bộ/bên ngoài bao gồm phát hiện, điểm mạnh, cơ hội cải tiến và hành động khắc phục.",
+  "roles_allowed": ["admin", "qa_manager", "quality_engineer", "internal_auditor", "production_director", "ceo"],
+  "fields": [
+    {"id": "audit_date", "type": "date", "label": "Ngày đánh giá", "label_en": "Audit Date", "required": true, "default": "today"},
+    {
+      "id": "audit_type",
+      "type": "select",
+      "label": "Loại đánh giá",
+      "label_en": "Audit Type",
+      "required": true,
+      "options": [
+        {"value": "internal", "label": "Nội bộ (Internal)"},
+        {"value": "external", "label": "Bên ngoài (External)"},
+        {"value": "supplier", "label": "Nhà cung cấp (Supplier)"},
+        {"value": "lpa", "label": "LPA (Layered Process Audit)"},
+        {"value": "process", "label": "Quy trình (Process)"}
+      ]
+    },
+    {"id": "audit_scope", "type": "textarea", "label": "Phạm vi đánh giá", "label_en": "Audit Scope", "rows": 3, "required": true, "placeholder": "Phạm vi, mục tiêu, tiêu chí đánh giá..."},
+    {
+      "id": "audit_standard",
+      "type": "select",
+      "label": "Tiêu chuẩn áp dụng",
+      "label_en": "Audit Standard",
+      "required": true,
+      "options": [
+        {"value": "iso9001", "label": "ISO 9001:2015"},
+        {"value": "as9100", "label": "AS9100D"},
+        {"value": "iatf16949", "label": "IATF 16949"},
+        {"value": "internal", "label": "Tiêu chuẩn nội bộ (Internal Standard)"},
+        {"value": "customer", "label": "Yêu cầu khách hàng (Customer Requirement)"}
+      ]
+    },
+    {"id": "auditor_name", "type": "text", "label": "Đánh giá viên", "label_en": "Auditor Name", "required": true},
+    {"id": "auditor_qualification", "type": "text", "label": "Trình độ đánh giá viên", "label_en": "Auditor Qualification", "placeholder": "VD: Lead Auditor ISO 9001"},
+    {
+      "id": "department_audited",
+      "type": "select",
+      "label": "Phòng ban được đánh giá",
+      "label_en": "Department Audited",
+      "required": true,
+      "options": [
+        {"value": "PROD", "label": "Sản xuất"},
+        {"value": "ENG", "label": "Kỹ thuật"},
+        {"value": "QA", "label": "Chất lượng"},
+        {"value": "SCM", "label": "Chuỗi cung ứng"},
+        {"value": "SALES", "label": "Kinh doanh"},
+        {"value": "FIN", "label": "Tài chính"},
+        {"value": "HR", "label": "Nhân sự"},
+        {"value": "IT", "label": "IT"},
+        {"value": "EHS", "label": "An toàn"},
+        {"value": "ALL", "label": "Toàn nhà máy"}
+      ]
+    },
+    {"id": "process_audited", "type": "text", "label": "Quy trình được đánh giá", "label_en": "Process Audited", "required": true, "placeholder": "VD: SOP-606, SOP-302"},
+    {
+      "id": "clause_references",
+      "type": "table",
+      "label": "Chi tiết phát hiện theo điều khoản",
+      "label_en": "Clause References & Findings",
+      "min_rows": 1,
+      "max_rows": 50,
+      "columns": [
+        {"id": "clause", "type": "text", "label": "Điều khoản", "width": "10%", "required": true, "placeholder": "VD: 8.5.1"},
+        {"id": "requirement", "type": "text", "label": "Yêu cầu", "width": "20%", "required": true},
+        {"id": "evidence", "type": "text", "label": "Bằng chứng", "width": "20%"},
+        {"id": "finding_type", "type": "select", "label": "Loại phát hiện", "width": "15%", "options": [
+          {"value": "conformity", "label": "Phù hợp", "color": "#2f9e44"},
+          {"value": "observation", "label": "Nhận xét", "color": "#1971c2"},
+          {"value": "minor_nc", "label": "NC nhẹ", "color": "#e67700"},
+          {"value": "major_nc", "label": "NC nặng", "color": "#e03131"}
+        ]},
+        {"id": "finding_description", "type": "text", "label": "Mô tả phát hiện", "width": "35%"}
+      ]
+    },
+    {"id": "total_findings", "type": "number", "label": "Tổng số phát hiện", "label_en": "Total Findings", "min": 0},
+    {"id": "total_nc", "type": "number", "label": "Tổng số NC", "label_en": "Total NC", "min": 0},
+    {"id": "audit_score", "type": "number", "label": "Điểm đánh giá (%)", "label_en": "Audit Score (%)", "min": 0, "max": 100, "step": 0.1},
+    {"id": "strengths", "type": "textarea", "label": "Điểm mạnh", "label_en": "Strengths", "rows": 3},
+    {"id": "opportunities_for_improvement", "type": "textarea", "label": "Cơ hội cải tiến", "label_en": "Opportunities for Improvement", "rows": 3},
+    {"id": "corrective_actions_required", "type": "textarea", "label": "Hành động khắc phục yêu cầu", "label_en": "Corrective Actions Required", "rows": 3},
+    {"id": "follow_up_date", "type": "date", "label": "Ngày theo dõi", "label_en": "Follow-up Date"},
+    {"id": "auditee_acknowledgment", "type": "checkbox", "label": "Bên được đánh giá xác nhận kết quả", "label_en": "Auditee Acknowledgment", "default": false},
+    {"id": "audit_report_number", "type": "text", "label": "Mã báo cáo đánh giá", "label_en": "Audit Report Number", "placeholder": "VD: AUD-2026-IA03"}
+  ],
+  "auto_fields": ["submitted_by", "submitted_at", "entry_id"],
+  "notifications": {
+    "on_major_nc": ["qa_manager", "production_director"],
+    "on_submit": ["qa_manager"]
+  }
+}

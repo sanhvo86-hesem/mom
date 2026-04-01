@@ -1,30 +1,30 @@
-# 05 — HTML Templates (Mẫu HTML cho từng loại tài liệu)
+# 05 — HTML Templates (HTML templates for each type of document)
 
-> Phiên bản: v7 | Cập nhật: 2026-03-24
-> Dùng các template dưới đây làm khung xuất phát khi tạo tài liệu mới.
+> Version: v7 | Updated: 2026-03-24
+> Use the templates below as starting frames when creating new documents.
 
-**Quy ước placeholder:**
-- `{{CODE}}` — Mã tài liệu (VD: SOP-101, WI-511, ANNEX-301)
-- `{{TITLE}}` — Tiêu đề tài liệu
-- `{{SUBTITLE}}` — Phụ đề tiếng Việt
-- `{{OWNER_ROLE_HTML}}` — Role code JD-linked của chủ sở hữu tài liệu
-- `{{APPROVER_ROLE_HTML}}` — Role code JD-linked của người phê duyệt
-- `{{OWNER_ENTITY_HTML}}` — Department code hoặc role code của chủ sở hữu, tùy loại tài liệu
-- `{{RELATIVE_PATH}}` — Đường dẫn tương đối tới thư mục gốc (VD: `../../..`)
+**Placeholder convention:**
+- `{{CODE}}` — Document code (eg: SOP-101, WI-511, ANNEX-301)
+- `{{TITLE}}` — Document title
+- `{{SUBTITLE}}` — Vietnamese subtitles
+- `{{OWNER_ROLE_HTML}}` — JD-linked role code of the document owner
+- `{{APPROVER_ROLE_HTML}}` — Role code JD-linked of the approver
+- `{{OWNER_ENTITY_HTML}}` — Department code or role code of the owner, depending on the type of document
+- `{{RELATIVE_PATH}}` — Relative path to the root directory (eg `../../..`)
 
 ---
 
-## Template 1: SOP (Quy trình vận hành chuẩn)
+## Template 1: SOP (Standard Operating Procedures)
 
-SOP có 10 mục chuẩn. Luôn có iso-map, preface-block, toc ở đầu.
+SOP has 10 standard items. Always have iso-map, preface-block, toc at the beginning.
 
-Lưu ý khóa:
-- Trước phát hành lần đầu, toàn bộ SOP giữ `Version = V0`.
-- Không đưa note biên tập, note so sánh bản cũ, note quy tắc thuật ngữ hoặc benchmark rationale vào thân SOP.
-- Khi tạo Section 6 / 7 mới, đọc thêm `12-sop-section-6-7-guide.md`, `13-sop-research-redraft-method.md`, `16-sop-graphics-kpi-and-redraft-quality.md`.
-- Template chỉ khóa khung HTML và format. Không dùng template này để đẩy cùng một bộ nội dung vào hàng loạt SOP.
-- Nội dung Section 1 / 2 / 3 / 4 / 5 / 8 phải nghiên cứu và nâng cấp theo từng SOP riêng.
-- Nếu tài liệu là handbook phòng ban hoặc tài liệu mô tả mandate cấp chức năng, đọc thêm `20-department-boundary-handbook-codes.md` và `reference/job-order-cnc-department-boundary-model.md`.
+Note the key:
+- Before initial release, all SOPs held `Version = V0`.
+- Do not include editorial notes, notes comparing old versions, notes on terminology rules or benchmark rationale in the body of the SOP.
+- When creating a new Section 6 / 7, read `12-sop-section-6-7-guide.md`, `13-sop-research-redraft-method.md`, `16-sop-graphics-kpi-and-redraft-quality.md`.
+- Template only locks HTML frame and format. Do not use this template to push the same set of content into a series of SOPs.
+- The content of Section 1 / 2 / 3 / 4 / 5 / 8 must be researched and upgraded according to each individual SOP.
+- If the document is a department handbook or a document describing a functional level mandate, read also `20-department-boundary-handbook-codes.md` and `reference/job-order-cnc-department-boundary-model.md`.
 
 ```html
 <!DOCTYPE html>
@@ -308,55 +308,55 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 
 ## Template 3: JD (Job Description)
 
-JD dùng template riêng tại `core-standards/templates/jd-template.html`.
+JD uses its own template at `core-standards/templates/jd-template.html`.
 
-Lưu ý khóa:
-- JD cũng phải là HTML đầy đủ: có `<!DOCTYPE html>`, `<html>`, `<head>`, `<body>`.
-- Meta header của JD dùng nhãn tiếng Việt giống SOP/WI: `Mã`, `Phiên bản`, `Ngày hiệu lực`, `Chủ sở hữu`, `Phê duyệt`.
-- Title block của JD dùng chuẩn `JD-<ROLECODE> — <Job title English>`.
+Note the key:
+- JD must also be full HTML: have `<!DOCTYPE html>`, `<html>`, `<head>`, `<body>`.
+- JD's meta header uses Vietnamese labels similar to SOP/WI: `Mã`, `Phiên bản`, `Ngày hiệu lực`, `Chủ sở hữu`, `Phê duyệt`.
+- JD's title block uses the `JD-<ROLECODE> — <Job title English>` standard.
 
 ---
 
 ## Template 5: Department Handbook
 
-Department handbook phải dùng `department code` ở header owner và giữ ranh giới rõ giữa:
-- mandate cấp phòng ban;
-- `subfunction` ổn định;
-- `role code` có link JD;
-- `coverage gap` đang được khóa tạm.
+The department handbook must use `department code` in the owner header and keep a clear boundary between:
+- department level mandate;
+- `subfunction` is stable;
+- `role code` has JD link;
+- `coverage gap` is temporarily locked.
 
-Tài liệu này không được tạo bằng cách copy nội dung giữa các phòng ban. Người viết phải:
-- đọc handbook hiện hành, JD liên quan và benchmark job-order CNC;
-- quyết định riêng cho từng handbook đâu là department mandate, đâu là role decision, đâu là gap;
-- chỉ sau đó mới dựng HTML.
+This document was not created by copying content between departments. Writers must:
+- read current handbooks, related JDs and CNC job-order benchmarks;
+- Decide separately for each handbook what is the department mandate, what is the role decision, and what is the gap;
+- only then build the HTML.
 
-Khung section tối thiểu:
-- Mục tiêu phòng ban
-- Phạm vi
-- Trách nhiệm bắt buộc
-- Quyền hạn cấp chức năng
-- Đầu ra / hồ sơ
-- KPI
-- Interface liên phòng ban
-- Tài liệu liên quan
-- Mô hình vận hành & ranh giới vai trò
-- Nhịp điều hành, dữ liệu & bằng chứng
-- Năng lực / deputy
-- Rủi ro & escalation
-- Coverage gap callout nếu có
+Minimum section frame:
+- Departmental goals
+- Scope
+- Mandatory responsibility
+- Functional level powers
+- Output/profile
+- KPIs
+- Inter-departmental interface
+- Related documents
+- Operating model & role boundaries
+- Operating cadence, data & evidence
+- Capacity / Deputy
+- Risk & escalation
+- Coverage gap callout if any
 
-Template HTML dùng tại `core-standards/templates/department-handbook-template.html`.
-- `Chủ sở hữu` và `Phê duyệt` ở header phải là `role chip` link JD, không dùng text trần.
-- Bảng thông tin vị trí phải có đúng 1 hàng `Mã vai trò dùng trong SOP/RACI`.
-- Nếu role có governance hat được phép gắn, thêm đúng 1 hàng `Mũ quản trị có thể gắn`.
-- Hàng `Chức danh theo tài liệu` giữ plain English title, không gắn chip.
-- Không được tạo JD bằng fragment HTML hở đầu/hở cuối rồi ghép tay vào portal.
+HTML template used at `core-standards/templates/department-handbook-template.html`.
+- `Chủ sở hữu` and `Phê duyệt` in the header must be `role chip` JD links, do not use bare text.
+- The location information table must have exactly one row `Mã vai trò dùng trong SOP/RACI`.
+- If the role has a governance hat that is allowed to be attached, add exactly one row `Mũ quản trị có thể gắn`.
+- Item `Chức danh theo tài liệu` keeps plain English title, no chip attached.
+- Do not create a JD with an open-end/open-end HTML fragment and then manually merge it into the portal.
 
 ---
 
-## Template 2: WI (Hướng dẫn công việc)
+## Template 2: WI (Work Instructions)
 
-WI có 7 mục. Không có iso-map và preface-block. Thường có `.note` ở đầu thay vì iso-map.
+WI has 7 items. There is no iso-map and preface-block. Usually has `.note` at the beginning instead of iso-map.
 
 ```html
 <!DOCTYPE html>
@@ -486,9 +486,9 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 
 ---
 
-## Template 3: ANNEX (Tài liệu tham chiếu / Rule Pack)
+## Template 3: ANNEX (Reference Document / Rule Pack)
 
-ANNEX linh hoạt về cấu trúc. Luôn có iso-map (dùng nguyên tắc bắt buộc), toc, và các section đánh số.
+ANNEX is flexible in structure. Always have an iso-map (using the mandatory rule), toc, and numbered sections.
 
 ```html
 <!DOCTYPE html>
@@ -592,9 +592,9 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 
 ---
 
-## Template 4: JD (Mô tả công việc)
+## Template 4: JD (Job Description)
 
-JD có 12 mục chuẩn. Dùng các component đặc thù: `.jd-purpose`, `.jd-mission`, `.auth-grid`, `.comp-grid`, `.backup-card`.
+JD has 12 standard items. Use specific components: `.jd-purpose`, `.jd-mission`, `.auth-grid`, `.comp-grid`, `.backup-card`.
 
 ```html
 <!DOCTYPE html>
@@ -802,9 +802,9 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 
 ---
 
-## Template 5: Training Module (Tài liệu đào tạo)
+## Template 5: Training Module (Training materials)
 
-Training module dùng `.badge` cho cấp độ, `.toc` cho mục lục, `.vflow` cho các bước.
+Training module uses `.badge` for levels, `.toc` for table of contents, `.vflow` for steps.
 
 ```html
 <!DOCTYPE html>
@@ -897,18 +897,18 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <p>Nội dung bài học ...</p>
 <!-- Dùng .note cho lưu ý, .callout cho quan trọng, .vflow cho bước thực hành -->
 
-<h2 class="h2" id="m2">Bài 2: Tên bài</h2>
-<p>Nội dung bài học ...</p>
+<h2 class="h2" id="m2">Lesson 2: Lesson title</h2>
+<p>Lesson content ...</p>
 
-<!-- KIỂM TRA -->
-<h2 class="h2" id="quiz">Kiểm tra kiến thức</h2>
+<!-- KNOWLEDGE CHECK -->
+<h2 class="h2" id="quiz">Knowledge check</h2>
 <div class="quiz-card">
-<h3>Câu 1</h3>
-<p>Nội dung câu hỏi?</p>
+<h3>Question 1</h3>
+<p>Question content?</p>
 <ul class="tight">
-<li>A. Phương án A</li>
-<li>B. Phương án B</li>
-<li>C. Phương án C</li>
+<li>A. Option A</li>
+<li>B. Option B</li>
+<li>C. Option C</li>
 </ul>
 </div>
 
@@ -931,9 +931,9 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 
 ---
 
-## Template 6: Department Handbook (Sổ tay phòng ban)
+## Template 6: Department Handbook
 
-Handbook dùng `.org-tree`, `.org-card`, `.org-level` cho sơ đồ tổ chức, `.phase-card` cho giai đoạn, `.kpi-box` cho KPI.
+Handbook uses `.org-tree`, `.org-card`, `.org-level` for organizational charts, `.phase-card` for periods, `.kpi-box` for KPIs.
 
 ```html
 <!DOCTYPE html>
@@ -1121,11 +1121,11 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 
 ---
 
-## Ghi chú chung cho tất cả template
+## General notes for all templates
 
 ### Form Header
 
-- `fh-company > span` thay đổi theo loại tài liệu:
+- `fh-company > span` varies by document type:
   - SOP, JD, Handbook: `Tài liệu kiểm soát`
   - WI: `Tài liệu vận hành &bull; Công việc Hướng dẫn`
   - ANNEX: `Tài liệu vận hành &bull; Annex số hóa`
@@ -1133,15 +1133,15 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 
 ### Relative Path
 
-- SOP (trong `03-Tai-Lieu-Van-Hanh/01-SOPs/xx-SOP-xxx/`): `../../..`
-- WI (trong `03-Tai-Lieu-Van-Hanh/02-Work-Instructions/xx-WI-xxx/`): `../../..`
-- ANNEX (trong `03-Tai-Lieu-Van-Hanh/03-Reference/xx-ANNEX-xxx/`): `../../..` hoặc `../../../..`
-- JD (trong `02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/xx-JD-xxx/`): `../../../..`
-- Handbook (trong `02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/`): `../../..`
+- SOP (in `03-Tai-Lieu-Van-Hanh/01-SOPs/xx-SOP-xxx/`): `../../..`
+- WI (in `03-Tai-Lieu-Van-Hanh/02-Work-Instructions/xx-WI-xxx/`): `../../..`
+- ANNEX (in `03-Tai-Lieu-Van-Hanh/03-Reference/xx-ANNEX-xxx/`): `../../..` or `../../../..`
+- JD (in `02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/xx-JD-xxx/`): `../../../..`
+- Handbook (in `02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/`): `../../..`
 
 ### Print disclaimer
 
-Luôn đặt ngay trước `</body>`:
+Always place immediately before `</body>`:
 
 ```html
 <div class="no-screen print-disclaimer">Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
@@ -1149,4 +1149,4 @@ Luôn đặt ngay trước `</body>`:
 
 ### In-page CSS
 
-Mỗi tài liệu có block `<style>` riêng trong `<head>` để khai báo các class bổ sung chưa có trong `style.css`. Lý do: style.css chỉ chứa class cốt lõi; các class chuyên dụng (metric-grid, gate-grid, comp-grid...) được khai báo inline để giữ style.css gọn nhẹ.
+Each document has its own `<style>` block in `<head>` to declare additional classes not yet in `style.css`. Reason: style.css only contains the core class; Specialized classes (metric-grid, gate-grid, comp-grid...) are declared inline to keep style.css compact.

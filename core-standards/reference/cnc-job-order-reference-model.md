@@ -4,42 +4,42 @@
 
 ---
 
-## 1. Mục đích
+## 1. Purpose
 
-File này khóa mô hình tham chiếu cho SOP vận hành **job-order CNC machine shop** của HESEM sau khi đối chiếu:
+This file locks the reference model for HESEM's **job-order CNC machine shop** operating SOP after comparison:
 
-- dấu vết file gốc và generator nội bộ,
-- mô hình vận hành của các hệ thống job-shop / ERP / MES / QMS đang dùng rộng rãi,
-- yêu cầu thực chiến của môi trường high-mix / low-volume.
-
----
-
-## 2. Nhận định sau khi rà nội bộ
-
-### 2.1 Điều đã xảy ra trong repo
-
-- `tools/scripts/sop-rewrite/generate_series_400_900.py` từng buộc `len(doc["igs"]) == len(doc["steps"])`.
-- Đợt standardize đã làm nhiều SOP 300–900 bị nén về mô hình `5 IG / 5 steps`.
-- Lịch sử file cho thấy đây **không phải bản chất quy trình**:
-  - `SOP-302` từng có flow 10 bước trong commit `94a21ca0`.
-  - `SOP-201` hiện vẫn có 10 bước.
-
-### 2.2 Kết luận nội bộ
-
-Lỗi không nằm ở việc dùng flowchart, mà nằm ở việc **đồng nhất lớp điều khiển với lớp vận hành**:
-
-- `IG` là lớp **gate / hold / release**
-- `procedure steps` là lớp **execution / handoff / evidence**
-
-Hai lớp này phải tách nhau.
+- original file trace and internal generator,
+- Operating models of widely used job-shop / ERP / MES / QMS systems,
+- Real-life requirements of high-mix / low-volume environments.
 
 ---
 
-## 3. Dấu hiệu từ nguồn thực hành quốc tế
+## 2. Comment after internal review
+
+### 2.1 What happened in the repo
+
+- `tools/scripts/sop-rewrite/generate_series_400_900.py` used to force `len(doc["igs"]) == len(doc["steps"])`.
+- The standardization has caused many SOPs 300–900 to be compressed to the `5 IG / 5 steps` model.
+- The file history shows that this is **not the nature of the process**:
+  - `SOP-302` used to have a 10-step flow in commit `94a21ca0`.
+  - `SOP-201` still has 10 steps.
+
+### 2.2 Internal conclusions
+
+The error is not in using flowchart, but in **identifying the control layer with the operating layer**:
+
+- `IG` is the **gate / hold / release** class
+- `procedure steps` is the **execution / handoff / evidence** class
+
+These two classes must be separate.
+
+---
+
+## 3. Signs from international practice sources
 
 ### 3.1 ProShop ERP
 
-Nguồn chính thức cho thấy luồng machine-shop được nhìn theo các lớp:
+The official source shows the machine-shop flow viewed in layers:
 
 - `quote / order`
 - `digital work order`
@@ -49,28 +49,28 @@ Nguồn chính thức cho thấy luồng machine-shop được nhìn theo các l
 - `traceability`
 - `job costing`
 
-Điều đó cho thấy quy trình thực tế là chuỗi đa lớp, không chỉ 5 bước phẳng.
+That shows the actual process is a multi-layer sequence, not just 5 flat steps.
 
 ### 3.2 MRPeasy
 
-Nguồn chính thức mô tả rõ:
+The official source clearly describes:
 
-- `routing` chứa operations, duration, cost, default workers/departments
-- `manufacturing orders` gắn với planning, workstations, procurement, inspections, stock lots, shipment
+- `routing` contains operations, duration, cost, default workers/departments
+- `manufacturing orders` is associated with planning, workstations, procurement, inspections, stock lots, shipments
 - `overlap and special sequences of manufacturing operations`
 
-Điểm quan trọng: **operations có thể overlap, special sequence, parallel execution**. Vì vậy số bước thực thi không thể bị ép bằng số gate.
+Important point: **operations can overlap, special sequence, parallel execution**. Therefore, the number of execution steps cannot be forced by the number of gates.
 
 ### 3.3 ERPNext
 
-Nguồn chính thức mô tả rõ:
+The official source clearly describes:
 
-- `Routing` là template của operations, có `Sequence ID`
-- `Work Order` kéo theo BOM, operations, WIP, material transfer, finished goods, capacity planning
-- `Job Card` theo từng operation và workstation, ghi actual time, completed quantity, material request, transfer
-- `Quality Inspection` áp cho incoming / outgoing / in-process, có acceptance criteria và sample/readings
+- `Routing` is the operations template, with `Sequence ID`
+- `Work Order` entails BOM, operations, WIP, material transfer, finished goods, capacity planning
+- `Job Card` according to each operation and workstation, record actual time, completed quantity, material request, transfer
+- `Quality Inspection` applies to incoming / outgoing / in-process, has acceptance criteria and sample/readings
 
-Điểm quan trọng: hệ thống này tách rất rõ:
+Important point: this system clearly separates:
 
 - planning,
 - work order,
@@ -79,69 +79,69 @@ Nguồn chính thức mô tả rõ:
 - quality inspection,
 - finished goods update.
 
-Đây là mô hình điển hình cho discrete manufacturing / job-shop toàn cầu.
+This is a typical model for global discrete manufacturing / job-shop.
 
 ---
 
-## 4. Kết luận mô hình toàn cầu phù hợp cho HESEM
+## 4. Conclusion of suitable global model for HESEM
 
-### 4.1 Không dùng mô hình 5/5
+### 4.1 Do not use the 5/5 model
 
-Mô hình `5 gates = 5 steps` chỉ phù hợp cho:
+Model `5 gates = 5 steps` is only suitable for:
 
 - executive dashboard,
 - portal gateway,
-- sơ đồ tổng quan cấp điều hành.
+- Executive level overview diagram.
 
-Nó **không đủ sâu** để điều hành job-order CNC thực chiến.
+It is **not deep enough** to run real-life CNC job-order operations.
 
-### 4.2 Mô hình tham chiếu khuyến nghị
+### 4.2 Recommended reference model
 
-Đối với SOP job-order CNC có liên quan Engineering, Planning, Setup, QC, Machining, Shipping:
+For CNC job-order SOPs related to Engineering, Planning, Setup, QC, Machining, Shipping:
 
-- **Internal Gates thường rơi vào:** `6–8`
-- **Detailed Procedure Steps thường rơi vào:** `9–13`
+- **Internal Gates usually falls into:** `6–8`
+- **Detailed Procedure Steps usually fall into:** `9–13`
 
-`7 IG / 12 bước` chỉ là **một mẫu tham chiếu mạnh**, không phải luật cố định cho mọi SOP.
+`7 IG / 12 bước` is just a **strong reference pattern**, not a fixed rule for all SOPs.
 
 ---
 
-## 5. Một mẫu 7 Internal Gates khuyến nghị
+## 5. A recommended model of 7 Internal Gates
 
-| IG | Tên cổng | Mục tiêu |
+| IG | Port name | Goal |
 |---|---|---|
-| IG1 | Requirement Lock | Khóa yêu cầu khách hàng, revision, spec, CTQ, điều kiện thương mại và trigger chất lượng |
-| IG2 | Baseline Release | Khóa route, program baseline, setup concept, measurement concept, make-or-buy và snapshot dữ liệu |
-| IG3 | Resource Readiness | Xác nhận material, supplier status, tool, fixture, gage, machine, capacity, traveler sẵn sàng |
-| IG4 | Setup / Prove-out Readiness | Chặn job trước prove-out nếu setup, datum, offsets, program, workholding chưa đúng |
-| IG5 | First-Piece / FAI Release | Chỉ cho chạy loạt khi first-piece / FAI / revalidation đạt và bằng chứng đủ |
-| IG6 | Production Control & Final Release | Kiểm soát chạy loạt, reaction plan, final inspection, CoC, packing release |
-| IG7 | Shipment & Closeout | Khóa shipment confirmation, costing, evidence index, lessons learned, carry-over actions |
+| IG1 | Requirement Lock | Key customer requirements, revision, spec, CTQ, commercial conditions and quality triggers |
+| IG2 | Baseline Release | Route lock, program baseline, setup concept, measurement concept, make-or-buy and data snapshot |
+| IG3 | Resource Readiness | Confirm material, supplier status, tool, fixture, gage, machine, capacity, traveler ready |
+| IG4 | Setup / Prove-out Readiness | Block job before prove-out if setup, datum, offsets, program, workholding are not correct |
+| IG5 | First-Piece / FAI Release | Only run series when first-piece / FAI / revalidation is achieved and the evidence is sufficient
+| IG6 | Production Control & Final Release | Control of batch run, reaction plan, final inspection, CoC, packing release |
+| IG7 | Shipment & Closeout | Lock shipment confirmation, costing, evidence index, lessons learned, carry-over actions |
 
 ---
 
-## 6. Một mẫu 12 bước chi tiết khuyến nghị
+## 6. A detailed 12-step recommended template
 
-| Bước | Tên bước | Vì sao phải tách riêng |
+| Step | Step name | Why must we separate |
 |---|---|---|
-| 1 | Tiếp nhận RFQ/PO và phân loại job | Khóa trigger, class part, customer requirement, risk class |
-| 2 | Contract review + feasibility + điều kiện báo giá/nhận đơn | Đây là điểm khóa giả định kỹ thuật và thương mại |
-| 3 | Freeze baseline package và route | Tách riêng để khóa đúng part/rev/program/setup/inspection concept |
-| 4 | Hoạch định nguồn lực, make-or-buy, lịch và mua hàng | Đây là lớp planning/procurement, không nên gộp vào engineering |
-| 5 | Tiếp nhận và xác minh material / source / cert / tool / fixture / gage | Đây là readiness hiện trường trước setup |
-| 6 | Setup machine, preset, datum, prove-out | Đây là bước riêng có rủi ro máy cao nhất |
-| 7 | First-piece check / FAI / revalidation decision | Đây là cổng chất lượng trước chạy loạt |
-| 8 | Chạy sản xuất có kiểm soát và reporting theo operation | Đây là execution thực tế trên shop floor |
-| 9 | IPQC / SPC / reaction plan / containment | Đây là lớp phản ứng, không được gộp vào “production” |
-| 10 | Changeover / work transfer / restart after hold | Với job-shop CNC đây là điểm rủi ro lặp lại rất lớn |
-| 11 | Final inspection / document pack / CoC / ship release | Đây là lớp release cuối cùng trước giao |
-| 12 | Packing, shipment confirmation, costing, closeout, learn-back | Đây là vòng đóng hồ sơ và học lại cho lần sau |
+| 1 | Receive RFQ/PO and classify jobs | Trigger key, class part, customer requirement, risk class |
+| 2 | Contract review + considerations + conditions for quotation/receipt of order | This is the technical and commercial assumption lock point |
+| 3 | Freeze baseline package and route | Separate to lock the correct part/rev/program/setup/inspection concept |
+| 4 | Resource planning, make-or-buy, scheduling and purchasing | This is a planning/procurement class, should not be included in engineering |
+| 5 | Receive and verify material / source / cert / tool / fixture / gage | This is field readiness before setup |
+| 6 | Setup machine, preset, datum, prove-out | This is the individual step with the highest machine risk |
+| 7 | First-piece check / FAI / revalidation decision | This is a quality port before running the series |
+| 8 | Run controlled production and report according to operation | This is the actual execution on the shop floor |
+| 9 | IPQC / SPC / reaction plan / containment | This is a reactive class, not included in “production” |
+| 10 | Changeover / work transfer / restart after hold | With job-shop CNC, this is a huge repeat risk point |
+| 11 | Final inspection / document pack / CoC / ship release | This is the last release class before delivery |
+| 12 | Packing, shipment confirmation, costing, closeout, learn-back | This is the round to close the application and study again for the next time |
 
 ---
 
-## 7. Mapping của mẫu 7 IG ↔ 12 bước
+## 7. Mapping of form 7 IG ↔ 12 steps
 
-| IG | Các bước chi tiết thường nằm dưới cổng |
+| IG | Detailed steps are usually located under portal |
 |---|---|
 | IG1 | B1, B2 |
 | IG2 | B3, B4 |
@@ -151,42 +151,42 @@ Nó **không đủ sâu** để điều hành job-order CNC thực chiến.
 | IG6 | B8, B9, B10, B11 |
 | IG7 | B12 |
 
-### 7.1 Ý nghĩa
+### 7.1 Meaning
 
-- Có IG chỉ bao trùm **1 bước rủi ro cao** như `setup / prove-out`, `FAI`.
-- Có IG bao trùm **nhiều bước vận hành liên tiếp** như `production control`.
-- Đây là mapping bình thường và đúng chuẩn. Không có yêu cầu đối xứng.
+- There is an IG that only covers **1 high risk step** such as `setup / prove-out`, `FAI`.
+- There is an IG that covers **many consecutive operating steps** like `production control`.
+- This is a normal and standard mapping. There is no symmetry requirement.
 
 ---
 
-## 8. Quy tắc áp dụng vào từng nhóm SOP
+## 8. Rules apply to each SOP group
 
-| Nhóm SOP | IG nên dùng | Steps nên dùng |
+| SOP Group | IG should use | Steps you should use |
 |---|---|---|
 | Engineering / DFM / release | 5–7 | 8–12 |
 | CNC machining / setup / changeover / transfer | 5–8 | 10–14 |
 | Quality gating / FAI / NCR reaction | 5–7 | 9–13 |
 | Final inspection / shipment / closeout | 4–6 | 8–10 |
 
-### 8.1 Quy tắc quyết định cuối cùng
+### 8.1 Final decision rule
 
-- Chọn số IG theo số điểm `HOLD / RELEASE` thật sự.
-- Chọn số bước theo số lần đổi vai trò, đổi resource, đổi trạng thái hệ thống, revalidation và bàn giao.
-- Nếu tài liệu cũ có logic vận hành tốt hơn mẫu tham chiếu, giữ logic cũ rồi chuẩn hóa lại cấu trúc.
-
----
-
-## 9. Anti-patterns phải chặn
-
-1. Một SOP CNC có 5 bước chỉ vì “vừa màn hình”.
-2. Một IG tương ứng cứng với một heading bước.
-3. Gộp `setup + prove-out + first-piece + release` vào một bước.
-4. Không có bước riêng cho `revalidation`, `work transfer`, `restart after hold`.
-5. Không có bước đóng hồ sơ và learn-back.
+- Choose the IG number according to the actual `HOLD / RELEASE` score.
+- Choose the number of steps according to the number of role changes, resource changes, system status changes, revalidation and handover.
+- If the old document has better operational logic than the reference sample, keep the old logic and then standardize the structure.
 
 ---
 
-## 10. Nguồn tham chiếu chính thức
+## 9. Anti-patterns must be blocked
+
+1. A CNC SOP has 5 steps just because it "fits the screen".
+2. An IG corresponds roughly to a step heading.
+3. Include `setup + prove-out + first-piece + release` into one step.
+4. There are no separate steps for `revalidation`, `work transfer`, `restart after hold`.
+5. There is no step to close the application and learn-back.
+
+---
+
+## 10. Official reference source
 
 - [ProShop ERP - Sales & Work Orders](https://proshoperp.com/product/sales-work-order-process/)
 - [ProShop ERP - Quality Systems & Inspection](https://proshoperp.com/product/quality-systems-inspection/)

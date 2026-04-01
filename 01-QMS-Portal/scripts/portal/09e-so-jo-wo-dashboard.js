@@ -94,6 +94,7 @@ var SELECT_OPTIONS = {
 
 var FIELDS = {
   so: [
+    { key:'so_number', labelVi:'Số SO thủ công (tùy chọn)', labelEn:'Manual SO Number (Optional)' },
     { key:'customer_id', labelVi:'Khách hàng', labelEn:'Customer', lookup:'customers', required:true },
     { key:'customer_site_id', labelVi:'Site khách hàng', labelEn:'Customer Site', lookup:'customer_sites' },
     { key:'ship_to_site_id', labelVi:'Ship-to site', labelEn:'Ship-to Site', lookup:'customer_sites' },
@@ -115,6 +116,7 @@ var FIELDS = {
     { key:'special_requirements', labelVi:'Yêu cầu đặc biệt', labelEn:'Special Requirements', type:'textarea', span:'wide' }
   ],
   jo: [
+    { key:'jo_number', labelVi:'Số JO thủ công (tùy chọn)', labelEn:'Manual JO Number (Optional)' },
     { key:'so_number', labelVi:'SO gốc', labelEn:'Parent SO', lookup:'so', required:true },
     { key:'part_number', labelVi:'Part Number', labelEn:'Part Number', lookup:'parts', required:true },
     { key:'part_revision', labelVi:'Revision', labelEn:'Revision', lookup:'revisions', required:true },
@@ -140,6 +142,7 @@ var FIELDS = {
     { key:'special_process_supplier_id', labelVi:'Nhà cung cấp công đoạn', labelEn:'Special Process Supplier', lookup:'suppliers' }
   ],
   wo: [
+    { key:'wo_number', labelVi:'Số WO thủ công (tùy chọn)', labelEn:'Manual WO Number (Optional)' },
     { key:'jo_number', labelVi:'JO gốc', labelEn:'Parent JO', lookup:'jo', required:true },
     { key:'operation_number', labelVi:'Số công đoạn', labelEn:'Operation Number', type:'integer', required:true },
     { key:'operation_desc', labelVi:'Tên công đoạn', labelEn:'Operation Description', required:true, span:'wide' },
@@ -722,6 +725,14 @@ function _refresh(){
   Promise.all([_api('order_dashboard_stats',{}), _api('order_hierarchy',{}), (typeof window._mdEnsureSnapshot==='function'?window._mdEnsureSnapshot(true):Promise.resolve(null))]).then(function(res){ _kpi=(res[0]&&res[0].ok)?(res[0].data||{}):{}; _hierarchy=(res[1]&&res[1].ok)?(res[1].data||res[1].hierarchy||[]):[]; _flat=_flatten(_hierarchy); _lastRefreshAt=(new Date()).toISOString(); _render(); if(_selected) _showDetail(_selected.id,_selected.type); }).catch(function(){ _kpi={}; _hierarchy=[]; _flat=[]; _lastRefreshAt=(new Date()).toISOString(); _render(); });
 }
 
+window._sojowoOpenCreate = function(type){
+  var target = String(type || '').toLowerCase();
+  if(['so','jo','wo'].indexOf(target) < 0) return false;
+  if(!_container || !_container.isConnected) return false;
+  _showCreate(target);
+  return true;
+};
+window._sojowoRefresh = function(){ if(_container && _container.isConnected) _refresh(); };
 window._renderSoJoWoDashboard=function(schemas,entries,container){ _container=container; _id=container.id||'sojowo'; if(!container.id) container.id=_id; _selected=null; _tableSearch=''; _filters={ search:'', type:'all', band:'all', phase:'all' }; _view='hierarchy'; _refresh(); };
 
 })();

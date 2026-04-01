@@ -1,45 +1,45 @@
-# 15 — Quy tắc đặt tên hồ sơ, evidence và form đã điền
+# 15 — Rules for naming records, evidence, and completed forms
 
-> Naming convention thống nhất cho MỌI file lưu lên SharePoint: form đã điền, evidence sản xuất,
-> engineering baseline, hồ sơ đào tạo, audit, và tài sản.
-> Tuân thủ AS9100 §8.5.2 (traceability), ISO 9001 §7.5.3 (record control).
+> Naming convention is consistent for EVERY file saved to SharePoint: completed forms, produced evidence,
+> engineering baseline, training records, audits, and assets.
+> Complies with AS9100 §8.5.2 (traceability), ISO 9001 §7.5.3 (record control).
 
 ---
 
-## 1. Quy tắc chung (áp dụng MỌI file)
+## 1. General rules (applies to EVERY file)
 
-| # | Quy tắc | Chi tiết |
+| # | Rules | Details |
 |---|---------|---------|
-| 1 | English only | Không dấu tiếng Việt, không Unicode ngoài ASCII |
-| 2 | Ký tự cho phép | `A-Z`, `a-z`, `0-9`, hyphen (`-`), underscore (`_`), dot (`.`) |
-| 3 | Phân cách segment | Underscore (`_`) |
-| 4 | Phân cách từ trong segment | Hyphen (`-`) |
-| 5 | Ngày | `YYYYMMDD` (compact, sort tốt) |
-| 6 | Thời gian | `HHMM` (24h format) |
-| 7 | Tên file tối đa | 120 ký tự |
-| 8 | KHÔNG có | Dấu cách, dấu ngoặc, ký tự đặc biệt |
+| 1 | English only | No Vietnamese accents, no Unicode other than ASCII |
+| 2 | The allowed character | `A-Z`, `a-z`, `0-9`, hyphen (`-`), underscore (`_`), dot (`.`) |
+| 3 | Segment separator | Underscore (`_`) |
+| 4 | Separate words in segment | Hyphen (`-`) |
+| 5 | Date | `YYYYMMDD` (compact, sorted well) |
+| 6 | Time | `HHMM` (24h format) |
+| 7 | Maximum filename | 120 characters |
+| 8 | NO | Spaces, brackets, special characters |
 
 ---
 
-## 2. Sáu naming patterns
+## 2. Six naming patterns
 
-### PATTERN 1 — Form đã điền (Filled Form Record)
+### PATTERN 1 — Filled Form Record
 
 **Template:**
 ```
 FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}
 ```
 
-| Segment | Bắt buộc | Mô tả | Ví dụ |
+| Segments | Required | Description | Example |
 |---------|---------|-------|-------|
-| `FRM-{code}` | Luôn | Mã form theo registry | FRM-631 |
-| `V{ver}` | Luôn | Version form blank đã dùng | V2.1 |
-| `{scope}` | Luôn | Phạm vi (xem bảng Scope Code) | JOB-2026-0042 |
-| `{YYYYMMDD}` | Luôn | Ngày điền/hoàn thành | 20260327 |
-| `{HHMM}-{UserID}` | Luôn | Giờ phút + mã người điền | 0830-NVA |
-| `.{ext}` | Luôn | .xlsx hoặc .pdf (online auto) | .xlsx |
+| `FRM-{code}` | Always | Form code according to registry | FRM-631 |
+| `V{ver}` | Always | Version blank form used | V2.1 |
+| `{scope}` | Always | Scope (see Scope Code table) | JOB-2026-0042 |
+| `{YYYYMMDD}` | Always | Date filled/completed | 20260327 |
+| `{HHMM}-{UserID}` | Always | Hour, minute + person code | 0830-NVA |
+| `.{ext}` | Always | .xlsx or .pdf (online auto) | .xlsx |
 
-**Ví dụ:**
+**For example:**
 ```
 FRM-631_V2.1_NCR-2026-043_20260327_0830-NVA.xlsx        ← NCR Excel đã điền
 FRM-631_V2.1_NCR-2026-043_20260327_0830-NVA.pdf         ← NCR online (auto PDF)
@@ -51,14 +51,14 @@ FRM-911_V1.0_MR-2026-Q1_20260327_0900-QMS1.xlsx         ← MR Minutes
 FRM-504_V1.0_PRO-SHIFT-A_20260327_0600-SL1.pdf          ← Shift Handover (online)
 ```
 
-### PATTERN 2 — Evidence gắn Job
+### PATTERN 2 — Evidence attached to Job
 
 **Template:**
 ```
 {RecordType}_{JobNum}_{PartRev}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}
 ```
 
-**Ví dụ:**
+**For example:**
 ```
 PHOTO-SETUP_JOB-2026-0042_714XXXX-REVA-OP10_20260327_0830-SET1.jpg
 CMM_JOB-2026-0042_714XXXX-REVA-OP10_20260327_0900-QC1.csv
@@ -79,7 +79,7 @@ PROVEOUT_JOB-2026-0042_714XXXX-REVA-OP10_20260327_0845-SET1.pdf
 {FileType}_{PartRev}_{Operation}_{MachineFamily}_V{ver}.{ext}
 ```
 
-**Ví dụ:**
+**For example:**
 ```
 NC_714XXXX-REVA_OP10_5AX_V3.nc
 NC_714XXXX-REVA_OP20_TURN_V3.nc
@@ -96,16 +96,16 @@ FRM-306_714XXXX-REVA_ALL_V3.xlsx
 FRM-307_714XXXX-REVA_ALL_V2-to-V3_20260327.xlsx
 ```
 
-**Lưu ý:** Engineering baseline KHÔNG dùng `{HHMM}-{UserID}` vì chỉ 1 người release tại 1 thời điểm (có approval gate FRM-306). Dùng `V{ver}` là đủ unique.
+**Note:** Engineering baseline DOES NOT use `{HHMM}-{UserID}` because only 1 person releases at a time (with approval gate FRM-306). Using `V{ver}` is unique enough.
 
-### PATTERN 4 — Evidence không gắn Job (Training, Audit, Department)
+### PATTERN 4 — Evidence without Job attached (Training, Audit, Department)
 
 **Template:**
 ```
 {RecordType}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}
 ```
 
-**Ví dụ:**
+**For example:**
 ```
 REPORT_AUD-2026-IA03_20260327_0900-QMS1.pdf
 CHECKLIST_AUD-2026-IA03_20260327_0900-QMS1.xlsx
@@ -127,14 +127,14 @@ SIGNOFF_TRN-2026-015_20260327_1400-HR1.pdf
 FRM-{code}_{Title}_V{ver}.xlsx
 ```
 
-**Ví dụ:**
+**For example:**
 ```
 FRM-302_Setup-Sheet-and-Tool-List_V3.2.xlsx
 FRM-631_NCR-Report_V2.1.xlsx
 FRM-311_FAI-Report_V1.0.xlsx
 ```
 
-**Phân biệt blank vs filled:**
+**Distinguish between blank vs filled:**
 ```
 BLANK:  FRM-302_Setup-Sheet-and-Tool-List_V3.2.xlsx     ← Có Title, KHÔNG có scope/HHMM
 FILLED: FRM-302_V3.2_JOB-2026-0042-OP10_20260327_0900-SET1.xlsx  ← Có scope/HHMM, KHÔNG có Title
@@ -147,7 +147,7 @@ FILLED: FRM-302_V3.2_JOB-2026-0042-OP10_20260327_0900-SET1.xlsx  ← Có scope/H
 {AssetType}-{AssetID}_{DocType}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}
 ```
 
-**Ví dụ:**
+**For example:**
 ```
 FIX-001_DWG_20260327_0800-ENG1.pdf
 FIX-001_PHOTO_20260327_0830-SET1.jpg
@@ -156,23 +156,23 @@ GAGE-CMM-005_CAL-CERT_20260327_0800-QC1.pdf
 
 ### PATTERN 7 — Server-managed Received / Resubmitted Form Copy
 
-Áp dụng cho bản offline hệ thống **đã tiếp nhận** hoặc bản online/offline được hệ thống đóng gói lại để lưu vết revision nội bộ.
+Applies to the offline version the system **received** or the online/offline version repackaged by the system to save internal revision traces.
 
 **Template:**
 ```
 FRM-{code}_V{ver}_{record_id}_{YYYYMMDD}_R{nn}.{ext}
 ```
 
-| Segment | Bắt buộc | Mô tả | Ví dụ |
+| Segments | Required | Description | Example |
 |---------|---------|-------|-------|
-| `FRM-{code}` | Luôn | Mã form theo registry | FRM-403 |
-| `V{ver}` | Luôn | Version form blank đang hiệu lực khi hồ sơ được tạo | V1 |
-| `{record_id}` | Luôn | Record-ID của instance hồ sơ | SCAR-2026-012 |
-| `{YYYYMMDD}` | Luôn | Ngày hệ thống tiếp nhận / đóng gói | 20260331 |
-| `R{nn}` | Luôn | Lần tiếp nhận / resubmission nội bộ | R01 |
-| `.{ext}` | Luôn | .xlsx, .pdf, .zip... | .xlsx |
+| `FRM-{code}` | Always | Form code according to registry | FRM-403 |
+| `V{ver}` | Always | Version form blank is in effect when the profile is created | V1 |
+| `{record_id}` | Always | Record-ID of the record instance | SCAR-2026-012 |
+| `{YYYYMMDD}` | Always | Receiving/packaging system date | 20260331 |
+| `R{nn}` | Always | Internal reception / resubmission times | R01 |
+| `.{ext}` | Always | .xlsx, .pdf, .zip... | .xlsx |
 
-**Ví dụ:**
+**For example:**
 ```
 FRM-403_V1_SCAR-2026-012_20260331_R01.xlsx
 FRM-403_V1_SCAR-2026-012_20260402_R02.xlsx
@@ -185,41 +185,41 @@ FRM-631_V2.1_NCR-2026-043_20260327_R01.pdf
 
 ### 3.1 Job Dossier Evidence
 
-| Code | Tên | Mô tả |
+| Code | Name | Description |
 |------|-----|-------|
-| PO | Purchase Order | Scan PO khách hàng |
-| CR | Contract Review | Kết quả xem xét hợp đồng |
+| PO | Purchase Order | Scan customer PO |
+| CR | Contract Review | Contract review results |
 | MTR | Material Test Report | Mill cert, heat cert, CoA |
-| IQC | Incoming QC Result | Kết quả kiểm tra đầu vào |
-| TRV | Traveler / Router | Scan phiếu theo dõi sản xuất |
-| CMM | CMM / Measurement Data | Dữ liệu đo CMM, caliper, mic |
-| FAI-BALLOON | Ballooned Drawing | Bản vẽ đánh số balloon |
-| COC | Certificate of Conformance | Chứng nhận phù hợp |
-| PACK | Packing List | Phiếu đóng gói |
-| SHIP-LABEL | Shipping Label / SSCC | Nhãn vận chuyển |
-| POD | Proof of Delivery | Bằng chứng giao hàng |
-| CONCESSION | Deviation / Waiver | Phê duyệt nhượng bộ |
-| REWORK | Rework Evidence | Bằng chứng làm lại + tái kiểm |
-| CUST-APPR | Customer Approval | Email/doc khách hàng phê duyệt |
-| PROVEOUT | Prove-out Evidence | Ghi chú chạy thử đầu tiên |
-| OFFSET-LOG | Offset Change Log | Log thay đổi offset máy |
-| TOOL-WEAR | Tool Wear Record | Ghi nhận mòn dao |
-| DOWNTIME | Downtime Record | Ghi nhận dừng máy |
+| IQC | Incoming QC Result | Entrance test results |
+| TRV | Traveler / Router | Scan production tracking slip |
+| CMM | CMM / Measurement Data | CMM, caliper, mic measurement data |
+| FAI-BALLOON | Ballooned Drawing | Balloon numbering drawing |
+| COC | Certificate of Conformance | Certificate of conformity |
+| PACK | Packing List | Packing slip |
+| SHIP-LABEL | Shipping Label / SSCC | Shipping labels |
+| POD | Proof of Delivery | Proof of delivery |
+| CONCESSION | Deviation / Waiver | Approval of concessions |
+| REWORK | Rework Evidence | Evidence of rework + retest |
+| CUST-APPR | Customer Approval | Email/doc customer approval |
+| PROVOUT | Prove-out Evidence | First test run notes |
+| OFFSET-LOG | Offset Change Log | Machine offset change log |
+| TOOL-WEAR | Tool Wear Record | Record tool wear |
+| DOWNTIME | Downtime Record | Record machine stoppage |
 
 ### 3.2 Photos
 
-| Code | Mô tả |
+| Code | Description |
 |------|-------|
-| PHOTO-SETUP | Ảnh trạng thái setup máy |
-| PHOTO-FAI | Ảnh chi tiết FAI |
-| PHOTO-FINAL | Ảnh kiểm tra cuối |
-| PHOTO-PACK | Ảnh đóng gói |
-| PHOTO-NCR | Ảnh lỗi |
-| PHOTO-GEN | Ảnh chung |
+| PHOTO-SETUP | Photo of machine setup status |
+| PHOTO-FAI | FAI detailed photos |
+| PHOTO-FINAL | Final inspection photo |
+| PHOTO-PACK | Packaging photo |
+| PHOTO-NCR | Error image |
+| PHOTO-GEN | General photos |
 
 ### 3.3 Engineering Baseline
 
-| Code | Mô tả |
+| Code | Description |
 |------|-------|
 | NC | NC Program (G-code) |
 | CAM | CAM Source File |
@@ -233,7 +233,7 @@ FRM-631_V2.1_NCR-2026-043_20260327_R01.pdf
 
 ### 3.4 QMS Governance
 
-| Code | Mô tả |
+| Code | Description |
 |------|-------|
 | REPORT | Audit report, analysis report |
 | CHECKLIST | Audit checklist, verify list |
@@ -246,7 +246,7 @@ FRM-631_V2.1_NCR-2026-043_20260327_R01.pdf
 
 ### 3.5 Training & Competence
 
-| Code | Mô tả |
+| Code | Description |
 |------|-------|
 | OJT | On-the-Job Training evidence |
 | GATE-TEST | Competency gate test result |
@@ -255,15 +255,15 @@ FRM-631_V2.1_NCR-2026-043_20260327_R01.pdf
 
 ### 3.6 Calibration & Assets
 
-| Code | Mô tả |
+| Code | Description |
 |------|-------|
 | CAL-CERT | Calibration certificate |
 | MAINT-LOG | Maintenance log |
 | SPEC | Specification sheet |
 
-### 3.7 Supplier
+### 3.7 Suppliers
 
-| Code | Mô tả |
+| Code | Description |
 |------|-------|
 | SUP-CERT | Supplier process certificate |
 | SUP-AUDIT | Supplier audit report |
@@ -274,20 +274,20 @@ FRM-631_V2.1_NCR-2026-043_20260327_R01.pdf
 
 ## 4. Scope Code Dictionary
 
-| Scope type | Format | Ví dụ |
+| Scope type | Format | Example |
 |-----------|--------|-------|
 | Job order | `JOB-{YYYY}-{4digit}` | JOB-2026-0042 |
 | Job + Operation | `JOB-{YYYY}-{4d}-OP{nn}` | JOB-2026-0042-OP10 |
 | NCR | `NCR-{YYYY}-{3digit}` | NCR-2026-043 |
 | CAPA | `CAPA-{YYYY}-{3digit}` | CAPA-2026-008 |
-| Training event | `TRN-{YYYY}-{3digit}` | TRN-2026-015 |
+| Training events | `TRN-{YYYY}-{3digit}` | TRN-2026-015 |
 | Internal Audit | `AUD-{YYYY}-IA{2digit}` | AUD-2026-IA03 |
 | External Audit | `AUD-{YYYY}-EA{2digit}` | AUD-2026-EA01 |
 | Mgmt Review | `MR-{YYYY}-Q{n}` | MR-2026-Q1 |
 | Calibration | `CAL-{EquipCode}-{3digit}` | CAL-MICR-005 |
 | Risk review | `RISK-{YYYY}-R{2digit}` | RISK-2026-R02 |
 | Change request | `ECR-{YYYY}-{3digit}` | ECR-2026-012 |
-| Improvement | `IMP-{YYYY}-{code}` | IMP-2026-K05 |
+| Improvements | `IMP-{YYYY}-{code}` | IMP-2026-K05 |
 | Employee | `EMP-{4digit}` | EMP-0123 |
 | Department | `{DeptCode}` | ENG, PRO, QA, SCM |
 | System-wide | `SYS` | SYS |
@@ -298,50 +298,50 @@ FRM-631_V2.1_NCR-2026-043_20260327_R01.pdf
 
 ## 5. UserID Registry
 
-### 5.1 Quy tắc tạo UserID
+### 5.1 Rules for creating UserID
 
-| # | Quy tắc |
+| # | Rules |
 |---|---------|
-| 1 | 3-4 ký tự viết tắt từ họ-tên đệm-tên |
-| 2 | Ưu tiên: chữ đầu họ + chữ đầu tên đệm + chữ đầu tên (NVA, TBH, LMC) |
-| 3 | Nếu trùng: thêm số (NVA → NVA2) |
-| 4 | Đăng ký 1 lần trong SharePoint List `Employee-Registry` hoặc Epicor Employee Master |
-| 5 | KHÔNG thay đổi khi nhân viên đổi phòng/chức vụ |
-| 6 | KHÔNG tái sử dụng UserID sau khi nhân viên nghỉ việc |
+| 1 | 3-4 characters abbreviation from first name-first name-middle name |
+| 2 | Priority: first letter of last name + first letter of middle name + first letter of first name (NVA, TBH, LMC) |
+| 3 | If duplicate: add number (NVA → NVA2) |
+| 4 | One-time registration in SharePoint List `Employee-Registry` or Epicor Employee Master |
+| 5 | NO changes when employees change rooms/positions |
+| 6 | DO NOT reuse UserID after employee leaves |
 
-### 5.2 Tại sao dùng `{HHMM}-{UserID}` thay vì `{seq}_{RoleCode}`
+### 5.2 Why use `{HHMM}-{UserID}` instead of `{seq}_{RoleCode}`
 
-| Vấn đề với `{seq}` | Giải pháp `{HHMM}-{UserID}` |
+| Problem with `{seq}` | Solution `{HHMM}-{UserID}` |
 |--------------------|-----------------------------|
-| Nhiều người upload cùng lúc → ai quản seq? | HHMM + UserID tự unique, không cần phối hợp |
-| 2 QC inspector cùng role code "QC" → trùng | UserID unique per person → NVA ≠ TBH |
-| Phải đếm file hiện có trước khi đặt tên | Chỉ cần nhìn đồng hồ + biết UserID mình |
+| Many people upload at the same time → who manages the seq? | HHMM + UserID is unique, no need to coordinate |
+| 2 QC inspectors with the same role code "QC" → overlap | UserID unique per person → NVA ≠ TBH |
+| Must count existing files before naming | Just look at the clock + know your UserID |
 
 ### 5.3 Uniqueness guarantee
 
-| Tình huống | HHMM | UserID | Kết quả |
+| Situation | HHMM | UserID | Results |
 |-----------|------|--------|---------|
-| Cùng người, cùng phút, cùng RecordType, cùng scope | Giống | Giống | **Không xảy ra** — 1 người không tạo 2 file cùng loại cùng phút |
-| Khác người, cùng phút | Giống | **Khác** | Unique |
-| Cùng người, khác phút | **Khác** | Giống | Unique |
+| Same person, same minute, same RecordType, same scope | Similar | Similar | **Does not happen** — 1 person does not create 2 files of the same type at the same time |
+| Different people, same minute | Similar | **Other** | Unique |
+| Same person, different minutes | **Other** | Similar | Unique |
 
 ---
 
-## 6. Record-ID — Server-assigned cho formal records
+## 6. Record-ID — Server-assigned for formal records
 
-### 6.1 Khi nào cần Record-ID
+### 6.1 When do you need Record-ID?
 
-| Loại | Cần Record-ID? | Ví dụ ID | Ai cấp? |
+| Type | Need Record-ID? | ExampleID | Who issued it? |
 |------|----------------|---------|---------|
-| NCR | CÓ | NCR-2026-043 | Server atomic counter |
-| CAPA | CÓ | CAPA-2026-008 | Server atomic counter |
-| FAI | CÓ | FAI-2026-016 | Server atomic counter |
-| Training event | CÓ | TRN-2026-028 | Server atomic counter |
-| Audit | CÓ | AUD-2026-IA03 | Server atomic counter |
-| ECR/ECO | CÓ | ECR-2026-012 | Server atomic counter |
-| Job order | CÓ (từ Epicor) | JOB-2026-0042 | Epicor SoR |
-| Photos, scans | KHÔNG | (dùng HHMM-UserID) | Người upload |
-| CMM data | KHÔNG | (dùng HHMM-UserID) | Người upload |
+| NCR | YES | NCR-2026-043 | Server atomic counter |
+| CAPA | YES | CAPA-2026-008 | Server atomic counter |
+| FAI | YES | FAI-2026-016 | Server atomic counter |
+| Training events | YES | TRN-2026-028 | Server atomic counter |
+| Audit | YES | AUD-2026-IA03 | Server atomic counter |
+| ECR/ECO | YES | ECR-2026-012 | Server atomic counter |
+| Job order | YES (from Epicor) | JOB-2026-0042 | Epicor SoR |
+| Photos, scans | NO | (use HHMM-UserID) | Uploader |
+| CMM data | NO | (use HHMM-UserID) | Uploader |
 
 ### 6.2 Server atomic counter
 
@@ -356,25 +356,25 @@ qms-data/counters/
 └── IMP-2026.txt      → "005"
 ```
 
-**Cơ chế:** File lock (LOCK_EX) đảm bảo chỉ 1 process đọc/ghi tại 1 thời điểm → không race condition.
+**Mechanism:** File lock (LOCK_EX) ensures only 1 process reads/writes at a time → no race condition.
 
 ---
 
 ### 6.3 eQMS Record-ID Reuse Rules
 
-| # | Quy tắc | Chi tiết bắt buộc |
+| # | Rules | Required Details |
 |---|---------|-------------------|
-| 1 | **Draft không sinh tên/mã mới** | Khi mở lại draft, hệ thống phải tiếp tục dùng `record_id` và naming lineage đã có; không được sinh file name/mã mới chỉ vì người dùng lưu nháp rồi mở lại. |
-| 2 | **Resubmission giữ nguyên Record-ID** | Online controlled edit và offline resubmission phải giữ nguyên `record_id`; chỉ tăng `submission_count`, `resubmission_count` hoặc `receipt_version`. |
-| 3 | **Filled copy user-side dùng Pattern 1** | File người dùng tải xuống để điền hoặc snapshot PDF người dùng xuất ra dùng PATTERN 1. |
-| 4 | **Server-managed received copy dùng Pattern 7** | Bản hệ thống tiếp nhận và khóa vào hồ sơ dùng PATTERN 7 để phản ánh số lần nộp lại nội bộ. |
-| 5 | **Không đè tên cũ** | Mọi lần nộp lại phải sinh tên lưu trữ mới; tuyệt đối không ghi đè file receipt trước đó. |
+| 1 | **Draft does not generate new names/codes** | When reopening a draft, the system must continue to use the existing `record_id` and naming lineage; Do not generate a new file name/code just because the user saved the draft and then reopened it. |
+| 2 | **Resubmission retains Record-ID** | Online controlled edit and offline resubmission must remain `record_id`; only increase `submission_count`, `resubmission_count` or `receipt_version`. |
+| 3 | **Filled copy user-side using Pattern 1** | User-downloaded file to fill out or user-exported PDF snapshot using PATTERN 1. |
+| 4 | **Server-managed received copy using Pattern 7** | The system receives and locks records using PATTERN 7 to reflect the number of internal submissions. |
+| 5 | **Do not overwrite the old name** | Every resubmission must generate a new archive name; Absolutely do not overwrite the previous receipt file. |
 
-### 6.4 Luồng lấy Record-ID
+### 6.4 Stream to get Record-ID
 
-**Online form:** Server tự cấp khi submit → nhúng vào filename PDF.
+**Online form:** Server automatically provided when submitting → embedded in PDF filename.
 
-**Excel form:** User vào portal → "Xin mã hồ sơ mới" → server trả mã → user dùng trong tên file khi save.
+**Excel form:** User goes to portal → "Ask for new profile code" → server returns code → user used in file name when saving.
 
 ---
 
@@ -382,19 +382,19 @@ qms-data/counters/
 
 ### 7.1 Form blank download — version stamp
 
-Khi user tải form blank từ web portal:
-- Filename BẮT BUỘC có `V{ver}`: `FRM-302_Setup-Sheet-and-Tool-List_V3.2.xlsx`
-- Server inject metadata vào sheet ẩn `_QMS_CONTROL`:
+When a user loads a blank form from the web portal:
+- Filename MUST include `V{ver}`: `FRM-302_Setup-Sheet-and-Tool-List_V3.2.xlsx`
+- Server injects metadata into hidden sheet `_QMS_CONTROL`:
   - form_code, version, checksum, downloaded_by, downloaded_at, source
 
 ### 7.2 Form filled upload — version validation
 
-Khi user upload form đã điền lên SharePoint:
-- SharePoint metadata column `Form-Version` phải khớp active version trong form_control_registry
-- Nếu version cũ → FLAG `Version-Valid = OBSOLETE` + notify uploader
+When the user uploads the completed form to SharePoint:
+- SharePoint metadata column `Form-Version` must match the active version in form_control_registry
+- If old version → FLAG `Version-Valid = OBSOLETE` + notify uploader
 - Monthly audit: query files where Version-Valid = OBSOLETE → action required
 
-### 7.3 Phân biệt blank vs filled nhìn từ tên file
+### 7.3 Distinguishing blank vs filled from the file name
 
 ```
 BLANK:  FRM-{code}_{Title}_V{ver}.xlsx                              ← Có Title
@@ -405,25 +405,25 @@ FILLED: FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.xlsx  ← Có scope
 
 ## 8. Validation rules (fail-fast)
 
-| Kiểm tra | Kết quả |
+| Check | Results |
 |----------|---------|
-| Tên file chứa dấu cách hoặc ký tự đặc biệt | REJECT |
-| Tên file không có date segment (YYYYMMDD) | REJECT |
-| Filled form không có V{ver} | REJECT |
+| The file name contains spaces or special characters | REJECT |
+| The file name does not have a date segment (YYYYMMDD) | REJECT |
+| Filled form without V{ver} | REJECT |
 | Filled form version ≠ current active version | FLAG OBSOLETE |
-| Job evidence không có JOB-{YYYY}-{nnnn} | REJECT |
-| Engineering baseline không có V{ver} | REJECT |
-| File trùng tên đã tồn tại (cùng tên, cùng folder) | REJECT |
-| Tên file > 120 ký tự | WARN |
-| RecordType code không trong dictionary (Section 3) | FLAG |
-| Date format sai (không phải YYYYMMDD) | REJECT |
-| Part number trong file ≠ Part number trong folder | REJECT |
+| Job evidence does not exist JOB-{YYYY}-{nnnn} | REJECT |
+| Engineering baseline does not have V{ver} | REJECT |
+| File with the same name already exists (same name, same folder) | REJECT |
+| File name > 120 characters | WARN |
+| RecordType code not in dictionary (Section 3) | FLAG |
+| Date format is wrong (not YYYYMMDD) | REJECT |
+| Part number in file ≠ Part number in folder | REJECT |
 
 ---
 
 ## 9. 60-second traceability test (AS9100 compliance)
 
-**Kịch bản:** Auditor hỏi "Show me the FAI report for job 0042, part 714XXXX rev A"
+**Scenario:** Auditor asks "Show me the FAI report for job 0042, part 714XXXX rev A"
 
 ```
 1. Mở HESEM-Job-Evidence → Job-Dossiers → 2026                     (5s)
@@ -436,7 +436,7 @@ FILLED: FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.xlsx  ← Có scope
 TỔNG: < 20 giây ✓ (yêu cầu < 60 giây)
 ```
 
-**Kịch bản 2:** "Show me all NCRs for Lam Research in Q1 2026"
+**Scenario 2:** "Show me all NCRs for Lam Research in Q1 2026"
 ```
 1. Mở HESEM-Records → Quality-Records                               (3s)
 2. Filter: Record-Type = NCR, Customer = Lam-Research, Year = 2026   (5s)
@@ -446,9 +446,9 @@ TỔNG: < 10 giây ✓
 
 ---
 
-## 10. Nhiều file cùng 1 Record — quy tắc nhóm
+## 10. Multiple files with 1 Record — group rule
 
-Một NCR có thể có nhiều file evidence. Tất cả dùng CÙNG Record-ID:
+An NCR can have many evidence files. All use the SAME Record-ID:
 
 ```
 FRM-631_V2.1_NCR-2026-043_20260327_0830-NVA.xlsx      ← Form NCR đã điền
@@ -462,6 +462,6 @@ SharePoint search: "NCR-2026-043" → tìm thấy TẤT CẢ files ← traceabil
 
 ---
 
-> **Cập nhật lần cuối:** 2026-03-27
-> **Áp dụng:** Mọi file lưu lên SharePoint — HESEM ENGINEERING
-> **Tài liệu liên quan:** 14-m365-sharepoint-architecture.md, evidence-naming-rule.html (Training Academy), ANNEX-131
+> **Last updated:** 2026-03-27
+> **Applies:** All files saved to SharePoint — HESEM ENGINEERING
+> **Related documents:** 14-m365-sharepoint-architecture.md, evidence-naming-rule.html (Training Academy), ANNEX-131

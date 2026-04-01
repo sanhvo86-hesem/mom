@@ -1,186 +1,200 @@
-# 29. WI-ANNEX research and redraft method
+# 29. WI/ANNEX Research and Redraft Method
 
 > Version: v1 | Date: 2026-03-30 | Owner: QMS Engineer
 
 ---
 
-## 1. Muc tieu
+## 1. Purpose
 
-Tai lieu nay khoa phuong phap nghien cuu va viet lai WI/ANNEX theo tung tai lieu.
+This document locks the research and rewrite method for WI and ANNEX documents on a document-by-document basis.
 
-Muc tieu la chan 5 loi:
-- viet lai WI hang loat theo mot khuon ma khong dua vao user that;
-- de SOP logic, matrix hoac spec lot vao WI;
-- de procedure narrative lot vao ANNEX;
-- doan acceptance criteria khi nguon goc la customer spec hoac paid standard;
-- sua hinh thuc truoc khi chot ranh gioi tai lieu.
+The purpose is to prevent 5 common errors:
+
+- rewriting many WI files from one generic mold without studying the real user;
+- pushing SOP logic, matrix content, or specification content into a WI;
+- pushing long procedure narrative into an ANNEX;
+- guessing acceptance criteria when the true source is a customer specification or paid standard;
+- polishing appearance before the document boundary is actually resolved.
 
 ---
 
-## 2. Nguyen tac bat buoc
+## 2. Mandatory Principles
 
-1. Moi WI/ANNEX phai duoc nghien cuu rieng.
-2. Khong duoc dung 1 mau noi dung de ep ca 1 series.
-3. Chuan hoa duoc phep o lop:
+1. Every WI and ANNEX must be researched individually.
+2. One content mold must not be forced across an entire series.
+3. Standardization is only allowed at these layers:
    - header;
    - HTML wrapper;
    - archetype QA;
    - visual rules;
-   - role/bundle rule.
-   Header normalization chi duoc dong vao:
+   - role/bundle rules.
+4. Header normalization may only affect:
    - title tag;
    - family subtitle;
    - meta labels;
-   - `.doc-code` hook cho ma tai lieu;
+   - `.doc-code` hook for the document code;
    - UTF-8-safe text handling.
-   Khong duoc nhan co hoi sua header de chen archetype, series hoac domain vao published subtitle.
-4. Noi dung van hanh phai chot theo user, risk va evidence cua tung tai lieu.
-5. Neu acceptance criteria khong co nguon chinh thuc, khong duoc tu dien so.
+5. Do not use header cleanup as an excuse to inject archetype, series, or domain wording into the published subtitle.
+6. Operational content must be finalized according to the specific user, risk, and evidence of that document.
+7. If acceptance criteria do not come from an official source, do not invent numbers.
 
 ---
 
-## 3. Trinh tu 8 buoc
+## 3. Eight-Step Sequence
 
-### Buoc 1. Doc tai lieu cu
+### Step 1. Read the old document
 
-Doc it nhat:
+At minimum, review:
+
 - title;
-- section/h2;
-- links den SOP/WI/ANNEX/FRM;
-- note hidden phase residue;
-- phan nao dang lam viec cua SOP/WI/ANNEX khac.
+- section/h2 structure;
+- links to SOP/WI/ANNEX/FRM documents;
+- any hidden phase residue;
+- which parts are doing the job of another SOP/WI/ANNEX.
 
-### Buoc 2. Xac dinh user that
+### Step 2. Identify the real user
 
-Phai tra loi:
-- ai dung?
-- dung o dau?
-- dung khi nao?
-- dung de ra quyet dinh gi?
+You must answer:
 
-### Buoc 3. Chot loai tai lieu
+- who uses it;
+- where it is used;
+- when it is used;
+- what decision it supports.
 
-Chon:
+### Step 3. Lock the document type
+
+Choose one of the following:
+
 - POU-WI;
 - Gate-Execution WI;
 - Control-Tower WI;
 - Digital-Operation WI;
-- hoac 1 trong 7 ANNEX archetype.
+- or one of the 7 ANNEX archetypes.
 
-Neu khong ro, tam dung va tach boundary truoc.
+If the type is still unclear, pause and resolve the boundary first.
 
-### Buoc 4. Tach noi dung sai layer
+### Step 4. Split out the wrong layer
 
-Rut ra:
-- gate definition/RACI/KPI definition -> SOP;
-- matrix/method/spec/map/worked example -> ANNEX;
-- step thao tac tai diem dung -> WI.
+Push content back to the correct layer:
 
-### Buoc 5. Nghien cuu nguon ben ngoai
+- gate definition / RACI / KPI definition -> SOP;
+- matrix / method / spec / map / worked example -> ANNEX;
+- point-of-use execution steps -> WI.
 
-Chi dung nguon chinh thong hoac nguon goc.
+### Step 5. Research outside sources
 
-Bo benchmark toi thieu cho repo nay:
+Use only official sources or primary sources.
 
-| Domain | Nguon uu tien | Y nghia su dung |
+Minimum benchmark stack for this repository:
+
+| Domain | Preferred source | Why it is used |
 |---|---|---|
-| QMS flexibility | ISO 9001:2015 official page | Xac nhan ISO yeu cau QMS controls va documented information, khong ep tao WI cho moi viec |
-| Standardized work | IATF public OEM CSR documents | Xac nhan `what-how-why`, operator instruction, visual standard |
-| Acceptance sampling | ISO 2859-1 official page + released internal controlled table | Khoa boundary AQL method vs WI execution va khong sao chep bang tra co ban quyen vao ANNEX |
-| FAI | SAE AS9102 + IAQG official FAQ/forms | Khoa boundary cho WI-302 va form stack |
-| Logistic label | GS1 Logistic Label Guideline + GS1 General Specifications + ISO/IEC 15416 official page | Khoa SSCC, GS1-128, placement, print quality logic va verification method cho linear symbol |
-| Digital resilience | NIST SP 800-34 Rev.1 | Khoa BIA, contingency, recovery priorities, offline fallback logic |
-| Media sanitization | NIST SP 800-88 Rev.2 | Khoa sanitization program, validation, storage media handling |
-| Semiconductor safety/cleanliness | SEMI public standard pages, standard notices, customer specs | Khoa S2, purity/particle/surface/material context, khong tu doan acceptance limits |
+| QMS flexibility | ISO 9001:2015 official page | Confirm that ISO requires QMS controls and documented information, but does not force a WI for every activity |
+| Standardized work | Public OEM CSR documents from IATF-related sources | Confirm `what-how-why`, operator instruction, and visual-standard logic |
+| Acceptance sampling | ISO 2859-1 official page + released internal controlled table | Lock the boundary between AQL method and WI execution, and avoid copying copyrighted tables into ANNEX documents |
+| FAI | SAE AS9102 + IAQG official FAQ/forms | Lock the boundary for WI-302 and the form stack |
+| Logistic label | GS1 Logistic Label Guideline + GS1 General Specifications + ISO/IEC 15416 official page | Lock SSCC, GS1-128, placement, print-quality logic, and verification method for linear symbols |
+| Digital resilience | NIST SP 800-34 Rev.1 | Lock BIA, contingency, recovery priority, and offline fallback logic |
+| Media sanitization | NIST SP 800-88 Rev.2 | Lock sanitization program, validation, and storage-media handling |
+| Semiconductor safety/cleanliness | SEMI public standard pages, standard notices, customer specs | Lock S2, purity/particle/surface/material context, and prevent guessed acceptance limits |
 
-### Buoc 6. Chot nguon acceptance criteria
+### Step 6. Lock the acceptance-criteria source
 
-Thu tu uu tien:
-1. drawing/spec/PO/customer note;
+Priority order:
+
+1. drawing / spec / PO / customer note;
 2. released customer CSR;
-3. official standard/public appendix;
-4. approved processor or internal released specification annex.
+3. official standard / public appendix;
+4. approved processor source or internal released specification annex.
 
-Neu acceptance number nam trong paid standard khong public:
-- khong doan;
-- ghi ro `source-controlled requirement`;
-- dua master limit vao Specification Annex sau khi owner cung cap nguon.
+If the acceptance number lives in a paid standard that is not publicly available:
 
-### Buoc 7. Viet lai
+- do not guess;
+- mark it clearly as `source-controlled requirement`;
+- move the master limit into a Specification Annex after the owner provides the source.
 
-WI:
-- viet cho user thuc thi;
-- ngan, ro, co PASS/FAIL.
+### Step 7. Rewrite
 
-ANNEX:
-- viet theo bang/matrix/spec/map;
-- khong ke chuyen dai.
+For WI:
 
-### Buoc 8. QA va release
+- write for the actual user who performs the task;
+- keep it short, clear, and PASS/FAIL-oriented.
+
+For ANNEX:
+
+- write in table/matrix/spec/map form;
+- do not turn it into a long story.
+
+### Step 8. QA and release
 
 Check:
-- dung archetype chua?
-- dung source chua?
-- dung role/bundle chua?
-- con phase residue khong?
-- con duplicate/alias/fragment HTML khong?
+
+- is the archetype correct;
+- is the source correct;
+- are role/bundle rules correct;
+- is any phase residue still present;
+- are there duplicate/alias/fragment HTML issues left.
 
 ---
 
-## 4. Benchmark rules phai noi ro trong working notes
+## 4. Benchmark Rules That Must Be Recorded in Working Notes
 
-Nguoi sua phai luu ngoai than tai lieu:
-- link nguon;
-- ngay tra cuu;
-- yeu to benchmark da dung;
-- cho nao la fact;
-- cho nao la suy luan noi bo.
+The editor must keep these items outside the released document body:
 
-Mau de nghi:
+- source link;
+- lookup date;
+- which benchmark factor was used;
+- which part is fact;
+- which part is internal inference.
+
+Recommended template:
+
 - `templates/wi-annex-research-working-notes-template.md`
 
-Khong dua note bien tap va reasoning nay vao than WI/ANNEX phat hanh.
+Do not place these editorial notes or reasoning traces inside the released WI/ANNEX body.
 
 ---
 
-## 5. Rule suy luan tu benchmark
+## 5. Rule for Inference From Benchmarks
 
-Duoc phep suy luan neu:
-- nguon goc xac nhan huong dieu hanh;
-- context HESEM can muc tieu noi bo chat hon;
-- suy luan duoc danh dau ro trong working notes.
+Inference is allowed only when:
 
-Khong duoc suy luan:
+- the source confirms the operating direction;
+- the HESEM context requires a tighter internal target;
+- the inference is explicitly labeled in the working notes.
+
+Inference is not allowed for:
+
 - acceptance numbers;
-- mandatory fields cua standard/paper form;
+- mandatory fields from standards or paper forms;
 - barcode symbology;
-- sanitization/disposal claim;
+- sanitization/disposal claims;
 - customer-specific release rules.
 
 ---
 
-## 6. Rule thuc chien cho semiconductor/vacuum
+## 6. Practical Rule for Semiconductor/Vacuum Work
 
-1. Cleanroom/vacuum WI uu tien cao khi business target la semiconductor/vacuum.
-2. Method va thao tac de o WI.
-3. Surface/leak/cleanliness acceptance criteria de o Specification Annex.
-4. Khong hardcode so leak/surface/particle neu nguon goc chua duoc release vao he thong.
-
----
-
-## 7. Checklist hoan tat
-
-1. Da doc tai lieu cu chua?
-2. Da chot user that chua?
-3. Da chot archetype chua?
-4. Da tach sai-layer content chua?
-5. Da dung nguon chinh thong ben ngoai chua?
-6. Da xac nhan nguon acceptance criteria chua?
-7. Da chay QA HTML/archetype/phase residue chua?
+1. Cleanroom/vacuum WI documents have high priority when the business target is semiconductor/vacuum work.
+2. Method and task execution stay in the WI.
+3. Surface/leak/cleanliness acceptance criteria stay in a Specification Annex.
+4. Do not hardcode leak/surface/particle numbers unless the source has already been released into the system.
 
 ---
 
-## 8. Tai lieu doc cung
+## 7. Completion Checklist
+
+1. Have you read the old document?
+2. Have you locked the real user?
+3. Have you locked the archetype?
+4. Have you split out wrong-layer content?
+5. Have you used official external sources?
+6. Have you confirmed the acceptance-criteria source?
+7. Have you run HTML/archetype/phase-residue QA?
+
+---
+
+## 8. Read Together With
 
 - `13-sop-research-redraft-method.md`
 - `26-wi-archetypes-and-qa-guide.md`
@@ -188,3 +202,4 @@ Khong duoc suy luan:
 - `28-pou-visual-and-machine-side-rules.md`
 - `30-wi-annex-translation-role-bundle-rules.md`
 - `templates/wi-annex-research-working-notes-template.md`
+

@@ -1,24 +1,24 @@
-# 06 — Tiêu chuẩn thiết kế biểu mẫu Excel
+# 06 — Excel form design standards
 
-> Phiên bản: V0 | Hiệu lực: 2025-06-01 | Chủ sở hữu: QMS Engineer
-> Tổng hợp từ: CLAUDE-MAX-FORM-TEMPLATE-BRIEF-v1 + LEAN_FORM_SPECS
-
----
-
-## 1. Mục tiêu
-
-- Thống nhất bố cục, phong cách và cấu trúc cho toàn bộ 111 biểu mẫu Excel của HESEM.
-- Đảm bảo mọi form in được trên A4/A3, điền được bằng tay hoặc trên máy, ai cầm vào cũng biết phải làm gì.
-- Đồng bộ header, màu sắc, font chữ với hệ thống SOP/WI/ANNEX hiện hành.
-- Sẵn sàng cho ISO 9001:2026 và AS9100D ở mức thực tế HESEM.
+> Version: V0 | Effective: 2025-06-01 | Owner: QMS Engineer
+> Compiled from: CLAUDE-MAX-FORM-TEMPLATE-BRIEF-v1 + LEAN_FORM_SPECS
 
 ---
 
-## 2. Phân loại biểu mẫu — 6 loại
+## 1. Purpose
+
+- Unify the layout, style and structure for all 111 HESEM Excel forms.
+- Make sure all forms can be printed on A4/A3, filled out by hand or on a computer, and everyone who picks them up knows what to do.
+- Synchronize header, color, font with current SOP/WI/ANNEX system.
+- Ready for ISO 9001:2026 and AS9100D at HESEM practical level.
+
+---
+
+## 2. Form classification — 6 types
 
 ### 2.1 TYPE A: Checklist / Gate (38 forms)
 
-**Cấu trúc chuẩn:**
+**Standard structure:**
 
 ```
 Header (brand row + tiêu đề)
@@ -29,15 +29,15 @@ Approval (2 hoặc 3 cột): Prepared | Approved (| thêm cột nếu cần)
 Notice
 ```
 
-**Nguyên tắc:**
-- Gate KHÔNG có section riêng — gate chính là kết quả tổng hợp từ checklist.
-- Action tracker KHÔNG tách tab riêng — ghi trực tiếp trong checklist nếu HOLD/FAIL.
-- Ref fields tối đa 4 field (Job/WO, Part/Rev, Date, Owner).
-- Checklist items: 6-12 mục, mỗi mục có criteria rõ ràng và ô Result dạng dropdown.
+**Principles:**
+- Gate does NOT have its own section — gate is the summary result from the checklist.
+- Action tracker does NOT separate tabs — record directly in checklist if HOLD/FAIL.
+- Ref fields maximum 4 fields (Job/WO, Part/Rev, Date, Owner).
+- Checklist items: 6-12 items, each item has clear criteria and a dropdown Result box.
 
-**Danh sách form TYPE A:**
+**List of TYPE A forms:**
 
-| Mã | Tên | Ref fields | Số mục check | Approval |
+| Code | Name | Ref fields | Number of check items | Approval |
 |----|-----|-----------|-------------|----------|
 | FRM-102 | Document Change Request | Job/Doc# + Date/Owner | 6 | 2-col |
 | FRM-104 | Document Deployment Checklist | Doc# + Date/Owner | 6 | 2-col |
@@ -82,7 +82,7 @@ Notice
 
 ### 2.2 TYPE B: Report / Event (15 forms)
 
-**Cấu trúc chuẩn:**
+**Standard structure:**
 
 ```
 Header (brand row + tiêu đề)
@@ -93,14 +93,14 @@ Approval (2 cột)
 Notice
 ```
 
-**Nguyên tắc:**
-- Containment table KHÔNG tách riêng — gộp vào description.
-- Action tracker KHÔNG tách tab — ghi action trong description hoặc liên kết CAPA.
-- Description phải đủ rộng để ghi chi tiết sự kiện.
+**Principles:**
+- Containment table is NOT separate — included in description.
+- Action tracker DOES NOT separate tabs — record action in description or CAPA link.
+- Description must be large enough to record event details.
 
-**Danh sách form TYPE B:**
+**List of TYPE B forms:**
 
-| Mã | Tên | Ref fields | Ghi chú |
+| Code | Name | Ref fields | Notes |
 |----|-----|-----------|---------|
 | FRM-121 | Context Analysis SWOT/PESTLE | Period + Date | A4L |
 | FRM-124 | Climate Change Assessment | Period + Date | 1 tab |
@@ -114,7 +114,7 @@ Notice
 | FRM-712 | Helium Leak Test Record | Job/WO + Part/Rev | 1 tab |
 | FRM-714 | Ultrasonic Cleaning Batch | Batch# + Date | 1 tab |
 | FRM-801 | Training Plan | Year + Dept | A4L |
-| FRM-804 | Competence Assessment | Employee + Skill | 1 tab |
+| FRM-804 | Competence Assessment | Employee + Skills | 1 tab |
 | FRM-808 | Performance Review | Employee + Period | 1 tab |
 | FRM-811 | Incident Report | Incident# + Date | 1 tab |
 | FRM-911 | Management Review Minutes | Date + Attendees | A4L |
@@ -123,7 +123,7 @@ Notice
 
 ### 2.3 TYPE C: Data Log / Register (30 forms)
 
-**Cấu trúc chuẩn:**
+**Standard structure:**
 
 ```
 Header gọn (1 dòng title + 1 dòng subtitle, KHÔNG header 5 dòng đầy đủ)
@@ -131,15 +131,15 @@ Dòng tiêu đề cột
 Dòng dữ liệu (mở rộng được)
 ```
 
-**Nguyên tắc:**
-- Log form = bảng dữ liệu tác nghiệp. Header tối thiểu. Mật độ dữ liệu tối đa.
-- KHÔNG có section header, gate, approval (log không cần phê duyệt từng dòng).
-- Định dạng mặc định: A4L (ngang).
-- Cột phải đủ hẹp để in trên A4L, không vượt khổ.
+**Principles:**
+- Log form = operational data table. Minimum headers. Maximum data density.
+- NO section header, gate, approval (log does not need to approve each line).
+- Default format: A4L (landscape).
+- Columns must be narrow enough to print on A4L, not oversized.
 
-**Danh sách form TYPE C:**
+**List of TYPE C forms:**
 
-| Mã | Tên | Cột chính |
+| Code | Name | Main column |
 |----|-----|----------|
 | FRM-101 | Master Document Register | Code, Title, Rev, Date, Owner, Status |
 | FRM-105 | Peer Review Log | Doc#, Reviewer, Date, Result, Comments |
@@ -181,16 +181,16 @@ Dòng dữ liệu (mở rộng được)
 
 ### 2.4 TYPE D: Multi-tab ISO (8 forms)
 
-**Nguyên tắc:**
-- Chỉ dùng multi-tab khi ISO/AS bắt buộc tách hoặc nội dung quá rộng cho 1 tab.
-- Tối đa 2-3 tab. Hầu hết form "multi-tab" cũ giờ chỉ cần 1 tab format A4L/A3L.
+**Principles:**
+- Only use multi-tab when ISO/AS requires separation or the content is too large for 1 tab.
+- Maximum 2-3 tabs. Most old "multi-tab" forms now only need 1 tab in A4L/A3L format.
 
-| Mã | Tên | Tab 1 | Tab 2 | Lý do |
+| Code | Name | Tab 1 | Tab 2 | Reason |
 |----|-----|-------|-------|-------|
-| FRM-132 | PFMEA Lite | PFMEA matrix (A3L) | — | 1 tab A3L đủ |
-| FRM-133 | Control Plan | Control Plan (A3L) | — | 1 tab A3L đủ |
-| FRM-302 | Setup Sheet | Setup (A3L) | Tool List (A4P) | 2 tabs: setup rộng + tool list riêng |
-| FRM-311 | FAI Report | FAI+Char (A4L) | Matl/Proc (A4P) | 2 tabs: AS9102 yêu cầu tách |
+| FRM-132 | PFMEA Lite | PFMEA matrix (A3L) | — | 1 A3L tab is enough |
+| FRM-133 | Control Plan | Control Plan (A3L) | — | 1 A3L tab is enough |
+| FRM-302 | Setup Sheet | Setup (A3L) | Tool List (A4P) | 2 tabs: general setup + separate tool list |
+| FRM-311 | FAI Report | FAI+Char (A4L) | Matl/Proc (A4P) | 2 tabs: AS9102 separation requirements |
 | FRM-621 | AQL Inspection Record | Record (A4L) | — | 1 tab |
 | FRM-631 | SPC/Process Capability | Data+Chart (A4L) | — | 1 tab |
 | FRM-641 | Final Inspection Report | Report (A4L) | — | 1 tab |
@@ -200,11 +200,11 @@ Dòng dữ liệu (mở rộng được)
 
 ### 2.5 TYPE E: Print Labels (5 forms)
 
-**Nguyên tắc:**
-- Kích thước in cố định, phù hợp máy in nhãn hoặc cắt từ A4.
-- Nội dung tối giản: chỉ thông tin cần thiết để nhận dạng.
+**Principles:**
+- Fixed print size, suitable for label printers or cut from A4.
+- Minimal content: only necessary information for identification.
 
-| Mã | Tên | Fields |
+| Code | Name | Fields |
 |----|-----|--------|
 | FRM-703 | WIP Tag | Job#, Part/Rev, Qty, Operation, Status |
 | FRM-704 | Part ID Label | Part#, Rev, Material, Lot# |
@@ -216,11 +216,11 @@ Dòng dữ liệu (mở rộng được)
 
 ### 2.6 TYPE F: MSA / Statistical (3 forms)
 
-**Nguyên tắc:**
-- Form chứa nhiều phép tính, sử dụng công thức Excel auto-calc.
-- Dữ liệu nhập vào grid, kết quả tự tính EV/AV/GRR%, bias, linearity, stability.
+**Principles:**
+- Form contains many calculations, using Excel auto-calc formula.
+- Data input into grid, results automatically calculate EV/AV/GRR%, bias, linearity, stability.
 
-| Mã | Tên | Format | Ghi chú |
+| Code | Name | Format | Notes |
 |----|-----|--------|---------|
 | FRM-611 | GR&R Study | A4L | Data grid + auto-calc EV/AV/GRR% |
 | FRM-612 | Bias/Linearity/Stability | A4L | Data grid + auto-calc |
@@ -228,90 +228,90 @@ Dòng dữ liệu (mở rộng được)
 
 ---
 
-## 3. Quy cách thiết kế chung
+## 3. General design specifications
 
-### 3.1 Font chữ
+### 3.1 Fonts
 
-| Mục đích | Font | Cỡ | Kiểu |
+| Purpose | Fonts | Size | Type |
 |----------|------|----|------|
-| Tiêu đề form | Segoe UI | 16 pt | Bold |
-| Section header | Segoe UI | 11 pt | Bold, chữ trắng |
-| Label ô | Segoe UI | 9 pt | Regular |
-| Dữ liệu nhập | Segoe UI | 10 pt | Regular |
+| Form title | Segoe UI | 16 points | Bold |
+| Section header | Segoe UI | 11 points | Bold, white text |
+| Label cell | Segoe UI | 9 points | Regular |
+| Input data | Segoe UI | 10 points | Regular |
 | Notice / footer | Segoe UI | 8 pt | Italic |
 
-### 3.2 Bảng màu chuẩn
+### 3.2 Standard color palette
 
-| Thành phần | Mã màu | Mô tả |
+| Ingredients | Color code | Description |
 |-----------|--------|-------|
-| Brand row (dòng thương hiệu) | `#0C2D48` nền, chữ trắng | Navy đậm, dòng đầu tiên của form |
-| Accent blue | `#1565C0` | Dùng cho đường kẻ nhấn, icon |
-| Gold accent | `#F9A825` | Dùng tiết chế cho nhấn mạnh đặc biệt |
-| Section header | Dark blue nền, chữ trắng | Phân chia section rõ ràng |
-| Label cells | Light gray `#F5F5F5` hoặc table blue `#E8EAF6` | Ô mô tả, tiêu đề cột |
-| Input cells | Very light blue `#E3F2FD` | Ô người dùng nhập liệu |
-| Nền trống | Trắng `#FFFFFF` | Vùng không dùng |
+| Brand row (brand line) | `#0C2D48` background, white text | Dark navy, first line of form |
+| Accent blue | `#1565C0` | Used for accent lines, icons |
+| Gold accent | `#F9A825` | Use moderation for special emphasis |
+| Section header | Dark blue background, white text | Divide sections clearly |
+| Label cells | Light gray `#F5F5F5` or table blue `#E8EAF6` | Description box, column title |
+| Input cells | Very light blue `#E3F2FD` | User input box |
+| Blank background | White `#FFFFFF` | Unused area |
 
-### 3.3 Meta box (góc phải header)
+### 3.3 Meta box (right corner of header)
 
-Mỗi form PHẢI có meta box ở góc trên bên phải chứa:
+Each form MUST have a meta box in the upper right corner containing:
 
-| Field | Ví dụ |
+| Field | Example |
 |-------|-------|
-| Mã biểu mẫu | FRM-511 |
-| Phiên bản | Rev 0 |
-| Ngày hiệu lực | 2025-06-01 |
-| Chủ sở hữu | Production Manager |
-| Người phê duyệt | QA Manager |
+| Form code | FRM-511 |
+| Version | Rev 0 |
+| Effective date | 2025-06-01 |
+| Owner | Production Manager |
+| Approver | QA Manager |
 
-### 3.4 Bố cục và in ấn
+### 3.4 Layout and printing
 
-- **Khổ giấy:** A4 Portrait (mặc định) hoặc A4 Landscape / A3 Landscape (ghi rõ trong danh mục).
-- **Chiều rộng:** PHẢI vừa 1 trang chiều ngang. Không cho phép tràn sang trang 2 theo chiều ngang.
-- **Gridlines:** TẮT khi in. Dùng border ô thay cho gridlines.
-- **Margins:** Gọn — Top/Bottom: 1.5 cm, Left/Right: 1.0 cm.
-- **Footer:** Mã form + "Page X of Y" ở góc phải dưới.
-- **Signature boxes:** Đủ rộng để ký tay khi in (tối thiểu 2.5 cm cao, 5 cm rộng).
+- **Paper size:** A4 Portrait (default) or A4 Landscape / A3 Landscape (specified in the catalog).
+- **Width:** MUST fit 1 page horizontally. Do not allow horizontal overflow to page 2.
+- **Gridlines:** OFF when printing. Use cell borders instead of gridlines.
+- **Margins:** Compact — Top/Bottom: 1.5 cm, Left/Right: 1.0 cm.
+- **Footer:** Form code + "Page X of Y" in the lower right corner.
+- **Signature boxes:** Large enough to hand sign when printing (minimum 2.5 cm high, 5 cm wide).
 
-### 3.5 Border
+### 3.5 Borders
 
-- Dùng border mảnh (thin), đều, chuyên nghiệp.
-- Border ngoài section: medium.
-- KHÔNG dùng border dày (thick) tràn lan.
-- KHÔNG để ô trống không có border trong vùng dữ liệu.
+- Use thin, even, professional borders.
+- Border outside section: medium.
+- DO NOT use thick borders widely.
+- DO NOT leave blank cells without borders in the data area.
 
 ---
 
-## 4. Sheet bắt buộc trong mỗi file Excel
+## 4. Sheet required in every Excel file
 
-Mỗi file `.xlsx` PHẢI có tối thiểu 3 sheet:
+Each file `.xlsx` MUST have at least 3 sheets:
 
 ### Sheet 1: MASTER-TEMPLATE
 
-- Sheet chính chứa biểu mẫu trống, sẵn sàng sử dụng.
-- Tên sheet: `MASTER-TEMPLATE`
-- Đây là bản gốc. Người dùng copy sheet này để điền dữ liệu mới.
+- The main sheet contains a blank, ready-to-use form.
+- Sheet name: `MASTER-TEMPLATE`
+- This is the original. The user copies this sheet to fill in new data.
 
 ### Sheet 2: EXAMPLE-FRM-XXX
 
-- Sheet ví dụ đã điền mẫu, giúp người dùng hiểu cách điền.
-- Tên sheet: `EXAMPLE-FRM-XXX` (thay XXX bằng mã form, ví dụ: `EXAMPLE-FRM-511`).
-- Dữ liệu ví dụ phải thực tế, không dùng "test", "abc", "xxx".
+- Example sheet with filled out form, helping users understand how to fill out.
+- Sheet name: `EXAMPLE-FRM-XXX` (replace XXX with form code, for example: `EXAMPLE-FRM-511`).
+- Example data must be realistic, do not use "test", "abc", "xxx".
 
-### Sheet 3: LISTS (ẩn)
+### Sheet 3: LISTS (hidden)
 
-- Sheet chứa danh sách giá trị cho dropdown (Data Validation).
-- Tên sheet: `LISTS`
-- Trạng thái: **Hidden** (ẩn, người dùng không thấy).
-- Cột A trở đi: mỗi cột là một danh sách dropdown.
+- Sheet contains list of values for dropdown (Data Validation).
+- Sheet name: `LISTS`
+- Status: **Hidden** (hidden, users cannot see).
+- Column A onwards: each column is a dropdown list.
 
 ---
 
-## 5. Dropdown chuẩn
+## 5. Standard dropdown
 
-Các danh sách dropdown sau PHẢI nhất quán trên toàn bộ 111 form:
+The following dropdown lists MUST be consistent across all 111 forms:
 
-### 5.1 Kết quả kiểm tra
+### 5.1 Test results
 
 ```
 PASS
@@ -320,7 +320,7 @@ FAIL
 NA
 ```
 
-### 5.2 Quyết định phê duyệt
+### 5.2 Approval decision
 
 ```
 APPROVED
@@ -329,7 +329,7 @@ CONDITIONAL
 ON HOLD
 ```
 
-### 5.3 Trạng thái mục
+### 5.3 Item Status
 
 ```
 OPEN
@@ -338,7 +338,7 @@ CLOSED
 MONITORING
 ```
 
-### 5.4 Mức độ nghiêm trọng / ưu tiên
+### 5.4 Severity / priority
 
 ```
 LOW
@@ -347,9 +347,9 @@ HIGH
 CRITICAL
 ```
 
-### 5.5 Dropdown bổ sung theo loại form
+### 5.5 Additional dropdown by form type
 
-| Ngữ cảnh | Giá trị |
+| Context | Value |
 |-----------|---------|
 | Disposition (NCR) | USE AS IS / REWORK / SCRAP / RETURN TO SUPPLIER / MRB |
 | Shift | DAY / NIGHT / A / B / C |
@@ -358,24 +358,24 @@ CRITICAL
 
 ---
 
-## 6. Điều cấm
+## 6. Prohibition
 
-| # | Điều cấm | Lý do |
+| # | Prohibition | Reason |
 |---|---------|-------|
-| 1 | Không tô quá nhiều màu | Gây rối mắt, khó in, không chuyên nghiệp |
-| 2 | Không để text nhỏ hơn 8pt | Không đọc được khi in |
-| 3 | Không merge ô tràn lan | Gây khó nhập liệu, khó copy, lỗi khi lọc |
-| 4 | Không để bảng rộng vượt A4 | Phải in được trên 1 trang chiều ngang |
-| 5 | Không nhắc "AI", "generated", "from merged document" | Form là tài liệu chính thức, không ghi nguồn gốc tạo |
-| 6 | Không dùng icon, shape, watermark gây nhiễu | Giữ layout sạch, chuyên nghiệp |
-| 7 | Không tạo layout đẹp nhưng khó nhập | Ưu tiên dùng được trước, đẹp sau |
-| 8 | Không duplicate dữ liệu đã có trong Epicor/M365 | Chỉ ghi dữ liệu cần để ra quyết định và lưu bằng chứng |
-| 9 | Không tạo chồng lấn giữa form này với form khác | Mỗi form một mục đích, không trùng scope |
-| 10 | Không tự bịa logic không có trong SOP/WI/ANNEX | Form PHẢI bám quy trình active |
+| 1 | Don't add too many colors | Disturbing, difficult to print, unprofessional |
+| 2 | Do not leave text smaller than 8pt | Unreadable when printing |
+| 3 | Do not merge cells everywhere | Causes difficulty in data entry, difficulty in copying, errors when filtering |
+| 4 | Do not let the board exceed A4 | Must be able to print on 1 page horizontally |
+| 5 | Do not prompt "AI", "generated", "from merged document" | Form is an official document, the origin is not recorded
+| 6 | Do not use icons, shapes, or watermarks that cause interference Keep the layout clean and professional |
+| 7 | Does not create a beautiful layout but is difficult to enter | Prioritize usability first, beauty later |
+| 8 | Do not duplicate existing data in Epicor/M365 | Record only the data needed to make decisions and save evidence |
+| 9 | Do not create overlap between this form and other forms | Each form has a purpose, no overlapping scope |
+| 10 | Do not make up logic that is not in SOP/WI/ANNEX | The form MUST adhere to the active | process
 
 ---
 
-## 7. Quy tắc đặt tên file
+## 7. File naming rules
 
 ### 7.1 Pattern
 
@@ -383,20 +383,20 @@ CRITICAL
 FRM-XXX_Description_With_Underscores.xlsx
 ```
 
-**Ví dụ:**
+**For example:**
 - `FRM-511_Setup_And_First_Piece_Record.xlsx`
 - `FRM-651_NCR_Report.xlsx`
 - `FRM-101_Master_Document_Register.xlsx`
 
-### 7.2 Quy tắc
+### 7.2 Rules
 
-- Mã form luôn viết hoa: `FRM-XXX`.
-- Dấu gạch dưới `_` giữa các từ trong phần mô tả.
-- Không dấu tiếng Việt trong tên file.
-- Không khoảng trắng trong tên file.
-- Phần mở rộng luôn `.xlsx`.
+- Form code is always capitalized: `FRM-XXX`.
+- Underscore `_` between words in the description.
+- No Vietnamese accents in the file name.
+- No spaces in the file name.
+- The extension is always `.xlsx`.
 
-### 7.3 Thư mục lưu trữ
+### 7.3 Storage folder
 
 ```
 04-Bieu-Mau/
@@ -413,41 +413,41 @@ FRM-XXX_Description_With_Underscores.xlsx
 
 ---
 
-## 8. Quy tắc bổ sung cho form tác nghiệp xưởng
+## 8. Additional rules for factory operations form
 
-Form dùng ngoài xưởng (TYPE A liên quan production) PHẢI có các field sau trong Ref block:
+Forms used outside the factory (TYPE A related to production) MUST have the following fields in the Ref block:
 
-| Field | Bắt buộc | Ghi chú |
+| Field | Required | Notes |
 |-------|---------|---------|
-| Job No / WO | PHẢI | Mã công việc từ Epicor |
-| Part No | PHẢI | Mã chi tiết |
-| Rev | PHẢI | Phiên bản bản vẽ |
-| Operation | NÊN | Nguyên công hiện tại |
-| Shift | NÊN | Ca làm việc |
-| Date | PHẢI | Ngày thực hiện |
-| Operator | PHẢI | Người thực hiện |
-| QA Hold logic | PHẢI (nếu có gate) | Điều kiện dừng / giữ hàng |
+| Job No / WO | MUST | Job code from Epicor |
+| Part No | MUST | Detailed code |
+| Rev | MUST | Drawing version |
+| Operation | SHOULD | Current work |
+| Shift | SHOULD | Shift |
+| Date | MUST | Implementation date |
+| Operator | MUST | Implementer |
+| QA Hold logic | MUST (if there is a gate) | Conditions for stopping / holding goods |
 
 ---
 
-## 9. Quy tắc kế thừa từ hệ thống tài liệu
+## 9. Rules inherited from the document system
 
-- Giữ cấu trúc thư viện hiện hành làm khung đích.
-- Không dịch tên file, slug, mã tài liệu sang tiếng Việt.
-- Chỉ Việt hóa nội dung bên trong form.
-- Giọng văn ngắn, rõ, dùng để thi hành. Không meta text.
-- Form PHẢI bám SOP/WI/ANNEX active, không tự bịa logic.
-- Form PHẢI có gate, owner, evidence, decision và approval khi cần.
-- Thiết kế PHẢI phù hợp ISO 9001:2026 và sẵn sàng cho AS9100D.
+- Keep the current library structure as the target framework.
+- Do not translate file names, slugs, and document codes into Vietnamese.
+- Only Vietnameseize the content inside the form.
+- The tone is short, clear, used for execution. No meta text.
+- Form MUST follow SOP/WI/ANNEX active, do not make up logic.
+- Form MUST have gate, owner, evidence, decision and approval when needed.
+- Design MUST be ISO 9001:2026 compliant and AS9100D ready.
 
 ---
 
-## 10. Tổng kết tinh gọn
+## 10. Lean summary
 
-| Chỉ số | Cũ | Mới | Giảm |
+| Index | Old | New | Reduce |
 |--------|-----|------|------|
-| Tổng visible tabs | ~200+ | 111 (1 tab/form) | -50% |
-| Ref fields trung bình | 8-16 | 2-4 | -65% |
-| Sections trung bình | 5 | 3 | -40% |
-| Forms có Gate section riêng | 38 | 0 (gate = checklist result) | -100% |
-| Forms có Action tab riêng | 40+ | 0 (action trong form hoặc link CAPA) | -100% |
+| Total visible tabs | ~200+ | 111 (1 tab/form) | -50% |
+| Average Ref fields | 8-16 | 2-4 | -65% |
+| Average Sections | 5 | 3 | -40% |
+| Forms has its own Gate section | 38 | 0 (gate = checklist result) | -100% |
+| Forms has its own Action tab | 40+ | 0 (action in form or CAPA link) | -100% |

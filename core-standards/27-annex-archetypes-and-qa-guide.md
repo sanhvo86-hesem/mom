@@ -1,145 +1,149 @@
-# 27. ANNEX archetypes and QA guide
+# 27. ANNEX Archetypes and QA Guide
 
 > Version: v1 | Date: 2026-03-30 | Owner: QMS Engineer
 
 ---
 
-## 1. Muc tieu
+## 1. Purpose
 
-Tai lieu nay bo sung cho `08-document-types.md` de khoa `archetype` cho ANNEX.
+This document extends `08-document-types.md` to lock the ANNEX archetype standard.
 
-ANNEX la tai lieu tham chieu co cau truc linh hoat, nhung khong duoc linh tinh.
-Muc tieu:
-- ANNEX la bang tra, matrix, method, map, spec hoac worked example;
-- ANNEX khong bien thanh narrative SOP;
-- ANNEX khong gianh viec voi WI;
-- moi ANNEX chi giu mot domain logic ro rang.
+An ANNEX is a flexible reference document, but it must not become a miscellaneous dump.
+The purpose is to ensure that:
 
----
-
-## 2. Nguyen tac nen
-
-1. ANNEX la tai lieu `lookup and control support`, khong phai tai lieu ke chuyen.
-2. ANNEX phai co it nhat mot bang, matrix, map hoac block specification co cau truc.
-3. ANNEX khong duoc dung de che mot SOP/WI chua viet xong.
-4. Neu nguoi doc can lam theo tung buoc tai diem su dung, do la WI.
-5. Neu tai lieu dang dinh nghia gate, role authority, boundary quy trinh cap he thong, do la SOP.
-6. Published ANNEX header phai khoa o muc family, khong duoc chen archetype, series hoac domain vao subtitle:
-   - subtitle bat buoc: `Tài liệu vận hành • Annex`;
-   - meta labels bat buoc: `Mã`, `Phiên bản`, `Ngày hiệu lực`, `Chủ sở hữu`, `Phê duyệt`;
-   - archetype nhu `Method`, `Rule-Pack`, `Dictionary`, `Specification` chi o core standard, decision log va working notes.
-7. Header ANNEX phai giu ma tai lieu va ten tai lieu thanh hai truong rieng trong runtime; title block chi hien `doc-name` va `sub-vn`, con ma tai lieu hien o hang meta. Portal runtime khong duoc ghep `ANNEX-xxx` voi ten tai lieu thanh mot chuoi plain text.
+- an ANNEX is a lookup table, matrix, method, map, specification, or worked example;
+- an ANNEX does not turn into SOP narrative;
+- an ANNEX does not steal work from a WI;
+- each ANNEX keeps one clear logic domain.
 
 ---
 
-## 3. Bay ANNEX archetypes duoc phep
+## 2. Foundation Principles
 
-| Archetype | Dung cho | Dinh dang uu tien |
+1. An ANNEX is a `lookup and control support` document, not a storytelling document.
+2. An ANNEX must contain at least one structured table, matrix, map, or specification block.
+3. An ANNEX must not be used to hide an SOP/WI that has not yet been written.
+4. If the reader must follow step-by-step action at point of use, the document is a WI.
+5. If the document defines gates, role authority, or system-level process boundaries, the document is a SOP.
+6. The published ANNEX header must stay locked at the family level and must not inject archetype, series, or domain wording into the subtitle:
+- required subtitle: `T?i li?u v?n h?nh ? Annex`;
+   - required meta labels: `M?`, `Phi?n b?n`, `Ng?y hi?u l?c`, `Ch? s? h?u`, `Ph? duy?t`;
+   - archetypes such as `Method`, `Rule-Pack`, `Dictionary`, `Specification` belong only in core standards, decision logs, and working notes.
+7. The ANNEX header must keep document code and document title as two separate runtime fields; the title block shows `doc-name` and `sub-vn`, while the code stays in the meta row. Portal runtime must not concatenate `ANNEX-xxx` and the title into one plain-text string.
+
+---
+
+## 3. Seven Allowed ANNEX Archetypes
+
+| Archetype | Used for | Preferred format |
 |---|---|---|
-| `Matrix Annex` | RACI, authority, access, deputy, cross-reference | Bang 2 chieu |
-| `Method Annex` | Sampling, formula, calculation, method logic, reaction method | Bang + cong thuc + vi du ngan |
-| `Rule-Pack Annex` | Tap quy tac domain cu the | Danh sach quy tac + consequence |
+| `Matrix Annex` | RACI, authority, access, deputy, cross-reference | 2D table |
+| `Method Annex` | Sampling, formula, calculation, method logic, reaction method | Table + formula + short example |
+| `Rule-Pack Annex` | A domain-specific rule set | Rule list + consequence |
 | `Dictionary Annex` | KPI dictionary, data dictionary, term/code table | Lookup table |
-| `Map/Topology Annex` | Process map, system topology, org map, route map | So do + legend + table |
-| `Worked Example Annex` | Evidence pack mau, case minh hoa, sample packet | Example pack co giai thich |
-| `Specification Annex` | Acceptance criteria, material/surface/package/spec limits | Bang parameter-target-method-source |
+| `Map/Topology Annex` | Process map, system topology, org map, route map | Diagram + legend + table |
+| `Worked Example Annex` | Example evidence pack, sample case, sample packet | Example pack with explanation |
+| `Specification Annex` | Acceptance criteria, material/surface/package/spec limits | Parameter-target-method-source table |
 
 ---
 
 ## 4. Matrix Annex
 
-### Dung khi
+### When to use it
 
-- Vai tro x quyen.
+- Role x authority.
 - Role x gate.
 - Department x interface.
 - Deputy x absence coverage.
 
-### Khong dung khi
+### When not to use it
 
-- Can giai thich step thao tac.
-- Can governance narrative dai.
+- When step-by-step action explanation is needed.
+- When the document needs long governance narrative.
 
 ### QA checklist
 
-- Hang/cot co ro y nghia khong?
-- Co mot nguon authority ro khong?
-- Co can narrative dai hon 2-3 cau mo dan khong? Neu co, kha nang sai type.
+- Do rows and columns have clear meaning?
+- Is there one clear authority source?
+- Does the document need more than 2-3 opening narrative sentences? If yes, the type is probably wrong.
 
 ---
 
 ## 5. Method Annex
 
-### Dung khi
+### When to use it
 
-- AQL, MSA, SPC-lite, calculation rule, method decision tree.
-- Phuong phap do/phan loai can cong thuc, bang tra, rule phan ung.
+- AQL, MSA, SPC-lite, calculation rule, or decision tree.
+- Measurement/classification methods that require formulas, lookup tables, or reaction rules.
 
-Template copy-paste mac dinh:
+Default copy-paste template:
+
 - `templates/annex-method-template.html`
-- Template nay khoa method logic, formula/table, decision rule, vi du ngan va note quay ve WI/SOP khi can thao tac.
-- Header published cua template van phai dung subtitle family-level, khong doi thanh `Method Annex`.
+- It locks method logic, formula/table blocks, decision rules, short examples, and the note that sends the reader back to WI/SOP when execution is required.
+- The published header still stays at the family-level subtitle and must not be renamed to `Method Annex`.
 
-### Khong dung khi
+### When not to use it
 
-- Step thao tac tai may/do ban.
-- Acceptance target thuan tuy.
+- Machine-side or bench-side action steps.
+- Pure acceptance target tables with no method logic.
 
 ### QA checklist
 
-- Co cong thuc, bang tra, sample input/output hoac decision rule khong?
-- Co bi tron voi checklist thao tac khong?
-- Co cho nguoi doc biet khi nao phai quay ve WI/SOP khong?
+- Does it contain formulas, lookup tables, sample input/output, or decision rules?
+- Is it mixed with an execution checklist?
+- Does it tell the reader when to go back to the WI/SOP?
 
 ---
 
 ## 6. Rule-Pack Annex
 
-### Dung khi
+### When to use it
 
-- Domain co nhieu quy tac dispatch, FIFO, packaging, receiving, FOD, governance rule.
+- Domains with many dispatch, FIFO, packaging, receiving, FOD, or governance rules.
 
-### Cau truc toi thieu
+### Minimum structure
 
-Moi rule nen co:
+Each rule should include:
+
 - condition;
 - action;
-- owner hoac enforcing actor;
-- consequence neu vi pham.
+- owner or enforcing actor;
+- consequence when violated.
 
-Template copy-paste mac dinh:
+Default copy-paste template:
+
 - `templates/annex-rule-pack-template.html`
-- Template nay khoa `Rule ID`, `Condition`, `Action`, `Owner`, `Consequence`, khong cho ANNEX tro thanh procedure step-by-step.
-- Header published cua template van phai dung subtitle family-level, khong doi thanh `Rule-Pack Annex`.
+- It locks `Rule ID`, `Condition`, `Action`, `Owner`, and `Consequence`, and prevents the ANNEX from becoming a step-by-step procedure.
+- The published header still stays at the family-level subtitle and must not be renamed to `Rule-Pack Annex`.
 
 ### QA checklist
 
-- Co rule numbering ro khong?
-- Co action/consequence ro khong?
-- Co dang trut vao do ca procedure step-by-step khong?
+- Is rule numbering clear?
+- Are action and result clear?
+- Is a step-by-step procedure being dumped into the rule pack?
 
 ---
 
 ## 7. Dictionary Annex
 
-### Dung khi
+### When to use it
 
 - KPI dictionary.
-- Metadata/data field list.
+- Metadata/data-field list.
 - SSCC data dictionary.
 - Code mapping.
 
 ### QA checklist
 
-- Co khoa lookup ro khong?
-- Co dinh nghia tung field/code ro khong?
-- Co them governance narrative khong can thiet khong?
+- Is the lookup key clear?
+- Is every field/code clearly defined?
+- Is unnecessary governance narrative being added?
 
 ---
 
 ## 8. Map/Topology Annex
 
-### Dung khi
+### When to use it
 
 - Org chart.
 - Site/library topology.
@@ -148,15 +152,15 @@ Template copy-paste mac dinh:
 
 ### QA checklist
 
-- Co so do/legend/bang giai nghia khong?
-- Co ro `what is mapped` va `what is not mapped` khong?
-- Co bi bien thanh handbook ke chuyen khong?
+- Is there a diagram, legend, and explanation table?
+- Is it clear `what is mapped` and `what is not mapped`?
+- Is the ANNEX drifting into handbook-style narrative?
 
 ---
 
 ## 9. Worked Example Annex
 
-### Dung khi
+### When to use it
 
 - Example evidence pack.
 - Poka-yoke example library.
@@ -164,14 +168,14 @@ Template copy-paste mac dinh:
 
 ### QA checklist
 
-- Co danh dau ro day la `example`, khong phai rule goc khong?
-- Co tieu chi de nguoi doc biet khi nao noi dung chi mang tinh minh hoa khong?
+- Is the content clearly marked as an `example`, not a primary rule?
+- Are there criteria that show when the content is illustrative only?
 
 ---
 
 ## 10. Specification Annex
 
-### Dung khi
+### When to use it
 
 - Surface finish.
 - Vacuum compatibility.
@@ -179,64 +183,65 @@ Template copy-paste mac dinh:
 - Leak acceptance criteria.
 - Cleanliness thresholds.
 
-### Quy tac quan trong
+### Important rules
 
-1. Spec table la noi dat `parameter`, `target`, `tolerance`, `unit`, `method`, `source`.
-2. Neu so lieu goc nam trong customer spec, drawing, PO, paid standard hoac processor cert, ANNEX phai dan nguon do, khong duoc tu doan so.
-3. WI chi nhac lai nguong toi thieu can thao tac, khong duoc tro thanh noi chua master acceptance criteria.
+1. The specification table is where `parameter`, `target`, `tolerance`, `unit`, `method`, and `source` belong.
+2. If original values come from a customer spec, drawing, PO, paid standard, or processor certificate, the ANNEX must cite that source and must not invent numbers.
+3. A WI may only repeat the minimum cue needed for execution and must not become the master store of acceptance criteria.
 
-Template copy-paste mac dinh:
+Default copy-paste template:
+
 - `templates/annex-specification-template.html`
-- Template nay khoa bang `parameter-target-tolerance-unit-method-source` va note `source-controlled requirement` khi so lieu goc chua duoc release vao he thong.
-- Header published cua template van phai dung subtitle family-level, khong doi thanh `Specification Annex`.
+- It locks the `parameter-target-tolerance-unit-method-source` table and the `source-controlled requirement` note when the original source has not yet been released into the system.
+- The published header still stays at the family-level subtitle and must not be renamed to `Specification Annex`.
 
 ### QA checklist
 
-- Co bang parameter-target-method-source khong?
-- Co don vi do va nguon goc khong?
-- Co nhot method step-by-step vao ANNEX nay khong?
+- Is there a parameter-target-method-source table?
+- Are measurement units and original source visible?
+- Has step-by-step method content been pushed into the ANNEX?
 
 ---
 
-## 11. Canonical location va duplicate rule
+## 11. Canonical Location and Duplicate Rule
 
-1. ANNEX moi phai song tai `series-folder` chinh thuc.
-2. Khong tao ban root duplicate cho cung basename.
-3. Neu can backward compatibility, chi duoc dung alias co kiem soat tam thoi va phai co backlog de xoa.
-4. Canonical path uu tien:
-   - path nam trong subfolder chuc nang;
-   - file co wrapper HTML day du;
-   - file co header/meta hop le;
-   - file co noi dung moi nhat da duoc QA.
+1. Every ANNEX must live in its official `series-folder`.
+2. Do not create a duplicate root copy with the same basename.
+3. If backward compatibility is required, only a temporary controlled alias is allowed and it must have a removal backlog.
+4. Canonical path priority is:
+   - path inside the functional subfolder;
+   - file with full HTML wrapper;
+   - file with valid header/meta;
+   - newest QA-approved content.
 
 ---
 
-## 12. Ranh gioi ANNEX - WI - SOP
+## 12. ANNEX - WI - SOP Boundary
 
-| Noi dung | SOP | WI | ANNEX |
+| Content | SOP | WI | ANNEX |
 |---|---|---|---|
-| Authority/quyen giu cong | Yes | No | Matrix support only |
-| Step thuc thi | No | Yes | No |
-| Formula/bang tra/spec | No | No | Yes |
-| Example packet | No | Han che | Yes |
-| Topology/map | Han che | No | Yes |
+| Authority / approval control | Yes | No | Matrix support only |
+| Execution steps | No | Yes | No |
+| Formula / lookup table / spec | No | No | Yes |
+| Example packet | No | Limited | Yes |
+| Topology / map | Limited | No | Yes |
 
 ---
 
-## 13. QA gate truoc phat hanh
+## 13. Pre-Release QA Gate
 
-Truoc khi release ANNEX, phai tra loi duoc:
+Before releasing an ANNEX, you must answer:
 
-1. Archetype nao?
-2. Co bang/matrix/spec/map ro rang chua?
-3. Co phan narrative nao dang lam viec cua SOP/WI khong?
-4. Co duplicate basename hay alias cu khong?
-5. Co link sang SOP/WI/FRM dung boi canh su dung khong?
-6. Co wrapper HTML day du, title/header/meta va anchor on dinh khong?
+1. Which archetype is it?
+2. Is the table/matrix/spec/map structure already clear?
+3. Is any narrative doing the job of a SOP/WI?
+4. Is there a duplicate basename or a legacy alias?
+5. Does it link to the right SOP/WI/FRM context?
+6. Does it have complete HTML wrapper, title/header/meta, and stable anchors?
 
 ---
 
-## 14. Tai lieu doc cung
+## 14. Read Together With
 
 - `08-document-types.md`
 - `11-html-structure-guide.md`
@@ -246,3 +251,4 @@ Truoc khi release ANNEX, phai tra loi duoc:
 - `templates/annex-method-template.html`
 - `templates/annex-rule-pack-template.html`
 - `templates/annex-specification-template.html`
+

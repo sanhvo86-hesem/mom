@@ -1,21 +1,21 @@
-# 14 — Kiến trúc M365 SharePoint và lưu trữ hồ sơ vận hành
+# 14 — M365 SharePoint architecture and operational record keeping
 
-> Thiết kế kiến trúc SharePoint 4-site cho lưu trữ hồ sơ, backup tài liệu, và đồng bộ với web portal.
-> Web portal (qms.hesem.com.vn) = nơi ĐỌC duy nhất. SharePoint = backup + lưu trữ hồ sơ vận hành.
+> Design a 4-site SharePoint architecture for record storage, document backup, and synchronization with web portal.
+> Web portal (qms.hesem.com.vn) = the only place to READ. SharePoint = backup + operational record storage.
 
 ---
 
-## 1. Nguyên tắc kiến trúc
+## 1. Architectural principles
 
-| # | Nguyên tắc | Mô tả |
+| # | Principles | Description |
 |---|-----------|-------|
-| 1 | **Web portal = đọc, SharePoint = lưu** | Mọi người đọc tài liệu trên web. SharePoint chỉ lưu hồ sơ vận hành (form đã điền, evidence) và backup source. |
-| 2 | **Site = security boundary** | Mỗi site = 1 mức nhạy cảm, 1 nhóm người dùng chính. Tách IP khách hàng ra site riêng. |
-| 3 | **Epicor = SoR, SharePoint = SSOT** | Epicor quản lý transaction (job, PO, inventory). SharePoint quản lý documents và evidence. Link, không copy. |
-| 4 | **Flat folder + metadata** | Tối đa 3 tầng folder. Dùng SharePoint metadata columns thay vì sub-folder sâu. |
-| 5 | **OneDrive cho file cá nhân** | Không tạo Employee Workbench trong SharePoint. Mỗi user dùng OneDrive (1TB/user trong Business Basic). |
-| 6 | **Group-based permission** | Phân quyền theo Entra ID Security Groups, không gán per-user. |
-| 7 | **Form blank tải từ web** | Form template (.xlsx) phục vụ từ web server. SharePoint chỉ chứa form đã điền và evidence. |
+| 1 | **Web portal = read, SharePoint = save** | People read documents on the web. SharePoint only stores operational records (filled forms, evidence) and backup sources. |
+| 2 | **Site = security boundary** | Each site = 1 sensitivity level, 1 main user group. Separate customer IPs to separate sites. |
+| 3 | **Epicor = SoR, SharePoint = SSOT** | Epicor manages transactions (job, PO, inventory). SharePoint manages documents and evidence. Link, do not copy. |
+| 4 | **Flat folder + metadata** | Maximum 3 levels of folders. Use SharePoint metadata columns instead of deep sub-folders. |
+| 5 | **OneDrive for personal files** | Do not create Employee Workbench in SharePoint. Each user uses OneDrive (1TB/user in Business Basic). |
+| 6 | **Group-based permission** | Delegate permissions according to Entra ID Security Groups, do not assign per-user. |
+| 7 | **Blank form downloaded from the web** | Form template (.xlsx) served from web server. SharePoint only contains completed forms and evidence. |
 
 ---
 
@@ -28,24 +28,24 @@ SITE 3: HESEM-People              ← HR restricted
 SITE 4: HESEM-Digital             ← Source control (backup web portal) + IT governance
 ```
 
-**Tại sao 4 sites thay vì 3?**
+**Why 4 sites instead of 3?**
 
-| Lý do | Giải thích |
+| Reason | Explanation |
 |-------|-----------|
-| IP khách hàng | Lam Research IP (bản vẽ, spec, CAM data) PHẢI tách site riêng — audit hỏi "How do you protect our IP?" |
-| Permission isolation | SharePoint site-level isolation = security boundary cứng nhất trong M365 Business Basic |
-| Performance | Job dossier volume lớn nhất (2000-5000 files/năm) — tách ra không ảnh hưởng site khác |
+| Client IP | Lam Research IP (drawings, spec, CAM data) MUST separate site — audit asks "How do you protect our IP?" |
+| Permission isolation | SharePoint site-level isolation = the hardest security boundary in M365 Business Basic |
+| Performance | Job dossier largest volume (2000-5000 files/year) — separated without affecting other sites |
 | Compliance | AS9100 §8.5.2 traceability + ISO 9001 §7.5.3 record protection |
 
 ---
 
-## 3. SITE 1: HESEM-Records — Hồ sơ vận hành
+## 3. SITE 1: HESEM-Records — Operational records
 
-**Mục đích:** Chứa form đã điền, evidence, records phát sinh trong vận hành hàng ngày (KHÔNG gắn job).
+**Purpose:** Contains completed forms, evidence, records arising in daily operations (NO job attached).
 
 ### 3.1 Document Libraries
 
-| Library | Nội dung | Cấu trúc folder |
+| Library | Content | Folder structure |
 |---------|---------|-----------------|
 | **Quality-Records** | NCR, CAPA, FAI, Calibration, SPC, IQC, Complaint, Ship-Release, Supplier | `{YYYY}/{RecordType}/` |
 | **QMS-Governance** | Management Review, Audit, Risk, Change Control, KPI, Improvement | `{YYYY}/{RecordType}/` |
@@ -54,7 +54,7 @@ SITE 4: HESEM-Digital             ← Source control (backup web portal) + IT go
 
 ### 3.2 SharePoint Lists (tracking dashboards)
 
-| List | Dữ liệu |
+| List | Data |
 |------|---------|
 | LST-NCR-Log | Tracker NCR status, link to file in Quality-Records |
 | LST-CAPA-Log | Tracker CAPA status |
@@ -66,9 +66,9 @@ SITE 4: HESEM-Digital             ← Source control (backup web portal) + IT go
 
 ### 3.3 Online form sync
 
-Mỗi online form (~25 forms) sync vào 1 SharePoint List riêng + auto PDF vào Document Library:
+Each online form (~25 forms) syncs to a separate SharePoint List + auto PDF to Document Library:
 
-| Online form | SharePoint List | PDF lưu tại |
+| Online forms | SharePoint List | PDF saved at |
 |------------|----------------|-------------|
 | FRM-208 Tier Meeting | LST-FRM-208 | Department-Ops/PRO/{YYYY}/ |
 | FRM-504 Shift Handover | LST-FRM-504 | Department-Ops/PRO/{YYYY}/ |
@@ -78,49 +78,49 @@ Mỗi online form (~25 forms) sync vào 1 SharePoint List riêng + auto PDF vào
 | FRM-651 Final Inspection | LST-FRM-651 | Quality-Records/{YYYY}/Ship-Release/ |
 | FRM-701 Receiving Log | LST-FRM-701 | Quality-Records/{YYYY}/IQC/ |
 | FRM-711 Packing/Ship | LST-FRM-711 | Quality-Records/{YYYY}/Ship-Release/ |
-| FRM-802 Training Attend. | LST-FRM-802 | Training-Records/{YYYY}/Attendance/ |
+| FRM-802 Training Attendance. | LST-FRM-802 | Training-Records/{YYYY}/Attendance/ |
 
 ### 3.4 Metadata columns (Quality-Records library)
 
-| Column | Type | Bắt buộc | Mô tả |
+| Columns | Type | Required | Description |
 |--------|------|---------|-------|
-| Record-Type | Choice | Có | NCR, CAPA, FAI, Calibration, SPC, IQC, Complaint, Ship-Release, Supplier |
-| Record-Number | Text (indexed) | Có | NCR-2026-043, FAI-2026-015 |
-| Form-Code | Text | Có khi là form | FRM-631, FRM-311 |
-| Form-Version | Text | Có khi là form | V2.1 |
-| Job-Number | Text | Nếu có | JOB-2026-0042 |
-| Part-Number | Text | Nếu có | 714-XXXXXX-001 |
-| Customer | Choice | Nếu có | Lam-Research |
-| Status | Choice | Có | Open, In-Review, Closed |
-| Department | Choice | Có | QA, ENG, PRO, SCM... |
-| Year | Text | Có | 2026 |
-| Closed-Date | Date | Khi đóng | 2026-04-15 |
+| Record-Type | Choice | Yes | NCR, CAPA, FAI, Calibration, SPC, IQC, Complaint, Ship-Release, Supplier |
+| Record-Number | Text (indexed) | Yes | NCR-2026-043, FAI-2026-015 |
+| Form-Code | Text | Sometimes it's form | FRM-631, FRM-311 |
+| Form-Version | Text | Sometimes it's form | V2.1 |
+| Job-Number | Text | If there is | JOB-2026-0042 |
+| Part-Number | Text | If there is | 714-XXXX-001 |
+| Customers | Choice | If there is | Lam-Research |
+| Status | Choice | Yes | Open, In-Review, Closed |
+| Department | Choice | Yes | QA, ENG, PRO, SCM... |
+| Year | Text | Yes | 2026 |
+| Closed-Date | Date | When closing | 2026-04-15 |
 
 ---
 
-## 4. SITE 2: HESEM-Job-Evidence — IP khách hàng
+## 4. SITE 2: HESEM-Job-Evidence — Customer IP
 
-**Mục đích:** Tất cả hồ sơ gắn job order + engineering baseline + tài liệu khách hàng. **NO external sharing.**
+**Purpose:** All records attach job order + engineering baseline + customer documents. **NO external sharing.**
 
 ### 4.1 Document Libraries
 
-| Library | Nội dung | Cấu trúc folder |
+| Library | Content | Folder structure |
 |---------|---------|-----------------|
-| **Part-REV-Master** | Engineering baseline tái sử dụng: NC, CAM, Setup Sheet, Tool List, Inspection Program, Fixture, Simulation, Control Plan | `{CustomerID}/{PartNum}/{REV-X}/` |
-| **Job-Dossiers** | Evidence thực thi per job: form đã điền, photos, CMM data, certs, traveler, CoC | `{YYYY}/{JobNum}_{PartRev}/` |
-| **Customer-Received** | Tài liệu gốc khách hàng gửi (bản vẽ, spec, quality requirements) | `{CustomerID}/{DocType}/` |
-| **Tooling-Fixture-Gage** | Tài sản tái sử dụng: fixture drawings, gage records, tool crib | `{AssetType}/{AssetID}/` |
+| **Part-REV-Master** | Reusable engineering baseline: NC, CAM, Setup Sheet, Tool List, Inspection Program, Fixture, Simulation, Control Plan | `{CustomerID}/{PartNum}/{REV-X}/` |
+| **Job-Dossiers** | Evidence of execution per job: filled out form, photos, CMM data, certs, traveler, CoC | `{YYYY}/{JobNum}_{PartRev}/` |
+| **Customer-Received** | Original documents sent by customers (drawings, spec, quality requirements) | `{CustomerID}/{DocType}/` |
+| **Tooling-Fixture-Gage** | Reusable assets: fixture drawings, gage records, tool crib | `{AssetType}/{AssetID}/` |
 
 ### 4.2 Part-REV-Master — file categories
 
-| File-Category | File types thực tế | Ví dụ |
+| File-Category | Actual file types | Example |
 |--------------|-------------------|-------|
 | NC-Program | .nc, .tap, .mpf, .eia, .cnc | NC_714XXXX-REVA_OP10_5AX_V3.nc |
 | CAM-Source | .mcam, .f3d, .emcam | CAM_714XXXX-REVA_OP10_5AX_V3.mcam |
 | CAD-Model | .step, .stp, .igs, .x_t | MODEL_714XXXX-REVA_ALL_V1.step |
 | Drawing | .pdf | DWG_714XXXX-REVA_ALL_V1.pdf |
 | Setup-Sheet | .xlsx (FRM-302) | SETUP_714XXXX-REVA_OP10_5AX_V3.xlsx |
-| Tool-List | .xlsx | (tích hợp trong FRM-302) |
+| Tool-List | .xlsx | (integrated in FRM-302) |
 | Inspection-Program | .dcc, .prg, .pcx | INSP_714XXXX-REVA_ALL_CMM_V2.dcc |
 | Control-Plan | .xlsx (FRM-133) | CTRL-PLAN_714XXXX-REVA_ALL_V2.xlsx |
 | Fixture-Drawing | .pdf, .step | FIXTURE_714XXXX-REVA_OP10_5AX_V1.pdf |
@@ -128,7 +128,7 @@ Mỗi online form (~25 forms) sync vào 1 SharePoint List riêng + auto PDF vào
 | Baseline-Manifest | .xlsx (FRM-306) | FRM-306_714XXXX-REVA_ALL_V3.xlsx |
 | Supersedure-Record | .xlsx (FRM-307) | FRM-307_714XXXX-REVA_ALL_V2-to-V3_20260327.xlsx |
 
-### 4.3 Quan hệ Part-REV-Master vs Job Dossier
+### 4.3 Part-REV-Master vs Job Dossier relationship
 
 ```
 Part-REV-Master (tái sử dụng)          Job Dossier (1 lần/đơn hàng)
@@ -144,7 +144,7 @@ RULE: Job Dossier KHÔNG chứa copy NC/Setup/Tool List.
 
 ### 4.4 SharePoint Lists
 
-| List | Dữ liệu |
+| List | Data |
 |------|---------|
 | LST-Job-Board | Status per job (sync Epicor) |
 | LST-Gate-Tracker | Which gate each job is at |
@@ -166,7 +166,7 @@ Sync: Restricted to managed devices only
 
 ### 5.1 Libraries
 
-| Library | Cấu trúc |
+| Library | Structure |
 |---------|----------|
 | **Employee-Records** | `Active/{EmpID}-{Name}/`, `Former/{YYYY}/`, `Contractors/{YYYY}/` |
 | **HR-Operations** | `{YYYY}/{RecordType}/` (Recruitment, Payroll, Leave, Onboarding) |
@@ -184,12 +184,12 @@ External sharing: OFF
 
 ### 6.1 Libraries
 
-| Library | Nội dung |
+| Library | Content |
 |---------|---------|
-| **QMS-Source-Control** | Backup toàn bộ web portal: `01-Controlled-Source/qms.hesem.com.vn/` + Release Manifests + Deploy Receipts |
+| **QMS-Source-Control** | Backup the entire web portal: `01-Controlled-Source/qms.hesem.com.vn/` + Release Manifests + Deploy Receipts |
 | **System-Records** | IT governance: Access-Control, M365-Config, Epicor-Control, Backup-Recovery |
 
-### 6.2 Sync flow (đã định nghĩa trong WI-107)
+### 6.2 Sync flow (defined in WI-107)
 
 ```
 SharePoint (source) → OneDrive sync → Local edit → Git → Server deploy
@@ -201,13 +201,13 @@ SharePoint (source) → OneDrive sync → Local edit → Git → Server deploy
 
 ### 7.1 Entra ID Security Groups
 
-| Group | Thành viên |
+| Group | Member |
 |-------|-----------|
-| HESEM-AllStaff | Toàn bộ nhân viên |
-| HESEM-Management | Trưởng phòng trở lên |
+| HESEM-AllStaff | All staff |
+| HESEM-Management | Head of department or higher |
 | HESEM-QMS-Team | QMS Manager + QMS Engineer + QA Manager |
 | HESEM-Quality | QA/QC team |
-| HESEM-Engineering | Engineering dept |
+| HESEM-Engineering | Engineering department |
 | HESEM-Production | Production + operators |
 | HESEM-SCM | Supply chain |
 | HESEM-Sales | Sales/CS |
@@ -224,7 +224,7 @@ SharePoint (source) → OneDrive sync → Local edit → Git → Server deploy
 | HESEM-Records | Quality-Records | Management + QMS | Quality |
 | HESEM-Records | QMS-Governance | Management | QMS-Team |
 | HESEM-Records | Training-Records | AllStaff | QMS-Team + Dept Mgrs |
-| HESEM-Records | Department-Ops | AllStaff (own dept) | Own Dept Group |
+| HESEM-Records | Department-Ops | AllStaff (own department) | Own Dept Group |
 | HESEM-Job-Evidence | Part-REV-Master | Job-Core | Engineering |
 | HESEM-Job-Evidence | Job-Dossiers | Job-Core | Job-Core |
 | HESEM-Job-Evidence | Customer-Received | Job-Core | Engineering + Sales |
@@ -235,27 +235,27 @@ SharePoint (source) → OneDrive sync → Local edit → Git → Server deploy
 
 ---
 
-## 8. Master Data Module và Order Management
+## 8. Master Data Module and Order Management
 
 ### 8.1 Master Data Control
 
-QMS Portal bao gồm module **Master Data Control** quản lý dữ liệu nền tảng mà tất cả form và order phụ thuộc vào:
+QMS Portal includes a **Master Data Control** module that manages the underlying data on which all forms and orders depend:
 
-| Đối tượng | Mô tả | Cascading relationships |
+| Object | Description | Cascading relationships |
 |-----------|-------|----------------------|
-| **Customer** | Khách hàng đã phê duyệt | Customer -> SO, Customer -> Part |
-| **Supplier** | Nhà cung cấp / gia công ngoài | Customer -> Approved Supplier |
-| **Part** | Mã chi tiết | Customer -> Part -> Revision |
-| **Part Revision** | Phiên bản chi tiết (REV-A, REV-B...) | Part -> Revision -> Engineering baseline |
-| **Sales Order (SO)** | Đơn hàng bán | Customer -> SO -> JO |
-| **Job Order (JO)** | Lệnh sản xuất | SO -> JO -> WO |
-| **Work Order (WO)** | Phiếu công việc per operation | JO -> WO (per routing operation) |
+| **Customer** | Customer approved | Customer -> SO, Customer -> Part |
+| **Supplier** | Supplier / outsourcing | Customer -> Approved Supplier |
+| **Part** | Detailed code | Customer -> Part -> Revision |
+| **Part Revision** | Detailed versions (REV-A, REV-B...) | Part -> Revision -> Engineering baseline |
+| **Sales Order (SO)** | Sales orders | Customer -> SO -> JO |
+| **Job Order (JO)** | Production order | SO -> JO -> WO |
+| **Work Order (WO)** | Worksheet per operation | JO -> WO (per routing operation) |
 
-**Quy tắc:** Khi field trên form đã có master data được quản lý, form **KHÔNG** cho phép nhập tay tự do. Phải dùng searchable lookup từ master data source.
+**Rule:** When the field on the form has master data managed, the form **DOES NOT allow free hand input. Must use searchable lookup from master data source.
 
 ### 8.2 Order Management (SO -> JO -> WO)
 
-Module `Quản lý đơn hàng` trên sidebar portal quản lý quan hệ phân cấp:
+Module `Quản lý đơn hàng` on the sidebar portal manages hierarchical relationships:
 
 ```
 Sales Order (SO)
@@ -263,48 +263,48 @@ Sales Order (SO)
         └── Work Order (WO) per operation
 ```
 
-Mỗi record chứa: customer, part number, revision, quantity, due date, status, route/operation context.
+Each record contains: customer, part number, revision, quantity, due date, status, route/operation context.
 
-Evidence forms (FRM-631 NCR, FRM-651 Final Inspection, FRM-511 Setup...) **bind** vào order record thay vì nhập text thủ công. Thay đổi trạng thái hoặc revision trên order được phản ánh trong form context.
+Evidence forms (FRM-631 NCR, FRM-651 Final Inspection, FRM-511 Setup...) **bind** to the order record instead of entering text manually. Status changes or revisions on the order are reflected in the form context.
 
-**SharePoint sync:** Order data được sync vào `LST-Job-Board` và `LST-Gate-Tracker` trên SITE 2 (HESEM-Job-Evidence) qua Graph API.
+**SharePoint sync:** Order data is synced to `LST-Job-Board` and `LST-Gate-Tracker` on SITE 2 (HESEM-Job-Evidence) via Graph API.
 
 ---
 
 ## 9. Online forms vs Excel forms
 
-> **Chi tiết đầy đủ:** core-standards/18-online-vs-offline-form-decision-framework.md
+> **Full details:** core-standards/18-online-vs-offline-form-decision-framework.md
 
-### 9.1 Tiêu chí phân loại (7 tiêu chí, tổng 100 điểm)
+### 9.1 Classification criteria (7 criteria, total 100 points)
 
-| # | Tiêu chí | Trọng số | → Online (+) | → Excel (−) |
+| # | Criteria | Weight | → Online (+) | → Excel (−) |
 |---|----------|---------|-------------|------------|
-| 1 | **Tần suất** | 25 | Daily/per-shift: +25 · Per-event: +20 | Monthly: −5 · Quarterly+: −15 |
-| 2 | **Số fields** | 20 | ≤15: +20 · 16-25: +10 | 26-50: −5 · >50/multi-tab: −20 |
-| 3 | **Nơi điền** | 15 | Sàn SX/tại máy: +15 | Phòng kỹ thuật: 0 · Phòng họp: −5 |
+| 1 | **Frequency** | 25 | Daily/per-shift: +25 · Per-event: +20 | Monthly: −5 · Quarterly+: −15 |
+| 2 | **Number of fields** | 20 | ≤15: +20 · 16-25: +10 | 26-50: −5 · >50/multi-tab: −20 |
+| 3 | **Place to fill** | 15 | Production floor/at machine: +15 | Technical rooms: 0 · Meeting rooms: −5 |
 | 4 | **Dashboard** | 15 | KPI live/escalation: +15 | Batch report: −5 · None: −10 |
 | 5 | **Approval workflow** | 10 | Multi-step e-sig: +10 | No workflow: 0 |
-| 6 | **Attachments** | 10 | Photo tại chỗ: +10 | CMM/CAM files: −5 · Multi-file: −10 |
-| 7 | **Formula** | 5 | Không cần: +5 | Matrix/VLOOKUP: −5 |
+| 6 | **Attachments** | 10 | On-site photo: +10 | CMM/CAM files: −5 · Multi-file: −10 |
+| 7 | **Formula** | 5 | No need: +5 | Matrix/VLOOKUP: −5 |
 
-**Quy tắc:** Tổng > 60 → **ONLINE**. Tổng ≤ 60 → **OFFLINE (Excel)**.
+**Rules:** Total > 60 → **ONLINE**. Total ≤ 60 → **OFFLINE (Excel)**.
 
-### 9.2 Quick Rules (không cần chấm điểm)
+### 9.2 Quick Rules (no grading required)
 
-| LUÔN ONLINE | LUÔN OFFLINE |
+| ALWAYS ONLINE | ALWAYS OFFLINE |
 |-------------|-------------|
-| Điền ≥2 lần/ngày hoặc mỗi ca | Multi-tab Excel với formula phức tạp |
-| Escalation/notification bắt buộc | Reference document, không điền mới |
-| Dữ liệu chảy vào OEE/OTD dashboard | Engineering baseline (CAM/NC linkage) |
-| Điền tại máy bằng phone/tablet | Tần suất ≤ quarterly |
+| Fill out ≥2 times/day or per shift | Multi-tab Excel with complex formula |
+| Escalation/notification required | Reference document, do not fill in new |
+| Data flows into the OEE/OTD dashboard | Engineering baseline (CAM/NC linkage) |
+| Fill in at the machine using phone/tablet | Frequency ≤ Quarterly |
 
-### 9.3 Danh sách online forms (3 phases, ~25 forms)
+### 9.3 List of online forms (3 phases, ~25 forms)
 
-**Phase 1 (đã triển khai):** FRM-208, FRM-504, FRM-512
+**Phase 1 (deployed):** FRM-208, FRM-504, FRM-512
 
-**Phase 2 (ưu tiên cao):** FRM-631, FRM-641, FRM-651, FRM-701, FRM-711, FRM-715, FRM-511, FRM-521, FRM-802, FRM-913, FRM-403, FRM-601
+**Phase 2 (high priority):** FRM-631, FRM-641, FRM-651, FRM-701, FRM-711, FRM-715, FRM-511, FRM-521, FRM-802, FRM-913, FRM-403, FRM-601
 
-**Phase 3 (mở rộng):** FRM-501, FRM-502, FRM-505, FRM-507, FRM-513, FRM-514, FRM-518, FRM-519, FRM-721, FRM-525
+**Phase 3 (expansion):** FRM-501, FRM-502, FRM-505, FRM-507, FRM-513, FRM-514, FRM-518, FRM-519, FRM-721, FRM-525
 
 ### 9.3b Sync mechanism
 
@@ -327,7 +327,7 @@ Upload:   SharePoint validate version vs registry → reject if obsolete
 
 ## 10. Storage estimate
 
-| File type | Size trung bình | Volume/năm | Total/năm |
+| File type | Medium size | Volume/year | Total/year |
 |-----------|----------------|-----------|-----------|
 | NC program (.nc) | 50KB-2MB | 500 files | ~500MB |
 | CAM source (.mcam, .f3d) | 5-50MB | 300 files | ~5GB |
@@ -335,12 +335,12 @@ Upload:   SharePoint validate version vs registry → reject if obsolete
 | Photos (.jpg) | 1-5MB | 2000 files | ~5GB |
 | Forms + PDFs | 200KB-2MB | 3000 files | ~3GB |
 | Scanned docs (.pdf) | 500KB-3MB | 1000 files | ~2GB |
-| **Total/năm** | | | **~18GB** |
+| **Total/year** | | | **~18GB** |
 
-M365 Business Basic: 1TB + 10GB/user. Với 100 user = ~2TB. 18GB/năm = **100+ năm storage**.
+M365 Business Basic: 1TB + 10GB/user. With 100 users = ~2TB. 18GB/year = **100+ years of storage**.
 
 ---
 
-> **Cập nhật lần cuối:** 2026-03-29
-> **Áp dụng:** M365 SharePoint deployment — HESEM ENGINEERING
-> **Tài liệu liên quan:** 15-evidence-and-records-naming.md, WI-102, WI-107, ANNEX-131 đến ANNEX-136, 23-form-lifecycle-and-allocation.md, record_type_expanded.json
+> **Last updated:** 2026-03-29
+> **Applies:** M365 SharePoint deployment — HESEM ENGINEERING
+> **Related documents:** 15-evidence-and-records-naming.md, WI-102, WI-107, ANNEX-131 to ANNEX-136, 23-form-lifecycle-and-allocation.md, record_type_expanded.json

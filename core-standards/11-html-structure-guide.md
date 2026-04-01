@@ -1,11 +1,11 @@
-# 11 — Hướng dẫn cấu trúc HTML chi tiết (Khi tạo mới hoặc chỉnh sửa tài liệu)
+# 11 — Detailed HTML structure instructions (When creating or editing documents)
 
-> Phiên bản: v3 | Cập nhật: 2026-03-30
-> Đây là ghi chú BẮT BUỘC đọc trước khi tạo mới hoặc chỉnh sửa bất kỳ file HTML nào trong hệ thống QMS.
+> Version: v3 | Updated: 2026-03-30
+> This is a MANDATORY note to read before creating or editing any HTML file in the QMS system.
 
 ---
 
-## 1. Cấu trúc tổng thể file HTML
+## 1. Overall structure of HTML file
 
 ```
 <!DOCTYPE html>
@@ -33,18 +33,18 @@
 </html>
 ```
 
-**Rule khóa shell trang:**
-- `.page-body` phải mở ngay sau `.page` và phải chứa toàn bộ nội dung hiển thị của tài liệu, không chỉ chứa `form-header`.
-- Không được đóng `.page-body` ngay sau `form-header`. Nếu đóng sớm, các block như `note`, `h1`, `section`, `table-card`, `annex-block`, `data-operating-rule` sẽ rơi ra ngoài vùng padding chuẩn và gây tràn trang hoặc vỡ bố cục.
-- `print-disclaimer` có thể đặt sau `</div></div></div>` của `container > page > page-body`, nhưng mọi block hiển thị cho người dùng phải nằm bên trong `.page-body`.
-- `print-disclaimer` không được là con trực tiếp của `.container`. Nếu `container` còn mở tới disclaimer thì vẫn bị xem là shell lỗi và phải đóng `container` trước disclaimer.
-- Thứ tự đúng ở cuối file là: `...</nội dung> </div><!-- page-body --> </div><!-- page --> </div><!-- container --> [print-disclaimer] [script] </body>`.
+**Page shell lock rule:**
+- `.page-body` must open immediately after `.page` and must contain the entire visible content of the document, not just `form-header`.
+- Do not close `.page-body` immediately after `form-header`. If closed prematurely, blocks such as `note`, `h1`, `section`, `table-card`, `annex-block`, `data-operating-rule` will fall outside the standard padding area and cause page overflow or broken layout.
+- `print-disclaimer` can be placed after `</div></div></div>` of `container > page > page-body`, but any block visible to the user must be inside `.page-body`.
+- `print-disclaimer` cannot be a direct child of `.container`. If `container` is still open until the disclaimer, it is still considered an error shell and must close `container` before the disclaimer.
+- The correct order at the end of the file is: `...</nội dung> </div><!-- page-body --> </div><!-- page --> </div><!-- container --> [print-disclaimer] [script] </body>`.
 
 ---
 
-## 2. Chi tiết từng phần
+## 2. Details of each part
 
-### 2.1 `<head>` — Meta và CSS
+### 2.1 `<head>` — Meta and CSS
 
 ```html
 <head>
@@ -73,9 +73,9 @@
 </head>
 ```
 
-**Quy tắc tính relative path:**
+**Rule for calculating relative path:**
 
-| Vị trí file | `{{RELATIVE_PATH}}` |
+| File location | `{{RELATIVE_PATH}}` |
 |-------------|---------------------|
 | `01-QMS-Portal/` | `..` |
 | `02-Tai-Lieu-He-Thong/01-Quality-Manual/` | `../..` |
@@ -84,7 +84,7 @@
 | `03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/10-ANNEX-100-xxx/` | `../../../..` |
 | `10-Training-Academy/01-Competency/02-Levels/01-C01/` | `../../../..` |
 
-### 2.2 FORM HEADER — Logo trái, title + chú thích bên phải, meta hàng dưới
+### 2.2 FORM HEADER — Logo on the left, title + caption on the right, meta on the bottom row
 
 ```html
 <div class="form-header">
@@ -107,34 +107,34 @@
 </div>
 ```
 
-**Lưu ý:**
-- Khối title trên header chỉ hiển thị `doc-name` và `sub-vn`; mã tài liệu hiển thị ở hàng meta.
-- `doc-name` luôn là English SSOT title theo filename/path controlled; không dịch title này sang tiếng Việt và không gộp mã tài liệu vào cùng node hiển thị.
-- Portal/catalog/runtime không được ghép mã và tên thành một text node. Nếu metadata runtime không sạch thì phải đọc lại `doc-name` từ header published và `doc-code` từ meta/header hook sạch.
-- `fh-company` là legacy node; template mới không render node này và CSS dùng chung phải ẩn hoàn toàn nếu file cũ còn giữ lại.
-- Meta labels hiển thị tiếng Việt: `Mã`, `Phiên bản`, `Ngày hiệu lực`, `Chủ sở hữu`, `Phê duyệt`
-- Hàng `Chủ sở hữu` và `Phê duyệt` phải dùng chip links tới JD hoặc department handbook tương ứng; không để plain text kiểu `QA Manager`, `Engineering`, `Tổng Giám Đốc`.
-- Quy tắc header này áp dụng cho toàn bộ tài liệu phát hành và cả form online/runtime trong `01-QMS-Portal`.
-- Với tài liệu chưa phát hành lần đầu, `Version` trong header luôn là `V0`
-- **Viền cam** header: mảnh 1px ở đầu hàng meta
-- **KHÔNG** thay đổi cấu trúc header — mọi file PHẢI giống nhau
-- `{{OWNER_ROLE_HTML}}` và `{{APPROVER_ROLE_HTML}}` phải là role chips link trực tiếp tới JD
-- Header không dùng text dài kiểu `QA Manager / Supply Chain Manager`; phải dùng role code gọn như `QA / SCM`
+**Note:**
+- The title block on the header only displays `doc-name` and `sub-vn`; The document code displays in the meta row.
+- `doc-name` is always English SSOT title according to filename/path controlled; Do not translate this title into Vietnamese and do not include the document code in the same display node.
+- Portal/catalog/runtime cannot combine code and name into one text node. If the runtime metadata is not clean, you must re-read `doc-name` from the published header and `doc-code` from the clean meta/header hook.
+- `fh-company` is the legacy node; The new template does not render this node and the shared CSS must be completely hidden if the old file is retained.
+- Meta labels displayed in Vietnamese: `Mã`, `Phiên bản`, `Ngày hiệu lực`, `Chủ sở hữu`, `Phê duyệt`
+- Rows `Chủ sở hữu` and `Phê duyệt` must use chip links to the corresponding JD or department handbook; Do not leave plain text as `QA Manager`, `Engineering`, `Tổng Giám Đốc`.
+- This header rule applies to all release documents and online/runtime forms in `01-QMS-Portal`.
+- For documents that have not been released for the first time, `Version` in the header is always `V0`
+- **Orange border** header: 1px piece at the beginning of the meta row
+- **DO NOT** change the header structure — every file MUST be the same
+- `{{OWNER_ROLE_HTML}}` and `{{APPROVER_ROLE_HTML}}` must be chip roles directly linked to JD
+- Header does not use long text like `QA Manager / Supply Chain Manager`; must use a concise role code like `QA / SCM`
 
-### 2.2a JD Header và Identity Rows
+### 2.2a JD Header and Identity Rows
 
-Với JD:
-- `strong` trong title block phải theo chuẩn `JD-<ROLECODE> — <Job title English>`.
-- `sub-vn` dùng tiếng Việt chuẩn của vị trí.
-- Row `Mã` trong header phải khớp đúng `JD-<ROLECODE>`.
-- Trong bảng thông tin vị trí:
+With JD:
+- `strong` in the title block must follow the `JD-<ROLECODE> — <Job title English>` standard.
+- `sub-vn` uses standard Vietnamese for the location.
+- Row `Mã` in the header must match `JD-<ROLECODE>`.
+- In the location information table:
   - `Mã vị trí` = `JD-<ROLECODE>`
-  - `Mã vai trò dùng trong SOP/RACI` = role chip JD-linked
-  - `Mũ quản trị có thể gắn` chỉ xuất hiện khi role thật sự có hat cho phép
-  - `Chức danh theo tài liệu` giữ plain English title, không render chip
-- Không cho phép JD có cấu trúc fragment kiểu thiếu `<html>`, `<head>` hoặc `<body>`.
+  - `Mã vai trò dùng trong SOP/RACI` = JD-linked chip role
+  - `Mũ quản trị có thể gắn` only appears when the role actually has permission
+  - `Chức danh theo tài liệu` keeps plain English title, does not render chip
+- Do not allow JD to have fragment structures of type missing `<html>`, `<head>` or `<body>`.
 
-### 2.3 ISO MAP — Chuẩn mực áp dụng
+### 2.3 ISO MAP — Applicable standards
 
 ```html
 <div class="iso-map">
@@ -154,28 +154,28 @@ Với JD:
 </div>
 ```
 
-**Đồ họa ISO Map:**
-- Nền: gradient xanh nhạt (`linear-gradient(135deg, #f0f7ff, #e8f4fd)`)
-- Viền: 1px solid xanh (`var(--blue)`)
-- Badge "ISO 9001:2026" tự động hiển thị phía trên (CSS `::before`)
-- Các `.req` box bên trong có nền trắng mờ (phân biệt với nền gradient)
+**ISO Map Graphics:**
+- Background: light blue gradient (`linear-gradient(135deg, #f0f7ff, #e8f4fd)`)
+- Border: 1px solid blue (`var(--blue)`)
+- Badge "ISO 9001:2026" automatically displays above (CSS `::before`)
+- The `.req` boxes inside have a translucent white background (distinguished from the gradient background)
 
-**Badges yêu cầu ISO:**
+**Badges require ISO:**
 
-| Badge | Class | Màu | Khi nào dùng |
+| Badges | Class | Color | When to use |
 |-------|-------|-----|--------------|
-| PHẢI | `req-tag shall` | Đỏ | Yêu cầu SHALL của ISO — vi phạm = nonconformity |
-| BẮT BUỘC | `req-tag must` | Đỏ | Yêu cầu nội bộ cứng — vi phạm = stop |
-| NÊN | `req-tag should` | Vàng | Khuyến nghị SHOULD — nên tuân theo |
-| CÓ THỂ | `req-tag may` | Xanh lá | Tùy chọn MAY — linh hoạt |
+| MUST | `req-tag shall` | Red | ISO SHALL requirement — violation = nonconformity |
+| REQUIRED | `req-tag must` | Red | Hard internal request — violation = stop |
+| SHOULD | `req-tag should` | Gold | SHOULD Recommendation — should be followed |
+| CAN | `req-tag may` | Green | SEWING options — flexible |
 
-**Điều khoản ISO badge:**
+**ISO badge terms:**
 ```html
 <span class="iso-clause">§7.5</span>
 ```
-Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
+Displays a small green badge with the ISO 9001:2026 clause number.
 
-### 2.4 PREFACE BLOCK — Lệnh điều hành
+### 2.4 PREFACE BLOCK — Executive command
 
 ```html
 <div class="preface-block">
@@ -192,9 +192,9 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
 </div>
 ```
 
-### 2.5 Gate Mapping Note — Vị trí trong hệ thống 8 cổng
+### 2.5 Gate Mapping Note — Location in 8-gate system
 
-**BẮT BUỘC** có trên MỌI tài liệu — đặt trước section 1 hoặc ngay sau preface block:
+**REQUIRED** on EVERY document — placed before section 1 or immediately after preface block:
 
 ```html
 <div class="note-blue" style="margin:12px 0">
@@ -204,26 +204,26 @@ Hiển thị badge xanh nhỏ với số điều khoản ISO 9001:2026.
 </div>
 ```
 
-### 2.6 Ranh giới giữa chuẩn hóa format và nâng cấp nội dung
+### 2.6 The boundary between format standardization and content upgrading
 
-Core-standard **được phép** chuẩn hóa tập trung:
+Core-standard **allows** central standardization:
 
 - header, preface, toc, table-card, field-grid, callout-grid,
-- palette màu flowchart, `proc-num`, `flow-num`, arrow, CSS fallback,
-- khung table của Section 6 và Section 8,
-- checklist QA kỹ thuật và comment hướng dẫn trong template.
+- flowchart color palette, `proc-num`, `flow-num`, arrow, CSS fallback,
+- table frame of Section 6 and Section 8,
+- Technical QA checklist and comment instructions in the template.
 
-Core-standard **không được dùng** để biện minh cho cập nhật nội dung hàng loạt:
+Core-standard **deprecated** to justify mass content updates:
 
-- nội dung `Section 1, 2, 3, 4, 5, 8` phải suy ra từ `Section 6` và `Section 7` của **từng SOP**,
-- số bước, tên bước, tên IG, KPI, role authority, exception scenario phải nghiên cứu theo **từng SOP**,
-- không để note biên tập, note benchmark, note khác bản cũ hay note quy tắc viết tài liệu hiển thị trong body SOP.
+- The content of `Section 1, 2, 3, 4, 5, 8` must be deduced from `Section 6` and `Section 7` of **each SOP**,
+- Step number, step name, IG name, KPI, role authority, exception scenarios must be researched according to **each SOP**,
+- Do not let editorial notes, benchmark notes, notes different from the old version or notes on document writing rules appear in the SOP body.
 
 ---
 
-## 3. Quy tắc đồ họa components
+## 3. Rules for graphic components
 
-### 3.1 Table — BẮT BUỘC có class="table"
+### 3.1 Table — MUST have class="table"
 
 ```html
 <div class="table-card">
@@ -236,22 +236,22 @@ Core-standard **không được dùng** để biện minh cho cập nhật nội
 </div>
 ```
 
-**⚠ KHÔNG BAO GIỜ:**
-- Tạo `<table>` không có `class="table"` → sẽ không có viền
-- Khai báo lại `.table thead th` trong inline `<style>` → ghi đè global
-- Dùng `border="1"` attribute trên `<table>` → dùng CSS class thay thế
-- Dùng inline style `style="border:..."` trên `<td>` → dùng CSS class
+**⚠ NEVER:**
+- Create `<table>` without `class="table"` → there will be no border
+- Redeclar `.table thead th` in inline `<style>` → override global
+- Use `border="1"` attribute on `<table>` → use CSS class instead
+- Use inline style `style="border:..."` on `<td>` → use CSS class
 
-**Đồ họa table chuẩn:**
-- Viền ngoài: 1px solid #1565c0 (xanh đậm)
-- Header: background rgba(21,101,192,0.12) (xanh nhạt)
+**Standard table graphics:**
+- Outer border: 1px solid #1565c0 (dark blue)
+- Header: background rgba(21,101,192,0.12) (light blue)
 - Row dividers: border-bottom 1px solid #1565c0
-- Column dividers: border-right 1px solid #1565c0 (cột cuối: none)
-- Hover: rgba(21,101,192,0.04) highlight nhẹ
-- Bo góc: var(--r) = 10px (trên table-card wrapper)
-- Không box-shadow
+- Column dividers: border-right 1px solid #1565c0 (last column: none)
+- Hover: rgba(21,101,192,0.04) light highlight
+- Round corners: var(--r) = 10px (on table-card wrapper)
+- No box-shadow
 
-### 3.2 Note / Callout / Box — Chỉ border-left 3px
+### 3.2 Note / Callout / Box — Only 3px border-left
 
 ```html
 <!-- Note xanh -->
@@ -273,11 +273,11 @@ Core-standard **không được dùng** để biện minh cho cập nhật nội
 <div class="box imp">Nội dung quan trọng (đỏ).</div>
 ```
 
-**Quy tắc:**
-- Tất cả note/callout/box: **CHỈ** có border-left 3px, **KHÔNG** có border trên/dưới/phải
-- Border-left width: **3px** thống nhất (không 1px, 2px, 4px, 5px)
-- Background: màu nhạt tương ứng với màu border-left
-- KHÔNG dùng inline style `style="border-left:..."` → dùng class
+**Rules:**
+- All note/callout/box: **ONLY** have 3px border-left, **NOT** have top/bottom/right border
+- Border-left width: **3px** uniform (not 1px, 2px, 4px, 5px)
+- Background: light color corresponding to border-left color
+- DO NOT use inline style `style="border-left:..."` → use class
 
 ### 3.3 Metric Cards — KPI display
 
@@ -291,17 +291,17 @@ Core-standard **không được dùng** để biện minh cho cập nhật nội
 </div>
 ```
 
-### 3.4 Section 6 — Cổng kiểm soát nội bộ (Internal Gates) — Dạng TABLE
+### 3.4 Section 6 — Internal Gates — TABLE format
 
-**Quy tắc cấu trúc Section 6:**
-- Internal Gate dùng ký hiệu **IG** (IG1, IG2, IG3...) — KHÔNG dùng G (G là system gates)
-- Số lượng IG **không giới hạn** — tùy quy trình cụ thể (3, 5, 6, 8...)
-- Format: **TABLE** 5 cột (KHÔNG dùng gate-card/grid)
-- Mỗi IG PHẢI có: Mô tả, Chủ trì, Điểm dừng bắt buộc, KPI đo được
-- Số IG **KHÔNG cần** khớp với số bước Section 7
-- Sau table: metric-card grid hiển thị KPI trực quan (tùy chọn)
-- Khi thay nội dung, chỉ thay phần nằm giữa `p6` và `p7`
-- Nội dung phải bám tài liệu cũ + research theo `13-sop-research-redraft-method.md`
+**Section 6 structure rules:**
+- Internal Gate uses the symbol **IG** (IG1, IG2, IG3...) — DO NOT use G (G is system gates)
+- Number of IG **unlimited** — depending on specific process (3, 5, 6, 8...)
+- Format: **TABLE** 5 columns (DO NOT use gate-card/grid)
+- Each IG MUST have: Description, Chair, Required Breakpoints, Measurable KPIs
+- The IG number **does NOT need to** match the Section 7 step number
+- After the table: metric-card grid displays KPIs visually (optional)
+- When changing content, only change the part between `p6` and `p7`
+- Content must follow old documents + research according to `13-sop-research-redraft-method.md`
 
 ```html
 <!-- Section 6: IG Table -->
@@ -333,30 +333,30 @@ Core-standard **không được dùng** để biện minh cho cập nhật nội
 </div>
 ```
 
-**⚠ KHÔNG BAO GIỜ:**
-- Dùng gate-card/gate-grid cho IG → dùng TABLE
-- Giới hạn cố định 5 IG → tùy quy trình
-- Để trống cột Chủ trì/Điểm dừng/KPI → mỗi IG PHẢI đầy đủ
-- Đặt IG badge không canh giữa → dùng `class="ig-center"` trên `<td>`
+**⚠ NEVER:**
+- Use gate-card/gate-grid for IG → use TABLE
+- Fixed limit of 5 IG → depending on the process
+- Leave the Leader/Stop/KPI column blank → each IG MUST be complete
+- Place the IG badge without centering → use `class="ig-center"` on `<td>`
 
-### 3.5 Section 7 — Quy trình chi tiết — FLOWCHART + Balloon headings
+### 3.5 Section 7 — Detailed process — FLOWCHART + Balloon headings
 
-**Quy tắc cấu trúc Section 7:**
-- **Phần 1:** Flowchart tổng quan (visual process flow)
-- **Phần 2:** Chi tiết từng bước với **proc-num balloon** trước heading
-- Số bước **không giới hạn** — tùy quy trình (5, 8, 10, 12...)
-- Flowchart PHẢI khớp đúng số bước h3 bên dưới
-- Số bước Section 7 **KHÔNG bị giới hạn** bởi số IG của Section 6
-- Mỗi bước balloon có **màu xoay** (rotating colors) — KHÔNG cố định 1 màu
-- Màu bubble ở flowchart phải khớp màu `proc-num` của bước tương ứng; không phụ thuộc việc step có class `active/critical` hay không
-- CSS toàn cục PHẢI có fallback palette để file cũ hoặc file viết tay không bị rơi về một màu duy nhất
-- Flowchart sinh mới bằng script PHẢI ưu tiên inline style ở `flow-step`, `flow-num`, `flow-arrow`; CSS fallback chỉ để bảo vệ file cũ hoặc file viết tay
-- `.active` và `.critical` chỉ bổ trợ nhấn thị giác; không được ghi đè logic màu theo số bước của bubble
-- Fallback palette phải tính đúng việc `.flow-arrow` chen giữa các `.flow-step`; selector phải dựa trên direct child positions của `.flow-step` thực tế, không giả định tất cả child đều là step
-- Khi thay nội dung, chỉ thay phần nằm giữa `p7` và `p8`
-- Số bước phải được chốt theo logic bàn giao và risk window của SOP đó, không theo template đẹp
+**Section 7 structure rules:**
+- **Part 1:** Overview flowchart (visual process flow)
+- **Part 2:** Step-by-step details with **proc-num balloon** before the heading
+- Number of steps **unlimited** — depending on the process (5, 8, 10, 12...)
+- Flowchart MUST match the number of h3 steps below
+- Section 7 step numbers are **NOT limited** by Section 6 IG numbers
+- Each balloon step has **rotating colors** (rotating colors) — NOT fixed to 1 color
+- The bubble color in the flowchart must match the `proc-num` color of the corresponding step; regardless of whether step has class `active/critical` or not
+- Global CSS MUST have a fallback palette so that old files or handwritten files do not fall back to a single color
+- New flowchart created by script MUST give priority to inline style in `flow-step`, `flow-num`, `flow-arrow`; CSS fallback is only to protect old or handwritten files
+- `.active` and `.critical` only support visual clicking; Do not override the color logic according to the number of bubble steps
+- Fallback palette must correctly account for `.flow-arrow` intervening between `.flow-step`; The selector must be based on the actual direct child positions of `.flow-step`, not assuming all children are steps
+- When changing content, only change the part between `p7` and `p8`
+- The number of steps must be determined according to the handover logic and risk window of that SOP, not according to a beautiful template
 
-**Phần 1: Flowchart**
+**Part 1: Flowchart**
 ```html
 <h2 id="p7">7. Quy trình chi tiết</h2>
 
@@ -378,21 +378,21 @@ Core-standard **không được dùng** để biện minh cho cập nhật nội
 </div>
 ```
 
-**Bảng màu xoay (10 màu):**
-| Bước | Gradient | Tính chất |
+**Rotating color palette (10 colors):**
+| Step | Gradients | Properties |
 |------|----------|-----------|
-| 1 | `#1565c0, #1976d2` | Xanh dương |
-| 2 | `#059669, #10b981` | Xanh lá |
-| 3 | `#d97706, #f59e0b` | Vàng cam |
-| 4 | `#7c3aed, #8b5cf6` | Tím |
-| 5 | `#dc2626, #ef4444` | Đỏ |
+| 1 | `#1565c0, #1976d2` | Blue |
+| 2 | `#059669, #10b981` | Green |
+| 3 | `#d97706, #f59e0b` | Orange yellow |
+| 4 | `#7c3aed, #8b5cf6` | Purple |
+| 5 | `#dc2626, #ef4444` | Red |
 | 6 | `#0891b2, #06b6d4` | Teal |
-| 7 | `#c2410c, #ea580c` | Cam đậm |
+| 7 | `#c2410c, #ea580c` | Dark orange |
 | 8 | `#4338ca, #6366f1` | Indigo |
-| 9 | `#15803d, #22c55e` | Xanh lá đậm |
-| 10 | `#be185d, #ec4899` | Hồng |
+| 9 | `#15803d, #22c55e` | Dark green |
+| 10 | `#be185d, #ec4899` | Hong |
 
-**Phần 2: Chi tiết từng bước**
+**Part 2: Step-by-step details**
 ```html
 <h3><span class="proc-num" style="background:linear-gradient(135deg,#1565c0,#1976d2)">1</span> Tên bước chi tiết</h3>
 <p>Mô tả chi tiết hoạt động...</p>
@@ -401,23 +401,23 @@ Core-standard **không được dùng** để biện minh cho cập nhật nội
 <p><b>Bàn giao:</b> Ai bàn giao gì cho ai.</p>
 ```
 
-**⚠ QUY TẮC QUAN TRỌNG:**
-- Flowchart PHẢI có TRƯỚC các h3 chi tiết
-- Số bước trong flowchart = Số h3 headings (KHÔNG được lệch)
-- Màu balloon h3 = Màu tương ứng trong flowchart
-- Khi cập nhật nội dung → kiểm tra lại đánh số + flowchart
-- Bước `.active` (vàng) = quyết định/phê duyệt
-- Bước `.critical` (đỏ) = kiểm tra/đo lường/hold point
+**⚠ IMPORTANT RULES:**
+- Flowchart MUST have BEFORE the detailed h3
+- Number of steps in flowchart = Number of h3 headings (must NOT be skewed)
+- Balloon color h3 = Corresponding color in the flowchart
+- When updating content → recheck numbering + flowchart
+- Step `.active` (yellow) = decision/approval
+- Step `.critical` (red) = test/measure/hold point
 
-### 3.6 Bốn loại Badge/Nút — Phân biệt trực quan
+### 3.6 Four Types of Badges/Buttons — Visual Distinction
 
-| Badge | CSS Class | Ký hiệu | Màu | Dùng cho |
+| Badges | CSS Class | Symbol | Color | Used for |
 |-------|-----------|---------|-----|----------|
-| **ISO Clause** | `.iso-clause` | §7.5, §8.2 | Xanh đậm (#1565c0) nền trắng | Viện dẫn ISO 9001:2026 |
-| **ISO Req** | `.req-tag.shall` / `.req-tag.should` / `.req-tag.may` | PHẢI, NÊN, CÓ THỂ | Đỏ / Vàng / Xanh lá | Mức bắt buộc ISO |
-| **Internal Gate** | `.step-tag` | IG1, IG2... | Navy gradient pill | Cổng kiểm soát nội bộ |
-| **Procedure Step** | `.proc-num` | ①②③... | Rotating 10 colors | Bước quy trình chi tiết |
-| **System Gate** | `.gate-tag` | G0, G1...G7 | Teal (#00838f) | 8 cổng hệ thống |
+| **ISO Clause** | `.iso-clause` | §7.5, §8.2 | Dark blue (#1565c0) white background | Reference ISO 9001:2026 |
+| **ISO Req** | `.req-tag.shall` / `.req-tag.should` / `.req-tag.may` | MUST, SHOULD, COULD | Red / Yellow / Green | ISO mandatory level |
+| **Internal Gate** | `.step-tag` | IG1, IG2... | Navy gradient pills | Internal control gate |
+| **Procedure Step** | `.proc-num` | ①②③... | Rotating 10 colors | Detailed process steps |
+| **System Gate** | `.gate-tag` | G0, G1...G7 | Teal (#00838f) | 8 system ports |
 
 ```html
 <!-- ISO Clause -->   <span class="iso-clause">§7.5</span>
@@ -429,105 +429,105 @@ Core-standard **không được dùng** để biện minh cho cập nhật nội
 
 ---
 
-## 4. Danh sách "KHÔNG BAO GIỜ" khi chỉnh sửa HTML
+## 4. "NEVER" list when editing HTML
 
-| # | KHÔNG BAO GIỜ | Lý do |
+| # | NEVER | Reason |
 |---|--------------|-------|
-| 1 | Khai báo lại `.table`, `.note`, `.callout`, `.box`, `.req`, `.iso-map` trong inline `<style>` | Ghi đè global CSS → mất đồng bộ |
-| 2 | Tạo `<table>` không có `class="table"` | Không nhận CSS viền/header |
-| 3 | Dùng `border="1"` attribute trên `<table>` | Dùng CSS class thay thế |
-| 4 | Dùng inline `style="border-left:Xpx"` trên note/box | Dùng class (global CSS set 3px) |
-| 5 | Thay đổi cấu trúc form-header | Mọi file PHẢI giống nhau |
-| 6 | Dịch tên file, folder, path sang tiếng Việt | Phá vỡ liên kết hệ thống |
-| 7 | Dịch metadata labels (Code, Version, Owner...) | Giữ nguyên tiếng Anh |
-| 8 | Dịch tên SharePoint List, Column names, Site names | Danh từ riêng hệ thống |
-| 9 | Dịch vai trò (Team Leader, Foreman, Inspector...) | Danh từ riêng thống nhất |
-| 10 | Dùng gate-card/gate-grid cho Internal Gates | IG PHẢI dùng TABLE 5 cột |
-| 11 | Giới hạn cố định 5 IG | Số IG tùy quy trình, không giới hạn |
-| 12 | Buộc số IG = số bước chi tiết | IG và bước chi tiết là hai lớp khác nhau |
-| 13 | Tạo flowchart không khớp số bước h3 | Flowchart steps = h3 headings |
-| 14 | Dùng 1 màu cố định cho proc-num balloons | Dùng 10 màu xoay |
-| 15 | Để trống cột Chủ trì/Điểm dừng/KPI trong IG table | Mỗi IG PHẢI đầy đủ |
-| 16 | Batch-upgrade nội dung `Section 1/2/3/4/5/8` bằng một bộ câu chung cho nhiều SOP | Dẫn tới sai boundary, sai role, sai exception và mất tính thực chiến |
-| 17 | Giữ lại note hướng dẫn biên tập, note benchmark hoặc note khác bản cũ trong body SOP | Tài liệu draft sẽ bẩn, sai ngữ cảnh vận hành và khó phát hành V0 |
-| 18 | Dùng list bullet cho Section 8 khi SOP có nhiều nhánh hold/restart/revalidation/change | Mất owner, mất người gỡ hold và khó audit |
-| 19 | Bắt buộc `metric-grid` cho mọi SOP dù không có nhu cầu tóm tắt KPI riêng | Tạo section trang trí, trùng lặp KPI đã nằm trong Section 6 |
-| 20 | Viết Section 3 bằng thuật ngữ nửa Anh nửa Việt hoặc lặp ngoặc | Làm mờ nghĩa vận hành và tạo lỗi dùng thuật ngữ trong thân SOP |
+| 1 | Redeclar `.table`, `.note`, `.callout`, `.box`, `.req`, `.iso-map` in inline `<style>` | Override global CSS → lose sync |
+| 2 | Create `<table>` without `class="table"` | Border/header CSS not accepted |
+| 3 | Use `border="1"` attribute on `<table>` | Use CSS class instead |
+| 4 | Use inline `style="border-left:Xpx"` on note/box | Use class (global CSS set 3px) |
+| 5 | Change the structure of form-header | All files MUST be the same |
+| 6 | Translate file names, folders, paths into Vietnamese | Breaking system links |
+| 7 | Translate metadata labels (Code, Version, Owner...) | Keep it in English |
+| 8 | Translate SharePoint List names, Column names, Site names | system proper noun |
+| 9 | Translate roles (Team Leader, Foreman, Inspector...) | Unified proper noun |
+| 10 | Use gate-card/gate-grid for Internal Gates | IG MUST use 5-column TABLE |
+| 11 | Fixed limit 5 IG | The number of IG depends on the process, unlimited |
+| 12 | Force IG number = detailed step number | IG and detail step are two different classes |
+| 13 | Creating a flowchart that doesn't match the number of steps h3 | Flowchart steps = h3 headings |
+| 14 | Use a fixed color for proc-num balloons | Use 10 rotating colors |
+| 15 | Leave the Lead/Stop/KPI column blank in the IG table | Each IG MUST be complete |
+| 16 | Batch-upgrade the content `Section 1/2/3/4/5/8` with a common set of sentences for many SOPs | Leads to wrong boundaries, wrong roles, wrong exceptions and loss of practicality
+| 17 | Retain editorial guidance notes, benchmark notes or other notes from the old version in the SOP body | Draft documents will be dirty, out of context and difficult to release V0 |
+| 18 | Use bullet list for Section 8 when the SOP has multiple hold/restart/revalidation/change | branches Loss of owner, loss of person to remove hold and difficulty in auditing |
+| 19 | `metric-grid` is required for all SOPs even if there is no need for a separate KPI summary | Create a decorative section, duplicate KPIs already in Section 6 |
+| 20 | Write Section 3 using half-English, half-Vietnamese terms or parentheses | Obfuscating operational meanings and creating errors in the use of terminology in the body of the SOP |
 
 ---
 
-## 5. Checklist trước khi commit file HTML
+## 5. Checklist before committing HTML files
 
-### 5.1 Cấu trúc chung
-- [ ] File có `<link href="...assets/style.css" rel="stylesheet"/>` ?
-- [ ] `<table>` có `class="table"` ?
-- [ ] IG table có `<colgroup>` với col-ig, col-desc, col-owner, col-hold, col-kpi ?
-- [ ] Không có khai báo lại `.table`, `.note`, `.callout` trong inline `<style>` ?
-- [ ] Form header đúng cấu trúc (logo + title cùng hàng) ?
-- [ ] CSS variables dùng `var(--...)` thay vì hard-code màu ?
-- [ ] Relative path tới assets/ đúng ?
+### 5.1 General structure
+- [ ] File has `<link href="...assets/style.css" rel="stylesheet"/>` ?
+- [ ] `<table>` has `class="table"` ?
+- [ ] IG table has `<colgroup>` with col-ig, col-desc, col-owner, col-hold, col-kpi ?
+- [ ] There is no redeclaration of `.table`, `.note`, `.callout` in inline `<style>` ?
+- [ ] Form header structure is correct (logo + title in the same row)?
+- [ ] CSS variables use `var(--...)` instead of hard-coding colors?
+- [ ] Relative path to assets/ correct?
 
-### 5.2 ISO map (Section đầu)
-- [ ] ISO map có badge PHẢI/NÊN/CÓ THỂ (`req-tag`) ?
-- [ ] Mỗi yêu cầu có `iso-clause` badge với điều khoản cụ thể (§X.Y) ?
-- [ ] ISO version = 9001:**2026** (KHÔNG phải 2015) ?
+### 5.2 ISO map (First section)
+- [ ] ISO map has badge MUST/SHOULD/CAN (`req-tag`) ?
+- [ ] Each request has a `iso-clause` badge with specific terms (§X.Y) ?
+- [ ] ISO version = 9001:**2026** (NOT 2015) ?
 
-### 5.3 Section 1, 2, 3, 4, 5, 8
-- [ ] Section 1 nêu rõ rủi ro / lỗi / quyết định / đầu ra mà SOP này đang khóa, không phải câu mở đầu chung chung ?
-- [ ] Section 2 bám đúng bước đầu, bước cuối và handoff thật sang SOP/WI khác ?
-- [ ] Section 2 có nêu boundary restart / re-entry / transfer nếu Section 7 có nhánh đó ?
-- [ ] Section 3 chỉ giữ các thuật ngữ thật sự cần để hiểu gate/step ?
-- [ ] Tên thuật ngữ theo mẫu `English term (thuật ngữ tiếng Việt chuẩn)` và thân SOP ưu tiên dùng bản tiếng Việt ?
-- [ ] Section 4 bao phủ toàn bộ owner giữ IG và vai trò có quyền HOLD / RELEASE / RESTART / REVALIDATE / APPROVE EXCEPTION ?
-- [ ] Section 5 map được về trước IG1/B1, sau gate cuối/bước cuối và trigger restart/change/escalation thật ?
-- [ ] Section 5 không dùng ô mơ hồ kiểu `khi cần`, `theo yêu cầu`, `tài liệu liên quan` ?
-- [ ] Section 8 mặc định dùng table 5 cột; nếu dùng bullet list thì đã chứng minh SOP này là governance hẹp và không mất owner / người gỡ hold / hồ sơ ?
-- [ ] Mỗi scenario ở Section 8 đều có chủ trì + người gỡ hold / phê duyệt tiếp + hồ sơ ?
-- [ ] Body SOP không còn note biên tập, note benchmark, note khác bản cũ hay note phương pháp viết ?
+### 5.3 Sections 1, 2, 3, 4, 5, 8
+- [ ] Section 1 clearly states the risks / errors / decisions / outputs that this SOP is blocking, not a general opening sentence?
+- [ ] Section 2 follows the correct first step, last step and real handoff to another SOP/WI?
+- [ ] Does Section 2 state boundary restart / re-entry / transfer if Section 7 has that branch?
+- [ ] Section 3 only keeps the terms really needed to understand gate/step?
+- [ ] The term name follows the form `English term (thuật ngữ tiếng Việt chuẩn)` and the Vietnamese version of the SOP body is preferred?
+- [ ] Section 4 covers all IG owners and roles with HOLD / RELEASE / RESTART / REVALIDATE / APPROVE EXCEPTION rights?
+- [ ] Section 5 map is returned before IG1/B1, after the last gate/last step and trigger restart/change/escalation?
+- [ ] Section 5 does not use ambiguous cells of type `khi cần`, `theo yêu cầu`, `tài liệu liên quan` ?
+- [ ] Section 8 uses a 5-column table by default; If you use a bullet list, it proves that this SOP is narrow governance and does not lose the owner / deholder / profile?
+- [ ] Each scenario in Section 8 has a chair + person to unhold / approve + documents ?
+- [ ] Body SOP no longer has editorial notes, benchmark notes, notes different from the old version, or writing method notes?
 
 ### 5.4 Section 6 — Internal Gates
-- [ ] Dùng TABLE 5 cột (KHÔNG dùng gate-card) ?
-- [ ] IG badge dùng `step-tag` + `ig-center` class ?
-- [ ] Mỗi IG có: Mô tả, Chủ trì, Điểm dừng, KPI (KHÔNG để trống) ?
-- [ ] Số IG phù hợp quy trình (KHÔNG giới hạn cố định 5) ?
-- [ ] Số IG không bị ép khớp với số bước Section 7 ?
+- [ ] Use 5-column TABLE (DO NOT use gate-card) ?
+- [ ] IG badge uses `step-tag` + `ig-center` class?
+- [ ] Each IG has: Description, Chair, Breakpoint, KPI (DO NOT leave blank) ?
+- [ ] Number of IGs that comply with the process (NO fixed limit of 5) ?
+- [ ] IG number is not forced to match the Section 7 step number?
 
-### 5.5 Section 7 — Quy trình chi tiết
-- [ ] Có flowchart (`<div class="flowchart">`) SAU heading h2 ?
-- [ ] Số bước flowchart = Số h3 headings bên dưới ?
-- [ ] Mỗi h3 có `proc-num` balloon với màu xoay ?
-- [ ] Với SOP sinh tự động: mỗi `flow-num` trong flowchart có inline style ?
-- [ ] Flowchart steps có `.active` (quyết định) và `.critical` (kiểm tra) ?
-- [ ] Số bước chi tiết được tách theo logic vận hành, không theo số IG ?
-- [ ] Nội dung bước chi tiết: giải thích WHO/WHAT/WHEN/HOW ?
-- [ ] Có callout "Điểm dừng bắt buộc" tại các bước quan trọng ?
-- [ ] Có "Bàn giao" cuối mỗi bước ?
-- [ ] Đã kiểm tra không xóa nhầm `p6`, `p7`, `p8` khi thay section ?
+### 5.5 Section 7 — Detailed procedures
+- [ ] Is there flowchart (`<div class="flowchart">`) AFTER heading h2 ?
+- [ ] Number of flowchart steps = Number of h3 headings below?
+- [ ] Each h3 has `proc-num` balloon with rotating color?
+- [ ] With automatically generated SOP: does each `flow-num` in the flowchart have an inline style?
+- [ ] Flowchart steps have `.active` (decision) and `.critical` (check) ?
+- [ ] Detailed step numbers are separated by operating logic, not by IG number?
+- [ ] Detailed step content: explain WHO/WHAT/WHEN/HOW ?
+- [ ] Is there a "Force stop" callout at important steps?
+- [ ] Is there a "Handover" at the end of each step?
+- [ ] Checked that `p6`, `p7`, `p8` were not mistakenly deleted when replacing the section?
 
-### 5.6 Khi cập nhật nội dung
-- [ ] Kiểm tra lại đánh số IG1→IGn (có bị lệch không) ?
-- [ ] Kiểm tra flowchart khớp h3 headings (thêm/xóa bước → update flowchart) ?
-- [ ] Kiểm tra nội dung procedure không bị đẩy sang section khác ?
-- [ ] Kiểm tra lỗi chính tả (đặc biệt chữ đầu từ tiếng Việt) ?
-- [ ] Kiểm tra body không còn note biên tập như `Bổ sung theo note`, `Liên kết note`, `Quy tắc dùng thuật ngữ`, `so với bản trước` ?
+### 5.6 When updating content
+- [ ] Check the numbering IG1→IGn (is it wrong)?
+- [ ] Check flowchart matches h3 headings (add/delete step → update flowchart) ?
+- [ ] Check that the procedure content is not pushed to another section?
+- [ ] Check spelling errors (especially the first letter of Vietnamese words)?
+- [ ] Check if the body no longer has editing notes like `Bổ sung theo note`, `Liên kết note`, `Quy tắc dùng thuật ngữ`, `so với bản trước` ?
 
 ---
 
-## 6. Hệ thống 8 cổng (G0→G7) — Tham chiếu nhanh
+## 6. 8-port system (G0→G7) — Quick reference
 
 ```
 G0 Contract → G1 Engineering ‖ G2 IQC → G3 Setup → G4 FAI → G5 IPQC → G6 Final QC → G7 Ship
 ```
 
-| Gate | Tên | Màu header | SOP chính |
+| Gate | Name | Header color | Main SOP |
 |------|-----|-----------|-----------|
-| G0 | Contract | #4CAF50 (xanh lá) | SOP-201 |
+| G0 | Contract | #4CAF50 (green) | SOP-201 |
 | G1 | Engineering | #1565C0 (navy) | SOP-303 |
-| G2 | IQC | #795548 (nâu) | WI-701, SOP-402 |
-| G3 | Setup | #2196F3 (xanh) | SOP-504 |
-| G4 | FAI | #FF9800 (cam) | SOP-302 |
-| G5 | IPQC | #9C27B0 (tím) | SOP-502, SOP-604 |
+| G2 | IQC | #795548 (brown) | WI-701, SOP-402 |
+| G3 | Setup | #2196F3 (green) | SOP-504 |
+| G4 | FAI | #FF9800 (orange) | SOP-302 |
+| G5 | IPQC | #9C27B0 (purple) | SOP-502, SOP-604 |
 | G6 | Final QC | #00BCD4 (teal) | SOP-605 |
-| G7 | Ship | #F44336 (đỏ) | SOP-605 |
+| G7 | Ship | #F44336 (red) | SOP-605 |
 
-**Lưu ý:** G1 và G2 chạy **SONG SONG**. Cả hai PHẢI hoàn tất trước G3.
+**Note:** G1 and G2 run **PARALLEL**. Both MUST be completed before G3.

@@ -1,0 +1,753 @@
+{
+    "_meta": {
+        "version": "1.2",
+        "created": "2026-03-28",
+        "updated": "2026-04-01T09:41:52+00:00",
+        "description": "Sales Order -> Job Order -> Work Order hierarchy with commercial, engineering, quality, and fulfillment governance. Seed runtime used before Epicor integration goes live.",
+        "counters": {
+            "last_so": "SO-2026-00002",
+            "last_jo": "JO-2026-00002",
+            "last_wo": "WO-2026-00003"
+        }
+    },
+    "sales_orders": [
+        {
+            "so_number": "SO-2026-00001",
+            "customer_id": "CUS-LAM",
+            "customer_name": "Lam Research",
+            "customer_site_id": "LAM-US-FREMONT",
+            "ship_to_site_id": "LAM-US-FREMONT",
+            "customer_po": "LAM-PO-88421",
+            "order_date": "2026-03-18",
+            "requested_date": "2026-04-05",
+            "promise_date": "2026-04-06",
+            "commit_date": "2026-04-07",
+            "due_date": "2026-04-08",
+            "total_qty": 80,
+            "priority": "high",
+            "incoterm_code": "FCA",
+            "shipping_method_id": "AIR-PRIORITY",
+            "payment_term_code": "NET30",
+            "contract_review": "CR-LAM-88421",
+            "contract_review_status": "approved",
+            "fulfillment_status": "pack_prep",
+            "certificate_of_conformance_required": true,
+            "certificate_of_analysis_required": true,
+            "export_control_required": true,
+            "packing_spec_code": "PK-LAM-AERO",
+            "label_spec_code": "LBL-LAM-CLEAN",
+            "document_requirements": [
+                {
+                    "code": "COC",
+                    "title_vi": "Chứng nhận phù hợp",
+                    "title_en": "Certificate of conformance",
+                    "status": "pending",
+                    "owner": "QA"
+                },
+                {
+                    "code": "COA",
+                    "title_vi": "Chứng nhận phân tích",
+                    "title_en": "Certificate of analysis",
+                    "status": "pending",
+                    "owner": "QA"
+                },
+                {
+                    "code": "EXPORT",
+                    "title_vi": "Hồ sơ xuất khẩu",
+                    "title_en": "Export documentation",
+                    "status": "ready",
+                    "owner": "LOG"
+                }
+            ],
+            "open_actions": [
+                {
+                    "action_id": "SO1-ACT-1",
+                    "title_vi": "Chốt COC/COA trước shipping release",
+                    "title_en": "Complete COC/COA before shipping release",
+                    "status": "open",
+                    "severity": "warning",
+                    "owner": "QA",
+                    "due_date": "2026-04-04"
+                }
+            ],
+            "status": "in_production"
+        },
+        {
+            "so_number": "SO-2026-00002",
+            "customer_id": "CUS-ACME",
+            "customer_name": "ACME Industries",
+            "customer_site_id": "ACME-SG-PLANT2",
+            "ship_to_site_id": "ACME-SG-PLANT2",
+            "customer_po": "ACME-PO-1109",
+            "order_date": "2026-03-20",
+            "requested_date": "2026-04-12",
+            "promise_date": "2026-04-16",
+            "commit_date": "2026-04-17",
+            "due_date": "2026-04-18",
+            "total_qty": 120,
+            "priority": "normal",
+            "incoterm_code": "DAP",
+            "shipping_method_id": "COURIER-DHL",
+            "payment_term_code": "NET45",
+            "contract_review": "",
+            "contract_review_status": "pending",
+            "fulfillment_status": "planning",
+            "certificate_of_conformance_required": true,
+            "certificate_of_analysis_required": false,
+            "export_control_required": false,
+            "packing_spec_code": "PK-ACME-STD",
+            "label_spec_code": "LBL-ACME-BLUE",
+            "document_requirements": [
+                {
+                    "code": "COC",
+                    "title_vi": "Chứng nhận phù hợp",
+                    "title_en": "Certificate of conformance",
+                    "status": "pending",
+                    "owner": "QA"
+                },
+                {
+                    "code": "PACK",
+                    "title_vi": "Quy cách đóng gói",
+                    "title_en": "Packing specification",
+                    "status": "ready",
+                    "owner": "LOG"
+                }
+            ],
+            "open_actions": [
+                {
+                    "action_id": "SO2-ACT-1",
+                    "title_vi": "Hoàn tất contract review và commit giao hàng",
+                    "title_en": "Finish contract review and internal commit",
+                    "status": "open",
+                    "severity": "warning",
+                    "owner": "Sales",
+                    "due_date": "2026-04-02"
+                }
+            ],
+            "status": "confirmed"
+        },
+        {
+            "customer_id": "CUS-LAM",
+            "customer_po": "PO-1775036333",
+            "due_date": "2026-04-15",
+            "order_date": "2026-04-01",
+            "priority": "normal",
+            "so_number": "SO-MANUAL-1775036333",
+            "total_qty": 25,
+            "status": "draft",
+            "created_at": "2026-04-01T09:38:53+00:00",
+            "created_by": "codex.admin",
+            "updated_at": "2026-04-01T09:38:53+00:00",
+            "updated_by": "codex.admin",
+            "status_history": [
+                {
+                    "status": "draft",
+                    "timestamp": "2026-04-01T09:38:53+00:00",
+                    "user": "codex.admin",
+                    "note": "created"
+                }
+            ],
+            "customer_name": "Lam Research",
+            "customer_site_id": "LAM-US-FREMONT",
+            "ship_to_site_id": "LAM-US-FREMONT",
+            "packing_spec_code": "PK-LAM-AERO",
+            "label_spec_code": "LBL-LAM-CLEAN",
+            "shipping_method_id": "AIR-PRIORITY",
+            "incoterm_code": "FCA",
+            "payment_term_code": "NET30",
+            "certificate_of_conformance_required": true,
+            "certificate_of_analysis_required": true,
+            "export_control_required": true,
+            "requested_date": "2026-04-15",
+            "promise_date": "2026-04-15",
+            "commit_date": "2026-04-15",
+            "contract_review_status": "pending",
+            "fulfillment_status": "pending",
+            "document_requirements": [
+                {
+                    "code": "COC",
+                    "title_vi": "Chứng nhận phù hợp",
+                    "title_en": "Certificate of conformance",
+                    "status": "pending",
+                    "required": true,
+                    "owner": "QA/LOG"
+                },
+                {
+                    "code": "COA",
+                    "title_vi": "Chứng nhận phân tích",
+                    "title_en": "Certificate of analysis",
+                    "status": "pending",
+                    "required": true,
+                    "owner": "QA/LOG"
+                },
+                {
+                    "code": "EXPORT",
+                    "title_vi": "Hồ sơ xuất khẩu",
+                    "title_en": "Export documentation",
+                    "status": "pending",
+                    "required": true,
+                    "owner": "QA/LOG"
+                },
+                {
+                    "code": "PACK",
+                    "title_vi": "Quy cách đóng gói",
+                    "title_en": "Packing specification",
+                    "status": "pending",
+                    "required": true,
+                    "owner": "LOG"
+                },
+                {
+                    "code": "LABEL",
+                    "title_vi": "Quy cách tem nhãn",
+                    "title_en": "Label specification",
+                    "status": "pending",
+                    "required": true,
+                    "owner": "LOG"
+                }
+            ],
+            "milestones": [
+                {
+                    "code": "order_received",
+                    "title_vi": "Nhận đơn hàng",
+                    "title_en": "Order received",
+                    "date": "2026-04-01",
+                    "status": "planned",
+                    "owner": ""
+                },
+                {
+                    "code": "requested",
+                    "title_vi": "Ngày khách cần",
+                    "title_en": "Customer need date",
+                    "date": "2026-04-15",
+                    "status": "planned",
+                    "owner": ""
+                },
+                {
+                    "code": "promise",
+                    "title_vi": "Ngày hứa",
+                    "title_en": "Promise date",
+                    "date": "2026-04-15",
+                    "status": "planned",
+                    "owner": ""
+                },
+                {
+                    "code": "commit",
+                    "title_vi": "Ngày cam kết nội bộ",
+                    "title_en": "Internal commit date",
+                    "date": "2026-04-15",
+                    "status": "planned",
+                    "owner": ""
+                },
+                {
+                    "code": "due",
+                    "title_vi": "Ngày giao",
+                    "title_en": "Due date",
+                    "date": "2026-04-15",
+                    "status": "planned",
+                    "owner": ""
+                }
+            ]
+        },
+        {
+            "so_number": "SO-UIMODAL-1775036506",
+            "customer_id": "CUS-LAM",
+            "customer_po": "PO-1775036506",
+            "order_date": "2026-04-01",
+            "requested_date": "2026-04-01",
+            "promise_date": "2026-04-01",
+            "commit_date": "2026-04-01",
+            "due_date": "2026-04-18",
+            "total_qty": 12,
+            "status": "draft",
+            "created_at": "2026-04-01T09:41:49+00:00",
+            "created_by": "codex.admin",
+            "updated_at": "2026-04-01T09:41:49+00:00",
+            "updated_by": "codex.admin",
+            "status_history": [
+                {
+                    "status": "draft",
+                    "timestamp": "2026-04-01T09:41:49+00:00",
+                    "user": "codex.admin",
+                    "note": "created"
+                }
+            ],
+            "customer_name": "Lam Research",
+            "customer_site_id": "LAM-US-FREMONT",
+            "ship_to_site_id": "LAM-US-FREMONT",
+            "packing_spec_code": "PK-LAM-AERO",
+            "label_spec_code": "LBL-LAM-CLEAN",
+            "shipping_method_id": "AIR-PRIORITY",
+            "incoterm_code": "FCA",
+            "payment_term_code": "NET30",
+            "certificate_of_conformance_required": true,
+            "certificate_of_analysis_required": true,
+            "export_control_required": true,
+            "contract_review_status": "pending",
+            "fulfillment_status": "pending",
+            "document_requirements": [
+                {
+                    "code": "COC",
+                    "title_vi": "Chứng nhận phù hợp",
+                    "title_en": "Certificate of conformance",
+                    "status": "pending",
+                    "required": true,
+                    "owner": "QA/LOG"
+                },
+                {
+                    "code": "COA",
+                    "title_vi": "Chứng nhận phân tích",
+                    "title_en": "Certificate of analysis",
+                    "status": "pending",
+                    "required": true,
+                    "owner": "QA/LOG"
+                },
+                {
+                    "code": "EXPORT",
+                    "title_vi": "Hồ sơ xuất khẩu",
+                    "title_en": "Export documentation",
+                    "status": "pending",
+                    "required": true,
+                    "owner": "QA/LOG"
+                },
+                {
+                    "code": "PACK",
+                    "title_vi": "Quy cách đóng gói",
+                    "title_en": "Packing specification",
+                    "status": "pending",
+                    "required": true,
+                    "owner": "LOG"
+                },
+                {
+                    "code": "LABEL",
+                    "title_vi": "Quy cách tem nhãn",
+                    "title_en": "Label specification",
+                    "status": "pending",
+                    "required": true,
+                    "owner": "LOG"
+                }
+            ],
+            "milestones": [
+                {
+                    "code": "order_received",
+                    "title_vi": "Nhận đơn hàng",
+                    "title_en": "Order received",
+                    "date": "2026-04-01",
+                    "status": "planned",
+                    "owner": ""
+                },
+                {
+                    "code": "requested",
+                    "title_vi": "Ngày khách cần",
+                    "title_en": "Customer need date",
+                    "date": "2026-04-01",
+                    "status": "planned",
+                    "owner": ""
+                },
+                {
+                    "code": "promise",
+                    "title_vi": "Ngày hứa",
+                    "title_en": "Promise date",
+                    "date": "2026-04-01",
+                    "status": "planned",
+                    "owner": ""
+                },
+                {
+                    "code": "commit",
+                    "title_vi": "Ngày cam kết nội bộ",
+                    "title_en": "Internal commit date",
+                    "date": "2026-04-01",
+                    "status": "planned",
+                    "owner": ""
+                },
+                {
+                    "code": "due",
+                    "title_vi": "Ngày giao",
+                    "title_en": "Due date",
+                    "date": "2026-04-18",
+                    "status": "planned",
+                    "owner": ""
+                }
+            ]
+        }
+    ],
+    "job_orders": [
+        {
+            "jo_number": "JO-2026-00001",
+            "so_number": "SO-2026-00001",
+            "customer_id": "CUS-LAM",
+            "part_number": "714-1101",
+            "part_revision": "REV-C",
+            "part_description": "Valve Housing, 17-4PH",
+            "material_spec": "17-4PH H900",
+            "qty_ordered": 80,
+            "start_date": "2026-03-25",
+            "release_target_date": "2026-03-24",
+            "due_date": "2026-04-06",
+            "routing_id": "ROUT-714-1101-C",
+            "bom_id": "BOM-714-1101-C",
+            "control_plan_id": "CP-714-1101-C",
+            "inspection_plan_id": "IP-714-1101-C",
+            "traveler_template_id": "TRV-714-1101-C",
+            "engineering_release_status": "released",
+            "material_ready_status": "ready",
+            "quality_plan_status": "ready",
+            "source_inspection_status": "pending",
+            "fai_required": true,
+            "customer_source_inspection": true,
+            "special_process": "Passivation",
+            "special_process_supplier_id": "SUP-ACOAT",
+            "traceability_level": "lot_heat",
+            "outside_processing_required": true,
+            "outside_processing_status": "scheduled",
+            "open_actions": [
+                {
+                    "action_id": "JO1-ACT-1",
+                    "title_vi": "Chốt lịch witness với khách",
+                    "title_en": "Confirm customer witness schedule",
+                    "status": "open",
+                    "severity": "warning",
+                    "owner": "Sales/QA",
+                    "due_date": "2026-04-01"
+                }
+            ],
+            "status": "active"
+        },
+        {
+            "jo_number": "JO-2026-00002",
+            "so_number": "SO-2026-00002",
+            "customer_id": "CUS-ACME",
+            "part_number": "P-1001",
+            "part_revision": "REV-C",
+            "part_description": "Mounting Bracket, AL6061",
+            "material_spec": "AL6061-T651",
+            "qty_ordered": 120,
+            "start_date": "2026-03-27",
+            "release_target_date": "2026-04-01",
+            "due_date": "2026-04-15",
+            "routing_id": "ROUT-P1001-C",
+            "bom_id": "BOM-P1001-C",
+            "control_plan_id": "CP-P1001-C",
+            "inspection_plan_id": "IP-P1001-C",
+            "traveler_template_id": "TRV-P1001-C",
+            "engineering_release_status": "released",
+            "material_ready_status": "pending",
+            "quality_plan_status": "planned",
+            "source_inspection_status": "not_required",
+            "fai_required": false,
+            "customer_source_inspection": false,
+            "special_process": "",
+            "traceability_level": "lot",
+            "outside_processing_required": false,
+            "outside_processing_status": "not_required",
+            "open_actions": [
+                {
+                    "action_id": "JO2-ACT-1",
+                    "title_vi": "Gỡ hold vật liệu trước release hoàn toàn",
+                    "title_en": "Clear material readiness before full release",
+                    "status": "open",
+                    "severity": "critical",
+                    "owner": "SCM",
+                    "due_date": "2026-04-01"
+                }
+            ],
+            "status": "released"
+        },
+        {
+            "due_date": "2026-04-12",
+            "jo_number": "JO-MANUAL-1775036333",
+            "material_spec": "AL6061",
+            "part_description": "Valve Housing, 17-4PH",
+            "part_number": "714-1101",
+            "part_revision": "REV-C",
+            "qty_ordered": 25,
+            "so_number": "SO-MANUAL-1775036333",
+            "start_date": "2026-04-02",
+            "status": "planned",
+            "created_at": "2026-04-01T09:38:53+00:00",
+            "created_by": "codex.admin",
+            "updated_at": "2026-04-01T09:38:53+00:00",
+            "updated_by": "codex.admin",
+            "status_history": [
+                {
+                    "status": "planned",
+                    "timestamp": "2026-04-01T09:38:53+00:00",
+                    "user": "codex.admin",
+                    "note": "created"
+                }
+            ],
+            "customer_id": "CUS-LAM",
+            "routing_id": "ROUT-714-1101-C",
+            "bom_id": "BOM-714-1101-C",
+            "control_plan_id": "CP-714-1101-C",
+            "inspection_plan_id": "IP-714-1101-C",
+            "traveler_template_id": "TRV-714-1101-C",
+            "release_target_date": "2026-04-02",
+            "engineering_release_status": "released",
+            "material_ready_status": "pending",
+            "quality_plan_status": "planned",
+            "source_inspection_status": "not_required",
+            "traceability_level": "lot_heat",
+            "outside_processing_required": false,
+            "outside_processing_status": "not_required",
+            "milestones": [
+                {
+                    "code": "planned_start",
+                    "title_vi": "Bắt đầu kế hoạch",
+                    "title_en": "Planned start",
+                    "date": "2026-04-02",
+                    "status": "planned",
+                    "owner": ""
+                },
+                {
+                    "code": "release_target",
+                    "title_vi": "Mốc phát hành",
+                    "title_en": "Release target",
+                    "date": "2026-04-02",
+                    "status": "planned",
+                    "owner": ""
+                },
+                {
+                    "code": "due",
+                    "title_vi": "Hạn JO",
+                    "title_en": "JO due date",
+                    "date": "2026-04-12",
+                    "status": "planned",
+                    "owner": ""
+                }
+            ]
+        },
+        {
+            "jo_number": "JO-UIMODAL-1775036506",
+            "so_number": "SO-UIMODAL-1775036506",
+            "part_number": "714-1101",
+            "part_revision": "REV-C",
+            "part_description": "Valve Housing, 17-4PH",
+            "material_spec": "AL6061",
+            "qty_ordered": 12,
+            "start_date": "2026-04-02",
+            "release_target_date": "2026-04-01",
+            "due_date": "2026-04-10",
+            "status": "planned",
+            "created_at": "2026-04-01T09:41:51+00:00",
+            "created_by": "codex.admin",
+            "updated_at": "2026-04-01T09:41:51+00:00",
+            "updated_by": "codex.admin",
+            "status_history": [
+                {
+                    "status": "planned",
+                    "timestamp": "2026-04-01T09:41:51+00:00",
+                    "user": "codex.admin",
+                    "note": "created"
+                }
+            ],
+            "customer_id": "CUS-LAM",
+            "routing_id": "ROUT-714-1101-C",
+            "bom_id": "BOM-714-1101-C",
+            "control_plan_id": "CP-714-1101-C",
+            "inspection_plan_id": "IP-714-1101-C",
+            "traveler_template_id": "TRV-714-1101-C",
+            "engineering_release_status": "released",
+            "material_ready_status": "pending",
+            "quality_plan_status": "planned",
+            "source_inspection_status": "not_required",
+            "traceability_level": "lot_heat",
+            "outside_processing_required": false,
+            "outside_processing_status": "not_required",
+            "milestones": [
+                {
+                    "code": "planned_start",
+                    "title_vi": "Bắt đầu kế hoạch",
+                    "title_en": "Planned start",
+                    "date": "2026-04-02",
+                    "status": "planned",
+                    "owner": ""
+                },
+                {
+                    "code": "release_target",
+                    "title_vi": "Mốc phát hành",
+                    "title_en": "Release target",
+                    "date": "2026-04-01",
+                    "status": "planned",
+                    "owner": ""
+                },
+                {
+                    "code": "due",
+                    "title_vi": "Hạn JO",
+                    "title_en": "JO due date",
+                    "date": "2026-04-10",
+                    "status": "planned",
+                    "owner": ""
+                }
+            ]
+        }
+    ],
+    "work_orders": [
+        {
+            "wo_number": "WO-2026-00001",
+            "jo_number": "JO-2026-00001",
+            "operation_number": 10,
+            "operation_desc": "5-axis rough machining",
+            "machine_id": "MC-5AX-01",
+            "work_center_id": "WC-5AX",
+            "operator_id": "OPR-001",
+            "nc_program_id": "NC_714-1101_REVC_OP10_5AX_V3",
+            "setup_time_est": 90,
+            "run_time_est": 240,
+            "scheduled_start": "2026-03-30T08:00:00+07:00",
+            "scheduled_end": "2026-03-30T13:30:00+07:00",
+            "actual_start": "2026-03-29T08:05:00+07:00",
+            "setup_time_actual": 82,
+            "run_time_actual": 138,
+            "qty_completed": 24,
+            "qty_scrap": 1,
+            "fixture_id": "FIX-001",
+            "dispatch_priority": "high",
+            "quality_gate_status": "in_progress",
+            "first_piece_status": "approved",
+            "handover_status": "done",
+            "material_lot_number": "MATL-174PH-20260318-A",
+            "heat_number": "H900-24-173",
+            "traveler_number": "TRV-7141101-0001",
+            "traveler_status": "verified",
+            "material_cert_status": "approved",
+            "status": "running"
+        },
+        {
+            "wo_number": "WO-2026-00002",
+            "jo_number": "JO-2026-00001",
+            "operation_number": 20,
+            "operation_desc": "FAI and final inspection",
+            "machine_id": "CMM-01",
+            "work_center_id": "WC-QA",
+            "operator_id": "QC-002",
+            "nc_program_id": "",
+            "setup_time_est": 20,
+            "run_time_est": 80,
+            "scheduled_start": "2026-03-31T09:00:00+07:00",
+            "scheduled_end": "2026-03-31T11:00:00+07:00",
+            "actual_start": "2026-03-29T12:00:00+07:00",
+            "setup_time_actual": 24,
+            "run_time_actual": 56,
+            "qty_completed": 24,
+            "qty_scrap": 1,
+            "fixture_id": "GAGE-CMM-002",
+            "dispatch_priority": "high",
+            "quality_gate_status": "pending",
+            "first_piece_status": "pending",
+            "handover_status": "pending",
+            "material_lot_number": "MATL-174PH-20260318-A",
+            "heat_number": "H900-24-173",
+            "traveler_number": "TRV-7141101-0001",
+            "traveler_status": "attached",
+            "material_cert_status": "approved",
+            "status": "inspection"
+        },
+        {
+            "wo_number": "WO-2026-00003",
+            "jo_number": "JO-2026-00002",
+            "operation_number": 10,
+            "operation_desc": "VMC machining",
+            "machine_id": "MC-3AX-04",
+            "work_center_id": "WC-3AX",
+            "operator_id": "OPR-014",
+            "nc_program_id": "NC_P-1001_REVC_OP10_3AX_V2",
+            "setup_time_est": 45,
+            "run_time_est": 210,
+            "scheduled_start": "2026-04-02T08:00:00+07:00",
+            "scheduled_end": "2026-04-02T12:30:00+07:00",
+            "actual_start": "2026-03-29T09:45:00+07:00",
+            "setup_time_actual": 44,
+            "run_time_actual": 72,
+            "qty_completed": 18,
+            "qty_scrap": 2,
+            "fixture_id": "FIX-014",
+            "dispatch_priority": "normal",
+            "quality_gate_status": "on_hold",
+            "first_piece_status": "not_required",
+            "handover_status": "pending",
+            "material_lot_number": "MATL-AL6061-20260324-B",
+            "heat_number": "",
+            "traveler_number": "",
+            "traveler_status": "pending",
+            "material_cert_status": "on_hold",
+            "status": "on_hold"
+        },
+        {
+            "jo_number": "JO-MANUAL-1775036333",
+            "machine_id": "MC-5AX-01",
+            "operation_desc": "Manual test operation",
+            "operation_number": "010",
+            "operator_id": "OPR-001",
+            "status": "scheduled",
+            "wo_number": "WO-MANUAL-1775036333",
+            "work_center_id": "WC-5AX",
+            "created_at": "2026-04-01T09:38:53+00:00",
+            "created_by": "codex.admin",
+            "updated_at": "2026-04-01T09:38:53+00:00",
+            "updated_by": "codex.admin",
+            "status_history": [
+                {
+                    "status": "scheduled",
+                    "timestamp": "2026-04-01T09:38:53+00:00",
+                    "user": "codex.admin",
+                    "note": "created"
+                }
+            ],
+            "part_number": "714-1101",
+            "part_revision": "REV-C",
+            "customer_id": "CUS-LAM",
+            "part_description": "Valve Housing, 17-4PH",
+            "material_spec": "AL6061",
+            "dispatch_priority": "normal",
+            "quality_gate_status": "pending",
+            "first_piece_status": "not_required",
+            "handover_status": "pending",
+            "milestones": []
+        },
+        {
+            "wo_number": "WO-UIMODAL-1775036506",
+            "jo_number": "JO-UIMODAL-1775036506",
+            "operation_number": 20,
+            "operation_desc": "UI modal test operation",
+            "machine_id": "MC-5AX-01",
+            "work_center_id": "WC-5AX",
+            "operator_id": "OPR-001",
+            "status": "scheduled",
+            "created_at": "2026-04-01T09:41:52+00:00",
+            "created_by": "codex.admin",
+            "updated_at": "2026-04-01T09:41:52+00:00",
+            "updated_by": "codex.admin",
+            "status_history": [
+                {
+                    "status": "scheduled",
+                    "timestamp": "2026-04-01T09:41:52+00:00",
+                    "user": "codex.admin",
+                    "note": "created"
+                }
+            ],
+            "part_number": "714-1101",
+            "part_revision": "REV-C",
+            "customer_id": "CUS-LAM",
+            "part_description": "Valve Housing, 17-4PH",
+            "material_spec": "AL6061",
+            "dispatch_priority": "standard",
+            "quality_gate_status": "pending",
+            "first_piece_status": "not_required",
+            "handover_status": "pending",
+            "milestones": []
+        }
+    ],
+    "form_links": [
+        {
+            "link_id": "LINK-202603291200-5190001",
+            "order_id": "WO-2026-00001",
+            "order_type": "wo",
+            "record_id": "PRERUN-2026-001",
+            "form_code": "FRM-519",
+            "status": "linked",
+            "auto_linked": true,
+            "linked_at": "2026-03-29T08:18:00+07:00",
+            "linked_by": "shift.leader"
+        }
+    ]
+}

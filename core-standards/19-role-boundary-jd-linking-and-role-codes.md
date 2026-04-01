@@ -1,105 +1,114 @@
-# 19. Role Boundary, JD Linking and Role Codes
+# 19. Role Boundary, JD Linking, and Role Codes
 
 > Version: v4 | Date: 2026-03-28 | Owner: QMS Engineer
 
 ---
 
-## 1. Muc tieu
+## 1. Purpose
 
-Tai lieu nay khoa chuan bat buoc cho toan bo he thong QMS khi dung:
-- chuc danh;
-- vai tro chu tri;
-- quyen han;
-- RACI;
-- owner KPI;
-- owner du lieu;
+This document locks the mandatory standard for the whole QMS system whenever we define:
+
+- job titles;
+- owning roles;
+- authority;
+- RACI actors;
+- KPI owners;
+- data owners;
 - hold/release authority;
-- actor trong exception va escalation.
+- actors in exceptions and escalation.
 
-Muc tieu la chan 6 loi he thong:
-- dung chuc danh troi dat, khong khop JD that;
-- dung placeholder mo ho nhu `Process Owner`, `Department Head`, `Data Owner`, `QA/QMS`;
-- giao authority cho mot vai tro khong ton tai trong JD;
-- thay the co hoc bang mot cum vai tro qua rong khong dung ngu canh SOP;
-- viet role dai dong trong header/RACI khien nguoi doc khong nhan ra ai co quyen that;
-- de sot role chung chung trong tai lieu cap doanh nghiep cua mo hinh `job-order CNC`.
+The purpose is to prevent 6 system-level errors:
 
-Tai lieu nay khoa chuan cho `role code`, `governance hat` va `bundle`.
-Quy tac cho `department code`, `subfunction code` va `coverage gap` duoc khoa rieng tai `20-department-boundary-handbook-codes.md`.
+- using floating titles that do not match a real JD;
+- using ambiguous placeholders such as `Process Owner`, `Department Head`, `Data Owner`, `QA/QMS`;
+- assigning authority to a role that does not actually exist in the JD library;
+- mechanically replacing actors with an overly broad role phrase that does not fit the SOP context;
+- writing long prose role descriptions in headers/RACI cells so readers cannot recognize who truly holds authority;
+- leaving vague role residue in enterprise-level documents for the `job-order CNC` operating model.
+
+This document locks standards for `role code`, `governance hat`, and `bundle` actors.
+Rules for `department code`, `subfunction code`, and `coverage gap` are locked separately in `20-department-boundary-handbook-codes.md`.
 
 ---
 
-## 2. Nguon chan ly
+## 2. Source of Truth
 
-Nguon chan ly vai tro gom 3 lop, theo thu tu uu tien:
+Role truth is organized in 3 layers, in order of priority:
 
 1. `02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/`
 2. `tools/data/role-registry-job-order-cnc.json`
 3. `tools/data/qms-terminology-dictionary.xlsx`
 
-Neu 3 lop mau thuan nhau:
-- JD that la nguon goc dau tien de xac nhan co hay khong co vai tro;
-- role registry la nguon hien thi chuan de dung trong HTML, header, RACI va link JD;
-- workbook chi la tu dien tham chieu, khong duoc phep di nguoc JD va registry.
+If the 3 layers conflict:
 
-Khong duoc phat hanh SOP/WI/ANNEX/JD moi neu vai tro trong tai lieu chua resolve vao 1 trong 3 lop tren.
+- the actual JD is the first source used to confirm whether a role truly exists;
+- the role registry is the canonical display source for HTML, headers, RACI, and JD links;
+- the workbook is reference glossary data and must not override the JD or registry.
 
-### 2.1 Benchmark ben ngoai bat buoc khi sua JD
+No new SOP/WI/ANNEX/JD may be released if the role in that document has not been resolved into one of the 3 layers above.
 
-Khi sua JD cho mo hinh `job-order CNC`, nguoi sua PHAI doi chieu them benchmark ben ngoai truoc khi chot boundary:
-- role dieu hanh san xuat va nang luc nha may;
-- role ky thuat / process / routing / prove-out;
-- role buyer / supply / warehouse / shipping;
-- role customer service / estimator trong chuoi `RFQ -> work order -> ship`;
-- role QMS / QA / inspection governance.
+### 2.1 Mandatory external benchmarking when a JD is edited
 
-Nguon benchmark ben ngoai chi duoc dung de:
-- kiem tra xem boundary noi bo co bo sot mot lop cong viec quan trong khong;
-- xac nhan mot role dang la authority ca nhan hay chi la mandate cap chuc nang;
-- bo sung nhiem vu thuc chien cho JD khi tai lieu cu noi qua so luoc.
+When editing a JD for the `job-order CNC` model, the editor MUST benchmark external references before closing the boundary:
 
-Role-family benchmark toi thieu nguoi sua PHAI doi chieu gom:
+- production-leadership and factory-capability roles;
+- engineering / process / routing / prove-out roles;
+- buyer / supply / warehouse / shipping roles;
+- customer service / estimator roles in the `RFQ -> work order -> ship` chain;
+- QMS / QA / inspection governance roles.
+
+External benchmarks may be used only to:
+
+- test whether the internal boundary is missing a real work layer;
+- confirm whether a role is individual authority or only a function-level mandate;
+- strengthen the JD with practical responsibilities when older documents are too thin.
+
+Minimum role-family benchmark layers:
+
 - industrial production manager / workshop manager layer;
 - first-line supervisor / frontline lead layer;
 - industrial / manufacturing / process engineer layer;
 - quality manager / quality engineer / inspector lead layer;
-- customer service / estimator / order admin layer;
-- IT infrastructure admin vs ERP / application admin layer.
+- customer service / estimator / order administration layer;
+- IT infrastructure admin versus ERP / application admin layer.
 
-Khong duoc copy nguyen van benchmark ben ngoai vao JD. Boundary cuoi cung van phai khoa theo to chuc HESEM, handbook phong ban va registry role da cong bo.
+Do not copy external benchmark language verbatim into a JD. Final boundaries must still be locked according to the HESEM organization, department handbooks, and the published role registry.
 
 ---
 
-## 3. Mo hinh role cho job-order CNC
+## 3. Role Model for Job-Order CNC
 
-HESEM van hanh theo mo hinh `job-order CNC`, tuc la:
+HESEM operates under a `job-order CNC` model:
+
 - high-mix, low-to-medium volume;
-- nhieu handoff giua thuong mai, ky thuat, ke hoach, xuong, QC, logistics va tai chinh;
-- quyen HOLD rong hon quyen RELEASE;
-- moi gate chi di tiep khi du bang chung.
+- many handoffs across commercial, engineering, planning, workshop, QC, logistics, and finance;
+- HOLD authority is broader than RELEASE authority;
+- every gate moves forward only when evidence is sufficient.
 
-Vi vay role boundary phai tach ro:
-- thuong mai va customer communication;
-- quoting va commit gia;
-- engineering feasibility va release;
-- process/routing/setup standard;
-- shop scheduling va dispatch;
+Because of that, role boundaries must stay separate for:
+
+- commercial ownership and customer communication;
+- quoting and commercial commitment;
+- engineering feasibility and release;
+- process / routing / setup standard ownership;
+- shop scheduling and dispatch;
 - workshop execution;
-- frontline leadership tai diem dung;
-- QC/QA/QMS governance;
-- supply chain, warehouse, shipping;
-- finance closeout;
-- HR/EHS/IT support.
+- frontline leadership at point of use;
+- QC / QA / QMS governance;
+- supply chain, warehouse, and shipping;
+- finance close-out;
+- HR / EHS / IT support.
 
-Khong duoc gop cac ranh gioi nay chi vi tai lieu cu tung viet gop.
+These boundaries must not be collapsed simply because older documents once wrote them as a combined cluster.
 
 ---
 
-## 4. Cac lop role duoc phep
+## 4. Allowed Role Layers
 
 ### 4.1 Base roles
 
-Base role la vi tri co JD that. Vi du:
+A base role is a position that has a real JD. Examples include:
+
 - `CEO`, `PD`
 - `CS`, `EST`
 - `ENGM`, `DFM`, `PE`, `CAM`
@@ -109,17 +118,19 @@ Base role la vi tri co JD that. Vi du:
 - `FIN`, `APAR`, `GLP`
 - `HR`, `EHS`, `ITA`, `ESA`
 
-Chi tao base role moi khi:
-- co JD rieng;
-- co duong bao cao ro;
-- co ranh gioi trach nhiem on dinh;
-- co nhu cau dung lap lai trong nhieu tai lieu.
+A new base role is allowed only when:
+
+- it has its own JD;
+- it has a clear reporting line;
+- it has a stable responsibility boundary;
+- it must be reused across multiple documents.
 
 ### 4.2 Governance hats
 
-Governance hat khong phai vi tri doc lap. Do la "mu" quan tri gan len mot base role that.
+A governance hat is not an independent position. It is a governance capability attached to a real host role.
 
-Hat chuan hien hanh:
+Current standard hats:
+
 - `QA[QMR]`
 - `QMS[DC]`
 - `QMS[LA]`
@@ -131,22 +142,25 @@ Hat chuan hien hanh:
 - `ITA[IC-IT]`
 - `ESA[IC-IT]`
 
-Quy tac:
-- khong viet tran `QMR`, `Lead Auditor`, `Document Controller`, `CI Lead`, `Incident Commander`;
-- phai gan hat len host role that;
-- neu host role thay doi, phai cap nhat ca JD, registry va tai lieu lien quan.
+Rules:
+
+- do not write bare tokens such as `QMR`, `Lead Auditor`, `Document Controller`, `CI Lead`, `Incident Commander`;
+- the hat must always stay attached to the real host role;
+- if the host role changes, the JD, registry, and related documents must all be updated.
 
 ### 4.3 Role bundles
 
-Role bundle khong phai JD moi. Day la nhom explicit cua nhieu base role that, dung khi mot trach nhiem thuc su la lop actor chung nhung van phai truy ve JD goc cua tung nguoi.
+A role bundle is not a new JD. It is an explicit group of multiple real base roles, used only when the responsibility truly belongs to a stable actor layer but still needs to trace back to the original JD of each member.
 
-Moi bundle duoc cong bo PHAI co du 4 lop nguon:
-- registry nguon tai `tools/data/role-registry-job-order-cnc.json`;
-- trang glossary cong bo tai `02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html`;
-- link bundle render duoc trong HTML;
-- workbook `tools/data/qms-terminology-dictionary.xlsx` sheet `Bundle glossary`.
+Every published bundle MUST exist in 4 places:
 
-Bundle chuan hien hanh:
+- source registry: `tools/data/role-registry-job-order-cnc.json`
+- published glossary page: `02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html`
+- renderable bundle links/chips in HTML
+- workbook sheet `Bundle glossary` in `tools/data/qms-terminology-dictionary.xlsx`
+
+Current standard bundles:
+
 - `TOP_MGMT`
 - `FUNC_HEADS`
 - `FUNC_OWNERS`
@@ -166,7 +180,8 @@ Bundle chuan hien hanh:
 - `KNOWLEDGE_SMES`
 - `MR_REPORT_OWNERS`
 
-Y nghia bat buoc:
+Mandatory meanings:
+
 - `FUNC_HEADS` = `PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA`
 - `FUNC_OWNERS` = `CS / EST / PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA`
 - `DATA_OWNERS` = `CS / EST / PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA`
@@ -183,41 +198,46 @@ Y nghia bat buoc:
 - `KNOWLEDGE_SMES` = `DFM / CAM / PE / QE / MCS / WKM / SET / QCL / MNT / TOOL / ESA`
 - `MR_REPORT_OWNERS` = `CS / EST / PD / ENGM / QA[QMR] / QMS / SCM / FIN / HR / EHS / ITA`
 
-Quy tac bundle:
-- khong tao bundle de che mo trach nhiem;
-- bundle chi dung khi trach nhiem thuc su la lop actor chung, khong phai mot JD don le;
-- neu SOP chi ap cho mot pham vi hep, phai dung subset explicit hoac base role cu the, khong lay bundle rong cho tien;
-- moi bundle token dung doc lap trong HTML PHAI render thanh chip/link tro ve glossary bundle, khong de text tran bat nguoi doc tu doan nghia;
-- trong actor cell va owner cell, bundle mac dinh phai hien dang 1 chip gon co link glossary; khong bung toan bo thanh phan bundle ngay trong cell tru khi dang lam glossary, dictionary hoac bang giai nghia thanh phan;
-- neu gom nhom phong ban hoac nhom JD moi, phai bo sung bundle vao registry + glossary + workbook truoc khi dua vao tai lieu phat hanh.
+Bundle rules:
 
-### 4.4 Boundary bat buoc cho he role digital va frontline
+- do not create a bundle to hide accountability;
+- use a bundle only when the responsibility truly belongs to a shared actor layer, not to one single JD;
+- if the SOP applies to a narrow scope, use an explicit subset or specific base roles instead of a broad bundle;
+- any standalone bundle token in HTML MUST render as a chip/link to the bundle glossary, not as plain text that forces the reader to guess;
+- in actor cells and owner cells, a bundle should normally appear as one compact chip with glossary link; do not expand all members directly in the cell unless the document itself is a glossary, dictionary, or component-breakdown table;
+- if a new department cluster or JD cluster is needed, add the bundle to registry + glossary + workbook before it enters a released document.
 
-Khi sua JD theo benchmark `job-order CNC`, phai giu ro 4 ranh gioi sau:
-- `ITA` = ha tang CNTT nen, endpoint, account lifecycle, backup, network, user support; KHONG giu quyen noi dung du lieu nghiep vu.
-- `ESA` = cau hinh ERP, workflow, transaction integrity, BAQ/reporting governance, SoD va rollback/UAT; KHONG thay `FUNC_OWNERS` phe duyet noi dung nghiep vu.
-- `SL` va `QCL` = frontline lead tai diem dung; duoc dieu hanh, xac nhan trong pham vi duoc uy quyen, nhung khong tro thanh `department head` thu nho.
-- `PPL`, `WKM`, `ENGM`, `QA`, `SCM`, `FIN`, `HR`, `EHS` = cac role giu ranh gioi quyen han chuc nang / gate / sign-off o cap dieu hanh, khong duoc bi hoa tan thanh cum chung chung kieu `manager`, `owner`, `lead`.
+### 4.4 Mandatory boundary for digital and frontline role systems
 
-Trong tai lieu digital / KPI / authority:
-- `MR_REPORT_OWNERS` = nhom role chot va nop pack KPI/MR.
-- `DATA_OWNERS` = nhom role/chuc nang so huu noi dung nghiep vu cua du lieu.
-- `SYSTEM_OWNERS` = nhom role so huu lop nen he thong, access, refresh logic, backup, workflow va truy vet ky thuat.
-- `FUNC_OWNERS` hoac `OPS_SCOPE_OWNERS` = nhom role/chuc nang so huu pham vi van hanh va noi dung lien phong ban khi tai lieu dang noi toi scope rong hon business-data ownership.
+When editing a JD using the `job-order CNC` benchmark, keep these boundaries explicit:
 
-Khong duoc gop 3 lop nay thanh mot cum mo ho nhu `data owner`, `business owner`, `system owner`, `process owner`.
+- `ITA` = base IT infrastructure, endpoints, account lifecycle, backup, network, and user support; it does NOT own business-content decisions.
+- `ESA` = ERP configuration, workflow, transaction integrity, BAQ/reporting governance, SoD, rollback/UAT; it does NOT replace `FUNC_OWNERS` for business-content approval.
+- `SL` and `QCL` = frontline leads at the point of use; they may direct and confirm within delegated scope, but they do not become miniature department heads.
+- `PPL`, `WKM`, `ENGM`, `QA`, `SCM`, `FIN`, `HR`, `EHS` = operating-level roles that hold function/gate/sign-off boundaries and must not dissolve into vague labels such as `manager`, `owner`, or `lead`.
 
-Neu can gom gon mot nhom JD hay mot nhom phong ban moi cho tai lieu phat hanh:
-- PHAI dang ky thanh `bundle` chinh thuc trong registry;
-- PHAI co trang glossary cong bo va workbook;
-- PHAI render thanh chip co link tro ve glossary;
-- KHONG duoc de text tran roi bat nguoi doc tu doan nghia.
+For digital / KPI / authority documents:
+
+- `MR_REPORT_OWNERS` = the group that closes and submits KPI/MR packs.
+- `DATA_OWNERS` = the group/function that owns the business content of data.
+- `SYSTEM_OWNERS` = the group that owns the technical system layer, access, refresh logic, backup, workflow, and technical traceability.
+- `FUNC_OWNERS` or `OPS_SCOPE_OWNERS` = the group/function that owns broad operating scope and cross-functional content when the document is talking about more than pure business-data ownership.
+
+Do not merge these three layers into vague phrases such as `data owner`, `business owner`, `system owner`, or `process owner`.
+
+If a new stable actor group is needed for released documents:
+
+- it MUST be published as an official `bundle` in the registry;
+- it MUST have a published glossary page and workbook entry;
+- it MUST render as a linked chip;
+- it MUST NOT remain as plain text that requires reader interpretation.
 
 ---
 
-## 5. Placeholder bi cam
+## 5. Forbidden Placeholders
 
-Cam xuat hien doc lap trong header, owner cell, RACI cell, hold/release cell, approver cell, KPI owner cell:
+The following must not appear as standalone actors in headers, owner cells, RACI cells, hold/release cells, approver cells, or KPI-owner cells:
+
 - `Process Owner`
 - `Department Head`
 - `Department head`
@@ -248,229 +268,251 @@ Cam xuat hien doc lap trong header, owner cell, RACI cell, hold/release cell, ap
 - `Change Owner`
 - `Commercial Responsible Person`
 
-Neu can dung cac khai niem nay, phai resolve thanh mot trong 3 dang:
+If one of those concepts is needed, it must resolve into one of only 3 forms:
 
-1. mot base role cu the;
-2. mot governance hat gan tren base role;
-3. mot explicit role bundle duoc render bang role chips co link JD.
+1. a specific base role;
+2. a governance hat attached to a base role;
+3. an explicit published role bundle rendered as linked role chips.
 
-Vi du dung:
+Correct examples:
+
 - `QA[QMR]`
 - `QMS[DC]`
 - `CS / EST / PPL`
 - `CS / EST / PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA`
 - `WKM / SL / DBL / CPS / QCL`
 
-Vi du sai:
+Incorrect examples:
+
 - `Process Owner`
 - `Department Head + QA`
-- `Responsible Person Thuong mai`
+- `Commercial Responsible Person`
 - `Top Management`
 - `QA/QMS`
 - `Team Leader / Supervisor`
 - `QMS Manager / IT Data Owner`
 - `Business Owner + System Owner`
 
-Pseudo-role kieu `QMS Manager`, `IT Manager`, `Sales Manager`, `Engineering Manager`, `Production Supervisor`, `IQC Team Leader`, `QC Operator`, `Business Owner`, `System Owner`, `KPI owner` chi duoc giu lai neu da duoc nang cap thanh JD that va cap nhat registry. Neu chua co JD that, phai resolve ve role code, hat quan tri, bundle hoac D-code da duoc cong bo.
+Pseudo-roles such as `QMS Manager`, `IT Manager`, `Sales Manager`, `Engineering Manager`, `Production Supervisor`, `IQC Team Leader`, `QC Operator`, `Business Owner`, `System Owner`, and `KPI owner` may remain only if they are promoted into a real JD and the registry is updated. Otherwise they must resolve back to a published role code, governance hat, bundle, or D-code.
 
-### 5.1 Rule resolve `truong bo phan` va role chung chung
+### 5.1 Rule for resolving `department head` and other vague roles
 
-Khi tai lieu cu viet `truong bo phan`, `department head`, `supervisor`, `team leader`, `process owner` hoac `data owner`, nguoi sua KHONG duoc doi co hoc bang mot bundle duy nhat cho toan he thong. Phai tra loi ro 3 cau hoi truoc khi chot role:
+When older documents say `department head`, `supervisor`, `team leader`, `process owner`, or `data owner`, the editor must not mechanically replace them with one default bundle for the whole system. The editor must first answer:
 
-1. Day la owner chuc nang kinh doanh hay owner hien truong?
-2. Day la owner authority, owner tri du lieu, hay nguoi thuc thi tac nghiep?
-3. Day la pham vi enterprise, pham vi function, hay pham vi cell/shift/point-of-use?
+1. Is this a business-function owner or a frontline owner?
+2. Is this an authority owner, a data-governance owner, or an operating executive?
+3. Is the scope enterprise-level, function-level, or cell/shift/point-of-use-level?
 
-Mapping bat buoc theo ngu canh:
-- commercial function owner: `CS / EST`
-- enterprise functional owner: `FUNC_OWNERS`
-- point-of-use / document deployment / visual control: `POU_LEADS`
-- cross-functional operational scope owner: `OPS_SCOPE_OWNERS`
-- line-manager accountability cho nang luc va phan cong: `DIRECT_LINE_MGRS`
-- OJT / coaching / xac nhan thao tac: `OJT_COACHES`
-- technical SME / knowledge gate: `KNOWLEDGE_SMES`
+Mandatory contextual mapping:
 
-Neu sau khi doc SOP cu va JD van khong xac dinh duoc vai tro, phai:
-- xem ngu canh gate, KPI, exception, record owner va escalation;
-- doi chieu route job-order CNC thuc te;
-- neu van phat sinh mot role assignment moi co tinh on dinh, cap nhat registry, core standard va JD truoc khi dua vao SOP.
+- commercial function owner -> `CS / EST`
+- enterprise functional owner -> `FUNC_OWNERS`
+- point-of-use / deployment / visual-control owner -> `POU_LEADS`
+- cross-functional operational-scope owner -> `OPS_SCOPE_OWNERS`
+- line-management accountability for competence and assignment -> `DIRECT_LINE_MGRS`
+- OJT / coaching / execution confirmation -> `OJT_COACHES`
+- technical SME / knowledge-gate owner -> `KNOWLEDGE_SMES`
 
-Khong duoc de lai cac cum mo nhu:
-- `truong bo phan`
-- `department head lien quan`
-- `nguoi phu trach qua trinh`
-- `nguoi chiu trach nhiem KPI`
+If the role is still unclear after reading the SOP and JD:
+
+- examine the gate, KPI, exception, record-owner, and escalation context;
+- compare against the real job-order CNC route;
+- if the assignment is truly stable and recurring, update registry + core standard + JD before inserting it into the SOP.
+
+Do not leave vague residue such as:
+
+- `department head`
+- `related department head`
+- `process owner`
+- `KPI owner`
 - `trainer / mentor`
 - `supervisor`
 
-Neu muon nhac toi mot vai tro giao viec tam thoi nhu nguoi kem cap, chi duoc mo ta trong prose la `nguoi kem cap duoc chi dinh`; khong duoc dat no vao owner cell, approver cell hay header neu vai tro do khong co JD.
+If temporary helper language is needed in narrative prose, it may describe `the designated coach`, but it must not enter owner cells, approver cells, or headers unless that actor has a real JD.
 
 ---
 
-## 6. Quy tac hien thi
+## 6. Display Rules
 
 ### 6.1 Header
 
-Header dung role code rut gon, khong dung chuc danh dai.
+Use short role codes in headers, not long textual titles.
 
-Vi du dung:
-- `Chu so huu: QMS[DC] + QA[QMR]`
-- `Chu so huu: CS / EST / PPL`
-- `Phe duyet: CEO`
+Correct examples:
 
-Role code trong header phai:
-- hien thi bang chip ngan;
-- link truc tiep toi JD tuong ung;
-- dung dung relative path;
-- khong de text tran khi da co JD.
+- `Owner: QMS[DC] + QA[QMR]`
+- `Owner: CS / EST / PPL`
+- `Approved by: CEO`
 
-JD alignment rule bo sung:
-- Khi role-boundary cua phong ban thay doi theo mo hinh `job-order CNC`, JD phai duoc cap nhat truoc SOP/WI/ANNEX.
-- `Chuc danh theo tai lieu` trong JD giu English title; `Ma vai tro dung trong SOP/RACI` moi dung role chip.
-- Preface JD khong duoc lap handbook/link tham chieu; chi giu mot lan cho moi tai lieu lien doi.
+Header role codes must:
 
-Neu header cua WI/ANNEX/handbook dang noi toi mandate cap chuc nang hoac governance lien phong ban, duoc phep dung `D-code` theo `20-department-boundary-handbook-codes.md`. Khong duoc ep moi header thanh role code neu tai lieu do khong co mot owner ca nhan duy nhat.
+- render as compact chips;
+- link directly to the corresponding JD;
+- use correct relative paths;
+- never stay as plain text when a JD already exists.
+
+Additional JD-alignment rule:
+
+- when a department role boundary changes under the `job-order CNC` model, the JD must be updated before SOP/WI/ANNEX documents;
+- `Job title shown in the document` in the JD keeps the English title; `Role code used in SOP/RACI` is the place that uses role chips;
+- the JD preface must not duplicate handbook/reference links repeatedly.
+
+If a header is expressing function-level mandate or cross-functional governance rather than one individual owner, `D-code` is allowed according to `20-department-boundary-handbook-codes.md`. Do not force every header into role code when the document has no single personal owner.
 
 ### 6.2 Section 4 / 6 / 8 / RACI / owner columns
 
-Trong cac bang vai tro, authority, gate, hold/release, exception:
-- uu tien dung role code chip;
-- neu can nhieu vai tro, render nhieu chip;
-- khong dung text dai khi co the render chip.
+In authority tables, gates, hold/release logic, and exceptions:
 
-Neu o dang noi toi mandate cap phong ban hoac phan he on dinh, KHONG duoc ep thanh role code. Khi do phai ap dung `department code` theo `20-department-boundary-handbook-codes.md`.
+- prefer role-code chips;
+- render multiple chips when multiple roles are required;
+- avoid long prose when chips can represent the actor clearly.
+
+If the cell is describing department mandate or a stable subfunction, do NOT force it into role code. Use `department code` according to `20-department-boundary-handbook-codes.md`.
 
 ### 6.3 Narrative prose
 
-Trong than tai lieu:
-- thuat ngu van hanh theo rule `English term (tieng Viet chuan)` cua Section 3;
-- chuc danh JD dung ten English chuan neu can viet day du trong cau;
-- khong dung nua Anh nua Viet kieu `QA Lead`, `Customer Dich vu`, `Production Engineer-IE`.
+In the body of a document:
 
-### 6.4 Role placeholder trong prose va label cot
+- operational terms follow the `English term (standard Vietnamese term)` rule from Section 3;
+- JD titles may use the standard English title when the sentence needs the full role name;
+- do not write half-English / half-Vietnamese phrases such as `QA Lead`, `Customer Service`, `Production Engineer-IE`.
 
-Trong prose, note, label cot hoac giai thich:
-- khong de nguyen placeholder kieu `Responsible Person`, `Top Management`, `Supervisor`;
-- phai doi thanh tieng Viet van hanh chuan, hoac resolve thanh role code / role bundle neu do la owner that;
-- khong duoc viet `QA/QMS`, `Department Head`, `Lead Department`, `Data Owner`, `Process Owner` nhu mot vai tro that neu chua neu ro do la ai.
+### 6.4 Role placeholders in prose and column labels
 
-Vi du:
-- `Responsible Person` -> `nguoi chiu trach nhiem` hoac `vai tro chu tri`
-- `Top Management` -> `Ban lanh dao` hoac `TOP_MGMT`
-- `Supervisor` -> `cap quan ly hien truong` hoac explicit frontline roles nhu `WKM / SL / DBL / CPS / QCL`
+In prose, notes, column labels, and explanations:
+
+- do not leave raw placeholders such as `Responsible Person`, `Top Management`, or `Supervisor`;
+- rewrite them as standard operational Vietnamese, or resolve them into role code / role bundle when they truly indicate the owner;
+- do not present `QA/QMS`, `Department Head`, `Lead Department`, `Data Owner`, or `Process Owner` as if they were real actors unless the exact role is explicitly resolved.
+
+Examples:
+
+- `Responsible Person` -> `responsible person` or `lead role`
+- `Top Management` -> `Leadership team` or `TOP_MGMT`
+- `Supervisor` -> `frontline management level` or explicit frontline roles such as `WKM / SL / DBL / CPS / QCL`
 
 ---
 
-## 7. Rule rieng cho HESEM commercial va frontline
+## 7. HESEM-Specific Rules for Commercial and Frontline Contexts
 
-### 7.1 Khong duoc viet chung `Department Head` cho nhanh thuong mai
+### 7.1 Do not use generic `Department Head` for commercial ownership
 
-HESEM hien khong co JD `Sales Manager` rieng. Vi vay:
-- neu tai lieu cap doanh nghiep can neu owner thuong mai, phai ghi ro `CS / EST`;
-- neu can tuyen phe duyet thuong mai cuoi cung, phai ghi `CEO`;
-- khong duoc viet chung `Sales Head`, `Department Head`, `Lead Department`.
+HESEM currently does not have a separate `Sales Manager` JD. Therefore:
 
-### 7.2 Khong duoc viet chung `Supervisor` cho hien truong
+- if an enterprise-level document needs the commercial owner, write `CS / EST` explicitly;
+- if the document needs the final commercial approval line, write `CEO`;
+- do not use generic labels such as `Sales Head`, `Department Head`, or `Lead Department`.
 
-Neu y la cap quan ly truc tiep tai diem dung trong nha may `job-order CNC`, phai resolve ve vai tro that:
+### 7.2 Do not use generic `Supervisor` for frontline authority
+
+If the intended meaning is direct management at the point of use in the `job-order CNC` factory, it must resolve to the real roles:
+
 - `WKM`
 - `SL`
 - `DBL`
 - `CPS`
 - `QCL`
 
-Khong duoc de tran `Supervisor` hoac `Team Leader` trong SOP/WI/ANNEX neu tai lieu dang giao authority that.
+Do not leave bare `Supervisor` or `Team Leader` in SOP/WI/ANNEX documents when the document is assigning real authority.
 
 ---
 
-## 8. Rule cho `Process Owner` va `Data Owner`
+## 8. Rule for `Process Owner` and `Data Owner`
 
-`Process Owner` va `Data Owner` la hai cum de sai nhat. Tu nay:
-- khong duoc tu dong mass-replace chung bang mot bundle mac dinh;
-- phai resolve theo dung logic cua chinh SOP do.
+`Process Owner` and `Data Owner` are two of the most error-prone phrases. From now on:
 
-Bat buoc tra loi ro 4 cau hoi:
-- ai that su so huu process hay bao cao do;
-- ai giu source data;
-- ai co quyen action;
-- ai co quyen stop/review/release.
+- do not mass-replace them with one default bundle;
+- resolve them according to the logic of the specific SOP.
 
-Neu chua tra loi duoc 4 cau hoi tren, khong duoc resolve co hoc.
+You must answer these 4 questions clearly:
+
+- who truly owns the process or report;
+- who owns the source data;
+- who has authority to act;
+- who has authority to stop / review / release.
+
+If those 4 answers are still unclear, no mechanical resolution is allowed.
 
 ---
 
-## 9. JD rules
+## 9. JD Rules
 
-Moi JD phai co:
-- ma JD rut gon theo role code, vi du `JD-QA`, `JD-CS`, `JD-PPL`;
-- title English chuan;
-- subtitle tieng Viet chuan;
-- row `Ma vai tro dung trong SOP/RACI`;
-- neu co, row `Mu quan tri co the gan`.
+Every JD must contain:
 
-Meta header cua JD phai dung nhan tieng Viet:
-- `Ma`
-- `Phien ban`
-- `Ngay hieu luc`
-- `Chu so huu`
-- `Phe duyet`
+- a short JD code aligned to the role code, for example `JD-QA`, `JD-CS`, `JD-PPL`;
+- standard English title;
+- standard Vietnamese subtitle;
+- row `Role code used in SOP/RACI`;
+- when applicable, row `Applicable governance hats`.
 
-Vung duoc phep dung role chip trong JD:
+JD header metadata must use Vietnamese labels:
+
+- `Code`
+- `Version`
+- `Effective date`
+- `Owner`
+- `Approved by`
+
+Where role chips are allowed inside a JD:
+
 - header owner/approver;
-- row `Ma vai tro dung trong SOP/RACI`;
-- row `Mu quan tri co the gan`;
-- cac bang authority/RACI/quyen han neu co.
+- row `Role code used in SOP/RACI`;
+- row `Applicable governance hats`;
+- authority/RACI/right tables when present.
 
-Vung khong duoc tu dong render chip:
-- `Chuc danh theo tai lieu`
-- title English cua JD
-- subtitle tieng Viet cua JD
-- mo ta narrative dang dung chuc danh nhu mot danh tu ngu nghia, khong phai cell quyen han.
+Where chips must not be auto-inserted:
 
-Neu SOP phat sinh mot vai tro lap lai ma chua co JD:
-- khong duoc va tam bang text tu nghia;
-- phai quyet dinh do la base role moi hay governance hat;
-- neu la base role moi, phai tao/cap nhat JD truoc khi phat hanh SOP;
-- neu la hat, phai cap nhat JD cua host role de mo ta quyen, pham vi va gioi han cua hat do.
+- `Job title shown in the document`
+- the English title itself
+- the Vietnamese subtitle itself
+- narrative descriptions where the title is used as semantic prose, not as an authority cell.
 
-### 9.1 Header JD va department ownership
+If a SOP introduces a recurring role that still has no JD:
 
-- `Chu so huu` cua JD phai dung `D-code` cua phong ban hoac phan he so huu vai tro theo role-boundary profile.
-- `Chu so huu` cua JD khong duoc de residue hanh chinh kieu `D-HR` neu vai tro do thuoc `D-EXEC`, `D-ENG`, `D-PROD`, `D-QUAL`, `D-SCM`, `D-FIN`, `D-EHS`, `D-IT` hoac phan he khac.
-- `Phe duyet` cua JD phai dung role chip cua role co tham quyen phe duyet nguon; mac dinh hien hanh la `CEO` neu khong co ngoai le da duoc cong bo ro trong core standard.
-- Header JD la metadata quy tri de xac dinh ai so huu mandate cap phong ban va ai phe duyet role; khong duoc de text tran, alias mo ho hoac ten phong ban viet dai dong.
+- do not patch it with a vague text label;
+- decide whether it is a new base role or a governance hat;
+- if it is a new base role, create/update the JD before releasing the SOP;
+- if it is a hat, update the host-role JD so the hat authority, scope, and limit are explicit.
 
-### 9.2 Phan biet role chip va department chip trong JD
+### 9.1 JD header and department ownership
 
-- Role chip duoc dung cho `Phe duyet`, row `Ma vai tro dung trong SOP/RACI`, row `Mu quan tri co the gan` va cac bang authority/RACI/quyen han.
-- Department chip duoc dung cho header `Chu so huu`, row `Bo phan` va preface block khi dang noi toi lop so huu chuc nang cua vai tro.
-- Khong duoc dung role chip de che mat department owner cua JD.
-- Khong duoc dung department chip de thay cho role co tham quyen phe duyet, sign-off hoac quyet dinh ca nhan.
+- `Owner` in a JD must use the `D-code` of the department/subfunction that owns the role according to the role-boundary profile.
+- `Owner` must not fall back to administrative residue such as `D-HR` when the role actually belongs to `D-EXEC`, `D-ENG`, `D-PROD`, `D-QUAL`, `D-SCM`, `D-FIN`, `D-EHS`, `D-IT`, or another function.
+- `Approved by` in a JD must use the role chip of the actor with source approval authority; the current default is `CEO` unless a clearly published exception exists.
+- JD header metadata is governance metadata that identifies department mandate ownership and role approval authority. It must not stay as plain text, vague alias, or long written department name.
+
+### 9.2 Distinguish role chips and department chips in a JD
+
+- role chips are used for `Approved by`, `Role code used in SOP/RACI`, `Applicable governance hats`, and authority/RACI/right tables;
+- department chips are used for header `Owner`, row `Department`, and the preface block when the document is talking about function-level ownership of the role;
+- do not use role chips to hide the department owner of the JD;
+- do not use department chips instead of the individual role that holds approval, sign-off, or personal decision authority.
 
 ---
 
-## 10. Phuong phap nghien cuu role truoc khi sua tai lieu
+## 10. Role-Research Method Before Editing a Document
 
-Khi gap mot vai tro / alias chua ro:
+When an unclear role or alias is found:
 
-1. Doc JD hien co va tai lieu cu de xem dang duoc hieu nhu the nao.
-2. Doi chieu benchmark chinh thuc ben ngoai theo dung boi canh `job-order CNC`.
-3. Chot ranh gioi:
-   - ai giu du lieu,
-   - ai quyet dinh,
-   - ai release,
-   - ai chi execute,
-   - ai co quyen stop.
-4. Xac dinh vai tro do la:
-   - base role,
-   - governance hat,
-   - role bundle,
-   - hay chi la placeholder phai cam.
-5. Neu tai lieu dang dung placeholder kieu `Process Owner`, `Data Owner`, `Department Head`, `Lead Department`, `QA/QMS`, bat buoc viet lai theo dung vai tro cu the cua chinh SOP do; khong duoc mass-replace bang mot bundle rong cho xong.
-6. Neu phat hien mot nhanh trach nhiem lap lai thuc su nhung chua co JD, phai quyet dinh ro:
-   - do la base role moi;
-   - hay la hat / nhiem vu gan len base role hien co.
-   Khong duoc giu nguyen placeholder vi se lam sai authority cua nha may.
-7. Cap nhat registry/JD/core-standard truoc khi cap nhat SOP.
+1. Read the existing JD and older documents to understand how the role is currently interpreted.
+2. Compare it against official external benchmarks in the correct `job-order CNC` context.
+3. Lock the boundary for:
+   - data ownership,
+   - decision ownership,
+   - release ownership,
+   - execution-only work,
+   - stop authority.
+4. Decide whether the actor is:
+   - a base role,
+   - a governance hat,
+   - a role bundle,
+   - or only a forbidden placeholder.
+5. If the document is using placeholders such as `Process Owner`, `Data Owner`, `Department Head`, `Lead Department`, `QA/QMS`, rewrite it to the actual role for that SOP; do not mass-replace it with a broad bundle just to finish the task.
+6. If a truly recurring responsibility branch is discovered but no JD exists yet, decide clearly whether it is:
+   - a new base role, or
+   - a hat/duty attached to an existing base role.
+   Do not keep the placeholder because it will distort factory authority.
+7. Update the registry / JD / core standard before updating the SOP.
 
-Khong duoc lam nguoc trinh tu nay.
+This order must not be reversed.
+

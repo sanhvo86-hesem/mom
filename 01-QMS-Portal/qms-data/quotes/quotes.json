@@ -1,0 +1,78 @@
+[
+    {
+        "customer_id": "C-002",
+        "customer_name": "Airbus",
+        "contact_name": "",
+        "contact_email": "",
+        "rfq_number": "",
+        "valid_until": "",
+        "currency": "USD",
+        "notes": "",
+        "line_items": [
+            {
+                "item_id": "P-001",
+                "qty": 100,
+                "description": "Bracket AL7075",
+                "unit_price": 150
+            }
+        ],
+        "quote_id": "QT-2026-0001",
+        "status": "draft",
+        "created_at": "2026-04-01T16:49:46+07:00",
+        "created_by": "sanh.vo",
+        "updated_at": "2026-04-01T16:49:46+07:00",
+        "updated_by": "sanh.vo",
+        "revision": 1,
+        "status_history": [
+            {
+                "from": null,
+                "to": "draft",
+                "timestamp": "2026-04-01T16:49:46+07:00",
+                "user": "sanh.vo",
+                "reason": "Quote created"
+            }
+        ]
+    },
+    {
+        "customer_id": "C-003",
+        "customer_name": "Boeing",
+        "contact_name": "",
+        "contact_email": "",
+        "rfq_number": "",
+        "valid_until": "",
+        "currency": "USD",
+        "notes": "",
+        "lines": [
+            {
+                "item_id": "BKT-001",
+                "qty": 500,
+                "description": "Titanium Bracket Ti-6Al-4V",
+                "unit_price": 0,
+                "material_cost": 0,
+                "labor_cost": 0,
+                "tooling_cost": 0,
+                "overhead_cost": 0,
+                "unit_cost": 0,
+                "margin_pct": 25,
+                "line_total": 0
+            }
+        ],
+        "quote_id": "QT-2026-0002",
+        "status": "draft",
+        "created_at": "2026-04-01T16:53:28+07:00",
+        "created_by": "sanh.vo",
+        "updated_at": "2026-04-01T16:53:28+07:00",
+        "updated_by": "sanh.vo",
+        "revision": 1,
+        "status_history": [
+            {
+                "from": null,
+                "to": "draft",
+                "timestamp": "2026-04-01T16:53:28+07:00",
+                "user": "sanh.vo",
+                "reason": "Quote created"
+            }
+        ],
+        "total_value": 0
+    }
+]

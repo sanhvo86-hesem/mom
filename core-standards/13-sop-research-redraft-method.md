@@ -1,265 +1,265 @@
-# 13. Phương pháp nghiên cứu và viết lại SOP theo từng tài liệu
+# 13. Research method and rewrite SOP according to each document
 
 > Version: v1 | Date: 2026-03-27 | Owner: QMS Engineer
 
 ---
 
-## 1. Mục tiêu
+## 1. Purpose
 
-Tài liệu này khóa phương pháp bắt buộc khi cập nhật bất kỳ SOP nào trong hệ thống HESEM QMS.
+This document locks down the required method when updating any SOP in the HESEM QMS system.
 
-Mục tiêu là ngăn kiểu cập nhật cơ học:
-- ép mọi SOP về cùng số cổng kiểm soát,
-- ép mọi SOP về cùng số bước chi tiết,
-- viết lại Section 6 và Section 7 theo một khuôn lặp mà không dựa trên phạm vi vận hành thực của SOP đó,
-- viết phần đầu, vai trò, đầu vào/đầu ra và ngoại lệ theo cùng một template nội dung cho tất cả SOP,
-- trộn nửa Anh nửa Việt làm thuật ngữ vận hành mất chuẩn.
-
----
-
-## 2. Nguyên tắc bắt buộc
-
-1. Mỗi SOP phải được nghiên cứu riêng.
-2. Không được dùng một mô hình bước hoặc mô hình cổng cho toàn bộ bộ SOP.
-3. Số cổng kiểm soát và số bước chi tiết phải do phạm vi vận hành, số lần bàn giao, số điểm HOLD/RELEASE, rủi ro và bằng chứng cần giữ quyết định.
-4. Flowchart của Section 7 phải khớp tuyệt đối với số heading bước chi tiết trong cùng Section 7.
-5. Section 6 và Section 7 là hai lớp khác nhau:
-   - Section 6 trả lời: giữ ở đâu, ai mở cổng, điều kiện gì mới đi tiếp.
-   - Section 7 trả lời: công việc thực diễn ra theo trình tự nào.
-6. Chỉ được viết lại Section 6 sau khi đã xác định rõ architecture kiểm soát của SOP đó.
-7. Chỉ được viết lại Section 7 sau khi đã chốt xong dòng công việc thực tế của SOP đó.
-8. Không dùng lại số bước hoặc số IG chỉ vì “trông đẹp”, “đều”, hoặc “dễ sinh hàng loạt”.
-9. Chuẩn hóa đồ họa, palette, HTML structure, bảng và checklist ở mức core-standard là được phép; nhưng nâng cấp nội dung SOP phải làm theo từng tài liệu một.
-10. Không nâng cấp hàng loạt nhiều SOP cùng lúc nếu nội dung thay đổi chạm logic vận hành; chỉ được batch với lỗi kỹ thuật, đồ họa, CSS, link, markup hoặc hygiene mang tính cấu trúc.
-11. Trước khi sửa vai trò, chủ trì, quyền hạn, RACI hoặc owner cell của SOP, phải đối chiếu `JD thật -> role registry -> benchmark chính thức bên ngoài` rồi mới chốt mapping.
-12. Các label như `Process Owner`, `Department Head`, `Responsible Person`, `Data Owner`, `Lead Auditor`, `Incident Commander` không được giữ nguyên nếu chúng đang đóng vai trò authority thật; phải resolve về base role, governance hat hoặc explicit role bundle.
+The purpose is to prevent this type of mechanical update:
+- force all SOPs to the same control port number,
+- force all SOPs to the same number of detailed steps,
+- rewrite Section 6 and Section 7 in an iterative format that is not based on the actual operating scope of that SOP,
+- write headers, roles, inputs/outputs and exceptions according to the same content template for all SOPs,
+- Mixing half English and half Vietnamese makes the operating terminology lose its standard.
 
 ---
 
-## 3. Trình tự nghiên cứu bắt buộc cho từng SOP
+## 2. Mandatory principle
 
-### Bước 1. Đọc tài liệu cũ
-
-Phải đọc ít nhất:
-- phạm vi SOP,
-- Section 3 thuật ngữ,
-- Section 4 vai trò,
-- Section 5 đầu vào/đầu ra,
-- Section 6 cũ,
-- Section 7 cũ,
-- Section 8 ngoại lệ,
-- Section 9 dữ liệu/hồ sơ.
-
-Mục đích:
-- giữ lại những logic vận hành còn đúng,
-- nhận ra phần bị nén cơ học hoặc thiếu điểm bàn giao,
-- tránh viết mới theo kiểu cắt rời khỏi bối cảnh HESEM.
-
-### Bước 2. Nghiên cứu nguồn chính thức bên ngoài
-
-Phải dùng nguồn chính thức hoặc nguồn gốc:
-- tài liệu chính thức của cơ quan quản lý,
-- tiêu chuẩn công khai của tổ chức kỹ thuật,
-- tài liệu chính thức của hệ thống ERP/MES/QMS công nghiệp,
-- handbook kỹ thuật hoặc thống kê chính thức.
-
-Không dựa vào:
-- blog marketing không có giá trị quy trình,
-- bài tổng hợp không có nguồn gốc,
-- nội dung suy diễn không có tài liệu đỡ lưng.
-
-### Bước 2C. Chốt ranh giới vai trò trước khi viết Section 4 / 6 / 8
-
-Trước khi sửa bất kỳ owner/authority cell nào, phải trả lời:
-- ai giữ dữ liệu;
-- ai quyết định;
-- ai release;
-- ai chỉ execute;
-- ai có quyền stop;
-- vai trò đó có phải vị trí JD thật hay chỉ là governance hat.
-
-Nếu vai trò không có JD thật mà vẫn lặp lại trong nhiều SOP:
-1. quyết định đó là hat hay base role mới;
-2. cập nhật JD/registry trước;
-3. rồi mới cập nhật SOP.
-
-### Bước 2A. Chốt benchmark KPI trước khi viết Section 6
-
-Trước khi chốt KPI của từng IG, phải trả lời:
-- benchmark chính thức bên ngoài nào dùng làm mốc tham chiếu,
-- ngưỡng nào là yêu cầu cứng của chuẩn / khách hàng / pháp lý,
-- ngưỡng nào là mục tiêu nội bộ thiết kế chặt hơn vì mức rủi ro HESEM,
-- dữ liệu nào trong hệ thống có thể đo được KPI đó thật sự.
-
-Nếu không có benchmark trực tiếp cho đúng tình huống, phải:
-1. dùng benchmark gần nhất có giá trị quản trị,
-2. ghi rõ đây là **mục tiêu nội bộ suy luận từ benchmark + risk level**,
-3. tránh ghi KPI kiểu chung chung không có số.
-
-### Bước 2B. Giữ benchmark rationale ở ngoài thân SOP
-
-Sau khi chốt benchmark, phải ghi rõ trong working note, script profile hoặc hồ sơ soạn thảo:
-- nguồn benchmark nào được dùng,
-- số nào là benchmark tham chiếu,
-- số nào là target nội bộ suy luận theo risk,
-- lý do siết chặt hoặc nới so với benchmark.
-
-Không đưa các ghi chú này vào thân SOP dưới dạng note biên tập.
-
-### Bước 3. Chốt kiến trúc kiểm soát
-
-Trước khi viết Section 6, phải trả lời:
-- có bao nhiêu điểm HOLD/RELEASE thật,
-- ai có quyền mở từng cổng,
-- cổng nào là điều kiện trước khi khởi động,
-- cổng nào là điều kiện trước khi bàn giao,
-- cổng nào là điều kiện trước khi release,
-- KPI nào đo được hiệu lực của từng cổng.
-- KPI nào có benchmark hoặc ngưỡng thiết kế đủ sức điều hành, không chỉ đủ form.
-
-### Bước 4. Chốt trình tự công việc thực tế
-
-Trước khi viết Section 7, phải trả lời:
-- vai trò nào đổi ở đâu,
-- hệ thống hoặc hồ sơ nào đổi ở đâu,
-- machine/tool/program/fixture/material/gage đổi ở đâu,
-- điểm nào cần revalidation,
-- điểm nào tạo suspect range,
-- điểm nào bắt buộc bàn giao.
-
-### Bước 5. Viết lại Section 6 và Section 7
-
-Chỉ sau khi hoàn tất bốn bước trên mới được viết lại.
-
-### Bước 5A. Suy lại Section 1, 2, 3, 4, 5, 8 từ Section 6 và Section 7
-
-Sau khi đã chốt gate và flow thật:
-
-- viết lại `Section 1` từ rủi ro bị chặn, quyết định được giữ và đầu ra bị khóa,
-- viết lại `Section 2` từ boundary bắt đầu/kết thúc và handoff thật,
-- viết lại `Section 3` từ các thuật ngữ xuất hiện thật trong gate/step,
-- viết lại `Section 4` từ owner giữ gate và vai trò có quyền chặn/gỡ hold,
-- viết lại `Section 5` từ trạng thái trước bước đầu và sau bước cuối,
-- viết lại `Section 8` từ các điểm hold, restart, revalidation, waiver, partial release hoặc change path thật.
-
-Không được suy các section này từ template cũ nếu template cũ không còn khớp logic vận hành đã chốt.
+1. Each SOP must be studied separately.
+2. Do not use one step model or gate model for the entire set of SOPs.
+3. The number of control gates and detailed steps must be determined by the scope of operations, number of handovers, number of HOLD/RELEASE points, risks and evidence to be kept.
+4. Flowchart of Section 7 must match absolutely with the number of detailed step headings in the same Section 7.
+5. Section 6 and Section 7 are two different classes:
+   - Section 6 answers: where to keep it, who opens the gate, what conditions must be followed before moving on.
+- Section 7 answers: in what order does real work take place?
+6. Section 6 can only be rewritten after clearly defining the control architecture of that SOP.
+7. Section 7 can only be rewritten after the actual work flow of that SOP has been finalized.
+8. Don't reuse step numbers or IG numbers just because they "look good", "even", or "easy to mass produce".
+9. Standardizing graphics, palettes, HTML structures, tables and checklists at a core-standard level is allowed; But upgrading SOP content must be done document by document.
+10. Do not bulk upgrade many SOPs at the same time if the changed content touches the operational logic; Batch only with technical, graphic, CSS, linking, markup or structural hygiene errors.
+11. Before editing the role, leader, authority, RACI or owner cell of the SOP, you must compare `JD thật -> role registry -> benchmark chính thức bên ngoài` and then finalize the mapping.
+12. Labels such as `Process Owner`, `Department Head`, `Responsible Person`, `Data Owner`, `Lead Auditor`, `Incident Commander` should not be retained if they are acting as real authority; Must resolve to base role, governance hat or explicit role bundle.
 
 ---
 
-## 4. Quy tắc thay thế Section 6 và Section 7
+## 3. Required research sequence for each SOP
+
+### Step 1. Read old documents
+
+Must read at least:
+- SOP range,
+- Section 3 terminology,
+- Section 4 roles,
+- Section 5 input/output,
+- Old Section 6,
+- Old Section 7,
+- Section 8 exceptions,
+- Section 9 data/records.
+
+Purpose:
+- retain correct operating logic,
+- recognize mechanically compressed parts or missing handover points,
+- avoid new writing cut out of the HESEM context.
+
+### Step 2. Research external official sources
+
+Must use official or original sources:
+- official documents of the regulatory authority,
+- public standards of technical organizations,
+- official documentation of industrial ERP/MES/QMS systems,
+- Technical handbook or official statistics.
+
+Do not rely on:
+- blog marketing has no process value,
+- general article without original source,
+- Deductive content without supporting documents.
+
+### Step 2C. Finalize role boundaries before writing Section 4 / 6 / 8
+
+Before editing any owner/authority cell, answer:
+- who keeps the data;
+- who decides;
+- who release;
+- who only execute;
+- who has the right to stop;
+- Is that role a real JD position or just a governance hat?
+
+If the role does not have a real JD but is still repeated in multiple SOPs:
+1. decide whether it is a new hat or base role;
+2. update JD/registry first;
+3. then update the SOP.
+
+### Step 2A. Finalize KPI benchmarks before writing Section 6
+
+Before finalizing the KPI of each IG, you must answer:
+- which official external benchmark is used as a reference,
+- what thresholds are standard/customer/legal hard requirements,
+- which threshold is the tighter internal design target for the HESEM risk level,
+- What data in the system can actually measure that KPI?
+
+If there is no direct benchmark for the right situation, you must:
+1. Use the most recent benchmark with administrative value,
+2. clearly state that this is **internal target inferred from benchmark + risk level**,
+3. Avoid writing generic KPIs without numbers.
+
+### Step 2B. Keep the benchmark rationale outside the body of the SOP
+
+After finalizing the benchmark, you must clearly state in the working note, script profile or editing profile:
+- which benchmark source is used,
+- which number is the reference benchmark,
+- Which number is the internal target inferred according to risk,
+- reason for tightening or loosening compared to benchmark.
+
+Do not include these notes in the SOP body as editorial notes.
+
+### Step 3. Finalize the control architecture
+
+Before writing Section 6, you must answer:
+- how many real HOLD/RELEASE points are there,
+- who has the right to open each gate,
+- which port is the pre-boot condition,
+- which port is the condition before handover,
+- which port is the pre-release condition,
+- Which KPI measures the effectiveness of each port?
+- Which KPI has a benchmark or design threshold capacity of operating, not just enough form?
+
+### Step 4. Finalize the actual work sequence
+
+Before writing Section 7, you must answer:
+- which roles change where,
+- which systems or records change where,
+- Where to change machine/tool/program/fixture/material/gage,
+- which points need revalidation,
+- Which point creates suspect range,
+- Which points are required to be handed over?
+
+### Step 5. Rewrite Section 6 and Section 7
+
+Only after completing the above four steps can it be rewritten.
+
+### Step 5A. Retract Sections 1, 2, 3, 4, 5, 8 from Section 6 and Section 7
+
+After locking the gate and real flow:
+
+- rewrite `Section 1` from risk blocked, decision held and output locked,
+- rewrite `Section 2` from start/end boundary and real handoff,
+- rewrite `Section 3` from terms that actually appear in gate/step,
+- rewrite `Section 4` from gate owner and role with block/unhold permission,
+- rewrite `Section 5` from the state before the first step and after the last step,
+- rewrite `Section 8` from the actual hold, restart, revalidation, waiver, partial release or change path points.
+
+Do not extrapolate these sections from the old template if the old template no longer matches the finalized operational logic.
+
+---
+
+## 4. Section 6 and Section 7 replacement rules
 
 ### 4.1 Section 6
 
-- Xóa toàn bộ phần nội dung nằm giữa `p6` và `p7`.
-- Không được xóa nhầm heading `p6`.
-- Không được xóa nhầm heading `p7`.
-- Section 6 phải dùng bảng IG.
-- Mỗi IG phải có:
-  - tên cổng,
-  - mô tả mục tiêu kiểm soát,
-  - chủ trì,
-  - điểm dừng bắt buộc,
-  - KPI hoặc bằng chứng tối thiểu.
-- KPI của từng IG phải có ngưỡng số hoặc SLA, nguồn dữ liệu chuẩn và trigger phản ứng.
-- KPI phải đọc được theo logic điều hành thật, ví dụ: `100% ... trước ...`, `<= 24 giờ`, `= 0 escape`, `>= 99%`.
+- Delete all content between `p6` and `p7`.
+- Do not delete heading `p6` by mistake.
+- Do not delete heading `p7` by mistake.
+- Section 6 must use IG table.
+- Each IG must have:
+  - port name,
+  - description of control objectives,
+  - preside,
+  - mandatory stops,
+  - KPI or minimum evidence.
+- Each IG's KPI must have a numerical threshold or SLA, a standard data source and a reaction trigger.
+- KPI must be read according to real operating logic, for example: `100% ... trước ...`, `<= 24 giờ`, `= 0 escape`, `>= 99%`.
 
 ### 4.2 Section 7
 
-- Xóa toàn bộ phần nội dung nằm giữa `p7` và `p8`.
-- Không được xóa nhầm heading `p7`.
-- Không được xóa nhầm heading `p8`.
-- Section 7 phải được viết lại hoàn toàn nếu flow hoặc bước cũ không còn phản ánh vận hành thật.
-- Số bước flowchart phải bằng số heading bước chi tiết.
-- Không được có tình trạng:
-  - flowchart 7 bước nhưng chi tiết 10 bước,
-  - flowchart 5 bước nhưng mô tả chi tiết 8 bước,
-  - flowchart chỉ là phiên bản rút gọn không khớp nội dung thực thi.
-- Với SOP sinh tự động, cần kiểm thêm việc bubble flowchart mang đúng palette màu theo step index, không chỉ đúng số lượng.
+- Delete all content between `p7` and `p8`.
+- Do not delete heading `p7` by mistake.
+- Do not delete heading `p8` by mistake.
+- Section 7 must be completely rewritten if the old flow or step no longer reflects the actual operation.
+- The number of flowchart steps must be equal to the number of detailed step headings.
+- Must not have the following conditions:
+  - 7 step flowchart but 10 detailed steps,
+  - 5-step flowchart but detailed description of 8 steps,
+  - flowchart is just an abridged version that does not match the execution content.
+- With automatically generated SOPs, it is necessary to check that the bubble flowchart has the correct color palette according to the step index, not just the correct quantity.
 
 ---
 
-## 5A. Quy tắc hygiene cho bản nháp trước phát hành
+## 5A. Hygiene rules for pre-release drafts
 
-- Tài liệu chưa phát hành chính thức lần đầu luôn giữ `V0`.
-- Không ghi trong body SOP các câu kiểu `bổ sung theo note`, `liên kết note`, `khác bản trước`, `điểm mới`, `quy tắc dùng thuật ngữ`.
-- Nếu cần lưu dấu vết soạn thảo, dùng DCR, review log, script output hoặc commit log.
-- Không giữ lại note benchmark, reasoning của AI hoặc comment biên tập trong body tài liệu vận hành.
+- Documents that have not been officially released for the first time always keep `V0`.
+- Do not write in the SOP body sentences like `bổ sung theo note`, `liên kết note`, `khác bản trước`, `điểm mới`, `quy tắc dùng thuật ngữ`.
+- If you need to save editing traces, use DCR, review log, script output or commit log.
+- Do not retain benchmark notes, AI reasoning or editorial comments in the operational document body.
 
 ---
 
-## 5. Quy tắc viết thuật ngữ
+## 5. Rules for writing terminology
 
-### 5.1 Cột tên thuật ngữ
+### 5.1 Term name column
 
-Cột tên thuật ngữ trong Section 3 phải viết theo mẫu:
+The term name column in Section 3 must be written in the following form:
 
 `English term (thuật ngữ tiếng Việt chuẩn)`
 
-Ví dụ:
+For example:
 - `Traceability (truy xuất nguồn gốc)`
 - `First Article Inspection - FAI (kiểm tra mẫu đầu tiên)`
 - `Process Capability (năng lực quá trình)`
 - `Lockout/Tagout - LOTO (khóa và gắn thẻ năng lượng)`
 
-### 5.2 Cách dùng trong nội dung tài liệu
+### 5.2 Usage in document content
 
-Sau khi đã định nghĩa ở Section 3:
-- trong thân tài liệu ưu tiên dùng bản tiếng Việt,
-- không viết kiểu nửa Anh nửa Việt,
-- chỉ giữ chữ viết tắt khi thật sự là chuẩn vận hành phổ biến và không làm mờ nghĩa.
+After being defined in Section 3:
+- In the document body, priority is given to using the Vietnamese version,
+- don't write half English and half Vietnamese,
+- keep abbreviations only when they are truly common operating standards and do not obscure the meaning.
 
-Ví dụ đúng:
+Correct example:
 - `truy xuất nguồn gốc`
 - `kiểm tra mẫu đầu tiên`
 - `năng lực quá trình`
 - `khóa và gắn thẻ năng lượng`
 
-Ví dụ không đúng:
+Incorrect example:
 - `trace`
-- `first-piece release` nếu tài liệu đã chọn bản Việt là `mở sản lượng sau chi tiết đầu tiên`
+- `first-piece release` if the document has selected the Vietnamese version as `mở sản lượng sau chi tiết đầu tiên`
 - `mixed source kiểm soát`
 - `job close tài chính`
 
 ---
 
-## 6. Dấu hiệu nhận biết SOP bị cập nhật cơ học
+## 6. Signs that SOP has been mechanically updated
 
-Một SOP bị xem là cập nhật cơ học khi có từ hai dấu hiệu trở lên:
-- số IG lặp hàng loạt không do phạm vi thật,
-- số bước chi tiết lặp hàng loạt không do phạm vi thật,
-- nhiều SOP dùng cùng một bộ câu mô tả chỉ thay danh từ,
-- Section 6 chỉ đổi tên cổng nhưng owner/hold/KPI không thay đổi bản chất,
-- Section 7 không có thay đổi vai trò, thay đổi trạng thái hay bàn giao nhưng vẫn chia bước đều,
-- thuật ngữ dùng lẫn Anh-Việt thiếu chuẩn hóa,
-- nội dung không giải thích được tại sao phải giữ cổng đó hoặc tại sao phải tách bước đó.
-
----
-
-## 7. Checklist phê duyệt trước khi coi là hoàn tất
-
-Chỉ coi một SOP đã cập nhật xong khi trả lời được toàn bộ:
-
-1. Đã đọc tài liệu cũ chưa?
-2. Đã dùng nguồn chính thức bên ngoài chưa?
-3. Đã chốt số IG theo thực tế SOP chưa?
-4. Đã chốt số bước theo thực tế SOP chưa?
-5. Flowchart và bước chi tiết đã khớp tuyệt đối chưa?
-6. Section 6 đã có owner, hold và KPI đo được chưa?
-7. Section 7 đã thể hiện đủ bàn giao, revalidation, restart hoặc containment chưa?
-8. Section 3 đã dùng mẫu `English (Việt)` chưa?
-9. Nội dung thân tài liệu đã ưu tiên dùng tiếng Việt chuẩn chưa?
-10. Đã thay đúng phần `p6→p7` và `p7→p8` mà không xóa nhầm section bên cạnh chưa?
-11. Đã quét sạch note biên tập và dấu vết “so với bản trước” khỏi body chưa?
-12. Với SOP sinh tự động, đã kiểm bubble màu flowchart và KPI numeric bằng script chưa?
+An SOP is considered mechanically updated when there are two or more signs:
+- Mass repeating IG numbers not due to real range,
+- the number of detailed steps to repeat in series is not due to the actual range,
+- many SOPs use the same set of descriptive sentences only replacing nouns,
+- Section 6 only changes the port name but the owner/hold/KPI does not change its nature,
+- Section 7 has no role changes, status changes or handovers but still divides steps equally,
+- Terminology mixed between English and Vietnamese lacks standardization,
+- the content does not explain why that gate must be kept or why that step must be separated.
 
 ---
 
-## 8. Quy định áp dụng
+## 7. Checklist for approval before considering complete
 
-Tài liệu này áp dụng cho:
-- mọi lần viết mới SOP,
-- mọi lần viết lại Section 1, 2, 3, 4, 5, 6, 7 hoặc 8,
-- mọi script tự động thay section của SOP,
-- mọi dự án chuẩn hóa hàng loạt trong `core-standard`.
+An SOP is only considered updated when it answers all of the following:
 
-Nếu script hoặc template nào mâu thuẫn với tài liệu này, tài liệu này được ưu tiên áp dụng.
+1. Have you read the old documents yet?
+2. Have you used official outside sources?
+3. Have you finalized the IG number according to the actual SOP?
+4. Have you finalized the number of steps according to the actual SOP?
+5. Do the flowchart and detailed steps match exactly?
+6. Does Section 6 have owners, holds and measurable KPIs?
+7. Does Section 7 demonstrate sufficient handover, revalidation, restart or containment?
+8. Has Section 3 used the form `English (Việt)`?
+9. Is the content of the document itself prioritized in standard Vietnamese?
+10. Have you replaced the correct parts `p6→p7` and `p7→p8` without deleting the next section by mistake?
+11. Have you cleaned the editorial notes and "compared to previous version" traces from the body?
+12. With automatically generated SOP, have you checked flowchart color bubbles and numeric KPIs with script?
+
+---
+
+## 8. Applicable regulations
+
+This document applies to:
+- write new SOP every time,
+- every time you rewrite Section 1, 2, 3, 4, 5, 6, 7 or 8,
+- all scripts automatically change sections of the SOP,
+- any batch normalization project in `core-standard`.
+
+If any script or template conflicts with this document, this document takes precedence.

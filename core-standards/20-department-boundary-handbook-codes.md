@@ -4,31 +4,31 @@
 
 ---
 
-## 1. Mục tiêu
+## 1. Purpose
 
-Tài liệu này khóa chuẩn bắt buộc cho toàn bộ hệ thống khi nhắc tới:
-- phòng ban;
-- phân hệ ổn định trong phòng ban;
-- ownership cấp chức năng;
-- handoff liên phòng ban;
-- khoảng trống phạm vi công việc chưa được JD hoặc handbook bao phủ.
+This document is a mandatory standard for the entire system when it comes to:
+- departments;
+- Stable subsystem in the department;
+- function-level ownership;
+- inter-departmental handoff;
+- scope of work gaps not yet covered by JD or handbook.
 
-Mục tiêu là chặn 7 lỗi hệ thống:
-- dùng JD cho một trách nhiệm thực ra là mandate của cả phòng ban;
-- dùng tên phòng ban để che một quyết định lẽ ra phải truy về một cá nhân có thẩm quyền;
-- dùng các cụm chung chung như `Department`, `bộ phận liên quan`, `các phòng chức năng`, `các phòng liên quan`, `line manager`, `line owner`, `bộ phận chuyên môn`, `all functions`, `team lead/supervisor` mà không chỉ ra phạm vi thật;
-- trộn `department`, `subfunction` và `role` trong cùng một ô RACI/owner gây hiểu sai thẩm quyền;
-- để các phòng ban thiếu phạm vi công việc thực tế nhưng không ghi nhận là gap;
-- tạo handbook phòng ban như bản tóm tắt SOP, không làm rõ ranh giới và điểm bàn giao;
-- cập nhật hàng loạt cơ học mà không đọc bối cảnh tài liệu, JD và mô hình vận hành thật.
+The purpose is to prevent 7 system errors:
+- Use JD for a responsibility that is actually a mandate of the entire department;
+- using a department name to cover up a decision that should be traced back to an individual with authority;
+- use generic phrases such as `Department`, `bộ phận liên quan`, `các phòng chức năng`, `các phòng liên quan`, `line manager`, `line owner`, `bộ phận chuyên môn`, `all functions`, `team lead/supervisor` without indicating the actual range;
+- mixing `department`, `subfunction` and `role` in the same RACI/owner cell causes misunderstanding of authority;
+- Let departments lack actual scope of work but do not record it as a gap;
+- create departmental handbooks such as SOP summaries, without clarifying boundaries and handover points;
+- batch update mechanics without reading the documentation context, JD and real operating model.
 
 ---
 
-## 2. Ba lớp thực thể phải tách bạch
+## 2. The three entity classes must be separate
 
 ### 2.1 Role code
 
-`Role code` là JD-linked role thực có cá nhân giữ vai trò, ví dụ:
+`Role code` is the actual JD-linked role whose individual holds the role, for example:
 - `CS`, `EST`
 - `ENGM`, `DFM`, `PE`, `CAM`
 - `PPL`, `WKM`, `SL`, `SET`, `OPR`, `MNT`, `CPS`, `DBL`
@@ -37,84 +37,84 @@ Mục tiêu là chặn 7 lỗi hệ thống:
 - `FIN`, `APAR`, `GLP`
 - `HR`, `EHS`, `ITA`, `ESA`
 
-Chỉ dùng `role code` khi tài liệu cần:
-- chỉ ra người quyết định;
-- người giữ quyền HOLD / RELEASE;
-- người phê duyệt;
-- owner KPI cá nhân;
-- người nhận bàn giao cụ thể;
-- người chịu trách nhiệm trong ngoại lệ, escalation hoặc sign-off.
+Only use `role code` when the document needs:
+- indicates the decision maker;
+- HOLD / RELEASE rights holder;
+- approver;
+- owner personal KPI;
+- specific handover recipient;
+- who is responsible for an exception, escalation or sign-off.
 
 ### 2.2 Department code
 
-`Department code` có dạng `D-XXX`, là mandate cấp phòng ban hoặc phân hệ ổn định, ví dụ:
+`Department code` has the form `D-XXX`, which is a stable department or subsystem level mandate, for example:
 - `D-SCS`, `D-ENG`, `D-PROD`, `D-QUAL`, `D-SCM`, `D-FIN`, `D-HR`, `D-EHS`, `D-IT`
 - `D-PPC`, `D-MNT`, `D-PUR`, `D-WHS`, `D-TCR`, `D-LOG`, `D-ERP`
 
-Chỉ dùng `department code` khi tài liệu đang nói tới:
-- phạm vi trách nhiệm tập thể của cả phòng ban;
-- đường handoff giữa hai chức năng;
-- nơi phát sinh hoặc nơi tiếp nhận yêu cầu liên phòng ban;
-- owner của handbook phòng ban;
-- owner cấp chức năng của một dữ liệu hoặc nhịp điều hành nhưng chưa đi tới quyết định cá nhân;
-- một phân hệ ổn định được tổ chức lặp lại, có đầu vào/đầu ra và ranh giới rõ.
+Only use `department code` when the document is talking about:
+- scope of collective responsibility of the whole department;
+- handoff line between two functions;
+- place where interdepartmental requests arise or are received;
+- owner of department handbook;
+- the owner grants the function of a data or operating rhythm but has not come to a personal decision;
+- a stable subsystem organized repeatedly, with clear inputs/outputs and boundaries.
 
 ### 2.3 Governance bundle
 
-`Governance bundle` là nhóm explicit gồm nhiều role code đã được định nghĩa tại `19-role-boundary-jd-linking-and-role-codes.md`.
+`Governance bundle` is an explicit group of many code roles defined in `19-role-boundary-jd-linking-and-role-codes.md`.
 
-Bundle chỉ dùng khi trách nhiệm thực sự là lớp actor chung nhiều vai trò. Bundle không thay thế được cả `department code` lẫn `role code`.
+Bundle is only used when the actual responsibility is an actor class that shares multiple roles. Bundle cannot replace both `department code` and `role code`.
 
 ---
 
-## 3. Quy tắc chọn đúng lớp
+## 3. Rules for choosing the right class
 
-### 3.1 Dùng role code khi
+### 3.1 Use role code when
 
-- có một cá nhân hoặc một tuyến thẩm quyền rõ ràng phải ký hoặc ra quyết định;
-- ô đang nói tới `phê duyệt`, `giữ`, `nhả`, `xác nhận`, `ủy quyền`, `disposition`, `sign-off`;
-- KPI có owner cá nhân;
-- action plan, escalation hoặc containment cần truy tới người chịu trách nhiệm cuối cùng.
+- there is a clear individual or line of authority that must sign or make the decision;
+- cell is talking about `phê duyệt`, `giữ`, `nhả`, `xác nhận`, `ủy quyền`, `disposition`, `sign-off`;
+- KPIs have individual owners;
+- action plan, escalation or containment needs to be traced to the person ultimately responsible.
 
-### 3.2 Dùng department code khi
+### 3.2 Use department code when
 
-- ô đang mô tả interface cấp phòng ban;
-- tài liệu đang chỉ ra đơn vị phải tham gia hoặc phải cung cấp đầu vào;
-- đó là handbook phòng ban hoặc bảng mô tả ranh giới chức năng;
-- một nhiệm vụ là responsibility chung của cả phòng ban, không phải quyết định ký duyệt;
-- phân hệ ổn định cần được nhìn thấy độc lập với JD, ví dụ `D-PPC`, `D-MNT`, `D-WHS`, `D-LOG`, `D-ERP`.
+- the cell is describing the department-level interface;
+- the document is indicating the entity that must be involved or must provide input;
+- it is a departmental handbook or table describing functional boundaries;
+- A task is a shared responsibility of the entire department, not a decision to sign off;
+- stable subsystems need to be seen independently of JD, for example `D-PPC`, `D-MNT`, `D-WHS`, `D-LOG`, `D-ERP`.
 
-### 3.3 Không được dùng department code để thay cho role code khi
+### 3.3 Do not use department code to replace role code
 
-- nói tới phê duyệt ngoại lệ;
-- ra quyết định chấp nhận/khước từ;
-- đóng/mở gate hoặc release shipment;
-- sign-off kiểm soát thay đổi;
-- chỉ định owner xử lý trong bảng ngoại lệ;
-- chỉ định deputy/back-up cá nhân.
+- refers to exception approval;
+- make an accept/reject decision;
+- open/close gate or release shipment;
+- sign-off change control;
+- specify handler owner in exception table;
+- appoint individual Deputy/back-up.
 
-### 3.4 Không được dùng role code để thay cho department code khi
+### 3.4 Do not use role code to replace department code
 
-- tài liệu đang mô tả mandate của cả phòng ban;
-- nói tới nhịp họp liên phòng ban hoặc đầu vào bắt buộc từ một chức năng;
-- nói tới `department handbook owner`;
-- mô tả một phân hệ ổn định mà có nhiều JD cùng tham gia nhưng ranh giới chức năng phải hiện ra độc lập.
+- The document describes the mandate of the entire department;
+- refers to inter-departmental meeting rhythms or required input from a function;
+- refers to `department handbook owner`;
+- describes a stable subsystem in which many JDs participate but the functional boundaries must appear independently.
 
-### 3.5 Placeholder phải resolve trước khi viết
+### 3.5 Placeholder must be resolved before writing
 
-Trong handbook phòng ban, matrix tổ chức, ANNEX summary hoặc SOP có ô interface cấp chức năng, các cụm dưới đây bị xem là placeholder và PHẢI resolve trước khi phát hành:
+In a departmental handbook, organizational matrix, ANNEX summary or SOP with a functional interface box, the following phrases are considered placeholders and MUST be resolved before release:
 - `các phòng liên quan`, `các phòng chức năng`, `bộ phận chuyên môn`
 - `line manager`, `line owner`, `department head`, `trưởng bộ phận`
-- `support`, `operations`, `all functions` nếu không nêu rõ danh sách D-code hoặc role code
+- `support`, `operations`, `all functions` if the D-code list or role code is not specified
 
 Rule resolve:
-- nếu câu đang nói về mandate/chuyển giao cấp chức năng, đổi thành `D-code` cụ thể;
-- nếu câu đang nói về sign-off/authorization/quyết định cuối, đổi thành `role code` cụ thể;
-- nếu chưa resolve được vì hệ thống thiếu phạm vi hoặc thiếu người giữ quyết định, phân loại thành gap theo Mục 5 thay vì giữ placeholder.
+- if the sentence is talking about mandate/functional transfer, change to `D-code` specifically;
+- if the sentence is talking about sign-off/authorization/final decision, change to `role code` specifically;
+- If it cannot be resolved because the system lacks scope or lacks a decision-maker, classify it as a gap according to Section 5 instead of keeping a placeholder.
 
 ---
 
-## 4. Department code chuẩn cho mô hình job-order CNC
+## 4. Standard department code for CNC job-order model
 
 ### 4.1 Departments
 
@@ -138,196 +138,196 @@ Rule resolve:
 - `D-LOG` — Logistics and Shipping Function
 - `D-ERP` — ERP Administration Function
 
-### 4.3 Data-content vs platform ownership trong job-order CNC
+### 4.3 Data-content vs platform ownership in job-order CNC
 
-Trong cac tai lieu so hoa / KPI / ERP / M365, phai tach ro:
-- `D-IT` = ha tang CNTT nen, endpoint, network, backup, access lifecycle.
-- `D-ERP` = quan tri ERP, workflow, transaction integrity, BAQ/reporting governance.
-- `D-MNT` = phạm vi bảo trì lặp lại cấp chức năng trong `D-PROD`: PM, breakdown response, machine health evidence, readiness hỗ trợ restart; không tự động đồng nghĩa với một JD quản lý bảo trì riêng.
-- cac `D-code` chuc nang nhu `D-SCS`, `D-ENG`, `D-PROD`, `D-QUAL`, `D-SCM`, `D-FIN`, `D-HR`, `D-EHS` = noi so huu noi dung nghiep vu, quy tac giao dich va quy tac dung du lieu trong pham vi minh.
+In the metrics / KPI / ERP / M365, you must take note of:
+- `D-IT` = IT infrastructure, endpoint, network, backup, access lifecycle.
+- `D-ERP` = ERP manager, workflow, transaction integrity, BAQ/reporting governance.
+- `D-MNT` = functional level repeatable maintenance scope in `D-PROD`: PM, breakdown response, machine health evidence, readiness to support restart; does not automatically mean a separate maintenance management JD.
+- The `D-code` functions such as `D-SCS`, `D-ENG`, `D-PROD`, `D-QUAL`, `D-SCM`, `D-FIN`, `D-HR`, `D-EHS` = refer to the business content, transaction rules and data usage rules within the scope.
 
-Vi vay:
-- neu cau dang noi ve `noi dung du lieu nghiep vu`, dung `D-code` chuc nang hoac role trong `FUNC_OWNERS` / `OPS_SCOPE_OWNERS`;
-- neu cau dang noi ve `nen tang he thong`, dung `D-IT` / `D-ERP` hoac role `ITA` / `ESA`;
-- khong duoc viet mo ho kieu `IT chu du lieu`, `bo phan lien quan`, `system owner`, `data owner`.
+Loan:
+- if the question is talking about `noi dung du lieu nghiep vu`, use `D-code` to represent the function or role in `FUNC_OWNERS` / `OPS_SCOPE_OWNERS`;
+- if the request is talking about `nen tang he thong`, use `D-IT` / `D-ERP` or role `ITA` / `ESA`;
+- Do not write code of type `IT chu du lieu`, `bo phan lien quan`, `system owner`, `data owner`.
 
-Chỉ tạo thêm `D-` code mới khi thỏa cả 4 điều kiện:
-- công việc lặp lại ổn định;
-- có đầu vào/đầu ra và điểm bàn giao rõ;
-- phạm vi không nên bị nhầm với một JD đơn lẻ;
-- có nhu cầu dùng lặp lại trong handbook/SOP/ANNEX/RACI.
+Only create new `D-` code when all 4 conditions are met:
+- stable repeat work;
+- have clear input/output and handover points;
+- scope should not be confused with a single JD;
+- there is a need for repeated use in handbooks/SOPs/ANNEX/RACI.
 
 ---
 
-## 5. Coverage Gap bắt buộc phải khóa
+## 5. Coverage Gap must be locked
 
-Khi đọc một tài liệu mà thấy công việc thực tế tồn tại nhưng chưa được bao phủ rõ bởi bất kỳ:
+When reading a document that actual work exists but is not clearly covered by any:
 - role code,
 - department code,
 - subfunction code,
-- hoặc handbook hiện hành,
+- or current handbook,
 
-thì người sửa tài liệu PHẢI dừng và phân loại gap theo một trong 3 dạng:
+then the person editing the document MUST stop and classify the gap in one of 3 types:
 
 1. `Department gap`
 2. `Subfunction gap`
 3. `JD gap`
 
-### 5.1 Cách xử lý từng loại gap
+### 5.1 How to handle each type of gap
 
-- `Department gap`: cập nhật handbook phòng ban, từ điển và nếu cần thì registry.
-- `Subfunction gap`: tạo `D-` code mới, cập nhật registry, handbook, từ điển và các tài liệu hệ thống liên quan.
-- `JD gap`: không được che bằng `department code` hoặc một cụm chung chung; phải cập nhật hoặc tạo JD, sau đó cập nhật registry, handbook và tài liệu liên đới.
+- `Department gap`: update department handbooks, dictionaries and, if necessary, the registry.
+- `Subfunction gap`: create new `D-` code, update registry, handbook, dictionary and related system documents.
+- `JD gap`: not covered by `department code` or a generic cluster; Must update or create JD, then update registry, handbook and associated documents.
 
-### 5.2 Ghi nhận gap trong handbook
+### 5.2 Record gaps in the handbook
 
-Mọi handbook phòng ban phải có một callout hoặc đoạn riêng nêu rõ:
-- khoảng trống nào đang được khóa tạm trong phiên bản hiện tại;
-- ai đang giữ thẩm quyền tạm thời;
-- điều kiện nào sẽ buộc tạo JD hoặc tách phân hệ riêng.
+Every department handbook must have a separate callout or paragraph stating:
+- which spaces are temporarily locked in the current version;
+- who is holding temporary authority;
+- What conditions will force the creation of JD or separation of separate subsystems?
 
-Ví dụ hợp lệ:
+Valid example:
 - `Hiện chưa có JD Commercial Manager; các cam kết vượt khung giá/chính sách do CEO giữ. Nếu tần suất ngoại lệ tăng hoặc xuất hiện khách chiến lược phải mở JD riêng.`
 - `EHS hiện do EHS Specialist dẫn dắt; dừng công việc không an toàn là quyền hiện trường, nhưng quyết định đóng mở diện rộng vẫn phải escalated lên CEO/PD.`
 
-### 5.3 Chuỗi cập nhật bắt buộc khi phát hiện gap
+### 5.3 Mandatory update sequence when a gap is detected
 
-Khi đã xác định có `Department gap`, `Subfunction gap` hoặc `JD gap`, người sửa tài liệu PHẢI cập nhật theo đúng chuỗi sau:
-1. sửa handbook hoặc JD nguồn trước;
-2. cập nhật `tools/data/role-registry-job-order-cnc.json` nếu có thêm `D-code` hoặc thay ranh giới đã công bố;
-3. cập nhật workbook `tools/data/qms-terminology-dictionary.xlsx`, tối thiểu 2 sheet:
+Once `Department gap`, `Subfunction gap` or `JD gap` has been determined, the document editor MUST update according to the following sequence:
+1. Edit the handbook or source JD first;
+2. update `tools/data/role-registry-job-order-cnc.json` if `D-code` is added or replace the published boundary;
+3. Update workbook `tools/data/qms-terminology-dictionary.xlsx`, minimum 2 sheets:
    - `Phong ban`
    - `Department code & handbook link`
-4. cập nhật các tài liệu hệ thống liên đới như matrix tổ chức, ANNEX, SOP có ô interface/owner dùng lại boundary đó;
-5. chỉ sau đó mới coi việc sửa tài liệu downstream là hoàn tất.
+4. Update related system documents such as organizational matrix, ANNEX, SOP with interface/owner box to reuse that boundary;
+5. Only then can editing of the downstream document be considered complete.
 
-### 5.4 Rule ve phan cong theo phong ban vs theo JD
+### 5.4 Rule about division according to department vs. JD
 
-Neu mot o dang noi ve:
-- function mandate, interface, queue, handoff, ownership cap phong ban: dung `D-code`;
-- phe duyet, hold/release, sign-off, deputy, escalation decision: dung `role code`;
-- lop actor lap lai da cong bo ro: dung `bundle`.
+If a person is talking about:
+- function mandate, interface, queue, handoff, ownership cap: use `D-code`;
+- faction, hold/release, sign-off, deputy, escalation decision: use `role code`;
+- The actor class repeats the scene: use `bundle`.
 
-Khong duoc giu text nua mua kieu:
+Do not keep text anymore than buying type:
 - `Engineering`, `Sales`, `Planning`, `Warehouse`, `Purchasing`, `Operations`;
 - `truong bo phan`, `line manager`, `supervisor`, `team lead`;
 - `phong lien quan`, `cac phong chuc nang`, `bo phan chuyen mon`.
 
-Neu can gom mot nhom `D-code` de rut gon:
-- phai tao thanh `department bundle` hoac `mixed bundle` cong bo trong registry;
-- phai co ten bundle, thanh phan, pham vi dung va canh bao khong duoc lam thay ro tai `02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html`;
-- khong duoc de text tran kieu `Support`, `Operations`, `all functions`, `back office`, `site support` trong actor cell, owner cell, audience cell, matrix row hoac org summary.
+If you need to gather a group of `D-code` to extract:
+- must create `department bundle` or `mixed bundle` board in the registry;
+- Must have bundle name, component, content scope and package must not be changed at `02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html`;
+- You cannot leave text in the form `Support`, `Operations`, `all functions`, `back office`, `site support` in actor cell, owner cell, audience cell, matrix row or org summary.
 
-Khi mot tu khoa phong ban cu xuat hien trong body SOP/WI/ANNEX/JD, nguoi sua phai tra loi ro no dang noi ve:
-1. mot department/subfunction;
-2. mot role co JD that;
-3. hay mot business concept phi-to-chuc.
+When a new security element appears in the SOP/WI/ANNEX/JD body, the editor must investigate the risk it is talking about:
+1. one department/subfunction;
+2. a role has that JD;
+3. or a non-business concept.
 
-Neu la (1), doi sang `D-code`.
-Neu la (2), doi sang `role code`.
-Neu la (3), viet lai bang tieng Viet van hanh ro nghia, khong de lai cau hybrid nua mua.
-
----
-
-## 6. Chuẩn nội dung cho Department Handbook
-
-Handbook phòng ban không phải bản tóm tắt SOP. Nó phải trả lời được 6 câu hỏi:
-
-1. Phòng ban này tồn tại để khóa rủi ro gì và tạo ra đầu ra nào?
-2. Phạm vi nào thuộc phòng ban này và phạm vi nào không?
-3. Trong phòng ban có những role code nào và những subfunction nào?
-4. Điểm bàn giao liên phòng ban nằm ở đâu?
-5. Có gap nào đang được khóa tạm không?
-6. Khi có sự cố, ai giữ action ở cấp phòng ban và ai giữ quyết định ở cấp cá nhân?
-
-Một handbook phòng ban tối thiểu phải có:
-- tiêu đề và header với `department code`;
-- `ISO/operating intent` 2-4 dòng;
-- danh sách role code thuộc phòng;
-- nếu có thì liệt kê `subfunction code` trong phạm vi;
-- mục tiêu phòng ban;
-- phạm vi bao gồm / không vượt quyền;
-- trách nhiệm bắt buộc;
-- quyền hạn cấp chức năng;
-- đầu ra/hồ sơ;
-- KPI có giá trị thực chiến;
-- interface liên phòng ban;
-- tài liệu liên quan;
-- mô hình vận hành và ranh giới vai trò;
-- nhịp điều hành/dữ liệu/bằng chứng;
-- năng lực/deputy;
-- rủi ro và escalations;
-- coverage gap callout nếu có.
-
-Ngoài danh mục trên, handbook PHẢI thể hiện rõ:
-- nhiệm vụ nào là mandate của cả phòng ban;
-- nhiệm vụ nào chỉ được giữ ở cấp role code;
-- ranh giới với handbook liền kề upstream/downstream trong mô hình job-order CNC;
-- phần việc nào hệ thống đang gán tạm vì chưa có JD hoặc chưa tách subfunction.
+If it is (1), move to `D-code`.
+If it is (2), move to `role code`.
+If it is (3), writing again in Vietnamese still has the meaning, do not repeat the hybrid sentence again.
 
 ---
 
-## 7. Quy tắc đồ họa và format cho handbook
+## 6. Content standards for Department Handbook
 
-- Header owner dùng `department code` chip, không dùng câu dài.
-- Approver vẫn phải là `role code` hoặc bundle hợp lệ; không dùng `department code`.
-- Role trong cùng phòng hiển thị bằng `role chip` có link JD.
-- Phân hệ hiển thị bằng `department chip` có link handbook tương ứng.
-- Trong bảng interface:
-  - cột “nhận từ / giao cho” có thể dùng `department code` nếu đang nói về interface chức năng;
-  - cột owner quyết định hoặc escalation phải dùng `role code`.
-- Trong bảng output/KPI/data:
-  - cột owner cấp chức năng dùng `department code` nếu đang nói về ownership cấp phòng ban;
-  - cột quyết định/sign-off/escalation dùng `role code`;
-  - không để lẫn `department code` vào cột vốn được định nghĩa là quyết định cá nhân.
-- Không dùng văn bản nửa Anh nửa Việt như `Customer Dịch vụ`, `Quy trình Owner`, `all functions`, `Department Head`.
-- Không để placeholder như `các phòng liên quan`, `các phòng chức năng`, `line manager`, `line owner`, `bộ phận chuyên môn` trong handbook phát hành.
-- Không đưa note biên tập, note migration, note “bản này thay bản trước” vào handbook.
-- Link handbook trong index, TOC, preface, note, legend hoặc reference list PHẢI hiển `D-code` canonical của handbook đích.
-- Subfunction code như `D-PPC`, `D-MNT`, `D-WHS`, `D-LOG`, `D-PUR`, `D-TCR`, `D-ERP` chỉ hiển trong owner/RACI/interface khi ngữ cảnh thật sự là subfunction.
-- Không dùng `D-PPC` làm nhãn cho department-summary link tới production handbook và không dùng `D-LOG` làm nhãn cho supply-chain handbook summary.
-- `ALL_DEPTS` khi được dùng như bundle phạm vi doanh nghiệp PHẢI bao gồm toàn bộ `department code` và `subfunction code` đã công bố trong registry hiện hành; không được bỏ sót subfunction đã phát hành như `D-PPC`, `D-MNT`, `D-PUR`, `D-WHS`, `D-TCR`, `D-LOG`, `D-ERP`.
+The department handbook is not a summary of SOPs. It must answer 6 questions:
 
----
+1. What risks does this department exist to lock in and what outputs do it produce?
+2. What scope belongs to this department and what scope does not?
+3. What code roles and subfunctions are there in the department?
+4. Where is the inter-departmental handover point?
+5. Are there any gaps being temporarily locked?
+6. When there is an incident, who holds the action at the department level and who holds the decision at the individual level?
 
-## 8. Phương pháp cập nhật bắt buộc
+A minimum department handbook must have:
+- title and header with `department code`;
+- `ISO/operating intent` 2-4 lines;
+- list of role codes belonging to the department;
+- if present then list `subfunction code` in scope;
+- departmental goals;
+- scope includes / does not exceed authority;
+- mandatory responsibilities;
+- functional level authority;
+- output/record;
+- KPI has real combat value;
+- inter-departmental interface;
+- related documents;
+- operating model and role boundaries;
+- operating cadence/data/evidence;
+- capacity/deputy;
+- risks and escalations;
+- coverage gap callout if any.
 
-Khi sửa handbook hoặc tài liệu liên quan tới department boundary, thứ tự bắt buộc là:
-
-1. đọc handbook hiện hành, handbook upstream/downstream liền kề, JD liên quan, SOP/WI/ANNEX nơi boundary đang được dùng;
-2. đối chiếu với mô hình job-order CNC và benchmark quốc tế để xác định ranh giới thực tế của chức năng;
-3. xác định rõ đâu là `role`, đâu là `department`, đâu là `subfunction`, đâu là `gap`;
-4. chốt nội dung riêng cho từng tài liệu, từng phòng ban một, không sửa đồng loạt cơ học;
-5. cập nhật handbook/JD nguồn;
-6. cập nhật workbook từ điển và registry nếu phạm vi đã thay đổi;
-7. rà lại matrix tổ chức, SOP và ANNEX liên đới rồi mới cập nhật HTML downstream.
-
-Benchmark logic bổ sung:
-- Phải đối chiếu với mô hình `job-order CNC` thực tế: `Sales / Customer Service`, `Engineering`, `Production`, `Quality`, `Supply Chain`, `IT / ERP`, `Finance`, `HR`, `EHS`.
-- Nếu tài liệu phát sinh một phạm vi lặp lại ổn định mà handbook/JD hiện hành chưa bao phủ, phải đánh dấu gap và cập nhật handbook/JD trước khi đổi chip trong SOP/ANNEX.
-
-Không được:
-- search/replace hàng loạt tên phòng ban sang mã viết tắt mà không đọc ngữ cảnh;
-- dùng cùng một bộ bullet/authority/KPI cho mọi handbook;
-- “vá chữ” trên một handbook đã sai cấu trúc thay vì chốt lại role boundary trước;
-- dùng bản dịch máy hoặc cụm lai tiếng Anh/tiếng Việt trong tài liệu phát hành;
-- sửa SOP/RACI trước khi sửa handbook/JD nguồn;
-- thêm `D-code` mới chỉ vì muốn gọn bảng nếu công việc đó vẫn chỉ là trách nhiệm của một JD đơn lẻ.
+In addition to the above list, the handbook MUST clearly show:
+- Which task is the mandate of the entire department;
+- which tasks are kept only at the role code level;
+- boundary with adjacent upstream/downstream handbook in CNC job-order model;
+- Which part of the system is temporarily assigned because there is no JD or subfunction has not been separated.
 
 ---
 
-## 9. Checklist QA trước khi phát hành
+## 7. Graphics and formatting rules for handbooks
 
-- `department code` có đúng loại department/subfunction không?
-- role quyết định đã truy về JD chưa?
-- ô interface cấp chức năng có đang dùng role code sai chỗ không?
-- handbook có nêu rõ phạm vi không thuộc trách nhiệm phòng ban không?
-- handbook có ghi rõ coverage gap đang tồn tại không?
-- KPI có owner, ngưỡng số và dữ liệu nguồn không?
-- mọi chip department đều link đúng handbook?
-- link handbook có đang hiện đúng `D-code` canonical của handbook đích không?
-- subfunction chip có xuất hiện đúng ngữ cảnh subfunction, không đội lốt department summary không?
-- mọi chip role đều link đúng JD?
-- workbook `Phong ban` và `Department code & handbook link` đã sync chưa?
-- matrix/ANNEX/SOP liên đới đã cập nhật theo boundary mới chưa?
-- còn sót cụm `Department`, `Process Owner`, `Customer Dịch vụ`, `all functions`, `team lead/supervisor`, `các phòng liên quan`, `các phòng chức năng`, `line manager`, `line owner` hoặc chữ lai không?
+- Header owner uses `department code` chip, does not use long sentences.
+- Approver must still be `role code` or a valid bundle; Do not use `department code`.
+- Roles in the same room are displayed as `role chip` with JD link.
+- The subsystem displayed by `department chip` has the corresponding handbook link.
+- In the interface table:
+  - column “received from / delivered to” can use `department code` if talking about functional interface;
+  - The owner column for decisions or escalations must use `role code`.
+- In the output/KPI/data table:
+  - Functional level ownership column uses `department code` if we are talking about department level ownership;
+  - decision/sign-off/escalation column uses `role code`;
+  - do not mix `department code` in the column that is defined as a personal decision.
+- Do not use half-English, half-Vietnamese text like `Customer Dịch vụ`, `Quy trình Owner`, `all functions`, `Department Head`.
+- Do not put placeholders like `các phòng liên quan`, `các phòng chức năng`, `line manager`, `line owner`, `bộ phận chuyên môn` in the release handbook.
+- Do not include editorial notes, migration notes, or "this version replaces the previous version" notes in the handbook.
+- Handbook links in index, TOC, preface, notes, legend or reference list MUST display the `D-code` canonical of the target handbook.
+- Subfunction codes like `D-PPC`, `D-MNT`, `D-WHS`, `D-LOG`, `D-PUR`, `D-TCR`, `D-ERP` are only visible in owner/RACI/interface when the context is actually a subfunction.
+- Do not use `D-PPC` as the label for the department-summary link to the production handbook and do not use `D-LOG` as the label for the supply-chain handbook summary.
+- `ALL_DEPTS` when used as an enterprise scope bundle MUST include all `department code` and `subfunction code` published in the current registry; Do not omit published subfunctions such as `D-PPC`, `D-MNT`, `D-PUR`, `D-WHS`, `D-TCR`, `D-LOG`, `D-ERP`.
+
+---
+
+## 8. Forced update method
+
+When editing handbooks or documents related to department boundaries, the required order is:
+
+1. read the current handbook, adjacent upstream/downstream handbook, related JD, SOP/WI/ANNEX where boundary is being used;
+2. compare with the CNC job-order model and international benchmarks to determine the actual boundaries of the function;
+3. clearly determine which is `role`, which is `department`, which is `subfunction`, which is `gap`;
+4. Finalize content separately for each document, each department, do not make mechanical edits at the same time;
+5. Update handbook/JD source;
+6. Update the dictionary and registry workbooks if the scope has changed;
+7. Review the organizational matrix, SOPs and associated ANNEX before updating the downstream HTML.
+
+Additional logic benchmarks:
+- Must compare with actual `job-order CNC` model: `Sales / Customer Service`, `Engineering`, `Production`, `Quality`, `Supply Chain`, `IT / ERP`, `Finance`, `HR`, `EHS`.
+- If the document arises a stable repetition range that is not covered by the current handbook/JD, the gap must be marked and the handbook/JD updated before changing the chip in SOP/ANNEX.
+
+Do not:
+- mass search/replace department names to abbreviated codes without reading the context;
+- use the same bullet/authority/KPI set for all handbooks;
+- "patching words" on a handbook with incorrect structure instead of closing the role boundary first;
+- use machine translation or hybrid English/Vietnamese phrases in release documents;
+- edit SOP/RACI before editing handbook/source JD;
+- add new `D-code` just to compact the table if that job is still the responsibility of a single JD.
+
+---
+
+## 9. QA Checklist before release
+
+- Is `department code` the correct department/subfunction type?
+- Has the decision role been traced back to JD?
+- Is the functional level interface box using role code in the wrong place?
+- Does the handbook clearly state the scope that is not within the department's responsibility?
+- Does the handbook clearly state the existing coverage gap?
+- Does the KPI have an owner, numeric threshold and source data?
+- Does every chip department link to the correct handbook?
+- Is the handbook link showing the correct `D-code` canonical of the target handbook?
+- Does the subfunction chip appear in the correct subfunction context, not disguised as a department summary?
+- Are all chip roles linked to the correct JD?
+- Are workbooks `Phong ban` and `Department code & handbook link` synced yet?
+- Has the associated matrix/ANNEX/SOP been updated according to the new boundary?
+- Are there any remaining clusters `Department`, `Process Owner`, `Customer Dịch vụ`, `all functions`, `team lead/supervisor`, `các phòng liên quan`, `các phòng chức năng`, `line manager`, `line owner` or hybrid letters?

@@ -1,0 +1,108 @@
+{
+  "form_code": "FRM-711",
+  "title": "Packing & Ship Checklist",
+  "title_vi": "Phiếu kiểm tra đóng gói và giao hàng",
+  "version": "V1",
+  "category": "logistics",
+  "frequency": "per_event",
+  "sop_ref": "SOP-701",
+  "description": "Danh sách kiểm tra trước khi đóng gói và giao hàng, đảm bảo sản phẩm đúng số lượng, chất lượng và bao bì đạt yêu cầu.",
+  "roles_allowed": ["admin", "production_manager", "warehouse_staff", "shipping_coordinator", "qc_inspector"],
+  "fields": [
+    {"id": "ship_date", "type": "date", "label": "Ngày giao hàng", "label_en": "Ship Date", "required": true, "default": "today"},
+    {"id": "job_number", "type": "text", "label": "Số Job", "label_en": "Job Number", "required": true},
+    {"id": "customer", "type": "text", "label": "Khách hàng", "label_en": "Customer", "required": true},
+    {"id": "po_number", "type": "text", "label": "Số PO", "label_en": "PO Number", "required": true},
+    {"id": "ship_to_address", "type": "textarea", "label": "Địa chỉ giao hàng", "label_en": "Ship-To Address", "rows": 2},
+    {
+      "id": "shipping_method",
+      "type": "select",
+      "label": "Phương thức vận chuyển",
+      "label_en": "Shipping Method",
+      "required": true,
+      "options": [
+        {"value": "courier", "label": "Chuyển phát nhanh (Courier)"},
+        {"value": "freight", "label": "Vận tải hàng hoá (Freight)"},
+        {"value": "customer_pickup", "label": "Khách tự nhận (Customer Pickup)"},
+        {"value": "hand_deliver", "label": "Giao tay (Hand Deliver)"}
+      ]
+    },
+    {"id": "tracking_number", "type": "text", "label": "Số vận đơn", "label_en": "Tracking Number"},
+    {
+      "id": "packing_items",
+      "type": "table",
+      "label": "Danh sách hàng đóng gói",
+      "label_en": "Packing Items",
+      "min_rows": 1,
+      "max_rows": 30,
+      "columns": [
+        {"id": "part_number", "type": "text", "label": "Mã chi tiết", "width": "18%", "required": true},
+        {"id": "part_rev", "type": "text", "label": "Rev", "width": "8%"},
+        {"id": "description", "type": "text", "label": "Mô tả", "width": "22%"},
+        {"id": "qty_ordered", "type": "text", "label": "SL đặt", "width": "10%"},
+        {"id": "qty_shipped", "type": "text", "label": "SL giao", "width": "10%", "required": true},
+        {"id": "box_no", "type": "text", "label": "Thùng #", "width": "10%"},
+        {"id": "weight", "type": "text", "label": "Trọng lượng", "width": "12%"}
+      ]
+    },
+    {
+      "id": "checklist",
+      "type": "table",
+      "label": "Hạng mục kiểm tra đóng gói",
+      "label_en": "Packing Checklist",
+      "min_rows": 1,
+      "max_rows": 15,
+      "columns": [
+        {"id": "check_item", "type": "text", "label": "Hạng mục", "width": "50%", "required": true},
+        {"id": "status", "type": "select", "label": "Trạng thái", "width": "25%", "required": true, "options": [
+          {"value": "ok", "label": "Đạt (OK)", "color": "#2f9e44"},
+          {"value": "ng", "label": "Không đạt (NG)", "color": "#e03131"},
+          {"value": "na", "label": "N/A", "color": "#868e96"}
+        ]},
+        {"id": "remark", "type": "text", "label": "Ghi chú", "width": "25%"}
+      ]
+    },
+    {
+      "id": "documents_included",
+      "type": "table",
+      "label": "Tài liệu đi kèm",
+      "label_en": "Documents Included",
+      "min_rows": 1,
+      "max_rows": 10,
+      "columns": [
+        {"id": "doc_type", "type": "select", "label": "Loại tài liệu", "width": "40%", "options": [
+          {"value": "coc", "label": "Certificate of Conformance (CoC)"},
+          {"value": "inspection_report", "label": "Phiếu kiểm tra (Inspection Report)"},
+          {"value": "material_cert", "label": "Chứng nhận vật liệu (Material Cert)"},
+          {"value": "packing_list", "label": "Packing List"},
+          {"value": "invoice", "label": "Hoá đơn (Invoice)"},
+          {"value": "fai", "label": "FAI Report"},
+          {"value": "other", "label": "Khác (Other)"}
+        ]},
+        {"id": "copies", "type": "text", "label": "Số bản", "width": "15%"},
+        {"id": "included", "type": "select", "label": "Đã đính kèm", "width": "20%", "options": [
+          {"value": "yes", "label": "Có", "color": "#2f9e44"},
+          {"value": "no", "label": "Chưa", "color": "#e03131"}
+        ]},
+        {"id": "note", "type": "text", "label": "Ghi chú", "width": "25%"}
+      ]
+    },
+    {"id": "total_boxes", "type": "number", "label": "Tổng số thùng", "label_en": "Total Boxes", "min": 1, "required": true},
+    {"id": "total_weight", "type": "text", "label": "Tổng trọng lượng", "label_en": "Total Weight", "placeholder": "VD: 15.5 kg"},
+    {
+      "id": "special_handling",
+      "type": "textarea",
+      "label": "Yêu cầu xử lý đặc biệt",
+      "label_en": "Special Handling",
+      "rows": 2,
+      "placeholder": "VD: Fragile, chống ẩm, chống tĩnh điện..."
+    },
+    {"id": "packed_by", "type": "text", "label": "Người đóng gói", "label_en": "Packed By", "required": true},
+    {"id": "checked_by", "type": "text", "label": "Người kiểm tra", "label_en": "Checked By", "required": true},
+    {"id": "notes", "type": "textarea", "label": "Ghi chú", "label_en": "Notes", "rows": 3}
+  ],
+  "auto_fields": ["submitted_by", "submitted_at", "entry_id"],
+  "notifications": {
+    "on_submit": ["production_manager", "shipping_coordinator"]
+  }
+}

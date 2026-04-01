@@ -1,34 +1,34 @@
-# 08 — Cấu trúc chuẩn theo loại tài liệu
+# 08 — Standard structure by document type
 
-> Phiên bản: V0 | Hiệu lực: 2025-06-01 | Chủ sở hữu: QMS Engineer
+> Version: V0 | Effective: 2025-06-01 | Owner: QMS Engineer
 
 ---
 
-## 1. SOP — Standard Operating Procedure (10 section)
+## 1. SOP — Standard Operating Procedure (10 sections)
 
-Mọi SOP của HESEM PHẢI có đủ 10 section theo thứ tự sau. KHÔNG được bỏ section, KHÔNG được đổi thứ tự.
+Every HESEM SOP MUST have 10 sections in the following order. Do NOT skip sections, DO NOT change the order.
 
-Lưu ý khóa:
+Note the key:
 
-- Tài liệu này chỉ khóa `cấu trúc` và `format`.
-- Không được dùng file này để hợp thức hóa việc nâng cấp nội dung hàng loạt theo cùng một bộ câu mẫu.
-- Đồ họa, palette, table format và HTML skeleton có thể chuẩn hóa ở mức core-standard.
-- Nội dung Section 1 / 2 / 3 / 4 / 5 / 6 / 7 / 8 phải nghiên cứu theo từng SOP một.
+- This document only locks `cấu trúc` and `format`.
+- Do not use this file to legitimize mass content upgrades according to the same set of sample sentences.
+- Graphics, palettes, table format and HTML skeleton can be standardized to a core-standard level.
+- The content of Section 1 / 2 / 3 / 4 / 5 / 6 / 7 / 8 must be studied according to each SOP.
 
-### Cấu trúc bắt buộc
+### Required structure
 
-| Section | Tiêu đề | Nội dung chính |
+| Section | Title | Main content |
 |---------|---------|---------------|
-| 1 | Mục đích | 1 câu mở đầu + 3-5 bullet, bám rủi ro bị chặn và đầu ra phải khóa của SOP đó |
-| 2 | Phạm vi | `Có bao phủ` + `Không thay thế`, bám điểm bắt đầu/kết thúc và handoff thật |
-| 3 | Thuật ngữ & nguyên tắc | Bảng 2 cột: thuật ngữ dùng thật trong gate/step |
-| 4 | Vai trò, quyền hạn & RACI | Bảng vai trò hoặc RACI matrix, nhưng phải thể hiện rõ quyền chặn/gỡ hold |
-| 5 | Đầu vào, đầu ra & điều kiện tiên quyết | 4 field boxes bám trạng thái trước bước đầu và sau bước cuối |
-| 6 | Cổng kiểm soát, điểm dừng bắt buộc & KPI | IG table, KPI thực chiến có số/SLA, không dùng gate cards |
-| 7 | Quy trình chi tiết | Flowchart + heading bước chi tiết + hold/handoff bám đúng flow thật |
-| 8 | Ngoại lệ, thay đổi & làm lại | Bảng tình huống ngoại lệ bám hold/restart/revalidation/change path |
-| 9 | Hệ thống, hồ sơ & dữ liệu | Table mapping: Hệ thống -> Dữ liệu -> Trách nhiệm -> Lưu trữ |
-| 10 | Biểu mẫu, WI, SOP & JD liên kết | Bảng mã tài liệu + tên + link |
+| 1 | Purpose | 1 opening sentence + 3-5 bullets, follow the risk of being blocked and the output must be locked of that SOP |
+| 2 | Scope | `Có bao phủ` + `Không thay thế`, tracking start/end points and real handoff |
+| 3 | Terminology & Principles | 2-column table: actual terms used in gate/step |
+| 4 | Roles, Authority & RACI | Role table or RACI matrix, but must clearly show permission to block/remove hold |
+| 5 | Inputs, Outputs & Prerequisites | 4 field boxes capture the state before the first step and after the last step |
+| 6 | Control gates, mandatory stops & KPIs | IG table, actual KPIs with numbers/SLA, do not use gate cards |
+| 7 | Detailed process | Flowchart + detailed step heading + hold/handoff follow the true flow |
+| 8 | Exceptions, changes & redo | The exception situation table holds/restart/revalidation/change path |
+| 9 | Systems, records & data | Table mapping: System -> Data -> Responsibilities -> Storage |
+| 10 | Forms, WI, SOP & JD links | Document code table + name + link |
 
 ### HTML skeleton
 
@@ -125,21 +125,21 @@ Lưu ý khóa:
 
 ---
 
-## 2. WI — Work Instruction (7 section)
+## 2. WI — Work Instruction (7 sections)
 
-WI là hướng dẫn thao tác cụ thể, chi tiết hơn SOP. Viết dạng bước-by-bước.
+WI is a specific operating instruction, more detailed than SOP. Write step-by-step.
 
-### Cấu trúc bắt buộc
+### Required structure
 
-| Section | Tiêu đề | Nội dung chính |
+| Section | Title | Main content |
 |---------|---------|---------------|
-| 1 | Mục đích | 2-3 bullet, mô tả WI này giúp gì |
-| 2 | Phạm vi & đối tượng áp dụng | Áp dụng cho ai, ở đâu, khi nào |
-| 3 | Công cụ, vật tư & tài liệu cần thiết | Danh sách công cụ, vật tư, tài liệu tham chiếu |
-| 4 | Điều kiện tiên quyết | Điều kiện PHẢI thỏa mãn trước khi bắt đầu |
-| 5 | Các bước thực hiện | Step-by-step, mỗi bước 1 hành động |
-| 6 | Hồ sơ & bằng chứng | Hồ sơ nào cần ghi, lưu ở đâu |
-| 7 | Tài liệu liên quan | Bảng mã + tên + link |
+| 1 | Purpose | 2-3 bullets, describe how this WI helps |
+| 2 | Scope & object of application | Applies to whom, where, when |
+| 3 | Necessary tools, supplies & documents | List of tools, supplies, reference documents |
+| 4 | Prerequisites | Conditions MUST be satisfied before starting |
+| 5 | Implementation steps | Step-by-step, 1 action per step |
+| 6 | Records & Evidence | What records need to be recorded and where to save them |
+| 7 | Related documents | Code table + name + link |
 
 ### HTML skeleton
 
@@ -196,39 +196,39 @@ WI là hướng dẫn thao tác cụ thể, chi tiết hơn SOP. Viết dạng b
 </section>
 ```
 
-### Nguyên tắc viết WI
+### Guidelines for writing WI
 
-- Mọi bước BẮT ĐẦU bằng động từ mệnh lệnh: "Đặt", "Mở", "Kiểm tra", "Ghi", "Báo cáo".
-- Mọi bước chỉ có 1 hành động. KHÔNG gộp nhiều hành động.
-- Nếu bước có điều kiện: viết "Nếu [điều kiện], thì [hành động]."
-- Nếu bước có cảnh báo: dùng `<div class="note-warning">` trước bước.
-- Kết thúc bằng hồ sơ cần ghi + người kiểm tra.
+- Every step STARTS with an imperative verb: "Set", "Open", "Check", "Record", "Report".
+- Every step has only 1 action. DO NOT combine multiple actions.
+- If the step is conditional: write "If [condition], then [action]."
+- If the step has a warning: use `<div class="note-warning">` before the step.
+- Finish with the documents to be recorded + the person checking.
 
 ---
 
-## 3. ANNEX — Phụ lục tham chiếu (Rule-pack format)
+## 3. ANNEX — Reference appendix (Rule-pack format)
 
-ANNEX la tài liệu tham chiếu chứa quy tắc, bảng, phương pháp, ma trận. Cấu trúc linh hoạt theo nội dung.
+ANNEX is a reference document containing rules, tables, methods, matrices. Flexible structure according to content.
 
-### Thành phần bắt buộc
+### Required component
 
-| Thành phần | Mô tả | Bắt buộc |
+| Ingredients | Description | Required |
 |-----------|-------|---------|
-| iso-map | Bảng liên kết clause ISO 9001/AS9100D | PHẢI |
-| Sections | Các phần nội dung, đánh số | PHẢI |
-| Tables | Bảng dữ liệu, quy tắc, ma trận | PHẢI (tối thiểu 1) |
-| Header (meta) | Ma, rev, hiệu lực, owner | PHẢI |
+| iso-map | Clause linkage table ISO 9001/AS9100D | MUST |
+| Sections | Content sections, numbered | MUST |
+| Tables | Data tables, rules, matrices | MUST (min 1) |
+| Header (meta) | Ma, rev, effect, owner | MUST |
 
-### Cac dang ANNEX
+### ANNEX forms
 
-| Dạng | Ví dụ | Đặc điểm |
+| Format | Example | Features |
 |------|-------|---------|
-| Reference data | ANNEX-302 Approved Materials List | Bang danh sach, co filter |
-| Matrix | ANNEX-120 Authority Matrix | Bảng 2 chiều: vai trò x quyền |
-| Method | ANNEX-601 AQL Method Reference | Quy trinh tinh toan, bang tra |
-| Rules | ANNEX-501 Dispatch Capacity WIP Rules | Dieu kien + hanh dong |
-| Map | ANNEX-106 ISO 9001 Matrix Full | Clause -> tài liệu -> trach nhiem |
-| Topology | ANNEX-133 M365 Site Topology | Cấu trúc thư mục, site, library |
+| Reference data | ANNEX-302 Approved Materials List | Bang list, have filter |
+| Matrix | ANNEX-120 Authority Matrix | 2-way table: roles x permissions |
+| Method | ANNEX-601 AQL Method Reference | Calculation and investigation process |
+| Rules | ANNEX-501 Dispatch Capacity WIP Rules | Conditions + performance |
+| Map | ANNEX-106 ISO 9001 Matrix Full | Clause -> documents -> documents |
+| Topology | ANNEX-133 M365 Site Topology | Directory structure, site, library |
 
 ### HTML skeleton
 
@@ -247,27 +247,27 @@ ANNEX la tài liệu tham chiếu chứa quy tắc, bảng, phương pháp, ma t
 </section>
 ```
 
-### Nguyen tac viet ANNEX
+### Nguyen Tac Viet ANNEX
 
-- KHÔNG viet dang tuong thuat. Dung bang và danh sach.
-- Mọi bảng PHẢI có header rõ ràng.
-- Ghi nguon/can cu cho moi quy tac (ISO clause, tiêu chuẩn, yêu cầu khách hàng).
-- Dat ten section theo nội dung, không theo so thu tu co dinh.
+- DO NOT write in the same manner. Dung state and list.
+- Every table MUST have a clear header.
+- Record source/source for each rule (ISO clause, standard, customer requirement).
+- Name sections according to content, not according to revenue and structure.
 
 ---
 
-## 4. JD — Job Description (6 section)
+## 4. JD — Job Description (6 sections)
 
-### Cấu trúc bắt buộc
+### Required structure
 
-| Section | Tiêu đề | CSS class | Nội dung |
+| Section | Title | CSS class | Content |
 |---------|---------|-----------|---------|
-| 1 | Mục đích & su menh | `jd-purpose`, `jd-mission` | 2-3 cau: vi tri nay ton tai de lam gi |
-| 2 | Trách nhiệm chính | `resp-table` | Bảng: STT \| Trách nhiệm \| Tần suất \| Hồ sơ |
-| 3 | Thẩm quyền | `auth-grid` | Bảng: Quyết định \| Phạm vi \| Giới hạn \| Báo cáo cho |
-| 4 | Nang luc yeu cau | `comp-grid` | Bang: Nang luc \| Muc do (Dreyfus) \| Bắt buộc/Uu tien |
-| 5 | Người dự phòng | `backup-card` | Card: Vai trò dự phòng + dieu kien kích hoạt |
-| 6 | Tài liệu liên quan | `link-table` | Bảng mã + tên + link |
+| 1 | Purpose & mission | `jd-purpose`, `jd-mission` | 2-3 sentences: why the role exists and what business purpose it serves |
+| 2 | Main Responsibilities | `resp-table` | Table: STT \| Responsibility \| Frequency \| Profile |
+| 3 | Authority | `auth-grid` | Table: Decision \| Range \| Limit \| Report to |
+| 4 | Competency & capability | `comp-grid` | Grid: current level \| Dreyfus stage \| required/premium expectation |
+| 5 | Backup person | `backup-card` | Card: Backup role + activation condition |
+| 6 | Related documents | `link-table` | Code table + name + link |
 
 ### HTML skeleton
 
@@ -330,27 +330,27 @@ ANNEX la tài liệu tham chiếu chứa quy tắc, bảng, phương pháp, ma t
 </section>
 ```
 
-### Nguyen tac viet JD
+### Nguyen tac writes JD
 
-- Trách nhiệm viet dang bang, KHÔNG viet đoạn văn.
-- Mọi dòng trách nhiệm có tần suất (Hằng ngày / Hằng tuần / Hằng tháng / Khi cần).
-- Auth-grid ghi ro gioi han: "Duoc duyet PO duoi $5,000" thay vi "Duoc duyet PO".
-- Nang luc dung thang Dreyfus 5 bac: Novice, Advanced Beginner, Competent, Proficient, Expert.
+- Responsibility for writing is complete, DO NOT write paragraphs.
+- Every line of responsibility has a frequency (Daily / Weekly / Monthly / As needed).
+- Auth-grid records the limit: "Approved PO under $5,000" instead of "Approved PO".
+- Instructions for using the Dreyfus scale in 5 steps: Novice, Advanced Beginner, Competent, Proficient, Expert.
 
 ---
 
-## 5. Department Handbook (6 section)
+## 5. Department Handbook (6 sections)
 
-### Cấu trúc bắt buộc
+### Required structure
 
-| Section | Tiêu đề | Nội dung |
+| Section | Title | Content |
 |---------|---------|---------|
-| 1 | Tổng quan phòng ban | Sứ mệnh, mục tiêu, vị trí trong tổ chức |
-| 2 | Phạm vi chức năng | Các chức năng chính phòng ban đảm nhận |
-| 3 | Sơ đồ tổ chức | Cây tổ chức (org-tree) của phòng ban |
-| 4 | Quy trình chính | Danh sách SOP chính phòng ban sở hữu hoặc tham gia |
-| 5 | KPI phòng ban | Bảng KPI: chỉ số, mục tiêu, đo lường, tần suất |
-| 6 | Liên kết SOP/WI/Form | Bang ma tài liệu liên quan |
+| 1 | Department overview | Mission, goals, position in the organization |
+| 2 | Functional scope | Main functions undertaken by the department |
+| 3 | Organization chart | Organizational tree (org-tree) of the department |
+| 4 | Main process | List of main SOPs that departments own or participate in |
+| 5 | Departmental KPI | KPI table: indicators, goals, measurements, frequency |
+| 6 | SOP/WI/Form Link | Bang ma related documents |
 
 ### HTML skeleton
 
@@ -406,18 +406,18 @@ ANNEX la tài liệu tham chiếu chứa quy tắc, bảng, phương pháp, ma t
 
 ---
 
-## 6. Training Module — C01 đến C19 (6 section)
+## 6. Training Module — C01 to C19 (6 sections)
 
-### Cấu trúc bắt buộc
+### Required structure
 
-| Section | Tiêu đề | Nội dung |
+| Section | Title | Content |
 |---------|---------|---------|
-| 1 | Thong tin triển khai | Đối tượng, thoi luong, dieu kien tham gia, hinh thuc |
-| 2 | Muc luc nhanh | Danh sách cac phan trong module |
-| 3 | Nội dung ly thuyet | Cac section kien thuc, bang, hinh anh |
-| 4 | Vi du thuc te | Case study, tinh huong thuc te tai HESEM |
-| 5 | Bai tap thuc hanh | Bai tap, tinh huong, cau hoi kiểm tra |
-| 6 | Checklist danh gia | Checklist de danh gia người hoc dat/chưa dat |
+| 1 | Deployment information | Subjects, salary, participation conditions, form |
+| 2 | Fast times | List of components in module |
+| 3 | Content of divorce | Sections: facts, states, images |
+| 4 | Because of the fact | Case study, practical situation at HESEM |
+| 5 | Exercises | Test questions, instructions, test questions |
+| 6 | Checklist of famous people | Checklist of registered/unregistered students |
 
 ### HTML skeleton
 
@@ -483,22 +483,22 @@ ANNEX la tài liệu tham chiếu chứa quy tắc, bảng, phương pháp, ma t
 
 ### Nguyen tac viet Training Module
 
-- Nội dung ly thuyet viet ngắn, tap trung vao "can biet de lam" KHÔNG phai "can biet de biet".
-- Vi du thuc te PHẢI lay tu boi canh HESEM (gia cong CNC, semiconductor parts, ISO 9001).
-- Bai tap thuc hanh PHẢI lam được tai nơi làm việc voi tài liệu và cong cu hien co.
-- Checklist danh gia bam sat nang luc can dat, dung thang Dreyfus lam tham chiếu.
+- The content of the essay is short, focusing on "need to know to do" NOT "need to know to know".
+- Because the equipment MUST be made from HESEM (CNC machining, semiconductor parts, ISO 9001).
+- The work report MUST be done in the workplace with documents and current documents.
+- Checklist of names to check when necessary, using the Dreyfus scale as reference.
 
 ---
 
-## 7. Bang tom tat so sanh
+## 7. State of totality
 
-| Đặc điểm | SOP | WI | ANNEX | JD | Dept HB | Training |
+| Features | SOP | WI | ANNEX | JD | Dept HB | Training |
 |----------|-----|----|-------|----|---------| ---------|
-| So section | 10 | 7 | Linh hoat | 6 | 6 | 6 |
-| Gate/checkpoint | Co | Không | Không | Không | Không | Co (checklist) |
-| RACI | Co (Section 4) | Không | Không | Co (Section 3) | Không | Không |
-| KPI | Co (Section 6) | Không | Không | Không | Co (Section 5) | Không |
-| Step-by-step | Co (Section 7) | Co (Section 5) | Không | Không | Không | Co (Section 5) |
-| iso-map | Không | Không | Co | Không | Không | Không |
-| Bang dữ liệu | Co | Co | PHẢI co | Co | Co | Co |
-| Liên kết tài liệu | Co (Section 10) | Co (Section 7) | Co | Co (Section 6) | Co (Section 6) | Không |
+| So section | 10 | 7 | Flexibility | 6 | 6 | 6 |
+| Gate/checkpoint | Co | No | No | No | No | Co (checklist) |
+| RACI | Co (Section 4) | No | No | Co (Section 3) | No | No |
+| KPI | Co (Section 6) | No | No | No | Co (Section 5) | No |
+| Step-by-step | Co (Section 7) | Co (Section 5) | No | No | No | Co (Section 5) |
+| iso-map | No | No | Co | No | No | No |
+| State data | Co | Co | MUST have | Co | Co | Co |
+| Documentation link | Co (Section 10) | Co (Section 7) | Co | Co (Section 6) | Co (Section 6) | No |

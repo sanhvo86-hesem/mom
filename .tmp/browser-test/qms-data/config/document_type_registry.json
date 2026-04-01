@@ -1,0 +1,960 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "created": "2026-03-28",
+    "description": "Document type registry for Record-ID generation and cascading dropdowns",
+    "sources": [
+      "core-standards/15-evidence-and-records-naming.md",
+      "core-standards/18-online-vs-offline-form-decision-framework.md",
+      "qms-data/counters/_registry.json"
+    ]
+  },
+
+  "departments": {
+    "QA": {
+      "label": "Quality Assurance",
+      "label_vi": "Đảm bảo Chất lượng",
+      "icon": "🔍",
+      "color": "#dc2626",
+      "record_types": ["NCR", "CAPA", "FAI", "SCAR", "AUD", "CAL"],
+      "form_series": [600, 900]
+    },
+    "PRO": {
+      "label": "Production",
+      "label_vi": "Sản xuất",
+      "icon": "🏭",
+      "color": "#059669",
+      "record_types": ["NCR", "IMP", "DOWNTIME"],
+      "form_series": [500]
+    },
+    "ENG": {
+      "label": "Engineering",
+      "label_vi": "Kỹ thuật",
+      "icon": "⚙️",
+      "color": "#0369a1",
+      "record_types": ["ECR", "FAI"],
+      "form_series": [300]
+    },
+    "SCM": {
+      "label": "Supply Chain",
+      "label_vi": "Chuỗi cung ứng",
+      "icon": "📦",
+      "color": "#84cc16",
+      "record_types": ["SCAR", "PO-EXCEPTION"],
+      "form_series": [400]
+    },
+    "HR": {
+      "label": "HR & Training",
+      "label_vi": "Nhân sự & Đào tạo",
+      "icon": "👥",
+      "color": "#8b5cf6",
+      "record_types": ["TRN"],
+      "form_series": [800]
+    },
+    "EXE": {
+      "label": "Executive / Management",
+      "label_vi": "Ban Giám đốc",
+      "icon": "👔",
+      "color": "#7c3aed",
+      "record_types": ["MR", "RISK", "IMP"],
+      "form_series": [100]
+    },
+    "SAL": {
+      "label": "Sales",
+      "label_vi": "Kinh doanh",
+      "icon": "💼",
+      "color": "#f59e0b",
+      "record_types": [],
+      "form_series": [200]
+    },
+    "WH": {
+      "label": "Warehouse / Logistics",
+      "label_vi": "Kho vận",
+      "icon": "📦",
+      "color": "#d97706",
+      "record_types": [],
+      "form_series": [700]
+    },
+    "IT": {
+      "label": "IT / Digital",
+      "label_vi": "Công nghệ thông tin",
+      "icon": "💻",
+      "color": "#6366f1",
+      "record_types": [],
+      "form_series": [100]
+    },
+    "EHS": {
+      "label": "EHS / Safety",
+      "label_vi": "An toàn & Môi trường",
+      "icon": "⚠️",
+      "color": "#ea580c",
+      "record_types": [],
+      "form_series": [800]
+    }
+  },
+
+  "record_types": {
+    "NCR": {
+      "label": "Non-Conformity Report",
+      "label_vi": "Phiếu báo lỗi không phù hợp",
+      "description": "Documents any product, process, or system nonconformance requiring disposition and corrective action",
+      "form_code": "FRM-631",
+      "counter_digits": 3,
+      "departments_allowed": ["QA", "PRO", "ENG"],
+      "variables": ["job_number", "part_rev", "customer", "defect_type", "disposition", "root_cause"],
+      "naming_pattern": "NCR-{YYYY}-{NNN}",
+      "sharepoint_path": "HESEM-Records/Quality-Records/NCR/{YYYY}",
+      "online": true,
+      "decision_score": 82
+    },
+    "CAPA": {
+      "label": "Corrective Action",
+      "label_vi": "Hành động khắc phục phòng ngừa",
+      "description": "Corrective and preventive action linked to NCR, audit finding, or customer complaint",
+      "form_code": "FRM-641",
+      "counter_digits": 3,
+      "departments_allowed": ["QA", "PRO", "ENG", "SCM"],
+      "variables": ["source_record", "root_cause_method", "action_owner", "target_date", "verification_result"],
+      "naming_pattern": "CAPA-{YYYY}-{NNN}",
+      "sharepoint_path": "HESEM-Records/Quality-Records/CAPA/{YYYY}",
+      "online": true,
+      "decision_score": 78
+    },
+    "FAI": {
+      "label": "First Article Inspection",
+      "label_vi": "Kiểm tra sản phẩm đầu tiên",
+      "description": "AS9102-compliant first article inspection report for new part, revision, or process change",
+      "form_code": "FRM-311",
+      "counter_digits": 3,
+      "departments_allowed": ["QA", "ENG"],
+      "variables": ["part_number", "part_rev", "job_number", "customer", "operation", "measurement_data"],
+      "naming_pattern": "FAI-{YYYY}-{NNN}",
+      "sharepoint_path": "HESEM-Records/Quality-Records/FAI/{YYYY}",
+      "online": false,
+      "decision_score": null
+    },
+    "TRN": {
+      "label": "Training Event",
+      "label_vi": "Sự kiện đào tạo",
+      "description": "Training session record including attendance, competency assessment, and sign-off",
+      "form_code": "FRM-802",
+      "counter_digits": 3,
+      "departments_allowed": ["HR"],
+      "variables": ["training_topic", "trainer", "attendees", "competency_level", "assessment_result"],
+      "naming_pattern": "TRN-{YYYY}-{NNN}",
+      "sharepoint_path": "HESEM-Records/HR-Records/Training/{YYYY}",
+      "online": true,
+      "decision_score": 72
+    },
+    "AUD": {
+      "label": "Audit",
+      "label_vi": "Đánh giá nội bộ / bên ngoài",
+      "description": "Internal or external audit finding report with corrective action linkage",
+      "form_code": "FRM-913",
+      "counter_digits": 3,
+      "departments_allowed": ["QA", "EXE"],
+      "variables": ["audit_type", "audit_scope", "auditor", "clause_ref", "finding_grade", "capa_link"],
+      "naming_pattern": "AUD-{YYYY}-IA{NN}",
+      "sharepoint_path": "HESEM-Records/Quality-Records/Audit/{YYYY}",
+      "online": true,
+      "decision_score": 70
+    },
+    "ECR": {
+      "label": "Engineering Change Request",
+      "label_vi": "Yêu cầu thay đổi kỹ thuật",
+      "description": "Formal request for engineering change to part, process, tooling, or documentation",
+      "form_code": "FRM-161",
+      "counter_digits": 3,
+      "departments_allowed": ["ENG", "QA"],
+      "variables": ["part_number", "change_type", "change_reason", "impact_assessment", "approver"],
+      "naming_pattern": "ECR-{YYYY}-{NNN}",
+      "sharepoint_path": "HESEM-Records/Engineering-Records/ECR/{YYYY}",
+      "online": false,
+      "decision_score": null
+    },
+    "CAL": {
+      "label": "Calibration Record",
+      "label_vi": "Hồ sơ hiệu chuẩn",
+      "description": "Calibration record for measurement equipment including certificate and result tracking",
+      "form_code": "FRM-601",
+      "counter_digits": 3,
+      "departments_allowed": ["QA"],
+      "variables": ["equipment_id", "equipment_type", "cal_standard", "cal_result", "next_due_date"],
+      "naming_pattern": "CAL-{EquipCode}-{NNN}",
+      "sharepoint_path": "HESEM-Records/Quality-Records/Calibration/{YYYY}",
+      "online": true,
+      "decision_score": 65
+    },
+    "SCAR": {
+      "label": "Supplier Corrective Action",
+      "label_vi": "Hành động khắc phục nhà cung cấp",
+      "description": "Supplier corrective action report for incoming quality or delivery nonconformance",
+      "form_code": "FRM-403",
+      "counter_digits": 3,
+      "departments_allowed": ["SCM", "QA"],
+      "variables": ["supplier_name", "po_number", "defect_description", "root_cause", "corrective_action"],
+      "naming_pattern": "SCAR-{YYYY}-{NNN}",
+      "sharepoint_path": "HESEM-Records/Supply-Chain-Records/SCAR/{YYYY}",
+      "online": true,
+      "decision_score": 68
+    },
+    "IMP": {
+      "label": "Improvement Project",
+      "label_vi": "Dự án cải tiến",
+      "description": "Continual improvement project tracked through plan-do-check-act cycle",
+      "form_code": null,
+      "counter_digits": 3,
+      "departments_allowed": ["EXE", "PRO", "QA", "ENG"],
+      "variables": ["project_title", "sponsor", "target_kpi", "baseline_value", "target_value", "status"],
+      "naming_pattern": "IMP-{YYYY}-{CODE}",
+      "sharepoint_path": "HESEM-Records/Improvement-Records/{YYYY}",
+      "online": false,
+      "decision_score": null
+    },
+    "MR": {
+      "label": "Management Review",
+      "label_vi": "Xem xét của lãnh đạo",
+      "description": "Periodic management review meeting record per ISO 9001 clause 9.3",
+      "form_code": "FRM-911",
+      "counter_digits": 2,
+      "departments_allowed": ["EXE"],
+      "variables": ["review_period", "attendees", "agenda_items", "action_items", "next_review_date"],
+      "naming_pattern": "MR-{YYYY}-Q{N}",
+      "sharepoint_path": "HESEM-Records/Management-Records/MR/{YYYY}",
+      "online": false,
+      "decision_score": null
+    },
+    "RISK": {
+      "label": "Risk Review",
+      "label_vi": "Đánh giá rủi ro",
+      "description": "Risk assessment and review record per ISO 9001 clause 6.1",
+      "form_code": "FRM-131",
+      "counter_digits": 2,
+      "departments_allowed": ["EXE", "QA"],
+      "variables": ["risk_category", "likelihood", "severity", "rpn", "mitigation_action", "residual_risk"],
+      "naming_pattern": "RISK-{YYYY}-R{NN}",
+      "sharepoint_path": "HESEM-Records/Management-Records/Risk/{YYYY}",
+      "online": false,
+      "decision_score": null
+    },
+    "DOWNTIME": {
+      "label": "Downtime Record",
+      "label_vi": "Ghi nhận dừng máy",
+      "description": "Machine downtime event record for OEE tracking and maintenance analysis",
+      "form_code": "FRM-512",
+      "counter_digits": 3,
+      "departments_allowed": ["PRO"],
+      "variables": ["machine_id", "downtime_start", "downtime_end", "reason_code", "job_affected", "resolution"],
+      "naming_pattern": "DOWNTIME-{YYYY}-{NNN}",
+      "sharepoint_path": "HESEM-Records/Production-Records/Downtime/{YYYY}",
+      "online": true,
+      "decision_score": 90
+    },
+    "PO-EXCEPTION": {
+      "label": "PO Exception",
+      "label_vi": "Ngoại lệ đơn hàng mua",
+      "description": "Purchase order exception or deviation requiring supply chain approval",
+      "form_code": null,
+      "counter_digits": 3,
+      "departments_allowed": ["SCM"],
+      "variables": ["po_number", "supplier", "exception_type", "justification", "approver"],
+      "naming_pattern": "PO-EXCEPTION-{YYYY}-{NNN}",
+      "sharepoint_path": "HESEM-Records/Supply-Chain-Records/PO-Exception/{YYYY}",
+      "online": false,
+      "decision_score": null
+    }
+  },
+
+  "evidence_types": {
+    "PO": {
+      "label": "Purchase Order",
+      "label_vi": "Đơn đặt hàng",
+      "category": "job_dossier",
+      "file_extensions": [".pdf", ".xlsx"],
+      "naming_pattern": "P2",
+      "description": "Scan PO from customer"
+    },
+    "CR": {
+      "label": "Contract Review",
+      "label_vi": "Kết quả xem xét hợp đồng",
+      "category": "job_dossier",
+      "file_extensions": [".pdf", ".xlsx"],
+      "naming_pattern": "P2",
+      "description": "Contract review result"
+    },
+    "MTR": {
+      "label": "Material Test Report",
+      "label_vi": "Chứng nhận vật liệu (mill cert, CoA)",
+      "category": "job_dossier",
+      "file_extensions": [".pdf"],
+      "naming_pattern": "P2",
+      "description": "Mill cert, heat cert, CoA"
+    },
+    "IQC": {
+      "label": "Incoming QC Result",
+      "label_vi": "Kết quả kiểm tra đầu vào",
+      "category": "job_dossier",
+      "file_extensions": [".pdf", ".xlsx"],
+      "naming_pattern": "P2",
+      "description": "Incoming quality control inspection result"
+    },
+    "TRV": {
+      "label": "Traveler / Router",
+      "label_vi": "Phiếu theo dõi sản xuất",
+      "category": "job_dossier",
+      "file_extensions": [".pdf"],
+      "naming_pattern": "P2",
+      "description": "Scan of production traveler/router"
+    },
+    "CMM": {
+      "label": "CMM / Measurement Data",
+      "label_vi": "Dữ liệu đo CMM",
+      "category": "job_dossier",
+      "file_extensions": [".csv", ".pdf", ".xlsx"],
+      "naming_pattern": "P2",
+      "description": "CMM, caliper, micrometer measurement data"
+    },
+    "FAI-BALLOON": {
+      "label": "Ballooned Drawing",
+      "label_vi": "Bản vẽ đánh số balloon",
+      "category": "job_dossier",
+      "file_extensions": [".pdf"],
+      "naming_pattern": "P2",
+      "description": "Drawing with balloon numbers for FAI"
+    },
+    "COC": {
+      "label": "Certificate of Conformance",
+      "label_vi": "Chứng nhận phù hợp",
+      "category": "job_dossier",
+      "file_extensions": [".pdf"],
+      "naming_pattern": "P2",
+      "description": "Certificate of conformance for shipment"
+    },
+    "PACK": {
+      "label": "Packing List",
+      "label_vi": "Phiếu đóng gói",
+      "category": "job_dossier",
+      "file_extensions": [".pdf", ".xlsx"],
+      "naming_pattern": "P2",
+      "description": "Packing list for shipment"
+    },
+    "SHIP-LABEL": {
+      "label": "Shipping Label / SSCC",
+      "label_vi": "Nhãn vận chuyển",
+      "category": "job_dossier",
+      "file_extensions": [".pdf", ".png"],
+      "naming_pattern": "P2",
+      "description": "Shipping label or SSCC barcode"
+    },
+    "POD": {
+      "label": "Proof of Delivery",
+      "label_vi": "Bằng chứng giao hàng",
+      "category": "job_dossier",
+      "file_extensions": [".pdf", ".jpg"],
+      "naming_pattern": "P2",
+      "description": "Signed proof of delivery"
+    },
+    "CONCESSION": {
+      "label": "Deviation / Waiver",
+      "label_vi": "Phê duyệt nhượng bộ",
+      "category": "job_dossier",
+      "file_extensions": [".pdf"],
+      "naming_pattern": "P2",
+      "description": "Customer or internal deviation/waiver approval"
+    },
+    "REWORK": {
+      "label": "Rework Evidence",
+      "label_vi": "Bằng chứng làm lại + tái kiểm",
+      "category": "job_dossier",
+      "file_extensions": [".pdf", ".xlsx", ".jpg"],
+      "naming_pattern": "P2",
+      "description": "Rework documentation with re-inspection results"
+    },
+    "CUST-APPR": {
+      "label": "Customer Approval",
+      "label_vi": "Phê duyệt từ khách hàng",
+      "category": "job_dossier",
+      "file_extensions": [".pdf", ".msg"],
+      "naming_pattern": "P2",
+      "description": "Customer email or document approval"
+    },
+    "PROVEOUT": {
+      "label": "Prove-out Evidence",
+      "label_vi": "Ghi chú chạy thử đầu tiên",
+      "category": "job_dossier",
+      "file_extensions": [".pdf", ".jpg", ".mp4"],
+      "naming_pattern": "P2",
+      "description": "First-run prove-out notes and evidence"
+    },
+    "OFFSET-LOG": {
+      "label": "Offset Change Log",
+      "label_vi": "Log thay đổi offset máy",
+      "category": "job_dossier",
+      "file_extensions": [".xlsx", ".csv"],
+      "naming_pattern": "P2",
+      "description": "Machine offset change log during production"
+    },
+    "TOOL-WEAR": {
+      "label": "Tool Wear Record",
+      "label_vi": "Ghi nhận mòn dao",
+      "category": "job_dossier",
+      "file_extensions": [".xlsx", ".csv"],
+      "naming_pattern": "P2",
+      "description": "Tool wear measurement and replacement log"
+    },
+    "DOWNTIME": {
+      "label": "Downtime Record",
+      "label_vi": "Ghi nhận dừng máy",
+      "category": "job_dossier",
+      "file_extensions": [".pdf", ".xlsx"],
+      "naming_pattern": "P2",
+      "description": "Machine downtime event record"
+    },
+    "PHOTO-SETUP": {
+      "label": "Setup Photo",
+      "label_vi": "Ảnh trạng thái setup máy",
+      "category": "photos",
+      "file_extensions": [".jpg", ".png"],
+      "naming_pattern": "P2",
+      "description": "Photo of machine setup state"
+    },
+    "PHOTO-FAI": {
+      "label": "FAI Photo",
+      "label_vi": "Ảnh chi tiết FAI",
+      "category": "photos",
+      "file_extensions": [".jpg", ".png"],
+      "naming_pattern": "P2",
+      "description": "Photo of first article inspection detail"
+    },
+    "PHOTO-FINAL": {
+      "label": "Final Inspection Photo",
+      "label_vi": "Ảnh kiểm tra cuối",
+      "category": "photos",
+      "file_extensions": [".jpg", ".png"],
+      "naming_pattern": "P2",
+      "description": "Photo of final inspection"
+    },
+    "PHOTO-PACK": {
+      "label": "Packing Photo",
+      "label_vi": "Ảnh đóng gói",
+      "category": "photos",
+      "file_extensions": [".jpg", ".png"],
+      "naming_pattern": "P2",
+      "description": "Photo of packed items"
+    },
+    "PHOTO-NCR": {
+      "label": "NCR Photo",
+      "label_vi": "Ảnh lỗi",
+      "category": "photos",
+      "file_extensions": [".jpg", ".png"],
+      "naming_pattern": "P2",
+      "description": "Photo of nonconformance defect"
+    },
+    "PHOTO-GEN": {
+      "label": "General Photo",
+      "label_vi": "Ảnh chung",
+      "category": "photos",
+      "file_extensions": [".jpg", ".png"],
+      "naming_pattern": "P2",
+      "description": "General-purpose photo evidence"
+    },
+    "NC": {
+      "label": "NC Program (G-code)",
+      "label_vi": "Chương trình NC",
+      "category": "engineering_baseline",
+      "file_extensions": [".nc", ".tap", ".gcode"],
+      "naming_pattern": "P3",
+      "description": "CNC program file"
+    },
+    "CAM": {
+      "label": "CAM Source File",
+      "label_vi": "File CAM gốc",
+      "category": "engineering_baseline",
+      "file_extensions": [".mcam", ".f3d", ".catpart"],
+      "naming_pattern": "P3",
+      "description": "CAM source project file"
+    },
+    "MODEL": {
+      "label": "CAD Model",
+      "label_vi": "Mô hình CAD (STEP, IGES)",
+      "category": "engineering_baseline",
+      "file_extensions": [".step", ".stp", ".iges", ".igs"],
+      "naming_pattern": "P3",
+      "description": "3D CAD model file"
+    },
+    "DWG": {
+      "label": "Drawing (PDF)",
+      "label_vi": "Bản vẽ kỹ thuật",
+      "category": "engineering_baseline",
+      "file_extensions": [".pdf"],
+      "naming_pattern": "P3",
+      "description": "Engineering drawing in PDF format"
+    },
+    "SETUP": {
+      "label": "Setup Sheet + Tool List",
+      "label_vi": "Phiếu setup & danh sách dao",
+      "category": "engineering_baseline",
+      "file_extensions": [".xlsx"],
+      "naming_pattern": "P3",
+      "description": "Setup sheet and tool list (FRM-302)"
+    },
+    "INSP": {
+      "label": "Inspection Program",
+      "label_vi": "Chương trình kiểm tra",
+      "category": "engineering_baseline",
+      "file_extensions": [".dcc", ".pcm"],
+      "naming_pattern": "P3",
+      "description": "CMM or inspection program file"
+    },
+    "FIXTURE": {
+      "label": "Fixture / Jig Drawing",
+      "label_vi": "Bản vẽ đồ gá",
+      "category": "engineering_baseline",
+      "file_extensions": [".pdf", ".step"],
+      "naming_pattern": "P3",
+      "description": "Fixture or jig drawing"
+    },
+    "SIM": {
+      "label": "Simulation Evidence",
+      "label_vi": "Bằng chứng mô phỏng",
+      "category": "engineering_baseline",
+      "file_extensions": [".mp4", ".pdf"],
+      "naming_pattern": "P3",
+      "description": "Machining simulation video or report"
+    },
+    "CTRL-PLAN": {
+      "label": "Control Plan",
+      "label_vi": "Kế hoạch kiểm soát",
+      "category": "engineering_baseline",
+      "file_extensions": [".xlsx"],
+      "naming_pattern": "P3",
+      "description": "Process control plan"
+    },
+    "REPORT": {
+      "label": "Report",
+      "label_vi": "Báo cáo",
+      "category": "qms_governance",
+      "file_extensions": [".pdf", ".xlsx"],
+      "naming_pattern": "P4",
+      "description": "Audit report, analysis report"
+    },
+    "CHECKLIST": {
+      "label": "Checklist",
+      "label_vi": "Danh sách kiểm tra",
+      "category": "qms_governance",
+      "file_extensions": [".xlsx", ".pdf"],
+      "naming_pattern": "P4",
+      "description": "Audit checklist, verification list"
+    },
+    "MINUTES": {
+      "label": "Meeting Minutes",
+      "label_vi": "Biên bản cuộc họp",
+      "category": "qms_governance",
+      "file_extensions": [".pdf", ".docx"],
+      "naming_pattern": "P4",
+      "description": "Meeting minutes (MR, department)"
+    },
+    "INPUT-PACK": {
+      "label": "Input Package",
+      "label_vi": "Gói dữ liệu đầu vào",
+      "category": "qms_governance",
+      "file_extensions": [".pdf", ".xlsx"],
+      "naming_pattern": "P4",
+      "description": "MR input, audit input package"
+    },
+    "ACTION-LOG": {
+      "label": "Action Log",
+      "label_vi": "Nhật ký hành động",
+      "category": "qms_governance",
+      "file_extensions": [".xlsx"],
+      "naming_pattern": "P4",
+      "description": "Follow-up actions tracking"
+    },
+    "KPI-REPORT": {
+      "label": "KPI Report",
+      "label_vi": "Báo cáo KPI",
+      "category": "qms_governance",
+      "file_extensions": [".xlsx", ".pdf"],
+      "naming_pattern": "P4",
+      "description": "Dashboard export, KPI analysis"
+    },
+    "RISK-REG": {
+      "label": "Risk Register Snapshot",
+      "label_vi": "Bản chụp sổ rủi ro",
+      "category": "qms_governance",
+      "file_extensions": [".xlsx"],
+      "naming_pattern": "P4",
+      "description": "Risk register snapshot at review point"
+    },
+    "MEETING-MIN": {
+      "label": "Department Meeting Minutes",
+      "label_vi": "Biên bản họp phòng ban",
+      "category": "qms_governance",
+      "file_extensions": [".pdf", ".docx"],
+      "naming_pattern": "P4",
+      "description": "Department-level meeting minutes"
+    },
+    "OJT": {
+      "label": "On-the-Job Training",
+      "label_vi": "Đào tạo tại chỗ",
+      "category": "training_competence",
+      "file_extensions": [".pdf", ".xlsx"],
+      "naming_pattern": "P4",
+      "description": "OJT evidence per competency cell"
+    },
+    "GATE-TEST": {
+      "label": "Competency Gate Test",
+      "label_vi": "Bài kiểm tra năng lực",
+      "category": "training_competence",
+      "file_extensions": [".pdf", ".xlsx"],
+      "naming_pattern": "P4",
+      "description": "Competency gate test result"
+    },
+    "CERT-SCAN": {
+      "label": "Certificate Scan",
+      "label_vi": "Scan chứng chỉ bên ngoài",
+      "category": "training_competence",
+      "file_extensions": [".pdf", ".jpg"],
+      "naming_pattern": "P4",
+      "description": "External certificate scan"
+    },
+    "SIGNOFF": {
+      "label": "Sign-off Sheet",
+      "label_vi": "Bảng ký xác nhận",
+      "category": "training_competence",
+      "file_extensions": [".pdf"],
+      "naming_pattern": "P4",
+      "description": "Wet signature sign-off sheet"
+    },
+    "CAL-CERT": {
+      "label": "Calibration Certificate",
+      "label_vi": "Chứng nhận hiệu chuẩn",
+      "category": "calibration_assets",
+      "file_extensions": [".pdf"],
+      "naming_pattern": "P4",
+      "description": "Calibration certificate from lab"
+    },
+    "MAINT-LOG": {
+      "label": "Maintenance Log",
+      "label_vi": "Nhật ký bảo trì",
+      "category": "calibration_assets",
+      "file_extensions": [".xlsx", ".pdf"],
+      "naming_pattern": "P6",
+      "description": "Equipment maintenance log"
+    },
+    "SPEC": {
+      "label": "Specification Sheet",
+      "label_vi": "Bảng thông số kỹ thuật",
+      "category": "calibration_assets",
+      "file_extensions": [".pdf"],
+      "naming_pattern": "P6",
+      "description": "Equipment or material specification"
+    },
+    "SUP-CERT": {
+      "label": "Supplier Process Certificate",
+      "label_vi": "Chứng nhận quy trình NCC",
+      "category": "supplier",
+      "file_extensions": [".pdf"],
+      "naming_pattern": "P4",
+      "description": "Supplier process certification (Nadcap, ISO, etc.)"
+    },
+    "SUP-AUDIT": {
+      "label": "Supplier Audit Report",
+      "label_vi": "Báo cáo đánh giá NCC",
+      "category": "supplier",
+      "file_extensions": [".pdf", ".xlsx"],
+      "naming_pattern": "P4",
+      "description": "Supplier audit report"
+    },
+    "SCAR": {
+      "label": "Supplier Corrective Action Report",
+      "label_vi": "Phiếu SCAR nhà cung cấp",
+      "category": "supplier",
+      "file_extensions": [".pdf", ".xlsx"],
+      "naming_pattern": "P4",
+      "description": "Supplier corrective action report"
+    },
+    "SUP-EVAL": {
+      "label": "Supplier Evaluation",
+      "label_vi": "Đánh giá nhà cung cấp",
+      "category": "supplier",
+      "file_extensions": [".xlsx"],
+      "naming_pattern": "P4",
+      "description": "Periodic supplier performance evaluation"
+    }
+  },
+
+  "scope_codes": {
+    "JOB": {
+      "label": "Job Order",
+      "label_vi": "Lệnh sản xuất",
+      "format": "JOB-{YYYY}-{NNNN}",
+      "example": "JOB-2026-0042",
+      "source": "Epicor SoR",
+      "description": "Production job order from ERP"
+    },
+    "JOB-OP": {
+      "label": "Job + Operation",
+      "label_vi": "Lệnh SX + Nguyên công",
+      "format": "JOB-{YYYY}-{NNNN}-OP{NN}",
+      "example": "JOB-2026-0042-OP10",
+      "source": "Epicor SoR",
+      "description": "Job order scoped to specific operation"
+    },
+    "NCR": {
+      "label": "NCR Scope",
+      "label_vi": "Phạm vi NCR",
+      "format": "NCR-{YYYY}-{NNN}",
+      "example": "NCR-2026-043",
+      "source": "Server atomic counter",
+      "description": "Non-conformity report scope"
+    },
+    "CAPA": {
+      "label": "CAPA Scope",
+      "label_vi": "Phạm vi CAPA",
+      "format": "CAPA-{YYYY}-{NNN}",
+      "example": "CAPA-2026-008",
+      "source": "Server atomic counter",
+      "description": "Corrective action scope"
+    },
+    "FAI": {
+      "label": "FAI Scope",
+      "label_vi": "Phạm vi FAI",
+      "format": "FAI-{YYYY}-{NNN}",
+      "example": "FAI-2026-016",
+      "source": "Server atomic counter",
+      "description": "First article inspection scope"
+    },
+    "TRN": {
+      "label": "Training Event Scope",
+      "label_vi": "Phạm vi đào tạo",
+      "format": "TRN-{YYYY}-{NNN}",
+      "example": "TRN-2026-015",
+      "source": "Server atomic counter",
+      "description": "Training event scope"
+    },
+    "AUD": {
+      "label": "Audit Scope",
+      "label_vi": "Phạm vi đánh giá",
+      "format": "AUD-{YYYY}-IA{NN}",
+      "format_external": "AUD-{YYYY}-EA{NN}",
+      "example": "AUD-2026-IA03",
+      "example_external": "AUD-2026-EA01",
+      "source": "Server atomic counter",
+      "description": "Internal or external audit scope"
+    },
+    "MR": {
+      "label": "Management Review Scope",
+      "label_vi": "Phạm vi xem xét lãnh đạo",
+      "format": "MR-{YYYY}-Q{N}",
+      "example": "MR-2026-Q1",
+      "source": "Server atomic counter",
+      "description": "Quarterly management review"
+    },
+    "CAL": {
+      "label": "Calibration Scope",
+      "label_vi": "Phạm vi hiệu chuẩn",
+      "format": "CAL-{EquipCode}-{NNN}",
+      "example": "CAL-MICR-005",
+      "source": "Equipment registry",
+      "description": "Calibration scope per equipment"
+    },
+    "RISK": {
+      "label": "Risk Review Scope",
+      "label_vi": "Phạm vi đánh giá rủi ro",
+      "format": "RISK-{YYYY}-R{NN}",
+      "example": "RISK-2026-R02",
+      "source": "Server atomic counter",
+      "description": "Risk assessment review scope"
+    },
+    "ECR": {
+      "label": "Engineering Change Scope",
+      "label_vi": "Phạm vi thay đổi kỹ thuật",
+      "format": "ECR-{YYYY}-{NNN}",
+      "example": "ECR-2026-012",
+      "source": "Server atomic counter",
+      "description": "Engineering change request scope"
+    },
+    "IMP": {
+      "label": "Improvement Project Scope",
+      "label_vi": "Phạm vi dự án cải tiến",
+      "format": "IMP-{YYYY}-{CODE}",
+      "example": "IMP-2026-K05",
+      "source": "Server atomic counter",
+      "description": "Improvement project scope"
+    },
+    "EMP": {
+      "label": "Employee Scope",
+      "label_vi": "Phạm vi nhân viên",
+      "format": "EMP-{NNNN}",
+      "example": "EMP-0123",
+      "source": "Epicor Employee Master",
+      "description": "Individual employee scope for training/competence"
+    },
+    "DEPT": {
+      "label": "Department Scope",
+      "label_vi": "Phạm vi phòng ban",
+      "format": "{DeptCode}",
+      "example": "ENG",
+      "source": "Department registry",
+      "description": "Department-level scope"
+    },
+    "SYS": {
+      "label": "System-wide Scope",
+      "label_vi": "Phạm vi toàn hệ thống",
+      "format": "SYS",
+      "example": "SYS",
+      "source": "Static",
+      "description": "System-wide scope for cross-functional records"
+    },
+    "SHIFT": {
+      "label": "Shift Scope",
+      "label_vi": "Phạm vi ca sản xuất",
+      "format": "PRO-SHIFT-{A|B|C}",
+      "example": "PRO-SHIFT-A",
+      "source": "Shift schedule",
+      "description": "Production shift scope"
+    },
+    "PART": {
+      "label": "Part Baseline Scope",
+      "label_vi": "Phạm vi baseline chi tiết",
+      "format": "{PartNum}-REV{X}",
+      "example": "714XXXX-REVA",
+      "source": "Engineering release",
+      "description": "Part number and revision baseline scope"
+    }
+  },
+
+  "naming_rules": {
+    "record_id_format": {
+      "pattern": "{PREFIX}-{YYYY}-{PADDED_SEQ}",
+      "description": "Server-assigned unique Record-ID for formal quality records",
+      "description_vi": "Mã hồ sơ do server cấp tự động, duy nhất",
+      "examples": ["NCR-2026-043", "CAPA-2026-008", "FAI-2026-016"]
+    },
+    "form_blank_format": {
+      "pattern": "FRM-{code}_{Title}_V{ver}.{ext}",
+      "description": "Version-stamped form template for download",
+      "description_vi": "Mẫu form có đánh dấu version để tải",
+      "examples": ["FRM-302_Setup-Sheet-and-Tool-List_V3.2.xlsx", "FRM-631_NCR-Report_V2.1.xlsx"]
+    },
+    "form_filled_format": {
+      "pattern": "FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}",
+      "description": "Filled form record with scope, date, time, and user identification",
+      "description_vi": "Form đã điền với phạm vi, ngày, giờ, người điền",
+      "examples": ["FRM-631_V2.1_NCR-2026-043_20260327_0830-NVA.xlsx"]
+    },
+    "job_evidence_format": {
+      "pattern": "{RecordType}_{JobNum}_{PartRev}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}",
+      "description": "Evidence file linked to a specific job order",
+      "description_vi": "File evidence gắn với lệnh sản xuất cụ thể",
+      "examples": ["CMM_JOB-2026-0042_714XXXX-REVA-OP10_20260327_0900-QC1.csv"]
+    },
+    "nonjob_evidence_format": {
+      "pattern": "{RecordType}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}",
+      "description": "Evidence file not linked to a job (training, audit, department)",
+      "description_vi": "File evidence không gắn job (đào tạo, audit, phòng ban)",
+      "examples": ["REPORT_AUD-2026-IA03_20260327_0900-QMS1.pdf"]
+    },
+    "eng_baseline_format": {
+      "pattern": "{FileType}_{PartRev}_{Operation}_{MachineFamily}_V{ver}.{ext}",
+      "description": "Engineering baseline file versioned by part revision",
+      "description_vi": "File baseline kỹ thuật theo version part",
+      "examples": ["NC_714XXXX-REVA_OP10_5AX_V3.nc"]
+    },
+    "asset_record_format": {
+      "pattern": "{AssetType}-{AssetID}_{DocType}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}",
+      "description": "Tooling, fixture, or gage record per asset",
+      "description_vi": "Hồ sơ tài sản (đồ gá, thiết bị đo)",
+      "examples": ["GAGE-CMM-005_CAL-CERT_20260327_0800-QC1.pdf"]
+    }
+  },
+
+  "form_series": {
+    "100": {
+      "label": "Document Control & Foundation",
+      "label_vi": "Kiểm soát tài liệu & Nền tảng",
+      "dept": "QA/IT",
+      "sop_series": "SOP-100",
+      "description": "Core QMS documents, document control, risk, change management"
+    },
+    "200": {
+      "label": "Sales & Customer",
+      "label_vi": "Kinh doanh & Khách hàng",
+      "dept": "SAL",
+      "sop_series": "SOP-200",
+      "description": "Quotation, contract review, customer communication"
+    },
+    "300": {
+      "label": "Engineering & Technical",
+      "label_vi": "Kỹ thuật & Thiết kế",
+      "dept": "ENG",
+      "sop_series": "SOP-300",
+      "description": "Setup sheets, engineering release, FAI, process planning"
+    },
+    "400": {
+      "label": "Supply Chain & Supplier",
+      "label_vi": "Chuỗi cung ứng & NCC",
+      "dept": "SCM",
+      "sop_series": "SOP-400",
+      "description": "Purchasing, supplier evaluation, SCAR, incoming inspection"
+    },
+    "500": {
+      "label": "Production & Operations",
+      "label_vi": "Sản xuất & Vận hành",
+      "dept": "PRO",
+      "sop_series": "SOP-500",
+      "description": "Shop floor operations, shift logs, downtime, maintenance"
+    },
+    "600": {
+      "label": "Quality & Calibration",
+      "label_vi": "Chất lượng & Hiệu chuẩn",
+      "dept": "QA",
+      "sop_series": "SOP-600",
+      "description": "Calibration, NCR, CAPA, inspection, final release"
+    },
+    "700": {
+      "label": "Warehouse & Shipping",
+      "label_vi": "Kho vận & Giao hàng",
+      "dept": "WH",
+      "sop_series": "SOP-700",
+      "description": "Receiving, packing, shipping, delivery tracking"
+    },
+    "800": {
+      "label": "Training & HR",
+      "label_vi": "Đào tạo & Nhân sự",
+      "dept": "HR",
+      "sop_series": "SOP-800",
+      "description": "Training, competence, OJT, certificates"
+    },
+    "900": {
+      "label": "Audit & Improvement",
+      "label_vi": "Đánh giá & Cải tiến",
+      "dept": "QA/EXE",
+      "sop_series": "SOP-900",
+      "description": "Internal audit, management review, continual improvement"
+    }
+  },
+
+  "validation": {
+    "file_name_max_length": 120,
+    "allowed_characters": "A-Za-z0-9_-.",
+    "segment_separator": "_",
+    "word_separator": "-",
+    "date_format": "YYYYMMDD",
+    "time_format": "HHMM",
+    "rules": [
+      {"check": "no_spaces_or_special_chars", "action": "REJECT"},
+      {"check": "date_segment_present", "action": "REJECT"},
+      {"check": "filled_form_has_version", "action": "REJECT"},
+      {"check": "filled_form_version_matches_active", "action": "FLAG_OBSOLETE"},
+      {"check": "job_evidence_has_job_number", "action": "REJECT"},
+      {"check": "eng_baseline_has_version", "action": "REJECT"},
+      {"check": "duplicate_filename_same_folder", "action": "REJECT"},
+      {"check": "filename_exceeds_120_chars", "action": "WARN"},
+      {"check": "record_type_not_in_dictionary", "action": "FLAG"},
+      {"check": "date_format_invalid", "action": "REJECT"},
+      {"check": "part_number_mismatch_folder", "action": "REJECT"}
+    ]
+  }
+}

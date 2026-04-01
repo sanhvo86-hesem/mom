@@ -1,0 +1,17 @@
+{
+  "exact": [
+    "proc-0024-hai-ba-bon.html",
+    "sdfsdf-sdfsdf.html"
+  ],
+  "prefixes": [
+    "ref-"
+  ],
+  "regex": [
+    "/^zz-.*\\.html$/i"
+  ],
+  "notes": {
+    "proc-0024-hai-ba-bon.html": "Placeholder training page excluded from portal scan as non-controlled content in baseline V0.",
+    "sdfsdf-sdfsdf.html": "Stray draft/test WI page excluded from portal scan as non-controlled content in baseline V0.",
+    "ref-*": "Legacy redirect stubs superseded by active ANNEX pages."
+  }
+}

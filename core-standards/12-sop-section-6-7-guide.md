@@ -1,101 +1,101 @@
-# 12. Hướng dẫn xây dựng Section 6 (Cổng kiểm soát nội bộ) & Section 7 (Quy trình chi tiết)
+# 12. Instructions for building Section 6 (Internal control gate) & Section 7 (Detailed process)
 
 > **Version:** v2 · **Date:** 2026-03-27 · **ISO:** 9001:2026 / AS9100D-ready
 
 ---
 
-## 1. Nguyên tắc cốt lõi
+## 1. Core principles
 
-Section 6 và Section 7 phục vụ **hai câu hỏi khác nhau**:
+Section 6 and Section 7 serve **two different questions**:
 
-| Section | Câu hỏi phải trả lời | Bản chất |
+| Section | Questions to answer | Nature |
 |---|---|---|
-| **6. Cổng kiểm soát nội bộ (IG)** | Ở đâu phải **HOLD / RELEASE**? Ai có quyền mở cổng? Điều kiện gì là bắt buộc? | **Control architecture** |
-| **7. Quy trình chi tiết** | Công việc thực tế diễn ra **theo trình tự nào**? Ai làm gì, ở đâu, bằng gì, bàn giao ra sao? | **Operating sequence** |
+| **6. Internal Control Gateway (IG)** | Where is **HOLD / RELEASE**? Who has the right to open the gate? What conditions are required? | **Control architecture** |
+| **7. Detailed process** | **In what order** does the actual work take place? Who does what, where, with what, how to hand over? | **Operating sequence** |
 
-### 1.1 Quy tắc bất biến
+### 1.1 Immutable rules
 
-1. **Số lượng IG và số lượng bước chi tiết là độc lập.**
-2. **Không có quy tắc nào bắt SOP phải có 5 cổng hoặc 5 bước.**
-3. Cặp duy nhất bắt buộc phải khớp là:
-   - **Số bước flowchart trong Section 7**
-   - **Số heading bước chi tiết trong Section 7**
-4. Một **IG có thể bao trùm nhiều bước chi tiết**.
-5. Một SOP tốt có thể có:
-   - 4 IG và 9 bước
-   - 6 IG và 12 bước
-   - 7 IG và 10 bước
-   - 8 IG và 14 bước
-6. Không được chốt số IG hoặc số bước trước khi đọc tài liệu cũ và đối chiếu nguồn chính thức bên ngoài.
-7. Việc viết lại Section 6 và Section 7 PHẢI tuân theo `13-sop-research-redraft-method.md`.
+1. **The number of IGs and the number of detailed steps are independent.**
+2. **There is no rule that an SOP must have 5 gates or 5 steps.**
+3. The only pairs that must match are:
+   - **Number of flowchart steps in Section 7**
+   - **Number of detailed step headings in Section 7**
+4. An **IG can cover many detailed steps**.
+5. A good SOP might have:
+   - 4 IG and 9 steps
+   - 6 IG and 12 steps
+   - 7 IGs and 10 steps
+   - 8 IGs and 14 steps
+6. Do not finalize the IG number or step number before reading old documents and comparing official external sources.
+7. Rewrites of Section 6 and Section 7 MUST comply with `13-sop-research-redraft-method.md`.
 
-### 1.2 Khi nào 5 bước là sai
+### 1.2 When are the 5 steps wrong?
 
-Nén SOP còn 5 bước thường tạo ra một trong các lỗi sau:
+Compressing an SOP to five steps usually creates one of the following errors:
 
-- Gộp nhiều lần bàn giao khác vai trò vào cùng một bước.
-- Gộp `setup`, `prove-out`, `first-piece`, `FAI`, `release` vào một khối mơ hồ.
-- Mất các điểm đổi trạng thái quan trọng như `HOLD`, `revalidation`, `move to next op`, `final release`.
-- Làm tài liệu đẹp về hình thức nhưng yếu về điều hành thực tế.
+- Combine multiple handovers from different roles into the same step.
+- Combine `setup`, `prove-out`, `first-piece`, `FAI`, `release` into one ambiguous block.
+- Loss of important status change points such as `HOLD`, `revalidation`, `move to next op`, `final release`.
+- Create documents that are beautiful in form but weak in practical operation.
 
-### 1.3 5 cổng dùng khi nào
+### 1.3 When to use 5 ports
 
-Mốc 5 là **phù hợp cho dashboard, executive summary, cổng điều hành cấp cao**, không phải để giới hạn mọi SOP vận hành.
+Milestone 5 is **suitable for dashboards, executive summaries, high-level executive portals**, not to limit every operational SOP.
 
-Nếu cần một sơ đồ điều hành ngắn gọn ở portal, có thể dùng 5 cổng cấp cao. Nhưng trong SOP thực thi, số IG và số bước phải do **rủi ro vận hành thật** quyết định.
+If you need a concise operating diagram in the portal, you can use 5 high-level portals. But in the implementation SOP, the number of IGs and the number of steps must be determined by **real operational risks**.
 
 ---
 
-## 2. Section 6 — Cổng kiểm soát nội bộ (IG)
+## 2. Section 6 — Internal control gateway (IG)
 
-### 2.1 Định nghĩa
+### 2.1 Definition
 
-**IG** là điểm mà quy trình **không được phép đi tiếp** nếu chưa có:
+**IG** is the point where the process **is not allowed to proceed** without:
 
-- điều kiện đầu vào đúng,
-- bằng chứng tối thiểu đúng,
-- người có thẩm quyền đúng,
-- quyết định `PASS / CONDITIONAL PASS / HOLD / FAIL` rõ ràng.
+- correct input conditions,
+- minimum proof correct,
+- the right authority,
+- clear `PASS / CONDITIONAL PASS / HOLD / FAIL` decision.
 
-**Không nhầm lẫn:**
+**No confusion:**
 
-| Ký hiệu | Nghĩa | Phạm vi |
+| Symbol | Meaning | Scope |
 |---|---|---|
-| **G0→G7** | System gates | Toàn bộ vòng đời đơn hàng |
-| **IG1, IG2...** | Cổng kiểm soát nội bộ | Bên trong một SOP cụ thể |
+| **G0→G7** | System gates | Complete order lifecycle |
+| **IG1, IG2...** | Internal control gate | Inside a specific SOP |
 
-### 2.2 Khi nào phải tạo một IG
+### 2.2 When to create an IG
 
-Chỉ tạo IG khi có **điểm mở cổng thật sự**. Một IG là hợp lệ nếu có đủ 4 yếu tố:
+Only create IG when there is an **actual opening point**. An IG is valid if all 4 elements are present:
 
-1. Có quyết định `HOLD / RELEASE`.
-2. Có owner rõ ràng.
-3. Có điều kiện đo được.
-4. Có bằng chứng hoặc hồ sơ tối thiểu để chứng minh.
+1. There is a decision `HOLD / RELEASE`.
+2. Have a clear owner.
+3. Have measurable conditions.
+4. There is minimal evidence or records to prove it.
 
-### 2.3 Khi nào KHÔNG nên tạo IG
+### 2.3 When should NOT create IG
 
-Không biến mọi vi thao tác thành một cổng. Không tạo IG nếu đó chỉ là:
+Don't turn every microoperation into a gate. Don't create IG if it's just:
 
-- thao tác con trong cùng một vai trò,
-- hành động không tạo quyết định mở cổng,
-- bước ghi chép đơn thuần,
-- kiểm tra phụ không làm đổi trạng thái job.
+- child operations in the same role,
+- the action does not make a decision to open the gate,
+- simple recording step,
+- sub-check does not change job status.
 
-### 2.4 Số lượng IG
+### 2.4 Number of IGs
 
-| Loại SOP | Khoảng IG thực tế khuyến nghị |
+| SOP Type | Recommended actual IG range |
 |---|---|
-| SOP điều hành/corporate | 4–6 |
+| Executive/corporate SOP | 4–6 |
 | SOP engineering / release / quality gating | 5–7 |
 | SOP CNC job-order / execution / shop-floor control | 5–8 |
-| SOP kiểm tra cuối / giao hàng / closeout | 4–6 |
+| Final inspection/delivery/closeout SOP | 4–6 |
 
-**Nguyên tắc:** số IG không giới hạn, nhưng phải đủ ít để giữ được tính điều hành và đủ nhiều để không bỏ lọt quyết định kiểm soát.
+**Principle:** The number of IGs is not limited, but must be small enough to maintain control and large enough to not let control decisions slip away.
 
-### 2.5 Format bắt buộc
+### 2.5 Required format
 
-Section 6 **PHẢI** dùng **TABLE**, không dùng `gate-card`, không dùng `gate-grid`.
+Section 6 **MUST** use **TABLE**, do not use `gate-card`, do not use `gate-grid`.
 
 ```html
 <h2 class="h2" id="p6">6. Cổng kiểm soát, điểm dừng bắt buộc & KPI</h2>
@@ -127,73 +127,73 @@ Section 6 **PHẢI** dùng **TABLE**, không dùng `gate-card`, không dùng `ga
 </table></div>
 ```
 
-### 2.5A Quy tắc thay section an toàn
+### 2.5A Rules for safe section replacement
 
-- Khi cập nhật Section 6, chỉ thay phần nội dung nằm giữa `p6` và `p7`.
-- Không được xóa nhầm heading `p6`.
-- Không được xóa nhầm heading `p7`.
-- Nếu SOP cũ có logic gate hữu ích, phải giữ lại tư duy vận hành đúng rồi mới chuẩn hóa cấu trúc bảng.
+- When updating Section 6, only change the content between `p6` and `p7`.
+- Do not delete heading `p6` by mistake.
+- Do not delete heading `p7` by mistake.
+- If the old SOP has useful gate logic, you must retain the correct operating thinking before standardizing the table structure.
 
-### 2.6 Quy tắc viết nội dung IG
+### 2.6 Rules for writing IG content
 
-| Thành phần | Yêu cầu |
+| Ingredients | Request |
 |---|---|
-| IG badge | `IG1`, `IG2`, `IG3`... liên tục, bắt đầu từ 1 |
-| Tên cổng | Phải là ngôn ngữ điều hành, không mơ hồ |
-| Chủ trì | Vai trò có quyền giữ/mở cổng |
-| Điểm dừng | Cụ thể, đo được, có thể audit |
-| KPI | Có target số hoặc trạng thái đóng/mở |
-| Hồ sơ | Chỉ nêu hồ sơ tối thiểu cần có để mở cổng |
+| IG badges | `IG1`, `IG2`, `IG3`... continuously, starting from 1 |
+| Port name | Must be an operating language, not ambiguous |
+| Chair | The role has permission to hold/open ports |
+| Stop | Specific, measurable, auditable |
+| KPI | Has a numerical target or open/closed status |
+| Profile | Only the minimum documents required to open the portal are listed
 
-### 2.6A KPI thực chiến
+### 2.6A Real battle KPI
 
-KPI của từng IG nên rơi vào một hoặc nhiều nhóm sau:
+Each IG's KPIs should fall into one or more of the following groups:
 
-- `Đúng ngay lần đầu` như `% receipt accepted without re-open`, `% setup release first-pass`.
-- `Tốc độ phản ứng` như `≤ 30 phút`, `≤ 1 ca`, `≤ 24 giờ`.
-- `Tính đầy đủ bằng chứng` như `100% hồ sơ đủ trường bắt buộc`, `0 lot không truy được`.
-- `Hiệu lực containment` như `% suspect range được khoanh trong 1 giờ`.
-- `Tính ổn định` như `Cpk tối thiểu`, `% on-time calibration`, `% action đóng đúng hạn`.
+- `Đúng ngay lần đầu` like `% receipt accepted without re-open`, `% setup release first-pass`.
+- `Tốc độ phản ứng` like `≤ 30 phút`, `≤ 1 ca`, `≤ 24 giờ`.
+- `Tính đầy đủ bằng chứng` like `100% hồ sơ đủ trường bắt buộc`, `0 lot không truy được`.
+- `Hiệu lực containment` as `% suspect range được khoanh trong 1 giờ`.
+- `Tính ổn định` like `Cpk tối thiểu`, `% on-time calibration`, `% action đóng đúng hạn`.
 
-### 2.6B Benchmark và ngưỡng số
+### 2.6B Benchmark and numerical threshold
 
-KPI của Section 6 không được viết kiểu mô tả chung chung. Mỗi KPI phải chỉ ra:
+Section 6 KPIs should not be written in a general descriptive style. Each KPI must indicate:
 
-1. **Ngưỡng số hoặc SLA**: ví dụ `>= 98%`, `<= 24 giờ`, `= 0 escape`.
-2. **Nguồn dữ liệu chuẩn**: ERP, MES, QMS register, calibration log, audit log, backup log...
-3. **Trigger phản ứng**: lệch bao nhiêu thì giữ cổng, mở escalation hoặc mở action.
-4. **Căn cứ chốt số**:
-   - benchmark chính thức bên ngoài,
-   - yêu cầu khách hàng / luật / chuẩn kỹ thuật,
-   - hoặc mục tiêu nội bộ được thiết kế chặt hơn benchmark vì mức rủi ro của HESEM.
+1. **Numerical threshold or SLA**: for example `>= 98%`, `<= 24 giờ`, `= 0 escape`.
+2. **Standard data source**: ERP, MES, QMS register, calibration log, audit log, backup log...
+3. **Reaction trigger**: no matter how much deviation, hold the gate, open escalation or open action.
+4. **Basis for finalization**:
+   - official external benchmark,
+   - customer requirements / laws / technical standards,
+   - or the internal target is designed to be stricter than the benchmark because of HESEM's risk level.
 
-Không copy số benchmark bên ngoài vào SOP nếu chưa chuyển hóa thành ngưỡng vận hành thực tế của HESEM.
+Do not copy external benchmark numbers into the SOP if they have not been converted into actual operating thresholds of HESEM.
 
-### 2.6C Công thức viết KPI
+### 2.6C Formula for writing KPI
 
-Mỗi ô KPI nên đọc được theo một trong các mẫu sau:
+Each KPI box should read one of the following formats:
 
 - `Metric + threshold + trigger`
 - `Metric + threshold + source + trigger`
 - `Threshold 1 + threshold 2 + zero-defect / zero-escape rule`
 
-Ví dụ đạt chuẩn:
+Standard example:
 
 - `100% contract review hoàn tất trước commit; mismatch sau commit = 0; ACK thay đổi khách hàng <= 1 ngày làm việc.`
 - `Backup success >= 99%; restore test dữ liệu critical = 100% theo quý; failed restore không có action = 0.`
 - `100% tín hiệu out-of-control phản ứng trước lot kế tiếp hoặc <= 1 giờ; đặc tính trọng yếu giữ Cpk/Ppk >= 1.33 hoặc có reaction plan được duyệt.`
 
-Ví dụ không đạt chuẩn:
+Non-standard example:
 
 - `Được kiểm soát tốt.`
 - `Đúng hạn và đủ hồ sơ.`
 - `Cải thiện liên tục.`
 
-### 2.6D Thư viện KPI khởi điểm theo family
+### 2.6D Starting KPI library by family
 
-Các ngưỡng dưới đây là starting points thực chiến để viết SOP mới. Không copy mù quáng; phải điều chỉnh theo risk, customer requirement và năng lực HESEM.
+The thresholds below are actual starting points for writing new SOPs. Don't copy blindly; must adjust according to risk, customer requirements and HESEM capabilities.
 
-| Family | KPI khởi điểm thường dùng |
+| Family | Commonly used starting KPI |
 |---|---|
 | Contract review / quotation | `ACK <= 1 ngày làm việc`, `mismatch sau commit = 0`, `100% review trước commit` |
 | Engineering release | `100% quyết định phát hành có approver + evidence`, `release sai revision = 0` |
@@ -206,59 +206,59 @@ Các ngưỡng dưới đây là starting points thực chiến để viết SOP
 | Access control | `cấp/đổi/thu hồi quyền <= 1 ngày làm việc`, `orphan account = 0`, `privileged review = 100% theo quý` |
 | Backup / resilience | `backup success >= 99%`, `restore test = 100% theo chu kỳ`, `failed restore không có action = 0` |
 | Records / retention / disposal | `SoR/SSOT xác định = 100%`, `duplicate live record = 0`, `sanitization compliance = 100%` |
-| MSA / capability | `GRR < 10%` là tốt, `10–30%` chỉ dùng có điều kiện, `>30%` không chấp nhận nếu không có rationale; `Cpk/Ppk >= 1.33` là ngưỡng tham chiếu phổ biến |
+| MSA / capability | `GRR < 10%` is good, `10–30%` is only used conditionally, `>30%` is not acceptable without rationale; `Cpk/Ppk >= 1.33` is a common reference threshold |
 
-### 2.7 KHÔNG được làm
+### 2.7 DO NOT do it
 
-- ❌ Cố định 5 IG cho mọi SOP.
-- ❌ Bắt `số IG = số bước chi tiết`.
-- ❌ Dùng `gate-card / gate-grid` cho Section 6.
-- ❌ Viết điểm dừng kiểu “đảm bảo chất lượng”, “đúng yêu cầu”.
-- ❌ Dùng owner không có quyền mở cổng.
+- ❌ Fixed 5 IGs for every SOP.
+- ❌ Catch `số IG = số bước chi tiết`.
+- ❌ Use `gate-card / gate-grid` for Section 6.
+- ❌ Write stop points like "quality assurance", "according to requirements".
+- ❌ Use an owner who does not have permission to open the port.
 
 ---
 
-## 3. Section 7 — Quy trình chi tiết
+## 3. Section 7 — Detailed process
 
-### 3.1 Định nghĩa
+### 3.1 Definition
 
-Section 7 mô tả **trình tự công việc thực tế**. Đây là nơi SOP phải chỉ ra:
+Section 7 describes the **actual work sequence**. This is where the SOP must indicate:
 
-- ai làm,
-- làm ở đâu,
-- làm bằng hệ thống / tài liệu / máy / dụng cụ nào,
-- kiểm gì,
-- bàn giao gì,
-- khi nào dừng,
-- khi nào phải quay lại hoặc revalidate.
+- who did it,
+- where to work,
+- made with what system/material/machine/tool,
+- What to check?
+- what to hand over,
+- when to stop,
+- When to return or revalidate.
 
-### 3.2 Số lượng bước chi tiết
+### 3.2 Number of detailed steps
 
-**Không giới hạn.** Với SOP vận hành thật, số bước nên do các yếu tố sau quyết định:
+**Unlimited.** For real operating SOPs, the number of steps should be determined by the following factors:
 
-- đổi vai trò,
-- đổi khu vực / cell / công đoạn,
-- đổi trạng thái hệ thống,
-- đổi resource chính (`machine`, `program`, `fixture`, `gage`, `material`),
-- phát sinh quyết định kiểm soát,
-- phát sinh bằng chứng / hồ sơ quan trọng,
-- phát sinh `revalidation`, `containment`, `handover`.
+- change roles,
+- change area / cell / stage,
+- change system status,
+- change main resource (`machine`, `program`, `fixture`, `gage`, `material`),
+- arise control decisions,
+- generation of vital evidence/records,
+- generates `revalidation`, `containment`, `handover`.
 
-### 3.3 Khoảng bước thực tế khuyến nghị
+### 3.3 Recommended actual step range
 
-| Loại SOP | Khoảng bước chi tiết thực tế khuyến nghị |
+| SOP Type | Recommended actual detailed step range |
 |---|---|
-| SOP điều hành/corporate | 7–10 |
+| Executive/corporate SOP | 7–10 |
 | SOP engineering / release / quality planning | 8–12 |
 | SOP CNC job-order / machine execution / first-piece / transfer | 10–14 |
 | SOP final inspection / shipment / closeout | 8–10 |
 
-### 3.4 Cấu trúc bắt buộc
+### 3.4 Required structure
 
-Section 7 gồm 2 phần:
+Section 7 includes 2 parts:
 
-1. **Flowchart tổng quan**
-2. **Chi tiết từng bước**
+1. **Overview flowchart**
+2. **Step by step details**
 
 ```html
 <h2 class="h2" id="p7">7. Quy trình chi tiết</h2>
@@ -287,181 +287,181 @@ Section 7 gồm 2 phần:
 <div class="role-note"><b>Bàn giao bắt buộc:</b> ai giao gì cho ai.</div>
 ```
 
-### 3.4A Quy tắc thay section an toàn
+### 3.4A Rules for safe section replacement
 
-- Khi cập nhật Section 7, chỉ thay phần nội dung nằm giữa `p7` và `p8`.
-- Không được xóa nhầm heading `p7`.
-- Không được xóa nhầm heading `p8`.
-- Nếu flow cũ và detailed steps cũ không còn phản ánh vận hành thật, phải xóa toàn bộ phần giữa `p7 → p8` và viết lại hoàn toàn.
+- When updating Section 7, only change the content between `p7` and `p8`.
+- Do not delete heading `p7` by mistake.
+- Do not delete heading `p8` by mistake.
+- If the old flow and detailed steps no longer reflect the actual operation, the entire section between `p7 → p8` must be deleted and completely rewritten.
 
-### 3.5 Cặp duy nhất phải khớp
+### 3.5 Unique pairs must match
 
-| Phần | Quy tắc |
+| Part | Rules |
 |---|---|
-| Flowchart Section 7 | Số bubble phải khớp số bước chi tiết |
-| Chi tiết từng bước | Mỗi bước phải có heading tương ứng |
+| Flowchart Section 7 | The number of bubbles must match the number of detailed steps |
+| Step-by-step details | Each step must have a corresponding heading |
 
-**Lưu ý:** quy tắc này **không liên quan** đến số lượng IG ở Section 6.
+**Note:** this rule is **not related** to the number of IGs in Section 6.
 
-### 3.5A Quy tắc đồ họa flowchart
+### 3.5A Flowchart graphics rules
 
-- Bubble số ở flowchart phải dùng đúng palette màu xoay của `proc-num`.
-- Không để tình trạng cùng một SOP có `proc-num` nhiều màu nhưng balloon flowchart chỉ một màu mặc định.
-- Nên có cả hai lớp bảo vệ:
-  - HTML sinh ra sẵn inline style cho bubble.
-  - CSS toàn cục có fallback palette theo vị trí để file cũ hoặc file viết tay không mất màu.
-- Với SOP sinh tự động, nên sinh inline style đồng thời cho `flow-step`, `flow-num` và `flow-arrow`.
-- `.active` và `.critical` là lớp ngữ nghĩa bổ trợ; không được thay đổi số thứ tự hay phá vỡ mapping màu theo step index.
-- Khi dùng fallback palette trong CSS, phải nhớ `.flow-arrow` nằm xen giữa các `.flow-step`; selector phải map đúng vị trí child thực tế của `.flow-step`.
+- Bubble numbers in the flowchart must use the correct rotating color palette of `proc-num`.
+- Do not let the same SOP have `proc-num` in many colors but the balloon flowchart only has one default color.
+- There should be two layers of protection:
+  - HTML generates inline styles for bubbles.
+  - Global CSS has a fallback palette based on position so that old files or handwritten files do not lose color.
+- With automatically generated SOP, inline styles should be generated simultaneously for `flow-step`, `flow-num` and `flow-arrow`.
+- `.active` and `.critical` are auxiliary semantic classes; Do not change the serial number or break the color mapping according to the step index.
+- When using the fallback palette in CSS, remember that `.flow-arrow` is located between `.flow-step`; The selector must correctly map the actual child position of `.flow-step`.
 
-### 3.5B Kiểm tra kỹ thuật tối thiểu cho flowchart
+### 3.5B Minimum technical check for flowchart
 
-Trước khi coi là đạt chuẩn, phải xác nhận đồng thời:
+Before being considered qualified, it must be confirmed at the same time:
 
 1. `flow-num count = proc-num count`
-2. Các số bước tăng liên tục từ `1...n`
-3. Mỗi bước chi tiết có `h3` tương ứng
-4. Với SOP sinh tự động: mỗi `flow-num` có inline style
-5. Không có SOP nào rơi về một màu bubble duy nhất chỉ vì thiếu inline style hoặc thiếu fallback CSS
+2. The number of steps increases continuously from `1...n`
+3. Each detailed step has a corresponding `h3`
+4. With automatically generated SOP: each `flow-num` has an inline style
+5. There is no SOP that falls back to a single bubble color just because of a missing inline style or missing CSS fallback
 
-### 3.6 Khi nào phải tách thành bước mới
+### 3.6 When to split into a new step
 
-Phải tách thành bước riêng nếu có một trong các dấu hiệu sau:
+Must be separated into separate steps if there is one of the following signs:
 
-1. Đổi vai trò chủ trì.
-2. Đổi nguồn dữ liệu hoặc hệ thống chuẩn.
-3. Đổi máy / đồ gá / chương trình / phương pháp đo.
-4. Bắt đầu hoặc kết thúc một kiểm soát chất lượng riêng.
-5. Có handover thực sự giữa các bên.
-6. Có điểm `HOLD / review / approval / revalidation`.
-7. Có risk window cần xác định `last-known-good` hoặc `suspect range`.
+1. Change the host role.
+2. Change the data source or standard system.
+3. Change machine/jig/program/measuring method.
+4. Initiate or terminate an individual quality control.
+5. There is actual handover between the parties.
+6. Has score `HOLD / review / approval / revalidation`.
+7. There is a risk window that needs to be determined `last-known-good` or `suspect range`.
 
-### 3.7 KHÔNG được làm
+### 3.7 DO NOT do it
 
-- ❌ Flowchart 5 bước nhưng phần chi tiết 9 bước.
-- ❌ Gộp `setup`, `prove-out`, `first-piece`, `FAI`, `release` vào một bước duy nhất.
-- ❌ Viết bước kiểu “thực hiện theo quy định”.
-- ❌ Gò số bước cho đẹp bố cục.
-- ❌ Bắt Section 7 đi theo đúng số IG.
+- ❌ Flowchart 5 steps but detailed section 9 steps.
+- ❌ Combine `setup`, `prove-out`, `first-piece`, `FAI`, `release` into a single step.
+- ❌ Write steps like "follow regulations".
+- ❌ Mound the number of steps for a beautiful layout.
+- ❌ Make Section 7 follow the correct IG number.
 
 ---
 
-## 4. Mapping giữa Section 6 và Section 7
+## 4. Mapping between Section 6 and Section 7
 
-### 4.1 Quy tắc mapping
+### 4.1 Mapping rules
 
-Mỗi SOP phải có tư duy mapping như sau:
+Each SOP must have mapping thinking as follows:
 
-- **Section 6** = kiểm soát theo **điểm mở cổng**
-- **Section 7** = mô tả theo **dòng công việc thực thi**
+- **Section 6** = control by **gate opening point**
+- **Section 7** = description according to **execution workflow**
 
-Vì vậy:
+So:
 
-- một IG có thể bao trùm nhiều bước,
-- nhiều bước có thể cùng đi tới một IG,
-- một SOP vẫn có thể dùng ít IG nhưng nhiều bước chi tiết nếu quy trình có nhiều bàn giao nội bộ,
-- chỉ khi quy trình thật sự rất ngắn thì số IG và số bước mới vô tình bằng nhau.
+- one IG can cover many steps,
+- multiple steps can go to the same IG,
+- an SOP can still use few IGs but many detailed steps if the process has many internal handovers,
+- only when the process is really very short will the number of IGs and the number of steps be accidentally equal.
 
-### 4.2 Ví dụ mapping tốt
+### 4.2 Good mapping example
 
-| IG | Mục tiêu cổng | Bước chi tiết thường nằm dưới cổng này |
+| IG | Port target | The detailed step is usually under this gate |
 |---|---|---|
-| IG1 | Khóa đầu vào đúng | B1 tiếp nhận, B2 rà soát yêu cầu |
-| IG2 | Baseline / route / package sẵn sàng | B3 release package, B4 hoạch định nguồn lực |
-| IG3 | Readiness tại hiện trường | B5 material/tool/fixture/gage ready, B6 setup ready |
-| IG4 | Chứng minh process trước chạy loạt | B7 prove-out, B8 first-piece / FAI |
-| IG5 | Kiểm soát chạy loạt | B9 production execution, B10 in-process reaction / revalidation |
-| IG6 | Release cuối | B11 final inspection + ship release |
+| IG1 | Correct input key | B1 receives, B2 reviews the request |
+| IG2 | Baseline / route / package ready | B3 release package, B4 resource planning |
+| IG3 | Readiness in the field | B5 material/tool/fixture/gage ready, B6 setup ready |
+| IG4 | Prove the process before running it in series | B7 prove-out, B8 first-piece / FAI |
+| IG5 | Batch control | B9 production execution, B10 in-process reaction / revalidation |
+| IG6 | Final release | B11 final inspection + ship release |
 | IG7 | Closeout | B12 shipment close + costing + learn-back |
 
-### 4.3 Dấu hiệu mapping xấu
+### 4.3 Signs of bad mapping
 
-- 5 IG và 5 bước lặp y hệt tên nhau.
-- IG chỉ là bản sao rút gọn của procedure heading.
-- Không có bước riêng cho `handover`, `revalidation`, `containment`, `closeout`.
+- 5 IGs and 5 iterations with identical names.
+- IG is just a shortened copy of procedure heading.
+- There are no separate steps for `handover`, `revalidation`, `containment`, `closeout`.
 
 ---
 
-## 5. Mô hình tham chiếu cho CNC job-order
+## 5. Reference model for CNC job-order
 
-HESEM **không dùng giới hạn 5 cổng / 5 bước** cho SOP job-order CNC.
+HESEM **does not use the 5-port / 5-step limit** for CNC job-order SOP.
 
-### 5.1 Mốc tham chiếu mặc định
+### 5.1 Default reference datum
 
-Đối với SOP CNC job-order end-to-end hoặc SOP có nhiều bàn giao giữa Engineering, Planning, QA, Setup, Machining, QC và Shipping:
+For end-to-end CNC job-order SOPs or SOPs with multiple handovers between Engineering, Planning, QA, Setup, Machining, QC and Shipping:
 
-- **IG tham chiếu tốt:** `6–7`
-- **Bước chi tiết tham chiếu tốt:** `10–14`
+- **Good reference IG:** `6–7`
+- **Detailed steps for good reference:** `10–14`
 
-### 5.2 Mô hình khuyến nghị nền
+### 5.2 Background recommendation model
 
-Mô hình tham chiếu hiện hành của core standard là:
+The current reference model of the core standard is:
 
 - **7 Internal Gates**
-- **12 bước chi tiết**
+- **12 detailed steps**
 
-Chi tiết đầy đủ xem file:
+For full details, see file:
 
 - `core-standards/reference/cnc-job-order-reference-model.md`
 
-### 5.3 Ý nghĩa của mô hình 7/12
+### 5.3 Meaning of the 7/12 model
 
-Mô hình này cho phép tách riêng:
+This model allows to separate:
 
-- khóa yêu cầu,
-- khóa baseline package,
-- readiness vật tư / dụng cụ / máy / đồ gá,
+- request lock,
+- lock baseline package,
+- readiness of materials/tools/machines/jigs,
 - setup & prove-out,
 - first-piece / FAI,
-- chạy loạt có reaction plan,
-- final release và closeout.
+- Run a series with a reaction plan,
+- final release and closeout.
 
-Đây là mức phân rã phù hợp hơn nhiều cho job-shop CNC so với mô hình 5/5 nén cơ học.
+This is a much more suitable level of decay for job-shop CNC than the mechanical compression 5/5 model.
 
 ---
 
-## 6. Checklist trước khi submit SOP
+## 6. Checklist before submitting SOP
 
 ### 6.1 Section 6
 
-- [ ] Dùng IG table, không dùng gate-card/gate-grid
-- [ ] Số IG do quy trình quyết định, không áp số cứng
-- [ ] Mỗi IG có owner, hold point, KPI/hồ sơ tối thiểu
-- [ ] Không dùng từ mơ hồ cho điều kiện mở cổng
-- [ ] KPI trong từng IG có số/SLA thật, không chỉ là câu mô tả
+- [ ] Use IG table, do not use gate-card/gate-grid
+- [ ] IG number is determined by the process, no hard number is applied
+- [ ] Each IG has an owner, holding points, KPI/minimum profile
+- [ ] Do not use vague words for the gate opening condition
+- [ ] KPIs in each IG have real numbers/SLA, not just descriptions
 
 ### 6.2 Section 7
 
-- [ ] Có flowchart ở đầu section 7
+- [ ] There is a flowchart at the beginning of section 7
 - [ ] Flowchart steps = detailed steps
-- [ ] Detailed steps không bị ép bằng số IG
-- [ ] Có đủ bước cho setup, prove-out, first-piece, release, reaction, closeout khi SOP cần
-- [ ] Có handover rõ ở các điểm đổi vai trò
-- [ ] Bubble flowchart có màu đúng từng bước, không rơi về một màu mặc định
+- [ ] Detailed steps are not forced by IG number
+- [ ] There are enough steps for setup, prove-out, first-piece, release, reaction, closeout when needed by SOP
+- [ ] There is clear handover at the points where roles are changed
+- [ ] Bubble flowchart has the correct color step by step, does not fall to a default color
 
-### 6.3 Logic tổng thể
+### 6.3 Overall logic
 
-- [ ] Section 6 trả lời đúng câu hỏi kiểm soát
-- [ ] Section 7 trả lời đúng câu hỏi vận hành
-- [ ] SOP không bị “đẹp để trình bày” nhưng thiếu logic thực thi
-
----
-
-## 7. Anti-patterns cần chặn ở mức core standard
-
-1. Đồng nhất `IG = step`.
-2. Đồng nhất `số gate dashboard = số gate trong SOP`.
-3. Dùng 5 bước cho mọi quy trình để dễ dựng flowchart.
-4. Dùng cùng một cụm từ cho tên gate và tên step mà không có ý nghĩa vận hành khác nhau.
-5. Bỏ qua `revalidation`, `containment`, `work transfer`, `closeout`.
+- [ ] Section 6 answers the control question correctly
+- [ ] Section 7 correctly answers the operational question
+- [ ] SOP is not "beautiful for presentation" but lacks implementation logic
 
 ---
 
-## 8. Kết luận chuẩn áp dụng
+## 7. Anti-patterns need to be blocked at the core standard level
 
-Từ ngày **2026-03-27**, core standard của HESEM áp dụng rõ ràng như sau:
+1. Homogeneous `IG = step`.
+2. Homogeneous `số gate dashboard = số gate trong SOP`.
+3. Use 5 steps for every process to easily build a flowchart.
+4. Use the same phrase for gate name and step name without different operational meanings.
+5. Ignore `revalidation`, `containment`, `work transfer`, `closeout`.
 
-- **Không giới hạn số cổng kiểm soát nội bộ.**
-- **Không giới hạn số bước quy trình chi tiết.**
-- **Nghiêm cấm ép cơ học số IG bằng số bước chi tiết.**
-- **SOP CNC job-order phải được mô hình hóa theo thực tế vận hành, không theo bố cục hình thức.**
+---
+
+## 8. Standard conclusions apply
+
+From **2026-03-27**, HESEM's core standard applies clearly as follows:
+
+- **Unlimited number of internal control ports.**
+- **Unlimited number of detailed process steps.**
+- **It is strictly forbidden to mechanically press the IG number with detailed step numbers.**
+- **CNC job-order SOP must be modeled according to actual operations, not according to the formal layout.**

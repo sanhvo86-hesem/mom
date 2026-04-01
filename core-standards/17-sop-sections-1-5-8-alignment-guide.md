@@ -4,282 +4,282 @@
 
 ---
 
-## 1. Mục tiêu
+## 1. Purpose
 
-Tài liệu này khóa cách viết `Section 1, 2, 3, 4, 5, 8` để các phần này:
+This document locks the spelling of `Section 1, 2, 3, 4, 5, 8` to these parts:
 
-- không bị viết như phần mở đầu trang trí,
-- không tách rời logic kiểm soát đã chốt ở `Section 6`,
-- không tách rời trình tự thực thi đã chốt ở `Section 7`,
-- không lặp thuật ngữ nửa Anh nửa Việt,
-- không tạo ra vai trò, đầu vào hay ngoại lệ không tồn tại trong vận hành thật.
+- not written as a decorative introduction,
+- do not separate the control logic latched at `Section 6`,
+- do not separate the execution sequence locked at `Section 7`,
+- do not repeat the term half English and half Vietnamese,
+- do not create roles, inputs or exceptions that do not exist in real operations.
 
-Nếu `Section 6` và `Section 7` là:
+If `Section 6` and `Section 7` are:
 - `control architecture`,
 - `operating sequence`,
 
-thì `Section 1, 2, 3, 4, 5, 8` là:
+then `Section 1, 2, 3, 4, 5, 8` is:
 - `operating frame`,
 - `authority boundary`,
 - `activation / exception logic`
 
-được suy ra từ hai phần đó.
+is deduced from those two parts.
 
 ---
 
-## 2. Nguyên tắc bất biến
+## 2. Principle of immutability
 
-1. Không viết `Section 1, 2, 3, 4, 5, 8` trước khi đã chốt xong logic thật của `Section 6` và `Section 7`.
-2. Không dùng một bộ câu mô tả chung rồi thay danh từ hàng loạt giữa các SOP.
-3. Mỗi phần phải trả lời đúng một câu hỏi vận hành riêng, không chồng chéo.
-4. Bất kỳ vai trò, trigger, dữ liệu, hold point hay ngoại lệ nào nêu trong `Section 1, 2, 3, 4, 5, 8` đều phải truy ngược được về gate hoặc step thật.
-5. Khi tài liệu chưa phát hành lần đầu, toàn bộ body vẫn giữ `V0`, không ghi note biên tập, note khác bản trước hay note benchmark.
-6. Chuẩn hóa format và đồ họa có thể làm ở mức core-standard; nâng cấp nội dung của `Section 1, 2, 3, 4, 5, 8` phải làm theo từng SOP một, không batch cơ học.
+1. Do not write `Section 1, 2, 3, 4, 5, 8` before finalizing the actual logic of `Section 6` and `Section 7`.
+2. Do not use a common set of descriptive sentences and then replace nouns in bulk between SOPs.
+3. Each section must correctly answer a separate, non-overlapping operational question.
+4. Any role, trigger, data, hold point or exception stated in `Section 1, 2, 3, 4, 5, 8` must be traceable back to the actual gate or step.
+5. When the document has not been released for the first time, the entire body still retains `V0`, without writing editorial notes, notes different from the previous version or benchmark notes.
+6. Standardization of format and graphics can be done at core-standard level; Upgrading the content of `Section 1, 2, 3, 4, 5, 8` must be done according to each SOP, not in mechanical batches.
 
 ---
 
-## 3. Bản đồ phụ thuộc giữa các section
+## 3. Dependency map between sections
 
-| Section | Câu hỏi phải trả lời | Phải suy ra từ đâu |
+| Section | Questions to answer | Where to infer |
 |---|---|---|
-| 1. Mục đích | Quy trình này tồn tại để chặn rủi ro nào, tạo đầu ra nào, bảo vệ quyết định nào? | `focus`, gate cuối, bước cuối, failure mode bị chặn |
-| 2. Phạm vi | Quy trình bắt đầu ở đâu, kết thúc ở đâu, bàn giao với SOP nào? | bước đầu, bước cuối, trigger, handoff, related SOP |
-| 3. Thuật ngữ | Khái niệm vận hành nào người đọc bắt buộc phải hiểu đúng? | thuật ngữ xuất hiện thật trong gate/step |
-| 4. Vai trò | Ai giữ cổng, ai làm, ai có quyền chặn, ai có quyền mở lại? | owner trong IG + vai trò bàn giao trong step |
-| 5. Đầu vào/đầu ra | Cần gì để bắt đầu, tạo ra gì khi xong, điều kiện nào kích hoạt hoặc không cho đi tiếp? | trước IG1/B1, sau IG cuối/B cuối, trigger restart/change |
-| 8. Ngoại lệ | Khi nào phải dừng, làm lại, revalidation, waiver hoặc escalation? | hold point, restart point, change point, release exception |
+| 1. Purpose | What risks does this process exist to block, what outputs to generate, what decisions to protect? | `focus`, last gate, last step, failure mode blocked |
+| 2. Scope | Where does the process start, where does it end, and what SOP is handed over? | first step, last step, trigger, handoff, related SOP |
+| 3. Terminology | What operational concepts are readers required to understand correctly? | The term actually appears in gate/step |
+| 4. Role | Who keeps the gate, who does it, who has the right to block it, who has the right to reopen it? | owner in IG + handover role in step |
+| 5. Input/output | What is needed to start, what is created when finished, what conditions enable or disable progress? | before IG1/B1, after last IG/last B, trigger restart/change |
+| 8. Exceptions | When should I stop, redo, revalidate, waft or escalate? | hold point, restart point, change point, release exception |
 
 ---
 
-## 4. Quy tắc chi tiết theo section
+## 4. Detailed rules by section
 
-### 4.1 Section 1 — Mục đích
+### 4.1 Section 1 — Purpose
 
-Section 1 phải được viết sau khi đã trả lời được:
+Section 1 must be written after answering:
 
-- gate nào đang bảo vệ quyết định quan trọng nhất,
-- lỗi lớn nhất SOP này đang chặn là gì,
-- đầu ra nào của SOP này quyết định downstream có được đi tiếp hay không.
+- which gate is protecting the most important decision,
+- what is the biggest error this SOP is blocking,
+- Which output of this SOP determines whether the downstream can proceed or not.
 
-Section 1 nên có:
+Section 1 should have:
 
-- 1 câu mở đầu rất ngắn, mô tả cơ chế điều hành thực của SOP,
-- 3 đến 5 bullet,
-- mỗi bullet nói rõ một trong các trục sau:
-  - chặn rủi ro nào,
-  - khóa quyết định nào,
-  - bảo đảm đầu ra nào,
-  - nối sang downstream nào.
+- 1 very short opening sentence, describing the actual operating mechanism of the SOP,
+- 3 to 5 bullets,
+- each bullet clearly states one of the following axes:
+  - prevent any risks,
+  - lock any decision,
+  - what output is guaranteed,
+  - which downstream to connect to?
 
-Section 1 không được:
+Section 1 cannot:
 
-- chỉ nói “thiết lập quy trình” mà không nói quy trình dùng để chặn cái gì,
-- copy nguyên tiêu đề gate vào bullet,
-- dùng câu rỗng như `nhằm nâng cao`, `góp phần bảo đảm`, `tăng cường phối hợp`.
+- just says “set up the process” without saying what the process is used to block,
+- Copy the entire gate title into the bullet,
+- Use empty sentences like `nhằm nâng cao`, `góp phần bảo đảm`, `tăng cường phối hợp`.
 
-Checklist bắt buộc:
+Required Checklist:
 
-- có nhắc tới rủi ro hoặc lỗi thật đang bị chặn,
-- có nhắc tới đầu ra hoặc release state thật,
-- đọc vào phải hiểu ngay SOP này khác SOP lân cận ở đâu.
+- there is a mention of a real risk or bug that is being blocked,
+- mention actual output or release state,
+- When reading, you must immediately understand how this SOP is different from neighboring SOPs.
 
-### 4.2 Section 2 — Phạm vi
+### 4.2 Section 2 — Scope
 
-Section 2 phải bám:
+Section 2 must adhere to:
 
-- điểm bắt đầu vận hành thật ở step đầu,
-- điểm kết thúc vận hành thật ở step cuối,
-- các handoff sang SOP khác,
-- các re-entry hoặc restart condition nếu SOP có.
+- actual operating starting point at the first step,
+- actual operational end point at the last step,
+- handoffs to other SOPs,
+- re-entry or restart conditions if SOP has them.
 
-`Có bao phủ` phải trả lời:
+`Có bao phủ` must answer:
 
-- SOP áp dụng cho loại job, loại dữ liệu, loại hoạt động hay loại sự kiện nào,
-- các activity nào nằm bên trong phạm vi từ bước đầu tới bước cuối,
-- các tình huống changeover, restart, transfer, partial release, waiver hoặc similar có nằm trong phạm vi hay không.
+- What type of job, data type, activity type or event type the SOP applies to,
+- which activities are within the scope from the first step to the last step,
+- Are changeover, restart, transfer, partial release, waiver or similar situations within scope?
 
-`Không thay thế / không được vượt quyền` phải trả lời:
+`Không thay thế / không được vượt quyền` must answer:
 
-- SOP lân cận nào đang giữ phần upstream hoặc downstream,
-- quyết định nào SOP này không được phép tự hợp thức hóa,
-- boundary nào phải đẩy sang SOP khác.
+- Which neighboring SOP is holding the upstream or downstream part,
+- decide which SOP is not allowed to legitimize itself,
+- Which boundary must be pushed to another SOP?
 
-Section 2 không được:
+Section 2 cannot:
 
-- liệt kê tài liệu không liên quan chỉ để làm đầy mục,
-- dùng “không thay thế” như danh sách link trang trí,
-- bỏ sót phạm vi re-entry nếu Section 7 có restart, transfer, revalidation hoặc change path.
+- listing irrelevant material just to fill the section,
+- use “not replace” as a decorative link list,
+- omit re-entry scope if Section 7 has restart, transfer, revalidation or change path.
 
-### 4.3 Section 3 — Thuật ngữ & nguyên tắc
+### 4.3 Section 3 — Terminology & principles
 
-Chỉ giữ các thuật ngữ thực sự cần để đọc đúng `Section 6` và `Section 7`.
+Keep only the terms absolutely necessary for the correct reading of `Section 6` and `Section 7`.
 
-Quy tắc bắt buộc:
+Required rules:
 
-- thường chỉ dùng `3–6` dòng,
-- cột tên thuật ngữ phải theo mẫu `English term (thuật ngữ tiếng Việt chuẩn)`,
-- nội dung định nghĩa phải mô tả cách dùng trong SOP này, không phải định nghĩa từ điển chung chung,
-- sau khi đã định nghĩa, trong thân SOP ưu tiên dùng bản tiếng Việt đã chốt.
+- usually only use `3–6` line,
+- the term name column must follow the form `English term (thuật ngữ tiếng Việt chuẩn)`,
+- the definition must describe usage in this SOP, not a generic dictionary definition,
+- After definition, in the SOP body, priority is given to using the finalized Vietnamese version.
 
-Không được:
+Do not:
 
-- copy cả glossary hệ thống vào một SOP,
-- tạo thuật ngữ không xuất hiện trong gate/step,
-- viết kiểu `mixed source kiểm soát`, `job close tài chính`, `control plan tại point-of-use` nếu đã có bản tiếng Việt chuẩn,
-- lặp ngoặc như `Epicor Kinetic (Epicor) (Epicor)`.
+- copy the entire system glossary into one SOP,
+- create terms that do not appear in gate/step,
+- write `mixed source kiểm soát`, `job close tài chính`, `control plan tại point-of-use` if there is a standard Vietnamese version,
+- repeat brackets like `Epicor Kinetic (Epicor) (Epicor)`.
 
-Checklist bắt buộc:
+Required Checklist:
 
-- từng thuật ngữ đều xuất hiện hoặc là tiền đề để hiểu gate/step,
-- không có dòng thuật ngữ chỉ để giải thích cách viết tài liệu,
-- thân SOP không lặp lại tiếng Anh nửa mùa cho cùng một khái niệm.
+- each term appears or is a premise to understand gate/step,
+- no jargon line just to explain how to write the document,
+- the SOP body does not repeat half-baked English for the same concept.
 
-### 4.4 Section 4 — Vai trò, quyền hạn & RACI
+### 4.4 Section 4 — Roles, authorities & RACI
 
-Section 4 phải bám đúng authority thật của SOP.
+Section 4 must adhere to the actual authority of the SOP.
 
-Tối thiểu phải bao phủ:
+Must cover at least:
 
-- tất cả owner đang giữ IG trong `Section 6`,
-- tất cả vai trò nhận hoặc bàn giao ở các bước quan trọng trong `Section 7`,
-- vai trò có quyền `HOLD`, `RELEASE`, `REVALIDATE`, `ESCALATE`, `APPROVE EXCEPTION`.
+- all owners holding IG in `Section 6`,
+- all roles received or handed over at key steps in `Section 7`,
+- role has permissions `HOLD`, `RELEASE`, `REVALIDATE`, `ESCALATE`, `APPROVE EXCEPTION`.
 
-Cho phép hai format:
+Two formats are allowed:
 
-1. Bảng 3 cột `Vai trò | Trách nhiệm chính | Quyền / điểm chặn`
-2. Ma trận RACI khi SOP có nhiều giao diện liên phòng ban và matrix giúp nhìn authority rõ hơn
+1. 3-column table `Vai trò | Trách nhiệm chính | Quyền / điểm chặn`
+2. RACI matrix when the SOP has many inter-departmental interfaces and the matrix helps to see authority more clearly
 
-Nếu dùng RACI matrix, vẫn phải có cột hoặc mô tả thể hiện:
+If using RACI matrix, there must still be a column or description showing:
 
-- ai có quyền chặn,
-- ai có quyền gỡ hold,
-- ai chỉ được consulted chứ không được release.
+- who has the right to block,
+- who has the right to remove the hold,
+- Who can only be consulted, not released.
 
-Section 4 không được:
+Section 4 cannot:
 
-- có vai trò “ma” không xuất hiện ở gate/step,
-- dùng câu quyền hạn chung chung như `chịu trách nhiệm chung`,
-- bỏ vai trò có quyền quyết định thật trong `Section 6`.
+- has a "ghost" role that does not appear at gate/step,
+- use general authority sentences like `chịu trách nhiệm chung`,
+- remove the role with real decision-making authority in `Section 6`.
 
-### 4.5 Section 5 — Đầu vào, đầu ra & điều kiện tiên quyết
+### 4.5 Section 5 — Inputs, outputs & prerequisites
 
-Section 5 là phần tóm tắt `điều kiện mở quy trình` và `điều kiện hoàn tất`.
+Section 5 is a summary of `điều kiện mở quy trình` and `điều kiện hoàn tất`.
 
-Phải suy từ:
+Must infer from:
 
-- `IG1` và `B1`,
-- gate cuối và bước cuối,
-- trigger đổi trạng thái, restart, change, escalation trong quy trình.
+- `IG1` and `B1`,
+- final gate and final step,
+- trigger state change, restart, change, escalation in the process.
 
-Quy tắc viết:
+Writing rules:
 
-- `Đầu vào bắt buộc`: dữ liệu, hồ sơ, nguồn lực hoặc decision phải có trước khi bước đầu được phép chạy,
-- `Đầu ra bắt buộc`: output tạo ra khi SOP hoàn tất hoặc khi gate cuối đóng,
-- `Điều kiện tiên quyết`: readiness condition trước khi bắt đầu,
-- ô thứ tư dùng để mô tả `Trigger`, `Điều kiện kích hoạt`, hoặc `Điều kiện không cho phép chuyển bước` tùy nature SOP, nhưng phải gắn trực tiếp với control logic thật.
+- `Đầu vào bắt buộc`: data, records, resources or decisions that must be present before the initial step is allowed to run,
+- `Đầu ra bắt buộc`: output generated when SOP is completed or when the last gate is closed,
+- `Điều kiện tiên quyết`: readiness condition before starting,
+- The fourth box is used to describe `Trigger`, `Điều kiện kích hoạt`, or `Điều kiện không cho phép chuyển bước` depending on the nature of the SOP, but must be directly tied to the actual control logic.
 
-Không được:
+Do not:
 
-- liệt kê input/output mơ hồ kiểu `theo yêu cầu`, `tài liệu liên quan`, `hồ sơ cần thiết`,
-- ghi output không xuất hiện ở gate cuối hay step cuối,
-- dùng trigger chung chung `khi cần`,
-- bỏ qua trigger restart, transfer, waiver, complaint, change hoặc incident nếu SOP có flow tương ứng.
+- list ambiguous input/output types `theo yêu cầu`, `tài liệu liên quan`, `hồ sơ cần thiết`,
+- record the output does not appear at the last gate or last step,
+- use generic trigger `khi cần`,
+- Skip trigger restart, transfer, waiver, complaint, change or incident if the SOP has a corresponding flow.
 
-### 4.6 Section 8 — Ngoại lệ, thay đổi & làm lại
+### 4.6 Section 8 — Exceptions, changes & redo
 
-Section 8 phải được suy từ các điểm `HOLD / RESTART / REVALIDATE / EXCEPTION` thật.
+Section 8 must be derived from the actual `HOLD / RESTART / REVALIDATE / EXCEPTION` points.
 
-Format chuẩn:
+Standard format:
 
-- bảng 5 cột:
+- 5 column table:
   - `Tình huống`
   - `Quy tắc xử lý bắt buộc`
   - `Chủ trì`
   - `Người gỡ hold / phê duyệt tiếp`
 - `Hồ sơ`
 
-Chỉ cho phép thay bảng bằng bullet list khi đồng thời thỏa cả 4 điều kiện:
+Replacement of tables with bullet lists is only allowed when all 4 conditions are met at the same time:
 
-- SOP là governance hẹp, ít nhánh ngoại lệ và không phải flow transaction/shop-floor.
-- Số tình huống thực tế ít, ổn định và không vượt quá mức cần theo dõi bằng bảng.
-- Không có nhiều owner hoặc nhiều người gỡ hold khác nhau giữa các tình huống.
-- Cách trình bày bullet không làm mất khả năng audit về quyết định, escalation và hồ sơ.
+- SOP is narrow governance, few exception branches and not transaction/shop-floor flow.
+- The number of actual situations is small, stable and does not exceed the level that needs to be monitored by table.
+- There are no multiple owners or different holders between situations.
+- Bullet presentation does not eliminate the ability to audit decisions, escalations and records.
 
-Nguồn scenario phải lấy từ:
+Scenario sources must come from:
 
-- input thiếu hoặc sai,
-- change sau release,
-- restart sau hold hoặc sự cố,
-- transfer giữa người/máy/cell,
+- missing or incorrect input,
+- changes after release,
+- restart after hold or crash,
+- transfer between human/machine/cell,
 - partial release / urgent request / waiver,
 - system down / evidence conflict / data mismatch,
-- situation đặc thù của SOP đó.
+- specific situation of that SOP.
 
-Section 8 không được:
+Section 8 cannot:
 
-- dùng scenario trang trí không xuất phát từ flow thật,
-- viết label sai nghĩa hoặc dịch hỏng như `ngắt / nghỉ-kính / thủy tinh admin`,
-- chỉ ghi hành động chung chung mà không nói ai gỡ hold,
-- bỏ qua record cần lưu cho exception.
-
----
-
-## 5. Dấu hiệu section đang viết sai hướng
-
-Section 1 sai hướng khi:
-
-- đọc xong vẫn không biết SOP đang chặn rủi ro gì,
-- bullet nào cũng dùng được cho SOP khác.
-
-Section 2 sai hướng khi:
-
-- không thấy ranh giới bắt đầu/kết thúc,
-- `Không thay thế` chỉ là danh sách link không liên quan tới handoff thật.
-
-Section 3 sai hướng khi:
-
-- thuật ngữ không xuất hiện trong flow,
-- thân SOP dùng tiếng Anh khác với bản Việt đã chốt.
-
-Section 4 sai hướng khi:
-
-- owner giữ gate không có trong bảng vai trò,
-- người có quyền chặn không được nêu rõ.
-
-Section 5 sai hướng khi:
-
-- input/output không map được vào flow,
-- trigger không nói được vì sao SOP bắt đầu hoặc vì sao phải mở lại.
-
-Section 8 sai hướng khi:
-
-- ngoại lệ không chạm tới hold/restart/release thật,
-- không chỉ ra ai quyết định và ai gỡ hold.
+- use decorative scenarios that do not come from the real flow,
+- Write a label with a wrong meaning or a bad translation like `ngắt / nghỉ-kính / thủy tinh admin`,
+- just records the general action without saying who removed the hold,
+- skip records that need to be saved for exceptions.
 
 ---
 
-## 6. Checklist QA trước khi coi là đạt
+## 5. Signs the section is written in the wrong direction
 
-- [ ] Section 1 nói đúng rủi ro bị chặn và đầu ra cần khóa.
-- [ ] Section 2 bắt đầu và kết thúc đúng theo step đầu/cuối.
-- [ ] Section 2 có nêu đúng SOP lân cận ở boundary thật.
-- [ ] Section 3 chỉ giữ thuật ngữ thật sự dùng trong gate/step.
-- [ ] Tên thuật ngữ đều theo mẫu `English (Việt)`.
-- [ ] Thân SOP ưu tiên dùng tiếng Việt đã chốt ở Section 3.
-- [ ] Mọi owner giữ gate trong Section 6 đều xuất hiện ở Section 4.
-- [ ] Quyền chặn/gỡ hold trong Section 4 bám đúng logic Section 6.
-- [ ] Section 5 phản ánh đúng input trước IG1/B1 và output sau gate cuối/B cuối.
-- [ ] Section 5 không có box chung chung kiểu “khi cần”, “theo yêu cầu”.
-- [ ] Section 8 bao phủ đủ các scenario hold/restart/change/waiver thật.
-- [ ] Section 8 có rõ chủ trì, người gỡ hold và hồ sơ.
-- [ ] Nếu Section 8 không dùng bảng 5 cột, đã có lý do rõ ràng theo rule governance hẹp và không làm mất trace quyết định.
-- [ ] Không còn thuật ngữ nửa Anh nửa Việt, nhãn dịch hỏng hay dấu vết biên tập.
+Section 1 is in the wrong direction when:
+
+- After reading it, I still don't know what risks the SOP is preventing,
+- Any bullet can be used for other SOPs.
+
+Section 2 is in the wrong direction when:
+
+- no start/end boundary visible,
+- `Không thay thế` is just a list of links unrelated to the actual handoff.
+
+Section 3 is in the wrong direction when:
+
+- the term does not appear in the flow,
+- The SOP body uses English different from the finalized Vietnamese version.
+
+Section 4 is in the wrong direction when:
+
+- the owner holding the gate is not in the role table,
+- the person with the right to block is not specified.
+
+Section 5 is in the wrong direction when:
+
+- input/output cannot be mapped to flow,
+- trigger does not say why the SOP started or why it must be reopened.
+
+Section 8 is in the wrong direction when:
+
+- the exception does not reach the actual hold/restart/release,
+- does not indicate who decides and who lifts the hold.
 
 ---
 
-## 7. Quan hệ với các tài liệu core-standard khác
+## 6. Checklist QA before considering it as passed
 
-- Đọc cùng `07-content-writing-guide.md` để khóa giọng văn và quy tắc dùng thuật ngữ.
-- Đọc cùng `12-sop-section-6-7-guide.md` để chốt đúng control architecture và flow.
-- Đọc cùng `13-sop-research-redraft-method.md` để làm đúng trình tự nghiên cứu trước khi viết.
-- Đọc cùng `16-sop-graphics-kpi-and-redraft-quality.md` để khóa KPI, hygiene bản nháp và QA kỹ thuật.
+- [ ] Section 1 correctly says the risk is blocked and the output needs to be blocked.
+- [ ] Section 2 starts and ends exactly according to the first/last step.
+- [ ] Section 2 correctly states the neighbor SOP at the real boundary.
+- [ ] Section 3 only keeps the terminology actually used in gate/step.
+- [ ] Term names follow the form `English (Việt)`.
+- [ ] The SOP body prioritizes the use of Vietnamese language as finalized in Section 3.
+- [ ] Every gate owner in Section 6 appears in Section 4.
+- [ ] The right to block/remove hold in Section 4 follows the logic of Section 6.
+- [ ] Section 5 correctly reflects input before IG1/B1 and output after last gate/last B.
+- [ ] Section 5 does not have a generic "when needed" or "on request" box.
+- [ ] Section 8 covers all real hold/restart/change/waiver scenarios.
+- [ ] Section 8 clearly states the chairperson, the person removing the hold, and the records.
+- [ ] If Section 8 does not use a 5-column table, there is a clear reason according to narrow governance rules and does not lose the decision trace.
+- [ ] No more half-English, half-Vietnamese jargon, broken translation labels or editorial traces.
+
+---
+
+## 7. Relationship with other core-standard documents
+
+- Read together with `07-content-writing-guide.md` to lock in tone and rules for using terminology.
+- Read along with `12-sop-section-6-7-guide.md` to confirm the correct control architecture and flow.
+- Read together with `13-sop-research-redraft-method.md` to follow the correct research order before writing.
+- Read along with `16-sop-graphics-kpi-and-redraft-quality.md` to lock in KPIs, draft hygiene, and technical QA.

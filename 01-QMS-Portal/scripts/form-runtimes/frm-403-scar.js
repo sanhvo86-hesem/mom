@@ -109,6 +109,7 @@ function init(){
   state.localKey = localDraftKey();
   bindEvents();
   bindRuntimeGuards();
+  repairVisibleMojibake(document.body);
   updateActionState();
   updateRuntimeAlert('info', 'Äang khá»Ÿi táº¡o biá»ƒu máº«u', 'Há»‡ thá»‘ng Ä‘ang táº£i thÃ´ng tin há»“ sÆ¡, nhÃ¡p gáº§n nháº¥t vÃ  dá»¯ liá»‡u ná»n nhÃ  cung cáº¥p.', 'Khá»Ÿi táº¡o');
   loadRuntime();
@@ -559,6 +560,7 @@ function renderAll(){
   updateMetaFootnotes();
   updateActionState();
   renderDisplayValues();
+  repairVisibleMojibake(document.body);
   publishDirtyState('render');
   notifyHeight();
 }
@@ -963,7 +965,7 @@ function ensureSignatureModuleReady(){
   if(typeof existing === 'function') return Promise.resolve(existing);
   if(window.__scarSignatureLoader) return window.__scarSignatureLoader;
   window.__scarSignatureLoader = new Promise(function(resolve){
-    var src = '/01-QMS-Portal/scripts/portal/11-e-signature.js?v=scar403-runtime-20260401-6';
+    var src = '/01-QMS-Portal/scripts/portal/11-e-signature.js?v=scar403-runtime-20260401-7';
     var script = document.querySelector('script[data-esignature-loader="scar-runtime"]');
     if(!script){
       script = document.createElement('script');
@@ -972,17 +974,175 @@ function ensureSignatureModuleReady(){
       script.dataset.esignatureLoader = 'scar-runtime';
       document.head.appendChild(script);
     }
+    if(script.dataset.loaded === '1'){
+      resolve(getESignatureCtor() || null);
+      return;
+    }
     var done = function(){
       var ctor = getESignatureCtor();
+      if(typeof ctor === 'function') script.dataset.loaded = '1';
       resolve(typeof ctor === 'function' ? ctor : null);
     };
     script.addEventListener('load', done, { once: true });
     script.addEventListener('error', function(){ resolve(null); }, { once: true });
-    window.setTimeout(done, 300);
+    window.setTimeout(done, 1500);
   }).finally(function(){
     window.__scarSignatureLoader = null;
   });
   return window.__scarSignatureLoader;
+}
+
+function cleanupBrokenSignatureOverlay(){
+  Array.prototype.forEach.call(document.querySelectorAll('.esig-overlay, .scar-signature-overlay'), function(node){
+    if(node && node.parentNode) node.parentNode.removeChild(node);
+  });
+}
+
+function ensureScarSignatureStyles(){
+  if(byId('scar-signature-inline-styles')) return;
+  var style = document.createElement('style');
+  style.id = 'scar-signature-inline-styles';
+  style.textContent = [
+    '.scar-signature-overlay{position:fixed;inset:0;z-index:10020;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px}',
+    '.scar-signature-modal{width:min(560px,96vw);background:#fff;border-radius:20px;box-shadow:0 24px 60px rgba(15,23,42,.28);overflow:hidden}',
+    '.scar-signature-modal header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 22px;border-bottom:1px solid #e2e8f0}',
+    '.scar-signature-modal header h3{margin:0;font-size:20px;line-height:1.3;color:#0f172a}',
+    '.scar-signature-modal header p{margin:6px 0 0;color:#64748b;line-height:1.5}',
+    '.scar-signature-close{border:none;background:#f8fafc;color:#334155;width:38px;height:38px;border-radius:12px;cursor:pointer;font-size:20px}',
+    '.scar-signature-body{padding:22px;display:grid;gap:16px}',
+    '.scar-signature-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}',
+    '.scar-signature-field{display:grid;gap:6px}',
+    '.scar-signature-field label{font-size:12px;font-weight:800;color:#475569;letter-spacing:.03em;text-transform:uppercase}',
+    '.scar-signature-field input,.scar-signature-field textarea{width:100%;border:1px solid #cbd5e1;border-radius:12px;padding:11px 12px;font:inherit;color:#0f172a;background:#fff}',
+    '.scar-signature-field input[readonly]{background:#f8fafc;color:#475569}',
+    '.scar-signature-field textarea{min-height:88px;resize:vertical}',
+    '.scar-signature-preview{border:1px dashed #93c5fd;border-radius:14px;background:#eff6ff;padding:18px;text-align:center}',
+    '.scar-signature-preview strong{display:block;font-size:28px;line-height:1.2;color:#0c2d48;font-family:"Segoe Script","Brush Script MT","Segoe UI",cursive}',
+    '.scar-signature-preview span{display:block;margin-top:8px;font-size:13px;color:#475569}',
+    '.scar-signature-actions{display:flex;justify-content:flex-end;gap:10px;padding:18px 22px;border-top:1px solid #e2e8f0;background:#f8fafc}',
+    '.scar-signature-actions button{min-width:130px;padding:11px 16px;border-radius:12px;border:1px solid #cbd5e1;background:#fff;color:#0f172a;font-weight:700;cursor:pointer}',
+    '.scar-signature-actions .primary{background:#1565c0;border-color:#1565c0;color:#fff}',
+    '.scar-signature-error{padding:0 22px 16px;color:#b91c1c;font-size:13px;font-weight:700}',
+    '@media (max-width:640px){.scar-signature-grid{grid-template-columns:1fr}}'
+  ].join('');
+  document.head.appendChild(style);
+}
+
+function hashSignaturePayload(value){
+  var text = String(value || '');
+  if(window.crypto && window.crypto.subtle && window.TextEncoder){
+    return window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(function(buffer){
+      return Array.from(new Uint8Array(buffer)).map(function(byte){
+        return byte.toString(16).padStart(2, '0');
+      }).join('');
+    });
+  }
+  var hash = 0;
+  for(var i = 0; i < text.length; i += 1){
+    hash = ((hash << 5) - hash) + text.charCodeAt(i);
+    hash |= 0;
+  }
+  return Promise.resolve('fallback-' + Math.abs(hash));
+}
+
+function openScarSignatureDialog(block){
+  cleanupBrokenSignatureOverlay();
+  ensureScarSignatureStyles();
+  var me = state.currentUser || {};
+  var signerName = String(me.display_name || me.name || me.username || state.data.issued_by || '').trim();
+  var signerRole = String(me.title || me.role || '').trim();
+  var meaning = String(block && (block.meaning || block.label_en || block.label || block.id) || 'Signed').trim();
+  return new Promise(function(resolve){
+    var overlay = document.createElement('div');
+    overlay.className = 'scar-signature-overlay';
+    overlay.innerHTML =
+      '<div class="scar-signature-modal" role="dialog" aria-modal="true" aria-label="Ký điện tử SCAR">' +
+        '<header>' +
+          '<div><h3>Ký điện tử SCAR</h3><p>Xác nhận bước <strong>' + esc(meaning) + '</strong> ngay trên biểu mẫu HTML này. Toàn bộ thông tin ký sẽ được băm và lưu vào hồ sơ.</p></div>' +
+          '<button type="button" class="scar-signature-close" aria-label="Đóng">×</button>' +
+        '</header>' +
+        '<div class="scar-signature-body">' +
+          '<div class="scar-signature-grid">' +
+            '<div class="scar-signature-field"><label>Người ký</label><input type="text" data-sign-name value="' + esc(signerName) + '"' + (signerName ? ' readonly' : '') + '></div>' +
+            '<div class="scar-signature-field"><label>Chức vụ</label><input type="text" data-sign-role value="' + esc(signerRole) + '"' + (signerRole ? ' readonly' : '') + '></div>' +
+          '</div>' +
+          '<div class="scar-signature-field"><label>Lý do ký</label><textarea data-sign-reason placeholder="Ví dụ: Xác nhận phát hành hồ sơ SCAR để gửi xem xét.">Xác nhận bước ' + esc(meaning) + '</textarea></div>' +
+          '<div class="scar-signature-preview"><strong>' + esc(signerName || 'Người ký') + '</strong><span>Chữ ký điện tử sẽ lưu tên người ký, thời điểm ký và mã băm xác thực.</span></div>' +
+        '</div>' +
+        '<div class="scar-signature-error scar-hidden" data-sign-error></div>' +
+        '<div class="scar-signature-actions">' +
+          '<button type="button" data-action="cancel">Hủy</button>' +
+          '<button type="button" class="primary" data-action="confirm">Ký và xác nhận</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    var nameInput = overlay.querySelector('[data-sign-name]');
+    var roleInput = overlay.querySelector('[data-sign-role]');
+    var reasonInput = overlay.querySelector('[data-sign-reason]');
+    var preview = overlay.querySelector('.scar-signature-preview strong');
+    var errorNode = overlay.querySelector('[data-sign-error]');
+    function close(result){
+      if(overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      resolve(result || null);
+    }
+    function showError(message){
+      if(!errorNode) return;
+      errorNode.textContent = message;
+      errorNode.classList.remove('scar-hidden');
+    }
+    function hideError(){
+      if(!errorNode) return;
+      errorNode.textContent = '';
+      errorNode.classList.add('scar-hidden');
+    }
+    function syncPreview(){
+      if(preview) preview.textContent = String(nameInput && nameInput.value || 'Người ký').trim() || 'Người ký';
+    }
+    if(nameInput && !nameInput.readOnly) nameInput.addEventListener('input', syncPreview);
+    overlay.querySelector('.scar-signature-close').onclick = function(){ close(null); };
+    overlay.querySelector('[data-action="cancel"]').onclick = function(){ close(null); };
+    overlay.addEventListener('click', function(event){
+      if(event.target === overlay) close(null);
+    });
+    document.addEventListener('keydown', function escClose(event){
+      if(event.key === 'Escape'){
+        document.removeEventListener('keydown', escClose);
+        close(null);
+      }
+    }, { once:true });
+    overlay.querySelector('[data-action="confirm"]').onclick = function(){
+      hideError();
+      var finalName = String(nameInput && nameInput.value || '').trim();
+      var finalRole = String(roleInput && roleInput.value || '').trim();
+      var finalReason = String(reasonInput && reasonInput.value || '').trim();
+      if(!finalName){
+        showError('Hãy nhập hoặc xác nhận họ tên người ký.');
+        if(nameInput) nameInput.focus();
+        return;
+      }
+      if(!finalReason){
+        showError('Hãy nhập lý do ký trước khi xác nhận.');
+        if(reasonInput) reasonInput.focus();
+        return;
+      }
+      var signedAt = new Date().toISOString();
+      hashSignaturePayload([FORM_CODE, currentRecordId(), block.id, finalName, finalRole, finalReason, signedAt].join('|')).then(function(hash){
+        close({
+          signer_name: finalName,
+          signer_role: finalRole,
+          signer_id: String(me.username || '').trim(),
+          signed_at: signedAt,
+          reason: finalReason,
+          signature_meaning: meaning,
+          hash: hash,
+          typed_name: finalName,
+          mode: 'typed'
+        });
+      });
+    };
+    syncPreview();
+    if(reasonInput) reasonInput.focus();
+  });
 }
 
 function captureSignature(blockId){
@@ -991,33 +1151,12 @@ function captureSignature(blockId){
     notifyParentToast('Không tìm thấy cấu hình chữ ký cho bước này.', 'warn');
     return Promise.resolve(null);
   }
-  return ensureSignatureModuleReady().then(function(ESignatureCtor){
-    if(typeof ESignatureCtor !== 'function'){
-      notifyParentToast('Module chữ ký điện tử chưa sẵn sàng.', 'error');
-      return null;
-    }
-    var me = state.currentUser || {};
-    return new Promise(function(resolve){
-      new ESignatureCtor({
-        lang: 'vi',
-        requireReason: true,
-        requirePin: false
-      }).show({
-        signerId: String(me.username || '').trim(),
-        signerName: String(me.display_name || me.name || me.username || '').trim(),
-        signerRole: String(me.title || me.role || '').trim(),
-        reason: 'Xác nhận bước ' + (block.label || block.label_en || block.id),
-        signatureMeaning: String(block.meaning || 'Approved'),
-        appliedTo: currentRecordId() + ':' + blockId,
-        onSign: function(sigData){
-          state.signatures[blockId] = normalizeSignature(sigData, block.meaning || '');
-          saveLocalDraft('signature_capture');
-          renderAll();
-          resolve(state.signatures[blockId]);
-        },
-        onCancel: function(){ resolve(null); }
-      });
-    });
+  return openScarSignatureDialog(block).then(function(sigData){
+    if(!sigData) return null;
+    state.signatures[blockId] = normalizeSignature(sigData, block.meaning || '');
+    saveLocalDraft('signature_capture');
+    renderAll();
+    return state.signatures[blockId];
   });
 }
 
@@ -2031,6 +2170,41 @@ function notifyHeight(){
 
 function postParentMessage(payload){
   if(window.parent && window.parent !== window) window.parent.postMessage(payload, window.location.origin || '*');
+}
+
+function repairVisibleMojibake(root){
+  if(!root || !root.querySelectorAll) return;
+  var suspicious = /Ã|Â|Æ|Ä|áº|á»/;
+  function repairString(value){
+    if(!value || !suspicious.test(value)) return value;
+    try{
+      return decodeURIComponent(escape(value));
+    }catch(_err){
+      try{
+        var bytes = new Uint8Array(Array.prototype.map.call(String(value), function(ch){
+          return ch.charCodeAt(0) & 255;
+        }));
+        return new TextDecoder('utf-8').decode(bytes);
+      }catch(_err2){
+        return value;
+      }
+    }
+  }
+  root.querySelectorAll('*').forEach(function(node){
+    Array.prototype.forEach.call(node.childNodes || [], function(child){
+      if(child && child.nodeType === Node.TEXT_NODE){
+        var fixed = repairString(child.nodeValue);
+        if(fixed !== child.nodeValue) child.nodeValue = fixed;
+      }
+    });
+    ['placeholder','title','aria-label','value'].forEach(function(attr){
+      if(node.hasAttribute && node.hasAttribute(attr)){
+        var raw = node.getAttribute(attr);
+        var fixedAttr = repairString(raw);
+        if(fixedAttr !== raw) node.setAttribute(attr, fixedAttr);
+      }
+    });
+  });
 }
 
 function esc(value){

@@ -1,81 +1,81 @@
-# 21 — Chuẩn Unicode và Quản trị Encoding (Chống biến dạng tiếng Việt)
+# 21 — Unicode Standard and Encoding Management (Vietnamese anti-distortion)
 
-> Mục tiêu: xử lý lỗi tiếng Việt từ gốc, không chắp vá từng tài liệu.
-> Chuẩn này là bắt buộc cho mọi tài liệu QMS, portal UI, script sinh tài liệu và pipeline phát hành.
-
----
-
-## A. Chuẩn gốc bắt buộc
-
-1. Tất cả file text phải lưu `UTF-8` **không BOM**.
-2. Nội dung tiếng Việt phải chuẩn hóa Unicode dạng `NFC` trước khi commit/publish.
-3. Nghiêm cấm lưu/đọc qua luồng `latin1/cp1252` cho nội dung tiếng Việt.
-4. Nghiêm cấm cơ chế “tự sửa hiển thị runtime” (decode vá lỗi ngay trên DOM) như một giải pháp lâu dài.
-5. Nếu phát hiện mojibake trong file nguồn, coi là lỗi dữ liệu nguồn, không coi là lỗi trình duyệt.
+> Purpose: handle Vietnamese errors from the source, not patching each document.
+> This standard is required for all QMS documents, portal UI, document generation scripts and release pipelines.
 
 ---
 
-## B. Cấm chắp vá (Patchwork Ban)
+## A. Required original standard
 
-Các kiểu sau bị cấm đưa vào baseline:
-
-- Hàm decode vá lỗi trực tiếp trên UI (`fixMojibake*`, `decodeLatin1*`, tương đương).
-- Script sửa chuỗi lẻ tẻ theo danh sách thủ công nhưng không có gate tổng thể.
-- Sửa từng tài liệu đơn lẻ mà không có audit cụm và tiêu chí kiểm chứng sau sửa.
-- Phụ thuộc vào terminal encoding để kết luận “file đã đúng”.
-
----
-
-## C. Quy tắc kỹ thuật xuyên suốt pipeline
-
-1. **Tạo tài liệu mới:** template nguồn phải là UTF-8 chuẩn; cấm literal đã mojibake trong generator.
-2. **Sửa tài liệu hiện có:** chỉ dùng batch theo cụm, có dry-run + report + smoke test.
-3. **Stream/serve tài liệu:** response phải giữ `charset=utf-8` cho file text/html/css/csv/json.
-4. **Kiểm tra trước phát hành:** phải chạy audit Unicode toàn repo; không đạt thì dừng publish.
-5. **Theo dõi hồi quy:** mọi file mới/chỉnh sửa phải qua gate không có marker mojibake.
+1. All text files must be saved as `UTF-8` **no BOM**.
+2. Vietnamese content must be standardized in Unicode format `NFC` before committing/publishing.
+3. Saving/reading via stream `latin1/cp1252` is strictly prohibited for Vietnamese content.
+4. Strictly prohibit the "runtime display self-correction" mechanism (decode and patch errors right on the DOM) as a long-term solution.
+5. If mojibake is detected in the source file, consider it a source data error, not a browser error.
 
 ---
 
-## D. Gating bắt buộc trước merge/publish
+## B. Patchwork Ban
 
-Chạy:
+The following types are prohibited from being included in the baseline:
+
+- Decode function to patch errors directly on the UI (`fixMojibake*`, `decodeLatin1*`, equivalent).
+- Script to edit sporadic strings according to manual list but no overall gate.
+- Edit individual documents without cluster audit and post-edit verification criteria.
+- Depends on terminal encoding to conclude "file is correct".
+
+---
+
+## C. Technical rules throughout the pipeline
+
+1. **Create new document:** source template must be standard UTF-8; ban literal mojibake in generator.
+2. **Edit existing documents:** only use cluster batches, have dry-run + report + smoke test.
+3. **Stream/serve document:** response must hold `charset=utf-8` for file text/html/css/csv/json.
+4. **Pre-release check:** must run a Unicode audit of the entire repo; If not, stop publishing.
+5. **Regression tracking:** all new/edited files must pass through a gate without mojibake markers.
+
+---
+
+## D. Gating required before merge/publish
+
+Run:
 
 ```bash
 node tools/scripts/encoding/unicode-governance-audit.mjs
 ```
 
-Điều kiện đạt:
+Conditions met:
 
-- `files_with_residue = 0` cho phạm vi release.
-- Không có file chứa replacement character `U+FFFD` hoặc ký tự control C1 (`U+0080..U+009F`).
-- Không có chuỗi marker mojibake theo danh sách chuẩn trong script audit Unicode.
+- `files_with_residue = 0` for release range.
+- There is no file containing replacement character `U+FFFD` or control character C1 (`U+0080..U+009F`).
+- There is no mojibake marker string according to the standard list in the Unicode audit script.
 
-Nếu không đạt: bắt buộc xử lý theo cụm (không sửa lẻ).
-
----
-
-## E. Quy trình khắc phục theo cụm (chuẩn nhanh + an toàn)
-
-1. Ưu tiên cụm `generator/runtime` để chặn phát sinh mới.
-2. Chuẩn hóa cụm `core-standards` để khóa luật và ngăn hồi quy.
-3. Sửa cụm tài liệu vận hành theo batch có báo cáo dòng lỗi.
-4. Chạy smoke test render sau mỗi cụm, rồi mới sang cụm kế tiếp.
-5. Chỉ gỡ toàn bộ patch runtime sau khi dữ liệu nguồn đã sạch.
+If not: forced to process in clusters (no individual corrections).
 
 ---
 
-## F. Trách nhiệm
+## E. Cluster remediation process (fast standard + safe)
 
-- **Owner kỹ thuật:** IT System Governance.
-- **Owner nội dung:** QMS Manager.
-- **Bắt buộc đồng phê duyệt** khi thay đổi script xử lý encoding hoặc generator nội dung.
+1. Prioritize cluster `generator/runtime` to block new occurrences.
+2. Normalize the `core-standards` cluster to lock the rule and prevent regression.
+3. Fix batch operation document clusters with error line reports.
+4. Run smoke test render after each cluster, then move on to the next cluster.
+5. Only remove the entire runtime patch after the source data is clean.
 
 ---
 
-## G. Tiêu chí hoàn tất “sạch từ gốc”
+## F. Responsibility
 
-Được xem là hoàn tất khi đồng thời thỏa:
+- **Technical Owner:** IT System Governance.
+- **Owner of content:** QMS Manager.
+- **Required co-approval** when changing encoding processing scripts or content generators.
 
-1. Không còn residue mojibake trong file nguồn thuộc phạm vi vận hành.
-2. Không còn cơ chế runtime patch để “đắp” lỗi dữ liệu nguồn.
-3. Gate Unicode hoạt động ổn định và chặn hồi quy ở mọi đợt cập nhật.
+---
+
+## G. Completion criteria “clean from the ground up”
+
+It is considered complete when it simultaneously meets:
+
+1. There is no mojibake residue left in the source file within the operating scope.
+2. There is no longer a runtime patch mechanism to "cover" source data errors.
+3. Gate Unicode operates stably and prevents regression in every update.

@@ -1,52 +1,52 @@
-# 09 — Kiểm soát phiên bản và quy trình phê duyệt
+# 09 — Version control and approval process
 
-> Phiên bản: V0 | Hiệu lực: 2025-06-01 | Chủ sở hữu: QMS Engineer
+> Version: V0 | Effective: 2025-06-01 | Owner: QMS Engineer
 
 ---
 
-## 1. Hệ thống đánh số phiên bản
+## 1. Version numbering system
 
-### 1.1 Các cấp phiên bản
+### 1.1 Version levels
 
-| Phiên bản | Trạng thái | Ý nghĩa | Ví dụ |
+| Version | Status | Meaning | Example |
 |-----------|-----------|---------|-------|
-| V0 (Draft) | Bản nháp | Đang soạn thảo, chưa phê duyệt. Chỉ lưu hành nội bộ nhóm soạn thảo. | V0 |
-| V0 (Published) | Phát hành lần đầu | Phê duyệt lần đầu và phát hành chính thức. Đây là phiên bản đầu tiên có hiệu lực. | V0 published |
-| V1.x | Cập nhật nhỏ | Sửa lỗi chính tả, định dạng, bổ sung nhỏ KHÔNG thay đổi logic quy trình. | V1.1, V1.2, V1.3 |
-| V2.0 | Cập nhật lớn | Thay đổi quy trình, thêm/bớt gate, thay đổi vai trò, thay đổi logic. | V2.0 |
-| V3.0, V4.0... | Cập nhật lớn tiếp theo | Mọi thay đổi lớn tăng số chính 1 đơn vị. | V3.0, V4.0 |
+| V0 (Draft) | Draft | Drafting, not yet approved. Only circulated within the drafting group. | V0 |
+| V0 (Published) | Initial release | Initial approval and official release. This is the first version to take effect. | V0 published |
+| V1.x | Small update | Correct spelling, formatting, minor additions that DO NOT change process logic. | V1.1, V1.2, V1.3 |
+| V2.0 | Big Update | Change processes, add/remove gates, change roles, change logic. | V2.0 |
+| V3.0, V4.0... | Next big update | Every major change increases the main number by 1 unit. | V3.0, V4.0 |
 
-### 1.2 Quy tắc đánh số
+### 1.2 Numbering rules
 
-- **Số chính** (major): Tăng khi thay đổi quy trình, gate, vai trò, logic nghiệp vụ.
-- **Số phụ** (minor): Tăng khi sửa lỗi nhỏ, cập nhật định dạng, bổ sung thông tin không ảnh hưởng vận hành.
-- Mọi lần tăng số chính, số phụ về 0. Ví dụ: V1.3 -> V2.0.
-- KHÔNG dùng số âm, số thập phân nhiều cấp (V1.2.3), hoặc chữ cái (V1a).
+- **Main number** (major): Increases when changing processes, gates, roles, business logic.
+- **Minor number** (minor): Increase when fixing minor errors, updating format, adding information that does not affect operation.
+- Every time the main and secondary numbers are increased to 0. For example: V1.3 -> V2.0.
+- DO NOT use negative numbers, multilevel decimals (V1.2.3), or letters (V1a).
 
-### 1.2A Quy tắc bắt buộc cho tài liệu chưa phát hành lần đầu
+### 1.2A Mandatory rule for unpublished material
 
-- Khi tài liệu vẫn đang trong pha soạn thảo / chuẩn hóa nội bộ và chưa có quyết định phát hành lần đầu, header phiên bản luôn giữ `V0`.
-- Không được tự tăng lên `V1`, `V1.x`, `V2` chỉ vì đã sửa nhiều vòng draft.
-- Không đưa note kiểu `mới so với bản trước`, `bổ sung theo vòng review`, `khác bản cũ` vào thân SOP/WI/ANNEX khi tài liệu vẫn là bản nháp.
-- Nếu cần theo dõi tiến trình soạn thảo, ghi trong DCR, working note, review log hoặc commit log; không ghi trong body tài liệu vận hành.
+- When the document is still in the drafting / internal standardization phase and has not yet decided to release it for the first time, the version header always remains `V0`.
+- Do not increase yourself to `V1`, `V1.x`, `V2` just because you have edited many draft rounds.
+- Do not put notes like `mới so với bản trước`, `bổ sung theo vòng review`, `khác bản cũ` in the body of SOP/WI/ANNEX when the document is still a draft.
+- If you need to track the drafting process, record it in DCR, working note, review log or commit log; not recorded in the body of the operating document.
 
-### 1.3 Phân biệt cập nhật nhỏ và lớn
+### 1.3 Distinguish between minor and major updates
 
-| Cập nhật nhỏ (Minor — V1.x) | Cập nhật lớn (Major — V2.0+) |
+| Minor Update (Minor — V1.x) | Major Update (Major — V2.0+) |
 |-----------------------------|-------------------------------|
-| Sửa lỗi chính tả, ngữ pháp | Thay đổi quy trình tổng thể |
-| Cập nhật định dạng, CSS | Thêm hoặc bớt gate/checkpoint |
-| Bổ sung ghi chú, làm rõ nội dung | Thay đổi vai trò chịu trách nhiệm |
-| Cập nhật liên kết tài liệu | Thay đổi điều kiện PASS/FAIL |
-| Sửa mã biểu mẫu tham chiếu | Thay đổi hệ thống lưu trữ (Epicor, M365) |
-| Thêm ví dụ minh họa | Thay đổi KPI mục tiêu |
-| Cập nhật thông tin liên hệ | Thay đổi phạm vi áp dụng |
+| Correct spelling and grammar errors | Overall process change |
+| Update formatting, CSS | Add or remove gate/checkpoint |
+| Add notes, clarify content | Change in responsible roles |
+| Updated documentation link | Change PASS/FAIL condition |
+| Edit reference form code | Change storage system (Epicor, M365) |
+| More illustrative examples | Change target KPI |
+| Update contact information | Change the scope of application |
 
 ---
 
-## 2. Quy trình phê duyệt tài liệu
+## 2. Document approval process
 
-### 2.1 Luồng công việc chính
+### 2.1 Main workflow
 
 ```
 Draft -> Submit -> Cross-Review -> Approve/Reject -> Publish
@@ -57,197 +57,197 @@ Soạn thảo        Rà soát chéo    Phê duyệt/Từ chối
  Owner)          Reviewer)        cấp trên)
 ```
 
-### 2.2 Chi tiết từng bước
+### 2.2 Step-by-step details
 
-#### Bước 1: Draft (Soạn thảo)
+#### Step 1: Draft
 
-| Hạng mục | Chi tiết |
+| Category | Details |
 |----------|---------|
-| Người thực hiện | Document Owner |
-| Hành động | Soạn nội dung tài liệu theo cấu trúc chuẩn (xem 08-document-types.md) |
-| Hồ sơ | File nháp lưu tại thư mục Draft trên SharePoint |
-| Thoát | Gửi DCR (Document Change Request) khi hoàn thành nháp |
+| Implementer | Document Owner |
+| Action | Compose document content according to standard structure (see 08-document-types.md) |
+| Profile | Draft files are saved in the Draft folder on SharePoint |
+| Exit | Send DCR (Document Change Request) when draft is completed |
 
-#### Bước 2: Submit (Gửi yêu cầu)
+#### Step 2: Submit (Send request)
 
-| Hạng mục | Chi tiết |
+| Category | Details |
 |----------|---------|
-| Người thực hiện | Document Owner |
-| Hành động | Điền FRM-102 Document Change Request |
-| Nội dung DCR | Lý do thay đổi, phạm vi ảnh hưởng, tài liệu liên quan |
-| Thoát | Chuyển DCR cho QMS Engineer |
+| Implementer | Document Owner |
+| Action | Fill out FRM-102 Document Change Request |
+| DCR Content | Reason for change, scope of impact, related documents |
+| Exit | Transfer DCR to QMS Engineer |
 
-#### Bước 3: Cross-Review (Rà soát chéo)
+#### Step 3: Cross-Review (Cross-Review)
 
-| Hạng mục | Chi tiết |
+| Category | Details |
 |----------|---------|
-| Người thực hiện | Peer Reviewer (do Document Owner hoặc QMS Engineer chỉ định) |
-| Yêu cầu | Người rà soát KHÔNG phải là người soạn thảo |
-| Hành động | Đọc toàn bộ tài liệu, kiểm tra nội dung, cross-reference, format |
-| Thời hạn | Tối đa 3 ngày làm việc từ khi nhận |
-| Hồ sơ | Ghi kết quả vào FRM-105 Peer Review Log |
-| Kết quả | PASS: chuyển phê duyệt. FAIL: trả về Document Owner sua. |
+| Implementer | Peer Reviewer (appointed by Document Owner or QMS Engineer) |
+| Request | The reviewer is NOT the editor |
+| Action | Read the entire document, check content, cross-reference, format |
+| Deadline | Maximum 3 working days from receipt |
+| Profile | Record results in FRM-105 Peer Review Log |
+| Results | PASS: transfer approval. FAIL: return Document Owner sua. |
 
-#### Bước 4: Approve/Reject (Phê duyệt / Từ chối)
+#### Step 4: Approve/Reject (Approve / Reject)
 
-| Hạng mục | Chi tiết |
+| Category | Details |
 |----------|---------|
-| Người thực hiện | QA Manager (cho SOP, WI, ANNEX). CEO (cho Quality Manual). |
-| Hành động | Xem xét tài liệu + kết quả cross-review |
-| Quyết định | APPROVED: chuyển Publish. REJECTED: trả về với lý do. CONDITIONAL: phê duyệt kèm điều kiện. |
-| Hồ sơ | Chữ ký trên DCR (FRM-102) |
+| Implementer | QA Manager (for SOP, WI, ANNEX). CEO (for Quality Manual). |
+| Action | Literature review + cross-review results |
+| Decision | APPROVED: transfer to Publish. REJECTED: returned with reason. CONDITIONAL: approval with conditions. |
+| Profile | Signature on DCR (FRM-102) |
 
-#### Bước 5: Publish (Phát hành)
+#### Step 5: Publish (Release)
 
-| Hạng mục | Chi tiết |
+| Category | Details |
 |----------|---------|
-| Người thực hiện | QMS Engineer |
-| Hành động | Chuyển tài liệu sang định dạng phát hành (HTML trên QMS site) |
-| Kiểm tra | Liên kết hoạt động, format đúng, phiên bản đúng |
-| Cập nhật | FRM-101 Master Document Register |
-| Thông báo | Gửi thông báo đến các bộ phận liên quan |
-| Hủy bỏ bản cũ | Đánh dấu phiên bản cũ là "Superseded" trên SharePoint |
+| Implementer | QMS Engineer |
+| Action | Convert documents to publishing format (HTML on QMS site) |
+| Check | Link works, format is correct, version is correct |
+| Update | FRM-101 Master Document Register |
+| Notice | Send notifications to relevant departments |
+| Cancel old version | Mark old versions as "Superseded" on SharePoint |
 
-### 2.3 Trường hợp đặc biệt
+### 2.3 Special cases
 
-| Tình huống | Xử lý |
+| Situation | Processing |
 |-----------|-------|
-| Tài liệu khẩn cấp (an toàn, pháp luật) | CEO có thể phê duyệt trực tiếp, bỏ qua cross-review. Ghi lý do vào DCR. Thực hiện cross-review bổ sung trong vòng 5 ngày. |
-| Người rà soát vắng mặt quá 3 ngày | Document Owner đề xuất người thay thế. QMS Engineer chấp thuận. |
-| Phê duyệt có điều kiện (CONDITIONAL) | Document Owner sửa theo điều kiện trong vòng 2 ngày. QMS Engineer xác nhận đã sửa. Không cần phê duyệt lại. |
-| Từ chối (REJECTED) | Document Owner sửa theo góp ý. Bắt đầu lại từ bước Cross-Review. |
+| Urgent documents (safety, legal) | The CEO can approve directly, skipping cross-review. Record the reason in DCR. Perform additional cross-review within 5 days. |
+| The reviewer is absent for more than 3 days | The Document Owner recommends a replacement. QMS Engineer approved. |
+| Conditional approval (CONDITIONAL) | Document Owner edits according to conditions within 2 days. QMS Engineer confirmed it has been fixed. No re-approval required. |
+| REJECTED | Document Owner edited according to comments. Start again from the Cross-Review step. |
 
 ---
 
 ## 3. DCR — Document Change Request
 
-### 3.1 Khi nào cần DCR
+### 3.1 When is DCR needed?
 
-| Tình huống | Cần DCR |
+| Situation | Need DCR |
 |-----------|---------|
-| Tạo tài liệu mới | CÓ |
-| Cập nhật lớn (Major) | CÓ |
-| Cập nhật nhỏ (Minor) | CÓ (đơn giản hóa: chỉ cần 1 dòng mô tả thay đổi) |
-| Sửa lỗi chính tả (< 5 chỗ) | KHÔNG (QMS Engineer tự sửa và ghi log) |
+| Create new document | YES |
+| Major Update (Major) | YES |
+| Minor Update (Minor) | YES (simplified: just 1 line of change description) |
+| Correct spelling errors (< 5 places) | NO (QMS Engineer self-corrects and logs) |
 
-### 3.2 Nội dung DCR (FRM-102)
+### 3.2 DCR Contents (FRM-102)
 
-| Field | Mô tả |
+| Field | Description |
 |-------|-------|
-| Mã tài liệu | Mã tài liệu cần thay đổi |
-| Phiên bản hiện tại | Phiên bản đang có hiệu lực |
-| Phiên bản đề xuất | Phiên bản mới sau thay đổi |
-| Lý do thay đổi | Tại sao cần thay đổi (cụ thể, không mơ hồ) |
-| Phạm vi ảnh hưởng | Những tài liệu/quy trình nào bị ảnh hưởng |
-| Hành động cần thiết | Những việc cần làm để triển khai thay đổi |
-| Người đề xuất | Tên + vai trò |
-| Ngày đề xuất | Ngày gửi DCR |
-| Người phê duyệt | QA Manager hoặc CEO |
-| Kết quả | APPROVED / REJECTED / CONDITIONAL |
+| Document code | Document code needs to be changed |
+| Current version | Version in effect |
+| Recommended version | New version after changes |
+| Reason for change | Why change is needed (be specific, not vague) |
+| Scope of influence | What documents/processes are affected |
+| Action required | Things to do to implement change |
+| Recommended by | Name + role |
+| Proposal date | DCR submission date |
+| Approver | QA Manager or CEO |
+| Results | APPROVED / REJECTED / CONDITIONAL |
 
 ---
 
-## 4. Yêu cầu rà soát chéo (Cross-Review)
+## 4. Cross-Review Request
 
-### 4.1 Ai rà soát cho ai
+### 4.1 Who reviews for whom?
 
-| Loại tài liệu | Người soạn | Người rà soát |
+| Document type | Editor | Reviewer |
 |--------------|-----------|--------------|
-| SOP | Process Owner | QMS Engineer + 1 người từ phòng ban liên quan |
-| WI | Team Lead / Engineer | 1 người cùng phòng ban + QMS Engineer |
-| ANNEX | Chuyên gia lĩnh vực | QMS Engineer |
+| SOP | Process Owner | QMS Engineer + 1 person from related departments |
+| WI | Team Lead / Engineer | 1 person in the same department + QMS Engineer |
+| ANNEX | Field expert | QMS Engineer |
 | JD | HR Manager + Line Manager | QMS Engineer |
-| Form (Excel) | Process Owner | QMS Engineer (kiểm tra format + logic) |
+| Form (Excel) | Process Owner | QMS Engineer (check format + logic) |
 
-### 4.2 Tiêu chí rà soát
+### 4.2 Review criteria
 
-| # | Tiêu chí | Kiểm tra |
+| # | Criteria | Check |
 |---|---------|---------|
-| 1 | Nội dung chính xác về mặt kỹ thuật | Có phản ánh đúng thực tế vận hành không? |
-| 2 | Cấu trúc đúng chuẩn | Dùng 10 section (SOP), 7 section (WI)...? |
-| 3 | Từ ngữ nhất quán | PHẢI/NÊN/CÓ THỂ dùng đúng cấp độ? |
-| 4 | Cross-reference chính xác | Mọi mã tài liệu đúng, link hoạt động? |
-| 5 | Không trùng lặp nội dung | Không duplicate thông tin đã có trong tài liệu khác? |
-| 6 | Vai trò nhất quán | Vai trò trong Section 4 xuất hiện trong Section 7? |
-| 7 | Gate rõ ràng | Mọi gate có điều kiện PASS/FAIL cụ thể? |
-| 8 | In được | Layout vừa A4, không tràn? |
-| 9 | Không meta-text | Không có "tài liệu này nhằm mục đích..."? |
-| 10 | Không "AI" mention | Không có "AI generated", "auto-generated"? |
+| 1 | Technically accurate content | Does it actually reflect operations? |
+| 2 | Correct structure | Use 10 sections (SOP), 7 sections (WI)...? |
+| 3 | Consistent Wording | MUST/SHOULD/CAN use the correct level? |
+| 4 | Correct cross-reference | All document codes correct, links working? |
+| 5 | Do not duplicate content | Do not information duplicate already in another document? |
+| 6 | Consistent roles | Do roles in Section 4 appear in Section 7? |
+| 7 | Clear Gate | Does every gate have specific PASS/FAIL conditions? |
+| 8 | Printable | Layout fits A4, no overflow? |
+| 9 | No meta-text | No "this document is intended to..."? |
+| 10 | No "AI" mentions | There is no "AI generated", "auto-generated"? |
 
 ---
 
-## 5. Theo doi lich su thay đổi (Revision History)
+## 5. Follow the change history (Revision History)
 
-### 5.1 Vị trí
+### 5.1 Location
 
-Mọi tài liệu HTML có bảng revision history ở cuối trang, trong `<footer>` hoặc section riêng.
+Every HTML document has a revision history table at the bottom of the page, in `<footer>` or a separate section.
 
-### 5.2 Cấu trúc bảng
+### 5.2 Table structure
 
-| Phiên bản | Ngày | Người thay đổi | Mô tả thay đổi | DCR # |
+| Version | Date | Changer | Change Description | DCR # |
 |-----------|------|---------------|---------------|-------|
-| V0 | 2025-06-01 | Nguyễn Văn A | Phát hành lần đầu | DCR-001 |
-| V1.1 | 2025-08-15 | Trần Văn B | Sửa lỗi chính tả Section 3, cập nhật link Section 10 | DCR-015 |
-| V2.0 | 2025-11-01 | Nguyễn Văn A | Thêm gate G5, thay đổi vai trò QC Lead | DCR-042 |
+| V0 | 2025-06-01 | Nguyen Van A | Initial release | DCR-001 |
+| V1.1 | 2025-08-15 | Tran Van B | Correct spelling errors in Section 3, update Section 10 link | DCR-015 |
+| V2.0 | 2025-11-01 | Nguyen Van A | Add gate G5, change QC Lead role | DCR-042 |
 
-### 5.3 Quy tắc ghi
+### 5.3 Recording rules
 
-- Ghi mọi lần thay đổi, kể cả cập nhật nhỏ.
-- Mô tả thay đổi cụ thể: ghi section nào, thay đổi gì. KHÔNG ghi "cập nhật nội dung".
-- Mọi dòng có số DCR tương ứng (trừ sửa lỗi chính tả nhỏ).
-- Giữ toàn bộ lịch sử, KHÔNG xóa dòng cũ.
-- Không hiển thị revision history để so sánh các bản nháp nội bộ trước phát hành đầu tiên. Với tài liệu còn `V0` và chưa issue, lịch sử draft nằm trong DCR / review log, không nằm trong thân SOP.
+- Record every change, including minor updates.
+- Describe specific changes: write which section, what changes. DO NOT say "content update".
+- Every line has a corresponding DCR number (except minor spelling corrections).
+- Keep full history, DO NOT delete old lines.
+- Don't show revision history to compare internal drafts before the first release. For documents that are still `V0` and not yet issued, the draft history is in the DCR / review log, not in the SOP body.
 
 ---
 
-## 6. Lưu trữ hồ sơ (Record Retention)
+## 6. Record Retention
 
-### 6.1 Thời gian lưu trữ
+### 6.1 Storage period
 
-| Loại hồ sơ | Thời gian lưu trữ | Ghi chú |
+| Record type | Storage time | Notes |
 |-----------|-------------------|---------|
-| Tài liệu QMS hiện hành (SOP, WI, ANNEX) | Vĩnh viễn (trên QMS site) | Phiên bản hiện tại luôn truy cập được |
-| Tài liệu QMS het hiệu lực (Superseded) | Tối thiểu 7 nam | Lưu trữ trên SharePoint Archive |
-| DCR (FRM-102) | Tối thiểu 7 năm | Lưu kèm tài liệu tương ứng |
-| Peer Review Log (FRM-105) | Tối thiểu 7 năm | Lưu kèm tài liệu tương ứng |
-| Hồ sơ sản xuất (Job records) | Tối thiểu 10 năm hoặc theo yêu cầu khách hàng | Theo hợp đồng |
-| Hồ sơ đào tạo (Training records) | Tối thiểu 5 năm sau khi nhân viên nghỉ việc | Theo luật lao động |
-| Hồ sơ kiểm định (Calibration) | Tối thiểu 7 năm | Theo ISO 10012 |
-| Hồ sơ audit (Internal/External) | Tối thiểu 7 năm | Theo ISO 9001 |
+| Current QMS documents (SOP, WI, ANNEX) | Permanent (on QMS site) | The current version is always accessible |
+| QMS document het effective (Superseded) | Minimum 7 men | Archived on SharePoint Archive |
+| DCR (FRM-102) | Minimum 7 years | Attach corresponding documents |
+| Peer Review Log (FRM-105) | Minimum 7 years | Attach corresponding documents |
+| Production records (Job records) | Minimum 10 years or according to customer requirements | According to the contract |
+| Training records (Training records) | Minimum 5 years after employee leaves | According to labor law |
+| Calibration records (Calibration) | Minimum 7 years | According to ISO 10012 |
+| Audit records (Internal/External) | Minimum 7 years | According to ISO 9001 |
 
-### 6.2 Hình thức lưu trữ
+### 6.2 Storage form
 
-| Hệ thống | Loại hồ sơ | Định dạng |
+| System | Record type | Format |
 |----------|-----------|-----------|
-| QMS Site (web) | Tài liệu hiện hành | HTML |
-| SharePoint — QMS Records | Tài liệu gốc, DCR, review log | PDF (từ HTML) |
-| SharePoint — Archive | Tài liệu hết hiệu lực | PDF |
-| Epicor | Hồ sơ sản xuất, job records | Dữ liệu hệ thống |
-| Local backup | Sao lưu toàn bộ | Theo quy định IT |
+| QMS Site (web) | Current documents | HTML |
+| SharePoint — QMS Records | Original document, DCR, review log | PDF (from HTML) |
+| SharePoint — Archive | Document expired | PDF |
+| Epicor | Production records, job records | System data |
+| Local backup | Full backup | According to IT regulations |
 
-### 6.3 Huy hồ sơ
+### 6.3 Huy profile
 
-- Chỉ hủy hồ sơ khi hết thời gian lưu trữ bắt buộc.
-- QMS Engineer lập danh sách hồ sơ cần hủy, QA Manager phê duyệt.
-- Ghi nhận vao FRM-101 Master Document Register.
-- KHÔNG tự ý huy hồ sơ khi chưa co phê duyệt.
+- Only destroy records when the mandatory storage period expires.
+- QMS Engineer prepares a list of documents that need to be destroyed and QA Manager approves.
+- Recorded in FRM-101 Master Document Register.
+- DO NOT arbitrarily delete documents without approval.
 
 ---
 
-## 7. Trạng thái tài liệu
+## 7. Document status
 
-### 7.1 Cac trang thai
+### 7.1 Pregnancy pages
 
-| Trạng thái | Mã màu | Ý nghĩa |
+| Status | Color code | Meaning |
 |-----------|--------|---------|
-| Draft | Vàng | Dang soạn thảo, chưa co hiệu lực |
-| In Review | Cam | Dang rà soát cheo hoặc cho phê duyệt |
-| Approved | Xanh la | Da phê duyệt, chưa phát hành |
-| Published | Xanh dương | Da phát hành, đang có hiệu lực |
-| Superseded | Xám | Hết hiệu lực, đã có phiên bản mới thay thế |
-| Obsolete | Đỏ | Bị hủy bỏ, không còn sử dụng |
+| Draft | Gold | Drafting, not yet effective |
+| Print Review | Orange | Reviewing or giving approval |
+| Approved | Green | Skin approved, unreleased |
+| Published | Blue | Leather released, in effect |
+| Superseded | Gray | Expired, there is a new replacement version |
+| Obsolete | Red | Cancelled, no longer used |
 
-### 7.2 Chuyển đổi trạng thái
+### 7.2 State transition
 
 ```
 Draft ----submit----> In Review
@@ -258,16 +258,16 @@ Published --new rev-> Superseded (phiên bản cu)
 Published --cancel--> Obsolete (bi huy)
 ```
 
-### 7.3 Quy tắc
+### 7.3 Rules
 
-- Tại nơi làm việc chỉ được sử dụng tài liệu trạng thái **Published**.
-- Tài liệu **Superseded** và **Obsolete** PHẢI ghi ro "KHÔNG CÒN HIỆU LỰC" tren trang dau.
-- QMS Engineer kiểm tra hằng tháng: không có tài liệu Draft qua 30 ngay chưa submit.
-- QMS Engineer kiểm tra hằng tháng: không có tài liệu In Review qua 10 ngay chưa phê duyệt.
+- At work, only **Published** status documents can be used.
+- **Superseded** and **Obsolete** documents MUST have "NO LONGER VALID" written on the first page.
+- QMS Engineer checks monthly: there are no Draft documents that have not been submitted for more than 30 days.
+- QMS Engineer checks monthly: no documents. Printed Review after 10 days has not been approved.
 
 ---
 
-## 8. So do tong the quy trình
+## 8. Compare the process
 
 ```
                     +----------+

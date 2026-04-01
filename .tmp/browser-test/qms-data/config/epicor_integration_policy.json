@@ -1,0 +1,121 @@
+{
+  "_meta": {
+    "version": "1.1",
+    "updated": "2026-03-30T23:40:00+07:00",
+    "description": "Governed Epicor Kinetic integration policy for MES synchronization, reconciliation, transport security, and outbox escalation."
+  },
+  "system_name": "Epicor Kinetic",
+  "domains": {
+    "sales_orders": {
+      "label_vi": "Đơn hàng bán",
+      "label_en": "Sales orders",
+      "direction": "inbound",
+      "poll_interval_minutes": 5,
+      "stale_after_minutes": 20,
+      "reconciliation_threshold_qty": 0,
+      "reconciliation_threshold_minutes": 30
+    },
+    "job_orders": {
+      "label_vi": "Lệnh công việc",
+      "label_en": "Job orders",
+      "direction": "inbound",
+      "poll_interval_minutes": 5,
+      "stale_after_minutes": 20,
+      "reconciliation_threshold_qty": 0,
+      "reconciliation_threshold_minutes": 30
+    },
+    "work_orders": {
+      "label_vi": "Work order",
+      "label_en": "Work orders",
+      "direction": "bidirectional",
+      "poll_interval_minutes": 5,
+      "stale_after_minutes": 15,
+      "reconciliation_threshold_qty": 1,
+      "reconciliation_threshold_minutes": 15
+    },
+    "master_data": {
+      "label_vi": "Dữ liệu nền",
+      "label_en": "Master data",
+      "direction": "bidirectional",
+      "poll_interval_minutes": 15,
+      "stale_after_minutes": 60,
+      "reconciliation_threshold_qty": 0,
+      "reconciliation_threshold_minutes": 120
+    },
+    "labor": {
+      "label_vi": "Giao dịch lao động",
+      "label_en": "Labor",
+      "direction": "outbound",
+      "poll_interval_minutes": 5,
+      "stale_after_minutes": 15,
+      "reconciliation_threshold_qty": 1,
+      "reconciliation_threshold_minutes": 30
+    },
+    "material": {
+      "label_vi": "Tiêu thụ vật tư",
+      "label_en": "Material",
+      "direction": "outbound",
+      "poll_interval_minutes": 5,
+      "stale_after_minutes": 15,
+      "reconciliation_threshold_qty": 1,
+      "reconciliation_threshold_minutes": 30
+    },
+    "completions": {
+      "label_vi": "Hoàn thành sản xuất",
+      "label_en": "Completions",
+      "direction": "outbound",
+      "poll_interval_minutes": 5,
+      "stale_after_minutes": 15,
+      "reconciliation_threshold_qty": 1,
+      "reconciliation_threshold_minutes": 20
+    },
+    "quality": {
+      "label_vi": "Chất lượng",
+      "label_en": "Quality",
+      "direction": "outbound",
+      "poll_interval_minutes": 10,
+      "stale_after_minutes": 30,
+      "reconciliation_threshold_qty": 0,
+      "reconciliation_threshold_minutes": 60
+    }
+  },
+  "transport": {
+    "auth_mode": "oauth2_client_credentials",
+    "base_url": "",
+    "token_url": "",
+    "scope": "",
+    "api_key_header": "X-API-Key",
+    "timeout_seconds": 20,
+    "verify_tls": true,
+    "dry_run_when_unconfigured": true,
+    "company": "",
+    "plant": "",
+    "api_paths": {
+      "sales_orders": "api/v2/Erp.BO.SalesOrderSvc/List",
+      "job_orders": "api/v2/Erp.BO.JobEntrySvc/List",
+      "work_orders": "api/v2/Erp.BO.JobOperSvc/List",
+      "master_data": "api/v2/Erp.BO.PartSvc/List",
+      "labor": "api/v2/Erp.BO.LaborSvc/Update",
+      "material": "api/v2/Erp.BO.IssueMaterialSvc/IssueMaterial",
+      "completions": "api/v2/Erp.BO.ReceiptSvc/ReceiveJob",
+      "quality": "api/v2/Erp.BO.InspResultsSvc/Update"
+    }
+  },
+  "outbound_targets": {
+    "max_retry_count": 5,
+    "retry_backoff_minutes": [1, 5, 15, 30, 60],
+    "dead_letter_after_failures": 5
+  },
+  "reconciliation_rules": {
+    "work_order_qty_tolerance": 1,
+    "labor_minutes_tolerance": 5,
+    "material_qty_tolerance": 0.05,
+    "quality_result_delay_minutes": 60
+  },
+  "alerts": {
+    "degraded_domain_threshold": 1,
+    "critical_domain_threshold": 2,
+    "open_reconciliation_threshold": 3,
+    "outbox_pending_threshold": 5
+  }
+}

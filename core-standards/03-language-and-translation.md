@@ -1,80 +1,80 @@
-# 03 — Quy tắc ngôn ngữ và dịch thuật
+# 03 — Language and translation rules
 
-> Quy tắc đầy đủ cho việc dịch và biên tập nội dung QMS từ tiếng Anh sang tiếng Việt.
-> Áp dụng cho cả dịch thủ công và dịch tự động bằng `context_translate_engine.py`.
+> Full rules for translating and editing QMS content from English to Vietnamese.
+> Applies to both manual translation and automatic translation using `context_translate_engine.py`.
 
 ---
 
-## A. Nguyên tắc tổng quát
+## A. General principles
 
-### A1. Ngôn ngữ chính: Tiếng Việt
+### A1. Main language: Vietnamese
 
-- Nội dung tài liệu QMS được viết bằng tiếng Việt thuần, rõ ràng, ngắn gọn
-- Viết tắt tiếng Anh giữ nguyên (xem danh sách đầy đủ tại mục C)
-- Thuật ngữ ngành không có tương đương chính xác giữ nguyên tiếng Anh (xem mục D)
-- Không viết hàn lâm, không viết dài dòng — mỗi câu phục vụ vận hành thật
-- Mọi nội dung hiển thị trong SOP/WI/ANNEX/JD PHẢI ưu tiên tiếng Việt, trừ các ngoại lệ đã khóa tại mục C, D và A4
+- The content of the QMS document is written in pure Vietnamese, clear and concise
+- English abbreviations remain the same (see full list in section C)
+- Industry terms that do not have exact equivalents remain in English (see section D)
+- Don't write academically, don't write long sentences — each sentence serves a real function
+- All content displayed in SOP/WI/ANNEX/JD MUST prioritize Vietnamese, except for locked exceptions in sections C, D and A4
 
-### A1a. Quy tắc glossary khi giữ viết tắt tiếng Anh
+### A1a. Glossary rules when keeping English abbreviations
 
-- Trong glossary, `meaning` PHẢI chứa tên đầy đủ tiếng Anh của term.
-- Nếu `term` là viết tắt, không được để `meaning` chỉ lặp lại chính viết tắt đó.
-- Nếu query hoặc tài liệu dùng dạng `Full Term (ABBR)`, glossary canonical vẫn phải trả về `ABBR`.
-- Khi một role code/JD code được đưa vào glossary, `meaning` vẫn phải là English title đầy đủ, còn `vi` là nhãn tiếng Việt chuẩn hóa.
+- In the glossary, `meaning` MUST contain the full English name of the term.
+- If `term` is an abbreviation, do not let `meaning` simply repeat the abbreviation itself.
+- If the query or document uses the form `Full Term (ABBR)`, glossary canonical must still return `ABBR`.
+- When a role code/JD code is included in the glossary, `meaning` must still be the full English title, while `vi` is the standardized Vietnamese label.
 
-Chuẩn canonical đầy đủ: xem `25-glossary-canonical-abbreviation-standard.md`.
+Full canonical: see `25-glossary-canonical-abbreviation-standard.md`.
 
-### A4. Ngoại lệ khóa cứng đã được xác nhận
+### A4. Lockout exception has been acknowledged
 
-- Giữ nguyên toàn bộ viết tắt chuẩn ở mục C.
-- Giữ nguyên 3 thuật ngữ ngành: `Setup`, `Traveler`, `Balloon`.
-- Giữ nguyên các phương pháp/tên học thuyết: `Kaizen`, `Dreyfus`, `Pareto`, `Kolb`, `Poka-yoke`.
-- Giữ nguyên tên riêng hệ thống, thương hiệu và danh xưng kỹ thuật như `Epicor`, `Epicor Kinetic`, `SharePoint`, `M365`, `Microsoft 365`, `Entra ID`, `Power Automate`, `Power BI`, `Azure`, `HESEM`, `Zalo`.
-- Ngoài các nhóm ngoại lệ trên, phần văn xuôi hiển thị cho người đọc phải được Việt hóa theo đúng ngữ cảnh vận hành.
-- Không được vin vào ngoại lệ để giữ lại các cụm nửa Anh nửa Việt như `review plan`, `shipment pack`, `tool readiness`, `change logic`, `route control` nếu đã có bản Việt chuẩn trong mục E và F.
+- Maintain all standard abbreviations in section C.
+- Maintain 3 industry terms: `Setup`, `Traveler`, `Balloon`.
+- Maintain the methods/doctrine names: `Kaizen`, `Dreyfus`, `Pareto`, `Kolb`, `Poka-yoke`.
+- Maintain the system's unique name, brand and technical titles such as `Epicor`, `Epicor Kinetic`, `SharePoint`, `M365`, `Microsoft 365`, `Entra ID`, `Power Automate`, `Power BI`, `Azure`, `HESEM`, `Zalo`.
+- In addition to the above exception groups, the prose displayed to the reader must be Vietnameseized according to the correct operating context.
+- Do not make exceptions to retain half-English, half-Vietnamese phrases such as `review plan`, `shipment pack`, `tool readiness`, `change logic`, `route control` if there is a standard Vietnamese version in sections E and F.
 
-### A5. Ngôn ngữ biểu mẫu eQMS (Online Form) — Song ngữ chuẩn
+### A5. eQMS (Online Form) form language — Standard bilingual
 
-Mọi biểu mẫu eQMS online form (FRM-xxx-SUFFIX) hiển thị **song ngữ** theo pattern thống nhất:
+All eQMS online forms (FRM-xxx-SUFFIX) display **bilingual** in a consistent pattern:
 
-**Pattern chung:** Tiếng Anh chính (bold, in hoa) + Tiếng Việt có dấu phụ (italic, nhỏ hơn, màu nhạt)
+**General pattern:** Main English (bold, capital letters) + Vietnamese with diacritics (italic, smaller, light color)
 
-| Thành phần | Ngôn ngữ chính | Ngôn ngữ phụ | Ví dụ |
+| Ingredients | Main language | Secondary language | Example |
 |------------|---------------|-------------|-------|
-| **Field label** | English (in hoa, bold) | Tiếng Việt có dấu (italic, nhỏ) | `SCAR DATE` *Ngày phát hành SCAR* |
-| **Section title** | English chính | Tiếng Việt diễn giải bên dưới | `Record Identification & Supplier` + `Khóa đủ ngữ cảnh phát hành...` |
-| **Section description / note** | Tiếng Việt có dấu | — | `Khóa đủ ngữ cảnh phát hành...` |
-| **Placeholder** | Tiếng Việt có dấu | — | `Chọn người phát hành SCAR` |
-| **Helper text** | Tiếng Việt có dấu | — | `Có thể gõ tên hoặc chọn từ danh sách` |
-| **Dropdown options** | Song ngữ Việt (English) | — | `Nghiêm trọng (Critical)` |
-| **Signature label** | English chính | Tiếng Việt phụ bên dưới | `Originator` / *Người phát hành* |
-| **Signature status** | Tiếng Việt | — | `Chưa ký`, `Ký` |
+| **Field label** | English (capital letters, bold) | Vietnamese has accents (italic, small) | `SCAR DATE` *SCAR release date* |
+| **Section title** | Main English | Vietnamese explanation below | `Record Identification & Supplier` + `Khóa đủ ngữ cảnh phát hành...` |
+| **Section description / notes** | Vietnamese has the accent | — | `Khóa đủ ngữ cảnh phát hành...` |
+| **Placeholder** | Vietnamese has the accent | — | `Chọn người phát hành SCAR` |
+| **Helper text** | Vietnamese has the accent | — | `Có thể gõ tên hoặc chọn từ danh sách` |
+| **Dropdown options** | Bilingual Vietnamese (English) | — | `Nghiêm trọng (Critical)` |
+| **Signature label** | Main English | Vietnamese subtitles below | `Originator` / *Publisher* |
+| **Signature status** | Vietnamese | — | `Chưa ký`, `Ký` |
 | **Header .doc-name** | English (SSOT) | — | `Supplier Corrective Action Request (SCAR)` |
-| **Header .sub-vn** | Tiếng Việt có dấu | — | `Ghi nhận yêu cầu hành động khắc phục...` |
+| **Header .sub-vn** | Vietnamese has the accent | — | `Ghi nhận yêu cầu hành động khắc phục...` |
 
-**Quy tắc bắt buộc:**
-- **Mọi chuỗi tiếng Việt PHẢI có dấu đầy đủ** — KHÔNG ĐƯỢC viết không dấu
+**Required rules:**
+- **All Vietnamese strings MUST have full diacritics** — CANNOT be written without diacritics
   - ❌ `"Yeu cau"` → ✅ `"Yêu cầu"`
   - ❌ `"Chua ky"` → ✅ `"Chưa ký"`
-- Schema JSON lưu chuỗi tiếng Việt với Unicode đầy đủ (UTF-8)
-- Các trường chọn từ dữ liệu nền (supplier, part, operator) dùng `type: "lookup"` với `lookup_source`
-- Người phát hành và phê duyệt PHẢI chọn từ danh sách nhân sự, không nhập tay
-- Các trường nhân sự cấp công ty như `issued_by`, `reviewed_by`, `approved_by`, `prepared_by`, `verified_by`, `owner_user` PHẢI dùng `lookup_source: "company_users"` thay vì `operators`
-- Với mọi trường `company_users`, frontend PHẢI có nút tắt `Dùng người đăng nhập` để người dùng áp dụng nhanh chính tài khoản đang đăng nhập
-- Với chữ ký điện tử, CTA mặc định PHẢI nêu rõ người ký là tài khoản hiện tại, ví dụ `Người đăng nhập ký`
-- Header form tuân thủ core standard 23 (`.doc-name` = English SSOT, `.sub-vn` = Vietnamese)
-- Section title của eQMS form PHẢI là English chính; mọi subtitle, explanation, helper, placeholder, warning, note, workflow hint phía dưới PHẢI là tiếng Việt có dấu
-- Quy tắc áp dụng cho `10-eqms-form-runtime.js`, PDF export, và mọi form renderer tương lai
+- Schema JSON saves Vietnamese strings with full Unicode (UTF-8)
+- Fields selected from background data (supplier, part, operator) use `type: "lookup"` with `lookup_source`
+- Issuing and approving people MUST be selected from the personnel list, not entered by hand
+- Company-level personnel fields such as `issued_by`, `reviewed_by`, `approved_by`, `prepared_by`, `verified_by`, `owner_user` MUST use `lookup_source: "company_users"` instead of `operators`
+- For every `company_users` field, the frontend MUST have a `Dùng người đăng nhập` shortcut button for users to quickly use the account they are logging in to
+- With electronic signatures, the default CTA MUST clearly state that the signer is the current account, for example `Người đăng nhập ký`
+- Header form complies with core standard 23 (`.doc-name` = English SSOT, `.sub-vn` = Vietnamese)
+- Section title of eQMS form MUST be primary English; All subtitles, explanations, helpers, placeholders, warnings, notes, workflow hints below MUST be in Vietnamese with accents
+- The rule applies to `10-eqms-form-runtime.js`, PDF export, and any future form renderers
 
-### A6. Ngôn ngữ thực thể dữ liệu nền (Master Data Entities)
+### A6. Master Data Entities Language
 
-- Tất cả thực thể dữ liệu nền (suppliers, customers, parts, operators, work centers, machines, tooling assets, etc.) lưu trữ và hiển thị **100% tiếng Anh**
-- Tên thực thể, mã, mô tả trong master-data.json: English only
-- Khi hiện trong dropdown/lookup trên form: hiển thị tiếng Anh gốc từ dữ liệu nền
-- **Quy tắc auto-link dữ liệu nền:** Nếu một ô nhập liệu (input field) trên form có dữ liệu tương ứng trong master data, field đó **PHẢI** được chuyển thành `type: "lookup"` với `lookup_source` trỏ đến bảng dữ liệu nền tương ứng, thay vì để người dùng nhập tay
-- Danh sách bảng dữ liệu nền chuẩn:
+- All underlying data entities (suppliers, customers, parts, operators, work centers, machines, tooling assets, etc.) are stored and displayed **100% English**
+- Entity name, code, description in master-data.json: English only
+- When appearing in dropdown/lookup on form: displays original English from background data
+- **Background data auto-link rule:** If an input field on the form has corresponding data in the master data, that field **MUST** be converted to `type: "lookup"` with `lookup_source` pointing to the corresponding background data table, instead of having the user enter it manually
+- List of standard background data tables:
 
-| Bảng | lookup_source | Nội dung |
+| Table | lookup_source | Content |
 |------|--------------|----------|
 | Customers | `customers` | customer_id, customer_name, customer_type |
 | Customer Sites | `customer_sites` | site_id, customer_id, site_name, country_code |
@@ -97,7 +97,7 @@ Mọi biểu mẫu eQMS online form (FRM-xxx-SUFFIX) hiển thị **song ngữ**
 | Supplier Process Approvals | `supplier_process_approvals` | approval_id, supplier_id, special_process |
 | Warehouse Locations | `warehouse_locations` | warehouse_id, warehouse_name, warehouse_type |
 | Defect Catalog | `defect_catalog` | defect_code, defect_name, defect_group, severity_default |
-| Company Directory | `company_users` | username, name, role, dept, title |
+| Company Directory | `company_users` | username, name, role, department, title |
 | Operators | `operators` | operator_id, operator_name, role |
 | Work Centers | `work_centers` | work_center_id, work_center_name, department |
 | Machines | `machines` | machine_id, machine_name, machine_type |
@@ -111,33 +111,33 @@ Mọi biểu mẫu eQMS online form (FRM-xxx-SUFFIX) hiển thị **song ngữ**
 | NC Program Releases | `nc_program_releases` | program_id, release_title, operation_number |
 | CAPA | `capas` | capa_number, title, status |
 
-- Khi tạo form mới, kiểm tra từng field: nếu field_id hoặc label match với bất kỳ bảng nào ở trên, bắt buộc dùng lookup
-- Lookup bắt buộc là searchable droplist có kiểm soát; không dùng `<select>` tĩnh nếu dữ liệu có thể tăng lớn hoặc cần tìm kiếm
+- When creating a new form, check each field: if field_id or label matches any of the above tables, lookup is required.
+- Required lookup is a controlled searchable droplist; Do not use static `<select>` if the data is likely to grow large or needs to be searched
 
-### A2. Quy tắc vàng
+### A2. Golden rule
 
-| Phần tử | Dịch? | Lý do |
+| Element | Translate? | Reason |
 |---------|-------|-------|
-| Nội dung text (giữa `>` và `<`) | **CÓ** — dịch sang tiếng Việt | Đây là nội dung người dùng đọc |
-| Thẻ `<title>` (tài liệu kiểm soát) | **KHÔNG** — giữ chuẩn English SSOT theo filename | Đồng bộ với `Tên file / tiêu đề chuẩn` trong Portal và tránh mất link khi rename |
-| Thuộc tính `href` | **KHÔNG** — giữ nguyên | Đường dẫn file, không phải nội dung |
-| Thuộc tính `class` | **KHÔNG** — giữ nguyên | Tên CSS class |
-| Thuộc tính `id` | **KHÔNG** — giữ nguyên | Định danh phần tử |
-| Thuộc tính `src` | **KHÔNG** — giữ nguyên | Đường dẫn tài nguyên |
-| Thuộc tính `style` | **KHÔNG** — giữ nguyên | CSS inline |
-| Thuộc tính `data-*` | **KHÔNG** — giữ nguyên | Dữ liệu kỹ thuật |
-| Thuộc tính `alt` (ảnh) | **CÓ** — dịch sang tiếng Việt | Mô tả ảnh cho accessibility |
-| Thuộc tính `title` (tooltip) | **CÓ** — dịch sang tiếng Việt | Tooltip người dùng đọc |
-| Thuộc tính `placeholder` | **CÓ** — dịch sang tiếng Việt | Hướng dẫn nhập liệu |
-| Khối `<style>...</style>` | **KHÔNG** — giữ nguyên toàn bộ | Mã CSS |
-| Logic/định danh trong `<script>...</script>` | **KHÔNG** — giữ nguyên | Hàm, biến, selector, key kỹ thuật |
-| Chuỗi hiển thị trong JavaScript / template literal / JSON UI | **CÓ** — viết tiếng Việt có dấu | Đây là nội dung người dùng nhìn thấy |
-| Tên file trong `href`/`download` | **KHÔNG** — giữ nguyên | Tên file thực trên hệ thống |
-| Comment HTML `<!-- -->` | **KHÔNG** — giữ nguyên | Comment kỹ thuật |
+| Text content (between `>` and `<`) | **YES** — translated into Vietnamese | This is what users read |
+| Tag `<title>` (control document) | **NO** — keep standard English SSOT according to filename | Synchronize with `Tên file / tiêu đề chuẩn` in Portal and avoid losing links when rename |
+| Attribute `href` | **NO** — keep | File path, not content |
+| Attribute `class` | **NO** — keep | CSS class name |
+| Attribute `id` | **NO** — keep | Element identifier |
+| Attribute `src` | **NO** — keep | Resource link |
+| Attribute `style` | **NO** — keep | CSS inline |
+| Attribute `data-*` | **NO** — keep | Technical data |
+| Attribute `alt` (image) | **YES** — translated into Vietnamese | Image description for accessibility |
+| Attribute `title` (tooltip) | **YES** — translated into Vietnamese | User tooltip read |
+| Attribute `placeholder` | **YES** — translated into Vietnamese | Data entry instructions |
+| Block `<style>...</style>` | **NO** — keep all | CSS Code |
+| Logic/identifier in `<script>...</script>` | **NO** — keep | Functions, variables, selectors, technical keys |
+| String displayed in JavaScript / template literal / JSON UI | **YES** — written in Vietnamese with | This is what users see |
+| File name in `href`/`download` | **NO** — keep | The actual file name on the system |
+| Comment HTML `<!-- -->` | **NO** — keep | Technical comments |
 
-### A3. Ví dụ minh họa
+### A3. Illustrative example
 
-**Trước (tiếng Anh):**
+**Previous (English):**
 ```html
 <h2 class="h2">1) Document Control Procedure</h2>
 <p>The document responsible person shall review all changes before release.</p>
@@ -146,7 +146,7 @@ Mọi biểu mẫu eQMS online form (FRM-xxx-SUFFIX) hiển thị **song ngữ**
 </a>
 ```
 
-**Sau (tiếng Việt):**
+**After (Vietnamese):**
 ```html
 <h2 class="h2">1) Quy trình kiểm soát tài liệu</h2>
 <p>Người phụ trách tài liệu phải rà soát tất cả thay đổi trước khi phát hành.</p>
@@ -155,36 +155,36 @@ Mọi biểu mẫu eQMS online form (FRM-xxx-SUFFIX) hiển thị **song ngữ**
 </a>
 ```
 
-**Lưu ý:**
-- `class="h2"` → giữ nguyên
-- `href="../sop-101-document-and-data-control.html"` → giữ nguyên
-- `class="doc-link"` → giữ nguyên
-- `SOP-101` → giữ nguyên (mã tài liệu)
-- Nội dung text → dịch sang tiếng Việt
+**Note:**
+- `class="h2"` → keep it the same
+- `href="../sop-101-document-and-data-control.html"` → keep it the same
+- `class="doc-link"` → keep it the same
+- `SOP-101` → keep (document code)
+- Text content → translated into Vietnamese
 
 ---
 
-## A+. Danh từ riêng nội bộ — TUYỆT ĐỐI KHÔNG dịch
+## A+. Internal proper nouns — ABSOLUTELY NOT translated
 
-> ⚠ Xem chi tiết đầy đủ tại `01-immutable-rules.md` mục B3.
+> ⚠ See full details at `01-immutable-rules.md` section B3.
 
-Các loại tên sau là **danh từ riêng hệ thống** — dịch sẽ phá vỡ liên kết:
+The following types of names are **systemic proper nouns** — translation will break the link:
 
-| Loại | Ví dụ | Lý do không dịch |
+| Type | Example | Reason for not translating |
 |------|-------|------------------|
-| Tên SharePoint Site | `HESEM-Records`, `HESEM-Job-Evidence`, `HESEM-People`, `HESEM-Digital` | Tên định danh site trên M365 |
-| Chủ sở hữu site / security group | `QMS-Owner` | Tên nhóm bảo mật M365 |
-| Tên cột CamelCase | `RecordType`, `StatusCode`, `JobNum`, `CustomerID`, `EvidenceUrl` | Tên cột kỹ thuật trong M365 Lists/Epicor |
-| Tên cột tiếng Việt đặt sẵn | `Người phê duyệt`, `Phiên bản` (khi là tên cột) | Tên cột đã cấu hình trong hệ thống |
-| Tên tài khoản/nhóm | `QMS-Owner`, `HESEM-Admin` | Tên security group |
+| SharePoint Site Name | `HESEM-Records`, `HESEM-Job-Evidence`, `HESEM-People`, `HESEM-Digital` | Site identifier on M365 |
+| Site owner / security group | `QMS-Owner` | M365 security group name |
+| Column name CamelCase | `RecordType`, `StatusCode`, `JobNum`, `CustomerID`, `EvidenceUrl` | Technical column names in M365 Lists/Epicor |
+| Preset Vietnamese column names | `Người phê duyệt`, `Phiên bản` (when column names) | Column name configured in system |
+| Account/group name | `QMS-Owner`, `HESEM-Admin` | Security group name |
 
-**Cách nhận dạng:** Từ viết dạng CamelCase (chữ hoa xen kẽ) → tên cột kỹ thuật → KHÔNG dịch.
+**How to identify:** Words written in CamelCase (alternate capital letters) → technical column name → DO NOT translate.
 
 ---
 
-## B. Quy tắc chi tiết cho từng loại phần tử
+## B. Detailed rules for each element type
 
-### B1. Heading và tiêu đề
+### B1. Heading and title
 
 ```html
 <!-- Dịch nội dung, giữ nguyên class -->
@@ -193,7 +193,7 @@ Các loại tên sau là **danh từ riêng hệ thống** — dịch sẽ phá 
 <h3 class="h3">1.1 Phạm vi áp dụng</h3>
 ```
 
-### B2. Bảng (table)
+### B2. Table
 
 ```html
 <!-- Dịch nội dung ô, giữ nguyên class/id -->
@@ -209,7 +209,7 @@ Các loại tên sau là **danh từ riêng hệ thống** — dịch sẽ phá 
 </table>
 ```
 
-### B3. Thẻ link và download
+### B3. Link and download tags
 
 ```html
 <!-- href giữ nguyên, text hiển thị dịch -->
@@ -221,7 +221,7 @@ Các loại tên sau là **danh từ riêng hệ thống** — dịch sẽ phá 
 ❌ <a href="../FRM-101_So_Dang_Ky_Tai_Lieu.xlsx">
 ```
 
-### B4. Thẻ meta header
+### B4. Meta header tag
 
 ```html
 <div class="meta">
@@ -233,7 +233,7 @@ Các loại tên sau là **danh từ riêng hệ thống** — dịch sẽ phá 
 </div>
 ```
 
-### B5. Note và callout
+### B5. Notes and callouts
 
 ```html
 <div class="note">
@@ -246,35 +246,35 @@ Các loại tên sau là **danh từ riêng hệ thống** — dịch sẽ phá 
 
 ---
 
-## C. Danh sách viết tắt giữ nguyên tiếng Anh
+## C. The list of abbreviations remains in English
 
-### C1. Hệ thống quản lý chất lượng
+### C1. Quality management system
 
-| Viết tắt | Nghĩa đầy đủ | Ghi chú |
+| Abbreviation | Full meaning | Notes |
 |----------|---------------|---------|
-| QMS | Quality Management System | Hệ thống quản lý chất lượng |
-| QA | Quality Assurance | Đảm bảo chất lượng |
-| QC | Quality Control | Kiểm soát chất lượng |
+| QMS | Quality Management System | Quality management system |
+| QA | Quality Assurance | Quality assurance |
+| QC | Quality Control | Quality Control |
 | ISO | International Organization for Standardization | |
 | AS9100D | Aerospace Quality Management System Standard | |
-| PDCA | Plan-Do-Check-Act | Chu trình cải tiến |
+| PDCA | Plan-Do-Check-Act | Improvement cycle |
 
-### C2. Loại tài liệu và mã
+### C2. Document type and code
 
-| Viết tắt | Nghĩa | Dùng trong |
+| Abbreviation | Meaning | Used in |
 |----------|-------|------------|
-| SOP | Standard Operating Procedure | Mã quy trình |
-| WI | Work Instruction | Mã hướng dẫn |
-| FRM | Form | Mã biểu mẫu |
-| ANNEX | Annex / Reference Pack | Mã tài liệu tham chiếu |
-| REC | Record | Mã hồ sơ |
-| RPT | Report | Mã báo cáo |
-| CERT | Certificate | Mã chứng chỉ |
-| DCR | Document Change Request | Yêu cầu thay đổi tài liệu |
+| SOP | Standard Operating Procedures | Process code |
+| WI | Work Instructions | Tutorial code |
+| FRM | Form | Form code |
+| ANNEX | Annex / Reference Pack | Reference document code |
+| REC | Record | Profile code |
+| RPT | Report | Report code |
+| CERT | Certificate | Certificate code |
+| DCR | Document Change Request | Document Change Request |
 
-### C3. Thương mại và chuỗi cung ứng
+### C3. Trade and supply chain
 
-| Viết tắt | Nghĩa |
+| Abbreviation | Meaning |
 |----------|-------|
 | RFQ | Request for Quotation |
 | PO | Purchase Order |
@@ -285,9 +285,9 @@ Các loại tên sau là **danh từ riêng hệ thống** — dịch sẽ phá 
 | BOM | Bill of Materials |
 | Incoterms | International Commercial Terms |
 
-### C4. Chất lượng và đo lường
+### C4. Quality and measurement
 
-| Viết tắt | Nghĩa |
+| Abbreviation | Meaning |
 |----------|-------|
 | NCR | Non-Conformance Report |
 | CAPA | Corrective and Preventive Action |
@@ -303,9 +303,9 @@ Các loại tên sau là **danh từ riêng hệ thống** — dịch sẽ phá 
 | ALCOA | Attributable, Legible, Contemporaneous, Original, Accurate |
 | GR&R | Gage Repeatability & Reproducibility |
 
-### C5. KPI và đo lường hiệu suất
+### C5. KPIs and performance measurement
 
-| Viết tắt | Nghĩa |
+| Abbreviation | Meaning |
 |----------|-------|
 | KPI | Key Performance Indicator |
 | OTD | On-Time Delivery |
@@ -314,9 +314,9 @@ Các loại tên sau là **danh từ riêng hệ thống** — dịch sẽ phá 
 | MTTR | Mean Time to Repair |
 | DPPM | Defective Parts Per Million |
 
-### C6. Kỹ thuật và sản xuất
+### C6. Engineering and manufacturing
 
-| Viết tắt | Nghĩa |
+| Abbreviation | Meaning |
 |----------|-------|
 | CNC | Computer Numerical Control |
 | NC | Numerical Control |
@@ -326,27 +326,27 @@ Các loại tên sau là **danh từ riêng hệ thống** — dịch sẽ phá 
 | 3D | Three-Dimensional |
 | ASME | American Society of Mechanical Engineers |
 | ASTM | American Society for Testing and Materials |
-| SMED | Single-Minute Exchange of Die |
+| SMED | Single-Minute Exchange of Dies |
 | LOTO | Lock Out / Tag Out |
 | GD&T | Geometric Dimensioning & Tolerancing |
 
-### C7. Hệ thống thông tin và quản trị
+### C7. Information systems and management
 
-| Viết tắt | Nghĩa |
+| Abbreviation | Meaning |
 |----------|-------|
 | ERP | Enterprise Resource Planning |
 | MES | Manufacturing Execution System |
 | SSOT | Single Source of Truth |
-| SoR | System of Record |
+| SoR | System of Records |
 | RACI | Responsible, Accountable, Consulted, Informed |
 | RBAC | Role-Based Access Control |
 | PDF | Portable Document Format |
 | M365 | Microsoft 365 |
 | API | Application Programming Interface |
 
-### C8. Quản lý vận hành
+### C8. Operational management
 
-| Viết tắt | Nghĩa |
+| Abbreviation | Meaning |
 |----------|-------|
 | FIFO | First In, First Out |
 | FEFO | First Expired, First Out |
@@ -355,25 +355,25 @@ Các loại tên sau là **danh từ riêng hệ thống** — dịch sẽ phá 
 | SSCC | Serial Shipping Container Code |
 | FOD | Foreign Object Debris/Damage |
 
-### C9. Phiên bản
+### C9. Version
 
-| Viết tắt | Nghĩa |
+| Abbreviation | Meaning |
 |----------|-------|
-| V0 | Revision token theo policy hệ thống; ý nghĩa chi tiết xem `09-versioning-and-workflow.md` |
-| V1, V2, V3... | Revision kế tiếp theo policy ở `09-versioning-and-workflow.md` |
+| V0 | Revision token according to system policy; For detailed meaning, see `09-versioning-and-workflow.md` |
+| V1, V2, V3... | The next revision follows the policy at `09-versioning-and-workflow.md` |
 
-### C10. Hành chính và pháp lý (Việt Nam)
+### C10. Administration and Legal Affairs (Vietnam)
 
-| Viết tắt | Nghĩa |
+| Abbreviation | Meaning |
 |----------|-------|
-| BHXH | Bảo hiểm xã hội |
-| BHYT | Bảo hiểm y tế |
-| BHTN | Bảo hiểm thất nghiệp |
-| PCCC | Phòng cháy chữa cháy |
+| Social insurance | Social insurance |
+| Health insurance | Health insurance |
+| Unemployment insurance | Unemployment insurance |
+| Fire protection | Fire prevention |
 
-### C11. Vật liệu chuyên ngành
+### C11. Specialized materials
 
-| Viết tắt | Nghĩa |
+| Abbreviation | Meaning |
 |----------|-------|
 | PEEK | Polyether Ether Ketone |
 | Vespel | DuPont Vespel polyimide |
@@ -382,248 +382,248 @@ Các loại tên sau là **danh từ riêng hệ thống** — dịch sẽ phá 
 
 ---
 
-## D. Thuật ngữ ngành giữ nguyên tiếng Anh
+## D. Industry terminology remains in English
 
-Các thuật ngữ sau **KHÔNG** dịch khi dùng trong văn bản tiếng Việt vì không có tương đương chính xác hoặc đã trở thành thuật ngữ thông dụng trong ngành:
+The following terms are **NOT** translated when used in Vietnamese documents because they do not have exact equivalents or have become common terms in the industry:
 
-### D1. Sản xuất CNC
+### D1. CNC manufacturing
 
-| Thuật ngữ | Ngữ cảnh sử dụng |
+| Terminology | Context of use |
 |-----------|-------------------|
-| **Setup** | Cài đặt máy, chuẩn bị gia công — "hoàn thành Setup trước khi chạy" |
-| **Traveler** | Phiếu theo dõi công việc di chuyển cùng sản phẩm — "ghi nhận trên Traveler" |
-| **Balloon** | Đánh số đặc tính trên bản vẽ FAI — "Balloon #3 tương ứng kích thước D1" |
+| **Setup** | Setting up the machine, preparing for machining — "complete Setup before running" |
+| **Traveler** | Travel tracking card with product — "recorded on Traveler" |
+| **Balloon** | Feature numbering on FAI drawings — "Balloon #3 corresponds to size D1" |
 
-### D2. Phần mềm và hệ thống
+### D2. Software and systems
 
-| Thuật ngữ | Ngữ cảnh sử dụng |
+| Terminology | Context of use |
 |-----------|-------------------|
-| **Epicor** | Phần mềm ERP — "nhập đơn hàng vào Epicor" |
-| **SharePoint** | Nền tảng lưu trữ tài liệu — "upload lên SharePoint" |
-| **M365** | Microsoft 365 — "cấu hình quyền trên M365" |
-| **Zalo** | Ứng dụng nhắn tin — "thông báo qua Zalo" |
+| **Epicor** | ERP software — "enter orders into Epicor" |
+| **SharePoint** | Document storage platform — "upload to SharePoint" |
+| **M365** | Microsoft 365 — "Configure permissions on M365" |
+| **Zalo** | Messaging application — "notification via Zalo" |
 
-### D3. Phương pháp và mô hình
+### D3. Methods and models
 
-| Thuật ngữ | Ngữ cảnh sử dụng |
+| Terminology | Context of use |
 |-----------|-------------------|
-| **Kaizen** | Cải tiến liên tục — "tổ chức Kaizen event" |
-| **Dreyfus** | Mô hình phát triển năng lực 5 cấp — "đánh giá theo Dreyfus" |
-| **Pareto** | Phân tích 80/20 — "lập biểu đồ Pareto" |
-| **Kolb** | Chu trình học tập — "áp dụng Kolb learning cycle" |
-| **Poka-yoke** | Thiết kế chống lỗi — "áp dụng Poka-yoke tại trạm kiểm tra" |
+| **Kaizen** | Continuous improvement — "organizing Kaizen events" |
+| **Dreyfus** | 5-level capacity development model — "assessment according to Dreyfus" |
+| **Pareto** | 80/20 analysis — "Pareto charting" |
+| **Kolb** | Learning cycle — "applying the Kolb learning cycle" |
+| **Poka-yoke** | Error-proof design — "apply Poka-yoke at the test station" |
 
 ---
 
-## E. Từ điển dịch thuật — Thuật ngữ QMS cốt lõi
+## E. Translation dictionary — Core QMS terminology
 
-### E1. Bảng dịch chuẩn
+### E1. Standard translation table
 
-| Tiếng Anh | Tiếng Việt | Ghi chú |
+| English | Vietnamese | Notes |
 |-----------|------------|---------|
-| document | tài liệu | |
-| record | hồ sơ | danh từ |
-| release | phát hành | tài liệu |
-| approval | phê duyệt | |
-| review | rà soát | |
-| revision | phiên bản | |
-| inspection | kiểm tra | |
-| requirement | yêu cầu | |
-| evidence | bằng chứng | |
-| compliance | tuân thủ | |
-| deviation | sai lệch | |
-| traceability | truy xuất nguồn gốc | |
-| calibration | hiệu chuẩn | |
-| competence | năng lực | |
-| training | đào tạo | |
-| production | sản xuất | |
-| quality | chất lượng | |
-| customer | khách hàng | |
-| supplier | nhà cung cấp | |
-| complaint | khiếu nại | |
-| incident | sự cố | |
-| equipment | thiết bị | |
-| maintenance | bảo trì | |
-| material | nguyên vật liệu | |
-| measurement | đo lường | |
-| warehouse | kho | |
-| delivery | giao hàng | |
-| packaging | đóng gói | |
-| operation | vận hành | |
-| workshop | phân xưởng | |
-| form | biểu mẫu | |
-| checklist | bảng kiểm | |
-| engineering | kỹ thuật | |
-| department | phòng ban | |
-| scrap | phế phẩm | |
-| rework | làm lại | |
-| recall | thu hồi | |
-| containment | ngăn chặn | |
-| finding | phát hiện | |
-| obsolete | hết hiệu lực | |
-| superseded | được thay thế | |
-| retention | lưu giữ | |
-| register | sổ đăng ký | |
-| input | đầu vào | |
-| output | đầu ra | |
+| document | documents | |
+| records | profile | noun |
+| release | release | documents |
+| approval | approval | |
+| review | review | |
+| revision | version | |
+| inspection | check | |
+| requirement | request | |
+| evidence | evidence | |
+| compliance | compliance | |
+| deviation | deviation | |
+| traceability | traceability | |
+| calibration | calibration | |
+| competence | capacity | |
+| training | training | |
+| production | production | |
+| quality | quality | |
+| customer | customers | |
+| suppliers | supplier | |
+| complaint | complaints | |
+| incident | incident | |
+| equipment | equipment | |
+| maintenance | maintenance | |
+| material | raw materials | |
+| measurement | measurement | |
+| warehouse | warehouse | |
+| delivery | delivery | |
+| packaging | packaging | |
+| operation | operate | |
+| workshop | workshop | |
+| form | form | |
+| checklist | checklist | |
+| engineering | technical | |
+| department | departments | |
+| scrap | waste products | |
+| rework | remake | |
+| recall | recall | |
+| containment | prevent | |
+| finding | detect | |
+| obsolete | expired | |
+| superseded | replaced | |
+| retention | keep | |
+| register | register | |
+| input | input | |
+| output | output | |
 
-### E2. Chức danh và vai trò
+### E2. Title and role
 
-Chức danh JD không đi theo rule dịch thuật thông thường. Phải áp dụng:
-- JD title chuẩn giữ bằng tiếng Anh;
-- header/RACI/owner/approver dùng role code rút gọn có link JD;
-- các hat như `QMR`, `Document Controller`, `Lead Auditor`, `CI Lead`, `Product Safety Officer`, `Incident Commander` không đứng độc lập, mà phải gắn lên host role thật;
-- không dùng nửa Anh nửa Việt kiểu `QA Lead`, `Customer Dịch vụ`, `Production Engineer-IE`, `Governance viên hệ thống Epicor`.
+The title JD does not follow normal translation rules. Must apply:
+- Standard JD title kept in English;
+- header/RACI/owner/approver uses shortened role code with JD link;
+- Hats like `QMR`, `Document Controller`, `Lead Auditor`, `CI Lead`, `Product Safety Officer`, `Incident Commander` do not stand alone, but must be attached to the actual host role;
+- Do not use half English and half Vietnamese like `QA Lead`, `Customer Dịch vụ`, `Production Engineer-IE`, `Governance viên hệ thống Epicor`.
 
-| Tiếng Anh | Tiếng Việt |
+| English | Vietnamese |
 |-----------|------------|
-| General Director | Tổng Giám đốc |
-| Production Director | Giám đốc Sản xuất |
-| Document Responsible Person | Người phụ trách tài liệu |
-| Team Leader | Tổ trưởng |
-| Shift Leader | Trưởng ca |
-| Cell Leader | Tổ trưởng |
-| Foreman | Quản đốc |
-| Operator | Người vận hành |
-| Inspector | Người kiểm tra |
-| Approver | Người phê duyệt |
-| Reviewer | Người rà soát |
-| Author | Người soạn |
-| Performer | Người thực hiện |
-| Specialist | Chuyên viên |
-| Worker | Công nhân |
-| Administrator | Quản trị viên |
+| General Director | General Director |
+| Production Director | Production Director |
+| Document Responsible Person | Document manager |
+| Team Leader | Team leader |
+| Shift Leader | Head of shift |
+| Cell Leader | Team leader |
+| Foreman | Foreman |
+| Operator | Operator |
+| Inspector | Tester |
+| Approver | Approver |
+| Reviewer | Reviewer |
+| Author | Editor |
+| Performer | Implementer |
+| Specialist | Expert |
+| Workers | Workers |
+| Admin | Admin |
 
-### E3. Phòng ban
+### E3. Departments
 
-| Tiếng Anh | Tiếng Việt |
+| English | Vietnamese |
 |-----------|------------|
-| Quality Department | Phòng Chất lượng |
-| Engineering Department | Phòng Kỹ thuật |
-| Production Department | Phòng Sản xuất |
-| Supply Chain | Chuỗi cung ứng |
-| Finance Department | Phòng Tài chính |
-| HR Department | Phòng Nhân sự |
-| EHS Department | Phòng An toàn – Sức khỏe – Môi trường |
+| Quality Department | Quality Department |
+| Engineering Department | Technical Department |
+| Production Department | Production Department |
+| Supply Chain | Supply Chain |
+| Finance Department | Finance Department |
+| HR Department | Human Resources Department |
+| EHS Department | Department of Safety - Health - Environment |
 
-### E4. Cụm từ thường gặp
+### E4. Common phrases
 
-| Tiếng Anh | Tiếng Việt |
+| English | Vietnamese |
 |-----------|------------|
-| point-of-use | điểm sử dụng |
-| cross-review | rà soát chéo |
-| hold point | điểm chặn |
-| control gate | cổng kiểm soát |
-| controlled copy | bản kiểm soát |
-| master copy | bản gốc |
-| release copy | bản phát hành |
-| job dossier | hồ sơ công việc |
-| readiness level | mức sẵn sàng |
-| lead department | bộ phận chủ trì |
-| internal audit | đánh giá nội bộ |
-| management review | xem xét của lãnh đạo |
-| continual improvement | cải tiến liên tục |
-| change control | kiểm soát thay đổi |
-| control plan | kế hoạch kiểm soát |
-| setup sheet | phiếu cài đặt |
-| tool list | danh sách dao cụ |
-| lessons learned | bài học kinh nghiệm |
-| production line | dây chuyền sản xuất |
-| tracking register | bảng theo dõi |
-| audit trail | dấu vết kiểm toán |
-| mandatory hold point | điểm dừng bắt buộc |
-| emergency release | phát hành khẩn cấp |
-| legal hold | giữ pháp lý |
-| wrong revision | sai phiên bản |
-| related documents | tài liệu liên quan |
-| revision history | lịch sử sửa đổi |
-| responsible person | người phụ trách |
-| Per issuance decision | Theo quyết định ban hành |
+| point-of-use | point of use |
+| cross-review | cross review |
+| holding points | intercept point |
+| control gate | control port |
+| controlled copy | control version |
+| master copy | original |
+| release copy | release |
+| job dossier | job profile |
+| readiness level | readiness level |
+| lead department | presiding department |
+| internal audit | internal assessment |
+| management review | leadership review |
+| continuous improvement | continuous improvement |
+| change control | change control |
+| control plan | control plan |
+| setup sheet | installation sheet |
+| tool list | tool list |
+| lessons learned | Lessons learned |
+| production line | production line |
+| tracking register | tracking table |
+| audit trail | audit trail |
+| mandatory holding points | forced stop |
+| emergency release | emergency release |
+| legal hold | keep legal |
+| wrong revision | wrong version |
+| related documents | Related documents |
+| revision history | revision history |
+| responsible person | person in charge |
+| Per issuance decision | According to the decision issued |
 
 ---
 
-## F. Từ đa nghĩa — Dịch theo ngữ cảnh
+## F. Polysemous words — Translated according to context
 
-Một số từ tiếng Anh có nhiều nghĩa tiếng Việt tùy ngữ cảnh. **PHẢI** chọn đúng nghĩa:
+Some English words have multiple Vietnamese meanings depending on the context. **MUST** choose the correct meaning:
 
 ### F1. "process"
 
-| Ngữ cảnh | Dịch | Ví dụ |
+| Context | Translate | Example |
 |-----------|------|-------|
-| Danh từ (quy trình) | **quy trình** | "the manufacturing process" → "quy trình sản xuất" |
-| Động từ (xử lý) | **xử lý** | "process the order" → "xử lý đơn hàng" |
-| Danh từ (quá trình) | **quá trình** | "the audit process" → "quá trình đánh giá" |
+| Noun (process) | **process** | "the manufacturing process" → "production process" |
+| Verb (process) | **processing** | "process the order" → "process the order" |
+| Noun (process) | **process** | "the audit process" → "assessment process" |
 
 ### F2. "release"
 
-| Ngữ cảnh | Dịch | Ví dụ |
+| Context | Translate | Example |
 |-----------|------|-------|
-| Tài liệu | **phát hành** | "release the document" → "phát hành tài liệu" |
-| Sản phẩm tạm giữ | **giải phóng** | "release from hold" → "giải phóng khỏi tạm giữ" |
-| Lô hàng | **cho xuất** | "release for shipment" → "cho xuất hàng" |
+| Documents | **release** | "release the document" → "release the document" |
+| Products on hold | **liberation** | "release from hold" → "release from hold" |
+| Shipment | **for export** | "release for shipment" → "release for shipment" |
 
 ### F3. "record"
 
-| Ngữ cảnh | Dịch | Ví dụ |
+| Context | Translate | Example |
 |-----------|------|-------|
-| Danh từ | **hồ sơ** | "quality records" → "hồ sơ chất lượng" |
-| Động từ | **ghi nhận** | "record the result" → "ghi nhận kết quả" |
+| Noun | **profile** | "quality records" → "quality records" |
+| Verb | **noted** | "record the result" → "record the result" |
 
 ### F4. "hold"
 
-| Ngữ cảnh | Dịch | Ví dụ |
+| Context | Translate | Example |
 |-----------|------|-------|
-| QMS (tạm giữ sản phẩm) | **tạm giữ** | "put on hold" → "đưa vào tạm giữ" |
-| Hold point (điểm chặn) | **điểm chặn** | "mandatory hold point" → "điểm chặn bắt buộc" |
-| Legal hold | **giữ pháp lý** | "legal hold" → "giữ pháp lý" |
+| QMS (product hold) | **on hold** | "put on hold" → "put on hold" |
+| Hold point | **intercept** | "mandatory hold point" → "mandatory hold point" |
+| Legal holds | **legal hold** | "legal hold" → "legal hold" |
 
 ### F5. "control"
 
-| Ngữ cảnh | Dịch | Ví dụ |
+| Context | Translate | Example |
 |-----------|------|-------|
-| Kiểm soát (quản lý) | **kiểm soát** | "document control" → "kiểm soát tài liệu" |
-| Điều khiển (máy) | **điều khiển** | "CNC control" → "điều khiển CNC" |
-| Kiểm tra (gate) | **kiểm soát** | "control gate" → "cổng kiểm soát" |
+| Control (management) | **control** | "document control" → "document control" |
+| Control (machine) | **control** | "CNC control" → "CNC control" |
+| Check (gate) | **control** | "control gate" → "control gate" |
 
 ### F6. "review"
 
-| Ngữ cảnh | Dịch | Ví dụ |
+| Context | Translate | Example |
 |-----------|------|-------|
-| Rà soát (tài liệu) | **rà soát** | "peer review" → "rà soát chéo" |
-| Xem xét (lãnh đạo) | **xem xét** | "management review" → "xem xét của lãnh đạo" |
-| Đánh giá (hiệu suất) | **đánh giá** | "performance review" → "đánh giá hiệu suất" |
+| Review (document) | **review** | "peer review" → "cross review" |
+| Review (leadership) | **review** | "management review" → "management review" |
+| Evaluation (performance) | **review** | "performance review" → "performance review" |
 
 ### F7. "audit"
 
-| Ngữ cảnh | Dịch | Ví dụ |
+| Context | Translate | Example |
 |-----------|------|-------|
-| Đánh giá (nội bộ/bên ngoài) | **đánh giá** | "internal audit" → "đánh giá nội bộ" |
-| Kiểm toán (tài chính) | **kiểm toán** | "financial audit" → "kiểm toán tài chính" |
-| Rà soát (dữ liệu) | **rà soát** | "audit trail" → "dấu vết kiểm toán" |
+| Evaluation (internal/external) | **review** | "internal audit" → "internal audit" |
+| Audit (finance) | **audit** | "financial audit" → "financial audit" |
+| Review (data) | **review** | "audit trail" → "audit trail" |
 
 ### F8. "verify" vs "validate"
 
-| Từ | Dịch | Nghĩa |
+| From | Translate | Meaning |
 |----|------|-------|
-| verify | **xác minh** | Xác nhận đúng yêu cầu đã định (kiểm tra theo spec) |
-| validate | **xác nhận giá trị sử dụng** | Xác nhận đáp ứng nhu cầu thực tế (dùng được thật) |
+| verify | **verification** | Confirm the correct requirements (check according to spec) |
+| validate | **validation confirmed** | Confirmed to meet actual needs (can be used for real) |
 
 ---
 
-## G. Công cụ dịch tự động
+## G. Automatic translation tool
 
-### G2. Engine chính: `context_translate_engine.py`
+### G2. Main engine: `context_translate_engine.py`
 
-**Vị trí:** `tools/engines/context_translate_engine.py`
+**Location:** `tools/engines/context_translate_engine.py`
 
-**Chức năng:**
-- Dịch text node trong file HTML từ tiếng Anh sang tiếng Việt
-- Chỉ dịch nội dung text — không động đến HTML tag, thuộc tính, CSS, JS
-- Dùng thuật toán longest-match-first để xử lý cụm từ nhiều từ
-- Tôn trọng danh sách viết tắt (giữ nguyên tiếng Anh)
-- Load từ điển từ file Excel
+**Function:**
+- Translate text nodes in HTML files from English to Vietnamese
+- Only translate text content — do not touch HTML tags, attributes, CSS, JS
+- Use the longest-match-first algorithm to handle multi-word phrases
+- Respect the list of abbreviations (keep the English intact)
+- Load dictionary from Excel file
 
-**Cách chạy:**
+**How to run:**
 ```bash
 # Dịch một file
 python tools/engines/context_translate_engine.py path/to/file.html
@@ -632,22 +632,22 @@ python tools/engines/context_translate_engine.py path/to/file.html
 python tools/engines/context_translate_engine.py "03-Tai-Lieu-Van-Hanh/01-SOPs/**/*.html"
 ```
 
-**Thứ tự ưu tiên từ điển:**
-1. `CORE_DICT` — từ điển cốt lõi trong code (ưu tiên cao nhất)
-2. `tools/data/qms-terminology-dictionary.xlsx` — từ điển thuật ngữ QMS
-3. `tools/data/remaining-english-words.xlsx` — danh sách từ bổ sung (5008 entries)
+**Dictionary priority:**
+1. `CORE_DICT` — core dictionary in the code (highest priority)
+2. `tools/data/qms-terminology-dictionary.xlsx` — QMS glossary of terms
+3. `tools/data/remaining-english-words.xlsx` — additional word list (5008 entries)
 
-### G3. File từ điển
+### G3. Dictionary file
 
-| File | Vị trí | Mô tả | Số lượng |
+| File | Location | Description | Quantity |
 |------|--------|-------|---------|
-| `qms-terminology-dictionary.xlsx` | `tools/data/` | Từ điển thuật ngữ QMS chính | ~200+ entries |
-| `remaining-english-words.xlsx` | `tools/data/` | Danh sách từ tiếng Anh cần dịch | 5008 entries |
-| `remaining-english-words-v2.xlsx` | `tools/data/` | Phiên bản cập nhật | Cập nhật |
+| `qms-terminology-dictionary.xlsx` | `tools/data/` | Key QMS Glossary | ~200+ entries |
+| `remaining-english-words.xlsx` | `tools/data/` | List of English words that need to be translated | 5008 entries |
+| `remaining-english-words-v2.xlsx` | `tools/data/` | Updated version | Update |
 
-### G4. Danh sách viết tắt giữ nguyên (trong engine)
+### G4. List of abbreviations remains the same (in engine)
 
-Engine tự động nhận diện và bỏ qua các viết tắt sau (trích từ `KEEP_ENGLISH` set):
+Engine automatically recognizes and ignores the following abbreviations (excerpt from `KEEP_ENGLISH` set):
 
 ```
 QMS, QA, QC, IT, HR, EHS, ENG, PRO, PUR, WHS, MNT, SAL, FIN, HSE,
@@ -663,93 +663,93 @@ ERP, MES, TIMWOODS, SBAR, SSCC, YYYYMMDD
 
 ---
 
-## H. Quy tắc phong cách viết
+## Q. Writing style rules
 
-### H0. Tiếng Việt BẮT BUỘC có dấu đầy đủ
+### H0. Vietnamese language MUST have full accents
 
-> ⚠ **QUY TẮC BẮT BUỘC:** Mọi nội dung tiếng Việt trong tài liệu **PHẢI** có dấu đầy đủ, chính xác.
+> ⚠ **MANDATORY RULES:** All Vietnamese content in the document **MUST** be fully and accurately marked.
 
-- **KHÔNG** viết tiếng Việt không dấu: ~~"Kiem tra chat luong"~~ → ✅ "Kiểm tra chất lượng"
-- **KHÔNG** viết thiếu dấu: ~~"Kiêm tra"~~ → ✅ "Kiểm tra"
-- **KHÔNG** viết sai dấu: ~~"Kiểm trà"~~ → ✅ "Kiểm tra"
-- Áp dụng cho: tiêu đề, nội dung, bảng, ghi chú, tooltip, alt text — mọi nơi hiển thị tiếng Việt
-- Ngoại lệ DUY NHẤT: viết tắt tiếng Anh (SOP, NCR, CAPA...) và danh từ riêng
+- **DO NOT** write Vietnamese without diacritics: ~~"Check chat quantity"~~ → ✅ "Check quality"
+- **DO NOT** write without punctuation: ~~"Check"~~ → ✅ "Check"
+- **DO NOT** write the wrong diacritics: ~~"Check the tea"~~ → ✅ "Check"
+- Applies to: titles, content, tables, notes, tooltips, alt text — everywhere Vietnamese is displayed
+- ONLY exceptions: English abbreviations (SOP, NCR, CAPA...) and proper nouns
 
-### H0.1 Danh từ riêng — KHÔNG dịch
+### H0.1 Proper nouns — DO NOT translate
 
-> ⚠ Xem danh sách đầy đủ tại `01-immutable-rules.md` mục B3.
+> ⚠ See the full list at `01-immutable-rules.md` section B3.
 
-Danh từ riêng là tên **định danh duy nhất** trong hệ thống. Dịch sẽ phá vỡ liên kết.
+A proper noun is a **unique identifier** in the system. Translation will break the link.
 
-| Loại | Ví dụ | Quy tắc |
+| Type | Example | Rules |
 |------|-------|---------|
-| Tên SharePoint Site | `HESEM-Records`, `HESEM-Job-Evidence`, `HESEM-People`, `HESEM-Digital` | Giữ nguyên 100% |
-| Tên chủ sở hữu | `QMS-Owner` | Giữ nguyên 100% |
-| Tên cột CamelCase | `RecordType`, `JobNum`, `CustomerID` | Giữ nguyên 100% |
-| Tên cột VN đặt sẵn | `Người phê duyệt`, `Phiên bản` (khi là tên cột) | Giữ nguyên 100% |
-| Tên thương hiệu | Epicor, Epicor Kinetic, SharePoint, M365, Microsoft 365, HESEM | Giữ nguyên 100% |
-| Tên phần mềm/hệ thống | Entra ID, Power Automate, Power BI, Azure | Giữ nguyên 100% |
+| SharePoint Site Name | `HESEM-Records`, `HESEM-Job-Evidence`, `HESEM-People`, `HESEM-Digital` | Keep it 100% |
+| Owner name | `QMS-Owner` | Keep it 100% |
+| Column name CamelCase | `RecordType`, `JobNum`, `CustomerID` | Keep it 100% |
+| Preset VN column name | `Người phê duyệt`, `Phiên bản` (when column names) | Keep it 100% |
+| Brand name | Epicor, Epicor Kinetic, SharePoint, M365, Microsoft 365, HESEM | Keep it 100% |
+| Software/system name | Entra ID, Power Automate, Power BI, Azure | Keep it 100% |
 
-**Cách nhận dạng danh từ riêng:**
-1. Viết CamelCase (chữ hoa xen kẽ) → tên cột kỹ thuật
-2. Có tiền tố `HESEM-` → tên site/nhóm
-3. Kết thúc bằng `ID`, `Num`, `Date`, `Code`, `Type`, `Status`, `Url` → tên cột
-4. Là tên sản phẩm/thương hiệu → danh từ riêng
+**How to identify proper nouns:**
+1. Write CamelCase (alternate capital letters) → technical column name
+2. Has the prefix `HESEM-` → site/group name
+3. End with `ID`, `Num`, `Date`, `Code`, `Type`, `Status`, `Url` → column name
+4. Is a product/brand name → proper noun
 
-### H1. Giọng văn
+### H1. Voice
 
-- **Ngắn gọn:** Mỗi câu tối đa 25-30 từ. Câu dài hơn phải tách.
-- **Chủ động:** "Người vận hành kiểm tra áp suất" thay vì "Áp suất được kiểm tra bởi người vận hành"
-- **Cụ thể:** "Kiểm tra 3 điểm: đường kính, độ sâu, độ nhám" thay vì "Kiểm tra các thông số"
-- **Thực chiến:** Viết để người nhà máy đọc hiểu ngay, không cần giải thích thêm
+- **Brief:** Each sentence has a maximum of 25-30 words. Longer sentences must be separated.
+- **Active:** "Operator checks pressure" instead of "Pressure is checked by operator"
+- **Specifically:** "Check 3 points: diameter, depth, roughness" instead of "Check parameters"
+- **Actual combat:** Write so that factory people can read and understand immediately, no need for further explanation
 
-### H2. Quy tắc viết hoa
+### H2. Capitalization rules
 
-| Đối tượng | Quy tắc | Ví dụ |
+| Object | Rules | Example |
 |-----------|---------|-------|
-| Tên phòng ban | Viết hoa | Phòng Chất lượng, Phòng Sản xuất |
-| Chức danh | Viết hoa | Tổng Giám đốc, Trưởng ca |
-| Viết tắt | Viết hoa toàn bộ | SOP, WI, NCR, CAPA |
-| Mã tài liệu | Giữ nguyên format | SOP-101, WI-201, FRM-301 |
-| Tên phần mềm | Viết hoa chữ cái đầu | Epicor, SharePoint |
+| Department name | Capitalization | Quality Department, Production Department |
+| Job title | Capitalization | General Director, Shift Manager |
+| Abbreviation | All caps | SOP, WI, NCR, CAPA |
+| Document code | Keep the format | SOP-101, WI-201, FRM-301 |
+| Software name | Capitalize the first letter | Epicor, SharePoint |
 
-### H3. Dấu câu và format
+### H3. Punctuation and formatting
 
-- Dùng dấu `—` (em dash) thay `–` (en dash) khi nối mệnh đề
-- Danh sách dùng `•` hoặc `-`
-- Số thứ tự: `1)`, `2)`, `3)` cho heading; `a)`, `b)`, `c)` cho sub-item
-- Ngày tháng: `DD/MM/YYYY` hoặc `YYYY-MM-DD` (theo ngữ cảnh)
-- Số: dùng dấu chấm cho phần thập phân (`3.14`), dấu phẩy cho phân cách hàng nghìn (`1,000`)
-
----
-
-## I. Kiểm tra sau dịch
-
-Sau khi dịch hoặc biên tập, kiểm tra:
-
-- [ ] Tất cả thuộc tính HTML (href, class, id, src) giữ nguyên tiếng Anh
-- [ ] Tất cả tên file trong link giữ nguyên
-- [ ] CSS và JS không bị dịch
-- [ ] Viết tắt giữ nguyên tiếng Anh
-- [ ] Mã tài liệu giữ nguyên (SOP-101, WI-201...)
-- [ ] Từ đa nghĩa dịch đúng ngữ cảnh
-- [ ] Thuật ngữ ngành giữ nguyên (Setup, Traveler, Balloon, Epicor...)
-- [ ] Giọng văn ngắn, rõ, thực chiến
-- [ ] Không có meta text hoặc ghi chú "AI generated"
-- [ ] Encoding UTF-8, hiển thị đúng dấu tiếng Việt
+- Use `—` (em dash) instead of `–` (en dash) when connecting clauses
+- List using `•` or `-`
+- Ordinal numbers: `1)`, `2)`, `3)` for heading; `a)`, `b)`, `c)` for sub-item
+- Date: `DD/MM/YYYY` or `YYYY-MM-DD` (depending on context)
+- Numbers: use dots for decimals (`3.14`), commas for thousands separators (`1,000`)
 
 ---
 
-> **Cập nhật lần cuối:** 2026-04-01
-> **Áp dụng:** Toàn bộ tài liệu QMS — HESEM ENGINEERING
+## I. Post-translation inspection
+
+After translating or editing, check:
+
+- [ ] All HTML attributes (href, class, id, src) remain in English
+- [ ] All file names in the link remain the same
+- [ ] CSS and JS are not translated
+- [ ] Abbreviations remain in English
+- [ ] Document code remains the same (SOP-101, WI-201...)
+- [ ] Polysemous words translated in the correct context
+- [ ] Industry terminology remains the same (Setup, Traveler, Balloon, Epicor...)
+- [ ] The tone is short, clear, realistic
+- [ ] No meta text or "AI generated" note
+- [ ] Encoding UTF-8, displays Vietnamese accents correctly
 
 ---
 
-## J. Quy tắc khóa: Tiếng Việt frontend phải có dấu
+> **Last updated:** 2026-04-01
+> **Applies:** Complete QMS documentation — HESEM ENGINEERING
+
+---
+
+## J. Locking rule: Vietnamese frontend must have accents
 
 <!-- FRONTEND-VI-DIACRITICS-RULE -->
 
-- Áp dụng bắt buộc cho mọi chuỗi hiển thị trên frontend: `01-QMS-Portal/portal.html`, `01-QMS-Portal/index.html`, `01-QMS-Portal/scripts/portal/*.js`, form runtime, dashboard, modal, toast, tooltip, placeholder.
-- Nghiêm cấm đưa chuỗi tiếng Việt không dấu lên UI ở bất kỳ trạng thái nào (kể cả demo, fallback, seed data, hay bản nháp).
-- Nếu chuỗi là tiếng Việt thì phải viết đúng chính tả và đầy đủ dấu Unicode (UTF-8/NFC).
-- Chỉ ngoại lệ cho mã kỹ thuật, route, slug, biến, class/id, và các từ tiếng Anh thuộc danh sách giữ nguyên đã khóa.
+- Mandatory application for all strings displayed on the frontend: `01-QMS-Portal/portal.html`, `01-QMS-Portal/index.html`, `01-QMS-Portal/scripts/portal/*.js`, form runtime, dashboard, modal, toast, tooltip, placeholder.
+- It is strictly forbidden to put unsigned Vietnamese strings on the UI in any state (including demo, fallback, seed data, or draft).
+- If the string is in Vietnamese, it must be spelled correctly and have full Unicode markings (UTF-8/NFC).
+- Exceptions are only for technical codes, routes, slugs, variables, class/id, and English words in the locked retention list.

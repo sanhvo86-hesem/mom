@@ -1,18 +1,18 @@
 # Job-Order CNC Department Boundary Model
 
-> Mục đích: tài liệu tham chiếu để nghiên cứu và chốt ranh giới phòng ban/phan hệ trước khi sửa handbook, SOP, ANNEX hoặc JD.
+> Purpose: reference document to research and finalize department/system boundaries before editing handbooks, SOPs, ANNEX or JD.
 
-## 1. Cách dùng tài liệu này
+## 1. How to use this document
 
-Tài liệu này không phải SOP. Nó là reference model để người viết:
-- hiểu cấu trúc phòng ban phổ biến của mô hình `job-order CNC`;
-- đối chiếu với HESEM hiện tại;
-- phát hiện coverage gap;
-- tránh cập nhật cơ học khi chuẩn hóa `department code`.
+This document is not an SOP. It is a reference model for writers to:
+- understand the common departmental structure of the `job-order CNC` model;
+- compare with current HESEM;
+- detect coverage gap;
+- avoid mechanical updates when normalizing `department code`.
 
-## 2. Nguồn tham chiếu quốc tế đã dùng
+## 2. International reference sources used
 
-Các nguồn dưới đây không phải “luật bắt buộc” cho HESEM. Chúng được dùng để suy luận mô hình vận hành phổ biến và ranh giới chức năng thường thấy của job shop / job-order manufacturing:
+The resources below are not “mandatory laws” for HESEM. They are used to infer common operating models and typical functional boundaries of job shop / job-order manufacturing:
 
 - ProShop ERP — [Sales & Work Orders](https://proshoperp.com/product/sales-work-order-process/)
 - ProShop ERP — [Modules / Estimating & Quoting / Quality Systems Management & Inspection](https://proshoperp.com/proshop-modules/)
@@ -26,13 +26,13 @@ Các nguồn dưới đây không phải “luật bắt buộc” cho HESEM. Ch
 - APQC — [Applying the PCF for Business Value](https://www.apqc.org/sites/default/files/files/PCF%20Collateral/Applying%20the%20PCF%20for%20Business%20Value%20-%20FINAL.pdf)
 - APQC — [Manage Financial Resources](https://www.apqc.org/sites/default/files/K04087_8.0_Manage_Financial_Resources.pdf)
 - APQC — [HCM Organization Measure List](https://www.apqc.org/sites/default/files/osb/297%20-%20HCM%20Organization%20Measure%20List.pdf)
-- APQC — [Information Technology Measure List](https://www.apqc.org/sites/default/files/osb/299%20-%20Information%20Technology%20Measure%20List.pdf)
+- APQC — [Information Technology Measurement List](https://www.apqc.org/sites/default/files/osb/299%20-%20Information%20Technology%20Measure%20List.pdf)
 
-## 3. Nhận định rút ra từ benchmark
+## 3. Comments drawn from benchmarks
 
-### 3.1 Ranh giới thường thấy
+### 3.1 Common boundaries
 
-Mô hình job-order CNC quốc tế gần như luôn tách rõ:
+The international CNC job-order model almost always clearly separates:
 - Sales / Customer Service / Estimating
 - Engineering / Routing / Programming / Release
 - Production Planning and Control
@@ -42,79 +42,79 @@ Mô hình job-order CNC quốc tế gần như luôn tách rõ:
 - Finance / Costing / Invoicing / AR-AP
 - HR / Competence / Onboarding-Offboarding
 - IT / Digital Platform / Access / Backup
-- ERP or Business System Administration khi hệ thống đủ lớn để tách khỏi IT hạ tầng
+- ERP or Business System Administration when the system is large enough to be separated from IT infrastructure
 
-### 3.2 Điểm nhất quán nổi bật
+### 3.2 Outstanding consistency
 
-- `Work Order` và `Routing` luôn tách planning/engineering khỏi execution.
-- `Job Card` hoặc lệnh công đoạn luôn đặt trọng tâm ở tuyến hiện trường thay vì dồn hết cho một “quản lý chung”.
-- `Quality Inspection` luôn là lớp độc lập với production execution.
-- purchasing / receiving / stock / shipping là các điểm handoff khác nhau, không nên gom thành “kho” chung chung.
-- ERP/business system administration thường không được phép tự sở hữu logic nghiệp vụ; họ cấu hình và bảo vệ transaction integrity, còn process owner giữ quyết định nghiệp vụ.
+- `Work Order` and `Routing` always separate planning/engineering from execution.
+- `Job Card` or stage orders always focus on the field line instead of putting it all under one "general management".
+- `Quality Inspection` is always a class independent of production execution.
+- purchasing / receiving / stock / shipping are different handoff points, should not be grouped into a general "warehouse".
+- ERP/business system administration is usually not allowed to own business logic; They configure and protect transaction integrity, while the process owner keeps the business decisions.
 
-### 3.3 Suy luận áp dụng cho HESEM
+### 3.3 Inference applied to HESEM
 
-Từ các nguồn trên, mô hình phù hợp cho HESEM là:
+From the above sources, the suitable model for HESEM is:
 - department layer: `D-SCS`, `D-ENG`, `D-PROD`, `D-QUAL`, `D-SCM`, `D-FIN`, `D-HR`, `D-EHS`, `D-IT`
 - subfunction layer: `D-PPC`, `D-PUR`, `D-WHS`, `D-TCR`, `D-LOG`, `D-ERP`
 
-Đây là suy luận vận hành từ benchmark và tài liệu nội bộ, không phải trích nguyên văn từ bất kỳ nguồn nào.
+This is an operational inference from benchmarks and internal documents, not a verbatim quote from any source.
 
-### 3.4 Ý nghĩa ranh giới theo từng phòng ban
+### 3.4 Meaning of boundaries according to each department
 
-- `D-SCS`: giữ giao tiếp khách hàng, RFQ clarity, quote assumptions, contract review và change log đối ngoại. Không được che quyết định kỹ thuật, chất lượng, lead time vật tư hoặc finance approval bằng câu chữ thương mại.
-- `D-ENG`: giữ feasibility kỹ thuật, routing, process design, CAM/program release và baseline engineering package. Không thay production dispatch, quality release hay cam kết commercial.
-- `D-PROD`: giữ execution tại hiện trường, readiness, dispatch, work transfer, recovery và resource use thật tại xưởng. Không thay engineering release hoặc quality disposition.
-- `D-QUAL`: giữ inspection independence, metrology discipline, product release, NCR/CAPA, audit-system mechanics và quality evidence. Không được hấp thụ execution của sản xuất chỉ vì muốn “tiện”.
-- `D-SCM`: giữ sourcing, receiving, warehouse integrity, tool crib, shipping handoff và traceability vật tư/logistics. Không thay QA trong quality disposition hoặc Engineering trong lựa chọn process.
-- `D-FIN`: giữ invoicing, AR/AP, close, costing và kiểm soát tài chính. Trong mô hình job-order, cost accounting là lớp công việc thật chứ không phải báo cáo trang trí; nếu chưa có JD riêng thì handbook phải nêu rõ ai đang giữ tạm.
-- `D-HR`: giữ manpower coordination, onboarding/offboarding, training administration, skills matrix và hồ sơ lao động. Sign-off năng lực kỹ thuật luôn phải quay về role quyết định của phòng chức năng tiếp nhận.
-- `D-EHS`: giữ hazard system, permit discipline, incident learning và emergency readiness. Stop-work có thể xảy ra tại nguồn, nhưng plant-wide shutdown/restart vẫn phải theo thẩm quyền đã công bố.
-- `D-IT`: giữ endpoint, network, identity, backup, platform support và recovery ở lớp hạ tầng. Không tự sở hữu nội dung dữ liệu nghiệp vụ hoặc logic giao dịch ERP.
+- `D-SCS`: maintain customer communication, RFQ clarity, quote assumptions, contract review and external change log. Do not cover technical decisions, quality, material lead time or financial approval with commercial language.
+- `D-ENG`: holds technical considerations, routing, process design, CAM/program release and baseline engineering package. Do not replace production dispatch, quality release or commercial commitments.
+- `D-PROD`: keep execution on site, readiness, dispatch, work transfer, recovery and real resource use at the factory. Do not change engineering release or quality disposition.
+- `D-QUAL`: keep inspection independence, metrology discipline, product release, NCR/CAPA, audit-system mechanics and quality evidence. Don't absorb the execution of production just for the sake of "convenience".
+- `D-SCM`: keep sourcing, receiving, warehouse integrity, tool crib, shipping handoff and materials/logistics traceability. Do not replace QA in quality disposition or Engineering in process selection.
+- `D-FIN`: holds invoicing, AR/AP, closing, costing and financial control. In the job-order model, cost accounting is a real job class, not a decorative report; If you do not have your own JD, the handbook must clearly state who is holding it temporarily.
+- `D-HR`: keeps manpower coordination, onboarding/offboarding, training administration, skills matrix and labor records. Sign-off technical capacity must always return to the decision role of the receiving function.
+- `D-EHS`: holds hazard system, permit discipline, incident learning and emergency readiness. Stop-work can occur at the source, but plant-wide shutdown/restart is still subject to published authority.
+- `D-IT`: holds endpoint, network, identity, backup, platform support and recovery at the infrastructure layer. Do not own business data content or ERP transaction logic.
 
-### 3.5 Ý nghĩa các subfunction đã khóa
+### 3.5 Meaning of locked subfunctions
 
-- `D-PPC`: dùng khi cần nhìn riêng planning, sequencing, dispatch và WIP control thay vì gom vào D-PROD chung chung.
-- `D-PUR`: dùng cho sourcing, PO, supplier follow-up và material availability ở lớp mua hàng.
-- `D-WHS`: dùng cho receiving, put-away, location control, lot integrity và inventory accuracy.
-- `D-TCR`: dùng cho tool issue/return, preset, tool life evidence và traceability dụng cụ cắt.
-- `D-LOG`: dùng cho booking, packing interface, shipment documents và carrier handoff.
-- `D-ERP`: dùng cho application logic, role model, workflow, report logic, master-data guardrail và transaction integrity; không phải synonym của IT.
+- `D-PPC`: used when you need to look at planning, sequencing, dispatch and WIP control separately instead of grouping them into a general D-PROD.
+- `D-PUR`: used for sourcing, PO, supplier follow-up and material availability in the purchasing layer.
+- `D-WHS`: used for receiving, put-away, location control, lot integrity and inventory accuracy.
+- `D-TCR`: used for tool issue/return, preset, tool life evidence and cutting tool traceability.
+- `D-LOG`: used for booking, packing interface, shipment documents and carrier handoff.
+- `D-ERP`: used for application logic, role model, workflow, report logic, master-data guardrail and transaction integrity; not a synonym of IT.
 
-## 4. Heuristics để phân loại đúng thực thể
+## 4. Heuristics to properly classify entities
 
-### 4.1 Dấu hiệu đó là Department/Subfunction
+### 4.1 The sign is Department/Subfunction
 
-- trách nhiệm lặp lại ổn định ở nhiều SOP/WI;
-- không phải một quyết định ký duyệt cá nhân;
-- có đầu vào/đầu ra và handoff rõ;
-- thường được gọi trong họp điều hành, dashboard, interface tables;
-- nếu thay người giữ JD thì phạm vi chức năng vẫn còn nguyên.
+- stable repeat responsibilities across multiple SOPs/WIs;
+- not an individual signing decision;
+- have clear inputs/outputs and handoffs;
+- often called in executive meetings, dashboards, interface tables;
+- If the JD holder is replaced, the functional scope remains intact.
 
-### 4.2 Dấu hiệu đó là JD role
+### 4.2 Signs that it is JD role
 
-- có quyền ký hoặc nhả giữ;
-- có thể bị truy trách nhiệm cá nhân;
-- owner KPI hoặc owner action plan rõ;
-- deputy/back-up phải chỉ định cho một cá nhân/role chứ không phải cả phòng ban.
+- has the right to sign or release;
+- may be held personally responsible;
+- clear owner KPI or owner action plan;
+- Deputy/back-up must be assigned to an individual/role, not the entire department.
 
-### 4.3 Dấu hiệu đó là gap
+### 4.3 That sign is a gap
 
-- công việc có thật nhưng mọi tài liệu hiện tại đều né bằng cụm mơ hồ;
-- một quyết định quan trọng đang “ngầm” do ai đó xử lý nhưng không có JD hoặc handbook nào ghi rõ;
-- nhiều SOP nhắc tới cùng một nhóm việc nhưng mỗi tài liệu gọi một kiểu khác nhau;
-- trong review thực tế, người dùng không trả lời được “ai là người có quyền quyết định cuối cùng”.
+- the job is real but all current documents are avoided with vague phrases;
+- an important decision is being "underground" handled by someone but there is no JD or handbook clearly recorded;
+- many SOPs refer to the same group of tasks but each document calls for a different type;
+- In actual reviews, users cannot answer "who has the final decision".
 
-### 4.4 Cách phân biệt gap phòng ban với gap JD
+### 4.4 How to distinguish departmental gap from JD gap
 
-- Nếu công việc là nhịp lặp lại cấp chức năng, có đầu vào/đầu ra rõ và vẫn tồn tại dù thay người, ưu tiên xem đây là `Department gap` hoặc `Subfunction gap`.
-- Nếu vấn đề nằm ở quyền ký, phê duyệt ngoại lệ, sign-off kỹ thuật, hold/release hoặc cá nhân chịu trách nhiệm cuối cùng, ưu tiên xem đây là `JD gap`.
-- Nếu benchmark quốc tế có một vai trò riêng nhưng HESEM chưa đủ tải để tách, handbook phải ghi rõ ai đang giữ tạm và trigger nào sẽ buộc mở JD riêng.
-- Nếu benchmark quốc tế có một nhóm việc riêng nhưng HESEM mới chỉ có một người làm, không tự động tạo `D-code`; chỉ tạo khi nhóm việc đó đã ổn định thành một lớp chức năng lặp lại.
+- If the job is a repetitive function at the functional level, has clear input/output and still exists despite changing people, priority should be given to this as `Department gap` or `Subfunction gap`.
+- If the issue is with signing authority, exception approval, technical sign-off, hold/release or the individual with final responsibility, consider this `JD gap` as the priority.
+- If the international benchmark has a separate role but HESEM is not loaded enough to separate, the handbook must clearly state who is holding it temporarily and which trigger will force the opening of a separate JD.
+- If the international benchmark has a separate group of tasks but HESEM only has one person working, do not automatically create `D-code`; Only create when the group of tasks has stabilized into a repeating class of functions.
 
-## 5. Rules để cập nhật tài liệu từ reference model
+## 5. Rules to update documents from reference model
 
-- Đọc tài liệu hiện hành trước, không dùng reference model để overwrite mù.
-- Nếu benchmark gợi ý một ranh giới mới nhưng nội bộ chưa có JD/handbook hỗ trợ, phải ghi nhận gap.
-- Nếu nội bộ có role thực tế nhỏ hơn benchmark, handbook phải ghi rõ cách giữ thẩm quyền tạm thời thay vì bịa role.
-- Chỉ dùng benchmark để chốt logic ranh giới; không copy KPI hay text mô tả nguyên xi.
+- Read the current document first, do not use reference models to blindly overwrite.
+- If the benchmark suggests a new boundary but there is no JD/handbook support internally, the gap must be noted.
+- If an internal role has an actual role that is smaller than the benchmark, the handbook must clearly state how to temporarily retain authority instead of fabricating the role.
+- Only use benchmarks to lock in boundary logic; Do not copy KPI or description text intact.

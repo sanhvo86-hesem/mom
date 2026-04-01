@@ -1,100 +1,108 @@
-# 28. POU visual and machine-side rules
+# 28. POU Visual and Machine-Side Rules
 
 > Version: v1 | Date: 2026-03-30 | Owner: QMS Engineer
 
 ---
 
-## 1. Muc tieu
+## 1. Purpose
 
-Tai lieu nay khoa cach trinh bay va viet `POU-WI` de nguoi dung doc duoc tai diem su dung:
-- ben may CNC;
-- bench setup;
-- ban kiem;
-- khu ve sinh/dong goi;
-- khu cleanroom/vacuum;
-- khu nhan hang/kho.
+This document locks how `POU-WI` documents are presented and written so users can read them directly at point of use:
 
-Day la rule cho `execution at point of use`, khong phai rule cho SOP hay ANNEX.
+- beside a CNC machine;
+- at a setup bench;
+- at an inspection table;
+- at a cleaning or packing area;
+- in a cleanroom or vacuum area;
+- at receiving or warehouse locations.
 
----
-
-## 2. Nguyen tac thiet ke
-
-1. Nguoi doc phai nhin thay `lam gi ngay bay gio`.
-2. Visual uu tien cao hon doan van.
-3. Step phai nhin ra duoc PASS/FAIL.
-4. Noi dung duoc phep in va mang ra hien truong ma van doc ro.
-5. Tai lieu khong duoc ep nguoi dung quay lai doc 8 trang mini-SOP de thuc thi 1 thao tac.
+This is a rule set for execution at point of use, not a rule set for SOPs or ANNEX documents.
 
 ---
 
-## 3. Gioi han POU-WI
+## 2. Design Principles
 
-- Uu tien toi da 2 trang A4 cho mot flow chinh.
-- Toi da 12 step cho 1 flow chinh.
-- Moi step toi da 2 dong text ngan.
-- Moi cau toi da 25 tu.
-- Moi step chi 1 hanh dong chinh.
-- Moi step neu rui ro cao phai co 1 dong `Ly do`.
-
-Neu vuot cac gioi han tren, phai:
-- tach thanh nhieu WI;
-- day matrix/spec sang ANNEX;
-- tra gate logic ve SOP.
+1. The reader must immediately see `what to do right now`.
+2. Visual hierarchy has priority over long paragraphs.
+3. Every step must make PASS/FAIL visible.
+4. The content must stay readable when printed and carried into the operating area.
+5. The document must not force the user to go back and read an 8-page mini-SOP just to perform one task.
 
 ---
 
-## 4. Bo cuc bat buoc
+## 3. POU-WI Size Limits
 
-### 4.1 Dau trang
+- Prefer a maximum of 2 A4 pages for one main flow.
+- Maximum 12 steps for one main flow.
+- Maximum 2 short lines per step.
+- Maximum 25 words per sentence.
+- Each step should contain only 1 main action.
+- Every high-risk step must include one `Reason` line.
 
-Phai co:
-- ma WI;
-- ten WI;
-- ai dung;
-- dung khi nao;
-- dung o dau;
-- lien ket den SOP/ANNEX/FRM can thiet nhat.
+If the document exceeds these limits, you must:
 
-### 4.2 Khu step
+- split it into multiple WIs;
+- move matrix/specification content into an ANNEX;
+- move gate logic back into the SOP.
 
-Moi step nen co 4 thanh phan:
-- `Hanh dong`;
-- `Ly do` neu la step nhay cam;
-- `PASS khi`;
-- `FAIL thi`.
+---
 
-### 4.3 Khu canh bao
+## 4. Mandatory Layout
 
-Dung mau/callout khac nhau cho:
+### 4.1 Top of page
+
+Must include:
+
+- WI code;
+- WI title;
+- who uses it;
+- when it is used;
+- where it is used;
+- links to the most important SOP/ANNEX/FRM references.
+
+### 4.2 Step area
+
+Each step should contain 4 elements:
+
+- `Action`;
+- `Reason` for sensitive steps;
+- `PASS when`;
+- `FAIL then`.
+
+### 4.3 Warning area
+
+Use distinct color/callout treatment for:
+
 - `STOP`;
 - `HOLD`;
 - `CAUTION`;
 - `EVIDENCE`.
 
-Khong dung mot kieu note cho moi muc.
+Do not use one generic note style for every warning type.
 
-### 4.4 Template copy-paste
+### 4.4 Copy-paste template
 
-Template mac dinh cho POU-WI:
+Default template for POU-WI:
+
 - `templates/wi-pou-template.html`
 
-Template nay khoa:
+This template locks:
+
 - section `wi-s1` -> `wi-s7`;
 - `step-block`;
-- cue `Ly do`, `PASS khi`, `FAIL thi`, `Evidence`.
+- the cues `Reason`, `PASS when`, `FAIL then`, `Evidence`.
 
-Template nay khong thay cho:
-- quyet dinh archetype;
-- nghien cuu user that;
-- tach matrix/spec/governance sai layer.
+The template does not replace:
+
+- archetype selection;
+- real user research;
+- separation of wrongly layered matrix/spec/governance content.
 
 ---
 
-## 5. Hinh anh, so do, minh hoa
+## 5. Images, Diagrams, and Visual Aids
 
-1. Step co rui ro cao nen co photo, sketch hoac diagram.
-2. Dung chi tiet can nhin:
+1. High-risk steps should use a photo, sketch, or diagram.
+2. Show only the details the operator must actually see:
    - datum;
    - fixture orientation;
    - clamp zone;
@@ -102,135 +110,147 @@ Template nay khong thay cho:
    - label placement;
    - bagging direction;
    - gowning order.
-3. Hinh phai phuc vu quyet dinh tai cho, khong chi de dep.
+3. Visuals must support in-place decision making, not decoration.
 
 ---
 
-## 6. Rule cho text tai diem su dung
+## 6. Rules for Point-of-Use Text
 
-1. Dong tu menh lenh dat dau cau.
-2. Khong dung paragraph mo ho dai.
-3. Khong dung cum half-English khong can thiet.
-4. Don vi do, huong, mat chuan, ID tool, lot, rev phai nhin thay ro.
-5. Tai cleanroom/vacuum/phong sach, text phai uu tien:
-   - sach/khong sach;
-   - mo/khong mo;
-   - thay gang/khong cham tran;
-   - bag 1/bag 2;
-   - cap/no cap;
-   - dry/khong dry.
-
----
-
-## 7. Rule `what - how - why`
-
-Theo benchmark standardized work, POU-WI nen cho nguoi dung thay:
-- `What`: phai lam gi;
-- `How`: lam bang cach nao;
-- `Why`: vi sao step nay quan trong.
-
-Tai HESEM, `Why` duoc viet rat ngan:
-- 1 cau;
-- khong vuot 12-15 tu;
-- noi truc tiep den risk.
-
-Vi du:
-- `Ly do: tranh sai rev truoc Cycle Start.`
-- `Ly do: tranh nhiem ban vao buong vacuum.`
-- `Ly do: giu truy xuat lot sau khi cat thanh cay.`
+1. Start the sentence with an imperative verb.
+2. Do not use long, vague paragraphs.
+3. Do not use unnecessary half-English phrasing.
+4. Units, direction, datum, tool ID, lot, and revision must be easy to see.
+5. In cleanroom/vacuum/clean handling contexts, the text must prioritize cues such as:
+   - clean / not clean;
+   - open / do not open;
+   - change gloves / do not touch with bare hands;
+   - bag 1 / bag 2;
+   - cap / do not cap;
+   - dry / not dry.
 
 ---
 
-## 8. Rule STOP/GO tai may
+## 7. `What - How - Why` Rule
 
-Moi POU-WI nhay cam phai chi ro:
-- dau hieu GO;
-- dau hieu STOP/HOLD;
-- ai duoc go hold neu co.
+Following standardized-work benchmarks, a POU-WI should help the reader see:
 
-Khong viet:
-- `bao cap tren`;
-- `xu ly theo quy dinh`;
-- `thong bao bo phan lien quan`
-ma khong neu actor cu the.
+- `What`: what must be done;
+- `How`: how it must be done;
+- `Why`: why the step matters.
+
+At HESEM, `Why` must stay very short:
+
+- 1 sentence;
+- no more than 12-15 words;
+- directly tied to the risk.
+
+Examples:
+
+- `Reason: prevent wrong rev before Cycle Start.`
+- `Reason: prevent contamination inside the vacuum chamber.`
+- `Reason: preserve lot traceability after cutting into bars.`
 
 ---
 
-## 9. Rule cho machine-side WI
+## 8. Machine-Side STOP/GO Rule
 
-### 9.1 CNC/setup/pre-run
+Every sensitive POU-WI must clearly show:
 
-Phai uu tien hien:
-- program/rev;
+- GO signal;
+- STOP/HOLD signal;
+- who is allowed to release the hold, if applicable.
+
+Do not write vague phrases such as:
+
+- `report upward`;
+- `handle according to regulations`;
+- `notify the related department`
+
+unless the specific actor is explicitly named.
+
+---
+
+## 9. Rule Set for Machine-Side WI
+
+### 9.1 CNC / setup / pre-run
+
+Must prioritize:
+
+- program/revision;
 - tool/offset/WCS;
 - fixture orientation;
 - first-piece checkpoint;
 - restart checkpoint.
 
-Khong dat trong POU-WI:
-- machine-family matrix day du;
-- QPL matrix day du;
-- escalation ladder day du;
+Do not place the following inside a POU-WI:
+
+- full machine-family matrix;
+- full QPL matrix;
+- full escalation ladder;
 - KPI dictionary.
 
 ### 9.2 Inspection-side
 
-Phai uu tien hien:
+Must prioritize:
+
 - what to measure;
 - method/gage;
 - acceptance cue;
-- reaction when fail.
+- reaction when failed.
 
-Formula va sampling table day du o ANNEX.
+Full formulas and sampling tables belong in an ANNEX.
 
-### 9.3 Receiving/storage
+### 9.3 Receiving / storage
 
-Phai uu tien hien:
-- receipt doc;
+Must prioritize:
+
+- receipt document;
 - lot/heat traceability cue;
 - label cue;
 - put-away cue;
 - hold cue.
 
-Workbook migration note, mapping matrix va source policy o ANNEX/SOP.
+Migration notes, mapping matrices, and source policy belong in ANNEX/SOP documents.
 
-### 9.4 Cleanroom/vacuum/helium
+### 9.4 Cleanroom / vacuum / helium
 
-Phai uu tien hien:
+Must prioritize:
+
 - cleanliness precondition;
 - glove/gown order;
 - no-touch / no-mix / no-reuse cue;
-- acceptance cue tu spec da duoc release;
-- evidence after operation.
+- acceptance cue derived from a released specification;
+- evidence after the operation.
 
-Acceptance criteria goc phai o `Specification Annex` hoac drawing/spec/PO.
-Neu cue acceptance tham chieu chuan ben ngoai thi phai khoa nguon da release ro rang, vi du customer CSR hoac standard nhu SEMI F20 / SEMI S2 khi co ap dung. Khong tu dien so limit vao POU-WI.
-
----
-
-## 10. Rule in an va hien truong
-
-1. Ban in phai doc duoc tren A4 den/trang.
-2. Khong dat thong tin quan trong chi bang mau nhe kho doc.
-3. Khoang trang phai du de danh dau bang but neu workflow can.
-4. Mobile view phai khong vo bo cuc.
+The original acceptance criteria must stay in the `Specification Annex` or in drawing/spec/PO sources.
+If the acceptance cue references an outside standard, the released source must be explicit, for example a customer CSR or an applicable standard such as SEMI F20 / SEMI S2. Do not invent numeric limits inside a POU-WI.
 
 ---
 
-## 11. QA checklist
+## 10. Print and Field-Use Rules
 
-1. Nguoi tai diem su dung co the doc trong 60-90 giay khong?
-2. Step co ro PASS/FAIL khong?
-3. Co `Ly do` cho step quan trong khong?
-4. Co nhot matrix/spec/governance vao than WI khong?
-5. Co photo/diagram cho diem de sai nhat khong?
-6. Ban in co dung duoc ngoai hien truong khong?
+1. Printed copies must remain readable on black-and-white A4.
+2. Do not place important information only in faint colors that are hard to read.
+3. Leave enough white space for pen marks when the workflow requires marking.
+4. Mobile view must not break the layout.
 
 ---
 
-## 12. Tai lieu doc cung
+## 11. QA Checklist
+
+1. Can the user at point of use read it within 60-90 seconds?
+2. Does each step clearly show PASS/FAIL?
+3. Is there a `Reason` for important steps?
+4. Has matrix/spec/governance content been pushed into the WI body?
+5. Is there a photo/diagram for the easiest-to-miss point?
+6. Is the print version usable in the field?
+
+---
+
+## 12. Read Together With
 
 - `26-wi-archetypes-and-qa-guide.md`
 - `29-wi-annex-research-redraft-method.md`
 - `30-wi-annex-translation-role-bundle-rules.md`
 - `templates/wi-pou-template.html`
+

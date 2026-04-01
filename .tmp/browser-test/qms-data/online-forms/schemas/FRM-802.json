@@ -1,0 +1,422 @@
+{
+  "form_code": "FRM-802",
+  "record_type": "TRN",
+  "title": "Training Record",
+  "title_vi": "H\u1ed3 s\u01a1 \u0111\u00e0o t\u1ea1o",
+  "title_note_vi": "Kh\u00f3a m\u1ee5c ti\u00eau \u0111\u00e0o t\u1ea1o, danh s\u00e1ch tham d\u1ef1, k\u1ebft qu\u1ea3 \u0111\u00e1nh gi\u00e1 v\u00e0 d\u1ea5u v\u1ebft hi\u1ec7u l\u1ef1c n\u0103ng l\u1ef1c trong m\u1ed9t controlled record.",
+  "title_note_en": "Lock training intent, attendance, assessment results, and effectiveness evidence in one controlled record.",
+  "version": "V2",
+  "category": "hr",
+  "frequency": "per_event",
+  "sop_ref": "SOP-801",
+  "description_vi": "Bi\u1ec3u m\u1eabu d\u00f9ng \u0111\u1ec3 ghi nh\u1eadn \u0111\u1ea7y \u0111\u1ee7 b\u1ed1i c\u1ea3nh \u0111\u00e0o t\u1ea1o, danh s\u00e1ch nh\u00e2n s\u1ef1 tham gia, k\u1ebft qu\u1ea3 \u0111\u00e1nh gi\u00e1, b\u1eb1ng ch\u1ee9ng \u0111\u00ednh k\u00e8m v\u00e0 ph\u00ea duy\u1ec7t ph\u00e1t h\u00e0nh.",
+  "description_en": "Capture training context, participant evidence, assessment results, effectiveness follow-up, and controlled release approval in one governed form.",
+  "roles_allowed": [
+    "admin",
+    "hr_manager",
+    "qa_manager",
+    "production_director",
+    "engineering_lead",
+    "shift_leader"
+  ],
+  "evidence_review": {
+    "approval_mode": "serial",
+    "label_vi": "Ph\u00ea duy\u1ec7t tu\u1ea7n t\u1ef1",
+    "label_en": "Serial approval",
+    "roles_allowed": [
+      "hr_manager",
+      "qa_manager",
+      "production_director",
+      "engineering_lead",
+      "shift_leader"
+    ]
+  },
+  "signature_blocks": [
+    {
+      "id": "trainer_signoff",
+      "label_vi": "X\u00e1c nh\u1eadn gi\u1ea3ng vi\u00ean",
+      "label_en": "Trainer sign-off",
+      "help_vi": "Gi\u1ea3ng vi\u00ean x\u00e1c nh\u1eadn n\u1ed9i dung \u0111\u00e3 \u0111\u01b0\u1ee3c tri\u1ec3n khai \u0111\u00fang ph\u1ea1m vi.",
+      "help_en": "Trainer confirms the session content was delivered as planned."
+    },
+    {
+      "id": "owner_release",
+      "label_vi": "Ph\u00e1t h\u00e0nh h\u1ed3 s\u01a1",
+      "label_en": "Owner release",
+      "help_vi": "Ch\u1ee7 s\u1edf h\u1eefu h\u1ed3 s\u01a1 ch\u1ed1t hi\u1ec7u l\u1ef1c b\u1eb1ng ch\u1ee9ng \u0111\u00e0o t\u1ea1o.",
+      "help_en": "Record owner releases the training evidence into the controlled record set."
+    }
+  ],
+  "approval_flow": [
+    {
+      "id": "trainer_signoff",
+      "required_on_submit": true
+    },
+    {
+      "id": "owner_release",
+      "required_on_submit": true
+    }
+  ],
+  "sections": [
+    {
+      "id": "training_scope",
+      "title_vi": "Kh\u1ed1i \u0111i\u1ec1u khi\u1ec3n \u0111\u00e0o t\u1ea1o",
+      "title_en": "Training session control",
+      "description_vi": "Kh\u00f3a m\u1ee5c ti\u00eau, trigger, \u0111\u1ed1i t\u01b0\u1ee3ng v\u00e0 b\u1eb1ng ch\u1ee9ng n\u1ec1n cho s\u1ef1 ki\u1ec7n \u0111\u00e0o t\u1ea1o.",
+      "description_en": "Lock objective, trigger, target audience, and supporting references for the training event.",
+      "field_ids": [
+        "training_date",
+        "training_type",
+        "training_trigger",
+        "department",
+        "course_name",
+        "course_code",
+        "competency_code",
+        "target_role",
+        "trainer_name",
+        "trainer_qualification",
+        "location",
+        "duration_hours",
+        "training_material_ref",
+        "evidence_reference"
+      ]
+    },
+    {
+      "id": "attendance_results",
+      "title_vi": "Tham d\u1ef1 & k\u1ebft qu\u1ea3",
+      "title_en": "Attendance and results",
+      "description_vi": "Ghi nh\u1eadn danh s\u00e1ch tham gia, ph\u01b0\u01a1ng ph\u00e1p \u0111\u00e1nh gi\u00e1 v\u00e0 k\u1ebft qu\u1ea3 sau \u0111\u00e0o t\u1ea1o.",
+      "description_en": "Record participants, assessment method, and training outcome evidence.",
+      "field_ids": [
+        "trainees",
+        "assessment_method",
+        "pass_criteria"
+      ]
+    },
+    {
+      "id": "effectiveness_followup",
+      "title_vi": "\u0110\u00e1nh gi\u00e1 hi\u1ec7u l\u1ef1c & theo d\u00f5i",
+      "title_en": "Effectiveness and follow-up",
+      "description_vi": "Kh\u00f3a k\u1ebft lu\u1eadn \u0111\u00e1nh gi\u00e1 hi\u1ec7u l\u1ef1c, h\u00e0nh \u0111\u1ed9ng ti\u1ebfp theo v\u00e0 deadline n\u1ebfu c\u1ea7n.",
+      "description_en": "Capture effectiveness conclusions, follow-up ownership, and due dates when further action is needed.",
+      "field_ids": [
+        "effectiveness_summary",
+        "follow_up_owner",
+        "follow_up_due_date",
+        "notes"
+      ]
+    },
+    {
+      "id": "release_confirmation",
+      "title_vi": "X\u00e1c nh\u1eadn ph\u00e1t h\u00e0nh",
+      "title_en": "Release confirmation",
+      "description_vi": "Kh\u00f3a d\u1ea5u v\u1ebft x\u00e1c nh\u1eadn cu\u1ed1i c\u00f9ng tr\u01b0\u1edbc khi form \u0111\u01b0\u1ee3c ph\u00e1t h\u00e0nh.",
+      "description_en": "Capture final acknowledgment details before releasing the record.",
+      "field_ids": [
+        "trainer_signature_date",
+        "trainee_acknowledgment"
+      ]
+    }
+  ],
+  "fields": [
+    {
+      "id": "training_date",
+      "type": "date",
+      "label_vi": "Ng\u00e0y \u0111\u00e0o t\u1ea1o",
+      "label_en": "Training date",
+      "required": true,
+      "default": "today",
+      "width": "third"
+    },
+    {
+      "id": "training_type",
+      "type": "select",
+      "label_vi": "H\u00ecnh th\u1ee9c \u0111\u00e0o t\u1ea1o",
+      "label_en": "Training type",
+      "required": true,
+      "width": "third",
+      "helper_vi": "Ph\u00e2n lo\u1ea1i h\u00ecnh th\u1ee9c \u0111\u00e0o t\u1ea1o \u0111\u1ec3 d\u00f9ng \u0111\u00fang logic theo d\u00f5i hi\u1ec7u l\u1ef1c.",
+      "helper_en": "Classify the session format so effectiveness tracking stays consistent.",
+      "options": [
+        { "value": "classroom", "label_vi": "L\u1edbp h\u1ecdc", "label_en": "Classroom" },
+        { "value": "ojt", "label_vi": "\u0110\u00e0o t\u1ea1o t\u1ea1i ch\u1ed7", "label_en": "On-the-job training" },
+        { "value": "e_learning", "label_vi": "E-learning", "label_en": "E-learning" },
+        { "value": "drill", "label_vi": "Th\u1ef1c h\u00e0nh/di\u1ec5n t\u1eadp", "label_en": "Drill or exercise" },
+        { "value": "assessment", "label_vi": "\u0110\u00e1nh gi\u00e1 n\u0103ng l\u1ef1c", "label_en": "Competency assessment" }
+      ]
+    },
+    {
+      "id": "training_trigger",
+      "type": "select",
+      "label_vi": "L\u00fd do k\u00edch ho\u1ea1t",
+      "label_en": "Training trigger",
+      "required": true,
+      "width": "third",
+      "options": [
+        { "value": "new_hire", "label_vi": "Nh\u00e2n s\u1ef1 m\u1edbi", "label_en": "New hire" },
+        { "value": "annual_refresh", "label_vi": "Nh\u1eafc l\u1ea1i \u0111\u1ecbnh k\u1ef3", "label_en": "Annual refresh" },
+        { "value": "change_control", "label_vi": "Thay \u0111\u1ed5i quy tr\u00ecnh/t\u00e0i li\u1ec7u", "label_en": "Change control" },
+        { "value": "customer_requirement", "label_vi": "Y\u00eau c\u1ea7u kh\u00e1ch h\u00e0ng", "label_en": "Customer requirement" },
+        { "value": "nc_capa", "label_vi": "Kh\u00f4ng ph\u00f9 h\u1ee3p/CAPA", "label_en": "NC or CAPA" },
+        { "value": "qualification_upgrade", "label_vi": "N\u00e2ng c\u1ea5p ch\u1ee9ng nh\u1eadn", "label_en": "Qualification upgrade" }
+      ]
+    },
+    {
+      "id": "department",
+      "type": "select",
+      "label_vi": "Ph\u1ea1m vi ph\u00f2ng ban",
+      "label_en": "Department scope",
+      "required": true,
+      "width": "third",
+      "options": [
+        { "value": "PRO", "label_vi": "S\u1ea3n xu\u1ea5t", "label_en": "Production" },
+        { "value": "ENG", "label_vi": "K\u1ef9 thu\u1eadt", "label_en": "Engineering" },
+        { "value": "QA", "label_vi": "Ch\u1ea5t l\u01b0\u1ee3ng", "label_en": "Quality" },
+        { "value": "SCM", "label_vi": "Chu\u1ed7i cung \u1ee9ng", "label_en": "Supply chain" },
+        { "value": "SAL", "label_vi": "Kinh doanh & CSKH", "label_en": "Sales and customer service" },
+        { "value": "FIN", "label_vi": "T\u00e0i ch\u00ednh", "label_en": "Finance" },
+        { "value": "HR", "label_vi": "Nh\u00e2n s\u1ef1", "label_en": "Human resources" },
+        { "value": "IT", "label_vi": "CNTT", "label_en": "IT" },
+        { "value": "EHS", "label_vi": "EHS", "label_en": "EHS" },
+        { "value": "ALL", "label_vi": "To\u00e0n c\u00f4ng ty", "label_en": "Company-wide" }
+      ]
+    },
+    {
+      "id": "course_name",
+      "type": "text",
+      "label_vi": "T\u00ean kh\u00f3a \u0111\u00e0o t\u1ea1o",
+      "label_en": "Course name",
+      "required": true,
+      "width": "full",
+      "helper_vi": "N\u00ean ghi r\u00f5 t\u00ean module, SOP, WI, tay ngh\u1ec1 ho\u1eb7c ch\u01b0\u01a1ng tr\u00ecnh n\u0103ng l\u1ef1c li\u00ean quan.",
+      "helper_en": "State the module, SOP, WI, skill, or competency program clearly."
+    },
+    {
+      "id": "course_code",
+      "type": "text",
+      "label_vi": "M\u00e3 kh\u00f3a \u0111\u00e0o t\u1ea1o",
+      "label_en": "Course code",
+      "width": "third",
+      "placeholder_vi": "VD: SOP-801 / C06-L2",
+      "placeholder_en": "Example: SOP-801 / C06-L2"
+    },
+    {
+      "id": "competency_code",
+      "type": "select",
+      "label_vi": "M\u00e3 n\u0103ng l\u1ef1c",
+      "label_en": "Competency code",
+      "width": "third",
+      "options": [
+        { "value": "C01", "label_vi": "C01 - An to\u00e0n & 5S", "label_en": "C01 - Safety and 5S" },
+        { "value": "C02", "label_vi": "C02 - K\u1ef7 lu\u1eadt quy tr\u00ecnh", "label_en": "C02 - Process discipline" },
+        { "value": "C03", "label_vi": "C03 - \u0110\u00fang ngay l\u1ea7n \u0111\u1ea7u", "label_en": "C03 - First-pass quality" },
+        { "value": "C04", "label_vi": "C04 - Giao ti\u1ebfp li\u00ean ph\u00f2ng", "label_en": "C04 - Cross-functional communication" },
+        { "value": "C05", "label_vi": "C05 - D\u1ecbch v\u1ee5 kh\u00e1ch h\u00e0ng B2B", "label_en": "C05 - B2B customer service" },
+        { "value": "C06", "label_vi": "C06 - Gi\u1ea3i quy\u1ebft v\u1ea5n \u0111\u1ec1 & RCA", "label_en": "C06 - Problem solving and RCA" },
+        { "value": "C07", "label_vi": "C07 - Kaizen & Lean", "label_en": "C07 - Kaizen and Lean" },
+        { "value": "C08", "label_vi": "C08 - D\u1eef li\u1ec7u & ERP", "label_en": "C08 - Data and ERP" },
+        { "value": "C09", "label_vi": "C09 - Qu\u1ea3n l\u00fd th\u1eddi gian", "label_en": "C09 - Time management" },
+        { "value": "C10", "label_vi": "C10 - Quy tr\u00ecnh Job Order CNC", "label_en": "C10 - CNC job order flow" },
+        { "value": "C11", "label_vi": "C11 - Xem x\u00e9t h\u1ee3p \u0111\u1ed3ng", "label_en": "C11 - Contract review" },
+        { "value": "C12", "label_vi": "C12 - \u01af\u1edbc t\u00ednh & \u0111\u1ecbnh gi\u00e1", "label_en": "C12 - Estimating and pricing" },
+        { "value": "C13", "label_vi": "C13 - Ki\u1ec3m so\u00e1t r\u1ee7i ro & revision", "label_en": "C13 - Risk and revision control" },
+        { "value": "C14", "label_vi": "C14 - B\u1ea3n v\u1ebd & GD&T", "label_en": "C14 - Drawings and GD&T" },
+        { "value": "C15", "label_vi": "C15 - Khoa h\u1ecdc v\u1eadt li\u1ec7u", "label_en": "C15 - Material science" },
+        { "value": "C16", "label_vi": "C16 - \u0110o l\u01b0\u1eddng n\u00e2ng cao", "label_en": "C16 - Advanced metrology" },
+        { "value": "C17", "label_vi": "C17 - CNC setup & CAM", "label_en": "C17 - CNC setup and CAM" },
+        { "value": "C18", "label_vi": "C18 - Chu\u1ed7i cung \u1ee9ng", "label_en": "C18 - Supply chain" },
+        { "value": "C19", "label_vi": "C19 - L\u00e3nh \u0111\u1ea1o & coaching", "label_en": "C19 - Leadership and coaching" }
+      ]
+    },
+    {
+      "id": "target_role",
+      "type": "text",
+      "label_vi": "Nh\u00f3m/vai tr\u00f2 \u0111\u00edch",
+      "label_en": "Target role",
+      "width": "third",
+      "placeholder_vi": "VD: Operator Level 2 / Inspector / Planner",
+      "placeholder_en": "Example: Operator Level 2 / Inspector / Planner"
+    },
+    {
+      "id": "trainer_name",
+      "type": "text",
+      "label_vi": "Gi\u1ea3ng vi\u00ean",
+      "label_en": "Trainer name",
+      "required": true,
+      "width": "third"
+    },
+    {
+      "id": "trainer_qualification",
+      "type": "text",
+      "label_vi": "N\u0103ng l\u1ef1c gi\u1ea3ng vi\u00ean",
+      "label_en": "Trainer qualification",
+      "width": "third",
+      "placeholder_vi": "VD: Internal trainer / Lead auditor / SME",
+      "placeholder_en": "Example: Internal trainer / Lead auditor / SME"
+    },
+    {
+      "id": "location",
+      "type": "text",
+      "label_vi": "\u0110\u1ecba \u0111i\u1ec3m",
+      "label_en": "Location",
+      "width": "third",
+      "placeholder_vi": "VD: Ph\u00f2ng \u0111\u00e0o t\u1ea1o / X\u01b0\u1edfng CNC",
+      "placeholder_en": "Example: Training room / CNC shop"
+    },
+    {
+      "id": "duration_hours",
+      "type": "number",
+      "label_vi": "Th\u1eddi l\u01b0\u1ee3ng (gi\u1edd)",
+      "label_en": "Duration (hours)",
+      "required": true,
+      "width": "third",
+      "min": 0.5,
+      "step": 0.5
+    },
+    {
+      "id": "training_material_ref",
+      "type": "text",
+      "label_vi": "T\u00e0i li\u1ec7u \u0111\u00e0o t\u1ea1o",
+      "label_en": "Training material reference",
+      "width": "third",
+      "placeholder_vi": "VD: SOP-801, slide deck, handout, video ID",
+      "placeholder_en": "Example: SOP-801, slide deck, handout, video ID"
+    },
+    {
+      "id": "evidence_reference",
+      "type": "text",
+      "label_vi": "M\u00e3 b\u1eb1ng ch\u1ee9ng / link",
+      "label_en": "Evidence reference",
+      "width": "third",
+      "helper_vi": "Li\u00ean k\u1ebft \u1ea3nh, b\u00e0i test, quiz, video, SOP ho\u1eb7c package b\u1eb1ng ch\u1ee9ng \u0111i k\u00e8m.",
+      "helper_en": "Reference photos, tests, quizzes, videos, SOPs, or linked evidence packages."
+    },
+    {
+      "id": "trainees",
+      "type": "table",
+      "label_vi": "Danh s\u00e1ch tham d\u1ef1 v\u00e0 k\u1ebft qu\u1ea3",
+      "label_en": "Trainee attendance and results",
+      "required": true,
+      "min_rows": 1,
+      "max_rows": 80,
+      "columns": [
+        { "id": "employee_id", "type": "text", "label_vi": "M\u00e3 nh\u00e2n vi\u00ean", "label_en": "Employee ID", "required": true },
+        { "id": "employee_name", "type": "text", "label_vi": "H\u1ecd t\u00ean", "label_en": "Employee name", "required": true },
+        { "id": "role", "type": "text", "label_vi": "Vai tr\u00f2", "label_en": "Role" },
+        { "id": "pre_score", "type": "number", "label_vi": "\u0110i\u1ec3m tr\u01b0\u1edbc", "label_en": "Pre-score", "min": 0, "max": 100 },
+        { "id": "post_score", "type": "number", "label_vi": "\u0110i\u1ec3m sau", "label_en": "Post-score", "min": 0, "max": 100 },
+        {
+          "id": "practical_check",
+          "type": "select",
+          "label_vi": "Ki\u1ec3m tra th\u1ef1c h\u00e0nh",
+          "label_en": "Practical check",
+          "options": [
+            { "value": "n_a", "label_vi": "Kh\u00f4ng \u00e1p d\u1ee5ng", "label_en": "N/A" },
+            { "value": "verified", "label_vi": "\u0110\u00e3 x\u00e1c minh", "label_en": "Verified" },
+            { "value": "retrain", "label_vi": "C\u1ea7n \u0111\u00e0o t\u1ea1o l\u1ea1i", "label_en": "Retrain required" }
+          ]
+        },
+        {
+          "id": "result",
+          "type": "select",
+          "label_vi": "K\u1ebft qu\u1ea3",
+          "label_en": "Result",
+          "required": true,
+          "options": [
+            { "value": "pass", "label_vi": "\u0110\u1ea1t", "label_en": "Pass" },
+            { "value": "conditional", "label_vi": "\u0110\u1ea1t c\u00f3 \u0111i\u1ec1u ki\u1ec7n", "label_en": "Conditional pass" },
+            { "value": "fail", "label_vi": "Kh\u00f4ng \u0111\u1ea1t", "label_en": "Fail" }
+          ]
+        },
+        { "id": "next_action", "type": "text", "label_vi": "H\u00e0nh \u0111\u1ed9ng ti\u1ebfp theo", "label_en": "Next action" }
+      ]
+    },
+    {
+      "id": "assessment_method",
+      "type": "select",
+      "label_vi": "Ph\u01b0\u01a1ng ph\u00e1p \u0111\u00e1nh gi\u00e1",
+      "label_en": "Assessment method",
+      "required": true,
+      "width": "third",
+      "options": [
+        { "value": "written_test", "label_vi": "B\u00e0i test vi\u1ebft", "label_en": "Written test" },
+        { "value": "practical_demo", "label_vi": "Th\u1ef1c h\u00e0nh minh ch\u1ee9ng", "label_en": "Practical demonstration" },
+        { "value": "observation", "label_vi": "Quan s\u00e1t c\u00f4ng vi\u1ec7c", "label_en": "Observation" },
+        { "value": "quiz", "label_vi": "Quiz/tr\u1eafc nghi\u1ec7m", "label_en": "Quiz" },
+        { "value": "coaching_review", "label_vi": "Coaching review", "label_en": "Coaching review" }
+      ]
+    },
+    {
+      "id": "pass_criteria",
+      "type": "text",
+      "label_vi": "Ti\u00eau ch\u00ed \u0111\u1ea1t",
+      "label_en": "Pass criteria",
+      "required": true,
+      "width": "third",
+      "placeholder_vi": "VD: >= 80% v\u00e0 \u0111\u1ea1t practical check",
+      "placeholder_en": "Example: >= 80% and practical check verified"
+    },
+    {
+      "id": "effectiveness_summary",
+      "type": "textarea",
+      "label_vi": "\u0110\u00e1nh gi\u00e1 hi\u1ec7u l\u1ef1c",
+      "label_en": "Effectiveness summary",
+      "required": true,
+      "width": "full",
+      "rows": 4,
+      "helper_vi": "T\u00f3m t\u1eaft hi\u1ec7u l\u1ef1c \u0111\u00e0o t\u1ea1o, r\u1ee7i ro c\u00f2n m\u1edf, \u0111i\u1ec1u ki\u1ec7n c\u1ea7n coaching ho\u1eb7c re-train.",
+      "helper_en": "Summarize effectiveness, residual risk, and any coaching or retraining conditions."
+    },
+    {
+      "id": "follow_up_owner",
+      "type": "text",
+      "label_vi": "Ng\u01b0\u1eddi theo d\u00f5i",
+      "label_en": "Follow-up owner",
+      "width": "third"
+    },
+    {
+      "id": "follow_up_due_date",
+      "type": "date",
+      "label_vi": "H\u1ea1n theo d\u00f5i",
+      "label_en": "Follow-up due date",
+      "width": "third"
+    },
+    {
+      "id": "notes",
+      "type": "textarea",
+      "label_vi": "Ghi ch\u00fa b\u1ed5 sung",
+      "label_en": "Additional notes",
+      "width": "full",
+      "rows": 3
+    },
+    {
+      "id": "trainer_signature_date",
+      "type": "date",
+      "label_vi": "Ng\u00e0y gi\u1ea3ng vi\u00ean x\u00e1c nh\u1eadn",
+      "label_en": "Trainer sign-off date",
+      "width": "third"
+    },
+    {
+      "id": "trainee_acknowledgment",
+      "type": "checkbox",
+      "label_vi": "H\u1ecdc vi\u00ean x\u00e1c nh\u1eadn \u0111\u00e3 tham d\u1ef1 v\u00e0 hi\u1ec3u n\u1ed9i dung",
+      "label_en": "Trainees acknowledge attendance and understanding",
+      "default": false
+    }
+  ],
+  "auto_fields": [
+    "submitted_by",
+    "submitted_at",
+    "entry_id"
+  ],
+  "notifications": {
+    "on_submit": [
+      "hr_manager"
+    ],
+    "on_overdue": [
+      "hr_manager",
+      "production_director",
+      "engineering_lead"
+    ]
+  }
+}

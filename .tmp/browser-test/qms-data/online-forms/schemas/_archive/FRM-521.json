@@ -1,0 +1,305 @@
+{
+  "form_code": "FRM-521",
+  "title": "Preventive Maintenance Verification",
+  "title_vi": "Phiếu xác nhận bảo trì phòng ngừa",
+  "version": "V2",
+  "category": "maintenance",
+  "frequency": "per_event",
+  "delivery_mode": "online",
+  "online": true,
+  "decision_score": 74,
+  "sop_ref": "SOP-503",
+  "description": "Lean online maintenance form for PM and corrective verification, machine condition capture, and governed machine and tooling assignment.",
+  "description_vi": "Biểu mẫu bảo trì online tinh gọn cho PM và xác nhận khắc phục, ghi nhận tình trạng máy và gán máy cùng tooling đã được quản lý.",
+  "roles_allowed": [
+    "admin",
+    "production_manager",
+    "maintenance_tech",
+    "maintenance_manager",
+    "shift_leader"
+  ],
+  "record_context": {
+    "required": ["machine_id", "work_center_id"],
+    "autofill_priority": ["machine_id", "work_center_id", "wo_number"]
+  },
+  "offline_package": {
+    "enabled": false,
+    "fallback_form": "FRM-521"
+  },
+  "sections": [
+    {
+      "id": "asset",
+      "title": "Asset Context",
+      "title_vi": "Ngữ cảnh thiết bị",
+      "description": "Select the governed machine, work center, maintenance type, and related work order if any.",
+      "description_vi": "Chọn máy, work center, loại bảo trì và work order liên quan nếu có.",
+      "field_ids": ["pm_date", "maintenance_type", "work_center_id", "machine_id", "wo_number", "related_tool_id", "assigned_to"]
+    },
+    {
+      "id": "execution",
+      "title": "Execution Scope",
+      "title_vi": "Phạm vi thực hiện",
+      "description": "Capture the main tasks completed, the operating hours, and any replaced parts or findings.",
+      "description_vi": "Ghi nhận các hạng mục chính đã thực hiện, giờ vận hành, linh kiện thay và các phát hiện chính.",
+      "field_ids": ["operating_hours", "maintenance_scope", "parts_replaced", "findings", "corrective_action"]
+    },
+    {
+      "id": "result",
+      "title": "Result & Next Action",
+      "title_vi": "Kết quả và bước tiếp theo",
+      "description": "Assess the machine condition, follow-up need, and the next PM date.",
+      "description_vi": "Đánh giá tình trạng máy, nhu cầu follow-up và ngày PM tiếp theo.",
+      "field_ids": ["overall_condition", "requires_follow_up", "next_pm_date", "notes"]
+    }
+  ],
+  "fields": [
+    {
+      "id": "pm_date",
+      "type": "date",
+      "label": "Maintenance Date",
+      "label_vi": "Ngày thực hiện",
+      "required": true,
+      "default": "today",
+      "width": "third"
+    },
+    {
+      "id": "maintenance_type",
+      "type": "select",
+      "label": "Maintenance Type",
+      "label_vi": "Loại bảo trì",
+      "required": true,
+      "width": "third",
+      "options": [
+        { "value": "preventive", "label": "Preventive", "label_vi": "Phòng ngừa" },
+        { "value": "corrective", "label": "Corrective", "label_vi": "Khắc phục" },
+        { "value": "inspection", "label": "Inspection", "label_vi": "Kiểm tra" }
+      ]
+    },
+    {
+      "id": "work_center_id",
+      "type": "lookup",
+      "label": "Work Center",
+      "label_vi": "Work center",
+      "required": true,
+      "width": "third",
+      "lookup_source": "work_centers",
+      "strict_select": true,
+      "display_fields": ["work_center_id", "work_center_name"],
+      "placeholder": "Search work center",
+      "placeholder_vi": "Tìm work center"
+    },
+    {
+      "id": "machine_id",
+      "type": "lookup",
+      "label": "Machine",
+      "label_vi": "Máy",
+      "required": true,
+      "width": "third",
+      "lookup_source": "machines",
+      "strict_select": true,
+      "depends_on": ["work_center_id"],
+      "display_fields": ["machine_id", "machine_name", "machine_type"],
+      "autofill_map": {
+        "work_center_id": "work_center_id"
+      },
+      "placeholder": "Search machine",
+      "placeholder_vi": "Tìm máy"
+    },
+    {
+      "id": "wo_number",
+      "type": "lookup",
+      "label": "Related Work Order",
+      "label_vi": "WO liên quan",
+      "required": false,
+      "width": "third",
+      "lookup_source": "work_orders",
+      "strict_select": true,
+      "depends_on": ["machine_id"],
+      "display_fields": ["wo_number", "operation_desc", "part_number", "part_revision"],
+      "autofill_map": {
+        "customer_id": "customer_id",
+        "so_number": "so_number",
+        "jo_number": "jo_number",
+        "wo_number": "wo_number",
+        "part_number": "part_number",
+        "part_revision": "part_revision",
+        "machine_id": "machine_id",
+        "work_center_id": "work_center_id"
+      },
+      "placeholder": "Search affected WO",
+      "placeholder_vi": "Tìm WO bị ảnh hưởng"
+    },
+    {
+      "id": "related_tool_id",
+      "type": "lookup",
+      "label": "Related Tool / Fixture",
+      "label_vi": "Tool / đồ gá liên quan",
+      "required": false,
+      "width": "third",
+      "lookup_source": "tooling_assets",
+      "strict_select": true,
+      "depends_on": ["machine_id", "work_center_id"],
+      "display_fields": ["tool_id", "tool_name", "tool_type"],
+      "placeholder": "Search related tooling",
+      "placeholder_vi": "Tìm tooling liên quan"
+    },
+    {
+      "id": "assigned_to",
+      "type": "lookup",
+      "label": "Assigned Technician",
+      "label_vi": "Kỹ thuật viên thực hiện",
+      "required": true,
+      "width": "third",
+      "lookup_source": "operators",
+      "strict_select": true,
+      "display_fields": ["operator_id", "operator_name", "role"],
+      "placeholder": "Search technician",
+      "placeholder_vi": "Tìm kỹ thuật viên"
+    },
+    {
+      "id": "operating_hours",
+      "type": "number",
+      "label": "Operating Hours",
+      "label_vi": "Giờ vận hành hiện tại",
+      "required": false,
+      "width": "third",
+      "min": 0
+    },
+    {
+      "id": "maintenance_scope",
+      "type": "multi_select",
+      "label": "Maintenance Scope",
+      "label_vi": "Hạng mục đã thực hiện",
+      "required": true,
+      "options": [
+        { "value": "lubrication", "label": "Lubrication", "label_vi": "Bôi trơn" },
+        { "value": "coolant_system", "label": "Coolant system", "label_vi": "Hệ thống coolant" },
+        { "value": "air_system", "label": "Air / pneumatic", "label_vi": "Khí nén / pneumatic" },
+        { "value": "chip_removal", "label": "Chip removal & guards", "label_vi": "Thoát phoi & che chắn" },
+        { "value": "tool_changer", "label": "Tool changer", "label_vi": "Ổ dao / tool changer" },
+        { "value": "spindle_check", "label": "Spindle check", "label_vi": "Kiểm tra spindle" },
+        { "value": "probe_fixture", "label": "Probe / fixture", "label_vi": "Probe / fixture" },
+        { "value": "electrical_panel", "label": "Electrical cabinet", "label_vi": "Tủ điện" }
+      ]
+    },
+    {
+      "id": "parts_replaced",
+      "type": "textarea",
+      "label": "Parts Replaced",
+      "label_vi": "Phụ tùng đã thay",
+      "required": false,
+      "rows": 3,
+      "width": "full",
+      "placeholder": "List replaced parts if any",
+      "placeholder_vi": "Liệt kê phụ tùng đã thay nếu có"
+    },
+    {
+      "id": "findings",
+      "type": "textarea",
+      "label": "Findings",
+      "label_vi": "Phát hiện",
+      "required": false,
+      "rows": 4,
+      "width": "full",
+      "placeholder": "Observed condition, leaks, wear, alarms, or anomalies",
+      "placeholder_vi": "Mô tả tình trạng quan sát được, rò rỉ, mài mòn, alarm hoặc bất thường"
+    },
+    {
+      "id": "corrective_action",
+      "type": "textarea",
+      "label": "Corrective / Preventive Action",
+      "label_vi": "Hành động khắc phục / phòng ngừa",
+      "required": false,
+      "rows": 4,
+      "width": "full",
+      "placeholder": "Action taken to restore or stabilize the machine",
+      "placeholder_vi": "Hành động đã thực hiện để khôi phục hoặc ổn định máy"
+    },
+    {
+      "id": "overall_condition",
+      "type": "select",
+      "label": "Overall Machine Condition",
+      "label_vi": "Tình trạng tổng thể của máy",
+      "required": true,
+      "width": "third",
+      "options": [
+        { "value": "good", "label": "Good", "label_vi": "Tốt" },
+        { "value": "acceptable", "label": "Acceptable", "label_vi": "Chấp nhận được" },
+        { "value": "needs_repair", "label": "Needs Repair", "label_vi": "Cần sửa chữa" },
+        { "value": "critical", "label": "Critical", "label_vi": "Nghiêm trọng" }
+      ]
+    },
+    {
+      "id": "requires_follow_up",
+      "type": "checkbox",
+      "label": "Requires Follow-up",
+      "label_vi": "Cần follow-up",
+      "checkbox_label": "This maintenance still requires follow-up or escalation",
+      "checkbox_label_vi": "Bảo trì này vẫn cần follow-up hoặc escalation thêm",
+      "required": false,
+      "default": false
+    },
+    {
+      "id": "next_pm_date",
+      "type": "date",
+      "label": "Next PM Date",
+      "label_vi": "Ngày PM tiếp theo",
+      "required": true,
+      "width": "third"
+    },
+    {
+      "id": "notes",
+      "type": "textarea",
+      "label": "Notes",
+      "label_vi": "Ghi chú",
+      "required": false,
+      "rows": 3,
+      "width": "full",
+      "placeholder": "Additional notes for maintenance control",
+      "placeholder_vi": "Ghi chú thêm cho kiểm soát bảo trì"
+    }
+  ],
+  "signature_blocks": [
+    {
+      "id": "performed_by",
+      "label": "Technician Signature",
+      "label_vi": "Chữ ký kỹ thuật viên",
+      "label_en": "Technician Signature",
+      "help": "Confirm the maintenance execution and reported findings.",
+      "help_vi": "Xác nhận việc thực hiện bảo trì và các phát hiện đã báo cáo.",
+      "require_reason": false,
+      "require_pin": false,
+      "signature_meaning": "Maintenance execution confirmation",
+      "signature_meaning_vi": "Xác nhận thực hiện bảo trì"
+    },
+    {
+      "id": "verified_by",
+      "label": "Maintenance Supervisor Review",
+      "label_vi": "Chữ ký xác nhận của quản lý bảo trì",
+      "label_en": "Maintenance Supervisor Review",
+      "help": "Verify the machine condition and the next PM commitment.",
+      "help_vi": "Xác nhận tình trạng máy và cam kết ngày PM tiếp theo.",
+      "require_reason": true,
+      "require_pin": true,
+      "signature_meaning": "Maintenance verification",
+      "signature_meaning_vi": "Xác nhận bảo trì"
+    }
+  ],
+  "approval_flow": [
+    {
+      "id": "performed_by",
+      "signature_block_id": "performed_by",
+      "requiredOnSubmit": true,
+      "labelVi": "Kỹ thuật viên",
+      "labelEn": "Technician"
+    },
+    {
+      "id": "verified_by",
+      "signature_block_id": "verified_by",
+      "requiredOnSubmit": false,
+      "labelVi": "Quản lý bảo trì",
+      "labelEn": "Maintenance supervisor"
+    }
+  ],
+  "auto_fields": ["submitted_by", "submitted_at", "entry_id"]
+}

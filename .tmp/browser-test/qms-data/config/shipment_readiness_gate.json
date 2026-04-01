@@ -1,0 +1,108 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "created": "2026-04-01",
+    "description": "Shipment readiness gate configuration. Defines required checks before an SO can transition to 'shipped'. Per AS9100D clause 8.6 Release of products."
+  },
+  "gate_items": [
+    {
+      "code": "SG-01",
+      "label": "Contract Review Completed",
+      "label_vi": "Xem xét hợp đồng hoàn thành",
+      "description": "All contract review checklist items approved or marked N/A",
+      "check_type": "contract_review",
+      "required_for": ["make_to_order", "engineer_to_order", "make_to_stock"],
+      "severity": "blocking"
+    },
+    {
+      "code": "SG-02",
+      "label": "All Job Orders Completed",
+      "label_vi": "Tất cả JO hoàn thành",
+      "description": "Every JO linked to this SO must be in 'completed' or 'closed' status",
+      "check_type": "jo_completion",
+      "required_for": ["make_to_order", "engineer_to_order"],
+      "severity": "blocking"
+    },
+    {
+      "code": "SG-03",
+      "label": "No Open NCRs",
+      "label_vi": "Không có NCR mở",
+      "description": "No unresolved nonconformance reports linked to this SO or its JOs/WOs",
+      "check_type": "ncr_clear",
+      "required_for": ["make_to_order", "engineer_to_order", "make_to_stock"],
+      "severity": "blocking"
+    },
+    {
+      "code": "SG-04",
+      "label": "No Active Holds",
+      "label_vi": "Không có hold đang hoạt động",
+      "description": "SO has no unreleased credit, engineering, quality, or shipping holds",
+      "check_type": "hold_clear",
+      "required_for": ["make_to_order", "engineer_to_order", "make_to_stock"],
+      "severity": "blocking"
+    },
+    {
+      "code": "SG-05",
+      "label": "Required Documents Received",
+      "label_vi": "Tài liệu yêu cầu đã nhận",
+      "description": "All required documents (CoC, CoA, material certs, test reports) received and verified",
+      "check_type": "documents_complete",
+      "required_for": ["make_to_order", "engineer_to_order"],
+      "severity": "blocking"
+    },
+    {
+      "code": "SG-06",
+      "label": "CAPA Actions Closed",
+      "label_vi": "Hành động CAPA đã đóng",
+      "description": "All corrective/preventive actions linked to this SO are closed and verified effective",
+      "check_type": "capa_clear",
+      "required_for": ["make_to_order", "engineer_to_order"],
+      "severity": "blocking"
+    },
+    {
+      "code": "SG-07",
+      "label": "FAI Approved",
+      "label_vi": "FAI đã phê duyệt",
+      "description": "First Article Inspection approved (required for new parts or new processes)",
+      "check_type": "fai_approved",
+      "required_for": ["engineer_to_order"],
+      "severity": "blocking",
+      "conditional": "fai_required == true"
+    },
+    {
+      "code": "SG-08",
+      "label": "Export Control Cleared",
+      "label_vi": "Kiểm soát xuất khẩu đã thông qua",
+      "description": "ITAR/EAR export license obtained if required",
+      "check_type": "export_clear",
+      "required_for": ["make_to_order", "engineer_to_order"],
+      "severity": "blocking",
+      "conditional": "export_control_required == true"
+    },
+    {
+      "code": "SG-09",
+      "label": "Packing & Labeling Confirmed",
+      "label_vi": "Đóng gói và nhãn mác đã xác nhận",
+      "description": "Packing specification and labeling requirements verified",
+      "check_type": "packing_confirmed",
+      "required_for": ["make_to_order", "engineer_to_order"],
+      "severity": "warning"
+    },
+    {
+      "code": "SG-10",
+      "label": "Customer Source Inspection",
+      "label_vi": "Kiểm tra nguồn khách hàng",
+      "description": "Customer witness/source inspection completed if required by contract",
+      "check_type": "source_inspection",
+      "required_for": ["make_to_order", "engineer_to_order"],
+      "severity": "blocking",
+      "conditional": "customer_source_inspection == true"
+    }
+  ],
+  "enforcement": {
+    "block_shipment_on_fail": true,
+    "allow_override_by_roles": ["ceo", "production_director", "qa_manager"],
+    "override_requires_reason": true,
+    "log_all_checks": true
+  }
+}

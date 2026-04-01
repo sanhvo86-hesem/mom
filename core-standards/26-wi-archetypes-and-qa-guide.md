@@ -1,253 +1,262 @@
-# 26. WI archetypes and QA guide
+# 26. WI Archetypes and QA Guide
 
 > Version: v1 | Date: 2026-03-30 | Owner: QMS Engineer
 
 ---
 
-## 1. Muc tieu
+## 1. Purpose
 
-Tai lieu nay bo sung cho `08-document-types.md` de khoa `archetype` cho WI.
+This document extends `08-document-types.md` to lock the WI archetype standard.
 
-`08-document-types.md` chi khoa 7 section co ban cua WI.
-Tai lieu nay khoa tiep:
-- WI nao duoc phep ton tai;
-- WI nao phai tra ve SOP;
-- WI nao phai day sang ANNEX;
-- checklist QA de chan mini-SOP, mini-ANNEX va WI xa hien truong.
+`08-document-types.md` locks the 7 base WI sections.
+This document additionally locks:
 
-Muc tieu thuc chien:
-- operator doc duoc, lam duoc, dung duoc tai diem su dung;
-- gate performer co checklist thuc thi, khong gap lai gate architecture trong SOP;
-- dashboard/control-tower doc theo nhip dieu hanh, khong bien thanh narrative dai;
-- tai lieu so hoa co fallback khi he thong gian doan.
+- which WI types are allowed to exist;
+- which content must stay in the SOP;
+- which content must move to an ANNEX;
+- the QA checklist that prevents mini-SOPs, mini-ANNEX documents, and WI files that are detached from the field.
 
----
+Practical outcome targets:
 
-## 2. Nguyen tac nen
-
-1. WI chi ton tai khi `neu khong co WI, nguoi thuc hien de lam sai`.
-2. Gate definition, authority matrix, KPI definition, RACI khung va logic hold/release cap he thong o lai trong SOP.
-3. Machine-family data, bang tra, acceptance criteria, formula va map tham chieu o trong ANNEX.
-4. WI chi duoc giu mot lop logic:
-   - thao tac tai diem su dung;
-   - thuc thi gate;
-   - dieu hanh control-tower;
-   - thao tac he thong so.
-5. Moi WI phai chi ro:
-   - ai dung;
-   - dung o dau;
-   - dung khi nao;
-   - khong duoc dung de thay cho gi.
-6. Published WI header phai khoa o muc family, khong duoc chen archetype, series hoac domain vao subtitle:
-   - subtitle bat buoc: `Tài liệu vận hành • Công việc hướng dẫn`;
-   - meta labels bat buoc: `Mã`, `Phiên bản`, `Ngày hiệu lực`, `Chủ sở hữu`, `Phê duyệt`;
-   - archetype `POU-WI`, `Gate-Execution WI`, `Control-Tower WI`, `Digital-Operation WI` chi o core standard, decision log va working notes.
-7. Header WI phai giu ma tai lieu va ten tai lieu thanh hai truong rieng trong runtime; title block chi hien `doc-name` va `sub-vn`, con ma tai lieu hien o hang meta. Portal runtime khong duoc ghep `WI-xxx` voi ten tai lieu thanh mot chuoi plain text.
+- operators can read it, execute it, and use it at point of use;
+- gate performers get an execution checklist instead of re-reading SOP gate architecture;
+- dashboard/control-tower users read by operating cadence instead of through long narrative;
+- digital documents have a fallback when systems are disrupted.
 
 ---
 
-## 3. Decision test
+## 2. Foundation Principles
 
-Dung chuoi cau hoi sau truoc khi tao moi hoac sua WI:
+1. A WI should exist only when `without the WI, the performer is likely to do it wrong`.
+2. Gate definition, authority matrix, KPI definition, high-level RACI, and system-level hold/release logic stay in the SOP.
+3. Machine-family data, lookup tables, acceptance criteria, formulas, and reference maps stay in an ANNEX.
+4. A WI may keep only one layer of logic:
+   - point-of-use execution;
+   - gate execution;
+   - control-tower operation;
+   - digital-system operation.
+5. Every WI must explicitly state:
+   - who uses it;
+   - where it is used;
+   - when it is used;
+   - what it must not replace.
+6. The published WI header must stay locked at the family level and must not inject archetype, series, or domain wording into the subtitle:
+- required subtitle: `T?i li?u v?n h?nh ? C?ng vi?c h??ng d?n`;
+   - required meta labels: `M?`, `Phi?n b?n`, `Ng?y hi?u l?c`, `Ch? s? h?u`, `Ph? duy?t`;
+   - archetypes such as `POU-WI`, `Gate-Execution WI`, `Control-Tower WI`, `Digital-Operation WI` belong only in core standards, decision logs, and working notes.
+7. The WI header must keep document code and document title as two separate runtime fields; the title block shows `doc-name` and `sub-vn`, while the document code stays in the meta row. Portal runtime must not concatenate `WI-xxx` and the title into one plain-text string.
 
-1. Tai lieu nay co huong dan hanh dong cu the khong?
-2. Nguoi doc co dung tai may, tai ban thao tac, tai checkpoint, tai dashboard hay tai desktop?
-3. Noi dung nay dang day:
-   - step thao tac;
+---
+
+## 3. Decision Test
+
+Use the following question chain before creating or rewriting a WI:
+
+1. Does the document give concrete action guidance?
+2. Does the user read it at the machine, at the workbench, at a checkpoint, on a dashboard, or at a desktop?
+3. Is the content mainly:
+   - execution steps;
    - gate logic;
-   - matrix/tham chieu;
+   - matrix/reference content;
    - governance?
-4. Neu bo WI nay, SOP da du de tranh loi chua?
-5. Co acceptance criteria, machine matrix, glossary bang tra hay role map nao dang bi nhot trong WI khong?
+4. If the WI were removed, would the SOP alone still prevent error?
+5. Is any acceptance criteria, machine matrix, lookup glossary, or role map being stuffed into the WI?
 
-Neu cau 3 hoac 5 tra loi sai layer, phai `SPLIT`, `RECLASSIFY` hoac `REBUILD`.
+If question 3 or 5 shows wrong-layer content, the document must be `SPLIT`, `RECLASSIFIED`, or `REBUILT`.
 
 ---
 
-## 4. Bon WI archetypes duoc phep
+## 4. Four Allowed WI Archetypes
 
-| Archetype | Dung cho | Khong dung cho | Dau hieu dung |
+| Archetype | Used for | Not used for | Correct signal |
 |---|---|---|---|
-| `POU-WI` | Huong dan thao tac tai may, tai ban thao tac, tai clean bench, tai khu dong goi | Gate matrix, dashboard governance, method formula, specification table | Ngan, visual-first, 1 action/step, evidence ro tai diem dung |
-| `Gate-Execution WI` | Checklist thuc thi gate da duoc SOP dinh nghia | Dinh nghia them gate, them RACI cap he thong, them KPI dictionary | Trigger ro, evidence ro, stop condition ro, signer ro |
-| `Control-Tower WI` | Daily management, tier meeting, readiness review, dashboard review cadence | SOP management review cap doanh nghiep, KPI dictionary, worked example | Nhip review ro, audience ro, data source ro, escalation ro |
-| `Digital-Operation WI` | M365, SharePoint, Epicor, online/offline forms, sync, backup, fallback | Rule-pack kien truc, metadata dictionary, authority matrix | Click-by-click, permission ro, fallback ro, SoR/SSOT ro |
+| `POU-WI` | Machine-side, bench-side, clean-bench, packing-area operating instruction | Gate matrix, dashboard governance, formulas, specification tables | Short, visual-first, 1 action per step, evidence visible at point of use |
+| `Gate-Execution WI` | Execution checklist for a gate already defined in the SOP | Defining new gates, new system-level RACI, KPI dictionary | Clear trigger, clear evidence, clear stop condition, clear signer |
+| `Control-Tower WI` | Daily management, tier meetings, readiness review, dashboard review cadence | Enterprise management-review SOP, KPI dictionary, worked examples | Clear cadence, clear audience, clear data source, clear escalation |
+| `Digital-Operation WI` | M365, SharePoint, Epicor, online/offline forms, sync, backup, fallback | Architecture rule-pack, metadata dictionary, authority matrix | Click-by-click, clear permissions, clear fallback, clear SoR/SSOT |
 
 ---
 
 ## 5. POU-WI
 
-### 5.1 Khi nao dung
+### 5.1 When to use it
 
-- Nguoi thuc hien dung ngay tai may, bench, cleanroom, kho, ban do.
-- Loi thao tac co the gay phe pham, escape, FOD, nhiem ban, sai truy xuat hoac sai release.
-- Nguoi doc can cue card, khong can doc SOP dai.
+- The performer uses it directly at the machine, bench, cleanroom, warehouse, or inspection point.
+- Execution error can create defect, escape, FOD, contamination, traceability failure, or release failure.
+- The reader needs a cue card, not a long SOP narrative.
 
-### 5.2 Khi nao khong dung
+### 5.2 When not to use it
 
-- Khi tai lieu dang chu yeu dinh nghia gate hoac authority.
-- Khi tai lieu dang chu yeu la bang tra theo ho may.
-- Khi tai lieu dang chu yeu la acceptance criteria/specification.
+- When the document mainly defines a gate or authority.
+- When the document is mainly a machine-family lookup table.
+- When the document is mainly acceptance criteria or specification content.
 
-### 5.3 Cau truc bat buoc
+### 5.3 Mandatory structure
 
-Van giu 7 section cua `08-document-types.md`, nhung Section 5 phai obey:
-- toi da 12 step cho mot flow chinh;
-- moi step chi 1 action chinh;
-- moi step co `ly do ngan` neu la diem rui ro cao;
-- moi step co evidence hoac dau hieu PASS/FAIL;
-- dung duoc khi in A4 va khi xem mobile.
+The WI still keeps the 7 sections from `08-document-types.md`, but Section 5 must follow these rules:
 
-Template copy-paste mac dinh cho POU-WI:
+- maximum 12 steps for one main flow;
+- one main action per step;
+- a short `reason` line for high-risk points;
+- PASS/FAIL or evidence cue for each step;
+- usable on A4 print and on mobile.
+
+Default copy-paste template for POU-WI:
+
 - `templates/wi-pou-template.html`
-- Template nay chi khoa khung section, `step-block`, PASS/FAIL/EVIDENCE va wrapper.
-- Header published cua template van phai dung subtitle family-level, khong doi thanh `POU-WI`.
-- Khong duoc dung template de bo qua decision test, user research hoac split boundary.
+- It locks the section wrapper, `step-block`, PASS/FAIL/EVIDENCE cues, and HTML wrapper.
+- The published header still stays at the family-level subtitle and must not be renamed to `POU-WI`.
+- The template must not be used to bypass archetype choice, user research, or boundary split.
 
 ### 5.4 QA checklist
 
-- Co dung tai diem su dung that khong?
-- Co bo cuc visual-first khong?
-- Co qua 12 step khong?
-- Co nhot machine matrix, formula hay specification vao day khong?
-- Co step nao gom nhieu hanh dong khong?
-- Co ghi ro PASS/FAIL hay stop point cho step nhay cam khong?
-- Co dong `Ly do` cho step gay scrap/escape/safety/cleanliness risk khong?
+- Is it truly used at point of use?
+- Is the layout visual-first?
+- Does it exceed 12 steps?
+- Has machine matrix, formula, or specification content been pushed into it?
+- Does any step combine multiple actions?
+- Do sensitive steps clearly state PASS/FAIL or stop points?
+- Is there a `Reason` line for steps that carry scrap, escape, safety, or cleanliness risk?
 
 ---
 
 ## 6. Gate-Execution WI
 
-### 6.1 Khi nao dung
+### 6.1 When to use it
 
-- SOP da dinh nghia gate, hold point, owner va minimum evidence.
-- Nguoi tai checkpoint can checklist thuc thi va criteria mo/rut ho so.
-- Vi du: FAI execution, pre-run verification, ship release handoff, incoming gate execution.
+- The SOP already defines the gate, hold point, owner, and minimum evidence.
+- The checkpoint user needs an execution checklist and clear open/close criteria.
+- Examples: FAI execution, pre-run verification, ship-release handoff, incoming gate execution.
 
-### 6.2 Khi nao khong dung
+### 6.2 When not to use it
 
-- Khi tai lieu dang tao gate matrix G0-G7 moi.
-- Khi tai lieu dang dinh nghia KPI/authority cap he thong.
-- Khi tai lieu dang gop ca QPL matrix, escalation ladder va worked example vao cung mot file.
+- When the document is creating a new G0-G7 gate matrix.
+- When the document is defining system-level KPI or authority.
+- When the document is merging QPL matrix, escalation ladder, and worked examples into one file.
 
-### 6.3 Cau truc bat buoc
+### 6.3 Mandatory structure
 
-Section 4 va 5 phai tra loi duoc 4 diem:
-- Trigger: khi nao mo WI.
-- Evidence: can ho so nao de pass.
-- Stop condition: khi nao buoc vao hold.
-- Release authority: ai ky hoac ai duoc phep dong checkpoint.
+Sections 4 and 5 must answer these 4 points:
 
-Template copy-paste mac dinh cho Gate-Execution WI:
+- Trigger: when the WI is opened.
+- Evidence: which records are required to pass.
+- Stop condition: when it goes to hold.
+- Release authority: who signs or who is allowed to close the checkpoint.
+
+Default copy-paste template for Gate-Execution WI:
+
 - `templates/wi-gate-execution-template.html`
-- Template nay khoa bang trigger/evidence, input criteria, step thuc thi, stop/release va record of decision.
-- Header published cua template van phai dung subtitle family-level, khong doi thanh `Gate-Execution WI`.
-- Khong duoc dung template de chen gate architecture, QPL matrix hay authority matrix cap he thong vao body WI.
+- It locks the trigger/evidence table, input criteria, execution steps, stop/release logic, and record-of-decision block.
+- The published header still stays at the family-level subtitle and must not be renamed to `Gate-Execution WI`.
+- The template must not be used to insert gate architecture, QPL matrix, or system-level authority matrix into the WI body.
 
 ### 6.4 QA checklist
 
-- Co lap lai gate architecture trong SOP khong?
-- Co matrix G0-G7 hay hold code dictionary dang nam trong body khong?
-- Co tach ro `input criteria` va `execution steps` khong?
-- Co noi ro use form/workbook nao la record of decision khong?
-- Co buoc nao thuc hien thay ca SOP va ANNEX cung luc khong?
+- Does it repeat gate architecture that already belongs in the SOP?
+- Is any G0-G7 matrix or hold-code dictionary sitting inside the body?
+- Are `input criteria` and `execution steps` clearly separated?
+- Is the record-of-decision form/workbook Clearly named?
+- Does any step try to replace both the SOP and ANNEX at the same time?
 
 ---
 
 ## 7. Control-Tower WI
 
-### 7.1 Khi nao dung
+### 7.1 When to use it
 
-- Nguoi dung la workshop manager, shift lead, quality lead, planner hoac readiness board.
-- Tai lieu phuc vu nhac review, freeze data, escalation, daily tier, high-risk readiness.
+- The users are workshop manager, shift lead, quality lead, planner, or readiness board.
+- The document supports review cadence, data freeze, escalation, daily tier review, or high-risk readiness review.
 
-### 7.2 Khi nao khong dung
+### 7.2 When not to use it
 
-- Khi tai lieu la management review cap he thong, internal audit program, CAPA governance tong.
-- Khi tai lieu chu yeu la KPI dictionary, threshold table, dashboard example.
+- When the document is an enterprise-level management review, internal-audit program, or broad CAPA-governance SOP.
+- When the document is primarily a KPI dictionary, threshold table, or dashboard example pack.
 
-### 7.3 Cau truc bat buoc
+### 7.3 Mandatory structure
 
-Phai co:
+Must include:
+
 - audience;
 - cadence;
 - data source;
 - review inputs;
 - escalation path;
-- records sau review.
+- records after review.
 
-Template copy-paste mac dinh cho Control-Tower WI:
+Default copy-paste template for Control-Tower WI:
+
 - `templates/wi-control-tower-template.html`
-- Template nay khoa audience/cadence, review input, review flow, escalation va record sau review.
-- Header published cua template van phai dung subtitle family-level, khong doi thanh `Control-Tower WI`.
-- Khong duoc dung template de bien WI thanh management review SOP, KPI dictionary hoac dashboard example pack.
+- It locks audience/cadence, review inputs, review flow, escalation, and post-review record sections.
+- The published header still stays at the family-level subtitle and must not be renamed to `Control-Tower WI`.
+- The template must not be used to turn the WI into a management-review SOP, KPI dictionary, or dashboard example pack.
 
 ### 7.4 QA checklist
 
-- Dashboard logic co bi tron voi KPI dictionary khong?
-- Co noi ro report nao la nguon so lieu, report nao la evidence pack khong?
-- Co cadence ro theo ca/ngay/tuan khong?
-- Co ai quyet dinh va ai chi cap nhat khong?
+- Is dashboard logic mixed together with the KPI dictionary?
+- Is it clear which report is the source data and which report is the evidence pack?
+- Is the cadence explicit by shift / day / week?
+- Is it clear who decides and who only updates?
 
 ---
 
 ## 8. Digital-Operation WI
 
-### 8.1 Khi nao dung
+### 8.1 When to use it
 
-- Nguoi dung thao tac tren M365, SharePoint, Epicor, portal, form runtime, backup, sync.
-- Can click path, permission, SoR/SSOT va offline fallback.
+- The user operates in M365, SharePoint, Epicor, portal runtime, backup, or sync workflows.
+- The document needs click-path, permission, SoR/SSOT, and offline fallback guidance.
 
-### 8.2 Khi nao khong dung
+### 8.2 When not to use it
 
-- Khi noi dung la file-plan, metadata dictionary, site topology, authority map.
-- Khi noi dung la architecture rule-pack.
+- When the content is file plan, metadata dictionary, site topology, or authority map.
+- When the content is an architecture rule-pack.
 
-### 8.3 Cau truc bat buoc
+### 8.3 Mandatory structure
 
-Phai co:
-- system/object dang thao tac;
-- role duoc phep;
-- step thao tac;
+Must include:
+
+- the system/object being operated;
+- allowed role;
+- action steps;
 - expected result;
-- fallback khi offline;
-- record/link sau thao tac.
+- offline fallback;
+- record/link after the action.
 
 ### 8.4 QA checklist
 
-- Co noi ro SoR va SSOT khong?
-- Co mo ta fallback khi he thong offline khong?
-- Co lap lai architecture/metadata dictionary trong WI khong?
-- Co dung role chip/JD-linked owner khong?
+- Is SoR and SSOT explicitly stated?
+- Is offline fallback described?
+- Does the WI repeat architecture/metadata-dictionary content?
+- Does it use the correct JD-linked owner/role chip?
 
 ---
 
-## 9. Ranh gioi WI - SOP - ANNEX
+## 9. WI - SOP - ANNEX Boundary
 
-| Noi dung | O lai SOP | O trong WI | Day sang ANNEX |
+| Content | Stays in SOP | Stays in WI | Moves to ANNEX |
 |---|---|---|---|
 | Gate definition | Yes | No | No |
-| Authority/RACI/KPI definition | Yes | No | Co the dictionary/matrix |
-| Step thao tac tai diem su dung | No | Yes | No |
-| Gate execution checklist | No | Yes | Co the evidence matrix ho tro |
-| Machine family matrix | No | No | Yes |
+| Authority / RACI / KPI definition | Yes | No | Dictionary/matrix support only |
+| Point-of-use execution step | No | Yes | No |
+| Gate execution checklist | No | Yes | Supporting evidence matrix if needed |
+| Machine-family matrix | No | No | Yes |
 | Formula, sampling table, method note | No | No | Yes |
-| Acceptance criteria/spec table | No | Chi neu nhac nguong toi thieu cho operator | Yes |
-| Worked examples | No | Rat han che | Yes |
+| Acceptance criteria / specification table | No | Only minimal operator cue when needed | Yes |
+| Worked examples | No | Very limited | Yes |
 
 ---
 
-## 10. Quy tac thuc thi khi rewrite
+## 10. Rewrite Execution Rules
 
-1. Tach phan SOP tra hinh ra truoc.
-2. Tach phan ANNEX tra hinh ra truoc.
-3. Rut gon WI ve dung user va dung context.
-4. Khoa lai link den SOP goc, ANNEX lien quan va workbook/FRM thuc thi.
-5. Chay QA theo archetype truoc khi phat hanh.
+1. Split SOP-shaped content out first.
+2. Split ANNEX-shaped content out first.
+3. Reduce the WI until it fits the real user and real context.
+4. Re-lock the links to the parent SOP, related ANNEX, and execution workbook/FRM.
+5. Run archetype QA before release.
 
 ---
 
-## 11. Tai lieu doc cung
+## 11. Read Together With
 
 - `08-document-types.md`
 - `11-html-structure-guide.md`
@@ -260,3 +269,4 @@ Phai co:
 - `templates/wi-pou-template.html`
 - `templates/wi-gate-execution-template.html`
 - `templates/wi-control-tower-template.html`
+

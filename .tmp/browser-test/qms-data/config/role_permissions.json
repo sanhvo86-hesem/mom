@@ -1,0 +1,104 @@
+{
+    "ceo": {
+        "canCreateDocs": true
+    },
+    "production_director": {
+        "canCreateDocs": true
+    },
+    "cnc_workshop_manager": {
+        "canCreateDocs": false
+    },
+    "shift_leader": {
+        "canCreateDocs": false
+    },
+    "setup_technician": {
+        "canCreateDocs": false
+    },
+    "cnc_operator": {
+        "canCreateDocs": false
+    },
+    "deburr_team_lead": {
+        "canCreateDocs": false
+    },
+    "deburr_technician": {
+        "canCreateDocs": false
+    },
+    "production_planner": {
+        "canCreateDocs": false
+    },
+    "cleaning_packaging_supervisor": {
+        "canCreateDocs": false
+    },
+    "cleaning_packaging_technician": {
+        "canCreateDocs": false
+    },
+    "maintenance_technician": {
+        "canCreateDocs": false
+    },
+    "engineering_lead": {
+        "canCreateDocs": false
+    },
+    "process_engineer": {
+        "canCreateDocs": false
+    },
+    "cam_nc_programmer": {
+        "canCreateDocs": false
+    },
+    "qa_manager": {
+        "canCreateDocs": true
+    },
+    "quality_engineer": {
+        "canCreateDocs": false
+    },
+    "qc_inspector": {
+        "canCreateDocs": false
+    },
+    "qms_engineer": {
+        "canCreateDocs": true
+    },
+    "internal_auditor": {
+        "canCreateDocs": false
+    },
+    "supply_chain_manager": {
+        "canCreateDocs": false
+    },
+    "buyer": {
+        "canCreateDocs": false
+    },
+    "warehouse_clerk": {
+        "canCreateDocs": false
+    },
+    "tool_storekeeper": {
+        "canCreateDocs": false
+    },
+    "logistics_coordinator": {
+        "canCreateDocs": false
+    },
+    "estimator": {
+        "canCreateDocs": false
+    },
+    "customer_service": {
+        "canCreateDocs": false
+    },
+    "finance_manager": {
+        "canCreateDocs": false
+    },
+    "gl_payroll_accountant": {
+        "canCreateDocs": false
+    },
+    "ap_ar_accountant": {
+        "canCreateDocs": false
+    },
+    "hr_manager": {
+        "canCreateDocs": true
+    },
+    "ehs_specialist": {
+        "canCreateDocs": false
+    },
+    "it_admin": {
+        "canCreateDocs": true
+    },
+    "epicor_admin": {
+        "canCreateDocs": false
+    }
+}

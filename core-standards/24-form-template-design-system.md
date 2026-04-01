@@ -32,7 +32,7 @@ All visual properties are defined as CSS custom properties (tokens) on `:root`. 
 
 ### 3.1 Color Palette
 
-| Token | Value | Usage |
+| Tokens | Value | Usage |
 |-------|-------|-------|
 | `--form-brand` | `#0c2d48` | Dark brand, section titles |
 | `--form-primary` | `#1565c0` | Interactive elements, focus rings |
@@ -43,7 +43,7 @@ All visual properties are defined as CSS custom properties (tokens) on `:root`. 
 
 **Status colors:**
 
-| Status | Token | Value | Usage |
+| Status | Tokens | Value | Usage |
 |--------|-------|-------|-------|
 | Success | `--form-success` | `#16a34a` | Pass, approved, valid |
 | Warning | `--form-warning` | `#d97706` | Pending, attention needed |
@@ -56,11 +56,11 @@ Each status color has a `-light` (background tint) and `-border` variant.
 
 Based on a 4px baseline grid using Major Second ratio (1.125).
 
-| Token | Size | Usage |
+| Tokens | Size | Usage |
 |-------|------|-------|
 | `--form-text-xs` | 11px | Micro labels, badges, helper text |
 | `--form-text-sm` | 12px | Labels, captions, table headers |
-| `--form-text-base` | 14px | Body text, input values |
+| `--form-text-base` | 14px | Body text, input values ​​|
 | `--form-text-md` | 15px | Section titles |
 | `--form-text-lg` | 18px | Form title |
 | `--form-text-xl` | 24px | Page heading |
@@ -74,13 +74,13 @@ Based on a 4px baseline grid using Major Second ratio (1.125).
 
 ### 3.4 Elevation Levels
 
-| Level | Token | Usage |
+| Level | Tokens | Usage |
 |-------|-------|-------|
 | 0 | none | Flat elements |
 | 1 | `--form-shadow-xs` | Inputs at rest |
 | 2 | `--form-shadow-sm` | Section cards |
 | 3 | `--form-shadow-md` | Hover states, elevated cards |
-| 4 | `--form-shadow-lg` | Form header, modals |
+| 4 | `--form-shadow-lg` | Form headers, modals |
 | Focus | `--form-shadow-focus` | 3px primary-color ring |
 
 ---
@@ -139,7 +139,7 @@ Below the header content, a **status stepper** shows form workflow stages (e.g.,
 
 - Form code must use monospace font in a pill badge
 - Record ID uses amber color to stand out as the unique identifier
-- Vietnamese title uses reduced opacity for secondary emphasis
+- Vietnamese title reduced uses opacity for secondary emphasis
 - The header prints as-is (colors preserved) for PDF output
 
 ---
@@ -226,7 +226,7 @@ Same base styling as text input, plus:
 
 Visual alternative to plain radio buttons for categorical selections:
 - 3-column grid (2-column on mobile)
-- Each card: centered icon + label + Vietnamese sublabel
+- Each card: center icon + label + Vietnamese sublabel
 - Border: 2px solid light gray at rest
 - Selected: Blue border + blue tint background + focus ring
 - Keyboard navigable via standard radio group behavior
@@ -236,7 +236,7 @@ Visual alternative to plain radio buttons for categorical selections:
 - Dashed border (2px), 8px radius
 - Upload icon + instructional text + file constraints hint
 - Hover/dragover: Blue dashed border + blue tint background
-- Hidden file input triggered programmatically
+- Hidden input file triggered programmatically
 
 ### 7.9 Signature Block
 
@@ -245,7 +245,7 @@ Visual alternative to plain radio buttons for categorical selections:
 - Signature pad area (64-80px height, white background)
 - Name + Role + Date inputs below (compact 32px height, centered text)
 - Unsigned state must show the current logged-in account in Vietnamese, for example: `Người đăng nhập hiện tại: ...`
-- Primary signing CTA must explicitly indicate the signer source, for example: `Người đăng nhập ký`
+- Primary signing CTA must clearly indicate the signer source, for example: `Người đăng nhập ký`
 
 ### 7.10 Lookup Input
 
@@ -254,9 +254,9 @@ Visual alternative to plain radio buttons for categorical selections:
 - Helper text below explains the lookup behavior
 - For `lookup_source: "company_users"`, the control must include a secondary shortcut button: `Dùng người đăng nhập`
 - Person-selection fields for issuer/reviewer/approver must use company directory lookup, not free text and not workshop-only `operators`
-- Any field that references a governed ERP/MES/eQMS entity must render as a searchable droplist / governed lookup, not a free-text input
-- The governed lookup catalog must cover, at minimum: `customers`, `customer_sites`, `commercial_accounts`, `suppliers`, `parts`, `revisions`, `incoterms`, `payment_terms`, `shipping_methods`, `promise_policies`, `routing_library`, `bom_library`, `control_plans`, `inspection_plans`, `traveler_templates`, `quality_gate_profiles`, `launch_gate_templates`, `customer_item_approvals`, `supplier_process_approvals`, `warehouse_locations`, `defect_catalog`, `company_users`, `operators`, `work_centers`, `machines`, `tooling_assets`, `tool_assemblies`, `downtime_reason_codes`, `downtime_resolution_codes`, `mes_connectivity_adapters`, `mes_alarm_catalog`, `mes_alarm_playbooks`, `nc_program_releases`, `capas`
-- When the schema omits `lookup_source` but the field id or label clearly maps to a governed entity, the runtime must infer the correct `lookup_source` and render the searchable lookup automatically
+- Any field that references a governing ERP/MES/eQMS entity must render as a searchable droplist / governing lookup, not a free-text input
+- The governing lookup catalog must cover, at minimum: `customers`, `customer_sites`, `commercial_accounts`, `suppliers`, `parts`, `revisions`, `incoterms`, `payment_terms`, `shipping_methods`, `promise_policies`, `routing_library`, `bom_library`, `control_plans`, `inspection_plans`, `traveler_templates`, `quality_gate_profiles`, `launch_gate_templates`, `customer_item_approvals`, `supplier_process_approvals`, `warehouse_locations`, `defect_catalog`, `company_users`, `operators`, `work_centers`, `machines`, `tooling_assets`, `tool_assemblies`, `downtime_reason_codes`, `downtime_resolution_codes`, `mes_connectivity_adapters`, `mes_alarm_catalog`, `mes_alarm_playbooks`, `nc_program_releases`, `capas`
+- When the schema omits `lookup_source` but the field id or label clearly maps to a governing entity, the runtime must infer the correct `lookup_source` and render the searchable lookup automatically
 
 ### 7.11 Form Template Editing Entry Point
 
@@ -326,7 +326,7 @@ A colored dot appears inside the severity select field that updates dynamically 
 
 ### 10.2 Defect Type Colors
 
-| Type | Color Token |
+| Type | ColorToken |
 |------|------------|
 | Dimensional | Blue `#1565c0` |
 | Surface | Amber `#d97706` |
@@ -335,7 +335,7 @@ A colored dot appears inside the severity select field that updates dynamically 
 | Process | Orange `#ea580c` |
 | Other | Slate `#475569` |
 
-The select text color changes to match the selected defect type.
+The selected text color changes to match the selected defect type.
 
 ### 10.3 Status Badges
 
@@ -344,7 +344,7 @@ Form status uses pill badges with background tint + text color:
 | Status | Background | Text |
 |--------|-----------|------|
 | Draft | `#f3f4f6` | `#374151` |
-| In Review | `--form-info-light` | `--form-info` |
+| Print Review | `--form-info-light` | `--form-info` |
 | Approved | `--form-success-light` | `--form-success` |
 | Rejected | `--form-error-light` | `--form-error` |
 | Closed | `--form-surface-sunken` | `--form-text-tertiary` |
@@ -357,7 +357,7 @@ Disposition dropdown options include leading Unicode icons for quick visual scan
 
 ## 11. Data Tables
 
-For forms requiring tabular data entry (measurement tables, inspection rows):
+For forms require tabular data entry (measurement tables, inspection rows):
 
 - Wrapped in `.qf-table-wrap` with horizontal scroll for mobile
 - Sticky header with sunken background
@@ -365,7 +365,7 @@ For forms requiring tabular data entry (measurement tables, inspection rows):
 - Alternating row hover highlight
 - Row numbers in a narrow left column
 - Pass/Fail column uses green/red bold text (with red background tint for fail)
-- "Add Row" button below table in primary-light style
+- "Add Row" below button table in primary-light style
 
 ---
 
@@ -380,7 +380,7 @@ For forms requiring tabular data entry (measurement tables, inspection rows):
 
 | Element | Style |
 |---------|-------|
-| Container | Dashed border, sunken background, 8px radius |
+| Containers | Dashed border, sunken background, 8px radius |
 | Title | Uppercase, bold, 11px, `--form-text-secondary` |
 | Signature pad | White background, 1px solid light border, 64-80px height |
 | Input fields | Compact (32px), centered text, light border |
@@ -388,7 +388,7 @@ For forms requiring tabular data entry (measurement tables, inspection rows):
 ### Rules
 
 - Signature blocks must never break across print pages (`break-inside: avoid`)
-- All three roles must be present: Reporter, Inspector/Verifier, Approver
+- All three roles must be presented: Reporter, Inspector/Verifier, Approver
 - Date fields use native date input type
 - If the form schema defines issuer/reviewer/approver person fields, those fields and the signature blocks must stay logically aligned with the current authenticated user model
 
@@ -452,7 +452,7 @@ Left side: secondary and ghost actions. Right side: primary action (using flex s
 
 1. On submit: validate all required fields, add `.is-error` to empty ones
 2. Scroll to and focus the first error field
-3. If field is inside a collapsed section, expand that section first
+3. If field is inside a collapsed section, expand that first section
 4. Clear error state when user begins typing/selecting
 
 ---
@@ -512,7 +512,7 @@ Use `-webkit-print-color-adjust: exact` and `print-color-adjust: exact` on all e
 
 ### Tablet Overrides (max-width: 1024px)
 
-| Property | Desktop | Tablet |
+| Property | Desktop | Tablets |
 |----------|---------|--------|
 | Input height | 40px | 44px |
 | Input padding-x | 12px | 16px |
@@ -590,7 +590,7 @@ Reusable form section templates are defined in:
 | Identification | Product/job/customer fields | NCR, SCAR, Inspection |
 | Measurement Table | Tabular data entry with pass/fail | First Article, In-Process |
 | Defect Description | Defect type, severity, description | NCR, Customer Complaint |
-| Containment/Disposition | Immediate actions, disposition decision | NCR, MRB |
+| Containment/Disposition | Immediate actions, disposition decisions | NCR, MRB |
 | Root Cause (6M) | Radio card selection + description | NCR, CAPA, 8D |
 | Corrective/Preventive Action | Action plan textareas | CAPA, NCR, Audit Finding |
 | Signature Block | 3-column name/role/date grid | All forms |
@@ -599,7 +599,7 @@ Reusable form section templates are defined in:
 
 ---
 
-## 21. Language and Diacritics Rules / Quy tắc ngôn ngữ và dấu
+## 21. Language and Diacritics Rules / Language and Diacritics Rules
 
 ### 21.1 Mandatory Rule: Vietnamese Diacritics on Frontend
 
@@ -607,7 +607,7 @@ Reusable form section templates are defined in:
 
 This is a non-negotiable requirement for professionalism and readability.
 
-| Layer | Language | Diacritics | Example |
+| Layers | Language | Diacritics | Example |
 |-------|----------|-----------|---------|
 | **Frontend HTML** | Vietnamese | ✅ REQUIRED | `Báo cáo không phù hợp` |
 | **Frontend JS strings** | Vietnamese | ✅ REQUIRED | `_t('Kiểm soát chứng cứ', 'Evidence Control')` |
@@ -643,7 +643,7 @@ All frontend fonts MUST support Vietnamese Unicode characters. Approved font sta
 font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, 'Roboto', sans-serif;
 ```
 
-Avoid: Monospace fonts without Vietnamese support, custom fonts not tested with dấu.
+Avoid: Monospace fonts without Vietnamese support, custom fonts not tested with accents.
 
 ### 21.4 Encoding
 
@@ -670,13 +670,13 @@ For eQMS forms:
 
 ### 21.6 Module Naming Convention
 
-| Module | Sidebar Label (VI) | Sidebar Label (EN) |
+| Modules | Sidebar Label (VI) | Sidebar Label (EN) |
 |--------|-------------------|-------------------|
-| Dashboard | Tổng quan | Dashboard |
-| Documents | Danh sách tài liệu | Documents |
-| Order Management | Quản lý đơn hàng | Order Management |
-| Evidence Control | Kiểm soát chứng cứ | Evidence Control |
-| Admin | Quản trị hệ thống | Admin Panel |
+| Dashboard | Overview | Dashboard |
+| Documents | List of documents | Documents |
+| Order Management | Order management | Order Management |
+| Evidence Control | Evidence Control | Evidence Control |
+| Admin | System Administration | Admin Panel |
 
 ---
 

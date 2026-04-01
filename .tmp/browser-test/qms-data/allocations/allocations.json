@@ -1,0 +1,246 @@
+{
+    "_meta": {
+        "version": "1.0",
+        "created": "2026-03-29",
+        "description": "Form allocation tracking log",
+        "updated_at": "2026-03-30T10:19:55+00:00"
+    },
+    "allocations": [
+        {
+            "allocation_id": "4782029d-2a30-4ade-bd97-f5a7af427d3c",
+            "record_id": "TRN-2026-001",
+            "record_type": "TRN",
+            "department": "HR",
+            "year": "2026",
+            "seq": 1,
+            "form_code": "FRM-802",
+            "form_revision": "V1",
+            "delivery_mode": "online",
+            "status": "allocated",
+            "priority": "normal",
+            "notes": "",
+            "master_context": [],
+            "linked_order_id": "",
+            "blank_form_path": "",
+            "blank_form_filename": "",
+            "template_checksum": "",
+            "expected_filename_pattern": "^FRM\\-802_V1_TRN\\-2026\\-001_\\d{8}_\\d{4}-[A-Z0-9]{2,6}\\.pdf$",
+            "receipt_version": 0,
+            "receipts": [],
+            "history": [
+                {
+                    "status": "allocated",
+                    "at": "2026-03-30T09:40:57+00:00",
+                    "by": "sanh.vo",
+                    "note": "record_id_allocated",
+                    "meta": []
+                }
+            ],
+            "created_at": "2026-03-30T09:40:57+00:00",
+            "created_by": "sanh.vo",
+            "updated_at": "2026-03-30T09:40:57+00:00",
+            "updated_by": "sanh.vo",
+            "suggested_filename": "FRM-802_V1_TRN-2026-001_20260330_1640-SV.pdf",
+            "events": [
+                {
+                    "action": "status_change",
+                    "at": "2026-03-30T09:40:57+00:00",
+                    "by": "sanh.vo",
+                    "note": "record_id_allocated",
+                    "meta": {
+                        "status": "allocated"
+                    }
+                }
+            ]
+        },
+        {
+            "allocation_id": "827172fc-53b2-472e-9bc7-35b1096ac47d",
+            "record_id": "SHIPPING-RELEASE-2026-001",
+            "record_type": "SHIPPING-RELEASE",
+            "department": "HR",
+            "year": "2026",
+            "seq": 1,
+            "form_code": "FRM-711",
+            "form_revision": "V1",
+            "delivery_mode": "online",
+            "status": "allocated",
+            "priority": "normal",
+            "notes": "",
+            "master_context": [],
+            "linked_order_id": "",
+            "blank_form_path": "",
+            "blank_form_filename": "",
+            "template_checksum": "",
+            "expected_filename_pattern": "^FRM\\-711_V1_SHIPPING\\-RELEASE\\-2026\\-001_\\d{8}_\\d{4}-[A-Z0-9]{2,6}\\.pdf$",
+            "receipt_version": 0,
+            "receipts": [],
+            "history": [
+                {
+                    "status": "allocated",
+                    "at": "2026-03-30T09:41:33+00:00",
+                    "by": "sanh.vo",
+                    "note": "record_id_allocated",
+                    "meta": []
+                }
+            ],
+            "created_at": "2026-03-30T09:41:33+00:00",
+            "created_by": "sanh.vo",
+            "updated_at": "2026-03-30T09:41:33+00:00",
+            "updated_by": "sanh.vo",
+            "suggested_filename": "FRM-711_V1_SHIPPING-RELEASE-2026-001_20260330_1641-SV.pdf",
+            "events": [
+                {
+                    "action": "status_change",
+                    "at": "2026-03-30T09:41:33+00:00",
+                    "by": "sanh.vo",
+                    "note": "record_id_allocated",
+                    "meta": {
+                        "status": "allocated"
+                    }
+                }
+            ]
+        },
+        {
+            "allocation_id": "ab4faf73-7878-40c8-89bd-fbde26547119",
+            "record_id": "SCAR-2026-001",
+            "record_type": "SCAR",
+            "department": "QA",
+            "year": "2026",
+            "seq": 1,
+            "form_code": "FRM-403",
+            "form_revision": "V1",
+            "delivery_mode": "online",
+            "status": "allocated",
+            "priority": "normal",
+            "notes": "",
+            "master_context": [],
+            "linked_order_id": "",
+            "blank_form_path": "",
+            "blank_form_filename": "",
+            "template_checksum": "",
+            "expected_filename_pattern": "^FRM\\-403_V1_SCAR\\-2026\\-001_\\d{8}_\\d{4}-[A-Z0-9]{2,6}\\.pdf$",
+            "receipt_version": 0,
+            "receipts": [],
+            "history": [
+                {
+                    "status": "allocated",
+                    "at": "2026-03-30T09:42:15+00:00",
+                    "by": "sanh.vo",
+                    "note": "record_id_allocated",
+                    "meta": []
+                }
+            ],
+            "created_at": "2026-03-30T09:42:15+00:00",
+            "created_by": "sanh.vo",
+            "updated_at": "2026-03-30T09:42:15+00:00",
+            "updated_by": "sanh.vo",
+            "suggested_filename": "FRM-403_V1_SCAR-2026-001_20260330_1642-SV.pdf",
+            "events": [
+                {
+                    "action": "status_change",
+                    "at": "2026-03-30T09:42:15+00:00",
+                    "by": "sanh.vo",
+                    "note": "record_id_allocated",
+                    "meta": {
+                        "status": "allocated"
+                    }
+                }
+            ]
+        },
+        {
+            "allocation_id": "d8aa557c-2955-4a29-8784-2c1ce11b050f",
+            "record_id": "FAI-2026-001",
+            "record_type": "FAI",
+            "department": "QA",
+            "year": "2026",
+            "seq": 1,
+            "form_code": "FRM-311",
+            "form_revision": "V1",
+            "delivery_mode": "online",
+            "status": "allocated",
+            "priority": "normal",
+            "notes": "",
+            "master_context": [],
+            "linked_order_id": "",
+            "blank_form_path": "",
+            "blank_form_filename": "",
+            "template_checksum": "",
+            "expected_filename_pattern": "^FRM\\-311_V1_FAI\\-2026\\-001_\\d{8}_\\d{4}-[A-Z0-9]{2,6}\\.pdf$",
+            "receipt_version": 0,
+            "receipts": [],
+            "history": [
+                {
+                    "status": "allocated",
+                    "at": "2026-03-30T09:53:48+00:00",
+                    "by": "sanh.vo",
+                    "note": "record_id_allocated",
+                    "meta": []
+                }
+            ],
+            "created_at": "2026-03-30T09:53:48+00:00",
+            "created_by": "sanh.vo",
+            "updated_at": "2026-03-30T09:53:48+00:00",
+            "updated_by": "sanh.vo",
+            "suggested_filename": "FRM-311_V1_FAI-2026-001_20260330_1653-SV.pdf",
+            "events": [
+                {
+                    "action": "status_change",
+                    "at": "2026-03-30T09:53:48+00:00",
+                    "by": "sanh.vo",
+                    "note": "record_id_allocated",
+                    "meta": {
+                        "status": "allocated"
+                    }
+                }
+            ]
+        },
+        {
+            "allocation_id": "0500dcf6-fe11-4446-85ff-ddbb7e618422",
+            "record_id": "ECR-2026-001",
+            "record_type": "ECR",
+            "department": "ENG",
+            "year": "2026",
+            "seq": 1,
+            "form_code": "FRM-161",
+            "form_revision": "V1",
+            "delivery_mode": "online",
+            "status": "allocated",
+            "priority": "normal",
+            "notes": "",
+            "master_context": [],
+            "linked_order_id": "",
+            "blank_form_path": "",
+            "blank_form_filename": "",
+            "template_checksum": "",
+            "expected_filename_pattern": "^FRM\\-161_V1_ECR\\-2026\\-001_\\d{8}_\\d{4}-[A-Z0-9]{2,6}\\.pdf$",
+            "receipt_version": 0,
+            "receipts": [],
+            "history": [
+                {
+                    "status": "allocated",
+                    "at": "2026-03-30T10:19:55+00:00",
+                    "by": "sanh.vo",
+                    "note": "record_id_allocated",
+                    "meta": []
+                }
+            ],
+            "created_at": "2026-03-30T10:19:55+00:00",
+            "created_by": "sanh.vo",
+            "updated_at": "2026-03-30T10:19:55+00:00",
+            "updated_by": "sanh.vo",
+            "suggested_filename": "FRM-161_V1_ECR-2026-001_20260330_1719-SV.pdf",
+            "events": [
+                {
+                    "action": "status_change",
+                    "at": "2026-03-30T10:19:55+00:00",
+                    "by": "sanh.vo",
+                    "note": "record_id_allocated",
+                    "meta": {
+                        "status": "allocated"
+                    }
+                }
+            ]
+        }
+    ],
+    "evidence_links": []
+}

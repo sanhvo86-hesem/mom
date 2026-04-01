@@ -1,14 +1,14 @@
 # 23 — Form Lifecycle, Allocation & Order Linking
 
-> Quy chuẩn vòng đời form, cấp phát Record-ID, kiểm soát phiên bản, và liên kết SO/JO/WO.
-> Tuân thủ ISO 9001:2015 clause 7.5 (Documented Information), AS9100D clause 8.5.2 (Traceability),
-> và FDA 21 CFR Part 11 (Electronic Records) khi áp dụng.
+> Form lifecycle rules, Record-ID allocation, version control, and SO/JO/WO linking.
+> Comply with ISO 9001:2015 clause 7.5 (Documented Information), AS9100D clause 8.5.2 (Traceability),
+> and FDA 21 CFR Part 11 (Electronic Records) when applicable.
 
 ---
 
-## 1. Form Lifecycle (Vòng đời Form Blank)
+## 1. Form Lifecycle (Form Blank Lifecycle)
 
-### 1.1 Sơ đồ trạng thái
+### 1.1 State diagram
 
 ```
  DRAFT ──→ REVIEW ──→ APPROVED ──→ ACTIVE ──→ OBSOLETE
@@ -18,33 +18,33 @@
                             └──→ ACTIVE khi có ≥1 user download
 ```
 
-### 1.2 Chi tiết từng trạng thái
+### 1.2 Details of each status
 
-| # | Trạng thái | Mô tả | Ai thực hiện | Hành động tiếp |
+| # | Status | Description | Who does it | Next Action |
 |---|-----------|-------|-------------|---------------|
-| 1 | **DRAFT** | Form đang soạn, chưa hoàn chỉnh | Form Author (ENG, QA) | Submit for review |
-| 2 | **REVIEW** | Đang chờ reviewer duyệt nội dung + layout | Assigned Reviewer | Approve hoặc Reject |
-| 3 | **APPROVED** | Đã duyệt nhưng chưa phát hành chính thức | Document Controller | Activate khi sẵn sàng |
-| 4 | **ACTIVE** | Đang sử dụng, user có thể download/điền | Hệ thống | Obsolete khi version mới thay thế |
-| 5 | **OBSOLETE** | Không còn sử dụng, chỉ giữ lại cho audit trail | Document Controller | Chỉ xem, không download |
-| 6 | **SUPERSEDED** | Bị thay thế bởi version mới, tự động chuyển | Hệ thống (auto) | Read-only archive |
+| 1 | **DRAFT** | Form is being prepared, not yet complete | Form Author (ENG, QA) | Submit for review |
+| 2 | **REVIEW** | Waiting for reviewer to approve content + layout | Assigned Reviewer | Approve or Reject |
+| 3 | **APPROVED** | Approved but not yet officially released | Document Controller | Activate when ready |
+| 4 | **ACTIVE** | In use, users can download/fill | System | Obsolete when the new version replaces |
+| 5 | **OBSOLETE** | No longer in use, kept only for audit trail | Document Controller | Just watch, don't download |
+| 6 | **SUPERSEDED** | Replaced by new version, automatically switched | System (auto) | Read-only archive |
 
-### 1.3 Quy tắc chuyển trạng thái
+### 1.3 State transition rules
 
-| Từ | Sang | Điều kiện | Ai duyệt |
+| From | Sang | Conditions | Who approves |
 |----|------|-----------|----------|
-| DRAFT → REVIEW | Author submit + tất cả required fields đầy đủ | Author |
-| REVIEW → APPROVED | Reviewer approve | Reviewer (role: doc_reviewer) |
-| REVIEW → DRAFT | Reviewer reject + ghi lý do | Reviewer |
-| APPROVED → ACTIVE | Document Controller phát hành | DC (role: doc_controller) |
-| ACTIVE → OBSOLETE | Manual obsolete hoặc superseded bởi version mới | DC hoặc System |
-| ACTIVE → SUPERSEDED | Version mới được ACTIVE → version cũ tự SUPERSEDED | System (auto) |
+| DRAFT → REVIEW | Author submit + all required fields complete | Author |
+| REVIEW → APPROVED | Reviewer approved | Reviewer (role: doc_reviewer) |
+| REVIEW → DRAFT | Reviewer reject + write reason | Reviewer |
+| APPROVED → ACTIVE | Document Controller released | DC (role: doc_controller) |
+| ACTIVE → OBSOLETE | Manual obsolete or superseded by new version | DC or System |
+| ACTIVE → SUPERSEDED | The new version is ACTIVE → the old version automatically SUPERSEDED | System (auto) |
 
 ---
 
-## 2. Allocation Lifecycle (Vòng đời Cấp phát Record-ID)
+## 2. Allocation Lifecycle (Record-ID Allocation Lifecycle)
 
-### 2.1 Sơ đồ trạng thái
+### 2.1 State diagram
 
 ```
  ALLOCATED ──→ DOWNLOADED ──→ SUBMITTED ──→ RECEIVED ──→ ARCHIVED
@@ -58,57 +58,57 @@
      └──→ AUTO-VOIDED (quá 90 ngày không submit)
 ```
 
-### 2.2 Chi tiết từng trạng thái
+### 2.2 Details of each status
 
-| # | Trạng thái | Mô tả | Trigger |
+| # | Status | Description | Triggers |
 |---|-----------|-------|---------|
-| 1 | **ALLOCATED** | Record-ID đã cấp, chưa download file | User request → server cấp mã |
-| 2 | **DOWNLOADED** | User đã download .txt placeholder hoặc Excel blank | User click download |
-| 3 | **SUBMITTED** | User đã upload file đã điền lên portal | User upload action |
-| 4 | **RECEIVED** | Document Controller xác nhận file hợp lệ | DC review + accept |
-| 5 | **ARCHIVED** | Hồ sơ đã lưu trữ chính thức trên SharePoint | Auto sau 30 ngày RECEIVED |
-| 6 | **VOIDED** | User hoặc admin hủy bỏ, không sử dụng | Manual void + reason |
-| 7 | **AUTO-VOIDED** | Quá hạn 90 ngày kể từ ALLOCATED mà không SUBMITTED | Cron job hàng ngày |
-| 8 | **REJECTED** | File upload không hợp lệ (sai version, thiếu data) | DC reject + ghi lý do |
+| 1 | **ALLOCATED** | Record-ID issued, file not downloaded yet | User request → server grants code |
+| 2 | **DOWNLOADED** | User downloaded .txt placeholder or Excel blank | User click download |
+| 3 | **SUBMITTED** | The user has uploaded the completed file to the portal | User upload action |
+| 4 | **RECEIVED** | Document Controller verifies that the file is valid | DC review + accept |
+| 5 | **ARCHIVED** | Records officially archived on SharePoint | Auto after 30 days RECEIVED |
+| 6 | **VOIDED** | User or admin cancel, do not use | Manual void + reason |
+| 7 | **AUTO-VOIDED** | Overdue 90 days from ALLOCATED without SUBMITTED | Daily Cron job |
+| 8 | **REJECTED** | File uploaded is invalid (wrong version, missing data) | DC reject + write reason |
 
 ### 2.3 Tracking Requirements
 
-Mỗi allocation record PHẢI lưu:
+Each allocation record MUST save:
 
-| Field | Bắt buộc | Mô tả |
+| Field | Required | Description |
 |-------|---------|-------|
-| `allocation_id` | CÓ | UUID v4 unique |
-| `record_id` | CÓ | Mã hồ sơ (e.g. NCR-2026-043) |
-| `record_type` | CÓ | Loại hồ sơ (NCR, CAPA, FAI...) |
-| `department` | CÓ | Phòng ban yêu cầu |
-| `requested_by` | CÓ | UserID người yêu cầu |
-| `requested_at` | CÓ | ISO 8601 timestamp |
-| `status` | CÓ | Trạng thái hiện tại |
-| `job_number` | Tùy | Số JO nếu gắn job |
-| `form_code` | Tùy | Mã form liên quan |
-| `downloaded_at` | Tùy | Thời điểm download |
-| `submitted_at` | Tùy | Thời điểm upload |
-| `received_at` | Tùy | Thời điểm DC accept |
-| `voided_at` | Tùy | Thời điểm void |
-| `void_reason` | Tùy | Lý do void |
-| `status_history` | CÓ | Array các lần chuyển trạng thái |
+| `allocation_id` | YES | UUID v4 unique |
+| `record_id` | YES | Case code (e.g. NCR-2026-043) |
+| `record_type` | YES | Type of application (NCR, CAPA, FAI...) |
+| `department` | YES | Department request |
+| `requested_by` | YES | Requester UserID |
+| `requested_at` | YES | ISO 8601 timestamp |
+| `status` | YES | Current status |
+| `job_number` | Depends | JO number if job | is attached
+| `form_code` | Depends | Related form code |
+| `downloaded_at` | Depends | Download time |
+| `submitted_at` | Depends | Upload time |
+| `received_at` | Depends | When DC accepts |
+| `voided_at` | Depends | Void moment |
+| `void_reason` | Depends | Reason void |
+| `status_history` | YES | Array of state transitions |
 
-### 2.4 eQMS Record Instance Rules (Bắt buộc cho form online/offline)
+### 2.4 eQMS Record Instance Rules (Required for online/offline forms)
 
-| # | Quy tắc | Chi tiết bắt buộc |
+| # | Rules | Required Details |
 |---|---------|-------------------|
-| 1 | **Một instance = một Record-ID** | Mỗi lần người dùng bấm `Tạo mới online` hoặc `Tạo mới offline`, hệ thống cấp **1** `allocation_id` + `record_id` duy nhất cho toàn bộ vòng đời hồ sơ đó. |
-| 2 | **Mở lại bản nháp không được cấp mã mới** | Nếu đã có `allocation_id`/`record_id`, mọi lần mở lại draft PHẢI tái sử dụng đúng mã cũ. `Save draft` tuyệt đối KHÔNG được tăng counter. |
-| 3 | **Tab Tạo mã không dùng cho form** | Form online/offline tự cấp mã trong runtime của form. Tab `Tạo mã` chỉ phục vụ thực thể ngoài form như ANNEX number, mã vật tư, phôi, tooling, tài sản hoặc các record tham khảo khác. |
-| 4 | **Online submit giữ nguyên Record-ID** | Form online khi submit lần đầu tạo `submission_count = 1`. Các lần nộp lại tiếp theo trên cùng hồ sơ vẫn giữ nguyên `record_id`, chỉ tăng `submission_count` / `resubmission_count`. |
-| 5 | **Controlled edit sau submit không tạo hồ sơ mới** | Khi hồ sơ online đã nộp và người dùng vào `Chỉnh sửa có kiểm soát`, hệ thống phải mở lại cùng `allocation_id`/`record_id`, tạo `submission_revision` mới và tăng `amendment_count` nếu đây là sửa sau submit/review/approve. |
-| 6 | **Offline resubmission giữ nguyên Record-ID** | Form offline sau khi được cấp mã và tải về phải upload lại theo đúng `allocation_id` cũ. Mỗi lần upload hợp lệ làm tăng `receipt_version`; không được cấp Record-ID mới chỉ vì nộp lại workbook. |
-| 7 | **Rejected / Reopen vẫn dùng cùng mã** | Nếu hồ sơ bị reject hoặc reopen, hệ thống giữ nguyên `record_id`; chỉ thay đổi trạng thái workflow và sinh revision/receipt mới. |
-| 8 | **Chỉ cấp mã mới khi là business case mới** | Chỉ tạo Record-ID mới khi người dùng chủ động `Tạo mới` hoặc hồ sơ cũ đã `VOIDED` và nghiệp vụ yêu cầu lập hồ sơ khác. |
+| 1 | **One instance = one Record-ID** | Each time the user presses `Tạo mới online` or `Tạo mới offline`, the system grants a unique **1** `allocation_id` + `record_id` for the entire life of that profile. |
+| 2 | **Reopen draft without new code** | If you already have `allocation_id`/`record_id`, any reopening of the draft MUST reuse the same code. `Save draft` absolutely DO NOT increase the counter. |
+| 3 | **Code Generation tab is not used for forms** | Online/offline forms automatically provide code during the form's runtime. Tab `Tạo mã` only serves entities outside the form such as ANNEX number, material code, workpiece, tooling, assets or other reference records. |
+| 4 | **Online submission retains Record-ID** | The online form when submitted for the first time creates `submission_count = 1`. Subsequent re-submissions on the same profile remain the same `record_id`, only increasing `submission_count` / `resubmission_count`. |
+| 5 | **Controlled edit after submission does not create a new profile** | Once the online application has been submitted and the user enters `Chỉnh sửa có kiểm soát`, the system must reopen the same `allocation_id`/`record_id`, create a new `submission_revision` and increase `amendment_count` if this is an edit after submit/review/approve. |
+| 6 | **Offline resubmission retains Record-ID** | After being issued a code and downloaded, the offline form must be re-uploaded according to the old `allocation_id`. Each valid upload increases `receipt_version`; A new Record-ID will not be issued just because the workbook is returned. |
+| 7 | **Rejected / Reopen still uses the same code** | If the profile is rejected or reopened, the system keeps `record_id`; Just change the workflow status and generate a new revision/receipt. |
+| 8 | **Only issue new code when it is a new business case** | Only create a new Record-ID when the user actively `Tạo mới` or the old record has `VOIDED` and the business requires another record. |
 
-### 2.5 Mandatory Registry Fields (Sổ quản lý mã eQMS)
+### 2.5 Mandatory Registry Fields (eQMS Code Management Book)
 
-Mọi hệ thống eQMS form PHẢI có một registry để theo dõi tối thiểu:
+Every eQMS form system MUST have a registry to track at least:
 
 ```
 allocation_id | record_id | form_code | delivery_mode | workflow_state | created_by | created_at
@@ -116,29 +116,29 @@ last_action_at | submission_count | resubmission_count | amendment_count | recei
 draft_exists | latest_filename | latest_submission_ref | completed_flag
 ```
 
-Quy định bắt buộc:
+Mandatory regulations:
 
-1. Registry phải hiển thị được cả online và offline trong cùng một màn hình tra cứu.
-2. Registry phải phân biệt rõ `draft`, `allocated`, `submitted`, `approved`, `closed`, `received`, `rejected`, `void`.
-3. Registry phải cho biết số lần nộp và số lần nộp lại của từng hồ sơ.
-4. Registry phải mở lại đúng hồ sơ hiện hành, không tạo bản mới khi người dùng chọn `Mở` hoặc `Chỉnh sửa`.
+1. Registry must be displayed both online and offline in the same lookup screen.
+2. Registry must clearly distinguish `draft`, `allocated`, `submitted`, `approved`, `closed`, `received`, `rejected`, `void`.
+3. The Registry must indicate the number of submissions and resubmissions of each application.
+4. Registry must reopen the correct current profile, not create a new version when the user selects `Mở` or `Chỉnh sửa`.
 
 ### 2.6 Cancel Creation / Withdraw Before First Submission
 
-| Tình huống | Cách xử lý bắt buộc |
+| Situation | Mandatory handling |
 |-----------|---------------------|
-| Người dùng bấm `Hủy tạo form` trước khi submit lần đầu | Hệ thống phải **xóa draft payload**, giữ nguyên `allocation_id` / `record_id`, và chuyển allocation sang trạng thái `void` |
-| Đã cấp mã nhưng chưa nộp | **Không được tái sử dụng mã** cho hồ sơ khác |
-| Hủy tạo form | Bắt buộc nhập **lý do hủy** |
-| Registry | Phải hiển thị bản ghi đã hủy với `void_reason`, `voided_by`, `voided_at` |
-| Hồ sơ đã submit / approved / closed | Không được dùng `Hủy tạo form`; chỉ được đi theo `Controlled Edit / Resubmission` |
+| User presses `Hủy tạo form` before submitting for the first time | The system must **clear the draft payload**, leave `allocation_id` / `record_id` intact, and move the allocation to state `void` |
+| Code issued but not yet submitted | **Code may not be reused** for other profiles |
+| Cancel creating form | Required to enter **reason for cancellation** |
+| Registry | Must display canceled records with `void_reason`, `voided_by`, `voided_at` |
+| Profile submitted / approved / closed | Do not use `Hủy tạo form`; Only follow `Controlled Edit / Resubmission` |
 
-Quy tắc bắt buộc:
+Required rules:
 
-1. `Hủy tạo form` là hành động nghiệp vụ kiểu `withdraw before first submission`, không phải xóa cứng.
-2. Mọi số đã cấp phải còn truy vết trong registry để audit không thấy "mất số".
-3. Nếu draft có trên server hoặc local browser, hệ thống phải dọn draft đó khi hủy.
-4. Nếu người dùng mở lại một business case mới sau khi đã hủy, hệ thống phải cấp **mã mới**, không được tái kích hoạt mã đã void.
+1. `Hủy tạo form` is a business action of type `withdraw before first submission`, not a hard delete.
+2. All issued numbers must still be traceable in the registry so that the audit does not see "lost numbers".
+3. If the draft is on the server or local browser, the system must clear that draft when canceling.
+4. If the user reopens a new business case after canceling, the system must issue a **new code**, and cannot reactivate the void code.
 
 ---
 
@@ -146,38 +146,38 @@ Quy tắc bắt buộc:
 
 ### 3.1 Online Forms
 
-| Quy tắc | Chi tiết |
+| Rules | Details |
 |---------|---------|
 | Version format | `{major}.{minor}` (e.g. 2.1) |
-| Major bump | Thay đổi structure (thêm/xóa field, đổi logic) |
-| Minor bump | Sửa typo, label, help text (không ảnh hưởng data) |
-| Active version | Chỉ 1 version ACTIVE tại mỗi thời điểm per form code |
-| Backward compatibility | Minor bump: dữ liệu cũ vẫn hợp lệ. Major bump: migration script bắt buộc |
+| Major bump | Change structure (add/remove fields, change logic) |
+| Minor bump | Edit typo, label, help text (does not affect data) |
+| Active version | Only 1 ACTIVE version at a time per form code |
+| Backward compatibility | Minor bump: old data is still valid. Major bump: required migration script |
 | Schema storage | `qms-data/online-forms/schemas/FRM-XXX_V{ver}.json` |
 
 ### 3.2 Offline Forms (Excel)
 
-| Quy tắc | Chi tiết |
+| Rules | Details |
 |---------|---------|
-| Version stamp | Sheet ẩn `_QMS_CONTROL` chứa version + checksum |
-| Download tracking | Server log mỗi lần download: who, when, which version |
-| Upload validation | So sánh version trong `_QMS_CONTROL` với active version |
-| Obsolete warning | Upload form version cũ → FLAG `Version-Valid = OBSOLETE` |
-| Grace period | 30 ngày sau khi version mới ACTIVE, form version cũ vẫn accepted (warning only) |
+| Version stamp | Hidden sheet `_QMS_CONTROL` contains version + checksum |
+| Download tracking | Server logs each download: who, when, which version |
+| Upload validation | Compare version in `_QMS_CONTROL` with active version |
+| Obsolete warning | Upload old form version → FLAG `Version-Valid = OBSOLETE` |
+| Grace period | 30 days after the new version is ACTIVE, the old version form is still accepted (warning only) |
 
 ### 3.3 Excel Hidden Sheet `_QMS_CONTROL` Verification Rules
 
-Mỗi form Excel blank PHẢI có sheet ẩn `_QMS_CONTROL` với:
+Every blank Excel form MUST have a hidden sheet `_QMS_CONTROL` with:
 
-| Cell | Nội dung | Ví dụ |
+| Cell | Content | Example |
 |------|---------|-------|
 | A1 | `form_code` | FRM-302 |
 | A2 | `version` | 3.2 |
-| A3 | `checksum` | SHA256 của form structure |
+| A3 | `checksum` | SHA256 of form structure |
 | A4 | `downloaded_by` | NVA |
 | A5 | `downloaded_at` | 2026-03-28T08:30:00Z |
 | A6 | `source` | HESEM-QMS-Portal |
-| A7 | `allocation_id` | UUID nếu có |
+| A7 | `allocation_id` | UUID if present |
 
 **Upload verification flow:**
 
@@ -193,47 +193,47 @@ Mỗi form Excel blank PHẢI có sheet ẩn `_QMS_CONTROL` với:
 
 ### 3.4 Controlled Edit / Resubmission Rules
 
-| Tình huống | Record-ID | Revision nội bộ | Yêu cầu audit trail |
+| Situation | Record-ID | Internal revision | Request an audit trail |
 |-----------|-----------|-----------------|---------------------|
-| Lưu nháp online | Giữ nguyên | Không tăng submission revision | Ghi `draft_saved_at`, `saved_by` |
-| Submit lần đầu online | Giữ nguyên | `submission_revision = 1` | Ghi `submitted_by`, `submitted_at`, chữ ký |
-| Chỉnh sửa sau submit online | Giữ nguyên | `submission_revision + 1` | Ghi lý do sửa, người sửa, thời điểm sửa, source revision |
-| Upload offline lần đầu | Giữ nguyên | `receipt_version = 1` | Ghi `uploaded_by`, `uploaded_at`, tên file đã nhận |
-| Upload offline nộp lại | Giữ nguyên | `receipt_version + 1` | Ghi version mới, giữ lịch sử receipt cũ |
+| Save draft online | Keep | Does not increase submission revision | Record `draft_saved_at`, `saved_by` |
+| Submit for the first time online | Keep | `submission_revision = 1` | Record `submitted_by`, `submitted_at`, signature |
+| Edit after submitting online | Keep | `submission_revision + 1` | Record the reason for editing, who edited it, when it was edited, and source revision |
+| Upload offline for the first time | Keep | `receipt_version = 1` | Record `uploaded_by`, `uploaded_at`, received file name |
+| Upload offline and resubmit | Keep | `receipt_version + 1` | Record new version, keep old receipt history |
 
-Quy tắc bắt buộc:
+Required rules:
 
-1. Bản cũ không được bị che khuất hoặc mất truy vết khi có controlled edit / resubmission.
-2. Hệ thống phải giữ đủ metadata để xác định `ai`, `khi nào`, `vì sao`, và `bản nào` bị thay thế.
-3. Nếu workflow yêu cầu reopen, hành động reopen phải được ghi riêng trong history và không được reset counter về 0.
+1. The old version must not be obscured or lost due to controlled edit / resubmission.
+2. The system must retain enough metadata to identify `ai`, `khi nào`, `vì sao`, and `bản nào` to be replaced.
+3. If the workflow requires reopening, the reopening action must be recorded separately in the history and must not reset the counter to 0.
 
 ---
 
 ## 4. Form Builder Governance
 
-### 4.1 Ai có thể làm gì
+### 4.1 Who can do what
 
-| Hành động | Roles được phép | Approval cần |
+| Action | Roles allowed | Approval needs |
 |-----------|---------------|-------------|
-| Tạo form blank mới (DRAFT) | `doc_author`, `admin` | Không |
-| Chỉnh sửa form DRAFT | `doc_author` (owner), `admin` | Không |
-| Submit for REVIEW | `doc_author` (owner) | Không |
-| Approve/Reject form | `doc_reviewer`, `admin` | Không |
-| Phát hành (ACTIVE) | `doc_controller`, `admin` | Reviewer đã approve |
-| Obsolete form | `doc_controller`, `admin` | Không |
-| Chỉnh sửa form ACTIVE | KHÔNG AI — phải tạo version mới | N/A |
-| Xóa form | `admin` only, chỉ khi DRAFT | Không |
+| Create new blank form (DRAFT) | `doc_author`, `admin` | No |
+| Edit form DRAFT | `doc_author` (owner), `admin` | No |
+| Submit for REVIEW | `doc_author` (owner) | No |
+| Approve/Reject form | `doc_reviewer`, `admin` | No |
+| Release (ACTIVE) | `doc_controller`, `admin` | Reviewer approved |
+| Obsolete form | `doc_controller`, `admin` | No |
+| Edit form ACTIVE | NOBODY — must create new version | N/A |
+| Delete form | `admin` only, only if DRAFT | No |
 
 ### 4.3 Form Template Editing Rules
 
-1. Nút `Chỉnh sửa mẫu form` phải mở **builder có version control**, không sửa trực tiếp live schema đang ACTIVE.
-2. Builder của form phải nằm ngay trong phân hệ `Online Form`, không nhảy sang một module tách rời.
-3. `Tạo mẫu form online` phải sinh schema draft mới, sau đó đi theo chu trình `Save Draft -> Submit Review -> Approve / Publish`.
-4. Bất kỳ chỉnh sửa nào với form template đang ACTIVE phải tạo working draft mới và giữ nguyên revision đã phát hành cho đến khi publish.
+1. The `Chỉnh sửa mẫu form` button must open **builder with version control**, do not directly edit live schema that is ACTIVE.
+2. The form's builder must be located within the `Online Form` module, not jumping to a separate module.
+3. `Tạo mẫu form online` must generate a new draft schema, then follow the `Save Draft -> Submit Review -> Approve / Publish` cycle.
+4. Any edits to the ACTIVE form template must create a new working draft and keep the published revision intact until published.
 
 ### 4.2 Form Code Assignment
 
-| Series | Phòng ban | Ví dụ |
+| Series | Departments | Example |
 |--------|----------|-------|
 | 100-199 | QMS Governance / Executive | FRM-101 Document Register |
 | 200-299 | Sales / Contract Review | FRM-201 Quotation Review |
@@ -249,19 +249,19 @@ Quy tắc bắt buộc:
 
 ## 5. Inter-form Formula Rules
 
-### 5.1 Nguyên tắc
+### 5.1 Principles
 
-| # | Quy tắc | Giải thích |
+| # | Rules | Explanation |
 |---|---------|-----------|
-| 1 | **Một chiều** | Form A có thể tham chiếu data từ Form B, nhưng Form B KHÔNG biết Form A |
-| 2 | **Read-only reference** | Cross-form data chỉ đọc, không ghi ngược |
-| 3 | **Explicit declaration** | Mọi cross-form reference phải khai báo trong schema `dependencies[]` |
-| 4 | **Fallback value** | Nếu form tham chiếu không có data → dùng default value, không crash |
-| 5 | **Version-pinned** | Reference gắn cụ thể version form nguồn |
+| 1 | **One-way** | Form A can reference data from Form B, but Form B does NOT know Form A |
+| 2 | **Read-only reference** | Cross-form data is only read, not written back |
+| 3 | **Explicit declaration** | All cross-form references must be declared in the schema `dependencies[]` |
+| 4 | **Fallback value** | If the reference form has no data → use default value, do not crash |
+| 5 | **Version-pinned** | Reference specifically attaches the source form version |
 
 ### 5.2 Dependency Map
 
-| Form đích | Tham chiếu từ | Data lấy |
+| Target form | Reference from | Data get |
 |-----------|-------------|---------|
 | FRM-641 (CAPA) | FRM-631 (NCR) | ncr_id, defect_type, root_cause_category |
 | FRM-651 (Final Insp) | FRM-511 (First Piece) | first_piece_result, setup_verified |
@@ -273,21 +273,21 @@ Quy tắc bắt buộc:
 
 ## 6. Cross-tab History Requirements
 
-### 6.1 Truy vết xuyên tab (Cross-tab traceability)
+### 6.1 Cross-tab traceability
 
-Mọi record phải truy vết được qua các bảng/tab khác nhau:
+Every record must be traceable across different tables/tabs:
 
-| Từ tab | Sang tab | Truy vết bằng |
+| From tab | Go to tab | Trace with |
 |--------|---------|-------------|
 | Allocation History | Form Submissions | `record_id` |
 | Form Submissions | Job Dossier | `job_number` |
 | Job Dossier | Order Hierarchy | `jo_number` → `so_number` |
-| NCR Log | CAPA Log | `ncr_id` trong CAPA `source_ref` |
-| Audit Finding | NCR / CAPA | `finding_id` → `ncr_id` / `capa_id` |
+| NCR Log | CAPA Log | `ncr_id` in CAPA `source_ref` |
+| Audit Finding | NCR/CAPA | `finding_id` → `ncr_id` / `capa_id` |
 
 ### 6.2 Minimum History Fields
 
-Mọi history view PHẢI hiển thị:
+Every history view MUST display:
 
 ```
 record_id | record_type | status | requested_by | requested_at | department | job_number
@@ -308,30 +308,30 @@ Sales Order (SO)
 
 ### 7.2 Linking Rules
 
-| # | Quy tắc | Chi tiết |
+| # | Rules | Details |
 |---|---------|---------|
-| 1 | **SO là gốc** | Mọi JO phải gắn 1 SO. Mọi WO phải gắn 1 JO. |
-| 2 | **Form gắn JO** | Form records (NCR, FAI, Inspection...) gắn vào JO level |
-| 3 | **WO-level optional** | Form có thể gắn đến WO nếu cần (per-operation tracking) |
-| 4 | **Cascading status** | Khi SO closed → tất cả JO phải completed hoặc cancelled |
-| 5 | **Cross-job NCR** | NCR có thể reference nhiều JO nếu lỗi ảnh hưởng nhiều job |
-| 6 | **Linking immutable** | Sau khi link, không xóa được — chỉ void allocation |
+| 1 | **SO is root** | Every JO must attach 1 SO. Every WO must have a JO attached. |
+| 2 | **JO attached form** | Form records (NCR, FAI, Inspection...) are attached to JO level |
+| 3 | **WO-level optional** | Form can be attached to WO if needed (per-operation tracking) |
+| 4 | **Cascading status** | When SO is closed → all JOs must be completed or canceled |
+| 5 | **Cross-job NCR** | NCR can reference multiple JOs if the error affects multiple jobs |
+| 6 | **Linking immutable** | Once linked, it cannot be deleted — only void allocation |
 
 ### 7.3 Data Sources
 
-| Entity | Source of Record | Sync |
+| Entities | Source of Record | Sync |
 |--------|-----------------|------|
-| SO | Epicor ERP | Daily import hoặc API |
-| JO | Epicor ERP | Daily import hoặc API |
-| WO | Epicor ERP | Daily import hoặc API |
+| SO | Epicor ERP | Daily import or API |
+| JO | Epicor ERP | Daily import or API |
+| WO | Epicor ERP | Daily import or API |
 | Form links | QMS Portal | Real-time |
 | Record-IDs | QMS Portal | Real-time (atomic counter) |
 
 ### 7.4 SO/JO/WO Number Format
 
-| Entity | Format | Ví dụ |
+| Entities | Format | Example |
 |--------|--------|-------|
-| Sales Order | `SO-{YYYY}-{4digit}` | SO-2026-0150 |
+| Sales Orders | `SO-{YYYY}-{4digit}` | SO-2026-0150 |
 | Job Order | `JOB-{YYYY}-{4digit}` | JOB-2026-0042 |
 | Work Order | `WO-{JOB}-OP{nn}` | WO-JOB-2026-0042-OP10 |
 
@@ -339,16 +339,16 @@ Sales Order (SO)
 
 ## 8. Audit Trail Requirements (ISO 9001 Clause 7.5)
 
-### 8.1 Nguyên tắc audit trail
+### 8.1 Audit trail principles
 
-| # | Yêu cầu ISO 9001:2015 | Triển khai HESEM |
+| # | ISO 9001:2015 requirements | Implementing HESEM |
 |---|----------------------|-----------------|
-| 7.5.1 | Tổ chức phải duy trì documented information theo yêu cầu QMS | Mọi form change lưu trong `status_history[]` |
-| 7.5.2 | Khi tạo/cập nhật, phải đảm bảo identification, format, review | Form lifecycle 6 trạng thái, reviewer gate |
-| 7.5.3a | Documented info phải available và suitable for use | Active forms trên portal, searchable |
+| 7.5.1 | The organization must maintain documented information according to QMS requirements All form changes are saved in `status_history[]` |
+| 7.5.2 | When creating/updating, make sure to identify, format, review | Form lifecycle 6 states, reviewer gate |
+| 7.5.3a | Documented information must be available and suitable for use | Active forms on portal, searchable |
 | 7.5.3b | Adequately protected | Role-based access, CSRF, audit log |
 
-### 8.2 Audit trail fields (bắt buộc mọi record)
+### 8.2 Audit trail fields (required for all records)
 
 ```json
 {
@@ -365,14 +365,14 @@ Sales Order (SO)
 
 ### 8.3 Retention Requirements
 
-| Loại hồ sơ | Thời gian giữ | Sau đó |
+| Record type | Holding time | Then |
 |-----------|-------------|-------|
-| Quality records (NCR, CAPA, FAI) | 10 năm | Archive → cold storage |
-| Production records | 7 năm | Archive → cold storage |
-| Training records | Đến khi nhân viên nghỉ + 3 năm | Archive |
-| Audit records | 10 năm | Archive |
-| Allocation logs | 5 năm | Purge |
-| Voided allocations | 3 năm | Purge |
+| Quality records (NCR, CAPA, FAI) | 10 years | Archive → cold storage |
+| Production records | 7 years | Archive → cold storage |
+| Training records | Until the employee leaves + 3 years | Archive |
+| Audit records | 10 years | Archive |
+| Allocation logs | 5 years | Purge |
+| Voided allocations | 3 years | Purge |
 
 ---
 
@@ -380,7 +380,7 @@ Sales Order (SO)
 
 ### 9.1 Quality Records
 
-| Code | Tên | Format | Counter Digits | Scope |
+| Code | Name | Format | Counter Digits | Scope |
 |------|-----|--------|---------------|-------|
 | NCR | Nonconformance Report | `NCR-{YYYY}-{3d}` | 3 | Per-event |
 | CAPA | Corrective/Preventive Action | `CAPA-{YYYY}-{3d}` | 3 | Per-event |
@@ -393,7 +393,7 @@ Sales Order (SO)
 
 ### 9.2 Production Records
 
-| Code | Tên | Format | Counter Digits | Scope |
+| Code | Name | Format | Counter Digits | Scope |
 |------|-----|--------|---------------|-------|
 | DOWNTIME | Machine Downtime | `DT-{YYYY}-{4d}` | 4 | Per-event |
 | SETUP | Setup Record | `SETUP-{YYYY}-{4d}` | 4 | Per-job-op |
@@ -403,16 +403,16 @@ Sales Order (SO)
 
 ### 9.3 Engineering Records
 
-| Code | Tên | Format | Counter Digits | Scope |
+| Code | Name | Format | Counter Digits | Scope |
 |------|-----|--------|---------------|-------|
 | ECR | Engineering Change Request | `ECR-{YYYY}-{3d}` | 3 | Per-event |
 | ECO | Engineering Change Order | `ECO-{YYYY}-{3d}` | 3 | Per-ECR |
 | DFM | Design for Manufacturing | `DFM-{YYYY}-{3d}` | 3 | Per-part |
-| PROVEOUT | Prove-out Record | `PO-{YYYY}-{3d}` | 3 | Per-part-rev |
+| PROVOUT | Prove-out Record | `PO-{YYYY}-{3d}` | 3 | Per-part-rev |
 
 ### 9.4 Logistics & Supply Chain Records
 
-| Code | Tên | Format | Counter Digits | Scope |
+| Code | Name | Format | Counter Digits | Scope |
 |------|-----|--------|---------------|-------|
 | PO-EXCEPTION | PO Exception | `POE-{YYYY}-{3d}` | 3 | Per-event |
 | IQC | Incoming QC | `IQC-{YYYY}-{4d}` | 4 | Per-lot |
@@ -420,14 +420,14 @@ Sales Order (SO)
 
 ### 9.5 HR & Training Records
 
-| Code | Tên | Format | Counter Digits | Scope |
+| Code | Name | Format | Counter Digits | Scope |
 |------|-----|--------|---------------|-------|
 | TRN | Training Event | `TRN-{YYYY}-{3d}` | 3 | Per-event |
 | COMP | Competency Assessment | `COMP-{YYYY}-{3d}` | 3 | Per-employee |
 
 ### 9.6 Management Records
 
-| Code | Tên | Format | Counter Digits | Scope |
+| Code | Name | Format | Counter Digits | Scope |
 |------|-----|--------|---------------|-------|
 | MR | Management Review | `MR-{YYYY}-Q{n}` | 1 | Quarterly |
 | RISK | Risk Assessment | `RISK-{YYYY}-R{2d}` | 2 | Per-review |
@@ -438,11 +438,11 @@ Sales Order (SO)
 
 ### 10.1 Trigger Conditions
 
-| # | Điều kiện | Hành động | Grace Period |
+| # | Conditions | Action | Grace Period |
 |---|----------|-----------|-------------|
-| 1 | ALLOCATED > 90 ngày, chưa DOWNLOADED | AUTO-VOID | 90 ngày |
-| 2 | DOWNLOADED > 90 ngày, chưa SUBMITTED | AUTO-VOID | 90 ngày |
-| 3 | REJECTED > 30 ngày, chưa re-SUBMITTED | AUTO-VOID | 30 ngày |
+| 1 | ALLOCATED > 90 days, not yet DOWNLOADED | AUTO-VOID | 90 days |
+| 2 | DOWNLOADED > 90 days, not yet SUBMITTED | AUTO-VOID | 90 days |
+| 3 | REJECTED > 30 days, not yet re-SUBMITTED | AUTO-VOID | 30 days |
 
 ### 10.2 Auto-Void Process
 
@@ -461,11 +461,11 @@ Sales Order (SO)
 
 ### 10.3 Reporting
 
-Auto-void report hàng tháng:
-- Tổng số allocations auto-voided
-- Breakdown theo record_type
-- Breakdown theo department
-- Top 5 users có nhiều auto-void nhất → training target
+Auto-void monthly report:
+- Total number of auto-voided allocations
+- Breakdown by record_type
+- Breakdown by department
+- Top 5 users with the most auto-voids → training target
 
 ---
 
@@ -495,6 +495,6 @@ qms-data/
 
 ---
 
-> **Cap nhat lan cuoi:** 2026-03-29
-> **Ap dung:** Moi quy trinh cap phat Record-ID, quan ly form lifecycle, va lien ket SO/JO/WO
-> **Tai lieu lien quan:** 15-evidence-and-records-naming.md, 18-online-vs-offline-form-decision-framework.md, RecordIdGenerator.php, FormEngine.php
+> **Last cap:** 2026-03-29
+> **Application:** All Record-ID generation process, lifecycle form management, and SO/JO/WO connection
+> **Related documents:** 15-evidence-and-records-naming.md, 18-online-vs-offline-form-decision-framework.md, RecordIdGenerator.php, FormEngine.php
