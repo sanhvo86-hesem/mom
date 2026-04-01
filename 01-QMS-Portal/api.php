@@ -14969,37 +14969,9 @@ if ($username === '') {
       $tree[$idx] = $reconcileTreeNodeWithFilesystem($node);
     }
 
-    // Repair custom_docs stale paths
-    try {
-      $custom = load_custom_docs($CUSTOM_DOCS_FILE);
-      $scannedByCode = [];
-      foreach ($docs as $d) {
-        $code = strtoupper((string)($d['code'] ?? ''));
-        if ($code === '') continue;
-        $scannedByCode[$code] = [
-          'path' => (string)($d['path'] ?? ''),
-          'folder' => (string)($d['folder'] ?? ''),
-        ];
-      }
-      $repaired = false;
-      foreach ($custom as &$cd) {
-        if (!is_array($cd) || empty($cd['code'])) continue;
-        $ccode = strtoupper($cd['code']);
-        if (isset($scannedByCode[$ccode])) {
-          $scanned = $scannedByCode[$ccode];
-          if (($cd['path'] ?? '') !== ($scanned['path'] ?? '')) {
-            $cd['path'] = $scanned['path'] ?? '';
-            $repaired = true;
-          }
-          if (($scanned['folder'] ?? '') !== '' && ($cd['folder'] ?? '') !== ($scanned['folder'] ?? '')) {
-            $cd['folder'] = $scanned['folder'] ?? '';
-            $repaired = true;
-          }
-        }
-      }
-      unset($cd);
-      if ($repaired) save_custom_docs($CUSTOM_DOCS_FILE, $custom);
-    } catch (Throwable $e) {}
+    // Do not auto-repair docs_custom.json during a read-only scan.
+    // Rewriting tracked config from a GET request makes the repo appear dirty
+    // again right after a manual discard, which blocks remote updates in admin.
 
     // Cache result
     ensure_dir($DATA_DIR);
