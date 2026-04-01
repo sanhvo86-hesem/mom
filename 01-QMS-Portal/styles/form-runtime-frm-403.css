@@ -361,12 +361,18 @@ body {
   line-height: 1.7;
 }
 
+.scar-signature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
 .scar-signature-card {
   position: relative;
   border: 1px dashed var(--scar-line-strong);
   border-radius: 18px;
   background: #fcfdff;
-  padding: 16px;
+  padding: 14px;
 }
 
 .scar-signature-card.signed {
@@ -379,7 +385,7 @@ body {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .scar-signature-head strong {
@@ -388,10 +394,11 @@ body {
   line-height: 1.45;
 }
 
-.scar-signature-head small {
+.scar-signature-head span {
   display: block;
   margin-top: 4px;
   color: var(--scar-text-muted);
+  font-size: 12px;
   line-height: 1.55;
 }
 
@@ -410,18 +417,18 @@ body {
 }
 
 .scar-signature-pad {
-  min-height: 112px;
-  margin-bottom: 12px;
+  min-height: 98px;
+  margin-bottom: 10px;
   border: 1px solid var(--scar-line);
   border-radius: 14px;
   background: #ffffff;
-  padding: 10px;
+  padding: 10px 12px;
 }
 
 .scar-signature-empty {
   display: grid;
   place-items: center;
-  min-height: 90px;
+  min-height: 74px;
   color: var(--scar-text-muted);
   font-size: 13px;
   text-align: center;
@@ -438,12 +445,32 @@ body {
 
 .scar-signature-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 10px;
 }
 
 .scar-signature-actions .qf-btn {
-  min-width: 150px;
+  min-width: 0;
+  width: 100%;
+}
+
+.scar-lookup-host {
+  position: relative;
+  z-index: 10;
+}
+
+.scar-lookup-host .si-input {
+  height: 46px;
+  border-radius: 14px;
+}
+
+.scar-lookup-host .si-dropdown {
+  z-index: 120;
+}
+
+.scar-lookup-self {
+  margin-top: 8px;
+  min-width: 0;
 }
 
 .scar-topbar,
@@ -474,6 +501,10 @@ body {
   .scar-runtime-alert {
     flex-direction: column;
   }
+
+  .scar-signature-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 640px) {
@@ -495,8 +526,16 @@ body {
     min-width: 0;
   }
 
+  .scar-signature-grid {
+    grid-template-columns: 1fr;
+  }
+
   .scar-signature-head {
     flex-direction: column;
+  }
+
+  .scar-signature-actions {
+    flex-wrap: wrap;
   }
 }
 

@@ -253,6 +253,11 @@ $router->actions([
     'order_search'            => [OrderController::class, 'search'],
     'order_link_form'         => [OrderController::class, 'linkForm'],
     'order_shipment_gate'     => [OrderController::class, 'checkShipmentReadiness'],
+    'order_schedule_get'      => [OrderController::class, 'getSchedule'],
+    'order_schedule_slot'     => [OrderController::class, 'createScheduleSlot'],
+    'order_schedule_update'   => [OrderController::class, 'updateScheduleSlot'],
+    'order_capacity_heatmap'  => [OrderController::class, 'getCapacityHeatmap'],
+    'order_promise_suggest'   => [OrderController::class, 'suggestPromiseDate'],
 ]);
 
 // Exception Management

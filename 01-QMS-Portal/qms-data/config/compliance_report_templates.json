@@ -1,0 +1,102 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "created": "2026-04-01",
+    "description": "Report templates for regulatory compliance, customer quality, and management review per AS9100D, NADCAP"
+  },
+  "report_types": [
+    {
+      "type": "management_review",
+      "label": "Management Review Input",
+      "label_vi": "Đầu vào xem xét lãnh đạo",
+      "description": "AS9100D clause 9.3 - aggregates quality, delivery, customer satisfaction, COPQ, process performance",
+      "frequency": "quarterly",
+      "sections": [
+        {"key": "kpi_summary", "label": "KPI Summary", "label_vi": "Tổng hợp KPI", "metrics": ["OTD", "FPY", "COPQ", "OEE", "SCRAP_RATE", "CAPA_CLOSURE"]},
+        {"key": "customer_feedback", "label": "Customer Feedback", "label_vi": "Phản hồi khách hàng", "data_source": "complaints"},
+        {"key": "ncr_trend", "label": "NCR/CAPA Trends", "label_vi": "Xu hướng NCR/CAPA", "data_source": "exceptions"},
+        {"key": "supplier_performance", "label": "Supplier Performance", "label_vi": "Hiệu suất NCC", "data_source": "supplier_scorecards"},
+        {"key": "audit_findings", "label": "Audit Findings", "label_vi": "Phát hiện kiểm toán", "data_source": "audits"},
+        {"key": "training_status", "label": "Training Completion", "label_vi": "Hoàn thành đào tạo", "data_source": "training"},
+        {"key": "calibration_status", "label": "Calibration Status", "label_vi": "Trạng thái hiệu chuẩn", "data_source": "calibration"},
+        {"key": "improvement_projects", "label": "Improvement Projects", "label_vi": "Dự án cải tiến", "data_source": "projects"},
+        {"key": "risk_review", "label": "Risk Register Review", "label_vi": "Xem xét sổ rủi ro", "data_source": "risks"},
+        {"key": "actions", "label": "Action Items", "label_vi": "Hành động", "data_source": "actions"}
+      ]
+    },
+    {
+      "type": "customer_quality",
+      "label": "Customer Quality Report",
+      "label_vi": "Báo cáo chất lượng khách hàng",
+      "description": "Quarterly quality performance report for customers",
+      "frequency": "quarterly",
+      "sections": [
+        {"key": "delivery_performance", "label": "Delivery Performance", "label_vi": "Hiệu suất giao hàng"},
+        {"key": "quality_metrics", "label": "Quality Metrics (PPM, FPY)", "label_vi": "Chỉ số chất lượng"},
+        {"key": "ncr_summary", "label": "NCR Summary", "label_vi": "Tổng hợp NCR"},
+        {"key": "capa_status", "label": "CAPA Status", "label_vi": "Trạng thái CAPA"},
+        {"key": "fai_status", "label": "FAI Status", "label_vi": "Trạng thái FAI"},
+        {"key": "continuous_improvement", "label": "Continuous Improvement", "label_vi": "Cải tiến liên tục"}
+      ]
+    },
+    {
+      "type": "supplier_review",
+      "label": "Supplier Performance Review",
+      "label_vi": "Đánh giá hiệu suất NCC",
+      "description": "Periodic supplier evaluation report",
+      "frequency": "semi_annual",
+      "sections": [
+        {"key": "scorecard_trend", "label": "Scorecard Trend", "label_vi": "Xu hướng điểm số"},
+        {"key": "scar_history", "label": "SCAR History", "label_vi": "Lịch sử SCAR"},
+        {"key": "incoming_results", "label": "Incoming Inspection", "label_vi": "Kiểm tra nhập hàng"},
+        {"key": "certification_status", "label": "Certifications", "label_vi": "Chứng nhận"},
+        {"key": "audit_findings", "label": "Audit Findings", "label_vi": "Phát hiện kiểm toán"},
+        {"key": "risk_assessment", "label": "Risk Assessment", "label_vi": "Đánh giá rủi ro"}
+      ]
+    },
+    {
+      "type": "audit_package",
+      "label": "Audit Evidence Package",
+      "label_vi": "Gói chứng cứ kiểm toán",
+      "description": "Evidence compilation for AS9100/NADCAP audits",
+      "sections": [
+        {"key": "document_index", "label": "Document Index", "label_vi": "Danh mục tài liệu"},
+        {"key": "process_records", "label": "Process Records", "label_vi": "Hồ sơ quy trình"},
+        {"key": "calibration_certs", "label": "Calibration Certificates", "label_vi": "Chứng chỉ hiệu chuẩn"},
+        {"key": "training_records", "label": "Training Records", "label_vi": "Hồ sơ đào tạo"},
+        {"key": "ncr_capa_records", "label": "NCR/CAPA Records", "label_vi": "Hồ sơ NCR/CAPA"},
+        {"key": "inspection_records", "label": "Inspection Records", "label_vi": "Hồ sơ kiểm tra"}
+      ]
+    },
+    {
+      "type": "copq_analysis",
+      "label": "Cost of Poor Quality Report",
+      "label_vi": "Báo cáo chi phí chất lượng kém",
+      "description": "PAF model analysis of quality costs",
+      "frequency": "monthly",
+      "sections": [
+        {"key": "prevention", "label": "Prevention Costs", "label_vi": "Chi phí phòng ngừa"},
+        {"key": "appraisal", "label": "Appraisal Costs", "label_vi": "Chi phí đánh giá"},
+        {"key": "internal_failure", "label": "Internal Failure", "label_vi": "Lỗi nội bộ"},
+        {"key": "external_failure", "label": "External Failure", "label_vi": "Lỗi bên ngoài"},
+        {"key": "pareto", "label": "Pareto Analysis", "label_vi": "Phân tích Pareto"},
+        {"key": "trend", "label": "12-Month Trend", "label_vi": "Xu hướng 12 tháng"}
+      ]
+    },
+    {
+      "type": "evidence_package",
+      "label": "Shipment Evidence Package",
+      "label_vi": "Gói chứng cứ giao hàng",
+      "description": "Complete evidence compilation for SO shipment",
+      "sections": [
+        {"key": "coc", "label": "Certificate of Conformance", "label_vi": "Giấy chứng nhận phù hợp"},
+        {"key": "coa", "label": "Certificate of Analysis", "label_vi": "Giấy chứng nhận phân tích"},
+        {"key": "material_certs", "label": "Material Certificates", "label_vi": "Chứng chỉ vật liệu"},
+        {"key": "fai_records", "label": "FAI Records", "label_vi": "Hồ sơ FAI"},
+        {"key": "test_reports", "label": "Test Reports", "label_vi": "Báo cáo thử nghiệm"},
+        {"key": "inspection_data", "label": "Inspection Data", "label_vi": "Dữ liệu kiểm tra"},
+        {"key": "dimensional_reports", "label": "Dimensional Reports", "label_vi": "Báo cáo kích thước"}
+      ]
+    }
+  ]
+}

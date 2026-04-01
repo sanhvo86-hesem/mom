@@ -6,6 +6,61 @@ var PORTAL_API_URL = '/01-QMS-Portal/api.php';
 var FIELD_IDS = ['scar_date','supplier_name','supplier_id','po_number','part_number','part_rev','lot_number','quantity_received','quantity_rejected','defect_type','defect_description','severity','containment_action','root_cause_required','supplier_response_due_date','supplier_root_cause','supplier_corrective_action','supplier_preventive_action','verification_method','verification_result','scar_status','issued_by','approved_by','supplier_contact'];
 var REQUIRED_FIELDS = ['scar_date','supplier_name','supplier_id','po_number','part_number','quantity_received','quantity_rejected','defect_type','defect_description','severity','containment_action','supplier_response_due_date','scar_status','issued_by'];
 var ROOT_CAUSE_FIELDS = ['supplier_root_cause','supplier_corrective_action','supplier_preventive_action'];
+var LOOKUP_FIELDS = {
+  supplier_name: {
+    hostId: 'supplier_name_lookup',
+    source: 'suppliers',
+    placeholder: 'Tìm và chọn nhà cung cấp từ dữ liệu nền',
+    helper: 'Chọn nhà cung cấp để tự động điền mã và liên hệ.',
+    onSelect: function(item){
+      state.data.supplier_name = String(item.supplier_name || item.label || '').trim();
+      state.data.supplier_id = String(item.supplier_id || item.value || '').trim();
+      state.data.supplier_contact = buildSupplierContact(item);
+    }
+  },
+  part_number: {
+    hostId: 'part_number_lookup',
+    source: 'parts',
+    placeholder: 'Tìm và chọn part / revision từ dữ liệu nền',
+    helper: 'Chọn part để tự động gắn revision hiện hành.',
+    onSelect: function(item){
+      state.data.part_number = String(item.part_number || item.value || '').trim();
+      state.data.part_rev = String(item.revision || '').trim();
+      if(!state.data.supplier_id && item.preferred_supplier_id){
+        applySupplierById(String(item.preferred_supplier_id || '').trim(), false);
+      }
+    }
+  },
+  issued_by: {
+    hostId: 'issued_by_lookup',
+    source: 'company_users',
+    placeholder: 'Tìm và chọn người phát hành',
+    helper: 'Chọn từ danh sách công ty hoặc dùng người đăng nhập.',
+    allowCurrentUser: true,
+    onSelect: function(item){
+      state.data.issued_by = String(item.person_name || item.label || item.value || '').trim();
+    }
+  },
+  approved_by: {
+    hostId: 'approved_by_lookup',
+    source: 'company_users',
+    placeholder: 'Tìm và chọn người phê duyệt',
+    helper: 'Chọn từ danh sách công ty hoặc dùng người đăng nhập.',
+    allowCurrentUser: true,
+    onSelect: function(item){
+      state.data.approved_by = String(item.person_name || item.label || item.value || '').trim();
+    }
+  },
+  defect_type: {
+    hostId: 'defect_type_lookup',
+    source: 'defect_catalog',
+    placeholder: 'Tìm và chọn loại lỗi từ danh mục kiểm soát',
+    helper: 'Loại lỗi dùng chung giữa EQMS, ERP và MES.',
+    onSelect: function(item){
+      state.data.defect_type = String(item.defect_name || item.label || item.value || '').trim();
+    }
+  }
+};
 var STATUS_LABELS = { open:'Mở', awaiting_response:'Chờ phản hồi nhà cung cấp', under_review:'Đang xem xét', verification:'Đang xác nhận', closed:'Đã đóng' };
 var SEVERITY_META = {
   minor:{ label:'Nhẹ', note:'Theo dõi theo nhịp xử lý thông thường, không cần escalations tức thời.', className:'success' },
@@ -27,6 +82,7 @@ var state = {
   serverDraft: null,
   localDraft: null,
   master: null,
+  companyDirectory: [],
   signatures: {},
   resetSignaturesSnapshot: {},
   approvalSummary: null,
@@ -41,7 +97,8 @@ var state = {
   busySubmit: false,
   localKey: '',
   editMode: true,
-  isDirty: false
+  isDirty: false,
+  lookupsMounted: false
 };
 var els = {};
 
@@ -94,7 +151,7 @@ function bindEvents(){
 
 function loadRuntime(){
   fetchStatus().then(function(){
-    return Promise.all([loadSchema(), loadAllocation(), loadServerDraft(), loadMasterData()]);
+    return Promise.all([loadSchema(), loadAllocation(), loadServerDraft(), loadMasterData(), loadCompanyDirectory()]);
   }).then(function(){
     state.localDraft = loadLocalDraft();
     return loadEntry();
@@ -104,6 +161,7 @@ function loadRuntime(){
     state.resetSnapshot = clone(state.data);
     state.resetSignaturesSnapshot = clone(state.signatures);
     populateForm();
+    mountLookupControls();
     renderAll();
     updateActionState();
     var hasSubmitted = !!(state.entry && state.entry.entry_id);
@@ -179,6 +237,17 @@ function loadMasterData(){
     hydrateSupplierDatalist();
     return state.master;
   }).catch(function(){ state.master = null; return null; });
+}
+
+function loadCompanyDirectory(){
+  if(!state.loggedIn) return Promise.resolve([]);
+  return callApi('company_directory_list', {}, 'GET').then(function(resp){
+    state.companyDirectory = Array.isArray(resp && resp.users) ? resp.users : [];
+    return state.companyDirectory;
+  }).catch(function(){
+    state.companyDirectory = [];
+    return state.companyDirectory;
+  });
 }
 
 function buildMergedData(){
@@ -333,6 +402,7 @@ function populateForm(){
     if(node.type === 'checkbox') node.checked = !!state.data[fieldId];
     else node.value = state.data[fieldId] == null ? '' : String(state.data[fieldId]);
   });
+  syncLookupControlsFromState();
 }
 
 function handleFieldChange(event){
@@ -1381,6 +1451,205 @@ function loadLocalDraft(){
   }
 }
 
+function mountLookupControls(){
+  if(typeof window.SearchableInput !== 'function') return;
+  Object.keys(LOOKUP_FIELDS).forEach(function(fieldId){
+    var cfg = LOOKUP_FIELDS[fieldId];
+    var host = byId(cfg.hostId);
+    var input = byId(fieldId);
+    if(!host || !input) return;
+    input.classList.add('scar-hidden');
+
+    var instanceId = 'scar-si-' + fieldId;
+    var items = buildLookupItems(cfg.source);
+    var existing = window.SearchableInput.get(instanceId);
+    if(existing){
+      existing.setData(items);
+      syncLookupControlValue(fieldId, existing);
+      ensureCurrentUserShortcut(cfg, fieldId, host);
+      return;
+    }
+
+    new window.SearchableInput({
+      containerId: cfg.hostId,
+      fieldId: instanceId,
+      placeholderVi: cfg.placeholder,
+      placeholder: cfg.placeholder,
+      dataSource: items,
+      displayField: 'label',
+      valueField: 'value',
+      subField: 'sub',
+      strictSelect: true,
+      onSelect: function(item){
+        applyLookupSelection(fieldId, item, cfg);
+      }
+    });
+    syncLookupControlValue(fieldId, window.SearchableInput.get(instanceId));
+    ensureCurrentUserShortcut(cfg, fieldId, host);
+  });
+  state.lookupsMounted = true;
+}
+
+function ensureCurrentUserShortcut(cfg, fieldId, host){
+  if(!cfg || !cfg.allowCurrentUser || !host) return;
+  var existing = host.parentElement && host.parentElement.querySelector('[data-use-current-user="' + fieldId + '"]');
+  if(existing) return;
+  var button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'qf-btn ghost scar-lookup-self';
+  button.setAttribute('data-use-current-user', fieldId);
+  button.textContent = 'Dùng người đăng nhập';
+  button.addEventListener('click', function(){
+    var item = currentCompanyUserItem();
+    if(!item){
+      notifyParentToast('Không tìm thấy người đăng nhập trong danh sách công ty.', 'warn');
+      return;
+    }
+    applyLookupSelection(fieldId, item, cfg);
+  });
+  host.insertAdjacentElement('afterend', button);
+}
+
+function syncLookupControlsFromState(){
+  if(typeof window.SearchableInput !== 'function') return;
+  Object.keys(LOOKUP_FIELDS).forEach(function(fieldId){
+    syncLookupControlValue(fieldId, window.SearchableInput.get('scar-si-' + fieldId));
+  });
+}
+
+function syncLookupControlValue(fieldId, instance){
+  if(!instance) return;
+  var value = state.data[fieldId];
+  if(value === undefined || value === null || value === '') return instance.reset();
+  instance.setValue(String(value));
+}
+
+function buildLookupItems(source){
+  if(source === 'company_users') return companyDirectoryItems();
+  if(source === 'defect_catalog'){
+    var defectRows = Array.isArray(state.master && state.master.defect_catalog) ? state.master.defect_catalog : [];
+    if(defectRows.length){
+      return defectRows.map(function(row){
+        return {
+          value: String(row.defect_name || row.defect_code || '').trim(),
+          label: String(row.defect_name || row.defect_code || '').trim(),
+          sub: [String(row.defect_code || '').trim(), String(row.defect_family || '').trim()].filter(Boolean).join(' · '),
+          defect_name: String(row.defect_name || row.defect_code || '').trim(),
+          defect_code: String(row.defect_code || '').trim(),
+          defect_family: String(row.defect_family || '').trim()
+        };
+      });
+    }
+    return defaultDefectCatalogItems();
+  }
+  if(source === 'suppliers'){
+    return (Array.isArray(state.master && state.master.suppliers) ? state.master.suppliers : []).map(function(supplier){
+      return {
+        value: String(supplier.supplier_name || '').trim(),
+        label: String(supplier.supplier_name || '').trim(),
+        sub: [String(supplier.supplier_id || '').trim(), buildSupplierContact(supplier)].filter(Boolean).join(' · '),
+        supplier_id: String(supplier.supplier_id || '').trim(),
+        supplier_name: String(supplier.supplier_name || '').trim(),
+        contact_name: String(supplier.contact_name || '').trim(),
+        contact_email: String(supplier.contact_email || '').trim(),
+        status: String(supplier.status || '').trim()
+      };
+    });
+  }
+  if(source === 'parts'){
+    return (Array.isArray(state.master && state.master.parts) ? state.master.parts : []).map(function(part){
+      var revision = resolvePartRevision(part);
+      return {
+        value: String(part.part_number || '').trim(),
+        label: [String(part.part_number || '').trim(), revision].filter(Boolean).join(' / '),
+        sub: [String(part.part_description || '').trim(), String(part.customer_id || '').trim()].filter(Boolean).join(' · '),
+        part_number: String(part.part_number || '').trim(),
+        revision: revision,
+        preferred_supplier_id: String(part.preferred_supplier_id || '').trim(),
+        part_description: String(part.part_description || '').trim()
+      };
+    });
+  }
+  return [];
+}
+
+function companyDirectoryItems(){
+  var rows = Array.isArray(state.companyDirectory) ? state.companyDirectory.slice() : [];
+  var current = currentCompanyUserItem();
+  if(current && !rows.some(function(person){
+    return String(person.username || '').trim().toLowerCase() === String(current.username || '').trim().toLowerCase();
+  })){
+    rows.unshift(current);
+  }
+  return rows.map(function(person){
+    var fullName = String(person.name || person.display_name || person.username || '').trim();
+    return {
+      value: fullName,
+      label: fullName,
+      sub: [String(person.username || '').trim() ? ('@' + String(person.username || '').trim()) : '', String(person.title || person.role || '').trim(), String(person.dept || '').trim()].filter(Boolean).join(' · '),
+      username: String(person.username || '').trim(),
+      person_name: fullName,
+      role: String(person.role || '').trim(),
+      dept: String(person.dept || '').trim(),
+      title: String(person.title || '').trim()
+    };
+  });
+}
+
+function currentCompanyUserItem(){
+  var user = state.currentUser || {};
+  var username = String(user.username || '').trim();
+  var displayName = String(user.display_name || user.name || user.username || '').trim();
+  if(!username && !displayName) return null;
+  var existing = (Array.isArray(state.companyDirectory) ? state.companyDirectory : []).find(function(person){
+    var personUsername = String(person.username || '').trim().toLowerCase();
+    var personName = String(person.name || person.display_name || '').trim().toLowerCase();
+    return (username && personUsername === username.toLowerCase()) || (displayName && personName === displayName.toLowerCase());
+  });
+  if(existing) return existing;
+  return {
+    username: username,
+    name: displayName,
+    role: String(user.role || '').trim(),
+    dept: String(user.dept || '').trim(),
+    title: String(user.title || '').trim()
+  };
+}
+
+function applyLookupSelection(fieldId, item, cfg){
+  if(!item || !cfg) return;
+  cfg.onSelect(item);
+  populateForm();
+  renderAll();
+  saveLocalDraft('lookup:' + fieldId);
+  clearFieldError(fieldId);
+}
+
+function resolvePartRevision(part){
+  if(!part || typeof part !== 'object') return '';
+  if(part.revision) return String(part.revision || '').trim();
+  var revisions = Array.isArray(state.master && state.master.revisions) ? state.master.revisions : [];
+  var released = revisions.filter(function(row){
+    return String(row.part_number || '').trim().toUpperCase() === String(part.part_number || '').trim().toUpperCase();
+  }).sort(function(a, b){
+    var aReleased = String(a.status || '').trim().toLowerCase() === 'released' ? 1 : 0;
+    var bReleased = String(b.status || '').trim().toLowerCase() === 'released' ? 1 : 0;
+    return bReleased - aReleased || String(b.release_date || '').localeCompare(String(a.release_date || ''));
+  });
+  return released.length ? String(released[0].revision || '').trim() : '';
+}
+
+function defaultDefectCatalogItems(){
+  return [
+    { value:'Dimensional', label:'Dimensional', sub:'Kích thước / dung sai', defect_name:'Dimensional', defect_code:'DEF-DIM' },
+    { value:'Surface', label:'Surface', sub:'Bề mặt / xử lý bề mặt', defect_name:'Surface', defect_code:'DEF-SUR' },
+    { value:'Packaging', label:'Packaging', sub:'Đóng gói / bảo quản', defect_name:'Packaging', defect_code:'DEF-PKG' },
+    { value:'Documentation', label:'Documentation', sub:'Tài liệu / chứng từ', defect_name:'Documentation', defect_code:'DEF-DOC' },
+    { value:'Material', label:'Material', sub:'Vật liệu / heat / lot', defect_name:'Material', defect_code:'DEF-MAT' },
+    { value:'Traceability', label:'Traceability', sub:'Truy xuất / nhãn / marking', defect_name:'Traceability', defect_code:'DEF-TRC' }
+  ];
+}
+
 function supplierSuggestions(){
   var suppliers = Array.isArray(state.master && state.master.suppliers) ? state.master.suppliers : [];
   var seen = {};
@@ -1390,7 +1659,7 @@ function supplierSuggestions(){
     seen[supplier.supplier_id] = true;
     out.push({
       supplier_id: String(supplier.supplier_id || ''),
-      supplier_name: String(supplier.supplier_name_vi || supplier.supplier_name || ''),
+      supplier_name: String(supplier.supplier_name || ''),
       note: note
     });
   }
@@ -1400,7 +1669,7 @@ function supplierSuggestions(){
   var typedName = String(state.data.supplier_name || '').trim().toLowerCase();
   suppliers.forEach(function(item){
     var supplierId = String(item.supplier_id || '').trim().toUpperCase();
-    var supplierName = String(item.supplier_name_vi || item.supplier_name || '').trim().toLowerCase();
+    var supplierName = String(item.supplier_name || '').trim().toLowerCase();
     if(typedId && supplierId === typedId) pushSupplier(item, 'Khớp trực tiếp với mã nhà cung cấp đang nhập.');
     else if(typedName && supplierName && supplierName.indexOf(typedName) >= 0) pushSupplier(item, 'Khớp với tên nhà cung cấp đang nhập.');
   });
@@ -1417,7 +1686,7 @@ function autoFillSupplierFromPart(data, rerender){
   var supplier = preferredSupplierForPart(data.part_number);
   if(!supplier) return;
   data.supplier_id = String(supplier.supplier_id || '');
-  data.supplier_name = String(supplier.supplier_name_vi || supplier.supplier_name || '');
+  data.supplier_name = String(supplier.supplier_name || '');
   data.supplier_contact = buildSupplierContact(supplier);
   if(rerender){
     populateForm();
@@ -1438,12 +1707,12 @@ function autoFillSupplierIdentity(data, rerender){
   }
   if(!supplier && typedName){
     supplier = suppliers.find(function(item){
-      return String(item.supplier_name_vi || item.supplier_name || '').trim().toLowerCase() === typedName;
+      return String(item.supplier_name || '').trim().toLowerCase() === typedName;
     }) || null;
   }
   if(!supplier) return;
   data.supplier_id = String(supplier.supplier_id || data.supplier_id || '');
-  data.supplier_name = String(supplier.supplier_name_vi || supplier.supplier_name || data.supplier_name || '');
+  data.supplier_name = String(supplier.supplier_name || data.supplier_name || '');
   if(!hasMeaningfulValue(data.supplier_contact)) data.supplier_contact = buildSupplierContact(supplier);
   if(rerender){
     populateForm();
@@ -1459,7 +1728,7 @@ function applySupplierById(supplierId, rerender){
   }) || null;
   if(!supplier) return;
   state.data.supplier_id = String(supplier.supplier_id || '');
-  state.data.supplier_name = String(supplier.supplier_name_vi || supplier.supplier_name || '');
+  state.data.supplier_name = String(supplier.supplier_name || '');
   state.data.supplier_contact = buildSupplierContact(supplier);
   if(rerender){
     populateForm();
@@ -1492,7 +1761,7 @@ function hydrateSupplierDatalist(){
   datalist.innerHTML = '';
   (Array.isArray(state.master && state.master.suppliers) ? state.master.suppliers : []).forEach(function(supplier){
     var option = document.createElement('option');
-    option.value = String(supplier.supplier_name_vi || supplier.supplier_name || '');
+    option.value = String(supplier.supplier_name || '');
     option.label = [String(supplier.supplier_id || ''), buildSupplierContact(supplier)].filter(Boolean).join(' · ');
     datalist.appendChild(option);
   });
