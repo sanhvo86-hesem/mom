@@ -138,6 +138,111 @@ class AdminController extends BaseController
     }
 
     /**
+     * GET gitStatus — Read current git repository status for cPanel sync panel.
+     *
+     * Legacy action: `admin_git_status`
+     *
+     * @return never
+     */
+    public function gitStatus(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAdmin($me);
+
+        try {
+            $result = git_repository_status($this->rootDir, true);
+            $this->success([
+                'repo_path'                => (string)($result['repo_path'] ?? ''),
+                'remote_url'               => (string)($result['remote_url'] ?? ''),
+                'branch'                   => (string)($result['branch'] ?? 'main'),
+                'remote_branch'            => (string)($result['remote_branch'] ?? ''),
+                'head'                     => is_array($result['head'] ?? null) ? [
+                    'hash'         => (string)($result['head']['hash'] ?? ''),
+                    'short_hash'   => (string)($result['head']['short_hash'] ?? ''),
+                    'subject'      => (string)($result['head']['subject'] ?? ''),
+                    'author_name'  => (string)($result['head']['author_name'] ?? ''),
+                    'author_email' => (string)($result['head']['author_email'] ?? ''),
+                    'committed_at' => (string)($result['head']['committed_at'] ?? ''),
+                ] : null,
+                'remote_head'              => is_array($result['remote_head'] ?? null) ? [
+                    'hash'         => (string)($result['remote_head']['hash'] ?? ''),
+                    'short_hash'   => (string)($result['remote_head']['short_hash'] ?? ''),
+                    'subject'      => (string)($result['remote_head']['subject'] ?? ''),
+                    'author_name'  => (string)($result['remote_head']['author_name'] ?? ''),
+                    'author_email' => (string)($result['remote_head']['author_email'] ?? ''),
+                    'committed_at' => (string)($result['remote_head']['committed_at'] ?? ''),
+                ] : null,
+                'ahead_count'              => (int)($result['ahead_count'] ?? 0),
+                'behind_count'             => (int)($result['behind_count'] ?? 0),
+                'working_tree_clean'       => (bool)($result['working_tree_clean'] ?? false),
+                'meaningful_dirty_count'   => (int)($result['meaningful_dirty_count'] ?? 0),
+                'meaningful_dirty_paths'   => array_values(array_map('strval', $result['meaningful_dirty_paths'] ?? [])),
+                'meaningful_dirty_entries' => array_values(array_map(static function ($row) {
+                    return [
+                        'xy'   => (string)($row['xy'] ?? ''),
+                        'path' => (string)($row['path'] ?? ''),
+                    ];
+                }, $result['meaningful_dirty_entries'] ?? [])),
+                'cpanel_yml_exists'        => (bool)($result['cpanel_yml_exists'] ?? false),
+                'deploy_ready'             => (bool)($result['deploy_ready'] ?? false),
+                'fetch_error'              => (string)($result['fetch_error'] ?? ''),
+            ]);
+        } catch (Throwable $e) {
+            $this->auditLog('admin_git_status_failed', ['error' => $e->getMessage()]);
+            $message = $e->getMessage();
+            $error = match (true) {
+                str_starts_with($message, 'exec_unavailable') => 'exec_unavailable',
+                str_starts_with($message, 'repo_not_found')   => 'repo_not_found',
+                str_starts_with($message, 'not_a_git_repo')   => 'not_a_git_repo',
+                str_starts_with($message, 'git_status_failed') => 'git_status_failed',
+                default                                        => 'git_status_failed',
+            };
+            $this->error($error, 500, $message);
+        }
+    }
+
+    /**
+     * POST gitDiscardLocal — Discard meaningful local runtime changes on server.
+     *
+     * Legacy action: `admin_git_discard_local`
+     *
+     * @return never
+     */
+    public function gitDiscardLocal(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        try {
+            $result = git_discard_meaningful_local_changes($this->rootDir);
+            $this->success([
+                'discarded'      => (bool)($result['discarded'] ?? false),
+                'branch'         => (string)($result['branch'] ?? 'main'),
+                'message'        => (string)($result['message'] ?? ''),
+                'discarded_paths' => array_values(array_map('strval', $result['discarded_paths'] ?? [])),
+                'restored_paths' => array_values(array_map('strval', $result['restored_paths'] ?? [])),
+                'removed_paths'  => array_values(array_map('strval', $result['removed_paths'] ?? [])),
+                'remaining_paths' => array_values(array_map('strval', $result['remaining_paths'] ?? [])),
+                'before_head'    => (string)($result['before_head'] ?? ''),
+                'after_head'     => (string)($result['after_head'] ?? ''),
+            ]);
+        } catch (Throwable $e) {
+            $this->auditLog('admin_git_discard_local_failed', ['error' => $e->getMessage()]);
+            $message = $e->getMessage();
+            $error = match (true) {
+                str_starts_with($message, 'exec_unavailable')  => 'exec_unavailable',
+                str_starts_with($message, 'repo_not_found')    => 'repo_not_found',
+                str_starts_with($message, 'not_a_git_repo')    => 'not_a_git_repo',
+                str_starts_with($message, 'git_status_failed') => 'git_status_failed',
+                str_starts_with($message, 'git_discard_failed') => 'git_discard_failed',
+                default                                         => 'git_discard_failed',
+            };
+            $this->error($error, 500, $message);
+        }
+    }
+
+    /**
      * POST clearCache — Clear browser/CDN caches via headers.
      *
      * Legacy action: `admin_clear_site_cache`

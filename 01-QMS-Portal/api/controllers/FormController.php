@@ -173,6 +173,19 @@ class FormController extends BaseController
     }
 
     /**
+     * GET configRecordTypes — Return record type registry configuration.
+     *
+     * Legacy action: `config_record_types`
+     *
+     * @return never
+     */
+    public function configRecordTypes(): never
+    {
+        $this->requireAuth();
+        $this->success(['record_types' => load_record_type_registry()]);
+    }
+
+    /**
      * POST getNextId — Generate and consume the next record ID.
      *
      * Legacy action: `record_id_next`

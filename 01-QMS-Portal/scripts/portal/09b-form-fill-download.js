@@ -3362,64 +3362,6 @@ function bindOffline(form,allocation,container){
   };
 }
 
-function bindOffline(form,allocation,container){
-  var dlBtn=document.getElementById('ec-download-offline');
-  if(dlBtn&&window.AllocationTracker) dlBtn.onclick=function(){
-    dlBtn.disabled=true;
-    window.AllocationTracker.downloadForm(allocation.allocation_id,form.form_code,{master_context:allocation.master_context||{}}).then(function(r){
-      if(r&&r.ok) toast(t('Đã tải gói Excel.','Excel package downloaded.'),'success');
-      else toast(t('Không thể tải.','Could not download.'),'error');
-    }).finally(function(){dlBtn.disabled=false;});
-  };
-
-  var receivedBtn=document.getElementById('ec-download-received');
-  if(receivedBtn) receivedBtn.onclick=function(){
-    var url='api.php?action=form_fill_download_received&allocation_id='+encodeURIComponent(allocation.allocation_id||'');
-    var link=document.createElement('a');
-    link.href=url;
-    link.target='_blank';
-    link.rel='noopener';
-    document.body.appendChild(link);
-    link.click();
-    if(link.parentNode) link.parentNode.removeChild(link);
-  };
-
-  var copyBtn=document.getElementById('ec-copy-filename');
-  if(copyBtn) copyBtn.onclick=function(){
-    var fname=(allocation.offline_package&&allocation.offline_package.filename)||allocation.suggested_filename||'';
-    if(window.AllocationTracker) window.AllocationTracker.copyToClipboard(fname);
-    toast(t('Đã sao chép.','Copied.'),'success');
-  };
-
-  var dropzone=document.getElementById('ec-dropzone');
-  var fileInput=document.getElementById('ec-file-input');
-  if(dropzone&&fileInput){
-    dropzone.onclick=function(e){if(e.target!==fileInput) fileInput.click();};
-    fileInput.onchange=function(){if(fileInput.files&&fileInput.files.length) inspectFiles(fileInput.files,allocation,container,form);fileInput.value='';};
-    dropzone.ondragover=function(e){e.preventDefault();dropzone.classList.add('drag');};
-    dropzone.ondragleave=function(){dropzone.classList.remove('drag');};
-    dropzone.ondrop=function(e){e.preventDefault();dropzone.classList.remove('drag');if(e.dataTransfer&&e.dataTransfer.files) inspectFiles(e.dataTransfer.files,allocation,container,form);};
-  }
-
-  var clearBtn=document.getElementById('ec-clear-queue');
-  if(clearBtn) clearBtn.onclick=function(){ws.uploadFiles=[];renderWorkspace(form,allocation,container);bindWorkspace(form,allocation,container);};
-
-  var receiveAll=document.getElementById('ec-receive-all');
-  if(receiveAll) receiveAll.onclick=function(){
-    var valid=ws.uploadFiles.filter(function(i){return i.inspect&&i.inspect.ok&&i.inspect.verification&&i.inspect.verification.status!=='rejected';});
-    if(!valid.length){toast(t('Không có tệp hợp lệ.','No valid files.'),'warn');return;}
-    receiveAll.disabled=true;
-    Promise.all(valid.map(function(item){
-      var aid=(item.inspect&&item.inspect.allocation&&item.inspect.allocation.allocation_id)||allocation.allocation_id||'';
-      return window.AllocationTracker.receiveUpload(aid,item.file).then(function(r){item.receive=r;return r;});
-    })).then(function(){
-      toast(t('Đã tiếp nhận.','Files received.'),'success');
-      ws.uploadFiles=[];
-      if(typeof window.renderOnlineForms==='function') window.renderOnlineForms(form.form_code);
-    }).finally(function(){receiveAll.disabled=false;});
-  };
-}
-
 function inspectFiles(files,allocation,container,form){
   Array.prototype.forEach.call(files,function(file){
     if(!/\.(xlsx|xlsm)$/i.test(file.name)){toast(t('Chỉ nhận .xlsx/.xlsm','Only .xlsx/.xlsm accepted'),'warn');return;}

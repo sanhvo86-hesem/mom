@@ -172,11 +172,11 @@ Các loại tên sau là **danh từ riêng hệ thống** — dịch sẽ phá 
 
 | Loại | Ví dụ | Lý do không dịch |
 |------|-------|------------------|
-| Tên SharePoint Site | `HESEM-QMS-Cốt lõi`, `HESEM-Con người-Hạn chế`, `HESEM-Số hóa-Control` | Tên định danh site trên M365 |
-| Chủ sở hữu site | `QMS-Chủ sở hữu` | Tên nhóm bảo mật M365 |
+| Tên SharePoint Site | `HESEM-Records`, `HESEM-Job-Evidence`, `HESEM-People`, `HESEM-Digital` | Tên định danh site trên M365 |
+| Chủ sở hữu site / security group | `QMS-Owner` | Tên nhóm bảo mật M365 |
 | Tên cột CamelCase | `RecordType`, `StatusCode`, `JobNum`, `CustomerID`, `EvidenceUrl` | Tên cột kỹ thuật trong M365 Lists/Epicor |
 | Tên cột tiếng Việt đặt sẵn | `Người phê duyệt`, `Phiên bản` (khi là tên cột) | Tên cột đã cấu hình trong hệ thống |
-| Tên tài khoản/nhóm | `QMS-Chủ sở hữu`, `HESEM-Admin` | Tên security group |
+| Tên tài khoản/nhóm | `QMS-Owner`, `HESEM-Admin` | Tên security group |
 
 **Cách nhận dạng:** Từ viết dạng CamelCase (chữ hoa xen kẽ) → tên cột kỹ thuật → KHÔNG dịch.
 
@@ -228,8 +228,8 @@ Các loại tên sau là **danh từ riêng hệ thống** — dịch sẽ phá 
   <div class="row"><span><b>Mã:</b></span><span>SOP-101</span></div>
   <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
   <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>Phòng Chất lượng</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám đốc</span></div>
+  <div class="row"><span><b>Chủ sở hữu:</b></span><span>{{OWNER_ROLE_HTML}}</span></div>
+  <div class="row"><span><b>Phê duyệt:</b></span><span>{{APPROVER_ROLE_HTML}}</span></div>
 </div>
 ```
 
@@ -359,8 +359,8 @@ Các loại tên sau là **danh từ riêng hệ thống** — dịch sẽ phá 
 
 | Viết tắt | Nghĩa |
 |----------|-------|
-| V0 | Draft / Version 0 |
-| V1, V2, V3... | Released versions |
+| V0 | Revision token theo policy hệ thống; ý nghĩa chi tiết xem `09-versioning-and-workflow.md` |
+| V1, V2, V3... | Revision kế tiếp theo policy ở `09-versioning-and-workflow.md` |
 
 ### C10. Hành chính và pháp lý (Việt Nam)
 
@@ -614,7 +614,7 @@ Một số từ tiếng Anh có nhiều nghĩa tiếng Việt tùy ngữ cảnh.
 
 ### G2. Engine chính: `context_translate_engine.py`
 
-**Vị trí:** `tools/context_translate_engine.py`
+**Vị trí:** `tools/engines/context_translate_engine.py`
 
 **Chức năng:**
 - Dịch text node trong file HTML từ tiếng Anh sang tiếng Việt
@@ -626,24 +626,24 @@ Một số từ tiếng Anh có nhiều nghĩa tiếng Việt tùy ngữ cảnh.
 **Cách chạy:**
 ```bash
 # Dịch một file
-python tools/context_translate_engine.py path/to/file.html
+python tools/engines/context_translate_engine.py path/to/file.html
 
 # Dịch nhiều file (dùng glob)
-python tools/context_translate_engine.py "03-Tai-Lieu-Van-Hanh/01-SOPs/**/*.html"
+python tools/engines/context_translate_engine.py "03-Tai-Lieu-Van-Hanh/01-SOPs/**/*.html"
 ```
 
 **Thứ tự ưu tiên từ điển:**
 1. `CORE_DICT` — từ điển cốt lõi trong code (ưu tiên cao nhất)
-2. `tools/qms-terminology-dictionary.xlsx` — từ điển thuật ngữ QMS
-3. `tools/remaining-english-words.xlsx` — danh sách từ bổ sung (5008 entries)
+2. `tools/data/qms-terminology-dictionary.xlsx` — từ điển thuật ngữ QMS
+3. `tools/data/remaining-english-words.xlsx` — danh sách từ bổ sung (5008 entries)
 
 ### G3. File từ điển
 
 | File | Vị trí | Mô tả | Số lượng |
 |------|--------|-------|---------|
-| `qms-terminology-dictionary.xlsx` | `tools/` | Từ điển thuật ngữ QMS chính | ~200+ entries |
-| `remaining-english-words.xlsx` | `tools/` | Danh sách từ tiếng Anh cần dịch | 5008 entries |
-| `remaining-english-words-v2.xlsx` | `tools/` | Phiên bản cập nhật | Cập nhật |
+| `qms-terminology-dictionary.xlsx` | `tools/data/` | Từ điển thuật ngữ QMS chính | ~200+ entries |
+| `remaining-english-words.xlsx` | `tools/data/` | Danh sách từ tiếng Anh cần dịch | 5008 entries |
+| `remaining-english-words-v2.xlsx` | `tools/data/` | Phiên bản cập nhật | Cập nhật |
 
 ### G4. Danh sách viết tắt giữ nguyên (trong engine)
 
@@ -683,8 +683,8 @@ Danh từ riêng là tên **định danh duy nhất** trong hệ thống. Dịch
 
 | Loại | Ví dụ | Quy tắc |
 |------|-------|---------|
-| Tên SharePoint Site | `HESEM-QMS-Cốt lõi`, `HESEM-Con người-Hạn chế` | Giữ nguyên 100% |
-| Tên chủ sở hữu | `QMS-Chủ sở hữu` | Giữ nguyên 100% |
+| Tên SharePoint Site | `HESEM-Records`, `HESEM-Job-Evidence`, `HESEM-People`, `HESEM-Digital` | Giữ nguyên 100% |
+| Tên chủ sở hữu | `QMS-Owner` | Giữ nguyên 100% |
 | Tên cột CamelCase | `RecordType`, `JobNum`, `CustomerID` | Giữ nguyên 100% |
 | Tên cột VN đặt sẵn | `Người phê duyệt`, `Phiên bản` (khi là tên cột) | Giữ nguyên 100% |
 | Tên thương hiệu | Epicor, Epicor Kinetic, SharePoint, M365, Microsoft 365, HESEM | Giữ nguyên 100% |

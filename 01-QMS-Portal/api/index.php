@@ -177,6 +177,7 @@ $router->actions([
     'online_form_schema'  => [FormController::class, 'getSchema'],
     'online_form_submit'  => [FormController::class, 'submit'],
     'online_form_entries' => [FormController::class, 'getEntries'],
+    'config_record_types' => [FormController::class, 'configRecordTypes'],
     'record_id_registry'  => [FormController::class, 'getIdRegistry'],
     'record_id_next'      => [FormController::class, 'getNextId'],
     'record_id_peek'      => [FormController::class, 'peekNextId'],
@@ -209,7 +210,9 @@ $router->actions([
 // Admin
 $router->actions([
     'admin_git_sync'                   => [AdminController::class, 'gitSync'],
+    'admin_git_status'                 => [AdminController::class, 'gitStatus'],
     'admin_git_pull'                   => [AdminController::class, 'gitPull'],
+    'admin_git_discard_local'          => [AdminController::class, 'gitDiscardLocal'],
     'admin_clear_site_cache'           => [AdminController::class, 'clearCache'],
     'get_data_settings'                => [AdminController::class, 'getSettings'],
     'save_data_settings'               => [AdminController::class, 'saveSettings'],

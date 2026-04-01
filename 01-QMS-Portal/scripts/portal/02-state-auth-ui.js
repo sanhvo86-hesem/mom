@@ -762,71 +762,6 @@ function fillLogin(username){
   document.getElementById('inp-pin').focus();
 }
 
-async function doLogin(){
-  const u = document.getElementById('inp-user').value.trim();
-  const p = document.getElementById('inp-pin').value;
-  const otp = (document.getElementById('inp-otp')?.value || '').trim();
-  const recovery = (document.getElementById('inp-recovery')?.value || '').trim();
-
-  try{
-    if(loginStage === 'password'){
-      if(!u || !p){ showLoginError(lang==='en' ? 'Please enter username and password' : 'Vui lòng nhập tài khoản và mật khẩu'); return; }
-
-      const res = await apiCall('auth_login', {username:u, password:p});
-      if(!res.ok){
-        showLoginError(res.error || T('login_error'));
-        return;
-      }
-      if(res.enroll_required){
-        enrollInfo = res;
-        document.getElementById('enroll-issuer').textContent = res.issuer || '';
-        document.getElementById('enroll-username').textContent = res.username || u;
-        document.getElementById('enroll-secret').textContent = res.secret || '';
-        document.getElementById('enroll-otpauth').textContent = res.otpauth_url || '';
-        renderEnrollQR(res.otpauth_url || '');
-        setLoginStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'Bước 2: Bật 2FA và nhập mã 6 số');
-        return;
-      }
-      if(res.mfa_required){
-        setLoginStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nhập mã xác thực 6 số từ Authenticator');
-        return;
-      }
-      if(res.logged_in){
-        await onLoggedIn(res);
-        return;
-      }
-      showLoginError(res.error || T('login_error'));
-      return;
-    }
-
-    if(loginStage === 'enroll'){
-      if(!otp){ showLoginError(lang==='en' ? 'Enter 6-digit code to confirm' : 'Nhập mã 6 số để xác nhận'); return; }
-      const res = await apiCall('auth_enroll_verify', {code: otp});
-      if(!res.ok){
-        if(res.error === 'unauthorized') showLoginError(lang==='en' ? 'Login session expired. Please sign in again.' : 'Phiên đăng nhập bị mất. Vui lòng thử đăng nhập lại.');
-        else showLoginError(res.error || (lang==='en' ? 'Invalid code' : 'Sai mã'));
-        return;
-      }
-      if(res.recovery_codes && Array.isArray(res.recovery_codes)){
-        showRecoveryCodes(res.recovery_codes);
-      }
-      await onLoggedIn(res);
-      return;
-    }
-
-    if(loginStage === 'mfa'){
-      if(!otp && !recovery){ showLoginError(lang==='en' ? 'Enter authenticator code or recovery code' : 'Nhập mã xác thực hoặc mã dự phòng'); return; }
-      const res = await apiCall('auth_mfa_verify', {username:u, password:p, code: otp, recovery: recovery});
-      if(!res.ok){ showLoginError(res.error || (lang==='en' ? 'Invalid code' : 'Sai mã')); return; }
-      await onLoggedIn(res);
-      return;
-    }
-  }catch(err){
-    console.error(err);
-    showLoginError(lang==='en' ? 'Cannot connect to server. Please try again.' : 'Không thể kết nối máy chủ. Vui lòng thử lại.');
-  }
-}
-
 async function onLoggedIn(res){
   csrfToken = res.csrf_token || csrfToken;
   syncCurrentUserRef(res.user || currentUser);
@@ -897,24 +832,6 @@ async function onLoggedIn(res){
   showApp();
 }
 
-async function doLogout(){
-  try{ await apiCall('auth_logout', {}, 'POST'); }catch(e){}
-
-  csrfToken = null;
-  syncCurrentUserRef(null);
-  try{ if(typeof stopLiveDocsSync==='function') stopLiveDocsSync(); }catch(e){}
-
-  document.getElementById('app').classList.remove('active');
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('inp-user').disabled = false;
-  document.getElementById('inp-pin').disabled = false;
-  document.getElementById('inp-user').value = '';
-  document.getElementById('inp-pin').value = '';
-  const otp = document.getElementById('inp-otp'); if(otp) otp.value='';
-  const r = document.getElementById('inp-recovery'); if(r) r.value='';
-  setLoginStage('password');
-}
-
 function setLoginChecking(isChecking, msg){
   const user = document.getElementById('inp-user');
   const pass = document.getElementById('inp-pin');
@@ -927,54 +844,6 @@ function setLoginChecking(isChecking, msg){
     stageMsg.textContent = msg || '';
     stageMsg.style.display = msg ? 'block' : 'none';
   }
-}
-
-async function checkSession(){
-  // Avoid "false logout" on hard refresh when the server is busy or a session file is locked.
-  // We temporarily disable the login form and retry a few times.
-  setLoginChecking(true, lang==='en' ? 'Checking session…' : 'Đang kiểm tra phiên đăng nhập…');
-
-  const delays = [0, 350, 900, 1600];
-  for(let i=0;i<delays.length;i++){
-    if(delays[i]) await new Promise(r=>setTimeout(r, delays[i]));
-    try{
-      const s = await apiCall('status', null, 'GET', 8000);
-      if(s && s.logged_in){
-        csrfToken = s.csrf_token || null;
-        syncCurrentUserRef(s.user);
-        setLoginChecking(false, '');
-        // Resume tracking with geolocation
-        const geo = await requireGeolocation().catch(()=>({ok:false}));
-        startActivityTracking(geo);
-        showApp();
-        return;
-      }
-      if(s && s.enroll_pending){
-        csrfToken = s.csrf_token || null;
-        enrollInfo = s;
-        document.getElementById('enroll-issuer').textContent = s.issuer || '';
-        document.getElementById('enroll-username').textContent = s.username || '';
-        document.getElementById('enroll-secret').textContent = s.secret || '';
-        document.getElementById('enroll-otpauth').textContent = s.otpauth_url || '';
-        renderEnrollQR(s.otpauth_url || '');
-        setLoginChecking(false, '');
-        setLoginStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'Bước 2: Bật 2FA và nhập mã 6 số');
-        return;
-      }
-      if(s && s.mfa_pending){
-        csrfToken = s.csrf_token || null;
-        setLoginChecking(false, '');
-        setLoginStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nhập mã xác thực 6 số từ Authenticator');
-        return;
-      }
-      // Not logged in
-      break;
-    }catch(e){
-      // try again
-    }
-  }
-
-  setLoginChecking(false, '');
 }
 
 function showRecoveryCodes(codes){
@@ -1119,32 +988,6 @@ function getCatForDoc(doc){
 // ═══════════════════════════════════════════════════
 // RENDER APP
 // ═══════════════════════════════════════════════════
-async function showApp(){
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app').classList.add('active');
-  const r = ROLES[currentUser.role] || {label: currentUser.title||currentUser.role, labelEn: currentUser.title||currentUser.role};
-  document.getElementById('hdr-name').textContent = currentUser.name;
-  document.getElementById('hdr-title').textContent = (lang==='en' ? (r.labelEn||r.label||currentUser.title||'') : (r.label||currentUser.title||''));
-  // Avatar removed
-  // Set avatar text (tricky with dropdown child)
-  document.getElementById('dd-name').textContent = currentUser.name;
-  document.getElementById('dd-title').textContent = (lang==='en'?(r.labelEn||currentUser.title):currentUser.title) + ' · ' + currentUser.dept;
-  document.getElementById('dd-access').textContent = lang==='en'?(r.labelEn||r.label):r.label;
-  // Load server-backed settings/lists before initial render
-  await loadDocsFromServer(); // ★ LIVE: scan filesystem for documents
-  await loadFolderDescriptions(); // ★ Load folder descriptions
-  await loadRolePermsFromServer();
-  await loadCustomDocsFromServer();
-  await loadDocVisibilityFromServer();
-  await refreshAllDocStatesFromServer();
-
-  renderSidebar();
-  syncSidebarToggleState();
-  navigateTo('dashboard');
-  loadUsersFromServerIfAdmin();
-  try{ if(typeof startLiveDocsSync==='function') startLiveDocsSync(); }catch(e){}
-}
-
 // Auth flow hardening override:
 // - keep MFA/enroll pending on the login screen only
 // - expire pending OTP/enroll sessions cleanly
@@ -1232,6 +1075,7 @@ async function doLogout(){
 
   csrfToken = null;
   syncCurrentUserRef(null);
+  try{ if(typeof stopLiveDocsSync==='function') stopLiveDocsSync(); }catch(e){}
 
   document.getElementById('app').classList.remove('active');
   document.getElementById('login-screen').style.display = 'flex';

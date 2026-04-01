@@ -992,19 +992,6 @@ function renderOeeTimeline(rows){
   }).join('') + '</div>';
 }
 
-function renderDowntimePareto(rows){
-  if(!rows.length){
-    return '<div class="mesx-empty"><strong>' + esc(t('Chưa có downtime đủ để phân tích', 'No downtime available for pareto')) + '</strong>' + esc(t('Khi runtime có downtime, bảng pareto sẽ xếp hạng theo tổng phút mất.', 'Once downtime exists in runtime, the pareto view will rank losses by total minutes.')) + '</div>';
-  }
-  return '<div class="mesx-analytics-stack">' + rows.slice(0, 5).map(function(row){
-    var band = Number(row.share_pct || 0) >= 50 ? 'risk' : (Number(row.share_pct || 0) >= 25 ? 'watch' : 'strong');
-    return '<div class="mesx-pareto-row">' +
-      '<div class="mesx-pareto-main"><strong>' + esc(String(row.category || 'uncategorized')) + '</strong><span>' + esc([(row.event_count || 0) + ' ' + t('sự kiện', 'events'), (row.open_count || 0) + ' ' + t('đang mở', 'open'), (row.major_count || 0) + ' ' + t('mức major+', 'major+')].join(' · ')) + '</span><div class="mesx-bar" data-band="' + esc(band) + '" style="margin-top:8px"><span style="width:' + esc(String(Math.max(0, Math.min(100, Number(row.share_pct || 0))))) + '%"></span></div></div>' +
-      '<div class="mesx-metric-value">' + esc(fmtMinutes(row.minutes || 0) + ' · ' + fmtPercent(row.share_pct || 0)) + '</div>' +
-    '</div>';
-  }).join('') + '</div>';
-}
-
 function renderProgramHandshakeQueue(rows){
   if(!rows.length){
     return '<div class="mesx-empty"><strong>' + esc(t('NC handshake đang sạch', 'NC handshake is clean')) + '</strong>' + esc(t('Chưa có WO nào báo sai hoặc thiếu chương trình NC so với lệnh phát hành.', 'No active WO is reporting a missing or mismatched NC program against the released route.')) + '</div>';
