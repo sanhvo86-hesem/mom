@@ -438,7 +438,7 @@ function _showFoundations(){
   var overlay=document.createElement('div'); overlay.className='sj-modal-overlay';
   var modal=document.createElement('div'); modal.className='sj-modal';
   modal.innerHTML='<div class="sj-modal-head"><h3>'+_t('Bản đồ dữ liệu nền','Foundation map')+'</h3><button type="button" class="sj-x">×</button></div><div class="sj-modal-body"><div class="sj-foundation-grid">'+groups.map(function(group){ return '<section class="sj-foundation-card"><h4>'+_esc(_t(group.titleVi,group.titleEn))+'</h4><strong>'+_esc(group.total)+'</strong><div class="sj-foundation-detail">'+group.detail.map(function(item){ return '<div class="sj-foundation-detail-row"><span>'+_esc(item.key)+'</span><strong>'+_esc(item.count)+'</strong></div>'; }).join('')+'</div>'+(group.missing.length?'<p>'+_t('Thiếu: ','Missing: ')+_esc(group.missing.join(', '))+'</p>':'<p>'+_t('Đã có tối thiểu dữ liệu nền cho nhóm này.','Baseline data is present for this group.')+'</p>')+'</section>'; }).join('')+'</div></div><div class="sj-modal-foot"><button type="button" class="sj-btn" data-close>'+_t('Đóng','Close')+'</button>'+(typeof window._mdOpenControl==='function'?'<button type="button" class="sj-btn accent" id="'+_id+'-foundation-open">'+_t('Mở dữ liệu nền','Open master data')+'</button>':'')+'</div>';
-  document.body.appendChild(overlay); document.body.appendChild(modal);
+  overlay.appendChild(modal); document.body.appendChild(overlay);
   function close(){ _closeModal(overlay, modal); }
   overlay.onclick=close; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
   _modalKeyHandler(overlay, modal);
@@ -451,7 +451,7 @@ function _showLinkModal(){
   var overlay=document.createElement('div'); overlay.className='sj-modal-overlay';
   var modal=document.createElement('div'); modal.className='sj-modal sj-modal-sm';
   modal.innerHTML='<div class="sj-modal-head"><h3>'+_t('Liên kết hồ sơ','Link record')+'</h3><button type="button" class="sj-x">×</button></div><div class="sj-modal-body"><label>'+_t('Mã hồ sơ','Record ID')+'</label><input id="'+_id+'-record-link" class="sj-input" placeholder="NCR-2026-001"></div><div class="sj-modal-foot"><button type="button" class="sj-btn" data-close>'+_t('Hủy','Cancel')+'</button><button type="button" class="sj-btn accent" id="'+_id+'-record-submit">'+_t('Liên kết','Link')+'</button></div>';
-  document.body.appendChild(overlay); document.body.appendChild(modal);
+  overlay.appendChild(modal); document.body.appendChild(overlay);
   function close(){ _closeModal(overlay, modal); }
   overlay.onclick=close; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
   _modalKeyHandler(overlay, modal);
@@ -492,7 +492,7 @@ function _showStatusTransition(type, orderId, currentStatus){
   h+='</div>';
   h+='<div class="sj-modal-foot"><button type="button" class="sj-btn" data-close>'+_t('Hủy','Cancel')+'</button><button type="button" class="sj-btn accent" id="'+_id+'-st-submit">'+_t('Xác nhận','Confirm')+'</button></div>';
   modal.innerHTML=h;
-  document.body.appendChild(overlay); document.body.appendChild(modal);
+  overlay.appendChild(modal); document.body.appendChild(overlay);
   function close(){ _closeModal(overlay, modal); }
   overlay.onclick=close; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
   _modalKeyHandler(overlay, modal);
@@ -524,7 +524,7 @@ function _showCreateInContext(type, prefill){
   var modal=document.createElement('div'); modal.className='sj-modal';
   var titleMap={ so:_t('Tạo đơn hàng mới','Create Sales Order'), jo:_t('Tạo lệnh sản xuất','Create Job Order'), wo:_t('Tạo lệnh công đoạn','Create Work Order') };
   modal.innerHTML='<div class="sj-modal-head"><h3>'+_esc(type.toUpperCase())+' · '+_esc(titleMap[type]||_t('Tạo mới','Create'))+'</h3><button type="button" class="sj-x">×</button></div><div class="sj-modal-body"><form id="'+_id+'-ctx-form" class="sj-form">'+FIELDS[type].map(function(f){ return _renderField(f,type); }).join('')+'</form></div><div class="sj-modal-foot"><button type="button" class="sj-btn" data-close>'+_t('Hủy','Cancel')+'</button><button type="button" class="sj-btn accent" id="'+_id+'-ctx-submit">'+_t('Tạo mới','Create')+'</button></div>';
-  document.body.appendChild(overlay); document.body.appendChild(modal);
+  overlay.appendChild(modal); document.body.appendChild(overlay);
   function close(){ _closeModal(overlay, modal); }
   overlay.onclick=close; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
   _modalKeyHandler(overlay, modal);
@@ -561,7 +561,7 @@ function _showCreate(type){
   var modal=document.createElement('div'); modal.className='sj-modal';
   var titleMap={ so:_t('Tạo đơn hàng mới','Create Sales Order'), jo:_t('Tạo lệnh sản xuất','Create Job Order'), wo:_t('Tạo lệnh công đoạn','Create Work Order') };
   modal.innerHTML='<div class="sj-modal-head"><h3>'+_esc(type.toUpperCase())+' · '+_esc(titleMap[type]||_t('Tạo mới','Create'))+'</h3><button type="button" class="sj-x">×</button></div><div class="sj-modal-body"><form id="'+_id+'-create-form" class="sj-form">'+FIELDS[type].map(function(f){ return _renderField(f,type); }).join('')+'</form></div><div class="sj-modal-foot"><button type="button" class="sj-btn" data-close>'+_t('Hủy','Cancel')+'</button><button type="button" class="sj-btn accent" id="'+_id+'-submit-create">'+_t('Tạo mới','Create')+'</button></div>';
-  document.body.appendChild(overlay); document.body.appendChild(modal);
+  overlay.appendChild(modal); document.body.appendChild(overlay);
   function close(){ _closeModal(overlay, modal); }
   overlay.onclick=close; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
   _modalKeyHandler(overlay, modal);
@@ -665,7 +665,7 @@ function _showEdit(type, data){
   var modal=document.createElement('div'); modal.className='sj-modal';
   var titleMap={ so:_t('Chỉnh sửa đơn hàng','Edit Sales Order'), jo:_t('Chỉnh sửa lệnh sản xuất','Edit Job Order'), wo:_t('Chỉnh sửa lệnh công đoạn','Edit Work Order') };
   modal.innerHTML='<div class="sj-modal-head"><h3>'+_esc(type.toUpperCase())+' · '+_esc(titleMap[type]||_t('Chỉnh sửa','Edit'))+'</h3><button type="button" class="sj-x">×</button></div><div class="sj-modal-body"><form id="'+_id+'-edit-form" class="sj-form">'+FIELDS[type].map(function(f){ return _renderField(f,type); }).join('')+'</form></div><div class="sj-modal-foot"><button type="button" class="sj-btn" data-close>'+_t('Hủy','Cancel')+'</button><button type="button" class="sj-btn accent" id="'+_id+'-submit-edit">'+_t('Lưu thay đổi','Save changes')+'</button></div>';
-  document.body.appendChild(overlay); document.body.appendChild(modal);
+  overlay.appendChild(modal); document.body.appendChild(overlay);
   function close(){ _closeModal(overlay, modal); }
   overlay.onclick=close; modal.querySelector('.sj-x').onclick=close; modal.querySelector('[data-close]').onclick=close;
   _modalKeyHandler(overlay, modal);
