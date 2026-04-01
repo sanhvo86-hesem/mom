@@ -38,6 +38,38 @@ function edSyncDocShellStyles(iframeDoc){
   }catch(e){}
 }
 
+function edPrepareFormTemplateClone(bodyClone){
+  try{
+    if(!bodyClone || !bodyClone.querySelector) return false;
+    var isFormDoc = !!bodyClone.querySelector('#scarForm,[data-form-edit-root],.qf-section,.scar-record-strip');
+    if(!isFormDoc) return false;
+    bodyClone.querySelectorAll('#runtimeAlert,.scar-runtime-alert,[data-sign-block],[data-sign-clear],[data-workflow-action],.scar-lookup-self').forEach(function(node){
+      if(node) node.remove();
+    });
+    var workflowPanel = bodyClone.querySelector('#scarWorkflowPanel');
+    if(workflowPanel){
+      workflowPanel.innerHTML =
+        '<div class="scar-signature-grid">' +
+          '<div class="scar-signature-card"><div class="scar-signature-head"><div><strong>Originator</strong><span>Người phát hành</span></div><span class="scar-signature-meaning">AUTHORED</span></div><div class="scar-signature-pad"><div class="scar-signature-empty">Block chữ ký mẫu</div><div>Chỉnh bố cục và thuộc tính. Chữ ký thật chỉ chạy khi mở hồ sơ runtime.</div></div></div>' +
+          '<div class="scar-signature-card"><div class="scar-signature-head"><div><strong>QA Reviewer</strong><span>Người xem xét QA</span></div><span class="scar-signature-meaning">REVIEWED</span></div><div class="scar-signature-pad"><div class="scar-signature-empty">Block chữ ký mẫu</div><div>Chỉnh bố cục và thuộc tính. Chữ ký thật chỉ chạy khi mở hồ sơ runtime.</div></div></div>' +
+          '<div class="scar-signature-card"><div class="scar-signature-head"><div><strong>Approver</strong><span>Người phê duyệt</span></div><span class="scar-signature-meaning">APPROVED</span></div><div class="scar-signature-pad"><div class="scar-signature-empty">Block chữ ký mẫu</div><div>Chỉnh bố cục và thuộc tính. Chữ ký thật chỉ chạy khi mở hồ sơ runtime.</div></div></div>' +
+        '</div>' +
+        '<div class="scar-workflow-note">Chế độ chỉnh mẫu: workflow, chữ ký điện tử, gửi xem xét và phê duyệt chỉ hoạt động khi mở hồ sơ thật. Tại đây anh chỉnh block, field, lookup và layout.</div>';
+    }
+    var actionsBar = bodyClone.querySelector('#qfActionsBar');
+    if(actionsBar){
+      actionsBar.classList.add('ed-form-template-actions');
+      actionsBar.innerHTML =
+        '<div class="qf-helper">Chế độ chỉnh mẫu form. Các nút Lưu nháp, Gửi SCAR, Ký và workflow runtime chỉ hoạt động khi mở hồ sơ thật trong workspace.</div>' +
+        '<div class="qf-actions-spacer"></div>' +
+        '<button class="qf-btn primary" type="button" disabled>Đang chỉnh bố cục mẫu HTML</button>';
+    }
+    return true;
+  }catch(_err){
+    return false;
+  }
+}
+
 function startEdit(code){
   try{
     if(window.edTiptapAdapter && typeof window.edTiptapAdapter.destroy==='function'){
@@ -74,6 +106,7 @@ function startEdit(code){
       if(iframeDoc && iframeDoc.body){
         edSyncDocShellStyles(iframeDoc);
         var bodyClone = iframeDoc.body.cloneNode(true);
+        edPrepareFormTemplateClone(bodyClone);
         bodyClone.querySelectorAll('script').forEach(function(s){s.remove();});
         bodyClone.querySelectorAll('#goog-gt-tt,.goog-te-banner-frame,#google_translate_element').forEach(function(el){el.remove();});
         // Remove only auto-injected duplicate header; keep original .form-header visible
