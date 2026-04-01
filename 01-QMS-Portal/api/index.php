@@ -42,6 +42,7 @@ spl_autoload_register(function (string $class): void {
         'HESEM\\QMS\\Api\\Controllers\\'  => __DIR__ . '/controllers/',
         'HESEM\\QMS\\Api\\Middleware\\'    => __DIR__ . '/middleware/',
         'HESEM\\QMS\\Api\\Validators\\'    => __DIR__ . '/validators/',
+        'HESEM\\QMS\\Services\\'           => __DIR__ . '/services/',
         'HESEM\\QMS\\Api\\'               => __DIR__ . '/',
         'HESEM\\QMS\\Database\\'           => dirname(__DIR__) . '/database/',
     ];
@@ -107,6 +108,14 @@ use HESEM\QMS\Api\Controllers\EvidenceController;
 use HESEM\QMS\Api\Controllers\FmeaController;
 use HESEM\QMS\Api\Controllers\ApqpController;
 use HESEM\QMS\Api\Controllers\MobileController;
+use HESEM\QMS\Api\Controllers\CncProgramController;
+use HESEM\QMS\Api\Controllers\ProductPassportController;
+use HESEM\QMS\Api\Controllers\AiSchedulingController;
+use HESEM\QMS\Api\Controllers\CustomerPortalController;
+use HESEM\QMS\Api\Controllers\ComplianceReportController;
+use HESEM\QMS\Api\Controllers\KnowledgeController;
+use HESEM\QMS\Api\Controllers\CiController;
+use HESEM\QMS\Api\Controllers\EnergyController;
 use HESEM\QMS\Database\DataLayer;
 
 // ── Bootstrap DataLayer ─────────────────────────────────────────────────────
@@ -374,6 +383,99 @@ $router->actions([
     'mobile_resolve_conflict' => [MobileController::class, 'resolveConflict'],
     'mobile_shop_overview'    => [MobileController::class, 'getShopFloorOverview'],
     'mobile_dashboard'        => [MobileController::class, 'getOperatorDashboard'],
+]);
+
+// CNC Programs
+$router->actions([
+    'cnc_program_list'          => [CncProgramController::class, 'listPrograms'],
+    'cnc_program_detail'        => [CncProgramController::class, 'getDetail'],
+    'cnc_program_create'        => [CncProgramController::class, 'create'],
+    'cnc_program_update'        => [CncProgramController::class, 'update'],
+    'cnc_program_upload_version'=> [CncProgramController::class, 'addVersion'],
+    'cnc_program_approve'       => [CncProgramController::class, 'approve'],
+    'cnc_program_setup_sheets'  => [CncProgramController::class, 'listSetupSheets'],
+    'cnc_program_setup_create'  => [CncProgramController::class, 'createSetupSheet'],
+]);
+
+// Product Passport
+$router->actions([
+    'product_passport_list'      => [ProductPassportController::class, 'listPassports'],
+    'product_passport_detail'    => [ProductPassportController::class, 'getDetail'],
+    'product_passport_create'    => [ProductPassportController::class, 'create'],
+    'product_passport_add_event' => [ProductPassportController::class, 'addEvent'],
+    'product_passport_trace'     => [ProductPassportController::class, 'trace'],
+    'product_passport_qr'        => [ProductPassportController::class, 'getQrData'],
+]);
+
+// AI Quality Scheduling
+$router->actions([
+    'ai_prediction_list'         => [AiSchedulingController::class, 'listPredictions'],
+    'ai_prediction_acknowledge'  => [AiSchedulingController::class, 'acknowledgePrediction'],
+    'ai_prediction_resolve'      => [AiSchedulingController::class, 'resolvePrediction'],
+    'ai_spc_anomalies'           => [AiSchedulingController::class, 'getSpcAnomalies'],
+    'ai_tool_wear'               => [AiSchedulingController::class, 'getToolWearPredictions'],
+    'ai_dashboard'               => [AiSchedulingController::class, 'getDashboard'],
+    'schedule_get'               => [AiSchedulingController::class, 'getSchedule'],
+    'schedule_slot_create'       => [AiSchedulingController::class, 'createSlot'],
+    'schedule_slot_update'       => [AiSchedulingController::class, 'updateSlot'],
+    'schedule_conflicts'         => [AiSchedulingController::class, 'getConflicts'],
+    'schedule_capacity'          => [AiSchedulingController::class, 'getCapacityHeatmap'],
+    'schedule_promise'           => [AiSchedulingController::class, 'suggestPromiseDate'],
+]);
+
+// Customer Portal
+$router->actions([
+    'customer_portal_users'         => [CustomerPortalController::class, 'listUsers'],
+    'customer_portal_user_create'   => [CustomerPortalController::class, 'createUser'],
+    'customer_portal_user_update'   => [CustomerPortalController::class, 'updateUser'],
+    'customer_portal_access_list'   => [CustomerPortalController::class, 'listAccessGrants'],
+    'customer_portal_access_grant'  => [CustomerPortalController::class, 'grantAccess'],
+    'customer_portal_access_revoke' => [CustomerPortalController::class, 'revokeAccess'],
+    'customer_portal_complaints'    => [CustomerPortalController::class, 'listComplaints'],
+    'customer_portal_documents'     => [CustomerPortalController::class, 'listDocAccess'],
+    'customer_portal_analytics'     => [CustomerPortalController::class, 'getAnalytics'],
+]);
+
+// Compliance Reports
+$router->actions([
+    'compliance_report_types'           => [ComplianceReportController::class, 'listReportTypes'],
+    'compliance_report_generate'        => [ComplianceReportController::class, 'generateReport'],
+    'compliance_report_history'         => [ComplianceReportController::class, 'getHistory'],
+    'compliance_report_management_review' => [ComplianceReportController::class, 'getManagementReviewData'],
+    'compliance_report_customer_quality'  => [ComplianceReportController::class, 'getCustomerQualityData'],
+    'compliance_report_supplier_review'   => [ComplianceReportController::class, 'getSupplierReviewData'],
+    'compliance_report_copq'            => [ComplianceReportController::class, 'getCopqData'],
+    'compliance_report_evidence_package' => [ComplianceReportController::class, 'getEvidencePackage'],
+]);
+
+// Knowledge Base
+$router->actions([
+    'knowledge_list'    => [KnowledgeController::class, 'listTips'],
+    'knowledge_detail'  => [KnowledgeController::class, 'getDetail'],
+    'knowledge_create'  => [KnowledgeController::class, 'create'],
+    'knowledge_update'  => [KnowledgeController::class, 'update'],
+    'knowledge_vote'    => [KnowledgeController::class, 'vote'],
+    'knowledge_comment' => [KnowledgeController::class, 'addComment'],
+]);
+
+// Continuous Improvement
+$router->actions([
+    'ci_dashboard'           => [CiController::class, 'dashboard'],
+    'ci_suggestion_list'     => [CiController::class, 'listSuggestions'],
+    'ci_suggestion_create'   => [CiController::class, 'createSuggestion'],
+    'ci_project_list'        => [CiController::class, 'listProjects'],
+    'ci_project_create'      => [CiController::class, 'createProject'],
+    'ci_project_update'      => [CiController::class, 'updateProject'],
+    'ci_project_transition'  => [CiController::class, 'transitionProject'],
+    'ci_roi_summary'         => [CiController::class, 'getRoiSummary'],
+]);
+
+// Energy Dashboard
+$router->actions([
+    'energy_overview'       => [EnergyController::class, 'getOverview'],
+    'energy_machine_detail' => [EnergyController::class, 'getMachineDetail'],
+    'energy_per_part'       => [EnergyController::class, 'getPerPartEnergy'],
+    'energy_cost_trend'     => [EnergyController::class, 'getCostTrend'],
 ]);
 
 // ── Register RESTful Routes ─────────────────────────────────────────────────

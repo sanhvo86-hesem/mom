@@ -21150,5 +21150,16 @@ if ($username === '') {
   }
 
   default:
+    // Forward unknown actions to MVC Router (api/index.php)
+    // Guard against recursion: api/index.php sets API_HELPERS_ONLY when loading this file
+    if (!defined('API_HELPERS_ONLY') && !defined('MVC_ROUTER_LOADED')) {
+        define('MVC_ROUTER_LOADED', true);
+        $mvcRouter = __DIR__ . '/api/index.php';
+        if (is_file($mvcRouter)) {
+            require $mvcRouter;
+            // MVC Router controllers call exit() on success, so if we reach here
+            // the action was not found by the MVC Router either.
+        }
+    }
     api_json(['ok' => false, 'error' => 'unknown_action'], 400);
 }
