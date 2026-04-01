@@ -10623,6 +10623,7 @@ function git_is_runtime_noise_path(string $path): bool {
   $p = git_qms_data_relative_path($path);
   if ($p === '') return false;
   if ($p === 'qms-data/config/users.json') return true;
+  if ($p === 'qms-data/audit.log') return true;
   if ($p === 'qms-data/php_error.log') return true;
   if ($p === 'qms-data/scan_cache.json') return true;
   if (str_starts_with($p, 'qms-data/sessions/')) {
@@ -10875,6 +10876,7 @@ function git_cleanup_runtime_noise(string $repoReal): void {
 
   // Clean untracked runtime files/dirs in known noisy locations.
   $cleanTargets = [
+    'qms-data/audit.log',
     'qms-data/form-workflow',
     'qms-data/sessions',
     'qms-data/ratelimit',

@@ -1,4 +1,5 @@
 # Runtime-generated portal data (keep README markers tracked)
+01-QMS-Portal/qms-data/audit.log
 01-QMS-Portal/qms-data/php_error.log
 01-QMS-Portal/qms-data/scan_cache.json
 01-QMS-Portal/qms-data/audit/audit_*.jsonl
