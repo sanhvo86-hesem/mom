@@ -108,6 +108,7 @@ use HESEM\QMS\Api\Controllers\EvidenceController;
 use HESEM\QMS\Api\Controllers\FmeaController;
 use HESEM\QMS\Api\Controllers\ApqpController;
 use HESEM\QMS\Api\Controllers\DispatchController;
+use HESEM\QMS\Api\Controllers\LogisticsController;
 use HESEM\QMS\Api\Controllers\MasterDataController;
 use HESEM\QMS\Api\Controllers\MobileController;
 use HESEM\QMS\Api\Controllers\CncProgramController;
@@ -422,6 +423,21 @@ $router->actions([
     'dispatch_send'              => [DispatchController::class, 'dispatchTarget'],
     'dispatch_operator_tasks'    => [DispatchController::class, 'getOperatorDispatch'],
     'dispatch_report_production' => [DispatchController::class, 'reportProduction'],
+]);
+
+// Logistics: Subcontract, OQC, Packing, Delivery
+$router->actions([
+    'subcontract_list'          => [LogisticsController::class, 'subcontract_list'],
+    'subcontract_create'        => [LogisticsController::class, 'subcontract_create'],
+    'subcontract_update'        => [LogisticsController::class, 'subcontract_update'],
+    'subcontract_receive'       => [LogisticsController::class, 'subcontract_receive'],
+    'oqc_list'                  => [LogisticsController::class, 'oqc_list'],
+    'oqc_create'                => [LogisticsController::class, 'oqc_create'],
+    'oqc_update'                => [LogisticsController::class, 'oqc_update'],
+    'packing_list'              => [LogisticsController::class, 'packing_list'],
+    'packing_create'            => [LogisticsController::class, 'packing_create'],
+    'packing_update'            => [LogisticsController::class, 'packing_update'],
+    'delivery_confirm'          => [LogisticsController::class, 'delivery_confirm'],
 ]);
 
 // CNC Programs
