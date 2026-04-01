@@ -283,11 +283,10 @@ class ExceptionController extends BaseController
                 'affected_part_id'   => trim((string)($body['affected_part_id'] ?? '')),
                 'affected_qty'       => (int)($body['affected_qty'] ?? 0),
                 'received_date'      => trim((string)($body['received_date'] ?? gmdate('Y-m-d'))),
-                'created_by'         => $userId,
-            ]);
+            ], $userId);
 
             $this->auditLog('exception_create_complaint', [
-                'complaint_number' => $complaint['number'],
+                'complaint_number' => $complaint['id'] ?? '',
             ], $userId);
 
             $this->success(['complaint' => $complaint], 201);
@@ -384,11 +383,10 @@ class ExceptionController extends BaseController
                 'job_number'   => trim((string)($body['job_number'] ?? '')),
                 'lot_number'   => trim((string)($body['lot_number'] ?? '')),
                 'qty_affected' => (int)($body['qty_affected'] ?? 0),
-                'created_by'   => $userId,
-            ]);
+            ], $userId);
 
             $this->auditLog('exception_create_mrb', [
-                'mrb_number' => $mrb['number'],
+                'mrb_number' => $mrb['id'] ?? '',
                 'ncr_id'     => $body['ncr_id'],
             ], $userId);
 
@@ -489,11 +487,10 @@ class ExceptionController extends BaseController
                 'department'       => trim((string)($body['department'] ?? '')),
                 'affected_process' => trim((string)($body['affected_process'] ?? '')),
                 'justification'    => trim((string)($body['justification'] ?? '')),
-                'created_by'       => $userId,
-            ]);
+            ], $userId);
 
             $this->auditLog('exception_create_deviation', [
-                'deviation_number' => $deviation['number'],
+                'deviation_number' => $deviation['id'] ?? '',
             ], $userId);
 
             $this->success(['deviation' => $deviation], 201);
@@ -594,11 +591,10 @@ class ExceptionController extends BaseController
                 'affected_part_id' => trim((string)($body['affected_part_id'] ?? '')),
                 'affected_qty'     => (int)($body['affected_qty'] ?? 0),
                 'justification'    => trim((string)($body['justification'] ?? '')),
-                'created_by'       => $userId,
-            ]);
+            ], $userId);
 
             $this->auditLog('exception_create_concession', [
-                'concession_number' => $concession['number'],
+                'concession_number' => $concession['id'] ?? '',
             ], $userId);
 
             $this->success(['concession' => $concession], 201);

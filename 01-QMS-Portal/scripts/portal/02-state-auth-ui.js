@@ -3931,6 +3931,22 @@ let adminTab = 'users';
 let adminUserViewMode = 'cards'; // 'cards' or 'list'
 let adminEditRole = 'ceo';
 let adminUnsaved = false;
+let adminManualRuntimeState = {
+  loading:false,
+  loaded:false,
+  master:null,
+  hierarchy:[],
+  lastCreated:null,
+  error:''
+};
+let adminDataSourceState = {
+  loading:false,
+  loaded:false,
+  error:'',
+  draft:null,
+  snapshot:null,
+  dirty:false
+};
 
 function showToast(msg, duration=2500){
   const t=document.createElement('div');
@@ -5165,6 +5181,9 @@ function renderAdmin(){
       <button class="admin-tab-v2 ${adminTab==='version_control'?'active':''}" onclick="adminTab='version_control';renderAdmin()">🔄 ${lang==='en'?'Version Control':'Điều khiển phiên bản'}</button>
       <button class="admin-tab-v2 ${adminTab==='portal_display'?'active':''}" onclick="adminTab='portal_display';renderAdmin()">🧭 ${lang==='en'?'Portal display':'Hiển thị portal'}</button>
       <button class="admin-tab-v2 ${adminTab==='retention'?'active':''}" onclick="adminTab='retention';renderAdmin()">📋 ${lang==='en'?'Retention':'Lưu giữ'}</button>
+      <button class="admin-tab-v2 ${adminTab==='manual_runtime'?'active':''}" onclick="adminTab='manual_runtime';renderAdmin()">🧾 ${lang==='en'?'Manual runtime':'Nhập tay vận hành'}</button>
+      <button class="admin-tab-v2 ${adminTab==='data_sources'?'active':''}" onclick="adminTab='data_sources';renderAdmin()">🗄 ${lang==='en'?'Data sources':'Nguồn dữ liệu'}</button>
+      <button class="admin-tab-v2 ${adminTab==='mfa'?'active':''}" onclick="adminTab='mfa';renderAdmin()">🔑 ${lang==='en'?'MFA Security':'Bảo mật MFA'}</button>
     </div>
     <div class="admin-panel" id="admin-content"></div>`;
   if(adminTab==='version_control' && !gitRepoStatusState.loaded && !gitRepoStatusState.loading && !gitRepoStatusState.error){
@@ -5177,12 +5196,102 @@ function renderAdmin(){
   if(adminTab==='orgchart') renderAdminOrgChart();
   if(adminTab==='activity') renderAdminActivity();
   if(adminTab==='docs') renderAdminEffectiveDocs();
+  if(adminTab==='manual_runtime') renderAdminManualRuntime();
+  if(adminTab==='data_sources') renderAdminDataSources();
   if(adminTab==='version_control') renderAdminVersionControl();
   if(adminTab==='portal_display'){
     renderAdminPortalDisplay();
     loadPortalDisplayConfigFromServer({silent:true});
   }
   if(adminTab==='retention') renderAdminRetention();
+  if(adminTab==='mfa') renderAdminMfa();
+}
+
+function renderAdminMfa(){
+  const el=document.getElementById('admin-content');
+  if(!el) return;
+  el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-3)">Đang tải cài đặt MFA...</div>';
+
+  apiCall('admin_mfa_settings_get',{},'GET').then(function(res){
+    if(!res||!res.ok){
+      el.innerHTML='<div style="color:var(--red);padding:20px">Lỗi tải MFA settings: '+(res?res.error:'unknown')+'</div>';
+      return;
+    }
+    const d=res;
+    const requireMfa=d.require_mfa;
+    const users=d.users_mfa||[];
+    const enrolled=d.mfa_enrolled||0;
+    const total=d.total_users||0;
+
+    let html='<div style="margin-bottom:24px">';
+    html+='<h3 style="font-size:16px;font-weight:700;margin-bottom:12px">'+(lang==='en'?'MFA Security Settings':'Cài đặt bảo mật MFA')+'</h3>';
+
+    // Global toggle
+    html+='<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;padding:16px;background:var(--bg);border-radius:8px">';
+    html+='<label style="font-weight:600;flex:1">'+(lang==='en'?'Require MFA for all users':'Yêu cầu MFA cho tất cả người dùng')+'</label>';
+    html+='<button id="mfa-toggle-btn" style="padding:8px 20px;border-radius:6px;border:none;cursor:pointer;font-weight:600;color:#fff;background:'+(requireMfa?'var(--green)':'var(--red)')+'">'+(requireMfa?(lang==='en'?'ON — Required':'BẬT — Bắt buộc'):(lang==='en'?'OFF — Not required':'TẮT — Không bắt buộc'))+'</button>';
+    html+='</div>';
+
+    // Stats
+    html+='<div style="display:flex;gap:16px;margin-bottom:20px">';
+    html+='<div style="flex:1;padding:12px;background:var(--bg);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700">'+total+'</div><div style="font-size:12px;color:var(--text-3)">'+(lang==='en'?'Total users':'Tổng người dùng')+'</div></div>';
+    html+='<div style="flex:1;padding:12px;background:var(--bg);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:var(--green)">'+enrolled+'</div><div style="font-size:12px;color:var(--text-3)">'+(lang==='en'?'MFA enrolled':'Đã đăng ký MFA')+'</div></div>';
+    html+='<div style="flex:1;padding:12px;background:var(--bg);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:'+(requireMfa?'var(--red)':'var(--text-3)')+'">'+(total-enrolled)+'</div><div style="font-size:12px;color:var(--text-3)">'+(lang==='en'?'Not enrolled':'Chưa đăng ký')+'</div></div>';
+    html+='</div>';
+
+    // User table
+    html+='<h4 style="font-size:14px;font-weight:600;margin-bottom:8px">'+(lang==='en'?'Per-User MFA Status':'Trạng thái MFA theo người dùng')+'</h4>';
+    html+='<table style="width:100%;border-collapse:collapse;font-size:13px">';
+    html+='<thead><tr style="background:var(--bg)"><th style="padding:8px;text-align:left">'+(lang==='en'?'User':'Người dùng')+'</th><th style="padding:8px;text-align:left">'+(lang==='en'?'Name':'Họ tên')+'</th><th style="padding:8px;text-align:left">'+(lang==='en'?'Role':'Vai trò')+'</th><th style="padding:8px;text-align:center">MFA</th><th style="padding:8px;text-align:center">'+(lang==='en'?'Actions':'Thao tác')+'</th></tr></thead><tbody>';
+
+    users.forEach(function(u){
+      html+='<tr style="border-bottom:1px solid var(--border)">';
+      html+='<td style="padding:8px;font-weight:600">'+String(u.username||'')+'</td>';
+      html+='<td style="padding:8px">'+String(u.name||'')+'</td>';
+      html+='<td style="padding:8px"><span style="padding:2px 8px;border-radius:4px;font-size:11px;background:var(--bg)">'+String(u.role||'')+'</span></td>';
+      html+='<td style="padding:8px;text-align:center">'+(u.mfa_enabled?'<span style="color:var(--green);font-weight:700">✓ '+('BẬT')+'</span>':'<span style="color:var(--text-3)">✗ '+('TẮT')+'</span>')+'</td>';
+      html+='<td style="padding:8px;text-align:center">';
+      if(u.mfa_enabled){
+        html+='<button data-mfa-reset="'+String(u.username||'')+'" style="padding:4px 10px;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:11px;background:#fff">'+(lang==='en'?'Reset':'Đặt lại')+'</button> ';
+        html+='<button data-mfa-disable="'+String(u.username||'')+'" style="padding:4px 10px;border:1px solid var(--red);border-radius:4px;cursor:pointer;font-size:11px;background:#fff;color:var(--red)">'+(lang==='en'?'Disable':'Tắt')+'</button>';
+      } else {
+        html+='<span style="color:var(--text-3);font-size:11px">'+(lang==='en'?'Will enroll on login':'Sẽ đăng ký khi đăng nhập')+'</span>';
+      }
+      html+='</td></tr>';
+    });
+
+    html+='</tbody></table></div>';
+    el.innerHTML=html;
+
+    // Event handlers
+    document.getElementById('mfa-toggle-btn').addEventListener('click',function(){
+      var newVal=!requireMfa;
+      apiCall('admin_mfa_settings_save',{require_mfa:newVal}).then(function(r){
+        if(r&&r.ok){ renderAdminMfa(); }
+        else { alert('Lỗi: '+(r?r.error:'unknown')); }
+      });
+    });
+
+    el.querySelectorAll('[data-mfa-reset]').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var username=this.getAttribute('data-mfa-reset');
+        if(!confirm((lang==='en'?'Reset MFA for ':'Đặt lại MFA cho ')+username+'?')) return;
+        apiCall('admin_mfa_settings_save',{reset_user:username}).then(function(r){
+          if(r&&r.ok) renderAdminMfa();
+        });
+      });
+    });
+
+    el.querySelectorAll('[data-mfa-disable]').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var username=this.getAttribute('data-mfa-disable');
+        if(!confirm((lang==='en'?'Disable MFA for ':'Tắt MFA cho ')+username+'?')) return;
+        apiCall('admin_mfa_settings_save',{disable_user:username}).then(function(r){
+          if(r&&r.ok) renderAdminMfa();
+        });
+      });
+    });
+  });
 }
 
 function renderAdminPortalDisplay(){
@@ -5313,6 +5422,542 @@ function renderAdminPortalDisplay(){
           : (lang==='en'?'Adjust the display configuration, then click Save':'Điều chỉnh cấu hình hiển thị rồi nhấn Lưu')}</span>
         <button class="btn-admin secondary" onclick="resetPortalDisplayConfigDraft()">↩ ${lang==='en'?'Reset draft':'Khôi phục bản nháp'}</button>
         <button class="btn-admin primary" onclick="savePortalDisplayConfig()" style="padding:8px 24px;font-size:13px">💾 ${lang==='en'?'SAVE':'LƯU'}</button>
+      </div>
+    </div>`;
+}
+
+function adminFormatRuntimeStamp(value){
+  const raw = String(value || '').trim();
+  if(!raw) return lang==='en' ? 'Not available' : 'Chưa có dữ liệu';
+  try{
+    const dt = new Date(raw);
+    if(isNaN(dt.getTime())) return raw;
+    return dt.toLocaleString(lang==='en' ? 'en-US' : 'vi-VN');
+  }catch(e){
+    return raw;
+  }
+}
+
+function adminManualRuntimeCounts(hierarchy){
+  const counts = { so:0, jo:0, wo:0 };
+  (Array.isArray(hierarchy) ? hierarchy : []).forEach(so => {
+    counts.so += 1;
+    (Array.isArray(so.job_orders) ? so.job_orders : []).forEach(jo => {
+      counts.jo += 1;
+      counts.wo += (Array.isArray(jo.work_orders) ? jo.work_orders.length : 0);
+    });
+  });
+  return counts;
+}
+
+function adminManualRuntimeRecentRows(hierarchy){
+  const rows = [];
+  (Array.isArray(hierarchy) ? hierarchy : []).forEach(so => {
+    rows.push({
+      type:'SO',
+      id:String(so.so_number || ''),
+      title:[so.customer_name || so.customer_id || '', so.customer_po ? ('PO ' + so.customer_po) : ''].filter(Boolean).join(' · '),
+      status:String(so.status || ''),
+      updated_at:String(so.updated_at || so.created_at || '')
+    });
+    (Array.isArray(so.job_orders) ? so.job_orders : []).forEach(jo => {
+      rows.push({
+        type:'JO',
+        id:String(jo.jo_number || ''),
+        title:[jo.part_number || '', jo.part_revision || ''].filter(Boolean).join(' / '),
+        status:String(jo.status || ''),
+        updated_at:String(jo.updated_at || jo.created_at || '')
+      });
+      (Array.isArray(jo.work_orders) ? jo.work_orders : []).forEach(wo => {
+        rows.push({
+          type:'WO',
+          id:String(wo.wo_number || ''),
+          title:['OP' + String(wo.operation_number || '-'), wo.operation_desc || '', wo.machine_id || ''].filter(Boolean).join(' · '),
+          status:String(wo.status || ''),
+          updated_at:String(wo.updated_at || wo.created_at || '')
+        });
+      });
+    });
+  });
+  return rows.sort((a,b) => String(b.updated_at || '').localeCompare(String(a.updated_at || ''))).slice(0, 10);
+}
+
+async function loadAdminManualRuntimeState(options={}){
+  if(adminManualRuntimeState.loading && !options.force) return;
+  adminManualRuntimeState.loading = true;
+  adminManualRuntimeState.error = '';
+  if(currentPage === 'admin' && adminTab === 'manual_runtime') renderAdminManualRuntime();
+  try{
+    const [masterRes, hierarchyRes] = await Promise.all([
+      apiCall('master_data_snapshot', null, 'GET'),
+      apiCall('order_hierarchy', null, 'GET')
+    ]);
+    if(!(masterRes && masterRes.ok)) throw new Error((masterRes && masterRes.error) || 'master_data_snapshot_failed');
+    if(!(hierarchyRes && hierarchyRes.ok)) throw new Error((hierarchyRes && hierarchyRes.error) || 'order_hierarchy_failed');
+    adminManualRuntimeState.master = masterRes.data || {};
+    adminManualRuntimeState.hierarchy = hierarchyRes.data || hierarchyRes.hierarchy || [];
+    adminManualRuntimeState.lastCreated = adminManualRuntimeRecentRows(adminManualRuntimeState.hierarchy)[0] || null;
+    adminManualRuntimeState.loaded = true;
+  }catch(e){
+    adminManualRuntimeState.error = (e && e.message) ? e.message : (lang==='en' ? 'Unable to load manual runtime data.' : 'Không tải được dữ liệu vận hành thủ công.');
+  }finally{
+    adminManualRuntimeState.loading = false;
+    if(currentPage === 'admin' && adminTab === 'manual_runtime') renderAdminManualRuntime();
+  }
+}
+
+function adminOpenMasterEntity(entity){
+  if(typeof window._mdOpenControl === 'function'){
+    window._mdOpenControl(entity);
+    return;
+  }
+  showToast(lang==='en' ? '⚠ Master Data Control is not ready.' : '⚠ Chưa mở được màn hình Dữ liệu nền.');
+}
+
+function adminOpenOrderManualCreate(type){
+  const orderType = String(type || '').toLowerCase();
+  if(['so','jo','wo'].indexOf(orderType) < 0) return;
+  navigateTo('orders');
+  let attempts = 0;
+  (function tryOpen(){
+    attempts += 1;
+    if(typeof window._sojowoOpenCreate === 'function' && window._sojowoOpenCreate(orderType)){
+      return;
+    }
+    if(attempts < 16){
+      setTimeout(tryOpen, 180);
+      return;
+    }
+    showToast(lang==='en' ? '⚠ Could not open the order create form.' : '⚠ Không mở được biểu mẫu tạo đơn.');
+  })();
+}
+
+function adminOpenOrderWorkspace(){
+  navigateTo('orders');
+}
+
+function renderAdminManualRuntime(){
+  const el = document.getElementById('admin-content');
+  if(!el) return;
+
+  if(!adminManualRuntimeState.loaded && !adminManualRuntimeState.loading){
+    loadAdminManualRuntimeState({force:true});
+  }
+
+  if(adminManualRuntimeState.loading && !adminManualRuntimeState.loaded){
+    el.innerHTML = `<div style="padding:28px;border:1px solid #dbe4f0;border-radius:18px;background:#fff;color:#475569">${lang==='en'?'Loading manual runtime workspace...':'Đang tải module nhập tay vận hành...'}</div>`;
+    return;
+  }
+
+  const master = adminManualRuntimeState.master || {};
+  const hierarchy = Array.isArray(adminManualRuntimeState.hierarchy) ? adminManualRuntimeState.hierarchy : [];
+  const orderCounts = adminManualRuntimeCounts(hierarchy);
+  const recentRows = adminManualRuntimeRecentRows(hierarchy);
+  const checklist = [
+    { label:lang==='en'?'Customers':'Khách hàng', count:(master.customers || []).length, entity:'customers' },
+    { label:'Part Number', count:(master.parts || []).length, entity:'parts' },
+    { label:'Revision', count:(master.revisions || []).length, entity:'revisions' },
+    { label:'Work center', count:(master.work_centers || []).length, entity:'work_centers' },
+    { label:lang==='en'?'Machines':'Máy', count:(master.machines || []).length, entity:'machines' },
+    { label:lang==='en'?'Operators':'Người vận hành', count:(master.operators || []).length, entity:'operators' }
+  ];
+  const missing = checklist.filter(item => Number(item.count || 0) === 0);
+  const stats = [
+    { label:lang==='en'?'Customers':'Khách hàng', value:(master.customers || []).length },
+    { label:'Part Number', value:(master.parts || []).length },
+    { label:'Revision', value:(master.revisions || []).length },
+    { label:'SO', value:orderCounts.so },
+    { label:'JO', value:orderCounts.jo },
+    { label:'WO', value:orderCounts.wo }
+  ];
+
+  el.innerHTML = `
+    <div style="display:grid;gap:16px">
+      <section style="border:1px solid #dbe4f0;border-radius:22px;background:linear-gradient(135deg,#f8fbff 0%,#eef6ff 48%,#fff9ed 100%);padding:22px 24px">
+        <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap">
+          <div style="max-width:760px">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0f4c81">${lang==='en'?'Manual runtime mode':'Chế độ vận hành nhập tay'}</div>
+            <h3 style="margin:8px 0 10px;font-size:24px;line-height:1.2;color:#102a43">${lang==='en'?'Operate while Epicor and CNC are offline':'Vẫn vận hành được khi Epicor và CNC chưa kết nối'}</h3>
+            <p style="margin:0;color:#334e68;line-height:1.65">${lang==='en'
+              ? 'Use this area to seed master data, create SO / JO / WO manually, and keep the internal workflow moving before ERP and machine connectors are ready.'
+              : 'Dùng khu vực này để seed dữ liệu nền, tạo SO / JO / WO bằng tay, và giữ workflow nội bộ vận hành trước khi ERP và kết nối máy sẵn sàng.'}</p>
+            <div style="margin-top:12px;font-size:13px;color:#486581">${lang==='en'
+              ? 'The order create forms now accept manual SO / JO / WO numbers. Leave the field blank if you still want automatic numbering.'
+              : 'Biểu mẫu tạo đơn hiện đã cho phép nhập số SO / JO / WO thủ công. Nếu để trống, hệ thống vẫn tự sinh mã như trước.'}</div>
+          </div>
+          <button class="btn-admin secondary" onclick="loadAdminManualRuntimeState({force:true})">⟳ ${lang==='en'?'Refresh':'Làm mới'}</button>
+        </div>
+      </section>
+
+      ${adminManualRuntimeState.error ? `<div style="padding:12px 14px;border-radius:14px;background:#fff4e5;border:1px solid #facc15;color:#92400e">${escapeHtml(adminManualRuntimeState.error)}</div>` : ''}
+
+      <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px">
+        ${stats.map(card => `
+          <div style="padding:16px;border:1px solid #dbe4f0;border-radius:18px;background:#fff">
+            <div style="font-size:12px;color:#486581">${escapeHtml(card.label)}</div>
+            <div style="margin-top:6px;font-size:28px;font-weight:700;color:#102a43">${escapeHtml(String(card.value))}</div>
+          </div>
+        `).join('')}
+      </section>
+
+      <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+        <article style="border:1px solid #dbe4f0;border-radius:20px;background:#fff;padding:18px">
+          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Seed minimum master data':'Seed dữ liệu nền tối thiểu'}</div>
+          <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${lang==='en'
+            ? 'Create the reference set first so lookup fields in the order forms work without Epicor.'
+            : 'Tạo bộ dữ liệu tham chiếu trước để các trường lookup trong form đơn hàng hoạt động ngay cả khi chưa có Epicor.'}</p>
+          <div style="display:grid;gap:10px">
+            ${checklist.map(item => `
+              <button type="button" onclick="adminOpenMasterEntity('${item.entity}')" style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:14px;background:${item.count > 0 ? '#effcf6' : '#fff7ed'};border:1px solid ${item.count > 0 ? '#bbf7d0' : '#fed7aa'};cursor:pointer;text-align:left">
+                <span>
+                  <strong style="display:block;color:#102a43">${escapeHtml(item.label)}</strong>
+                  <small style="color:#52667a">${item.count > 0 ? (lang==='en'?'Available':'Đã có dữ liệu') : (lang==='en'?'Missing baseline':'Đang thiếu dữ liệu nền')}</small>
+                </span>
+                <strong style="font-size:20px;color:#102a43">${escapeHtml(String(item.count))}</strong>
+              </button>
+            `).join('')}
+          </div>
+        </article>
+
+        <article style="border:1px solid #dbe4f0;border-radius:20px;background:#fff;padding:18px">
+          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Manual order input':'Nhập tay SO / JO / WO'}</div>
+          <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${lang==='en'
+            ? 'Open the governed order forms directly from Admin so operations can start before Epicor inbound is connected.'
+            : 'Mở trực tiếp các form đơn hàng có kiểm soát từ Admin để vận hành có thể bắt đầu trước khi Epicor inbound được kết nối.'}</p>
+          <div style="display:grid;gap:10px">
+            <button class="btn-admin primary" onclick="adminOpenOrderManualCreate('so')">+ SO</button>
+            <button class="btn-admin primary" onclick="adminOpenOrderManualCreate('jo')">+ JO</button>
+            <button class="btn-admin primary" onclick="adminOpenOrderManualCreate('wo')">+ WO</button>
+            <button class="btn-admin secondary" onclick="adminOpenOrderWorkspace()">${lang==='en'?'Open Order Management':'Mở Quản lý đơn hàng'}</button>
+          </div>
+          <div style="margin-top:14px;padding:12px 14px;border-radius:14px;background:#f8fafc;border:1px dashed #cbd5e1;color:#475569;font-size:13px;line-height:1.6">
+            ${lang==='en'
+              ? 'Suggested sequence: Customer -> Part Number -> Revision -> Work center / Machine / Operator -> SO -> JO -> WO.'
+              : 'Trình tự gợi ý: Khách hàng -> Part Number -> Revision -> Work center / Máy / Người vận hành -> SO -> JO -> WO.'}
+          </div>
+        </article>
+
+        <article style="border:1px solid #dbe4f0;border-radius:20px;background:#fff;padding:18px">
+          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Current readiness':'Độ sẵn sàng hiện tại'}</div>
+          <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${missing.length
+            ? (lang==='en'
+              ? ('Still missing baseline data for: ' + missing.map(item => item.label).join(', ') + '.')
+              : ('Hiện vẫn đang thiếu dữ liệu nền cho: ' + missing.map(item => item.label).join(', ') + '.'))
+            : (lang==='en'
+              ? 'The minimum baseline is already in place. You can start creating SO / JO / WO manually now.'
+              : 'Bộ dữ liệu nền tối thiểu đã sẵn sàng. Bạn có thể bắt đầu tạo SO / JO / WO thủ công ngay bây giờ.')}
+          </p>
+          <div style="display:grid;gap:10px">
+            <div style="padding:12px 14px;border-radius:14px;background:#f8fafc;border:1px solid #dbe4f0;color:#334e68;line-height:1.6">
+              ${lang==='en'
+                ? 'Manual mode keeps the workflow alive: users create orders, operators update progress manually, and evidence still links to WO as usual.'
+                : 'Chế độ thủ công vẫn giữ workflow sống: người dùng tạo đơn, người vận hành cập nhật tiến độ bằng tay, và hồ sơ chứng cứ vẫn liên kết về WO như bình thường.'}
+            </div>
+            <div style="padding:12px 14px;border-radius:14px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;line-height:1.6">
+              ${lang==='en'
+                ? 'Security note: secrets for database and external connectors stay on the server, not in editable frontend fields.'
+                : 'Lưu ý an toàn: secret cho database và kết nối ngoài vẫn nằm ở server, không đặt trong các ô frontend có thể sửa.'}
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section style="border:1px solid #dbe4f0;border-radius:20px;background:#fff;padding:18px">
+        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
+          <div>
+            <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Recent records':'Bản ghi gần nhất'}</div>
+            <div style="margin-top:6px;color:#52667a">${lang==='en'
+              ? 'Quickly verify that manual data is being created in the expected order.'
+              : 'Kiểm tra nhanh xem dữ liệu nhập tay đã được tạo đúng trình tự mong muốn hay chưa.'}</div>
+          </div>
+          <div style="font-size:12px;color:#486581">${lang==='en'?'Last event':'Lần cập nhật gần nhất'}: ${escapeHtml(adminFormatRuntimeStamp(adminManualRuntimeState.lastCreated && adminManualRuntimeState.lastCreated.updated_at))}</div>
+        </div>
+        <div style="margin-top:14px;overflow:auto">
+          <table class="admin-table" style="width:100%;font-size:12px">
+            <thead>
+              <tr style="background:#f8fafc">
+                <th style="padding:10px;text-align:left">${lang==='en'?'Type':'Loại'}</th>
+                <th style="padding:10px;text-align:left">${lang==='en'?'Number':'Mã'}</th>
+                <th style="padding:10px;text-align:left">${lang==='en'?'Description':'Mô tả'}</th>
+                <th style="padding:10px;text-align:left">${lang==='en'?'Status':'Trạng thái'}</th>
+                <th style="padding:10px;text-align:left">${lang==='en'?'Updated':'Cập nhật'}</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${recentRows.length ? recentRows.map(row => `
+                <tr style="border-bottom:1px solid #eef2f7">
+                  <td style="padding:10px;font-weight:700">${escapeHtml(row.type)}</td>
+                  <td style="padding:10px"><code>${escapeHtml(row.id || '-')}</code></td>
+                  <td style="padding:10px;color:#334e68">${escapeHtml(row.title || '-')}</td>
+                  <td style="padding:10px">${escapeHtml(row.status || '-')}</td>
+                  <td style="padding:10px;color:#52667a">${escapeHtml(adminFormatRuntimeStamp(row.updated_at))}</td>
+                </tr>
+              `).join('') : `<tr><td colspan="5" style="padding:14px;color:#64748b">${lang==='en'?'No SO / JO / WO records yet.':'Chưa có SO / JO / WO nào được tạo.'}</td></tr>`}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>`;
+}
+
+function adminDataSourceClone(value){
+  try{ return JSON.parse(JSON.stringify(value || {})); }catch(e){ return {}; }
+}
+
+function adminDataSourceModePreview(config){
+  const cfg = config || {};
+  if(!cfg.use_postgres) return 'JSON_ONLY';
+  if(cfg.shadow_write) return 'SHADOW_WRITE';
+  if(cfg.json_fallback) return 'POSTGRES_PRIMARY';
+  return 'POSTGRES_ONLY';
+}
+
+function adminDataSourceDirty(value){
+  adminDataSourceState.dirty = !!value;
+  const bar = document.getElementById('admin-data-source-save-bar');
+  if(bar) bar.style.display = adminDataSourceState.dirty ? 'flex' : 'none';
+}
+
+function adminDataSourceSetField(key, value){
+  if(!adminDataSourceState.draft){
+    adminDataSourceState.draft = adminDataSourceClone((adminDataSourceState.snapshot && adminDataSourceState.snapshot.config && adminDataSourceState.snapshot.config.effective_config) || {});
+  }
+  adminDataSourceState.draft[key] = value;
+  adminDataSourceDirty(true);
+  const preview = document.getElementById('admin-data-source-mode-preview');
+  if(preview) preview.textContent = adminDataSourceModePreview(adminDataSourceState.draft);
+}
+
+async function loadAdminDataSourceState(options={}){
+  if(adminDataSourceState.loading && !options.force) return;
+  adminDataSourceState.loading = true;
+  adminDataSourceState.error = '';
+  if(currentPage === 'admin' && adminTab === 'data_sources') renderAdminDataSources();
+  try{
+    const results = await Promise.allSettled([
+      apiCall('admin_data_layer_config_get', null, 'GET'),
+      apiCall('mes_shadow_status', null, 'GET'),
+      apiCall('epicor_transport_health', null, 'GET'),
+      apiCall('mes_connector_snapshot', null, 'GET')
+    ]);
+    const configRes = results[0].status === 'fulfilled' ? results[0].value : null;
+    if(!(configRes && configRes.ok)) throw new Error((configRes && configRes.error) || 'admin_data_layer_config_get_failed');
+    adminDataSourceState.snapshot = {
+      config: configRes,
+      shadow: (results[1].status === 'fulfilled' && results[1].value && results[1].value.ok) ? results[1].value : null,
+      epicor: (results[2].status === 'fulfilled' && results[2].value && results[2].value.ok) ? results[2].value : null,
+      connectors: (results[3].status === 'fulfilled' && results[3].value && results[3].value.ok) ? results[3].value : null
+    };
+    if(!adminDataSourceState.dirty || options.forceDraftSync){
+      adminDataSourceState.draft = adminDataSourceClone(configRes.effective_config || {});
+      adminDataSourceState.dirty = false;
+    }
+    adminDataSourceState.loaded = true;
+  }catch(e){
+    adminDataSourceState.error = (e && e.message) ? e.message : (lang==='en' ? 'Unable to load data source configuration.' : 'Không tải được cấu hình nguồn dữ liệu.');
+  }finally{
+    adminDataSourceState.loading = false;
+    if(currentPage === 'admin' && adminTab === 'data_sources') renderAdminDataSources();
+  }
+}
+
+function adminDataSourceResetDraft(){
+  adminDataSourceState.draft = adminDataSourceClone((adminDataSourceState.snapshot && adminDataSourceState.snapshot.config && adminDataSourceState.snapshot.config.effective_config) || {});
+  adminDataSourceDirty(false);
+  renderAdminDataSources();
+}
+
+async function saveAdminDataSourceConfig(){
+  if(adminDataSourceState.loading) return;
+  try{
+    adminDataSourceState.loading = true;
+    renderAdminDataSources();
+    const res = await apiCall('admin_data_layer_config_save', { config: adminDataSourceState.draft || {} });
+    if(!(res && res.ok)){
+      throw new Error((res && res.error) || 'admin_data_layer_config_save_failed');
+    }
+    adminDataSourceDirty(false);
+    await loadAdminDataSourceState({force:true, forceDraftSync:true});
+    showToast(lang==='en' ? '✅ Data source configuration saved.' : '✅ Đã lưu cấu hình nguồn dữ liệu.');
+  }catch(e){
+    adminDataSourceState.loading = false;
+    renderAdminDataSources();
+    showToast('⚠ ' + ((e && e.message) ? e.message : (lang==='en' ? 'Save failed.' : 'Lưu cấu hình thất bại.')));
+  }
+}
+
+function renderAdminDataSources(){
+  const el = document.getElementById('admin-content');
+  if(!el) return;
+
+  if(!adminDataSourceState.loaded && !adminDataSourceState.loading){
+    loadAdminDataSourceState({force:true});
+  }
+
+  if(adminDataSourceState.loading && !adminDataSourceState.loaded){
+    el.innerHTML = `<div style="padding:28px;border:1px solid #dbe4f0;border-radius:18px;background:#fff;color:#475569">${lang==='en'?'Loading data source diagnostics...':'Đang tải chẩn đoán nguồn dữ liệu...'}</div>`;
+    return;
+  }
+
+  const snapshot = adminDataSourceState.snapshot || {};
+  const cfgRes = snapshot.config || {};
+  const runtimeMode = cfgRes.runtime_mode || {};
+  const draft = adminDataSourceState.draft || adminDataSourceClone(cfgRes.effective_config || {});
+  const shadow = snapshot.shadow || {};
+  const epicor = snapshot.epicor || {};
+  const connector = snapshot.connectors || {};
+  const shadowFailures = Array.isArray(shadow.shadow_sync_failures) ? shadow.shadow_sync_failures.length : 0;
+  const fallbackReads = Array.isArray(shadow.primary_read_fallbacks) ? shadow.primary_read_fallbacks.length : 0;
+  const connectorFailures = Array.isArray(shadow.recent_connector_failures) ? shadow.recent_connector_failures.length : 0;
+  const launchBlockers = Array.isArray(shadow.launch_blockers) ? shadow.launch_blockers.length : 0;
+  const epicorHealth = epicor.health || {};
+  const connectorKpis = connector.kpis || {};
+
+  el.innerHTML = `
+    <div style="display:grid;gap:16px">
+      <section style="border:1px solid #dbe4f0;border-radius:22px;background:linear-gradient(135deg,#fffdf7 0%,#f4f9ff 55%,#eef2ff 100%);padding:22px 24px">
+        <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start">
+          <div style="max-width:760px">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7c2d12">${lang==='en'?'Data source and database control':'Nguồn dữ liệu và Database'}</div>
+            <h3 style="margin:8px 0 10px;font-size:24px;line-height:1.2;color:#102a43">${lang==='en'?'Inspect and tune the runtime data layer from frontend':'Kiểm tra và chỉnh lớp dữ liệu runtime ngay trên frontend'}</h3>
+            <p style="margin:0;color:#334e68;line-height:1.65">${lang==='en'
+              ? 'This panel exposes the active JSON / PostgreSQL runtime mode, shadow-sync health, and the connection profile you can safely adjust without touching server code.'
+              : 'Panel này hiển thị chế độ runtime JSON / PostgreSQL đang hoạt động, sức khỏe shadow-sync, và bộ cấu hình kết nối mà bạn có thể chỉnh an toàn mà không cần sửa code server.'}</p>
+          </div>
+          <button class="btn-admin secondary" onclick="loadAdminDataSourceState({force:true,forceDraftSync:true})">⟳ ${lang==='en'?'Refresh diagnostics':'Làm mới chẩn đoán'}</button>
+        </div>
+      </section>
+
+      ${adminDataSourceState.error ? `<div style="padding:12px 14px;border-radius:14px;background:#fff4e5;border:1px solid #facc15;color:#92400e">${escapeHtml(adminDataSourceState.error)}</div>` : ''}
+
+      <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+        <div style="padding:16px;border:1px solid #dbe4f0;border-radius:18px;background:#fff">
+          <div style="font-size:12px;color:#486581">${lang==='en'?'Runtime mode':'Chế độ runtime'}</div>
+          <div id="admin-data-source-mode-preview" style="margin-top:6px;font-size:28px;font-weight:700;color:#102a43">${escapeHtml(adminDataSourceModePreview(draft))}</div>
+          <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'Applied to new requests immediately':'Áp dụng ngay cho các request mới'}</div>
+        </div>
+        <div style="padding:16px;border:1px solid #dbe4f0;border-radius:18px;background:#fff">
+          <div style="font-size:12px;color:#486581">PostgreSQL</div>
+          <div style="margin-top:6px;font-size:28px;font-weight:700;color:${runtimeMode.postgres_reachable ? '#0f766e' : '#b45309'}">${runtimeMode.postgres_reachable ? (lang==='en'?'Reachable':'Kết nối được') : (draft.use_postgres ? (lang==='en'?'Unavailable':'Chưa kết nối') : 'JSON')}</div>
+          <div style="margin-top:6px;font-size:12px;color:#52667a">${escapeHtml(runtimeMode.postgres_error || (lang==='en'?'No PostgreSQL error reported':'Không có lỗi PostgreSQL được báo'))}</div>
+        </div>
+        <div style="padding:16px;border:1px solid #dbe4f0;border-radius:18px;background:#fff">
+          <div style="font-size:12px;color:#486581">${lang==='en'?'Shadow-sync failures':'Lỗi shadow-sync'}</div>
+          <div style="margin-top:6px;font-size:28px;font-weight:700;color:#102a43">${escapeHtml(String(shadowFailures))}</div>
+          <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'JSON fallback reads':'Lượt fallback về JSON'}: ${escapeHtml(String(fallbackReads))}</div>
+        </div>
+        <div style="padding:16px;border:1px solid #dbe4f0;border-radius:18px;background:#fff">
+          <div style="font-size:12px;color:#486581">${lang==='en'?'Connector alerts':'Cảnh báo connector'}</div>
+          <div style="margin-top:6px;font-size:28px;font-weight:700;color:#102a43">${escapeHtml(String(connectorFailures))}</div>
+          <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'WO launch blockers':'WO bị chặn'}: ${escapeHtml(String(launchBlockers))}</div>
+        </div>
+      </section>
+
+      <section style="display:grid;grid-template-columns:minmax(340px,1.25fr) minmax(280px,.95fr);gap:16px">
+        <article style="border:1px solid #dbe4f0;border-radius:20px;background:#fff;padding:18px">
+          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'PostgreSQL runtime profile':'Hồ sơ runtime PostgreSQL'}</div>
+          <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${lang==='en'
+            ? 'Switch between JSON-only, shadow-write, PostgreSQL-primary, and PostgreSQL-only here. Passwords remain on the server and are not exposed in frontend.'
+            : 'Chuyển giữa JSON-only, shadow-write, PostgreSQL-primary và PostgreSQL-only ngay tại đây. Mật khẩu vẫn được giữ ở server và không lộ ra frontend.'}</p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+            <label style="display:grid;gap:6px">
+              <span style="font-size:12px;color:#486581">Host</span>
+              <input class="sj-input" value="${escapeHtml(String(draft.host || ''))}" oninput="adminDataSourceSetField('host', this.value)">
+            </label>
+            <label style="display:grid;gap:6px">
+              <span style="font-size:12px;color:#486581">Port</span>
+              <input class="sj-input" type="number" value="${escapeHtml(String(draft.port || 5432))}" oninput="adminDataSourceSetField('port', Number(this.value || 0))">
+            </label>
+            <label style="display:grid;gap:6px">
+              <span style="font-size:12px;color:#486581">Database</span>
+              <input class="sj-input" value="${escapeHtml(String(draft.database || ''))}" oninput="adminDataSourceSetField('database', this.value)">
+            </label>
+            <label style="display:grid;gap:6px">
+              <span style="font-size:12px;color:#486581">${lang==='en'?'Username':'Tài khoản'}</span>
+              <input class="sj-input" value="${escapeHtml(String(draft.username || ''))}" oninput="adminDataSourceSetField('username', this.value)">
+            </label>
+            <label style="display:grid;gap:6px">
+              <span style="font-size:12px;color:#486581">Schema</span>
+              <input class="sj-input" value="${escapeHtml(String(draft.schema || 'public'))}" oninput="adminDataSourceSetField('schema', this.value)">
+            </label>
+            <label style="display:grid;gap:6px">
+              <span style="font-size:12px;color:#486581">SSL Mode</span>
+              <select class="sj-input" onchange="adminDataSourceSetField('sslmode', this.value)">
+                ${['disable','allow','prefer','require','verify-ca','verify-full'].map(item => `<option value="${item}" ${String(draft.sslmode || 'prefer')===item ? 'selected' : ''}>${item}</option>`).join('')}
+              </select>
+            </label>
+            <label style="display:grid;gap:6px">
+              <span style="font-size:12px;color:#486581">${lang==='en'?'Connect timeout (s)':'Timeout kết nối (giây)'}</span>
+              <input class="sj-input" type="number" value="${escapeHtml(String(draft.connect_timeout || 5))}" oninput="adminDataSourceSetField('connect_timeout', Number(this.value || 0))">
+            </label>
+            <label style="display:grid;gap:6px">
+              <span style="font-size:12px;color:#486581">${lang==='en'?'Statement timeout (ms)':'Statement timeout (ms)'}</span>
+              <input class="sj-input" type="number" value="${escapeHtml(String(draft.statement_timeout || 30000))}" oninput="adminDataSourceSetField('statement_timeout', Number(this.value || 0))">
+            </label>
+            <label style="display:grid;gap:6px">
+              <span style="font-size:12px;color:#486581">${lang==='en'?'Read retry count':'Số lần retry khi đọc'}</span>
+              <input class="sj-input" type="number" value="${escapeHtml(String(draft.read_retry_count || 3))}" oninput="adminDataSourceSetField('read_retry_count', Number(this.value || 0))">
+            </label>
+            <label style="display:grid;gap:6px">
+              <span style="font-size:12px;color:#486581">${lang==='en'?'Read retry delay (ms)':'Độ trễ retry khi đọc (ms)'}</span>
+              <input class="sj-input" type="number" value="${escapeHtml(String(draft.read_retry_delay_ms || 150))}" oninput="adminDataSourceSetField('read_retry_delay_ms', Number(this.value || 0))">
+            </label>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:14px">
+            <label style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:#f8fafc;border:1px solid #dbe4f0">
+              <input type="checkbox" ${draft.use_postgres ? 'checked' : ''} onchange="adminDataSourceSetField('use_postgres', this.checked)">
+              <span><strong>use_postgres</strong><br><small>${lang==='en'?'Enable PostgreSQL path':'Bật đường đọc/ghi PostgreSQL'}</small></span>
+            </label>
+            <label style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:#f8fafc;border:1px solid #dbe4f0">
+              <input type="checkbox" ${draft.shadow_write ? 'checked' : ''} onchange="adminDataSourceSetField('shadow_write', this.checked)">
+              <span><strong>shadow_write</strong><br><small>${lang==='en'?'Write JSON + PostgreSQL in parallel':'Ghi song song JSON + PostgreSQL'}</small></span>
+            </label>
+            <label style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:#f8fafc;border:1px solid #dbe4f0">
+              <input type="checkbox" ${draft.json_fallback ? 'checked' : ''} onchange="adminDataSourceSetField('json_fallback', this.checked)">
+              <span><strong>json_fallback</strong><br><small>${lang==='en'?'Fallback to JSON if PostgreSQL read fails':'Fallback về JSON nếu đọc PostgreSQL lỗi'}</small></span>
+            </label>
+          </div>
+          <div style="margin-top:14px;padding:12px 14px;border-radius:14px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;line-height:1.6;font-size:13px">
+            ${lang==='en'
+              ? 'Frontend edits only non-secret parameters. Database passwords and external connector tokens remain in server environment variables.'
+              : 'Frontend chỉ chỉnh các tham số không chứa bí mật. Mật khẩu database và token kết nối ngoài vẫn nằm trong biến môi trường của server.'}
+          </div>
+        </article>
+
+        <article style="border:1px solid #dbe4f0;border-radius:20px;background:#fff;padding:18px;display:grid;gap:12px">
+          <div>
+            <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Integration diagnostics':'Chẩn đoán tích hợp'}</div>
+            <p style="margin:8px 0 0;color:#52667a;line-height:1.6">${lang==='en'
+              ? 'Use these cards to judge whether manual mode is still necessary or whether Epicor / CNC links are healthy enough to rely on.'
+              : 'Dùng các thẻ này để đánh giá xem có còn cần chế độ nhập tay hay không, hoặc Epicor / CNC đã đủ khỏe để dựa vào kết nối hay chưa.'}</p>
+          </div>
+
+          <div style="padding:14px;border-radius:16px;background:#f8fafc;border:1px solid #dbe4f0">
+            <div style="font-size:12px;color:#486581">Epicor</div>
+            <div style="margin-top:6px;font-size:22px;font-weight:700;color:#102a43">${epicorHealth.configured ? (lang==='en'?'Configured':'Đã cấu hình') : (lang==='en'?'Not configured':'Chưa cấu hình')}</div>
+            <div style="margin-top:6px;font-size:13px;color:#52667a">${epicorHealth.dry_run ? (lang==='en'?'Dry-run is active while transport is incomplete.':'Đang ở chế độ dry-run khi transport chưa cấu hình đủ.') : (lang==='en'?'Live transport is active.':'Transport thực đang hoạt động.')}</div>
+            <div style="margin-top:8px;font-size:12px;color:#52667a">${lang==='en'?'Company':'Company'}: ${escapeHtml(String(epicorHealth.company || '-'))} · Plant: ${escapeHtml(String(epicorHealth.plant || '-'))}</div>
+          </div>
+
+          <div style="padding:14px;border-radius:16px;background:#f8fafc;border:1px solid #dbe4f0">
+            <div style="font-size:12px;color:#486581">${lang==='en'?'CNC connectors':'Kết nối CNC'}</div>
+            <div style="margin-top:6px;font-size:22px;font-weight:700;color:#102a43">${escapeHtml(String(connectorKpis.connectors_healthy || 0))}/${escapeHtml(String(connectorKpis.connectors_total || 0))} ${lang==='en'?'healthy':'ổn định'}</div>
+            <div style="margin-top:6px;font-size:13px;color:#52667a">${lang==='en'?'Manual bridges':'Manual bridge'}: ${escapeHtml(String(connectorKpis.manual_bridges || 0))} · ${lang==='en'?'Stale links':'Link stale'}: ${escapeHtml(String(connectorKpis.connectors_stale || 0))}</div>
+          </div>
+
+          <div style="padding:14px;border-radius:16px;background:#f8fafc;border:1px solid #dbe4f0">
+            <div style="font-size:12px;color:#486581">${lang==='en'?'Shadow observability':'Quan sát shadow'}</div>
+            <div style="margin-top:6px;font-size:22px;font-weight:700;color:#102a43">${escapeHtml(String(shadowFailures))} ${lang==='en'?'failures':'lỗi'}</div>
+            <div style="margin-top:6px;font-size:13px;color:#52667a">${lang==='en'?'JSON fallback reads':'Lượt fallback về JSON'}: ${escapeHtml(String(fallbackReads))}</div>
+            <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'Last config update':'Lần lưu cấu hình gần nhất'}: ${escapeHtml(adminFormatRuntimeStamp((cfgRes.override_meta || {}).updated || ''))}</div>
+          </div>
+        </article>
+      </section>
+
+      <div class="admin-save-bar" id="admin-data-source-save-bar" style="${adminDataSourceState.dirty ? 'display:flex' : 'display:none'}">
+        <span class="save-hint"><b>⚠ ${lang==='en'?'Unsaved data source changes':'Có thay đổi nguồn dữ liệu chưa lưu'}</b></span>
+        <button class="btn-admin secondary" onclick="adminDataSourceResetDraft()">${lang==='en'?'Reset draft':'Khôi phục bản nháp'}</button>
+        <button class="btn-admin primary" onclick="saveAdminDataSourceConfig()">${adminDataSourceState.loading ? (lang==='en'?'Saving...':'Đang lưu...') : (lang==='en'?'Save configuration':'Lưu cấu hình')}</button>
       </div>
     </div>`;
 }

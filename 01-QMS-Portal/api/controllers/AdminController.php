@@ -374,4 +374,130 @@ class AdminController extends BaseController
         $this->auditLog('admin_portal_display_config_save');
         $this->success(['config' => portal_display_config_public_payload($saved)]);
     }
+
+    // ── MFA Management ─────────────────────────────────────────────────────
+
+    /**
+     * GET getMfaSettings — Get current MFA settings and per-user MFA status.
+     * Action: `admin_mfa_settings_get`
+     * @return never
+     */
+    public function getMfaSettings(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+
+        try {
+            $usersFile = $this->confDir . '/users.json';
+            $data = $this->readJsonFile($usersFile) ?? ['settings' => [], 'users' => []];
+
+            $settings = $data['settings'] ?? [];
+            $users = $data['users'] ?? [];
+
+            $mfaStatus = [];
+            foreach ($users as $u) {
+                $mfaStatus[] = [
+                    'username'    => (string)($u['username'] ?? ''),
+                    'name'        => (string)($u['name'] ?? ''),
+                    'role'        => (string)($u['role'] ?? ''),
+                    'active'      => (bool)($u['active'] ?? false),
+                    'mfa_enabled' => !empty($u['mfa']['enabled']),
+                    'mfa_enrolled_at' => (string)($u['mfa']['enabled_at'] ?? ''),
+                ];
+            }
+
+            $this->success([
+                'require_mfa'   => (bool)($settings['require_mfa'] ?? false),
+                'issuer'        => (string)($settings['issuer'] ?? 'HESEM QMS'),
+                'users_mfa'     => $mfaStatus,
+                'total_users'   => count($users),
+                'mfa_enrolled'  => count(array_filter($mfaStatus, fn($u) => $u['mfa_enabled'])),
+            ]);
+        } catch (Throwable $e) {
+            $this->error('mfa_settings_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST saveMfaSettings — Update global MFA settings and per-user MFA status.
+     * Action: `admin_mfa_settings_save`
+     *
+     * Body fields:
+     *   - require_mfa (bool): Global MFA requirement toggle.
+     *   - reset_user  (string, optional): Username to reset MFA for.
+     *   - enable_user (string, optional): Username to enable MFA for.
+     *   - disable_user (string, optional): Username to disable MFA for.
+     *
+     * @return never
+     */
+    public function saveMfaSettings(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $this->requireCsrf();
+
+        $body = $this->jsonBody();
+        $userId = (string)($user['username'] ?? 'admin');
+
+        try {
+            $usersFile = $this->confDir . '/users.json';
+            $data = $this->readJsonFile($usersFile) ?? ['settings' => [], 'users' => []];
+
+            // Update global require_mfa setting
+            if (isset($body['require_mfa'])) {
+                $data['settings']['require_mfa'] = (bool)$body['require_mfa'];
+            }
+
+            // Reset MFA for a specific user
+            if (!empty($body['reset_user'])) {
+                $targetUser = trim((string)$body['reset_user']);
+                foreach ($data['users'] as &$u) {
+                    if (($u['username'] ?? '') === $targetUser) {
+                        $u['mfa'] = ['enabled' => false, 'secret_b32' => '', 'enabled_at' => ''];
+                        break;
+                    }
+                }
+                unset($u);
+            }
+
+            // Disable MFA for a specific user
+            if (!empty($body['disable_user'])) {
+                $targetUser = trim((string)$body['disable_user']);
+                foreach ($data['users'] as &$u) {
+                    if (($u['username'] ?? '') === $targetUser) {
+                        $u['mfa']['enabled'] = false;
+                        break;
+                    }
+                }
+                unset($u);
+            }
+
+            // Enable MFA for a specific user (they'll need to enroll on next login)
+            if (!empty($body['enable_user'])) {
+                $targetUser = trim((string)$body['enable_user']);
+                foreach ($data['users'] as &$u) {
+                    if (($u['username'] ?? '') === $targetUser) {
+                        if (empty($u['mfa'])) {
+                            $u['mfa'] = ['enabled' => false, 'secret_b32' => '', 'enabled_at' => ''];
+                        }
+                        // Mark for enrollment - user will set up on next login
+                        break;
+                    }
+                }
+                unset($u);
+            }
+
+            $this->writeJsonFile($usersFile, $data);
+
+            $this->auditLog('admin_mfa_settings_save', [
+                'require_mfa' => $data['settings']['require_mfa'] ?? false,
+                'reset_user'  => $body['reset_user'] ?? null,
+                'disable_user' => $body['disable_user'] ?? null,
+            ], $userId);
+
+            $this->success(['saved' => true, 'require_mfa' => (bool)($data['settings']['require_mfa'] ?? false)]);
+        } catch (Throwable $e) {
+            $this->error('mfa_settings_save_failed', 500, $e->getMessage());
+        }
+    }
 }

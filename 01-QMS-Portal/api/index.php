@@ -218,6 +218,8 @@ $router->actions([
     'save_data_settings'               => [AdminController::class, 'saveSettings'],
     'admin_portal_display_config_get'  => [AdminController::class, 'getPortalConfig'],
     'admin_portal_display_config_save' => [AdminController::class, 'savePortalConfig'],
+    'admin_mfa_settings_get'           => [AdminController::class, 'getMfaSettings'],
+    'admin_mfa_settings_save'          => [AdminController::class, 'saveMfaSettings'],
 ]);
 
 // Dictionary

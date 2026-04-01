@@ -217,15 +217,16 @@ class MobileController extends BaseController
         $userId     = $this->userId($user);
 
         try {
-            $entry = $this->mobileService()->clockIn($employeeId, [
-                'wo_number'     => trim((string)($body['wo_number'] ?? '')),
-                'operation_seq' => trim((string)($body['operation_seq'] ?? '')),
-                'machine_id'    => trim((string)($body['machine_id'] ?? '')),
-                'labor_type'    => strtolower(trim((string)($body['labor_type'] ?? ''))),
-            ]);
+            $entry = $this->mobileService()->clockIn(
+                $employeeId,
+                trim((string)($body['wo_number'] ?? '')),
+                (int)($body['operation_seq'] ?? 0),
+                trim((string)($body['machine_id'] ?? '')),
+                strtolower(trim((string)($body['labor_type'] ?? 'run')))
+            );
 
             $this->auditLog('mobile_clock_in', [
-                'entry_id'      => $entry['id'],
+                'entry_id'      => $entry['entry_id'] ?? '',
                 'employee_id'   => $employeeId,
                 'wo_number'     => $body['wo_number'],
                 'operation_seq' => $body['operation_seq'],

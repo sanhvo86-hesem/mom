@@ -1,6 +1,6 @@
 {
     "settings": {
-        "require_mfa": true,
+        "require_mfa": false,
         "issuer": "HESEM QMS"
     },
     "users": [
