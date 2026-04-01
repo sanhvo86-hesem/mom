@@ -1226,28 +1226,37 @@ function renderSidebar(){
   let html = coreButtons.length ? `<div class="nav-section">${coreButtons.join('')}</div>` : '';
 
   if(isPortalSidebarCoreVisible('deploy')){
-    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'DEPLOYMENT':'TRIỂN KHAI VẬN HÀNH'}</div>
-      <button class="nav-item ${currentPage==='deploy'?'active':''}" onclick="navigateTo('deploy')"><span class="icon">🚀</span><span>${lang==='en'?'Operations Deploy':'Triển khai vận hành'}</span></button>
-      <button class="nav-item ${currentPage==='mes'?'active':''}" onclick="navigateTo('mes')"><span class="icon">🏭</span><span>${lang==='en'?'MES Control Center':'Trung tâm điều hành MES'}</span></button>
-      <button class="nav-item ${currentPage==='exceptions'?'active':''}" onclick="navigateTo('exceptions')"><span class="icon">\u26a0\ufe0f</span><span>${lang==='en'?'Exception Dashboard':'B\u1ea3ng ngo\u1ea1i l\u1ec7'}</span></button>
-      <button class="nav-item ${currentPage==='orders'?'active':''}" onclick="navigateTo('orders')"><span class="icon">📦</span><span>${lang==='en'?'Order Management':'Quản lý đơn hàng'}</span></button>
+    // ── SẢN XUẤT ──
+    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'PRODUCTION':'SẢN XUẤT'}</div>
+      <button class="nav-item ${currentPage==='orders'?'active':''}" onclick="navigateTo('orders')"><span class="icon">📦</span><span>${lang==='en'?'Orders':'Đơn hàng'}</span></button>
       <button class="nav-item ${currentPage==='dispatch'?'active':''}" onclick="navigateTo('dispatch')"><span class="icon">📋</span><span>${lang==='en'?'Production Dispatch':'Phân công sản xuất'}</span></button>
-      <button class="nav-item ${currentPage==='forms'?'active':''}" onclick="navigateTo('forms')"><span class="icon">📋</span><span>${lang==='en'?'Evidence Control':'Kiểm soát chứng cứ'}</span></button>
-      <button class="nav-item ${currentPage==='quality-exceptions'?'active':''}" onclick="navigateTo('quality-exceptions')"><span class="icon">🔴</span><span>${lang==='en'?'Quality Exceptions':'Ngoại lệ chất lượng'}</span></button>
-      <button class="nav-item ${currentPage==='supplier-quality'?'active':''}" onclick="navigateTo('supplier-quality')"><span class="icon">🏭</span><span>${lang==='en'?'Supplier Quality':'Chất lượng NCC'}</span></button>
+      <button class="nav-item ${currentPage==='mes'?'active':''}" onclick="navigateTo('mes')"><span class="icon">🏭</span><span>${lang==='en'?'Shop Floor':'Xưởng sản xuất'}</span></button>
+      <button class="nav-item ${currentPage==='mobile-shopfloor'?'active':''}" onclick="navigateTo('mobile-shopfloor')"><span class="icon">📱</span><span>${lang==='en'?'Operator Mobile':'Công nhân di động'}</span></button>
       <button class="nav-item ${currentPage==='quoting'?'active':''}" onclick="navigateTo('quoting')"><span class="icon">💰</span><span>${lang==='en'?'Quoting':'Báo giá'}</span></button>
-      <button class="nav-item ${currentPage==='evidence'?'active':''}" onclick="navigateTo('evidence')"><span class="icon">🔒</span><span>${lang==='en'?'Evidence Vault':'Kho chứng cứ'}</span></button>
-      <button class="nav-item ${currentPage==='ai-scheduling'?'active':''}" onclick="navigateTo('ai-scheduling')"><span class="icon">🤖</span><span>${lang==='en'?'AI Quality & Scheduling':'AI Chất lượng & Lịch trình'}</span></button>
-      <button class="nav-item ${currentPage==='cnc-programs'?'active':''}" onclick="navigateTo('cnc-programs')"><span class="icon">⚙</span><span>${lang==='en'?'CNC Programs':'Chương trình CNC'}</span></button>
-      <button class="nav-item ${currentPage==='product-passport'?'active':''}" onclick="navigateTo('product-passport')"><span class="icon">🔗</span><span>${lang==='en'?'Product Passport':'Hộ chiếu sản phẩm'}</span></button>
-      <button class="nav-item ${currentPage==='customer-portal'?'active':''}" onclick="navigateTo('customer-portal')"><span class="icon">🌐</span><span>${lang==='en'?'Customer Portal':'Cổng khách hàng'}</span></button>
-      <button class="nav-item ${currentPage==='compliance-reports'?'active':''}" onclick="navigateTo('compliance-reports')"><span class="icon">📊</span><span>${lang==='en'?'Compliance Reports':'Báo cáo tuân thủ'}</span></button>
+    </div>`;
+    // ── CHẤT LƯỢNG ──
+    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'QUALITY':'CHẤT LƯỢNG'}</div>
+      <button class="nav-item ${['quality-exceptions','exceptions'].indexOf(currentPage)>=0?'active':''}" onclick="navigateTo('quality-exceptions')"><span class="icon">🔴</span><span>${lang==='en'?'Nonconformance':'Sự không phù hợp'}</span></button>
+      <button class="nav-item ${currentPage==='supplier-quality'?'active':''}" onclick="navigateTo('supplier-quality')"><span class="icon">🏪</span><span>${lang==='en'?'Supplier Quality':'Chất lượng NCC'}</span></button>
       <button class="nav-item ${currentPage==='fmea'?'active':''}" onclick="navigateTo('fmea')"><span class="icon">⚡</span><span>${lang==='en'?'FMEA & Control Plan':'FMEA & Control Plan'}</span></button>
       <button class="nav-item ${currentPage==='apqp-ppap'?'active':''}" onclick="navigateTo('apqp-ppap')"><span class="icon">🎯</span><span>${lang==='en'?'APQP / PPAP':'APQP / PPAP'}</span></button>
-      <button class="nav-item ${currentPage==='mobile-shopfloor'?'active':''}" onclick="navigateTo('mobile-shopfloor')"><span class="icon">📱</span><span>${lang==='en'?'Shop Floor Mobile':'Xưởng di động'}</span></button>
+      <button class="nav-item ${currentPage==='ai-scheduling'?'active':''}" onclick="navigateTo('ai-scheduling')"><span class="icon">🤖</span><span>${lang==='en'?'AI Quality':'AI Chất lượng'}</span></button>
+    </div>`;
+    // ── HỒ SƠ & BÁO CÁO ──
+    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'RECORDS & REPORTS':'HỒ SƠ & BÁO CÁO'}</div>
+      <button class="nav-item ${currentPage==='forms'?'active':''}" onclick="navigateTo('forms')"><span class="icon">📋</span><span>${lang==='en'?'Evidence Control':'Kiểm soát chứng cứ'}</span></button>
+      <button class="nav-item ${currentPage==='evidence'?'active':''}" onclick="navigateTo('evidence')"><span class="icon">🔒</span><span>${lang==='en'?'Evidence Vault':'Kho chứng cứ'}</span></button>
+      <button class="nav-item ${currentPage==='compliance-reports'?'active':''}" onclick="navigateTo('compliance-reports')"><span class="icon">📊</span><span>${lang==='en'?'Reports':'Báo cáo'}</span></button>
+      <button class="nav-item ${currentPage==='continuous-improvement'?'active':''}" onclick="navigateTo('continuous-improvement')"><span class="icon">🔄</span><span>${lang==='en'?'Improvement':'Cải tiến liên tục'}</span></button>
       <button class="nav-item ${currentPage==='knowledge-base'?'active':''}" onclick="navigateTo('knowledge-base')"><span class="icon">💡</span><span>${lang==='en'?'Knowledge Base':'Kho kiến thức'}</span></button>
-      <button class="nav-item ${currentPage==='continuous-improvement'?'active':''}" onclick="navigateTo('continuous-improvement')"><span class="icon">🔄</span><span>${lang==='en'?'Continuous Improvement':'Cải tiến liên tục'}</span></button>
-      <button class="nav-item ${currentPage==='energy-dashboard'?'active':''}" onclick="navigateTo('energy-dashboard')"><span class="icon">⚡</span><span>${lang==='en'?'Energy Monitor':'Giám sát năng lượng'}</span></button>
+    </div>`;
+    // ── CÔNG CỤ ──
+    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'TOOLS':'CÔNG CỤ'}</div>
+      <button class="nav-item ${currentPage==='cnc-programs'?'active':''}" onclick="navigateTo('cnc-programs')"><span class="icon">⚙</span><span>${lang==='en'?'CNC Programs':'Chương trình CNC'}</span></button>
+      <button class="nav-item ${currentPage==='product-passport'?'active':''}" onclick="navigateTo('product-passport')"><span class="icon">🔗</span><span>${lang==='en'?'Product Passport':'Hộ chiếu sản phẩm'}</span></button>
+      <button class="nav-item ${currentPage==='energy-dashboard'?'active':''}" onclick="navigateTo('energy-dashboard')"><span class="icon">⚡</span><span>${lang==='en'?'Energy':'Năng lượng'}</span></button>
+      <button class="nav-item ${currentPage==='deploy'?'active':''}" onclick="navigateTo('deploy')"><span class="icon">🚀</span><span>${lang==='en'?'Deploy':'Triển khai'}</span></button>
+      <button class="nav-item ${currentPage==='customer-portal'?'active':''}" onclick="navigateTo('customer-portal')"><span class="icon">🌐</span><span>${lang==='en'?'Customer Portal':'Cổng khách hàng'}</span></button>
     </div>`;
   }
   if(isAdmin() && isPortalSidebarCoreVisible('admin')){
