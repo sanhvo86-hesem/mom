@@ -452,7 +452,7 @@ function buildEditorToolbar(){
       ${btn(EI.find,'_find',v?'TÃ¬m / Thay tháº¿ (Ctrl+F / Ctrl+H)':'Find / Replace (Ctrl+F / Ctrl+H)')}
       ${btn(EI.source,'_source',v?'HTML':'HTML')}
       <button class="ed-btn ed-btn-text" onclick="edDomToggle()" title="${v?'DOM Inspector (bố cục)':'DOM Inspector (layout)'}">DOM</button>
-      <button class="ed-btn ed-btn-text" onclick="edFormDockToggle()" title="${v?'Ẩn / hiện Form Blocks':'Toggle Form Blocks'}">BLK</button>
+      <button class="ed-btn ed-btn-text" id="ed-form-dock-toggle-btn" onclick="edFormDockToggle()" title="${v?'Ẩn / hiện Form Blocks':'Toggle Form Blocks'}">FORM</button>
       <button class="ed-btn ed-btn-text" onclick="if(window._mdOpenControl){window._mdOpenControl();}" title="${v?'Mở dữ liệu nền':'Open master data'}">DATA</button>
       ${btn(EI.print,'_print',v?'In':'Print')}
 
@@ -463,6 +463,8 @@ function buildEditorToolbar(){
       ${btn(EI.fullscreen,'_fullscreen',v?'ToÃ n mÃ n hÃ¬nh':'Fullscreen')}
     </div>
   `;
+  edRepairMojibake(tb);
+  edSyncFormDockToggleButton();
   const area=document.getElementById('editor-area');
   area.removeEventListener('input',edOnInput);
   area.removeEventListener('keydown',edKeyDown);
@@ -1282,6 +1284,8 @@ function edInsertQmsTemplate(kind){
 function edUnmountFormDesignerDock(){
   var existing=document.getElementById('ed-form-designer-dock');
   if(existing) existing.remove();
+  var btn=document.getElementById('ed-form-dock-toggle-btn');
+  if(btn) btn.classList.remove('active');
 }
 
 function edMountFormDesignerDock(ctx){
@@ -1302,12 +1306,20 @@ function edMountFormDesignerDock(ctx){
   dock.innerHTML=edBuildFormDesignerDock();
   edRepairMojibake(dock);
   dock.classList.toggle('is-hidden', !!window._edFormDockHidden);
+  edSyncFormDockToggleButton();
 }
 
 function edFormDockToggle(){
   window._edFormDockHidden = !window._edFormDockHidden;
   var dock = document.getElementById('ed-form-designer-dock');
   if(dock) dock.classList.toggle('is-hidden', !!window._edFormDockHidden);
+  edSyncFormDockToggleButton();
+}
+
+function edSyncFormDockToggleButton(){
+  var btn=document.getElementById('ed-form-dock-toggle-btn');
+  if(!btn) return;
+  btn.classList.toggle('active', !window._edFormDockHidden);
 }
 
 function edBuildFormDesignerDock(){
@@ -1726,12 +1738,21 @@ function edQmsFieldProps(block){
     formula: String(block.dataset.formula || '').trim(),
     apiEndpoint: String(block.dataset.apiEndpoint || '').trim(),
     apiMethod: String(block.dataset.apiMethod || '').trim() || 'GET',
+    apiParams: String(block.dataset.apiParams || '').trim(),
     dbEntity: String(block.dataset.dbEntity || '').trim(),
     dbField: String(block.dataset.dbField || '').trim(),
+    dbFilter: String(block.dataset.dbFilter || '').trim(),
     relatedForm: String(block.dataset.relatedForm || '').trim(),
     relatedField: String(block.dataset.relatedField || '').trim(),
+    lookupLabelField: String(block.dataset.lookupLabelField || '').trim(),
+    lookupValueField: String(block.dataset.lookupValueField || '').trim(),
+    lookupFilter: String(block.dataset.lookupFilter || '').trim(),
     visibilityRule: String(block.dataset.visibilityRule || '').trim(),
     requiredWhen: String(block.dataset.requiredWhen || '').trim(),
+    functionRef: String(block.dataset.functionRef || '').trim(),
+    formulaPrecision: String(block.dataset.formulaPrecision || '').trim(),
+    autofillMap: String(block.dataset.autofillMap || '').trim(),
+    webhookUrl: String(block.dataset.webhookUrl || '').trim(),
     readonly: !!((control && control.hasAttribute && control.hasAttribute('readonly')) || String(block.dataset.readonly || '').trim() === '1')
   };
 }
@@ -1953,6 +1974,8 @@ function edEditQmsBlockProperties(block){
       '</div>' +
       '<div id="ed-qms-field-lookup-wrap">' +
         '<label>' + (vi ? 'Nguồn lookup dữ liệu nền' : 'Lookup source') + '</label><select id="ed-qms-field-source"><option value="">' + (vi ? 'Không dùng' : 'None') + '</option>' + sourceOptions + '</select>' +
+        '<div class="ed-qms-prop-grid"><div><label>' + (vi ? 'Field label nguồn' : 'Source label field') + '</label><input id="ed-qms-field-lookup-label" value="' + _edEscapeHtml(fp.lookupLabelField || '') + '" placeholder="supplier_name"></div><div><label>' + (vi ? 'Field value nguồn' : 'Source value field') + '</label><input id="ed-qms-field-lookup-value" value="' + _edEscapeHtml(fp.lookupValueField || '') + '" placeholder="supplier_id"></div></div>' +
+        '<label>' + (vi ? 'Bộ lọc lookup' : 'Lookup filter') + '</label><input id="ed-qms-field-lookup-filter" value="' + _edEscapeHtml(fp.lookupFilter || '') + '" placeholder="[status] = active">' +
         '<div class="ed-qms-prop-actions"><button type="button" class="ed-qms-secondary" onclick="edOpenQmsLookupSource()">' + (vi ? 'Mở quản lý dữ liệu nền' : 'Open master data') + '</button></div>' +
         '<div class="ed-qms-prop-note">' + (vi ? 'Xem nhanh nội dung droplist đang dùng cho field lookup này.' : 'Preview the current lookup items for this field.') + '</div>' +
         '<div class="ed-qms-lookup-preview" id="ed-qms-lookup-preview"></div>' +
@@ -1960,9 +1983,14 @@ function edEditQmsBlockProperties(block){
       '<div class="ed-qms-prop-divider">' + (vi ? 'Kết nối dữ liệu & logic' : 'Data binding & logic') + '</div>' +
       '<div class="ed-qms-prop-grid"><div><label>API endpoint</label><input id="ed-qms-field-api" value="' + _edEscapeHtml(fp.apiEndpoint || '') + '" placeholder="/01-QMS-Portal/api.php?action=..."></div><div><label>' + (vi ? 'Phương thức API' : 'API method') + '</label><select id="ed-qms-field-api-method">' +
       ['GET','POST','PUT'].map(function(method){ return '<option value="' + method + '"' + (fp.apiMethod === method ? ' selected' : '') + '>' + method + '</option>'; }).join('') + '</select></div></div>' +
+      '<label>' + (vi ? 'Tham số API / query map' : 'API params / query map') + '</label><input id="ed-qms-field-api-params" value="' + _edEscapeHtml(fp.apiParams || '') + '" placeholder="customer_id=[customer_id]&part=[part_number]">' +
       '<div class="ed-qms-prop-grid"><div><label>Database entity</label><input id="ed-qms-field-db-entity" value="' + _edEscapeHtml(fp.dbEntity || '') + '" placeholder="supplier_approvals"></div><div><label>Database field</label><input id="ed-qms-field-db-field" value="' + _edEscapeHtml(fp.dbField || '') + '" placeholder="supplier_name"></div></div>' +
+      '<label>' + (vi ? 'Bộ lọc database' : 'Database filter') + '</label><input id="ed-qms-field-db-filter" value="' + _edEscapeHtml(fp.dbFilter || '') + '" placeholder="status=active AND site=[site_code]">' +
       '<div class="ed-qms-prop-grid"><div><label>' + (vi ? 'Form liên kết' : 'Related form') + '</label><input id="ed-qms-field-related-form" value="' + _edEscapeHtml(fp.relatedForm || '') + '" placeholder="FRM-404"></div><div><label>' + (vi ? 'Field liên kết' : 'Related field') + '</label><input id="ed-qms-field-related-field" value="' + _edEscapeHtml(fp.relatedField || '') + '" placeholder="supplier_id"></div></div>' +
       '<label>' + (vi ? 'Công thức / hàm tính' : 'Formula expression') + '</label><input id="ed-qms-field-formula" value="' + _edEscapeHtml(fp.formula || '') + '" placeholder="=[quantity_rejected]/[quantity_received]*100">' +
+      '<div class="ed-qms-prop-grid"><div><label>' + (vi ? 'Hàm dùng lại' : 'Reusable function') + '</label><input id="ed-qms-field-function-ref" value="' + _edEscapeHtml(fp.functionRef || '') + '" placeholder="scar.computeRejectRate"></div><div><label>' + (vi ? 'Độ chính xác số' : 'Formula precision') + '</label><input id="ed-qms-field-formula-precision" value="' + _edEscapeHtml(fp.formulaPrecision || '') + '" placeholder="2"></div></div>' +
+      '<label>' + (vi ? 'Ánh xạ tự điền' : 'Autofill map') + '</label><textarea id="ed-qms-field-autofill-map" rows="3" placeholder="supplier_name=supplier_name&#10;supplier_contact=contact_email">' + _edEscapeHtml(fp.autofillMap || '') + '</textarea>' +
+      '<label>' + (vi ? 'Webhook / endpoint hậu xử lý' : 'Webhook / post-process endpoint') + '</label><input id="ed-qms-field-webhook-url" value="' + _edEscapeHtml(fp.webhookUrl || '') + '" placeholder="https://.../hooks/scar-created">' +
       '<label>' + (vi ? 'Điều kiện hiển thị' : 'Visibility rule') + '</label><input id="ed-qms-field-visibility" value="' + _edEscapeHtml(fp.visibilityRule || '') + '" placeholder="[scar_status] = verification">' +
       '<label>' + (vi ? 'Điều kiện bắt buộc' : 'Required rule') + '</label><input id="ed-qms-field-required-when" value="' + _edEscapeHtml(fp.requiredWhen || '') + '" placeholder="[root_cause_required] = true">' +
       '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="ed-qms-field-required"' + (fp.required ? ' checked' : '') + '> ' + (vi ? 'Trường bắt buộc' : 'Required field') + '</label>' +
@@ -2005,11 +2033,20 @@ function edApplyQmsFieldProps(){
   var selectOptions = edQmsParseSelectOptions(String((document.getElementById('ed-qms-field-options') || {}).value || ''));
   var apiEndpoint = String((document.getElementById('ed-qms-field-api') || {}).value || '').trim();
   var apiMethod = String((document.getElementById('ed-qms-field-api-method') || {}).value || 'GET').trim();
+  var apiParams = String((document.getElementById('ed-qms-field-api-params') || {}).value || '').trim();
   var dbEntity = String((document.getElementById('ed-qms-field-db-entity') || {}).value || '').trim();
   var dbField = String((document.getElementById('ed-qms-field-db-field') || {}).value || '').trim();
+  var dbFilter = String((document.getElementById('ed-qms-field-db-filter') || {}).value || '').trim();
   var relatedForm = String((document.getElementById('ed-qms-field-related-form') || {}).value || '').trim();
   var relatedField = String((document.getElementById('ed-qms-field-related-field') || {}).value || '').trim();
+  var lookupLabelField = String((document.getElementById('ed-qms-field-lookup-label') || {}).value || '').trim();
+  var lookupValueField = String((document.getElementById('ed-qms-field-lookup-value') || {}).value || '').trim();
+  var lookupFilter = String((document.getElementById('ed-qms-field-lookup-filter') || {}).value || '').trim();
   var formula = String((document.getElementById('ed-qms-field-formula') || {}).value || '').trim();
+  var functionRef = String((document.getElementById('ed-qms-field-function-ref') || {}).value || '').trim();
+  var formulaPrecision = String((document.getElementById('ed-qms-field-formula-precision') || {}).value || '').trim();
+  var autofillMap = String((document.getElementById('ed-qms-field-autofill-map') || {}).value || '').trim();
+  var webhookUrl = String((document.getElementById('ed-qms-field-webhook-url') || {}).value || '').trim();
   var visibilityRule = String((document.getElementById('ed-qms-field-visibility') || {}).value || '').trim();
   var requiredWhen = String((document.getElementById('ed-qms-field-required-when') || {}).value || '').trim();
   var required = !!((document.getElementById('ed-qms-field-required') || {}).checked);
@@ -2028,13 +2065,22 @@ function edApplyQmsFieldProps(){
   if(dv) dv.id = fieldId + '__dv';
   if(error) error.setAttribute('data-error-for', fieldId);
   block.dataset.lookupSource = fieldType === 'lookup' ? lookupSource : '';
+  block.dataset.lookupLabelField = fieldType === 'lookup' ? lookupLabelField : '';
+  block.dataset.lookupValueField = fieldType === 'lookup' ? lookupValueField : '';
+  block.dataset.lookupFilter = fieldType === 'lookup' ? lookupFilter : '';
   block.dataset.apiEndpoint = apiEndpoint;
   block.dataset.apiMethod = apiMethod;
+  block.dataset.apiParams = apiParams;
   block.dataset.dbEntity = dbEntity;
   block.dataset.dbField = dbField;
+  block.dataset.dbFilter = dbFilter;
   block.dataset.relatedForm = relatedForm;
   block.dataset.relatedField = relatedField;
   block.dataset.formula = formula;
+  block.dataset.functionRef = functionRef;
+  block.dataset.formulaPrecision = formulaPrecision;
+  block.dataset.autofillMap = autofillMap;
+  block.dataset.webhookUrl = webhookUrl;
   block.dataset.visibilityRule = visibilityRule;
   block.dataset.requiredWhen = requiredWhen;
   block.dataset.readonly = readonly ? '1' : '';
@@ -2069,6 +2115,7 @@ function edDeselectAllQmsBlocks(){
 function edBuildQmsToolbar(block){
   const vi=lang!=='en';
   const bar=document.createElement('div');
+  const isField = !!(block && block.classList && block.classList.contains('qf-field'));
   bar.className='ed-qms-toolbar';
   bar.setAttribute('contenteditable','false');
   bar.setAttribute('data-kind-label',edQmsKindMeta((block&&block.dataset&&block.dataset.qmsKind)||'note').title);
@@ -2076,13 +2123,16 @@ function edBuildQmsToolbar(block){
   bar.addEventListener('click',function(ev){ev.stopPropagation();});
   [
     {action:'settings',icon:'SET',title:vi?'Thuộc tính':'Properties',handler:function(){edEditQmsBlockProperties(block);}},
+    {action:'data',icon:'DATA',title:vi?'Nguồn dữ liệu nền':'Master data',handler:function(){ if(typeof window._mdOpenControl==='function'){ window._mdOpenControl(String(block.dataset.lookupSource || 'suppliers').trim() || 'suppliers'); } }},
     {action:'edit',icon:'EDIT',title:vi?'Chỉnh sửa':'Edit',handler:function(){edFocusQmsBlock(block);}},
     {action:'up',icon:'UP',title:vi?'Đưa lên':'Move up',handler:function(){edQmsMoveBlock(block,'up');}},
     {action:'down',icon:'DN',title:vi?'Đưa xuống':'Move down',handler:function(){edQmsMoveBlock(block,'down');}},
-    {action:'wide',icon:'W',title:vi?'Mở rộng':'Widen',handler:function(){edQmsApplyFieldWidth(block, block.classList.contains('qf-col-span-2') ? '3' : '2');}},
+    {action:'col1',icon:'1',title:vi?'Rộng 1 cột':'1 column',handler:function(){edQmsApplyFieldWidth(block,'1');},show:isField},
+    {action:'col2',icon:'2',title:vi?'Rộng 2 cột':'2 columns',handler:function(){edQmsApplyFieldWidth(block,'2');},show:isField},
+    {action:'col3',icon:'3',title:vi?'Toàn hàng':'Full row',handler:function(){edQmsApplyFieldWidth(block,'3');},show:isField},
     {action:'duplicate',icon:'COPY',title:vi?'Nhân bản':'Duplicate',handler:function(){edDuplicateQmsBlock(block);}},
     {action:'delete',icon:'DEL',title:vi?'Xóa':'Delete',handler:function(){edDeleteQmsBlock(block);}}
-  ].forEach(function(cfg){
+  ].filter(function(cfg){ return cfg.show !== false; }).forEach(function(cfg){
     const btn=document.createElement('button');
     btn.type='button';
     btn.className='ed-qms-toolbtn'+(cfg.action==='delete'?' is-danger':'')+(cfg.icon.length>2?' is-text':'');
@@ -2151,6 +2201,7 @@ function edOpenQmsContextMenu(block,x,y){
   var actions=[
     {label:'Thuộc tính',handler:function(){edEditQmsBlockProperties(block);}},
     {label:'Chỉnh droplist / lookup',handler:function(){edOpenQmsDropdownSettings(block);},show:isField},
+    {label:'Mở dữ liệu nền',handler:function(){ if(typeof window._mdOpenControl==='function'){ window._mdOpenControl(String(block.dataset.lookupSource || 'suppliers').trim() || 'suppliers'); } },show:isField},
     {label:'Nhân bản block',handler:function(){edDuplicateQmsBlock(block);}},
     {label:'Đưa lên',handler:function(){edQmsMoveBlock(block,'up');}},
     {label:'Đưa xuống',handler:function(){edQmsMoveBlock(block,'down');}},

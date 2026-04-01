@@ -965,7 +965,7 @@ function ensureSignatureModuleReady(){
   if(typeof existing === 'function') return Promise.resolve(existing);
   if(window.__scarSignatureLoader) return window.__scarSignatureLoader;
   window.__scarSignatureLoader = new Promise(function(resolve){
-    var src = '/01-QMS-Portal/scripts/portal/11-e-signature.js?v=scar403-runtime-20260401-7';
+    var src = '/01-QMS-Portal/scripts/portal/11-e-signature.js?v=scar403-runtime-20260401-8';
     var script = document.querySelector('script[data-esignature-loader="scar-runtime"]');
     if(!script){
       script = document.createElement('script');
