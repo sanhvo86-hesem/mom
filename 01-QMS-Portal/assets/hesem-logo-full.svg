@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" fill="none">
+  <!-- Hexagon Icon -->
+  <g transform="translate(4,4)">
+    <path d="M20 0L37.32 10v20L20 40L2.68 30V10Z" fill="#1565c0"/>
+    <path d="M20 6L32.32 13v14L20 34L7.68 27V13Z" fill="#0c2d48"/>
+    <text x="20" y="26" text-anchor="middle" fill="white" font-family="-apple-system,sans-serif" font-size="14" font-weight="700">H</text>
+  </g>
+  <!-- HESEM Text -->
+  <text x="52" y="22" fill="#0c2d48" font-family="-apple-system,'Segoe UI',sans-serif" font-size="20" font-weight="800" letter-spacing="1">HESEM</text>
+  <!-- QMS Subtitle -->
+  <text x="52" y="38" fill="#64748b" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10" font-weight="600" letter-spacing="2">QUALITY MANAGEMENT SYSTEM</text>
+</svg>
