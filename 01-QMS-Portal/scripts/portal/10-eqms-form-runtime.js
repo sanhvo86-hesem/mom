@@ -1225,31 +1225,160 @@ function submitForm(){
 }
 
 /* ── E-Signature Dialog ── */
+function ensureEqmsSignatureModuleReady(){
+  if(typeof window.ESignature === 'function') return Promise.resolve(window.ESignature);
+  try{
+    if(window.parent && window.parent !== window && typeof window.parent.ESignature === 'function'){
+      return Promise.resolve(window.parent.ESignature);
+    }
+  }catch(_err){}
+  if(window.__eqmsSignatureLoader) return window.__eqmsSignatureLoader;
+  window.__eqmsSignatureLoader = new Promise(function(resolve){
+    var script = document.querySelector('script[data-eqms-esign-loader="1"]');
+    if(!script){
+      script = document.createElement('script');
+      script.src = '/01-QMS-Portal/scripts/portal/11-e-signature.js?v=20260401m';
+      script.async = true;
+      script.dataset.eqmsEsignLoader = '1';
+      document.head.appendChild(script);
+    }
+    var done = function(){
+      if(typeof window.ESignature === 'function'){
+        resolve(window.ESignature);
+        return;
+      }
+      try{
+        if(window.parent && window.parent !== window && typeof window.parent.ESignature === 'function'){
+          resolve(window.parent.ESignature);
+          return;
+        }
+      }catch(_err){}
+      resolve(null);
+    };
+    script.addEventListener('load', done, { once:true });
+    script.addEventListener('error', function(){ resolve(null); }, { once:true });
+    setTimeout(done, 2600);
+  }).finally(function(){
+    window.__eqmsSignatureLoader = null;
+  });
+  return window.__eqmsSignatureLoader;
+}
+
+function showEqmsSignatureFallback(block){
+  var u = currentUser();
+  return new Promise(function(resolve){
+    var overlay = document.createElement('div');
+    overlay.className = 'eqms-signature-fallback';
+    overlay.innerHTML =
+      '<div class="eqms-signature-fallback__backdrop" data-action="cancel"></div>' +
+      '<div class="eqms-signature-fallback__modal" role="dialog" aria-modal="true" aria-label="' + esc(t('Ký điện tử', 'Electronic signature')) + '">' +
+        '<div class="eqms-signature-fallback__head">' +
+          '<div><strong>' + esc(t('Ký điện tử hồ sơ', 'Electronic signature')) + '</strong><p>' + esc(t('Fallback an toàn khi module chữ ký chưa tải kịp. Hệ thống vẫn lưu tên, thời điểm và ý nghĩa chữ ký.', 'Safe fallback when the signature module is not loaded yet. The system still stores signer, time, and meaning.')) + '</p></div>' +
+          '<button type="button" class="eqms-signature-fallback__close" data-action="cancel">×</button>' +
+        '</div>' +
+        '<div class="eqms-signature-fallback__body">' +
+          '<label>' + esc(t('Người ký', 'Signer')) + '<input type="text" data-field="name" value="' + esc(u.name || '') + '"></label>' +
+          '<label>' + esc(t('Vai trò', 'Role')) + '<input type="text" data-field="role" value="' + esc(u.role || u.dept || '') + '"></label>' +
+          '<label>' + esc(t('Lý do ký', 'Signing reason')) + '<textarea data-field="reason" rows="4">' + esc(block.meaning || 'Approved') + '</textarea></label>' +
+          '<div class="eqms-signature-fallback__error scar-hidden" data-field="error"></div>' +
+        '</div>' +
+        '<div class="eqms-signature-fallback__actions">' +
+          '<button type="button" data-action="cancel">' + esc(t('Hủy', 'Cancel')) + '</button>' +
+          '<button type="button" class="primary" data-action="confirm">' + esc(t('Ký và xác nhận', 'Sign and confirm')) + '</button>' +
+        '</div>' +
+      '</div>';
+    if(!document.getElementById('eqms-signature-fallback-style')){
+      var style = document.createElement('style');
+      style.id = 'eqms-signature-fallback-style';
+      style.textContent = [
+        '.eqms-signature-fallback{position:fixed;inset:0;z-index:10050;display:flex;align-items:center;justify-content:center}',
+        '.eqms-signature-fallback__backdrop{position:absolute;inset:0;background:rgba(15,23,42,.58);backdrop-filter:blur(4px)}',
+        '.eqms-signature-fallback__modal{position:relative;width:min(520px,94vw);background:#fff;border-radius:18px;box-shadow:0 24px 64px rgba(15,23,42,.28);overflow:hidden}',
+        '.eqms-signature-fallback__head{display:flex;justify-content:space-between;gap:16px;padding:18px 20px;border-bottom:1px solid #e2e8f0}',
+        '.eqms-signature-fallback__head strong{display:block;font-size:18px;color:#0f172a}',
+        '.eqms-signature-fallback__head p{margin:6px 0 0;color:#64748b;line-height:1.5}',
+        '.eqms-signature-fallback__close{width:36px;height:36px;border:none;border-radius:12px;background:#f8fafc;font-size:22px;cursor:pointer}',
+        '.eqms-signature-fallback__body{display:grid;gap:12px;padding:20px}',
+        '.eqms-signature-fallback__body label{display:grid;gap:6px;color:#334155;font-weight:700;font-size:13px}',
+        '.eqms-signature-fallback__body input,.eqms-signature-fallback__body textarea{border:1px solid #cbd5e1;border-radius:12px;padding:10px 12px;font:inherit;color:#0f172a;background:#fff}',
+        '.eqms-signature-fallback__actions{display:flex;justify-content:flex-end;gap:10px;padding:16px 20px;border-top:1px solid #e2e8f0;background:#f8fafc}',
+        '.eqms-signature-fallback__actions button{min-width:132px;padding:10px 14px;border-radius:12px;border:1px solid #cbd5e1;background:#fff;font-weight:700;cursor:pointer}',
+        '.eqms-signature-fallback__actions .primary{background:#1565c0;border-color:#1565c0;color:#fff}',
+        '.eqms-signature-fallback__error{color:#b91c1c;font-size:12px;font-weight:700}'
+      ].join('');
+      document.head.appendChild(style);
+    }
+    function close(result){
+      if(overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      resolve(result || null);
+    }
+    function showError(message){
+      var node = overlay.querySelector('[data-field="error"]');
+      if(!node) return;
+      node.textContent = message;
+      node.classList.remove('scar-hidden');
+    }
+    overlay.addEventListener('click', function(event){
+      var action = event.target && event.target.getAttribute ? event.target.getAttribute('data-action') : '';
+      if(action === 'cancel') close(null);
+      if(action !== 'confirm') return;
+      var name = String((overlay.querySelector('[data-field="name"]') || {}).value || '').trim();
+      var role = String((overlay.querySelector('[data-field="role"]') || {}).value || '').trim();
+      var reason = String((overlay.querySelector('[data-field="reason"]') || {}).value || '').trim();
+      if(!name){
+        showError(t('Hãy nhập tên người ký.', 'Please enter the signer name.'));
+        return;
+      }
+      if(!reason){
+        showError(t('Hãy nhập lý do ký.', 'Please enter the signing reason.'));
+        return;
+      }
+      close({
+        signerId: String(u.username || '').trim().toUpperCase(),
+        signerName: name,
+        signerRole: role,
+        meaning: block.meaning || 'Approved',
+        signedAt: new Date().toISOString(),
+        reason: reason,
+        mode: 'typed'
+      });
+    });
+    document.body.appendChild(overlay);
+  });
+}
+
 function openSignatureDialog(blockId){
-  if(typeof window.ESignature !== 'function'){
-    toast(t('Module chu ky chua san sang.', 'Signature module not ready.'), 'error');
-    return;
-  }
   var schema = state.schema;
   var block = (schema.signature_blocks || []).find(function(b){ return b.id === blockId; });
   if(!block) return;
-  var u = currentUser();
-  new window.ESignature({
-    lang: (typeof lang !== 'undefined' && lang === 'en') ? 'en' : 'vi',
-    requireReason: block.require_reason !== false,
-    requirePin: block.require_pin === true
-  }).show({
-    signerId: u.username.toUpperCase(),
-    signerName: u.name,
-    signerRole: u.role || u.dept,
-    signatureMeaning: block.meaning || 'Approved',
-    appliedTo: (state.recordId || state.formCode) + ':' + blockId,
-    onSign: function(sigData){
-      state.signatures[blockId] = sigData;
-      logFieldChange('signature:' + blockId, '', sigData.signerName + ' (' + (sigData.meaning || block.meaning) + ')');
-      var container = document.querySelector('.eqms-runtime') || document.getElementById('eqms-form-container');
-      if(container) renderForm(container);
+  ensureEqmsSignatureModuleReady().then(function(ESignatureCtor){
+    if(typeof ESignatureCtor !== 'function'){
+      return showEqmsSignatureFallback(block).then(function(sigData){
+        if(!sigData) return;
+        state.signatures[blockId] = sigData;
+        logFieldChange('signature:' + blockId, '', sigData.signerName + ' (' + (sigData.meaning || block.meaning) + ')');
+        var container = document.querySelector('.eqms-runtime') || document.getElementById('eqms-form-container');
+        if(container) renderForm(container);
+      });
     }
+    var u = currentUser();
+    new ESignatureCtor({
+      lang: (typeof lang !== 'undefined' && lang === 'en') ? 'en' : 'vi',
+      requireReason: block.require_reason !== false,
+      requirePin: block.require_pin === true
+    }).show({
+      signerId: u.username.toUpperCase(),
+      signerName: u.name,
+      signerRole: u.role || u.dept,
+      signatureMeaning: block.meaning || 'Approved',
+      appliedTo: (state.recordId || state.formCode) + ':' + blockId,
+      onSign: function(sigData){
+        state.signatures[blockId] = sigData;
+        logFieldChange('signature:' + blockId, '', sigData.signerName + ' (' + (sigData.meaning || block.meaning) + ')');
+        var container = document.querySelector('.eqms-runtime') || document.getElementById('eqms-form-container');
+        if(container) renderForm(container);
+      }
+    });
   });
 }
 

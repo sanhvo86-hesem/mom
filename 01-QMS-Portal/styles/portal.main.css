@@ -981,6 +981,8 @@ mark.ed-hl-active{outline:2px solid #f59e0b}
 #editor-area .ed-qms-body:focus{outline:none}
 #editor-area .ed-qms-toolbar{position:absolute;top:0;right:10px;display:flex;align-items:center;gap:4px;padding:4px 5px;background:#fff;border:1px solid #cbd5e1;border-radius:999px;box-shadow:0 10px 24px rgba(15,23,42,.12);z-index:12;white-space:nowrap}
 #editor-area .ed-qms-toolbar::before{content:attr(data-kind-label);font-size:10px;font-weight:700;letter-spacing:.2px;color:#334155;padding:0 6px}
+#editor-area .ed-qms-just-inserted{outline:2px solid #3b82f6;outline-offset:4px;animation:edQmsInsertedPulse 1.6s ease}
+@keyframes edQmsInsertedPulse{0%{box-shadow:0 0 0 0 rgba(59,130,246,.32)}70%{box-shadow:0 0 0 14px rgba(59,130,246,0)}100%{box-shadow:0 0 0 0 rgba(59,130,246,0)}}
 #editor-area .ed-qms-toolbtn{width:26px;height:24px;border:none;background:#fff;border-radius:999px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;color:#334155}
 #editor-area .ed-qms-toolbtn:hover{background:#eff6ff;color:#1d4ed8}
 #editor-area .ed-qms-toolbtn.is-danger:hover{background:#fef2f2;color:#dc2626}
@@ -1032,6 +1034,13 @@ mark.ed-hl-active{outline:2px solid #f59e0b}
 #editor-area .qf-grid--3 > .qf-field.qf-col-span-3{grid-column:span 3}
 .ed-form-designer-dock{position:fixed;right:24px;top:164px;z-index:240;width:220px;padding:12px;border:1px solid #dbe4ee;border-radius:16px;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);box-shadow:0 16px 40px rgba(15,23,42,.14)}
 .ed-form-designer-dock.is-hidden{display:none}
+.ed-form-template-surface [data-sign-block],
+.ed-form-template-surface [data-sign-clear],
+.ed-form-template-surface [data-workflow-action],
+.ed-form-template-surface .scar-view-btn,
+.ed-form-template-surface .scar-edit-btn,
+.ed-form-template-surface .scar-lookup-self{display:none !important}
+.ed-form-template-surface #qfActionsBar{display:flex;align-items:center;gap:12px}
 .ed-form-dock-head{display:grid;gap:3px;margin-bottom:10px}
 .ed-form-dock-head strong{font-size:13px;color:#0f172a}
 .ed-form-dock-head span{font-size:11px;color:#64748b;line-height:1.45}

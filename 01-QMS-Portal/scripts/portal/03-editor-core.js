@@ -452,7 +452,7 @@ function buildEditorToolbar(){
       ${btn(EI.find,'_find',v?'TÃ¬m / Thay tháº¿ (Ctrl+F / Ctrl+H)':'Find / Replace (Ctrl+F / Ctrl+H)')}
       ${btn(EI.source,'_source',v?'HTML':'HTML')}
       <button class="ed-btn ed-btn-text" onclick="edDomToggle()" title="${v?'DOM Inspector (bố cục)':'DOM Inspector (layout)'}">DOM</button>
-      <button class="ed-btn ed-btn-text" id="ed-form-dock-toggle-btn" onclick="edFormDockToggle()" title="${v?'Ẩn / hiện Form Blocks':'Toggle Form Blocks'}">FORM</button>
+      <button class="ed-btn ed-btn-text" id="ed-form-dock-toggle-btn" onclick="edFormDockToggle()" title="${v?'Ẩn / hiện Form Blocks':'Toggle Form Blocks'}">BLK</button>
       <button class="ed-btn ed-btn-text" onclick="if(window._mdOpenControl){window._mdOpenControl();}" title="${v?'Mở dữ liệu nền':'Open master data'}">DATA</button>
       ${btn(EI.print,'_print',v?'In':'Print')}
 
@@ -464,6 +464,7 @@ function buildEditorToolbar(){
     </div>
   `;
   edRepairMojibake(tb);
+  edInstallMojibakeObserver();
   edSyncFormDockToggleButton();
   const area=document.getElementById('editor-area');
   area.removeEventListener('input',edOnInput);
@@ -1177,28 +1178,121 @@ function edInsertDateTime(){
 }
 
 function edRepairMojibake(root){
-  if(!root||!root.querySelectorAll) return;
-  var suspicious=/Ã|Â|Æ|Ä|áº|á»/;
-  function fix(value){
-    if(!value||!suspicious.test(value)) return value;
-    try{
-      return decodeURIComponent(escape(value));
-    }catch(_err){
-      try{
-        var bytes=new Uint8Array(Array.prototype.map.call(String(value),function(ch){ return ch.charCodeAt(0)&255; }));
-        return new TextDecoder('utf-8').decode(bytes);
-      }catch(_err2){
-        return value;
-      }
-    }
+  if(!root) return;
+  function cleanup(value){
+    return String(value==null?'':value)
+      .replace(/\uFFFD/g,'')
+      .replace(/[\u0018\u0019]/g,'')
+      .replace(/Â·/g,'·')
+      .replace(/â€”/g,'—')
+      .replace(/â€“/g,'–')
+      .replace(/â€œ/g,'“')
+      .replace(/â€|â€�/g,'”')
+      .replace(/â€˜|â€™/g,'’')
+      .replace(/â€¦/g,'…')
+      .replace(/Ã /g,'à')
+      .replace(/Ã¡/g,'á')
+      .replace(/Ã¢/g,'â')
+      .replace(/Äƒ/g,'ă')
+      .replace(/Ä‘/g,'đ')
+      .replace(/Ä/g,'Đ')
+      .replace(/Æ°/g,'ư')
+      .replace(/Æ¡/g,'ơ')
+      .replace(/áº¡/g,'ạ')
+      .replace(/áº£/g,'ả')
+      .replace(/áº¥/g,'ấ')
+      .replace(/áº§/g,'ầ')
+      .replace(/á»™/g,'ộ')
+      .replace(/á»›/g,'ớ')
+      .replace(/á»/g,'ờ')
+      .replace(/á»§/g,'ủ')
+      .replace(/á»«/g,'ừ')
+      .replace(/á»¯/g,'ữ')
+      .replace(/Dùng người Ēng nhập/g,'Dùng người đăng nhập')
+      .replace(/ChÃ¨n/g,'Chèn')
+      .replace(/NhÃ£n tiáº¿ng Viá»‡t/g,'Nhãn tiếng Việt')
+      .replace(/Giáº£i thÃ­ch tiáº¿ng Viá»‡t cÃ³ dáº¥u/g,'Giải thích tiếng Việt có dấu')
+      .replace(/Khá»‘i chá»¯ kÃ½/g,'Khối chữ ký')
+      .replace(/LÆ°á»›i field 2 cá»™t/g,'Lưới field 2 cột')
+      .replace(/Field nháº­p 1 dÃ²ng/g,'Field nhập 1 dòng')
+      .replace(/Field nháº­p nhiá»u dÃ²ng/g,'Field nhập nhiều dòng')
+      .replace(/Field chá»n dropdown/g,'Field chọn dropdown')
+      .replace(/Field lookup dá»¯ liá»‡u ná»n/g,'Field lookup dữ liệu nền')
+      .replace(/Dáº£i chá»¯ kÃ½ form/g,'Dải chữ ký form')
+      .replace(/Thanh tÃ³m táº¯t há»“ sÆ¡ phÃ­a trÃªn form/g,'Thanh tóm tắt hồ sơ phía trên form')
+      .replace(/Section chuáº©n cÃ³ sá»‘, tiÃªu Ä‘á» tiáº¿ng Anh vÃ  giáº£i thÃ­ch tiáº¿ng Viá»‡t/g,'Section chuẩn có số, tiêu đề tiếng Anh và giải thích tiếng Việt')
+      .replace(/Khung hÃ ng field 2 cá»™t Ä‘Ãºng chuáº©n form runtime/g,'Khung hàng field 2 cột đúng chuẩn form runtime')
+      .replace(/Field text chuáº©n vá»›i nhÃ£n EN vÃ  ghi chÃº VI/g,'Field text chuẩn với nhãn EN và ghi chú VI')
+      .replace(/Field mÃ´ táº£ nhiá»u dÃ²ng Ä‘Ãºng chuáº©n form runtime/g,'Field mô tả nhiều dòng đúng chuẩn form runtime')
+      .replace(/Field select dÃ¹ng cho dá»¯ liá»‡u ná»n hoáº·c tráº¡ng thÃ¡i/g,'Field select dùng cho dữ liệu nền hoặc trạng thái')
+      .replace(/Field tra cá»©u cho supplier, part, customer, person/g,'Field tra cứu cho supplier, part, customer, person')
+      .replace(/Khá»‘i chá»¯ kÃ½ chuáº©n cho ngÆ°á»i láº­p, xem xÃ©t, phÃª duyá»‡t/g,'Khối chữ ký chuẩn cho người lập, xem xét, phê duyệt')
+      .replace(/Khá»‘i kiá»ƒm soÃ¡t tÃ i liá»‡u/g,'Khối kiểm soát tài liệu')
+      .replace(/Báº£ng lá»‹ch sá»­ sá»­a Ä‘á»•i/g,'Bảng lịch sử sửa đổi')
+      .replace(/Khá»‘i kÃ½ duyá»‡t/g,'Khối ký duyệt')
+      .replace(/Báº£ng hÃ nh Ä‘á»™ng \/ CAPA/g,'Bảng hành động / CAPA')
+      .replace(/Báº£ng rá»§i ro & kiá»ƒm soÃ¡t/g,'Bảng rủi ro & kiểm soát')
+      .replace(/Ghi chÃº váº­n hÃ nh/g,'Ghi chú vận hành')
+      .replace(/DÃ²ng trá»‘ng Ä‘iá»n tay/g,'Dòng trống điền tay')
+      .replace(/Thuá»™c tÃ­nh section form/g,'Thuộc tính section form')
+      .replace(/TiÃªu Ä‘á» tiáº¿ng Anh/g,'Tiêu đề tiếng Anh')
+      .replace(/Giáº£i thÃ­ch tiáº¿ng Viá»‡t/g,'Giải thích tiếng Việt')
+      .replace(/MÃ u\/loáº¡i section/g,'Màu/loại section')
+      .replace(/Thuá»™c tÃ­nh field form/g,'Thuộc tính field form')
+      .replace(/Nháºn tiáº¿ng Anh/g,'Nhãn tiếng Anh')
+      .replace(/Nháºn tiáº¿ng Viá»‡t/g,'Nhãn tiếng Việt')
+      .replace(/Nguá»“n lookup dá»¯ liá»‡u ná»n/g,'Nguồn lookup dữ liệu nền')
+      .replace(/Mở quản lý dữ liệu nền/g,'Mở quản lý dữ liệu nền')
+      .replace(/Nội dung dropdown/g,'Nội dung dropdown')
+      .replace(/Kết nối dữ liệu & logic/g,'Kết nối dữ liệu & logic');
   }
-  root.querySelectorAll('*').forEach(function(node){
-    Array.prototype.forEach.call(node.childNodes||[],function(child){
-      if(child&&child.nodeType===Node.TEXT_NODE){
-        var fixed=fix(child.nodeValue);
-        if(fixed!==child.nodeValue) child.nodeValue=fixed;
-      }
+  function score(value){
+    var text=String(value==null?'':value);
+    var bad=(text.match(/Ã|Â|Æ|Ä|â|ð|�|\uFFFD|\u0018|\u0019|Ē|€™|€|™|!t|trư:c|bu\"c/g)||[]).length;
+    var good=(text.match(/[àáạảãăằắặẳẵâầấậẩẫđèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹÀÁẠẢÃĂẰẮẶẲẴÂẦẤẬẨẪĐÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸ]/g)||[]).length;
+    var bonus=0;
+    ['không','đã','chưa','người','biểu mẫu','dữ liệu','trường','bắt buộc','ký','gửi','chèn','thuộc tính','dòng','cột','nền'].forEach(function(token){
+      if(text.toLowerCase().indexOf(token)>=0) bonus+=2;
     });
+    return (good*2)+bonus-(bad*6);
+  }
+  function decodeCandidate(value){
+    var source=String(value==null?'':value);
+    var candidates=[source];
+    try{ candidates.push(decodeURIComponent(escape(source))); }catch(_err){}
+    try{
+      var bytes=new Uint8Array(Array.prototype.map.call(source,function(ch){ return ch.charCodeAt(0)&255; }));
+      candidates.push(new TextDecoder('utf-8').decode(bytes));
+    }catch(_err2){}
+    return candidates;
+  }
+  function fix(value){
+    var best=cleanup(value);
+    var bestScore=score(best);
+    for(var attempt=0;attempt<5;attempt+=1){
+      var improved=false;
+      decodeCandidate(best).forEach(function(candidate){
+        var cleaned=cleanup(candidate);
+        var nextScore=score(cleaned);
+        if(nextScore>bestScore){
+          best=cleaned;
+          bestScore=nextScore;
+          improved=true;
+        }
+      });
+      if(!improved) break;
+    }
+    return best;
+  }
+  function repairNode(node){
+    if(!node) return;
+    if(node.nodeType===Node.TEXT_NODE){
+      var fixedText=fix(node.nodeValue);
+      if(fixedText!==node.nodeValue) node.nodeValue=fixedText;
+      return;
+    }
+    if(node.nodeType!==Node.ELEMENT_NODE) return;
+    Array.prototype.forEach.call(node.childNodes||[],repairNode);
     ['title','placeholder','aria-label','value'].forEach(function(attr){
       if(node.hasAttribute&&node.hasAttribute(attr)){
         var raw=node.getAttribute(attr);
@@ -1206,6 +1300,29 @@ function edRepairMojibake(root){
         if(fixedAttr!==raw) node.setAttribute(attr,fixedAttr);
       }
     });
+  }
+  repairNode(root);
+}
+
+let edMojibakeObserver=null;
+function edInstallMojibakeObserver(){
+  if(edMojibakeObserver||!document.body||typeof MutationObserver!=='function') return;
+  edMojibakeObserver=new MutationObserver(function(records){
+    records.forEach(function(record){
+      if(record.type==='childList'){
+        Array.prototype.forEach.call(record.addedNodes||[],function(node){
+          edRepairMojibake(node);
+        });
+      }else if(record.type==='attributes'&&record.target){
+        edRepairMojibake(record.target);
+      }
+    });
+  });
+  edMojibakeObserver.observe(document.body,{
+    subtree:true,
+    childList:true,
+    attributes:true,
+    attributeFilter:['title','placeholder','aria-label','value']
   });
 }
 
@@ -1235,25 +1352,25 @@ function edBuildQmsPanel(){
   const panel=document.getElementById('ed-qms-panel');
   const vi=lang!=='en';
   const items=[
-    {kind:'formRecordStrip', title:vi?'Record strip cho form':'Form record strip', desc:vi?'Thanh tÃ³m táº¯t há»“ sÆ¡ phÃ­a trÃªn form':'Top record summary strip for forms'},
-    {kind:'formSection', title:vi?'Section form':'Form section', desc:vi?'Section chuáº©n cÃ³ sá»‘, tiÃªu Ä‘á» tiáº¿ng Anh vÃ  giáº£i thÃ­ch tiáº¿ng Viá»‡t':'Standard numbered section with EN title and VI explanation'},
-    {kind:'formGrid2', title:vi?'LÆ°á»›i field 2 cá»™t':'2-column field grid', desc:vi?'Khung hÃ ng field 2 cá»™t Ä‘Ãºng chuáº©n form runtime':'Standard 2-column row for runtime forms'},
-    {kind:'formTextField', title:vi?'Field nháº­p 1 dÃ²ng':'Single-line form field', desc:vi?'Field text chuáº©n vá»›i nhÃ£n EN vÃ  ghi chÃº VI':'Standard text field with EN label and VI note'},
-    {kind:'formTextareaField', title:vi?'Field nháº­p nhiá»u dÃ²ng':'Textarea form field', desc:vi?'Field mÃ´ táº£ nhiá»u dÃ²ng Ä‘Ãºng chuáº©n form runtime':'Multi-line field for rich descriptions'},
-    {kind:'formSelectField', title:vi?'Field chá»n dropdown':'Dropdown form field', desc:vi?'Field select dÃ¹ng cho dá»¯ liá»‡u ná»n hoáº·c tráº¡ng thÃ¡i':'Select field for master-data or state choices'},
-    {kind:'formLookupField', title:vi?'Field lookup dá»¯ liá»‡u ná»n':'Master-data lookup field', desc:vi?'Field tra cá»©u cho supplier, part, customer, person...':'Lookup field for supplier, part, customer, person...'},
-    {kind:'formSignatureRow', title:vi?'Dáº£i chá»¯ kÃ½ form':'Form signature row', desc:vi?'Khá»‘i chá»¯ kÃ½ chuáº©n cho ngÆ°á»i láº­p, xem xÃ©t, phÃª duyá»‡t':'Signature row for originator, reviewer, approver'},
-    {kind:'docControl', title:vi?'Khá»‘i kiá»ƒm soÃ¡t tÃ i liá»‡u':'Document control', desc:vi?'MÃ£, phiÃªn báº£n, owner, hiá»‡u lá»±c, phÃª duyá»‡t':'Code, revision, owner, effective date, approval'},
-    {kind:'revisionTable', title:vi?'Báº£ng lá»‹ch sá»­ sá»­a Ä‘á»•i':'Revision history', desc:vi?'Báº£ng Rev / ngÃ y / mÃ´ táº£ / ngÆ°á»i thá»±c hiá»‡n':'Rev / date / description / owner table'},
-    {kind:'approval', title:vi?'Khá»‘i kÃ½ duyá»‡t':'Approval signatures', desc:vi?'Láº­p, rÃ  soÃ¡t, phÃª duyá»‡t':'Prepared, reviewed, approved'},
-    {kind:'actionTable', title:vi?'Báº£ng hÃ nh Ä‘á»™ng / CAPA':'Action / CAPA table', desc:vi?'HÃ nh Ä‘á»™ng, owner, due date, tráº¡ng thÃ¡i':'Action, owner, due date, status'},
-    {kind:'riskTable', title:vi?'Báº£ng rá»§i ro & kiá»ƒm soÃ¡t':'Risk & control table', desc:vi?'Rá»§i ro, tÃ¡c Ä‘á»™ng, kiá»ƒm soÃ¡t, owner':'Risk, impact, control, owner'},
-    {kind:'callout', title:vi?'Callout ISO':'ISO callout', desc:vi?'Khá»‘i yÃªu cáº§u kiá»ƒm soÃ¡t ná»•i báº­t':'Highlighted controlled requirement'},
-    {kind:'note', title:vi?'Ghi chÃº váº­n hÃ nh':'Operational note', desc:vi?'Khá»‘i lÆ°u Ã½ / cáº£nh bÃ¡o thá»±c hiá»‡n':'Operational note / warning'},
-    {kind:'blankField', title:vi?'DÃ²ng trá»‘ng Ä‘iá»n tay':'Blank field', desc:vi?'DÃ²ng trá»‘ng cho form/QMS record':'Blank line for forms and records'}
+    {kind:'formRecordStrip', title:vi?'Record strip cho form':'Form record strip', desc:vi?'Thanh tóm tắt hồ sơ phía trên form':'Top record summary strip for forms'},
+    {kind:'formSection', title:vi?'Section form':'Form section', desc:vi?'Section chuẩn có số, tiêu đề tiếng Anh và giải thích tiếng Việt':'Standard numbered section with EN title and VI explanation'},
+    {kind:'formGrid2', title:vi?'Lưới field 2 cột':'2-column field grid', desc:vi?'Khung hàng field 2 cột đúng chuẩn form runtime':'Standard 2-column row for runtime forms'},
+    {kind:'formTextField', title:vi?'Field nhập 1 dòng':'Single-line form field', desc:vi?'Field text chuẩn với nhãn EN và ghi chú VI':'Standard text field with EN label and VI note'},
+    {kind:'formTextareaField', title:vi?'Field nhập nhiều dòng':'Textarea form field', desc:vi?'Field mô tả nhiều dòng đúng chuẩn form runtime':'Multi-line field for rich descriptions'},
+    {kind:'formSelectField', title:vi?'Field chọn dropdown':'Dropdown form field', desc:vi?'Field select dùng cho dữ liệu nền hoặc trạng thái':'Select field for master-data or state choices'},
+    {kind:'formLookupField', title:vi?'Field lookup dữ liệu nền':'Master-data lookup field', desc:vi?'Field tra cứu cho supplier, part, customer, person...':'Lookup field for supplier, part, customer, person...'},
+    {kind:'formSignatureRow', title:vi?'Dải chữ ký form':'Form signature row', desc:vi?'Khối chữ ký chuẩn cho người lập, xem xét, phê duyệt':'Signature row for originator, reviewer, approver'},
+    {kind:'docControl', title:vi?'Khối kiểm soát tài liệu':'Document control', desc:vi?'Mã, phiên bản, owner, hiệu lực, phê duyệt':'Code, revision, owner, effective date, approval'},
+    {kind:'revisionTable', title:vi?'Bảng lịch sử sửa đổi':'Revision history', desc:vi?'Bảng Rev / ngày / mô tả / người thực hiện':'Rev / date / description / owner table'},
+    {kind:'approval', title:vi?'Khối ký duyệt':'Approval signatures', desc:vi?'Lập, rà soát, phê duyệt':'Prepared, reviewed, approved'},
+    {kind:'actionTable', title:vi?'Bảng hành động / CAPA':'Action / CAPA table', desc:vi?'Hành động, owner, due date, trạng thái':'Action, owner, due date, status'},
+    {kind:'riskTable', title:vi?'Bảng rủi ro & kiểm soát':'Risk & control table', desc:vi?'Rủi ro, tác động, kiểm soát, owner':'Risk, impact, control, owner'},
+    {kind:'callout', title:vi?'Callout ISO':'ISO callout', desc:vi?'Khối yêu cầu kiểm soát nổi bật':'Highlighted controlled requirement'},
+    {kind:'note', title:vi?'Ghi chú vận hành':'Operational note', desc:vi?'Khối lưu ý / cảnh báo thực hiện':'Operational note / warning'},
+    {kind:'blankField', title:vi?'Dòng trống điền tay':'Blank field', desc:vi?'Dòng trống cho form/QMS record':'Blank line for forms and records'}
   ];
   let html='<div class="ed-qms-head">'+(vi?'QMS Quick Insert':'QMS Quick Insert')+'</div>';
-  html+='<div class="ed-qms-sub">'+(vi?'ChÃ¨n nhanh cÃ¡c khá»‘i chuáº©n cho SOP/WI/FRM/QMS record.':'Insert standard blocks for SOP/WI/FRM/QMS records.')+'</div>';
+  html+='<div class="ed-qms-sub">'+(vi?'Chèn nhanh các khối chuẩn cho SOP/WI/FRM/QMS record.':'Insert standard blocks for SOP/WI/FRM/QMS records.')+'</div>';
   html+='<div class="ed-qms-grid">';
   items.forEach(function(item){
     html+='<button onmousedown="event.preventDefault()" onclick="edInsertQmsTemplate(\''+item.kind+'\');event.stopPropagation()"><span class="ed-qms-title">'+_edEscapeHtml(item.title)+'</span><span class="ed-qms-desc">'+_edEscapeHtml(item.desc)+'</span></button>';
@@ -1276,6 +1393,20 @@ function edInsertQmsTemplate(kind){
     if(block){
       edSelectQmsBlock(block);
       edFocusQmsBlock(block);
+      try{
+        if(typeof block.scrollIntoView === 'function') block.scrollIntoView({ behavior:'smooth', block:'center' });
+        block.classList.add('ed-qms-just-inserted');
+        window.setTimeout(function(){ block.classList.remove('ed-qms-just-inserted'); }, 1600);
+      }catch(_scrollErr){}
+      if(['formSection','formTextField','formTextareaField','formSelectField','formLookupField'].indexOf(kind)>=0){
+        window.setTimeout(function(){
+          edSelectQmsBlock(block);
+          edEditQmsBlockProperties(block);
+        }, 140);
+      }
+      showToast((lang!=='en') ? 'Đã chèn block biểu mẫu mới.' : 'Inserted new form block.');
+    }else{
+      showToast((lang!=='en') ? 'Không thể đặt block vào canvas hiện tại.' : 'Could not place block into the current canvas.');
     }
   },0);
 }
@@ -1310,8 +1441,13 @@ function edMountFormDesignerDock(ctx){
 }
 
 function edFormDockToggle(){
-  window._edFormDockHidden = !window._edFormDockHidden;
   var dock = document.getElementById('ed-form-designer-dock');
+  if(!dock){
+    try{ edMountFormDesignerDock(edGetContentRoot() || document.getElementById('editor-area')); }catch(_err){}
+    dock = document.getElementById('ed-form-designer-dock');
+    if(!dock) return;
+  }
+  window._edFormDockHidden = !window._edFormDockHidden;
   if(dock) dock.classList.toggle('is-hidden', !!window._edFormDockHidden);
   edSyncFormDockToggleButton();
 }
@@ -1349,20 +1485,20 @@ function edQmsKindMeta(kind){
   const map={
     formRecordStrip:{title:vi?'Record strip cho form':'Form record strip'},
     formSection:{title:vi?'Section form':'Form section'},
-    formGrid2:{title:vi?'LÆ°á»›i field 2 cá»™t':'2-column field grid'},
-    formTextField:{title:vi?'Field nháº­p 1 dÃ²ng':'Single-line field'},
-    formTextareaField:{title:vi?'Field nháº­p nhiá»u dÃ²ng':'Textarea field'},
-    formSelectField:{title:vi?'Field chá»n dropdown':'Dropdown field'},
-    formLookupField:{title:vi?'Field lookup dá»¯ liá»‡u ná»n':'Master-data lookup field'},
-    formSignatureRow:{title:vi?'Dáº£i chá»¯ kÃ½ form':'Form signature row'},
-    docControl:{title:vi?'Kiá»ƒm soÃ¡t tÃ i liá»‡u':'Document control'},
-    revisionTable:{title:vi?'Lá»‹ch sá»­ sá»­a Ä‘á»•i':'Revision history'},
-    approval:{title:vi?'KÃ½ duyá»‡t':'Approval'},
-    actionTable:{title:vi?'Báº£ng hÃ nh Ä‘á»™ng / CAPA':'Action / CAPA'},
-    riskTable:{title:vi?'Rá»§i ro & kiá»ƒm soÃ¡t':'Risk & control'},
+    formGrid2:{title:vi?'Lưới field 2 cột':'2-column field grid'},
+    formTextField:{title:vi?'Field nhập 1 dòng':'Single-line field'},
+    formTextareaField:{title:vi?'Field nhập nhiều dòng':'Textarea field'},
+    formSelectField:{title:vi?'Field chọn dropdown':'Dropdown field'},
+    formLookupField:{title:vi?'Field lookup dữ liệu nền':'Master-data lookup field'},
+    formSignatureRow:{title:vi?'Dải chữ ký form':'Form signature row'},
+    docControl:{title:vi?'Kiểm soát tài liệu':'Document control'},
+    revisionTable:{title:vi?'Lịch sử sửa đổi':'Revision history'},
+    approval:{title:vi?'Ký duyệt':'Approval'},
+    actionTable:{title:vi?'Bảng hành động / CAPA':'Action / CAPA'},
+    riskTable:{title:vi?'Rủi ro & kiểm soát':'Risk & control'},
     callout:{title:vi?'Callout ISO':'ISO callout'},
-    note:{title:vi?'Ghi chÃº váº­n hÃ nh':'Operational note'},
-    blankField:{title:vi?'DÃ²ng Ä‘iá»n tay':'Blank field'}
+    note:{title:vi?'Ghi chú vận hành':'Operational note'},
+    blankField:{title:vi?'Dòng điền tay':'Blank field'}
   };
   return map[kind]||map.note;
 }
@@ -1398,10 +1534,10 @@ function edBuildQmsTemplateHtml(kind){
       +'</div>',
     formSection:
       '<section class="qf-section qf-section--info" data-form-edit-root="1">'
-      +'<div class="qf-section-header"><div><div class="qf-section-title"><span class="qf-section-num">1</span> Section Title</div><div class="qf-section-subtitle">Giáº£i thÃ­ch tiáº¿ng Viá»‡t cÃ³ dáº¥u cho section nÃ y Ä‘á»ƒ ngÆ°á»i dÃ¹ng hiá»ƒu rÃµ má»¥c Ä‘Ã­ch.</div></div></div>'
+      +'<div class="qf-section-header"><div><div class="qf-section-title"><span class="qf-section-num">1</span> Section Title</div><div class="qf-section-subtitle">Giải thích tiếng Việt có dấu cho section này để người dùng hiểu rõ mục đích.</div></div></div>'
       +'<div class="qf-section-body"><div class="qf-grid qf-grid--2">'
-      +'<div class="qf-field"><label class="qf-label" for="field_code">FIELD LABEL <span class="qf-required">*</span><span class="qf-label-vi">NhÃ£n tiáº¿ng Viá»‡t</span></label><input class="qf-input" id="field_code" name="field_code" placeholder="Ghi chÃº tiáº¿ng Viá»‡t cÃ³ dáº¥u"/><div class="qf-helper">Giáº£i thÃ­ch tiáº¿ng Viá»‡t cÃ³ dáº¥u cho field nÃ y.</div></div>'
-      +'<div class="qf-field"><label class="qf-label" for="field_code_2">FIELD LABEL 2 <span class="qf-label-vi">NhÃ£n phá»¥ tiáº¿ng Viá»‡t</span></label><input class="qf-input" id="field_code_2" name="field_code_2" placeholder="Nháº­p ná»™i dung"/><div class="qf-helper">Ghi chÃº hÆ°á»›ng dáº«n hoÃ n toÃ n báº±ng tiáº¿ng Viá»‡t cÃ³ dáº¥u.</div></div>'
+      +'<div class="qf-field"><label class="qf-label" for="field_code">FIELD LABEL <span class="qf-required">*</span><span class="qf-label-vi">Nhãn tiếng Việt</span></label><input class="qf-input" id="field_code" name="field_code" placeholder="Ghi chú tiếng Việt có dấu"/><div class="qf-helper">Giải thích tiếng Việt có dấu cho field này.</div></div>'
+      +'<div class="qf-field"><label class="qf-label" for="field_code_2">FIELD LABEL 2 <span class="qf-label-vi">Nhãn phụ tiếng Việt</span></label><input class="qf-input" id="field_code_2" name="field_code_2" placeholder="Nhập nội dung"/><div class="qf-helper">Ghi chú hướng dẫn hoàn toàn bằng tiếng Việt có dấu.</div></div>'
       +'</div></div></section>',
     formGrid2:
       '<div class="qf-grid qf-grid--2">'
@@ -1435,11 +1571,11 @@ function edBuildQmsTemplateHtml(kind){
       +'</div>',
     formSignatureRow:
       '<section class="qf-section qf-section--success">'
-      +'<div class="qf-section-header"><div><div class="qf-section-title"><span class="qf-section-num">S</span> Electronic Signatures</div><div class="qf-section-subtitle">Giáº£i thÃ­ch tiáº¿ng Viá»‡t cÃ³ dáº¥u cho quy táº¯c kÃ½ Ä‘iá»‡n tá»­ cá»§a biá»ƒu máº«u.</div></div></div>'
+      +'<div class="qf-section-header"><div><div class="qf-section-title"><span class="qf-section-num">S</span> Electronic Signatures</div><div class="qf-section-subtitle">Giải thích tiếng Việt có dấu cho quy tắc ký điện tử của biểu mẫu.</div></div></div>'
       +'<div class="qf-section-body"><div class="qf-grid qf-grid--3">'
-      +'<div class="qf-field"><label class="qf-label">ORIGINATOR<span class="qf-label-vi">NgÆ°á»i phÃ¡t hÃ nh</span></label><div class="qf-input" style="min-height:44px;display:flex;align-items:center;color:#64748b">ChÆ°a kÃ½</div></div>'
-      +'<div class="qf-field"><label class="qf-label">REVIEWER<span class="qf-label-vi">NgÆ°á»i xem xÃ©t</span></label><div class="qf-input" style="min-height:44px;display:flex;align-items:center;color:#64748b">ChÆ°a kÃ½</div></div>'
-      +'<div class="qf-field"><label class="qf-label">APPROVER<span class="qf-label-vi">NgÆ°á»i phÃª duyá»‡t</span></label><div class="qf-input" style="min-height:44px;display:flex;align-items:center;color:#64748b">ChÆ°a kÃ½</div></div>'
+      +'<div class="qf-field"><label class="qf-label">ORIGINATOR<span class="qf-label-vi">Người phát hành</span></label><div class="qf-input" style="min-height:44px;display:flex;align-items:center;color:#64748b">Chưa ký</div></div>'
+      +'<div class="qf-field"><label class="qf-label">REVIEWER<span class="qf-label-vi">Người xem xét</span></label><div class="qf-input" style="min-height:44px;display:flex;align-items:center;color:#64748b">Chưa ký</div></div>'
+      +'<div class="qf-field"><label class="qf-label">APPROVER<span class="qf-label-vi">Người phê duyệt</span></label><div class="qf-input" style="min-height:44px;display:flex;align-items:center;color:#64748b">Chưa ký</div></div>'
       +'</div></div></section>',
     docControl:
       '<div class="card"><div class="card-title">'+(vi?'ThÃ´ng tin kiá»ƒm soÃ¡t tÃ i liá»‡u':'Document Control Information')+'</div><table class="form-table"><tbody>'
@@ -1818,7 +1954,7 @@ function edOpenQmsLookupSource(){
     window._mdOpenControl(source || 'suppliers');
     return;
   }
-  if(typeof toast === 'function') toast('KhÃ´ng má»Ÿ Ä‘Æ°á»£c quáº£n lÃ½ dá»¯ liá»‡u ná»n.', 'warn');
+  if(typeof toast === 'function') toast('Không mở được quản lý dữ liệu nền.', 'warn');
 }
 
 function edQmsSectionProps(block){
@@ -1925,7 +2061,7 @@ function edEditQmsBlockProperties(block){
     var props = edQmsSectionProps(block) || { number:'', title:'', subtitle:'', tone:'info' };
     root.innerHTML =
       '<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal ed-qms-prop-modal">' +
-      '<h4>' + (vi ? 'âš™ Thuá»™c tÃ­nh section form' : 'âš™ Form section properties') + '</h4>' +
+      '<h4>' + (vi ? 'Thuộc tính section form' : 'Form section properties') + '</h4>' +
       '<label>' + (vi ? 'Sá»‘ section' : 'Section number') + '</label><input id="ed-qms-sec-number" value="' + _edEscapeHtml(props.number) + '">' +
       '<label>' + (vi ? 'TiÃªu Ä‘á» tiáº¿ng Anh' : 'English title') + '</label><input id="ed-qms-sec-title" value="' + _edEscapeHtml(props.title) + '">' +
       '<label>' + (vi ? 'Giáº£i thÃ­ch tiáº¿ng Viá»‡t' : 'Vietnamese explanation') + '</label><textarea id="ed-qms-sec-subtitle" rows="4">' + _edEscapeHtml(props.subtitle) + '</textarea>' +
@@ -1946,7 +2082,7 @@ function edEditQmsBlockProperties(block){
     }).join('');
     root.innerHTML =
       '<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal ed-qms-prop-modal">' +
-      '<h4>' + (vi ? '⚙ Thuộc tính field form' : '⚙ Form field properties') + '</h4>' +
+      '<h4>' + (vi ? 'Thuộc tính field form' : 'Form field properties') + '</h4>' +
       '<label>' + (vi ? 'Nhãn tiếng Anh' : 'English label') + '</label><input id="ed-qms-field-label" value="' + _edEscapeHtml(fp.label || '') + '">' +
       '<label>' + (vi ? 'Nhãn tiếng Việt' : 'Vietnamese label') + '</label><input id="ed-qms-field-label-vi" value="' + _edEscapeHtml(fp.labelVi || '') + '">' +
       '<label>' + (vi ? 'Giải thích tiếng Việt' : 'Vietnamese helper') + '</label><textarea id="ed-qms-field-helper" rows="3">' + _edEscapeHtml(fp.helper || '') + '</textarea>' +

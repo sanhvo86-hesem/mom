@@ -77,6 +77,38 @@ function edPrepareFormTemplateClone(bodyClone){
   }
 }
 
+function edScrubLiveFormRuntime(root){
+  try{
+    if(!root || !root.querySelectorAll) return;
+    root.classList.add('ed-form-template-surface');
+    root.querySelectorAll('[data-sign-block],[data-sign-clear],[data-workflow-action],.scar-signature-overlay,.esig-overlay').forEach(function(node){
+      if(node) node.remove();
+    });
+    root.querySelectorAll('#btnPrint,#btnEdit,#btnCancel,#btnSaveDraft,#btnReset,#btnSubmit,.scar-view-btn,.scar-edit-btn,.scar-lookup-self').forEach(function(node){
+      if(node) node.remove();
+    });
+    root.querySelectorAll('#qfActionsBar').forEach(function(node){
+      node.classList.add('ed-form-template-actions');
+      node.innerHTML =
+        '<div class="qf-helper">Chế độ chỉnh mẫu form. Các nút Lưu nháp, Gửi SCAR, Ký và workflow runtime chỉ hoạt động khi mở hồ sơ thật trong workspace.</div>' +
+        '<div class="qf-actions-spacer"></div>' +
+        '<button class="qf-btn primary" type="button" disabled>Đang chỉnh bố cục mẫu HTML</button>';
+    });
+    root.querySelectorAll('#scarWorkflowPanel').forEach(function(node){
+      node.innerHTML =
+        '<div class="scar-signature-grid">' +
+          '<div class="scar-signature-card"><div class="scar-signature-head"><div><strong>Originator</strong><span>Người phát hành</span></div><span class="scar-signature-meaning">AUTHORED</span></div><div class="scar-signature-pad"><div class="scar-signature-empty">Block chữ ký mẫu</div><div>Chỉ chỉnh bố cục và thuộc tính. Chữ ký thật chỉ chạy khi mở hồ sơ runtime.</div></div></div>' +
+          '<div class="scar-signature-card"><div class="scar-signature-head"><div><strong>QA Reviewer</strong><span>Người xem xét QA</span></div><span class="scar-signature-meaning">REVIEWED</span></div><div class="scar-signature-pad"><div class="scar-signature-empty">Block chữ ký mẫu</div><div>Chỉ chỉnh bố cục và thuộc tính. Chữ ký thật chỉ chạy khi mở hồ sơ runtime.</div></div></div>' +
+          '<div class="scar-signature-card"><div class="scar-signature-head"><div><strong>Approver</strong><span>Người phê duyệt</span></div><span class="scar-signature-meaning">APPROVED</span></div><div class="scar-signature-pad"><div class="scar-signature-empty">Block chữ ký mẫu</div><div>Chỉ chỉnh bố cục và thuộc tính. Chữ ký thật chỉ chạy khi mở hồ sơ runtime.</div></div></div>' +
+        '</div>' +
+        '<div class="scar-workflow-note">Chế độ chỉnh mẫu: workflow, chữ ký điện tử, gửi xem xét và phê duyệt chỉ hoạt động khi mở hồ sơ thật. Tại đây anh chỉnh block, field, lookup và layout.</div>';
+    });
+    try{
+      if(typeof window.edRepairMojibake === 'function') window.edRepairMojibake(root);
+    }catch(_repairErr){}
+  }catch(_err){}
+}
+
 function edPrepareFormTemplateHtmlFragment(html){
   try{
     var shell = document.createElement('div');
@@ -193,6 +225,7 @@ function startEdit(code){
         }
         if(dc){
           if(hasDocContent || dc !== wrap) dc.innerHTML=originalHtml;
+          edScrubLiveFormRuntime(dc);
           dc.setAttribute('contenteditable','true');
           dc.setAttribute('spellcheck','true');
           dc.style.pointerEvents='auto';
@@ -216,6 +249,7 @@ function startEdit(code){
       }else{
         _ea.classList.remove('ed-doc-shell');
         _ea.innerHTML=originalHtml;
+        edScrubLiveFormRuntime(_ea);
       }
       try{
         if(typeof edApplyGlobalTablePolicy==='function'){
