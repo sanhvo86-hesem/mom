@@ -264,11 +264,10 @@
 /* ── Tabs ────────────────────────────────────────────────────────────────── */
 .hm-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-1);
   border-bottom: 2px solid var(--border);
   margin-bottom: var(--space-5);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
 }
 .hm-tab {
   padding: var(--space-3) var(--space-4);
@@ -379,8 +378,8 @@
 @media (max-width: 768px) {
   .hm-btn { height: 44px; font-size: var(--text-base); }
   .hm-input { height: 44px; font-size: var(--text-md); }
-  .hm-tabs { gap: 0; }
-  .hm-tab { padding: var(--space-3) var(--space-3); font-size: var(--text-xs); }
+  .hm-tabs { gap: 2px; }
+  .hm-tab { padding: var(--space-2) var(--space-3); font-size: var(--text-xs); }
   .hm-kpi-row { gap: var(--space-2); }
   .hm-kpi-card { min-width: 100px; padding: var(--space-3); }
   .hm-kpi-value { font-size: var(--text-xl); }

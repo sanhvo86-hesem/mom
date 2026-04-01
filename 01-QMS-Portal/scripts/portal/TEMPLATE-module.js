@@ -1,592 +1,364 @@
 /* ============================================================================
-   HESEM QMS — MASTER MODULE TEMPLATE v1.0
-
-   Đây là template chuẩn cho TẤT CẢ 10 modules.
-   Sử dụng: Design Tokens (hesem-design-tokens.css) + Block Engine (00-block-engine.js)
-   CSS classes: hm-* prefix (từ Design System)
-
-   Quy tắc:
-   1. KHÔNG tự tạo CSS riêng — chỉ dùng hm-* classes
-   2. KHÔNG gọi fetch() trực tiếp — dùng _api()
-   3. MỌI text phải bilingual _t(vi, en)
-   4. MỌI status phải dùng HmBlockEngine.badge(status)
-   5. MỌI progress phải dùng HmBlockEngine.progressBar(value, max)
-   6. Toast dùng HmBlockEngine.toast(msg, type)
+   HESEM QMS — MASTER MODULE TEMPLATE v2 (Claude version)
+   So sánh với GPT version (DEMO-gpt-blueprint.js)
    ============================================================================ */
 (function(){
 'use strict';
 
-/* ── Helpers (chuẩn cho mọi module) ─────────────────────────────────────── */
 var BE = window.HmBlockEngine || {};
-function _t(vi,en){ return BE._t ? BE._t(vi,en) : vi; }
-function _esc(v){ return BE._esc ? BE._esc(v) : String(v==null?'':v); }
-function _api(action,payload,method){
-  if(typeof apiCall==='function') return apiCall(action,payload||{},method||'POST',30000);
-  return fetch('api.php?action='+encodeURIComponent(action),{
-    method:method||'POST', credentials:'include',
-    headers:{'Content-Type':'application/json',...(typeof csrfToken!=='undefined'&&csrfToken?{'X-CSRF-Token':csrfToken}:{})},
-    body:(method||'POST')==='GET'?undefined:JSON.stringify(payload||{})
-  }).then(function(r){return r.json();});
-}
-function _toast(msg,type){ BE.toast ? BE.toast(msg,type) : alert(msg); }
-function _badge(status){ return BE.badge ? BE.badge(status) : '<span>'+_esc(status)+'</span>'; }
-function _progress(val,max,color){ return BE.progressBar ? BE.progressBar(val,max,color) : ''; }
-function _fmtDate(v){ if(!v) return '-'; var d=v.substring(0,10).split('-'); return d[2]+'/'+d[1]+'/'+d[0]; }
-function _fmtNum(v,dec){ return Number(v||0).toFixed(dec||0); }
+function _t(vi,en){ return BE._t ? BE._t(vi,en) : ((typeof lang!=='undefined'&&lang==='en')?en:vi); }
+function _esc(v){ return BE._esc ? BE._esc(v) : String(v==null?'':v).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];}); }
+function _toast(m,t){ if(BE.toast) BE.toast(m,t); }
+function _fmtDate(v){ if(!v) return '-'; try{ var d=new Date(v); return isNaN(d)?'-':d.toLocaleDateString('vi-VN'); }catch(e){return '-';} }
 
-/* ── Module State ────────────────────────────────────────────────────────── */
-var state = {
-  container: null,
-  activeTab: 'tab1',      // Tab mặc định
-  loading: false,
-
-  // Data per tab (mỗi tab load riêng, cache ở đây)
-  kpi: {},
-  listData: [],
-  detailData: null,
-  formData: {},
-
-  // Filters
-  filters: {},
-
-  // Pagination
-  pagination: { offset:0, limit:50, total:0 }
-};
-
-/* ── Tab Definitions ─────────────────────────────────────────────────────── */
-var TABS = [
-  { key:'tab1', label:'Tổng quan',       labelEn:'Overview',    icon:'📊' },
-  { key:'tab2', label:'Danh sách',       labelEn:'List',        icon:'📋' },
-  { key:'tab3', label:'Tạo mới',         labelEn:'Create',      icon:'➕' },
-  { key:'tab4', label:'Chi tiết',        labelEn:'Detail',      icon:'🔍' },
+/* ── Sample Data (giống GPT để so sánh công bằng) ────────────────────── */
+var MODULES = [
+  { id:'M1', code:'💰 Báo giá',        route:'/quoting',     owner:'Sales, Estimator',    type:'sales',      status:'approved',  progress:100, apis:'quote_*',                    desc:'RFQ → Quote → Convert to SO' },
+  { id:'M2', code:'📦 Đơn hàng',       route:'/orders',      owner:'Sales, Manager',      type:'production', status:'approved',  progress:95,  apis:'order_* / packing_* / delivery_*', desc:'SO lifecycle + contract review + shipment gate' },
+  { id:'M3', code:'📋 Kế hoạch',       route:'/planning',    owner:'Planner, Engineering', type:'production', status:'active',    progress:88,  apis:'order_jo_* / dispatch_* / schedule_* / shift_* / subcontract_*', desc:'JO/WO + dispatch + scheduling + outsource + parts/shifts' },
+  { id:'M4', code:'🚚 Mua hàng & IQC', route:'/purchasing',  owner:'SCM, QC',             type:'scm',        status:'approved',  progress:100, apis:'supplier_*',                  desc:'Supplier scorecard + incoming inspection + SCAR' },
+  { id:'M5', code:'🏭 Sản xuất',       route:'/production',  owner:'Operator, Supervisor', type:'production', status:'active',    progress:82,  apis:'dispatch_operator_* / mobile_* / cnc_* / knowledge_* / energy_*', desc:'Operator mobile + MES + CNC + knowledge + energy' },
+  { id:'M6', code:'🔴 Chất lượng',     route:'/quality',     owner:'QA Engineer, Manager', type:'quality',    status:'active',    progress:78,  apis:'exception_* / fmea_* / apqp_* / oqc_* / spc_* / ai_*', desc:'NCR/CAPA/8D/MRB + FMEA + APQP + OQC + SPC + AI' },
+  { id:'M7', code:'📋 Hồ sơ',          route:'/records',     owner:'QA, Auditor',          type:'records',    status:'review',    progress:72,  apis:'online_form_* / evidence_* / product_passport_*', desc:'Forms + evidence vault + DPP + genealogy' },
+  { id:'M8', code:'📊 Báo cáo',        route:'/reports',     owner:'Manager, CEO',         type:'support',    status:'planned',   progress:55,  apis:'compliance_report_* / ci_* / dispatch_dashboard', desc:'Reports + CI/Kaizen + shift summary' },
+  { id:'M9', code:'📁 Tài liệu',       route:'/documents',   owner:'All',                  type:'records',    status:'approved',  progress:100, apis:'doc_* / scan_folders',         desc:'Document control (existing)' },
+  { id:'M10',code:'⚙ Quản trị',        route:'/admin',       owner:'Admin, IT',            type:'support',    status:'approved',  progress:100, apis:'admin_* / master_data_*',      desc:'Users + master data + settings' },
 ];
 
-/* ── RENDER ENTRY POINT ──────────────────────────────────────────────────── */
+var TYPE_COLORS = { sales:'#f59e0b', production:'#3b82f6', scm:'#8b5cf6', quality:'#ef4444', records:'#0891b2', support:'#64748b' };
+var TYPE_LABELS = { sales:'Kinh doanh', production:'Sản xuất', scm:'Cung ứng', quality:'Chất lượng', records:'Hồ sơ', support:'Hỗ trợ' };
+
+var TABS = [
+  { key:'overview', icon:'📐', vi:'Tổng quan', en:'Overview' },
+  { key:'modules',  icon:'🧩', vi:'10 Modules', en:'10 Modules' },
+  { key:'flow',     icon:'🔗', vi:'Luồng dữ liệu', en:'Data Flow' },
+  { key:'api',      icon:'⚡', vi:'API Coverage', en:'API Coverage' },
+];
+
+var state = { container:null, activeTab:'overview', selected:null };
+
 function render(container){
   state.container = container;
   _paint();
-  _loadTab(state.activeTab);
 }
 
-/* ── PAINT (Re-render toàn bộ UI) ────────────────────────────────────────── */
 function _paint(){
   var c = state.container;
   if(!c) return;
+  var h = '';
 
-  var html = '';
+  /* ── Header with gradient accent bar ───────────────────────────────── */
+  h += '<div style="background:linear-gradient(135deg,var(--brand) 0%,var(--brand-2) 100%);color:#fff;padding:var(--space-6) var(--space-6) var(--space-5);border-radius:var(--radius-xl);margin-bottom:var(--space-5)">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:var(--space-4)">';
+  h += '<div>';
+  h += '<div style="font-size:var(--text-xs);text-transform:uppercase;letter-spacing:0.15em;opacity:0.7;margin-bottom:var(--space-2)">HESEM QMS — MODULE ARCHITECTURE v2.0</div>';
+  h += '<h1 style="margin:0;font-size:var(--text-2xl);font-weight:var(--font-bold)">'+_t('10 Modules theo Workflow Sản xuất','10 Workflow-based Modules')+'</h1>';
+  h += '<p style="margin:var(--space-2) 0 0;opacity:0.85;font-size:var(--text-sm);max-width:600px">'+_t('Chia theo dòng chảy: Báo giá → Đơn hàng → Kế hoạch → Mua hàng → Sản xuất → Chất lượng → Giao hàng','Organized by production flow: Quoting → Orders → Planning → Purchasing → Production → Quality → Shipping')+'</p>';
+  h += '</div>';
+  h += '<div style="display:flex;gap:var(--space-2)">';
+  h += '<span style="background:rgba(255,255,255,0.15);padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);font-size:var(--text-xs);font-weight:var(--font-semibold)">192 API endpoints</span>';
+  h += '<span style="background:rgba(255,255,255,0.15);padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);font-size:var(--text-xs);font-weight:var(--font-semibold)">45 migrations</span>';
+  h += '<span style="background:rgba(255,255,255,0.15);padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);font-size:var(--text-xs);font-weight:var(--font-semibold)">87 features</span>';
+  h += '</div>';
+  h += '</div></div>';
 
-  /* ── Page Header ──────────────────────────────────────────────────────── */
-  html += '<div class="hm-page-header">';
-  html += '<div>';
-  html += '<h1 class="hm-page-title">'+_t('Tên Module','Module Name')+'</h1>';
-  html += '<p class="hm-page-subtitle">'+_t('Mô tả ngắn về module này','Short description of this module')+'</p>';
-  html += '</div>';
-  html += '<div style="display:flex;gap:var(--space-2)">';
-  html += '<button class="hm-btn hm-btn-primary" data-action="create-new">'+_t('+ Tạo mới','+ Create New')+'</button>';
-  html += '<button class="hm-btn hm-btn-secondary" data-action="refresh">'+_t('Làm mới','Refresh')+'</button>';
-  html += '</div>';
-  html += '</div>';
-
-  /* ── Tab Bar ──────────────────────────────────────────────────────────── */
-  html += '<div class="hm-tabs">';
+  /* ── Tabs ──────────────────────────────────────────────────────────── */
+  h += '<div class="hm-tabs">';
   TABS.forEach(function(tab){
-    var cls = 'hm-tab' + (state.activeTab === tab.key ? ' active' : '');
-    html += '<button class="'+cls+'" data-action="switch-tab" data-tab="'+_esc(tab.key)+'">';
-    html += tab.icon + ' ' + _t(tab.label, tab.labelEn);
-    html += '</button>';
+    h += '<button class="hm-tab'+(state.activeTab===tab.key?' active':'')+'" data-action="tab" data-tab="'+_esc(tab.key)+'">';
+    h += tab.icon+' '+_t(tab.vi,tab.en);
+    h += '</button>';
   });
-  html += '</div>';
+  h += '</div>';
 
-  /* ── Tab Content ──────────────────────────────────────────────────────── */
-  html += '<div class="hm-tab-content">';
-
+  /* ── Tab Content ───────────────────────────────────────────────────── */
   switch(state.activeTab){
-    case 'tab1': html += _renderOverviewTab(); break;
-    case 'tab2': html += _renderListTab(); break;
-    case 'tab3': html += _renderCreateTab(); break;
-    case 'tab4': html += _renderDetailTab(); break;
-    default:     html += '<div class="hm-empty">'+_t('Chọn tab','Select a tab')+'</div>';
+    case 'overview': h += _renderOverview(); break;
+    case 'modules':  h += _renderModules(); break;
+    case 'flow':     h += _renderFlow(); break;
+    case 'api':      h += _renderApi(); break;
   }
 
-  html += '</div>';
-
-  c.innerHTML = html;
-
-  /* ── Event Delegation (1 listener cho toàn bộ module) ─────────────────── */
-  c.removeEventListener('click', _handleClick);
-  c.addEventListener('click', _handleClick);
-  c.removeEventListener('change', _handleChange);
-  c.addEventListener('change', _handleChange);
+  c.innerHTML = h;
+  c.onclick = function(e){
+    var btn = e.target.closest('[data-action]');
+    if(!btn) return;
+    var action = btn.getAttribute('data-action');
+    if(action === 'tab'){ state.activeTab = btn.getAttribute('data-tab'); _paint(); }
+    if(action === 'select'){ state.selected = btn.getAttribute('data-id'); state.activeTab = 'modules'; _paint(); }
+  };
 }
 
-/* ── TAB 1: TỔNG QUAN (KPI + Quick Summary) ─────────────────────────────── */
-function _renderOverviewTab(){
+/* ── TAB 1: OVERVIEW ─────────────────────────────────────────────────── */
+function _renderOverview(){
+  var approved = MODULES.filter(function(m){return m.status==='approved';}).length;
+  var active   = MODULES.filter(function(m){return m.status==='active';}).length;
+  var avgProg  = Math.round(MODULES.reduce(function(s,m){return s+m.progress;},0)/MODULES.length);
   var h = '';
 
-  /* KPI Row — dùng class chuẩn hm-kpi-* */
-  h += '<div class="hm-kpi-row">';
-
+  /* KPI Row — style khác GPT: dùng border-left color accent */
+  h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:var(--space-3);margin-bottom:var(--space-6)">';
   var kpis = [
-    { key:'total',      label:'Tổng cộng',       labelEn:'Total',       color:'var(--brand-2)', suffix:'' },
-    { key:'active',     label:'Đang hoạt động',   labelEn:'Active',      color:'var(--amber)',   suffix:'' },
-    { key:'completed',  label:'Hoàn thành',       labelEn:'Completed',   color:'var(--green)',   suffix:'' },
-    { key:'overdue',    label:'Quá hạn',          labelEn:'Overdue',     color:'var(--red)',     suffix:'' },
-    { key:'rate',       label:'Tỷ lệ đạt',       labelEn:'Achievement', color:'var(--green)',   suffix:'%' },
+    { value:'10',       label:_t('Tổng modules','Total Modules'),    color:'var(--brand-2)', icon:'🧩' },
+    { value:approved,   label:_t('Đã hoàn thiện','Completed'),        color:'var(--green)',    icon:'✅' },
+    { value:active,     label:_t('Đang xây dựng','In Progress'),      color:'var(--amber)',    icon:'🔨' },
+    { value:avgProg+'%',label:_t('Tiến độ TB','Avg Progress'),        color:'var(--brand-2)', icon:'📈' },
+    { value:'192',      label:_t('API Endpoints','API Endpoints'),    color:'var(--purple)',   icon:'⚡' },
   ];
-
   kpis.forEach(function(kpi){
-    var val = state.kpi[kpi.key] !== undefined ? state.kpi[kpi.key] : 0;
-    h += '<div class="hm-kpi-card">';
-    h += '<div class="hm-kpi-value" style="color:'+kpi.color+'">'+_esc(String(val))+kpi.suffix+'</div>';
-    h += '<div class="hm-kpi-label">'+_t(kpi.label, kpi.labelEn)+'</div>';
-    h += '</div>';
-  });
-
-  h += '</div>';
-
-  /* Quick table — top 5 recent items */
-  h += '<div class="hm-card" style="margin-top:var(--space-4)">';
-  h += '<h3 style="margin:0 0 var(--space-3);font-size:var(--text-md);font-weight:var(--font-bold)">'+_t('Gần đây','Recent')+'</h3>';
-
-  if(state.loading){
-    h += '<div class="hm-empty">'+_t('Đang tải...','Loading...')+'</div>';
-  } else if(!state.listData.length){
-    h += '<div class="hm-empty">';
-    h += '<div class="hm-empty-icon">📭</div>';
-    h += _t('Chưa có dữ liệu','No data yet');
-    h += '</div>';
-  } else {
-    h += '<table class="hm-table">';
-    h += '<thead><tr>';
-    h += '<th>#</th>';
-    h += '<th>'+_t('Mã','Code')+'</th>';
-    h += '<th>'+_t('Tên','Name')+'</th>';
-    h += '<th>'+_t('Ngày','Date')+'</th>';
-    h += '<th>'+_t('Trạng thái','Status')+'</th>';
-    h += '<th></th>';
-    h += '</tr></thead><tbody>';
-
-    state.listData.slice(0,5).forEach(function(row, i){
-      h += '<tr>';
-      h += '<td style="color:var(--text-tertiary)">'+(i+1)+'</td>';
-      h += '<td style="font-weight:var(--font-semibold)">'+_esc(row.code || row.id || '')+'</td>';
-      h += '<td>'+_esc(row.name || row.title || row.description || '')+'</td>';
-      h += '<td>'+_fmtDate(row.created_at || row.date || '')+'</td>';
-      h += '<td>'+_badge(row.status || 'draft')+'</td>';
-      h += '<td><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="view-detail" data-id="'+_esc(row.id || row.code || '')+'">'+_t('Xem','View')+'</button></td>';
-      h += '</tr>';
-    });
-
-    h += '</tbody></table>';
-  }
-  h += '</div>';
-
-  return h;
-}
-
-/* ── TAB 2: DANH SÁCH (Filter + Paginated Table) ────────────────────────── */
-function _renderListTab(){
-  var h = '';
-
-  /* Filter Bar — dùng class chuẩn hm-filter-bar */
-  h += '<div class="hm-filter-bar">';
-  h += '<input type="text" class="hm-input" placeholder="'+_t('Tìm kiếm...','Search...')+'" data-filter="search" value="'+_esc(state.filters.search || '')+'" style="max-width:240px">';
-  h += '<select class="hm-input hm-select" data-filter="status" style="max-width:160px">';
-  h += '<option value="">'+_t('Tất cả trạng thái','All statuses')+'</option>';
-  h += '<option value="draft">Draft</option>';
-  h += '<option value="active">Active</option>';
-  h += '<option value="completed">Completed</option>';
-  h += '</select>';
-  h += '<input type="date" class="hm-input" data-filter="date_from" style="max-width:160px">';
-  h += '<input type="date" class="hm-input" data-filter="date_to" style="max-width:160px">';
-  h += '<button class="hm-btn hm-btn-primary" data-action="apply-filter">'+_t('Tìm','Search')+'</button>';
-  h += '</div>';
-
-  /* Data Table */
-  if(state.loading){
-    h += '<div class="hm-empty">'+_t('Đang tải...','Loading...')+'</div>';
-  } else if(!state.listData.length){
-    h += '<div class="hm-empty">';
-    h += '<div class="hm-empty-icon">📭</div>';
-    h += _t('Không tìm thấy dữ liệu','No data found');
-    h += '</div>';
-  } else {
-    h += '<div style="overflow-x:auto">';
-    h += '<table class="hm-table">';
-    h += '<thead><tr>';
-    h += '<th>'+_t('Mã','Code')+'</th>';
-    h += '<th>'+_t('Tên / Mô tả','Name / Description')+'</th>';
-    h += '<th>'+_t('Ngày tạo','Created')+'</th>';
-    h += '<th>'+_t('Trạng thái','Status')+'</th>';
-    h += '<th>'+_t('Người tạo','Created by')+'</th>';
-    h += '<th style="text-align:center">'+_t('Thao tác','Actions')+'</th>';
-    h += '</tr></thead><tbody>';
-
-    state.listData.forEach(function(row){
-      h += '<tr>';
-      h += '<td style="font-weight:var(--font-semibold);white-space:nowrap">'+_esc(row.code || row.id || '')+'</td>';
-      h += '<td>'+_esc(row.name || row.title || row.description || '')+'</td>';
-      h += '<td style="white-space:nowrap">'+_fmtDate(row.created_at || '')+'</td>';
-      h += '<td>'+_badge(row.status || 'draft')+'</td>';
-      h += '<td>'+_esc(row.created_by || '')+'</td>';
-      h += '<td style="text-align:center;white-space:nowrap">';
-      h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="view-detail" data-id="'+_esc(row.id || row.code || '')+'">'+_t('Xem','View')+'</button> ';
-      h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="edit" data-id="'+_esc(row.id || row.code || '')+'">'+_t('Sửa','Edit')+'</button>';
-      h += '</td>';
-      h += '</tr>';
-    });
-
-    h += '</tbody></table>';
-    h += '</div>';
-
-    /* Pagination */
-    var p = state.pagination;
-    var totalPages = Math.ceil(p.total / p.limit) || 1;
-    var currentPage = Math.floor(p.offset / p.limit) + 1;
-
-    h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:var(--space-4);font-size:var(--text-sm);color:var(--text-secondary)">';
-    h += '<span>'+_t('Hiển thị','Showing')+' '+(p.offset+1)+'-'+Math.min(p.offset+p.limit, p.total)+' / '+p.total+'</span>';
-    h += '<div style="display:flex;gap:var(--space-1)">';
-    if(currentPage > 1){
-      h += '<button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="page-prev">←</button>';
-    }
-    h += '<span style="padding:0 var(--space-3);line-height:28px">'+currentPage+' / '+totalPages+'</span>';
-    if(currentPage < totalPages){
-      h += '<button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="page-next">→</button>';
-    }
+    h += '<div style="background:var(--bg-surface);border:1px solid var(--border);border-left:4px solid '+kpi.color+';border-radius:var(--radius-lg);padding:var(--space-4);display:flex;gap:var(--space-3);align-items:center">';
+    h += '<div style="font-size:1.5rem">'+kpi.icon+'</div>';
+    h += '<div>';
+    h += '<div style="font-size:var(--text-2xl);font-weight:var(--font-bold);color:'+kpi.color+'">'+_esc(String(kpi.value))+'</div>';
+    h += '<div style="font-size:var(--text-xs);color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em">'+_esc(kpi.label)+'</div>';
     h += '</div></div>';
-  }
+  });
+  h += '</div>';
 
-  return h;
-}
-
-/* ── TAB 3: TẠO MỚI (Form) ──────────────────────────────────────────────── */
-function _renderCreateTab(){
-  var h = '';
-
-  h += '<div class="hm-card" style="max-width:800px">';
-  h += '<h3 style="margin:0 0 var(--space-5);font-size:var(--text-lg);font-weight:var(--font-bold)">'+_t('Tạo mới','Create New')+'</h3>';
-
-  /* Form grid — 2 columns */
+  /* 2-column layout: Workflow stages + Module cards */
   h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)">';
 
-  /* Field: Mã (auto-generated) */
-  h += '<div>';
-  h += '<label class="hm-label">'+_t('Mã','Code')+' <span style="color:var(--text-tertiary);font-weight:normal">('+_t('tự động','auto')+')</span></label>';
-  h += '<input type="text" class="hm-input" id="tpl-code" disabled placeholder="'+_t('Tự động tạo','Auto-generated')+'">';
+  /* Left: Production workflow stages */
+  h += '<div class="hm-card">';
+  h += '<h3 style="margin:0 0 var(--space-4);font-size:var(--text-lg);font-weight:var(--font-bold)">'+_t('Dòng chảy sản xuất','Production Flow')+'</h3>';
+  var stages = [
+    { icon:'💰', name:_t('Báo giá','Quoting'),          module:'M1', color:'#f59e0b' },
+    { icon:'📦', name:_t('Đơn hàng','Orders'),           module:'M2', color:'#3b82f6' },
+    { icon:'📋', name:_t('Kế hoạch','Planning'),          module:'M3', color:'#6366f1' },
+    { icon:'🚚', name:_t('Mua hàng & IQC','Purchasing'),  module:'M4', color:'#8b5cf6' },
+    { icon:'🏭', name:_t('Sản xuất','Production'),        module:'M5', color:'#10b981' },
+    { icon:'🔴', name:_t('Chất lượng','Quality'),         module:'M6', color:'#ef4444' },
+    { icon:'📦', name:_t('Giao hàng','Shipping'),         module:'M2', color:'#0891b2' },
+  ];
+  stages.forEach(function(s, i){
+    var mod = MODULES.find(function(m){return m.id===s.module;});
+    h += '<div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3);'+(i<stages.length-1?'border-bottom:1px solid var(--border);':'')+'cursor:pointer" data-action="select" data-id="'+_esc(s.module)+'">';
+    h += '<div style="width:36px;height:36px;border-radius:50%;background:'+s.color+';color:#fff;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">'+s.icon+'</div>';
+    h += '<div style="flex:1;min-width:0">';
+    h += '<div style="font-weight:var(--font-semibold);font-size:var(--text-sm)">'+_esc(s.name)+'</div>';
+    h += '<div style="font-size:var(--text-xs);color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+_esc(mod?mod.desc:'')+'</div>';
+    h += '</div>';
+    h += '<div style="display:flex;align-items:center;gap:var(--space-2)">';
+    if(mod) h += _statusBadge(mod.status);
+    h += '<span style="font-size:var(--text-xs);font-weight:var(--font-bold);color:var(--text-secondary)">'+(mod?mod.progress:'0')+'%</span>';
+    h += '</div>';
+    if(i < stages.length-1) h += '<div style="color:var(--text-tertiary);font-size:var(--text-xs)">→</div>';
+    h += '</div>';
+  });
   h += '</div>';
 
-  /* Field: Tên */
-  h += '<div>';
-  h += '<label class="hm-label hm-label-required">'+_t('Tên / Mô tả','Name / Description')+'</label>';
-  h += '<input type="text" class="hm-input" id="tpl-name" placeholder="'+_t('Nhập tên...','Enter name...')+'">';
-  h += '</div>';
-
-  /* Field: Dropdown */
-  h += '<div>';
-  h += '<label class="hm-label hm-label-required">'+_t('Loại','Type')+'</label>';
-  h += '<select class="hm-input hm-select" id="tpl-type">';
-  h += '<option value="">-- '+_t('Chọn','Select')+' --</option>';
-  h += '<option value="type_a">'+_t('Loại A','Type A')+'</option>';
-  h += '<option value="type_b">'+_t('Loại B','Type B')+'</option>';
-  h += '<option value="type_c">'+_t('Loại C','Type C')+'</option>';
-  h += '</select>';
-  h += '</div>';
-
-  /* Field: Date */
-  h += '<div>';
-  h += '<label class="hm-label hm-label-required">'+_t('Ngày','Date')+'</label>';
-  h += '<input type="date" class="hm-input" id="tpl-date" value="'+(new Date().toISOString().substring(0,10))+'">';
-  h += '</div>';
-
-  /* Field: Number */
-  h += '<div>';
-  h += '<label class="hm-label">'+_t('Số lượng','Quantity')+'</label>';
-  h += '<input type="number" class="hm-input" id="tpl-qty" min="0" value="0">';
-  h += '</div>';
-
-  /* Field: Priority slider */
-  h += '<div>';
-  h += '<label class="hm-label">'+_t('Độ ưu tiên','Priority')+' <span id="tpl-priority-val" style="font-weight:var(--font-bold)">50</span>/100</label>';
-  h += '<input type="range" min="1" max="100" value="50" id="tpl-priority" style="width:100%">';
+  /* Right: Module progress cards */
+  h += '<div class="hm-card">';
+  h += '<h3 style="margin:0 0 var(--space-4);font-size:var(--text-lg);font-weight:var(--font-bold)">'+_t('Tiến độ từng module','Module Progress')+'</h3>';
+  MODULES.forEach(function(mod){
+    var barColor = mod.progress >= 90 ? 'var(--green)' : mod.progress >= 70 ? 'var(--amber)' : 'var(--red)';
+    h += '<div style="margin-bottom:var(--space-3);cursor:pointer" data-action="select" data-id="'+_esc(mod.id)+'">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+    h += '<span style="font-size:var(--text-sm);font-weight:var(--font-medium)">'+_esc(mod.code)+'</span>';
+    h += '<span style="font-size:var(--text-xs);font-weight:var(--font-bold);color:'+barColor+'">'+mod.progress+'%</span>';
+    h += '</div>';
+    h += '<div style="height:6px;background:var(--gray-100);border-radius:var(--radius-full);overflow:hidden">';
+    h += '<div style="height:100%;width:'+mod.progress+'%;background:'+barColor+';border-radius:var(--radius-full);transition:width 0.3s"></div>';
+    h += '</div></div>';
+  });
   h += '</div>';
 
   h += '</div>'; // close grid
 
-  /* Field: Textarea (full width) */
-  h += '<div style="margin-top:var(--space-4)">';
-  h += '<label class="hm-label">'+_t('Ghi chú','Notes')+'</label>';
-  h += '<textarea class="hm-input hm-textarea" id="tpl-notes" rows="3" placeholder="'+_t('Ghi chú thêm...','Additional notes...')+'"></textarea>';
-  h += '</div>';
+  return h;
+}
 
-  /* Action buttons */
-  h += '<div style="display:flex;gap:var(--space-3);justify-content:flex-end;margin-top:var(--space-6);padding-top:var(--space-4);border-top:1px solid var(--border)">';
-  h += '<button class="hm-btn hm-btn-secondary" data-action="cancel-create">'+_t('Hủy','Cancel')+'</button>';
-  h += '<button class="hm-btn hm-btn-primary" data-action="submit-create">'+_t('Tạo mới','Create')+'</button>';
-  h += '</div>';
+/* ── TAB 2: MODULES ──────────────────────────────────────────────────── */
+function _renderModules(){
+  var h = '';
 
-  h += '</div>'; // close card
+  /* Module cards grid */
+  h += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:var(--space-4)">';
+  MODULES.forEach(function(mod){
+    var typeColor = TYPE_COLORS[mod.type] || '#94a3b8';
+    var selected = state.selected === mod.id;
+    h += '<div class="hm-card" style="border-left:4px solid '+typeColor+';'+(selected?'box-shadow:0 0 0 2px var(--brand-2);':'')+'cursor:pointer" data-action="select" data-id="'+_esc(mod.id)+'">';
+
+    /* Card header */
+    h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--space-3)">';
+    h += '<div>';
+    h += '<div style="font-size:var(--text-lg);font-weight:var(--font-bold)">'+_esc(mod.code)+'</div>';
+    h += '<div style="font-size:var(--text-xs);color:var(--text-secondary);margin-top:2px">'+_esc(mod.route)+' · '+_esc(mod.owner)+'</div>';
+    h += '</div>';
+    h += _statusBadge(mod.status);
+    h += '</div>';
+
+    /* Description */
+    h += '<p style="font-size:var(--text-sm);color:var(--text-secondary);margin:0 0 var(--space-3);line-height:1.5">'+_esc(mod.desc)+'</p>';
+
+    /* API bundle */
+    h += '<div style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--text-tertiary);background:var(--bg-surface-alt);padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm);margin-bottom:var(--space-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+_esc(mod.apis)+'">'+_esc(mod.apis)+'</div>';
+
+    /* Progress bar */
+    h += '<div style="display:flex;align-items:center;gap:var(--space-3)">';
+    h += '<div style="flex:1;height:6px;background:var(--gray-100);border-radius:var(--radius-full);overflow:hidden">';
+    var barColor = mod.progress >= 90 ? 'var(--green)' : mod.progress >= 70 ? 'var(--amber)' : 'var(--red)';
+    h += '<div style="height:100%;width:'+mod.progress+'%;background:'+barColor+';border-radius:var(--radius-full)"></div>';
+    h += '</div>';
+    h += '<span style="font-size:var(--text-sm);font-weight:var(--font-bold);min-width:40px;text-align:right">'+mod.progress+'%</span>';
+    h += '</div>';
+
+    /* Type badge */
+    h += '<div style="margin-top:var(--space-3);display:flex;gap:var(--space-2)">';
+    h += '<span style="font-size:var(--text-xs);padding:2px 8px;border-radius:var(--radius-full);background:'+typeColor+'15;color:'+typeColor+';font-weight:var(--font-semibold)">'+_esc(TYPE_LABELS[mod.type] || mod.type)+'</span>';
+    h += '</div>';
+
+    h += '</div>';
+  });
+  h += '</div>';
 
   return h;
 }
 
-/* ── TAB 4: CHI TIẾT (Detail View) ──────────────────────────────────────── */
-function _renderDetailTab(){
+/* ── TAB 3: DATA FLOW ────────────────────────────────────────────────── */
+function _renderFlow(){
   var h = '';
-  var d = state.detailData;
 
-  if(!d){
-    h += '<div class="hm-empty">';
-    h += '<div class="hm-empty-icon">🔍</div>';
-    h += _t('Chọn một mục từ danh sách để xem chi tiết','Select an item from the list to view details');
-    h += '</div>';
-    return h;
-  }
+  h += '<div class="hm-card" style="overflow-x:auto">';
+  h += '<h3 style="margin:0 0 var(--space-4);font-size:var(--text-lg)">'+_t('Dòng chảy dữ liệu giữa 10 modules','Cross-module Data Flow')+'</h3>';
 
-  /* Detail header */
-  h += '<div class="hm-card">';
-  h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--space-4)">';
-  h += '<div>';
-  h += '<h2 style="margin:0;font-size:var(--text-xl);font-weight:var(--font-bold)">'+_esc(d.code || d.id || '')+'</h2>';
-  h += '<p style="margin:var(--space-1) 0 0;color:var(--text-secondary)">'+_esc(d.name || d.title || '')+'</p>';
-  h += '</div>';
-  h += '<div style="display:flex;gap:var(--space-2);align-items:center">';
-  h += _badge(d.status || 'draft');
-  h += '<button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="edit" data-id="'+_esc(d.id || d.code || '')+'">'+_t('Sửa','Edit')+'</button>';
-  h += '</div>';
-  h += '</div>';
-
-  /* Detail grid */
-  h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);font-size:var(--text-sm)">';
-
-  var fields = [
-    { label:'Loại',        labelEn:'Type',       value: d.type || '-' },
-    { label:'Ngày tạo',    labelEn:'Created',    value: _fmtDate(d.created_at) },
-    { label:'Người tạo',   labelEn:'Created by', value: d.created_by || '-' },
-    { label:'Cập nhật',    labelEn:'Updated',    value: _fmtDate(d.updated_at) },
-    { label:'Số lượng',    labelEn:'Quantity',   value: d.qty || d.quantity || '-' },
-    { label:'Ưu tiên',     labelEn:'Priority',   value: d.priority || '-' },
+  /* Flow diagram using CSS */
+  var flow = [
+    { from:'💰 Báo giá',    to:'📦 Đơn hàng',    data:'quote → SO',          color:'#f59e0b' },
+    { from:'📦 Đơn hàng',   to:'📋 Kế hoạch',     data:'SO → JO/WO',          color:'#3b82f6' },
+    { from:'📋 Kế hoạch',    to:'🚚 Mua hàng',    data:'BOM → PO',            color:'#6366f1' },
+    { from:'📋 Kế hoạch',    to:'🏭 Sản xuất',    data:'dispatch → operator',  color:'#10b981' },
+    { from:'🚚 Mua hàng',   to:'🏭 Sản xuất',    data:'material received',    color:'#8b5cf6' },
+    { from:'🏭 Sản xuất',   to:'🔴 Chất lượng',   data:'NCR / inspection',     color:'#ef4444' },
+    { from:'🔴 Chất lượng',  to:'📦 Đơn hàng',    data:'OQC pass → ship',      color:'#0891b2' },
+    { from:'🏭 Sản xuất',   to:'📋 Hồ sơ',       data:'evidence',             color:'#0891b2' },
+    { from:'All modules',    to:'📊 Báo cáo',     data:'KPI aggregation',      color:'#64748b' },
   ];
 
-  fields.forEach(function(f){
-    h += '<div style="padding:var(--space-2) 0;border-bottom:1px solid var(--border)">';
-    h += '<span style="color:var(--text-secondary);display:block;font-size:var(--text-xs);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px">'+_t(f.label,f.labelEn)+'</span>';
-    h += '<span style="font-weight:var(--font-medium)">'+_esc(String(f.value))+'</span>';
-    h += '</div>';
+  h += '<table class="hm-table">';
+  h += '<thead><tr>';
+  h += '<th>'+_t('Từ','From')+'</th>';
+  h += '<th></th>';
+  h += '<th>'+_t('Đến','To')+'</th>';
+  h += '<th>'+_t('Dữ liệu truyền','Data Transferred')+'</th>';
+  h += '</tr></thead><tbody>';
+
+  flow.forEach(function(f){
+    h += '<tr>';
+    h += '<td style="font-weight:var(--font-semibold)">'+_esc(f.from)+'</td>';
+    h += '<td style="text-align:center;color:'+f.color+';font-size:var(--text-lg)">→</td>';
+    h += '<td style="font-weight:var(--font-semibold)">'+_esc(f.to)+'</td>';
+    h += '<td><span style="font-family:var(--font-mono);font-size:var(--text-xs);background:var(--bg-surface-alt);padding:2px 8px;border-radius:var(--radius-sm)">'+_esc(f.data)+'</span></td>';
+    h += '</tr>';
   });
-
+  h += '</tbody></table>';
   h += '</div>';
 
-  /* Notes */
-  if(d.notes){
-    h += '<div style="margin-top:var(--space-4);padding:var(--space-3);background:var(--bg-surface-alt);border-radius:var(--radius-md)">';
-    h += '<span style="font-size:var(--text-xs);color:var(--text-secondary);text-transform:uppercase">'+_t('Ghi chú','Notes')+'</span>';
-    h += '<p style="margin:var(--space-1) 0 0;white-space:pre-wrap">'+_esc(d.notes)+'</p>';
-    h += '</div>';
-  }
+  /* Shared entities */
+  h += '<div class="hm-card" style="margin-top:var(--space-4)">';
+  h += '<h3 style="margin:0 0 var(--space-4);font-size:var(--text-lg)">'+_t('Entities chia sẻ giữa modules','Shared Entities')+'</h3>';
 
-  /* Progress bar example */
-  if(d.progress !== undefined){
-    h += '<div style="margin-top:var(--space-4)">';
-    h += '<div style="display:flex;justify-content:space-between;font-size:var(--text-sm);margin-bottom:var(--space-1)">';
-    h += '<span>'+_t('Tiến độ','Progress')+'</span>';
-    h += '<span style="font-weight:var(--font-bold)">'+_fmtNum(d.progress)+'%</span>';
-    h += '</div>';
-    h += _progress(d.progress, 100);
-    h += '</div>';
-  }
+  var entities = [
+    { key:'so_number',    created:'📦 Đơn hàng', used:'📋📚🏭🔴📋📊',   desc:_t('Số đơn hàng','Sales Order number') },
+    { key:'jo_number',    created:'📋 Kế hoạch',  used:'🏭🔴📋',          desc:_t('Số lệnh sản xuất','Job Order number') },
+    { key:'wo_number',    created:'📋 Kế hoạch',  used:'🏭🔴📋',          desc:_t('Số lệnh công đoạn','Work Order number') },
+    { key:'part_number',  created:'📋 Kế hoạch',  used:'ALL',              desc:_t('Mã chi tiết','Part number') },
+    { key:'machine_id',   created:'⚙ Quản trị',  used:'📋🏭',            desc:_t('Mã máy','Machine ID') },
+    { key:'operator_id',  created:'⚙ Quản trị',  used:'📋🏭',            desc:_t('Mã công nhân','Operator ID') },
+    { key:'ncr_id',       created:'🔴 Chất lượng',used:'🏭📋',            desc:_t('Mã NCR','NCR ID') },
+    { key:'evidence_id',  created:'📋 Hồ sơ',     used:'ALL',              desc:_t('Mã chứng cứ','Evidence ID') },
+  ];
 
-  h += '</div>';
+  h += '<table class="hm-table">';
+  h += '<thead><tr><th>Entity Key</th><th>'+_t('Tạo bởi','Created by')+'</th><th>'+_t('Dùng bởi','Used by')+'</th><th>'+_t('Mô tả','Description')+'</th></tr></thead><tbody>';
+  entities.forEach(function(e){
+    h += '<tr>';
+    h += '<td style="font-family:var(--font-mono);font-weight:var(--font-bold);font-size:var(--text-xs)">'+_esc(e.key)+'</td>';
+    h += '<td>'+_esc(e.created)+'</td>';
+    h += '<td>'+_esc(e.used)+'</td>';
+    h += '<td style="color:var(--text-secondary);font-size:var(--text-sm)">'+_esc(e.desc)+'</td>';
+    h += '</tr>';
+  });
+  h += '</tbody></table></div>';
 
   return h;
 }
 
-/* ── EVENT HANDLERS ──────────────────────────────────────────────────────── */
-function _handleClick(e){
-  var btn = e.target.closest('[data-action]');
-  if(!btn) return;
-  var action = btn.getAttribute('data-action');
+/* ── TAB 4: API COVERAGE ─────────────────────────────────────────────── */
+function _renderApi(){
+  var h = '';
 
-  switch(action){
-    case 'switch-tab':
-      var tab = btn.getAttribute('data-tab');
-      if(tab && tab !== state.activeTab){
-        state.activeTab = tab;
-        _paint();
-        _loadTab(tab);
-      }
-      break;
+  var apiData = [
+    { module:'💰 Báo giá',        get:2,  post:5,  total:7 },
+    { module:'📦 Đơn hàng',       get:8,  post:10, total:18 },
+    { module:'📋 Kế hoạch',        get:14, post:16, total:30 },
+    { module:'🚚 Mua hàng & IQC', get:7,  post:10, total:17 },
+    { module:'🏭 Sản xuất',       get:11, post:11, total:22 },
+    { module:'🔴 Chất lượng',      get:14, post:22, total:36 },
+    { module:'📋 Hồ sơ',          get:10, post:6,  total:16 },
+    { module:'📊 Báo cáo',        get:8,  post:4,  total:12 },
+    { module:'📁 Tài liệu',       get:8,  post:8,  total:16 },
+    { module:'⚙ Quản trị',        get:8,  post:10, total:18 },
+  ];
+  var totalGet = 0, totalPost = 0, totalAll = 0;
+  apiData.forEach(function(a){ totalGet += a.get; totalPost += a.post; totalAll += a.total; });
+  var maxTotal = Math.max.apply(null, apiData.map(function(a){return a.total;}));
 
-    case 'refresh':
-      _loadTab(state.activeTab);
-      break;
+  h += '<div class="hm-card">';
+  h += '<h3 style="margin:0 0 var(--space-4);font-size:var(--text-lg)">'+_t('API Coverage theo Module','API Coverage by Module')+' <span style="font-weight:var(--font-normal);color:var(--text-secondary);font-size:var(--text-sm)">('+totalAll+' '+_t('endpoints tổng','total endpoints')+')</span></h3>';
 
-    case 'create-new':
-      state.activeTab = 'tab3';
-      _paint();
-      break;
+  h += '<table class="hm-table">';
+  h += '<thead><tr><th>Module</th><th style="text-align:center">GET</th><th style="text-align:center">POST</th><th style="text-align:center">Total</th><th style="min-width:200px">'+_t('Tỷ lệ','Distribution')+'</th></tr></thead><tbody>';
 
-    case 'submit-create':
-      _submitCreate();
-      break;
-
-    case 'cancel-create':
-      state.activeTab = 'tab1';
-      _paint();
-      _loadTab('tab1');
-      break;
-
-    case 'view-detail':
-      var id = btn.getAttribute('data-id');
-      if(id) _loadDetail(id);
-      break;
-
-    case 'apply-filter':
-      _applyFilters();
-      break;
-
-    case 'page-prev':
-      if(state.pagination.offset >= state.pagination.limit){
-        state.pagination.offset -= state.pagination.limit;
-        _loadList();
-      }
-      break;
-
-    case 'page-next':
-      if(state.pagination.offset + state.pagination.limit < state.pagination.total){
-        state.pagination.offset += state.pagination.limit;
-        _loadList();
-      }
-      break;
-  }
-}
-
-function _handleChange(e){
-  var el = e.target;
-
-  /* Priority slider live update */
-  if(el.id === 'tpl-priority'){
-    var span = state.container.querySelector('#tpl-priority-val');
-    if(span) span.textContent = el.value;
-  }
-
-  /* Filter change */
-  if(el.hasAttribute('data-filter')){
-    state.filters[el.getAttribute('data-filter')] = el.value;
-  }
-}
-
-/* ── DATA LOADING ────────────────────────────────────────────────────────── */
-function _loadTab(tab){
-  switch(tab){
-    case 'tab1': _loadKpi(); _loadList(); break;
-    case 'tab2': _loadList(); break;
-    case 'tab3': break; // form, no data load
-    case 'tab4': break; // detail loaded on click
-  }
-}
-
-function _loadKpi(){
-  // ← THAY API ACTION PHÙ HỢP VỚI MODULE CỤ THỂ
-  // Ví dụ: dispatch_dashboard, exception_dashboard, supplier_dashboard, etc.
-  _api('MODULE_DASHBOARD_ACTION', {}, 'GET').then(function(r){
-    if(r && r.ok){
-      state.kpi = {
-        total:     r.total_tasks || r.total || 0,
-        active:    r.in_progress || r.active || 0,
-        completed: r.completed || 0,
-        overdue:   r.overdue || 0,
-        rate:      r.achievement_pct || r.rate || 0,
-      };
-    }
-    _paint();
-  }).catch(function(){ _paint(); });
-}
-
-function _loadList(){
-  state.loading = true;
-  _paint();
-
-  var params = Object.assign({
-    offset: state.pagination.offset,
-    limit:  state.pagination.limit,
-  }, state.filters);
-
-  // ← THAY API ACTION PHÙ HỢP
-  _api('MODULE_LIST_ACTION', params, 'GET').then(function(r){
-    state.loading = false;
-    if(r && r.ok){
-      // ← THAY data key phù hợp (r.targets, r.quotes, r.exceptions, etc.)
-      state.listData = r.items || r.targets || r.data || [];
-      state.pagination.total = r.total || state.listData.length;
-    }
-    _paint();
-  }).catch(function(){
-    state.loading = false;
-    _paint();
-    _toast(_t('Lỗi tải dữ liệu','Error loading data'), 'error');
+  apiData.forEach(function(a){
+    var pct = Math.round((a.total / totalAll) * 100);
+    var getPct = Math.round((a.get / a.total) * 100);
+    h += '<tr>';
+    h += '<td style="font-weight:var(--font-semibold);white-space:nowrap">'+_esc(a.module)+'</td>';
+    h += '<td style="text-align:center;color:var(--green);font-weight:var(--font-semibold)">'+a.get+'</td>';
+    h += '<td style="text-align:center;color:var(--blue);font-weight:var(--font-semibold)">'+a.post+'</td>';
+    h += '<td style="text-align:center;font-weight:var(--font-bold)">'+a.total+'</td>';
+    h += '<td>';
+    h += '<div style="display:flex;align-items:center;gap:var(--space-2)">';
+    h += '<div style="flex:1;height:16px;background:var(--gray-100);border-radius:var(--radius-sm);overflow:hidden;display:flex">';
+    h += '<div style="width:'+getPct+'%;height:100%;background:var(--green)" title="GET: '+a.get+'"></div>';
+    h += '<div style="width:'+(100-getPct)+'%;height:100%;background:var(--blue)" title="POST: '+a.post+'"></div>';
+    h += '</div>';
+    h += '<span style="font-size:var(--text-xs);color:var(--text-secondary);min-width:30px">'+pct+'%</span>';
+    h += '</div></td>';
+    h += '</tr>';
   });
+
+  h += '<tr style="font-weight:var(--font-bold);border-top:2px solid var(--border)">';
+  h += '<td>'+_t('TỔNG','TOTAL')+'</td>';
+  h += '<td style="text-align:center;color:var(--green)">'+totalGet+'</td>';
+  h += '<td style="text-align:center;color:var(--blue)">'+totalPost+'</td>';
+  h += '<td style="text-align:center">'+totalAll+'</td>';
+  h += '<td>';
+  h += '<div style="display:flex;gap:var(--space-3);font-size:var(--text-xs)">';
+  h += '<span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--green)"></span> GET</span>';
+  h += '<span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--blue)"></span> POST</span>';
+  h += '</div></td>';
+  h += '</tr>';
+  h += '</tbody></table></div>';
+
+  return h;
 }
 
-function _loadDetail(id){
-  state.activeTab = 'tab4';
-  state.loading = true;
-  _paint();
-
-  // ← THAY API ACTION PHÙ HỢP
-  _api('MODULE_DETAIL_ACTION', { id: id }, 'GET').then(function(r){
-    state.loading = false;
-    if(r && r.ok){
-      state.detailData = r.record || r.data || r;
-    }
-    _paint();
-  }).catch(function(){
-    state.loading = false;
-    _paint();
-  });
-}
-
-function _submitCreate(){
-  var c = state.container;
-  var name = (c.querySelector('#tpl-name') || {}).value || '';
-  var type = (c.querySelector('#tpl-type') || {}).value || '';
-  var date = (c.querySelector('#tpl-date') || {}).value || '';
-
-  if(!name.trim()){
-    _toast(_t('Vui lòng nhập tên','Please enter a name'), 'warning');
-    return;
-  }
-
-  var payload = {
-    name:     name.trim(),
-    type:     type,
-    date:     date,
-    qty:      parseInt((c.querySelector('#tpl-qty') || {}).value) || 0,
-    priority: parseInt((c.querySelector('#tpl-priority') || {}).value) || 50,
-    notes:    (c.querySelector('#tpl-notes') || {}).value || '',
+/* ── Status Badge ────────────────────────────────────────────────────── */
+function _statusBadge(status){
+  var map = {
+    approved:  { bg:'var(--green-bg)',  color:'var(--green)',  label:_t('Hoàn thiện','Completed') },
+    active:    { bg:'var(--amber-bg)',  color:'var(--amber)',  label:_t('Đang xây dựng','In Progress') },
+    review:    { bg:'var(--purple-bg)', color:'var(--purple)', label:_t('Đang review','In Review') },
+    planned:   { bg:'var(--cyan-bg)',   color:'var(--cyan)',   label:_t('Kế hoạch','Planned') },
+    draft:     { bg:'var(--gray-100)',  color:'var(--gray-600)',label:_t('Nháp','Draft') },
   };
-
-  // ← THAY API ACTION PHÙ HỢP
-  _api('MODULE_CREATE_ACTION', payload).then(function(r){
-    if(r && r.ok){
-      _toast(_t('Tạo thành công!','Created successfully!'), 'success');
-      state.activeTab = 'tab1';
-      _loadTab('tab1');
-    } else {
-      _toast((r && r.error) || _t('Lỗi tạo mới','Error creating'), 'error');
-    }
-  }).catch(function(){
-    _toast(_t('Lỗi kết nối','Connection error'), 'error');
-  });
+  var s = map[status] || map.draft;
+  return '<span style="display:inline-flex;align-items:center;padding:2px 10px;border-radius:var(--radius-full);font-size:var(--text-xs);font-weight:var(--font-semibold);background:'+s.bg+';color:'+s.color+'">'+_esc(s.label)+'</span>';
 }
 
-function _applyFilters(){
-  state.pagination.offset = 0;
-  _loadList();
-}
-
-/* ── EXPORT ──────────────────────────────────────────────────────────────── */
-// ← ĐỔI TÊN EXPORT PHÙ HỢP VỚI MODULE
+/* ── Export ───────────────────────────────────────────────────────────── */
 window._renderTemplateModule = render;
 
 })();

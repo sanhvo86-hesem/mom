@@ -1257,10 +1257,17 @@ function renderSidebar(){
       <button class="nav-item ${currentPage==='energy-dashboard'?'active':''}" onclick="navigateTo('energy-dashboard')"><span class="icon">⚡</span><span>${lang==='en'?'Energy':'Năng lượng'}</span></button>
       <button class="nav-item ${currentPage==='deploy'?'active':''}" onclick="navigateTo('deploy')"><span class="icon">🚀</span><span>${lang==='en'?'Deploy':'Triển khai'}</span></button>
       <button class="nav-item ${currentPage==='customer-portal'?'active':''}" onclick="navigateTo('customer-portal')"><span class="icon">🌐</span><span>${lang==='en'?'Customer Portal':'Cổng khách hàng'}</span></button>
+      <button class="nav-item ${currentPage==='template-demo'?'active':''}" onclick="navigateTo('template-demo')" style="border:1px dashed rgba(255,255,255,0.3)"><span class="icon">🧩</span><span>${lang==='en'?'Template Demo':'Template Demo'}</span></button>
     </div>`;
   }
   if(isAdmin() && isPortalSidebarCoreVisible('admin')){
     html += `<div class="nav-section"><div class="nav-section-title">ADMIN</div><button class="nav-item ${currentPage==='admin'?'active':''}" onclick="navigateTo('admin')"><span class="icon">⚙</span><span>${T('admin_panel')}</span></button></div>`;
+  }
+
+  if(isAdmin()){
+    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'TEMPLATE LAB':'TEMPLATE LAB'}</div>
+      <button class="nav-item ${currentPage==='template-demo'?'active':''}" onclick="navigateTo('template-demo')"><span class="icon">🧩</span><span>${lang==='en'?'Master Module Template':'Master Module Template'}</span></button>
+    </div>`;
   }
 
   SIDEBAR_SECTIONS.forEach(sec => {
@@ -1308,6 +1315,7 @@ function navigateTo(page, filter, bypassGuard){
   trackPageView(page + (filter ? '/'+filter : ''), (pageTitles[page]||page) + (filter ? ' — '+filter : ''));
   
   const titles = {dashboard:T('bc_dashboard'),documents:T('bc_documents'),search:T('bc_search'),dictionary:T('bc_dictionary'),access:T('bc_access'),deploy:lang==='en'?'Operations Deployment':'Triển khai vận hành',mes:lang==='en'?'MES Control Center':'Trung tâm điều hành MES',exceptions:lang==='en'?'Exception Dashboard':'Bảng ngoại lệ',orders:lang==='en'?'Order Management':'Quản lý đơn hàng',forms:lang==='en'?'Evidence Control':'Kiểm soát chứng cứ','quality-exceptions':lang==='en'?'Quality Exception Hub':'Quản lý ngoại lệ chất lượng','supplier-quality':lang==='en'?'Supplier Quality':'Quản lý chất lượng NCC',quoting:lang==='en'?'Quoting & Estimation':'Báo giá & Ước tính',evidence:lang==='en'?'Evidence Vault':'Kho chứng cứ','customer-portal':lang==='en'?'Customer Portal Admin':'Quản trị cổng khách hàng','cnc-programs':lang==='en'?'CNC Programs':'Chương trình CNC','product-passport':lang==='en'?'Digital Product Passport':'Hộ chiếu sản phẩm số','ai-scheduling':lang==='en'?'AI Quality & Scheduling':'AI Chất lượng & Lịch trình','compliance-reports':lang==='en'?'Compliance Reports':'Báo cáo tuân thủ',fmea:lang==='en'?'FMEA & Control Plan':'FMEA & Control Plan','apqp-ppap':lang==='en'?'APQP / PPAP':'APQP / PPAP','mobile-shopfloor':lang==='en'?'Shop Floor Mobile':'Xưởng di động','knowledge-base':lang==='en'?'Knowledge Base':'Kho kiến thức','continuous-improvement':lang==='en'?'Continuous Improvement':'Cải tiến liên tục','energy-dashboard':lang==='en'?'Energy Monitor':'Giám sát năng lượng'};
+  titles['template-demo'] = 'Master Module Template';
   // Reset header breadcrumb for non-documents pages
   if(page !== 'documents'){
     const bcEl = document.getElementById('header-breadcrumb');
