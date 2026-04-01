@@ -1231,6 +1231,7 @@ function renderSidebar(){
       <button class="nav-item ${currentPage==='mes'?'active':''}" onclick="navigateTo('mes')"><span class="icon">🏭</span><span>${lang==='en'?'MES Control Center':'Trung tâm điều hành MES'}</span></button>
       <button class="nav-item ${currentPage==='exceptions'?'active':''}" onclick="navigateTo('exceptions')"><span class="icon">\u26a0\ufe0f</span><span>${lang==='en'?'Exception Dashboard':'B\u1ea3ng ngo\u1ea1i l\u1ec7'}</span></button>
       <button class="nav-item ${currentPage==='orders'?'active':''}" onclick="navigateTo('orders')"><span class="icon">📦</span><span>${lang==='en'?'Order Management':'Quản lý đơn hàng'}</span></button>
+      <button class="nav-item ${currentPage==='dispatch'?'active':''}" onclick="navigateTo('dispatch')"><span class="icon">📋</span><span>${lang==='en'?'Production Dispatch':'Phân công sản xuất'}</span></button>
       <button class="nav-item ${currentPage==='forms'?'active':''}" onclick="navigateTo('forms')"><span class="icon">📋</span><span>${lang==='en'?'Evidence Control':'Kiểm soát chứng cứ'}</span></button>
       <button class="nav-item ${currentPage==='quality-exceptions'?'active':''}" onclick="navigateTo('quality-exceptions')"><span class="icon">🔴</span><span>${lang==='en'?'Quality Exceptions':'Ngoại lệ chất lượng'}</span></button>
       <button class="nav-item ${currentPage==='supplier-quality'?'active':''}" onclick="navigateTo('supplier-quality')"><span class="icon">🏭</span><span>${lang==='en'?'Supplier Quality':'Chất lượng NCC'}</span></button>
@@ -1330,6 +1331,7 @@ function navigateTo(page, filter, bypassGuard){
   if(page==='knowledge-base' && typeof window._renderKnowledgeBase==='function'){ var kbp=document.getElementById('page-knowledge-base'); if(kbp) window._renderKnowledgeBase(kbp); }
   if(page==='continuous-improvement' && typeof window._renderContinuousImprovement==='function'){ var cip=document.getElementById('page-continuous-improvement'); if(cip) window._renderContinuousImprovement(cip); }
   if(page==='energy-dashboard' && typeof window._renderEnergyDashboard==='function'){ var edp=document.getElementById('page-energy-dashboard'); if(edp) window._renderEnergyDashboard(edp); }
+  if(page==='dispatch' && typeof window._renderProductionDispatch==='function'){ var dsp=document.getElementById('page-dispatch'); if(dsp) window._renderProductionDispatch(dsp); }
   if(page==='admin'){ if(!isAdmin()){navigateTo('dashboard');return;} renderAdmin(); }
   
   document.getElementById('page-'+page).classList.add('active');

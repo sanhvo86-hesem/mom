@@ -107,6 +107,7 @@ use HESEM\QMS\Api\Controllers\QuoteController;
 use HESEM\QMS\Api\Controllers\EvidenceController;
 use HESEM\QMS\Api\Controllers\FmeaController;
 use HESEM\QMS\Api\Controllers\ApqpController;
+use HESEM\QMS\Api\Controllers\DispatchController;
 use HESEM\QMS\Api\Controllers\MobileController;
 use HESEM\QMS\Api\Controllers\CncProgramController;
 use HESEM\QMS\Api\Controllers\ProductPassportController;
@@ -388,6 +389,18 @@ $router->actions([
     'mobile_resolve_conflict' => [MobileController::class, 'resolveConflict'],
     'mobile_shop_overview'    => [MobileController::class, 'getShopFloorOverview'],
     'mobile_dashboard'        => [MobileController::class, 'getOperatorDashboard'],
+]);
+
+// Production Dispatch & Shift Targets
+$router->actions([
+    'dispatch_timeline'          => [DispatchController::class, 'getTimeline'],
+    'dispatch_dashboard'         => [DispatchController::class, 'getDashboard'],
+    'dispatch_list_targets'      => [DispatchController::class, 'listTargets'],
+    'dispatch_create_target'     => [DispatchController::class, 'createTarget'],
+    'dispatch_update_target'     => [DispatchController::class, 'updateTarget'],
+    'dispatch_send'              => [DispatchController::class, 'dispatchTarget'],
+    'dispatch_operator_tasks'    => [DispatchController::class, 'getOperatorDispatch'],
+    'dispatch_report_production' => [DispatchController::class, 'reportProduction'],
 ]);
 
 // CNC Programs
