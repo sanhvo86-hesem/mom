@@ -1258,6 +1258,24 @@ function edMountFormDesignerDock(ctx){
   dock.innerHTML=edBuildFormDesignerDock();
 }
 
+function edBuildFormDesignerDock(){
+  const items=[
+    {kind:'formSection', title:'Section'},
+    {kind:'formGrid2', title:'2-column grid'},
+    {kind:'formTextField', title:'Text field'},
+    {kind:'formTextareaField', title:'Textarea'},
+    {kind:'formSelectField', title:'Dropdown'},
+    {kind:'formLookupField', title:'Lookup'},
+    {kind:'formSignatureRow', title:'Signatures'},
+    {kind:'formRecordStrip', title:'Record strip'}
+  ];
+  return '<div class="ed-form-dock-head"><strong>Form Blocks</strong><span>Insert FRM blocks into the live HTML canvas.</span></div>'
+    + '<div class="ed-form-dock-grid">' + items.map(function(item){
+      return '<button type="button" onmousedown="event.preventDefault();edSaveSelection();" onclick="edInsertQmsTemplate(\'' + item.kind + '\');event.stopPropagation()" title="' + _edEscapeHtml(item.title) + '">' + _edEscapeHtml(item.title) + '</button>';
+    }).join('') + '</div>'
+    + '<button type="button" class="ed-form-dock-manage" onmousedown="event.preventDefault()" onclick="if(window._mdOpenControl){window._mdOpenControl();}">' + _edEscapeHtml((lang!=='en') ? 'Mở dữ liệu nền' : 'Open master data') + '</button>';
+}
+
 function edQmsKindMeta(kind){
   const vi=lang!=='en';
   const map={
@@ -1643,6 +1661,114 @@ function edQmsFieldProps(block){
   };
 }
 
+function edQmsFieldProps(block){
+  if(!block) return null;
+  var label = block.querySelector('.qf-label');
+  var labelVi = label ? label.querySelector('.qf-label-vi') : null;
+  var helper = block.querySelector('.qf-helper');
+  var lookupHost = block.querySelector('.scar-lookup-host');
+  var control = lookupHost
+    ? (block.querySelector('input.qf-input.scar-hidden, input.qf-input[name], textarea.qf-textarea, select.qf-select') || lookupHost)
+    : (block.querySelector('textarea.qf-textarea, select.qf-select, input.qf-input[name]') || null);
+  var fieldId = control && control.id ? control.id : '';
+  var fieldName = control && control.name ? control.name : fieldId;
+  var placeholder = '';
+  var selectOptions = '';
+  if(control && control.tagName === 'SELECT'){
+    placeholder = control.options && control.options.length ? String(control.options[0].textContent || '').trim() : '';
+    selectOptions = Array.from(control.options || []).slice(1).map(function(option){
+      var value = String(option.value || '').trim();
+      var text = String(option.textContent || '').trim();
+      return value && value !== text ? value + ' | ' + text : text;
+    }).join('\n');
+  }else if(control && typeof control.getAttribute === 'function'){
+    placeholder = String(control.getAttribute('placeholder') || '').trim();
+  }
+  var labelText = '';
+  if(label){
+    labelText = Array.from(label.childNodes).filter(function(node){
+      return node.nodeType === 3;
+    }).map(function(node){ return String(node.textContent || '').trim(); }).join(' ').trim();
+  }
+  return {
+    label: labelText,
+    labelVi: labelVi ? String(labelVi.textContent || '').trim() : '',
+    helper: helper ? String(helper.textContent || '').trim() : '',
+    fieldId: fieldId,
+    fieldName: fieldName,
+    placeholder: placeholder,
+    required: !!(control && typeof control.hasAttribute === 'function' && control.hasAttribute('required')),
+    type: lookupHost ? 'lookup' : (control ? String(control.tagName || '').toLowerCase() === 'textarea' ? 'textarea' : String(control.tagName || '').toLowerCase() === 'select' ? 'select' : String(control.type || 'text').toLowerCase() : 'text'),
+    width: block.classList.contains('qf-col-span-3') ? '3' : (block.classList.contains('qf-col-span-2') ? '2' : '1'),
+    lookupSource: String(block.dataset.lookupSource || '').trim(),
+    selectOptions: selectOptions
+  };
+}
+
+function edQmsLookupPreview(source){
+  if(!source) return [];
+  try{
+    if(typeof window._mdLookupOptions === 'function'){
+      return (window._mdLookupOptions(source) || []).slice(0, 8);
+    }
+  }catch(_err){}
+  return [];
+}
+
+function edQmsParseSelectOptions(raw){
+  return String(raw || '').split(/\r?\n/).map(function(line){
+    var next = String(line || '').trim();
+    if(!next) return null;
+    var parts = next.split('|');
+    if(parts.length > 1){
+      var value = String(parts.shift() || '').trim();
+      var label = String(parts.join('|') || '').trim();
+      if(!value && !label) return null;
+      return { value:value || label, label:label || value };
+    }
+    return { value:next, label:next };
+  }).filter(Boolean);
+}
+
+function edRefreshQmsFieldTypeUi(){
+  var typeSel = document.getElementById('ed-qms-field-type');
+  var sourceSel = document.getElementById('ed-qms-field-source');
+  var selectWrap = document.getElementById('ed-qms-field-select-wrap');
+  var lookupWrap = document.getElementById('ed-qms-field-lookup-wrap');
+  var preview = document.getElementById('ed-qms-lookup-preview');
+  var type = typeSel ? String(typeSel.value || '').trim() : 'text';
+  var source = sourceSel ? String(sourceSel.value || '').trim() : '';
+  if(selectWrap) selectWrap.style.display = (type === 'select') ? 'block' : 'none';
+  if(lookupWrap) lookupWrap.style.display = (type === 'lookup') ? 'block' : 'none';
+  if(!preview) return;
+  if(type !== 'lookup'){
+    preview.innerHTML = '';
+    return;
+  }
+  if(!source){
+    preview.innerHTML = '<div class="ed-qms-prop-note">Chọn nguồn dữ liệu nền để xem nội dung droplist.</div>';
+    return;
+  }
+  var items = edQmsLookupPreview(source);
+  if(!items.length){
+    preview.innerHTML = '<div class="ed-qms-prop-note">Chưa có bản ghi trong nguồn dữ liệu này.</div>';
+    return;
+  }
+  preview.innerHTML = '<ul>' + items.map(function(item){
+    return '<li><strong>' + _edEscapeHtml(String(item.label || item.value || '')) + '</strong><span>' + _edEscapeHtml(String(item.value || '')) + '</span></li>';
+  }).join('') + '</ul>';
+}
+
+function edOpenQmsLookupSource(){
+  var sourceSel = document.getElementById('ed-qms-field-source');
+  var source = sourceSel ? String(sourceSel.value || '').trim() : '';
+  if(typeof window._mdOpenControl === 'function'){
+    window._mdOpenControl(source || 'suppliers');
+    return;
+  }
+  if(typeof toast === 'function') toast('Không mở được quản lý dữ liệu nền.', 'warn');
+}
+
 function edQmsSectionProps(block){
   if(!block) return null;
   var titleEl = block.querySelector('.qf-section-title');
@@ -1684,6 +1810,53 @@ function edQmsReplaceFieldControl(block, cfg){
     html = '<textarea class="qf-textarea" id="' + fieldId + '" name="' + fieldName + '"' + requiredAttr + ' rows="4" placeholder="' + placeholder + '"></textarea>';
   }else if(type === 'select'){
     html = '<select class="qf-select" id="' + fieldId + '" name="' + fieldName + '"' + requiredAttr + '><option value="">' + _edEscapeHtml(cfg.placeholder || 'Chọn') + '</option><option>Option A</option><option>Option B</option></select>';
+  }else if(type === 'lookup'){
+    html = '<div class="scar-lookup-host" id="' + fieldId + '_lookup"></div><input class="qf-input scar-hidden" id="' + fieldId + '" name="' + fieldName + '"' + requiredAttr + ' placeholder="' + placeholder + '"/>';
+  }else{
+    var inputType = ['date','number','email'].indexOf(type) >= 0 ? type : 'text';
+    html = '<input class="qf-input" id="' + fieldId + '" name="' + fieldName + '"' + requiredAttr + ' type="' + inputType + '" placeholder="' + placeholder + '"/>';
+  }
+  var frag = document.createElement('template');
+  frag.innerHTML = html;
+  Array.from(frag.content.childNodes).forEach(function(node){
+    block.insertBefore(node, insertBefore);
+  });
+}
+
+function edQmsReplaceFieldControl(block, cfg){
+  if(!block) return;
+  var helper = block.querySelector('.qf-helper');
+  var dv = block.querySelector('.qf-dv');
+  var error = block.querySelector('.qf-error-msg');
+  block.querySelectorAll('.scar-lookup-host,input.qf-input,select.qf-select,textarea.qf-textarea,datalist').forEach(function(node){
+    if(node === dv || node === error) return;
+    if(helper && node === helper) return;
+    node.remove();
+  });
+  var insertBefore = dv || helper || error || null;
+  var type = String(cfg.type || 'text').trim();
+  var requiredAttr = cfg.required ? ' required' : '';
+  var placeholder = _edEscapeHtml(cfg.placeholder || '');
+  var fieldId = _edEscapeHtml(cfg.fieldId || 'field_code');
+  var fieldName = _edEscapeHtml(cfg.fieldName || cfg.fieldId || 'field_code');
+  var options = Array.isArray(cfg.options) ? cfg.options : [];
+  var html = '';
+  if(type === 'textarea'){
+    html = '<textarea class="qf-textarea" id="' + fieldId + '" name="' + fieldName + '"' + requiredAttr + ' rows="4" placeholder="' + placeholder + '"></textarea>';
+  }else if(type === 'select'){
+    if(!options.length){
+      options = [
+        { value:'OPTION_A', label:'Option A' },
+        { value:'OPTION_B', label:'Option B' }
+      ];
+    }
+    html = '<select class="qf-select" id="' + fieldId + '" name="' + fieldName + '"' + requiredAttr + '><option value="">' + _edEscapeHtml(cfg.placeholder || 'Chọn') + '</option>'
+      + options.map(function(option){
+        var value = String((option && option.value) || '').trim();
+        var label = String((option && option.label) || value).trim();
+        return '<option value="' + _edEscapeHtml(value) + '">' + _edEscapeHtml(label) + '</option>';
+      }).join('')
+      + '</select>';
   }else if(type === 'lookup'){
     html = '<div class="scar-lookup-host" id="' + fieldId + '_lookup"></div><input class="qf-input scar-hidden" id="' + fieldId + '" name="' + fieldName + '"' + requiredAttr + ' placeholder="' + placeholder + '"/>';
   }else{
@@ -1823,6 +1996,135 @@ function edApplyQmsFieldProps(){
     fieldName: fieldName,
     placeholder: placeholder,
     required: required
+  });
+  edQmsApplyFieldWidth(block, fieldWidth);
+  edMarkModified();
+  edUpdateState();
+  edSelectQmsBlock(block);
+  edCloseModal();
+}
+
+function edEditQmsBlockProperties(block){
+  if(!block) return;
+  var vi = lang !== 'en';
+  var isSection = block.classList.contains('qf-section') || String(block.dataset.qmsKind || '') === 'formSection';
+  var isField = block.classList.contains('qf-field');
+  var root = edGetModalRoot();
+  if(isSection){
+    var props = edQmsSectionProps(block) || { number:'', title:'', subtitle:'', tone:'info' };
+    root.innerHTML =
+      '<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal ed-qms-prop-modal">' +
+      '<h4>' + (vi ? '⚙ Thuộc tính section form' : '⚙ Form section properties') + '</h4>' +
+      '<label>' + (vi ? 'Số section' : 'Section number') + '</label><input id="ed-qms-sec-number" value="' + _edEscapeHtml(props.number) + '">' +
+      '<label>' + (vi ? 'Tiêu đề tiếng Anh' : 'English title') + '</label><input id="ed-qms-sec-title" value="' + _edEscapeHtml(props.title) + '">' +
+      '<label>' + (vi ? 'Giải thích tiếng Việt' : 'Vietnamese explanation') + '</label><textarea id="ed-qms-sec-subtitle" rows="4">' + _edEscapeHtml(props.subtitle) + '</textarea>' +
+      '<label>' + (vi ? 'Màu/loại section' : 'Section tone') + '</label><select id="ed-qms-sec-tone">' +
+      ['info','warning','error','success'].map(function(tone){
+        return '<option value="' + tone + '"' + (props.tone === tone ? ' selected' : '') + '>' + tone + '</option>';
+      }).join('') + '</select>' +
+      '<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">' + (vi ? 'Hủy' : 'Cancel') + '</button>' +
+      '<button class="ed-m-ok" onclick="edApplyQmsSectionProps()">' + (vi ? 'Áp dụng' : 'Apply') + '</button></div></div></div>';
+    root._qmsBlock = block;
+    return;
+  }
+  if(isField){
+    var fp = edQmsFieldProps(block) || {};
+    var sourceOptions = edQmsLookupSources().map(function(source){
+      return '<option value="' + source + '"' + (fp.lookupSource === source ? ' selected' : '') + '>' + source + '</option>';
+    }).join('');
+    root.innerHTML =
+      '<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal ed-qms-prop-modal">' +
+      '<h4>' + (vi ? '⚙ Thuộc tính field form' : '⚙ Form field properties') + '</h4>' +
+      '<label>' + (vi ? 'Nhãn tiếng Anh' : 'English label') + '</label><input id="ed-qms-field-label" value="' + _edEscapeHtml(fp.label || '') + '">' +
+      '<label>' + (vi ? 'Nhãn tiếng Việt' : 'Vietnamese label') + '</label><input id="ed-qms-field-label-vi" value="' + _edEscapeHtml(fp.labelVi || '') + '">' +
+      '<label>' + (vi ? 'Giải thích tiếng Việt' : 'Vietnamese helper') + '</label><textarea id="ed-qms-field-helper" rows="3">' + _edEscapeHtml(fp.helper || '') + '</textarea>' +
+      '<div class="ed-qms-prop-grid"><div><label>ID</label><input id="ed-qms-field-id" value="' + _edEscapeHtml(fp.fieldId || '') + '"></div><div><label>' + (vi ? 'Tên field' : 'Field name') + '</label><input id="ed-qms-field-name" value="' + _edEscapeHtml(fp.fieldName || '') + '"></div></div>' +
+      '<div class="ed-qms-prop-grid"><div><label>' + (vi ? 'Loại field' : 'Field type') + '</label><select id="ed-qms-field-type">' +
+      [
+        ['text', vi ? 'Text 1 dòng' : 'Text'],
+        ['textarea', vi ? 'Textarea' : 'Textarea'],
+        ['select', vi ? 'Dropdown' : 'Dropdown'],
+        ['lookup', vi ? 'Lookup dữ liệu nền' : 'Master-data lookup'],
+        ['date', vi ? 'Ngày' : 'Date'],
+        ['number', vi ? 'Số' : 'Number']
+      ].map(function(item){
+        return '<option value="' + item[0] + '"' + (fp.type === item[0] ? ' selected' : '') + '>' + _edEscapeHtml(item[1]) + '</option>';
+      }).join('') + '</select></div><div><label>' + (vi ? 'Độ rộng' : 'Width') + '</label><select id="ed-qms-field-width">' +
+      [['1',vi?'1 cột':'1 column'],['2',vi?'2 cột':'2 columns'],['3',vi?'Toàn hàng':'Full row']].map(function(item){
+        return '<option value="' + item[0] + '"' + (fp.width === item[0] ? ' selected' : '') + '>' + _edEscapeHtml(item[1]) + '</option>';
+      }).join('') + '</select></div></div>' +
+      '<label>' + (vi ? 'Placeholder / ghi chú nhập liệu' : 'Placeholder') + '</label><input id="ed-qms-field-placeholder" value="' + _edEscapeHtml(fp.placeholder || '') + '">' +
+      '<div id="ed-qms-field-select-wrap">' +
+        '<label>' + (vi ? 'Nội dung dropdown' : 'Dropdown items') + '</label>' +
+        '<textarea id="ed-qms-field-options" rows="6" placeholder="value | label&#10;open | Mở&#10;closed | Đóng">' + _edEscapeHtml(fp.selectOptions || '') + '</textarea>' +
+        '<div class="ed-qms-prop-note">' + (vi ? 'Mỗi dòng là một lựa chọn. Có thể dùng mẫu: value | label.' : 'Use one option per line. Format: value | label.') + '</div>' +
+      '</div>' +
+      '<div id="ed-qms-field-lookup-wrap">' +
+        '<label>' + (vi ? 'Nguồn lookup dữ liệu nền' : 'Lookup source') + '</label><select id="ed-qms-field-source"><option value="">' + (vi ? 'Không dùng' : 'None') + '</option>' + sourceOptions + '</select>' +
+        '<div class="ed-qms-prop-actions"><button type="button" class="ed-qms-secondary" onclick="edOpenQmsLookupSource()">' + (vi ? 'Mở quản lý dữ liệu nền' : 'Open master data') + '</button></div>' +
+        '<div class="ed-qms-prop-note">' + (vi ? 'Xem nhanh nội dung droplist đang dùng cho field lookup này.' : 'Preview the current lookup items for this field.') + '</div>' +
+        '<div class="ed-qms-lookup-preview" id="ed-qms-lookup-preview"></div>' +
+      '</div>' +
+      '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="ed-qms-field-required"' + (fp.required ? ' checked' : '') + '> ' + (vi ? 'Trường bắt buộc' : 'Required field') + '</label>' +
+      '<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">' + (vi ? 'Hủy' : 'Cancel') + '</button>' +
+      '<button class="ed-m-ok" onclick="edApplyQmsFieldProps()">' + (vi ? 'Áp dụng' : 'Apply') + '</button></div></div></div>';
+    root._qmsBlock = block;
+    var typeSel = document.getElementById('ed-qms-field-type');
+    var sourceSel = document.getElementById('ed-qms-field-source');
+    if(typeSel) typeSel.addEventListener('change', edRefreshQmsFieldTypeUi);
+    if(sourceSel) sourceSel.addEventListener('change', edRefreshQmsFieldTypeUi);
+    edRefreshQmsFieldTypeUi();
+    return;
+  }
+  edDomActive = true;
+  var panel = document.getElementById('ed-dom-panel');
+  if(panel) panel.style.display = 'flex';
+  edDomRefresh();
+  try{
+    edDomSelected = block;
+    edDomShowProps(block);
+  }catch(e){}
+}
+
+function edApplyQmsFieldProps(){
+  var root = edGetModalRoot();
+  var block = root._qmsBlock;
+  if(!block) return edCloseModal();
+  var labelText = String((document.getElementById('ed-qms-field-label') || {}).value || '').trim();
+  var labelVi = String((document.getElementById('ed-qms-field-label-vi') || {}).value || '').trim();
+  var helper = String((document.getElementById('ed-qms-field-helper') || {}).value || '').trim();
+  var fieldId = String((document.getElementById('ed-qms-field-id') || {}).value || '').trim() || 'field_code';
+  var fieldName = String((document.getElementById('ed-qms-field-name') || {}).value || '').trim() || fieldId;
+  var fieldType = String((document.getElementById('ed-qms-field-type') || {}).value || 'text').trim();
+  var fieldWidth = String((document.getElementById('ed-qms-field-width') || {}).value || '1').trim();
+  var placeholder = String((document.getElementById('ed-qms-field-placeholder') || {}).value || '').trim();
+  var lookupSource = String((document.getElementById('ed-qms-field-source') || {}).value || '').trim();
+  var selectOptions = edQmsParseSelectOptions(String((document.getElementById('ed-qms-field-options') || {}).value || ''));
+  var required = !!((document.getElementById('ed-qms-field-required') || {}).checked);
+  var label = block.querySelector('.qf-label');
+  var helperEl = block.querySelector('.qf-helper');
+  var dv = block.querySelector('.qf-dv');
+  var error = block.querySelector('.qf-error-msg');
+  if(label){
+    label.innerHTML = _edEscapeHtml(labelText || 'FIELD LABEL')
+      + (required ? ' <span class="qf-required">*</span>' : '')
+      + '<span class="qf-label-vi">' + _edEscapeHtml(labelVi) + '</span>';
+    label.setAttribute('for', fieldType === 'lookup' ? fieldId + '_lookup' : fieldId);
+  }
+  if(helperEl) helperEl.textContent = helper || '';
+  if(dv) dv.id = fieldId + '__dv';
+  if(error) error.setAttribute('data-error-for', fieldId);
+  block.dataset.lookupSource = fieldType === 'lookup' ? lookupSource : '';
+  block.dataset.qmsKind = fieldType === 'lookup' ? 'formLookupField' :
+    (fieldType === 'textarea' ? 'formTextareaField' :
+    (fieldType === 'select' ? 'formSelectField' : 'formTextField'));
+  edQmsReplaceFieldControl(block, {
+    type: fieldType,
+    fieldId: fieldId,
+    fieldName: fieldName,
+    placeholder: placeholder,
+    required: required,
+    options: selectOptions
   });
   edQmsApplyFieldWidth(block, fieldWidth);
   edMarkModified();
