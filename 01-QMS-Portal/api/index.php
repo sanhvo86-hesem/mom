@@ -104,6 +104,9 @@ use HESEM\QMS\Api\Controllers\ExceptionController;
 use HESEM\QMS\Api\Controllers\SupplierController;
 use HESEM\QMS\Api\Controllers\QuoteController;
 use HESEM\QMS\Api\Controllers\EvidenceController;
+use HESEM\QMS\Api\Controllers\FmeaController;
+use HESEM\QMS\Api\Controllers\ApqpController;
+use HESEM\QMS\Api\Controllers\MobileController;
 use HESEM\QMS\Database\DataLayer;
 
 // ── Bootstrap DataLayer ─────────────────────────────────────────────────────
@@ -322,6 +325,55 @@ $router->actions([
     'evidence_chain_custody'  => [EvidenceController::class, 'chainOfCustody'],
     'evidence_verify_chain'   => [EvidenceController::class, 'verifyChain'],
     'evidence_search'         => [EvidenceController::class, 'search'],
+]);
+
+// FMEA & Control Plan
+$router->actions([
+    'fmea_list'               => [FmeaController::class, 'listFmeas'],
+    'fmea_detail'             => [FmeaController::class, 'getFmeaDetail'],
+    'fmea_create'             => [FmeaController::class, 'createFmea'],
+    'fmea_update'             => [FmeaController::class, 'updateFmea'],
+    'fmea_add_failure_mode'   => [FmeaController::class, 'addFailureMode'],
+    'fmea_update_failure_mode'=> [FmeaController::class, 'updateFailureMode'],
+    'fmea_add_action'         => [FmeaController::class, 'addAction'],
+    'fmea_complete_action'    => [FmeaController::class, 'completeAction'],
+    'fmea_generate_cp'        => [FmeaController::class, 'generateControlPlan'],
+    'fmea_control_plans'      => [FmeaController::class, 'listControlPlans'],
+    'fmea_cp_detail'          => [FmeaController::class, 'getControlPlanDetail'],
+    'fmea_rpn_trend'          => [FmeaController::class, 'getRpnTrend'],
+    'fmea_link_ncr'           => [FmeaController::class, 'linkNcrToFmea'],
+]);
+
+// APQP / PPAP
+$router->actions([
+    'apqp_list'               => [ApqpController::class, 'listProjects'],
+    'apqp_detail'             => [ApqpController::class, 'getProjectDetail'],
+    'apqp_create'             => [ApqpController::class, 'createProject'],
+    'apqp_update'             => [ApqpController::class, 'updateProject'],
+    'apqp_advance_phase'      => [ApqpController::class, 'advancePhase'],
+    'apqp_gate_review'        => [ApqpController::class, 'submitGateReview'],
+    'apqp_gate_approve'       => [ApqpController::class, 'approveGate'],
+    'apqp_gate_reject'        => [ApqpController::class, 'rejectGate'],
+    'apqp_ppap_create'        => [ApqpController::class, 'createPpapSubmission'],
+    'apqp_ppap_element'       => [ApqpController::class, 'updatePpapElement'],
+    'apqp_ppap_response'      => [ApqpController::class, 'recordCustomerResponse'],
+    'apqp_deliverables'       => [ApqpController::class, 'getPhaseDeliverables'],
+    'apqp_dashboard'          => [ApqpController::class, 'getDashboard'],
+]);
+
+// Mobile Shop Floor
+$router->actions([
+    'mobile_my_queue'         => [MobileController::class, 'getMyQueue'],
+    'mobile_start_task'       => [MobileController::class, 'startTask'],
+    'mobile_complete_task'    => [MobileController::class, 'completeTask'],
+    'mobile_clock_in'         => [MobileController::class, 'clockIn'],
+    'mobile_clock_out'        => [MobileController::class, 'clockOut'],
+    'mobile_capture_inspection' => [MobileController::class, 'captureInspection'],
+    'mobile_sync_batch'       => [MobileController::class, 'submitOfflineBatch'],
+    'mobile_sync_status'      => [MobileController::class, 'getSyncStatus'],
+    'mobile_resolve_conflict' => [MobileController::class, 'resolveConflict'],
+    'mobile_shop_overview'    => [MobileController::class, 'getShopFloorOverview'],
+    'mobile_dashboard'        => [MobileController::class, 'getOperatorDashboard'],
 ]);
 
 // ── Register RESTful Routes ─────────────────────────────────────────────────
