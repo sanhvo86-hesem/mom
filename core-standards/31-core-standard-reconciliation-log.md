@@ -124,7 +124,28 @@ Hiện file này đã được giữ ở trạng thái tương thích ngược, 
 
 ---
 
-## E. Quy tắc tạm thời trước khi có quyết định
+## E. Nợ chuẩn hóa còn lại trong chính `core-standards/`
+
+Các file sau vẫn còn một lượng đáng kể tiếng Việt không dấu / half-English trong thân tài liệu, dù logic chuẩn của chúng nhìn chung đã rõ:
+
+- `19-role-boundary-jd-linking-and-role-codes.md`
+- `20-department-boundary-handbook-codes.md`
+- `22-jd-header-and-department-code-governance.md`
+- `26-wi-archetypes-and-qa-guide.md`
+- `27-annex-archetypes-and-qa-guide.md`
+- `28-pou-visual-and-machine-side-rules.md`
+- `29-wi-annex-research-redraft-method.md`
+- `30-wi-annex-translation-role-bundle-rules.md`
+
+Đây là **debt biên tập/ngôn ngữ**, không phải quyết định governance mới. Khi làm vòng polish tiếp theo trong `core-standards/`, nên ưu tiên normalize các file này về:
+
+1. tiếng Việt có dấu đầy đủ;
+2. tiêu đề/heading nhất quán;
+3. thuật ngữ đã khóa ở `01`, `03`, `19`, `20`, `23`, `25`.
+
+---
+
+## F. Quy tắc tạm thời trước khi có quyết định
 
 1. Nếu có xung đột, áp dụng thứ bậc trong `README.md`.
 2. Không tự đổi canonical name của security group SharePoint cho tới khi xác nhận tenant.
