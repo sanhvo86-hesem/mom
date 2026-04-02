@@ -26,6 +26,81 @@ class LogisticsController extends BaseController
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
     }
 
+    private function logisticsReadRoles(): array
+    {
+        return [
+            'admin',
+            'it_admin',
+            'ceo',
+            'production_director',
+            'supply_chain_manager',
+            'buyer',
+            'warehouse_clerk',
+            'logistics_coordinator',
+            'customer_service',
+            'sales_manager',
+            'qa_manager',
+            'quality_engineer',
+            'qc_inspector',
+        ];
+    }
+
+    private function subcontractWriteRoles(): array
+    {
+        return [
+            'admin',
+            'it_admin',
+            'ceo',
+            'production_director',
+            'supply_chain_manager',
+            'buyer',
+            'logistics_coordinator',
+        ];
+    }
+
+    private function receivingRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            $this->subcontractWriteRoles(),
+            ['qa_manager', 'quality_engineer', 'qc_inspector', 'warehouse_clerk']
+        )));
+    }
+
+    private function packingWriteRoles(): array
+    {
+        return [
+            'admin',
+            'it_admin',
+            'ceo',
+            'production_director',
+            'supply_chain_manager',
+            'logistics_coordinator',
+            'warehouse_clerk',
+            'customer_service',
+            'sales_manager',
+        ];
+    }
+
+    private function requireLogisticsReadAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->logisticsReadRoles());
+    }
+
+    private function requireSubcontractWriteAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->subcontractWriteRoles());
+    }
+
+    private function requireReceivingAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->receivingRoles());
+    }
+
+    private function requirePackingWriteAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->packingWriteRoles());
+    }
+
     /**
      * Generate a sequential number: PREFIX-YYYY-NNNN.
      *
@@ -59,7 +134,8 @@ class LogisticsController extends BaseController
      */
     public function subcontract_list(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireLogisticsReadAccess($user);
 
         $status   = $this->query('status');
         $vendorId = $this->query('vendor_id');
@@ -96,6 +172,7 @@ class LogisticsController extends BaseController
     public function subcontract_create(): never
     {
         $user = $this->requireAuth();
+        $this->requireSubcontractWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -160,6 +237,7 @@ class LogisticsController extends BaseController
     public function subcontract_update(): never
     {
         $user = $this->requireAuth();
+        $this->requireSubcontractWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -218,6 +296,7 @@ class LogisticsController extends BaseController
     public function subcontract_receive(): never
     {
         $user = $this->requireAuth();
+        $this->requireReceivingAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -281,7 +360,8 @@ class LogisticsController extends BaseController
      */
     public function oqc_list(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireLogisticsReadAccess($user);
 
         $status   = $this->query('status');
         $soNumber = $this->query('so_number');
@@ -318,6 +398,7 @@ class LogisticsController extends BaseController
     public function oqc_create(): never
     {
         $user = $this->requireAuth();
+        $this->requireReceivingAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -388,6 +469,7 @@ class LogisticsController extends BaseController
     public function oqc_update(): never
     {
         $user = $this->requireAuth();
+        $this->requireReceivingAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -459,6 +541,7 @@ class LogisticsController extends BaseController
     public function packing_create(): never
     {
         $user = $this->requireAuth();
+        $this->requirePackingWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -513,6 +596,7 @@ class LogisticsController extends BaseController
     public function packing_update(): never
     {
         $user = $this->requireAuth();
+        $this->requirePackingWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -574,7 +658,8 @@ class LogisticsController extends BaseController
      */
     public function packing_list(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireLogisticsReadAccess($user);
 
         $status   = $this->query('status');
         $soNumber = $this->query('so_number');
@@ -613,6 +698,7 @@ class LogisticsController extends BaseController
     public function delivery_confirm(): never
     {
         $user = $this->requireAuth();
+        $this->requirePackingWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();

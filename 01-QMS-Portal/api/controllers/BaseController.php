@@ -262,15 +262,15 @@ abstract class BaseController
     }
 
     /**
-     * Require the current user to hold at least one of the allowed roles.
+     * Check whether the current user holds at least one of the allowed roles.
      *
      * Role checks are normalized through the legacy migration map so
      * old role codes continue to work with the standardized controllers.
      *
      * @param array<int, string> $roles Allowed role codes.
-     * @return void
+     * @return bool
      */
-    protected function requireAnyRole(array $user, array $roles): void
+    protected function userHasAnyRole(array $user, array $roles): bool
     {
         $allowed = array_values(array_unique(array_filter(array_map(
             static fn($role) => migrate_role(strtolower(trim((string)$role))),
@@ -281,11 +281,27 @@ abstract class BaseController
         foreach ($userRoles as $role) {
             $normalized = migrate_role(strtolower(trim((string)$role)));
             if ($normalized !== '' && in_array($normalized, $allowed, true)) {
-                return;
+                return true;
             }
         }
 
-        $this->error('forbidden', 403);
+        return false;
+    }
+
+    /**
+     * Require the current user to hold at least one of the allowed roles.
+     *
+     * Role checks are normalized through the legacy migration map so
+     * old role codes continue to work with the standardized controllers.
+     *
+     * @param array<int, string> $roles Allowed role codes.
+     * @return void
+     */
+    protected function requireAnyRole(array $user, array $roles): void
+    {
+        if (!$this->userHasAnyRole($user, $roles)) {
+            $this->error('forbidden', 403);
+        }
     }
 
     /**

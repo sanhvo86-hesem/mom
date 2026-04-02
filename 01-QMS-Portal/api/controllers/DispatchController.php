@@ -26,6 +26,68 @@ class DispatchController extends BaseController
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
     }
 
+    private function dispatchReadRoles(): array
+    {
+        return [
+            'admin',
+            'it_admin',
+            'ceo',
+            'production_director',
+            'cnc_workshop_manager',
+            'production_planner',
+            'shift_leader',
+            'qa_manager',
+            'process_engineer',
+            'engineering_lead',
+            'quality_engineer',
+        ];
+    }
+
+    private function dispatchWriteRoles(): array
+    {
+        return [
+            'admin',
+            'it_admin',
+            'ceo',
+            'production_director',
+            'cnc_workshop_manager',
+            'production_planner',
+            'shift_leader',
+            'process_engineer',
+            'engineering_lead',
+        ];
+    }
+
+    private function dispatchOperatorRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            $this->dispatchWriteRoles(),
+            [
+                'operator',
+                'cnc_operator',
+                'setup_technician',
+                'cam_nc_programmer',
+                'cleaning_packaging_supervisor',
+                'cleaning_packaging_technician',
+            ]
+        )));
+    }
+
+    private function requireDispatchReadAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->dispatchReadRoles());
+    }
+
+    private function requireDispatchWriteAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->dispatchWriteRoles());
+    }
+
+    private function requireDispatchOperatorAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->dispatchOperatorRoles());
+    }
+
     // nowIso() inherited from BaseController
 
     // â”€â”€ Shift Targets (Planner creates dispatch plan) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -36,7 +98,8 @@ class DispatchController extends BaseController
      */
     public function getTimeline(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireDispatchReadAccess($user);
 
         $startDate = $this->query('start_date') ?? date('Y-m-d');
         $endDate   = $this->query('end_date') ?? date('Y-m-d', strtotime('+7 days'));
@@ -93,6 +156,7 @@ class DispatchController extends BaseController
     public function createTarget(): never
     {
         $user = $this->requireAuth();
+        $this->requireDispatchWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -152,6 +216,7 @@ class DispatchController extends BaseController
     public function dispatchTarget(): never
     {
         $user = $this->requireAuth();
+        $this->requireDispatchWriteAccess($user);
         $this->requireCsrf();
 
         $body     = $this->jsonBody();
@@ -195,9 +260,17 @@ class DispatchController extends BaseController
     public function getOperatorDispatch(): never
     {
         $user = $this->requireAuth();
+        $this->requireDispatchOperatorAccess($user);
 
-        $operatorId = $this->query('operator_id') ?? $this->userId($user);
-        $date       = $this->query('date') ?? date('Y-m-d');
+        $currentUserId = $this->userId($user);
+        $operatorId    = trim((string)($this->query('operator_id') ?? $currentUserId));
+        if ($operatorId === '') {
+            $operatorId = $currentUserId;
+        }
+        if ($operatorId !== $currentUserId && !$this->userHasAnyRole($user, $this->dispatchWriteRoles())) {
+            $this->error('forbidden', 403);
+        }
+        $date = $this->query('date') ?? date('Y-m-d');
 
         try {
             $file    = $this->dispatchDir() . '/targets.json';
@@ -248,6 +321,7 @@ class DispatchController extends BaseController
     public function reportProduction(): never
     {
         $user = $this->requireAuth();
+        $this->requireDispatchOperatorAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -276,6 +350,9 @@ class DispatchController extends BaseController
             unset($t);
 
             if (!$target) $this->error('target_not_found', 404);
+            if (($target['operator_id'] ?? '') !== '' && ($target['operator_id'] ?? '') !== $uid && !$this->userHasAnyRole($user, $this->dispatchWriteRoles())) {
+                $this->error('forbidden', 403);
+            }
 
             $this->writeJsonFile($tFile, $targets);
 
@@ -366,7 +443,8 @@ class DispatchController extends BaseController
      */
     public function getDashboard(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireDispatchReadAccess($user);
 
         $date = $this->query('date') ?? date('Y-m-d');
 
@@ -434,7 +512,8 @@ class DispatchController extends BaseController
      */
     public function listTargets(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireDispatchReadAccess($user);
 
         $startDate  = $this->query('start_date');
         $endDate    = $this->query('end_date');
@@ -477,6 +556,7 @@ class DispatchController extends BaseController
     public function updateTarget(): never
     {
         $user = $this->requireAuth();
+        $this->requireDispatchWriteAccess($user);
         $this->requireCsrf();
 
         $body     = $this->jsonBody();

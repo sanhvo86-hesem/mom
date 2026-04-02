@@ -29,6 +29,90 @@ final class DashboardController extends BaseController
     private KpiEngine        $kpi;
     private SpcEngine        $spc;
 
+    private function analyticsReadRoles(): array
+    {
+        return [
+            'admin',
+            'it_admin',
+            'ceo',
+            'production_director',
+            'qa_manager',
+            'sales_manager',
+            'finance_manager',
+            'supply_chain_manager',
+            'production_planner',
+            'engineering_lead',
+            'process_engineer',
+            'quality_engineer',
+            'qc_inspector',
+            'qms_engineer',
+            'internal_auditor',
+            'buyer',
+            'customer_service',
+            'logistics_coordinator',
+            'warehouse_clerk',
+        ];
+    }
+
+    private function executiveDashboardRoles(): array
+    {
+        return [
+            'admin',
+            'it_admin',
+            'ceo',
+            'production_director',
+            'qa_manager',
+            'sales_manager',
+            'finance_manager',
+            'supply_chain_manager',
+            'engineering_lead',
+            'production_planner',
+            'internal_auditor',
+        ];
+    }
+
+    private function qualityAnalyticsRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            $this->executiveDashboardRoles(),
+            ['quality_engineer', 'qc_inspector', 'qms_engineer']
+        )));
+    }
+
+    private function productionAnalyticsRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            $this->executiveDashboardRoles(),
+            ['cnc_workshop_manager', 'shift_leader', 'process_engineer', 'setup_technician']
+        )));
+    }
+
+    private function supplierAnalyticsRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            $this->executiveDashboardRoles(),
+            ['buyer', 'customer_service', 'logistics_coordinator', 'warehouse_clerk', 'quality_engineer']
+        )));
+    }
+
+    private function spcRoles(): array
+    {
+        return [
+            'admin',
+            'it_admin',
+            'ceo',
+            'production_director',
+            'qa_manager',
+            'quality_engineer',
+            'qc_inspector',
+            'qms_engineer',
+            'process_engineer',
+            'engineering_lead',
+            'cnc_workshop_manager',
+            'production_planner',
+        ];
+    }
+
     // â”€â”€ Construction â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     public function __construct(DataLayer $data, string $rootDir, string $dataDir)
@@ -137,7 +221,8 @@ final class DashboardController extends BaseController
      */
     public function executive(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->executiveDashboardRoles());
         $period = $this->parsePeriod();
         $data   = $this->dashboard->getExecutiveDashboard($period);
         $this->success($data);
@@ -149,7 +234,8 @@ final class DashboardController extends BaseController
      */
     public function quality(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->qualityAnalyticsRoles());
         $period = $this->parsePeriod();
         $data   = $this->dashboard->getQualityDashboard($period);
         $this->success($data);
@@ -161,7 +247,8 @@ final class DashboardController extends BaseController
      */
     public function production(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->productionAnalyticsRoles());
         $period = $this->parsePeriod();
         $data   = $this->dashboard->getProductionDashboard($period);
         $this->success($data);
@@ -173,7 +260,8 @@ final class DashboardController extends BaseController
      */
     public function supplier(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->supplierAnalyticsRoles());
         $period = $this->parsePeriod();
         $data   = $this->dashboard->getSupplierDashboard($period);
         $this->success($data);
@@ -185,7 +273,8 @@ final class DashboardController extends BaseController
      */
     public function department(?string $deptCode = null): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->analyticsReadRoles());
         $dept   = $deptCode ?? $this->query('department', 'ALL');
         $period = $this->parsePeriod();
         $data   = $this->dashboard->getDepartmentDashboard($dept, $period);
@@ -198,7 +287,8 @@ final class DashboardController extends BaseController
      */
     public function widget(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->analyticsReadRoles());
         $type = $this->query('widget_type', '');
         if ($type === '') {
             $this->error('missing_widget_type', 400);
@@ -210,7 +300,8 @@ final class DashboardController extends BaseController
 
     private function widgetRest(?string $type): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->analyticsReadRoles());
         if ($type === null || $type === '') {
             $this->error('missing_widget_type', 400);
         }
@@ -227,7 +318,8 @@ final class DashboardController extends BaseController
      */
     public function kpiGet(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->analyticsReadRoles());
         $code = strtoupper(trim($this->query('metric_code', '')));
         if ($code === '') {
             $this->error('missing_metric_code', 400);
@@ -237,7 +329,8 @@ final class DashboardController extends BaseController
 
     private function kpiGetRest(string $code): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->analyticsReadRoles());
         $period = $this->parsePeriod();
         $filters = $this->parseKpiFilters();
 
@@ -256,7 +349,8 @@ final class DashboardController extends BaseController
      */
     public function kpiTrend(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->analyticsReadRoles());
         $code = strtoupper(trim($this->query('metric_code', '')));
         if ($code === '') {
             $this->error('missing_metric_code', 400);
@@ -266,7 +360,8 @@ final class DashboardController extends BaseController
 
     private function kpiTrendRest(string $code): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->analyticsReadRoles());
         $period      = $this->parsePeriod();
         $granularity = $this->query('granularity', 'daily');
 
@@ -284,7 +379,8 @@ final class DashboardController extends BaseController
      */
     public function kpiAlerts(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->analyticsReadRoles());
         $alerts = $this->kpi->getKpiAlerts();
         $this->success(['alerts' => $alerts, 'count' => count($alerts)]);
     }
@@ -299,7 +395,8 @@ final class DashboardController extends BaseController
      */
     public function spcCapability(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->spcRoles());
         $body = $this->jsonBody();
         $this->requireFields($body, ['measurements', 'usl', 'lsl']);
 
@@ -324,7 +421,8 @@ final class DashboardController extends BaseController
      */
     public function spcChart(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->spcRoles());
         $body = $this->jsonBody();
         $this->requireFields($body, ['chart_type', 'measurements']);
 
@@ -351,7 +449,8 @@ final class DashboardController extends BaseController
      */
     public function spcSummary(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->spcRoles());
         $partNumber     = $this->query('part_number', '');
         $characteristic = $this->query('characteristic', '');
         if ($partNumber === '' || $characteristic === '') {
@@ -362,7 +461,8 @@ final class DashboardController extends BaseController
 
     private function spcSummaryRest(string $partNumber, string $characteristic): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->spcRoles());
         $period = $this->parsePeriod();
 
         $summary = $this->spc->getSpcSummary($partNumber, $characteristic, $period);
@@ -375,7 +475,8 @@ final class DashboardController extends BaseController
      */
     public function spcAlerts(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->spcRoles());
         $alerts = $this->spc->getSpcAlerts();
         $this->success(['alerts' => $alerts, 'count' => count($alerts)]);
     }
