@@ -98,12 +98,606 @@ var BLOCK_CATALOG = {
 };
 
 var BLOCK_CATEGORIES = [
-  { key:'layout', label:'Bố cục',       labelEn:'Layout',  color:'#3b82f6' },
-  { key:'data',   label:'Dữ liệu',      labelEn:'Data',    color:'#16a34a' },
-  { key:'form',   label:'Biểu mẫu',     labelEn:'Form',    color:'#7c3aed' },
-  { key:'chart',  label:'Biểu đồ',      labelEn:'Chart',   color:'#d97706' },
-  { key:'action', label:'Hành động',     labelEn:'Action',  color:'#dc2626' },
+  { key:'layout',        label:'Bo cuc',      labelEn:'Layout',        color:'#2563eb' },
+  { key:'data',          label:'Du lieu',     labelEn:'Data',          color:'#0f766e' },
+  { key:'form',          label:'Bieu mau',    labelEn:'Form',          color:'#7c3aed' },
+  { key:'chart',         label:'Bieu do',     labelEn:'Chart',         color:'#d97706' },
+  { key:'action',        label:'Hanh dong',   labelEn:'Action',        color:'#dc2626' },
+  { key:'media',         label:'Noi dung',    labelEn:'Media',         color:'#0891b2' },
+  { key:'navigation',    label:'Dieu huong',  labelEn:'Navigation',    color:'#4f46e5' },
+  { key:'insight',       label:'Tong hop',    labelEn:'Insight',       color:'#7c2d12' },
+  { key:'manufacturing', label:'San xuat',    labelEn:'Manufacturing', color:'#15803d' },
+  { key:'quality',       label:'Chat luong',  labelEn:'Quality',       color:'#be123c' },
+  { key:'automation',    label:'Tu dong hoa', labelEn:'Automation',    color:'#6d28d9' },
+  { key:'iot',           label:'IoT / SCADA', labelEn:'IoT / SCADA',   color:'#0f766e' }
 ];
+
+BLOCK_CATALOG = _buildExpandedBlockCatalog(BLOCK_CATALOG);
+
+function _parseCatalogLines(text){
+  return text.replace(/^\s+|\s+$/g, '').split(/\n+/).filter(function(line){
+    return !!line;
+  }).map(function(line){
+    var parts = line.split('|');
+    return {
+      key: parts[0],
+      label: parts[1],
+      labelEn: parts[2] || parts[1],
+      icon: parts[3] || '📦',
+      desc: parts[4] || '',
+      descEn: parts[4] || '',
+      renderer: parts[5] || ''
+    };
+  });
+}
+
+function _blockCatalogEntry(def, category, fallbackRenderer){
+  return {
+    label: def.label,
+    labelEn: def.labelEn || def.label,
+    category: category,
+    icon: def.icon || '📦',
+    desc: def.desc || '',
+    descEn: def.descEn || def.desc || '',
+    renderer: def.renderer || fallbackRenderer || def.key
+  };
+}
+
+function _extendBlockCatalog(catalog, category, fallbackRenderer, lines){
+  _parseCatalogLines(lines).forEach(function(item){
+    catalog[item.key] = _blockCatalogEntry(item, category, fallbackRenderer);
+  });
+}
+
+function _buildExpandedBlockCatalog(seed){
+  var catalog = {};
+
+  Object.keys(seed || {}).forEach(function(key){
+    catalog[key] = _clone(seed[key]);
+    if(!catalog[key].renderer) catalog[key].renderer = key;
+  });
+
+  _extendBlockCatalog(catalog, 'layout', 'section-header', [
+    'page-header|Tieu de trang|Page Header|🧭|Tieu de lon va hanh dong|section-header',
+    'section-header|Tieu de khu vuc|Section Header|🏷️|Tieu de cho tung khu vuc|section-header',
+    'sub-header|Tieu de phu|Sub Header|🔖|Dong mo dau ngan|section-header',
+    'hero-banner|Banner mo dau|Hero Banner|🌤️|Khoi gioi thieu lon|info-banner',
+    'kpi-row|Day KPI|KPI Row|📊|Hang KPI tong hop|kpi-row',
+    'metric-strip|Thanh metric|Metric Strip|📈|Day metric ngang gon|kpi-row',
+    'card-container|Nhom the|Card Container|🗂️|Khung chua block con|card-container',
+    'two-column|Hai cot|Two Column|↔️|Bo cuc hai cot|two-column',
+    'three-column|Ba cot|Three Column|🧱|Bo cuc ba cot|card-container',
+    'tab-bar|Thanh tab|Tab Bar|📑|Dieu huong tab|action-toolbar',
+    'spacer|Khoang trong|Spacer|↕️|Khoang trong phan tach|spacer',
+    'divider-line|Duong phan cach|Divider Line|➖|Duong chia section|spacer',
+    'accordion-group|Accordion|Accordion Group|📚|Danh sach mo rong|card-container',
+    'sticky-toolbar|Thanh gan dinh|Sticky Toolbar|📌|Toolbar co dinh khi cuon|action-toolbar'
+  ].join('\n'));
+
+  _extendBlockCatalog(catalog, 'data', 'data-table', [
+    'data-table|Bang du lieu|Data Table|📋|Bang du lieu nang cao|data-table',
+    'data-cards|The du lieu|Data Cards|🪪|Danh sach du lieu dang the|data-cards',
+    'data-list|Danh sach|Data List|📝|Danh sach ban ghi don gian|data-cards',
+    'data-grid|Luoi du lieu|Data Grid|🔲|Luoi ban ghi nhieu cot|data-cards',
+    'data-timeline|Timeline|Timeline|🕒|Dong thoi gian su kien|data-timeline',
+    'master-detail|Master detail|Master Detail|📂|Danh sach va chi tiet|data-table',
+    'kanban-board|Kanban|Kanban Board|🗃️|Lane theo trang thai|data-cards',
+    'tree-view|Cay du lieu|Tree View|🌳|Du lieu phan cap|data-cards',
+    'pivot-table|Pivot table|Pivot Table|🧮|Tong hop theo hang cot|data-table',
+    'matrix-grid|Ma tran|Matrix Grid|🔳|Ma tran giao nhau|data-table',
+    'record-detail|Chi tiet ban ghi|Record Detail|🧾|Card chi tiet mot ban ghi|data-cards',
+    'audit-log|Nhat ky thao tac|Audit Log|📜|Lich su thay doi|data-timeline',
+    'attachment-list|Tep dinh kem|Attachment List|📎|Danh sach tep va media|data-cards',
+    'status-board|Bang trang thai|Status Board|🚦|Tong hop theo trang thai|data-cards',
+    'map-list|Danh sach dia diem|Map List|🗺️|Danh sach co vi tri|data-cards',
+    'schedule-grid|Lich bieu|Schedule Grid|🗓️|Bang lich theo ca ngay|data-table',
+    'heat-table|Bang nhiet|Heat Table|🔥|Bang to mau theo muc|data-table',
+    'compliance-log|Nhat ky tuan thu|Compliance Log|✅|Theo doi tuan thu|data-table'
+  ].join('\n'));
+
+  _extendBlockCatalog(catalog, 'form', 'form-standard', [
+    'form-standard|Form chuan|Standard Form|🧩|Form nhap lieu tieu chuan|form-standard',
+    'form-wizard|Form wizard|Form Wizard|🪜|Form nhieu buoc|form-standard',
+    'form-inline|Form ngang|Inline Form|↔️|Form gon tren mot dong|form-standard',
+    'filter-bar|Thanh loc|Filter Bar|🔎|Loc va tim kiem nhanh|filter-bar',
+    'search-panel|Panel tim kiem|Search Panel|🔍|Panel tim kiem mo rong|filter-bar',
+    'approval-form|Form phe duyet|Approval Form|✍️|Form phe duyet va ghi chu|form-standard',
+    'checklist-form|Checklist|Checklist Form|☑️|Danh sach kiem tra|form-standard',
+    'dynamic-form|Form dong|Dynamic Form|🧠|Form thay doi theo dieu kien|form-standard',
+    'subform-table|Subform dang bang|Subform Table|🧮|Bang du lieu con|data-table',
+    'upload-center|Tai tep|Upload Center|📤|Tai tai lieu va anh|form-standard',
+    'signature-pad|Chu ky|Signature Pad|🖊️|Nhap xac nhan chu ky|form-standard',
+    'comment-box|Hop binh luan|Comment Box|💬|Nhap ghi chu va trao doi|form-standard',
+    'query-builder|Query builder|Query Builder|🧪|Xay dieu kien nang cao|filter-bar',
+    'parameter-panel|Panel tham so|Parameter Panel|🎛️|Nhap tham so truy van|form-standard',
+    'date-range-picker|Khoang ngay|Date Range Picker|📅|Chon tu ngay den ngay|filter-bar'
+  ].join('\n'));
+
+  _extendBlockCatalog(catalog, 'chart', 'chart-bar', [
+    'chart-bar|Bieu do cot|Bar Chart|📊|So sanh gia tri theo nhom|chart-bar',
+    'chart-line|Bieu do duong|Line Chart|📈|Xu huong theo thoi gian|chart-bar',
+    'chart-area|Bieu do mien|Area Chart|🌊|Mien tich luy theo thoi gian|chart-bar',
+    'chart-donut|Bieu do donut|Donut Chart|🍩|Ti le co lo o giua|chart-donut',
+    'chart-pie|Bieu do tron|Pie Chart|🥧|Co cau theo ty le|chart-donut',
+    'chart-stacked-bar|Cot chong|Stacked Bar|🧱|Cot chong nhieu series|chart-bar',
+    'chart-combo|Bieu do ket hop|Combo Chart|📶|Ket hop cot va duong|chart-bar',
+    'chart-radar|Bieu do radar|Radar Chart|🕸️|So sanh da chieu|chart-bar',
+    'chart-scatter|Bieu do scatter|Scatter Plot|⚫|Tuong quan bien|chart-bar',
+    'chart-bubble|Bieu do bubble|Bubble Chart|🫧|Scatter co kich thuoc|chart-bar',
+    'chart-heatmap|Heatmap|Heatmap|🔥|Ma tran nhiet|chart-bar',
+    'chart-gauge|Dong ho gauge|Gauge|🧭|Chi so tren dong ho|chart-donut',
+    'chart-progress|Vong tien do|Progress Ring|⭕|Tien do dang vong tron|chart-donut',
+    'chart-sparkline|Sparkline|Sparkline|〰️|Duong xu huong gon|chart-bar',
+    'chart-waterfall|Waterfall|Waterfall|🪜|Dong gop tang giam|chart-bar',
+    'chart-control|Control chart|Control Chart|🎯|Bieu do kiem soat|chart-bar',
+    'chart-boxplot|Box plot|Box Plot|📦|Phan bo tu phan vi|chart-bar',
+    'chart-histogram|Histogram|Histogram|📚|Tan suat theo khoang|chart-bar'
+  ].join('\n'));
+
+  _extendBlockCatalog(catalog, 'action', 'action-toolbar', [
+    'action-toolbar|Thanh cong cu|Toolbar|🛠️|Nhom nut hanh dong|action-toolbar',
+    'action-status-flow|Chuyen trang thai|Status Flow|🔄|Workflow chuyen trang thai|action-toolbar',
+    'action-quick-create|Tao nhanh|Quick Create|⚡|Tao ban ghi nhanh|action-toolbar',
+    'action-summary|Tong hop hanh dong|Action Summary|📌|Tom tat hanh dong|data-cards',
+    'action-export|Xuat du lieu|Export|💾|Xuat CSV Excel PDF|action-toolbar',
+    'action-bulk|Xu ly hang loat|Bulk Actions|🧰|Thao tac nhieu ban ghi|action-toolbar',
+    'action-approval|Phe duyet|Approval Actions|✅|Dong y tu choi ghi chu|action-toolbar',
+    'action-split|Nut chia nhanh|Split Actions|🔀|Cum nut theo nhom|action-toolbar',
+    'action-launchpad|Launchpad|Launchpad|🚀|Cum hanh dong nhanh|action-toolbar',
+    'action-shortcuts|Shortcut|Shortcuts|⌨️|Nut tat thao tac|action-toolbar',
+    'action-refresh|Lam moi|Refresh Actions|🔁|Lam moi va dong bo|action-toolbar',
+    'action-share|Chia se|Share Actions|📤|Gui lien ket thong bao|action-toolbar'
+  ].join('\n'));
+
+  _extendBlockCatalog(catalog, 'media', 'info-banner', [
+    'info-banner|Thong bao|Info Banner|ℹ️|Banner thong bao trang thai|info-banner',
+    'media-image|Hinh anh|Image|🖼️|Hien thi mot hinh anh|info-banner',
+    'media-gallery|Gallery|Gallery|🖼️|Nhieu anh dang bo suu tap|data-cards',
+    'media-document|Tai lieu|Document|📄|Tai lieu huong dan ho so|data-cards',
+    'media-video|Video|Video|🎬|Khung video huong dan|info-banner',
+    'media-html|HTML tu do|Raw HTML|</>|Noi dung HTML tu chinh|info-banner',
+    'media-markdown|Markdown|Markdown|📝|Noi dung markdown|info-banner',
+    'media-pdf|PDF viewer|PDF Viewer|📕|Khung xem PDF|info-banner',
+    'media-iframe|IFrame|IFrame|🌐|Nhung trang noi bo|info-banner',
+    'media-announcement|Thong bao noi bo|Announcement|📣|Thong diep can nhan manh|info-banner'
+  ].join('\n'));
+
+  _extendBlockCatalog(catalog, 'navigation', 'action-toolbar', [
+    'nav-breadcrumb|Breadcrumb|Breadcrumb|🧭|Duong dan dieu huong|action-toolbar',
+    'nav-tabs|Tabs|Tabs|📚|Dieu huong bang tab|action-toolbar',
+    'nav-pills|Pills|Pills|🏷️|Lua chon dang pill|action-toolbar',
+    'nav-steps|Buoc thuc hien|Step Navigation|🪜|Tien trinh tung buoc|action-toolbar',
+    'nav-sidebar|Sidebar menu|Sidebar Menu|📂|Menu module ben trai|action-toolbar',
+    'nav-anchor|Anchor menu|Anchor Menu|📍|Nhay den tung section|action-toolbar',
+    'nav-pagination|Phan trang|Pagination|↔️|Dieu huong nhieu trang|action-toolbar',
+    'nav-related-links|Lien ket lien quan|Related Links|🔗|Lien ket nhanh|action-toolbar',
+    'nav-module-menu|Menu module|Module Menu|🧩|Menu theo vai tro|action-toolbar',
+    'nav-process-map|Ban do quy trinh|Process Map|🗺️|Dieu huong theo quy trinh|action-toolbar'
+  ].join('\n'));
+
+  _extendBlockCatalog(catalog, 'insight', 'kpi-row', [
+    'insight-kpi-card|KPI card|KPI Card|🏁|The KPI don le|kpi-row',
+    'insight-stat-callout|Stat callout|Stat Callout|📣|Chi so lon co mo ta|kpi-row',
+    'insight-scorecard|Scorecard|Scorecard|🧠|Bang diem muc tieu va ket qua|data-table',
+    'insight-funnel|Funnel|Funnel|🔻|Chuyen doi qua cac buoc|chart-bar',
+    'insight-cohort|Cohort|Cohort|👥|So sanh nhom theo thoi gian|chart-bar',
+    'insight-alert-feed|Dong canh bao|Alert Feed|🚨|Canh bao va bat thuong|data-timeline',
+    'insight-driver-tree|Driver tree|Driver Tree|🌿|Cay nguyen nhan KPI|data-cards',
+    'insight-variance|So sanh chenh lech|Variance Analysis|⚖️|So sanh plan va actual|chart-bar',
+    'insight-summary-grid|Luoi tong hop|Summary Grid|🔲|Tong hop metric dang luoi|data-cards',
+    'insight-target-tracker|Theo doi muc tieu|Target Tracker|🎯|Tien do dat muc tieu|chart-donut'
+  ].join('\n'));
+
+  _extendBlockCatalog(catalog, 'manufacturing', 'data-table', [
+    'mfg-job-board|Bang JO|Job Board|🏭|Theo doi lenh san xuat|data-table',
+    'mfg-machine-status|Trang thai may|Machine Status|🟢|Trang thai may realtime|kpi-row',
+    'mfg-shift-roster|Ca lam viec|Shift Roster|🕘|Nhan su va lich ca|data-table',
+    'mfg-capacity-grid|Cong suat|Capacity Grid|📦|Cong suat may chuyen ca|data-table',
+    'mfg-wip-lane|WIP lane|WIP Lane|🚚|Ban ghi dang giua cong doan|data-cards',
+    'mfg-route-tracker|Tuyen cong doan|Route Tracker|🛣️|Theo doi lo trinh cong doan|data-timeline',
+    'mfg-tool-life|Tuoi dao cu|Tool Life|🛠️|Theo doi su dung dao cu|chart-bar',
+    'mfg-material-flow|Dong vat tu|Material Flow|📦|Theo doi cap phat vat tu|data-timeline',
+    'mfg-andon-board|Andon|Andon Board|🚦|Bang su co va can tro giup|kpi-row',
+    'mfg-setup-check|Checklist setup|Setup Checklist|✅|Checklist truoc khi chay may|form-standard',
+    'mfg-production-schedule|Lich san xuat|Production Schedule|🗓️|Ke hoach san xuat theo ca|data-table',
+    'mfg-downtime-feed|Dong downtime|Downtime Feed|🛑|Lich su dung may va ly do|data-timeline'
+  ].join('\n'));
+
+  _extendBlockCatalog(catalog, 'quality', 'chart-bar', [
+    'quality-spc-chart|SPC chart|SPC Chart|📏|Theo doi SPC|chart-bar',
+    'quality-control-chart|Control chart|Control Chart|🎯|UCL LCL center line|chart-bar',
+    'quality-pareto|Pareto|Pareto Chart|📚|Nhan dien nguyen nhan chinh|chart-bar',
+    'quality-checksheet|Checksheet|Checksheet|🗒️|Ghi nhan loi theo ca|form-standard',
+    'quality-defect-matrix|Ma tran loi|Defect Matrix|🔳|Tong hop loi theo may cong doan|data-table',
+    'quality-capa-board|CAPA board|CAPA Board|🛡️|Theo doi hanh dong khac phuc|data-cards',
+    'quality-inspection-form|Form kiem tra|Inspection Form|🧪|Form kiem tra chat luong|form-standard',
+    'quality-ncr-log|NCR log|NCR Log|📕|Nhat ky non-conformance|data-table',
+    'quality-gage-rnr|Gage R&R|Gage R&R|📐|Danh gia he thong do luong|chart-bar',
+    'quality-capability|Capability|Capability|📉|Cp Cpk va capability|chart-bar',
+    'quality-audit-plan|Audit plan|Audit Plan|🗓️|Ke hoach va trang thai audit|data-table',
+    'quality-traceability|Traceability|Traceability|🔗|Lien ket lot JO may cong doan|data-timeline'
+  ].join('\n'));
+
+  _extendBlockCatalog(catalog, 'automation', 'action-toolbar', [
+    'auto-rule-list|Danh sach rule|Rule List|⚙️|Danh sach rule va dieu kien|data-table',
+    'auto-approval-lane|Lane phe duyet|Approval Lane|✅|Tien trinh phe duyet|data-cards',
+    'auto-task-board|Task board|Task Board|🧰|Hang doi task tu dong|data-cards',
+    'auto-webhook-log|Webhook log|Webhook Log|🪝|Nhat ky webhook vao ra|data-table',
+    'auto-notification-center|Trung tam thong bao|Notification Center|🔔|Thong bao va escalation|data-timeline',
+    'auto-escalation-map|Ban do escalation|Escalation Map|🧭|Quy tac nang cap xu ly|data-cards',
+    'auto-sla-timer|SLA timer|SLA Timer|⏱️|Dem nguoc SLA|kpi-row',
+    'auto-queue-monitor|Queue monitor|Queue Monitor|📥|Hang doi xu ly nen|kpi-row',
+    'auto-runbook|Runbook|Runbook|📘|Huong dan xu ly su co|data-timeline',
+    'auto-bot-panel|Bot panel|Bot Panel|🤖|Dieu khien bot va helper|action-toolbar'
+  ].join('\n'));
+
+  _extendBlockCatalog(catalog, 'iot', 'chart-bar', [
+    'iot-device-grid|Luoi thiet bi|Device Grid|📟|Danh sach thiet bi va suc khoe|data-cards',
+    'iot-sensor-strip|Thanh cam bien|Sensor Strip|📡|Gia tri sensor theo hang ngang|kpi-row',
+    'iot-alarm-timeline|Timeline alarm|Alarm Timeline|🚨|Lich su alarm may|data-timeline',
+    'iot-live-trend|Trend realtime|Live Trend|📈|Bieu do trend realtime|chart-bar',
+    'iot-connector-panel|Connector panel|Connector Panel|🔌|Chon va cau hinh connector|form-standard',
+    'iot-telemetry-table|Bang telemetry|Telemetry Table|📋|Bang du lieu stream may|data-table',
+    'iot-machine-twin|Machine twin|Machine Twin|🧭|Trang thai tong hop cua may|data-cards',
+    'iot-oee-board|Bang OEE|OEE Board|🏁|OEE va cac thanh phan|kpi-row',
+    'iot-energy-monitor|Energy monitor|Energy Monitor|⚡|Cong suat tieu thu peak|chart-bar',
+    'iot-maintenance-panel|Bao tri du doan|Maintenance Panel|🛠️|Canh bao bao tri va suc khoe|data-cards',
+    'iot-signal-map|Ban do signal|Signal Map|🛰️|Map point register topic node|data-table',
+    'iot-threshold-manager|Nguong canh bao|Threshold Manager|🎚️|Nguong va quy tac alarm|form-standard',
+    'iot-condition-monitor|Theo doi condition|Condition Monitor|🌡️|Theo doi vibration temp load|chart-bar',
+    'iot-edge-health|Suc khoe edge|Edge Health|🧱|Trang thai gateway edge app|kpi-row'
+  ].join('\n'));
+
+  return catalog;
+}
+
+var BLOCK_PROPERTIES_SCHEMA = _buildBlockPropertiesSchema(BLOCK_CATALOG);
+
+function _schemaAssign(base, extra){
+  Object.keys(extra || {}).forEach(function(key){
+    base[key] = extra[key];
+  });
+  return base;
+}
+
+function _blockField(key, label, labelEn, type, path, extra){
+  return _schemaAssign({
+    key: key,
+    label: label,
+    labelEn: labelEn || label,
+    type: type,
+    path: path
+  }, extra || {});
+}
+
+function _blockSection(key, label, labelEn, fields){
+  return { key:key, label:label, labelEn:labelEn || label, fields:fields || [] };
+}
+
+function _blockTab(key, label, labelEn, sections, icon){
+  return { key:key, label:label, labelEn:labelEn || label, sections:sections || [], icon:icon || '' };
+}
+
+function _buildBlockPropertiesSchema(catalog){
+  var schema = {};
+  Object.keys(catalog || {}).forEach(function(type){
+    schema[type] = _buildBlockTabs(type, catalog[type] || {});
+  });
+  return schema;
+}
+
+function _buildBlockTabs(type, entry){
+  var renderer = entry.renderer || type;
+  return [
+    _blockTab('general', 'Tong quan', 'General', _buildGeneralSections(type, entry, renderer), '⚙️'),
+    _blockTab('data', 'Du lieu', 'Data', _buildDataSections(type, entry, renderer), '🗄️'),
+    _blockTab('style', 'Giao dien', 'Style', _buildStyleSections(renderer), '🎨'),
+    _blockTab('events', 'Su kien', 'Events', _buildEventSections(), '⚡')
+  ];
+}
+
+function _buildGeneralSections(type, entry, renderer){
+  return [
+    _blockSection('identity', 'Nhan dang', 'Identity', [
+      _blockField('titleVi', 'Tieu de (VI)', 'Title (VI)', 'text', 'title.vi', { default:entry.label || type }),
+      _blockField('titleEn', 'Tieu de (EN)', 'Title (EN)', 'text', 'title.en', { default:entry.labelEn || entry.label || type }),
+      _blockField('subtitleVi', 'Phu de (VI)', 'Subtitle (VI)', 'text', 'subtitle.vi', { default:'' }),
+      _blockField('subtitleEn', 'Phu de (EN)', 'Subtitle (EN)', 'text', 'subtitle.en', { default:'' }),
+      _blockField('icon', 'Icon', 'Icon', 'text', 'config.header.icon', { default:entry.icon || '📦' }),
+      _blockField('anchor', 'Anchor ID', 'Anchor ID', 'text', 'config.anchorId', { default:'', placeholder:'overview-kpi' })
+    ]),
+    _blockSection('behavior', 'Hanh vi', 'Behavior', [
+      _blockField('visible', 'Dang hien', 'Visible', 'toggle', 'visible', { default:true }),
+      _blockField('visibleWhen', 'Dieu kien hien thi', 'Visibility rule', 'expression', 'visibleWhen', { default:'', placeholder:'filters.status === "open"' }),
+      _blockField('variant', 'Bien the', 'Variant', 'select', 'config.variant', {
+        default:renderer,
+        options:['standard','compact','dense','spotlight']
+      }),
+      _blockField('roles', 'Roles duoc xem', 'Visible roles', 'text', 'config.permissions.roles', { default:'', placeholder:'ceo,it_admin' }),
+      _blockField('builderNote', 'Ghi chu builder', 'Builder note', 'textarea', 'config.builderNote', { default:'', rows:2 })
+    ])
+  ];
+}
+
+function _buildDataSections(type, entry, renderer){
+  var sections = [
+    _blockSection('source', 'Nguon du lieu', 'Data source', [
+      _blockField('api', 'API endpoint', 'API endpoint', 'api-select', 'config.dataSource.api', { default:'', repaintOnChange:true }),
+      _blockField('method', 'HTTP method', 'HTTP method', 'select', 'config.dataSource.method', { default:'GET', options:['GET','POST','PUT','PATCH','DELETE'] }),
+      _blockField('dataKey', 'Data key', 'Data key', 'text', 'config.dataSource.dataKey', { default:'items', placeholder:'items' }),
+      _blockField('params', 'Params JSON', 'Params JSON', 'json', 'config.dataSource.params', { default:{} }),
+      _blockField('transformer', 'Transformer', 'Transformer', 'code', 'config.dataSource.transformer', { default:'' })
+    ]),
+    _blockSection('refresh', 'Lam moi', 'Refresh', [
+      _blockField('autoRefresh', 'Tu dong lam moi', 'Auto refresh', 'toggle', 'config.refresh.enabled', { default:false }),
+      _blockField('interval', 'Chu ky (ms)', 'Interval (ms)', 'number', 'config.refresh.intervalMs', { default:30000, min:0, step:500 }),
+      _blockField('cache', 'Cache TTL (s)', 'Cache TTL (s)', 'number', 'config.dataSource.cacheTtlSec', { default:0, min:0, step:5 }),
+      _blockField('emptyTitle', 'Tieu de rong', 'Empty title', 'text', 'config.emptyState.title', { default:'' }),
+      _blockField('emptyText', 'Noi dung rong', 'Empty text', 'textarea', 'config.emptyState.message', { default:'' })
+    ])
+  ];
+
+  if(renderer === 'kpi-row'){
+    sections.push(_blockSection('metrics', 'Metrics', 'Metrics', [
+      _blockField('items', 'Danh sach KPI', 'Metric items', 'collection', 'config.items', {
+        default:[
+          { label:{vi:'KPI 1', en:'KPI 1'}, valueField:'value', color:'#2563eb' },
+          { label:{vi:'KPI 2', en:'KPI 2'}, valueField:'value_2', color:'#16a34a' }
+        ],
+        addLabel:'Them KPI',
+        itemLabel:'KPI',
+        itemFields:[
+          _blockField('labelVi', 'Nhan VI', 'Label VI', 'text', 'label.vi', { default:'KPI' }),
+          _blockField('labelEn', 'Nhan EN', 'Label EN', 'text', 'label.en', { default:'KPI' }),
+          _blockField('valueField', 'Field gia tri', 'Value field', 'field-select', 'valueField', { default:'value' }),
+          _blockField('targetField', 'Field target', 'Target field', 'field-select', 'targetField', { default:'' }),
+          _blockField('formula', 'Preset formula', 'Preset formula', 'formula-select', 'formula', { default:'' }),
+          _blockField('unit', 'Don vi', 'Unit', 'text', 'unit', { default:'' }),
+          _blockField('color', 'Mau nhan', 'Accent color', 'color', 'color', { default:'#2563eb' })
+        ]
+      })
+    ]));
+  } else if(renderer === 'data-table'){
+    sections.push(_blockSection('columns', 'Columns', 'Columns', [
+      _blockField('columns', 'Danh sach cot', 'Columns', 'collection', 'config.columns', {
+        default:[
+          { key:'code', label:{vi:'Ma', en:'Code'}, type:'string', width:'140', align:'left', sortable:true, filterable:true },
+          { key:'name', label:{vi:'Ten', en:'Name'}, type:'string', width:'220', align:'left', sortable:true, filterable:true },
+          { key:'status', label:{vi:'Trang thai', en:'Status'}, type:'badge', width:'140', align:'center', sortable:true, filterable:true, statusSet:'so_status' }
+        ],
+        addLabel:'Them cot',
+        itemLabel:'Cot',
+        itemFields:[
+          _blockField('key', 'Field key', 'Field key', 'field-select', 'key', { default:'field_key' }),
+          _blockField('labelVi', 'Nhan VI', 'Label VI', 'text', 'label.vi', { default:'Cot' }),
+          _blockField('labelEn', 'Nhan EN', 'Label EN', 'text', 'label.en', { default:'Column' }),
+          _blockField('type', 'Field type', 'Field type', 'field-type-select', 'type', { default:'string' }),
+          _blockField('width', 'Width', 'Width', 'text', 'width', { default:'160' }),
+          _blockField('align', 'Canh', 'Align', 'select', 'align', { default:'left', options:['left','center','right'] }),
+          _blockField('formula', 'Preset formula', 'Preset formula', 'formula-select', 'formula', { default:'' }),
+          _blockField('statusSet', 'Status set', 'Status set', 'status-set-select', 'statusSet', { default:'' }),
+          _blockField('sortable', 'Sortable', 'Sortable', 'toggle', 'sortable', { default:true }),
+          _blockField('filterable', 'Filterable', 'Filterable', 'toggle', 'filterable', { default:true })
+        ]
+      }),
+      _blockField('pageSize', 'Page size', 'Page size', 'number', 'config.pageSize', { default:20, min:5, step:5 }),
+      _blockField('rowKey', 'Row key', 'Row key', 'field-select', 'config.rowKey', { default:'id' })
+    ]));
+  } else if(renderer === 'data-cards'){
+    sections.push(_blockSection('cards', 'Card mapping', 'Card mapping', [
+      _blockField('titleField', 'Field tieu de', 'Title field', 'field-select', 'config.card.titleField', { default:'name' }),
+      _blockField('subtitleField', 'Field phu de', 'Subtitle field', 'field-select', 'config.card.subtitleField', { default:'status' }),
+      _blockField('valueField', 'Field gia tri', 'Value field', 'field-select', 'config.card.valueField', { default:'' }),
+      _blockField('tagField', 'Field tag', 'Tag field', 'field-select', 'config.card.tagField', { default:'' }),
+      _blockField('imageField', 'Field image', 'Image field', 'field-select', 'config.card.imageField', { default:'' }),
+      _blockField('columns', 'So cot', 'Columns', 'number', 'config.columns', { default:3, min:1, max:6 })
+    ]));
+  } else if(renderer === 'data-timeline'){
+    sections.push(_blockSection('timeline', 'Timeline mapping', 'Timeline mapping', [
+      _blockField('dateKey', 'Field thoi gian', 'Date field', 'field-select', 'config.dateKey', { default:'created_at' }),
+      _blockField('titleKey', 'Field tieu de', 'Title field', 'field-select', 'config.titleKey', { default:'title' }),
+      _blockField('descKey', 'Field mo ta', 'Description field', 'field-select', 'config.descKey', { default:'description' }),
+      _blockField('statusKey', 'Field trang thai', 'Status field', 'field-select', 'config.statusKey', { default:'status' }),
+      _blockField('groupBy', 'Group by', 'Group by', 'field-select', 'config.groupBy', { default:'' })
+    ]));
+  } else if(renderer === 'filter-bar'){
+    sections.push(_blockSection('filters', 'Bo loc', 'Filters', [
+      _blockField('filters', 'Danh sach filter', 'Filters', 'collection', 'config.filters', {
+        default:[
+          { key:'keyword', label:{vi:'Tu khoa', en:'Keyword'}, type:'search', placeholder:{vi:'Nhap tu khoa', en:'Search'} },
+          { key:'status', label:{vi:'Trang thai', en:'Status'}, type:'select', statusSet:'so_status' }
+        ],
+        addLabel:'Them filter',
+        itemLabel:'Filter',
+        itemFields:[
+          _blockField('key', 'Key', 'Key', 'text', 'key', { default:'filter_key' }),
+          _blockField('labelVi', 'Nhan VI', 'Label VI', 'text', 'label.vi', { default:'Filter' }),
+          _blockField('labelEn', 'Nhan EN', 'Label EN', 'text', 'label.en', { default:'Filter' }),
+          _blockField('type', 'Loai', 'Type', 'select', 'type', { default:'text', options:['search','text','select','date-range','number-range','status','checkbox'] }),
+          _blockField('fieldRef', 'Field ref', 'Field ref', 'field-select', 'fieldRef', { default:'' }),
+          _blockField('statusSet', 'Status set', 'Status set', 'status-set-select', 'statusSet', { default:'' }),
+          _blockField('placeholderVi', 'Placeholder VI', 'Placeholder VI', 'text', 'placeholder.vi', { default:'' }),
+          _blockField('placeholderEn', 'Placeholder EN', 'Placeholder EN', 'text', 'placeholder.en', { default:'' }),
+          _blockField('defaultValue', 'Mac dinh', 'Default value', 'text', 'defaultValue', { default:'' })
+        ]
+      })
+    ]));
+  } else if(renderer === 'form-standard'){
+    sections.push(_blockSection('fields', 'Field layout', 'Field layout', [
+      _blockField('fields', 'Danh sach field', 'Fields', 'collection', 'config.fields', {
+        default:[
+          { key:'code', label:{vi:'Ma', en:'Code'}, type:'string', required:true, span:'half' },
+          { key:'name', label:{vi:'Ten', en:'Name'}, type:'string', required:true, span:'half' },
+          { key:'status', label:{vi:'Trang thai', en:'Status'}, type:'select', required:false, span:'half', statusSet:'so_status' }
+        ],
+        addLabel:'Them field',
+        itemLabel:'Field',
+        itemFields:[
+          _blockField('key', 'Key', 'Key', 'text', 'key', { default:'field_key' }),
+          _blockField('fieldRef', 'Field ref', 'Field ref', 'field-select', 'fieldRef', { default:'' }),
+          _blockField('labelVi', 'Nhan VI', 'Label VI', 'text', 'label.vi', { default:'Field' }),
+          _blockField('labelEn', 'Nhan EN', 'Label EN', 'text', 'label.en', { default:'Field' }),
+          _blockField('type', 'Loai', 'Type', 'select', 'type', { default:'string', options:['string','textarea','number','select','date','datetime','boolean','currency','email','phone','file','signature'] }),
+          _blockField('placeholderVi', 'Placeholder VI', 'Placeholder VI', 'text', 'placeholder.vi', { default:'' }),
+          _blockField('placeholderEn', 'Placeholder EN', 'Placeholder EN', 'text', 'placeholder.en', { default:'' }),
+          _blockField('statusSet', 'Status set', 'Status set', 'status-set-select', 'statusSet', { default:'' }),
+          _blockField('required', 'Bat buoc', 'Required', 'toggle', 'required', { default:false }),
+          _blockField('span', 'Do rong', 'Span', 'select', 'span', { default:'half', options:['half','full'] }),
+          _blockField('defaultValue', 'Mac dinh', 'Default value', 'text', 'defaultValue', { default:'' }),
+          _blockField('rules', 'Validation', 'Validation', 'expression', 'rules', { default:'' })
+        ]
+      }),
+      _blockField('columns', 'So cot form', 'Form columns', 'number', 'config.columns', { default:2, min:1, max:4 }),
+      _blockField('submitEndpoint', 'Submit API', 'Submit API', 'api-select', 'config.submit.api', { default:'', repaintOnChange:true }),
+      _blockField('submitMethod', 'Submit method', 'Submit method', 'select', 'config.submit.method', { default:'POST', options:['POST','PUT','PATCH'] })
+    ]));
+  } else if(renderer === 'chart-donut'){
+    sections.push(_blockSection('segments', 'Segments', 'Segments', [
+      _blockField('labelField', 'Field nhan', 'Label field', 'field-select', 'config.chart.labelField', { default:'name' }),
+      _blockField('valueField', 'Field gia tri', 'Value field', 'field-select', 'config.chart.valueField', { default:'value' }),
+      _blockField('innerRadius', 'Inner radius', 'Inner radius', 'number', 'config.chart.innerRadius', { default:60, min:0, max:95 }),
+      _blockField('showPercent', 'Hien %', 'Show percent', 'toggle', 'config.chart.showPercent', { default:true }),
+      _blockField('series', 'Segments config', 'Segments config', 'collection', 'config.series', {
+        default:[],
+        addLabel:'Them segment',
+        itemLabel:'Segment',
+        itemFields:[
+          _blockField('matchValue', 'Match value', 'Match value', 'text', 'matchValue', { default:'' }),
+          _blockField('labelVi', 'Nhan VI', 'Label VI', 'text', 'label.vi', { default:'Segment' }),
+          _blockField('labelEn', 'Nhan EN', 'Label EN', 'text', 'label.en', { default:'Segment' }),
+          _blockField('color', 'Mau', 'Color', 'color', 'color', { default:'#2563eb' })
+        ]
+      })
+    ]));
+  } else if(renderer === 'action-toolbar'){
+    sections.push(_blockSection('buttons', 'Buttons', 'Buttons', [
+      _blockField('buttons', 'Danh sach nut', 'Buttons', 'collection', 'config.buttons', {
+        default:[
+          { actionId:'refresh', label:{vi:'Lam moi', en:'Refresh'}, variant:'secondary', endpoint:'', confirmMessage:'' },
+          { actionId:'export', label:{vi:'Xuat', en:'Export'}, variant:'primary', endpoint:'', confirmMessage:'' }
+        ],
+        addLabel:'Them nut',
+        itemLabel:'Nut',
+        itemFields:[
+          _blockField('actionId', 'Action ID', 'Action ID', 'text', 'actionId', { default:'action_id' }),
+          _blockField('labelVi', 'Nhan VI', 'Label VI', 'text', 'label.vi', { default:'Nut' }),
+          _blockField('labelEn', 'Nhan EN', 'Label EN', 'text', 'label.en', { default:'Button' }),
+          _blockField('icon', 'Icon', 'Icon', 'text', 'icon', { default:'' }),
+          _blockField('variant', 'Variant', 'Variant', 'select', 'variant', { default:'primary', options:['primary','secondary','ghost','danger','success'] }),
+          _blockField('endpoint', 'API endpoint', 'API endpoint', 'api-select', 'endpoint', { default:'', repaintOnChange:true }),
+          _blockField('method', 'Method', 'Method', 'select', 'method', { default:'POST', options:['GET','POST','PUT','PATCH','DELETE'] }),
+          _blockField('confirmMessage', 'Confirm message', 'Confirm message', 'text', 'confirmMessage', { default:'' }),
+          _blockField('visibleWhen', 'Visible when', 'Visible when', 'expression', 'visibleWhen', { default:'' })
+        ]
+      })
+    ]));
+  } else {
+    sections.push(_blockSection('mapping', 'Mapping', 'Mapping', [
+      _blockField('titleField', 'Field tieu de', 'Title field', 'field-select', 'config.mapping.titleField', { default:'name' }),
+      _blockField('valueField', 'Field gia tri', 'Value field', 'field-select', 'config.mapping.valueField', { default:'value' }),
+      _blockField('statusField', 'Field trang thai', 'Status field', 'field-select', 'config.mapping.statusField', { default:'status' }),
+      _blockField('notes', 'Ghi chu mapping', 'Mapping note', 'textarea', 'config.mapping.notes', { default:'', rows:3 })
+    ]));
+  }
+
+  if(entry.category === 'quality'){
+    sections.push(_blockSection('quality', 'Quality rules', 'Quality rules', [
+      _blockField('lsl', 'LSL', 'LSL', 'number', 'config.quality.lsl', { default:0 }),
+      _blockField('target', 'Target', 'Target', 'number', 'config.quality.target', { default:0 }),
+      _blockField('usl', 'USL', 'USL', 'number', 'config.quality.usl', { default:0 }),
+      _blockField('formula', 'Preset formula', 'Preset formula', 'formula-select', 'config.quality.formulaPreset', { default:'' }),
+      _blockField('statusSet', 'Status set', 'Status set', 'status-set-select', 'config.quality.statusSet', { default:'' })
+    ]));
+  }
+
+  if(entry.category === 'iot'){
+    sections.push(_blockSection('iot', 'IoT config', 'IoT config', [
+      _blockField('connector', 'Connector', 'Connector', 'iot-connector-select', 'config.iot.connector', { default:'', repaintOnChange:true }),
+      _blockField('deviceId', 'Device ID', 'Device ID', 'text', 'config.iot.deviceId', { default:'' }),
+      _blockField('topic', 'Topic / Node', 'Topic / Node', 'text', 'config.iot.topic', { default:'' }),
+      _blockField('signals', 'Signal map', 'Signal map', 'collection', 'config.iot.signals', {
+        default:[],
+        addLabel:'Them signal',
+        itemLabel:'Signal',
+        itemFields:[
+          _blockField('labelVi', 'Nhan VI', 'Label VI', 'text', 'label.vi', { default:'Signal' }),
+          _blockField('labelEn', 'Nhan EN', 'Label EN', 'text', 'label.en', { default:'Signal' }),
+          _blockField('point', 'Point', 'Point', 'text', 'point', { default:'' }),
+          _blockField('fieldKey', 'Field key', 'Field key', 'text', 'fieldKey', { default:'' }),
+          _blockField('unit', 'Don vi', 'Unit', 'text', 'unit', { default:'' }),
+          _blockField('threshold', 'Threshold', 'Threshold', 'number', 'threshold', { default:0 }),
+          _blockField('color', 'Mau', 'Color', 'color', 'color', { default:'#f59e0b' })
+        ]
+      })
+    ]));
+  }
+
+  return sections;
+}
+
+function _buildStyleSections(renderer){
+  return [
+    _blockSection('layout', 'Layout', 'Layout', [
+      _blockField('columns', 'So cot desktop', 'Desktop columns', 'number', 'config.style.columns', { default:renderer === 'data-cards' ? 3 : 1, min:1, max:6 }),
+      _blockField('gap', 'Khoang cach', 'Gap', 'number', 'config.style.gap', { default:16, min:0, step:2 }),
+      _blockField('padding', 'Padding', 'Padding', 'number', 'config.style.padding', { default:16, min:0, step:2 }),
+      _blockField('minHeight', 'Min height', 'Min height', 'number', 'config.style.minHeight', { default:0, min:0, step:8 }),
+      _blockField('compact', 'Compact mode', 'Compact mode', 'toggle', 'config.style.compact', { default:false })
+    ]),
+    _blockSection('surface', 'Surface', 'Surface', [
+      _blockField('background', 'Nen', 'Background', 'color', 'config.style.background', { default:'#ffffff' }),
+      _blockField('textColor', 'Mau chu', 'Text color', 'color', 'config.style.textColor', { default:'#0f172a' }),
+      _blockField('accentColor', 'Mau nhan', 'Accent color', 'color', 'config.style.accentColor', { default:'#2563eb' }),
+      _blockField('borderColor', 'Vien', 'Border color', 'color', 'config.style.borderColor', { default:'#d7dee7' }),
+      _blockField('radius', 'Bo goc', 'Radius', 'number', 'config.style.radius', { default:16, min:0, step:2 }),
+      _blockField('shadow', 'Do bong', 'Shadow', 'select', 'config.style.shadow', { default:'sm', options:['none','xs','sm','md','lg'] })
+    ]),
+    _blockSection('typography', 'Typography', 'Typography', [
+      _blockField('titleSize', 'Size tieu de', 'Title size', 'number', 'config.style.titleSize', { default:18, min:12, max:40 }),
+      _blockField('labelSize', 'Size nhan', 'Label size', 'number', 'config.style.labelSize', { default:13, min:10, max:24 }),
+      _blockField('valueSize', 'Size gia tri', 'Value size', 'number', 'config.style.valueSize', { default:28, min:12, max:56 }),
+      _blockField('weight', 'Do dam', 'Weight', 'select', 'config.style.fontWeight', { default:'600', options:['400','500','600','700','800'] }),
+      _blockField('align', 'Canh noi dung', 'Content align', 'select', 'config.style.align', { default:'left', options:['left','center','right'] })
+    ]),
+    _blockSection('responsive', 'Responsive', 'Responsive', [
+      _blockField('mobileColumns', 'Cot mobile', 'Mobile columns', 'number', 'config.responsive.mobile.columns', { default:1, min:1, max:4 }),
+      _blockField('tabletColumns', 'Cot tablet', 'Tablet columns', 'number', 'config.responsive.tablet.columns', { default:2, min:1, max:6 }),
+      _blockField('mobileCompact', 'Mobile compact', 'Mobile compact', 'toggle', 'config.responsive.mobile.compact', { default:true }),
+      _blockField('hideHeaderMobile', 'An header tren mobile', 'Hide header on mobile', 'toggle', 'config.responsive.mobile.hideHeader', { default:false })
+    ])
+  ];
+}
+
+function _buildEventSections(){
+  return [
+    _blockSection('actions', 'Tac vu', 'Actions', [
+      _blockField('actions', 'Danh sach event', 'Event actions', 'collection', 'config.events.actions', {
+        default:[],
+        addLabel:'Them action',
+        itemLabel:'Action',
+        itemFields:[
+          _blockField('event', 'Event', 'Event', 'select', 'event', { default:'click', options:['click','row-click','change','submit','load','success','error'] }),
+          _blockField('type', 'Action type', 'Action type', 'select', 'type', { default:'toast', options:['toast','navigate','open-modal','api-call','set-state','emit-event'] }),
+          _blockField('target', 'Target', 'Target', 'text', 'target', { default:'' }),
+          _blockField('payload', 'Payload', 'Payload', 'expression', 'payload', { default:'' })
+        ]
+      })
+    ]),
+    _blockSection('lifecycle', 'Lifecycle', 'Lifecycle', [
+      _blockField('refreshOnFilter', 'Refresh khi loc', 'Refresh on filter', 'toggle', 'config.events.refreshOnFilter', { default:true }),
+      _blockField('emitOnLoad', 'Emit on load', 'Emit on load', 'text', 'config.events.emitOnLoad', { default:'' }),
+      _blockField('successToast', 'Toast thanh cong', 'Success toast', 'text', 'config.events.successToast', { default:'' }),
+      _blockField('errorToast', 'Toast loi', 'Error toast', 'text', 'config.events.errorToast', { default:'' }),
+      _blockField('confirmMessage', 'Thong diep xac nhan', 'Confirmation message', 'text', 'config.events.confirmMessage', { default:'' })
+    ]),
+    _blockSection('advanced', 'Nang cao', 'Advanced', [
+      _blockField('telemetryEvent', 'Telemetry event', 'Telemetry event', 'text', 'config.events.telemetryEvent', { default:'' }),
+      _blockField('permissionExpression', 'Permission expression', 'Permission expression', 'expression', 'config.permissions.expression', { default:'' }),
+      _blockField('featureFlag', 'Feature flag', 'Feature flag', 'text', 'config.permissions.featureFlag', { default:'' }),
+      _blockField('customHook', 'Custom hook', 'Custom hook', 'code', 'config.events.customHook', { default:'' })
+    ])
+  ];
+}
 
 /* ── API Catalog — FULL 192 endpoints organized by module ──────────────── */
 var API_CATALOG = [
@@ -1892,6 +2486,9 @@ function renderBlock(block, data, state){
 
 function _renderBlockInner(block, data, state, reactiveCtx){
   var config = block.config || {};
+  var catalogEntry = BLOCK_CATALOG[block.type] || {};
+  var renderType = catalogEntry.renderer || block.type;
+  var blockRuntimeId = block.id || block.blockId || '';
 
   // Resolve bindings in config if reactive context available
   var resolvedConfig = config;
@@ -1899,9 +2496,9 @@ function _renderBlockInner(block, data, state, reactiveCtx){
     try { resolvedConfig = _resolveConfigBindings(config, reactiveCtx); } catch(e){ /* fallback */ }
   }
 
-  switch(block.type){
+  switch(renderType){
     case 'kpi-row':         return renderKpiRow(resolvedConfig, data);
-    case 'data-table':      return renderAdvancedTableV3(resolvedConfig, data, state, block.id, reactiveCtx);
+    case 'data-table':      return renderAdvancedTableV3(resolvedConfig, data, state, blockRuntimeId, reactiveCtx);
     case 'filter-bar':      return renderFilterBar(resolvedConfig, data);
     case 'section-header':  return renderSectionHeader(resolvedConfig);
     case 'spacer':          return '<div style="height:'+(resolvedConfig.height||16)+'px"></div>';
@@ -1915,7 +2512,7 @@ function _renderBlockInner(block, data, state, reactiveCtx){
     case 'two-column':      return renderTwoColumn(block, data, state);
     case 'card-container':  return renderCardContainer(block, data, state);
     default:
-      return '<div class="hm-empty">'+_t('Block chua co noi dung','Block has no content')+'</div>';
+      return '<div class="hm-empty"><div style="font-weight:600;margin-bottom:4px">'+_esc(_t(catalogEntry.label || block.type, catalogEntry.labelEn || block.type))+'</div><div style="font-size:12px;color:var(--text-tertiary)">'+_t('Block dang dung renderer mac dinh. Cau hinh them trong Module Builder.','This block is using the generic renderer. Configure it in Module Builder.')+'</div></div>';
   }
 }
 
@@ -2930,18 +3527,45 @@ function _addBlockFromTemplate(moduleId, tabKey, afterBlockId, templateKey){
   }
 }
 
+function _schemaCloneDefault(value){
+  if(Array.isArray(value) || (value && typeof value === 'object')) return _clone(value);
+  return value;
+}
+
+function _schemaSetPath(target, path, value){
+  if(!path) return;
+  var parts = path.split('.');
+  var ctx = target;
+  var i;
+  for(i = 0; i < parts.length - 1; i++){
+    if(!ctx[parts[i]] || typeof ctx[parts[i]] !== 'object') ctx[parts[i]] = {};
+    ctx = ctx[parts[i]];
+  }
+  ctx[parts[parts.length - 1]] = _schemaCloneDefault(value);
+}
+
+function _collectSchemaDefaults(type){
+  var blockDefaults = {};
+  var tabs = BLOCK_PROPERTIES_SCHEMA[type] || [];
+
+  tabs.forEach(function(tab){
+    (tab.sections || []).forEach(function(section){
+      (section.fields || []).forEach(function(field){
+        if(field.default === undefined) return;
+        _schemaSetPath(blockDefaults, field.path, field.default);
+      });
+    });
+  });
+
+  return blockDefaults.config || {};
+}
+
 function _defaultConfigForType(type){
+  var schemaConfig = _collectSchemaDefaults(type);
+  if(schemaConfig && Object.keys(schemaConfig).length) return schemaConfig;
   switch(type){
-    case 'kpi-row':        return { items:[] };
-    case 'data-table':     return { columns:[], dataKey:'items', pageSize:20 };
-    case 'filter-bar':     return { filters:[] };
-    case 'chart-bar':      return { dataKey:'items', items:[] };
-    case 'chart-donut':    return { dataKey:'items', items:[] };
-    case 'data-cards':     return { dataKey:'items', columns:3 };
-    case 'form-standard':  return { fields:[], columns:2 };
     case 'section-header': return { text:'', textEn:'', level:'h3' };
     case 'info-banner':    return { text:'', textEn:'', type:'info' };
-    case 'action-toolbar': return { buttons:[] };
     case 'spacer':         return { height:16 };
     case 'two-column':     return { ratio:'50-50' };
     case 'card-container': return {};
@@ -3243,6 +3867,7 @@ window.HmBlockEngine = {
   // Catalog
   BLOCK_CATALOG: BLOCK_CATALOG,
   BLOCK_CATEGORIES: BLOCK_CATEGORIES,
+  BLOCK_PROPERTIES_SCHEMA: BLOCK_PROPERTIES_SCHEMA,
   API_CATALOG: API_CATALOG,
 
   // Schema operations

@@ -11,6 +11,55 @@ var MR = window.HmModuleRouter || {};
 function _t(vi,en){ return BE._t ? BE._t(vi,en) : vi; }
 function _esc(v){ return BE._esc ? BE._esc(v) : String(v==null?'':v); }
 function _uid(){ return 'blk-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function _clone(obj){ return obj == null ? obj : JSON.parse(JSON.stringify(obj)); }
+function _isObject(value){ return !!value && typeof value === 'object' && !Array.isArray(value); }
+function _mergeDeep(target, source){
+  target = target || {};
+  Object.keys(source || {}).forEach(function(key){
+    var value = source[key];
+    if(Array.isArray(value)){
+      target[key] = _clone(value);
+    } else if(_isObject(value)){
+      if(!_isObject(target[key])) target[key] = {};
+      _mergeDeep(target[key], value);
+    } else {
+      target[key] = value;
+    }
+  });
+  return target;
+}
+function _getByPath(obj, path){
+  var parts = (path || '').split('.');
+  var ctx = obj;
+  var i;
+  for(i = 0; i < parts.length; i++){
+    if(!parts[i]) continue;
+    if(ctx == null) return undefined;
+    ctx = ctx[parts[i]];
+  }
+  return ctx;
+}
+function _setByPath(obj, path, value){
+  var parts = (path || '').split('.');
+  var ctx = obj;
+  var i;
+  for(i = 0; i < parts.length - 1; i++){
+    if(!parts[i]) continue;
+    if(!_isObject(ctx[parts[i]]) && !Array.isArray(ctx[parts[i]])) ctx[parts[i]] = {};
+    ctx = ctx[parts[i]];
+  }
+  if(parts.length) ctx[parts[parts.length - 1]] = value;
+}
+function _deleteByPath(obj, path){
+  var parts = (path || '').split('.');
+  var ctx = obj;
+  var i;
+  for(i = 0; i < parts.length - 1; i++){
+    if(!ctx || ctx[parts[i]] == null) return;
+    ctx = ctx[parts[i]];
+  }
+  if(ctx && parts.length) delete ctx[parts[parts.length - 1]];
+}
 
 var ICONS = ['📦','📋','🏭','🔴','🚚','💰','📊','⚙','🔍','📱','🎯','💡','🔒','🤖','⚡','📝','🌐','🔗','🔄','📈'];
 
@@ -26,6 +75,18 @@ var state = {
   insertAfter: null,     // blockId to insert after (or null for beginning)
   insertTab: null,       // tabId to insert into
   savedModules: [],      // List of user-created modules
+  propsTab: 'general',
+  propsDraft: null,
+  registries: {
+    loading: false,
+    loaded: false,
+    error: '',
+    fieldTypes: {},
+    statusOptions: {},
+    dataFields: {},
+    computedFormulas: {},
+    iotConnectors: {}
+  }
 };
 
 /* ── Render Entry ─────────────────────────────────────────────────────────── */
@@ -47,6 +108,7 @@ function _paint(){
 
   c.onclick = _handleClick;
   c.oninput = _handleInput;
+  c.onchange = _handleInput;
 }
 
 /* ── STEP 1: SETUP — Tên module, icon, route ─────────────────────────────── */
@@ -228,9 +290,11 @@ function _renderBuilder(){
 function _renderBlockPreview(block){
   var type = block.type;
   var config = block.config || {};
+  var entry = (BE.BLOCK_CATALOG||{})[type] || {};
+  var renderType = entry.renderer || type;
   var h = '';
 
-  switch(type){
+  switch(renderType){
     case 'kpi-row':
       h += '<div style="display:flex;gap:var(--space-3);flex-wrap:wrap">';
       (config.items||[{},{},{}]).forEach(function(item){
@@ -296,6 +360,32 @@ function _renderBlockPreview(block){
       h += '</div>';
       break;
 
+    case 'section-header':
+      h += '<div style="padding:var(--space-3);border-left:4px solid var(--brand-2);background:var(--gray-50);border-radius:var(--radius-md)">';
+      h += '<div style="font-size:var(--text-lg);font-weight:var(--font-bold);color:var(--text-primary)">'+_esc(block.title?_t(block.title.vi||'',block.title.en||''):_getCatalogLabel(type))+'</div>';
+      h += '<div style="font-size:var(--text-sm);color:var(--text-secondary);margin-top:4px">'+_esc(block.subtitle?_t(block.subtitle.vi||'',block.subtitle.en||''):'Section summary')+'</div>';
+      h += '</div>';
+      break;
+
+    case 'card-container':
+      h += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-2)">';
+      [1,2,3].forEach(function(){
+        h += '<div style="height:68px;border:1px dashed var(--border);border-radius:var(--radius-md);background:var(--gray-50)"></div>';
+      });
+      h += '</div>';
+      break;
+
+    case 'two-column':
+      h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3)">';
+      h += '<div style="height:92px;border:1px dashed var(--border);border-radius:var(--radius-md);background:var(--gray-50)"></div>';
+      h += '<div style="height:92px;border:1px dashed var(--border);border-radius:var(--radius-md);background:var(--gray-50)"></div>';
+      h += '</div>';
+      break;
+
+    case 'spacer':
+      h += '<div style="height:24px;border:1px dashed var(--border);border-radius:var(--radius-md);background:repeating-linear-gradient(90deg,var(--gray-50),var(--gray-50) 12px,#fff 12px,#fff 24px)"></div>';
+      break;
+
     case 'action-toolbar':
       h += '<div style="display:flex;gap:var(--space-2)">';
       (config.buttons||[{label:{vi:'Nút 1'},variant:'primary'},{label:{vi:'Nút 2'},variant:'secondary'}]).forEach(function(btn){
@@ -318,7 +408,16 @@ function _renderBlockPreview(block){
       break;
 
     default:
-      h += '<div style="padding:var(--space-4);text-align:center;color:var(--text-tertiary);font-size:var(--text-sm)">'+_esc(_getCatalogLabel(type))+' — '+_t('Click ⚙ để cấu hình','Click ⚙ to configure')+'</div>';
+      h += '<div style="padding:var(--space-4);border:1px dashed var(--border);border-radius:var(--radius-md);background:var(--gray-50)">';
+      h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:var(--space-2);margin-bottom:var(--space-2)">';
+      h += '<div><div style="font-weight:var(--font-semibold);color:var(--text-primary)">'+_esc(_getCatalogLabel(type))+'</div>';
+      h += '<div style="font-size:var(--text-xs);color:var(--text-tertiary)">'+_esc(entry.category||'custom')+'</div></div>';
+      h += '<div style="font-size:1.2rem">'+_esc(entry.icon||'📦')+'</div></div>';
+      if(config.dataSource && config.dataSource.api){
+        h += '<div style="font-size:var(--text-xs);color:var(--text-secondary);margin-bottom:var(--space-2)">API: <code style="background:#fff;padding:2px 6px;border:1px solid var(--border);border-radius:999px">'+_esc(config.dataSource.api)+'</code></div>';
+      }
+      h += '<div style="font-size:var(--text-sm);color:var(--text-tertiary)">'+_t('Block dang dung preview tong quat. Mo panel thuoc tinh de cau hinh chi tiet.','This block is using the generic preview. Open properties to configure the details.')+'</div>';
+      h += '</div>';
   }
 
   return h;
@@ -400,55 +499,62 @@ function _renderLibraryPanel(){
 function _renderPropertiesPanel(){
   var block = _findBlock(state.selectedBlock);
   if(!block) return '';
+  _ensurePropsDraft(block);
+  _ensureRegistriesLoaded();
+
+  var draft = state.propsDraft || block;
+  var catalog = (BE.BLOCK_CATALOG||{})[draft.type] || {};
+  var tabs = ((BE.BLOCK_PROPERTIES_SCHEMA||{})[draft.type] || []);
+  var activeKey = state.propsTab || (tabs[0] && tabs[0].key) || 'general';
+  var activeTab = tabs.find(function(tab){ return tab.key === activeKey; }) || tabs[0];
 
   var h = '';
   h += '<div style="position:fixed;right:0;top:0;bottom:0;width:400px;background:var(--bg-surface);border-left:1px solid var(--border);z-index:var(--z-modal);box-shadow:var(--shadow-xl);display:flex;flex-direction:column">';
 
   h += '<div style="padding:var(--space-4);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">';
-  h += '<h3 style="margin:0;font-size:var(--text-lg)">⚙ '+_t('Cấu hình Block','Block Config')+'</h3>';
+  h += '<div>';
+  h += '<div style="font-size:var(--text-xs);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-tertiary)">'+_t('Bo thuoc tinh','Property Inspector')+'</div>';
+  h += '<h3 style="margin:4px 0 0;font-size:var(--text-lg)">'+_esc(catalog.icon||'📦')+' '+_t('Cau hinh Block','Block Config')+'</h3>';
+  h += '</div>';
   h += '<button class="hm-btn hm-btn-ghost" data-action="close-props" style="font-size:1.2rem">×</button>';
   h += '</div>';
 
-  h += '<div style="flex:1;overflow-y:auto;padding:var(--space-4)">';
-
-  /* Block type */
-  h += '<div style="padding:var(--space-2) var(--space-3);background:var(--gray-50);border-radius:var(--radius-md);margin-bottom:var(--space-4);font-size:var(--text-sm)"><strong>'+_esc(_getCatalogLabel(block.type))+'</strong> <span style="color:var(--text-tertiary);font-size:var(--text-xs)">'+_esc(block.blockId)+'</span></div>';
-
-  /* Title */
-  h += '<label class="hm-label">'+_t('Tiêu đề (VI)','Title (VI)')+'</label>';
-  h += '<input type="text" class="hm-input" data-prop="title.vi" value="'+_esc(block.title?block.title.vi||'':'')+'" style="margin-bottom:var(--space-3)">';
-  h += '<label class="hm-label">'+_t('Tiêu đề (EN)','Title (EN)')+'</label>';
-  h += '<input type="text" class="hm-input" data-prop="title.en" value="'+_esc(block.title?block.title.en||'':'')+'" style="margin-bottom:var(--space-3)">';
-
-  /* API Binding */
-  h += '<label class="hm-label">'+_t('API Endpoint','API Endpoint')+'</label>';
-  var currentApi = (block.config&&block.config.dataSource&&block.config.dataSource.api)||'';
-  h += '<select class="hm-input hm-select" data-prop="api" style="margin-bottom:var(--space-3)">';
-  h += '<option value="">-- '+_t('Không có API','No API')+' --</option>';
-  var apiCatalog = BE.API_CATALOG || [];
-  var lastModule = '';
-  apiCatalog.forEach(function(api){
-    if(api.module !== lastModule){
-      if(lastModule) h += '</optgroup>';
-      h += '<optgroup label="'+_esc(api.module)+'">';
-      lastModule = api.module;
-    }
-    h += '<option value="'+_esc(api.action)+'"'+(currentApi===api.action?' selected':'')+'>'+_esc(api.action)+' — '+_esc(api.label)+'</option>';
+  h += '<div style="padding:var(--space-3);border-bottom:1px solid var(--border);background:var(--gray-50)">';
+  h += '<div style="display:flex;gap:var(--space-2);overflow:auto">';
+  tabs.forEach(function(tab){
+    h += '<button class="hm-btn '+(activeKey===tab.key?'hm-btn-primary':'hm-btn-ghost')+'" data-action="props-tab" data-tab="'+_esc(tab.key)+'" style="white-space:nowrap">'+_esc(tab.icon||'')+' '+_esc(_t(tab.label,tab.labelEn||tab.label))+'</button>';
   });
-  if(lastModule) h += '</optgroup>';
-  h += '</select>';
+  h += '</div>';
+  h += '</div>';
 
-  /* Data Key */
-  h += '<label class="hm-label">'+_t('Data Key (field trong response)','Data Key (response field)')+'</label>';
-  h += '<input type="text" class="hm-input" data-prop="dataKey" value="'+_esc(block.config&&block.config.dataSource?block.config.dataSource.dataKey||'':'')+'" placeholder="e.g. sales_orders" style="margin-bottom:var(--space-3)">';
+  h += '<div style="flex:1;overflow-y:auto;padding:var(--space-4)">';
+  h += '<div style="padding:var(--space-3);border:1px solid var(--border);border-radius:var(--radius-md);background:var(--gray-50);margin-bottom:var(--space-4)">';
+  h += '<div style="display:flex;justify-content:space-between;gap:var(--space-2);align-items:flex-start">';
+  h += '<div><strong style="display:block">'+_esc(_getCatalogLabel(draft.type))+'</strong><span style="font-size:var(--text-xs);color:var(--text-tertiary)">'+_esc(draft.blockId||'')+'</span></div>';
+  h += '<span style="font-size:1.2rem">'+_esc(catalog.icon||'📦')+'</span></div>';
+  if(catalog.desc) h += '<div style="font-size:var(--text-xs);color:var(--text-secondary);margin-top:var(--space-2)">'+_esc(catalog.desc)+'</div>';
+  h += '</div>';
 
-  /* Visibility condition */
-  h += '<label class="hm-label">'+_t('Điều kiện hiển thị','Visibility Condition')+'</label>';
-  h += '<input type="text" class="hm-input" data-prop="visibleWhen" value="'+_esc(block.visibleWhen||'')+'" placeholder="{{ currentUser.role === \'admin\' }}" style="margin-bottom:var(--space-3)">';
+  if(state.registries.loading){
+    h += '<div style="padding:var(--space-2) var(--space-3);margin-bottom:var(--space-3);font-size:var(--text-xs);color:var(--text-secondary);background:var(--amber-bg);border:1px solid var(--amber);border-radius:var(--radius-md)">'+_t('Dang nap registry local...','Loading local registries...')+'</div>';
+  } else if(state.registries.error){
+    h += '<div style="padding:var(--space-2) var(--space-3);margin-bottom:var(--space-3);font-size:var(--text-xs);color:var(--red);background:var(--red-bg);border:1px solid var(--red);border-radius:var(--radius-md);display:flex;justify-content:space-between;gap:var(--space-2);align-items:center">';
+    h += '<span>'+_esc(state.registries.error)+'</span>';
+    h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="registry-retry">'+_t('Thu lai','Retry')+'</button></div>';
+  }
 
-  /* Save button */
-  h += '<div style="margin-top:var(--space-4)"><button class="hm-btn hm-btn-primary" data-action="save-props">'+_t('Áp dụng','Apply')+'</button></div>';
+  if(activeTab){
+    (activeTab.sections||[]).forEach(function(section){
+      h += _renderPropSection(section, draft);
+    });
+  } else {
+    h += '<div class="hm-empty">'+_t('Khong tim thay property schema cho block nay','No property schema was found for this block')+'</div>';
+  }
 
+  h += '</div>';
+  h += '<div style="padding:var(--space-4);border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:var(--space-2)">';
+  h += '<button class="hm-btn hm-btn-secondary" data-action="close-props">'+_t('Dong','Close')+'</button>';
+  h += '<button class="hm-btn hm-btn-primary" data-action="save-props">'+_t('Ap dung','Apply')+'</button>';
   h += '</div></div>';
 
   h = '<div style="position:fixed;inset:0;background:rgba(0,0,0,0.2);z-index:'+(parseInt(getComputedStyle(document.documentElement).getPropertyValue('--z-modal'))||1300 - 1)+'" data-action="close-props"></div>' + h;
@@ -537,6 +643,8 @@ function _handleClick(e){
 
     case 'open-library':
       state.showLibrary = true;
+      state.selectedBlock = null;
+      state.propsDraft = null;
       state.insertTab = btn.getAttribute('data-tab');
       state.insertAfter = btn.getAttribute('data-after') || null;
       _paint();
@@ -563,18 +671,24 @@ function _handleClick(e){
       break;
 
     case 'config-block':
-      state.selectedBlock = btn.getAttribute('data-block');
+      _openBlockConfig(btn.getAttribute('data-block'));
+      break;
+
+    case 'props-tab':
+      state.propsTab = btn.getAttribute('data-tab') || 'general';
       _paint();
       break;
 
     case 'close-props':
       state.selectedBlock = null;
+      state.propsDraft = null;
       _paint();
       break;
 
     case 'save-props':
       _saveBlockProps();
       state.selectedBlock = null;
+      state.propsDraft = null;
       _paint();
       break;
 
@@ -594,6 +708,35 @@ function _handleClick(e){
     case 'move-up':
     case 'move-down':
       _moveBlock(btn.getAttribute('data-block'), action==='move-up'?-1:1);
+      _paint();
+      break;
+
+    case 'collection-add':
+      _collectionAdd(btn.getAttribute('data-path'));
+      _paint();
+      break;
+
+    case 'collection-remove':
+      _collectionRemove(btn.getAttribute('data-path'), parseInt(btn.getAttribute('data-index'),10));
+      _paint();
+      break;
+
+    case 'collection-duplicate':
+      _collectionDuplicate(btn.getAttribute('data-path'), parseInt(btn.getAttribute('data-index'),10));
+      _paint();
+      break;
+
+    case 'collection-up':
+    case 'collection-down':
+      _collectionMove(btn.getAttribute('data-path'), parseInt(btn.getAttribute('data-index'),10), action==='collection-up'?-1:1);
+      _paint();
+      break;
+
+    case 'registry-retry':
+      state.registries.loading = false;
+      state.registries.loaded = false;
+      state.registries.error = '';
+      _ensureRegistriesLoaded(true);
       _paint();
       break;
 
@@ -621,7 +764,13 @@ function _handleClick(e){
 function _handleInput(e){
   if(e.target.id === 'mb-lib-search'){
     state.librarySearch = e.target.value;
-    // Don't full repaint, just filter
+    _paint();
+    return;
+  }
+
+  if(e.target.hasAttribute('data-field-path')){
+    _updateDraftValue(e.target);
+    if(e.target.getAttribute('data-trigger-repaint') === '1') _paint();
   }
 }
 
@@ -655,6 +804,9 @@ function _createBlankModule(){
     tabs: tabs
   };
 
+  state.selectedBlock = null;
+  state.propsDraft = null;
+  state.propsTab = 'general';
   state.activeTab = tabs[0].tabId;
   state.step = 'build';
   _paint();
@@ -667,14 +819,8 @@ function _addBlockToSchema(blockType, preConfig){
   if(!tab && state.schema.tabs.length) tab = state.schema.tabs[0];
   if(!tab) return;
 
-  var newBlock = {
-    blockId: _uid(),
-    type: blockType,
-    visible: true,
-    order: (tab.blocks||[]).length + 1,
-    title: { vi: (BE.BLOCK_CATALOG[blockType]||{}).label||blockType, en: (BE.BLOCK_CATALOG[blockType]||{}).labelEn||blockType },
-    config: preConfig ? JSON.parse(JSON.stringify(preConfig)) : {}
-  };
+  var newBlock = _createBlockScaffold(blockType, preConfig);
+  newBlock.order = (tab.blocks||[]).length + 1;
 
   if(state.insertAfter){
     var idx = tab.blocks.findIndex(function(b){ return b.blockId === state.insertAfter; });
@@ -683,6 +829,9 @@ function _addBlockToSchema(blockType, preConfig){
     tab.blocks.push(newBlock);
   }
   tab.blocks.forEach(function(b,i){ b.order = i+1; });
+  state.selectedBlock = newBlock.blockId;
+  state.propsDraft = _clone(newBlock);
+  state.propsTab = 'general';
 }
 
 function _removeBlock(blockId){
@@ -724,33 +873,21 @@ function _findBlock(blockId){
   if(!state.schema) return null;
   var found = null;
   state.schema.tabs.forEach(function(tab){
-    (tab.blocks||[]).forEach(function(b){ if(b.blockId === blockId) found = b; });
+    (tab.blocks||[]).forEach(function(b){
+      var currentId = b.blockId || b.id;
+      if(currentId === blockId) found = b;
+    });
   });
   return found;
 }
 
 function _saveBlockProps(){
   var block = _findBlock(state.selectedBlock);
-  if(!block) return;
-  var c = state.container;
-
-  // Title
-  var titleVi = (c.querySelector('[data-prop="title.vi"]')||{}).value;
-  var titleEn = (c.querySelector('[data-prop="title.en"]')||{}).value;
-  if(titleVi !== undefined){ if(!block.title) block.title = {}; block.title.vi = titleVi; block.title.en = titleEn||titleVi; }
-
-  // API
-  var api = (c.querySelector('[data-prop="api"]')||{}).value;
-  var dataKey = (c.querySelector('[data-prop="dataKey"]')||{}).value;
-  if(api){
-    if(!block.config) block.config = {};
-    block.config.dataSource = { api: api, method: 'GET', dataKey: dataKey };
-  }
-
-  // Visibility
-  var visibleWhen = (c.querySelector('[data-prop="visibleWhen"]')||{}).value;
-  if(visibleWhen) block.visibleWhen = visibleWhen;
-  else delete block.visibleWhen;
+  var draft = state.propsDraft;
+  if(!block || !draft) return;
+  _applySchemaDefaults(draft, _getBlockSchema(draft.type));
+  Object.keys(block).forEach(function(key){ delete block[key]; });
+  Object.keys(draft).forEach(function(key){ block[key] = _clone(draft[key]); });
 }
 
 function _saveModule(){
@@ -802,6 +939,10 @@ function _openSavedModule(moduleId){
     var raw = localStorage.getItem('hm_module_schema_'+moduleId);
     if(raw){
       state.schema = JSON.parse(raw);
+      _normalizeSchemaBlocks();
+      state.selectedBlock = null;
+      state.propsDraft = null;
+      state.propsTab = 'general';
       state.activeTab = state.schema.tabs && state.schema.tabs.length ? state.schema.tabs[0].tabId : null;
       state.step = 'build';
       _paint();
@@ -818,6 +959,350 @@ function _deleteSavedModule(moduleId){
 function _getCatalogLabel(type){
   var entry = (BE.BLOCK_CATALOG||{})[type];
   return entry ? _t(entry.label, entry.labelEn||entry.label) : type;
+}
+
+function _getBlockSchema(type){
+  return ((BE.BLOCK_PROPERTIES_SCHEMA||{})[type] || []);
+}
+
+function _ensurePropsDraft(block){
+  if(!block) return;
+  if(state.propsDraft && state.propsDraft.blockId === (block.blockId||block.id)) return;
+  state.propsDraft = _clone(block);
+  _applySchemaDefaults(state.propsDraft, _getBlockSchema(block.type));
+}
+
+function _applySchemaDefaults(target, tabs){
+  (tabs||[]).forEach(function(tab){
+    (tab.sections||[]).forEach(function(section){
+      (section.fields||[]).forEach(function(field){
+        if(field.default === undefined) return;
+        if(_getByPath(target, field.path) === undefined) _setByPath(target, field.path, _clone(field.default));
+      });
+    });
+  });
+  if(!target.blockId && target.id) target.blockId = target.id;
+  if(!target.id && target.blockId) target.id = target.blockId;
+  if(!target.title) target.title = { vi:'', en:'' };
+  if(!target.subtitle) target.subtitle = { vi:'', en:'' };
+  if(!target.config) target.config = {};
+  return target;
+}
+
+function _createBlockScaffold(blockType, preConfig){
+  var catalog = (BE.BLOCK_CATALOG||{})[blockType] || {};
+  var id = _uid();
+  var block = {
+    blockId: id,
+    id: id,
+    type: blockType,
+    visible: true,
+    title: { vi: catalog.label || blockType, en: catalog.labelEn || blockType },
+    subtitle: { vi:'', en:'' },
+    config: {}
+  };
+  _applySchemaDefaults(block, _getBlockSchema(blockType));
+  if(preConfig) _mergeDeep(block.config, _clone(preConfig));
+  return block;
+}
+
+function _openBlockConfig(blockId){
+  var block = _findBlock(blockId);
+  if(!block) return;
+  state.selectedBlock = block.blockId || block.id;
+  state.propsTab = 'general';
+  state.propsDraft = _clone(block);
+  _applySchemaDefaults(state.propsDraft, _getBlockSchema(block.type));
+  _ensureRegistriesLoaded();
+  _paint();
+}
+
+function _normalizeSchemaBlocks(){
+  if(!state.schema) return;
+  (state.schema.tabs||[]).forEach(function(tab){
+    (tab.blocks||[]).forEach(function(block, index){
+      if(!block.blockId && block.id) block.blockId = block.id;
+      if(!block.id && block.blockId) block.id = block.blockId;
+      if(!block.blockId){
+        block.blockId = _uid();
+        block.id = block.blockId;
+      }
+      if(block.order == null) block.order = index + 1;
+      _applySchemaDefaults(block, _getBlockSchema(block.type));
+    });
+  });
+}
+
+function _renderPropSection(section, draft){
+  var h = '';
+  h += '<section class="hm-card hm-card-flat" style="margin-bottom:var(--space-3);padding:var(--space-3)">';
+  h += '<div style="margin-bottom:var(--space-3)"><div style="font-weight:var(--font-semibold)">'+_esc(_t(section.label,section.labelEn||section.label))+'</div></div>';
+  (section.fields||[]).forEach(function(field){
+    h += _renderPropField(field, field.path, _getByPath(draft, field.path));
+  });
+  h += '</section>';
+  return h;
+}
+
+function _renderPropField(field, path, value){
+  var label = _t(field.label, field.labelEn||field.label);
+  var h = '<div style="margin-bottom:var(--space-3)">';
+  if(field.type === 'collection'){
+    h += '<div class="hm-label">'+_esc(label)+'</div>';
+    h += _renderCollectionField(field, path, Array.isArray(value) ? value : []);
+    h += '</div>';
+    return h;
+  }
+  h += '<label class="hm-label">'+_esc(label)+'</label>';
+  h += _renderFieldControl(field, path, value);
+  h += '</div>';
+  return h;
+}
+
+function _renderCollectionField(field, path, items){
+  var h = '';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-2)">';
+  h += '<div style="font-size:var(--text-xs);color:var(--text-tertiary)">'+_esc((field.itemLabel||'Item')+' × '+items.length)+'</div>';
+  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="collection-add" data-path="'+_esc(path)+'">+ '+_esc(field.addLabel||'Add item')+'</button>';
+  h += '</div>';
+  if(!items.length){
+    h += '<div style="padding:var(--space-3);border:1px dashed var(--border);border-radius:var(--radius-md);color:var(--text-tertiary);font-size:var(--text-sm)">'+_t('Chua co item nao. Bam nut them de bat dau.','No items yet. Add one to begin.')+'</div>';
+    return h;
+  }
+  items.forEach(function(item, index){
+    h += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-3);margin-bottom:var(--space-2)">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-2);margin-bottom:var(--space-3)">';
+    h += '<strong style="font-size:var(--text-sm)">'+_esc(_getCollectionItemTitle(field, item, index))+'</strong>';
+    h += '<div style="display:flex;gap:2px">';
+    h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="collection-up" data-path="'+_esc(path)+'" data-index="'+index+'">▲</button>';
+    h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="collection-down" data-path="'+_esc(path)+'" data-index="'+index+'">▼</button>';
+    h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="collection-duplicate" data-path="'+_esc(path)+'" data-index="'+index+'">⧉</button>';
+    h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" style="color:var(--red)" data-action="collection-remove" data-path="'+_esc(path)+'" data-index="'+index+'">🗑</button>';
+    h += '</div></div>';
+    (field.itemFields||[]).forEach(function(itemField){
+      var itemPath = path + '.' + index + '.' + itemField.path;
+      h += _renderPropField(itemField, itemPath, _getByPath(state.propsDraft, itemPath));
+    });
+    h += '</div>';
+  });
+  return h;
+}
+
+function _renderFieldControl(field, path, value){
+  var type = field.type;
+  var attrs = ' data-field-path="'+_esc(path)+'" data-field-type="'+_esc(type)+'"'+(field.repaintOnChange?' data-trigger-repaint="1"':'');
+  var placeholder = field.placeholder ? ' placeholder="'+_esc(field.placeholder)+'"' : '';
+  var options = _getFieldOptions(field);
+  var textValue = value == null ? '' : (typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value));
+
+  if(type === 'toggle'){
+    return '<label style="display:flex;align-items:center;gap:var(--space-2);height:40px"><input type="checkbox"'+attrs+(value?' checked':'')+'> <span style="font-size:var(--text-sm);color:var(--text-secondary)">'+_t('Bat','Enabled')+'</span></label>';
+  }
+  if(type === 'select' || type === 'api-select' || type === 'field-select' || type === 'formula-select' || type === 'status-set-select' || type === 'iot-connector-select' || type === 'field-type-select'){
+    if(!options.length){
+      return '<input type="text" class="hm-input"'+attrs+' value="'+_esc(textValue)+'"'+placeholder+'>';
+    }
+    var h = '<select class="hm-input hm-select"'+attrs+'>';
+    h += '<option value=""></option>';
+    options.forEach(function(option){
+      var raw = _normalizeOption(option);
+      var selected = String(raw.value) === String(textValue) ? ' selected' : '';
+      h += '<option value="'+_esc(raw.value)+'"'+selected+'>'+_esc(raw.label)+'</option>';
+    });
+    if(textValue && !options.some(function(option){ return String(_normalizeOption(option).value) === String(textValue); })){
+      h += '<option value="'+_esc(textValue)+'" selected>'+_esc(textValue)+'</option>';
+    }
+    h += '</select>';
+    return h;
+  }
+  if(type === 'textarea' || type === 'json' || type === 'code' || type === 'expression'){
+    return '<textarea class="hm-input" style="height:'+(field.rows ? (field.rows*28+18) : 104)+'px;font-family:'+(type === 'textarea' ? 'inherit' : 'ui-monospace, SFMono-Regular, Menlo, monospace')+'"' + attrs + placeholder + '>'+_esc(textValue)+'</textarea>';
+  }
+  if(type === 'color'){
+    return '<input type="color" class="hm-input" style="padding:6px;height:40px"'+attrs+' value="'+_esc(textValue || '#2563eb')+'">';
+  }
+  if(type === 'number'){
+    return '<input type="number" class="hm-input"'+attrs+' value="'+_esc(textValue)+'"'+(field.min!=null?' min="'+field.min+'"':'')+(field.max!=null?' max="'+field.max+'"':'')+(field.step!=null?' step="'+field.step+'"':'')+placeholder+'>';
+  }
+  return '<input type="text" class="hm-input"'+attrs+' value="'+_esc(textValue)+'"'+placeholder+'>';
+}
+
+function _normalizeOption(option){
+  if(option && typeof option === 'object') return { value: option.value, label: option.label || option.labelEn || option.value };
+  return { value: option, label: option };
+}
+
+function _getFieldOptions(field){
+  if(field.options) return field.options;
+  switch(field.type){
+    case 'api-select':
+      return (BE.API_CATALOG||[]).map(function(api){
+        return { value: api.action, label: api.action + ' - ' + (api.label || api.action) };
+      });
+    case 'field-select':
+      var api = _getByPath(state.propsDraft, 'config.dataSource.api');
+      return (state.registries.dataFields[api] || []).map(function(item){
+        return { value:item.key, label:item.key + ' - ' + (item.labelEn || item.label || item.key) };
+      });
+    case 'formula-select':
+      return Object.keys(state.registries.computedFormulas||{}).filter(function(key){ return key !== '_meta'; }).map(function(key){
+        var item = state.registries.computedFormulas[key] || {};
+        return { value:key, label:key + ' - ' + (item.labelEn || item.label || key) };
+      });
+    case 'status-set-select':
+      return Object.keys(state.registries.statusOptions||{}).filter(function(key){ return key !== '_meta'; }).map(function(key){
+        var item = state.registries.statusOptions[key] || {};
+        return { value:key, label:key + ' - ' + (item.labelEn || item.label || key) };
+      });
+    case 'iot-connector-select':
+      return Object.keys(state.registries.iotConnectors||{}).filter(function(key){ return key !== '_meta'; }).map(function(key){
+        var item = state.registries.iotConnectors[key] || {};
+        return { value:key, label:key + ' - ' + (item.labelVi || item.label || key) };
+      });
+    case 'field-type-select':
+      return Object.keys(state.registries.fieldTypes||{}).filter(function(key){ return key !== '_meta'; }).map(function(key){
+        return { value:key, label:key };
+      });
+    default:
+      return [];
+  }
+}
+
+function _getCollectionItemTitle(field, item, index){
+  return _getByPath(item,'label.vi') || _getByPath(item,'label.en') || item.key || item.actionId || item.point || item.fieldRef || item.valueField || ((field.itemLabel||'Item') + ' ' + (index+1));
+}
+
+function _createCollectionItem(field){
+  var item = {};
+  (field.itemFields||[]).forEach(function(itemField){
+    if(itemField.default !== undefined) _setByPath(item, itemField.path, _clone(itemField.default));
+  });
+  return item;
+}
+
+function _collectionFieldByPath(path){
+  var tabs = _getBlockSchema((state.propsDraft||{}).type);
+  var found = null;
+  tabs.forEach(function(tab){
+    (tab.sections||[]).forEach(function(section){
+      (section.fields||[]).forEach(function(field){
+        if(field.type === 'collection' && field.path === path) found = field;
+      });
+    });
+  });
+  return found;
+}
+
+function _collectionAdd(path){
+  if(!state.propsDraft) return;
+  var field = _collectionFieldByPath(path);
+  var items = _getByPath(state.propsDraft, path);
+  if(!Array.isArray(items)){
+    items = [];
+    _setByPath(state.propsDraft, path, items);
+  }
+  items.push(_createCollectionItem(field || {}));
+}
+
+function _collectionRemove(path, index){
+  var items = _getByPath(state.propsDraft, path);
+  if(!Array.isArray(items)) return;
+  items.splice(index, 1);
+}
+
+function _collectionDuplicate(path, index){
+  var items = _getByPath(state.propsDraft, path);
+  if(!Array.isArray(items) || !items[index]) return;
+  items.splice(index + 1, 0, _clone(items[index]));
+}
+
+function _collectionMove(path, index, direction){
+  var items = _getByPath(state.propsDraft, path);
+  var swap = index + direction;
+  var tmp;
+  if(!Array.isArray(items) || swap < 0 || swap >= items.length) return;
+  tmp = items[index];
+  items[index] = items[swap];
+  items[swap] = tmp;
+}
+
+function _updateDraftValue(target){
+  var path = target.getAttribute('data-field-path');
+  var type = target.getAttribute('data-field-type');
+  var value = target.value;
+  if(!state.propsDraft || !path) return;
+
+  if(type === 'toggle'){
+    _setByPath(state.propsDraft, path, !!target.checked);
+    return;
+  }
+  if(type === 'number'){
+    _setByPath(state.propsDraft, path, value === '' ? 0 : Number(value));
+    return;
+  }
+  if(type === 'json'){
+    try {
+      _setByPath(state.propsDraft, path, value ? JSON.parse(value) : {});
+    } catch(err){
+      _setByPath(state.propsDraft, path, value);
+    }
+    return;
+  }
+  _setByPath(state.propsDraft, path, value);
+}
+
+function _ensureRegistriesLoaded(force){
+  if(state.registries.loading) return;
+  if(state.registries.loaded && !force) return;
+  if(typeof fetch !== 'function') return;
+  state.registries.loading = true;
+  state.registries.error = '';
+  Promise.all([
+    _loadRegistry('field-types', 'fieldTypes'),
+    _loadRegistry('status-options', 'statusOptions'),
+    _loadRegistry('data-fields', 'dataFields'),
+    _loadRegistry('computed-formulas', 'computedFormulas'),
+    _loadRegistry('iot-connectors', 'iotConnectors')
+  ]).then(function(){
+    state.registries.loading = false;
+    state.registries.loaded = true;
+    if(state.selectedBlock) _paint();
+  }).catch(function(){
+    state.registries.loading = false;
+    state.registries.error = _t('Khong the nap mot phan registry local. Ban van co the nhap tay.','Could not load one or more local registries. You can still enter values manually.');
+    if(state.selectedBlock) _paint();
+  });
+}
+
+function _loadRegistry(file, key){
+  var fallback = key === 'iotConnectors' ? (BE.IOT_CONNECTORS||{}) : {};
+  return _fetchJsonWithFallback(_registryPaths(file), 0).catch(function(){
+    return fallback;
+  }).then(function(data){
+    state.registries[key] = data || {};
+    return data;
+  });
+}
+
+function _registryPaths(file){
+  return [
+    'qms-data/registry/' + file + '.json',
+    './qms-data/registry/' + file + '.json',
+    '/qms-data/registry/' + file + '.json',
+    '01-QMS-Portal/qms-data/registry/' + file + '.json',
+    './01-QMS-Portal/qms-data/registry/' + file + '.json',
+    '/01-QMS-Portal/qms-data/registry/' + file + '.json'
+  ];
+}
+
+function _fetchJsonWithFallback(paths, index){
+  if(index >= paths.length) return Promise.reject(new Error('not-found'));
+  return fetch(paths[index], { cache:'no-store' }).then(function(resp){
+    if(!resp.ok) throw new Error('bad-response');
+    return resp.json();
+  }).catch(function(){
+    return _fetchJsonWithFallback(paths, index + 1);
+  });
 }
 
 /* ── Export ───────────────────────────────────────────────────────────────── */
