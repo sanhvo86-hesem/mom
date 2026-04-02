@@ -55,6 +55,44 @@ class AllocationController extends BaseController
         return $this->idGenerator;
     }
 
+    /**
+     * @return array<int, string>
+     */
+    private function allocationReadRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            ['qms_engineer', 'qa_manager', 'quality_manager', 'quality_engineer', 'internal_auditor']
+        )));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function allocationWriteRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            ['qms_engineer', 'qa_manager', 'quality_manager', 'quality_engineer']
+        )));
+    }
+
+    /**
+     * @return void
+     */
+    private function requireAllocationReadAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->allocationReadRoles());
+    }
+
+    /**
+     * @return void
+     */
+    private function requireAllocationWriteAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->allocationWriteRoles());
+    }
+
     // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
@@ -72,6 +110,7 @@ class AllocationController extends BaseController
     public function allocate(): never
     {
         $user = $this->requireAuth();
+        $this->requireAllocationWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -134,7 +173,8 @@ class AllocationController extends BaseController
      */
     public function getHistory(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAllocationReadAccess($user);
 
         $filters = [];
 
@@ -197,6 +237,7 @@ class AllocationController extends BaseController
     public function void(): never
     {
         $user = $this->requireAuth();
+        $this->requireAllocationWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -247,7 +288,8 @@ class AllocationController extends BaseController
      */
     public function checkDuplicate(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAllocationReadAccess($user);
 
         $recordId = $this->query('record_id');
         if ($recordId === null || trim($recordId) === '') {
@@ -282,7 +324,8 @@ class AllocationController extends BaseController
      */
     public function getStatus(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAllocationReadAccess($user);
 
         $recordId     = $this->query('record_id');
         $allocationId = $this->query('allocation_id');
@@ -329,6 +372,7 @@ class AllocationController extends BaseController
     public function downloadTxt(): never
     {
         $user = $this->requireAuth();
+        $this->requireAllocationWriteAccess($user);
 
         $recordId = $this->query('record_id');
         if ($recordId === null || trim($recordId) === '') {
@@ -385,7 +429,8 @@ class AllocationController extends BaseController
      */
     public function getExpandedTypes(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAllocationReadAccess($user);
 
         $department = $this->query('department');
         if ($department !== null && $department !== '') {
@@ -453,7 +498,8 @@ class AllocationController extends BaseController
      */
     public function preview(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAllocationReadAccess($user);
 
         $recordType = $this->query('record_type');
         if ($recordType === null || trim($recordType) === '') {

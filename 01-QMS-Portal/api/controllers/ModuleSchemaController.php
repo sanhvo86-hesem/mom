@@ -9,6 +9,16 @@ use Throwable;
  */
 class ModuleSchemaController extends BaseController
 {
+    /**
+     * Module schema mutations are effectively low-code platform administration.
+     *
+     * @return void
+     */
+    private function requireSchemaWriteAccess(array $user): void
+    {
+        $this->requireAnyRole($user, array_merge(admin_roles(), ['qms_engineer', 'quality_manager']));
+    }
+
     private function schemaDir(): string
     {
         $dir = $this->dataDir . '/modules';
@@ -69,6 +79,7 @@ class ModuleSchemaController extends BaseController
     public function saveSchema(): never
     {
         $user = $this->requireAuth();
+        $this->requireSchemaWriteAccess($user);
         $this->requireCsrf();
         $body = $this->jsonBody();
         $schema = $body['schema'] ?? $body;
@@ -97,6 +108,7 @@ class ModuleSchemaController extends BaseController
     public function deleteSchema(): never
     {
         $user = $this->requireAuth();
+        $this->requireSchemaWriteAccess($user);
         $this->requireCsrf();
         $body = $this->jsonBody();
         $moduleId = $body['moduleId'] ?? '';
@@ -118,6 +130,7 @@ class ModuleSchemaController extends BaseController
     public function resetSchema(): never
     {
         $user = $this->requireAuth();
+        $this->requireSchemaWriteAccess($user);
         $this->requireCsrf();
         $body = $this->jsonBody();
         $moduleId = $body['moduleId'] ?? '';

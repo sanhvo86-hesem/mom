@@ -1212,6 +1212,77 @@ const supplementalVietnameseTokens = {
   phantom: 'ảo',
   standard: 'tiêu chuẩn',
   uncertainty: 'độ không đảm bảo',
+  link: 'liên kết',
+  links: 'liên kết',
+  part: 'phụ tùng',
+  parts: 'phụ tùng',
+  fact: 'sự kiện',
+  financial: 'tài chính',
+  tag: 'thẻ',
+  tooling: 'tooling',
+  aging: 'lão hóa',
+  allocated: 'đã phân bổ',
+  bottleneck: 'nút cổ chai',
+  day: 'ngày',
+  days: 'ngày',
+  locked: 'khóa',
+  until: 'đến',
+  actor: 'người thao tác',
+  aggregate: 'tổng thể',
+  alternate: 'thay thế',
+  cal: 'CAL',
+  grr: 'GRR',
+  result: 'kết quả',
+  results: 'kết quả',
+  file: 'tệp',
+  path: 'đường dẫn',
+  size: 'kích thước',
+  byte: 'byte',
+  bytes: 'byte',
+  piece: 'chi tiết',
+  software: 'phần mềm',
+  amendment: 'phụ lục',
+  summary: 'tóm tắt',
+  responsibility: 'trách nhiệm',
+  discount: 'chiết khấu',
+  accrual: 'trích trước',
+  period: 'kỳ',
+  american: 'Mỹ',
+  compliant: 'tuân thủ',
+  dfars: 'DFARS',
+  jurisdiction: 'thẩm quyền',
+  restricted: 'hạn chế',
+  party: 'đối tượng',
+  screen: 'sàng lọc',
+  specialty: 'đặc chủng',
+  metal: 'kim loại',
+  nonconformance: 'không phù hợp',
+  detail: 'chi tiết',
+  inspector: 'thanh tra',
+  reviewer: 'người xem xét',
+  owner: 'chủ sở hữu',
+  author: 'tác giả',
+  parent: 'cha',
+  subject: 'chủ đề',
+  phone: 'điện thoại',
+  primary: 'chính',
+  touchpoint: 'điểm chạm',
+  sentiment: 'cảm xúc',
+  channel: 'kênh',
+  team: 'nhóm',
+  closure: 'đóng',
+  capability: 'năng lực',
+  intermittency: 'gián đoạn',
+  variability: 'biến thiên',
+  chunk: 'khối',
+  embedding: 'nhúng',
+  text: 'văn bản',
+  spec: 'quy cách',
+  profit: 'lợi nhuận',
+  center: 'trung tâm',
+  industry: 'ngành',
+  segment: 'phân khúc',
+  baseline: 'chuẩn gốc',
 };
 
 const tableModulePrefixes = new Set(['ap', 'ar', 'aps', 'crm', 'wms', 'mes', 'mdm', 'ehs', 'hcm', 'tms', 'srm', 'svc', 'fin', 'qual', 'osc', 'trade', 'trace', 'eng', 'com', 'prj', 'pm']);
@@ -1245,14 +1316,24 @@ const phraseModifierTokens = new Set([
 const ambiguousGenericColumns = new Set(['status', 'type', 'reason_code', 'priority', 'category', 'severity', 'level', 'name', 'code', 'number', 'metadata', 'description']);
 const tableLabelOverrides = {
   ap_ar_invoices: 'Hóa đơn AP AR',
+  aps_pegging_links: 'Liên kết gán nối APS',
   bill_of_materials: 'Định mức vật liệu',
+  dw_fact_financial: 'Bảng sự kiện tài chính DW',
+  evidence_links: 'Liên kết bằng chứng',
   ncr_records: 'Hồ sơ NCR',
   capa_records: 'Hồ sơ CAPA',
   fai_records: 'Hồ sơ FAI',
   job_orders: 'Lệnh sản xuất',
+  record_links: 'Liên kết hồ sơ',
   sales_orders: 'Đơn hàng bán',
   purchase_orders: 'Đơn hàng mua',
+  svc_service_parts: 'Phụ tùng dịch vụ SVC',
+  tags: 'Thẻ',
+  tooling_calibration_links: 'Liên kết hiệu chuẩn tooling',
+  trace_genealogy_links: 'Liên kết phả hệ truy xuất',
+  warehouses: 'Kho hàng',
   wms_transfer_orders: 'Lệnh chuyển kho WMS',
+  wms_zones: 'Khu vực WMS',
   approved_supplier_list: 'Danh sách nhà cung cấp được duyệt',
 };
 const labelOverridesV2 = {
@@ -1378,7 +1459,7 @@ function translateVietnameseTokenV2(token) {
   if (supplementalVietnameseTokens[token]) return supplementalVietnameseTokens[token];
   if (token.endsWith('sis')) return translateVietnameseToken(token);
   if (token.length > 4 && token.endsWith('ies')) return translateVietnameseTokenV2(`${token.slice(0, -3)}y`);
-  if (token.length > 4 && token.endsWith('es')) return translateVietnameseTokenV2(token.slice(0, -2));
+  if (token.length > 4 && /(ches|shes|xes|zes|sses)$/.test(token)) return translateVietnameseTokenV2(token.slice(0, -2));
   if (token.length > 3 && token.endsWith('s')) return translateVietnameseTokenV2(token.slice(0, -1));
   return translateVietnameseToken(token);
 }
@@ -1399,6 +1480,7 @@ function vietnameseLabelFromKeyV2(key) {
   const normalized = toSnakeCase(key);
   const tokens = normalized.split('_').filter(Boolean);
   if (!tokens.length) return key;
+  if (tokens[0] === 'is' && tokens.length > 1) return capitalizeLabel(vietnamesePhrase(tokens.slice(1)));
   if (tokens.at(-1) === 'id' && tokens.length > 1) return capitalizeLabel(`ID ${vietnamesePhrase(tokens.slice(0, -1))}`);
   if (tokens.at(-1) === 'status' && tokens.length > 1) return capitalizeLabel(`Trạng thái ${vietnamesePhrase(tokens.slice(0, -1))}`);
   if (tokens.at(-1) === 'number' && tokens.length > 1) return capitalizeLabel(`Số ${vietnamesePhrase(tokens.slice(0, -1))}`);

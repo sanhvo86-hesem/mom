@@ -54,6 +54,56 @@ class CiController extends BaseController
     }
 
     /**
+     * @return array<int, string>
+     */
+    private function ciReadRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            [
+                'ceo',
+                'production_director',
+                'production_manager',
+                'cnc_workshop_manager',
+                'sales_manager',
+                'quality_manager',
+                'qa_manager',
+                'quality_engineer',
+                'qms_engineer',
+                'engineering_manager',
+                'engineering_lead',
+            ]
+        )));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function ciWriteRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            $this->ciReadRoles(),
+            ['shift_leader', 'production_planner']
+        )));
+    }
+
+    /**
+     * @return void
+     */
+    private function requireCiReadAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->ciReadRoles());
+    }
+
+    /**
+     * @return void
+     */
+    private function requireCiWriteAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->ciWriteRoles());
+    }
+
+    /**
      * Generate a sequential number for a given prefix and year.
      *
      * @param array  $items  Existing items to scan.
@@ -92,6 +142,7 @@ class CiController extends BaseController
     public function dashboard(): never
     {
         $user = $this->requireAuth();
+        $this->requireCiReadAccess($user);
 
         try {
             $suggestions = $this->readJsonFile($this->ciDir() . '/suggestions.json') ?? [];
@@ -109,6 +160,35 @@ class CiController extends BaseController
             }
 
             $openSuggestions = count(array_filter($suggestions, fn(array $s) => !in_array(strtolower($s['status'] ?? ''), ['closed', 'rejected', 'implemented'], true)));
+            $implementedCount = count(array_filter($suggestions, static fn(array $s): bool => strtolower((string)($s['status'] ?? '')) === 'implemented'));
+            $recentActivity = [];
+
+            foreach ($suggestions as $suggestion) {
+                $recentActivity[] = [
+                    'date' => (string)($suggestion['updated_at'] ?? $suggestion['created_at'] ?? ''),
+                    'text' => 'Suggestion ' . (string)($suggestion['number'] ?? $suggestion['id'] ?? '') . ' - ' . (string)($suggestion['title'] ?? ''),
+                ];
+            }
+
+            foreach ($projects as $project) {
+                $history = is_array($project['phase_history'] ?? null) ? $project['phase_history'] : [];
+                if ($history === []) {
+                    $recentActivity[] = [
+                        'date' => (string)($project['updated_at'] ?? $project['created_at'] ?? ''),
+                        'text' => 'Project ' . (string)($project['number'] ?? $project['id'] ?? '') . ' - ' . (string)($project['title'] ?? ''),
+                    ];
+                    continue;
+                }
+
+                foreach ($history as $event) {
+                    $recentActivity[] = [
+                        'date' => (string)($event['entered_at'] ?? $project['updated_at'] ?? ''),
+                        'text' => 'Project ' . (string)($project['number'] ?? $project['id'] ?? '') . ' -> ' . strtoupper((string)($event['phase'] ?? $project['phase'] ?? 'plan')),
+                    ];
+                }
+            }
+
+            usort($recentActivity, static fn(array $a, array $b): int => strcmp((string)($b['date'] ?? ''), (string)($a['date'] ?? '')));
 
             $kpis = [
                 'total_suggestions'   => count($suggestions),
@@ -122,7 +202,15 @@ class CiController extends BaseController
                     : 0,
             ];
 
-            $this->success(['kpis' => $kpis]);
+            $this->success([
+                'kpis' => $kpis,
+                'active_projects' => $kpis['active_projects'],
+                'suggestions_count' => $kpis['total_suggestions'],
+                'implemented_count' => $implementedCount,
+                'total_cost_saved' => $kpis['total_savings'],
+                'phase_counts' => $phaseCounts,
+                'recent_activity' => array_slice($recentActivity, 0, 10),
+            ]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('ci_dashboard_failed', 500, $e->getMessage());
@@ -143,18 +231,19 @@ class CiController extends BaseController
     public function listSuggestions(): never
     {
         $user = $this->requireAuth();
+        $this->requireCiReadAccess($user);
 
         try {
             $file = $this->ciDir() . '/suggestions.json';
             $all  = $this->readJsonFile($file) ?? [];
 
-            $status = $this->query('status');
+            $status = $this->input('status');
             if ($status !== null && $status !== '') {
                 $status = strtolower($status);
                 $all = array_filter($all, fn(array $s) => strtolower($s['status'] ?? '') === $status);
             }
 
-            $department = $this->query('department');
+            $department = $this->input('department');
             if ($department !== null && $department !== '') {
                 $all = array_filter($all, fn(array $s) => stripos($s['department'] ?? '', $department) !== false);
             }
@@ -162,8 +251,8 @@ class CiController extends BaseController
             // Sort newest first
             usort($all, fn(array $a, array $b) => ($b['created_at'] ?? '') <=> ($a['created_at'] ?? ''));
 
-            $offset = max(0, (int)($this->query('offset', '0')));
-            $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
+            $offset = max(0, (int)($this->input('offset', '0')));
+            $limit  = min(200, max(1, (int)($this->input('limit', '50'))));
             $total  = count($all);
             $items  = array_slice(array_values($all), $offset, $limit);
 
@@ -212,6 +301,8 @@ class CiController extends BaseController
                 'category'          => strtolower(trim((string)($body['category'] ?? 'quality'))),
                 'priority'          => strtolower(trim((string)($body['priority'] ?? 'medium'))),
                 'estimated_savings' => round((float)($body['estimated_savings'] ?? 0), 2),
+                'expected_benefit'  => trim((string)($body['expected_benefit'] ?? '')),
+                'affected_area'     => trim((string)($body['affected_area'] ?? '')),
                 'status'            => 'new',
                 'submitted_by'      => $userId,
                 'created_at'        => $this->nowIso(),
@@ -249,24 +340,25 @@ class CiController extends BaseController
     public function listProjects(): never
     {
         $user = $this->requireAuth();
+        $this->requireCiReadAccess($user);
 
         try {
             $file = $this->ciDir() . '/projects.json';
             $all  = $this->readJsonFile($file) ?? [];
 
-            $phase = $this->query('phase');
+            $phase = $this->input('phase');
             if ($phase !== null && $phase !== '') {
                 $phase = strtolower($phase);
                 $all = array_filter($all, fn(array $p) => strtolower($p['phase'] ?? '') === $phase);
             }
 
-            $status = $this->query('status');
+            $status = $this->input('status');
             if ($status !== null && $status !== '') {
                 $status = strtolower($status);
                 $all = array_filter($all, fn(array $p) => strtolower($p['status'] ?? '') === $status);
             }
 
-            $department = $this->query('department');
+            $department = $this->input('department');
             if ($department !== null && $department !== '') {
                 $all = array_filter($all, fn(array $p) => stripos($p['department'] ?? '', $department) !== false);
             }
@@ -274,8 +366,8 @@ class CiController extends BaseController
             // Sort newest first
             usort($all, fn(array $a, array $b) => ($b['created_at'] ?? '') <=> ($a['created_at'] ?? ''));
 
-            $offset = max(0, (int)($this->query('offset', '0')));
-            $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
+            $offset = max(0, (int)($this->input('offset', '0')));
+            $limit  = min(200, max(1, (int)($this->input('limit', '50'))));
             $total  = count($all);
             $items  = array_slice(array_values($all), $offset, $limit);
 
@@ -307,6 +399,7 @@ class CiController extends BaseController
     public function createProject(): never
     {
         $user = $this->requireAuth();
+        $this->requireCiWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -328,7 +421,7 @@ class CiController extends BaseController
                 'owner'             => trim((string)($body['owner'] ?? $userId)),
                 'team_members'      => (array)($body['team_members'] ?? []),
                 'target_date'       => trim((string)($body['target_date'] ?? '')),
-                'estimated_savings' => round((float)($body['estimated_savings'] ?? 0), 2),
+                'estimated_savings' => round((float)($body['estimated_savings'] ?? $body['cost_impact'] ?? 0), 2),
                 'actual_savings'    => 0,
                 'suggestion_id'     => trim((string)($body['suggestion_id'] ?? '')),
                 'phase'             => 'plan',
@@ -389,6 +482,7 @@ class CiController extends BaseController
     public function updateProject(): never
     {
         $user = $this->requireAuth();
+        $this->requireCiWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -459,9 +553,13 @@ class CiController extends BaseController
     public function transitionProject(): never
     {
         $user = $this->requireAuth();
+        $this->requireCiWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
+        if (!isset($body['to_phase']) && isset($body['phase'])) {
+            $body['to_phase'] = $body['phase'];
+        }
         $this->requireFields($body, ['id', 'to_phase']);
 
         $id      = trim((string)($body['id'] ?? ''));
@@ -543,6 +641,7 @@ class CiController extends BaseController
     public function getRoiSummary(): never
     {
         $user = $this->requireAuth();
+        $this->requireCiReadAccess($user);
 
         try {
             $projects = $this->readJsonFile($this->ciDir() . '/projects.json') ?? [];

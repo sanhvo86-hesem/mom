@@ -599,12 +599,12 @@ $router->actions([
 
 // Module 19: customer-portal-admin.js aliases
 $router->actions([
-    'customer_portal_data'                => [CustomerPortalController::class, 'getAnalytics'],
+    'customer_portal_data'                => [CustomerPortalController::class, 'getAdminData'],
     'customer_portal_grant_access'        => [CustomerPortalController::class, 'grantAccess'],
     'customer_portal_revoke_access'       => [CustomerPortalController::class, 'revokeAccess'],
-    'customer_portal_complaint_update'    => [CustomerPortalController::class, 'listComplaints'],
-    'customer_portal_resend_verification' => [CustomerPortalController::class, 'updateUser'],
-    'customer_portal_revoke_doc'          => [CustomerPortalController::class, 'listDocuments'],
+    'customer_portal_complaint_update'    => [CustomerPortalController::class, 'updateComplaintStatus'],
+    'customer_portal_resend_verification' => [CustomerPortalController::class, 'resendVerification'],
+    'customer_portal_revoke_doc'          => [CustomerPortalController::class, 'revokeDocument'],
 ]);
 
 // Module 20: cnc-programs.js aliases

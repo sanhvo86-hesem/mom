@@ -1,0 +1,248 @@
+{
+  "_meta": {
+    "version": "4.0",
+    "generatedAt": "2026-04-02T15:27:21.123Z",
+    "description": "Canonical data field registry rebuilt from table-registry coverage, orphan field normalization, and full migration-backed schema validation.",
+    "sourceEndpointCount": 838,
+    "generatedEndpointCount": 2228,
+    "uniqueFieldKeys": 3824,
+    "uniqueDbColumnNamesCovered": 3419,
+    "totalDbTableColumnsCovered": 6640,
+    "baselineUniqueColumnCoverage": 3319,
+    "migrationCount": 68,
+    "researchReferences": [
+      {
+        "key": "sap_inspection_lot",
+        "platform": "SAP S/4HANA / SAP ERP",
+        "url": "https://help.sap.com/docs/SAP_ERP/250374f0514e4e0f9057066374265eba/a7e4b65334e6b54ce10000000a174cb4.html",
+        "focus": [
+          "QM integration with MM, PP, SD, PM",
+          "inspection lot lifecycle",
+          "normalized logistics linkages"
+        ]
+      },
+      {
+        "key": "sap_status_management",
+        "platform": "SAP S/4HANA",
+        "url": "https://help.sap.com/docs/SAP_S4HANA_ON-PREMISE/5e23dc8fe9be4fd496f8ab556667ea05/0ed49753858ced23e10000000a174cb4.html",
+        "focus": [
+          "system status and user status",
+          "business transaction controls"
+        ]
+      },
+      {
+        "key": "sap_language_texts",
+        "platform": "SAP",
+        "url": "https://help.sap.com/doc/saphelp_ewm900/9.0/en-US/4a/40815bacb51cece10000000a42189b/content.htm",
+        "focus": [
+          "language-dependent text tables",
+          "text-key pattern"
+        ]
+      },
+      {
+        "key": "epicor_cpc",
+        "platform": "Epicor Kinetic / CPC",
+        "url": "https://www.epicor.com/en/products/connected-worker/epicor-connected-process-control/",
+        "focus": [
+          "operator guidance",
+          "traceability",
+          "task-level data collection"
+        ]
+      },
+      {
+        "key": "epicor_track_trace",
+        "platform": "Epicor Kinetic / CPC",
+        "url": "https://www.epicor.com/en/products/connected-worker/epicor-connected-process-control/control-track-and-trace/",
+        "focus": [
+          "serial and lot traceability",
+          "quality containment"
+        ]
+      },
+      {
+        "key": "epicor_industrial_machinery",
+        "platform": "Epicor Kinetic",
+        "url": "https://ondemand.epicor.com/courseResources/r2378_Industrial%20Machinery%20Manufacturing_Transcript_1.pdf",
+        "focus": [
+          "part",
+          "job",
+          "APS",
+          "manufacturing quote flow"
+        ]
+      },
+      {
+        "key": "ifs_projection",
+        "platform": "IFS Cloud",
+        "url": "https://docs.ifs.com/techdocs/25r2/030_administration/010_security/020_permission_sets/004_permission_set_overview/010_projections/",
+        "focus": [
+          "projection as self-contained business function",
+          "bounded API surface"
+        ]
+      },
+      {
+        "key": "ifs_custom_fields",
+        "platform": "IFS Cloud",
+        "url": "https://docs.ifs.com/techdocs/Foundation1/040_administration/220_user_interface/020_custom_objects/040_custom_fields/",
+        "focus": [
+          "logical units",
+          "persistent and calculated custom fields"
+        ]
+      },
+      {
+        "key": "ifs_translation_manager",
+        "platform": "IFS Cloud",
+        "url": "https://docs.ifs.com/techdocs/22r2/060_development/050_development_tools/025_translation_manager_aurena/",
+        "focus": [
+          "field descriptions",
+          "field description translations",
+          "translation manager"
+        ]
+      },
+      {
+        "key": "ifs_cloud_brochure",
+        "platform": "IFS Cloud",
+        "url": "https://www.ifs.com/-/media10/project/ifs/ifs/assets/ifs-cloud-brochure-24r2_02_2025.pdf",
+        "focus": [
+          "manufacturing",
+          "supply chain",
+          "finance",
+          "projects",
+          "asset",
+          "service"
+        ]
+      },
+      {
+        "key": "oracle_workflow_status",
+        "platform": "Oracle Fusion Cloud SCM",
+        "url": "https://docs.oracle.com/en/cloud/saas/supply-chain-and-manufacturing/25a/fauqm/workflow-status.html",
+        "focus": [
+          "quality issue and action workflows",
+          "predefined status models"
+        ]
+      },
+      {
+        "key": "oracle_workflow_templates",
+        "platform": "Oracle Fusion Cloud SCM",
+        "url": "https://docs.oracle.com/en/cloud/saas/supply-chain-and-manufacturing/24b/fauqm/workflow-templates.html",
+        "focus": [
+          "workflow templates",
+          "status sequence governance"
+        ]
+      },
+      {
+        "key": "oracle_translation_table",
+        "platform": "Oracle Fusion Cloud",
+        "url": "https://docs.oracle.com/en/cloud/saas/supply-chain-and-manufacturing/25d/oedsc/acdcomponenttlint-25230.html",
+        "focus": [
+          "_TL translation table pattern",
+          "MLS support",
+          "who columns"
+        ]
+      },
+      {
+        "key": "oracle_who_columns",
+        "platform": "Oracle Applications",
+        "url": "https://docs.oracle.com/cd/B25516_20/current/acrobat/iby115ig.pdf",
+        "focus": [
+          "WHO columns",
+          "base and translation table pattern"
+        ]
+      },
+      {
+        "key": "dynamics_virtual_tables",
+        "platform": "Microsoft Dynamics 365 / Dataverse",
+        "url": "https://learn.microsoft.com/en-us/power-apps/maker/data-platform/create-edit-virtual-entities",
+        "focus": [
+          "virtual tables",
+          "external runtime data",
+          "schema metadata"
+        ]
+      },
+      {
+        "key": "dynamics_table_metadata",
+        "platform": "Microsoft Dynamics 365 / Dataverse",
+        "url": "https://learn.microsoft.com/en-us/power-apps/developer/data-platform/webapi/create-update-entity-definitions-using-web-api",
+        "focus": [
+          "schema names",
+          "display names",
+          "localized labels",
+          "solution prefixes"
+        ]
+      },
+      {
+        "key": "dynamics_audit_columns",
+        "platform": "Microsoft Dynamics 365 / Dataverse",
+        "url": "https://learn.microsoft.com/en-us/power-apps/developer/data-platform/reference/entities/account",
+        "focus": [
+          "createdby",
+          "createdon",
+          "modifiedby",
+          "modifiedon",
+          "logical names"
+        ]
+      }
+    ]
+  },
+  "split": true,
+  "lineCount": 382598,
+  "parts": [
+    {
+      "file": "data-fields-part1.json",
+      "endpointCount": 1313,
+      "domains": [
+        "core_system",
+        "document_control",
+        "master_data",
+        "sales",
+        "purchasing",
+        "inventory",
+        "production",
+        "quality_management",
+        "calibration_equipment",
+        "audit_risk",
+        "training_hr",
+        "finance",
+        "shipping_compliance",
+        "mes_execution",
+        "plant_maintenance",
+        "advanced_planning",
+        "plm_change_control",
+        "hcm_workforce",
+        "warehouse_management",
+        "finance_extended",
+        "project_management",
+        "crm",
+        "transportation",
+        "bi_datawarehouse",
+        "supplier_relationship"
+      ]
+    },
+    {
+      "file": "data-fields-part2.json",
+      "endpointCount": 915,
+      "domains": [
+        "tooling_lifecycle",
+        "demand_supply_planning",
+        "service_warranty",
+        "finance_treasury",
+        "quality_lab",
+        "ehs_sustainability",
+        "mfg_engineering",
+        "master_data_governance",
+        "commercial_contracts",
+        "traceability_serialization",
+        "outsource_execution",
+        "trade_compliance",
+        "forms_system",
+        "record_system",
+        "system_infrastructure",
+        "customer_portal",
+        "evidence_vault",
+        "cnc_programs",
+        "digital_product_passport",
+        "ai_predictive",
+        "fmea_apqp",
+        "mobile_operations"
+      ]
+    }
+  ]
+}

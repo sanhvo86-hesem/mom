@@ -53,6 +53,27 @@ class AiSchedulingController extends BaseController
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
     }
 
+    /**
+     * Roles allowed to update AI prediction workflow and planning slots.
+     *
+     * @return array<int, string>
+     */
+    private function aiWriteRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            ['quality_engineer', 'quality_manager', 'qa_manager', 'production_planner', 'production_manager', 'cnc_workshop_manager']
+        )));
+    }
+
+    /**
+     * @return void
+     */
+    private function requireAiWriteAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->aiWriteRoles());
+    }
+
     // -- Prediction Endpoints -------------------------------------------------
 
     /**
@@ -110,6 +131,7 @@ class AiSchedulingController extends BaseController
     public function acknowledgePrediction(): never
     {
         $user = $this->requireAuth();
+        $this->requireAiWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -165,6 +187,7 @@ class AiSchedulingController extends BaseController
     public function resolvePrediction(): never
     {
         $user = $this->requireAuth();
+        $this->requireAiWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -399,6 +422,7 @@ class AiSchedulingController extends BaseController
     public function createSlot(): never
     {
         $user = $this->requireAuth();
+        $this->requireAiWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -454,6 +478,7 @@ class AiSchedulingController extends BaseController
     public function updateSlot(): never
     {
         $user = $this->requireAuth();
+        $this->requireAiWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();

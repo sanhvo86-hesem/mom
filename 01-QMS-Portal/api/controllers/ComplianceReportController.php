@@ -53,6 +53,44 @@ class ComplianceReportController extends BaseController
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
     }
 
+    /**
+     * @return array<int, string>
+     */
+    private function reportReadRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            ['quality_manager', 'production_director', 'sales_manager', 'auditor', 'qms_engineer']
+        )));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function reportGenerateRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            $this->reportReadRoles(),
+            ['quality_engineer']
+        )));
+    }
+
+    /**
+     * @return void
+     */
+    private function requireReportReadAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->reportReadRoles());
+    }
+
+    /**
+     * @return void
+     */
+    private function requireReportGenerateAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->reportGenerateRoles());
+    }
+
     // -- Endpoints ------------------------------------------------------------
 
     /**
@@ -63,6 +101,7 @@ class ComplianceReportController extends BaseController
     public function listReportTypes(): never
     {
         $user = $this->requireAuth();
+        $this->requireReportReadAccess($user);
 
         try {
             $types = [
@@ -131,6 +170,7 @@ class ComplianceReportController extends BaseController
     public function generateReport(): never
     {
         $user = $this->requireAuth();
+        $this->requireReportGenerateAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -188,6 +228,7 @@ class ComplianceReportController extends BaseController
     public function getHistory(): never
     {
         $user = $this->requireAuth();
+        $this->requireReportReadAccess($user);
 
         try {
             $file = $this->reportDir() . '/history.json';
@@ -230,6 +271,7 @@ class ComplianceReportController extends BaseController
     public function getManagementReviewData(): never
     {
         $user = $this->requireAuth();
+        $this->requireReportReadAccess($user);
 
         try {
             // Pull data from various stores
@@ -280,6 +322,7 @@ class ComplianceReportController extends BaseController
     public function getCustomerQualityData(): never
     {
         $user = $this->requireAuth();
+        $this->requireReportReadAccess($user);
 
         try {
             $complaintsFile = $this->dataDir . '/exceptions/complaints.json';
@@ -325,6 +368,7 @@ class ComplianceReportController extends BaseController
     public function getSupplierReviewData(): never
     {
         $user = $this->requireAuth();
+        $this->requireReportReadAccess($user);
 
         try {
             $scorecardsFile = $this->dataDir . '/supplier/scorecards.json';
@@ -374,6 +418,7 @@ class ComplianceReportController extends BaseController
     public function getCopqData(): never
     {
         $user = $this->requireAuth();
+        $this->requireReportReadAccess($user);
 
         try {
             $ncrFile        = $this->dataDir . '/ncr/ncr_items.json';
@@ -437,6 +482,7 @@ class ComplianceReportController extends BaseController
     public function getEvidencePackage(): never
     {
         $user = $this->requireAuth();
+        $this->requireReportGenerateAccess($user);
 
         $soNumber = $this->query('so_number');
         if ($soNumber === null || trim($soNumber) === '') {

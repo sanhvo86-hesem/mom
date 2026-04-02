@@ -629,6 +629,12 @@ function renderField(field, value, readOnly){
   var disabled = readOnly ? ' disabled' : '';
   var cls = 'eqms-field' + (field.width === 'full' || field.type === 'textarea' || field.type === 'table' ? ' full' : field.width === 'third' ? ' third' : '');
 
+  /* ARIA helpers */
+  var isRequired = !!(field.required);
+  var ariaReq = isRequired ? ' aria-required="true"' : '';
+  var helperId = (field.helper || field.helper_vi) ? 'eqms-help-' + field.id : '';
+  var ariaDesc = helperId ? ' aria-describedby="' + esc(helperId) + '"' : '';
+
   var html = '<div class="' + cls + '" data-field-wrapper="' + esc(field.id) + '">' +
     '<label class="eqms-label" for="' + esc(id) + '">' + label + ' ' + required + '</label>';
 
@@ -638,19 +644,22 @@ function renderField(field, value, readOnly){
     case 'text':
     case 'email':
     case 'phone':
-      html += '<input class="eqms-input" id="' + esc(id) + '" type="' + (field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text') + '" value="' + esc(val) + '" placeholder="' + esc(t(field.placeholder || '', field.placeholder_en || '')) + '"' + disabled + '>';
+      html += '<input class="eqms-input" id="' + esc(id) + '" type="' + (field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text') + '" value="' + esc(val) + '" placeholder="' + esc(t(field.placeholder || '', field.placeholder_en || '')) + '"' + ariaReq + ariaDesc + disabled + '>';
       break;
     case 'number':
-      html += '<input class="eqms-input" id="' + esc(id) + '" type="number" value="' + esc(val) + '"' + (field.min !== undefined ? ' min="' + field.min + '"' : '') + (field.max !== undefined ? ' max="' + field.max + '"' : '') + disabled + '>';
+      html += '<input class="eqms-input" id="' + esc(id) + '" type="number" value="' + esc(val) + '"' + (field.min !== undefined ? ' min="' + field.min + '"' : '') + (field.max !== undefined ? ' max="' + field.max + '"' : '') + ariaReq + ariaDesc + disabled + '>';
       break;
     case 'date':
-      html += '<input class="eqms-input" id="' + esc(id) + '" type="date" value="' + esc(val) + '"' + disabled + '>';
+      html += '<input class="eqms-input" id="' + esc(id) + '" type="date" value="' + esc(val) + '"' + ariaReq + ariaDesc + disabled + '>';
+      break;
+    case 'time':
+      html += '<input class="eqms-input" id="' + esc(id) + '" type="time" value="' + esc(val) + '"' + ariaReq + ariaDesc + disabled + '>';
       break;
     case 'datetime':
-      html += '<input class="eqms-input" id="' + esc(id) + '" type="datetime-local" value="' + esc(val) + '"' + disabled + '>';
+      html += '<input class="eqms-input" id="' + esc(id) + '" type="datetime-local" value="' + esc(val) + '"' + ariaReq + ariaDesc + disabled + '>';
       break;
     case 'select':
-      html += '<select class="eqms-input" id="' + esc(id) + '"' + disabled + '><option value="">' + esc(t('Chọn', 'Select')) + '</option>';
+      html += '<select class="eqms-input" id="' + esc(id) + '"' + ariaReq + ariaDesc + disabled + '><option value="">' + esc(t('Chọn', 'Select')) + '</option>';
       (field.options || []).forEach(function(opt){
         var ov = typeof opt === 'string' ? opt : (opt.value || '');
         var ol = typeof opt === 'string' ? opt : t(opt.label || opt.value, opt.label_en || opt.label || opt.value);
@@ -659,7 +668,7 @@ function renderField(field, value, readOnly){
       html += '</select>';
       break;
     case 'multi_select':
-      html += '<div class="eqms-multi">';
+      html += '<div class="eqms-multi" role="group" aria-label="' + esc(labelEn) + '">';
       var selected = Array.isArray(val) ? val : [];
       (field.options || []).forEach(function(opt){
         var ov = typeof opt === 'string' ? opt : (opt.value || '');
@@ -669,13 +678,13 @@ function renderField(field, value, readOnly){
       html += '</div>';
       break;
     case 'textarea':
-      html += '<textarea class="eqms-input eqms-textarea" id="' + esc(id) + '" rows="4" placeholder="' + esc(t(field.placeholder || '', field.placeholder_en || '')) + '"' + disabled + '>' + esc(val) + '</textarea>';
+      html += '<textarea class="eqms-input eqms-textarea" id="' + esc(id) + '" rows="4" placeholder="' + esc(t(field.placeholder || '', field.placeholder_en || '')) + '"' + ariaReq + ariaDesc + disabled + '>' + esc(val) + '</textarea>';
       break;
     case 'checkbox':
-      html += '<label class="eqms-check"><input type="checkbox" id="' + esc(id) + '"' + (val ? ' checked' : '') + disabled + '> ' + esc(t(field.checkbox_label || label, field.checkbox_label_en || field.label_en || label)) + '</label>';
+      html += '<label class="eqms-check"><input type="checkbox" id="' + esc(id) + '"' + (val ? ' checked' : '') + ariaDesc + disabled + '> ' + esc(t(field.checkbox_label || label, field.checkbox_label_en || field.label_en || label)) + '</label>';
       break;
     case 'file':
-      html += '<input class="eqms-input" id="' + esc(id) + '" type="file" accept="' + esc((field.accept || '.pdf,.jpg,.png,.xlsx').replace(/\s/g, '')) + '"' + disabled + '>';
+      html += '<input class="eqms-input" id="' + esc(id) + '" type="file" accept="' + esc((field.accept || '.pdf,.jpg,.png,.xlsx').replace(/\s/g, '')) + '"' + ariaReq + ariaDesc + disabled + '>';
       break;
     case 'lookup':
       /* Lookup field — renders as searchable dropdown from master data */
@@ -729,21 +738,31 @@ function renderField(field, value, readOnly){
   }
 
   if(field.helper || field.helper_vi)
-    html += '<div class="eqms-helper">' + esc(t(field.helper_vi || field.helper || '', field.helper_en || field.helper || '')) + '</div>';
+    html += '<div class="eqms-helper"' + (helperId ? ' id="' + esc(helperId) + '"' : '') + '>' + esc(t(field.helper_vi || field.helper || '', field.helper_en || field.helper || '')) + '</div>';
 
   html += '</div>';
   return html;
 }
 
-/* ── Signature Block ── */
-function renderSignatureBlockLegacy(block, signatureData, canSign){
+/* ── Signature Block (unified) ── */
+function renderSignatureBlock(block, signatureData, canSign, showCurrentUser){
+  if(showCurrentUser === undefined) showCurrentUser = true;
   var signed = !!signatureData;
   var meaning = block.meaning || 'Approved';
   var labelEn = block.label_en || block.label || block.id;
   var labelVi = block.label || '';
   var signer = currentUser();
   var currentSigner = [signer.name || signer.username || '', signer.role || signer.dept || ''].filter(Boolean).join(' · ');
-  return '<div class="eqms-sig-block' + (signed ? ' signed' : '') + '">' +
+  var signBtnHtml = '';
+  if(canSign && !signed){
+    if(showCurrentUser){
+      signBtnHtml = '<div class="eqms-sig-current-user">' + esc(t('Người đăng nhập hiện tại: ', 'Current user: ')) + '<strong>' + esc(currentSigner || '—') + '</strong></div>' +
+        '<button class="eqms-btn primary" data-sign-block="' + esc(block.id) + '">' + esc(t('Người đăng nhập ký', 'Sign as current user')) + '</button>';
+    } else {
+      signBtnHtml = '<button class="eqms-btn primary" data-sign-block="' + esc(block.id) + '">' + esc(t('Ký', 'Sign')) + '</button>';
+    }
+  }
+  return '<div class="eqms-sig-block' + (signed ? ' signed' : '') + '" role="group" aria-label="' + esc(labelEn) + '">' +
     '<div class="eqms-sig-header">' +
       '<div><strong>' + esc(labelEn) + '</strong>' +
         (labelVi && labelVi !== labelEn ? '<div class="eqms-sig-label-vi">' + esc(labelVi) + '</div>' : '') +
@@ -751,36 +770,16 @@ function renderSignatureBlockLegacy(block, signatureData, canSign){
       '<span class="eqms-sig-meaning">' + esc(meaning) + '</span>' +
     '</div>' +
     (signed ? '<div class="eqms-sig-data">' +
-      '<div>Họ tên: <strong>' + esc(signatureData.printed_name || signatureData.signerName || '') + '</strong></div>' +
-      '<div>Ngày ký: ' + esc(fmtDate(signatureData.timestamp || signatureData.signed_at || '')) + '</div>' +
-      '<div>Ý nghĩa: ' + esc(signatureData.meaning || meaning) + '</div>' +
-    '</div>' : '<div class="eqms-sig-empty">Chưa ký</div>') +
-    (canSign && !signed ? '<button class="eqms-btn primary" data-sign-block="' + esc(block.id) + '">Ký</button>' : '') +
+      '<div>' + esc(t('Họ tên: ', 'Name: ')) + '<strong>' + esc(signatureData.printed_name || signatureData.signerName || '') + '</strong></div>' +
+      '<div>' + esc(t('Ngày ký: ', 'Signed: ')) + esc(fmtDate(signatureData.timestamp || signatureData.signed_at || '')) + '</div>' +
+      '<div>' + esc(t('Ý nghĩa: ', 'Meaning: ')) + esc(signatureData.meaning || meaning) + '</div>' +
+    '</div>' : '<div class="eqms-sig-empty">' + esc(t('Chưa ký', 'Not signed')) + '</div>') +
+    signBtnHtml +
   '</div>';
 }
-
-function renderSignatureBlockUi(block, signatureData, canSign){
-  var signed = !!signatureData;
-  var meaning = block.meaning || 'Approved';
-  var labelEn = block.label_en || block.label || block.id;
-  var labelVi = block.label || '';
-  var signer = currentUser();
-  var currentSigner = [signer.name || signer.username || '', signer.role || signer.dept || ''].filter(Boolean).join(' · ');
-  return '<div class="eqms-sig-block' + (signed ? ' signed' : '') + '">' +
-    '<div class="eqms-sig-header">' +
-      '<div><strong>' + esc(labelEn) + '</strong>' +
-        (labelVi && labelVi !== labelEn ? '<div class="eqms-sig-label-vi">' + esc(labelVi) + '</div>' : '') +
-      '</div>' +
-      '<span class="eqms-sig-meaning">' + esc(meaning) + '</span>' +
-    '</div>' +
-    (signed ? '<div class="eqms-sig-data">' +
-      '<div>Họ tên: <strong>' + esc(signatureData.printed_name || signatureData.signerName || '') + '</strong></div>' +
-      '<div>Ngày ký: ' + esc(fmtDate(signatureData.timestamp || signatureData.signed_at || '')) + '</div>' +
-      '<div>Ý nghĩa: ' + esc(signatureData.meaning || meaning) + '</div>' +
-    '</div>' : '<div class="eqms-sig-empty">Chưa ký</div>') +
-    (canSign && !signed ? '<div class="eqms-sig-current-user">Người đăng nhập hiện tại: <strong>' + esc(currentSigner || '—') + '</strong></div><button class="eqms-btn primary" data-sign-block="' + esc(block.id) + '">Người đăng nhập ký</button>' : '') +
-  '</div>';
-}
+/* Legacy alias for backward compat */
+function renderSignatureBlockLegacy(block, signatureData, canSign){ return renderSignatureBlock(block, signatureData, canSign, false); }
+function renderSignatureBlockUi(block, signatureData, canSign){ return renderSignatureBlock(block, signatureData, canSign, true); }
 
 /* ── Main Render ── */
 function renderForm(container){
@@ -792,7 +791,7 @@ function renderForm(container){
 
   var readOnly = !state.editMode;
   var fields = schema.fields || [];
-  var sections = schema.sections || [{ id: 'main', title: t('Thong tin', 'Information'), field_ids: fields.map(function(f){ return f.id; }) }];
+  var sections = schema.sections || [{ id: 'main', title: t('Thông tin', 'Information'), field_ids: fields.map(function(f){ return f.id; }) }];
   var sigBlocks = schema.signature_blocks || [];
   var u = currentUser();
 
@@ -819,9 +818,9 @@ function renderForm(container){
   /* ── Record context ── */
   if(state.recordId || state.allocationId){
     html += '<div class="eqms-record-bar">';
-    if(state.recordId) html += '<div class="eqms-record-chip"><small>' + esc(t('Ma ho so', 'Record ID')) + '</small><strong>' + esc(state.recordId) + '</strong></div>';
+    if(state.recordId) html += '<div class="eqms-record-chip"><small>' + esc(t('Mã hồ sơ', 'Record ID')) + '</small><strong>' + esc(state.recordId) + '</strong></div>';
     var ctx = state.entry && state.entry.master_context ? state.entry.master_context : {};
-    if(ctx.customer_id) html += '<div class="eqms-record-chip"><small>' + esc(t('Khach hang', 'Customer')) + '</small><strong>' + esc(ctx.customer_id) + '</strong></div>';
+    if(ctx.customer_id) html += '<div class="eqms-record-chip"><small>' + esc(t('Khách hàng', 'Customer')) + '</small><strong>' + esc(ctx.customer_id) + '</strong></div>';
     if(ctx.so_number) html += '<div class="eqms-record-chip"><small>SO</small><strong>' + esc(ctx.so_number) + '</strong></div>';
     if(ctx.part_number) html += '<div class="eqms-record-chip"><small>Part</small><strong>' + esc(ctx.part_number) + '</strong></div>';
     html += '</div>';
@@ -1048,6 +1047,7 @@ function bindFields(container){
         wrap.classList.remove('eqms-field-error');
         var em = wrap.querySelector('.eqms-error-msg');
         if(em && em.parentNode) em.parentNode.removeChild(em);
+        el.removeAttribute('aria-invalid');
       }
       /* Update conditional visibility and calculated fields */
       applyConditions(container, schema);
@@ -1126,12 +1126,16 @@ function bindFields(container){
         el.classList.remove('eqms-field-error');
         var em = el.querySelector('.eqms-error-msg');
         if(em && em.parentNode) em.parentNode.removeChild(em);
+        var inv = el.querySelector('[aria-invalid]');
+        if(inv) inv.removeAttribute('aria-invalid');
       });
       /* Mark each invalid field */
       missing.forEach(function(m){
         var wrap = container.querySelector('[data-field-wrapper="' + m.id + '"]');
         if(wrap){
           wrap.classList.add('eqms-field-error');
+          var inp = wrap.querySelector('.eqms-input, select, textarea, input');
+          if(inp) inp.setAttribute('aria-invalid', 'true');
           var errMsg = document.createElement('div');
           errMsg.className = 'eqms-error-msg';
           errMsg.textContent = t('Trường bắt buộc', 'Required field');
@@ -1186,7 +1190,7 @@ function bindFields(container){
         toast(t('Không thể gửi: ', 'Could not submit: ') + (resp && resp.error || ''), 'error');
       }
     }).catch(function(){
-      toast(t('Loi ket noi.', 'Connection error.'), 'error');
+      toast(t('Lỗi kết nối.', 'Connection error.'), 'error');
     }).finally(function(){ submitBtn.disabled = false; });
   };
 
@@ -1675,7 +1679,13 @@ window.openEqmsForm = function(formCode, container, options){
   Promise.all([loadSchema(formCode), ensureMasterData(), ensureCompanyDirectory()]).then(function(results){
     var schema = normalizeSchemaLookups(results[0]);
     if(!schema){
-      runtime.innerHTML = '<div class="eqms-empty">Không tìm thấy schema cho form này.</div>';
+      runtime.innerHTML = '<div class="eqms-empty">' +
+        '<div style="font-size:32px;margin-bottom:12px">📋</div>' +
+        '<h3>' + esc(t('Không tìm thấy định nghĩa biểu mẫu', 'Form schema not found')) + '</h3>' +
+        '<p style="color:#64748b;font-size:13px">' + esc(t('Mã form: ', 'Form code: ') + formCode) + '</p>' +
+      '</div>';
+      console.warn('[eQMS] Schema not found for:', formCode);
+      if(options.onError && typeof options.onError === 'function') options.onError(new Error('Schema not found: ' + formCode));
       return;
     }
     state.schema = schema;
@@ -1783,7 +1793,16 @@ window.openEqmsForm = function(formCode, container, options){
 
     renderForm(runtime);
   }).catch(function(err){
-    runtime.innerHTML = '<div class="eqms-empty">' + esc(t('Loi tai form: ', 'Error loading form: ') + (err && err.message || '')) + '</div>';
+    var errMsg = (err && err.message) || t('Không rõ lỗi', 'Unknown error');
+    runtime.innerHTML = '<div class="eqms-empty">' +
+      '<div style="font-size:32px;margin-bottom:12px">⚠</div>' +
+      '<h3>' + esc(t('Không thể tải biểu mẫu', 'Could not load form')) + '</h3>' +
+      '<p style="color:#64748b;font-size:13px">' + esc(errMsg) + '</p>' +
+      '<button class="eqms-btn secondary" onclick="window.openEqmsForm(\'' + esc(formCode) + '\',this.closest(\'.eqms-runtime\').parentNode,' + esc(JSON.stringify(options)) + ')">' + esc(t('Thử lại', 'Retry')) + '</button>' +
+    '</div>';
+    console.error('[eQMS] Form load failed:', formCode, err);
+    if(options.onError && typeof options.onError === 'function') options.onError(err);
+    try { window.dispatchEvent(new CustomEvent('eqms-form-error', { detail: { formCode: formCode, error: errMsg } })); } catch(e){}
   });
 };
 

@@ -29,6 +29,54 @@ class MasterDataController extends BaseController
     }
 
     /**
+     * @return array<int, string>
+     */
+    private function masterDataWriteRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            [
+                'it_admin',
+                'epicor_admin',
+                'qms_engineer',
+                'quality_manager',
+                'production_manager',
+                'production_planner',
+                'engineering_manager',
+                'supply_chain_manager',
+                'hr_manager',
+            ]
+        )));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function shiftPlanningRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            $this->masterDataWriteRoles(),
+            ['cnc_workshop_manager', 'shift_leader', 'supervisor']
+        )));
+    }
+
+    /**
+     * @return void
+     */
+    private function requireMasterDataWriteAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->masterDataWriteRoles());
+    }
+
+    /**
+     * @return void
+     */
+    private function requireShiftPlanningAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->shiftPlanningRoles());
+    }
+
+    /**
      * Load all records for an entity type from master-data.json.
      */
     private function loadEntityRecords(string $entity): array
@@ -136,6 +184,7 @@ class MasterDataController extends BaseController
     public function createRecord(): never
     {
         $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
         $this->requireCsrf();
 
         $body   = $this->jsonBody();
@@ -167,6 +216,7 @@ class MasterDataController extends BaseController
     public function updateRecord(): never
     {
         $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
         $this->requireCsrf();
 
         $body   = $this->jsonBody();
@@ -200,6 +250,7 @@ class MasterDataController extends BaseController
     public function deleteRecord(): never
     {
         $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
         $this->requireCsrf();
 
         $body   = $this->jsonBody();
@@ -235,6 +286,7 @@ class MasterDataController extends BaseController
     public function changeStatus(): never
     {
         $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
         $this->requireCsrf();
 
         $body   = $this->jsonBody();
@@ -261,7 +313,8 @@ class MasterDataController extends BaseController
      */
     public function getHistory(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireMasterDataWriteAccess($user);
 
         $entity = $this->query('entity') ?? '';
         $id     = $this->query('id') ?? '';
@@ -352,6 +405,7 @@ class MasterDataController extends BaseController
     public function saveShift(): never
     {
         $user = $this->requireAuth();
+        $this->requireShiftPlanningAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -436,6 +490,7 @@ class MasterDataController extends BaseController
     public function saveShiftAssignment(): never
     {
         $user = $this->requireAuth();
+        $this->requireShiftPlanningAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -503,6 +558,7 @@ class MasterDataController extends BaseController
     public function saveHoliday(): never
     {
         $user = $this->requireAuth();
+        $this->requireShiftPlanningAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();

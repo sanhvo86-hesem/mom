@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-02T15:07:57.468Z",
+    "generatedAt": "2026-04-02T15:10:15.000Z",
     "description": "Resolution plan for 590 orphan registry fields and 2,870 orphan DB column names."
   },
   "orphan_fields": {
@@ -3163,7 +3163,7 @@
           "tables": [
             "departments"
           ],
-          "suggestedLabel": "Hồ sơ Typ",
+          "suggestedLabel": "Hồ sơ Loại",
           "suggestedLabelEn": "Record Types",
           "suggestedType": "select",
           "dbTypes": [
@@ -3327,7 +3327,7 @@
           "tables": [
             "audit_events"
           ],
-          "suggestedLabel": "Aggregate Loại",
+          "suggestedLabel": "Tổng thể Loại",
           "suggestedLabelEn": "Aggregate Type",
           "suggestedType": "select",
           "dbTypes": [
@@ -3479,7 +3479,7 @@
           "tables": [
             "document_embeddings"
           ],
-          "suggestedLabel": "Chunk Index",
+          "suggestedLabel": "Khối Index",
           "suggestedLabelEn": "Chunk Index",
           "suggestedType": "number",
           "dbTypes": [
@@ -3492,7 +3492,7 @@
           "tables": [
             "document_embeddings"
           ],
-          "suggestedLabel": "Chunk Text",
+          "suggestedLabel": "Khối văn bản",
           "suggestedLabelEn": "Chunk Text",
           "suggestedType": "string",
           "dbTypes": [
@@ -3505,7 +3505,7 @@
           "tables": [
             "document_embeddings"
           ],
-          "suggestedLabel": "Embedding",
+          "suggestedLabel": "Nhúng",
           "suggestedLabelEn": "Embedding",
           "suggestedType": "string",
           "dbTypes": [
@@ -3623,7 +3623,7 @@
             "file_attachments",
             "form_attachments"
           ],
-          "suggestedLabel": "File Băm",
+          "suggestedLabel": "Tệp Băm",
           "suggestedLabelEn": "File Hash",
           "suggestedType": "file",
           "dbTypes": [
@@ -3667,7 +3667,7 @@
             "tooling_calibration_links",
             "trace_genealogy_links"
           ],
-          "suggestedLabel": "Link Loại",
+          "suggestedLabel": "Liên kết Loại",
           "suggestedLabelEn": "Link Type",
           "suggestedType": "select",
           "dbTypes": [
@@ -3790,7 +3790,7 @@
             "items",
             "mes_part_genealogy"
           ],
-          "suggestedLabel": "Vật liệu Spec",
+          "suggestedLabel": "Vật liệu quy cách",
           "suggestedLabelEn": "Material Spec",
           "suggestedType": "string",
           "dbTypes": [
@@ -4014,7 +4014,7 @@
             "items",
             "plm_obsolescence_tracking"
           ],
-          "suggestedLabel": "Số Manufacturer Part",
+          "suggestedLabel": "Số Manufacturer phụ tùng",
           "suggestedLabelEn": "Manufacturer Part Number",
           "suggestedType": "string",
           "dbTypes": [
@@ -4187,7 +4187,7 @@
           "tables": [
             "items"
           ],
-          "suggestedLabel": "Yêu cầu Đặc biệt Proc",
+          "suggestedLabel": "Yêu cầu Đặc biệt Proce",
           "suggestedLabelEn": "Special Process Required",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -4200,7 +4200,7 @@
           "tables": [
             "items"
           ],
-          "suggestedLabel": "Roh Compliant",
+          "suggestedLabel": "Roh tuân thủ",
           "suggestedLabelEn": "Rohs Compliant",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -4213,7 +4213,7 @@
           "tables": [
             "items"
           ],
-          "suggestedLabel": "Reach Compliant",
+          "suggestedLabel": "Reach tuân thủ",
           "suggestedLabelEn": "Reach Compliant",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -4318,7 +4318,7 @@
           "tables": [
             "bill_of_materials"
           ],
-          "suggestedLabel": "BOM Not",
+          "suggestedLabel": "BOM Ghi chú",
           "suggestedLabelEn": "BOM Notes",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -4503,7 +4503,7 @@
             "routing_operations",
             "work_centers"
           ],
-          "suggestedLabel": "Center tên công việc",
+          "suggestedLabel": "Trung tâm tên công việc",
           "suggestedLabelEn": "Work Center Name",
           "suggestedType": "string",
           "dbTypes": [
@@ -4516,7 +4516,7 @@
           "tables": [
             "work_centers"
           ],
-          "suggestedLabel": "Center tên Vi công việc",
+          "suggestedLabel": "Trung tâm tên Vi công việc",
           "suggestedLabelEn": "Work Center Name Vi",
           "suggestedType": "string",
           "dbTypes": [
@@ -4529,7 +4529,7 @@
           "tables": [
             "work_centers"
           ],
-          "suggestedLabel": "Center Loại công việc",
+          "suggestedLabel": "Trung tâm Loại công việc",
           "suggestedLabelEn": "Work Center Type",
           "suggestedType": "select",
           "dbTypes": [
@@ -4549,7 +4549,7 @@
             "pm_maintenance_budgets",
             "work_centers"
           ],
-          "suggestedLabel": "Chi phí Center",
+          "suggestedLabel": "Chi phí trung tâm",
           "suggestedLabelEn": "Cost Center",
           "suggestedType": "currency",
           "dbTypes": [
@@ -4562,7 +4562,7 @@
           "tables": [
             "work_centers"
           ],
-          "suggestedLabel": "Năng lực giờ Per Day",
+          "suggestedLabel": "Năng lực giờ Per ngày",
           "suggestedLabelEn": "Capacity Hours Per Day",
           "suggestedType": "duration",
           "dbTypes": [
@@ -4575,7 +4575,7 @@
           "tables": [
             "work_centers"
           ],
-          "suggestedLabel": "Năng lực Đơn vị Per Day",
+          "suggestedLabel": "Năng lực Đơn vị Per ngày",
           "suggestedLabelEn": "Capacity Units Per Day",
           "suggestedType": "number",
           "dbTypes": [
@@ -4616,7 +4616,7 @@
           "tables": [
             "work_centers"
           ],
-          "suggestedLabel": "Num Machin",
+          "suggestedLabel": "Num Máy",
           "suggestedLabelEn": "Num Machines",
           "suggestedType": "number",
           "dbTypes": [
@@ -4642,7 +4642,7 @@
           "tables": [
             "work_centers"
           ],
-          "suggestedLabel": "Alternate công việc Center",
+          "suggestedLabel": "Thay thế công việc trung tâm",
           "suggestedLabelEn": "Alternate Work Center",
           "suggestedType": "string",
           "dbTypes": [
@@ -4903,7 +4903,7 @@
             "aps_capacity_buckets",
             "routing_operations"
           ],
-          "suggestedLabel": "Tổ máy Size",
+          "suggestedLabel": "Tổ máy kích thước",
           "suggestedLabelEn": "Crew Size",
           "suggestedType": "number",
           "dbTypes": [
@@ -4958,7 +4958,7 @@
           "tables": [
             "routing_operations"
           ],
-          "suggestedLabel": "Mã Outside Proc",
+          "suggestedLabel": "Mã Outside Proce",
           "suggestedLabelEn": "Outside Process Code",
           "suggestedType": "string",
           "dbTypes": [
@@ -5023,7 +5023,7 @@
           "tables": [
             "routing_operations"
           ],
-          "suggestedLabel": "Yêu cầu Đầu tiên Piece",
+          "suggestedLabel": "Yêu cầu Đầu tiên chi tiết",
           "suggestedLabelEn": "First Piece Required",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -5036,7 +5036,7 @@
           "tables": [
             "routing_operations"
           ],
-          "suggestedLabel": "Yêu cầu Last Piece",
+          "suggestedLabel": "Yêu cầu Last chi tiết",
           "suggestedLabelEn": "Last Piece Required",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -5049,7 +5049,7 @@
           "tables": [
             "routing_operations"
           ],
-          "suggestedLabel": "Yêu cầu Năng lực Study",
+          "suggestedLabel": "Yêu cầu năng lực Study",
           "suggestedLabelEn": "Capability Study Required",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -5104,7 +5104,7 @@
             "customers",
             "vendors"
           ],
-          "suggestedLabel": "Primary liên hệ",
+          "suggestedLabel": "Chính liên hệ",
           "suggestedLabelEn": "Primary Contact",
           "suggestedType": "string",
           "dbTypes": [
@@ -5118,7 +5118,7 @@
             "customers",
             "vendors"
           ],
-          "suggestedLabel": "Liên hệ Phone",
+          "suggestedLabel": "Liên hệ điện thoại",
           "suggestedLabelEn": "Contact Phone",
           "suggestedType": "string",
           "dbTypes": [
@@ -5198,7 +5198,7 @@
           "tables": [
             "customers"
           ],
-          "suggestedLabel": "Mã Industry",
+          "suggestedLabel": "Mã ngành",
           "suggestedLabelEn": "Industry Code",
           "suggestedType": "string",
           "dbTypes": [
@@ -5224,7 +5224,7 @@
           "tables": [
             "customers"
           ],
-          "suggestedLabel": "Spec Danh sách Khách hàng",
+          "suggestedLabel": "Quy cách Danh sách Khách hàng",
           "suggestedLabelEn": "Customer Spec List",
           "suggestedType": "string",
           "dbTypes": [
@@ -5238,7 +5238,7 @@
             "customers",
             "vendors"
           ],
-          "suggestedLabel": "Proc Danh sách Đã phê duyệt",
+          "suggestedLabel": "Proce Danh sách Đã phê duyệt",
           "suggestedLabelEn": "Approved Process List",
           "suggestedType": "string",
           "dbTypes": [
@@ -5540,7 +5540,7 @@
           "tables": [
             "sales_orders"
           ],
-          "suggestedLabel": "Spec yêu cầu Khách hàng",
+          "suggestedLabel": "Quy cách yêu cầu Khách hàng",
           "suggestedLabelEn": "Customer Spec Requirements",
           "suggestedType": "string",
           "dbTypes": [
@@ -5640,7 +5640,7 @@
             "com_payment_terms_profiles",
             "sales_order_lines"
           ],
-          "suggestedLabel": "Tỷ lệ Discount",
+          "suggestedLabel": "Tỷ lệ chiết khấu",
           "suggestedLabelEn": "Discount Pct",
           "suggestedType": "percentage",
           "dbTypes": [
@@ -5763,7 +5763,7 @@
           "tables": [
             "vendors"
           ],
-          "suggestedLabel": "Addr Line1",
+          "suggestedLabel": "Addre Line1",
           "suggestedLabelEn": "Address Line1",
           "suggestedType": "string",
           "dbTypes": [
@@ -5776,7 +5776,7 @@
           "tables": [
             "vendors"
           ],
-          "suggestedLabel": "Addr Line2",
+          "suggestedLabel": "Addre Line2",
           "suggestedLabelEn": "Address Line2",
           "suggestedType": "string",
           "dbTypes": [
@@ -5935,7 +5935,7 @@
           "tables": [
             "vendors"
           ],
-          "suggestedLabel": "Part Danh sách Đã phê duyệt",
+          "suggestedLabel": "Phụ tùng Danh sách Đã phê duyệt",
           "suggestedLabelEn": "Approved Part List",
           "suggestedType": "string",
           "dbTypes": [
@@ -5948,7 +5948,7 @@
           "tables": [
             "vendors"
           ],
-          "suggestedLabel": "Khách hàng tiềm năng thời gian Avg Day",
+          "suggestedLabel": "Khách hàng tiềm năng thời gian Avg ngày",
           "suggestedLabelEn": "Lead Time Avg Days",
           "suggestedType": "datetime",
           "dbTypes": [
@@ -6042,7 +6042,7 @@
           "tables": [
             "vendors"
           ],
-          "suggestedLabel": "Small Busin",
+          "suggestedLabel": "Small Busine",
           "suggestedLabelEn": "Small Business",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -6651,7 +6651,7 @@
             "inventory_transactions",
             "wms_bin_contents"
           ],
-          "suggestedLabel": "Số lượng Allocated",
+          "suggestedLabel": "Số lượng đã phân bổ",
           "suggestedLabelEn": "Qty Allocated",
           "suggestedType": "number",
           "dbTypes": [
@@ -6959,7 +6959,7 @@
             "portal_document_access",
             "product_passports"
           ],
-          "suggestedLabel": "Đơn hàng tham chiếu Sal",
+          "suggestedLabel": "Đơn hàng tham chiếu Sale",
           "suggestedLabelEn": "Sales Order Ref",
           "suggestedType": "string",
           "dbTypes": [
@@ -7063,7 +7063,7 @@
           "tables": [
             "job_orders"
           ],
-          "suggestedLabel": "Hiện tại công việc Center",
+          "suggestedLabel": "Hiện tại công việc trung tâm",
           "suggestedLabelEn": "Current Work Center",
           "suggestedType": "string",
           "dbTypes": [
@@ -7916,7 +7916,7 @@
             "mes_spc_control_limits",
             "spc_data"
           ],
-          "suggestedLabel": "Proc Sigma",
+          "suggestedLabel": "Proce Sigma",
           "suggestedLabelEn": "Process Sigma",
           "suggestedType": "number",
           "dbTypes": [
@@ -7942,7 +7942,7 @@
           "tables": [
             "ncr_records"
           ],
-          "suggestedLabel": "Nonconformance Nguồn",
+          "suggestedLabel": "Không phù hợp Nguồn",
           "suggestedLabelEn": "Nonconformance Source",
           "suggestedType": "string",
           "dbTypes": [
@@ -7997,7 +7997,7 @@
             "capa_records",
             "scar_records"
           ],
-          "suggestedLabel": "Xác minh Result",
+          "suggestedLabel": "Xác minh kết quả",
           "suggestedLabelEn": "Verification Result",
           "suggestedType": "select",
           "dbTypes": [
@@ -8024,7 +8024,7 @@
           "tables": [
             "fai_records"
           ],
-          "suggestedLabel": "FAI Overall Result",
+          "suggestedLabel": "FAI Overall kết quả",
           "suggestedLabelEn": "FAI Overall Result",
           "suggestedType": "select",
           "dbTypes": [
@@ -8148,7 +8148,7 @@
           "tables": [
             "npi_projects"
           ],
-          "suggestedLabel": "Lần chạy lúc Tỷ lệ Result",
+          "suggestedLabel": "Lần chạy lúc Tỷ lệ kết quả",
           "suggestedLabelEn": "Run At Rate Result",
           "suggestedType": "select",
           "dbTypes": [
@@ -8291,7 +8291,7 @@
           "tables": [
             "contamination_checks"
           ],
-          "suggestedLabel": "Cleanlin Mức",
+          "suggestedLabel": "Cleanline Mức",
           "suggestedLabelEn": "Cleanliness Level",
           "suggestedType": "select",
           "dbTypes": [
@@ -8304,7 +8304,7 @@
           "tables": [
             "contamination_checks"
           ],
-          "suggestedLabel": "Fod kiểm tra Result",
+          "suggestedLabel": "Fod kiểm tra kết quả",
           "suggestedLabelEn": "Fod Check Result",
           "suggestedType": "select",
           "dbTypes": [
@@ -8395,7 +8395,7 @@
           "tables": [
             "engineering_change_requests"
           ],
-          "suggestedLabel": "Baseline phiên bản",
+          "suggestedLabel": "Chuẩn gốc phiên bản",
           "suggestedLabelEn": "Baseline Version",
           "suggestedType": "string",
           "dbTypes": [
@@ -8623,7 +8623,7 @@
           "tables": [
             "equipment"
           ],
-          "suggestedLabel": "Interval Day hiệu chuẩn",
+          "suggestedLabel": "Interval ngày hiệu chuẩn",
           "suggestedLabelEn": "Calibration Interval Days",
           "suggestedType": "percentage",
           "dbTypes": [
@@ -8701,7 +8701,7 @@
           "tables": [
             "calibration_records"
           ],
-          "suggestedLabel": "Cal tiêu chuẩn",
+          "suggestedLabel": "CAL tiêu chuẩn",
           "suggestedLabelEn": "Cal Standard",
           "suggestedType": "string",
           "dbTypes": [
@@ -8727,7 +8727,7 @@
           "tables": [
             "calibration_records"
           ],
-          "suggestedLabel": "Grr Result",
+          "suggestedLabel": "GRR kết quả",
           "suggestedLabelEn": "Grr Result",
           "suggestedType": "select",
           "dbTypes": [
@@ -8740,7 +8740,7 @@
           "tables": [
             "calibration_records"
           ],
-          "suggestedLabel": "Trạng thái Grr",
+          "suggestedLabel": "Trạng thái GRR",
           "suggestedLabelEn": "Grr Status",
           "suggestedType": "select",
           "dbTypes": [
@@ -8753,7 +8753,7 @@
           "tables": [
             "calibration_records"
           ],
-          "suggestedLabel": "Chứng chỉ Path",
+          "suggestedLabel": "Chứng chỉ đường dẫn",
           "suggestedLabelEn": "Certificate Path",
           "suggestedType": "file",
           "dbTypes": [
@@ -8846,7 +8846,7 @@
           "tables": [
             "maintenance_work_orders"
           ],
-          "suggestedLabel": "Part Chi phí",
+          "suggestedLabel": "Phụ tùng Chi phí",
           "suggestedLabelEn": "Parts Cost",
           "suggestedType": "currency",
           "dbTypes": [
@@ -8902,7 +8902,7 @@
           "tables": [
             "maintenance_work_orders"
           ],
-          "suggestedLabel": "Oil phân tích Result",
+          "suggestedLabel": "Oil phân tích kết quả",
           "suggestedLabelEn": "Oil Analysis Result",
           "suggestedType": "select",
           "dbTypes": [
@@ -8915,7 +8915,7 @@
           "tables": [
             "maintenance_work_orders"
           ],
-          "suggestedLabel": "Số lượng dự phòng Part",
+          "suggestedLabel": "Số lượng dự phòng phụ tùng",
           "suggestedLabelEn": "Spare Part Qty",
           "suggestedType": "number",
           "dbTypes": [
@@ -8993,7 +8993,7 @@
           "tables": [
             "tools"
           ],
-          "suggestedLabel": "Dao cụ Flut",
+          "suggestedLabel": "Dao cụ Flute",
           "suggestedLabelEn": "Tool Flutes",
           "suggestedType": "number",
           "dbTypes": [
@@ -9032,7 +9032,7 @@
           "tables": [
             "tools"
           ],
-          "suggestedLabel": "Dao cụ Vòng đời Minut",
+          "suggestedLabel": "Dao cụ Vòng đời phút",
           "suggestedLabelEn": "Tool Life Minutes",
           "suggestedType": "duration",
           "dbTypes": [
@@ -9058,7 +9058,7 @@
           "tables": [
             "tools"
           ],
-          "suggestedLabel": "Dao cụ Vòng đời Part Số lượng",
+          "suggestedLabel": "Dao cụ Vòng đời phụ tùng Số lượng",
           "suggestedLabelEn": "Tool Life Parts Count",
           "suggestedType": "number",
           "dbTypes": [
@@ -9071,7 +9071,7 @@
           "tables": [
             "tools"
           ],
-          "suggestedLabel": "Dao cụ Vòng đời Tổng Part",
+          "suggestedLabel": "Dao cụ Vòng đời Tổng phụ tùng",
           "suggestedLabelEn": "Tool Life Total Parts",
           "suggestedType": "number",
           "dbTypes": [
@@ -9294,7 +9294,7 @@
           "tables": [
             "tools"
           ],
-          "suggestedLabel": "Associated Machin",
+          "suggestedLabel": "Associated Máy",
           "suggestedLabelEn": "Associated Machines",
           "suggestedType": "string",
           "dbTypes": [
@@ -9426,7 +9426,7 @@
           "tables": [
             "training_records"
           ],
-          "suggestedLabel": "Assessment Result",
+          "suggestedLabel": "Assessment kết quả",
           "suggestedLabelEn": "Assessment Result",
           "suggestedType": "select",
           "dbTypes": [
@@ -9579,7 +9579,7 @@
             "audits",
             "supplier_audit_schedule"
           ],
-          "suggestedLabel": "Team Đánh giá",
+          "suggestedLabel": "Nhóm Đánh giá",
           "suggestedLabelEn": "Audit Team",
           "suggestedType": "json",
           "dbTypes": [
@@ -9698,7 +9698,7 @@
           "tables": [
             "audit_actions"
           ],
-          "suggestedLabel": "Xác minh Not",
+          "suggestedLabel": "Xác minh Ghi chú",
           "suggestedLabelEn": "Verification Notes",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -9805,7 +9805,7 @@
             "management_reviews",
             "risk_register"
           ],
-          "suggestedLabel": "Xem xét Period",
+          "suggestedLabel": "Xem xét kỳ",
           "suggestedLabelEn": "Review Period",
           "suggestedType": "string",
           "dbTypes": [
@@ -9858,7 +9858,7 @@
             "management_reviews",
             "plm_design_reviews"
           ],
-          "suggestedLabel": "Attende",
+          "suggestedLabel": "Attendee",
           "suggestedLabelEn": "Attendees",
           "suggestedType": "json",
           "dbTypes": [
@@ -9898,7 +9898,7 @@
           "tables": [
             "management_reviews"
           ],
-          "suggestedLabel": "Minut Path",
+          "suggestedLabel": "Phút đường dẫn",
           "suggestedLabelEn": "Minutes Path",
           "suggestedType": "duration",
           "dbTypes": [
@@ -10265,7 +10265,7 @@
             "cost_elements",
             "gl_transactions"
           ],
-          "suggestedLabel": "Profit Center",
+          "suggestedLabel": "Lợi nhuận trung tâm",
           "suggestedLabelEn": "Profit Center",
           "suggestedType": "string",
           "dbTypes": [
@@ -10374,7 +10374,7 @@
           "tables": [
             "gl_transactions"
           ],
-          "suggestedLabel": "Tài chính Period",
+          "suggestedLabel": "Tài chính kỳ",
           "suggestedLabelEn": "Fiscal Period",
           "suggestedType": "number",
           "dbTypes": [
@@ -10608,7 +10608,7 @@
           "tables": [
             "ap_ar_invoices"
           ],
-          "suggestedLabel": "Ngày Discount",
+          "suggestedLabel": "Ngày chiết khấu",
           "suggestedLabelEn": "Discount Date",
           "suggestedType": "date",
           "dbTypes": [
@@ -10621,7 +10621,7 @@
           "tables": [
             "ap_ar_invoices"
           ],
-          "suggestedLabel": "Discount Giá trị",
+          "suggestedLabel": "Chiết khấu Giá trị",
           "suggestedLabelEn": "Discount Amount",
           "suggestedType": "currency",
           "dbTypes": [
@@ -10686,7 +10686,7 @@
           "tables": [
             "ap_ar_invoices"
           ],
-          "suggestedLabel": "Aging bucket",
+          "suggestedLabel": "Lão hóa bucket",
           "suggestedLabelEn": "Aging Bucket",
           "suggestedType": "string",
           "dbTypes": [
@@ -10809,7 +10809,7 @@
           "tables": [
             "shipments"
           ],
-          "suggestedLabel": "Num Packag",
+          "suggestedLabel": "Num Package",
           "suggestedLabelEn": "Num Packages",
           "suggestedType": "number",
           "dbTypes": [
@@ -10997,7 +10997,7 @@
           "tables": [
             "compliance_records"
           ],
-          "suggestedLabel": "Jurisdiction",
+          "suggestedLabel": "Thẩm quyền",
           "suggestedLabelEn": "Jurisdiction",
           "suggestedType": "string",
           "dbTypes": [
@@ -11077,7 +11077,7 @@
           "tables": [
             "compliance_records"
           ],
-          "suggestedLabel": "Ngày Restricted Party Screen",
+          "suggestedLabel": "Ngày hạn chế đối tượng sàng lọc",
           "suggestedLabelEn": "Restricted Party Screen Date",
           "suggestedType": "date",
           "dbTypes": [
@@ -11090,7 +11090,7 @@
           "tables": [
             "compliance_records"
           ],
-          "suggestedLabel": "Restricted Party Screen Result",
+          "suggestedLabel": "Hạn chế đối tượng sàng lọc kết quả",
           "suggestedLabelEn": "Restricted Party Screen Result",
           "suggestedType": "select",
           "dbTypes": [
@@ -11103,7 +11103,7 @@
           "tables": [
             "compliance_records"
           ],
-          "suggestedLabel": "Dfar Compliant",
+          "suggestedLabel": "DFARS tuân thủ",
           "suggestedLabelEn": "Dfars Compliant",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -11116,7 +11116,7 @@
           "tables": [
             "compliance_records"
           ],
-          "suggestedLabel": "Mua American Compliant",
+          "suggestedLabel": "Mua Mỹ tuân thủ",
           "suggestedLabelEn": "Buy American Compliant",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -11129,7 +11129,7 @@
           "tables": [
             "compliance_records"
           ],
-          "suggestedLabel": "Specialty Metal Compliant",
+          "suggestedLabel": "Đặc chủng kim loại tuân thủ",
           "suggestedLabelEn": "Specialty Metals Compliant",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -11223,7 +11223,7 @@
           "tables": [
             "subcontract_orders"
           ],
-          "suggestedLabel": "Turnaround Day Mục tiêu",
+          "suggestedLabel": "Turnaround ngày Mục tiêu",
           "suggestedLabelEn": "Turnaround Days Target",
           "suggestedType": "number",
           "dbTypes": [
@@ -11236,7 +11236,7 @@
           "tables": [
             "subcontract_orders"
           ],
-          "suggestedLabel": "Turnaround Day thực tế",
+          "suggestedLabel": "Turnaround ngày thực tế",
           "suggestedLabelEn": "Turnaround Days Actual",
           "suggestedType": "number",
           "dbTypes": [
@@ -11941,7 +11941,7 @@
           "tables": [
             "mrp_planned_orders"
           ],
-          "suggestedLabel": "Hoạch định Fence Day",
+          "suggestedLabel": "Hoạch định Fence ngày",
           "suggestedLabelEn": "Planning Fence Days",
           "suggestedType": "number",
           "dbTypes": [
@@ -11954,7 +11954,7 @@
           "tables": [
             "mrp_planned_orders"
           ],
-          "suggestedLabel": "Nhu cầu Fence Day",
+          "suggestedLabel": "Nhu cầu Fence ngày",
           "suggestedLabelEn": "Demand Fence Days",
           "suggestedType": "number",
           "dbTypes": [
@@ -11967,7 +11967,7 @@
           "tables": [
             "mrp_planned_orders"
           ],
-          "suggestedLabel": "Lô Size quy tắc",
+          "suggestedLabel": "Lô kích thước quy tắc",
           "suggestedLabelEn": "Lot Size Rule",
           "suggestedType": "string",
           "dbTypes": [
@@ -11980,7 +11980,7 @@
           "tables": [
             "mrp_planned_orders"
           ],
-          "suggestedLabel": "Lô Size Min",
+          "suggestedLabel": "Lô kích thước Min",
           "suggestedLabelEn": "Lot Size Min",
           "suggestedType": "number",
           "dbTypes": [
@@ -11993,7 +11993,7 @@
           "tables": [
             "mrp_planned_orders"
           ],
-          "suggestedLabel": "Lô Size Max",
+          "suggestedLabel": "Lô kích thước Max",
           "suggestedLabelEn": "Lot Size Max",
           "suggestedType": "number",
           "dbTypes": [
@@ -12006,7 +12006,7 @@
           "tables": [
             "mrp_planned_orders"
           ],
-          "suggestedLabel": "Lô Size Multiple",
+          "suggestedLabel": "Lô kích thước Multiple",
           "suggestedLabelEn": "Lot Size Multiple",
           "suggestedType": "number",
           "dbTypes": [
@@ -12032,7 +12032,7 @@
           "tables": [
             "mrp_planned_orders"
           ],
-          "suggestedLabel": "An toàn khách hàng tiềm năng thời gian Day",
+          "suggestedLabel": "An toàn khách hàng tiềm năng thời gian ngày",
           "suggestedLabelEn": "Safety Lead Time Days",
           "suggestedType": "datetime",
           "dbTypes": [
@@ -12071,7 +12071,7 @@
           "tables": [
             "variable_registry"
           ],
-          "suggestedLabel": "Enum Valu",
+          "suggestedLabel": "Enum Giá trị",
           "suggestedLabelEn": "Enum Values",
           "suggestedType": "json",
           "dbTypes": [
@@ -12150,7 +12150,7 @@
           "tables": [
             "notifications"
           ],
-          "suggestedLabel": "Link",
+          "suggestedLabel": "Liên kết",
           "suggestedLabelEn": "Link",
           "suggestedType": "string",
           "dbTypes": [
@@ -12163,7 +12163,7 @@
           "tables": [
             "notifications"
           ],
-          "suggestedLabel": "Is Read",
+          "suggestedLabel": "Read",
           "suggestedLabelEn": "Is Read",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -12189,7 +12189,7 @@
           "tables": [
             "tags"
           ],
-          "suggestedLabel": "Tag tên",
+          "suggestedLabel": "Thẻ tên",
           "suggestedLabelEn": "Tag Name",
           "suggestedType": "string",
           "dbTypes": [
@@ -12215,7 +12215,7 @@
           "tables": [
             "workflow_definitions"
           ],
-          "suggestedLabel": "Stat",
+          "suggestedLabel": "Trạng thái",
           "suggestedLabelEn": "States",
           "suggestedType": "select",
           "dbTypes": [
@@ -12254,7 +12254,7 @@
           "tables": [
             "workflow_definitions"
           ],
-          "suggestedLabel": "Cuối Stat",
+          "suggestedLabel": "Cuối Trạng thái",
           "suggestedLabelEn": "Final States",
           "suggestedType": "select",
           "dbTypes": [
@@ -12308,7 +12308,7 @@
           "tables": [
             "mes_sites"
           ],
-          "suggestedLabel": "Địa điểm Addr",
+          "suggestedLabel": "Địa điểm Addre",
           "suggestedLabelEn": "Site Address",
           "suggestedType": "string",
           "dbTypes": [
@@ -12386,7 +12386,7 @@
           "tables": [
             "mes_areas"
           ],
-          "suggestedLabel": "Sàn kế hoạch Path",
+          "suggestedLabel": "Sàn kế hoạch đường dẫn",
           "suggestedLabelEn": "Floor Plan Path",
           "suggestedType": "file",
           "dbTypes": [
@@ -12399,7 +12399,7 @@
           "tables": [
             "mes_equipment_extended"
           ],
-          "suggestedLabel": "Ip Addr Máy",
+          "suggestedLabel": "Ip Addre Máy",
           "suggestedLabelEn": "Machine Ip Address",
           "suggestedType": "string",
           "dbTypes": [
@@ -12531,7 +12531,7 @@
           "tables": [
             "mes_equipment_extended"
           ],
-          "suggestedLabel": "Table Size X Mm",
+          "suggestedLabel": "Table kích thước X Mm",
           "suggestedLabelEn": "Table Size X Mm",
           "suggestedType": "number",
           "dbTypes": [
@@ -12544,7 +12544,7 @@
           "tables": [
             "mes_equipment_extended"
           ],
-          "suggestedLabel": "Table Size Y Mm",
+          "suggestedLabel": "Table kích thước Y Mm",
           "suggestedLabelEn": "Table Size Y Mm",
           "suggestedType": "number",
           "dbTypes": [
@@ -12557,7 +12557,7 @@
           "tables": [
             "mes_equipment_extended"
           ],
-          "suggestedLabel": "Max Part Khối lượng Kg",
+          "suggestedLabel": "Max phụ tùng Khối lượng Kg",
           "suggestedLabelEn": "Max Part Weight Kg",
           "suggestedType": "weight",
           "dbTypes": [
@@ -12609,7 +12609,7 @@
           "tables": [
             "mes_equipment_extended"
           ],
-          "suggestedLabel": "Cad Model Path",
+          "suggestedLabel": "Cad Model đường dẫn",
           "suggestedLabelEn": "Cad Model Path",
           "suggestedType": "file",
           "dbTypes": [
@@ -12622,7 +12622,7 @@
           "tables": [
             "mes_equipment_extended"
           ],
-          "suggestedLabel": "Plc Tag Map",
+          "suggestedLabel": "Plc thẻ Map",
           "suggestedLabelEn": "Plc Tag Map",
           "suggestedType": "json",
           "dbTypes": [
@@ -12793,7 +12793,7 @@
             "mes_downtime_events",
             "mes_machine_state_events"
           ],
-          "suggestedLabel": "Lý do Text",
+          "suggestedLabel": "Lý do văn bản",
           "suggestedLabelEn": "Reason Text",
           "suggestedType": "string",
           "dbTypes": [
@@ -13201,7 +13201,7 @@
           "tables": [
             "mes_machine_telemetry"
           ],
-          "suggestedLabel": "Part Số lượng Ca",
+          "suggestedLabel": "Phụ tùng Số lượng Ca",
           "suggestedLabelEn": "Parts Count Shift",
           "suggestedType": "number",
           "dbTypes": [
@@ -13241,7 +13241,7 @@
           "tables": [
             "mes_machine_alarms"
           ],
-          "suggestedLabel": "Cảnh báo Text",
+          "suggestedLabel": "Cảnh báo văn bản",
           "suggestedLabelEn": "Alarm Text",
           "suggestedType": "string",
           "dbTypes": [
@@ -13386,7 +13386,7 @@
           "tables": [
             "mes_program_events"
           ],
-          "suggestedLabel": "Part Số lượng lúc sự kiện",
+          "suggestedLabel": "Phụ tùng Số lượng lúc sự kiện",
           "suggestedLabelEn": "Part Count At Event",
           "suggestedType": "number",
           "dbTypes": [
@@ -13412,7 +13412,7 @@
           "tables": [
             "mes_job_execution"
           ],
-          "suggestedLabel": "Đầu tiên Piece Complete",
+          "suggestedLabel": "Đầu tiên chi tiết Complete",
           "suggestedLabelEn": "First Piece Complete",
           "suggestedType": "datetime",
           "dbTypes": [
@@ -13425,7 +13425,7 @@
           "tables": [
             "mes_job_execution"
           ],
-          "suggestedLabel": "Last Piece Complete",
+          "suggestedLabel": "Last chi tiết Complete",
           "suggestedLabelEn": "Last Piece Complete",
           "suggestedType": "datetime",
           "dbTypes": [
@@ -13597,7 +13597,7 @@
           "tables": [
             "mes_job_execution"
           ],
-          "suggestedLabel": "Is On tạm giữ",
+          "suggestedLabel": "On tạm giữ",
           "suggestedLabelEn": "Is On Hold",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -13653,7 +13653,7 @@
           "tables": [
             "mes_job_execution"
           ],
-          "suggestedLabel": "Machin Used",
+          "suggestedLabel": "Máy Used",
           "suggestedLabelEn": "Machines Used",
           "suggestedType": "string",
           "dbTypes": [
@@ -13718,7 +13718,7 @@
           "tables": [
             "mes_operation_execution"
           ],
-          "suggestedLabel": "Đầu tiên Piece lúc",
+          "suggestedLabel": "Đầu tiên chi tiết lúc",
           "suggestedLabelEn": "First Piece At",
           "suggestedType": "datetime",
           "dbTypes": [
@@ -13731,7 +13731,7 @@
           "tables": [
             "mes_operation_execution"
           ],
-          "suggestedLabel": "Last Piece lúc",
+          "suggestedLabel": "Last chi tiết lúc",
           "suggestedLabelEn": "Last Piece At",
           "suggestedType": "datetime",
           "dbTypes": [
@@ -13934,7 +13934,7 @@
           "tables": [
             "mes_operation_execution"
           ],
-          "suggestedLabel": "Is Complete",
+          "suggestedLabel": "Complete",
           "suggestedLabelEn": "Is Complete",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -13947,7 +13947,7 @@
           "tables": [
             "mes_operation_execution"
           ],
-          "suggestedLabel": "Phế phẩm Lý do Cod",
+          "suggestedLabel": "Phế phẩm Lý do Mã",
           "suggestedLabelEn": "Scrap Reason Codes",
           "suggestedType": "select",
           "dbTypes": [
@@ -13960,7 +13960,7 @@
           "tables": [
             "mes_operation_execution"
           ],
-          "suggestedLabel": "Rework Lý do Cod",
+          "suggestedLabel": "Rework Lý do Mã",
           "suggestedLabelEn": "Rework Reason Codes",
           "suggestedType": "select",
           "dbTypes": [
@@ -13974,7 +13974,7 @@
             "mes_cycle_events",
             "mes_inline_measurements"
           ],
-          "suggestedLabel": "Part trình tự",
+          "suggestedLabel": "Phụ tùng trình tự",
           "suggestedLabelEn": "Part Sequence",
           "suggestedType": "number",
           "dbTypes": [
@@ -14120,7 +14120,7 @@
           "tables": [
             "mes_oee_loss_events"
           ],
-          "suggestedLabel": "Los Lý do Text",
+          "suggestedLabel": "Los Lý do văn bản",
           "suggestedLabelEn": "Loss Reason Text",
           "suggestedType": "string",
           "dbTypes": [
@@ -14228,7 +14228,7 @@
           "tables": [
             "mes_oee_snapshots"
           ],
-          "suggestedLabel": "Tổng Piec",
+          "suggestedLabel": "Tổng chi tiết",
           "suggestedLabelEn": "Total Pieces",
           "suggestedType": "number",
           "dbTypes": [
@@ -14254,7 +14254,7 @@
           "tables": [
             "mes_oee_snapshots"
           ],
-          "suggestedLabel": "Good Piec",
+          "suggestedLabel": "Good chi tiết",
           "suggestedLabelEn": "Good Pieces",
           "suggestedType": "number",
           "dbTypes": [
@@ -14267,7 +14267,7 @@
           "tables": [
             "mes_oee_snapshots"
           ],
-          "suggestedLabel": "Khuyết tật Piec",
+          "suggestedLabel": "Khuyết tật chi tiết",
           "suggestedLabelEn": "Defect Pieces",
           "suggestedType": "number",
           "dbTypes": [
@@ -14280,7 +14280,7 @@
           "tables": [
             "mes_oee_snapshots"
           ],
-          "suggestedLabel": "Rework Piec",
+          "suggestedLabel": "Rework chi tiết",
           "suggestedLabelEn": "Rework Pieces",
           "suggestedType": "number",
           "dbTypes": [
@@ -14306,7 +14306,7 @@
           "tables": [
             "mes_oee_snapshots"
           ],
-          "suggestedLabel": "Số Primary Lệnh",
+          "suggestedLabel": "Số chính Lệnh",
           "suggestedLabelEn": "Primary Job Number",
           "suggestedType": "string",
           "dbTypes": [
@@ -14550,7 +14550,7 @@
             "mes_shop_floor_layout",
             "mes_spc_control_limits"
           ],
-          "suggestedLabel": "Is hiện tại",
+          "suggestedLabel": "Hiện tại",
           "suggestedLabelEn": "Is Current",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -14836,7 +14836,7 @@
           "tables": [
             "mes_shift_handover"
           ],
-          "suggestedLabel": "Lệnh In Progr",
+          "suggestedLabel": "Lệnh In Progre",
           "suggestedLabelEn": "Job In Progress",
           "suggestedType": "string",
           "dbTypes": [
@@ -14849,7 +14849,7 @@
           "tables": [
             "mes_shift_handover"
           ],
-          "suggestedLabel": "Công đoạn In Progr",
+          "suggestedLabel": "Công đoạn In Progre",
           "suggestedLabelEn": "Operation In Progress",
           "suggestedType": "percentage",
           "dbTypes": [
@@ -14862,7 +14862,7 @@
           "tables": [
             "mes_shift_handover"
           ],
-          "suggestedLabel": "Part hoàn tất",
+          "suggestedLabel": "Phụ tùng hoàn tất",
           "suggestedLabelEn": "Parts Completed",
           "suggestedType": "number",
           "dbTypes": [
@@ -14888,7 +14888,7 @@
           "tables": [
             "mes_shift_handover"
           ],
-          "suggestedLabel": "Issu Noted",
+          "suggestedLabel": "Vấn đề Noted",
           "suggestedLabelEn": "Issues Noted",
           "suggestedType": "string",
           "dbTypes": [
@@ -14927,7 +14927,7 @@
           "tables": [
             "mes_shift_handover"
           ],
-          "suggestedLabel": "Trạng thái Tooling",
+          "suggestedLabel": "Trạng thái tooling",
           "suggestedLabelEn": "Tooling Status",
           "suggestedType": "select",
           "dbTypes": [
@@ -15308,7 +15308,7 @@
           "tables": [
             "mes_dispatch_queue"
           ],
-          "suggestedLabel": "Est thiết lập Minut",
+          "suggestedLabel": "Est thiết lập phút",
           "suggestedLabelEn": "Est Setup Minutes",
           "suggestedType": "duration",
           "dbTypes": [
@@ -15321,7 +15321,7 @@
           "tables": [
             "mes_dispatch_queue"
           ],
-          "suggestedLabel": "Est lần chạy Minut",
+          "suggestedLabel": "Est lần chạy phút",
           "suggestedLabelEn": "Est Run Minutes",
           "suggestedType": "duration",
           "dbTypes": [
@@ -15373,7 +15373,7 @@
           "tables": [
             "mes_dispatch_queue"
           ],
-          "suggestedLabel": "Khả dụng Tooling",
+          "suggestedLabel": "Khả dụng tooling",
           "suggestedLabelEn": "Tooling Available",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -15425,7 +15425,7 @@
           "tables": [
             "mes_dispatch_queue"
           ],
-          "suggestedLabel": "Điều độ viên Not",
+          "suggestedLabel": "Điều độ viên Ghi chú",
           "suggestedLabelEn": "Planner Notes",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -15451,7 +15451,7 @@
           "tables": [
             "mes_downtime_events"
           ],
-          "suggestedLabel": "Is Kế hoạch",
+          "suggestedLabel": "Kế hoạch",
           "suggestedLabelEn": "Is Planned",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -15884,7 +15884,7 @@
           "tables": [
             "mes_genealogy_operations"
           ],
-          "suggestedLabel": "Proc Param",
+          "suggestedLabel": "Proce Param",
           "suggestedLabelEn": "Process Params",
           "suggestedType": "json",
           "dbTypes": [
@@ -16001,7 +16001,7 @@
           "tables": [
             "mes_machine_snapshot"
           ],
-          "suggestedLabel": "Part Good Ca",
+          "suggestedLabel": "Phụ tùng Good Ca",
           "suggestedLabelEn": "Parts Good Shift",
           "suggestedType": "number",
           "dbTypes": [
@@ -16014,7 +16014,7 @@
           "tables": [
             "mes_machine_snapshot"
           ],
-          "suggestedLabel": "Part Phế phẩm Ca",
+          "suggestedLabel": "Phụ tùng Phế phẩm Ca",
           "suggestedLabelEn": "Parts Scrap Shift",
           "suggestedType": "number",
           "dbTypes": [
@@ -16027,7 +16027,7 @@
           "tables": [
             "mes_machine_snapshot"
           ],
-          "suggestedLabel": "Part Rework Ca",
+          "suggestedLabel": "Phụ tùng Rework Ca",
           "suggestedLabelEn": "Parts Rework Shift",
           "suggestedType": "number",
           "dbTypes": [
@@ -16079,7 +16079,7 @@
           "tables": [
             "mes_machine_snapshot"
           ],
-          "suggestedLabel": "Số Next Part",
+          "suggestedLabel": "Số Next phụ tùng",
           "suggestedLabelEn": "Next Part Number",
           "suggestedType": "string",
           "dbTypes": [
@@ -16157,7 +16157,7 @@
           "tables": [
             "mes_production_kpi_daily"
           ],
-          "suggestedLabel": "Tổng Part Produced",
+          "suggestedLabel": "Tổng phụ tùng Produced",
           "suggestedLabelEn": "Total Parts Produced",
           "suggestedType": "number",
           "dbTypes": [
@@ -16170,7 +16170,7 @@
           "tables": [
             "mes_production_kpi_daily"
           ],
-          "suggestedLabel": "Tổng Part Good",
+          "suggestedLabel": "Tổng phụ tùng Good",
           "suggestedLabelEn": "Total Parts Good",
           "suggestedType": "number",
           "dbTypes": [
@@ -16183,7 +16183,7 @@
           "tables": [
             "mes_production_kpi_daily"
           ],
-          "suggestedLabel": "Tổng Part Phế phẩm",
+          "suggestedLabel": "Tổng phụ tùng Phế phẩm",
           "suggestedLabelEn": "Total Parts Scrap",
           "suggestedType": "number",
           "dbTypes": [
@@ -16196,7 +16196,7 @@
           "tables": [
             "mes_production_kpi_daily"
           ],
-          "suggestedLabel": "Tổng Part Rework",
+          "suggestedLabel": "Tổng phụ tùng Rework",
           "suggestedLabelEn": "Total Parts Rework",
           "suggestedType": "number",
           "dbTypes": [
@@ -16248,7 +16248,7 @@
           "tables": [
             "mes_production_kpi_daily"
           ],
-          "suggestedLabel": "Part Per giờ",
+          "suggestedLabel": "Phụ tùng Per giờ",
           "suggestedLabelEn": "Parts Per Hour",
           "suggestedType": "number",
           "dbTypes": [
@@ -16274,7 +16274,7 @@
           "tables": [
             "mes_production_kpi_daily"
           ],
-          "suggestedLabel": "Est Chi phí Per Part",
+          "suggestedLabel": "Est Chi phí Per phụ tùng",
           "suggestedLabelEn": "Est Cost Per Part",
           "suggestedType": "currency",
           "dbTypes": [
@@ -16340,7 +16340,7 @@
           "tables": [
             "mes_on_time_delivery"
           ],
-          "suggestedLabel": "Day Early Late",
+          "suggestedLabel": "Ngày Early Late",
           "suggestedLabelEn": "Days Early Late",
           "suggestedType": "number",
           "dbTypes": [
@@ -16353,7 +16353,7 @@
           "tables": [
             "mes_on_time_delivery"
           ],
-          "suggestedLabel": "Is On thời gian",
+          "suggestedLabel": "On thời gian",
           "suggestedLabelEn": "Is On Time",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -16379,7 +16379,7 @@
           "tables": [
             "mes_on_time_delivery"
           ],
-          "suggestedLabel": "Late Lý do Text",
+          "suggestedLabel": "Late Lý do văn bản",
           "suggestedLabelEn": "Late Reason Text",
           "suggestedType": "string",
           "dbTypes": [
@@ -16419,7 +16419,7 @@
           "tables": [
             "mes_erp_inbound_queue"
           ],
-          "suggestedLabel": "Trạng thái Proc",
+          "suggestedLabel": "Trạng thái Proce",
           "suggestedLabelEn": "Process Status",
           "suggestedType": "select",
           "dbTypes": [
@@ -16552,7 +16552,7 @@
           "tables": [
             "mes_event_subscriptions"
           ],
-          "suggestedLabel": "Channel",
+          "suggestedLabel": "Kênh",
           "suggestedLabelEn": "Channel",
           "suggestedType": "string",
           "dbTypes": [
@@ -16802,7 +16802,7 @@
           "tables": [
             "mes_alarm_catalog"
           ],
-          "suggestedLabel": "Response Owner vai trò",
+          "suggestedLabel": "Response chủ sở hữu vai trò",
           "suggestedLabelEn": "Response Owner Role",
           "suggestedType": "string",
           "dbTypes": [
@@ -16816,7 +16816,7 @@
             "mes_alarm_catalog",
             "mes_alarm_playbooks"
           ],
-          "suggestedLabel": "Response Mục tiêu Minut",
+          "suggestedLabel": "Response Mục tiêu phút",
           "suggestedLabelEn": "Response Target Minutes",
           "suggestedType": "duration",
           "dbTypes": [
@@ -16829,7 +16829,7 @@
           "tables": [
             "mes_alarm_catalog"
           ],
-          "suggestedLabel": "Requir Lockout",
+          "suggestedLabel": "Require Lockout",
           "suggestedLabelEn": "Requires Lockout",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -16842,7 +16842,7 @@
           "tables": [
             "mes_alarm_catalog"
           ],
-          "suggestedLabel": "Requir bảo trì",
+          "suggestedLabel": "Require bảo trì",
           "suggestedLabelEn": "Requires Maintenance",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -17381,7 +17381,7 @@
           "tables": [
             "mes_erp_sync_runs"
           ],
-          "suggestedLabel": "Summary",
+          "suggestedLabel": "Tóm tắt",
           "suggestedLabelEn": "Summary",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -17420,7 +17420,7 @@
           "tables": [
             "mes_erp_reconciliation_exceptions"
           ],
-          "suggestedLabel": "Difference Summary",
+          "suggestedLabel": "Difference tóm tắt",
           "suggestedLabelEn": "Difference Summary",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -17808,7 +17808,7 @@
           "tables": [
             "customer_sites"
           ],
-          "suggestedLabel": "Mã đóng gói Spec",
+          "suggestedLabel": "Mã đóng gói quy cách",
           "suggestedLabelEn": "Packing Spec Code",
           "suggestedType": "string",
           "dbTypes": [
@@ -17821,7 +17821,7 @@
           "tables": [
             "customer_sites"
           ],
-          "suggestedLabel": "Mã nhãn Spec",
+          "suggestedLabel": "Mã nhãn quy cách",
           "suggestedLabelEn": "Label Spec Code",
           "suggestedType": "string",
           "dbTypes": [
@@ -17847,7 +17847,7 @@
           "tables": [
             "commercial_accounts"
           ],
-          "suggestedLabel": "Tài khoản Owner",
+          "suggestedLabel": "Tài khoản chủ sở hữu",
           "suggestedLabelEn": "Account Owner",
           "suggestedType": "string",
           "dbTypes": [
@@ -18166,7 +18166,7 @@
           "tables": [
             "outside_processing_orders"
           ],
-          "suggestedLabel": "Mã Đặc biệt Proc",
+          "suggestedLabel": "Mã Đặc biệt Proce",
           "suggestedLabelEn": "Special Process Code",
           "suggestedType": "string",
           "dbTypes": [
@@ -18457,7 +18457,7 @@
           "tables": [
             "order_notes"
           ],
-          "suggestedLabel": "Author tên",
+          "suggestedLabel": "Tác giả tên",
           "suggestedLabelEn": "Author Name",
           "suggestedType": "string",
           "dbTypes": [
@@ -18500,7 +18500,7 @@
           "tables": [
             "order_documents_required"
           ],
-          "suggestedLabel": "File tham chiếu",
+          "suggestedLabel": "Tệp tham chiếu",
           "suggestedLabelEn": "File Reference",
           "suggestedType": "file",
           "dbTypes": [
@@ -18606,7 +18606,7 @@
           "tables": [
             "customer_complaints"
           ],
-          "suggestedLabel": "D1 Team Member",
+          "suggestedLabel": "D1 nhóm Member",
           "suggestedLabelEn": "D1 Team Members",
           "suggestedType": "json",
           "dbTypes": [
@@ -18671,7 +18671,7 @@
           "tables": [
             "customer_complaints"
           ],
-          "suggestedLabel": "D8 Closure Not",
+          "suggestedLabel": "D8 đóng Ghi chú",
           "suggestedLabelEn": "D8 Closure Notes",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -18913,7 +18913,7 @@
           "tables": [
             "concessions"
           ],
-          "suggestedLabel": "Nonconformance Detail",
+          "suggestedLabel": "Không phù hợp chi tiết",
           "suggestedLabelEn": "Nonconformance Detail",
           "suggestedType": "string",
           "dbTypes": [
@@ -19257,7 +19257,7 @@
           "tables": [
             "incoming_inspections"
           ],
-          "suggestedLabel": "Sampling Size",
+          "suggestedLabel": "Sampling kích thước",
           "suggestedLabelEn": "Sampling Size",
           "suggestedType": "number",
           "dbTypes": [
@@ -19335,7 +19335,7 @@
           "tables": [
             "skip_lot_tracking"
           ],
-          "suggestedLabel": "Last Kiểm tra Result",
+          "suggestedLabel": "Last Kiểm tra kết quả",
           "suggestedLabelEn": "Last Inspection Result",
           "suggestedType": "select",
           "dbTypes": [
@@ -19400,7 +19400,7 @@
           "tables": [
             "approved_supplier_list"
           ],
-          "suggestedLabel": "Phạm vi Proc",
+          "suggestedLabel": "Phạm vi Proce",
           "suggestedLabelEn": "Scope Processes",
           "suggestedType": "json",
           "dbTypes": [
@@ -19715,7 +19715,7 @@
             "supplier_audit_schedule",
             "svc_field_visit_reports"
           ],
-          "suggestedLabel": "Phát hiện Summary",
+          "suggestedLabel": "Phát hiện tóm tắt",
           "suggestedLabelEn": "Findings Summary",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -19806,7 +19806,7 @@
           "tables": [
             "quotes"
           ],
-          "suggestedLabel": "Validity Day",
+          "suggestedLabel": "Validity ngày",
           "suggestedLabelEn": "Validity Days",
           "suggestedType": "number",
           "dbTypes": [
@@ -19845,7 +19845,7 @@
           "tables": [
             "quotes"
           ],
-          "suggestedLabel": "Tổng Tooling Chi phí",
+          "suggestedLabel": "Tổng tooling Chi phí",
           "suggestedLabelEn": "Total Tooling Cost",
           "suggestedType": "currency",
           "dbTypes": [
@@ -20080,7 +20080,7 @@
           "tables": [
             "quote_lines"
           ],
-          "suggestedLabel": "Chi phí Tooling",
+          "suggestedLabel": "Chi phí tooling",
           "suggestedLabelEn": "Tooling Cost",
           "suggestedType": "currency",
           "dbTypes": [
@@ -20263,7 +20263,7 @@
           "tables": [
             "quote_history"
           ],
-          "suggestedLabel": "Previou Valu",
+          "suggestedLabel": "Previou Giá trị",
           "suggestedLabelEn": "Previous Values",
           "suggestedType": "json",
           "dbTypes": [
@@ -20276,7 +20276,7 @@
           "tables": [
             "quote_history"
           ],
-          "suggestedLabel": "New Valu",
+          "suggestedLabel": "New Giá trị",
           "suggestedLabelEn": "New Values",
           "suggestedType": "json",
           "dbTypes": [
@@ -20318,7 +20318,7 @@
             "cnc_program_versions",
             "evidence_vault"
           ],
-          "suggestedLabel": "File Size Byt",
+          "suggestedLabel": "Tệp kích thước byte",
           "suggestedLabelEn": "File Size Bytes",
           "suggestedType": "number",
           "dbTypes": [
@@ -20333,7 +20333,7 @@
             "cnc_programs",
             "evidence_vault"
           ],
-          "suggestedLabel": "File Băm Sha256",
+          "suggestedLabel": "Tệp Băm Sha256",
           "suggestedLabelEn": "File Hash Sha256",
           "suggestedType": "file",
           "dbTypes": [
@@ -20398,7 +20398,7 @@
           "tables": [
             "evidence_vault"
           ],
-          "suggestedLabel": "Lưu giữ Expir lúc",
+          "suggestedLabel": "Lưu giữ Expire lúc",
           "suggestedLabelEn": "Retention Expires At",
           "suggestedType": "date",
           "dbTypes": [
@@ -20411,7 +20411,7 @@
           "tables": [
             "evidence_chain_custody"
           ],
-          "suggestedLabel": "Actor Ip",
+          "suggestedLabel": "Người thao tác Ip",
           "suggestedLabelEn": "Actor Ip",
           "suggestedType": "string",
           "dbTypes": [
@@ -20450,7 +20450,7 @@
           "tables": [
             "evidence_fts"
           ],
-          "suggestedLabel": "Nội dung Text",
+          "suggestedLabel": "Nội dung văn bản",
           "suggestedLabelEn": "Content Text",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -20595,7 +20595,7 @@
           "tables": [
             "portal_access_tokens"
           ],
-          "suggestedLabel": "Scop",
+          "suggestedLabel": "Phạm vi",
           "suggestedLabelEn": "Scopes",
           "suggestedType": "json",
           "dbTypes": [
@@ -20661,7 +20661,7 @@
           "tables": [
             "portal_complaint_submissions"
           ],
-          "suggestedLabel": "Bị ảnh hưởng Part tham chiếu",
+          "suggestedLabel": "Bị ảnh hưởng phụ tùng tham chiếu",
           "suggestedLabelEn": "Affected Part Ref",
           "suggestedType": "string",
           "dbTypes": [
@@ -20716,7 +20716,7 @@
           "tables": [
             "cnc_programs"
           ],
-          "suggestedLabel": "Cam Software",
+          "suggestedLabel": "Cam phần mềm",
           "suggestedLabelEn": "Cam Software",
           "suggestedType": "string",
           "dbTypes": [
@@ -20768,7 +20768,7 @@
           "tables": [
             "cnc_program_versions"
           ],
-          "suggestedLabel": "Đầu tiên Piece Result",
+          "suggestedLabel": "Đầu tiên chi tiết kết quả",
           "suggestedLabelEn": "First Piece Result",
           "suggestedType": "select",
           "dbTypes": [
@@ -20967,7 +20967,7 @@
           "tables": [
             "product_passports"
           ],
-          "suggestedLabel": "Thử nghiệm Báo cáo Referenc",
+          "suggestedLabel": "Thử nghiệm Báo cáo tham chiếu",
           "suggestedLabelEn": "Test Report References",
           "suggestedType": "json",
           "dbTypes": [
@@ -20980,7 +20980,7 @@
           "tables": [
             "product_passports"
           ],
-          "suggestedLabel": "Tổng Machining thời gian Minut",
+          "suggestedLabel": "Tổng Machining thời gian phút",
           "suggestedLabelEn": "Total Machining Time Minutes",
           "suggestedType": "datetime",
           "dbTypes": [
@@ -20993,7 +20993,7 @@
           "tables": [
             "product_passports"
           ],
-          "suggestedLabel": "Tổng Kiểm tra thời gian Minut",
+          "suggestedLabel": "Tổng Kiểm tra thời gian phút",
           "suggestedLabelEn": "Total Inspection Time Minutes",
           "suggestedType": "datetime",
           "dbTypes": [
@@ -21006,7 +21006,7 @@
           "tables": [
             "product_passports"
           ],
-          "suggestedLabel": "Nonconformanc",
+          "suggestedLabel": "Không phù hợp",
           "suggestedLabelEn": "Nonconformances",
           "suggestedType": "json",
           "dbTypes": [
@@ -21214,7 +21214,7 @@
           "tables": [
             "quality_predictions"
           ],
-          "suggestedLabel": "Resolution Not",
+          "suggestedLabel": "Resolution Ghi chú",
           "suggestedLabelEn": "Resolution Notes",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -21279,7 +21279,7 @@
           "tables": [
             "prediction_models"
           ],
-          "suggestedLabel": "Đào tạo Sampl",
+          "suggestedLabel": "Đào tạo mẫu",
           "suggestedLabelEn": "Training Samples",
           "suggestedType": "number",
           "dbTypes": [
@@ -21436,7 +21436,7 @@
             "fin_exchange_rates",
             "production_schedule_slots"
           ],
-          "suggestedLabel": "Is Locked",
+          "suggestedLabel": "Khóa",
           "suggestedLabelEn": "Is Locked",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -21449,7 +21449,7 @@
           "tables": [
             "production_schedule_slots"
           ],
-          "suggestedLabel": "Locked Lý do",
+          "suggestedLabel": "Khóa Lý do",
           "suggestedLabelEn": "Locked Reason",
           "suggestedType": "string",
           "dbTypes": [
@@ -21490,7 +21490,7 @@
             "capacity_snapshots",
             "eng_factory_calendar_days"
           ],
-          "suggestedLabel": "Khả dụng Minut",
+          "suggestedLabel": "Khả dụng phút",
           "suggestedLabelEn": "Available Minutes",
           "suggestedType": "duration",
           "dbTypes": [
@@ -21504,7 +21504,7 @@
           "tables": [
             "capacity_snapshots"
           ],
-          "suggestedLabel": "Scheduled Minut",
+          "suggestedLabel": "Scheduled phút",
           "suggestedLabelEn": "Scheduled Minutes",
           "suggestedType": "duration",
           "dbTypes": [
@@ -21518,7 +21518,7 @@
             "capacity_snapshots",
             "mobile_work_queue"
           ],
-          "suggestedLabel": "Minut thực tế",
+          "suggestedLabel": "Phút thực tế",
           "suggestedLabelEn": "Actual Minutes",
           "suggestedType": "duration",
           "dbTypes": [
@@ -21534,7 +21534,7 @@
             "capacity_snapshots",
             "dw_fact_production"
           ],
-          "suggestedLabel": "Thiết lập Minut",
+          "suggestedLabel": "Thiết lập phút",
           "suggestedLabelEn": "Setup Minutes",
           "suggestedType": "duration",
           "dbTypes": [
@@ -21548,7 +21548,7 @@
           "tables": [
             "capacity_snapshots"
           ],
-          "suggestedLabel": "Idle Minut",
+          "suggestedLabel": "Idle phút",
           "suggestedLabelEn": "Idle Minutes",
           "suggestedType": "duration",
           "dbTypes": [
@@ -21561,7 +21561,7 @@
           "tables": [
             "capacity_snapshots"
           ],
-          "suggestedLabel": "Bảo trì Minut",
+          "suggestedLabel": "Bảo trì phút",
           "suggestedLabelEn": "Maintenance Minutes",
           "suggestedType": "duration",
           "dbTypes": [
@@ -21600,7 +21600,7 @@
           "tables": [
             "fmea_failure_modes"
           ],
-          "suggestedLabel": "Proc Function",
+          "suggestedLabel": "Proce Function",
           "suggestedLabelEn": "Process Function",
           "suggestedType": "string",
           "dbTypes": [
@@ -21613,7 +21613,7 @@
           "tables": [
             "fmea_failure_modes"
           ],
-          "suggestedLabel": "Proc Function Vi",
+          "suggestedLabel": "Proce Function Vi",
           "suggestedLabelEn": "Process Function Vi",
           "suggestedType": "string",
           "dbTypes": [
@@ -21864,7 +21864,7 @@
           "tables": [
             "control_plan_characteristics"
           ],
-          "suggestedLabel": "Sản phẩm Spec",
+          "suggestedLabel": "Sản phẩm quy cách",
           "suggestedLabelEn": "Product Spec",
           "suggestedType": "string",
           "dbTypes": [
@@ -21877,7 +21877,7 @@
           "tables": [
             "control_plan_characteristics"
           ],
-          "suggestedLabel": "Proc Spec",
+          "suggestedLabel": "Proce quy cách",
           "suggestedLabelEn": "Process Spec",
           "suggestedType": "string",
           "dbTypes": [
@@ -21942,7 +21942,7 @@
           "tables": [
             "control_plan_characteristics"
           ],
-          "suggestedLabel": "Reaction kế hoạch Detail",
+          "suggestedLabel": "Reaction kế hoạch chi tiết",
           "suggestedLabelEn": "Reaction Plan Detail",
           "suggestedType": "string",
           "dbTypes": [
@@ -22048,7 +22048,7 @@
           "tables": [
             "apqp_gate_reviews"
           ],
-          "suggestedLabel": "Trạng thái Deliverabl",
+          "suggestedLabel": "Trạng thái Deliverable",
           "suggestedLabelEn": "Deliverables Status",
           "suggestedType": "select",
           "dbTypes": [
@@ -22061,7 +22061,7 @@
           "tables": [
             "apqp_gate_reviews"
           ],
-          "suggestedLabel": "Cuộc họp Minut",
+          "suggestedLabel": "Cuộc họp phút",
           "suggestedLabelEn": "Meeting Minutes",
           "suggestedType": "duration",
           "dbTypes": [
@@ -22207,7 +22207,7 @@
           "tables": [
             "mobile_work_queue"
           ],
-          "suggestedLabel": "Estimated Minut",
+          "suggestedLabel": "Estimated phút",
           "suggestedLabelEn": "Estimated Minutes",
           "suggestedType": "duration",
           "dbTypes": [
@@ -22386,7 +22386,7 @@
           "tables": [
             "shift_production_log"
           ],
-          "suggestedLabel": "Issu Encountered",
+          "suggestedLabel": "Vấn đề Encountered",
           "suggestedLabelEn": "Issues Encountered",
           "suggestedType": "number",
           "dbTypes": [
@@ -22399,7 +22399,7 @@
           "tables": [
             "shift_definitions"
           ],
-          "suggestedLabel": "Hiệu lực Minut",
+          "suggestedLabel": "Hiệu lực phút",
           "suggestedLabelEn": "Effective Minutes",
           "suggestedType": "date",
           "dbTypes": [
@@ -22438,7 +22438,7 @@
           "tables": [
             "oqc_inspections"
           ],
-          "suggestedLabel": "Yêu cầu Witn Khách hàng",
+          "suggestedLabel": "Yêu cầu Witne Khách hàng",
           "suggestedLabelEn": "Customer Witness Required",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -22451,7 +22451,7 @@
           "tables": [
             "oqc_inspections"
           ],
-          "suggestedLabel": "Witn tên Khách hàng",
+          "suggestedLabel": "Witne tên Khách hàng",
           "suggestedLabelEn": "Customer Witness Name",
           "suggestedType": "string",
           "dbTypes": [
@@ -22464,7 +22464,7 @@
           "tables": [
             "oqc_inspections"
           ],
-          "suggestedLabel": "Ngày Witn Khách hàng",
+          "suggestedLabel": "Ngày Witne Khách hàng",
           "suggestedLabelEn": "Customer Witness Date",
           "suggestedType": "date",
           "dbTypes": [
@@ -22516,7 +22516,7 @@
           "tables": [
             "packing_lists"
           ],
-          "suggestedLabel": "Đặc biệt Packaging Not",
+          "suggestedLabel": "Đặc biệt Packaging Ghi chú",
           "suggestedLabelEn": "Special Packaging Notes",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -22801,7 +22801,7 @@
             "eng_time_standards",
             "pm_maintenance_plan_items"
           ],
-          "suggestedLabel": "Tiêu chuẩn Minut",
+          "suggestedLabel": "Tiêu chuẩn phút",
           "suggestedLabelEn": "Standard Minutes",
           "suggestedType": "duration",
           "dbTypes": [
@@ -22855,7 +22855,7 @@
             "hcm_qualification_requirements",
             "pm_maintenance_plan_items"
           ],
-          "suggestedLabel": "Is Mandatory",
+          "suggestedLabel": "Mandatory",
           "suggestedLabelEn": "Is Mandatory",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -22913,7 +22913,7 @@
           "tables": [
             "pm_work_orders"
           ],
-          "suggestedLabel": "Gốc Cause Summary",
+          "suggestedLabel": "Gốc Cause tóm tắt",
           "suggestedLabelEn": "Root Cause Summary",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -22926,7 +22926,7 @@
           "tables": [
             "pm_work_orders"
           ],
-          "suggestedLabel": "Kết thúc Not",
+          "suggestedLabel": "Kết thúc Ghi chú",
           "suggestedLabelEn": "Closeout Notes",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -22965,7 +22965,7 @@
           "tables": [
             "pm_work_order_operations"
           ],
-          "suggestedLabel": "Instruction Text",
+          "suggestedLabel": "Instruction văn bản",
           "suggestedLabelEn": "Instruction Text",
           "suggestedType": "string",
           "dbTypes": [
@@ -23194,7 +23194,7 @@
           "tables": [
             "pm_failure_history"
           ],
-          "suggestedLabel": "Symptom Summary",
+          "suggestedLabel": "Symptom tóm tắt",
           "suggestedLabelEn": "Symptom Summary",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -23233,7 +23233,7 @@
           "tables": [
             "pm_condition_monitoring"
           ],
-          "suggestedLabel": "Is cảnh báo",
+          "suggestedLabel": "Cảnh báo",
           "suggestedLabelEn": "Is Alarm",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -23417,7 +23417,7 @@
           "tables": [
             "aps_planning_scenarios"
           ],
-          "suggestedLabel": "Is Baseline",
+          "suggestedLabel": "Chuẩn gốc",
           "suggestedLabelEn": "Is Baseline",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -23430,7 +23430,7 @@
           "tables": [
             "aps_planning_scenarios"
           ],
-          "suggestedLabel": "Locked Until",
+          "suggestedLabel": "Khóa đến",
           "suggestedLabelEn": "Locked Until",
           "suggestedType": "datetime",
           "dbTypes": [
@@ -23537,7 +23537,7 @@
           "tables": [
             "aps_capacity_buckets"
           ],
-          "suggestedLabel": "Allocated Minut",
+          "suggestedLabel": "Đã phân bổ phút",
           "suggestedLabelEn": "Allocated Minutes",
           "suggestedType": "duration",
           "dbTypes": [
@@ -23550,7 +23550,7 @@
           "tables": [
             "aps_capacity_buckets"
           ],
-          "suggestedLabel": "Bảo trì Blocked Minut",
+          "suggestedLabel": "Bảo trì Blocked phút",
           "suggestedLabelEn": "Maintenance Blocked Minutes",
           "suggestedType": "duration",
           "dbTypes": [
@@ -23563,7 +23563,7 @@
           "tables": [
             "aps_capacity_buckets"
           ],
-          "suggestedLabel": "Overtime Khả dụng Minut",
+          "suggestedLabel": "Overtime Khả dụng phút",
           "suggestedLabelEn": "Overtime Available Minutes",
           "suggestedType": "duration",
           "dbTypes": [
@@ -23591,7 +23591,7 @@
           "tables": [
             "aps_constraint_resources"
           ],
-          "suggestedLabel": "Max năng lực Per Day",
+          "suggestedLabel": "Max năng lực Per ngày",
           "suggestedLabelEn": "Max Capacity Per Day",
           "suggestedType": "number",
           "dbTypes": [
@@ -23604,7 +23604,7 @@
           "tables": [
             "aps_constraint_resources"
           ],
-          "suggestedLabel": "Is Bottleneck",
+          "suggestedLabel": "Nút cổ chai",
           "suggestedLabelEn": "Is Bottleneck",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -23631,7 +23631,7 @@
             "aps_schedule_blocks",
             "dw_fact_production"
           ],
-          "suggestedLabel": "Lần chạy Minut",
+          "suggestedLabel": "Lần chạy phút",
           "suggestedLabelEn": "Run Minutes",
           "suggestedType": "duration",
           "dbTypes": [
@@ -23748,7 +23748,7 @@
           "tables": [
             "aps_material_availability"
           ],
-          "suggestedLabel": "Cung ứng Nguồn Summary",
+          "suggestedLabel": "Cung ứng Nguồn tóm tắt",
           "suggestedLabelEn": "Supply Source Summary",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -23761,7 +23761,7 @@
           "tables": [
             "aps_setup_matrices"
           ],
-          "suggestedLabel": "Từ Part Family",
+          "suggestedLabel": "Từ phụ tùng Family",
           "suggestedLabelEn": "From Part Family",
           "suggestedType": "string",
           "dbTypes": [
@@ -23774,7 +23774,7 @@
           "tables": [
             "aps_setup_matrices"
           ],
-          "suggestedLabel": "Đến Part Family",
+          "suggestedLabel": "Đến phụ tùng Family",
           "suggestedLabelEn": "To Part Family",
           "suggestedType": "string",
           "dbTypes": [
@@ -23943,7 +23943,7 @@
           "tables": [
             "aps_kpi_snapshots"
           ],
-          "suggestedLabel": "Tỷ lệ Bottleneck Tải",
+          "suggestedLabel": "Tỷ lệ nút cổ chai Tải",
           "suggestedLabelEn": "Bottleneck Load Pct",
           "suggestedType": "percentage",
           "dbTypes": [
@@ -23982,7 +23982,7 @@
           "tables": [
             "aps_planning_horizons"
           ],
-          "suggestedLabel": "Đóng băng Day",
+          "suggestedLabel": "Đóng băng ngày",
           "suggestedLabelEn": "Frozen Days",
           "suggestedType": "number",
           "dbTypes": [
@@ -23995,7 +23995,7 @@
           "tables": [
             "aps_planning_horizons"
           ],
-          "suggestedLabel": "Linh hoạt Day",
+          "suggestedLabel": "Linh hoạt ngày",
           "suggestedLabelEn": "Slushy Days",
           "suggestedType": "number",
           "dbTypes": [
@@ -24008,7 +24008,7 @@
           "tables": [
             "aps_planning_horizons"
           ],
-          "suggestedLabel": "Tự do Day",
+          "suggestedLabel": "Tự do ngày",
           "suggestedLabelEn": "Free Days",
           "suggestedType": "number",
           "dbTypes": [
@@ -24021,7 +24021,7 @@
           "tables": [
             "aps_planning_horizons"
           ],
-          "suggestedLabel": "Reschedule dung sai Day",
+          "suggestedLabel": "Reschedule dung sai ngày",
           "suggestedLabelEn": "Reschedule Tolerance Days",
           "suggestedType": "number",
           "dbTypes": [
@@ -24103,7 +24103,7 @@
           "tables": [
             "plm_change_requests"
           ],
-          "suggestedLabel": "Impact Summary",
+          "suggestedLabel": "Impact tóm tắt",
           "suggestedLabelEn": "Impact Summary",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -24314,7 +24314,7 @@
           "tables": [
             "plm_change_review_board"
           ],
-          "suggestedLabel": "Vote Result",
+          "suggestedLabel": "Vote kết quả",
           "suggestedLabelEn": "Vote Result",
           "suggestedType": "select",
           "dbTypes": [
@@ -24327,7 +24327,7 @@
           "tables": [
             "plm_change_review_board"
           ],
-          "suggestedLabel": "Vote Not",
+          "suggestedLabel": "Vote Ghi chú",
           "suggestedLabelEn": "Vote Notes",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -24406,7 +24406,7 @@
             "plm_requirements",
             "qual_customer_requirements"
           ],
-          "suggestedLabel": "Yêu cầu Text",
+          "suggestedLabel": "Yêu cầu văn bản",
           "suggestedLabelEn": "Requirement Text",
           "suggestedType": "string",
           "dbTypes": [
@@ -24523,7 +24523,7 @@
           "tables": [
             "plm_test_results"
           ],
-          "suggestedLabel": "Trạng thái Result",
+          "suggestedLabel": "Trạng thái kết quả",
           "suggestedLabelEn": "Result Status",
           "suggestedType": "select",
           "dbTypes": [
@@ -24536,7 +24536,7 @@
           "tables": [
             "plm_test_results"
           ],
-          "suggestedLabel": "Result Summary",
+          "suggestedLabel": "Kết quả tóm tắt",
           "suggestedLabelEn": "Result Summary",
           "suggestedType": "select",
           "dbTypes": [
@@ -24575,7 +24575,7 @@
           "tables": [
             "plm_design_reviews"
           ],
-          "suggestedLabel": "Decision Result",
+          "suggestedLabel": "Decision kết quả",
           "suggestedLabelEn": "Decision Result",
           "suggestedType": "select",
           "dbTypes": [
@@ -24588,7 +24588,7 @@
           "tables": [
             "plm_design_reviews"
           ],
-          "suggestedLabel": "Hành động Mã hàng Summary",
+          "suggestedLabel": "Hành động Mã hàng tóm tắt",
           "suggestedLabelEn": "Action Item Summary",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -24881,7 +24881,7 @@
           "tables": [
             "hcm_employees"
           ],
-          "suggestedLabel": "Khẩn cấp liên hệ Phone",
+          "suggestedLabel": "Khẩn cấp liên hệ điện thoại",
           "suggestedLabelEn": "Emergency Contact Phone",
           "suggestedType": "string",
           "dbTypes": [
@@ -25065,7 +25065,7 @@
           "tables": [
             "hcm_certifications"
           ],
-          "suggestedLabel": "Regulated Proc Flag",
+          "suggestedLabel": "Regulated Proce Flag",
           "suggestedLabelEn": "Regulated Process Flag",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -25236,7 +25236,7 @@
           "tables": [
             "hcm_leave_balances"
           ],
-          "suggestedLabel": "Accrued Day",
+          "suggestedLabel": "Accrued ngày",
           "suggestedLabelEn": "Accrued Days",
           "suggestedType": "number",
           "dbTypes": [
@@ -25249,7 +25249,7 @@
           "tables": [
             "hcm_leave_balances"
           ],
-          "suggestedLabel": "Used Day",
+          "suggestedLabel": "Used ngày",
           "suggestedLabelEn": "Used Days",
           "suggestedType": "number",
           "dbTypes": [
@@ -25262,7 +25262,7 @@
           "tables": [
             "hcm_leave_balances"
           ],
-          "suggestedLabel": "Còn lại Day",
+          "suggestedLabel": "Còn lại ngày",
           "suggestedLabelEn": "Remaining Days",
           "suggestedType": "number",
           "dbTypes": [
@@ -25275,7 +25275,7 @@
           "tables": [
             "hcm_leave_balances"
           ],
-          "suggestedLabel": "Carry Forward Day",
+          "suggestedLabel": "Carry Forward ngày",
           "suggestedLabelEn": "Carry Forward Days",
           "suggestedType": "number",
           "dbTypes": [
@@ -25288,7 +25288,7 @@
           "tables": [
             "hcm_payroll_periods"
           ],
-          "suggestedLabel": "Period Năm",
+          "suggestedLabel": "Kỳ Năm",
           "suggestedLabelEn": "Period Year",
           "suggestedType": "number",
           "dbTypes": [
@@ -25301,7 +25301,7 @@
           "tables": [
             "hcm_payroll_periods"
           ],
-          "suggestedLabel": "Số Period",
+          "suggestedLabel": "Số kỳ",
           "suggestedLabelEn": "Period Number",
           "suggestedType": "number",
           "dbTypes": [
@@ -25431,7 +25431,7 @@
           "tables": [
             "hcm_payroll_lines"
           ],
-          "suggestedLabel": "Allowanc Tổng",
+          "suggestedLabel": "Allowance Tổng",
           "suggestedLabelEn": "Allowances Total",
           "suggestedType": "number",
           "dbTypes": [
@@ -25535,7 +25535,7 @@
           "tables": [
             "hcm_disciplinary_actions"
           ],
-          "suggestedLabel": "Hiệu lực Until",
+          "suggestedLabel": "Hiệu lực đến",
           "suggestedLabelEn": "Effective Until",
           "suggestedType": "date",
           "dbTypes": [
@@ -25810,7 +25810,7 @@
           "tables": [
             "wms_putaway_rules"
           ],
-          "suggestedLabel": "Requir ITAR khu",
+          "suggestedLabel": "Require ITAR khu",
           "suggestedLabelEn": "Requires Itar Zone",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -25953,7 +25953,7 @@
           "tables": [
             "wms_cycle_count_plans"
           ],
-          "suggestedLabel": "Frequency Day",
+          "suggestedLabel": "Frequency ngày",
           "suggestedLabelEn": "Frequency Days",
           "suggestedType": "number",
           "dbTypes": [
@@ -26110,7 +26110,7 @@
           "tables": [
             "fin_currencies"
           ],
-          "suggestedLabel": "Decimal Plac",
+          "suggestedLabel": "Decimal Place",
           "suggestedLabelEn": "Decimal Places",
           "suggestedType": "number",
           "dbTypes": [
@@ -26123,7 +26123,7 @@
           "tables": [
             "fin_currencies"
           ],
-          "suggestedLabel": "Is Functional Default",
+          "suggestedLabel": "Functional Default",
           "suggestedLabelEn": "Is Functional Default",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -26216,7 +26216,7 @@
             "crm_contacts",
             "fin_multi_book_ledgers"
           ],
-          "suggestedLabel": "Is Primary",
+          "suggestedLabel": "Chính",
           "suggestedLabelEn": "Is Primary",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -26753,7 +26753,7 @@
           "tables": [
             "prj_projects"
           ],
-          "suggestedLabel": "Baseline ngân sách",
+          "suggestedLabel": "Chuẩn gốc ngân sách",
           "suggestedLabelEn": "Baseline Budget",
           "suggestedType": "currency",
           "dbTypes": [
@@ -27003,7 +27003,7 @@
             "prj_change_requests",
             "prj_risk_register"
           ],
-          "suggestedLabel": "Impact Day",
+          "suggestedLabel": "Impact ngày",
           "suggestedLabelEn": "Impact Days",
           "suggestedType": "number",
           "dbTypes": [
@@ -27044,7 +27044,7 @@
           "tables": [
             "prj_change_requests"
           ],
-          "suggestedLabel": "Thay đổi Summary",
+          "suggestedLabel": "Thay đổi tóm tắt",
           "suggestedLabelEn": "Change Summary",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -27164,7 +27164,7 @@
             "crm_accounts",
             "dw_customer_dim"
           ],
-          "suggestedLabel": "Industry Segment",
+          "suggestedLabel": "Ngành phân khúc",
           "suggestedLabelEn": "Industry Segment",
           "suggestedType": "string",
           "dbTypes": [
@@ -27192,7 +27192,7 @@
             "crm_leads",
             "tms_carriers"
           ],
-          "suggestedLabel": "Phone",
+          "suggestedLabel": "Điện thoại",
           "suggestedLabelEn": "Phone",
           "suggestedType": "string",
           "dbTypes": [
@@ -27543,7 +27543,7 @@
           "tables": [
             "crm_customer_touchpoints"
           ],
-          "suggestedLabel": "Ngày Touchpoint",
+          "suggestedLabel": "Ngày điểm chạm",
           "suggestedLabelEn": "Touchpoint Date",
           "suggestedType": "date",
           "dbTypes": [
@@ -27556,7 +27556,7 @@
           "tables": [
             "crm_customer_touchpoints"
           ],
-          "suggestedLabel": "Touchpoint Channel",
+          "suggestedLabel": "Điểm chạm kênh",
           "suggestedLabelEn": "Touchpoint Channel",
           "suggestedType": "string",
           "dbTypes": [
@@ -27569,7 +27569,7 @@
           "tables": [
             "crm_customer_touchpoints"
           ],
-          "suggestedLabel": "Sentiment Score",
+          "suggestedLabel": "Cảm xúc Score",
           "suggestedLabelEn": "Sentiment Score",
           "suggestedType": "percentage",
           "dbTypes": [
@@ -27595,7 +27595,7 @@
           "tables": [
             "crm_forecasts"
           ],
-          "suggestedLabel": "Dự báo Period",
+          "suggestedLabel": "Dự báo kỳ",
           "suggestedLabelEn": "Forecast Period",
           "suggestedType": "date",
           "dbTypes": [
@@ -27738,7 +27738,7 @@
           "tables": [
             "tms_routes"
           ],
-          "suggestedLabel": "Transit Day",
+          "suggestedLabel": "Transit ngày",
           "suggestedLabelEn": "Transit Days",
           "suggestedType": "number",
           "dbTypes": [
@@ -27844,7 +27844,7 @@
           "tables": [
             "tms_export_screenings"
           ],
-          "suggestedLabel": "Screening Result",
+          "suggestedLabel": "Screening kết quả",
           "suggestedLabelEn": "Screening Result",
           "suggestedType": "select",
           "dbTypes": [
@@ -28031,7 +28031,7 @@
           "tables": [
             "dw_time_dim"
           ],
-          "suggestedLabel": "Day Of Week",
+          "suggestedLabel": "Ngày Of Week",
           "suggestedLabelEn": "Day Of Week",
           "suggestedType": "number",
           "dbTypes": [
@@ -28044,7 +28044,7 @@
           "tables": [
             "dw_time_dim"
           ],
-          "suggestedLabel": "Day tên",
+          "suggestedLabel": "Ngày tên",
           "suggestedLabelEn": "Day Name",
           "suggestedType": "string",
           "dbTypes": [
@@ -28122,7 +28122,7 @@
           "tables": [
             "dw_time_dim"
           ],
-          "suggestedLabel": "Is Weekend",
+          "suggestedLabel": "Weekend",
           "suggestedLabelEn": "Is Weekend",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -28135,7 +28135,7 @@
           "tables": [
             "dw_time_dim"
           ],
-          "suggestedLabel": "Is Holiday",
+          "suggestedLabel": "Holiday",
           "suggestedLabelEn": "Is Holiday",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -28305,7 +28305,7 @@
           "tables": [
             "dw_fact_delivery"
           ],
-          "suggestedLabel": "Day Late",
+          "suggestedLabel": "Ngày Late",
           "suggestedLabelEn": "Days Late",
           "suggestedType": "number",
           "dbTypes": [
@@ -28465,7 +28465,7 @@
             "com_customer_scorecards",
             "dw_kpi_scorecards"
           ],
-          "suggestedLabel": "Thẻ điểm Period",
+          "suggestedLabel": "Thẻ điểm kỳ",
           "suggestedLabelEn": "Scorecard Period",
           "suggestedType": "date",
           "dbTypes": [
@@ -28652,7 +28652,7 @@
           "tables": [
             "srm_sourcing_bids"
           ],
-          "suggestedLabel": "Quoted khách hàng tiềm năng thời gian Day",
+          "suggestedLabel": "Quoted khách hàng tiềm năng thời gian ngày",
           "suggestedLabelEn": "Quoted Lead Time Days",
           "suggestedType": "datetime",
           "dbTypes": [
@@ -28721,7 +28721,7 @@
             "srm_supplier_capabilities",
             "srm_supplier_capacity"
           ],
-          "suggestedLabel": "Mã Proc",
+          "suggestedLabel": "Mã Proce",
           "suggestedLabelEn": "Process Code",
           "suggestedType": "string",
           "dbTypes": [
@@ -28760,7 +28760,7 @@
           "tables": [
             "srm_supplier_capabilities"
           ],
-          "suggestedLabel": "Min Lô Size",
+          "suggestedLabel": "Min Lô kích thước",
           "suggestedLabelEn": "Min Lot Size",
           "suggestedType": "number",
           "dbTypes": [
@@ -28773,7 +28773,7 @@
           "tables": [
             "srm_supplier_capabilities"
           ],
-          "suggestedLabel": "Max Lô Size",
+          "suggestedLabel": "Max Lô kích thước",
           "suggestedLabelEn": "Max Lot Size",
           "suggestedType": "number",
           "dbTypes": [
@@ -28800,7 +28800,7 @@
           "tables": [
             "srm_supplier_capacity"
           ],
-          "suggestedLabel": "Năng lực Period",
+          "suggestedLabel": "Năng lực kỳ",
           "suggestedLabelEn": "Capacity Period",
           "suggestedType": "date",
           "dbTypes": [
@@ -28878,7 +28878,7 @@
           "tables": [
             "srm_supplier_risk_events"
           ],
-          "suggestedLabel": "Rủi ro Summary",
+          "suggestedLabel": "Rủi ro tóm tắt",
           "suggestedLabelEn": "Risk Summary",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -28917,7 +28917,7 @@
           "tables": [
             "srm_supplier_portal_messages"
           ],
-          "suggestedLabel": "Thông điệp Subject",
+          "suggestedLabel": "Thông điệp chủ đề",
           "suggestedLabelEn": "Message Subject",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -29026,7 +29026,7 @@
           "tables": [
             "srm_vendor_managed_inventory"
           ],
-          "suggestedLabel": "Replenishment khách hàng tiềm năng thời gian Day",
+          "suggestedLabel": "Replenishment khách hàng tiềm năng thời gian ngày",
           "suggestedLabelEn": "Replenishment Lead Time Days",
           "suggestedType": "datetime",
           "dbTypes": [
@@ -29340,7 +29340,7 @@
           "tables": [
             "fixture_master"
           ],
-          "suggestedLabel": "Bảo trì Interval Day",
+          "suggestedLabel": "Bảo trì Interval ngày",
           "suggestedLabelEn": "Maintenance Interval Days",
           "suggestedType": "number",
           "dbTypes": [
@@ -29445,7 +29445,7 @@
             "demand_history_buckets",
             "sop_demand_consensus"
           ],
-          "suggestedLabel": "Nhu cầu Period",
+          "suggestedLabel": "Nhu cầu kỳ",
           "suggestedLabelEn": "Demand Period",
           "suggestedType": "date",
           "dbTypes": [
@@ -29458,7 +29458,7 @@
           "tables": [
             "sop_demand_consensus"
           ],
-          "suggestedLabel": "Số lượng Baseline",
+          "suggestedLabel": "Số lượng chuẩn gốc",
           "suggestedLabelEn": "Baseline Qty",
           "suggestedType": "number",
           "dbTypes": [
@@ -29484,7 +29484,7 @@
           "tables": [
             "sop_supply_consensus"
           ],
-          "suggestedLabel": "Cung ứng Period",
+          "suggestedLabel": "Cung ứng kỳ",
           "suggestedLabelEn": "Supply Period",
           "suggestedType": "date",
           "dbTypes": [
@@ -29640,7 +29640,7 @@
           "tables": [
             "sop_meeting_cycles"
           ],
-          "suggestedLabel": "Cuộc họp Not",
+          "suggestedLabel": "Cuộc họp Ghi chú",
           "suggestedLabelEn": "Meeting Notes",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -29655,7 +29655,7 @@
             "qual_containment_actions",
             "sop_action_items"
           ],
-          "suggestedLabel": "Hành động Summary",
+          "suggestedLabel": "Hành động tóm tắt",
           "suggestedLabelEn": "Action Summary",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -29694,7 +29694,7 @@
           "tables": [
             "demand_classifications"
           ],
-          "suggestedLabel": "Intermittency Index",
+          "suggestedLabel": "Gián đoạn Index",
           "suggestedLabelEn": "Intermittency Index",
           "suggestedType": "number",
           "dbTypes": [
@@ -29707,7 +29707,7 @@
           "tables": [
             "demand_classifications"
           ],
-          "suggestedLabel": "Variability Index",
+          "suggestedLabel": "Biến thiên Index",
           "suggestedLabelEn": "Variability Index",
           "suggestedType": "number",
           "dbTypes": [
@@ -29760,7 +29760,7 @@
           "tables": [
             "supply_replenishment_policies"
           ],
-          "suggestedLabel": "Xem xét Chu kỳ Day",
+          "suggestedLabel": "Xem xét Chu kỳ ngày",
           "suggestedLabelEn": "Review Cycle Days",
           "suggestedType": "number",
           "dbTypes": [
@@ -29947,7 +29947,7 @@
           "tables": [
             "svc_warranty_claims"
           ],
-          "suggestedLabel": "Lỗi Summary",
+          "suggestedLabel": "Lỗi tóm tắt",
           "suggestedLabelEn": "Failure Summary",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -30091,7 +30091,7 @@
           "tables": [
             "svc_customer_assets"
           ],
-          "suggestedLabel": "Tài sản Tag",
+          "suggestedLabel": "Tài sản thẻ",
           "suggestedLabelEn": "Asset Tag",
           "suggestedType": "string",
           "dbTypes": [
@@ -30118,7 +30118,7 @@
           "tables": [
             "svc_service_kpi_snapshots"
           ],
-          "suggestedLabel": "Ảnh chụp Period",
+          "suggestedLabel": "Ảnh chụp kỳ",
           "suggestedLabelEn": "Snapshot Period",
           "suggestedType": "date",
           "dbTypes": [
@@ -30197,7 +30197,7 @@
           "tables": [
             "fin_cost_versions"
           ],
-          "suggestedLabel": "Is đóng băng",
+          "suggestedLabel": "Đóng băng",
           "suggestedLabelEn": "Is Frozen",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -30236,7 +30236,7 @@
           "tables": [
             "fin_budget_lines"
           ],
-          "suggestedLabel": "Ngân sách Period",
+          "suggestedLabel": "Ngân sách kỳ",
           "suggestedLabelEn": "Budget Period",
           "suggestedType": "date",
           "dbTypes": [
@@ -30340,7 +30340,7 @@
           "tables": [
             "fin_asset_depreciation"
           ],
-          "suggestedLabel": "Depreciation Period",
+          "suggestedLabel": "Depreciation kỳ",
           "suggestedLabelEn": "Depreciation Period",
           "suggestedType": "date",
           "dbTypes": [
@@ -30444,7 +30444,7 @@
           "tables": [
             "fin_bank_reconciliations"
           ],
-          "suggestedLabel": "Đối soát Period",
+          "suggestedLabel": "Đối soát kỳ",
           "suggestedLabelEn": "Reconciliation Period",
           "suggestedType": "date",
           "dbTypes": [
@@ -30535,7 +30535,7 @@
           "tables": [
             "fin_tax_jurisdictions"
           ],
-          "suggestedLabel": "Mã Jurisdiction",
+          "suggestedLabel": "Mã thẩm quyền",
           "suggestedLabelEn": "Jurisdiction Code",
           "suggestedType": "string",
           "dbTypes": [
@@ -30548,7 +30548,7 @@
           "tables": [
             "fin_tax_jurisdictions"
           ],
-          "suggestedLabel": "Jurisdiction tên",
+          "suggestedLabel": "Thẩm quyền tên",
           "suggestedLabelEn": "Jurisdiction Name",
           "suggestedType": "string",
           "dbTypes": [
@@ -31032,7 +31032,7 @@
           "tables": [
             "qual_escape_events"
           ],
-          "suggestedLabel": "Escape Summary",
+          "suggestedLabel": "Escape tóm tắt",
           "suggestedLabelEn": "Escape Summary",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -31097,7 +31097,7 @@
           "tables": [
             "qual_effectiveness_reviews"
           ],
-          "suggestedLabel": "Xem xét Result",
+          "suggestedLabel": "Xem xét kết quả",
           "suggestedLabelEn": "Review Result",
           "suggestedType": "select",
           "dbTypes": [
@@ -31308,7 +31308,7 @@
           "tables": [
             "ehs_emergency_drills"
           ],
-          "suggestedLabel": "Score Result",
+          "suggestedLabel": "Score kết quả",
           "suggestedLabelEn": "Score Result",
           "suggestedType": "select",
           "dbTypes": [
@@ -31620,7 +31620,7 @@
           "tables": [
             "eng_line_balancing_studies"
           ],
-          "suggestedLabel": "Takt thời gian Minut",
+          "suggestedLabel": "Takt thời gian phút",
           "suggestedLabelEn": "Takt Time Minutes",
           "suggestedType": "datetime",
           "dbTypes": [
@@ -31672,7 +31672,7 @@
           "tables": [
             "eng_capacity_models"
           ],
-          "suggestedLabel": "Khả dụng giờ Per Day",
+          "suggestedLabel": "Khả dụng giờ Per ngày",
           "suggestedLabelEn": "Available Hours Per Day",
           "suggestedType": "duration",
           "dbTypes": [
@@ -31711,7 +31711,7 @@
           "tables": [
             "eng_factory_calendar_days"
           ],
-          "suggestedLabel": "Is Working Day",
+          "suggestedLabel": "Working ngày",
           "suggestedLabelEn": "Is Working Day",
           "suggestedType": "boolean",
           "dbTypes": [
@@ -31790,7 +31790,7 @@
           "tables": [
             "eng_work_instruction_steps"
           ],
-          "suggestedLabel": "Bước Text",
+          "suggestedLabel": "Bước văn bản",
           "suggestedLabelEn": "Step Text",
           "suggestedType": "string",
           "dbTypes": [
@@ -31829,7 +31829,7 @@
           "tables": [
             "eng_process_validation"
           ],
-          "suggestedLabel": "Kiểm tra tính hợp lệ Result",
+          "suggestedLabel": "Kiểm tra tính hợp lệ kết quả",
           "suggestedLabelEn": "Validation Result",
           "suggestedType": "select",
           "dbTypes": [
@@ -32338,7 +32338,7 @@
           "tables": [
             "com_rebate_accruals"
           ],
-          "suggestedLabel": "Accrual Period",
+          "suggestedLabel": "Trích trước kỳ",
           "suggestedLabelEn": "Accrual Period",
           "suggestedType": "date",
           "dbTypes": [
@@ -32351,7 +32351,7 @@
           "tables": [
             "com_rebate_accruals"
           ],
-          "suggestedLabel": "Accrual Giá trị",
+          "suggestedLabel": "Trích trước Giá trị",
           "suggestedLabelEn": "Accrual Amount",
           "suggestedType": "currency",
           "dbTypes": [
@@ -32364,7 +32364,7 @@
           "tables": [
             "com_incoterms_profiles"
           ],
-          "suggestedLabel": "Responsibility Summary",
+          "suggestedLabel": "Trách nhiệm tóm tắt",
           "suggestedLabelEn": "Responsibility Summary",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -32390,7 +32390,7 @@
           "tables": [
             "com_payment_terms_profiles"
           ],
-          "suggestedLabel": "Day Hạn",
+          "suggestedLabel": "Ngày Hạn",
           "suggestedLabelEn": "Days Due",
           "suggestedType": "number",
           "dbTypes": [
@@ -32403,7 +32403,7 @@
           "tables": [
             "com_payment_terms_profiles"
           ],
-          "suggestedLabel": "Discount Day",
+          "suggestedLabel": "Chiết khấu ngày",
           "suggestedLabelEn": "Discount Days",
           "suggestedType": "number",
           "dbTypes": [
@@ -32455,7 +32455,7 @@
           "tables": [
             "com_contract_amendments"
           ],
-          "suggestedLabel": "Số Amendment",
+          "suggestedLabel": "Số phụ lục",
           "suggestedLabelEn": "Amendment Number",
           "suggestedType": "string",
           "dbTypes": [
@@ -32468,7 +32468,7 @@
           "tables": [
             "com_contract_amendments"
           ],
-          "suggestedLabel": "Ngày Amendment",
+          "suggestedLabel": "Ngày phụ lục",
           "suggestedLabelEn": "Amendment Date",
           "suggestedType": "date",
           "dbTypes": [
@@ -32481,7 +32481,7 @@
           "tables": [
             "com_contract_amendments"
           ],
-          "suggestedLabel": "Amendment Summary",
+          "suggestedLabel": "Phụ lục tóm tắt",
           "suggestedLabelEn": "Amendment Summary",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -32507,7 +32507,7 @@
           "tables": [
             "trace_genealogy_links"
           ],
-          "suggestedLabel": "Parent tham chiếu",
+          "suggestedLabel": "Cha tham chiếu",
           "suggestedLabelEn": "Parent Reference",
           "suggestedType": "string",
           "dbTypes": [
@@ -32754,7 +32754,7 @@
           "tables": [
             "osc_supplier_capacity_reservations"
           ],
-          "suggestedLabel": "Giữ chỗ Period",
+          "suggestedLabel": "Giữ chỗ kỳ",
           "suggestedLabelEn": "Reservation Period",
           "suggestedType": "date",
           "dbTypes": [
@@ -32845,7 +32845,7 @@
           "tables": [
             "osc_supplier_nonconformances"
           ],
-          "suggestedLabel": "Vấn đề Summary",
+          "suggestedLabel": "Vấn đề tóm tắt",
           "suggestedLabelEn": "Issue Summary",
           "suggestedType": "textarea",
           "dbTypes": [
@@ -32871,7 +32871,7 @@
           "tables": [
             "osc_supplier_score_trends"
           ],
-          "suggestedLabel": "Score Period",
+          "suggestedLabel": "Score kỳ",
           "suggestedLabelEn": "Score Period",
           "suggestedType": "date",
           "dbTypes": [
@@ -32884,7 +32884,7 @@
           "tables": [
             "osc_supplier_score_trends"
           ],
-          "suggestedLabel": "Responsiven Score",
+          "suggestedLabel": "Responsivene Score",
           "suggestedLabelEn": "Responsiveness Score",
           "suggestedType": "percentage",
           "dbTypes": [
@@ -32989,7 +32989,7 @@
             "trade_restricted_party_lists",
             "trade_screening_hits"
           ],
-          "suggestedLabel": "Party tên",
+          "suggestedLabel": "Đối tượng tên",
           "suggestedLabelEn": "Party Name",
           "suggestedType": "string",
           "dbTypes": [

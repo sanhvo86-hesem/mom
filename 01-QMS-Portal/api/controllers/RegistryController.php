@@ -12,6 +12,14 @@ use Throwable;
  */
 class RegistryController extends BaseController
 {
+    /**
+     * @return void
+     */
+    private function requireRegistryWriteAccess(array $user): void
+    {
+        $this->requireAnyRole($user, array_merge(admin_roles(), ['qms_engineer', 'quality_manager']));
+    }
+
     private function registryDir(): string
     {
         $dir = $this->dataDir . '/registry';
@@ -185,6 +193,7 @@ class RegistryController extends BaseController
     public function updateRegistry(): never
     {
         $user = $this->requireAuth();
+        $this->requireRegistryWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();

@@ -55,6 +55,71 @@ class MobileController extends BaseController
     }
 
     /**
+     * @return array<int, string>
+     */
+    private function mobileAccessRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            [
+                'production_director',
+                'production_manager',
+                'production_planner',
+                'cnc_workshop_manager',
+                'engineering_manager',
+                'engineering_lead',
+                'quality_manager',
+                'qa_manager',
+                'quality_engineer',
+                'supervisor',
+                'shift_leader',
+                'setup_technician',
+                'operator',
+                'cnc_operator',
+            ]
+        )));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function mobileOverviewRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            [
+                'production_director',
+                'production_manager',
+                'production_planner',
+                'cnc_workshop_manager',
+                'engineering_manager',
+                'engineering_lead',
+                'quality_manager',
+                'qa_manager',
+                'quality_engineer',
+                'supervisor',
+                'shift_leader',
+            ]
+        )));
+    }
+
+    /**
+     * @return void
+     */
+    private function requireMobileAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->mobileAccessRoles());
+    }
+
+    /**
+     * @return void
+     */
+    private function requireMobileOverviewAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->mobileOverviewRoles());
+    }
+
+    /**
      * Resolve employee_id from user record via users.json mapping.
      *
      * Falls back to username if no explicit employee_id mapping exists.
@@ -98,6 +163,7 @@ class MobileController extends BaseController
     public function getMyQueue(): never
     {
         $user       = $this->requireAuth();
+        $this->requireMobileAccess($user);
         $employeeId = $this->resolveEmployeeId($user);
 
         try {
@@ -121,6 +187,7 @@ class MobileController extends BaseController
     public function startTask(): never
     {
         $user = $this->requireAuth();
+        $this->requireMobileAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -163,6 +230,7 @@ class MobileController extends BaseController
     public function completeTask(): never
     {
         $user = $this->requireAuth();
+        $this->requireMobileAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -211,6 +279,7 @@ class MobileController extends BaseController
     public function clockIn(): never
     {
         $user = $this->requireAuth();
+        $this->requireMobileAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -256,6 +325,7 @@ class MobileController extends BaseController
     public function clockOut(): never
     {
         $user = $this->requireAuth();
+        $this->requireMobileAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -304,6 +374,7 @@ class MobileController extends BaseController
     public function captureInspection(): never
     {
         $user = $this->requireAuth();
+        $this->requireMobileAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -348,6 +419,7 @@ class MobileController extends BaseController
     public function submitOfflineBatch(): never
     {
         $user = $this->requireAuth();
+        $this->requireMobileAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -386,6 +458,7 @@ class MobileController extends BaseController
     public function getSyncStatus(): never
     {
         $user       = $this->requireAuth();
+        $this->requireMobileAccess($user);
         $employeeId = $this->resolveEmployeeId($user);
 
         try {
@@ -411,6 +484,7 @@ class MobileController extends BaseController
     public function resolveConflict(): never
     {
         $user = $this->requireAuth();
+        $this->requireMobileAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -455,6 +529,7 @@ class MobileController extends BaseController
     public function getShopFloorOverview(): never
     {
         $user = $this->requireAuth();
+        $this->requireMobileOverviewAccess($user);
 
         try {
             $overview = $this->mobileService()->getShopFloorOverview();
@@ -477,6 +552,7 @@ class MobileController extends BaseController
     public function getOperatorDashboard(): never
     {
         $user       = $this->requireAuth();
+        $this->requireMobileAccess($user);
         $employeeId = $this->resolveEmployeeId($user);
 
         try {

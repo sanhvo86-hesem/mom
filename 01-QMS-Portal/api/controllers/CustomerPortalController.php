@@ -201,6 +201,218 @@ class CustomerPortalController extends BaseController
         return false;
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function loadPortalUsers(): array
+    {
+        return $this->readJsonFile($this->portalDir() . '/users.json') ?? [];
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function loadPortalAccess(): array
+    {
+        return $this->readJsonFile($this->portalDir() . '/access.json') ?? [];
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function loadPortalComplaints(): array
+    {
+        return $this->readJsonFile($this->portalDir() . '/complaints.json') ?? [];
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function loadPortalDocuments(): array
+    {
+        return $this->readJsonFile($this->portalDir() . '/doc-access.json') ?? [];
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $users
+     * @param array<int, array<string, mixed>> $access
+     * @param array<int, array<string, mixed>> $complaints
+     * @param array<int, array<string, mixed>> $documents
+     * @return array<string, mixed>
+     */
+    private function buildPortalAdminPayload(array $users, array $access, array $complaints, array $documents): array
+    {
+        $userIndex = [];
+        foreach ($users as $user) {
+            if (!is_array($user)) {
+                continue;
+            }
+            $userIndex[(string)($user['id'] ?? '')] = $user;
+        }
+
+        $statusFilter = strtolower(trim((string)($this->query('status', ''))));
+        if ($statusFilter !== '' && $statusFilter !== 'all') {
+            $users = array_values(array_filter($users, static function ($user) use ($statusFilter): bool {
+                return is_array($user) && strtolower((string)($user['status'] ?? '')) === $statusFilter;
+            }));
+        }
+
+        $complaintStatusFilter = strtolower(trim((string)($this->query('complaint_status', ''))));
+        if ($complaintStatusFilter !== '' && $complaintStatusFilter !== 'all') {
+            $complaints = array_values(array_filter($complaints, static function ($complaint) use ($complaintStatusFilter): bool {
+                return is_array($complaint) && strtolower((string)($complaint['status'] ?? '')) === $complaintStatusFilter;
+            }));
+        }
+
+        $grantCounts = [];
+        foreach ($access as $grant) {
+            if (!is_array($grant) || ($grant['revoked'] ?? false)) {
+                continue;
+            }
+            $portalUserId = (string)($grant['portal_user_id'] ?? '');
+            if ($portalUserId !== '') {
+                $grantCounts[$portalUserId] = (int)($grantCounts[$portalUserId] ?? 0) + 1;
+            }
+        }
+
+        $complaintCounts = [];
+        foreach ($complaints as $complaint) {
+            if (!is_array($complaint)) {
+                continue;
+            }
+            $portalUserId = (string)($complaint['portal_user_id'] ?? '');
+            if ($portalUserId !== '') {
+                $complaintCounts[$portalUserId] = (int)($complaintCounts[$portalUserId] ?? 0) + 1;
+            }
+        }
+
+        $portalUsers = [];
+        foreach ($users as $user) {
+            if (!is_array($user)) {
+                continue;
+            }
+            $portalUserId = (string)($user['id'] ?? '');
+            $user['customer_name'] = (string)($user['customer_name'] ?? $user['company'] ?? '');
+            $user['user_status'] = (string)($user['status'] ?? 'active');
+            $user['order_count'] = (int)($grantCounts[$portalUserId] ?? 0);
+            $user['complaint_count'] = (int)($complaintCounts[$portalUserId] ?? 0);
+            $portalUsers[] = $user;
+        }
+
+        $orderViews = [];
+        foreach ($access as $grant) {
+            if (!is_array($grant) || ($grant['revoked'] ?? false)) {
+                continue;
+            }
+            $portalUserId = (string)($grant['portal_user_id'] ?? '');
+            if ($portalUserId === '') {
+                continue;
+            }
+            if (!isset($orderViews[$portalUserId])) {
+                $user = $userIndex[$portalUserId] ?? [];
+                $orderViews[$portalUserId] = [
+                    'user_id' => $portalUserId,
+                    'user_email' => (string)($user['email'] ?? ''),
+                    'user_status' => (string)($user['status'] ?? 'active'),
+                    'customer_name' => (string)($user['customer_name'] ?? $user['company'] ?? ''),
+                    'orders' => [],
+                ];
+            }
+            $orderViews[$portalUserId]['orders'][] = [
+                'so_number' => (string)($grant['so_number'] ?? ''),
+                'so_id' => (string)($grant['so_number'] ?? $grant['id'] ?? ''),
+                'status' => (string)($grant['status'] ?? 'active'),
+                'scope' => (string)($grant['scope'] ?? 'status_only'),
+            ];
+        }
+
+        $documentsOut = [];
+        foreach ($documents as $document) {
+            if (!is_array($document) || ($document['revoked'] ?? false)) {
+                continue;
+            }
+            $portalUserId = (string)($document['portal_user_id'] ?? '');
+            $user = $userIndex[$portalUserId] ?? [];
+            $document['title'] = (string)($document['title'] ?? $document['filename'] ?? $document['document_title'] ?? 'Shared document');
+            $document['doc_type'] = (string)($document['doc_type'] ?? $document['type'] ?? '');
+            $document['customer_name'] = (string)($document['customer_name'] ?? $user['customer_name'] ?? $user['company'] ?? '');
+            $document['shared_by'] = (string)($document['shared_by'] ?? $document['granted_by'] ?? '');
+            $document['shared_at'] = (string)($document['shared_at'] ?? $document['created_at'] ?? '');
+            $document['download_count'] = (int)($document['download_count'] ?? $document['downloads'] ?? 0);
+            $documentsOut[] = $document;
+        }
+
+        $nowMonth = gmdate('Y-m');
+        $loginsThisMonth = 0;
+        foreach ($users as $user) {
+            if (!is_array($user)) {
+                continue;
+            }
+            $lastLogin = (string)($user['last_login'] ?? '');
+            if ($lastLogin !== '' && str_starts_with($lastLogin, $nowMonth)) {
+                $loginsThisMonth++;
+            }
+            foreach ((array)($user['login_history'] ?? []) as $event) {
+                if (is_array($event) && str_starts_with((string)($event['timestamp'] ?? ''), $nowMonth)) {
+                    $loginsThisMonth++;
+                }
+            }
+        }
+
+        $recentActivity = [];
+        foreach ($access as $grant) {
+            if (!is_array($grant)) {
+                continue;
+            }
+            $portalUserId = (string)($grant['portal_user_id'] ?? '');
+            $user = $userIndex[$portalUserId] ?? [];
+            $recentActivity[] = [
+                'timestamp' => (string)($grant['revoked_at'] ?? $grant['granted_at'] ?? ''),
+                'user_email' => (string)($user['email'] ?? ''),
+                'action' => ($grant['revoked'] ?? false) ? 'access_revoked' : 'access_granted',
+                'detail' => (string)($grant['so_number'] ?? ''),
+            ];
+        }
+        foreach ($complaints as $complaint) {
+            if (!is_array($complaint)) {
+                continue;
+            }
+            $recentActivity[] = [
+                'timestamp' => (string)($complaint['updated_at'] ?? $complaint['submitted_at'] ?? ''),
+                'user_email' => (string)($complaint['contact_email'] ?? ''),
+                'action' => 'complaint_' . strtolower((string)($complaint['status'] ?? 'submitted')),
+                'detail' => (string)($complaint['complaint_number'] ?? $complaint['id'] ?? ''),
+            ];
+        }
+        foreach ($documentsOut as $document) {
+            $recentActivity[] = [
+                'timestamp' => (string)($document['shared_at'] ?? ''),
+                'user_email' => (string)($document['customer_email'] ?? ''),
+                'action' => 'document_shared',
+                'detail' => (string)($document['title'] ?? ''),
+            ];
+        }
+        usort($recentActivity, static function (array $a, array $b): int {
+            return strcmp((string)($b['timestamp'] ?? ''), (string)($a['timestamp'] ?? ''));
+        });
+
+        return [
+            'users' => array_values($portalUsers),
+            'order_views' => array_values($orderViews),
+            'complaints' => array_values($complaints),
+            'documents' => array_values($documentsOut),
+            'analytics' => [
+                'active_users' => count(array_filter($users, static fn($user) => is_array($user) && strtolower((string)($user['status'] ?? '')) === 'active')),
+                'logins_this_month' => $loginsThisMonth,
+                'docs_downloaded' => array_sum(array_map(static fn($document) => (int)($document['download_count'] ?? 0), $documentsOut)),
+                'complaints_submitted' => count($complaints),
+                'total_users' => count($users),
+                'recent_activity' => array_slice($recentActivity, 0, 20),
+            ],
+            'total' => count($portalUsers),
+        ];
+    }
+
     // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
@@ -713,6 +925,162 @@ class CustomerPortalController extends BaseController
             $this->rethrowResponse($e);
             $this->error('portal_list_doc_access_failed', 500, $e->getMessage());
         }
+    }
+
+    /**
+     * GET getAdminData — Compatibility payload for the legacy portal admin UI.
+     *
+     * Returns the combined user/access/complaint/document dataset expected by
+     * `19-customer-portal-admin.js`.
+     *
+     * @return never
+     */
+    public function getAdminData(): never
+    {
+        $user = $this->requireAuth();
+        $this->requirePortalReadAccess($user);
+
+        try {
+            $payload = $this->buildPortalAdminPayload(
+                $this->loadPortalUsers(),
+                $this->loadPortalAccess(),
+                $this->loadPortalComplaints(),
+                $this->loadPortalDocuments()
+            );
+            $this->success($payload);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('portal_admin_data_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST updateComplaintStatus — Update portal complaint status from the admin UI.
+     *
+     * @return never
+     */
+    public function updateComplaintStatus(): never
+    {
+        $user = $this->requireAuth();
+        $this->requirePortalComplaintAccess($user);
+        $this->requireCsrf();
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['id', 'status']);
+
+        $id = trim((string)($body['id'] ?? ''));
+        $status = strtolower(trim((string)($body['status'] ?? '')));
+        if (!in_array($status, ['new', 'acknowledged', 'resolved', 'closed'], true)) {
+            $this->error('invalid_status', 400);
+        }
+
+        $file = $this->portalDir() . '/complaints.json';
+        $all = $this->readJsonFile($file) ?? [];
+        $userId = $this->userId($user);
+        $found = false;
+
+        foreach ($all as &$entry) {
+            if (is_array($entry) && (string)($entry['id'] ?? '') === $id) {
+                $entry['status'] = $status;
+                $entry['updated_at'] = $this->nowIso();
+                $entry['updated_by'] = $userId;
+                $updated = $entry;
+                $found = true;
+                break;
+            }
+        }
+        unset($entry);
+
+        if (!$found) {
+            $this->error('not_found', 404, "Portal complaint {$id} not found.");
+        }
+
+        $this->writeJsonFile($file, $all);
+        $this->auditLog('portal_update_complaint', ['complaint_id' => $id, 'status' => $status], $userId);
+        $this->success(['complaint' => $updated]);
+    }
+
+    /**
+     * POST resendVerification — Compatibility endpoint for portal user re-invite.
+     *
+     * @return never
+     */
+    public function resendVerification(): never
+    {
+        $user = $this->requireAuth();
+        $this->requirePortalWriteAccess($user);
+        $this->requireCsrf();
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['id']);
+        $id = $this->validatePortalUserId((string)($body['id'] ?? ''));
+        $userId = $this->userId($user);
+
+        $file = $this->portalDir() . '/users.json';
+        $all = $this->readJsonFile($file) ?? [];
+        $found = false;
+
+        foreach ($all as &$entry) {
+            if (is_array($entry) && (string)($entry['id'] ?? '') === $id) {
+                $entry['verification_resent_at'] = $this->nowIso();
+                $entry['verification_resent_by'] = $userId;
+                $entry['updated_at'] = $this->nowIso();
+                $entry['updated_by'] = $userId;
+                $updated = $entry;
+                $found = true;
+                break;
+            }
+        }
+        unset($entry);
+
+        if (!$found) {
+            $this->error('not_found', 404, "Portal user {$id} not found.");
+        }
+
+        $this->writeJsonFile($file, $all);
+        $this->auditLog('portal_resend_verification', ['portal_user_id' => $id], $userId);
+        $this->success(['user' => $updated]);
+    }
+
+    /**
+     * POST revokeDocument — Revoke a shared portal document entry.
+     *
+     * @return never
+     */
+    public function revokeDocument(): never
+    {
+        $user = $this->requireAuth();
+        $this->requirePortalWriteAccess($user);
+        $this->requireCsrf();
+
+        $body = $this->jsonBody();
+        $this->requireFields($body, ['id']);
+        $id = trim((string)($body['id'] ?? ''));
+        $userId = $this->userId($user);
+
+        $file = $this->portalDir() . '/doc-access.json';
+        $all = $this->readJsonFile($file) ?? [];
+        $found = false;
+
+        foreach ($all as &$entry) {
+            if (is_array($entry) && (string)($entry['id'] ?? '') === $id) {
+                $entry['revoked'] = true;
+                $entry['revoked_at'] = $this->nowIso();
+                $entry['revoked_by'] = $userId;
+                $updated = $entry;
+                $found = true;
+                break;
+            }
+        }
+        unset($entry);
+
+        if (!$found) {
+            $this->error('not_found', 404, "Shared document {$id} not found.");
+        }
+
+        $this->writeJsonFile($file, $all);
+        $this->auditLog('portal_revoke_document', ['document_id' => $id], $userId);
+        $this->success(['document' => $updated]);
     }
 
     /**

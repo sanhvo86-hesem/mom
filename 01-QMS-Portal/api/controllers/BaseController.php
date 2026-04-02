@@ -97,6 +97,34 @@ abstract class BaseController
     }
 
     /**
+     * Get a scalar input parameter from query string or JSON body.
+     *
+     * Query parameters win when both are present.
+     *
+     * @param string      $key     Parameter name.
+     * @param string|null $default Default value.
+     * @return string|null
+     */
+    protected function input(string $key, ?string $default = null): ?string
+    {
+        if (isset($_GET[$key])) {
+            return (string)$_GET[$key];
+        }
+
+        $body = $this->jsonBody();
+        if (!array_key_exists($key, $body)) {
+            return $default;
+        }
+
+        $value = $body[$key];
+        if (is_scalar($value) || $value === null) {
+            return $value === null ? $default : (string)$value;
+        }
+
+        return $default;
+    }
+
+    /**
      * Get the HTTP request method (uppercase).
      *
      * @return string

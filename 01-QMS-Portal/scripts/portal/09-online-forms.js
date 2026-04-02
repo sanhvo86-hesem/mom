@@ -97,27 +97,9 @@ var state = {
 
 window._ecState = state;
 
-var KNOWN_HTML_RUNTIME_FORMS = {
-  'FRM-403-SCAR': {
-    form_code: 'FRM-403-SCAR',
-    title: 'Supplier Corrective Action Request (SCAR)',
-    title_vi: 'Yêu cầu hành động khắc phục nhà cung cấp (SCAR)',
-    version: 'V1',
-    category: 'quality',
-    frequency: 'per_event',
-    online: true,
-    delivery_mode: 'online',
-    standalone_html: '04-Bieu-Mau/04-FRM-400/FRM-403-SCAR_Supplier_Corrective_Action_Request.html',
-    sop_ref: 'SOP-401',
-    record_type: 'SCAR',
-    owner: 'QA / SCM',
-    approver: 'QA / SCM',
-    effective_date: '2026-03-31',
-    linked_excel: 'FRM-403',
-    description: 'SCAR form for supplier corrective actions. Covers identification, quality issue, containment, supplier response, and verification.',
-    description_vi: 'Ghi nhận yêu cầu hành động khắc phục đối với nhà cung cấp khi phát hiện lỗi chất lượng hoặc giao hàng.'
-  }
-};
+/* Emergency fallback — populated dynamically from form_catalog_snapshot API.
+   Add entries here ONLY if the API is permanently unavailable. */
+var KNOWN_HTML_RUNTIME_FORMS = {};
 
 function t(vi, en){ return (typeof lang !== 'undefined' && lang === 'en') ? en : vi; }
 function esc(value){
@@ -314,17 +296,35 @@ function buildFormToRecordTypeMap(forms, recordTypes){
 }
 
 function ensureKnownHtmlRuntimeForms(){
+  /* Add emergency fallback forms if API failed to load them */
   Object.keys(KNOWN_HTML_RUNTIME_FORMS).forEach(function(code){
     if(state.formMap[code]) return;
     var seed = Object.assign({}, KNOWN_HTML_RUNTIME_FORMS[code]);
     state.forms.push(seed);
     state.formMap[code] = seed;
   });
+  normalizeFormAliases();
+}
+
+/* Data-driven form alias normalization — runs after API load */
+function normalizeFormAliases(){
+  /* FRM-403 (Excel) → FRM-403-SCAR (online HTML runtime) */
   var alias = state.formMap['FRM-403'];
-  if(alias){
+  var target = state.formMap['FRM-403-SCAR'];
+  if(alias && target){
     if(!alias.html_runtime_form_code) alias.html_runtime_form_code = 'FRM-403-SCAR';
-    if(!alias.standalone_html) alias.standalone_html = KNOWN_HTML_RUNTIME_FORMS['FRM-403-SCAR'].standalone_html;
+    if(!alias.standalone_html && target.standalone_html) alias.standalone_html = target.standalone_html;
   }
+  /* Generic: any form with linked_excel pointing to another form code gets aliased */
+  (state.forms || []).forEach(function(form){
+    if(!form || !form.linked_excel) return;
+    var linkedCode = String(form.linked_excel).trim().toUpperCase();
+    var linkedForm = state.formMap[linkedCode];
+    if(linkedForm && !linkedForm.html_runtime_form_code && form.standalone_html){
+      linkedForm.html_runtime_form_code = form.form_code;
+      if(!linkedForm.standalone_html) linkedForm.standalone_html = form.standalone_html;
+    }
+  });
 }
 
 function buildQuery(payload){
@@ -1825,51 +1825,7 @@ function renderSidebar(){
   '</aside>';
 }
 
-function renderEqmsFormList(container){
-  /* Known eQMS online forms — no API dependency */
-  var KNOWN_FORMS = [
-    { code:'FRM-403-SCAR', title:'Supplier Corrective Action Request (SCAR)', version:'V1', sop:'SOP-401', desc:'SCAR form for supplier corrective actions. Covers identification, quality issue, containment, supplier response, and verification.' }
-  ];
-
-  var html = '<div style="max-width:900px;margin:0 auto;padding:24px">' +
-    '<h2 style="font-size:18px;font-weight:800;color:#0f172a;margin:0 0 4px">Online Forms (eQMS Web Form)</h2>' +
-    '<p style="font-size:13px;color:#64748b;margin:0 0 20px;line-height:1.6">Select a form to open. Online forms use the eQMS runtime with audit trail, e-signature, workflow, and version control.</p>' +
-    '<div style="display:grid;gap:12px">';
-
-  KNOWN_FORMS.forEach(function(f){
-    html += '<div data-open-eqms="' + esc(f.code) + '" style="cursor:pointer;padding:18px 20px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;display:flex;align-items:center;gap:16px;transition:border-color .15s,box-shadow .15s">' +
-      '<div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#dbeafe,#eff6ff);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">\uD83D\uDCCB</div>' +
-      '<div style="flex:1;min-width:0">' +
-        '<div style="font-family:Consolas,monospace;font-size:14px;font-weight:800;color:#0f172a">' + esc(f.code) +
-          ' <span style="font-size:11px;font-weight:600;color:#1565c0;background:#dbeafe;padding:2px 8px;border-radius:999px;margin-left:6px">' + esc(f.version) + '</span>' +
-          ' <span style="font-size:11px;font-weight:600;color:#1565c0;margin-left:4px">' + esc(f.sop) + '</span>' +
-        '</div>' +
-        '<div style="font-size:14px;font-weight:600;color:#334155;margin-top:3px">' + esc(f.title) + '</div>' +
-        '<div style="font-size:12px;color:#94a3b8;margin-top:3px;line-height:1.5">' + esc(f.desc) + '</div>' +
-      '</div>' +
-      '<div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px">' +
-        '<span style="font-size:10px;font-weight:700;text-transform:uppercase;padding:3px 10px;border-radius:999px;background:#dcfce7;color:#16a34a;letter-spacing:.04em">eQMS Online</span>' +
-        '<span style="font-size:11px;color:#64748b">Click to open \u2192</span>' +
-      '</div>' +
-    '</div>';
-  });
-
-  html += '</div></div>';
-  container.innerHTML = html;
-
-  /* Bind click */
-  Array.prototype.forEach.call(container.querySelectorAll('[data-open-eqms]'), function(card){
-    card.onmouseenter = function(){ card.style.borderColor = '#93c5fd'; card.style.boxShadow = '0 4px 16px rgba(21,101,192,.1)'; };
-    card.onmouseleave = function(){ card.style.borderColor = '#e2e8f0'; card.style.boxShadow = 'none'; };
-    card.onclick = function(){
-      var code = card.getAttribute('data-open-eqms');
-      if(!code) return;
-      state._eqmsOpenCode = code;
-      var page = pageEl();
-      if(page) render(page);
-    };
-  });
-}
+/* renderEqmsFormList removed — was dead code (never called). Forms now load dynamically via eqmsForms() from API. */
 
 function renderEqmsHub(container){
   var forms = eqmsForms();
