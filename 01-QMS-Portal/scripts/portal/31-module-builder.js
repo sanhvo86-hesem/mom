@@ -4376,7 +4376,7 @@ _addToSavedModules = function(schema){
   try { localStorage.setItem('hm_saved_modules', JSON.stringify(state.savedModules)); } catch(err){}
 };
 
-_legacySaveModule = function(){
+var _legacySaveModule = function(){
   var runtimeSchema;
   if(!state.schema) return;
   state.schema.version = (state.schema.version || 0) + 1;
@@ -4391,7 +4391,7 @@ _legacySaveModule = function(){
   if(BE.toast) BE.toast(_t('Đã lưu module: ', 'Module saved: ') + _t(state.schema.title.vi, state.schema.title.en), 'success');
 };
 
-_legacyOpenSavedModule = function(moduleId){
+var _legacyOpenSavedModule = function(moduleId){
   var raw = null;
   try { raw = localStorage.getItem(_builderStorageKey(moduleId)) || localStorage.getItem('hm_module_schema_'+moduleId); } catch(err){}
   if(!raw) return;
@@ -4408,7 +4408,7 @@ _legacyOpenSavedModule = function(moduleId){
   } catch(err){}
 };
 
-_legacyDeleteSavedModule = function(moduleId){
+var _legacyDeleteSavedModule = function(moduleId){
   try { localStorage.removeItem('hm_module_schema_'+moduleId); } catch(err){}
   _clearBuilderSnapshotLocal(moduleId);
   state.savedModules = state.savedModules.filter(function(item){
