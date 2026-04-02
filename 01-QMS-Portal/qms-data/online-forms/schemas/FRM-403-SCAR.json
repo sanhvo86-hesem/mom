@@ -118,6 +118,7 @@
       "label_vi": "Trạng thái SCAR",
       "required": true,
       "default": "open",
+      "options_source": "registry:scar_status",
       "options": [
         { "value": "open", "label": "Mở (Open)", "color": "#e03131" },
         { "value": "awaiting_response", "label": "Chờ phản hồi NCC (Awaiting Response)", "color": "#e67700" },
@@ -254,6 +255,7 @@
       "label": "Severity",
       "label_vi": "Mức độ nghiêm trọng",
       "required": true,
+      "options_source": "registry:severity_level",
       "options": [
         { "value": "minor", "label": "Nhẹ (Minor)", "color": "#2f9e44" },
         { "value": "major", "label": "Nặng (Major)", "color": "#e67700" },

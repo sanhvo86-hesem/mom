@@ -22,14 +22,28 @@ var PALETTE = [
   { type:'calculated', group:'advanced', icon:'FX', label:'Calculated', desc:'Formula output' },
   { type:'heading', group:'layout', icon:'HD', label:'Heading', desc:'Visual divider' },
   { type:'hidden', group:'layout', icon:'HI', label:'Hidden', desc:'Hidden value' },
-  { type:'section', group:'layout', icon:'SC', label:'Section', desc:'Field group' }
+  { type:'section', group:'layout', icon:'SC', label:'Section', desc:'Field group' },
+  { type:'two_column', group:'layout', icon:'2C', label:'2-Column', desc:'Two-column grid' },
+  { type:'panel', group:'layout', icon:'PN', label:'Panel', desc:'Collapsible panel' },
+  /* Composite blocks — pre-built field groups from form_template_blocks.json */
+  { type:'record_strip', group:'composite', icon:'RS', label:'Record Strip', desc:'Record summary header' },
+  { type:'approval_block', group:'composite', icon:'AP', label:'Approval Block', desc:'Prepared + approved by' },
+  { type:'root_cause_block', group:'composite', icon:'RC', label:'Root Cause', desc:'Root cause analysis' },
+  { type:'corrective_action_block', group:'composite', icon:'CA', label:'Corrective Action', desc:'Action + verification' },
+  /* Data-linked blocks — bind to registry/master data */
+  { type:'registry_select', group:'data', icon:'RS', label:'Registry Select', desc:'Options from registry' },
+  { type:'registry_lookup', group:'data', icon:'RL', label:'Registry Lookup', desc:'Master data search' },
+  { type:'data_panel', group:'data', icon:'DP', label:'Data Panel', desc:'Registry data display' },
+  { type:'formula', group:'data', icon:'FX', label:'Formula', desc:'Calculated with preview' }
 ];
 
 var GROUPS = {
   input: 'Inputs',
   choice: 'Choices',
   advanced: 'Advanced',
-  layout: 'Layout'
+  layout: 'Layout',
+  composite: 'Composite',
+  data: 'Data'
 };
 
 var WIDTHS = ['full', 'half', 'third', 'two-thirds', 'quarter'];

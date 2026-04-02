@@ -56,6 +56,41 @@ body {
   text-decoration: none;
 }
 
+/* Entity/Role clusters in form header (QA / SCM badges) */
+.scar-page .entity-cluster,
+.scar-page .role-cluster {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.scar-page .entity-code,
+.scar-page .role-code {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--scar-surface-soft);
+  color: var(--scar-primary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.scar-page .entity-sep,
+.scar-page .role-sep {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--scar-text-muted);
+}
+.scar-page .entity-link,
+.scar-page .role-link {
+  text-decoration: none;
+  color: inherit;
+}
+.scar-page .entity-link:hover .entity-code,
+.scar-page .role-link:hover .role-code {
+  background: var(--scar-primary-soft);
+}
+
 .scar-record-strip {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -70,7 +105,7 @@ body {
 .scar-record-item {
   min-height: 78px;
   padding: 14px 16px;
-  background: var(--scar-page);
+  background: var(--scar-surface-soft);
 }
 
 .scar-record-item small,

@@ -318,6 +318,49 @@ function ensureCompanyDirectory(){
   });
 }
 
+/* ── Registry Options (status-options.json) ── */
+var registryOptions = null;
+function ensureRegistryOptions(){
+  if(registryOptions) return Promise.resolve(registryOptions);
+  return api('registry_status_options', {}, 'GET').then(function(resp){
+    registryOptions = (resp && resp.ok && resp.data) ? resp.data : {};
+    return registryOptions;
+  }).catch(function(){
+    /* Fallback: try direct fetch */
+    return fetch('qms-data/registry/status-options.json', { credentials:'include' })
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        registryOptions = data || {};
+        return registryOptions;
+      })
+      .catch(function(){
+        registryOptions = {};
+        return registryOptions;
+      });
+  });
+}
+
+function resolveRegistryOptions(source){
+  if(!source || !registryOptions) return null;
+  /* source format: "registry:scar_status" or "registry:severity_level" */
+  var key = String(source).replace(/^registry:/, '').trim();
+  if(!key) return null;
+  var entry = registryOptions[key];
+  if(!entry) return null;
+  /* Registry status-options format: { values: [{value, label, label_vi, color}] } or array */
+  var values = Array.isArray(entry) ? entry : (entry.values || entry.options || []);
+  if(!Array.isArray(values) || !values.length) return null;
+  return values.map(function(item){
+    if(typeof item === 'string') return { value: item, label: item };
+    return {
+      value: item.value || item.code || '',
+      label: item.label || item.label_vi || item.value || '',
+      label_en: item.label_en || item.label || item.value || '',
+      color: item.color || ''
+    };
+  });
+}
+
 function mergeParts(){
   /* Merge revisions into parts: each part gets latest revision appended */
   if(!masterData || !masterData.parts || !masterData.revisions) return;
@@ -659,13 +702,20 @@ function renderField(field, value, readOnly){
       html += '<input class="eqms-input" id="' + esc(id) + '" type="datetime-local" value="' + esc(val) + '"' + ariaReq + ariaDesc + disabled + '>';
       break;
     case 'select':
+      /* Resolve options: prefer registry source over hardcoded */
+      var selectOpts = field.options || [];
+      if(field.options_source){
+        var regOpts = resolveRegistryOptions(field.options_source);
+        if(regOpts && regOpts.length) selectOpts = regOpts;
+      }
       html += '<select class="eqms-input" id="' + esc(id) + '"' + ariaReq + ariaDesc + disabled + '><option value="">' + esc(t('Chọn', 'Select')) + '</option>';
-      (field.options || []).forEach(function(opt){
+      selectOpts.forEach(function(opt){
         var ov = typeof opt === 'string' ? opt : (opt.value || '');
         var ol = typeof opt === 'string' ? opt : t(opt.label || opt.value, opt.label_en || opt.label || opt.value);
         html += '<option value="' + esc(ov) + '"' + (String(val) === String(ov) ? ' selected' : '') + '>' + esc(ol) + '</option>';
       });
       html += '</select>';
+      if(field.options_source) html += '<div class="eqms-helper eqms-registry-hint">' + esc(t('Dữ liệu từ registry: ', 'Data from registry: ') + field.options_source) + '</div>';
       break;
     case 'multi_select':
       html += '<div class="eqms-multi" role="group" aria-label="' + esc(labelEn) + '">';
@@ -1676,7 +1726,7 @@ window.openEqmsForm = function(formCode, container, options){
   container.innerHTML = '<div class="eqms-runtime" id="eqms-form-container"><div class="eqms-loading">Đang tải biểu mẫu...</div></div>';
   var runtime = container.querySelector('.eqms-runtime');
 
-  Promise.all([loadSchema(formCode), ensureMasterData(), ensureCompanyDirectory()]).then(function(results){
+  Promise.all([loadSchema(formCode), ensureMasterData(), ensureCompanyDirectory(), ensureRegistryOptions()]).then(function(results){
     var schema = normalizeSchemaLookups(results[0]);
     if(!schema){
       runtime.innerHTML = '<div class="eqms-empty">' +
