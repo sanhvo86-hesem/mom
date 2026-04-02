@@ -119,6 +119,7 @@ use HESEM\QMS\Api\Controllers\ComplianceReportController;
 use HESEM\QMS\Api\Controllers\KnowledgeController;
 use HESEM\QMS\Api\Controllers\CiController;
 use HESEM\QMS\Api\Controllers\EnergyController;
+use HESEM\QMS\Api\Controllers\ModuleSchemaController;
 use HESEM\QMS\Database\DataLayer;
 
 // ── Bootstrap DataLayer ─────────────────────────────────────────────────────
@@ -531,6 +532,16 @@ $router->actions([
     'energy_machine_detail' => [EnergyController::class, 'getMachineDetail'],
     'energy_per_part'       => [EnergyController::class, 'getPerPartEnergy'],
     'energy_cost_trend'     => [EnergyController::class, 'getCostTrend'],
+]);
+
+// Module Schema Builder
+$router->actions([
+    'module_schema_list'    => [ModuleSchemaController::class, 'listSchemas'],
+    'module_schema_get'     => [ModuleSchemaController::class, 'getSchema'],
+    'module_schema_save'    => [ModuleSchemaController::class, 'saveSchema'],
+    'module_schema_delete'  => [ModuleSchemaController::class, 'deleteSchema'],
+    'module_schema_reset'   => [ModuleSchemaController::class, 'resetSchema'],
+    'module_api_catalog'    => [ModuleSchemaController::class, 'apiCatalog'],
 ]);
 
 // ── Frontend Action Aliases ─────────────────────────────────────────────────
