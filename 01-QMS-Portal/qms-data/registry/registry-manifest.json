@@ -1,183 +1,184 @@
 {
   "_meta": {
-    "version": "2.0",
+    "version": "3.0",
     "description": "Registry manifest and coverage index for the metadata backbone.",
-    "generatedAt": "2026-04-02T06:00:20.356Z"
+    "generatedAt": "2026-04-02T09:02:28.221Z"
   },
   "coverage": {
     "router_actions": 345,
     "ui_actions": 246,
-    "field_definitions": 6209,
-    "unique_field_keys": 1005,
-    "status_sets": 43,
-    "workflow_count": 8,
-    "relation_edges": 22,
-    "standard_crosswalks": 8
+    "field_registry_actions": 838,
+    "field_definitions": 11396,
+    "unique_field_keys": 1111,
+    "status_sets": 105,
+    "workflow_count": 25,
+    "relation_edges": 67,
+    "validation_rules": 1836,
+    "formula_count": 107,
+    "domain_pack_count": 189
   },
   "research_sources": [
     {
-      "key": "microsoft_dynamics_quality",
-      "label": "Microsoft Dynamics 365 Supply Chain Quality Management",
-      "url": "https://learn.microsoft.com/en-us/dynamics365/supply-chain/inventory/quality-management-processes",
+      "key": "epicor_kinetic_cpc",
+      "label": "Epicor Kinetic / Connected Process Control",
+      "url": "https://www.epicor.com/en-us/products/connected-worker/epicor-connected-process-control/",
       "focus": [
-        "quality orders",
-        "associations",
-        "sample management",
-        "blocking rules"
+        "part master",
+        "job operations",
+        "digital work instructions",
+        "quality checks",
+        "traceability"
+      ]
+    },
+    {
+      "key": "sap_s4hana_order_manufacturing",
+      "label": "SAP S/4HANA / Digital Manufacturing",
+      "url": "https://help.sap.com/docs/sap-digital-manufacturing/execution/manage-orders",
+      "focus": [
+        "production order",
+        "material master",
+        "inspection lot",
+        "order execution"
       ]
     },
     {
       "key": "oracle_quality_management",
-      "label": "Oracle Fusion Cloud Quality Management",
+      "label": "Oracle Fusion Cloud Manufacturing / Quality",
       "url": "https://docs.oracle.com/en/cloud/saas/supply-chain-and-manufacturing/25d/fauqm/using-quality-management.pdf",
       "focus": [
-        "inspection characteristics",
         "inspection plans",
+        "inspection characteristics",
         "quality issues",
         "action plans"
       ]
     },
     {
-      "key": "sap_quality_management",
-      "label": "SAP Quality Management",
-      "url": "https://help.sap.com/doc/9364dd64548a4ef9a21f0c987e968517/6.00.29/en-US/Chapter_15__QM_Quality_ManagementE_%282%29.PDF",
+      "key": "qad_enterprise_quality_management",
+      "label": "QAD Adaptive ERP / EQMS",
+      "url": "https://www.qad.com/en-us/products/transformational-applications/enterprise-quality-management-system",
       "focus": [
-        "inspection lots",
-        "inspection results",
-        "quality notifications",
-        "certificates"
+        "supplier quality",
+        "nonconformance",
+        "CAPA",
+        "audit and compliance"
       ]
     },
     {
-      "key": "epicor_cpc",
-      "label": "Epicor Connected Process Control",
-      "url": "https://www.epicor.com/en-us/resources/library/manufacturing/brochure-connected-process-control/",
+      "key": "infor_csi_quality",
+      "label": "Infor CloudSuite Industrial (SyteLine)",
+      "url": "https://docs.infor.com/csi/9.01.x/en-us/csbiolh/lsm1454144403275.html",
       "focus": [
-        "connected work instructions",
-        "quality checks",
-        "digital execution",
-        "operator guidance"
+        "jobs",
+        "bill of manufacture",
+        "routing",
+        "quality control"
       ]
     },
     {
-      "key": "iaqg_apqp_ppap",
-      "label": "IAQG APQP / PPAP",
-      "url": "https://iaqg.org/wp-content/uploads/2019/10/planning-for-quality-QP-article.pdf",
+      "key": "mastercontrol_qms",
+      "label": "MasterControl QMS",
+      "url": "https://www.mastercontrol.com/gxp-lifeline/quality-event-management/",
       "focus": [
-        "phase gates",
-        "deliverables",
-        "PPAP readiness",
-        "cross-functional reviews"
+        "nonconformance",
+        "CAPA",
+        "change control",
+        "training",
+        "audit"
       ]
     },
     {
-      "key": "nadcap_pri",
-      "label": "PRI Nadcap",
-      "url": "https://www.p-r-i.org/nadcap/getting-started",
+      "key": "etq_reliance_qms",
+      "label": "ETQ Reliance",
+      "url": "https://www.etq.com/qms-software/nonconformance-management/",
       "focus": [
-        "special processes",
-        "accreditation workflow",
-        "audit evidence",
-        "supplier controls"
+        "NCR",
+        "CAPA",
+        "SCAR",
+        "document control",
+        "complaint handling"
       ]
     },
     {
-      "key": "bis_eccn",
-      "label": "BIS ECCN Resources",
-      "url": "https://www.bis.gov/media/1326",
+      "key": "greenlight_guru_medtech_qms",
+      "label": "Greenlight Guru",
+      "url": "https://www.greenlight.guru/solutions/quality-management-software",
       "focus": [
-        "ECCN classification",
-        "EAR controls",
-        "export classification workflow"
+        "design control",
+        "CAPA",
+        "risk management",
+        "complaints",
+        "traceability"
       ]
     },
     {
-      "key": "opcf_opcua",
-      "label": "OPC Foundation OPC UA",
-      "url": "https://opcfoundation.org/wp-content/uploads/2014/03/OPC_UA_I_4.0_Pioneer_US_v2.pdf",
+      "key": "arena_plm_qms",
+      "label": "Arena PLM / QMS",
+      "url": "https://www.arenasolutions.com/plm-qms/quality-management-system-software/",
       "focus": [
-        "interoperability",
-        "industrial connectivity",
-        "companion specifications",
-        "machine data models"
+        "BOM",
+        "change order",
+        "quality process",
+        "compliance",
+        "supplier collaboration"
       ]
     },
     {
-      "key": "espr_dpp",
-      "label": "EU Digital Product Passport / ESPR",
-      "url": "https://webgate.ec.europa.eu/circabc-ewpp/d/d/workspace/SpacesStore/c03929dd-9d98-4472-bc13-ab118ac6973f/download",
+      "key": "plex_smart_manufacturing",
+      "label": "Plex Smart Manufacturing / MES",
+      "url": "https://www.plex.com/products/manufacturing-execution-system",
       "focus": [
-        "digital product passport",
-        "sustainability attributes",
+        "production",
+        "inventory",
+        "quality",
         "traceability",
-        "product-level disclosures"
+        "operator execution"
       ]
     }
   ],
   "assets": {
     "data-fields.json": {
       "kind": "field-registry",
-      "records": 6209
+      "records": 11396
+    },
+    "status-options.json": {
+      "kind": "enum-library",
+      "records": 105
+    },
+    "validation-rules.json": {
+      "kind": "validation-rules",
+      "records": 1836
+    },
+    "workflow-library.json": {
+      "kind": "workflow-library",
+      "records": 25
+    },
+    "computed-formulas.json": {
+      "kind": "formula-library",
+      "records": 107
+    },
+    "domain-field-packs.json": {
+      "kind": "pack-library",
+      "records": 189
+    },
+    "relation-map.json": {
+      "kind": "relation-map",
+      "records": 67
+    },
+    "migration-gap-report.json": {
+      "kind": "migration-gap-report",
+      "records": 182
     },
     "api-params.json": {
       "kind": "api-contracts",
       "records": 345
     },
-    "field-types.json": {
-      "kind": "type-library",
-      "records": 25
-    },
-    "status-options.json": {
-      "kind": "enum-library",
-      "records": 43
-    },
-    "computed-formulas.json": {
-      "kind": "formula-library",
-      "records": 43
-    },
-    "iot-connectors.json": {
-      "kind": "connector-library",
-      "records": 13
-    },
-    "domain-field-packs.json": {
-      "kind": "pack-library",
-      "records": 74
-    },
-    "schema-library.json": {
-      "kind": "schema-library",
-      "records": 5
-    },
     "endpoint-catalog.json": {
       "kind": "endpoint-catalog",
       "records": 345
     },
-    "validation-rules.json": {
-      "kind": "validation-rules",
-      "records": 1350
-    },
-    "relation-map.json": {
-      "kind": "relation-map",
-      "records": 22
-    },
-    "workflow-library.json": {
-      "kind": "workflow-library",
-      "records": 8
-    },
-    "compliance-crosswalk.json": {
-      "kind": "compliance-crosswalk",
-      "records": 8
-    },
-    "registry-quality-report.json": {
-      "kind": "quality-report",
+    "registry-manifest.json": {
+      "kind": "manifest",
       "records": 1
-    },
-    "unit-library.json": {
-      "kind": "unit-library",
-      "records": 10
-    },
-    "identifier-patterns.json": {
-      "kind": "identifier-patterns",
-      "records": 10
     }
   }
 }

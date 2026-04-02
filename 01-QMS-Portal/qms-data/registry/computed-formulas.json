@@ -1,718 +1,2770 @@
 {
   "_meta": {
-    "version": "2.0",
-    "description": "World-class computed formula presets for finance, production, quality, supplier, energy, and traceability.",
-    "generatedAt": "2026-04-02T06:00:20.356Z",
-    "formulaCount": 43
+    "version": "3.0",
+    "description": "Computed formulas for manufacturing, quality, supplier, financial, compliance, and logistics analytics.",
+    "generatedAt": "2026-04-02T09:02:28.221Z",
+    "formulaCount": 107
   },
   "total_line_amount": {
-    "label": "Line Total Amount",
-    "labelEn": "Line Total Amount",
-    "formula": "quantity * unit_price",
-    "resultType": "currency",
+    "formulaId": "total_line_amount",
+    "name": "Tổng Dòng Giá trị",
+    "nameEn": "Total Line Amount",
     "category": "financial",
-    "description": "Extended amount for a single commercial line.",
-    "inputs": [
-      "quantity",
-      "unit_price"
-    ],
-    "tags": [
-      "quote",
-      "order",
-      "finance"
-    ]
+    "formula": "quantity * unit_price",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "discount_amount": {
-    "label": "Discount Amount",
-    "labelEn": "Discount Amount",
-    "formula": "subtotal * (discount_pct / 100)",
-    "resultType": "currency",
+    "formulaId": "discount_amount",
+    "name": "Discount Giá trị",
+    "nameEn": "Discount Amount",
     "category": "financial",
-    "description": "Monetary discount derived from subtotal and percent.",
-    "inputs": [
-      "subtotal",
-      "discount_pct"
-    ],
-    "tags": [
-      "quote",
-      "order"
-    ]
+    "formula": "subtotal * (discount_pct / 100)",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "gross_margin_pct": {
-    "label": "Gross Margin Percent",
-    "labelEn": "Gross Margin Percent",
-    "formula": "((selling_price - unit_cost) / selling_price) * 100",
-    "resultType": "percent",
+    "formulaId": "gross_margin_pct",
+    "name": "Biên lợi nhuận gộp",
+    "nameEn": "Gross Margin Percent",
     "category": "financial",
-    "description": "Margin percent relative to selling price.",
-    "inputs": [
-      "selling_price",
-      "unit_cost"
-    ],
-    "tags": [
-      "quote",
-      "costing"
-    ]
+    "formula": "((selling_price - unit_cost) / selling_price) * 100",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "markup_pct": {
-    "label": "Markup Percent",
-    "labelEn": "Markup Percent",
-    "formula": "((selling_price - unit_cost) / unit_cost) * 100",
-    "resultType": "percent",
+    "formulaId": "markup_pct",
+    "name": "Tỷ lệ cộng giá",
+    "nameEn": "Markup Percent",
     "category": "financial",
-    "description": "Markup percent relative to cost.",
-    "inputs": [
-      "selling_price",
-      "unit_cost"
-    ],
-    "tags": [
-      "quote",
-      "costing"
-    ]
+    "formula": "((selling_price - unit_cost) / unit_cost) * 100",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "total_order_value": {
-    "label": "Total Order Value",
-    "labelEn": "Total Order Value",
-    "formula": "SUM(lines.quantity * lines.unit_price)",
-    "resultType": "currency",
+    "formulaId": "total_order_value",
+    "name": "Tổng Đơn Giá trị",
+    "nameEn": "Total Order Value",
     "category": "financial",
-    "description": "Aggregate value across all lines in a commercial document.",
-    "inputs": [
-      "lines.quantity",
-      "lines.unit_price"
-    ],
-    "tags": [
-      "sales_order",
-      "quote"
-    ]
+    "formula": "SUM(lines.quantity * lines.unit_price)",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "vat_amount": {
-    "label": "VAT Amount",
-    "labelEn": "VAT Amount",
-    "formula": "subtotal * (vat_rate / 100)",
-    "resultType": "currency",
+    "formulaId": "vat_amount",
+    "name": "Vat Giá trị",
+    "nameEn": "Vat Amount",
     "category": "financial",
-    "description": "Tax amount calculated from taxable subtotal.",
-    "inputs": [
-      "subtotal",
-      "vat_rate"
-    ],
-    "tags": [
-      "finance",
-      "compliance"
-    ]
+    "formula": "subtotal * (vat_rate / 100)",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "grand_total": {
-    "label": "Grand Total",
-    "labelEn": "Grand Total",
-    "formula": "subtotal - discount_amount + vat_amount + freight_amount",
-    "resultType": "currency",
+    "formulaId": "grand_total",
+    "name": "Grand Tổng",
+    "nameEn": "Grand Total",
     "category": "financial",
-    "description": "Commercial grand total including tax and freight.",
-    "inputs": [
-      "subtotal",
-      "discount_amount",
-      "vat_amount",
-      "freight_amount"
-    ],
-    "tags": [
-      "quote",
-      "sales_order"
-    ]
+    "formula": "subtotal - discount_amount + vat_amount + freight_amount",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "copq_total": {
-    "label": "Total Cost Of Poor Quality",
-    "labelEn": "Total Cost Of Poor Quality",
-    "formula": "scrap_cost + rework_cost + warranty_cost + inspection_cost",
-    "resultType": "currency",
+    "formulaId": "copq_total",
+    "name": "Copq Tổng",
+    "nameEn": "Copq Total",
     "category": "quality",
-    "description": "Total direct poor quality cost bucket.",
-    "inputs": [
-      "scrap_cost",
-      "rework_cost",
-      "warranty_cost",
-      "inspection_cost"
-    ],
-    "tags": [
-      "quality",
-      "management_review"
-    ]
+    "formula": "scrap_cost + rework_cost + warranty_cost + inspection_cost",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "copq_rate_pct": {
-    "label": "COPQ Rate Percent",
-    "labelEn": "COPQ Rate Percent",
-    "formula": "(copq_total / revenue_amount) * 100",
-    "resultType": "percent",
+    "formulaId": "copq_rate_pct",
+    "name": "Tỷ lệ Copq Tỷ lệ",
+    "nameEn": "Copq Rate Pct",
     "category": "quality",
-    "description": "Poor quality cost as percentage of revenue.",
-    "inputs": [
-      "copq_total",
-      "revenue_amount"
-    ],
-    "tags": [
-      "quality",
-      "finance"
-    ]
+    "formula": "(copq_total / revenue_amount) * 100",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "cycle_time_total": {
-    "label": "Total Cycle Time",
-    "labelEn": "Total Cycle Time",
-    "formula": "setup_time + (run_time_per_unit * quantity)",
-    "resultType": "duration",
+    "formulaId": "cycle_time_total",
+    "name": "Chu kỳ thời gian Tổng",
+    "nameEn": "Cycle Time Total",
     "category": "production",
-    "description": "Combined setup and runtime requirement.",
-    "inputs": [
-      "setup_time",
-      "run_time_per_unit",
-      "quantity"
-    ],
-    "tags": [
-      "routing",
-      "scheduling"
-    ]
+    "formula": "setup_time + (run_time_per_unit * quantity)",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "takt_gap_minutes": {
-    "label": "Takt Gap Minutes",
-    "labelEn": "Takt Gap Minutes",
-    "formula": "actual_cycle_time - takt_time",
-    "resultType": "duration",
+    "formulaId": "takt_gap_minutes",
+    "name": "Takt Gap Minutes",
+    "nameEn": "Takt Gap Minutes",
     "category": "production",
-    "description": "Positive value indicates cycle exceeds takt.",
-    "inputs": [
-      "actual_cycle_time",
-      "takt_time"
-    ],
-    "tags": [
-      "production",
-      "capacity"
-    ]
+    "formula": "actual_cycle_time - takt_time",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "oee_pct": {
-    "label": "OEE Percent",
-    "labelEn": "OEE Percent",
-    "formula": "availability * performance * quality * 100",
-    "resultType": "percent",
+    "formulaId": "oee_pct",
+    "name": "Tỷ lệ OEE",
+    "nameEn": "OEE Pct",
     "category": "production",
-    "description": "Overall equipment effectiveness.",
-    "inputs": [
-      "availability",
-      "performance",
-      "quality"
-    ],
-    "tags": [
-      "machine",
-      "kpi"
-    ]
+    "formula": "availability * performance * quality * 100",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "scrap_rate_pct": {
-    "label": "Scrap Rate Percent",
-    "labelEn": "Scrap Rate Percent",
-    "formula": "(scrap_qty / total_produced) * 100",
-    "resultType": "percent",
+    "formulaId": "scrap_rate_pct",
+    "name": "Tỷ lệ Phế phẩm Tỷ lệ",
+    "nameEn": "Scrap Rate Pct",
     "category": "quality",
-    "description": "Scrap quantity relative to production output.",
-    "inputs": [
-      "scrap_qty",
-      "total_produced"
-    ],
-    "tags": [
-      "quality",
-      "shop_floor"
-    ]
+    "formula": "(scrap_qty / total_produced) * 100",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "first_pass_yield": {
-    "label": "First Pass Yield",
-    "labelEn": "First Pass Yield",
-    "formula": "(good_qty / total_inspected) * 100",
-    "resultType": "percent",
+    "formulaId": "first_pass_yield",
+    "name": "Đầu tiên Pass Tỷ lệ đạt",
+    "nameEn": "First Pass Yield",
     "category": "quality",
-    "description": "Yield without rework or repair.",
-    "inputs": [
-      "good_qty",
-      "total_inspected"
-    ],
-    "tags": [
-      "quality",
-      "inspection"
-    ]
+    "formula": "(good_qty / total_inspected) * 100",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "defect_escape_rate": {
-    "label": "Defect Escape Rate",
-    "labelEn": "Defect Escape Rate",
-    "formula": "(customer_returns / total_shipments) * 100",
-    "resultType": "percent",
+    "formulaId": "defect_escape_rate",
+    "name": "Khuyết tật Escape Tỷ lệ",
+    "nameEn": "Defect Escape Rate",
     "category": "quality",
-    "description": "Escaped defects as percentage of shipments.",
-    "inputs": [
-      "customer_returns",
-      "total_shipments"
-    ],
-    "tags": [
-      "quality",
-      "customer"
-    ]
+    "formula": "(customer_returns / total_shipments) * 100",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "dpmo": {
-    "label": "DPMO",
-    "labelEn": "Defects Per Million Opportunities",
-    "formula": "(defect_count / (total_units * opportunities_per_unit)) * 1000000",
-    "resultType": "number",
+    "formulaId": "dpmo",
+    "name": "Dpmo",
+    "nameEn": "Dpmo",
     "category": "quality",
-    "description": "Six Sigma style opportunity metric.",
-    "inputs": [
-      "defect_count",
-      "total_units",
-      "opportunities_per_unit"
-    ],
-    "tags": [
-      "quality",
-      "spc"
-    ]
+    "formula": "(defect_count / (total_units * opportunities_per_unit)) * 1000000",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "cpk": {
-    "label": "Cpk",
-    "labelEn": "Process Capability Index Cpk",
-    "formula": "MIN((usl - mean) / (3 * stdev), (mean - lsl) / (3 * stdev))",
-    "resultType": "number",
+    "formulaId": "cpk",
+    "name": "CPK",
+    "nameEn": "Cpk",
     "category": "quality",
-    "description": "Capability index using upper and lower specification limits.",
-    "inputs": [
-      "usl",
-      "mean",
-      "stdev",
-      "lsl"
-    ],
-    "tags": [
-      "quality",
-      "spc"
-    ]
+    "formula": "MIN((usl - mean) / (3 * stdev), (mean - lsl) / (3 * stdev))",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "closure_aging_days": {
-    "label": "Closure Aging Days",
-    "labelEn": "Closure Aging Days",
-    "formula": "DATEDIFF(close_date, open_date)",
-    "resultType": "integer",
+    "formulaId": "closure_aging_days",
+    "name": "Closure Aging Days",
+    "nameEn": "Closure Aging Days",
     "category": "quality",
-    "description": "Elapsed days from event opening to closure.",
-    "inputs": [
-      "close_date",
-      "open_date"
-    ],
-    "tags": [
-      "ncr",
-      "capa",
-      "scar"
-    ]
+    "formula": "DATEDIFF(close_date, open_date)",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "audit_closure_rate": {
-    "label": "Audit Closure Rate",
-    "labelEn": "Audit Closure Rate",
-    "formula": "(closed_findings / total_findings) * 100",
-    "resultType": "percent",
+    "formulaId": "audit_closure_rate",
+    "name": "Đánh giá Closure Tỷ lệ",
+    "nameEn": "Audit Closure Rate",
     "category": "audit",
-    "description": "Closure percentage of audit findings.",
-    "inputs": [
-      "closed_findings",
-      "total_findings"
-    ],
-    "tags": [
-      "audit",
-      "supplier"
-    ]
+    "formula": "(closed_findings / total_findings) * 100",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "ppap_completeness_pct": {
-    "label": "PPAP Completeness Percent",
-    "labelEn": "PPAP Completeness Percent",
-    "formula": "(approved_elements / required_elements) * 100",
-    "resultType": "percent",
+    "formulaId": "ppap_completeness_pct",
+    "name": "Tỷ lệ Ppap Completeness",
+    "nameEn": "Ppap Completeness Pct",
     "category": "quality",
-    "description": "PPAP element completeness score.",
-    "inputs": [
-      "approved_elements",
-      "required_elements"
-    ],
-    "tags": [
-      "ppap",
-      "apqp"
-    ]
+    "formula": "(approved_elements / required_elements) * 100",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "first_article_completion_pct": {
-    "label": "First Article Completion Percent",
-    "labelEn": "First Article Completion Percent",
-    "formula": "(completed_characteristics / total_characteristics) * 100",
-    "resultType": "percent",
+    "formulaId": "first_article_completion_pct",
+    "name": "Tỷ lệ Đầu tiên Article Completion",
+    "nameEn": "First Article Completion Pct",
     "category": "quality",
-    "description": "Completion percent for first article inspection characteristics.",
-    "inputs": [
-      "completed_characteristics",
-      "total_characteristics"
-    ],
-    "tags": [
-      "fai",
-      "inspection"
-    ]
+    "formula": "(completed_characteristics / total_characteristics) * 100",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "supplier_score": {
-    "label": "Supplier Scorecard",
-    "labelEn": "Supplier Scorecard",
-    "formula": "(quality_score * 0.4) + (delivery_score * 0.3) + (cost_score * 0.2) + (service_score * 0.1)",
-    "resultType": "number",
+    "formulaId": "supplier_score",
+    "name": "Nhà cung cấp Score",
+    "nameEn": "Supplier Score",
     "category": "supplier",
-    "description": "Weighted supplier composite performance score.",
-    "inputs": [
-      "quality_score",
-      "delivery_score",
-      "cost_score",
-      "service_score"
-    ],
-    "tags": [
-      "supplier",
-      "scorecard"
-    ]
+    "formula": "(quality_score * 0.4) + (delivery_score * 0.3) + (cost_score * 0.2) + (service_score * 0.1)",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "on_time_delivery_pct": {
-    "label": "On Time Delivery Percent",
-    "labelEn": "On Time Delivery Percent",
-    "formula": "(on_time_count / total_deliveries) * 100",
-    "resultType": "percent",
+    "formulaId": "on_time_delivery_pct",
+    "name": "Tỷ lệ On thời gian Giao hàng",
+    "nameEn": "On Time Delivery Pct",
     "category": "supplier",
-    "description": "Delivery performance percentage.",
-    "inputs": [
-      "on_time_count",
-      "total_deliveries"
-    ],
-    "tags": [
-      "supplier",
-      "shipping"
-    ]
+    "formula": "(on_time_count / total_deliveries) * 100",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "incoming_acceptance_rate": {
-    "label": "Incoming Acceptance Rate",
-    "labelEn": "Incoming Acceptance Rate",
-    "formula": "(accepted_lots / total_lots_inspected) * 100",
-    "resultType": "percent",
+    "formulaId": "incoming_acceptance_rate",
+    "name": "Incoming Acceptance Tỷ lệ",
+    "nameEn": "Incoming Acceptance Rate",
     "category": "supplier",
-    "description": "Receiving acceptance ratio.",
-    "inputs": [
-      "accepted_lots",
-      "total_lots_inspected"
-    ],
-    "tags": [
-      "supplier",
-      "inspection"
-    ]
+    "formula": "(accepted_lots / total_lots_inspected) * 100",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "supplier_ppm": {
-    "label": "Supplier PPM",
-    "labelEn": "Supplier Parts Per Million",
-    "formula": "(defective_qty / received_qty) * 1000000",
-    "resultType": "number",
+    "formulaId": "supplier_ppm",
+    "name": "Nhà cung cấp PPM",
+    "nameEn": "Supplier Ppm",
     "category": "supplier",
-    "description": "Supplier defect rate per million units received.",
-    "inputs": [
-      "defective_qty",
-      "received_qty"
-    ],
-    "tags": [
-      "supplier",
-      "quality"
-    ]
+    "formula": "(defective_qty / received_qty) * 1000000",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "scar_closure_pct": {
-    "label": "SCAR Closure Percent",
-    "labelEn": "SCAR Closure Percent",
-    "formula": "(closed_scars / total_scars) * 100",
-    "resultType": "percent",
+    "formulaId": "scar_closure_pct",
+    "name": "Tỷ lệ Scar Closure",
+    "nameEn": "Scar Closure Pct",
     "category": "supplier",
-    "description": "Closure percentage for supplier corrective actions.",
-    "inputs": [
-      "closed_scars",
-      "total_scars"
-    ],
-    "tags": [
-      "supplier",
-      "scar"
-    ]
+    "formula": "(closed_scars / total_scars) * 100",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "material_cost_estimate": {
-    "label": "Material Cost Estimate",
-    "labelEn": "Material Cost Estimate",
-    "formula": "raw_weight * material_price_per_kg * buy_to_fly_ratio",
-    "resultType": "currency",
+    "formulaId": "material_cost_estimate",
+    "name": "Vật liệu Chi phí Ước tính",
+    "nameEn": "Material Cost Estimate",
     "category": "quoting",
-    "description": "Material cost estimate for machining and aerospace parts.",
-    "inputs": [
-      "raw_weight",
-      "material_price_per_kg",
-      "buy_to_fly_ratio"
-    ],
-    "tags": [
-      "quote",
-      "material"
-    ]
+    "formula": "raw_weight * material_price_per_kg * buy_to_fly_ratio",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "machining_cost_estimate": {
-    "label": "Machining Cost Estimate",
-    "labelEn": "Machining Cost Estimate",
-    "formula": "cycle_time_hours * machine_rate_per_hour",
-    "resultType": "currency",
+    "formulaId": "machining_cost_estimate",
+    "name": "Machining Chi phí Ước tính",
+    "nameEn": "Machining Cost Estimate",
     "category": "quoting",
-    "description": "Estimated cost of machine runtime.",
-    "inputs": [
-      "cycle_time_hours",
-      "machine_rate_per_hour"
-    ],
-    "tags": [
-      "quote",
-      "production"
-    ]
+    "formula": "cycle_time_hours * machine_rate_per_hour",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "setup_cost_estimate": {
-    "label": "Setup Cost Estimate",
-    "labelEn": "Setup Cost Estimate",
-    "formula": "setup_hours * setup_rate_per_hour",
-    "resultType": "currency",
+    "formulaId": "setup_cost_estimate",
+    "name": "Setup Chi phí Ước tính",
+    "nameEn": "Setup Cost Estimate",
     "category": "quoting",
-    "description": "Setup cost burden for quoting and routing.",
-    "inputs": [
-      "setup_hours",
-      "setup_rate_per_hour"
-    ],
-    "tags": [
-      "quote",
-      "routing"
-    ]
+    "formula": "setup_hours * setup_rate_per_hour",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "quote_total": {
-    "label": "Quote Total",
-    "labelEn": "Quote Total",
-    "formula": "material_cost + machining_cost + overhead_cost + profit_margin",
-    "resultType": "currency",
+    "formulaId": "quote_total",
+    "name": "Báo giá Tổng",
+    "nameEn": "Quote Total",
     "category": "quoting",
-    "description": "Quoted commercial total before tax.",
-    "inputs": [
-      "material_cost",
-      "machining_cost",
-      "overhead_cost",
-      "profit_margin"
-    ],
-    "tags": [
-      "quote"
-    ]
+    "formula": "material_cost + machining_cost + overhead_cost + profit_margin",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "lead_time_days": {
-    "label": "Lead Time Days",
-    "labelEn": "Lead Time Days",
-    "formula": "material_lead_days + production_days + finishing_days + buffer_days",
-    "resultType": "integer",
+    "formulaId": "lead_time_days",
+    "name": "Dẫn thời gian Days",
+    "nameEn": "Lead Time Days",
     "category": "quoting",
-    "description": "Estimated end-to-end lead time.",
-    "inputs": [
-      "material_lead_days",
-      "production_days",
-      "finishing_days",
-      "buffer_days"
-    ],
-    "tags": [
-      "quote",
-      "planning"
-    ]
+    "formula": "material_lead_days + production_days + finishing_days + buffer_days",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "inventory_value": {
-    "label": "Inventory Value",
-    "labelEn": "Inventory Value",
-    "formula": "qty_on_hand * unit_cost",
-    "resultType": "currency",
+    "formulaId": "inventory_value",
+    "name": "Tồn kho Giá trị",
+    "nameEn": "Inventory Value",
     "category": "inventory",
-    "description": "Inventory carrying value at location or part level.",
-    "inputs": [
-      "qty_on_hand",
-      "unit_cost"
-    ],
-    "tags": [
-      "inventory",
-      "finance"
-    ]
+    "formula": "qty_on_hand * unit_cost",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "reorder_point": {
-    "label": "Reorder Point",
-    "labelEn": "Reorder Point",
-    "formula": "(avg_daily_usage * lead_time_days) + safety_stock",
-    "resultType": "number",
+    "formulaId": "reorder_point",
+    "name": "Reorder Point",
+    "nameEn": "Reorder Point",
     "category": "inventory",
-    "description": "Inventory reorder trigger threshold.",
-    "inputs": [
-      "avg_daily_usage",
-      "lead_time_days",
-      "safety_stock"
-    ],
-    "tags": [
-      "inventory",
-      "planning"
-    ]
+    "formula": "(avg_daily_usage * lead_time_days) + safety_stock",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "days_of_supply": {
-    "label": "Days Of Supply",
-    "labelEn": "Days Of Supply",
-    "formula": "qty_on_hand / avg_daily_usage",
-    "resultType": "number",
+    "formulaId": "days_of_supply",
+    "name": "Days Of Supply",
+    "nameEn": "Days Of Supply",
     "category": "inventory",
-    "description": "Projected available supply days.",
-    "inputs": [
-      "qty_on_hand",
-      "avg_daily_usage"
-    ],
-    "tags": [
-      "inventory",
-      "planning"
-    ]
+    "formula": "qty_on_hand / avg_daily_usage",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "lot_age_days": {
-    "label": "Lot Age Days",
-    "labelEn": "Lot Age Days",
-    "formula": "DATEDIFF(today, receipt_date)",
-    "resultType": "integer",
+    "formulaId": "lot_age_days",
+    "name": "Lô Age Days",
+    "nameEn": "Lot Age Days",
     "category": "inventory",
-    "description": "Age of a lot since receipt.",
-    "inputs": [
-      "today",
-      "receipt_date"
-    ],
-    "tags": [
-      "lot",
-      "traceability"
-    ]
+    "formula": "DATEDIFF(today, receipt_date)",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "traceability_completeness_pct": {
-    "label": "Traceability Completeness Percent",
-    "labelEn": "Traceability Completeness Percent",
-    "formula": "(completed_trace_links / required_trace_links) * 100",
-    "resultType": "percent",
+    "formulaId": "traceability_completeness_pct",
+    "name": "Tỷ lệ Truy xuất nguồn gốc Completeness",
+    "nameEn": "Traceability Completeness Pct",
     "category": "traceability",
-    "description": "Completeness of lot, serial, cert, and operation genealogy.",
-    "inputs": [
-      "completed_trace_links",
-      "required_trace_links"
-    ],
-    "tags": [
-      "traceability",
-      "passport"
-    ]
+    "formula": "(completed_trace_links / required_trace_links) * 100",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "labor_efficiency_pct": {
-    "label": "Labor Efficiency Percent",
-    "labelEn": "Labor Efficiency Percent",
-    "formula": "(standard_hours / actual_hours) * 100",
-    "resultType": "percent",
+    "formulaId": "labor_efficiency_pct",
+    "name": "Tỷ lệ Nhân công Hiệu suất",
+    "nameEn": "Labor Efficiency Pct",
     "category": "production",
-    "description": "Standard to actual labor efficiency.",
-    "inputs": [
-      "standard_hours",
-      "actual_hours"
-    ],
-    "tags": [
-      "labor",
-      "production"
-    ]
+    "formula": "(standard_hours / actual_hours) * 100",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "machine_utilization_pct": {
-    "label": "Machine Utilization Percent",
-    "labelEn": "Machine Utilization Percent",
-    "formula": "(actual_run_time / available_time) * 100",
-    "resultType": "percent",
+    "formulaId": "machine_utilization_pct",
+    "name": "Tỷ lệ Máy Utilization",
+    "nameEn": "Machine Utilization Pct",
     "category": "production",
-    "description": "Machine utilization ratio.",
-    "inputs": [
-      "actual_run_time",
-      "available_time"
-    ],
-    "tags": [
-      "machine",
-      "capacity"
-    ]
+    "formula": "(actual_run_time / available_time) * 100",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "schedule_adherence_pct": {
-    "label": "Schedule Adherence Percent",
-    "labelEn": "Schedule Adherence Percent",
-    "formula": "(operations_on_time / total_operations) * 100",
-    "resultType": "percent",
+    "formulaId": "schedule_adherence_pct",
+    "name": "Tỷ lệ Lịch Adherence",
+    "nameEn": "Schedule Adherence Pct",
     "category": "production",
-    "description": "Schedule adherence across operations.",
-    "inputs": [
-      "operations_on_time",
-      "total_operations"
-    ],
-    "tags": [
-      "schedule",
-      "production"
-    ]
+    "formula": "(operations_on_time / total_operations) * 100",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "runtime_variance_pct": {
-    "label": "Runtime Variance Percent",
-    "labelEn": "Runtime Variance Percent",
-    "formula": "((actual_runtime - planned_runtime) / planned_runtime) * 100",
-    "resultType": "percent",
+    "formulaId": "runtime_variance_pct",
+    "name": "Tỷ lệ Runtime Chênh lệch",
+    "nameEn": "Runtime Variance Pct",
     "category": "production",
-    "description": "Deviation between planned and actual runtime.",
-    "inputs": [
-      "actual_runtime",
-      "planned_runtime"
-    ],
-    "tags": [
-      "production",
-      "variance"
-    ]
+    "formula": "((actual_runtime - planned_runtime) / planned_runtime) * 100",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "energy_cost_per_part": {
-    "label": "Energy Cost Per Part",
-    "labelEn": "Energy Cost Per Part",
-    "formula": "(kwh_consumed * electricity_rate) / parts_completed",
-    "resultType": "currency",
+    "formulaId": "energy_cost_per_part",
+    "name": "Energy Chi phí Per Part",
+    "nameEn": "Energy Cost Per Part",
     "category": "energy",
-    "description": "Energy cost allocation per produced part.",
-    "inputs": [
-      "kwh_consumed",
-      "electricity_rate",
-      "parts_completed"
-    ],
-    "tags": [
-      "energy",
-      "cost"
-    ]
+    "formula": "(kwh_consumed * electricity_rate) / parts_completed",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "carbon_per_part": {
-    "label": "Carbon Per Part",
-    "labelEn": "Carbon Per Part",
-    "formula": "(kwh_consumed * emission_factor) / parts_completed",
-    "resultType": "number",
+    "formulaId": "carbon_per_part",
+    "name": "Carbon Per Part",
+    "nameEn": "Carbon Per Part",
     "category": "energy",
-    "description": "Estimated carbon footprint per part.",
-    "inputs": [
-      "kwh_consumed",
-      "emission_factor",
-      "parts_completed"
-    ],
-    "tags": [
-      "energy",
-      "sustainability"
-    ]
+    "formula": "(kwh_consumed * emission_factor) / parts_completed",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
   },
   "weight_from_dimensions": {
-    "label": "Weight From Dimensions",
-    "labelEn": "Weight From Dimensions",
-    "formula": "length * width * height * material_density",
-    "resultType": "weight",
+    "formulaId": "weight_from_dimensions",
+    "name": "Khối lượng Từ Dimensions",
+    "nameEn": "Weight From Dimensions",
     "category": "engineering",
-    "description": "Estimated weight from envelope dimensions and density.",
-    "inputs": [
-      "length",
-      "width",
-      "height",
-      "material_density"
+    "formula": "length * width * height * material_density",
+    "variables": [],
+    "unit": "number",
+    "target": {
+      "worldClass": 95,
+      "minimum": 80
+    },
+    "dataSource": {
+      "tables": [
+        "registry_legacy_formulas"
+      ],
+      "refreshInterval": "60m"
+    }
+  },
+  "f_schedule_adherence": {
+    "formulaId": "f_schedule_adherence",
+    "name": "Tuân thủ lịch sản xuất",
+    "nameEn": "Schedule Adherence",
+    "category": "manufacturing",
+    "formula": "on_time_jobs / total_jobs",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "on_time_jobs",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "total_jobs",
+        "unit": "number"
+      }
     ],
-    "tags": [
-      "engineering",
-      "material"
-    ]
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "prd_work_orders"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_otif": {
+    "formulaId": "f_otif",
+    "name": "OTIF nhà cung cấp",
+    "nameEn": "Supplier OTIF",
+    "category": "supplier",
+    "formula": "supplier_on_time_in_full / supplier_shipments",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "supplier_on_time_in_full",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "supplier_shipments",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "supplier_scorecards"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_rft": {
+    "formulaId": "f_rft",
+    "name": "Right First Time",
+    "nameEn": "Right First Time",
+    "category": "quality",
+    "formula": "wo_without_rework / completed_work_orders",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "wo_without_rework",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "completed_work_orders",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "prd_work_orders"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_scrap_rate": {
+    "formulaId": "f_scrap_rate",
+    "name": "Tỷ lệ phế phẩm",
+    "nameEn": "Scrap Rate",
+    "category": "manufacturing",
+    "formula": "scrapped_qty / total_qty",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "scrapped_qty",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "total_qty",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "prd_scrap_reports"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_rework_rate": {
+    "formulaId": "f_rework_rate",
+    "name": "Tỷ lệ làm lại",
+    "nameEn": "Rework Rate",
+    "category": "quality",
+    "formula": "reworked_qty / total_qty",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "reworked_qty",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "total_qty",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "qm_ncrs"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_supplier_ppm": {
+    "formulaId": "f_supplier_ppm",
+    "name": "PPM nhà cung cấp",
+    "nameEn": "Supplier PPM",
+    "category": "supplier",
+    "formula": "supplier_defects * 1000000 / received_qty",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "supplier_defects * 1000000",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "received_qty",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "receiving_inspections"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_customer_ppm": {
+    "formulaId": "f_customer_ppm",
+    "name": "PPM khách hàng",
+    "nameEn": "Customer PPM",
+    "category": "quality",
+    "formula": "customer_defects * 1000000 / shipped_qty",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "customer_defects * 1000000",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "shipped_qty",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "customer_complaints"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_ncr_closure_ontime": {
+    "formulaId": "f_ncr_closure_ontime",
+    "name": "Tỷ lệ đóng NCR đúng hạn",
+    "nameEn": "NCR On-Time Closure",
+    "category": "quality",
+    "formula": "ncr_closed_ontime / ncr_closed_total",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "ncr_closed_ontime",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "ncr_closed_total",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "qm_ncrs"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_capa_closure_ontime": {
+    "formulaId": "f_capa_closure_ontime",
+    "name": "Tỷ lệ đóng CAPA đúng hạn",
+    "nameEn": "CAPA On-Time Closure",
+    "category": "quality",
+    "formula": "capa_closed_ontime / capa_closed_total",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "capa_closed_ontime",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "capa_closed_total",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "qm_capas"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_audit_finding_closure": {
+    "formulaId": "f_audit_finding_closure",
+    "name": "Tỷ lệ đóng điểm đánh giá",
+    "nameEn": "Audit Finding Closure",
+    "category": "quality",
+    "formula": "audit_findings_closed / audit_findings_total",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "audit_findings_closed",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "audit_findings_total",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "audit_findings"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_fai_approval_rate": {
+    "formulaId": "f_fai_approval_rate",
+    "name": "Tỷ lệ phê duyệt FAI",
+    "nameEn": "FAI Approval Rate",
+    "category": "quality",
+    "formula": "fai_approved / fai_submitted",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "fai_approved",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "fai_submitted",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "qm_fai_headers"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_receiving_acceptance_rate": {
+    "formulaId": "f_receiving_acceptance_rate",
+    "name": "Tỷ lệ chấp nhận đầu vào",
+    "nameEn": "Receiving Acceptance Rate",
+    "category": "quality",
+    "formula": "accepted_receipts / inspected_receipts",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "accepted_receipts",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "inspected_receipts",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "receiving_inspections"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_final_acceptance_rate": {
+    "formulaId": "f_final_acceptance_rate",
+    "name": "Tỷ lệ chấp nhận cuối",
+    "nameEn": "Final Acceptance Rate",
+    "category": "quality",
+    "formula": "final_accept_lots / final_inspected_lots",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "final_accept_lots",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "final_inspected_lots",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "inspection_lots"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_calibration_ontime": {
+    "formulaId": "f_calibration_ontime",
+    "name": "Tỷ lệ hiệu chuẩn đúng hạn",
+    "nameEn": "Calibration On-Time",
+    "category": "compliance",
+    "formula": "calibrations_on_time / calibrations_due",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "calibrations_on_time",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "calibrations_due",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "calibration_records"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_training_completion": {
+    "formulaId": "f_training_completion",
+    "name": "Tỷ lệ hoàn thành đào tạo",
+    "nameEn": "Training Completion",
+    "category": "compliance",
+    "formula": "training_completed / training_assigned",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "training_completed",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "training_assigned",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "training_assignments"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_document_training_linkage": {
+    "formulaId": "f_document_training_linkage",
+    "name": "Tỷ lệ liên kết đào tạo tài liệu",
+    "nameEn": "Document Training Linkage",
+    "category": "compliance",
+    "formula": "docs_with_training / effective_docs",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "docs_with_training",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "effective_docs",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "documents"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_equipment_availability": {
+    "formulaId": "f_equipment_availability",
+    "name": "Mức sẵn sàng thiết bị",
+    "nameEn": "Equipment Availability",
+    "category": "manufacturing",
+    "formula": "available_time / planned_time",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "available_time",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "planned_time",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "mes_machine_metrics"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_machine_utilization": {
+    "formulaId": "f_machine_utilization",
+    "name": "Mức sử dụng máy",
+    "nameEn": "Machine Utilization",
+    "category": "manufacturing",
+    "formula": "runtime / calendar_time",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "runtime",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "calendar_time",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "mes_machine_metrics"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_setup_ratio": {
+    "formulaId": "f_setup_ratio",
+    "name": "Tỷ lệ thời gian setup",
+    "nameEn": "Setup Ratio",
+    "category": "manufacturing",
+    "formula": "setup_time / planned_time",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "setup_time",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "planned_time",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "mes_machine_metrics"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_queue_time_ratio": {
+    "formulaId": "f_queue_time_ratio",
+    "name": "Tỷ lệ thời gian chờ",
+    "nameEn": "Queue Time Ratio",
+    "category": "manufacturing",
+    "formula": "queue_time / lead_time",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "queue_time",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "lead_time",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "prd_work_orders"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_ship_release_first_pass": {
+    "formulaId": "f_ship_release_first_pass",
+    "name": "Tỷ lệ phát hành giao hàng lần đầu",
+    "nameEn": "Shipment Release First Pass",
+    "category": "logistics",
+    "formula": "shipment_release_without_rework / shipment_release_total",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "shipment_release_without_rework",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "shipment_release_total",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "shipment_releases"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_export_compliance_rate": {
+    "formulaId": "f_export_compliance_rate",
+    "name": "Tỷ lệ tuân thủ xuất khẩu",
+    "nameEn": "Export Compliance Rate",
+    "category": "compliance",
+    "formula": "export_compliant_shipments / export_controlled_shipments",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "export_compliant_shipments",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "export_controlled_shipments",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "shipment_releases"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_shelf_life_acceptance": {
+    "formulaId": "f_shelf_life_acceptance",
+    "name": "Tỷ lệ chấp nhận hạn sử dụng",
+    "nameEn": "Shelf Life Acceptance",
+    "category": "supplier",
+    "formula": "accepted_shelf_life_lots / received_shelf_life_lots",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "accepted_shelf_life_lots",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "received_shelf_life_lots",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "receiving_inspections"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_source_inspection_pass": {
+    "formulaId": "f_source_inspection_pass",
+    "name": "Tỷ lệ đạt kiểm tra nguồn",
+    "nameEn": "Source Inspection Pass Rate",
+    "category": "quality",
+    "formula": "source_inspection_passed / source_inspection_total",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "source_inspection_passed",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "source_inspection_total",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "inspection_lots"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_spc_in_control": {
+    "formulaId": "f_spc_in_control",
+    "name": "Tỷ lệ điểm SPC trong kiểm soát",
+    "nameEn": "SPC In-Control Rate",
+    "category": "quality",
+    "formula": "spc_points_in_control / spc_points_total",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "spc_points_in_control",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "spc_points_total",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "spc_measurements"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_tool_life_compliance": {
+    "formulaId": "f_tool_life_compliance",
+    "name": "Tỷ lệ tuân thủ tuổi thọ dao",
+    "nameEn": "Tool Life Compliance",
+    "category": "manufacturing",
+    "formula": "tool_changes_before_limit / tool_changes_total",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "tool_changes_before_limit",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "tool_changes_total",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "tool_life_events"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_operator_qualification_coverage": {
+    "formulaId": "f_operator_qualification_coverage",
+    "name": "Bao phủ đủ điều kiện vận hành",
+    "nameEn": "Operator Qualification Coverage",
+    "category": "compliance",
+    "formula": "qualified_operators / required_operators",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "qualified_operators",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "required_operators",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "training_assignments"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_evidence_signature_rate": {
+    "formulaId": "f_evidence_signature_rate",
+    "name": "Tỷ lệ ký số bằng chứng",
+    "nameEn": "Evidence Digital Signature Rate",
+    "category": "compliance",
+    "formula": "signed_evidence_records / evidence_records_total",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "signed_evidence_records",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "evidence_records_total",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "evidence_records"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_hash_chain_integrity": {
+    "formulaId": "f_hash_chain_integrity",
+    "name": "Tỷ lệ toàn vẹn chuỗi băm",
+    "nameEn": "Hash Chain Integrity",
+    "category": "compliance",
+    "formula": "valid_hash_links / hash_links_total",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "valid_hash_links",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "hash_links_total",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "evidence_hash_chain"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_customer_source_approval_lead": {
+    "formulaId": "f_customer_source_approval_lead",
+    "name": "Tỷ lệ CSA đúng hạn",
+    "nameEn": "Customer Source Approval On-Time",
+    "category": "compliance",
+    "formula": "csa_completed_on_time / csa_requests_total",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "csa_completed_on_time",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "csa_requests_total",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "customer_source_approvals"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_nadcap_validity": {
+    "formulaId": "f_nadcap_validity",
+    "name": "Tỷ lệ chứng chỉ NADCAP còn hiệu lực",
+    "nameEn": "Valid NADCAP Certificate Rate",
+    "category": "compliance",
+    "formula": "valid_nadcap_certs / required_nadcap_certs",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "valid_nadcap_certs",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "required_nadcap_certs",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "special_process_certificates"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_ppap_approval_rate": {
+    "formulaId": "f_ppap_approval_rate",
+    "name": "Tỷ lệ phê duyệt PPAP",
+    "nameEn": "PPAP Approval Rate",
+    "category": "quality",
+    "formula": "ppap_approved / ppap_submitted",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "ppap_approved",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "ppap_submitted",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "ppap_submissions"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_customer_ote": {
+    "formulaId": "f_customer_ote",
+    "name": "Tỷ lệ giao đúng hẹn khách hàng",
+    "nameEn": "Customer On-Time Delivery",
+    "category": "logistics",
+    "formula": "on_time_shipments / total_shipments",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "on_time_shipments",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "total_shipments",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "shipments"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_supplier_ote": {
+    "formulaId": "f_supplier_ote",
+    "name": "Tỷ lệ giao đúng hẹn nhà cung cấp",
+    "nameEn": "Supplier On-Time Delivery",
+    "category": "supplier",
+    "formula": "supplier_on_time_shipments / supplier_shipments",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "supplier_on_time_shipments",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "supplier_shipments",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "po_receipts"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_inventory_accuracy": {
+    "formulaId": "f_inventory_accuracy",
+    "name": "Độ chính xác tồn kho",
+    "nameEn": "Inventory Accuracy",
+    "category": "logistics",
+    "formula": "counted_correct_items / counted_items",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "counted_correct_items",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "counted_items",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "inventory_counts"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_cycle_count_accuracy": {
+    "formulaId": "f_cycle_count_accuracy",
+    "name": "Độ chính xác cycle count",
+    "nameEn": "Cycle Count Accuracy",
+    "category": "logistics",
+    "formula": "accurate_cycle_count_items / cycle_count_items",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "accurate_cycle_count_items",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "cycle_count_items",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "inventory_counts"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_mrp_hit_rate": {
+    "formulaId": "f_mrp_hit_rate",
+    "name": "Tỷ lệ đáp ứng đề xuất MRP",
+    "nameEn": "MRP Suggestion Hit Rate",
+    "category": "planning",
+    "formula": "mrp_suggestions_executed / mrp_suggestions_total",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "mrp_suggestions_executed",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "mrp_suggestions_total",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "mrp_runs"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_capacity_overload_rate": {
+    "formulaId": "f_capacity_overload_rate",
+    "name": "Tỷ lệ quá tải năng lực",
+    "nameEn": "Capacity Overload Rate",
+    "category": "planning",
+    "formula": "overloaded_resources / scheduled_resources",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "overloaded_resources",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "scheduled_resources",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "capacity_plans"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_constraint_breach_rate": {
+    "formulaId": "f_constraint_breach_rate",
+    "name": "Tỷ lệ vi phạm ràng buộc",
+    "nameEn": "Constraint Breach Rate",
+    "category": "planning",
+    "formula": "constraint_breaches / scheduled_orders",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "constraint_breaches",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "scheduled_orders",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "constraint_sets"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_dispatch_adherence": {
+    "formulaId": "f_dispatch_adherence",
+    "name": "Tỷ lệ tuân thủ điều độ",
+    "nameEn": "Dispatch Adherence",
+    "category": "manufacturing",
+    "formula": "dispatch_orders_started_on_sequence / dispatch_orders_total",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "dispatch_orders_started_on_sequence",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "dispatch_orders_total",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "dispatch_targets"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_shift_handoff_completion": {
+    "formulaId": "f_shift_handoff_completion",
+    "name": "Tỷ lệ hoàn tất bàn giao ca",
+    "nameEn": "Shift Handoff Completion",
+    "category": "manufacturing",
+    "formula": "completed_shift_handoffs / scheduled_shift_handoffs",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "completed_shift_handoffs",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "scheduled_shift_handoffs",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "shift_handoffs"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_outside_process_ontime": {
+    "formulaId": "f_outside_process_ontime",
+    "name": "Tỷ lệ gia công ngoài đúng hạn",
+    "nameEn": "Outside Process On-Time",
+    "category": "supplier",
+    "formula": "outside_process_on_time / outside_process_orders",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "outside_process_on_time",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "outside_process_orders",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "outside_process_orders"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_outside_process_cert_complete": {
+    "formulaId": "f_outside_process_cert_complete",
+    "name": "Tỷ lệ đủ chứng chỉ gia công ngoài",
+    "nameEn": "Outside Process Certification Completeness",
+    "category": "supplier",
+    "formula": "outside_process_orders_with_certs / outside_process_orders",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "outside_process_orders_with_certs",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "outside_process_orders",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "outside_process_orders"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_costed_quote_hit_rate": {
+    "formulaId": "f_costed_quote_hit_rate",
+    "name": "Tỷ lệ báo giá có định giá đầy đủ",
+    "nameEn": "Quote Costing Completeness",
+    "category": "financial",
+    "formula": "quotes_costed / quotes_total",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "quotes_costed",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "quotes_total",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "quotes"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_quote_win_rate": {
+    "formulaId": "f_quote_win_rate",
+    "name": "Tỷ lệ thắng báo giá",
+    "nameEn": "Quote Win Rate",
+    "category": "financial",
+    "formula": "won_quotes / submitted_quotes",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "won_quotes",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "submitted_quotes",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "quotes"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_margin_realization": {
+    "formulaId": "f_margin_realization",
+    "name": "Tỷ lệ hiện thực biên lợi nhuận",
+    "nameEn": "Margin Realization",
+    "category": "financial",
+    "formula": "actual_margin / quoted_margin",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "actual_margin",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "quoted_margin",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "quotes",
+        "sales_orders"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_wip_turns": {
+    "formulaId": "f_wip_turns",
+    "name": "Số vòng quay WIP",
+    "nameEn": "WIP Turns",
+    "category": "financial",
+    "formula": "cogs / average_wip",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "cogs",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "average_wip",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "fin_journal_lines"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_fg_turns": {
+    "formulaId": "f_fg_turns",
+    "name": "Số vòng quay thành phẩm",
+    "nameEn": "Finished Goods Turns",
+    "category": "financial",
+    "formula": "cogs / average_fg_inventory",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "cogs",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "average_fg_inventory",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "fin_journal_lines"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_revenue_realization": {
+    "formulaId": "f_revenue_realization",
+    "name": "Tỷ lệ ghi nhận doanh thu",
+    "nameEn": "Revenue Realization",
+    "category": "financial",
+    "formula": "recognized_revenue / booked_revenue",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "recognized_revenue",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "booked_revenue",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "fin_journal_lines"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_material_trace_back_coverage": {
+    "formulaId": "f_material_trace_back_coverage",
+    "name": "Bao phủ truy ngược vật liệu",
+    "nameEn": "Material Trace Back Coverage",
+    "category": "traceability",
+    "formula": "lots_with_parent_trace / produced_lots",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "lots_with_parent_trace",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "produced_lots",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "mfg_lot_transactions"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_material_trace_forward_coverage": {
+    "formulaId": "f_material_trace_forward_coverage",
+    "name": "Bao phủ truy xuôi vật liệu",
+    "nameEn": "Material Trace Forward Coverage",
+    "category": "traceability",
+    "formula": "lots_with_child_trace / received_lots",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "lots_with_child_trace",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "received_lots",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "mfg_lot_transactions"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_serial_traceability_coverage": {
+    "formulaId": "f_serial_traceability_coverage",
+    "name": "Bao phủ truy xuất sê-ri",
+    "nameEn": "Serial Traceability Coverage",
+    "category": "traceability",
+    "formula": "serials_fully_traced / serials_total",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "serials_fully_traced",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "serials_total",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "serial_genealogy"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_genealogy_resolution_time": {
+    "formulaId": "f_genealogy_resolution_time",
+    "name": "Tỷ lệ điều tra genealogy đúng SLA",
+    "nameEn": "Genealogy Resolution On-Time",
+    "category": "traceability",
+    "formula": "genealogy_requests_on_time / genealogy_requests_total",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "genealogy_requests_on_time",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "genealogy_requests_total",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "trace_requests"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_capa_effectiveness_pass": {
+    "formulaId": "f_capa_effectiveness_pass",
+    "name": "Tỷ lệ CAPA đạt hiệu lực",
+    "nameEn": "CAPA Effectiveness Pass Rate",
+    "category": "quality",
+    "formula": "capa_effective / capa_effectiveness_reviews",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "capa_effective",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "capa_effectiveness_reviews",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "qm_capas"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_ncr_escape_rate": {
+    "formulaId": "f_ncr_escape_rate",
+    "name": "Tỷ lệ lọt lỗi",
+    "nameEn": "Defect Escape Rate",
+    "category": "quality",
+    "formula": "escaped_defects / total_defects",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "escaped_defects",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "total_defects",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "qm_ncrs"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_complaint_recurrence_rate": {
+    "formulaId": "f_complaint_recurrence_rate",
+    "name": "Tỷ lệ tái diễn khiếu nại",
+    "nameEn": "Complaint Recurrence Rate",
+    "category": "quality",
+    "formula": "repeat_complaints / total_complaints",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "repeat_complaints",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "total_complaints",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "customer_complaints"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_deviation_approval_rate": {
+    "formulaId": "f_deviation_approval_rate",
+    "name": "Tỷ lệ phê duyệt miễn trừ",
+    "nameEn": "Deviation Approval Rate",
+    "category": "compliance",
+    "formula": "approved_deviations / submitted_deviations",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "approved_deviations",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "submitted_deviations",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "deviations"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_document_revision_ontime": {
+    "formulaId": "f_document_revision_ontime",
+    "name": "Tỷ lệ revision tài liệu đúng hạn",
+    "nameEn": "Document Revision On-Time",
+    "category": "compliance",
+    "formula": "revisions_on_time / revisions_due",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "revisions_on_time",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "revisions_due",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "documents"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_permission_review_completion": {
+    "formulaId": "f_permission_review_completion",
+    "name": "Tỷ lệ rà soát phân quyền",
+    "nameEn": "Permission Review Completion",
+    "category": "administrative",
+    "formula": "permission_reviews_done / permission_reviews_due",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "permission_reviews_done",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "permission_reviews_due",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "permission_reviews"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_integration_sync_success": {
+    "formulaId": "f_integration_sync_success",
+    "name": "Tỷ lệ đồng bộ tích hợp thành công",
+    "nameEn": "Integration Sync Success Rate",
+    "category": "administrative",
+    "formula": "successful_sync_runs / sync_runs_total",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "successful_sync_runs",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "sync_runs_total",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "integration_runs"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_integration_reconciliation_resolution": {
+    "formulaId": "f_integration_reconciliation_resolution",
+    "name": "Tỷ lệ xử lý ngoại lệ tích hợp",
+    "nameEn": "Integration Exception Resolution Rate",
+    "category": "administrative",
+    "formula": "integration_exceptions_resolved / integration_exceptions_total",
+    "variables": [
+      {
+        "name": "numerator",
+        "formula": "integration_exceptions_resolved",
+        "unit": "number"
+      },
+      {
+        "name": "denominator",
+        "formula": "integration_exceptions_total",
+        "unit": "number"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 95,
+      "minimum": 85
+    },
+    "dataSource": {
+      "tables": [
+        "integration_runs"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_oee": {
+    "formulaId": "f_oee",
+    "name": "OEE - Hiệu suất thiết bị tổng thể",
+    "nameEn": "Overall Equipment Effectiveness",
+    "category": "manufacturing",
+    "formula": "availability * performance * quality_rate",
+    "variables": [
+      {
+        "name": "availability",
+        "formula": "(planned_time - downtime) / planned_time",
+        "unit": "ratio"
+      },
+      {
+        "name": "performance",
+        "formula": "actual_output / (planned_time / ideal_cycle_time)",
+        "unit": "ratio"
+      },
+      {
+        "name": "quality_rate",
+        "formula": "good_parts / total_parts",
+        "unit": "ratio"
+      }
+    ],
+    "unit": "percentage",
+    "target": {
+      "worldClass": 85,
+      "minimum": 60
+    },
+    "dataSource": {
+      "tables": [
+        "mes_machine_metrics",
+        "prd_work_orders"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_copq": {
+    "formulaId": "f_copq",
+    "name": "COPQ - Chi phí chất lượng kém",
+    "nameEn": "Cost of Poor Quality",
+    "category": "quality",
+    "formula": "scrap_cost + rework_cost + warranty_cost + inspection_cost + containment_cost",
+    "variables": [
+      {
+        "name": "scrap_cost",
+        "formula": "SUM(scrap_cost)",
+        "unit": "currency"
+      },
+      {
+        "name": "rework_cost",
+        "formula": "SUM(rework_cost)",
+        "unit": "currency"
+      },
+      {
+        "name": "warranty_cost",
+        "formula": "SUM(warranty_cost)",
+        "unit": "currency"
+      },
+      {
+        "name": "inspection_cost",
+        "formula": "SUM(inspection_cost)",
+        "unit": "currency"
+      },
+      {
+        "name": "containment_cost",
+        "formula": "SUM(containment_cost)",
+        "unit": "currency"
+      }
+    ],
+    "unit": "currency",
+    "target": {
+      "worldClass": 0.5,
+      "minimum": 3
+    },
+    "dataSource": {
+      "tables": [
+        "qm_ncrs",
+        "qm_capa_actions",
+        "fin_journal_lines"
+      ],
+      "refreshInterval": "15m"
+    }
+  },
+  "f_buy_to_fly_ratio": {
+    "formulaId": "f_buy_to_fly_ratio",
+    "name": "Tỷ lệ buy-to-fly",
+    "nameEn": "Buy-to-Fly Ratio",
+    "category": "manufacturing",
+    "formula": "billet_weight_kg / finished_weight_kg",
+    "variables": [
+      {
+        "name": "billet_weight_kg",
+        "formula": "SUM(billet_weight_kg)",
+        "unit": "kg"
+      },
+      {
+        "name": "finished_weight_kg",
+        "formula": "SUM(finished_weight_kg)",
+        "unit": "kg"
+      }
+    ],
+    "unit": "ratio",
+    "target": {
+      "worldClass": 1.2,
+      "minimum": 3.5
+    },
+    "dataSource": {
+      "tables": [
+        "quote_estimations",
+        "prd_work_orders"
+      ],
+      "refreshInterval": "15m"
+    }
   }
 }

@@ -1,283 +1,5417 @@
 {
   "_meta": {
-    "version": "2.0",
-    "description": "Cross-module workflow blueprints linking status models, endpoints, and KPI formulas.",
-    "generatedAt": "2026-04-02T06:00:20.356Z",
-    "workflowCount": 8
+    "version": "3.0",
+    "description": "Cross-module workflow blueprints for ERP / MES / QMS digital thread orchestration.",
+    "generatedAt": "2026-04-02T09:02:28.221Z",
+    "workflowCount": 25
   },
   "workflows": {
-    "quote_to_cash": {
-      "key": "quote_to_cash",
-      "label": "Quote To Cash",
-      "description": "Commercial flow from RFQ capture to quote, sales order, release, packing, and delivery confirmation.",
-      "domains": [
-        "commercial",
-        "planning",
-        "shipping"
+    "wf_quote_lifecycle": {
+      "workflowId": "wf_quote_lifecycle",
+      "name": "Vòng đời báo giá",
+      "nameEn": "Quote Lifecycle",
+      "entity": "quote",
+      "standard": "internal",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "review",
+          "label": "Xem xét",
+          "labelEn": "Review",
+          "color": "#3b82f6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "sent",
+          "label": "Đã gửi",
+          "labelEn": "Sent",
+          "color": "#8b5cf6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "won",
+          "label": "Thắng",
+          "labelEn": "Won",
+          "color": "#10b981",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "lost",
+          "label": "Thua",
+          "labelEn": "Lost",
+          "color": "#ef4444",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "expired",
+          "label": "Hết hạn",
+          "labelEn": "Expired",
+          "color": "#f59e0b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        }
       ],
-      "entities": [
-        "quote",
-        "sales_order",
-        "dispatch_target",
-        "packing_list",
-        "delivery"
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "review",
+          "trigger": "submit",
+          "label": "Gửi xem xét",
+          "labelEn": "Submit for Review",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_quote_lifecycle_submit"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Vòng đời báo giá - Gửi xem xét"
+            }
+          ]
+        },
+        {
+          "from": "review",
+          "to": "sent",
+          "trigger": "send",
+          "label": "Gửi khách hàng",
+          "labelEn": "Send to Customer",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_quote_lifecycle_send"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Vòng đời báo giá - Gửi khách hàng"
+            }
+          ]
+        },
+        {
+          "from": "sent",
+          "to": "won",
+          "trigger": "award",
+          "label": "Trúng báo giá",
+          "labelEn": "Award Quote",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_quote_lifecycle_award"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Vòng đời báo giá - Trúng báo giá"
+            }
+          ]
+        },
+        {
+          "from": "sent",
+          "to": "lost",
+          "trigger": "lose",
+          "label": "Mất báo giá",
+          "labelEn": "Lose Quote",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_quote_lifecycle_lose"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Vòng đời báo giá - Mất báo giá"
+            }
+          ]
+        },
+        {
+          "from": "sent",
+          "to": "expired",
+          "trigger": "expire",
+          "label": "Hết hạn",
+          "labelEn": "Expire",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_quote_lifecycle_expire"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Vòng đời báo giá - Hết hạn"
+            }
+          ]
+        }
       ],
-      "statusRefs": [
-        "quote_status",
-        "so_status",
-        "fulfillment_status",
-        "contract_review_status"
-      ],
-      "endpoints": [
-        "quote_list",
-        "quote_create",
-        "quote_transition",
-        "quote_convert_to_so",
-        "order_so_list",
-        "dispatch_dashboard",
-        "packing_list",
-        "delivery_confirm"
-      ],
-      "kpis": [
-        "quote_total",
-        "lead_time_days",
-        "on_time_delivery_pct"
-      ]
+      "sla": {
+        "draft_to_review": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "review_to_sent": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "sent_to_won": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "sent_to_lost": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "sent_to_expired": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "customer_rfq_received"
+        ],
+        "downstreamEffects": [
+          "sales_order_create",
+          "cost_baseline_lock"
+        ]
+      }
     },
-    "plan_to_produce": {
-      "key": "plan_to_produce",
-      "label": "Plan To Produce",
-      "description": "Job and work order planning, schedule slot management, dispatch, execution, and machine reporting.",
-      "domains": [
-        "planning",
-        "production",
-        "mes"
+    "wf_sales_order": {
+      "workflowId": "wf_sales_order",
+      "name": "Thực hiện đơn hàng bán",
+      "nameEn": "Sales Order Fulfillment",
+      "entity": "sales_order",
+      "standard": "internal",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "confirmed",
+          "label": "Đã xác nhận",
+          "labelEn": "Confirmed",
+          "color": "#3b82f6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "engineering_ready",
+          "label": "Sẵn sàng kỹ thuật",
+          "labelEn": "Engineering Ready",
+          "color": "#8b5cf6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "in_production",
+          "label": "Đang sản xuất",
+          "labelEn": "In Production",
+          "color": "#f59e0b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "shipped",
+          "label": "Đã giao",
+          "labelEn": "Shipped",
+          "color": "#10b981",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#64748b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        }
       ],
-      "entities": [
-        "job_order",
-        "work_order",
-        "schedule_slot",
-        "dispatch_target",
-        "mobile_queue"
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "confirmed",
+          "trigger": "confirm",
+          "label": "Xác nhận",
+          "labelEn": "Confirm",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_sales_order_confirm"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Thực hiện đơn hàng bán - Xác nhận"
+            }
+          ]
+        },
+        {
+          "from": "confirmed",
+          "to": "engineering_ready",
+          "trigger": "release_engineering",
+          "label": "Nhả kỹ thuật",
+          "labelEn": "Release Engineering",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_sales_order_release_engineering"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Thực hiện đơn hàng bán - Nhả kỹ thuật"
+            }
+          ]
+        },
+        {
+          "from": "engineering_ready",
+          "to": "in_production",
+          "trigger": "launch",
+          "label": "Khởi chạy",
+          "labelEn": "Launch",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_sales_order_launch"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Thực hiện đơn hàng bán - Khởi chạy"
+            }
+          ]
+        },
+        {
+          "from": "in_production",
+          "to": "shipped",
+          "trigger": "ship",
+          "label": "Giao hàng",
+          "labelEn": "Ship",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_sales_order_ship"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Thực hiện đơn hàng bán - Giao hàng"
+            }
+          ]
+        },
+        {
+          "from": "shipped",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đóng đơn",
+          "labelEn": "Close Order",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_sales_order_close"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Thực hiện đơn hàng bán - Đóng đơn"
+            }
+          ]
+        }
       ],
-      "statusRefs": [
-        "jo_status",
-        "wo_status",
-        "fulfillment_status",
-        "schedule_conflict_status"
-      ],
-      "endpoints": [
-        "order_jo_list",
-        "order_wo_list",
-        "schedule_get",
-        "schedule_slot_create",
-        "dispatch_list_targets",
-        "dispatch_report_production"
-      ],
-      "kpis": [
-        "cycle_time_total",
-        "schedule_adherence_pct",
-        "machine_utilization_pct"
-      ]
+      "sla": {
+        "draft_to_confirmed": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "confirmed_to_engineering_ready": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "engineering_ready_to_in_production": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "in_production_to_shipped": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "shipped_to_closed": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "quote_awarded"
+        ],
+        "downstreamEffects": [
+          "job_order_create",
+          "shipment_release"
+        ]
+      }
     },
-    "supplier_quality": {
-      "key": "supplier_quality",
-      "label": "Supplier Quality",
-      "description": "Receiving inspection, skip lot governance, ASL management, SCAR handling, and supplier audits.",
-      "domains": [
-        "supplier",
-        "quality",
-        "audit"
+    "wf_job_order": {
+      "workflowId": "wf_job_order",
+      "name": "Lệnh công việc",
+      "nameEn": "Job Order Lifecycle",
+      "entity": "job_order",
+      "standard": "internal",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "planned",
+          "label": "Kế hoạch",
+          "labelEn": "Planned",
+          "color": "#3b82f6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "released",
+          "label": "Đã phát hành",
+          "labelEn": "Released",
+          "color": "#8b5cf6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "active",
+          "label": "Đang chạy",
+          "labelEn": "Active",
+          "color": "#f59e0b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "completed",
+          "label": "Hoàn thành",
+          "labelEn": "Completed",
+          "color": "#10b981",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#64748b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        }
       ],
-      "entities": [
-        "incoming_inspection",
-        "skip_lot",
-        "asl_entry",
-        "scar",
-        "supplier_audit"
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "planned",
+          "trigger": "plan",
+          "label": "Lập kế hoạch",
+          "labelEn": "Plan",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_job_order_plan"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Lệnh công việc - Lập kế hoạch"
+            }
+          ]
+        },
+        {
+          "from": "planned",
+          "to": "released",
+          "trigger": "release",
+          "label": "Phát hành",
+          "labelEn": "Release",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_job_order_release"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Lệnh công việc - Phát hành"
+            }
+          ]
+        },
+        {
+          "from": "released",
+          "to": "active",
+          "trigger": "start",
+          "label": "Bắt đầu",
+          "labelEn": "Start",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_job_order_start"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Lệnh công việc - Bắt đầu"
+            }
+          ]
+        },
+        {
+          "from": "active",
+          "to": "completed",
+          "trigger": "complete",
+          "label": "Hoàn thành",
+          "labelEn": "Complete",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_job_order_complete"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Lệnh công việc - Hoàn thành"
+            }
+          ]
+        },
+        {
+          "from": "completed",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đóng",
+          "labelEn": "Close",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_job_order_close"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Lệnh công việc - Đóng"
+            }
+          ]
+        }
       ],
-      "statusRefs": [
-        "iqc_result",
-        "skip_lot_level",
-        "scar_status",
-        "audit_finding_type"
-      ],
-      "endpoints": [
-        "supplier_incoming_list",
-        "supplier_incoming_create",
-        "supplier_skip_lot_status",
-        "supplier_asl_list",
-        "supplier_scar_list",
-        "supplier_audit_list"
-      ],
-      "kpis": [
-        "supplier_score",
-        "incoming_acceptance_rate",
-        "scar_closure_pct"
-      ]
+      "sla": {
+        "draft_to_planned": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "planned_to_released": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "released_to_active": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "active_to_completed": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "completed_to_closed": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "sales_order_confirmed"
+        ],
+        "downstreamEffects": [
+          "work_order_create",
+          "mrp_reservation"
+        ]
+      }
     },
-    "ncr_to_capa": {
-      "key": "ncr_to_capa",
-      "label": "NCR To CAPA",
-      "description": "Nonconformance intake, material review, 8D, corrective action, and closure effectiveness.",
-      "domains": [
-        "quality",
-        "risk",
-        "improvement"
+    "wf_work_order_execution": {
+      "workflowId": "wf_work_order_execution",
+      "name": "Thực thi WO",
+      "nameEn": "Work Order Execution",
+      "entity": "work_order",
+      "standard": "ISA-95 / internal",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "planned",
+          "label": "Đã lập kế hoạch",
+          "labelEn": "Planned",
+          "color": "#3b82f6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "released",
+          "label": "Đã phát hành",
+          "labelEn": "Released",
+          "color": "#8b5cf6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "in_production",
+          "label": "Đang sản xuất",
+          "labelEn": "In Production",
+          "color": "#f59e0b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "quality_hold",
+          "label": "Giữ chất lượng",
+          "labelEn": "Quality Hold",
+          "color": "#ef4444",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#10b981",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "cancelled",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "color": "#64748b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        }
       ],
-      "entities": [
-        "ncr_record",
-        "mrb_disposition",
-        "eight_d",
-        "capa_record"
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "planned",
+          "trigger": "plan",
+          "label": "Lập kế hoạch",
+          "labelEn": "Plan",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_work_order_execution_plan"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Thực thi WO - Lập kế hoạch"
+            }
+          ]
+        },
+        {
+          "from": "planned",
+          "to": "released",
+          "trigger": "release",
+          "label": "Phát hành",
+          "labelEn": "Release",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_work_order_execution_release"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Thực thi WO - Phát hành"
+            }
+          ]
+        },
+        {
+          "from": "released",
+          "to": "in_production",
+          "trigger": "start",
+          "label": "Bắt đầu",
+          "labelEn": "Start Production",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_work_order_execution_start"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Thực thi WO - Bắt đầu"
+            }
+          ]
+        },
+        {
+          "from": "in_production",
+          "to": "quality_hold",
+          "trigger": "hold",
+          "label": "Giữ chất lượng",
+          "labelEn": "Quality Hold",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_work_order_execution_hold"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Thực thi WO - Giữ chất lượng"
+            }
+          ]
+        },
+        {
+          "from": "quality_hold",
+          "to": "in_production",
+          "trigger": "release_hold",
+          "label": "Nhả giữ",
+          "labelEn": "Release Hold",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_work_order_execution_release_hold"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Thực thi WO - Nhả giữ"
+            }
+          ]
+        },
+        {
+          "from": "in_production",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đóng WO",
+          "labelEn": "Close WO",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_work_order_execution_close"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Thực thi WO - Đóng WO"
+            }
+          ]
+        }
       ],
-      "statusRefs": [
-        "ncr_status",
-        "disposition",
-        "action_priority",
-        "severity"
-      ],
-      "endpoints": [
-        "quality_exception_list",
-        "quality_exception_create",
-        "quality_exception_mrb_disposition",
-        "quality_exception_save_8d",
-        "quality_exception_transition"
-      ],
-      "kpis": [
-        "closure_aging_days",
-        "copq_total",
-        "defect_escape_rate"
-      ]
+      "sla": {
+        "draft_to_planned": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "planned_to_released": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "released_to_in_production": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "in_production_to_quality_hold": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "quality_hold_to_in_production": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "in_production_to_closed": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "job_order_released",
+          "material_reserved"
+        ],
+        "downstreamEffects": [
+          "lot_trace_record",
+          "fai_trigger",
+          "ncr_auto_create"
+        ]
+      }
     },
-    "apqp_ppap_launch": {
-      "key": "apqp_ppap_launch",
-      "label": "APQP And PPAP Launch",
-      "description": "Launch readiness workflow covering APQP phases, FMEA, control plans, and PPAP evidence gates.",
-      "domains": [
-        "engineering",
-        "quality",
-        "program_management"
+    "wf_purchase_order": {
+      "workflowId": "wf_purchase_order",
+      "name": "Đơn mua hàng",
+      "nameEn": "Purchase Order Lifecycle",
+      "entity": "purchase_order",
+      "standard": "internal",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "pending_approval",
+          "label": "Chờ phê duyệt",
+          "labelEn": "Pending Approval",
+          "color": "#f59e0b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "approved",
+          "label": "Đã phê duyệt",
+          "labelEn": "Approved",
+          "color": "#3b82f6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "released",
+          "label": "Đã phát hành",
+          "labelEn": "Released",
+          "color": "#8b5cf6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "partial",
+          "label": "Nhận một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "received",
+          "label": "Đã nhận",
+          "labelEn": "Received",
+          "color": "#10b981",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#64748b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        }
       ],
-      "entities": [
-        "apqp_project",
-        "pfmea",
-        "control_plan",
-        "ppap_submission"
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "pending_approval",
+          "trigger": "submit",
+          "label": "Gửi phê duyệt",
+          "labelEn": "Submit",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_purchase_order_submit"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Đơn mua hàng - Gửi phê duyệt"
+            }
+          ]
+        },
+        {
+          "from": "pending_approval",
+          "to": "approved",
+          "trigger": "approve",
+          "label": "Phê duyệt",
+          "labelEn": "Approve",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_purchase_order_approve"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Đơn mua hàng - Phê duyệt"
+            }
+          ]
+        },
+        {
+          "from": "approved",
+          "to": "released",
+          "trigger": "release",
+          "label": "Phát hành",
+          "labelEn": "Release",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_purchase_order_release"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Đơn mua hàng - Phát hành"
+            }
+          ]
+        },
+        {
+          "from": "released",
+          "to": "partial",
+          "trigger": "receive_partial",
+          "label": "Nhận một phần",
+          "labelEn": "Receive Partial",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_purchase_order_receive_partial"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Đơn mua hàng - Nhận một phần"
+            }
+          ]
+        },
+        {
+          "from": "released",
+          "to": "received",
+          "trigger": "receive_full",
+          "label": "Nhận đủ",
+          "labelEn": "Receive Full",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_purchase_order_receive_full"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Đơn mua hàng - Nhận đủ"
+            }
+          ]
+        },
+        {
+          "from": "received",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đóng",
+          "labelEn": "Close",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_purchase_order_close"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Đơn mua hàng - Đóng"
+            }
+          ]
+        }
       ],
-      "statusRefs": [
-        "apqp_phase",
-        "apqp_gate_status",
-        "ppap_status",
-        "action_priority"
-      ],
-      "endpoints": [
-        "apqp_dashboard",
-        "apqp_project_list",
-        "fmea_list",
-        "cp_detail",
-        "ppap_create"
-      ],
-      "kpis": [
-        "ppap_completeness_pct",
-        "first_article_completion_pct",
-        "traceability_completeness_pct"
-      ]
+      "sla": {
+        "draft_to_pending_approval": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "pending_approval_to_approved": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "approved_to_released": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "released_to_partial": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "released_to_received": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "received_to_closed": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "mrp_purchase_suggestion"
+        ],
+        "downstreamEffects": [
+          "goods_receipt_create",
+          "supplier_otif_update"
+        ]
+      }
     },
-    "documented_information": {
-      "key": "documented_information",
-      "label": "Documented Information",
-      "description": "Controlled documents, revisions, form schemas, record IDs, and knowledge articles.",
-      "domains": [
-        "document_control",
-        "records",
-        "training"
+    "wf_receiving_inspection": {
+      "workflowId": "wf_receiving_inspection",
+      "name": "Kiểm tra đầu vào",
+      "nameEn": "Receiving Inspection",
+      "entity": "receiving_inspection",
+      "standard": "AS9100D §8.4",
+      "states": [
+        {
+          "id": "queued",
+          "label": "Chờ kiểm tra",
+          "labelEn": "Queued",
+          "color": "#3b82f6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "in_progress",
+          "label": "Đang kiểm tra",
+          "labelEn": "In Progress",
+          "color": "#f59e0b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "accepted",
+          "label": "Đạt",
+          "labelEn": "Accepted",
+          "color": "#10b981",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "rejected",
+          "label": "Không đạt",
+          "labelEn": "Rejected",
+          "color": "#ef4444",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "waived",
+          "label": "Miễn kiểm",
+          "labelEn": "Waived",
+          "color": "#8b5cf6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        }
       ],
-      "entities": [
-        "document",
-        "document_revision",
-        "online_form",
-        "record_id",
-        "knowledge_article"
+      "transitions": [
+        {
+          "from": "queued",
+          "to": "in_progress",
+          "trigger": "start",
+          "label": "Bắt đầu",
+          "labelEn": "Start",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_receiving_inspection_start"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Kiểm tra đầu vào - Bắt đầu"
+            }
+          ]
+        },
+        {
+          "from": "in_progress",
+          "to": "accepted",
+          "trigger": "accept",
+          "label": "Chấp nhận",
+          "labelEn": "Accept",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_receiving_inspection_accept"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Kiểm tra đầu vào - Chấp nhận"
+            }
+          ]
+        },
+        {
+          "from": "in_progress",
+          "to": "rejected",
+          "trigger": "reject",
+          "label": "Từ chối",
+          "labelEn": "Reject",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_receiving_inspection_reject"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Kiểm tra đầu vào - Từ chối"
+            }
+          ]
+        },
+        {
+          "from": "queued",
+          "to": "waived",
+          "trigger": "waive",
+          "label": "Miễn kiểm",
+          "labelEn": "Waive",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_receiving_inspection_waive"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Kiểm tra đầu vào - Miễn kiểm"
+            }
+          ]
+        }
       ],
-      "statusRefs": [
-        "doc_status",
-        "master_data_status"
-      ],
-      "endpoints": [
-        "doc_create",
-        "doc_versions_list",
-        "online_form_list",
-        "record_id_next",
-        "knowledge_list"
-      ],
-      "kpis": [
-        "audit_closure_rate",
-        "traceability_completeness_pct"
-      ]
+      "sla": {
+        "queued_to_in_progress": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "in_progress_to_accepted": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "in_progress_to_rejected": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "queued_to_waived": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "goods_receipt_posted"
+        ],
+        "downstreamEffects": [
+          "inventory_release",
+          "ncr_auto_create"
+        ]
+      }
     },
-    "digital_thread_traceability": {
-      "key": "digital_thread_traceability",
-      "label": "Digital Thread Traceability",
-      "description": "Lot, serial, material cert, process event, and shipment trace continuity into product passport artifacts.",
-      "domains": [
-        "traceability",
-        "compliance",
-        "shipping"
+    "wf_supplier_qualification": {
+      "workflowId": "wf_supplier_qualification",
+      "name": "Phê duyệt nhà cung cấp",
+      "nameEn": "Supplier Qualification",
+      "entity": "supplier",
+      "standard": "AS9100D §8.4",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "assessment",
+          "label": "Đánh giá",
+          "labelEn": "Assessment",
+          "color": "#3b82f6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "approved",
+          "label": "Đã phê duyệt",
+          "labelEn": "Approved",
+          "color": "#10b981",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "conditional",
+          "label": "Có điều kiện",
+          "labelEn": "Conditional",
+          "color": "#f59e0b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "hold",
+          "label": "Tạm dừng",
+          "labelEn": "Hold",
+          "color": "#ef4444",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "inactive",
+          "label": "Ngưng hoạt động",
+          "labelEn": "Inactive",
+          "color": "#64748b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        }
       ],
-      "entities": [
-        "lot",
-        "serial",
-        "certificate",
-        "passport",
-        "shipment"
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "assessment",
+          "trigger": "assess",
+          "label": "Đánh giá",
+          "labelEn": "Assess",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_supplier_qualification_assess"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Phê duyệt nhà cung cấp - Đánh giá"
+            }
+          ]
+        },
+        {
+          "from": "assessment",
+          "to": "approved",
+          "trigger": "approve",
+          "label": "Phê duyệt",
+          "labelEn": "Approve",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_supplier_qualification_approve"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Phê duyệt nhà cung cấp - Phê duyệt"
+            }
+          ]
+        },
+        {
+          "from": "assessment",
+          "to": "conditional",
+          "trigger": "conditional_approve",
+          "label": "Duyệt có điều kiện",
+          "labelEn": "Conditional Approve",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_supplier_qualification_conditional_approve"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Phê duyệt nhà cung cấp - Duyệt có điều kiện"
+            }
+          ]
+        },
+        {
+          "from": "approved",
+          "to": "hold",
+          "trigger": "hold",
+          "label": "Tạm dừng",
+          "labelEn": "Hold",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_supplier_qualification_hold"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Phê duyệt nhà cung cấp - Tạm dừng"
+            }
+          ]
+        },
+        {
+          "from": "hold",
+          "to": "approved",
+          "trigger": "reactivate",
+          "label": "Kích hoạt lại",
+          "labelEn": "Reactivate",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_supplier_qualification_reactivate"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Phê duyệt nhà cung cấp - Kích hoạt lại"
+            }
+          ]
+        }
       ],
-      "statusRefs": [
-        "passport_event_type",
-        "export_control",
-        "evidence_status"
-      ],
-      "endpoints": [
-        "product_passport_list",
-        "product_passport_add_event",
-        "product_passport_trace",
-        "compliance_report_evidence_package"
-      ],
-      "kpis": [
-        "traceability_completeness_pct",
-        "carbon_per_part"
-      ]
+      "sla": {
+        "draft_to_assessment": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "assessment_to_approved": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "assessment_to_conditional": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "approved_to_hold": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "hold_to_approved": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "supplier_created"
+        ],
+        "downstreamEffects": [
+          "asl_entry_create",
+          "supplier_scorecard_update"
+        ]
+      }
     },
-    "cnc_program_release": {
-      "key": "cnc_program_release",
-      "label": "CNC Program Release",
-      "description": "Program authoring, setup sheets, revision approvals, and controlled NC release to the shop floor.",
-      "domains": [
-        "engineering",
-        "production",
-        "document_control"
+    "wf_ncr": {
+      "workflowId": "wf_ncr",
+      "name": "Xử lý NCR",
+      "nameEn": "NCR Processing",
+      "entity": "ncr",
+      "standard": "AS9100D §10.2",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "submitted",
+          "label": "Đã gửi",
+          "labelEn": "Submitted",
+          "color": "#3b82f6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "under_review",
+          "label": "Đang xem xét",
+          "labelEn": "Under Review",
+          "color": "#f59e0b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "disposition_set",
+          "label": "Đã xác lập xử lý",
+          "labelEn": "Disposition Set",
+          "color": "#8b5cf6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "containment_active",
+          "label": "Đang ngăn chặn",
+          "labelEn": "Containment Active",
+          "color": "#f59e0b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "close_requested",
+          "label": "Yêu cầu đóng",
+          "labelEn": "Close Requested",
+          "color": "#3b82f6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#10b981",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        }
       ],
-      "entities": [
-        "cnc_program",
-        "program_version",
-        "setup_sheet",
-        "approval"
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "submitted",
+          "trigger": "submit",
+          "label": "Gửi duyệt",
+          "labelEn": "Submit",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_ncr_submit"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Xử lý NCR - Gửi duyệt"
+            }
+          ]
+        },
+        {
+          "from": "submitted",
+          "to": "under_review",
+          "trigger": "assign_review",
+          "label": "Phân công xem xét",
+          "labelEn": "Assign Review",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_ncr_assign_review"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Xử lý NCR - Phân công xem xét"
+            }
+          ]
+        },
+        {
+          "from": "under_review",
+          "to": "disposition_set",
+          "trigger": "set_disposition",
+          "label": "Xác lập xử lý",
+          "labelEn": "Set Disposition",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_ncr_set_disposition"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Xử lý NCR - Xác lập xử lý"
+            }
+          ]
+        },
+        {
+          "from": "disposition_set",
+          "to": "containment_active",
+          "trigger": "start_containment",
+          "label": "Bắt đầu ngăn chặn",
+          "labelEn": "Start Containment",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_ncr_start_containment"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Xử lý NCR - Bắt đầu ngăn chặn"
+            }
+          ]
+        },
+        {
+          "from": "containment_active",
+          "to": "close_requested",
+          "trigger": "request_close",
+          "label": "Yêu cầu đóng",
+          "labelEn": "Request Close",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_ncr_request_close"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Xử lý NCR - Yêu cầu đóng"
+            }
+          ]
+        },
+        {
+          "from": "close_requested",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đóng NCR",
+          "labelEn": "Close NCR",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_ncr_close"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Xử lý NCR - Đóng NCR"
+            }
+          ]
+        }
       ],
-      "statusRefs": [
-        "program_approval_status",
-        "doc_status"
+      "sla": {
+        "draft_to_submitted": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "submitted_to_under_review": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "under_review_to_disposition_set": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "disposition_set_to_containment_active": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "containment_active_to_close_requested": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "close_requested_to_closed": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "wo_defect_found",
+          "receiving_inspection_fail",
+          "customer_complaint"
+        ],
+        "downstreamEffects": [
+          "lot_quarantine",
+          "capa_auto_create",
+          "supplier_scorecard_deduct"
+        ]
+      }
+    },
+    "wf_capa": {
+      "workflowId": "wf_capa",
+      "name": "Xử lý CAPA",
+      "nameEn": "CAPA Lifecycle",
+      "entity": "capa",
+      "standard": "AS9100D §10.2 / ISO 13485",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "initiated",
+          "label": "Khởi tạo",
+          "labelEn": "Initiated",
+          "color": "#3b82f6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "action_planning",
+          "label": "Lập kế hoạch hành động",
+          "labelEn": "Action Planning",
+          "color": "#f59e0b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "implementation",
+          "label": "Triển khai",
+          "labelEn": "Implementation",
+          "color": "#8b5cf6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "effectiveness_review",
+          "label": "Đánh giá hiệu lực",
+          "labelEn": "Effectiveness Review",
+          "color": "#3b82f6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#10b981",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        }
       ],
-      "endpoints": [
-        "cnc_program_list",
-        "cnc_program_create",
-        "cnc_program_upload_version",
-        "cnc_program_approve",
-        "cnc_program_setup_create"
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "initiated",
+          "trigger": "initiate",
+          "label": "Khởi tạo",
+          "labelEn": "Initiate",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_capa_initiate"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Xử lý CAPA - Khởi tạo"
+            }
+          ]
+        },
+        {
+          "from": "initiated",
+          "to": "action_planning",
+          "trigger": "plan",
+          "label": "Lập kế hoạch",
+          "labelEn": "Plan",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_capa_plan"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Xử lý CAPA - Lập kế hoạch"
+            }
+          ]
+        },
+        {
+          "from": "action_planning",
+          "to": "implementation",
+          "trigger": "implement",
+          "label": "Triển khai",
+          "labelEn": "Implement",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_capa_implement"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Xử lý CAPA - Triển khai"
+            }
+          ]
+        },
+        {
+          "from": "implementation",
+          "to": "effectiveness_review",
+          "trigger": "review",
+          "label": "Đánh giá hiệu lực",
+          "labelEn": "Review",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_capa_review"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Xử lý CAPA - Đánh giá hiệu lực"
+            }
+          ]
+        },
+        {
+          "from": "effectiveness_review",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đóng CAPA",
+          "labelEn": "Close CAPA",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_capa_close"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Xử lý CAPA - Đóng CAPA"
+            }
+          ]
+        }
       ],
-      "kpis": [
-        "runtime_variance_pct",
-        "machine_utilization_pct"
-      ]
+      "sla": {
+        "draft_to_initiated": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "initiated_to_action_planning": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "action_planning_to_implementation": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "implementation_to_effectiveness_review": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "effectiveness_review_to_closed": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "ncr_escalated",
+          "audit_major_finding",
+          "customer_complaint_8d"
+        ],
+        "downstreamEffects": [
+          "training_update",
+          "control_plan_update",
+          "fmea_review"
+        ]
+      }
+    },
+    "wf_fai": {
+      "workflowId": "wf_fai",
+      "name": "Kiểm tra FAI",
+      "nameEn": "First Article Inspection",
+      "entity": "fai",
+      "standard": "AS9102",
+      "states": [
+        {
+          "id": "planned",
+          "label": "Lên kế hoạch",
+          "labelEn": "Planned",
+          "color": "#3b82f6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "in_progress",
+          "label": "Đang thực hiện",
+          "labelEn": "In Progress",
+          "color": "#f59e0b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "review",
+          "label": "Xem xét",
+          "labelEn": "Review",
+          "color": "#8b5cf6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "approved",
+          "label": "Đã phê duyệt",
+          "labelEn": "Approved",
+          "color": "#10b981",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "waived",
+          "label": "Miễn trừ",
+          "labelEn": "Waived",
+          "color": "#64748b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "planned",
+          "to": "in_progress",
+          "trigger": "start",
+          "label": "Bắt đầu",
+          "labelEn": "Start",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_fai_start"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Kiểm tra FAI - Bắt đầu"
+            }
+          ]
+        },
+        {
+          "from": "in_progress",
+          "to": "review",
+          "trigger": "submit_review",
+          "label": "Gửi xem xét",
+          "labelEn": "Submit Review",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_fai_submit_review"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Kiểm tra FAI - Gửi xem xét"
+            }
+          ]
+        },
+        {
+          "from": "review",
+          "to": "approved",
+          "trigger": "approve",
+          "label": "Phê duyệt",
+          "labelEn": "Approve",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_fai_approve"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Kiểm tra FAI - Phê duyệt"
+            }
+          ]
+        },
+        {
+          "from": "planned",
+          "to": "waived",
+          "trigger": "waive",
+          "label": "Miễn trừ",
+          "labelEn": "Waive",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_fai_waive"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Kiểm tra FAI - Miễn trừ"
+            }
+          ]
+        }
+      ],
+      "sla": {
+        "planned_to_in_progress": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "in_progress_to_review": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "review_to_approved": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "planned_to_waived": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "new_part_release",
+          "major_revision_change"
+        ],
+        "downstreamEffects": [
+          "shipment_release_hold",
+          "doc_package_create"
+        ]
+      }
+    },
+    "wf_document_change_control": {
+      "workflowId": "wf_document_change_control",
+      "name": "Kiểm soát thay đổi tài liệu",
+      "nameEn": "Document Change Control",
+      "entity": "document",
+      "standard": "AS9100D §7.5",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "in_review",
+          "label": "Đang xem xét",
+          "labelEn": "In Review",
+          "color": "#3b82f6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "pending_approval",
+          "label": "Chờ phê duyệt",
+          "labelEn": "Pending Approval",
+          "color": "#f59e0b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "approved",
+          "label": "Đã phê duyệt",
+          "labelEn": "Approved",
+          "color": "#10b981",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "effective",
+          "label": "Có hiệu lực",
+          "labelEn": "Effective",
+          "color": "#8b5cf6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "obsolete",
+          "label": "Lỗi thời",
+          "labelEn": "Obsolete",
+          "color": "#64748b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "in_review",
+          "trigger": "submit_review",
+          "label": "Gửi xem xét",
+          "labelEn": "Submit Review",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_document_change_control_submit_review"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Kiểm soát thay đổi tài liệu - Gửi xem xét"
+            }
+          ]
+        },
+        {
+          "from": "in_review",
+          "to": "pending_approval",
+          "trigger": "request_approval",
+          "label": "Yêu cầu phê duyệt",
+          "labelEn": "Request Approval",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_document_change_control_request_approval"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Kiểm soát thay đổi tài liệu - Yêu cầu phê duyệt"
+            }
+          ]
+        },
+        {
+          "from": "pending_approval",
+          "to": "approved",
+          "trigger": "approve",
+          "label": "Phê duyệt",
+          "labelEn": "Approve",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_document_change_control_approve"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Kiểm soát thay đổi tài liệu - Phê duyệt"
+            }
+          ]
+        },
+        {
+          "from": "approved",
+          "to": "effective",
+          "trigger": "release",
+          "label": "Phát hành",
+          "labelEn": "Release",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_document_change_control_release"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Kiểm soát thay đổi tài liệu - Phát hành"
+            }
+          ]
+        },
+        {
+          "from": "effective",
+          "to": "obsolete",
+          "trigger": "obsolete",
+          "label": "Lỗi thời",
+          "labelEn": "Obsolete",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_document_change_control_obsolete"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Kiểm soát thay đổi tài liệu - Lỗi thời"
+            }
+          ]
+        }
+      ],
+      "sla": {
+        "draft_to_in_review": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "in_review_to_pending_approval": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "pending_approval_to_approved": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "approved_to_effective": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "effective_to_obsolete": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "engineering_change_notice_approved"
+        ],
+        "downstreamEffects": [
+          "training_assignment",
+          "traveler_template_update"
+        ]
+      }
+    },
+    "wf_training_qualification": {
+      "workflowId": "wf_training_qualification",
+      "name": "Đào tạo và chứng nhận",
+      "nameEn": "Training and Qualification",
+      "entity": "training",
+      "standard": "AS9100D §7.2",
+      "states": [
+        {
+          "id": "assigned",
+          "label": "Đã giao",
+          "labelEn": "Assigned",
+          "color": "#3b82f6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "in_progress",
+          "label": "Đang thực hiện",
+          "labelEn": "In Progress",
+          "color": "#f59e0b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "completed",
+          "label": "Hoàn thành",
+          "labelEn": "Completed",
+          "color": "#8b5cf6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "qualified",
+          "label": "Đủ điều kiện",
+          "labelEn": "Qualified",
+          "color": "#10b981",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "expired",
+          "label": "Hết hạn",
+          "labelEn": "Expired",
+          "color": "#ef4444",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "assigned",
+          "to": "in_progress",
+          "trigger": "start",
+          "label": "Bắt đầu",
+          "labelEn": "Start",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_training_qualification_start"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Đào tạo và chứng nhận - Bắt đầu"
+            }
+          ]
+        },
+        {
+          "from": "in_progress",
+          "to": "completed",
+          "trigger": "complete",
+          "label": "Hoàn thành",
+          "labelEn": "Complete",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_training_qualification_complete"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Đào tạo và chứng nhận - Hoàn thành"
+            }
+          ]
+        },
+        {
+          "from": "completed",
+          "to": "qualified",
+          "trigger": "qualify",
+          "label": "Xác nhận năng lực",
+          "labelEn": "Qualify",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_training_qualification_qualify"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Đào tạo và chứng nhận - Xác nhận năng lực"
+            }
+          ]
+        },
+        {
+          "from": "qualified",
+          "to": "expired",
+          "trigger": "expire",
+          "label": "Hết hạn",
+          "labelEn": "Expire",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_training_qualification_expire"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Đào tạo và chứng nhận - Hết hạn"
+            }
+          ]
+        }
+      ],
+      "sla": {
+        "assigned_to_in_progress": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "in_progress_to_completed": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "completed_to_qualified": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "qualified_to_expired": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "document_release",
+          "capa_training_required"
+        ],
+        "downstreamEffects": [
+          "operator_authorization_update"
+        ]
+      }
+    },
+    "wf_shipment_release": {
+      "workflowId": "wf_shipment_release",
+      "name": "Phát hành giao hàng",
+      "nameEn": "Shipment Release",
+      "entity": "shipment_release",
+      "standard": "AS9100D / internal",
+      "states": [
+        {
+          "id": "blocked",
+          "label": "Bị chặn",
+          "labelEn": "Blocked",
+          "color": "#ef4444",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "ready",
+          "label": "Sẵn sàng",
+          "labelEn": "Ready",
+          "color": "#3b82f6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "released",
+          "label": "Đã phát hành",
+          "labelEn": "Released",
+          "color": "#10b981",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "dispatched",
+          "label": "Đã xuất kho",
+          "labelEn": "Dispatched",
+          "color": "#8b5cf6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "delivered",
+          "label": "Đã giao",
+          "labelEn": "Delivered",
+          "color": "#10b981",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "blocked",
+          "to": "ready",
+          "trigger": "clear_hold",
+          "label": "Xóa chặn",
+          "labelEn": "Clear Hold",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_shipment_release_clear_hold"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Phát hành giao hàng - Xóa chặn"
+            }
+          ]
+        },
+        {
+          "from": "ready",
+          "to": "released",
+          "trigger": "release",
+          "label": "Phát hành",
+          "labelEn": "Release",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_shipment_release_release"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Phát hành giao hàng - Phát hành"
+            }
+          ]
+        },
+        {
+          "from": "released",
+          "to": "dispatched",
+          "trigger": "dispatch",
+          "label": "Xuất kho",
+          "labelEn": "Dispatch",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_shipment_release_dispatch"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Phát hành giao hàng - Xuất kho"
+            }
+          ]
+        },
+        {
+          "from": "dispatched",
+          "to": "delivered",
+          "trigger": "deliver",
+          "label": "Giao hàng",
+          "labelEn": "Deliver",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_shipment_release_deliver"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Phát hành giao hàng - Giao hàng"
+            }
+          ]
+        }
+      ],
+      "sla": {
+        "blocked_to_ready": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "ready_to_released": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "released_to_dispatched": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "dispatched_to_delivered": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "fai_approved",
+          "packing_complete"
+        ],
+        "downstreamEffects": [
+          "invoice_create",
+          "customer_otd_update"
+        ]
+      }
+    },
+    "wf_tool_life": {
+      "workflowId": "wf_tool_life",
+      "name": "Theo dõi tuổi thọ dao",
+      "nameEn": "Tool Life Management",
+      "entity": "tool",
+      "standard": "MES best practice",
+      "states": [
+        {
+          "id": "new",
+          "label": "Mới",
+          "labelEn": "New",
+          "color": "#3b82f6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "qualified",
+          "label": "Đủ điều kiện",
+          "labelEn": "Qualified",
+          "color": "#10b981",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "in_use",
+          "label": "Đang sử dụng",
+          "labelEn": "In Use",
+          "color": "#8b5cf6",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "worn",
+          "label": "Mòn",
+          "labelEn": "Worn",
+          "color": "#f59e0b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "replace",
+          "label": "Cần thay",
+          "labelEn": "Replace",
+          "color": "#ef4444",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "scrapped",
+          "label": "Loại bỏ",
+          "labelEn": "Scrapped",
+          "color": "#64748b",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "new",
+          "to": "qualified",
+          "trigger": "qualify",
+          "label": "Xác nhận",
+          "labelEn": "Qualify",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_tool_life_qualify"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Theo dõi tuổi thọ dao - Xác nhận"
+            }
+          ]
+        },
+        {
+          "from": "qualified",
+          "to": "in_use",
+          "trigger": "issue",
+          "label": "Xuất dùng",
+          "labelEn": "Issue",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_tool_life_issue"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Theo dõi tuổi thọ dao - Xuất dùng"
+            }
+          ]
+        },
+        {
+          "from": "in_use",
+          "to": "worn",
+          "trigger": "wear",
+          "label": "Ghi nhận mòn",
+          "labelEn": "Wear",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_tool_life_wear"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Theo dõi tuổi thọ dao - Ghi nhận mòn"
+            }
+          ]
+        },
+        {
+          "from": "worn",
+          "to": "replace",
+          "trigger": "replace",
+          "label": "Thay dao",
+          "labelEn": "Replace",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_tool_life_replace"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Theo dõi tuổi thọ dao - Thay dao"
+            }
+          ]
+        },
+        {
+          "from": "replace",
+          "to": "scrapped",
+          "trigger": "scrap",
+          "label": "Loại bỏ",
+          "labelEn": "Scrap",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "quality_engineer",
+                "quality_manager",
+                "production_planner"
+              ]
+            },
+            {
+              "type": "fieldRequired",
+              "field": "status",
+              "message": "Phải có trạng thái hợp lệ"
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_tool_life_scrap"
+            },
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "evidence",
+              "action": "snapshot",
+              "reason": "Theo dõi tuổi thọ dao - Loại bỏ"
+            }
+          ]
+        }
+      ],
+      "sla": {
+        "new_to_qualified": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "qualified_to_in_use": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "in_use_to_worn": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "worn_to_replace": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "replace_to_scrapped": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "machine_setup"
+        ],
+        "downstreamEffects": [
+          "offset_history_capture",
+          "wo_hold_if_expired"
+        ]
+      }
+    },
+    "wf_work-order": {
+      "workflowId": "wf_work-order",
+      "name": "Work Đơn",
+      "nameEn": "Work Order",
+      "entity": "work-order",
+      "standard": "internal",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "planned",
+          "label": "Đã lên kế hoạch",
+          "labelEn": "Planned",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "released",
+          "label": "Đã phát hành",
+          "labelEn": "Released",
+          "color": "#10b981",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "in_production",
+          "label": "Đang sản xuất",
+          "labelEn": "In Production",
+          "color": "#10b981",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "cancelled",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "planned",
+          "trigger": "plan",
+          "label": "Kế hoạch",
+          "labelEn": "Plan",
+          "guards": [
+            {
+              "type": "custom",
+              "field": "hasBom",
+              "message": "Part has no active BOM. Create BOM in Engineering -> Parts -> BOMs."
+            },
+            {
+              "type": "custom",
+              "field": "hasRouting",
+              "message": "Part has no active routing. Create routing in Engineering -> Parts -> Routings."
+            }
+          ],
+          "actions": [
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_work-order_plan"
+            }
+          ]
+        },
+        {
+          "from": "planned",
+          "to": "released",
+          "trigger": "release",
+          "label": "Phát hành",
+          "labelEn": "Release",
+          "guards": [
+            {
+              "type": "custom",
+              "field": "materialsAvailable",
+              "message": "Required materials not available. Check inventory or create purchase requisition."
+            }
+          ],
+          "actions": [
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_work-order_release"
+            }
+          ]
+        },
+        {
+          "from": "released",
+          "to": "in_production",
+          "trigger": "startProduction",
+          "label": "Bắt đầu Sản xuất",
+          "labelEn": "Start Production",
+          "guards": [],
+          "actions": [
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_work-order_startProduction"
+            }
+          ]
+        },
+        {
+          "from": "in_production",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đóng",
+          "labelEn": "Close",
+          "guards": [
+            {
+              "type": "custom",
+              "field": "allOpsComplete",
+              "message": "Not all operations complete. ${ctx.qtyCompleted}/${ctx.qtyOrdered} pieces finished."
+            },
+            {
+              "type": "custom",
+              "field": "fqcPassed",
+              "message": "Final Quality Check has not passed. Complete FQC inspection first."
+            },
+            {
+              "type": "custom",
+              "field": "noOpenNcr",
+              "message": "Open NCR exists for this work order. Disposition NCR before closing."
+            }
+          ],
+          "actions": [
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_work-order_close"
+            }
+          ]
+        },
+        {
+          "from": "draft",
+          "to": "cancelled",
+          "trigger": "cancel",
+          "label": "Cancel",
+          "labelEn": "Cancel",
+          "guards": [],
+          "actions": [
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_work-order_cancel"
+            }
+          ]
+        },
+        {
+          "from": "planned",
+          "to": "cancelled",
+          "trigger": "cancel",
+          "label": "Cancel",
+          "labelEn": "Cancel",
+          "guards": [],
+          "actions": [
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_work-order_cancel"
+            }
+          ]
+        },
+        {
+          "from": "released",
+          "to": "cancelled",
+          "trigger": "cancel",
+          "label": "Cancel",
+          "labelEn": "Cancel",
+          "guards": [],
+          "actions": [
+            {
+              "type": "setField",
+              "field": "updated_at",
+              "value": "NOW()"
+            },
+            {
+              "type": "notify",
+              "to": "workflow_owner",
+              "template": "wf_work-order_cancel"
+            }
+          ]
+        }
+      ],
+      "sla": {
+        "draft_to_planned": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "planned_to_released": {
+          "hours": 24,
+          "escalateTo": "quality_director"
+        },
+        "released_to_in_production": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "in_production_to_closed": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "draft_to_cancelled": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "planned_to_cancelled": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        },
+        "released_to_cancelled": {
+          "hours": 48,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "integration_sync",
+          "manual_request"
+        ],
+        "downstreamEffects": [
+          "audit_log",
+          "evidence_snapshot"
+        ]
+      }
+    },
+    "wf_supplier_scorecard": {
+      "workflowId": "wf_supplier_scorecard",
+      "name": "Nhà cung cấp Thẻ điểm",
+      "nameEn": "Supplier Scorecard",
+      "entity": "supplier_scorecard",
+      "standard": "internal",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "active",
+          "label": "Đang hoạt động",
+          "labelEn": "Active",
+          "color": "#3b82f6",
+          "entryActions": [
+            "notify_owner"
+          ],
+          "exitActions": [
+            "snapshot"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#10b981",
+          "entryActions": [
+            "archive"
+          ],
+          "exitActions": [
+            "retain"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "active",
+          "trigger": "activate",
+          "label": "Kích hoạt",
+          "labelEn": "Activate",
+          "guards": [],
+          "actions": []
+        },
+        {
+          "from": "active",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đóng",
+          "labelEn": "Close",
+          "guards": [],
+          "actions": []
+        }
+      ],
+      "sla": {
+        "draft_to_active": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "active_to_closed": {
+          "hours": 72,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "manual_request"
+        ],
+        "downstreamEffects": [
+          "audit_log"
+        ]
+      }
+    },
+    "wf_retention_policy": {
+      "workflowId": "wf_retention_policy",
+      "name": "Lưu giữ Chính sách",
+      "nameEn": "Retention Policy",
+      "entity": "retention_policy",
+      "standard": "internal",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "active",
+          "label": "Đang hoạt động",
+          "labelEn": "Active",
+          "color": "#3b82f6",
+          "entryActions": [
+            "notify_owner"
+          ],
+          "exitActions": [
+            "snapshot"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#10b981",
+          "entryActions": [
+            "archive"
+          ],
+          "exitActions": [
+            "retain"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "active",
+          "trigger": "activate",
+          "label": "Kích hoạt",
+          "labelEn": "Activate",
+          "guards": [],
+          "actions": []
+        },
+        {
+          "from": "active",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đóng",
+          "labelEn": "Close",
+          "guards": [],
+          "actions": []
+        }
+      ],
+      "sla": {
+        "draft_to_active": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "active_to_closed": {
+          "hours": 72,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "manual_request"
+        ],
+        "downstreamEffects": [
+          "audit_log"
+        ]
+      }
+    },
+    "wf_integration_monitor": {
+      "workflowId": "wf_integration_monitor",
+      "name": "Tích hợp Monitor",
+      "nameEn": "Integration Monitor",
+      "entity": "integration_monitor",
+      "standard": "internal",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "active",
+          "label": "Đang hoạt động",
+          "labelEn": "Active",
+          "color": "#3b82f6",
+          "entryActions": [
+            "notify_owner"
+          ],
+          "exitActions": [
+            "snapshot"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#10b981",
+          "entryActions": [
+            "archive"
+          ],
+          "exitActions": [
+            "retain"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "active",
+          "trigger": "activate",
+          "label": "Kích hoạt",
+          "labelEn": "Activate",
+          "guards": [],
+          "actions": []
+        },
+        {
+          "from": "active",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đóng",
+          "labelEn": "Close",
+          "guards": [],
+          "actions": []
+        }
+      ],
+      "sla": {
+        "draft_to_active": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "active_to_closed": {
+          "hours": 72,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "manual_request"
+        ],
+        "downstreamEffects": [
+          "audit_log"
+        ]
+      }
+    },
+    "wf_scrap_report": {
+      "workflowId": "wf_scrap_report",
+      "name": "Phế phẩm Báo cáo",
+      "nameEn": "Scrap Report",
+      "entity": "scrap_report",
+      "standard": "internal",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "active",
+          "label": "Đang hoạt động",
+          "labelEn": "Active",
+          "color": "#3b82f6",
+          "entryActions": [
+            "notify_owner"
+          ],
+          "exitActions": [
+            "snapshot"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#10b981",
+          "entryActions": [
+            "archive"
+          ],
+          "exitActions": [
+            "retain"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "active",
+          "trigger": "activate",
+          "label": "Kích hoạt",
+          "labelEn": "Activate",
+          "guards": [],
+          "actions": []
+        },
+        {
+          "from": "active",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đóng",
+          "labelEn": "Close",
+          "guards": [],
+          "actions": []
+        }
+      ],
+      "sla": {
+        "draft_to_active": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "active_to_closed": {
+          "hours": 72,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "manual_request"
+        ],
+        "downstreamEffects": [
+          "audit_log"
+        ]
+      }
+    },
+    "wf_resource_calendar": {
+      "workflowId": "wf_resource_calendar",
+      "name": "Nguồn lực Calendar",
+      "nameEn": "Resource Calendar",
+      "entity": "resource_calendar",
+      "standard": "internal",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "active",
+          "label": "Đang hoạt động",
+          "labelEn": "Active",
+          "color": "#3b82f6",
+          "entryActions": [
+            "notify_owner"
+          ],
+          "exitActions": [
+            "snapshot"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#10b981",
+          "entryActions": [
+            "archive"
+          ],
+          "exitActions": [
+            "retain"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "active",
+          "trigger": "activate",
+          "label": "Kích hoạt",
+          "labelEn": "Activate",
+          "guards": [],
+          "actions": []
+        },
+        {
+          "from": "active",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đóng",
+          "labelEn": "Close",
+          "guards": [],
+          "actions": []
+        }
+      ],
+      "sla": {
+        "draft_to_active": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "active_to_closed": {
+          "hours": 72,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "manual_request"
+        ],
+        "downstreamEffects": [
+          "audit_log"
+        ]
+      }
+    },
+    "wf_capacity_plan": {
+      "workflowId": "wf_capacity_plan",
+      "name": "Capacity Kế hoạch",
+      "nameEn": "Capacity Plan",
+      "entity": "capacity_plan",
+      "standard": "internal",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "active",
+          "label": "Đang hoạt động",
+          "labelEn": "Active",
+          "color": "#3b82f6",
+          "entryActions": [
+            "notify_owner"
+          ],
+          "exitActions": [
+            "snapshot"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#10b981",
+          "entryActions": [
+            "archive"
+          ],
+          "exitActions": [
+            "retain"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "active",
+          "trigger": "activate",
+          "label": "Kích hoạt",
+          "labelEn": "Activate",
+          "guards": [],
+          "actions": []
+        },
+        {
+          "from": "active",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đóng",
+          "labelEn": "Close",
+          "guards": [],
+          "actions": []
+        }
+      ],
+      "sla": {
+        "draft_to_active": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "active_to_closed": {
+          "hours": 72,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "manual_request"
+        ],
+        "downstreamEffects": [
+          "audit_log"
+        ]
+      }
+    },
+    "wf_mrp_suggestion": {
+      "workflowId": "wf_mrp_suggestion",
+      "name": "Mrp Suggestion",
+      "nameEn": "Mrp Suggestion",
+      "entity": "mrp_suggestion",
+      "standard": "internal",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "active",
+          "label": "Đang hoạt động",
+          "labelEn": "Active",
+          "color": "#3b82f6",
+          "entryActions": [
+            "notify_owner"
+          ],
+          "exitActions": [
+            "snapshot"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#10b981",
+          "entryActions": [
+            "archive"
+          ],
+          "exitActions": [
+            "retain"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "active",
+          "trigger": "activate",
+          "label": "Kích hoạt",
+          "labelEn": "Activate",
+          "guards": [],
+          "actions": []
+        },
+        {
+          "from": "active",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đóng",
+          "labelEn": "Close",
+          "guards": [],
+          "actions": []
+        }
+      ],
+      "sla": {
+        "draft_to_active": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "active_to_closed": {
+          "hours": 72,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "manual_request"
+        ],
+        "downstreamEffects": [
+          "audit_log"
+        ]
+      }
+    },
+    "wf_goods_receipt": {
+      "workflowId": "wf_goods_receipt",
+      "name": "Goods Nhập hàng",
+      "nameEn": "Goods Receipt",
+      "entity": "goods_receipt",
+      "standard": "internal",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "active",
+          "label": "Đang hoạt động",
+          "labelEn": "Active",
+          "color": "#3b82f6",
+          "entryActions": [
+            "notify_owner"
+          ],
+          "exitActions": [
+            "snapshot"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#10b981",
+          "entryActions": [
+            "archive"
+          ],
+          "exitActions": [
+            "retain"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "active",
+          "trigger": "activate",
+          "label": "Kích hoạt",
+          "labelEn": "Activate",
+          "guards": [],
+          "actions": []
+        },
+        {
+          "from": "active",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đóng",
+          "labelEn": "Close",
+          "guards": [],
+          "actions": []
+        }
+      ],
+      "sla": {
+        "draft_to_active": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "active_to_closed": {
+          "hours": 72,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "manual_request"
+        ],
+        "downstreamEffects": [
+          "audit_log"
+        ]
+      }
+    },
+    "wf_doc_master": {
+      "workflowId": "wf_doc_master",
+      "name": "Doc Master",
+      "nameEn": "Doc Master",
+      "entity": "doc_master",
+      "standard": "internal",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "active",
+          "label": "Đang hoạt động",
+          "labelEn": "Active",
+          "color": "#3b82f6",
+          "entryActions": [
+            "notify_owner"
+          ],
+          "exitActions": [
+            "snapshot"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#10b981",
+          "entryActions": [
+            "archive"
+          ],
+          "exitActions": [
+            "retain"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "active",
+          "trigger": "activate",
+          "label": "Kích hoạt",
+          "labelEn": "Activate",
+          "guards": [],
+          "actions": []
+        },
+        {
+          "from": "active",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đóng",
+          "labelEn": "Close",
+          "guards": [],
+          "actions": []
+        }
+      ],
+      "sla": {
+        "draft_to_active": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "active_to_closed": {
+          "hours": 72,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "manual_request"
+        ],
+        "downstreamEffects": [
+          "audit_log"
+        ]
+      }
+    },
+    "wf_audit_log_viewer": {
+      "workflowId": "wf_audit_log_viewer",
+      "name": "Đánh giá Nhật ký Viewer",
+      "nameEn": "Audit Log Viewer",
+      "entity": "audit_log_viewer",
+      "standard": "internal",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#94a3b8",
+          "entryActions": [
+            "auto_assign_sequence"
+          ],
+          "exitActions": [
+            "validate_mandatory_fields"
+          ]
+        },
+        {
+          "id": "active",
+          "label": "Đang hoạt động",
+          "labelEn": "Active",
+          "color": "#3b82f6",
+          "entryActions": [
+            "notify_owner"
+          ],
+          "exitActions": [
+            "snapshot"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#10b981",
+          "entryActions": [
+            "archive"
+          ],
+          "exitActions": [
+            "retain"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "active",
+          "trigger": "activate",
+          "label": "Kích hoạt",
+          "labelEn": "Activate",
+          "guards": [],
+          "actions": []
+        },
+        {
+          "from": "active",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đóng",
+          "labelEn": "Close",
+          "guards": [],
+          "actions": []
+        }
+      ],
+      "sla": {
+        "draft_to_active": {
+          "hours": 24,
+          "escalateTo": "quality_manager"
+        },
+        "active_to_closed": {
+          "hours": 72,
+          "escalateTo": "quality_manager"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "manual_request"
+        ],
+        "downstreamEffects": [
+          "audit_log"
+        ]
+      }
     }
   }
 }
