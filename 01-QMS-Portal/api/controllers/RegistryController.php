@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 namespace HESEM\QMS\Api\Controllers;
+
+use HESEM\QMS\Api\Services\RegistryService;
 use Throwable;
 
 /**
@@ -12,6 +14,17 @@ use Throwable;
  */
 class RegistryController extends BaseController
 {
+    private ?RegistryService $registry = null;
+
+    private function registry(): RegistryService
+    {
+        if ($this->registry === null) {
+            $this->registry = new RegistryService($this->dataDir);
+        }
+
+        return $this->registry;
+    }
+
     /**
      * @return void
      */
@@ -37,16 +50,19 @@ class RegistryController extends BaseController
         $api = $this->query('api');
 
         try {
-            $file = $this->registryDir() . '/data-fields.json';
-            $data = $this->readJsonFile($file) ?? [];
+            $data = $this->registry()->raw('data-fields');
 
             if ($api && $api !== '') {
                 $result = $data[$api] ?? null;
                 if (!$result) $this->error('api_not_found', 404, "No field definitions for: {$api}");
-                $this->success(['api' => $api, 'fields' => $result]);
+                $this->success(['api' => $api, 'data' => $result, 'fields' => $result]);
             }
 
-            $this->success(['registry' => $data, 'count' => count($data)]);
+            $this->success([
+                'data' => $data,
+                'registry' => $data,
+                'count' => count(array_filter(array_keys($data), static fn(string $key): bool => $key !== '_meta')),
+            ]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('registry_failed', 500, $e->getMessage());
@@ -86,9 +102,8 @@ class RegistryController extends BaseController
     {
         $this->requireAuth();
         try {
-            $file = $this->registryDir() . '/field-types.json';
-            $data = $this->readJsonFile($file) ?? [];
-            $this->success(['field_types' => $data]);
+            $data = $this->registry()->raw('field-types');
+            $this->success(['data' => $data, 'field_types' => $data]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('registry_failed', 500, $e->getMessage());
@@ -105,16 +120,19 @@ class RegistryController extends BaseController
         $key = $this->query('key');
 
         try {
-            $file = $this->registryDir() . '/status-options.json';
-            $data = $this->readJsonFile($file) ?? [];
+            $data = $this->registry()->raw('status-options');
 
             if ($key && $key !== '') {
                 $result = $data[$key] ?? null;
                 if (!$result) $this->error('key_not_found', 404);
-                $this->success(['key' => $key, 'options' => $result]);
+                $this->success(['key' => $key, 'data' => $result, 'options' => $result]);
             }
 
-            $this->success(['registry' => $data, 'count' => count($data)]);
+            $this->success([
+                'data' => $data,
+                'registry' => $data,
+                'count' => count(array_filter(array_keys($data), static fn(string $itemKey): bool => $itemKey !== '_meta')),
+            ]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('registry_failed', 500, $e->getMessage());
@@ -128,9 +146,83 @@ class RegistryController extends BaseController
     {
         $this->requireAuth();
         try {
-            $file = $this->registryDir() . '/computed-formulas.json';
-            $data = $this->readJsonFile($file) ?? [];
-            $this->success(['formulas' => $data]);
+            $data = $this->registry()->raw('computed-formulas');
+            $this->success(['data' => $data, 'formulas' => $data]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('registry_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * GET registry_validation_rules â€” Validation rules registry.
+     */
+    public function getValidationRules(): never
+    {
+        $this->requireAuth();
+        try {
+            $data = $this->registry()->raw('validation-rules');
+            $this->success(['data' => $data, 'rules' => $data]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('registry_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * GET registry_workflow_library â€” Workflow registry.
+     */
+    public function getWorkflowLibrary(): never
+    {
+        $this->requireAuth();
+        try {
+            $data = $this->registry()->raw('workflow-library');
+            $this->success(['data' => $data, 'workflow_library' => $data]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('registry_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * GET registry_domain_field_packs â€” Domain pack registry.
+     */
+    public function getDomainFieldPacks(): never
+    {
+        $this->requireAuth();
+        try {
+            $data = $this->registry()->raw('domain-field-packs');
+            $this->success(['data' => $data, 'domain_field_packs' => $data]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('registry_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * GET registry_relation_map â€” Relation map registry.
+     */
+    public function getRelationMap(): never
+    {
+        $this->requireAuth();
+        try {
+            $data = $this->registry()->raw('relation-map');
+            $this->success(['data' => $data, 'relation_map' => $data]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('registry_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * GET registry_endpoint_catalog â€” Endpoint catalog registry.
+     */
+    public function getEndpointCatalog(): never
+    {
+        $this->requireAuth();
+        try {
+            $data = $this->registry()->raw('endpoint-catalog');
+            $this->success(['data' => $data, 'endpoint_catalog' => $data]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('registry_failed', 500, $e->getMessage());
@@ -144,9 +236,8 @@ class RegistryController extends BaseController
     {
         $this->requireAuth();
         try {
-            $file = $this->registryDir() . '/iot-connectors.json';
-            $data = $this->readJsonFile($file) ?? [];
-            $this->success(['connectors' => $data]);
+            $data = $this->registry()->raw('iot-connectors');
+            $this->success(['data' => $data, 'connectors' => $data]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('registry_failed', 500, $e->getMessage());
@@ -160,25 +251,45 @@ class RegistryController extends BaseController
     {
         $this->requireAuth();
         try {
-            $dir = $this->registryDir();
+            $registry = $this->registry();
+            $data = [
+                'data_fields' => $registry->raw('data-fields'),
+                'api_params' => $registry->raw('api-params'),
+                'field_types' => $registry->raw('field-types'),
+                'status_options' => $registry->raw('status-options'),
+                'domain_field_packs' => $registry->raw('domain-field-packs'),
+                'schema_library' => $registry->raw('schema-library'),
+                'registry_manifest' => $registry->raw('registry-manifest'),
+                'endpoint_catalog' => $registry->raw('endpoint-catalog'),
+                'validation_rules' => $registry->raw('validation-rules'),
+                'relation_map' => $registry->raw('relation-map'),
+                'workflow_library' => $registry->raw('workflow-library'),
+                'compliance_crosswalk' => $registry->raw('compliance-crosswalk'),
+                'registry_quality_report' => $registry->raw('registry-quality-report'),
+                'unit_library' => $registry->raw('unit-library'),
+                'identifier_patterns' => $registry->raw('identifier-patterns'),
+                'computed_formulas' => $registry->raw('computed-formulas'),
+                'iot_connectors' => $registry->raw('iot-connectors'),
+            ];
             $this->success([
-                'data_fields'       => $this->readJsonFile($dir . '/data-fields.json') ?? [],
-                'api_params'        => $this->readJsonFile($dir . '/api-params.json') ?? [],
-                'field_types'       => $this->readJsonFile($dir . '/field-types.json') ?? [],
-                'status_options'    => $this->readJsonFile($dir . '/status-options.json') ?? [],
-                'domain_field_packs'=> $this->readJsonFile($dir . '/domain-field-packs.json') ?? [],
-                'schema_library'    => $this->readJsonFile($dir . '/schema-library.json') ?? [],
-                'registry_manifest' => $this->readJsonFile($dir . '/registry-manifest.json') ?? [],
-                'endpoint_catalog'  => $this->readJsonFile($dir . '/endpoint-catalog.json') ?? [],
-                'validation_rules'  => $this->readJsonFile($dir . '/validation-rules.json') ?? [],
-                'relation_map'      => $this->readJsonFile($dir . '/relation-map.json') ?? [],
-                'workflow_library'  => $this->readJsonFile($dir . '/workflow-library.json') ?? [],
-                'compliance_crosswalk' => $this->readJsonFile($dir . '/compliance-crosswalk.json') ?? [],
-                'registry_quality_report' => $this->readJsonFile($dir . '/registry-quality-report.json') ?? [],
-                'unit_library'      => $this->readJsonFile($dir . '/unit-library.json') ?? [],
-                'identifier_patterns' => $this->readJsonFile($dir . '/identifier-patterns.json') ?? [],
-                'computed_formulas' => $this->readJsonFile($dir . '/computed-formulas.json') ?? [],
-                'iot_connectors'    => $this->readJsonFile($dir . '/iot-connectors.json') ?? [],
+                'data' => $data,
+                'data_fields' => $data['data_fields'],
+                'api_params' => $data['api_params'],
+                'field_types' => $data['field_types'],
+                'status_options' => $data['status_options'],
+                'domain_field_packs' => $data['domain_field_packs'],
+                'schema_library' => $data['schema_library'],
+                'registry_manifest' => $data['registry_manifest'],
+                'endpoint_catalog' => $data['endpoint_catalog'],
+                'validation_rules' => $data['validation_rules'],
+                'relation_map' => $data['relation_map'],
+                'workflow_library' => $data['workflow_library'],
+                'compliance_crosswalk' => $data['compliance_crosswalk'],
+                'registry_quality_report' => $data['registry_quality_report'],
+                'unit_library' => $data['unit_library'],
+                'identifier_patterns' => $data['identifier_patterns'],
+                'computed_formulas' => $data['computed_formulas'],
+                'iot_connectors' => $data['iot_connectors'],
             ]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);

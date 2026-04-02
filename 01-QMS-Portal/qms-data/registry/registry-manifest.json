@@ -1,183 +1,40 @@
 {
   "_meta": {
-    "version": "3.0",
-    "description": "Registry manifest and coverage index for the metadata backbone.",
-    "generatedAt": "2026-04-02T09:02:28.221Z"
+    "version": "5.0",
+    "description": "Registry manifest and coverage index for the registry-backed runtime.",
+    "generatedAt": "2026-04-02T17:09:08.705Z"
   },
   "coverage": {
-    "router_actions": 345,
-    "ui_actions": 246,
-    "field_registry_actions": 838,
-    "field_definitions": 11396,
-    "unique_field_keys": 1111,
-    "status_sets": 105,
-    "workflow_count": 25,
-    "relation_edges": 67,
-    "validation_rules": 1836,
-    "formula_count": 107,
-    "domain_pack_count": 189
+    "router_actions": 2224,
+    "field_registry_actions": 2224,
+    "field_definitions": 24950,
+    "unique_field_keys": 3824,
+    "status_sets": 503,
+    "workflow_count": 412,
+    "relation_edges": 761,
+    "validation_rules": 15577,
+    "formula_count": 875,
+    "domain_pack_count": 3030
   },
-  "research_sources": [
-    {
-      "key": "epicor_kinetic_cpc",
-      "label": "Epicor Kinetic / Connected Process Control",
-      "url": "https://www.epicor.com/en-us/products/connected-worker/epicor-connected-process-control/",
-      "focus": [
-        "part master",
-        "job operations",
-        "digital work instructions",
-        "quality checks",
-        "traceability"
-      ]
-    },
-    {
-      "key": "sap_s4hana_order_manufacturing",
-      "label": "SAP S/4HANA / Digital Manufacturing",
-      "url": "https://help.sap.com/docs/sap-digital-manufacturing/execution/manage-orders",
-      "focus": [
-        "production order",
-        "material master",
-        "inspection lot",
-        "order execution"
-      ]
-    },
-    {
-      "key": "oracle_quality_management",
-      "label": "Oracle Fusion Cloud Manufacturing / Quality",
-      "url": "https://docs.oracle.com/en/cloud/saas/supply-chain-and-manufacturing/25d/fauqm/using-quality-management.pdf",
-      "focus": [
-        "inspection plans",
-        "inspection characteristics",
-        "quality issues",
-        "action plans"
-      ]
-    },
-    {
-      "key": "qad_enterprise_quality_management",
-      "label": "QAD Adaptive ERP / EQMS",
-      "url": "https://www.qad.com/en-us/products/transformational-applications/enterprise-quality-management-system",
-      "focus": [
-        "supplier quality",
-        "nonconformance",
-        "CAPA",
-        "audit and compliance"
-      ]
-    },
-    {
-      "key": "infor_csi_quality",
-      "label": "Infor CloudSuite Industrial (SyteLine)",
-      "url": "https://docs.infor.com/csi/9.01.x/en-us/csbiolh/lsm1454144403275.html",
-      "focus": [
-        "jobs",
-        "bill of manufacture",
-        "routing",
-        "quality control"
-      ]
-    },
-    {
-      "key": "mastercontrol_qms",
-      "label": "MasterControl QMS",
-      "url": "https://www.mastercontrol.com/gxp-lifeline/quality-event-management/",
-      "focus": [
-        "nonconformance",
-        "CAPA",
-        "change control",
-        "training",
-        "audit"
-      ]
-    },
-    {
-      "key": "etq_reliance_qms",
-      "label": "ETQ Reliance",
-      "url": "https://www.etq.com/qms-software/nonconformance-management/",
-      "focus": [
-        "NCR",
-        "CAPA",
-        "SCAR",
-        "document control",
-        "complaint handling"
-      ]
-    },
-    {
-      "key": "greenlight_guru_medtech_qms",
-      "label": "Greenlight Guru",
-      "url": "https://www.greenlight.guru/solutions/quality-management-software",
-      "focus": [
-        "design control",
-        "CAPA",
-        "risk management",
-        "complaints",
-        "traceability"
-      ]
-    },
-    {
-      "key": "arena_plm_qms",
-      "label": "Arena PLM / QMS",
-      "url": "https://www.arenasolutions.com/plm-qms/quality-management-system-software/",
-      "focus": [
-        "BOM",
-        "change order",
-        "quality process",
-        "compliance",
-        "supplier collaboration"
-      ]
-    },
-    {
-      "key": "plex_smart_manufacturing",
-      "label": "Plex Smart Manufacturing / MES",
-      "url": "https://www.plex.com/products/manufacturing-execution-system",
-      "focus": [
-        "production",
-        "inventory",
-        "quality",
-        "traceability",
-        "operator execution"
-      ]
-    }
-  ],
   "assets": {
-    "data-fields.json": {
-      "kind": "field-registry",
-      "records": 11396
-    },
-    "status-options.json": {
-      "kind": "enum-library",
-      "records": 105
-    },
-    "validation-rules.json": {
-      "kind": "validation-rules",
-      "records": 1836
-    },
-    "workflow-library.json": {
-      "kind": "workflow-library",
-      "records": 25
-    },
-    "computed-formulas.json": {
-      "kind": "formula-library",
-      "records": 107
+    "endpoint-catalog.json": {
+      "kind": "endpoint-catalog",
+      "records": 2224
     },
     "domain-field-packs.json": {
       "kind": "pack-library",
-      "records": 189
+      "records": 3030
     },
     "relation-map.json": {
       "kind": "relation-map",
-      "records": 67
-    },
-    "migration-gap-report.json": {
-      "kind": "migration-gap-report",
-      "records": 182
-    },
-    "api-params.json": {
-      "kind": "api-contracts",
-      "records": 345
-    },
-    "endpoint-catalog.json": {
-      "kind": "endpoint-catalog",
-      "records": 345
+      "records": 761
     },
     "registry-manifest.json": {
       "kind": "manifest",
+      "records": 1
+    },
+    "registry-quality-report.json": {
+      "kind": "quality-report",
       "records": 1
     }
   }

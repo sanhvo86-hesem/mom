@@ -96,7 +96,8 @@ var state = {
     validationRules: {},
     workflows: {},
     domainPacks: {},
-    relationMap: {}
+    relationMap: {},
+    endpointCatalog: {}
   }
 };
 
@@ -1853,13 +1854,14 @@ function _ensureRegistriesLoaded(force){
       state.registries.iotConnectors    = HR.raw('iot-connectors') || (BE.IOT_CONNECTORS || {});
 
       // Lazy-load remaining registries via HmRegistry preload
-      var remaining = 4;
+      var remaining = 5;
       function _onLazy(){ remaining--; if(remaining <= 0){ _finishRegistryLoad(); } }
 
       HR.preload('validation-rules', function(d){ state.registries.validationRules = d || {}; _onLazy(); });
       HR.preload('workflow-library', function(d){ state.registries.workflows = d || {}; _onLazy(); });
       HR.preload('domain-field-packs', function(d){ state.registries.domainPacks = d || {}; _onLazy(); });
       HR.preload('relation-map', function(d){ state.registries.relationMap = d || {}; _onLazy(); });
+      HR.preload('endpoint-catalog', function(d){ state.registries.endpointCatalog = d || {}; _onLazy(); });
     });
     return;
   }
@@ -1877,7 +1879,8 @@ function _ensureRegistriesLoaded(force){
     _loadRegistry('validation-rules', 'validationRules'),
     _loadRegistry('workflow-library', 'workflows'),
     _loadRegistry('domain-field-packs', 'domainPacks'),
-    _loadRegistry('relation-map', 'relationMap')
+    _loadRegistry('relation-map', 'relationMap'),
+    _loadRegistry('endpoint-catalog', 'endpointCatalog')
   ]).then(function(){
     _finishRegistryLoad();
   }).catch(function(){
@@ -1892,7 +1895,24 @@ function _finishRegistryLoad(){
   state.registries.loading = false;
   state.registries.loadingMessage = '';
   state.registries.loaded = true;
-  if(state.selectedBlock) _paint();
+  _applyEndpointCatalog();
+  if(state.container) _paint();
+}
+
+function _endpointCatalogItems(){
+  var raw = state.registries.endpointCatalog || {};
+  var endpoints = raw.endpoints || raw;
+  if(Array.isArray(endpoints)) return endpoints;
+  return Object.keys(endpoints || {}).filter(function(key){ return key !== '_meta'; }).map(function(key){
+    return endpoints[key];
+  });
+}
+
+function _applyEndpointCatalog(){
+  var items = _endpointCatalogItems();
+  if(!items.length) return;
+  BE.API_CATALOG = items;
+  if(window.HmBlockEngine) window.HmBlockEngine.API_CATALOG = items;
 }
 
 function _loadRegistry(file, key){
@@ -1902,6 +1922,31 @@ function _loadRegistry(file, key){
   }).then(function(data){
     state.registries[key] = data || {};
     return data;
+  });
+}
+
+function _loadDataFieldsRegistry(){
+  return _fetchJsonWithFallback(_registryPaths('data-fields'), 0).then(function(data){
+    var parts = Array.isArray(data && data.parts) ? data.parts : (data && data._meta && Array.isArray(data._meta.parts) ? data._meta.parts : []);
+    if(!parts.length){
+      state.registries.dataFields = data || {};
+      return state.registries.dataFields;
+    }
+    return Promise.all(parts.map(function(part){
+      var file = String((part && part.file) || '').replace(/\.json$/i, '');
+      if(!file) return Promise.resolve({});
+      return _fetchJsonWithFallback(_registryPaths(file), 0).catch(function(){ return {}; });
+    })).then(function(payloads){
+      var merged = data || {};
+      payloads.forEach(function(payload){
+        Object.keys(payload || {}).forEach(function(key){
+          if(key === '_meta') return;
+          merged[key] = payload[key];
+        });
+      });
+      state.registries.dataFields = merged;
+      return merged;
+    });
   });
 }
 
@@ -2090,6 +2135,7 @@ function _ensureDataFieldsForApi(api, force){
   var candidates;
   var loadingKey;
   var promise;
+  var HR = window.HmRegistry;
   if(!api) return Promise.resolve([]);
   candidates = _dataFieldKeyCandidates(api);
   candidates.forEach(function(candidate){
@@ -2102,21 +2148,20 @@ function _ensureDataFieldsForApi(api, force){
   if(state.registries.dataFieldsLoading[loadingKey] && !force) return state.registries.dataFieldsLoading[loadingKey];
   state.registries.loading = true;
   state.registries.loadingMessage = _t('Đang nạp trường dữ liệu cho API: ', 'Loading field metadata for API: ') + api;
-  promise = (state.registries.dataFieldsText ? Promise.resolve(state.registries.dataFieldsText) : _loadRegistryText('data-fields').then(function(text){
-    state.registries.dataFieldsText = text || '';
-    return state.registries.dataFieldsText;
-  })).then(function(text){
+  promise = ((HR && typeof HR.preload === 'function')
+    ? new Promise(function(resolve){
+        HR.preload('data-fields', function(data){
+          state.registries.dataFields = data || {};
+          resolve(state.registries.dataFields);
+        });
+      })
+    : _loadDataFieldsRegistry()).then(function(dataMap){
     var parsed = [];
-    var slice = null;
     var i;
+    dataMap = dataMap || {};
     for(i = 0; i < candidates.length; i++){
-      slice = _extractNamedJsonArray(text, candidates[i]);
-      if(slice){
-        try {
-          parsed = JSON.parse(slice) || [];
-        } catch(err){
-          parsed = [];
-        }
+      if(Array.isArray(dataMap[candidates[i]])){
+        parsed = dataMap[candidates[i]] || [];
         state.registries.dataFields[candidates[i]] = parsed;
         state.registries.dataFields[api] = parsed;
         return parsed;

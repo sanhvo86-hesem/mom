@@ -249,7 +249,8 @@
         "auditPattern": "CreatedBy, CreatedOn, ModifiedBy, ModifiedOn as standard system-managed fields.",
         "multilingualPattern": "LocalizedLabels on metadata objects and label merge semantics by language code."
       }
-    }
+    },
+    "workflowCoverageGeneratedAt": "2026-04-02T17:09:08.060Z"
   },
   "domains": {
     "core_system": {
@@ -317,7 +318,14 @@
         "transportation",
         "warehouse_management"
       ],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_department",
+        "wf_role",
+        "wf_session",
+        "wf_user",
+        "wf_user_role"
+      ]
     },
     "document_control": {
       "label": "Kiểm soát tài liệu",
@@ -346,7 +354,12 @@
         "plm_change_control",
         "quality_lab"
       ],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_document_change_control",
+        "wf_document_distribution",
+        "wf_document_embedding"
+      ]
     },
     "master_data": {
       "label": "Dữ liệu chủ",
@@ -407,7 +420,14 @@
         "transportation",
         "warehouse_management"
       ],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_bill_of_material",
+        "wf_bom_component",
+        "wf_item",
+        "wf_routing",
+        "wf_work_center"
+      ]
     },
     "sales": {
       "label": "Bán hàng",
@@ -470,7 +490,17 @@
         "transportation",
         "warehouse_management"
       ],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_customer",
+        "wf_customer_site",
+        "wf_order_documents_required",
+        "wf_order_hold",
+        "wf_order_milestone",
+        "wf_order_note",
+        "wf_quote_lifecycle",
+        "wf_sales_order"
+      ]
     },
     "purchasing": {
       "label": "Mua hàng",
@@ -507,7 +537,12 @@
         "tooling_lifecycle",
         "traceability_serialization"
       ],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_purchase_order",
+        "wf_vendor",
+        "wf_vendor_rating"
+      ]
     },
     "inventory": {
       "label": "Tồn kho",
@@ -548,7 +583,14 @@
         "traceability_serialization",
         "warehouse_management"
       ],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_inventory_location",
+        "wf_inventory_transaction",
+        "wf_lot_master",
+        "wf_serial_master",
+        "wf_warehous"
+      ]
     },
     "production": {
       "label": "Sản xuất",
@@ -591,7 +633,17 @@
         "traceability_serialization",
         "warehouse_management"
       ],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_job_order",
+        "wf_job_release_gate",
+        "wf_labor_transaction",
+        "wf_production_schedule",
+        "wf_shift_calendar_holiday",
+        "wf_shift_definition",
+        "wf_shift_production_log",
+        "wf_shift_target"
+      ]
     },
     "quality_management": {
       "label": "Quản lý chất lượng",
@@ -649,7 +701,24 @@
         "mobile_operations",
         "quality_lab"
       ],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_capa",
+        "wf_certificate",
+        "wf_concession",
+        "wf_contamination_check",
+        "wf_copq_ledger",
+        "wf_customer_complaint",
+        "wf_deviation",
+        "wf_fai",
+        "wf_fai_characteristic",
+        "wf_inspection_plan",
+        "wf_material_review_board",
+        "wf_ncr",
+        "wf_oqc_inspection",
+        "wf_receiving_inspection",
+        "wf_spc_data"
+      ]
     },
     "calibration_equipment": {
       "label": "Hiệu chuẩn và thiết bị",
@@ -684,7 +753,13 @@
         "quality_lab",
         "tooling_lifecycle"
       ],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_calibration_record",
+        "wf_equipment",
+        "wf_maintenance_work_order",
+        "wf_tool_transaction"
+      ]
     },
     "audit_risk": {
       "label": "Đánh giá và rủi ro",
@@ -714,7 +789,15 @@
         "record_system"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_audit",
+        "wf_audit_action",
+        "wf_audit_finding",
+        "wf_improvement_project",
+        "wf_management_review",
+        "wf_risk_register"
+      ]
     },
     "training_hr": {
       "label": "Đào tạo và nhân sự",
@@ -747,7 +830,13 @@
         "production",
         "project_management"
       ],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_employee",
+        "wf_employee_certification",
+        "wf_skills_matrix",
+        "wf_training_qualification"
+      ]
     },
     "finance": {
       "label": "Tài chính",
@@ -773,7 +862,13 @@
         "master_data"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_ap_ar_invoice",
+        "wf_cost_element",
+        "wf_gl_transaction",
+        "wf_job_costing"
+      ]
     },
     "shipping_compliance": {
       "label": "Giao hàng và tuân thủ",
@@ -808,7 +903,14 @@
         "trade_compliance",
         "transportation"
       ],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_compliance_record",
+        "wf_export_licens",
+        "wf_packing_list",
+        "wf_shipment_package",
+        "wf_shipment_release"
+      ]
     },
     "mes_execution": {
       "label": "MES thực thi",
@@ -1006,7 +1108,47 @@
             "mes_tool_preset_offsets"
           ]
         }
-      }
+      },
+      "workflows": [
+        "wf_mes_alarm_catalog",
+        "wf_mes_alarm_playbook",
+        "wf_mes_area",
+        "wf_mes_connectivity_adapter",
+        "wf_mes_cost_tracking",
+        "wf_mes_dispatch_queue",
+        "wf_mes_dpp_passport",
+        "wf_mes_equipment_extended",
+        "wf_mes_erp_inbound_queue",
+        "wf_mes_erp_outbound_queue",
+        "wf_mes_erp_reconciliation_exception",
+        "wf_mes_erp_sync_run",
+        "wf_mes_event_subscription",
+        "wf_mes_inline_measurement",
+        "wf_mes_job_execution",
+        "wf_mes_machine_alarm",
+        "wf_mes_machine_snapshot",
+        "wf_mes_machine_telemetry",
+        "wf_mes_material_consumption",
+        "wf_mes_nc_download_receipt",
+        "wf_mes_nc_release_package",
+        "wf_mes_on_time_delivery",
+        "wf_mes_operation_execution",
+        "wf_mes_operator_qualification",
+        "wf_mes_operator_session",
+        "wf_mes_part_genealogy",
+        "wf_mes_pm_execution",
+        "wf_mes_production_kpi_daily",
+        "wf_mes_shift_handover",
+        "wf_mes_shop_floor_layout",
+        "wf_mes_site",
+        "wf_mes_spare_parts_consumption",
+        "wf_mes_spc_control_limit",
+        "wf_mes_spc_violation",
+        "wf_mes_tool_assembly",
+        "wf_mes_tool_preset_offset",
+        "wf_mes_wip_location",
+        "wf_mes_wip_movement"
+      ]
     },
     "plant_maintenance": {
       "label": "Bảo trì nhà máy",
@@ -1053,7 +1195,20 @@
         "purchasing"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_pm_condition_monitoring",
+        "wf_pm_condition_threshold",
+        "wf_pm_equipment_counter",
+        "wf_pm_equipment_master",
+        "wf_pm_failure_code",
+        "wf_pm_functional_location",
+        "wf_pm_maintenance_budget",
+        "wf_pm_maintenance_plan",
+        "wf_pm_reliability_metric",
+        "wf_pm_spare_parts_inventory",
+        "wf_pm_work_order"
+      ]
     },
     "advanced_planning": {
       "label": "Hoạch định nâng cao",
@@ -1101,7 +1256,21 @@
         "sales"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_aps_capacity_bucket",
+        "wf_aps_constraint_resource",
+        "wf_aps_demand_forecast",
+        "wf_aps_material_availability",
+        "wf_aps_planning_horizon",
+        "wf_aps_scenario",
+        "wf_aps_schedule_block",
+        "wf_aps_schedule_conflict",
+        "wf_aps_setup_matrice",
+        "wf_mrp_planned_order",
+        "wf_production_schedule_slot",
+        "wf_schedule_conflict"
+      ]
     },
     "plm_change_control": {
       "label": "PLM và thay đổi kỹ thuật",
@@ -1146,7 +1315,19 @@
         "sales"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_engineering_change_request",
+        "wf_plm_change_order",
+        "wf_plm_change_request",
+        "wf_plm_change_review_board",
+        "wf_plm_design_review",
+        "wf_plm_deviation_permit",
+        "wf_plm_obsolescence_tracking",
+        "wf_plm_product_configuration",
+        "wf_plm_requirement_trace",
+        "wf_plm_test_plan"
+      ]
     },
     "hcm_workforce": {
       "label": "Nhân lực mở rộng",
@@ -1192,7 +1373,21 @@
         "training_hr"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_hcm_attendance_record",
+        "wf_hcm_certification",
+        "wf_hcm_disciplinary_action",
+        "wf_hcm_employee",
+        "wf_hcm_employee_certification",
+        "wf_hcm_employee_skill",
+        "wf_hcm_leave_balance",
+        "wf_hcm_org_unit",
+        "wf_hcm_payroll_period",
+        "wf_hcm_payroll_run",
+        "wf_hcm_position",
+        "wf_hcm_skills_catalog"
+      ]
     },
     "warehouse_management": {
       "label": "Quản lý kho nâng cao",
@@ -1236,7 +1431,19 @@
         "sales"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_wms_bin_content",
+        "wf_wms_cycle_count_plan",
+        "wf_wms_material_handling_unit",
+        "wf_wms_pick_list",
+        "wf_wms_putaway_rule",
+        "wf_wms_quarantine_hold",
+        "wf_wms_storage_bin",
+        "wf_wms_transfer_order",
+        "wf_wms_wave_plan",
+        "wf_wms_zone"
+      ]
     },
     "finance_extended": {
       "label": "Tài chính thương mại mở rộng",
@@ -1279,7 +1486,20 @@
       "downstreamDomains": [
         "finance_treasury"
       ],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_fin_country_tax_profile",
+        "wf_fin_currency",
+        "wf_fin_customs_declaration",
+        "wf_fin_customs_tariff_code",
+        "wf_fin_exchange_rate",
+        "wf_fin_exchange_rate_type",
+        "wf_fin_lc_draw_request",
+        "wf_fin_letters_of_credit",
+        "wf_fin_multi_book_ledger",
+        "wf_fin_realized_fx_gain",
+        "wf_fin_withholding_tax_code"
+      ]
     },
     "project_management": {
       "label": "Quản lý dự án",
@@ -1325,7 +1545,21 @@
         "training_hr"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_npi_project",
+        "wf_prj_billing_milestone",
+        "wf_prj_cost_collection",
+        "wf_prj_milestone",
+        "wf_prj_risk_register",
+        "wf_prj_time_entry",
+        "wf_prj_wbs_element",
+        "wf_project",
+        "wf_project_change_request",
+        "wf_project_execution",
+        "wf_project_milestone",
+        "wf_project_resource"
+      ]
     },
     "crm": {
       "label": "CRM",
@@ -1363,7 +1597,18 @@
         "sales"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_crm_account",
+        "wf_crm_activity",
+        "wf_crm_campaign",
+        "wf_crm_contact",
+        "wf_crm_customer_touchpoint",
+        "wf_crm_forecast",
+        "wf_crm_lead",
+        "wf_crm_opportunity",
+        "wf_crm_quotes_pipeline"
+      ]
     },
     "transportation": {
       "label": "Vận tải",
@@ -1402,7 +1647,17 @@
         "system_infrastructure"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_freight_audit",
+        "wf_tms_carrier",
+        "wf_tms_customs_document",
+        "wf_tms_dangerous_good",
+        "wf_tms_export_screening",
+        "wf_tms_freight_quote",
+        "wf_tms_route",
+        "wf_tms_shipment"
+      ]
     },
     "bi_datawarehouse": {
       "label": "BI và kho dữ liệu",
@@ -1451,7 +1706,22 @@
         "training_hr"
       ],
       "downstreamDomains": [],
-      "supportDomain": true
+      "supportDomain": true,
+      "workflows": [
+        "wf_dw_customer_dim",
+        "wf_dw_employee_dim",
+        "wf_dw_etl_run",
+        "wf_dw_fact_delivery",
+        "wf_dw_fact_financial",
+        "wf_dw_fact_production",
+        "wf_dw_fact_quality",
+        "wf_dw_item_dim",
+        "wf_dw_kpi_scorecard",
+        "wf_dw_machine_dim",
+        "wf_dw_supplier_dim",
+        "wf_dw_time_dim",
+        "wf_kpi_definition"
+      ]
     },
     "supplier_relationship": {
       "label": "Quan hệ nhà cung cấp",
@@ -1507,7 +1777,25 @@
         "record_system"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_approved_supplier_list",
+        "wf_scar_record",
+        "wf_skip_lot_tracking",
+        "wf_srm_bid_comparison",
+        "wf_srm_sourcing_bid",
+        "wf_srm_supplier_capability",
+        "wf_srm_supplier_capacity",
+        "wf_srm_supplier_contract",
+        "wf_srm_supplier_development_plan",
+        "wf_srm_supplier_portal_message",
+        "wf_srm_supplier_portal_user",
+        "wf_srm_supplier_ppap_package",
+        "wf_srm_vendor_managed_inventory",
+        "wf_supplier_action_request",
+        "wf_supplier_audit_schedule",
+        "wf_supplier_scorecard"
+      ]
     },
     "tooling_lifecycle": {
       "label": "Vòng đời tooling",
@@ -1555,7 +1843,20 @@
       "downstreamDomains": [
         "mfg_engineering"
       ],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_fixture_master",
+        "wf_tool_life",
+        "wf_tooling_assembly",
+        "wf_tooling_component",
+        "wf_tooling_crib_transaction",
+        "wf_tooling_family",
+        "wf_tooling_kit",
+        "wf_tooling_life_measurement",
+        "wf_tooling_location",
+        "wf_tooling_preset",
+        "wf_tooling_regrind_cycle"
+      ]
     },
     "demand_supply_planning": {
       "label": "Cân đối cung cầu",
@@ -1598,7 +1899,19 @@
         "sales"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_demand_classification",
+        "wf_demand_history_bucket",
+        "wf_inventory_buffer_profile",
+        "wf_sop_cycle",
+        "wf_sop_demand_consensu",
+        "wf_sop_inventory_policy",
+        "wf_sop_plan",
+        "wf_sop_scenario_assumption",
+        "wf_sop_supply_consensu",
+        "wf_supply_replenishment_policy"
+      ]
     },
     "service_warranty": {
       "label": "Dịch vụ và bảo hành",
@@ -1640,7 +1953,18 @@
         "sales"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_rma_order",
+        "wf_service_request",
+        "wf_svc_customer_asset",
+        "wf_svc_field_visit_report",
+        "wf_svc_installed_base",
+        "wf_svc_return_authorization",
+        "wf_svc_service_contract",
+        "wf_svc_service_work_order",
+        "wf_warranty_claim"
+      ]
     },
     "finance_treasury": {
       "label": "Ngân quỹ và tài sản",
@@ -1680,7 +2004,18 @@
         "sales"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_fin_asset_depreciation",
+        "wf_fin_cash_account",
+        "wf_fin_cash_transaction",
+        "wf_fin_fixed_asset",
+        "wf_fin_intercompany_pair",
+        "wf_fin_revenue_schedule",
+        "wf_fin_standard_cost_rollup",
+        "wf_fin_tax_jurisdiction",
+        "wf_treasury_close"
+      ]
     },
     "quality_lab": {
       "label": "Phòng lab chất lượng",
@@ -1731,7 +2066,20 @@
         "sales"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_qual_audit_program",
+        "wf_qual_containment_action",
+        "wf_qual_effectiveness_review",
+        "wf_qual_first_article_package",
+        "wf_qual_lab_equipment",
+        "wf_qual_root_cause_session",
+        "wf_qual_sample_plan",
+        "wf_qual_test_lab",
+        "wf_qual_test_method",
+        "wf_quality_lab_case",
+        "wf_quality_obligation"
+      ]
     },
     "ehs_sustainability": {
       "label": "EHS và phát triển bền vững",
@@ -1782,7 +2130,23 @@
         "training_hr"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_ehs_contractor",
+        "wf_ehs_corrective_action",
+        "wf_ehs_emergency_drill",
+        "wf_ehs_emissions_monitoring",
+        "wf_ehs_energy_target",
+        "wf_ehs_exposure_assessment",
+        "wf_ehs_hazardous_material",
+        "wf_ehs_incident",
+        "wf_ehs_material_safety_data",
+        "wf_ehs_permit_register",
+        "wf_ehs_regulatory_submission",
+        "wf_ehs_training_matrix",
+        "wf_ehs_waste_shipment",
+        "wf_ehs_waste_stream"
+      ]
     },
     "mfg_engineering": {
       "label": "Kỹ thuật sản xuất",
@@ -1826,7 +2190,19 @@
         "tooling_lifecycle"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_eng_capacity_model",
+        "wf_eng_changeover_standard",
+        "wf_eng_factory_calendar",
+        "wf_eng_factory_calendar_day",
+        "wf_eng_line_balancing_study",
+        "wf_eng_process_family",
+        "wf_eng_process_validation",
+        "wf_eng_resource_group",
+        "wf_eng_time_standard",
+        "wf_work_instruction_release"
+      ]
     },
     "master_data_governance": {
       "label": "Quản trị dữ liệu chủ",
@@ -1867,7 +2243,21 @@
         "core_system"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_mdm_approval_policy",
+        "wf_mdm_attribute_set",
+        "wf_mdm_attribute_value",
+        "wf_mdm_data_steward",
+        "wf_mdm_duplicate_candidate",
+        "wf_mdm_governance",
+        "wf_mdm_item_class",
+        "wf_mdm_number_sery",
+        "wf_mdm_reference_code",
+        "wf_mdm_reference_code_value",
+        "wf_mdm_site_parameter",
+        "wf_mdm_uom_conversion"
+      ]
     },
     "commercial_contracts": {
       "label": "Thương mại và hợp đồng",
@@ -1913,7 +2303,21 @@
         "sales"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_com_contract_amendment",
+        "wf_com_credit_profile",
+        "wf_com_customer_scorecard",
+        "wf_com_incoterms_profile",
+        "wf_com_payment_terms_profile",
+        "wf_com_price_list",
+        "wf_com_rebate_accrual",
+        "wf_com_rebate_program",
+        "wf_commercial_account",
+        "wf_contract_lifecycle",
+        "wf_machine_rate_card",
+        "wf_order_promise"
+      ]
     },
     "traceability_serialization": {
       "label": "Truy xuất và serialization",
@@ -1952,7 +2356,15 @@
         "purchasing"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_trace_genealogy_batche",
+        "wf_trace_heat_lot_register",
+        "wf_trace_label_print_job",
+        "wf_trace_material_certificate",
+        "wf_traceability_recall",
+        "wf_traceability_traveler"
+      ]
     },
     "outsource_execution": {
       "label": "Gia công ngoài",
@@ -2001,7 +2413,22 @@
         "sales"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_osc_subcontract_plan",
+        "wf_osc_supplier_capacity_reservation",
+        "wf_osc_supplier_chargeback",
+        "wf_osc_supplier_nonconformance",
+        "wf_osc_supplier_portal_document",
+        "wf_osc_supplier_recovery_claim",
+        "wf_osc_supplier_score_trend",
+        "wf_osc_supplier_shipment_notice",
+        "wf_outside_processing_order",
+        "wf_outsource_dispatch",
+        "wf_outsource_receipt",
+        "wf_subcontract_order",
+        "wf_subcontract_receipt"
+      ]
     },
     "trade_compliance": {
       "label": "Tuân thủ thương mại",
@@ -2042,7 +2469,20 @@
         "shipping_compliance"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_trade_broker_profile",
+        "wf_trade_certificate_of_origin",
+        "wf_trade_compliance_audit",
+        "wf_trade_duty_drawback",
+        "wf_trade_eccn_master",
+        "wf_trade_end_use_certificate",
+        "wf_trade_import_bond",
+        "wf_trade_license_exception",
+        "wf_trade_preference_program",
+        "wf_trade_restricted_party_list",
+        "wf_trade_screening"
+      ]
     },
     "forms_system": {
       "label": "Hệ thống biểu mẫu",
@@ -2065,7 +2505,12 @@
         "core_system"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_form_attachment",
+        "wf_form_schema",
+        "wf_form_submission"
+      ]
     },
     "record_system": {
       "label": "Hệ thống hồ sơ",
@@ -2096,7 +2541,11 @@
         "supplier_relationship",
         "training_hr"
       ],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_record_counter",
+        "wf_record_lifecycle"
+      ]
     },
     "system_infrastructure": {
       "label": "Hạ tầng hệ thống",
@@ -2135,7 +2584,19 @@
       "downstreamDomains": [
         "transportation"
       ],
-      "supportDomain": true
+      "supportDomain": true,
+      "workflows": [
+        "wf_comment",
+        "wf_escalation_log",
+        "wf_escalation_rule",
+        "wf_file_attachment",
+        "wf_naming_pattern",
+        "wf_notification",
+        "wf_tag",
+        "wf_variable_registry",
+        "wf_workflow_definition",
+        "wf_workflow_instance"
+      ]
     },
     "customer_portal": {
       "label": "Cổng khách hàng",
@@ -2165,7 +2626,15 @@
         "sales"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_portal_access_token",
+        "wf_portal_complaint_submission",
+        "wf_portal_document_access",
+        "wf_portal_order_view",
+        "wf_portal_session",
+        "wf_portal_user"
+      ]
     },
     "evidence_vault": {
       "label": "Kho bằng chứng",
@@ -2189,7 +2658,12 @@
         "core_system"
       ],
       "downstreamDomains": [],
-      "supportDomain": true
+      "supportDomain": true,
+      "workflows": [
+        "wf_evidence_chain_custody",
+        "wf_evidence_ft",
+        "wf_evidence_vault"
+      ]
     },
     "cnc_programs": {
       "label": "Chương trình CNC",
@@ -2216,7 +2690,11 @@
       "downstreamDomains": [
         "tooling_lifecycle"
       ],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_cnc_program_approval",
+        "wf_setup_sheet"
+      ]
     },
     "digital_product_passport": {
       "label": "Hộ chiếu sản phẩm số",
@@ -2240,7 +2718,11 @@
         "sales"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_passport_access_log",
+        "wf_product_passport"
+      ]
     },
     "ai_predictive": {
       "label": "AI dự báo",
@@ -2263,7 +2745,11 @@
         "master_data"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_predictive_quality",
+        "wf_spc_anomaly_rule"
+      ]
     },
     "fmea_apqp": {
       "label": "FMEA và APQP",
@@ -2298,7 +2784,13 @@
       "downstreamDomains": [
         "quality_management"
       ],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_apqp_project",
+        "wf_control_plan_characteristic",
+        "wf_fmea",
+        "wf_ppap_submission"
+      ]
     },
     "mobile_operations": {
       "label": "Vận hành di động",
@@ -2321,7 +2813,10 @@
         "training_hr"
       ],
       "downstreamDomains": [],
-      "supportDomain": false
+      "supportDomain": false,
+      "workflows": [
+        "wf_mobile_task"
+      ]
     }
   }
 }

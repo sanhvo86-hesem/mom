@@ -122,6 +122,7 @@ use HESEM\QMS\Api\Controllers\ComplianceReportController;
 use HESEM\QMS\Api\Controllers\KnowledgeController;
 use HESEM\QMS\Api\Controllers\CiController;
 use HESEM\QMS\Api\Controllers\EnergyController;
+use HESEM\QMS\Api\Controllers\GenericCrudController;
 use HESEM\QMS\Api\Controllers\ModuleSchemaController;
 use HESEM\QMS\Api\Controllers\RegistryController;
 use HESEM\QMS\Database\DataLayer;
@@ -562,10 +563,49 @@ $router->actions([
     'registry_field_types'       => [RegistryController::class, 'getFieldTypes'],
     'registry_status_options'    => [RegistryController::class, 'getStatusOptions'],
     'registry_computed_formulas' => [RegistryController::class, 'getComputedFormulas'],
+    'registry_validation_rules'  => [RegistryController::class, 'getValidationRules'],
+    'registry_workflow_library'  => [RegistryController::class, 'getWorkflowLibrary'],
+    'registry_domain_field_packs'=> [RegistryController::class, 'getDomainFieldPacks'],
+    'registry_relation_map'      => [RegistryController::class, 'getRelationMap'],
+    'registry_endpoint_catalog'  => [RegistryController::class, 'getEndpointCatalog'],
     'registry_iot_connectors'    => [RegistryController::class, 'getIotConnectors'],
     'registry_full'              => [RegistryController::class, 'getFull'],
     'registry_update'            => [RegistryController::class, 'updateRegistry'],
 ]);
+
+// Registry-backed generic CRUD
+$tableRegistryPath = $DATA_DIR . '/registry/table-registry.json';
+$tableRegistry = [];
+if (is_file($tableRegistryPath)) {
+    $rawTableRegistry = @file_get_contents($tableRegistryPath);
+    $decodedTableRegistry = $rawTableRegistry !== false ? json_decode($rawTableRegistry, true) : null;
+    $tableRegistry = is_array($decodedTableRegistry['tables'] ?? null) ? $decodedTableRegistry['tables'] : [];
+}
+
+foreach ($tableRegistry as $tableName => $tableMeta) {
+    if (!is_string($tableName) || !is_array($tableMeta)) {
+        continue;
+    }
+
+    $domain = strtolower((string)($tableMeta['domain'] ?? ''));
+    $safeTable = strtolower($tableName);
+    if (!preg_match('/^[a-z0-9_]+$/', $domain) || !preg_match('/^[a-z0-9_]+$/', $safeTable)) {
+        continue;
+    }
+
+    $prefix = $domain . '.' . $safeTable;
+    $router->actions([
+        $prefix . '.list'   => [GenericCrudController::class, 'listRecords'],
+        $prefix . '.detail' => [GenericCrudController::class, 'getDetail'],
+        $prefix . '.create' => [GenericCrudController::class, 'createRecord'],
+        $prefix . '.update' => [GenericCrudController::class, 'updateRecord'],
+        $prefix . '.delete' => [GenericCrudController::class, 'deleteRecord'],
+    ]);
+
+    if (!empty($tableMeta['statusColumn'])) {
+        $router->action($prefix . '.transition', GenericCrudController::class, 'transitionRecord');
+    }
+}
 
 // â”€â”€ Frontend Action Aliases â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Map frontend action names to existing controller methods where naming differs.
@@ -706,6 +746,14 @@ $router->delete('/api/dictionary', DictController::class, 'delete');
 
 // Meta / API catalog
 $router->get('/api/meta/catalog', ModuleSchemaController::class, 'apiCatalog');
+
+// Generic runtime entity access
+$router->get('/api/runtime/{domain}/{table}', GenericCrudController::class, 'listRecords');
+$router->get('/api/runtime/{domain}/{table}/{id}', GenericCrudController::class, 'getDetail');
+$router->post('/api/runtime/{domain}/{table}', GenericCrudController::class, 'createRecord');
+$router->put('/api/runtime/{domain}/{table}/{id}', GenericCrudController::class, 'updateRecord');
+$router->delete('/api/runtime/{domain}/{table}/{id}', GenericCrudController::class, 'deleteRecord');
+$router->post('/api/runtime/{domain}/{table}/{id}/transition', GenericCrudController::class, 'transitionRecord');
 
 // Folders
 $router->get('/api/folders', FileController::class, 'scanFolders');

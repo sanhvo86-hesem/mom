@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace HESEM\QMS\Api\Services;
 
+use RuntimeException;
+
 /**
  * RegistryService — Backend centralized data layer.
  *
@@ -39,18 +41,63 @@ class RegistryService
             return $this->cache[$name];
         }
 
-        $file = $this->registryDir . '/' . $name . '.json';
+        if ($name === 'data-fields') {
+            return $this->cache[$name] = $this->loadDataFieldsRegistry();
+        }
+
+        return $this->cache[$name] = $this->readJsonFile($this->registryDir . '/' . $name . '.json');
+    }
+
+    /**
+     * Read a JSON registry file into an array, returning [] on failure.
+     */
+    private function readJsonFile(string $file): array
+    {
         if (!is_file($file)) {
-            return $this->cache[$name] = [];
+            return [];
         }
 
         $raw = @file_get_contents($file);
         if ($raw === false) {
-            return $this->cache[$name] = [];
+            return [];
         }
 
         $data = json_decode($raw, true);
-        return $this->cache[$name] = (is_array($data) ? $data : []);
+        return is_array($data) ? $data : [];
+    }
+
+    /**
+     * Merge split data-fields parts into one in-memory registry.
+     */
+    private function loadDataFieldsRegistry(): array
+    {
+        $index = $this->readJsonFile($this->registryDir . '/data-fields.json');
+        if ($index === []) {
+            return [];
+        }
+
+        $parts = $index['parts'] ?? ($index['_meta']['parts'] ?? []);
+        if (!is_array($parts) || $parts === []) {
+            return $index;
+        }
+
+        $merged = $index;
+        foreach ($parts as $part) {
+            $file = trim((string)($part['file'] ?? ''));
+            if ($file === '') {
+                continue;
+            }
+
+            $payload = $this->readJsonFile($this->registryDir . '/' . $file);
+            foreach ($payload as $key => $value) {
+                if ($key === '_meta') {
+                    continue;
+                }
+                $merged[$key] = $value;
+            }
+        }
+
+        return $merged;
     }
 
     /**
@@ -63,6 +110,14 @@ class RegistryService
         } else {
             $this->cache = [];
         }
+    }
+
+    /**
+     * Return the raw registry payload for callers that need the full document.
+     */
+    public function raw(string $name): array
+    {
+        return $this->load($name);
     }
 
     /* ── Status API ───────────────────────────────────────────────────── */
@@ -155,6 +210,7 @@ class RegistryService
     public function workflow(string $entityType): ?array
     {
         $wf = $this->load('workflow-library');
+        $wf = $wf['workflows'] ?? $wf;
         $key = strtolower($entityType);
 
         if (isset($wf[$key])) return $wf[$key];
@@ -165,6 +221,16 @@ class RegistryService
             if (is_array($w) && ($w['entity'] ?? '') === $key) return $w;
         }
         return null;
+    }
+
+    /**
+     * Get a workflow by exact workflow ID.
+     */
+    public function workflowById(string $workflowId): ?array
+    {
+        $wf = $this->load('workflow-library');
+        $wf = $wf['workflows'] ?? $wf;
+        return is_array($wf[$workflowId] ?? null) ? $wf[$workflowId] : null;
     }
 
     /**
@@ -351,6 +417,25 @@ class RegistryService
             return array_values(array_filter($list, fn(array $item) => ($item['category'] ?? '') === $category));
         }
         return $list;
+    }
+
+    /**
+     * Get endpoint catalog list.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function endpointCatalog(): array
+    {
+        $catalog = $this->load('endpoint-catalog');
+        if (array_is_list($catalog)) {
+            return $catalog;
+        }
+
+        if (isset($catalog['endpoints']) && is_array($catalog['endpoints'])) {
+            return array_values($catalog['endpoints']);
+        }
+
+        return array_values(array_filter($catalog, static fn($value, $key) => $key !== '_meta' && is_array($value), ARRAY_FILTER_USE_BOTH));
     }
 
     /* ── Domain Packs API ─────────────────────────────────────────────── */

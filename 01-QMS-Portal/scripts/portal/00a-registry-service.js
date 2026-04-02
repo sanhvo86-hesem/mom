@@ -28,6 +28,94 @@ var _initCallbacks = [];
 var FALLBACK_COLOR = '#6b7280';
 var FALLBACK_BADGE_STYLE = 'display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;color:#fff;background:';
 
+function _isObject(value){
+  return !!value && typeof value === 'object' && !Array.isArray(value);
+}
+
+function _stripRegistryMeta(value){
+  var out = {};
+  Object.keys(value || {}).forEach(function(key){
+    if(key === '_meta' || key === 'parts') return;
+    out[key] = value[key];
+  });
+  return out;
+}
+
+function _statusMap(raw){
+  var map = {};
+  if(_isObject(raw && raw.statusSets)){
+    Object.keys(raw.statusSets).forEach(function(key){
+      if(_isObject(raw.statusSets[key]) && Array.isArray(raw.statusSets[key].options)) map[key] = raw.statusSets[key];
+    });
+  }
+  Object.keys(raw || {}).forEach(function(key){
+    if(key === '_meta' || key === 'statusSets') return;
+    if(_isObject(raw[key]) && Array.isArray(raw[key].options)) map[key] = raw[key];
+  });
+  return map;
+}
+
+function _workflowMap(raw){
+  return _isObject(raw && raw.workflows) ? raw.workflows : (raw || {});
+}
+
+function _formulaMap(raw){
+  return _isObject(raw && raw.formulas) ? raw.formulas : (raw || {});
+}
+
+function _packMap(raw){
+  return _isObject(raw && raw.packs) ? raw.packs : (raw || {});
+}
+
+function _relationList(raw){
+  if(Array.isArray(raw)) return raw;
+  return (raw && (raw.relations || raw.edges)) || [];
+}
+
+function _splitParts(data){
+  return Array.isArray(data && data.parts) ? data.parts : (data && data._meta && Array.isArray(data._meta.parts) ? data._meta.parts : []);
+}
+
+function _isSplitRegistryIndex(data){
+  return !!_splitParts(data).length;
+}
+
+function _mergeSplitRegistry(data, onSuccess, onError){
+  var parts = _splitParts(data);
+  if(!parts.length){
+    if(onSuccess) onSuccess(data || {});
+    return;
+  }
+
+  var merged = _stripRegistryMeta(data || {});
+  var remaining = parts.length;
+
+  function finalize(){
+    remaining--;
+    if(remaining <= 0 && onSuccess) onSuccess(merged);
+  }
+
+  parts.forEach(function(part){
+    var file = String((part && part.file) || '').replace(/\.json$/i, '');
+    if(!file){
+      finalize();
+      return;
+    }
+    _fetchJson(_paths(file), 0, function(payload){
+      if(_isObject(payload)){
+        Object.keys(payload).forEach(function(key){
+          if(key === '_meta') return;
+          merged[key] = payload[key];
+        });
+      }
+      finalize();
+    }, function(){
+      if(onError && remaining === parts.length) onError();
+      finalize();
+    });
+  });
+}
+
 /** Helper: bilingual label */
 function _t(vi, en){
   return (typeof lang !== 'undefined' && lang === 'en') ? (en || vi) : vi;
@@ -99,13 +187,23 @@ function _fetchRegistry(name, onSuccess, onError){
         // RegistryController returns { ok:true, data:{...} }
         var data = (resp && resp.data) ? resp.data : resp;
         if(data && typeof data === 'object'){
+          if(name === 'data-fields' && _isSplitRegistryIndex(data)){
+            _mergeSplitRegistry(data, onSuccess, onError);
+            return;
+          }
           if(onSuccess) onSuccess(data);
           return;
         }
       }catch(e){}
     }
     // API failed → fallback to direct file fetch
-    _fetchJson(_paths(name), 0, onSuccess, onError);
+    _fetchJson(_paths(name), 0, function(data){
+      if(name === 'data-fields' && _isSplitRegistryIndex(data)){
+        _mergeSplitRegistry(data, onSuccess, onError);
+        return;
+      }
+      if(onSuccess) onSuccess(data);
+    }, onError);
   };
   xhr.send();
 }
@@ -213,8 +311,9 @@ function off(event, callback){
  * @returns {{ label:string, labelEn:string, color:string, icon:string, value:string }}
  */
 function status(setKey, value){
-  var opts = _cache['status-options'];
+  var opts = _statusMap(_cache['status-options']);
   if(!opts) opts = _ensure('status-options');
+  opts = _statusMap(opts);
   if(!opts || !opts[setKey] || !opts[setKey].options) {
     return { value: value, label: value, labelEn: value, color: FALLBACK_COLOR, icon: '' };
   }
@@ -231,8 +330,9 @@ function status(setKey, value){
  * @returns {Array<{value,label,labelEn,color,icon}>}
  */
 function statusSet(setKey){
-  var opts = _cache['status-options'];
+  var opts = _statusMap(_cache['status-options']);
   if(!opts) opts = _ensure('status-options');
+  opts = _statusMap(opts);
   if(!opts || !opts[setKey]) return [];
   return opts[setKey].options || [];
 }
@@ -242,10 +342,11 @@ function statusSet(setKey){
  * @returns {Array<string>}
  */
 function statusSetKeys(){
-  var opts = _cache['status-options'];
+  var opts = _statusMap(_cache['status-options']);
   if(!opts) opts = _ensure('status-options');
+  opts = _statusMap(opts);
   if(!opts) return [];
-  return Object.keys(opts).filter(function(k){ return k !== '_meta'; });
+  return Object.keys(opts);
 }
 
 /**
@@ -324,11 +425,12 @@ function fieldTypes(){
  * @returns {Object|null} - { states, transitions, guards, sla, digitalThread }
  */
 function workflow(entityType){
-  var wf = _cache['workflow-library'];
+  var wf = _workflowMap(_cache['workflow-library']);
   if(!wf){
     _load('workflow-library');
     return null;
   }
+  wf = _workflowMap(wf);
   // Support both keyed by ID and by entity name
   var key = entityType.toLowerCase();
   if(wf[key]) return wf[key];
@@ -512,8 +614,9 @@ function validate(entity, fieldKey, value){
  * @returns {Object|null}
  */
 function formula(formulaId){
-  var formulas = _cache['computed-formulas'];
+  var formulas = _formulaMap(_cache['computed-formulas']);
   if(!formulas) formulas = _ensure('computed-formulas');
+  formulas = _formulaMap(formulas);
   if(!formulas) return null;
 
   // Support array format
@@ -533,8 +636,9 @@ function formula(formulaId){
  * @returns {Array}
  */
 function formulas(category){
-  var f = _cache['computed-formulas'];
+  var f = _formulaMap(_cache['computed-formulas']);
   if(!f) f = _ensure('computed-formulas');
+  f = _formulaMap(f);
   if(!f) return [];
 
   var list = Array.isArray(f) ? f : Object.keys(f).filter(function(k){ return k !== '_meta'; }).map(function(k){ return f[k]; });
@@ -578,14 +682,25 @@ function role(roleKey){
  * @returns {Array|null}
  */
 function packs(module){
-  var p = _cache['domain-field-packs'];
+  var p = _packMap(_cache['domain-field-packs']);
   if(!p){
     _load('domain-field-packs');
     return null;
   }
+  p = _packMap(p);
 
   // Support array or object format
-  var list = Array.isArray(p) ? p : (p.packs || Object.keys(p).filter(function(k){ return k !== '_meta'; }).map(function(k){ return p[k]; }));
+  var list = Array.isArray(p) ? p : Object.keys(p).filter(function(k){ return k !== '_meta'; }).map(function(key){
+    var fields = p[key];
+    var first = Array.isArray(fields) && fields.length ? fields[0] : {};
+    return {
+      packId: key,
+      module: first.module || first.domain || '',
+      table: first.dbTable || '',
+      packType: (String(key).split('_').slice(-1)[0] || '').toLowerCase(),
+      fields: Array.isArray(fields) ? fields : []
+    };
+  });
 
   if(module){
     return list.filter(function(pack){ return pack.module === module; });
@@ -602,13 +717,13 @@ function packs(module){
  * @returns {Array|null}
  */
 function relations(entity){
-  var r = _cache['relation-map'];
+  var r = _relationList(_cache['relation-map']);
   if(!r){
     _load('relation-map');
     return null;
   }
 
-  var list = Array.isArray(r) ? r : (r.relations || r.edges || []);
+  var list = _relationList(r);
 
   if(entity){
     return list.filter(function(rel){
