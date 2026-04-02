@@ -1,0 +1,305 @@
+{
+  "_meta": { "version": "1.0", "description": "All enum/dropdown option sets used across the system" },
+
+  "so_status": {
+    "label": "Trạng thái SO", "labelEn": "SO Status",
+    "options": [
+      { "value": "draft",         "label": "Nháp",            "labelEn": "Draft",         "color": "#94a3b8" },
+      { "value": "quoted",        "label": "Đã báo giá",      "labelEn": "Quoted",        "color": "#3b82f6" },
+      { "value": "confirmed",     "label": "Đã xác nhận",     "labelEn": "Confirmed",     "color": "#8b5cf6" },
+      { "value": "in_production", "label": "Đang sản xuất",   "labelEn": "In Production", "color": "#f59e0b" },
+      { "value": "shipped",       "label": "Đã giao hàng",    "labelEn": "Shipped",       "color": "#10b981" },
+      { "value": "closed",        "label": "Đóng",            "labelEn": "Closed",        "color": "#6b7280" },
+      { "value": "cancelled",     "label": "Đã hủy",          "labelEn": "Cancelled",     "color": "#ef4444" }
+    ]
+  },
+  "jo_status": {
+    "label": "Trạng thái JO", "labelEn": "JO Status",
+    "options": [
+      { "value": "planned",    "label": "Kế hoạch",       "labelEn": "Planned",    "color": "#94a3b8" },
+      { "value": "released",   "label": "Đã phát hành",   "labelEn": "Released",   "color": "#3b82f6" },
+      { "value": "active",     "label": "Đang chạy",      "labelEn": "Active",     "color": "#f59e0b" },
+      { "value": "on_hold",    "label": "Tạm dừng",       "labelEn": "On Hold",    "color": "#ef4444" },
+      { "value": "completed",  "label": "Hoàn thành",     "labelEn": "Completed",  "color": "#10b981" },
+      { "value": "closed",     "label": "Đóng",           "labelEn": "Closed",     "color": "#6b7280" }
+    ]
+  },
+  "wo_status": {
+    "label": "Trạng thái WO", "labelEn": "WO Status",
+    "options": [
+      { "value": "scheduled",  "label": "Đã lên lịch",    "labelEn": "Scheduled",  "color": "#94a3b8" },
+      { "value": "setup",      "label": "Đang setup",     "labelEn": "Setup",      "color": "#3b82f6" },
+      { "value": "running",    "label": "Đang chạy",      "labelEn": "Running",    "color": "#f59e0b" },
+      { "value": "inspection", "label": "Đang kiểm tra",  "labelEn": "Inspection", "color": "#8b5cf6" },
+      { "value": "completed",  "label": "Hoàn thành",     "labelEn": "Completed",  "color": "#10b981" },
+      { "value": "on_hold",    "label": "Tạm dừng",       "labelEn": "On Hold",    "color": "#ef4444" }
+    ]
+  },
+  "quote_status": {
+    "label": "Trạng thái báo giá", "labelEn": "Quote Status",
+    "options": [
+      { "value": "draft",     "label": "Nháp",          "labelEn": "Draft",     "color": "#94a3b8" },
+      { "value": "sent",      "label": "Đã gửi",        "labelEn": "Sent",      "color": "#3b82f6" },
+      { "value": "accepted",  "label": "Chấp nhận",     "labelEn": "Accepted",  "color": "#10b981" },
+      { "value": "rejected",  "label": "Từ chối",       "labelEn": "Rejected",  "color": "#ef4444" },
+      { "value": "expired",   "label": "Hết hạn",       "labelEn": "Expired",   "color": "#6b7280" },
+      { "value": "converted", "label": "Đã chuyển SO",  "labelEn": "Converted", "color": "#8b5cf6" }
+    ]
+  },
+  "ncr_status": {
+    "label": "Trạng thái NCR", "labelEn": "NCR Status",
+    "options": [
+      { "value": "new",            "label": "Mới",              "labelEn": "New",            "color": "#0891b2" },
+      { "value": "investigating",  "label": "Đang điều tra",    "labelEn": "Investigating",  "color": "#3b82f6" },
+      { "value": "containment",    "label": "Ngăn chặn",        "labelEn": "Containment",    "color": "#f59e0b" },
+      { "value": "root_cause",     "label": "Phân tích gốc",    "labelEn": "Root Cause",     "color": "#8b5cf6" },
+      { "value": "corrective",     "label": "Khắc phục",        "labelEn": "Corrective",     "color": "#6366f1" },
+      { "value": "verification",   "label": "Xác minh",         "labelEn": "Verification",   "color": "#d97706" },
+      { "value": "closed",         "label": "Đóng",             "labelEn": "Closed",         "color": "#10b981" },
+      { "value": "rejected",       "label": "Từ chối",          "labelEn": "Rejected",       "color": "#ef4444" }
+    ]
+  },
+  "priority": {
+    "label": "Mức ưu tiên", "labelEn": "Priority",
+    "options": [
+      { "value": "normal", "label": "Bình thường", "labelEn": "Normal",  "color": "#94a3b8" },
+      { "value": "high",   "label": "Cao",         "labelEn": "High",    "color": "#f59e0b" },
+      { "value": "urgent", "label": "Khẩn cấp",    "labelEn": "Urgent",  "color": "#ef4444" },
+      { "value": "aog",    "label": "AOG",          "labelEn": "AOG",     "color": "#dc2626" }
+    ]
+  },
+  "severity": {
+    "label": "Mức nghiêm trọng", "labelEn": "Severity",
+    "options": [
+      { "value": "minor",    "label": "Nhẹ",           "labelEn": "Minor",    "color": "#22c55e" },
+      { "value": "major",    "label": "Lớn",           "labelEn": "Major",    "color": "#f59e0b" },
+      { "value": "critical", "label": "Nghiêm trọng", "labelEn": "Critical", "color": "#ef4444" },
+      { "value": "safety",   "label": "An toàn",       "labelEn": "Safety",   "color": "#000000" }
+    ]
+  },
+  "disposition": {
+    "label": "Quyết định xử lý", "labelEn": "Disposition",
+    "options": [
+      { "value": "use_as_is",           "label": "Dùng nguyên trạng",     "labelEn": "Use As-Is" },
+      { "value": "rework",              "label": "Làm lại",               "labelEn": "Rework" },
+      { "value": "scrap",               "label": "Phế phẩm",              "labelEn": "Scrap" },
+      { "value": "return_to_supplier",  "label": "Trả NCC",               "labelEn": "Return to Supplier" },
+      { "value": "sort_and_segregate",  "label": "Phân loại & cách ly",   "labelEn": "Sort & Segregate" },
+      { "value": "concession_required", "label": "Cần nhượng bộ KH",      "labelEn": "Concession Required" }
+    ]
+  },
+  "shift_code": {
+    "label": "Ca làm việc", "labelEn": "Shift",
+    "options": [
+      { "value": "morning",   "label": "Ca sáng",  "labelEn": "Morning",   "color": "#fbbf24" },
+      { "value": "afternoon", "label": "Ca chiều", "labelEn": "Afternoon", "color": "#60a5fa" },
+      { "value": "night",     "label": "Ca đêm",   "labelEn": "Night",     "color": "#818cf8" }
+    ]
+  },
+  "labor_type": {
+    "label": "Loại lao động", "labelEn": "Labor Type",
+    "options": [
+      { "value": "setup",      "label": "Setup",      "labelEn": "Setup" },
+      { "value": "run",        "label": "Chạy máy",   "labelEn": "Run" },
+      { "value": "rework",     "label": "Làm lại",    "labelEn": "Rework" },
+      { "value": "inspection", "label": "Kiểm tra",   "labelEn": "Inspection" },
+      { "value": "indirect",   "label": "Gián tiếp",  "labelEn": "Indirect" },
+      { "value": "idle",       "label": "Chờ",        "labelEn": "Idle" }
+    ]
+  },
+  "defect_type": {
+    "label": "Loại lỗi", "labelEn": "Defect Type",
+    "options": [
+      { "value": "dimensional",     "label": "Kích thước",      "labelEn": "Dimensional" },
+      { "value": "surface_finish",  "label": "Bề mặt",          "labelEn": "Surface Finish" },
+      { "value": "material",        "label": "Vật liệu",        "labelEn": "Material" },
+      { "value": "visual",          "label": "Ngoại quan",       "labelEn": "Visual" },
+      { "value": "burr",            "label": "Ba via",           "labelEn": "Burr" },
+      { "value": "thread",          "label": "Ren",              "labelEn": "Thread" },
+      { "value": "fod",             "label": "Dị vật (FOD)",     "labelEn": "FOD" },
+      { "value": "contamination",   "label": "Nhiễm bẩn",        "labelEn": "Contamination" },
+      { "value": "documentation",   "label": "Tài liệu",        "labelEn": "Documentation" },
+      { "value": "functional",      "label": "Chức năng",        "labelEn": "Functional" },
+      { "value": "other",           "label": "Khác",             "labelEn": "Other" }
+    ]
+  },
+  "oqc_result": {
+    "label": "Kết quả OQC", "labelEn": "OQC Result",
+    "options": [
+      { "value": "pass",        "label": "Đạt",          "labelEn": "Pass",        "color": "#10b981" },
+      { "value": "fail",        "label": "Không đạt",    "labelEn": "Fail",        "color": "#ef4444" },
+      { "value": "conditional", "label": "Có điều kiện", "labelEn": "Conditional", "color": "#f59e0b" },
+      { "value": "pending",     "label": "Chờ",          "labelEn": "Pending",     "color": "#94a3b8" }
+    ]
+  },
+  "iqc_result": {
+    "label": "Kết quả IQC", "labelEn": "IQC Result",
+    "options": [
+      { "value": "accept",            "label": "Chấp nhận",       "labelEn": "Accept",            "color": "#10b981" },
+      { "value": "reject",            "label": "Từ chối",         "labelEn": "Reject",            "color": "#ef4444" },
+      { "value": "conditional_accept","label": "Chấp nhận ĐK",    "labelEn": "Conditional Accept","color": "#f59e0b" },
+      { "value": "pending_mrb",       "label": "Chờ MRB",         "labelEn": "Pending MRB",       "color": "#8b5cf6" }
+    ]
+  },
+  "skip_lot_level": {
+    "label": "Mức skip-lot", "labelEn": "Skip-lot Level",
+    "options": [
+      { "value": "normal",    "label": "Bình thường", "labelEn": "Normal",    "color": "#3b82f6" },
+      { "value": "tightened", "label": "Siết chặt",   "labelEn": "Tightened", "color": "#ef4444" },
+      { "value": "reduced",   "label": "Giảm nhẹ",    "labelEn": "Reduced",   "color": "#10b981" },
+      { "value": "skip",      "label": "Bỏ qua",      "labelEn": "Skip",      "color": "#6b7280" }
+    ]
+  },
+  "scar_status": {
+    "label": "Trạng thái SCAR", "labelEn": "SCAR Status",
+    "options": [
+      { "value": "issued",            "label": "Đã phát hành",      "labelEn": "Issued" },
+      { "value": "acknowledged",      "label": "Đã xác nhận",       "labelEn": "Acknowledged" },
+      { "value": "root_cause_analysis","label": "Phân tích gốc",    "labelEn": "Root Cause Analysis" },
+      { "value": "corrective_action", "label": "Hành động khắc phục","labelEn": "Corrective Action" },
+      { "value": "verification",      "label": "Xác minh",           "labelEn": "Verification" },
+      { "value": "closed",            "label": "Đóng",               "labelEn": "Closed" },
+      { "value": "overdue",           "label": "Quá hạn",            "labelEn": "Overdue" }
+    ]
+  },
+  "action_priority": {
+    "label": "Mức ưu tiên hành động (FMEA)", "labelEn": "Action Priority (FMEA)",
+    "options": [
+      { "value": "high",   "label": "Cao",         "labelEn": "High",   "color": "#ef4444" },
+      { "value": "medium", "label": "Trung bình",  "labelEn": "Medium", "color": "#f59e0b" },
+      { "value": "low",    "label": "Thấp",        "labelEn": "Low",    "color": "#10b981" }
+    ]
+  },
+  "apqp_phase": {
+    "label": "Giai đoạn APQP", "labelEn": "APQP Phase",
+    "options": [
+      { "value": "phase1_planning",       "label": "Giai đoạn 1: Lập kế hoạch",     "labelEn": "Phase 1: Planning" },
+      { "value": "phase2_product_design", "label": "Giai đoạn 2: Thiết kế SP",       "labelEn": "Phase 2: Product Design" },
+      { "value": "phase3_process_design", "label": "Giai đoạn 3: Thiết kế quy trình","labelEn": "Phase 3: Process Design" },
+      { "value": "phase4_validation",     "label": "Giai đoạn 4: Xác nhận",          "labelEn": "Phase 4: Validation" },
+      { "value": "phase5_production",     "label": "Giai đoạn 5: Sản xuất",          "labelEn": "Phase 5: Production" }
+    ]
+  },
+  "doc_status": {
+    "label": "Trạng thái tài liệu", "labelEn": "Document Status",
+    "options": [
+      { "value": "draft",      "label": "Nháp",          "labelEn": "Draft" },
+      { "value": "review",     "label": "Đang xem xét",  "labelEn": "In Review" },
+      { "value": "approved",   "label": "Đã phê duyệt",  "labelEn": "Approved" },
+      { "value": "superseded", "label": "Đã thay thế",    "labelEn": "Superseded" },
+      { "value": "obsolete",   "label": "Lỗi thời",       "labelEn": "Obsolete" }
+    ]
+  },
+  "master_data_status": {
+    "label": "Trạng thái dữ liệu nền", "labelEn": "Master Data Status",
+    "options": [
+      { "value": "draft",    "label": "Nháp",          "labelEn": "Draft" },
+      { "value": "active",   "label": "Hoạt động",     "labelEn": "Active" },
+      { "value": "inactive", "label": "Không hoạt động","labelEn": "Inactive" },
+      { "value": "obsolete", "label": "Lỗi thời",       "labelEn": "Obsolete" }
+    ]
+  },
+  "vendor_rating": {
+    "label": "Xếp hạng NCC", "labelEn": "Vendor Rating",
+    "options": [
+      { "value": "A", "label": "A — Ưu tú",       "labelEn": "A — Preferred",   "color": "#10b981" },
+      { "value": "B", "label": "B — Tốt",          "labelEn": "B — Approved",    "color": "#3b82f6" },
+      { "value": "C", "label": "C — Đạt",          "labelEn": "C — Conditional", "color": "#f59e0b" },
+      { "value": "D", "label": "D — Cảnh báo",     "labelEn": "D — Probation",   "color": "#ef4444" },
+      { "value": "F", "label": "F — Không đạt",    "labelEn": "F — Disqualified","color": "#dc2626" }
+    ]
+  },
+  "dispatch_status": {
+    "label": "Trạng thái lệnh SX", "labelEn": "Dispatch Status",
+    "options": [
+      { "value": "planned",     "label": "Kế hoạch",    "labelEn": "Planned",     "color": "#94a3b8" },
+      { "value": "dispatched",  "label": "Đã gửi",      "labelEn": "Dispatched",  "color": "#3b82f6" },
+      { "value": "in_progress", "label": "Đang chạy",   "labelEn": "In Progress", "color": "#f59e0b" },
+      { "value": "completed",   "label": "Hoàn thành",  "labelEn": "Completed",   "color": "#10b981" },
+      { "value": "cancelled",   "label": "Đã hủy",      "labelEn": "Cancelled",   "color": "#ef4444" }
+    ]
+  },
+  "ci_phase": {
+    "label": "Giai đoạn PDCA", "labelEn": "PDCA Phase",
+    "options": [
+      { "value": "plan",   "label": "Lập kế hoạch", "labelEn": "Plan",  "color": "#3b82f6" },
+      { "value": "do",     "label": "Thực hiện",    "labelEn": "Do",    "color": "#f59e0b" },
+      { "value": "check",  "label": "Kiểm tra",     "labelEn": "Check", "color": "#8b5cf6" },
+      { "value": "act",    "label": "Hành động",     "labelEn": "Act",   "color": "#10b981" },
+      { "value": "closed", "label": "Đóng",          "labelEn": "Closed","color": "#6b7280" }
+    ]
+  },
+  "hold_type": {
+    "label": "Loại hold", "labelEn": "Hold Type",
+    "options": [
+      { "value": "credit",           "label": "Tín dụng",         "labelEn": "Credit" },
+      { "value": "engineering",      "label": "Kỹ thuật",          "labelEn": "Engineering" },
+      { "value": "quality",          "label": "Chất lượng",        "labelEn": "Quality" },
+      { "value": "shipping",         "label": "Vận chuyển",        "labelEn": "Shipping" },
+      { "value": "material",         "label": "Vật liệu",          "labelEn": "Material" },
+      { "value": "customer_request", "label": "Yêu cầu KH",        "labelEn": "Customer Request" }
+    ]
+  },
+  "subcontract_process": {
+    "label": "Loại gia công ngoài", "labelEn": "Subcontract Process",
+    "options": [
+      { "value": "heat_treat", "label": "Xử lý nhiệt",   "labelEn": "Heat Treatment" },
+      { "value": "plating",    "label": "Mạ",             "labelEn": "Plating" },
+      { "value": "grinding",   "label": "Mài",            "labelEn": "Grinding" },
+      { "value": "ndt",        "label": "Kiểm tra NDT",   "labelEn": "NDT" },
+      { "value": "painting",   "label": "Sơn",            "labelEn": "Painting" },
+      { "value": "anodize",    "label": "Anodize",         "labelEn": "Anodize" },
+      { "value": "passivate",  "label": "Thụ động hóa",    "labelEn": "Passivate" },
+      { "value": "other",      "label": "Khác",             "labelEn": "Other" }
+    ]
+  },
+  "evidence_type": {
+    "label": "Loại chứng cứ", "labelEn": "Evidence Type",
+    "options": [
+      { "value": "photo",            "label": "Ảnh",                "labelEn": "Photo" },
+      { "value": "video",            "label": "Video",              "labelEn": "Video" },
+      { "value": "document",         "label": "Tài liệu",          "labelEn": "Document" },
+      { "value": "measurement_data", "label": "Dữ liệu đo",       "labelEn": "Measurement Data" },
+      { "value": "machine_log",      "label": "Log máy",            "labelEn": "Machine Log" },
+      { "value": "material_cert",    "label": "Chứng chỉ vật liệu","labelEn": "Material Cert" },
+      { "value": "test_report",      "label": "Báo cáo thử nghiệm","labelEn": "Test Report" },
+      { "value": "coc",              "label": "CoC",                "labelEn": "CoC" },
+      { "value": "coa",              "label": "CoA",                "labelEn": "CoA" },
+      { "value": "scan",             "label": "Bản scan",           "labelEn": "Scan" },
+      { "value": "email",            "label": "Email",              "labelEn": "Email" },
+      { "value": "other",            "label": "Khác",               "labelEn": "Other" }
+    ]
+  },
+  "machine_type": {
+    "label": "Loại máy", "labelEn": "Machine Type",
+    "options": [
+      { "value": "3_axis_mill",    "label": "Phay 3 trục",      "labelEn": "3-Axis Mill" },
+      { "value": "5_axis_mill",    "label": "Phay 5 trục",      "labelEn": "5-Axis Mill" },
+      { "value": "turning",        "label": "Tiện",              "labelEn": "Turning" },
+      { "value": "turn_mill",      "label": "Tiện phay",         "labelEn": "Turn-Mill" },
+      { "value": "wire_edm",       "label": "Cắt dây EDM",      "labelEn": "Wire EDM" },
+      { "value": "sinker_edm",     "label": "EDM xung",          "labelEn": "Sinker EDM" },
+      { "value": "surface_grind",  "label": "Mài phẳng",         "labelEn": "Surface Grinding" },
+      { "value": "cylindrical_grind","label":"Mài tròn",          "labelEn": "Cylindrical Grinding" },
+      { "value": "cmm",            "label": "Máy đo CMM",        "labelEn": "CMM" },
+      { "value": "laser_cut",      "label": "Cắt laser",         "labelEn": "Laser Cutting" },
+      { "value": "press_brake",    "label": "Máy chấn",          "labelEn": "Press Brake" },
+      { "value": "assembly",       "label": "Lắp ráp",           "labelEn": "Assembly" }
+    ]
+  },
+  "material_type": {
+    "label": "Loại vật liệu", "labelEn": "Material Type",
+    "options": [
+      { "value": "aluminum",       "label": "Nhôm",               "labelEn": "Aluminum" },
+      { "value": "steel",          "label": "Thép",               "labelEn": "Steel" },
+      { "value": "stainless_steel","label": "Thép không gỉ",      "labelEn": "Stainless Steel" },
+      { "value": "titanium",       "label": "Titan",              "labelEn": "Titanium" },
+      { "value": "inconel",        "label": "Inconel",            "labelEn": "Inconel" },
+      { "value": "copper",         "label": "Đồng",               "labelEn": "Copper" },
+      { "value": "brass",          "label": "Đồng thau",          "labelEn": "Brass" },
+      { "value": "plastic",        "label": "Nhựa",               "labelEn": "Plastic" },
+      { "value": "composite",      "label": "Vật liệu composite", "labelEn": "Composite" },
+      { "value": "other",          "label": "Khác",                "labelEn": "Other" }
+    ]
+  }
+}

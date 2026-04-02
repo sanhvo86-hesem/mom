@@ -1,0 +1,179 @@
+{
+  "_meta": { "version": "1.0", "description": "Pre-built formula presets for computed columns in Module Builder" },
+
+  "total_line_amount": {
+    "label": "Thành tiền dòng",
+    "labelEn": "Line Total Amount",
+    "formula": "quantity * unit_price",
+    "resultType": "currency",
+    "category": "financial"
+  },
+  "gross_margin_pct": {
+    "label": "Biên lợi nhuận gộp (%)",
+    "labelEn": "Gross Margin %",
+    "formula": "((selling_price - unit_cost) / selling_price) * 100",
+    "resultType": "percent",
+    "category": "financial"
+  },
+  "markup_pct": {
+    "label": "Tỷ lệ markup (%)",
+    "labelEn": "Markup %",
+    "formula": "((selling_price - unit_cost) / unit_cost) * 100",
+    "resultType": "percent",
+    "category": "financial"
+  },
+  "total_order_value": {
+    "label": "Tổng giá trị đơn hàng",
+    "labelEn": "Total Order Value",
+    "formula": "SUM(lines.quantity * lines.unit_price)",
+    "resultType": "currency",
+    "category": "financial"
+  },
+  "vat_amount": {
+    "label": "Tiền VAT",
+    "labelEn": "VAT Amount",
+    "formula": "subtotal * (vat_rate / 100)",
+    "resultType": "currency",
+    "category": "financial"
+  },
+  "cycle_time_total": {
+    "label": "Tổng thời gian chu trình",
+    "labelEn": "Total Cycle Time",
+    "formula": "setup_time + (run_time_per_unit * quantity)",
+    "resultType": "duration",
+    "category": "production"
+  },
+  "oee_pct": {
+    "label": "OEE (%)",
+    "labelEn": "Overall Equipment Effectiveness %",
+    "formula": "availability * performance * quality * 100",
+    "resultType": "percent",
+    "category": "production"
+  },
+  "scrap_rate_pct": {
+    "label": "Tỷ lệ phế phẩm (%)",
+    "labelEn": "Scrap Rate %",
+    "formula": "(scrap_qty / total_produced) * 100",
+    "resultType": "percent",
+    "category": "quality"
+  },
+  "first_pass_yield": {
+    "label": "Tỷ lệ đạt lần đầu (%)",
+    "labelEn": "First Pass Yield %",
+    "formula": "(good_qty / total_inspected) * 100",
+    "resultType": "percent",
+    "category": "quality"
+  },
+  "dpmo": {
+    "label": "DPMO",
+    "labelEn": "Defects Per Million Opportunities",
+    "formula": "(defect_count / (total_units * opportunities_per_unit)) * 1000000",
+    "resultType": "number",
+    "category": "quality"
+  },
+  "cpk": {
+    "label": "Chỉ số năng lực Cpk",
+    "labelEn": "Process Capability Index Cpk",
+    "formula": "MIN((usl - mean) / (3 * stdev), (mean - lsl) / (3 * stdev))",
+    "resultType": "number",
+    "category": "quality"
+  },
+  "copq_total": {
+    "label": "Tổng chi phí chất lượng kém",
+    "labelEn": "Total Cost of Poor Quality",
+    "formula": "scrap_cost + rework_cost + warranty_cost + inspection_cost",
+    "resultType": "currency",
+    "category": "quality"
+  },
+  "supplier_score": {
+    "label": "Điểm đánh giá nhà cung cấp",
+    "labelEn": "Supplier Scorecard",
+    "formula": "(quality_score * 0.4) + (delivery_score * 0.3) + (cost_score * 0.2) + (service_score * 0.1)",
+    "resultType": "number",
+    "category": "supplier"
+  },
+  "on_time_delivery_pct": {
+    "label": "Tỷ lệ giao hàng đúng hạn (%)",
+    "labelEn": "On-Time Delivery %",
+    "formula": "(on_time_count / total_deliveries) * 100",
+    "resultType": "percent",
+    "category": "supplier"
+  },
+  "incoming_acceptance_rate": {
+    "label": "Tỷ lệ chấp nhận hàng nhập (%)",
+    "labelEn": "Incoming Acceptance Rate %",
+    "formula": "(accepted_lots / total_lots_inspected) * 100",
+    "resultType": "percent",
+    "category": "supplier"
+  },
+  "material_cost_estimate": {
+    "label": "Ước tính chi phí vật liệu",
+    "labelEn": "Material Cost Estimate",
+    "formula": "raw_weight * material_price_per_kg * buy_to_fly_ratio",
+    "resultType": "currency",
+    "category": "quoting"
+  },
+  "machining_cost_estimate": {
+    "label": "Ước tính chi phí gia công",
+    "labelEn": "Machining Cost Estimate",
+    "formula": "cycle_time_hours * machine_rate_per_hour",
+    "resultType": "currency",
+    "category": "quoting"
+  },
+  "quote_total": {
+    "label": "Tổng giá báo",
+    "labelEn": "Quote Total",
+    "formula": "material_cost + machining_cost + overhead_cost + profit_margin",
+    "resultType": "currency",
+    "category": "quoting"
+  },
+  "lead_time_days": {
+    "label": "Thời gian giao hàng (ngày)",
+    "labelEn": "Lead Time (Days)",
+    "formula": "material_lead_days + production_days + finishing_days + buffer_days",
+    "resultType": "integer",
+    "category": "quoting"
+  },
+  "inventory_value": {
+    "label": "Giá trị tồn kho",
+    "labelEn": "Inventory Value",
+    "formula": "qty_on_hand * unit_cost",
+    "resultType": "currency",
+    "category": "inventory"
+  },
+  "reorder_point": {
+    "label": "Điểm đặt hàng lại",
+    "labelEn": "Reorder Point",
+    "formula": "(avg_daily_usage * lead_time_days) + safety_stock",
+    "resultType": "number",
+    "category": "inventory"
+  },
+  "days_of_supply": {
+    "label": "Số ngày cung ứng",
+    "labelEn": "Days of Supply",
+    "formula": "qty_on_hand / avg_daily_usage",
+    "resultType": "number",
+    "category": "inventory"
+  },
+  "labor_efficiency_pct": {
+    "label": "Hiệu suất lao động (%)",
+    "labelEn": "Labor Efficiency %",
+    "formula": "(standard_hours / actual_hours) * 100",
+    "resultType": "percent",
+    "category": "production"
+  },
+  "machine_utilization_pct": {
+    "label": "Tỷ lệ sử dụng máy (%)",
+    "labelEn": "Machine Utilization %",
+    "formula": "(actual_run_time / available_time) * 100",
+    "resultType": "percent",
+    "category": "production"
+  },
+  "weight_from_dimensions": {
+    "label": "Trọng lượng từ kích thước",
+    "labelEn": "Weight from Dimensions",
+    "formula": "length * width * height * material_density",
+    "resultType": "weight",
+    "category": "engineering"
+  }
+}

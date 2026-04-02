@@ -120,6 +120,7 @@ use HESEM\QMS\Api\Controllers\KnowledgeController;
 use HESEM\QMS\Api\Controllers\CiController;
 use HESEM\QMS\Api\Controllers\EnergyController;
 use HESEM\QMS\Api\Controllers\ModuleSchemaController;
+use HESEM\QMS\Api\Controllers\RegistryController;
 use HESEM\QMS\Database\DataLayer;
 
 // ── Bootstrap DataLayer ─────────────────────────────────────────────────────
@@ -542,6 +543,18 @@ $router->actions([
     'module_schema_delete'  => [ModuleSchemaController::class, 'deleteSchema'],
     'module_schema_reset'   => [ModuleSchemaController::class, 'resetSchema'],
     'module_api_catalog'    => [ModuleSchemaController::class, 'apiCatalog'],
+]);
+
+// Centralized Data Registry
+$router->actions([
+    'registry_data_fields'       => [RegistryController::class, 'getDataFields'],
+    'registry_api_params'        => [RegistryController::class, 'getApiParams'],
+    'registry_field_types'       => [RegistryController::class, 'getFieldTypes'],
+    'registry_status_options'    => [RegistryController::class, 'getStatusOptions'],
+    'registry_computed_formulas' => [RegistryController::class, 'getComputedFormulas'],
+    'registry_iot_connectors'    => [RegistryController::class, 'getIotConnectors'],
+    'registry_full'              => [RegistryController::class, 'getFull'],
+    'registry_update'            => [RegistryController::class, 'updateRegistry'],
 ]);
 
 // ── Frontend Action Aliases ─────────────────────────────────────────────────

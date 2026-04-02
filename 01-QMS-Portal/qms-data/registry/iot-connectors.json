@@ -1,0 +1,154 @@
+{
+  "_meta": { "version": "1.0", "description": "IoT connector definitions for real-time machine/sensor data integration" },
+
+  "mtconnect": {
+    "label": "MTConnect",
+    "labelVi": "MTConnect (CNC)",
+    "protocol": "http",
+    "defaultPort": 5000,
+    "description": "Open standard for CNC machine data — Haas, DMG Mori, Mazak, Okuma",
+    "dataPoints": ["execution_state", "spindle_speed", "feed_rate", "tool_id", "part_count", "alarm_code", "path_position", "axis_load", "coolant_level", "power_consumption"],
+    "pollIntervalMs": 1000,
+    "authType": "none",
+    "configFields": [
+      { "key": "agentUrl", "label": "Agent URL", "type": "url", "required": true, "placeholder": "http://192.168.1.100:5000" },
+      { "key": "deviceId", "label": "Device ID", "type": "string", "required": true },
+      { "key": "pollRate", "label": "Poll Rate (ms)", "type": "number", "default": 1000 }
+    ]
+  },
+  "opcua": {
+    "label": "OPC-UA",
+    "labelVi": "OPC-UA (Công nghiệp)",
+    "protocol": "opcua",
+    "defaultPort": 4840,
+    "description": "Industrial standard for PLC/SCADA — Siemens, Allen-Bradley, Mitsubishi",
+    "dataPoints": ["node_value", "temperature", "pressure", "vibration", "humidity", "flow_rate", "level", "digital_io", "analog_input", "alarm_state"],
+    "pollIntervalMs": 500,
+    "authType": "certificate",
+    "configFields": [
+      { "key": "endpointUrl", "label": "Endpoint URL", "type": "url", "required": true, "placeholder": "opc.tcp://192.168.1.50:4840" },
+      { "key": "securityPolicy", "label": "Security Policy", "type": "select", "options": ["None", "Basic128Rsa15", "Basic256", "Basic256Sha256"], "default": "Basic256Sha256" },
+      { "key": "nodeIds", "label": "Node IDs (comma-separated)", "type": "textarea", "required": true }
+    ]
+  },
+  "modbus_tcp": {
+    "label": "Modbus TCP",
+    "labelVi": "Modbus TCP (Cảm biến)",
+    "protocol": "tcp",
+    "defaultPort": 502,
+    "description": "Legacy industrial protocol — sensors, energy meters, older PLCs",
+    "dataPoints": ["register_value", "coil_status", "input_register", "holding_register"],
+    "pollIntervalMs": 2000,
+    "authType": "none",
+    "configFields": [
+      { "key": "host", "label": "Host IP", "type": "string", "required": true, "placeholder": "192.168.1.200" },
+      { "key": "port", "label": "Port", "type": "number", "default": 502 },
+      { "key": "slaveId", "label": "Slave ID", "type": "number", "default": 1 },
+      { "key": "registers", "label": "Register Map (JSON)", "type": "json", "required": true }
+    ]
+  },
+  "mqtt": {
+    "label": "MQTT",
+    "labelVi": "MQTT (IoT Gateway)",
+    "protocol": "mqtt",
+    "defaultPort": 1883,
+    "description": "Lightweight pub/sub messaging — edge gateways, ESP32/Arduino, custom sensors",
+    "dataPoints": ["topic_payload"],
+    "pollIntervalMs": 0,
+    "authType": "username_password",
+    "configFields": [
+      { "key": "brokerUrl", "label": "Broker URL", "type": "url", "required": true, "placeholder": "mqtt://192.168.1.10:1883" },
+      { "key": "topics", "label": "Subscribe Topics", "type": "textarea", "required": true, "placeholder": "factory/machine1/#" },
+      { "key": "username", "label": "Username", "type": "string" },
+      { "key": "password", "label": "Password", "type": "string" },
+      { "key": "qos", "label": "QoS Level", "type": "select", "options": ["0", "1", "2"], "default": "1" }
+    ]
+  },
+  "focas": {
+    "label": "FANUC FOCAS",
+    "labelVi": "FANUC FOCAS (CNC)",
+    "protocol": "tcp",
+    "defaultPort": 8193,
+    "description": "FANUC proprietary CNC protocol — direct machine monitoring",
+    "dataPoints": ["program_number", "program_name", "sequence_number", "spindle_speed_actual", "feed_rate_actual", "tool_number", "alarm_number", "cycle_time", "part_count", "servo_load"],
+    "pollIntervalMs": 1000,
+    "authType": "none",
+    "configFields": [
+      { "key": "host", "label": "CNC IP Address", "type": "string", "required": true },
+      { "key": "port", "label": "Port", "type": "number", "default": 8193 },
+      { "key": "timeout", "label": "Timeout (ms)", "type": "number", "default": 5000 }
+    ]
+  },
+  "rest_api": {
+    "label": "REST API",
+    "labelVi": "REST API (Tùy chỉnh)",
+    "protocol": "https",
+    "defaultPort": 443,
+    "description": "Generic REST API connector — any HTTP endpoint returning JSON",
+    "dataPoints": ["json_response"],
+    "pollIntervalMs": 5000,
+    "authType": "bearer_token",
+    "configFields": [
+      { "key": "url", "label": "API URL", "type": "url", "required": true },
+      { "key": "method", "label": "HTTP Method", "type": "select", "options": ["GET", "POST"], "default": "GET" },
+      { "key": "headers", "label": "Custom Headers (JSON)", "type": "json" },
+      { "key": "body", "label": "Request Body (JSON)", "type": "json" },
+      { "key": "authToken", "label": "Bearer Token", "type": "string" },
+      { "key": "responseMapping", "label": "Response Field Mapping (JSON)", "type": "json" }
+    ]
+  },
+  "epicor_kinetic": {
+    "label": "Epicor Kinetic",
+    "labelVi": "Epicor Kinetic (ERP)",
+    "protocol": "https",
+    "defaultPort": 443,
+    "description": "Epicor Kinetic ERP REST API v2 — BAQ, BO methods, custom functions",
+    "dataPoints": ["baq_result", "bo_method_result", "efx_result"],
+    "pollIntervalMs": 30000,
+    "authType": "api_key",
+    "configFields": [
+      { "key": "serverUrl", "label": "Epicor Server URL", "type": "url", "required": true, "placeholder": "https://erp.company.com/api/v2" },
+      { "key": "apiKey", "label": "API Key", "type": "string", "required": true },
+      { "key": "company", "label": "Company ID", "type": "string", "required": true },
+      { "key": "baqId", "label": "BAQ ID (for queries)", "type": "string" },
+      { "key": "boName", "label": "Business Object Name", "type": "string" },
+      { "key": "methodName", "label": "BO Method", "type": "string" }
+    ]
+  },
+  "database_poll": {
+    "label": "Database Query",
+    "labelVi": "Truy vấn CSDL",
+    "protocol": "tcp",
+    "defaultPort": 5432,
+    "description": "Direct database polling — PostgreSQL, MySQL for real-time dashboards",
+    "dataPoints": ["query_result"],
+    "pollIntervalMs": 10000,
+    "authType": "username_password",
+    "configFields": [
+      { "key": "dbType", "label": "Database Type", "type": "select", "options": ["postgresql", "mysql"], "default": "postgresql" },
+      { "key": "host", "label": "Host", "type": "string", "required": true },
+      { "key": "port", "label": "Port", "type": "number", "default": 5432 },
+      { "key": "database", "label": "Database Name", "type": "string", "required": true },
+      { "key": "username", "label": "Username", "type": "string", "required": true },
+      { "key": "password", "label": "Password", "type": "string", "required": true },
+      { "key": "query", "label": "SQL Query", "type": "textarea", "required": true }
+    ]
+  },
+  "csv_file_watch": {
+    "label": "CSV File Watcher",
+    "labelVi": "Theo dõi file CSV",
+    "protocol": "filesystem",
+    "defaultPort": null,
+    "description": "Watch a directory for new CSV files — CMM reports, inspection data exports",
+    "dataPoints": ["csv_rows"],
+    "pollIntervalMs": 5000,
+    "authType": "none",
+    "configFields": [
+      { "key": "watchDir", "label": "Watch Directory", "type": "string", "required": true, "placeholder": "/data/cmm-exports/" },
+      { "key": "filePattern", "label": "File Pattern (glob)", "type": "string", "default": "*.csv" },
+      { "key": "delimiter", "label": "Delimiter", "type": "select", "options": [",", ";", "\\t", "|"], "default": "," },
+      { "key": "headerRow", "label": "Has Header Row", "type": "boolean", "default": true },
+      { "key": "archiveAfterRead", "label": "Archive After Read", "type": "boolean", "default": true }
+    ]
+  }
+}
