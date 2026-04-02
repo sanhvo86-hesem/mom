@@ -8,38 +8,38 @@
 
 ### 1.1 Version levels
 
-| Version | Status | Meaning | Example |
+| Version | Status | Meaning | For example |
 |-----------|-----------|---------|-------|
 | V0 (Draft) | Draft | Drafting, not yet approved. Only circulated within the drafting group. | V0 |
-| V0 (Published) | Initial release | Initial approval and official release. This is the first version to take effect. | V0 published |
+| V0 (Published) | First release | Initial approval and official release. This is the first version to take effect. | V0 published |
 | V1.x | Small update | Correct spelling, formatting, minor additions that DO NOT change process logic. | V1.1, V1.2, V1.3 |
-| V2.0 | Big Update | Change processes, add/remove gates, change roles, change logic. | V2.0 |
+| V2.0 | Big update | Change processes, add/remove gates, change roles, change logic. | V2.0 |
 | V3.0, V4.0... | Next big update | Every major change increases the main number by 1 unit. | V3.0, V4.0 |
 
 ### 1.2 Numbering rules
 
 - **Main number** (major): Increases when changing processes, gates, roles, business logic.
 - **Minor number** (minor): Increase when fixing minor errors, updating format, adding information that does not affect operation.
-- Every time the main and secondary numbers are increased to 0. For example: V1.3 -> V2.0.
-- DO NOT use negative numbers, multilevel decimals (V1.2.3), or letters (V1a).
+- Every time the main number increases, the secondary number returns to 0. For example: V1.3 -> V2.0.
+- DO NOT use negative numbers, multiple decimals (V1.2.3), or letters (V1a).
 
-### 1.2A Mandatory rule for unpublished material
+### 1.2A Mandatory rules for unpublished material
 
-- When the document is still in the drafting / internal standardization phase and has not yet decided to release it for the first time, the version header always remains `V0`.
+- When the document is still in the drafting / internal standardization phase and has not yet decided on its initial release, the version header always remains `V0`.
 - Do not increase yourself to `V1`, `V1.x`, `V2` just because you have edited many draft rounds.
-- Do not put notes like `mới so với bản trước`, `bổ sung theo vòng review`, `khác bản cũ` in the body of SOP/WI/ANNEX when the document is still a draft.
+- Do not include notes like `mới so với bản trước`, `bổ sung theo vòng review`, `khác bản cũ` in the SOP/WI/ANNEX body when the document is still a draft.
 - If you need to track the drafting process, record it in DCR, working note, review log or commit log; not recorded in the body of the operating document.
 
 ### 1.3 Distinguish between minor and major updates
 
 | Minor Update (Minor — V1.x) | Major Update (Major — V2.0+) |
 |-----------------------------|-------------------------------|
-| Correct spelling and grammar errors | Overall process change |
+| Correct spelling and grammar errors | Change the overall process |
 | Update formatting, CSS | Add or remove gate/checkpoint |
-| Add notes, clarify content | Change in responsible roles |
+| Add notes and clarify content | Change responsible roles |
 | Updated documentation link | Change PASS/FAIL condition |
-| Edit reference form code | Change storage system (Epicor, M365) |
-| More illustrative examples | Change target KPI |
+| Correct the reference form code | Change storage system (Epicor, M365) |
+| Add illustrative examples | Change target KPI |
 | Update contact information | Change the scope of application |
 
 ---
@@ -57,60 +57,60 @@ Soạn thảo        Rà soát chéo    Phê duyệt/Từ chối
  Owner)          Reviewer)        cấp trên)
 ```
 
-### 2.2 Step-by-step details
+### 2.2 Details of each step
 
 #### Step 1: Draft
 
-| Category | Details |
+| Category | Detail |
 |----------|---------|
 | Implementer | Document Owner |
-| Action | Compose document content according to standard structure (see 08-document-types.md) |
-| Profile | Draft files are saved in the Draft folder on SharePoint |
+| Act | Prepare document content according to standard structure (see 08-document-types.md) |
+| File | Draft files are saved in the Draft folder on SharePoint |
 | Exit | Send DCR (Document Change Request) when draft is completed |
 
 #### Step 2: Submit (Send request)
 
-| Category | Details |
+| Category | Detail |
 |----------|---------|
 | Implementer | Document Owner |
-| Action | Fill out FRM-102 Document Change Request |
-| DCR Content | Reason for change, scope of impact, related documents |
+| Act | Fill out FRM-102 Document Change Request |
+| DCR content | Reason for change, scope of impact, related documents |
 | Exit | Transfer DCR to QMS Engineer |
 
 #### Step 3: Cross-Review (Cross-Review)
 
-| Category | Details |
+| Category | Detail |
 |----------|---------|
 | Implementer | Peer Reviewer (appointed by Document Owner or QMS Engineer) |
 | Request | The reviewer is NOT the editor |
-| Action | Read the entire document, check content, cross-reference, format |
-| Deadline | Maximum 3 working days from receipt |
-| Profile | Record results in FRM-105 Peer Review Log |
-| Results | PASS: transfer approval. FAIL: return Document Owner sua. |
+| Act | Read the entire document, check content, cross-references, formatting |
+| Duration | Maximum 3 working days from receipt |
+| File | Record results in FRM-105 Peer Review Log |
+| Result | PASS: transfer approval. FAIL: return Document Owner sua. |
 
 #### Step 4: Approve/Reject (Approve / Reject)
 
-| Category | Details |
+| Category | Detail |
 |----------|---------|
 | Implementer | QA Manager (for SOP, WI, ANNEX). CEO (for Quality Manual). |
-| Action | Literature review + cross-review results |
+| Act | Literature review + cross-review results |
 | Decision | APPROVED: transfer to Publish. REJECTED: returned with reason. CONDITIONAL: approval with conditions. |
-| Profile | Signature on DCR (FRM-102) |
+| File | Signature on DCR (FRM-102) |
 
 #### Step 5: Publish (Release)
 
-| Category | Details |
+| Category | Detail |
 |----------|---------|
 | Implementer | QMS Engineer |
-| Action | Convert documents to publishing format (HTML on QMS site) |
+| Act | Convert documents to publishing format (HTML on QMS site) |
 | Check | Link works, format is correct, version is correct |
 | Update | FRM-101 Master Document Register |
-| Notice | Send notifications to relevant departments |
-| Cancel old version | Mark old versions as "Superseded" on SharePoint |
+| Notification | Send notifications to relevant departments |
+| Cancel the old version | Mark old versions as "Superseded" on SharePoint |
 
 ### 2.3 Special cases
 
-| Situation | Processing |
+| Situation | Handle |
 |-----------|-------|
 | Urgent documents (safety, legal) | The CEO can approve directly, skipping cross-review. Record the reason in DCR. Perform additional cross-review within 5 days. |
 | The reviewer is absent for more than 3 days | The Document Owner recommends a replacement. QMS Engineer approved. |
@@ -125,25 +125,25 @@ Soạn thảo        Rà soát chéo    Phê duyệt/Từ chối
 
 | Situation | Need DCR |
 |-----------|---------|
-| Create new document | YES |
-| Major Update (Major) | YES |
-| Minor Update (Minor) | YES (simplified: just 1 line of change description) |
+| Create new document | HAVE |
+| Major Update (Major) | HAVE |
+| Minor Update (Minor) | YES (simplified: just 1 line describing the change) |
 | Correct spelling errors (< 5 places) | NO (QMS Engineer self-corrects and logs) |
 
-### 3.2 DCR Contents (FRM-102)
+### 3.2 DCR content (FRM-102)
 
-| Field | Description |
+| Field | Describe |
 |-------|-------|
-| Document code | Document code needs to be changed |
+| Document code | The document code needs to change |
 | Current version | Version in effect |
 | Recommended version | New version after changes |
 | Reason for change | Why change is needed (be specific, not vague) |
 | Scope of influence | What documents/processes are affected |
-| Action required | Things to do to implement change |
-| Recommended by | Name + role |
-| Proposal date | DCR submission date |
+| Necessary action | What needs to be done to implement change |
+| Proposer | Name + role |
+| Proposed date | DCR submission date |
 | Approver | QA Manager or CEO |
-| Results | APPROVED / REJECTED / CONDITIONAL |
+| Result | APPROVED / REJECTED / CONDITIONAL |
 
 ---
 
@@ -157,19 +157,19 @@ Soạn thảo        Rà soát chéo    Phê duyệt/Từ chối
 | WI | Team Lead / Engineer | 1 person in the same department + QMS Engineer |
 | ANNEX | Field expert | QMS Engineer |
 | JD | HR Manager + Line Manager | QMS Engineer |
-| Form (Excel) | Process Owner | QMS Engineer (check format + logic) |
+| Forms (Excel) | Process Owner | QMS Engineer (check format + logic) |
 
 ### 4.2 Review criteria
 
 | # | Criteria | Check |
 |---|---------|---------|
-| 1 | Technically accurate content | Does it actually reflect operations? |
+| 1 | Content is technically accurate | Does it reflect actual operations? |
 | 2 | Correct structure | Use 10 sections (SOP), 7 sections (WI)...? |
-| 3 | Consistent Wording | MUST/SHOULD/CAN use the correct level? |
-| 4 | Correct cross-reference | All document codes correct, links working? |
-| 5 | Do not duplicate content | Do not information duplicate already in another document? |
+| 3 | Consistent wording | MUST/SHOULD/CAN use the correct level? |
+| 4 | Cross-reference correctly | All document codes correct, links working? |
+| 5 | No duplicate content | Do not duplicate information already in another document? |
 | 6 | Consistent roles | Do roles in Section 4 appear in Section 7? |
-| 7 | Clear Gate | Does every gate have specific PASS/FAIL conditions? |
+| 7 | Gate is clear | Does every gate have specific PASS/FAIL conditions? |
 | 8 | Printable | Layout fits A4, no overflow? |
 | 9 | No meta-text | No "this document is intended to..."? |
 | 10 | No "AI" mentions | There is no "AI generated", "auto-generated"? |
@@ -184,18 +184,18 @@ Every HTML document has a revision history table at the bottom of the page, in `
 
 ### 5.2 Table structure
 
-| Version | Date | Changer | Change Description | DCR # |
+| Version | Day | People change | Description of changes | DCR # |
 |-----------|------|---------------|---------------|-------|
-| V0 | 2025-06-01 | Nguyen Van A | Initial release | DCR-001 |
+| V0 | 2025-06-01 | Nguyen Van A | First release | DCR-001 |
 | V1.1 | 2025-08-15 | Tran Van B | Correct spelling errors in Section 3, update Section 10 link | DCR-015 |
 | V2.0 | 2025-11-01 | Nguyen Van A | Add gate G5, change QC Lead role | DCR-042 |
 
 ### 5.3 Recording rules
 
-- Record every change, including minor updates.
+- Record every change, even minor updates.
 - Describe specific changes: write which section, what changes. DO NOT say "content update".
-- Every line has a corresponding DCR number (except minor spelling corrections).
-- Keep full history, DO NOT delete old lines.
+- Every line has a corresponding DCR number (minus minor spelling corrections).
+- Keep the entire history, DO NOT delete old lines.
 - Don't show revision history to compare internal drafts before the first release. For documents that are still `V0` and not yet issued, the draft history is in the DCR / review log, not in the SOP body.
 
 ---
@@ -204,15 +204,15 @@ Every HTML document has a revision history table at the bottom of the page, in `
 
 ### 6.1 Storage period
 
-| Record type | Storage time | Notes |
+| Record type | Storage time | Note |
 |-----------|-------------------|---------|
 | Current QMS documents (SOP, WI, ANNEX) | Permanent (on QMS site) | The current version is always accessible |
-| QMS document het effective (Superseded) | Minimum 7 men | Archived on SharePoint Archive |
+| Effective QMS Document (Superseded) | Minimum 7 men | Stored on SharePoint Archive |
 | DCR (FRM-102) | Minimum 7 years | Attach corresponding documents |
 | Peer Review Log (FRM-105) | Minimum 7 years | Attach corresponding documents |
-| Production records (Job records) | Minimum 10 years or according to customer requirements | According to the contract |
-| Training records (Training records) | Minimum 5 years after employee leaves | According to labor law |
-| Calibration records (Calibration) | Minimum 7 years | According to ISO 10012 |
+| Job records | Minimum 10 years or according to customer requirements | According to the contract |
+| Training records | At least 5 years after the employee leaves the job | According to labor law |
+| Calibration documents (Calibration) | Minimum 7 years | According to ISO 10012 |
 | Audit records (Internal/External) | Minimum 7 years | According to ISO 9001 |
 
 ### 6.2 Storage form
@@ -220,14 +220,14 @@ Every HTML document has a revision history table at the bottom of the page, in `
 | System | Record type | Format |
 |----------|-----------|-----------|
 | QMS Site (web) | Current documents | HTML |
-| SharePoint — QMS Records | Original document, DCR, review log | PDF (from HTML) |
-| SharePoint — Archive | Document expired | PDF |
+| SharePoint — QMS Records | Original documents, DCR, review log | PDF (from HTML) |
+| SharePoint — Archive | Document is expired | PDF |
 | Epicor | Production records, job records | System data |
 | Local backup | Full backup | According to IT regulations |
 
-### 6.3 Huy profile
+### 6.3 Documentation
 
-- Only destroy records when the mandatory storage period expires.
+- Only destroy records when the mandatory retention period expires.
 - QMS Engineer prepares a list of documents that need to be destroyed and QA Manager approves.
 - Recorded in FRM-101 Master Document Register.
 - DO NOT arbitrarily delete documents without approval.
@@ -236,16 +236,16 @@ Every HTML document has a revision history table at the bottom of the page, in `
 
 ## 7. Document status
 
-### 7.1 Pregnancy pages
+### 7.1 Sites
 
 | Status | Color code | Meaning |
 |-----------|--------|---------|
-| Draft | Gold | Drafting, not yet effective |
+| Draft | Yellow | Being drafted, not yet in effect |
 | Print Review | Orange | Reviewing or giving approval |
-| Approved | Green | Skin approved, unreleased |
-| Published | Blue | Leather released, in effect |
-| Superseded | Gray | Expired, there is a new replacement version |
-| Obsolete | Red | Cancelled, no longer used |
+| Approved | Green la | Leather approved, unreleased |
+| Published | Blue | Skin released, in effect |
+| Superseded | Grey | Expired, there is a new replacement version |
+| Obsolete | Red | Canceled, no longer in use |
 
 ### 7.2 State transition
 
@@ -260,14 +260,14 @@ Published --cancel--> Obsolete (bi huy)
 
 ### 7.3 Rules
 
-- At work, only **Published** status documents can be used.
-- **Superseded** and **Obsolete** documents MUST have "NO LONGER VALID" written on the first page.
-- QMS Engineer checks monthly: there are no Draft documents that have not been submitted for more than 30 days.
-- QMS Engineer checks monthly: no documents. Printed Review after 10 days has not been approved.
+- Only **Published** status documents can be used in the workplace.
+- **Superseded** and **Obsolete** documents MUST display "NO LONGER VALID" on the first page.
+- QMS Engineer checks monthly: no Draft documents over 30 days have not been submitted.
+- QMS Engineer checks monthly: no documents. In Review after 10 days, not approved.
 
 ---
 
-## 8. Compare the process
+## 8. Compare the entire process
 
 ```
                     +----------+

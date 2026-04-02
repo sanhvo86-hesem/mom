@@ -3,3 +3,17 @@
 {"record_id":"SCAR-2026-001","prefix":"SCAR","year":"2026","seq":1,"time":"2026-03-30T09:42:15+00:00","user":"sanh.vo","ip":"103.156.4.102"}
 {"record_id":"FAI-2026-001","prefix":"FAI","year":"2026","seq":1,"time":"2026-03-30T09:53:48+00:00","user":"sanh.vo","ip":"103.156.4.102"}
 {"record_id":"ECR-2026-001","prefix":"ECR","year":"2026","seq":1,"time":"2026-03-30T10:19:55+00:00","user":"sanh.vo","ip":"103.156.4.102"}
+{"record_id":"SCAR-2026-002","prefix":"SCAR","year":"2026","seq":2,"time":"2026-04-01T12:09:22+00:00","user":"sanh.vo","ip":"127.0.0.1"}
+{"record_id":"SCAR-2026-003","prefix":"SCAR","year":"2026","seq":3,"time":"2026-04-01T12:27:00+00:00","user":"sanh.vo","ip":"127.0.0.1"}
+{"record_id":"SCAR-2026-004","prefix":"SCAR","year":"2026","seq":4,"time":"2026-04-01T12:27:43+00:00","user":"sanh.vo","ip":"127.0.0.1"}
+{"record_id":"SCAR-2026-005","prefix":"SCAR","year":"2026","seq":5,"time":"2026-04-01T12:28:25+00:00","user":"sanh.vo","ip":"127.0.0.1"}
+{"record_id":"SCAR-2026-006","prefix":"SCAR","year":"2026","seq":6,"time":"2026-04-01T12:40:30+00:00","user":"sanh.vo","ip":"127.0.0.1"}
+{"record_id":"SCAR-2026-007","prefix":"SCAR","year":"2026","seq":7,"time":"2026-04-01T12:55:20+00:00","user":"sanh.vo","ip":"127.0.0.1"}
+{"record_id":"SCAR-2026-008","prefix":"SCAR","year":"2026","seq":8,"time":"2026-04-01T12:55:59+00:00","user":"sanh.vo","ip":"127.0.0.1"}
+{"record_id":"SCAR-2026-009","prefix":"SCAR","year":"2026","seq":9,"time":"2026-04-01T12:56:34+00:00","user":"sanh.vo","ip":"127.0.0.1"}
+{"record_id":"SCAR-2026-010","prefix":"SCAR","year":"2026","seq":10,"time":"2026-04-01T12:58:04+00:00","user":"sanh.vo","ip":"127.0.0.1"}
+{"record_id":"SCAR-2026-011","prefix":"SCAR","year":"2026","seq":11,"time":"2026-04-01T12:58:38+00:00","user":"sanh.vo","ip":"127.0.0.1"}
+{"record_id":"SCAR-2026-012","prefix":"SCAR","year":"2026","seq":12,"time":"2026-04-01T13:01:15+00:00","user":"sanh.vo","ip":"127.0.0.1"}
+{"record_id":"SCAR-2026-013","prefix":"SCAR","year":"2026","seq":13,"time":"2026-04-01T13:02:15+00:00","user":"sanh.vo","ip":"127.0.0.1"}
+{"record_id":"SCAR-2026-014","prefix":"SCAR","year":"2026","seq":14,"time":"2026-04-01T13:13:27+00:00","user":"sanh.vo","ip":"127.0.0.1"}
+{"record_id":"SCAR-2026-015","prefix":"SCAR","year":"2026","seq":15,"time":"2026-04-01T14:30:03+00:00","user":"sanh.vo","ip":"127.0.0.1"}

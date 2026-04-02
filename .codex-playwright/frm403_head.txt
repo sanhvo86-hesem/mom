@@ -1,0 +1,260 @@
+(function(){
+'use strict';
+
+var FORM_CODE = String((new URLSearchParams(window.location.search || '')).get('form_code') || 'FRM-403-SCAR').trim() || 'FRM-403-SCAR';
+var PORTAL_API_URL = '/01-QMS-Portal/api.php';
+var FIELD_IDS = ['scar_date','supplier_name','supplier_id','po_number','part_number','part_rev','lot_number','quantity_received','quantity_rejected','defect_type','defect_description','severity','containment_action','root_cause_required','supplier_response_due_date','supplier_root_cause','supplier_corrective_action','supplier_preventive_action','verification_method','verification_result','scar_status','issued_by','approved_by','supplier_contact'];
+var REQUIRED_FIELDS = ['scar_date','supplier_name','supplier_id','po_number','part_number','quantity_received','quantity_rejected','defect_type','defect_description','severity','containment_action','supplier_response_due_date','scar_status','issued_by'];
+var ROOT_CAUSE_FIELDS = ['supplier_root_cause','supplier_corrective_action','supplier_preventive_action'];
+var LOOKUP_FIELDS = {
+  supplier_name: {
+    hostId: 'supplier_name_lookup',
+    source: 'suppliers',
+    placeholder: 'Tìm và ch?n nhà cung c?p t? d? li?u n?n',
+    helper: 'Ch?n nhà cung c?p d? t? d?ng di?n mã và liên h?.',
+    onSelect: function(item){
+      state.data.supplier_name = String(item.supplier_name || item.label || '').trim();
+      state.data.supplier_id = String(item.supplier_id || item.value || '').trim();
+      state.data.supplier_contact = buildSupplierContact(item);
+    }
+  },
+  part_number: {
+    hostId: 'part_number_lookup',
+    source: 'parts',
+    placeholder: 'Tìm và ch?n part / revision t? d? li?u n?n',
+    helper: 'Ch?n part d? t? d?ng g?n revision hi?n hành.',
+    onSelect: function(item){
+      state.data.part_number = String(item.part_number || item.value || '').trim();
+      state.data.part_rev = String(item.revision || '').trim();
+      if(!state.data.supplier_id && item.preferred_supplier_id){
+        applySupplierById(String(item.preferred_supplier_id || '').trim(), false);
+      }
+    }
+  },
+  issued_by: {
+    hostId: 'issued_by_lookup',
+    source: 'company_users',
+    placeholder: 'Tìm và ch?n ngu?i phát hành',
+    helper: 'Ch?n t? danh sách công ty ho?c dùng ngu?i dang nh?p.',
+    allowCurrentUser: true,
+    onSelect: function(item){
+      state.data.issued_by = String(item.person_name || item.label || item.value || '').trim();
+    }
+  },
+  approved_by: {
+    hostId: 'approved_by_lookup',
+    source: 'company_users',
+    placeholder: 'Tìm và ch?n ngu?i phê duy?t',
+    helper: 'Ch?n t? danh sách công ty ho?c dùng ngu?i dang nh?p.',
+    allowCurrentUser: true,
+    onSelect: function(item){
+      state.data.approved_by = String(item.person_name || item.label || item.value || '').trim();
+    }
+  },
+  defect_type: {
+    hostId: 'defect_type_lookup',
+    source: 'defect_catalog',
+    placeholder: 'Tìm và ch?n lo?i l?i t? danh m?c ki?m soát',
+    helper: 'Lo?i l?i dùng chung gi?a EQMS, ERP và MES.',
+    onSelect: function(item){
+      state.data.defect_type = String(item.defect_name || item.label || item.value || '').trim();
+    }
+  }
+};
+var STATUS_LABELS = { open:'M?', awaiting_response:'Ch? ph?n h?i nhà cung c?p', under_review:'Ðang xem xét', verification:'Ðang xác nh?n', closed:'Ðã dóng' };
+var SEVERITY_META = {
+  minor:{ label:'Nh?', note:'Theo dõi theo nh?p x? lý thông thu?ng, không c?n escalations t?c th?i.', className:'success' },
+  major:{ label:'N?ng', note:'C?n containment rõ ràng và ph?n h?i nguyên nhân g?c trong h?n ng?n.', className:'warning' },
+  critical:{ label:'Nghiêm tr?ng', note:'C?n di?u ph?i kh?n, nh?n m?nh nguy co tái di?n và xác minh hi?u l?c ch?t ch?.', className:'danger' }
+};
+
+var params = new URLSearchParams(window.location.search || '');
+var state = {
+  lang: params.get('lang') === 'en' ? 'en-US' : 'vi-VN',
+  allocationId: String(params.get('allocation_id') || '').trim(),
+  recordId: String(params.get('record_id') || '').trim(),
+  csrfToken: '',
+  loggedIn: false,
+  currentUser: null,
+  schema: null,
+  allocation: null,
+  entry: null,
+  serverDraft: null,
+  localDraft: null,
+  master: null,
+  companyDirectory: [],
+  signatures: {},
+  resetSignaturesSnapshot: {},
+  approvalSummary: null,
+  reviewSla: null,
+  data: {},
+  resetSnapshot: {},
+  loadedSource: 'M?c d?nh t? h? so',
+  lastLocalSaveAt: '',
+  lastServerSaveAt: '',
+  saveTimer: null,
+  busySave: false,
+  busySubmit: false,
+  localKey: '',
+  editMode: true,
+  isDirty: false,
+  lookupsMounted: false
+};
+var els = {};
+
+document.addEventListener('DOMContentLoaded', init);
+
+function init(){
+  cacheElements();
+  state.localKey = localDraftKey();
+  bindEvents();
+  bindRuntimeGuards();
+  repairVisibleMojibake(document.body);
+  updateActionState();
+  updateRuntimeAlert('info', 'Ðang kh?i t?o bi?u m?u', 'H? th?ng dang t?i thông tin h? so, nháp g?n nh?t và d? li?u n?n nhà cung c?p.', 'Kh?i t?o');
+  loadRuntime();
+}
+
+function cacheElements(){
+  els.form = byId('scarForm');
+  els.supplierHints = byId('supplierHints');
+  els.saveMeta = byId('saveMeta');
+  els.entryMeta = byId('entryMeta');
+  els.workflowPanel = byId('scarWorkflowPanel');
+  els.btnSaveDraft = byId('btnSaveDraft');
+  els.btnReset = byId('btnReset');
+  els.btnSubmit = byId('btnSubmit');
+  els.btnEdit   = byId('btnEdit');
+  els.btnCancel = byId('btnCancel');
+  els.btnPrint  = byId('btnPrint');
+}
+
+function bindEvents(){
+  if(els.form){
+    els.form.addEventListener('input', handleFieldChange);
+    els.form.addEventListener('change', handleFieldChange);
+    els.form.addEventListener('submit', handleSubmit);
+  }
+  if(els.btnSaveDraft) els.btnSaveDraft.addEventListener('click', handleSaveDraft);
+  if(els.btnReset) els.btnReset.addEventListener('click', handleReset);
+  if(els.btnEdit)   els.btnEdit.addEventListener('click', handleEnterEdit);
+  if(els.btnCancel) els.btnCancel.addEventListener('click', handleCancelEdit);
+  if(els.btnPrint)  els.btnPrint.addEventListener('click', handlePrint);
+  if(els.supplierHints){
+    els.supplierHints.addEventListener('click', function(event){
+      var button = event.target.closest('[data-supplier-id]');
+      if(!button) return;
+      event.preventDefault();
+      applySupplierById(String(button.getAttribute('data-supplier-id') || '').trim(), true);
+    });
+  }
+}
+
+function loadRuntime(){
+  fetchStatus().then(function(){
+    return Promise.all([loadSchema(), loadAllocation(), loadServerDraft(), loadMasterData(), loadCompanyDirectory()]);
+  }).then(function(){
+    state.localDraft = loadLocalDraft();
+    return loadEntry();
+  }).then(function(){
+    state.signatures = buildMergedSignatures();
+    state.data = buildMergedData();
+    state.resetSnapshot = clone(state.data);
+    state.resetSignaturesSnapshot = clone(state.signatures);
+    populateForm();
+    mountLookupControls();
+    renderAll();
+    updateActionState();
+    var hasSubmitted = !!(state.entry && state.entry.entry_id);
+    setMode(hasSubmitted ? 'view' : 'edit');
+    if(!state.loggedIn){
+      updateRuntimeAlert('warning', 'Phiên dang nh?p chua s?n sàng', 'Bi?u m?u v?n cho phép nh?p và tính toán c?c b?, nhung mu?n luu nháp máy ch? ho?c g?i h? so thì c?n dang nh?p QMS h?p l?.', 'Khách');
+    } else if(!state.allocationId){
+      updateRuntimeAlert('warning', 'Bi?u m?u dang m? d?c l?p', 'Chua có allocation_id nên anh ch? có th? nh?p th? và luu c?c b?. Mu?n g?i SCAR th?t, hãy m? t? workspace dã c?p mã h? so.', 'Chua c?p mã');
+    } else {
+      updateRuntimeAlert('success', 'Bi?u m?u dã s?n sàng', 'D? li?u h? so, nháp và ng? c?nh truy xu?t dã du?c d?ng b?. Anh có th? ti?p t?c hoàn thi?n SCAR ngay trên file HTML d?c l?p này.', 'S?n sàng');
+    }
+    notifyHeight();
+  }).catch(function(error){
+    console.error(error);
+    updateRuntimeAlert('danger', 'Không th? kh?i t?o bi?u m?u', error && error.message ? error.message : 'H? th?ng không t?i du?c d? li?u c?n thi?t cho SCAR.', 'L?i');
+    updateActionState();
+    notifyParentToast('Không th? kh?i t?o bi?u m?u SCAR.', 'error');
+  });
+}
+
+function fetchStatus(){
+  return callApiDirect('status', {}, 'GET').then(function(resp){
+    state.loggedIn = !!(resp && resp.ok && resp.logged_in);
+    state.currentUser = resp && resp.user ? resp.user : null;
+    state.csrfToken = String(resp && resp.csrf_token || '').trim();
+    return resp;
+  });
+}
+
+function loadSchema(){
+  return callApi('form_fill_load_schema', { form_code: FORM_CODE }, 'GET').then(function(resp){
+    state.schema = resp && resp.ok ? (resp.schema || null) : null;
+    setText('metaVersion', (state.schema && state.schema.version) || 'V1');
+    return state.schema;
+  }).catch(function(){ state.schema = null; return null; });
+}
+
+function loadAllocation(){
+  if(!state.allocationId) return Promise.resolve(null);
+  return callApi('upload_allocation_status', { allocation_id: state.allocationId }, 'GET').then(function(resp){
+    state.allocation = resp && resp.ok ? (resp.allocation || null) : null;
+    if(state.allocation && !state.recordId) state.recordId = String(state.allocation.record_id || '').trim();
+    state.approvalSummary = state.allocation && state.allocation.approval_summary ? clone(state.allocation.approval_summary) : null;
+    state.reviewSla = state.allocation && state.allocation.review_sla ? clone(state.allocation.review_sla) : null;
+    return state.allocation;
+  }).catch(function(){ state.allocation = null; return null; });
+}
+
+function loadEntry(){
+  if(!state.loggedIn || !state.allocationId) return Promise.resolve(null);
+  return callApi('online_form_entry_get', {
+    form_code: FORM_CODE,
+    allocation_id: state.allocationId,
+    entry_id: state.allocation && state.allocation.online_submission ? String(state.allocation.online_submission.entry_id || '') : ''
+  }, 'POST').then(function(resp){
+    state.entry = resp && resp.ok ? (resp.entry || null) : null;
+    return state.entry;
+  }).catch(function(){ state.entry = null; return null; });
+}
+
+function loadServerDraft(){
+  if(!state.loggedIn || !state.allocationId) return Promise.resolve(null);
+  return callApi('form_fill_get_draft', { allocation_id: state.allocationId }, 'GET').then(function(resp){
+    state.serverDraft = resp && resp.ok ? (resp.draft || null) : null;
+    return state.serverDraft;
+  }).catch(function(){ state.serverDraft = null; return null; });
+}
+
+function loadMasterData(){
+  if(!state.loggedIn) return Promise.resolve(null);
+  return callApi('master_data_snapshot', {}, 'GET').then(function(resp){
+    state.master = resp && resp.ok ? (resp.data || null) : null;
+    hydrateSupplierDatalist();
+    return state.master;
+  }).catch(function(){ state.master = null; return null; });
+}
+
+function loadCompanyDirectory(){
+  if(!state.loggedIn) return Promise.resolve([]);
+  return callApi('company_directory_list', {}, 'GET').then(function(resp){
+    state.companyDirectory = Array.isArray(resp && resp.users) ? resp.users : [];
+    return state.companyDirectory;
+  }).catch(function(){
+    state.companyDirectory = [];
+    return state.companyDirectory;
+  });
+}
+
+function buildMergedData(){
+  var base = defaultData();
+  mergeFieldMap(base, allocationPrefill());
+  [
+    { label:'Báº£n ná»™p gáº§n nháº¥t', timestamp:parseTimestamp(state.entry && (state.entry.updated_at || state.entry.submitted_at || state.entry.created_at)), values:extractEntryValues(state.entry), order:1 },
+    { label:'NhÃ¡p mÃ¡y chá»§', timestamp:parseTimestamp(state.serverDraft && state.serverDraft.saved_at), values:extractDraftValues(state.serverDraft), order:2 },
+    { label:'NhÃ¡p cá»¥c bá»™', timestamp:parseTimestamp(state.localDraft && state.localDraft.saved_at), values:extractDraftValues(state.localDraft), order:3 }

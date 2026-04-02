@@ -145,14 +145,14 @@ qms.hesem.com.vn/
 │   │   ├── qms-terminology-dictionary.xlsx
 │   │   ├── remaining-english-words.xlsx
 │   │   └── remaining-english-words-v2.xlsx
-?   ??? legacy/ ? Older scripts not yet reclassified
+│   └── legacy/                            → Scripts cũ chưa phân loại
 │
-??? _reports/ ? AI-generated outputs and reports (details: 11-ai-tooling-and-reports.md)
-?   ??? analysis/ ? Strategic analysis and expert reviews
-?   ??? translation/ ? Translation progress
-?   ??? link-repair/ ? Broken-link repair tracking
-?   ??? encoding/ ? Encoding/mojibake fix tracking
-?   ??? language/ ? Language audit and mixed-term inventories
+├── _reports/                               → Output & báo cáo AI-generated (chi tiết: 11-ai-tooling-and-reports.md)
+│   ├── analysis/                          → Phân tích chiến lược & expert reviews
+│   ├── translation/                       → Tiến độ dịch thuật
+│   ├── link-repair/                       → Tracking sửa broken links
+│   ├── encoding/                          → Encoding/mojibake fix tracking
+│   ├── language/                          → Language audit & mixed-term
 │   ├── m365/                              → SharePoint/M365 templates
 │   ├── form-audit/                        → Form analysis & compliance
 │   └── screenshots/                       → Screenshots minh họa
@@ -178,9 +178,9 @@ qms.hesem.com.vn/
 
 **Model:** `sop-[3digit]-[kebab-case].html`
 
-| Ingredients | Rules | Example |
+| Ingredient | Rules | For example |
 |------------|---------|-------|
-| Prefix | `sop-` (always lowercase) | `sop-` |
+| Prefix | `sop-` (always lower case) | `sop-` |
 | Code | 3 digits, in series (1xx, 2xx...) | `101`, `501` |
 | Name | kebab-case, English, content description | `document-and-data-control` |
 | Tail | `.html` | `.html` |
@@ -201,10 +201,10 @@ sop-902-management-review.html
 **Series code:**
 | Series | Scope | Presiding department |
 |--------|---------|-------------------|
-| 100 | Platform & Administration | Quality / IT |
+| 100 | Platform & administration | Quality / IT |
 | 200 | Customer & trade | Sales / Quality |
 | 300 | Engineering & design | Engineering |
-| 400 | Supply Chain | Supply Chain |
+| 400 | Supply chain | Supply Chain |
 | 500 | Production & operations | Production |
 | 600 | Quality & measurement | Quality |
 | 700 | Warehouse & logistics | Warehouse / Supply Chain |
@@ -272,9 +272,9 @@ jd-it-admin.html
 **Rules:**
 - Prefix `FRM-` is in CAPITAL
 - 3-digit code, according to series (1xx, 2xx...)
-- The descriptive name uses `_` (underscore) instead of spaces
+- Description names use `_` (underscore) instead of spaces
 - Words capitalize the first letter (Title_Case)
-- End `.xlsx`
+- Tail `.xlsx`
 
 **Practical example:**
 ```
@@ -323,7 +323,7 @@ dept-ehs-handbook.html
 
 ---
 
-## C. Directory naming rules
+## C. Folder naming rules
 
 ### C1. Prefix the sequence number
 
@@ -336,7 +336,7 @@ All directories use a 2-digit prefix:
 
 ### C2. Writing conventions
 
-| Level | Convention | Example |
+| Grant | Convention | For example |
 |-----|---------|-------|
 | Level 1 | PascalCase or kebab-case | `01-QMS-Portal`, `02-Tai-Lieu-He-Thong` |
 | Level 2 | PascalCase | `01-Quality-Manual`, `02-Department-Handbooks` |
@@ -344,11 +344,11 @@ All directories use a 2-digit prefix:
 
 ### C3. Valid characters
 
-| Allowed | Not allowed |
+| Allowed | Unauthorized |
 |-----------|-----------------|
-| `a-z` | Vietnamese accents (à, ê, ọ...) |
-| `A-Z` | Whitespace |
-| `0-9` | Special character (@ # $ % & ...) |
+| `a-z` | Vietnamese diacritics (uh, ê, ugh...) |
+| `A-Z` | White space |
+| `0-9` | Special characters (@ # $ % & ...) |
 | `-` (hyphen) | Brackets ( ) [ ] { } |
 | `_` (underscore) | Semicolon, comma |
 | `.` (period — file extension only) | Unicode beyond ASCII |
@@ -370,8 +370,8 @@ Create a file `index.html` that lists the documents in the folder with a short d
 
 **Rules:**
 - All series folders (SOP, WI, ANNEX, FRM) **MUST** have their contents noted in at least 1 of the 2 ways above
-- Notes must list the abbreviations or main topics of the documents inside
-- When adding or removing documents from folders, notes **MUST** be updated accordingly
+- The note should list the abbreviation or main subject of the documents within
+- When adding or removing documents from a folder, notes **MUST** be updated accordingly
 - Note: Use English or bilingual, do not use pure Vietnamese
 
 ---
@@ -445,13 +445,13 @@ Where `[relative]` is the relative path from the current file to the root of the
 
 ### E5. Cross-reference between document types
 
-| From | To | Pattern |
+| From | Arrive | Pattern |
 |----|-----|---------|
 | SOP → WI | `../../02-Work-Instructions/[series]/wi-xxx.html` | Same level 1 |
 | SOP → ANNEX | `../../03-Reference/[series]/annex-xxx.html` | Same level 1 |
-| SOP → Form | `../../../04-Bieu-Mau/[series]/FRM-xxx.xlsx` | Other level 1 |
+| SOP → Form | `../../../04-Bieu-Mau/[series]/FRM-xxx.xlsx` | Different from level 1 |
 | WI → SOP | `../../01-SOPs/[series]/sop-xxx.html` | Same level 1 |
-| JD → SOP | `../../../03-Tai-Lieu-Van-Hanh/01-SOPs/[series]/sop-xxx.html` | Other level 1 |
+| JD → SOP | `../../../03-Tai-Lieu-Van-Hanh/01-SOPs/[series]/sop-xxx.html` | Different from level 1 |
 
 ### E6. Form download link
 
@@ -468,7 +468,7 @@ Where `[relative]` is the relative path from the current file to the root of the
 
 ## F. Quick summary table
 
-| Type | File name pattern | Root directory | Tail |
+| Type | File name template | Root directory | Tail |
 |------|---------------|-------------|------|
 | SOP | `sop-[3d]-[kebab].html` | `03-Tai-Lieu-Van-Hanh/01-SOPs/` | `.html` |
 | WI | `wi-[3d]-[kebab].html` | `03-Tai-Lieu-Van-Hanh/02-Work-Instructions/` | `.html` |
@@ -493,9 +493,9 @@ File 15 specifies how to name **operational records** (completed form, evidence,
 
 ### G1. Summary of 6 naming patterns for operational records
 
-| Pattern | Templates | Used for |
+| Pattern | Template | Used for |
 |---------|---------|---------|
-| 1. Filled Form | `FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}` | Filled form (Excel/PDF) |
+| 1. Filled Forms | `FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}` | Filled form (Excel/PDF) |
 | 2. Job Evidence | `{RecordType}_{JobNum}_{PartRev}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}` | Photos, CMM, certs, scans attached to job |
 | 3. Eng. Baseline | `{FileType}_{PartRev}_{Op}_{Machine}_V{ver}.{ext}` | NC, CAM, Setup Sheet, Fixture master |
 | 4. Non-job Evidence | `{RecordType}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}` | Audit, MR, training, department records |
@@ -504,7 +504,7 @@ File 15 specifies how to name **operational records** (completed form, evidence,
 
 ### G2. Distinguish between document and file file names
 
-| System | File name | Example | Regulations |
+| System | File name | For example | Regulations |
 |----------|---------|-------|----------|
 | Web portal (document) | kebab-case, English | `sop-631-ncr-management.html` | Section B (this file) |
 | Web portal (form blank) | FRM + Title + Version | `FRM-631_NCR-Report_V2.1.xlsx` | Section B5 + File 15 |

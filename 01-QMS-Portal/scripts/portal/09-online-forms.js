@@ -1041,7 +1041,9 @@ function waitForDocViewerReady(docRef){
         var sameCode = !!(expectedCode && window.currentDoc === expectedCode);
         var samePath = !!(expectedPath && normalizeEqmsPath(window.currentDocPath || '') === expectedPath);
         var srcMatches = !!(expectedPath && iframe && String(iframe.src || '').indexOf(expectedPath) >= 0);
-        ready = !!(iframe && viewer && viewer.classList.contains('active') && readyState && (sameCode || samePath || srcMatches));
+        var hasBody = !!(iframeDoc && iframeDoc.body && String(iframeDoc.body.innerHTML || '').replace(/\s+/g, '').length > 40);
+        var hasFormCanvas = !!(iframeDoc && iframeDoc.body && iframeDoc.body.querySelector && iframeDoc.body.querySelector('.form-header,[data-form-edit-root],#scarForm,.qf-section,.scar-record-strip'));
+        ready = !!(iframe && viewer && viewer.classList.contains('active') && readyState && hasBody && (hasFormCanvas || String(iframeDoc.body.textContent || '').trim().length > 30) && (sameCode || samePath || srcMatches));
       }catch(_err){
         ready = false;
       }
@@ -1075,20 +1077,21 @@ function openEqmsTemplateEditor(formCode, bypassGuard){
   }
   Promise.resolve(openDoc(doc)).then(function(){
     return waitForDocViewerReady(doc);
-  }).then(function(){
-    try{ startEdit(doc); }catch(_err){}
-    return new Promise(function(resolve, reject){
-      setTimeout(function(){
-        var editorActive = (typeof editMode !== 'undefined' && editMode && typeof editingDoc !== 'undefined' && !!editingDoc);
-        var sameCode = editorActive && editingDoc === doc.code;
-        var samePath = editorActive && normalizeEqmsPath(window.currentDocPath || '') === normalizeEqmsPath(doc.path || '');
-        if(sameCode || samePath){
-          showToast(t('Đã mở mẫu HTML để chỉnh sửa bằng cùng bề mặt hiển thị.', 'Opened the HTML template in the same visual surface.'), 'success');
-          resolve();
-          return;
-        }
-        reject(new Error('editor_not_ready'));
-      }, 260);
+  }).then(function(viewerReady){
+    if(viewerReady === false) throw new Error('viewer_not_ready');
+    var targetRef = doc.path || doc.code || doc;
+    var resolved = (typeof window._resolveDocRecord === 'function') ? window._resolveDocRecord(targetRef) : doc;
+    var canDirectEdit = !!(resolved && typeof canEdit === 'function' && canEdit(resolved));
+    if(canDirectEdit){
+      try{ startEdit(targetRef); }catch(_err){}
+    }else if(typeof startNewRevision === 'function'){
+      try{ startNewRevision(targetRef); }catch(_err2){}
+    }else{
+      throw new Error('editor_not_ready');
+    }
+    return waitForEqmsEditorReady(doc).then(function(ready){
+      if(!ready) throw new Error('editor_not_ready');
+      showToast(t('Đã mở mẫu HTML để chỉnh sửa bằng cùng bề mặt hiển thị.', 'Opened the HTML template in the same visual surface.'), 'success');
     });
   }).catch(function(){
     showToast(t('Không thể mở trình chỉnh sửa mẫu HTML lúc này.', 'Could not open the HTML template editor right now.'), 'error');

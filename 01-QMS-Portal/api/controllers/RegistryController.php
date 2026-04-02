@@ -152,6 +152,17 @@ class RegistryController extends BaseController
                 'api_params'        => $this->readJsonFile($dir . '/api-params.json') ?? [],
                 'field_types'       => $this->readJsonFile($dir . '/field-types.json') ?? [],
                 'status_options'    => $this->readJsonFile($dir . '/status-options.json') ?? [],
+                'domain_field_packs'=> $this->readJsonFile($dir . '/domain-field-packs.json') ?? [],
+                'schema_library'    => $this->readJsonFile($dir . '/schema-library.json') ?? [],
+                'registry_manifest' => $this->readJsonFile($dir . '/registry-manifest.json') ?? [],
+                'endpoint_catalog'  => $this->readJsonFile($dir . '/endpoint-catalog.json') ?? [],
+                'validation_rules'  => $this->readJsonFile($dir . '/validation-rules.json') ?? [],
+                'relation_map'      => $this->readJsonFile($dir . '/relation-map.json') ?? [],
+                'workflow_library'  => $this->readJsonFile($dir . '/workflow-library.json') ?? [],
+                'compliance_crosswalk' => $this->readJsonFile($dir . '/compliance-crosswalk.json') ?? [],
+                'registry_quality_report' => $this->readJsonFile($dir . '/registry-quality-report.json') ?? [],
+                'unit_library'      => $this->readJsonFile($dir . '/unit-library.json') ?? [],
+                'identifier_patterns' => $this->readJsonFile($dir . '/identifier-patterns.json') ?? [],
                 'computed_formulas' => $this->readJsonFile($dir . '/computed-formulas.json') ?? [],
                 'iot_connectors'    => $this->readJsonFile($dir . '/iot-connectors.json') ?? [],
             ]);
@@ -173,7 +184,25 @@ class RegistryController extends BaseController
         $registry = trim((string)($body['registry'] ?? ''));
         $data = $body['data'] ?? null;
 
-        $allowed = ['data-fields', 'api-params', 'field-types', 'status-options', 'computed-formulas', 'iot-connectors'];
+        $allowed = [
+            'data-fields',
+            'api-params',
+            'field-types',
+            'status-options',
+            'domain-field-packs',
+            'schema-library',
+            'registry-manifest',
+            'endpoint-catalog',
+            'validation-rules',
+            'relation-map',
+            'workflow-library',
+            'compliance-crosswalk',
+            'registry-quality-report',
+            'unit-library',
+            'identifier-patterns',
+            'computed-formulas',
+            'iot-connectors',
+        ];
         if (!in_array($registry, $allowed, true)) {
             $this->error('invalid_registry', 400, 'Allowed: ' . implode(', ', $allowed));
         }

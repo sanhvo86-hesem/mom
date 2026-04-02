@@ -6,9 +6,9 @@
 
 This document is not an SOP. It is a reference model for writers to:
 - understand the common departmental structure of the `job-order CNC` model;
-- compare with current HESEM;
+- Compare with current HESEM;
 - detect coverage gap;
-- avoid mechanical updates when normalizing `department code`.
+- Avoid mechanical updates when normalizing `department code`.
 
 ## 2. International reference sources used
 
@@ -21,7 +21,7 @@ The resources below are not “mandatory laws” for HESEM. They are used to inf
 - ERPNext — [Routing](https://docs.frappe.io/erpnext/user/manual/en/routing)
 - ERPNext — [Quality Inspection](https://docs.frappe.io/erpnext/user/manual/en/quality-inspection)
 - MRPeasy — [Manufacturing Orders](https://www.mrpeasy.com/resources/user-manual/production-planning/manufacturing-orders/)
-- MRPeasy — [Routings](https://www.mrpeasy.com/resources/user-manual/production-planning/routings/)
+- MRPeasy — [Routing](https://www.mrpeasy.com/resources/user-manual/production-planning/routings/)
 - MRPeasy — [Overlap and Special Sequences of Manufacturing Operations](https://www.mrpeasy.com/resources/user-manual/settings/system/professional-functions/overlap-and-sequence-of-manufacturing-operations/)
 - APQC — [Applying the PCF for Business Value](https://www.apqc.org/sites/default/files/files/PCF%20Collateral/Applying%20the%20PCF%20for%20Business%20Value%20-%20FINAL.pdf)
 - APQC — [Manage Financial Resources](https://www.apqc.org/sites/default/files/K04087_8.0_Manage_Financial_Resources.pdf)
@@ -42,14 +42,14 @@ The international CNC job-order model almost always clearly separates:
 - Finance / Costing / Invoicing / AR-AP
 - HR / Competence / Onboarding-Offboarding
 - IT / Digital Platform / Access / Backup
-- ERP or Business System Administration when the system is large enough to be separated from IT infrastructure
+- ERP or Business System Administration when the system is large enough to be separated from the IT infrastructure
 
-### 3.2 Outstanding consistency
+### 3.2 Outstanding consistency points
 
 - `Work Order` and `Routing` always separate planning/engineering from execution.
 - `Job Card` or stage orders always focus on the field line instead of putting it all under one "general management".
 - `Quality Inspection` is always a class independent of production execution.
-- purchasing / receiving / stock / shipping are different handoff points, should not be grouped into a general "warehouse".
+- Purchasing / receiving / stock / shipping are different handoff points and should not be grouped into a general "warehouse".
 - ERP/business system administration is usually not allowed to own business logic; They configure and protect transaction integrity, while the process owner keeps the business decisions.
 
 ### 3.3 Inference applied to HESEM
@@ -68,7 +68,7 @@ This is an operational inference from benchmarks and internal documents, not a v
 - `D-QUAL`: keep inspection independence, metrology discipline, product release, NCR/CAPA, audit-system mechanics and quality evidence. Don't absorb the execution of production just for the sake of "convenience".
 - `D-SCM`: keep sourcing, receiving, warehouse integrity, tool crib, shipping handoff and materials/logistics traceability. Do not replace QA in quality disposition or Engineering in process selection.
 - `D-FIN`: holds invoicing, AR/AP, closing, costing and financial control. In the job-order model, cost accounting is a real job class, not a decorative report; If you do not have your own JD, the handbook must clearly state who is holding it temporarily.
-- `D-HR`: keeps manpower coordination, onboarding/offboarding, training administration, skills matrix and labor records. Sign-off technical capacity must always return to the decision role of the receiving function.
+- `D-HR`: keep manpower coordination, onboarding/offboarding, training administration, matrix skills and labor records. Sign-off technical capacity must always return to the decision role of the receiving function.
 - `D-EHS`: holds hazard system, permit discipline, incident learning and emergency readiness. Stop-work can occur at the source, but plant-wide shutdown/restart is still subject to published authority.
 - `D-IT`: holds endpoint, network, identity, backup, platform support and recovery at the infrastructure layer. Do not own business data content or ERP transaction logic.
 
@@ -81,40 +81,40 @@ This is an operational inference from benchmarks and internal documents, not a v
 - `D-LOG`: used for booking, packing interface, shipment documents and carrier handoff.
 - `D-ERP`: used for application logic, role model, workflow, report logic, master-data guardrail and transaction integrity; not a synonym of IT.
 
-## 4. Heuristics to properly classify entities
+## 4. Heuristics to correctly classify entities
 
 ### 4.1 The sign is Department/Subfunction
 
 - stable repeat responsibilities across multiple SOPs/WIs;
-- not an individual signing decision;
-- have clear inputs/outputs and handoffs;
+- not a personal signing decision;
+- have clear input/output and handoff;
 - often called in executive meetings, dashboards, interface tables;
 - If the JD holder is replaced, the functional scope remains intact.
 
 ### 4.2 Signs that it is JD role
 
 - has the right to sign or release;
-- may be held personally responsible;
+- may be held personally liable;
 - clear owner KPI or owner action plan;
 - Deputy/back-up must be assigned to an individual/role, not the entire department.
 
-### 4.3 That sign is a gap
+### 4.3 The sign is a gap
 
-- the job is real but all current documents are avoided with vague phrases;
-- an important decision is being "underground" handled by someone but there is no JD or handbook clearly recorded;
-- many SOPs refer to the same group of tasks but each document calls for a different type;
+- the work is real but all current documents avoid it with vague phrases;
+- An important decision is being "underground" handled by someone but there is no JD or handbook clearly recorded;
+- Many SOPs refer to the same group of tasks but each document calls for a different type;
 - In actual reviews, users cannot answer "who has the final decision".
 
 ### 4.4 How to distinguish departmental gap from JD gap
 
-- If the job is a repetitive function at the functional level, has clear input/output and still exists despite changing people, priority should be given to this as `Department gap` or `Subfunction gap`.
-- If the issue is with signing authority, exception approval, technical sign-off, hold/release or the individual with final responsibility, consider this `JD gap` as the priority.
-- If the international benchmark has a separate role but HESEM is not loaded enough to separate, the handbook must clearly state who is holding it temporarily and which trigger will force the opening of a separate JD.
+- If the job is a repetitive function at a functional level, has clear inputs/outputs, and persists despite substitutions, consider this as `Department gap` or `Subfunction gap`.
+- If the issue is with signing authority, exception approval, technical sign-off, hold/release, or the individual with ultimate responsibility, consider this `JD gap` in preference.
+- If the international benchmark has a separate role but HESEM is not sufficiently loaded to separate, the handbook must clearly state who is holding the temporary and which trigger will force the opening of the separate JD.
 - If the international benchmark has a separate group of tasks but HESEM only has one person working, do not automatically create `D-code`; Only create when the group of tasks has stabilized into a repeating class of functions.
 
 ## 5. Rules to update documents from reference model
 
-- Read the current document first, do not use reference models to blindly overwrite.
-- If the benchmark suggests a new boundary but there is no JD/handbook support internally, the gap must be noted.
-- If an internal role has an actual role that is smaller than the benchmark, the handbook must clearly state how to temporarily retain authority instead of fabricating the role.
+- Read the current document first, do not use the reference model to blindly overwrite.
+- If the benchmark suggests a new boundary but there is no internal JD/handbook support, the gap must be noted.
+- If an internal role has an actual role that is smaller than the benchmark, the handbook must clearly state how to retain temporary authority instead of fabricating the role.
 - Only use benchmarks to lock in boundary logic; Do not copy KPI or description text intact.

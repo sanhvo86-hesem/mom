@@ -7,7 +7,7 @@
 
 ## 1. Purpose
 
-- Unify the layout, style and structure for all 111 HESEM Excel forms.
+- Unified layout, style and structure for all 111 HESEM Excel forms.
 - Make sure all forms can be printed on A4/A3, filled out by hand or on a computer, and everyone who picks them up knows what to do.
 - Synchronize header, color, font with current SOP/WI/ANNEX system.
 - Ready for ISO 9001:2026 and AS9100D at HESEM practical level.
@@ -29,7 +29,7 @@ Approval (2 hoặc 3 cột): Prepared | Approved (| thêm cột nếu cần)
 Notice
 ```
 
-**Principles:**
+**Principle:**
 - Gate does NOT have its own section — gate is the summary result from the checklist.
 - Action tracker does NOT separate tabs — record directly in checklist if HOLD/FAIL.
 - Ref fields maximum 4 fields (Job/WO, Part/Rev, Date, Owner).
@@ -93,14 +93,14 @@ Approval (2 cột)
 Notice
 ```
 
-**Principles:**
+**Principle:**
 - Containment table is NOT separate — included in description.
-- Action tracker DOES NOT separate tabs — record action in description or CAPA link.
+- The action tracker is NOT tabbed — record the action in the description or CAPA link.
 - Description must be large enough to record event details.
 
 **List of TYPE B forms:**
 
-| Code | Name | Ref fields | Notes |
+| Code | Name | Ref fields | Note |
 |----|-----|-----------|---------|
 | FRM-121 | Context Analysis SWOT/PESTLE | Period + Date | A4L |
 | FRM-124 | Climate Change Assessment | Period + Date | 1 tab |
@@ -131,9 +131,9 @@ Dòng tiêu đề cột
 Dòng dữ liệu (mở rộng được)
 ```
 
-**Principles:**
+**Principle:**
 - Log form = operational data table. Minimum headers. Maximum data density.
-- NO section header, gate, approval (log does not need to approve each line).
+- NO section header, gate, approval (log does not need line-by-line approval).
 - Default format: A4L (landscape).
 - Columns must be narrow enough to print on A4L, not oversized.
 
@@ -181,9 +181,9 @@ Dòng dữ liệu (mở rộng được)
 
 ### 2.4 TYPE D: Multi-tab ISO (8 forms)
 
-**Principles:**
+**Principle:**
 - Only use multi-tab when ISO/AS requires separation or the content is too large for 1 tab.
-- Maximum 2-3 tabs. Most old "multi-tab" forms now only need 1 tab in A4L/A3L format.
+- 2-3 tabs maximum. Most old "multi-tab" forms now only need 1 tab in A4L/A3L format.
 
 | Code | Name | Tab 1 | Tab 2 | Reason |
 |----|-----|-------|-------|-------|
@@ -200,9 +200,9 @@ Dòng dữ liệu (mở rộng được)
 
 ### 2.5 TYPE E: Print Labels (5 forms)
 
-**Principles:**
+**Principle:**
 - Fixed print size, suitable for label printers or cut from A4.
-- Minimal content: only necessary information for identification.
+- Minimal content: only information needed for identification.
 
 | Code | Name | Fields |
 |----|-----|--------|
@@ -216,11 +216,11 @@ Dòng dữ liệu (mở rộng được)
 
 ### 2.6 TYPE F: MSA / Statistical (3 forms)
 
-**Principles:**
-- Form contains many calculations, using Excel auto-calc formula.
-- Data input into grid, results automatically calculate EV/AV/GRR%, bias, linearity, stability.
+**Principle:**
+- The form contains many calculations, using Excel auto-calc formulas.
+- Data entered into grid, results automatically calculate EV/AV/GRR%, bias, linearity, stability.
 
-| Code | Name | Format | Notes |
+| Code | Name | Format | Note |
 |----|-----|--------|---------|
 | FRM-611 | GR&R Study | A4L | Data grid + auto-calc EV/AV/GRR% |
 | FRM-612 | Bias/Linearity/Stability | A4L | Data grid + auto-calc |
@@ -232,20 +232,20 @@ Dòng dữ liệu (mở rộng được)
 
 ### 3.1 Fonts
 
-| Purpose | Fonts | Size | Type |
+| Purpose | Font | Size | Type |
 |----------|------|----|------|
-| Form title | Segoe UI | 16 points | Bold |
-| Section header | Segoe UI | 11 points | Bold, white text |
-| Label cell | Segoe UI | 9 points | Regular |
-| Input data | Segoe UI | 10 points | Regular |
+| Form title | Segoe UI | 16 pt | Bold |
+| Section header | Segoe UI | 11 pt | Bold, white text |
+| Cell label | Segoe UI | 9 pt | Regular |
+| Input data | Segoe UI | 10 pt | Regular |
 | Notice / footer | Segoe UI | 8 pt | Italic |
 
 ### 3.2 Standard color palette
 
-| Ingredients | Color code | Description |
+| Ingredient | Color code | Describe |
 |-----------|--------|-------|
-| Brand row (brand line) | `#0C2D48` background, white text | Dark navy, first line of form |
-| Accent blue | `#1565C0` | Used for accent lines, icons |
+| Brand row (brand line) | `#0C2D48` background, white text | Dark Navy, first line of the form |
+| Accent blue | `#1565C0` | Used for accent lines and icons |
 | Gold accent | `#F9A825` | Use moderation for special emphasis |
 | Section header | Dark blue background, white text | Divide sections clearly |
 | Label cells | Light gray `#F5F5F5` or table blue `#E8EAF6` | Description box, column title |
@@ -256,7 +256,7 @@ Dòng dữ liệu (mở rộng được)
 
 Each form MUST have a meta box in the upper right corner containing:
 
-| Field | Example |
+| Field | For example |
 |-------|-------|
 | Form code | FRM-511 |
 | Version | Rev 0 |
@@ -266,7 +266,7 @@ Each form MUST have a meta box in the upper right corner containing:
 
 ### 3.4 Layout and printing
 
-- **Paper size:** A4 Portrait (default) or A4 Landscape / A3 Landscape (specified in the catalog).
+- **Paper size:** A4 Portrait (default) or A4 Landscape / A3 Landscape (specified in catalog).
 - **Width:** MUST fit 1 page horizontally. Do not allow horizontal overflow to page 2.
 - **Gridlines:** OFF when printing. Use cell borders instead of gridlines.
 - **Margins:** Compact — Top/Bottom: 1.5 cm, Left/Right: 1.0 cm.
@@ -282,7 +282,7 @@ Each form MUST have a meta box in the upper right corner containing:
 
 ---
 
-## 4. Sheet required in every Excel file
+## 4. Sheet required in each Excel file
 
 Each file `.xlsx` MUST have at least 3 sheets:
 
@@ -294,13 +294,13 @@ Each file `.xlsx` MUST have at least 3 sheets:
 
 ### Sheet 2: EXAMPLE-FRM-XXX
 
-- Example sheet with filled out form, helping users understand how to fill out.
+- The example sheet has filled out the form, helping users understand how to fill it out.
 - Sheet name: `EXAMPLE-FRM-XXX` (replace XXX with form code, for example: `EXAMPLE-FRM-511`).
 - Example data must be realistic, do not use "test", "abc", "xxx".
 
 ### Sheet 3: LISTS (hidden)
 
-- Sheet contains list of values for dropdown (Data Validation).
+- Sheet contains list of values ​​for dropdown (Data Validation).
 - Sheet name: `LISTS`
 - Status: **Hidden** (hidden, users cannot see).
 - Column A onwards: each column is a dropdown list.
@@ -329,7 +329,7 @@ CONDITIONAL
 ON HOLD
 ```
 
-### 5.3 Item Status
+### 5.3 Item status
 
 ```
 OPEN
@@ -338,7 +338,7 @@ CLOSED
 MONITORING
 ```
 
-### 5.4 Severity / priority
+### 5.4 Severity/priority
 
 ```
 LOW
@@ -362,22 +362,22 @@ CRITICAL
 
 | # | Prohibition | Reason |
 |---|---------|-------|
-| 1 | Don't add too many colors | Disturbing, difficult to print, unprofessional |
-| 2 | Do not leave text smaller than 8pt | Unreadable when printing |
-| 3 | Do not merge cells everywhere | Causes difficulty in data entry, difficulty in copying, errors when filtering |
-| 4 | Do not let the board exceed A4 | Must be able to print on 1 page horizontally |
-| 5 | Do not prompt "AI", "generated", "from merged document" | Form is an official document, the origin is not recorded
-| 6 | Do not use icons, shapes, or watermarks that cause interference Keep the layout clean and professional |
+| 1 | Don't add too many colors | Distracting, difficult to print, and unprofessional |
+| 2 | Do not leave text smaller than 8pt | Unreadable when printed |
+| 3 | Do not merge cells excessively | Causes difficulty in data entry, copying, errors when filtering |
+| 4 | Do not let the board exceed A4 width | Must be able to print on 1 page horizontally |
+| 5 | Do not prompt "AI", "generated", "from merged document" | Form is an official document, the origin of creation is not recorded |
+| 6 | Do not use icons, shapes, or watermarks that cause interference | Keep the layout clean and professional |
 | 7 | Does not create a beautiful layout but is difficult to enter | Prioritize usability first, beauty later |
 | 8 | Do not duplicate existing data in Epicor/M365 | Record only the data needed to make decisions and save evidence |
 | 9 | Do not create overlap between this form and other forms | Each form has a purpose, no overlapping scope |
-| 10 | Do not make up logic that is not in SOP/WI/ANNEX | The form MUST adhere to the active | process
+| 10 | Do not make up logic that is not in SOP/WI/ANNEX | The form MUST follow the active process |
 
 ---
 
 ## 7. File naming rules
 
-### 7.1 Pattern
+### 7.1 Patterns
 
 ```
 FRM-XXX_Description_With_Underscores.xlsx
@@ -390,7 +390,7 @@ FRM-XXX_Description_With_Underscores.xlsx
 
 ### 7.2 Rules
 
-- Form code is always capitalized: `FRM-XXX`.
+- Form codes are always capitalized: `FRM-XXX`.
 - Underscore `_` between words in the description.
 - No Vietnamese accents in the file name.
 - No spaces in the file name.
@@ -417,16 +417,16 @@ FRM-XXX_Description_With_Underscores.xlsx
 
 Forms used outside the factory (TYPE A related to production) MUST have the following fields in the Ref block:
 
-| Field | Required | Notes |
+| Field | Obligatory | Note |
 |-------|---------|---------|
-| Job No / WO | MUST | Job code from Epicor |
-| Part No | MUST | Detailed code |
-| Rev | MUST | Drawing version |
-| Operation | SHOULD | Current work |
+| Job No / WO | RIGHT | Job code from Epicor |
+| Part No | RIGHT | Detailed code |
+| Rev | RIGHT | Drawing version |
+| Operation | SHOULD | Current cause |
 | Shift | SHOULD | Shift |
-| Date | MUST | Implementation date |
-| Operator | MUST | Implementer |
-| QA Hold logic | MUST (if there is a gate) | Conditions for stopping / holding goods |
+| Date | RIGHT | Implementation date |
+| Operator | RIGHT | Implementer |
+| QA Hold logic | MUST (if there is a gate) | Conditions for stopping/holding goods |
 
 ---
 
@@ -437,8 +437,8 @@ Forms used outside the factory (TYPE A related to production) MUST have the foll
 - Only Vietnameseize the content inside the form.
 - The tone is short, clear, used for execution. No meta text.
 - Form MUST follow SOP/WI/ANNEX active, do not make up logic.
-- Form MUST have gate, owner, evidence, decision and approval when needed.
-- Design MUST be ISO 9001:2026 compliant and AS9100D ready.
+- Form MUST have gate, owner, evidence, decision and approval as needed.
+- The design MUST be ISO 9001:2026 compliant and AS9100D ready.
 
 ---
 

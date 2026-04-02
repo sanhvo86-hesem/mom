@@ -1,0 +1,283 @@
+{
+  "_meta": {
+    "version": "2.0",
+    "description": "Cross-module workflow blueprints linking status models, endpoints, and KPI formulas.",
+    "generatedAt": "2026-04-02T06:00:20.356Z",
+    "workflowCount": 8
+  },
+  "workflows": {
+    "quote_to_cash": {
+      "key": "quote_to_cash",
+      "label": "Quote To Cash",
+      "description": "Commercial flow from RFQ capture to quote, sales order, release, packing, and delivery confirmation.",
+      "domains": [
+        "commercial",
+        "planning",
+        "shipping"
+      ],
+      "entities": [
+        "quote",
+        "sales_order",
+        "dispatch_target",
+        "packing_list",
+        "delivery"
+      ],
+      "statusRefs": [
+        "quote_status",
+        "so_status",
+        "fulfillment_status",
+        "contract_review_status"
+      ],
+      "endpoints": [
+        "quote_list",
+        "quote_create",
+        "quote_transition",
+        "quote_convert_to_so",
+        "order_so_list",
+        "dispatch_dashboard",
+        "packing_list",
+        "delivery_confirm"
+      ],
+      "kpis": [
+        "quote_total",
+        "lead_time_days",
+        "on_time_delivery_pct"
+      ]
+    },
+    "plan_to_produce": {
+      "key": "plan_to_produce",
+      "label": "Plan To Produce",
+      "description": "Job and work order planning, schedule slot management, dispatch, execution, and machine reporting.",
+      "domains": [
+        "planning",
+        "production",
+        "mes"
+      ],
+      "entities": [
+        "job_order",
+        "work_order",
+        "schedule_slot",
+        "dispatch_target",
+        "mobile_queue"
+      ],
+      "statusRefs": [
+        "jo_status",
+        "wo_status",
+        "fulfillment_status",
+        "schedule_conflict_status"
+      ],
+      "endpoints": [
+        "order_jo_list",
+        "order_wo_list",
+        "schedule_get",
+        "schedule_slot_create",
+        "dispatch_list_targets",
+        "dispatch_report_production"
+      ],
+      "kpis": [
+        "cycle_time_total",
+        "schedule_adherence_pct",
+        "machine_utilization_pct"
+      ]
+    },
+    "supplier_quality": {
+      "key": "supplier_quality",
+      "label": "Supplier Quality",
+      "description": "Receiving inspection, skip lot governance, ASL management, SCAR handling, and supplier audits.",
+      "domains": [
+        "supplier",
+        "quality",
+        "audit"
+      ],
+      "entities": [
+        "incoming_inspection",
+        "skip_lot",
+        "asl_entry",
+        "scar",
+        "supplier_audit"
+      ],
+      "statusRefs": [
+        "iqc_result",
+        "skip_lot_level",
+        "scar_status",
+        "audit_finding_type"
+      ],
+      "endpoints": [
+        "supplier_incoming_list",
+        "supplier_incoming_create",
+        "supplier_skip_lot_status",
+        "supplier_asl_list",
+        "supplier_scar_list",
+        "supplier_audit_list"
+      ],
+      "kpis": [
+        "supplier_score",
+        "incoming_acceptance_rate",
+        "scar_closure_pct"
+      ]
+    },
+    "ncr_to_capa": {
+      "key": "ncr_to_capa",
+      "label": "NCR To CAPA",
+      "description": "Nonconformance intake, material review, 8D, corrective action, and closure effectiveness.",
+      "domains": [
+        "quality",
+        "risk",
+        "improvement"
+      ],
+      "entities": [
+        "ncr_record",
+        "mrb_disposition",
+        "eight_d",
+        "capa_record"
+      ],
+      "statusRefs": [
+        "ncr_status",
+        "disposition",
+        "action_priority",
+        "severity"
+      ],
+      "endpoints": [
+        "quality_exception_list",
+        "quality_exception_create",
+        "quality_exception_mrb_disposition",
+        "quality_exception_save_8d",
+        "quality_exception_transition"
+      ],
+      "kpis": [
+        "closure_aging_days",
+        "copq_total",
+        "defect_escape_rate"
+      ]
+    },
+    "apqp_ppap_launch": {
+      "key": "apqp_ppap_launch",
+      "label": "APQP And PPAP Launch",
+      "description": "Launch readiness workflow covering APQP phases, FMEA, control plans, and PPAP evidence gates.",
+      "domains": [
+        "engineering",
+        "quality",
+        "program_management"
+      ],
+      "entities": [
+        "apqp_project",
+        "pfmea",
+        "control_plan",
+        "ppap_submission"
+      ],
+      "statusRefs": [
+        "apqp_phase",
+        "apqp_gate_status",
+        "ppap_status",
+        "action_priority"
+      ],
+      "endpoints": [
+        "apqp_dashboard",
+        "apqp_project_list",
+        "fmea_list",
+        "cp_detail",
+        "ppap_create"
+      ],
+      "kpis": [
+        "ppap_completeness_pct",
+        "first_article_completion_pct",
+        "traceability_completeness_pct"
+      ]
+    },
+    "documented_information": {
+      "key": "documented_information",
+      "label": "Documented Information",
+      "description": "Controlled documents, revisions, form schemas, record IDs, and knowledge articles.",
+      "domains": [
+        "document_control",
+        "records",
+        "training"
+      ],
+      "entities": [
+        "document",
+        "document_revision",
+        "online_form",
+        "record_id",
+        "knowledge_article"
+      ],
+      "statusRefs": [
+        "doc_status",
+        "master_data_status"
+      ],
+      "endpoints": [
+        "doc_create",
+        "doc_versions_list",
+        "online_form_list",
+        "record_id_next",
+        "knowledge_list"
+      ],
+      "kpis": [
+        "audit_closure_rate",
+        "traceability_completeness_pct"
+      ]
+    },
+    "digital_thread_traceability": {
+      "key": "digital_thread_traceability",
+      "label": "Digital Thread Traceability",
+      "description": "Lot, serial, material cert, process event, and shipment trace continuity into product passport artifacts.",
+      "domains": [
+        "traceability",
+        "compliance",
+        "shipping"
+      ],
+      "entities": [
+        "lot",
+        "serial",
+        "certificate",
+        "passport",
+        "shipment"
+      ],
+      "statusRefs": [
+        "passport_event_type",
+        "export_control",
+        "evidence_status"
+      ],
+      "endpoints": [
+        "product_passport_list",
+        "product_passport_add_event",
+        "product_passport_trace",
+        "compliance_report_evidence_package"
+      ],
+      "kpis": [
+        "traceability_completeness_pct",
+        "carbon_per_part"
+      ]
+    },
+    "cnc_program_release": {
+      "key": "cnc_program_release",
+      "label": "CNC Program Release",
+      "description": "Program authoring, setup sheets, revision approvals, and controlled NC release to the shop floor.",
+      "domains": [
+        "engineering",
+        "production",
+        "document_control"
+      ],
+      "entities": [
+        "cnc_program",
+        "program_version",
+        "setup_sheet",
+        "approval"
+      ],
+      "statusRefs": [
+        "program_approval_status",
+        "doc_status"
+      ],
+      "endpoints": [
+        "cnc_program_list",
+        "cnc_program_create",
+        "cnc_program_upload_version",
+        "cnc_program_approve",
+        "cnc_program_setup_create"
+      ],
+      "kpis": [
+        "runtime_variance_pct",
+        "machine_utilization_pct"
+      ]
+    }
+  }
+}

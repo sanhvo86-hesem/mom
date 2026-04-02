@@ -1,1061 +1,1087 @@
 {
-  "_meta": {
-    "version": "1.3",
-    "created": "2026-03-29T12:00:00+07:00",
-    "updated": "2026-03-31T22:10:00+07:00",
-    "description": "Master data seed for customer, commercial, engineering, quality, fulfillment, and MES governance used by Evidence Control, Order Management, and the CNC runtime."
-  },
-  "customers": [
-    {
-      "customer_id": "CUS-LAM",
-      "customer_name": "Lam Research",
-      "customer_name_vi": "Lam Research",
-      "customer_type": "OEM",
-      "status": "active",
-      "contact_name": "SQE Desk",
-      "contact_email": "sqe@lam.example",
-      "site_code": "LAM-US"
-    },
-    {
-      "customer_id": "CUS-ACME",
-      "customer_name": "ACME Industries",
-      "customer_name_vi": "ACME Industries",
-      "customer_type": "Tier 1",
-      "status": "active",
-      "contact_name": "John Smith",
-      "contact_email": "john.smith@acme.example",
-      "site_code": "ACME-SG"
-    },
-    {
-      "customer_id": "CUS-GLOBEX",
-      "customer_name": "Globex Corporation",
-      "customer_name_vi": "Globex Corporation",
-      "customer_type": "Tier 1",
-      "status": "active",
-      "contact_name": "Jane Doe",
-      "contact_email": "jane.doe@globex.example",
-      "site_code": "GLOBEX-VN"
-    }
-  ],
-  "customer_sites": [
-    {
-      "site_id": "LAM-US-FREMONT",
-      "customer_id": "CUS-LAM",
-      "site_name": "Lam Research Fremont",
-      "country_code": "US",
-      "default_incoterm_code": "FCA",
-      "default_shipping_method_id": "AIR-PRIORITY",
-      "default_payment_term_code": "NET30",
-      "certificate_of_conformance_required": true,
-      "certificate_of_analysis_required": true,
-      "export_control_required": true,
-      "packing_spec_code": "PK-LAM-AERO",
-      "label_spec_code": "LBL-LAM-CLEAN",
-      "status": "active"
-    },
-    {
-      "site_id": "ACME-SG-PLANT2",
-      "customer_id": "CUS-ACME",
-      "site_name": "ACME Singapore Plant 2",
-      "country_code": "SG",
-      "default_incoterm_code": "DAP",
-      "default_shipping_method_id": "COURIER-DHL",
-      "default_payment_term_code": "NET45",
-      "certificate_of_conformance_required": true,
-      "certificate_of_analysis_required": false,
-      "export_control_required": false,
-      "packing_spec_code": "PK-ACME-STD",
-      "label_spec_code": "LBL-ACME-BLUE",
-      "status": "active"
-    },
-    {
-      "site_id": "GLOBEX-VN-ASM",
-      "customer_id": "CUS-GLOBEX",
-      "site_name": "Globex Vietnam Assembly",
-      "country_code": "VN",
-      "default_incoterm_code": "EXW",
-      "default_shipping_method_id": "TRUCK-DOMESTIC",
-      "default_payment_term_code": "NET30",
-      "certificate_of_conformance_required": true,
-      "certificate_of_analysis_required": false,
-      "export_control_required": false,
-      "packing_spec_code": "PK-GLOBEX-HEAVY",
-      "label_spec_code": "LBL-GLOBEX-STD",
-      "status": "active"
-    }
-  ],
-  "commercial_accounts": [
-    {
-      "account_id": "ACC-LAM-US",
-      "customer_id": "CUS-LAM",
-      "account_owner": "son.phan",
-      "order_coordinator_role": "customer_service",
-      "promise_policy_id": "PROM-CRIT-AERO",
-      "currency_code": "USD",
-      "status": "active"
-    },
-    {
-      "account_id": "ACC-ACME-SG",
-      "customer_id": "CUS-ACME",
-      "account_owner": "ngoc.pham",
-      "order_coordinator_role": "estimator",
-      "promise_policy_id": "PROM-STD-GLOBAL",
-      "currency_code": "USD",
-      "status": "active"
-    }
-  ],
-  "suppliers": [
-    {
-      "supplier_id": "SUP-ACOAT",
-      "supplier_name": "A-Coat Surface Treatment",
-      "supplier_name_vi": "A-Coat Surface Treatment",
-      "supplier_type": "special_process",
-      "status": "approved",
-      "approved_customers": [
-        "CUS-LAM"
-      ],
-      "contact_name": "Planner",
-      "contact_email": "planner@acoat.example"
-    },
-    {
-      "supplier_id": "SUP-MITUTOYO",
-      "supplier_name": "Mitutoyo Vietnam",
-      "supplier_name_vi": "Mitutoyo Vietnam",
-      "supplier_type": "calibration",
-      "status": "approved",
-      "approved_customers": [
-        "CUS-LAM",
-        "CUS-ACME"
-      ],
-      "contact_name": "Service Desk",
-      "contact_email": "service@mitutoyo.example"
-    },
-    {
-      "supplier_id": "SUP-KIMLONG",
-      "supplier_name": "Kim Long Precision Supply",
-      "supplier_name_vi": "Kim Long Precision Supply",
-      "supplier_type": "raw_material",
-      "status": "approved",
-      "approved_customers": [
-        "CUS-GLOBEX",
-        "CUS-ACME"
-      ],
-      "contact_name": "Buyer 02",
-      "contact_email": "buyer@kimlong.example"
-    }
-  ],
-  "parts": [
-    {
-      "part_number": "714-1101",
-      "part_description": "Valve Housing, 17-4PH",
-      "customer_id": "CUS-LAM",
-      "status": "active",
-      "preferred_supplier_id": "SUP-ACOAT",
-      "traceability_level": "lot_heat",
-      "material_trace_required": "yes",
-      "required_trace_fields": "material_lot_number, heat_number, traveler_number, traveler_status, material_cert_status"
-    },
-    {
-      "part_number": "P-1001",
-      "part_description": "Mounting Bracket, AL6061",
-      "customer_id": "CUS-ACME",
-      "status": "active",
-      "preferred_supplier_id": "SUP-KIMLONG",
-      "traceability_level": "lot",
-      "material_trace_required": "yes",
-      "required_trace_fields": "material_lot_number, traveler_number, traveler_status, material_cert_status"
-    },
-    {
-      "part_number": "P-2003",
-      "part_description": "Drive Shaft, 316SS",
-      "customer_id": "CUS-GLOBEX",
-      "status": "active",
-      "preferred_supplier_id": "SUP-KIMLONG",
-      "traceability_level": "lot_heat",
-      "material_trace_required": "yes",
-      "required_trace_fields": "material_lot_number, heat_number, traveler_number, traveler_status, material_cert_status"
-    }
-  ],
-  "revisions": [
-    {
-      "revision_id": "714-1101-REV-C",
-      "part_number": "714-1101",
-      "revision": "REV-C",
-      "status": "released",
-      "release_date": "2026-03-10"
-    },
-    {
-      "revision_id": "P-1001-REV-C",
-      "part_number": "P-1001",
-      "revision": "REV-C",
-      "status": "released",
-      "release_date": "2026-02-18"
-    },
-    {
-      "revision_id": "P-2003-REV-B",
-      "part_number": "P-2003",
-      "revision": "REV-B",
-      "status": "released",
-      "release_date": "2026-01-21"
-    }
-  ],
-  "incoterms": [
-    {
-      "incoterm_code": "FCA",
-      "incoterm_name": "Free Carrier",
-      "status": "active"
-    },
-    {
-      "incoterm_code": "DAP",
-      "incoterm_name": "Delivered At Place",
-      "status": "active"
-    },
-    {
-      "incoterm_code": "EXW",
-      "incoterm_name": "Ex Works",
-      "status": "active"
-    }
-  ],
-  "payment_terms": [
-    {
-      "payment_term_code": "NET30",
-      "payment_term_name": "Net 30 days",
-      "status": "active"
-    },
-    {
-      "payment_term_code": "NET45",
-      "payment_term_name": "Net 45 days",
-      "status": "active"
-    }
-  ],
-  "shipping_methods": [
-    {
-      "shipping_method_id": "AIR-PRIORITY",
-      "shipping_method_name": "Priority air freight",
-      "mode": "air",
-      "status": "active"
-    },
-    {
-      "shipping_method_id": "COURIER-DHL",
-      "shipping_method_name": "Courier DHL Express",
-      "mode": "courier",
-      "status": "active"
-    },
-    {
-      "shipping_method_id": "TRUCK-DOMESTIC",
-      "shipping_method_name": "Domestic truck",
-      "mode": "road",
-      "status": "active"
-    }
-  ],
-  "promise_policies": [
-    {
-      "promise_policy_id": "PROM-CRIT-AERO",
-      "policy_name": "Critical aerospace controlled promise",
-      "target_otd_percent": 98.0,
-      "review_frequency": "daily",
-      "status": "active"
-    },
-    {
-      "promise_policy_id": "PROM-STD-GLOBAL",
-      "policy_name": "Standard global make-to-order",
-      "target_otd_percent": 95.0,
-      "review_frequency": "weekly",
-      "status": "active"
-    }
-  ],
-  "routing_library": [
-    {
-      "routing_id": "ROUT-714-1101-C",
-      "part_number": "714-1101",
-      "part_revision": "REV-C",
-      "routing_name": "714-1101 REV-C production routing",
-      "work_center_path": "WC-5AX > WC-QA > WC-OUT",
-      "status": "released"
-    },
-    {
-      "routing_id": "ROUT-P1001-C",
-      "part_number": "P-1001",
-      "part_revision": "REV-C",
-      "routing_name": "P-1001 REV-C standard routing",
-      "work_center_path": "WC-3AX > WC-QA",
-      "status": "released"
-    }
-  ],
-  "bom_library": [
-    {
-      "bom_id": "BOM-714-1101-C",
-      "part_number": "714-1101",
-      "part_revision": "REV-C",
-      "bom_name": "Valve Housing raw + special process BOM",
-      "status": "released"
-    },
-    {
-      "bom_id": "BOM-P1001-C",
-      "part_number": "P-1001",
-      "part_revision": "REV-C",
-      "bom_name": "Mounting Bracket standard BOM",
-      "status": "released"
-    }
-  ],
-  "control_plans": [
-    {
-      "control_plan_id": "CP-714-1101-C",
-      "part_number": "714-1101",
-      "part_revision": "REV-C",
-      "control_plan_name": "Valve Housing control plan",
-      "status": "released"
-    },
-    {
-      "control_plan_id": "CP-P1001-C",
-      "part_number": "P-1001",
-      "part_revision": "REV-C",
-      "control_plan_name": "Mounting Bracket control plan",
-      "status": "released"
-    }
-  ],
-  "inspection_plans": [
-    {
-      "inspection_plan_id": "IP-714-1101-C",
-      "part_number": "714-1101",
-      "part_revision": "REV-C",
-      "inspection_plan_name": "714-1101 FAI + final inspection",
-      "status": "released"
-    },
-    {
-      "inspection_plan_id": "IP-P1001-C",
-      "part_number": "P-1001",
-      "part_revision": "REV-C",
-      "inspection_plan_name": "P-1001 final inspection",
-      "status": "released"
-    }
-  ],
-  "traveler_templates": [
-    {
-      "traveler_template_id": "TRV-714-1101-C",
-      "part_number": "714-1101",
-      "part_revision": "REV-C",
-      "traveler_template_name": "Valve Housing router / traveler",
-      "status": "released"
-    },
-    {
-      "traveler_template_id": "TRV-P1001-C",
-      "part_number": "P-1001",
-      "part_revision": "REV-C",
-      "traveler_template_name": "Mounting Bracket router / traveler",
-      "status": "released"
-    }
-  ],
-  "quality_gate_profiles": [
-    {
-      "quality_gate_profile_id": "QG-AERO-FAI",
-      "profile_name": "Aerospace CNC FAI release gates",
-      "required_gates": "contract_review, engineering_release, material_trace, nc_release, first_piece, coc",
-      "status": "active"
-    },
-    {
-      "quality_gate_profile_id": "QG-STD-CNC",
-      "profile_name": "Standard CNC delivery gates",
-      "required_gates": "engineering_release, material_trace, final_inspection, coc",
-      "status": "active"
-    }
-  ],
-  "launch_gate_templates": [
-    {
-      "gate_template_id": "LGT-5AX-AERO",
-      "work_center_id": "WC-5AX",
-      "gate_name": "5-axis aerospace launch template",
-      "required_gates": "connector_guard, nc_release, tool_readiness, operator_governance, material_trace, evidence_gate",
-      "status": "active"
-    },
-    {
-      "gate_template_id": "LGT-3AX-STD",
-      "work_center_id": "WC-3AX",
-      "gate_name": "3-axis production launch template",
-      "required_gates": "connector_guard, nc_release, tool_readiness, material_trace, evidence_gate",
-      "status": "active"
-    }
-  ],
-  "customer_item_approvals": [
-    {
-      "approval_id": "CIA-LAM-714-1101",
-      "customer_id": "CUS-LAM",
-      "part_number": "714-1101",
-      "part_revision": "REV-C",
-      "approved_for_production": true,
-      "status": "active"
-    },
-    {
-      "approval_id": "CIA-ACME-P1001",
-      "customer_id": "CUS-ACME",
-      "part_number": "P-1001",
-      "part_revision": "REV-C",
-      "approved_for_production": true,
-      "status": "active"
-    }
-  ],
-  "supplier_process_approvals": [
-    {
-      "approval_id": "SPA-LAM-PASS",
-      "supplier_id": "SUP-ACOAT",
-      "customer_id": "CUS-LAM",
-      "special_process": "Passivation",
-      "status": "approved"
-    },
-    {
-      "approval_id": "SPA-ACME-ANOD",
-      "supplier_id": "SUP-ACOAT",
-      "customer_id": "CUS-ACME",
-      "special_process": "Clear anodize",
-      "status": "approved"
-    }
-  ],
-  "warehouse_locations": [
-    {
-      "warehouse_id": "WH-FG-01",
-      "warehouse_name": "Finished goods warehouse",
-      "warehouse_type": "fg",
-      "status": "active"
-    },
-    {
-      "warehouse_id": "WH-RM-01",
-      "warehouse_name": "Raw material supermarket",
-      "warehouse_type": "rm",
-      "status": "active"
-    }
-  ],
-  "nc_program_releases": [
-    {
-      "program_id": "NC_714-1101_REVC_OP10_5AX_V3",
-      "release_title": "714-1101 REV-C OP10 roughing release",
-      "part_number": "714-1101",
-      "part_revision": "REV-C",
-      "operation_number": 10,
-      "machine_type": "5-axis",
-      "work_center_id": "WC-5AX",
-      "cam_source_rev": "CAM-7141101-OP10-R7",
-      "post_processor_rev": "PP-MAKINO-5AX-R3",
-      "checksum": "sha256:7ad4e091c6f8",
-      "package_id": "PKG-7141101-OP10-V3",
-      "controller_program_name": "O7141101V3",
-      "release_manifest_version": "RM-3.2",
-      "approved_machine_ids": "MC-5AX-01",
-      "download_required_before_run": "yes",
-      "status": "released",
-      "released_at": "2026-03-29T07:40:00+07:00",
-      "released_by": "eng.manager",
-      "notes": "Bản release chuẩn cho prove-out và batch đầu tiên."
-    },
-    {
-      "program_id": "NC_P-1001_REVC_OP10_3AX_V2",
-      "release_title": "P-1001 REV-C OP10 production release",
-      "part_number": "P-1001",
-      "part_revision": "REV-C",
-      "operation_number": 10,
-      "machine_type": "3-axis",
-      "work_center_id": "WC-3AX",
-      "cam_source_rev": "CAM-P1001-OP10-R4",
-      "post_processor_rev": "PP-BROTHER-3AX-R2",
-      "checksum": "sha256:58bc101a0f2e",
-      "package_id": "PKG-P1001-OP10-V2",
-      "controller_program_name": "P1001C-OP10-V2",
-      "release_manifest_version": "RM-2.8",
-      "approved_machine_ids": "MC-3AX-04",
-      "download_required_before_run": "yes",
-      "status": "draft",
-      "released_at": "",
-      "released_by": "",
-      "notes": "Đang chờ xác nhận bù dao sau thay cutter và review prove-out."
-    },
-    {
-      "program_id": "CMM_714-1101_REVC_FAI_V2",
-      "release_title": "714-1101 REV-C FAI CMM release",
-      "part_number": "714-1101",
-      "part_revision": "REV-C",
-      "operation_number": 90,
-      "machine_type": "cmm",
-      "work_center_id": "WC-QA",
-      "cam_source_rev": "CMM-7141101-FAI-R2",
-      "post_processor_rev": "MITUTOYO-CMM-R1",
-      "checksum": "sha256:4ef0b1f90c44",
-      "package_id": "PKG-7141101-FAI-V2",
-      "controller_program_name": "CMM-7141101-FAI-V2",
-      "release_manifest_version": "RM-1.9",
-      "approved_machine_ids": "CMM-01",
-      "download_required_before_run": "yes",
-      "status": "released",
-      "released_at": "2026-03-28T16:10:00+07:00",
-      "released_by": "qe.lead",
-      "notes": "Dùng cho FAI và final inspection CMM."
-    }
-  ],
-  "capas": [
-    {
-      "capa_number": "CAPA-2026-001",
-      "title": "Tooling wear on CNC-05",
-      "status": "open",
-      "customer_id": "CUS-LAM",
-      "part_number": "714-1101",
-      "opened_date": "2026-01-12"
-    },
-    {
-      "capa_number": "CAPA-2026-002",
-      "title": "Operator training gap - night shift",
-      "status": "in_progress",
-      "customer_id": "CUS-ACME",
-      "part_number": "P-1001",
-      "opened_date": "2026-02-19"
-    },
-    {
-      "capa_number": "CAPA-2026-003",
-      "title": "Raw material specification deviation",
-      "status": "closed",
-      "customer_id": "CUS-GLOBEX",
-      "part_number": "P-2003",
-      "opened_date": "2025-12-22"
-    }
-  ],
-  "work_centers": [
-    {
-      "work_center_id": "WC-5AX",
-      "work_center_name": "5-Axis Machining Cell",
-      "department": "PRO",
-      "process_family": "5-axis",
-      "area": "Xưởng CNC A",
-      "status": "active"
-    },
-    {
-      "work_center_id": "WC-3AX",
-      "work_center_name": "VMC Production Cell",
-      "department": "PRO",
-      "process_family": "3-axis",
-      "area": "Xưởng CNC B",
-      "status": "active"
-    },
-    {
-      "work_center_id": "WC-QA",
-      "work_center_name": "Final Inspection Cell",
-      "department": "QA",
-      "process_family": "inspection",
-      "area": "Phòng QA",
-      "status": "active"
-    },
-    {
-      "work_center_id": "WC-MNT",
-      "work_center_name": "Maintenance Support Cell",
-      "department": "MNT",
-      "process_family": "maintenance",
-      "area": "Utility Bay",
-      "status": "active"
-    }
-  ],
-  "machines": [
-    {
-      "machine_id": "MC-5AX-01",
-      "machine_name": "Makino DA300",
-      "work_center_id": "WC-5AX",
-      "machine_type": "5-axis",
-      "location": "Xưởng CNC A - Line 01",
-      "telemetry_mode": "machine",
-      "connector_type": "mtconnect",
-      "connector_name": "Makino MTConnect Adapter",
-      "connector_endpoint": "https://mes.hesem.local/mtconnect/mc-5ax-01/current",
-      "heartbeat_sla_seconds": 90,
-      "connector_required_for_release": "yes",
-      "manual_bridge_allowed": "no",
-      "preferred_operator_id": "OPR-001",
-      "status": "active",
-      "last_pm_date": "2026-03-21",
-      "next_pm_date": "2026-04-21"
-    },
-    {
-      "machine_id": "MC-3AX-04",
-      "machine_name": "Brother S700X2",
-      "work_center_id": "WC-3AX",
-      "machine_type": "3-axis",
-      "location": "Xưởng CNC B - Line 02",
-      "telemetry_mode": "machine",
-      "connector_type": "opcua",
-      "connector_name": "Brother OPC UA Bridge",
-      "connector_endpoint": "opc.tcp://192.168.10.44:4840",
-      "heartbeat_sla_seconds": 120,
-      "connector_required_for_release": "yes",
-      "manual_bridge_allowed": "no",
-      "preferred_operator_id": "OPR-014",
-      "status": "active",
-      "last_pm_date": "2026-03-14",
-      "next_pm_date": "2026-04-14"
-    },
-    {
-      "machine_id": "CMM-01",
-      "machine_name": "Mitutoyo Crysta-Apex",
-      "work_center_id": "WC-QA",
-      "machine_type": "cmm",
-      "location": "Phòng QA - CMM Zone",
-      "telemetry_mode": "manual",
-      "connector_type": "manual_bridge",
-      "connector_name": "CMM Manual Bridge",
-      "connector_endpoint": "manual://cmm-01",
-      "heartbeat_sla_seconds": 180,
-      "connector_required_for_release": "yes",
-      "manual_bridge_allowed": "yes",
-      "preferred_operator_id": "QC-002",
-      "status": "active",
-      "last_pm_date": "2026-03-05",
-      "next_pm_date": "2026-04-05"
-    }
-  ],
-  "operators": [
-    {
-      "operator_id": "OPR-001",
-      "operator_name": "Nguyễn Văn An",
-      "role": "operator",
-      "work_center_id": "WC-5AX",
-      "shift": "1",
-      "skills": "5-axis, setup, prove-out",
-      "qualification_status": "active",
-      "qualification_expiry": "2026-12-31",
-      "qualified_machine_types": "5-axis",
-      "qualified_machine_ids": "MC-5AX-01",
-      "qualified_work_centers": "WC-5AX",
-      "certified_processes": "5-axis machining, prove-out, setup",
-      "status": "active"
-    },
-    {
-      "operator_id": "OPR-014",
-      "operator_name": "Trần Minh Khang",
-      "role": "operator",
-      "work_center_id": "WC-3AX",
-      "shift": "2",
-      "skills": "3-axis, VMC, tool offsets",
-      "qualification_status": "expired",
-      "qualification_expiry": "2026-03-15",
-      "qualified_machine_types": "3-axis",
-      "qualified_machine_ids": "",
-      "qualified_work_centers": "WC-3AX",
-      "certified_processes": "3-axis machining, setup",
-      "status": "active"
-    },
-    {
-      "operator_id": "QC-002",
-      "operator_name": "Lê Thu Hà",
-      "role": "qc_inspector",
-      "work_center_id": "WC-QA",
-      "shift": "day",
-      "skills": "CMM, FAI, final inspection",
-      "qualification_status": "active",
-      "qualification_expiry": "2026-11-30",
-      "qualified_machine_types": "cmm",
-      "qualified_machine_ids": "CMM-01",
-      "qualified_work_centers": "WC-QA",
-      "certified_processes": "CMM, FAI, final inspection",
-      "status": "active"
-    },
-    {
-      "operator_id": "MNT-001",
-      "operator_name": "Phạm Quốc Dũng",
-      "role": "maintenance_tech",
-      "work_center_id": "WC-MNT",
-      "shift": "day",
-      "skills": "PM, spindle, coolant, pneumatics",
-      "qualification_status": "active",
-      "qualification_expiry": "2026-10-31",
-      "qualified_machine_types": "5-axis,3-axis,cmm",
-      "qualified_machine_ids": "MC-5AX-01,MC-3AX-04,CMM-01",
-      "qualified_work_centers": "WC-MNT,WC-5AX,WC-3AX,WC-QA",
-      "certified_processes": "maintenance, PM, spindle, coolant, pneumatics",
-      "status": "active"
-    }
-  ],
-  "tooling_assets": [
-    {
-      "tool_id": "TL-EM12-5AX-001",
-      "tool_name": "Endmill Carbide Ø12 ALTiN",
-      "tool_type": "endmill",
-      "machine_type": "5-axis",
-      "preferred_work_center_id": "WC-5AX",
-      "life_limit_minutes": 180,
-      "life_limit_parts": 60,
-      "warning_pct": 80,
-      "critical_pct": 95,
-      "default_offset_band_mm": 0.02,
-      "status": "active"
-    },
-    {
-      "tool_id": "TL-DR06-3AX-014",
-      "tool_name": "Through Coolant Drill Ø6",
-      "tool_type": "drill",
-      "machine_type": "3-axis",
-      "preferred_work_center_id": "WC-3AX",
-      "life_limit_minutes": 90,
-      "life_limit_parts": 45,
-      "warning_pct": 75,
-      "critical_pct": 92,
-      "default_offset_band_mm": 0.015,
-      "status": "active"
-    },
-    {
-      "tool_id": "TL-PRB-CMM-001",
-      "tool_name": "CMM Probe Stylus Set",
-      "tool_type": "probe",
-      "machine_type": "cmm",
-      "preferred_work_center_id": "WC-QA",
-      "life_limit_minutes": 0,
-      "life_limit_parts": 0,
-      "warning_pct": 80,
-      "critical_pct": 95,
-      "default_offset_band_mm": 0.005,
-      "status": "active"
-    },
-    {
-      "tool_id": "TL-HLD-5AX-021",
-      "tool_name": "Shrink Holder HSK63A",
-      "tool_type": "holder",
-      "machine_type": "5-axis",
-      "preferred_work_center_id": "WC-5AX",
-      "life_limit_minutes": 0,
-      "life_limit_parts": 0,
-      "warning_pct": 80,
-      "critical_pct": 95,
-      "default_offset_band_mm": 0.01,
-      "status": "active"
-    }
-  ],
-  "downtime_reason_codes": [
-    {
-      "reason_code": "DT-BRK-SPINDLE",
-      "reason_name": "Spindle alarm or machine breakdown",
-      "reason_name_vi": "Báo lỗi trục chính hoặc hỏng máy",
-      "category": "breakdown",
-      "reason_group": "machine",
-      "default_severity": "critical",
-      "planned_flag": "no",
-      "escalation_sla_minutes": 10,
-      "status": "active"
-    },
-    {
-      "reason_code": "DT-TOOL-LIFE",
-      "reason_name": "Tool life exceeded or offset re-verification",
-      "reason_name_vi": "Dao vượt ngưỡng life hoặc cần xác nhận lại offset",
-      "category": "tool_change",
-      "reason_group": "tooling",
-      "default_severity": "major",
-      "planned_flag": "no",
-      "escalation_sla_minutes": 15,
-      "status": "active"
-    },
-    {
-      "reason_code": "DT-SETUP-PROGRAM",
-      "reason_name": "NC program mismatch during setup",
-      "reason_name_vi": "Lệch chương trình NC trong giai đoạn setup",
-      "category": "setup",
-      "reason_group": "program",
-      "default_severity": "major",
-      "planned_flag": "no",
-      "escalation_sla_minutes": 20,
-      "status": "active"
-    },
-    {
-      "reason_code": "DT-MATL-WAIT",
-      "reason_name": "Material or outsource lot not ready",
-      "reason_name_vi": "Vật tư hoặc lô outsource chưa sẵn sàng",
-      "category": "material_wait",
-      "reason_group": "material",
-      "default_severity": "major",
-      "planned_flag": "no",
-      "escalation_sla_minutes": 30,
-      "status": "active"
-    },
-    {
-      "reason_code": "DT-QUAL-HOLD",
-      "reason_name": "Quality hold or verification pending",
-      "reason_name_vi": "Giữ lô chất lượng hoặc chờ xác nhận kiểm tra",
-      "category": "quality_hold",
-      "reason_group": "quality",
-      "default_severity": "major",
-      "planned_flag": "no",
-      "escalation_sla_minutes": 20,
-      "status": "active"
-    },
-    {
-      "reason_code": "DT-PM-WINDOW",
-      "reason_name": "Planned preventive maintenance window",
-      "reason_name_vi": "Cửa sổ bảo trì phòng ngừa đã hoạch định",
-      "category": "planned_pm",
-      "reason_group": "maintenance",
-      "default_severity": "minor",
-      "planned_flag": "yes",
-      "escalation_sla_minutes": 60,
-      "status": "active"
-    },
-    {
-      "reason_code": "DT-UTIL-AIR",
-      "reason_name": "Utility interruption or low air pressure",
-      "reason_name_vi": "Gián đoạn tiện ích hoặc áp suất khí thấp",
-      "category": "utility",
-      "reason_group": "utility",
-      "default_severity": "critical",
-      "planned_flag": "no",
-      "escalation_sla_minutes": 10,
-      "status": "active"
-    }
-  ],
-  "downtime_resolution_codes": [
-    {
-      "resolution_code": "resolved",
-      "resolution_name": "Resolved and released",
-      "resolution_name_vi": "Đã khôi phục và cho chạy lại",
-      "resolution_group": "reset",
-      "status": "active"
-    },
-    {
-      "resolution_code": "temporary_fix",
-      "resolution_name": "Temporary fix applied",
-      "resolution_name_vi": "Đã khắc phục tạm",
-      "resolution_group": "temporary_fix",
-      "status": "active"
-    },
-    {
-      "resolution_code": "awaiting_parts",
-      "resolution_name": "Awaiting spare parts",
-      "resolution_name_vi": "Đang chờ phụ tùng",
-      "resolution_group": "parts_wait",
-      "status": "active"
-    },
-    {
-      "resolution_code": "tool_replaced",
-      "resolution_name": "Tool or holder replaced",
-      "resolution_name_vi": "Đã thay dao hoặc holder",
-      "resolution_group": "tooling",
-      "status": "active"
-    },
-    {
-      "resolution_code": "program_reloaded",
-      "resolution_name": "Program reloaded and verified",
-      "resolution_name_vi": "Đã nạp lại chương trình và xác nhận",
-      "resolution_group": "program",
-      "status": "active"
-    }
-  ],
-  "mes_connectivity_adapters": [
-    {
-      "adapter_id": "ADP-MC-5AX-01-MTC",
-      "machine_id": "MC-5AX-01",
-      "adapter_name": "Makino MTConnect Adapter",
-      "adapter_type": "mtconnect",
-      "transport_protocol": "https",
-      "endpoint_url": "https://mes.hesem.local/mtconnect/mc-5ax-01/current",
-      "poll_interval_seconds": 30,
-      "heartbeat_sla_seconds": 90,
-      "stale_after_seconds": 150,
-      "auth_mode": "service_account",
-      "store_and_forward_enabled": true,
-      "payload_schema_version": "1.3",
-      "status": "active",
-      "last_validated_at": "2026-03-30T07:10:00+07:00"
-    },
-    {
-      "adapter_id": "ADP-MC-3AX-04-OPCUA",
-      "machine_id": "MC-3AX-04",
-      "adapter_name": "Brother OPC UA Bridge",
-      "adapter_type": "opcua",
-      "transport_protocol": "opc.tcp",
-      "endpoint_url": "opc.tcp://192.168.10.44:4840",
-      "heartbeat_sla_seconds": 120,
-      "stale_after_seconds": 180,
-      "auth_mode": "certificate",
-      "store_and_forward_enabled": true,
-      "payload_schema_version": "1.0",
-      "status": "active",
-      "last_validated_at": "2026-03-29T18:20:00+07:00"
-    },
-    {
-      "adapter_id": "ADP-CMM-01-MANUAL",
-      "machine_id": "CMM-01",
-      "adapter_name": "CMM Manual Bridge",
-      "adapter_type": "manual_bridge",
-      "transport_protocol": "manual",
-      "endpoint_url": "manual://cmm-01",
-      "heartbeat_sla_seconds": 180,
-      "stale_after_seconds": 240,
-      "auth_mode": "session_user",
-      "store_and_forward_enabled": false,
-      "payload_schema_version": "1.0",
-      "status": "active",
-      "last_validated_at": "2026-03-29T13:05:00+07:00"
-    }
-  ],
-  "mes_alarm_catalog": [
-    {
-      "alarm_code": "SPINDLE_OVERLOAD",
-      "controller_family": "makino-pro",
-      "alarm_group": "spindle",
-      "title": "Spindle overload",
-      "title_vi": "Quá tải trục chính",
-      "severity_default": "CRITICAL",
-      "downtime_category_default": "breakdown",
-      "response_owner_role": "maintenance_manager",
-      "response_target_minutes": 10,
-      "requires_lockout": true,
-      "requires_maintenance": true,
-      "status": "active",
-      "ack_required": true,
-      "ack_sla_minutes": 5,
-      "escalation_sla_minutes": 10
-    },
-    {
-      "alarm_code": "AXIS_SERVO_FAULT",
-      "controller_family": "brother-cnc-c00",
-      "alarm_group": "axis",
-      "title": "Axis servo fault",
-      "title_vi": "Lỗi servo trục",
-      "severity_default": "ALARM",
-      "downtime_category_default": "breakdown",
-      "response_owner_role": "maintenance_technician",
-      "response_target_minutes": 15,
-      "requires_lockout": false,
-      "requires_maintenance": true,
-      "status": "active",
-      "ack_required": true,
-      "ack_sla_minutes": 7,
-      "escalation_sla_minutes": 15
-    },
-    {
-      "alarm_code": "PROBE_CAL_WARN",
-      "controller_family": "mitutoyo-cmm",
-      "alarm_group": "metrology",
-      "title": "Probe calibration warning",
-      "title_vi": "Cảnh báo hiệu chuẩn đầu dò",
-      "severity_default": "WARNING",
-      "downtime_category_default": "quality_hold",
-      "response_owner_role": "qa_manager",
-      "response_target_minutes": 20,
-      "requires_lockout": false,
-      "requires_maintenance": false,
-      "status": "active",
-      "ack_required": true,
-      "ack_sla_minutes": 10,
-      "escalation_sla_minutes": 20
-    }
-  ],
-  "mes_alarm_playbooks": [
-    {
-      "playbook_id": "PB-SPINDLE-001",
-      "alarm_code": "SPINDLE_OVERLOAD",
-      "title": "Spindle overload response",
-      "title_vi": "Ứng phó quá tải trục chính",
-      "response_steps": [
-        "Pause work order immediately.",
-        "Apply LOTO if spindle cannot be reset safely.",
-        "Check tooling, holder balance, and spindle alarm history.",
-        "Escalate to maintenance manager if not cleared within 10 minutes."
-      ],
-      "escalation_role": "maintenance_manager",
-      "response_target_minutes": 10,
-      "status": "active",
-      "acknowledge_within_minutes": 5,
-      "lockout_release_required": true
-    },
-    {
-      "playbook_id": "PB-AXIS-001",
-      "alarm_code": "AXIS_SERVO_FAULT",
-      "title": "Axis servo fault response",
-      "title_vi": "Ứng phó lỗi servo trục",
-      "response_steps": [
-        "Hold the machine and secure the part.",
-        "Capture axis alarm code and active program state.",
-        "Check mechanical obstruction and lubrication status.",
-        "Re-home only after maintenance confirmation."
-      ],
-      "escalation_role": "maintenance_technician",
-      "response_target_minutes": 15,
-      "status": "active",
-      "acknowledge_within_minutes": 7,
-      "lockout_release_required": false
-    },
-    {
-      "playbook_id": "PB-PROBE-001",
-      "alarm_code": "PROBE_CAL_WARN",
-      "title": "Probe warning response",
-      "title_vi": "Ứng phó cảnh báo đầu dò",
-      "response_steps": [
-        "Stop measurement release for the affected WO.",
-        "Run probe health verification and check calibration due date.",
-        "Notify QA manager before resuming FAI or final inspection."
-      ],
-      "escalation_role": "qa_manager",
-      "response_target_minutes": 20,
-      "status": "active",
-      "acknowledge_within_minutes": 10,
-      "lockout_release_required": false
-    }
-  ],
-  "defect_catalog": [
-    {
-      "defect_code": "DEF-DIM",
-      "defect_name": "Dimensional",
-      "defect_name_vi": "Sai lệch kích thước",
-      "defect_group": "dimensional",
-      "severity_default": "major",
-      "status": "active"
-    },
-    {
-      "defect_code": "DEF-SURF",
-      "defect_name": "Surface",
-      "defect_name_vi": "Lỗi bề mặt",
-      "defect_group": "surface",
-      "severity_default": "major",
-      "status": "active"
-    },
-    {
-      "defect_code": "DEF-PACK",
-      "defect_name": "Packaging",
-      "defect_name_vi": "Lỗi đóng gói",
-      "defect_group": "packaging",
-      "severity_default": "minor",
-      "status": "active"
-    },
-    {
-      "defect_code": "DEF-DOC",
-      "defect_name": "Documentation",
-      "defect_name_vi": "Lỗi tài liệu",
-      "defect_group": "documentation",
-      "severity_default": "major",
-      "status": "active"
-    },
-    {
-      "defect_code": "DEF-MAT",
-      "defect_name": "Material",
-      "defect_name_vi": "Lỗi vật liệu",
-      "defect_group": "material",
-      "severity_default": "critical",
-      "status": "active"
-    },
-    {
-      "defect_code": "DEF-TRACE",
-      "defect_name": "Traceability",
-      "defect_name_vi": "Lỗi truy xuất",
-      "defect_group": "traceability",
-      "severity_default": "critical",
-      "status": "active"
-    }
-  ],
-  "tool_assemblies": [
-    {
-      "assembly_id": "ASM-5AX-ROUGH-001",
-      "parent_tool_id": "TL-HLD-5AX-021",
-      "component_tool_id": "TL-EM12-5AX-001",
-      "component_role": "cutter",
-      "quantity_required": 1,
-      "status": "active"
-    },
-    {
-      "assembly_id": "ASM-QA-PROBE-001",
-      "parent_tool_id": "TL-PRB-CMM-001",
-      "component_tool_id": "TL-PRB-CMM-001",
-      "component_role": "probe",
-      "quantity_required": 1,
-      "status": "active"
-    }
-  ]
+    "_meta": {
+        "version": "1.3",
+        "created": "2026-03-29T12:00:00+07:00",
+        "updated": "2026-04-01T19:23:55+07:00",
+        "description": "Master data seed for customer, commercial, engineering, quality, fulfillment, and MES governance used by Evidence Control, Order Management, and the CNC runtime."
+    },
+    "customers": [
+        {
+            "customer_id": "CUS-LAM",
+            "customer_name": "Lam Research",
+            "customer_name_vi": "Lam Research",
+            "customer_type": "OEM",
+            "status": "active",
+            "contact_name": "SQE Desk",
+            "contact_email": "sqe@lam.example",
+            "site_code": "LAM-US"
+        },
+        {
+            "customer_id": "CUS-ACME",
+            "customer_name": "ACME Industries",
+            "customer_name_vi": "ACME Industries",
+            "customer_type": "Tier 1",
+            "status": "active",
+            "contact_name": "John Smith",
+            "contact_email": "john.smith@acme.example",
+            "site_code": "ACME-SG"
+        },
+        {
+            "customer_id": "CUS-GLOBEX",
+            "customer_name": "Globex Corporation",
+            "customer_name_vi": "Globex Corporation",
+            "customer_type": "Tier 1",
+            "status": "active",
+            "contact_name": "Jane Doe",
+            "contact_email": "jane.doe@globex.example",
+            "site_code": "GLOBEX-VN"
+        }
+    ],
+    "customer_sites": [
+        {
+            "site_id": "LAM-US-FREMONT",
+            "customer_id": "CUS-LAM",
+            "site_name": "Lam Research Fremont",
+            "country_code": "US",
+            "default_incoterm_code": "FCA",
+            "default_shipping_method_id": "AIR-PRIORITY",
+            "default_payment_term_code": "NET30",
+            "certificate_of_conformance_required": true,
+            "certificate_of_analysis_required": true,
+            "export_control_required": true,
+            "packing_spec_code": "PK-LAM-AERO",
+            "label_spec_code": "LBL-LAM-CLEAN",
+            "status": "active"
+        },
+        {
+            "site_id": "ACME-SG-PLANT2",
+            "customer_id": "CUS-ACME",
+            "site_name": "ACME Singapore Plant 2",
+            "country_code": "SG",
+            "default_incoterm_code": "DAP",
+            "default_shipping_method_id": "COURIER-DHL",
+            "default_payment_term_code": "NET45",
+            "certificate_of_conformance_required": true,
+            "certificate_of_analysis_required": false,
+            "export_control_required": false,
+            "packing_spec_code": "PK-ACME-STD",
+            "label_spec_code": "LBL-ACME-BLUE",
+            "status": "active"
+        },
+        {
+            "site_id": "GLOBEX-VN-ASM",
+            "customer_id": "CUS-GLOBEX",
+            "site_name": "Globex Vietnam Assembly",
+            "country_code": "VN",
+            "default_incoterm_code": "EXW",
+            "default_shipping_method_id": "TRUCK-DOMESTIC",
+            "default_payment_term_code": "NET30",
+            "certificate_of_conformance_required": true,
+            "certificate_of_analysis_required": false,
+            "export_control_required": false,
+            "packing_spec_code": "PK-GLOBEX-HEAVY",
+            "label_spec_code": "LBL-GLOBEX-STD",
+            "status": "active"
+        }
+    ],
+    "commercial_accounts": [
+        {
+            "account_id": "ACC-LAM-US",
+            "customer_id": "CUS-LAM",
+            "account_owner": "son.phan",
+            "order_coordinator_role": "customer_service",
+            "promise_policy_id": "PROM-CRIT-AERO",
+            "currency_code": "USD",
+            "status": "active"
+        },
+        {
+            "account_id": "ACC-ACME-SG",
+            "customer_id": "CUS-ACME",
+            "account_owner": "ngoc.pham",
+            "order_coordinator_role": "estimator",
+            "promise_policy_id": "PROM-STD-GLOBAL",
+            "currency_code": "USD",
+            "status": "active"
+        }
+    ],
+    "suppliers": [
+        {
+            "supplier_id": "SUP-ACOAT",
+            "supplier_name": "A-Coat Surface Treatment",
+            "supplier_name_vi": "A-Coat Surface Treatment",
+            "supplier_type": "special_process",
+            "status": "approved",
+            "approved_customers": [
+                "CUS-LAM"
+            ],
+            "contact_name": "Planner",
+            "contact_email": "planner@acoat.example"
+        },
+        {
+            "supplier_id": "SUP-MITUTOYO",
+            "supplier_name": "Mitutoyo Vietnam",
+            "supplier_name_vi": "Mitutoyo Vietnam",
+            "supplier_type": "calibration",
+            "status": "approved",
+            "approved_customers": [
+                "CUS-LAM",
+                "CUS-ACME"
+            ],
+            "contact_name": "Service Desk",
+            "contact_email": "service@mitutoyo.example"
+        },
+        {
+            "supplier_id": "SUP-KIMLONG",
+            "supplier_name": "Kim Long Precision Supply",
+            "supplier_name_vi": "Kim Long Precision Supply",
+            "supplier_type": "raw_material",
+            "status": "approved",
+            "approved_customers": [
+                "CUS-GLOBEX",
+                "CUS-ACME"
+            ],
+            "contact_name": "Buyer 02",
+            "contact_email": "buyer@kimlong.example"
+        }
+    ],
+    "parts": [
+        {
+            "part_number": "714-1101",
+            "part_description": "Valve Housing, 17-4PH",
+            "customer_id": "CUS-LAM",
+            "status": "active",
+            "preferred_supplier_id": "SUP-ACOAT",
+            "traceability_level": "lot_heat",
+            "material_trace_required": "yes",
+            "required_trace_fields": "material_lot_number, heat_number, traveler_number, traveler_status, material_cert_status"
+        },
+        {
+            "part_number": "P-1001",
+            "part_description": "Mounting Bracket, AL6061",
+            "customer_id": "CUS-ACME",
+            "status": "active",
+            "preferred_supplier_id": "SUP-KIMLONG",
+            "traceability_level": "lot",
+            "material_trace_required": "yes",
+            "required_trace_fields": "material_lot_number, traveler_number, traveler_status, material_cert_status"
+        },
+        {
+            "part_number": "P-2003",
+            "part_description": "Drive Shaft, 316SS",
+            "customer_id": "CUS-GLOBEX",
+            "status": "active",
+            "preferred_supplier_id": "SUP-KIMLONG",
+            "traceability_level": "lot_heat",
+            "material_trace_required": "yes",
+            "required_trace_fields": "material_lot_number, heat_number, traveler_number, traveler_status, material_cert_status"
+        },
+        {
+            "part_number": "FLG-200",
+            "description": "Titanium Flange Ti-6Al-4V",
+            "material_type": "Titanium",
+            "material_grade": "Ti-6Al-4V",
+            "drawing_number": "DWG-FLG-200",
+            "lot_tracked": true,
+            "serial_tracked": true,
+            "status": "active",
+            "created_at": "2026-04-01T19:23:55+07:00",
+            "created_by": "sanh.vo",
+            "updated_at": "2026-04-01T19:23:55+07:00",
+            "updated_by": "sanh.vo"
+        }
+    ],
+    "revisions": [
+        {
+            "revision_id": "714-1101-REV-C",
+            "part_number": "714-1101",
+            "revision": "REV-C",
+            "status": "released",
+            "release_date": "2026-03-10"
+        },
+        {
+            "revision_id": "P-1001-REV-C",
+            "part_number": "P-1001",
+            "revision": "REV-C",
+            "status": "released",
+            "release_date": "2026-02-18"
+        },
+        {
+            "revision_id": "P-2003-REV-B",
+            "part_number": "P-2003",
+            "revision": "REV-B",
+            "status": "released",
+            "release_date": "2026-01-21"
+        }
+    ],
+    "incoterms": [
+        {
+            "incoterm_code": "FCA",
+            "incoterm_name": "Free Carrier",
+            "status": "active"
+        },
+        {
+            "incoterm_code": "DAP",
+            "incoterm_name": "Delivered At Place",
+            "status": "active"
+        },
+        {
+            "incoterm_code": "EXW",
+            "incoterm_name": "Ex Works",
+            "status": "active"
+        }
+    ],
+    "payment_terms": [
+        {
+            "payment_term_code": "NET30",
+            "payment_term_name": "Net 30 days",
+            "status": "active"
+        },
+        {
+            "payment_term_code": "NET45",
+            "payment_term_name": "Net 45 days",
+            "status": "active"
+        }
+    ],
+    "shipping_methods": [
+        {
+            "shipping_method_id": "AIR-PRIORITY",
+            "shipping_method_name": "Priority air freight",
+            "mode": "air",
+            "status": "active"
+        },
+        {
+            "shipping_method_id": "COURIER-DHL",
+            "shipping_method_name": "Courier DHL Express",
+            "mode": "courier",
+            "status": "active"
+        },
+        {
+            "shipping_method_id": "TRUCK-DOMESTIC",
+            "shipping_method_name": "Domestic truck",
+            "mode": "road",
+            "status": "active"
+        }
+    ],
+    "promise_policies": [
+        {
+            "promise_policy_id": "PROM-CRIT-AERO",
+            "policy_name": "Critical aerospace controlled promise",
+            "target_otd_percent": 98,
+            "review_frequency": "daily",
+            "status": "active"
+        },
+        {
+            "promise_policy_id": "PROM-STD-GLOBAL",
+            "policy_name": "Standard global make-to-order",
+            "target_otd_percent": 95,
+            "review_frequency": "weekly",
+            "status": "active"
+        }
+    ],
+    "routing_library": [
+        {
+            "routing_id": "ROUT-714-1101-C",
+            "part_number": "714-1101",
+            "part_revision": "REV-C",
+            "routing_name": "714-1101 REV-C production routing",
+            "work_center_path": "WC-5AX > WC-QA > WC-OUT",
+            "status": "released"
+        },
+        {
+            "routing_id": "ROUT-P1001-C",
+            "part_number": "P-1001",
+            "part_revision": "REV-C",
+            "routing_name": "P-1001 REV-C standard routing",
+            "work_center_path": "WC-3AX > WC-QA",
+            "status": "released"
+        }
+    ],
+    "bom_library": [
+        {
+            "bom_id": "BOM-714-1101-C",
+            "part_number": "714-1101",
+            "part_revision": "REV-C",
+            "bom_name": "Valve Housing raw + special process BOM",
+            "status": "released"
+        },
+        {
+            "bom_id": "BOM-P1001-C",
+            "part_number": "P-1001",
+            "part_revision": "REV-C",
+            "bom_name": "Mounting Bracket standard BOM",
+            "status": "released"
+        }
+    ],
+    "control_plans": [
+        {
+            "control_plan_id": "CP-714-1101-C",
+            "part_number": "714-1101",
+            "part_revision": "REV-C",
+            "control_plan_name": "Valve Housing control plan",
+            "status": "released"
+        },
+        {
+            "control_plan_id": "CP-P1001-C",
+            "part_number": "P-1001",
+            "part_revision": "REV-C",
+            "control_plan_name": "Mounting Bracket control plan",
+            "status": "released"
+        }
+    ],
+    "inspection_plans": [
+        {
+            "inspection_plan_id": "IP-714-1101-C",
+            "part_number": "714-1101",
+            "part_revision": "REV-C",
+            "inspection_plan_name": "714-1101 FAI + final inspection",
+            "status": "released"
+        },
+        {
+            "inspection_plan_id": "IP-P1001-C",
+            "part_number": "P-1001",
+            "part_revision": "REV-C",
+            "inspection_plan_name": "P-1001 final inspection",
+            "status": "released"
+        }
+    ],
+    "traveler_templates": [
+        {
+            "traveler_template_id": "TRV-714-1101-C",
+            "part_number": "714-1101",
+            "part_revision": "REV-C",
+            "traveler_template_name": "Valve Housing router / traveler",
+            "status": "released"
+        },
+        {
+            "traveler_template_id": "TRV-P1001-C",
+            "part_number": "P-1001",
+            "part_revision": "REV-C",
+            "traveler_template_name": "Mounting Bracket router / traveler",
+            "status": "released"
+        }
+    ],
+    "quality_gate_profiles": [
+        {
+            "quality_gate_profile_id": "QG-AERO-FAI",
+            "profile_name": "Aerospace CNC FAI release gates",
+            "required_gates": "contract_review, engineering_release, material_trace, nc_release, first_piece, coc",
+            "status": "active"
+        },
+        {
+            "quality_gate_profile_id": "QG-STD-CNC",
+            "profile_name": "Standard CNC delivery gates",
+            "required_gates": "engineering_release, material_trace, final_inspection, coc",
+            "status": "active"
+        }
+    ],
+    "launch_gate_templates": [
+        {
+            "gate_template_id": "LGT-5AX-AERO",
+            "work_center_id": "WC-5AX",
+            "gate_name": "5-axis aerospace launch template",
+            "required_gates": "connector_guard, nc_release, tool_readiness, operator_governance, material_trace, evidence_gate",
+            "status": "active"
+        },
+        {
+            "gate_template_id": "LGT-3AX-STD",
+            "work_center_id": "WC-3AX",
+            "gate_name": "3-axis production launch template",
+            "required_gates": "connector_guard, nc_release, tool_readiness, material_trace, evidence_gate",
+            "status": "active"
+        }
+    ],
+    "customer_item_approvals": [
+        {
+            "approval_id": "CIA-LAM-714-1101",
+            "customer_id": "CUS-LAM",
+            "part_number": "714-1101",
+            "part_revision": "REV-C",
+            "approved_for_production": true,
+            "status": "active"
+        },
+        {
+            "approval_id": "CIA-ACME-P1001",
+            "customer_id": "CUS-ACME",
+            "part_number": "P-1001",
+            "part_revision": "REV-C",
+            "approved_for_production": true,
+            "status": "active"
+        }
+    ],
+    "supplier_process_approvals": [
+        {
+            "approval_id": "SPA-LAM-PASS",
+            "supplier_id": "SUP-ACOAT",
+            "customer_id": "CUS-LAM",
+            "special_process": "Passivation",
+            "status": "approved"
+        },
+        {
+            "approval_id": "SPA-ACME-ANOD",
+            "supplier_id": "SUP-ACOAT",
+            "customer_id": "CUS-ACME",
+            "special_process": "Clear anodize",
+            "status": "approved"
+        }
+    ],
+    "warehouse_locations": [
+        {
+            "warehouse_id": "WH-FG-01",
+            "warehouse_name": "Finished goods warehouse",
+            "warehouse_type": "fg",
+            "status": "active"
+        },
+        {
+            "warehouse_id": "WH-RM-01",
+            "warehouse_name": "Raw material supermarket",
+            "warehouse_type": "rm",
+            "status": "active"
+        }
+    ],
+    "nc_program_releases": [
+        {
+            "program_id": "NC_714-1101_REVC_OP10_5AX_V3",
+            "release_title": "714-1101 REV-C OP10 roughing release",
+            "part_number": "714-1101",
+            "part_revision": "REV-C",
+            "operation_number": 10,
+            "machine_type": "5-axis",
+            "work_center_id": "WC-5AX",
+            "cam_source_rev": "CAM-7141101-OP10-R7",
+            "post_processor_rev": "PP-MAKINO-5AX-R3",
+            "checksum": "sha256:7ad4e091c6f8",
+            "package_id": "PKG-7141101-OP10-V3",
+            "controller_program_name": "O7141101V3",
+            "release_manifest_version": "RM-3.2",
+            "approved_machine_ids": "MC-5AX-01",
+            "download_required_before_run": "yes",
+            "status": "released",
+            "released_at": "2026-03-29T07:40:00+07:00",
+            "released_by": "eng.manager",
+            "notes": "Bản release chuẩn cho prove-out và batch đầu tiên."
+        },
+        {
+            "program_id": "NC_P-1001_REVC_OP10_3AX_V2",
+            "release_title": "P-1001 REV-C OP10 production release",
+            "part_number": "P-1001",
+            "part_revision": "REV-C",
+            "operation_number": 10,
+            "machine_type": "3-axis",
+            "work_center_id": "WC-3AX",
+            "cam_source_rev": "CAM-P1001-OP10-R4",
+            "post_processor_rev": "PP-BROTHER-3AX-R2",
+            "checksum": "sha256:58bc101a0f2e",
+            "package_id": "PKG-P1001-OP10-V2",
+            "controller_program_name": "P1001C-OP10-V2",
+            "release_manifest_version": "RM-2.8",
+            "approved_machine_ids": "MC-3AX-04",
+            "download_required_before_run": "yes",
+            "status": "draft",
+            "released_at": "",
+            "released_by": "",
+            "notes": "Đang chờ xác nhận bù dao sau thay cutter và review prove-out."
+        },
+        {
+            "program_id": "CMM_714-1101_REVC_FAI_V2",
+            "release_title": "714-1101 REV-C FAI CMM release",
+            "part_number": "714-1101",
+            "part_revision": "REV-C",
+            "operation_number": 90,
+            "machine_type": "cmm",
+            "work_center_id": "WC-QA",
+            "cam_source_rev": "CMM-7141101-FAI-R2",
+            "post_processor_rev": "MITUTOYO-CMM-R1",
+            "checksum": "sha256:4ef0b1f90c44",
+            "package_id": "PKG-7141101-FAI-V2",
+            "controller_program_name": "CMM-7141101-FAI-V2",
+            "release_manifest_version": "RM-1.9",
+            "approved_machine_ids": "CMM-01",
+            "download_required_before_run": "yes",
+            "status": "released",
+            "released_at": "2026-03-28T16:10:00+07:00",
+            "released_by": "qe.lead",
+            "notes": "Dùng cho FAI và final inspection CMM."
+        }
+    ],
+    "capas": [
+        {
+            "capa_number": "CAPA-2026-001",
+            "title": "Tooling wear on CNC-05",
+            "status": "open",
+            "customer_id": "CUS-LAM",
+            "part_number": "714-1101",
+            "opened_date": "2026-01-12"
+        },
+        {
+            "capa_number": "CAPA-2026-002",
+            "title": "Operator training gap - night shift",
+            "status": "in_progress",
+            "customer_id": "CUS-ACME",
+            "part_number": "P-1001",
+            "opened_date": "2026-02-19"
+        },
+        {
+            "capa_number": "CAPA-2026-003",
+            "title": "Raw material specification deviation",
+            "status": "closed",
+            "customer_id": "CUS-GLOBEX",
+            "part_number": "P-2003",
+            "opened_date": "2025-12-22"
+        }
+    ],
+    "work_centers": [
+        {
+            "work_center_id": "WC-5AX",
+            "work_center_name": "5-Axis Machining Cell",
+            "department": "PRO",
+            "process_family": "5-axis",
+            "area": "Xưởng CNC A",
+            "status": "active"
+        },
+        {
+            "work_center_id": "WC-3AX",
+            "work_center_name": "VMC Production Cell",
+            "department": "PRO",
+            "process_family": "3-axis",
+            "area": "Xưởng CNC B",
+            "status": "active"
+        },
+        {
+            "work_center_id": "WC-QA",
+            "work_center_name": "Final Inspection Cell",
+            "department": "QA",
+            "process_family": "inspection",
+            "area": "Phòng QA",
+            "status": "active"
+        },
+        {
+            "work_center_id": "WC-MNT",
+            "work_center_name": "Maintenance Support Cell",
+            "department": "MNT",
+            "process_family": "maintenance",
+            "area": "Utility Bay",
+            "status": "active"
+        }
+    ],
+    "machines": [
+        {
+            "machine_id": "MC-5AX-01",
+            "machine_name": "Makino DA300",
+            "work_center_id": "WC-5AX",
+            "machine_type": "5-axis",
+            "location": "Xưởng CNC A - Line 01",
+            "telemetry_mode": "machine",
+            "connector_type": "mtconnect",
+            "connector_name": "Makino MTConnect Adapter",
+            "connector_endpoint": "https://mes.hesem.local/mtconnect/mc-5ax-01/current",
+            "heartbeat_sla_seconds": 90,
+            "connector_required_for_release": "yes",
+            "manual_bridge_allowed": "no",
+            "preferred_operator_id": "OPR-001",
+            "status": "active",
+            "last_pm_date": "2026-03-21",
+            "next_pm_date": "2026-04-21"
+        },
+        {
+            "machine_id": "MC-3AX-04",
+            "machine_name": "Brother S700X2",
+            "work_center_id": "WC-3AX",
+            "machine_type": "3-axis",
+            "location": "Xưởng CNC B - Line 02",
+            "telemetry_mode": "machine",
+            "connector_type": "opcua",
+            "connector_name": "Brother OPC UA Bridge",
+            "connector_endpoint": "opc.tcp://192.168.10.44:4840",
+            "heartbeat_sla_seconds": 120,
+            "connector_required_for_release": "yes",
+            "manual_bridge_allowed": "no",
+            "preferred_operator_id": "OPR-014",
+            "status": "active",
+            "last_pm_date": "2026-03-14",
+            "next_pm_date": "2026-04-14"
+        },
+        {
+            "machine_id": "CMM-01",
+            "machine_name": "Mitutoyo Crysta-Apex",
+            "work_center_id": "WC-QA",
+            "machine_type": "cmm",
+            "location": "Phòng QA - CMM Zone",
+            "telemetry_mode": "manual",
+            "connector_type": "manual_bridge",
+            "connector_name": "CMM Manual Bridge",
+            "connector_endpoint": "manual://cmm-01",
+            "heartbeat_sla_seconds": 180,
+            "connector_required_for_release": "yes",
+            "manual_bridge_allowed": "yes",
+            "preferred_operator_id": "QC-002",
+            "status": "active",
+            "last_pm_date": "2026-03-05",
+            "next_pm_date": "2026-04-05"
+        },
+        {
+            "machine_id": "CNC-07",
+            "machine_name": "Mazak Integrex i-200S (Turn-Mill)",
+            "work_center_id": "WC-TURN",
+            "machine_type": "turn_mill",
+            "location": "Xưởng B - Bay 1",
+            "status": "active",
+            "created_at": "2026-04-01T19:22:17+07:00",
+            "created_by": "sanh.vo",
+            "updated_at": "2026-04-01T19:22:17+07:00",
+            "updated_by": "sanh.vo"
+        }
+    ],
+    "operators": [
+        {
+            "operator_id": "OPR-001",
+            "operator_name": "Nguyễn Văn An",
+            "role": "operator",
+            "work_center_id": "WC-5AX",
+            "shift": "1",
+            "skills": "5-axis, setup, prove-out",
+            "qualification_status": "active",
+            "qualification_expiry": "2026-12-31",
+            "qualified_machine_types": "5-axis",
+            "qualified_machine_ids": "MC-5AX-01",
+            "qualified_work_centers": "WC-5AX",
+            "certified_processes": "5-axis machining, prove-out, setup",
+            "status": "active"
+        },
+        {
+            "operator_id": "OPR-014",
+            "operator_name": "Trần Minh Khang",
+            "role": "operator",
+            "work_center_id": "WC-3AX",
+            "shift": "2",
+            "skills": "3-axis, VMC, tool offsets",
+            "qualification_status": "expired",
+            "qualification_expiry": "2026-03-15",
+            "qualified_machine_types": "3-axis",
+            "qualified_machine_ids": "",
+            "qualified_work_centers": "WC-3AX",
+            "certified_processes": "3-axis machining, setup",
+            "status": "active"
+        },
+        {
+            "operator_id": "QC-002",
+            "operator_name": "Lê Thu Hà",
+            "role": "qc_inspector",
+            "work_center_id": "WC-QA",
+            "shift": "day",
+            "skills": "CMM, FAI, final inspection",
+            "qualification_status": "active",
+            "qualification_expiry": "2026-11-30",
+            "qualified_machine_types": "cmm",
+            "qualified_machine_ids": "CMM-01",
+            "qualified_work_centers": "WC-QA",
+            "certified_processes": "CMM, FAI, final inspection",
+            "status": "active"
+        },
+        {
+            "operator_id": "MNT-001",
+            "operator_name": "Phạm Quốc Dũng",
+            "role": "maintenance_tech",
+            "work_center_id": "WC-MNT",
+            "shift": "day",
+            "skills": "PM, spindle, coolant, pneumatics",
+            "qualification_status": "active",
+            "qualification_expiry": "2026-10-31",
+            "qualified_machine_types": "5-axis,3-axis,cmm",
+            "qualified_machine_ids": "MC-5AX-01,MC-3AX-04,CMM-01",
+            "qualified_work_centers": "WC-MNT,WC-5AX,WC-3AX,WC-QA",
+            "certified_processes": "maintenance, PM, spindle, coolant, pneumatics",
+            "status": "active"
+        }
+    ],
+    "tooling_assets": [
+        {
+            "tool_id": "TL-EM12-5AX-001",
+            "tool_name": "Endmill Carbide Ø12 ALTiN",
+            "tool_type": "endmill",
+            "machine_type": "5-axis",
+            "preferred_work_center_id": "WC-5AX",
+            "life_limit_minutes": 180,
+            "life_limit_parts": 60,
+            "warning_pct": 80,
+            "critical_pct": 95,
+            "default_offset_band_mm": 0.02,
+            "status": "active"
+        },
+        {
+            "tool_id": "TL-DR06-3AX-014",
+            "tool_name": "Through Coolant Drill Ø6",
+            "tool_type": "drill",
+            "machine_type": "3-axis",
+            "preferred_work_center_id": "WC-3AX",
+            "life_limit_minutes": 90,
+            "life_limit_parts": 45,
+            "warning_pct": 75,
+            "critical_pct": 92,
+            "default_offset_band_mm": 0.015,
+            "status": "active"
+        },
+        {
+            "tool_id": "TL-PRB-CMM-001",
+            "tool_name": "CMM Probe Stylus Set",
+            "tool_type": "probe",
+            "machine_type": "cmm",
+            "preferred_work_center_id": "WC-QA",
+            "life_limit_minutes": 0,
+            "life_limit_parts": 0,
+            "warning_pct": 80,
+            "critical_pct": 95,
+            "default_offset_band_mm": 0.005,
+            "status": "active"
+        },
+        {
+            "tool_id": "TL-HLD-5AX-021",
+            "tool_name": "Shrink Holder HSK63A",
+            "tool_type": "holder",
+            "machine_type": "5-axis",
+            "preferred_work_center_id": "WC-5AX",
+            "life_limit_minutes": 0,
+            "life_limit_parts": 0,
+            "warning_pct": 80,
+            "critical_pct": 95,
+            "default_offset_band_mm": 0.01,
+            "status": "active"
+        }
+    ],
+    "downtime_reason_codes": [
+        {
+            "reason_code": "DT-BRK-SPINDLE",
+            "reason_name": "Spindle alarm or machine breakdown",
+            "reason_name_vi": "Báo lỗi trục chính hoặc hỏng máy",
+            "category": "breakdown",
+            "reason_group": "machine",
+            "default_severity": "critical",
+            "planned_flag": "no",
+            "escalation_sla_minutes": 10,
+            "status": "active"
+        },
+        {
+            "reason_code": "DT-TOOL-LIFE",
+            "reason_name": "Tool life exceeded or offset re-verification",
+            "reason_name_vi": "Dao vượt ngưỡng life hoặc cần xác nhận lại offset",
+            "category": "tool_change",
+            "reason_group": "tooling",
+            "default_severity": "major",
+            "planned_flag": "no",
+            "escalation_sla_minutes": 15,
+            "status": "active"
+        },
+        {
+            "reason_code": "DT-SETUP-PROGRAM",
+            "reason_name": "NC program mismatch during setup",
+            "reason_name_vi": "Lệch chương trình NC trong giai đoạn setup",
+            "category": "setup",
+            "reason_group": "program",
+            "default_severity": "major",
+            "planned_flag": "no",
+            "escalation_sla_minutes": 20,
+            "status": "active"
+        },
+        {
+            "reason_code": "DT-MATL-WAIT",
+            "reason_name": "Material or outsource lot not ready",
+            "reason_name_vi": "Vật tư hoặc lô outsource chưa sẵn sàng",
+            "category": "material_wait",
+            "reason_group": "material",
+            "default_severity": "major",
+            "planned_flag": "no",
+            "escalation_sla_minutes": 30,
+            "status": "active"
+        },
+        {
+            "reason_code": "DT-QUAL-HOLD",
+            "reason_name": "Quality hold or verification pending",
+            "reason_name_vi": "Giữ lô chất lượng hoặc chờ xác nhận kiểm tra",
+            "category": "quality_hold",
+            "reason_group": "quality",
+            "default_severity": "major",
+            "planned_flag": "no",
+            "escalation_sla_minutes": 20,
+            "status": "active"
+        },
+        {
+            "reason_code": "DT-PM-WINDOW",
+            "reason_name": "Planned preventive maintenance window",
+            "reason_name_vi": "Cửa sổ bảo trì phòng ngừa đã hoạch định",
+            "category": "planned_pm",
+            "reason_group": "maintenance",
+            "default_severity": "minor",
+            "planned_flag": "yes",
+            "escalation_sla_minutes": 60,
+            "status": "active"
+        },
+        {
+            "reason_code": "DT-UTIL-AIR",
+            "reason_name": "Utility interruption or low air pressure",
+            "reason_name_vi": "Gián đoạn tiện ích hoặc áp suất khí thấp",
+            "category": "utility",
+            "reason_group": "utility",
+            "default_severity": "critical",
+            "planned_flag": "no",
+            "escalation_sla_minutes": 10,
+            "status": "active"
+        }
+    ],
+    "downtime_resolution_codes": [
+        {
+            "resolution_code": "resolved",
+            "resolution_name": "Resolved and released",
+            "resolution_name_vi": "Đã khôi phục và cho chạy lại",
+            "resolution_group": "reset",
+            "status": "active"
+        },
+        {
+            "resolution_code": "temporary_fix",
+            "resolution_name": "Temporary fix applied",
+            "resolution_name_vi": "Đã khắc phục tạm",
+            "resolution_group": "temporary_fix",
+            "status": "active"
+        },
+        {
+            "resolution_code": "awaiting_parts",
+            "resolution_name": "Awaiting spare parts",
+            "resolution_name_vi": "Đang chờ phụ tùng",
+            "resolution_group": "parts_wait",
+            "status": "active"
+        },
+        {
+            "resolution_code": "tool_replaced",
+            "resolution_name": "Tool or holder replaced",
+            "resolution_name_vi": "Đã thay dao hoặc holder",
+            "resolution_group": "tooling",
+            "status": "active"
+        },
+        {
+            "resolution_code": "program_reloaded",
+            "resolution_name": "Program reloaded and verified",
+            "resolution_name_vi": "Đã nạp lại chương trình và xác nhận",
+            "resolution_group": "program",
+            "status": "active"
+        }
+    ],
+    "mes_connectivity_adapters": [
+        {
+            "adapter_id": "ADP-MC-5AX-01-MTC",
+            "machine_id": "MC-5AX-01",
+            "adapter_name": "Makino MTConnect Adapter",
+            "adapter_type": "mtconnect",
+            "transport_protocol": "https",
+            "endpoint_url": "https://mes.hesem.local/mtconnect/mc-5ax-01/current",
+            "poll_interval_seconds": 30,
+            "heartbeat_sla_seconds": 90,
+            "stale_after_seconds": 150,
+            "auth_mode": "service_account",
+            "store_and_forward_enabled": true,
+            "payload_schema_version": "1.3",
+            "status": "active",
+            "last_validated_at": "2026-03-30T07:10:00+07:00"
+        },
+        {
+            "adapter_id": "ADP-MC-3AX-04-OPCUA",
+            "machine_id": "MC-3AX-04",
+            "adapter_name": "Brother OPC UA Bridge",
+            "adapter_type": "opcua",
+            "transport_protocol": "opc.tcp",
+            "endpoint_url": "opc.tcp://192.168.10.44:4840",
+            "heartbeat_sla_seconds": 120,
+            "stale_after_seconds": 180,
+            "auth_mode": "certificate",
+            "store_and_forward_enabled": true,
+            "payload_schema_version": "1.0",
+            "status": "active",
+            "last_validated_at": "2026-03-29T18:20:00+07:00"
+        },
+        {
+            "adapter_id": "ADP-CMM-01-MANUAL",
+            "machine_id": "CMM-01",
+            "adapter_name": "CMM Manual Bridge",
+            "adapter_type": "manual_bridge",
+            "transport_protocol": "manual",
+            "endpoint_url": "manual://cmm-01",
+            "heartbeat_sla_seconds": 180,
+            "stale_after_seconds": 240,
+            "auth_mode": "session_user",
+            "store_and_forward_enabled": false,
+            "payload_schema_version": "1.0",
+            "status": "active",
+            "last_validated_at": "2026-03-29T13:05:00+07:00"
+        }
+    ],
+    "mes_alarm_catalog": [
+        {
+            "alarm_code": "SPINDLE_OVERLOAD",
+            "controller_family": "makino-pro",
+            "alarm_group": "spindle",
+            "title": "Spindle overload",
+            "title_vi": "Quá tải trục chính",
+            "severity_default": "CRITICAL",
+            "downtime_category_default": "breakdown",
+            "response_owner_role": "maintenance_manager",
+            "response_target_minutes": 10,
+            "requires_lockout": true,
+            "requires_maintenance": true,
+            "status": "active",
+            "ack_required": true,
+            "ack_sla_minutes": 5,
+            "escalation_sla_minutes": 10
+        },
+        {
+            "alarm_code": "AXIS_SERVO_FAULT",
+            "controller_family": "brother-cnc-c00",
+            "alarm_group": "axis",
+            "title": "Axis servo fault",
+            "title_vi": "Lỗi servo trục",
+            "severity_default": "ALARM",
+            "downtime_category_default": "breakdown",
+            "response_owner_role": "maintenance_technician",
+            "response_target_minutes": 15,
+            "requires_lockout": false,
+            "requires_maintenance": true,
+            "status": "active",
+            "ack_required": true,
+            "ack_sla_minutes": 7,
+            "escalation_sla_minutes": 15
+        },
+        {
+            "alarm_code": "PROBE_CAL_WARN",
+            "controller_family": "mitutoyo-cmm",
+            "alarm_group": "metrology",
+            "title": "Probe calibration warning",
+            "title_vi": "Cảnh báo hiệu chuẩn đầu dò",
+            "severity_default": "WARNING",
+            "downtime_category_default": "quality_hold",
+            "response_owner_role": "qa_manager",
+            "response_target_minutes": 20,
+            "requires_lockout": false,
+            "requires_maintenance": false,
+            "status": "active",
+            "ack_required": true,
+            "ack_sla_minutes": 10,
+            "escalation_sla_minutes": 20
+        }
+    ],
+    "mes_alarm_playbooks": [
+        {
+            "playbook_id": "PB-SPINDLE-001",
+            "alarm_code": "SPINDLE_OVERLOAD",
+            "title": "Spindle overload response",
+            "title_vi": "Ứng phó quá tải trục chính",
+            "response_steps": [
+                "Pause work order immediately.",
+                "Apply LOTO if spindle cannot be reset safely.",
+                "Check tooling, holder balance, and spindle alarm history.",
+                "Escalate to maintenance manager if not cleared within 10 minutes."
+            ],
+            "escalation_role": "maintenance_manager",
+            "response_target_minutes": 10,
+            "status": "active",
+            "acknowledge_within_minutes": 5,
+            "lockout_release_required": true
+        },
+        {
+            "playbook_id": "PB-AXIS-001",
+            "alarm_code": "AXIS_SERVO_FAULT",
+            "title": "Axis servo fault response",
+            "title_vi": "Ứng phó lỗi servo trục",
+            "response_steps": [
+                "Hold the machine and secure the part.",
+                "Capture axis alarm code and active program state.",
+                "Check mechanical obstruction and lubrication status.",
+                "Re-home only after maintenance confirmation."
+            ],
+            "escalation_role": "maintenance_technician",
+            "response_target_minutes": 15,
+            "status": "active",
+            "acknowledge_within_minutes": 7,
+            "lockout_release_required": false
+        },
+        {
+            "playbook_id": "PB-PROBE-001",
+            "alarm_code": "PROBE_CAL_WARN",
+            "title": "Probe warning response",
+            "title_vi": "Ứng phó cảnh báo đầu dò",
+            "response_steps": [
+                "Stop measurement release for the affected WO.",
+                "Run probe health verification and check calibration due date.",
+                "Notify QA manager before resuming FAI or final inspection."
+            ],
+            "escalation_role": "qa_manager",
+            "response_target_minutes": 20,
+            "status": "active",
+            "acknowledge_within_minutes": 10,
+            "lockout_release_required": false
+        }
+    ],
+    "defect_catalog": [
+        {
+            "defect_code": "DEF-DIM",
+            "defect_name": "Dimensional",
+            "defect_name_vi": "Sai lệch kích thước",
+            "defect_group": "dimensional",
+            "severity_default": "major",
+            "status": "active"
+        },
+        {
+            "defect_code": "DEF-SURF",
+            "defect_name": "Surface",
+            "defect_name_vi": "Lỗi bề mặt",
+            "defect_group": "surface",
+            "severity_default": "major",
+            "status": "active"
+        },
+        {
+            "defect_code": "DEF-PACK",
+            "defect_name": "Packaging",
+            "defect_name_vi": "Lỗi đóng gói",
+            "defect_group": "packaging",
+            "severity_default": "minor",
+            "status": "active"
+        },
+        {
+            "defect_code": "DEF-DOC",
+            "defect_name": "Documentation",
+            "defect_name_vi": "Lỗi tài liệu",
+            "defect_group": "documentation",
+            "severity_default": "major",
+            "status": "active"
+        },
+        {
+            "defect_code": "DEF-MAT",
+            "defect_name": "Material",
+            "defect_name_vi": "Lỗi vật liệu",
+            "defect_group": "material",
+            "severity_default": "critical",
+            "status": "active"
+        },
+        {
+            "defect_code": "DEF-TRACE",
+            "defect_name": "Traceability",
+            "defect_name_vi": "Lỗi truy xuất",
+            "defect_group": "traceability",
+            "severity_default": "critical",
+            "status": "active"
+        }
+    ],
+    "tool_assemblies": [
+        {
+            "assembly_id": "ASM-5AX-ROUGH-001",
+            "parent_tool_id": "TL-HLD-5AX-021",
+            "component_tool_id": "TL-EM12-5AX-001",
+            "component_role": "cutter",
+            "quantity_required": 1,
+            "status": "active"
+        },
+        {
+            "assembly_id": "ASM-QA-PROBE-001",
+            "parent_tool_id": "TL-PRB-CMM-001",
+            "component_tool_id": "TL-PRB-CMM-001",
+            "component_role": "probe",
+            "quantity_required": 1,
+            "status": "active"
+        }
+    ]
 }

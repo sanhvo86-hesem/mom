@@ -1,10 +1,10 @@
-# 31. Core Standard Reconciliation Log
+# 31 — Core Standard Reconciliation Log
 
-> Purpose: compare `core-standards/` against legacy reference notes, portal/runtime behavior, registries, and released documents; lock what is already clear; and isolate the points that still need an owner decision.
+> Purpose: compare `core-standards/` with the old background document, portal/runtime, config registry and some release documents to lock the clear part, and isolate the conflicting or unclear points that need to be decided by the system owner.
 
 ---
 
-## A. Sources Reviewed
+## A. Sources collated
 
 - `core-standards/01-immutable-rules.md`
 - `core-standards/03-language-and-translation.md`
@@ -24,122 +24,131 @@
 
 ---
 
-## B. Reconciled and Locked Items
+## B. Part reconciled and locked
 
 1. **Rename governance**
-   `01-immutable-rules.md` and `23-portal-standard-title-filename-ssot.md` were reconciled around one rule: manual rename outside the governed flow is prohibited. Canonical rename is allowed only through the portal-controlled flow so filename, SSOT title, header, and downstream links stay synchronized.
+   `01-immutable-rules.md` and `23-portal-standard-title-filename-ssot.md` are reconciled in the direction of: prohibiting manual renaming outside the box; Standard rename is only allowed through the portal's control flow to synchronize filename + SSOT title + header + link update.
 
 2. **Header examples**
-   `03-language-and-translation.md` was aligned so header examples use `{{OWNER_ROLE_HTML}}` / `{{APPROVER_ROLE_HTML}}`, matching `05-html-templates.md`, `11-html-structure-guide.md`, and current published documents.
+   `03-language-and-translation.md` has been adjusted so that the header example uses `{{OWNER_ROLE_HTML}}` / `{{APPROVER_ROLE_HTML}}`, matching `05-html-templates.md`, `11-html-structure-guide.md` and current published docs.
 
 3. **Tooling paths**
-   The canonical paths for translation tooling and glossary data are locked to:
+   The path standard for the translation engine and dictionary is locked to:
    - `tools/engines/context_translate_engine.py`
    - `tools/data/qms-terminology-dictionary.xlsx`
    - `tools/data/remaining-english-words.xlsx`
 
-4. **README hierarchy**
-   `README.md` now explicitly states application hierarchy so legacy summary files and implementation drift do not override the core standards.
+4. **WI base template**
+   `templates/wi-template.html` has been pulled up to the same header standard as the remaining templates: Vietnamese metadata label, `HESEM ENGINEERING`, owner/approver according to actor HTML chips.
 
-5. **English note policy**
-   The note/markdown layer under `core-standards/` is now treated as English-first documentation, while HTML templates under `core-standards/templates/` remain unchanged.
+5. **README authority order**
+   `README.md` has a clear hierarchy of application to avoid `general_note.md` or implementation drift overriding the base standard.
 
 ---
 
-## C. Conflicts That Still Need a Decision
+## C. Conflict needs to be decided
 
-### D-01. Canonical SharePoint owner-group name
+### D-01. Canonical name of the SharePoint owner group
 
-**Conflicting sources**
+**Source is off**
 - `01-immutable-rules.md` and `03-language-and-translation.md` use `QMS-Owner`
 - `annex-136-...html` uses `QMS-Owners`
-- `tools/scripts/role-system/normalize_job_order_role_system.py` contains `QMS-Owners / QMS-IT-Administrators`
+- `tools/scripts/role-system/normalize_job_order_role_system.py` has cluster `QMS-Owners / QMS-IT-Administrators`
 
 **Options**
-1. Lock `QMS-Owner` as canonical.
-2. Lock `QMS-Owners` as canonical.
-3. Split the meaning: `QMS-Owners` is the real tenant group, while `QMS-Owner` is only a legacy display label that must be phased out.
+1. The `QMS-Owner` pin is canonical.
+2. The `QMS-Owners` pin is canonical.
+3. Separation of meaning: `QMS-Owners` is the real group on the tenant; `QMS-Owner` is just a legacy label/display alias and must be phased out.
 
 **Impact**
-- Affects M365/SharePoint standards, provisioning scripts, architecture annexes, and operating instructions.
-- Do not bulk rename the standard or scripts until the real tenant group name is confirmed.
+- Affects all M365/SharePoint standards, script provisions, architectural annexes and operating instructions.
+- Do not bulk rename in the standard or script until you confirm the correct group name on the tenant.
 
-### D-02. First-release revision model
+### D-02. Revision model cho lần phát hành đầu tiên
 
-**Conflicting sources**
-- `09-versioning-and-workflow.md` uses `V0 (Draft)` and `V0 (Published)`
-- `general_note.md` also describes `V0` for both draft and first release
-- `03-language-and-translation.md` historically described `V1, V2, V3...` as released versions
-- `01-QMS-Portal/qms-data/config/form_control_registry.json` and `form_release_workflow.json` currently lean toward a `V0-first` model
+**Source is off**
+- `09-versioning-and-workflow.md` uses models `V0 (Draft)` and `V0 (Published)`
+- `general_note.md` is also describing `V0` for both draft and initial release
+- `03-language-and-translation.md` before reconciliation each describes `V1, V2, V3...` as released versions
+- `01-QMS-Portal/qms-data/config/form_control_registry.json` and `form_release_workflow.json` are leaning towards the `V0`-first model
 
 **Options**
 1. Keep `V0` as the first released revision.
-2. Move to `V1.0` for the first released revision and keep `V0` for draft only.
+2. Switch to `V1.0` for first release; `V0` is just a draft.
 
 **Impact**
-- Option 1 is lighter for the current system.
-- Option 2 is closer to common document-control practice, but requires a portal/registry/training migration plan.
+- Option 1 has less impact on the current system.
+- Option 2 is closer to common document control practices, but requires a migration plan for portal, registration, form naming and training material.
 
-### D-03. Canonical owner metadata format in registry/config
+### D-03. Canonical format of owner metadata in registry/config
 
-**Conflicting sources**
-- `01`, `07`, `19`, and `23` prohibit ambiguous placeholders and require owner/approver rendering from published role code, department code, or bundle actors
-- `01-QMS-Portal/qms-data/config/docs_custom.json` and `form_control_registry.json` still contain free-text values such as `Top Management / QA/QMS` and `HR Manager / Department Heads / Training owners`
+**Source is off**
+- `01`, `07`, `19`, `23` prohibit ambiguous placeholders and require owner/approver according to role code, department code or published bundle
+- `01-QMS-Portal/qms-data/config/docs_custom.json` and `form_control_registry.json` still have values ​​of type `Top Management / QA/QMS`, `HR Manager / Department Heads / Training owners`
 
 **Options**
-1. Allow free-text owner strings to remain in registry/config and only normalize published HTML when possible.
-2. Standardize registry/config data to canonical actors (`role code`, `department code`, approved bundle) and phase out placeholders.
+1. Allows the registry to keep the free-text owner string; Only published HTML will render chips/links when possible.
+2. Standardize the registry to actor canonical (`role code`, `department code`, approved bundle) and gradually eliminate placeholders.
 
 **Impact**
-- Option 1 requires less migration but preserves source-data ambiguity.
-- Option 2 is cleaner and more consistent with the core standard, but requires cleanup and actor-mapping logic.
+- Option 1 requires less data migration but continues to maintain ambiguity in the source data.
+- Option 2 is cleaner and more consistent with the core standard, but requires cleanup of the registry and mapping logic.
 
-### D-04. Department Handbook metadata labels
+### D-04. The metadata label is in the Department Handbook
 
-**Conflicting sources**
-- `01-immutable-rules.md` locks header metadata labels in Vietnamese (`M?`, `Phi?n b?n`, `Ng?y hi?u l?c`, `Ch? s? h?u`, `Ph? duy?t`)
-- `templates/department-handbook-template.html` and published handbooks use English labels (`Code`, `Version`, `Effective Date`, `Owner`, `Approved by`)
+**Source is off**
+- `01-immutable-rules.md` locks the metadata header label in Vietnamese (`Mã`, `Phiên bản`, `Ngày hiệu lực`, `Chủ sở hữu`, `Phê duyệt`)
+- `templates/department-handbook-template.html` and published handbooks are using English labels (`Code`, `Version`, `Effective Date`, `Owner`, `Approved by`)
 
 **Options**
-1. Keep Department Handbook as an explicit English-label exception.
-2. Standardize Department Handbook to the same Vietnamese metadata labels used in SOP/WI/JD/ANNEX documents.
+1. Keep the Department Handbook as an exception using English labels.
+2. Standardize the Department Handbook to the same set of Vietnamese labels as SOP/WI/JD/ANNEX.
 
 **Impact**
-- Option 1 requires the exception to be stated explicitly in the standard.
-- Option 2 requires template updates and handbook-wide remediation.
+- Option 1 needs to clearly state the exception in the standard.
+- Option 2 requires updating the template + the entire published handbook.
 
 ---
 
-## D. Unclear Points That Need Confirmation
+## D. Unclear points need confirmation
 
-### U-01. Owner input in the quick-create portal
+### U-01. Owner input in quick-create portal
 
-`01-QMS-Portal/scripts/portal/02-state-auth-ui.js` currently collects ownership through a plain `<select>` value. There is not enough evidence yet to confirm whether this is only a temporary draft-creation input or a real source-of-truth for published header actor rows.
+`01-QMS-Portal/scripts/portal/02-state-auth-ui.js` now collects ownership via a `<select>` plain value. There is not enough evidence to conclude whether this is just a temporary input in the draft creation step or the main source-of-truth for the header actor rows after publishing.
 
-### U-02. Future role of `general_note.md`
+### U-02. `general_note.md`'s role later
 
-`general_note.md` is still being kept for backward compatibility, but it continues to contain legacy content that no longer fully matches the new core standards. It still needs a governance choice:
-
-1. keep it as a quick legacy summary, or
-2. rewrite it so it mirrors `core-standards/`.
-
----
-
-## E. Residual Editorial Risk After the English Rewrite
-
-The English rewrite of note/markdown files is complete for this pass. Remaining risk is now editorial, not governance:
-
-- several long files were translated in bulk and should still be spot-reviewed for phrasing quality;
-- Vietnamese literal labels intentionally remain inside backticks/examples where the standard is describing released UI or header labels;
-- contradiction items D-01 to D-04 and unclear items U-01 to U-02 are still open until an owner decision is made.
+This file has been kept backward compatible, but still contains some old content that no longer matches the new core standards. Need confirmation will:
+1. keep as quick summary legacy, or
+2. completely rewrite to mirror `core-standards/`.
 
 ---
 
-## F. Interim Rule Until Decisions Are Made
+## E. Remaining normalized debt in key `core-standards/`
 
-1. If a conflict appears, apply the hierarchy in `README.md`.
-2. Do not rename SharePoint security-group terminology until the real tenant group name is confirmed.
-3. Newly released documents should keep using actor chips/links for owner/approver wherever the standard is already clear.
-4. Do not change the live revision/runtime model until D-02 is formally decided.
-5. Treat unresolved owner metadata in registry/config as provisional data, not canonical governance.
+The following files still have a significant amount of unaccented Vietnamese / half-English in the document body, although their standard logic is generally clear:
 
+- `19-role-boundary-jd-linking-and-role-codes.md`
+- `20-department-boundary-handbook-codes.md`
+- `22-jd-header-and-department-code-governance.md`
+- `26-wi-archetypes-and-qa-guide.md`
+- `27-annex-archetypes-and-qa-guide.md`
+- `28-pou-visual-and-machine-side-rules.md`
+- `29-wi-annex-research-redraft-method.md`
+- `30-wi-annex-translation-role-bundle-rules.md`
+
+This is an **editorial/language debt**, not a new governance decision. When doing the next polishing round in `core-standards/`, priority should be given to normalizing these files to:
+
+1. Vietnamese has full accents;
+2. consistent title/heading;
+3. Locked terms at `01`, `03`, `19`, `20`, `23`, `25`.
+
+---
+
+## F. Interim rules before decision
+
+1. If there is a conflict, apply the hierarchy in `README.md`.
+2. Do not manually change the canonical name of the SharePoint security group until the tenant is confirmed.
+3. Newly released documents continue to use actor chips/links for owner/approver in all document types that already have clear standards.
+4. With the Department Handbook, keep the current implementation until D-04 is finalized.
+5. With model revision, do not change the running runtime/config until D-02 is finalized.

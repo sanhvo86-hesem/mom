@@ -8,51 +8,51 @@
 
 ### 1.1 Easy to understand
 
-| Ten | Hex | CSS Variables | Content |
+| Ten | Hex | CSS Variables | Cong content |
 |---|---|---|---|
 | Navy | `#0c2d48` | `--navy` | Title (h1, h2), title header, main badge, card-title, vnum bg, table header text |
 | Blue | `#1565c0` | `--blue` | Link, main accent, border-left note, chip text, gate-card border, org-card border-top |
 | Blue Light | `#e3f2fd` | `--blue-l` | Nen note, chip bg, iso-ref bg, badge-soft bg, kpi-pill bg, box.core bg |
 | Gold | `#f9a825` | `--gold` | View the meta view of form-header, callout border, box.sup border, phase-card border |
-| Gold Light | `#fff8e1` | `--gold-l` | Callout, box.sup |
+| Gold Light | `#fff8e1` | `--gold-l` | Next callout, next box.sup |
 
 ### 1.2 Quick state
 
-| Ten | Hex | CSS Variables | Content |
+| Ten | Hex | CSS Variables | Cong content |
 |---|---|---|---|
 | Table Header BG | `#eef4fb` | `--th-bg` | Nen header state (thehead th), form-table th |
-| Table Header Border | `#b8d4f0` | `--th-bdr` | Border header bang (thehead th border-bottom) |
+| Table Header Border | `#b8d4f0` | `--th-bdr` | Border header state (thehead th border-bottom) |
 
-### 1.3 Mau Canh Bao / Trang Thai
+### 1.3 Quick soup / thai page
 
-| Ten | Hex | CSS Variables | Content |
+| Ten | Hex | CSS Variables | Cong content |
 |---|---|---|---|
 | Red | `#e03131` | `--red` | Canh bao, loi, req-tag.shall, box.imp border |
 | Green | `#2f9e44` | `--green` | Curve bar, req-tag.may, kpi-pill text |
 
 ### 1.4 Ink (Text)
 
-| Ten | Hex | CSS Variables | Content |
+| Ten | Hex | CSS Variables | Cong content |
 |---|---|---|---|
 | Ink | `#212529` | `--ink` | Main text (body, p, td) |
-| Ink 2 | `#495057` | `--ink2` | Text phu (sub-vn, mini-note, inline-note, lead) |
+| Ink 2 | `#495057` | `--ink2` | Additional text (sub-vn, mini-note, inline-note, lead) |
 | Ink 3 | `#868e96` | `--ink3` | Text mo (muted, iso-title, field label, meta label) |
-| Ink 4 | `#adb5bd` | `--ink4` | Text very small (small.muted, blank border, check border) |
+| Ink 4 | `#adb5bd` | `--ink4` | Text is small (small.muted, blank border, check border) |
 
 ### 1.5 Background
 
-| Ten | Hex | CSS Variables | Content |
+| Ten | Hex | CSS Variables | Cong content |
 |---|---|---|---|
 | BG | `#ffffff` | `--bg` | Main information (page, card, table cell) |
-| BG 2 | `#f8f9fa` | `--bg2` | Latest features (meta, toc, preface, sig-box, input, auth-item) |
-| BG 3 | `#f1f3f5` | `--bg3` | Ne xam (tag bg, mono/code bg, inline-tag bg) |
+| BG 2 | `#f8f9fa` | `--bg2` | Maximum parameters (meta, toc, preface, sig-box, input, auth-item) |
+| BG 3 | `#f1f3f5` | `--bg3` | Print code (tag bg, mono/code bg, inline-tag bg) |
 
 ### 1.6 Borders
 
-| Ten | Hex | CSS Variables | Content |
+| Ten | Hex | CSS Variables | Cong content |
 |---|---|---|---|
 | Line | `#dee2e6` | `--ln` | Main border (card, table, sep, form-header) |
-| Line 2 | `#e9ecef` | `--ln2` | Border filler (td border-bottom, vstep, fh-left border) |
+| Line 2 | `#e9ecef` | `--ln2` | Border assignment (td border-bottom, vstep, fh-left border) |
 
 ---
 
@@ -62,10 +62,10 @@ These colors are used directly in additional classes (in-page `<style>` or speci
 
 ### 2.1 Background tints
 
-| Hex | Dung for | Connect with border |
+| Hex | Don't give | Connect with border |
 |---|---|---|
-| `#fafcfe` | `tr:nth-child(even)` — soc nha bang | (no border) |
-| `#f0f4ff` | `tr:hover` — hover bang | (no border) |
+| `#fafcfe` | `tr:nth-child(even)` — soc nha bang | (no borders) |
+| `#f0f4ff` | `tr:hover` — hover bang | (no borders) |
 | `#eef6ff` / `#eef7ff` | `.jd-mission`, `.callout-info` | `#cfe0ff` / `#1971c2` |
 | `#f8fafc` | `.role-note`, `.auth-item`, `.jd-purpose` | `#94a3b8` / `--ln` |
 | `#fff5f5` | `.box.imp`, `.req-tag.shall`, `.callout-danger`, `.raci-A` | `#ffc9c9` / `#c92a2a` |
@@ -78,9 +78,9 @@ These colors are used directly in additional classes (in-page `<style>` or speci
 | `#e6fcf5` | `.tag.teal` | `#96f2d7` |
 | `#fff4e6` | `.tag.orange` | `#ffd8a8` |
 
-### 2.2 Add additional text
+### 2.2 Additional text color
 
-| Hex | Dung for |
+| Hex | Don't give |
 |---|---|
 | `#087f5b` | `.tag.teal` text |
 | `#d9480f` | `.tag.orange` text |
@@ -104,29 +104,29 @@ These colors are used directly in additional classes (in-page `<style>` or speci
 
 ### 2.3 Quick severity levels
 
-| Cap by | BG | Text | Border | Dung when |
+| Cap due | BG | Text | Border | Dung Khi |
 |---|---|---|---|---|
-| Level 1 (Info) | `#dbe4ff` | `#364fc7` | — | Information, desire |
+| Level 1 (Info) | `#dbe4ff` | `#364fc7` | — | Be confident, ambitious |
 | Level 2 (OK) | `#d3f9d8` | `#2b8a3e` | — | Binh Thuong, Dat |
-| Level 3 (Warning) | `#fff3bf` | `#e67700` | — | Canh bao, can chu y |
+| Level 3 (Warning) | `#fff3bf` | `#e67700` | — | Can soup, can chu y |
 | Level 4 (Critical) | `#ffe3e3` | `#c92a2a` | — | Deep in thought, fading away |
 
 ---
 
-## 3. Quick union rules
+## 3. Quick merger rules
 
-### 3.1 Quick cap + small border
+### 3.1 Cap color + small border
 
-| Purpose | Nen | Border boys | Class title |
+| Purpose | Nen | Border boy | Class title |
 |---|---|---|---|
 | Information / notes | `--blue-l` (#e3f2fd) | `--blue` (#1565c0) | `.note`, `.box.core`, `.note-blue` |
 | Canh bao / lenh | `--gold-l` (#fff8e1) | `--gold` (#f9a825) | `.callout`, `.box.sup` |
 | Danger / emergency | `#fff5f5` | `--red` (#e03131) | `.box.imp`, `.callout-danger` |
-| Noodle soup | `#fffbeb` | `#eab308` | `.note-soft` |
-| Manager | `#f3f0ff` | `#7950f2` | `.box.mgt` |
-| Role | `#f8fafc` | `#94a3b8` | `.role-note` |
+| How about soup? | `#fffbeb` | `#eab308` | `.note-soft` |
+| Judge | `#f3f0ff` | `#7950f2` | `.box.mgt` |
+| Ash role | `#f8fafc` | `#94a3b8` | `.role-note` |
 | Control control | `--bg` | `--blue` (#1565c0) | `.gate-card` |
-| Backups | `--bg2` | `#0f766e` | `.backup-card` |
+| Backup | `--bg2` | `#0f766e` | `.backup-card` |
 | Giai doan | `#fffdf5` | `--gold` | `.phase-card` |
 
 ### 3.2 Cap quickly badge
@@ -135,17 +135,17 @@ These colors are used directly in additional classes (in-page `<style>` or speci
 |---|---|---|---|
 | Bat (SHALL) | `#fff5f5` | `--red` | `#ffc9c9` |
 | Recommendation (SHOULD) | `#fff9db` | `#e67700` | `#ffe066` |
-| Choice (MAY) | `#ebfbee` | `--green` | `#b2f2bb` |
+| Option (MAY) | `#ebfbee` | `--green` | `#b2f2bb` |
 | KPI dat | `#ebfbee` | `--green` | `#b2f2bb` |
 
-### 3.3 General Rules
+### 3.3 General rules
 
 1. **Do not use more than 3 accent colors in 1 page.** Usually use blue + gold + (red if possible).
 2. **Navy for black, blue for links and accent.** Do not use navy for links, do not use blue for black.
-3. **Callout is only used for control commands or internal commands.** Do not use callout.
-4. **Green note for additional information.** Use note instead of printing the address.
-5. **Red chi dung cho canh bao, loi, hoac yeu cau bat buoc (SHALL/PHAI).** Khong dung red cho trang tri.
-6. **Green is only used for bars, buildings, or options (MAY/CO THE).** Green is not used for people.
+3. **Ring callout is only used for control commands or internal commands.** Do not use callout.
+4. **Green note for additional information.** Use note instead to print the address.
+5. **Red is only used for warnings, errors, or emergency requests (SHALL/PHAI).** Red is not used for decoration.
+6. **Green is only used for bars, places, or options (MAY/CO THE).** Green is not used for people.
 7. **Ink gradient:** --ink (main) > --ink2 (part) > --ink3 (mod) > --ink4 (rat mo). Use the caption to explain important reasons.
 8. **Background gradient:** --bg (card) > --bg2 (section bg, input) > --bg3 (tag bg, code bg). Do not tolerate bg3 for this reason.
 
@@ -157,29 +157,29 @@ When creating an Excel (.xlsx) or Word (.docx) color style, use the following co
 
 | CSS Variables | Excel Equivalent | RGB | Format in Excel |
 |---|---|---|---|
-| `--navy` (#0c2d48) | Dark Blue | 12, 45, 72 | Title, header |
+| `--navy` (#0c2d48) | Dark Blue | 12, 45, 72 | Header, header |
 | `--blue` (#1565c0) | Blue | 21, 101, 192 | Link text, accent |
-| `--blue-l` (#e3f2fd) | Light Blue fill | 227, 242, 253 | Notes, highlights |
+| `--blue-l` (#e3f2fd) | Light Blue fill | 227, 242, 253 | Take notes, highlight |
 | `--gold` (#f9a825) | Gold/Amber | 249, 168, 37 | Border accent |
-| `--gold-l` (#fff8e1) | Light Yellow fill | 255, 248, 225 | Nen soup |
-| `--th-bg` (#eef4fb) | Light Steel Blue | 238, 244, 251 | Nen header bang |
+| `--gold-l` (#fff8e1) | Light Yellow fill | 255, 248, 225 | Nen watch the bag |
+| `--th-bg` (#eef4fb) | Light Steel Blue | 238, 244, 251 | Nen header state |
 | `--red` (#e03131) | Red | 224, 49, 49 | Canh bao, loi |
 | `--green` (#2f9e44) | Green | 47, 158, 68 | Cong bar, dat |
 | `--ink` (#212529) | Near Black | 33, 37, 41 | Main text |
-| `--ink2` (#495057) | Dark Gray | 73, 80, 87 | Text details |
+| `--ink2` (#495057) | Dark Grey | 73, 80, 87 | Text details |
 | `--ink3` (#868e96) | Medium Gray | 134, 142, 150 | Text mo |
-| `--bg2` (#f8f9fa) | Light Gray fill | 248, 249, 250 | Men's wife |
+| `--bg2` (#f8f9fa) | Light Gray fill | 248, 249, 250 | Ne wife |
 | `--bg3` (#f1f3f5) | Gray fill | 241, 243, 245 | Nen tag |
 | `--ln` (#dee2e6) | Light Gray border | 222, 226, 230 | Border main |
 | `--ln2` (#e9ecef) | Lighter Gray border | 233, 236, 239 | Border wife |
-| `#fafcfe` | Very Light Blue | 250, 252, 254 | Soc nhe bang (even row) |
+| `#fafcfe` | Very Light Blue | 250, 252, 254 | Soc nha bang (even row) |
 
-### Excel Rules
+### Excel rules
 
-1. **Header state:** Nen `--th-bg` (#eef4fb), text `--navy` (#0c2d48), bold, uppercase
+1. **Header state:** Text `--th-bg` (#eef4fb), text `--navy` (#0c2d48), bold, uppercase
 2. **Even row:** Please use `#fafcfe` to create the order
-3. **Border:** Dung `--ln` (#dee2e6) for main border, `--ln2` (#e9ecef) for secondary border
-4. **Canh bao:** Enen `#fff5f5`, text `--red` (#e03131)
+3. **Border:** Use `--ln` (#dee2e6) for main border, `--ln2` (#e9ecef) for secondary border
+4. **Canh Bao:** Name `#fff5f5`, text `--red` (#e03131)
 5. **Bar:** Line `#ebfbee`, text `--green` (#2f9e44)
 6. **Note/highlight:** Name `--blue-l` (#e3f2fd)
 
@@ -189,18 +189,18 @@ When creating an Excel (.xlsx) or Word (.docx) color style, use the following co
 
 ### Contrast ratio
 
-| Cap | Ty le | Join |
+| Cap | Ty le | Connect |
 |---|---|---|
 | Dat AAA | > 7:1 | `--ink` (#212529) on `--bg` (#ffffff) = ~16:1 |
 | Data AA | > 4.5:1 | `--navy` (#0c2d48) on `--bg` = ~14:1 |
 | Data AA | > 4.5:1 | `--blue` (#1565c0) on `--bg` = ~6:1 |
 | Data AA | > 4.5:1 | `--ink2` (#495057) on `--bg` = ~8:1 |
-| Complain | ~3.5:1 | `--ink3` (#868e96) on `--bg` — used for additional text |
-| No text tolerance | ~2.5:1 | `--ink4` (#adb5bd) on `--bg` — only for border/icon |
+| Can complain | ~3.5:1 | `--ink3` (#868e96) on `--bg` — only used for additional text |
+| No tolerance for small text | ~2.5:1 | `--ink4` (#adb5bd) on `--bg` — only for border/icon |
 
 ### Note
 
-- Main text (`--ink`) always sets AAA on the page
+- The main text (`--ink`) is always set to AAA on the page
 - Link (`--blue`) to AA on the page
 - New text (`--ink3`) can only be used for notes, labels — not allowed for important content
 - `--ink4` is only used for borders, placeholders, icons — not readable text

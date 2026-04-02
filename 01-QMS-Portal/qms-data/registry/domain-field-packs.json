@@ -1,0 +1,6373 @@
+{
+  "_meta": {
+    "version": "2.0",
+    "description": "Canonical domain field packs generated from variable_library, heuristics, and world-class ERP/QMS research.",
+    "generatedAt": "2026-04-02T06:00:20.356Z",
+    "packCount": 74
+  },
+  "packs": {
+    "document_header": [
+      {
+        "key": "doc_id",
+        "label": "Mã tài liệu",
+        "labelEn": "Document ID"
+      },
+      {
+        "key": "doc_title",
+        "label": "Tên tài liệu",
+        "labelEn": "Document Title"
+      },
+      {
+        "key": "doc_title_vi",
+        "label": "Tên tài liệu (tiếng Việt)",
+        "labelEn": "Document Title (Vietnamese)"
+      },
+      {
+        "key": "doc_type",
+        "label": "Loại tài liệu",
+        "labelEn": "Document Type"
+      },
+      {
+        "key": "doc_category",
+        "label": "Danh mục tài liệu",
+        "labelEn": "Document Category"
+      },
+      {
+        "key": "rev",
+        "label": "Phiên bản",
+        "labelEn": "Revision"
+      },
+      {
+        "key": "effective_date",
+        "label": "Ngày hiệu lực",
+        "labelEn": "Effective Date"
+      },
+      {
+        "key": "department",
+        "label": "Phòng ban",
+        "labelEn": "Department"
+      },
+      {
+        "key": "department_label",
+        "label": "Tên phòng ban",
+        "labelEn": "Department Label"
+      },
+      {
+        "key": "department_label_vi",
+        "label": "Tên phòng ban (tiếng Việt)",
+        "labelEn": "Department Label (Vietnamese)"
+      },
+      {
+        "key": "author",
+        "label": "Người soạn thảo",
+        "labelEn": "Author / Prepared By"
+      },
+      {
+        "key": "reviewer",
+        "label": "Người xem xét",
+        "labelEn": "Reviewed By"
+      },
+      {
+        "key": "approver",
+        "label": "Người phê duyệt",
+        "labelEn": "Approved By"
+      },
+      {
+        "key": "status",
+        "label": "Trạng thái",
+        "labelEn": "Document Status"
+      },
+      {
+        "key": "control_status",
+        "label": "Trạng thái kiểm soát",
+        "labelEn": "Control Status"
+      },
+      {
+        "key": "iso_clause",
+        "label": "Điều khoản ISO tham chiếu",
+        "labelEn": "ISO Clause Reference"
+      },
+      {
+        "key": "as9100_clause",
+        "label": "Điều khoản AS9100",
+        "labelEn": "AS9100 Clause Reference"
+      },
+      {
+        "key": "owner_role",
+        "label": "Vai trò chủ sở hữu tài liệu",
+        "labelEn": "Document Owner Role"
+      },
+      {
+        "key": "change_history_rev",
+        "label": "Lịch sử thay đổi - Phiên bản",
+        "labelEn": "Change History - Revision"
+      },
+      {
+        "key": "change_history_date",
+        "label": "Lịch sử thay đổi - Ngày",
+        "labelEn": "Change History - Date"
+      },
+      {
+        "key": "change_history_description",
+        "label": "Lịch sử thay đổi - Mô tả",
+        "labelEn": "Change History - Description"
+      }
+    ],
+    "record_identification": [
+      {
+        "key": "record_id",
+        "label": "Mã hồ sơ",
+        "labelEn": "Record ID"
+      },
+      {
+        "key": "record_type",
+        "label": "Loại hồ sơ",
+        "labelEn": "Record Type"
+      },
+      {
+        "key": "sequence_number",
+        "label": "Số thứ tự",
+        "labelEn": "Sequence Number"
+      },
+      {
+        "key": "fiscal_year",
+        "label": "Năm tài chính",
+        "labelEn": "Fiscal Year"
+      },
+      {
+        "key": "counter_digits",
+        "label": "Số chữ số đếm",
+        "labelEn": "Counter Digits"
+      },
+      {
+        "key": "form_code",
+        "label": "Mã biểu mẫu",
+        "labelEn": "Form Code"
+      },
+      {
+        "key": "sharepoint_path",
+        "label": "Đường dẫn SharePoint",
+        "labelEn": "SharePoint Path"
+      },
+      {
+        "key": "source_record",
+        "label": "Hồ so nguồn",
+        "labelEn": "Source Record"
+      },
+      {
+        "key": "capa_link",
+        "label": "Liên kết CAPA",
+        "labelEn": "CAPA Link"
+      }
+    ],
+    "job_context": [
+      {
+        "key": "job_number",
+        "label": "So đơn hàng sản xuất",
+        "labelEn": "Job Number"
+      },
+      {
+        "key": "part_number",
+        "label": "Mã chi tiết",
+        "labelEn": "Part Number"
+      },
+      {
+        "key": "part_rev",
+        "label": "Phiên bản chi tiết",
+        "labelEn": "Part Revision"
+      },
+      {
+        "key": "part_name",
+        "label": "Tên chi tiết",
+        "labelEn": "Part Name / Description"
+      },
+      {
+        "key": "customer",
+        "label": "Khách hàng",
+        "labelEn": "Customer"
+      },
+      {
+        "key": "customer_id",
+        "label": "Mã khách hàng",
+        "labelEn": "Customer ID"
+      },
+      {
+        "key": "operation_number",
+        "label": "Số nguyên công",
+        "labelEn": "Operation Number"
+      },
+      {
+        "key": "work_order",
+        "label": "Lệnh sản xuất",
+        "labelEn": "Work Order"
+      },
+      {
+        "key": "sales_order",
+        "label": "Đơn hàng bản",
+        "labelEn": "Sales Order"
+      },
+      {
+        "key": "lot_number",
+        "label": "Số lô",
+        "labelEn": "Lot Number"
+      },
+      {
+        "key": "quantity_ordered",
+        "label": "Số lượng đặt hàng",
+        "labelEn": "Quantity Ordered"
+      },
+      {
+        "key": "quantity_shipped",
+        "label": "So lượng giao hàng",
+        "labelEn": "Quantity Shipped"
+      },
+      {
+        "key": "material_spec",
+        "label": "Quy cách vật liệu",
+        "labelEn": "Material Specification"
+      },
+      {
+        "key": "heat_lot",
+        "label": "So lô nhiệt luyện / vật liệu",
+        "labelEn": "Heat / Lot Number (Material)"
+      },
+      {
+        "key": "drawing_number",
+        "label": "So bản về",
+        "labelEn": "Drawing Number"
+      },
+      {
+        "key": "machine_family",
+        "label": "Đồng máy",
+        "labelEn": "Machine Family"
+      },
+      {
+        "key": "due_date",
+        "label": "Ngày giao hàng",
+        "labelEn": "Due Date"
+      }
+    ],
+    "personnel": [
+      {
+        "key": "employee_id",
+        "label": "Mã nhân viên",
+        "labelEn": "Employee ID"
+      },
+      {
+        "key": "employee_name",
+        "label": "Hồ tên nhận viên",
+        "labelEn": "Employee Name"
+      },
+      {
+        "key": "user_id_code",
+        "label": "Mã người dụng",
+        "labelEn": "UserID Code"
+      },
+      {
+        "key": "role",
+        "label": "Vai trợ",
+        "labelEn": "Role"
+      },
+      {
+        "key": "role_label",
+        "label": "Tên vai trợ",
+        "labelEn": "Role Label"
+      },
+      {
+        "key": "department_assignment",
+        "label": "Phòng bản phần công",
+        "labelEn": "Department Assignment"
+      },
+      {
+        "key": "shift",
+        "label": "Ca làm việc",
+        "labelEn": "Shift"
+      },
+      {
+        "key": "supervisor",
+        "label": "Người giám sát",
+        "labelEn": "Supervisor"
+      },
+      {
+        "key": "auditor",
+        "label": "Kiểm toán viên",
+        "labelEn": "Auditor"
+      },
+      {
+        "key": "lead_auditor",
+        "label": "Trưởng đoàn kiểm toán",
+        "labelEn": "Lead Auditor"
+      },
+      {
+        "key": "inspector",
+        "label": "Kiểm tra viên",
+        "labelEn": "Inspector"
+      },
+      {
+        "key": "operator",
+        "label": "Người vận hành máy",
+        "labelEn": "CNC Operator"
+      },
+      {
+        "key": "setup_person",
+        "label": "Kỹ thuật viên setup",
+        "labelEn": "Setup Technician"
+      },
+      {
+        "key": "action_owner",
+        "label": "Người chịu trách nhiễm",
+        "labelEn": "Action Owner"
+      },
+      {
+        "key": "trainer",
+        "label": "Người đào tạo",
+        "labelEn": "Trainer"
+      },
+      {
+        "key": "trainee",
+        "label": "Học viên",
+        "labelEn": "Trainee"
+      },
+      {
+        "key": "attendees",
+        "label": "Người tham dự",
+        "labelEn": "Attendees"
+      }
+    ],
+    "equipment": [
+      {
+        "key": "machine_id",
+        "label": "Mã máy",
+        "labelEn": "Machine ID"
+      },
+      {
+        "key": "machine_name",
+        "label": "Tên máy",
+        "labelEn": "Machine Name"
+      },
+      {
+        "key": "machine_type",
+        "label": "Loại máy",
+        "labelEn": "Machine Type"
+      },
+      {
+        "key": "resource_group",
+        "label": "Nhóm tài nguyên",
+        "labelEn": "Resource Group"
+      },
+      {
+        "key": "tool_id",
+        "label": "Mã dụng cũ cắt",
+        "labelEn": "Tool ID"
+      },
+      {
+        "key": "tool_description",
+        "label": "Mô tả dụng cũ",
+        "labelEn": "Tool Description"
+      },
+      {
+        "key": "tool_life_remaining",
+        "label": "Tuổi thọ dụng cũ còn lại (%)",
+        "labelEn": "Tool Life Remaining (%)"
+      },
+      {
+        "key": "fixture_id",
+        "label": "Mã đo gá",
+        "labelEn": "Fixture ID"
+      },
+      {
+        "key": "gage_id",
+        "label": "Mã dụng cụ đo",
+        "labelEn": "Gage ID"
+      },
+      {
+        "key": "gage_type",
+        "label": "Loại dụng cũ đo",
+        "labelEn": "Gage Type"
+      },
+      {
+        "key": "calibration_due",
+        "label": "Ngày hiệu chuẩn tiếp theo",
+        "labelEn": "Calibration Due Date"
+      },
+      {
+        "key": "asset_type",
+        "label": "Loại tài sản",
+        "labelEn": "Asset Type"
+      },
+      {
+        "key": "asset_id",
+        "label": "Mã tài sản",
+        "labelEn": "Asset ID"
+      }
+    ],
+    "quality_inspection": [
+      {
+        "key": "characteristic",
+        "label": "Đặc tính",
+        "labelEn": "Characteristic"
+      },
+      {
+        "key": "characteristic_designator",
+        "label": "Kỹ hiệu đặc tính",
+        "labelEn": "Characteristic Designator"
+      },
+      {
+        "key": "nominal",
+        "label": "Giá trị danh nghĩa",
+        "labelEn": "Nominal Value"
+      },
+      {
+        "key": "usl",
+        "label": "Giới hạn trên",
+        "labelEn": "Upper Specification Limit"
+      },
+      {
+        "key": "lsl",
+        "label": "Giới hạn dưới",
+        "labelEn": "Lower Specification Limit"
+      },
+      {
+        "key": "tolerance",
+        "label": "Dụng sai",
+        "labelEn": "Tolerance"
+      },
+      {
+        "key": "actual_value",
+        "label": "Giá trị đo thực tế",
+        "labelEn": "Actual Measured Value"
+      },
+      {
+        "key": "measurement_unit",
+        "label": "Đơn vị đo",
+        "labelEn": "Measurement Unit"
+      },
+      {
+        "key": "pass_fail",
+        "label": "Đạt / Không đạt",
+        "labelEn": "Pass / Fail"
+      },
+      {
+        "key": "sample_size",
+        "label": "Có mẫu",
+        "labelEn": "Sample Size"
+      },
+      {
+        "key": "aql_level",
+        "label": "Mức AQL",
+        "labelEn": "AQL Level"
+      },
+      {
+        "key": "accept_number",
+        "label": "Số chấp nhận",
+        "labelEn": "Accept Number (Ac)"
+      },
+      {
+        "key": "reject_number",
+        "label": "Số từ chối",
+        "labelEn": "Reject Number (Re)"
+      },
+      {
+        "key": "defects_found",
+        "label": "So lỗi phát hiện",
+        "labelEn": "Defects Found"
+      },
+      {
+        "key": "lot_disposition",
+        "label": "Xử lý lô hàng",
+        "labelEn": "Lot Disposition"
+      },
+      {
+        "key": "cpk",
+        "label": "Chỉ số năng lực quá trình Cpk",
+        "labelEn": "Process Capability Index (Cpk)"
+      },
+      {
+        "key": "cp",
+        "label": "Chỉ số năng lực Cp",
+        "labelEn": "Process Capability (Cp)"
+      },
+      {
+        "key": "ppk",
+        "label": "Chỉ số hiệu suất quá trình Ppk",
+        "labelEn": "Process Performance Index (Ppk)"
+      },
+      {
+        "key": "x_bar",
+        "label": "Trung bình mẫu",
+        "labelEn": "Sample Mean (X-bar)"
+      },
+      {
+        "key": "range_r",
+        "label": "Biến đo màu",
+        "labelEn": "Sample Range (R)"
+      },
+      {
+        "key": "sigma",
+        "label": "Độ lệch chuẩn",
+        "labelEn": "Standard Deviation"
+      },
+      {
+        "key": "measurement_method",
+        "label": "Phương pháp đo",
+        "labelEn": "Measurement Method"
+      }
+    ],
+    "ncr_capa": [
+      {
+        "key": "ncr_number",
+        "label": "Số NCR",
+        "labelEn": "NCR Number"
+      },
+      {
+        "key": "defect_type",
+        "label": "Loại lỗi",
+        "labelEn": "Defect Type"
+      },
+      {
+        "key": "defect_description",
+        "label": "Mô tả lỗi",
+        "labelEn": "Defect Description"
+      },
+      {
+        "key": "disposition",
+        "label": "Xử lý",
+        "labelEn": "Disposition"
+      },
+      {
+        "key": "root_cause",
+        "label": "Nguyên nhân gốc",
+        "labelEn": "Root Cause"
+      },
+      {
+        "key": "root_cause_method",
+        "label": "Phương pháp phần tích nguyên nhận gốc",
+        "labelEn": "Root Cause Method"
+      },
+      {
+        "key": "containment_action",
+        "label": "Hành đồng kiểm soát tâm thời",
+        "labelEn": "Containment Action"
+      },
+      {
+        "key": "corrective_action",
+        "label": "Hành động khắc phục",
+        "labelEn": "Corrective Action"
+      },
+      {
+        "key": "preventive_action",
+        "label": "Hành động phòng ngừa",
+        "labelEn": "Preventive Action"
+      },
+      {
+        "key": "verification_result",
+        "label": "Kết quả xác nhận",
+        "labelEn": "Verification Result"
+      },
+      {
+        "key": "target_date",
+        "label": "Ngày mục tiêu",
+        "labelEn": "Target Date"
+      },
+      {
+        "key": "completion_date_capa",
+        "label": "Ngày hoàn thành thực tế",
+        "labelEn": "Actual Completion Date"
+      },
+      {
+        "key": "severity",
+        "label": "Mức độ nghiêm trọng",
+        "labelEn": "Severity (S)"
+      },
+      {
+        "key": "occurrence",
+        "label": "Tần suất xảy ra",
+        "labelEn": "Occurrence (O)"
+      },
+      {
+        "key": "detection",
+        "label": "Khả năng phát hiện",
+        "labelEn": "Detection (D)"
+      },
+      {
+        "key": "rpn",
+        "label": "Chỉ số ưu tiên rủi ro",
+        "labelEn": "Risk Priority Number (RPN)"
+      },
+      {
+        "key": "ncr_status",
+        "label": "Trạng thái NCR",
+        "labelEn": "NCR Status"
+      },
+      {
+        "key": "capa_status",
+        "label": "Trạng thái CAPA",
+        "labelEn": "CAPA Status"
+      },
+      {
+        "key": "nonconformance_source",
+        "label": "Nguồn không phụ hợp",
+        "labelEn": "Nonconformance Source"
+      }
+    ],
+    "fai": [
+      {
+        "key": "fai_number",
+        "label": "Số FAI",
+        "labelEn": "FAI Number"
+      },
+      {
+        "key": "fai_type",
+        "label": "Loại FAI",
+        "labelEn": "FAI Type"
+      },
+      {
+        "key": "fai_reason",
+        "label": "Lý đo FAI",
+        "labelEn": "FAI Reason"
+      },
+      {
+        "key": "balloon_number",
+        "label": "Số balloon",
+        "labelEn": "Balloon Number"
+      },
+      {
+        "key": "design_requirement",
+        "label": "Yêu cầu thiết kế",
+        "labelEn": "Design Requirement"
+      },
+      {
+        "key": "actual_result",
+        "label": "Kết quả thực tệ",
+        "labelEn": "Actual Result"
+      },
+      {
+        "key": "conformance",
+        "label": "Sự phụ hợp",
+        "labelEn": "Conformance (C/NC)"
+      },
+      {
+        "key": "fai_form_number",
+        "label": "So biểu mẫu FAI AS9102",
+        "labelEn": "FAI Form Number (AS9102)"
+      },
+      {
+        "key": "fai_overall_result",
+        "label": "Kết quả FAI tổng thể",
+        "labelEn": "FAI Overall Result"
+      },
+      {
+        "key": "measurement_data",
+        "label": "Tham chiều dự liệu đo",
+        "labelEn": "Measurement Data Reference"
+      }
+    ],
+    "supplier": [
+      {
+        "key": "supplier_id",
+        "label": "Mã nhà cung cấp",
+        "labelEn": "Supplier ID"
+      },
+      {
+        "key": "supplier_name",
+        "label": "Tên nhà cung cấp",
+        "labelEn": "Supplier Name"
+      },
+      {
+        "key": "supplier_rating",
+        "label": "Xếp hàng nhà cung cấp",
+        "labelEn": "Supplier Rating"
+      },
+      {
+        "key": "scar_number",
+        "label": "Số SCAR",
+        "labelEn": "SCAR Number"
+      },
+      {
+        "key": "po_number",
+        "label": "So đơn đạt hàng",
+        "labelEn": "Purchase Order Number"
+      },
+      {
+        "key": "supplier_process_type",
+        "label": "Loại quả trình nhà cung cấp",
+        "labelEn": "Supplier Process Type"
+      },
+      {
+        "key": "exception_type",
+        "label": "Loại ngoài lệ",
+        "labelEn": "Exception Type"
+      },
+      {
+        "key": "justification",
+        "label": "Lý đo chính đang",
+        "labelEn": "Justification"
+      }
+    ],
+    "training": [
+      {
+        "key": "training_id",
+        "label": "Mã sự kiện đào tạo",
+        "labelEn": "Training Event ID"
+      },
+      {
+        "key": "training_topic",
+        "label": "Chủ đề đào tạo",
+        "labelEn": "Training Topic"
+      },
+      {
+        "key": "training_type",
+        "label": "Loại đào tạo",
+        "labelEn": "Training Type"
+      },
+      {
+        "key": "competence_level",
+        "label": "Cấp độ năng lực",
+        "labelEn": "Competence Level"
+      },
+      {
+        "key": "assessment_result",
+        "label": "Kết quả đánh giá",
+        "labelEn": "Assessment Result"
+      },
+      {
+        "key": "assessment_score",
+        "label": "Điểm đánh giá",
+        "labelEn": "Assessment Score"
+      },
+      {
+        "key": "completion_date",
+        "label": "Ngày hoàn thành",
+        "labelEn": "Completion Date"
+      },
+      {
+        "key": "certification_expiry",
+        "label": "Ngày hết hạn chứng chỉ",
+        "labelEn": "Certification Expiry Date"
+      },
+      {
+        "key": "certification_body",
+        "label": "Tổ chức cấp chung chi",
+        "labelEn": "Certification Body"
+      },
+      {
+        "key": "training_hours",
+        "label": "So giờ đào tạo",
+        "labelEn": "Training Hours"
+      }
+    ],
+    "audit": [
+      {
+        "key": "audit_id",
+        "label": "Mã kiểm toán",
+        "labelEn": "Audit ID"
+      },
+      {
+        "key": "audit_type",
+        "label": "Loại kiểm toán",
+        "labelEn": "Audit Type"
+      },
+      {
+        "key": "audit_scope",
+        "label": "Phạm vi kiểm toán",
+        "labelEn": "Audit Scope"
+      },
+      {
+        "key": "audit_date",
+        "label": "Ngày kiểm toán",
+        "labelEn": "Audit Date"
+      },
+      {
+        "key": "finding_type",
+        "label": "Loại phát hiện",
+        "labelEn": "Finding Type"
+      },
+      {
+        "key": "finding_grade",
+        "label": "Cấp độ phát hiện",
+        "labelEn": "Finding Grade"
+      },
+      {
+        "key": "clause_reference",
+        "label": "Điều khoản tham chiếu",
+        "labelEn": "Clause Reference"
+      },
+      {
+        "key": "finding_description",
+        "label": "Mô tả phát hiện",
+        "labelEn": "Finding Description"
+      },
+      {
+        "key": "audit_score",
+        "label": "Điểm kiểm toán",
+        "labelEn": "Audit Score"
+      },
+      {
+        "key": "audit_conclusion",
+        "label": "Kết luận kiểm toán",
+        "labelEn": "Audit Conclusion"
+      },
+      {
+        "key": "next_audit_date",
+        "label": "Ngày kiểm toán tiếp theo",
+        "labelEn": "Next Audit Date"
+      }
+    ],
+    "calibration": [
+      {
+        "key": "calibration_id",
+        "label": "Mã hồ so hiệu chuẩn",
+        "labelEn": "Calibration Record ID"
+      },
+      {
+        "key": "calibration_date",
+        "label": "Ngày hiệu chuẩn",
+        "labelEn": "Calibration Date"
+      },
+      {
+        "key": "next_due",
+        "label": "Ngày hiệu chuẩn tiếp theo",
+        "labelEn": "Next Calibration Due"
+      },
+      {
+        "key": "calibration_interval",
+        "label": "Chu kỳ hiệu chuẩn",
+        "labelEn": "Calibration Interval"
+      },
+      {
+        "key": "calibration_result",
+        "label": "Kết quả hiệu chuẩn",
+        "labelEn": "Calibration Result"
+      },
+      {
+        "key": "uncertainty",
+        "label": "Độ không đảm bảo đo",
+        "labelEn": "Measurement Uncertainty"
+      },
+      {
+        "key": "standard_used",
+        "label": "Chuẩn tham chiếu sử dụng",
+        "labelEn": "Standard / Reference Used"
+      },
+      {
+        "key": "cal_standard",
+        "label": "Tiêu chuẩn hiệu chuẩn",
+        "labelEn": "Calibration Standard"
+      },
+      {
+        "key": "equipment_id",
+        "label": "Mã thiết bị (hieu chuan)",
+        "labelEn": "Equipment ID (Calibration)"
+      },
+      {
+        "key": "equipment_type",
+        "label": "Loại thiết bị (hieu chuan)",
+        "labelEn": "Equipment Type (Calibration)"
+      },
+      {
+        "key": "calibration_location",
+        "label": "Địa điểm hiệu chuẩn",
+        "labelEn": "Calibration Location"
+      },
+      {
+        "key": "grr_result",
+        "label": "Kết quả GR&R (%)",
+        "labelEn": "GR&R Result (%)"
+      },
+      {
+        "key": "grr_status",
+        "label": "Trạng thái GR&R",
+        "labelEn": "GR&R Status"
+      }
+    ],
+    "risk": [
+      {
+        "key": "risk_id",
+        "label": "Mã rủi ro",
+        "labelEn": "Risk ID"
+      },
+      {
+        "key": "risk_category",
+        "label": "Danh mục rủi ro",
+        "labelEn": "Risk Category"
+      },
+      {
+        "key": "risk_description",
+        "label": "Mô tả rủi rõ",
+        "labelEn": "Risk Description"
+      },
+      {
+        "key": "likelihood",
+        "label": "Khả năng xảy ra",
+        "labelEn": "Likelihood"
+      },
+      {
+        "key": "impact",
+        "label": "Mức đo ảnh hướng",
+        "labelEn": "Impact / Severity"
+      },
+      {
+        "key": "risk_level",
+        "label": "Mức đo rủi rõ",
+        "labelEn": "Risk Level"
+      },
+      {
+        "key": "mitigation_action",
+        "label": "Hành động giảm thiểu",
+        "labelEn": "Mitigation Action"
+      },
+      {
+        "key": "residual_risk",
+        "label": "Mức rủi rõ còn lại",
+        "labelEn": "Residual Risk Level"
+      },
+      {
+        "key": "risk_owner",
+        "label": "Người quản lý rủi rõ",
+        "labelEn": "Risk Owner"
+      },
+      {
+        "key": "review_period",
+        "label": "Kỹ xem xét",
+        "labelEn": "Review Period"
+      }
+    ],
+    "engineering": [
+      {
+        "key": "ecr_number",
+        "label": "Số ECR",
+        "labelEn": "ECR Number"
+      },
+      {
+        "key": "change_type",
+        "label": "Loại thay đổi",
+        "labelEn": "Change Type"
+      },
+      {
+        "key": "change_reason",
+        "label": "Lý do thay đổi",
+        "labelEn": "Change Reason"
+      },
+      {
+        "key": "revision_from",
+        "label": "Phiên bản cũ",
+        "labelEn": "Revision From"
+      },
+      {
+        "key": "revision_to",
+        "label": "Phiên bản mới",
+        "labelEn": "Revision To"
+      },
+      {
+        "key": "change_description",
+        "label": "Mô tả thay đổi",
+        "labelEn": "Change Description"
+      },
+      {
+        "key": "impact_assessment",
+        "label": "Đánh giá tác động",
+        "labelEn": "Impact Assessment"
+      },
+      {
+        "key": "affected_documents",
+        "label": "Tài liệu bị ảnh hướng",
+        "labelEn": "Affected Documents"
+      },
+      {
+        "key": "cam_program_id",
+        "label": "Mã chương trình CẤM",
+        "labelEn": "CAM Program ID"
+      },
+      {
+        "key": "baseline_version",
+        "label": "Phiên bản có so",
+        "labelEn": "Baseline Version"
+      },
+      {
+        "key": "ecr_status",
+        "label": "Trạng thái ECR",
+        "labelEn": "ECR Status"
+      }
+    ],
+    "production": [
+      {
+        "key": "shift_date",
+        "label": "Ngày ca",
+        "labelEn": "Shift Date"
+      },
+      {
+        "key": "shift_code",
+        "label": "Mã ca",
+        "labelEn": "Shift Code"
+      },
+      {
+        "key": "machine_utilization",
+        "label": "Hiệu suất sự dụng máy (%)",
+        "labelEn": "Machine Utilization (%)"
+      },
+      {
+        "key": "oee",
+        "label": "Hiệu suất thiết bị toán bỏ",
+        "labelEn": "Overall Equipment Effectiveness (OEE)"
+      },
+      {
+        "key": "cycle_time",
+        "label": "Thời gián chủ kỹ (phut)",
+        "labelEn": "Cycle Time (minutes)"
+      },
+      {
+        "key": "setup_time",
+        "label": "Thời gián setup (phut)",
+        "labelEn": "Setup Time (minutes)"
+      },
+      {
+        "key": "downtime_minutes",
+        "label": "Thời gián dụng máy (phut)",
+        "labelEn": "Downtime (minutes)"
+      },
+      {
+        "key": "downtime_start",
+        "label": "Bắt đầu dừng máy",
+        "labelEn": "Downtime Start"
+      },
+      {
+        "key": "downtime_end",
+        "label": "Kết thực dụng máy",
+        "labelEn": "Downtime End"
+      },
+      {
+        "key": "reason_code",
+        "label": "Mã lý đo dụng máy",
+        "labelEn": "Downtime Reason Code"
+      },
+      {
+        "key": "resolution",
+        "label": "Giai pháp dụng máy",
+        "labelEn": "Downtime Resolution"
+      },
+      {
+        "key": "job_affected",
+        "label": "Đơn hàng bị ảnh hướng",
+        "labelEn": "Job Affected"
+      },
+      {
+        "key": "scrap_count",
+        "label": "Số lượng phế phẩm",
+        "labelEn": "Scrap Count"
+      },
+      {
+        "key": "good_count",
+        "label": "Số lượng đạt",
+        "labelEn": "Good Count"
+      },
+      {
+        "key": "rework_count",
+        "label": "So lượng làm lại",
+        "labelEn": "Rework Count"
+      },
+      {
+        "key": "first_pass_yield",
+        "label": "Tỷ lệ đạt lần đầu (%)",
+        "labelEn": "First Pass Yield (%)"
+      }
+    ],
+    "management_review": [
+      {
+        "key": "mr_id",
+        "label": "Mã xem xét lãnh đào",
+        "labelEn": "Management Review ID"
+      },
+      {
+        "key": "agenda_items",
+        "label": "Các mục nghị sự",
+        "labelEn": "Agenda Items"
+      },
+      {
+        "key": "action_items",
+        "label": "Mức hành đồng",
+        "labelEn": "Action Items"
+      },
+      {
+        "key": "next_review_date",
+        "label": "Ngày xem xét tiếp theo",
+        "labelEn": "Next Review Date"
+      }
+    ],
+    "improvement": [
+      {
+        "key": "improvement_id",
+        "label": "Mã dự an cải tiến",
+        "labelEn": "Improvement Project ID"
+      },
+      {
+        "key": "project_title",
+        "label": "Tên dự án",
+        "labelEn": "Project Title"
+      },
+      {
+        "key": "sponsor",
+        "label": "Người bảo trợ dự an",
+        "labelEn": "Project Sponsor"
+      },
+      {
+        "key": "target_kpi",
+        "label": "KPI mức tiêu",
+        "labelEn": "Target KPI"
+      },
+      {
+        "key": "baseline_value",
+        "label": "Giá trị có so",
+        "labelEn": "Baseline Value"
+      },
+      {
+        "key": "target_value",
+        "label": "Giá trị mức tiêu",
+        "labelEn": "Target Value"
+      },
+      {
+        "key": "improvement_status",
+        "label": "Trạng thái dự an cải tiến",
+        "labelEn": "Improvement Status"
+      }
+    ],
+    "naming_pattern": [
+      {
+        "key": "np_form_code",
+        "label": "Mã biểu mẫu (P1)",
+        "labelEn": "Form Code (P1)"
+      },
+      {
+        "key": "np_form_version",
+        "label": "Phiên bản biểu mẫu (P1)",
+        "labelEn": "Form Version (P1)"
+      },
+      {
+        "key": "np_scope",
+        "label": "Mã phạm vị",
+        "labelEn": "Scope Code"
+      },
+      {
+        "key": "np_date",
+        "label": "Ngày (YYYYMMDD)",
+        "labelEn": "Date Stamp (YYYYMMDD)"
+      },
+      {
+        "key": "np_time_user",
+        "label": "Thời gian-MaNguoiDung",
+        "labelEn": "Time-UserID Stamp (HHMM-UserID)"
+      },
+      {
+        "key": "np_record_type_code",
+        "label": "Mã loại hồ so (P2/P4)",
+        "labelEn": "Record Type Code (P2/P4)"
+      },
+      {
+        "key": "np_job_num",
+        "label": "So đơn hàng (P2)",
+        "labelEn": "Job Number (P2)"
+      },
+      {
+        "key": "np_part_rev",
+        "label": "Chi tiết-Phiên bản (P2/P3)",
+        "labelEn": "Part-Rev (P2/P3)"
+      },
+      {
+        "key": "np_part_rev_op",
+        "label": "Chi tiết-Phiên bản-Nguyên công (P2/P3)",
+        "labelEn": "Part-Rev-Operation (P2/P3)"
+      },
+      {
+        "key": "np_file_type",
+        "label": "Mã loại file (P3)",
+        "labelEn": "File Type Code (P3)"
+      },
+      {
+        "key": "np_machine_family",
+        "label": "Đồng máy (P3)",
+        "labelEn": "Machine Family (P3)"
+      },
+      {
+        "key": "np_baseline_ver",
+        "label": "Phiên bản có so (P3)",
+        "labelEn": "Baseline Version (P3)"
+      },
+      {
+        "key": "np_form_title",
+        "label": "Tên biểu mẫu (P5)",
+        "labelEn": "Form Title (P5)"
+      },
+      {
+        "key": "np_asset_type",
+        "label": "Loại tài sản (P6)",
+        "labelEn": "Asset Type (P6)"
+      },
+      {
+        "key": "np_asset_id",
+        "label": "Mã tài sản (P6)",
+        "labelEn": "Asset ID (P6)"
+      },
+      {
+        "key": "np_doc_type_p6",
+        "label": "Loại tài liệu (P6)",
+        "labelEn": "Document Type (P6)"
+      },
+      {
+        "key": "np_extension",
+        "label": "Phần mô rộng file",
+        "labelEn": "File Extension"
+      }
+    ],
+    "portal_system": [
+      {
+        "key": "session_user",
+        "label": "Tên đang nhập phiên",
+        "labelEn": "Session Username"
+      },
+      {
+        "key": "session_mfa_ok",
+        "label": "MFA đã xác nhận",
+        "labelEn": "MFA Verified"
+      },
+      {
+        "key": "session_last_active",
+        "label": "Thời điểm hoạt đồng cuối",
+        "labelEn": "Last Active Timestamp"
+      },
+      {
+        "key": "csrf_token",
+        "label": "Mã CSRF",
+        "labelEn": "CSRF Token"
+      },
+      {
+        "key": "current_user_username",
+        "label": "Người dụng hiện tài - Tên đang nhập",
+        "labelEn": "Current User - Username"
+      },
+      {
+        "key": "current_user_name",
+        "label": "Người dụng hiện tài - Tên hiện thi",
+        "labelEn": "Current User - Display Name"
+      },
+      {
+        "key": "current_user_role",
+        "label": "Người dụng hiện tài - Vai trợ",
+        "labelEn": "Current User - Role"
+      },
+      {
+        "key": "current_user_dept",
+        "label": "Người dụng hiện tài - Phòng bản",
+        "labelEn": "Current User - Department"
+      },
+      {
+        "key": "is_admin",
+        "label": "Là quản trị viên",
+        "labelEn": "Is Admin"
+      },
+      {
+        "key": "can_create_docs",
+        "label": "Quyền tạo tài liệu",
+        "labelEn": "Can Create Documents"
+      },
+      {
+        "key": "portal_language",
+        "label": "Ngôn ngữ portal",
+        "labelEn": "Portal Language"
+      },
+      {
+        "key": "browser_language",
+        "label": "Ngôn ngữ trình duyệt",
+        "labelEn": "Browser Language"
+      },
+      {
+        "key": "browser_timezone",
+        "label": "Mùi giờ trình duyệt",
+        "labelEn": "Browser Timezone"
+      },
+      {
+        "key": "portal_version",
+        "label": "Phiên bản portal",
+        "labelEn": "Portal Version"
+      },
+      {
+        "key": "session_preauth_user",
+        "label": "Tên đang nhập trước xác thực",
+        "labelEn": "Pre-Auth Username"
+      },
+      {
+        "key": "session_preauth_started",
+        "label": "Bắt đầu xác thực trước",
+        "labelEn": "Pre-Auth Started"
+      },
+      {
+        "key": "idle_timeout_seconds",
+        "label": "Thời gián cho phép không hoạt đồng (giay)",
+        "labelEn": "Idle Timeout (seconds)"
+      }
+    ],
+    "form_delivery": [
+      {
+        "key": "delivery_mode",
+        "label": "Chế độ phân phối",
+        "labelEn": "Delivery Mode"
+      },
+      {
+        "key": "portal_behavior",
+        "label": "Hành vị portal",
+        "labelEn": "Portal Behavior"
+      },
+      {
+        "key": "desktop_excel_required",
+        "label": "Cần Excel trên máy",
+        "labelEn": "Desktop Excel Required"
+      },
+      {
+        "key": "browser_open_enabled",
+        "label": "Cho phép mở trên trình duyệt",
+        "labelEn": "Browser Open Enabled"
+      },
+      {
+        "key": "form_pack",
+        "label": "Gọi biểu mẫu",
+        "labelEn": "Form Pack"
+      },
+      {
+        "key": "sha256",
+        "label": "Mã kiểm tra SHA-256",
+        "labelEn": "SHA-256 Checksum"
+      },
+      {
+        "key": "release_workflow_id",
+        "label": "Mã quy trình phát hành",
+        "labelEn": "Release Workflow ID"
+      },
+      {
+        "key": "decision_score",
+        "label": "Điểm quyết định trực tuyến",
+        "labelEn": "Online Decision Score"
+      }
+    ],
+    "workflow_state": [
+      {
+        "key": "workflow_status",
+        "label": "Trạng thái quy trình",
+        "labelEn": "Workflow Status"
+      },
+      {
+        "key": "submitted_by",
+        "label": "Người gửi",
+        "labelEn": "Submitted By"
+      },
+      {
+        "key": "submitted_date",
+        "label": "Ngày gửi",
+        "labelEn": "Submitted Date"
+      },
+      {
+        "key": "approved_by",
+        "label": "Người phê duyệt (quy trinh)",
+        "labelEn": "Approved By (Workflow)"
+      },
+      {
+        "key": "approved_date",
+        "label": "Ngày phê duyệt",
+        "labelEn": "Approved Date"
+      },
+      {
+        "key": "last_edit_by",
+        "label": "Sửa lần cuối bồi",
+        "labelEn": "Last Edited By"
+      },
+      {
+        "key": "last_edit_role",
+        "label": "Vai trợ sửa lần cuối",
+        "labelEn": "Last Edit Role"
+      },
+      {
+        "key": "last_edit_date",
+        "label": "Ngày sửa lần cuối",
+        "labelEn": "Last Edit Date"
+      },
+      {
+        "key": "last_edit_note",
+        "label": "Ghi chủ sửa lần cuối",
+        "labelEn": "Last Edit Note"
+      },
+      {
+        "key": "version_history_entry",
+        "label": "Mức lịch sự phiên bản",
+        "labelEn": "Version History Entry"
+      }
+    ],
+    "timestamp": [
+      {
+        "key": "created_at",
+        "label": "Ngày tạo",
+        "labelEn": "Created At"
+      },
+      {
+        "key": "updated_at",
+        "label": "Ngày cập nhật",
+        "labelEn": "Updated At"
+      },
+      {
+        "key": "closed_at",
+        "label": "Ngày đóng",
+        "labelEn": "Closed At"
+      },
+      {
+        "key": "date_compact",
+        "label": "Ngày rút gọn",
+        "labelEn": "Compact Date (YYYYMMDD)"
+      },
+      {
+        "key": "time_compact",
+        "label": "Giờ rút gọn",
+        "labelEn": "Compact Time (HHMM)"
+      },
+      {
+        "key": "timezone",
+        "label": "Mùi giờ",
+        "labelEn": "Timezone"
+      }
+    ],
+    "shipment": [
+      {
+        "key": "shipment_date",
+        "label": "Ngày xuất hàng",
+        "labelEn": "Shipment Date"
+      },
+      {
+        "key": "tracking_number",
+        "label": "So theo đổi vận chuyển",
+        "labelEn": "Tracking Number"
+      },
+      {
+        "key": "carrier",
+        "label": "Đơn vị vận chuyển",
+        "labelEn": "Carrier"
+      },
+      {
+        "key": "packing_list_number",
+        "label": "So phiếu đồng gọi",
+        "labelEn": "Packing List Number"
+      },
+      {
+        "key": "coc_number",
+        "label": "So chung nhận phụ hợp",
+        "labelEn": "CoC Number"
+      },
+      {
+        "key": "ship_to_address",
+        "label": "Địa chỉ giao hàng",
+        "labelEn": "Ship-To Address"
+      },
+      {
+        "key": "special_packaging_req",
+        "label": "Yêu cầu đồng gọi đặc biệt",
+        "labelEn": "Special Packaging Requirements"
+      }
+    ],
+    "ehs": [
+      {
+        "key": "incident_id",
+        "label": "Mã sự cố",
+        "labelEn": "Incident ID"
+      },
+      {
+        "key": "incident_type",
+        "label": "Loại sự cố",
+        "labelEn": "Incident Type"
+      },
+      {
+        "key": "incident_location",
+        "label": "Địa điểm sự cố",
+        "labelEn": "Incident Location"
+      },
+      {
+        "key": "incident_description",
+        "label": "Mô tả sự cố",
+        "labelEn": "Incident Description"
+      },
+      {
+        "key": "corrective_action_ehs",
+        "label": "Hành động khắc phục EHS",
+        "labelEn": "EHS Corrective Action"
+      }
+    ],
+    "finance": [
+      {
+        "key": "invoice_number",
+        "label": "Số hóa đơn",
+        "labelEn": "Invoice Number"
+      },
+      {
+        "key": "job_cost_total",
+        "label": "Tổng chi phí đơn hàng",
+        "labelEn": "Job Cost Total"
+      },
+      {
+        "key": "material_cost",
+        "label": "Chi phí vật liệu",
+        "labelEn": "Material Cost"
+      },
+      {
+        "key": "labor_cost",
+        "label": "Chi phí nhân công",
+        "labelEn": "Labor Cost"
+      },
+      {
+        "key": "overhead_cost",
+        "label": "Chi phí gián tiếp",
+        "labelEn": "Overhead Cost"
+      },
+      {
+        "key": "outsource_cost",
+        "label": "Chi phí gia công ngoài",
+        "labelEn": "Outsource Cost"
+      }
+    ],
+    "contamination_fod": [
+      {
+        "key": "cleanliness_level",
+        "label": "Mức đo sạch",
+        "labelEn": "Cleanliness Level"
+      },
+      {
+        "key": "fod_check_result",
+        "label": "Kết quả kiểm tra FOD",
+        "labelEn": "FOD Check Result"
+      },
+      {
+        "key": "contamination_type",
+        "label": "Loại nhiễm bản",
+        "labelEn": "Contamination Type"
+      },
+      {
+        "key": "cleaning_method",
+        "label": "Phương pháp làm sạch",
+        "labelEn": "Cleaning Method"
+      },
+      {
+        "key": "packaging_material",
+        "label": "Vật liệu đồng gọi",
+        "labelEn": "Packaging Material"
+      }
+    ],
+    "kpi_metrics": [
+      {
+        "key": "kpi_id",
+        "label": "Mã KPI",
+        "labelEn": "KPI ID"
+      },
+      {
+        "key": "kpi_name",
+        "label": "Tên KPI",
+        "labelEn": "KPI Name"
+      },
+      {
+        "key": "kpi_target",
+        "label": "Mức tiêu KPI",
+        "labelEn": "KPI Target"
+      },
+      {
+        "key": "kpi_actual",
+        "label": "KPI thực tệ",
+        "labelEn": "KPI Actual"
+      },
+      {
+        "key": "kpi_status",
+        "label": "Trạng thái KPI",
+        "labelEn": "KPI Status"
+      },
+      {
+        "key": "kpi_period",
+        "label": "Kỹ bảo cao KPI",
+        "labelEn": "KPI Reporting Period"
+      },
+      {
+        "key": "on_time_delivery_rate",
+        "label": "Tỷ lệ giao hàng dụng hẹn (%)",
+        "labelEn": "On-Time Delivery Rate (%)"
+      },
+      {
+        "key": "customer_complaint_rate",
+        "label": "Tỷ lệ khiếu nại khách hàng (%)",
+        "labelEn": "Customer Complaint Rate (%)"
+      },
+      {
+        "key": "internal_reject_rate",
+        "label": "Tỷ lệ tự chối nơi bỏ (PPM)",
+        "labelEn": "Internal Reject Rate (PPM)"
+      },
+      {
+        "key": "supplier_quality_index",
+        "label": "Chỉ số chất lượng nhà cung cấp",
+        "labelEn": "Supplier Quality Index"
+      },
+      {
+        "key": "training_completion_rate",
+        "label": "Tỷ lệ hoàn thành đào tạo (%)",
+        "labelEn": "Training Completion Rate (%)"
+      },
+      {
+        "key": "capa_closure_rate",
+        "label": "Tỷ lệ đồng CAPA dụng hạn (%)",
+        "labelEn": "CAPA On-Time Closure Rate (%)"
+      },
+      {
+        "key": "calibration_compliance_rate",
+        "label": "Tỷ lệ tuần thu hiệu chuẩn (%)",
+        "labelEn": "Calibration Compliance Rate (%)"
+      },
+      {
+        "key": "scrap_rate",
+        "label": "Tỷ lệ phê phạm (%)",
+        "labelEn": "Scrap Rate (%)"
+      }
+    ],
+    "erp_master_data": [
+      {
+        "key": "item_id",
+        "label": "Mã hàng hóa",
+        "labelEn": "Item ID"
+      },
+      {
+        "key": "item_description",
+        "label": "Mô tả hàng hóa",
+        "labelEn": "Item Description"
+      },
+      {
+        "key": "item_description_vi",
+        "label": "Mô tả hàng hóa (tieng Viet)",
+        "labelEn": "Item Description (Vietnamese)"
+      },
+      {
+        "key": "item_group",
+        "label": "Nhóm hàng hóa",
+        "labelEn": "Item Group"
+      },
+      {
+        "key": "item_class",
+        "label": "Lớp hàng hóa",
+        "labelEn": "Item Class"
+      },
+      {
+        "key": "item_type",
+        "label": "Loại hàng hóa",
+        "labelEn": "Item Type"
+      },
+      {
+        "key": "uom",
+        "label": "Đơn vị tính",
+        "labelEn": "Unit of Measure"
+      },
+      {
+        "key": "alt_uom",
+        "label": "Đơn vị tính thay thể",
+        "labelEn": "Alternate UOM"
+      },
+      {
+        "key": "uom_conversion_factor",
+        "label": "Hệ so chuyển đổi đơn vị",
+        "labelEn": "UOM Conversion Factor"
+      },
+      {
+        "key": "weight_net",
+        "label": "Khối lượng tính",
+        "labelEn": "Net Weight"
+      },
+      {
+        "key": "weight_gross",
+        "label": "Khối lượng thọ",
+        "labelEn": "Gross Weight"
+      },
+      {
+        "key": "weight_uom",
+        "label": "Đơn vị khối lượng",
+        "labelEn": "Weight UOM"
+      },
+      {
+        "key": "volume",
+        "label": "Thể tích",
+        "labelEn": "Volume"
+      },
+      {
+        "key": "dimension_length",
+        "label": "Chiều dài",
+        "labelEn": "Length"
+      },
+      {
+        "key": "dimension_width",
+        "label": "Chiều rộng",
+        "labelEn": "Width"
+      },
+      {
+        "key": "dimension_height",
+        "label": "Chiều cao",
+        "labelEn": "Height"
+      },
+      {
+        "key": "dimension_uom",
+        "label": "Đơn vị kích thuộc",
+        "labelEn": "Dimension UOM"
+      },
+      {
+        "key": "material_type",
+        "label": "Loại vật liệu",
+        "labelEn": "Material Type"
+      },
+      {
+        "key": "material_grade",
+        "label": "Cấp độ vật liệu",
+        "labelEn": "Material Grade"
+      },
+      {
+        "key": "material_spec_erp",
+        "label": "Quy cách vật liệu (ERP)",
+        "labelEn": "Material Specification"
+      },
+      {
+        "key": "material_condition",
+        "label": "Tính trạng vật liệu",
+        "labelEn": "Material Condition"
+      },
+      {
+        "key": "shelf_life_days",
+        "label": "Hạn sự dụng (ngay)",
+        "labelEn": "Shelf Life (Days)"
+      },
+      {
+        "key": "item_status",
+        "label": "Trạng thái hàng hóa",
+        "labelEn": "Item Status"
+      },
+      {
+        "key": "abc_class",
+        "label": "Phần loại ABC",
+        "labelEn": "ABC Classification"
+      },
+      {
+        "key": "commodity_code",
+        "label": "Mã nhóm hàng hóa",
+        "labelEn": "Commodity Code"
+      },
+      {
+        "key": "hs_tariff_code",
+        "label": "Mã thuế quản HS",
+        "labelEn": "HS Tariff Code"
+      },
+      {
+        "key": "eccn_code",
+        "label": "Mã ECCN",
+        "labelEn": "ECCN Code"
+      },
+      {
+        "key": "itar_controlled",
+        "label": "Kiểm soát ITAR",
+        "labelEn": "ITAR Controlled"
+      },
+      {
+        "key": "country_of_origin",
+        "label": "Nước xuất xử",
+        "labelEn": "Country of Origin"
+      },
+      {
+        "key": "make_buy_code",
+        "label": "Mã sản xuat/Mua",
+        "labelEn": "Make/Buy Code"
+      },
+      {
+        "key": "planner_code",
+        "label": "Mã người lập kế hoạch",
+        "labelEn": "Planner Code"
+      },
+      {
+        "key": "buyer_code",
+        "label": "Mã người mua hàng",
+        "labelEn": "Buyer Code"
+      },
+      {
+        "key": "drawing_number_erp",
+        "label": "So bản về (ERP)",
+        "labelEn": "Drawing Number (ERP)"
+      },
+      {
+        "key": "drawing_revision_erp",
+        "label": "Phiên bản bản về (ERP)",
+        "labelEn": "Drawing Revision (ERP)"
+      },
+      {
+        "key": "model_number",
+        "label": "Số model",
+        "labelEn": "Model Number"
+      },
+      {
+        "key": "customer_part_number",
+        "label": "So chi tiết khách hàng",
+        "labelEn": "Customer Part Number"
+      },
+      {
+        "key": "manufacturer_part_number",
+        "label": "So chi tiết nhà sản xuất",
+        "labelEn": "Manufacturer Part Number"
+      },
+      {
+        "key": "substitute_item_id",
+        "label": "Mã hàng hóa thay thể",
+        "labelEn": "Substitute Item ID"
+      },
+      {
+        "key": "preferred_vendor_id",
+        "label": "Mã nhà cung cấp ưu tiến",
+        "labelEn": "Preferred Vendor ID"
+      },
+      {
+        "key": "lead_time_days",
+        "label": "Thời gián đạt hàng (ngay)",
+        "labelEn": "Lead Time (Days)"
+      },
+      {
+        "key": "safety_stock_qty",
+        "label": "Lượng tồn kho an toán",
+        "labelEn": "Safety Stock Quantity"
+      },
+      {
+        "key": "reorder_point",
+        "label": "Điểm đặt hàng lại",
+        "labelEn": "Reorder Point"
+      },
+      {
+        "key": "reorder_qty",
+        "label": "So lượng đạt hàng lại",
+        "labelEn": "Reorder Quantity"
+      },
+      {
+        "key": "min_order_qty",
+        "label": "So lượng đạt hàng tối thiểu",
+        "labelEn": "Minimum Order Quantity"
+      },
+      {
+        "key": "max_order_qty",
+        "label": "So lượng đạt hàng tối đã",
+        "labelEn": "Maximum Order Quantity"
+      },
+      {
+        "key": "order_multiple",
+        "label": "Bội số đặt hàng",
+        "labelEn": "Order Multiple"
+      },
+      {
+        "key": "lot_tracked",
+        "label": "Theo đổi lô",
+        "labelEn": "Lot Tracked"
+      },
+      {
+        "key": "serial_tracked",
+        "label": "Theo đổi serial",
+        "labelEn": "Serial Tracked"
+      },
+      {
+        "key": "revision_tracked",
+        "label": "Theo đổi phiên bản",
+        "labelEn": "Revision Tracked"
+      },
+      {
+        "key": "inspection_required",
+        "label": "Yêu cầu kiểm tra",
+        "labelEn": "Inspection Required"
+      },
+      {
+        "key": "certificate_required",
+        "label": "Yêu cầu chung chi",
+        "labelEn": "Certificate Required"
+      },
+      {
+        "key": "first_article_required",
+        "label": "Yêu cầu kiểm tra sản phạm đầu tiến",
+        "labelEn": "First Article Required"
+      },
+      {
+        "key": "special_process_required",
+        "label": "Yêu cầu quy trình đặc biệt",
+        "labelEn": "Special Process Required"
+      },
+      {
+        "key": "rohs_compliant",
+        "label": "Tuần thu RoHS",
+        "labelEn": "RoHS Compliant"
+      },
+      {
+        "key": "reach_compliant",
+        "label": "Tuần thu REACH",
+        "labelEn": "REACH Compliant"
+      },
+      {
+        "key": "conflict_mineral_free",
+        "label": "Không khoảng sản xung đợt",
+        "labelEn": "Conflict Mineral Free"
+      },
+      {
+        "key": "shelf_life_controlled",
+        "label": "Kiểm soát hạn sự dụng",
+        "labelEn": "Shelf Life Controlled"
+      },
+      {
+        "key": "moisture_sensitive_level",
+        "label": "Cấp độ nhạy ẩm",
+        "labelEn": "Moisture Sensitive Level"
+      },
+      {
+        "key": "esd_sensitive",
+        "label": "Nhạy cấm tính điện",
+        "labelEn": "ESD Sensitive"
+      }
+    ],
+    "erp_bom": [
+      {
+        "key": "bom_id",
+        "label": "Mã BOM",
+        "labelEn": "BOM ID"
+      },
+      {
+        "key": "bom_revision",
+        "label": "Phiên bản BOM",
+        "labelEn": "BOM Revision"
+      },
+      {
+        "key": "bom_type",
+        "label": "Loại BOM",
+        "labelEn": "BOM Type"
+      },
+      {
+        "key": "bom_status",
+        "label": "Trạng thái BOM",
+        "labelEn": "BOM Status"
+      },
+      {
+        "key": "parent_item_id",
+        "label": "Mã hàng hóa cha",
+        "labelEn": "Parent Item ID"
+      },
+      {
+        "key": "component_item_id",
+        "label": "Mã hàng hóa thành phần",
+        "labelEn": "Component Item ID"
+      },
+      {
+        "key": "component_qty_per",
+        "label": "So lượng thành phan/san phạm",
+        "labelEn": "Component Qty Per"
+      },
+      {
+        "key": "component_uom",
+        "label": "Đơn vị tính thành phần",
+        "labelEn": "Component UOM"
+      },
+      {
+        "key": "scrap_factor_pct",
+        "label": "Hệ so phê phạm (%)",
+        "labelEn": "Scrap Factor (%)"
+      },
+      {
+        "key": "yield_factor_pct",
+        "label": "Hệ so hiệu suất (%)",
+        "labelEn": "Yield Factor (%)"
+      },
+      {
+        "key": "operation_seq_bom",
+        "label": "Thu tự nguyên công (BOM)",
+        "labelEn": "Operation Sequence (BOM)"
+      },
+      {
+        "key": "effective_date_from",
+        "label": "Ngày hiệu lực tự",
+        "labelEn": "Effective Date From"
+      },
+      {
+        "key": "effective_date_to",
+        "label": "Ngày hiệu lực đến",
+        "labelEn": "Effective Date To"
+      },
+      {
+        "key": "eco_number",
+        "label": "So lệnh thay đổi kỹ thuật",
+        "labelEn": "ECO Number"
+      },
+      {
+        "key": "phantom_flag",
+        "label": "Có phần tử ảo",
+        "labelEn": "Phantom Flag"
+      },
+      {
+        "key": "reference_designator",
+        "label": "Kỹ hiệu tham chiều",
+        "labelEn": "Reference Designator"
+      },
+      {
+        "key": "find_number",
+        "label": "So vị trị",
+        "labelEn": "Find Number"
+      },
+      {
+        "key": "bom_notes",
+        "label": "Ghi chủ BOM",
+        "labelEn": "BOM Notes"
+      },
+      {
+        "key": "alternate_bom_id",
+        "label": "Mã BOM thay thể",
+        "labelEn": "Alternate BOM ID"
+      },
+      {
+        "key": "substitute_component_id",
+        "label": "Mã thành phần thay thể",
+        "labelEn": "Substitute Component ID"
+      },
+      {
+        "key": "bom_level",
+        "label": "Cấp BOM",
+        "labelEn": "BOM Level"
+      },
+      {
+        "key": "low_level_code",
+        "label": "Mã cấp thấp nhật",
+        "labelEn": "Low Level Code"
+      },
+      {
+        "key": "extended_qty",
+        "label": "So lượng mô rộng",
+        "labelEn": "Extended Quantity"
+      },
+      {
+        "key": "component_type",
+        "label": "Loại thành phần",
+        "labelEn": "Component Type"
+      }
+    ],
+    "erp_routing": [
+      {
+        "key": "routing_id",
+        "label": "Mã định tuyển",
+        "labelEn": "Routing ID"
+      },
+      {
+        "key": "routing_revision",
+        "label": "Phiên bản định tuyển",
+        "labelEn": "Routing Revision"
+      },
+      {
+        "key": "operation_seq",
+        "label": "Thu tự nguyên công",
+        "labelEn": "Operation Sequence"
+      },
+      {
+        "key": "operation_code",
+        "label": "Mã nguyên công",
+        "labelEn": "Operation Code"
+      },
+      {
+        "key": "operation_description",
+        "label": "Mô tả nguyên công",
+        "labelEn": "Operation Description"
+      },
+      {
+        "key": "operation_description_vi",
+        "label": "Mô tả nguyên công (tieng Viet)",
+        "labelEn": "Operation Description (Vietnamese)"
+      },
+      {
+        "key": "work_center_id_rtg",
+        "label": "Mã trung tâm giá công (Dinh tuyen)",
+        "labelEn": "Work Center ID (Routing)"
+      },
+      {
+        "key": "work_center_name_rtg",
+        "label": "Tên trung tâm giá công (Dinh tuyen)",
+        "labelEn": "Work Center Name (Routing)"
+      },
+      {
+        "key": "resource_group_id",
+        "label": "Mã nhóm tài nguyên",
+        "labelEn": "Resource Group ID"
+      },
+      {
+        "key": "resource_id",
+        "label": "Mã tài nguyên",
+        "labelEn": "Resource ID"
+      },
+      {
+        "key": "setup_time_std",
+        "label": "Thời gián setup tiêu chuẩn (gio)",
+        "labelEn": "Setup Time Standard (hours)"
+      },
+      {
+        "key": "run_time_std",
+        "label": "Thời gián chạy tiêu chuẩn (gio/san pham)",
+        "labelEn": "Run Time Standard (hours/piece)"
+      },
+      {
+        "key": "run_time_per_unit",
+        "label": "Thời gián chạy mới đơn vị",
+        "labelEn": "Run Time Per Unit"
+      },
+      {
+        "key": "labor_rate_std",
+        "label": "Đơn giá nhận công tiêu chuẩn",
+        "labelEn": "Standard Labor Rate"
+      },
+      {
+        "key": "overhead_rate_rtg",
+        "label": "Tỉ lệ chi phí gián tiếp",
+        "labelEn": "Overhead Rate"
+      },
+      {
+        "key": "machine_rate",
+        "label": "Đơn giá máy",
+        "labelEn": "Machine Rate"
+      },
+      {
+        "key": "move_time_hours",
+        "label": "Thời gián di chuyển (gio)",
+        "labelEn": "Move Time (hours)"
+      },
+      {
+        "key": "queue_time_hours",
+        "label": "Thời gián cho (gio)",
+        "labelEn": "Queue Time (hours)"
+      },
+      {
+        "key": "wait_time_hours",
+        "label": "Thời gián đổi (gio)",
+        "labelEn": "Wait Time (hours)"
+      },
+      {
+        "key": "overlap_pct",
+        "label": "Tỷ lệ chống lập",
+        "labelEn": "Overlap Percentage"
+      },
+      {
+        "key": "overlap_qty",
+        "label": "So lượng chống lập",
+        "labelEn": "Overlap Quantity"
+      },
+      {
+        "key": "crew_size",
+        "label": "So nhận công",
+        "labelEn": "Crew Size"
+      },
+      {
+        "key": "simultaneous_resources",
+        "label": "Tài nguyên đồng thời",
+        "labelEn": "Simultaneous Resources"
+      },
+      {
+        "key": "subcontract_flag",
+        "label": "Có gia công ngoài",
+        "labelEn": "Subcontract Flag"
+      },
+      {
+        "key": "subcontract_vendor_id",
+        "label": "Mã nhà giá công ngoài",
+        "labelEn": "Subcontract Vendor ID"
+      },
+      {
+        "key": "subcontract_cost_rtg",
+        "label": "Chi phí gia công ngoài (Định tuyến)",
+        "labelEn": "Subcontract Cost"
+      },
+      {
+        "key": "outside_process_code",
+        "label": "Mã quy trình ngoài",
+        "labelEn": "Outside Process Code"
+      },
+      {
+        "key": "tool_list",
+        "label": "Danh sách dụng cụ",
+        "labelEn": "Tool List"
+      },
+      {
+        "key": "fixture_list",
+        "label": "Danh sách đồ gá",
+        "labelEn": "Fixture List"
+      },
+      {
+        "key": "gage_list",
+        "label": "Danh sách dụng cụ đo",
+        "labelEn": "Gage List"
+      },
+      {
+        "key": "inspection_operation",
+        "label": "Nguyên công kiểm tra",
+        "labelEn": "Inspection Operation"
+      },
+      {
+        "key": "spc_required",
+        "label": "Yêu cầu SPC",
+        "labelEn": "SPC Required"
+      },
+      {
+        "key": "first_piece_required",
+        "label": "Yêu cầu kiểm tra sản phạm đầu",
+        "labelEn": "First Piece Required"
+      },
+      {
+        "key": "last_piece_required",
+        "label": "Yêu cầu kiểm tra sản phạm cuối",
+        "labelEn": "Last Piece Required"
+      },
+      {
+        "key": "capability_study_required",
+        "label": "Yêu cầu nghiên cứu năng lực",
+        "labelEn": "Capability Study Required"
+      },
+      {
+        "key": "special_instruction",
+        "label": "Hướng dẫn đặc biệt",
+        "labelEn": "Special Instruction"
+      },
+      {
+        "key": "nc_program_id",
+        "label": "Mã chương trình NC",
+        "labelEn": "NC Program ID"
+      },
+      {
+        "key": "setup_instruction_id",
+        "label": "Mã hướng dẫn setup",
+        "labelEn": "Setup Instruction ID"
+      },
+      {
+        "key": "operator_skill_required",
+        "label": "Kỹ năng người vận hành yêu cầu",
+        "labelEn": "Operator Skill Required"
+      }
+    ],
+    "erp_work_center": [
+      {
+        "key": "work_center_id",
+        "label": "Mã trung tâm giá công",
+        "labelEn": "Work Center ID"
+      },
+      {
+        "key": "work_center_name",
+        "label": "Tên trung tâm giá công",
+        "labelEn": "Work Center Name"
+      },
+      {
+        "key": "work_center_name_vi",
+        "label": "Tên trung tâm giá công (tieng Viet)",
+        "labelEn": "Work Center Name (Vietnamese)"
+      },
+      {
+        "key": "work_center_type",
+        "label": "Loại trung tâm giá công",
+        "labelEn": "Work Center Type"
+      },
+      {
+        "key": "department_id_wc",
+        "label": "Mã phòng bản",
+        "labelEn": "Department ID"
+      },
+      {
+        "key": "cost_center",
+        "label": "Trung tâm chi phí",
+        "labelEn": "Cost Center"
+      },
+      {
+        "key": "capacity_hours_per_day",
+        "label": "Công suất giờ/ngày",
+        "labelEn": "Capacity Hours/Day"
+      },
+      {
+        "key": "capacity_units_per_day",
+        "label": "Công suất đơn vị/ngày",
+        "labelEn": "Capacity Units/Day"
+      },
+      {
+        "key": "efficiency_factor",
+        "label": "Hệ số hiệu suất",
+        "labelEn": "Efficiency Factor"
+      },
+      {
+        "key": "utilization_factor",
+        "label": "Hệ số sử dụng",
+        "labelEn": "Utilization Factor"
+      },
+      {
+        "key": "num_machines",
+        "label": "So lượng máy",
+        "labelEn": "Number of Machines"
+      },
+      {
+        "key": "num_operators",
+        "label": "So lượng người vận hành",
+        "labelEn": "Number of Operators"
+      },
+      {
+        "key": "alternate_work_center",
+        "label": "Trung tâm giá công thay thể",
+        "labelEn": "Alternate Work Center"
+      },
+      {
+        "key": "scheduling_rule",
+        "label": "Quy tác lập lịch",
+        "labelEn": "Scheduling Rule"
+      },
+      {
+        "key": "queue_time_default",
+        "label": "Thời gián cho mặc định",
+        "labelEn": "Default Queue Time"
+      },
+      {
+        "key": "move_time_default",
+        "label": "Thời gián di chuyển mặc định",
+        "labelEn": "Default Move Time"
+      },
+      {
+        "key": "shift_pattern_id",
+        "label": "Mã mẫu ca làm việc",
+        "labelEn": "Shift Pattern ID"
+      },
+      {
+        "key": "hourly_rate_labor",
+        "label": "Đơn giá giờ - Nhận công",
+        "labelEn": "Hourly Rate - Labor"
+      },
+      {
+        "key": "hourly_rate_overhead",
+        "label": "Đơn giá giờ - Chi phí chung",
+        "labelEn": "Hourly Rate - Overhead"
+      },
+      {
+        "key": "hourly_rate_machine",
+        "label": "Đơn giá giờ - Máy",
+        "labelEn": "Hourly Rate - Machine"
+      },
+      {
+        "key": "backflush_labor",
+        "label": "Tự đồng tính nhận công",
+        "labelEn": "Backflush Labor"
+      },
+      {
+        "key": "backflush_material",
+        "label": "Tự đồng tính vật liệu",
+        "labelEn": "Backflush Material"
+      }
+    ],
+    "erp_sales_order": [
+      {
+        "key": "sales_order_number",
+        "label": "Số đơn hàng bán",
+        "labelEn": "Sales Order Number"
+      },
+      {
+        "key": "so_line_number",
+        "label": "So đồng đơn hàng",
+        "labelEn": "SO Line Number"
+      },
+      {
+        "key": "so_status",
+        "label": "Trạng thái đơn hàng bản",
+        "labelEn": "SO Status"
+      },
+      {
+        "key": "customer_id_so",
+        "label": "Mã khách hàng (DH ban)",
+        "labelEn": "Customer ID (SO)"
+      },
+      {
+        "key": "customer_name_so",
+        "label": "Tên khách hàng (DH ban)",
+        "labelEn": "Customer Name (SO)"
+      },
+      {
+        "key": "customer_po_number",
+        "label": "Số PO khách hàng",
+        "labelEn": "Customer PO Number"
+      },
+      {
+        "key": "customer_po_line",
+        "label": "Đồng PO khách hàng",
+        "labelEn": "Customer PO Line"
+      },
+      {
+        "key": "ship_to_address_id",
+        "label": "Mã địa chi giao hàng",
+        "labelEn": "Ship-To Address ID"
+      },
+      {
+        "key": "bill_to_address_id",
+        "label": "Mã địa chi thành toán",
+        "labelEn": "Bill-To Address ID"
+      },
+      {
+        "key": "order_date",
+        "label": "Ngày đặt hàng",
+        "labelEn": "Order Date"
+      },
+      {
+        "key": "requested_date",
+        "label": "Ngày yêu cầu",
+        "labelEn": "Requested Date"
+      },
+      {
+        "key": "promise_date",
+        "label": "Ngày cấm kết",
+        "labelEn": "Promise Date"
+      },
+      {
+        "key": "scheduled_ship_date",
+        "label": "Ngày giao hàng dự kiện",
+        "labelEn": "Scheduled Ship Date"
+      },
+      {
+        "key": "actual_ship_date",
+        "label": "Ngày giao hàng thực tệ",
+        "labelEn": "Actual Ship Date"
+      },
+      {
+        "key": "item_id_so",
+        "label": "Mã hàng hóa (DH ban)",
+        "labelEn": "Item ID (SO)"
+      },
+      {
+        "key": "order_qty_so",
+        "label": "Số lượng đặt hàng",
+        "labelEn": "Order Quantity"
+      },
+      {
+        "key": "shipped_qty",
+        "label": "So lượng đã giao",
+        "labelEn": "Shipped Quantity"
+      },
+      {
+        "key": "remaining_qty_so",
+        "label": "Số lượng còn lại",
+        "labelEn": "Remaining Quantity"
+      },
+      {
+        "key": "unit_price",
+        "label": "Đơn giá",
+        "labelEn": "Unit Price"
+      },
+      {
+        "key": "extended_price",
+        "label": "Thành tiến",
+        "labelEn": "Extended Price"
+      },
+      {
+        "key": "currency_code_so",
+        "label": "Mã tiến tệ",
+        "labelEn": "Currency Code"
+      },
+      {
+        "key": "exchange_rate",
+        "label": "Tỉ giá hội đoại",
+        "labelEn": "Exchange Rate"
+      },
+      {
+        "key": "discount_pct",
+        "label": "Chiết khấu (%)",
+        "labelEn": "Discount (%)"
+      },
+      {
+        "key": "tax_code",
+        "label": "Mã thuế",
+        "labelEn": "Tax Code"
+      },
+      {
+        "key": "tax_amount",
+        "label": "Tiến thuế",
+        "labelEn": "Tax Amount"
+      },
+      {
+        "key": "freight_terms",
+        "label": "Điều khoản vận chuyển",
+        "labelEn": "Freight Terms"
+      },
+      {
+        "key": "shipping_method",
+        "label": "Phương thực vận chuyển",
+        "labelEn": "Shipping Method"
+      },
+      {
+        "key": "priority_code_so",
+        "label": "Mã ưu tiến",
+        "labelEn": "Priority Code"
+      },
+      {
+        "key": "credit_status",
+        "label": "Trạng thái tín dụng",
+        "labelEn": "Credit Status"
+      },
+      {
+        "key": "commission_pct",
+        "label": "Hóa hỏng (%)",
+        "labelEn": "Commission (%)"
+      },
+      {
+        "key": "sales_rep_id",
+        "label": "Mã nhận viên kinh doanh",
+        "labelEn": "Sales Rep ID"
+      },
+      {
+        "key": "territory_code",
+        "label": "Mã vùng lãnh thọ",
+        "labelEn": "Territory Code"
+      },
+      {
+        "key": "project_id_so",
+        "label": "Mã dự an (DH ban)",
+        "labelEn": "Project ID (SO)"
+      },
+      {
+        "key": "contract_id",
+        "label": "Mã hợp đồng",
+        "labelEn": "Contract ID"
+      },
+      {
+        "key": "blanket_order_ref",
+        "label": "Tham chiều đơn hàng bảo",
+        "labelEn": "Blanket Order Reference"
+      },
+      {
+        "key": "release_number",
+        "label": "So phát hành",
+        "labelEn": "Release Number"
+      },
+      {
+        "key": "customer_revision_so",
+        "label": "Phiên bản khách hàng",
+        "labelEn": "Customer Revision"
+      },
+      {
+        "key": "customer_spec_requirements",
+        "label": "Yêu cầu quy cách khách hàng",
+        "labelEn": "Customer Spec Requirements"
+      },
+      {
+        "key": "export_license_required",
+        "label": "Yêu cầu giây phép xuất khấu",
+        "labelEn": "Export License Required"
+      },
+      {
+        "key": "end_use_certificate",
+        "label": "Chứng nhận mục đích sử dụng",
+        "labelEn": "End-Use Certificate"
+      }
+    ],
+    "erp_purchase_order": [
+      {
+        "key": "po_number_erp",
+        "label": "So đơn đạt hàng mua",
+        "labelEn": "PO Number"
+      },
+      {
+        "key": "po_line_number",
+        "label": "So đồng PO",
+        "labelEn": "PO Line Number"
+      },
+      {
+        "key": "po_status",
+        "label": "Trạng thái PO",
+        "labelEn": "PO Status"
+      },
+      {
+        "key": "vendor_id",
+        "label": "Mã nhà cung cấp",
+        "labelEn": "Vendor ID"
+      },
+      {
+        "key": "vendor_name_po",
+        "label": "Tên nhà cung cấp",
+        "labelEn": "Vendor Name"
+      },
+      {
+        "key": "vendor_contact",
+        "label": "Liên hệ nhà cung cấp",
+        "labelEn": "Vendor Contact"
+      },
+      {
+        "key": "po_type",
+        "label": "Loại PO",
+        "labelEn": "PO Type"
+      },
+      {
+        "key": "po_date",
+        "label": "Ngày PO",
+        "labelEn": "PO Date"
+      },
+      {
+        "key": "need_by_date",
+        "label": "Ngày cần hàng",
+        "labelEn": "Need By Date"
+      },
+      {
+        "key": "promise_date_po",
+        "label": "Ngày cấm kết (PO)",
+        "labelEn": "Promise Date (PO)"
+      },
+      {
+        "key": "item_id_po",
+        "label": "Mã hàng hóa (PO)",
+        "labelEn": "Item ID (PO)"
+      },
+      {
+        "key": "order_qty_po",
+        "label": "So lượng đạt mua",
+        "labelEn": "Order Quantity (PO)"
+      },
+      {
+        "key": "received_qty",
+        "label": "So lượng đã nhận",
+        "labelEn": "Received Quantity"
+      },
+      {
+        "key": "rejected_qty",
+        "label": "So lượng tự chối",
+        "labelEn": "Rejected Quantity"
+      },
+      {
+        "key": "remaining_qty_po",
+        "label": "So lượng còn lại (PO)",
+        "labelEn": "Remaining Quantity (PO)"
+      },
+      {
+        "key": "unit_cost",
+        "label": "Đơn giá mua",
+        "labelEn": "Unit Cost"
+      },
+      {
+        "key": "extended_cost",
+        "label": "Thành tiến mua",
+        "labelEn": "Extended Cost"
+      },
+      {
+        "key": "currency_code_po",
+        "label": "Mã tiến tệ (PO)",
+        "labelEn": "Currency Code (PO)"
+      },
+      {
+        "key": "payment_terms_po",
+        "label": "Điều kiện thanh toán",
+        "labelEn": "Payment Terms"
+      },
+      {
+        "key": "incoterms",
+        "label": "Điều kiện giao hàng quốc tế",
+        "labelEn": "Incoterms"
+      },
+      {
+        "key": "fob_point",
+        "label": "Điểm giao hàng FOB",
+        "labelEn": "FOB Point"
+      },
+      {
+        "key": "ship_via",
+        "label": "Vận chuyển quả",
+        "labelEn": "Ship Via"
+      },
+      {
+        "key": "buyer_id_po",
+        "label": "Mã người mua",
+        "labelEn": "Buyer ID"
+      },
+      {
+        "key": "approved_by_po",
+        "label": "Người phê duyệt (PO)",
+        "labelEn": "Approved By (PO)"
+      },
+      {
+        "key": "approval_date_po",
+        "label": "Ngày phê duyệt (PO)",
+        "labelEn": "Approval Date (PO)"
+      },
+      {
+        "key": "requisition_id",
+        "label": "Mã yêu cầu mua hàng",
+        "labelEn": "Requisition ID"
+      },
+      {
+        "key": "rfq_id",
+        "label": "Mã yêu cầu bảo giá",
+        "labelEn": "RFQ ID"
+      },
+      {
+        "key": "vendor_quote_ref",
+        "label": "Tham chiều bảo giá NCC",
+        "labelEn": "Vendor Quote Reference"
+      },
+      {
+        "key": "lot_number_vendor",
+        "label": "So lô nhà cung cấp",
+        "labelEn": "Vendor Lot Number"
+      },
+      {
+        "key": "coc_required_po",
+        "label": "Yêu cầu CoC (PO)",
+        "labelEn": "CoC Required (PO)"
+      },
+      {
+        "key": "material_cert_required",
+        "label": "Yêu cầu chung nhận vật liệu",
+        "labelEn": "Material Cert Required"
+      },
+      {
+        "key": "test_report_required",
+        "label": "Yêu cầu bảo cao thu nghiệm",
+        "labelEn": "Test Report Required"
+      },
+      {
+        "key": "source_inspection_required",
+        "label": "Yêu cầu kiểm tra tài nguồn",
+        "labelEn": "Source Inspection Required"
+      },
+      {
+        "key": "incoming_inspection_plan",
+        "label": "Kế hoạch kiểm tra đầu vào",
+        "labelEn": "Incoming Inspection Plan"
+      },
+      {
+        "key": "blanket_po_ref",
+        "label": "Tham chiều PO bảo",
+        "labelEn": "Blanket PO Reference"
+      },
+      {
+        "key": "release_number_po",
+        "label": "So phát hành (PO)",
+        "labelEn": "Release Number (PO)"
+      },
+      {
+        "key": "landed_cost",
+        "label": "Chi phí nhập kho",
+        "labelEn": "Landed Cost"
+      },
+      {
+        "key": "duty_pct",
+        "label": "Thuế nhập khấu (%)",
+        "labelEn": "Duty (%)"
+      },
+      {
+        "key": "freight_cost",
+        "label": "Chi phí vận chuyển",
+        "labelEn": "Freight Cost"
+      }
+    ],
+    "erp_vendor_master": [
+      {
+        "key": "vendor_id_vm",
+        "label": "Mã nhà cung cấp",
+        "labelEn": "Vendor ID"
+      },
+      {
+        "key": "vendor_name_vm",
+        "label": "Tên nhà cung cấp",
+        "labelEn": "Vendor Name"
+      },
+      {
+        "key": "vendor_name_vi",
+        "label": "Tên nhà cung cấp (tieng Viet)",
+        "labelEn": "Vendor Name (Vietnamese)"
+      },
+      {
+        "key": "vendor_type",
+        "label": "Loại nhà cung cấp",
+        "labelEn": "Vendor Type"
+      },
+      {
+        "key": "vendor_status_vm",
+        "label": "Trạng thái nhà cung cấp",
+        "labelEn": "Vendor Status"
+      },
+      {
+        "key": "vendor_rating_score",
+        "label": "Điểm xếp hạng NCC",
+        "labelEn": "Vendor Rating Score"
+      },
+      {
+        "key": "vendor_rating_grade",
+        "label": "Xếp loại NCC",
+        "labelEn": "Vendor Rating Grade"
+      },
+      {
+        "key": "primary_contact_vm",
+        "label": "Liên hệ chính",
+        "labelEn": "Primary Contact"
+      },
+      {
+        "key": "contact_email_vm",
+        "label": "Email liên hệ",
+        "labelEn": "Contact Email"
+      },
+      {
+        "key": "contact_phone_vm",
+        "label": "Điện thoại liên hệ",
+        "labelEn": "Contact Phone"
+      },
+      {
+        "key": "address_line1_vm",
+        "label": "Địa chỉ dòng 1",
+        "labelEn": "Address Line 1"
+      },
+      {
+        "key": "address_line2_vm",
+        "label": "Địa chỉ dòng 2",
+        "labelEn": "Address Line 2"
+      },
+      {
+        "key": "city_vm",
+        "label": "Thành phố",
+        "labelEn": "City"
+      },
+      {
+        "key": "state_province_vm",
+        "label": "Tỉnh/Thành",
+        "labelEn": "State/Province"
+      },
+      {
+        "key": "postal_code_vm",
+        "label": "Mã bưu chính",
+        "labelEn": "Postal Code"
+      },
+      {
+        "key": "country_vm",
+        "label": "Quốc gia",
+        "labelEn": "Country"
+      },
+      {
+        "key": "payment_terms_default_vm",
+        "label": "Điều kiện thanh toán mặc định",
+        "labelEn": "Default Payment Terms"
+      },
+      {
+        "key": "currency_default_vm",
+        "label": "Tiến tệ mặc định",
+        "labelEn": "Default Currency"
+      },
+      {
+        "key": "tax_id_vm",
+        "label": "Mã so thuế",
+        "labelEn": "Tax ID"
+      },
+      {
+        "key": "duns_number",
+        "label": "Số DUNS",
+        "labelEn": "DUNS Number"
+      },
+      {
+        "key": "cage_code",
+        "label": "Mã CAGE",
+        "labelEn": "CAGE Code"
+      },
+      {
+        "key": "approved_process_list_vm",
+        "label": "Danh sách quy trình được duyệt",
+        "labelEn": "Approved Process List"
+      },
+      {
+        "key": "certification_list",
+        "label": "Danh sách chứng nhận",
+        "labelEn": "Certification List"
+      },
+      {
+        "key": "certification_expiry_date_vm",
+        "label": "Ngày hết hạn chung nhận",
+        "labelEn": "Certification Expiry Date"
+      },
+      {
+        "key": "last_audit_date_vm",
+        "label": "Ngày kiểm toán gần nhật",
+        "labelEn": "Last Audit Date"
+      },
+      {
+        "key": "next_audit_due_vm",
+        "label": "Ngày kiểm toán tiếp theo",
+        "labelEn": "Next Audit Due"
+      },
+      {
+        "key": "approved_part_list",
+        "label": "Danh sách hàng hóa được duyệt",
+        "labelEn": "Approved Part List"
+      },
+      {
+        "key": "lead_time_avg_days",
+        "label": "Thời gián giao hàng trung bình (ngay)",
+        "labelEn": "Average Lead Time (Days)"
+      },
+      {
+        "key": "on_time_delivery_pct",
+        "label": "Tỷ lệ giao hàng dụng hẹn (%)",
+        "labelEn": "On-Time Delivery (%)"
+      },
+      {
+        "key": "quality_rejection_pct",
+        "label": "Tỷ lệ tự chối chất lượng (%)",
+        "labelEn": "Quality Rejection (%)"
+      },
+      {
+        "key": "corrective_action_count_vm",
+        "label": "So lượng hành đồng khắc phục",
+        "labelEn": "Corrective Action Count"
+      },
+      {
+        "key": "scar_open_count",
+        "label": "So SCAR đang mô",
+        "labelEn": "Open SCAR Count"
+      },
+      {
+        "key": "risk_level_vm",
+        "label": "Mức đo rủi rõ",
+        "labelEn": "Risk Level"
+      },
+      {
+        "key": "single_source_flag",
+        "label": "Có nguồn cung cấp duy nhất",
+        "labelEn": "Single Source Flag"
+      },
+      {
+        "key": "minority_owned",
+        "label": "Doanh nghiệp thiểu số",
+        "labelEn": "Minority Owned"
+      },
+      {
+        "key": "small_business",
+        "label": "Doanh nghiệp nhỏ",
+        "labelEn": "Small Business"
+      },
+      {
+        "key": "country_of_manufacture_vm",
+        "label": "Nước sản xuất",
+        "labelEn": "Country of Manufacture"
+      }
+    ],
+    "erp_customer_master": [
+      {
+        "key": "customer_id_cm",
+        "label": "Mã khách hàng",
+        "labelEn": "Customer ID"
+      },
+      {
+        "key": "customer_name_cm",
+        "label": "Tên khách hàng",
+        "labelEn": "Customer Name"
+      },
+      {
+        "key": "customer_name_vi",
+        "label": "Tên khách hàng (tieng Viet)",
+        "labelEn": "Customer Name (Vietnamese)"
+      },
+      {
+        "key": "customer_type",
+        "label": "Loại khách hàng",
+        "labelEn": "Customer Type"
+      },
+      {
+        "key": "customer_status_cm",
+        "label": "Trạng thái khách hàng",
+        "labelEn": "Customer Status"
+      },
+      {
+        "key": "customer_since_date",
+        "label": "Ngày bắt đầu hợp tác",
+        "labelEn": "Customer Since Date"
+      },
+      {
+        "key": "primary_contact_cm",
+        "label": "Liên hệ chính",
+        "labelEn": "Primary Contact"
+      },
+      {
+        "key": "contact_email_cm",
+        "label": "Email liên hệ",
+        "labelEn": "Contact Email"
+      },
+      {
+        "key": "contact_phone_cm",
+        "label": "Điện thoại liên hệ",
+        "labelEn": "Contact Phone"
+      },
+      {
+        "key": "billing_address_id",
+        "label": "Mã địa chi thành toán",
+        "labelEn": "Billing Address ID"
+      },
+      {
+        "key": "shipping_address_id_cm",
+        "label": "Mã địa chi giao hàng",
+        "labelEn": "Shipping Address ID"
+      },
+      {
+        "key": "credit_limit",
+        "label": "Hạn mức tín dụng",
+        "labelEn": "Credit Limit"
+      },
+      {
+        "key": "credit_terms",
+        "label": "Điều kiện tín dụng",
+        "labelEn": "Credit Terms"
+      },
+      {
+        "key": "payment_terms_cm",
+        "label": "Điều kiện thanh toán",
+        "labelEn": "Payment Terms"
+      },
+      {
+        "key": "currency_default_cm",
+        "label": "Tiến tệ mặc định",
+        "labelEn": "Default Currency"
+      },
+      {
+        "key": "tax_exempt",
+        "label": "Miễn thuế",
+        "labelEn": "Tax Exempt"
+      },
+      {
+        "key": "tax_exempt_cert",
+        "label": "Chứng nhận miễn thuế",
+        "labelEn": "Tax Exempt Certificate"
+      },
+      {
+        "key": "industry_code",
+        "label": "Mã ngành công nghiệp",
+        "labelEn": "Industry Code"
+      },
+      {
+        "key": "quality_requirements_cm",
+        "label": "Yêu cầu chất lượng",
+        "labelEn": "Quality Requirements"
+      },
+      {
+        "key": "customer_spec_list",
+        "label": "Danh sách quy cách khách hàng",
+        "labelEn": "Customer Spec List"
+      },
+      {
+        "key": "approved_process_list_cm",
+        "label": "Danh sách quy trình được duyệt",
+        "labelEn": "Approved Process List"
+      },
+      {
+        "key": "packing_requirements",
+        "label": "Yêu cầu đồng gọi",
+        "labelEn": "Packing Requirements"
+      },
+      {
+        "key": "labeling_requirements",
+        "label": "Yêu cầu nhận mặc",
+        "labelEn": "Labeling Requirements"
+      },
+      {
+        "key": "shipping_instructions",
+        "label": "Hướng dẫn vận chuyển",
+        "labelEn": "Shipping Instructions"
+      },
+      {
+        "key": "required_certifications_cm",
+        "label": "Chứng nhận yêu cầu",
+        "labelEn": "Required Certifications"
+      },
+      {
+        "key": "source_inspection_flag",
+        "label": "Có kiểm tra tại nguồn",
+        "labelEn": "Source Inspection Flag"
+      },
+      {
+        "key": "fai_required_flag",
+        "label": "Có yêu cầu FAI",
+        "labelEn": "FAI Required Flag"
+      },
+      {
+        "key": "customer_portal_url",
+        "label": "URL công thông tín khách hàng",
+        "labelEn": "Customer Portal URL"
+      },
+      {
+        "key": "edi_capable",
+        "label": "Hồ trợ EDI",
+        "labelEn": "EDI Capable"
+      },
+      {
+        "key": "customer_rating_cm",
+        "label": "Xếp hàng khách hàng",
+        "labelEn": "Customer Rating"
+      },
+      {
+        "key": "territory_code_cm",
+        "label": "Mã vùng lãnh thọ",
+        "labelEn": "Territory Code"
+      },
+      {
+        "key": "sales_rep_id_cm",
+        "label": "Mã nhận viên kinh doanh",
+        "labelEn": "Sales Rep ID"
+      },
+      {
+        "key": "account_manager",
+        "label": "Quản lý tài khoản",
+        "labelEn": "Account Manager"
+      }
+    ],
+    "erp_inventory": [
+      {
+        "key": "warehouse_id",
+        "label": "Mã kho",
+        "labelEn": "Warehouse ID"
+      },
+      {
+        "key": "warehouse_name_inv",
+        "label": "Tên kho",
+        "labelEn": "Warehouse Name"
+      },
+      {
+        "key": "location_id",
+        "label": "Mã vị trị",
+        "labelEn": "Location ID"
+      },
+      {
+        "key": "bin_location",
+        "label": "Vị trị kế",
+        "labelEn": "Bin Location"
+      },
+      {
+        "key": "zone_code",
+        "label": "Mã khu vực",
+        "labelEn": "Zone Code"
+      },
+      {
+        "key": "lot_number_inv",
+        "label": "Số lô",
+        "labelEn": "Lot Number"
+      },
+      {
+        "key": "serial_number_inv",
+        "label": "Số serial",
+        "labelEn": "Serial Number"
+      },
+      {
+        "key": "heat_number",
+        "label": "So mẹ nhiệt luyện",
+        "labelEn": "Heat Number"
+      },
+      {
+        "key": "batch_number",
+        "label": "So lô sản xuất",
+        "labelEn": "Batch Number"
+      },
+      {
+        "key": "qty_on_hand",
+        "label": "Số lượng tồn kho",
+        "labelEn": "Qty On Hand"
+      },
+      {
+        "key": "qty_available",
+        "label": "So lượng khả dụng",
+        "labelEn": "Qty Available"
+      },
+      {
+        "key": "qty_allocated",
+        "label": "So lượng đã phần bỏ",
+        "labelEn": "Qty Allocated"
+      },
+      {
+        "key": "qty_on_order",
+        "label": "So lượng đang đạt",
+        "labelEn": "Qty On Order"
+      },
+      {
+        "key": "qty_in_transit",
+        "label": "So lượng đang vận chuyển",
+        "labelEn": "Qty In Transit"
+      },
+      {
+        "key": "qty_in_inspection",
+        "label": "So lượng đang kiểm tra",
+        "labelEn": "Qty In Inspection"
+      },
+      {
+        "key": "qty_quarantined",
+        "label": "So lượng cách lý",
+        "labelEn": "Qty Quarantined"
+      },
+      {
+        "key": "qty_reserved",
+        "label": "So lượng đạt trước",
+        "labelEn": "Qty Reserved"
+      },
+      {
+        "key": "qty_backordered",
+        "label": "So lượng đạt chưa giao",
+        "labelEn": "Qty Backordered"
+      },
+      {
+        "key": "last_receipt_date",
+        "label": "Ngày nhận hàng gần nhật",
+        "labelEn": "Last Receipt Date"
+      },
+      {
+        "key": "last_issue_date",
+        "label": "Ngày xuất hàng gần nhật",
+        "labelEn": "Last Issue Date"
+      },
+      {
+        "key": "last_count_date",
+        "label": "Ngày kiểm kế gần nhật",
+        "labelEn": "Last Count Date"
+      },
+      {
+        "key": "last_movement_date",
+        "label": "Ngày di chuyển gần nhật",
+        "labelEn": "Last Movement Date"
+      },
+      {
+        "key": "unit_cost_avg",
+        "label": "Đơn giá trung bình",
+        "labelEn": "Unit Cost (Average)"
+      },
+      {
+        "key": "unit_cost_std_inv",
+        "label": "Đơn giá tiêu chuẩn",
+        "labelEn": "Unit Cost (Standard)"
+      },
+      {
+        "key": "unit_cost_fifo",
+        "label": "Đơn giá FIFO",
+        "labelEn": "Unit Cost (FIFO)"
+      },
+      {
+        "key": "unit_cost_lifo",
+        "label": "Đơn giá LIFO",
+        "labelEn": "Unit Cost (LIFO)"
+      },
+      {
+        "key": "unit_cost_last",
+        "label": "Đơn giá mua lần cuối",
+        "labelEn": "Unit Cost (Last)"
+      },
+      {
+        "key": "inventory_value",
+        "label": "Giá trị tồn kho",
+        "labelEn": "Inventory Value"
+      },
+      {
+        "key": "abc_classification_inv",
+        "label": "Phần loại ABC",
+        "labelEn": "ABC Classification"
+      },
+      {
+        "key": "cycle_count_class",
+        "label": "Lớp kiểm kế định kỹ",
+        "labelEn": "Cycle Count Class"
+      },
+      {
+        "key": "expiration_date",
+        "label": "Ngày hết hạn",
+        "labelEn": "Expiration Date"
+      },
+      {
+        "key": "received_date_inv",
+        "label": "Ngày nhận hàng",
+        "labelEn": "Received Date"
+      },
+      {
+        "key": "vendor_lot_number",
+        "label": "So lô nhà cung cấp",
+        "labelEn": "Vendor Lot Number"
+      },
+      {
+        "key": "purchase_order_ref_inv",
+        "label": "Tham chiều PO",
+        "labelEn": "Purchase Order Reference"
+      },
+      {
+        "key": "coc_number_inv",
+        "label": "Số CoC",
+        "labelEn": "CoC Number"
+      },
+      {
+        "key": "material_cert_number",
+        "label": "So chung nhận vật liệu",
+        "labelEn": "Material Cert Number"
+      },
+      {
+        "key": "country_of_origin_inv",
+        "label": "Nước xuất xử",
+        "labelEn": "Country of Origin"
+      },
+      {
+        "key": "conformance_status",
+        "label": "Trạng thái phụ hợp",
+        "labelEn": "Conformance Status"
+      },
+      {
+        "key": "dmr_number",
+        "label": "So bảo cao không phụ hợp vật liệu",
+        "labelEn": "DMR Number"
+      },
+      {
+        "key": "stock_type",
+        "label": "Loại tồn kho",
+        "labelEn": "Stock Type"
+      }
+    ],
+    "erp_mrp_planning": [
+      {
+        "key": "planned_order_id",
+        "label": "Mã lệnh kế hoạch",
+        "labelEn": "Planned Order ID"
+      },
+      {
+        "key": "planned_order_type",
+        "label": "Loại lệnh kế hoạch",
+        "labelEn": "Planned Order Type"
+      },
+      {
+        "key": "item_id_mrp",
+        "label": "Mã hàng hóa (MRP)",
+        "labelEn": "Item ID (MRP)"
+      },
+      {
+        "key": "order_qty_mrp",
+        "label": "So lượng lệnh (MRP)",
+        "labelEn": "Order Quantity (MRP)"
+      },
+      {
+        "key": "due_date_mrp",
+        "label": "Ngày cần (MRP)",
+        "labelEn": "Due Date (MRP)"
+      },
+      {
+        "key": "start_date_mrp",
+        "label": "Ngày bắt đầu (MRP)",
+        "labelEn": "Start Date (MRP)"
+      },
+      {
+        "key": "release_date_mrp",
+        "label": "Ngày phát hành (MRP)",
+        "labelEn": "Release Date (MRP)"
+      },
+      {
+        "key": "planner_code_mrp",
+        "label": "Mã người lập kế hoạch",
+        "labelEn": "Planner Code"
+      },
+      {
+        "key": "mrp_status",
+        "label": "Trạng thái MRP",
+        "labelEn": "MRP Status"
+      },
+      {
+        "key": "mrp_exception_code",
+        "label": "Mã ngoài lệ MRP",
+        "labelEn": "MRP Exception Code"
+      },
+      {
+        "key": "exception_message",
+        "label": "Thông bảo ngoài lệ",
+        "labelEn": "Exception Message"
+      },
+      {
+        "key": "demand_source",
+        "label": "Nguồn như cầu",
+        "labelEn": "Demand Source"
+      },
+      {
+        "key": "demand_source_ref",
+        "label": "Tham chiều nguồn như cầu",
+        "labelEn": "Demand Source Reference"
+      },
+      {
+        "key": "supply_source",
+        "label": "Nguồn cung cấp",
+        "labelEn": "Supply Source"
+      },
+      {
+        "key": "pegging_ref",
+        "label": "Tham chiều gần kết",
+        "labelEn": "Pegging Reference"
+      },
+      {
+        "key": "net_requirement",
+        "label": "Như cầu rộng",
+        "labelEn": "Net Requirement"
+      },
+      {
+        "key": "gross_requirement",
+        "label": "Như cầu gộp",
+        "labelEn": "Gross Requirement"
+      },
+      {
+        "key": "projected_available",
+        "label": "Tồn kho dự kiện",
+        "labelEn": "Projected Available"
+      },
+      {
+        "key": "available_to_promise",
+        "label": "Khả năng cấm kết giao hàng",
+        "labelEn": "Available to Promise"
+      },
+      {
+        "key": "capable_to_promise",
+        "label": "Năng lực cấm kết giao hàng",
+        "labelEn": "Capable to Promise"
+      },
+      {
+        "key": "cumulative_lead_time",
+        "label": "Thời gián sản xuất tích lũy",
+        "labelEn": "Cumulative Lead Time"
+      },
+      {
+        "key": "manufacturing_lead_time",
+        "label": "Thời gian sản xuất",
+        "labelEn": "Manufacturing Lead Time"
+      },
+      {
+        "key": "purchasing_lead_time",
+        "label": "Thời gian mua hàng",
+        "labelEn": "Purchasing Lead Time"
+      },
+      {
+        "key": "inspection_lead_time",
+        "label": "Thời gián kiểm tra",
+        "labelEn": "Inspection Lead Time"
+      },
+      {
+        "key": "planning_fence_days",
+        "label": "Hàng ráo kế hoạch (ngay)",
+        "labelEn": "Planning Fence (Days)"
+      },
+      {
+        "key": "demand_fence_days",
+        "label": "Hàng ráo như cầu (ngay)",
+        "labelEn": "Demand Fence (Days)"
+      },
+      {
+        "key": "lot_size_rule",
+        "label": "Quy tác có lô",
+        "labelEn": "Lot Size Rule"
+      },
+      {
+        "key": "lot_size_min",
+        "label": "Cỡ lô tối thiểu",
+        "labelEn": "Lot Size Minimum"
+      },
+      {
+        "key": "lot_size_max",
+        "label": "Cỡ lô tối đa",
+        "labelEn": "Lot Size Maximum"
+      },
+      {
+        "key": "lot_size_multiple",
+        "label": "Bội số cỡ lô",
+        "labelEn": "Lot Size Multiple"
+      },
+      {
+        "key": "safety_stock_method",
+        "label": "Phương pháp tồn kho an toán",
+        "labelEn": "Safety Stock Method"
+      },
+      {
+        "key": "safety_lead_time_days",
+        "label": "Thời gián an toán (ngay)",
+        "labelEn": "Safety Lead Time (Days)"
+      },
+      {
+        "key": "time_bucket",
+        "label": "Khoảng thời gián",
+        "labelEn": "Time Bucket"
+      }
+    ],
+    "erp_job_order": [
+      {
+        "key": "job_number_erp",
+        "label": "So đơn hàng sản xuất (ERP)",
+        "labelEn": "Job Number (ERP)"
+      },
+      {
+        "key": "job_type_erp",
+        "label": "Loại đơn hàng sản xuất",
+        "labelEn": "Job Type"
+      },
+      {
+        "key": "job_status_erp",
+        "label": "Trạng thái đơn hàng sản xuất",
+        "labelEn": "Job Status"
+      },
+      {
+        "key": "item_id_job",
+        "label": "Mã hàng hóa (Don SX)",
+        "labelEn": "Item ID (Job)"
+      },
+      {
+        "key": "order_qty_job",
+        "label": "So lượng sản xuất",
+        "labelEn": "Order Quantity (Job)"
+      },
+      {
+        "key": "completed_qty",
+        "label": "So lượng hoàn thành",
+        "labelEn": "Completed Quantity"
+      },
+      {
+        "key": "scrapped_qty",
+        "label": "Số lượng phế phẩm",
+        "labelEn": "Scrapped Quantity"
+      },
+      {
+        "key": "rework_qty",
+        "label": "So lượng làm lại",
+        "labelEn": "Rework Quantity"
+      },
+      {
+        "key": "start_date_planned",
+        "label": "Ngày bắt đầu dự kiện",
+        "labelEn": "Planned Start Date"
+      },
+      {
+        "key": "end_date_planned",
+        "label": "Ngày kết thực dự kiện",
+        "labelEn": "Planned End Date"
+      },
+      {
+        "key": "start_date_actual",
+        "label": "Ngày bắt đầu thực tế",
+        "labelEn": "Actual Start Date"
+      },
+      {
+        "key": "end_date_actual",
+        "label": "Ngày kết thực thực tệ",
+        "labelEn": "Actual End Date"
+      },
+      {
+        "key": "released_date",
+        "label": "Ngày phát hành",
+        "labelEn": "Released Date"
+      },
+      {
+        "key": "closed_date_job",
+        "label": "Ngày đóng",
+        "labelEn": "Closed Date"
+      },
+      {
+        "key": "priority_job",
+        "label": "Độ ưu tiên",
+        "labelEn": "Priority"
+      },
+      {
+        "key": "customer_id_job",
+        "label": "Mã khách hàng (Don SX)",
+        "labelEn": "Customer ID (Job)"
+      },
+      {
+        "key": "sales_order_ref",
+        "label": "Tham chiều đơn hàng bản",
+        "labelEn": "Sales Order Reference"
+      },
+      {
+        "key": "so_line_ref",
+        "label": "Tham chiều đồng DH bản",
+        "labelEn": "SO Line Reference"
+      },
+      {
+        "key": "project_id_job",
+        "label": "Mã dự an (Don SX)",
+        "labelEn": "Project ID (Job)"
+      },
+      {
+        "key": "lot_number_assigned",
+        "label": "So lô được gần",
+        "labelEn": "Assigned Lot Number"
+      },
+      {
+        "key": "serial_number_range",
+        "label": "Phạm vị so serial",
+        "labelEn": "Serial Number Range"
+      },
+      {
+        "key": "bom_revision_used",
+        "label": "Phiên bản BOM sự dụng",
+        "labelEn": "BOM Revision Used"
+      },
+      {
+        "key": "routing_revision_used",
+        "label": "Phiên bản định tuyển sự dụng",
+        "labelEn": "Routing Revision Used"
+      },
+      {
+        "key": "planner_code_job",
+        "label": "Mã người lập kế hoạch (Don SX)",
+        "labelEn": "Planner Code (Job)"
+      },
+      {
+        "key": "production_manager",
+        "label": "Quản lý sản xuất",
+        "labelEn": "Production Manager"
+      },
+      {
+        "key": "current_operation",
+        "label": "Nguyên công hiện tại",
+        "labelEn": "Current Operation"
+      },
+      {
+        "key": "current_work_center_job",
+        "label": "Trung tâm giá công hiện tài",
+        "labelEn": "Current Work Center"
+      },
+      {
+        "key": "pct_complete",
+        "label": "Phần trăm hoàn thành",
+        "labelEn": "Percent Complete"
+      },
+      {
+        "key": "est_total_cost",
+        "label": "Tổng chi phí ước tính",
+        "labelEn": "Estimated Total Cost"
+      },
+      {
+        "key": "actual_total_cost",
+        "label": "Tổng chi phí thực tệ",
+        "labelEn": "Actual Total Cost"
+      },
+      {
+        "key": "variance_cost",
+        "label": "Chênh lệch chi phí",
+        "labelEn": "Cost Variance"
+      },
+      {
+        "key": "material_cost_est",
+        "label": "Chi phí vật liệu (ước tính)",
+        "labelEn": "Material Cost (Estimated)"
+      },
+      {
+        "key": "material_cost_actual",
+        "label": "Chi phí vật liệu (thực tế)",
+        "labelEn": "Material Cost (Actual)"
+      },
+      {
+        "key": "labor_cost_est",
+        "label": "Chi phí nhân công (ước tính)",
+        "labelEn": "Labor Cost (Estimated)"
+      },
+      {
+        "key": "labor_cost_actual_job",
+        "label": "Chi phí nhân công (thực tế)",
+        "labelEn": "Labor Cost (Actual)"
+      },
+      {
+        "key": "overhead_cost_est",
+        "label": "Chi phí chung (ước tính)",
+        "labelEn": "Overhead Cost (Estimated)"
+      },
+      {
+        "key": "overhead_cost_actual_job",
+        "label": "Chi phí chung (thực tế)",
+        "labelEn": "Overhead Cost (Actual)"
+      },
+      {
+        "key": "subcontract_cost_est",
+        "label": "Chi phí gia công ngoài (ước tính)",
+        "labelEn": "Subcontract Cost (Estimated)"
+      },
+      {
+        "key": "subcontract_cost_actual",
+        "label": "Chi phí gia công ngoài (thực tế)",
+        "labelEn": "Subcontract Cost (Actual)"
+      },
+      {
+        "key": "burden_cost_est",
+        "label": "Chi phí phân bổ (ước tính)",
+        "labelEn": "Burden Cost (Estimated)"
+      },
+      {
+        "key": "burden_cost_actual",
+        "label": "Chi phí phân bổ (thực tế)",
+        "labelEn": "Burden Cost (Actual)"
+      }
+    ],
+    "erp_labor_tracking": [
+      {
+        "key": "labor_transaction_id",
+        "label": "Mã giao dịch nhận công",
+        "labelEn": "Labor Transaction ID"
+      },
+      {
+        "key": "employee_id_lbr",
+        "label": "Mã nhân viên",
+        "labelEn": "Employee ID"
+      },
+      {
+        "key": "job_number_lbr",
+        "label": "So đơn hàng sản xuất",
+        "labelEn": "Job Number"
+      },
+      {
+        "key": "operation_seq_lbr",
+        "label": "Thu tự nguyên công",
+        "labelEn": "Operation Sequence"
+      },
+      {
+        "key": "work_center_id_lbr",
+        "label": "Mã trung tâm giá công",
+        "labelEn": "Work Center ID"
+      },
+      {
+        "key": "labor_type",
+        "label": "Loại nhận công",
+        "labelEn": "Labor Type"
+      },
+      {
+        "key": "clock_in",
+        "label": "Giờ vào",
+        "labelEn": "Clock In"
+      },
+      {
+        "key": "clock_out",
+        "label": "Giờ ra",
+        "labelEn": "Clock Out"
+      },
+      {
+        "key": "labor_hours",
+        "label": "So giờ lao đồng",
+        "labelEn": "Labor Hours"
+      },
+      {
+        "key": "labor_qty_reported",
+        "label": "So lượng bảo cao",
+        "labelEn": "Quantity Reported"
+      },
+      {
+        "key": "qty_good_lbr",
+        "label": "Số lượng đạt",
+        "labelEn": "Qty Good"
+      },
+      {
+        "key": "qty_scrap_lbr",
+        "label": "Số lượng phế phẩm",
+        "labelEn": "Qty Scrap"
+      },
+      {
+        "key": "qty_rework_lbr",
+        "label": "So lượng làm lại",
+        "labelEn": "Qty Rework"
+      },
+      {
+        "key": "labor_rate_lbr",
+        "label": "Đơn giá nhận công",
+        "labelEn": "Labor Rate"
+      },
+      {
+        "key": "labor_cost_lbr",
+        "label": "Chi phí nhân công",
+        "labelEn": "Labor Cost"
+      },
+      {
+        "key": "indirect_code",
+        "label": "Mã gián tiếp",
+        "labelEn": "Indirect Code"
+      },
+      {
+        "key": "shift_code_lbr",
+        "label": "Mã ca",
+        "labelEn": "Shift Code"
+      },
+      {
+        "key": "pay_type",
+        "label": "Loại lượng",
+        "labelEn": "Pay Type"
+      },
+      {
+        "key": "approved_by_lbr",
+        "label": "Người phê duyệt",
+        "labelEn": "Approved By"
+      },
+      {
+        "key": "approval_status_lbr",
+        "label": "Trạng thái phê duyệt",
+        "labelEn": "Approval Status"
+      },
+      {
+        "key": "payroll_exported",
+        "label": "Đã xuất bảng lương",
+        "labelEn": "Payroll Exported"
+      }
+    ],
+    "erp_costing": [
+      {
+        "key": "cost_element",
+        "label": "Yêu tổ chi phí",
+        "labelEn": "Cost Element"
+      },
+      {
+        "key": "cost_type_erp",
+        "label": "Loại chi phí",
+        "labelEn": "Cost Type"
+      },
+      {
+        "key": "cost_method",
+        "label": "Phương pháp tính chi phí",
+        "labelEn": "Cost Method"
+      },
+      {
+        "key": "cost_group",
+        "label": "Nhóm chi phí",
+        "labelEn": "Cost Group"
+      },
+      {
+        "key": "item_id_cost",
+        "label": "Mã hàng hóa",
+        "labelEn": "Item ID"
+      },
+      {
+        "key": "std_material_cost",
+        "label": "Chi phí vật liệu tiêu chuẩn",
+        "labelEn": "Std Material Cost"
+      },
+      {
+        "key": "std_labor_cost",
+        "label": "Chi phí nhân công tiêu chuẩn",
+        "labelEn": "Std Labor Cost"
+      },
+      {
+        "key": "std_overhead_cost",
+        "label": "Chi phí chung tiêu chuẩn",
+        "labelEn": "Std Overhead Cost"
+      },
+      {
+        "key": "std_subcontract_cost",
+        "label": "Chi phí gia công ngoài tiêu chuẩn",
+        "labelEn": "Std Subcontract Cost"
+      },
+      {
+        "key": "std_burden_cost",
+        "label": "Chi phí phân bổ tiêu chuẩn",
+        "labelEn": "Std Burden Cost"
+      },
+      {
+        "key": "std_total_cost",
+        "label": "Tổng chi phí tiêu chuẩn",
+        "labelEn": "Std Total Cost"
+      },
+      {
+        "key": "actual_material_cost_c",
+        "label": "Chi phí vật liệu thực tế",
+        "labelEn": "Actual Material Cost"
+      },
+      {
+        "key": "actual_labor_cost_c",
+        "label": "Chi phí nhân công thực tế",
+        "labelEn": "Actual Labor Cost"
+      },
+      {
+        "key": "actual_overhead_cost_c",
+        "label": "Chi phí chung thực tế",
+        "labelEn": "Actual Overhead Cost"
+      },
+      {
+        "key": "actual_subcontract_cost_c",
+        "label": "Chi phí gia công ngoài thực tế",
+        "labelEn": "Actual Subcontract Cost"
+      },
+      {
+        "key": "actual_total_cost_c",
+        "label": "Tổng chi phí thực tệ",
+        "labelEn": "Actual Total Cost"
+      },
+      {
+        "key": "variance_material",
+        "label": "Chênh lệch vật liệu",
+        "labelEn": "Material Variance"
+      },
+      {
+        "key": "variance_labor",
+        "label": "Chênh lệch nhân công",
+        "labelEn": "Labor Variance"
+      },
+      {
+        "key": "variance_overhead",
+        "label": "Chênh lệch chi phí chung",
+        "labelEn": "Overhead Variance"
+      },
+      {
+        "key": "variance_total",
+        "label": "Tổng chênh lệch",
+        "labelEn": "Total Variance"
+      },
+      {
+        "key": "variance_type",
+        "label": "Loại chênh lệch",
+        "labelEn": "Variance Type"
+      },
+      {
+        "key": "overhead_rate_labor_pct",
+        "label": "Tỉ lệ chi phí chung - Nhận công (%)",
+        "labelEn": "Overhead Rate - Labor (%)"
+      },
+      {
+        "key": "overhead_rate_machine_pct",
+        "label": "Tỉ lệ chi phí chung - Máy (%)",
+        "labelEn": "Overhead Rate - Machine (%)"
+      },
+      {
+        "key": "burden_rate",
+        "label": "Tỉ lệ phần bỏ",
+        "labelEn": "Burden Rate"
+      },
+      {
+        "key": "scrap_allowance_pct",
+        "label": "Phụ cấp phê phạm (%)",
+        "labelEn": "Scrap Allowance (%)"
+      },
+      {
+        "key": "yield_adjustment",
+        "label": "Điều chỉnh hiệu suất",
+        "labelEn": "Yield Adjustment"
+      },
+      {
+        "key": "cost_roll_date",
+        "label": "Ngày cấp nhật chi phí",
+        "labelEn": "Cost Roll Date"
+      },
+      {
+        "key": "frozen_cost_date",
+        "label": "Ngày đồng bảng chi phí",
+        "labelEn": "Frozen Cost Date"
+      },
+      {
+        "key": "gl_account_cost",
+        "label": "Tài khoản so cải",
+        "labelEn": "GL Account"
+      },
+      {
+        "key": "cost_center_cost",
+        "label": "Trung tâm chi phí",
+        "labelEn": "Cost Center"
+      },
+      {
+        "key": "profit_center_cost",
+        "label": "Trung tâm lỗi nhuận",
+        "labelEn": "Profit Center"
+      },
+      {
+        "key": "cost_revision",
+        "label": "Phiên bản chi phí",
+        "labelEn": "Cost Revision"
+      }
+    ],
+    "erp_gl_finance": [
+      {
+        "key": "gl_account_number",
+        "label": "So tài khoản so cải",
+        "labelEn": "GL Account Number"
+      },
+      {
+        "key": "gl_account_name",
+        "label": "Tên tài khoản so cải",
+        "labelEn": "GL Account Name"
+      },
+      {
+        "key": "gl_account_type",
+        "label": "Loại tài khoản so cải",
+        "labelEn": "GL Account Type"
+      },
+      {
+        "key": "journal_entry_id",
+        "label": "Mã bút toán",
+        "labelEn": "Journal Entry ID"
+      },
+      {
+        "key": "posting_date",
+        "label": "Ngày ghi so",
+        "labelEn": "Posting Date"
+      },
+      {
+        "key": "fiscal_year_gl",
+        "label": "Năm tài chính",
+        "labelEn": "Fiscal Year"
+      },
+      {
+        "key": "fiscal_period",
+        "label": "Kỹ tài chính",
+        "labelEn": "Fiscal Period"
+      },
+      {
+        "key": "debit_amount",
+        "label": "So tiến nợ",
+        "labelEn": "Debit Amount"
+      },
+      {
+        "key": "credit_amount",
+        "label": "So tiến có",
+        "labelEn": "Credit Amount"
+      },
+      {
+        "key": "currency_code_gl",
+        "label": "Mã tiến tệ",
+        "labelEn": "Currency Code"
+      },
+      {
+        "key": "cost_center_gl",
+        "label": "Trung tâm chi phí",
+        "labelEn": "Cost Center"
+      },
+      {
+        "key": "profit_center_gl",
+        "label": "Trung tâm lỗi nhuận",
+        "labelEn": "Profit Center"
+      },
+      {
+        "key": "project_id_gl",
+        "label": "Mã dự án",
+        "labelEn": "Project ID"
+      },
+      {
+        "key": "job_number_gl",
+        "label": "So đơn hàng",
+        "labelEn": "Job Number"
+      },
+      {
+        "key": "department_id_gl",
+        "label": "Mã phòng bản",
+        "labelEn": "Department ID"
+      },
+      {
+        "key": "transaction_type_gl",
+        "label": "Loại giao dịch",
+        "labelEn": "Transaction Type"
+      },
+      {
+        "key": "reference_number_gl",
+        "label": "So tham chiều",
+        "labelEn": "Reference Number"
+      },
+      {
+        "key": "batch_number_gl",
+        "label": "So lô ghi so",
+        "labelEn": "Batch Number"
+      },
+      {
+        "key": "posted_by",
+        "label": "Người ghi so",
+        "labelEn": "Posted By"
+      },
+      {
+        "key": "approved_by_gl",
+        "label": "Người phê duyệt",
+        "labelEn": "Approved By"
+      },
+      {
+        "key": "intercompany_flag",
+        "label": "Có liên công ty",
+        "labelEn": "Intercompany Flag"
+      },
+      {
+        "key": "consolidation_code",
+        "label": "Mã hợp nhật",
+        "labelEn": "Consolidation Code"
+      },
+      {
+        "key": "budget_code",
+        "label": "Mã ngân sạch",
+        "labelEn": "Budget Code"
+      },
+      {
+        "key": "budget_amount",
+        "label": "So tiến ngân sạch",
+        "labelEn": "Budget Amount"
+      },
+      {
+        "key": "actual_amount_gl",
+        "label": "So tiến thực tệ",
+        "labelEn": "Actual Amount"
+      },
+      {
+        "key": "variance_amount_gl",
+        "label": "So tiến chênh lệch",
+        "labelEn": "Variance Amount"
+      },
+      {
+        "key": "encumbrance_amount",
+        "label": "So tiến cấm kết",
+        "labelEn": "Encumbrance Amount"
+      }
+    ],
+    "erp_ap_ar": [
+      {
+        "key": "invoice_number_erp",
+        "label": "Số hóa đơn",
+        "labelEn": "Invoice Number"
+      },
+      {
+        "key": "invoice_date_erp",
+        "label": "Ngày hóa đơn",
+        "labelEn": "Invoice Date"
+      },
+      {
+        "key": "invoice_type",
+        "label": "Loại hóa đơn",
+        "labelEn": "Invoice Type"
+      },
+      {
+        "key": "vendor_id_or_customer_id",
+        "label": "Mã NCC/Khach hàng",
+        "labelEn": "Vendor/Customer ID"
+      },
+      {
+        "key": "po_reference_apar",
+        "label": "Tham chiều PO",
+        "labelEn": "PO Reference"
+      },
+      {
+        "key": "so_reference_apar",
+        "label": "Tham chiều DH bản",
+        "labelEn": "SO Reference"
+      },
+      {
+        "key": "line_amount",
+        "label": "So tiến đồng",
+        "labelEn": "Line Amount"
+      },
+      {
+        "key": "tax_amount_apar",
+        "label": "Tiến thuế",
+        "labelEn": "Tax Amount"
+      },
+      {
+        "key": "total_amount",
+        "label": "Tổng tiến",
+        "labelEn": "Total Amount"
+      },
+      {
+        "key": "currency_code_apar",
+        "label": "Mã tiến tệ",
+        "labelEn": "Currency Code"
+      },
+      {
+        "key": "payment_terms_apar",
+        "label": "Điều kiện thanh toán",
+        "labelEn": "Payment Terms"
+      },
+      {
+        "key": "due_date_apar",
+        "label": "Ngày đến hạn",
+        "labelEn": "Due Date"
+      },
+      {
+        "key": "discount_date",
+        "label": "Ngày chiết khấu",
+        "labelEn": "Discount Date"
+      },
+      {
+        "key": "discount_amount",
+        "label": "So tiến chiết khấu",
+        "labelEn": "Discount Amount"
+      },
+      {
+        "key": "payment_status",
+        "label": "Trạng thái thanh toán",
+        "labelEn": "Payment Status"
+      },
+      {
+        "key": "payment_date",
+        "label": "Ngày thanh toán",
+        "labelEn": "Payment Date"
+      },
+      {
+        "key": "payment_method",
+        "label": "Phương thực thành toán",
+        "labelEn": "Payment Method"
+      },
+      {
+        "key": "payment_reference",
+        "label": "Tham chiều thành toán",
+        "labelEn": "Payment Reference"
+      },
+      {
+        "key": "aging_bucket",
+        "label": "Kỹ hạn công nợ",
+        "labelEn": "Aging Bucket"
+      },
+      {
+        "key": "three_way_match_status",
+        "label": "Trạng thái đổi chiều 3 chiều",
+        "labelEn": "3-Way Match Status"
+      }
+    ],
+    "erp_maintenance_cmms": [
+      {
+        "key": "work_order_id_maint",
+        "label": "Mã lệnh công việc",
+        "labelEn": "Work Order ID"
+      },
+      {
+        "key": "wo_type",
+        "label": "Loại lệnh công việc",
+        "labelEn": "WO Type"
+      },
+      {
+        "key": "wo_status",
+        "label": "Trạng thái lệnh công việc",
+        "labelEn": "WO Status"
+      },
+      {
+        "key": "equipment_id_maint",
+        "label": "Mã thiết bị",
+        "labelEn": "Equipment ID"
+      },
+      {
+        "key": "equipment_name_maint",
+        "label": "Tên thiết bị",
+        "labelEn": "Equipment Name"
+      },
+      {
+        "key": "equipment_type_maint",
+        "label": "Loại thiết bị",
+        "labelEn": "Equipment Type"
+      },
+      {
+        "key": "equipment_serial",
+        "label": "So serial thiết bị",
+        "labelEn": "Equipment Serial"
+      },
+      {
+        "key": "equipment_location",
+        "label": "Vị trị thiết bị",
+        "labelEn": "Equipment Location"
+      },
+      {
+        "key": "manufacturer_maint",
+        "label": "Nhà sản xuất",
+        "labelEn": "Manufacturer"
+      },
+      {
+        "key": "model_number_maint",
+        "label": "Số model",
+        "labelEn": "Model Number"
+      },
+      {
+        "key": "installation_date",
+        "label": "Ngày lập đạt",
+        "labelEn": "Installation Date"
+      },
+      {
+        "key": "warranty_expiry",
+        "label": "Hết hạn bảo hành",
+        "labelEn": "Warranty Expiry"
+      },
+      {
+        "key": "criticality_rating",
+        "label": "Xếp hàng quản trọng",
+        "labelEn": "Criticality Rating"
+      },
+      {
+        "key": "failure_code",
+        "label": "Mã hư hỏng",
+        "labelEn": "Failure Code"
+      },
+      {
+        "key": "failure_mode",
+        "label": "Kiểu hư hỏng",
+        "labelEn": "Failure Mode"
+      },
+      {
+        "key": "cause_code",
+        "label": "Mã nguyên nhận",
+        "labelEn": "Cause Code"
+      },
+      {
+        "key": "remedy_code",
+        "label": "Mã khắc phục",
+        "labelEn": "Remedy Code"
+      },
+      {
+        "key": "priority_maint",
+        "label": "Độ ưu tiên",
+        "labelEn": "Priority"
+      },
+      {
+        "key": "requested_by_maint",
+        "label": "Người yêu cầu",
+        "labelEn": "Requested By"
+      },
+      {
+        "key": "assigned_to_maint",
+        "label": "Người được phần công",
+        "labelEn": "Assigned To"
+      },
+      {
+        "key": "scheduled_start_maint",
+        "label": "Bắt đầu dự kiến",
+        "labelEn": "Scheduled Start"
+      },
+      {
+        "key": "scheduled_end_maint",
+        "label": "Kết thực dự kiện",
+        "labelEn": "Scheduled End"
+      },
+      {
+        "key": "actual_start_maint",
+        "label": "Bắt đầu thực tế",
+        "labelEn": "Actual Start"
+      },
+      {
+        "key": "actual_end_maint",
+        "label": "Kết thực thực tệ",
+        "labelEn": "Actual End"
+      },
+      {
+        "key": "downtime_hours_maint",
+        "label": "So giờ dụng máy",
+        "labelEn": "Downtime Hours"
+      },
+      {
+        "key": "labor_hours_maint",
+        "label": "So giờ nhận công (bao tri)",
+        "labelEn": "Labor Hours (Maintenance)"
+      },
+      {
+        "key": "parts_cost_maint",
+        "label": "Chi phí phụ tùng",
+        "labelEn": "Parts Cost"
+      },
+      {
+        "key": "labor_cost_maint",
+        "label": "Chi phí nhân công (bảo trì)",
+        "labelEn": "Labor Cost (Maintenance)"
+      },
+      {
+        "key": "total_maint_cost",
+        "label": "Tổng chi phí bảo trị",
+        "labelEn": "Total Maintenance Cost"
+      },
+      {
+        "key": "mtbf_hours",
+        "label": "MTBF (Giờ)",
+        "labelEn": "MTBF (Hours)"
+      },
+      {
+        "key": "mttr_hours",
+        "label": "MTTR (Giờ)",
+        "labelEn": "MTTR (Hours)"
+      },
+      {
+        "key": "pm_frequency",
+        "label": "Tần suất bảo trị định kỹ",
+        "labelEn": "PM Frequency"
+      },
+      {
+        "key": "pm_last_date",
+        "label": "Ngày PM lần cuối",
+        "labelEn": "PM Last Date"
+      },
+      {
+        "key": "pm_next_date",
+        "label": "Ngày PM tiếp theo",
+        "labelEn": "PM Next Date"
+      },
+      {
+        "key": "pm_checklist_id",
+        "label": "Mã đánh sạch kiểm tra PM",
+        "labelEn": "PM Checklist ID"
+      },
+      {
+        "key": "condition_monitoring_type",
+        "label": "Loại giám sát tính trạng",
+        "labelEn": "Condition Monitoring Type"
+      },
+      {
+        "key": "vibration_level",
+        "label": "Mức rung đồng",
+        "labelEn": "Vibration Level"
+      },
+      {
+        "key": "temperature_reading",
+        "label": "Đọc nhiệt độ",
+        "labelEn": "Temperature Reading"
+      },
+      {
+        "key": "oil_analysis_result",
+        "label": "Kết quả phần tích đầu",
+        "labelEn": "Oil Analysis Result"
+      },
+      {
+        "key": "spare_part_id",
+        "label": "Mã phụ từng",
+        "labelEn": "Spare Part ID"
+      },
+      {
+        "key": "spare_part_qty",
+        "label": "So lượng phụ từng",
+        "labelEn": "Spare Part Quantity"
+      }
+    ],
+    "erp_tool_management": [
+      {
+        "key": "tool_id_erp",
+        "label": "Mã dụng cụ",
+        "labelEn": "Tool ID"
+      },
+      {
+        "key": "tool_description_erp",
+        "label": "Mô tả dụng cũ",
+        "labelEn": "Tool Description"
+      },
+      {
+        "key": "tool_type_erp",
+        "label": "Loại dụng cụ",
+        "labelEn": "Tool Type"
+      },
+      {
+        "key": "tool_material_erp",
+        "label": "Vật liệu dụng cũ",
+        "labelEn": "Tool Material"
+      },
+      {
+        "key": "tool_diameter",
+        "label": "Đường kính dụng cụ",
+        "labelEn": "Tool Diameter"
+      },
+      {
+        "key": "tool_length",
+        "label": "Chiều dài dụng cụ",
+        "labelEn": "Tool Length"
+      },
+      {
+        "key": "tool_flutes",
+        "label": "So mẹ cắt",
+        "labelEn": "Number of Flutes"
+      },
+      {
+        "key": "tool_coating",
+        "label": "Lớp phủ dụng cụ",
+        "labelEn": "Tool Coating"
+      },
+      {
+        "key": "tool_holder_id",
+        "label": "Mã để kẹp dụng cũ",
+        "labelEn": "Tool Holder ID"
+      },
+      {
+        "key": "tool_holder_type",
+        "label": "Loại để kẹp",
+        "labelEn": "Tool Holder Type"
+      },
+      {
+        "key": "tool_life_minutes",
+        "label": "Tuổi thọ dụng cũ (phut)",
+        "labelEn": "Tool Life (Minutes)"
+      },
+      {
+        "key": "tool_life_remaining_pct",
+        "label": "Tuổi thọ dụng cũ còn lại (%)",
+        "labelEn": "Tool Life Remaining (%)"
+      },
+      {
+        "key": "tool_life_parts_count",
+        "label": "So sản phạm dụng cũ đã cắt",
+        "labelEn": "Tool Life Parts Count"
+      },
+      {
+        "key": "tool_life_total_parts",
+        "label": "Tổng so sản phạm dụng cũ",
+        "labelEn": "Tool Life Total Parts"
+      },
+      {
+        "key": "tool_preset_length",
+        "label": "Chiều dài cài đặt trước",
+        "labelEn": "Tool Preset Length"
+      },
+      {
+        "key": "tool_preset_diameter",
+        "label": "Đường kinh cải đạt trước",
+        "labelEn": "Tool Preset Diameter"
+      },
+      {
+        "key": "tool_offset_length",
+        "label": "Bù trừ chiều dài",
+        "labelEn": "Tool Offset - Length"
+      },
+      {
+        "key": "tool_offset_diameter",
+        "label": "Bù trừ đường kính",
+        "labelEn": "Tool Offset - Diameter"
+      },
+      {
+        "key": "tool_wear_offset",
+        "label": "Bù trừ mòi mòn",
+        "labelEn": "Tool Wear Offset"
+      },
+      {
+        "key": "tool_breakage_detected",
+        "label": "Phát hiện gây dụng cũ",
+        "labelEn": "Tool Breakage Detected"
+      },
+      {
+        "key": "tool_location",
+        "label": "Vị trị dụng cũ",
+        "labelEn": "Tool Location"
+      },
+      {
+        "key": "tool_crib_location",
+        "label": "Vị trị kho dụng cũ",
+        "labelEn": "Tool Crib Location"
+      },
+      {
+        "key": "tool_cost_erp",
+        "label": "Chi phí dụng cụ",
+        "labelEn": "Tool Cost"
+      },
+      {
+        "key": "tool_vendor_id",
+        "label": "Mã NCC dụng cũ",
+        "labelEn": "Tool Vendor ID"
+      },
+      {
+        "key": "tool_reorder_point",
+        "label": "Điểm đặt lại dụng cụ",
+        "labelEn": "Tool Reorder Point"
+      },
+      {
+        "key": "tool_reorder_qty",
+        "label": "So lượng đạt lại dụng cũ",
+        "labelEn": "Tool Reorder Qty"
+      },
+      {
+        "key": "tool_on_hand_qty",
+        "label": "So lượng dụng cũ tồn kho",
+        "labelEn": "Tool On-Hand Qty"
+      },
+      {
+        "key": "regrind_count",
+        "label": "So lần mài lại",
+        "labelEn": "Regrind Count"
+      },
+      {
+        "key": "max_regrind_count",
+        "label": "So lần mài lại tối đã",
+        "labelEn": "Max Regrind Count"
+      },
+      {
+        "key": "regrind_vendor_id",
+        "label": "Mã NCC mài lại",
+        "labelEn": "Regrind Vendor ID"
+      },
+      {
+        "key": "regrind_cost",
+        "label": "Chi phí mài lại",
+        "labelEn": "Regrind Cost"
+      },
+      {
+        "key": "associated_operations_tool",
+        "label": "Nguyên công liên quản",
+        "labelEn": "Associated Operations"
+      },
+      {
+        "key": "associated_machines_tool",
+        "label": "Máy liên quản",
+        "labelEn": "Associated Machines"
+      },
+      {
+        "key": "tool_group_id",
+        "label": "Mã nhóm dụng cũ",
+        "labelEn": "Tool Group ID"
+      },
+      {
+        "key": "catalog_number",
+        "label": "Số catalog",
+        "labelEn": "Catalog Number"
+      }
+    ],
+    "erp_scheduling": [
+      {
+        "key": "schedule_id",
+        "label": "Mã lịch trình",
+        "labelEn": "Schedule ID"
+      },
+      {
+        "key": "schedule_type",
+        "label": "Loại lập lịch",
+        "labelEn": "Schedule Type"
+      },
+      {
+        "key": "schedule_status_sch",
+        "label": "Trạng thái lịch trình",
+        "labelEn": "Schedule Status"
+      },
+      {
+        "key": "job_number_sch",
+        "label": "So đơn hàng",
+        "labelEn": "Job Number"
+      },
+      {
+        "key": "operation_seq_sch",
+        "label": "Thu tự nguyên công",
+        "labelEn": "Operation Sequence"
+      },
+      {
+        "key": "work_center_id_sch",
+        "label": "Mã trung tâm giá công",
+        "labelEn": "Work Center ID"
+      },
+      {
+        "key": "machine_id_sch",
+        "label": "Mã máy",
+        "labelEn": "Machine ID"
+      },
+      {
+        "key": "scheduled_start_sch",
+        "label": "Bắt đầu dự kiến",
+        "labelEn": "Scheduled Start"
+      },
+      {
+        "key": "scheduled_end_sch",
+        "label": "Kết thực dự kiện",
+        "labelEn": "Scheduled End"
+      },
+      {
+        "key": "setup_start_sch",
+        "label": "Bắt đầu setup",
+        "labelEn": "Setup Start"
+      },
+      {
+        "key": "setup_end_sch",
+        "label": "Kết thực setup",
+        "labelEn": "Setup End"
+      },
+      {
+        "key": "run_start",
+        "label": "Bắt đầu chạy",
+        "labelEn": "Run Start"
+      },
+      {
+        "key": "run_end",
+        "label": "Kết thực chạy",
+        "labelEn": "Run End"
+      },
+      {
+        "key": "sequence_number_sch",
+        "label": "Số thứ tự",
+        "labelEn": "Sequence Number"
+      },
+      {
+        "key": "priority_rank",
+        "label": "Thu hàng ưu tiến",
+        "labelEn": "Priority Rank"
+      },
+      {
+        "key": "schedule_qty",
+        "label": "So lượng lịch trình",
+        "labelEn": "Schedule Quantity"
+      },
+      {
+        "key": "remaining_qty_sch",
+        "label": "Số lượng còn lại",
+        "labelEn": "Remaining Quantity"
+      },
+      {
+        "key": "schedule_hours",
+        "label": "So giờ lịch trình",
+        "labelEn": "Schedule Hours"
+      },
+      {
+        "key": "capacity_available_sch",
+        "label": "Công suất khả dụng",
+        "labelEn": "Capacity Available"
+      },
+      {
+        "key": "capacity_load_pct",
+        "label": "Tài trọng công suất (%)",
+        "labelEn": "Capacity Load (%)"
+      },
+      {
+        "key": "overtime_available",
+        "label": "Tăng ca khả dụng",
+        "labelEn": "Overtime Available"
+      },
+      {
+        "key": "shift_code_sch",
+        "label": "Mã ca",
+        "labelEn": "Shift Code"
+      },
+      {
+        "key": "constraint_type",
+        "label": "Loại răng bước",
+        "labelEn": "Constraint Type"
+      },
+      {
+        "key": "reschedule_recommendation",
+        "label": "Đề xuất lập lịch lại",
+        "labelEn": "Reschedule Recommendation"
+      },
+      {
+        "key": "reschedule_date",
+        "label": "Ngày lập lịch lại",
+        "labelEn": "Reschedule Date"
+      },
+      {
+        "key": "scheduling_direction",
+        "label": "Hướng lập lịch",
+        "labelEn": "Scheduling Direction"
+      }
+    ],
+    "erp_shipping_logistics": [
+      {
+        "key": "shipment_id_erp",
+        "label": "Mã lô hàng",
+        "labelEn": "Shipment ID"
+      },
+      {
+        "key": "shipment_status_erp",
+        "label": "Trạng thái lô hàng",
+        "labelEn": "Shipment Status"
+      },
+      {
+        "key": "ship_date",
+        "label": "Ngày xuất hàng",
+        "labelEn": "Ship Date"
+      },
+      {
+        "key": "delivery_date_est",
+        "label": "Ngày giao hàng dự kiện",
+        "labelEn": "Estimated Delivery Date"
+      },
+      {
+        "key": "delivery_date_actual",
+        "label": "Ngày giao hàng thực tệ",
+        "labelEn": "Actual Delivery Date"
+      },
+      {
+        "key": "carrier_id",
+        "label": "Mã hàng vận chuyển",
+        "labelEn": "Carrier ID"
+      },
+      {
+        "key": "carrier_name_erp",
+        "label": "Tên hàng vận chuyển",
+        "labelEn": "Carrier Name"
+      },
+      {
+        "key": "carrier_service",
+        "label": "Dịch vụ vận chuyển",
+        "labelEn": "Carrier Service"
+      },
+      {
+        "key": "tracking_number_erp",
+        "label": "So theo đổi",
+        "labelEn": "Tracking Number"
+      },
+      {
+        "key": "waybill_number",
+        "label": "So vận đơn",
+        "labelEn": "Waybill Number"
+      },
+      {
+        "key": "freight_charge",
+        "label": "Phí vận chuyển",
+        "labelEn": "Freight Charge"
+      },
+      {
+        "key": "freight_terms_erp",
+        "label": "Điều khoản vận chuyển",
+        "labelEn": "Freight Terms"
+      },
+      {
+        "key": "incoterms_ship",
+        "label": "Điều kiện giao hàng",
+        "labelEn": "Incoterms"
+      },
+      {
+        "key": "ship_from_warehouse",
+        "label": "Kho xuất hàng",
+        "labelEn": "Ship From Warehouse"
+      },
+      {
+        "key": "ship_to_address_erp",
+        "label": "Địa chỉ giao hàng",
+        "labelEn": "Ship-To Address"
+      },
+      {
+        "key": "packing_list_number_erp",
+        "label": "So phiếu đồng gọi",
+        "labelEn": "Packing List Number"
+      },
+      {
+        "key": "num_packages",
+        "label": "Số kiện hàng",
+        "labelEn": "Number of Packages"
+      },
+      {
+        "key": "total_weight_ship",
+        "label": "Tổng khối lượng",
+        "labelEn": "Total Weight"
+      },
+      {
+        "key": "total_volume_ship",
+        "label": "Tổng thể tích",
+        "labelEn": "Total Volume"
+      },
+      {
+        "key": "hazmat_flag",
+        "label": "Có hàng nguy hiểm",
+        "labelEn": "Hazmat Flag"
+      },
+      {
+        "key": "customs_declaration_number",
+        "label": "So tổ khai hai quản",
+        "labelEn": "Customs Declaration Number"
+      },
+      {
+        "key": "export_license_number",
+        "label": "So giây phép xuất khấu",
+        "labelEn": "Export License Number"
+      },
+      {
+        "key": "itar_license",
+        "label": "Giây phép ITAR",
+        "labelEn": "ITAR License"
+      },
+      {
+        "key": "country_of_destination",
+        "label": "Nước dịch",
+        "labelEn": "Country of Destination"
+      },
+      {
+        "key": "commercial_invoice_number",
+        "label": "So hóa đơn thương mài",
+        "labelEn": "Commercial Invoice Number"
+      },
+      {
+        "key": "certificate_of_origin_ship",
+        "label": "Giây chung nhận xuất xử",
+        "labelEn": "Certificate of Origin"
+      }
+    ],
+    "erp_project_management": [
+      {
+        "key": "project_id_pm",
+        "label": "Mã dự án",
+        "labelEn": "Project ID"
+      },
+      {
+        "key": "project_name_pm",
+        "label": "Tên dự án",
+        "labelEn": "Project Name"
+      },
+      {
+        "key": "project_name_vi",
+        "label": "Tên dự an (tieng Viet)",
+        "labelEn": "Project Name (Vietnamese)"
+      },
+      {
+        "key": "project_type_pm",
+        "label": "Loại dự an",
+        "labelEn": "Project Type"
+      },
+      {
+        "key": "project_status_pm",
+        "label": "Trạng thái dự án",
+        "labelEn": "Project Status"
+      },
+      {
+        "key": "project_manager",
+        "label": "Quản lý dự an",
+        "labelEn": "Project Manager"
+      },
+      {
+        "key": "start_date_planned_pm",
+        "label": "Ngày bắt đầu dự kiện",
+        "labelEn": "Planned Start Date"
+      },
+      {
+        "key": "end_date_planned_pm",
+        "label": "Ngày kết thực dự kiện",
+        "labelEn": "Planned End Date"
+      },
+      {
+        "key": "wbs_code",
+        "label": "Mã WBS",
+        "labelEn": "WBS Code"
+      },
+      {
+        "key": "budget_total",
+        "label": "Tổng ngân sạch",
+        "labelEn": "Budget Total"
+      },
+      {
+        "key": "actual_total_pm",
+        "label": "Tổng thực tệ",
+        "labelEn": "Actual Total"
+      },
+      {
+        "key": "pct_complete_pm",
+        "label": "Phần trăm hoàn thành",
+        "labelEn": "Percent Complete"
+      },
+      {
+        "key": "earned_value",
+        "label": "Giá trị đạt được",
+        "labelEn": "Earned Value"
+      },
+      {
+        "key": "spi_index",
+        "label": "Chỉ số SPI",
+        "labelEn": "SPI Index"
+      },
+      {
+        "key": "cpi_index",
+        "label": "Chỉ số CPI",
+        "labelEn": "CPI Index"
+      }
+    ],
+    "erp_warranty_rma": [
+      {
+        "key": "rma_number",
+        "label": "Số RMA",
+        "labelEn": "RMA Number"
+      },
+      {
+        "key": "rma_status",
+        "label": "Trạng thái RMA",
+        "labelEn": "RMA Status"
+      },
+      {
+        "key": "rma_type",
+        "label": "Loại RMA",
+        "labelEn": "RMA Type"
+      },
+      {
+        "key": "customer_id_rma",
+        "label": "Mã khách hàng",
+        "labelEn": "Customer ID"
+      },
+      {
+        "key": "original_so_number",
+        "label": "So DH bản bản đầu",
+        "labelEn": "Original SO Number"
+      },
+      {
+        "key": "return_date",
+        "label": "Ngày tra hàng",
+        "labelEn": "Return Date"
+      },
+      {
+        "key": "item_id_rma",
+        "label": "Mã hàng hóa",
+        "labelEn": "Item ID"
+      },
+      {
+        "key": "serial_number_rma",
+        "label": "Số serial",
+        "labelEn": "Serial Number"
+      },
+      {
+        "key": "qty_returned",
+        "label": "So lượng tra",
+        "labelEn": "Qty Returned"
+      },
+      {
+        "key": "failure_description_rma",
+        "label": "Mô tả hư hỏng",
+        "labelEn": "Failure Description"
+      },
+      {
+        "key": "disposition_rma",
+        "label": "Xử lý",
+        "labelEn": "Disposition"
+      },
+      {
+        "key": "warranty_start_date",
+        "label": "Ngày bắt đầu bảo hành",
+        "labelEn": "Warranty Start Date"
+      },
+      {
+        "key": "warranty_end_date",
+        "label": "Ngày hết bảo hành",
+        "labelEn": "Warranty End Date"
+      },
+      {
+        "key": "repair_cost",
+        "label": "Chi phí sửa chữa",
+        "labelEn": "Repair Cost"
+      },
+      {
+        "key": "credit_amount_rma",
+        "label": "So tiến tín dụng",
+        "labelEn": "Credit Amount"
+      },
+      {
+        "key": "linked_ncr_number",
+        "label": "So NCR liên kết",
+        "labelEn": "Linked NCR Number"
+      },
+      {
+        "key": "linked_capa_number",
+        "label": "So CAPA liên kết",
+        "labelEn": "Linked CAPA Number"
+      }
+    ],
+    "erp_quality_extended": [
+      {
+        "key": "inspection_plan_id",
+        "label": "Mã kế hoạch kiểm tra",
+        "labelEn": "Inspection Plan ID"
+      },
+      {
+        "key": "inspection_type_erp",
+        "label": "Loại kiểm tra",
+        "labelEn": "Inspection Type"
+      },
+      {
+        "key": "sampling_plan",
+        "label": "Kế hoạch lấy mẫu",
+        "labelEn": "Sampling Plan"
+      },
+      {
+        "key": "sampling_standard",
+        "label": "Tiêu chuẩn lấy mẫu",
+        "labelEn": "Sampling Standard"
+      },
+      {
+        "key": "inspection_result_erp",
+        "label": "Kết quả kiểm tra",
+        "labelEn": "Inspection Result"
+      },
+      {
+        "key": "inspector_id_erp",
+        "label": "Mã kiểm tra viên",
+        "labelEn": "Inspector ID"
+      },
+      {
+        "key": "characteristic_type",
+        "label": "Loại đặc tính",
+        "labelEn": "Characteristic Type"
+      },
+      {
+        "key": "ctq_flag",
+        "label": "Có CTQ",
+        "labelEn": "CTQ Flag"
+      },
+      {
+        "key": "kpc_flag",
+        "label": "Có KPC",
+        "labelEn": "KPC Flag"
+      },
+      {
+        "key": "spc_chart_type",
+        "label": "Loại biểu đồ SPC",
+        "labelEn": "SPC Chart Type"
+      },
+      {
+        "key": "cpk_value",
+        "label": "Giá trị Cpk",
+        "labelEn": "Cpk Value"
+      },
+      {
+        "key": "ppk_value",
+        "label": "Giá trị Ppk",
+        "labelEn": "Ppk Value"
+      },
+      {
+        "key": "process_sigma",
+        "label": "Sigma quả trình",
+        "labelEn": "Process Sigma"
+      },
+      {
+        "key": "gage_rr_pct_erp",
+        "label": "GR&R (%)",
+        "labelEn": "Gage R&R (%)"
+      },
+      {
+        "key": "gage_rr_ndc",
+        "label": "GR&R NDC",
+        "labelEn": "Gage R&R NDC"
+      },
+      {
+        "key": "measurement_uncertainty_erp",
+        "label": "Độ không đảm bảo đo",
+        "labelEn": "Measurement Uncertainty"
+      },
+      {
+        "key": "test_method",
+        "label": "Phương pháp thu nghiệm",
+        "labelEn": "Test Method"
+      },
+      {
+        "key": "certificate_type_erp",
+        "label": "Loại chung nhận",
+        "labelEn": "Certificate Type"
+      },
+      {
+        "key": "certificate_number_erp",
+        "label": "So chung nhận",
+        "labelEn": "Certificate Number"
+      },
+      {
+        "key": "ppap_level",
+        "label": "Cấp PPAP",
+        "labelEn": "PPAP Level"
+      },
+      {
+        "key": "ppap_status_erp",
+        "label": "Trạng thái PPAP",
+        "labelEn": "PPAP Status"
+      }
+    ],
+    "erp_document_control": [
+      {
+        "key": "document_master_id",
+        "label": "Mã tài liệu gốc",
+        "labelEn": "Document Master ID"
+      },
+      {
+        "key": "document_type_erp",
+        "label": "Loại tài liệu (ERP)",
+        "labelEn": "Document Type (ERP)"
+      },
+      {
+        "key": "document_number_erp",
+        "label": "So tài liệu",
+        "labelEn": "Document Number"
+      },
+      {
+        "key": "document_title_erp",
+        "label": "Tên tài liệu (ERP)",
+        "labelEn": "Document Title (ERP)"
+      },
+      {
+        "key": "revision_level_erp",
+        "label": "Cấp phiên bản",
+        "labelEn": "Revision Level"
+      },
+      {
+        "key": "document_status_erp",
+        "label": "Trạng thái tài liệu (ERP)",
+        "labelEn": "Document Status (ERP)"
+      },
+      {
+        "key": "retention_period_years",
+        "label": "Thời gián lưu trừ (nam)",
+        "labelEn": "Retention Period (Years)"
+      },
+      {
+        "key": "electronic_flag",
+        "label": "Có điện tử",
+        "labelEn": "Electronic Flag"
+      },
+      {
+        "key": "confidentiality_level",
+        "label": "Mức đo bảo mặt",
+        "labelEn": "Confidentiality Level"
+      },
+      {
+        "key": "review_cycle_months",
+        "label": "Chu kỳ xem xét (tháng)",
+        "labelEn": "Review Cycle (Months)"
+      },
+      {
+        "key": "next_review_date_doc",
+        "label": "Ngày xem xét tiếp theo",
+        "labelEn": "Next Review Date"
+      }
+    ],
+    "erp_compliance_regulatory": [
+      {
+        "key": "regulation_code",
+        "label": "Mã quy định",
+        "labelEn": "Regulation Code"
+      },
+      {
+        "key": "regulation_name",
+        "label": "Tên quy định",
+        "labelEn": "Regulation Name"
+      },
+      {
+        "key": "compliance_status_reg",
+        "label": "Trạng thái tuần thu",
+        "labelEn": "Compliance Status"
+      },
+      {
+        "key": "jurisdiction",
+        "label": "Phạm vị pháp lý",
+        "labelEn": "Jurisdiction"
+      },
+      {
+        "key": "export_classification",
+        "label": "Phần loại xuất khấu",
+        "labelEn": "Export Classification"
+      },
+      {
+        "key": "eccn_number_reg",
+        "label": "Số ECCN",
+        "labelEn": "ECCN Number"
+      },
+      {
+        "key": "license_type",
+        "label": "Loại giây phép",
+        "labelEn": "License Type"
+      },
+      {
+        "key": "license_number_reg",
+        "label": "So giây phép",
+        "labelEn": "License Number"
+      },
+      {
+        "key": "license_expiry",
+        "label": "Hạn giây phép",
+        "labelEn": "License Expiry"
+      },
+      {
+        "key": "restricted_party_screen_date",
+        "label": "Ngày kiểm tra đổi tác hạn chế",
+        "labelEn": "Restricted Party Screen Date"
+      },
+      {
+        "key": "restricted_party_screen_result",
+        "label": "Kết quả kiểm tra đổi tác hạn chế",
+        "labelEn": "Restricted Party Screen Result"
+      },
+      {
+        "key": "dfars_compliant",
+        "label": "Tuần thu DFARS",
+        "labelEn": "DFARS Compliant"
+      },
+      {
+        "key": "buy_american_compliant",
+        "label": "Tuần thu Buy American",
+        "labelEn": "Buy American Compliant"
+      },
+      {
+        "key": "specialty_metals_compliant",
+        "label": "Tuần thu kim loại đặc biệt",
+        "labelEn": "Specialty Metals Compliant"
+      },
+      {
+        "key": "prop65_warning_required",
+        "label": "Yêu cầu cảnh bảo Prop 65",
+        "labelEn": "Prop 65 Warning Required"
+      }
+    ],
+    "erp_npi": [
+      {
+        "key": "npi_project_id",
+        "label": "Mã dự an NPI",
+        "labelEn": "NPI Project ID"
+      },
+      {
+        "key": "npi_phase",
+        "label": "Giai đoạn NPI",
+        "labelEn": "NPI Phase"
+      },
+      {
+        "key": "npi_gate",
+        "label": "Cổng NPI",
+        "labelEn": "NPI Gate"
+      },
+      {
+        "key": "gate_review_date",
+        "label": "Ngày xem xét công",
+        "labelEn": "Gate Review Date"
+      },
+      {
+        "key": "gate_status",
+        "label": "Trạng thái công",
+        "labelEn": "Gate Status"
+      },
+      {
+        "key": "pfmea_id",
+        "label": "Mã PFMEA",
+        "labelEn": "PFMEA ID"
+      },
+      {
+        "key": "pfmea_rpn_max",
+        "label": "RPN cao nhật PFMEA",
+        "labelEn": "PFMEA Max RPN"
+      },
+      {
+        "key": "control_plan_id",
+        "label": "Mã kế hoạch kiểm soát",
+        "labelEn": "Control Plan ID"
+      },
+      {
+        "key": "ppap_submission_date",
+        "label": "Ngày nộp PPAP",
+        "labelEn": "PPAP Submission Date"
+      },
+      {
+        "key": "run_at_rate_date",
+        "label": "Ngày chạy thu tốc đo",
+        "labelEn": "Run-at-Rate Date"
+      },
+      {
+        "key": "run_at_rate_result",
+        "label": "Kết quả chạy thu tốc đo",
+        "labelEn": "Run-at-Rate Result"
+      },
+      {
+        "key": "initial_cpk",
+        "label": "Cpk ban đầu",
+        "labelEn": "Initial Cpk"
+      },
+      {
+        "key": "initial_ppk",
+        "label": "Ppk bản đầu",
+        "labelEn": "Initial Ppk"
+      },
+      {
+        "key": "prototype_qty",
+        "label": "So lượng mẫu thu",
+        "labelEn": "Prototype Quantity"
+      },
+      {
+        "key": "pilot_lot_number",
+        "label": "So lô pilot",
+        "labelEn": "Pilot Lot Number"
+      },
+      {
+        "key": "first_production_date",
+        "label": "Ngày sản xuất đầu tiến",
+        "labelEn": "First Production Date"
+      }
+    ],
+    "erp_subcontracting": [
+      {
+        "key": "subcontract_po_number",
+        "label": "So PO giá công ngoài",
+        "labelEn": "Subcontract PO Number"
+      },
+      {
+        "key": "subcontract_type",
+        "label": "Loại giá công ngoài",
+        "labelEn": "Subcontract Type"
+      },
+      {
+        "key": "subcontract_process",
+        "label": "Quy trình giá công ngoài",
+        "labelEn": "Subcontract Process"
+      },
+      {
+        "key": "subcontract_spec",
+        "label": "Quy cách giá công ngoài",
+        "labelEn": "Subcontract Specification"
+      },
+      {
+        "key": "vendor_id_sub",
+        "label": "Mã nhà cung cấp",
+        "labelEn": "Vendor ID"
+      },
+      {
+        "key": "ship_out_date",
+        "label": "Ngày gửi di",
+        "labelEn": "Ship Out Date"
+      },
+      {
+        "key": "ship_out_qty",
+        "label": "So lượng gửi di",
+        "labelEn": "Ship Out Quantity"
+      },
+      {
+        "key": "expected_return_date",
+        "label": "Ngày dự kiện tra về",
+        "labelEn": "Expected Return Date"
+      },
+      {
+        "key": "actual_return_date",
+        "label": "Ngày thực tệ tra về",
+        "labelEn": "Actual Return Date"
+      },
+      {
+        "key": "return_qty_good",
+        "label": "So lượng tra về đạt",
+        "labelEn": "Return Qty Good"
+      },
+      {
+        "key": "return_qty_reject",
+        "label": "So lượng tra về không đạt",
+        "labelEn": "Return Qty Reject"
+      },
+      {
+        "key": "unit_cost_sub",
+        "label": "Đơn giá giá công",
+        "labelEn": "Unit Cost"
+      },
+      {
+        "key": "nadcap_required",
+        "label": "Yêu cầu NADCAP",
+        "labelEn": "NADCAP Required"
+      },
+      {
+        "key": "nadcap_accreditation",
+        "label": "Chứng nhận NADCAP",
+        "labelEn": "NADCAP Accreditation"
+      },
+      {
+        "key": "coc_received_sub",
+        "label": "Đã nhận CoC",
+        "labelEn": "CoC Received"
+      },
+      {
+        "key": "test_report_received",
+        "label": "Đã nhận báo cáo thử nghiệm",
+        "labelEn": "Test Report Received"
+      },
+      {
+        "key": "turnaround_days_target",
+        "label": "Thời gián quay vòng mức tiêu (ngay)",
+        "labelEn": "Turnaround Days Target"
+      },
+      {
+        "key": "turnaround_days_actual",
+        "label": "Thời gián quay vòng thực tệ (ngay)",
+        "labelEn": "Turnaround Days Actual"
+      }
+    ],
+    "mes_connectivity_adapter": [
+      {
+        "key": "adapter_id",
+        "label": "Mã bộ kết nối",
+        "labelEn": "Adapter ID"
+      },
+      {
+        "key": "adapter_type",
+        "label": "Loại bộ kết nối",
+        "labelEn": "Adapter Type"
+      },
+      {
+        "key": "transport_protocol",
+        "label": "Giao thức truyền tải",
+        "labelEn": "Transport Protocol"
+      },
+      {
+        "key": "heartbeat_sla_seconds",
+        "label": "SLA heartbeat (giây)",
+        "labelEn": "Heartbeat SLA (Seconds)"
+      },
+      {
+        "key": "stale_after_seconds",
+        "label": "Ngưỡng stale (giây)",
+        "labelEn": "Stale After (Seconds)"
+      },
+      {
+        "key": "store_and_forward_enabled",
+        "label": "Cho phép store-and-forward",
+        "labelEn": "Store and Forward Enabled"
+      }
+    ],
+    "mes_alarm_management": [
+      {
+        "key": "alarm_code_mes",
+        "label": "Mã cảnh báo",
+        "labelEn": "Alarm Code"
+      },
+      {
+        "key": "controller_family",
+        "label": "Dòng điều khiển",
+        "labelEn": "Controller Family"
+      },
+      {
+        "key": "alarm_group_mes",
+        "label": "Nhóm cảnh báo",
+        "labelEn": "Alarm Group"
+      },
+      {
+        "key": "playbook_id",
+        "label": "Mã playbook",
+        "labelEn": "Playbook ID"
+      },
+      {
+        "key": "response_target_minutes",
+        "label": "Mục tiêu phản ứng (phút)",
+        "labelEn": "Target Response Minutes"
+      },
+      {
+        "key": "requires_lockout",
+        "label": "Yêu cầu lockout",
+        "labelEn": "Requires Lockout"
+      }
+    ],
+    "mes_nc_release_governance": [
+      {
+        "key": "package_id",
+        "label": "Mã gói release",
+        "labelEn": "Release Package ID"
+      },
+      {
+        "key": "program_checksum_sha256",
+        "label": "Checksum chương trình SHA-256",
+        "labelEn": "Program Checksum SHA-256"
+      },
+      {
+        "key": "controller_program_name",
+        "label": "Tên chương trình trên máy",
+        "labelEn": "Controller Program Name"
+      },
+      {
+        "key": "download_receipt_id",
+        "label": "Mã biên nhận download",
+        "labelEn": "Download Receipt ID"
+      },
+      {
+        "key": "download_verified_flag",
+        "label": "Đã xác minh download",
+        "labelEn": "Download Verified"
+      },
+      {
+        "key": "release_manifest_version",
+        "label": "Phiên bản manifest release",
+        "labelEn": "Release Manifest Version"
+      }
+    ],
+    "mes_tool_offset_governance": [
+      {
+        "key": "preset_id_mes",
+        "label": "Mã bản ghi preset",
+        "labelEn": "Preset Record ID"
+      },
+      {
+        "key": "offset_number_mes",
+        "label": "Số offset",
+        "labelEn": "Offset Number"
+      },
+      {
+        "key": "preset_length_mm",
+        "label": "Chiều dài preset (mm)",
+        "labelEn": "Preset Length (mm)"
+      },
+      {
+        "key": "preset_diameter_mm",
+        "label": "Đường kính preset (mm)",
+        "labelEn": "Preset Diameter (mm)"
+      },
+      {
+        "key": "wear_offset_mm",
+        "label": "Offset bù mòn (mm)",
+        "labelEn": "Wear Offset (mm)"
+      },
+      {
+        "key": "offset_drift_mm",
+        "label": "Độ lệch offset (mm)",
+        "labelEn": "Offset Drift (mm)"
+      }
+    ],
+    "mes_material_genealogy_governance": [
+      {
+        "key": "material_issue_id_mes",
+        "label": "Mã issue vật liệu MES",
+        "labelEn": "MES Material Issue ID"
+      },
+      {
+        "key": "material_lot_number_mes",
+        "label": "Số lot vật liệu",
+        "labelEn": "Material Lot Number"
+      },
+      {
+        "key": "material_heat_number_mes",
+        "label": "Số heat vật liệu",
+        "labelEn": "Material Heat Number"
+      },
+      {
+        "key": "traveler_number_mes",
+        "label": "Số traveler",
+        "labelEn": "Traveler Number"
+      },
+      {
+        "key": "genealogy_snapshot_id_mes",
+        "label": "Mã snapshot genealogy MES",
+        "labelEn": "MES Genealogy Snapshot ID"
+      },
+      {
+        "key": "serial_number_mes",
+        "label": "Số serial",
+        "labelEn": "Serial Number"
+      }
+    ],
+    "mes_shift_handover_governance": [
+      {
+        "key": "shift_handover_id_mes",
+        "label": "Mã bàn giao ca MES",
+        "labelEn": "MES Shift Handover ID"
+      },
+      {
+        "key": "shift_from_mes",
+        "label": "Ca giao",
+        "labelEn": "Shift From"
+      },
+      {
+        "key": "shift_to_mes",
+        "label": "Ca nhận",
+        "labelEn": "Shift To"
+      },
+      {
+        "key": "handover_issue_note_mes",
+        "label": "Vấn đề tồn ca",
+        "labelEn": "Shift Handover Issues"
+      },
+      {
+        "key": "handover_pending_action_mes",
+        "label": "Hành động cần tiếp tục",
+        "labelEn": "Shift Pending Action"
+      },
+      {
+        "key": "handover_acknowledged_at_mes",
+        "label": "Thời điểm xác nhận bàn giao ca",
+        "labelEn": "Shift Handover Acknowledged At"
+      }
+    ],
+    "erp_mes_integration_governance": [
+      {
+        "key": "epicor_sync_run_id_erp",
+        "label": "Mã chu kỳ đồng bộ Epicor",
+        "labelEn": "Epicor Sync Run ID"
+      },
+      {
+        "key": "epicor_sync_direction_erp",
+        "label": "Hướng đồng bộ Epicor",
+        "labelEn": "Epicor Sync Direction"
+      },
+      {
+        "key": "epicor_sync_domain_erp",
+        "label": "Miền đồng bộ Epicor",
+        "labelEn": "Epicor Sync Domain"
+      },
+      {
+        "key": "epicor_sync_status_erp",
+        "label": "Trạng thái đồng bộ Epicor",
+        "labelEn": "Epicor Sync Status"
+      },
+      {
+        "key": "epicor_last_success_at_erp",
+        "label": "Thời điểm đồng bộ Epicor thành công gần nhất",
+        "labelEn": "Epicor Last Success At"
+      },
+      {
+        "key": "epicor_reconciliation_gap_qty_erp",
+        "label": "Độ lệch số lượng khi đối soát Epicor",
+        "labelEn": "Epicor Reconciliation Quantity Gap"
+      },
+      {
+        "key": "epicor_reconciliation_gap_minutes_erp",
+        "label": "Số phút trễ khi đối soát Epicor",
+        "labelEn": "Epicor Reconciliation Delay Minutes"
+      },
+      {
+        "key": "epicor_outbox_event_id_erp",
+        "label": "Mã outbox Epicor",
+        "labelEn": "Epicor Outbox Event ID"
+      },
+      {
+        "key": "epicor_transaction_type_erp",
+        "label": "Loại giao dịch Epicor",
+        "labelEn": "Epicor Transaction Type"
+      },
+      {
+        "key": "epicor_site_id_erp",
+        "label": "Mã site Epicor",
+        "labelEn": "Epicor Site ID"
+      }
+    ],
+    "mes_digital_product_passport": [
+      {
+        "key": "dpp_id_mes",
+        "label": "Ma DPP",
+        "labelEn": "DPP ID"
+      },
+      {
+        "key": "dpp_origin_country_mes",
+        "label": "Quoc gia xuat xu",
+        "labelEn": "Origin Country"
+      },
+      {
+        "key": "dpp_carbon_footprint_mes",
+        "label": "Dau chan carbon",
+        "labelEn": "Carbon Footprint"
+      },
+      {
+        "key": "dpp_energy_kwh_mes",
+        "label": "Nang luong tren DPP",
+        "labelEn": "Passport Energy"
+      },
+      {
+        "key": "dpp_qr_code_mes",
+        "label": "Ma QR DPP",
+        "labelEn": "DPP QR Code"
+      }
+    ],
+    "mes_energy_management": [
+      {
+        "key": "energy_snapshot_id_mes",
+        "label": "Ma snapshot nang luong",
+        "labelEn": "Energy Snapshot ID"
+      },
+      {
+        "key": "machine_power_kw_mes",
+        "label": "Cong suat may",
+        "labelEn": "Machine Power"
+      },
+      {
+        "key": "energy_kwh_mes",
+        "label": "Dien nang kWh",
+        "labelEn": "Energy kWh"
+      },
+      {
+        "key": "energy_per_unit_kwh_mes",
+        "label": "kWh tren moi san pham",
+        "labelEn": "Energy per Unit"
+      },
+      {
+        "key": "energy_target_per_unit_kwh_mes",
+        "label": "Muc tieu kWh tren moi san pham",
+        "labelEn": "Energy Target per Unit"
+      }
+    ],
+    "mes_cost_governance": [
+      {
+        "key": "cost_tracking_id_mes",
+        "label": "Ma costing runtime",
+        "labelEn": "Cost Tracking ID"
+      },
+      {
+        "key": "standard_cost_total_mes",
+        "label": "Tong chi phi ke hoach",
+        "labelEn": "Standard Cost Total"
+      },
+      {
+        "key": "actual_cost_total_mes",
+        "label": "Tong chi phi thuc te",
+        "labelEn": "Actual Cost Total"
+      },
+      {
+        "key": "cost_variance_pct_mes",
+        "label": "Phan tram lech chi phi",
+        "labelEn": "Cost Variance Percent"
+      },
+      {
+        "key": "cost_per_good_unit_mes",
+        "label": "Chi phi tren moi san pham tot",
+        "labelEn": "Cost per Good Unit"
+      }
+    ],
+    "cockpit": [
+      {
+        "key": "requested_date",
+        "label": "Ngày yêu cầu",
+        "labelEn": "Requested Date"
+      },
+      {
+        "key": "promise_date",
+        "label": "Ngày cấm kết",
+        "labelEn": "Promise Date"
+      },
+      {
+        "key": "internal_commit_date",
+        "label": "Internal Commit Date",
+        "labelEn": "Internal Commit Date"
+      },
+      {
+        "key": "fulfillment_status",
+        "label": "Fulfillment Status",
+        "labelEn": "Fulfillment Status"
+      },
+      {
+        "key": "health_band",
+        "label": "Health Band",
+        "labelEn": "Health Band"
+      },
+      {
+        "key": "readiness_score",
+        "label": "Readiness Score",
+        "labelEn": "Readiness Score"
+      },
+      {
+        "key": "blocked",
+        "label": "Blocked",
+        "labelEn": "Blocked"
+      },
+      {
+        "key": "late_days",
+        "label": "Late Days",
+        "labelEn": "Late Days"
+      },
+      {
+        "key": "gate_cards",
+        "label": "Gate Cards",
+        "labelEn": "Gate Cards"
+      },
+      {
+        "key": "exception_cards",
+        "label": "Exception Cards",
+        "labelEn": "Exception Cards"
+      },
+      {
+        "key": "milestones",
+        "label": "Milestones",
+        "labelEn": "Milestones"
+      },
+      {
+        "key": "next_action_owner",
+        "label": "Next Action Owner",
+        "labelEn": "Next Action Owner"
+      },
+      {
+        "key": "next_action_due",
+        "label": "Next Action Due",
+        "labelEn": "Next Action Due"
+      },
+      {
+        "key": "document_requirements",
+        "label": "Document Requirements",
+        "labelEn": "Document Requirements"
+      }
+    ],
+    "timeline": [
+      {
+        "key": "event_id",
+        "label": "Event ID",
+        "labelEn": "Event ID"
+      },
+      {
+        "key": "event_type",
+        "label": "Event Type",
+        "labelEn": "Event Type"
+      },
+      {
+        "key": "event_title",
+        "label": "Event Title",
+        "labelEn": "Event Title"
+      },
+      {
+        "key": "event_description",
+        "label": "Event Description",
+        "labelEn": "Event Description"
+      },
+      {
+        "key": "event_at",
+        "label": "Event Timestamp",
+        "labelEn": "Event Timestamp"
+      },
+      {
+        "key": "actor_name",
+        "label": "Actor Name",
+        "labelEn": "Actor Name"
+      },
+      {
+        "key": "actor_role",
+        "label": "Actor Role",
+        "labelEn": "Actor Role"
+      },
+      {
+        "key": "status_from",
+        "label": "Status From",
+        "labelEn": "Status From"
+      },
+      {
+        "key": "status_to",
+        "label": "Status To",
+        "labelEn": "Status To"
+      },
+      {
+        "key": "reference_number",
+        "label": "Reference Number",
+        "labelEn": "Reference Number"
+      }
+    ],
+    "hierarchy": [
+      {
+        "key": "node_id",
+        "label": "Node ID",
+        "labelEn": "Node ID"
+      },
+      {
+        "key": "parent_id",
+        "label": "Parent ID",
+        "labelEn": "Parent ID"
+      },
+      {
+        "key": "node_type",
+        "label": "Node Type",
+        "labelEn": "Node Type"
+      },
+      {
+        "key": "node_number",
+        "label": "Node Number",
+        "labelEn": "Node Number"
+      },
+      {
+        "key": "node_label",
+        "label": "Node Label",
+        "labelEn": "Node Label"
+      },
+      {
+        "key": "node_path",
+        "label": "Node Path",
+        "labelEn": "Node Path"
+      },
+      {
+        "key": "depth_level",
+        "label": "Depth Level",
+        "labelEn": "Depth Level"
+      },
+      {
+        "key": "children",
+        "label": "Children",
+        "labelEn": "Children"
+      }
+    ],
+    "security": [
+      {
+        "key": "username",
+        "label": "Username",
+        "labelEn": "Username"
+      },
+      {
+        "key": "password",
+        "label": "Password",
+        "labelEn": "Password"
+      },
+      {
+        "key": "device_name",
+        "label": "Device Name",
+        "labelEn": "Device Name"
+      },
+      {
+        "key": "remember_me",
+        "label": "Remember Me",
+        "labelEn": "Remember Me"
+      },
+      {
+        "key": "mfa_code",
+        "label": "MFA Code",
+        "labelEn": "MFA Code"
+      },
+      {
+        "key": "requires_mfa",
+        "label": "Requires MFA",
+        "labelEn": "Requires MFA"
+      },
+      {
+        "key": "token",
+        "label": "Token",
+        "labelEn": "Token"
+      },
+      {
+        "key": "session_id",
+        "label": "Session ID",
+        "labelEn": "Session ID"
+      },
+      {
+        "key": "success",
+        "label": "Success",
+        "labelEn": "Success"
+      }
+    ],
+    "integration": [
+      {
+        "key": "sync_run_id",
+        "label": "Sync Run ID",
+        "labelEn": "Sync Run ID"
+      },
+      {
+        "key": "sync_direction",
+        "label": "Sync Direction",
+        "labelEn": "Sync Direction"
+      },
+      {
+        "key": "sync_domain",
+        "label": "Sync Domain",
+        "labelEn": "Sync Domain"
+      },
+      {
+        "key": "sync_status",
+        "label": "Sync Status",
+        "labelEn": "Sync Status"
+      },
+      {
+        "key": "last_success_at",
+        "label": "Last Success At",
+        "labelEn": "Last Success At"
+      },
+      {
+        "key": "reconciliation_gap_qty",
+        "label": "Reconciliation Gap Qty",
+        "labelEn": "Reconciliation Gap Qty"
+      },
+      {
+        "key": "reconciliation_gap_minutes",
+        "label": "Reconciliation Gap Minutes",
+        "labelEn": "Reconciliation Gap Minutes"
+      },
+      {
+        "key": "outbox_event_id",
+        "label": "Outbox Event ID",
+        "labelEn": "Outbox Event ID"
+      },
+      {
+        "key": "transaction_type",
+        "label": "Transaction Type",
+        "labelEn": "Transaction Type"
+      },
+      {
+        "key": "last_error",
+        "label": "Last Error",
+        "labelEn": "Last Error"
+      }
+    ],
+    "metrics": [
+      {
+        "key": "metric_name",
+        "label": "Metric Name",
+        "labelEn": "Metric Name"
+      },
+      {
+        "key": "metric_value",
+        "label": "Metric Value",
+        "labelEn": "Metric Value"
+      },
+      {
+        "key": "metric_target",
+        "label": "Metric Target",
+        "labelEn": "Metric Target"
+      },
+      {
+        "key": "metric_unit",
+        "label": "Metric Unit",
+        "labelEn": "Metric Unit"
+      },
+      {
+        "key": "trend_direction",
+        "label": "Trend Direction",
+        "labelEn": "Trend Direction"
+      },
+      {
+        "key": "trend_pct",
+        "label": "Trend Percent",
+        "labelEn": "Trend Percent"
+      },
+      {
+        "key": "period_label",
+        "label": "Period Label",
+        "labelEn": "Period Label"
+      },
+      {
+        "key": "generated_at",
+        "label": "Generated At",
+        "labelEn": "Generated At"
+      }
+    ],
+    "api_meta": [
+      {
+        "key": "ok",
+        "label": "OK",
+        "labelEn": "OK"
+      },
+      {
+        "key": "message",
+        "label": "Message",
+        "labelEn": "Message"
+      },
+      {
+        "key": "estimate",
+        "label": "Estimate",
+        "labelEn": "Estimate"
+      },
+      {
+        "key": "quote",
+        "label": "Quote",
+        "labelEn": "Quote"
+      },
+      {
+        "key": "schemas",
+        "label": "Schemas",
+        "labelEn": "Schemas"
+      },
+      {
+        "key": "schema",
+        "label": "Schema",
+        "labelEn": "Schema"
+      },
+      {
+        "key": "tabs",
+        "label": "Tabs",
+        "labelEn": "Tabs"
+      },
+      {
+        "key": "keys",
+        "label": "Keys",
+        "labelEn": "Keys"
+      }
+    ],
+    "auth_session": [
+      {
+        "key": "logged_in",
+        "label": "Logged In",
+        "labelEn": "Logged In"
+      },
+      {
+        "key": "mfa_pending",
+        "label": "MFA Pending",
+        "labelEn": "MFA Pending"
+      },
+      {
+        "key": "enroll_pending",
+        "label": "Enrollment Pending",
+        "labelEn": "Enrollment Pending"
+      },
+      {
+        "key": "mfa_required",
+        "label": "MFA Required",
+        "labelEn": "MFA Required"
+      },
+      {
+        "key": "enroll_required",
+        "label": "Enrollment Required",
+        "labelEn": "Enrollment Required"
+      },
+      {
+        "key": "pending_expires_in",
+        "label": "Pending Expires In",
+        "labelEn": "Pending Expires In"
+      },
+      {
+        "key": "auth_expired",
+        "label": "Auth Expired",
+        "labelEn": "Auth Expired"
+      },
+      {
+        "key": "initialized",
+        "label": "Initialized",
+        "labelEn": "Initialized"
+      },
+      {
+        "key": "csrf_token",
+        "label": "Mã CSRF",
+        "labelEn": "CSRF Token"
+      },
+      {
+        "key": "server_time",
+        "label": "Server Time",
+        "labelEn": "Server Time"
+      },
+      {
+        "key": "issuer",
+        "label": "Issuer",
+        "labelEn": "Issuer"
+      },
+      {
+        "key": "account",
+        "label": "Account",
+        "labelEn": "Account"
+      },
+      {
+        "key": "secret",
+        "label": "Secret",
+        "labelEn": "Secret"
+      },
+      {
+        "key": "otpauth_url",
+        "label": "OTPAuth URL",
+        "labelEn": "OTPAuth URL"
+      },
+      {
+        "key": "code",
+        "label": "Code",
+        "labelEn": "Code"
+      },
+      {
+        "key": "otp",
+        "label": "OTP",
+        "labelEn": "OTP"
+      },
+      {
+        "key": "recovery",
+        "label": "Recovery Code",
+        "labelEn": "Recovery Code"
+      }
+    ],
+    "git_admin": [
+      {
+        "key": "pushed",
+        "label": "Pushed",
+        "labelEn": "Pushed"
+      },
+      {
+        "key": "pulled",
+        "label": "Pulled",
+        "labelEn": "Pulled"
+      },
+      {
+        "key": "branch",
+        "label": "Branch",
+        "labelEn": "Branch"
+      },
+      {
+        "key": "files",
+        "label": "Files",
+        "labelEn": "Files"
+      },
+      {
+        "key": "status_entries",
+        "label": "Status Entries",
+        "labelEn": "Status Entries"
+      },
+      {
+        "key": "commit_output",
+        "label": "Commit Output",
+        "labelEn": "Commit Output"
+      },
+      {
+        "key": "push_output",
+        "label": "Push Output",
+        "labelEn": "Push Output"
+      },
+      {
+        "key": "head_before",
+        "label": "Head Before",
+        "labelEn": "Head Before"
+      },
+      {
+        "key": "head_after",
+        "label": "Head After",
+        "labelEn": "Head After"
+      },
+      {
+        "key": "before_head",
+        "label": "Before Head",
+        "labelEn": "Before Head"
+      },
+      {
+        "key": "after_head",
+        "label": "After Head",
+        "labelEn": "After Head"
+      },
+      {
+        "key": "changed_files",
+        "label": "Changed Files",
+        "labelEn": "Changed Files"
+      },
+      {
+        "key": "presync",
+        "label": "Presync",
+        "labelEn": "Presync"
+      },
+      {
+        "key": "fetch_output",
+        "label": "Fetch Output",
+        "labelEn": "Fetch Output"
+      },
+      {
+        "key": "pull_output",
+        "label": "Pull Output",
+        "labelEn": "Pull Output"
+      }
+    ],
+    "module_schema_contract": [
+      {
+        "key": "moduleId",
+        "label": "Module ID",
+        "labelEn": "Module ID"
+      },
+      {
+        "key": "title",
+        "label": "Title",
+        "labelEn": "Title"
+      },
+      {
+        "key": "roles",
+        "label": "Roles",
+        "labelEn": "Roles"
+      },
+      {
+        "key": "version",
+        "label": "Version",
+        "labelEn": "Version"
+      },
+      {
+        "key": "tabCount",
+        "label": "Tab Count",
+        "labelEn": "Tab Count"
+      },
+      {
+        "key": "blockCount",
+        "label": "Block Count",
+        "labelEn": "Block Count"
+      },
+      {
+        "key": "saved",
+        "label": "Saved",
+        "labelEn": "Saved"
+      },
+      {
+        "key": "deleted",
+        "label": "Deleted",
+        "labelEn": "Deleted"
+      },
+      {
+        "key": "reset",
+        "label": "Reset",
+        "labelEn": "Reset"
+      },
+      {
+        "key": "action",
+        "label": "Action",
+        "labelEn": "Action"
+      },
+      {
+        "key": "method",
+        "label": "Method",
+        "labelEn": "Method"
+      },
+      {
+        "key": "label",
+        "label": "Label",
+        "labelEn": "Label"
+      },
+      {
+        "key": "module",
+        "label": "Module",
+        "labelEn": "Module"
+      }
+    ],
+    "quote_contract": [
+      {
+        "key": "id",
+        "label": "ID",
+        "labelEn": "ID"
+      },
+      {
+        "key": "contact_name",
+        "label": "Contact Name",
+        "labelEn": "Contact Name"
+      },
+      {
+        "key": "contact_email",
+        "label": "Contact Email",
+        "labelEn": "Contact Email"
+      },
+      {
+        "key": "rfq_number",
+        "label": "RFQ Number",
+        "labelEn": "RFQ Number"
+      },
+      {
+        "key": "line_items",
+        "label": "Line Items",
+        "labelEn": "Line Items"
+      },
+      {
+        "key": "to_status",
+        "label": "To Status",
+        "labelEn": "To Status"
+      },
+      {
+        "key": "po_number",
+        "label": "So đơn đạt hàng",
+        "labelEn": "Purchase Order Number"
+      },
+      {
+        "key": "dimensions",
+        "label": "Dimensions",
+        "labelEn": "Dimensions"
+      },
+      {
+        "key": "complexity",
+        "label": "Complexity",
+        "labelEn": "Complexity"
+      }
+    ]
+  }
+}

@@ -1,4 +1,4 @@
-# 15 — Rules for naming records, evidence, and completed forms
+# 15 — Rules for naming documents, evidence and completed forms
 
 > Naming convention is consistent for EVERY file saved to SharePoint: completed forms, produced evidence,
 > engineering baseline, training records, audits, and assets.
@@ -8,16 +8,16 @@
 
 ## 1. General rules (applies to EVERY file)
 
-| # | Rules | Details |
+| # | Rules | Detail |
 |---|---------|---------|
 | 1 | English only | No Vietnamese accents, no Unicode other than ASCII |
-| 2 | The allowed character | `A-Z`, `a-z`, `0-9`, hyphen (`-`), underscore (`_`), dot (`.`) |
-| 3 | Segment separator | Underscore (`_`) |
+| 2 | Allowed characters | `A-Z`, `a-z`, `0-9`, hyphen (`-`), underscore (`_`), dot (`.`) |
+| 3 | Segment separation | Underscore (`_`) |
 | 4 | Separate words in segment | Hyphen (`-`) |
-| 5 | Date | `YYYYMMDD` (compact, sorted well) |
+| 5 | Day | `YYYYMMDD` (compact, sorted well) |
 | 6 | Time | `HHMM` (24h format) |
 | 7 | Maximum filename | 120 characters |
-| 8 | NO | Spaces, brackets, special characters |
+| 8 | Do not have | Spaces, brackets, special characters |
 
 ---
 
@@ -30,7 +30,7 @@
 FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}
 ```
 
-| Segments | Required | Description | Example |
+| Segment | Obligatory | Describe | For example |
 |---------|---------|-------|-------|
 | `FRM-{code}` | Always | Form code according to registry | FRM-631 |
 | `V{ver}` | Always | Version blank form used | V2.1 |
@@ -163,13 +163,13 @@ Applies to the offline version the system **received** or the online/offline ver
 FRM-{code}_V{ver}_{record_id}_{YYYYMMDD}_R{nn}.{ext}
 ```
 
-| Segments | Required | Description | Example |
+| Segment | Obligatory | Describe | For example |
 |---------|---------|-------|-------|
 | `FRM-{code}` | Always | Form code according to registry | FRM-403 |
-| `V{ver}` | Always | Version form blank is in effect when the profile is created | V1 |
+| `V{ver}` | Always | Version blank form is in effect when the profile is created | V1 |
 | `{record_id}` | Always | Record-ID of the record instance | SCAR-2026-012 |
 | `{YYYYMMDD}` | Always | Receiving/packaging system date | 20260331 |
-| `R{nn}` | Always | Internal reception / resubmission times | R01 |
+| `R{nn}` | Always | Internal reception/resubmission times | R01 |
 | `.{ext}` | Always | .xlsx, .pdf, .zip... | .xlsx |
 
 **For example:**
@@ -185,44 +185,44 @@ FRM-631_V2.1_NCR-2026-043_20260327_R01.pdf
 
 ### 3.1 Job Dossier Evidence
 
-| Code | Name | Description |
+| Code | Name | Describe |
 |------|-----|-------|
 | PO | Purchase Order | Scan customer PO |
 | CR | Contract Review | Contract review results |
-| MTR | Material Test Report | Mill cert, heat cert, CoA |
-| IQC | Incoming QC Result | Entrance test results |
-| TRV | Traveler / Router | Scan production tracking slip |
+| MTR | Material Test Report | Mill certificate, heat certificate, CoA |
+| IQC | Incoming QC Result | Input test results |
+| TRV | Traveler/Router | Scan the production tracking slip |
 | CMM | CMM / Measurement Data | CMM, caliper, mic measurement data |
 | FAI-BALLOON | Ballooned Drawing | Balloon numbering drawing |
-| COC | Certificate of Conformance | Certificate of conformity |
+| COC | Certificate of Conformance | Appropriate certification |
 | PACK | Packing List | Packing slip |
-| SHIP-LABEL | Shipping Label / SSCC | Shipping labels |
+| SHIP-LABEL | Shipping Label / SSCC | Shipping label |
 | POD | Proof of Delivery | Proof of delivery |
-| CONCESSION | Deviation / Waiver | Approval of concessions |
+| CONCESSION | Deviation/Waiver | Concession approval |
 | REWORK | Rework Evidence | Evidence of rework + retest |
 | CUST-APPR | Customer Approval | Email/doc customer approval |
 | PROVOUT | Prove-out Evidence | First test run notes |
-| OFFSET-LOG | Offset Change Log | Machine offset change log |
-| TOOL-WEAR | Tool Wear Record | Record tool wear |
-| DOWNTIME | Downtime Record | Record machine stoppage |
+| OFFSET-LOG | Offset Change Log | Log machine offset changes |
+| TOOL-WEAR | Tool Wear Record | Record knife wear |
+| DOWNTIME | Downtime Record | Record machine stop |
 
 ### 3.2 Photos
 
-| Code | Description |
+| Code | Describe |
 |------|-------|
 | PHOTO-SETUP | Photo of machine setup status |
 | PHOTO-FAI | FAI detailed photos |
 | PHOTO-FINAL | Final inspection photo |
 | PHOTO-PACK | Packaging photo |
-| PHOTO-NCR | Error image |
-| PHOTO-GEN | General photos |
+| PHOTO-NCR | Error photo |
+| PHOTO-GEN | General photo |
 
 ### 3.3 Engineering Baseline
 
-| Code | Description |
+| Code | Describe |
 |------|-------|
 | NC | NC Program (G-code) |
-| CAM | CAM Source File |
+| ORANGE | CAM Source File |
 | MODEL | CAD Model (STEP, IGES) |
 | DWG | Drawing (PDF) |
 | SETUP | Setup Sheet + Tool List (FRM-302) |
@@ -233,7 +233,7 @@ FRM-631_V2.1_NCR-2026-043_20260327_R01.pdf
 
 ### 3.4 QMS Governance
 
-| Code | Description |
+| Code | Describe |
 |------|-------|
 | REPORT | Audit report, analysis report |
 | CHECKLIST | Audit checklist, verify list |
@@ -246,16 +246,16 @@ FRM-631_V2.1_NCR-2026-043_20260327_R01.pdf
 
 ### 3.5 Training & Competence
 
-| Code | Description |
+| Code | Describe |
 |------|-------|
-| OJT | On-the-Job Training evidence |
+| O.J.T | On-the-Job Training evidence |
 | GATE-TEST | Competency gate test result |
 | CERT-SCAN | Certificate scan (external) |
 | SIGNOFF | Wet signature sign-off sheet |
 
 ### 3.6 Calibration & Assets
 
-| Code | Description |
+| Code | Describe |
 |------|-------|
 | CAL-CERT | Calibration certificate |
 | MAINT-LOG | Maintenance log |
@@ -263,7 +263,7 @@ FRM-631_V2.1_NCR-2026-043_20260327_R01.pdf
 
 ### 3.7 Suppliers
 
-| Code | Description |
+| Code | Describe |
 |------|-------|
 | SUP-CERT | Supplier process certificate |
 | SUP-AUDIT | Supplier audit report |
@@ -274,7 +274,7 @@ FRM-631_V2.1_NCR-2026-043_20260327_R01.pdf
 
 ## 4. Scope Code Dictionary
 
-| Scope type | Format | Example |
+| Scope type | Format | For example |
 |-----------|--------|-------|
 | Job order | `JOB-{YYYY}-{4digit}` | JOB-2026-0042 |
 | Job + Operation | `JOB-{YYYY}-{4d}-OP{nn}` | JOB-2026-0042-OP10 |
@@ -287,7 +287,7 @@ FRM-631_V2.1_NCR-2026-043_20260327_R01.pdf
 | Calibration | `CAL-{EquipCode}-{3digit}` | CAL-MICR-005 |
 | Risk review | `RISK-{YYYY}-R{2digit}` | RISK-2026-R02 |
 | Change request | `ECR-{YYYY}-{3digit}` | ECR-2026-012 |
-| Improvements | `IMP-{YYYY}-{code}` | IMP-2026-K05 |
+| Improvement | `IMP-{YYYY}-{code}` | IMP-2026-K05 |
 | Employee | `EMP-{4digit}` | EMP-0123 |
 | Department | `{DeptCode}` | ENG, PRO, QA, SCM |
 | System-wide | `SYS` | SYS |
@@ -305,7 +305,7 @@ FRM-631_V2.1_NCR-2026-043_20260327_R01.pdf
 | 1 | 3-4 characters abbreviation from first name-first name-middle name |
 | 2 | Priority: first letter of last name + first letter of middle name + first letter of first name (NVA, TBH, LMC) |
 | 3 | If duplicate: add number (NVA → NVA2) |
-| 4 | One-time registration in SharePoint List `Employee-Registry` or Epicor Employee Master |
+| 4 | Register once in SharePoint List `Employee-Registry` or Epicor Employee Master |
 | 5 | NO changes when employees change rooms/positions |
 | 6 | DO NOT reuse UserID after employee leaves |
 
@@ -313,17 +313,17 @@ FRM-631_V2.1_NCR-2026-043_20260327_R01.pdf
 
 | Problem with `{seq}` | Solution `{HHMM}-{UserID}` |
 |--------------------|-----------------------------|
-| Many people upload at the same time → who manages the seq? | HHMM + UserID is unique, no need to coordinate |
+| Many people upload at the same time → who manages the seq? | HHMM + UserID are unique, no need to coordinate |
 | 2 QC inspectors with the same role code "QC" → overlap | UserID unique per person → NVA ≠ TBH |
 | Must count existing files before naming | Just look at the clock + know your UserID |
 
 ### 5.3 Uniqueness guarantee
 
-| Situation | HHMM | UserID | Results |
+| Situation | HHMM | UserID | Result |
 |-----------|------|--------|---------|
-| Same person, same minute, same RecordType, same scope | Similar | Similar | **Does not happen** — 1 person does not create 2 files of the same type at the same time |
-| Different people, same minute | Similar | **Other** | Unique |
-| Same person, different minutes | **Other** | Similar | Unique |
+| Same person, same minute, same RecordType, same scope | Alike | Alike | **Does not happen** — 1 person does not create 2 files of the same type at the same minute |
+| Different people, same minute | Alike | **Other** | Unique |
+| Same person, different minutes | **Other** | Alike | Unique |
 
 ---
 
@@ -331,17 +331,17 @@ FRM-631_V2.1_NCR-2026-043_20260327_R01.pdf
 
 ### 6.1 When do you need Record-ID?
 
-| Type | Need Record-ID? | ExampleID | Who issued it? |
+| Type | Need Record-ID? | For example ID | Who issued it? |
 |------|----------------|---------|---------|
-| NCR | YES | NCR-2026-043 | Server atomic counter |
-| CAPA | YES | CAPA-2026-008 | Server atomic counter |
-| FAI | YES | FAI-2026-016 | Server atomic counter |
-| Training events | YES | TRN-2026-028 | Server atomic counter |
-| Audit | YES | AUD-2026-IA03 | Server atomic counter |
-| ECR/ECO | YES | ECR-2026-012 | Server atomic counter |
+| NCR | HAVE | NCR-2026-043 | Server atomic counter |
+| CAPA | HAVE | CAPA-2026-008 | Server atomic counter |
+| FAI | HAVE | FAI-2026-016 | Server atomic counter |
+| Training events | HAVE | TRN-2026-028 | Server atomic counter |
+| Audit | HAVE | AUD-2026-IA03 | Server atomic counter |
+| ECR/ECO | HAVE | ECR-2026-012 | Server atomic counter |
 | Job order | YES (from Epicor) | JOB-2026-0042 | Epicor SoR |
-| Photos, scans | NO | (use HHMM-UserID) | Uploader |
-| CMM data | NO | (use HHMM-UserID) | Uploader |
+| Photos, scans | ARE NOT | (use HHMM-UserID) | Uploader |
+| CMM data | ARE NOT | (use HHMM-UserID) | Uploader |
 
 ### 6.2 Server atomic counter
 
@@ -362,7 +362,7 @@ qms-data/counters/
 
 ### 6.3 eQMS Record-ID Reuse Rules
 
-| # | Rules | Required Details |
+| # | Rules | Required details |
 |---|---------|-------------------|
 | 1 | **Draft does not generate new names/codes** | When reopening a draft, the system must continue to use the existing `record_id` and naming lineage; Do not generate a new file name/code just because the user saved the draft and then reopened it. |
 | 2 | **Resubmission retains Record-ID** | Online controlled edit and offline resubmission must remain `record_id`; only increase `submission_count`, `resubmission_count` or `receipt_version`. |
@@ -405,13 +405,13 @@ FILLED: FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.xlsx  ← Có scope
 
 ## 8. Validation rules (fail-fast)
 
-| Check | Results |
+| Check | Result |
 |----------|---------|
 | The file name contains spaces or special characters | REJECT |
-| The file name does not have a date segment (YYYYMMDD) | REJECT |
+| File name without date segment (YYYYMMDD) | REJECT |
 | Filled form without V{ver} | REJECT |
 | Filled form version ≠ current active version | FLAG OBSOLETE |
-| Job evidence does not exist JOB-{YYYY}-{nnnn} | REJECT |
+| Job evidence no JOB-{YYYY}-{nnnn} | REJECT |
 | Engineering baseline does not have V{ver} | REJECT |
 | File with the same name already exists (same name, same folder) | REJECT |
 | File name > 120 characters | WARN |
@@ -446,7 +446,7 @@ TỔNG: < 10 giây ✓
 
 ---
 
-## 10. Multiple files with 1 Record — group rule
+## 10. Multiple files with 1 Record — grouping rules
 
 An NCR can have many evidence files. All use the SAME Record-ID:
 

@@ -34,7 +34,7 @@ When user edits document code or SSOT title in portal:
 6. Metadata registry (`docs_custom`) is synced to the same SSOT title.
 7. Header meta row for `Mã:` is synced to the edited document code.
 8. `Mô tả tiếng Việt` field updates the published header subtitle/note and its metadata registry entry.
-9. Portal-generated draft HTML must preserve the current shared header structure and must not fall back to plain-text owner/approver values when linkable role chips are available.
+9. Portal-generated draft HTML must preserve the current shared header structure and must not fall back to plain-text owner/approver values ​​when linkable role chips are available.
 
 ## D. Governance Notes
 

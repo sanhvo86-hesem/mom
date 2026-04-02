@@ -8,10 +8,10 @@
 ## A. Core principles
 
 1. **Clean Root** — Never leave files `.py`, `.mjs`, `.ps1` loose at the root of the repo. All scripts must be in `tools/`.
-2. **Classification by function** — Not classified by AI agent (Claude vs GPT). Sort by PURPOSE of script/report.
-3. **Engines vs Scripts** — Clearly distinguish between reusable engines (long-term retention) and one-time scripts (can be deleted later).
+2. **Functional classification** — Not classified by AI agent (Claude vs GPT). Sort by PURPOSE of script/report.
+3. **Engines vs Scripts** — Distinguish clearly between reusable engines (long-term retention) and one-time scripts (can be deleted later).
 4. **Reports has subfolders** — `_reports/` MUST have substructure, not dump flat.
-5. **Consistent date-stamp** — Files have a date using the format `YYYYMMDD` (for example: `20260325`), placed at the END of the file name.
+5. **Consistent date-stamp** — Files have a date using the format `YYYYMMDD` (e.g. `20260325`), placed at the END of the file name.
 
 ---
 
@@ -19,35 +19,35 @@
 
 ```
 tools/
-??? engines/ ? Reusable engines (kept long-term)
-?   ??? context_translate_engine.py ? Context-aware English?Vietnamese translation engine
-?   ??? fill_missing_translations.py ? Fill missing translations
-?   ??? translate_en_to_vi.py ? Direct EN?VI translator
-?   ??? create_dictionary.py ? Build dictionary files
-?   ??? restore_roles_storage.py ? Restore roles / permissions storage
+├── engines/                          → Engine tái sử dụng (giữ vĩnh viễn)
+│   ├── context_translate_engine.py  → Dịch Anh→Việt có ngữ cảnh
+│   ├── fill_missing_translations.py → Điền bản dịch thiếu
+│   ├── translate_en_to_vi.py        → Dịch trực tiếp EN→VI
+│   ├── create_dictionary.py         → Xây dựng từ điển
+│   └── restore_roles_storage.py     → Khôi phục vai trò/phân quyền
 │
-??? scripts/ ? One-off or batch scripts
-?   ??? form-repair/ ? Repair Excel forms
-?   ??? translation/ ? Batch translation runs (date-stamped)
-?   ??? encoding/ ? Fix mojibake / encoding issues
-?   ??? link-repair/ ? Repair broken links and document codes
-?   ??? language-polish/ ? Vietnamese language polishing
-?   ??? m365/ ? SharePoint / M365 scripts
+├── scripts/                          → Scripts chạy một lần hoặc theo đợt
+│   ├── form-repair/                 → Sửa lỗi Excel forms
+│   ├── translation/                 → Dịch theo batch (có date-stamp)
+│   ├── encoding/                    → Sửa mojibake/encoding
+│   ├── link-repair/                 → Sửa broken links & doc codes
+│   ├── language-polish/             → Polish ngôn ngữ Việt
+│   └── m365/                        → SharePoint/M365 scripts
 │
-??? data/ ? Reference data (dictionary files, word lists)
+├── data/                             → Dữ liệu tham chiếu (từ điển, word lists)
 │   ├── qms-terminology-dictionary.xlsx
 │   ├── remaining-english-words.xlsx
 │   └── remaining-english-words-v2.xlsx
 │
-??? legacy/ ? Older scripts not yet reclassified (temporary hold)
+└── legacy/                           → Scripts cũ, chưa phân loại (tạm giữ)
 ```
 
 ### B1. Classification rules
 
-| Type | Criteria | Directory | Example |
+| Type | Criteria | Directory | For example |
 |------|----------|---------|-------|
-| **Engine** | Reusable, no date-stamp, importable | `tools/engines/` | `context_translate_engine.py` |
-| **Script** | Run once, with date-stamp or version | `tools/scripts/[category]/` | `fix_forms_v5.py` |
+| **Engine** | Reusable, not date-stamp, importable | `tools/engines/` | `context_translate_engine.py` |
+| **Script** | Run once, have date-stamp or version | `tools/scripts/[category]/` | `fix_forms_v5.py` |
 | **Data** | Data files (.xlsx, .csv, .json, .txt) used as input | `tools/data/` | `qms-terminology-dictionary.xlsx` |
 
 ### B2. Name the script
@@ -71,24 +71,24 @@ batch_upgrade_all.py
 
 ```
 _reports/
-??? analysis/ ? Strategic analysis and expert reviews
+├── analysis/                         → Phân tích chiến lược & expert reviews
 │   ├── job-order-deployment-expert-analysis-20260325.md
 │   ├── cnc-job-order-iso-as9100-practicality-assessment-2026-03-22.md
 │   └── security-hardening-audit-2026-03-22.md
 │
-??? translation/ ? Translation progress and inventories
+├── translation/                      → Tiến độ dịch thuật & inventories
 │   ├── translation-progress-summary-20260324.md
 │   ├── translation-01-qms-portal-20260324.md
 │   ├── translation-01-qms-portal-20260324.json
 │   └── ...
 │
-??? link-repair/ ? Broken-link repair tracking
+├── link-repair/                      → Tracking sửa broken links
 │   ├── broken_links_before.csv
 │   ├── link_fix_applied.csv
 │   ├── internal-link-fix-updated-files-20260324.txt
 │   └── ...
 │
-??? encoding/ ? Encoding / mojibake fix tracking
+├── encoding/                         → Encoding/mojibake fix tracking
 │   ├── encoding_autofix_log.csv
 │   ├── mojibake-fix-report-2026-03-22.md
 │   └── ...
@@ -100,7 +100,7 @@ _reports/
 │   ├── deep-operational-vietnamese-*.md
 │   └── ...
 │
-??? m365/ ? SharePoint / M365 templates and cross-references
+├── m365/                             → SharePoint/M365 templates & cross-refs
 │   ├── m365-sharepoint-upload-template-tree-20260324.txt
 │   ├── sharepoint-doc-scan-20260324.txt
 │   └── ...
@@ -111,7 +111,7 @@ _reports/
 │   ├── wi_names.txt
 │   └── ...
 │
-??? screenshots/ ? Screenshots and visual references
+└── screenshots/                      → Screenshots & hình minh họa
     ├── portal-manual-iframe-translate.png
     └── translated-doc.png
 ```
@@ -121,7 +121,7 @@ _reports/
 | Category | Keyword in file name | Directory |
 |----------|----------------------|---------|
 | Expert analysis, assessment, strategic audit | `analysis`, `assessment`, `expert`, `security` | `analysis/` |
-| Translation, translated batches | `translation-*`, `*-translate-*` | `translation/` |
+| Translation, translation, batch | `translation-*`, `*-translate-*` | `translation/` |
 | Broken links, fix links, doc codes | `broken_links_*`, `link_fix_*`, `*-link-*`, `*unresolved*` | `link-repair/` |
 | Encoding, mojibake | `encoding_*`, `mojibake_*` | `encoding/` |
 | Language, mixed-term, Vietnamese, editorial, polish | `mixed-language-*`, `editorial-*`, `deep-operational-*`, `polish-*`, `nonform-*` | `language/` |
@@ -136,7 +136,7 @@ _reports/
 ```
 job-order-deployment-expert-analysis-20260325.md
 translation-progress-summary-20260324.md
-broken_links_before.csv ? legacy name is acceptable, no rename needed
+broken_links_before.csv                          ← legacy OK, không cần rename
 ```
 
 ---
@@ -146,7 +146,7 @@ broken_links_before.csv ? legacy name is acceptable, no rename needed
 This folder contains the form engine and specs specific to form generation. **Remain in position** because:
 - `form_engine.py` is a specialized engine for Excel forms
 - `specs_frm*.py`, `run_frm*.py` belong to the form creation process
-- Already has a good structure, no need to move
+- Already in good structure, no need to move
 
 ---
 
@@ -163,7 +163,7 @@ This folder contains the form engine and specs specific to form generation. **Re
 
 1. **NEVER** dump into the original `_reports/`
 2. Determine category according to table C1
-3. Put it in the correct subfolder
+3. Place in the correct subfolder
 4. Always have date-stamp `YYYYMMDD` in the file name
 
 ### E3. When cleaning
@@ -177,31 +177,31 @@ This folder contains the form engine and specs specific to form generation. **Re
 1. **DO NOT commit files > 5MB** to git — use `.gitignore` if necessary
 2. Before committing: `git pull --rebase` to avoid conflict
 3. Commit message format: `[category] mô tả ngắn` (for example: `[tools] move form-repair scripts to tools/scripts/`)
-4. After reorganizing: commit only once, do not split
+4. After reorganize: commit only once, do not split
 
 ---
 
 ## F. Quick summary — Decide where to put the file
 
 ```
-What kind of file did I just create?
-|
-+- Python/JS/PS1 script?
-|  +- Reusable / importable? -> tools/engines/
-|  +- One-off or batch run? -> tools/scripts/[category]/
-|  `- Data file (xlsx, csv)? -> tools/data/
-|
-+- Report / output?
-|  +- Strategic analysis? -> _reports/analysis/
-|  +- Translation? -> _reports/translation/
-|  +- Link repair? -> _reports/link-repair/
-|  +- Encoding? -> _reports/encoding/
-|  +- Language? -> _reports/language/
-|  +- M365 / SharePoint? -> _reports/m365/
-|  +- Audit form? -> _reports/form-audit/
-|  `- Screenshots? -> _reports/screenshots/
-|
-`- Form engine / specs? -> 04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/
+Tôi vừa tạo file gì?
+│
+├─ Script Python/JS/PS1?
+│  ├─ Tái sử dụng, import được? → tools/engines/
+│  ├─ Chạy 1 lần, batch? → tools/scripts/[category]/
+│  └─ Data file (xlsx, csv)? → tools/data/
+│
+├─ Report/Output?
+│  ├─ Phân tích chiến lược? → _reports/analysis/
+│  ├─ Dịch thuật? → _reports/translation/
+│  ├─ Sửa links? → _reports/link-repair/
+│  ├─ Encoding? → _reports/encoding/
+│  ├─ Ngôn ngữ? → _reports/language/
+│  ├─ M365/SharePoint? → _reports/m365/
+│  ├─ Form audit? → _reports/form-audit/
+│  └─ Screenshot? → _reports/screenshots/
+│
+└─ Form engine/specs? → 04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/
 ```
 
 ---

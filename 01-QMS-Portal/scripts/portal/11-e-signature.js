@@ -16,6 +16,75 @@
 (function () {
   'use strict';
 
+  function repairEsigText(value) {
+    var text = String(value == null ? '' : value);
+    if (!text) return text;
+    function cleanup(input) {
+      return String(input == null ? '' : input)
+        .replace(/\uFFFD/g, '')
+        .replace(/[\u0018\u0019]/g, '')
+        .replace(/Â·/g, '·')
+        .replace(/â€”/g, '—')
+        .replace(/â€“/g, '–')
+        .replace(/â€œ/g, '“')
+        .replace(/â€|â€�/g, '”')
+        .replace(/â€˜|â€™/g, '’')
+        .replace(/â€¦/g, '…')
+        .replace(/Ã /g, 'à')
+        .replace(/Ã¡/g, 'á')
+        .replace(/Ã¢/g, 'â')
+        .replace(/Äƒ/g, 'ă')
+        .replace(/Ä‘/g, 'đ')
+        .replace(/Ä/g, 'Đ')
+        .replace(/Æ°/g, 'ư')
+        .replace(/Æ¡/g, 'ơ')
+        .replace(/áº¡/g, 'ạ')
+        .replace(/áº£/g, 'ả')
+        .replace(/áº¥/g, 'ấ')
+        .replace(/áº§/g, 'ầ')
+        .replace(/á»™/g, 'ộ')
+        .replace(/á»›/g, 'ớ')
+        .replace(/á»/g, 'ờ')
+        .replace(/á»§/g, 'ủ')
+        .replace(/á»«/g, 'ừ')
+        .replace(/á»¯/g, 'ữ');
+    }
+    var best = cleanup(text);
+    for (var i = 0; i < 4; i += 1) {
+      var improved = best;
+      try {
+        improved = cleanup(decodeURIComponent(escape(best)));
+      } catch (_err) {
+        try {
+          var bytes = new Uint8Array(Array.prototype.map.call(best, function (ch) { return ch.charCodeAt(0) & 255; }));
+          improved = cleanup(new TextDecoder('utf-8').decode(bytes));
+        } catch (_err2) {}
+      }
+      if (improved === best) break;
+      best = improved;
+    }
+    return best;
+  }
+
+  function repairEsigDom(root) {
+    if (!root || !root.querySelectorAll) return;
+    root.querySelectorAll('*').forEach(function (node) {
+      Array.prototype.forEach.call(node.childNodes || [], function (child) {
+        if (child && child.nodeType === Node.TEXT_NODE) {
+          var fixed = repairEsigText(child.nodeValue);
+          if (fixed !== child.nodeValue) child.nodeValue = fixed;
+        }
+      });
+      ['title', 'placeholder', 'aria-label', 'value'].forEach(function (attr) {
+        if (node.hasAttribute && node.hasAttribute(attr)) {
+          var raw = node.getAttribute(attr);
+          var fixedAttr = repairEsigText(raw);
+          if (fixedAttr !== raw) node.setAttribute(attr, fixedAttr);
+        }
+      });
+    });
+  }
+
   /* ── Google Fonts for typed signatures ─────────────── */
   var fontLink = document.getElementById('esig-fonts');
   if (!fontLink) {
@@ -175,7 +244,7 @@
 
   ESignature.prototype._l = function (key) {
     var lang = this.config.lang === 'vi' ? 'vi' : 'en';
-    return ESignature.LABELS[lang][key] || ESignature.LABELS.en[key] || key;
+    return repairEsigText(ESignature.LABELS[lang][key] || ESignature.LABELS.en[key] || key);
   };
 
   /* ── Show signature modal ──────────────────────────── */
@@ -281,6 +350,7 @@
 
     document.body.appendChild(overlay);
     this._overlay = overlay;
+    repairEsigDom(overlay);
 
     /* Canvas init */
     this._canvas = overlay.querySelector('#esig-canvas');

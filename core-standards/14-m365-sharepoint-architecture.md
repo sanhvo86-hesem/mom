@@ -7,11 +7,11 @@
 
 ## 1. Architectural principles
 
-| # | Principles | Description |
+| # | Principle | Describe |
 |---|-----------|-------|
 | 1 | **Web portal = read, SharePoint = save** | People read documents on the web. SharePoint only stores operational records (filled forms, evidence) and backup sources. |
 | 2 | **Site = security boundary** | Each site = 1 sensitivity level, 1 main user group. Separate customer IPs to separate sites. |
-| 3 | **Epicor = SoR, SharePoint = SSOT** | Epicor manages transactions (job, PO, inventory). SharePoint manages documents and evidence. Link, do not copy. |
+| 3 | **Epicor = SoR, SharePoint = SSOT** | Epicor manages transactions (job, PO, inventory). SharePoint manages documents and evidence. Link, không copy. |
 | 4 | **Flat folder + metadata** | Maximum 3 levels of folders. Use SharePoint metadata columns instead of deep sub-folders. |
 | 5 | **OneDrive for personal files** | Do not create Employee Workbench in SharePoint. Each user uses OneDrive (1TB/user in Business Basic). |
 | 6 | **Group-based permission** | Delegate permissions according to Entra ID Security Groups, do not assign per-user. |
@@ -30,9 +30,9 @@ SITE 4: HESEM-Digital             ← Source control (backup web portal) + IT go
 
 **Why 4 sites instead of 3?**
 
-| Reason | Explanation |
+| Reason | Explain |
 |-------|-----------|
-| Client IP | Lam Research IP (drawings, spec, CAM data) MUST separate site — audit asks "How do you protect our IP?" |
+| Customer IP | Lam Research IP (drawings, spec, CAM data) MUST separate site — audit asks "How do you protect our IP?" |
 | Permission isolation | SharePoint site-level isolation = the hardest security boundary in M365 Business Basic |
 | Performance | Job dossier largest volume (2000-5000 files/year) — separated without affecting other sites |
 | Compliance | AS9100 §8.5.2 traceability + ISO 9001 §7.5.3 record protection |
@@ -68,7 +68,7 @@ SITE 4: HESEM-Digital             ← Source control (backup web portal) + IT go
 
 Each online form (~25 forms) syncs to a separate SharePoint List + auto PDF to Document Library:
 
-| Online forms | SharePoint List | PDF saved at |
+| Online form | SharePoint List | PDF saved at |
 |------------|----------------|-------------|
 | FRM-208 Tier Meeting | LST-FRM-208 | Department-Ops/PRO/{YYYY}/ |
 | FRM-504 Shift Handover | LST-FRM-504 | Department-Ops/PRO/{YYYY}/ |
@@ -82,19 +82,19 @@ Each online form (~25 forms) syncs to a separate SharePoint List + auto PDF to D
 
 ### 3.4 Metadata columns (Quality-Records library)
 
-| Columns | Type | Required | Description |
+| Column | Type | Obligatory | Describe |
 |--------|------|---------|-------|
-| Record-Type | Choice | Yes | NCR, CAPA, FAI, Calibration, SPC, IQC, Complaint, Ship-Release, Supplier |
-| Record-Number | Text (indexed) | Yes | NCR-2026-043, FAI-2026-015 |
-| Form-Code | Text | Sometimes it's form | FRM-631, FRM-311 |
-| Form-Version | Text | Sometimes it's form | V2.1 |
-| Job-Number | Text | If there is | JOB-2026-0042 |
-| Part-Number | Text | If there is | 714-XXXX-001 |
-| Customers | Choice | If there is | Lam-Research |
-| Status | Choice | Yes | Open, In-Review, Closed |
-| Department | Choice | Yes | QA, ENG, PRO, SCM... |
-| Year | Text | Yes | 2026 |
-| Closed-Date | Date | When closing | 2026-04-15 |
+| Record-Type | Choice | Have | NCR, CAPA, FAI, Calibration, SPC, IQC, Complaint, Ship-Release, Supplier |
+| Record-Number | Text (indexed) | Have | NCR-2026-043, FAI-2026-015 |
+| Form-Code | Text | Sometimes it's a form | FRM-631, FRM-311 |
+| Form-Version | Text | Sometimes it's a form | V2.1 |
+| Job-Number | Text | If any | JOB-2026-0042 |
+| Part-Number | Text | If any | 714-XXXX-001 |
+| Customer | Choice | If any | Lam-Research |
+| Status | Choice | Have | Open, In-Review, Closed |
+| Department | Choice | Have | QA, ENG, PRO, SCM... |
+| Year | Text | Have | 2026 |
+| Closed-Date | Date | When closed | 2026-04-15 |
 
 ---
 
@@ -113,7 +113,7 @@ Each online form (~25 forms) syncs to a separate SharePoint List + auto PDF to D
 
 ### 4.2 Part-REV-Master — file categories
 
-| File-Category | Actual file types | Example |
+| File-Category | Actual file types | For example |
 |--------------|-------------------|-------|
 | NC-Program | .nc, .tap, .mpf, .eia, .cnc | NC_714XXXX-REVA_OP10_5AX_V3.nc |
 | CAM-Source | .mcam, .f3d, .emcam | CAM_714XXXX-REVA_OP10_5AX_V3.mcam |
@@ -207,7 +207,7 @@ SharePoint (source) → OneDrive sync → Local edit → Git → Server deploy
 | HESEM-Management | Head of department or higher |
 | HESEM-QMS-Team | QMS Manager + QMS Engineer + QA Manager |
 | HESEM-Quality | QA/QC team |
-| HESEM-Engineering | Engineering department |
+| HESEM-Engineering | Engineering dept |
 | HESEM-Production | Production + operators |
 | HESEM-SCM | Supply chain |
 | HESEM-Sales | Sales/CS |
@@ -241,13 +241,13 @@ SharePoint (source) → OneDrive sync → Local edit → Git → Server deploy
 
 QMS Portal includes a **Master Data Control** module that manages the underlying data on which all forms and orders depend:
 
-| Object | Description | Cascading relationships |
+| Object | Describe | Cascading relationships |
 |-----------|-------|----------------------|
 | **Customer** | Customer approved | Customer -> SO, Customer -> Part |
-| **Supplier** | Supplier / outsourcing | Customer -> Approved Supplier |
+| **Supplier** | Supplier/outsourcing | Customer -> Approved Supplier |
 | **Part** | Detailed code | Customer -> Part -> Revision |
 | **Part Revision** | Detailed versions (REV-A, REV-B...) | Part -> Revision -> Engineering baseline |
-| **Sales Order (SO)** | Sales orders | Customer -> SO -> JO |
+| **Sales Order (SO)** | Sales order | Customer -> SO -> JO |
 | **Job Order (JO)** | Production order | SO -> JO -> WO |
 | **Work Order (WO)** | Worksheet per operation | JO -> WO (per routing operation) |
 
@@ -281,7 +281,7 @@ Evidence forms (FRM-631 NCR, FRM-651 Final Inspection, FRM-511 Setup...) **bind*
 |---|----------|---------|-------------|------------|
 | 1 | **Frequency** | 25 | Daily/per-shift: +25 · Per-event: +20 | Monthly: −5 · Quarterly+: −15 |
 | 2 | **Number of fields** | 20 | ≤15: +20 · 16-25: +10 | 26-50: −5 · >50/multi-tab: −20 |
-| 3 | **Place to fill** | 15 | Production floor/at machine: +15 | Technical rooms: 0 · Meeting rooms: −5 |
+| 3 | **Place of filling** | 15 | Production floor/at machine: +15 | Technical rooms: 0 · Meeting rooms: −5 |
 | 4 | **Dashboard** | 15 | KPI live/escalation: +15 | Batch report: −5 · None: −10 |
 | 5 | **Approval workflow** | 10 | Multi-step e-sig: +10 | No workflow: 0 |
 | 6 | **Attachments** | 10 | On-site photo: +10 | CMM/CAM files: −5 · Multi-file: −10 |
@@ -293,8 +293,8 @@ Evidence forms (FRM-631 NCR, FRM-651 Final Inspection, FRM-511 Setup...) **bind*
 
 | ALWAYS ONLINE | ALWAYS OFFLINE |
 |-------------|-------------|
-| Fill out ≥2 times/day or per shift | Multi-tab Excel with complex formula |
-| Escalation/notification required | Reference document, do not fill in new |
+| Fill ≥2 times/day or per shift | Multi-tab Excel with complex formula |
+| Escalation/notification required | Reference document, do not fill in new ones |
 | Data flows into the OEE/OTD dashboard | Engineering baseline (CAM/NC linkage) |
 | Fill in at the machine using phone/tablet | Frequency ≤ Quarterly |
 
@@ -325,7 +325,7 @@ Upload:   SharePoint validate version vs registry → reject if obsolete
 
 ---
 
-## 10. Storage estimate
+## 10. Storage estimates
 
 | File type | Medium size | Volume/year | Total/year |
 |-----------|----------------|-----------|-----------|
@@ -334,7 +334,7 @@ Upload:   SharePoint validate version vs registry → reject if obsolete
 | CAD model (.step) | 1-20MB | 200 files | ~2GB |
 | Photos (.jpg) | 1-5MB | 2000 files | ~5GB |
 | Forms + PDFs | 200KB-2MB | 3000 files | ~3GB |
-| Scanned docs (.pdf) | 500KB-3MB | 1000 files | ~2GB |
+| Scanned documents (.pdf) | 500KB-3MB | 1000 files | ~2GB |
 | **Total/year** | | | **~18GB** |
 
 M365 Business Basic: 1TB + 10GB/user. With 100 users = ~2TB. 18GB/year = **100+ years of storage**.

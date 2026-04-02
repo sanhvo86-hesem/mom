@@ -1,0 +1,106 @@
+{
+  "_meta": {
+    "version": "2.0",
+    "description": "Internal quality report for registry completeness and normalization.",
+    "generatedAt": "2026-04-02T06:00:20.356Z"
+  },
+  "summary": {
+    "endpoint_count": 345,
+    "field_count": 6209,
+    "average_fields_per_endpoint": 18,
+    "unique_field_keys": 1005,
+    "status_set_count": 43,
+    "formula_count": 43,
+    "connector_count": 13,
+    "workflow_count": 8,
+    "standards_count": 8
+  },
+  "coverage": {
+    "router_only_actions": 99,
+    "auth_protected_actions": 334,
+    "csrf_protected_actions": 173,
+    "admin_actions": 22,
+    "paginated_actions": 40,
+    "actions_with_permission_keys": 122
+  },
+  "highest_complexity_endpoints": [
+    {
+      "action": "customer_portal_revoke_doc",
+      "params": 12,
+      "fields": 36,
+      "permissions": 0
+    },
+    {
+      "action": "dispatch_list_targets",
+      "params": 7,
+      "fields": 36,
+      "permissions": 0
+    },
+    {
+      "action": "product_passport_data",
+      "params": 6,
+      "fields": 36,
+      "permissions": 0
+    },
+    {
+      "action": "fmea_control_plans",
+      "params": 4,
+      "fields": 36,
+      "permissions": 1
+    },
+    {
+      "action": "master_data_snapshot",
+      "params": 5,
+      "fields": 36,
+      "permissions": 0
+    },
+    {
+      "action": "ai_spc_anomalies",
+      "params": 5,
+      "fields": 36,
+      "permissions": 0
+    },
+    {
+      "action": "schedule_get",
+      "params": 5,
+      "fields": 36,
+      "permissions": 0
+    },
+    {
+      "action": "cnc_program_data",
+      "params": 5,
+      "fields": 36,
+      "permissions": 0
+    },
+    {
+      "action": "schedule_slot_breakdown",
+      "params": 5,
+      "fields": 36,
+      "permissions": 0
+    },
+    {
+      "action": "schedule_slot_detail",
+      "params": 5,
+      "fields": 36,
+      "permissions": 0
+    },
+    {
+      "action": "cnc_program_setup_sheets",
+      "params": 4,
+      "fields": 36,
+      "permissions": 0
+    },
+    {
+      "action": "ai_tool_wear",
+      "params": 4,
+      "fields": 36,
+      "permissions": 0
+    }
+  ],
+  "recommendations": [
+    "Use endpoint-catalog.json as the canonical inventory for routed actions.",
+    "Use validation-rules.json when generating schema validators and API guards.",
+    "Use identifier-patterns.json and unit-library.json when expanding database migrations.",
+    "Use workflow-library.json and compliance-crosswalk.json to keep new modules aligned to aerospace quality expectations."
+  ]
+}

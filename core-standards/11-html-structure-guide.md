@@ -112,10 +112,10 @@
 - `doc-name` is always English SSOT title according to filename/path controlled; Do not translate this title into Vietnamese and do not include the document code in the same display node.
 - Portal/catalog/runtime cannot combine code and name into one text node. If the runtime metadata is not clean, you must re-read `doc-name` from the published header and `doc-code` from the clean meta/header hook.
 - `fh-company` is the legacy node; The new template does not render this node and the shared CSS must be completely hidden if the old file is retained.
-- Meta labels displayed in Vietnamese: `Mã`, `Phiên bản`, `Ngày hiệu lực`, `Chủ sở hữu`, `Phê duyệt`
+- Meta labels display in Vietnamese: `Mã`, `Phiên bản`, `Ngày hiệu lực`, `Chủ sở hữu`, `Phê duyệt`
 - Rows `Chủ sở hữu` and `Phê duyệt` must use chip links to the corresponding JD or department handbook; Do not leave plain text as `QA Manager`, `Engineering`, `Tổng Giám Đốc`.
 - This header rule applies to all release documents and online/runtime forms in `01-QMS-Portal`.
-- For documents that have not been released for the first time, `Version` in the header is always `V0`
+- For unpublished documents, `Version` in the header is always `V0`
 - **Orange border** header: 1px piece at the beginning of the meta row
 - **DO NOT** change the header structure — every file MUST be the same
 - `{{OWNER_ROLE_HTML}}` and `{{APPROVER_ROLE_HTML}}` must be chip roles directly linked to JD
@@ -127,12 +127,12 @@ With JD:
 - `strong` in the title block must follow the `JD-<ROLECODE> — <Job title English>` standard.
 - `sub-vn` uses standard Vietnamese for the location.
 - Row `Mã` in the header must match `JD-<ROLECODE>`.
-- In the location information table:
+- In the location information panel:
   - `Mã vị trí` = `JD-<ROLECODE>`
   - `Mã vai trò dùng trong SOP/RACI` = JD-linked chip role
   - `Mũ quản trị có thể gắn` only appears when the role actually has permission
   - `Chức danh theo tài liệu` keeps plain English title, does not render chip
-- Do not allow JD to have fragment structures of type missing `<html>`, `<head>` or `<body>`.
+- JDs with fragment structures of type missing `<html>`, `<head>` or `<body>` are not allowed.
 
 ### 2.3 ISO MAP — Applicable standards
 
@@ -158,16 +158,16 @@ With JD:
 - Background: light blue gradient (`linear-gradient(135deg, #f0f7ff, #e8f4fd)`)
 - Border: 1px solid blue (`var(--blue)`)
 - Badge "ISO 9001:2026" automatically displays above (CSS `::before`)
-- The `.req` boxes inside have a translucent white background (distinguished from the gradient background)
+- The `.req` boxes inside have a translucent white background (distinguished from the gradient background).
 
 **Badges require ISO:**
 
 | Badges | Class | Color | When to use |
 |-------|-------|-----|--------------|
-| MUST | `req-tag shall` | Red | ISO SHALL requirement — violation = nonconformity |
-| REQUIRED | `req-tag must` | Red | Hard internal request — violation = stop |
-| SHOULD | `req-tag should` | Gold | SHOULD Recommendation — should be followed |
-| CAN | `req-tag may` | Green | SEWING options — flexible |
+| RIGHT | `req-tag shall` | Red | ISO SHALL requirement — violation = nonconformity |
+| OBLIGATORY | `req-tag must` | Red | Hard internal request — violation = stop |
+| SHOULD | `req-tag should` | Yellow | SHOULD recommendation — should be followed |
+| MAYBE | `req-tag may` | Green | SEWING options — flexible |
 
 **ISO badge terms:**
 ```html
@@ -175,7 +175,7 @@ With JD:
 ```
 Displays a small green badge with the ISO 9001:2026 clause number.
 
-### 2.4 PREFACE BLOCK — Executive command
+### 2.4 PREFACE BLOCK — Executive order
 
 ```html
 <div class="preface-block">
@@ -210,8 +210,8 @@ Core-standard **allows** central standardization:
 
 - header, preface, toc, table-card, field-grid, callout-grid,
 - flowchart color palette, `proc-num`, `flow-num`, arrow, CSS fallback,
-- table frame of Section 6 and Section 8,
-- Technical QA checklist and comment instructions in the template.
+- table frames of Section 6 and Section 8,
+- Technical QA checklist and instructional comments in the template.
 
 Core-standard **deprecated** to justify mass content updates:
 
@@ -294,8 +294,8 @@ Core-standard **deprecated** to justify mass content updates:
 ### 3.4 Section 6 — Internal Gates — TABLE format
 
 **Section 6 structure rules:**
-- Internal Gate uses the symbol **IG** (IG1, IG2, IG3...) — DO NOT use G (G is system gates)
-- Number of IG **unlimited** — depending on specific process (3, 5, 6, 8...)
+- Internal Gate uses the symbol **IG** (IG1, IG2, IG3...) — DO NOT use G (G is system gate)
+- Number of IGs **unlimited** — depending on specific process (3, 5, 6, 8...)
 - Format: **TABLE** 5 columns (DO NOT use gate-card/grid)
 - Each IG MUST have: Description, Chair, Required Breakpoints, Measurable KPIs
 - The IG number **does NOT need to** match the Section 7 step number
@@ -336,8 +336,8 @@ Core-standard **deprecated** to justify mass content updates:
 **⚠ NEVER:**
 - Use gate-card/gate-grid for IG → use TABLE
 - Fixed limit of 5 IG → depending on the process
-- Leave the Leader/Stop/KPI column blank → each IG MUST be complete
-- Place the IG badge without centering → use `class="ig-center"` on `<td>`
+- Leave the Host/Stop/KPI column blank → each IG MUST be complete
+- Set the IG badge without centering → use `class="ig-center"` on `<td>`
 
 ### 3.5 Section 7 — Detailed process — FLOWCHART + Balloon headings
 
@@ -345,16 +345,16 @@ Core-standard **deprecated** to justify mass content updates:
 - **Part 1:** Overview flowchart (visual process flow)
 - **Part 2:** Step-by-step details with **proc-num balloon** before the heading
 - Number of steps **unlimited** — depending on the process (5, 8, 10, 12...)
-- Flowchart MUST match the number of h3 steps below
+- The flowchart MUST match the exact number of h3 steps below
 - Section 7 step numbers are **NOT limited** by Section 6 IG numbers
-- Each balloon step has **rotating colors** (rotating colors) — NOT fixed to 1 color
+- Each balloon step has **rotating colors** (rotating colors) — NOT a fixed color
 - The bubble color in the flowchart must match the `proc-num` color of the corresponding step; regardless of whether step has class `active/critical` or not
 - Global CSS MUST have a fallback palette so that old files or handwritten files do not fall back to a single color
-- New flowchart created by script MUST give priority to inline style in `flow-step`, `flow-num`, `flow-arrow`; CSS fallback is only to protect old or handwritten files
-- `.active` and `.critical` only support visual clicking; Do not override the color logic according to the number of bubble steps
-- Fallback palette must correctly account for `.flow-arrow` intervening between `.flow-step`; The selector must be based on the actual direct child positions of `.flow-step`, not assuming all children are steps
+- New flowcharts created by script MUST prioritize inline style in `flow-step`, `flow-num`, `flow-arrow`; CSS fallback is only to protect old or handwritten files
+- `.active` and `.critical` only support visual emphasis; Do not override the color logic according to the number of bubble steps
+- The Fallback palette must properly account for `.flow-arrow` intervening between `.flow-step`; The selector must be based on the actual direct child positions of `.flow-step`, not assuming all children are steps
 - When changing content, only change the part between `p7` and `p8`
-- The number of steps must be determined according to the handover logic and risk window of that SOP, not according to a beautiful template
+- The number of steps must be determined according to the delivery logic and risk window of that SOP, not according to a beautiful template
 
 **Part 1: Flowchart**
 ```html
@@ -379,7 +379,7 @@ Core-standard **deprecated** to justify mass content updates:
 ```
 
 **Rotating color palette (10 colors):**
-| Step | Gradients | Properties |
+| Step | Gradient | Nature |
 |------|----------|-----------|
 | 1 | `#1565c0, #1976d2` | Blue |
 | 2 | `#059669, #10b981` | Green |
@@ -390,7 +390,7 @@ Core-standard **deprecated** to justify mass content updates:
 | 7 | `#c2410c, #ea580c` | Dark orange |
 | 8 | `#4338ca, #6366f1` | Indigo |
 | 9 | `#15803d, #22c55e` | Dark green |
-| 10 | `#be185d, #ec4899` | Hong |
+| 10 | `#be185d, #ec4899` | Pink |
 
 **Part 2: Step-by-step details**
 ```html
@@ -402,20 +402,20 @@ Core-standard **deprecated** to justify mass content updates:
 ```
 
 **⚠ IMPORTANT RULES:**
-- Flowchart MUST have BEFORE the detailed h3
+- Flowchart MUST have BEFORE detailed h3s
 - Number of steps in flowchart = Number of h3 headings (must NOT be skewed)
 - Balloon color h3 = Corresponding color in the flowchart
 - When updating content → recheck numbering + flowchart
 - Step `.active` (yellow) = decision/approval
 - Step `.critical` (red) = test/measure/hold point
 
-### 3.6 Four Types of Badges/Buttons — Visual Distinction
+### 3.6 Four types of Badges/Buttons — Visual distinction
 
 | Badges | CSS Class | Symbol | Color | Used for |
 |-------|-----------|---------|-----|----------|
 | **ISO Clause** | `.iso-clause` | §7.5, §8.2 | Dark blue (#1565c0) white background | Reference ISO 9001:2026 |
-| **ISO Req** | `.req-tag.shall` / `.req-tag.should` / `.req-tag.may` | MUST, SHOULD, COULD | Red / Yellow / Green | ISO mandatory level |
-| **Internal Gate** | `.step-tag` | IG1, IG2... | Navy gradient pills | Internal control gate |
+| **ISO Req** | `.req-tag.shall` / `.req-tag.should` / `.req-tag.may` | MUST, SHOULD, COULD | Red / Yellow / Green | Required ISO level |
+| **Internal Gate** | `.step-tag` | IG1, IG2... | Navy gradient pills | Internal control port |
 | **Procedure Step** | `.proc-num` | ①②③... | Rotating 10 colors | Detailed process steps |
 | **System Gate** | `.gate-tag` | G0, G1...G7 | Teal (#00838f) | 8 system ports |
 
@@ -433,26 +433,26 @@ Core-standard **deprecated** to justify mass content updates:
 
 | # | NEVER | Reason |
 |---|--------------|-------|
-| 1 | Redeclar `.table`, `.note`, `.callout`, `.box`, `.req`, `.iso-map` in inline `<style>` | Override global CSS → lose sync |
-| 2 | Create `<table>` without `class="table"` | Border/header CSS not accepted |
+| 1 | Redeclar `.table`, `.note`, `.callout`, `.box`, `.req`, `.iso-map` in inline `<style>` | Overwrite global CSS → lose sync |
+| 2 | Create `<table>` without `class="table"` | Border/header CSS is not accepted |
 | 3 | Use `border="1"` attribute on `<table>` | Use CSS class instead |
 | 4 | Use inline `style="border-left:Xpx"` on note/box | Use class (global CSS set 3px) |
-| 5 | Change the structure of form-header | All files MUST be the same |
-| 6 | Translate file names, folders, paths into Vietnamese | Breaking system links |
+| 5 | Change form-header structure | All files MUST be the same |
+| 6 | Translate file names, folders, paths into Vietnamese | Break system links |
 | 7 | Translate metadata labels (Code, Version, Owner...) | Keep it in English |
-| 8 | Translate SharePoint List names, Column names, Site names | system proper noun |
-| 9 | Translate roles (Team Leader, Foreman, Inspector...) | Unified proper noun |
-| 10 | Use gate-card/gate-grid for Internal Gates | IG MUST use 5-column TABLE |
-| 11 | Fixed limit 5 IG | The number of IG depends on the process, unlimited |
-| 12 | Force IG number = detailed step number | IG and detail step are two different classes |
+| 8 | Translate SharePoint List names, Column names, Site names | System proper noun |
+| 9 | Translating roles (Team Leader, Foreman, Inspector...) | Unified proper noun |
+| 10 | Use gate-card/gate-grid for Internal Gates | IG MUST use a 5-column TABLE |
+| 11 | Fixed limit of 5 IG | The number of IG depends on the process, there is no limit |
+| 12 | Force IG number = detailed step number | IG and detail step are two different layers |
 | 13 | Creating a flowchart that doesn't match the number of steps h3 | Flowchart steps = h3 headings |
 | 14 | Use a fixed color for proc-num balloons | Use 10 rotating colors |
 | 15 | Leave the Lead/Stop/KPI column blank in the IG table | Each IG MUST be complete |
-| 16 | Batch-upgrade the content `Section 1/2/3/4/5/8` with a common set of sentences for many SOPs | Leads to wrong boundaries, wrong roles, wrong exceptions and loss of practicality
+| 16 | Batch-upgrade the content `Section 1/2/3/4/5/8` with a set of statements common to many SOPs | Leading to wrong boundaries, wrong roles, wrong exceptions and loss of practicality |
 | 17 | Retain editorial guidance notes, benchmark notes or other notes from the old version in the SOP body | Draft documents will be dirty, out of context and difficult to release V0 |
-| 18 | Use bullet list for Section 8 when the SOP has multiple hold/restart/revalidation/change | branches Loss of owner, loss of person to remove hold and difficulty in auditing |
+| 18 | Use bullet list for Section 8 when the SOP has multiple hold/restart/revalidation/change branches | Loss of owner, loss of person to remove hold and difficulty in auditing |
 | 19 | `metric-grid` is required for all SOPs even if there is no need for a separate KPI summary | Create a decorative section, duplicate KPIs already in Section 6 |
-| 20 | Write Section 3 using half-English, half-Vietnamese terms or parentheses | Obfuscating operational meanings and creating errors in the use of terminology in the body of the SOP |
+| 20 | Write Section 3 using half-English, half-Vietnamese terms or parentheses | Obfuscating operational meanings and creating errors in terminology within the SOP body |
 
 ---
 
@@ -469,7 +469,7 @@ Core-standard **deprecated** to justify mass content updates:
 
 ### 5.2 ISO map (First section)
 - [ ] ISO map has badge MUST/SHOULD/CAN (`req-tag`) ?
-- [ ] Each request has a `iso-clause` badge with specific terms (§X.Y) ?
+- [ ] Does each request have a `iso-clause` badge with specific terms (§X.Y) ?
 - [ ] ISO version = 9001:**2026** (NOT 2015) ?
 
 ### 5.3 Sections 1, 2, 3, 4, 5, 8
@@ -478,29 +478,29 @@ Core-standard **deprecated** to justify mass content updates:
 - [ ] Does Section 2 state boundary restart / re-entry / transfer if Section 7 has that branch?
 - [ ] Section 3 only keeps the terms really needed to understand gate/step?
 - [ ] The term name follows the form `English term (thuật ngữ tiếng Việt chuẩn)` and the Vietnamese version of the SOP body is preferred?
-- [ ] Section 4 covers all IG owners and roles with HOLD / RELEASE / RESTART / REVALIDATE / APPROVE EXCEPTION rights?
+- [ ] Section 4 covers all IG owners and roles with HOLD / RELEASE / RESTART / REVALIDATE / APPROVE EXCEPTION permissions?
 - [ ] Section 5 map is returned before IG1/B1, after the last gate/last step and trigger restart/change/escalation?
 - [ ] Section 5 does not use ambiguous cells of type `khi cần`, `theo yêu cầu`, `tài liệu liên quan` ?
 - [ ] Section 8 uses a 5-column table by default; If you use a bullet list, it proves that this SOP is narrow governance and does not lose the owner / deholder / profile?
-- [ ] Each scenario in Section 8 has a chair + person to unhold / approve + documents ?
+- [ ] Each scenario in Section 8 has a chairperson + person to unhold / approve further + documents ?
 - [ ] Body SOP no longer has editorial notes, benchmark notes, notes different from the old version, or writing method notes?
 
 ### 5.4 Section 6 — Internal Gates
 - [ ] Use 5-column TABLE (DO NOT use gate-card) ?
-- [ ] IG badge uses `step-tag` + `ig-center` class?
-- [ ] Each IG has: Description, Chair, Breakpoint, KPI (DO NOT leave blank) ?
+- [ ] IG badge uses `step-tag` + `ig-center` class ?
+- [ ] Each IG has: Description, Chair, Breakpoint, KPI (NOT blank) ?
 - [ ] Number of IGs that comply with the process (NO fixed limit of 5) ?
 - [ ] IG number is not forced to match the Section 7 step number?
 
 ### 5.5 Section 7 — Detailed procedures
 - [ ] Is there flowchart (`<div class="flowchart">`) AFTER heading h2 ?
 - [ ] Number of flowchart steps = Number of h3 headings below?
-- [ ] Each h3 has `proc-num` balloon with rotating color?
+- [ ] Each h3 has `proc-num` balloon with rotating color ?
 - [ ] With automatically generated SOP: does each `flow-num` in the flowchart have an inline style?
 - [ ] Flowchart steps have `.active` (decision) and `.critical` (check) ?
 - [ ] Detailed step numbers are separated by operating logic, not by IG number?
 - [ ] Detailed step content: explain WHO/WHAT/WHEN/HOW ?
-- [ ] Is there a "Force stop" callout at important steps?
+- [ ] Is there a "Force stop" callout at critical steps?
 - [ ] Is there a "Handover" at the end of each step?
 - [ ] Checked that `p6`, `p7`, `p8` were not mistakenly deleted when replacing the section?
 

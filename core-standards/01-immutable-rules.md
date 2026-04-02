@@ -1,7 +1,7 @@
 # 01 — Immutable Rules
 
-> The rules in this file can **NEVER** be violated, no matter the circumstances.
-> Violation of any of the rules below will break the integrity of the entire QMS system.
+> The rules in this file can **NEVER** be violated, regardless of the circumstances.
+> Violating any of the rules below will break the integrity of the entire QMS system.
 
 ---
 
@@ -30,7 +30,7 @@ The following HTML attributes are **NEVER** translated:
 - `style` — inline CSS property
 - `data-*` — data attribute
 - `name` — form field name
-- `value` — hidden value of form field (displayed value can be translated)
+- `value` — hidden value of form field (visible value can be translated)
 
 ```html
 ✅ <a href="../sop-101-document-and-data-control.html" class="doc-link">
@@ -41,7 +41,7 @@ The following HTML attributes are **NEVER** translated:
 
 ### A3. CSS and JavaScript — retain technical identifiers, localize display strings
 
-Technical sections in tags `<style>` and `<script>` **NEVER** are translated. Includes:
+Technical sections in tags `<style>` and `<script>` **NEVER** are translated. Include:
 - CSS variable names (`--navy`, `--blue`, `--gold`)
 - Class name (`.form-header`, `.doc-content`, `.callout`)
 - JavaScript function name
@@ -89,7 +89,7 @@ When an abbreviation appears in the glossary/term dictionary:
 - `term` MUST be a canonical lookup key;
 - `meaning` MUST be the full English name of the abbreviation;
 - Do not create new canonical records in the form `Full Term (ABBR)`;
-- with the pair `ABBR` and `Full Term (ABBR)`, `ABBR` is the main entry;
+- With the pair `ABBR` and `Full Term (ABBR)`, `ABBR` is the main entry;
 - role/JD codes like `QA-01`, `PUR-02`, `EXE-01` are still allowed in glossary, but `meaning` MUST be the full English title.
 
 Detailed standards: see `25-glossary-canonical-abbreviation-standard.md`.
@@ -122,7 +122,7 @@ The following names are **system proper nouns** (SharePoint, Epicor, M365). If t
 
 The following column names are technical identifiers in M365 Lists/Epicor. **NEVER** translate:
 
-| Column name | Description | Original language |
+| Column name | Describe | Original language |
 |---------|--------|---------------|
 | `RecordType` | Record type | English |
 | `RecordCode` | Profile code | English |
@@ -136,13 +136,13 @@ The following column names are technical identifiers in M365 Lists/Epicor. **NEV
 | `Phiên bản` | Version | Vietnamese (preset) |
 | `CustomerID` | Customer code | English |
 | `SupplierID` | Supplier code | English |
-| `EvidenceUrl` | Evidence Path | English |
+| `EvidenceUrl` | Evidence path | English |
 
 **Quick identification of internal column names:** Any words written in the form **CamelCase** (like `RecordType`, `JobNum`, `CustomerID`) are technical column names — **DO NOT translate**.
 
 #### B3.2b Storage Locations — keep the English 100%
 
-| English name | Description |
+| English name | Describe |
 |---------------|--------|
 | `Quality-Records` | Library of quality records (site HESEM-Records) |
 | `QMS-Governance` | Library of QMS administrative records (site HESEM-Records) |
@@ -155,7 +155,7 @@ The following column names are technical identifiers in M365 Lists/Epicor. **NEV
 | `QMS-Source-Control` | Library backup web portal (site HESEM-Digital) |
 | `Point-of-use` / `Point-of-use Control` | Point of use |
 | `Document Library` | Document library |
-| `Record Library` | Profile Library |
+| `Record Library` | Profile library |
 
 **Rule:** Repository names are M365/SharePoint proper nouns — translation will cause reference confusion.
 
@@ -163,43 +163,43 @@ The following column names are technical identifiers in M365 Lists/Epicor. **NEV
 
 | English | Vietnamese (description) |
 |-----------|---------------------|
-| `Document Responsible Person` | Document manager |
+| `Document Responsible Person` | Person in charge of documents |
 | `Lead Department` | Presiding department |
-| `IT Administrator` | IT Administrator |
+| `IT Administrator` | IT administrator |
 | `Team Leader` | Team leader |
 | `Shift Leader` | Head of shift |
 | `Foreman` | Foreman |
-| `Approver` / `Reviewer` / `Author` | Approver / reviewer / editor |
+| `Approver` / `Reviewer` / `Author` | Approver/reviewer/editor |
 | `Performer` / `Inspector` / `Operator` | Implementer/inspector/operator |
-| `Specialist` / `Worker` / `End User` | Professional / Worker / End User |
+| `Specialist` / `Worker` / `End User` | Professionals / Workers / End users |
 
 **Alternative rules:**
-- Standard JD title in English.
+- The title JD is standard in English.
 - Header, RACI, host table, gate owner, hold/release authority and approver use shortened `role code` with JD link.
 - Governance hats must be attached to the actual host role, for example `QA[QMR]`, `QMS[DC]`, `QMS[LA]`.
 - Prohibit independent use of placeholders such as `Process Owner`, `Department Head`, `Responsible Person`, `Data Owner`, `Top Management` in owner/RACI/authority cells.
-- When a group of roles is needed, it must be rendered into an explicit role bundle consisting of multiple JD chip link roles, do not write ambiguous groups.
+- When a group of roles is needed, it must be rendered into an explicit role bundle consisting of multiple JD link chip roles, do not write ambiguous groups.
 
 #### B3.3 SharePoint List name — keep 100%
 
-| Original List name | Description |
+| Original List name | Describe |
 |---------------|--------|
 | `QMS-Document-Register` | Document register |
 | `QMS-Change-Register` | Change register |
 | `QMS-NCR-Register` | NCR Registry |
 | `QMS-CAPA-Register` | CAPA Register |
 | `QMS-Training-Register` | Training register |
-| `QMS-Competence-Matrix` | Competency Matrix |
+| `QMS-Competence-Matrix` | Competency matrix |
 | `OPS-Job-Dossier-Index` | Job profile list |
-| `PUR-Supplier-Register` | Supplier Register |
+| `PUR-Supplier-Register` | Supplier register |
 | `M365-Record-Provisioning-Requests` | Request for issuance of documents |
-| `M365-Record-Series-Catalog` | List of records series |
-| `Department-Zone-Catalog` | Directory of departments/areas |
-| `People-Dossier-Index` | Personnel profile list |
+| `M365-Record-Series-Catalog` | List of record chains |
+| `Department-Zone-Catalog` | List of departments/areas |
+| `People-Dossier-Index` | List of personnel records |
 | `System-Record-Request-Log` | System profile request log |
-| `External-Share-Approval-Log` | External Shared Browsing Log |
-| `Automation-Run-Log` | Auto run log |
-| `Archive-Lock-Register` | Stored Key Registry |
+| `External-Share-Approval-Log` | Externally shared browsing logs |
+| `Automation-Run-Log` | Log runs automatically |
+| `Archive-Lock-Register` | Stored key registry |
 
 **Rule:** List names are system identifiers — translation will break Power Automate flows and lookup columns.
 
@@ -213,13 +213,13 @@ The following column names are technical identifiers in M365 Lists/Epicor. **NEV
 
 Metatag labels in the document header use Vietnamese according to standardized conventions:
 
-| Display label | Content |
+| Label displayed | Content |
 |----------------|----------|
 | **Code:** | Document code (SOP-101, WI-201...) |
 | **Version:** | V0, V1, V2... |
 | **Effective date:** | Date or "By decision issued" |
 | **Owner:** | Role code JD-linked is responsible |
-| **Approval:** | Role code JD-linked has the right to approve |
+| **Approve:** | Role code JD-linked has approval authority |
 
 Document codes (SOP-101, WI-201, FRM-301, ANNEX-111) **ALWAYS** remain in English.
 
@@ -235,9 +235,9 @@ The following rules are permanently locked in and apply to all QMS documents:
 
 2. **Do not arbitrarily rename files/slugs/document codes.** Do not rename manually or rename locally outside of control. If you need to change the standard name, it can only be done through the governments rename flow locked at `23-portal-standard-title-filename-ssot.md` to synchronize filename + SSOT title + header + link update.
 
-3. **Only Vietnameseize the content displayed to users.** File names, HTML attributes, CSS selectors, JS identifier/logic remain in English; but every Vietnamese UI string in HTML/JS must have full marks.
+3. **Only Vietnamese content displayed to users.** File names, HTML attributes, CSS selectors, JS identifier/logic remain in English; but every Vietnamese UI string in HTML/JS must have full marks.
 
-4. **Only keep department names, terms, and abbreviations when absolutely necessary.** Prioritize Vietnamese for content, only keep English for abbreviations and terms that do not have exact equivalents.
+4. **Only keep department names, terms, and abbreviations when absolutely necessary.** Prioritize Vietnamese for content, keep English only for abbreviations and terms that do not have exact equivalents.
 
 ### Language quality
 
@@ -245,9 +245,9 @@ The following rules are permanently locked in and apply to all QMS documents:
 
 6. **Language must be short, clear, and practical.** Do not write in lengthy, academic, or vague terms.
 
-7. **No meta text, no "AI generated", no explanation of document origin.** Documents must read as if written by a QMS expert, not machine-generated.
+7. **No meta text, no "AI generated", no explanation of document origin.** Documents should read as if written by a QMS expert, not machine-generated.
 
-8. **Each sentence must serve a real operation.** Do not write sentences "for the sake of it", do not add content just to fill in the blank space.
+8. **Each sentence must serve a real function.** Don't write sentences "for the sake of it", don't add content just to fill in the blank space.
 
 ### Content integrity
 
@@ -259,15 +259,15 @@ The following rules are permanently locked in and apply to all QMS documents:
 
 12. **Don't lose important content through oversimplification.** Simplify the language, not the content.
 
-### Classify documents
+### Document classification
 
 13. **SOP is the executive layer; WI is point-of-use instructions; ANNEX is rule-pack; FORM is where data/evidence/decisions are recorded.**
-    - SOP: management level process, decision-making logic, responsibilities
+    - SOP: management level processes, decision-making logic, responsibilities
     - WI: step-by-step instructions at the scene, who does what when
     - ANNEX: criteria, lookup tables, reference rules
-    - FORM: form for recording data, evidence, and decisions
+    - FORM: form for recording data, evidence, decisions
 
-14. **Do not let forms overlap responsibilities or duplicate useless data.** Each data field is only recorded once at the most appropriate source.
+14. **Do not let the form overlap responsibilities or duplicate useless data.** Each data field is only recorded once at the most appropriate source.
 
 15. **ANNEX replaces REF for valid internal documents.** Do not use REF codes for internal reference documents — use ANNEX.
 
@@ -277,7 +277,7 @@ The following rules are permanently locked in and apply to all QMS documents:
 
 17. **Form must show gate, hold point, release logic, KPI, owner, approver as needed.** Form is not just a blank slate — it must reflect the control process.
 
-### Operating practices
+### Operational practice
 
 18. **Must be the correct CNC job order factory model, usable in the field.** Documents must be appropriate to the scale and characteristics of HESEM, not an ideal factory.
 
@@ -287,9 +287,9 @@ The following rules are permanently locked in and apply to all QMS documents:
 
 21. **Do not create ambiguity so that employees do not know what to fill in, what to sign, what decisions to make.** Each field, each signature box must be clear: who, what, when, what criteria.
 
-22. **"Increasing depth" means increasing the depth of expertise and practicality, not adding words to make it thicker.** The value lies in the depth of the content, not the length.
+22. **"Pumping depth" means increasing the depth of expertise and practicality, not adding words to make it thicker.** The value lies in the depth of the content, not the length.
 
-23. **Must be in line with ISO 9001:2026 targets and ready for AS9100D at a realistic HESEM level.** Do not set the bar so high that it cannot be implemented, nor set it too low.
+23. **Must be in line with ISO 9001:2026 targets and ready for AS9100D at the HESEM practical level.** Don't set the bar so high that it can't be implemented, nor set it too low.
 
 24. **When designing a form, you must look at product safety, traceability, external providers, evidence discipline, human factors, operational risk if the form is related.** Form is the last layer to capture risk — it must be designed intentionally.
 
@@ -299,7 +299,7 @@ The following rules are permanently locked in and apply to all QMS documents:
 
 ### D1. Brand Colors
 
-| Name | Hex code | CSS Variables | Used for |
+| Name | Hex code | CSS variables | Used for |
 |-----|--------|----------|----------|
 | Navy | `#0C2D48` | `--navy` | Title, heading, header |
 | Blue | `#1565C0` | `--blue` | Link, main accent |
@@ -316,13 +316,13 @@ The following rules are permanently locked in and apply to all QMS documents:
 
 | Attributes | Value |
 |------------|---------|
-| Paper size | A4 (default), A3 (large table) |
-| Fonts | Segoe UI or equivalent |
+| Paper size | A4 (default), A3 (large board) |
+| Font | Segoe UI or equivalent |
 | Original font size | 14px |
 | Line height | 1.6 |
 | Table overflow | **NO** — all tables must fit paper size |
-| Flashy colors | **NO** — only use defined palettes |
-| Page break | `page-break-inside: avoid` for every block |
+| Flashy color | **NO** — only use defined palettes |
+| Page breaks | `page-break-inside: avoid` for every block |
 
 ### D3. Document headers
 
@@ -343,19 +343,19 @@ Footer must have page number and document identification.
 |-----------|---------|---------------|
 | **Epicor** | System of Record (SoR) | ERP transactions: orders, production, warehouse, finance |
 | **M365 (SharePoint)** | Single Source of Truth (SSOT) | QMS documents, control records, policies |
-| **Excel (Forms)** | Gate / Evidence / Decision layer | Recording form, checklist, decision log |
+| **Excel (Forms)** | Gate / Evidence / Decision layer | Recording forms, checklists, decision logs |
 
 ### E2. Rules are not duplicated
 
 - **Do not duplicate data between systems.** Each data point has only one official source.
-- Epicor is the source for transactional data — do not copy to SharePoint.
-- SharePoint is the source for documents — do not save copies on personal drives.
-- Excel form only records data required by SOP/WI — do not add fields outside the scope.
+- Epicor is the source for transactional data — not copied to SharePoint.
+- SharePoint is the source for documents — don't keep copies on personal drives.
+- The Excel form records only the data required by the SOP/WI — do not add out-of-range fields.
 
 ### E3. System link
 
-- HTML documents on the web refer to the form by download link
-- Excel form references back to SOP/WI/ANNEX by document code
+- HTML documents on the web refer to the form using a download link
+- Excel form references back to SOP/WI/ANNEX using document code
 - Portal (`portal.html`) is the central access point for the entire system
 
 ---
@@ -366,7 +366,7 @@ Before completing any documentation, check:
 
 - [ ] File name is English slug, kebab-case, no accents
 - [ ] HTML attributes (href, class, id, src) are not translated
-- [ ] Original CSS/JS, not translated
+- [ ] Original, untranslated CSS/JS
 - [ ] Abbreviations remain in English
 - [ ] Document code remains the same (SOP-101, WI-201, FRM-301, ANNEX-111)
 - [ ] Brand colors in the correct palette

@@ -1,4 +1,4 @@
-# 10 — QMS system expansion roadmap
+# 10 — Roadmap for expanding the QMS system
 
 > Version: V0 | Effective: 2025-06-01 | Owner: QMS Engineer
 
@@ -7,12 +7,12 @@
 ## 1. Purpose
 
 - Specifies how to expand the QMS documentation system as HESEM develops.
-- Ensure any new documents comply with current structure, numbering and rules.
+- Ensure any new documents comply with applicable structure, numbering and rules.
 - Prevent code conflicts, duplicate content and loss of consistency.
 
 ---
 
-## 2. Backup slot for SOP
+## 2. Spare slot for SOP
 
 ### 2.1 Current number range (used)
 
@@ -31,16 +31,16 @@
 ### 2.2 Spare slots in the current range
 
 Each strip has spare slots from the last number + 1 to x99. For example:
-- SOP-109 to SOP-199: reserve for Foundation.
+- SOP-109 to SOP-199: Foundation backup.
 - SOP-204 to SOP-299: provision for Sales & Customer.
-- Similar for other strips.
+- Same for other bands.
 
 ### 2.3 Backup range for new fields (SOP-1000+)
 
 | Strip | Expected field | When needed |
 |-----|-----------------|------------|
 | SOP-1000 | Automation & Robotics | When HESEM deploys robots or line automation |
-| SOP-1100 | R&D & New Product Introduction | When having your own R&D department |
+| SOP-1100 | R&D & New Product Introduction | When there is a separate R&D department |
 | SOP-1200 | Environmental Management (ISO 14001) | When implementing ISO 14001 |
 | SOP-1300 | Information Security (ISO 27001) | When implementing ISO 27001 |
 | SOP-1400 | Energy Management (ISO 50001) | When implementing ISO 50001 |
@@ -48,11 +48,11 @@ Each strip has spare slots from the last number + 1 to x99. For example:
 
 ### 2.4 Procedure for adding new SOP
 
-1. Determine which range the SOP belongs to (current or new).
+1. Determine which range the SOP belongs to (existing or new).
 2. Get the next number in the range (check FRM-101 Master Document Register).
 3. Prepare SOP according to a 10-section structure (see 08-document-types.md).
 4. Submit DCR (FRM-102) for approval.
-5. Update FRM-101 and cross-reference table of related SOPs.
+5. Updated FRM-101 and cross-reference table of related SOPs.
 
 ---
 
@@ -60,16 +60,16 @@ Each strip has spare slots from the last number + 1 to x99. For example:
 
 ### 3.1 Current number range
 
-| Strip | Scope | Example |
+| Strip | Scope | For example |
 |-----|---------|-------|
 | WI-100 | Foundation | WI-102 |
 | WI-200 | Sales & Customers | WI-201, WI-203, WI-206, WI-207 |
 | WI-500 | Production | WI-501, WI-511-WI-519 |
 | WI-600 | Quality | WI-602, WI-605, WI-606 |
 | WI-700 | Warehouse & Packaging | WI-701, WI-702, WI-713-WI-721 |
-| WI-900 | Improvements | WI-901 |
+| WI-900 | Improvement | WI-901 |
 
-### 3.2 Backup range (WI-1000+)
+### 3.2 Redundant range (WI-1000+)
 
 | Strip | Expected field |
 |-----|-----------------|
@@ -84,18 +84,18 @@ Each strip has spare slots from the last number + 1 to x99. For example:
 2. Get the next number (check FRM-101).
 3. Prepare WI according to the 7 section structure.
 4. Submit DCR, approve, release.
-5. Update the parent SOP (Section 10) to link the new WI.
+5. Update parent SOP (Section 10) to link new WI.
 
 ---
 
-## 4. Backup Slot for FRM (Form)
+## 4. Backup slot for FRM (Form)
 
 ### 4.1 Current number range: FRM-100 to FRM-999
 
 111 forms defined. Backup slots in each band:
 - FRM-142 to FRM-199: Foundation.
 - FRM-214 to FRM-299: Sales & Customer.
-- Similar for other strips.
+- Same for other bands.
 
 ### 4.2 Redundant range (FRM-1000+)
 
@@ -106,7 +106,7 @@ Each strip has spare slots from the last number + 1 to x99. For example:
 | FRM-1200 | Environmental |
 | FRM-1300 | IT Security |
 
-### 4.3 Procedure for adding new form
+### 4.3 Process of adding new form
 
 1. Determine which TYPE the form belongs to (A-F) and which number range.
 2. Get the next number.
@@ -129,7 +129,7 @@ Each strip has spare slots from the last number + 1 to x99. For example:
 | C11-C15 | Quality & inspection |
 | C16-C19 | Support functions (HR, EHS, IT) |
 
-### 5.2 Backup (C20+)
+### 5.2 Redundancy (C20+)
 
 | Strip | Expected field |
 |-----|-----------------|
@@ -143,29 +143,29 @@ Each strip has spare slots from the last number + 1 to x99. For example:
 ### 5.3 Procedure for adding new training modules
 
 1. HR Manager + Line Manager identify new capacity needs.
-2. Prepare the module according to the 6-section structure (see 08-document-types.md).
+2. Prepare the module according to a 6-section structure (see 08-document-types.md).
 3. Take the next C number.
 4. Submit DCR, approve.
-5. Update FRM-807 Skills Matrix and FRM-809 Skills & KPI Matrix.
+5. Updated FRM-807 Skills Matrix and FRM-809 Skills & KPI Matrix.
 6. Implement training and record it on FRM-802 Attendance List.
 
 ---
 
-## 6. Expanding new departments
+## 6. Expand new departments
 
 ### 6.1 When do you need more departments?
 
-- HESEM established new departments (eg: R&D, Automation).
+- HESEM established new departments (e.g. R&D, Automation).
 - The current department is divided into 2 separate departments.
 - Merger or organizational restructuring.
 
 ### 6.2 List of documents to create for new department
 
-| STT | Documents | Type | Required |
+| No | Document | Type | Obligatory |
 |-----|---------|------|---------|
-| 1 | Department Handbook | Handbook | MUST |
-| 2 | JD for each position | JD | MUST |
-| 3 | SOP for main process | SOP | MUST (min 1) |
+| 1 | Department Handbook | Handbook | RIGHT |
+| 2 | JD for each position | JD | RIGHT |
+| 3 | SOP for main process | SOP | MUST (minimum 1) |
 | 4 | WI for specific operations | WI | SHOULD |
 | 5 | Form for department records | FRM | SHOULD |
 | 6 | Training module for specific competencies | Training | SHOULD |
@@ -174,8 +174,8 @@ Each strip has spare slots from the last number + 1 to x99. For example:
 
 1. CEO approves the establishment of new departments.
 2. HR Manager + QMS Engineer determine the required document structure.
-3. Create Department Handbook with 6 section structure.
-4. Create a JD for deployment according to a 6-section structure.
+3. Tao Department Handbook is structured in 6 sections.
+4. Create JD for launching information according to a 6-section structure.
 5. Determine which SOPs the department owns and which SOPs are only involved.
 6. Update ANNEX-120 Authority Matrix, ANNEX-122 KPI Cascade, ANNEX-123 Deputy Backup Matrix.
 7. Update org chart on QMS site.
@@ -197,16 +197,16 @@ Each strip has spare slots from the last number + 1 to x99. For example:
 | ANNEX-700 | Warehouse & packaging reference |
 | ANNEX-800 | HR, training reference |
 
-### 7.2 Them ANNEX new
+### 7.2 Add new ANNEX
 
 1. Determine which range ANNEX belongs to.
-2. Get the next number in the dai.
-3. Prepare in rule-pack format (see 08-document-types.md).
+2. Get the next number in dai.
+3. Soan in rule-pack format (see 08-document-types.md).
 4. MUST have iso-map, sections, tables.
 5. Submit DCR, approve.
 6. Update relevant SOP/WI.
 
-### 7.3 Backup strip
+### 7.3 Backup range
 
 | Strip | Field |
 |-----|---------|
@@ -221,7 +221,7 @@ Each strip has spare slots from the last number + 1 to x99. For example:
 
 ### 8.1 Current Status (2026-03-29)
 
-| Category | Description | Status |
+| Category | Describe | Status |
 |----------|-------|-----------|
 | **PostgreSQL schema** | 103 tables, 80+ enum types, pgvector, partitioned audit/inventory/labor | COMPLETE |
 | **MVC API** | Router, 9 domain controllers, middleware stack, service layer, validators | COMPLETE |
@@ -235,11 +235,11 @@ Each strip has spare slots from the last number + 1 to x99. For example:
 | **Intelligence Layer** | Semantic search, auto-fill, anomaly detection, RCA assistant | NOT STARTED |
 | **Production Integration** | Phases A-H: master data, schema-driven forms, form builder, record ID, offline packages, e-signature flow, order management, documentation update | NEXT |
 
-### 8.2 Manufacturing Integration Roadmap (Phases A-H)
+### 8.2 Production integration roadmap (Phases A-H)
 
-| Phase | Content | Depends |
+| Phase | Content | Dependent |
 |-------|---------|-----------|
-| A | Master Data Control: customer, supplier, part, revision, SO/JO/WO | Platform |
+| A | Master Data Control: customer, supplier, part, revision, SO/JO/WO | Foundation |
 | B | FRM-631 NCR moves from demo to production schema-driven | Phase A |
 | C | Form Builder / Form Version Control module | Phase B |
 | D | Record ID Assistant is separate from the full release log | Phase A |
@@ -254,32 +254,32 @@ Each strip has spare slots from the last number + 1 to x99. For example:
 
 ### 9.1 Epicor ERP
 
-| Phase | Content | Expected time |
+| Stage | Content | Expected time |
 |-----------|---------|-------------------|
-| Current | Import data, export report | Deployment skin |
-| Phase 1 | Report Job/WO from Epicor into QMS form | Q3 2025 |
+| Present | Import data, export report | Deployment skin |
+| Phase 1 | Report Job/WO from Epicor to QMS form | Q3 2025 |
 | Phase 2 | Create Job Dossier from Epicor data | Q4 2025 |
 | Phase 3 | Dashboard KPI read directly from Epicor | Q1 2026 |
-| Phase 4 | Epicor-M365 integration approval workflow | Q2 2026 |
+| Phase 4 | Workflow approves Epicor-M365 integration | Q2 2026 |
 
 ### 9.2 Microsoft 365
 
-| Phase | Content | Expected time |
+| Stage | Content | Expected time |
 |-----------|---------|-------------------|
-| Current | SharePoint document storage, Teams information | Deployment skin |
+| Present | SharePoint stores documents, Teams reports | Deployment skin |
 | Phase 1 | Power Automate for DCR workflows | Q3 2025 |
 | Phase 2 | SharePoint lists replace some FRM logs | Q4 2025 |
 | Phase 3 | Teams integration: updates when documents change | Q1 2026 |
-| Phase 4 | Retention labels custom on SharePoint | Q2 2026 |
+| Phase 4 | Retention labels are consistent on SharePoint | Q2 2026 |
 
 ### 9.3 Power BI
 
-| Phase | Content | Expected time |
+| Stage | Content | Expected time |
 |-----------|---------|-------------------|
-| Current | Dashboard collected, updated weekly | Deployment skin |
+| Present | Dashboard collected, updated weekly | Deployment skin |
 | Phase 1 | Dashboard verbs Epicor data | Q3 2025 |
 | Phase 2 | Dashboard QMS KPI (NCR, CAPA, OTD, FPY) | Q4 2025 |
-| Phase 3 | Dashboard with face-to-face information | Q1 2026 |
+| Phase 3 | Dashboard with face time information | Q1 2026 |
 | Phase 4 | Embedded dashboard in QMS site | Q2 2026 |
 
 ---
@@ -289,53 +289,53 @@ Each strip has spare slots from the last number + 1 to x99. For example:
 ### 10.1 Current status
 
 - Complete QMS documentation is in V0 (first release).
-- Structure, content, and format are standardized.
+- Structure, content, and format are standard.
 - There is no official signature on the printed board.
 
 ### 10.2 Conversion conditions V0 -> V1.0
 
 | # | Conditions | Status |
 |---|----------|-----------|
-| 1 | Complete SOP has been cross-reviewed | Sour |
+| 1 | The entire SOP has been cross-reviewed | Sour |
 | 2 | FRM-101 Master Document Register day du | Sour |
-| 3 | FRM-102 DCR is available for every SOP | Sour |
+| 3 | FRM-102 DCR is available for each SOP | Sour |
 | 4 | QA Manager has signed and approved | Sour |
-| 5 | How to create a complete QMS | Sour |
-| 6 | Internal audit spreads across the country | Sour |
-| 7 | Management review lan dau thanh hoa | Sour |
+| 5 | QMS creation tool completed | Sour |
+| 6 | Internal audit is completed | Sour |
+| 7 | Management review spreads successfully | Sour |
 
-### 10.3 Conversion instructions
+### 10.3 Transfer order
 
 | Giai doan | Content | Time |
 |-----------|---------|-----------|
 | 1. Compassion | Complete cross-review of entire SOP/WI | 4 weeks |
 | 2. Approval | QA Manager + CEO signs approval | 2 weeks |
-| 3. Knife | How to create a QMS for factory management | 2 weeks |
+| 3. Knife | How to create a QMS for your factory | 2 weeks |
 | 4. Release V1.0 | Updated version, officially released | 1 week |
-| 5. Internal Audit | Carry out internal audit at the beginning | 2 weeks |
-| 6. Management Review | Hop to consider spreading the knife | 1 week |
-| 7. Certification audit | Signing up for a general audit of ISO 9001 | According to the code |
+| 5. Internal audit | Perform internal audit first | 2 weeks |
+| 6. Management Review | Hoping to consider spreading the knife | 1 week |
+| 7. Certification audit | Signing up for an ISO 9001 general audit | According to the plan |
 
-### 10.4 Rules of transfer
+### 10.4 Transfer rules
 
 - DO NOT convert V0 -> V1.0 from document release. DONG LOAT transfer of the entire system.
-- All documents MUST have a DCR and approval signature before transferring to V1.0.
+- All documents MUST have a DCR and approval signature prior to V1.0 transfer.
 - After converting to V1.0, any further changes follow the DCR maintenance process.
-- Update V0 on SharePoint Archive as archive.
+- Giu Nguyen V0 on SharePoint Archive as an archiver.
 
 ---
 
 ## 11. General extension principle
 
-| # | Principle | Description |
+| # | Nguyen tac | Describe |
 |---|-----------|-------|
-| 1 | Check numbering first | Check FRM-101 before assigning any new code |
-| 2 | Check scope first | Check the current SOP scope before creating a new SOP |
-| 3 | Preserve structure | All new documents MUST follow the standard structure (`08-document-types.md`) |
-| 4 | Design Tuan | All new forms MUST follow the standards (06-excel-form-standards.md) |
-| 5 | Tuan Thu is delicious | All content MUST follow Vietnamese guidelines (07-content-writing-sendide.md) |
-| 6 | Cross-reference | All new documents MUST be linked to related documents
-| 7 | Training | Any new material MUST have an accompanying training plan |
+| 1 | Ghost in the sky | Check FRM-101 before placing a new number |
+| 2 | No scope | Check the current SOP before creating a new SOP |
+| 3 | Structure collection | All new documents MUST follow a standard structure (08-document-types.md) |
+| 4 | Tuan Thu design | All new forms MUST follow the standards (06-excel-form-standards.md) |
+| 5 | Tuan Thu is delicious | All content MUST follow Vietnamese instructions (07-content-writing-sendide.md) |
+| 6 | Cross-reference | All new documents MUST be linked to related documents |
+| 7 | Train | Any new materials MUST have an accompanying training plan |
 | 8 | DCR | All new documents MUST have an approved DCR |
-| 9 | Backward compatible | New documents must NOT create old document links
-| 10 | Learn English | Keep all English articles according to a standard list (see reference/abbreviations-keep-english.md) |
+| 9 | Backward compatible | New documents must NOT create old document links |
+| 10 | Learn English fluently | Keep all English texts according to a standard list (see reference/abbreviations-keep-english.md) |

@@ -1,7 +1,7 @@
 # 23 — Form Lifecycle, Allocation & Order Linking
 
 > Form lifecycle rules, Record-ID allocation, version control, and SO/JO/WO linking.
-> Comply with ISO 9001:2015 clause 7.5 (Documented Information), AS9100D clause 8.5.2 (Traceability),
+> Complies with ISO 9001:2015 clause 7.5 (Documented Information), AS9100D clause 8.5.2 (Traceability),
 > and FDA 21 CFR Part 11 (Electronic Records) when applicable.
 
 ---
@@ -20,25 +20,25 @@
 
 ### 1.2 Details of each status
 
-| # | Status | Description | Who does it | Next Action |
+| # | Status | Describe | Who does it? | Continue action |
 |---|-----------|-------|-------------|---------------|
-| 1 | **DRAFT** | Form is being prepared, not yet complete | Form Author (ENG, QA) | Submit for review |
+| 1 | **DRAFT** | The form is being drafted and is not complete | Form Author (ENG, QA) | Submit for review |
 | 2 | **REVIEW** | Waiting for reviewer to approve content + layout | Assigned Reviewer | Approve or Reject |
-| 3 | **APPROVED** | Approved but not yet officially released | Document Controller | Activate when ready |
-| 4 | **ACTIVE** | In use, users can download/fill | System | Obsolete when the new version replaces |
-| 5 | **OBSOLETE** | No longer in use, kept only for audit trail | Document Controller | Just watch, don't download |
+| 3 | **APPROVED** | Approved but not officially released yet | Document Controller | Activate when ready |
+| 4 | **ACTIVE** | In use, users can download/fill in | System | Obsolete when the new version replaces it |
+| 5 | **OBSOLETE** | No longer in use, only kept for audit trail | Document Controller | Only view, do not download |
 | 6 | **SUPERSEDED** | Replaced by new version, automatically switched | System (auto) | Read-only archive |
 
 ### 1.3 State transition rules
 
-| From | Sang | Conditions | Who approves |
+| From | Luxurious | Condition | Who approves? |
 |----|------|-----------|----------|
-| DRAFT → REVIEW | Author submit + all required fields complete | Author |
+| DRAFT → REVIEW | Author submit + all required fields in full | Author |
 | REVIEW → APPROVED | Reviewer approved | Reviewer (role: doc_reviewer) |
 | REVIEW → DRAFT | Reviewer reject + write reason | Reviewer |
 | APPROVED → ACTIVE | Document Controller released | DC (role: doc_controller) |
 | ACTIVE → OBSOLETE | Manual obsolete or superseded by new version | DC or System |
-| ACTIVE → SUPERSEDED | The new version is ACTIVE → the old version automatically SUPERSEDED | System (auto) |
+| ACTIVE → SUPERSEDED | The new version is ACTIVE → the old version is automatically SUPERSEDED | System (auto) |
 
 ---
 
@@ -60,53 +60,53 @@
 
 ### 2.2 Details of each status
 
-| # | Status | Description | Triggers |
+| # | Status | Describe | Trigger |
 |---|-----------|-------|---------|
-| 1 | **ALLOCATED** | Record-ID issued, file not downloaded yet | User request → server grants code |
-| 2 | **DOWNLOADED** | User downloaded .txt placeholder or Excel blank | User click download |
+| 1 | **ALLOCATED** | Record-ID issued, file not downloaded yet | User request → server issues code |
+| 2 | **DOWNLOADED** | User downloaded .txt placeholder or Excel blank | User clicks download |
 | 3 | **SUBMITTED** | The user has uploaded the completed file to the portal | User upload action |
 | 4 | **RECEIVED** | Document Controller verifies that the file is valid | DC review + accept |
-| 5 | **ARCHIVED** | Records officially archived on SharePoint | Auto after 30 days RECEIVED |
-| 6 | **VOIDED** | User or admin cancel, do not use | Manual void + reason |
-| 7 | **AUTO-VOIDED** | Overdue 90 days from ALLOCATED without SUBMITTED | Daily Cron job |
-| 8 | **REJECTED** | File uploaded is invalid (wrong version, missing data) | DC reject + write reason |
+| 5 | **ARCHIVED** | Officially stored records on SharePoint | Auto after 30 days RECEIVED |
+| 6 | **VOIDED** | User or admin cancels, does not use | Manual void + reason |
+| 7 | **AUTO-VOIDED** | Overdue 90 days from ALLOCATED without SUBMITTED | Cron jobs daily |
+| 8 | **REJECTED** | Invalid uploaded file (wrong version, missing data) | DC reject + write reason |
 
 ### 2.3 Tracking Requirements
 
 Each allocation record MUST save:
 
-| Field | Required | Description |
+| Field | Obligatory | Describe |
 |-------|---------|-------|
-| `allocation_id` | YES | UUID v4 unique |
-| `record_id` | YES | Case code (e.g. NCR-2026-043) |
-| `record_type` | YES | Type of application (NCR, CAPA, FAI...) |
-| `department` | YES | Department request |
-| `requested_by` | YES | Requester UserID |
-| `requested_at` | YES | ISO 8601 timestamp |
-| `status` | YES | Current status |
-| `job_number` | Depends | JO number if job | is attached
+| `allocation_id` | HAVE | UUID v4 unique |
+| `record_id` | HAVE | Case code (e.g. NCR-2026-043) |
+| `record_type` | HAVE | Document type (NCR, CAPA, FAI...) |
+| `department` | HAVE | Department request |
+| `requested_by` | HAVE | Requester UserID |
+| `requested_at` | HAVE | ISO 8601 timestamp |
+| `status` | HAVE | Current status |
+| `job_number` | Depends | JO number if job is attached |
 | `form_code` | Depends | Related form code |
 | `downloaded_at` | Depends | Download time |
 | `submitted_at` | Depends | Upload time |
-| `received_at` | Depends | When DC accepts |
+| `received_at` | Depends | DC acceptance time |
 | `voided_at` | Depends | Void moment |
 | `void_reason` | Depends | Reason void |
-| `status_history` | YES | Array of state transitions |
+| `status_history` | HAVE | Array of state transitions |
 
 ### 2.4 eQMS Record Instance Rules (Required for online/offline forms)
 
-| # | Rules | Required Details |
+| # | Rules | Required details |
 |---|---------|-------------------|
 | 1 | **One instance = one Record-ID** | Each time the user presses `Tạo mới online` or `Tạo mới offline`, the system grants a unique **1** `allocation_id` + `record_id` for the entire life of that profile. |
-| 2 | **Reopen draft without new code** | If you already have `allocation_id`/`record_id`, any reopening of the draft MUST reuse the same code. `Save draft` absolutely DO NOT increase the counter. |
+| 2 | **Reopening draft without new codes** | If you already have `allocation_id`/`record_id`, any reopening of the draft MUST reuse the same code. `Save draft` absolutely DO NOT increase the counter. |
 | 3 | **Code Generation tab is not used for forms** | Online/offline forms automatically provide code during the form's runtime. Tab `Tạo mã` only serves entities outside the form such as ANNEX number, material code, workpiece, tooling, assets or other reference records. |
 | 4 | **Online submission retains Record-ID** | The online form when submitted for the first time creates `submission_count = 1`. Subsequent re-submissions on the same profile remain the same `record_id`, only increasing `submission_count` / `resubmission_count`. |
 | 5 | **Controlled edit after submission does not create a new profile** | Once the online application has been submitted and the user enters `Chỉnh sửa có kiểm soát`, the system must reopen the same `allocation_id`/`record_id`, create a new `submission_revision` and increase `amendment_count` if this is an edit after submit/review/approve. |
 | 6 | **Offline resubmission retains Record-ID** | After being issued a code and downloaded, the offline form must be re-uploaded according to the old `allocation_id`. Each valid upload increases `receipt_version`; A new Record-ID will not be issued just because the workbook is returned. |
 | 7 | **Rejected / Reopen still uses the same code** | If the profile is rejected or reopened, the system keeps `record_id`; Just change the workflow status and generate a new revision/receipt. |
-| 8 | **Only issue new code when it is a new business case** | Only create a new Record-ID when the user actively `Tạo mới` or the old record has `VOIDED` and the business requires another record. |
+| 8 | **Only issue new codes when it is a new business case** | Only create a new Record-ID when the user actively `Tạo mới` or the old record has `VOIDED` and the business requires another record. |
 
-### 2.5 Mandatory Registry Fields (eQMS Code Management Book)
+### 2.5 Mandatory Registry Fields (eQMS code management book)
 
 Every eQMS form system MUST have a registry to track at least:
 
@@ -121,14 +121,14 @@ Mandatory regulations:
 1. Registry must be displayed both online and offline in the same lookup screen.
 2. Registry must clearly distinguish `draft`, `allocated`, `submitted`, `approved`, `closed`, `received`, `rejected`, `void`.
 3. The Registry must indicate the number of submissions and resubmissions of each application.
-4. Registry must reopen the correct current profile, not create a new version when the user selects `Mở` or `Chỉnh sửa`.
+4. The Registry must reopen the correct current profile, not create a new one when the user selects `Mở` or `Chỉnh sửa`.
 
 ### 2.6 Cancel Creation / Withdraw Before First Submission
 
 | Situation | Mandatory handling |
 |-----------|---------------------|
-| User presses `Hủy tạo form` before submitting for the first time | The system must **clear the draft payload**, leave `allocation_id` / `record_id` intact, and move the allocation to state `void` |
-| Code issued but not yet submitted | **Code may not be reused** for other profiles |
+| The user presses `Hủy tạo form` before submitting for the first time | The system must **clear the draft payload**, leave `allocation_id` / `record_id` intact, and move the allocation to state `void` |
+| Code issued but not submitted yet | **Code may not be reused** for another profile |
 | Cancel creating form | Required to enter **reason for cancellation** |
 | Registry | Must display canceled records with `void_reason`, `voided_by`, `voided_at` |
 | Profile submitted / approved / closed | Do not use `Hủy tạo form`; Only follow `Controlled Edit / Resubmission` |
@@ -136,8 +136,8 @@ Mandatory regulations:
 Required rules:
 
 1. `Hủy tạo form` is a business action of type `withdraw before first submission`, not a hard delete.
-2. All issued numbers must still be traceable in the registry so that the audit does not see "lost numbers".
-3. If the draft is on the server or local browser, the system must clear that draft when canceling.
+2. All issued numbers must still be traced in the registry so that audit does not see "lost numbers".
+3. If the draft exists on the server or local browser, the system must clean up that draft when canceling.
 4. If the user reopens a new business case after canceling, the system must issue a **new code**, and cannot reactivate the void code.
 
 ---
@@ -146,7 +146,7 @@ Required rules:
 
 ### 3.1 Online Forms
 
-| Rules | Details |
+| Rules | Detail |
 |---------|---------|
 | Version format | `{major}.{minor}` (e.g. 2.1) |
 | Major bump | Change structure (add/remove fields, change logic) |
@@ -157,11 +157,11 @@ Required rules:
 
 ### 3.2 Offline Forms (Excel)
 
-| Rules | Details |
+| Rules | Detail |
 |---------|---------|
 | Version stamp | Hidden sheet `_QMS_CONTROL` contains version + checksum |
 | Download tracking | Server logs each download: who, when, which version |
-| Upload validation | Compare version in `_QMS_CONTROL` with active version |
+| Upload validation | Compare the version in `_QMS_CONTROL` with the active version |
 | Obsolete warning | Upload old form version → FLAG `Version-Valid = OBSOLETE` |
 | Grace period | 30 days after the new version is ACTIVE, the old version form is still accepted (warning only) |
 
@@ -169,7 +169,7 @@ Required rules:
 
 Every blank Excel form MUST have a hidden sheet `_QMS_CONTROL` with:
 
-| Cell | Content | Example |
+| Cell | Content | For example |
 |------|---------|-------|
 | A1 | `form_code` | FRM-302 |
 | A2 | `version` | 3.2 |
@@ -177,7 +177,7 @@ Every blank Excel form MUST have a hidden sheet `_QMS_CONTROL` with:
 | A4 | `downloaded_by` | NVA |
 | A5 | `downloaded_at` | 2026-03-28T08:30:00Z |
 | A6 | `source` | HESEM-QMS-Portal |
-| A7 | `allocation_id` | UUID if present |
+| A7 | `allocation_id` | UUID if available |
 
 **Upload verification flow:**
 
@@ -195,17 +195,17 @@ Every blank Excel form MUST have a hidden sheet `_QMS_CONTROL` with:
 
 | Situation | Record-ID | Internal revision | Request an audit trail |
 |-----------|-----------|-----------------|---------------------|
-| Save draft online | Keep | Does not increase submission revision | Record `draft_saved_at`, `saved_by` |
-| Submit for the first time online | Keep | `submission_revision = 1` | Record `submitted_by`, `submitted_at`, signature |
-| Edit after submitting online | Keep | `submission_revision + 1` | Record the reason for editing, who edited it, when it was edited, and source revision |
-| Upload offline for the first time | Keep | `receipt_version = 1` | Record `uploaded_by`, `uploaded_at`, received file name |
-| Upload offline and resubmit | Keep | `receipt_version + 1` | Record new version, keep old receipt history |
+| Save draft online | Keep it the same | Does not increase submission revision | Record `draft_saved_at`, `saved_by` |
+| Submit for the first time online | Keep it the same | `submission_revision = 1` | Record `submitted_by`, `submitted_at`, signature |
+| Edit after submitting online | Keep it the same | `submission_revision + 1` | Record the reason for editing, who edited it, when it was edited, and the revision source |
+| Upload offline for the first time | Keep it the same | `receipt_version = 1` | Record `uploaded_by`, `uploaded_at`, the received file name |
+| Upload offline and submit again | Keep it the same | `receipt_version + 1` | Record new version, keep old receipt history |
 
 Required rules:
 
-1. The old version must not be obscured or lost due to controlled edit / resubmission.
-2. The system must retain enough metadata to identify `ai`, `khi nào`, `vì sao`, and `bản nào` to be replaced.
-3. If the workflow requires reopening, the reopening action must be recorded separately in the history and must not reset the counter to 0.
+1. Old versions must not be obscured or untraceable when controlled edit / resubmission occurs.
+2. The system must retain enough metadata to identify which `ai`, `khi nào`, `vì sao`, and `bản nào` are being replaced.
+3. If the workflow requires reopening, the reopen action must be recorded separately in the history and must not reset the counter to 0.
 
 ---
 
@@ -213,16 +213,16 @@ Required rules:
 
 ### 4.1 Who can do what
 
-| Action | Roles allowed | Approval needs |
+| Act | Roles are allowed | Approval needed |
 |-----------|---------------|-------------|
-| Create new blank form (DRAFT) | `doc_author`, `admin` | No |
-| Edit form DRAFT | `doc_author` (owner), `admin` | No |
-| Submit for REVIEW | `doc_author` (owner) | No |
-| Approve/Reject form | `doc_reviewer`, `admin` | No |
+| Create a new blank form (DRAFT) | `doc_author`, `admin` | Are not |
+| Edit DRAFT form | `doc_author` (owner), `admin` | Are not |
+| Submit for REVIEW | `doc_author` (owner) | Are not |
+| Approve/Reject form | `doc_reviewer`, `admin` | Are not |
 | Release (ACTIVE) | `doc_controller`, `admin` | Reviewer approved |
-| Obsolete form | `doc_controller`, `admin` | No |
-| Edit form ACTIVE | NOBODY — must create new version | N/A |
-| Delete form | `admin` only, only if DRAFT | No |
+| Obsolete form | `doc_controller`, `admin` | Are not |
+| Edit ACTIVE form | NO ONE — must create a new version | N/A |
+| Delete form | `admin` only, only if DRAFT | Are not |
 
 ### 4.3 Form Template Editing Rules
 
@@ -233,7 +233,7 @@ Required rules:
 
 ### 4.2 Form Code Assignment
 
-| Series | Departments | Example |
+| Series | Departments | For example |
 |--------|----------|-------|
 | 100-199 | QMS Governance / Executive | FRM-101 Document Register |
 | 200-299 | Sales / Contract Review | FRM-201 Quotation Review |
@@ -242,7 +242,7 @@ Required rules:
 | 500-599 | Production | FRM-512 Downtime Log |
 | 600-699 | Quality Control / Assurance | FRM-631 NCR Report |
 | 700-799 | Logistics / Warehouse | FRM-711 Packing Checklist |
-| 800-899 | HR / Training | FRM-802 Training Attendance |
+| 800-899 | HR/Training | FRM-802 Training Attendance |
 | 900-999 | Audit / Management Review | FRM-913 Audit Finding |
 
 ---
@@ -251,17 +251,17 @@ Required rules:
 
 ### 5.1 Principles
 
-| # | Rules | Explanation |
+| # | Rules | Explain |
 |---|---------|-----------|
-| 1 | **One-way** | Form A can reference data from Form B, but Form B does NOT know Form A |
+| 1 | **One way** | Form A can reference data from Form B, but Form B does NOT know Form A |
 | 2 | **Read-only reference** | Cross-form data is only read, not written back |
 | 3 | **Explicit declaration** | All cross-form references must be declared in the schema `dependencies[]` |
-| 4 | **Fallback value** | If the reference form has no data → use default value, do not crash |
+| 4 | **Fallback value** | If the reference form has no data → use default value, no crash |
 | 5 | **Version-pinned** | Reference specifically attaches the source form version |
 
 ### 5.2 Dependency Map
 
-| Target form | Reference from | Data get |
+| Target form | Word reference | Data took |
 |-----------|-------------|---------|
 | FRM-641 (CAPA) | FRM-631 (NCR) | ncr_id, defect_type, root_cause_category |
 | FRM-651 (Final Insp) | FRM-511 (First Piece) | first_piece_result, setup_verified |
@@ -277,7 +277,7 @@ Required rules:
 
 Every record must be traceable across different tables/tabs:
 
-| From tab | Go to tab | Trace with |
+| From tab | Go to tab | Trace by |
 |--------|---------|-------------|
 | Allocation History | Form Submissions | `record_id` |
 | Form Submissions | Job Dossier | `job_number` |
@@ -308,10 +308,10 @@ Sales Order (SO)
 
 ### 7.2 Linking Rules
 
-| # | Rules | Details |
+| # | Rules | Detail |
 |---|---------|---------|
-| 1 | **SO is root** | Every JO must attach 1 SO. Every WO must have a JO attached. |
-| 2 | **JO attached form** | Form records (NCR, FAI, Inspection...) are attached to JO level |
+| 1 | **SO is the root** | Every JO must attach 1 SO. Every WO must have a JO attached. |
+| 2 | **JO attachment form** | Form records (NCR, FAI, Inspection...) attached to JO level |
 | 3 | **WO-level optional** | Form can be attached to WO if needed (per-operation tracking) |
 | 4 | **Cascading status** | When SO is closed → all JOs must be completed or canceled |
 | 5 | **Cross-job NCR** | NCR can reference multiple JOs if the error affects multiple jobs |
@@ -319,7 +319,7 @@ Sales Order (SO)
 
 ### 7.3 Data Sources
 
-| Entities | Source of Record | Sync |
+| Entity | Source of Records | Sync |
 |--------|-----------------|------|
 | SO | Epicor ERP | Daily import or API |
 | JO | Epicor ERP | Daily import or API |
@@ -329,7 +329,7 @@ Sales Order (SO)
 
 ### 7.4 SO/JO/WO Number Format
 
-| Entities | Format | Example |
+| Entity | Format | For example |
 |--------|--------|-------|
 | Sales Orders | `SO-{YYYY}-{4digit}` | SO-2026-0150 |
 | Job Order | `JOB-{YYYY}-{4digit}` | JOB-2026-0042 |
@@ -341,10 +341,10 @@ Sales Order (SO)
 
 ### 8.1 Audit trail principles
 
-| # | ISO 9001:2015 requirements | Implementing HESEM |
+| # | ISO 9001:2015 requirements | Implement HESEM |
 |---|----------------------|-----------------|
-| 7.5.1 | The organization must maintain documented information according to QMS requirements All form changes are saved in `status_history[]` |
-| 7.5.2 | When creating/updating, make sure to identify, format, review | Form lifecycle 6 states, reviewer gate |
+| 7.5.1 | The organization must maintain documented information according to QMS requirements | All form changes are saved in `status_history[]` |
+| 7.5.2 | When creating/updating, make sure to identify, format, and review | Form lifecycle 6 states, reviewer gate |
 | 7.5.3a | Documented information must be available and suitable for use | Active forms on portal, searchable |
 | 7.5.3b | Adequately protected | Role-based access, CSRF, audit log |
 
@@ -365,7 +365,7 @@ Sales Order (SO)
 
 ### 8.3 Retention Requirements
 
-| Record type | Holding time | Then |
+| Record type | Holding time | Afterward |
 |-----------|-------------|-------|
 | Quality records (NCR, CAPA, FAI) | 10 years | Archive → cold storage |
 | Production records | 7 years | Archive → cold storage |
@@ -438,11 +438,11 @@ Sales Order (SO)
 
 ### 10.1 Trigger Conditions
 
-| # | Conditions | Action | Grace Period |
+| # | Condition | Act | Grace Period |
 |---|----------|-----------|-------------|
 | 1 | ALLOCATED > 90 days, not yet DOWNLOADED | AUTO-VOID | 90 days |
 | 2 | DOWNLOADED > 90 days, not yet SUBMITTED | AUTO-VOID | 90 days |
-| 3 | REJECTED > 30 days, not yet re-SUBMITTED | AUTO-VOID | 30 days |
+| 3 | REJECTED > 30 days, not re-SUBMITTED | AUTO-VOID | 30 days |
 
 ### 10.2 Auto-Void Process
 

@@ -5,7 +5,7 @@
 
 ---
 
-## 1. CSS Variables (Original variables)
+## 1. CSS Variables (Original Variables)
 
 All variables are declared in `:root` of `style.css`. Every component uses variables instead of hard-coding colors.
 
@@ -59,30 +59,30 @@ All variables are declared in `:root` of `style.css`. Every component uses varia
 
 | Attributes | Value |
 |---|---|
-| Font family | `var(--font)` — system font stack supports Vietnamese |
+| Font families | `var(--font)` — system font stack supports Vietnamese |
 | Monospace | `var(--mono)` — used for code, document code |
 | Root font-size | `14px` |
 | Body line-height | `1.6` |
 | Paragraph font-size | `13px`, line-height `1.7` |
 
-### 2.2 Heading
+### 2.2 Headings
 
-| Class | Size | Weight | Color | Notes |
+| Class | Size | Weight | Color | Note |
 |---|---|---|---|---|
-| `.h1`, `h1.h1` | 20px | 700 | `--navy` | There is `border-bottom: 2px solid var(--navy)` |
-| `.h2`, `h2.h2` | 14px | 700 | `--navy` | There is `border-bottom: 1px solid var(--ln)` |
+| `.h1`, `h1.h1` | 20px | 700 | `--navy` | Yes `border-bottom: 2px solid var(--navy)` |
+| `.h2`, `h2.h2` | 14px | 700 | `--navy` | Yes `border-bottom: 1px solid var(--ln)` |
 | `.h3`, `h3.h3` | 13px | 700 | `--ink` | No borders |
 | `h4` | 13px | 700 | `--ink` | Usually override in `<style>` builtin |
 
 ### 2.3 Text utilities
 
-| Class | Description |
+| Class | Describe |
 |---|---|
 | `.lead` | 14px, `--ink2`, line-height 1.7 — opening paragraph |
-| `.muted` | 12px, `--ink3` — secondary text, note |
+| `.muted` | 12px, `--ink3` — secondary text, notes |
 | `.small` | 12px — small text |
 | `.small.muted` | 11px, `--ink4` — very small text, very blurry |
-| `.big` | 16px bold — outstanding figures |
+| `.big` | 16px bold — figures that stand out |
 | `.mono`, `.code` | Monospace 12px, background `--bg3`, padding 2px 6px |
 | `.center` | `text-align: center` |
 | `.mini-note` | 12px, `--ink2`, line-height 1.6 — small note |
@@ -109,16 +109,16 @@ All variables are declared in `:root` of `style.css`. Every component uses varia
 
 ### 3.2 Grid classes
 
-| Class | Columns | Gap | Notes |
+| Class | Columns | Gap | Note |
 |---|---|---|---|
 | `.grid-2` | `1fr 1fr` or `auto-fit minmax(260px,1fr)` | 20px / 14px | 2 column layout |
-| `.grid-3` | `auto-fit minmax(220px,1fr)` | 14px | 3-column layout |
+| `.grid-3` | `auto-fit minmax(220px,1fr)` | 14px | 3 column layout |
 | `.field-grid` | `repeat(2, minmax(0,1fr))` | 10px 16px | Form input 2 columns |
-| `.toc-grid` | `auto-fit minmax(220px,1fr)` | 6-10px | Quick Table of Contents |
+| `.toc-grid` | `auto-fit minmax(220px,1fr)` | 6-10px | Quick table of contents |
 | `.metric-grid` | `auto-fit minmax(180-210px,1fr)` | 12-14px | KPI metrics |
-| `.gate-grid` | `auto-fit minmax(220px,1fr)` | 12px | Grid information cards / legacy visual cards; **not for use in Section 6 SOP** |
+| `.gate-grid` | `auto-fit minmax(220px,1fr)` | 12px | Grid information cards / legacy visual cards; **not for use with Section 6 SOP** |
 | `.callout-grid` | `auto-fit minmax(260px,1fr)` | 14px | Multi-column callout |
-| `.auth-grid` | `repeat(2, minmax(0,1fr))` | 12px | JD Powers |
+| `.auth-grid` | `repeat(2, minmax(0,1fr))` | 12px | JD powers |
 | `.comp-grid` | `repeat(2, minmax(0,1fr))` | 12px | JD capacity |
 | `.portal-grid` | `auto-fit minmax(220px,1fr)` | 16px | Portal landing |
 | `.form-grid` | `1fr 1fr` | 10px | Form layout |
@@ -130,7 +130,7 @@ All variables are declared in `:root` of `style.css`. Every component uses varia
 
 ### 3.3 Sections & separators
 
-| Class | Description |
+| Class | Describe |
 |---|---|
 | `.section` | margin 20px 0 — section block |
 | `.sep`, `hr.sep` | Border-top 1px `--ln`, margin 28px 0 |
@@ -144,20 +144,20 @@ All variables are declared in `:root` of `style.css`. Every component uses varia
 
 ### 4.1 Basic cards
 
-| Class | Description | Special Border |
+| Class | Describe | Border special |
 |---|---|---|
-| `.card` | General card — white background, border `--ln`, radius `--r`, padding 20px 24px | No |
-| `.card-title` | Title card — 14px bold `--navy` | No |
-| `.table-card` | Table wrapper — `border: 1px solid var(--th-bdr)` = blue #1565c0, radius `--r`, overflow auto, **no box-shadow** | No |
+| `.card` | Generic card — white background, border `--ln`, radius `--r`, padding 20px 24px | Are not |
+| `.card-title` | Title card — 14px bold `--navy` | Are not |
+| `.table-card` | Table wrapper — `border: 1px solid var(--th-bdr)` = blue #1565c0, radius `--r`, overflow auto, **no box-shadow** | Are not |
 | `.gate-card` | Information card / legacy gate card — border `--ln`, padding 14px | `border-left: 3px solid var(--blue)` |
 | `.metric-card` | KPI metric — border `--ln`, radius `--r`, padding 16px 12px, text-align center | `border-top: 3px solid var(--blue)` |
-| `.callout-card` | Multi-column callout — border `--ln`, padding 14px | No |
-| `.portal-card` | Portal landing card — border `--ln`, padding 18px | No |
-| `.link-card` | Link card — border `--ln`, padding 16px | No |
+| `.callout-card` | Multi-column callout — border `--ln`, padding 14px | Are not |
+| `.portal-card` | Portal landing card — border `--ln`, padding 18px | Are not |
+| `.link-card` | Link card — border `--ln`, padding 16px | Are not |
 
 ### 4.2 Dedicated card (JD)
 
-| Class | Description |
+| Class | Describe |
 |---|---|
 | `.jd-purpose` | JD purpose block — bg `--bg2`, border-left 4px `#1d4ed8` |
 | `.jd-mission` | Location mission — bg `#eef6ff`, border-left 4px `#2563eb` |
@@ -167,7 +167,7 @@ All variables are declared in `:root` of `style.css`. Every component uses varia
 
 ### 4.3 Dedicated cards (other)
 
-| Class | Description |
+| Class | Describe |
 |---|---|
 | `.org-card` | Organization — border `--ln`, border-top 4px `--blue` |
 | `.org-row` | Organization row — border `--ln`, padding 14px |
@@ -260,18 +260,18 @@ All variables are declared in `:root` of `style.css`. Every component uses varia
 
 | Class | Background | Left border 3px | Use when |
 |---|---|---|---|
-| `.note` | `--blue-l` (#e3f2fd) | `--blue` (#1565c0) | Information, instructions |
+| `.note` | `--blue-l` (#e3f2fd) | `--blue` (#1565c0) | Information and instructions |
 | `.note-blue` | `--blue-l` (#e3f2fd) | `--blue` (#1565c0) | Alias ​​of `.note` |
 | `.note-soft` | `--bg2` (#f8f9fa) | `--blue` (#1565c0) | Light notes, gray background |
-| `.note-green` | `#ebfbee` | `--green` (#2f9e44) | Note success / OK |
+| `.note-green` | `#ebfbee` | `--green` (#2f9e44) | Note successful/OK |
 
 ### 5.2 Callout variants
 
 | Class | Background | Left border 3px | Use when |
 |---|---|---|---|
-| `.callout` | `--gold-l` (#fff8e1) | `--gold` (#f9a825) | Warnings, executive orders |
+| `.callout` | `--gold-l` (#fff8e1) | `--gold` (#f9a825) | Warning, executive order |
 | `.callout-danger` | `#fff5f5` | `--red` (#e03131) | Danger / stop now |
-| `.callout-info` | `--blue-l` (#e3f2fd) | `--blue` (#1565c0) | Additional Information |
+| `.callout-info` | `--blue-l` (#e3f2fd) | `--blue` (#1565c0) | Additional information |
 | `.callout-warn` | `--gold-l` (#fff8e1) | `--gold` (#f9a825) | Yellow/orange warning |
 
 ### 5.3 Example HTML
@@ -294,10 +294,10 @@ All variables are declared in `:root` of `style.css`. Every component uses varia
 
 | Class | Background | Left border 3px | Use when |
 |---|---|---|---|
-| `.box` | `--bg` (#ffffff) | `--blue` (#1565c0) | General Box |
-| `.box.core` | `--blue-l` (#e3f2fd) | `--blue` (#1565c0) | Core Requirements |
+| `.box` | `--bg` (#ffffff) | `--blue` (#1565c0) | General box |
+| `.box.core` | `--blue-l` (#e3f2fd) | `--blue` (#1565c0) | Core requirements |
 | `.box.sup` | `--gold-l` (#fff8e1) | `--gold` (#f9a825) | Support/additional |
-| `.box.imp` | `#fff5f5` | `--red` (#e03131) | Important / required |
+| `.box.imp` | `#fff5f5` | `--red` (#e03131) | Important/required |
 | `.box.mgt` | `#f3f0ff` | `#7950f2` (purple) | Administration / management |
 
 > **Important:** All `.box` variants use `border: none !important; border-left: 3px solid ... !important;` — NO other borders.
@@ -319,13 +319,13 @@ All variables are declared in `:root` of `style.css`. Every component uses varia
 
 ### 6.1 Basic Badge & Tag
 
-| Class | Type | Notes |
+| Class | Type | Note |
 |---|---|---|
 | `.badge` | Uppercase, navy bg, white text, 10px, letter-spacing .8px | Main label |
 | `.tag` | Border `--ln`, width `--bg3`, 11px, 600 weight | Inline label |
 | `.tag.teal` | bg `#e6fcf5`, text `#087f5b`, border `#96f2d7` | Tag teal |
 | `.tag.orange` | bg `#fff4e6`, text `#d9480f`, border `#ffd8a8` | Tag orange |
-| `.chip` | bg `--blue-l`, text `--blue`, 11px, 600 weight | Chip information |
+| `.chip` | bg `--blue-l`, text `--blue`, 11px, 600 weight | Information chip |
 | `.pill`, `.status-pill` | Rounded 20px, uppercase 10px, 700 weight, border `--ln` | Status |
 | `.kpi-pill` | bg `#ebfbee`, text `--green`, border `#b2f2bb`, 11px 700 | KPI pills |
 
@@ -342,10 +342,10 @@ All variables are declared in `:root` of `style.css`. Every component uses varia
 
 | Class | Background | Text | Border | Show | Meaning |
 |---|---|---|---|---|---|
-| `.req-tag.shall` | `#fff5f5` | `--red` (#e03131) | `1px solid #ffc9c9` | **MUST** | Mandatory requirements |
-| `.req-tag.must` | `#fff5f5` | `--red` (#e03131) | `1px solid #ffc9c9` | **REQUIRED** | Like shall — red alias |
-| `.req-tag.should` | `#fff9db` | `#e67700` (amber) | `1px solid #ffe066` | **SHOULD** | Recommendations |
-| `.req-tag.may` | `#ebfbee` | `--green` (#2f9e44) | `1px solid #b2f2bb` | **CAN** | Options |
+| `.req-tag.shall` | `#fff5f5` | `--red` (#e03131) | `1px solid #ffc9c9` | **RIGHT** | Mandatory requirement |
+| `.req-tag.must` | `#fff5f5` | `--red` (#e03131) | `1px solid #ffc9c9` | **OBLIGATORY** | Same as shall — red alias |
+| `.req-tag.should` | `#fff9db` | `#e67700` (amber) | `1px solid #ffe066` | **SHOULD** | Recommended |
+| `.req-tag.may` | `#ebfbee` | `--green` (#2f9e44) | `1px solid #b2f2bb` | **MAYBE** | Options |
 
 > **Note:** `.req-tag` base: `padding: 3px 10px`, `font-size: 10px`, `font-weight: 800`, `text-transform: uppercase`, `flex-shrink: 0`.
 
@@ -374,9 +374,9 @@ All variables are declared in `:root` of `style.css`. Every component uses varia
 
 ### 6.4 System of 4 different types of labels (Badge Types)
 
-> **Rule:** Look at the badge color = know the type. DO NOT mix.
+> **Rules:** Look at the badge color = know the type. DO NOT mix.
 
-| # | Class | Color | Shape | Example | Used for |
+| # | Class | Color | Shape | For example | Used for |
 |---|-------|-----|-----------|-------|----------|
 | 1 | `.iso-clause` | 🔵 White on blue `#1565c0` | Pill (rounded 12px) | `§8.2` | Reference ISO 9001:2026 |
 | 2 | `.step-tag` | ⬛ White on dark `#37474f` | Rounded square | `S1`, `S3` | SOP/WI internal step |
@@ -397,9 +397,9 @@ All variables are declared in `:root` of `style.css`. Every component uses varia
 <span class="proc-tag">Bước 1</span>
 ```
 
-> **NEVER** use `G1`, `G2`... for internal SOP steps → use `S1`, `S2`...
+> **NEVER** use `G1`, `G2`... for internal SOP step → use `S1`, `S2`...
 > **NEVER** use `.iso-clause` for non-ISO references.
-> Each MUST/SHOULD/CAN request in iso-map MUST have `<span class="iso-clause">§X.Y</span>` attached.
+> Each MUST/SHOULD/CAN request in the iso-map MUST have `<span class="iso-clause">§X.Y</span>` attached.
 
 ### 6.5 Flowchart — Detailed process flow chart
 
@@ -433,31 +433,31 @@ All variables are declared in `:root` of `style.css`. Every component uses varia
 |-------|-----|----------|
 | `.flow-step` | White, border blue | Normal step |
 | `.flow-step.active` | Amber background `#fffbeb` | Decision / approval / release step |
-| `.flow-step.critical` | Red background `#fef2f2` | Inspection / measurement / hold point step |
-| `.flow-arrow` | Blue `#1565c0` | Arrows connecting steps |
+| `.flow-step.critical` | Red background `#fef2f2` | Inspection/measurement/hold point step |
+| `.flow-arrow` | Blue `#1565c0` | Arrows follow steps |
 | `.flow-num` | White circle on blue | Step number |
 
 **Flowchart rules:**
 1. Maximum number of steps: **12** (if more → divide sub-process)
-2. Step name: **2-3 words** (brief)
+2. Step name: **2-3 words** (short)
 3. Description: **1 line** (optional, leave blank if name is clear enough)
 4. Responsive: horizontal → vertical on mobile
-5. Print: can be printed in all colors
+5. Print: can print in full color
 6. **Required** to book before the "Detailed Process" section
 
 ---
 
 ## 7. Table System (Table System)
 
-> **Table design v10:** Blue border `#1565c0`, blue tint header, column dividers, no box-shadow.
+> **V10 table design:** Blue border `#1565c0`, blue tint header, column dividers, no box-shadow.
 > See `style.css` lines 152–200.
 
 ### 7.1 General rules
 
-1. **MANDATORY** use `class="table"` on every `<table>` — if the class is missing, the table will not have the correct style
-2. Always wrap the table in `.table-card` to make it responsive on mobile
+1. **REQUIRED** use `class="table"` on every `<table>` — if the class is missing, the table will not be properly styled
+2. Always wrap tables in `.table-card` for mobile responsiveness
 3. Use `.form-table` for form tables
-4. Use `.docx-table` for Word/docx import table
+4. Use `.docx-table` for tables from Word/docx import
 
 ### 7.2 Standard HTML structure
 
@@ -484,7 +484,7 @@ All variables are declared in `:root` of `style.css`. Every component uses varia
 
 ### 7.3 Detailed styling (style.css lines 152–200)
 
-| Ingredients | Realistic style |
+| Ingredient | Realistic style |
 |---|---|
 | `.table-card` | `border: 1px solid var(--th-bdr)` = blue #1565c0, `border-radius: var(--r)`, `box-shadow: none`, `overflow: auto` |
 | `.table` | `width: 100%`, `border-collapse: separate`, `border-spacing: 0`, `border: 1px solid var(--th-bdr)`, `border-radius: var(--r)`, font 12.5px |
@@ -498,11 +498,11 @@ All variables are declared in `:root` of `style.css`. Every component uses varia
 
 > **Important note:** When the table is in `.table-card`, the inner table does NOT have its own border (`border: none`) — the outer border is taken care of by `.table-card`.
 
-### 7.4 Dedicated board
+### 7.4 Specialized tables
 
-| Class | Description |
+| Class | Describe |
 |---|---|
-| `.form-table` | Same design as blue border, font size `--th-bg`, font 12px, 11px bold |
+| `.form-table` | Same design as blue border, font `--th-bg`, font 12px, 11px bold |
 | `.docx-table` | Same design as blue border, 12px font, used for importing Word |
 | `.iso-matrix` | Font 11px, small padding 5px 8px, thead 9px |
 | `.tbl` | Simple table, `border-collapse: collapse`, border `--ln`, padding 6px 10px |
@@ -539,7 +539,7 @@ Tables with attributes `data-qms-autofit="balanced"` or `data-ed-autofit="balanc
 </div>
 ```
 
-| Class | Description |
+| Class | Describe |
 |---|---|
 | `.vflow` | Container flex column, gap 6px |
 | `.vstep` | Step — flex, gap 12px, border `--ln2`, padding 12px 16px |
@@ -547,7 +547,7 @@ Tables with attributes `data-qms-autofit="balanced"` or `data-ed-autofit="balanc
 | `.vtext` | Step content — flex 1, 13px |
 | `.vbranches` | Child branch — margin-left 42px, border-left 2px `--ln` |
 
-### 8.2 Step band
+### 8.2 Step bands
 
 ```html
 <div class="step-band">
@@ -574,9 +574,9 @@ Tables with attributes `data-qms-autofit="balanced"` or `data-ed-autofit="balanc
 
 ## 9. Form & Field Components
 
-| Class | Description |
+| Class | Describe |
 |---|---|
-| `.field` | Form box — border `--ln`, padding 10px 12px, border `--bg` |
+| `.field` | Form box — border `--ln`, padding 10px 12px, width `--bg` |
 | `.field b` | Label — 11px uppercase `--ink3` |
 | `.blank` | Blank line — border-bottom `--ink4`, min-height 20px |
 | `.input` | Fake input — border `--ln`, padding 6px 10px, width `--bg2` |
@@ -598,7 +598,7 @@ Tables with attributes `data-qms-autofit="balanced"` or `data-ed-autofit="balanc
 | Border | `1px solid var(--blue)` = #1565c0 |
 | Border-radius | `var(--r)` = 8px |
 | `::before` pseudo | Label **"ISO 9001:2026"** — bg blue, white text, font 9px bold, absolute top -9px |
-| `.iso-clause` | Green badge `--blue` bg, white text, 9px bold font — used for clause codes (e.g. §7.5) |
+| `.iso-clause` | Green badge `--blue` bg, white text, 9px bold font — used for term codes (e.g. §7.5) |
 | `.iso-map .req` | bg `rgba(255,255,255,0.85)`, border `1px solid rgba(21,101,192,0.15)`, border-left `3px solid --blue` |
 | `.iso-title` | 11px bold uppercase, `--ink3`, letter-spacing .8px |
 
@@ -699,7 +699,7 @@ html { font-size: 10pt; }
 
 ### 11.2 Page break control (3 combined blocks)
 
-| Rules | Applies to |
+| Rules | Apply for |
 |---|---|
 | `page-break-inside: avoid` | `.req`, `.vstep`, `.legend`, `.sig-row`, `.sign-row`, `.approval-row`, `.backup-card` (block 1+2), `.callout`, `.note`, `.card`, `.iso-map`, `.preface-block`, `.jd-mission`, `.form-header`, `.badge`, `.auth-grid` (block 3) |
 | `page-break-inside: auto` | `.card`, `.table-card`, `.callout`, `.note`, `.box`, `.iso-map`, `.preface-block`, `.form-sheet`, `.form-header` (block 1+2 — allow cutting if long) |
@@ -715,10 +715,10 @@ html { font-size: 10pt; }
 
 | Class | Screen | Print |
 |---|---|---|
-| `.no-print` | Show | Hide (`display: none !important`) |
+| `.no-print` | Presently | Hide (`display: none !important`) |
 | `.print-disclaimer` | Hide (`display: none !important`) | Show (`display: block !important`) |
-| `.no-screen` | Hide (`display: none !important`) | Show |
-| `.btn` | Show | Hide (`display: none !important`) |
+| `.no-screen` | Hide (`display: none !important`) | Presently |
+| `.btn` | Presently | Hide (`display: none !important`) |
 
 ### 11.4 Print overrides
 
@@ -770,7 +770,7 @@ Multiple documents override grid at 960px in `<style>` builtin:
 
 ## 13. Buttons & Actions
 
-| Class | Description |
+| Class | Describe |
 |---|---|
 | `.btn` | Button — border `--ln`, bg `--bg`, text `--navy`, hover bg `--bg2` |
 | `.btnrow` | Button row — flex, gap 8px |
@@ -793,14 +793,14 @@ Style.css has a CSS block that hides the entire Google Translate UI (banner, men
 | `org-` | Organization chart |
 | `comp-` | Competency |
 | `auth-` | Authority |
-| `req-` | Requirements |
+| `req-` | Requirement |
 | `raci-` | RACI matrix |
 | `iso-` | ISO mapping |
 | `doc-` | Document content |
-| `gate-` | Control gate |
+| `gate-` | Control gates |
 | `metric-` | KPI metrics |
-| `kpi-` | KPI indicators |
-| `badge-` | Badge variant |
+| `kpi-` | KPI indicator |
+| `badge-` | Badge variants |
 | `note-` | Note variants |
 | `callout-` | Callout variant |
 | `step-` | Step/flow |
@@ -812,20 +812,20 @@ Style.css has a CSS block that hides the entire Google Translate UI (banner, men
 
 ### Principle: WYSIWYG — display as it is, print as it is
 
-| Attributes | Value (final result after 3 blocks `@media print`) |
+| Attributes | Value (final result after 3 `@media print` blocks) |
 |-----------|---------|
 | `@page margin` | 18mm top, 12mm sides, 20mm bottom; size A4 (block 3 override) |
 | `@page :first` | margin-top 10mm |
 | `html font-size` | 10pt (smaller than screen 14px) |
 | `form-header` | Keep the same grid layout, border 1px solid #999, `border-radius: 0`, `page-break-inside: avoid` |
-| Table headers | `print-color-adjust: exact` — prints the correct color `var(--th-bg)` |
-| Table borders | `border: 1px solid var(--th-bdr)` — keep blue border when printing |
-| Large Cards/Notes | `page-break-inside: auto` — allow cutting if longer than 1 page |
+| Table header | `print-color-adjust: exact` — prints correct color `var(--th-bg)` |
+| Table border | `border: 1px solid var(--th-bdr)` — keep blue border when printing |
+| Large Cards/Notes | `page-break-inside: auto` — allows cutting if longer than 1 page |
 | `req`, `vstep`, `legend` | `page-break-inside: avoid` — do not cut small elements |
 | Badge/Tag/Chip | `print-color-adjust: exact` — prints in correct color |
 | Gate cards | More compact: gap 8px, padding 10px, font 11px |
 | `.page` | Remove shadow, border, radius — print flat |
-| `.table-card` | `overflow: visible !important` — not cut off when printing |
+| `.table-card` | `overflow: visible !important` — not cropped when printing |
 
 ### Note the ISO on the printout:
 - Page footer (block 1): `"Bản in không kiểm soát nếu không có dấu kiểm soát — HESEM QMS"` (font 7pt, #999)
@@ -834,7 +834,7 @@ Style.css has a CSS block that hides the entire Google Translate UI (banner, men
 ### Required rules:
 1. **DO NOT** add inline `@media print` to HTML files — all print rules are in `style.css`
 2. **DO NOT** add `page-break-inside: avoid` for large elements (card, table-card, note, box, iso-map)
-3. **CAN** add `page-break-before: always` before the large heading if you need to separate pages
+3. **CAN** add `page-break-before: always` before the large heading if page separation is needed
 4. **DO NOT** override `overflow` in inline styles — style.css has set `overflow: visible !important` for print
 
 ---
@@ -849,7 +849,7 @@ Style.css has a CSS block that hides the entire Google Translate UI (banner, men
     <div class="vtext"><b>Tên bước</b><br>Mô tả chi tiết...</div>
   </div>
   <div class="vstep decision">
-<div class="vnum">?</div>
+    <div class="vnum">?</div>
     <div class="vtext"><b>Quyết định</b><br>Nếu PASS → bước tiếp. Nếu FAIL → hold.</div>
   </div>
   <div class="vstep hold">
@@ -866,9 +866,9 @@ Style.css has a CSS block that hides the entire Google Translate UI (banner, men
 ### Variants:
 | Class | Border-left color | Vnum background | Use when |
 |-------|-----------------|----------------|----------|
-| `.vstep` (default) | `--blue` | `--blue` | Common Steps |
+| `.vstep` (default) | `--blue` | `--blue` | Normal step |
 | `.vstep.decision` | `--gold` | `--gold` | Decision step (pass/fail) |
-| `.vstep.hold` | `--red` | `--red` | Step HOLD/stop |
+| `.vstep.hold` | `--red` | `--red` | HOLD/stop step |
 | `.vstep.end` | `--green` | `--green` | Complete/release step |
 
 ### Visual:

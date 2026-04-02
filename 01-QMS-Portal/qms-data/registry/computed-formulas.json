@@ -1,179 +1,718 @@
 {
-  "_meta": { "version": "1.0", "description": "Pre-built formula presets for computed columns in Module Builder" },
-
+  "_meta": {
+    "version": "2.0",
+    "description": "World-class computed formula presets for finance, production, quality, supplier, energy, and traceability.",
+    "generatedAt": "2026-04-02T06:00:20.356Z",
+    "formulaCount": 43
+  },
   "total_line_amount": {
-    "label": "Thành tiền dòng",
+    "label": "Line Total Amount",
     "labelEn": "Line Total Amount",
     "formula": "quantity * unit_price",
     "resultType": "currency",
-    "category": "financial"
+    "category": "financial",
+    "description": "Extended amount for a single commercial line.",
+    "inputs": [
+      "quantity",
+      "unit_price"
+    ],
+    "tags": [
+      "quote",
+      "order",
+      "finance"
+    ]
+  },
+  "discount_amount": {
+    "label": "Discount Amount",
+    "labelEn": "Discount Amount",
+    "formula": "subtotal * (discount_pct / 100)",
+    "resultType": "currency",
+    "category": "financial",
+    "description": "Monetary discount derived from subtotal and percent.",
+    "inputs": [
+      "subtotal",
+      "discount_pct"
+    ],
+    "tags": [
+      "quote",
+      "order"
+    ]
   },
   "gross_margin_pct": {
-    "label": "Biên lợi nhuận gộp (%)",
-    "labelEn": "Gross Margin %",
+    "label": "Gross Margin Percent",
+    "labelEn": "Gross Margin Percent",
     "formula": "((selling_price - unit_cost) / selling_price) * 100",
     "resultType": "percent",
-    "category": "financial"
+    "category": "financial",
+    "description": "Margin percent relative to selling price.",
+    "inputs": [
+      "selling_price",
+      "unit_cost"
+    ],
+    "tags": [
+      "quote",
+      "costing"
+    ]
   },
   "markup_pct": {
-    "label": "Tỷ lệ markup (%)",
-    "labelEn": "Markup %",
+    "label": "Markup Percent",
+    "labelEn": "Markup Percent",
     "formula": "((selling_price - unit_cost) / unit_cost) * 100",
     "resultType": "percent",
-    "category": "financial"
+    "category": "financial",
+    "description": "Markup percent relative to cost.",
+    "inputs": [
+      "selling_price",
+      "unit_cost"
+    ],
+    "tags": [
+      "quote",
+      "costing"
+    ]
   },
   "total_order_value": {
-    "label": "Tổng giá trị đơn hàng",
+    "label": "Total Order Value",
     "labelEn": "Total Order Value",
     "formula": "SUM(lines.quantity * lines.unit_price)",
     "resultType": "currency",
-    "category": "financial"
+    "category": "financial",
+    "description": "Aggregate value across all lines in a commercial document.",
+    "inputs": [
+      "lines.quantity",
+      "lines.unit_price"
+    ],
+    "tags": [
+      "sales_order",
+      "quote"
+    ]
   },
   "vat_amount": {
-    "label": "Tiền VAT",
+    "label": "VAT Amount",
     "labelEn": "VAT Amount",
     "formula": "subtotal * (vat_rate / 100)",
     "resultType": "currency",
-    "category": "financial"
+    "category": "financial",
+    "description": "Tax amount calculated from taxable subtotal.",
+    "inputs": [
+      "subtotal",
+      "vat_rate"
+    ],
+    "tags": [
+      "finance",
+      "compliance"
+    ]
+  },
+  "grand_total": {
+    "label": "Grand Total",
+    "labelEn": "Grand Total",
+    "formula": "subtotal - discount_amount + vat_amount + freight_amount",
+    "resultType": "currency",
+    "category": "financial",
+    "description": "Commercial grand total including tax and freight.",
+    "inputs": [
+      "subtotal",
+      "discount_amount",
+      "vat_amount",
+      "freight_amount"
+    ],
+    "tags": [
+      "quote",
+      "sales_order"
+    ]
+  },
+  "copq_total": {
+    "label": "Total Cost Of Poor Quality",
+    "labelEn": "Total Cost Of Poor Quality",
+    "formula": "scrap_cost + rework_cost + warranty_cost + inspection_cost",
+    "resultType": "currency",
+    "category": "quality",
+    "description": "Total direct poor quality cost bucket.",
+    "inputs": [
+      "scrap_cost",
+      "rework_cost",
+      "warranty_cost",
+      "inspection_cost"
+    ],
+    "tags": [
+      "quality",
+      "management_review"
+    ]
+  },
+  "copq_rate_pct": {
+    "label": "COPQ Rate Percent",
+    "labelEn": "COPQ Rate Percent",
+    "formula": "(copq_total / revenue_amount) * 100",
+    "resultType": "percent",
+    "category": "quality",
+    "description": "Poor quality cost as percentage of revenue.",
+    "inputs": [
+      "copq_total",
+      "revenue_amount"
+    ],
+    "tags": [
+      "quality",
+      "finance"
+    ]
   },
   "cycle_time_total": {
-    "label": "Tổng thời gian chu trình",
+    "label": "Total Cycle Time",
     "labelEn": "Total Cycle Time",
     "formula": "setup_time + (run_time_per_unit * quantity)",
     "resultType": "duration",
-    "category": "production"
+    "category": "production",
+    "description": "Combined setup and runtime requirement.",
+    "inputs": [
+      "setup_time",
+      "run_time_per_unit",
+      "quantity"
+    ],
+    "tags": [
+      "routing",
+      "scheduling"
+    ]
+  },
+  "takt_gap_minutes": {
+    "label": "Takt Gap Minutes",
+    "labelEn": "Takt Gap Minutes",
+    "formula": "actual_cycle_time - takt_time",
+    "resultType": "duration",
+    "category": "production",
+    "description": "Positive value indicates cycle exceeds takt.",
+    "inputs": [
+      "actual_cycle_time",
+      "takt_time"
+    ],
+    "tags": [
+      "production",
+      "capacity"
+    ]
   },
   "oee_pct": {
-    "label": "OEE (%)",
-    "labelEn": "Overall Equipment Effectiveness %",
+    "label": "OEE Percent",
+    "labelEn": "OEE Percent",
     "formula": "availability * performance * quality * 100",
     "resultType": "percent",
-    "category": "production"
+    "category": "production",
+    "description": "Overall equipment effectiveness.",
+    "inputs": [
+      "availability",
+      "performance",
+      "quality"
+    ],
+    "tags": [
+      "machine",
+      "kpi"
+    ]
   },
   "scrap_rate_pct": {
-    "label": "Tỷ lệ phế phẩm (%)",
-    "labelEn": "Scrap Rate %",
+    "label": "Scrap Rate Percent",
+    "labelEn": "Scrap Rate Percent",
     "formula": "(scrap_qty / total_produced) * 100",
     "resultType": "percent",
-    "category": "quality"
+    "category": "quality",
+    "description": "Scrap quantity relative to production output.",
+    "inputs": [
+      "scrap_qty",
+      "total_produced"
+    ],
+    "tags": [
+      "quality",
+      "shop_floor"
+    ]
   },
   "first_pass_yield": {
-    "label": "Tỷ lệ đạt lần đầu (%)",
-    "labelEn": "First Pass Yield %",
+    "label": "First Pass Yield",
+    "labelEn": "First Pass Yield",
     "formula": "(good_qty / total_inspected) * 100",
     "resultType": "percent",
-    "category": "quality"
+    "category": "quality",
+    "description": "Yield without rework or repair.",
+    "inputs": [
+      "good_qty",
+      "total_inspected"
+    ],
+    "tags": [
+      "quality",
+      "inspection"
+    ]
+  },
+  "defect_escape_rate": {
+    "label": "Defect Escape Rate",
+    "labelEn": "Defect Escape Rate",
+    "formula": "(customer_returns / total_shipments) * 100",
+    "resultType": "percent",
+    "category": "quality",
+    "description": "Escaped defects as percentage of shipments.",
+    "inputs": [
+      "customer_returns",
+      "total_shipments"
+    ],
+    "tags": [
+      "quality",
+      "customer"
+    ]
   },
   "dpmo": {
     "label": "DPMO",
     "labelEn": "Defects Per Million Opportunities",
     "formula": "(defect_count / (total_units * opportunities_per_unit)) * 1000000",
     "resultType": "number",
-    "category": "quality"
+    "category": "quality",
+    "description": "Six Sigma style opportunity metric.",
+    "inputs": [
+      "defect_count",
+      "total_units",
+      "opportunities_per_unit"
+    ],
+    "tags": [
+      "quality",
+      "spc"
+    ]
   },
   "cpk": {
-    "label": "Chỉ số năng lực Cpk",
+    "label": "Cpk",
     "labelEn": "Process Capability Index Cpk",
     "formula": "MIN((usl - mean) / (3 * stdev), (mean - lsl) / (3 * stdev))",
     "resultType": "number",
-    "category": "quality"
+    "category": "quality",
+    "description": "Capability index using upper and lower specification limits.",
+    "inputs": [
+      "usl",
+      "mean",
+      "stdev",
+      "lsl"
+    ],
+    "tags": [
+      "quality",
+      "spc"
+    ]
   },
-  "copq_total": {
-    "label": "Tổng chi phí chất lượng kém",
-    "labelEn": "Total Cost of Poor Quality",
-    "formula": "scrap_cost + rework_cost + warranty_cost + inspection_cost",
-    "resultType": "currency",
-    "category": "quality"
+  "closure_aging_days": {
+    "label": "Closure Aging Days",
+    "labelEn": "Closure Aging Days",
+    "formula": "DATEDIFF(close_date, open_date)",
+    "resultType": "integer",
+    "category": "quality",
+    "description": "Elapsed days from event opening to closure.",
+    "inputs": [
+      "close_date",
+      "open_date"
+    ],
+    "tags": [
+      "ncr",
+      "capa",
+      "scar"
+    ]
+  },
+  "audit_closure_rate": {
+    "label": "Audit Closure Rate",
+    "labelEn": "Audit Closure Rate",
+    "formula": "(closed_findings / total_findings) * 100",
+    "resultType": "percent",
+    "category": "audit",
+    "description": "Closure percentage of audit findings.",
+    "inputs": [
+      "closed_findings",
+      "total_findings"
+    ],
+    "tags": [
+      "audit",
+      "supplier"
+    ]
+  },
+  "ppap_completeness_pct": {
+    "label": "PPAP Completeness Percent",
+    "labelEn": "PPAP Completeness Percent",
+    "formula": "(approved_elements / required_elements) * 100",
+    "resultType": "percent",
+    "category": "quality",
+    "description": "PPAP element completeness score.",
+    "inputs": [
+      "approved_elements",
+      "required_elements"
+    ],
+    "tags": [
+      "ppap",
+      "apqp"
+    ]
+  },
+  "first_article_completion_pct": {
+    "label": "First Article Completion Percent",
+    "labelEn": "First Article Completion Percent",
+    "formula": "(completed_characteristics / total_characteristics) * 100",
+    "resultType": "percent",
+    "category": "quality",
+    "description": "Completion percent for first article inspection characteristics.",
+    "inputs": [
+      "completed_characteristics",
+      "total_characteristics"
+    ],
+    "tags": [
+      "fai",
+      "inspection"
+    ]
   },
   "supplier_score": {
-    "label": "Điểm đánh giá nhà cung cấp",
+    "label": "Supplier Scorecard",
     "labelEn": "Supplier Scorecard",
     "formula": "(quality_score * 0.4) + (delivery_score * 0.3) + (cost_score * 0.2) + (service_score * 0.1)",
     "resultType": "number",
-    "category": "supplier"
+    "category": "supplier",
+    "description": "Weighted supplier composite performance score.",
+    "inputs": [
+      "quality_score",
+      "delivery_score",
+      "cost_score",
+      "service_score"
+    ],
+    "tags": [
+      "supplier",
+      "scorecard"
+    ]
   },
   "on_time_delivery_pct": {
-    "label": "Tỷ lệ giao hàng đúng hạn (%)",
-    "labelEn": "On-Time Delivery %",
+    "label": "On Time Delivery Percent",
+    "labelEn": "On Time Delivery Percent",
     "formula": "(on_time_count / total_deliveries) * 100",
     "resultType": "percent",
-    "category": "supplier"
+    "category": "supplier",
+    "description": "Delivery performance percentage.",
+    "inputs": [
+      "on_time_count",
+      "total_deliveries"
+    ],
+    "tags": [
+      "supplier",
+      "shipping"
+    ]
   },
   "incoming_acceptance_rate": {
-    "label": "Tỷ lệ chấp nhận hàng nhập (%)",
-    "labelEn": "Incoming Acceptance Rate %",
+    "label": "Incoming Acceptance Rate",
+    "labelEn": "Incoming Acceptance Rate",
     "formula": "(accepted_lots / total_lots_inspected) * 100",
     "resultType": "percent",
-    "category": "supplier"
+    "category": "supplier",
+    "description": "Receiving acceptance ratio.",
+    "inputs": [
+      "accepted_lots",
+      "total_lots_inspected"
+    ],
+    "tags": [
+      "supplier",
+      "inspection"
+    ]
+  },
+  "supplier_ppm": {
+    "label": "Supplier PPM",
+    "labelEn": "Supplier Parts Per Million",
+    "formula": "(defective_qty / received_qty) * 1000000",
+    "resultType": "number",
+    "category": "supplier",
+    "description": "Supplier defect rate per million units received.",
+    "inputs": [
+      "defective_qty",
+      "received_qty"
+    ],
+    "tags": [
+      "supplier",
+      "quality"
+    ]
+  },
+  "scar_closure_pct": {
+    "label": "SCAR Closure Percent",
+    "labelEn": "SCAR Closure Percent",
+    "formula": "(closed_scars / total_scars) * 100",
+    "resultType": "percent",
+    "category": "supplier",
+    "description": "Closure percentage for supplier corrective actions.",
+    "inputs": [
+      "closed_scars",
+      "total_scars"
+    ],
+    "tags": [
+      "supplier",
+      "scar"
+    ]
   },
   "material_cost_estimate": {
-    "label": "Ước tính chi phí vật liệu",
+    "label": "Material Cost Estimate",
     "labelEn": "Material Cost Estimate",
     "formula": "raw_weight * material_price_per_kg * buy_to_fly_ratio",
     "resultType": "currency",
-    "category": "quoting"
+    "category": "quoting",
+    "description": "Material cost estimate for machining and aerospace parts.",
+    "inputs": [
+      "raw_weight",
+      "material_price_per_kg",
+      "buy_to_fly_ratio"
+    ],
+    "tags": [
+      "quote",
+      "material"
+    ]
   },
   "machining_cost_estimate": {
-    "label": "Ước tính chi phí gia công",
+    "label": "Machining Cost Estimate",
     "labelEn": "Machining Cost Estimate",
     "formula": "cycle_time_hours * machine_rate_per_hour",
     "resultType": "currency",
-    "category": "quoting"
+    "category": "quoting",
+    "description": "Estimated cost of machine runtime.",
+    "inputs": [
+      "cycle_time_hours",
+      "machine_rate_per_hour"
+    ],
+    "tags": [
+      "quote",
+      "production"
+    ]
+  },
+  "setup_cost_estimate": {
+    "label": "Setup Cost Estimate",
+    "labelEn": "Setup Cost Estimate",
+    "formula": "setup_hours * setup_rate_per_hour",
+    "resultType": "currency",
+    "category": "quoting",
+    "description": "Setup cost burden for quoting and routing.",
+    "inputs": [
+      "setup_hours",
+      "setup_rate_per_hour"
+    ],
+    "tags": [
+      "quote",
+      "routing"
+    ]
   },
   "quote_total": {
-    "label": "Tổng giá báo",
+    "label": "Quote Total",
     "labelEn": "Quote Total",
     "formula": "material_cost + machining_cost + overhead_cost + profit_margin",
     "resultType": "currency",
-    "category": "quoting"
+    "category": "quoting",
+    "description": "Quoted commercial total before tax.",
+    "inputs": [
+      "material_cost",
+      "machining_cost",
+      "overhead_cost",
+      "profit_margin"
+    ],
+    "tags": [
+      "quote"
+    ]
   },
   "lead_time_days": {
-    "label": "Thời gian giao hàng (ngày)",
-    "labelEn": "Lead Time (Days)",
+    "label": "Lead Time Days",
+    "labelEn": "Lead Time Days",
     "formula": "material_lead_days + production_days + finishing_days + buffer_days",
     "resultType": "integer",
-    "category": "quoting"
+    "category": "quoting",
+    "description": "Estimated end-to-end lead time.",
+    "inputs": [
+      "material_lead_days",
+      "production_days",
+      "finishing_days",
+      "buffer_days"
+    ],
+    "tags": [
+      "quote",
+      "planning"
+    ]
   },
   "inventory_value": {
-    "label": "Giá trị tồn kho",
+    "label": "Inventory Value",
     "labelEn": "Inventory Value",
     "formula": "qty_on_hand * unit_cost",
     "resultType": "currency",
-    "category": "inventory"
+    "category": "inventory",
+    "description": "Inventory carrying value at location or part level.",
+    "inputs": [
+      "qty_on_hand",
+      "unit_cost"
+    ],
+    "tags": [
+      "inventory",
+      "finance"
+    ]
   },
   "reorder_point": {
-    "label": "Điểm đặt hàng lại",
+    "label": "Reorder Point",
     "labelEn": "Reorder Point",
     "formula": "(avg_daily_usage * lead_time_days) + safety_stock",
     "resultType": "number",
-    "category": "inventory"
+    "category": "inventory",
+    "description": "Inventory reorder trigger threshold.",
+    "inputs": [
+      "avg_daily_usage",
+      "lead_time_days",
+      "safety_stock"
+    ],
+    "tags": [
+      "inventory",
+      "planning"
+    ]
   },
   "days_of_supply": {
-    "label": "Số ngày cung ứng",
-    "labelEn": "Days of Supply",
+    "label": "Days Of Supply",
+    "labelEn": "Days Of Supply",
     "formula": "qty_on_hand / avg_daily_usage",
     "resultType": "number",
-    "category": "inventory"
+    "category": "inventory",
+    "description": "Projected available supply days.",
+    "inputs": [
+      "qty_on_hand",
+      "avg_daily_usage"
+    ],
+    "tags": [
+      "inventory",
+      "planning"
+    ]
+  },
+  "lot_age_days": {
+    "label": "Lot Age Days",
+    "labelEn": "Lot Age Days",
+    "formula": "DATEDIFF(today, receipt_date)",
+    "resultType": "integer",
+    "category": "inventory",
+    "description": "Age of a lot since receipt.",
+    "inputs": [
+      "today",
+      "receipt_date"
+    ],
+    "tags": [
+      "lot",
+      "traceability"
+    ]
+  },
+  "traceability_completeness_pct": {
+    "label": "Traceability Completeness Percent",
+    "labelEn": "Traceability Completeness Percent",
+    "formula": "(completed_trace_links / required_trace_links) * 100",
+    "resultType": "percent",
+    "category": "traceability",
+    "description": "Completeness of lot, serial, cert, and operation genealogy.",
+    "inputs": [
+      "completed_trace_links",
+      "required_trace_links"
+    ],
+    "tags": [
+      "traceability",
+      "passport"
+    ]
   },
   "labor_efficiency_pct": {
-    "label": "Hiệu suất lao động (%)",
-    "labelEn": "Labor Efficiency %",
+    "label": "Labor Efficiency Percent",
+    "labelEn": "Labor Efficiency Percent",
     "formula": "(standard_hours / actual_hours) * 100",
     "resultType": "percent",
-    "category": "production"
+    "category": "production",
+    "description": "Standard to actual labor efficiency.",
+    "inputs": [
+      "standard_hours",
+      "actual_hours"
+    ],
+    "tags": [
+      "labor",
+      "production"
+    ]
   },
   "machine_utilization_pct": {
-    "label": "Tỷ lệ sử dụng máy (%)",
-    "labelEn": "Machine Utilization %",
+    "label": "Machine Utilization Percent",
+    "labelEn": "Machine Utilization Percent",
     "formula": "(actual_run_time / available_time) * 100",
     "resultType": "percent",
-    "category": "production"
+    "category": "production",
+    "description": "Machine utilization ratio.",
+    "inputs": [
+      "actual_run_time",
+      "available_time"
+    ],
+    "tags": [
+      "machine",
+      "capacity"
+    ]
+  },
+  "schedule_adherence_pct": {
+    "label": "Schedule Adherence Percent",
+    "labelEn": "Schedule Adherence Percent",
+    "formula": "(operations_on_time / total_operations) * 100",
+    "resultType": "percent",
+    "category": "production",
+    "description": "Schedule adherence across operations.",
+    "inputs": [
+      "operations_on_time",
+      "total_operations"
+    ],
+    "tags": [
+      "schedule",
+      "production"
+    ]
+  },
+  "runtime_variance_pct": {
+    "label": "Runtime Variance Percent",
+    "labelEn": "Runtime Variance Percent",
+    "formula": "((actual_runtime - planned_runtime) / planned_runtime) * 100",
+    "resultType": "percent",
+    "category": "production",
+    "description": "Deviation between planned and actual runtime.",
+    "inputs": [
+      "actual_runtime",
+      "planned_runtime"
+    ],
+    "tags": [
+      "production",
+      "variance"
+    ]
+  },
+  "energy_cost_per_part": {
+    "label": "Energy Cost Per Part",
+    "labelEn": "Energy Cost Per Part",
+    "formula": "(kwh_consumed * electricity_rate) / parts_completed",
+    "resultType": "currency",
+    "category": "energy",
+    "description": "Energy cost allocation per produced part.",
+    "inputs": [
+      "kwh_consumed",
+      "electricity_rate",
+      "parts_completed"
+    ],
+    "tags": [
+      "energy",
+      "cost"
+    ]
+  },
+  "carbon_per_part": {
+    "label": "Carbon Per Part",
+    "labelEn": "Carbon Per Part",
+    "formula": "(kwh_consumed * emission_factor) / parts_completed",
+    "resultType": "number",
+    "category": "energy",
+    "description": "Estimated carbon footprint per part.",
+    "inputs": [
+      "kwh_consumed",
+      "emission_factor",
+      "parts_completed"
+    ],
+    "tags": [
+      "energy",
+      "sustainability"
+    ]
   },
   "weight_from_dimensions": {
-    "label": "Trọng lượng từ kích thước",
-    "labelEn": "Weight from Dimensions",
+    "label": "Weight From Dimensions",
+    "labelEn": "Weight From Dimensions",
     "formula": "length * width * height * material_density",
     "resultType": "weight",
-    "category": "engineering"
+    "category": "engineering",
+    "description": "Estimated weight from envelope dimensions and density.",
+    "inputs": [
+      "length",
+      "width",
+      "height",
+      "material_density"
+    ],
+    "tags": [
+      "engineering",
+      "material"
+    ]
   }
 }

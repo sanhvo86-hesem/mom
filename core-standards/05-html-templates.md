@@ -8,7 +8,7 @@
 - `{{TITLE}}` — Document title
 - `{{SUBTITLE}}` — Vietnamese subtitles
 - `{{OWNER_ROLE_HTML}}` — JD-linked role code of the document owner
-- `{{APPROVER_ROLE_HTML}}` — Role code JD-linked of the approver
+- `{{APPROVER_ROLE_HTML}}` — The approver's JD-linked role code
 - `{{OWNER_ENTITY_HTML}}` — Department code or role code of the owner, depending on the type of document
 - `{{RELATIVE_PATH}}` — Relative path to the root directory (eg `../../..`)
 
@@ -21,10 +21,10 @@ SOP has 10 standard items. Always have iso-map, preface-block, toc at the beginn
 Note the key:
 - Before initial release, all SOPs held `Version = V0`.
 - Do not include editorial notes, notes comparing old versions, notes on terminology rules or benchmark rationale in the body of the SOP.
-- When creating a new Section 6 / 7, read `12-sop-section-6-7-guide.md`, `13-sop-research-redraft-method.md`, `16-sop-graphics-kpi-and-redraft-quality.md`.
-- Template only locks HTML frame and format. Do not use this template to push the same set of content into a series of SOPs.
+- When creating a new Section 6 / 7, read also `12-sop-section-6-7-guide.md`, `13-sop-research-redraft-method.md`, `16-sop-graphics-kpi-and-redraft-quality.md`.
+- The template only locks the HTML frame and format. Do not use this template to push the same set of content into a series of SOPs.
 - The content of Section 1 / 2 / 3 / 4 / 5 / 8 must be researched and upgraded according to each individual SOP.
-- If the document is a department handbook or a document describing a functional level mandate, read also `20-department-boundary-handbook-codes.md` and `reference/job-order-cnc-department-boundary-model.md`.
+- If the document is a departmental handbook or a document describing a functional level mandate, read also `20-department-boundary-handbook-codes.md` and `reference/job-order-cnc-department-boundary-model.md`.
 
 ```html
 <!DOCTYPE html>
@@ -311,7 +311,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 JD uses its own template at `core-standards/templates/jd-template.html`.
 
 Note the key:
-- JD must also be full HTML: have `<!DOCTYPE html>`, `<html>`, `<head>`, `<body>`.
+- The JD must also be full HTML: there are `<!DOCTYPE html>`, `<html>`, `<head>`, `<body>`.
 - JD's meta header uses Vietnamese labels similar to SOP/WI: `Mã`, `Phiên bản`, `Ngày hiệu lực`, `Chủ sở hữu`, `Phê duyệt`.
 - JD's title block uses the `JD-<ROLECODE> — <Job title English>` standard.
 
@@ -320,13 +320,13 @@ Note the key:
 ## Template 5: Department Handbook
 
 The department handbook must use `department code` in the owner header and keep a clear boundary between:
-- department level mandate;
-- `subfunction` is stable;
+- departmental mandate;
+- `subfunction` stable;
 - `role code` has JD link;
 - `coverage gap` is temporarily locked.
 
 This document was not created by copying content between departments. Writers must:
-- read current handbooks, related JDs and CNC job-order benchmarks;
+- Read current handbooks, related JDs and CNC job-order benchmarks;
 - Decide separately for each handbook what is the department mandate, what is the role decision, and what is the gap;
 - only then build the HTML.
 
@@ -334,13 +334,13 @@ Minimum section frame:
 - Departmental goals
 - Scope
 - Mandatory responsibility
-- Functional level powers
+- Function-level authority
 - Output/profile
-- KPIs
+- KPI
 - Inter-departmental interface
 - Related documents
 - Operating model & role boundaries
-- Operating cadence, data & evidence
+- Executive cadence, data & evidence
 - Capacity / Deputy
 - Risk & escalation
 - Coverage gap callout if any
@@ -349,7 +349,7 @@ HTML template used at `core-standards/templates/department-handbook-template.htm
 - `Chủ sở hữu` and `Phê duyệt` in the header must be `role chip` JD links, do not use bare text.
 - The location information table must have exactly one row `Mã vai trò dùng trong SOP/RACI`.
 - If the role has a governance hat that is allowed to be attached, add exactly one row `Mũ quản trị có thể gắn`.
-- Item `Chức danh theo tài liệu` keeps plain English title, no chip attached.
+- Item `Chức danh theo tài liệu` holds plain English title, without chip.
 - Do not create a JD with an open-end/open-end HTML fragment and then manually merge it into the portal.
 
 ---
@@ -802,7 +802,7 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 
 ---
 
-## Template 5: Training Module (Training materials)
+## Template 5: Training Module (Training documents)
 
 Training module uses `.badge` for levels, `.toc` for table of contents, `.vflow` for steps.
 
@@ -897,18 +897,18 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word;vertical-ali
 <p>Nội dung bài học ...</p>
 <!-- Dùng .note cho lưu ý, .callout cho quan trọng, .vflow cho bước thực hành -->
 
-<h2 class="h2" id="m2">Lesson 2: Lesson title</h2>
-<p>Lesson content ...</p>
+<h2 class="h2" id="m2">Bài 2: Tên bài</h2>
+<p>Nội dung bài học ...</p>
 
-<!-- KNOWLEDGE CHECK -->
-<h2 class="h2" id="quiz">Knowledge check</h2>
+<!-- KIỂM TRA -->
+<h2 class="h2" id="quiz">Kiểm tra kiến thức</h2>
 <div class="quiz-card">
-<h3>Question 1</h3>
-<p>Question content?</p>
+<h3>Câu 1</h3>
+<p>Nội dung câu hỏi?</p>
 <ul class="tight">
-<li>A. Option A</li>
-<li>B. Option B</li>
-<li>C. Option C</li>
+<li>A. Phương án A</li>
+<li>B. Phương án B</li>
+<li>C. Phương án C</li>
 </ul>
 </div>
 

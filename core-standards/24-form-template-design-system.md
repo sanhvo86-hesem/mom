@@ -60,7 +60,7 @@ Based on a 4px baseline grid using Major Second ratio (1.125).
 |-------|------|-------|
 | `--form-text-xs` | 11px | Micro labels, badges, helper text |
 | `--form-text-sm` | 12px | Labels, captions, table headers |
-| `--form-text-base` | 14px | Body text, input values ​​|
+| `--form-text-base` | 14px | Body text, input values |
 | `--form-text-md` | 15px | Section titles |
 | `--form-text-lg` | 18px | Form title |
 | `--form-text-xl` | 24px | Page heading |
@@ -272,7 +272,7 @@ Visual alternative to plain radio buttons for categorical selections:
 
 ### When to Use Each Layout
 
-| Columns | Class | Use When |
+| Columns | Class | UseWhen |
 |---------|-------|----------|
 | 1 | default | Full-width textareas, descriptions, single selects |
 | 2 | `.qf-grid--2` | Related short fields (part number + revision, date + shift) |
@@ -326,7 +326,7 @@ A colored dot appears inside the severity select field that updates dynamically 
 
 ### 10.2 Defect Type Colors
 
-| Type | ColorToken |
+| Type | Color Tokens |
 |------|------------|
 | Dimensional | Blue `#1565c0` |
 | Surface | Amber `#d97706` |
@@ -365,7 +365,7 @@ For forms require tabular data entry (measurement tables, inspection rows):
 - Alternating row hover highlight
 - Row numbers in a narrow left column
 - Pass/Fail column uses green/red bold text (with red background tint for fail)
-- "Add Row" below button table in primary-light style
+- "Add Row" button below table in primary-light style
 
 ---
 
@@ -411,7 +411,7 @@ For forms require tabular data entry (measurement tables, inspection rows):
 | Ghost | `.qf-btn--ghost` | Transparent, gray text | Clear, Reset |
 | Danger | `.qf-btn--danger` | White with red border/text | Delete, Reject |
 
-### Arrangement
+### Arrangements
 
 ```
 [Secondary: Save Draft] [Ghost: Clear] ... spacer ... [Primary: Submit]
@@ -437,7 +437,7 @@ Left side: secondary and ghost actions. Right side: primary action (using flex s
 | Default | `--form-border` | White | None |
 | Focus | `--form-border-focus` | White | None (focus ring) |
 | Error | `--form-error` | `--form-error-light` | Red error message with icon |
-| Warning | `--form-warning` | `--form-warning-light` | Amber warning message |
+| Warning | `--form-warning` | `--form-warning-light` | Amber warns the message |
 | Valid | `--form-success` | White | Optional green checkmark |
 | Disabled | `--form-border-light` | `--form-surface-sunken` | Grayed out, `cursor: not-allowed` |
 
@@ -508,7 +508,7 @@ Use `-webkit-print-color-adjust: exact` and `print-color-adjust: exact` on all e
 
 ---
 
-## 17. Mobile / Tablet Adaptation
+## 17. Mobile/Tablet Adaptation
 
 ### Tablet Overrides (max-width: 1024px)
 
@@ -550,7 +550,7 @@ All status colors remain the same (they already have sufficient contrast on dark
 
 ## 19. Do's and Don'ts
 
-### Do
+### Due
 
 - Use the design tokens for all colors, spacing, and typography
 - Keep labels above inputs (top-aligned)
@@ -585,7 +585,7 @@ Reusable form section templates are defined in:
 
 ### Standard Section Types
 
-| Section Type | Description | Example Forms |
+| Section Type | Description | ExampleForms |
 |-------------|-------------|--------------|
 | Identification | Product/job/customer fields | NCR, SCAR, Inspection |
 | Measurement Table | Tabular data entry with pass/fail | First Article, In-Process |
@@ -607,7 +607,7 @@ Reusable form section templates are defined in:
 
 This is a non-negotiable requirement for professionalism and readability.
 
-| Layers | Language | Diacritics | Example |
+| Layer | Language | Diacritics | Example |
 |-------|----------|-----------|---------|
 | **Frontend HTML** | Vietnamese | ✅ REQUIRED | `Báo cáo không phù hợp` |
 | **Frontend JS strings** | Vietnamese | ✅ REQUIRED | `_t('Kiểm soát chứng cứ', 'Evidence Control')` |
@@ -670,13 +670,13 @@ For eQMS forms:
 
 ### 21.6 Module Naming Convention
 
-| Modules | Sidebar Label (VI) | Sidebar Label (EN) |
+| Module | Sidebar Label (VI) | Sidebar Label (EN) |
 |--------|-------------------|-------------------|
 | Dashboard | Overview | Dashboard |
 | Documents | List of documents | Documents |
 | Order Management | Order management | Order Management |
-| Evidence Control | Evidence Control | Evidence Control |
-| Admin | System Administration | Admin Panel |
+| Evidence Control | Control of evidence | Evidence Control |
+| Admin | System administration | Admin Panel |
 
 ---
 
