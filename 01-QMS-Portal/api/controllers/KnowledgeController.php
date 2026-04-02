@@ -53,6 +53,73 @@ class KnowledgeController extends BaseController
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
     }
 
+    /**
+     * @return array<int, string>
+     */
+    private function knowledgeReadRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            [
+                'production_director',
+                'production_manager',
+                'cnc_workshop_manager',
+                'engineering_manager',
+                'engineering_lead',
+                'process_engineer',
+                'quality_manager',
+                'qa_manager',
+                'quality_engineer',
+                'shift_leader',
+                'supervisor',
+                'setup_technician',
+                'operator',
+                'cnc_operator',
+            ]
+        )));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function knowledgeWriteRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            [
+                'production_manager',
+                'cnc_workshop_manager',
+                'engineering_manager',
+                'engineering_lead',
+                'process_engineer',
+                'quality_manager',
+                'qa_manager',
+                'quality_engineer',
+                'shift_leader',
+                'supervisor',
+                'setup_technician',
+                'operator',
+                'cnc_operator',
+            ]
+        )));
+    }
+
+    /**
+     * @return void
+     */
+    private function requireKnowledgeReadAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->knowledgeReadRoles());
+    }
+
+    /**
+     * @return void
+     */
+    private function requireKnowledgeWriteAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->knowledgeWriteRoles());
+    }
+
     // -- Endpoints ------------------------------------------------------------
 
     /**
@@ -72,6 +139,7 @@ class KnowledgeController extends BaseController
     public function listTips(): never
     {
         $user = $this->requireAuth();
+        $this->requireKnowledgeReadAccess($user);
 
         try {
             $file = $this->kbDir() . '/tips.json';
@@ -128,6 +196,7 @@ class KnowledgeController extends BaseController
 
             $this->paginated('tips', $items, $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('knowledge_list_failed', 500, $e->getMessage());
         }
     }
@@ -143,6 +212,7 @@ class KnowledgeController extends BaseController
     public function getDetail(): never
     {
         $user = $this->requireAuth();
+        $this->requireKnowledgeReadAccess($user);
 
         $id = $this->query('id');
         if ($id === null || trim($id) === '') {
@@ -176,6 +246,7 @@ class KnowledgeController extends BaseController
 
             $this->success(['tip' => $tip]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('knowledge_detail_failed', 500, $e->getMessage());
         }
     }
@@ -197,6 +268,7 @@ class KnowledgeController extends BaseController
     public function create(): never
     {
         $user = $this->requireAuth();
+        $this->requireKnowledgeWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -240,6 +312,7 @@ class KnowledgeController extends BaseController
 
             $this->success(['tip' => $tip], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('knowledge_create_failed', 500, $e->getMessage());
         }
     }
@@ -256,6 +329,7 @@ class KnowledgeController extends BaseController
     public function update(): never
     {
         $user = $this->requireAuth();
+        $this->requireKnowledgeWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -299,6 +373,7 @@ class KnowledgeController extends BaseController
 
             $this->success(['tip' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('knowledge_update_failed', 500, $e->getMessage());
         }
     }
@@ -315,6 +390,7 @@ class KnowledgeController extends BaseController
     public function vote(): never
     {
         $user = $this->requireAuth();
+        $this->requireKnowledgeReadAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -373,6 +449,7 @@ class KnowledgeController extends BaseController
 
             $this->success(['tip' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('knowledge_vote_failed', 500, $e->getMessage());
         }
     }
@@ -389,6 +466,7 @@ class KnowledgeController extends BaseController
     public function addComment(): never
     {
         $user = $this->requireAuth();
+        $this->requireKnowledgeReadAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -441,6 +519,7 @@ class KnowledgeController extends BaseController
 
             $this->success(['comment' => $comment], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('knowledge_comment_failed', 500, $e->getMessage());
         }
     }

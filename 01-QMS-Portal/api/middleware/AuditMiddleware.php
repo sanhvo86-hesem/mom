@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace HESEM\QMS\Api\Middleware;
 
+use HESEM\QMS\Api\Controllers\ExitException;
+use Throwable;
+
 /**
  * Audit trail middleware for HESEM QMS API.
  *
@@ -62,15 +65,21 @@ class AuditMiddleware
             // Capture request summary (sanitized)
             $entry['request'] = $self->summarizeRequest();
 
-            // Register a shutdown function to capture the response status
-            // (since controllers call exit() after sending the response)
-            register_shutdown_function(static function () use ($self, $entry, $startTime): void {
-                $entry['response_code'] = http_response_code() ?: 200;
+            $responseCode = 200;
+
+            try {
+                $next();
+                $responseCode = http_response_code() ?: 200;
+            } catch (Throwable $e) {
+                $responseCode = $e instanceof ExitException
+                    ? $e->getStatusCode()
+                    : (http_response_code() ?: 500);
+                throw $e;
+            } finally {
+                $entry['response_code'] = $responseCode;
                 $entry['duration_ms']   = round((microtime(true) - $startTime) * 1000, 2);
                 $self->writeEntry($entry);
-            });
-
-            $next();
+            }
         };
     }
 

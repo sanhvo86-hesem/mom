@@ -19,7 +19,7 @@ use Throwable;
 class DocumentController extends BaseController
 {
     /**
-     * POST create — Create a new document with initial draft.
+     * POST create â€” Create a new document with initial draft.
      *
      * Legacy action: `doc_create`
      *
@@ -63,6 +63,9 @@ class DocumentController extends BaseController
                 $this->resolveSubfolder($folder, $code);
             }
             $folder = safe_rel_path($folder);
+            if (is_reserved_root_segment($folder)) {
+                $this->error('invalid_folder', 400);
+            }
 
             if (preg_match('#(^|/)_Archive(/|$)#i', $folder)) {
                 $this->error('invalid_folder', 400);
@@ -163,13 +166,14 @@ class DocumentController extends BaseController
                 'draft_rel' => $draftRel,
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             if ($e instanceof \HESEM\QMS\Api\Controllers\ExitException) throw $e;
             $this->error('doc_create_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST saveDraft — Save a working draft of a document.
+     * POST saveDraft â€” Save a working draft of a document.
      *
      * Legacy action: `doc_save_draft`
      *
@@ -192,7 +196,7 @@ class DocumentController extends BaseController
         if ($html === '') $this->error('missing_html', 400);
         if ($path === '') $this->error('missing_path', 400);
 
-        $baseRel = safe_rel_path($path);
+        $baseRel = $this->resolveManagedDocumentPath($code, $path);
         $archiveDir = $this->rootDir . '/archive';
 
         $state = load_doc_state($this->rootDir, $baseRel, $archiveDir, $code);
@@ -244,7 +248,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * POST submitReview — Submit a document for review/approval.
+     * POST submitReview â€” Submit a document for review/approval.
      *
      * Legacy action: `doc_submit_review`
      *
@@ -268,7 +272,7 @@ class DocumentController extends BaseController
         if ($code === '') $this->error('missing_code', 400);
         if ($path === '') $this->error('missing_path', 400);
 
-        $baseRel    = safe_rel_path($path);
+        $baseRel    = $this->resolveManagedDocumentPath($code, $path);
         $archiveDir = $this->rootDir . '/archive';
 
         $state = load_doc_state($this->rootDir, $baseRel, $archiveDir, $code);
@@ -310,7 +314,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * POST approve — Approve a document (releases it).
+     * POST approve â€” Approve a document (releases it).
      *
      * Legacy action: `doc_approve`
      *
@@ -331,7 +335,7 @@ class DocumentController extends BaseController
         if ($code === '') $this->error('missing_code', 400);
         if ($path === '') $this->error('missing_path', 400);
 
-        $baseRel    = safe_rel_path($path);
+        $baseRel    = $this->resolveManagedDocumentPath($code, $path);
         $archiveDir = $this->rootDir . '/archive';
 
         $state = load_doc_state($this->rootDir, $baseRel, $archiveDir, $code);
@@ -357,6 +361,7 @@ class DocumentController extends BaseController
                             break;
                         }
                     } catch (Throwable $e) {
+                        $this->rethrowResponse($e);
                         // skip
                     }
                 }
@@ -417,7 +422,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * POST reject — Reject a document review submission.
+     * POST reject â€” Reject a document review submission.
      *
      * Legacy action: `doc_reject`
      *
@@ -437,7 +442,7 @@ class DocumentController extends BaseController
         if ($code === '') $this->error('missing_code', 400);
         if ($path === '') $this->error('missing_path', 400);
 
-        $baseRel    = safe_rel_path($path);
+        $baseRel    = $this->resolveManagedDocumentPath($code, $path);
         $archiveDir = $this->rootDir . '/archive';
 
         $state = load_doc_state($this->rootDir, $baseRel, $archiveDir, $code);
@@ -474,7 +479,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * POST updateMeta — Update document metadata (title, owner, etc.).
+     * POST updateMeta â€” Update document metadata (title, owner, etc.).
      *
      * Legacy action: `doc_update_meta`
      *
@@ -516,7 +521,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * POST deleteDrafts — Delete all draft versions of a document.
+     * POST deleteDrafts â€” Delete all draft versions of a document.
      *
      * Legacy action: `doc_delete_drafts`
      *
@@ -535,7 +540,7 @@ class DocumentController extends BaseController
         if ($code === '') $this->error('missing_code', 400);
         if ($path === '') $this->error('missing_path', 400);
 
-        $baseRel    = safe_rel_path($path);
+        $baseRel    = $this->resolveManagedDocumentPath($code, $path);
         $archiveDir = $this->rootDir . '/archive';
 
         $manifest = load_doc_manifest($this->rootDir, $baseRel, $archiveDir, $code);
@@ -556,6 +561,7 @@ class DocumentController extends BaseController
                             @unlink($abs);
                         }
                     } catch (Throwable $e) {
+                        $this->rethrowResponse($e);
                         // skip
                     }
                 }
@@ -581,7 +587,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * POST deleteVersion — Delete a specific version entry.
+     * POST deleteVersion â€” Delete a specific version entry.
      *
      * Legacy action: `doc_delete_version`
      *
@@ -602,7 +608,7 @@ class DocumentController extends BaseController
             $this->error('missing_params', 400);
         }
 
-        $baseRel    = safe_rel_path($path);
+        $baseRel    = $this->resolveManagedDocumentPath($code, $path);
         $archiveDir = $this->rootDir . '/archive';
 
         $manifest = load_doc_manifest($this->rootDir, $baseRel, $archiveDir, $code);
@@ -638,7 +644,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * GET listVersions — List all version entries for a document.
+     * GET listVersions â€” List all version entries for a document.
      *
      * Legacy action: `doc_versions_list`
      *
@@ -654,7 +660,7 @@ class DocumentController extends BaseController
         if ($code === '') $this->error('missing_code', 400);
         if ($path === '') $this->error('missing_path', 400);
 
-        $baseRel    = safe_rel_path($path);
+        $baseRel    = $this->resolveManagedDocumentPath($code, $path);
         $archiveDir = $this->rootDir . '/archive';
 
         $manifest = load_doc_manifest($this->rootDir, $baseRel, $archiveDir, $code);
@@ -668,7 +674,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * POST startNewRevision — Start a new revision cycle for a document.
+     * POST startNewRevision â€” Start a new revision cycle for a document.
      *
      * Legacy action: `doc_start_new_revision`
      *
@@ -690,7 +696,7 @@ class DocumentController extends BaseController
         if ($code === '') $this->error('missing_code', 400);
         if ($path === '') $this->error('missing_path', 400);
 
-        $baseRel    = safe_rel_path($path);
+        $baseRel    = $this->resolveManagedDocumentPath($code, $path);
         $archiveDir = $this->rootDir . '/archive';
 
         $state = load_doc_state($this->rootDir, $baseRel, $archiveDir, $code);
@@ -746,7 +752,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * GET stream — Stream a document file for viewing/download.
+     * GET stream â€” Stream a document file for viewing/download.
      *
      * Legacy action: `doc_stream`
      *
@@ -754,41 +760,69 @@ class DocumentController extends BaseController
      */
     public function stream(): never
     {
-        $this->requireAuth();
+        if ($this->method() !== 'GET') {
+            $this->error('method_not_allowed', 405);
+        }
+
+        $me = $this->requireAuth();
 
         $path = trim((string)($this->query('path') ?? ''));
         if ($path === '') $this->error('missing_path', 400);
 
         $relPath = safe_rel_path($path);
-        $absPath = join_in_root($this->rootDir, $relPath);
+        $displayConfig = portal_load_display_config($this->confDir . '/portal_display_config.json');
+        $ext = portal_get_doc_extension($relPath);
+        if (!portal_allowed_stream_extension($relPath) || !portal_doc_extension_is_enabled($ext, $displayConfig)) {
+            $this->error('unsupported_type', 403);
+        }
 
-        if (!is_file($absPath)) {
+        $doc = $this->findManagedDocumentByPath($relPath, $displayConfig);
+        if ($doc === null) {
+            $this->error('doc_not_registered', 404);
+        }
+
+        $absPath = join_in_root($this->rootDir, $relPath);
+        if (!is_file($absPath) || !is_inside_root($absPath, $this->rootDir)) {
             $this->error('file_not_found', 404);
         }
 
-        $ext  = portal_get_doc_extension($relPath);
+        $hidden = array_values(array_unique(array_map(
+            static fn($value): string => strtoupper((string)$value),
+            load_doc_visibility($this->confDir . '/docs_visibility.json')
+        )));
+        $roleDocs = portal_load_role_docs($this->portalConfigJsFile());
+        if (!portal_can_access_doc($me, $doc, $roleDocs, $hidden, $displayConfig)) {
+            $this->error('forbidden', 403);
+        }
+
         $mime = portal_stream_mime_type($ext);
+        $asAttachment = $this->query('download') !== null || !portal_stream_can_inline($ext);
 
         if (session_status() === PHP_SESSION_ACTIVE) {
             @session_write_close();
         }
 
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         header('Content-Type: ' . $mime);
-        if (portal_stream_can_inline($ext)) {
-            header('Content-Disposition: inline');
+        header('X-Content-Type-Options: nosniff');
+        header('X-Frame-Options: SAMEORIGIN');
+        header('Referrer-Policy: same-origin');
+        if ($asAttachment) {
+            header('Content-Disposition: attachment; filename="' . rawurlencode(basename($relPath)) . '"');
         } else {
-            $fileName = basename($relPath);
-            header('Content-Disposition: attachment; filename="' . $fileName . '"');
+            header('Content-Disposition: inline; filename="' . rawurlencode(basename($relPath)) . '"');
         }
-        header('Content-Length: ' . filesize($absPath));
-        header('Cache-Control: private, max-age=300');
+        $size = @filesize($absPath);
+        if ($size !== false) {
+            header('Content-Length: ' . (string)$size);
+        }
 
         readfile($absPath);
         exit;
     }
 
     /**
-     * GET listCustom — List documents visible to the current user.
+     * GET listCustom â€” List documents visible to the current user.
      *
      * Legacy action: `docs_custom_list`
      *
@@ -813,7 +847,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * GET getDescriptions — Get document descriptions from custom docs.
+     * GET getDescriptions â€” Get document descriptions from custom docs.
      *
      * Legacy action: `doc_descriptions_get`
      *
@@ -839,7 +873,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * POST saveDescription — Save a document description.
+     * POST saveDescription â€” Save a document description.
      *
      * Legacy action: `save_doc_description`
      *
@@ -864,7 +898,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * GET getVisibility — Get hidden document codes.
+     * GET getVisibility â€” Get hidden document codes.
      *
      * Legacy action: `docs_visibility_get`
      *
@@ -881,7 +915,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * POST saveVisibility — Save document visibility settings.
+     * POST saveVisibility â€” Save document visibility settings.
      *
      * Legacy action: `admin_docs_visibility_save`
      *
@@ -910,7 +944,7 @@ class DocumentController extends BaseController
         $this->success(['hidden' => array_values(array_unique($clean))]);
     }
 
-    // ── Private Helpers ─────────────────────────────────────────────────────
+    // â”€â”€ Private Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * Try to resolve a subfolder matching the doc code pattern.
@@ -919,6 +953,89 @@ class DocumentController extends BaseController
      * @param string $code   Document code.
      * @return void
      */
+    /**
+     * Validate a document workflow base path provided by the client.
+     *
+     * @param string $code Expected document code.
+     * @param string $path Relative live document path.
+     * @return string
+     */
+    private function resolveManagedDocumentPath(string $code, string $path): string
+    {
+        $baseRel = safe_rel_path($path);
+        if (is_reserved_root_segment($baseRel)) {
+            $this->error('invalid_base_path', 400);
+        }
+        if (!filename_matches_doc_code(basename($baseRel), $code)) {
+            $this->error('code_path_mismatch', 400);
+        }
+
+        return $baseRel;
+    }
+
+    /**
+     * Return the portal role-doc configuration file path.
+     *
+     * @return string
+     */
+    private function portalConfigJsFile(): string
+    {
+        return $this->rootDir . '/01-QMS-Portal/scripts/portal/01-data-config.js';
+    }
+
+    /**
+     * Build the managed portal document catalog.
+     *
+     * @param array $displayConfig Portal display configuration.
+     * @return array<int, array<string, mixed>>
+     */
+    private function managedDocumentCatalog(array $displayConfig): array
+    {
+        $docs = [];
+        $cacheFile = $this->dataDir . '/scan_cache.json';
+        if (is_file($cacheFile)) {
+            $cached = json_decode((string)@file_get_contents($cacheFile), true);
+            if (is_array($cached['docs'] ?? null)) {
+                $docs = $cached['docs'];
+            }
+        }
+
+        $docs = array_merge(
+            $docs,
+            load_custom_docs($this->confDir . '/docs_custom.json'),
+            load_form_control_registry_docs(
+                $this->confDir . '/form_control_registry.json',
+                $this->rootDir,
+                portal_display_config_enabled_extensions($displayConfig)
+            )
+        );
+
+        return portal_dedupe_docs($docs);
+    }
+
+    /**
+     * Locate a managed document catalog entry by its relative path.
+     *
+     * @param string $relPath Relative document path.
+     * @param array  $displayConfig Portal display configuration.
+     * @return array<string, mixed>|null
+     */
+    private function findManagedDocumentByPath(string $relPath, array $displayConfig): ?array
+    {
+        foreach ($this->managedDocumentCatalog($displayConfig) as $candidate) {
+            if (!is_array($candidate)) {
+                continue;
+            }
+
+            $candidatePath = str_replace('\\', '/', (string)($candidate['path'] ?? ''));
+            if ($candidatePath === $relPath) {
+                return $candidate;
+            }
+        }
+
+        return null;
+    }
+
     private function resolveSubfolder(string &$folder, string $code): void
     {
         $parentAbs = $this->rootDir . '/' . $folder;
@@ -1072,7 +1189,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * POST docsSnapshot — Batch-fetch document/form states for a list of codes.
+     * POST docsSnapshot â€” Batch-fetch document/form states for a list of codes.
      *
      * Legacy action: `docs_snapshot`
      *
@@ -1085,7 +1202,7 @@ class DocumentController extends BaseController
     {
         $this->requireAuth();
 
-        // Release session lock early — this action can be heavy.
+        // Release session lock early â€” this action can be heavy.
         if (session_status() === PHP_SESSION_ACTIVE) {
             @session_write_close();
         }

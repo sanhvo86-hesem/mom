@@ -4,7 +4,7 @@ namespace HESEM\QMS\Api\Controllers;
 use Throwable;
 
 /**
- * Registry Controller — Centralized data registry for the entire platform.
+ * Registry Controller â€” Centralized data registry for the entire platform.
  *
  * Serves: data field definitions, API parameters, field types, status options,
  * computed formulas, IoT connectors. All modules and the Module Builder
@@ -12,6 +12,14 @@ use Throwable;
  */
 class RegistryController extends BaseController
 {
+    /**
+     * @return void
+     */
+    private function requireRegistryWriteAccess(array $user): void
+    {
+        $this->requireAnyRole($user, array_merge(admin_roles(), ['qms_engineer', 'quality_manager']));
+    }
+
     private function registryDir(): string
     {
         $dir = $this->dataDir . '/registry';
@@ -20,7 +28,7 @@ class RegistryController extends BaseController
     }
 
     /**
-     * GET registry_data_fields — All data field definitions per API endpoint.
+     * GET registry_data_fields â€” All data field definitions per API endpoint.
      * Optional: ?api=order_so_list to get fields for specific API.
      */
     public function getDataFields(): never
@@ -40,12 +48,13 @@ class RegistryController extends BaseController
 
             $this->success(['registry' => $data, 'count' => count($data)]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('registry_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET registry_api_params — Input parameters + response schema per API.
+     * GET registry_api_params â€” Input parameters + response schema per API.
      * Optional: ?api=order_so_create to get params for specific API.
      */
     public function getApiParams(): never
@@ -65,12 +74,13 @@ class RegistryController extends BaseController
 
             $this->success(['registry' => $data, 'count' => count($data)]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('registry_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET registry_field_types — Field type definitions (string, number, date, badge...).
+     * GET registry_field_types â€” Field type definitions (string, number, date, badge...).
      */
     public function getFieldTypes(): never
     {
@@ -80,12 +90,13 @@ class RegistryController extends BaseController
             $data = $this->readJsonFile($file) ?? [];
             $this->success(['field_types' => $data]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('registry_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET registry_status_options — All enum/dropdown option sets.
+     * GET registry_status_options â€” All enum/dropdown option sets.
      * Optional: ?key=so_status to get specific set.
      */
     public function getStatusOptions(): never
@@ -105,12 +116,13 @@ class RegistryController extends BaseController
 
             $this->success(['registry' => $data, 'count' => count($data)]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('registry_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET registry_computed_formulas — Pre-built formula presets.
+     * GET registry_computed_formulas â€” Pre-built formula presets.
      */
     public function getComputedFormulas(): never
     {
@@ -120,12 +132,13 @@ class RegistryController extends BaseController
             $data = $this->readJsonFile($file) ?? [];
             $this->success(['formulas' => $data]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('registry_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET registry_iot_connectors — IoT connector definitions.
+     * GET registry_iot_connectors â€” IoT connector definitions.
      */
     public function getIotConnectors(): never
     {
@@ -135,12 +148,13 @@ class RegistryController extends BaseController
             $data = $this->readJsonFile($file) ?? [];
             $this->success(['connectors' => $data]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('registry_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET registry_full — Load entire registry in one call (for Module Builder init).
+     * GET registry_full â€” Load entire registry in one call (for Module Builder init).
      */
     public function getFull(): never
     {
@@ -167,17 +181,19 @@ class RegistryController extends BaseController
                 'iot_connectors'    => $this->readJsonFile($dir . '/iot-connectors.json') ?? [],
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('registry_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST registry_update — Admin updates a registry file.
+     * POST registry_update â€” Admin updates a registry file.
      * Body: { registry: 'data-fields'|'api-params'|..., data: {...} }
      */
     public function updateRegistry(): never
     {
         $user = $this->requireAuth();
+        $this->requireRegistryWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -216,6 +232,7 @@ class RegistryController extends BaseController
             $this->auditLog('registry_update', ['registry' => $registry], (string)($user['username'] ?? ''));
             $this->success(['updated' => $registry, 'count' => count((array)$data)]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('registry_update_failed', 500, $e->getMessage());
         }
     }

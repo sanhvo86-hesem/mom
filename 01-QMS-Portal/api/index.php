@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * HESEM QMS API v2 — New MVC Entry Point.
+ * HESEM QMS API v2 â€” New MVC Entry Point.
  *
  * Bootstraps the Router with middleware stack and dispatches to controllers.
  * Falls back to the legacy monolithic api.php for unmapped actions,
@@ -13,14 +13,14 @@ declare(strict_types=1);
  * @since   2.0.0
  */
 
-// ── Error Handling ──────────────────────────────────────────────────────────
+// â”€â”€ Error Handling â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 ini_set('display_errors', '0');
 ini_set('log_errors', '1');
 @ini_set('expose_php', '0');
 error_reporting(E_ALL);
 
-// ── Paths ───────────────────────────────────────────────────────────────────
+// â”€â”€ Paths â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 $BASE_DIR = dirname(__DIR__); // 01-QMS-Portal
 $ROOT_DIR = realpath($BASE_DIR . '/..') ?: dirname($BASE_DIR);
@@ -33,7 +33,9 @@ $DATA_DIR = $DATA_DIR_ENV !== ''
 $LOG_FILE = $DATA_DIR . '/php_error.log';
 @ini_set('error_log', $LOG_FILE);
 
-// ── Autoloader ──────────────────────────────────────────────────────────────
+$apiConfig = require __DIR__ . '/config.php';
+
+// â”€â”€ Autoloader â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 // Simple PSR-4-like autoloader for HESEM\QMS namespace
 spl_autoload_register(function (string $class): void {
@@ -61,7 +63,7 @@ spl_autoload_register(function (string $class): void {
     }
 });
 
-// ── Load Legacy Functions ───────────────────────────────────────────────────
+// â”€â”€ Load Legacy Functions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 // The legacy api.php contains many helper functions that controllers depend on.
 // We include it in a way that loads the functions but does NOT execute the
@@ -72,6 +74,7 @@ if (!function_exists('api_json')) {
     // The API_HELPERS_ONLY guard prevents the boot section and switch statement
     // from executing, so we can bootstrap the MVC router ourselves.
     define('API_HELPERS_ONLY', true);
+    define('API_THROW_RESPONSES', true);
     require_once $BASE_DIR . '/api.php';
 }
 
@@ -85,7 +88,7 @@ if (!isset($store)) {
     $store = users_load($USERS_FILE);
 }
 
-// ── Import Classes ──────────────────────────────────────────────────────────
+// â”€â”€ Import Classes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 use HESEM\QMS\Api\Router;
 use HESEM\QMS\Api\Middleware\AuthMiddleware;
@@ -123,19 +126,26 @@ use HESEM\QMS\Api\Controllers\ModuleSchemaController;
 use HESEM\QMS\Api\Controllers\RegistryController;
 use HESEM\QMS\Database\DataLayer;
 
-// ── Bootstrap DataLayer ─────────────────────────────────────────────────────
+// â”€â”€ Bootstrap DataLayer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 $dataLayer = new DataLayer($DATA_DIR, $ROOT_DIR);
 
-// ── Build Router ────────────────────────────────────────────────────────────
+// â”€â”€ Build Router â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 $router = new Router($dataLayer, $ROOT_DIR, $DATA_DIR);
 $router->setStore($store);
+$router->setEmitBackendHeaders((bool)($apiConfig['observability']['emit_backend_headers'] ?? true));
 
-// ── Register Middleware ─────────────────────────────────────────────────────
+// â”€â”€ Register Middleware â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-$corsMiddleware      = new CorsMiddleware();
-$authMiddleware      = new AuthMiddleware($store);
+$corsMiddleware      = new CorsMiddleware(
+    (array)($apiConfig['cors']['allowed_origins'] ?? []),
+    (array)($apiConfig['cors']['allowed_methods'] ?? ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']),
+    (array)($apiConfig['cors']['allowed_headers'] ?? ['Content-Type', 'X-CSRF-Token', 'X-Requested-With', 'Authorization']),
+    (int)($apiConfig['cors']['max_age'] ?? 86400),
+    (bool)($apiConfig['cors']['allow_credentials'] ?? true),
+);
+$authMiddleware      = new AuthMiddleware($store, (array)($apiConfig['auth'] ?? []));
 $rateLimitMiddleware = new RateLimitMiddleware($DATA_DIR . '/ratelimit');
 $auditMiddleware     = new AuditMiddleware($DATA_DIR . '/audit.log');
 
@@ -144,7 +154,7 @@ $router->use($authMiddleware->handler());
 $router->use($rateLimitMiddleware->handler());
 $router->use($auditMiddleware->handler());
 
-// ── Register Action Routes (backward compatible) ────────────────────────────
+// â”€â”€ Register Action Routes (backward compatible) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 // Auth
 $router->actions([
@@ -557,7 +567,7 @@ $router->actions([
     'registry_update'            => [RegistryController::class, 'updateRegistry'],
 ]);
 
-// ── Frontend Action Aliases ─────────────────────────────────────────────────
+// â”€â”€ Frontend Action Aliases â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Map frontend action names to existing controller methods where naming differs.
 
 // Module 15: quality-exception-hub.js aliases
@@ -589,12 +599,12 @@ $router->actions([
 
 // Module 19: customer-portal-admin.js aliases
 $router->actions([
-    'customer_portal_data'                => [CustomerPortalController::class, 'getAnalytics'],
+    'customer_portal_data'                => [CustomerPortalController::class, 'getAdminData'],
     'customer_portal_grant_access'        => [CustomerPortalController::class, 'grantAccess'],
     'customer_portal_revoke_access'       => [CustomerPortalController::class, 'revokeAccess'],
-    'customer_portal_complaint_update'    => [CustomerPortalController::class, 'listComplaints'],
-    'customer_portal_resend_verification' => [CustomerPortalController::class, 'updateUser'],
-    'customer_portal_revoke_doc'          => [CustomerPortalController::class, 'listDocuments'],
+    'customer_portal_complaint_update'    => [CustomerPortalController::class, 'updateComplaintStatus'],
+    'customer_portal_resend_verification' => [CustomerPortalController::class, 'resendVerification'],
+    'customer_portal_revoke_doc'          => [CustomerPortalController::class, 'revokeDocument'],
 ]);
 
 // Module 20: cnc-programs.js aliases
@@ -659,7 +669,7 @@ $router->actions([
     'order_get_linked_forms' => [OrderController::class, 'getHierarchy'],
 ]);
 
-// ── Register RESTful Routes ─────────────────────────────────────────────────
+// â”€â”€ Register RESTful Routes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 // Documents
 $router->get('/api/documents', DocumentController::class, 'listCustom');
@@ -694,6 +704,9 @@ $router->get('/api/dictionary', DictController::class, 'list');
 $router->post('/api/dictionary', DictController::class, 'upsert');
 $router->delete('/api/dictionary', DictController::class, 'delete');
 
+// Meta / API catalog
+$router->get('/api/meta/catalog', ModuleSchemaController::class, 'apiCatalog');
+
 // Folders
 $router->get('/api/folders', FileController::class, 'scanFolders');
 $router->post('/api/folders', FileController::class, 'createFolder');
@@ -703,10 +716,10 @@ $router->post('/api/admin/git/sync', AdminController::class, 'gitSync');
 $router->post('/api/admin/git/pull', AdminController::class, 'gitPull');
 $router->post('/api/admin/cache/clear', AdminController::class, 'clearCache');
 
-// Documents — snapshot
+// Documents â€” snapshot
 $router->post('/api/documents/snapshot', DocumentController::class, 'docsSnapshot');
 
-// Forms — draft upload
+// Forms â€” draft upload
 $router->post('/api/forms/upload-draft', FormController::class, 'uploadDraft');
 
 // Dashboards
@@ -781,7 +794,7 @@ $router->get('/api/evidence/{id}/custody', EvidenceController::class, 'chainOfCu
 $router->get('/api/evidence/verify', EvidenceController::class, 'verifyChain');
 $router->get('/api/evidence/search', EvidenceController::class, 'search');
 
-// ── Dispatch ────────────────────────────────────────────────────────────────
+// â”€â”€ Dispatch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 $handled = $router->dispatch();
 

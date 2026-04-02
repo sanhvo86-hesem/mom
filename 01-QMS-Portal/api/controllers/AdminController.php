@@ -18,7 +18,7 @@ use Throwable;
 class AdminController extends BaseController
 {
     /**
-     * POST gitSync — Commit and push local document changes to git.
+     * POST gitSync â€” Commit and push local document changes to git.
      *
      * Legacy action: `admin_git_sync`
      *
@@ -50,6 +50,7 @@ class AdminController extends BaseController
                 'head_after'     => (string)($result['head_after'] ?? ''),
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->auditLog('admin_git_sync_failed', ['error' => $e->getMessage()]);
             $message = $e->getMessage();
             $error = match (true) {
@@ -70,7 +71,7 @@ class AdminController extends BaseController
     }
 
     /**
-     * POST gitPull — Pull latest changes from the remote repository.
+     * POST gitPull â€” Pull latest changes from the remote repository.
      *
      * Legacy action: `admin_git_pull`
      *
@@ -118,6 +119,7 @@ class AdminController extends BaseController
                 'pull_output'   => (string)($result['pull_output'] ?? ''),
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->auditLog('admin_git_pull_failed', ['error' => $e->getMessage()]);
             $message = $e->getMessage();
             $error = match (true) {
@@ -138,7 +140,7 @@ class AdminController extends BaseController
     }
 
     /**
-     * GET gitStatus — Read current git repository status for cPanel sync panel.
+     * GET gitStatus â€” Read current git repository status for cPanel sync panel.
      *
      * Legacy action: `admin_git_status`
      *
@@ -188,6 +190,7 @@ class AdminController extends BaseController
                 'fetch_error'              => (string)($result['fetch_error'] ?? ''),
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->auditLog('admin_git_status_failed', ['error' => $e->getMessage()]);
             $message = $e->getMessage();
             $error = match (true) {
@@ -202,7 +205,7 @@ class AdminController extends BaseController
     }
 
     /**
-     * POST gitDiscardLocal — Discard meaningful local runtime changes on server.
+     * POST gitDiscardLocal â€” Discard meaningful local runtime changes on server.
      *
      * Legacy action: `admin_git_discard_local`
      *
@@ -228,6 +231,7 @@ class AdminController extends BaseController
                 'after_head'     => (string)($result['after_head'] ?? ''),
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->auditLog('admin_git_discard_local_failed', ['error' => $e->getMessage()]);
             $message = $e->getMessage();
             $error = match (true) {
@@ -243,7 +247,7 @@ class AdminController extends BaseController
     }
 
     /**
-     * POST clearCache — Clear browser/CDN caches via headers.
+     * POST clearCache â€” Clear browser/CDN caches via headers.
      *
      * Legacy action: `admin_clear_site_cache`
      *
@@ -267,7 +271,7 @@ class AdminController extends BaseController
     }
 
     /**
-     * GET getSettings — Get data collection settings.
+     * GET getSettings â€” Get data collection settings.
      *
      * Legacy action: `get_data_settings`
      *
@@ -295,7 +299,7 @@ class AdminController extends BaseController
     }
 
     /**
-     * POST saveSettings — Save data collection settings (admin only).
+     * POST saveSettings â€” Save data collection settings (admin only).
      *
      * Legacy action: `save_data_settings`
      *
@@ -325,6 +329,7 @@ class AdminController extends BaseController
         try {
             users_save($usersFile, $this->store);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('save_failed', 500, $e->getMessage());
         }
 
@@ -333,7 +338,7 @@ class AdminController extends BaseController
     }
 
     /**
-     * GET getPortalConfig — Get portal display configuration (admin only).
+     * GET getPortalConfig â€” Get portal display configuration (admin only).
      *
      * Legacy action: `admin_portal_display_config_get`
      *
@@ -351,7 +356,7 @@ class AdminController extends BaseController
     }
 
     /**
-     * POST savePortalConfig — Save portal display configuration (admin only).
+     * POST savePortalConfig â€” Save portal display configuration (admin only).
      *
      * Legacy action: `admin_portal_display_config_save`
      *
@@ -375,10 +380,10 @@ class AdminController extends BaseController
         $this->success(['config' => portal_display_config_public_payload($saved)]);
     }
 
-    // ── MFA Management ─────────────────────────────────────────────────────
+    // â”€â”€ MFA Management â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * GET getMfaSettings — Get current MFA settings and per-user MFA status.
+     * GET getMfaSettings â€” Get current MFA settings and per-user MFA status.
      * Action: `admin_mfa_settings_get`
      * @return never
      */
@@ -414,12 +419,13 @@ class AdminController extends BaseController
                 'mfa_enrolled'  => count(array_filter($mfaStatus, fn($u) => $u['mfa_enabled'])),
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('mfa_settings_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST saveMfaSettings — Update global MFA settings and per-user MFA status.
+     * POST saveMfaSettings â€” Update global MFA settings and per-user MFA status.
      * Action: `admin_mfa_settings_save`
      *
      * Body fields:
@@ -497,6 +503,7 @@ class AdminController extends BaseController
 
             $this->success(['saved' => true, 'require_mfa' => (bool)($data['settings']['require_mfa'] ?? false)]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('mfa_settings_save_failed', 500, $e->getMessage());
         }
     }

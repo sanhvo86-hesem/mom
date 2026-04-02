@@ -6,6 +6,7 @@ namespace HESEM\QMS\Api\Controllers;
 
 use HESEM\QMS\Database\DataLayer;
 use RuntimeException;
+use Throwable;
 
 /**
  * Base controller with shared utilities for all QMS API controllers.
@@ -96,6 +97,34 @@ abstract class BaseController
     }
 
     /**
+     * Get a scalar input parameter from query string or JSON body.
+     *
+     * Query parameters win when both are present.
+     *
+     * @param string      $key     Parameter name.
+     * @param string|null $default Default value.
+     * @return string|null
+     */
+    protected function input(string $key, ?string $default = null): ?string
+    {
+        if (isset($_GET[$key])) {
+            return (string)$_GET[$key];
+        }
+
+        $body = $this->jsonBody();
+        if (!array_key_exists($key, $body)) {
+            return $default;
+        }
+
+        $value = $body[$key];
+        if (is_scalar($value) || $value === null) {
+            return $value === null ? $default : (string)$value;
+        }
+
+        return $default;
+    }
+
+    /**
      * Get the HTTP request method (uppercase).
      *
      * @return string
@@ -140,17 +169,8 @@ abstract class BaseController
      */
     protected function json(array $payload, int $code = 200): never
     {
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            @session_write_close();
-        }
-        http_response_code($code);
-        header('Content-Type: application/json; charset=utf-8');
-        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
-        header('X-Content-Type-Options: nosniff');
-        header('X-Frame-Options: SAMEORIGIN');
-        header('Referrer-Policy: same-origin');
-        echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        exit;
+        api_json($payload, $code);
+        throw new RuntimeException('api_json did not terminate the request');
     }
 
     /**
@@ -182,6 +202,13 @@ abstract class BaseController
         }
         $payload['server_time'] = $this->nowIso();
         $this->json($payload, $code);
+    }
+
+    protected function rethrowResponse(Throwable $e): void
+    {
+        if ($e instanceof ExitException) {
+            throw $e;
+        }
     }
 
     /**
@@ -235,6 +262,33 @@ abstract class BaseController
     }
 
     /**
+     * Require the current user to hold at least one of the allowed roles.
+     *
+     * Role checks are normalized through the legacy migration map so
+     * old role codes continue to work with the standardized controllers.
+     *
+     * @param array<int, string> $roles Allowed role codes.
+     * @return void
+     */
+    protected function requireAnyRole(array $user, array $roles): void
+    {
+        $allowed = array_values(array_unique(array_filter(array_map(
+            static fn($role) => migrate_role(strtolower(trim((string)$role))),
+            $roles
+        ))));
+
+        $userRoles = is_array($user['roles'] ?? null) ? $user['roles'] : [(string)($user['role'] ?? '')];
+        foreach ($userRoles as $role) {
+            $normalized = migrate_role(strtolower(trim((string)$role)));
+            if ($normalized !== '' && in_array($normalized, $allowed, true)) {
+                return;
+            }
+        }
+
+        $this->error('forbidden', 403);
+    }
+
+    /**
      * Require CSRF token validation. Terminates with 403 on failure.
      *
      * @return void
@@ -242,6 +296,17 @@ abstract class BaseController
     protected function requireCsrf(): void
     {
         require_csrf();
+    }
+
+    /**
+     * Require an allowed Origin/Referer for browser-auth flows.
+     *
+     * @param list<string> $extraAllowedOrigins Additional allowed origins.
+     * @return void
+     */
+    protected function requireAllowedOrigin(array $extraAllowedOrigins = []): void
+    {
+        require_allowed_origin($extraAllowedOrigins);
     }
 
     /**

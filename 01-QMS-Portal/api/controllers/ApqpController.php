@@ -28,7 +28,7 @@ class ApqpController extends BaseController
     /** @var array|null Cached APQP access-control config. */
     private ?array $apqpConfig = null;
 
-    // ── Service Access ──────────────────────────────────────────────────────
+    // â”€â”€ Service Access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * Get or create the ApqpPpapService instance.
@@ -112,10 +112,10 @@ class ApqpController extends BaseController
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
     }
 
-    // ── Endpoints ───────────────────────────────────────────────────────────
+    // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * GET listProjects — List APQP projects with optional filters.
+     * GET listProjects â€” List APQP projects with optional filters.
      *
      * Query params:
      *   - phase    (string, optional): 1-5 or concept, program_approval, etc.
@@ -158,12 +158,13 @@ class ApqpController extends BaseController
 
             $this->paginated('projects', array_values($items), $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('apqp_list_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getProjectDetail — Get full APQP project detail with phases and deliverables.
+     * GET getProjectDetail â€” Get full APQP project detail with phases and deliverables.
      *
      * Query params:
      *   - apqp_id (string, required)
@@ -190,12 +191,13 @@ class ApqpController extends BaseController
 
             $this->success(['project' => $record]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('apqp_detail_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST createProject — Create a new APQP project.
+     * POST createProject â€” Create a new APQP project.
      *
      * Body fields:
      *   - title        (string, required)
@@ -235,12 +237,13 @@ class ApqpController extends BaseController
 
             $this->success(['project' => $project], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('apqp_create_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST updateProject — Update an existing APQP project.
+     * POST updateProject â€” Update an existing APQP project.
      *
      * Body fields:
      *   - apqp_id (string, required)
@@ -273,12 +276,13 @@ class ApqpController extends BaseController
 
             $this->success(['project' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('apqp_update_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST advancePhase — Advance an APQP project to the next phase.
+     * POST advancePhase â€” Advance an APQP project to the next phase.
      *
      * Body fields:
      *   - apqp_id      (string, required)
@@ -316,12 +320,13 @@ class ApqpController extends BaseController
 
             $this->success(['project' => $result]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('phase_advance_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST submitGateReview — Submit a phase gate review for an APQP project.
+     * POST submitGateReview â€” Submit a phase gate review for an APQP project.
      *
      * Body fields:
      *   - apqp_id     (string, required)
@@ -365,12 +370,13 @@ class ApqpController extends BaseController
 
             $this->success(['review' => $review], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('gate_review_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST approveGate — Approve a phase gate review.
+     * POST approveGate â€” Approve a phase gate review.
      *
      * Body fields:
      *   - apqp_id   (string, required)
@@ -406,12 +412,13 @@ class ApqpController extends BaseController
 
             $this->success(['review' => $result]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('gate_approve_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST rejectGate — Reject a phase gate review.
+     * POST rejectGate â€” Reject a phase gate review.
      *
      * Body fields:
      *   - apqp_id   (string, required)
@@ -448,12 +455,13 @@ class ApqpController extends BaseController
 
             $this->success(['review' => $result]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('gate_reject_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST createPpapSubmission — Create a PPAP submission package.
+     * POST createPpapSubmission â€” Create a PPAP submission package.
      *
      * Body fields:
      *   - apqp_id       (string, required)
@@ -493,12 +501,13 @@ class ApqpController extends BaseController
 
             $this->success(['submission' => $submission], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('ppap_submission_create_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST updatePpapElement — Update a PPAP element status within a submission.
+     * POST updatePpapElement â€” Update a PPAP element status within a submission.
      *
      * Body fields:
      *   - submission_id (string, required)
@@ -541,12 +550,13 @@ class ApqpController extends BaseController
 
             $this->success(['element' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('ppap_element_update_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST recordCustomerResponse — Record customer decision on a PPAP submission.
+     * POST recordCustomerResponse â€” Record customer decision on a PPAP submission.
      *
      * Body fields:
      *   - submission_id (string, required)
@@ -589,12 +599,13 @@ class ApqpController extends BaseController
 
             $this->success(['submission' => $result]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('customer_response_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getPhaseDeliverables — Get required deliverables for a specific APQP phase.
+     * GET getPhaseDeliverables â€” Get required deliverables for a specific APQP phase.
      *
      * Query params:
      *   - phase (string, required): Phase identifier (1-5 or name).
@@ -618,12 +629,13 @@ class ApqpController extends BaseController
 
             $this->success(['phase' => $phase, 'deliverables' => $deliverables]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('phase_deliverables_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getDashboard — APQP/PPAP dashboard KPIs.
+     * GET getDashboard â€” APQP/PPAP dashboard KPIs.
      *
      * Returns active projects count, phase distribution, overdue gates,
      * pending PPAP submissions, and recent activity.
@@ -640,6 +652,7 @@ class ApqpController extends BaseController
 
             $this->success(['dashboard' => $dashboard]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('apqp_dashboard_failed', 500, $e->getMessage());
         }
     }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace HESEM\QMS\Api\Middleware;
 
+use HESEM\QMS\Api\Controllers\ExitException;
+
 /**
  * Rate-limiting middleware using a token-bucket algorithm.
  *
@@ -131,20 +133,17 @@ class RateLimitMiddleware
             @file_put_contents($stateFile, json_encode($state), LOCK_EX);
 
             $retryAfter = $windowSeconds - ($now - (int)$state['start']);
-            header('Retry-After: ' . max(1, $retryAfter));
-            header('X-RateLimit-Limit: ' . $maxRequests);
-            header('X-RateLimit-Remaining: 0');
-            header('X-RateLimit-Reset: ' . ((int)$state['start'] + $windowSeconds));
-
-            http_response_code(429);
-            header('Content-Type: application/json; charset=utf-8');
-            echo json_encode([
+            throw ExitException::json([
                 'ok'          => false,
                 'error'       => 'rate_limited',
                 'retry_after' => max(1, $retryAfter),
                 'server_time' => gmdate('c'),
-            ], JSON_UNESCAPED_UNICODE);
-            exit;
+            ], 429, [
+                'Retry-After' => (string)max(1, $retryAfter),
+                'X-RateLimit-Limit' => (string)$maxRequests,
+                'X-RateLimit-Remaining' => '0',
+                'X-RateLimit-Reset' => (string)((int)$state['start'] + $windowSeconds),
+            ]);
         }
 
         // Save state and set rate-limit headers

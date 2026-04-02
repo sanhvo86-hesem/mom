@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace HESEM\QMS\Api;
 
 use HESEM\QMS\Api\Controllers\BaseController;
+use HESEM\QMS\Api\Controllers\ExitException;
 use HESEM\QMS\Database\DataLayer;
 use RuntimeException;
 use Throwable;
@@ -49,6 +50,9 @@ class Router
     /** @var array<string, BaseController> Controller instance cache. */
     private array $controllerCache = [];
 
+    /** @var bool Emit backend observability headers. */
+    private bool $emitBackendHeaders = true;
+
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
@@ -72,6 +76,12 @@ class Router
     public function setStore(?array $store): static
     {
         $this->store = $store;
+        return $this;
+    }
+
+    public function setEmitBackendHeaders(bool $emitBackendHeaders): static
+    {
+        $this->emitBackendHeaders = $emitBackendHeaders;
         return $this;
     }
 
@@ -305,6 +315,8 @@ class Router
 
         try {
             $pipeline();
+        } catch (ExitException $e) {
+            $this->emitResponse($e, $action);
         } catch (Throwable $e) {
             $this->handleException($e, $action);
         }
@@ -366,24 +378,47 @@ class Router
      *
      * @param Throwable $e      The exception.
      * @param string    $action The action that was being dispatched.
-     * @return never
+     * @return void
      */
-    private function handleException(Throwable $e, string $action): never
+    private function handleException(Throwable $e, string $action): void
     {
         @error_log("[API] Error in {$action}: " . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
 
+        $this->emitResponse(ExitException::json([
+            'ok'          => false,
+            'error'       => 'server_error',
+            'server_time' => gmdate('c'),
+        ], 500), $action);
+    }
+
+    private function emitResponse(ExitException $response, string $action): void
+    {
         if (session_status() === PHP_SESSION_ACTIVE) {
             @session_write_close();
         }
 
-        http_response_code(500);
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode([
-            'ok'          => false,
-            'error'       => 'server_error',
-            'server_time' => gmdate('c'),
-        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        exit;
+        http_response_code($response->getStatusCode());
+        $this->emitStandardHeaders($action);
+
+        foreach ($response->getHeaders() as $name => $value) {
+            header($name . ': ' . $value);
+        }
+
+        $body = $response->getBody();
+        if ($body !== '') {
+            echo $body;
+        }
+    }
+
+    private function emitStandardHeaders(string $action): void
+    {
+        if (!$this->emitBackendHeaders) {
+            return;
+        }
+
+        header('X-QMS-API-Pipeline: mvc');
+        header('X-QMS-API-Route: ' . $action);
+        header('X-QMS-Data-Mode: ' . $this->data->getMode());
     }
 
     /**

@@ -28,7 +28,7 @@ class MobileController extends BaseController
     /** @var MobileWorkQueueService|null Lazy-loaded mobile work queue service. */
     private ?MobileWorkQueueService $mobileSvc = null;
 
-    // ── Service Access ──────────────────────────────────────────────────────
+    // â”€â”€ Service Access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * Get or create the MobileWorkQueueService instance.
@@ -52,6 +52,71 @@ class MobileController extends BaseController
     private function userId(array $user): string
     {
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function mobileAccessRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            [
+                'production_director',
+                'production_manager',
+                'production_planner',
+                'cnc_workshop_manager',
+                'engineering_manager',
+                'engineering_lead',
+                'quality_manager',
+                'qa_manager',
+                'quality_engineer',
+                'supervisor',
+                'shift_leader',
+                'setup_technician',
+                'operator',
+                'cnc_operator',
+            ]
+        )));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function mobileOverviewRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            [
+                'production_director',
+                'production_manager',
+                'production_planner',
+                'cnc_workshop_manager',
+                'engineering_manager',
+                'engineering_lead',
+                'quality_manager',
+                'qa_manager',
+                'quality_engineer',
+                'supervisor',
+                'shift_leader',
+            ]
+        )));
+    }
+
+    /**
+     * @return void
+     */
+    private function requireMobileAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->mobileAccessRoles());
+    }
+
+    /**
+     * @return void
+     */
+    private function requireMobileOverviewAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->mobileOverviewRoles());
     }
 
     /**
@@ -85,10 +150,10 @@ class MobileController extends BaseController
         return $this->userId($user);
     }
 
-    // ── Endpoints ───────────────────────────────────────────────────────────
+    // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * GET getMyQueue — Get the current operator's work queue for today.
+     * GET getMyQueue â€” Get the current operator's work queue for today.
      *
      * Returns tasks assigned to the authenticated user's employee_id,
      * sorted by priority and scheduled sequence.
@@ -98,6 +163,7 @@ class MobileController extends BaseController
     public function getMyQueue(): never
     {
         $user       = $this->requireAuth();
+        $this->requireMobileAccess($user);
         $employeeId = $this->resolveEmployeeId($user);
 
         try {
@@ -105,12 +171,13 @@ class MobileController extends BaseController
 
             $this->success(['queue' => $queue, 'employee_id' => $employeeId]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('queue_fetch_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST startTask — Start working on a queued task.
+     * POST startTask â€” Start working on a queued task.
      *
      * Body fields:
      *   - queue_id (string, required): Work queue entry ID.
@@ -120,6 +187,7 @@ class MobileController extends BaseController
     public function startTask(): never
     {
         $user = $this->requireAuth();
+        $this->requireMobileAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -142,12 +210,13 @@ class MobileController extends BaseController
 
             $this->success(['task' => $task]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('task_start_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST completeTask — Complete a queued task with result.
+     * POST completeTask â€” Complete a queued task with result.
      *
      * Body fields:
      *   - queue_id      (string, required)
@@ -161,6 +230,7 @@ class MobileController extends BaseController
     public function completeTask(): never
     {
         $user = $this->requireAuth();
+        $this->requireMobileAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -190,12 +260,13 @@ class MobileController extends BaseController
 
             $this->success(['task' => $task]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('task_complete_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST clockIn — Clock in for a work order operation.
+     * POST clockIn â€” Clock in for a work order operation.
      *
      * Body fields:
      *   - wo_number     (string, required): Work order number.
@@ -208,6 +279,7 @@ class MobileController extends BaseController
     public function clockIn(): never
     {
         $user = $this->requireAuth();
+        $this->requireMobileAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -235,12 +307,13 @@ class MobileController extends BaseController
 
             $this->success(['entry' => $entry], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('clock_in_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST clockOut — Clock out from a time entry.
+     * POST clockOut â€” Clock out from a time entry.
      *
      * Body fields:
      *   - entry_id      (string, required): Time clock entry ID.
@@ -252,6 +325,7 @@ class MobileController extends BaseController
     public function clockOut(): never
     {
         $user = $this->requireAuth();
+        $this->requireMobileAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -280,12 +354,13 @@ class MobileController extends BaseController
 
             $this->success(['entry' => $entry]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('clock_out_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST captureInspection — Capture inspection data from a tablet.
+     * POST captureInspection â€” Capture inspection data from a tablet.
      *
      * Body fields:
      *   - wo_number    (string, required): Work order number.
@@ -299,6 +374,7 @@ class MobileController extends BaseController
     public function captureInspection(): never
     {
         $user = $this->requireAuth();
+        $this->requireMobileAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -326,12 +402,13 @@ class MobileController extends BaseController
 
             $this->success(['capture' => $capture], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('inspection_capture_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST submitOfflineBatch — Batch sync of offline-created records.
+     * POST submitOfflineBatch â€” Batch sync of offline-created records.
      *
      * Body fields:
      *   - entries (array, required): Array of offline records to sync.
@@ -342,6 +419,7 @@ class MobileController extends BaseController
     public function submitOfflineBatch(): never
     {
         $user = $this->requireAuth();
+        $this->requireMobileAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -367,18 +445,20 @@ class MobileController extends BaseController
 
             $this->success(['sync_result' => $result]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('offline_sync_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getSyncStatus — Get pending items and conflict list for the operator.
+     * GET getSyncStatus â€” Get pending items and conflict list for the operator.
      *
      * @return never
      */
     public function getSyncStatus(): never
     {
         $user       = $this->requireAuth();
+        $this->requireMobileAccess($user);
         $employeeId = $this->resolveEmployeeId($user);
 
         try {
@@ -386,12 +466,13 @@ class MobileController extends BaseController
 
             $this->success(['sync_status' => $status, 'employee_id' => $employeeId]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('sync_status_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST resolveConflict — Resolve an offline sync conflict.
+     * POST resolveConflict â€” Resolve an offline sync conflict.
      *
      * Body fields:
      *   - entry_id   (string, required): Conflicting entry ID.
@@ -403,6 +484,7 @@ class MobileController extends BaseController
     public function resolveConflict(): never
     {
         $user = $this->requireAuth();
+        $this->requireMobileAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -431,12 +513,13 @@ class MobileController extends BaseController
 
             $this->success(['resolved' => $result]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('conflict_resolve_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getShopFloorOverview — Get all operators and machine status.
+     * GET getShopFloorOverview â€” Get all operators and machine status.
      *
      * Returns a real-time view of all active operators, their current
      * tasks, machine utilization, and overall shop floor status.
@@ -446,18 +529,20 @@ class MobileController extends BaseController
     public function getShopFloorOverview(): never
     {
         $user = $this->requireAuth();
+        $this->requireMobileOverviewAccess($user);
 
         try {
             $overview = $this->mobileService()->getShopFloorOverview();
 
             $this->success(['overview' => $overview]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('shop_floor_overview_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getOperatorDashboard — Get KPIs for the current operator.
+     * GET getOperatorDashboard â€” Get KPIs for the current operator.
      *
      * Returns efficiency metrics, completed tasks today, scrap rate,
      * active time entries, and personal quality performance.
@@ -467,6 +552,7 @@ class MobileController extends BaseController
     public function getOperatorDashboard(): never
     {
         $user       = $this->requireAuth();
+        $this->requireMobileAccess($user);
         $employeeId = $this->resolveEmployeeId($user);
 
         try {
@@ -474,6 +560,7 @@ class MobileController extends BaseController
 
             $this->success(['dashboard' => $dashboard, 'employee_id' => $employeeId]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('operator_dashboard_failed', 500, $e->getMessage());
         }
     }

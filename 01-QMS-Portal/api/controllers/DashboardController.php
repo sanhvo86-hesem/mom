@@ -29,7 +29,7 @@ final class DashboardController extends BaseController
     private KpiEngine        $kpi;
     private SpcEngine        $spc;
 
-    // ── Construction ────────────────────────────────────────────────────────
+    // â”€â”€ Construction â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     public function __construct(DataLayer $data, string $rootDir, string $dataDir)
     {
@@ -41,7 +41,7 @@ final class DashboardController extends BaseController
         $this->dashboard = new DashboardService($dataDir, $db, $this->kpi, $this->spc);
     }
 
-    // ── Route Dispatcher ────────────────────────────────────────────────────
+    // â”€â”€ Route Dispatcher â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * Handle legacy ?action= routes.
@@ -85,7 +85,7 @@ final class DashboardController extends BaseController
         };
     }
 
-    // ── REST Sub-dispatchers ────────────────────────────────────────────────
+    // â”€â”€ REST Sub-dispatchers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private function handleDashboardRest(?string $type, ?string $subAction): never
     {
@@ -129,7 +129,7 @@ final class DashboardController extends BaseController
         $this->error('invalid_spc_request', 400, 'Provide /spc/{partNumber}/{characteristic} or POST /spc/capability');
     }
 
-    // ── Dashboard Endpoints ─────────────────────────────────────────────────
+    // â”€â”€ Dashboard Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * GET /api/dashboard/executive
@@ -219,7 +219,7 @@ final class DashboardController extends BaseController
         $this->success(['widget' => $data]);
     }
 
-    // ── KPI Endpoints ───────────────────────────────────────────────────────
+    // â”€â”€ KPI Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * GET /api/kpi/{metricCode}
@@ -245,6 +245,7 @@ final class DashboardController extends BaseController
             $result = $this->kpi->calculateKpi($code, $period, $filters);
             $this->success(['kpi' => $result->toArray()]);
         } catch (\Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('kpi_calculation_failed', 500, $e->getMessage());
         }
     }
@@ -288,7 +289,7 @@ final class DashboardController extends BaseController
         $this->success(['alerts' => $alerts, 'count' => count($alerts)]);
     }
 
-    // ── SPC Endpoints ───────────────────────────────────────────────────────
+    // â”€â”€ SPC Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * POST /api/spc/capability
@@ -311,6 +312,7 @@ final class DashboardController extends BaseController
             $result = $this->spc->calculateCapability($measurements, $usl, $lsl, $subgroupSize);
             $this->success(['capability' => $result->toArray()]);
         } catch (\Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('capability_calculation_failed', 400, $e->getMessage());
         }
     }
@@ -338,6 +340,7 @@ final class DashboardController extends BaseController
                 'violations' => $violations,
             ]);
         } catch (\Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('chart_generation_failed', 400, $e->getMessage());
         }
     }
@@ -377,7 +380,7 @@ final class DashboardController extends BaseController
         $this->success(['alerts' => $alerts, 'count' => count($alerts)]);
     }
 
-    // ── Request Parsing Helpers ─────────────────────────────────────────────
+    // â”€â”€ Request Parsing Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * Parse date_from / date_to query parameters into a DateRange.

@@ -4,11 +4,21 @@ namespace HESEM\QMS\Api\Controllers;
 use Throwable;
 
 /**
- * Module Schema Controller — CRUD for module layout schemas.
+ * Module Schema Controller â€” CRUD for module layout schemas.
  * Stores JSON schemas that the Block Engine renders into modules.
  */
 class ModuleSchemaController extends BaseController
 {
+    /**
+     * Module schema mutations are effectively low-code platform administration.
+     *
+     * @return void
+     */
+    private function requireSchemaWriteAccess(array $user): void
+    {
+        $this->requireAnyRole($user, array_merge(admin_roles(), ['qms_engineer', 'quality_manager']));
+    }
+
     private function schemaDir(): string
     {
         $dir = $this->dataDir . '/modules';
@@ -18,7 +28,7 @@ class ModuleSchemaController extends BaseController
         return $dir;
     }
 
-    /** GET list — List all module schemas. */
+    /** GET list â€” List all module schemas. */
     public function listSchemas(): never
     {
         $this->requireAuth();
@@ -42,11 +52,12 @@ class ModuleSchemaController extends BaseController
             }
             $this->success(['schemas' => $schemas]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('list_failed', 500, $e->getMessage());
         }
     }
 
-    /** GET get — Get single module schema. */
+    /** GET get â€” Get single module schema. */
     public function getSchema(): never
     {
         $this->requireAuth();
@@ -59,14 +70,16 @@ class ModuleSchemaController extends BaseController
             if (!$schema) $this->error('not_found', 404);
             $this->success(['schema' => $schema]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('get_failed', 500, $e->getMessage());
         }
     }
 
-    /** POST save — Create or update module schema. */
+    /** POST save â€” Create or update module schema. */
     public function saveSchema(): never
     {
         $user = $this->requireAuth();
+        $this->requireSchemaWriteAccess($user);
         $this->requireCsrf();
         $body = $this->jsonBody();
         $schema = $body['schema'] ?? $body;
@@ -86,14 +99,16 @@ class ModuleSchemaController extends BaseController
             $this->auditLog('module_schema_save', ['moduleId' => $moduleId, 'version' => $schema['version']], $uid);
             $this->success(['saved' => true, 'moduleId' => $moduleId, 'version' => $schema['version']]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('save_failed', 500, $e->getMessage());
         }
     }
 
-    /** POST delete — Delete module schema. */
+    /** POST delete â€” Delete module schema. */
     public function deleteSchema(): never
     {
         $user = $this->requireAuth();
+        $this->requireSchemaWriteAccess($user);
         $this->requireCsrf();
         $body = $this->jsonBody();
         $moduleId = $body['moduleId'] ?? '';
@@ -106,14 +121,16 @@ class ModuleSchemaController extends BaseController
             $this->auditLog('module_schema_delete', ['moduleId' => $moduleId], (string)($user['username'] ?? ''));
             $this->success(['deleted' => true]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('delete_failed', 500, $e->getMessage());
         }
     }
 
-    /** POST reset — Reset module schema to default. */
+    /** POST reset â€” Reset module schema to default. */
     public function resetSchema(): never
     {
         $user = $this->requireAuth();
+        $this->requireSchemaWriteAccess($user);
         $this->requireCsrf();
         $body = $this->jsonBody();
         $moduleId = $body['moduleId'] ?? '';
@@ -129,46 +146,46 @@ class ModuleSchemaController extends BaseController
                 if ($default) {
                     $this->writeJsonFile($targetFile, $default);
                     $this->success(['reset' => true, 'moduleId' => $moduleId]);
-                    return; // never reached but for clarity
                 }
             }
             $this->error('no_default', 404, 'No default schema found for ' . $moduleId);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('reset_failed', 500, $e->getMessage());
         }
     }
 
-    /** GET apiCatalog — List available API endpoints for binding. */
+    /** GET apiCatalog â€” List available API endpoints for binding. */
     public function apiCatalog(): never
     {
         $this->requireAuth();
         // Return catalog from Block Engine (hardcoded server-side mirror)
         $catalog = [
-            ['action'=>'order_so_list','method'=>'GET','label'=>'Danh sách SO','module'=>'Đơn hàng','keys'=>['sales_orders']],
-            ['action'=>'order_dashboard_kpi','method'=>'GET','label'=>'KPI đơn hàng','module'=>'Đơn hàng','keys'=>['active_so_count','on_time_pct']],
-            ['action'=>'order_hierarchy','method'=>'GET','label'=>'Cây SO→JO→WO','module'=>'Đơn hàng','keys'=>['hierarchy']],
-            ['action'=>'dispatch_timeline','method'=>'GET','label'=>'Timeline Gantt','module'=>'Kế hoạch','keys'=>['timeline']],
-            ['action'=>'dispatch_dashboard','method'=>'GET','label'=>'Tổng hợp ca','module'=>'Sản xuất','keys'=>['total_tasks','total_good','achievement_pct']],
-            ['action'=>'dispatch_list_targets','method'=>'GET','label'=>'Danh sách lệnh','module'=>'Kế hoạch','keys'=>['targets']],
-            ['action'=>'exception_dashboard','method'=>'GET','label'=>'KPI chất lượng','module'=>'Chất lượng','keys'=>['open_ncr','open_capa','copq_mtd']],
-            ['action'=>'exception_list','method'=>'GET','label'=>'Danh sách NCR/CAPA','module'=>'Chất lượng','keys'=>['exceptions']],
-            ['action'=>'supplier_dashboard','method'=>'GET','label'=>'KPI NCC','module'=>'Mua hàng','keys'=>['avg_score','open_scars']],
-            ['action'=>'supplier_incoming_list','method'=>'GET','label'=>'IQC list','module'=>'Mua hàng','keys'=>['inspections']],
-            ['action'=>'quote_list','method'=>'GET','label'=>'Danh sách báo giá','module'=>'Báo giá','keys'=>['quotes']],
-            ['action'=>'quote_dashboard','method'=>'GET','label'=>'KPI báo giá','module'=>'Báo giá','keys'=>['pipeline_value','win_rate']],
-            ['action'=>'fmea_list','method'=>'GET','label'=>'Danh sách FMEA','module'=>'Chất lượng','keys'=>['fmeas']],
-            ['action'=>'apqp_dashboard','method'=>'GET','label'=>'APQP dashboard','module'=>'Chất lượng','keys'=>['projects']],
-            ['action'=>'evidence_list','method'=>'GET','label'=>'Danh sách chứng cứ','module'=>'Hồ sơ','keys'=>['evidence']],
-            ['action'=>'compliance_report_types','method'=>'GET','label'=>'Loại báo cáo','module'=>'Báo cáo','keys'=>['report_types']],
-            ['action'=>'ci_dashboard','method'=>'GET','label'=>'CI dashboard','module'=>'Báo cáo','keys'=>['active_projects','cost_saved']],
-            ['action'=>'master_data_list','method'=>'GET','label'=>'Master data list','module'=>'Quản trị','keys'=>['items']],
-            ['action'=>'knowledge_list','method'=>'GET','label'=>'Kho kiến thức','module'=>'Sản xuất','keys'=>['tips']],
-            ['action'=>'energy_overview','method'=>'GET','label'=>'Năng lượng','module'=>'Sản xuất','keys'=>['machines']],
-            ['action'=>'oqc_list','method'=>'GET','label'=>'OQC list','module'=>'Chất lượng','keys'=>['inspections']],
-            ['action'=>'subcontract_list','method'=>'GET','label'=>'Gia công ngoài','module'=>'Kế hoạch','keys'=>['subcontracts']],
-            ['action'=>'packing_list','method'=>'GET','label'=>'Packing list','module'=>'Đơn hàng','keys'=>['packing_lists']],
-            ['action'=>'shift_list','method'=>'GET','label'=>'Danh sách ca','module'=>'Kế hoạch','keys'=>['shifts']],
-            ['action'=>'cnc_program_list','method'=>'GET','label'=>'CNC programs','module'=>'Sản xuất','keys'=>['programs']],
+            ['action'=>'order_so_list','method'=>'GET','label'=>'Danh sÃ¡ch SO','module'=>'ÄÆ¡n hÃ ng','keys'=>['sales_orders']],
+            ['action'=>'order_dashboard_kpi','method'=>'GET','label'=>'KPI Ä‘Æ¡n hÃ ng','module'=>'ÄÆ¡n hÃ ng','keys'=>['active_so_count','on_time_pct']],
+            ['action'=>'order_hierarchy','method'=>'GET','label'=>'CÃ¢y SOâ†’JOâ†’WO','module'=>'ÄÆ¡n hÃ ng','keys'=>['hierarchy']],
+            ['action'=>'dispatch_timeline','method'=>'GET','label'=>'Timeline Gantt','module'=>'Káº¿ hoáº¡ch','keys'=>['timeline']],
+            ['action'=>'dispatch_dashboard','method'=>'GET','label'=>'Tá»•ng há»£p ca','module'=>'Sáº£n xuáº¥t','keys'=>['total_tasks','total_good','achievement_pct']],
+            ['action'=>'dispatch_list_targets','method'=>'GET','label'=>'Danh sÃ¡ch lá»‡nh','module'=>'Káº¿ hoáº¡ch','keys'=>['targets']],
+            ['action'=>'exception_dashboard','method'=>'GET','label'=>'KPI cháº¥t lÆ°á»£ng','module'=>'Cháº¥t lÆ°á»£ng','keys'=>['open_ncr','open_capa','copq_mtd']],
+            ['action'=>'exception_list','method'=>'GET','label'=>'Danh sÃ¡ch NCR/CAPA','module'=>'Cháº¥t lÆ°á»£ng','keys'=>['exceptions']],
+            ['action'=>'supplier_dashboard','method'=>'GET','label'=>'KPI NCC','module'=>'Mua hÃ ng','keys'=>['avg_score','open_scars']],
+            ['action'=>'supplier_incoming_list','method'=>'GET','label'=>'IQC list','module'=>'Mua hÃ ng','keys'=>['inspections']],
+            ['action'=>'quote_list','method'=>'GET','label'=>'Danh sÃ¡ch bÃ¡o giÃ¡','module'=>'BÃ¡o giÃ¡','keys'=>['quotes']],
+            ['action'=>'quote_dashboard','method'=>'GET','label'=>'KPI bÃ¡o giÃ¡','module'=>'BÃ¡o giÃ¡','keys'=>['pipeline_value','win_rate']],
+            ['action'=>'fmea_list','method'=>'GET','label'=>'Danh sÃ¡ch FMEA','module'=>'Cháº¥t lÆ°á»£ng','keys'=>['fmeas']],
+            ['action'=>'apqp_dashboard','method'=>'GET','label'=>'APQP dashboard','module'=>'Cháº¥t lÆ°á»£ng','keys'=>['projects']],
+            ['action'=>'evidence_list','method'=>'GET','label'=>'Danh sÃ¡ch chá»©ng cá»©','module'=>'Há»“ sÆ¡','keys'=>['evidence']],
+            ['action'=>'compliance_report_types','method'=>'GET','label'=>'Loáº¡i bÃ¡o cÃ¡o','module'=>'BÃ¡o cÃ¡o','keys'=>['report_types']],
+            ['action'=>'ci_dashboard','method'=>'GET','label'=>'CI dashboard','module'=>'BÃ¡o cÃ¡o','keys'=>['active_projects','cost_saved']],
+            ['action'=>'master_data_list','method'=>'GET','label'=>'Master data list','module'=>'Quáº£n trá»‹','keys'=>['items']],
+            ['action'=>'knowledge_list','method'=>'GET','label'=>'Kho kiáº¿n thá»©c','module'=>'Sáº£n xuáº¥t','keys'=>['tips']],
+            ['action'=>'energy_overview','method'=>'GET','label'=>'NÄƒng lÆ°á»£ng','module'=>'Sáº£n xuáº¥t','keys'=>['machines']],
+            ['action'=>'oqc_list','method'=>'GET','label'=>'OQC list','module'=>'Cháº¥t lÆ°á»£ng','keys'=>['inspections']],
+            ['action'=>'subcontract_list','method'=>'GET','label'=>'Gia cÃ´ng ngoÃ i','module'=>'Káº¿ hoáº¡ch','keys'=>['subcontracts']],
+            ['action'=>'packing_list','method'=>'GET','label'=>'Packing list','module'=>'ÄÆ¡n hÃ ng','keys'=>['packing_lists']],
+            ['action'=>'shift_list','method'=>'GET','label'=>'Danh sÃ¡ch ca','module'=>'Káº¿ hoáº¡ch','keys'=>['shifts']],
+            ['action'=>'cnc_program_list','method'=>'GET','label'=>'CNC programs','module'=>'Sáº£n xuáº¥t','keys'=>['programs']],
         ];
         $this->success(['catalog' => $catalog]);
     }

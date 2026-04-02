@@ -33,7 +33,7 @@ class OrderController extends BaseController
     /** @var array|null Cached SO/JO/WO config. */
     private ?array $orderConfig = null;
 
-    // ── Service Access ──────────────────────────────────────────────────────
+    // â”€â”€ Service Access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * Get or create the OrderService instance.
@@ -125,10 +125,10 @@ class OrderController extends BaseController
         }
     }
 
-    // ── Endpoints ───────────────────────────────────────────────────────────
+    // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * GET listSalesOrders — List sales orders with optional filters.
+     * GET listSalesOrders â€” List sales orders with optional filters.
      *
      * Action: `order_so_list`
      *
@@ -179,12 +179,13 @@ class OrderController extends BaseController
 
             $this->paginated('sales_orders', array_values($items), $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('so_list_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getSalesOrderDetail — Get full details of a single Sales Order.
+     * GET getSalesOrderDetail â€” Get full details of a single Sales Order.
      *
      * Action: `order_so_detail`
      *
@@ -213,12 +214,13 @@ class OrderController extends BaseController
 
             $this->success(['sales_order' => $so]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('so_detail_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET listJobOrders — List job orders with optional SO and status filters.
+     * GET listJobOrders â€” List job orders with optional SO and status filters.
      *
      * Action: `order_jo_list`
      *
@@ -263,12 +265,13 @@ class OrderController extends BaseController
 
             $this->paginated('job_orders', array_values($items), $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('jo_list_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getJobOrderDetail — Get full details of a single Job Order.
+     * GET getJobOrderDetail â€” Get full details of a single Job Order.
      *
      * Action: `order_jo_detail`
      *
@@ -302,12 +305,13 @@ class OrderController extends BaseController
 
             $this->success(['job_order' => $jo]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('jo_detail_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getHierarchy — Get the full SO -> JO -> WO hierarchy tree.
+     * GET getHierarchy â€” Get the full SO -> JO -> WO hierarchy tree.
      *
      * Action: `order_hierarchy`
      *
@@ -331,12 +335,13 @@ class OrderController extends BaseController
 
             $this->success(['hierarchy' => $tree]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('hierarchy_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST linkForm — Link a form record to a Job Order.
+     * POST linkForm â€” Link a form record to a Job Order.
      *
      * Action: `order_link_form`
      *
@@ -379,12 +384,13 @@ class OrderController extends BaseController
 
             $this->success(['linked' => true]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('link_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getDashboardStats — Get order-related dashboard statistics.
+     * GET getDashboardStats â€” Get order-related dashboard statistics.
      *
      * Action: `order_dashboard_stats`
      *
@@ -402,14 +408,15 @@ class OrderController extends BaseController
 
             $this->success(['stats' => $stats]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('stats_failed', 500, $e->getMessage());
         }
     }
 
-    // ── CRUD: Sales Orders ─────────────────────────────────────────────────
+    // â”€â”€ CRUD: Sales Orders â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * POST createSalesOrder — Create a new Sales Order.
+     * POST createSalesOrder â€” Create a new Sales Order.
      * Action: `order_so_create`
      * @return never
      */
@@ -455,12 +462,13 @@ class OrderController extends BaseController
             $this->auditLog('order_so_create', ['so_number' => $saved['so_number']], $uid);
             $this->success(['sales_order' => $saved], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('so_create_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST updateSalesOrder — Update an existing Sales Order.
+     * POST updateSalesOrder â€” Update an existing Sales Order.
      * Action: `order_so_update`
      * @return never
      */
@@ -490,14 +498,15 @@ class OrderController extends BaseController
             $this->auditLog('order_so_update', ['so_number' => $soNumber, 'fields' => array_keys($changes)], $uid);
             $this->success(['sales_order' => $result->data]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('so_update_failed', 500, $e->getMessage());
         }
     }
 
-    // ── CRUD: Job Orders ───────────────────────────────────────────────────
+    // â”€â”€ CRUD: Job Orders â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * POST createJobOrder — Create a new Job Order linked to an SO.
+     * POST createJobOrder â€” Create a new Job Order linked to an SO.
      * Action: `order_jo_create`
      * @return never
      */
@@ -541,12 +550,13 @@ class OrderController extends BaseController
             $this->auditLog('order_jo_create', ['jo_number' => $saved['jo_number'], 'so_number' => $jo['so_number']], $uid);
             $this->success(['job_order' => $saved], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('jo_create_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST updateJobOrder — Update an existing Job Order.
+     * POST updateJobOrder â€” Update an existing Job Order.
      * Action: `order_jo_update`
      * @return never
      */
@@ -576,14 +586,15 @@ class OrderController extends BaseController
             $this->auditLog('order_jo_update', ['jo_number' => $joNumber, 'fields' => array_keys($changes)], $uid);
             $this->success(['job_order' => $result->data]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('jo_update_failed', 500, $e->getMessage());
         }
     }
 
-    // ── CRUD: Work Orders ──────────────────────────────────────────────────
+    // â”€â”€ CRUD: Work Orders â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * POST createWorkOrder — Create a new Work Order linked to a JO.
+     * POST createWorkOrder â€” Create a new Work Order linked to a JO.
      * Action: `order_wo_create`
      * @return never
      */
@@ -627,12 +638,13 @@ class OrderController extends BaseController
             $this->auditLog('order_wo_create', ['wo_number' => $saved['wo_number'], 'jo_number' => $wo['jo_number']], $uid);
             $this->success(['work_order' => $saved], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('wo_create_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST updateWorkOrder — Update an existing Work Order.
+     * POST updateWorkOrder â€” Update an existing Work Order.
      * Action: `order_wo_update`
      * @return never
      */
@@ -662,14 +674,15 @@ class OrderController extends BaseController
             $this->auditLog('order_wo_update', ['wo_number' => $woNumber, 'fields' => array_keys($changes)], $uid);
             $this->success(['work_order' => $result->data]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('wo_update_failed', 500, $e->getMessage());
         }
     }
 
-    // ── Workflow ────────────────────────────────────────────────────────────
+    // â”€â”€ Workflow â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * POST transition — Execute status transition on any order type.
+     * POST transition â€” Execute status transition on any order type.
      * Action: `order_transition`
      * @return never
      */
@@ -707,14 +720,15 @@ class OrderController extends BaseController
             ], $uid);
             $this->success(['transition' => $result->toArray()]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('transition_failed', 500, $e->getMessage());
         }
     }
 
-    // ── Contract Review ────────────────────────────────────────────────────
+    // â”€â”€ Contract Review â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * POST contractReview — Submit or update contract review for an SO.
+     * POST contractReview â€” Submit or update contract review for an SO.
      * Action: `order_contract_review`
      * @return never
      */
@@ -789,14 +803,15 @@ class OrderController extends BaseController
 
             $this->success(['review' => $existing]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('contract_review_failed', 500, $e->getMessage());
         }
     }
 
-    // ── Holds ──────────────────────────────────────────────────────────────
+    // â”€â”€ Holds â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * POST setHold — Set a hold on an order.
+     * POST setHold â€” Set a hold on an order.
      * Action: `order_hold_set`
      * @return never
      */
@@ -837,12 +852,13 @@ class OrderController extends BaseController
             $this->auditLog('order_hold_set', ['order_id' => $orderId, 'hold_type' => $holdType], $uid);
             $this->success(['hold_set' => true]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('hold_set_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST releaseHold — Release a hold on an order.
+     * POST releaseHold â€” Release a hold on an order.
      * Action: `order_hold_release`
      * @return never
      */
@@ -884,14 +900,15 @@ class OrderController extends BaseController
             $this->auditLog('order_hold_release', ['hold_id' => $holdId], $uid);
             $this->success(['released' => true]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('hold_release_failed', 500, $e->getMessage());
         }
     }
 
-    // ── Notes ──────────────────────────────────────────────────────────────
+    // â”€â”€ Notes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * POST addNote — Add a note to an order.
+     * POST addNote â€” Add a note to an order.
      * Action: `order_note_add`
      * @return never
      */
@@ -926,14 +943,15 @@ class OrderController extends BaseController
             $this->auditLog('order_note_add', ['order_id' => $note['order_number'], 'note_type' => $note['note_type']], $uid);
             $this->success(['note' => $note]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('note_add_failed', 500, $e->getMessage());
         }
     }
 
-    // ── Timeline ───────────────────────────────────────────────────────────
+    // â”€â”€ Timeline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * GET getTimeline — Get timeline events for Gantt visualization.
+     * GET getTimeline â€” Get timeline events for Gantt visualization.
      * Action: `order_timeline`
      * @return never
      */
@@ -986,14 +1004,15 @@ class OrderController extends BaseController
 
             $this->success(['timeline' => $events]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('timeline_failed', 500, $e->getMessage());
         }
     }
 
-    // ── Dashboard KPI ──────────────────────────────────────────────────────
+    // â”€â”€ Dashboard KPI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * GET getDashboardKpi — Extended KPI aggregation.
+     * GET getDashboardKpi â€” Extended KPI aggregation.
      * Action: `order_dashboard_kpi`
      * @return never
      */
@@ -1018,14 +1037,15 @@ class OrderController extends BaseController
 
             $this->success(['kpi' => $stats]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('kpi_failed', 500, $e->getMessage());
         }
     }
 
-    // ── Search ─────────────────────────────────────────────────────────────
+    // â”€â”€ Search â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * GET search — Full-text search across all orders.
+     * GET search â€” Full-text search across all orders.
      * Action: `order_search`
      * @return never
      */
@@ -1064,14 +1084,15 @@ class OrderController extends BaseController
 
             $this->paginated('results', $paged, $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('search_failed', 500, $e->getMessage());
         }
     }
 
-    // ── Shipment Readiness Gate ────────────────────────────────────────────
+    // â”€â”€ Shipment Readiness Gate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * GET checkShipmentReadiness — Check if SO is ready to ship.
+     * GET checkShipmentReadiness â€” Check if SO is ready to ship.
      * Action: `order_shipment_gate`
      * @return never
      */
@@ -1091,6 +1112,7 @@ class OrderController extends BaseController
 
             $this->success(['shipment_gate' => $result]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('shipment_gate_failed', 500, $e->getMessage());
         }
     }

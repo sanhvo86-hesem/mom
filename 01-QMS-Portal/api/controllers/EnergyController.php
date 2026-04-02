@@ -23,6 +23,42 @@ class EnergyController extends BaseController
     /** @var string Base directory for MES energy data. */
     private string $mesDir = '';
 
+    /**
+     * @return array<int, string>
+     */
+    private function energyReadRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            [
+                'ceo',
+                'production_director',
+                'production_manager',
+                'production_planner',
+                'cnc_workshop_manager',
+                'engineering_manager',
+                'engineering_lead',
+                'process_engineer',
+                'quality_manager',
+                'qa_manager',
+                'quality_engineer',
+                'shift_leader',
+                'supervisor',
+                'setup_technician',
+                'operator',
+                'cnc_operator',
+            ]
+        )));
+    }
+
+    /**
+     * @return void
+     */
+    private function requireEnergyReadAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->energyReadRoles());
+    }
+
     // -- Helpers --------------------------------------------------------------
 
     /**
@@ -88,12 +124,13 @@ class EnergyController extends BaseController
     public function getOverview(): never
     {
         $user = $this->requireAuth();
+        $this->requireEnergyReadAccess($user);
 
         try {
             $snapshots = $this->loadEnergyData();
             $machines  = $this->loadMachines();
 
-            $dateRange = strtolower(trim($this->query('date_range', 'last_30d') ?? 'last_30d'));
+            $dateRange = strtolower(trim($this->input('date_range', 'last_30d') ?? 'last_30d'));
             $days = match ($dateRange) {
                 'last_7d'  => 7,
                 'last_90d' => 90,
@@ -175,6 +212,7 @@ class EnergyController extends BaseController
                 'machines' => $machineList,
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('energy_overview_failed', 500, $e->getMessage());
         }
     }
@@ -191,8 +229,9 @@ class EnergyController extends BaseController
     public function getMachineDetail(): never
     {
         $user = $this->requireAuth();
+        $this->requireEnergyReadAccess($user);
 
-        $machineId = $this->query('machine_id');
+        $machineId = $this->input('machine_id');
         if ($machineId === null || trim($machineId) === '') {
             $this->error('missing_machine_id', 400);
         }
@@ -201,7 +240,7 @@ class EnergyController extends BaseController
         try {
             $snapshots = $this->loadEnergyData();
 
-            $dateRange = strtolower(trim($this->query('date_range', 'last_30d') ?? 'last_30d'));
+            $dateRange = strtolower(trim($this->input('date_range', 'last_30d') ?? 'last_30d'));
             $days = match ($dateRange) {
                 'last_7d'  => 7,
                 'last_90d' => 90,
@@ -270,6 +309,7 @@ class EnergyController extends BaseController
 
             $this->success(['machine_detail' => $detail]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('energy_machine_detail_failed', 500, $e->getMessage());
         }
     }
@@ -288,11 +328,12 @@ class EnergyController extends BaseController
     public function getPerPartEnergy(): never
     {
         $user = $this->requireAuth();
+        $this->requireEnergyReadAccess($user);
 
         try {
             $snapshots = $this->loadEnergyData();
 
-            $dateRange = strtolower(trim($this->query('date_range', 'last_30d') ?? 'last_30d'));
+            $dateRange = strtolower(trim($this->input('date_range', 'last_30d') ?? 'last_30d'));
             $days = match ($dateRange) {
                 'last_7d'  => 7,
                 'last_90d' => 90,
@@ -305,7 +346,7 @@ class EnergyController extends BaseController
                 return substr($date, 0, 10) >= $cutoff;
             });
 
-            $partFilter = $this->query('part_id');
+            $partFilter = $this->input('part_id');
             if ($partFilter !== null && $partFilter !== '') {
                 $filtered = array_filter($filtered, fn(array $s) => ($s['part_id'] ?? '') === $partFilter);
             }
@@ -355,6 +396,7 @@ class EnergyController extends BaseController
                 'total_parts'     => count($partList),
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('energy_per_part_failed', 500, $e->getMessage());
         }
     }
@@ -370,11 +412,12 @@ class EnergyController extends BaseController
     public function getCostTrend(): never
     {
         $user = $this->requireAuth();
+        $this->requireEnergyReadAccess($user);
 
         try {
             $snapshots = $this->loadEnergyData();
 
-            $months = min(36, max(1, (int)($this->query('months', '12'))));
+            $months = min(36, max(1, (int)($this->input('months', '12'))));
             $cutoff = gmdate('Y-m-d', strtotime("-{$months} months"));
 
             $filtered = array_filter($snapshots, function (array $s) use ($cutoff) {
@@ -428,6 +471,7 @@ class EnergyController extends BaseController
                 'months'     => $months,
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('energy_cost_trend_failed', 500, $e->getMessage());
         }
     }

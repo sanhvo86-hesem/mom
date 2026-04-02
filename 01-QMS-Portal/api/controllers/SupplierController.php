@@ -28,7 +28,7 @@ class SupplierController extends BaseController
     /** @var array|null Cached supplier quality access-control config. */
     private ?array $supplierConfig = null;
 
-    // ── Service Access ──────────────────────────────────────────────────────
+    // â”€â”€ Service Access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * Get or create the SupplierQualityService instance.
@@ -113,10 +113,10 @@ class SupplierController extends BaseController
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
     }
 
-    // ── Endpoints ───────────────────────────────────────────────────────────
+    // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * GET dashboard — Supplier quality KPIs.
+     * GET dashboard â€” Supplier quality KPIs.
      *
      * Returns avg score, at-risk suppliers, open SCARs, incoming reject rate.
      *
@@ -132,12 +132,13 @@ class SupplierController extends BaseController
 
             $this->success(['kpis' => $kpis]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('supplier_dashboard_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET listScorecards — List supplier scorecards with optional filters.
+     * GET listScorecards â€” List supplier scorecards with optional filters.
      *
      * Query params:
      *   - vendor_id    (string, optional): Filter by vendor.
@@ -180,12 +181,13 @@ class SupplierController extends BaseController
 
             $this->paginated('scorecards', array_values($items), $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('scorecards_list_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET scorecardDetail — Single vendor scorecard with trend data.
+     * GET scorecardDetail â€” Single vendor scorecard with trend data.
      *
      * Query params:
      *   - vendor_id (string, required): Vendor identifier.
@@ -214,12 +216,13 @@ class SupplierController extends BaseController
 
             $this->success(['scorecard' => $scorecard]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('scorecard_detail_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST calculateScorecard — Calculate/recalculate scorecard for a vendor and period.
+     * POST calculateScorecard â€” Calculate/recalculate scorecard for a vendor and period.
      *
      * Body fields:
      *   - vendor_id (string, required)
@@ -250,12 +253,13 @@ class SupplierController extends BaseController
 
             $this->success(['scorecard' => $scorecard]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('scorecard_calc_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET listIncoming — List incoming inspections with optional filters.
+     * GET listIncoming â€” List incoming inspections with optional filters.
      *
      * Query params:
      *   - vendor_id  (string, optional)
@@ -341,12 +345,13 @@ class SupplierController extends BaseController
 
             $this->paginated('inspections', array_values($items), $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('incoming_list_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST createIncoming — Create an incoming inspection record.
+     * POST createIncoming â€” Create an incoming inspection record.
      *
      * Body fields:
      *   - vendor_id   (string, required)
@@ -387,12 +392,13 @@ class SupplierController extends BaseController
 
             $this->success(['inspection' => $inspection], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('incoming_create_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST updateIncoming — Update incoming inspection with results.
+     * POST updateIncoming â€” Update incoming inspection with results.
      *
      * Body fields:
      *   - id          (string, required)
@@ -429,12 +435,13 @@ class SupplierController extends BaseController
 
             $this->success(['inspection' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('incoming_update_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET skipLotStatus — Get skip-lot status for a vendor x part combination.
+     * GET skipLotStatus â€” Get skip-lot status for a vendor x part combination.
      *
      * Query params:
      *   - vendor_id (string, required)
@@ -465,12 +472,13 @@ class SupplierController extends BaseController
 
             $this->success(['skip_lot' => $status]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('skip_lot_status_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST updateSkipLot — Update skip-lot tracking (auto-calculated from inspection results).
+     * POST updateSkipLot â€” Update skip-lot tracking (auto-calculated from inspection results).
      *
      * Body fields:
      *   - vendor_id (string, required)
@@ -503,12 +511,13 @@ class SupplierController extends BaseController
 
             $this->success(['skip_lot' => $status]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('skip_lot_update_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET listAsl — List approved supplier list entries.
+     * GET listAsl â€” List approved supplier list entries.
      *
      * Query params:
      *   - vendor_id (string, optional)
@@ -551,12 +560,13 @@ class SupplierController extends BaseController
 
             $this->paginated('asl_entries', array_values($items), $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('asl_list_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST upsertAsl — Create or update an ASL entry.
+     * POST upsertAsl â€” Create or update an ASL entry.
      *
      * Body fields:
      *   - vendor_id   (string, required)
@@ -599,12 +609,13 @@ class SupplierController extends BaseController
 
             $this->success(['asl_entry' => $entry]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('asl_upsert_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET listScar — List SCAR (Supplier Corrective Action Request) records.
+     * GET listScar â€” List SCAR (Supplier Corrective Action Request) records.
      *
      * Query params:
      *   - vendor_id (string, optional)
@@ -666,12 +677,13 @@ class SupplierController extends BaseController
 
             $this->paginated('scars', array_values($items), $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('scar_list_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST createScar — Create a SCAR. Auto-generates SCAR-YYYY-NNN number.
+     * POST createScar â€” Create a SCAR. Auto-generates SCAR-YYYY-NNN number.
      *
      * Body fields:
      *   - vendor_id   (string, required)
@@ -713,12 +725,13 @@ class SupplierController extends BaseController
 
             $this->success(['scar' => $scar], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('scar_create_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST updateScar — Update SCAR with root cause, corrective action, etc.
+     * POST updateScar â€” Update SCAR with root cause, corrective action, etc.
      *
      * Body fields:
      *   - id               (string, required)
@@ -755,12 +768,13 @@ class SupplierController extends BaseController
 
             $this->success(['scar' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('scar_update_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST scarTransition — SCAR status transition.
+     * POST scarTransition â€” SCAR status transition.
      *
      * Body fields:
      *   - id        (string, required)
@@ -797,12 +811,13 @@ class SupplierController extends BaseController
 
             $this->success(['scar' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('scar_transition_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET listAudits — List supplier audit schedule.
+     * GET listAudits â€” List supplier audit schedule.
      *
      * Query params:
      *   - vendor_id (string, optional)
@@ -845,12 +860,13 @@ class SupplierController extends BaseController
 
             $this->paginated('audits', array_values($items), $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('audits_list_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST upsertAudit — Create or update a supplier audit entry.
+     * POST upsertAudit â€” Create or update a supplier audit entry.
      *
      * Body fields:
      *   - vendor_id    (string, required)
@@ -897,6 +913,7 @@ class SupplierController extends BaseController
 
             $this->success(['audit' => $audit]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('audit_upsert_failed', 500, $e->getMessage());
         }
     }

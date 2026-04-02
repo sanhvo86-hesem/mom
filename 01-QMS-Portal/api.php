@@ -92,6 +92,15 @@ function api_json(array $payload, int $code = 200): void {
     @session_write_close();
   }
 
+  if (defined('API_THROW_RESPONSES') && API_THROW_RESPONSES) {
+    throw \HESEM\QMS\Api\Controllers\ExitException::json($payload, $code, [
+      'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+      'X-Content-Type-Options' => 'nosniff',
+      'X-Frame-Options' => 'SAMEORIGIN',
+      'Referrer-Policy' => 'same-origin',
+    ]);
+  }
+
   http_response_code($code);
   header('Content-Type: application/json; charset=utf-8');
   header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
@@ -8938,6 +8947,41 @@ function load_form_schema_by_code(string $formCode): ?array {
   return is_array($data) ? $data : null;
 }
 
+function normalize_online_form_code(string $formCode): string {
+  $formCode = strtoupper(trim($formCode));
+  if ($formCode === '') {
+    throw new RuntimeException('missing_form_code');
+  }
+  if (!preg_match('/^[A-Z0-9._-]+$/', $formCode)) {
+    throw new RuntimeException('invalid_form_code');
+  }
+  return $formCode;
+}
+
+function require_online_form_code(string $formCode): string {
+  try {
+    return normalize_online_form_code($formCode);
+  } catch (RuntimeException $e) {
+    $message = $e->getMessage();
+    api_json(['ok' => false, 'error' => $message === 'missing_form_code' ? 'missing_form_code' : 'invalid_form_code'], 400);
+  }
+}
+
+function require_existing_online_form(string $formCode): array {
+  $formCode = require_online_form_code($formCode);
+  $schema = load_form_schema_by_code($formCode);
+  $registry = load_form_registry_entry($formCode);
+  if (!is_array($schema) && !is_array($registry)) {
+    api_json(['ok' => false, 'error' => 'form_not_found'], 404);
+  }
+
+  return [
+    'code' => $formCode,
+    'schema' => $schema,
+    'registry' => $registry,
+  ];
+}
+
 function load_form_registry_entry(string $formCode): ?array {
   global $FORM_CONTROL_REGISTRY_FILE;
   if (!is_file($FORM_CONTROL_REGISTRY_FILE)) return null;
@@ -10540,6 +10584,109 @@ function require_csrf(): void {
   $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
   if ($token === '' || empty($_SESSION['csrf']) || !hash_equals((string)$_SESSION['csrf'], (string)$token)) {
     api_json(['ok' => false, 'error' => 'csrf_failed'], 403);
+  }
+}
+
+function api_request_allowed_origins(): array {
+  $defaults = [
+    'https://qms.hesem.com.vn',
+    'https://*.hesem.com.vn',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:4173',
+    'http://127.0.0.1:4173',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+  ];
+
+  $raw = getenv('QMS_API_ALLOWED_ORIGINS');
+  if ($raw !== false && trim((string)$raw) !== '') {
+    $defaults = array_values(array_filter(array_map(
+      static fn(string $item): string => trim($item),
+      explode(',', (string)$raw)
+    ), static fn(string $item): bool => $item !== ''));
+  }
+
+  $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (strtolower((string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https')
+    || ((string)($_SERVER['HTTP_X_FORWARDED_SSL'] ?? '') === 'on');
+  $host = trim((string)($_SERVER['HTTP_HOST'] ?? ''));
+  if ($host !== '') {
+    $defaults[] = ($https ? 'https' : 'http') . '://' . strtolower($host);
+  }
+
+  $out = [];
+  $seen = [];
+  foreach ($defaults as $origin) {
+    $origin = strtolower(trim((string)$origin));
+    if ($origin === '' || isset($seen[$origin])) continue;
+    $seen[$origin] = true;
+    $out[] = $origin;
+  }
+
+  return $out;
+}
+
+function api_origin_matches_pattern(string $origin, string $allowed): bool {
+  $origin = strtolower(trim($origin));
+  $allowed = strtolower(trim($allowed));
+  if ($origin === '' || $allowed === '') return false;
+  if ($origin === $allowed) return true;
+  if (!str_contains($allowed, '*')) return false;
+
+  $regex = '/^' . str_replace('\*', '[a-z0-9.-]+', preg_quote($allowed, '/')) . '$/';
+  return (bool)preg_match($regex, $origin);
+}
+
+function api_request_origin_candidate(): string {
+  $origin = strtolower(trim((string)($_SERVER['HTTP_ORIGIN'] ?? '')));
+  if ($origin !== '') {
+    return $origin;
+  }
+
+  $referer = trim((string)($_SERVER['HTTP_REFERER'] ?? ''));
+  if ($referer === '') {
+    return '';
+  }
+
+  $parts = parse_url($referer);
+  if (!is_array($parts)) {
+    return '';
+  }
+
+  $scheme = strtolower(trim((string)($parts['scheme'] ?? '')));
+  $host = strtolower(trim((string)($parts['host'] ?? '')));
+  if ($scheme === '' || $host === '') {
+    return '';
+  }
+
+  $candidate = $scheme . '://' . $host;
+  if (isset($parts['port'])) {
+    $candidate .= ':' . (int)$parts['port'];
+  }
+
+  return $candidate;
+}
+
+function request_has_allowed_origin(array $extraAllowedOrigins = []): bool {
+  $candidate = api_request_origin_candidate();
+  if ($candidate === '') {
+    return false;
+  }
+
+  $allowed = array_merge(api_request_allowed_origins(), $extraAllowedOrigins);
+  foreach ($allowed as $pattern) {
+    if (api_origin_matches_pattern($candidate, (string)$pattern)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function require_allowed_origin(array $extraAllowedOrigins = []): void {
+  if (!request_has_allowed_origin($extraAllowedOrigins)) {
+    api_json(['ok' => false, 'error' => 'origin_not_allowed'], 403);
   }
 }
 
@@ -13975,6 +14122,7 @@ case 'doc_save_draft': {
 
 case 'auth_login': {
     if ($method !== 'POST') api_json(['ok' => false, 'error' => 'method_not_allowed'], 405);
+    require_allowed_origin();
     $data = read_json_body();
     $username = strtolower(trim((string)($data['username'] ?? '')));
     $password = (string)($data['password'] ?? '');
@@ -14104,6 +14252,7 @@ case 'auth_login': {
 
   case 'auth_mfa_verify': {
     if ($method !== 'POST') api_json(['ok' => false, 'error' => 'method_not_allowed'], 405);
+    require_allowed_origin();
     if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
 
     $data = read_json_body();
@@ -14165,6 +14314,7 @@ if ($username === '') {
 
   case 'auth_enroll_verify': {
     if ($method !== 'POST') api_json(['ok' => false, 'error' => 'method_not_allowed'], 405);
+    require_allowed_origin();
     if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
 
     $data = read_json_body();
@@ -14212,6 +14362,7 @@ if ($username === '') {
 
   case 'auth_logout': {
     if ($method !== 'POST') api_json(['ok' => false, 'error' => 'method_not_allowed'], 405);
+    require_allowed_origin();
     require_csrf();
     destroy_auth_session();
     api_json(['ok' => true, 'logged_in' => false]);
@@ -16405,6 +16556,7 @@ if ($username === '') {
   // ONLINE FORMS ENGINE
   // ═══════════════════════════════════════════════════
   case 'online_form_list': {
+    require_logged_in($store);
     $schemasDir = $DATA_DIR . '/online-forms/schemas';
     $entriesDir = $DATA_DIR . '/online-forms/entries';
     $forms = [];
@@ -16520,24 +16672,25 @@ if ($username === '') {
   }
 
   case 'online_form_schema': {
-    $code = trim((string)($_GET['code'] ?? ''));
-    if (!$code) { api_json(['ok' => false, 'error' => 'missing_code'], 400); }
-    $schemasDir = $DATA_DIR . '/online-forms/schemas';
-    $file = $schemasDir . '/' . $code . '.json';
-    if (!file_exists($file)) { api_json(['ok' => false, 'error' => 'schema_not_found'], 404); }
-    $schema = json_decode(file_get_contents($file), true);
+    require_logged_in($store);
+    $form = require_existing_online_form((string)($_GET['code'] ?? ''));
+    $schema = is_array($form['schema']) ? $form['schema'] : null;
+    if (!is_array($schema)) { api_json(['ok' => false, 'error' => 'schema_not_found'], 404); }
     if (!$schema) { api_json(['ok' => false, 'error' => 'invalid_schema'], 500); }
     api_json(['ok' => true, 'schema' => $schema]);
   }
 
   case 'eqms_audit_log': {
+    if ($method !== 'POST') api_json(['ok' => false, 'error' => 'method_not_allowed'], 405);
     $me = require_logged_in($store);
     require_csrf();
     $body = read_json_body();
-    $formCode = trim((string)($body['form_code'] ?? ''));
+    $form = require_existing_online_form((string)($body['form_code'] ?? ''));
+    $formCode = (string)$form['code'];
     $entryId = trim((string)($body['entry_id'] ?? ''));
     $events = is_array($body['events'] ?? null) ? $body['events'] : [];
     if ($formCode === '' || empty($events)) api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
+    if (count($events) > 250) api_json(['ok' => false, 'error' => 'too_many_events'], 413);
 
     $auditDir = $DATA_DIR . '/online-forms/audit/' . preg_replace('/[^A-Za-z0-9._-]/', '', $formCode);
     ensure_dir($auditDir);
@@ -16561,40 +16714,45 @@ if ($username === '') {
   }
 
   case 'form_standalone_save': {
+    if ($method !== 'POST') api_json(['ok' => false, 'error' => 'method_not_allowed'], 405);
     $me = require_logged_in($store);
     require_csrf();
+    $role = migrate_role((string)($me['role'] ?? ''));
+    $allowedRoles = array_values(array_unique(array_merge(admin_roles(), ['quality_manager', 'qms_engineer', 'engineering_manager'])));
+    if (!in_array($role, $allowedRoles, true)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
     $body = read_json_body();
-    $formCode = trim((string)($body['form_code'] ?? ''));
+    $form = require_existing_online_form((string)($body['form_code'] ?? ''));
+    $formCode = (string)$form['code'];
+    $schema = is_array($form['schema']) ? $form['schema'] : null;
     $html = (string)($body['html'] ?? '');
     if ($formCode === '' || strlen($html) < 100) api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
-    if (!preg_match('/^[A-Za-z0-9._-]+$/', $formCode)) api_json(['ok' => false, 'error' => 'invalid_form_code'], 400);
+    if (!is_array($schema)) api_json(['ok' => false, 'error' => 'schema_not_found'], 404);
 
-    $runtimeDir = $ROOT_DIR . '/form-runtimes';
-    $target = $runtimeDir . '/frm-' . strtolower(str_replace(['FRM-','frm-'], '', $formCode)) . '-*.html';
-    $candidates = glob($target);
-    if (empty($candidates)) {
-      $safeName = 'frm-' . strtolower(preg_replace('/[^a-z0-9-]/i', '', str_replace('FRM-', '', $formCode))) . '.html';
-      $targetFile = $runtimeDir . '/' . $safeName;
-    } else {
-      $targetFile = $candidates[0];
-    }
+    $runtimeRel = trim((string)($schema['standalone_html'] ?? ''));
+    if ($runtimeRel === '') api_json(['ok' => false, 'error' => 'standalone_runtime_not_configured'], 400);
+    $runtimeRel = safe_rel_path($runtimeRel);
+    $targetFile = join_in_root($ROOT_DIR, $runtimeRel);
+    if (!is_inside_root($targetFile, $ROOT_DIR)) api_json(['ok' => false, 'error' => 'invalid_runtime_target'], 400);
+    if (strtolower((string)pathinfo($targetFile, PATHINFO_EXTENSION)) !== 'html') api_json(['ok' => false, 'error' => 'invalid_runtime_target'], 400);
+    if (!is_file($targetFile)) api_json(['ok' => false, 'error' => 'runtime_file_not_found'], 404);
 
     $username = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
 
     /* Backup current version */
     if (is_file($targetFile)) {
-      $backupDir = $runtimeDir . '/_archive';
+      $backupDir = $DATA_DIR . '/online-forms/runtime-backups/' . preg_replace('/[^A-Za-z0-9._-]/', '', $formCode);
       ensure_dir($backupDir);
       $backupName = basename($targetFile, '.html') . '_' . date('YmdHis') . '.html';
       copy($targetFile, $backupDir . '/' . $backupName);
     }
 
     /* Write new version */
-    file_put_contents($targetFile, $html);
+    file_put_contents($targetFile, $html, LOCK_EX);
 
     api_json([
       'ok' => true,
       'file' => basename($targetFile),
+      'path' => $runtimeRel,
       'size' => strlen($html),
       'saved_by' => $username,
       'saved_at' => now_iso(),
@@ -16837,11 +16995,15 @@ if ($username === '') {
   }
 
   case 'online_form_submit': {
+    if ($method !== 'POST') api_json(['ok' => false, 'error' => 'method_not_allowed'], 405);
+    require_logged_in($store);
+    require_csrf();
     $input = json_decode(file_get_contents('php://input'), true);
     if (!$input || empty($input['form_code']) || empty($input['data'])) {
       api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
     }
-    $code = (string)$input['form_code'];
+    $form = require_existing_online_form((string)$input['form_code']);
+    $code = (string)$form['code'];
     $data = $input['data'];
     $status = (string)($input['status'] ?? 'submitted');
     $entriesDir = $DATA_DIR . '/online-forms/entries';
@@ -16906,8 +17068,9 @@ if ($username === '') {
   }
 
   case 'online_form_entries': {
-    $code = trim((string)($_GET['code'] ?? ''));
-    if (!$code) { api_json(['ok' => false, 'error' => 'missing_code'], 400); }
+    require_logged_in($store);
+    $form = require_existing_online_form((string)($_GET['code'] ?? ''));
+    $code = (string)$form['code'];
     $entryFile = $DATA_DIR . '/online-forms/entries/' . $code . '.json';
     $entries = [];
     if (file_exists($entryFile)) {
@@ -16921,8 +17084,8 @@ if ($username === '') {
     require_logged_in($store);
     require_csrf();
     $body = read_json_body();
-    $code = trim((string)($body['form_code'] ?? $_GET['form_code'] ?? ''));
-    if ($code === '') { api_json(['ok' => false, 'error' => 'missing_form_code'], 400); }
+    $form = require_existing_online_form((string)($body['form_code'] ?? $_GET['form_code'] ?? ''));
+    $code = (string)$form['code'];
     $entryId = trim((string)($body['entry_id'] ?? $_GET['entry_id'] ?? ''));
     $allocationId = trim((string)($body['allocation_id'] ?? $_GET['allocation_id'] ?? ''));
     if ($entryId === '' && $allocationId === '') { api_json(['ok' => false, 'error' => 'missing_entry_selector'], 400); }

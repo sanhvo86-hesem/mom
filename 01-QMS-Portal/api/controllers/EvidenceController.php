@@ -30,7 +30,7 @@ class EvidenceController extends BaseController
     /** @var array|null Cached evidence access-control config. */
     private ?array $evidenceConfig = null;
 
-    // ── Service Access ──────────────────────────────────────────────────────
+    // â”€â”€ Service Access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * Get or create the EvidenceVaultService instance.
@@ -114,10 +114,10 @@ class EvidenceController extends BaseController
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
     }
 
-    // ── Endpoints ───────────────────────────────────────────────────────────
+    // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * GET listEvidence — List evidence items with optional filters.
+     * GET listEvidence â€” List evidence items with optional filters.
      *
      * Query params:
      *   - type      (string, optional): Evidence type (photo, document, certificate, etc.).
@@ -172,12 +172,13 @@ class EvidenceController extends BaseController
 
             $this->paginated('evidence', array_values($items), $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('evidence_list_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET detail — Single evidence item with chain-of-custody timeline.
+     * GET detail â€” Single evidence item with chain-of-custody timeline.
      *
      * Query params:
      *   - id (string, required): Evidence record ID.
@@ -208,12 +209,13 @@ class EvidenceController extends BaseController
 
             $this->success(['evidence' => $evidence]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('evidence_detail_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST upload — Upload an evidence file (multipart/form-data).
+     * POST upload â€” Upload an evidence file (multipart/form-data).
      *
      * Computes SHA-256 hash and extends the hash chain for tamper detection.
      *
@@ -287,12 +289,13 @@ class EvidenceController extends BaseController
 
             $this->success(['evidence' => $evidence], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('evidence_upload_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST link — Link evidence to an entity (NCR, CAPA, SO, JO, etc.).
+     * POST link â€” Link evidence to an entity (NCR, CAPA, SO, JO, etc.).
      *
      * Body fields:
      *   - evidence_id (string, required): Evidence record ID.
@@ -331,12 +334,13 @@ class EvidenceController extends BaseController
 
             $this->success(['link' => $link]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('evidence_link_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET chainOfCustody — Get custody log for an evidence item.
+     * GET chainOfCustody â€” Get custody log for an evidence item.
      *
      * Query params:
      *   - id (string, required): Evidence record ID.
@@ -363,12 +367,13 @@ class EvidenceController extends BaseController
 
             $this->success(['chain_of_custody' => $custody]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('custody_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET verifyChain — Verify integrity of hash chain (no tampering).
+     * GET verifyChain â€” Verify integrity of hash chain (no tampering).
      *
      * Query params:
      *   - id (string, optional): Verify a single evidence item. If omitted, verifies entire chain.
@@ -390,12 +395,13 @@ class EvidenceController extends BaseController
 
             $this->success(['verification' => $result]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('verify_chain_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET search — Full-text search across evidence titles, descriptions, metadata.
+     * GET search â€” Full-text search across evidence titles, descriptions, metadata.
      *
      * Query params:
      *   - q      (string, required): Search query.
@@ -432,6 +438,7 @@ class EvidenceController extends BaseController
 
             $this->paginated('results', array_values($items), $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('evidence_search_failed', 500, $e->getMessage());
         }
     }

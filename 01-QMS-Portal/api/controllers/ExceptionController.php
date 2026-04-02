@@ -30,7 +30,7 @@ class ExceptionController extends BaseController
     /** @var array|null Cached exception access-control config. */
     private ?array $exceptionConfig = null;
 
-    // ── Service Access ──────────────────────────────────────────────────────
+    // â”€â”€ Service Access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * Get or create the ExceptionService instance.
@@ -119,10 +119,10 @@ class ExceptionController extends BaseController
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
     }
 
-    // ── Endpoints ───────────────────────────────────────────────────────────
+    // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * GET dashboard — Unified exception KPIs.
+     * GET dashboard â€” Unified exception KPIs.
      *
      * Returns open NCRs, open CAPAs, open complaints, COPQ MTD, average age.
      *
@@ -138,12 +138,13 @@ class ExceptionController extends BaseController
 
             $this->success(['kpis' => $kpis]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('exception_dashboard_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET listAll — Unified list across all exception types.
+     * GET listAll â€” Unified list across all exception types.
      *
      * Supports filters: type, severity, status, date_from, date_to,
      * department, assigned_to. Paginated.
@@ -205,12 +206,13 @@ class ExceptionController extends BaseController
 
             $this->paginated('exceptions', array_values($items), $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('exception_list_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET detail — Get single exception detail by type and id.
+     * GET detail â€” Get single exception detail by type and id.
      *
      * Query params:
      *   - type (string, required): Exception type (ncr, capa, complaint, mrb, deviation, concession).
@@ -244,12 +246,13 @@ class ExceptionController extends BaseController
 
             $this->success(['exception' => $record]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('exception_detail_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST createComplaint — Create a customer complaint with 8D template.
+     * POST createComplaint â€” Create a customer complaint with 8D template.
      *
      * Body fields:
      *   - customer_id        (string, required)
@@ -296,12 +299,13 @@ class ExceptionController extends BaseController
 
             $this->success(['complaint' => $complaint], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('complaint_create_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST updateComplaint — Update complaint fields including 8D steps (d1-d8).
+     * POST updateComplaint â€” Update complaint fields including 8D steps (d1-d8).
      *
      * Body fields:
      *   - id (string, required): Complaint record ID.
@@ -354,12 +358,13 @@ class ExceptionController extends BaseController
 
             $this->success(['complaint' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('complaint_update_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST createMrb — Create an MRB (Material Review Board) session.
+     * POST createMrb â€” Create an MRB (Material Review Board) session.
      *
      * Body fields:
      *   - ncr_id     (string, required): Related NCR record ID.
@@ -397,12 +402,13 @@ class ExceptionController extends BaseController
 
             $this->success(['mrb' => $mrb], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('mrb_create_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST updateMrb — Update MRB session with disposition decision.
+     * POST updateMrb â€” Update MRB session with disposition decision.
      *
      * Body fields:
      *   - id         (string, required): MRB record ID.
@@ -456,12 +462,13 @@ class ExceptionController extends BaseController
 
             $this->success(['mrb' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('mrb_update_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST createDeviation — Create a deviation request.
+     * POST createDeviation â€” Create a deviation request.
      *
      * Body fields:
      *   - title       (string, required)
@@ -500,12 +507,13 @@ class ExceptionController extends BaseController
 
             $this->success(['deviation' => $deviation], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('deviation_create_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST updateDeviation — Update a deviation request.
+     * POST updateDeviation â€” Update a deviation request.
      *
      * Body fields:
      *   - id (string, required): Deviation record ID.
@@ -558,12 +566,13 @@ class ExceptionController extends BaseController
 
             $this->success(['deviation' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('deviation_update_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST createConcession — Create a concession request.
+     * POST createConcession â€” Create a concession request.
      *
      * Body fields:
      *   - title       (string, required)
@@ -604,12 +613,13 @@ class ExceptionController extends BaseController
 
             $this->success(['concession' => $concession], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('concession_create_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST updateConcession — Update a concession request.
+     * POST updateConcession â€” Update a concession request.
      *
      * Body fields:
      *   - id (string, required): Concession record ID.
@@ -662,12 +672,13 @@ class ExceptionController extends BaseController
 
             $this->success(['concession' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('concession_update_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST transition — Generic status transition for any exception type.
+     * POST transition â€” Generic status transition for any exception type.
      *
      * Body fields:
      *   - type       (string, required): Exception type.
@@ -707,12 +718,13 @@ class ExceptionController extends BaseController
 
             $this->success(['exception' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('transition_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET copqSummary — COPQ aggregation by period and category.
+     * GET copqSummary â€” COPQ aggregation by period and category.
      *
      * Query params:
      *   - period (string, optional): month, quarter, year (default: month).
@@ -798,12 +810,13 @@ class ExceptionController extends BaseController
 
             $this->success(['copq' => $summary]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('copq_summary_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET trends — Pareto and trend data across exception types.
+     * GET trends â€” Pareto and trend data across exception types.
      *
      * Query params:
      *   - months (int, optional): Number of months to look back (default: 12).
@@ -875,12 +888,13 @@ class ExceptionController extends BaseController
 
             $this->success(['trends' => $trendData]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('trends_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST escalate — Manual escalation trigger for an exception.
+     * POST escalate â€” Manual escalation trigger for an exception.
      *
      * Body fields:
      *   - type   (string, required): Exception type.
@@ -954,6 +968,7 @@ class ExceptionController extends BaseController
 
             $this->success(['escalation' => $record]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('escalation_failed', 500, $e->getMessage());
         }
     }

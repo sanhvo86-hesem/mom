@@ -27,7 +27,7 @@ class AllocationController extends BaseController
     /** @var RecordIdGenerator|null Lazy-loaded ID generator. */
     private ?RecordIdGenerator $idGenerator = null;
 
-    // ── Service Access ──────────────────────────────────────────────────────
+    // â”€â”€ Service Access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * Get or create the AllocationService instance.
@@ -55,10 +55,48 @@ class AllocationController extends BaseController
         return $this->idGenerator;
     }
 
-    // ── Endpoints ───────────────────────────────────────────────────────────
+    /**
+     * @return array<int, string>
+     */
+    private function allocationReadRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            ['qms_engineer', 'qa_manager', 'quality_manager', 'quality_engineer', 'internal_auditor']
+        )));
+    }
 
     /**
-     * POST allocate — Create a new Record-ID allocation.
+     * @return array<int, string>
+     */
+    private function allocationWriteRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            ['qms_engineer', 'qa_manager', 'quality_manager', 'quality_engineer']
+        )));
+    }
+
+    /**
+     * @return void
+     */
+    private function requireAllocationReadAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->allocationReadRoles());
+    }
+
+    /**
+     * @return void
+     */
+    private function requireAllocationWriteAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->allocationWriteRoles());
+    }
+
+    // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    /**
+     * POST allocate â€” Create a new Record-ID allocation.
      *
      * Action: `record_id_generate`
      *
@@ -72,6 +110,7 @@ class AllocationController extends BaseController
     public function allocate(): never
     {
         $user = $this->requireAuth();
+        $this->requireAllocationWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -110,12 +149,13 @@ class AllocationController extends BaseController
                 'allocation' => $result,
             ], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('allocation_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getHistory — Get allocation history with optional filters.
+     * GET getHistory â€” Get allocation history with optional filters.
      *
      * Action: `record_id_history`
      *
@@ -133,7 +173,8 @@ class AllocationController extends BaseController
      */
     public function getHistory(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAllocationReadAccess($user);
 
         $filters = [];
 
@@ -177,12 +218,13 @@ class AllocationController extends BaseController
 
             $this->paginated('allocations', array_values($items), $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('history_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST void — Void an unused allocation.
+     * POST void â€” Void an unused allocation.
      *
      * Action: `record_id_void`
      *
@@ -195,6 +237,7 @@ class AllocationController extends BaseController
     public function void(): never
     {
         $user = $this->requireAuth();
+        $this->requireAllocationWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -228,12 +271,13 @@ class AllocationController extends BaseController
 
             $this->success(['voided' => true]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('void_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET checkDuplicate — Check if a Record-ID already exists.
+     * GET checkDuplicate â€” Check if a Record-ID already exists.
      *
      * Action: `record_id_check_duplicate`
      *
@@ -244,7 +288,8 @@ class AllocationController extends BaseController
      */
     public function checkDuplicate(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAllocationReadAccess($user);
 
         $recordId = $this->query('record_id');
         if ($recordId === null || trim($recordId) === '') {
@@ -261,12 +306,13 @@ class AllocationController extends BaseController
                 'exists'    => $exists,
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('check_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getStatus — Get allocation status by Record-ID or allocation_id.
+     * GET getStatus â€” Get allocation status by Record-ID or allocation_id.
      *
      * Action: `upload_allocation_status`
      *
@@ -278,7 +324,8 @@ class AllocationController extends BaseController
      */
     public function getStatus(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAllocationReadAccess($user);
 
         $recordId     = $this->query('record_id');
         $allocationId = $this->query('allocation_id');
@@ -307,12 +354,13 @@ class AllocationController extends BaseController
 
             $this->success(['allocation' => $allocation]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('status_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET downloadTxt — Generate and download an empty .txt file named with the Record-ID.
+     * GET downloadTxt â€” Generate and download an empty .txt file named with the Record-ID.
      *
      * Action: `record_id_download_txt`
      *
@@ -324,6 +372,7 @@ class AllocationController extends BaseController
     public function downloadTxt(): never
     {
         $user = $this->requireAuth();
+        $this->requireAllocationWriteAccess($user);
 
         $recordId = $this->query('record_id');
         if ($recordId === null || trim($recordId) === '') {
@@ -363,12 +412,13 @@ class AllocationController extends BaseController
             @unlink($filePath);
             exit;
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('download_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getExpandedTypes — Get all record types with optional department filter.
+     * GET getExpandedTypes â€” Get all record types with optional department filter.
      *
      * Action: `record_id_types_expanded`
      *
@@ -379,7 +429,8 @@ class AllocationController extends BaseController
      */
     public function getExpandedTypes(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAllocationReadAccess($user);
 
         $department = $this->query('department');
         if ($department !== null && $department !== '') {
@@ -429,12 +480,13 @@ class AllocationController extends BaseController
 
             $this->success(['record_types' => $result]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('types_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET preview — Preview the next Record-ID without allocating.
+     * GET preview â€” Preview the next Record-ID without allocating.
      *
      * Action: `record_id_preview`
      *
@@ -446,7 +498,8 @@ class AllocationController extends BaseController
      */
     public function preview(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAllocationReadAccess($user);
 
         $recordType = $this->query('record_type');
         if ($recordType === null || trim($recordType) === '') {
@@ -488,11 +541,12 @@ class AllocationController extends BaseController
                 'note'          => 'Preview only. Actual ID assigned on allocation.',
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('preview_failed', 500, $e->getMessage());
         }
     }
 
-    // ── Private Helpers ─────────────────────────────────────────────────────
+    // â”€â”€ Private Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * Find all departments that include a given record type.

@@ -28,10 +28,10 @@ class DispatchController extends BaseController
 
     // nowIso() inherited from BaseController
 
-    // ── Shift Targets (Planner creates dispatch plan) ───────────────────
+    // â”€â”€ Shift Targets (Planner creates dispatch plan) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * GET getTimeline — Gantt-style timeline for a date range.
+     * GET getTimeline â€” Gantt-style timeline for a date range.
      * Shows all machines, their assigned WOs per shift, operators, targets.
      */
     public function getTimeline(): never
@@ -51,7 +51,7 @@ class DispatchController extends BaseController
                 return $d >= $startDate && $d <= $endDate;
             });
 
-            // Group by machine → date → shift
+            // Group by machine â†’ date â†’ shift
             $timeline = [];
             foreach ($filtered as $t) {
                 $mid = $t['machine_id'] ?? '';
@@ -82,12 +82,13 @@ class DispatchController extends BaseController
                 'end_date'   => $endDate,
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('timeline_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST createTarget — Create shift production target (planner dispatches work).
+     * POST createTarget â€” Create shift production target (planner dispatches work).
      */
     public function createTarget(): never
     {
@@ -140,12 +141,13 @@ class DispatchController extends BaseController
 
             $this->success(['target' => $target], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('create_target_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST dispatchTarget — Mark target as dispatched (sent to operator).
+     * POST dispatchTarget â€” Mark target as dispatched (sent to operator).
      */
     public function dispatchTarget(): never
     {
@@ -181,12 +183,13 @@ class DispatchController extends BaseController
             $this->auditLog('dispatch_target', ['target_id' => $targetId], $uid);
             $this->success(['dispatched' => true]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('dispatch_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getOperatorDispatch — Get all dispatched targets for an operator today.
+     * GET getOperatorDispatch â€” Get all dispatched targets for an operator today.
      * This is what the operator sees on their phone.
      */
     public function getOperatorDispatch(): never
@@ -233,12 +236,13 @@ class DispatchController extends BaseController
                 'task_count'  => count($myTasks),
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('operator_dispatch_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST reportProduction — Operator reports shift output (qty good, NG, rework).
+     * POST reportProduction â€” Operator reports shift output (qty good, NG, rework).
      * Can be called multiple times (updates existing log for same target).
      */
     public function reportProduction(): never
@@ -352,12 +356,13 @@ class DispatchController extends BaseController
 
             $this->success(['production_log' => $log]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('report_production_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getDashboard — Dispatch overview with shift summary.
+     * GET getDashboard â€” Dispatch overview with shift summary.
      */
     public function getDashboard(): never
     {
@@ -419,12 +424,13 @@ class DispatchController extends BaseController
                 'logs'               => $logMap,
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('dashboard_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET listTargets — List all targets with filters.
+     * GET listTargets â€” List all targets with filters.
      */
     public function listTargets(): never
     {
@@ -460,12 +466,13 @@ class DispatchController extends BaseController
 
             $this->paginated('targets', array_slice(array_values($filtered), $offset, $limit), count($filtered), $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('list_targets_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST updateTarget — Update an existing target.
+     * POST updateTarget â€” Update an existing target.
      */
     public function updateTarget(): never
     {
@@ -504,6 +511,7 @@ class DispatchController extends BaseController
             $this->auditLog('dispatch_update_target', ['target_id' => $targetId], $uid);
             $this->success(['target' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('update_target_failed', 500, $e->getMessage());
         }
     }
