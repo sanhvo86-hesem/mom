@@ -1637,6 +1637,7 @@ function _buildThresholdSections(type){
 function _buildStatusFlowSections(type){
   return [
     _blockSection('transitions', 'Luồng trạng thái', 'Status transitions', [
+      _blockField('workflowId', 'Workflow từ registry', 'Registry workflow', 'workflow-select', 'config.workflow.workflowId', { default:'', repaintOnChange:true }),
       _blockField('stateField', 'Field trạng thái', 'State field', 'field-select', 'config.workflow.stateField', { default:'status' }),
       _blockField('transitions', 'Danh sách chuyển trạng thái', 'Transition list', 'collection', 'config.workflow.transitions', {
         default:[],
@@ -1653,6 +1654,9 @@ function _buildStatusFlowSections(type){
           _blockField('requireComment', 'Bắt buộc ghi chú', 'Require comment', 'toggle', 'requireComment', { default:false })
         ]
       }),
+      _blockField('showDiagram', 'Hiện sơ đồ trạng thái', 'Show state diagram', 'toggle', 'config.workflow.showDiagram', { default:true }),
+      _blockField('showSla', 'Hiện SLA', 'Show SLA', 'toggle', 'config.workflow.showSla', { default:true }),
+      _blockField('showDigitalThread', 'Hiện digital thread', 'Show digital thread', 'toggle', 'config.workflow.showDigitalThread', { default:true }),
       _blockField('showHistory', 'Hiện lịch sử', 'Show transition history', 'toggle', 'config.workflow.showHistory', { default:true }),
       _blockField('escalationRole', 'Vai trò escalation', 'Escalation role', 'text', 'config.workflow.escalationRole', { default:'' })
     ])
@@ -2152,21 +2156,34 @@ function _buildReactiveContext(moduleId){
   var ms = getModuleState(moduleId);
   var schema = ms._schema;
   var blocksData = {};
+  function registerBlock(block){
+    var blockId = block.id || block.blockId;
+    var alias = _safeBlockBindingKey(blockId);
+    var entry = {
+      data: ms.blockData[blockId] || null,
+      config: block.config || {},
+      type: block.type,
+      selectedRow: ms.activeRows[blockId] || null,
+      selectedRows: _readSelectedRows(ms, blockId),
+      formData: ms.formDrafts[blockId] || {},
+      formErrors: ms.formErrors[blockId] || {},
+    };
+    blocksData[blockId] = entry;
+    blocksData[alias] = entry;
+    if(block.blockId) blocksData[block.blockId] = entry;
+  }
 
   // Build blocks map: blocks.blk_xxx.data = { ... }
   if(schema && schema.tabs){
     schema.tabs.forEach(function(tab){
       (tab.blocks||[]).forEach(function(block){
-        blocksData[block.id] = {
-          data: ms.blockData[block.id] || null,
-          config: block.config || {},
-          type: block.type
-        };
+        registerBlock(block);
       });
     });
   }
 
   return {
+    _moduleId: moduleId,
     data: ms.blockData || {},
     moduleData: ms.blockData || {},
     blocks: blocksData,
@@ -2659,9 +2676,19 @@ function initDragDrop(container, moduleId, tabKey){
  */
 function buildDependencyGraph(schema){
   var graph = {};
+  var aliasMap = {};
   if(!schema || !schema.tabs) return graph;
 
-  var bindingPattern = /\{\{\s*blocks\.(\w+)/g;
+  var bindingPattern = /\{\{\s*blocks\.([A-Za-z0-9_\-]+)/g;
+
+  schema.tabs.forEach(function(tab){
+    (tab.blocks||[]).forEach(function(block){
+      var blockId = block.id || block.blockId;
+      aliasMap[blockId] = blockId;
+      aliasMap[_safeBlockBindingKey(blockId)] = blockId;
+      if(block.blockId) aliasMap[block.blockId] = blockId;
+    });
+  });
 
   schema.tabs.forEach(function(tab){
     (tab.blocks||[]).forEach(function(block){
@@ -2676,7 +2703,7 @@ function buildDependencyGraph(schema){
 
       var match;
       while((match = bindingPattern.exec(configStr)) !== null){
-        var depId = match[1];
+        var depId = aliasMap[match[1]] || match[1];
         if(depId !== block.id && deps.indexOf(depId) < 0){
           deps.push(depId);
         }
@@ -2721,9 +2748,10 @@ function refreshDependents(moduleId, changedBlockId){
     if(block.config && block.config.dataSource){
       invalidateCache(block.config.dataSource.api);
       ms.loading[bid] = true;
-      fetchBlockData(block).then(function(data){
+      fetchBlockData(block, moduleId).then(function(data){
         ms.loading[bid] = false;
         ms.blockData[bid] = data;
+        if(_currentContainer && ms._schema) _rerenderBlockContent(_currentContainer, block, data, ms);
         // Cascade: check if this block also has dependents
         refreshDependents(moduleId, bid);
       });
@@ -3815,6 +3843,9 @@ function getModuleState(moduleId){
     _moduleStates[moduleId] = {
       activeTab: null,
       blockData: {},
+      renderedRows: {},
+      activeRows: {},
+      activeRowIndex: {},
       tableStates: {},
       editMode: false,
       selectedBlock: null,
@@ -3823,6 +3854,8 @@ function getModuleState(moduleId){
       customState: {},
       navParams: {},
       inlineEdits: {},
+      formDrafts: {},
+      formErrors: {},
       selectedRows: {},
       expandedRows: {},
       columnVisibility: {},
@@ -3831,19 +3864,50 @@ function getModuleState(moduleId){
   return _moduleStates[moduleId];
 }
 
+function _safeBlockBindingKey(value){
+  var text = String(value == null ? '' : value).replace(/[^A-Za-z0-9_]/g, '_');
+  if(!text) return 'block_ref';
+  if(/^[0-9]/.test(text)) text = 'block_' + text;
+  return text;
+}
+
+function _readSelectedRows(ms, blockId){
+  var rows = ms.renderedRows[blockId] || [];
+  var selected = [];
+  var map = ms.selectedRows[blockId] || {};
+  Object.keys(map).forEach(function(idx){
+    var absIdx = parseInt(idx, 10);
+    if(map[idx] && rows[absIdx]) selected.push(rows[absIdx]);
+  });
+  return selected;
+}
+
 /* ── Data Fetching per Block ─────────────────────────────────────────── */
 var _fetchCache = {};  // key = action+JSON(params) -> { promise, ts }
 var CACHE_TTL = 60000; // 60 s
 
-function fetchBlockData(block){
+function fetchBlockData(block, moduleId){
   var ds = block.config && block.config.dataSource;
+  var params = ds ? (ds.params || {}) : {};
+  var context;
+  var cacheKey;
+  var cached;
+  var p;
   if(!ds || !ds.api) return Promise.resolve(null);
 
-  var cacheKey = ds.api + '|' + JSON.stringify(ds.params||{});
-  var cached = _fetchCache[cacheKey];
+  if(moduleId){
+    context = _buildReactiveContext(moduleId);
+    context._moduleId = moduleId;
+    context.block = block || {};
+    context.data = getModuleState(moduleId).blockData[block.id || block.blockId] || {};
+    try { params = _resolveBindings(params, context); } catch(err){ params = ds.params || {}; }
+  }
+
+  cacheKey = ds.api + '|' + JSON.stringify(params||{});
+  cached = _fetchCache[cacheKey];
   if(cached && (Date.now()-cached.ts) < CACHE_TTL) return cached.promise;
 
-  var p = _api(ds.api, ds.params||{}, ds.method||'GET').then(function(resp){
+  p = _api(ds.api, params||{}, ds.method||'GET').then(function(resp){
     if(!resp) return null;
     if(ds.dataKey) return resp[ds.dataKey] !== undefined ? resp[ds.dataKey] : resp.data;
     return resp.data || resp;
@@ -3941,6 +4005,7 @@ function renderModuleFromSchema(container, schema, options){
   var moduleId = schema.moduleId;
   var state = getModuleState(moduleId);
   state._schema = schema;
+  container.setAttribute('data-module', moduleId);
 
   // Track current module for keyboard shortcuts
   _currentModuleId = moduleId;
@@ -4045,7 +4110,7 @@ function renderModuleFromSchema(container, schema, options){
       if(block.config && block.config.dataSource){
         state.loading[block.id] = true;
         _showBlockLoading(container, block.id);
-        fetchBlockData(block).then(function(data){
+        fetchBlockData(block, moduleId).then(function(data){
           state.loading[block.id] = false;
           state.blockData[block.id] = data;
           _rerenderBlockContent(container, block, data, state);
@@ -4069,7 +4134,7 @@ function renderModuleFromSchema(container, schema, options){
           (block.slots[slotKey]||[]).forEach(function(child){
             if(child.config && child.config.dataSource){
               state.loading[child.id] = true;
-              fetchBlockData(child).then(function(data){
+              fetchBlockData(child, moduleId).then(function(data){
                 state.loading[child.id] = false;
                 state.blockData[child.id] = data;
               });
@@ -4200,9 +4265,21 @@ function _attachModuleEvents(container, moduleId){
   container.removeEventListener('click', container._hmClick);
   container._hmClick = function(e){
     var btn = e.target.closest('[data-action]');
-    if(!btn) return;
+    var rowEl;
+    if(!btn){
+      rowEl = e.target.closest('.hm-table-row[data-row-abs]');
+      if(rowEl && !e.target.closest('input,button,select,textarea,a,label')){
+        _activateTableRow(container, moduleId, rowEl);
+      }
+      return;
+    }
     var action = btn.getAttribute('data-action');
     var state = getModuleState(moduleId);
+    rowEl = btn.closest('.hm-table-row[data-row-abs]');
+    if(rowEl && btn === rowEl){
+      _activateTableRow(container, moduleId, rowEl);
+      if(action === 'hm-table-row-click') return;
+    }
 
     switch(action){
       case 'hm-toggle-edit':
@@ -4286,6 +4363,9 @@ function _attachModuleEvents(container, moduleId){
       case 'hm-table-export':
         _handleTableExport(moduleId, btn);
         break;
+      case 'hm-status-transition':
+        _handleStatusTransition(container, moduleId, btn);
+        break;
       case 'hm-add-from-template':
         var tplKey = btn.getAttribute('data-template');
         if(tplKey && BLOCK_TEMPLATES[tplKey]){
@@ -4334,6 +4414,10 @@ function _attachModuleEvents(container, moduleId){
   container.removeEventListener('input', container._hmInput);
   container._hmInput = _debounce(function(e){
     var el = e.target;
+    var formEl = el.form || el.closest('[data-hm-form-block]');
+    if(formEl && formEl.getAttribute && formEl.getAttribute('data-hm-form-block')){
+      _storeFormDraftFromElement(moduleId, formEl);
+    }
     if(el.hasAttribute('data-filter')){
       var blockEl = el.closest('.hm-block');
       if(blockEl) _handleFilterChange(container, moduleId, blockEl.getAttribute('data-block-id'));
@@ -4349,6 +4433,10 @@ function _attachModuleEvents(container, moduleId){
   container.removeEventListener('change', container._hmChange);
   container._hmChange = function(e){
     var el = e.target;
+    var formEl = el.form || el.closest('[data-hm-form-block]');
+    if(formEl && formEl.getAttribute && formEl.getAttribute('data-hm-form-block')){
+      _storeFormDraftFromElement(moduleId, formEl);
+    }
     if(el.hasAttribute('data-action')){
       var act = el.getAttribute('data-action');
       if(act === 'hm-table-pagesize'){
@@ -4361,6 +4449,16 @@ function _attachModuleEvents(container, moduleId){
     }
   };
   container.addEventListener('change', container._hmChange);
+
+  container.removeEventListener('submit', container._hmSubmit);
+  container._hmSubmit = function(e){
+    var formEl = e.target;
+    if(formEl && formEl.matches && formEl.matches('form[data-hm-form-block]')){
+      e.preventDefault();
+      _handleFormSubmit(container, moduleId, formEl);
+    }
+  };
+  container.addEventListener('submit', container._hmSubmit);
 }
 
 function _debounce(fn, ms){
@@ -4396,6 +4494,217 @@ function _findBlockById(schema, blockId){
 
 /* ── Render Block ────────────────────────────────────────────────────── */
 
+function _findActiveTab(moduleId){
+  var ms = getModuleState(moduleId);
+  var schema = ms._schema;
+  var tabs = schema && schema.tabs ? schema.tabs : [];
+  var found = null;
+  tabs.forEach(function(tab){
+    if(tab.tabId === ms.activeTab) found = tab;
+  });
+  return found || tabs[0] || null;
+}
+
+function _getBlockEntity(block){
+  var config = block && block.config ? block.config : {};
+  return config.entity || (config.workflow && config.workflow.entity) || '';
+}
+
+function _getFieldLabel(field){
+  if(!field) return '';
+  if(field.label && typeof field.label === 'object'){
+    return _t(field.label.vi || field.label.en || field.key || '', field.label.en || field.label.vi || field.key || '');
+  }
+  return _t(field.label || field.key || '', field.labelEn || field.label || field.key || '');
+}
+
+function _readFormDataFromElement(formEl){
+  var data = {};
+  if(!formEl || !formEl.elements) return data;
+  Array.prototype.forEach.call(formEl.elements, function(el){
+    if(!el.name || el.disabled) return;
+    if(el.type === 'checkbox'){
+      data[el.name] = !!el.checked;
+      return;
+    }
+    if(el.type === 'radio' && !el.checked) return;
+    data[el.name] = el.value;
+  });
+  return data;
+}
+
+function _storeFormDraftFromElement(moduleId, formEl){
+  var ms = getModuleState(moduleId);
+  var blockId = formEl && formEl.getAttribute ? formEl.getAttribute('data-hm-form-block') : '';
+  var formData = _readFormDataFromElement(formEl);
+  if(blockId) ms.formDrafts[blockId] = formData;
+  return formData;
+}
+
+function _fieldSeverity(field){
+  var rules = field && field.validationRules ? field.validationRules : [];
+  return rules.length ? (rules[0].severity || 'error') : 'error';
+}
+
+function _findCompanionFormBlock(moduleId, entity){
+  var tab = _findActiveTab(moduleId);
+  var match = null;
+  var normalizedEntity = String(entity || '').toLowerCase();
+  (tab && tab.blocks || []).forEach(function(block){
+    if(match || !block || block.type !== 'form-standard') return;
+    if(!normalizedEntity || String(_getBlockEntity(block) || '').toLowerCase() === normalizedEntity){
+      match = block;
+    }
+  });
+  return match;
+}
+
+function _workflowGuardReasons(transition, formData, context){
+  var reasons = [];
+  var guards = transition && transition.guards ? transition.guards : [];
+  var userInfo = context.currentUser || context.user || {};
+  var userRoles = Array.isArray(userInfo.roles) ? userInfo.roles.slice() : [];
+  if(userInfo.role) userRoles.push(userInfo.role);
+  guards.forEach(function(guard){
+    var fieldValue;
+    if(!guard) return;
+    if(guard.type === 'role'){
+      var roles = guard.roles || [];
+      var allowed = roles.some(function(role){ return userRoles.indexOf(role) >= 0; });
+      if(!allowed) reasons.push(guard.message || _t('Bạn không có quyền thực hiện chuyển trạng thái này.', 'You do not have permission to run this transition.'));
+    } else if(guard.type === 'fieldRequired'){
+      fieldValue = formData ? formData[guard.field] : null;
+      if(fieldValue === '' || fieldValue === null || fieldValue === undefined){
+        reasons.push(guard.message || (_t('Thiếu trường bắt buộc: ', 'Missing required field: ') + guard.field));
+      }
+    }
+  });
+  return reasons;
+}
+
+function _activateTableRow(container, moduleId, rowEl){
+  var ms = getModuleState(moduleId);
+  var blockId = rowEl.getAttribute('data-block-id');
+  var absIdx = parseInt(rowEl.getAttribute('data-row-abs'), 10);
+  if(!blockId || isNaN(absIdx)) return;
+  ms.activeRowIndex[blockId] = absIdx;
+  ms.activeRows[blockId] = (ms.renderedRows[blockId] || [])[absIdx] || null;
+  refreshDependents(moduleId, blockId);
+  renderModuleFromSchema(container, ms._schema);
+}
+
+function _handleFormSubmit(container, moduleId, formEl){
+  var ms = getModuleState(moduleId);
+  var blockId = formEl.getAttribute('data-hm-form-block');
+  var block = _findBlockById(ms._schema, blockId);
+  var formData = _storeFormDraftFromElement(moduleId, formEl);
+  var context = _buildReactiveContext(moduleId);
+  var validationResult = { valid:true, errors:{} };
+  var submitConfig;
+  if(!block) return;
+  context._moduleId = moduleId;
+  context._container = container;
+  context.block = block;
+  context.formData = formData;
+  if(!(block.config && block.config.validation && block.config.validation.autoApply === false)){
+    validationResult = validateForm(block.config.fields || [], formData, context);
+  }
+  ms.formErrors[blockId] = validationResult.errors || {};
+  showValidationErrors(formEl, validationResult.errors || {});
+  if(!validationResult.valid){
+    toast(_t('Biểu mẫu còn lỗi validation.', 'The form still has validation errors.'), 'danger');
+    return;
+  }
+  submitConfig = block.config.submit || {};
+  if(!submitConfig.api){
+    toast(_t('Biểu mẫu hợp lệ và đã được lưu trong phiên làm việc.', 'The form is valid and has been stored in the current session.'), 'success');
+    renderModuleFromSchema(container, ms._schema);
+    return;
+  }
+  _api(submitConfig.api, formData, submitConfig.method || 'POST').then(function(resp){
+    ms.blockData[blockId] = resp && resp.data ? resp.data : formData;
+    ms.formErrors[blockId] = {};
+    toast(_t('Đã gửi biểu mẫu thành công.', 'Form submitted successfully.'), 'success');
+    invalidateCache(submitConfig.api);
+    renderModuleFromSchema(container, ms._schema);
+  }).catch(function(err){
+    toast(_t('Gửi biểu mẫu thất bại.', 'Form submission failed.'), 'danger');
+    console.warn('[BlockEngine] form submit failed', err);
+  });
+}
+
+function _handleStatusTransition(container, moduleId, btn){
+  var ms = getModuleState(moduleId);
+  var blockId = btn.getAttribute('data-block-id');
+  var transitionIndex = parseInt(btn.getAttribute('data-transition-index'), 10);
+  var block = _findBlockById(ms._schema, blockId);
+  var workflow = block && block.config ? (block.config.workflow || {}) : {};
+  var transitions = workflow.transitions || [];
+  var transition = transitions[transitionIndex];
+  var formBlock = _findCompanionFormBlock(moduleId, workflow.entity);
+  var formEl = formBlock ? container.querySelector('[data-hm-form-block="'+formBlock.id+'"]') : null;
+  var formData = formEl ? _storeFormDraftFromElement(moduleId, formEl) : (formBlock ? (ms.formDrafts[formBlock.id] || ms.blockData[formBlock.id] || {}) : {});
+  var context = _buildReactiveContext(moduleId);
+  var reasons;
+  var validationResult;
+  var payload;
+  if(!block || !transition) return;
+  context._moduleId = moduleId;
+  context._container = container;
+  context.block = block;
+  if(formBlock && !(formBlock.config && formBlock.config.validation && formBlock.config.validation.autoApply === false)){
+    validationResult = validateForm(formBlock.config.fields || [], formData, context);
+    ms.formErrors[formBlock.id] = validationResult.errors || {};
+    if(formEl) showValidationErrors(formEl, ms.formErrors[formBlock.id]);
+    if(validationResult && !validationResult.valid){
+      toast(_t('Biểu mẫu còn lỗi, chưa thể chuyển trạng thái.', 'The form still has errors, so the transition cannot continue.'), 'warning');
+      return;
+    }
+  }
+  reasons = _workflowGuardReasons(transition, formData, context);
+  if(reasons.length){
+    if(formBlock){
+      if(!ms.formErrors[formBlock.id]) ms.formErrors[formBlock.id] = {};
+      (transition.guards || []).forEach(function(guard){
+        if(guard && guard.type === 'fieldRequired' && (formData[guard.field] === '' || formData[guard.field] == null)){
+          ms.formErrors[formBlock.id][guard.field] = { message: guard.message || (_t('Thiếu trường bắt buộc: ', 'Missing required field: ') + guard.field), severity:'error' };
+        }
+      });
+      if(formEl) showValidationErrors(formEl, ms.formErrors[formBlock.id]);
+    }
+    toast(reasons[0], 'warning');
+    return;
+  }
+  if(transition.confirmMessage && !confirm(_t(transition.confirmMessage, transition.confirmMessageEn || transition.confirmMessage))) return;
+  payload = {
+    from: transition.from,
+    to: transition.to,
+    entity: workflow.entity || '',
+    data: formData
+  };
+  if(formData && workflow.stateField) formData[workflow.stateField] = transition.to;
+  if(formBlock) ms.formDrafts[formBlock.id] = formData;
+  function applyLocalTransition(){
+    if(ms.blockData[blockId] && typeof ms.blockData[blockId] === 'object' && workflow.stateField){
+      ms.blockData[blockId][workflow.stateField] = transition.to;
+    }
+    toast(_t('Đã chuyển trạng thái sang ', 'Transitioned to ') + transition.to, 'success');
+    refreshDependents(moduleId, blockId);
+    renderModuleFromSchema(container, ms._schema);
+  }
+  if(transition.endpoint){
+    _api(transition.endpoint, payload, transition.method || 'POST').then(function(){
+      invalidateCache(transition.endpoint);
+      applyLocalTransition();
+    }).catch(function(err){
+      toast(_t('Chuyển trạng thái thất bại.', 'Transition failed.'), 'danger');
+      console.warn('[BlockEngine] transition failed', err);
+    });
+  } else {
+    applyLocalTransition();
+  }
+}
+
 function renderBlock(block, data, state){
   if(!block) return '';
   var blockClasses = getBlockClasses(block);
@@ -4426,6 +4735,7 @@ function _renderBlockInner(block, data, state, reactiveCtx){
     blockCtx.filters = (state && state.filterValues) || reactiveCtx.filters || {};
     try { resolvedConfig = _resolveBindings(config, blockCtx); } catch(e){ resolvedConfig = config; }
   }
+  if(block.type === 'action-status-flow') renderType = 'action-status-flow';
 
   switch(renderType){
     case 'kpi-row':         return renderKpiRow(resolvedConfig, data);
@@ -4436,10 +4746,11 @@ function _renderBlockInner(block, data, state, reactiveCtx){
     case 'info-banner':     return renderInfoBanner(resolvedConfig);
     case 'chart-bar':       return renderBarChart(resolvedConfig, data);
     case 'chart-donut':     return renderDonutChart(resolvedConfig, data);
+    case 'action-status-flow': return renderStatusFlow(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx);
     case 'action-toolbar':  return renderToolbar(resolvedConfig, data);
     case 'data-cards':      return renderCardGrid(resolvedConfig, data);
     case 'data-timeline':   return renderTimeline(resolvedConfig, data);
-    case 'form-standard':   return renderFormStandard(resolvedConfig, data);
+    case 'form-standard':   return renderFormStandard(resolvedConfig, data, blockCtx || reactiveCtx, block);
     case 'two-column':
       var columnBlock = _clone(block);
       columnBlock.config = resolvedConfig;
@@ -4590,6 +4901,10 @@ function renderAdvancedTableV3(config, data, state, blockId, reactiveCtx){
   if(ts.page > totalPages) ts.page = totalPages;
   var startIdx = (ts.page - 1) * ts.pageSize;
   var pageRows = rows.slice(startIdx, startIdx + ts.pageSize);
+  ms.renderedRows[blockId] = rows;
+  if(ms.activeRowIndex[blockId] != null){
+    ms.activeRows[blockId] = rows[ms.activeRowIndex[blockId]] || null;
+  }
 
   // Aggregation calculations
   var aggregations = _computeAggregations(visibleColumns, rows);
@@ -4725,9 +5040,9 @@ function renderAdvancedTableV3(config, data, state, blockId, reactiveCtx){
 
   pageRows.forEach(function(row, ri){
     var absIdx = startIdx + ri;
-    var rowAction = config.rowAction ? ' data-action="'+_esc(config.rowAction)+'"' : '';
-    var rowSelected = ms.selectedRows[blockId] && ms.selectedRows[blockId][absIdx];
-    html += '<tr class="hm-table-row'+(rowSelected?' hm-row-selected':'')+'" data-row-idx="'+ri+'"'+rowAction+' style="cursor:'+(config.rowAction?'pointer':'default')+'">';
+    var rowAction = config.rowAction || 'hm-table-row-click';
+    var rowSelected = (ms.selectedRows[blockId] && ms.selectedRows[blockId][absIdx]) || ms.activeRowIndex[blockId] === absIdx;
+    html += '<tr class="hm-table-row'+(rowSelected?' hm-row-selected':'')+'" data-action="'+_esc(rowAction)+'" data-row-idx="'+ri+'" data-row-abs="'+absIdx+'" data-block-id="'+_esc(blockId)+'" data-row-action="'+_esc(config.rowAction || '')+'" style="cursor:pointer">';
 
     // Selection checkbox
     if(config.selectable){
@@ -4924,6 +5239,14 @@ function _handleRowSelect(moduleId, btn){
   var ms = getModuleState(moduleId);
   if(!ms.selectedRows[blockId]) ms.selectedRows[blockId] = {};
   ms.selectedRows[blockId][rowIdx] = btn.checked;
+  if(btn.checked){
+    ms.activeRowIndex[blockId] = rowIdx;
+    ms.activeRows[blockId] = (ms.renderedRows[blockId] || [])[rowIdx] || null;
+  } else if(ms.activeRowIndex[blockId] === rowIdx){
+    ms.activeRowIndex[blockId] = null;
+    ms.activeRows[blockId] = null;
+  }
+  refreshDependents(moduleId, blockId);
 }
 
 function _handleSelectAll(moduleId, btn){
@@ -4936,6 +5259,10 @@ function _handleSelectAll(moduleId, btn){
   for(var i = startIdx; i < startIdx + ts.pageSize; i++){
     ms.selectedRows[blockId][i] = btn.checked;
   }
+  if(btn.checked){
+    ms.activeRowIndex[blockId] = startIdx;
+    ms.activeRows[blockId] = (ms.renderedRows[blockId] || [])[startIdx] || null;
+  }
   // Update individual checkboxes
   var container = btn.closest('.hm-block');
   if(container){
@@ -4943,6 +5270,7 @@ function _handleSelectAll(moduleId, btn){
       cb.checked = btn.checked;
     });
   }
+  refreshDependents(moduleId, blockId);
 }
 
 /* --- Row Expansion --- */
@@ -5253,6 +5581,69 @@ function renderToolbar(config, data){
   return html;
 }
 
+function renderStatusFlow(config, data, state, blockId, reactiveCtx){
+  var workflow = config.workflow || {};
+  var transitions = workflow.transitions || [];
+  var states = workflow.states || [];
+  var moduleId = state && state._schema ? state._schema.moduleId : '';
+  var ms = moduleId ? getModuleState(moduleId) : null;
+  var companionForm = moduleId ? _findCompanionFormBlock(moduleId, workflow.entity) : null;
+  var formData = companionForm && ms ? (ms.formDrafts[companionForm.id] || ms.blockData[companionForm.id] || {}) : {};
+  var stateField = workflow.stateField || 'status';
+  var currentState = formData[stateField] || (data && data[stateField]) || (states[0] && (states[0].id || states[0].value)) || '';
+  var html = '<div class="hm-status-flow" style="display:grid;gap:14px">';
+  if(!transitions.length){
+    return '<div class="hm-empty">'+_t('Chưa cấu hình workflow cho block này', 'No workflow has been configured for this block')+'</div>';
+  }
+  if(config.workflow && config.workflow.showDiagram !== false && states.length){
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">';
+    states.forEach(function(item, idx){
+      var stateId = item.id || item.value || '';
+      var active = stateId === currentState;
+      html += '<div style="padding:8px 12px;border-radius:999px;border:1px solid '+(active ? 'var(--brand-2,#2563eb)' : 'var(--border,#cbd5e1)')+';background:'+(active ? 'rgba(37,99,235,0.08)' : '#fff')+';font-weight:'+(active ? '700' : '600')+'">'+_esc(_t(item.label || stateId, item.labelEn || item.label || stateId))+'</div>';
+      if(idx < states.length - 1) html += '<span style="color:var(--text-tertiary)">→</span>';
+    });
+    html += '</div>';
+  }
+  html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  transitions.forEach(function(transition, idx){
+    var reasons = _workflowGuardReasons(transition, formData, reactiveCtx || {});
+    var disabled = currentState && transition.from && transition.from !== currentState;
+    var title = '';
+    if(disabled){
+      title = _t('Chỉ khả dụng khi trạng thái hiện tại là ', 'Only available when the current state is ') + transition.from;
+    } else if(reasons.length){
+      disabled = true;
+      title = reasons.join(' • ');
+    }
+    html += '<button class="hm-btn hm-btn-'+_esc(transition.variant || 'secondary')+'" data-action="hm-status-transition" data-block-id="'+_esc(blockId)+'" data-transition-index="'+idx+'"'+(disabled ? ' disabled' : '')+(title ? ' title="'+_esc(title)+'"' : '')+'>';
+    if(transition.icon) html += '<span class="hm-btn-icon">'+_esc(transition.icon)+'</span> ';
+    html += _esc(_t(transition.label && transition.label.vi || transition.label || transition.to, transition.label && transition.label.en || transition.labelEn || transition.label || transition.to));
+    html += '</button>';
+  });
+  html += '</div>';
+  if(config.workflow && config.workflow.showSla !== false && workflow.sla && Object.keys(workflow.sla).length){
+    html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">';
+    Object.keys(workflow.sla).slice(0, 4).forEach(function(key){
+      var item = workflow.sla[key] || {};
+      html += '<div style="padding:10px 12px;border:1px solid var(--border,#cbd5e1);border-radius:14px;background:#fff"><div style="font-size:11px;color:var(--text-tertiary)">'+_esc(key)+'</div><div style="font-size:18px;font-weight:700">'+_esc(String(item.hours || 0))+'h</div><div style="font-size:12px;color:var(--text-secondary)">'+_esc(item.escalateTo || '')+'</div></div>';
+    });
+    html += '</div>';
+  }
+  if(config.workflow && config.workflow.showDigitalThread !== false && workflow.digitalThread){
+    html += '<div style="padding:12px 14px;border:1px solid rgba(15,118,110,0.22);border-radius:16px;background:rgba(15,118,110,0.05)">';
+    html += '<div style="font-weight:700;color:#0f766e;margin-bottom:6px">'+_t('Digital thread', 'Digital thread')+'</div>';
+    if((workflow.digitalThread.upstreamTriggers || []).length){
+      html += '<div style="font-size:12px;color:var(--text-secondary)"><strong>'+_t('Upstream', 'Upstream')+':</strong> '+_esc(workflow.digitalThread.upstreamTriggers.join(', '))+'</div>';
+    }
+    if((workflow.digitalThread.downstreamEffects || []).length){
+      html += '<div style="font-size:12px;color:var(--text-secondary);margin-top:4px"><strong>'+_t('Downstream', 'Downstream')+':</strong> '+_esc(workflow.digitalThread.downstreamEffects.join(', '))+'</div>';
+    }
+    html += '</div>';
+  }
+  return html + '</div>';
+}
+
 /* --- Card Grid --- */
 function renderCardGrid(config, data){
   var items = (data && data[config.dataKey]) || [];
@@ -5298,29 +5689,59 @@ function renderTimeline(config, data){
 }
 
 /* --- Form Standard --- */
-function renderFormStandard(config, data){
+function renderFormStandard(config, data, reactiveCtx, block){
   var fields = config.fields || [];
   var cols = config.columns || 2;
-  var html = '<form class="hm-form" style="display:grid;grid-template-columns:repeat('+cols+',1fr);gap:var(--space-4)" onsubmit="return false">';
+  var moduleId = reactiveCtx && reactiveCtx._moduleId ? reactiveCtx._moduleId : '';
+  var blockId = block ? (block.id || block.blockId || '') : '';
+  var ms = moduleId ? getModuleState(moduleId) : null;
+  var formData = {};
+  var errors = ms && blockId ? (ms.formErrors[blockId] || {}) : {};
+  var html;
+  Object.keys(data || {}).forEach(function(key){ formData[key] = data[key]; });
+  if(ms && blockId && ms.formDrafts[blockId]){
+    Object.keys(ms.formDrafts[blockId]).forEach(function(key){ formData[key] = ms.formDrafts[blockId][key]; });
+  }
+  html = '<form class="hm-form" data-hm-form-block="'+_esc(blockId)+'" data-entity="'+_esc(config.entity || '')+'" style="display:grid;grid-template-columns:repeat('+cols+',1fr);gap:var(--space-4)" onsubmit="return false" novalidate>';
   fields.forEach(function(f){
-    var span = f.span || 1;
-    html += '<div class="hm-form-group" style="grid-column:span '+span+'">';
-    html += '<label class="hm-label">'+_esc(_t(f.label||'',f.labelEn||''))+(f.required?' <span class="hm-required">*</span>':'')+'</label>';
-    var val = (data && data[f.key]!=null) ? data[f.key] : (f.default||'');
+    var span = f.span === 'full' ? '1 / -1' : ('span ' + (f.span === 'half' ? 1 : (parseInt(f.span, 10) || 1)));
+    var validation = config.validation && config.validation.autoApply === false ? {} : (f.validation || {});
+    var val = formData[f.key] != null ? formData[f.key] : (f.default || '');
+    var placeholder = '';
+    var attrs = '';
+    var error = errors[f.key];
+    if(f.placeholder && typeof f.placeholder === 'object') placeholder = _t(f.placeholder.vi || '', f.placeholder.en || f.placeholder.vi || '');
+    else placeholder = _t(f.placeholder || '', f.placeholderEn || f.placeholder || '');
+    if(f.required || validation.required) attrs += ' required';
+    if(validation.min != null) attrs += ' min="'+_esc(String(validation.min))+'"';
+    if(validation.max != null) attrs += ' max="'+_esc(String(validation.max))+'"';
+    if(validation.minLength != null) attrs += ' minlength="'+_esc(String(validation.minLength))+'"';
+    if(validation.maxLength != null) attrs += ' maxlength="'+_esc(String(validation.maxLength))+'"';
+    if(validation.pattern) attrs += ' pattern="'+_esc(validation.pattern)+'"';
+    html += '<div class="hm-form-group" style="grid-column:'+span+'">';
+    html += '<label class="hm-label">'+_esc(_getFieldLabel(f))+(f.required || validation.required ? ' <span class="hm-required">*</span>' : '')+'</label>';
     if(f.type==='textarea'){
-      html += '<textarea class="hm-input hm-textarea" name="'+_esc(f.key)+'" rows="'+(f.rows||3)+'"'+(f.required?' required':'')+'>'+_esc(val)+'</textarea>';
+      html += '<textarea class="hm-input hm-textarea'+(error ? ' hm-field-invalid' : '')+'" name="'+_esc(f.key)+'" rows="'+(f.rows||3)+'"'+attrs+(placeholder ? ' placeholder="'+_esc(placeholder)+'"' : '')+'>'+_esc(val)+'</textarea>';
     } else if(f.type==='select'){
-      html += '<select class="hm-input hm-select" name="'+_esc(f.key)+'"'+(f.required?' required':'')+'>';
+      html += '<select class="hm-input hm-select'+(error ? ' hm-field-invalid' : '')+'" name="'+_esc(f.key)+'"'+attrs+'>';
       html += '<option value="">'+_t('Chon...','Select...')+'</option>';
       (f.options||[]).forEach(function(opt){
         var sel = String(val)===String(opt.value) ? ' selected' : '';
-        html += '<option value="'+_esc(opt.value)+'"'+sel+'>'+_esc(_t(opt.label,opt.labelEn||opt.label))+'</option>';
+        html += '<option value="'+_esc(opt.value)+'"'+sel+'>'+_esc(_t(opt.label && opt.label.vi || opt.label || '', opt.label && opt.label.en || opt.labelEn || opt.label || ''))+'</option>';
       });
       html += '</select>';
     } else if(f.type==='checkbox'){
       html += '<label class="hm-checkbox-label"><input type="checkbox" name="'+_esc(f.key)+'"'+(val?' checked':'')+'> '+_esc(_t(f.checkLabel||'',f.checkLabelEn||''))+'</label>';
     } else {
-      html += '<input type="'+(f.type||'text')+'" class="hm-input" name="'+_esc(f.key)+'" value="'+_esc(val)+'"'+(f.required?' required':'')+(f.placeholder?' placeholder="'+_esc(_t(f.placeholder,f.placeholderEn||f.placeholder))+'"':'')+'>';
+      var inputType = f.type || 'text';
+      if(inputType === 'string' || inputType === 'badge') inputType = 'text';
+      if(inputType === 'integer') inputType = 'number';
+      if(inputType === 'currency' || inputType === 'percent' || inputType === 'percentage') inputType = 'number';
+      if(inputType === 'datetime') inputType = 'datetime-local';
+      html += '<input type="'+inputType+'" class="hm-input'+(error ? ' hm-field-invalid' : '')+'" name="'+_esc(f.key)+'" value="'+_esc(val)+'"'+attrs+(placeholder ? ' placeholder="'+_esc(placeholder)+'"' : '')+'>';
+    }
+    if(error){
+      html += '<div class="hm-field-error hm-field-error-'+_esc((error.severity || _fieldSeverity(f)).toLowerCase())+'" role="alert">'+_esc(error.message || error)+'</div>';
     }
     html += '</div>';
   });
@@ -5826,6 +6247,7 @@ window.HmBlockEngine = {
   renderBarChart: renderBarChart,
   renderDonutChart: renderDonutChart,
   renderToolbar: renderToolbar,
+  renderStatusFlow: renderStatusFlow,
   renderCardGrid: renderCardGrid,
   renderTimeline: renderTimeline,
   renderFormStandard: renderFormStandard,
@@ -6003,6 +6425,10 @@ function validateField(value, rules, context) {
     return { valid: false, message: rules.patternMessage || _t('Định dạng không đúng', 'Invalid format') };
   }
 
+  if (rules.enum && Array.isArray(rules.enum) && rules.enum.length && rules.enum.indexOf(value) < 0) {
+    return { valid: false, message: _t('Giá trị không nằm trong danh sách hợp lệ', 'Value is not in the allowed list') };
+  }
+
   // Numeric range
   if (rules.min !== undefined && Number(value) < rules.min) {
     return { valid: false, message: _t('Tối thiểu ' + rules.min, 'Minimum ' + rules.min) };
@@ -6030,7 +6456,7 @@ function validateForm(fields, formData, context) {
     if (!field.validation) return;
     var result = validateField(formData[field.key], field.validation, context);
     if (!result.valid) {
-      errors[field.key] = result.message;
+      errors[field.key] = { message: result.message, severity: _fieldSeverity(field) };
       valid = false;
     }
   });
@@ -6049,12 +6475,15 @@ function showValidationErrors(container, errors) {
   if (!errors) return;
   Object.keys(errors).forEach(function (key) {
     var input = container.querySelector('[name="' + key + '"]');
+    var errorInfo = errors[key];
+    var message = errorInfo && typeof errorInfo === 'object' ? errorInfo.message : errorInfo;
+    var severity = errorInfo && typeof errorInfo === 'object' ? (errorInfo.severity || 'error') : 'error';
     if (!input) return;
     input.classList.add('hm-field-invalid');
     var errEl = document.createElement('div');
-    errEl.className = 'hm-field-error';
+    errEl.className = 'hm-field-error hm-field-error-' + severity;
     errEl.setAttribute('role', 'alert');
-    errEl.textContent = errors[key];
+    errEl.textContent = message;
     input.parentNode.insertBefore(errEl, input.nextSibling);
   });
 }
@@ -6112,7 +6541,7 @@ function startAutoRefresh(moduleId, blockId, intervalSeconds) {
     if (state && !state.editMode && !document.hidden) {
       var block = _findBlockInSchema(moduleId, blockId);
       if (block) {
-        fetchBlockData(block).then(function () { _rerender(); });
+        fetchBlockData(block, moduleId).then(function () { _rerender(); });
       }
     }
   }, (intervalSeconds || 60) * 1000);

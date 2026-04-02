@@ -77,15 +77,26 @@ var state = {
   savedModules: [],      // List of user-created modules
   propsTab: 'general',
   propsDraft: null,
+  libraryMode: 'blocks',
+  fieldSearch: {},
+  packPicker: null,
+  showDigitalThreadLinks: true,
   registries: {
     loading: false,
     loaded: false,
     error: '',
+    loadingMessage: '',
     fieldTypes: {},
     statusOptions: {},
     dataFields: {},
+    dataFieldsText: '',
+    dataFieldsLoading: {},
     computedFormulas: {},
-    iotConnectors: {}
+    iotConnectors: {},
+    validationRules: {},
+    workflows: {},
+    domainPacks: {},
+    relationMap: {}
   }
 };
 
@@ -435,6 +446,28 @@ function _renderBlockPreview(block){
         var span = f.span==='full'?'grid-column:1/-1;':'';
         h += '<div style="'+span+'"><div style="font-size:var(--text-xs);color:var(--text-secondary);margin-bottom:2px">'+_esc(f.label?_t(f.label.vi||'',f.label.en||''):'Field')+'</div><div style="height:32px;background:var(--gray-50);border:1px solid var(--border);border-radius:var(--radius-md)"></div></div>';
       });
+      h += '</div>';
+      break;
+
+    case 'action-status-flow':
+      var wf = config.workflow || {};
+      var states = wf.states || [];
+      var transitions = wf.transitions || [];
+      h += '<div style="display:grid;gap:10px">';
+      h += '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">';
+      (states.length ? states : [{ id:'draft', label:'Draft' }, { id:'review', label:'Review' }, { id:'approved', label:'Approved' }]).slice(0,5).forEach(function(item, idx){
+        h += '<div style="padding:6px 10px;border-radius:999px;border:1px solid '+(idx === 0 ? 'var(--brand-2)' : 'var(--border)')+';background:'+(idx === 0 ? 'rgba(37,99,235,0.08)' : '#fff')+';font-size:12px;font-weight:700">'+_esc(item.label || item.labelEn || item.id || item.value)+'</div>';
+        if(idx < ((states.length ? states : [1,2,3]).slice(0,5).length - 1)) h += '<span style="color:var(--text-tertiary)">→</span>';
+      });
+      h += '</div>';
+      h += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+      (transitions.length ? transitions : [{ label:{ vi:'Gửi duyệt' }, variant:'primary' }, { label:{ vi:'Từ chối' }, variant:'danger' }]).slice(0,4).forEach(function(item){
+        h += '<div style="padding:8px 12px;border-radius:12px;font-size:12px;font-weight:700;'+(item.variant === 'danger' ? 'background:rgba(220,38,38,0.12);color:var(--red)' : item.variant === 'primary' ? 'background:var(--brand-2);color:#fff' : 'border:1px solid var(--border);color:var(--text-secondary)')+'">'+_esc(item.label && item.label.vi || item.labelEn || item.label || item.to || 'Transition')+'</div>';
+      });
+      h += '</div>';
+      if(wf.sla && Object.keys(wf.sla).length){
+        h += '<div style="font-size:11px;color:var(--text-tertiary)">'+_t('SLA và digital thread sẽ tự lấy từ workflow registry.', 'SLA and digital thread metadata will be derived from the workflow registry.')+'</div>';
+      }
       h += '</div>';
       break;
 
@@ -950,6 +983,31 @@ function _renderLibraryPanel(){
   var categories = BE.BLOCK_CATEGORIES || [];
   var search = (state.librarySearch||'').toLowerCase();
 
+  if(state.libraryMode === 'packs'){
+    _ensureRegistriesLoaded();
+    if(state.registries.loading && !Object.keys(packMap).length){
+      h += '<div class="mb-inline-loading"><span class="mb-spinner"></span><span>'+_esc(state.registries.loadingMessage || _t('Đang nạp field pack...', 'Loading field packs...'))+'</span></div>';
+    }
+    ['bao_gia','don_hang','ke_hoach','mua_hang','san_xuat','chat_luong','ho_so','bao_cao','tai_lieu','quan_tri'].forEach(function(moduleKey){
+      var items = Object.keys(packMap).filter(function(packKey){
+        var info = _getPackInfo(packKey, packMap[packKey] || []);
+        var haystack = _normalizeSearchText(packKey + ' ' + info.label + ' ' + info.description + ' ' + info.module);
+        return info.module === moduleKey && (!search || haystack.indexOf(_normalizeSearchText(search)) >= 0);
+      });
+      if(!items.length) return;
+      h += '<div style="margin-top:16px">';
+      h += '<div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary);font-weight:700;margin-bottom:8px">'+_esc(_packModuleInfo(moduleKey).icon)+' '+_esc(_packModuleInfo(moduleKey).label)+' ('+items.length+')</div>';
+      items.forEach(function(packKey){
+        var info = _getPackInfo(packKey, packMap[packKey] || []);
+        h += '<div class="mb-pack-card" draggable="true" data-field-pack="'+_esc(packKey)+'">';
+        h += '<div class="mb-pack-head"><div class="mb-pack-icon">'+_esc(info.icon)+'</div><div style="flex:1"><div class="mb-pack-name">'+_esc(info.label)+'</div><div class="mb-pack-meta">'+_esc(info.moduleLabel)+' • '+info.count+' '+_t('trường', 'fields')+'</div></div></div>';
+        h += '<div class="mb-pack-desc">'+_esc(info.description)+'</div>';
+        h += '<div class="mb-pack-actions"><button class="hm-btn hm-btn-primary hm-btn-sm" data-action="open-pack-picker" data-pack="'+_esc(packKey)+'">'+_t('Thêm nhanh', 'Quick add')+'</button></div>';
+        h += '</div>';
+      });
+      h += '</div>';
+    });
+  } else {
   categories.forEach(function(cat){
     var blocks = Object.keys(catalog).filter(function(key){
       var entry = catalog[key];
@@ -990,6 +1048,7 @@ function _renderLibraryPanel(){
       h += '</div>';
     });
     h += '</div>';
+  }
   }
 
   h += '</div></div>';
@@ -1600,10 +1659,13 @@ function _renderFieldControl(field, path, value){
   var options = _getFieldOptions(field);
   var textValue = value == null ? '' : (typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value));
 
+  if(type === 'field-select'){
+    return _renderRegistryFieldSelect(field, path, textValue, attrs, placeholder);
+  }
   if(type === 'toggle'){
     return '<label style="display:flex;align-items:center;gap:var(--space-2);height:40px"><input type="checkbox"'+attrs+(value?' checked':'')+'> <span style="font-size:var(--text-sm);color:var(--text-secondary)">'+_t('Bat','Enabled')+'</span></label>';
   }
-  if(type === 'select' || type === 'api-select' || type === 'field-select' || type === 'formula-select' || type === 'status-set-select' || type === 'iot-connector-select' || type === 'field-type-select'){
+  if(type === 'select' || type === 'api-select' || type === 'formula-select' || type === 'status-set-select' || type === 'iot-connector-select' || type === 'field-type-select' || type === 'workflow-select'){
     if(!options.length){
       return '<input type="text" class="hm-input"'+attrs+' value="'+_esc(textValue)+'"'+placeholder+'>';
     }
@@ -1633,11 +1695,12 @@ function _renderFieldControl(field, path, value){
 }
 
 function _normalizeOption(option){
-  if(option && typeof option === 'object') return { value: option.value, label: option.label || option.labelEn || option.value };
+  if(option && typeof option === 'object') return { value: option.value, label: option.label || option.labelEn || option.name || option.nameEn || option.value };
   return { value: option, label: option };
 }
 
 function _getFieldOptions(field){
+  var workflowMap;
   if(field.options) return field.options;
   switch(field.type){
     case 'api-select':
@@ -1645,14 +1708,11 @@ function _getFieldOptions(field){
         return { value: api.action, label: api.action + ' - ' + (api.label || api.action) };
       });
     case 'field-select':
-      var api = _getByPath(state.propsDraft, 'config.dataSource.api');
-      return (state.registries.dataFields[api] || []).map(function(item){
-        return { value:item.key, label:item.key + ' - ' + (item.labelEn || item.label || item.key) };
-      });
+      return [];
     case 'formula-select':
       return Object.keys(state.registries.computedFormulas||{}).filter(function(key){ return key !== '_meta'; }).map(function(key){
         var item = state.registries.computedFormulas[key] || {};
-        return { value:key, label:key + ' - ' + (item.labelEn || item.label || key) };
+        return { value:key, label:key + ' - ' + (item.name || item.label || item.nameEn || item.labelEn || key) };
       });
     case 'status-set-select':
       return Object.keys(state.registries.statusOptions||{}).filter(function(key){ return key !== '_meta'; }).map(function(key){
@@ -1667,6 +1727,12 @@ function _getFieldOptions(field){
     case 'field-type-select':
       return Object.keys(state.registries.fieldTypes||{}).filter(function(key){ return key !== '_meta'; }).map(function(key){
         return { value:key, label:key };
+      });
+    case 'workflow-select':
+      workflowMap = _getWorkflowRegistryMap();
+      return Object.keys(workflowMap).map(function(key){
+        var workflow = workflowMap[key] || {};
+        return { value:key, label:key + ' - ' + (workflow.name || workflow.nameEn || key) };
       });
     default:
       return [];
@@ -1770,24 +1836,63 @@ function _updateDraftValue(target){
 function _ensureRegistriesLoaded(force){
   if(state.registries.loading) return;
   if(state.registries.loaded && !force) return;
+
+  var HR = window.HmRegistry;
+
+  // ── Path A: HmRegistry available → delegate to centralized service ──
+  if(HR && typeof HR.init === 'function'){
+    state.registries.loading = true;
+    state.registries.error = '';
+    state.registries.loadingMessage = _t('Đang nạp metadata từ HmRegistry...', 'Loading from HmRegistry...');
+
+    HR.init(function(){
+      // Populate state.registries from HmRegistry cache (backward compat)
+      state.registries.fieldTypes       = HR.raw('field-types') || {};
+      state.registries.statusOptions    = HR.raw('status-options') || {};
+      state.registries.computedFormulas = HR.raw('computed-formulas') || {};
+      state.registries.iotConnectors    = HR.raw('iot-connectors') || (BE.IOT_CONNECTORS || {});
+
+      // Lazy-load remaining registries via HmRegistry preload
+      var remaining = 4;
+      function _onLazy(){ remaining--; if(remaining <= 0){ _finishRegistryLoad(); } }
+
+      HR.preload('validation-rules', function(d){ state.registries.validationRules = d || {}; _onLazy(); });
+      HR.preload('workflow-library', function(d){ state.registries.workflows = d || {}; _onLazy(); });
+      HR.preload('domain-field-packs', function(d){ state.registries.domainPacks = d || {}; _onLazy(); });
+      HR.preload('relation-map', function(d){ state.registries.relationMap = d || {}; _onLazy(); });
+    });
+    return;
+  }
+
+  // ── Path B: HmRegistry NOT available → fallback to legacy direct fetch ──
   if(typeof fetch !== 'function') return;
   state.registries.loading = true;
   state.registries.error = '';
+  state.registries.loadingMessage = _t('Đang nạp metadata từ registry...', 'Loading registry metadata...');
   Promise.all([
     _loadRegistry('field-types', 'fieldTypes'),
     _loadRegistry('status-options', 'statusOptions'),
-    _loadRegistry('data-fields', 'dataFields'),
     _loadRegistry('computed-formulas', 'computedFormulas'),
-    _loadRegistry('iot-connectors', 'iotConnectors')
+    _loadRegistry('iot-connectors', 'iotConnectors'),
+    _loadRegistry('validation-rules', 'validationRules'),
+    _loadRegistry('workflow-library', 'workflows'),
+    _loadRegistry('domain-field-packs', 'domainPacks'),
+    _loadRegistry('relation-map', 'relationMap')
   ]).then(function(){
-    state.registries.loading = false;
-    state.registries.loaded = true;
-    if(state.selectedBlock) _paint();
+    _finishRegistryLoad();
   }).catch(function(){
     state.registries.loading = false;
+    state.registries.loadingMessage = '';
     state.registries.error = _t('Không thể nạp một phần registry local. Bạn vẫn có thể nhập tay.','Could not load one or more local registries. You can still enter values manually.');
     if(state.selectedBlock) _paint();
   });
+}
+
+function _finishRegistryLoad(){
+  state.registries.loading = false;
+  state.registries.loadingMessage = '';
+  state.registries.loaded = true;
+  if(state.selectedBlock) _paint();
 }
 
 function _loadRegistry(file, key){
@@ -1798,6 +1903,10 @@ function _loadRegistry(file, key){
     state.registries[key] = data || {};
     return data;
   });
+}
+
+function _loadRegistryText(file){
+  return _fetchTextWithFallback(_registryPaths(file), 0);
 }
 
 function _registryPaths(file){
@@ -1819,6 +1928,1046 @@ function _fetchJsonWithFallback(paths, index){
   }).catch(function(){
     return _fetchJsonWithFallback(paths, index + 1);
   });
+}
+
+function _fetchTextWithFallback(paths, index){
+  if(index >= paths.length) return Promise.reject(new Error('not-found'));
+  return fetch(paths[index], { cache:'no-store' }).then(function(resp){
+    if(!resp.ok) throw new Error('bad-response');
+    return resp.text();
+  }).catch(function(){
+    return _fetchTextWithFallback(paths, index + 1);
+  });
+}
+
+function _toastBuilder(message, type){
+  if(BE.toast) BE.toast(message, type || 'info');
+}
+
+function _normalizeSearchText(value){
+  var text = String(value == null ? '' : value).toLowerCase();
+  if(typeof text.normalize === 'function'){
+    try {
+      text = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    } catch(err){}
+  }
+  return text;
+}
+
+function _safeBindingKey(value){
+  var text = String(value == null ? '' : value).replace(/[^A-Za-z0-9_]/g, '_');
+  if(!text) return 'block_ref';
+  if(/^[0-9]/.test(text)) text = 'block_' + text;
+  return text;
+}
+
+function _humanizeKey(key){
+  return String(key == null ? '' : key).replace(/[_\-]+/g, ' ').replace(/\s+/g, ' ').replace(/\b([a-z])/g, function(all, ch){
+    return ch.toUpperCase();
+  }).trim();
+}
+
+function _highlightRegistryMatch(text, query){
+  var raw = String(text == null ? '' : text);
+  var haystack = _normalizeSearchText(raw);
+  var needle = _normalizeSearchText(query);
+  var index;
+  if(!needle) return _esc(raw);
+  index = haystack.indexOf(needle);
+  if(index < 0) return _esc(raw);
+  return _esc(raw.slice(0, index)) + '<mark>' + _esc(raw.slice(index, index + needle.length)) + '</mark>' + _esc(raw.slice(index + needle.length));
+}
+
+function _fieldTypeLabel(type){
+  var map = {
+    string: 'string',
+    textarea: 'textarea',
+    number: 'number',
+    integer: 'integer',
+    date: 'date',
+    datetime: 'datetime',
+    boolean: 'boolean',
+    badge: 'badge',
+    select: 'select',
+    currency: 'currency',
+    percent: 'percent',
+    percentage: 'percentage',
+    email: 'email',
+    phone: 'phone',
+    file: 'file'
+  };
+  return map[type] || type || 'text';
+}
+
+function _getWorkflowRegistryMap(){
+  var workflows = state.registries.workflows || {};
+  return workflows.workflows || workflows;
+}
+
+function _getDomainPackMap(){
+  var packs = state.registries.domainPacks || {};
+  return packs.packs || packs;
+}
+
+function _getValidationRuleList(){
+  var rules = state.registries.validationRules || {};
+  return rules.rules || [];
+}
+
+function _getRelationList(){
+  var relationMap = state.registries.relationMap || {};
+  return relationMap.relations || [];
+}
+
+function _getRelationEntityMap(){
+  var relationMap = state.registries.relationMap || {};
+  return relationMap.entities || {};
+}
+
+function _dataFieldKeyCandidates(api){
+  var candidates = [];
+  var raw = String(api || '');
+  function add(value){
+    if(value && candidates.indexOf(value) < 0) candidates.push(value);
+  }
+  add(raw);
+  add(raw.replace(/[\.\/]/g, '_'));
+  add(raw.replace(/[^A-Za-z0-9_]/g, '_'));
+  if(/_detail$/.test(raw)) add(raw.replace(/_detail$/, '_list'));
+  if(/_workspace$/.test(raw)) add(raw.replace(/_workspace$/, '_list'));
+  if(/_workspace_meta$/.test(raw)) add(raw.replace(/_workspace_meta$/, '_list'));
+  return candidates.filter(function(item){ return !!item; });
+}
+
+function _extractNamedJsonArray(text, key){
+  var marker = '"' + String(key).replace(/"/g, '\\"') + '"';
+  var markerIndex = text.indexOf(marker);
+  var start = -1;
+  var depth = 0;
+  var inString = false;
+  var escapeNext = false;
+  var i;
+  var ch = '';
+  if(markerIndex < 0) return null;
+  for(i = markerIndex + marker.length; i < text.length; i++){
+    ch = text.charAt(i);
+    if(ch === '['){
+      start = i;
+      break;
+    }
+    if(ch !== ':' && /\S/.test(ch)) return null;
+  }
+  if(start < 0) return null;
+  for(i = start; i < text.length; i++){
+    ch = text.charAt(i);
+    if(inString){
+      if(escapeNext){
+        escapeNext = false;
+      } else if(ch === '\\'){
+        escapeNext = true;
+      } else if(ch === '"'){
+        inString = false;
+      }
+      continue;
+    }
+    if(ch === '"'){
+      inString = true;
+      continue;
+    }
+    if(ch === '['){
+      depth++;
+      continue;
+    }
+    if(ch === ']'){
+      depth--;
+      if(depth === 0) return text.slice(start, i + 1);
+    }
+  }
+  return null;
+}
+
+function _ensureDataFieldsForApi(api, force){
+  var candidates;
+  var loadingKey;
+  var promise;
+  if(!api) return Promise.resolve([]);
+  candidates = _dataFieldKeyCandidates(api);
+  candidates.forEach(function(candidate){
+    if(state.registries.dataFields[candidate] && !state.registries.dataFields[api]){
+      state.registries.dataFields[api] = state.registries.dataFields[candidate];
+    }
+  });
+  if(state.registries.dataFields[api] && !force) return Promise.resolve(state.registries.dataFields[api]);
+  loadingKey = candidates.join('|');
+  if(state.registries.dataFieldsLoading[loadingKey] && !force) return state.registries.dataFieldsLoading[loadingKey];
+  state.registries.loading = true;
+  state.registries.loadingMessage = _t('Đang nạp trường dữ liệu cho API: ', 'Loading field metadata for API: ') + api;
+  promise = (state.registries.dataFieldsText ? Promise.resolve(state.registries.dataFieldsText) : _loadRegistryText('data-fields').then(function(text){
+    state.registries.dataFieldsText = text || '';
+    return state.registries.dataFieldsText;
+  })).then(function(text){
+    var parsed = [];
+    var slice = null;
+    var i;
+    for(i = 0; i < candidates.length; i++){
+      slice = _extractNamedJsonArray(text, candidates[i]);
+      if(slice){
+        try {
+          parsed = JSON.parse(slice) || [];
+        } catch(err){
+          parsed = [];
+        }
+        state.registries.dataFields[candidates[i]] = parsed;
+        state.registries.dataFields[api] = parsed;
+        return parsed;
+      }
+    }
+    state.registries.dataFields[api] = [];
+    return [];
+  }).then(function(fields){
+    delete state.registries.dataFieldsLoading[loadingKey];
+    state.registries.loading = false;
+    state.registries.loadingMessage = '';
+    return fields;
+  }, function(){
+    delete state.registries.dataFieldsLoading[loadingKey];
+    state.registries.loading = false;
+    state.registries.loadingMessage = '';
+    state.registries.error = _t('Không thể nạp danh sách trường cho API đã chọn. Bạn vẫn có thể nhập tay.', 'Could not load fields for the selected API. You can still type manually.');
+    state.registries.dataFields[api] = [];
+    return [];
+  });
+  state.registries.dataFieldsLoading[loadingKey] = promise;
+  return promise;
+}
+
+function _getRegistryFieldsForApi(api){
+  var candidates;
+  var i;
+  if(!api) return [];
+  if(state.registries.dataFields[api]) return state.registries.dataFields[api];
+  candidates = _dataFieldKeyCandidates(api);
+  for(i = 0; i < candidates.length; i++){
+    if(state.registries.dataFields[candidates[i]]) return state.registries.dataFields[candidates[i]];
+  }
+  return [];
+}
+
+function _renderRegistryFieldSelect(field, path, textValue, attrs, placeholder){
+  var api = _getByPath(state.propsDraft, 'config.dataSource.api');
+  var loadingKey = _dataFieldKeyCandidates(api).join('|');
+  var search = state.fieldSearch[path] || '';
+  var allFields = _getRegistryFieldsForApi(api);
+  var grouped = {};
+  var orderedGroups = ['general', 'dimensions', 'cost', 'quality', 'scheduling', 'compliance', 'traceability'];
+  var filtered = [];
+  var exists = false;
+  var h = '';
+  if(!api){
+    return '<div class="mb-field-select-wrap"><input type="text" class="hm-input"'+attrs+' value="'+_esc(textValue)+'"'+placeholder+'><div class="mb-field-hint">'+_t('Chọn API endpoint trước để builder gợi ý đúng trường dữ liệu.', 'Choose an API endpoint first so the builder can suggest available fields.')+'</div></div>';
+  }
+  if(!allFields.length && !state.registries.dataFieldsLoading[loadingKey]){
+    _ensureDataFieldsForApi(api).then(function(){
+      if(state.selectedBlock) _paint();
+    });
+  }
+  if(state.registries.dataFieldsLoading[loadingKey]){
+    return '<div class="mb-field-select-wrap"><div class="mb-inline-loading"><span class="mb-spinner"></span><span>'+_t('Đang nạp trường dữ liệu cho API ', 'Loading fields for API ')+'<code>'+_esc(api)+'</code></span></div><input type="text" class="hm-input"'+attrs+' value="'+_esc(textValue)+'"'+placeholder+'><div class="mb-field-hint">'+_t('Builder sẽ tự chuyển sang dropdown khi registry trả về schema endpoint.', 'The builder will switch to a dropdown when the endpoint schema arrives.')+'</div></div>';
+  }
+  if(!allFields.length){
+    return '<div class="mb-field-select-wrap"><input type="text" class="hm-input"'+attrs+' value="'+_esc(textValue)+'"'+placeholder+'><div class="mb-field-hint">'+_t('Registry chưa có schema cho API này. Bạn vẫn có thể nhập key trường thủ công.', 'No registry schema is available for this API yet. You can still type a field key manually.')+'</div></div>';
+  }
+  filtered = allFields.filter(function(item){
+    var haystack = _normalizeSearchText((item.key || '') + ' ' + (item.label || '') + ' ' + (item.labelEn || ''));
+    return !search || haystack.indexOf(_normalizeSearchText(search)) >= 0;
+  });
+  filtered.forEach(function(item){
+    var groupKey = item.group || 'general';
+    if(!grouped[groupKey]) grouped[groupKey] = [];
+    grouped[groupKey].push(item);
+    if(String(item.key) === String(textValue)) exists = true;
+  });
+  h += '<div class="mb-field-select-wrap">';
+  h += '<input type="text" class="hm-input hm-input-sm" data-field-search-path="'+_esc(path)+'" placeholder="'+_t('Tìm key, nhãn VI hoặc nhãn EN...', 'Search by key, VI label, or EN label...')+'" value="'+_esc(search)+'">';
+  h += '<select class="hm-input hm-select"'+attrs+'>';
+  h += '<option value=""></option>';
+  orderedGroups.concat(Object.keys(grouped).filter(function(key){ return orderedGroups.indexOf(key) < 0; })).forEach(function(groupKey){
+    var items = grouped[groupKey] || [];
+    if(!items.length) return;
+    h += '<optgroup label="'+_esc(_humanizeKey(groupKey))+' ('+items.length+')">';
+    items.forEach(function(item){
+      var meta = [];
+      var selected = String(item.key) === String(textValue) ? ' selected' : '';
+      meta.push(_fieldTypeLabel(item.type));
+      if(item.required) meta.push(_t('bắt buộc', 'required'));
+      if(item.constraints && item.constraints.maxLength) meta.push('≤ ' + item.constraints.maxLength);
+      h += '<option value="'+_esc(item.key)+'"'+selected+'>'+_esc((item.label || item.labelEn || item.key) + ' (' + item.key + ') — ' + meta.join(', '))+'</option>';
+    });
+    h += '</optgroup>';
+  });
+  if(textValue && !exists){
+    h += '<option value="'+_esc(textValue)+'" selected>'+_esc(textValue)+'</option>';
+  }
+  h += '</select>';
+  h += '<div class="mb-field-hint">'+_t('Schema đang lấy từ registry endpoint ', 'Schema is sourced from registry endpoint ')+'<code>'+_esc(api)+'</code></div>';
+  if(search){
+    if(filtered.length){
+      h += '<div class="mb-field-match-list">';
+      filtered.slice(0, 5).forEach(function(item){
+        h += '<div class="mb-field-match-item"><strong>'+_highlightRegistryMatch(item.label || item.key, search)+'</strong><span>'+_highlightRegistryMatch(item.key, search)+' • '+_esc(_fieldTypeLabel(item.type))+'</span></div>';
+      });
+      h += '</div>';
+    } else {
+      h += '<div class="mb-field-hint">'+_t('Không có trường nào khớp với từ khóa vừa nhập.', 'No fields matched the current keyword.')+'</div>';
+    }
+  }
+  h += '</div>';
+  return h;
+}
+
+function _entityAliasMap(){
+  return {
+    quote: ['quote', 'quote_header', 'quoting'],
+    sales_order: ['sales_order', 'salesorder', 'so', 'so_header', 'order_so'],
+    job_order: ['job_order', 'joborder', 'jo', 'jo_header', 'order_jo'],
+    work_order: ['work_order', 'workorder', 'wo', 'wo_header', 'order_wo'],
+    work_order_operation: ['work_order_operation', 'wo_operation', 'operation'],
+    work_order_material: ['work_order_material', 'wo_material'],
+    work_order_labor: ['work_order_labor', 'wo_labor'],
+    ncr: ['ncr', 'nonconformance'],
+    capa: ['capa'],
+    goods_receipt: ['goods_receipt', 'goodsreceipt', 'gr', 'gr_header'],
+    receiving_inspection: ['receiving_inspection', 'inspection_receiving', 'ri'],
+    purchase_order: ['purchase_order', 'purchaseorder', 'po', 'po_header'],
+    supplier: ['supplier'],
+    inspection_lot: ['inspection_lot', 'inspectionlot'],
+    lot: ['lot'],
+    item: ['item'],
+    bom_header: ['bom_header', 'bom'],
+    routing_header: ['routing_header', 'routing'],
+    document: ['document', 'doc'],
+    doc_master: ['doc_master'],
+    customer_complaint: ['customer_complaint', 'complaint'],
+    audit_finding: ['audit_finding'],
+    supplier_audit: ['supplier_audit'],
+    ppap: ['ppap'],
+    fai: ['fai'],
+    special_process: ['special_process'],
+    machine_setup: ['machine_setup'],
+    tool_management: ['tool_management']
+  };
+}
+
+function _aliasCandidatesForEntity(entity, api){
+  var aliases = _entityAliasMap();
+  var list = aliases[entity] ? aliases[entity].slice() : [];
+  function add(value){
+    if(value && list.indexOf(value) < 0) list.push(value);
+  }
+  add(String(entity || ''));
+  if(api){
+    String(api).split(/[^A-Za-z0-9]+/).forEach(function(token){ add(token); });
+  }
+  return list;
+}
+
+function _inferEntityFromApi(api){
+  var text = _normalizeSearchText(api);
+  var aliases = _entityAliasMap();
+  var relationEntities = Object.keys(_getRelationEntityMap());
+  var candidates = relationEntities.length ? relationEntities : Object.keys(aliases);
+  var best = '';
+  var bestScore = -1;
+  candidates.forEach(function(entity){
+    _aliasCandidatesForEntity(entity).forEach(function(alias){
+      var normalized = _normalizeSearchText(alias).replace(/_/g, '');
+      var score = normalized && text.indexOf(normalized) >= 0 ? normalized.length : -1;
+      if(score > bestScore){
+        bestScore = score;
+        best = entity;
+      }
+    });
+  });
+  return best || '';
+}
+
+function _statusOptionsForSet(statusSet){
+  var set = (state.registries.statusOptions || {})[statusSet] || {};
+  return set.options || [];
+}
+
+function _matchStatusSetForField(api, field, entity){
+  var key = String(field && field.key || '').toLowerCase();
+  var aliases = _aliasCandidatesForEntity(entity, api);
+  var candidates = [];
+  function add(value){
+    if(value && candidates.indexOf(value) < 0) candidates.push(value);
+  }
+  add(field && field.statusSet);
+  add(key);
+  if(key.indexOf('severity') >= 0) add('severity');
+  if(key.indexOf('priority') >= 0) add('priority');
+  if(key.indexOf('disposition') >= 0) add('disposition');
+  if(key.indexOf('shift') >= 0) add('shift_code');
+  if(key.indexOf('workflow') >= 0) add('workflow_status');
+  if(key.indexOf('digital_thread') >= 0) add('digital_thread_status');
+  if(field && field.type === 'badge' || key === 'status' || key.indexOf('status') >= 0){
+    aliases.forEach(function(alias){
+      add(alias + '_status');
+    });
+    add('workflow_status');
+  }
+  return candidates.filter(function(candidate){
+    return !!(state.registries.statusOptions || {})[candidate];
+  })[0] || '';
+}
+
+function _scoreRegistryField(field){
+  var score = 0;
+  var key = String(field && field.key || '').toLowerCase();
+  if(!field) return score;
+  if(field.required) score += 16;
+  if(field.sortable) score += 10;
+  if(field.filterable) score += 10;
+  if((field.group || '') === 'general') score += 8;
+  if(key === 'status' || key.indexOf('status') >= 0) score += 6;
+  if(key === 'name' || key === 'title' || key === 'description') score += 5;
+  if(key.indexOf('date') >= 0) score += 4;
+  if(field.type === 'badge') score += 5;
+  return score;
+}
+
+function _sortRegistryFields(fields){
+  return (fields || []).slice().sort(function(a, b){
+    var scoreA = _scoreRegistryField(a);
+    var scoreB = _scoreRegistryField(b);
+    if(scoreA !== scoreB) return scoreB - scoreA;
+    if(!!a.required !== !!b.required) return a.required ? -1 : 1;
+    return String(a.key || '').localeCompare(String(b.key || ''), 'vi');
+  });
+}
+
+function _inferFormulaDomain(entity, api){
+  var value = entity || _inferEntityFromApi(api);
+  if(!value) return '';
+  if(/quote/.test(value)) return 'quoting';
+  if(/sales_order|job_order/.test(value)) return 'planning';
+  if(/work_order|machine|routing|bom|tool/.test(value)) return 'manufacturing';
+  if(/ncr|capa|inspection|audit|complaint/.test(value)) return 'quality';
+  if(/supplier|purchase_order|goods_receipt/.test(value)) return 'supplier';
+  if(/document|doc_master|ppap|fai/.test(value)) return 'compliance';
+  if(/lot|trace/.test(value)) return 'traceability';
+  return '';
+}
+
+function _getValidationRulesForField(entity, fieldKey){
+  return _getValidationRuleList().filter(function(rule){
+    return (!entity || rule.entity === entity) && rule.field === fieldKey;
+  });
+}
+
+function _applyValidationToFieldConfig(fieldConfig, rules){
+  var validation = {};
+  var summary = [];
+  (rules || []).forEach(function(rule){
+    var params = rule.params || {};
+    summary.push(rule.type);
+    if(rule.type === 'required') validation.required = true;
+    if(rule.type === 'minLength' && params.min != null) validation.minLength = Math.max(validation.minLength || 0, Number(params.min));
+    if(rule.type === 'maxLength' && params.max != null) validation.maxLength = validation.maxLength == null ? Number(params.max) : Math.min(validation.maxLength, Number(params.max));
+    if(rule.type === 'range'){
+      if(params.min != null) validation.min = Number(params.min);
+      if(params.max != null) validation.max = Number(params.max);
+    }
+    if(rule.type === 'enum' && params.values && params.values.length){
+      fieldConfig.type = 'select';
+      fieldConfig.options = params.values.map(function(option){
+        return { value: option, label: option, labelEn: option };
+      });
+      validation.enum = params.values.slice();
+    }
+  });
+  fieldConfig.validation = validation;
+  fieldConfig.validationRules = (rules || []).map(function(rule){
+    return _clone(rule);
+  });
+  fieldConfig.rules = summary.join(', ');
+  if(validation.required) fieldConfig.required = true;
+}
+
+function _guessColumnWidth(type){
+  var map = {
+    string: '200',
+    textarea: '280',
+    number: '120',
+    integer: '120',
+    badge: '130',
+    currency: '140',
+    percentage: '120',
+    percent: '120',
+    date: '120',
+    datetime: '160',
+    boolean: '110'
+  };
+  return (map[type] || '180') + 'px';
+}
+
+function _coerceFormFieldType(type){
+  if(type === 'badge') return 'select';
+  if(type === 'integer') return 'number';
+  if(type === 'percent') return 'number';
+  return type || 'string';
+}
+
+function _buildAutoColumnsFromRegistry(api, fields, entity){
+  return _sortRegistryFields(fields).slice(0, 8).map(function(field){
+    var statusSet = _matchStatusSetForField(api, field, entity);
+    return {
+      key: field.key,
+      fieldRef: field.key,
+      label: { vi: field.label || field.labelEn || field.key, en: field.labelEn || field.label || field.key },
+      type: field.type || 'string',
+      width: _guessColumnWidth(field.type),
+      sortable: !!field.sortable,
+      filterable: !!field.filterable,
+      statusSet: statusSet
+    };
+  });
+}
+
+function _buildAutoFormFieldsFromRegistry(api, fields, entity){
+  var sorted = _sortRegistryFields(fields);
+  var required = sorted.filter(function(item){ return !!item.required; });
+  var optional = sorted.filter(function(item){ return !item.required; });
+  var selected = required.concat(optional.slice(0, Math.max(0, 8 - required.length)));
+  return selected.slice(0, 10).map(function(field){
+    var statusSet = _matchStatusSetForField(api, field, entity);
+    var config = {
+      key: field.key,
+      fieldRef: field.key,
+      label: { vi: field.label || field.labelEn || field.key, en: field.labelEn || field.label || field.key },
+      type: statusSet ? 'select' : _coerceFormFieldType(field.type),
+      required: !!field.required,
+      span: field.type === 'textarea' ? 'full' : 'half',
+      statusSet: statusSet,
+      placeholder: { vi: field.label || field.key, en: field.labelEn || field.label || field.key }
+    };
+    if(statusSet) config.options = _statusOptionsForSet(statusSet);
+    _applyValidationToFieldConfig(config, _getValidationRulesForField(entity, field.key));
+    return config;
+  });
+}
+
+function _buildAutoFiltersFromRegistry(api, fields, entity){
+  var filters = [{
+    key: 'keyword',
+    label: { vi: 'Từ khóa', en: 'Keyword' },
+    type: 'search',
+    placeholder: { vi: 'Nhập từ khóa', en: 'Search keyword' }
+  }];
+  var statusField = _sortRegistryFields(fields).filter(function(field){
+    return field.type === 'badge' || String(field.key || '').toLowerCase().indexOf('status') >= 0;
+  })[0];
+  var dateField = _sortRegistryFields(fields).filter(function(field){
+    return field.type === 'date' || field.type === 'datetime';
+  })[0];
+  if(statusField){
+    filters.push({
+      key: statusField.key,
+      fieldRef: statusField.key,
+      label: { vi: statusField.label || 'Trạng thái', en: statusField.labelEn || 'Status' },
+      type: 'status',
+      statusSet: _matchStatusSetForField(api, statusField, entity)
+    });
+  }
+  if(dateField){
+    filters.push({
+      key: dateField.key,
+      fieldRef: dateField.key,
+      label: { vi: dateField.label || 'Ngày', en: dateField.labelEn || 'Date' },
+      type: 'date-range'
+    });
+  }
+  return filters;
+}
+
+function _buildAutoKpisFromRegistry(entity, api){
+  var domain = _inferFormulaDomain(entity, api);
+  return Object.keys(state.registries.computedFormulas || {}).filter(function(key){
+    var formula = state.registries.computedFormulas[key] || {};
+    if(key === '_meta') return false;
+    return !domain || formula.category === domain;
+  }).slice(0, 4).map(function(key){
+    var formula = state.registries.computedFormulas[key] || {};
+    return {
+      dataKey: key,
+      formulaId: key,
+      label: { vi: formula.name || formula.label || key, en: formula.nameEn || formula.labelEn || formula.name || key },
+      suffix: formula.unit === 'percentage' || formula.unit === 'percent' ? '%' : '',
+      color: formula.category === 'quality' ? '#dc2626' : (formula.category === 'manufacturing' ? '#2563eb' : '#0f766e')
+    };
+  });
+}
+
+function _guessTransitionApi(entity){
+  var aliases = _aliasCandidatesForEntity(entity);
+  var catalog = BE.API_CATALOG || [];
+  var matched = '';
+  catalog.forEach(function(item){
+    var action = String(item.action || '');
+    var actionText = _normalizeSearchText(action);
+    if(matched) return;
+    if(actionText.indexOf('transition') < 0) return;
+    aliases.forEach(function(alias){
+      if(!matched && actionText.indexOf(_normalizeSearchText(alias).replace(/_/g, '')) >= 0){
+        matched = action;
+      }
+    });
+  });
+  return matched;
+}
+
+function _guessTransitionVariant(transition){
+  var to = String((transition && transition.to) || '').toLowerCase();
+  if(to.indexOf('cancel') >= 0 || to.indexOf('reject') >= 0 || to.indexOf('void') >= 0 || to.indexOf('lost') >= 0) return 'danger';
+  if(to.indexOf('approved') >= 0 || to.indexOf('active') >= 0 || to.indexOf('released') >= 0 || to.indexOf('closed') >= 0) return 'primary';
+  return 'secondary';
+}
+
+function _guessTransitionIcon(transition){
+  var trigger = String((transition && transition.trigger) || '').toLowerCase();
+  if(trigger.indexOf('approve') >= 0 || trigger.indexOf('release') >= 0) return '✔';
+  if(trigger.indexOf('reject') >= 0 || trigger.indexOf('cancel') >= 0) return '✖';
+  if(trigger.indexOf('submit') >= 0 || trigger.indexOf('send') >= 0) return '➜';
+  return '↻';
+}
+
+function _applyWorkflowRegistryToDraft(draft, workflowId){
+  var workflow = _getWorkflowRegistryMap()[workflowId];
+  var entity;
+  if(!workflow || !draft) return 0;
+  if(!draft.config) draft.config = {};
+  if(!draft.config.workflow) draft.config.workflow = {};
+  entity = workflow.entity || _inferEntityFromApi(_getByPath(draft, 'config.dataSource.api'));
+  draft.config.workflow.workflowId = workflowId;
+  draft.config.workflow.entity = entity || '';
+  draft.config.workflow.stateField = draft.config.workflow.stateField || 'status';
+  draft.config.workflow.states = _clone(workflow.states || []);
+  draft.config.workflow.transitions = (workflow.transitions || []).map(function(transition){
+    return {
+      from: transition.from,
+      to: transition.to,
+      label: { vi: transition.label || transition.trigger || transition.to, en: transition.labelEn || transition.label || transition.trigger || transition.to },
+      icon: _guessTransitionIcon(transition),
+      variant: _guessTransitionVariant(transition),
+      endpoint: _guessTransitionApi(entity),
+      method: 'POST',
+      guards: _clone(transition.guards || []),
+      actions: _clone(transition.actions || [])
+    };
+  });
+  draft.config.workflow.guards = (workflow.transitions || []).map(function(transition){
+    return {
+      from: transition.from,
+      to: transition.to,
+      guards: _clone(transition.guards || [])
+    };
+  });
+  draft.config.workflow.sla = _clone(workflow.sla || {});
+  draft.config.workflow.digitalThread = _clone(workflow.digitalThread || {});
+  if(draft.config.workflow.showDiagram == null) draft.config.workflow.showDiagram = true;
+  if(draft.config.workflow.showSla == null) draft.config.workflow.showSla = true;
+  if(draft.config.workflow.showDigitalThread == null) draft.config.workflow.showDigitalThread = true;
+  return (workflow.transitions || []).length;
+}
+
+function _autoPopulateDraftFromApi(draft, api){
+  var fields = _getRegistryFieldsForApi(api);
+  var entity = _inferEntityFromApi(api);
+  var count = 0;
+  var noun = '';
+  if(!draft || !draft.config || !api || !fields.length) return null;
+  draft.config.dataSource = draft.config.dataSource || {};
+  draft.config.dataSource.api = api;
+  draft.config.entity = entity || draft.config.entity || '';
+  if(draft.type === 'data-table'){
+    draft.config.columns = _buildAutoColumnsFromRegistry(api, fields, entity);
+    count = draft.config.columns.length;
+    noun = _t('cột', 'columns');
+  } else if(draft.type === 'form-standard'){
+    draft.config.fields = _buildAutoFormFieldsFromRegistry(api, fields, entity);
+    count = draft.config.fields.length;
+    noun = _t('trường', 'fields');
+  } else if(draft.type === 'filter-bar'){
+    draft.config.filters = _buildAutoFiltersFromRegistry(api, fields, entity);
+    count = draft.config.filters.length;
+    noun = _t('bộ lọc', 'filters');
+  } else if(draft.type === 'kpi-row'){
+    draft.config.items = _buildAutoKpisFromRegistry(entity, api);
+    count = draft.config.items.length;
+    noun = _t('KPI', 'KPIs');
+  }
+  return count ? { count: count, noun: noun, entity: entity } : null;
+}
+
+function _syncDraftToSelectedBlock(label){
+  var selectedId = state.selectedBlock;
+  var draft = state.propsDraft;
+  if(!selectedId || !draft) return;
+  _mutateSchema(label || _t('Đồng bộ block từ registry', 'Sync block from registry'), function(){
+    var block = _findBlock(selectedId);
+    if(!block) return;
+    _applySchemaDefaults(draft, _getBlockSchema(draft.type));
+    Object.keys(block).forEach(function(key){ delete block[key]; });
+    Object.keys(draft).forEach(function(key){ block[key] = _clone(draft[key]); });
+    state.selectedBlock = block.blockId || block.id;
+    state.propsDraft = _clone(block);
+    _applySchemaDefaults(state.propsDraft, _getBlockSchema(block.type));
+  });
+}
+
+function _inferPackModule(packKey){
+  var key = _normalizeSearchText(packKey);
+  if(key.indexOf('quote') >= 0) return 'bao_gia';
+  if(key.indexOf('so') >= 0 || key.indexOf('jo') >= 0 || key.indexOf('order') >= 0) return 'don_hang';
+  if(key.indexOf('plan') >= 0 || key.indexOf('schedule') >= 0) return 'ke_hoach';
+  if(key.indexOf('po') >= 0 || key.indexOf('supplier') >= 0 || key.indexOf('receipt') >= 0 || key.indexOf('receiving') >= 0) return 'mua_hang';
+  if(key.indexOf('wo') >= 0 || key.indexOf('machine') >= 0 || key.indexOf('setup') >= 0 || key.indexOf('tool') >= 0 || key.indexOf('production') >= 0) return 'san_xuat';
+  if(key.indexOf('ncr') >= 0 || key.indexOf('capa') >= 0 || key.indexOf('audit') >= 0 || key.indexOf('inspection') >= 0 || key.indexOf('scar') >= 0 || key.indexOf('quality') >= 0) return 'chat_luong';
+  if(key.indexOf('doc') >= 0 || key.indexOf('record') >= 0 || key.indexOf('form') >= 0) return 'ho_so';
+  if(key.indexOf('dashboard') >= 0 || key.indexOf('report') >= 0 || key.indexOf('kpi') >= 0) return 'bao_cao';
+  if(key.indexOf('training') >= 0 || key.indexOf('knowledge') >= 0) return 'tai_lieu';
+  return 'quan_tri';
+}
+
+function _packModuleInfo(moduleKey){
+  var map = {
+    bao_gia: { icon:'💰', label:_t('Báo giá', 'Quoting') },
+    don_hang: { icon:'📦', label:_t('Đơn hàng', 'Orders') },
+    ke_hoach: { icon:'🗓', label:_t('Kế hoạch', 'Planning') },
+    mua_hang: { icon:'🧾', label:_t('Mua hàng', 'Purchasing') },
+    san_xuat: { icon:'🏭', label:_t('Sản xuất', 'Manufacturing') },
+    chat_luong: { icon:'🧪', label:_t('Chất lượng', 'Quality') },
+    ho_so: { icon:'🗂', label:_t('Hồ sơ', 'Records') },
+    bao_cao: { icon:'📊', label:_t('Báo cáo', 'Reports') },
+    tai_lieu: { icon:'📚', label:_t('Tài liệu', 'Documents') },
+    quan_tri: { icon:'⚙', label:_t('Quản trị', 'Admin') }
+  };
+  return map[moduleKey] || map.quan_tri;
+}
+
+function _getPackInfo(packKey, fields){
+  var moduleKey = _inferPackModule(packKey);
+  var moduleInfo = _packModuleInfo(moduleKey);
+  var labels = (fields || []).slice(0, 3).map(function(field){
+    return field.label || field.labelEn || field.key;
+  });
+  return {
+    key: packKey,
+    module: moduleKey,
+    icon: moduleInfo.icon,
+    moduleLabel: moduleInfo.label,
+    label: _humanizeKey(packKey),
+    count: (fields || []).length,
+    description: labels.length ? _t('Gồm các trường: ', 'Includes fields: ') + labels.join(', ') + ((fields || []).length > 3 ? '…' : '') : _t('Pack trường kéo thả theo domain.', 'Domain-driven drag-and-drop field pack.')
+  };
+}
+
+function _packPayloadForType(blockType, packKey, fields, entity, api){
+  if(blockType === 'data-table') return { columns: _buildAutoColumnsFromRegistry(api || packKey, fields, entity) };
+  if(blockType === 'filter-bar') return { filters: _buildAutoFiltersFromRegistry(api || packKey, fields, entity) };
+  return { fields: _buildAutoFormFieldsFromRegistry(api || packKey, fields, entity), columns: 2 };
+}
+
+function _isPackCompatibleBlock(block){
+  return !!(block && ['form-standard', 'data-table', 'filter-bar'].indexOf(block.type) >= 0);
+}
+
+function _mergePackIntoBlock(block, packKey){
+  var packFields = _getDomainPackMap()[packKey] || [];
+  var entity = (block.config && block.config.entity) || _inferEntityFromApi((block.config && block.config.dataSource && block.config.dataSource.api) || packKey);
+  var api = block.config && block.config.dataSource ? block.config.dataSource.api : '';
+  var payload = _packPayloadForType(block.type, packKey, packFields, entity, api);
+  if(block.type === 'data-table'){
+    block.config.columns = (block.config.columns || []).concat(payload.columns || []);
+  } else if(block.type === 'filter-bar'){
+    block.config.filters = (block.config.filters || []).concat(payload.filters || []);
+  } else {
+    block.config.fields = (block.config.fields || []).concat(payload.fields || []);
+  }
+  block.config.entity = entity || block.config.entity || '';
+}
+
+function _openPackPicker(packKey){
+  state.packPicker = { packKey: packKey };
+  _paint();
+}
+
+function _renderPackPickerModal(){
+  var packKey;
+  var packFields;
+  var info;
+  var tab;
+  var h = '';
+  if(!state.packPicker) return '';
+  packKey = state.packPicker.packKey;
+  packFields = _getDomainPackMap()[packKey] || [];
+  info = _getPackInfo(packKey, packFields);
+  tab = _getActiveTab();
+  h += '<div class="mb-modal-surface" data-action="close-pack-picker">';
+  h += '<div class="mb-modal-card" onclick="event.stopPropagation()">';
+  h += '<div class="mb-panel-header" style="padding:0 0 14px;border-bottom:1px solid var(--border);margin-bottom:14px"><div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary)">'+_t('Field Pack', 'Field Pack')+'</div><strong>'+_esc(info.icon)+' '+_esc(info.label)+'</strong></div><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="close-pack-picker">×</button></div>';
+  h += '<div class="mb-pack-desc">'+_esc(info.description)+'</div>';
+  h += '<div class="mb-choice-list">';
+  if(tab){
+    (tab.blocks || []).filter(function(block){ return _isPackCompatibleBlock(block); }).forEach(function(block){
+      h += '<div class="mb-choice-card"><div><strong>'+_esc(_getBlockTitle(block))+'</strong><div class="mb-pack-meta">'+_esc(_getCatalogLabel(block.type))+'</div></div><button class="hm-btn hm-btn-primary hm-btn-sm" data-action="apply-pack-target" data-pack="'+_esc(packKey)+'" data-target="'+_esc(block.blockId || block.id)+'">'+_t('Thêm vào block này', 'Add to this block')+'</button></div>';
+    });
+  }
+  h += '<div class="mb-choice-card"><div><strong>'+_t('Tạo form mới', 'Create new form')+'</strong><div class="mb-pack-meta">'+_t('Khi canvas chưa có block phù hợp', 'When no compatible block exists')+'</div></div><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="apply-pack-create" data-pack="'+_esc(packKey)+'" data-type="form-standard">'+_t('Tạo form', 'Create form')+'</button></div>';
+  h += '<div class="mb-choice-card"><div><strong>'+_t('Tạo bảng mới', 'Create new table')+'</strong><div class="mb-pack-meta">'+_t('Dành cho pack thiên về danh sách dữ liệu', 'Best for list-oriented packs')+'</div></div><button class="hm-btn hm-btn-secondary hm-btn-sm" data-action="apply-pack-create" data-pack="'+_esc(packKey)+'" data-type="data-table">'+_t('Tạo bảng', 'Create table')+'</button></div>';
+  h += '</div></div></div>';
+  return h;
+}
+
+function _applyPackToTarget(packKey, blockId){
+  _mutateSchema(_t('Thêm field pack', 'Apply field pack'), function(){
+    var block = _findBlock(blockId);
+    if(!block || !_isPackCompatibleBlock(block)) return;
+    _mergePackIntoBlock(block, packKey);
+    state.selectedBlock = block.blockId || block.id;
+    state.propsDraft = _clone(block);
+  });
+  state.packPicker = null;
+  _toastBuilder(_t('Đã thêm field pack vào block đã chọn.', 'Field pack added to the selected block.'), 'success');
+}
+
+function _createBlockFromPack(packKey, blockType, target){
+  var packFields = _getDomainPackMap()[packKey] || [];
+  var entity = _inferEntityFromApi(packKey);
+  var preConfig = _packPayloadForType(blockType, packKey, packFields, entity, '');
+  target = target || {
+    tabId: state.activeTab,
+    parentId: state.insertParent || null,
+    slotKey: state.insertSlot || 'default',
+    insertIndex: state.insertPosition
+  };
+  preConfig.entity = entity || '';
+  _mutateSchema(_t('Tạo block từ field pack', 'Create block from field pack'), function(){
+    _insertBlockAtTarget(blockType, preConfig, target);
+  });
+  state.packPicker = null;
+  _toastBuilder(_t('Đã tạo block mới từ field pack.', 'Created a new block from the field pack.'), 'success');
+}
+
+function _tabEntityBlocks(tab){
+  return (tab && tab.blocks || []).filter(function(block){
+    return !!(block && block.config && block.config.dataSource && block.config.dataSource.api);
+  }).map(function(block){
+    return {
+      block: block,
+      blockId: block.blockId || block.id,
+      bindingId: _safeBindingKey(block.blockId || block.id),
+      api: block.config.dataSource.api,
+      entity: (block.config && block.config.entity) || _inferEntityFromApi(block.config.dataSource.api)
+    };
+  }).filter(function(item){
+    return !!item.entity;
+  });
+}
+
+function _isSuggestionConfigured(suggestion){
+  var target = suggestion && suggestion.target && suggestion.target.block;
+  var link = target && target.config ? target.config.crossBlockLink : null;
+  return !!(link && link.relationId === suggestion.relation.id && link.sourceBlockId === suggestion.source.blockId);
+}
+
+function _relationSuggestionsForTab(tab){
+  var entities = _tabEntityBlocks(tab);
+  var suggestions = [];
+  _getRelationList().forEach(function(relation){
+    entities.forEach(function(source){
+      entities.forEach(function(target){
+        if(source.blockId === target.blockId) return;
+        if(source.entity === relation.from.entity && target.entity === relation.to.entity){
+          suggestions.push({
+            relation: relation,
+            source: source,
+            target: target
+          });
+        }
+      });
+    });
+  });
+  return suggestions;
+}
+
+function _findRelationSuggestionByIds(tab, relationId, sourceId, targetId){
+  var suggestions = _relationSuggestionsForTab(tab);
+  var i;
+  for(i = 0; i < suggestions.length; i++){
+    if((!relationId || suggestions[i].relation.id === relationId) &&
+       suggestions[i].source.blockId === sourceId &&
+       suggestions[i].target.blockId === targetId){
+      return suggestions[i];
+    }
+  }
+  return null;
+}
+
+function _applyRelationSuggestion(suggestion){
+  if(!suggestion || !suggestion.target || !suggestion.target.block) return;
+  _mutateSchema(_t('Thiết lập liên kết số', 'Setup digital thread link'), function(){
+    var target = _findBlock(suggestion.target.blockId);
+    if(!target) return;
+    if(!target.config) target.config = {};
+    if(!target.config.dataSource) target.config.dataSource = {};
+    if(!target.config.dataSource.params) target.config.dataSource.params = {};
+    target.config.dataSource.params[suggestion.relation.to.field] = '{{ blocks.' + suggestion.source.bindingId + '.selectedRow.' + suggestion.relation.from.field + ' }}';
+    target.config.crossBlockLink = {
+      relationId: suggestion.relation.id,
+      sourceBlockId: suggestion.source.blockId,
+      sourceBindingId: suggestion.source.bindingId,
+      sourceField: suggestion.relation.from.field,
+      targetField: suggestion.relation.to.field,
+      type: suggestion.relation.type,
+      label: suggestion.relation.label || suggestion.relation.labelEn || ''
+    };
+  });
+  _toastBuilder(_t('Đã cấu hình liên kết giữa hai block theo relation map.', 'Configured a registry-driven link between the two blocks.'), 'success');
+}
+
+function _relationsForSelectedBlock(blockId){
+  return _relationSuggestionsForTab(_getActiveTab()).filter(function(item){
+    return item.source.blockId === blockId || item.target.blockId === blockId;
+  });
+}
+
+function _renderRelationsPanel(block){
+  var suggestions = _relationsForSelectedBlock(block.blockId || block.id);
+  var h = '';
+  if(!_getRelationList().length){
+    return '<div class="mb-helper-note">'+_t('Relation map chưa sẵn sàng. Builder sẽ hiện gợi ý liên kết khi registry tải xong.', 'Relation map is not ready yet. Suggestions will appear after registry loading completes.')+'</div>';
+  }
+  h += '<div class="mb-helper-note">'+_t('Builder đang dò quan hệ trực tiếp giữa các block trong cùng tab để gợi ý digital thread link.', 'The builder is scanning direct relationships between blocks in the same tab to suggest digital thread links.')+'</div>';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px"><strong>'+_t('Liên kết khả dụng', 'Available links')+'</strong><button class="hm-btn '+(state.showDigitalThreadLinks ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm" data-action="toggle-digital-thread-links">'+_t('🔗 Hiện/Ẩn links', '🔗 Toggle links')+'</button></div>';
+  if(!suggestions.length){
+    h += '<div class="mb-field-hint">'+_t('Chưa phát hiện relation trực tiếp phù hợp với block này trong tab hiện tại.', 'No direct relation suggestion was detected for this block in the active tab.')+'</div>';
+    return h;
+  }
+  suggestions.forEach(function(item){
+    var targetLabel = item.target.blockId === (block.blockId || block.id) ? _t('Nhận lọc từ', 'Receive filter from') : _t('Lọc block', 'Filter block');
+    var other = item.target.blockId === (block.blockId || block.id) ? item.source : item.target;
+    h += '<div class="mb-choice-card"><div><strong>'+_esc(item.relation.label || item.relation.labelEn || item.relation.id)+'</strong><div class="mb-pack-desc">'+_esc(targetLabel)+' <code>'+_esc(_getBlockTitle(other.block))+'</code> • '+_esc(item.relation.type)+'</div></div>';
+    h += '<button class="hm-btn '+(_isSuggestionConfigured(item) ? 'hm-btn-secondary' : 'hm-btn-primary')+' hm-btn-sm" data-action="apply-relation-link" data-relation-id="'+_esc(item.relation.id)+'" data-source="'+_esc(item.source.blockId)+'" data-target="'+_esc(item.target.blockId)+'">'+(_isSuggestionConfigured(item) ? _t('Đã kết nối', 'Linked') : _t('Kết nối', 'Connect'))+'</button></div>';
+  });
+  return h;
+}
+
+function _configuredDigitalLinks(tab){
+  return (tab && tab.blocks || []).map(function(block){
+    if(!(block && block.config && block.config.crossBlockLink)) return null;
+    return {
+      sourceBlockId: block.config.crossBlockLink.sourceBlockId,
+      targetBlockId: block.blockId || block.id,
+      label: block.config.crossBlockLink.label || '',
+      type: block.config.crossBlockLink.type || '',
+      relationId: block.config.crossBlockLink.relationId || ''
+    };
+  }).filter(function(item){ return !!item; });
+}
+
+function _paintDigitalThreadOverlay(){
+  var stage = state.container && state.container.querySelector ? state.container.querySelector('.mb-canvas-stage') : null;
+  var links = _configuredDigitalLinks(_getActiveTab());
+  var svg;
+  var stageRect;
+  if(!stage) return;
+  svg = stage.querySelector('.mb-link-overlay');
+  if(svg && svg.parentNode) svg.parentNode.removeChild(svg);
+  if(state.step !== 'build' || !state.showDigitalThreadLinks || !links.length) return;
+  stageRect = stage.getBoundingClientRect();
+  svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', 'mb-link-overlay');
+  svg.setAttribute('width', stage.scrollWidth || stage.clientWidth || 0);
+  svg.setAttribute('height', stage.scrollHeight || stage.clientHeight || 0);
+  links.forEach(function(link){
+    var source = stage.querySelector('[data-block-wrapper="'+link.sourceBlockId+'"]');
+    var target = stage.querySelector('[data-block-wrapper="'+link.targetBlockId+'"]');
+    var sourceRect;
+    var targetRect;
+    var startX;
+    var startY;
+    var endX;
+    var endY;
+    var path;
+    var circle;
+    var label;
+    var title;
+    if(!source || !target) return;
+    sourceRect = source.getBoundingClientRect();
+    targetRect = target.getBoundingClientRect();
+    startX = sourceRect.right - stageRect.left + stage.scrollLeft;
+    startY = sourceRect.top - stageRect.top + stage.scrollTop + sourceRect.height / 2;
+    endX = targetRect.left - stageRect.left + stage.scrollLeft;
+    endY = targetRect.top - stageRect.top + stage.scrollTop + targetRect.height / 2;
+    path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', 'M ' + startX + ' ' + startY + ' C ' + (startX + 44) + ' ' + startY + ', ' + (endX - 44) + ' ' + endY + ', ' + endX + ' ' + endY);
+    title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+    title.textContent = (link.label || link.relationId || '') + (link.type ? ' • ' + link.type : '');
+    path.appendChild(title);
+    svg.appendChild(path);
+    circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', endX);
+    circle.setAttribute('cy', endY);
+    circle.setAttribute('r', 4);
+    svg.appendChild(circle);
+    label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    label.setAttribute('x', (startX + endX) / 2);
+    label.setAttribute('y', Math.min(startY, endY) - 8);
+    label.textContent = link.label || link.type || '';
+    svg.appendChild(label);
+  });
+  stage.appendChild(svg);
+}
+
+function _renderRegistryValidationSummary(draft){
+  var entity = (draft.config && draft.config.entity) || _inferEntityFromApi(_getByPath(draft, 'config.dataSource.api'));
+  var fields = _getByPath(draft, 'config.fields') || [];
+  var rules = _getValidationRuleList().filter(function(rule){
+    return !entity || rule.entity === entity;
+  });
+  var h = '';
+  h += '<div class="mb-helper-note">'+_t('Validation tự động đang đồng bộ từ registry theo entity hiện tại.', 'Automatic validation is being synced from the registry for the current entity.')+'</div>';
+  h += _renderPropField({ label:_t('Bật validation tự động', 'Auto validation from registry'), labelEn:'Auto validation from registry', type:'toggle', path:'config.validation.autoApply' }, 'config.validation.autoApply', _getByPath(draft, 'config.validation.autoApply') !== false);
+  h += '<div class="mb-choice-list">';
+  h += '<div class="mb-choice-card"><div><strong>'+_t('Entity hiện tại', 'Current entity')+'</strong><div class="mb-pack-meta">'+_esc(entity || _t('Chưa xác định', 'Unknown'))+'</div></div><div class="mb-pack-meta">'+rules.length+' '+_t('rule', 'rules')+'</div></div>';
+  fields.slice(0, 10).forEach(function(field){
+    var fieldRules = _getValidationRulesForField(entity, field.key);
+    if(!fieldRules.length) return;
+    h += '<div class="mb-choice-card"><div><strong>'+_esc(field.label && (field.label.vi || field.label.en) || field.key)+'</strong><div class="mb-pack-desc">'+_esc(fieldRules.map(function(rule){ return rule.type; }).join(', '))+'</div></div><div class="mb-pack-meta">'+_esc(fieldRules[0].message || fieldRules[0].messageEn || '')+'</div></div>';
+  });
+  h += '</div>';
+  return h;
+}
+
+function _renderWorkflowRegistrySummary(draft){
+  var workflowId = _getByPath(draft, 'config.workflow.workflowId');
+  var workflow = _getWorkflowRegistryMap()[workflowId] || {};
+  var transitions = _getByPath(draft, 'config.workflow.transitions') || [];
+  var h = '';
+  h += '<div class="mb-helper-note">'+_t('Chọn workflow để builder tự tạo button chuyển trạng thái, guards, SLA và digital thread metadata.', 'Choose a workflow so the builder can auto-create transition buttons, guards, SLA, and digital thread metadata.')+'</div>';
+  if(!workflowId){
+    h += '<div class="mb-field-hint">'+_t('Chưa chọn workflow. Block vẫn có thể cấu hình tay danh sách transition.', 'No workflow selected yet. You can still configure transitions manually.')+'</div>';
+    return h;
+  }
+  h += '<div class="mb-choice-list">';
+  h += '<div class="mb-choice-card"><div><strong>'+_esc(workflow.name || workflow.nameEn || workflowId)+'</strong><div class="mb-pack-meta">'+_esc(workflow.entity || '')+'</div></div><div class="mb-pack-meta">'+transitions.length+' '+_t('transition', 'transitions')+'</div></div>';
+  (workflow.states || []).slice(0, 6).forEach(function(stateItem){
+    h += '<div class="mb-choice-card"><div><strong>'+_esc(stateItem.label || stateItem.labelEn || stateItem.id)+'</strong><div class="mb-pack-desc">'+_esc(stateItem.id)+'</div></div><div class="mb-pack-meta">'+_esc(stateItem.color || '')+'</div></div>';
+  });
+  h += '</div>';
+  return h;
 }
 
 /* ============================================================================
@@ -1912,6 +3061,12 @@ function _ensureBuilderState(){
   if(state.insertPosition === undefined) state.insertPosition = null;
   if(state.contextMenu === undefined) state.contextMenu = null;
   if(state.pendingUndoLabel === undefined) state.pendingUndoLabel = '';
+  if(!state.libraryMode) state.libraryMode = 'blocks';
+  if(!state.fieldSearch) state.fieldSearch = {};
+  if(state.packPicker === undefined) state.packPicker = null;
+  if(state.showDigitalThreadLinks === undefined) state.showDigitalThreadLinks = true;
+  if(!state.registries.dataFieldsLoading) state.registries.dataFieldsLoading = {};
+  if(state.registries.loadingMessage === undefined) state.registries.loadingMessage = '';
 }
 
 function _ensureBuilderStyles(){
@@ -1931,7 +3086,7 @@ function _ensureBuilderStyles(){
   css += '.mb-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--gray-50)}';
   css += '.mb-toolbar-group{display:flex;gap:8px;align-items:center;flex-wrap:wrap}';
   css += '.mb-toolbar-spacer{flex:1 1 auto}';
-  css += '.mb-canvas-stage{padding:18px;min-height:520px;background:linear-gradient(180deg,rgba(37,99,235,0.04),rgba(255,255,255,0));overflow:auto}';
+  css += '.mb-canvas-stage{padding:18px;min-height:520px;background:linear-gradient(180deg,rgba(37,99,235,0.04),rgba(255,255,255,0));overflow:auto;position:relative}';
   css += '.mb-canvas-root{min-height:400px;padding:18px;border:1px dashed rgba(37,99,235,0.3);border-radius:20px;background:#fff}';
   css += '.mb-layout-stack{display:flex;flex-direction:column}';
   css += '.mb-layout-grid{display:grid}';
@@ -1980,7 +3135,37 @@ function _ensureBuilderStyles(){
   css += '.mb-context-menu button{width:100%;text-align:left;border:0;background:none;padding:9px 10px;border-radius:10px;cursor:pointer;font:inherit;color:var(--text-primary)}';
   css += '.mb-context-menu button:hover{background:var(--gray-50)}';
   css += '.mb-helper-note{padding:10px 12px;border:1px solid rgba(37,99,235,0.18);background:rgba(37,99,235,0.05);border-radius:12px;color:var(--text-secondary);font-size:12px;margin-bottom:12px}';
+  css += '.mb-inline-loading{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px dashed rgba(37,99,235,0.22);border-radius:12px;background:rgba(37,99,235,0.04);font-size:12px;color:var(--text-secondary);margin-bottom:10px}';
+  css += '.mb-spinner{width:14px;height:14px;border:2px solid rgba(37,99,235,0.18);border-top-color:var(--brand-2);border-radius:50%;display:inline-block;animation:mb-spin .8s linear infinite}';
+  css += '.mb-field-select-wrap{display:grid;gap:8px}';
+  css += '.mb-field-hint{font-size:12px;color:var(--text-tertiary)}';
+  css += '.mb-field-match-list{display:grid;gap:6px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:rgba(15,23,42,0.02)}';
+  css += '.mb-field-match-item{display:flex;justify-content:space-between;gap:12px;font-size:12px;color:var(--text-secondary)}';
+  css += '.mb-field-match-item strong{font-size:12px;color:var(--text-primary)}';
+  css += '.mb-field-match-item span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}';
+  css += '.mb-field-match-item mark{background:rgba(245,158,11,0.22);padding:0 2px;border-radius:4px}';
+  css += '.mb-library-tabs{display:flex;gap:8px;margin-bottom:12px}';
+  css += '.mb-pack-card{display:grid;gap:8px;padding:12px 14px;border:1px solid var(--border);border-radius:16px;background:#fff;margin-bottom:10px;cursor:pointer;transition:border-color .15s, box-shadow .15s, transform .15s}';
+  css += '.mb-pack-card:hover{border-color:rgba(37,99,235,0.35);box-shadow:0 12px 24px rgba(15,23,42,0.06);transform:translateY(-1px)}';
+  css += '.mb-pack-head{display:flex;align-items:flex-start;gap:10px}';
+  css += '.mb-pack-icon{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(37,99,235,0.08);font-size:18px}';
+  css += '.mb-pack-name{font-weight:700;font-size:14px;color:var(--text-primary)}';
+  css += '.mb-pack-meta{font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.08em}';
+  css += '.mb-pack-desc{font-size:12px;color:var(--text-secondary);line-height:1.45}';
+  css += '.mb-pack-actions{display:flex;gap:8px;flex-wrap:wrap}';
+  css += '.mb-link-banner{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid rgba(15,118,110,0.24);border-radius:16px;background:rgba(15,118,110,0.06);margin:0 16px 14px}';
+  css += '.mb-link-banner strong{display:block;color:#0f766e;margin-bottom:4px}';
+  css += '.mb-link-overlay{position:absolute;inset:18px;pointer-events:none;overflow:visible}';
+  css += '.mb-link-overlay path{fill:none;stroke:rgba(15,118,110,0.48);stroke-width:2.25;stroke-dasharray:8 6}';
+  css += '.mb-link-overlay circle{fill:#0f766e}';
+  css += '.mb-link-overlay text{font-size:11px;fill:#0f766e;font-weight:700}';
+  css += '.mb-modal-surface{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,0.36);z-index:1500;padding:24px}';
+  css += '.mb-modal-card{width:min(560px,100%);max-height:calc(100vh - 48px);overflow:auto;background:#fff;border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow-xl);padding:18px}';
+  css += '.mb-choice-list{display:grid;gap:10px;margin-top:14px}';
+  css += '.mb-choice-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--border);border-radius:14px;background:#fff}';
+  css += '.mb-choice-card strong{display:block;font-size:14px;color:var(--text-primary)}';
   css += '.mb-kbd-chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--border);padding:4px 8px;border-radius:999px;background:#fff;font-size:12px;color:var(--text-secondary)}';
+  css += '@keyframes mb-spin{to{transform:rotate(360deg)}}';
   css += '@media (max-width: 1360px){.mb-builder-shell{flex-direction:column}.mb-side-panel,.mb-right-rail{width:auto}}';
   style.textContent = css;
   document.head.appendChild(style);
@@ -2662,32 +3847,66 @@ _renderLibraryPanel = function(){
   var h = '';
   var catalog = BE.BLOCK_CATALOG || {};
   var categories = BE.BLOCK_CATEGORIES || [];
-  var search = (state.librarySearch || '').toLowerCase();
+  var packMap = _getDomainPackMap();
+  var search = state.librarySearch || '';
+  var normalizedSearch = _normalizeSearchText(search);
   h += '<div class="mb-rail-panel">';
   h += '<div class="mb-panel-header"><div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary)">'+_t('Library', 'Library')+'</div><strong>'+_t('Thư viện block', 'Block Library')+'</strong></div><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="close-library">×</button></div>';
   h += '<div class="mb-panel-body">';
-  h += '<div class="mb-helper-note">'+_t('Kéo trực tiếp block từ thư viện vào canvas hoặc bấm để chèn vào vị trí đang chọn.', 'Drag blocks directly from the library into the canvas or click to insert at the selected position.')+'</div>';
-  h += '<input type="text" class="hm-input" id="mb-lib-search" placeholder="'+_t('Tìm block...', 'Search blocks...')+'" value="'+_esc(state.librarySearch || '')+'">';
-  categories.forEach(function(cat){
-    var keys = Object.keys(catalog).filter(function(key){
-      var entry = catalog[key];
-      var label = (entry.label || '').toLowerCase();
-      var labelEn = (entry.labelEn || '').toLowerCase();
-      return entry.category === cat.key && (!search || label.indexOf(search) >= 0 || labelEn.indexOf(search) >= 0 || key.indexOf(search) >= 0);
-    });
-    if(!keys.length) return;
-    h += '<div style="margin-top:16px">';
-    h += '<div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:'+cat.color+';font-weight:700;margin-bottom:8px">'+_esc(_t(cat.label, cat.labelEn || cat.label))+' ('+keys.length+')</div>';
-    keys.forEach(function(key){
-      var entry = catalog[key];
-      h += '<div class="mb-tree-node" draggable="true" data-library-type="'+_esc(key)+'" style="border:1px solid var(--border);margin-bottom:8px">';
-      h += '<div style="font-size:18px;width:26px;text-align:center">'+_esc(entry.icon || '📦')+'</div>';
-      h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="add-block-type" data-type="'+_esc(key)+'" style="padding:0;border:0;background:none;display:flex;align-items:flex-start;gap:8px;flex:1;min-width:0;text-align:left">';
-      h += '<span class="mb-tree-label"><span class="mb-tree-title">'+_esc(entry.label)+'</span><span class="mb-tree-type">'+_esc(entry.labelEn || '')+'</span></span></button>';
+  h += '<div class="mb-library-tabs">';
+  h += '<button class="hm-btn '+(state.libraryMode === 'blocks' ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm" data-action="library-mode" data-mode="blocks">🧩 '+_t('Blocks', 'Blocks')+'</button>';
+  h += '<button class="hm-btn '+(state.libraryMode === 'packs' ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm" data-action="library-mode" data-mode="packs">📦 '+_t('Field Packs', 'Field Packs')+'</button>';
+  h += '</div>';
+  if(state.libraryMode === 'packs'){
+    h += '<div class="mb-helper-note">'+_t('Kéo field pack vào block biểu mẫu, bảng dữ liệu hoặc thanh lọc để builder tự ghép schema theo domain.', 'Drag a field pack into a form, table, or filter bar so the builder can merge domain-aware schema automatically.')+'</div>';
+    h += '<input type="text" class="hm-input" id="mb-lib-search" placeholder="'+_t('Tìm field pack...', 'Search field packs...')+'" value="'+_esc(state.librarySearch || '')+'">';
+    _ensureRegistriesLoaded();
+    if(state.registries.loading && !Object.keys(packMap).length){
+      h += '<div class="mb-inline-loading"><span class="mb-spinner"></span><span>'+_esc(state.registries.loadingMessage || _t('Đang nạp field pack...', 'Loading field packs...'))+'</span></div>';
+    }
+    ['bao_gia','don_hang','ke_hoach','mua_hang','san_xuat','chat_luong','ho_so','bao_cao','tai_lieu','quan_tri'].forEach(function(moduleKey){
+      var items = Object.keys(packMap).filter(function(packKey){
+        var info = _getPackInfo(packKey, packMap[packKey] || []);
+        var haystack = _normalizeSearchText(packKey + ' ' + info.label + ' ' + info.description + ' ' + info.moduleLabel);
+        return info.module === moduleKey && (!normalizedSearch || haystack.indexOf(normalizedSearch) >= 0);
+      });
+      if(!items.length) return;
+      h += '<div style="margin-top:16px">';
+      h += '<div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary);font-weight:700;margin-bottom:8px">'+_esc(_packModuleInfo(moduleKey).icon)+' '+_esc(_packModuleInfo(moduleKey).label)+' ('+items.length+')</div>';
+      items.forEach(function(packKey){
+        var info = _getPackInfo(packKey, packMap[packKey] || []);
+        h += '<div class="mb-pack-card" draggable="true" data-field-pack="'+_esc(packKey)+'">';
+        h += '<div class="mb-pack-head"><div class="mb-pack-icon">'+_esc(info.icon)+'</div><div style="flex:1"><div class="mb-pack-name">'+_esc(info.label)+'</div><div class="mb-pack-meta">'+_esc(info.moduleLabel)+' • '+info.count+' '+_t('trường', 'fields')+'</div></div></div>';
+        h += '<div class="mb-pack-desc">'+_esc(info.description)+'</div>';
+        h += '<div class="mb-pack-actions"><button class="hm-btn hm-btn-primary hm-btn-sm" data-action="open-pack-picker" data-pack="'+_esc(packKey)+'">'+_t('Thêm nhanh', 'Quick add')+'</button></div>';
+        h += '</div>';
+      });
       h += '</div>';
     });
-    h += '</div>';
-  });
+  } else {
+    h += '<div class="mb-helper-note">'+_t('Kéo trực tiếp block từ thư viện vào canvas hoặc bấm để chèn vào vị trí đang chọn.', 'Drag blocks directly from the library into the canvas or click to insert at the selected position.')+'</div>';
+    h += '<input type="text" class="hm-input" id="mb-lib-search" placeholder="'+_t('Tìm block...', 'Search blocks...')+'" value="'+_esc(state.librarySearch || '')+'">';
+    categories.forEach(function(cat){
+      var keys = Object.keys(catalog).filter(function(key){
+        var entry = catalog[key];
+        var label = _normalizeSearchText(entry.label || '');
+        var labelEn = _normalizeSearchText(entry.labelEn || '');
+        return entry.category === cat.key && (!normalizedSearch || label.indexOf(normalizedSearch) >= 0 || labelEn.indexOf(normalizedSearch) >= 0 || _normalizeSearchText(key).indexOf(normalizedSearch) >= 0);
+      });
+      if(!keys.length) return;
+      h += '<div style="margin-top:16px">';
+      h += '<div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:'+cat.color+';font-weight:700;margin-bottom:8px">'+_esc(_t(cat.label, cat.labelEn || cat.label))+' ('+keys.length+')</div>';
+      keys.forEach(function(key){
+        var entry = catalog[key];
+        h += '<div class="mb-tree-node" draggable="true" data-library-type="'+_esc(key)+'" style="border:1px solid var(--border);margin-bottom:8px">';
+        h += '<div style="font-size:18px;width:26px;text-align:center">'+_esc(entry.icon || '📦')+'</div>';
+        h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="add-block-type" data-type="'+_esc(key)+'" style="padding:0;border:0;background:none;display:flex;align-items:flex-start;gap:8px;flex:1;min-width:0;text-align:left">';
+        h += '<span class="mb-tree-label"><span class="mb-tree-title">'+_esc(entry.label)+'</span><span class="mb-tree-type">'+_esc(entry.labelEn || '')+'</span></span></button>';
+        h += '</div>';
+      });
+      h += '</div>';
+    });
+  }
   h += '</div></div>';
   return h;
 };
@@ -2706,7 +3925,10 @@ _renderPropertiesPanel = function(){
   _ensureRegistriesLoaded();
   draft = state.propsDraft || block;
   catalog = (BE.BLOCK_CATALOG || {})[draft.type] || {};
-  tabs = (BE.BLOCK_PROPERTIES_SCHEMA || {})[draft.type] || [];
+  tabs = ((BE.BLOCK_PROPERTIES_SCHEMA || {})[draft.type] || []).slice();
+  if(_relationsForSelectedBlock(draft.blockId || draft.id).length || _getRelationList().length){
+    tabs.push({ key:'relations', label:'Liên kết', labelEn:'Links', icon:'🔗' });
+  }
   activeKey = state.propsTab || (tabs[0] && tabs[0].key) || 'general';
   for(i = 0; i < tabs.length; i++){
     if(tabs[i].key === activeKey) activeTab = tabs[i];
@@ -2735,10 +3957,18 @@ _renderPropertiesPanel = function(){
     });
     h += '</div>';
   }
-  if(activeTab){
+  if(activeKey === 'relations'){
+    h += _renderRelationsPanel(draft);
+  } else if(activeTab){
     (activeTab.sections || []).forEach(function(section){
       h += _renderPropSection(section, draft);
     });
+    if(draft.type === 'form-standard'){
+      h += _renderRegistryValidationSummary(draft);
+    }
+    if(draft.type === 'action-status-flow'){
+      h += _renderWorkflowRegistrySummary(draft);
+    }
   }
   h += '</div><div class="mb-panel-header" style="border-top:1px solid var(--border);border-bottom:0;background:#fff">';
   h += '<button class="hm-btn hm-btn-secondary" data-action="close-props">'+_t('Đóng', 'Close')+'</button>';
@@ -2753,12 +3983,16 @@ _renderBuilder = function(){
   var tree;
   var roots;
   var undoInfo;
+  var relationSuggestions;
+  var configuredLinks;
   var h = '';
   if(!schema) return '<div class="hm-empty">No schema</div>';
   activeTab = _getActiveTab();
   tree = activeTab ? _buildTabTree(activeTab) : { roots: [] };
   roots = tree.roots || [];
   undoInfo = undoManager.getInfo();
+  relationSuggestions = activeTab ? _relationSuggestionsForTab(activeTab) : [];
+  configuredLinks = activeTab ? _configuredDigitalLinks(activeTab) : [];
   h += '<div style="background:linear-gradient(135deg,var(--brand) 0%,var(--brand-2) 100%);color:#fff;padding:20px 24px;border-radius:24px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">';
   h += '<div><div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.72">MODULE BUILDER V2</div><h1 style="margin:6px 0 0;font-size:24px">'+_esc(schema.icon || '📦')+' '+_esc(_t(schema.title.vi, schema.title.en))+'</h1><div style="margin-top:8px;opacity:.85;font-size:13px">'+_t('Canvas dạng tree, kéo thả HTML5, undo/redo 200 bước và binding {{ }} an toàn.', 'Tree canvas, HTML5 drag-drop, 200-step undo/redo, and safe {{ }} bindings.')+'</div></div>';
   h += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
@@ -2798,6 +4032,12 @@ _renderBuilder = function(){
     h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="toggle-tree">🌳 '+_t('Tree', 'Tree')+'</button>';
     h += '<button class="hm-btn '+(state.showLibrary ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm" data-action="open-library" data-tab="'+_esc(activeTab.tabId)+'" data-parent="" data-slot="default">📚 '+_t('Library', 'Library')+'</button>';
     h += '</div></div>';
+    if(relationSuggestions.length || configuredLinks.length){
+      h += '<div class="mb-link-banner">';
+      h += '<div><strong>'+_t('Registry phát hiện digital thread giữa các block', 'Registry detected digital thread opportunities between blocks')+'</strong><div style="font-size:12px;color:var(--text-secondary)">'+_t('Gợi ý '+relationSuggestions.length+' liên kết mới và đang hiển thị '+configuredLinks.length+' liên kết đã cấu hình trên canvas hiện tại.', 'There are '+relationSuggestions.length+' suggested links and '+configuredLinks.length+' configured links on the current canvas.')+'</div></div>';
+      h += '<button class="hm-btn '+(state.showDigitalThreadLinks ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm" data-action="toggle-digital-thread-links">'+_t('🔗 Hiện/Ẩn links', '🔗 Toggle links')+'</button>';
+      h += '</div>';
+    }
     h += '<div class="mb-canvas-stage">';
     h += '<div class="mb-canvas-root" data-drop-zone="1" data-drop-tab="'+_esc(activeTab.tabId)+'" data-drop-parent="" data-drop-slot="default" style="'+_layoutStyle(activeTab.layout)+'">';
     if(!roots.length){
@@ -2819,6 +4059,7 @@ _renderBuilder = function(){
   h += '</div>';
   h += _renderShortcutPopover();
   h += _renderContextMenu();
+  if(state.packPicker) h += _renderPackPickerModal();
   return h;
 };
 
@@ -3024,6 +4265,7 @@ _deleteSavedModule = function(moduleId){
 
 _openBlockConfig = function(blockId){
   var block = _findBlock(blockId);
+  var api;
   if(!block) return;
   state.selectedBlock = block.blockId || block.id;
   state.propsTab = 'general';
@@ -3032,6 +4274,12 @@ _openBlockConfig = function(blockId){
   state.showLibrary = false;
   state.contextMenu = null;
   _ensureRegistriesLoaded();
+  api = _getByPath(state.propsDraft, 'config.dataSource.api');
+  if(api){
+    _ensureDataFieldsForApi(api).then(function(){
+      if(state.selectedBlock === (block.blockId || block.id)) _paint();
+    });
+  }
   _paint();
 };
 
@@ -3076,6 +4324,7 @@ _paint = function(){
   c.ontouchend = _handleTouchEnd;
   c.ontouchcancel = _handleTouchCancel;
   c.oncontextmenu = _handleContextMenu;
+  _paintDigitalThreadOverlay();
   _scrollSelectedIntoView();
 };
 
@@ -3145,21 +4394,37 @@ function _applyDragIndicator(target){
 }
 
 function _resolveDragSourceFromNode(node){
-  var el = node && node.closest ? node.closest('[data-library-type],[data-drag-block]') : null;
+  var el = node && node.closest ? node.closest('[data-library-type],[data-drag-block],[data-field-pack]') : null;
   if(!el) return null;
   if(el.getAttribute('data-drag-disabled') === '1') return null;
   if(el.getAttribute('data-library-type')){
     return { kind:'library', blockType:el.getAttribute('data-library-type') };
   }
+  if(el.getAttribute('data-field-pack')){
+    return { kind:'field-pack', packKey:el.getAttribute('data-field-pack') };
+  }
   return { kind:'block', blockId:el.getAttribute('data-drag-block'), tabId:el.getAttribute('data-drag-tab') };
 }
 
 function _performDropAction(source, target){
+  var targetBlock;
   if(!source || !target) return;
   if(source.kind === 'library'){
     _mutateSchema(_t('Thêm block bằng kéo thả', 'Add block by drag-drop'), function(){
       _insertBlockAtTarget(source.blockType, null, target);
     });
+  } else if(source.kind === 'field-pack' && source.packKey){
+    targetBlock = target.indicatorType === 'zone' ? null : _findBlock(target.indicatorId);
+    if(targetBlock && _isPackCompatibleBlock(targetBlock)){
+      _mutateSchema(_t('Thả field pack vào block', 'Drop field pack into block'), function(){
+        _mergePackIntoBlock(targetBlock, source.packKey);
+        state.selectedBlock = targetBlock.blockId || targetBlock.id;
+        state.propsDraft = _clone(targetBlock);
+      });
+      _toastBuilder(_t('Đã thêm field pack vào block đang thả.', 'Field pack added to the hovered block.'), 'success');
+    } else {
+      _createBlockFromPack(source.packKey, 'form-standard', target);
+    }
   } else if(source.kind === 'block' && source.blockId){
     _mutateSchema(_t('Sắp xếp lại block', 'Reorder block'), function(){
       _moveTreeToTarget(source.blockId, target);
@@ -3179,7 +4444,7 @@ function _resetTouchDragState(){
 }
 
 _handleDragStart = function(e){
-  var el = e.target && e.target.closest ? e.target.closest('[data-library-type],[data-drag-block]') : null;
+  var el = e.target && e.target.closest ? e.target.closest('[data-library-type],[data-drag-block],[data-field-pack]') : null;
   var payload = _resolveDragSourceFromNode(e.target);
   if(!el) return;
   if(!payload){ e.preventDefault(); return; }
@@ -3347,6 +4612,7 @@ _handleClick = function(e){
   var btn = e.target && e.target.closest ? e.target.closest('[data-action]') : null;
   var action;
   var blockId;
+  var suggestion;
   if(state.contextMenu && (!e.target.closest || !e.target.closest('[data-context-menu]'))){
     state.contextMenu = null;
     if(!btn){ _paint(); return; }
@@ -3423,6 +4689,11 @@ _handleClick = function(e){
       _setInsertTarget(btn.getAttribute('data-tab') || state.activeTab, btn.getAttribute('data-parent') || null, btn.getAttribute('data-slot') || 'default', null);
       _paint();
       break;
+    case 'library-mode':
+      state.libraryMode = btn.getAttribute('data-mode') || 'blocks';
+      if(state.libraryMode === 'packs') _ensureRegistriesLoaded();
+      _paint();
+      break;
     case 'close-library':
       state.showLibrary = false;
       _paint();
@@ -3430,6 +4701,19 @@ _handleClick = function(e){
     case 'add-block-type':
       _addBlockToSchema(btn.getAttribute('data-type'));
       state.showLibrary = false;
+      break;
+    case 'open-pack-picker':
+      _openPackPicker(btn.getAttribute('data-pack'));
+      break;
+    case 'close-pack-picker':
+      state.packPicker = null;
+      _paint();
+      break;
+    case 'apply-pack-target':
+      _applyPackToTarget(btn.getAttribute('data-pack'), btn.getAttribute('data-target'));
+      break;
+    case 'apply-pack-create':
+      _createBlockFromPack(btn.getAttribute('data-pack'), btn.getAttribute('data-type') || 'form-standard');
       break;
     case 'config-block':
     case 'select-block':
@@ -3510,6 +4794,19 @@ _handleClick = function(e){
       _collectionMove(btn.getAttribute('data-path'), parseInt(btn.getAttribute('data-index'), 10), 1);
       _paint();
       break;
+    case 'apply-relation-link':
+      suggestion = _findRelationSuggestionByIds(
+        _getActiveTab(),
+        btn.getAttribute('data-relation-id'),
+        btn.getAttribute('data-source'),
+        btn.getAttribute('data-target')
+      );
+      if(suggestion) _applyRelationSuggestion(suggestion);
+      break;
+    case 'toggle-digital-thread-links':
+      state.showDigitalThreadLinks = !state.showDigitalThreadLinks;
+      _paint();
+      break;
     case 'registry-retry':
       state.registries.loading = false;
       state.registries.loaded = false;
@@ -3543,6 +4840,9 @@ _handleClick = function(e){
 
 _handleInput = function(e){
   var target = e.target;
+  var path;
+  var api;
+  var workflowId;
   if(target.id === 'mb-lib-search'){
     state.librarySearch = target.value;
     _paint();
@@ -3567,8 +4867,42 @@ _handleInput = function(e){
     });
     return;
   }
+  if(target.hasAttribute('data-field-search-path')){
+    state.fieldSearch[target.getAttribute('data-field-search-path')] = target.value || '';
+    _paint();
+    return;
+  }
   if(target.hasAttribute('data-field-path')){
+    path = target.getAttribute('data-field-path');
     _updateDraftValue(target);
+    if(path === 'config.dataSource.api'){
+      api = target.value || '';
+      if(api){
+        _paint();
+        _ensureDataFieldsForApi(api).then(function(){
+          var result = _autoPopulateDraftFromApi(state.propsDraft, api);
+          if(result){
+            _syncDraftToSelectedBlock(_t('Tự động thêm schema từ registry', 'Auto-populate from registry'));
+            _toastBuilder(_t('Đã tự động thêm ', 'Auto-added ') + result.count + ' ' + result.noun + _t(' từ registry.', ' from registry.'), 'success');
+          } else if(state.selectedBlock){
+            _paint();
+          }
+        });
+        return;
+      }
+    }
+    if(path === 'config.workflow.workflowId'){
+      workflowId = target.value || '';
+      if(workflowId && _applyWorkflowRegistryToDraft(state.propsDraft, workflowId)){
+        _syncDraftToSelectedBlock(_t('Đồng bộ workflow từ registry', 'Sync workflow from registry'));
+        _toastBuilder(_t('Đã tự động tạo transitions, guards và SLA từ workflow đã chọn.', 'Transitions, guards, and SLA were generated from the selected workflow.'), 'success');
+        return;
+      }
+    }
+    if(path === 'config.validation.autoApply' && state.propsDraft && state.propsDraft.type === 'form-standard'){
+      _syncDraftToSelectedBlock(_t('Cập nhật validation tự động', 'Update automatic validation'));
+      return;
+    }
     if(target.getAttribute('data-trigger-repaint') === '1') _paint();
   }
 };
