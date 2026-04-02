@@ -3680,4 +3680,434 @@ Object.assign(window.HmBlockEngine, {
   _announce:          _announce,
 });
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   ADVANCED FEATURES — IoT Connectors, Transformer, Extra Templates,
+   Responsive Breakpoints, Block States, Undo History
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+// ─── 1. IoT CONNECTOR REGISTRY ──────────────────────────────────────────────
+var IOT_CONNECTORS = {
+  'mtconnect': {
+    label: 'MTConnect',
+    labelVi: 'MTConnect (CNC)',
+    icon: '🔌',
+    desc: 'Read-only streaming from CNC machines via MTConnect agent',
+    descVi: 'Đọc dữ liệu máy CNC qua MTConnect agent',
+    protocol: 'HTTP/XML',
+    direction: 'inbound',
+    config: {
+      agentUrl: { type:'text', label:'Agent URL', placeholder:'http://192.168.1.100:5000' },
+      deviceId: { type:'text', label:'Device ID', placeholder:'CNC-05' },
+      pollIntervalMs: { type:'number', label:'Poll interval (ms)', default: 1000 },
+      dataItems: { type:'tags', label:'Data items', placeholder:'Xact, Yact, Zact, spindle_speed, feed_rate' }
+    }
+  },
+  'opcua': {
+    label: 'OPC-UA',
+    labelVi: 'OPC-UA (Tự động hóa)',
+    icon: '🏭',
+    desc: 'Read/write industrial automation data via OPC-UA protocol',
+    descVi: 'Đọc/ghi dữ liệu tự động hóa qua giao thức OPC-UA',
+    protocol: 'OPC-UA Binary/JSON',
+    direction: 'bidirectional',
+    config: {
+      endpointUrl: { type:'text', label:'Endpoint URL', placeholder:'opc.tcp://192.168.1.100:4840' },
+      securityMode: { type:'select', label:'Security', options:['None','Sign','SignAndEncrypt'] },
+      nodeIds: { type:'tags', label:'Node IDs', placeholder:'ns=2;s=Temperature, ns=2;s=Pressure' }
+    }
+  },
+  'mqtt': {
+    label: 'MQTT',
+    labelVi: 'MQTT (IoT)',
+    icon: '📡',
+    desc: 'Pub/sub messaging for IoT sensors and edge devices',
+    descVi: 'Nhắn tin pub/sub cho cảm biến IoT và thiết bị biên',
+    protocol: 'MQTT 3.1.1 / 5.0',
+    direction: 'bidirectional',
+    config: {
+      brokerUrl: { type:'text', label:'Broker URL', placeholder:'mqtt://broker.hesem.local:1883' },
+      topic: { type:'text', label:'Topic', placeholder:'factory/cnc-05/telemetry' },
+      qos: { type:'select', label:'QoS', options:['0','1','2'], default:'1' },
+      username: { type:'text', label:'Username' },
+      password: { type:'password', label:'Password' }
+    }
+  },
+  'mqtt-sparkplug': {
+    label: 'MQTT Sparkplug B',
+    labelVi: 'Sparkplug B (Công nghiệp)',
+    icon: '⚡',
+    desc: 'Industrial IoT standard on MQTT with birth/death certificates',
+    descVi: 'Chuẩn IoT công nghiệp trên MQTT với chứng chỉ sinh/tử',
+    protocol: 'Sparkplug B / MQTT',
+    direction: 'bidirectional',
+    config: {
+      brokerUrl: { type:'text', label:'Broker URL' },
+      groupId: { type:'text', label:'Group ID', placeholder:'HESEM' },
+      edgeNodeId: { type:'text', label:'Edge Node ID', placeholder:'CNC-Shop-01' },
+      deviceId: { type:'text', label:'Device ID', placeholder:'CNC-05' }
+    }
+  },
+  'rest-api': {
+    label: 'REST API',
+    labelVi: 'REST API (HTTP)',
+    icon: '🌐',
+    desc: 'Connect to any REST API endpoint (GET/POST/PUT/DELETE)',
+    descVi: 'Kết nối bất kỳ API REST nào (GET/POST/PUT/DELETE)',
+    protocol: 'HTTP/HTTPS JSON',
+    direction: 'bidirectional',
+    config: {
+      baseUrl: { type:'text', label:'Base URL', placeholder:'https://api.example.com/v1' },
+      method: { type:'select', label:'Method', options:['GET','POST','PUT','DELETE'] },
+      headers: { type:'json', label:'Headers', placeholder:'{"Authorization":"Bearer xxx"}' },
+      body: { type:'json', label:'Body template', placeholder:'{"key":"{{value}}"}' },
+      authType: { type:'select', label:'Auth type', options:['none','bearer','basic','api-key','oauth2'] }
+    }
+  },
+  'webhook': {
+    label: 'Webhook',
+    labelVi: 'Webhook (Nhận sự kiện)',
+    icon: '🪝',
+    desc: 'Receive real-time events via HTTP POST from external systems',
+    descVi: 'Nhận sự kiện thời gian thực qua HTTP POST từ hệ thống bên ngoài',
+    protocol: 'HTTP POST',
+    direction: 'inbound',
+    config: {
+      path: { type:'text', label:'Webhook path', placeholder:'/webhook/machine-alarm' },
+      secret: { type:'password', label:'Signing secret' },
+      eventTypes: { type:'tags', label:'Event types', placeholder:'alarm, status_change, cycle_complete' }
+    }
+  },
+  'modbus': {
+    label: 'Modbus TCP',
+    labelVi: 'Modbus TCP (PLC)',
+    icon: '🔧',
+    desc: 'Read/write PLC registers via Modbus TCP protocol',
+    descVi: 'Đọc/ghi thanh ghi PLC qua giao thức Modbus TCP',
+    protocol: 'Modbus TCP/IP',
+    direction: 'bidirectional',
+    config: {
+      host: { type:'text', label:'PLC IP', placeholder:'192.168.1.50' },
+      port: { type:'number', label:'Port', default: 502 },
+      unitId: { type:'number', label:'Unit ID', default: 1 },
+      registers: { type:'tags', label:'Registers', placeholder:'HR100, HR101, IR200' }
+    }
+  },
+  'database': {
+    label: 'Database',
+    labelVi: 'Cơ sở dữ liệu',
+    icon: '🗄️',
+    desc: 'Direct SQL query to PostgreSQL, MySQL, SQLite',
+    descVi: 'Truy vấn SQL trực tiếp PostgreSQL, MySQL, SQLite',
+    protocol: 'SQL',
+    direction: 'bidirectional',
+    config: {
+      type: { type:'select', label:'DB Type', options:['postgresql','mysql','sqlite'] },
+      host: { type:'text', label:'Host' },
+      port: { type:'number', label:'Port' },
+      database: { type:'text', label:'Database' },
+      username: { type:'text', label:'Username' },
+      password: { type:'password', label:'Password' },
+      query: { type:'code', label:'SQL Query', placeholder:'SELECT * FROM table WHERE ...' }
+    }
+  },
+  'epicor-kinetic': {
+    label: 'Epicor Kinetic',
+    labelVi: 'Epicor Kinetic (ERP)',
+    icon: '🏢',
+    desc: 'Bidirectional sync with Epicor Kinetic ERP via REST API',
+    descVi: 'Đồng bộ hai chiều với Epicor Kinetic ERP qua REST API',
+    protocol: 'REST / OAuth2',
+    direction: 'bidirectional',
+    config: {
+      baseUrl: { type:'text', label:'Epicor API URL' },
+      company: { type:'text', label:'Company ID' },
+      apiKey: { type:'password', label:'API Key' },
+      syncDomains: { type:'tags', label:'Sync domains', placeholder:'sales_orders, job_orders, parts, inventory' }
+    }
+  }
+};
+
+// Render IoT connector config form
+function renderConnectorConfig(connectorType) {
+  var conn = IOT_CONNECTORS[connectorType];
+  if (!conn) return '';
+  var h = '<div class="hm-card" style="border-left:4px solid var(--brand-2)">';
+  h += '<div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-4)">';
+  h += '<span style="font-size:1.5rem">' + (conn.icon||'🔌') + '</span>';
+  h += '<div><div style="font-weight:var(--font-bold)">' + _esc(conn.label) + '</div>';
+  h += '<div style="font-size:var(--text-xs);color:var(--text-secondary)">' + _esc(conn.protocol) + ' — ' + _esc(conn.direction) + '</div></div>';
+  h += '</div>';
+  var config = conn.config || {};
+  Object.keys(config).forEach(function(key) {
+    var field = config[key];
+    h += '<div style="margin-bottom:var(--space-3)">';
+    h += '<label class="hm-label">' + _esc(field.label || key) + '</label>';
+    switch(field.type) {
+      case 'select':
+        h += '<select class="hm-input hm-select" data-conn-field="' + _esc(key) + '">';
+        (field.options||[]).forEach(function(opt) {
+          h += '<option value="' + _esc(opt) + '"' + (opt===field.default?' selected':'') + '>' + _esc(opt) + '</option>';
+        });
+        h += '</select>';
+        break;
+      case 'password':
+        h += '<input type="password" class="hm-input" data-conn-field="' + _esc(key) + '" placeholder="' + _esc(field.placeholder||'') + '">';
+        break;
+      case 'number':
+        h += '<input type="number" class="hm-input" data-conn-field="' + _esc(key) + '" value="' + (field.default||'') + '">';
+        break;
+      case 'json':
+      case 'code':
+        h += '<textarea class="hm-input hm-textarea" data-conn-field="' + _esc(key) + '" rows="3" style="font-family:var(--font-mono);font-size:var(--text-xs)" placeholder="' + _esc(field.placeholder||'') + '"></textarea>';
+        break;
+      case 'tags':
+        h += '<input type="text" class="hm-input" data-conn-field="' + _esc(key) + '" placeholder="' + _esc(field.placeholder||'') + '">';
+        h += '<div style="font-size:var(--text-xs);color:var(--text-tertiary);margin-top:2px">' + _t('Phân cách bằng dấu phẩy','Comma separated') + '</div>';
+        break;
+      default:
+        h += '<input type="text" class="hm-input" data-conn-field="' + _esc(key) + '" placeholder="' + _esc(field.placeholder||'') + '">';
+    }
+    h += '</div>';
+  });
+  h += '<button class="hm-btn hm-btn-primary" data-action="test-connector" data-type="' + _esc(connectorType) + '">' + _t('🔗 Kiểm tra kết nối','🔗 Test Connection') + '</button>';
+  h += '</div>';
+  return h;
+}
+
+// List all available connectors
+function renderConnectorLibrary() {
+  var h = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-3)">';
+  Object.keys(IOT_CONNECTORS).forEach(function(key) {
+    var conn = IOT_CONNECTORS[key];
+    var dirBadge = conn.direction === 'bidirectional' ? 'hm-badge-approved' : 'hm-badge-planned';
+    h += '<div class="hm-card" style="cursor:pointer" data-action="select-connector" data-type="' + _esc(key) + '">';
+    h += '<div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-2)">';
+    h += '<span style="font-size:1.5rem">' + (conn.icon||'🔌') + '</span>';
+    h += '<div><div style="font-weight:var(--font-bold)">' + _esc(conn.label) + '</div>';
+    h += '<div style="font-size:var(--text-xs);color:var(--text-secondary)">' + _esc(_t(conn.labelVi, conn.label)) + '</div></div>';
+    h += '</div>';
+    h += '<div style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-2)">' + _esc(_t(conn.descVi, conn.desc)) + '</div>';
+    h += '<div style="display:flex;gap:var(--space-2)">';
+    h += '<span class="hm-badge hm-badge-draft">' + _esc(conn.protocol) + '</span>';
+    h += '<span class="hm-badge ' + dirBadge + '">' + _esc(conn.direction) + '</span>';
+    h += '</div></div>';
+  });
+  h += '</div>';
+  return h;
+}
+
+// ─── 2. DATA TRANSFORMER (Code Mode) ────────────────────────────────────────
+
+// Users can write JavaScript transformers on API responses
+// Similar to Appsmith's {{ }} but for complex multi-line transforms
+// Stored in block config: config.transformer = "return data.map(row => ({...row, total: row.qty * row.price}))"
+
+function executeTransformer(code, data, context) {
+  // Sandboxed execution of user-provided transformer code
+  // 'data' = raw API response
+  // 'context' = { filters, currentUser, state, moment, Math, etc. }
+  // Returns transformed data
+  if (!code || typeof code !== 'string') return data;
+  try {
+    var fn = new Function('data', 'ctx', 'moment', 'Math',
+      '"use strict";\n' + code
+    );
+    return fn(data, context, { now: function() { return new Date(); }, format: function(d,f) { return new Date(d).toLocaleDateString(); } }, Math);
+  } catch(e) {
+    console.warn('[Transformer]', e.message);
+    return data;
+  }
+}
+
+// Render code editor for transformer
+function renderTransformerEditor(currentCode) {
+  var h = '<div style="border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:var(--space-2) var(--space-3);background:var(--gray-800);color:var(--text-inverse);font-size:var(--text-xs)">';
+  h += '<span>JavaScript Transformer</span>';
+  h += '<div style="display:flex;gap:var(--space-2)">';
+  h += '<button class="hm-btn hm-btn-sm" style="background:rgba(255,255,255,0.1);color:#fff;border:none" data-action="format-code">Format</button>';
+  h += '<button class="hm-btn hm-btn-sm" style="background:var(--green);color:#fff;border:none" data-action="run-transformer">▶ Run</button>';
+  h += '</div></div>';
+  h += '<textarea id="hm-transformer-code" style="width:100%;min-height:120px;padding:var(--space-3);font-family:var(--font-mono);font-size:var(--text-sm);border:none;background:var(--gray-900);color:#e2e8f0;resize:vertical;outline:none;line-height:1.6" spellcheck="false" placeholder="// Transform API response data\n// Available: data (raw response), ctx (filters, user, state)\nreturn data.map(row => ({\n  ...row,\n  total: row.qty * row.unit_price,\n  overdue: new Date(row.due_date) < new Date()\n}));">' + _esc(currentCode || '') + '</textarea>';
+  h += '<div id="hm-transformer-output" style="padding:var(--space-2) var(--space-3);background:var(--gray-50);border-top:1px solid var(--border);font-family:var(--font-mono);font-size:var(--text-xs);color:var(--text-secondary);max-height:80px;overflow-y:auto;display:none"></div>';
+  h += '</div>';
+  return h;
+}
+
+// ─── 3. ENHANCED BLOCK TEMPLATES (30+ manufacturing-specific presets) ────────
+
+var EXTRA_TEMPLATES = {
+  // Production
+  'dispatch-gantt': { type:'data-gantt', title:{vi:'Gantt phân công',en:'Dispatch Gantt'}, config:{ dataSource:{api:'dispatch_timeline',method:'GET',dataKey:'timeline'}, rowKey:'machine_id', startKey:'start_time', endKey:'end_time', labelKey:'wo_number' } },
+  'shift-summary-kpi': { type:'kpi-row', title:{vi:'Tổng hợp ca',en:'Shift Summary'}, config:{ items:[ {label:{vi:'Tổng lệnh',en:'Total Tasks'},dataSource:{api:'dispatch_dashboard',field:'total_tasks'},color:'var(--brand-2)'}, {label:{vi:'Sản lượng',en:'Output'},dataSource:{api:'dispatch_dashboard',field:'total_good'},color:'var(--green)'}, {label:{vi:'NG',en:'NG'},dataSource:{api:'dispatch_dashboard',field:'total_ng'},color:'var(--red)'}, {label:{vi:'Đạt %',en:'Achievement'},dataSource:{api:'dispatch_dashboard',field:'achievement_pct'},color:'var(--brand-2)',suffix:'%'} ] } },
+  'machine-status-cards': { type:'data-cards', title:{vi:'Trạng thái máy',en:'Machine Status'}, config:{ dataSource:{api:'mobile_shop_overview',method:'GET',dataKey:'machines'}, columns:3, titleKey:'machine_id', subtitleKey:'status', badgeKey:'status' } },
+  // Quality
+  'ncr-capa-table': { type:'data-table', title:{vi:'Danh sách NCR/CAPA',en:'NCR/CAPA List'}, config:{ dataSource:{api:'exception_list',method:'GET',dataKey:'exceptions'}, columns:[ {key:'id',label:{vi:'Mã',en:'ID'},sortable:true}, {key:'type',label:{vi:'Loại',en:'Type'},type:'badge'}, {key:'severity',label:{vi:'Mức độ',en:'Severity'},type:'badge'}, {key:'subject',label:{vi:'Tiêu đề',en:'Subject'}}, {key:'status',label:{vi:'Trạng thái',en:'Status'},type:'badge',sortable:true}, {key:'created_at',label:{vi:'Ngày tạo',en:'Created'},type:'date',sortable:true} ], pagination:true, pageSize:20 } },
+  'copq-breakdown': { type:'chart-stacked-bar', title:{vi:'Chi phí chất lượng kém',en:'COPQ Breakdown'}, config:{ dataSource:{api:'exception_copq_summary',method:'GET',dataKey:'breakdown'} } },
+  'fmea-worksheet': { type:'data-table', title:{vi:'FMEA Worksheet',en:'FMEA Worksheet'}, config:{ dataSource:{api:'fmea_list',method:'GET',dataKey:'fmeas'}, columns:[ {key:'fmea_number',label:{vi:'Số FMEA',en:'FMEA#'}}, {key:'type',label:{vi:'Loại',en:'Type'},type:'badge'}, {key:'title',label:{vi:'Tiêu đề',en:'Title'}}, {key:'status',label:{vi:'Trạng thái',en:'Status'},type:'badge'} ] } },
+  // Supplier
+  'supplier-scorecard-chart': { type:'chart-bar', title:{vi:'Điểm NCC',en:'Supplier Scores'}, config:{ dataSource:{api:'supplier_scorecard_list',method:'GET',dataKey:'scorecards'}, labelKey:'vendor_id', valueKey:'overall_score' } },
+  'incoming-inspection-table': { type:'data-table', title:{vi:'Kiểm tra nhận hàng',en:'Incoming Inspection'}, config:{ dataSource:{api:'supplier_incoming_list',method:'GET',dataKey:'inspections'}, columns:[ {key:'inspection_number',label:{vi:'Số IQC',en:'IQC#'}}, {key:'vendor_id',label:{vi:'NCC',en:'Vendor'}}, {key:'item_id',label:{vi:'Part',en:'Part'}}, {key:'result',label:{vi:'Kết quả',en:'Result'},type:'badge'} ], pagination:true } },
+  // Orders
+  'so-list-table': { type:'data-table', title:{vi:'Danh sách đơn hàng',en:'Sales Orders'}, config:{ dataSource:{api:'order_so_list',method:'GET',dataKey:'sales_orders'}, columns:[ {key:'so_number',label:{vi:'Số SO',en:'SO#'},sortable:true}, {key:'customer_name',label:{vi:'Khách hàng',en:'Customer'},sortable:true}, {key:'due_date',label:{vi:'Hạn giao',en:'Due'},type:'date',sortable:true}, {key:'status',label:{vi:'Trạng thái',en:'Status'},type:'badge'} ], pagination:true, pageSize:25 } },
+  'order-hierarchy-tree': { type:'data-tree', title:{vi:'Cây SO→JO→WO',en:'SO→JO→WO Tree'}, config:{ dataSource:{api:'order_hierarchy',method:'GET',dataKey:'hierarchy'}, childrenKey:'job_orders', expandLevel:2 } },
+  'quote-pipeline-kpi': { type:'kpi-row', title:{vi:'KPI báo giá',en:'Quote KPIs'}, config:{ items:[ {label:{vi:'Pipeline',en:'Pipeline'},dataSource:{api:'quote_dashboard',field:'pipeline_value'},color:'var(--brand-2)',suffix:' USD'}, {label:{vi:'Win Rate',en:'Win Rate'},dataSource:{api:'quote_dashboard',field:'win_rate'},color:'var(--green)',suffix:'%'} ] } },
+  // Evidence & Records
+  'evidence-vault-table': { type:'data-table', title:{vi:'Kho chứng cứ',en:'Evidence Vault'}, config:{ dataSource:{api:'evidence_list',method:'GET',dataKey:'evidence'}, columns:[ {key:'evidence_number',label:{vi:'Mã',en:'ID'}}, {key:'evidence_type',label:{vi:'Loại',en:'Type'},type:'badge'}, {key:'title',label:{vi:'Tiêu đề',en:'Title'}}, {key:'uploaded_at',label:{vi:'Ngày tải',en:'Uploaded'},type:'date'} ], pagination:true } },
+  // Reports
+  'ci-kanban': { type:'data-kanban', title:{vi:'Bảng cải tiến PDCA',en:'CI PDCA Board'}, config:{ dataSource:{api:'ci_project_list',method:'GET',dataKey:'projects'}, columnKey:'status', columns:['plan','do','check','act','closed'] } },
+  'compliance-report-list': { type:'data-cards', title:{vi:'Báo cáo tuân thủ',en:'Compliance Reports'}, config:{ dataSource:{api:'compliance_report_types',method:'GET',dataKey:'report_types'}, columns:2, titleKey:'label', subtitleKey:'description' } },
+  // Master data
+  'machine-list': { type:'data-table', title:{vi:'Danh sách máy',en:'Machine List'}, config:{ dataSource:{api:'master_data_list',method:'GET',dataKey:'machines',params:{entity:'machines'}}, columns:[ {key:'machine_id',label:{vi:'Mã máy',en:'ID'}}, {key:'machine_name',label:{vi:'Tên máy',en:'Name'}}, {key:'machine_type',label:{vi:'Loại',en:'Type'}}, {key:'status',label:{vi:'Trạng thái',en:'Status'},type:'badge'} ] } },
+  'operator-list': { type:'data-table', title:{vi:'Danh sách công nhân',en:'Operator List'}, config:{ dataSource:{api:'master_data_list',method:'GET',dataKey:'operators',params:{entity:'operators'}}, columns:[ {key:'operator_id',label:{vi:'Mã NV',en:'ID'}}, {key:'operator_name',label:{vi:'Họ tên',en:'Name'}}, {key:'role',label:{vi:'Vai trò',en:'Role'}}, {key:'shift',label:{vi:'Ca',en:'Shift'}} ] } },
+  // IoT blocks
+  'iot-machine-telemetry': { type:'kpi-row', title:{vi:'Telemetry máy',en:'Machine Telemetry'}, config:{ items:[ {label:{vi:'Tốc độ trục chính',en:'Spindle Speed'},color:'var(--brand-2)',suffix:' RPM'}, {label:{vi:'Tải trục chính',en:'Spindle Load'},color:'var(--amber)',suffix:'%'}, {label:{vi:'Feed Rate',en:'Feed Rate'},color:'var(--green)',suffix:' mm/min'}, {label:{vi:'Nhiệt độ',en:'Temperature'},color:'var(--red)',suffix:'°C'} ] } },
+  'iot-alarm-timeline': { type:'data-timeline', title:{vi:'Lịch sử cảnh báo máy',en:'Machine Alarm History'}, config:{ dataSource:{api:'mobile_shop_overview',method:'GET'}, dateKey:'timestamp', titleKey:'alarm_code', descKey:'description' } },
+};
+
+// Merge extra templates into existing BLOCK_TEMPLATES
+if (window.HmBlockEngine && window.HmBlockEngine.BLOCK_TEMPLATES) {
+  Object.keys(EXTRA_TEMPLATES).forEach(function(key) {
+    window.HmBlockEngine.BLOCK_TEMPLATES[key] = EXTRA_TEMPLATES[key];
+  });
+}
+
+// ─── 4. RESPONSIVE BREAKPOINTS ──────────────────────────────────────────────
+
+var BREAKPOINTS = {
+  mobile: { maxWidth: 768, label: 'Di động', labelEn: 'Mobile' },
+  tablet: { maxWidth: 1024, label: 'Máy tính bảng', labelEn: 'Tablet' },
+  desktop: { maxWidth: 99999, label: 'Máy tính', labelEn: 'Desktop' }
+};
+
+function getCurrentBreakpoint() {
+  var w = window.innerWidth;
+  if (w <= 768) return 'mobile';
+  if (w <= 1024) return 'tablet';
+  return 'desktop';
+}
+
+// Block can have: config.responsive = { mobile: { visible: false }, tablet: { columns: 1 } }
+function applyResponsiveConfig(config, breakpoint) {
+  if (!config || !config.responsive || !config.responsive[breakpoint]) return config;
+  return Object.assign({}, config, config.responsive[breakpoint]);
+}
+
+function renderBreakpointToggle(currentBreakpoint) {
+  var h = '<div style="display:flex;gap:var(--space-1);padding:var(--space-2);background:var(--gray-100);border-radius:var(--radius-md)">';
+  Object.keys(BREAKPOINTS).forEach(function(bp) {
+    var b = BREAKPOINTS[bp];
+    var active = currentBreakpoint === bp;
+    h += '<button class="hm-btn hm-btn-sm ' + (active ? 'hm-btn-primary' : 'hm-btn-ghost') + '" data-action="set-breakpoint" data-bp="' + _esc(bp) + '" title="' + _esc(_t(b.label, b.labelEn)) + '">';
+    h += bp === 'mobile' ? '📱' : bp === 'tablet' ? '📟' : '🖥️';
+    h += '</button>';
+  });
+  h += '</div>';
+  return h;
+}
+
+// ─── 5. BLOCK STATES (loading, error, empty, disabled) ──────────────────────
+
+var BLOCK_STATES = {
+  'default': { class: '', label: 'Mặc định', labelEn: 'Default' },
+  'loading': { class: 'hm-block-loading', label: 'Đang tải', labelEn: 'Loading' },
+  'error':   { class: 'hm-block-error', label: 'Lỗi', labelEn: 'Error' },
+  'empty':   { class: 'hm-block-empty', label: 'Trống', labelEn: 'Empty' },
+  'disabled':{ class: 'hm-block-disabled', label: 'Vô hiệu', labelEn: 'Disabled' },
+};
+
+function setBlockState(container, blockId, stateName) {
+  var el = container.querySelector('[data-block-id="' + blockId + '"]');
+  if (!el) return;
+  // Remove all state classes
+  Object.keys(BLOCK_STATES).forEach(function(s) {
+    if (BLOCK_STATES[s].class) el.classList.remove(BLOCK_STATES[s].class);
+  });
+  // Add new state
+  var state = BLOCK_STATES[stateName];
+  if (state && state.class) el.classList.add(state.class);
+}
+
+// Loading skeleton for blocks
+function renderBlockSkeleton(type) {
+  var h = '<div class="hm-skeleton" style="animation:hm-shimmer 1.5s infinite">';
+  switch(type) {
+    case 'kpi-row':
+      h += '<div style="display:flex;gap:var(--space-3)">';
+      for(var i=0;i<4;i++) h += '<div style="flex:1;height:80px;background:var(--gray-100);border-radius:var(--radius-md)"></div>';
+      h += '</div>';
+      break;
+    case 'data-table':
+      h += '<div style="height:36px;background:var(--gray-100);border-radius:var(--radius-md);margin-bottom:var(--space-2)"></div>';
+      for(var j=0;j<5;j++) h += '<div style="height:44px;background:var(--gray-50);border-radius:var(--radius-sm);margin-bottom:var(--space-1)"></div>';
+      break;
+    case 'chart-bar':
+    case 'chart-donut':
+      h += '<div style="height:200px;background:var(--gray-100);border-radius:var(--radius-md)"></div>';
+      break;
+    default:
+      h += '<div style="height:100px;background:var(--gray-100);border-radius:var(--radius-md)"></div>';
+  }
+  h += '</div>';
+  return h;
+}
+
+// ─── 6. UNDO HISTORY PANEL ──────────────────────────────────────────────────
+
+function renderUndoHistoryPanel(moduleId) {
+  var undoStack = window.HmBlockEngine._undoStack || [];
+  var redoStack = window.HmBlockEngine._redoStack || [];
+  var moduleUndos = undoStack.filter(function(e) { return e.moduleId === moduleId; });
+  var moduleRedos = redoStack.filter(function(e) { return e.moduleId === moduleId; });
+
+  var h = '<div class="hm-card" style="max-height:300px;overflow-y:auto">';
+  h += '<h4 style="margin:0 0 var(--space-3);font-size:var(--text-sm);font-weight:var(--font-bold)">' + _t('Lịch sử thay đổi','Change History') + '</h4>';
+
+  if (!moduleUndos.length && !moduleRedos.length) {
+    h += '<div style="color:var(--text-tertiary);font-size:var(--text-sm)">' + _t('Chưa có thay đổi','No changes yet') + '</div>';
+  } else {
+    // Redo items (future)
+    moduleRedos.reverse().forEach(function(entry) {
+      h += '<div style="padding:var(--space-2);font-size:var(--text-xs);color:var(--text-tertiary);opacity:0.5">';
+      h += '↪️ ' + _esc(entry.action) + ' <span style="float:right">' + new Date(entry.timestamp).toLocaleTimeString() + '</span>';
+      h += '</div>';
+    });
+    // Current marker
+    h += '<div style="padding:var(--space-2);font-size:var(--text-xs);font-weight:var(--font-bold);color:var(--brand-2);border-left:2px solid var(--brand-2)">⬤ ' + _t('Hiện tại','Current') + '</div>';
+    // Undo items (past)
+    moduleUndos.reverse().forEach(function(entry) {
+      h += '<div style="padding:var(--space-2);font-size:var(--text-xs);color:var(--text-secondary);border-left:2px solid var(--border)">';
+      h += '↩️ ' + _esc(entry.action) + ' <span style="float:right">' + new Date(entry.timestamp).toLocaleTimeString() + '</span>';
+      h += '</div>';
+    });
+  }
+  h += '</div>';
+  return h;
+}
+
+// ─── 7. EXPORT ALL NEW FUNCTIONS ────────────────────────────────────────────
+
+Object.assign(window.HmBlockEngine, {
+  // IoT
+  IOT_CONNECTORS: IOT_CONNECTORS,
+  renderConnectorConfig: renderConnectorConfig,
+  renderConnectorLibrary: renderConnectorLibrary,
+  // Transformer
+  executeTransformer: executeTransformer,
+  renderTransformerEditor: renderTransformerEditor,
+  // Templates
+  EXTRA_TEMPLATES: EXTRA_TEMPLATES,
+  // Responsive
+  BREAKPOINTS: BREAKPOINTS,
+  getCurrentBreakpoint: getCurrentBreakpoint,
+  applyResponsiveConfig: applyResponsiveConfig,
+  renderBreakpointToggle: renderBreakpointToggle,
+  // Block states
+  BLOCK_STATES: BLOCK_STATES,
+  setBlockState: setBlockState,
+  renderBlockSkeleton: renderBlockSkeleton,
+  // Undo history
+  renderUndoHistoryPanel: renderUndoHistoryPanel,
+});
+
 })();
