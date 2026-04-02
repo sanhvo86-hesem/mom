@@ -48,6 +48,574 @@ function _uid(){ return 'b'+Date.now().toString(36)+Math.random().toString(36).s
 /** Deep clone helper */
 function _clone(obj){ return JSON.parse(JSON.stringify(obj)); }
 
+var _exprCache = {};
+var _exprFilters = {
+  number: function(value){
+    if(value == null || value === '') return '';
+    var num = typeof value === 'number' ? value : Number(value);
+    if(isNaN(num)) return value;
+    return _fmt(num);
+  },
+  currency: function(value){
+    if(value == null || value === '') return '';
+    var num = typeof value === 'number' ? value : Number(value);
+    if(isNaN(num)) return value;
+    return _fmt(num) + ' ₫';
+  },
+  date: function(value){
+    if(value == null || value === '') return '';
+    var date = value instanceof Date ? value : new Date(value);
+    if(!date || isNaN(date.getTime())) return value;
+    var dd = String(date.getDate());
+    var mm = String(date.getMonth() + 1);
+    var yyyy = String(date.getFullYear());
+    if(dd.length < 2) dd = '0' + dd;
+    if(mm.length < 2) mm = '0' + mm;
+    return dd + '/' + mm + '/' + yyyy;
+  }
+};
+
+function _exprToken(type, value){
+  return { type:type, value:value };
+}
+
+function _tokenizeExpr(expr){
+  var tokens = [];
+  var i = 0;
+  var ch;
+  var pair3;
+  var pair2;
+  while(i < expr.length){
+    ch = expr.charAt(i);
+    if(/\s/.test(ch)){
+      i++;
+      continue;
+    }
+    pair3 = expr.slice(i, i + 3);
+    if(pair3 === '===' || pair3 === '!=='){
+      tokens.push(_exprToken('op', pair3));
+      i += 3;
+      continue;
+    }
+    pair2 = expr.slice(i, i + 2);
+    if(pair2 === '&&' || pair2 === '||' || pair2 === '==' || pair2 === '!=' || pair2 === '>=' || pair2 === '<='){
+      tokens.push(_exprToken('op', pair2));
+      i += 2;
+      continue;
+    }
+    if(ch === '"' || ch === "'"){
+      var quote = ch;
+      var value = '';
+      i++;
+      while(i < expr.length){
+        ch = expr.charAt(i);
+        if(ch === '\\'){
+          i++;
+          if(i >= expr.length) break;
+          ch = expr.charAt(i);
+          if(ch === 'n') value += '\n';
+          else if(ch === 't') value += '\t';
+          else value += ch;
+          i++;
+          continue;
+        }
+        if(ch === quote){
+          i++;
+          break;
+        }
+        value += ch;
+        i++;
+      }
+      tokens.push(_exprToken('string', value));
+      continue;
+    }
+    if(/[0-9]/.test(ch) || (ch === '.' && /[0-9]/.test(expr.charAt(i + 1)))){
+      var numberText = ch;
+      i++;
+      while(i < expr.length && /[0-9.]/.test(expr.charAt(i))){
+        numberText += expr.charAt(i);
+        i++;
+      }
+      tokens.push(_exprToken('number', parseFloat(numberText)));
+      continue;
+    }
+    if(/[A-Za-z_$]/.test(ch)){
+      var ident = ch;
+      i++;
+      while(i < expr.length && /[A-Za-z0-9_$]/.test(expr.charAt(i))){
+        ident += expr.charAt(i);
+        i++;
+      }
+      if(ident === 'true' || ident === 'false'){
+        tokens.push(_exprToken('literal', ident === 'true'));
+      } else if(ident === 'null'){
+        tokens.push(_exprToken('literal', null));
+      } else if(ident === 'undefined'){
+        tokens.push(_exprToken('literal', undefined));
+      } else {
+        tokens.push(_exprToken('identifier', ident));
+      }
+      continue;
+    }
+    if('?:(),.!+-*/%<>|'.indexOf(ch) >= 0){
+      tokens.push(_exprToken(ch === '.' || ch === '(' || ch === ')' || ch === ',' || ch === '?' || ch === ':' ? ch : 'op', ch));
+      i++;
+      continue;
+    }
+    i++;
+  }
+  return tokens;
+}
+
+function _splitTopLevel(text, delimiter){
+  var parts = [];
+  var current = '';
+  var depth = 0;
+  var quote = '';
+  var i;
+  var ch;
+  for(i = 0; i < text.length; i++){
+    ch = text.charAt(i);
+    if(quote){
+      current += ch;
+      if(ch === '\\'){
+        i++;
+        if(i < text.length) current += text.charAt(i);
+        continue;
+      }
+      if(ch === quote) quote = '';
+      continue;
+    }
+    if(ch === '"' || ch === "'"){
+      quote = ch;
+      current += ch;
+      continue;
+    }
+    if(ch === '('){
+      depth++;
+      current += ch;
+      continue;
+    }
+    if(ch === ')'){
+      if(depth > 0) depth--;
+      current += ch;
+      continue;
+    }
+    if(depth === 0 && ch === delimiter){
+      parts.push(current);
+      current = '';
+      continue;
+    }
+    current += ch;
+  }
+  parts.push(current);
+  return parts;
+}
+
+function _splitExprPipes(expr){
+  var parts = [];
+  var current = '';
+  var depth = 0;
+  var quote = '';
+  var i;
+  var ch;
+  var next;
+  for(i = 0; i < expr.length; i++){
+    ch = expr.charAt(i);
+    next = expr.charAt(i + 1);
+    if(quote){
+      current += ch;
+      if(ch === '\\'){
+        i++;
+        if(i < expr.length) current += expr.charAt(i);
+        continue;
+      }
+      if(ch === quote) quote = '';
+      continue;
+    }
+    if(ch === '"' || ch === "'"){
+      quote = ch;
+      current += ch;
+      continue;
+    }
+    if(ch === '('){
+      depth++;
+      current += ch;
+      continue;
+    }
+    if(ch === ')'){
+      if(depth > 0) depth--;
+      current += ch;
+      continue;
+    }
+    if(depth === 0 && ch === '|' && next !== '|'){
+      parts.push(current);
+      current = '';
+      continue;
+    }
+    current += ch;
+  }
+  parts.push(current);
+  return parts;
+}
+
+function _parseFilterSpec(text){
+  var parts = _splitTopLevel(text, ':');
+  var args = [];
+  var argParts;
+  var i;
+  if(parts.length > 1 && parts[1]){
+    argParts = _splitTopLevel(parts.slice(1).join(':').replace(/^\s+|\s+$/g, ''), ',');
+    for(i = 0; i < argParts.length; i++){
+      if(argParts[i].replace(/^\s+|\s+$/g, '')){
+        args.push(_compileExpression(argParts[i].replace(/^\s+|\s+$/g, '')));
+      }
+    }
+  }
+  return {
+    name: (parts[0] || '').replace(/^\s+|\s+$/g, ''),
+    args: args
+  };
+}
+
+function _currentExprToken(parser){
+  return parser.tokens[parser.index];
+}
+
+function _consumeExprToken(parser, expectedType, expectedValue){
+  var token = parser.tokens[parser.index];
+  if(!token) return null;
+  if(expectedType && token.type !== expectedType) return null;
+  if(expectedValue && token.value !== expectedValue) return null;
+  parser.index++;
+  return token;
+}
+
+function _parseExpressionPrimary(parser){
+  var token = _currentExprToken(parser);
+  var expr;
+  if(!token) return { type:'literal', value:'' };
+  if(token.type === 'number' || token.type === 'string' || token.type === 'literal'){
+    parser.index++;
+    return { type:'literal', value:token.value };
+  }
+  if(token.type === 'identifier'){
+    parser.index++;
+    expr = { type:'identifier', name:token.value };
+    while(_currentExprToken(parser) && (_currentExprToken(parser).type === '.' || _currentExprToken(parser).type === '(')){
+      if(_consumeExprToken(parser, '.')){
+        token = _consumeExprToken(parser, 'identifier');
+        if(!token) break;
+        expr = { type:'member', object:expr, property:token.value };
+      } else if(_consumeExprToken(parser, '(')){
+        var args = [];
+        while(_currentExprToken(parser) && _currentExprToken(parser).type !== ')'){
+          args.push(_parseExpressionConditional(parser));
+          if(!_consumeExprToken(parser, ',')) break;
+        }
+        _consumeExprToken(parser, ')');
+        expr = { type:'call', callee:expr, args:args };
+      }
+    }
+    return expr;
+  }
+  if(_consumeExprToken(parser, '(')){
+    expr = _parseExpressionConditional(parser);
+    _consumeExprToken(parser, ')');
+    return expr;
+  }
+  parser.index++;
+  return { type:'literal', value:'' };
+}
+
+function _parseExpressionUnary(parser){
+  var token = _currentExprToken(parser);
+  if(token && token.type === 'op' && (token.value === '!' || token.value === '-')){
+    parser.index++;
+    return { type:'unary', operator:token.value, argument:_parseExpressionUnary(parser) };
+  }
+  return _parseExpressionPrimary(parser);
+}
+
+function _parseBinaryExpr(parser, nextParser, operators){
+  var left = nextParser(parser);
+  var token = _currentExprToken(parser);
+  while(token && token.type === 'op' && operators.indexOf(token.value) >= 0){
+    parser.index++;
+    left = {
+      type:(token.value === '&&' || token.value === '||') ? 'logical' : 'binary',
+      operator:token.value,
+      left:left,
+      right:nextParser(parser)
+    };
+    token = _currentExprToken(parser);
+  }
+  return left;
+}
+
+function _parseExpressionMultiply(parser){
+  return _parseBinaryExpr(parser, _parseExpressionUnary, ['*', '/', '%']);
+}
+
+function _parseExpressionAdd(parser){
+  return _parseBinaryExpr(parser, _parseExpressionMultiply, ['+', '-']);
+}
+
+function _parseExpressionCompare(parser){
+  return _parseBinaryExpr(parser, _parseExpressionAdd, ['>', '<', '>=', '<=']);
+}
+
+function _parseExpressionEqual(parser){
+  return _parseBinaryExpr(parser, _parseExpressionCompare, ['==', '!=', '===', '!==']);
+}
+
+function _parseExpressionAnd(parser){
+  return _parseBinaryExpr(parser, _parseExpressionEqual, ['&&']);
+}
+
+function _parseExpressionOr(parser){
+  return _parseBinaryExpr(parser, _parseExpressionAnd, ['||']);
+}
+
+function _parseExpressionConditional(parser){
+  var test = _parseExpressionOr(parser);
+  if(_consumeExprToken(parser, '?')){
+    var consequent = _parseExpressionConditional(parser);
+    _consumeExprToken(parser, ':');
+    var alternate = _parseExpressionConditional(parser);
+    return { type:'conditional', test:test, consequent:consequent, alternate:alternate };
+  }
+  return test;
+}
+
+function _compileExpression(expr){
+  var source = String(expr == null ? '' : expr).replace(/^\s+|\s+$/g, '');
+  var parser;
+  var compiled;
+  var pipeParts;
+  var i;
+  if(!_exprCache[source]){
+    pipeParts = _splitExprPipes(source);
+    parser = { tokens:_tokenizeExpr(pipeParts[0] || ''), index:0 };
+    compiled = {
+      source: source,
+      ast: _parseExpressionConditional(parser),
+      filters: []
+    };
+    for(i = 1; i < pipeParts.length; i++){
+      if(pipeParts[i].replace(/^\s+|\s+$/g, '')){
+        compiled.filters.push(_parseFilterSpec(pipeParts[i]));
+      }
+    }
+    _exprCache[source] = compiled;
+  }
+  return _exprCache[source];
+}
+
+function _getExprRootName(node){
+  if(!node) return '';
+  if(node.type === 'identifier') return node.name;
+  if(node.type === 'member') return _getExprRootName(node.object);
+  return '';
+}
+
+function _resolveExpressionValue(node, context){
+  if(!node) return '';
+  if(node.type === 'identifier') return context ? context[node.name] : undefined;
+  if(node.type === 'member'){
+    var owner = _evaluateExpressionAst(node.object, context);
+    if(owner == null) return undefined;
+    return owner[node.property];
+  }
+  return undefined;
+}
+
+function _resolveCallable(node, context){
+  if(!node) return null;
+  if(node.type === 'identifier'){
+    return { fn: context ? context[node.name] : undefined, owner:null, root:node.name };
+  }
+  if(node.type === 'member'){
+    var owner = _evaluateExpressionAst(node.object, context);
+    if(owner == null) return null;
+    return { fn: owner[node.property], owner:owner, root:_getExprRootName(node.object) };
+  }
+  return null;
+}
+
+function _isSafeCallable(callable){
+  var root = callable && callable.root;
+  if(!callable || typeof callable.fn !== 'function') return false;
+  if(root === 'Math' || root === 'Date' || root === 'Number' || root === 'String' || root === 'filters') return true;
+  if(root === 'parseInt' || root === 'parseFloat' || root === 'isNaN' || root === 'encodeURIComponent' || root === 'decodeURIComponent') return true;
+  return false;
+}
+
+function _evaluateExpressionAst(node, context){
+  var left;
+  var right;
+  var callable;
+  var args;
+  if(!node) return '';
+  switch(node.type){
+    case 'literal':
+      return node.value;
+    case 'identifier':
+    case 'member':
+      return _resolveExpressionValue(node, context || {});
+    case 'unary':
+      left = _evaluateExpressionAst(node.argument, context);
+      if(node.operator === '!') return !left;
+      if(node.operator === '-') return -Number(left || 0);
+      return left;
+    case 'binary':
+      left = _evaluateExpressionAst(node.left, context);
+      right = _evaluateExpressionAst(node.right, context);
+      switch(node.operator){
+        case '+': return left + right;
+        case '-': return Number(left || 0) - Number(right || 0);
+        case '*': return Number(left || 0) * Number(right || 0);
+        case '/': return Number(right || 0) === 0 ? 0 : Number(left || 0) / Number(right || 0);
+        case '%': return Number(right || 0) === 0 ? 0 : Number(left || 0) % Number(right || 0);
+        case '>': return left > right;
+        case '<': return left < right;
+        case '>=': return left >= right;
+        case '<=': return left <= right;
+        case '==': return left == right; // eslint-disable-line eqeqeq
+        case '!=': return left != right; // eslint-disable-line eqeqeq
+        case '===': return left === right;
+        case '!==': return left !== right;
+      }
+      return '';
+    case 'logical':
+      if(node.operator === '&&'){
+        left = _evaluateExpressionAst(node.left, context);
+        return left ? _evaluateExpressionAst(node.right, context) : left;
+      }
+      if(node.operator === '||'){
+        left = _evaluateExpressionAst(node.left, context);
+        return left ? left : _evaluateExpressionAst(node.right, context);
+      }
+      return '';
+    case 'conditional':
+      return _evaluateExpressionAst(node.test, context) ? _evaluateExpressionAst(node.consequent, context) : _evaluateExpressionAst(node.alternate, context);
+    case 'call':
+      callable = _resolveCallable(node.callee, context || {});
+      if(!_isSafeCallable(callable)) return '';
+      args = (node.args || []).map(function(argNode){
+        return _evaluateExpressionAst(argNode, context);
+      });
+      try {
+        return callable.fn.apply(callable.owner || null, args);
+      } catch(err){
+        return '';
+      }
+  }
+  return '';
+}
+
+function _applyExpressionFilter(value, filterSpec, context){
+  var filterName = filterSpec && filterSpec.name;
+  var args = [];
+  var fn;
+  if(!filterName) return value;
+  if(filterSpec.args && filterSpec.args.length){
+    args = filterSpec.args.map(function(argExpr){
+      return _evaluateCompiledExpression(argExpr, context);
+    });
+  }
+  if(context && context.filters && typeof context.filters[filterName] === 'function'){
+    fn = context.filters[filterName];
+  } else {
+    fn = _exprFilters[filterName];
+  }
+  if(typeof fn !== 'function') return value;
+  try {
+    return fn.apply(null, [value].concat(args));
+  } catch(err){
+    return value;
+  }
+}
+
+function _evaluateCompiledExpression(compiled, context){
+  var value;
+  var i;
+  if(!compiled) return '';
+  value = _evaluateExpressionAst(compiled.ast, context || {});
+  for(i = 0; i < compiled.filters.length; i++){
+    value = _applyExpressionFilter(value, compiled.filters[i], context || {});
+  }
+  return value;
+}
+
+function _extractTemplateBindings(template){
+  var parts = [];
+  var cursor = 0;
+  var start;
+  var end;
+  while(cursor < template.length){
+    start = template.indexOf('{{', cursor);
+    if(start < 0){
+      if(cursor < template.length) parts.push({ type:'text', value:template.slice(cursor) });
+      break;
+    }
+    if(start > cursor) parts.push({ type:'text', value:template.slice(cursor, start) });
+    end = template.indexOf('}}', start + 2);
+    if(end < 0){
+      parts.push({ type:'text', value:template.slice(start) });
+      break;
+    }
+    parts.push({ type:'expr', value:template.slice(start + 2, end).replace(/^\s+|\s+$/g, '') });
+    cursor = end + 2;
+  }
+  return parts;
+}
+
+function _evalExpr(template, context){
+  var parts;
+  var output;
+  var i;
+  var value;
+  if(template == null) return template;
+  if(typeof template !== 'string') return template;
+  if(template.indexOf('{{') < 0 || template.indexOf('}}') < 0) return template;
+  parts = _extractTemplateBindings(template);
+  if(parts.length === 1 && parts[0].type === 'expr'){
+    return _evaluateCompiledExpression(_compileExpression(parts[0].value), context || {});
+  }
+  output = '';
+  for(i = 0; i < parts.length; i++){
+    if(parts[i].type === 'text'){
+      output += parts[i].value;
+    } else {
+      value = _evaluateCompiledExpression(_compileExpression(parts[i].value), context || {});
+      output += value == null ? '' : String(value);
+    }
+  }
+  return output;
+}
+
+function _resolveBindings(obj, context){
+  var out;
+  var key;
+  if(typeof obj === 'string') return _evalExpr(obj, context || {});
+  if(Array.isArray(obj)){
+    return obj.map(function(item){
+      return _resolveBindings(item, context || {});
+    });
+  }
+  if(obj && typeof obj === 'object'){
+    out = {};
+    for(key in obj){
+      if(Object.prototype.hasOwnProperty.call(obj, key)){
+        out[key] = _resolveBindings(obj[key], context || {});
+      }
+    }
+    return out;
+  }
+  return obj;
+}
+
 /* ── Block Registry ─────────────────────────────────────────────────────── */
 var BLOCK_CATALOG = {
   /* BỐ CỤC / LAYOUT */
@@ -1551,19 +2119,18 @@ var API_CATALOG = [
    ══════════════════════════════════════════════════════════════════════════ */
 
 /**
- * Evaluate a single JS expression within a sandboxed context.
+ * Evaluate a single expression within a safe parsed context.
  * context = { data:{}, filters:{}, state:{}, currentUser:{}, blocks:{}, row:{}, ... }
- * Returns result or empty string on error.
  */
 function evaluateExpression(expr, context){
-  if(expr==null || expr==='') return '';
+  var source = expr;
+  var match;
+  if(source == null || source === '') return '';
+  source = String(source);
+  match = source.match(/^\s*\{\{([\s\S]+)\}\}\s*$/);
+  if(match) source = match[1];
   try {
-    var keys = Object.keys(context||{});
-    var vals = keys.map(function(k){ return context[k]; });
-    // Create a function with named params matching context keys
-    var fn = new Function(keys.join(','), 'try{return ('+expr+')}catch(e){return ""}');
-    var result = fn.apply(null, vals);
-    return result==null ? '' : result;
+    return _evaluateCompiledExpression(_compileExpression(source), context || {});
   } catch(e){
     return '';
   }
@@ -1574,11 +2141,7 @@ function evaluateExpression(expr, context){
  * Example: "Tong: {{data.total}} don" -> "Tong: 42 don"
  */
 function resolveBindings(template, context){
-  if(typeof template !== 'string') return template;
-  return template.replace(/\{\{(.+?)\}\}/g, function(match, expr){
-    var result = evaluateExpression(expr.trim(), context);
-    return result==null ? '' : String(result);
-  });
+  return _evalExpr(template, context || {});
 }
 
 /**
@@ -1605,10 +2168,15 @@ function _buildReactiveContext(moduleId){
 
   return {
     data: ms.blockData || {},
+    moduleData: ms.blockData || {},
     blocks: blocksData,
     filters: ms.filterValues || {},
     state: ms.customState || {},
     currentUser: (typeof currentUser !== 'undefined') ? currentUser : {},
+    user: (typeof currentUser !== 'undefined') ? currentUser : {},
+    module: schema || {},
+    record: {},
+    block: {},
     lang: (typeof lang !== 'undefined') ? lang : 'vi',
     Math: Math,
     Date: Date,
@@ -1628,18 +2196,7 @@ function _buildReactiveContext(moduleId){
  * Walks strings, arrays, and plain objects.
  */
 function _resolveConfigBindings(config, context){
-  if(typeof config === 'string') return resolveBindings(config, context);
-  if(Array.isArray(config)){
-    return config.map(function(item){ return _resolveConfigBindings(item, context); });
-  }
-  if(config && typeof config === 'object'){
-    var out = {};
-    Object.keys(config).forEach(function(k){
-      out[k] = _resolveConfigBindings(config[k], context);
-    });
-    return out;
-  }
-  return config;
+  return _resolveBindings(config, context || {});
 }
 
 
@@ -2359,6 +2916,768 @@ var BLOCK_TEMPLATES = {
 /**
  * Render a two-column block with left/right slots.
  */
+BLOCK_TEMPLATES = {};
+
+function _tplLabel(vi, en){
+  return { vi:vi, en:en };
+}
+
+function _tplSource(api, method, dataKey, totalKey, transformer){
+  var source = { api:api, method:(method || 'GET') };
+  if(dataKey) source.dataKey = dataKey;
+  if(totalKey) source.totalKey = totalKey;
+  if(transformer) source.transformer = transformer;
+  return source;
+}
+
+function _tplMeta(type, vi, en, desc, module, config){
+  return {
+    type: type,
+    label: vi,
+    labelEn: en,
+    title: { vi:vi, en:en },
+    desc: desc,
+    module: module,
+    config: config || {}
+  };
+}
+
+function _tplKpi(dataKey, vi, en, color, suffix, extra){
+  var item = { label:_tplLabel(vi, en), dataKey:dataKey, color:(color || 'var(--brand-2)') };
+  if(suffix) item.suffix = suffix;
+  if(extra){
+    Object.keys(extra).forEach(function(key){ item[key] = extra[key]; });
+  }
+  return item;
+}
+
+function _tplCol(key, vi, en, type, width, sortable, filterable, statusSet){
+  var col = { key:key, label:_tplLabel(vi, en), type:(type || 'string') };
+  if(width) col.width = width;
+  if(typeof sortable !== 'undefined') col.sortable = sortable;
+  if(typeof filterable !== 'undefined') col.filterable = filterable;
+  if(statusSet) col.statusSet = statusSet;
+  return col;
+}
+
+function _tplField(key, vi, en, type, required, span, extra){
+  var field = { key:key, label:_tplLabel(vi, en), type:(type || 'string') };
+  if(required) field.required = true;
+  if(span) field.span = span;
+  if(extra){
+    Object.keys(extra).forEach(function(name){ field[name] = extra[name]; });
+  }
+  return field;
+}
+
+function _tplStep(key, vi, en, fieldsCsv, visibleWhen){
+  var step = { key:key, label:_tplLabel(vi, en), fieldsCsv:(fieldsCsv || '') };
+  if(visibleWhen) step.visibleWhen = visibleWhen;
+  return step;
+}
+
+function _tplLane(key, vi, en, color, limit){
+  return { key:key, label:_tplLabel(vi, en), color:color, limit:limit };
+}
+
+function _tplBtn(vi, en, variant, action, icon){
+  return { label:_tplLabel(vi, en), variant:(variant || 'secondary'), action:(action || ''), icon:(icon || '') };
+}
+
+function _tplTransition(from, to, vi, en, endpoint, role, requireComment, confirmMessage){
+  return {
+    from: from,
+    to: to,
+    label: _tplLabel(vi, en),
+    endpoint: endpoint,
+    role: role || '',
+    requireComment: !!requireComment,
+    confirmMessage: confirmMessage || ''
+  };
+}
+
+function _tplCheck(key, vi, en, type, required, score, evidenceRequired){
+  return {
+    key: key,
+    label: _tplLabel(vi, en),
+    type: (type || 'check'),
+    required: !!required,
+    score: (typeof score === 'number' ? score : 0),
+    evidenceRequired: !!evidenceRequired
+  };
+}
+
+BLOCK_TEMPLATES['tpl-quote-dashboard-kpi'] = _tplMeta('kpi-row', 'Dashboard KPI Báo giá', 'Quote Dashboard KPIs', 'Tổng hợp khối lượng và hiệu quả báo giá theo pipeline hiện hành.', 'quoting', {
+  dataSource: _tplSource('quote_dashboard', 'GET'),
+  items: [
+    _tplKpi('total_quotes', 'Tổng báo giá', 'Total Quotes', 'var(--brand-2)'),
+    _tplKpi('open_quotes', 'Chờ xử lý', 'Pending Quotes', 'var(--amber)'),
+    _tplKpi('conversion_rate', 'Win Rate', 'Win Rate', 'var(--green)', '%'),
+    _tplKpi('avg_quote_value', 'Giá trị TB', 'Average Value', 'var(--brand-1)', ' USD')
+  ]
+});
+
+BLOCK_TEMPLATES['tpl-quote-list-table'] = _tplMeta('data-table', 'Bảng danh sách báo giá', 'Quote List Table', 'Danh sách báo giá chuẩn với cột khách hàng, giá trị và trạng thái.', 'quoting', {
+  dataSource: _tplSource('quote_list', 'GET', 'quotes', 'total'),
+  dataKey: 'quotes',
+  pageSize: 20,
+  rowKey: 'quote_id',
+  columns: [
+    _tplCol('quote_number', 'Số báo giá', 'Quote Number', 'string', '150', true, true),
+    _tplCol('customer_name', 'Khách hàng', 'Customer', 'string', '220', true, true),
+    _tplCol('total_amount', 'Tổng tiền', 'Total Amount', 'currency', '150', true, false),
+    _tplCol('status', 'Trạng thái', 'Status', 'badge', '130', true, true, 'quote_status'),
+    _tplCol('created_at', 'Ngày tạo', 'Created At', 'datetime', '160', true, false)
+  ]
+});
+
+BLOCK_TEMPLATES['tpl-quote-create-form'] = _tplMeta('form-wizard', 'Wizard tạo báo giá', 'Quote Create Wizard', 'Wizard 3 bước để tạo và rà soát báo giá khách hàng.', 'quoting', {
+  dataSource: _tplSource('quote_create', 'POST'),
+  wizard: {
+    showProgress: true,
+    allowSkip: false,
+    summaryStepKey: 'confirm',
+    steps: [
+      _tplStep('info', 'Thông tin', 'Information', 'customer_name,requested_date,promise_date,currency_code'),
+      _tplStep('product', 'Sản phẩm', 'Products', 'lines,markup_pct,gross_margin_pct,flight_critical_flag'),
+      _tplStep('confirm', 'Xác nhận', 'Confirmation', 'payment_terms,incoterm,total_order_value')
+    ],
+    saveDraft: { api:'quote_create', method:'POST' },
+    submit: { api:'quote_create', method:'POST' }
+  }
+});
+
+BLOCK_TEMPLATES['tpl-quote-pipeline-kanban'] = _tplMeta('data-kanban', 'Kanban pipeline báo giá', 'Quote Pipeline Kanban', 'Pipeline báo giá theo trạng thái thương mại và hành động chuyển tiếp.', 'quoting', {
+  dataSource: _tplSource('quote_list', 'GET', 'quotes', 'total'),
+  dataKey: 'quotes',
+  kanban: {
+    laneField: 'status',
+    allowCreate: true,
+    allowDrag: true,
+    lanes: [
+      _tplLane('draft', 'Nháp', 'Draft', '#94a3b8', 8),
+      _tplLane('sent', 'Đã gửi', 'Submitted', '#38bdf8', 6),
+      _tplLane('review', 'Đang duyệt', 'Reviewing', '#f59e0b', 4),
+      _tplLane('accepted', 'Trúng', 'Won', '#22c55e', 3),
+      _tplLane('rejected', 'Trượt', 'Lost', '#ef4444', 2)
+    ],
+    card: {
+      titleField: 'quote_number',
+      subtitleField: 'customer_name',
+      priorityField: 'flight_critical_flag',
+      dueDateField: 'promise_date',
+      tagField: 'currency_code'
+    },
+    persist: { api:'quote_transition', method:'POST' }
+  }
+});
+
+BLOCK_TEMPLATES['tpl-quote-trend-chart'] = _tplMeta('chart-line', 'Xu hướng giá trị báo giá', 'Quote Value Trend', 'Xu hướng giá trị báo giá theo tháng để theo dõi pipeline và hiệu suất chào giá.', 'quoting', {
+  dataSource: _tplSource('quote_dashboard', 'GET', 'monthly_trend'),
+  chart: {
+    xField: 'period',
+    yField: 'quote_value',
+    smooth: true,
+    showGrid: true,
+    showLegend: true,
+    series: [
+      { field:'quote_value', label:_tplLabel('Giá trị báo giá', 'Quote Value'), type:'line', color:'#2563eb' },
+      { field:'won_value', label:_tplLabel('Giá trị trúng', 'Won Value'), type:'area', color:'#0ea5e9' }
+    ]
+  }
+});
+
+BLOCK_TEMPLATES['tpl-order-dashboard-kpi'] = _tplMeta('kpi-row', 'Dashboard KPI đơn hàng', 'Order Dashboard KPIs', 'Bộ KPI điều hành đơn hàng dựa trên dữ liệu dashboard tổng hợp hiện có.', 'orders', {
+  dataSource: _tplSource('order_dashboard_kpi', 'GET'),
+  items: [
+    _tplKpi('backlog_value', 'Giá trị tồn đọng', 'Backlog Value', 'var(--brand-2)', ' USD'),
+    _tplKpi('on_time_delivery', 'OTD', 'On-Time Delivery', 'var(--green)'),
+    _tplKpi('revenue_this_month', 'Doanh thu tháng', 'Revenue This Month', 'var(--brand-1)', ' USD'),
+    _tplKpi('book_to_bill_ratio', 'Book-to-Bill', 'Book-to-Bill', 'var(--amber)')
+  ]
+});
+
+BLOCK_TEMPLATES['tpl-order-so-table'] = _tplMeta('data-table', 'Bảng Sales Order', 'Sales Order Table', 'Danh sách SO với khách hàng, giá trị, tiến độ và hạn giao hàng.', 'orders', {
+  dataSource: _tplSource('order_so_list', 'GET', 'sales_orders', 'total'),
+  dataKey: 'sales_orders',
+  pageSize: 20,
+  rowKey: 'so_id',
+  columns: [
+    _tplCol('so_number', 'Số SO', 'SO Number', 'string', '150', true, true),
+    _tplCol('customer_name', 'Khách hàng', 'Customer', 'string', '220', true, true),
+    _tplCol('total_value', 'Tổng giá trị', 'Total Value', 'currency', '150', true, false),
+    _tplCol('status', 'Trạng thái', 'Status', 'badge', '130', true, true, 'so_status'),
+    _tplCol('due_date', 'Hạn giao', 'Due Date', 'date', '120', true, false),
+    _tplCol('order_date', 'Ngày đặt', 'Order Date', 'date', '120', true, false)
+  ]
+});
+
+BLOCK_TEMPLATES['tpl-order-tree'] = _tplMeta('data-tree', 'Cây SO > JO > WO', 'SO > JO > WO Tree', 'Cây phân rã từ sales order xuống job order và work order.', 'orders', {
+  dataSource: _tplSource('order_hierarchy', 'GET', 'tree'),
+  dataKey: 'tree',
+  childrenKey: 'children',
+  titleField: 'sales_order_number',
+  subtitleField: 'so_status'
+});
+
+BLOCK_TEMPLATES['tpl-order-gantt'] = _tplMeta('data-gantt', 'Gantt điều độ đơn hàng', 'Order Schedule Gantt', 'Tiến độ WO theo máy và giai đoạn kế hoạch dùng dữ liệu capacity thực tế.', 'orders', {
+  dataSource: _tplSource('schedule_capacity', 'GET', 'capacity_data'),
+  dataKey: 'capacity_data',
+  schedule: {
+    defaultView: 'week',
+    resourceField: 'machine_id',
+    startField: 'start_date',
+    endField: 'end_date',
+    titleField: 'capacity_data',
+    statusField: 'utilization_pct',
+    showWeekends: false
+  }
+});
+
+BLOCK_TEMPLATES['tpl-order-status-flow'] = _tplMeta('action-status-flow', 'Luồng trạng thái SO', 'Sales Order Status Flow', 'Bộ nút chuyển trạng thái SO từ báo giá tới giao hàng hoàn tất.', 'orders', {
+  dataSource: _tplSource('order_so_list', 'GET', 'sales_orders', 'total'),
+  workflow: {
+    stateField: 'status',
+    showHistory: true,
+    escalationRole: 'sales_manager',
+    transitions: [
+      _tplTransition('draft', 'quoted', 'Chốt báo giá', 'Quote Locked', 'order_transition', 'sales', false, 'Xác nhận khóa báo giá thành đơn hàng?'),
+      _tplTransition('quoted', 'confirmed', 'Xác nhận SO', 'Confirm SO', 'order_transition', 'sales_manager', false, 'Xác nhận chuyển sang confirmed?'),
+      _tplTransition('confirmed', 'in_production', 'Phát hành WO', 'Release to Production', 'order_transition', 'planner', false, 'Phát hành cho sản xuất?'),
+      _tplTransition('in_production', 'shipped', 'Xuất hàng', 'Ship', 'order_transition', 'logistics', true, 'Đã hoàn tất chứng từ và sẵn sàng xuất hàng?'),
+      _tplTransition('shipped', 'closed', 'Đóng đơn', 'Close Order', 'order_transition', 'sales_manager', false, 'Đóng đơn hàng này?')
+    ]
+  }
+});
+
+BLOCK_TEMPLATES['tpl-plan-capacity-grid'] = _tplMeta('schedule-grid', 'Lưới năng lực máy theo ca', 'Machine Capacity Grid', 'Lịch năng lực theo máy và khung thời gian kế hoạch.', 'planning', {
+  dataSource: _tplSource('schedule_capacity', 'GET', 'capacity_data'),
+  dataKey: 'capacity_data',
+  schedule: {
+    defaultView: 'week',
+    startField: 'start_date',
+    endField: 'end_date',
+    resourceField: 'machine_id',
+    statusField: 'schedule_status_sch',
+    progressField: 'utilization_pct',
+    slotMinutes: 480,
+    workdayStart: '06:00',
+    workdayEnd: '22:00',
+    showWeekends: false
+  }
+});
+
+BLOCK_TEMPLATES['tpl-plan-mrp-table'] = _tplMeta('data-table', 'Bảng nhu cầu vật tư', 'Material Planning Table', 'Bảng vật tư kế hoạch dùng dữ liệu estimate vật liệu hiện có của hệ thống.', 'planning', {
+  dataSource: _tplSource('quote_estimate_material', 'GET'),
+  pageSize: 20,
+  rowKey: 'material_type',
+  columns: [
+    _tplCol('material_type', 'Loại vật tư', 'Material Type', 'string', '180', true, true),
+    _tplCol('dimensions', 'Quy cách', 'Dimensions', 'string', '180', false, true),
+    _tplCol('qty', 'Nhu cầu', 'Required Qty', 'number', '100', true, false),
+    _tplCol('buy_to_fly', 'Buy-to-Fly', 'Buy-to-Fly', 'number', '110', true, false),
+    _tplCol('estimate', 'Ước tính', 'Estimate', 'currency', '140', true, false)
+  ]
+});
+
+BLOCK_TEMPLATES['tpl-plan-dispatch-board'] = _tplMeta('data-kanban', 'Kanban phát lệnh sản xuất', 'Dispatch Kanban', 'Bảng phát lệnh theo tình trạng mục tiêu sản xuất và ưu tiên dispatch.', 'planning', {
+  dataSource: _tplSource('dispatch_list_targets', 'GET'),
+  kanban: {
+    laneField: 'status',
+    allowCreate: false,
+    allowDrag: true,
+    lanes: [
+      _tplLane('draft', 'Nháp', 'Draft', '#94a3b8', 6),
+      _tplLane('released', 'Đã phát hành', 'Released', '#38bdf8', 5),
+      _tplLane('running', 'Đang chạy', 'Running', '#22c55e', 4),
+      _tplLane('hold', 'Tạm dừng', 'On Hold', '#f59e0b', 2)
+    ],
+    card: {
+      titleField: 'wo_number',
+      subtitleField: 'machine_name',
+      priorityField: 'priority',
+      dueDateField: 'target_date',
+      tagField: 'shift_code'
+    },
+    persist: { api:'dispatch_update_target', method:'POST' }
+  }
+});
+
+BLOCK_TEMPLATES['tpl-plan-schedule-gantt'] = _tplMeta('data-gantt', 'Gantt điều độ kế hoạch', 'Planning Schedule Gantt', 'Tiến độ WO kế hoạch theo máy và năng lực từng khung thời gian.', 'planning', {
+  dataSource: _tplSource('schedule_capacity', 'GET', 'capacity_data'),
+  dataKey: 'capacity_data',
+  schedule: {
+    defaultView: 'week',
+    startField: 'start_date',
+    endField: 'end_date',
+    resourceField: 'machine_id',
+    titleField: 'job_number_sch',
+    statusField: 'schedule_status_sch',
+    groupByField: 'work_center_id_sch'
+  }
+});
+
+BLOCK_TEMPLATES['tpl-plan-material-shortage'] = _tplMeta('data-table', 'Bảng cảnh báo vật tư', 'Material Shortage Table', 'Danh sách vật tư cần chú ý theo buy-to-fly và estimate vật liệu.', 'planning', {
+  dataSource: _tplSource('quote_estimate_material', 'GET'),
+  pageSize: 20,
+  rowKey: 'material_type',
+  columns: [
+    _tplCol('material_type', 'Loại vật tư', 'Material Type', 'string', '180', true, true),
+    _tplCol('dimensions', 'Quy cách', 'Dimensions', 'string', '180', false, true),
+    _tplCol('qty', 'Số lượng yêu cầu', 'Required Qty', 'number', '120', true, false),
+    _tplCol('buy_to_fly', 'Tỷ lệ buy-to-fly', 'Buy-to-Fly', 'number', '130', true, false),
+    _tplCol('estimate', 'Giá trị ước tính', 'Estimated Value', 'currency', '150', true, false)
+  ]
+});
+
+BLOCK_TEMPLATES['tpl-purchase-dashboard-kpi'] = _tplMeta('kpi-row', 'Dashboard KPI mua hàng', 'Purchasing Dashboard KPIs', 'Bộ KPI nhà cung cấp và chất lượng đầu vào từ dashboard hiện hành.', 'purchasing', {
+  dataSource: _tplSource('supplier_dashboard', 'GET'),
+  items: [
+    _tplKpi('total_suppliers', 'Tổng NCC', 'Total Suppliers', 'var(--brand-2)'),
+    _tplKpi('open_scars', 'SCAR đang mở', 'Open SCARs', 'var(--red)'),
+    _tplKpi('avg_delivery_score', 'Điểm giao hàng', 'Delivery Score', 'var(--green)'),
+    _tplKpi('iqc_acceptance_rate', 'Tỷ lệ IQC đạt', 'IQC Acceptance', 'var(--amber)', '%')
+  ]
+});
+
+BLOCK_TEMPLATES['tpl-purchase-po-table'] = _tplMeta('data-table', 'Bảng PO / subcontract', 'PO / Subcontract Table', 'Danh sách đặt mua và gia công ngoài với trạng thái giao nhận.', 'purchasing', {
+  dataSource: _tplSource('subcontract_list', 'GET'),
+  pageSize: 20,
+  rowKey: 'sc_id',
+  columns: [
+    _tplCol('po_number', 'Số PO', 'PO Number', 'string', '150', true, true),
+    _tplCol('sc_number', 'Số subcontract', 'Subcontract Number', 'string', '160', true, true),
+    _tplCol('vendor_name', 'Nhà cung cấp', 'Vendor', 'string', '220', true, true),
+    _tplCol('quantity', 'Số lượng', 'Quantity', 'number', '110', true, false),
+    _tplCol('status', 'Trạng thái', 'Status', 'badge', '130', true, true),
+    _tplCol('expected_return', 'Ngày nhận dự kiến', 'Expected Return', 'date', '140', true, false)
+  ]
+});
+
+BLOCK_TEMPLATES['tpl-purchase-receiving-form'] = _tplMeta('form-standard', 'Form nhận hàng và kiểm tra', 'Receiving Inspection Form', 'Form nhập dữ liệu nhận hàng, số lượng đạt/không đạt và CoC.', 'purchasing', {
+  dataSource: _tplSource('subcontract_receive', 'POST'),
+  columns: 2,
+  fields: [
+    _tplField('subcontract_id', 'Mã subcontract', 'Subcontract ID', 'string', true, '', { placeholder:'SC-0001' }),
+    _tplField('received_date', 'Ngày nhận', 'Received Date', 'date', true),
+    _tplField('qty_received', 'Số lượng nhận', 'Qty Received', 'number', true),
+    _tplField('qty_accepted', 'Số lượng đạt', 'Qty Accepted', 'number', true),
+    _tplField('qty_rejected', 'Số lượng NG', 'Qty Rejected', 'number', false),
+    _tplField('coc_received', 'Đã nhận CoC', 'CoC Received', 'checkbox', false),
+    _tplField('condition', 'Tình trạng hàng', 'Condition', 'text', false, 'full'),
+    _tplField('inspection_notes', 'Ghi chú kiểm tra', 'Inspection Notes', 'textarea', false, 'full', { rows:4 })
+  ],
+  showSubmit: true,
+  submitAction: 'subcontract_receive',
+  submitLabel: 'Ghi nhận nhận hàng',
+  submitLabelEn: 'Post Receipt'
+});
+
+BLOCK_TEMPLATES['tpl-purchase-supplier-scorecard'] = _tplMeta('insight-scorecard', 'Scorecard nhà cung cấp', 'Supplier Scorecard', 'Scorecard năng lực nhà cung cấp theo chất lượng, giao hàng và chi phí.', 'purchasing', {
+  dataSource: _tplSource('supplier_scorecard_list', 'GET', 'scorecards'),
+  dataKey: 'scorecards',
+  pageSize: 15,
+  rowKey: 'vendor_id',
+  columns: [
+    _tplCol('vendor_name', 'Nhà cung cấp', 'Vendor', 'string', '220', true, true),
+    _tplCol('quality_score', 'Điểm chất lượng', 'Quality Score', 'number', '120', true, false),
+    _tplCol('delivery_score', 'Điểm giao hàng', 'Delivery Score', 'number', '120', true, false),
+    _tplCol('cost_score', 'Điểm chi phí', 'Cost Score', 'number', '120', true, false),
+    _tplCol('overall_score', 'Điểm tổng', 'Overall Score', 'number', '120', true, false),
+    _tplCol('rating', 'Xếp hạng', 'Rating', 'badge', '110', true, true)
+  ]
+});
+
+BLOCK_TEMPLATES['tpl-purchase-3way-match'] = _tplMeta('data-table', 'Đối chiếu PO / nhận hàng', 'Receipt Match Table', 'Bảng đối chiếu PO, trạng thái nhận hàng và kết quả kiểm tra đầu vào.', 'purchasing', {
+  dataSource: _tplSource('supplier_incoming_list', 'GET', 'inspections'),
+  dataKey: 'inspections',
+  pageSize: 20,
+  rowKey: 'iqc_id',
+  columns: [
+    _tplCol('po_number', 'Số PO', 'PO Number', 'string', '150', true, true),
+    _tplCol('vendor_name', 'Nhà cung cấp', 'Vendor', 'string', '200', true, true),
+    _tplCol('part_number', 'Mã vật tư', 'Part Number', 'string', '160', true, true),
+    _tplCol('lot_qty', 'SL lô', 'Lot Qty', 'number', '110', true, false),
+    _tplCol('result', 'Kết quả IQC', 'IQC Result', 'badge', '120', true, true),
+    _tplCol('inspection_date', 'Ngày kiểm', 'Inspection Date', 'date', '130', true, false)
+  ]
+});
+
+BLOCK_TEMPLATES['tpl-mes-shopfloor-status'] = _tplMeta('mfg-machine-status', 'Trạng thái shopfloor', 'Shopfloor Machine Status', 'Lưới trạng thái máy tại shopfloor theo dữ liệu realtime hiện hành.', 'manufacturing', {
+  dataSource: _tplSource('mobile_shop_overview', 'GET'),
+  machine: {
+    assetField: 'machine_name',
+    lineField: 'machine_id',
+    statusField: 'status',
+    reasonField: 'alarm_code',
+    updatedAtField: 'updated_at',
+    showDowntime: true,
+    showCounters: true,
+    statusMap: [
+      { key:'running', label:_tplLabel('Chạy', 'Running'), color:'var(--green)', severity:'ok' },
+      { key:'idle', label:_tplLabel('Chờ', 'Idle'), color:'var(--amber)', severity:'warn' },
+      { key:'down', label:_tplLabel('Dừng', 'Down'), color:'var(--red)', severity:'critical' }
+    ]
+  }
+});
+
+BLOCK_TEMPLATES['tpl-mes-oee-dashboard'] = _tplMeta('iot-oee-board', 'Dashboard OEE shopfloor', 'Shopfloor OEE Dashboard', 'Bảng OEE theo máy với Availability, Performance và Quality.', 'manufacturing', {
+  dataSource: _tplSource('mobile_shop_overview', 'GET'),
+  oee: {
+    oeeField: 'oee',
+    availabilityField: 'kpi_target',
+    performanceField: 'kpi_actual',
+    qualityField: 'part_count',
+    machineField: 'machine_name',
+    showTrend: true,
+    timeBucket: 'shift'
+  }
+});
+
+BLOCK_TEMPLATES['tpl-mes-andon'] = _tplMeta('mfg-andon-board', 'Bảng Andon trạm', 'Station Andon Board', 'Bảng Andon hiển thị tình trạng trợ giúp và cảnh báo theo trạm.', 'manufacturing', {
+  dataSource: _tplSource('mobile_shop_overview', 'GET'),
+  machine: {
+    assetField: 'machine_name',
+    statusField: 'status',
+    reasonField: 'alarm_code',
+    updatedAtField: 'updated_at'
+  }
+});
+
+BLOCK_TEMPLATES['tpl-mes-wo-execution'] = _tplMeta('data-table', 'Bảng thực thi WO', 'WO Execution Table', 'Bảng WO đang thực thi với máy, ca, sản lượng và trạng thái chạy.', 'manufacturing', {
+  dataSource: _tplSource('dispatch_list_targets', 'GET'),
+  pageSize: 20,
+  rowKey: 'target_id',
+  columns: [
+    _tplCol('wo_number', 'Số WO', 'WO Number', 'string', '150', true, true),
+    _tplCol('machine_name', 'Máy', 'Machine', 'string', '160', true, true),
+    _tplCol('operator_name', 'Nhân viên', 'Operator', 'string', '160', true, true),
+    _tplCol('shift_code', 'Ca', 'Shift', 'string', '90', true, true),
+    _tplCol('target_qty', 'Mục tiêu', 'Target Qty', 'number', '100', true, false),
+    _tplCol('good_qty', 'Đạt', 'Good Qty', 'number', '90', true, false),
+    _tplCol('status', 'Trạng thái', 'Status', 'badge', '120', true, true)
+  ]
+});
+
+BLOCK_TEMPLATES['tpl-mes-downtime-pareto'] = _tplMeta('quality-pareto', 'Pareto nguyên nhân downtime', 'Downtime Pareto', 'Pareto downtime dựa trên alarm code và trạng thái máy shopfloor.', 'manufacturing', {
+  dataSource: _tplSource('mobile_shop_overview', 'GET', 'items', '', 'var rows = Array.isArray(data) ? data : (data.items || []); var buckets = {}; rows.forEach(function(row){ var key = row.alarm_code || row.status || "unknown"; buckets[key] = (buckets[key] || 0) + 1; }); return { items:Object.keys(buckets).map(function(key){ return { category:key, value:buckets[key] }; }) };'),
+  dataKey: 'items',
+  distribution: {
+    categoryField: 'category',
+    valueField: 'value',
+    showCumulative: true,
+    topN: 10,
+    sortBy: 'value_desc'
+  }
+});
+
+BLOCK_TEMPLATES['tpl-quality-dashboard-kpi'] = _tplMeta('kpi-row', 'Dashboard KPI chất lượng', 'Quality Dashboard KPIs', 'KPI chất lượng tổng hợp cho NCR, CAPA, scrap và first pass yield.', 'quality', {
+  dataSource: _tplSource('dashboard_quality', 'GET'),
+  items: [
+    _tplKpi('ncr_open', 'NCR đang mở', 'Open NCR', 'var(--red)'),
+    _tplKpi('capa_open', 'CAPA đang mở', 'Open CAPA', 'var(--amber)'),
+    _tplKpi('scrap_rate', 'Tỷ lệ scrap', 'Scrap Rate', 'var(--brand-1)', '%'),
+    _tplKpi('first_pass_yield', 'FPY', 'First Pass Yield', 'var(--green)', '%')
+  ]
+});
+
+BLOCK_TEMPLATES['tpl-quality-ncr-table'] = _tplMeta('data-table', 'Bảng ngoại lệ chất lượng', 'Quality Exception Table', 'Danh sách ngoại lệ chất lượng với severity, priority và người phụ trách.', 'quality', {
+  dataSource: _tplSource('exception_list', 'GET', 'exceptions', 'total'),
+  dataKey: 'exceptions',
+  pageSize: 20,
+  rowKey: 'exception_id',
+  columns: [
+    _tplCol('exception_number', 'Số ngoại lệ', 'Exception Number', 'string', '150', true, true),
+    _tplCol('title', 'Tiêu đề', 'Title', 'string', '260', false, true),
+    _tplCol('severity', 'Mức độ', 'Severity', 'badge', '110', true, true, 'severity'),
+    _tplCol('priority', 'Ưu tiên', 'Priority', 'badge', '110', true, true, 'priority'),
+    _tplCol('status', 'Trạng thái', 'Status', 'badge', '120', true, true),
+    _tplCol('assigned_to', 'Người phụ trách', 'Assigned To', 'string', '160', true, true),
+    _tplCol('created_date', 'Ngày tạo', 'Created Date', 'date', '120', true, false)
+  ]
+});
+
+BLOCK_TEMPLATES['tpl-quality-ncr-create'] = _tplMeta('form-wizard', 'Wizard tạo NCR', 'NCR Create Wizard', 'Wizard 4 bước để tạo ngoại lệ chất lượng và hành động containment.', 'quality', {
+  dataSource: _tplSource('quality_exception_create', 'POST'),
+  wizard: {
+    showProgress: true,
+    allowSkip: false,
+    summaryStepKey: 'submit',
+    steps: [
+      _tplStep('info', 'Thông tin', 'Information', 'customer_id,source,subject,received_date'),
+      _tplStep('defect', 'Lỗi', 'Defect', 'severity,description,affected_part_id,affected_qty'),
+      _tplStep('containment', 'Containment', 'Containment', 'affected_so_number,description'),
+      _tplStep('submit', 'Gửi', 'Submit', 'subject,description,severity')
+    ],
+    saveDraft: { api:'quality_exception_create', method:'POST' },
+    submit: { api:'quality_exception_create', method:'POST' }
+  }
+});
+
+BLOCK_TEMPLATES['tpl-quality-spc-chart'] = _tplMeta('quality-spc-chart', 'Biểu đồ SPC Xbar-R', 'SPC Xbar-R Chart', 'Biểu đồ SPC theo đặc tính đo, centerline và giới hạn kiểm soát.', 'quality', {
+  dataSource: _tplSource('spc_chart', 'GET'),
+  spc: {
+    valueField: 'data_points',
+    sampleField: 'subgroup_size',
+    targetField: 'centerline',
+    uclField: 'ucl',
+    lclField: 'lcl',
+    centerLineField: 'centerline',
+    chartMode: 'xbar-r',
+    highlightViolations: true
+  }
+});
+
+BLOCK_TEMPLATES['tpl-quality-pareto'] = _tplMeta('quality-pareto', 'Pareto lỗi chất lượng', 'Quality Pareto', 'Pareto defect dựa trên danh sách top defect từ dashboard ngoại lệ.', 'quality', {
+  dataSource: _tplSource('exception_dashboard', 'GET', 'top_defects'),
+  dataKey: 'top_defects',
+  distribution: {
+    categoryField: 'defect',
+    valueField: 'count',
+    showCumulative: true,
+    topN: 10,
+    sortBy: 'value_desc'
+  }
+});
+
+BLOCK_TEMPLATES['tpl-evidence-vault-table'] = _tplMeta('data-table', 'Kho hồ sơ chứng cứ', 'Evidence Vault Table', 'Kho chứng cứ số với hash SHA-256, liên kết hồ sơ và người tải lên.', 'evidence', {
+  dataSource: _tplSource('evidence_list', 'GET', 'evidence', 'total'),
+  dataKey: 'evidence',
+  pageSize: 20,
+  rowKey: 'evidence_id',
+  columns: [
+    _tplCol('evidence_id', 'Mã chứng cứ', 'Evidence ID', 'string', '150', true, true),
+    _tplCol('file_type', 'Loại tệp', 'File Type', 'badge', '110', true, true),
+    _tplCol('sha256_hash', 'SHA-256', 'SHA-256', 'string', '240', false, true),
+    _tplCol('linked_entities', 'Liên kết hồ sơ', 'Linked Entities', 'string', '220', false, true),
+    _tplCol('uploaded_at', 'Ngày tải', 'Uploaded At', 'datetime', '160', true, false),
+    _tplCol('uploaded_by', 'Người tải', 'Uploaded By', 'string', '140', true, true)
+  ]
+});
+
+BLOCK_TEMPLATES['tpl-evidence-chain-timeline'] = _tplMeta('data-timeline', 'Timeline chuỗi custody', 'Evidence Chain Timeline', 'Dòng thời gian xác minh chain of custody theo sự kiện chứng cứ.', 'evidence', {
+  dataSource: _tplSource('evidence_chain_custody', 'GET'),
+  dateKey: 'created_at',
+  titleKey: 'action',
+  descKey: 'notes',
+  statusKey: 'workflow_status',
+  groupBy: 'evidence_id'
+});
+
+BLOCK_TEMPLATES['tpl-evidence-upload'] = _tplMeta('form-standard', 'Form tải chứng cứ', 'Evidence Upload Form', 'Form tải chứng cứ kèm mô tả, entity liên kết và tags.', 'evidence', {
+  dataSource: _tplSource('evidence_upload', 'POST'),
+  columns: 2,
+  fields: [
+    _tplField('file', 'Tệp chứng cứ', 'Evidence File', 'file', true, 'full'),
+    _tplField('entity_type', 'Loại đối tượng', 'Entity Type', 'select', true),
+    _tplField('entity_id', 'Mã đối tượng', 'Entity ID', 'string', true),
+    _tplField('tags', 'Tags', 'Tags', 'text', false),
+    _tplField('description', 'Mô tả', 'Description', 'textarea', false, 'full', { rows:4 })
+  ],
+  showSubmit: true,
+  submitAction: 'evidence_upload',
+  submitLabel: 'Tải chứng cứ',
+  submitLabelEn: 'Upload Evidence'
+});
+
+BLOCK_TEMPLATES['tpl-evidence-custody-log'] = _tplMeta('audit-log', 'Audit log custody', 'Custody Audit Log', 'Audit log thể hiện actor, action và trạng thái chain of custody.', 'evidence', {
+  dataSource: _tplSource('evidence_chain_custody', 'GET'),
+  dateKey: 'created_at',
+  titleKey: 'action',
+  descKey: 'notes',
+  statusKey: 'workflow_status'
+});
+
+BLOCK_TEMPLATES['tpl-evidence-dashboard-kpi'] = _tplMeta('kpi-row', 'Dashboard KPI chứng cứ', 'Evidence Dashboard KPIs', 'KPI xác minh integrity của hồ sơ chứng cứ số.', 'evidence', {
+  dataSource: _tplSource('evidence_verify_chain', 'GET', '', '', 'return { total_records:data.total_records || 0, verified_records:data.verified_records || 0, chain_integrity_pct:(data.total_records ? Math.round((data.verified_records / data.total_records) * 100) : (data.chain_valid ? 100 : 0)), broken_at:data.broken_at || "-", verification_time:data.verification_time || "-" };'),
+  items: [
+    _tplKpi('total_records', 'Tổng hồ sơ', 'Total Records', 'var(--brand-2)'),
+    _tplKpi('verified_records', 'Đã xác minh', 'Verified Records', 'var(--green)'),
+    _tplKpi('chain_integrity_pct', 'Toàn vẹn chain', 'Chain Integrity', 'var(--amber)', '%'),
+    _tplKpi('verification_time', 'Lần xác minh', 'Verification Time', 'var(--brand-1)')
+  ]
+});
+
+BLOCK_TEMPLATES['tpl-report-kpi-dashboard'] = _tplMeta('kpi-row', 'Dashboard KPI điều hành', 'Executive KPI Dashboard', 'Dashboard 8 KPI điều hành dùng dữ liệu chất lượng tổng hợp hiện có.', 'reports', {
+  dataSource: _tplSource('dashboard_quality', 'GET'),
+  items: [
+    _tplKpi('first_pass_yield', 'FPY', 'First Pass Yield', 'var(--green)', '%'),
+    _tplKpi('scrap_rate', 'Scrap', 'Scrap Rate', 'var(--red)', '%'),
+    _tplKpi('copq_month', 'COPQ', 'COPQ Month', 'var(--brand-2)', ' USD'),
+    _tplKpi('ncr_open', 'NCR mở', 'Open NCR', 'var(--amber)'),
+    _tplKpi('capa_open', 'CAPA mở', 'Open CAPA', 'var(--amber)'),
+    _tplKpi('customer_complaints', 'Khiếu nại KH', 'Customer Complaints', 'var(--red)'),
+    _tplKpi('supplier_quality_score', 'Điểm NCC', 'Supplier Score', 'var(--brand-1)'),
+    _tplKpi('spc_in_control', 'SPC in control', 'SPC In Control', 'var(--green)', '%')
+  ]
+});
+
+BLOCK_TEMPLATES['tpl-report-copq-breakdown'] = _tplMeta('chart-donut', 'Donut COPQ breakdown', 'COPQ Breakdown Donut', 'Phân bổ chi phí chất lượng theo prevention, appraisal và failure cost.', 'reports', {
+  dataSource: _tplSource('compliance_report_copq', 'GET', 'breakdown', '', 'return { breakdown:[{ label:\"Prevention\", value:data.prevention_cost || 0 }, { label:\"Appraisal\", value:data.appraisal_cost || 0 }, { label:\"Internal\", value:data.internal_failure_cost || 0 }, { label:\"External\", value:data.external_failure_cost || 0 }] };'),
+  dataKey: 'breakdown',
+  labelKey: 'label',
+  valueKey: 'value'
+});
+
+BLOCK_TEMPLATES['tpl-report-trend-chart'] = _tplMeta('chart-line', 'Xu hướng KPI theo tháng', 'Monthly KPI Trend', 'Xu hướng KPI theo tháng phục vụ báo cáo chất lượng và tuân thủ.', 'reports', {
+  dataSource: _tplSource('exception_dashboard', 'GET', 'trend_monthly'),
+  dataKey: 'trend_monthly',
+  chart: {
+    xField: 'period',
+    yField: 'value',
+    smooth: true,
+    showGrid: true,
+    showLegend: true,
+    series: [
+      { field:'value', label:_tplLabel('Giá trị thực tế', 'Actual'), type:'line', color:'#2563eb' },
+      { field:'target', label:_tplLabel('Mục tiêu', 'Target'), type:'line', color:'#f59e0b' }
+    ]
+  }
+});
+
+BLOCK_TEMPLATES['tpl-report-matrix'] = _tplMeta('matrix-grid', 'Ma trận lỗi theo bộ phận', 'Defect Matrix', 'Ma trận defect theo bộ phận và loại ngoại lệ để phân tích chéo.', 'reports', {
+  dataSource: _tplSource('exception_list', 'GET', 'exceptions', 'total'),
+  dataKey: 'exceptions',
+  matrix: {
+    rowField: 'department',
+    columnField: 'type',
+    valueField: 'exception_id',
+    aggregate: 'count',
+    showTotals: true
+  }
+});
+
+BLOCK_TEMPLATES['tpl-report-export-toolbar'] = _tplMeta('action-toolbar', 'Thanh công cụ xuất báo cáo', 'Report Export Toolbar', 'Thanh công cụ xuất PDF, Excel và lịch gửi email báo cáo định kỳ.', 'reports', {
+  dataSource: _tplSource('compliance_report_history', 'GET'),
+  buttons: [
+    _tplBtn('Xuất PDF', 'Export PDF', 'primary', 'export-pdf', '📄'),
+    _tplBtn('Xuất Excel', 'Export Excel', 'secondary', 'export-excel', '📊'),
+    _tplBtn('Lịch gửi email', 'Schedule Email', 'secondary', 'schedule-email', '✉️')
+  ]
+});
+
+BLOCK_TEMPLATES['tpl-doc-registry-table'] = _tplMeta('data-table', 'Bảng đăng ký tài liệu', 'Document Registry Table', 'Danh mục tài liệu kiểm soát với revision, trạng thái và hiệu lực.', 'documents', {
+  dataSource: _tplSource('docs_custom_list', 'GET', 'docs', 'total'),
+  dataKey: 'docs',
+  pageSize: 20,
+  rowKey: 'doc_id',
+  columns: [
+    _tplCol('doc_id', 'Mã tài liệu', 'Document ID', 'string', '150', true, true),
+    _tplCol('title', 'Tiêu đề', 'Title', 'string', '260', true, true),
+    _tplCol('revision', 'Phiên bản', 'Revision', 'string', '90', true, true),
+    _tplCol('status', 'Trạng thái', 'Status', 'badge', '120', true, true, 'doc_status'),
+    _tplCol('effective_date', 'Ngày hiệu lực', 'Effective Date', 'date', '130', true, false),
+    _tplCol('author', 'Người soạn', 'Author', 'string', '150', true, true)
+  ]
+});
+
+BLOCK_TEMPLATES['tpl-doc-create-form'] = _tplMeta('form-wizard', 'Wizard tạo tài liệu', 'Document Create Wizard', 'Wizard 3 bước để tạo tài liệu, nhập nội dung và chọn tuyến phê duyệt.', 'documents', {
+  dataSource: _tplSource('doc_create', 'POST'),
+  wizard: {
+    showProgress: true,
+    allowSkip: false,
+    summaryStepKey: 'approval',
+    steps: [
+      _tplStep('meta', 'Metadata', 'Metadata', 'doc_type,title,department,revision_number,effective_date'),
+      _tplStep('content', 'Nội dung', 'Content', 'notes,doc_title,doc_title_vi,doc_category'),
+      _tplStep('approval', 'Phê duyệt', 'Approval Route', 'author,department,rev')
+    ],
+    saveDraft: { api:'doc_save_draft', method:'POST' },
+    submit: { api:'doc_submit_review', method:'POST' }
+  }
+});
+
+BLOCK_TEMPLATES['tpl-doc-approval-flow'] = _tplMeta('action-status-flow', 'Luồng phê duyệt tài liệu', 'Document Approval Flow', 'Bộ chuyển trạng thái tài liệu từ draft tới approved và superseded.', 'documents', {
+  dataSource: _tplSource('docs_custom_list', 'GET', 'docs', 'total'),
+  workflow: {
+    stateField: 'status',
+    showHistory: true,
+    escalationRole: 'qa_manager',
+    transitions: [
+      _tplTransition('draft', 'review', 'Gửi duyệt', 'Submit for Review', 'doc_submit_review', 'author', true, 'Gửi tài liệu sang bước review?'),
+      _tplTransition('review', 'approved', 'Phê duyệt', 'Approve', 'doc_approve', 'approver', true, 'Phê duyệt tài liệu này?'),
+      _tplTransition('review', 'draft', 'Trả về sửa', 'Return to Draft', 'doc_reject', 'approver', true, 'Trả tài liệu về draft để chỉnh sửa?'),
+      _tplTransition('approved', 'superseded', 'Thay thế', 'Supersede', 'doc_update_meta', 'document_control', false, 'Đánh dấu tài liệu đã bị thay thế?')
+    ]
+  }
+});
+
+BLOCK_TEMPLATES['tpl-doc-related-list'] = _tplMeta('data-list', 'Danh sách phiên bản liên quan', 'Related Document Versions', 'Danh sách phiên bản tài liệu liên quan với thay đổi revision và workflow status.', 'documents', {
+  dataSource: _tplSource('doc_versions_list', 'GET'),
+  dataKey: 'items',
+  titleKey: 'doc_id',
+  subtitleKey: 'revision',
+  badgeKey: 'workflow_status',
+  bodyKeys: ['author', 'created_at', 'change_description']
+});
+
+BLOCK_TEMPLATES['tpl-doc-dashboard-kpi'] = _tplMeta('kpi-row', 'Dashboard KPI tài liệu', 'Document Dashboard KPIs', 'KPI tài liệu kiểm soát được tính từ registry tài liệu hiện hành.', 'documents', {
+  dataSource: _tplSource('docs_custom_list', 'GET', '', '', 'var rows = data.docs || data.items || []; var approved = 0; var review = 0; rows.forEach(function(row){ if(row.status === "approved") approved += 1; if(row.status === "review") review += 1; }); return { total_docs:rows.length, pending_review:review, controlled_pct:(rows.length ? Math.round((approved / rows.length) * 100) : 0), overdue_review:rows.filter(function(row){ return row.status === "review"; }).length };'),
+  items: [
+    _tplKpi('total_docs', 'Tổng tài liệu', 'Total Documents', 'var(--brand-2)'),
+    _tplKpi('pending_review', 'Chờ review', 'Pending Review', 'var(--amber)'),
+    _tplKpi('overdue_review', 'Review quá hạn', 'Overdue Review', 'var(--red)'),
+    _tplKpi('controlled_pct', 'Tỷ lệ kiểm soát', 'Controlled Percentage', 'var(--green)', '%')
+  ]
+});
+
+BLOCK_TEMPLATES['tpl-admin-user-table'] = _tplMeta('data-table', 'Bảng người dùng hệ thống', 'System User Table', 'Danh sách người dùng hệ thống với vai trò, trạng thái và lần đăng nhập gần nhất.', 'admin', {
+  dataSource: _tplSource('admin_users_list', 'GET'),
+  pageSize: 20,
+  rowKey: 'user_id',
+  columns: [
+    _tplCol('username', 'Tên đăng nhập', 'Username', 'string', '140', true, true),
+    _tplCol('full_name', 'Họ và tên', 'Full Name', 'string', '200', true, true),
+    _tplCol('email', 'Email', 'Email', 'string', '220', true, true),
+    _tplCol('role', 'Vai trò', 'Role', 'badge', '130', true, true),
+    _tplCol('is_active', 'Kích hoạt', 'Active', 'badge', '110', true, true),
+    _tplCol('last_login', 'Đăng nhập cuối', 'Last Login', 'datetime', '160', true, false)
+  ]
+});
+
+BLOCK_TEMPLATES['tpl-admin-role-matrix'] = _tplMeta('matrix-grid', 'Ma trận role / permission', 'Role Permission Matrix', 'Ma trận quyền theo role và tập permission đang khai báo trong hệ thống.', 'admin', {
+  dataSource: _tplSource('role_perms_get', 'GET', 'items', '', 'var rows = data.items || []; if(!rows.length && data.role){ rows = [data]; } return { items:rows };'),
+  dataKey: 'items',
+  matrix: {
+    rowField: 'role',
+    columnField: 'permissions',
+    valueField: 'permissions',
+    aggregate: 'count',
+    showTotals: true
+  }
+});
+
+BLOCK_TEMPLATES['tpl-admin-audit-trail'] = _tplMeta('audit-log', 'Audit trail hệ thống', 'System Audit Trail', 'Audit trail thay đổi master data và thao tác hệ thống.', 'admin', {
+  dataSource: _tplSource('master_data_history', 'GET'),
+  dateKey: 'created_at',
+  titleKey: 'field',
+  descKey: 'new_value',
+  statusKey: 'entity_type'
+});
+
+BLOCK_TEMPLATES['tpl-admin-integration-status'] = _tplMeta('mfg-machine-status', 'Trạng thái tích hợp', 'Integration Status Board', 'Theo dõi trạng thái các thiết bị đồng bộ và mức tồn đọng đồng bộ.', 'admin', {
+  dataSource: _tplSource('mobile_sync_status', 'GET'),
+  machine: {
+    assetField: 'device_id',
+    lineField: 'device_id',
+    statusField: 'pending_count',
+    reasonField: 'conflict_count',
+    updatedAtField: 'last_sync',
+    showDowntime: true,
+    showCounters: true
+  }
+});
+
+BLOCK_TEMPLATES['tpl-admin-system-kpi'] = _tplMeta('kpi-row', 'Dashboard KPI quản trị', 'Admin KPI Dashboard', 'KPI quản trị được tổng hợp từ người dùng hệ thống và mức bao phủ kích hoạt.', 'admin', {
+  dataSource: _tplSource('admin_users_list', 'GET', '', '', 'var rows = data.items || data.users || data; rows = Array.isArray(rows) ? rows : []; var active = rows.filter(function(row){ return !!row.is_active; }).length; var mfa = rows.filter(function(row){ return !!row.mfa_enabled; }).length; var logged = rows.filter(function(row){ return !!row.last_login; }).length; var roles = {}; rows.forEach(function(row){ roles[row.role || ""] = true; }); return { active_users:active, mfa_enabled:mfa, recent_logins:logged, role_count:Object.keys(roles).filter(function(key){ return !!key; }).length };'),
+  items: [
+    _tplKpi('active_users', 'Người dùng kích hoạt', 'Active Users', 'var(--brand-2)'),
+    _tplKpi('mfa_enabled', 'Đã bật MFA', 'MFA Enabled', 'var(--green)'),
+    _tplKpi('recent_logins', 'Có đăng nhập gần đây', 'Recent Logins', 'var(--amber)'),
+    _tplKpi('role_count', 'Số role', 'Role Count', 'var(--brand-1)')
+  ]
+});
+
 function renderTwoColumn(block, data, state){
   var config = block.config || {};
   var ratio = config.ratio || '50-50';
@@ -2396,6 +3715,20 @@ function renderTwoColumn(block, data, state){
   return html;
 }
 
+function _getRuntimeLayoutStyle(layout){
+  var actual = layout || {};
+  var gap = actual.gap || '16px';
+  var style = 'gap:' + gap + ';';
+  if(actual.type === 'grid'){
+    style += 'display:grid;grid-template-columns:repeat(' + Math.max(1, Math.min(6, parseInt(actual.columns, 10) || 1)) + ',minmax(0,1fr));';
+  } else if(actual.type === 'flex'){
+    style += 'display:flex;flex-wrap:wrap;align-items:' + (actual.align || 'stretch') + ';';
+  } else {
+    style += 'display:flex;flex-direction:column;';
+  }
+  return style;
+}
+
 /**
  * Render a card container with a single content slot.
  */
@@ -2403,7 +3736,7 @@ function renderCardContainer(block, data, state){
   var slots = block.slots || {};
   var children = slots.content || [];
 
-  var html = '<div class="hm-card-container">';
+  var html = '<div class="hm-card-container" style="' + _getRuntimeLayoutStyle(block.layout || {}) + '">';
   children.forEach(function(childBlock){
     html += renderBlock(childBlock, state.blockData[childBlock.id]||{}, state);
   });
@@ -2661,7 +3994,7 @@ function renderModuleFromSchema(container, schema, options){
   // Active tab blocks
   var activeTab = renderSchema.tabs.find(function(t){ return t.tabId===state.activeTab; });
   if(activeTab){
-    html += '<div class="hm-blocks-container" data-module="'+_esc(moduleId)+'" data-tab="'+_esc(activeTab.tabId)+'">';
+    html += '<div class="hm-blocks-container" data-module="'+_esc(moduleId)+'" data-tab="'+_esc(activeTab.tabId)+'" style="'+_getRuntimeLayoutStyle(activeTab.layout || {})+'">';
 
     // Add-block button at top (edit mode)
     if(state.editMode){
@@ -2753,6 +4086,7 @@ function renderModuleFromSchema(container, schema, options){
  */
 function _renderBlockWrapper(block, data, state, blockClasses, reactiveCtx){
   var editMode = state && state.editMode;
+  var titleCtx = reactiveCtx;
 
   var html = '<div class="'+blockClasses+'" data-block-id="'+_esc(block.id)+'" data-block-type="'+_esc(block.type)+'">';
 
@@ -2773,8 +4107,18 @@ function _renderBlockWrapper(block, data, state, blockClasses, reactiveCtx){
     var titleVi = block.title.vi || block.title;
     var titleEn = block.title.en || block.title;
     if(reactiveCtx){
-      titleVi = resolveBindings(String(titleVi), reactiveCtx);
-      titleEn = resolveBindings(String(titleEn), reactiveCtx);
+      titleCtx = {};
+      Object.keys(reactiveCtx).forEach(function(key){
+        titleCtx[key] = reactiveCtx[key];
+      });
+      titleCtx.data = data || {};
+      titleCtx.record = data || {};
+      titleCtx.block = block || {};
+      titleCtx.module = (state && state._schema) ? state._schema : (reactiveCtx.module || {});
+      titleCtx.user = reactiveCtx.user || reactiveCtx.currentUser || {};
+      titleCtx.currentUser = titleCtx.user;
+      titleVi = _evalExpr(String(titleVi), titleCtx);
+      titleEn = _evalExpr(String(titleEn), titleCtx);
     }
     html += '<div class="hm-block-header">';
     html += '<span class="hm-block-title">'+_esc(_t(titleVi, titleEn))+'</span>';
@@ -3064,16 +4408,28 @@ function _renderBlockInner(block, data, state, reactiveCtx){
   var catalogEntry = BLOCK_CATALOG[block.type] || {};
   var renderType = catalogEntry.renderer || block.type;
   var blockRuntimeId = block.id || block.blockId || '';
+  var blockCtx = reactiveCtx;
 
   // Resolve bindings in config if reactive context available
   var resolvedConfig = config;
   if(reactiveCtx){
-    try { resolvedConfig = _resolveConfigBindings(config, reactiveCtx); } catch(e){ /* fallback */ }
+    blockCtx = {};
+    Object.keys(reactiveCtx).forEach(function(key){
+      blockCtx[key] = reactiveCtx[key];
+    });
+    blockCtx.data = data || {};
+    blockCtx.record = data || {};
+    blockCtx.block = block || {};
+    blockCtx.module = (state && state._schema) ? state._schema : (reactiveCtx.module || {});
+    blockCtx.user = reactiveCtx.user || reactiveCtx.currentUser || {};
+    blockCtx.currentUser = blockCtx.user;
+    blockCtx.filters = (state && state.filterValues) || reactiveCtx.filters || {};
+    try { resolvedConfig = _resolveBindings(config, blockCtx); } catch(e){ resolvedConfig = config; }
   }
 
   switch(renderType){
     case 'kpi-row':         return renderKpiRow(resolvedConfig, data);
-    case 'data-table':      return renderAdvancedTableV3(resolvedConfig, data, state, blockRuntimeId, reactiveCtx);
+    case 'data-table':      return renderAdvancedTableV3(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx);
     case 'filter-bar':      return renderFilterBar(resolvedConfig, data);
     case 'section-header':  return renderSectionHeader(resolvedConfig);
     case 'spacer':          return '<div style="height:'+(resolvedConfig.height||16)+'px"></div>';
@@ -3084,8 +4440,14 @@ function _renderBlockInner(block, data, state, reactiveCtx){
     case 'data-cards':      return renderCardGrid(resolvedConfig, data);
     case 'data-timeline':   return renderTimeline(resolvedConfig, data);
     case 'form-standard':   return renderFormStandard(resolvedConfig, data);
-    case 'two-column':      return renderTwoColumn(block, data, state);
-    case 'card-container':  return renderCardContainer(block, data, state);
+    case 'two-column':
+      var columnBlock = _clone(block);
+      columnBlock.config = resolvedConfig;
+      return renderTwoColumn(columnBlock, data, state);
+    case 'card-container':
+      var containerBlock = _clone(block);
+      containerBlock.config = resolvedConfig;
+      return renderCardContainer(containerBlock, data, state);
     default:
       return '<div class="hm-empty"><div style="font-weight:600;margin-bottom:4px">'+_esc(_t(catalogEntry.label || block.type, catalogEntry.labelEn || block.type))+'</div><div style="font-size:12px;color:var(--text-tertiary)">'+_t('Block đang dùng renderer mặc định. Cấu hình thêm trong Module Builder.','This block is using the generic renderer. Configure it in Module Builder.')+'</div></div>';
   }
@@ -4482,6 +5844,8 @@ window.HmBlockEngine = {
   evaluateExpression: evaluateExpression,
   resolveBindings: resolveBindings,
   evaluateFormula: evaluateFormula,
+  _evalExpr: _evalExpr,
+  _resolveBindings: _resolveBindings,
 
   // Conditional visibility (v3)
   isBlockVisible: isBlockVisible,
@@ -5316,37 +6680,88 @@ function renderConnectorLibrary() {
 
 // ─── 2. DATA TRANSFORMER (Code Mode) ────────────────────────────────────────
 
-// Users can write JavaScript transformers on API responses
-// Similar to Appsmith's {{ }} but for complex multi-line transforms
-// Stored in block config: config.transformer = "return data.map(row => ({...row, total: row.qty * row.price}))"
+// Safe transformer config using bindings / JSON templates
+// Examples:
+//   {{ data }}
+//   { "mode":"pick", "path":"items" }
+//   { "mode":"map", "template":{ "total":"{{ record.qty * record.unit_price }}" } }
 
-function executeTransformer(code, data, context) {
-  // Sandboxed execution of user-provided transformer code
-  // 'data' = raw API response
-  // 'context' = { filters, currentUser, state, moment, Math, etc. }
-  // Returns transformed data
-  if (!code || typeof code !== 'string') return data;
-  try {
-    var fn = new Function('data', 'ctx', 'moment', 'Math',
-      '"use strict";\n' + code
-    );
-    return fn(data, context, { now: function() { return new Date(); }, format: function(d,f) { return new Date(d).toLocaleDateString(); } }, Math);
-  } catch(e) {
-    console.warn('[Transformer]', e.message);
-    return data;
-  }
+function _buildTransformerContext(data, context, record) {
+  var ctx = {};
+  var source = context || {};
+  Object.keys(source).forEach(function(key){
+    ctx[key] = source[key];
+  });
+  ctx.data = data;
+  ctx.record = record == null ? data : record;
+  ctx.user = source.user || source.currentUser || {};
+  ctx.currentUser = ctx.user;
+  ctx.module = source.module || {};
+  ctx.filters = source.filters || {};
+  ctx.state = source.state || {};
+  ctx.Math = Math;
+  return ctx;
 }
 
-// Render code editor for transformer
+function _getTransformerByPath(obj, path) {
+  var parts = String(path || '').split('.');
+  var ctx = obj;
+  var i;
+  for (i = 0; i < parts.length; i++) {
+    if (!parts[i]) continue;
+    if (ctx == null) return undefined;
+    ctx = ctx[parts[i]];
+  }
+  return ctx;
+}
+
+function _containsUnsafeTransformerSyntax(code) {
+  return /(function\s*\(|=>|\bnew\b|\bwhile\b|\bfor\b|\beval\b|\bwindow\b|\bdocument\b|;)/.test(code || '');
+}
+
+function executeTransformer(code, data, context) {
+  var trimmed;
+  var parsed;
+  if (!code || typeof code !== 'string') return data;
+  trimmed = code.replace(/^\s+|\s+$/g, '');
+  if (!trimmed) return data;
+  if (_containsUnsafeTransformerSyntax(trimmed)) {
+    console.warn('[Transformer] Unsafe syntax is no longer supported. Use bindings or JSON config instead.');
+    return data;
+  }
+  if (trimmed.indexOf('{{') === 0 && trimmed.lastIndexOf('}}') === trimmed.length - 2) {
+    return evaluateExpression(trimmed, _buildTransformerContext(data, context, data));
+  }
+  try {
+    parsed = JSON.parse(trimmed);
+  } catch (e) {
+    console.warn('[Transformer] Invalid safe transformer config:', e.message);
+    return data;
+  }
+  if (parsed && parsed.mode === 'pick' && parsed.path) {
+    return _getTransformerByPath(data, parsed.path);
+  }
+  if (parsed && parsed.mode === 'map' && Array.isArray(data) && parsed.template) {
+    return data.map(function(row){
+      return _resolveBindings(parsed.template, _buildTransformerContext(data, context, row));
+    });
+  }
+  if (parsed && parsed.mode === 'wrap') {
+    return _resolveBindings(parsed.value, _buildTransformerContext(data, context, data));
+  }
+  return _resolveBindings(parsed, _buildTransformerContext(data, context, data));
+}
+
+// Render code editor for safe transformer config
 function renderTransformerEditor(currentCode) {
   var h = '<div style="border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden">';
   h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:var(--space-2) var(--space-3);background:var(--gray-800);color:var(--text-inverse);font-size:var(--text-xs)">';
-  h += '<span>JavaScript Transformer</span>';
+  h += '<span>'+_t('Safe Transformer', 'Safe Transformer')+'</span>';
   h += '<div style="display:flex;gap:var(--space-2)">';
-  h += '<button class="hm-btn hm-btn-sm" style="background:rgba(255,255,255,0.1);color:#fff;border:none" data-action="format-code">Format</button>';
-  h += '<button class="hm-btn hm-btn-sm" style="background:var(--green);color:#fff;border:none" data-action="run-transformer">▶ Run</button>';
+  h += '<button class="hm-btn hm-btn-sm" style="background:rgba(255,255,255,0.1);color:#fff;border:none" data-action="format-code">'+_t('Định dạng', 'Format')+'</button>';
+  h += '<button class="hm-btn hm-btn-sm" style="background:var(--green);color:#fff;border:none" data-action="run-transformer">'+_t('▶ Kiểm tra', '▶ Validate')+'</button>';
   h += '</div></div>';
-  h += '<textarea id="hm-transformer-code" style="width:100%;min-height:120px;padding:var(--space-3);font-family:var(--font-mono);font-size:var(--text-sm);border:none;background:var(--gray-900);color:#e2e8f0;resize:vertical;outline:none;line-height:1.6" spellcheck="false" placeholder="// Transform API response data\n// Available: data (raw response), ctx (filters, user, state)\nreturn data.map(row => ({\n  ...row,\n  total: row.qty * row.unit_price,\n  overdue: new Date(row.due_date) < new Date()\n}));">' + _esc(currentCode || '') + '</textarea>';
+  h += '<textarea id="hm-transformer-code" style="width:100%;min-height:120px;padding:var(--space-3);font-family:var(--font-mono);font-size:var(--text-sm);border:none;background:var(--gray-900);color:#e2e8f0;resize:vertical;outline:none;line-height:1.6" spellcheck="false" placeholder=\'{ "mode":"map", "template": { "total":"{{ record.qty * record.unit_price }}", "status":"{{ record.status || \\\'draft\\\' }}" } }\'>' + _esc(currentCode || '') + '</textarea>';
   h += '<div id="hm-transformer-output" style="padding:var(--space-2) var(--space-3);background:var(--gray-50);border-top:1px solid var(--border);font-family:var(--font-mono);font-size:var(--text-xs);color:var(--text-secondary);max-height:80px;overflow-y:auto;display:none"></div>';
   h += '</div>';
   return h;
@@ -5382,6 +6797,8 @@ var EXTRA_TEMPLATES = {
   'iot-machine-telemetry': { type:'kpi-row', title:{vi:'Telemetry máy',en:'Machine Telemetry'}, config:{ items:[ {label:{vi:'Tốc độ trục chính',en:'Spindle Speed'},color:'var(--brand-2)',suffix:' RPM'}, {label:{vi:'Tải trục chính',en:'Spindle Load'},color:'var(--amber)',suffix:'%'}, {label:{vi:'Feed Rate',en:'Feed Rate'},color:'var(--green)',suffix:' mm/min'}, {label:{vi:'Nhiệt độ',en:'Temperature'},color:'var(--red)',suffix:'°C'} ] } },
   'iot-alarm-timeline': { type:'data-timeline', title:{vi:'Lịch sử cảnh báo máy',en:'Machine Alarm History'}, config:{ dataSource:{api:'mobile_shop_overview',method:'GET'}, dateKey:'timestamp', titleKey:'alarm_code', descKey:'description' } },
 };
+
+EXTRA_TEMPLATES = {};
 
 // Merge extra templates into existing BLOCK_TEMPLATES
 if (window.HmBlockEngine && window.HmBlockEngine.BLOCK_TEMPLATES) {

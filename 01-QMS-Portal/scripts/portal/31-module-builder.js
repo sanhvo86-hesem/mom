@@ -293,6 +293,99 @@ function _renderBlockPreview(block){
   var entry = (BE.BLOCK_CATALOG||{})[type] || {};
   var renderType = entry.renderer || type;
   var h = '';
+  var previewOverrides = {
+    'data-kanban': 'data-kanban',
+    'kanban-board': 'data-kanban',
+    'data-gantt': 'data-gantt',
+    'gantt-board': 'data-gantt',
+    'schedule-grid': 'schedule-grid',
+    'calendar-board': 'schedule-grid',
+    'pivot-table': 'pivot-table',
+    'matrix-grid': 'pivot-table',
+    'heat-table': 'pivot-table',
+    'record-detail': 'record-detail',
+    'master-detail': 'record-detail',
+    'data-tree': 'data-tree',
+    'tree-view': 'data-tree',
+    'data-stat-compare': 'data-stat-compare',
+    'audit-log': 'audit-log',
+    'compliance-log': 'audit-log',
+    'chart-line': 'chart-line',
+    'chart-area': 'chart-line',
+    'chart-radar': 'chart-radar',
+    'chart-gauge': 'chart-gauge',
+    'chart-waterfall': 'chart-waterfall',
+    'chart-scatter': 'chart-scatter',
+    'chart-bubble': 'chart-scatter',
+    'mfg-machine-status': 'mfg-machine-status',
+    'mfg-oee-trend': 'mfg-oee-trend',
+    'iot-oee-board': 'mfg-oee-trend',
+    'mfg-andon-board': 'mfg-andon-board',
+    'mfg-tool-life': 'mfg-tool-life',
+    'quality-spc-chart': 'quality-spc-chart',
+    'quality-control-chart': 'quality-spc-chart',
+    'quality-pareto': 'quality-pareto',
+    'quality-capability': 'quality-capability',
+    'quality-capa-board': 'quality-capa-board',
+    'quality-8d-board': 'quality-capa-board',
+    'quality-inspection-form': 'quality-inspection-form',
+    'quality-checksheet': 'quality-inspection-form',
+    'form-wizard': 'form-wizard',
+    'approval-form': 'approval-form',
+    'iot-live-trend': 'iot-live-trend',
+    'iot-sensor-strip': 'iot-live-trend'
+  };
+  var i;
+
+  if(previewOverrides[type]) renderType = previewOverrides[type];
+
+  function _pvText(value, valueEn, fallbackVi, fallbackEn){
+    if(value && typeof value === 'object'){
+      return _esc(_t(value.vi || fallbackVi || '', value.en || fallbackEn || value.vi || fallbackVi || ''));
+    }
+    if(typeof value === 'string'){
+      return _esc(value);
+    }
+    if(typeof valueEn === 'string' && value){
+      return _esc(_t(String(value), valueEn));
+    }
+    return _esc(_t(fallbackVi || '', fallbackEn || fallbackVi || ''));
+  }
+
+  function _pvLabel(def, fallbackVi, fallbackEn){
+    if(!def) return _esc(_t(fallbackVi || '', fallbackEn || fallbackVi || ''));
+    if(def.label && typeof def.label === 'object'){
+      return _esc(_t(def.label.vi || fallbackVi || '', def.label.en || fallbackEn || def.label.vi || fallbackVi || ''));
+    }
+    if(typeof def.label === 'string'){
+      return _esc(_t(def.label, def.labelEn || fallbackEn || def.label));
+    }
+    if(def.title && typeof def.title === 'object'){
+      return _esc(_t(def.title.vi || fallbackVi || '', def.title.en || fallbackEn || def.title.vi || fallbackVi || ''));
+    }
+    if(typeof def.title === 'string'){
+      return _esc(def.title);
+    }
+    if(typeof def.name === 'string'){
+      return _esc(def.name);
+    }
+    if(typeof def.key === 'string'){
+      return _esc(def.key);
+    }
+    return _esc(_t(fallbackVi || '', fallbackEn || fallbackVi || ''));
+  }
+
+  function _pvStatusColor(value, fallback){
+    var key = String(value || '').toLowerCase();
+    if(key.indexOf('run') >= 0 || key.indexOf('ok') >= 0 || key.indexOf('approved') >= 0 || key.indexOf('won') >= 0 || key.indexOf('pass') >= 0 || key.indexOf('closed') >= 0 || key.indexOf('success') >= 0 || key.indexOf('verified') >= 0) return 'var(--green)';
+    if(key.indexOf('warn') >= 0 || key.indexOf('idle') >= 0 || key.indexOf('review') >= 0 || key.indexOf('draft') >= 0 || key.indexOf('pending') >= 0 || key.indexOf('submit') >= 0 || key.indexOf('hold') >= 0) return 'var(--amber)';
+    if(key.indexOf('down') >= 0 || key.indexOf('fail') >= 0 || key.indexOf('reject') >= 0 || key.indexOf('lost') >= 0 || key.indexOf('overdue') >= 0 || key.indexOf('critical') >= 0 || key.indexOf('major') >= 0) return 'var(--red)';
+    return fallback || 'var(--brand-2)';
+  }
+
+  function _pvPill(text, color, fg){
+    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:'+(color || 'var(--gray-100)')+';color:'+(fg || '#fff')+';font-size:11px;font-weight:700;line-height:1.2">'+text+'</span>';
+  }
 
   switch(renderType){
     case 'kpi-row':
@@ -404,6 +497,418 @@ function _renderBlockPreview(block){
       [1,2,3].forEach(function(i){
         h += '<div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-2)"><div style="width:10px;height:10px;border-radius:50%;background:var(--brand-2);margin-top:4px;flex-shrink:0"></div><div><div style="font-size:var(--text-sm);font-weight:var(--font-semibold);color:var(--text-secondary)">Event '+i+'</div><div style="font-size:var(--text-xs);color:var(--text-tertiary)">Description...</div></div></div>';
       });
+      h += '</div>';
+      break;
+
+    case 'data-kanban':
+      var lanes = (config.kanban && config.kanban.lanes && config.kanban.lanes.length ? config.kanban.lanes : [
+        { key:'draft', label:{vi:'Nháp', en:'Draft'}, color:'#94a3b8', limit:6 },
+        { key:'submitted', label:{vi:'Đã gửi', en:'Submitted'}, color:'#38bdf8', limit:4 },
+        { key:'reviewing', label:{vi:'Đang duyệt', en:'Reviewing'}, color:'#f59e0b', limit:3 },
+        { key:'won', label:{vi:'Thắng', en:'Won'}, color:'#22c55e', limit:2 }
+      ]).slice(0,4);
+      var cardTitleField = config.kanban && config.kanban.card && config.kanban.card.titleField ? config.kanban.card.titleField : 'record_number';
+      var cardSubtitleField = config.kanban && config.kanban.card && config.kanban.card.subtitleField ? config.kanban.card.subtitleField : 'customer_name';
+      h += '<div style="display:grid;grid-template-columns:repeat('+lanes.length+',minmax(0,1fr));gap:var(--space-2)">';
+      lanes.forEach(function(lane, laneIndex){
+        var laneColor = lane.color || ['#94a3b8','#38bdf8','#f59e0b','#22c55e'][laneIndex % 4];
+        var laneCount = lane.limit || (laneIndex + 2);
+        h += '<div style="background:#fff;border:1px solid var(--border);border-top:3px solid '+laneColor+';border-radius:var(--radius-md);padding:var(--space-2);min-height:148px">';
+        h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-2)"><div style="font-size:var(--text-xs);font-weight:var(--font-bold);color:var(--text-primary)">'+_pvLabel(lane, 'Làn', 'Lane')+'</div><div style="padding:2px 8px;border-radius:999px;background:'+laneColor+'1A;color:'+laneColor+';font-size:11px;font-weight:700">'+laneCount+'</div></div>';
+        for(i=0;i<Math.min(3, laneIndex===1 ? 3 : 2);i++){
+          h += '<div style="padding:var(--space-2);margin-bottom:var(--space-2);border:1px solid var(--border);border-radius:var(--radius-md);background:linear-gradient(180deg,#fff,#f8fafc);box-shadow:0 1px 2px rgba(15,23,42,0.04)">';
+          h += '<div style="display:flex;justify-content:space-between;gap:var(--space-2);margin-bottom:4px"><strong style="font-size:var(--text-xs);color:var(--text-primary)">'+_esc(cardTitleField.toUpperCase())+'-'+(laneIndex+1)+(i+1)+'</strong>'+_pvPill(_esc(_t('Ưu tiên','Priority')), laneColor, '#fff')+'</div>';
+          h += '<div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px">'+_esc(cardSubtitleField)+' · CNC Aerospace</div>';
+          h += '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-tertiary)"><span>'+_t('Hạn','Due')+': 0'+(i+2)+'/04</span><span>'+_t('SL','Qty')+': '+((i+1)*12)+'</span></div>';
+          h += '</div>';
+        }
+        h += '</div>';
+      });
+      h += '</div>';
+      h += '<div style="margin-top:var(--space-2);font-size:var(--text-xs);color:var(--text-tertiary)"><code style="background:var(--gray-50);padding:1px 5px;border-radius:999px">'+_esc(cardTitleField)+'</code> · <code style="background:var(--gray-50);padding:1px 5px;border-radius:999px">'+_esc(cardSubtitleField)+'</code></div>';
+      break;
+
+    case 'data-gantt':
+      var ganttRows = ['MC-01', 'MC-03', 'CMM-02', 'EDM-01'];
+      var ganttDates = ['01/04', '03/04', '05/04', '07/04', '09/04'];
+      var scheduleCfg = config.schedule || {};
+      h += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;background:#fff">';
+      h += '<div style="display:grid;grid-template-columns:84px 1fr;background:var(--gray-50);border-bottom:1px solid var(--border)"><div style="padding:var(--space-2) var(--space-3);font-size:11px;font-weight:700;color:var(--text-secondary)">'+_t('Nguồn lực','Resource')+'</div><div style="display:grid;grid-template-columns:repeat('+ganttDates.length+',1fr)">';
+      ganttDates.forEach(function(label){
+        h += '<div style="padding:var(--space-2);text-align:center;font-size:11px;font-weight:700;color:var(--text-secondary);border-left:1px solid var(--border)">'+_esc(label)+'</div>';
+      });
+      h += '</div></div>';
+      ganttRows.forEach(function(row, rowIndex){
+        var left = [4, 20, 42, 58][rowIndex];
+        var width = [28, 36, 22, 26][rowIndex];
+        var color = ['#2563eb', '#0f766e', '#f59e0b', '#ef4444'][rowIndex];
+        h += '<div style="display:grid;grid-template-columns:84px 1fr;align-items:center;border-bottom:1px solid var(--border)"><div style="padding:var(--space-2) var(--space-3);font-size:11px;font-weight:700;color:var(--text-primary)">'+_esc(row)+'</div><div style="position:relative;height:34px;background:repeating-linear-gradient(90deg,#f8fafc,#f8fafc 18%,#fff 18%,#fff 20%)">';
+        h += '<div style="position:absolute;left:'+left+'%;top:9px;width:'+width+'%;height:16px;border-radius:999px;background:'+color+';box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25)"></div>';
+        h += '<div style="position:absolute;left:'+(left + 2)+'%;top:12px;font-size:10px;color:#fff;font-weight:700">WO-'+(rowIndex+11)+'</div>';
+        h += '</div></div>';
+      });
+      h += '</div>';
+      h += '<div style="margin-top:var(--space-2);font-size:var(--text-xs);color:var(--text-tertiary)">'+_t('Trường','Fields')+': <code style="background:var(--gray-50);padding:1px 4px;border-radius:999px">'+_esc(scheduleCfg.resourceField || 'machine_id')+'</code> <code style="background:var(--gray-50);padding:1px 4px;border-radius:999px">'+_esc(scheduleCfg.startField || 'planned_start')+'</code> <code style="background:var(--gray-50);padding:1px 4px;border-radius:999px">'+_esc(scheduleCfg.endField || 'planned_end')+'</code></div>';
+      break;
+
+    case 'schedule-grid':
+      var dayLabels = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+      var slotLabels = ['06:00', '14:00', '22:00'];
+      h += '<div style="display:grid;grid-template-columns:56px repeat(7,minmax(0,1fr));border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;background:#fff">';
+      h += '<div style="background:var(--gray-50);border-bottom:1px solid var(--border)"></div>';
+      dayLabels.forEach(function(label){
+        h += '<div style="padding:var(--space-2);text-align:center;font-size:11px;font-weight:700;color:var(--text-secondary);background:var(--gray-50);border-left:1px solid var(--border);border-bottom:1px solid var(--border)">'+_esc(label)+'</div>';
+      });
+      slotLabels.forEach(function(slot, slotIndex){
+        h += '<div style="padding:var(--space-2);font-size:11px;font-weight:700;color:var(--text-secondary);background:var(--gray-50);border-top:1px solid var(--border)">'+_esc(slot)+'</div>';
+        dayLabels.forEach(function(_, dayIndex){
+          var badge = '';
+          if((slotIndex===0 && dayIndex===1) || (slotIndex===1 && dayIndex===3)) badge = '<div style="height:16px;border-radius:6px;background:#0ea5e9;opacity:0.85"></div>';
+          if(slotIndex===1 && dayIndex===5) badge = '<div style="height:16px;border-radius:6px;background:#f59e0b;opacity:0.85"></div>';
+          if(slotIndex===2 && dayIndex===2) badge = '<div style="height:16px;border-radius:6px;background:#22c55e;opacity:0.85"></div>';
+          h += '<div style="padding:6px;border-left:1px solid var(--border);border-top:1px solid var(--border);min-height:36px;background:'+(dayIndex===6?'#fafafa':'#fff')+'">'+badge+'</div>';
+        });
+      });
+      h += '</div>';
+      h += '<div style="margin-top:var(--space-2);display:flex;gap:var(--space-2);font-size:11px;color:var(--text-tertiary)">'+_pvPill(_esc(_t('Lệnh chạy','Running job')), '#0ea5e9', '#fff')+_pvPill(_esc(_t('Bảo trì','Maintenance')), '#f59e0b', '#fff')+_pvPill(_esc(_t('Khả dụng','Available')), '#22c55e', '#fff')+'</div>';
+      break;
+
+    case 'pivot-table':
+      var matrixCfg = config.matrix || {};
+      var matrixRows = (matrixCfg.rows && matrixCfg.rows.length ? matrixCfg.rows : [
+        { label:{vi:'CNC 3 trục', en:'3-axis CNC'} },
+        { label:{vi:'CNC 5 trục', en:'5-axis CNC'} },
+        { label:{vi:'CMM', en:'CMM'} }
+      ]).slice(0,3);
+      var matrixCols = (matrixCfg.columns && matrixCfg.columns.length ? matrixCfg.columns : [
+        { label:{vi:'Sai kích thước', en:'Dimensional'} },
+        { label:{vi:'Bavia', en:'Burr'} },
+        { label:{vi:'Xước bề mặt', en:'Surface'} }
+      ]).slice(0,3);
+      var matrixVals = [[14, 38, 72], [22, 56, 88], [10, 31, 64]];
+      h += '<table style="width:100%;border-collapse:collapse;border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;background:#fff">';
+      h += '<thead><tr><th style="padding:var(--space-2) var(--space-3);text-align:left;font-size:11px;color:var(--text-secondary);background:var(--gray-50);border-bottom:1px solid var(--border)">'+_t('Dòng / Cột','Rows / Columns')+'</th>';
+      matrixCols.forEach(function(col){
+        h += '<th style="padding:var(--space-2);font-size:11px;color:var(--text-secondary);background:var(--gray-50);border-left:1px solid var(--border);border-bottom:1px solid var(--border)">'+_pvLabel(col, 'Cột', 'Column')+'</th>';
+      });
+      h += '</tr></thead><tbody>';
+      matrixRows.forEach(function(row, rowIndex){
+        h += '<tr><td style="padding:var(--space-2) var(--space-3);font-size:11px;font-weight:700;color:var(--text-primary);border-bottom:1px solid var(--border)">'+_pvLabel(row, 'Dòng', 'Row')+'</td>';
+        matrixCols.forEach(function(_, colIndex){
+          var val = matrixVals[rowIndex][colIndex];
+          h += '<td style="padding:var(--space-2);text-align:center;font-size:11px;font-weight:700;color:var(--text-primary);background:rgba(14,165,233,'+(0.14 + (val/100)*0.55)+');border-left:1px solid var(--border);border-bottom:1px solid var(--border)">'+val+'</td>';
+        });
+        h += '</tr>';
+      });
+      if(matrixCfg.showTotals){
+        h += '<tr><td style="padding:var(--space-2) var(--space-3);font-size:11px;font-weight:700;background:var(--gray-50)">'+_t('Tổng','Total')+'</td><td style="text-align:center;font-size:11px;font-weight:700;background:var(--gray-50);border-left:1px solid var(--border)">46</td><td style="text-align:center;font-size:11px;font-weight:700;background:var(--gray-50);border-left:1px solid var(--border)">125</td><td style="text-align:center;font-size:11px;font-weight:700;background:var(--gray-50);border-left:1px solid var(--border)">224</td></tr>';
+      }
+      h += '</tbody></table>';
+      h += '<div style="margin-top:var(--space-2);font-size:var(--text-xs);color:var(--text-tertiary)"><code style="background:var(--gray-50);padding:1px 4px;border-radius:999px">'+_esc(matrixCfg.rowField || 'row_field')+'</code> × <code style="background:var(--gray-50);padding:1px 4px;border-radius:999px">'+_esc(matrixCfg.columnField || 'column_field')+'</code> → <code style="background:var(--gray-50);padding:1px 4px;border-radius:999px">'+_esc(matrixCfg.valueField || 'value_field')+'</code></div>';
+      break;
+
+    case 'record-detail':
+      var detailCfg = config.detail || {};
+      var detailSections = (detailCfg.sections && detailCfg.sections.length ? detailCfg.sections : [
+        { label:{vi:'Thông tin chính', en:'Overview'} },
+        { label:{vi:'Truy xuất', en:'Traceability'} },
+        { label:{vi:'Đính kèm', en:'Attachments'} }
+      ]).slice(0,3);
+      h += '<div style="display:grid;grid-template-columns:170px 1fr;gap:var(--space-2)">';
+      h += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-2)">';
+      for(i=0;i<3;i++){
+        h += '<div style="padding:var(--space-2);border-radius:var(--radius-md);margin-bottom:6px;background:'+(i===0?'var(--brand-2)':'var(--gray-50)')+';color:'+(i===0?'#fff':'var(--text-primary)')+'">';
+        h += '<div style="font-size:11px;font-weight:700">'+_esc((detailCfg.titleField || 'record_number').toUpperCase())+'-'+(104 + i)+'</div>';
+        h += '<div style="font-size:10px;opacity:0.85">'+_esc(detailCfg.subtitleField || 'description')+'</div></div>';
+      }
+      h += '</div>';
+      h += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-3)">';
+      h += '<div style="display:flex;justify-content:space-between;gap:var(--space-2);align-items:flex-start;margin-bottom:var(--space-2)"><div><div style="font-size:var(--text-sm);font-weight:700;color:var(--text-primary)">QMS-REC-104</div><div style="font-size:11px;color:var(--text-secondary)">Titanium housing inspection dossier</div></div>'+_pvPill(_esc(detailCfg.statusField || 'status'), 'var(--green)', '#fff')+'</div>';
+      h += '<div style="display:flex;gap:var(--space-2);flex-wrap:wrap;margin-bottom:var(--space-3)">'+_pvPill(_esc(detailCfg.ownerField || 'owner_name'), 'var(--gray-100)', 'var(--text-primary)')+_pvPill(_esc(detailCfg.updatedAtField || 'updated_at'), 'var(--gray-100)', 'var(--text-primary)')+'</div>';
+      detailSections.forEach(function(section){
+        h += '<div style="padding:var(--space-2) 0;border-top:1px solid var(--border)"><div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:4px">'+_pvLabel(section, 'Phần', 'Section')+'</div><div style="height:10px;border-radius:999px;background:linear-gradient(90deg,var(--gray-100),var(--gray-50) 70%,transparent 70%)"></div></div>';
+      });
+      h += '</div></div>';
+      break;
+
+    case 'data-tree':
+      var treeChildKey = config.childrenKey || 'children';
+      h += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-3)">';
+      h += '<div style="font-size:11px;color:var(--text-tertiary);margin-bottom:var(--space-2)">'+_t('Cấu trúc cây','Tree structure')+' · <code style="background:var(--gray-50);padding:1px 4px;border-radius:999px">'+_esc(treeChildKey)+'</code></div>';
+      h += '<div style="display:flex;align-items:center;gap:8px;font-size:var(--text-sm);font-weight:700;color:var(--text-primary)"><span style="color:var(--brand-2)">▾</span><span>SO-24018</span></div>';
+      h += '<div style="margin-left:16px;border-left:1px dashed var(--border);padding-left:var(--space-3);margin-top:6px">';
+      h += '<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-primary);margin-bottom:6px"><span style="color:var(--amber)">▾</span><span>JO-24018-A</span>'+_pvPill(_esc(_t('Đang chạy','Running')), 'var(--green)', '#fff')+'</div>';
+      h += '<div style="margin-left:16px;border-left:1px dashed var(--border);padding-left:var(--space-3)">';
+      h += '<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-secondary);margin-bottom:6px"><span style="color:var(--text-tertiary)">•</span><span>WO-24018-01 / Setup</span></div>';
+      h += '<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-secondary)"><span style="color:var(--text-tertiary)">•</span><span>WO-24018-02 / Final QC</span></div>';
+      h += '</div>';
+      h += '<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-primary);margin-top:6px"><span style="color:var(--text-secondary)">▸</span><span>JO-24018-B</span></div>';
+      h += '</div></div>';
+      break;
+
+    case 'data-stat-compare':
+      var deltaDown = config.deltaDirection === 'down';
+      var deltaArrow = deltaDown ? '▼' : '▲';
+      var deltaColor = deltaDown ? 'var(--red)' : 'var(--green)';
+      h += '<div style="display:grid;grid-template-columns:1.3fr 1fr;gap:var(--space-3);align-items:center;border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-3)">';
+      h += '<div><div style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em">'+_t('Hiện tại','Current')+'</div><div style="display:flex;align-items:flex-end;gap:var(--space-2);margin-top:6px"><div style="font-size:28px;line-height:1;font-weight:800;color:var(--text-primary)">98.4%</div>'+_pvPill(_esc(deltaArrow+' 2.3%'), deltaColor, '#fff')+'</div><div style="font-size:11px;color:var(--text-tertiary);margin-top:8px"><code style="background:var(--gray-50);padding:1px 4px;border-radius:999px">'+_esc(config.valueField || (config.gauge && config.gauge.valueField) || 'current_value')+'</code> vs <code style="background:var(--gray-50);padding:1px 4px;border-radius:999px">'+_esc(config.targetField || (config.gauge && config.gauge.targetField) || 'target_value')+'</code></div></div>';
+      h += '<div style="height:70px;border-radius:var(--radius-md);background:linear-gradient(180deg,#eff6ff,#fff);padding:var(--space-2)"><svg viewBox="0 0 120 56" width="100%" height="100%"><polyline fill="none" stroke="#94a3b8" stroke-width="2" points="4,40 24,34 44,38 64,24 84,18 104,14"/><circle cx="104" cy="14" r="4" fill="#2563eb"/></svg><div style="font-size:10px;color:var(--text-secondary);margin-top:4px">'+_t('So với kỳ trước','Compared to previous period')+'</div></div>';
+      h += '</div>';
+      break;
+
+    case 'audit-log':
+      var logRows = [
+        { time:'08:14', user:'qa.lead', action:_t('Phê duyệt CAPA','Approved CAPA'), status:'approved' },
+        { time:'09:02', user:'planner.01', action:_t('Cập nhật WO-24021','Updated WO-24021'), status:'review' },
+        { time:'10:37', user:'it.audit', action:_t('Đồng bộ hash chain','Synced hash chain'), status:'verified' }
+      ];
+      h += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-3)">';
+      logRows.forEach(function(row, rowIndex){
+        var rowColor = _pvStatusColor(row.status);
+        h += '<div style="display:grid;grid-template-columns:56px 88px 1fr auto;gap:var(--space-2);align-items:center;padding:'+(rowIndex===0?'0':'var(--space-2) 0 0')+';margin-top:'+(rowIndex===0?'0':'var(--space-2)')+';border-top:'+(rowIndex===0?'none':'1px solid var(--border)')+'">';
+        h += '<div style="font-size:11px;font-weight:700;color:var(--text-secondary)">'+_esc(row.time)+'</div>';
+        h += '<div style="font-size:11px;color:var(--text-primary)">'+_esc(row.user)+'</div>';
+        h += '<div style="font-size:11px;color:var(--text-secondary)">'+_esc(row.action)+'</div>';
+        h += _pvPill(_esc(row.status.toUpperCase()), rowColor, '#fff');
+        h += '</div>';
+      });
+      h += '</div>';
+      break;
+
+    case 'chart-line':
+      var lineCfg = config.chart || {};
+      h += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);background:linear-gradient(180deg,#fff,#f8fafc);padding:var(--space-2)">';
+      h += '<svg viewBox="0 0 220 110" width="100%" height="120" aria-hidden="true">';
+      h += '<line x1="16" y1="92" x2="208" y2="92" stroke="#cbd5e1" stroke-width="1"/><line x1="16" y1="18" x2="16" y2="92" stroke="#cbd5e1" stroke-width="1"/>';
+      h += '<line x1="16" y1="68" x2="208" y2="68" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4"/><line x1="16" y1="44" x2="208" y2="44" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4"/>';
+      h += '<path d="M16 88 L44 72 L72 76 L100 48 L128 56 L156 32 L184 38 L208 22 L208 92 L16 92 Z" fill="rgba(37,99,235,0.12)"></path>';
+      h += '<polyline fill="none" stroke="#2563eb" stroke-width="3" points="16,88 44,72 72,76 100,48 128,56 156,32 184,38 208,22"></polyline>';
+      [16,44,72,100,128,156,184,208].forEach(function(x, idx){
+        var y = [88,72,76,48,56,32,38,22][idx];
+        h += '<circle cx="'+x+'" cy="'+y+'" r="4" fill="#2563eb" stroke="#fff" stroke-width="2"></circle>';
+      });
+      h += '</svg>';
+      h += '<div style="display:flex;justify-content:space-between;gap:var(--space-2);font-size:11px;color:var(--text-tertiary)"><span><code style="background:var(--gray-50);padding:1px 4px;border-radius:999px">'+_esc(lineCfg.xField || 'period')+'</code></span><span><code style="background:var(--gray-50);padding:1px 4px;border-radius:999px">'+_esc(lineCfg.yField || 'value')+'</code></span></div>';
+      h += '</div>';
+      break;
+
+    case 'chart-radar':
+      var radarCfg = config.chart || {};
+      h += '<div style="display:grid;grid-template-columns:120px 1fr;gap:var(--space-3);align-items:center;border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-2)">';
+      h += '<svg viewBox="0 0 120 120" width="120" height="120" aria-hidden="true">';
+      h += '<polygon points="60,12 92,30 104,60 92,90 60,108 28,90 16,60 28,30" fill="none" stroke="#cbd5e1"/>';
+      h += '<polygon points="60,24 82,36 90,60 82,84 60,96 38,84 30,60 38,36" fill="none" stroke="#dbeafe"/>';
+      h += '<polygon points="60,36 72,42 78,60 72,78 60,84 48,78 42,60 48,42" fill="none" stroke="#dbeafe"/>';
+      h += '<polygon points="60,18 84,40 76,68 68,86 44,80 34,56 42,34 52,24" fill="rgba(14,165,233,0.28)" stroke="#0ea5e9" stroke-width="2"></polygon>';
+      h += '</svg>';
+      h += '<div><div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:6px">'+_t('So sánh đa tiêu chí','Multi-axis comparison')+'</div>';
+      ['Quality', 'Delivery', 'Cost', 'Risk'].forEach(function(label, idx){
+        h += '<div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text-secondary);margin-bottom:4px"><span>'+_esc(label)+'</span><div style="width:'+(72 - idx*10)+'%;height:8px;border-radius:999px;background:#dbeafe"><div style="width:'+(60 + idx*8)+'%;height:8px;border-radius:999px;background:#0ea5e9"></div></div></div>';
+      });
+      h += '<div style="font-size:10px;color:var(--text-tertiary);margin-top:6px"><code style="background:var(--gray-50);padding:1px 4px;border-radius:999px">'+_esc(radarCfg.seriesField || 'series_field')+'</code></div></div>';
+      h += '</div>';
+      break;
+
+    case 'chart-gauge':
+      var gaugeCfg = config.gauge || {};
+      h += '<div style="display:grid;grid-template-columns:180px 1fr;gap:var(--space-3);align-items:center;border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-3)">';
+      h += '<div style="position:relative;width:180px;height:96px;overflow:hidden"><div style="position:absolute;left:0;top:0;width:180px;height:180px;border-radius:50%;background:conic-gradient(#22c55e 0 40%,#f59e0b 40% 72%,#ef4444 72% 100%)"></div><div style="position:absolute;left:24px;top:24px;width:132px;height:132px;border-radius:50%;background:#fff"></div><div style="position:absolute;left:89px;top:38px;width:2px;height:52px;background:#0f172a;transform-origin:bottom center;transform:rotate(34deg)"></div><div style="position:absolute;left:84px;top:82px;width:12px;height:12px;border-radius:50%;background:#0f172a"></div></div>';
+      h += '<div><div style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em">'+_t('Mức hiện tại','Current level')+'</div><div style="font-size:30px;font-weight:800;color:var(--text-primary);line-height:1;margin:6px 0">82'+_esc(gaugeCfg.unit || '%')+'</div><div style="display:flex;gap:var(--space-2);flex-wrap:wrap">'+_pvPill(_esc(_t('Mục tiêu 85%','Target 85%')), 'var(--gray-100)', 'var(--text-primary)')+_pvPill(_esc(gaugeCfg.valueField || 'value_field'), 'var(--gray-100)', 'var(--text-primary)')+'</div></div>';
+      h += '</div>';
+      break;
+
+    case 'chart-waterfall':
+      h += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-2)">';
+      h += '<svg viewBox="0 0 220 110" width="100%" height="120" aria-hidden="true">';
+      h += '<line x1="14" y1="90" x2="210" y2="90" stroke="#cbd5e1" stroke-width="1"></line>';
+      h += '<rect x="24" y="42" width="24" height="48" rx="4" fill="#22c55e"></rect><line x1="48" y1="42" x2="78" y2="42" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4 4"></line>';
+      h += '<rect x="78" y="56" width="24" height="34" rx="4" fill="#ef4444"></rect><line x1="102" y1="56" x2="132" y2="56" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4 4"></line>';
+      h += '<rect x="132" y="34" width="24" height="56" rx="4" fill="#22c55e"></rect><line x1="156" y1="34" x2="186" y2="34" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4 4"></line>';
+      h += '<rect x="186" y="24" width="24" height="66" rx="4" fill="#2563eb"></rect>';
+      h += '<text x="27" y="102" font-size="10" fill="#64748b">Base</text><text x="79" y="102" font-size="10" fill="#64748b">Loss</text><text x="128" y="102" font-size="10" fill="#64748b">Gain</text><text x="186" y="102" font-size="10" fill="#64748b">Total</text>';
+      h += '</svg>';
+      h += '</div>';
+      break;
+
+    case 'chart-scatter':
+      h += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-2)">';
+      h += '<svg viewBox="0 0 220 110" width="100%" height="120" aria-hidden="true">';
+      h += '<line x1="16" y1="92" x2="208" y2="92" stroke="#cbd5e1" stroke-width="1"/><line x1="16" y1="16" x2="16" y2="92" stroke="#cbd5e1" stroke-width="1"/>';
+      h += '<line x1="64" y1="16" x2="64" y2="92" stroke="#e2e8f0" stroke-dasharray="4 4"/><line x1="112" y1="16" x2="112" y2="92" stroke="#e2e8f0" stroke-dasharray="4 4"/><line x1="160" y1="16" x2="160" y2="92" stroke="#e2e8f0" stroke-dasharray="4 4"/>';
+      h += '<line x1="16" y1="68" x2="208" y2="68" stroke="#e2e8f0" stroke-dasharray="4 4"/><line x1="16" y1="44" x2="208" y2="44" stroke="#e2e8f0" stroke-dasharray="4 4"/>';
+      h += '<circle cx="44" cy="72" r="5" fill="rgba(14,165,233,0.65)"></circle><circle cx="68" cy="60" r="7" fill="rgba(14,165,233,0.45)"></circle><circle cx="94" cy="54" r="4" fill="rgba(34,197,94,0.7)"></circle><circle cx="116" cy="36" r="8" fill="rgba(34,197,94,0.45)"></circle><circle cx="146" cy="48" r="6" fill="rgba(245,158,11,0.7)"></circle><circle cx="174" cy="28" r="10" fill="rgba(239,68,68,0.4)"></circle>';
+      h += '</svg>';
+      h += '</div>';
+      break;
+
+    case 'mfg-machine-status':
+      var statusMap = (config.machine && config.machine.statusMap && config.machine.statusMap.length ? config.machine.statusMap : [
+        { key:'running', label:{vi:'Chạy', en:'Running'}, color:'var(--green)' },
+        { key:'idle', label:{vi:'Chờ', en:'Idle'}, color:'var(--amber)' },
+        { key:'down', label:{vi:'Dừng', en:'Down'}, color:'var(--red)' }
+      ]);
+      h += '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-2)">';
+      [0,1,2,0,1,2].forEach(function(statusIdx, machineIdx){
+        var status = statusMap[statusIdx] || statusMap[0];
+        h += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-3)"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-2)"><strong style="font-size:var(--text-sm)">MC-'+('0'+(machineIdx+1)).slice(-2)+'</strong><span style="width:10px;height:10px;border-radius:50%;background:'+_esc(status.color || _pvStatusColor(status.key))+';box-shadow:0 0 0 3px rgba(148,163,184,0.16)"></span></div><div style="font-size:11px;color:var(--text-secondary);margin-bottom:8px">'+_pvLabel(status, 'Trạng thái', 'Status')+'</div><div style="height:8px;border-radius:999px;background:var(--gray-100);overflow:hidden"><div style="width:'+(52 + (machineIdx*7))+'%;height:8px;border-radius:999px;background:'+_esc(status.color || _pvStatusColor(status.key))+'"></div></div></div>';
+      });
+      h += '</div>';
+      break;
+
+    case 'mfg-oee-trend':
+      var oeeCfg = config.oee || {};
+      var rings = [
+        { key:'A', value:89, color:'#22c55e', field:oeeCfg.availabilityField || 'availability' },
+        { key:'P', value:83, color:'#0ea5e9', field:oeeCfg.performanceField || 'performance' },
+        { key:'Q', value:97, color:'#f59e0b', field:oeeCfg.qualityField || 'quality' }
+      ];
+      h += '<div style="display:grid;grid-template-columns:repeat(3,86px) 1fr;gap:var(--space-3);align-items:center">';
+      rings.forEach(function(ring){
+        h += '<div style="text-align:center"><div style="width:74px;height:74px;margin:0 auto 6px;border-radius:50%;background:conic-gradient('+ring.color+' 0 '+ring.value+'%,#e2e8f0 '+ring.value+'% 100%);display:flex;align-items:center;justify-content:center"><div style="width:48px;height:48px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--text-primary)">'+ring.value+'%</div></div><div style="font-size:11px;font-weight:700;color:var(--text-secondary)">'+_esc(ring.key)+'</div></div>';
+      });
+      h += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-3)"><div style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em">'+_t('OEE tổng hợp','Overall OEE')+'</div><div style="display:flex;align-items:flex-end;gap:var(--space-2);margin-top:6px"><div style="font-size:30px;font-weight:800;color:var(--text-primary)">71.7%</div>'+_pvPill(_esc(oeeCfg.oeeField || 'oee'), 'var(--brand-2)', '#fff')+'</div><div style="margin-top:8px;height:34px"><svg viewBox="0 0 120 30" width="100%" height="100%"><polyline fill="none" stroke="#2563eb" stroke-width="2.5" points="0,24 18,22 36,20 54,18 72,16 90,11 108,9 120,8"/></svg></div></div>';
+      h += '</div>';
+      break;
+
+    case 'mfg-andon-board':
+      h += '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-2)">';
+      ['CNC-01', 'CNC-02', 'CMM-01'].forEach(function(station, stationIdx){
+        h += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-3)"><div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:var(--space-2)">'+_esc(station)+'</div><div style="display:flex;justify-content:center;gap:10px">';
+        ['#22c55e', '#f59e0b', '#ef4444'].forEach(function(lightColor, lightIdx){
+          var active = stationIdx === lightIdx || (stationIdx === 2 && lightIdx === 1);
+          h += '<span style="display:inline-block;width:18px;height:18px;border-radius:50%;background:'+lightColor+';opacity:'+(active?'1':'0.22')+';box-shadow:'+(active?'0 0 12px '+lightColor:'none')+'"></span>';
+        });
+        h += '</div><div style="margin-top:var(--space-2);font-size:10px;text-align:center;color:var(--text-tertiary)">'+(stationIdx===0?_t('Đang chạy ổn định','Running steady'):stationIdx===1?_t('Chờ hỗ trợ vật tư','Waiting for material'):_t('Báo lỗi chất lượng','Quality alarm'))+'</div></div>';
+      });
+      h += '</div>';
+      break;
+
+    case 'mfg-tool-life':
+      h += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-3)">';
+      [
+        { code:'T01', value:78, remain:'42 pcs', color:'#0ea5e9' },
+        { code:'T07', value:55, remain:'118 pcs', color:'#22c55e' },
+        { code:'T11', value:92, remain:'8 pcs', color:'#ef4444' }
+      ].forEach(function(tool, idx){
+        h += '<div style="display:grid;grid-template-columns:48px 1fr 56px;gap:var(--space-2);align-items:center;margin-top:'+(idx===0?'0':'var(--space-2)')+'"><strong style="font-size:11px;color:var(--text-primary)">'+_esc(tool.code)+'</strong><div style="height:10px;border-radius:999px;background:var(--gray-100);overflow:hidden"><div style="width:'+tool.value+'%;height:10px;border-radius:999px;background:'+tool.color+'"></div></div><div style="font-size:11px;text-align:right;color:var(--text-secondary)">'+_esc(tool.remain)+'</div></div>';
+      });
+      h += '</div>';
+      break;
+
+    case 'quality-spc-chart':
+      var spcCfg = config.spc || {};
+      h += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-2)">';
+      h += '<svg viewBox="0 0 220 110" width="100%" height="120" aria-hidden="true">';
+      h += '<line x1="16" y1="20" x2="208" y2="20" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5 4"></line>';
+      h += '<line x1="16" y1="54" x2="208" y2="54" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 4"></line>';
+      h += '<line x1="16" y1="86" x2="208" y2="86" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5 4"></line>';
+      h += '<polyline fill="none" stroke="#2563eb" stroke-width="2.5" points="16,64 40,58 64,60 88,44 112,52 136,28 160,56 184,50 208,70"></polyline>';
+      h += '<circle cx="136" cy="28" r="4.5" fill="#ef4444"></circle><circle cx="208" cy="70" r="4.5" fill="#ef4444"></circle>';
+      [16,40,64,88,112,136,160,184,208].forEach(function(x, idx){
+        var y = [64,58,60,44,52,28,56,50,70][idx];
+        h += '<circle cx="'+x+'" cy="'+y+'" r="3" fill="#2563eb" stroke="#fff" stroke-width="1.5"></circle>';
+      });
+      h += '</svg>';
+      h += '<div style="display:flex;gap:var(--space-2);flex-wrap:wrap;font-size:11px;color:var(--text-tertiary)">'+_pvPill(_esc(spcCfg.uclField || 'ucl'), '#fee2e2', '#b91c1c')+_pvPill(_esc(spcCfg.centerLineField || 'centerline'), '#e2e8f0', '#334155')+_pvPill(_esc(spcCfg.lclField || 'lcl'), '#fee2e2', '#b91c1c')+'</div>';
+      h += '</div>';
+      break;
+
+    case 'quality-pareto':
+      var paretoCfg = config.distribution || {};
+      h += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-2)">';
+      h += '<svg viewBox="0 0 220 110" width="100%" height="120" aria-hidden="true">';
+      h += '<line x1="16" y1="90" x2="208" y2="90" stroke="#cbd5e1" stroke-width="1"></line>';
+      h += '<line x1="16" y1="32" x2="208" y2="32" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5 4"></line>';
+      h += '<rect x="28" y="36" width="20" height="54" rx="3" fill="#2563eb"></rect><rect x="62" y="46" width="20" height="44" rx="3" fill="#3b82f6"></rect><rect x="96" y="56" width="20" height="34" rx="3" fill="#60a5fa"></rect><rect x="130" y="64" width="20" height="26" rx="3" fill="#93c5fd"></rect><rect x="164" y="72" width="20" height="18" rx="3" fill="#bfdbfe"></rect>';
+      h += '<polyline fill="none" stroke="#f97316" stroke-width="2.5" points="38,70 72,48 106,36 140,28 174,24"></polyline>';
+      [38,72,106,140,174].forEach(function(x, idx){
+        var y = [70,48,36,28,24][idx];
+        h += '<circle cx="'+x+'" cy="'+y+'" r="3.5" fill="#f97316"></circle>';
+      });
+      h += '</svg>';
+      h += '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-tertiary)"><span><code style="background:var(--gray-50);padding:1px 4px;border-radius:999px">'+_esc(paretoCfg.categoryField || 'category')+'</code></span><span>'+_t('Mốc 80/20','80/20 line')+'</span></div>';
+      h += '</div>';
+      break;
+
+    case 'quality-capability':
+      var capabilityCfg = config.spc || {};
+      h += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-2)">';
+      h += '<svg viewBox="0 0 220 110" width="100%" height="120" aria-hidden="true">';
+      h += '<line x1="48" y1="18" x2="48" y2="92" stroke="#ef4444" stroke-width="2"></line><line x1="172" y1="18" x2="172" y2="92" stroke="#ef4444" stroke-width="2"></line>';
+      h += '<path d="M16 90 C52 90 62 24 110 24 C158 24 168 90 204 90" fill="none" stroke="#2563eb" stroke-width="3"></path>';
+      h += '<path d="M16 90 C52 90 62 24 110 24 C158 24 168 90 204 90 L204 92 L16 92 Z" fill="rgba(37,99,235,0.12)"></path>';
+      h += '<line x1="110" y1="18" x2="110" y2="92" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4"></line>';
+      h += '</svg>';
+      h += '<div style="display:flex;gap:var(--space-2);flex-wrap:wrap;font-size:11px">'+_pvPill(_esc('Cp 1.67'), '#dbeafe', '#1d4ed8')+_pvPill(_esc('Cpk 1.42'), '#dcfce7', '#166534')+_pvPill(_esc((capabilityCfg.lslField || 'lsl')+' / '+(capabilityCfg.uslField || 'usl')), '#fee2e2', '#b91c1c')+'</div>';
+      h += '</div>';
+      break;
+
+    case 'quality-capa-board':
+      h += '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-2)">';
+      [
+        { code:'CAPA-124', severity:'Critical', status:'Open', due:'05/04', color:'var(--red)' },
+        { code:'8D-031', severity:'Major', status:'Containment', due:'08/04', color:'var(--amber)' },
+        { code:'CAPA-129', severity:'Minor', status:'Verified', due:'12/04', color:'var(--green)' }
+      ].forEach(function(card){
+        h += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-3)"><div style="display:flex;justify-content:space-between;gap:var(--space-2);margin-bottom:var(--space-2)"><strong style="font-size:var(--text-sm);color:var(--text-primary)">'+_esc(card.code)+'</strong>'+_pvPill(_esc(card.severity), card.color, '#fff')+'</div><div style="font-size:11px;color:var(--text-secondary);margin-bottom:8px">'+_t('Containment / corrective action owner assigned','Containment / corrective action owner assigned')+'</div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-tertiary)"><span>'+_t('Hạn','Due')+': '+_esc(card.due)+'</span>'+_pvPill(_esc(card.status), 'var(--gray-100)', 'var(--text-primary)')+'</div></div>';
+      });
+      h += '</div>';
+      break;
+
+    case 'quality-inspection-form':
+      var checklistCfg = config.checklist || {};
+      var checklistItems = (checklistCfg.items && checklistCfg.items.length ? checklistCfg.items : [
+        { label:{vi:'Kích thước Ø ngoài', en:'Outer diameter'} },
+        { label:{vi:'Độ nhám bề mặt', en:'Surface roughness'} },
+        { label:{vi:'Vết xước / va đập', en:'Scratch / dent'} },
+        { label:{vi:'Tem truy xuất', en:'Traceability label'} }
+      ]).slice(0,4);
+      h += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-3)">';
+      checklistItems.forEach(function(item, itemIdx){
+        h += '<div style="display:grid;grid-template-columns:1fr 64px 88px;gap:var(--space-2);align-items:center;padding:'+(itemIdx===0?'0':'var(--space-2) 0 0')+';margin-top:'+(itemIdx===0?'0':'var(--space-2)')+';border-top:'+(itemIdx===0?'none':'1px solid var(--border)')+'"><div style="font-size:11px;color:var(--text-primary)">'+_pvLabel(item, 'Điểm kiểm', 'Checkpoint')+'</div><div style="text-align:center;font-size:16px">'+(itemIdx===2?'❌':'✅')+'</div><div style="text-align:right">'+_pvPill(_esc(itemIdx===2?_t('NG','NG'):_t('OK','OK')), itemIdx===2?'var(--red)':'var(--green)', '#fff')+'</div></div>';
+      });
+      h += '<div style="margin-top:var(--space-3);display:flex;justify-content:space-between;font-size:11px;color:var(--text-tertiary)"><span>'+_t('Điểm đạt','Pass score')+': '+_esc(String(checklistCfg.passScore || 90))+'</span><span>'+_t('Stop on fail','Stop on fail')+': '+_esc(checklistCfg.stopOnFail ? _t('Có','Yes') : _t('Không','No'))+'</span></div>';
+      h += '</div>';
+      break;
+
+    case 'form-wizard':
+      var wizardCfg = config.wizard || {};
+      var wizardSteps = (wizardCfg.steps && wizardCfg.steps.length ? wizardCfg.steps : [
+        { label:{vi:'Thông tin', en:'Info'} },
+        { label:{vi:'Chi tiết', en:'Details'} },
+        { label:{vi:'Xác nhận', en:'Confirm'} }
+      ]).slice(0,4);
+      h += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-3)">';
+      h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:var(--space-3)">';
+      wizardSteps.forEach(function(step, stepIdx){
+        var activeStep = stepIdx === 1 ? 'background:var(--brand-2);color:#fff;border-color:var(--brand-2)' : 'background:#fff;color:var(--text-secondary);border-color:var(--border)';
+        h += '<div style="display:flex;align-items:center;gap:8px">';
+        h += '<div style="width:28px;height:28px;border-radius:50%;border:1px solid '+(stepIdx===1?'var(--brand-2)':'var(--border)')+';'+activeStep+';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">'+(stepIdx+1)+'</div>';
+        h += '<div style="font-size:11px;font-weight:700;color:'+(stepIdx===1?'var(--brand-2)':'var(--text-secondary)')+'">'+_pvLabel(step, 'Bước', 'Step')+'</div>';
+        h += '</div>';
+        if(stepIdx < wizardSteps.length-1){
+          h += '<div style="flex:1;min-width:18px;height:1px;background:var(--border)"></div>';
+        }
+      });
+      h += '</div>';
+      h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3)"><div><div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px">'+_t('Trường bước hiện tại','Active step field')+'</div><div style="height:34px;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--gray-50)"></div></div><div><div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px">'+_t('Xác nhận dữ liệu','Validation')+'</div><div style="height:34px;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--gray-50)"></div></div></div>';
+      h += '</div>';
+      break;
+
+    case 'approval-form':
+      h += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-3)">';
+      h += '<div style="display:flex;justify-content:space-between;gap:var(--space-2);margin-bottom:var(--space-3)"><div><div style="font-size:var(--text-sm);font-weight:700;color:var(--text-primary)">'+_t('Phiếu phê duyệt thay đổi quy trình','Process change approval form')+'</div><div style="font-size:11px;color:var(--text-secondary)">'+_t('Người duyệt: QA Manager / Production Head','Reviewer: QA Manager / Production Head')+'</div></div>'+_pvPill(_esc(_t('Chờ phê duyệt','Pending approval')), 'var(--amber)', '#fff')+'</div>';
+      h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);margin-bottom:var(--space-3)"><div><div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px">'+_t('Người gửi','Submitted by')+'</div><div style="height:34px;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--gray-50)"></div></div><div><div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px">'+_t('Ngày yêu cầu','Request date')+'</div><div style="height:34px;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--gray-50)"></div></div></div>';
+      h += '<div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px">'+_t('Ý kiến phê duyệt','Reviewer comment')+'</div><div style="height:54px;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--gray-50);margin-bottom:var(--space-3)"></div>';
+      h += '<div style="display:flex;justify-content:flex-end;gap:var(--space-2)"><div style="padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);border:1px solid var(--red);color:var(--red);font-size:11px;font-weight:700">'+_t('Reject','Reject')+'</div><div style="padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);background:var(--green);color:#fff;font-size:11px;font-weight:700">'+_t('Approve','Approve')+'</div></div>';
+      h += '</div>';
+      break;
+
+    case 'iot-live-trend':
+      var liveCfg = config.chart || {};
+      h += '<div style="display:grid;grid-template-columns:1fr 120px;gap:var(--space-3);align-items:center;border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-3)">';
+      h += '<div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em">'+_t('Tín hiệu realtime','Live telemetry')+'</div><div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--green)"><span style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px rgba(34,197,94,0.15)"></span>'+_t('Live','Live')+'</div></div><svg viewBox="0 0 220 72" width="100%" height="72" aria-hidden="true"><polyline fill="none" stroke="#0ea5e9" stroke-width="2.5" points="0,48 24,44 48,46 72,30 96,28 120,16 144,24 168,18 192,22 220,12"></polyline><circle cx="220" cy="12" r="4" fill="#0ea5e9"></circle></svg><div style="font-size:10px;color:var(--text-tertiary)"><code style="background:var(--gray-50);padding:1px 4px;border-radius:999px">'+_esc(liveCfg.yField || 'sensor_value')+'</code></div></div>';
+      h += '<div style="text-align:center;border-left:1px solid var(--border);padding-left:var(--space-3)"><div style="font-size:11px;color:var(--text-secondary)">'+_t('Giá trị hiện tại','Current value')+'</div><div style="font-size:28px;font-weight:800;color:var(--text-primary);line-height:1.1;margin:6px 0">2.314</div>'+_pvPill(_esc(_t('Ổn định','Stable')), 'var(--green)', '#fff')+'</div>';
       h += '</div>';
       break;
 
@@ -1315,6 +1820,1758 @@ function _fetchJsonWithFallback(paths, index){
     return _fetchJsonWithFallback(paths, index + 1);
   });
 }
+
+/* ============================================================================
+   BUILDER V2 OVERRIDE
+   Tree canvas + undo/redo + clipboard + drag-drop + layout controls
+   ============================================================================ */
+
+state.showTree = true;
+state.showShortcuts = false;
+state.treeCollapsed = {};
+state.contextMenu = null;
+state.insertParent = null;
+state.insertSlot = 'default';
+state.insertPosition = null;
+state.pendingUndoLabel = '';
+state.pendingScrollBlock = null;
+
+var undoManager = {
+  stack: [],
+  position: -1,
+  maxDepth: 200,
+  commit: function(snapshot, label){
+    if(snapshot == null) return;
+    if(this.position >= 0 && this.stack[this.position] && this.stack[this.position].snapshot === snapshot) return;
+    if(this.position < this.stack.length - 1){
+      this.stack = this.stack.slice(0, this.position + 1);
+    }
+    this.stack.push({
+      snapshot: snapshot,
+      label: label || ''
+    });
+    if(this.stack.length > this.maxDepth){
+      this.stack.shift();
+    }
+    this.position = this.stack.length - 1;
+  },
+  undo: function(){
+    if(!this.hasUndo()) return null;
+    this.position--;
+    return this.stack[this.position] || null;
+  },
+  redo: function(){
+    if(!this.hasRedo()) return null;
+    this.position++;
+    return this.stack[this.position] || null;
+  },
+  hasUndo: function(){ return this.position > 0; },
+  hasRedo: function(){ return this.position >= 0 && this.position < this.stack.length - 1; },
+  clear: function(){
+    this.stack = [];
+    this.position = -1;
+  },
+  getInfo: function(){
+    return {
+      canUndo: this.hasUndo(),
+      canRedo: this.hasRedo(),
+      depth: this.stack.length,
+      position: this.position
+    };
+  }
+};
+
+var clipboard = { block: null };
+var dragState = { source: null, target: null, indicatorKey: '' };
+var _keyboardReady = false;
+var _builderStyleId = 'hm-module-builder-v2-style';
+var _handleDragStart;
+var _handleDragOver;
+var _handleDrop;
+var _handleDragEnd;
+var _handleContextMenu;
+var _handleTouchStart;
+var _handleTouchMove;
+var _handleTouchEnd;
+var _handleTouchCancel;
+var touchDragState = {
+  source: null,
+  target: null,
+  active: false,
+  timer: null,
+  startX: 0,
+  startY: 0
+};
+
+function _ensureBuilderState(){
+  if(state.showTree === undefined) state.showTree = true;
+  if(state.showShortcuts === undefined) state.showShortcuts = false;
+  if(!state.treeCollapsed) state.treeCollapsed = {};
+  if(state.insertParent === undefined) state.insertParent = null;
+  if(!state.insertSlot) state.insertSlot = 'default';
+  if(state.insertPosition === undefined) state.insertPosition = null;
+  if(state.contextMenu === undefined) state.contextMenu = null;
+  if(state.pendingUndoLabel === undefined) state.pendingUndoLabel = '';
+}
+
+function _ensureBuilderStyles(){
+  var style = document.getElementById(_builderStyleId);
+  var css = '';
+  if(style) return;
+  style = document.createElement('style');
+  style.id = _builderStyleId;
+  css += '.mb-builder-shell{display:flex;gap:16px;align-items:stretch;min-height:560px}';
+  css += '.mb-side-panel,.mb-main-panel,.mb-rail-panel{background:var(--bg-surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow-sm)}';
+  css += '.mb-side-panel{width:240px;overflow:hidden;display:flex;flex-direction:column}';
+  css += '.mb-main-panel{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}';
+  css += '.mb-right-rail{width:400px;display:flex;flex-direction:column;gap:16px}';
+  css += '.mb-rail-panel{display:flex;flex-direction:column;overflow:hidden}';
+  css += '.mb-panel-header{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px;background:linear-gradient(180deg,#fff,rgba(37,99,235,0.03))}';
+  css += '.mb-panel-body{padding:14px 16px;overflow:auto;flex:1;min-height:0}';
+  css += '.mb-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--gray-50)}';
+  css += '.mb-toolbar-group{display:flex;gap:8px;align-items:center;flex-wrap:wrap}';
+  css += '.mb-toolbar-spacer{flex:1 1 auto}';
+  css += '.mb-canvas-stage{padding:18px;min-height:520px;background:linear-gradient(180deg,rgba(37,99,235,0.04),rgba(255,255,255,0));overflow:auto}';
+  css += '.mb-canvas-root{min-height:400px;padding:18px;border:1px dashed rgba(37,99,235,0.3);border-radius:20px;background:#fff}';
+  css += '.mb-layout-stack{display:flex;flex-direction:column}';
+  css += '.mb-layout-grid{display:grid}';
+  css += '.mb-layout-flex{display:flex;flex-wrap:wrap}';
+  css += '.mb-slot{border:1px dashed var(--border);border-radius:16px;padding:10px;min-height:84px;background:rgba(255,255,255,0.82);position:relative}';
+  css += '.mb-slot + .mb-slot{margin-top:12px}';
+  css += '.mb-slot-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary);margin-bottom:8px;font-weight:700}';
+  css += '.mb-slot-empty{padding:18px 12px;text-align:center;color:var(--text-tertiary);font-size:13px}';
+  css += '.mb-slot-actions{display:flex;justify-content:center;margin-top:10px}';
+  css += '.mb-block-card{border:1px solid var(--border);border-radius:18px;background:#fff;overflow:hidden;position:relative;transition:border-color .15s, box-shadow .15s, transform .15s;margin-bottom:14px}';
+  css += '.mb-block-card.is-selected{border-color:var(--brand-2);box-shadow:0 0 0 2px rgba(37,99,235,0.12)}';
+  css += '.mb-block-card.is-hidden{opacity:.72}';
+  css += '.mb-block-card.is-locked{background:rgba(15,23,42,0.03)}';
+  css += '.mb-block-card.hm-block-dragging{opacity:.45;transform:scale(.985)}';
+  css += '.mb-block-card,.mb-tree-node,[data-library-type]{touch-action:manipulation}';
+  css += '.mb-block-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:12px 14px;background:linear-gradient(180deg,rgba(15,23,42,0.02),rgba(15,23,42,0))}';
+  css += '.mb-block-meta{display:flex;gap:8px;align-items:flex-start}';
+  css += '.mb-block-icon{font-size:18px;line-height:1;width:24px;text-align:center}';
+  css += '.mb-block-name{font-weight:700;color:var(--text-primary);font-size:14px}';
+  css += '.mb-block-type{font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}';
+  css += '.mb-block-tools{display:flex;gap:4px;flex-wrap:wrap}';
+  css += '.mb-block-body{padding:0 14px 14px}';
+  css += '.mb-drop-above:before,.mb-drop-below:after{content:\"\";position:absolute;left:10px;right:10px;height:2px;background:var(--brand-2);border-radius:999px}';
+  css += '.mb-drop-above:before{top:0}';
+  css += '.mb-drop-below:after{bottom:0}';
+  css += '.mb-drop-zone-active{border-color:var(--brand-2);box-shadow:0 0 0 2px rgba(37,99,235,0.12)}';
+  css += '.mb-tree-scroll{padding:10px 10px 14px;overflow:auto;flex:1}';
+  css += '.mb-tree-root{font-size:12px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.08em;padding:0 8px 8px;font-weight:700}';
+  css += '.mb-tree-node{display:flex;align-items:center;gap:6px;padding:7px 8px;border-radius:12px;cursor:pointer;margin-bottom:4px;position:relative}';
+  css += '.mb-tree-node:hover{background:var(--gray-50)}';
+  css += '.mb-tree-node.is-selected{background:rgba(37,99,235,0.08);color:var(--brand-2)}';
+  css += '.mb-tree-node.is-hidden{opacity:.68}';
+  css += '.mb-tree-node.is-locked{background:rgba(15,23,42,0.04)}';
+  css += '.mb-tree-label{flex:1 1 auto;min-width:0}';
+  css += '.mb-tree-title{display:block;font-weight:600;font-size:13px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}';
+  css += '.mb-tree-type{display:block;font-size:11px;color:var(--text-tertiary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}';
+  css += '.mb-tree-tools{display:flex;gap:2px}';
+  css += '.mb-tab-strip{display:flex;gap:8px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--border)}';
+  css += '.mb-tab-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:999px;padding:8px 12px;background:#fff;cursor:pointer;font-weight:600;font-size:13px}';
+  css += '.mb-tab-pill.is-active{background:var(--brand-2);border-color:var(--brand-2);color:#fff}';
+  css += '.mb-shortcuts{position:fixed;right:28px;top:110px;width:300px;max-width:calc(100vw - 32px);background:#0f172a;color:#fff;border-radius:18px;box-shadow:var(--shadow-xl);padding:16px;z-index:1400}';
+  css += '.mb-shortcuts h4{margin:0 0 10px;font-size:14px}';
+  css += '.mb-shortcuts-list{display:grid;grid-template-columns:1fr auto;gap:8px 12px;font-size:13px}';
+  css += '.mb-shortcuts-list kbd{background:rgba(255,255,255,0.14);border-radius:8px;padding:2px 8px;font-family:inherit;font-size:12px}';
+  css += '.mb-context-menu{position:fixed;z-index:1450;min-width:180px;background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-xl);padding:8px}';
+  css += '.mb-context-menu button{width:100%;text-align:left;border:0;background:none;padding:9px 10px;border-radius:10px;cursor:pointer;font:inherit;color:var(--text-primary)}';
+  css += '.mb-context-menu button:hover{background:var(--gray-50)}';
+  css += '.mb-helper-note{padding:10px 12px;border:1px solid rgba(37,99,235,0.18);background:rgba(37,99,235,0.05);border-radius:12px;color:var(--text-secondary);font-size:12px;margin-bottom:12px}';
+  css += '.mb-kbd-chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--border);padding:4px 8px;border-radius:999px;background:#fff;font-size:12px;color:var(--text-secondary)}';
+  css += '@media (max-width: 1360px){.mb-builder-shell{flex-direction:column}.mb-side-panel,.mb-right-rail{width:auto}}';
+  style.textContent = css;
+  document.head.appendChild(style);
+}
+
+function _builderStorageKey(moduleId){
+  return 'hm_module_builder_' + moduleId;
+}
+
+function _snapshotSchema(){
+  if(!state.schema) return '';
+  try { return JSON.stringify(state.schema); } catch(err){ return ''; }
+}
+
+function _restoreSchemaSnapshot(snapshot){
+  if(!snapshot) return;
+  try {
+    state.schema = JSON.parse(snapshot);
+    _normalizeSchemaBlocks();
+    if(!_getTabById(state.activeTab)){
+      state.activeTab = state.schema && state.schema.tabs && state.schema.tabs.length ? state.schema.tabs[0].tabId : null;
+    }
+    if(state.selectedBlock && !_findBlock(state.selectedBlock)){
+      state.selectedBlock = null;
+      state.propsDraft = null;
+    }
+  } catch(err){}
+}
+
+function _resetUndoBaseline(label){
+  undoManager.clear();
+  undoManager.commit(_snapshotSchema(), label || _t('Khởi tạo module', 'Initialize module'));
+}
+
+function _pushUndoState(label){
+  if(!state.schema) return;
+  if(!undoManager.stack.length){
+    undoManager.commit(_snapshotSchema(), label || _t('Khởi tạo module', 'Initialize module'));
+  }
+  state.pendingUndoLabel = label || '';
+}
+
+function _commitUndoState(label){
+  if(!state.schema) return;
+  undoManager.commit(_snapshotSchema(), label || state.pendingUndoLabel || '');
+  state.pendingUndoLabel = '';
+}
+
+function _getUndoToastLabel(entry){
+  return entry && entry.label ? entry.label : _t('thay đổi', 'change');
+}
+
+function _undo(){
+  var entry = undoManager.undo();
+  if(!entry) return;
+  _restoreSchemaSnapshot(entry.snapshot);
+  if(BE.toast) BE.toast(_t('↩ Hoàn tác: ', '↩ Undo: ') + _getUndoToastLabel(entry), 'info');
+  _paint();
+}
+
+function _redo(){
+  var entry = undoManager.redo();
+  if(!entry) return;
+  _restoreSchemaSnapshot(entry.snapshot);
+  if(BE.toast) BE.toast(_t('↪ Làm lại: ', '↪ Redo: ') + _getUndoToastLabel(entry), 'info');
+  _paint();
+}
+
+function _mutateSchema(label, mutateFn){
+  if(!state.schema || typeof mutateFn !== 'function') return;
+  _pushUndoState(label);
+  mutateFn();
+  _normalizeSchemaBlocks();
+  _commitUndoState(label);
+  _paint();
+}
+
+function _getTabById(tabId){
+  var tabs = state.schema && state.schema.tabs ? state.schema.tabs : [];
+  var i;
+  for(i = 0; i < tabs.length; i++){
+    if(tabs[i].tabId === tabId) return tabs[i];
+  }
+  return null;
+}
+
+function _getActiveTab(){
+  if(!state.schema || !state.schema.tabs || !state.schema.tabs.length) return null;
+  return _getTabById(state.activeTab) || state.schema.tabs[0];
+}
+
+function _ensureTabLayout(tab){
+  if(!tab) return null;
+  if(!_isObject(tab.layout)) tab.layout = {};
+  if(!tab.layout.type) tab.layout.type = 'stack';
+  if(!tab.layout.columns) tab.layout.columns = tab.layout.type === 'grid' ? 2 : 1;
+  if(!tab.layout.gap) tab.layout.gap = '16px';
+  if(!tab.layout.align) tab.layout.align = 'stretch';
+  return tab.layout;
+}
+
+function _isContainerType(type){
+  return ['two-column', 'three-column', 'card-container', 'accordion-group'].indexOf(type) >= 0;
+}
+
+function _getContainerSlots(type){
+  if(type === 'two-column') return ['left', 'right'];
+  return ['content'];
+}
+
+function _defaultBlockLayout(type){
+  if(type === 'three-column'){
+    return { type:'grid', columns:3, gap:'16px', align:'stretch' };
+  }
+  if(type === 'accordion-group'){
+    return { type:'stack', columns:1, gap:'12px', align:'stretch' };
+  }
+  return { type:'stack', columns:1, gap:'16px', align:'stretch' };
+}
+
+function _ensureBlockBuilderDefaults(block){
+  if(!block) return block;
+  if(!block.blockId && block.id) block.blockId = block.id;
+  if(!block.id && block.blockId) block.id = block.blockId;
+  if(!block.blockId){
+    block.blockId = _uid();
+    block.id = block.blockId;
+  }
+  if(block.parentId === undefined) block.parentId = null;
+  if(!block.slotKey) block.slotKey = block.parentId ? 'content' : 'default';
+  if(!_isObject(block.layout)) block.layout = _defaultBlockLayout(block.type);
+  if(!block.layout.type) block.layout.type = 'stack';
+  if(!block.layout.columns) block.layout.columns = block.layout.type === 'grid' ? 2 : 1;
+  if(!block.layout.gap) block.layout.gap = '16px';
+  if(!block.layout.align) block.layout.align = 'stretch';
+  if(block.locked == null) block.locked = false;
+  if(block.collapsed == null) block.collapsed = false;
+  if(block.visible == null) block.visible = true;
+  return block;
+}
+
+function _flattenRuntimeBlocks(blocks, parentId, slotKey, out){
+  var i;
+  var block;
+  var slots;
+  var slotKeys;
+  var s;
+  var children;
+  for(i = 0; i < (blocks || []).length; i++){
+    block = blocks[i];
+    if(!block) continue;
+    _ensureBlockBuilderDefaults(block);
+    block.parentId = parentId || null;
+    block.slotKey = slotKey || 'default';
+    slots = block.slots;
+    delete block.slots;
+    out.push(block);
+    if(slots){
+      slotKeys = Object.keys(slots);
+      for(s = 0; s < slotKeys.length; s++){
+        children = slots[slotKeys[s]] || [];
+        _flattenRuntimeBlocks(children, block.blockId || block.id, slotKeys[s], out);
+      }
+    }
+  }
+}
+
+function _layoutStyle(layout){
+  var actual = layout || { type:'stack', columns:1, gap:'16px', align:'stretch' };
+  var style = 'gap:' + _esc(actual.gap || '16px') + ';';
+  if(actual.type === 'grid'){
+    style += 'display:grid;grid-template-columns:repeat(' + Math.max(1, Math.min(6, parseInt(actual.columns, 10) || 1)) + ',minmax(0,1fr));';
+  } else if(actual.type === 'flex'){
+    style += 'display:flex;flex-wrap:wrap;align-items:' + _esc(actual.align || 'stretch') + ';';
+  } else {
+    style += 'display:flex;flex-direction:column;';
+  }
+  return style;
+}
+
+function _resequenceTabBlocks(tab){
+  if(!tab) return;
+  (tab.blocks || []).forEach(function(block, index){
+    block.order = index + 1;
+  });
+}
+
+function _normalizeSchemaBlocks(){
+  var tabs;
+  if(!state.schema) return;
+  tabs = state.schema.tabs || [];
+  tabs.forEach(function(tab){
+    var flat = [];
+    var hasRuntimeSlots = false;
+    _ensureTabLayout(tab);
+    (tab.blocks || []).forEach(function(block){
+      if(block && block.slots) hasRuntimeSlots = true;
+    });
+    if(hasRuntimeSlots){
+      _flattenRuntimeBlocks(tab.blocks || [], null, 'default', flat);
+      tab.blocks = flat;
+    } else {
+      tab.blocks = tab.blocks || [];
+    }
+    (tab.blocks || []).forEach(function(block){
+      _ensureBlockBuilderDefaults(block);
+      _applySchemaDefaults(block, _getBlockSchema(block.type));
+    });
+    tab.blocks.sort(function(a, b){
+      return (a.order || 0) - (b.order || 0);
+    });
+    _resequenceTabBlocks(tab);
+  });
+}
+
+function _buildTabTree(tab){
+  var tree = { roots: [], children: {}, byId: {} };
+  var blocks = (tab && tab.blocks ? tab.blocks.slice() : []).sort(function(a, b){
+    return (a.order || 0) - (b.order || 0);
+  });
+  blocks.forEach(function(block){
+    tree.byId[block.blockId] = block;
+  });
+  blocks.forEach(function(block){
+    var parentId = block.parentId || '';
+    var slotKey = block.slotKey || 'default';
+    if(parentId){
+      if(!tree.children[parentId]) tree.children[parentId] = {};
+      if(!tree.children[parentId][slotKey]) tree.children[parentId][slotKey] = [];
+      tree.children[parentId][slotKey].push(block);
+    } else {
+      tree.roots.push(block);
+    }
+  });
+  return tree;
+}
+
+function _getTreeChildren(tree, parentId, slotKey){
+  if(!parentId) return tree.roots || [];
+  return tree.children[parentId] && tree.children[parentId][slotKey] ? tree.children[parentId][slotKey] : [];
+}
+
+function _getSiblingBlocks(tab, parentId, slotKey, excludeIds){
+  var ids = excludeIds || [];
+  return (tab.blocks || []).filter(function(block){
+    var currentParent = block.parentId || null;
+    var currentSlot = block.slotKey || 'default';
+    return currentParent === (parentId || null) && currentSlot === (slotKey || 'default') && ids.indexOf(block.blockId) < 0;
+  }).sort(function(a, b){
+    return (a.order || 0) - (b.order || 0);
+  });
+}
+
+function _findBlockLocation(blockId){
+  var result = null;
+  (state.schema && state.schema.tabs ? state.schema.tabs : []).forEach(function(tab, tabIndex){
+    (tab.blocks || []).forEach(function(block, blockIndex){
+      if(block.blockId === blockId){
+        result = {
+          tab: tab,
+          tabId: tab.tabId,
+          tabIndex: tabIndex,
+          block: block,
+          blockIndex: blockIndex
+        };
+      }
+    });
+  });
+  return result;
+}
+
+function _getDescendantIds(tab, blockId){
+  var ids = [];
+  function walk(parentId){
+    (tab.blocks || []).forEach(function(block){
+      if((block.parentId || null) === parentId){
+        ids.push(block.blockId);
+        walk(block.blockId);
+      }
+    });
+  }
+  walk(blockId);
+  return ids;
+}
+
+function _getBlockTreeIds(tab, blockId){
+  return [blockId].concat(_getDescendantIds(tab, blockId));
+}
+
+function _detachBlockTree(tab, blockId){
+  var ids = _getBlockTreeIds(tab, blockId);
+  var removed = [];
+  (tab.blocks || []).forEach(function(block){
+    if(ids.indexOf(block.blockId) >= 0) removed.push(block);
+  });
+  tab.blocks = (tab.blocks || []).filter(function(block){
+    return ids.indexOf(block.blockId) < 0;
+  });
+  return removed;
+}
+
+function _findFlatIndex(tab, blockId){
+  var i;
+  for(i = 0; i < (tab.blocks || []).length; i++){
+    if(tab.blocks[i].blockId === blockId) return i;
+  }
+  return -1;
+}
+
+function _insertBlockTree(tab, blocks, rootId, parentId, slotKey, siblingIndex){
+  var anchor;
+  var insertIndex;
+  var siblings = _getSiblingBlocks(tab, parentId, slotKey, []);
+  var rootBlock = null;
+  blocks.forEach(function(block){
+    if(block.blockId === rootId) rootBlock = block;
+  });
+  if(!rootBlock) return;
+  rootBlock.parentId = parentId || null;
+  rootBlock.slotKey = slotKey || 'default';
+  anchor = siblingIndex < siblings.length ? siblings[siblingIndex] : null;
+  insertIndex = anchor ? _findFlatIndex(tab, anchor.blockId) : (tab.blocks || []).length;
+  if(insertIndex < 0) insertIndex = (tab.blocks || []).length;
+  Array.prototype.splice.apply(tab.blocks, [insertIndex, 0].concat(blocks));
+  _resequenceTabBlocks(tab);
+}
+
+function _cloneBlockTreeData(blockId){
+  var location = _findBlockLocation(blockId);
+  var ids;
+  var blocks;
+  if(!location) return null;
+  ids = _getBlockTreeIds(location.tab, blockId);
+  blocks = (location.tab.blocks || []).filter(function(block){
+    return ids.indexOf(block.blockId) >= 0;
+  }).map(function(block){
+    return _clone(block);
+  });
+  return {
+    rootId: blockId,
+    blocks: blocks
+  };
+}
+
+function _remapTreeIds(treeData){
+  var map = {};
+  var blocks;
+  var rootId;
+  if(!treeData) return null;
+  blocks = (treeData.blocks || []).map(function(block){
+    var clone = _clone(block);
+    var newId = _uid();
+    map[clone.blockId] = newId;
+    clone.blockId = newId;
+    clone.id = newId;
+    return clone;
+  });
+  blocks.forEach(function(block){
+    if(block.parentId && map[block.parentId]) block.parentId = map[block.parentId];
+  });
+  rootId = map[treeData.rootId] || '';
+  return { rootId: rootId, blocks: blocks };
+}
+
+function _compileRuntimeSchema(schema){
+  var runtime = _clone(schema || {});
+  (runtime.tabs || []).forEach(function(tab){
+    var byId = {};
+    var roots = [];
+    var blocks = (tab.blocks || []).slice().sort(function(a, b){
+      return (a.order || 0) - (b.order || 0);
+    });
+    blocks.forEach(function(block){
+      var item = _clone(block);
+      var slots = {};
+      _getContainerSlots(item.type).forEach(function(slot){
+        slots[slot] = [];
+      });
+      if(_isContainerType(item.type)) item.slots = slots;
+      byId[item.blockId || item.id] = item;
+    });
+    blocks.forEach(function(block){
+      var id = block.blockId || block.id;
+      var compiled = byId[id];
+      var parentId = block.parentId || null;
+      var slotKey = block.slotKey || 'content';
+      if(parentId && byId[parentId] && byId[parentId].slots){
+        if(!byId[parentId].slots[slotKey]) byId[parentId].slots[slotKey] = [];
+        byId[parentId].slots[slotKey].push(compiled);
+      } else {
+        roots.push(compiled);
+      }
+    });
+    tab.blocks = roots;
+  });
+  return runtime;
+}
+
+function _saveBuilderSnapshotLocal(){
+  if(!state.schema) return;
+  try { localStorage.setItem(_builderStorageKey(state.schema.moduleId), JSON.stringify(state.schema)); } catch(err){}
+}
+
+function _clearBuilderSnapshotLocal(moduleId){
+  try { localStorage.removeItem(_builderStorageKey(moduleId)); } catch(err){}
+}
+
+function _getBlockTitle(block){
+  var title = block && block.title ? _t(block.title.vi || '', block.title.en || '') : '';
+  if(title) return title;
+  return _getCatalogLabel(block.type);
+}
+
+function _isBlockLocked(blockId){
+  var block = _findBlock(blockId);
+  return !!(block && block.locked);
+}
+
+function _collectBlockSequence(tab){
+  var tree = _buildTabTree(tab);
+  var list = [];
+  function walk(block){
+    list.push(block);
+    _getContainerSlots(block.type).forEach(function(slotKey){
+      _getTreeChildren(tree, block.blockId, slotKey).forEach(function(child){
+        walk(child);
+      });
+    });
+  }
+  tree.roots.forEach(function(root){
+    walk(root);
+  });
+  return list;
+}
+
+function _navigateSelection(delta){
+  var tab = _getActiveTab();
+  var sequence;
+  var index = -1;
+  if(!tab) return;
+  sequence = _collectBlockSequence(tab);
+  sequence.forEach(function(block, idx){
+    if(block.blockId === state.selectedBlock) index = idx;
+  });
+  if(index < 0 && sequence.length){
+    state.selectedBlock = sequence[0].blockId;
+  } else if(sequence[index + delta]){
+    state.selectedBlock = sequence[index + delta].blockId;
+  }
+  state.pendingScrollBlock = state.selectedBlock;
+  _paint();
+}
+
+function _copyBlock(blockId){
+  var treeData = _cloneBlockTreeData(blockId || state.selectedBlock);
+  if(!treeData) return;
+  clipboard.block = treeData;
+  if(BE.toast) BE.toast(_t('Đã sao chép block', 'Block copied'), 'success');
+}
+
+function _pasteBlock(targetBlockId){
+  var treeData = clipboard.block ? _remapTreeIds(clipboard.block) : null;
+  var targetLocation;
+  var tab;
+  var siblings;
+  var siblingIndex = 0;
+  if(!treeData || !treeData.blocks.length) return;
+  targetLocation = targetBlockId ? _findBlockLocation(targetBlockId) : null;
+  tab = targetLocation ? targetLocation.tab : _getActiveTab();
+  if(!tab) return;
+  _mutateSchema(_t('Dán block', 'Paste block'), function(){
+    if(targetLocation){
+      siblings = _getSiblingBlocks(tab, targetLocation.block.parentId || null, targetLocation.block.slotKey || 'default', []);
+      siblings.forEach(function(item, index){
+        if(item.blockId === targetLocation.block.blockId) siblingIndex = index + 1;
+      });
+      _insertBlockTree(tab, treeData.blocks, treeData.rootId, targetLocation.block.parentId || null, targetLocation.block.slotKey || 'default', siblingIndex);
+    } else {
+      _insertBlockTree(tab, treeData.blocks, treeData.rootId, null, 'default', _getSiblingBlocks(tab, null, 'default', []).length);
+    }
+    state.selectedBlock = treeData.rootId;
+    state.pendingScrollBlock = treeData.rootId;
+  });
+}
+
+function _setInsertTarget(tabId, parentId, slotKey, position){
+  state.insertTab = tabId || (state.activeTab || '');
+  state.insertParent = parentId || null;
+  state.insertSlot = slotKey || 'default';
+  state.insertPosition = position == null ? null : position;
+}
+
+function _insertBlockAtTarget(blockType, preConfig, target){
+  var tab = _getTabById(target.tabId) || _getActiveTab();
+  var newBlock;
+  if(!tab) return;
+  newBlock = _createBlockScaffold(blockType, preConfig);
+  _insertBlockTree(tab, [newBlock], newBlock.blockId, target.parentId || null, target.slotKey || 'default', target.insertIndex == null ? _getSiblingBlocks(tab, target.parentId || null, target.slotKey || 'default', []).length : target.insertIndex);
+  state.selectedBlock = newBlock.blockId;
+  state.propsDraft = _clone(newBlock);
+  state.propsTab = 'general';
+  state.pendingScrollBlock = newBlock.blockId;
+}
+
+function _moveTreeToTarget(blockId, target){
+  var sourceLocation = _findBlockLocation(blockId);
+  var sourceIds;
+  var detached;
+  var targetTab;
+  if(!sourceLocation || !target) return;
+  sourceIds = _getBlockTreeIds(sourceLocation.tab, blockId);
+  if(target.parentId && sourceIds.indexOf(target.parentId) >= 0) return;
+  detached = _detachBlockTree(sourceLocation.tab, blockId);
+  targetTab = _getTabById(target.tabId) || sourceLocation.tab;
+  _insertBlockTree(targetTab, detached, blockId, target.parentId || null, target.slotKey || 'default', target.insertIndex == null ? _getSiblingBlocks(targetTab, target.parentId || null, target.slotKey || 'default', []).length : target.insertIndex);
+  _resequenceTabBlocks(sourceLocation.tab);
+  if(targetTab !== sourceLocation.tab) _resequenceTabBlocks(targetTab);
+  state.activeTab = targetTab.tabId;
+  state.selectedBlock = blockId;
+  state.pendingScrollBlock = blockId;
+}
+
+function _renderShortcutPopover(){
+  if(!state.showShortcuts) return '';
+  var h = '';
+  h += '<div class="mb-shortcuts">';
+  h += '<h4>'+_t('⌨ Phím tắt Builder', '⌨ Builder Shortcuts')+'</h4>';
+  h += '<div class="mb-shortcuts-list">';
+  h += '<span>'+_t('Hoàn tác / Làm lại', 'Undo / Redo')+'</span><kbd>Ctrl+Z / Ctrl+Y</kbd>';
+  h += '<span>'+_t('Lưu module', 'Save module')+'</span><kbd>Ctrl+S</kbd>';
+  h += '<span>'+_t('Nhân đôi block', 'Duplicate block')+'</span><kbd>Ctrl+D</kbd>';
+  h += '<span>'+_t('Sao chép / Cắt / Dán', 'Copy / Cut / Paste')+'</span><kbd>Ctrl+C / X / V</kbd>';
+  h += '<span>'+_t('Xóa block', 'Delete block')+'</span><kbd>Delete</kbd>';
+  h += '<span>'+_t('Đi lên / xuống block', 'Navigate blocks')+'</span><kbd>↑ / ↓</kbd>';
+  h += '<span>'+_t('Đổi tab', 'Cycle tabs')+'</span><kbd>Tab</kbd>';
+  h += '<span>'+_t('Mở thư viện / cây widget', 'Toggle library / tree')+'</span><kbd>L / T</kbd>';
+  h += '<span>'+_t('Bỏ chọn / đóng panel', 'Deselect / close panels')+'</span><kbd>Esc</kbd>';
+  h += '</div></div>';
+  return h;
+}
+
+function _renderContextMenu(){
+  if(!state.contextMenu || !state.contextMenu.blockId) return '';
+  var blockId = state.contextMenu.blockId;
+  var disabledPaste = clipboard.block ? '' : ' disabled';
+  var h = '';
+  h += '<div class="mb-context-menu" data-context-menu="1" style="left:'+state.contextMenu.x+'px;top:'+state.contextMenu.y+'px">';
+  h += '<button data-action="duplicate-block" data-block="'+_esc(blockId)+'">'+_t('Nhân đôi', 'Duplicate')+'</button>';
+  h += '<button data-action="copy-block" data-block="'+_esc(blockId)+'">'+_t('Sao chép', 'Copy')+'</button>';
+  h += '<button data-action="cut-block" data-block="'+_esc(blockId)+'">'+_t('Cắt', 'Cut')+'</button>';
+  h += '<button data-action="paste-block" data-block="'+_esc(blockId)+'"'+disabledPaste+'>'+_t('Dán', 'Paste')+'</button>';
+  h += '<button data-action="delete-block" data-block="'+_esc(blockId)+'" style="color:var(--red)">'+_t('Xóa', 'Delete')+'</button>';
+  h += '</div>';
+  return h;
+}
+
+function _renderTreeNode(block, tab, tree, depth){
+  var catalog = (BE.BLOCK_CATALOG || {})[block.type] || {};
+  var slots = _getContainerSlots(block.type);
+  var hasChildren = false;
+  var collapsedKey = 'block:' + block.blockId;
+  var rowClass = 'mb-tree-node';
+  var h = '';
+  slots.forEach(function(slotKey){
+    if(_getTreeChildren(tree, block.blockId, slotKey).length) hasChildren = true;
+  });
+  if(state.selectedBlock === block.blockId) rowClass += ' is-selected';
+  if(block.visible === false) rowClass += ' is-hidden';
+  if(block.locked) rowClass += ' is-locked';
+  h += '<div style="margin-left:'+(depth * 12)+'px">';
+  h += '<div class="'+rowClass+'" data-context-block="'+_esc(block.blockId)+'" draggable="'+(block.locked ? 'false' : 'true')+'" data-drag-block="'+_esc(block.blockId)+'" data-drag-tab="'+_esc(tab.tabId)+'" data-drag-disabled="'+(block.locked ? '1' : '0')+'">';
+  if(hasChildren || _isContainerType(block.type)){
+    h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="toggle-node-collapse" data-block="'+_esc(block.blockId)+'">'+(state.treeCollapsed[collapsedKey] ? '▸' : '▾')+'</button>';
+  } else {
+    h += '<span style="display:inline-block;width:26px"></span>';
+  }
+  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="select-block" data-block="'+_esc(block.blockId)+'" style="padding:0;border:0;background:none;display:flex;align-items:center;gap:8px;flex:1;min-width:0">';
+  h += '<span style="font-size:14px">'+_esc(catalog.icon || '📦')+'</span>';
+  h += '<span class="mb-tree-label"><span class="mb-tree-title">'+_esc(_getBlockTitle(block))+'</span><span class="mb-tree-type">'+_esc(_getCatalogLabel(block.type))+'</span></span>';
+  h += '</button>';
+  h += '<div class="mb-tree-tools">';
+  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="toggle-block-visibility" data-block="'+_esc(block.blockId)+'" title="'+_t('Hiện / Ẩn', 'Show / Hide')+'">'+(block.visible === false ? '🙈' : '👁')+'</button>';
+  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="toggle-block-lock" data-block="'+_esc(block.blockId)+'" title="'+_t('Khóa / Mở khóa', 'Lock / Unlock')+'">'+(block.locked ? '🔒' : '🔓')+'</button>';
+  h += '</div></div>';
+  if(!state.treeCollapsed[collapsedKey]){
+    slots.forEach(function(slotKey){
+      _getTreeChildren(tree, block.blockId, slotKey).forEach(function(child){
+        h += _renderTreeNode(child, tab, tree, depth + 1);
+      });
+    });
+  }
+  h += '</div>';
+  return h;
+}
+
+function _renderWidgetTree(){
+  var h = '';
+  h += '<div class="mb-side-panel">';
+  h += '<div class="mb-panel-header"><div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary)">'+_t('Widget Tree', 'Widget Tree')+'</div><strong>'+_t('Cây module', 'Module Tree')+'</strong></div><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="toggle-tree">×</button></div>';
+  h += '<div class="mb-tree-scroll">';
+  h += '<div class="mb-tree-root">'+_esc(state.schema ? _t(state.schema.title.vi, state.schema.title.en) : _t('Module', 'Module'))+'</div>';
+  (state.schema && state.schema.tabs ? state.schema.tabs : []).forEach(function(tab){
+    var tree = _buildTabTree(tab);
+    var tabCollapsedKey = 'tab:' + tab.tabId;
+    h += '<div style="margin-bottom:10px">';
+    h += '<div class="mb-tree-node'+(state.activeTab === tab.tabId ? ' is-selected' : '')+'">';
+    h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="toggle-node-collapse" data-block="'+_esc(tabCollapsedKey)+'">'+(state.treeCollapsed[tabCollapsedKey] ? '▸' : '▾')+'</button>';
+    h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="switch-tab" data-tab="'+_esc(tab.tabId)+'" style="padding:0;border:0;background:none;display:flex;align-items:center;gap:8px;flex:1;min-width:0"><span style="font-size:14px">'+_esc(tab.icon || '📑')+'</span><span class="mb-tree-label"><span class="mb-tree-title">'+_esc(_t(tab.title.vi, tab.title.en))+'</span><span class="mb-tree-type">'+_esc(_t('Tab', 'Tab'))+' • '+tree.roots.length+'</span></span></button>';
+    h += '</div>';
+    if(!state.treeCollapsed[tabCollapsedKey]){
+      if(!tree.roots.length){
+        h += '<div style="margin-left:24px;color:var(--text-tertiary);font-size:12px;padding:6px 8px">'+_t('Chưa có block', 'No blocks yet')+'</div>';
+      }
+      tree.roots.forEach(function(root){
+        h += _renderTreeNode(root, tab, tree, 1);
+      });
+    }
+    h += '</div>';
+  });
+  h += '</div></div>';
+  return h;
+}
+
+function _renderSlotChildren(tab, tree, parentId, slotKey, slotLabel){
+  var children = _getTreeChildren(tree, parentId, slotKey);
+  var h = '';
+  h += '<div class="mb-slot" data-drop-zone="1" data-drop-tab="'+_esc(tab.tabId)+'" data-drop-parent="'+_esc(parentId || '')+'" data-drop-slot="'+_esc(slotKey || 'default')+'">';
+  h += '<div class="mb-slot-title">'+_esc(slotLabel)+'</div>';
+  if(!children.length){
+    h += '<div class="mb-slot-empty">'+_t('Kéo block vào đây hoặc mở thư viện để thêm nhanh.', 'Drop a block here or open the library to add one quickly.')+'</div>';
+  }
+  children.forEach(function(child){
+    h += _renderCanvasBlock(child, tab, tree, 0);
+  });
+  h += '<div class="mb-slot-actions"><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="open-library" data-tab="'+_esc(tab.tabId)+'" data-parent="'+_esc(parentId || '')+'" data-slot="'+_esc(slotKey || 'default')+'">+ '+_t('Thêm block', 'Add block')+'</button></div>';
+  h += '</div>';
+  return h;
+}
+
+function _renderCanvasBlock(block, tab, tree, depth){
+  var catalog = (BE.BLOCK_CATALOG || {})[block.type] || {};
+  var cardClass = 'mb-block-card';
+  var h = '';
+  if(state.selectedBlock === block.blockId) cardClass += ' is-selected';
+  if(block.visible === false) cardClass += ' is-hidden';
+  if(block.locked) cardClass += ' is-locked';
+  h += '<div class="'+cardClass+'" data-context-block="'+_esc(block.blockId)+'" data-block-wrapper="'+_esc(block.blockId)+'" data-tab-id="'+_esc(tab.tabId)+'" draggable="'+(block.locked ? 'false' : 'true')+'" data-drag-block="'+_esc(block.blockId)+'" data-drag-tab="'+_esc(tab.tabId)+'" data-drag-disabled="'+(block.locked ? '1' : '0')+'">';
+  h += '<div class="mb-block-head">';
+  h += '<div class="mb-block-meta">';
+  h += '<div class="mb-block-icon">'+_esc(catalog.icon || '📦')+'</div>';
+  h += '<div><div class="mb-block-name">'+_esc(_getBlockTitle(block))+'</div><div class="mb-block-type">'+_esc(_getCatalogLabel(block.type))+(block.locked ? ' • '+_t('Đã khóa', 'Locked') : '')+(block.visible === false ? ' • '+_t('Đang ẩn', 'Hidden') : '')+'</div></div>';
+  h += '</div>';
+  h += '<div class="mb-block-tools">';
+  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="move-up" data-block="'+_esc(block.blockId)+'" title="'+_t('Lên trên', 'Move up')+'">▲</button>';
+  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="move-down" data-block="'+_esc(block.blockId)+'" title="'+_t('Xuống dưới', 'Move down')+'">▼</button>';
+  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="config-block" data-block="'+_esc(block.blockId)+'" title="'+_t('Cấu hình', 'Configure')+'">⚙</button>';
+  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="duplicate-block" data-block="'+_esc(block.blockId)+'" title="'+_t('Nhân đôi', 'Duplicate')+'">📋</button>';
+  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" style="color:var(--red)" data-action="delete-block" data-block="'+_esc(block.blockId)+'" title="'+_t('Xóa', 'Delete')+'">🗑</button>';
+  h += '</div></div>';
+  h += '<div class="mb-block-body">';
+  h += _renderBlockPreview(block);
+  if(_isContainerType(block.type) && !state.treeCollapsed['block:'+block.blockId]){
+    if(block.type === 'two-column'){
+      h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">';
+      h += _renderSlotChildren(tab, tree, block.blockId, 'left', _t('Cột trái', 'Left column'));
+      h += _renderSlotChildren(tab, tree, block.blockId, 'right', _t('Cột phải', 'Right column'));
+      h += '</div>';
+    } else {
+      h += '<div style="'+_layoutStyle(block.layout)+'margin-top:12px">';
+      h += _renderSlotChildren(tab, tree, block.blockId, 'content', _t('Vùng nội dung', 'Content slot'));
+      h += '</div>';
+    }
+  }
+  h += '</div></div>';
+  return h;
+}
+
+_renderLibraryPanel = function(){
+  var h = '';
+  var catalog = BE.BLOCK_CATALOG || {};
+  var categories = BE.BLOCK_CATEGORIES || [];
+  var search = (state.librarySearch || '').toLowerCase();
+  h += '<div class="mb-rail-panel">';
+  h += '<div class="mb-panel-header"><div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary)">'+_t('Library', 'Library')+'</div><strong>'+_t('Thư viện block', 'Block Library')+'</strong></div><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="close-library">×</button></div>';
+  h += '<div class="mb-panel-body">';
+  h += '<div class="mb-helper-note">'+_t('Kéo trực tiếp block từ thư viện vào canvas hoặc bấm để chèn vào vị trí đang chọn.', 'Drag blocks directly from the library into the canvas or click to insert at the selected position.')+'</div>';
+  h += '<input type="text" class="hm-input" id="mb-lib-search" placeholder="'+_t('Tìm block...', 'Search blocks...')+'" value="'+_esc(state.librarySearch || '')+'">';
+  categories.forEach(function(cat){
+    var keys = Object.keys(catalog).filter(function(key){
+      var entry = catalog[key];
+      var label = (entry.label || '').toLowerCase();
+      var labelEn = (entry.labelEn || '').toLowerCase();
+      return entry.category === cat.key && (!search || label.indexOf(search) >= 0 || labelEn.indexOf(search) >= 0 || key.indexOf(search) >= 0);
+    });
+    if(!keys.length) return;
+    h += '<div style="margin-top:16px">';
+    h += '<div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:'+cat.color+';font-weight:700;margin-bottom:8px">'+_esc(_t(cat.label, cat.labelEn || cat.label))+' ('+keys.length+')</div>';
+    keys.forEach(function(key){
+      var entry = catalog[key];
+      h += '<div class="mb-tree-node" draggable="true" data-library-type="'+_esc(key)+'" style="border:1px solid var(--border);margin-bottom:8px">';
+      h += '<div style="font-size:18px;width:26px;text-align:center">'+_esc(entry.icon || '📦')+'</div>';
+      h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="add-block-type" data-type="'+_esc(key)+'" style="padding:0;border:0;background:none;display:flex;align-items:flex-start;gap:8px;flex:1;min-width:0;text-align:left">';
+      h += '<span class="mb-tree-label"><span class="mb-tree-title">'+_esc(entry.label)+'</span><span class="mb-tree-type">'+_esc(entry.labelEn || '')+'</span></span></button>';
+      h += '</div>';
+    });
+    h += '</div>';
+  });
+  h += '</div></div>';
+  return h;
+};
+
+_renderPropertiesPanel = function(){
+  var block = _findBlock(state.selectedBlock);
+  var draft;
+  var catalog;
+  var tabs;
+  var activeKey;
+  var activeTab = null;
+  var i;
+  var h = '';
+  if(!block) return '';
+  _ensurePropsDraft(block);
+  _ensureRegistriesLoaded();
+  draft = state.propsDraft || block;
+  catalog = (BE.BLOCK_CATALOG || {})[draft.type] || {};
+  tabs = (BE.BLOCK_PROPERTIES_SCHEMA || {})[draft.type] || [];
+  activeKey = state.propsTab || (tabs[0] && tabs[0].key) || 'general';
+  for(i = 0; i < tabs.length; i++){
+    if(tabs[i].key === activeKey) activeTab = tabs[i];
+  }
+  if(!activeTab && tabs.length) activeTab = tabs[0];
+  h += '<div class="mb-rail-panel">';
+  h += '<div class="mb-panel-header"><div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary)">'+_t('Properties', 'Properties')+'</div><strong>'+_esc(catalog.icon || '📦')+' '+_esc(_getCatalogLabel(draft.type))+'</strong></div><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="close-props">×</button></div>';
+  h += '<div class="mb-panel-body">';
+  h += '<div class="mb-helper-note">'+_t('Hỗ trợ binding kiểu {{ data.total || 0 }} và pipe filter như {{ data.total | number }}.', 'Supports bindings like {{ data.total || 0 }} and pipe filters like {{ data.total | number }}.')+'</div>';
+  if(block.locked){
+    h += '<div style="padding:10px 12px;border:1px solid rgba(245,158,11,0.25);background:rgba(245,158,11,0.08);border-radius:12px;color:var(--text-secondary);font-size:12px;margin-bottom:12px">'+_t('Block này đang khóa. Bạn vẫn có thể mở để xem cấu hình hoặc mở khóa từ cây widget.', 'This block is locked. You can inspect it here or unlock it from the widget tree.')+'</div>';
+  }
+  h += _renderPropField({ label:_t('Hiển thị', 'Visible'), labelEn:'Visible', type:'toggle', path:'visible' }, 'visible', draft.visible);
+  h += _renderPropField({ label:_t('Khóa chỉnh sửa', 'Lock editing'), labelEn:'Lock editing', type:'toggle', path:'locked' }, 'locked', draft.locked);
+  if(_isContainerType(draft.type)){
+    h += _renderPropField({ label:_t('Kiểu bố cục', 'Layout type'), labelEn:'Layout type', type:'select', path:'layout.type', repaintOnChange:true, options:[{ value:'stack', label:_t('Xếp dọc', 'Stack') }, { value:'grid', label:_t('Lưới', 'Grid') }, { value:'flex', label:_t('Flex', 'Flex') }] }, 'layout.type', _getByPath(draft, 'layout.type'));
+    h += _renderPropField({ label:_t('Số cột', 'Columns'), labelEn:'Columns', type:'number', path:'layout.columns', repaintOnChange:true, min:1, max:6, step:1 }, 'layout.columns', _getByPath(draft, 'layout.columns'));
+    h += _renderPropField({ label:_t('Khoảng cách', 'Gap'), labelEn:'Gap', type:'text', path:'layout.gap' }, 'layout.gap', _getByPath(draft, 'layout.gap'));
+    h += _renderPropField({ label:_t('Canh flex', 'Flex align'), labelEn:'Flex align', type:'select', path:'layout.align', options:['stretch','start','center','end'] }, 'layout.align', _getByPath(draft, 'layout.align'));
+  }
+  h += '<div style="font-size:12px;color:var(--text-tertiary);margin:0 0 16px">'+_t('Parent: ', 'Parent: ')+_esc(draft.parentId || 'root')+' • Slot: '+_esc(draft.slotKey || 'default')+'</div>';
+  if(tabs.length){
+    h += '<div class="mb-toolbar" style="padding:0 0 12px;border:0;background:none">';
+    tabs.forEach(function(tab){
+      h += '<button class="hm-btn '+(activeKey === tab.key ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm" data-action="props-tab" data-tab="'+_esc(tab.key)+'">'+_esc(tab.icon || '')+' '+_esc(_t(tab.label, tab.labelEn || tab.label))+'</button>';
+    });
+    h += '</div>';
+  }
+  if(activeTab){
+    (activeTab.sections || []).forEach(function(section){
+      h += _renderPropSection(section, draft);
+    });
+  }
+  h += '</div><div class="mb-panel-header" style="border-top:1px solid var(--border);border-bottom:0;background:#fff">';
+  h += '<button class="hm-btn hm-btn-secondary" data-action="close-props">'+_t('Đóng', 'Close')+'</button>';
+  h += '<button class="hm-btn hm-btn-primary" data-action="save-props">'+_t('Áp dụng', 'Apply')+'</button>';
+  h += '</div></div>';
+  return h;
+};
+
+_renderBuilder = function(){
+  var schema = state.schema;
+  var activeTab;
+  var tree;
+  var roots;
+  var undoInfo;
+  var h = '';
+  if(!schema) return '<div class="hm-empty">No schema</div>';
+  activeTab = _getActiveTab();
+  tree = activeTab ? _buildTabTree(activeTab) : { roots: [] };
+  roots = tree.roots || [];
+  undoInfo = undoManager.getInfo();
+  h += '<div style="background:linear-gradient(135deg,var(--brand) 0%,var(--brand-2) 100%);color:#fff;padding:20px 24px;border-radius:24px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">';
+  h += '<div><div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.72">MODULE BUILDER V2</div><h1 style="margin:6px 0 0;font-size:24px">'+_esc(schema.icon || '📦')+' '+_esc(_t(schema.title.vi, schema.title.en))+'</h1><div style="margin-top:8px;opacity:.85;font-size:13px">'+_t('Canvas dạng tree, kéo thả HTML5, undo/redo 200 bước và binding {{ }} an toàn.', 'Tree canvas, HTML5 drag-drop, 200-step undo/redo, and safe {{ }} bindings.')+'</div></div>';
+  h += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  h += '<button class="hm-btn" style="background:rgba(255,255,255,.16);color:#fff" data-action="undo-builder">'+_t('↩ Hoàn tác', '↩ Undo')+' ('+(undoInfo.position > 0 ? undoInfo.position : 0)+')</button>';
+  h += '<button class="hm-btn" style="background:rgba(255,255,255,.12);color:#fff" data-action="redo-builder">'+_t('↪ Làm lại', '↪ Redo')+' ('+(undoInfo.canRedo ? (undoInfo.depth - undoInfo.position - 1) : 0)+')</button>';
+  h += '<button class="hm-btn" style="background:rgba(255,255,255,.12);color:#fff" data-action="toggle-shortcuts">⌨</button>';
+  h += '<button class="hm-btn" style="background:rgba(255,255,255,.16);color:#fff" data-action="preview-module">👁 '+_t('Xem trước', 'Preview')+'</button>';
+  h += '<button class="hm-btn" style="background:var(--green);color:#fff" data-action="save-module">💾 '+_t('Lưu', 'Save')+'</button>';
+  h += '<button class="hm-btn" style="background:rgba(255,255,255,.12);color:#fff" data-action="back-setup">← '+_t('Quay lại', 'Back')+'</button>';
+  h += '</div></div>';
+  h += '<div class="mb-builder-shell">';
+  if(state.showTree) h += _renderWidgetTree();
+  h += '<div class="mb-main-panel">';
+  h += '<div class="mb-tab-strip">';
+  (schema.tabs || []).forEach(function(tab){
+    h += '<button class="mb-tab-pill'+(state.activeTab === tab.tabId ? ' is-active' : '')+'" data-action="switch-tab" data-tab="'+_esc(tab.tabId)+'">'+_esc(tab.icon || '📑')+' '+_esc(_t(tab.title.vi, tab.title.en))+'</button>';
+  });
+  h += '<button class="mb-tab-pill" data-action="add-tab">+ '+_t('Thêm tab', 'Add tab')+'</button>';
+  if(schema.tabs && schema.tabs.length > 1){
+    h += '<button class="mb-tab-pill" data-action="remove-tab">'+_t('🗑 Xóa tab hiện tại', '🗑 Remove active tab')+'</button>';
+  }
+  h += '</div>';
+  if(activeTab){
+    _ensureTabLayout(activeTab);
+    h += '<div class="mb-toolbar">';
+    h += '<div class="mb-toolbar-group">';
+    h += '<button class="hm-btn '+(activeTab.layout.type === 'stack' ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm" data-action="set-tab-layout" data-layout="stack">⬇ '+_t('Stack', 'Stack')+'</button>';
+    h += '<button class="hm-btn '+(activeTab.layout.type === 'grid' ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm" data-action="set-tab-layout" data-layout="grid">⊞ '+_t('Grid', 'Grid')+'</button>';
+    h += '<button class="hm-btn '+(activeTab.layout.type === 'flex' ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm" data-action="set-tab-layout" data-layout="flex">↔ '+_t('Flex', 'Flex')+'</button>';
+    h += '</div>';
+    h += '<div class="mb-toolbar-group">';
+    h += '<span class="mb-kbd-chip">'+_t('Cột', 'Columns')+': <select class="hm-input hm-select" id="mb-layout-columns" style="height:30px;padding:2px 8px;min-width:68px"><option value="1"'+(String(activeTab.layout.columns) === '1' ? ' selected' : '')+'>1</option><option value="2"'+(String(activeTab.layout.columns) === '2' ? ' selected' : '')+'>2</option><option value="3"'+(String(activeTab.layout.columns) === '3' ? ' selected' : '')+'>3</option><option value="4"'+(String(activeTab.layout.columns) === '4' ? ' selected' : '')+'>4</option><option value="5"'+(String(activeTab.layout.columns) === '5' ? ' selected' : '')+'>5</option><option value="6"'+(String(activeTab.layout.columns) === '6' ? ' selected' : '')+'>6</option></select></span>';
+    h += '<span class="mb-kbd-chip">'+_t('Gap', 'Gap')+': <select class="hm-input hm-select" id="mb-layout-gap" style="height:30px;padding:2px 8px;min-width:84px"><option value="8px"'+(activeTab.layout.gap === '8px' ? ' selected' : '')+'>8px</option><option value="12px"'+(activeTab.layout.gap === '12px' ? ' selected' : '')+'>12px</option><option value="16px"'+(activeTab.layout.gap === '16px' ? ' selected' : '')+'>16px</option><option value="24px"'+(activeTab.layout.gap === '24px' ? ' selected' : '')+'>24px</option></select></span>';
+    h += '</div>';
+    h += '<div class="mb-toolbar-spacer"></div>';
+    h += '<div class="mb-toolbar-group">';
+    h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="toggle-tree">🌳 '+_t('Tree', 'Tree')+'</button>';
+    h += '<button class="hm-btn '+(state.showLibrary ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm" data-action="open-library" data-tab="'+_esc(activeTab.tabId)+'" data-parent="" data-slot="default">📚 '+_t('Library', 'Library')+'</button>';
+    h += '</div></div>';
+    h += '<div class="mb-canvas-stage">';
+    h += '<div class="mb-canvas-root" data-drop-zone="1" data-drop-tab="'+_esc(activeTab.tabId)+'" data-drop-parent="" data-drop-slot="default" style="'+_layoutStyle(activeTab.layout)+'">';
+    if(!roots.length){
+      h += '<div class="mb-slot-empty">'+_t('Trang đang trống. Bấm mở thư viện hoặc kéo block vào canvas để bắt đầu.', 'This page is empty. Open the library or drag a block onto the canvas to start.')+'</div>';
+    }
+    roots.forEach(function(root){
+      h += _renderCanvasBlock(root, activeTab, tree, 0);
+    });
+    h += '<div class="mb-slot-actions"><button class="hm-btn hm-btn-primary hm-btn-sm" data-action="open-library" data-tab="'+_esc(activeTab.tabId)+'" data-parent="" data-slot="default">+ '+_t('Thêm block ở cuối canvas', 'Add block to canvas end')+'</button></div>';
+    h += '</div></div>';
+  }
+  h += '</div>';
+  if(state.showLibrary || state.selectedBlock){
+    h += '<div class="mb-right-rail">';
+    if(state.showLibrary) h += _renderLibraryPanel();
+    if(state.selectedBlock) h += _renderPropertiesPanel();
+    h += '</div>';
+  }
+  h += '</div>';
+  h += _renderShortcutPopover();
+  h += _renderContextMenu();
+  return h;
+};
+
+_renderPreview = function(){
+  var runtimeSchema = _compileRuntimeSchema(state.schema);
+  var h = '';
+  h += '<div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">';
+  h += '<h2 style="margin:0;font-size:18px">👁 '+_t('Xem trước module', 'Module Preview')+'</h2>';
+  h += '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="hm-btn hm-btn-secondary" data-action="back-build">← '+_t('Quay lại Builder', 'Back to Builder')+'</button><button class="hm-btn hm-btn-primary" data-action="save-module">💾 '+_t('Lưu & Xuất bản', 'Save & Publish')+'</button></div>';
+  h += '</div>';
+  h += '<div id="mb-preview-container" style="border:1px solid var(--border);border-radius:24px;padding:16px;min-height:420px;background:var(--bg-page)"></div>';
+  setTimeout(function(){
+    var previewEl = document.getElementById('mb-preview-container');
+    if(previewEl && runtimeSchema && MR.renderModuleById){
+      try { localStorage.setItem('hm_module_schema_'+runtimeSchema.moduleId, JSON.stringify(runtimeSchema)); } catch(err){}
+      _saveBuilderSnapshotLocal();
+      MR.renderModuleById(previewEl, runtimeSchema.moduleId);
+    }
+  }, 100);
+  return h;
+};
+
+_createBlockScaffold = function(blockType, preConfig){
+  var catalog = (BE.BLOCK_CATALOG || {})[blockType] || {};
+  var id = _uid();
+  var block = {
+    blockId: id,
+    id: id,
+    type: blockType,
+    visible: true,
+    locked: false,
+    collapsed: false,
+    parentId: null,
+    slotKey: 'default',
+    layout: _defaultBlockLayout(blockType),
+    title: { vi: catalog.label || blockType, en: catalog.labelEn || blockType },
+    subtitle: { vi:'', en:'' },
+    config: {}
+  };
+  _applySchemaDefaults(block, _getBlockSchema(blockType));
+  if(preConfig) _mergeDeep(block.config, _clone(preConfig));
+  return block;
+};
+
+_createBlankModule = function(){
+  var nameVi = (document.getElementById('mb-name') || {}).value || 'Module mới';
+  var nameEn = (document.getElementById('mb-name-en') || {}).value || 'New Module';
+  var route = (document.getElementById('mb-route') || {}).value || '/new-module';
+  var icon = (document.getElementById('mb-icon') || {}).value || '📦';
+  var tabsStr = (document.getElementById('mb-tabs') || {}).value || 'Tổng quan';
+  var tabs = tabsStr.split(',').map(function(item, index){
+    var title = item.replace(/^\s+|\s+$/g, '');
+    return {
+      tabId: 'tab-' + index + '-' + Date.now().toString(36),
+      title: { vi: title, en: title },
+      icon: '',
+      layout: { type:'stack', columns:1, gap:'16px', align:'stretch' },
+      blocks: []
+    };
+  });
+  state.schema = {
+    moduleId: 'custom-' + Date.now().toString(36),
+    title: { vi: nameVi, en: nameEn },
+    subtitle: { vi:'', en:'' },
+    icon: icon,
+    route: route,
+    roles: ['ceo', 'it_admin'],
+    version: 1,
+    createdBy: (typeof currentUser !== 'undefined' && currentUser) ? currentUser.username : 'admin',
+    createdAt: new Date().toISOString(),
+    tabs: tabs
+  };
+  state.selectedBlock = null;
+  state.propsDraft = null;
+  state.propsTab = 'general';
+  state.activeTab = tabs.length ? tabs[0].tabId : null;
+  state.step = 'build';
+  _normalizeSchemaBlocks();
+  _resetUndoBaseline(_t('Tạo module trắng', 'Create blank module'));
+  _paint();
+};
+
+_addBlockToSchema = function(blockType, preConfig){
+  var target = {
+    tabId: state.insertTab || (state.activeTab || ''),
+    parentId: state.insertParent || null,
+    slotKey: state.insertSlot || 'default',
+    insertIndex: state.insertPosition
+  };
+  _mutateSchema(_t('Thêm block', 'Add block'), function(){
+    _insertBlockAtTarget(blockType, preConfig, target);
+  });
+};
+
+_removeBlock = function(blockId){
+  _mutateSchema(_t('Xóa block', 'Delete block'), function(){
+    var location = _findBlockLocation(blockId);
+    var ids;
+    if(!location) return;
+    ids = _getBlockTreeIds(location.tab, blockId);
+    location.tab.blocks = (location.tab.blocks || []).filter(function(block){
+      return ids.indexOf(block.blockId) < 0;
+    });
+    if(ids.indexOf(state.selectedBlock) >= 0){
+      state.selectedBlock = null;
+      state.propsDraft = null;
+    }
+  });
+};
+
+_duplicateBlock = function(blockId){
+  _mutateSchema(_t('Nhân đôi block', 'Duplicate block'), function(){
+    var location = _findBlockLocation(blockId);
+    var treeData;
+    var cloneData;
+    var siblings;
+    var siblingIndex = 0;
+    if(!location) return;
+    treeData = _cloneBlockTreeData(blockId);
+    cloneData = _remapTreeIds(treeData);
+    siblings = _getSiblingBlocks(location.tab, location.block.parentId || null, location.block.slotKey || 'default', []);
+    siblings.forEach(function(item, index){
+      if(item.blockId === location.block.blockId) siblingIndex = index + 1;
+    });
+    _insertBlockTree(location.tab, cloneData.blocks, cloneData.rootId, location.block.parentId || null, location.block.slotKey || 'default', siblingIndex);
+    state.selectedBlock = cloneData.rootId;
+    state.pendingScrollBlock = cloneData.rootId;
+  });
+};
+
+_moveBlock = function(blockId, direction){
+  _mutateSchema(direction < 0 ? _t('Di chuyển block lên', 'Move block up') : _t('Di chuyển block xuống', 'Move block down'), function(){
+    var location = _findBlockLocation(blockId);
+    var siblings;
+    var currentIndex = -1;
+    var targetIndex;
+    var detached;
+    if(!location) return;
+    siblings = _getSiblingBlocks(location.tab, location.block.parentId || null, location.block.slotKey || 'default', []);
+    siblings.forEach(function(item, index){
+      if(item.blockId === blockId) currentIndex = index;
+    });
+    targetIndex = currentIndex + direction;
+    if(currentIndex < 0 || targetIndex < 0 || targetIndex >= siblings.length) return;
+    detached = _detachBlockTree(location.tab, blockId);
+    _insertBlockTree(location.tab, detached, blockId, location.block.parentId || null, location.block.slotKey || 'default', targetIndex);
+    state.pendingScrollBlock = blockId;
+  });
+};
+
+_saveBlockProps = function(){
+  var selectedId = state.selectedBlock;
+  var draft = state.propsDraft;
+  _mutateSchema(_t('Cập nhật thuộc tính block', 'Update block properties'), function(){
+    var block = _findBlock(selectedId);
+    if(!block || !draft) return;
+    _applySchemaDefaults(draft, _getBlockSchema(draft.type));
+    Object.keys(block).forEach(function(key){ delete block[key]; });
+    Object.keys(draft).forEach(function(key){ block[key] = _clone(draft[key]); });
+  });
+};
+
+_saveModule = function(){
+  var runtimeSchema;
+  if(!state.schema) return;
+  state.schema.version = (state.schema.version || 0) + 1;
+  state.schema.updatedAt = new Date().toISOString();
+  runtimeSchema = _compileRuntimeSchema(state.schema);
+  try { localStorage.setItem('hm_module_schema_'+state.schema.moduleId, JSON.stringify(runtimeSchema)); } catch(err){}
+  _saveBuilderSnapshotLocal();
+  _addToSavedModules(state.schema);
+  if(typeof apiCall === 'function'){
+    apiCall('module_schema_save', { schema: runtimeSchema }, 'POST', 10000).catch(function(){});
+  }
+  if(BE.toast) BE.toast(_t('Đã lưu module: ', 'Module saved: ') + _t(state.schema.title.vi, state.schema.title.en), 'success');
+};
+
+_openSavedModule = function(moduleId){
+  var raw = null;
+  try { raw = localStorage.getItem(_builderStorageKey(moduleId)) || localStorage.getItem('hm_module_schema_'+moduleId); } catch(err){}
+  if(!raw) return;
+  try {
+    state.schema = JSON.parse(raw);
+    _normalizeSchemaBlocks();
+    state.selectedBlock = null;
+    state.propsDraft = null;
+    state.propsTab = 'general';
+    state.activeTab = state.schema.tabs && state.schema.tabs.length ? state.schema.tabs[0].tabId : null;
+    state.step = 'build';
+    _resetUndoBaseline(_t('Mở module', 'Open module'));
+    _paint();
+  } catch(err){}
+};
+
+_deleteSavedModule = function(moduleId){
+  try { localStorage.removeItem('hm_module_schema_'+moduleId); } catch(err){}
+  _clearBuilderSnapshotLocal(moduleId);
+  state.savedModules = state.savedModules.filter(function(item){
+    return item.moduleId !== moduleId;
+  });
+  try { localStorage.setItem('hm_saved_modules', JSON.stringify(state.savedModules)); } catch(err){}
+};
+
+_openBlockConfig = function(blockId){
+  var block = _findBlock(blockId);
+  if(!block) return;
+  state.selectedBlock = block.blockId || block.id;
+  state.propsTab = 'general';
+  state.propsDraft = _clone(block);
+  _applySchemaDefaults(state.propsDraft, _getBlockSchema(block.type));
+  state.showLibrary = false;
+  state.contextMenu = null;
+  _ensureRegistriesLoaded();
+  _paint();
+};
+
+function _scrollSelectedIntoView(){
+  if(!state.pendingScrollBlock) return;
+  setTimeout(function(){
+    var el = state.container && state.container.querySelector('[data-block-wrapper="'+state.pendingScrollBlock+'"]');
+    if(el && el.scrollIntoView) el.scrollIntoView({ block:'nearest', behavior:'smooth' });
+    state.pendingScrollBlock = null;
+  }, 30);
+}
+
+render = function(container){
+  state.container = container;
+  _ensureBuilderState();
+  _ensureBuilderStyles();
+  _setupKeyboardShortcuts();
+  _loadSavedModules();
+  if(state.schema) _normalizeSchemaBlocks();
+  _paint();
+};
+
+_paint = function(){
+  var c = state.container;
+  if(!c) return;
+  _ensureBuilderState();
+  _ensureBuilderStyles();
+  switch(state.step){
+    case 'setup': c.innerHTML = _renderSetup(); break;
+    case 'preview': c.innerHTML = _renderPreview(); break;
+    default: c.innerHTML = _renderBuilder(); break;
+  }
+  c.onclick = _handleClick;
+  c.oninput = _handleInput;
+  c.onchange = _handleInput;
+  c.ondragstart = _handleDragStart;
+  c.ondragover = _handleDragOver;
+  c.ondrop = _handleDrop;
+  c.ondragend = _handleDragEnd;
+  c.ontouchstart = _handleTouchStart;
+  c.ontouchmove = _handleTouchMove;
+  c.ontouchend = _handleTouchEnd;
+  c.ontouchcancel = _handleTouchCancel;
+  c.oncontextmenu = _handleContextMenu;
+  _scrollSelectedIntoView();
+};
+
+function _resolveDropTarget(targetNode, clientY){
+  var wrapper = targetNode && targetNode.closest ? targetNode.closest('[data-block-wrapper]') : null;
+  var zone = targetNode && targetNode.closest ? targetNode.closest('[data-drop-zone="1"]') : null;
+  var location;
+  var siblings;
+  var index = 0;
+  var rect;
+  var above;
+  if(wrapper){
+    location = _findBlockLocation(wrapper.getAttribute('data-block-wrapper'));
+    if(!location) return null;
+    siblings = _getSiblingBlocks(location.tab, location.block.parentId || null, location.block.slotKey || 'default', []);
+    siblings.forEach(function(item, idx){
+      if(item.blockId === location.block.blockId) index = idx;
+    });
+    rect = wrapper.getBoundingClientRect();
+    above = clientY < (rect.top + rect.height / 2);
+    return {
+      tabId: location.tabId,
+      parentId: location.block.parentId || null,
+      slotKey: location.block.slotKey || 'default',
+      insertIndex: above ? index : index + 1,
+      indicatorType: above ? 'above' : 'below',
+      indicatorId: location.block.blockId
+    };
+  }
+  if(zone){
+    return {
+      tabId: zone.getAttribute('data-drop-tab') || state.activeTab,
+      parentId: zone.getAttribute('data-drop-parent') || null,
+      slotKey: zone.getAttribute('data-drop-slot') || 'default',
+      insertIndex: null,
+      indicatorType: 'zone',
+      indicatorId: (zone.getAttribute('data-drop-parent') || 'root') + ':' + (zone.getAttribute('data-drop-slot') || 'default')
+    };
+  }
+  return null;
+}
+
+function _clearDragIndicators(){
+  if(!state.container) return;
+  (state.container.querySelectorAll('.mb-drop-above') || []).forEach(function(el){ el.classList.remove('mb-drop-above'); });
+  (state.container.querySelectorAll('.mb-drop-below') || []).forEach(function(el){ el.classList.remove('mb-drop-below'); });
+  (state.container.querySelectorAll('.mb-drop-zone-active') || []).forEach(function(el){ el.classList.remove('mb-drop-zone-active'); });
+  dragState.indicatorKey = '';
+}
+
+function _applyDragIndicator(target){
+  var wrapper;
+  var zone;
+  var key;
+  if(!target || !state.container) return;
+  key = target.indicatorType + ':' + target.indicatorId;
+  if(dragState.indicatorKey === key) return;
+  _clearDragIndicators();
+  dragState.indicatorKey = key;
+  if(target.indicatorType === 'zone'){
+    zone = state.container.querySelector('[data-drop-zone="1"][data-drop-parent="'+_esc(target.parentId || '')+'"][data-drop-slot="'+_esc(target.slotKey || 'default')+'"][data-drop-tab="'+_esc(target.tabId || '')+'"]');
+    if(zone) zone.classList.add('mb-drop-zone-active');
+  } else {
+    wrapper = state.container.querySelector('[data-block-wrapper="'+_esc(target.indicatorId)+'"]');
+    if(wrapper) wrapper.classList.add(target.indicatorType === 'above' ? 'mb-drop-above' : 'mb-drop-below');
+  }
+}
+
+function _resolveDragSourceFromNode(node){
+  var el = node && node.closest ? node.closest('[data-library-type],[data-drag-block]') : null;
+  if(!el) return null;
+  if(el.getAttribute('data-drag-disabled') === '1') return null;
+  if(el.getAttribute('data-library-type')){
+    return { kind:'library', blockType:el.getAttribute('data-library-type') };
+  }
+  return { kind:'block', blockId:el.getAttribute('data-drag-block'), tabId:el.getAttribute('data-drag-tab') };
+}
+
+function _performDropAction(source, target){
+  if(!source || !target) return;
+  if(source.kind === 'library'){
+    _mutateSchema(_t('Thêm block bằng kéo thả', 'Add block by drag-drop'), function(){
+      _insertBlockAtTarget(source.blockType, null, target);
+    });
+  } else if(source.kind === 'block' && source.blockId){
+    _mutateSchema(_t('Sắp xếp lại block', 'Reorder block'), function(){
+      _moveTreeToTarget(source.blockId, target);
+    });
+  }
+}
+
+function _resetTouchDragState(){
+  if(touchDragState.timer){
+    clearTimeout(touchDragState.timer);
+    touchDragState.timer = null;
+  }
+  touchDragState.source = null;
+  touchDragState.target = null;
+  touchDragState.active = false;
+  _clearDragIndicators();
+}
+
+_handleDragStart = function(e){
+  var el = e.target && e.target.closest ? e.target.closest('[data-library-type],[data-drag-block]') : null;
+  var payload = _resolveDragSourceFromNode(e.target);
+  if(!el) return;
+  if(!payload){ e.preventDefault(); return; }
+  dragState.source = payload;
+  dragState.target = null;
+  if(e.dataTransfer){
+    e.dataTransfer.effectAllowed = payload.kind === 'library' ? 'copy' : 'move';
+    e.dataTransfer.setData('text/plain', JSON.stringify(payload));
+    if(e.dataTransfer.setDragImage) e.dataTransfer.setDragImage(el, 24, 24);
+  }
+  if(el.classList) el.classList.add('hm-block-dragging');
+};
+
+_handleDragOver = function(e){
+  var target;
+  if(!dragState.source) return;
+  target = _resolveDropTarget(e.target, e.clientY);
+  if(!target) return;
+  e.preventDefault();
+  dragState.target = target;
+  _applyDragIndicator(target);
+};
+
+_handleDrop = function(e){
+  var source = dragState.source;
+  var target = dragState.target || _resolveDropTarget(e.target, e.clientY);
+  if(!source || !target) return;
+  e.preventDefault();
+  _performDropAction(source, target);
+  _clearDragIndicators();
+  dragState.source = null;
+  dragState.target = null;
+};
+
+_handleDragEnd = function(){
+  if(!state.container) return;
+  (state.container.querySelectorAll('.hm-block-dragging') || []).forEach(function(el){ el.classList.remove('hm-block-dragging'); });
+  _clearDragIndicators();
+  dragState.source = null;
+  dragState.target = null;
+};
+
+_handleTouchStart = function(e){
+  var touch = e.touches && e.touches[0];
+  var source = _resolveDragSourceFromNode(e.target);
+  if(!touch || !source) return;
+  _resetTouchDragState();
+  touchDragState.source = source;
+  touchDragState.startX = touch.clientX;
+  touchDragState.startY = touch.clientY;
+  touchDragState.timer = setTimeout(function(){
+    touchDragState.active = true;
+    if(BE.toast){
+      BE.toast(_t('Đang kéo thả block. Thả tay để chèn vào vị trí mới.', 'Dragging block. Release to drop at the new position.'), 'info');
+    }
+  }, 180);
+};
+
+_handleTouchMove = function(e){
+  var touch = e.touches && e.touches[0];
+  var dx;
+  var dy;
+  var targetNode;
+  var target;
+  if(!touch || !touchDragState.source) return;
+  dx = Math.abs(touch.clientX - touchDragState.startX);
+  dy = Math.abs(touch.clientY - touchDragState.startY);
+  if(!touchDragState.active && (dx > 10 || dy > 10)){
+    if(touchDragState.timer){
+      clearTimeout(touchDragState.timer);
+      touchDragState.timer = null;
+    }
+    touchDragState.source = null;
+    return;
+  }
+  if(!touchDragState.active) return;
+  e.preventDefault();
+  targetNode = document.elementFromPoint ? document.elementFromPoint(touch.clientX, touch.clientY) : e.target;
+  target = _resolveDropTarget(targetNode, touch.clientY);
+  if(!target) return;
+  touchDragState.target = target;
+  _applyDragIndicator(target);
+};
+
+_handleTouchEnd = function(e){
+  if(touchDragState.timer){
+    clearTimeout(touchDragState.timer);
+    touchDragState.timer = null;
+  }
+  if(touchDragState.active && touchDragState.source && touchDragState.target){
+    e.preventDefault();
+    _performDropAction(touchDragState.source, touchDragState.target);
+  }
+  _resetTouchDragState();
+};
+
+_handleTouchCancel = function(){
+  _resetTouchDragState();
+};
+
+_handleContextMenu = function(e){
+  var trigger = e.target && e.target.closest ? e.target.closest('[data-context-block]') : null;
+  if(!trigger || !trigger.getAttribute('data-context-block')) return;
+  e.preventDefault();
+  state.contextMenu = {
+    blockId: trigger.getAttribute('data-context-block'),
+    x: e.clientX,
+    y: e.clientY
+  };
+  _paint();
+};
+
+function _setupKeyboardShortcuts(){
+  if(_keyboardReady) return;
+  document.addEventListener('keydown', function(e){
+    var key = String(e.key || '').toLowerCase();
+    var isMeta = e.ctrlKey || e.metaKey;
+    var target = e.target || {};
+    var tag = target.tagName ? target.tagName.toLowerCase() : '';
+    var typing = tag === 'input' || tag === 'textarea' || tag === 'select' || target.isContentEditable;
+    if(!state.container || !document.body.contains(state.container) || state.step !== 'build') return;
+    if(isMeta && key === 'z' && !e.shiftKey){ e.preventDefault(); _undo(); return; }
+    if(isMeta && (key === 'y' || (key === 'z' && e.shiftKey))){ e.preventDefault(); _redo(); return; }
+    if(isMeta && key === 's'){ e.preventDefault(); _saveModule(); return; }
+    if(typing) return;
+    if(isMeta && key === 'd' && state.selectedBlock){ e.preventDefault(); _duplicateBlock(state.selectedBlock); return; }
+    if(isMeta && key === 'c' && state.selectedBlock){ e.preventDefault(); _copyBlock(state.selectedBlock); return; }
+    if(isMeta && key === 'x' && state.selectedBlock){ e.preventDefault(); _copyBlock(state.selectedBlock); _removeBlock(state.selectedBlock); return; }
+    if(isMeta && key === 'v'){ e.preventDefault(); _pasteBlock(state.selectedBlock); return; }
+    if((key === 'delete' || key === 'backspace') && state.selectedBlock){
+      e.preventDefault();
+      if(confirm(_t('Xóa block đang chọn?', 'Delete selected block?'))) _removeBlock(state.selectedBlock);
+      return;
+    }
+    if(key === 'escape'){
+      state.selectedBlock = null;
+      state.propsDraft = null;
+      state.showLibrary = false;
+      state.contextMenu = null;
+      state.showShortcuts = false;
+      _paint();
+      return;
+    }
+    if(key === 'arrowup'){ e.preventDefault(); _navigateSelection(-1); return; }
+    if(key === 'arrowdown'){ e.preventDefault(); _navigateSelection(1); return; }
+    if(key === 'enter' && state.selectedBlock){ e.preventDefault(); _openBlockConfig(state.selectedBlock); return; }
+    if(key === 'tab'){
+      var tabs = state.schema && state.schema.tabs ? state.schema.tabs : [];
+      var index = 0;
+      e.preventDefault();
+      tabs.forEach(function(tab, idx){ if(tab.tabId === state.activeTab) index = idx; });
+      if(tabs.length){
+        state.activeTab = tabs[(index + 1) % tabs.length].tabId;
+        _paint();
+      }
+      return;
+    }
+    if(key === 'l'){ state.showLibrary = !state.showLibrary; _paint(); return; }
+    if(key === 't'){ state.showTree = !state.showTree; _paint(); }
+  });
+  _keyboardReady = true;
+}
+
+_handleClick = function(e){
+  var btn = e.target && e.target.closest ? e.target.closest('[data-action]') : null;
+  var action;
+  var blockId;
+  if(state.contextMenu && (!e.target.closest || !e.target.closest('[data-context-menu]'))){
+    state.contextMenu = null;
+    if(!btn){ _paint(); return; }
+  }
+  if(!btn) return;
+  action = btn.getAttribute('data-action');
+  blockId = btn.getAttribute('data-block');
+  if(blockId && ['delete-block', 'duplicate-block', 'move-up', 'move-down'].indexOf(action) >= 0 && _isBlockLocked(blockId)){
+    if(BE.toast) BE.toast(_t('Block đang khóa. Hãy mở khóa trong cây widget trước khi chỉnh sửa.', 'This block is locked. Unlock it in the widget tree before editing.'), 'warning');
+    return;
+  }
+  if(action === 'save-props' && _isBlockLocked(state.selectedBlock)){
+    if(BE.toast) BE.toast(_t('Block đang khóa. Hãy mở khóa trong cây widget trước khi chỉnh sửa.', 'This block is locked. Unlock it in the widget tree before editing.'), 'warning');
+    return;
+  }
+  switch(action){
+    case 'pick-icon':
+      var icon = btn.getAttribute('data-icon');
+      document.getElementById('mb-icon').value = icon;
+      state.container.querySelectorAll('[data-action="pick-icon"]').forEach(function(node){ node.style.border = ''; });
+      btn.style.border = '2px solid var(--brand-2)';
+      break;
+    case 'create-blank':
+      _createBlankModule();
+      break;
+    case 'open-module':
+      _openSavedModule(btn.getAttribute('data-id'));
+      break;
+    case 'delete-module':
+      if(confirm(_t('Xóa module này?', 'Delete this module?'))){ _deleteSavedModule(btn.getAttribute('data-id')); _paint(); }
+      break;
+    case 'switch-tab':
+      state.activeTab = btn.getAttribute('data-tab');
+      _paint();
+      break;
+    case 'add-tab':
+      var tabName = prompt(_t('Tên tab mới:', 'New tab name:'));
+      if(tabName){
+        _mutateSchema(_t('Thêm tab', 'Add tab'), function(){
+          state.schema.tabs.push({ tabId:'tab-'+Date.now().toString(36), title:{ vi:tabName, en:tabName }, icon:'', layout:{ type:'stack', columns:1, gap:'16px', align:'stretch' }, blocks:[] });
+          state.activeTab = state.schema.tabs[state.schema.tabs.length - 1].tabId;
+        });
+      }
+      break;
+    case 'remove-tab':
+      if(state.schema.tabs.length > 1 && confirm(_t('Xóa tab hiện tại?', 'Delete current tab?'))){
+        _mutateSchema(_t('Xóa tab', 'Delete tab'), function(){
+          state.schema.tabs = state.schema.tabs.filter(function(tab){ return tab.tabId !== state.activeTab; });
+          state.activeTab = state.schema.tabs[0] ? state.schema.tabs[0].tabId : null;
+          state.selectedBlock = null;
+          state.propsDraft = null;
+        });
+      }
+      break;
+    case 'set-tab-layout':
+      _mutateSchema(_t('Đổi bố cục canvas', 'Change canvas layout'), function(){
+        var tab = _getActiveTab();
+        if(!tab) return;
+        _ensureTabLayout(tab);
+        tab.layout.type = btn.getAttribute('data-layout') || 'stack';
+        if(tab.layout.type === 'grid' && (!tab.layout.columns || tab.layout.columns < 2)) tab.layout.columns = 2;
+      });
+      break;
+    case 'toggle-tree':
+      state.showTree = !state.showTree;
+      _paint();
+      break;
+    case 'toggle-shortcuts':
+      state.showShortcuts = !state.showShortcuts;
+      _paint();
+      break;
+    case 'open-library':
+      state.showLibrary = true;
+      _setInsertTarget(btn.getAttribute('data-tab') || state.activeTab, btn.getAttribute('data-parent') || null, btn.getAttribute('data-slot') || 'default', null);
+      _paint();
+      break;
+    case 'close-library':
+      state.showLibrary = false;
+      _paint();
+      break;
+    case 'add-block-type':
+      _addBlockToSchema(btn.getAttribute('data-type'));
+      state.showLibrary = false;
+      break;
+    case 'config-block':
+    case 'select-block':
+      _openBlockConfig(btn.getAttribute('data-block'));
+      break;
+    case 'props-tab':
+      state.propsTab = btn.getAttribute('data-tab') || 'general';
+      _paint();
+      break;
+    case 'close-props':
+      state.selectedBlock = null;
+      state.propsDraft = null;
+      _paint();
+      break;
+    case 'save-props':
+      _saveBlockProps();
+      state.propsDraft = null;
+      break;
+    case 'delete-block':
+      if(confirm(_t('Xóa block này?', 'Delete this block?'))) _removeBlock(btn.getAttribute('data-block'));
+      break;
+    case 'duplicate-block':
+      _duplicateBlock(btn.getAttribute('data-block'));
+      break;
+    case 'move-up':
+      _moveBlock(btn.getAttribute('data-block'), -1);
+      break;
+    case 'move-down':
+      _moveBlock(btn.getAttribute('data-block'), 1);
+      break;
+    case 'toggle-block-visibility':
+      _mutateSchema(_t('Bật / tắt hiển thị block', 'Toggle block visibility'), function(){
+        var block = _findBlock(btn.getAttribute('data-block'));
+        if(block) block.visible = block.visible === false;
+      });
+      break;
+    case 'toggle-block-lock':
+      _mutateSchema(_t('Khóa / mở khóa block', 'Toggle block lock'), function(){
+        var block = _findBlock(btn.getAttribute('data-block'));
+        if(block) block.locked = !block.locked;
+      });
+      break;
+    case 'toggle-node-collapse':
+      var collapseKey = btn.getAttribute('data-block') || '';
+      state.treeCollapsed[collapseKey] = !state.treeCollapsed[collapseKey];
+      _paint();
+      break;
+    case 'copy-block':
+      _copyBlock(btn.getAttribute('data-block'));
+      state.contextMenu = null;
+      _paint();
+      break;
+    case 'cut-block':
+      _copyBlock(btn.getAttribute('data-block'));
+      _removeBlock(btn.getAttribute('data-block'));
+      break;
+    case 'paste-block':
+      _pasteBlock(btn.getAttribute('data-block'));
+      state.contextMenu = null;
+      break;
+    case 'collection-add':
+      _collectionAdd(btn.getAttribute('data-path'));
+      _paint();
+      break;
+    case 'collection-remove':
+      _collectionRemove(btn.getAttribute('data-path'), parseInt(btn.getAttribute('data-index'), 10));
+      _paint();
+      break;
+    case 'collection-duplicate':
+      _collectionDuplicate(btn.getAttribute('data-path'), parseInt(btn.getAttribute('data-index'), 10));
+      _paint();
+      break;
+    case 'collection-up':
+      _collectionMove(btn.getAttribute('data-path'), parseInt(btn.getAttribute('data-index'), 10), -1);
+      _paint();
+      break;
+    case 'collection-down':
+      _collectionMove(btn.getAttribute('data-path'), parseInt(btn.getAttribute('data-index'), 10), 1);
+      _paint();
+      break;
+    case 'registry-retry':
+      state.registries.loading = false;
+      state.registries.loaded = false;
+      state.registries.error = '';
+      _ensureRegistriesLoaded(true);
+      _paint();
+      break;
+    case 'undo-builder':
+      _undo();
+      break;
+    case 'redo-builder':
+      _redo();
+      break;
+    case 'save-module':
+      _saveModule();
+      break;
+    case 'preview-module':
+      state.step = 'preview';
+      _paint();
+      break;
+    case 'back-build':
+      state.step = 'build';
+      _paint();
+      break;
+    case 'back-setup':
+      state.step = 'setup';
+      _paint();
+      break;
+  }
+};
+
+_handleInput = function(e){
+  var target = e.target;
+  if(target.id === 'mb-lib-search'){
+    state.librarySearch = target.value;
+    _paint();
+    return;
+  }
+  if(target.id === 'mb-layout-columns'){
+    _mutateSchema(_t('Cập nhật số cột', 'Update column count'), function(){
+      var tab = _getActiveTab();
+      if(!tab) return;
+      _ensureTabLayout(tab);
+      tab.layout.columns = parseInt(target.value, 10) || 1;
+      if(tab.layout.type !== 'grid') tab.layout.type = 'grid';
+    });
+    return;
+  }
+  if(target.id === 'mb-layout-gap'){
+    _mutateSchema(_t('Cập nhật khoảng cách canvas', 'Update canvas gap'), function(){
+      var tab = _getActiveTab();
+      if(!tab) return;
+      _ensureTabLayout(tab);
+      tab.layout.gap = target.value || '16px';
+    });
+    return;
+  }
+  if(target.hasAttribute('data-field-path')){
+    _updateDraftValue(target);
+    if(target.getAttribute('data-trigger-repaint') === '1') _paint();
+  }
+};
 
 /* ── Export ───────────────────────────────────────────────────────────────── */
 window._renderModuleBuilder = render;
