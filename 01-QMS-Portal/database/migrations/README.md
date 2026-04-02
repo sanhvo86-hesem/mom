@@ -2,7 +2,7 @@
 
 ## Overview
 
-This directory contains ordered PostgreSQL migration files that compose the full HESEM QMS Portal database schema. The monolithic `schema.sql` has been split into 24 independently runnable migration files.
+This directory contains ordered PostgreSQL migration files that compose the full HESEM QMS Portal database schema. The migration set now spans `001` through `068`, and the current world-class manufacturing expansion brings the stack to roughly `518` tables across ERP, QMS, MES, APS, PLM, WMS, HCM, CRM, TMS, trade, SRM, tooling, EHS, service, and analytics domains.
 
 ## Prerequisites
 
@@ -40,6 +40,17 @@ This directory contains ordered PostgreSQL migration files that compose the full
 | `023_rls_policies.sql` | ALL Row Level Security policies |
 | `024_seed_data.sql` | ALL seed data (departments, roles, naming patterns, KPI definitions, record counters) |
 
+## Latest Expansion Waves
+
+| Range | Description |
+|------|-------------|
+| `025`-`031` | MES world-class foundations, alarms, DPP, energy, cost |
+| `032`-`039` | Order management, exceptions, supplier quality, quoting, evidence vault, portal, CNC program management |
+| `040`-`045` | Digital product passport, AI quality + APS lite, FMEA/APQP/control plan, dispatch, shift calendar, OQC/packing |
+| `046`-`055` | Plant maintenance, APS, PLM, HCM, WMS, multi-currency/trade, project system, CRM, TMS, BI/DWH |
+| `056`-`060` | SRM, tooling lifecycle, S&OP, service/warranty, treasury/assets |
+| `061`-`068` | Quality lab/compliance, EHS/ESG, manufacturing engineering, MDM, pricing/contracts, traceability, outsource execution, advanced trade compliance |
+
 ## Running Migrations
 
 ### Using the migration script
@@ -55,12 +66,24 @@ This directory contains ordered PostgreSQL migration files that compose the full
 psql -h localhost -d qms_portal -f migrations/001_extensions_and_types.sql
 ```
 
+The script auto-discovers all `*.sql` files in `migrations/` and executes them in lexical order, so newly added zero-padded migrations do not require manual edits to the runner.
+
+### Regenerating the schema snapshot
+
+The checked-in [schema.sql](/C:/Users/TEST4/qms.hesem.com.vn/01-QMS-Portal/database/schema.sql) is now generated from the migration directory instead of being maintained manually.
+
+```bash
+php database/build_schema_snapshot.php
+```
+
+This rebuilds the snapshot from `001` through the latest migration in lexical order, which keeps `schema.sql` aligned with the actual migration source of truth.
+
 ### Manual execution
 
 Run each file in numerical order:
 
 ```bash
-for f in migrations/0*.sql; do
+for f in $(ls migrations/*.sql | sort); do
     echo "Running $f..."
     psql -h localhost -d qms_portal -f "$f"
 done
@@ -68,7 +91,7 @@ done
 
 ## Rolling Back
 
-Each migration file contains rollback instructions in comments at the bottom of the file. To rollback, execute the rollback SQL statements in reverse order (024 first, then 023, etc.).
+Each migration file contains rollback instructions in comments at the bottom of the file. To rollback, execute the rollback SQL statements in reverse order (`068` first, then `067`, and so on).
 
 ## Notes
 
@@ -76,4 +99,4 @@ Each migration file contains rollback instructions in comments at the bottom of 
 - Each migration is independently runnable given its dependencies are met
 - The `020_indexes.sql` file creates all indexes; if running tables and indexes together, you can skip the inline index creation in table files (they are duplicated in 020 for the split-file approach)
 - Partitioned tables (audit_events, inventory_transactions, labor_transactions) include partition definitions in their respective migration files
-- The schema covers 86+ tables, 8 views, 5 functions, and ~80 ENUM types mapping 1,061 variables across 53 categories
+- The current migration set expands the platform to roughly 518 tables and pushes HESEM into full-stack manufacturing ERP territory rather than a partial ERP/QMS portal

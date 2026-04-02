@@ -92,6 +92,15 @@ function api_json(array $payload, int $code = 200): void {
     @session_write_close();
   }
 
+  if (defined('API_THROW_RESPONSES') && API_THROW_RESPONSES) {
+    throw \HESEM\QMS\Api\Controllers\ExitException::json($payload, $code, [
+      'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+      'X-Content-Type-Options' => 'nosniff',
+      'X-Frame-Options' => 'SAMEORIGIN',
+      'Referrer-Policy' => 'same-origin',
+    ]);
+  }
+
   http_response_code($code);
   header('Content-Type: application/json; charset=utf-8');
   header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');

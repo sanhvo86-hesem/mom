@@ -128,6 +128,7 @@ class KnowledgeController extends BaseController
 
             $this->paginated('tips', $items, $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('knowledge_list_failed', 500, $e->getMessage());
         }
     }
@@ -176,6 +177,7 @@ class KnowledgeController extends BaseController
 
             $this->success(['tip' => $tip]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('knowledge_detail_failed', 500, $e->getMessage());
         }
     }
@@ -240,6 +242,7 @@ class KnowledgeController extends BaseController
 
             $this->success(['tip' => $tip], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('knowledge_create_failed', 500, $e->getMessage());
         }
     }
@@ -299,6 +302,7 @@ class KnowledgeController extends BaseController
 
             $this->success(['tip' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('knowledge_update_failed', 500, $e->getMessage());
         }
     }
@@ -373,6 +377,7 @@ class KnowledgeController extends BaseController
 
             $this->success(['tip' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('knowledge_vote_failed', 500, $e->getMessage());
         }
     }
@@ -441,6 +446,7 @@ class KnowledgeController extends BaseController
 
             $this->success(['comment' => $comment], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('knowledge_comment_failed', 500, $e->getMessage());
         }
     }

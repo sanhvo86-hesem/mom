@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace HESEM\QMS\Api\Middleware;
 
+use HESEM\QMS\Api\Controllers\ExitException;
+
 /**
  * Authentication middleware for HESEM QMS API.
  *
@@ -15,25 +17,48 @@ namespace HESEM\QMS\Api\Middleware;
  */
 class AuthMiddleware
 {
-    /** @var list<string> Actions that do not require authentication. */
-    private const PUBLIC_ACTIONS = [
-        'status',
-        'auth_login',
-        'auth_mfa_verify',
-        'auth_enroll_verify',
-    ];
-
     /** @var array|null Users store reference. */
     private ?array $store;
+
+    /** @var list<string> */
+    private array $publicActions;
+
+    /** @var list<string> */
+    private array $publicRoutes;
+
+    private bool $enforce;
+
+    private int $idleTimeoutSeconds;
 
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
-     * @param array|null $store Users store data.
+     * @param array|null              $store  Users store data.
+     * @param array<string, mixed>    $config Auth middleware configuration.
      */
-    public function __construct(?array $store)
+    public function __construct(?array $store, array $config = [])
     {
         $this->store = $store;
+        $this->publicActions = array_values(array_filter(array_map(
+            'strval',
+            (array)($config['public_actions'] ?? [
+                'status',
+                'auth_login',
+                'auth_mfa_verify',
+                'auth_enroll_verify',
+            ])
+        )));
+        $this->publicRoutes = array_values(array_filter(array_map(
+            static fn($route): string => strtoupper(trim((string)$route)),
+            (array)($config['public_routes'] ?? [
+                'GET /api/auth/status',
+                'POST /api/auth/login',
+                'POST /api/auth/mfa',
+                'POST /api/auth/enroll',
+            ])
+        )));
+        $this->enforce = (bool)($config['enforce_middleware'] ?? true);
+        $this->idleTimeoutSeconds = max(60, (int)($config['idle_timeout_seconds'] ?? (4 * 60 * 60)));
     }
 
     /**
@@ -43,17 +68,15 @@ class AuthMiddleware
      */
     public function handler(): callable
     {
-        $store = $this->store;
+        $self = $this;
 
-        return static function (string $action, callable $next) use ($store): void {
-            // Strip RESTful prefix for matching (e.g. "GET:/api/documents" -> just check the action)
-            $actionName = $action;
-            if (str_contains($action, ':')) {
-                $actionName = substr($action, strpos($action, ':') + 1);
+        return static function (string $action, callable $next) use ($self): void {
+            if ($self->isPublic($action)) {
+                $next();
+                return;
             }
 
-            // Skip auth for public endpoints
-            if (in_array($actionName, self::PUBLIC_ACTIONS, true)) {
+            if (!$self->enforce) {
                 $next();
                 return;
             }
@@ -64,29 +87,33 @@ class AuthMiddleware
             }
 
             // Check system initialization
-            if ($store === null) {
-                // Allow the request through; controllers will check for store
-                $next();
-                return;
+            if ($self->store === null) {
+                $self->deny('system_not_initialized', 500);
             }
 
             // Check session exists
             if (empty($_SESSION['user'])) {
-                // Allow through for status-like checks; controller handles 401
-                $next();
-                return;
+                $self->deny('unauthorized', 401);
             }
 
             // Validate idle session timeout
-            $idleLimit = 4 * 60 * 60; // 4 hours
             $now = time();
             if (isset($_SESSION['last_active'])) {
                 $last = (int)$_SESSION['last_active'];
-                if ($last > 0 && ($now - $last) > $idleLimit) {
-                    // Session expired - let controller handle the error
-                    $next();
-                    return;
+                if ($last > 0 && ($now - $last) > $self->idleTimeoutSeconds) {
+                    destroy_auth_session();
+                    $self->deny('session_expired', 401);
                 }
+            }
+
+            $user = find_user_by_username($self->store, (string)$_SESSION['user']);
+            if (!$user || !($user['active'] ?? true)) {
+                $self->deny('unauthorized', 401);
+            }
+
+            $settings = $self->store['settings'] ?? [];
+            if (session_requires_completed_mfa($user, is_array($settings) ? $settings : []) && empty($_SESSION['mfa_ok'])) {
+                $self->deny('mfa_required', 401);
             }
 
             // Update last active time
@@ -95,6 +122,37 @@ class AuthMiddleware
             // Pass through to controller
             $next();
         };
+    }
+
+    private function isPublic(string $action): bool
+    {
+        if (in_array($action, $this->publicActions, true)) {
+            return true;
+        }
+
+        if (!str_contains($action, ':')) {
+            return false;
+        }
+
+        [$method, $path] = explode(':', $action, 2);
+        $routeKey = strtolower(strtoupper(trim($method)) . ' ' . trim($path));
+
+        foreach ($this->publicRoutes as $publicRoute) {
+            if ($routeKey === strtolower($publicRoute)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function deny(string $error, int $statusCode): never
+    {
+        throw ExitException::json([
+            'ok' => false,
+            'error' => $error,
+            'server_time' => gmdate('c'),
+        ], $statusCode);
     }
 
     /**

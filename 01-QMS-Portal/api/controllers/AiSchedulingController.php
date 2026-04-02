@@ -93,6 +93,7 @@ class AiSchedulingController extends BaseController
 
             $this->paginated('predictions', $items, $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('ai_list_predictions_failed', 500, $e->getMessage());
         }
     }
@@ -145,6 +146,7 @@ class AiSchedulingController extends BaseController
 
             $this->success(['prediction' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('ai_acknowledge_failed', 500, $e->getMessage());
         }
     }
@@ -201,6 +203,7 @@ class AiSchedulingController extends BaseController
 
             $this->success(['prediction' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('ai_resolve_failed', 500, $e->getMessage());
         }
     }
@@ -248,6 +251,7 @@ class AiSchedulingController extends BaseController
 
             $this->paginated('anomalies', $items, $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('ai_spc_anomalies_failed', 500, $e->getMessage());
         }
     }
@@ -289,6 +293,7 @@ class AiSchedulingController extends BaseController
 
             $this->paginated('tool_wear', $items, $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('ai_tool_wear_failed', 500, $e->getMessage());
         }
     }
@@ -322,6 +327,7 @@ class AiSchedulingController extends BaseController
 
             $this->success(['kpis' => $kpis]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('ai_dashboard_failed', 500, $e->getMessage());
         }
     }
@@ -370,6 +376,7 @@ class AiSchedulingController extends BaseController
 
             $this->paginated('slots', $items, $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('schedule_get_failed', 500, $e->getMessage());
         }
     }
@@ -430,6 +437,7 @@ class AiSchedulingController extends BaseController
 
             $this->success(['slot' => $slot], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('schedule_create_slot_failed', 500, $e->getMessage());
         }
     }
@@ -489,6 +497,7 @@ class AiSchedulingController extends BaseController
 
             $this->success(['slot' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('schedule_update_slot_failed', 500, $e->getMessage());
         }
     }
@@ -555,6 +564,7 @@ class AiSchedulingController extends BaseController
 
             $this->success(['conflicts' => $conflicts, 'total' => count($conflicts)]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('schedule_conflicts_failed', 500, $e->getMessage());
         }
     }
@@ -607,6 +617,7 @@ class AiSchedulingController extends BaseController
 
             $this->success(['heatmap' => array_values($heatmap)]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('schedule_capacity_failed', 500, $e->getMessage());
         }
     }
@@ -679,6 +690,7 @@ class AiSchedulingController extends BaseController
 
             $this->success(['suggestion' => $suggestion]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('schedule_promise_failed', 500, $e->getMessage());
         }
     }

@@ -8,7 +8,7 @@ use HESEM\QMS\Services\MasterDataService;
 use Throwable;
 
 /**
- * Master Data Controller — CRUD for machines, parts, operators, shifts,
+ * Master Data Controller â€” CRUD for machines, parts, operators, shifts,
  * work centers, and all 30+ master data entity types.
  */
 class MasterDataController extends BaseController
@@ -64,10 +64,10 @@ class MasterDataController extends BaseController
         return $dir;
     }
 
-    // ── Generic Master Data CRUD ────────────────────────────────────────
+    // â”€â”€ Generic Master Data CRUD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * GET list — List records for any entity type.
+     * GET list â€” List records for any entity type.
      * Query: entity (required), search, status, offset, limit
      */
     public function listRecords(): never
@@ -102,12 +102,13 @@ class MasterDataController extends BaseController
 
             $this->paginated($entity, array_slice(array_values($all), $offset, $limit), count($all), $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('list_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET detail — Get single record.
+     * GET detail â€” Get single record.
      * Query: entity, id (required)
      */
     public function getDetail(): never
@@ -123,12 +124,13 @@ class MasterDataController extends BaseController
             if (!$record) $this->error('not_found', 404);
             $this->success(['record' => $record]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('detail_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST create — Create new master data record.
+     * POST create â€” Create new master data record.
      * Body: entity (required), data (required)
      */
     public function createRecord(): never
@@ -153,12 +155,13 @@ class MasterDataController extends BaseController
             $this->auditLog('master_data_create', ['entity' => $entity], $uid);
             $this->success(['record' => $result->data ?? $data], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('create_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST update — Update existing master data record.
+     * POST update â€” Update existing master data record.
      * Body: entity, id, data (required)
      */
     public function updateRecord(): never
@@ -185,12 +188,13 @@ class MasterDataController extends BaseController
             $this->auditLog('master_data_update', ['entity' => $entity, 'id' => $id], $uid);
             $this->success(['record' => $result->data ?? $data]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('update_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST delete — Delete master data record (with referential integrity check).
+     * POST delete â€” Delete master data record (with referential integrity check).
      * Body: entity, id (required)
      */
     public function deleteRecord(): never
@@ -219,12 +223,13 @@ class MasterDataController extends BaseController
             $this->auditLog('master_data_delete', ['entity' => $entity, 'id' => $id], $uid);
             $this->success(['deleted' => true]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('delete_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST changeStatus — Change status of a master data record.
+     * POST changeStatus â€” Change status of a master data record.
      * Body: entity, id, target_status (required)
      */
     public function changeStatus(): never
@@ -246,12 +251,13 @@ class MasterDataController extends BaseController
             $this->auditLog('master_data_status_change', ['entity' => $entity, 'id' => $id, 'status' => $target], $uid);
             $this->success(['record' => $result]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('status_change_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET history — Get change history for a record.
+     * GET history â€” Get change history for a record.
      */
     public function getHistory(): never
     {
@@ -264,43 +270,44 @@ class MasterDataController extends BaseController
             $history = $this->mdService()->getHistory($entity, $id);
             $this->success(['history' => $history]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('history_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET entities — List all available entity types with labels.
+     * GET entities â€” List all available entity types with labels.
      */
     public function listEntities(): never
     {
         $this->requireAuth();
 
         $entities = [
-            ['key' => 'machines',           'label' => 'Máy', 'label_en' => 'Machines', 'icon' => '🏭'],
-            ['key' => 'work_centers',       'label' => 'Work Center', 'label_en' => 'Work Centers', 'icon' => '🔧'],
-            ['key' => 'parts',              'label' => 'Chi tiết / Part Number', 'label_en' => 'Parts', 'icon' => '⚙'],
-            ['key' => 'revisions',          'label' => 'Revision', 'label_en' => 'Revisions', 'icon' => '🔄'],
-            ['key' => 'operators',          'label' => 'Người vận hành', 'label_en' => 'Operators', 'icon' => '👷'],
-            ['key' => 'customers',          'label' => 'Khách hàng', 'label_en' => 'Customers', 'icon' => '🏢'],
-            ['key' => 'suppliers',          'label' => 'Nhà cung cấp', 'label_en' => 'Suppliers', 'icon' => '🚚'],
-            ['key' => 'routing_library',    'label' => 'Routing', 'label_en' => 'Routings', 'icon' => '🛤'],
-            ['key' => 'bom_library',        'label' => 'BOM', 'label_en' => 'Bill of Materials', 'icon' => '📋'],
-            ['key' => 'control_plans',      'label' => 'Control Plan', 'label_en' => 'Control Plans', 'icon' => '📊'],
-            ['key' => 'inspection_plans',   'label' => 'Kế hoạch kiểm tra', 'label_en' => 'Inspection Plans', 'icon' => '🔍'],
-            ['key' => 'tooling_assets',     'label' => 'Dụng cụ cắt', 'label_en' => 'Tooling Assets', 'icon' => '🔩'],
-            ['key' => 'defect_catalog',     'label' => 'Danh mục lỗi', 'label_en' => 'Defect Catalog', 'icon' => '🐛'],
-            ['key' => 'shipping_methods',   'label' => 'Phương thức giao', 'label_en' => 'Shipping Methods', 'icon' => '📦'],
-            ['key' => 'payment_terms',      'label' => 'Điều khoản thanh toán', 'label_en' => 'Payment Terms', 'icon' => '💳'],
-            ['key' => 'incoterms',          'label' => 'Incoterms', 'label_en' => 'Incoterms', 'icon' => '🌍'],
+            ['key' => 'machines',           'label' => 'MÃ¡y', 'label_en' => 'Machines', 'icon' => 'ðŸ­'],
+            ['key' => 'work_centers',       'label' => 'Work Center', 'label_en' => 'Work Centers', 'icon' => 'ðŸ”§'],
+            ['key' => 'parts',              'label' => 'Chi tiáº¿t / Part Number', 'label_en' => 'Parts', 'icon' => 'âš™'],
+            ['key' => 'revisions',          'label' => 'Revision', 'label_en' => 'Revisions', 'icon' => 'ðŸ”„'],
+            ['key' => 'operators',          'label' => 'NgÆ°á»i váº­n hÃ nh', 'label_en' => 'Operators', 'icon' => 'ðŸ‘·'],
+            ['key' => 'customers',          'label' => 'KhÃ¡ch hÃ ng', 'label_en' => 'Customers', 'icon' => 'ðŸ¢'],
+            ['key' => 'suppliers',          'label' => 'NhÃ  cung cáº¥p', 'label_en' => 'Suppliers', 'icon' => 'ðŸšš'],
+            ['key' => 'routing_library',    'label' => 'Routing', 'label_en' => 'Routings', 'icon' => 'ðŸ›¤'],
+            ['key' => 'bom_library',        'label' => 'BOM', 'label_en' => 'Bill of Materials', 'icon' => 'ðŸ“‹'],
+            ['key' => 'control_plans',      'label' => 'Control Plan', 'label_en' => 'Control Plans', 'icon' => 'ðŸ“Š'],
+            ['key' => 'inspection_plans',   'label' => 'Káº¿ hoáº¡ch kiá»ƒm tra', 'label_en' => 'Inspection Plans', 'icon' => 'ðŸ”'],
+            ['key' => 'tooling_assets',     'label' => 'Dá»¥ng cá»¥ cáº¯t', 'label_en' => 'Tooling Assets', 'icon' => 'ðŸ”©'],
+            ['key' => 'defect_catalog',     'label' => 'Danh má»¥c lá»—i', 'label_en' => 'Defect Catalog', 'icon' => 'ðŸ›'],
+            ['key' => 'shipping_methods',   'label' => 'PhÆ°Æ¡ng thá»©c giao', 'label_en' => 'Shipping Methods', 'icon' => 'ðŸ“¦'],
+            ['key' => 'payment_terms',      'label' => 'Äiá»u khoáº£n thanh toÃ¡n', 'label_en' => 'Payment Terms', 'icon' => 'ðŸ’³'],
+            ['key' => 'incoterms',          'label' => 'Incoterms', 'label_en' => 'Incoterms', 'icon' => 'ðŸŒ'],
         ];
 
         $this->success(['entities' => $entities]);
     }
 
-    // ── Shift Management ────────────────────────────────────────────────
+    // â”€â”€ Shift Management â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * GET listShifts — List all shift definitions.
+     * GET listShifts â€” List all shift definitions.
      */
     public function listShifts(): never
     {
@@ -334,12 +341,13 @@ class MasterDataController extends BaseController
 
             $this->success(['shifts' => array_values($shifts ?: [])]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('shifts_list_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST saveShift — Create or update a shift definition.
+     * POST saveShift â€” Create or update a shift definition.
      */
     public function saveShift(): never
     {
@@ -387,12 +395,13 @@ class MasterDataController extends BaseController
             $this->auditLog('shift_save', ['shift_code' => $code], $uid);
             $this->success(['shift' => $shift]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('shift_save_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET listShiftAssignments — Get shift assignments for operators.
+     * GET listShiftAssignments â€” Get shift assignments for operators.
      * Query: employee_id, start_date, end_date
      */
     public function listShiftAssignments(): never
@@ -416,12 +425,13 @@ class MasterDataController extends BaseController
 
             $this->success(['assignments' => array_values($filtered)]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('assignments_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST saveShiftAssignment — Assign operator to shift.
+     * POST saveShiftAssignment â€” Assign operator to shift.
      */
     public function saveShiftAssignment(): never
     {
@@ -465,12 +475,13 @@ class MasterDataController extends BaseController
 
             $this->success(['assignment' => $assignment], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('assignment_save_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET listHolidays — Get holiday calendar.
+     * GET listHolidays â€” Get holiday calendar.
      */
     public function listHolidays(): never
     {
@@ -481,12 +492,13 @@ class MasterDataController extends BaseController
             $holidays = $this->readJsonFile($file) ?? [];
             $this->success(['holidays' => array_values($holidays)]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('holidays_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST saveHoliday — Add or update a holiday.
+     * POST saveHoliday â€” Add or update a holiday.
      */
     public function saveHoliday(): never
     {
@@ -529,6 +541,7 @@ class MasterDataController extends BaseController
             $this->auditLog('holiday_save', ['date' => $date, 'name' => $holiday['holiday_name']], $uid);
             $this->success(['holiday' => $holiday]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('holiday_save_failed', 500, $e->getMessage());
         }
     }

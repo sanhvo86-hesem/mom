@@ -175,6 +175,7 @@ class EnergyController extends BaseController
                 'machines' => $machineList,
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('energy_overview_failed', 500, $e->getMessage());
         }
     }
@@ -270,6 +271,7 @@ class EnergyController extends BaseController
 
             $this->success(['machine_detail' => $detail]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('energy_machine_detail_failed', 500, $e->getMessage());
         }
     }
@@ -355,6 +357,7 @@ class EnergyController extends BaseController
                 'total_parts'     => count($partList),
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('energy_per_part_failed', 500, $e->getMessage());
         }
     }
@@ -428,6 +431,7 @@ class EnergyController extends BaseController
                 'months'     => $months,
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('energy_cost_trend_failed', 500, $e->getMessage());
         }
     }

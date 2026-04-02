@@ -6,6 +6,7 @@ namespace HESEM\QMS\Api\Controllers;
 
 use HESEM\QMS\Database\DataLayer;
 use RuntimeException;
+use Throwable;
 
 /**
  * Base controller with shared utilities for all QMS API controllers.
@@ -140,17 +141,8 @@ abstract class BaseController
      */
     protected function json(array $payload, int $code = 200): never
     {
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            @session_write_close();
-        }
-        http_response_code($code);
-        header('Content-Type: application/json; charset=utf-8');
-        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
-        header('X-Content-Type-Options: nosniff');
-        header('X-Frame-Options: SAMEORIGIN');
-        header('Referrer-Policy: same-origin');
-        echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        exit;
+        api_json($payload, $code);
+        throw new RuntimeException('api_json did not terminate the request');
     }
 
     /**
@@ -182,6 +174,13 @@ abstract class BaseController
         }
         $payload['server_time'] = $this->nowIso();
         $this->json($payload, $code);
+    }
+
+    protected function rethrowResponse(Throwable $e): void
+    {
+        if ($e instanceof ExitException) {
+            throw $e;
+        }
     }
 
     /**

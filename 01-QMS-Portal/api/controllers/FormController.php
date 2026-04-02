@@ -18,7 +18,7 @@ use Throwable;
 class FormController extends BaseController
 {
     /**
-     * GET list — List available online forms.
+     * GET list â€” List available online forms.
      *
      * Legacy action: `online_form_list`
      *
@@ -48,7 +48,7 @@ class FormController extends BaseController
     }
 
     /**
-     * GET getSchema — Get the JSON schema for a specific form.
+     * GET getSchema â€” Get the JSON schema for a specific form.
      *
      * Legacy action: `online_form_schema`
      *
@@ -81,7 +81,7 @@ class FormController extends BaseController
     }
 
     /**
-     * POST submit — Submit a new form entry.
+     * POST submit â€” Submit a new form entry.
      *
      * Legacy action: `online_form_submit`
      *
@@ -132,7 +132,7 @@ class FormController extends BaseController
     }
 
     /**
-     * GET getEntries — Get all entries for a specific form.
+     * GET getEntries â€” Get all entries for a specific form.
      *
      * Legacy action: `online_form_entries`
      *
@@ -156,7 +156,7 @@ class FormController extends BaseController
     }
 
     /**
-     * GET getIdRegistry — Get the record ID registry (counter state).
+     * GET getIdRegistry â€” Get the record ID registry (counter state).
      *
      * Legacy action: `record_id_registry`
      *
@@ -173,7 +173,7 @@ class FormController extends BaseController
     }
 
     /**
-     * GET configRecordTypes — Return record type registry configuration.
+     * GET configRecordTypes â€” Return record type registry configuration.
      *
      * Legacy action: `config_record_types`
      *
@@ -186,7 +186,7 @@ class FormController extends BaseController
     }
 
     /**
-     * POST getNextId — Generate and consume the next record ID.
+     * POST getNextId â€” Generate and consume the next record ID.
      *
      * Legacy action: `record_id_next`
      *
@@ -221,7 +221,7 @@ class FormController extends BaseController
     }
 
     /**
-     * GET peekNextId — Preview the next record ID without consuming it.
+     * GET peekNextId â€” Preview the next record ID without consuming it.
      *
      * Legacy action: `record_id_peek`
      *
@@ -250,7 +250,7 @@ class FormController extends BaseController
     }
 
     /**
-     * GET streamVersion — Stream a specific form version file.
+     * GET streamVersion â€” Stream a specific form version file.
      *
      * Legacy action: `form_version_stream`
      *
@@ -291,7 +291,7 @@ class FormController extends BaseController
     }
 
     /**
-     * POST uploadDraft — Upload a workbook file as a form draft.
+     * POST uploadDraft â€” Upload a workbook file as a form draft.
      *
      * Legacy action: `form_upload_draft`
      *
@@ -423,6 +423,7 @@ class FormController extends BaseController
                     $oldPrivateAbs = form_resolve_private_abs($this->dataDir, $oldPrivateRel);
                     if (is_file($oldPrivateAbs)) @unlink($oldPrivateAbs);
                 } catch (Throwable $e) {
+                    $this->rethrowResponse($e);
                     // ignore stale file
                 }
             }

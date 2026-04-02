@@ -23,7 +23,7 @@ class CncProgramController extends BaseController
     /** @var string Base directory for CNC program data. */
     private string $cncDir = '';
 
-    // ── Helpers ─────────────────────────────────────────────────────────────
+    // â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * Get the CNC programs data directory, creating it on first use.
@@ -52,10 +52,10 @@ class CncProgramController extends BaseController
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
     }
 
-    // ── Endpoints ───────────────────────────────────────────────────────────
+    // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * GET listPrograms — List CNC programs with optional filters.
+     * GET listPrograms â€” List CNC programs with optional filters.
      *
      * Query params:
      *   - machine    (string, optional)
@@ -97,12 +97,13 @@ class CncProgramController extends BaseController
 
             $this->paginated('programs', $items, $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('cnc_list_programs_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getDetail — Get a single CNC program with version history.
+     * GET getDetail â€” Get a single CNC program with version history.
      *
      * Query params:
      *   - id (string, required)
@@ -145,12 +146,13 @@ class CncProgramController extends BaseController
 
             $this->success(['program' => $program]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('cnc_detail_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST create — Create a CNC program record.
+     * POST create â€” Create a CNC program record.
      *
      * Body fields:
      *   - name        (string, required)
@@ -205,12 +207,13 @@ class CncProgramController extends BaseController
 
             $this->success(['program' => $program], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('cnc_create_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST update — Update a CNC program record.
+     * POST update â€” Update a CNC program record.
      *
      * Body fields:
      *   - id (string, required)
@@ -264,12 +267,13 @@ class CncProgramController extends BaseController
 
             $this->success(['program' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('cnc_update_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST addVersion — Upload a new version for a CNC program.
+     * POST addVersion â€” Upload a new version for a CNC program.
      *
      * Body fields:
      *   - program_id  (string, required)
@@ -330,12 +334,13 @@ class CncProgramController extends BaseController
 
             $this->success(['version' => $version], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('cnc_add_version_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET listApprovals — List pending CNC program approvals.
+     * GET listApprovals â€” List pending CNC program approvals.
      *
      * Query params:
      *   - status (string, optional): pending_approval, approved, rejected.
@@ -365,12 +370,13 @@ class CncProgramController extends BaseController
 
             $this->paginated('approvals', $items, $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('cnc_list_approvals_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST approve — Approve or reject a CNC program version.
+     * POST approve â€” Approve or reject a CNC program version.
      *
      * Body fields:
      *   - version_id (string, required)
@@ -432,12 +438,13 @@ class CncProgramController extends BaseController
 
             $this->success(['approval' => $approval]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('cnc_approve_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET listSetupSheets — List setup sheets.
+     * GET listSetupSheets â€” List setup sheets.
      *
      * Query params:
      *   - program_id (string, optional)
@@ -472,12 +479,13 @@ class CncProgramController extends BaseController
 
             $this->paginated('setup_sheets', $items, $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('cnc_list_setup_sheets_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST createSetupSheet — Create a setup sheet.
+     * POST createSetupSheet â€” Create a setup sheet.
      *
      * Body fields:
      *   - program_id (string, required)
@@ -526,12 +534,13 @@ class CncProgramController extends BaseController
 
             $this->success(['setup_sheet' => $sheet], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('cnc_create_setup_sheet_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST updateSetupSheet — Update a setup sheet.
+     * POST updateSetupSheet â€” Update a setup sheet.
      *
      * Body fields:
      *   - id (string, required)
@@ -584,6 +593,7 @@ class CncProgramController extends BaseController
 
             $this->success(['setup_sheet' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('cnc_update_setup_sheet_failed', 500, $e->getMessage());
         }
     }

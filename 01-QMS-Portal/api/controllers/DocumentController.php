@@ -19,7 +19,7 @@ use Throwable;
 class DocumentController extends BaseController
 {
     /**
-     * POST create — Create a new document with initial draft.
+     * POST create â€” Create a new document with initial draft.
      *
      * Legacy action: `doc_create`
      *
@@ -163,13 +163,14 @@ class DocumentController extends BaseController
                 'draft_rel' => $draftRel,
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             if ($e instanceof \HESEM\QMS\Api\Controllers\ExitException) throw $e;
             $this->error('doc_create_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST saveDraft — Save a working draft of a document.
+     * POST saveDraft â€” Save a working draft of a document.
      *
      * Legacy action: `doc_save_draft`
      *
@@ -244,7 +245,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * POST submitReview — Submit a document for review/approval.
+     * POST submitReview â€” Submit a document for review/approval.
      *
      * Legacy action: `doc_submit_review`
      *
@@ -310,7 +311,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * POST approve — Approve a document (releases it).
+     * POST approve â€” Approve a document (releases it).
      *
      * Legacy action: `doc_approve`
      *
@@ -357,6 +358,7 @@ class DocumentController extends BaseController
                             break;
                         }
                     } catch (Throwable $e) {
+                        $this->rethrowResponse($e);
                         // skip
                     }
                 }
@@ -417,7 +419,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * POST reject — Reject a document review submission.
+     * POST reject â€” Reject a document review submission.
      *
      * Legacy action: `doc_reject`
      *
@@ -474,7 +476,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * POST updateMeta — Update document metadata (title, owner, etc.).
+     * POST updateMeta â€” Update document metadata (title, owner, etc.).
      *
      * Legacy action: `doc_update_meta`
      *
@@ -516,7 +518,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * POST deleteDrafts — Delete all draft versions of a document.
+     * POST deleteDrafts â€” Delete all draft versions of a document.
      *
      * Legacy action: `doc_delete_drafts`
      *
@@ -556,6 +558,7 @@ class DocumentController extends BaseController
                             @unlink($abs);
                         }
                     } catch (Throwable $e) {
+                        $this->rethrowResponse($e);
                         // skip
                     }
                 }
@@ -581,7 +584,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * POST deleteVersion — Delete a specific version entry.
+     * POST deleteVersion â€” Delete a specific version entry.
      *
      * Legacy action: `doc_delete_version`
      *
@@ -638,7 +641,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * GET listVersions — List all version entries for a document.
+     * GET listVersions â€” List all version entries for a document.
      *
      * Legacy action: `doc_versions_list`
      *
@@ -668,7 +671,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * POST startNewRevision — Start a new revision cycle for a document.
+     * POST startNewRevision â€” Start a new revision cycle for a document.
      *
      * Legacy action: `doc_start_new_revision`
      *
@@ -746,7 +749,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * GET stream — Stream a document file for viewing/download.
+     * GET stream â€” Stream a document file for viewing/download.
      *
      * Legacy action: `doc_stream`
      *
@@ -788,7 +791,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * GET listCustom — List documents visible to the current user.
+     * GET listCustom â€” List documents visible to the current user.
      *
      * Legacy action: `docs_custom_list`
      *
@@ -813,7 +816,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * GET getDescriptions — Get document descriptions from custom docs.
+     * GET getDescriptions â€” Get document descriptions from custom docs.
      *
      * Legacy action: `doc_descriptions_get`
      *
@@ -839,7 +842,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * POST saveDescription — Save a document description.
+     * POST saveDescription â€” Save a document description.
      *
      * Legacy action: `save_doc_description`
      *
@@ -864,7 +867,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * GET getVisibility — Get hidden document codes.
+     * GET getVisibility â€” Get hidden document codes.
      *
      * Legacy action: `docs_visibility_get`
      *
@@ -881,7 +884,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * POST saveVisibility — Save document visibility settings.
+     * POST saveVisibility â€” Save document visibility settings.
      *
      * Legacy action: `admin_docs_visibility_save`
      *
@@ -910,7 +913,7 @@ class DocumentController extends BaseController
         $this->success(['hidden' => array_values(array_unique($clean))]);
     }
 
-    // ── Private Helpers ─────────────────────────────────────────────────────
+    // â”€â”€ Private Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * Try to resolve a subfolder matching the doc code pattern.
@@ -1072,7 +1075,7 @@ class DocumentController extends BaseController
     }
 
     /**
-     * POST docsSnapshot — Batch-fetch document/form states for a list of codes.
+     * POST docsSnapshot â€” Batch-fetch document/form states for a list of codes.
      *
      * Legacy action: `docs_snapshot`
      *
@@ -1085,7 +1088,7 @@ class DocumentController extends BaseController
     {
         $this->requireAuth();
 
-        // Release session lock early — this action can be heavy.
+        // Release session lock early â€” this action can be heavy.
         if (session_status() === PHP_SESSION_ACTIVE) {
             @session_write_close();
         }

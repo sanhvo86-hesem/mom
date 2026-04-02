@@ -112,6 +112,7 @@ class ComplianceReportController extends BaseController
 
             $this->success(['report_types' => $types]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('compliance_report_types_failed', 500, $e->getMessage());
         }
     }
@@ -168,6 +169,7 @@ class ComplianceReportController extends BaseController
 
             $this->success(['report' => $report], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('compliance_generate_failed', 500, $e->getMessage());
         }
     }
@@ -212,6 +214,7 @@ class ComplianceReportController extends BaseController
 
             $this->paginated('reports', $items, $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('compliance_history_failed', 500, $e->getMessage());
         }
     }
@@ -260,6 +263,7 @@ class ComplianceReportController extends BaseController
 
             $this->success(['management_review' => $data]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('compliance_mgmt_review_failed', 500, $e->getMessage());
         }
     }
@@ -305,6 +309,7 @@ class ComplianceReportController extends BaseController
 
             $this->success(['customer_quality' => $data]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('compliance_customer_quality_failed', 500, $e->getMessage());
         }
     }
@@ -353,6 +358,7 @@ class ComplianceReportController extends BaseController
 
             $this->success(['supplier_review' => $data]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('compliance_supplier_review_failed', 500, $e->getMessage());
         }
     }
@@ -415,6 +421,7 @@ class ComplianceReportController extends BaseController
 
             $this->success(['copq' => $data]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('compliance_copq_failed', 500, $e->getMessage());
         }
     }
@@ -491,6 +498,7 @@ class ComplianceReportController extends BaseController
 
             $this->success(['evidence_package' => $package]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('compliance_evidence_package_failed', 500, $e->getMessage());
         }
     }

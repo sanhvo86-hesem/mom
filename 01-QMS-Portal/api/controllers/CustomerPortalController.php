@@ -23,7 +23,7 @@ class CustomerPortalController extends BaseController
     /** @var string Base directory for customer portal data. */
     private string $portalDir = '';
 
-    // ── Helpers ─────────────────────────────────────────────────────────────
+    // â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * Get the portal data directory, creating it on first use.
@@ -52,10 +52,10 @@ class CustomerPortalController extends BaseController
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
     }
 
-    // ── Endpoints ───────────────────────────────────────────────────────────
+    // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * GET listUsers — List portal users.
+     * GET listUsers â€” List portal users.
      *
      * Query params:
      *   - status  (string, optional): active, inactive.
@@ -85,12 +85,13 @@ class CustomerPortalController extends BaseController
 
             $this->paginated('users', $items, $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('portal_list_users_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST createUser — Create a portal user.
+     * POST createUser â€” Create a portal user.
      *
      * Body fields:
      *   - email       (string, required)
@@ -136,12 +137,13 @@ class CustomerPortalController extends BaseController
 
             $this->success(['user' => $newUser], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('portal_create_user_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST updateUser — Update a portal user.
+     * POST updateUser â€” Update a portal user.
      *
      * Body fields:
      *   - id     (string, required)
@@ -195,12 +197,13 @@ class CustomerPortalController extends BaseController
 
             $this->success(['user' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('portal_update_user_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET listAccessGrants — List access grants.
+     * GET listAccessGrants â€” List access grants.
      *
      * Query params:
      *   - portal_user_id (string, optional)
@@ -242,12 +245,13 @@ class CustomerPortalController extends BaseController
 
             $this->paginated('access_grants', $items, $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('portal_list_access_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST grantAccess — Grant SO visibility to a portal user.
+     * POST grantAccess â€” Grant SO visibility to a portal user.
      *
      * Body fields:
      *   - portal_user_id (string, required)
@@ -291,12 +295,13 @@ class CustomerPortalController extends BaseController
 
             $this->success(['access' => $grant], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('portal_grant_access_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST revokeAccess — Revoke SO access from a portal user.
+     * POST revokeAccess â€” Revoke SO access from a portal user.
      *
      * Body fields:
      *   - id (string, required): Access grant ID.
@@ -341,12 +346,13 @@ class CustomerPortalController extends BaseController
 
             $this->success(['access' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('portal_revoke_access_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET listComplaints — List portal complaint submissions.
+     * GET listComplaints â€” List portal complaint submissions.
      *
      * Query params:
      *   - portal_user_id (string, optional)
@@ -382,12 +388,13 @@ class CustomerPortalController extends BaseController
 
             $this->paginated('complaints', $items, $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('portal_list_complaints_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST linkComplaint — Link a portal complaint to an internal 8D.
+     * POST linkComplaint â€” Link a portal complaint to an internal 8D.
      *
      * Body fields:
      *   - complaint_id (string, required): Portal complaint ID.
@@ -437,12 +444,13 @@ class CustomerPortalController extends BaseController
 
             $this->success(['complaint' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('portal_link_complaint_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET listDocAccess — Document access tracking.
+     * GET listDocAccess â€” Document access tracking.
      *
      * Query params:
      *   - portal_user_id (string, optional)
@@ -471,12 +479,13 @@ class CustomerPortalController extends BaseController
 
             $this->paginated('doc_access', $items, $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('portal_list_doc_access_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getAnalytics — Portal usage KPIs.
+     * GET getAnalytics â€” Portal usage KPIs.
      *
      * Returns active users count, total logins, complaints submitted,
      * documents accessed, average response time.
@@ -511,6 +520,7 @@ class CustomerPortalController extends BaseController
 
             $this->success(['kpis' => $kpis]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('portal_analytics_failed', 500, $e->getMessage());
         }
     }

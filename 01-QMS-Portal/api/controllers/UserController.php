@@ -18,7 +18,7 @@ use Throwable;
 class UserController extends BaseController
 {
     /**
-     * GET list — List all users (admin only).
+     * GET list â€” List all users (admin only).
      *
      * Legacy action: `admin_users_list`
      *
@@ -40,7 +40,7 @@ class UserController extends BaseController
     }
 
     /**
-     * POST upsert — Create or update a user (admin only).
+     * POST upsert â€” Create or update a user (admin only).
      *
      * Legacy action: `admin_user_upsert`
      *
@@ -114,6 +114,7 @@ class UserController extends BaseController
         try {
             users_save($usersFile, $this->store);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('save_failed', 500, $e->getMessage());
         }
 
@@ -122,7 +123,7 @@ class UserController extends BaseController
     }
 
     /**
-     * POST delete — Delete a user (admin only).
+     * POST delete â€” Delete a user (admin only).
      *
      * Legacy action: `admin_user_delete`
      *
@@ -153,6 +154,7 @@ class UserController extends BaseController
         try {
             users_save($usersFile, $this->store);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('save_failed', 500, $e->getMessage());
         }
 
@@ -161,7 +163,7 @@ class UserController extends BaseController
     }
 
     /**
-     * POST resetPassword — Reset a user's password (admin only).
+     * POST resetPassword â€” Reset a user's password (admin only).
      *
      * Legacy action: `admin_user_reset_password`
      *
@@ -196,6 +198,7 @@ class UserController extends BaseController
         try {
             users_save($usersFile, $this->store);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('save_failed', 500, $e->getMessage());
         }
 
@@ -207,7 +210,7 @@ class UserController extends BaseController
     }
 
     /**
-     * GET getPermissions — Get role permission configuration.
+     * GET getPermissions â€” Get role permission configuration.
      *
      * Legacy action: `role_perms_get`
      *
@@ -224,7 +227,7 @@ class UserController extends BaseController
     }
 
     /**
-     * POST savePermissions — Save role permission configuration (admin only).
+     * POST savePermissions â€” Save role permission configuration (admin only).
      *
      * Legacy action: `admin_role_perms_save`
      *

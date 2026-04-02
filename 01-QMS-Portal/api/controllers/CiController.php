@@ -124,6 +124,7 @@ class CiController extends BaseController
 
             $this->success(['kpis' => $kpis]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('ci_dashboard_failed', 500, $e->getMessage());
         }
     }
@@ -168,6 +169,7 @@ class CiController extends BaseController
 
             $this->paginated('suggestions', $items, $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('ci_list_suggestions_failed', 500, $e->getMessage());
         }
     }
@@ -227,6 +229,7 @@ class CiController extends BaseController
 
             $this->success(['suggestion' => $suggestion], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('ci_create_suggestion_failed', 500, $e->getMessage());
         }
     }
@@ -278,6 +281,7 @@ class CiController extends BaseController
 
             $this->paginated('projects', $items, $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('ci_list_projects_failed', 500, $e->getMessage());
         }
     }
@@ -368,6 +372,7 @@ class CiController extends BaseController
 
             $this->success(['project' => $project], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('ci_create_project_failed', 500, $e->getMessage());
         }
     }
@@ -436,6 +441,7 @@ class CiController extends BaseController
 
             $this->success(['project' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('ci_update_project_failed', 500, $e->getMessage());
         }
     }
@@ -524,6 +530,7 @@ class CiController extends BaseController
 
             $this->success(['project' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('ci_transition_failed', 500, $e->getMessage());
         }
     }
@@ -582,6 +589,7 @@ class CiController extends BaseController
 
             $this->success(['roi_summary' => $summary]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('ci_roi_summary_failed', 500, $e->getMessage());
         }
     }

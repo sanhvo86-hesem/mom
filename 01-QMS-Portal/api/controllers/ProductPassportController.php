@@ -23,7 +23,7 @@ class ProductPassportController extends BaseController
     /** @var string Base directory for passport data. */
     private string $passportDir = '';
 
-    // ── Helpers ─────────────────────────────────────────────────────────────
+    // â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * Get the passport data directory, creating it on first use.
@@ -52,10 +52,10 @@ class ProductPassportController extends BaseController
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
     }
 
-    // ── Endpoints ───────────────────────────────────────────────────────────
+    // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * GET listPassports — List passports with optional filters.
+     * GET listPassports â€” List passports with optional filters.
      *
      * Query params:
      *   - part_id    (string, optional)
@@ -103,12 +103,13 @@ class ProductPassportController extends BaseController
 
             $this->paginated('passports', $items, $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('passport_list_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getDetail — Get full passport with lifecycle events.
+     * GET getDetail â€” Get full passport with lifecycle events.
      *
      * Query params:
      *   - id (string, required)
@@ -151,12 +152,13 @@ class ProductPassportController extends BaseController
 
             $this->success(['passport' => $passport]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('passport_detail_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST create — Create a digital product passport.
+     * POST create â€” Create a digital product passport.
      *
      * Body fields:
      *   - part_id     (string, required)
@@ -211,12 +213,13 @@ class ProductPassportController extends BaseController
 
             $this->success(['passport' => $passport], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('passport_create_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST addEvent — Add a lifecycle event to a passport.
+     * POST addEvent â€” Add a lifecycle event to a passport.
      *
      * Body fields:
      *   - passport_id (string, required)
@@ -263,12 +266,13 @@ class ProductPassportController extends BaseController
 
             $this->success(['event' => $event], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('passport_add_event_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET trace — Forward/backward genealogy trace.
+     * GET trace â€” Forward/backward genealogy trace.
      *
      * Query params:
      *   - id        (string, required): Passport ID.
@@ -348,12 +352,13 @@ class ProductPassportController extends BaseController
                 'backward' => $backward,
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('passport_trace_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getQrData — QR code data for a passport.
+     * GET getQrData â€” QR code data for a passport.
      *
      * Query params:
      *   - id (string, required)
@@ -400,6 +405,7 @@ class ProductPassportController extends BaseController
 
             $this->success(['qr_data' => $qrData]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('passport_qr_data_failed', 500, $e->getMessage());
         }
     }

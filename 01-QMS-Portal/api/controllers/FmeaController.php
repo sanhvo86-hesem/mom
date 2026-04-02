@@ -29,7 +29,7 @@ class FmeaController extends BaseController
     /** @var array|null Cached FMEA access-control config. */
     private ?array $fmeaConfig = null;
 
-    // ── Service Access ──────────────────────────────────────────────────────
+    // â”€â”€ Service Access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * Get or create the FmeaService instance.
@@ -113,10 +113,10 @@ class FmeaController extends BaseController
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
     }
 
-    // ── Endpoints ───────────────────────────────────────────────────────────
+    // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * GET listFmeas — List FMEA records with optional filters.
+     * GET listFmeas â€” List FMEA records with optional filters.
      *
      * Query params:
      *   - type   (string, optional): DFMEA or PFMEA.
@@ -159,12 +159,13 @@ class FmeaController extends BaseController
 
             $this->paginated('fmeas', array_values($items), $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('fmea_list_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getFmeaDetail — Get a single FMEA with all failure modes and actions.
+     * GET getFmeaDetail â€” Get a single FMEA with all failure modes and actions.
      *
      * Query params:
      *   - fmea_id (string, required): FMEA record ID.
@@ -191,12 +192,13 @@ class FmeaController extends BaseController
 
             $this->success(['fmea' => $record]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('fmea_detail_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST createFmea — Create a new FMEA record.
+     * POST createFmea â€” Create a new FMEA record.
      *
      * Body fields:
      *   - type         (string, required): DFMEA or PFMEA.
@@ -235,12 +237,13 @@ class FmeaController extends BaseController
 
             $this->success(['fmea' => $fmea], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('fmea_create_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST updateFmea — Update an existing FMEA record.
+     * POST updateFmea â€” Update an existing FMEA record.
      *
      * Body fields:
      *   - fmea_id (string, required): FMEA record ID.
@@ -273,12 +276,13 @@ class FmeaController extends BaseController
 
             $this->success(['fmea' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('fmea_update_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST addFailureMode — Add a failure mode to an FMEA.
+     * POST addFailureMode â€” Add a failure mode to an FMEA.
      *
      * Body fields:
      *   - fmea_id          (string, required)
@@ -329,12 +333,13 @@ class FmeaController extends BaseController
 
             $this->success(['failure_mode' => $failureMode], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('failure_mode_add_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST updateFailureMode — Update a failure mode entry.
+     * POST updateFailureMode â€” Update a failure mode entry.
      *
      * Body fields:
      *   - failure_mode_id (string, required)
@@ -367,12 +372,13 @@ class FmeaController extends BaseController
 
             $this->success(['failure_mode' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('failure_mode_update_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST addAction — Add a recommended action to a failure mode.
+     * POST addAction â€” Add a recommended action to a failure mode.
      *
      * Body fields:
      *   - failure_mode_id (string, required)
@@ -415,12 +421,13 @@ class FmeaController extends BaseController
 
             $this->success(['action' => $action], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('action_add_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST completeAction — Complete an action with new S/O/D ratings.
+     * POST completeAction â€” Complete an action with new S/O/D ratings.
      *
      * Body fields:
      *   - action_id      (string, required)
@@ -463,12 +470,13 @@ class FmeaController extends BaseController
 
             $this->success(['action' => $result]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('action_complete_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST generateControlPlan — Auto-generate a control plan from an FMEA.
+     * POST generateControlPlan â€” Auto-generate a control plan from an FMEA.
      *
      * Body fields:
      *   - fmea_id (string, required): Source FMEA record ID.
@@ -500,12 +508,13 @@ class FmeaController extends BaseController
 
             $this->success(['control_plan' => $controlPlan], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('control_plan_generate_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET listControlPlans — List control plans with optional filters.
+     * GET listControlPlans â€” List control plans with optional filters.
      *
      * Query params:
      *   - status  (string, optional): draft, active, superseded.
@@ -558,12 +567,13 @@ class FmeaController extends BaseController
 
             $this->paginated('control_plans', array_values($items), $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('control_plan_list_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getControlPlanDetail — Get a single control plan with all characteristics.
+     * GET getControlPlanDetail â€” Get a single control plan with all characteristics.
      *
      * Query params:
      *   - control_plan_id (string, required)
@@ -600,12 +610,13 @@ class FmeaController extends BaseController
 
             $this->success(['control_plan' => $record]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('control_plan_detail_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET getRpnTrend — Get RPN trend data for an FMEA over time.
+     * GET getRpnTrend â€” Get RPN trend data for an FMEA over time.
      *
      * Query params:
      *   - fmea_id (string, required)
@@ -632,12 +643,13 @@ class FmeaController extends BaseController
 
             $this->success(['rpn_trend' => $trend]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('rpn_trend_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST linkNcrToFmea — Cross-link an NCR to a specific failure mode.
+     * POST linkNcrToFmea â€” Cross-link an NCR to a specific failure mode.
      *
      * Body fields:
      *   - ncr_id          (string, required): NCR record ID.
@@ -671,6 +683,7 @@ class FmeaController extends BaseController
 
             $this->success(['link' => $link], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('ncr_link_failed', 500, $e->getMessage());
         }
     }

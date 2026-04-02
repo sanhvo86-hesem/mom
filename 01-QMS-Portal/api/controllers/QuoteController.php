@@ -29,7 +29,7 @@ class QuoteController extends BaseController
     /** @var array|null Cached quote access-control config. */
     private ?array $quoteConfig = null;
 
-    // ── Service Access ──────────────────────────────────────────────────────
+    // â”€â”€ Service Access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * Get or create the QuoteService instance.
@@ -115,10 +115,10 @@ class QuoteController extends BaseController
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
     }
 
-    // ── Endpoints ───────────────────────────────────────────────────────────
+    // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * GET listQuotes — List quotes with optional filters.
+     * GET listQuotes â€” List quotes with optional filters.
      *
      * Query params:
      *   - status    (string, optional): draft, sent, accepted, rejected, expired.
@@ -167,12 +167,13 @@ class QuoteController extends BaseController
 
             $this->paginated('quotes', array_values($items), $total, $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('quotes_list_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET detail — Single quote with line items.
+     * GET detail â€” Single quote with line items.
      *
      * Query params:
      *   - id (string, required): Quote record ID or quote number.
@@ -199,12 +200,13 @@ class QuoteController extends BaseController
 
             $this->success(['quote' => $quote]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('quote_detail_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST create — Create a quote with header and line items.
+     * POST create â€” Create a quote with header and line items.
      *
      * Body fields:
      *   - customer_id   (string, required)
@@ -256,12 +258,13 @@ class QuoteController extends BaseController
 
             $this->success(['quote' => $quote], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('quote_create_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST update — Update quote header or line items.
+     * POST update â€” Update quote header or line items.
      *
      * Body fields:
      *   - id (string, required): Quote record ID.
@@ -294,12 +297,13 @@ class QuoteController extends BaseController
 
             $this->success(['quote' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('quote_update_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST transition — Quote status transition.
+     * POST transition â€” Quote status transition.
      *
      * Allowed transitions: draft -> sent -> accepted|rejected|expired.
      *
@@ -338,12 +342,13 @@ class QuoteController extends BaseController
 
             $this->success(['quote' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('quote_transition_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST convertToSo — Convert an accepted quote to a Sales Order.
+     * POST convertToSo â€” Convert an accepted quote to a Sales Order.
      *
      * Body fields:
      *   - id (string, required): Quote record ID (must be in 'accepted' status).
@@ -380,12 +385,13 @@ class QuoteController extends BaseController
                 'so_number' => $result['so_number'],
             ]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('convert_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST estimateCycleTime — Estimate CNC cycle time from parameters.
+     * POST estimateCycleTime â€” Estimate CNC cycle time from parameters.
      *
      * Body fields:
      *   - material   (string, required): Material type (e.g. "6061-T6", "316SS").
@@ -417,12 +423,13 @@ class QuoteController extends BaseController
 
             $this->success(['estimate' => $estimate]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('cycle_time_estimate_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * POST estimateMaterial — Estimate material cost from parameters.
+     * POST estimateMaterial â€” Estimate material cost from parameters.
      *
      * Body fields:
      *   - material_type (string, required): e.g. "6061-T6", "Ti-6Al-4V".
@@ -454,12 +461,13 @@ class QuoteController extends BaseController
 
             $this->success(['estimate' => $estimate]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('material_estimate_failed', 500, $e->getMessage());
         }
     }
 
     /**
-     * GET dashboard — Quote pipeline KPIs.
+     * GET dashboard â€” Quote pipeline KPIs.
      *
      * Returns win rate, avg quote value, pipeline value, avg response time.
      *
@@ -475,6 +483,7 @@ class QuoteController extends BaseController
 
             $this->success(['kpis' => $kpis]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('quote_dashboard_failed', 500, $e->getMessage());
         }
     }

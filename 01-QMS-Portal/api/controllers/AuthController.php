@@ -16,7 +16,7 @@ namespace HESEM\QMS\Api\Controllers;
 class AuthController extends BaseController
 {
     /**
-     * GET status — Check current authentication state.
+     * GET status â€” Check current authentication state.
      *
      * Legacy action: `status` / `auth_status`
      *
@@ -124,7 +124,7 @@ class AuthController extends BaseController
     }
 
     /**
-     * POST login — Authenticate with username/password (+ optional OTP).
+     * POST login â€” Authenticate with username/password (+ optional OTP).
      *
      * Legacy action: `auth_login` / `login`
      *
@@ -239,7 +239,7 @@ class AuthController extends BaseController
     }
 
     /**
-     * POST mfaVerify — Verify TOTP code during login.
+     * POST mfaVerify â€” Verify TOTP code during login.
      *
      * Legacy action: `auth_mfa_verify` / `mfa_verify` / `verify`
      *
@@ -319,7 +319,7 @@ class AuthController extends BaseController
     }
 
     /**
-     * POST enrollVerify — Verify TOTP during MFA enrollment.
+     * POST enrollVerify â€” Verify TOTP during MFA enrollment.
      *
      * Legacy action: `auth_enroll_verify` / `enroll_verify` / `enroll`
      *
@@ -379,7 +379,7 @@ class AuthController extends BaseController
     }
 
     /**
-     * POST logout — Destroy the current session.
+     * POST logout â€” Destroy the current session.
      *
      * Legacy action: `auth_logout` / `logout`
      *
@@ -395,7 +395,7 @@ class AuthController extends BaseController
         $this->json(['ok' => true, 'logged_in' => false]);
     }
 
-    // ── Private Helpers ─────────────────────────────────────────────────────
+    // â”€â”€ Private Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * Update user's last_login timestamp and persist.
@@ -423,6 +423,7 @@ class AuthController extends BaseController
         try {
             users_save($usersFile, $this->store);
         } catch (\Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('users_save_failed', 500);
         }
     }

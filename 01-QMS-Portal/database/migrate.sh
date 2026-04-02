@@ -65,33 +65,22 @@ if [[ ! -d "$MIGRATIONS_DIR" ]]; then
     exit 1
 fi
 
-# Ordered list of migration files
-MIGRATIONS=(
-    "001_extensions_and_types.sql"
-    "002_core_system.sql"
-    "003_document_management.sql"
-    "004_form_system.sql"
-    "005_record_management.sql"
-    "006_erp_master_data.sql"
-    "007_customers_sales.sql"
-    "008_vendors_purchasing.sql"
-    "009_inventory.sql"
-    "010_production.sql"
-    "011_quality.sql"
-    "012_calibration_equipment.sql"
-    "013_training_hr.sql"
-    "014_audit_risk.sql"
-    "015_finance.sql"
-    "016_shipping_compliance.sql"
-    "017_subcontracting_rma.sql"
-    "018_projects_kpi.sql"
-    "019_system_tables.sql"
-    "020_indexes.sql"
-    "021_views.sql"
-    "022_functions_triggers.sql"
-    "023_rls_policies.sql"
-    "024_seed_data.sql"
-)
+# Auto-discover ordered migration files.
+# Zero-padded numeric prefixes keep lexical sort aligned with execution order.
+shopt -s nullglob
+MIGRATIONS=()
+for filepath in "${MIGRATIONS_DIR}"/*.sql; do
+    MIGRATIONS+=("$(basename "$filepath")")
+done
+shopt -u nullglob
+
+if [[ ${#MIGRATIONS[@]} -eq 0 ]]; then
+    echo -e "${RED}Error: No SQL migration files found in ${MIGRATIONS_DIR}${NC}"
+    exit 1
+fi
+
+IFS=$'\n' MIGRATIONS=($(printf '%s\n' "${MIGRATIONS[@]}" | sort))
+unset IFS
 
 echo "============================================================================"
 echo " HESEM QMS Portal - Database Migration"

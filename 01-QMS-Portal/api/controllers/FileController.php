@@ -22,7 +22,7 @@ use Throwable;
 class FileController extends BaseController
 {
     /**
-     * GET scanFolders — Scan the filesystem tree and return document listing.
+     * GET scanFolders â€” Scan the filesystem tree and return document listing.
      *
      * Legacy action: `scan_folders`
      *
@@ -85,6 +85,7 @@ class FileController extends BaseController
                     RecursiveIteratorIterator::SELF_FIRST
                 );
             } catch (Throwable $e) {
+                $this->rethrowResponse($e);
                 continue;
             }
 
@@ -92,6 +93,7 @@ class FileController extends BaseController
                 try {
                     $itemPath = str_replace('\\', '/', $item->getPathname());
                 } catch (Throwable $e) {
+                    $this->rethrowResponse($e);
                     continue;
                 }
 
@@ -173,7 +175,7 @@ class FileController extends BaseController
     }
 
     /**
-     * POST createFolder — Create a new folder in the document tree.
+     * POST createFolder â€” Create a new folder in the document tree.
      *
      * Legacy action: `create_folder`
      *
@@ -220,7 +222,7 @@ class FileController extends BaseController
     }
 
     /**
-     * POST renameFolder — Rename a folder.
+     * POST renameFolder â€” Rename a folder.
      *
      * Legacy action: `rename_folder`
      *
@@ -292,7 +294,7 @@ class FileController extends BaseController
     }
 
     /**
-     * POST deleteFolder — Delete a folder (moves to _Deleted).
+     * POST deleteFolder â€” Delete a folder (moves to _Deleted).
      *
      * Legacy action: `delete_folder`
      *
@@ -336,7 +338,7 @@ class FileController extends BaseController
     }
 
     /**
-     * POST moveDoc — Move a document to a different folder.
+     * POST moveDoc â€” Move a document to a different folder.
      *
      * Legacy action: `move_doc`
      *
@@ -386,6 +388,7 @@ class FileController extends BaseController
         try {
             rename_doc_store_assets($this->rootDir, $srcRel, $newRel, $code);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             // Non-fatal
         }
 
@@ -402,7 +405,7 @@ class FileController extends BaseController
     }
 
     /**
-     * POST deleteDoc — Archive (soft-delete) a document.
+     * POST deleteDoc â€” Archive (soft-delete) a document.
      *
      * Legacy action: `delete_doc`
      *
@@ -446,6 +449,7 @@ class FileController extends BaseController
                     @rename($absPath, $deletedDir . '/' . $destName);
                 }
             } catch (Throwable $e) {
+                $this->rethrowResponse($e);
                 // Non-fatal; continue to remove from registry
             }
         }
@@ -462,7 +466,7 @@ class FileController extends BaseController
     }
 
     /**
-     * POST renameDoc — Rename a document file.
+     * POST renameDoc â€” Rename a document file.
      *
      * Legacy action: `rename_doc`
      *
@@ -517,6 +521,7 @@ class FileController extends BaseController
         try {
             rename_doc_store_assets($this->rootDir, $srcRel, $newRel, $newCode !== '' ? $newCode : $code);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             // Non-fatal
         }
 
@@ -532,7 +537,7 @@ class FileController extends BaseController
     }
 
     /**
-     * GET getFolderDescriptions — Get descriptions for folders.
+     * GET getFolderDescriptions â€” Get descriptions for folders.
      *
      * Legacy action: `folder_descriptions`
      *

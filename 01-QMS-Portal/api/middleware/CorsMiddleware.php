@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace HESEM\QMS\Api\Middleware;
 
+use HESEM\QMS\Api\Controllers\ExitException;
+
 /**
  * CORS middleware for HESEM QMS API.
  *
@@ -80,13 +82,22 @@ class CorsMiddleware
             // Handle preflight OPTIONS requests
             $method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
             if ($method === 'OPTIONS') {
+                $headers = [];
                 if ($origin !== '' && $self->isOriginAllowed($origin)) {
-                    header('Access-Control-Allow-Methods: ' . implode(', ', $self->allowedMethods));
-                    header('Access-Control-Allow-Headers: ' . implode(', ', $self->allowedHeaders));
-                    header('Access-Control-Max-Age: ' . $self->maxAge);
+                    $headers = [
+                        'Access-Control-Allow-Methods' => implode(', ', $self->allowedMethods),
+                        'Access-Control-Allow-Headers' => implode(', ', $self->allowedHeaders),
+                        'Access-Control-Max-Age' => (string)$self->maxAge,
+                    ];
+                    if ($origin !== '') {
+                        $headers['Access-Control-Allow-Origin'] = $origin;
+                        $headers['Vary'] = 'Origin';
+                        if ($self->credentials) {
+                            $headers['Access-Control-Allow-Credentials'] = 'true';
+                        }
+                    }
                 }
-                http_response_code(204);
-                exit;
+                throw ExitException::empty(204, $headers);
             }
 
             $next();

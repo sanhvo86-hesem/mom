@@ -49,7 +49,7 @@ class LogisticsController extends BaseController
         return $prefix . '-' . $year . '-' . str_pad((string)$counter['seq'], 4, '0', STR_PAD_LEFT);
     }
 
-    // ── SUBCONTRACT ENDPOINTS ──────────────────────────────────────────────
+    // â”€â”€ SUBCONTRACT ENDPOINTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private const SUBCONTRACT_STATUSES  = ['planned', 'shipped_out', 'at_vendor', 'received', 'inspected', 'closed'];
     private const SUBCONTRACT_PROCESSES = ['heat_treat', 'plating', 'grinding', 'ndt', 'painting', 'anodize', 'passivate', 'other'];
@@ -85,6 +85,7 @@ class LogisticsController extends BaseController
 
             $this->paginated('subcontracts', array_slice(array_values($filtered), $offset, $limit), count($filtered), $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('subcontract_list_failed', 500, $e->getMessage());
         }
     }
@@ -148,6 +149,7 @@ class LogisticsController extends BaseController
 
             $this->success(['subcontract' => $record], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('subcontract_create_failed', 500, $e->getMessage());
         }
     }
@@ -205,6 +207,7 @@ class LogisticsController extends BaseController
             $this->auditLog('subcontract_update', ['id' => $id, 'status' => $updated['status'] ?? ''], $uid);
             $this->success(['subcontract' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('subcontract_update_failed', 500, $e->getMessage());
         }
     }
@@ -263,11 +266,12 @@ class LogisticsController extends BaseController
 
             $this->success(['subcontract' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('subcontract_receive_failed', 500, $e->getMessage());
         }
     }
 
-    // ── OQC ENDPOINTS ──────────────────────────────────────────────────────
+    // â”€â”€ OQC ENDPOINTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private const OQC_TYPES   = ['final_inspection', 'oqc_sampling', 'customer_witness'];
     private const OQC_RESULTS = ['pending', 'pass', 'fail', 'conditional'];
@@ -303,6 +307,7 @@ class LogisticsController extends BaseController
 
             $this->paginated('oqc_records', array_slice(array_values($filtered), $offset, $limit), count($filtered), $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('oqc_list_failed', 500, $e->getMessage());
         }
     }
@@ -372,6 +377,7 @@ class LogisticsController extends BaseController
 
             $this->success(['oqc' => $record], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('oqc_create_failed', 500, $e->getMessage());
         }
     }
@@ -438,11 +444,12 @@ class LogisticsController extends BaseController
 
             $this->success(['oqc' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('oqc_update_failed', 500, $e->getMessage());
         }
     }
 
-    // ── PACKING ENDPOINTS ──────────────────────────────────────────────────
+    // â”€â”€ PACKING ENDPOINTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private const PACKING_STATUSES = ['draft', 'packed', 'verified', 'shipped'];
 
@@ -495,6 +502,7 @@ class LogisticsController extends BaseController
 
             $this->success(['packing' => $record], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('packing_create_failed', 500, $e->getMessage());
         }
     }
@@ -556,6 +564,7 @@ class LogisticsController extends BaseController
             $this->auditLog('packing_update', ['id' => $id, 'status' => $updated['status'] ?? ''], $uid);
             $this->success(['packing' => $updated]);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('packing_update_failed', 500, $e->getMessage());
         }
     }
@@ -591,11 +600,12 @@ class LogisticsController extends BaseController
 
             $this->paginated('packing_lists', array_slice(array_values($filtered), $offset, $limit), count($filtered), $offset, $limit);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('packing_list_failed', 500, $e->getMessage());
         }
     }
 
-    // ── DELIVERY ENDPOINT ──────────────────────────────────────────────────
+    // â”€â”€ DELIVERY ENDPOINT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * POST delivery_confirm -- Confirm delivery of a shipment.
@@ -660,6 +670,7 @@ class LogisticsController extends BaseController
 
             $this->success(['delivery' => $record], 201);
         } catch (Throwable $e) {
+            $this->rethrowResponse($e);
             $this->error('delivery_confirm_failed', 500, $e->getMessage());
         }
     }
