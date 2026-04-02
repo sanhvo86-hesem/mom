@@ -1,106 +1,217 @@
 {
   "_meta": {
-    "version": "2.0",
-    "description": "Internal quality report for registry completeness and normalization.",
-    "generatedAt": "2026-04-02T06:00:20.356Z"
+    "version": "4.0",
+    "description": "Cross-registry verification report for table, field, workflow, status, relation, endpoint, and formula coverage.",
+    "generatedAt": "2026-04-02T16:08:05.972Z",
+    "totalChecks": 15,
+    "passedChecks": 15,
+    "failedChecks": 0,
+    "status": "passed"
   },
-  "summary": {
-    "endpoint_count": 345,
-    "field_count": 6209,
-    "average_fields_per_endpoint": 18,
-    "unique_field_keys": 1005,
-    "status_set_count": 43,
-    "formula_count": 43,
-    "connector_count": 13,
-    "workflow_count": 8,
-    "standards_count": 8
-  },
-  "coverage": {
-    "router_only_actions": 99,
-    "auth_protected_actions": 334,
-    "csrf_protected_actions": 173,
-    "admin_actions": 22,
-    "paginated_actions": 40,
-    "actions_with_permission_keys": 122
-  },
-  "highest_complexity_endpoints": [
+  "checks": [
     {
-      "action": "customer_portal_revoke_doc",
-      "params": 12,
-      "fields": 36,
-      "permissions": 0
+      "id": "table_to_fields",
+      "label": "Mọi table trong table-registry có fields trong data-fields",
+      "pass": true,
+      "actual": {
+        "covered": 505,
+        "total": 505
+      },
+      "expected": {
+        "total": 505
+      },
+      "missing": []
     },
     {
-      "action": "dispatch_list_targets",
-      "params": 7,
-      "fields": 36,
-      "permissions": 0
+      "id": "table_to_domain",
+      "label": "Mọi table thuộc domain trong domain-architecture",
+      "pass": true,
+      "actual": {
+        "covered": 505,
+        "total": 505
+      },
+      "expected": {
+        "total": 505
+      },
+      "missing": []
     },
     {
-      "action": "product_passport_data",
-      "params": 6,
-      "fields": 36,
-      "permissions": 0
+      "id": "status_workflow",
+      "label": "Mọi table có status có workflow hoặc kế thừa workflow support và có status set",
+      "pass": true,
+      "actual": {
+        "covered": 204,
+        "total": 204
+      },
+      "expected": {
+        "total": 204
+      },
+      "missing": []
     },
     {
-      "action": "fmea_control_plans",
-      "params": 4,
-      "fields": 36,
-      "permissions": 1
+      "id": "fk_edges",
+      "label": "Mọi FK trong table-registry có edge trong relation-map",
+      "pass": true,
+      "actual": {
+        "covered": 761,
+        "total": 761
+      },
+      "expected": {
+        "total": 761
+      },
+      "missing": []
     },
     {
-      "action": "master_data_snapshot",
-      "params": 5,
-      "fields": 36,
-      "permissions": 0
+      "id": "field_validation",
+      "label": "Mọi field trong data-fields có validation rule",
+      "pass": true,
+      "actual": {
+        "covered": 7049,
+        "total": 7049
+      },
+      "expected": {
+        "total": 7049
+      },
+      "missing": []
     },
     {
-      "action": "ai_spc_anomalies",
-      "params": 5,
-      "fields": 36,
-      "permissions": 0
+      "id": "domain_packs",
+      "label": "Mọi domain có ít nhất một domain-field-pack",
+      "pass": true,
+      "actual": {
+        "covered": 47,
+        "total": 47
+      },
+      "expected": {
+        "total": 47
+      },
+      "missing": []
     },
     {
-      "action": "schedule_get",
-      "params": 5,
-      "fields": 36,
-      "permissions": 0
+      "id": "endpoint_fields",
+      "label": "Mọi endpoint trong endpoint-catalog có fields trong data-fields",
+      "pass": true,
+      "actual": {
+        "covered": 2228,
+        "total": 2228
+      },
+      "expected": {
+        "total": 2228
+      },
+      "missing": []
     },
     {
-      "action": "cnc_program_data",
-      "params": 5,
-      "fields": 36,
-      "permissions": 0
+      "id": "workflow_primary_table",
+      "label": "Mọi workflow có primaryTable tồn tại",
+      "pass": true,
+      "actual": {
+        "covered": 400,
+        "total": 400
+      },
+      "expected": {
+        "total": 400
+      },
+      "missing": []
     },
     {
-      "action": "schedule_slot_breakdown",
-      "params": 5,
-      "fields": 36,
-      "permissions": 0
+      "id": "formula_reference",
+      "label": "Mọi formula được reference bởi field hoặc KPI endpoint",
+      "pass": true,
+      "actual": {
+        "covered": 401,
+        "total": 401
+      },
+      "expected": {
+        "total": 401
+      },
+      "missing": []
     },
     {
-      "action": "schedule_slot_detail",
-      "params": 5,
-      "fields": 36,
-      "permissions": 0
+      "id": "orphan_table",
+      "label": "Không có orphan table",
+      "pass": true,
+      "actual": {
+        "covered": 505,
+        "total": 505
+      },
+      "expected": {
+        "total": 505
+      },
+      "missing": []
     },
     {
-      "action": "cnc_program_setup_sheets",
-      "params": 4,
-      "fields": 36,
-      "permissions": 0
+      "id": "orphan_field",
+      "label": "Không có orphan field",
+      "pass": true,
+      "actual": {
+        "covered": 7049,
+        "total": 7049
+      },
+      "expected": {
+        "total": 7049
+      },
+      "missing": []
     },
     {
-      "action": "ai_tool_wear",
-      "params": 4,
-      "fields": 36,
-      "permissions": 0
+      "id": "orphan_workflow",
+      "label": "Không có orphan workflow",
+      "pass": true,
+      "actual": {
+        "covered": 400,
+        "total": 400
+      },
+      "expected": {
+        "total": 400
+      },
+      "missing": []
+    },
+    {
+      "id": "orphan_status",
+      "label": "Không có orphan status set",
+      "pass": true,
+      "actual": {
+        "covered": 244,
+        "total": 244
+      },
+      "expected": {
+        "total": 244
+      },
+      "missing": []
+    },
+    {
+      "id": "orphan_formula",
+      "label": "Không có orphan formula",
+      "pass": true,
+      "actual": {
+        "covered": 401,
+        "total": 401
+      },
+      "expected": {
+        "total": 401
+      },
+      "missing": []
+    },
+    {
+      "id": "dead_column",
+      "label": "Không có dead column",
+      "pass": true,
+      "actual": {
+        "covered": 6640,
+        "total": 6640
+      },
+      "expected": {
+        "total": 6640
+      },
+      "missing": []
     }
   ],
-  "recommendations": [
-    "Use endpoint-catalog.json as the canonical inventory for routed actions.",
-    "Use validation-rules.json when generating schema validators and API guards.",
-    "Use identifier-patterns.json and unit-library.json when expanding database migrations.",
-    "Use workflow-library.json and compliance-crosswalk.json to keep new modules aligned to aerospace quality expectations."
-  ]
+  "summary": {
+    "tables": 505,
+    "domains": 47,
+    "endpoints": 2228,
+    "packs": 3030,
+    "edges": 761,
+    "validationRules": 10692,
+    "formulas": 401
+  }
 }

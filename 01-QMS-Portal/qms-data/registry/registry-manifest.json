@@ -1,180 +1,272 @@
 {
   "_meta": {
-    "version": "3.0",
-    "description": "Registry manifest and coverage index for the metadata backbone.",
-    "generatedAt": "2026-04-02T09:02:28.221Z"
+    "version": "4.0",
+    "description": "Registry manifest and coverage index for the metadata backbone after full cross-link rebuild.",
+    "generatedAt": "2026-04-02T16:08:05.972Z"
   },
   "coverage": {
-    "router_actions": 345,
-    "ui_actions": 246,
-    "field_registry_actions": 838,
-    "field_definitions": 11396,
-    "unique_field_keys": 1111,
-    "status_sets": 105,
-    "workflow_count": 25,
-    "relation_edges": 67,
-    "validation_rules": 1836,
-    "formula_count": 107,
-    "domain_pack_count": 189
+    "tables": 505,
+    "domains": 47,
+    "generated_endpoints": 2228,
+    "data_field_endpoints": 2228,
+    "field_definitions": 24948,
+    "unique_field_keys": 3824,
+    "status_sets": 244,
+    "workflow_count": 400,
+    "relation_edges": 761,
+    "validation_rules": 10692,
+    "formula_count": 401,
+    "domain_pack_count": 3030,
+    "quality_checks_passed": 15,
+    "quality_checks_failed": 0
   },
   "research_sources": [
     {
-      "key": "epicor_kinetic_cpc",
-      "label": "Epicor Kinetic / Connected Process Control",
-      "url": "https://www.epicor.com/en-us/products/connected-worker/epicor-connected-process-control/",
+      "key": "sap_inspection_lot",
+      "platform": "SAP S/4HANA / SAP ERP",
+      "url": "https://help.sap.com/docs/SAP_ERP/250374f0514e4e0f9057066374265eba/a7e4b65334e6b54ce10000000a174cb4.html",
       "focus": [
-        "part master",
-        "job operations",
-        "digital work instructions",
-        "quality checks",
-        "traceability"
+        "QM integration with MM, PP, SD, PM",
+        "inspection lot lifecycle",
+        "normalized logistics linkages"
       ]
     },
     {
-      "key": "sap_s4hana_order_manufacturing",
-      "label": "SAP S/4HANA / Digital Manufacturing",
-      "url": "https://help.sap.com/docs/sap-digital-manufacturing/execution/manage-orders",
+      "key": "sap_status_management",
+      "platform": "SAP S/4HANA",
+      "url": "https://help.sap.com/docs/SAP_S4HANA_ON-PREMISE/5e23dc8fe9be4fd496f8ab556667ea05/0ed49753858ced23e10000000a174cb4.html",
       "focus": [
-        "production order",
-        "material master",
-        "inspection lot",
-        "order execution"
+        "system status and user status",
+        "business transaction controls"
       ]
     },
     {
-      "key": "oracle_quality_management",
-      "label": "Oracle Fusion Cloud Manufacturing / Quality",
-      "url": "https://docs.oracle.com/en/cloud/saas/supply-chain-and-manufacturing/25d/fauqm/using-quality-management.pdf",
+      "key": "sap_language_texts",
+      "platform": "SAP",
+      "url": "https://help.sap.com/doc/saphelp_ewm900/9.0/en-US/4a/40815bacb51cece10000000a42189b/content.htm",
       "focus": [
-        "inspection plans",
-        "inspection characteristics",
-        "quality issues",
-        "action plans"
+        "language-dependent text tables",
+        "text-key pattern"
       ]
     },
     {
-      "key": "qad_enterprise_quality_management",
-      "label": "QAD Adaptive ERP / EQMS",
-      "url": "https://www.qad.com/en-us/products/transformational-applications/enterprise-quality-management-system",
+      "key": "epicor_cpc",
+      "platform": "Epicor Kinetic / CPC",
+      "url": "https://www.epicor.com/en/products/connected-worker/epicor-connected-process-control/",
       "focus": [
-        "supplier quality",
-        "nonconformance",
-        "CAPA",
-        "audit and compliance"
-      ]
-    },
-    {
-      "key": "infor_csi_quality",
-      "label": "Infor CloudSuite Industrial (SyteLine)",
-      "url": "https://docs.infor.com/csi/9.01.x/en-us/csbiolh/lsm1454144403275.html",
-      "focus": [
-        "jobs",
-        "bill of manufacture",
-        "routing",
-        "quality control"
-      ]
-    },
-    {
-      "key": "mastercontrol_qms",
-      "label": "MasterControl QMS",
-      "url": "https://www.mastercontrol.com/gxp-lifeline/quality-event-management/",
-      "focus": [
-        "nonconformance",
-        "CAPA",
-        "change control",
-        "training",
-        "audit"
-      ]
-    },
-    {
-      "key": "etq_reliance_qms",
-      "label": "ETQ Reliance",
-      "url": "https://www.etq.com/qms-software/nonconformance-management/",
-      "focus": [
-        "NCR",
-        "CAPA",
-        "SCAR",
-        "document control",
-        "complaint handling"
-      ]
-    },
-    {
-      "key": "greenlight_guru_medtech_qms",
-      "label": "Greenlight Guru",
-      "url": "https://www.greenlight.guru/solutions/quality-management-software",
-      "focus": [
-        "design control",
-        "CAPA",
-        "risk management",
-        "complaints",
-        "traceability"
-      ]
-    },
-    {
-      "key": "arena_plm_qms",
-      "label": "Arena PLM / QMS",
-      "url": "https://www.arenasolutions.com/plm-qms/quality-management-system-software/",
-      "focus": [
-        "BOM",
-        "change order",
-        "quality process",
-        "compliance",
-        "supplier collaboration"
-      ]
-    },
-    {
-      "key": "plex_smart_manufacturing",
-      "label": "Plex Smart Manufacturing / MES",
-      "url": "https://www.plex.com/products/manufacturing-execution-system",
-      "focus": [
-        "production",
-        "inventory",
-        "quality",
+        "operator guidance",
         "traceability",
-        "operator execution"
+        "task-level data collection"
       ]
+    },
+    {
+      "key": "epicor_track_trace",
+      "platform": "Epicor Kinetic / CPC",
+      "url": "https://www.epicor.com/en/products/connected-worker/epicor-connected-process-control/control-track-and-trace/",
+      "focus": [
+        "serial and lot traceability",
+        "quality containment"
+      ]
+    },
+    {
+      "key": "epicor_industrial_machinery",
+      "platform": "Epicor Kinetic",
+      "url": "https://ondemand.epicor.com/courseResources/r2378_Industrial%20Machinery%20Manufacturing_Transcript_1.pdf",
+      "focus": [
+        "part",
+        "job",
+        "APS",
+        "manufacturing quote flow"
+      ]
+    },
+    {
+      "key": "ifs_projection",
+      "platform": "IFS Cloud",
+      "url": "https://docs.ifs.com/techdocs/25r2/030_administration/010_security/020_permission_sets/004_permission_set_overview/010_projections/",
+      "focus": [
+        "projection as self-contained business function",
+        "bounded API surface"
+      ]
+    },
+    {
+      "key": "ifs_custom_fields",
+      "platform": "IFS Cloud",
+      "url": "https://docs.ifs.com/techdocs/Foundation1/040_administration/220_user_interface/020_custom_objects/040_custom_fields/",
+      "focus": [
+        "logical units",
+        "persistent and calculated custom fields"
+      ]
+    },
+    {
+      "key": "ifs_translation_manager",
+      "platform": "IFS Cloud",
+      "url": "https://docs.ifs.com/techdocs/22r2/060_development/050_development_tools/025_translation_manager_aurena/",
+      "focus": [
+        "field descriptions",
+        "field description translations",
+        "translation manager"
+      ]
+    },
+    {
+      "key": "ifs_cloud_brochure",
+      "platform": "IFS Cloud",
+      "url": "https://www.ifs.com/-/media10/project/ifs/ifs/assets/ifs-cloud-brochure-24r2_02_2025.pdf",
+      "focus": [
+        "manufacturing",
+        "supply chain",
+        "finance",
+        "projects",
+        "asset",
+        "service"
+      ]
+    },
+    {
+      "key": "oracle_workflow_status",
+      "platform": "Oracle Fusion Cloud SCM",
+      "url": "https://docs.oracle.com/en/cloud/saas/supply-chain-and-manufacturing/25a/fauqm/workflow-status.html",
+      "focus": [
+        "quality issue and action workflows",
+        "predefined status models"
+      ]
+    },
+    {
+      "key": "oracle_workflow_templates",
+      "platform": "Oracle Fusion Cloud SCM",
+      "url": "https://docs.oracle.com/en/cloud/saas/supply-chain-and-manufacturing/24b/fauqm/workflow-templates.html",
+      "focus": [
+        "workflow templates",
+        "status sequence governance"
+      ]
+    },
+    {
+      "key": "oracle_translation_table",
+      "platform": "Oracle Fusion Cloud",
+      "url": "https://docs.oracle.com/en/cloud/saas/supply-chain-and-manufacturing/25d/oedsc/acdcomponenttlint-25230.html",
+      "focus": [
+        "_TL translation table pattern",
+        "MLS support",
+        "who columns"
+      ]
+    },
+    {
+      "key": "oracle_who_columns",
+      "platform": "Oracle Applications",
+      "url": "https://docs.oracle.com/cd/B25516_20/current/acrobat/iby115ig.pdf",
+      "focus": [
+        "WHO columns",
+        "base and translation table pattern"
+      ]
+    },
+    {
+      "key": "dynamics_virtual_tables",
+      "platform": "Microsoft Dynamics 365 / Dataverse",
+      "url": "https://learn.microsoft.com/en-us/power-apps/maker/data-platform/create-edit-virtual-entities",
+      "focus": [
+        "virtual tables",
+        "external runtime data",
+        "schema metadata"
+      ]
+    },
+    {
+      "key": "dynamics_table_metadata",
+      "platform": "Microsoft Dynamics 365 / Dataverse",
+      "url": "https://learn.microsoft.com/en-us/power-apps/developer/data-platform/webapi/create-update-entity-definitions-using-web-api",
+      "focus": [
+        "schema names",
+        "display names",
+        "localized labels",
+        "solution prefixes"
+      ]
+    },
+    {
+      "key": "dynamics_audit_columns",
+      "platform": "Microsoft Dynamics 365 / Dataverse",
+      "url": "https://learn.microsoft.com/en-us/power-apps/developer/data-platform/reference/entities/account",
+      "focus": [
+        "createdby",
+        "createdon",
+        "modifiedby",
+        "modifiedon",
+        "logical names"
+      ]
+    },
+    {
+      "key": "sap_status_management",
+      "url": "https://help.sap.com/docs/SAP_S4HANA_ON-PREMISE/5e23dc8fe9be4fd496f8ab556667ea05/0ed49753858ced23e10000000a174cb4.html"
+    },
+    {
+      "key": "sap_inspection_lot",
+      "url": "https://help.sap.com/docs/SAP_ERP/250374f0514e4e0f9057066374265eba/a7e4b65334e6b54ce10000000a174cb4.html"
+    },
+    {
+      "key": "epicor_connected_process_control",
+      "url": "https://www.epicor.com/en/products/connected-worker/epicor-connected-process-control/"
+    },
+    {
+      "key": "ifs_projection",
+      "url": "https://docs.ifs.com/techdocs/25r2/030_administration/010_security/020_permission_sets/004_permission_set_overview/010_projections/"
+    },
+    {
+      "key": "oracle_workflow_status",
+      "url": "https://docs.oracle.com/en/cloud/saas/supply-chain-and-manufacturing/25a/fauqm/workflow-status.html"
+    },
+    {
+      "key": "dynamics_virtual_tables",
+      "url": "https://learn.microsoft.com/en-us/power-apps/maker/data-platform/create-edit-virtual-entities"
+    },
+    {
+      "key": "mastercontrol_quality_event",
+      "url": "https://www.mastercontrol.com/glossary-page/quality-event/"
+    },
+    {
+      "key": "etq_nonconformance",
+      "url": "https://www.etq.com/nonconformance-handling/"
     }
   ],
   "assets": {
+    "table-registry.json": {
+      "kind": "table-registry",
+      "records": 505
+    },
+    "domain-architecture.json": {
+      "kind": "domain-architecture",
+      "records": 47
+    },
     "data-fields.json": {
-      "kind": "field-registry",
-      "records": 11396
-    },
-    "status-options.json": {
-      "kind": "enum-library",
-      "records": 105
-    },
-    "validation-rules.json": {
-      "kind": "validation-rules",
-      "records": 1836
+      "kind": "field-registry-index",
+      "records": 2228
     },
     "workflow-library.json": {
       "kind": "workflow-library",
-      "records": 25
+      "records": 400
+    },
+    "status-options.json": {
+      "kind": "status-library",
+      "records": 244
+    },
+    "validation-rules.json": {
+      "kind": "validation-rules",
+      "records": 10692
     },
     "computed-formulas.json": {
       "kind": "formula-library",
-      "records": 107
+      "records": 401
     },
     "domain-field-packs.json": {
       "kind": "pack-library",
-      "records": 189
+      "records": 3030
     },
     "relation-map.json": {
       "kind": "relation-map",
-      "records": 67
-    },
-    "migration-gap-report.json": {
-      "kind": "migration-gap-report",
-      "records": 182
-    },
-    "api-params.json": {
-      "kind": "api-contracts",
-      "records": 345
+      "records": 761
     },
     "endpoint-catalog.json": {
       "kind": "endpoint-catalog",
-      "records": 345
+      "records": 2228
+    },
+    "registry-quality-report.json": {
+      "kind": "quality-report",
+      "records": 15
     },
     "registry-manifest.json": {
       "kind": "manifest",
