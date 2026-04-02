@@ -3939,14 +3939,40 @@ function loadModuleSchema(moduleId){
   });
 }
 
-function _loadSchemaLocal(moduleId){
-  try{
-    var raw = localStorage.getItem('hm_schema_'+moduleId);
-    return raw ? JSON.parse(raw) : null;
-  }catch(e){ return null; }
+function _schemaStorageKeys(moduleId){
+  return ['hm_module_schema_'+moduleId, 'hm_schema_'+moduleId];
 }
 
-function saveModuleSchema(moduleId, schema){
+function _loadSchemaLocal(moduleId){
+  try{
+    var keys = _schemaStorageKeys(moduleId);
+    var raw = null;
+    var i;
+    for(i = 0; i < keys.length; i++){
+      raw = localStorage.getItem(keys[i]);
+      if(raw) return JSON.parse(raw);
+    }
+  }catch(e){ return null; }
+  return null;
+}
+
+function _writeSchemaLocal(moduleId, schema){
+  try{
+    _schemaStorageKeys(moduleId).forEach(function(key){
+      localStorage.setItem(key, JSON.stringify(schema));
+    });
+  }catch(e){}
+}
+
+function _clearSchemaLocal(moduleId){
+  try{
+    _schemaStorageKeys(moduleId).forEach(function(key){
+      localStorage.removeItem(key);
+    });
+  }catch(e){}
+}
+
+function _legacySaveModuleSchemaRaw(moduleId, schema){
   // Save to localStorage first (backup)
   try{ localStorage.setItem('hm_schema_'+moduleId, JSON.stringify(schema)); }catch(e){}
   // Then persist via API
@@ -3959,10 +3985,60 @@ function saveModuleSchema(moduleId, schema){
   });
 }
 
-function resetModuleSchema(moduleId){
+function _legacyResetModuleSchemaRaw(moduleId){
   try{ localStorage.removeItem('hm_schema_'+moduleId); }catch(e){}
   return _api('module_schema_reset', { moduleId:moduleId }, 'POST').then(function(resp){
     toast(_t('Đã khôi phục mặc định','Reset to defaults'), 'success');
+    return resp;
+  }).catch(function(){ return { ok:false }; });
+}
+
+function saveModuleSchema(moduleId, schema){
+  var savedSchema = _clone(schema || {});
+  var nowIso = new Date().toISOString();
+  savedSchema.moduleId = savedSchema.moduleId || moduleId;
+  if(!savedSchema.updatedAt) savedSchema.updatedAt = nowIso;
+  _writeSchemaLocal(moduleId, savedSchema);
+  if(window.HmModuleRouter && typeof window.HmModuleRouter.clearCache === 'function'){
+    window.HmModuleRouter.clearCache(moduleId);
+  }
+  return _api('module_schema_save', { moduleId:moduleId, schema:savedSchema }, 'POST').then(function(resp){
+    if(!resp || resp.ok === false || resp.saved === false){
+      throw new Error((resp && (resp.detail || resp.error)) || 'save_failed');
+    }
+    savedSchema.version = resp.version != null ? resp.version : ((savedSchema.version || 0) + 1);
+    savedSchema.updatedAt = resp.updatedAt || savedSchema.updatedAt || nowIso;
+    if(resp.updatedBy) savedSchema.updatedBy = resp.updatedBy;
+    _writeSchemaLocal(moduleId, savedSchema);
+    if(window.HmModuleRouter && typeof window.HmModuleRouter.clearCache === 'function'){
+      window.HmModuleRouter.clearCache(moduleId);
+    }
+    toast(_t('ÄÃ£ lÆ°u thÃ nh cÃ´ng','Saved successfully'), 'success');
+    return { ok:true, saved:true, version:savedSchema.version, updatedAt:savedSchema.updatedAt, updatedBy:savedSchema.updatedBy || '', schema:savedSchema };
+  }).catch(function(err){
+    toast(_t('Luu that bai, da luu cuc bo','Save failed, saved locally'), 'warning');
+    return { ok:false, local:true, error: err && err.message ? err.message : '', schema:savedSchema };
+  });
+}
+
+function _legacyResetModuleSchema(moduleId){
+  _clearSchemaLocal(moduleId);
+  return _api('module_schema_reset', { moduleId:moduleId }, 'POST').then(function(resp){
+    toast(_t('ÄÃ£ khÃ´i phá»¥c máº·c Ä‘á»‹nh','Reset to defaults'), 'success');
+    return resp;
+  }).catch(function(){ return { ok:false }; });
+}
+
+function resetModuleSchema(moduleId){
+  _clearSchemaLocal(moduleId);
+  if(window.HmModuleRouter && typeof window.HmModuleRouter.clearCache === 'function'){
+    window.HmModuleRouter.clearCache(moduleId);
+  }
+  return _api('module_schema_reset', { moduleId:moduleId }, 'POST').then(function(resp){
+    if(window.HmModuleRouter && typeof window.HmModuleRouter.clearCache === 'function'){
+      window.HmModuleRouter.clearCache(moduleId);
+    }
+    toast(_t('Reset ve mac dinh','Reset to defaults'), 'success');
     return resp;
   }).catch(function(){ return { ok:false }; });
 }
@@ -4331,7 +4407,13 @@ function _attachModuleEvents(container, moduleId){
         renderModuleFromSchema(container, state._schema);
         break;
       case 'hm-save-schema':
-        saveModuleSchema(moduleId, state._schema);
+        saveModuleSchema(moduleId, state._schema).then(function(resp){
+          if(resp && resp.schema){
+            state._schema = resp.schema;
+            pushSchemaVersion(moduleId, resp.schema);
+            renderModuleFromSchema(container, resp.schema);
+          }
+        });
         break;
       case 'hm-undo':
         if(undo(moduleId)) renderModuleFromSchema(container, state._schema);
