@@ -50,94 +50,112 @@ function _clone(obj){ return JSON.parse(JSON.stringify(obj)); }
 
 /* ── Block Registry ─────────────────────────────────────────────────────── */
 var BLOCK_CATALOG = {
-  /* LAYOUT */
-  'page-header':    { label:'Tieu de trang',     labelEn:'Page Header',    category:'layout',  icon:'\u{1F4C4}', desc:'Tieu de + breadcrumb', descEn:'Title + breadcrumb' },
-  'kpi-row':        { label:'Day KPI',            labelEn:'KPI Row',        category:'layout',  icon:'\u{1F4CA}', desc:'Hang cac the KPI', descEn:'Row of KPI cards' },
-  'tab-bar':        { label:'Thanh tab',          labelEn:'Tab Bar',        category:'layout',  icon:'\u{1F4D1}', desc:'Dieu huong tab', descEn:'Tab navigation' },
-  'filter-bar':     { label:'Bo loc',             labelEn:'Filter Bar',     category:'layout',  icon:'\u{1F50D}', desc:'Tim kiem + loc', descEn:'Search + filter controls' },
-  'section-header': { label:'Tieu de muc',        labelEn:'Section Header', category:'layout',  icon:'\u{1F4DD}', desc:'H2/H3 voi duong ke', descEn:'H2/H3 with divider' },
-  'spacer':         { label:'Khoang cach',        labelEn:'Spacer',         category:'layout',  icon:'\u21D5',    desc:'Khoang cach trong', descEn:'Empty spacing' },
-  'info-banner':    { label:'Banner thong bao',   labelEn:'Info Banner',    category:'layout',  icon:'\u{1F4E2}', desc:'Thong bao mau sac', descEn:'Colored notice banner' },
-  'two-column':     { label:'Hai cot',            labelEn:'Two Column',     category:'layout',  icon:'\u{1F4D0}', desc:'Chia 2 cot trai-phai', descEn:'Left-right split layout' },
-  'card-container': { label:'Hop chua',           labelEn:'Card Container', category:'layout',  icon:'\u{1F4E6}', desc:'Khung chua block con', descEn:'Container for child blocks' },
+  /* BỐ CỤC / LAYOUT */
+  'page-header':      { label:'Tiêu đề trang',        labelEn:'Page Header',      category:'layout',  icon:'📄', desc:'Tiêu đề + breadcrumb + nút hành động', descEn:'Title + breadcrumb + action buttons' },
+  'kpi-row':          { label:'Dãy KPI',               labelEn:'KPI Row',          category:'layout',  icon:'📊', desc:'Hàng các thẻ KPI (1-8 thẻ)', descEn:'Row of KPI cards (1-8)' },
+  'tab-bar':          { label:'Thanh tab',             labelEn:'Tab Bar',          category:'layout',  icon:'📑', desc:'Điều hướng tab', descEn:'Tab navigation' },
+  'filter-bar':       { label:'Bộ lọc',               labelEn:'Filter Bar',       category:'layout',  icon:'🔍', desc:'Tìm kiếm + lọc + ngày', descEn:'Search + filter + date range' },
+  'section-header':   { label:'Tiêu đề mục',          labelEn:'Section Header',   category:'layout',  icon:'📝', desc:'H2/H3 với đường kẻ', descEn:'H2/H3 with divider' },
+  'spacer':           { label:'Khoảng cách',           labelEn:'Spacer',           category:'layout',  icon:'↕️', desc:'Khoảng trống giữa các block', descEn:'Empty spacing between blocks' },
+  'info-banner':      { label:'Thông báo',             labelEn:'Info Banner',      category:'layout',  icon:'📢', desc:'Banner thông báo màu sắc', descEn:'Colored notice banner' },
+  'two-column':       { label:'Hai cột',               labelEn:'Two Column',       category:'layout',  icon:'📐', desc:'Chia 2 cột trái-phải (tỉ lệ tùy chọn)', descEn:'Left-right split layout' },
+  'card-container':   { label:'Hộp chứa',              labelEn:'Card Container',   category:'layout',  icon:'📦', desc:'Khung chứa block con (có thể thu gọn)', descEn:'Collapsible container for child blocks' },
+  'divider':          { label:'Đường phân cách',       labelEn:'Divider',          category:'layout',  icon:'➖', desc:'Đường kẻ ngang phân tách nội dung', descEn:'Horizontal line separator' },
 
-  /* DATA */
-  'data-table':     { label:'Bang du lieu',       labelEn:'Data Table',     category:'data',    icon:'\u{1F4CB}', desc:'Bang sort/filter/phan trang', descEn:'Table with sort/filter/pagination' },
-  'data-cards':     { label:'Luoi the',           labelEn:'Card Grid',      category:'data',    icon:'\u{1F5C2}', desc:'Luoi the responsive', descEn:'Responsive card grid' },
-  'data-list':      { label:'Danh sach',          labelEn:'List',           category:'data',    icon:'\u{1F4C3}', desc:'Danh sach don gian', descEn:'Simple list' },
-  'data-tree':      { label:'Cay phan cap',       labelEn:'Tree View',      category:'data',    icon:'\u{1F333}', desc:'Cau truc cay', descEn:'Tree structure' },
-  'data-timeline':  { label:'Dong thoi gian',     labelEn:'Timeline',       category:'data',    icon:'\u{1F4C5}', desc:'Timeline doc', descEn:'Vertical timeline' },
-  'data-gantt':     { label:'Bieu do Gantt',      labelEn:'Gantt Chart',    category:'data',    icon:'\u{1F4CA}', desc:'Bieu do tien do', descEn:'Gantt schedule' },
+  /* DỮ LIỆU / DATA */
+  'data-table':       { label:'Bảng dữ liệu',         labelEn:'Data Table',       category:'data',    icon:'📋', desc:'Bảng nâng cao: sắp xếp, lọc, phân trang, xuất file', descEn:'Advanced table: sort, filter, pagination, export' },
+  'data-cards':       { label:'Lưới thẻ',              labelEn:'Card Grid',        category:'data',    icon:'🗂️', desc:'Lưới thẻ responsive (2-4 cột)', descEn:'Responsive card grid (2-4 columns)' },
+  'data-list':        { label:'Danh sách',             labelEn:'List',             category:'data',    icon:'📃', desc:'Danh sách đơn giản với icon + hành động', descEn:'Simple list with icons + actions' },
+  'data-tree':        { label:'Cây phân cấp',          labelEn:'Tree View',        category:'data',    icon:'🌳', desc:'Cấu trúc cây (SO→JO→WO)', descEn:'Tree structure (SO→JO→WO)' },
+  'data-timeline':    { label:'Dòng thời gian',        labelEn:'Timeline',         category:'data',    icon:'📅', desc:'Timeline dọc với mốc thời gian', descEn:'Vertical timeline with events' },
+  'data-gantt':       { label:'Biểu đồ Gantt',        labelEn:'Gantt Chart',      category:'data',    icon:'📊', desc:'Biểu đồ tiến độ máy × ngày × ca', descEn:'Schedule chart: machine × date × shift' },
+  'data-detail':      { label:'Chi tiết bản ghi',      labelEn:'Record Detail',    category:'data',    icon:'🔍', desc:'Hiển thị chi tiết 1 bản ghi (grid 2 cột)', descEn:'Single record detail view (2-col grid)' },
+  'data-kanban':      { label:'Bảng Kanban',           labelEn:'Kanban Board',     category:'data',    icon:'📌', desc:'Bảng kéo thả theo trạng thái', descEn:'Drag-drop board by status columns' },
+  'data-stat-compare':{ label:'So sánh chỉ số',        labelEn:'Stat Compare',     category:'data',    icon:'📈', desc:'So sánh giá trị hiện tại vs trước đó', descEn:'Current vs previous value comparison' },
 
-  /* FORM */
-  'form-standard':  { label:'Bieu mau',           labelEn:'Form',           category:'form',    icon:'\u{1F4DD}', desc:'Form nhieu cot', descEn:'Multi-column form' },
-  'form-wizard':    { label:'Bieu mau tung buoc', labelEn:'Step Wizard',    category:'form',    icon:'\u{1F9D9}', desc:'Form wizard', descEn:'Step-by-step form' },
-  'form-inline':    { label:'Chinh sua nhanh',    labelEn:'Inline Edit',    category:'form',    icon:'\u270F',    desc:'Edit tai cho', descEn:'In-place editing' },
+  /* BIỂU MẪU / FORM */
+  'form-standard':    { label:'Biểu mẫu',             labelEn:'Form',             category:'form',    icon:'📝', desc:'Form tạo/sửa nhiều cột với validation', descEn:'Multi-column create/edit form with validation' },
+  'form-wizard':      { label:'Biểu mẫu từng bước',   labelEn:'Step Wizard',      category:'form',    icon:'🧙', desc:'Form wizard theo bước (1→2→3→hoàn thành)', descEn:'Step-by-step wizard form' },
+  'form-inline':      { label:'Chỉnh sửa nhanh',      labelEn:'Inline Edit',      category:'form',    icon:'✏️', desc:'Chỉnh sửa tại chỗ trên dòng dữ liệu', descEn:'In-place editing on data row' },
+  'form-modal':       { label:'Form trong hộp thoại',  labelEn:'Modal Form',       category:'form',    icon:'🪟', desc:'Form mở ra trong popup modal', descEn:'Form that opens in a popup modal' },
+  'form-search':      { label:'Tìm kiếm nâng cao',    labelEn:'Search Form',      category:'form',    icon:'🔎', desc:'Thanh tìm kiếm với gợi ý tự động', descEn:'Search bar with auto-suggestions' },
 
-  /* CHART */
-  'chart-bar':      { label:'Bieu do cot',        labelEn:'Bar Chart',      category:'chart',   icon:'\u{1F4CA}', desc:'Bieu do ngang', descEn:'Horizontal bar chart' },
-  'chart-donut':    { label:'Bieu do tron',       labelEn:'Donut Chart',    category:'chart',   icon:'\u{1F369}', desc:'Conic-gradient donut', descEn:'CSS donut chart' },
-  'chart-line':     { label:'Bieu do duong',      labelEn:'Line Chart',     category:'chart',   icon:'\u{1F4C8}', desc:'Bieu do xu huong', descEn:'Trend line chart' },
-  'chart-heatmap':  { label:'Ban do nhiet',       labelEn:'Heatmap',        category:'chart',   icon:'\u{1F5FA}', desc:'Luoi mau theo gia tri', descEn:'Value-colored grid' },
+  /* BIỂU ĐỒ / CHART */
+  'chart-bar':        { label:'Biểu đồ cột',          labelEn:'Bar Chart',        category:'chart',   icon:'📊', desc:'Biểu đồ cột ngang/dọc', descEn:'Horizontal/vertical bar chart' },
+  'chart-stacked-bar':{ label:'Biểu đồ cột chồng',    labelEn:'Stacked Bar',      category:'chart',   icon:'📊', desc:'Biểu đồ cột xếp chồng nhiều series', descEn:'Multi-series stacked bar chart' },
+  'chart-donut':      { label:'Biểu đồ tròn',         labelEn:'Donut Chart',      category:'chart',   icon:'🍩', desc:'Biểu đồ tròn (conic-gradient)', descEn:'CSS donut/pie chart' },
+  'chart-line':       { label:'Biểu đồ đường',        labelEn:'Line Chart',       category:'chart',   icon:'📈', desc:'Biểu đồ xu hướng theo thời gian', descEn:'Trend line chart over time' },
+  'chart-heatmap':    { label:'Bản đồ nhiệt',         labelEn:'Heatmap',          category:'chart',   icon:'🗺️', desc:'Lưới màu theo giá trị (máy × ngày)', descEn:'Value-colored grid (machine × day)' },
+  'chart-progress':   { label:'Vòng tiến độ',          labelEn:'Progress Ring',    category:'chart',   icon:'⭕', desc:'Vòng tròn % hoàn thành', descEn:'Circular progress percentage' },
+  'chart-sparkline':  { label:'Đường mini',            labelEn:'Sparkline',        category:'chart',   icon:'〰️', desc:'Biểu đồ xu hướng nhỏ gọn', descEn:'Compact inline trend line' },
 
-  /* ACTION */
-  'action-toolbar': { label:'Thanh cong cu',      labelEn:'Toolbar',        category:'action',  icon:'\u{1F527}', desc:'Nhom nut hanh dong', descEn:'Action button group' },
-  'action-summary': { label:'Tom tat',            labelEn:'Summary',        category:'action',  icon:'\u{1F4CB}', desc:'Panel tom tat', descEn:'Summary panel' },
+  /* HÀNH ĐỘNG / ACTION */
+  'action-toolbar':   { label:'Thanh công cụ',         labelEn:'Toolbar',          category:'action',  icon:'🔧', desc:'Nhóm nút hành động (tạo, lọc, xuất)', descEn:'Action button group (create, filter, export)' },
+  'action-status-flow':{ label:'Chuyển trạng thái',    labelEn:'Status Flow',      category:'action',  icon:'🔄', desc:'Nút chuyển trạng thái theo workflow', descEn:'Workflow status transition buttons' },
+  'action-quick-create':{ label:'Tạo nhanh',           labelEn:'Quick Create',     category:'action',  icon:'⚡', desc:'Nút + modal form tạo nhanh bản ghi', descEn:'Button + modal form for quick record creation' },
+  'action-summary':   { label:'Tóm tắt',              labelEn:'Summary',          category:'action',  icon:'📋', desc:'Panel tóm tắt thông tin', descEn:'Information summary panel' },
+  'action-export':    { label:'Xuất dữ liệu',          labelEn:'Export',           category:'action',  icon:'💾', desc:'Nút xuất CSV, Excel, PDF', descEn:'Export CSV, Excel, PDF buttons' },
 };
 
 var BLOCK_CATEGORIES = [
-  { key:'layout', label:'Bo cuc',      labelEn:'Layout',  color:'#3b82f6' },
-  { key:'data',   label:'Du lieu',     labelEn:'Data',    color:'#16a34a' },
-  { key:'form',   label:'Bieu mau',    labelEn:'Form',    color:'#7c3aed' },
-  { key:'chart',  label:'Bieu do',     labelEn:'Chart',   color:'#d97706' },
-  { key:'action', label:'Hanh dong',   labelEn:'Action',  color:'#dc2626' },
+  { key:'layout', label:'Bố cục',       labelEn:'Layout',  color:'#3b82f6' },
+  { key:'data',   label:'Dữ liệu',      labelEn:'Data',    color:'#16a34a' },
+  { key:'form',   label:'Biểu mẫu',     labelEn:'Form',    color:'#7c3aed' },
+  { key:'chart',  label:'Biểu đồ',      labelEn:'Chart',   color:'#d97706' },
+  { key:'action', label:'Hành động',     labelEn:'Action',  color:'#dc2626' },
 ];
 
 /* ── API Catalog (commonly used endpoints for the binding dropdown) ──── */
 var API_CATALOG = [
-  /* Don hang / Orders */
-  { action:'order_so_list',          method:'GET',  label:'Danh sach SO',        module:'Don hang',    responseKeys:['sales_orders'] },
-  { action:'order_jo_list',          method:'GET',  label:'Danh sach JO',        module:'Don hang',    responseKeys:['job_orders'] },
-  { action:'order_wo_list',          method:'GET',  label:'Danh sach WO',        module:'Don hang',    responseKeys:['work_orders'] },
-  { action:'order_dashboard_kpi',    method:'GET',  label:'KPI don hang',        module:'Don hang',    responseKeys:['active_so_count','on_time_pct','active_holds'] },
-  { action:'order_detail',           method:'POST', label:'Chi tiet don hang',   module:'Don hang',    responseKeys:['order'] },
-  { action:'order_hierarchy',        method:'GET',  label:'Cay SO-JO-WO',       module:'Don hang',    responseKeys:['hierarchy'] },
-  /* San xuat / Production */
-  { action:'dispatch_dashboard',     method:'GET',  label:'Tong hop ca',         module:'San xuat',    responseKeys:['total_tasks','total_good','total_ng','achievement_pct'] },
-  { action:'dispatch_task_list',     method:'GET',  label:'DS task san xuat',    module:'San xuat',    responseKeys:['tasks'] },
-  { action:'dispatch_shift_report',  method:'GET',  label:'Bao cao ca',          module:'San xuat',    responseKeys:['report'] },
-  { action:'production_oee',        method:'GET',  label:'OEE tong hop',        module:'San xuat',    responseKeys:['oee','availability','performance','quality'] },
-  /* Chat luong / Quality */
-  { action:'exception_dashboard',    method:'GET',  label:'KPI chat luong',      module:'Chat luong',  responseKeys:['open_ncr','open_capa','copq_mtd'] },
-  { action:'exception_list',         method:'GET',  label:'DS exception',        module:'Chat luong',  responseKeys:['exceptions'] },
-  { action:'exception_detail',       method:'POST', label:'Chi tiet exception',  module:'Chat luong',  responseKeys:['exception'] },
-  { action:'ncr_list',               method:'GET',  label:'Danh sach NCR',       module:'Chat luong',  responseKeys:['ncrs'] },
-  { action:'capa_list',              method:'GET',  label:'Danh sach CAPA',      module:'Chat luong',  responseKeys:['capas'] },
-  { action:'fmea_list',              method:'GET',  label:'Danh sach FMEA',      module:'Chat luong',  responseKeys:['items'] },
-  /* Mua hang / Purchasing */
-  { action:'supplier_dashboard',     method:'GET',  label:'KPI NCC',             module:'Mua hang',    responseKeys:['avg_score','open_scars','incoming_reject_rate'] },
-  { action:'supplier_list',          method:'GET',  label:'Danh sach NCC',       module:'Mua hang',    responseKeys:['suppliers'] },
-  { action:'scar_list',              method:'GET',  label:'Danh sach SCAR',      module:'Mua hang',    responseKeys:['scars'] },
-  { action:'incoming_inspection_list',method:'GET', label:'DS IQC',              module:'Mua hang',    responseKeys:['inspections'] },
-  /* Bao gia / Quoting */
-  { action:'quote_dashboard',        method:'GET',  label:'KPI bao gia',         module:'Bao gia',     responseKeys:['pipeline_value','win_rate'] },
-  { action:'quote_list',             method:'GET',  label:'Danh sach bao gia',   module:'Bao gia',     responseKeys:['quotes'] },
-  /* Master data */
-  { action:'master_data_snapshot',   method:'GET',  label:'Master data',         module:'He thong',    responseKeys:['data'] },
-  { action:'user_list',              method:'GET',  label:'Danh sach user',      module:'He thong',    responseKeys:['users'] },
-  /* Tai lieu / Documents */
-  { action:'doc_index',              method:'GET',  label:'Danh sach tai lieu',  module:'Tai lieu',    responseKeys:['documents'] },
-  { action:'doc_search',             method:'POST', label:'Tim tai lieu',        module:'Tai lieu',    responseKeys:['results'] },
-  /* Thiet bi / Equipment */
-  { action:'equipment_list',         method:'GET',  label:'DS thiet bi',         module:'Thiet bi',    responseKeys:['items'] },
-  { action:'calibration_schedule',   method:'GET',  label:'Lich hieu chuan',     module:'Thiet bi',    responseKeys:['schedule'] },
-  /* Bao cao / Reports */
-  { action:'compliance_reports',     method:'GET',  label:'Bao cao tuan thu',    module:'Bao cao',     responseKeys:['reports'] },
-  { action:'energy_dashboard',       method:'GET',  label:'KPI nang luong',      module:'Bao cao',     responseKeys:['consumption','cost'] },
-  /* Module schema */
-  { action:'module_schema_get',      method:'GET',  label:'Lay schema module',   module:'He thong',    responseKeys:['schema'] },
-  { action:'module_schema_save',     method:'POST', label:'Luu schema module',   module:'He thong',    responseKeys:['ok'] },
-  { action:'module_schema_reset',    method:'POST', label:'Reset schema module',  module:'He thong',   responseKeys:['ok'] },
+  /* Đơn hàng / Orders */
+  { action:'order_so_list',          method:'GET',  label:'Danh sách SO',            module:'Đơn hàng',      responseKeys:['sales_orders'] },
+  { action:'order_jo_list',          method:'GET',  label:'Danh sách JO',            module:'Đơn hàng',      responseKeys:['job_orders'] },
+  { action:'order_wo_list',          method:'GET',  label:'Danh sách WO',            module:'Đơn hàng',      responseKeys:['work_orders'] },
+  { action:'order_dashboard_kpi',    method:'GET',  label:'KPI đơn hàng',            module:'Đơn hàng',      responseKeys:['active_so_count','on_time_pct','active_holds'] },
+  { action:'order_so_detail',        method:'GET',  label:'Chi tiết SO',             module:'Đơn hàng',      responseKeys:['sales_order'] },
+  { action:'order_hierarchy',        method:'GET',  label:'Cây SO→JO→WO',           module:'Đơn hàng',      responseKeys:['hierarchy'] },
+  { action:'order_shipment_gate',    method:'GET',  label:'Kiểm tra giao hàng',      module:'Đơn hàng',      responseKeys:['shipment_gate'] },
+  { action:'packing_list',           method:'GET',  label:'Danh sách packing',       module:'Đơn hàng',      responseKeys:['packing_lists'] },
+  /* Kế hoạch / Planning */
+  { action:'dispatch_timeline',      method:'GET',  label:'Timeline Gantt',          module:'Kế hoạch',      responseKeys:['timeline'] },
+  { action:'dispatch_dashboard',     method:'GET',  label:'Tổng hợp ca',             module:'Kế hoạch',      responseKeys:['total_tasks','total_good','achievement_pct'] },
+  { action:'dispatch_list_targets',  method:'GET',  label:'Danh sách lệnh SX',      module:'Kế hoạch',      responseKeys:['targets'] },
+  { action:'dispatch_operator_tasks',method:'GET',  label:'Lệnh của công nhân',      module:'Kế hoạch',      responseKeys:['tasks'] },
+  { action:'schedule_capacity',      method:'GET',  label:'Năng lực sản xuất',       module:'Kế hoạch',      responseKeys:['capacity'] },
+  { action:'subcontract_list',       method:'GET',  label:'Danh sách gia công ngoài',module:'Kế hoạch',      responseKeys:['subcontracts'] },
+  { action:'shift_list',             method:'GET',  label:'Danh sách ca',            module:'Kế hoạch',      responseKeys:['shifts'] },
+  /* Sản xuất / Production */
+  { action:'mobile_shop_overview',   method:'GET',  label:'Giám sát xưởng',          module:'Sản xuất',      responseKeys:['machines'] },
+  { action:'cnc_program_list',       method:'GET',  label:'Chương trình CNC',        module:'Sản xuất',      responseKeys:['programs'] },
+  { action:'knowledge_list',         method:'GET',  label:'Kho kiến thức',           module:'Sản xuất',      responseKeys:['tips'] },
+  { action:'energy_overview',        method:'GET',  label:'Năng lượng tổng quan',    module:'Sản xuất',      responseKeys:['machines'] },
+  /* Chất lượng / Quality */
+  { action:'exception_dashboard',    method:'GET',  label:'KPI chất lượng',          module:'Chất lượng',    responseKeys:['open_ncr','open_capa','copq_mtd'] },
+  { action:'exception_list',         method:'GET',  label:'Danh sách NCR/CAPA',      module:'Chất lượng',    responseKeys:['exceptions'] },
+  { action:'fmea_list',              method:'GET',  label:'Danh sách FMEA',          module:'Chất lượng',    responseKeys:['fmeas'] },
+  { action:'apqp_dashboard',         method:'GET',  label:'APQP dashboard',          module:'Chất lượng',    responseKeys:['projects'] },
+  { action:'oqc_list',               method:'GET',  label:'Kiểm tra cuối (OQC)',     module:'Chất lượng',    responseKeys:['inspections'] },
+  { action:'exception_copq_summary', method:'GET',  label:'Chi phí chất lượng kém',  module:'Chất lượng',    responseKeys:['breakdown'] },
+  /* Mua hàng / Purchasing */
+  { action:'supplier_dashboard',     method:'GET',  label:'KPI nhà cung cấp',        module:'Mua hàng',      responseKeys:['avg_score','open_scars'] },
+  { action:'supplier_incoming_list', method:'GET',  label:'Kiểm tra nhận hàng',      module:'Mua hàng',      responseKeys:['inspections'] },
+  { action:'supplier_scar_list',     method:'GET',  label:'Danh sách SCAR',          module:'Mua hàng',      responseKeys:['scars'] },
+  { action:'supplier_scorecard_list',method:'GET',  label:'Điểm NCC',               module:'Mua hàng',      responseKeys:['scorecards'] },
+  /* Báo giá / Quoting */
+  { action:'quote_list',             method:'GET',  label:'Danh sách báo giá',       module:'Báo giá',       responseKeys:['quotes'] },
+  { action:'quote_dashboard',        method:'GET',  label:'KPI báo giá',             module:'Báo giá',       responseKeys:['pipeline_value','win_rate'] },
+  /* Hồ sơ / Records */
+  { action:'evidence_list',          method:'GET',  label:'Kho chứng cứ',            module:'Hồ sơ',         responseKeys:['evidence'] },
+  { action:'online_form_list',       method:'GET',  label:'Biểu mẫu online',        module:'Hồ sơ',         responseKeys:['forms'] },
+  { action:'product_passport_list',  method:'GET',  label:'Hộ chiếu sản phẩm',      module:'Hồ sơ',         responseKeys:['passports'] },
+  /* Báo cáo / Reports */
+  { action:'compliance_report_types',method:'GET',  label:'Loại báo cáo',            module:'Báo cáo',       responseKeys:['report_types'] },
+  { action:'ci_dashboard',           method:'GET',  label:'Cải tiến liên tục',       module:'Báo cáo',       responseKeys:['active_projects','cost_saved'] },
+  /* Quản trị / Admin */
+  { action:'master_data_list',       method:'GET',  label:'Dữ liệu nền',            module:'Quản trị',      responseKeys:['items'] },
+  { action:'master_data_entities',   method:'GET',  label:'Loại dữ liệu nền',       module:'Quản trị',      responseKeys:['entities'] },
+  { action:'module_schema_list',     method:'GET',  label:'Danh sách module',        module:'Quản trị',      responseKeys:['schemas'] },
+  { action:'module_api_catalog',     method:'GET',  label:'API catalog',             module:'Quản trị',      responseKeys:['catalog'] },
 ];
 
 /* ══════════════════════════════════════════════════════════════════════════
