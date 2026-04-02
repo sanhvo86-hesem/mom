@@ -3097,4 +3097,569 @@ window.HmBlockEngine = {
   isEditMode: isEditMode,
 };
 
+/* ================================================================
+ *  V4 — ADVANCED FEATURES
+ *  Query Chaining · Validation · Conditional Format · Auto-Refresh
+ *  Virtual Scroll · Clipboard · Block Search · Schema Versioning
+ *  Accessibility (WCAG 2.1 AA)
+ * ================================================================ */
+
+// ─── 1. QUERY CHAINING ────────────────────────────────────────────
+// Execute a sequential chain of actions (api → refresh → toast …).
+// Each result is merged into context._lastResult for the next step.
+
+function executeChain(actions, context, index) {
+  index = index || 0;
+  if (!actions || index >= actions.length) return Promise.resolve();
+  return new Promise(function (resolve, reject) {
+    var action = actions[index];
+    var resolved = _resolveActionConfig(action, context);
+    _executeSingleAction(resolved, context).then(function (result) {
+      context._lastResult = result;
+      executeChain(actions, context, index + 1).then(resolve).catch(reject);
+    }).catch(function (err) {
+      // Chain stops on first error
+      if (action.onError) toast(resolveBindings(action.onError, context), 'error');
+      reject(err);
+    });
+  });
+}
+
+function _resolveActionConfig(action, context) {
+  var str = JSON.stringify(action);
+  str = resolveBindings(str, context);
+  try { return JSON.parse(str); } catch (e) { return action; }
+}
+
+function _executeSingleAction(action, context) {
+  switch (action.type) {
+    case 'api':
+      return _api(action.action, action.body || {}, action.method || 'POST').then(function (r) {
+        if (r && !r.ok && action.onError) {
+          toast(resolveBindings(action.onError, context), 'error');
+        }
+        return r;
+      });
+
+    case 'refresh':
+      (action.blocks || []).forEach(function (bid) { invalidateCache(bid); });
+      return Promise.resolve();
+
+    case 'toast':
+      toast(resolveBindings(action.message || '', context), action.toastType || 'success');
+      return Promise.resolve();
+
+    case 'navigate':
+      if (action.url) {
+        var url = resolveBindings(action.url, context);
+        window.location.href = url;
+      }
+      return Promise.resolve();
+
+    case 'setContext':
+      if (action.key && action.value !== undefined) {
+        context[action.key] = resolveBindings(String(action.value), context);
+      }
+      return Promise.resolve();
+
+    case 'delay':
+      return new Promise(function (resolve) {
+        setTimeout(resolve, (action.ms || 500));
+      });
+
+    default:
+      console.warn('[BlockEngine] Unknown chain action type:', action.type);
+      return Promise.resolve();
+  }
+}
+
+// ─── 2. DATA VALIDATION ENGINE ────────────────────────────────────
+// Per-field validation: required, minLength, maxLength, pattern,
+// min/max (numeric), and custom expression rules.
+
+function validateField(value, rules, context) {
+  if (!rules) return { valid: true };
+
+  // Required
+  if (rules.required && (value === '' || value === null || value === undefined)) {
+    return { valid: false, message: _t('Trường bắt buộc', 'Required field') };
+  }
+
+  // Skip further checks for empty non-required fields
+  if (value === '' || value === null || value === undefined) return { valid: true };
+
+  var strVal = String(value);
+
+  // String length
+  if (rules.minLength && strVal.length < rules.minLength) {
+    return { valid: false, message: _t('Tối thiểu ' + rules.minLength + ' ký tự', 'Minimum ' + rules.minLength + ' characters') };
+  }
+  if (rules.maxLength && strVal.length > rules.maxLength) {
+    return { valid: false, message: _t('Tối đa ' + rules.maxLength + ' ký tự', 'Maximum ' + rules.maxLength + ' characters') };
+  }
+
+  // Regex pattern
+  if (rules.pattern && !new RegExp(rules.pattern).test(strVal)) {
+    return { valid: false, message: rules.patternMessage || _t('Định dạng không đúng', 'Invalid format') };
+  }
+
+  // Numeric range
+  if (rules.min !== undefined && Number(value) < rules.min) {
+    return { valid: false, message: _t('Tối thiểu ' + rules.min, 'Minimum ' + rules.min) };
+  }
+  if (rules.max !== undefined && Number(value) > rules.max) {
+    return { valid: false, message: _t('Tối đa ' + rules.max, 'Maximum ' + rules.max) };
+  }
+
+  // Custom expression — evaluated with { value } in context
+  if (rules.custom) {
+    var ctx = Object.assign({}, context, { value: value });
+    var result = evaluateExpression(rules.custom, ctx);
+    if (!result) {
+      return { valid: false, message: rules.customMessage || _t('Không hợp lệ', 'Invalid') };
+    }
+  }
+
+  return { valid: true };
+}
+
+function validateForm(fields, formData, context) {
+  var errors = {};
+  var valid = true;
+  (fields || []).forEach(function (field) {
+    if (!field.validation) return;
+    var result = validateField(formData[field.key], field.validation, context);
+    if (!result.valid) {
+      errors[field.key] = result.message;
+      valid = false;
+    }
+  });
+  return { valid: valid, errors: errors };
+}
+
+/** Apply validation error UI to a form container */
+function showValidationErrors(container, errors) {
+  // Clear previous
+  var prev = container.querySelectorAll('.hm-field-error');
+  for (var i = 0; i < prev.length; i++) prev[i].remove();
+
+  var prevHighlight = container.querySelectorAll('.hm-field-invalid');
+  for (var j = 0; j < prevHighlight.length; j++) prevHighlight[j].classList.remove('hm-field-invalid');
+
+  if (!errors) return;
+  Object.keys(errors).forEach(function (key) {
+    var input = container.querySelector('[name="' + key + '"]');
+    if (!input) return;
+    input.classList.add('hm-field-invalid');
+    var errEl = document.createElement('div');
+    errEl.className = 'hm-field-error';
+    errEl.setAttribute('role', 'alert');
+    errEl.textContent = errors[key];
+    input.parentNode.insertBefore(errEl, input.nextSibling);
+  });
+}
+
+// ─── 3. CONDITIONAL FORMATTING (tables) ───────────────────────────
+// Cell-level: column.conditionalFormat = [{ condition, style }]
+// Row-level:  config.rowConditionalFormat = [{ condition, style }]
+
+function resolveConditionalFormat(rules, value, row, context) {
+  if (!rules || !rules.length) return '';
+  var ctx = Object.assign({}, context, { value: value, row: row });
+  for (var i = 0; i < rules.length; i++) {
+    var rule = rules[i];
+    if (evaluateExpression(rule.condition, ctx)) {
+      return _buildStyleAttr(rule.style);
+    }
+  }
+  return '';
+}
+
+function resolveRowConditionalFormat(rules, row, context) {
+  if (!rules || !rules.length) return '';
+  var ctx = Object.assign({}, context, { row: row });
+  for (var i = 0; i < rules.length; i++) {
+    var rule = rules[i];
+    if (evaluateExpression(rule.condition, ctx)) {
+      return _buildStyleAttr(rule.style);
+    }
+  }
+  return '';
+}
+
+function _buildStyleAttr(styleObj) {
+  if (!styleObj) return '';
+  var parts = [];
+  Object.keys(styleObj).forEach(function (prop) {
+    var kebab = prop.replace(/([A-Z])/g, '-$1').toLowerCase();
+    parts.push(kebab + ':' + styleObj[prop]);
+  });
+  return parts.length ? ' style="' + _esc(parts.join(';')) + '"' : '';
+}
+
+// ─── 4. AUTO-REFRESH (Polling) ────────────────────────────────────
+// block.config.autoRefresh = { enabled: true, intervalSeconds: 30 }
+
+var _autoRefreshTimers = {};
+
+function startAutoRefresh(moduleId, blockId, intervalSeconds) {
+  var key = moduleId + ':' + blockId;
+  stopAutoRefresh(moduleId, blockId);
+  _autoRefreshTimers[key] = setInterval(function () {
+    invalidateCache(blockId);
+    var state = getModuleState(moduleId);
+    // Only refresh if module is not in edit mode and tab is active
+    if (state && !state.editMode && !document.hidden) {
+      var block = _findBlockInSchema(moduleId, blockId);
+      if (block) {
+        fetchBlockData(block).then(function () { _rerender(); });
+      }
+    }
+  }, (intervalSeconds || 60) * 1000);
+}
+
+function stopAutoRefresh(moduleId, blockId) {
+  var key = moduleId + ':' + blockId;
+  if (_autoRefreshTimers[key]) {
+    clearInterval(_autoRefreshTimers[key]);
+    delete _autoRefreshTimers[key];
+  }
+}
+
+function stopAllAutoRefresh(moduleId) {
+  Object.keys(_autoRefreshTimers).forEach(function (key) {
+    if (!moduleId || key.indexOf(moduleId + ':') === 0) {
+      clearInterval(_autoRefreshTimers[key]);
+      delete _autoRefreshTimers[key];
+    }
+  });
+}
+
+function _findBlockInSchema(moduleId, blockId) {
+  var schema = _loadSchemaLocal(moduleId);
+  if (!schema || !schema.tabs) return null;
+  for (var t = 0; t < schema.tabs.length; t++) {
+    var blocks = schema.tabs[t].blocks || [];
+    for (var b = 0; b < blocks.length; b++) {
+      if (blocks[b].blockId === blockId) return blocks[b];
+    }
+  }
+  return null;
+}
+
+// Pause polling when tab is hidden, resume when visible
+document.addEventListener('visibilitychange', function () {
+  if (document.hidden) {
+    // Timers keep running but the interval callbacks check document.hidden
+    return;
+  }
+  // On return, force one immediate refresh for all active timers
+  Object.keys(_autoRefreshTimers).forEach(function (key) {
+    var parts = key.split(':');
+    if (parts.length === 2) {
+      var bid = parts[1];
+      invalidateCache(bid);
+    }
+  });
+});
+
+// ─── 5. VIRTUAL SCROLL (1 000+ rows) ─────────────────────────────
+// When row count exceeds threshold, render only visible rows + buffer.
+
+var VIRTUAL_ROW_HEIGHT = 44;
+var VIRTUAL_BUFFER     = 10;
+var VIRTUAL_THRESHOLD  = 200;
+
+function renderVirtualTable(config, allRows, state, blockId, container) {
+  var visibleHeight = 500;
+  var scrollTop = 0;
+
+  var tableEl = container
+    ? container.querySelector('[data-virtual-table="' + blockId + '"]')
+    : null;
+  if (tableEl) {
+    scrollTop     = tableEl.scrollTop;
+    visibleHeight = tableEl.clientHeight || visibleHeight;
+  }
+
+  var totalHeight = allRows.length * VIRTUAL_ROW_HEIGHT;
+  var startIdx    = Math.max(0, Math.floor(scrollTop / VIRTUAL_ROW_HEIGHT) - VIRTUAL_BUFFER);
+  var endIdx      = Math.min(allRows.length, Math.ceil((scrollTop + visibleHeight) / VIRTUAL_ROW_HEIGHT) + VIRTUAL_BUFFER);
+  var visibleRows = allRows.slice(startIdx, endIdx);
+  var paddingTop    = startIdx * VIRTUAL_ROW_HEIGHT;
+  var paddingBottom = Math.max(0, (allRows.length - endIdx) * VIRTUAL_ROW_HEIGHT);
+
+  return {
+    visibleRows:   visibleRows,
+    paddingTop:    paddingTop,
+    paddingBottom: paddingBottom,
+    totalHeight:   totalHeight,
+    startIdx:      startIdx,
+    endIdx:        endIdx,
+    isVirtual:     allRows.length > VIRTUAL_THRESHOLD
+  };
+}
+
+/** Attach scroll listener that triggers debounced re-render */
+function initVirtualScroll(container, blockId, renderFn) {
+  var el = container
+    ? container.querySelector('[data-virtual-table="' + blockId + '"]')
+    : null;
+  if (!el) return;
+
+  var _raf = null;
+  el.addEventListener('scroll', function () {
+    if (_raf) cancelAnimationFrame(_raf);
+    _raf = requestAnimationFrame(function () {
+      if (typeof renderFn === 'function') renderFn(el.scrollTop);
+      _raf = null;
+    });
+  }, { passive: true });
+}
+
+// ─── 6. CLIPBOARD & PASTE (Block Copy) ───────────────────────────
+
+function copyBlockToClipboard(moduleId, blockId) {
+  var schema = _loadSchemaLocal(moduleId);
+  if (!schema) return;
+  var block = null;
+  (schema.tabs || []).forEach(function (tab) {
+    (tab.blocks || []).forEach(function (b) {
+      if (b.blockId === blockId) block = _clone(b);
+    });
+  });
+  if (!block) { toast(_t('Không tìm thấy block', 'Block not found'), 'warning'); return; }
+  block.blockId = _uid();
+  block._copied = true;
+  try {
+    localStorage.setItem('hm_clipboard_block', JSON.stringify(block));
+    toast(_t('Đã copy block', 'Block copied'), 'success');
+  } catch (e) {
+    toast(_t('Lỗi copy', 'Copy error'), 'error');
+  }
+}
+
+function pasteBlockFromClipboard(moduleId, tabKey, afterBlockId) {
+  try {
+    var raw = localStorage.getItem('hm_clipboard_block');
+    if (!raw) { toast(_t('Clipboard trống', 'Clipboard empty'), 'warning'); return; }
+    var block = JSON.parse(raw);
+    block.blockId = _uid(); // Ensure unique ID
+    delete block._copied;
+    addBlock(moduleId, tabKey, afterBlockId, block.type, block);
+    toast(_t('Đã paste block', 'Block pasted'), 'success');
+  } catch (e) {
+    toast(_t('Lỗi paste', 'Paste error'), 'error');
+  }
+}
+
+function hasClipboardBlock() {
+  try { return !!localStorage.getItem('hm_clipboard_block'); } catch (e) { return false; }
+}
+
+// ─── 7. BLOCK SEARCH (Fuzzy) ─────────────────────────────────────
+
+function _fuzzyMatch(needle, haystack) {
+  needle   = String(needle).toLowerCase();
+  haystack = String(haystack).toLowerCase();
+  if (haystack.indexOf(needle) >= 0) return true;
+  // All chars of needle appear in order in haystack
+  var ni = 0;
+  for (var hi = 0; hi < haystack.length && ni < needle.length; hi++) {
+    if (haystack[hi] === needle[ni]) ni++;
+  }
+  return ni === needle.length;
+}
+
+/** Filter a list of block templates by search query */
+function searchBlockTemplates(query, templates) {
+  if (!query) return templates || [];
+  return (templates || []).filter(function (tpl) {
+    var label = (tpl.label && (tpl.label.vi || tpl.label.en)) || tpl.type || '';
+    var desc  = (tpl.description && (tpl.description.vi || tpl.description.en)) || '';
+    return _fuzzyMatch(query, label) || _fuzzyMatch(query, desc) || _fuzzyMatch(query, tpl.type || '');
+  });
+}
+
+// ─── 8. SCHEMA VERSIONING ─────────────────────────────────────────
+
+var SCHEMA_VERSION_LIMIT = 20;
+
+function getSchemaVersions(moduleId) {
+  try {
+    var raw = localStorage.getItem('hm_schema_versions_' + moduleId);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) { return []; }
+}
+
+function pushSchemaVersion(moduleId, schema) {
+  var versions = getSchemaVersions(moduleId);
+  versions.push({
+    version:   schema.version || versions.length + 1,
+    timestamp: new Date().toISOString(),
+    schema:    _clone(schema)
+  });
+  if (versions.length > SCHEMA_VERSION_LIMIT) {
+    versions = versions.slice(-SCHEMA_VERSION_LIMIT);
+  }
+  try {
+    localStorage.setItem('hm_schema_versions_' + moduleId, JSON.stringify(versions));
+  } catch (e) {
+    console.warn('[BlockEngine] Could not persist schema version:', e.message);
+  }
+}
+
+function rollbackSchema(moduleId, versionIndex) {
+  var versions = getSchemaVersions(moduleId);
+  if (versionIndex < 0 || versionIndex >= versions.length) {
+    toast(_t('Phiên bản không tồn tại', 'Version not found'), 'error');
+    return false;
+  }
+  var target = versions[versionIndex];
+  if (!target || !target.schema) return false;
+  saveModuleSchema(moduleId, target.schema);
+  toast(
+    _t('Đã rollback về phiên bản ' + target.version,
+       'Rolled back to version ' + target.version),
+    'success'
+  );
+  return true;
+}
+
+function clearSchemaVersions(moduleId) {
+  try { localStorage.removeItem('hm_schema_versions_' + moduleId); } catch (e) {}
+}
+
+// ─── 9. ACCESSIBILITY (WCAG 2.1 AA) ──────────────────────────────
+
+function _ariaAttrs(block) {
+  var attrs = ' role="region"';
+  var label = _t(
+    (block.title && block.title.vi) || block.type || '',
+    (block.title && block.title.en) || block.type || ''
+  );
+  attrs += ' aria-label="' + _esc(label) + '"';
+  if (block.visible === false) attrs += ' aria-hidden="true"';
+  return attrs;
+}
+
+function _tableAriaAttrs(config) {
+  var rowCount = config._totalRows || 0;
+  var colCount = (config.columns || []).length;
+  return ' role="grid" aria-rowcount="' + rowCount + '" aria-colcount="' + colCount + '"';
+}
+
+/** Keyboard navigation within table cells (Arrow keys + Enter) */
+function _initTableKeyNav(container, blockId) {
+  var table = container
+    ? container.querySelector('[data-block-id="' + blockId + '"] table')
+    : null;
+  if (!table) return;
+  table.setAttribute('tabindex', '0');
+
+  // Make cells focusable
+  var cells = table.querySelectorAll('td, th');
+  for (var c = 0; c < cells.length; c++) {
+    if (!cells[c].hasAttribute('tabindex')) cells[c].setAttribute('tabindex', '-1');
+  }
+
+  table.addEventListener('keydown', function (e) {
+    var cell = document.activeElement;
+    if (!cell || !cell.closest('td,th')) return;
+    var row = cell.closest('tr');
+    if (!row) return;
+    var idx = Array.from(row.cells).indexOf(cell.closest('td,th'));
+
+    switch (e.key) {
+      case 'ArrowRight':
+        if (cell.nextElementSibling) { cell.nextElementSibling.focus(); e.preventDefault(); }
+        break;
+      case 'ArrowLeft':
+        if (cell.previousElementSibling) { cell.previousElementSibling.focus(); e.preventDefault(); }
+        break;
+      case 'ArrowDown':
+        var nextRow = row.nextElementSibling;
+        if (nextRow && nextRow.cells[idx]) { nextRow.cells[idx].focus(); e.preventDefault(); }
+        break;
+      case 'ArrowUp':
+        var prevRow = row.previousElementSibling;
+        if (prevRow && prevRow.cells[idx]) { prevRow.cells[idx].focus(); e.preventDefault(); }
+        break;
+      case 'Enter':
+        if (cell.closest('td')) {
+          cell.closest('td').dispatchEvent(new Event('dblclick', { bubbles: true }));
+          e.preventDefault();
+        }
+        break;
+      case 'Home':
+        if (row.cells[0]) { row.cells[0].focus(); e.preventDefault(); }
+        break;
+      case 'End':
+        if (row.cells[row.cells.length - 1]) { row.cells[row.cells.length - 1].focus(); e.preventDefault(); }
+        break;
+    }
+  });
+}
+
+/** Live-region announcer for dynamic content updates */
+function _announce(message) {
+  var el = document.getElementById('hm-aria-live');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'hm-aria-live';
+    el.setAttribute('role', 'status');
+    el.setAttribute('aria-live', 'polite');
+    el.setAttribute('aria-atomic', 'true');
+    el.className = 'hm-sr-only';
+    document.body.appendChild(el);
+  }
+  el.textContent = message;
+}
+
+// ─── 10. EXPORT v4 features ───────────────────────────────────────
+
+Object.assign(window.HmBlockEngine, {
+  // Query chaining
+  executeChain:             executeChain,
+
+  // Validation
+  validateField:            validateField,
+  validateForm:             validateForm,
+  showValidationErrors:     showValidationErrors,
+
+  // Conditional formatting
+  resolveConditionalFormat:    resolveConditionalFormat,
+  resolveRowConditionalFormat: resolveRowConditionalFormat,
+
+  // Auto-refresh
+  startAutoRefresh:   startAutoRefresh,
+  stopAutoRefresh:    stopAutoRefresh,
+  stopAllAutoRefresh: stopAllAutoRefresh,
+
+  // Virtual scroll
+  renderVirtualTable:  renderVirtualTable,
+  initVirtualScroll:   initVirtualScroll,
+  VIRTUAL_THRESHOLD:   VIRTUAL_THRESHOLD,
+
+  // Clipboard
+  copyBlockToClipboard:    copyBlockToClipboard,
+  pasteBlockFromClipboard: pasteBlockFromClipboard,
+  hasClipboardBlock:       hasClipboardBlock,
+
+  // Block search
+  searchBlockTemplates: searchBlockTemplates,
+
+  // Schema versioning
+  getSchemaVersions:    getSchemaVersions,
+  pushSchemaVersion:    pushSchemaVersion,
+  rollbackSchema:       rollbackSchema,
+  clearSchemaVersions:  clearSchemaVersions,
+
+  // Accessibility
+  _ariaAttrs:         _ariaAttrs,
+  _tableAriaAttrs:    _tableAriaAttrs,
+  _initTableKeyNav:   _initTableKeyNav,
+  _announce:          _announce,
+});
+
 })();
