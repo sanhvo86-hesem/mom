@@ -98,17 +98,17 @@ var BLOCK_CATALOG = {
 };
 
 var BLOCK_CATEGORIES = [
-  { key:'layout',        label:'Bo cuc',      labelEn:'Layout',        color:'#2563eb' },
-  { key:'data',          label:'Du lieu',     labelEn:'Data',          color:'#0f766e' },
-  { key:'form',          label:'Bieu mau',    labelEn:'Form',          color:'#7c3aed' },
-  { key:'chart',         label:'Bieu do',     labelEn:'Chart',         color:'#d97706' },
-  { key:'action',        label:'Hanh dong',   labelEn:'Action',        color:'#dc2626' },
-  { key:'media',         label:'Noi dung',    labelEn:'Media',         color:'#0891b2' },
-  { key:'navigation',    label:'Dieu huong',  labelEn:'Navigation',    color:'#4f46e5' },
-  { key:'insight',       label:'Tong hop',    labelEn:'Insight',       color:'#7c2d12' },
-  { key:'manufacturing', label:'San xuat',    labelEn:'Manufacturing', color:'#15803d' },
-  { key:'quality',       label:'Chat luong',  labelEn:'Quality',       color:'#be123c' },
-  { key:'automation',    label:'Tu dong hoa', labelEn:'Automation',    color:'#6d28d9' },
+  { key:'layout',        label:'Bố cục',      labelEn:'Layout',        color:'#2563eb' },
+  { key:'data',          label:'Dữ liệu',     labelEn:'Data',          color:'#0f766e' },
+  { key:'form',          label:'Biểu mẫu',    labelEn:'Form',          color:'#7c3aed' },
+  { key:'chart',         label:'Biểu đồ',     labelEn:'Chart',         color:'#d97706' },
+  { key:'action',        label:'Hành động',   labelEn:'Action',        color:'#dc2626' },
+  { key:'media',         label:'Nội dung',    labelEn:'Media',         color:'#0891b2' },
+  { key:'navigation',    label:'Điều hướng',  labelEn:'Navigation',    color:'#4f46e5' },
+  { key:'insight',       label:'Tổng hợp',    labelEn:'Insight',       color:'#7c2d12' },
+  { key:'manufacturing', label:'Sản xuất',    labelEn:'Manufacturing', color:'#15803d' },
+  { key:'quality',       label:'Chất lượng',  labelEn:'Quality',       color:'#be123c' },
+  { key:'automation',    label:'Tự động hóa', labelEn:'Automation',    color:'#6d28d9' },
   { key:'iot',           label:'IoT / SCADA', labelEn:'IoT / SCADA',   color:'#0f766e' }
 ];
 
@@ -158,194 +158,199 @@ function _buildExpandedBlockCatalog(seed){
   });
 
   _extendBlockCatalog(catalog, 'layout', 'section-header', [
-    'page-header|Tieu de trang|Page Header|🧭|Tieu de lon va hanh dong|section-header',
-    'section-header|Tieu de khu vuc|Section Header|🏷️|Tieu de cho tung khu vuc|section-header',
-    'sub-header|Tieu de phu|Sub Header|🔖|Dong mo dau ngan|section-header',
-    'hero-banner|Banner mo dau|Hero Banner|🌤️|Khoi gioi thieu lon|info-banner',
-    'kpi-row|Day KPI|KPI Row|📊|Hang KPI tong hop|kpi-row',
-    'metric-strip|Thanh metric|Metric Strip|📈|Day metric ngang gon|kpi-row',
-    'card-container|Nhom the|Card Container|🗂️|Khung chua block con|card-container',
-    'two-column|Hai cot|Two Column|↔️|Bo cuc hai cot|two-column',
-    'three-column|Ba cot|Three Column|🧱|Bo cuc ba cot|card-container',
-    'tab-bar|Thanh tab|Tab Bar|📑|Dieu huong tab|action-toolbar',
-    'spacer|Khoang trong|Spacer|↕️|Khoang trong phan tach|spacer',
-    'divider-line|Duong phan cach|Divider Line|➖|Duong chia section|spacer',
-    'accordion-group|Accordion|Accordion Group|📚|Danh sach mo rong|card-container',
-    'sticky-toolbar|Thanh gan dinh|Sticky Toolbar|📌|Toolbar co dinh khi cuon|action-toolbar'
+    'page-header|Tiêu đề trang|Page Header|🧭|Tiêu đề lớn và hành động chính|section-header',
+    'section-header|Tiêu đề khu vực|Section Header|🏷️|Tiêu đề cho từng khu vực nội dung|section-header',
+    'sub-header|Tiêu đề phụ|Sub Header|🔖|Dòng mở đầu ngắn cho khối nội dung|section-header',
+    'hero-banner|Banner mở đầu|Hero Banner|🌤️|Khối giới thiệu lớn đầu trang|info-banner',
+    'kpi-row|Dãy KPI|KPI Row|📊|Hàng KPI tổng hợp theo mục tiêu|kpi-row',
+    'metric-strip|Thanh metric|Metric Strip|📈|Dải metric ngang gọn cho dashboard|kpi-row',
+    'card-container|Nhóm thẻ|Card Container|🗂️|Khung chứa nhiều block con|card-container',
+    'two-column|Hai cột|Two Column|↔️|Bố cục hai cột linh hoạt|two-column',
+    'three-column|Ba cột|Three Column|🧱|Bố cục ba cột cho dashboard|card-container',
+    'tab-bar|Thanh tab|Tab Bar|📑|Điều hướng bằng tab trong khu vực|action-toolbar',
+    'spacer|Khoảng trống|Spacer|↕️|Khoảng trống phân tách nội dung|spacer',
+    'divider-line|Đường phân cách|Divider Line|➖|Đường chia section trực quan|spacer',
+    'accordion-group|Accordion|Accordion Group|📚|Danh sách có thể mở rộng hoặc thu gọn|card-container',
+    'sticky-toolbar|Thanh ghim dính|Sticky Toolbar|📌|Toolbar cố định khi cuộn trang|action-toolbar'
   ].join('\n'));
 
   _extendBlockCatalog(catalog, 'data', 'data-table', [
-    'data-table|Bang du lieu|Data Table|📋|Bang du lieu nang cao|data-table',
-    'data-cards|The du lieu|Data Cards|🪪|Danh sach du lieu dang the|data-cards',
-    'data-list|Danh sach|Data List|📝|Danh sach ban ghi don gian|data-cards',
-    'data-grid|Luoi du lieu|Data Grid|🔲|Luoi ban ghi nhieu cot|data-cards',
-    'data-timeline|Timeline|Timeline|🕒|Dong thoi gian su kien|data-timeline',
-    'master-detail|Master detail|Master Detail|📂|Danh sach va chi tiet|data-table',
-    'kanban-board|Kanban|Kanban Board|🗃️|Lane theo trang thai|data-cards',
-    'tree-view|Cay du lieu|Tree View|🌳|Du lieu phan cap|data-cards',
-    'pivot-table|Pivot table|Pivot Table|🧮|Tong hop theo hang cot|data-table',
-    'matrix-grid|Ma tran|Matrix Grid|🔳|Ma tran giao nhau|data-table',
-    'record-detail|Chi tiet ban ghi|Record Detail|🧾|Card chi tiet mot ban ghi|data-cards',
-    'audit-log|Nhat ky thao tac|Audit Log|📜|Lich su thay doi|data-timeline',
-    'attachment-list|Tep dinh kem|Attachment List|📎|Danh sach tep va media|data-cards',
-    'status-board|Bang trang thai|Status Board|🚦|Tong hop theo trang thai|data-cards',
-    'map-list|Danh sach dia diem|Map List|🗺️|Danh sach co vi tri|data-cards',
-    'schedule-grid|Lich bieu|Schedule Grid|🗓️|Bang lich theo ca ngay|data-table',
-    'heat-table|Bang nhiet|Heat Table|🔥|Bang to mau theo muc|data-table',
-    'compliance-log|Nhat ky tuan thu|Compliance Log|✅|Theo doi tuan thu|data-table'
+    'data-table|Bảng dữ liệu|Data Table|📋|Bảng dữ liệu nâng cao có phân trang và lọc|data-table',
+    'data-cards|Thẻ dữ liệu|Data Cards|🪪|Danh sách dữ liệu hiển thị dạng thẻ|data-cards',
+    'data-list|Danh sách|Data List|📝|Danh sách bản ghi đơn giản theo dòng|data-cards',
+    'data-grid|Lưới dữ liệu|Data Grid|🔲|Lưới bản ghi nhiều cột dạng card|data-cards',
+    'data-timeline|Timeline|Timeline|🕒|Dòng thời gian sự kiện và thay đổi|data-timeline',
+    'master-detail|Master detail|Master Detail|📂|Danh sách và chi tiết|data-table',
+    'kanban-board|Kanban|Kanban Board|🗃️|Lane theo trạng thái và người phụ trách|data-cards',
+    'tree-view|Cây dữ liệu|Tree View|🌳|Dữ liệu phân cấp dạng cây|data-cards',
+    'pivot-table|Pivot table|Pivot Table|🧮|Tổng hợp dữ liệu theo hàng và cột|data-table',
+    'matrix-grid|Ma trận|Matrix Grid|🔳|Ma trận giao nhau của nhiều chiều dữ liệu|data-table',
+    'record-detail|Chi tiết bản ghi|Record Detail|🧾|Card chi tiết cho một bản ghi|data-cards',
+    'audit-log|Nhật ký thao tác|Audit Log|📜|Lịch sử thay đổi có dấu vết đầy đủ|data-timeline',
+    'attachment-list|Tệp đính kèm|Attachment List|📎|Danh sách tệp, ảnh và media|data-cards',
+    'status-board|Bảng trạng thái|Status Board|🚦|Tổng hợp bản ghi theo trạng thái|data-cards',
+    'map-list|Danh sách địa điểm|Map List|🗺️|Danh sách có thông tin vị trí hoặc khu vực|data-cards',
+    'schedule-grid|Lịch biểu|Schedule Grid|🗓️|Bảng lịch theo ca, ngày hoặc nguồn lực|data-table',
+    'calendar-board|Lịch calendar|Calendar Board|📆|Lịch hiển thị dạng calendar theo ngày|data-table',
+    'gantt-board|Biểu đồ Gantt|Gantt Board|📐|Tiến độ theo timeline và phụ thuộc|data-table',
+    'heat-table|Bảng nhiệt|Heat Table|🔥|Bảng tô màu theo mức độ hoặc mật độ|data-table',
+    'compliance-log|Nhật ký tuân thủ|Compliance Log|✅|Theo dõi trạng thái tuân thủ theo dòng|data-table'
   ].join('\n'));
 
   _extendBlockCatalog(catalog, 'form', 'form-standard', [
-    'form-standard|Form chuan|Standard Form|🧩|Form nhap lieu tieu chuan|form-standard',
-    'form-wizard|Form wizard|Form Wizard|🪜|Form nhieu buoc|form-standard',
-    'form-inline|Form ngang|Inline Form|↔️|Form gon tren mot dong|form-standard',
-    'filter-bar|Thanh loc|Filter Bar|🔎|Loc va tim kiem nhanh|filter-bar',
-    'search-panel|Panel tim kiem|Search Panel|🔍|Panel tim kiem mo rong|filter-bar',
-    'approval-form|Form phe duyet|Approval Form|✍️|Form phe duyet va ghi chu|form-standard',
-    'checklist-form|Checklist|Checklist Form|☑️|Danh sach kiem tra|form-standard',
-    'dynamic-form|Form dong|Dynamic Form|🧠|Form thay doi theo dieu kien|form-standard',
-    'subform-table|Subform dang bang|Subform Table|🧮|Bang du lieu con|data-table',
-    'upload-center|Tai tep|Upload Center|📤|Tai tai lieu va anh|form-standard',
-    'signature-pad|Chu ky|Signature Pad|🖊️|Nhap xac nhan chu ky|form-standard',
-    'comment-box|Hop binh luan|Comment Box|💬|Nhap ghi chu va trao doi|form-standard',
-    'query-builder|Query builder|Query Builder|🧪|Xay dieu kien nang cao|filter-bar',
-    'parameter-panel|Panel tham so|Parameter Panel|🎛️|Nhap tham so truy van|form-standard',
-    'date-range-picker|Khoang ngay|Date Range Picker|📅|Chon tu ngay den ngay|filter-bar'
+    'form-standard|Form chuẩn|Standard Form|🧩|Form nhập liệu tiêu chuẩn nhiều trường|form-standard',
+    'form-wizard|Form wizard|Form Wizard|🪜|Form nhiều bước có điều hướng|form-standard',
+    'form-inline|Form ngang|Inline Form|↔️|Form gọn hiển thị trên một dòng|form-standard',
+    'filter-bar|Thanh lọc|Filter Bar|🔎|Lọc và tìm kiếm nhanh trên màn hình|filter-bar',
+    'search-panel|Panel tìm kiếm|Search Panel|🔍|Panel tìm kiếm mở rộng nhiều điều kiện|filter-bar',
+    'approval-form|Form phê duyệt|Approval Form|✍️|Form phê duyệt có ghi chú và xác nhận|form-standard',
+    'checklist-form|Checklist|Checklist Form|☑️|Danh sách kiểm tra theo bước hoặc tiêu chí|form-standard',
+    'dynamic-form|Form động|Dynamic Form|🧠|Form thay đổi theo điều kiện nhập liệu|form-standard',
+    'subform-table|Subform dạng bảng|Subform Table|🧮|Bảng dữ liệu con nằm trong form|data-table',
+    'upload-center|Tải tệp|Upload Center|📤|Tải tài liệu, ảnh và minh chứng|form-standard',
+    'signature-pad|Chữ ký|Signature Pad|🖊️|Nhập và xác nhận chữ ký điện tử|form-standard',
+    'comment-box|Hộp bình luận|Comment Box|💬|Nhập ghi chú và trao đổi nội bộ|form-standard',
+    'query-builder|Query builder|Query Builder|🧪|Xây điều kiện truy vấn nâng cao|filter-bar',
+    'parameter-panel|Panel tham số|Parameter Panel|🎛️|Nhập tham số cho báo cáo hoặc truy vấn|form-standard',
+    'date-range-picker|Khoảng ngày|Date Range Picker|📅|Chọn khoảng thời gian từ ngày đến ngày|filter-bar'
   ].join('\n'));
 
   _extendBlockCatalog(catalog, 'chart', 'chart-bar', [
-    'chart-bar|Bieu do cot|Bar Chart|📊|So sanh gia tri theo nhom|chart-bar',
-    'chart-line|Bieu do duong|Line Chart|📈|Xu huong theo thoi gian|chart-bar',
-    'chart-area|Bieu do mien|Area Chart|🌊|Mien tich luy theo thoi gian|chart-bar',
-    'chart-donut|Bieu do donut|Donut Chart|🍩|Ti le co lo o giua|chart-donut',
-    'chart-pie|Bieu do tron|Pie Chart|🥧|Co cau theo ty le|chart-donut',
-    'chart-stacked-bar|Cot chong|Stacked Bar|🧱|Cot chong nhieu series|chart-bar',
-    'chart-combo|Bieu do ket hop|Combo Chart|📶|Ket hop cot va duong|chart-bar',
-    'chart-radar|Bieu do radar|Radar Chart|🕸️|So sanh da chieu|chart-bar',
-    'chart-scatter|Bieu do scatter|Scatter Plot|⚫|Tuong quan bien|chart-bar',
-    'chart-bubble|Bieu do bubble|Bubble Chart|🫧|Scatter co kich thuoc|chart-bar',
-    'chart-heatmap|Heatmap|Heatmap|🔥|Ma tran nhiet|chart-bar',
-    'chart-gauge|Dong ho gauge|Gauge|🧭|Chi so tren dong ho|chart-donut',
-    'chart-progress|Vong tien do|Progress Ring|⭕|Tien do dang vong tron|chart-donut',
-    'chart-sparkline|Sparkline|Sparkline|〰️|Duong xu huong gon|chart-bar',
-    'chart-waterfall|Waterfall|Waterfall|🪜|Dong gop tang giam|chart-bar',
-    'chart-control|Control chart|Control Chart|🎯|Bieu do kiem soat|chart-bar',
-    'chart-boxplot|Box plot|Box Plot|📦|Phan bo tu phan vi|chart-bar',
-    'chart-histogram|Histogram|Histogram|📚|Tan suat theo khoang|chart-bar'
+    'chart-bar|Biểu đồ cột|Bar Chart|📊|So sánh giá trị theo nhóm|chart-bar',
+    'chart-line|Biểu đồ đường|Line Chart|📈|Xu hướng theo thời gian|chart-bar',
+    'chart-area|Biểu đồ miền|Area Chart|🌊|Miền tích lũy theo thời gian|chart-bar',
+    'chart-donut|Biểu đồ donut|Donut Chart|🍩|Tỷ lệ có lỗ ở giữa|chart-donut',
+    'chart-pie|Biểu đồ tròn|Pie Chart|🥧|Cơ cấu theo tỷ lệ|chart-donut',
+    'chart-stacked-bar|Cột chồng|Stacked Bar|🧱|Cột chồng nhiều series|chart-bar',
+    'chart-combo|Biểu đồ kết hợp|Combo Chart|📶|Kết hợp cột và đường|chart-bar',
+    'chart-radar|Biểu đồ radar|Radar Chart|🕸️|So sánh đa chiều nhiều tiêu chí|chart-bar',
+    'chart-scatter|Biểu đồ scatter|Scatter Plot|⚫|Tương quan giữa nhiều biến số|chart-bar',
+    'chart-bubble|Biểu đồ bubble|Bubble Chart|🫧|Scatter có kích thước bong bóng|chart-bar',
+    'chart-heatmap|Heatmap|Heatmap|🔥|Ma trận nhiệt theo cường độ giá trị|chart-bar',
+    'chart-gauge|Đồng hồ gauge|Gauge|🧭|Chỉ số hiện tại trên mặt đồng hồ|chart-donut',
+    'chart-progress|Vòng tiến độ|Progress Ring|⭕|Tiến độ dạng vòng tròn|chart-donut',
+    'chart-sparkline|Sparkline|Sparkline|〰️|Đường xu hướng gọn|chart-bar',
+    'chart-waterfall|Waterfall|Waterfall|🪜|Đóng góp tăng giảm theo từng bước|chart-bar',
+    'chart-control|Control chart|Control Chart|🎯|Biểu đồ kiểm soát với UCL và LCL|chart-bar',
+    'chart-boxplot|Box plot|Box Plot|📦|Phân bố theo tứ phân vị|chart-bar',
+    'chart-histogram|Histogram|Histogram|📚|Tần suất theo khoảng phân phối|chart-bar'
   ].join('\n'));
 
   _extendBlockCatalog(catalog, 'action', 'action-toolbar', [
-    'action-toolbar|Thanh cong cu|Toolbar|🛠️|Nhom nut hanh dong|action-toolbar',
-    'action-status-flow|Chuyen trang thai|Status Flow|🔄|Workflow chuyen trang thai|action-toolbar',
-    'action-quick-create|Tao nhanh|Quick Create|⚡|Tao ban ghi nhanh|action-toolbar',
-    'action-summary|Tong hop hanh dong|Action Summary|📌|Tom tat hanh dong|data-cards',
-    'action-export|Xuat du lieu|Export|💾|Xuat CSV Excel PDF|action-toolbar',
-    'action-bulk|Xu ly hang loat|Bulk Actions|🧰|Thao tac nhieu ban ghi|action-toolbar',
-    'action-approval|Phe duyet|Approval Actions|✅|Dong y tu choi ghi chu|action-toolbar',
-    'action-split|Nut chia nhanh|Split Actions|🔀|Cum nut theo nhom|action-toolbar',
-    'action-launchpad|Launchpad|Launchpad|🚀|Cum hanh dong nhanh|action-toolbar',
-    'action-shortcuts|Shortcut|Shortcuts|⌨️|Nut tat thao tac|action-toolbar',
-    'action-refresh|Lam moi|Refresh Actions|🔁|Lam moi va dong bo|action-toolbar',
-    'action-share|Chia se|Share Actions|📤|Gui lien ket thong bao|action-toolbar'
+    'action-toolbar|Thanh công cụ|Toolbar|🛠️|Nhóm nút hành động chính|action-toolbar',
+    'action-status-flow|Chuyển trạng thái|Status Flow|🔄|Workflow chuyển trạng thái bản ghi|action-toolbar',
+    'action-quick-create|Tạo nhanh|Quick Create|⚡|Tạo bản ghi nhanh từ modal|action-toolbar',
+    'action-summary|Tổng hợp hành động|Action Summary|📌|Tóm tắt hành động và bước kế tiếp|data-cards',
+    'action-export|Xuất dữ liệu|Export|💾|Xuất CSV, Excel hoặc PDF|action-toolbar',
+    'action-bulk|Xử lý hàng loạt|Bulk Actions|🧰|Thao tác trên nhiều bản ghi cùng lúc|action-toolbar',
+    'action-approval|Phê duyệt|Approval Actions|✅|Đồng ý, từ chối và ghi chú phê duyệt|action-toolbar',
+    'action-split|Nút chia nhanh|Split Actions|🔀|Cụm nút theo nhóm tác vụ|action-toolbar',
+    'action-launchpad|Launchpad|Launchpad|🚀|Cụm hành động nhanh theo vai trò|action-toolbar',
+    'action-shortcuts|Shortcut|Shortcuts|⌨️|Nút tắt cho thao tác thường dùng|action-toolbar',
+    'action-refresh|Làm mới|Refresh Actions|🔁|Làm mới và đồng bộ dữ liệu|action-toolbar',
+    'action-share|Chia sẻ|Share Actions|📤|Gửi liên kết và thông báo|action-toolbar'
   ].join('\n'));
 
   _extendBlockCatalog(catalog, 'media', 'info-banner', [
-    'info-banner|Thong bao|Info Banner|ℹ️|Banner thong bao trang thai|info-banner',
-    'media-image|Hinh anh|Image|🖼️|Hien thi mot hinh anh|info-banner',
-    'media-gallery|Gallery|Gallery|🖼️|Nhieu anh dang bo suu tap|data-cards',
-    'media-document|Tai lieu|Document|📄|Tai lieu huong dan ho so|data-cards',
-    'media-video|Video|Video|🎬|Khung video huong dan|info-banner',
-    'media-html|HTML tu do|Raw HTML|</>|Noi dung HTML tu chinh|info-banner',
-    'media-markdown|Markdown|Markdown|📝|Noi dung markdown|info-banner',
-    'media-pdf|PDF viewer|PDF Viewer|📕|Khung xem PDF|info-banner',
-    'media-iframe|IFrame|IFrame|🌐|Nhung trang noi bo|info-banner',
-    'media-announcement|Thong bao noi bo|Announcement|📣|Thong diep can nhan manh|info-banner'
+    'info-banner|Thông báo|Info Banner|ℹ️|Banner thông báo trạng thái hoặc lưu ý|info-banner',
+    'media-image|Hình ảnh|Image|🖼️|Hiển thị một hình ảnh đơn lẻ|info-banner',
+    'media-gallery|Gallery|Gallery|🖼️|Nhiều ảnh dạng bộ sưu tập|data-cards',
+    'media-document|Tài liệu|Document|📄|Tài liệu hướng dẫn hoặc hồ sơ|data-cards',
+    'media-video|Video|Video|🎬|Khung video hướng dẫn thao tác|info-banner',
+    'media-html|HTML tự do|Raw HTML|</>|Nội dung HTML tùy chỉnh|info-banner',
+    'media-markdown|Markdown|Markdown|📝|Nội dung markdown có định dạng|info-banner',
+    'media-pdf|PDF viewer|PDF Viewer|📕|Khung xem tài liệu PDF|info-banner',
+    'media-iframe|IFrame|IFrame|🌐|Nhúng trang nội bộ hoặc bên ngoài|info-banner',
+    'media-announcement|Thông báo nội bộ|Announcement|📣|Thông điệp cần nhấn mạnh|info-banner'
   ].join('\n'));
 
   _extendBlockCatalog(catalog, 'navigation', 'action-toolbar', [
-    'nav-breadcrumb|Breadcrumb|Breadcrumb|🧭|Duong dan dieu huong|action-toolbar',
-    'nav-tabs|Tabs|Tabs|📚|Dieu huong bang tab|action-toolbar',
-    'nav-pills|Pills|Pills|🏷️|Lua chon dang pill|action-toolbar',
-    'nav-steps|Buoc thuc hien|Step Navigation|🪜|Tien trinh tung buoc|action-toolbar',
-    'nav-sidebar|Sidebar menu|Sidebar Menu|📂|Menu module ben trai|action-toolbar',
-    'nav-anchor|Anchor menu|Anchor Menu|📍|Nhay den tung section|action-toolbar',
-    'nav-pagination|Phan trang|Pagination|↔️|Dieu huong nhieu trang|action-toolbar',
-    'nav-related-links|Lien ket lien quan|Related Links|🔗|Lien ket nhanh|action-toolbar',
-    'nav-module-menu|Menu module|Module Menu|🧩|Menu theo vai tro|action-toolbar',
-    'nav-process-map|Ban do quy trinh|Process Map|🗺️|Dieu huong theo quy trinh|action-toolbar'
+    'nav-breadcrumb|Breadcrumb|Breadcrumb|🧭|Đường dẫn điều hướng theo cấp|action-toolbar',
+    'nav-tabs|Tabs|Tabs|📚|Điều hướng bằng tab|action-toolbar',
+    'nav-pills|Pills|Pills|🏷️|Lựa chọn dạng pill theo trạng thái|action-toolbar',
+    'nav-steps|Bước thực hiện|Step Navigation|🪜|Tiến trình điều hướng từng bước|action-toolbar',
+    'nav-sidebar|Sidebar menu|Sidebar Menu|📂|Menu module ở thanh bên trái|action-toolbar',
+    'nav-anchor|Anchor menu|Anchor Menu|📍|Nhảy nhanh đến từng section|action-toolbar',
+    'nav-pagination|Phân trang|Pagination|↔️|Điều hướng qua nhiều trang dữ liệu|action-toolbar',
+    'nav-related-links|Liên kết liên quan|Related Links|🔗|Liên kết nhanh đến tác vụ kế cận|action-toolbar',
+    'nav-module-menu|Menu module|Module Menu|🧩|Menu module theo vai trò và quyền|action-toolbar',
+    'nav-process-map|Bản đồ quy trình|Process Map|🗺️|Điều hướng theo luồng quy trình|action-toolbar'
   ].join('\n'));
 
   _extendBlockCatalog(catalog, 'insight', 'kpi-row', [
-    'insight-kpi-card|KPI card|KPI Card|🏁|The KPI don le|kpi-row',
-    'insight-stat-callout|Stat callout|Stat Callout|📣|Chi so lon co mo ta|kpi-row',
-    'insight-scorecard|Scorecard|Scorecard|🧠|Bang diem muc tieu va ket qua|data-table',
-    'insight-funnel|Funnel|Funnel|🔻|Chuyen doi qua cac buoc|chart-bar',
-    'insight-cohort|Cohort|Cohort|👥|So sanh nhom theo thoi gian|chart-bar',
-    'insight-alert-feed|Dong canh bao|Alert Feed|🚨|Canh bao va bat thuong|data-timeline',
-    'insight-driver-tree|Driver tree|Driver Tree|🌿|Cay nguyen nhan KPI|data-cards',
-    'insight-variance|So sanh chenh lech|Variance Analysis|⚖️|So sanh plan va actual|chart-bar',
-    'insight-summary-grid|Luoi tong hop|Summary Grid|🔲|Tong hop metric dang luoi|data-cards',
-    'insight-target-tracker|Theo doi muc tieu|Target Tracker|🎯|Tien do dat muc tieu|chart-donut'
+    'insight-kpi-card|KPI card|KPI Card|🏁|Thẻ KPI đơn lẻ nổi bật|kpi-row',
+    'insight-stat-callout|Stat callout|Stat Callout|📣|Chỉ số lớn kèm mô tả ngắn|kpi-row',
+    'insight-scorecard|Scorecard|Scorecard|🧠|Bảng điểm mục tiêu và kết quả|data-table',
+    'insight-funnel|Funnel|Funnel|🔻|Chuyển đổi qua các bước quy trình|chart-bar',
+    'insight-cohort|Cohort|Cohort|👥|So sánh nhóm theo thời gian|chart-bar',
+    'insight-alert-feed|Dòng cảnh báo|Alert Feed|🚨|Cảnh báo và bất thường cần theo dõi|data-timeline',
+    'insight-driver-tree|Driver tree|Driver Tree|🌿|Cây nguyên nhân và tác động KPI|data-cards',
+    'insight-variance|So sánh chênh lệch|Variance Analysis|⚖️|So sánh kế hoạch và thực tế|chart-bar',
+    'insight-summary-grid|Lưới tổng hợp|Summary Grid|🔲|Tổng hợp metric dạng lưới|data-cards',
+    'insight-target-tracker|Theo dõi mục tiêu|Target Tracker|🎯|Tiến độ đạt mục tiêu theo thời gian|chart-donut'
   ].join('\n'));
 
   _extendBlockCatalog(catalog, 'manufacturing', 'data-table', [
-    'mfg-job-board|Bang JO|Job Board|🏭|Theo doi lenh san xuat|data-table',
-    'mfg-machine-status|Trang thai may|Machine Status|🟢|Trang thai may realtime|kpi-row',
-    'mfg-shift-roster|Ca lam viec|Shift Roster|🕘|Nhan su va lich ca|data-table',
-    'mfg-capacity-grid|Cong suat|Capacity Grid|📦|Cong suat may chuyen ca|data-table',
-    'mfg-wip-lane|WIP lane|WIP Lane|🚚|Ban ghi dang giua cong doan|data-cards',
-    'mfg-route-tracker|Tuyen cong doan|Route Tracker|🛣️|Theo doi lo trinh cong doan|data-timeline',
-    'mfg-tool-life|Tuoi dao cu|Tool Life|🛠️|Theo doi su dung dao cu|chart-bar',
-    'mfg-material-flow|Dong vat tu|Material Flow|📦|Theo doi cap phat vat tu|data-timeline',
-    'mfg-andon-board|Andon|Andon Board|🚦|Bang su co va can tro giup|kpi-row',
-    'mfg-setup-check|Checklist setup|Setup Checklist|✅|Checklist truoc khi chay may|form-standard',
-    'mfg-production-schedule|Lich san xuat|Production Schedule|🗓️|Ke hoach san xuat theo ca|data-table',
-    'mfg-downtime-feed|Dong downtime|Downtime Feed|🛑|Lich su dung may va ly do|data-timeline'
+    'mfg-job-board|Bảng JO|Job Board|🏭|Theo dõi lệnh sản xuất theo trạng thái|data-table',
+    'mfg-machine-status|Trạng thái máy|Machine Status|🟢|Trạng thái máy theo thời gian thực|kpi-row',
+    'mfg-shift-roster|Ca làm việc|Shift Roster|🕘|Nhân sự và lịch ca theo tổ|data-table',
+    'mfg-capacity-grid|Công suất|Capacity Grid|📦|Công suất máy, chuyền và ca|data-table',
+    'mfg-wip-lane|WIP lane|WIP Lane|🚚|Bản ghi đang ở giữa các công đoạn|data-cards',
+    'mfg-route-tracker|Tuyến công đoạn|Route Tracker|🛣️|Theo dõi lộ trình công đoạn của JO|data-timeline',
+    'mfg-tool-life|Tuổi dao cụ|Tool Life|🛠️|Theo dõi sử dụng và thay dao cụ|chart-bar',
+    'mfg-material-flow|Dòng vật tư|Material Flow|📦|Theo dõi cấp phát vật tư và tồn tại điểm dùng|data-timeline',
+    'mfg-andon-board|Andon|Andon Board|🚦|Bảng sự cố và cần trợ giúp|kpi-row',
+    'mfg-setup-check|Checklist setup|Setup Checklist|✅|Checklist trước khi chạy máy|form-standard',
+    'mfg-production-schedule|Lịch sản xuất|Production Schedule|🗓️|Kế hoạch sản xuất theo ca và nguồn lực|data-table',
+    'mfg-downtime-feed|Dòng downtime|Downtime Feed|🛑|Lịch sử dừng máy và nguyên nhân|data-timeline',
+    'mfg-oee-trend|Xu hướng OEE|OEE Trend|📈|Xu hướng OEE theo máy hoặc ca|chart-bar'
   ].join('\n'));
 
   _extendBlockCatalog(catalog, 'quality', 'chart-bar', [
-    'quality-spc-chart|SPC chart|SPC Chart|📏|Theo doi SPC|chart-bar',
-    'quality-control-chart|Control chart|Control Chart|🎯|UCL LCL center line|chart-bar',
-    'quality-pareto|Pareto|Pareto Chart|📚|Nhan dien nguyen nhan chinh|chart-bar',
-    'quality-checksheet|Checksheet|Checksheet|🗒️|Ghi nhan loi theo ca|form-standard',
-    'quality-defect-matrix|Ma tran loi|Defect Matrix|🔳|Tong hop loi theo may cong doan|data-table',
-    'quality-capa-board|CAPA board|CAPA Board|🛡️|Theo doi hanh dong khac phuc|data-cards',
-    'quality-inspection-form|Form kiem tra|Inspection Form|🧪|Form kiem tra chat luong|form-standard',
-    'quality-ncr-log|NCR log|NCR Log|📕|Nhat ky non-conformance|data-table',
-    'quality-gage-rnr|Gage R&R|Gage R&R|📐|Danh gia he thong do luong|chart-bar',
-    'quality-capability|Capability|Capability|📉|Cp Cpk va capability|chart-bar',
-    'quality-audit-plan|Audit plan|Audit Plan|🗓️|Ke hoach va trang thai audit|data-table',
-    'quality-traceability|Traceability|Traceability|🔗|Lien ket lot JO may cong doan|data-timeline'
+    'quality-spc-chart|SPC chart|SPC Chart|📏|Theo dõi SPC theo đặc tính đo|chart-bar',
+    'quality-control-chart|Control chart|Control Chart|🎯|Biểu đồ kiểm soát với UCL, LCL và center line|chart-bar',
+    'quality-pareto|Pareto|Pareto Chart|📚|Nhận diện nguyên nhân lỗi chính|chart-bar',
+    'quality-checksheet|Checksheet|Checksheet|🗒️|Ghi nhận lỗi theo ca, máy hoặc bước kiểm|form-standard',
+    'quality-defect-matrix|Ma trận lỗi|Defect Matrix|🔳|Tổng hợp lỗi theo máy và công đoạn|data-table',
+    'quality-capa-board|CAPA board|CAPA Board|🛡️|Theo dõi hành động khắc phục phòng ngừa|data-cards',
+    'quality-inspection-form|Form kiểm tra|Inspection Form|🧪|Form kiểm tra chất lượng theo checklist|form-standard',
+    'quality-ncr-log|NCR log|NCR Log|📕|Nhật ký non-conformance|data-table',
+    'quality-gage-rnr|Gage R&R|Gage R&R|📐|Đánh giá hệ thống đo lường|chart-bar',
+    'quality-capability|Capability|Capability|📉|Cp, Cpk và capability process|chart-bar',
+    'quality-audit-plan|Audit plan|Audit Plan|🗓️|Kế hoạch và trạng thái audit|data-table',
+    'quality-traceability|Traceability|Traceability|🔗|Liên kết lot, JO, máy và công đoạn|data-timeline',
+    'quality-8d-board|Bảng 8D|8D Board|🧷|Theo dõi điều tra và hành động 8D|data-cards'
   ].join('\n'));
 
   _extendBlockCatalog(catalog, 'automation', 'action-toolbar', [
-    'auto-rule-list|Danh sach rule|Rule List|⚙️|Danh sach rule va dieu kien|data-table',
-    'auto-approval-lane|Lane phe duyet|Approval Lane|✅|Tien trinh phe duyet|data-cards',
-    'auto-task-board|Task board|Task Board|🧰|Hang doi task tu dong|data-cards',
-    'auto-webhook-log|Webhook log|Webhook Log|🪝|Nhat ky webhook vao ra|data-table',
-    'auto-notification-center|Trung tam thong bao|Notification Center|🔔|Thong bao va escalation|data-timeline',
-    'auto-escalation-map|Ban do escalation|Escalation Map|🧭|Quy tac nang cap xu ly|data-cards',
-    'auto-sla-timer|SLA timer|SLA Timer|⏱️|Dem nguoc SLA|kpi-row',
-    'auto-queue-monitor|Queue monitor|Queue Monitor|📥|Hang doi xu ly nen|kpi-row',
-    'auto-runbook|Runbook|Runbook|📘|Huong dan xu ly su co|data-timeline',
-    'auto-bot-panel|Bot panel|Bot Panel|🤖|Dieu khien bot va helper|action-toolbar'
+    'auto-rule-list|Danh sách rule|Rule List|⚙️|Danh sách rule và điều kiện kích hoạt|data-table',
+    'auto-approval-lane|Lane phê duyệt|Approval Lane|✅|Tiến trình phê duyệt theo bước|data-cards',
+    'auto-task-board|Task board|Task Board|🧰|Hàng đợi task tự động cần xử lý|data-cards',
+    'auto-webhook-log|Webhook log|Webhook Log|🪝|Nhật ký webhook vào và ra|data-table',
+    'auto-notification-center|Trung tâm thông báo|Notification Center|🔔|Thông báo, nhắc việc và escalation|data-timeline',
+    'auto-escalation-map|Bản đồ escalation|Escalation Map|🧭|Quy tắc nâng cấp xử lý|data-cards',
+    'auto-sla-timer|SLA timer|SLA Timer|⏱️|Đếm ngược SLA và deadline|kpi-row',
+    'auto-queue-monitor|Queue monitor|Queue Monitor|📥|Hàng đợi xử lý nền theo worker|kpi-row',
+    'auto-runbook|Runbook|Runbook|📘|Hướng dẫn xử lý sự cố theo bước|data-timeline',
+    'auto-bot-panel|Bot panel|Bot Panel|🤖|Điều khiển bot và trợ lý tự động|action-toolbar',
+    'auto-workflow-designer|Thiết kế workflow|Workflow Designer|🧬|Thiết kế luồng xử lý và rẽ nhánh|action-toolbar'
   ].join('\n'));
 
   _extendBlockCatalog(catalog, 'iot', 'chart-bar', [
-    'iot-device-grid|Luoi thiet bi|Device Grid|📟|Danh sach thiet bi va suc khoe|data-cards',
-    'iot-sensor-strip|Thanh cam bien|Sensor Strip|📡|Gia tri sensor theo hang ngang|kpi-row',
-    'iot-alarm-timeline|Timeline alarm|Alarm Timeline|🚨|Lich su alarm may|data-timeline',
-    'iot-live-trend|Trend realtime|Live Trend|📈|Bieu do trend realtime|chart-bar',
-    'iot-connector-panel|Connector panel|Connector Panel|🔌|Chon va cau hinh connector|form-standard',
-    'iot-telemetry-table|Bang telemetry|Telemetry Table|📋|Bang du lieu stream may|data-table',
-    'iot-machine-twin|Machine twin|Machine Twin|🧭|Trang thai tong hop cua may|data-cards',
-    'iot-oee-board|Bang OEE|OEE Board|🏁|OEE va cac thanh phan|kpi-row',
-    'iot-energy-monitor|Energy monitor|Energy Monitor|⚡|Cong suat tieu thu peak|chart-bar',
-    'iot-maintenance-panel|Bao tri du doan|Maintenance Panel|🛠️|Canh bao bao tri va suc khoe|data-cards',
-    'iot-signal-map|Ban do signal|Signal Map|🛰️|Map point register topic node|data-table',
-    'iot-threshold-manager|Nguong canh bao|Threshold Manager|🎚️|Nguong va quy tac alarm|form-standard',
-    'iot-condition-monitor|Theo doi condition|Condition Monitor|🌡️|Theo doi vibration temp load|chart-bar',
-    'iot-edge-health|Suc khoe edge|Edge Health|🧱|Trang thai gateway edge app|kpi-row'
+    'iot-device-grid|Lưới thiết bị|Device Grid|📟|Danh sách thiết bị và sức khỏe kết nối|data-cards',
+    'iot-sensor-strip|Thanh cảm biến|Sensor Strip|📡|Giá trị sensor theo hàng ngang|kpi-row',
+    'iot-alarm-timeline|Timeline alarm|Alarm Timeline|🚨|Lịch sử alarm máy theo thời gian|data-timeline',
+    'iot-live-trend|Trend realtime|Live Trend|📈|Biểu đồ trend realtime từ telemetry|chart-bar',
+    'iot-connector-panel|Connector panel|Connector Panel|🔌|Chọn và cấu hình connector|form-standard',
+    'iot-telemetry-table|Bảng telemetry|Telemetry Table|📋|Bảng dữ liệu stream từ máy và sensor|data-table',
+    'iot-machine-twin|Machine twin|Machine Twin|🧭|Trạng thái tổng hợp của máy số hóa|data-cards',
+    'iot-oee-board|Bảng OEE|OEE Board|🏁|OEE và các thành phần theo máy|kpi-row',
+    'iot-energy-monitor|Energy monitor|Energy Monitor|⚡|Công suất, tiêu thụ và peak load|chart-bar',
+    'iot-maintenance-panel|Bảo trì dự đoán|Maintenance Panel|🛠️|Cảnh báo bảo trì và sức khỏe thiết bị|data-cards',
+    'iot-signal-map|Bản đồ signal|Signal Map|🛰️|Map point, register, topic và node|data-table',
+    'iot-threshold-manager|Ngưỡng cảnh báo|Threshold Manager|🎚️|Ngưỡng và quy tắc alarm|form-standard',
+    'iot-condition-monitor|Theo dõi condition|Condition Monitor|🌡️|Theo dõi vibration, nhiệt độ và tải|chart-bar',
+    'iot-edge-health|Sức khỏe edge|Edge Health|🧱|Trạng thái gateway và edge app|kpi-row'
   ].join('\n'));
 
   return catalog;
@@ -389,91 +394,111 @@ function _buildBlockPropertiesSchema(catalog){
 function _buildBlockTabs(type, entry){
   var renderer = entry.renderer || type;
   return [
-    _blockTab('general', 'Tong quan', 'General', _buildGeneralSections(type, entry, renderer), '⚙️'),
-    _blockTab('data', 'Du lieu', 'Data', _buildDataSections(type, entry, renderer), '🗄️'),
-    _blockTab('style', 'Giao dien', 'Style', _buildStyleSections(renderer), '🎨'),
-    _blockTab('events', 'Su kien', 'Events', _buildEventSections(), '⚡')
+    _blockTab('general', 'Tổng quan', 'General', _buildGeneralSections(type, entry, renderer), '⚙️'),
+    _blockTab('data', 'Dữ liệu', 'Data', _buildDataSections(type, entry, renderer), '🗄️'),
+    _blockTab('style', 'Giao diện', 'Style', _buildStyleSections(renderer), '🎨'),
+    _blockTab('events', 'Sự kiện', 'Events', _buildEventSections(), '⚡')
   ];
 }
 
 function _buildGeneralSections(type, entry, renderer){
   return [
-    _blockSection('identity', 'Nhan dang', 'Identity', [
-      _blockField('titleVi', 'Tieu de (VI)', 'Title (VI)', 'text', 'title.vi', { default:entry.label || type }),
-      _blockField('titleEn', 'Tieu de (EN)', 'Title (EN)', 'text', 'title.en', { default:entry.labelEn || entry.label || type }),
-      _blockField('subtitleVi', 'Phu de (VI)', 'Subtitle (VI)', 'text', 'subtitle.vi', { default:'' }),
-      _blockField('subtitleEn', 'Phu de (EN)', 'Subtitle (EN)', 'text', 'subtitle.en', { default:'' }),
+    _blockSection('identity', 'Nhận dạng', 'Identity', [
+      _blockField('titleVi', 'Tiêu đề (VI)', 'Title (VI)', 'text', 'title.vi', { default:entry.label || type }),
+      _blockField('titleEn', 'Tiêu đề (EN)', 'Title (EN)', 'text', 'title.en', { default:entry.labelEn || entry.label || type }),
+      _blockField('subtitleVi', 'Phụ đề (VI)', 'Subtitle (VI)', 'text', 'subtitle.vi', { default:'' }),
+      _blockField('subtitleEn', 'Phụ đề (EN)', 'Subtitle (EN)', 'text', 'subtitle.en', { default:'' }),
       _blockField('icon', 'Icon', 'Icon', 'text', 'config.header.icon', { default:entry.icon || '📦' }),
-      _blockField('anchor', 'Anchor ID', 'Anchor ID', 'text', 'config.anchorId', { default:'', placeholder:'overview-kpi' })
+      _blockField('descriptionVi', 'Mô tả (VI)', 'Description (VI)', 'textarea', 'config.header.descriptionVi', { default:'', rows:2 }),
+      _blockField('descriptionEn', 'Mô tả (EN)', 'Description (EN)', 'textarea', 'config.header.descriptionEn', { default:'', rows:2 }),
+      _blockField('badgeText', 'Badge', 'Badge', 'text', 'config.header.badge', { default:'' }),
+      _blockField('anchor', 'Anchor ID', 'Anchor ID', 'text', 'config.anchorId', { default:'', placeholder:'overview-kpi' }),
+      _blockField('testId', 'Test ID', 'Test ID', 'text', 'config.testId', { default:'' })
     ]),
-    _blockSection('behavior', 'Hanh vi', 'Behavior', [
-      _blockField('visible', 'Dang hien', 'Visible', 'toggle', 'visible', { default:true }),
-      _blockField('visibleWhen', 'Dieu kien hien thi', 'Visibility rule', 'expression', 'visibleWhen', { default:'', placeholder:'filters.status === "open"' }),
-      _blockField('variant', 'Bien the', 'Variant', 'select', 'config.variant', {
+    _blockSection('behavior', 'Hành vi', 'Behavior', [
+      _blockField('visible', 'Đang hiện', 'Visible', 'toggle', 'visible', { default:true }),
+      _blockField('visibleWhen', 'Điều kiện hiển thị', 'Visibility rule', 'expression', 'visibleWhen', { default:'', placeholder:'filters.status === "open"' }),
+      _blockField('variant', 'Biến thể', 'Variant', 'select', 'config.variant', {
         default:renderer,
         options:['standard','compact','dense','spotlight']
       }),
-      _blockField('roles', 'Roles duoc xem', 'Visible roles', 'text', 'config.permissions.roles', { default:'', placeholder:'ceo,it_admin' }),
-      _blockField('builderNote', 'Ghi chu builder', 'Builder note', 'textarea', 'config.builderNote', { default:'', rows:2 })
+      _blockField('roles', 'Vai trò được xem', 'Visible roles', 'text', 'config.permissions.roles', { default:'', placeholder:'ceo,it_admin' }),
+      _blockField('ownerRole', 'Vai trò sở hữu', 'Owner role', 'text', 'config.permissions.ownerRole', { default:'' }),
+      _blockField('selectionScope', 'Khóa ngữ cảnh', 'Selection scope', 'text', 'config.context.selectionScope', { default:'' }),
+      _blockField('recordIdExpr', 'Biểu thức record ID', 'Record ID expression', 'expression', 'config.context.recordIdExpr', { default:'' }),
+      _blockField('lazyLoad', 'Tải khi cần', 'Lazy load', 'toggle', 'config.behavior.lazyLoad', { default:false }),
+      _blockField('hiddenInPrint', 'Ẩn khi in', 'Hide in print', 'toggle', 'config.behavior.hiddenInPrint', { default:false }),
+      _blockField('builderNote', 'Ghi chú builder', 'Builder note', 'textarea', 'config.builderNote', { default:'', rows:2 })
     ])
   ];
 }
 
 function _buildDataSections(type, entry, renderer){
   var sections = [
-    _blockSection('source', 'Nguon du lieu', 'Data source', [
+    _blockSection('source', 'Nguồn dữ liệu', 'Data source', [
       _blockField('api', 'API endpoint', 'API endpoint', 'api-select', 'config.dataSource.api', { default:'', repaintOnChange:true }),
       _blockField('method', 'HTTP method', 'HTTP method', 'select', 'config.dataSource.method', { default:'GET', options:['GET','POST','PUT','PATCH','DELETE'] }),
+      _blockField('moduleKey', 'Khóa module nguồn', 'Source module key', 'text', 'config.dataSource.moduleKey', { default:'', placeholder:'quality.ncr' }),
+      _blockField('path', 'Đường dẫn dữ liệu', 'Data path', 'text', 'config.dataSource.path', { default:'', placeholder:'payload.items' }),
       _blockField('dataKey', 'Data key', 'Data key', 'text', 'config.dataSource.dataKey', { default:'items', placeholder:'items' }),
+      _blockField('totalKey', 'Total key', 'Total key', 'text', 'config.dataSource.totalKey', { default:'total', placeholder:'total' }),
+      _blockField('sortExpr', 'Biểu thức sắp xếp', 'Sort expression', 'expression', 'config.dataSource.sortExpr', { default:'' }),
+      _blockField('filtersExpr', 'Biểu thức bộ lọc', 'Filter expression', 'expression', 'config.dataSource.filtersExpr', { default:'' }),
       _blockField('params', 'Params JSON', 'Params JSON', 'json', 'config.dataSource.params', { default:{} }),
       _blockField('transformer', 'Transformer', 'Transformer', 'code', 'config.dataSource.transformer', { default:'' })
     ]),
-    _blockSection('refresh', 'Lam moi', 'Refresh', [
-      _blockField('autoRefresh', 'Tu dong lam moi', 'Auto refresh', 'toggle', 'config.refresh.enabled', { default:false }),
-      _blockField('interval', 'Chu ky (ms)', 'Interval (ms)', 'number', 'config.refresh.intervalMs', { default:30000, min:0, step:500 }),
+    _blockSection('refresh', 'Làm mới', 'Refresh', [
+      _blockField('autoRefresh', 'Tự động làm mới', 'Auto refresh', 'toggle', 'config.refresh.enabled', { default:false }),
+      _blockField('interval', 'Chu kỳ (ms)', 'Interval (ms)', 'number', 'config.refresh.intervalMs', { default:30000, min:0, step:500 }),
       _blockField('cache', 'Cache TTL (s)', 'Cache TTL (s)', 'number', 'config.dataSource.cacheTtlSec', { default:0, min:0, step:5 }),
-      _blockField('emptyTitle', 'Tieu de rong', 'Empty title', 'text', 'config.emptyState.title', { default:'' }),
-      _blockField('emptyText', 'Noi dung rong', 'Empty text', 'textarea', 'config.emptyState.message', { default:'' })
+      _blockField('retryEnabled', 'Cho phép thử lại', 'Enable retry', 'toggle', 'config.refresh.retryEnabled', { default:true }),
+      _blockField('loadingText', 'Nội dung khi tải', 'Loading text', 'text', 'config.loadingState.message', { default:'' }),
+      _blockField('emptyTitle', 'Tiêu đề rỗng', 'Empty title', 'text', 'config.emptyState.title', { default:'' }),
+      _blockField('emptyText', 'Nội dung rỗng', 'Empty text', 'textarea', 'config.emptyState.message', { default:'' }),
+      _blockField('emptyAction', 'CTA rỗng', 'Empty-state CTA', 'text', 'config.emptyState.actionLabel', { default:'' })
     ])
   ];
 
-  if(renderer === 'kpi-row'){
+  var specialized = _buildSpecializedDataSections(type, renderer);
+  if(specialized.length){
+    Array.prototype.push.apply(sections, specialized);
+  } else if(renderer === 'kpi-row'){
     sections.push(_blockSection('metrics', 'Metrics', 'Metrics', [
-      _blockField('items', 'Danh sach KPI', 'Metric items', 'collection', 'config.items', {
+      _blockField('items', 'Danh sách KPI', 'Metric items', 'collection', 'config.items', {
         default:[
           { label:{vi:'KPI 1', en:'KPI 1'}, valueField:'value', color:'#2563eb' },
           { label:{vi:'KPI 2', en:'KPI 2'}, valueField:'value_2', color:'#16a34a' }
         ],
-        addLabel:'Them KPI',
+        addLabel:'Thêm KPI',
         itemLabel:'KPI',
         itemFields:[
-          _blockField('labelVi', 'Nhan VI', 'Label VI', 'text', 'label.vi', { default:'KPI' }),
-          _blockField('labelEn', 'Nhan EN', 'Label EN', 'text', 'label.en', { default:'KPI' }),
-          _blockField('valueField', 'Field gia tri', 'Value field', 'field-select', 'valueField', { default:'value' }),
+          _blockField('labelVi', 'Nhãn VI', 'Label VI', 'text', 'label.vi', { default:'KPI' }),
+          _blockField('labelEn', 'Nhãn EN', 'Label EN', 'text', 'label.en', { default:'KPI' }),
+          _blockField('valueField', 'Field giá trị', 'Value field', 'field-select', 'valueField', { default:'value' }),
           _blockField('targetField', 'Field target', 'Target field', 'field-select', 'targetField', { default:'' }),
           _blockField('formula', 'Preset formula', 'Preset formula', 'formula-select', 'formula', { default:'' }),
-          _blockField('unit', 'Don vi', 'Unit', 'text', 'unit', { default:'' }),
-          _blockField('color', 'Mau nhan', 'Accent color', 'color', 'color', { default:'#2563eb' })
+          _blockField('unit', 'Đơn vị', 'Unit', 'text', 'unit', { default:'' }),
+          _blockField('color', 'Màu nhấn', 'Accent color', 'color', 'color', { default:'#2563eb' })
         ]
       })
     ]));
   } else if(renderer === 'data-table'){
-    sections.push(_blockSection('columns', 'Columns', 'Columns', [
-      _blockField('columns', 'Danh sach cot', 'Columns', 'collection', 'config.columns', {
+    sections.push(_blockSection('columns', 'Cột dữ liệu', 'Columns', [
+      _blockField('columns', 'Danh sách cột', 'Columns', 'collection', 'config.columns', {
         default:[
-          { key:'code', label:{vi:'Ma', en:'Code'}, type:'string', width:'140', align:'left', sortable:true, filterable:true },
-          { key:'name', label:{vi:'Ten', en:'Name'}, type:'string', width:'220', align:'left', sortable:true, filterable:true },
-          { key:'status', label:{vi:'Trang thai', en:'Status'}, type:'badge', width:'140', align:'center', sortable:true, filterable:true, statusSet:'so_status' }
+          { key:'code', label:{vi:'Mã', en:'Code'}, type:'string', width:'140', align:'left', sortable:true, filterable:true },
+          { key:'name', label:{vi:'Tên', en:'Name'}, type:'string', width:'220', align:'left', sortable:true, filterable:true },
+          { key:'status', label:{vi:'Trạng thái', en:'Status'}, type:'badge', width:'140', align:'center', sortable:true, filterable:true, statusSet:'so_status' }
         ],
-        addLabel:'Them cot',
-        itemLabel:'Cot',
+        addLabel:'Thêm cột',
+        itemLabel:'Cột',
         itemFields:[
           _blockField('key', 'Field key', 'Field key', 'field-select', 'key', { default:'field_key' }),
-          _blockField('labelVi', 'Nhan VI', 'Label VI', 'text', 'label.vi', { default:'Cot' }),
-          _blockField('labelEn', 'Nhan EN', 'Label EN', 'text', 'label.en', { default:'Column' }),
+          _blockField('labelVi', 'Nhãn VI', 'Label VI', 'text', 'label.vi', { default:'Cột' }),
+          _blockField('labelEn', 'Nhãn EN', 'Label EN', 'text', 'label.en', { default:'Column' }),
           _blockField('type', 'Field type', 'Field type', 'field-type-select', 'type', { default:'string' }),
           _blockField('width', 'Width', 'Width', 'text', 'width', { default:'160' }),
-          _blockField('align', 'Canh', 'Align', 'select', 'align', { default:'left', options:['left','center','right'] }),
+          _blockField('align', 'Căn', 'Align', 'select', 'align', { default:'left', options:['left','center','right'] }),
           _blockField('formula', 'Preset formula', 'Preset formula', 'formula-select', 'formula', { default:'' }),
           _blockField('statusSet', 'Status set', 'Status set', 'status-set-select', 'statusSet', { default:'' }),
           _blockField('sortable', 'Sortable', 'Sortable', 'toggle', 'sortable', { default:true }),
@@ -484,104 +509,104 @@ function _buildDataSections(type, entry, renderer){
       _blockField('rowKey', 'Row key', 'Row key', 'field-select', 'config.rowKey', { default:'id' })
     ]));
   } else if(renderer === 'data-cards'){
-    sections.push(_blockSection('cards', 'Card mapping', 'Card mapping', [
-      _blockField('titleField', 'Field tieu de', 'Title field', 'field-select', 'config.card.titleField', { default:'name' }),
-      _blockField('subtitleField', 'Field phu de', 'Subtitle field', 'field-select', 'config.card.subtitleField', { default:'status' }),
-      _blockField('valueField', 'Field gia tri', 'Value field', 'field-select', 'config.card.valueField', { default:'' }),
+    sections.push(_blockSection('cards', 'Ánh xạ thẻ', 'Card mapping', [
+      _blockField('titleField', 'Field tiêu đề', 'Title field', 'field-select', 'config.card.titleField', { default:'name' }),
+      _blockField('subtitleField', 'Field phụ đề', 'Subtitle field', 'field-select', 'config.card.subtitleField', { default:'status' }),
+      _blockField('valueField', 'Field giá trị', 'Value field', 'field-select', 'config.card.valueField', { default:'' }),
       _blockField('tagField', 'Field tag', 'Tag field', 'field-select', 'config.card.tagField', { default:'' }),
       _blockField('imageField', 'Field image', 'Image field', 'field-select', 'config.card.imageField', { default:'' }),
-      _blockField('columns', 'So cot', 'Columns', 'number', 'config.columns', { default:3, min:1, max:6 })
+      _blockField('columns', 'Số cột', 'Columns', 'number', 'config.columns', { default:3, min:1, max:6 })
     ]));
   } else if(renderer === 'data-timeline'){
-    sections.push(_blockSection('timeline', 'Timeline mapping', 'Timeline mapping', [
-      _blockField('dateKey', 'Field thoi gian', 'Date field', 'field-select', 'config.dateKey', { default:'created_at' }),
-      _blockField('titleKey', 'Field tieu de', 'Title field', 'field-select', 'config.titleKey', { default:'title' }),
-      _blockField('descKey', 'Field mo ta', 'Description field', 'field-select', 'config.descKey', { default:'description' }),
-      _blockField('statusKey', 'Field trang thai', 'Status field', 'field-select', 'config.statusKey', { default:'status' }),
+    sections.push(_blockSection('timeline', 'Ánh xạ timeline', 'Timeline mapping', [
+      _blockField('dateKey', 'Field thời gian', 'Date field', 'field-select', 'config.dateKey', { default:'created_at' }),
+      _blockField('titleKey', 'Field tiêu đề', 'Title field', 'field-select', 'config.titleKey', { default:'title' }),
+      _blockField('descKey', 'Field mô tả', 'Description field', 'field-select', 'config.descKey', { default:'description' }),
+      _blockField('statusKey', 'Field trạng thái', 'Status field', 'field-select', 'config.statusKey', { default:'status' }),
       _blockField('groupBy', 'Group by', 'Group by', 'field-select', 'config.groupBy', { default:'' })
     ]));
   } else if(renderer === 'filter-bar'){
-    sections.push(_blockSection('filters', 'Bo loc', 'Filters', [
-      _blockField('filters', 'Danh sach filter', 'Filters', 'collection', 'config.filters', {
+    sections.push(_blockSection('filters', 'Bộ lọc', 'Filters', [
+      _blockField('filters', 'Danh sách filter', 'Filters', 'collection', 'config.filters', {
         default:[
-          { key:'keyword', label:{vi:'Tu khoa', en:'Keyword'}, type:'search', placeholder:{vi:'Nhap tu khoa', en:'Search'} },
-          { key:'status', label:{vi:'Trang thai', en:'Status'}, type:'select', statusSet:'so_status' }
+          { key:'keyword', label:{vi:'Từ khóa', en:'Keyword'}, type:'search', placeholder:{vi:'Nhập từ khóa', en:'Search'} },
+          { key:'status', label:{vi:'Trạng thái', en:'Status'}, type:'select', statusSet:'so_status' }
         ],
-        addLabel:'Them filter',
+        addLabel:'Thêm filter',
         itemLabel:'Filter',
         itemFields:[
           _blockField('key', 'Key', 'Key', 'text', 'key', { default:'filter_key' }),
-          _blockField('labelVi', 'Nhan VI', 'Label VI', 'text', 'label.vi', { default:'Filter' }),
-          _blockField('labelEn', 'Nhan EN', 'Label EN', 'text', 'label.en', { default:'Filter' }),
-          _blockField('type', 'Loai', 'Type', 'select', 'type', { default:'text', options:['search','text','select','date-range','number-range','status','checkbox'] }),
+          _blockField('labelVi', 'Nhãn VI', 'Label VI', 'text', 'label.vi', { default:'Filter' }),
+          _blockField('labelEn', 'Nhãn EN', 'Label EN', 'text', 'label.en', { default:'Filter' }),
+          _blockField('type', 'Loại', 'Type', 'select', 'type', { default:'text', options:['search','text','select','date-range','number-range','status','checkbox'] }),
           _blockField('fieldRef', 'Field ref', 'Field ref', 'field-select', 'fieldRef', { default:'' }),
           _blockField('statusSet', 'Status set', 'Status set', 'status-set-select', 'statusSet', { default:'' }),
           _blockField('placeholderVi', 'Placeholder VI', 'Placeholder VI', 'text', 'placeholder.vi', { default:'' }),
           _blockField('placeholderEn', 'Placeholder EN', 'Placeholder EN', 'text', 'placeholder.en', { default:'' }),
-          _blockField('defaultValue', 'Mac dinh', 'Default value', 'text', 'defaultValue', { default:'' })
+          _blockField('defaultValue', 'Mặc định', 'Default value', 'text', 'defaultValue', { default:'' })
         ]
       })
     ]));
   } else if(renderer === 'form-standard'){
-    sections.push(_blockSection('fields', 'Field layout', 'Field layout', [
-      _blockField('fields', 'Danh sach field', 'Fields', 'collection', 'config.fields', {
+    sections.push(_blockSection('fields', 'Bố cục field', 'Field layout', [
+      _blockField('fields', 'Danh sách field', 'Fields', 'collection', 'config.fields', {
         default:[
-          { key:'code', label:{vi:'Ma', en:'Code'}, type:'string', required:true, span:'half' },
-          { key:'name', label:{vi:'Ten', en:'Name'}, type:'string', required:true, span:'half' },
-          { key:'status', label:{vi:'Trang thai', en:'Status'}, type:'select', required:false, span:'half', statusSet:'so_status' }
+          { key:'code', label:{vi:'Mã', en:'Code'}, type:'string', required:true, span:'half' },
+          { key:'name', label:{vi:'Tên', en:'Name'}, type:'string', required:true, span:'half' },
+          { key:'status', label:{vi:'Trạng thái', en:'Status'}, type:'select', required:false, span:'half', statusSet:'so_status' }
         ],
-        addLabel:'Them field',
+        addLabel:'Thêm field',
         itemLabel:'Field',
         itemFields:[
           _blockField('key', 'Key', 'Key', 'text', 'key', { default:'field_key' }),
           _blockField('fieldRef', 'Field ref', 'Field ref', 'field-select', 'fieldRef', { default:'' }),
-          _blockField('labelVi', 'Nhan VI', 'Label VI', 'text', 'label.vi', { default:'Field' }),
-          _blockField('labelEn', 'Nhan EN', 'Label EN', 'text', 'label.en', { default:'Field' }),
-          _blockField('type', 'Loai', 'Type', 'select', 'type', { default:'string', options:['string','textarea','number','select','date','datetime','boolean','currency','email','phone','file','signature'] }),
+          _blockField('labelVi', 'Nhãn VI', 'Label VI', 'text', 'label.vi', { default:'Field' }),
+          _blockField('labelEn', 'Nhãn EN', 'Label EN', 'text', 'label.en', { default:'Field' }),
+          _blockField('type', 'Loại', 'Type', 'select', 'type', { default:'string', options:['string','textarea','number','select','date','datetime','boolean','currency','email','phone','file','signature'] }),
           _blockField('placeholderVi', 'Placeholder VI', 'Placeholder VI', 'text', 'placeholder.vi', { default:'' }),
           _blockField('placeholderEn', 'Placeholder EN', 'Placeholder EN', 'text', 'placeholder.en', { default:'' }),
           _blockField('statusSet', 'Status set', 'Status set', 'status-set-select', 'statusSet', { default:'' }),
-          _blockField('required', 'Bat buoc', 'Required', 'toggle', 'required', { default:false }),
-          _blockField('span', 'Do rong', 'Span', 'select', 'span', { default:'half', options:['half','full'] }),
-          _blockField('defaultValue', 'Mac dinh', 'Default value', 'text', 'defaultValue', { default:'' }),
+          _blockField('required', 'Bắt buộc', 'Required', 'toggle', 'required', { default:false }),
+          _blockField('span', 'Độ rộng', 'Span', 'select', 'span', { default:'half', options:['half','full'] }),
+          _blockField('defaultValue', 'Mặc định', 'Default value', 'text', 'defaultValue', { default:'' }),
           _blockField('rules', 'Validation', 'Validation', 'expression', 'rules', { default:'' })
         ]
       }),
-      _blockField('columns', 'So cot form', 'Form columns', 'number', 'config.columns', { default:2, min:1, max:4 }),
+      _blockField('columns', 'Số cột form', 'Form columns', 'number', 'config.columns', { default:2, min:1, max:4 }),
       _blockField('submitEndpoint', 'Submit API', 'Submit API', 'api-select', 'config.submit.api', { default:'', repaintOnChange:true }),
       _blockField('submitMethod', 'Submit method', 'Submit method', 'select', 'config.submit.method', { default:'POST', options:['POST','PUT','PATCH'] })
     ]));
   } else if(renderer === 'chart-donut'){
-    sections.push(_blockSection('segments', 'Segments', 'Segments', [
-      _blockField('labelField', 'Field nhan', 'Label field', 'field-select', 'config.chart.labelField', { default:'name' }),
-      _blockField('valueField', 'Field gia tri', 'Value field', 'field-select', 'config.chart.valueField', { default:'value' }),
-      _blockField('innerRadius', 'Inner radius', 'Inner radius', 'number', 'config.chart.innerRadius', { default:60, min:0, max:95 }),
-      _blockField('showPercent', 'Hien %', 'Show percent', 'toggle', 'config.chart.showPercent', { default:true }),
+    sections.push(_blockSection('segments', 'Phân đoạn', 'Segments', [
+      _blockField('labelField', 'Field nhãn', 'Label field', 'field-select', 'config.chart.labelField', { default:'name' }),
+      _blockField('valueField', 'Field giá trị', 'Value field', 'field-select', 'config.chart.valueField', { default:'value' }),
+      _blockField('innerRadius', 'Bán kính trong', 'Inner radius', 'number', 'config.chart.innerRadius', { default:60, min:0, max:95 }),
+      _blockField('showPercent', 'Hiện %', 'Show percent', 'toggle', 'config.chart.showPercent', { default:true }),
       _blockField('series', 'Segments config', 'Segments config', 'collection', 'config.series', {
         default:[],
-        addLabel:'Them segment',
+        addLabel:'Thêm segment',
         itemLabel:'Segment',
         itemFields:[
           _blockField('matchValue', 'Match value', 'Match value', 'text', 'matchValue', { default:'' }),
-          _blockField('labelVi', 'Nhan VI', 'Label VI', 'text', 'label.vi', { default:'Segment' }),
-          _blockField('labelEn', 'Nhan EN', 'Label EN', 'text', 'label.en', { default:'Segment' }),
-          _blockField('color', 'Mau', 'Color', 'color', 'color', { default:'#2563eb' })
+          _blockField('labelVi', 'Nhãn VI', 'Label VI', 'text', 'label.vi', { default:'Segment' }),
+          _blockField('labelEn', 'Nhãn EN', 'Label EN', 'text', 'label.en', { default:'Segment' }),
+          _blockField('color', 'Màu', 'Color', 'color', 'color', { default:'#2563eb' })
         ]
       })
     ]));
   } else if(renderer === 'action-toolbar'){
-    sections.push(_blockSection('buttons', 'Buttons', 'Buttons', [
-      _blockField('buttons', 'Danh sach nut', 'Buttons', 'collection', 'config.buttons', {
+    sections.push(_blockSection('buttons', 'Nút hành động', 'Buttons', [
+      _blockField('buttons', 'Danh sách nút', 'Buttons', 'collection', 'config.buttons', {
         default:[
-          { actionId:'refresh', label:{vi:'Lam moi', en:'Refresh'}, variant:'secondary', endpoint:'', confirmMessage:'' },
-          { actionId:'export', label:{vi:'Xuat', en:'Export'}, variant:'primary', endpoint:'', confirmMessage:'' }
+          { actionId:'refresh', label:{vi:'Làm mới', en:'Refresh'}, variant:'secondary', endpoint:'', confirmMessage:'' },
+          { actionId:'export', label:{vi:'Xuất', en:'Export'}, variant:'primary', endpoint:'', confirmMessage:'' }
         ],
-        addLabel:'Them nut',
-        itemLabel:'Nut',
+        addLabel:'Thêm nút',
+        itemLabel:'Nút',
         itemFields:[
           _blockField('actionId', 'Action ID', 'Action ID', 'text', 'actionId', { default:'action_id' }),
-          _blockField('labelVi', 'Nhan VI', 'Label VI', 'text', 'label.vi', { default:'Nut' }),
-          _blockField('labelEn', 'Nhan EN', 'Label EN', 'text', 'label.en', { default:'Button' }),
+          _blockField('labelVi', 'Nhãn VI', 'Label VI', 'text', 'label.vi', { default:'Nút' }),
+          _blockField('labelEn', 'Nhãn EN', 'Label EN', 'text', 'label.en', { default:'Button' }),
           _blockField('icon', 'Icon', 'Icon', 'text', 'icon', { default:'' }),
           _blockField('variant', 'Variant', 'Variant', 'select', 'variant', { default:'primary', options:['primary','secondary','ghost','danger','success'] }),
           _blockField('endpoint', 'API endpoint', 'API endpoint', 'api-select', 'endpoint', { default:'', repaintOnChange:true }),
@@ -592,109 +617,659 @@ function _buildDataSections(type, entry, renderer){
       })
     ]));
   } else {
-    sections.push(_blockSection('mapping', 'Mapping', 'Mapping', [
-      _blockField('titleField', 'Field tieu de', 'Title field', 'field-select', 'config.mapping.titleField', { default:'name' }),
-      _blockField('valueField', 'Field gia tri', 'Value field', 'field-select', 'config.mapping.valueField', { default:'value' }),
-      _blockField('statusField', 'Field trang thai', 'Status field', 'field-select', 'config.mapping.statusField', { default:'status' }),
-      _blockField('notes', 'Ghi chu mapping', 'Mapping note', 'textarea', 'config.mapping.notes', { default:'', rows:3 })
+    sections.push(_blockSection('mapping', 'Ánh xạ', 'Mapping', [
+      _blockField('titleField', 'Field tiêu đề', 'Title field', 'field-select', 'config.mapping.titleField', { default:'name' }),
+      _blockField('valueField', 'Field giá trị', 'Value field', 'field-select', 'config.mapping.valueField', { default:'value' }),
+      _blockField('statusField', 'Field trạng thái', 'Status field', 'field-select', 'config.mapping.statusField', { default:'status' }),
+      _blockField('notes', 'Ghi chú mapping', 'Mapping note', 'textarea', 'config.mapping.notes', { default:'', rows:3 })
     ]));
   }
 
   if(entry.category === 'quality'){
-    sections.push(_blockSection('quality', 'Quality rules', 'Quality rules', [
+    sections.push(_blockSection('quality', 'Quy tắc chất lượng', 'Quality rules', [
       _blockField('lsl', 'LSL', 'LSL', 'number', 'config.quality.lsl', { default:0 }),
       _blockField('target', 'Target', 'Target', 'number', 'config.quality.target', { default:0 }),
       _blockField('usl', 'USL', 'USL', 'number', 'config.quality.usl', { default:0 }),
+      _blockField('sampleSize', 'Cỡ mẫu', 'Sample size', 'number', 'config.quality.sampleSize', { default:1, min:1 }),
+      _blockField('defectField', 'Field lỗi/defect', 'Defect field', 'field-select', 'config.quality.defectField', { default:'defect_code' }),
+      _blockField('reactionPlan', 'Kế hoạch phản ứng', 'Reaction plan', 'textarea', 'config.quality.reactionPlan', { default:'', rows:2 }),
       _blockField('formula', 'Preset formula', 'Preset formula', 'formula-select', 'config.quality.formulaPreset', { default:'' }),
       _blockField('statusSet', 'Status set', 'Status set', 'status-set-select', 'config.quality.statusSet', { default:'' })
     ]));
   }
 
   if(entry.category === 'iot'){
-    sections.push(_blockSection('iot', 'IoT config', 'IoT config', [
+    sections.push(_blockSection('iot', 'Cấu hình IoT', 'IoT config', [
       _blockField('connector', 'Connector', 'Connector', 'iot-connector-select', 'config.iot.connector', { default:'', repaintOnChange:true }),
       _blockField('deviceId', 'Device ID', 'Device ID', 'text', 'config.iot.deviceId', { default:'' }),
       _blockField('topic', 'Topic / Node', 'Topic / Node', 'text', 'config.iot.topic', { default:'' }),
+      _blockField('qualityField', 'Field quality code', 'Quality-code field', 'field-select', 'config.iot.qualityField', { default:'quality_code' }),
+      _blockField('staleAfterSec', 'Quá hạn sau (s)', 'Stale after (sec)', 'number', 'config.iot.staleAfterSec', { default:120, min:0 }),
+      _blockField('reconnectMs', 'Chu kỳ reconnect (ms)', 'Reconnect interval (ms)', 'number', 'config.iot.reconnectMs', { default:15000, min:0, step:500 }),
       _blockField('signals', 'Signal map', 'Signal map', 'collection', 'config.iot.signals', {
         default:[],
-        addLabel:'Them signal',
+        addLabel:'Thêm signal',
         itemLabel:'Signal',
         itemFields:[
-          _blockField('labelVi', 'Nhan VI', 'Label VI', 'text', 'label.vi', { default:'Signal' }),
-          _blockField('labelEn', 'Nhan EN', 'Label EN', 'text', 'label.en', { default:'Signal' }),
+          _blockField('labelVi', 'Nhãn VI', 'Label VI', 'text', 'label.vi', { default:'Signal' }),
+          _blockField('labelEn', 'Nhãn EN', 'Label EN', 'text', 'label.en', { default:'Signal' }),
           _blockField('point', 'Point', 'Point', 'text', 'point', { default:'' }),
           _blockField('fieldKey', 'Field key', 'Field key', 'text', 'fieldKey', { default:'' }),
-          _blockField('unit', 'Don vi', 'Unit', 'text', 'unit', { default:'' }),
+          _blockField('unit', 'Đơn vị', 'Unit', 'text', 'unit', { default:'' }),
           _blockField('threshold', 'Threshold', 'Threshold', 'number', 'threshold', { default:0 }),
-          _blockField('color', 'Mau', 'Color', 'color', 'color', { default:'#f59e0b' })
+          _blockField('color', 'Màu', 'Color', 'color', 'color', { default:'#f59e0b' })
         ]
-      })
+      }),
+      _blockField('alarmApi', 'API sự kiện alarm', 'Alarm event API', 'api-select', 'config.iot.alarm.api', { default:'', repaintOnChange:true })
     ]));
   }
 
   return sections;
 }
 
+function _buildSpecializedDataSections(type, renderer){
+  if(type === 'kanban-board' || type === 'status-board' || type === 'auto-approval-lane' || type === 'auto-task-board') return _buildKanbanSections(type);
+  if(type === 'schedule-grid' || type === 'calendar-board' || type === 'gantt-board' || type === 'mfg-production-schedule') return _buildScheduleSections(type);
+  if(type === 'pivot-table' || type === 'matrix-grid' || type === 'heat-table' || type === 'quality-defect-matrix') return _buildMatrixSections(type);
+  if(type === 'record-detail' || type === 'master-detail' || type === 'quality-traceability') return _buildRecordDetailSections(type);
+  if(type === 'mfg-machine-status' || type === 'iot-machine-twin' || type === 'iot-edge-health') return _buildMachineStatusSections(type);
+  if(type === 'mfg-oee-trend' || type === 'iot-oee-board' || type === 'iot-energy-monitor') return _buildOeeSections(type);
+  if(type === 'quality-spc-chart' || type === 'quality-control-chart' || type === 'chart-control') return _buildSpcSections(type);
+  if(type === 'quality-pareto' || type === 'chart-waterfall' || type === 'chart-histogram' || type === 'chart-boxplot') return _buildDistributionChartSections(type);
+  if(type === 'form-wizard' || type === 'approval-form') return _buildFormWizardSections(type);
+  if(type === 'checklist-form' || type === 'mfg-setup-check' || type === 'quality-inspection-form' || type === 'quality-checksheet') return _buildChecklistSections(type);
+  if(type === 'query-builder' || type === 'search-panel') return _buildQueryBuilderSections(type);
+  if(type === 'iot-connector-panel') return _buildIoTConnectorPanelSections();
+  if(type === 'iot-signal-map') return _buildSignalMapSections();
+  if(type === 'iot-threshold-manager' || type === 'iot-condition-monitor') return _buildThresholdSections(type);
+  if(type === 'action-status-flow' || type === 'action-approval' || type === 'auto-workflow-designer') return _buildStatusFlowSections(type);
+  if(type === 'action-bulk') return _buildBulkActionSections();
+  if(type === 'chart-gauge' || type === 'chart-progress' || type === 'insight-target-tracker') return _buildGaugeSections(type);
+  if(type === 'chart-radar' || type === 'chart-scatter' || type === 'chart-bubble' || type === 'chart-heatmap' || type === 'insight-cohort') return _buildAdvancedChartSections(type);
+  if(renderer === 'chart-bar' && /^chart-/.test(type)) return _buildCartesianChartSections(type);
+  return [];
+}
+
+function _buildKanbanSections(type){
+  return [
+    _blockSection('lanes', 'Làn trạng thái', 'Status lanes', [
+      _blockField('laneField', 'Field lane', 'Lane field', 'field-select', 'config.kanban.laneField', { default:'status' }),
+      _blockField('swimlaneField', 'Field swimlane', 'Swimlane field', 'field-select', 'config.kanban.swimlaneField', { default:'' }),
+      _blockField('ownerField', 'Field phụ trách', 'Owner field', 'field-select', 'config.kanban.ownerField', { default:'owner_name' }),
+      _blockField('wipField', 'Field WIP', 'WIP field', 'field-select', 'config.kanban.wipField', { default:'' }),
+      _blockField('lanes', 'Danh sách lane', 'Lane list', 'collection', 'config.kanban.lanes', {
+        default:[],
+        addLabel:'Thêm lane',
+        itemLabel:'Lane',
+        itemFields:[
+          _blockField('key', 'Mã lane', 'Lane key', 'text', 'key', { default:'new' }),
+          _blockField('labelVi', 'Nhãn VI', 'Label VI', 'text', 'label.vi', { default:'Mới' }),
+          _blockField('labelEn', 'Nhãn EN', 'Label EN', 'text', 'label.en', { default:'New' }),
+          _blockField('limit', 'Giới hạn WIP', 'WIP limit', 'number', 'limit', { default:0, min:0 }),
+          _blockField('color', 'Màu', 'Color', 'color', 'color', { default:'#2563eb' })
+        ]
+      })
+    ]),
+    _blockSection('cards', 'Hiển thị thẻ', 'Card display', [
+      _blockField('titleField', 'Field tiêu đề', 'Title field', 'field-select', 'config.kanban.card.titleField', { default:'title' }),
+      _blockField('subtitleField', 'Field phụ đề', 'Subtitle field', 'field-select', 'config.kanban.card.subtitleField', { default:'owner_name' }),
+      _blockField('priorityField', 'Field ưu tiên', 'Priority field', 'field-select', 'config.kanban.card.priorityField', { default:'priority' }),
+      _blockField('dateField', 'Field hạn xử lý', 'Due-date field', 'field-select', 'config.kanban.card.dueDateField', { default:'due_date' }),
+      _blockField('tagField', 'Field tag', 'Tag field', 'field-select', 'config.kanban.card.tagField', { default:'' }),
+      _blockField('allowCreate', 'Cho phép tạo nhanh', 'Allow quick create', 'toggle', 'config.kanban.allowCreate', { default:true }),
+      _blockField('allowDrag', 'Cho phép kéo thả', 'Allow drag and drop', 'toggle', 'config.kanban.allowDrag', { default:true }),
+      _blockField('persistApi', 'API lưu thay đổi', 'Persist API', 'api-select', 'config.kanban.persist.api', { default:'', repaintOnChange:true })
+    ])
+  ];
+}
+
+function _buildScheduleSections(type){
+  return [
+    _blockSection('timeline', 'Timeline & lịch', 'Timeline & calendar', [
+      _blockField('defaultView', 'View mặc định', 'Default view', 'select', 'config.schedule.defaultView', {
+        default:type === 'calendar-board' ? 'month' : (type === 'gantt-board' ? 'gantt' : 'week'),
+        options:['day','week','month','timeline','gantt']
+      }),
+      _blockField('startField', 'Field bắt đầu', 'Start field', 'field-select', 'config.schedule.startField', { default:'start_at' }),
+      _blockField('endField', 'Field kết thúc', 'End field', 'field-select', 'config.schedule.endField', { default:'end_at' }),
+      _blockField('titleField', 'Field tiêu đề', 'Title field', 'field-select', 'config.schedule.titleField', { default:'title' }),
+      _blockField('resourceField', 'Field nguồn lực', 'Resource field', 'field-select', 'config.schedule.resourceField', { default:'resource_name' }),
+      _blockField('statusField', 'Field trạng thái', 'Status field', 'field-select', 'config.schedule.statusField', { default:'status' }),
+      _blockField('progressField', 'Field tiến độ', 'Progress field', 'field-select', 'config.schedule.progressField', { default:'progress_pct' }),
+      _blockField('dependencyField', 'Field phụ thuộc', 'Dependency field', 'field-select', 'config.schedule.dependencyField', { default:'depends_on' })
+    ]),
+    _blockSection('calendar', 'Hiển thị lịch', 'Calendar settings', [
+      _blockField('slotMinutes', 'Bước thời gian (phút)', 'Slot minutes', 'number', 'config.schedule.slotMinutes', { default:30, min:5, step:5 }),
+      _blockField('workdayStart', 'Giờ bắt đầu', 'Workday start', 'text', 'config.schedule.workdayStart', { default:'08:00' }),
+      _blockField('workdayEnd', 'Giờ kết thúc', 'Workday end', 'text', 'config.schedule.workdayEnd', { default:'17:00' }),
+      _blockField('showWeekends', 'Hiện cuối tuần', 'Show weekends', 'toggle', 'config.schedule.showWeekends', { default:false }),
+      _blockField('allowOverlap', 'Cho phép chồng lịch', 'Allow overlaps', 'toggle', 'config.schedule.allowOverlap', { default:false }),
+      _blockField('colorField', 'Field màu', 'Color field', 'field-select', 'config.schedule.colorField', { default:'' }),
+      _blockField('groupByField', 'Nhóm theo', 'Group by', 'field-select', 'config.schedule.groupByField', { default:'' }),
+      _blockField('timezone', 'Time zone', 'Time zone', 'text', 'config.schedule.timezone', { default:'Asia/Ho_Chi_Minh' })
+    ])
+  ];
+}
+
+function _buildMatrixSections(type){
+  return [
+    _blockSection('axes', 'Trục tổng hợp', 'Aggregation axes', [
+      _blockField('rowField', 'Field hàng', 'Row field', 'field-select', 'config.matrix.rowField', { default:'category' }),
+      _blockField('columnField', 'Field cột', 'Column field', 'field-select', 'config.matrix.columnField', { default:'period' }),
+      _blockField('valueField', 'Field giá trị', 'Value field', 'field-select', 'config.matrix.valueField', { default:'value' }),
+      _blockField('aggregate', 'Hàm tổng hợp', 'Aggregate', 'select', 'config.matrix.aggregate', { default:'sum', options:['sum','avg','count','min','max'] }),
+      _blockField('sortBy', 'Sắp xếp theo', 'Sort by', 'select', 'config.matrix.sortBy', { default:'value-desc', options:['value-desc','value-asc','label-asc','label-desc'] }),
+      _blockField('showTotals', 'Hiện tổng', 'Show totals', 'toggle', 'config.matrix.showTotals', { default:true })
+    ]),
+    _blockSection('definitions', 'Định nghĩa hiển thị', 'Display definitions', [
+      _blockField('rows', 'Danh sách hàng', 'Row definitions', 'collection', 'config.matrix.rows', {
+        default:[],
+        addLabel:'Thêm hàng',
+        itemLabel:'Hàng',
+        itemFields:[
+          _blockField('key', 'Mã', 'Key', 'text', 'key', { default:'row_key' }),
+          _blockField('labelVi', 'Nhãn VI', 'Label VI', 'text', 'label.vi', { default:'Hàng' }),
+          _blockField('labelEn', 'Nhãn EN', 'Label EN', 'text', 'label.en', { default:'Row' }),
+          _blockField('formula', 'Công thức', 'Formula', 'formula-select', 'formula', { default:'' })
+        ]
+      }),
+      _blockField('columns', 'Danh sách cột', 'Column definitions', 'collection', 'config.matrix.columns', {
+        default:[],
+        addLabel:'Thêm cột',
+        itemLabel:'Cột',
+        itemFields:[
+          _blockField('key', 'Mã', 'Key', 'text', 'key', { default:'col_key' }),
+          _blockField('labelVi', 'Nhãn VI', 'Label VI', 'text', 'label.vi', { default:'Cột' }),
+          _blockField('labelEn', 'Nhãn EN', 'Label EN', 'text', 'label.en', { default:'Column' }),
+          _blockField('color', 'Màu', 'Color', 'color', 'color', { default:'#0f766e' })
+        ]
+      }),
+      _blockField('heatScale', 'Thang nhiệt', 'Heat scale', 'select', 'config.matrix.heatScale', { default:type === 'heat-table' ? 'red-yellow-green' : 'none', options:['none','red-yellow-green','blue-scale','amber-scale'] }),
+      _blockField('decimals', 'Số chữ số thập phân', 'Decimals', 'number', 'config.matrix.decimals', { default:0, min:0, max:6 })
+    ])
+  ];
+}
+
+function _buildRecordDetailSections(type){
+  return [
+    _blockSection('summary', 'Thông tin chính', 'Summary fields', [
+      _blockField('titleField', 'Field tiêu đề', 'Title field', 'field-select', 'config.detail.titleField', { default:'title' }),
+      _blockField('subtitleField', 'Field phụ đề', 'Subtitle field', 'field-select', 'config.detail.subtitleField', { default:'code' }),
+      _blockField('statusField', 'Field trạng thái', 'Status field', 'field-select', 'config.detail.statusField', { default:'status' }),
+      _blockField('ownerField', 'Field phụ trách', 'Owner field', 'field-select', 'config.detail.ownerField', { default:'owner_name' }),
+      _blockField('updatedAtField', 'Field cập nhật', 'Updated-at field', 'field-select', 'config.detail.updatedAtField', { default:'updated_at' }),
+      _blockField('heroImageField', 'Field ảnh đại diện', 'Hero image field', 'field-select', 'config.detail.heroImageField', { default:'' })
+    ]),
+    _blockSection('sections', 'Khu vực chi tiết', 'Detail sections', [
+      _blockField('sections', 'Danh sách section', 'Section list', 'collection', 'config.detail.sections', {
+        default:[],
+        addLabel:'Thêm section',
+        itemLabel:'Section',
+        itemFields:[
+          _blockField('key', 'Mã section', 'Section key', 'text', 'key', { default:'overview' }),
+          _blockField('labelVi', 'Tiêu đề VI', 'Title VI', 'text', 'label.vi', { default:'Tổng quan' }),
+          _blockField('labelEn', 'Tiêu đề EN', 'Title EN', 'text', 'label.en', { default:'Overview' }),
+          _blockField('fieldsCsv', 'Danh sách field', 'Field list', 'text', 'fieldsCsv', { default:'code,name,status' }),
+          _blockField('visibleWhen', 'Điều kiện hiện', 'Visible when', 'expression', 'visibleWhen', { default:'' })
+        ]
+      }),
+      _blockField('relatedApi', 'API liên quan', 'Related-record API', 'api-select', 'config.detail.relatedApi', { default:'', repaintOnChange:true }),
+      _blockField('childDataKey', 'Data key liên quan', 'Related data key', 'text', 'config.detail.relatedDataKey', { default:'items' }),
+      _blockField('useTabs', 'Hiển thị dạng tab', 'Render as tabs', 'toggle', 'config.detail.useTabs', { default:type === 'master-detail' })
+    ])
+  ];
+}
+
+function _buildMachineStatusSections(type){
+  return [
+    _blockSection('machine', 'Trạng thái thiết bị', 'Machine status', [
+      _blockField('assetField', 'Field máy/thiết bị', 'Asset field', 'field-select', 'config.machine.assetField', { default:'machine_name' }),
+      _blockField('lineField', 'Field chuyền', 'Line field', 'field-select', 'config.machine.lineField', { default:'line_name' }),
+      _blockField('statusField', 'Field trạng thái', 'Status field', 'field-select', 'config.machine.statusField', { default:'status' }),
+      _blockField('reasonField', 'Field lý do', 'Reason field', 'field-select', 'config.machine.reasonField', { default:'reason' }),
+      _blockField('updatedAtField', 'Field thời điểm', 'Updated-at field', 'field-select', 'config.machine.updatedAtField', { default:'updated_at' }),
+      _blockField('showDowntime', 'Hiện downtime', 'Show downtime', 'toggle', 'config.machine.showDowntime', { default:true })
+    ]),
+    _blockSection('legend', 'Legend trạng thái', 'Status legend', [
+      _blockField('statusMap', 'Danh sách trạng thái', 'Status mapping', 'collection', 'config.machine.statusMap', {
+        default:[],
+        addLabel:'Thêm trạng thái',
+        itemLabel:'Trạng thái',
+        itemFields:[
+          _blockField('key', 'Mã', 'Key', 'text', 'key', { default:'running' }),
+          _blockField('labelVi', 'Nhãn VI', 'Label VI', 'text', 'label.vi', { default:'Đang chạy' }),
+          _blockField('labelEn', 'Nhãn EN', 'Label EN', 'text', 'label.en', { default:'Running' }),
+          _blockField('color', 'Màu', 'Color', 'color', 'color', { default:'#16a34a' }),
+          _blockField('severity', 'Mức độ', 'Severity', 'select', 'severity', { default:'info', options:['info','warning','critical'] })
+        ]
+      }),
+      _blockField('alertAgeMin', 'Phút cảnh báo', 'Alert age (min)', 'number', 'config.machine.alertAgeMin', { default:15, min:0 }),
+      _blockField('showCounters', 'Hiện bộ đếm', 'Show counters', 'toggle', 'config.machine.showCounters', { default:true })
+    ])
+  ];
+}
+
+function _buildOeeSections(type){
+  return [
+    _blockSection('factors', 'Thành phần OEE', 'OEE factors', [
+      _blockField('oeeField', 'Field OEE', 'OEE field', 'field-select', 'config.oee.oeeField', { default:'oee' }),
+      _blockField('availabilityField', 'Field availability', 'Availability field', 'field-select', 'config.oee.availabilityField', { default:'availability' }),
+      _blockField('performanceField', 'Field performance', 'Performance field', 'field-select', 'config.oee.performanceField', { default:'performance' }),
+      _blockField('qualityField', 'Field quality', 'Quality field', 'field-select', 'config.oee.qualityField', { default:'quality' }),
+      _blockField('targetField', 'Field target', 'Target field', 'field-select', 'config.oee.targetField', { default:'target_oee' }),
+      _blockField('timeBucket', 'Bucket thời gian', 'Time bucket', 'select', 'config.oee.timeBucket', { default:type === 'mfg-oee-trend' ? 'shift' : 'current', options:['current','hour','shift','day','week'] })
+    ]),
+    _blockSection('context', 'Ngữ cảnh sản xuất', 'Manufacturing context', [
+      _blockField('machineField', 'Field máy', 'Machine field', 'field-select', 'config.oee.machineField', { default:'machine_name' }),
+      _blockField('shiftField', 'Field ca', 'Shift field', 'field-select', 'config.oee.shiftField', { default:'shift_name' }),
+      _blockField('goodCountField', 'Field good count', 'Good-count field', 'field-select', 'config.oee.goodCountField', { default:'good_qty' }),
+      _blockField('rejectCountField', 'Field reject count', 'Reject-count field', 'field-select', 'config.oee.rejectCountField', { default:'reject_qty' }),
+      _blockField('runtimeField', 'Field runtime', 'Runtime field', 'field-select', 'config.oee.runtimeField', { default:'runtime_min' }),
+      _blockField('downtimeField', 'Field downtime', 'Downtime field', 'field-select', 'config.oee.downtimeField', { default:'downtime_min' }),
+      _blockField('showTrend', 'Hiện xu hướng', 'Show trend', 'toggle', 'config.oee.showTrend', { default:type === 'mfg-oee-trend' })
+    ])
+  ];
+}
+
+function _buildSpcSections(type){
+  return [
+    _blockSection('measurement', 'Đo lường SPC', 'SPC measurement', [
+      _blockField('valueField', 'Field giá trị đo', 'Measurement field', 'field-select', 'config.spc.valueField', { default:'measured_value' }),
+      _blockField('sampleField', 'Field mẫu', 'Sample field', 'field-select', 'config.spc.sampleField', { default:'sample_no' }),
+      _blockField('subgroupField', 'Field subgroup', 'Subgroup field', 'field-select', 'config.spc.subgroupField', { default:'subgroup' }),
+      _blockField('specTargetField', 'Field target', 'Target field', 'field-select', 'config.spc.targetField', { default:'target' }),
+      _blockField('lslField', 'Field LSL', 'LSL field', 'field-select', 'config.spc.lslField', { default:'lsl' }),
+      _blockField('uslField', 'Field USL', 'USL field', 'field-select', 'config.spc.uslField', { default:'usl' }),
+      _blockField('timestampField', 'Field thời gian', 'Timestamp field', 'field-select', 'config.spc.timestampField', { default:'measured_at' }),
+      _blockField('chartMode', 'Chế độ chart', 'Chart mode', 'select', 'config.spc.chartMode', { default:type === 'quality-control-chart' ? 'xbar-r' : 'individual', options:['individual','xbar-r','xbar-s','np','p'] })
+    ]),
+    _blockSection('rules', 'Luật kiểm soát', 'Control rules', [
+      _blockField('uclField', 'Field UCL', 'UCL field', 'field-select', 'config.spc.uclField', { default:'ucl' }),
+      _blockField('lclField', 'Field LCL', 'LCL field', 'field-select', 'config.spc.lclField', { default:'lcl' }),
+      _blockField('centerLineField', 'Field center line', 'Center-line field', 'field-select', 'config.spc.centerLineField', { default:'center_line' }),
+      _blockField('showSigmaBands', 'Hiện sigma bands', 'Show sigma bands', 'toggle', 'config.spc.showSigmaBands', { default:true }),
+      _blockField('highlightViolations', 'Nhấn vi phạm', 'Highlight violations', 'toggle', 'config.spc.highlightViolations', { default:true }),
+      _blockField('rulePreset', 'Preset rule', 'Rule preset', 'select', 'config.spc.rulePreset', { default:'western-electric', options:['western-electric','nelson','custom'] }),
+      _blockField('violationField', 'Field vi phạm', 'Violation field', 'field-select', 'config.spc.violationField', { default:'violation_code' })
+    ])
+  ];
+}
+
+function _buildDistributionChartSections(type){
+  return [
+    _blockSection('distribution', 'Phân bố & thứ hạng', 'Distribution & ranking', [
+      _blockField('categoryField', 'Field hạng mục', 'Category field', 'field-select', 'config.distribution.categoryField', { default:'category' }),
+      _blockField('valueField', 'Field giá trị', 'Value field', 'field-select', 'config.distribution.valueField', { default:'value' }),
+      _blockField('secondaryValueField', 'Field phụ', 'Secondary value field', 'field-select', 'config.distribution.secondaryValueField', { default:'' }),
+      _blockField('sortBy', 'Sắp xếp theo', 'Sort by', 'select', 'config.distribution.sortBy', { default:'value-desc', options:['value-desc','value-asc','category-asc','category-desc'] }),
+      _blockField('topN', 'Giới hạn top N', 'Top N', 'number', 'config.distribution.topN', { default:type === 'quality-pareto' ? 10 : 0, min:0 }),
+      _blockField('showCumulative', 'Hiện lũy kế', 'Show cumulative', 'toggle', 'config.distribution.showCumulative', { default:type === 'quality-pareto' || type === 'chart-waterfall' }),
+      _blockField('binCount', 'Số bucket/bin', 'Bucket count', 'number', 'config.distribution.binCount', { default:type === 'chart-histogram' ? 12 : 0, min:0 }),
+      _blockField('orientation', 'Hướng hiển thị', 'Orientation', 'select', 'config.distribution.orientation', { default:'vertical', options:['vertical','horizontal'] })
+    ]),
+    _blockSection('benchmarks', 'Mốc chuẩn', 'Benchmarks', [
+      _blockField('targetValue', 'Giá trị mục tiêu', 'Target value', 'number', 'config.distribution.targetValue', { default:0 }),
+      _blockField('warningValue', 'Ngưỡng cảnh báo', 'Warning value', 'number', 'config.distribution.warningValue', { default:0 }),
+      _blockField('criticalValue', 'Ngưỡng nghiêm trọng', 'Critical value', 'number', 'config.distribution.criticalValue', { default:0 }),
+      _blockField('showLabels', 'Hiện nhãn giá trị', 'Show value labels', 'toggle', 'config.distribution.showLabels', { default:true })
+    ])
+  ];
+}
+
+function _buildFormWizardSections(type){
+  return [
+    _blockSection('steps', 'Các bước', 'Wizard steps', [
+      _blockField('steps', 'Danh sách bước', 'Step list', 'collection', 'config.wizard.steps', {
+        default:[],
+        addLabel:'Thêm bước',
+        itemLabel:'Bước',
+        itemFields:[
+          _blockField('key', 'Mã bước', 'Step key', 'text', 'key', { default:'step_1' }),
+          _blockField('labelVi', 'Tiêu đề VI', 'Title VI', 'text', 'label.vi', { default:'Bước 1' }),
+          _blockField('labelEn', 'Tiêu đề EN', 'Title EN', 'text', 'label.en', { default:'Step 1' }),
+          _blockField('fieldsCsv', 'Danh sách field', 'Field list', 'text', 'fieldsCsv', { default:'code,name' }),
+          _blockField('visibleWhen', 'Điều kiện hiện', 'Visible when', 'expression', 'visibleWhen', { default:'' })
+        ]
+      }),
+      _blockField('allowSkip', 'Cho phép bỏ qua', 'Allow skip', 'toggle', 'config.wizard.allowSkip', { default:false }),
+      _blockField('showProgress', 'Hiện thanh tiến độ', 'Show progress', 'toggle', 'config.wizard.showProgress', { default:true }),
+      _blockField('saveDraftApi', 'API lưu nháp', 'Save-draft API', 'api-select', 'config.wizard.saveDraft.api', { default:'', repaintOnChange:true })
+    ]),
+    _blockSection('submission', 'Nộp & hoàn tất', 'Submission', [
+      _blockField('submitApi', 'API hoàn tất', 'Submit API', 'api-select', 'config.wizard.submit.api', { default:'', repaintOnChange:true }),
+      _blockField('submitMethod', 'Phương thức nộp', 'Submit method', 'select', 'config.wizard.submit.method', { default:'POST', options:['POST','PUT','PATCH'] }),
+      _blockField('successRoute', 'Route thành công', 'Success route', 'text', 'config.wizard.successRoute', { default:'' }),
+      _blockField('summaryStepKey', 'Bước xác nhận', 'Review step key', 'text', 'config.wizard.summaryStepKey', { default:'' })
+    ])
+  ];
+}
+
+function _buildChecklistSections(type){
+  return [
+    _blockSection('items', 'Danh sách kiểm tra', 'Checklist items', [
+      _blockField('items', 'Danh sách item', 'Checklist items', 'collection', 'config.checklist.items', {
+        default:[],
+        addLabel:'Thêm item',
+        itemLabel:'Item',
+        itemFields:[
+          _blockField('key', 'Mã item', 'Item key', 'text', 'key', { default:'item_1' }),
+          _blockField('labelVi', 'Nhãn VI', 'Label VI', 'text', 'label.vi', { default:'Tiêu chí kiểm tra' }),
+          _blockField('labelEn', 'Nhãn EN', 'Label EN', 'text', 'label.en', { default:'Checklist item' }),
+          _blockField('type', 'Loại đánh giá', 'Input type', 'select', 'type', { default:'boolean', options:['boolean','status','number','text','photo','signature'] }),
+          _blockField('required', 'Bắt buộc', 'Required', 'toggle', 'required', { default:true }),
+          _blockField('score', 'Điểm', 'Score', 'number', 'score', { default:1, min:0 }),
+          _blockField('evidenceRequired', 'Cần minh chứng', 'Evidence required', 'toggle', 'evidenceRequired', { default:false })
+        ]
+      }),
+      _blockField('passScore', 'Điểm đạt', 'Pass score', 'number', 'config.checklist.passScore', { default:0, min:0 }),
+      _blockField('stopOnFail', 'Dừng khi fail', 'Stop on fail', 'toggle', 'config.checklist.stopOnFail', { default:false }),
+      _blockField('statusSet', 'Bộ trạng thái', 'Status set', 'status-set-select', 'config.checklist.statusSet', { default:'' })
+    ]),
+    _blockSection('review', 'Phê duyệt & hậu kiểm', 'Review & follow-up', [
+      _blockField('reviewerRole', 'Vai trò phê duyệt', 'Reviewer role', 'text', 'config.checklist.reviewerRole', { default:'' }),
+      _blockField('ncrApi', 'API tạo NCR', 'NCR API', 'api-select', 'config.checklist.ncrApi', { default:'', repaintOnChange:true }),
+      _blockField('autoCreateAction', 'Tạo action khi fail', 'Create action on fail', 'toggle', 'config.checklist.autoCreateAction', { default:type === 'quality-inspection-form' }),
+      _blockField('failReasonField', 'Field lý do fail', 'Fail-reason field', 'field-select', 'config.checklist.failReasonField', { default:'fail_reason' })
+    ])
+  ];
+}
+
+function _buildQueryBuilderSections(type){
+  return [
+    _blockSection('clauses', 'Điều kiện truy vấn', 'Query clauses', [
+      _blockField('defaultCombinator', 'Toán tử mặc định', 'Default combinator', 'select', 'config.query.defaultCombinator', { default:'AND', options:['AND','OR'] }),
+      _blockField('allowNested', 'Cho phép nhóm lồng', 'Allow nested groups', 'toggle', 'config.query.allowNested', { default:true }),
+      _blockField('maxDepth', 'Độ sâu tối đa', 'Max depth', 'number', 'config.query.maxDepth', { default:3, min:1, max:8 }),
+      _blockField('clauses', 'Danh sách clause mẫu', 'Preset clauses', 'collection', 'config.query.clauses', {
+        default:[],
+        addLabel:'Thêm clause',
+        itemLabel:'Clause',
+        itemFields:[
+          _blockField('fieldRef', 'Field ref', 'Field ref', 'field-select', 'fieldRef', { default:'' }),
+          _blockField('labelVi', 'Nhãn VI', 'Label VI', 'text', 'label.vi', { default:'Điều kiện' }),
+          _blockField('labelEn', 'Nhãn EN', 'Label EN', 'text', 'label.en', { default:'Condition' }),
+          _blockField('operator', 'Toán tử', 'Operator', 'select', 'operator', { default:'=', options:['=','!=','>','>=','<','<=','contains','between','in'] }),
+          _blockField('inputType', 'Loại input', 'Input type', 'select', 'inputType', { default:'text', options:['text','number','date','select','status'] })
+        ]
+      })
+    ]),
+    _blockSection('presets', 'Preset & đầu ra', 'Presets & outputs', [
+      _blockField('allowSavePreset', 'Cho phép lưu preset', 'Allow save preset', 'toggle', 'config.query.allowSavePreset', { default:true }),
+      _blockField('presetStorageKey', 'Khóa lưu preset', 'Preset storage key', 'text', 'config.query.presetStorageKey', { default:'' }),
+      _blockField('resultTarget', 'Đích áp dụng', 'Result target', 'select', 'config.query.resultTarget', { default:'filters', options:['filters','api-params','redirect'] }),
+      _blockField('syncToRoute', 'Đồng bộ lên route', 'Sync to route', 'toggle', 'config.query.syncToRoute', { default:type === 'search-panel' })
+    ])
+  ];
+}
+
+function _buildIoTConnectorPanelSections(){
+  return [
+    _blockSection('connector', 'Kết nối thiết bị', 'Connector setup', [
+      _blockField('connector', 'Connector', 'Connector', 'iot-connector-select', 'config.connector.key', { default:'', repaintOnChange:true }),
+      _blockField('authMode', 'Chế độ xác thực', 'Auth mode', 'select', 'config.connector.authMode', { default:'inherited', options:['inherited','token','basic','certificate'] }),
+      _blockField('endpoint', 'Endpoint / broker', 'Endpoint / broker', 'text', 'config.connector.endpoint', { default:'' }),
+      _blockField('topic', 'Topic mặc định', 'Default topic', 'text', 'config.connector.topic', { default:'' }),
+      _blockField('pollIntervalMs', 'Chu kỳ poll (ms)', 'Poll interval (ms)', 'number', 'config.connector.pollIntervalMs', { default:5000, min:0, step:500 }),
+      _blockField('payloadPath', 'Đường dẫn payload', 'Payload path', 'text', 'config.connector.payloadPath', { default:'payload' }),
+      _blockField('heartbeatField', 'Field heartbeat', 'Heartbeat field', 'field-select', 'config.connector.heartbeatField', { default:'heartbeat_at' }),
+      _blockField('statusField', 'Field trạng thái', 'Status field', 'field-select', 'config.connector.statusField', { default:'status' })
+    ])
+  ];
+}
+
+function _buildSignalMapSections(){
+  return [
+    _blockSection('signals', 'Ánh xạ tín hiệu', 'Signal mapping', [
+      _blockField('signals', 'Danh sách tín hiệu', 'Signal list', 'collection', 'config.signalMap.signals', {
+        default:[],
+        addLabel:'Thêm tín hiệu',
+        itemLabel:'Tín hiệu',
+        itemFields:[
+          _blockField('point', 'Point / tag', 'Point / tag', 'text', 'point', { default:'machine.temp' }),
+          _blockField('labelVi', 'Nhãn VI', 'Label VI', 'text', 'label.vi', { default:'Nhiệt độ' }),
+          _blockField('labelEn', 'Nhãn EN', 'Label EN', 'text', 'label.en', { default:'Temperature' }),
+          _blockField('fieldKey', 'Field đích', 'Target field', 'text', 'fieldKey', { default:'temperature' }),
+          _blockField('dataType', 'Kiểu dữ liệu', 'Data type', 'select', 'dataType', { default:'number', options:['number','boolean','string','json'] }),
+          _blockField('unit', 'Đơn vị', 'Unit', 'text', 'unit', { default:'' }),
+          _blockField('formula', 'Công thức', 'Formula', 'formula-select', 'formula', { default:'' }),
+          _blockField('chartAxis', 'Trục chart', 'Chart axis', 'select', 'chartAxis', { default:'left', options:['left','right','hidden'] })
+        ]
+      }),
+      _blockField('sampleMode', 'Chế độ lấy mẫu', 'Sample mode', 'select', 'config.signalMap.sampleMode', { default:'latest', options:['latest','window','aggregate'] }),
+      _blockField('sampleWindowMin', 'Cửa sổ (phút)', 'Sample window (min)', 'number', 'config.signalMap.sampleWindowMin', { default:15, min:1 }),
+      _blockField('includeQuality', 'Kèm quality code', 'Include quality code', 'toggle', 'config.signalMap.includeQuality', { default:true })
+    ])
+  ];
+}
+
+function _buildThresholdSections(type){
+  return [
+    _blockSection('thresholds', 'Ngưỡng giám sát', 'Monitoring thresholds', [
+      _blockField('signalField', 'Field tín hiệu', 'Signal field', 'field-select', 'config.threshold.signalField', { default:'signal' }),
+      _blockField('valueField', 'Field giá trị', 'Value field', 'field-select', 'config.threshold.valueField', { default:'value' }),
+      _blockField('thresholds', 'Danh sách ngưỡng', 'Threshold list', 'collection', 'config.threshold.rules', {
+        default:[],
+        addLabel:'Thêm ngưỡng',
+        itemLabel:'Ngưỡng',
+        itemFields:[
+          _blockField('signal', 'Tín hiệu', 'Signal', 'text', 'signal', { default:'temperature' }),
+          _blockField('operator', 'Toán tử', 'Operator', 'select', 'operator', { default:'>', options:['>','>=','<','<=','=','between'] }),
+          _blockField('warning', 'Cảnh báo', 'Warning', 'number', 'warning', { default:0 }),
+          _blockField('critical', 'Nghiêm trọng', 'Critical', 'number', 'critical', { default:0 }),
+          _blockField('debounceMs', 'Debounce (ms)', 'Debounce (ms)', 'number', 'debounceMs', { default:5000, min:0 }),
+          _blockField('notifyRole', 'Vai trò nhận tin', 'Notify role', 'text', 'notifyRole', { default:'' })
+        ]
+      }),
+      _blockField('autoAcknowledge', 'Tự xác nhận', 'Auto acknowledge', 'toggle', 'config.threshold.autoAcknowledge', { default:false }),
+      _blockField('showTrend', 'Hiện mini trend', 'Show mini trend', 'toggle', 'config.threshold.showTrend', { default:type === 'iot-condition-monitor' })
+    ])
+  ];
+}
+
+function _buildStatusFlowSections(type){
+  return [
+    _blockSection('transitions', 'Luồng trạng thái', 'Status transitions', [
+      _blockField('stateField', 'Field trạng thái', 'State field', 'field-select', 'config.workflow.stateField', { default:'status' }),
+      _blockField('transitions', 'Danh sách chuyển trạng thái', 'Transition list', 'collection', 'config.workflow.transitions', {
+        default:[],
+        addLabel:'Thêm transition',
+        itemLabel:'Transition',
+        itemFields:[
+          _blockField('from', 'Từ trạng thái', 'From state', 'text', 'from', { default:'draft' }),
+          _blockField('to', 'Sang trạng thái', 'To state', 'text', 'to', { default:'submitted' }),
+          _blockField('labelVi', 'Nhãn VI', 'Label VI', 'text', 'label.vi', { default:'Gửi duyệt' }),
+          _blockField('labelEn', 'Nhãn EN', 'Label EN', 'text', 'label.en', { default:'Submit' }),
+          _blockField('role', 'Vai trò được phép', 'Allowed role', 'text', 'role', { default:'' }),
+          _blockField('endpoint', 'API thực thi', 'Action API', 'api-select', 'endpoint', { default:'', repaintOnChange:true }),
+          _blockField('confirmMessage', 'Xác nhận', 'Confirm message', 'text', 'confirmMessage', { default:'' }),
+          _blockField('requireComment', 'Bắt buộc ghi chú', 'Require comment', 'toggle', 'requireComment', { default:false })
+        ]
+      }),
+      _blockField('showHistory', 'Hiện lịch sử', 'Show transition history', 'toggle', 'config.workflow.showHistory', { default:true }),
+      _blockField('escalationRole', 'Vai trò escalation', 'Escalation role', 'text', 'config.workflow.escalationRole', { default:'' })
+    ])
+  ];
+}
+
+function _buildBulkActionSections(){
+  return [
+    _blockSection('selection', 'Chọn nhiều bản ghi', 'Selection rules', [
+      _blockField('selectionField', 'Field khóa', 'Selection key field', 'field-select', 'config.bulk.selectionField', { default:'id' }),
+      _blockField('minSelected', 'Tối thiểu', 'Minimum selected', 'number', 'config.bulk.minSelected', { default:1, min:0 }),
+      _blockField('maxSelected', 'Tối đa', 'Maximum selected', 'number', 'config.bulk.maxSelected', { default:0, min:0 }),
+      _blockField('requireReason', 'Yêu cầu lý do', 'Require reason', 'toggle', 'config.bulk.requireReason', { default:false }),
+      _blockField('confirmTemplate', 'Mẫu xác nhận', 'Confirm template', 'text', 'config.bulk.confirmTemplate', { default:'' }),
+      _blockField('batchSize', 'Kích thước batch', 'Batch size', 'number', 'config.bulk.batchSize', { default:100, min:1, step:1 }),
+      _blockField('api', 'API xử lý', 'Execution API', 'api-select', 'config.bulk.api', { default:'', repaintOnChange:true }),
+      _blockField('method', 'Phương thức', 'Method', 'select', 'config.bulk.method', { default:'POST', options:['POST','PATCH','DELETE'] })
+    ])
+  ];
+}
+
+function _buildGaugeSections(type){
+  return [
+    _blockSection('gauge', 'Thang đo', 'Gauge scale', [
+      _blockField('valueField', 'Field giá trị', 'Value field', 'field-select', 'config.gauge.valueField', { default:'value' }),
+      _blockField('targetField', 'Field mục tiêu', 'Target field', 'field-select', 'config.gauge.targetField', { default:'target' }),
+      _blockField('minValue', 'Giá trị nhỏ nhất', 'Minimum value', 'number', 'config.gauge.min', { default:0 }),
+      _blockField('maxValue', 'Giá trị lớn nhất', 'Maximum value', 'number', 'config.gauge.max', { default:100 }),
+      _blockField('unit', 'Đơn vị', 'Unit', 'text', 'config.gauge.unit', { default:'%' }),
+      _blockField('showTarget', 'Hiện target', 'Show target', 'toggle', 'config.gauge.showTarget', { default:true }),
+      _blockField('showDelta', 'Hiện chênh lệch', 'Show delta', 'toggle', 'config.gauge.showDelta', { default:type === 'insight-target-tracker' })
+    ]),
+    _blockSection('segments', 'Dải màu', 'Gauge segments', [
+      _blockField('segments', 'Danh sách dải', 'Segment list', 'collection', 'config.gauge.segments', {
+        default:[],
+        addLabel:'Thêm dải',
+        itemLabel:'Dải',
+        itemFields:[
+          _blockField('from', 'Từ', 'From', 'number', 'from', { default:0 }),
+          _blockField('to', 'Đến', 'To', 'number', 'to', { default:60 }),
+          _blockField('labelVi', 'Nhãn VI', 'Label VI', 'text', 'label.vi', { default:'Thấp' }),
+          _blockField('labelEn', 'Nhãn EN', 'Label EN', 'text', 'label.en', { default:'Low' }),
+          _blockField('color', 'Màu', 'Color', 'color', 'color', { default:'#dc2626' })
+        ]
+      })
+    ])
+  ];
+}
+
+function _buildAdvancedChartSections(type){
+  return [
+    _blockSection('axes', 'Trục & series', 'Axes & series', [
+      _blockField('xField', 'Field X', 'X field', 'field-select', 'config.chart.xField', { default:'x' }),
+      _blockField('yField', 'Field Y', 'Y field', 'field-select', 'config.chart.yField', { default:'y' }),
+      _blockField('zField', 'Field Z / size', 'Z / size field', 'field-select', 'config.chart.zField', { default:'' }),
+      _blockField('seriesField', 'Field nhóm series', 'Series field', 'field-select', 'config.chart.seriesField', { default:'series' }),
+      _blockField('colorField', 'Field màu', 'Color field', 'field-select', 'config.chart.colorField', { default:'' }),
+      _blockField('categoryField', 'Field category', 'Category field', 'field-select', 'config.chart.categoryField', { default:'' }),
+      _blockField('markerSize', 'Cỡ marker', 'Marker size', 'number', 'config.chart.markerSize', { default:type === 'chart-bubble' ? 18 : 8, min:2, max:40 }),
+      _blockField('showRegression', 'Hiện regression', 'Show regression', 'toggle', 'config.chart.showRegression', { default:type === 'chart-scatter' })
+    ]),
+    _blockSection('presentation', 'Trình bày nâng cao', 'Advanced presentation', [
+      _blockField('radarFill', 'Tô vùng radar', 'Fill radar area', 'toggle', 'config.chart.radarFill', { default:type === 'chart-radar' }),
+      _blockField('heatScale', 'Heat scale', 'Heat scale', 'select', 'config.chart.heatScale', { default:type === 'chart-heatmap' ? 'amber' : 'none', options:['none','amber','green','blue','red'] }),
+      _blockField('showLegend', 'Hiện chú giải', 'Show legend', 'toggle', 'config.chart.showLegend', { default:true }),
+      _blockField('showLabels', 'Hiện nhãn', 'Show labels', 'toggle', 'config.chart.showLabels', { default:false })
+    ])
+  ];
+}
+
+function _buildCartesianChartSections(type){
+  return [
+    _blockSection('axes', 'Trục dữ liệu', 'Data axes', [
+      _blockField('xField', 'Field trục X', 'X-axis field', 'field-select', 'config.chart.xField', { default:'label' }),
+      _blockField('xLabel', 'Nhãn trục X', 'X-axis label', 'text', 'config.chart.xLabel', { default:'' }),
+      _blockField('yLabel', 'Nhãn trục Y', 'Y-axis label', 'text', 'config.chart.yLabel', { default:'' }),
+      _blockField('series', 'Danh sách series', 'Series list', 'collection', 'config.chart.series', {
+        default:[],
+        addLabel:'Thêm series',
+        itemLabel:'Series',
+        itemFields:[
+          _blockField('field', 'Field', 'Field', 'field-select', 'field', { default:'value' }),
+          _blockField('labelVi', 'Nhãn VI', 'Label VI', 'text', 'label.vi', { default:'Series' }),
+          _blockField('labelEn', 'Nhãn EN', 'Label EN', 'text', 'label.en', { default:'Series' }),
+          _blockField('type', 'Kiểu', 'Type', 'select', 'type', { default:type === 'chart-line' ? 'line' : 'bar', options:['bar','line','area'] }),
+          _blockField('color', 'Màu', 'Color', 'color', 'color', { default:'#2563eb' }),
+          _blockField('stack', 'Stack key', 'Stack key', 'text', 'stack', { default:'' })
+        ]
+      })
+    ]),
+    _blockSection('rendering', 'Hiển thị chart', 'Chart rendering', [
+      _blockField('smooth', 'Làm mượt', 'Smooth lines', 'toggle', 'config.chart.smooth', { default:type === 'chart-line' || type === 'chart-area' }),
+      _blockField('showGrid', 'Hiện lưới', 'Show grid', 'toggle', 'config.chart.showGrid', { default:true }),
+      _blockField('showLegend', 'Hiện chú giải', 'Show legend', 'toggle', 'config.chart.showLegend', { default:true }),
+      _blockField('stackMode', 'Chế độ stack', 'Stack mode', 'select', 'config.chart.stackMode', { default:type === 'chart-stacked-bar' ? 'normal' : 'none', options:['none','normal','percent'] }),
+      _blockField('labelRotation', 'Xoay nhãn X', 'X-label rotation', 'number', 'config.chart.labelRotation', { default:0, min:-90, max:90, step:5 }),
+      _blockField('showDataLabels', 'Hiện data labels', 'Show data labels', 'toggle', 'config.chart.showDataLabels', { default:false })
+    ])
+  ];
+}
+
 function _buildStyleSections(renderer){
   return [
     _blockSection('layout', 'Layout', 'Layout', [
-      _blockField('columns', 'So cot desktop', 'Desktop columns', 'number', 'config.style.columns', { default:renderer === 'data-cards' ? 3 : 1, min:1, max:6 }),
-      _blockField('gap', 'Khoang cach', 'Gap', 'number', 'config.style.gap', { default:16, min:0, step:2 }),
+      _blockField('columns', 'Số cột desktop', 'Desktop columns', 'number', 'config.style.columns', { default:renderer === 'data-cards' ? 3 : 1, min:1, max:6 }),
+      _blockField('gap', 'Khoảng cách', 'Gap', 'number', 'config.style.gap', { default:16, min:0, step:2 }),
       _blockField('padding', 'Padding', 'Padding', 'number', 'config.style.padding', { default:16, min:0, step:2 }),
       _blockField('minHeight', 'Min height', 'Min height', 'number', 'config.style.minHeight', { default:0, min:0, step:8 }),
-      _blockField('compact', 'Compact mode', 'Compact mode', 'toggle', 'config.style.compact', { default:false })
+      _blockField('maxWidth', 'Chiều rộng tối đa', 'Max width', 'text', 'config.style.maxWidth', { default:'' }),
+      _blockField('justify', 'Căn bố cục', 'Justify', 'select', 'config.style.justify', { default:'start', options:['start','center','space-between','space-around'] }),
+      _blockField('sticky', 'Ghim khi cuộn', 'Sticky', 'toggle', 'config.style.sticky', { default:false }),
+      _blockField('stickyOffset', 'Offset sticky', 'Sticky offset', 'number', 'config.style.stickyOffset', { default:0, min:0, step:4 }),
+      _blockField('compact', 'Chế độ gọn', 'Compact mode', 'toggle', 'config.style.compact', { default:false })
     ]),
     _blockSection('surface', 'Surface', 'Surface', [
-      _blockField('background', 'Nen', 'Background', 'color', 'config.style.background', { default:'#ffffff' }),
-      _blockField('textColor', 'Mau chu', 'Text color', 'color', 'config.style.textColor', { default:'#0f172a' }),
-      _blockField('accentColor', 'Mau nhan', 'Accent color', 'color', 'config.style.accentColor', { default:'#2563eb' }),
-      _blockField('borderColor', 'Vien', 'Border color', 'color', 'config.style.borderColor', { default:'#d7dee7' }),
-      _blockField('radius', 'Bo goc', 'Radius', 'number', 'config.style.radius', { default:16, min:0, step:2 }),
-      _blockField('shadow', 'Do bong', 'Shadow', 'select', 'config.style.shadow', { default:'sm', options:['none','xs','sm','md','lg'] })
+      _blockField('background', 'Nền', 'Background', 'color', 'config.style.background', { default:'#ffffff' }),
+      _blockField('textColor', 'Màu chữ', 'Text color', 'color', 'config.style.textColor', { default:'#0f172a' }),
+      _blockField('accentColor', 'Màu nhấn', 'Accent color', 'color', 'config.style.accentColor', { default:'#2563eb' }),
+      _blockField('borderColor', 'Viền', 'Border color', 'color', 'config.style.borderColor', { default:'#d7dee7' }),
+      _blockField('borderWidth', 'Độ dày viền', 'Border width', 'number', 'config.style.borderWidth', { default:1, min:0, step:1 }),
+      _blockField('radius', 'Làm tròn góc', 'Radius', 'number', 'config.style.radius', { default:16, min:0, step:2 }),
+      _blockField('shadow', 'Đổ bóng', 'Shadow', 'select', 'config.style.shadow', { default:'sm', options:['none','xs','sm','md','lg'] }),
+      _blockField('opacity', 'Độ trong suốt', 'Opacity', 'number', 'config.style.opacity', { default:100, min:0, max:100, step:5 }),
+      _blockField('backdrop', 'Backdrop blur', 'Backdrop blur', 'number', 'config.style.backdropBlur', { default:0, min:0, step:1 })
     ]),
     _blockSection('typography', 'Typography', 'Typography', [
-      _blockField('titleSize', 'Size tieu de', 'Title size', 'number', 'config.style.titleSize', { default:18, min:12, max:40 }),
-      _blockField('labelSize', 'Size nhan', 'Label size', 'number', 'config.style.labelSize', { default:13, min:10, max:24 }),
-      _blockField('valueSize', 'Size gia tri', 'Value size', 'number', 'config.style.valueSize', { default:28, min:12, max:56 }),
-      _blockField('weight', 'Do dam', 'Weight', 'select', 'config.style.fontWeight', { default:'600', options:['400','500','600','700','800'] }),
-      _blockField('align', 'Canh noi dung', 'Content align', 'select', 'config.style.align', { default:'left', options:['left','center','right'] })
+      _blockField('titleSize', 'Cỡ tiêu đề', 'Title size', 'number', 'config.style.titleSize', { default:18, min:12, max:40 }),
+      _blockField('subtitleSize', 'Cỡ phụ đề', 'Subtitle size', 'number', 'config.style.subtitleSize', { default:13, min:10, max:30 }),
+      _blockField('labelSize', 'Cỡ nhãn', 'Label size', 'number', 'config.style.labelSize', { default:13, min:10, max:24 }),
+      _blockField('valueSize', 'Cỡ giá trị', 'Value size', 'number', 'config.style.valueSize', { default:28, min:12, max:56 }),
+      _blockField('weight', 'Độ đậm', 'Weight', 'select', 'config.style.fontWeight', { default:'600', options:['400','500','600','700','800'] }),
+      _blockField('lineClamp', 'Giới hạn dòng', 'Line clamp', 'number', 'config.style.lineClamp', { default:0, min:0, max:6 }),
+      _blockField('letterSpacing', 'Khoảng chữ', 'Letter spacing', 'number', 'config.style.letterSpacing', { default:0, min:-1, max:8, step:0.5 }),
+      _blockField('align', 'Căn nội dung', 'Content align', 'select', 'config.style.align', { default:'left', options:['left','center','right'] })
     ]),
     _blockSection('responsive', 'Responsive', 'Responsive', [
-      _blockField('mobileColumns', 'Cot mobile', 'Mobile columns', 'number', 'config.responsive.mobile.columns', { default:1, min:1, max:4 }),
-      _blockField('tabletColumns', 'Cot tablet', 'Tablet columns', 'number', 'config.responsive.tablet.columns', { default:2, min:1, max:6 }),
+      _blockField('mobileColumns', 'Cột mobile', 'Mobile columns', 'number', 'config.responsive.mobile.columns', { default:1, min:1, max:4 }),
+      _blockField('tabletColumns', 'Cột tablet', 'Tablet columns', 'number', 'config.responsive.tablet.columns', { default:2, min:1, max:6 }),
+      _blockField('desktopColumns', 'Cột desktop override', 'Desktop columns override', 'number', 'config.responsive.desktop.columns', { default:0, min:0, max:8 }),
       _blockField('mobileCompact', 'Mobile compact', 'Mobile compact', 'toggle', 'config.responsive.mobile.compact', { default:true }),
-      _blockField('hideHeaderMobile', 'An header tren mobile', 'Hide header on mobile', 'toggle', 'config.responsive.mobile.hideHeader', { default:false })
+      _blockField('hideHeaderMobile', 'Ẩn header trên mobile', 'Hide header on mobile', 'toggle', 'config.responsive.mobile.hideHeader', { default:false }),
+      _blockField('mobileGap', 'Khoảng cách mobile', 'Mobile gap', 'number', 'config.responsive.mobile.gap', { default:12, min:0, step:2 }),
+      _blockField('tabletGap', 'Khoảng cách tablet', 'Tablet gap', 'number', 'config.responsive.tablet.gap', { default:16, min:0, step:2 }),
+      _blockField('printScale', 'Tỷ lệ khi in (%)', 'Print scale (%)', 'number', 'config.responsive.print.scale', { default:100, min:50, max:100, step:5 }),
+      _blockField('hideInPrint', 'Ẩn toàn bộ khi in', 'Hide block in print', 'toggle', 'config.responsive.print.hide', { default:false })
     ])
   ];
 }
 
 function _buildEventSections(){
   return [
-    _blockSection('actions', 'Tac vu', 'Actions', [
-      _blockField('actions', 'Danh sach event', 'Event actions', 'collection', 'config.events.actions', {
+    _blockSection('actions', 'Tác vụ', 'Actions', [
+      _blockField('actions', 'Danh sách event', 'Event actions', 'collection', 'config.events.actions', {
         default:[],
-        addLabel:'Them action',
+        addLabel:'Thêm action',
         itemLabel:'Action',
         itemFields:[
           _blockField('event', 'Event', 'Event', 'select', 'event', { default:'click', options:['click','row-click','change','submit','load','success','error'] }),
-          _blockField('type', 'Action type', 'Action type', 'select', 'type', { default:'toast', options:['toast','navigate','open-modal','api-call','set-state','emit-event'] }),
+          _blockField('type', 'Loại action', 'Action type', 'select', 'type', { default:'toast', options:['toast','navigate','open-modal','api-call','set-state','emit-event'] }),
           _blockField('target', 'Target', 'Target', 'text', 'target', { default:'' }),
-          _blockField('payload', 'Payload', 'Payload', 'expression', 'payload', { default:'' })
+          _blockField('payload', 'Payload', 'Payload', 'expression', 'payload', { default:'' }),
+          _blockField('confirmText', 'Thông điệp xác nhận', 'Confirm text', 'text', 'confirmText', { default:'' }),
+          _blockField('successText', 'Thông điệp thành công', 'Success text', 'text', 'successText', { default:'' })
         ]
       })
     ]),
     _blockSection('lifecycle', 'Lifecycle', 'Lifecycle', [
-      _blockField('refreshOnFilter', 'Refresh khi loc', 'Refresh on filter', 'toggle', 'config.events.refreshOnFilter', { default:true }),
-      _blockField('emitOnLoad', 'Emit on load', 'Emit on load', 'text', 'config.events.emitOnLoad', { default:'' }),
-      _blockField('successToast', 'Toast thanh cong', 'Success toast', 'text', 'config.events.successToast', { default:'' }),
-      _blockField('errorToast', 'Toast loi', 'Error toast', 'text', 'config.events.errorToast', { default:'' }),
-      _blockField('confirmMessage', 'Thong diep xac nhan', 'Confirmation message', 'text', 'config.events.confirmMessage', { default:'' })
+      _blockField('refreshOnFilter', 'Làm mới khi lọc', 'Refresh on filter', 'toggle', 'config.events.refreshOnFilter', { default:true }),
+      _blockField('emitOnLoad', 'Emit khi load', 'Emit on load', 'text', 'config.events.emitOnLoad', { default:'' }),
+      _blockField('emitOnSuccess', 'Emit khi thành công', 'Emit on success', 'text', 'config.events.emitOnSuccess', { default:'' }),
+      _blockField('emitOnError', 'Emit khi lỗi', 'Emit on error', 'text', 'config.events.emitOnError', { default:'' }),
+      _blockField('successToast', 'Toast thành công', 'Success toast', 'text', 'config.events.successToast', { default:'' }),
+      _blockField('errorToast', 'Toast lỗi', 'Error toast', 'text', 'config.events.errorToast', { default:'' }),
+      _blockField('confirmMessage', 'Thông điệp xác nhận', 'Confirmation message', 'text', 'config.events.confirmMessage', { default:'' }),
+      _blockField('debounceMs', 'Debounce (ms)', 'Debounce (ms)', 'number', 'config.events.debounceMs', { default:0, min:0, step:50 }),
+      _blockField('throttleMs', 'Throttle (ms)', 'Throttle (ms)', 'number', 'config.events.throttleMs', { default:0, min:0, step:50 })
     ]),
-    _blockSection('advanced', 'Nang cao', 'Advanced', [
+    _blockSection('advanced', 'Nâng cao', 'Advanced', [
       _blockField('telemetryEvent', 'Telemetry event', 'Telemetry event', 'text', 'config.events.telemetryEvent', { default:'' }),
-      _blockField('permissionExpression', 'Permission expression', 'Permission expression', 'expression', 'config.permissions.expression', { default:'' }),
+      _blockField('auditTag', 'Audit tag', 'Audit tag', 'text', 'config.events.auditTag', { default:'' }),
+      _blockField('permissionExpression', 'Biểu thức quyền', 'Permission expression', 'expression', 'config.permissions.expression', { default:'' }),
       _blockField('featureFlag', 'Feature flag', 'Feature flag', 'text', 'config.permissions.featureFlag', { default:'' }),
-      _blockField('customHook', 'Custom hook', 'Custom hook', 'code', 'config.events.customHook', { default:'' })
+      _blockField('beforeHook', 'Hook trước action', 'Before-action hook', 'code', 'config.events.beforeHook', { default:'' }),
+      _blockField('customHook', 'Custom hook', 'Custom hook', 'code', 'config.events.customHook', { default:'' }),
+      _blockField('afterHook', 'Hook sau action', 'After-action hook', 'code', 'config.events.afterHook', { default:'' })
     ])
   ];
 }
@@ -1239,7 +1814,7 @@ var EVENT_TYPES = {
     if(formConfig.fields){
       html += renderFormStandard(formConfig, config.data || {});
     } else {
-      html += '<div class="hm-empty">'+_t('Chua cau hinh form','No form configured')+'</div>';
+      html += '<div class="hm-empty">'+_t('Chưa cấu hình form','No form configured')+'</div>';
     }
 
     html += '</div>';
@@ -1625,74 +2200,74 @@ function getBlockClasses(block){
 var BLOCK_TEMPLATES = {
   'order-kpi-row': {
     type: 'kpi-row',
-    title: { vi:'KPI Don hang', en:'Order KPI' },
+    title: { vi:'KPI Đơn hàng', en:'Order KPI' },
     config: {
       dataSource: { api:'order_dashboard_kpi', method:'GET' },
       items: [
-        { label:'Don hoat dong', labelEn:'Active Orders', dataKey:'active_so_count', color:'var(--brand-2)' },
+        { label:'Đơn hoạt động', labelEn:'Active Orders', dataKey:'active_so_count', color:'var(--brand-2)' },
         { label:'OTD %', labelEn:'OTD %', dataKey:'on_time_pct', color:'var(--green)', suffix:'%' },
-        { label:'Qua han', labelEn:'Overdue', dataKey:'overdue_count', color:'var(--red)' },
-        { label:'Tam dung', labelEn:'On Hold', dataKey:'active_holds', color:'var(--amber)' },
+        { label:'Quá hạn', labelEn:'Overdue', dataKey:'overdue_count', color:'var(--red)' },
+        { label:'Tạm dừng', labelEn:'On Hold', dataKey:'active_holds', color:'var(--amber)' },
       ]
     }
   },
   'production-shift-summary': {
     type: 'kpi-row',
-    title: { vi:'Tong hop ca san xuat', en:'Shift Summary' },
+    title: { vi:'Tổng hợp ca sản xuất', en:'Shift Summary' },
     config: {
       dataSource: { api:'dispatch_dashboard', method:'GET' },
       items: [
-        { label:'Tong task', labelEn:'Total Tasks', dataKey:'total_tasks', color:'var(--brand-2)' },
-        { label:'San pham tot', labelEn:'Good Output', dataKey:'total_good', color:'var(--green)' },
+        { label:'Tổng task', labelEn:'Total Tasks', dataKey:'total_tasks', color:'var(--brand-2)' },
+        { label:'Sản phẩm tốt', labelEn:'Good Output', dataKey:'total_good', color:'var(--green)' },
         { label:'NG', labelEn:'NG', dataKey:'total_ng', color:'var(--red)' },
-        { label:'Dat %', labelEn:'Achievement', dataKey:'achievement_pct', color:'var(--brand-1)', suffix:'%' },
+        { label:'Đạt %', labelEn:'Achievement', dataKey:'achievement_pct', color:'var(--brand-1)', suffix:'%' },
       ]
     }
   },
   'quality-ncr-table': {
     type: 'data-table',
-    title: { vi:'Danh sach NCR', en:'NCR List' },
+    title: { vi:'Danh sách NCR', en:'NCR List' },
     config: {
       dataSource: { api:'ncr_list', method:'GET', dataKey:'ncrs' },
       dataKey: 'ncrs',
       pageSize: 20,
       columns: [
-        { key:'ncr_id', label:'Ma NCR', labelEn:'NCR ID', type:'text' },
-        { key:'title', label:'Tieu de', labelEn:'Title', type:'text' },
-        { key:'status', label:'Trang thai', labelEn:'Status', type:'badge' },
-        { key:'severity', label:'Muc do', labelEn:'Severity', type:'badge' },
-        { key:'created_at', label:'Ngay tao', labelEn:'Created', type:'date' },
-        { key:'assigned_to', label:'Nguoi xu ly', labelEn:'Assignee', type:'text' },
+        { key:'ncr_id', label:'Mã NCR', labelEn:'NCR ID', type:'text' },
+        { key:'title', label:'Tiêu đề', labelEn:'Title', type:'text' },
+        { key:'status', label:'Trạng thái', labelEn:'Status', type:'badge' },
+        { key:'severity', label:'Mức độ', labelEn:'Severity', type:'badge' },
+        { key:'created_at', label:'Ngày tạo', labelEn:'Created', type:'date' },
+        { key:'assigned_to', label:'Người xử lý', labelEn:'Assignee', type:'text' },
       ]
     }
   },
   'quality-exception-kpi': {
     type: 'kpi-row',
-    title: { vi:'KPI Chat luong', en:'Quality KPI' },
+    title: { vi:'KPI Chất lượng', en:'Quality KPI' },
     config: {
       dataSource: { api:'exception_dashboard', method:'GET' },
       items: [
-        { label:'NCR mo', labelEn:'Open NCR', dataKey:'open_ncr', color:'var(--red)' },
-        { label:'CAPA mo', labelEn:'Open CAPA', dataKey:'open_capa', color:'var(--amber)' },
+        { label:'NCR mở', labelEn:'Open NCR', dataKey:'open_ncr', color:'var(--red)' },
+        { label:'CAPA mở', labelEn:'Open CAPA', dataKey:'open_capa', color:'var(--amber)' },
         { label:'COPQ MTD', labelEn:'COPQ MTD', dataKey:'copq_mtd', color:'var(--brand-2)', suffix:' VND' },
       ]
     }
   },
   'supplier-dashboard-kpi': {
     type: 'kpi-row',
-    title: { vi:'KPI Nha cung cap', en:'Supplier KPI' },
+    title: { vi:'KPI Nhà cung cấp', en:'Supplier KPI' },
     config: {
       dataSource: { api:'supplier_dashboard', method:'GET' },
       items: [
-        { label:'Diem TB', labelEn:'Avg Score', dataKey:'avg_score', color:'var(--brand-2)' },
-        { label:'SCAR mo', labelEn:'Open SCAR', dataKey:'open_scars', color:'var(--red)' },
-        { label:'Ti le tu choi IQC', labelEn:'IQC Reject %', dataKey:'incoming_reject_rate', color:'var(--amber)', suffix:'%' },
+        { label:'Điểm TB', labelEn:'Avg Score', dataKey:'avg_score', color:'var(--brand-2)' },
+        { label:'SCAR mở', labelEn:'Open SCAR', dataKey:'open_scars', color:'var(--red)' },
+        { label:'Tỉ lệ từ chối IQC', labelEn:'IQC Reject %', dataKey:'incoming_reject_rate', color:'var(--amber)', suffix:'%' },
       ]
     }
   },
   'oee-kpi-row': {
     type: 'kpi-row',
-    title: { vi:'OEE Tong hop', en:'OEE Overview' },
+    title: { vi:'OEE Tổng hợp', en:'OEE Overview' },
     config: {
       dataSource: { api:'production_oee', method:'GET' },
       items: [
@@ -1705,72 +2280,72 @@ var BLOCK_TEMPLATES = {
   },
   'empty-filter-bar': {
     type: 'filter-bar',
-    title: { vi:'Bo loc', en:'Filters' },
+    title: { vi:'Bộ lọc', en:'Filters' },
     config: {
       filters: [
-        { key:'search', type:'search', placeholder:'Tim kiem...', placeholderEn:'Search...' },
-        { key:'status', type:'select', allLabel:'Tat ca', allLabelEn:'All', options:[
-          { value:'active', label:'Dang hoat dong', labelEn:'Active' },
-          { value:'closed', label:'Da dong', labelEn:'Closed' },
+        { key:'search', type:'search', placeholder:'Tìm kiếm...', placeholderEn:'Search...' },
+        { key:'status', type:'select', allLabel:'Tất cả', allLabelEn:'All', options:[
+          { value:'active', label:'Đang hoạt động', labelEn:'Active' },
+          { value:'closed', label:'Đã đóng', labelEn:'Closed' },
         ]},
       ]
     }
   },
   'empty-data-table': {
     type: 'data-table',
-    title: { vi:'Bang du lieu', en:'Data Table' },
+    title: { vi:'Bảng dữ liệu', en:'Data Table' },
     config: { columns:[], dataKey:'items', pageSize:20 }
   },
   'so-list-table': {
     type: 'data-table',
-    title: { vi:'Danh sach SO', en:'Sales Order List' },
+    title: { vi:'Danh sách SO', en:'Sales Order List' },
     config: {
       dataSource: { api:'order_so_list', method:'GET', dataKey:'sales_orders' },
       dataKey: 'sales_orders',
       pageSize: 20,
       columns: [
-        { key:'so_number', label:'Ma SO', labelEn:'SO Number', type:'text' },
-        { key:'customer', label:'Khach hang', labelEn:'Customer', type:'text' },
-        { key:'status', label:'Trang thai', labelEn:'Status', type:'badge' },
-        { key:'total_value', label:'Gia tri', labelEn:'Value', type:'number' },
-        { key:'due_date', label:'Han giao', labelEn:'Due Date', type:'date' },
+        { key:'so_number', label:'Mã SO', labelEn:'SO Number', type:'text' },
+        { key:'customer', label:'Khách hàng', labelEn:'Customer', type:'text' },
+        { key:'status', label:'Trạng thái', labelEn:'Status', type:'badge' },
+        { key:'total_value', label:'Giá trị', labelEn:'Value', type:'number' },
+        { key:'due_date', label:'Hạn giao', labelEn:'Due Date', type:'date' },
       ]
     }
   },
   'scar-list-table': {
     type: 'data-table',
-    title: { vi:'Danh sach SCAR', en:'SCAR List' },
+    title: { vi:'Danh sách SCAR', en:'SCAR List' },
     config: {
       dataSource: { api:'scar_list', method:'GET', dataKey:'scars' },
       dataKey: 'scars',
       pageSize: 20,
       columns: [
-        { key:'scar_id', label:'Ma SCAR', labelEn:'SCAR ID', type:'text' },
+        { key:'scar_id', label:'Mã SCAR', labelEn:'SCAR ID', type:'text' },
         { key:'supplier', label:'NCC', labelEn:'Supplier', type:'text' },
-        { key:'status', label:'Trang thai', labelEn:'Status', type:'badge' },
-        { key:'issue_date', label:'Ngay phat hanh', labelEn:'Issue Date', type:'date' },
+        { key:'status', label:'Trạng thái', labelEn:'Status', type:'badge' },
+        { key:'issue_date', label:'Ngày phát hành', labelEn:'Issue Date', type:'date' },
       ]
     }
   },
   'equipment-list-table': {
     type: 'data-table',
-    title: { vi:'Danh sach thiet bi', en:'Equipment List' },
+    title: { vi:'Danh sách thiết bị', en:'Equipment List' },
     config: {
       dataSource: { api:'equipment_list', method:'GET', dataKey:'items' },
       dataKey: 'items',
       pageSize: 20,
       columns: [
-        { key:'code', label:'Ma TB', labelEn:'Code', type:'text' },
-        { key:'name', label:'Ten', labelEn:'Name', type:'text' },
-        { key:'status', label:'Trang thai', labelEn:'Status', type:'badge' },
-        { key:'location', label:'Vi tri', labelEn:'Location', type:'text' },
-        { key:'next_cal', label:'Hieu chuan tiep', labelEn:'Next Cal.', type:'date' },
+        { key:'code', label:'Mã TB', labelEn:'Code', type:'text' },
+        { key:'name', label:'Tên', labelEn:'Name', type:'text' },
+        { key:'status', label:'Trạng thái', labelEn:'Status', type:'badge' },
+        { key:'location', label:'Vị trí', labelEn:'Location', type:'text' },
+        { key:'next_cal', label:'Hiệu chuẩn tiếp', labelEn:'Next Cal.', type:'date' },
       ]
     }
   },
   'two-col-layout': {
     type: 'two-column',
-    title: { vi:'Bo cuc 2 cot', en:'Two Column Layout' },
+    title: { vi:'Bố cục 2 cột', en:'Two Column Layout' },
     config: { ratio:'60-40' },
     slots: { left:[], right:[] }
   },
@@ -1979,7 +2554,7 @@ function saveModuleSchema(moduleId, schema){
   try{ localStorage.setItem('hm_schema_'+moduleId, JSON.stringify(schema)); }catch(e){}
   // Then persist via API
   return _api('module_schema_save', { moduleId:moduleId, schema:schema }, 'POST').then(function(resp){
-    toast(_t('Da luu thanh cong','Saved successfully'), 'success');
+    toast(_t('Đã lưu thành công','Saved successfully'), 'success');
     return resp;
   }).catch(function(err){
     toast(_t('Luu that bai, da luu cuc bo','Save failed, saved locally'), 'warning');
@@ -1990,7 +2565,7 @@ function saveModuleSchema(moduleId, schema){
 function resetModuleSchema(moduleId){
   try{ localStorage.removeItem('hm_schema_'+moduleId); }catch(e){}
   return _api('module_schema_reset', { moduleId:moduleId }, 'POST').then(function(resp){
-    toast(_t('Da khoi phuc mac dinh','Reset to defaults'), 'success');
+    toast(_t('Đã khôi phục mặc định','Reset to defaults'), 'success');
     return resp;
   }).catch(function(){ return { ok:false }; });
 }
@@ -1999,13 +2574,13 @@ function createNewModule(config){
   var id = config.id || ('mod-'+_uid());
   var schema = {
     moduleId: id,
-    title: config.title || { vi:'Module moi', en:'New Module' },
+    title: config.title || { vi:'Module mới', en:'New Module' },
     icon: config.icon || '\u{1F4E6}',
     route: config.route || id,
     roles: config.roles || ['admin'],
     tabs: [{
       tabId: 'main',
-      title: { vi:'Chinh', en:'Main' },
+      title: { vi:'Chính', en:'Main' },
       blocks: []
     }]
   };
@@ -2187,7 +2762,7 @@ function _renderBlockWrapper(block, data, state, blockClasses, reactiveCtx){
     html += '<button class="hm-block-btn" data-action="hm-move-up" data-block-id="'+_esc(block.id)+'" title="'+_t('Di len','Move up')+'">&#9650;</button>';
     html += '<button class="hm-block-btn" data-action="hm-move-down" data-block-id="'+_esc(block.id)+'" title="'+_t('Di xuong','Move down')+'">&#9660;</button>';
     html += '<button class="hm-block-btn" data-action="hm-toggle-block" data-block-id="'+_esc(block.id)+'" title="'+_t('An/hien','Toggle')+'">'+(block.visible===false?'\u{1F441}\u200D\u{1F5E8}':'\u{1F441}')+'</button>';
-    html += '<button class="hm-block-btn" data-action="hm-select-block" data-block-id="'+_esc(block.id)+'" title="'+_t('Cau hinh','Config')+'">&#9881;</button>';
+    html += '<button class="hm-block-btn" data-action="hm-select-block" data-block-id="'+_esc(block.id)+'" title="'+_t('Cấu hình','Config')+'">&#9881;</button>';
     html += '<button class="hm-block-btn" data-action="hm-duplicate-block" data-block-id="'+_esc(block.id)+'" title="'+_t('Nhan ban','Duplicate')+'">&#128203;</button>';
     html += '<button class="hm-block-btn hm-block-btn-danger" data-action="hm-delete-block" data-block-id="'+_esc(block.id)+'" title="'+_t('Xoa','Delete')+'">&#128465;</button>';
     html += '</div>';
@@ -2512,7 +3087,7 @@ function _renderBlockInner(block, data, state, reactiveCtx){
     case 'two-column':      return renderTwoColumn(block, data, state);
     case 'card-container':  return renderCardContainer(block, data, state);
     default:
-      return '<div class="hm-empty"><div style="font-weight:600;margin-bottom:4px">'+_esc(_t(catalogEntry.label || block.type, catalogEntry.labelEn || block.type))+'</div><div style="font-size:12px;color:var(--text-tertiary)">'+_t('Block dang dung renderer mac dinh. Cau hinh them trong Module Builder.','This block is using the generic renderer. Configure it in Module Builder.')+'</div></div>';
+      return '<div class="hm-empty"><div style="font-weight:600;margin-bottom:4px">'+_esc(_t(catalogEntry.label || block.type, catalogEntry.labelEn || block.type))+'</div><div style="font-size:12px;color:var(--text-tertiary)">'+_t('Block đang dùng renderer mặc định. Cấu hình thêm trong Module Builder.','This block is using the generic renderer. Configure it in Module Builder.')+'</div></div>';
   }
 }
 
@@ -2544,7 +3119,7 @@ function renderAdvancedTableV3(config, data, state, blockId, reactiveCtx){
   var dataKey = config.dataKey || 'items';
   var allRows = (data && (Array.isArray(data) ? data : data[dataKey])) || [];
 
-  if(!columns.length) return '<div class="hm-empty">'+_t('Chua cau hinh cot','No columns configured')+'</div>';
+  if(!columns.length) return '<div class="hm-empty">'+_t('Chưa cấu hình cột','No columns configured')+'</div>';
 
   // Get or init table state
   var moduleId = state && state._schema ? state._schema.moduleId : '_';
@@ -2659,7 +3234,7 @@ function renderAdvancedTableV3(config, data, state, blockId, reactiveCtx){
 
   // Empty state
   if(!allRows.length){
-    return '<div class="hm-empty"><div class="hm-empty-icon">&#128203;</div><div>'+_t('Khong co du lieu','No data')+'</div></div>';
+    return '<div class="hm-empty"><div class="hm-empty-icon">&#128203;</div><div>'+_t('Không có dữ liệu','No data')+'</div></div>';
   }
 
   // Build table HTML
@@ -2771,7 +3346,7 @@ function renderAdvancedTableV3(config, data, state, blockId, reactiveCtx){
       html += '<th><select class="hm-input hm-input-xs" data-table-filter="'+_esc(col.key)+'">';
       html += '<option value="">'+_t('Tat ca','All')+'</option>';
       html += '<option value="true"'+(fv==='true'?' selected':'')+'>'+_t('Co','Yes')+'</option>';
-      html += '<option value="false"'+(fv==='false'?' selected':'')+'>'+_t('Khong','No')+'</option>';
+      html += '<option value="false"'+(fv==='false'?' selected':'')+'>'+_t('Không','No')+'</option>';
       html += '</select></th>';
     } else {
       html += '<th><input type="text" class="hm-input hm-input-xs" placeholder="'+_t('Loc...','Filter...')+'" data-table-filter="'+_esc(col.key)+'" value="'+_esc(typeof fv==='string'?fv:'')+'"></th>';
@@ -2783,7 +3358,7 @@ function renderAdvancedTableV3(config, data, state, blockId, reactiveCtx){
   html += '<tbody>';
   if(!pageRows.length){
     var colspan = visibleColumns.length + (config.selectable?1:0) + (config.expandable?1:0);
-    html += '<tr><td colspan="'+colspan+'" class="hm-empty">'+_t('Khong tim thay','No results found')+'</td></tr>';
+    html += '<tr><td colspan="'+colspan+'" class="hm-empty">'+_t('Không tìm thấy','No results found')+'</td></tr>';
   }
 
   pageRows.forEach(function(row, ri){
@@ -3077,7 +3652,7 @@ function _handleTableExport(moduleId, btn){
       lines.push(visCols.map(function(c){ return row[c.key]!=null ? String(row[c.key]) : ''; }).join('\t'));
     });
     _copyToClipboard(lines.join('\n'));
-    toast(_t('Da sao chep '+rows.length+' dong','Copied '+rows.length+' rows'), 'success');
+    toast(_t('Đã sao chép '+rows.length+' dòng','Copied '+rows.length+' rows'), 'success');
   }
 }
 
@@ -3250,7 +3825,7 @@ function renderFilterBar(config, data){
 /* --- Bar Chart --- */
 function renderBarChart(config, data){
   var items = (data && data[config.dataKey]) || config.items || [];
-  if(!items.length) return '<div class="hm-empty">'+_t('Khong co du lieu','No data')+'</div>';
+  if(!items.length) return '<div class="hm-empty">'+_t('Không có dữ liệu','No data')+'</div>';
 
   var max = 0;
   items.forEach(function(i){ if((i.value||0)>max) max = i.value||0; });
@@ -3275,7 +3850,7 @@ function renderDonutChart(config, data){
   var items = (data && data[config.dataKey]) || config.items || [];
   var total = 0;
   items.forEach(function(i){ total += (i.value||0); });
-  if(total===0) return '<div class="hm-empty">'+_t('Khong co du lieu','No data')+'</div>';
+  if(total===0) return '<div class="hm-empty">'+_t('Không có dữ liệu','No data')+'</div>';
 
   var gradientParts = [];
   var cumPct = 0;
@@ -3319,7 +3894,7 @@ function renderToolbar(config, data){
 /* --- Card Grid --- */
 function renderCardGrid(config, data){
   var items = (data && data[config.dataKey]) || [];
-  if(!items.length) return '<div class="hm-empty">'+_t('Khong co du lieu','No data')+'</div>';
+  if(!items.length) return '<div class="hm-empty">'+_t('Không có dữ liệu','No data')+'</div>';
 
   var cols = config.columns || 3;
   var html = '<div class="hm-card-grid" style="grid-template-columns:repeat('+cols+',1fr)">';
@@ -3342,7 +3917,7 @@ function renderCardGrid(config, data){
 /* --- Timeline --- */
 function renderTimeline(config, data){
   var items = (data && data[config.dataKey]) || config.items || [];
-  if(!items.length) return '<div class="hm-empty">'+_t('Khong co du lieu','No data')+'</div>';
+  if(!items.length) return '<div class="hm-empty">'+_t('Không có dữ liệu','No data')+'</div>';
 
   var html = '<div class="hm-timeline">';
   items.forEach(function(item, idx){
@@ -3669,7 +4244,7 @@ function renderPropertiesPanel(block, moduleId){
 
   // Title
   html += '<div class="hm-form-group">';
-  html += '<label class="hm-label">'+_t('Tieu de','Title')+'</label>';
+  html += '<label class="hm-label">'+_t('Tiêu đề','Title')+'</label>';
   html += '<input class="hm-input" id="hm-prop-title-vi" value="'+_esc(block.title?block.title.vi||'':'')+'" placeholder="Tieng Viet">';
   html += '<input class="hm-input" id="hm-prop-title-en" value="'+_esc(block.title?block.title.en||'':'')+'" placeholder="English" style="margin-top:4px">';
   html += '</div>';
@@ -3683,7 +4258,7 @@ function renderPropertiesPanel(block, moduleId){
 
   // Conditional visibility
   html += '<div class="hm-form-group">';
-  html += '<label class="hm-label">'+_t('Dieu kien hien thi','Visible When')+'</label>';
+  html += '<label class="hm-label">'+_t('Điều kiện hiển thị','Visible When')+'</label>';
   html += '<input class="hm-input hm-input-sm" id="hm-prop-visible-when" value="'+_esc(block.visibleWhen||'')+'" placeholder="{{ expression }}">';
   html += '<small class="hm-hint">'+_t('VD: {{ state.activeTab === &quot;overview&quot; }}','E.g.: {{ state.activeTab === &quot;overview&quot; }}')+'</small>';
   html += '</div>';
@@ -3712,9 +4287,9 @@ function renderPropertiesPanel(block, moduleId){
 
   // API endpoint selector
   html += '<div class="hm-form-group">';
-  html += '<label class="hm-label">'+_t('Nguon du lieu','Data Source')+'</label>';
+  html += '<label class="hm-label">'+_t('Nguồn dữ liệu','Data Source')+'</label>';
   html += '<select class="hm-input hm-select" id="hm-prop-api">';
-  html += '<option value="">'+_t('Khong','None')+'</option>';
+  html += '<option value="">'+_t('Không','None')+'</option>';
   var currentApi = (block.config && block.config.dataSource) ? block.config.dataSource.api : '';
   // Group by module
   var grouped = {};
@@ -3744,8 +4319,8 @@ function renderPropertiesPanel(block, moduleId){
 
   // Events section
   html += '<div class="hm-form-group">';
-  html += '<label class="hm-label">'+_t('Su kien','Events')+'</label>';
-  html += '<small class="hm-hint">'+_t('Cau hinh su kien qua JSON','Configure events via JSON')+'</small>';
+  html += '<label class="hm-label">'+_t('Sự kiện','Events')+'</label>';
+  html += '<small class="hm-hint">'+_t('Cấu hình sự kiện qua JSON','Configure events via JSON')+'</small>';
   html += '<textarea class="hm-input hm-textarea hm-input-sm" id="hm-prop-events" rows="4" placeholder=\'{"onClick":{"type":"navigate","tab":"detail"}}\'>';
   html += _esc(block.events ? JSON.stringify(block.events, null, 2) : '');
   html += '</textarea>';
@@ -3797,7 +4372,7 @@ function _renderKpiEditor(config){
 function _renderFilterEditor(config){
   var filters = (config && config.filters) || [];
   var html = '<div class="hm-form-group">';
-  html += '<label class="hm-label">'+_t('Bo loc','Filters')+' ('+filters.length+')</label>';
+  html += '<label class="hm-label">'+_t('Bộ lọc','Filters')+' ('+filters.length+')</label>';
   html += '<div class="hm-prop-list">';
   filters.forEach(function(f){
     html += '<div class="hm-prop-list-item">';

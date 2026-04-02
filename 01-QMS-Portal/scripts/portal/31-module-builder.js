@@ -416,7 +416,7 @@ function _renderBlockPreview(block){
       if(config.dataSource && config.dataSource.api){
         h += '<div style="font-size:var(--text-xs);color:var(--text-secondary);margin-bottom:var(--space-2)">API: <code style="background:#fff;padding:2px 6px;border:1px solid var(--border);border-radius:999px">'+_esc(config.dataSource.api)+'</code></div>';
       }
-      h += '<div style="font-size:var(--text-sm);color:var(--text-tertiary)">'+_t('Block dang dung preview tong quat. Mo panel thuoc tinh de cau hinh chi tiet.','This block is using the generic preview. Open properties to configure the details.')+'</div>';
+      h += '<div style="font-size:var(--text-sm);color:var(--text-tertiary)">'+_t('Block đang dùng preview tổng quát. Mở panel thuộc tính để cấu hình chi tiết.','This block is using the generic preview. Open properties to configure the details.')+'</div>';
       h += '</div>';
   }
 
@@ -513,8 +513,8 @@ function _renderPropertiesPanel(){
 
   h += '<div style="padding:var(--space-4);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">';
   h += '<div>';
-  h += '<div style="font-size:var(--text-xs);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-tertiary)">'+_t('Bo thuoc tinh','Property Inspector')+'</div>';
-  h += '<h3 style="margin:4px 0 0;font-size:var(--text-lg)">'+_esc(catalog.icon||'📦')+' '+_t('Cau hinh Block','Block Config')+'</h3>';
+  h += '<div style="font-size:var(--text-xs);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-tertiary)">'+_t('Bộ thuộc tính','Property Inspector')+'</div>';
+  h += '<h3 style="margin:4px 0 0;font-size:var(--text-lg)">'+_esc(catalog.icon||'📦')+' '+_t('Cấu hình Block','Block Config')+'</h3>';
   h += '</div>';
   h += '<button class="hm-btn hm-btn-ghost" data-action="close-props" style="font-size:1.2rem">×</button>';
   h += '</div>';
@@ -536,11 +536,11 @@ function _renderPropertiesPanel(){
   h += '</div>';
 
   if(state.registries.loading){
-    h += '<div style="padding:var(--space-2) var(--space-3);margin-bottom:var(--space-3);font-size:var(--text-xs);color:var(--text-secondary);background:var(--amber-bg);border:1px solid var(--amber);border-radius:var(--radius-md)">'+_t('Dang nap registry local...','Loading local registries...')+'</div>';
+    h += '<div style="padding:var(--space-2) var(--space-3);margin-bottom:var(--space-3);font-size:var(--text-xs);color:var(--text-secondary);background:var(--amber-bg);border:1px solid var(--amber);border-radius:var(--radius-md)">'+_t('Đang nạp registry local...','Loading local registries...')+'</div>';
   } else if(state.registries.error){
     h += '<div style="padding:var(--space-2) var(--space-3);margin-bottom:var(--space-3);font-size:var(--text-xs);color:var(--red);background:var(--red-bg);border:1px solid var(--red);border-radius:var(--radius-md);display:flex;justify-content:space-between;gap:var(--space-2);align-items:center">';
     h += '<span>'+_esc(state.registries.error)+'</span>';
-    h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="registry-retry">'+_t('Thu lai','Retry')+'</button></div>';
+    h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="registry-retry">'+_t('Thử lại','Retry')+'</button></div>';
   }
 
   if(activeTab){
@@ -548,13 +548,13 @@ function _renderPropertiesPanel(){
       h += _renderPropSection(section, draft);
     });
   } else {
-    h += '<div class="hm-empty">'+_t('Khong tim thay property schema cho block nay','No property schema was found for this block')+'</div>';
+    h += '<div class="hm-empty">'+_t('Không tìm thấy property schema cho block này','No property schema was found for this block')+'</div>';
   }
 
   h += '</div>';
   h += '<div style="padding:var(--space-4);border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:var(--space-2)">';
-  h += '<button class="hm-btn hm-btn-secondary" data-action="close-props">'+_t('Dong','Close')+'</button>';
-  h += '<button class="hm-btn hm-btn-primary" data-action="save-props">'+_t('Ap dung','Apply')+'</button>';
+  h += '<button class="hm-btn hm-btn-secondary" data-action="close-props">'+_t('Đóng','Close')+'</button>';
+  h += '<button class="hm-btn hm-btn-primary" data-action="save-props">'+_t('Áp dụng','Apply')+'</button>';
   h += '</div></div>';
 
   h = '<div style="position:fixed;inset:0;background:rgba(0,0,0,0.2);z-index:'+(parseInt(getComputedStyle(document.documentElement).getPropertyValue('--z-modal'))||1300 - 1)+'" data-action="close-props"></div>' + h;
@@ -1066,7 +1066,7 @@ function _renderCollectionField(field, path, items){
   h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="collection-add" data-path="'+_esc(path)+'">+ '+_esc(field.addLabel||'Add item')+'</button>';
   h += '</div>';
   if(!items.length){
-    h += '<div style="padding:var(--space-3);border:1px dashed var(--border);border-radius:var(--radius-md);color:var(--text-tertiary);font-size:var(--text-sm)">'+_t('Chua co item nao. Bam nut them de bat dau.','No items yet. Add one to begin.')+'</div>';
+    h += '<div style="padding:var(--space-3);border:1px dashed var(--border);border-radius:var(--radius-md);color:var(--text-tertiary);font-size:var(--text-sm)">'+_t('Chưa có item nào. Bấm nút thêm để bắt đầu.','No items yet. Add one to begin.')+'</div>';
     return h;
   }
   items.forEach(function(item, index){
@@ -1169,7 +1169,18 @@ function _getFieldOptions(field){
 }
 
 function _getCollectionItemTitle(field, item, index){
-  return _getByPath(item,'label.vi') || _getByPath(item,'label.en') || item.key || item.actionId || item.point || item.fieldRef || item.valueField || ((field.itemLabel||'Item') + ' ' + (index+1));
+  return _getByPath(item,'label.vi')
+    || _getByPath(item,'label.en')
+    || item.key
+    || item.actionId
+    || item.signal
+    || item.point
+    || item.connector
+    || item.fieldRef
+    || item.valueField
+    || item.from
+    || item.to
+    || ((field.itemLabel||'Item') + ' ' + (index+1));
 }
 
 function _createCollectionItem(field){
@@ -1269,7 +1280,7 @@ function _ensureRegistriesLoaded(force){
     if(state.selectedBlock) _paint();
   }).catch(function(){
     state.registries.loading = false;
-    state.registries.error = _t('Khong the nap mot phan registry local. Ban van co the nhap tay.','Could not load one or more local registries. You can still enter values manually.');
+    state.registries.error = _t('Không thể nạp một phần registry local. Bạn vẫn có thể nhập tay.','Could not load one or more local registries. You can still enter values manually.');
     if(state.selectedBlock) _paint();
   });
 }
