@@ -1,2964 +1,1621 @@
 {
   "_meta": {
-    "version": "2.0",
-    "description": "Entity relation map for commercial, production, quality, and compliance flows.",
-    "generatedAt": "2026-04-02T06:00:20.356Z",
-    "edgeCount": 22
+    "version": "3.0",
+    "description": "Digital thread relation map covering order, production, quality, compliance, evidence, and traceability chains.",
+    "generatedAt": "2026-04-02T09:02:28.221Z",
+    "edgeCount": 67
   },
   "entities": {
-    "status": {
-      "domain": "platform",
-      "endpoints": [
-        "status"
-      ],
-      "primary_keys": [],
-      "status_refs": []
-    },
-    "auth_login": {
-      "domain": "platform",
-      "endpoints": [
-        "auth_login"
-      ],
-      "primary_keys": [],
-      "status_refs": []
-    },
-    "auth_mfa_verify": {
-      "domain": "platform",
-      "endpoints": [
-        "auth_mfa_verify"
-      ],
-      "primary_keys": [],
-      "status_refs": []
-    },
-    "auth_enroll_verify": {
-      "domain": "platform",
-      "endpoints": [
-        "auth_enroll_verify"
-      ],
-      "primary_keys": [],
-      "status_refs": []
-    },
-    "auth_logout": {
-      "domain": "platform",
-      "endpoints": [
-        "auth_logout"
-      ],
-      "primary_keys": [],
-      "status_refs": []
-    },
-    "doc": {
-      "domain": "document_control",
-      "endpoints": [
-        "doc_create",
-        "doc_approve",
-        "doc_reject"
-      ],
-      "primary_keys": [
-        "doc_id"
-      ],
-      "status_refs": []
-    },
-    "doc_save_draft": {
-      "domain": "document_control",
-      "endpoints": [
-        "doc_save_draft"
-      ],
-      "primary_keys": [
-        "doc_id"
-      ],
-      "status_refs": []
-    },
-    "doc_submit_review": {
-      "domain": "document_control",
-      "endpoints": [
-        "doc_submit_review"
-      ],
-      "primary_keys": [
-        "doc_id"
-      ],
-      "status_refs": []
-    },
-    "doc_update_meta": {
-      "domain": "document_control",
-      "endpoints": [
-        "doc_update_meta"
-      ],
-      "primary_keys": [
-        "doc_id"
-      ],
-      "status_refs": []
-    },
-    "doc_delete_drafts": {
-      "domain": "document_control",
-      "endpoints": [
-        "doc_delete_drafts"
-      ],
-      "primary_keys": [
-        "doc_id"
-      ],
-      "status_refs": []
-    },
-    "doc_delete_version": {
-      "domain": "document_control",
-      "endpoints": [
-        "doc_delete_version"
-      ],
-      "primary_keys": [
-        "doc_id"
-      ],
-      "status_refs": []
-    },
-    "doc_versions": {
-      "domain": "document_control",
-      "endpoints": [
-        "doc_versions_list"
-      ],
-      "primary_keys": [
-        "doc_id"
-      ],
-      "status_refs": []
-    },
-    "doc_start_new_revision": {
-      "domain": "document_control",
-      "endpoints": [
-        "doc_start_new_revision"
-      ],
-      "primary_keys": [
-        "doc_id"
-      ],
-      "status_refs": []
-    },
-    "doc_stream": {
-      "domain": "document_control",
-      "endpoints": [
-        "doc_stream"
-      ],
-      "primary_keys": [
-        "doc_id"
-      ],
-      "status_refs": []
-    },
-    "docs_custom": {
-      "domain": "document_control",
-      "endpoints": [
-        "docs_custom_list"
-      ],
-      "primary_keys": [
-        "doc_id"
-      ],
-      "status_refs": []
-    },
-    "doc_descriptions": {
-      "domain": "document_control",
-      "endpoints": [
-        "doc_descriptions_get"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": []
-    },
-    "save_doc_description": {
-      "domain": "general",
-      "endpoints": [
-        "save_doc_description"
-      ],
-      "primary_keys": [
-        "save_id"
-      ],
-      "status_refs": []
-    },
-    "docs_visibility": {
-      "domain": "document_control",
-      "endpoints": [
-        "docs_visibility_get"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": []
-    },
-    "admin_docs_visibility": {
-      "domain": "platform",
-      "endpoints": [
-        "admin_docs_visibility_save"
-      ],
-      "primary_keys": [
-        "admin_id"
-      ],
-      "status_refs": []
-    },
-    "docs_snapshot": {
-      "domain": "document_control",
-      "endpoints": [
-        "docs_snapshot"
-      ],
-      "primary_keys": [
-        "doc_id"
-      ],
-      "status_refs": []
-    },
-    "online_form": {
-      "domain": "document_control",
-      "endpoints": [
-        "online_form_list"
-      ],
-      "primary_keys": [
-        "form_id"
-      ],
-      "status_refs": []
-    },
-    "online_form_schema": {
-      "domain": "document_control",
-      "endpoints": [
-        "online_form_schema"
-      ],
-      "primary_keys": [
-        "form_id"
-      ],
-      "status_refs": []
-    },
-    "online_form_submit": {
-      "domain": "document_control",
-      "endpoints": [
-        "online_form_submit"
-      ],
-      "primary_keys": [
-        "form_id"
-      ],
-      "status_refs": []
-    },
-    "online_form_entries": {
-      "domain": "document_control",
-      "endpoints": [
-        "online_form_entries"
-      ],
-      "primary_keys": [
-        "form_id"
-      ],
-      "status_refs": []
-    },
-    "config_record_types": {
-      "domain": "general",
-      "endpoints": [
-        "config_record_types"
-      ],
-      "primary_keys": [
-        "config_id"
-      ],
-      "status_refs": []
-    },
-    "record_id_registry": {
-      "domain": "document_control",
-      "endpoints": [
-        "record_id_registry"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": []
-    },
-    "record_id_next": {
-      "domain": "document_control",
-      "endpoints": [
-        "record_id_next"
-      ],
-      "primary_keys": [
-        "generated_id"
-      ],
-      "status_refs": []
-    },
-    "record_id_peek": {
-      "domain": "document_control",
-      "endpoints": [
-        "record_id_peek"
-      ],
-      "primary_keys": [
-        "next_id"
-      ],
-      "status_refs": []
-    },
-    "form_version_stream": {
-      "domain": "general",
-      "endpoints": [
-        "form_version_stream"
-      ],
-      "primary_keys": [
-        "form_id"
-      ],
-      "status_refs": []
-    },
-    "form_upload_draft": {
-      "domain": "general",
-      "endpoints": [
-        "form_upload_draft"
-      ],
-      "primary_keys": [
-        "form_id"
-      ],
-      "status_refs": []
-    },
-    "scan_folders": {
-      "domain": "general",
-      "endpoints": [
-        "scan_folders"
-      ],
-      "primary_keys": [
-        "scan_id"
-      ],
-      "status_refs": []
-    },
-    "create_folder": {
-      "domain": "general",
-      "endpoints": [
-        "create_folder"
-      ],
-      "primary_keys": [
-        "create_id"
-      ],
-      "status_refs": []
-    },
-    "rename_folder": {
-      "domain": "general",
-      "endpoints": [
-        "rename_folder"
-      ],
-      "primary_keys": [
-        "rename_id"
-      ],
-      "status_refs": []
-    },
-    "delete_folder": {
-      "domain": "general",
-      "endpoints": [
-        "delete_folder"
-      ],
-      "primary_keys": [
-        "delete_id"
-      ],
-      "status_refs": []
-    },
-    "move_doc": {
-      "domain": "general",
-      "endpoints": [
-        "move_doc"
-      ],
-      "primary_keys": [
-        "move_id"
-      ],
-      "status_refs": []
-    },
-    "delete_doc": {
-      "domain": "general",
-      "endpoints": [
-        "delete_doc"
-      ],
-      "primary_keys": [
-        "delete_id"
-      ],
-      "status_refs": []
-    },
-    "rename_doc": {
-      "domain": "general",
-      "endpoints": [
-        "rename_doc"
-      ],
-      "primary_keys": [
-        "rename_id"
-      ],
-      "status_refs": []
-    },
-    "folder_descriptions": {
-      "domain": "general",
-      "endpoints": [
-        "folder_descriptions"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": []
-    },
-    "admin_users": {
-      "domain": "platform",
-      "endpoints": [
-        "admin_users_list"
-      ],
-      "primary_keys": [
-        "user_id"
-      ],
-      "status_refs": []
-    },
-    "admin_user_upsert": {
-      "domain": "platform",
-      "endpoints": [
-        "admin_user_upsert"
-      ],
-      "primary_keys": [
-        "admin_id"
-      ],
-      "status_refs": []
-    },
-    "admin_user": {
-      "domain": "platform",
-      "endpoints": [
-        "admin_user_delete"
-      ],
-      "primary_keys": [
-        "user_id"
-      ],
-      "status_refs": []
-    },
-    "admin_user_reset_password": {
-      "domain": "platform",
-      "endpoints": [
-        "admin_user_reset_password"
-      ],
-      "primary_keys": [
-        "user_id"
-      ],
-      "status_refs": []
-    },
-    "role_perms": {
-      "domain": "general",
-      "endpoints": [
-        "role_perms_get"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": []
-    },
-    "admin_role_perms": {
-      "domain": "platform",
-      "endpoints": [
-        "admin_role_perms_save"
-      ],
-      "primary_keys": [
-        "admin_id"
-      ],
-      "status_refs": []
-    },
-    "admin_git": {
-      "domain": "platform",
-      "endpoints": [
-        "admin_git_sync",
-        "admin_git_status"
-      ],
-      "primary_keys": [
-        "admin_id"
-      ],
-      "status_refs": []
-    },
-    "admin_git_pull": {
-      "domain": "platform",
-      "endpoints": [
-        "admin_git_pull"
-      ],
-      "primary_keys": [
-        "admin_id"
-      ],
-      "status_refs": []
-    },
-    "admin_git_discard_local": {
-      "domain": "platform",
-      "endpoints": [
-        "admin_git_discard_local"
-      ],
-      "primary_keys": [
-        "admin_id"
-      ],
-      "status_refs": []
-    },
-    "admin_clear_site_cache": {
-      "domain": "platform",
-      "endpoints": [
-        "admin_clear_site_cache"
-      ],
-      "primary_keys": [
-        "admin_id"
-      ],
-      "status_refs": []
-    },
-    "get_data_settings": {
-      "domain": "general",
-      "endpoints": [
-        "get_data_settings"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": []
-    },
-    "save_data_settings": {
-      "domain": "general",
-      "endpoints": [
-        "save_data_settings"
-      ],
-      "primary_keys": [
-        "save_id"
-      ],
-      "status_refs": []
-    },
-    "admin_portal_display_config": {
-      "domain": "platform",
-      "endpoints": [
-        "admin_portal_display_config_get",
-        "admin_portal_display_config_save"
-      ],
-      "primary_keys": [
-        "record_id",
-        "admin_id"
-      ],
-      "status_refs": []
-    },
-    "admin_mfa_settings": {
-      "domain": "platform",
-      "endpoints": [
-        "admin_mfa_settings_get",
-        "admin_mfa_settings_save"
-      ],
-      "primary_keys": [
-        "record_id",
-        "admin_id"
-      ],
-      "status_refs": []
-    },
-    "dict": {
-      "domain": "platform",
-      "endpoints": [
-        "dict_list",
-        "dict_delete"
-      ],
-      "primary_keys": [
-        "dict_id"
-      ],
-      "status_refs": []
-    },
-    "dict_upsert": {
-      "domain": "platform",
-      "endpoints": [
-        "dict_upsert"
-      ],
-      "primary_keys": [
-        "dict_id"
-      ],
-      "status_refs": []
-    },
-    "dashboard_executive": {
-      "domain": "analytics",
-      "endpoints": [
-        "dashboard_executive"
-      ],
-      "primary_keys": [
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "dashboard_quality": {
-      "domain": "analytics",
-      "endpoints": [
-        "dashboard_quality"
-      ],
-      "primary_keys": [
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "dashboard_production": {
-      "domain": "analytics",
-      "endpoints": [
-        "dashboard_production"
-      ],
-      "primary_keys": [
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "dashboard_supplier": {
-      "domain": "analytics",
-      "endpoints": [
-        "dashboard_supplier"
-      ],
-      "primary_keys": [
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "dashboard_department": {
-      "domain": "analytics",
-      "endpoints": [
-        "dashboard_department"
-      ],
-      "primary_keys": [
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "dashboard_widget": {
-      "domain": "analytics",
-      "endpoints": [
-        "dashboard_widget"
-      ],
-      "primary_keys": [
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "kpi": {
-      "domain": "analytics",
-      "endpoints": [
-        "kpi_get"
-      ],
-      "primary_keys": [
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "kpi_trend": {
-      "domain": "analytics",
-      "endpoints": [
-        "kpi_trend"
-      ],
-      "primary_keys": [
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "kpi_alerts": {
-      "domain": "analytics",
-      "endpoints": [
-        "kpi_alerts"
-      ],
-      "primary_keys": [
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "spc_capability": {
-      "domain": "analytics",
-      "endpoints": [
-        "spc_capability"
-      ],
-      "primary_keys": [
-        "spc_id"
-      ],
-      "status_refs": []
-    },
-    "spc_chart": {
-      "domain": "analytics",
-      "endpoints": [
-        "spc_chart"
-      ],
-      "primary_keys": [
-        "spc_id"
-      ],
-      "status_refs": []
-    },
-    "spc": {
-      "domain": "analytics",
-      "endpoints": [
-        "spc_summary"
-      ],
-      "primary_keys": [
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "spc_alerts": {
-      "domain": "analytics",
-      "endpoints": [
-        "spc_alerts"
-      ],
-      "primary_keys": [
-        "alert_id"
-      ],
-      "status_refs": [
-        "severity"
-      ]
+    "quote": {
+      "entity": "quote",
+      "fields": [
+        "quote_id",
+        "sales_order_id"
+      ],
+      "digitalThread": true
     },
     "sales_order": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "order_so_list",
-        "order_so_detail",
-        "order_so_create",
-        "order_so_update",
-        "order_so_update_status"
-      ],
-      "primary_keys": [
+      "entity": "sales_order",
+      "fields": [
+        "quote_id",
         "so_id",
-        "customer_id",
-        "order_id"
+        "source_quote_id"
       ],
-      "status_refs": [
-        "priority",
-        "contract_review_status"
-      ]
+      "digitalThread": true
     },
     "job_order": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "order_jo_list",
-        "order_jo_detail",
-        "order_jo_create",
-        "order_jo_update",
-        "order_jo_update_status"
+      "entity": "job_order",
+      "fields": [
+        "sales_order_id",
+        "jo_id"
       ],
-      "primary_keys": [
-        "jo_id",
-        "so_id",
-        "order_id"
-      ],
-      "status_refs": [
-        "priority",
-        "material_type"
-      ]
+      "digitalThread": true
     },
     "work_order": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "order_wo_create",
-        "order_wo_update",
-        "order_wo_update_status"
-      ],
-      "primary_keys": [
-        "jo_id",
+      "entity": "work_order",
+      "fields": [
+        "job_order_id",
         "wo_id",
-        "order_id"
+        "routing_id",
+        "bom_id"
       ],
-      "status_refs": [
-        "so_status"
-      ]
+      "digitalThread": true
     },
-    "order": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "order_transition",
-        "order_detail"
+    "work_order_operation": {
+      "entity": "work_order_operation",
+      "fields": [
+        "work_order_id",
+        "operation_id"
       ],
-      "primary_keys": [
-        "entity_id",
-        "record_id"
-      ],
-      "status_refs": [
-        "so_status"
-      ]
+      "digitalThread": true
     },
-    "contract_review": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "order_contract_review"
+    "work_order_material": {
+      "entity": "work_order_material",
+      "fields": [
+        "work_order_id",
+        "lot_id"
       ],
-      "primary_keys": [
-        "so_id"
-      ],
-      "status_refs": []
+      "digitalThread": true
     },
-    "hold_set": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "order_hold_set"
+    "work_order_labor": {
+      "entity": "work_order_labor",
+      "fields": [
+        "work_order_id"
       ],
-      "primary_keys": [
-        "entity_id"
-      ],
-      "status_refs": [
-        "hold_type"
-      ]
+      "digitalThread": true
     },
-    "hold_release": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "order_hold_release"
+    "lot": {
+      "entity": "lot",
+      "fields": [
+        "current_operation_id",
+        "lot_id",
+        "parent_lot_id"
       ],
-      "primary_keys": [
-        "hold_id"
-      ],
-      "status_refs": []
+      "digitalThread": true
     },
-    "note_add": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "order_note_add"
+    "inspection_lot": {
+      "entity": "inspection_lot",
+      "fields": [
+        "lot_id",
+        "inspection_lot_id"
       ],
-      "primary_keys": [
-        "entity_id"
-      ],
-      "status_refs": [
-        "so_status"
-      ]
+      "digitalThread": true
     },
-    "hierarchy": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "order_hierarchy"
+    "ncr": {
+      "entity": "ncr",
+      "fields": [
+        "inspection_lot_id",
+        "ncr_id",
+        "receiving_inspection_id",
+        "work_order_id",
+        "customer_complaint_id"
       ],
-      "primary_keys": [
-        "so_id"
-      ],
-      "status_refs": [
-        "so_status"
-      ]
+      "digitalThread": true
     },
-    "timeline": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "order_timeline"
+    "capa": {
+      "entity": "capa",
+      "fields": [
+        "source_ncr_id",
+        "capa_id",
+        "customer_complaint_id",
+        "audit_finding_id"
       ],
-      "primary_keys": [
-        "entity_id"
-      ],
-      "status_refs": [
-        "so_status"
-      ]
-    },
-    "dashboard_stats": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "order_dashboard_stats"
-      ],
-      "primary_keys": [
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "dashboard_kpi": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "order_dashboard_kpi"
-      ],
-      "primary_keys": [
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "result": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "order_search",
-        "evidence_search"
-      ],
-      "primary_keys": [
-        "order_id",
-        "doc_id"
-      ],
-      "status_refs": [
-        "so_status"
-      ]
-    },
-    "link_form": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "order_link_form"
-      ],
-      "primary_keys": [
-        "jo_id"
-      ],
-      "status_refs": []
-    },
-    "shipment_gate": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "order_shipment_gate"
-      ],
-      "primary_keys": [
-        "so_id"
-      ],
-      "status_refs": [
-        "so_status"
-      ]
-    },
-    "schedule": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "order_schedule_get",
-        "order_schedule_update"
-      ],
-      "primary_keys": [
-        "record_id",
-        "ship_to_address_id"
-      ],
-      "status_refs": [
-        "so_status"
-      ]
-    },
-    "schedule_slot": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "order_schedule_slot",
-        "schedule_slot_create",
-        "schedule_slot_update",
-        "schedule_slot_breakdown",
-        "schedule_slot_detail"
-      ],
-      "primary_keys": [
-        "record_id",
-        "wo_id",
-        "slot_id",
-        "machine_id"
-      ],
-      "status_refs": [
-        "so_status"
-      ]
-    },
-    "capacity_heatmap": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "order_capacity_heatmap"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": [
-        "so_status"
-      ]
-    },
-    "promise_suggest": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "order_promise_suggest"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": [
-        "so_status"
-      ]
-    },
-    "exception": {
-      "domain": "general",
-      "endpoints": [
-        "exception_dashboard",
-        "exception_list",
-        "exception_detail",
-        "exception_transition"
-      ],
-      "primary_keys": [
-        "kpi_id",
-        "exception_id"
-      ],
-      "status_refs": [
-        "severity",
-        "priority",
-        "disposition"
-      ]
-    },
-    "exception_complaint": {
-      "domain": "general",
-      "endpoints": [
-        "exception_complaint_create",
-        "exception_complaint_update"
-      ],
-      "primary_keys": [
-        "exception_id"
-      ],
-      "status_refs": [
-        "severity",
-        "priority",
-        "defect_type",
-        "disposition"
-      ]
-    },
-    "exception_mrb": {
-      "domain": "general",
-      "endpoints": [
-        "exception_mrb_create",
-        "exception_mrb_update"
-      ],
-      "primary_keys": [
-        "exception_id"
-      ],
-      "status_refs": [
-        "defect_type",
-        "disposition"
-      ]
-    },
-    "exception_deviation": {
-      "domain": "general",
-      "endpoints": [
-        "exception_deviation_create",
-        "exception_deviation_update"
-      ],
-      "primary_keys": [
-        "exception_id"
-      ],
-      "status_refs": [
-        "defect_type",
-        "disposition"
-      ]
-    },
-    "exception_concession": {
-      "domain": "general",
-      "endpoints": [
-        "exception_concession_create",
-        "exception_concession_update"
-      ],
-      "primary_keys": [
-        "exception_id"
-      ],
-      "status_refs": [
-        "defect_type",
-        "disposition"
-      ]
-    },
-    "exception_copq": {
-      "domain": "general",
-      "endpoints": [
-        "exception_copq_summary"
-      ],
-      "primary_keys": [
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "exception_trends": {
-      "domain": "general",
-      "endpoints": [
-        "exception_trends"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": [
-        "defect_type",
-        "disposition"
-      ]
-    },
-    "exception_escalate": {
-      "domain": "general",
-      "endpoints": [
-        "exception_escalate"
-      ],
-      "primary_keys": [
-        "exception_id"
-      ],
-      "status_refs": []
-    },
-    "supplier": {
-      "domain": "supplier_quality",
-      "endpoints": [
-        "supplier_dashboard"
-      ],
-      "primary_keys": [
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "scorecard": {
-      "domain": "supplier_quality",
-      "endpoints": [
-        "supplier_scorecard_list"
-      ],
-      "primary_keys": [
-        "vendor_id"
-      ],
-      "status_refs": []
-    },
-    "supplier_scorecard": {
-      "domain": "supplier_quality",
-      "endpoints": [
-        "supplier_scorecard_detail"
-      ],
-      "primary_keys": [
-        "vendor_id"
-      ],
-      "status_refs": []
-    },
-    "supplier_scorecard_calc": {
-      "domain": "supplier_quality",
-      "endpoints": [
-        "supplier_scorecard_calc"
-      ],
-      "primary_keys": [
-        "vendor_id"
-      ],
-      "status_refs": []
-    },
-    "incoming_inspection": {
-      "domain": "supplier_quality",
-      "endpoints": [
-        "supplier_incoming_list",
-        "supplier_incoming_create",
-        "supplier_incoming_update",
-        "supplier_incoming_disposition"
-      ],
-      "primary_keys": [
-        "iqc_id",
-        "vendor_id",
-        "id"
-      ],
-      "status_refs": []
-    },
-    "supplier_skip_lot": {
-      "domain": "supplier_quality",
-      "endpoints": [
-        "supplier_skip_lot_status",
-        "supplier_skip_lot_update"
-      ],
-      "primary_keys": [
-        "vendor_id"
-      ],
-      "status_refs": []
-    },
-    "asl_entry": {
-      "domain": "supplier_quality",
-      "endpoints": [
-        "supplier_asl_list",
-        "supplier_asl_upsert",
-        "supplier_asl_create",
-        "supplier_asl_suspend"
-      ],
-      "primary_keys": [
-        "vendor_id"
-      ],
-      "status_refs": []
-    },
-    "scar": {
-      "domain": "supplier_quality",
-      "endpoints": [
-        "supplier_scar_list",
-        "supplier_scar_create",
-        "supplier_scar_update",
-        "supplier_scar_transition"
-      ],
-      "primary_keys": [
-        "scar_id",
-        "vendor_id"
-      ],
-      "status_refs": [
-        "severity"
-      ]
-    },
-    "supplier_audit": {
-      "domain": "supplier_quality",
-      "endpoints": [
-        "supplier_audit_list",
-        "supplier_audit_upsert",
-        "supplier_audit_create"
-      ],
-      "primary_keys": [
-        "audit_id",
-        "vendor_id",
-        "id"
-      ],
-      "status_refs": []
-    },
-    "quote": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "quote_list",
-        "quote_detail",
-        "quote_create",
-        "quote_update",
-        "quote_transition",
-        "quote_dashboard",
-        "quote_save"
-      ],
-      "primary_keys": [
-        "quote_id",
-        "customer_id",
-        "id",
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "quote_convert_to_so": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "quote_convert_to_so"
-      ],
-      "primary_keys": [
-        "id"
-      ],
-      "status_refs": []
-    },
-    "quote_estimate_cycle": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "quote_estimate_cycle"
-      ],
-      "primary_keys": [
-        "quote_id"
-      ],
-      "status_refs": []
-    },
-    "quote_estimate_material": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "quote_estimate_material"
-      ],
-      "primary_keys": [
-        "quote_id"
-      ],
-      "status_refs": [
-        "material_type"
-      ]
+      "digitalThread": true
     },
     "evidence": {
-      "domain": "quality_management",
-      "endpoints": [
-        "evidence_list",
-        "evidence_detail"
+      "entity": "evidence",
+      "fields": [
+        "parent_record_id",
+        "shipment_release_id",
+        "lot_id",
+        "tool_id",
+        "ppap_id",
+        "doc_id",
+        "retention_policy_id"
       ],
-      "primary_keys": [
-        "evidence_id"
-      ],
-      "status_refs": []
+      "digitalThread": true
     },
-    "evidence_upload": {
-      "domain": "quality_management",
-      "endpoints": [
-        "evidence_upload"
+    "purchase_order": {
+      "entity": "purchase_order",
+      "fields": [
+        "po_id",
+        "special_process_id"
       ],
-      "primary_keys": [
-        "entity_id"
-      ],
-      "status_refs": []
+      "digitalThread": true
     },
-    "evidence_link": {
-      "domain": "quality_management",
-      "endpoints": [
-        "evidence_link"
+    "goods_receipt": {
+      "entity": "goods_receipt",
+      "fields": [
+        "purchase_order_id",
+        "gr_id",
+        "supplier_id"
       ],
-      "primary_keys": [
-        "evidence_id"
-      ],
-      "status_refs": []
+      "digitalThread": true
     },
-    "evidence_chain_custody": {
-      "domain": "quality_management",
-      "endpoints": [
-        "evidence_chain_custody"
+    "receiving_inspection": {
+      "entity": "receiving_inspection",
+      "fields": [
+        "goods_receipt_id",
+        "inspection_id",
+        "supplier_id"
       ],
-      "primary_keys": [
-        "evidence_id"
-      ],
-      "status_refs": []
+      "digitalThread": true
     },
-    "evidence_verify_chain": {
-      "domain": "quality_management",
-      "endpoints": [
-        "evidence_verify_chain"
+    "item": {
+      "entity": "item",
+      "fields": [
+        "item_id"
       ],
-      "primary_keys": [
-        "evidence_id"
+      "digitalThread": true
+    },
+    "bom_header": {
+      "entity": "bom_header",
+      "fields": [
+        "item_id",
+        "item_revision_id",
+        "bom_id",
+        "ecn_id"
       ],
-      "status_refs": []
+      "digitalThread": true
+    },
+    "item_revision": {
+      "entity": "item_revision",
+      "fields": [
+        "item_revision_id",
+        "ecn_id"
+      ],
+      "digitalThread": true
+    },
+    "routing_header": {
+      "entity": "routing_header",
+      "fields": [
+        "item_id",
+        "routing_id",
+        "ecn_id"
+      ],
+      "digitalThread": true
+    },
+    "routing_operation": {
+      "entity": "routing_operation",
+      "fields": [
+        "routing_id"
+      ],
+      "digitalThread": true
+    },
+    "fai": {
+      "entity": "fai",
+      "fields": [
+        "fai_id",
+        "work_order_id",
+        "ppap_id"
+      ],
+      "digitalThread": true
+    },
+    "doc_master": {
+      "entity": "doc_master",
+      "fields": [
+        "fai_id"
+      ],
+      "digitalThread": true
     },
     "fmea": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "fmea_list",
-        "fmea_detail",
-        "fmea_create",
-        "fmea_update",
-        "fmea_save"
-      ],
-      "primary_keys": [
-        "fmea_id",
-        "item_id"
-      ],
-      "status_refs": []
-    },
-    "fmea_add_failure_mode": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "fmea_add_failure_mode"
-      ],
-      "primary_keys": [
+      "entity": "fmea",
+      "fields": [
         "fmea_id"
       ],
-      "status_refs": [
-        "severity"
-      ]
-    },
-    "fmea_update_failure_mode": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "fmea_update_failure_mode"
-      ],
-      "primary_keys": [
-        "fmea_id"
-      ],
-      "status_refs": [
-        "severity"
-      ]
-    },
-    "fmea_add_action": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "fmea_add_action"
-      ],
-      "primary_keys": [
-        "fmea_id"
-      ],
-      "status_refs": []
-    },
-    "fmea_complete_action": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "fmea_complete_action"
-      ],
-      "primary_keys": [
-        "fmea_id"
-      ],
-      "status_refs": []
-    },
-    "fmea_generate_cp": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "fmea_generate_cp"
-      ],
-      "primary_keys": [
-        "fmea_id"
-      ],
-      "status_refs": []
+      "digitalThread": true
     },
     "control_plan": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "fmea_control_plans"
-      ],
-      "primary_keys": [
-        "cp_id"
-      ],
-      "status_refs": []
-    },
-    "fmea_cp": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "fmea_cp_detail"
-      ],
-      "primary_keys": [
-        "cp_id"
-      ],
-      "status_refs": []
-    },
-    "fmea_rpn_trend": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "fmea_rpn_trend"
-      ],
-      "primary_keys": [
-        "fmea_id"
-      ],
-      "status_refs": []
-    },
-    "fmea_link_ncr": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "fmea_link_ncr"
-      ],
-      "primary_keys": [
-        "fmea_id"
-      ],
-      "status_refs": []
-    },
-    "project": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "apqp_list",
-        "ci_project_list"
-      ],
-      "primary_keys": [
-        "apqp_id",
-        "project_id"
-      ],
-      "status_refs": []
-    },
-    "apqp": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "apqp_detail",
-        "apqp_create",
-        "apqp_update",
-        "apqp_dashboard"
-      ],
-      "primary_keys": [
-        "apqp_id",
-        "npi_project_id",
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "apqp_advance_phase": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "apqp_advance_phase"
-      ],
-      "primary_keys": [
-        "apqp_id"
-      ],
-      "status_refs": []
-    },
-    "apqp_gate_review": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "apqp_gate_review"
-      ],
-      "primary_keys": [
-        "apqp_id"
-      ],
-      "status_refs": []
-    },
-    "apqp_gate": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "apqp_gate_approve",
-        "apqp_gate_reject"
-      ],
-      "primary_keys": [
-        "apqp_id"
-      ],
-      "status_refs": []
-    },
-    "apqp_ppap": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "apqp_ppap_create"
-      ],
-      "primary_keys": [
-        "apqp_id"
-      ],
-      "status_refs": []
-    },
-    "apqp_ppap_element": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "apqp_ppap_element"
-      ],
-      "primary_keys": [
+      "entity": "control_plan",
+      "fields": [
+        "fmea_id",
+        "control_plan_id",
         "ppap_id"
       ],
-      "status_refs": []
+      "digitalThread": true
     },
-    "apqp_ppap_response": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "apqp_ppap_response"
+    "inspection_plan": {
+      "entity": "inspection_plan",
+      "fields": [
+        "control_plan_id",
+        "inspection_plan_id"
       ],
-      "primary_keys": [
-        "ppap_id"
-      ],
-      "status_refs": []
+      "digitalThread": true
     },
-    "apqp_deliverables": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "apqp_deliverables"
+    "spc_chart": {
+      "entity": "spc_chart",
+      "fields": [
+        "inspection_plan_id",
+        "measurement_id"
       ],
-      "primary_keys": [
-        "apqp_id"
-      ],
-      "status_refs": []
+      "digitalThread": true
     },
-    "mobile_my_queue": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "mobile_my_queue"
+    "supplier": {
+      "entity": "supplier",
+      "fields": [
+        "supplier_id"
       ],
-      "primary_keys": [
-        "task_id"
-      ],
-      "status_refs": [
-        "priority"
-      ]
+      "digitalThread": true
     },
-    "mobile_start_task": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "mobile_start_task"
+    "asl_entry": {
+      "entity": "asl_entry",
+      "fields": [
+        "supplier_id"
       ],
-      "primary_keys": [
-        "task_id"
-      ],
-      "status_refs": [
-        "shift_code"
-      ]
+      "digitalThread": true
     },
-    "mobile_complete_task": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "mobile_complete_task"
+    "supplier_scorecard": {
+      "entity": "supplier_scorecard",
+      "fields": [
+        "supplier_id",
+        "scorecard_id"
       ],
-      "primary_keys": [
-        "task_id"
-      ],
-      "status_refs": []
+      "digitalThread": true
     },
-    "mobile_clock_in": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "mobile_clock_in"
+    "scar": {
+      "entity": "scar",
+      "fields": [
+        "scorecard_id",
+        "audit_finding_id"
       ],
-      "primary_keys": [
-        "employee_id"
-      ],
-      "status_refs": []
+      "digitalThread": true
     },
-    "mobile_clock_out": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "mobile_clock_out"
+    "calibration_record": {
+      "entity": "calibration_record",
+      "fields": [
+        "calibration_id"
       ],
-      "primary_keys": [
-        "employee_id"
-      ],
-      "status_refs": [
-        "shift_code"
-      ]
+      "digitalThread": true
     },
-    "mobile_capture_inspection": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "mobile_capture_inspection"
+    "equipment": {
+      "entity": "equipment",
+      "fields": [
+        "equipment_id"
       ],
-      "primary_keys": [
-        "task_id"
-      ],
-      "status_refs": [
-        "inspection_type"
-      ]
+      "digitalThread": true
     },
-    "mobile_sync_batch": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "mobile_sync_batch"
+    "measurement_record": {
+      "entity": "measurement_record",
+      "fields": [
+        "equipment_id",
+        "measurement_id"
       ],
-      "primary_keys": [
-        "mobile_id"
-      ],
-      "status_refs": [
-        "shift_code"
-      ]
+      "digitalThread": true
     },
-    "mobile_sync": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "mobile_sync_status"
+    "shipment_release": {
+      "entity": "shipment_release",
+      "fields": [
+        "sales_order_id",
+        "shipment_release_id",
+        "deviation_id"
       ],
-      "primary_keys": [
-        "device_id"
-      ],
-      "status_refs": []
+      "digitalThread": true
     },
-    "mobile_resolve_conflict": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "mobile_resolve_conflict"
+    "document": {
+      "entity": "document",
+      "fields": [
+        "doc_id"
       ],
-      "primary_keys": [
-        "conflict_id"
-      ],
-      "status_refs": []
+      "digitalThread": true
     },
-    "mobile_shop": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "mobile_shop_overview"
+    "training_assignment": {
+      "entity": "training_assignment",
+      "fields": [
+        "doc_id",
+        "training_id"
       ],
-      "primary_keys": [
-        "machine_id"
-      ],
-      "status_refs": []
+      "digitalThread": true
     },
-    "mobile": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "mobile_dashboard",
-        "mobile_sync"
-      ],
-      "primary_keys": [
-        "kpi_id",
-        "mobile_id"
-      ],
-      "status_refs": [
-        "shift_code"
-      ]
-    },
-    "master_data": {
-      "domain": "master_data",
-      "endpoints": [
-        "master_data_list",
-        "master_data_detail",
-        "master_data_create",
-        "master_data_update",
-        "master_data_delete",
-        "master_data_status",
-        "master_data_history"
-      ],
-      "primary_keys": [
-        "id",
-        "item_id"
-      ],
-      "status_refs": []
-    },
-    "master_data_entities": {
-      "domain": "master_data",
-      "endpoints": [
-        "master_data_entities"
-      ],
-      "primary_keys": [
-        "master_id"
-      ],
-      "status_refs": []
-    },
-    "master_data_snapshot": {
-      "domain": "master_data",
-      "endpoints": [
-        "master_data_snapshot"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": []
-    },
-    "shift": {
-      "domain": "general",
-      "endpoints": [
-        "shift_list",
-        "shift_save"
-      ],
-      "primary_keys": [
-        "shift_id"
-      ],
-      "status_refs": [
-        "shift_code"
-      ]
-    },
-    "shift_assignments": {
-      "domain": "general",
-      "endpoints": [
-        "shift_assignments"
-      ],
-      "primary_keys": [
-        "employee_id"
-      ],
-      "status_refs": []
-    },
-    "shift_assign": {
-      "domain": "general",
-      "endpoints": [
-        "shift_assign"
-      ],
-      "primary_keys": [
-        "employee_id"
-      ],
-      "status_refs": [
-        "shift_code"
-      ]
-    },
-    "shift_holidays": {
-      "domain": "general",
-      "endpoints": [
-        "shift_holidays"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": []
-    },
-    "shift_holiday": {
-      "domain": "general",
-      "endpoints": [
-        "shift_holiday_save"
-      ],
-      "primary_keys": [
-        "shift_id"
-      ],
-      "status_refs": []
-    },
-    "dispatch_timeline": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "dispatch_timeline"
-      ],
-      "primary_keys": [
-        "machine_id"
-      ],
-      "status_refs": []
-    },
-    "dispatch": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "dispatch_dashboard"
-      ],
-      "primary_keys": [
-        "kpi_id"
-      ],
-      "status_refs": [
-        "shift_code"
-      ]
-    },
-    "target": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "dispatch_list_targets"
-      ],
-      "primary_keys": [
-        "target_id"
-      ],
-      "status_refs": [
-        "shift_code",
-        "priority"
-      ]
-    },
-    "dispatch_create_target": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "dispatch_create_target"
-      ],
-      "primary_keys": [
-        "wo_id"
-      ],
-      "status_refs": [
-        "shift_code",
-        "priority"
-      ]
-    },
-    "dispatch_update_target": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "dispatch_update_target"
-      ],
-      "primary_keys": [
-        "target_id"
-      ],
-      "status_refs": []
-    },
-    "dispatch_send": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "dispatch_send"
-      ],
-      "primary_keys": [
-        "schedule_id"
-      ],
-      "status_refs": []
-    },
-    "dispatch_operator_tasks": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "dispatch_operator_tasks"
-      ],
-      "primary_keys": [
-        "operator_id"
-      ],
-      "status_refs": []
-    },
-    "dispatch_report_production": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "dispatch_report_production"
-      ],
-      "primary_keys": [
-        "target_id"
-      ],
-      "status_refs": []
-    },
-    "subcontract": {
-      "domain": "supplier_quality",
-      "endpoints": [
-        "subcontract_list",
-        "subcontract_create",
-        "subcontract_update"
-      ],
-      "primary_keys": [
-        "sc_id",
-        "vendor_id"
-      ],
-      "status_refs": [
-        "subcontract_process"
-      ]
-    },
-    "subcontract_receive": {
-      "domain": "supplier_quality",
-      "endpoints": [
-        "subcontract_receive"
-      ],
-      "primary_keys": [
-        "sc_id"
-      ],
-      "status_refs": []
-    },
-    "oqc_record": {
-      "domain": "shipping_quality",
-      "endpoints": [
-        "oqc_list"
-      ],
-      "primary_keys": [
-        "oqc_id"
-      ],
-      "status_refs": []
-    },
-    "oqc": {
-      "domain": "shipping_quality",
-      "endpoints": [
-        "oqc_create",
-        "oqc_update"
-      ],
-      "primary_keys": [
-        "so_id",
-        "oqc_id"
-      ],
-      "status_refs": []
-    },
-    "packing_list": {
-      "domain": "shipping_quality",
-      "endpoints": [
-        "packing_list"
-      ],
-      "primary_keys": [
-        "pl_id"
-      ],
-      "status_refs": []
-    },
-    "packing": {
-      "domain": "shipping_quality",
-      "endpoints": [
-        "packing_create",
-        "packing_update"
-      ],
-      "primary_keys": [
-        "so_id",
-        "pl_id"
-      ],
-      "status_refs": []
-    },
-    "delivery": {
-      "domain": "shipping_quality",
-      "endpoints": [
-        "delivery_confirm"
-      ],
-      "primary_keys": [
-        "pl_id"
-      ],
-      "status_refs": []
-    },
-    "program": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "cnc_program_list",
-        "cnc_program_data"
-      ],
-      "primary_keys": [
-        "program_id",
-        "part_id"
-      ],
-      "status_refs": [
-        "machine_type",
-        "shift_code"
-      ]
-    },
-    "cnc_program": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "cnc_program_detail",
-        "cnc_program_create",
-        "cnc_program_update",
-        "cnc_program_approve"
-      ],
-      "primary_keys": [
-        "program_id"
-      ],
-      "status_refs": [
-        "machine_type",
-        "shift_code"
-      ]
-    },
-    "cnc_program_upload_version": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "cnc_program_upload_version"
-      ],
-      "primary_keys": [
-        "program_id"
-      ],
-      "status_refs": []
-    },
-    "setup_sheet": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "cnc_program_setup_sheets"
-      ],
-      "primary_keys": [
-        "setup_id"
-      ],
-      "status_refs": [
-        "machine_type",
-        "shift_code"
-      ]
-    },
-    "cnc_program_setup": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "cnc_program_setup_create"
-      ],
-      "primary_keys": [
-        "program_id"
-      ],
-      "status_refs": [
-        "machine_type",
-        "shift_code"
-      ]
-    },
-    "product_passport": {
-      "domain": "traceability",
-      "endpoints": [
-        "product_passport_list",
-        "product_passport_detail",
-        "product_passport_create",
-        "product_passport_add_event",
-        "product_passport_trace",
-        "product_passport_qr",
-        "product_passport_data",
-        "product_passport_transition"
-      ],
-      "primary_keys": [
-        "passport_id",
-        "jo_id",
-        "id",
-        "part_id"
-      ],
-      "status_refs": []
-    },
-    "prediction": {
-      "domain": "analytics",
-      "endpoints": [
-        "ai_prediction_list"
-      ],
-      "primary_keys": [
-        "prediction_id"
-      ],
-      "status_refs": []
-    },
-    "ai_prediction_acknowledge": {
-      "domain": "analytics",
-      "endpoints": [
-        "ai_prediction_acknowledge"
-      ],
-      "primary_keys": [
-        "prediction_id"
-      ],
-      "status_refs": []
-    },
-    "ai_prediction_resolve": {
-      "domain": "analytics",
-      "endpoints": [
-        "ai_prediction_resolve"
-      ],
-      "primary_keys": [
-        "prediction_id"
-      ],
-      "status_refs": []
-    },
-    "anomalie": {
-      "domain": "analytics",
-      "endpoints": [
-        "ai_spc_anomalies"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": [
-        "severity"
-      ]
-    },
-    "tool_wear": {
-      "domain": "analytics",
-      "endpoints": [
-        "ai_tool_wear"
-      ],
-      "primary_keys": [
-        "machine_id"
-      ],
-      "status_refs": []
-    },
-    "ai": {
-      "domain": "analytics",
-      "endpoints": [
-        "ai_dashboard"
-      ],
-      "primary_keys": [
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "slot": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "schedule_get"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": []
-    },
-    "schedule_conflicts": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "schedule_conflicts"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": [
-        "severity"
-      ]
-    },
-    "schedule_capacity": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "schedule_capacity"
-      ],
-      "primary_keys": [
-        "machine_id"
-      ],
-      "status_refs": []
-    },
-    "schedule_promise": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "schedule_promise"
-      ],
-      "primary_keys": [
-        "so_id"
-      ],
-      "status_refs": []
-    },
-    "user": {
-      "domain": "customer_portal",
-      "endpoints": [
-        "customer_portal_users"
-      ],
-      "primary_keys": [
+    "user_profile": {
+      "entity": "user_profile",
+      "fields": [
         "user_id"
       ],
-      "status_refs": []
+      "digitalThread": true
     },
-    "customer_portal_user": {
-      "domain": "customer_portal",
-      "endpoints": [
-        "customer_portal_user_create",
-        "customer_portal_user_update"
+    "integration_monitor": {
+      "entity": "integration_monitor",
+      "fields": [
+        "integration_id"
       ],
-      "primary_keys": [
-        "customer_id",
-        "id"
-      ],
-      "status_refs": []
-    },
-    "customer_access_grant": {
-      "domain": "customer_portal",
-      "endpoints": [
-        "customer_portal_access_list",
-        "customer_portal_access_grant",
-        "customer_portal_access_revoke"
-      ],
-      "primary_keys": [
-        "portal_user_id",
-        "id"
-      ],
-      "status_refs": []
-    },
-    "complaint": {
-      "domain": "customer_portal",
-      "endpoints": [
-        "customer_portal_complaints",
-        "customer_portal_complaint_update"
-      ],
-      "primary_keys": [
-        "portal_user_id"
-      ],
-      "status_refs": []
-    },
-    "doc_acces": {
-      "domain": "customer_portal",
-      "endpoints": [
-        "customer_portal_documents"
-      ],
-      "primary_keys": [
-        "portal_user_id"
-      ],
-      "status_refs": []
-    },
-    "customer_portal_analytics": {
-      "domain": "customer_portal",
-      "endpoints": [
-        "customer_portal_analytics"
-      ],
-      "primary_keys": [
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "compliance_report_types": {
-      "domain": "compliance",
-      "endpoints": [
-        "compliance_report_types"
-      ],
-      "primary_keys": [
-        "type_id"
-      ],
-      "status_refs": []
-    },
-    "compliance_report": {
-      "domain": "compliance",
-      "endpoints": [
-        "compliance_report_generate",
-        "compliance_report_list"
-      ],
-      "primary_keys": [
-        "report_id",
-        "compliance_id"
-      ],
-      "status_refs": []
-    },
-    "report": {
-      "domain": "compliance",
-      "endpoints": [
-        "compliance_report_history"
-      ],
-      "primary_keys": [
-        "report_id"
-      ],
-      "status_refs": []
-    },
-    "compliance_report_management_review": {
-      "domain": "compliance",
-      "endpoints": [
-        "compliance_report_management_review"
-      ],
-      "primary_keys": [
-        "compliance_id"
-      ],
-      "status_refs": []
-    },
-    "compliance_report_customer_quality": {
-      "domain": "compliance",
-      "endpoints": [
-        "compliance_report_customer_quality"
-      ],
-      "primary_keys": [
-        "compliance_id"
-      ],
-      "status_refs": [
-        "ppap_status"
-      ]
-    },
-    "compliance_report_supplier_review": {
-      "domain": "compliance",
-      "endpoints": [
-        "compliance_report_supplier_review"
-      ],
-      "primary_keys": [
-        "vendor_id"
-      ],
-      "status_refs": []
-    },
-    "compliance_report_copq": {
-      "domain": "compliance",
-      "endpoints": [
-        "compliance_report_copq"
-      ],
-      "primary_keys": [
-        "compliance_id"
-      ],
-      "status_refs": []
-    },
-    "compliance_report_evidence_package": {
-      "domain": "compliance",
-      "endpoints": [
-        "compliance_report_evidence_package"
-      ],
-      "primary_keys": [
-        "so_id"
-      ],
-      "status_refs": []
-    },
-    "tip": {
-      "domain": "continuous_improvement",
-      "endpoints": [
-        "knowledge_list"
-      ],
-      "primary_keys": [
-        "tip_id"
-      ],
-      "status_refs": []
-    },
-    "knowledge": {
-      "domain": "continuous_improvement",
-      "endpoints": [
-        "knowledge_detail",
-        "knowledge_create",
-        "knowledge_update",
-        "knowledge_vote",
-        "knowledge_comment"
-      ],
-      "primary_keys": [
-        "tip_id",
-        "doc_id",
-        "id"
-      ],
-      "status_refs": []
-    },
-    "ci": {
-      "domain": "continuous_improvement",
-      "endpoints": [
-        "ci_dashboard"
-      ],
-      "primary_keys": [
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "suggestion": {
-      "domain": "continuous_improvement",
-      "endpoints": [
-        "ci_suggestion_list"
-      ],
-      "primary_keys": [
-        "suggestion_id"
-      ],
-      "status_refs": []
-    },
-    "ci_suggestion": {
-      "domain": "continuous_improvement",
-      "endpoints": [
-        "ci_suggestion_create"
-      ],
-      "primary_keys": [
-        "improvement_id"
-      ],
-      "status_refs": []
-    },
-    "ci_project": {
-      "domain": "continuous_improvement",
-      "endpoints": [
-        "ci_project_create",
-        "ci_project_update",
-        "ci_project_transition"
-      ],
-      "primary_keys": [
-        "improvement_id",
-        "project_id"
-      ],
-      "status_refs": []
-    },
-    "ci_roi": {
-      "domain": "continuous_improvement",
-      "endpoints": [
-        "ci_roi_summary"
-      ],
-      "primary_keys": [
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "energy": {
-      "domain": "sustainability",
-      "endpoints": [
-        "energy_overview"
-      ],
-      "primary_keys": [
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "energy_machine": {
-      "domain": "sustainability",
-      "endpoints": [
-        "energy_machine_detail"
-      ],
-      "primary_keys": [
-        "machine_id"
-      ],
-      "status_refs": []
-    },
-    "energy_per_part": {
-      "domain": "sustainability",
-      "endpoints": [
-        "energy_per_part"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": []
-    },
-    "energy_cost_trend": {
-      "domain": "sustainability",
-      "endpoints": [
-        "energy_cost_trend"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": []
-    },
-    "module_schema": {
-      "domain": "platform",
-      "endpoints": [
-        "module_schema_list",
-        "module_schema_get",
-        "module_schema_save",
-        "module_schema_delete",
-        "module_schema_reset"
-      ],
-      "primary_keys": [
-        "moduleId"
-      ],
-      "status_refs": []
-    },
-    "module_api_catalog": {
-      "domain": "platform",
-      "endpoints": [
-        "module_api_catalog"
-      ],
-      "primary_keys": [
-        "module_id"
-      ],
-      "status_refs": []
-    },
-    "registry_data_fields": {
-      "domain": "platform",
-      "endpoints": [
-        "registry_data_fields"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": []
-    },
-    "registry_api_params": {
-      "domain": "platform",
-      "endpoints": [
-        "registry_api_params"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": []
-    },
-    "registry_field_types": {
-      "domain": "platform",
-      "endpoints": [
-        "registry_field_types"
-      ],
-      "primary_keys": [],
-      "status_refs": []
-    },
-    "registry_status_options": {
-      "domain": "platform",
-      "endpoints": [
-        "registry_status_options"
-      ],
-      "primary_keys": [],
-      "status_refs": []
-    },
-    "registry_computed_formulas": {
-      "domain": "platform",
-      "endpoints": [
-        "registry_computed_formulas"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": []
-    },
-    "registry_iot_connectors": {
-      "domain": "platform",
-      "endpoints": [
-        "registry_iot_connectors"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": []
-    },
-    "registry_full": {
-      "domain": "platform",
-      "endpoints": [
-        "registry_full"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": []
-    },
-    "registry": {
-      "domain": "platform",
-      "endpoints": [
-        "registry_update"
-      ],
-      "primary_keys": [],
-      "status_refs": []
-    },
-    "ncr_record": {
-      "domain": "quality_management",
-      "endpoints": [
-        "quality_exception_list",
-        "quality_exception_kpi",
-        "quality_exception_copq",
-        "quality_exception_trends",
-        "quality_exception_create",
-        "quality_exception_transition",
-        "quality_exception_save_8d",
-        "quality_exception_mrb_disposition"
-      ],
-      "primary_keys": [
-        "ncr_id",
-        "kpi_id",
-        "record_id",
-        "customer_id",
-        "id"
-      ],
-      "status_refs": [
-        "severity"
-      ]
-    },
-    "supplier_quality_data": {
-      "domain": "supplier_quality",
-      "endpoints": [
-        "supplier_quality_data"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": []
-    },
-    "quote_kpi": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "quote_kpi"
-      ],
-      "primary_keys": [
-        "kpi_id"
-      ],
-      "status_refs": []
-    },
-    "customer_portal_data": {
-      "domain": "customer_portal",
-      "endpoints": [
-        "customer_portal_data"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": []
-    },
-    "customer_portal_grant_access": {
-      "domain": "customer_portal",
-      "endpoints": [
-        "customer_portal_grant_access"
-      ],
-      "primary_keys": [
-        "portal_user_id"
-      ],
-      "status_refs": []
-    },
-    "customer_portal_revoke_access": {
-      "domain": "customer_portal",
-      "endpoints": [
-        "customer_portal_revoke_access"
-      ],
-      "primary_keys": [
-        "id"
-      ],
-      "status_refs": []
-    },
-    "customer_portal_resend_verification": {
-      "domain": "customer_portal",
-      "endpoints": [
-        "customer_portal_resend_verification"
-      ],
-      "primary_keys": [
-        "id"
-      ],
-      "status_refs": []
-    },
-    "customer_portal_revoke_doc": {
-      "domain": "customer_portal",
-      "endpoints": [
-        "customer_portal_revoke_doc"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": []
-    },
-    "cnc_program_compare": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "cnc_program_compare"
-      ],
-      "primary_keys": [
-        "id"
-      ],
-      "status_refs": [
-        "shift_code"
-      ]
-    },
-    "cnc_setup_sheet": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "cnc_setup_sheet_create"
-      ],
-      "primary_keys": [
-        "program_id"
-      ],
-      "status_refs": [
-        "shift_code"
-      ]
-    },
-    "ai_quality_scheduling_data": {
-      "domain": "analytics",
-      "endpoints": [
-        "ai_quality_scheduling_data"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": []
-    },
-    "ai_prediction_false_positive": {
-      "domain": "analytics",
-      "endpoints": [
-        "ai_prediction_false_positive"
-      ],
-      "primary_keys": [
-        "id"
-      ],
-      "status_refs": []
-    },
-    "schedule_promise_calculate": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "schedule_promise_calculate"
-      ],
-      "primary_keys": [
-        "machine_id"
-      ],
-      "status_refs": [
-        "priority"
-      ]
-    },
-    "cp": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "cp_detail"
-      ],
-      "primary_keys": [
-        "control_plan_id"
-      ],
-      "status_refs": []
-    },
-    "cp_add_characteristic": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "cp_add_characteristic"
-      ],
-      "primary_keys": [
-        "fmea_id"
-      ],
-      "status_refs": []
-    },
-    "cp_auto": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "cp_auto_generate"
-      ],
-      "primary_keys": [
-        "fmea_id"
-      ],
-      "status_refs": []
-    },
-    "apqp_toggle_deliverable": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "apqp_toggle_deliverable"
-      ],
-      "primary_keys": [
-        "apqp_id"
-      ],
-      "status_refs": []
-    },
-    "ppap": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "ppap_create"
-      ],
-      "primary_keys": [
-        "apqp_id"
-      ],
-      "status_refs": []
-    },
-    "ppap_update_element": {
-      "domain": "engineering_quality",
-      "endpoints": [
-        "ppap_update_element"
-      ],
-      "primary_keys": [
-        "submission_id"
-      ],
-      "status_refs": []
-    },
-    "mobile_queue": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "mobile_queue"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": [
-        "shift_code"
-      ]
-    },
-    "mobile_create_ncr": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "mobile_create_ncr"
-      ],
-      "primary_keys": [
-        "mobile_id"
-      ],
-      "status_refs": []
-    },
-    "mobile_inspection_plan": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "mobile_inspection_plan"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": [
-        "shift_code"
-      ]
-    },
-    "mobile_submit_first_piece": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "mobile_submit_first_piece"
-      ],
-      "primary_keys": [
-        "mobile_id"
-      ],
-      "status_refs": []
-    },
-    "mobile_submit_inprocess": {
-      "domain": "manufacturing_execution",
-      "endpoints": [
-        "mobile_submit_inprocess"
-      ],
-      "primary_keys": [
-        "mobile_id"
-      ],
-      "status_refs": []
-    },
-    "update_fields": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "order_update_fields"
-      ],
-      "primary_keys": [
-        "order_id"
-      ],
-      "status_refs": []
-    },
-    "get_linked_forms": {
-      "domain": "commercial_operations",
-      "endpoints": [
-        "order_get_linked_forms"
-      ],
-      "primary_keys": [
-        "record_id"
-      ],
-      "status_refs": [
-        "so_status"
-      ]
-    }
-  },
-  "edges": [
-    {
-      "from": "quote",
-      "to": "sales_order",
-      "relation": "converts_to",
-      "joinFields": [
-        "quote_id",
-        "so_id"
-      ],
-      "endpoints": [
-        "quote_convert_to_so"
-      ]
-    },
-    {
-      "from": "sales_order",
-      "to": "job_order",
-      "relation": "drives",
-      "joinFields": [
-        "so_id",
-        "jo_id"
-      ],
-      "endpoints": [
-        "order_jo_list",
-        "order_detail"
-      ]
-    },
-    {
-      "from": "job_order",
-      "to": "work_order",
-      "relation": "contains",
-      "joinFields": [
-        "jo_id",
-        "wo_id"
-      ],
-      "endpoints": [
-        "order_wo_list",
-        "order_detail"
-      ]
-    },
-    {
-      "from": "work_order",
-      "to": "dispatch_target",
-      "relation": "dispatches_to",
-      "joinFields": [
-        "wo_id",
-        "dispatch_id"
-      ],
-      "endpoints": [
-        "dispatch_list_targets",
-        "dispatch_send"
-      ]
-    },
-    {
-      "from": "work_order",
-      "to": "schedule_slot",
-      "relation": "plans_into",
-      "joinFields": [
-        "wo_id",
-        "slot_id"
-      ],
-      "endpoints": [
-        "schedule_get",
-        "schedule_slot_create"
-      ]
-    },
-    {
-      "from": "work_order",
-      "to": "subcontract",
-      "relation": "outsources_to",
-      "joinFields": [
-        "wo_number",
-        "vendor_id"
-      ],
-      "endpoints": [
-        "subcontract_create",
-        "subcontract_receive"
-      ]
-    },
-    {
-      "from": "sales_order",
-      "to": "oqc_record",
-      "relation": "ships_through",
-      "joinFields": [
-        "so_number",
-        "oqc_id"
-      ],
-      "endpoints": [
-        "oqc_create",
-        "oqc_update"
-      ]
+      "digitalThread": true
     },
-    {
-      "from": "sales_order",
-      "to": "packing_list",
-      "relation": "packed_as",
-      "joinFields": [
-        "so_number",
-        "packing_id"
+    "audit_log": {
+      "entity": "audit_log",
+      "fields": [
+        "integration_id"
       ],
-      "endpoints": [
-        "packing_create",
-        "packing_update"
-      ]
+      "digitalThread": true
     },
-    {
-      "from": "packing_list",
-      "to": "delivery",
-      "relation": "delivered_by",
-      "joinFields": [
-        "so_number",
-        "delivery_id"
+    "special_process": {
+      "entity": "special_process",
+      "fields": [
+        "special_process_id",
+        "supplier_id",
+        "operation_id"
       ],
-      "endpoints": [
-        "delivery_confirm"
-      ]
+      "digitalThread": true
     },
-    {
-      "from": "sales_order",
-      "to": "product_passport",
-      "relation": "disclosed_in",
-      "joinFields": [
-        "so_number",
-        "passport_id"
+    "machine_setup": {
+      "entity": "machine_setup",
+      "fields": [
+        "operation_id",
+        "setup_id"
       ],
-      "endpoints": [
-        "product_passport_create",
-        "product_passport_trace"
-      ]
+      "digitalThread": true
     },
-    {
-      "from": "incoming_inspection",
-      "to": "supplier_scorecard",
-      "relation": "rolls_up_to",
-      "joinFields": [
-        "vendor_id",
-        "period"
+    "tool_management": {
+      "entity": "tool_management",
+      "fields": [
+        "setup_id",
+        "tool_id"
       ],
-      "endpoints": [
-        "supplier_scorecards",
-        "supplier_scorecard_detail"
-      ]
+      "digitalThread": true
     },
-    {
-      "from": "incoming_inspection",
-      "to": "skip_lot",
-      "relation": "feeds",
-      "joinFields": [
-        "vendor_id",
-        "part_id"
+    "customer_complaint": {
+      "entity": "customer_complaint",
+      "fields": [
+        "complaint_id"
       ],
-      "endpoints": [
-        "supplier_skip_lot_status",
-        "supplier_skip_lot_update"
-      ]
+      "digitalThread": true
     },
-    {
-      "from": "supplier_scorecard",
-      "to": "scar",
-      "relation": "may_trigger",
-      "joinFields": [
-        "vendor_id",
-        "scar_id"
+    "ecn": {
+      "entity": "ecn",
+      "fields": [
+        "ecn_id"
       ],
-      "endpoints": [
-        "supplier_scar_create",
-        "supplier_scar_transition"
-      ]
+      "digitalThread": true
     },
-    {
-      "from": "scar",
-      "to": "supplier_audit",
-      "relation": "verified_by",
-      "joinFields": [
-        "vendor_id",
+    "supplier_audit": {
+      "entity": "supplier_audit",
+      "fields": [
         "audit_id"
       ],
-      "endpoints": [
-        "supplier_audit_create"
-      ]
+      "digitalThread": true
     },
-    {
-      "from": "ncr_record",
-      "to": "capa_record",
-      "relation": "corrected_by",
-      "joinFields": [
-        "ncr_id",
-        "capa_id"
+    "audit_finding": {
+      "entity": "audit_finding",
+      "fields": [
+        "supplier_audit_id",
+        "finding_id"
       ],
-      "endpoints": [
-        "quality_exception_transition",
-        "quality_exception_save_8d"
-      ]
+      "digitalThread": true
     },
-    {
-      "from": "ncr_record",
-      "to": "evidence",
-      "relation": "proven_by",
-      "joinFields": [
-        "ncr_id",
-        "evidence_id"
-      ],
-      "endpoints": [
-        "evidence_attach",
-        "evidence_verify"
-      ]
-    },
-    {
-      "from": "pfmea",
-      "to": "control_plan",
-      "relation": "derives",
-      "joinFields": [
-        "fmea_id",
-        "cp_id"
-      ],
-      "endpoints": [
-        "cp_auto_generate",
-        "cp_add_characteristic"
-      ]
-    },
-    {
-      "from": "apqp_project",
-      "to": "ppap_submission",
-      "relation": "culminates_in",
-      "joinFields": [
-        "apqp_id",
+    "ppap": {
+      "entity": "ppap",
+      "fields": [
         "ppap_id"
       ],
-      "endpoints": [
-        "ppap_create",
-        "ppap_update_element"
+      "digitalThread": true
+    },
+    "deviation": {
+      "entity": "deviation",
+      "fields": [
+        "ncr_id",
+        "deviation_id"
+      ],
+      "digitalThread": true
+    },
+    "digital_signature": {
+      "entity": "digital_signature",
+      "fields": [
+        "user_id"
+      ],
+      "digitalThread": true
+    },
+    "retention_policy": {
+      "entity": "retention_policy",
+      "fields": [
+        "policy_id"
+      ],
+      "digitalThread": true
+    }
+  },
+  "relations": [
+    {
+      "id": "rel_001",
+      "from": {
+        "entity": "quote",
+        "field": "quote_id"
+      },
+      "to": {
+        "entity": "sales_order",
+        "field": "quote_id"
+      },
+      "type": "one_to_many",
+      "label": "Báo giá → Đơn hàng bán",
+      "labelEn": "Quote -> Sales Order",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
       ]
     },
     {
-      "from": "cnc_program",
-      "to": "program_version",
-      "relation": "revisions",
-      "joinFields": [
-        "program_id",
-        "version_id"
-      ],
-      "endpoints": [
-        "cnc_program_upload_version"
+      "id": "rel_002",
+      "from": {
+        "entity": "sales_order",
+        "field": "so_id"
+      },
+      "to": {
+        "entity": "job_order",
+        "field": "sales_order_id"
+      },
+      "type": "one_to_many",
+      "label": "SO → JO",
+      "labelEn": "Sales Order -> Job Order",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
       ]
     },
     {
-      "from": "program_version",
-      "to": "setup_sheet",
-      "relation": "configures",
-      "joinFields": [
-        "program_id",
-        "setup_sheet_id"
-      ],
-      "endpoints": [
-        "cnc_program_setup_create"
+      "id": "rel_003",
+      "from": {
+        "entity": "job_order",
+        "field": "jo_id"
+      },
+      "to": {
+        "entity": "work_order",
+        "field": "job_order_id"
+      },
+      "type": "one_to_many",
+      "label": "JO → WO",
+      "labelEn": "Job Order -> Work Order",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
       ]
     },
     {
-      "from": "document",
-      "to": "record_id",
-      "relation": "identified_by",
-      "joinFields": [
-        "document_number",
-        "record_id"
-      ],
-      "endpoints": [
-        "record_id_registry",
-        "record_id_next"
+      "id": "rel_004",
+      "from": {
+        "entity": "work_order",
+        "field": "wo_id"
+      },
+      "to": {
+        "entity": "work_order_operation",
+        "field": "work_order_id"
+      },
+      "type": "one_to_many",
+      "label": "WO → Công đoạn WO",
+      "labelEn": "Work Order -> Work Order Operation",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
       ]
     },
     {
-      "from": "document",
-      "to": "knowledge_article",
-      "relation": "institutionalized_as",
-      "joinFields": [
-        "doc_id",
-        "knowledge_id"
-      ],
-      "endpoints": [
-        "knowledge_create",
-        "knowledge_comment"
+      "id": "rel_005",
+      "from": {
+        "entity": "work_order",
+        "field": "wo_id"
+      },
+      "to": {
+        "entity": "work_order_material",
+        "field": "work_order_id"
+      },
+      "type": "one_to_many",
+      "label": "WO → Vật liệu WO",
+      "labelEn": "Work Order -> Work Order Material",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_006",
+      "from": {
+        "entity": "work_order",
+        "field": "wo_id"
+      },
+      "to": {
+        "entity": "work_order_labor",
+        "field": "work_order_id"
+      },
+      "type": "one_to_many",
+      "label": "WO → Nhân công WO",
+      "labelEn": "Work Order -> Work Order Labor",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_007",
+      "from": {
+        "entity": "work_order_operation",
+        "field": "operation_id"
+      },
+      "to": {
+        "entity": "lot",
+        "field": "current_operation_id"
+      },
+      "type": "one_to_many",
+      "label": "Công đoạn → Lô WIP",
+      "labelEn": "Work Order Operation -> Lot",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_008",
+      "from": {
+        "entity": "lot",
+        "field": "lot_id"
+      },
+      "to": {
+        "entity": "inspection_lot",
+        "field": "lot_id"
+      },
+      "type": "one_to_many",
+      "label": "Lô → Lô kiểm tra",
+      "labelEn": "Lot -> Inspection Lot",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_009",
+      "from": {
+        "entity": "inspection_lot",
+        "field": "inspection_lot_id"
+      },
+      "to": {
+        "entity": "ncr",
+        "field": "inspection_lot_id"
+      },
+      "type": "one_to_many",
+      "label": "Inspection → NCR",
+      "labelEn": "Inspection Lot -> NCR",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_010",
+      "from": {
+        "entity": "ncr",
+        "field": "ncr_id"
+      },
+      "to": {
+        "entity": "capa",
+        "field": "source_ncr_id"
+      },
+      "type": "one_to_many",
+      "label": "NCR → CAPA",
+      "labelEn": "NCR -> CAPA",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_011",
+      "from": {
+        "entity": "capa",
+        "field": "capa_id"
+      },
+      "to": {
+        "entity": "evidence",
+        "field": "parent_record_id"
+      },
+      "type": "one_to_many",
+      "label": "CAPA → Bằng chứng",
+      "labelEn": "CAPA -> Evidence",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_012",
+      "from": {
+        "entity": "purchase_order",
+        "field": "po_id"
+      },
+      "to": {
+        "entity": "goods_receipt",
+        "field": "purchase_order_id"
+      },
+      "type": "one_to_many",
+      "label": "PO → Phiếu nhập",
+      "labelEn": "Purchase Order -> Goods Receipt",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_013",
+      "from": {
+        "entity": "goods_receipt",
+        "field": "gr_id"
+      },
+      "to": {
+        "entity": "receiving_inspection",
+        "field": "goods_receipt_id"
+      },
+      "type": "one_to_many",
+      "label": "Phiếu nhập → Kiểm tra đầu vào",
+      "labelEn": "Goods Receipt -> Receiving Inspection",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_014",
+      "from": {
+        "entity": "receiving_inspection",
+        "field": "inspection_id"
+      },
+      "to": {
+        "entity": "ncr",
+        "field": "receiving_inspection_id"
+      },
+      "type": "one_to_many",
+      "label": "Kiểm tra đầu vào → NCR",
+      "labelEn": "Receiving Inspection -> NCR",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_015",
+      "from": {
+        "entity": "item",
+        "field": "item_id"
+      },
+      "to": {
+        "entity": "bom_header",
+        "field": "item_id"
+      },
+      "type": "one_to_many",
+      "label": "Item → BOM",
+      "labelEn": "Item -> Bom Header",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_016",
+      "from": {
+        "entity": "item_revision",
+        "field": "item_revision_id"
+      },
+      "to": {
+        "entity": "bom_header",
+        "field": "item_revision_id"
+      },
+      "type": "one_to_many",
+      "label": "Item Revision → BOM",
+      "labelEn": "Item Revision -> Bom Header",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_017",
+      "from": {
+        "entity": "item",
+        "field": "item_id"
+      },
+      "to": {
+        "entity": "routing_header",
+        "field": "item_id"
+      },
+      "type": "one_to_many",
+      "label": "Item → Routing",
+      "labelEn": "Item -> Routing Header",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_018",
+      "from": {
+        "entity": "routing_header",
+        "field": "routing_id"
+      },
+      "to": {
+        "entity": "routing_operation",
+        "field": "routing_id"
+      },
+      "type": "one_to_many",
+      "label": "Routing → Công đoạn routing",
+      "labelEn": "Routing Header -> Routing Operation",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_019",
+      "from": {
+        "entity": "routing_header",
+        "field": "routing_id"
+      },
+      "to": {
+        "entity": "work_order",
+        "field": "routing_id"
+      },
+      "type": "one_to_many",
+      "label": "Routing → WO",
+      "labelEn": "Routing Header -> Work Order",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_020",
+      "from": {
+        "entity": "bom_header",
+        "field": "bom_id"
+      },
+      "to": {
+        "entity": "work_order",
+        "field": "bom_id"
+      },
+      "type": "one_to_many",
+      "label": "BOM → WO",
+      "labelEn": "Bom Header -> Work Order",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_021",
+      "from": {
+        "entity": "fai",
+        "field": "fai_id"
+      },
+      "to": {
+        "entity": "item_revision",
+        "field": "item_revision_id"
+      },
+      "type": "many_to_one",
+      "label": "FAI → Item Revision",
+      "labelEn": "FAI -> Item Revision",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_022",
+      "from": {
+        "entity": "fai",
+        "field": "fai_id"
+      },
+      "to": {
+        "entity": "doc_master",
+        "field": "fai_id"
+      },
+      "type": "one_to_many",
+      "label": "FAI → Gói tài liệu",
+      "labelEn": "FAI -> Doc Master",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_023",
+      "from": {
+        "entity": "fmea",
+        "field": "fmea_id"
+      },
+      "to": {
+        "entity": "control_plan",
+        "field": "fmea_id"
+      },
+      "type": "one_to_many",
+      "label": "FMEA → Control Plan",
+      "labelEn": "FMEA -> Control Plan",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_024",
+      "from": {
+        "entity": "control_plan",
+        "field": "control_plan_id"
+      },
+      "to": {
+        "entity": "inspection_plan",
+        "field": "control_plan_id"
+      },
+      "type": "one_to_many",
+      "label": "Control Plan → Inspection Plan",
+      "labelEn": "Control Plan -> Inspection Plan",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_025",
+      "from": {
+        "entity": "inspection_plan",
+        "field": "inspection_plan_id"
+      },
+      "to": {
+        "entity": "spc_chart",
+        "field": "inspection_plan_id"
+      },
+      "type": "one_to_many",
+      "label": "Inspection Plan → SPC",
+      "labelEn": "Inspection Plan -> SPC Chart",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_026",
+      "from": {
+        "entity": "supplier",
+        "field": "supplier_id"
+      },
+      "to": {
+        "entity": "asl_entry",
+        "field": "supplier_id"
+      },
+      "type": "one_to_many",
+      "label": "Supplier → ASL",
+      "labelEn": "Supplier -> Asl Entry",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_027",
+      "from": {
+        "entity": "supplier",
+        "field": "supplier_id"
+      },
+      "to": {
+        "entity": "supplier_scorecard",
+        "field": "supplier_id"
+      },
+      "type": "one_to_many",
+      "label": "Supplier → Scorecard",
+      "labelEn": "Supplier -> Supplier Scorecard",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_028",
+      "from": {
+        "entity": "supplier_scorecard",
+        "field": "scorecard_id"
+      },
+      "to": {
+        "entity": "scar",
+        "field": "scorecard_id"
+      },
+      "type": "one_to_many",
+      "label": "Scorecard → SCAR",
+      "labelEn": "Supplier Scorecard -> Scar",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_029",
+      "from": {
+        "entity": "quote",
+        "field": "quote_id"
+      },
+      "to": {
+        "entity": "sales_order",
+        "field": "source_quote_id"
+      },
+      "type": "one_to_one",
+      "label": "Quote → SO conversion",
+      "labelEn": "Quote -> Sales Order",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_030",
+      "from": {
+        "entity": "calibration_record",
+        "field": "calibration_id"
+      },
+      "to": {
+        "entity": "equipment",
+        "field": "equipment_id"
+      },
+      "type": "many_to_one",
+      "label": "Hiệu chuẩn → Thiết bị",
+      "labelEn": "Calibration Record -> Equipment",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_031",
+      "from": {
+        "entity": "equipment",
+        "field": "equipment_id"
+      },
+      "to": {
+        "entity": "measurement_record",
+        "field": "equipment_id"
+      },
+      "type": "one_to_many",
+      "label": "Thiết bị → Kết quả đo",
+      "labelEn": "Equipment -> Measurement Record",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_032",
+      "from": {
+        "entity": "measurement_record",
+        "field": "measurement_id"
+      },
+      "to": {
+        "entity": "spc_chart",
+        "field": "measurement_id"
+      },
+      "type": "one_to_many",
+      "label": "Đo lường → SPC",
+      "labelEn": "Measurement Record -> SPC Chart",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_033",
+      "from": {
+        "entity": "sales_order",
+        "field": "so_id"
+      },
+      "to": {
+        "entity": "shipment_release",
+        "field": "sales_order_id"
+      },
+      "type": "one_to_many",
+      "label": "SO → Phát hành giao hàng",
+      "labelEn": "Sales Order -> Shipment Release",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_034",
+      "from": {
+        "entity": "shipment_release",
+        "field": "shipment_release_id"
+      },
+      "to": {
+        "entity": "evidence",
+        "field": "shipment_release_id"
+      },
+      "type": "one_to_many",
+      "label": "Phát hành giao hàng → Bằng chứng",
+      "labelEn": "Shipment Release -> Evidence",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_035",
+      "from": {
+        "entity": "document",
+        "field": "doc_id"
+      },
+      "to": {
+        "entity": "training_assignment",
+        "field": "doc_id"
+      },
+      "type": "one_to_many",
+      "label": "Tài liệu → Đào tạo",
+      "labelEn": "Document -> Training Assignment",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_036",
+      "from": {
+        "entity": "training_assignment",
+        "field": "training_id"
+      },
+      "to": {
+        "entity": "user_profile",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Đào tạo → Người dùng",
+      "labelEn": "Training Assignment -> User Profile",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_037",
+      "from": {
+        "entity": "integration_monitor",
+        "field": "integration_id"
+      },
+      "to": {
+        "entity": "audit_log",
+        "field": "integration_id"
+      },
+      "type": "one_to_many",
+      "label": "Tích hợp → Nhật ký kiểm soát",
+      "labelEn": "Integration Monitor -> Audit Log",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_038",
+      "from": {
+        "entity": "special_process",
+        "field": "special_process_id"
+      },
+      "to": {
+        "entity": "purchase_order",
+        "field": "special_process_id"
+      },
+      "type": "one_to_many",
+      "label": "Công đoạn đặc biệt → PO ngoài công",
+      "labelEn": "Special Process -> Purchase Order",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_039",
+      "from": {
+        "entity": "supplier",
+        "field": "supplier_id"
+      },
+      "to": {
+        "entity": "special_process",
+        "field": "supplier_id"
+      },
+      "type": "one_to_many",
+      "label": "Supplier → Công đoạn đặc biệt",
+      "labelEn": "Supplier -> Special Process",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_040",
+      "from": {
+        "entity": "work_order_operation",
+        "field": "operation_id"
+      },
+      "to": {
+        "entity": "special_process",
+        "field": "operation_id"
+      },
+      "type": "one_to_many",
+      "label": "Công đoạn → Công đoạn đặc biệt",
+      "labelEn": "Work Order Operation -> Special Process",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_041",
+      "from": {
+        "entity": "work_order",
+        "field": "wo_id"
+      },
+      "to": {
+        "entity": "fai",
+        "field": "work_order_id"
+      },
+      "type": "one_to_many",
+      "label": "WO → FAI",
+      "labelEn": "Work Order -> FAI",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_042",
+      "from": {
+        "entity": "work_order",
+        "field": "wo_id"
+      },
+      "to": {
+        "entity": "ncr",
+        "field": "work_order_id"
+      },
+      "type": "one_to_many",
+      "label": "WO → NCR",
+      "labelEn": "Work Order -> NCR",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_043",
+      "from": {
+        "entity": "work_order_material",
+        "field": "lot_id"
+      },
+      "to": {
+        "entity": "lot",
+        "field": "lot_id"
+      },
+      "type": "many_to_one",
+      "label": "Vật liệu WO → Lô",
+      "labelEn": "Work Order Material -> Lot",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_044",
+      "from": {
+        "entity": "lot",
+        "field": "parent_lot_id"
+      },
+      "to": {
+        "entity": "lot",
+        "field": "lot_id"
+      },
+      "type": "many_to_one",
+      "label": "Lô cha → Lô con",
+      "labelEn": "Lot -> Lot",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_045",
+      "from": {
+        "entity": "lot",
+        "field": "lot_id"
+      },
+      "to": {
+        "entity": "evidence",
+        "field": "lot_id"
+      },
+      "type": "one_to_many",
+      "label": "Lô → Bằng chứng",
+      "labelEn": "Lot -> Evidence",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_046",
+      "from": {
+        "entity": "work_order_operation",
+        "field": "operation_id"
+      },
+      "to": {
+        "entity": "machine_setup",
+        "field": "operation_id"
+      },
+      "type": "one_to_one",
+      "label": "Công đoạn → Setup máy",
+      "labelEn": "Work Order Operation -> Machine Setup",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_047",
+      "from": {
+        "entity": "machine_setup",
+        "field": "setup_id"
+      },
+      "to": {
+        "entity": "tool_management",
+        "field": "setup_id"
+      },
+      "type": "one_to_many",
+      "label": "Setup máy → Dao cụ",
+      "labelEn": "Machine Setup -> Tool Management",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_048",
+      "from": {
+        "entity": "tool_management",
+        "field": "tool_id"
+      },
+      "to": {
+        "entity": "evidence",
+        "field": "tool_id"
+      },
+      "type": "one_to_many",
+      "label": "Dao cụ → Bằng chứng",
+      "labelEn": "Tool Management -> Evidence",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_049",
+      "from": {
+        "entity": "customer_complaint",
+        "field": "complaint_id"
+      },
+      "to": {
+        "entity": "ncr",
+        "field": "customer_complaint_id"
+      },
+      "type": "one_to_many",
+      "label": "Khiếu nại → NCR",
+      "labelEn": "Customer Complaint -> NCR",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_050",
+      "from": {
+        "entity": "customer_complaint",
+        "field": "complaint_id"
+      },
+      "to": {
+        "entity": "capa",
+        "field": "customer_complaint_id"
+      },
+      "type": "one_to_many",
+      "label": "Khiếu nại → CAPA",
+      "labelEn": "Customer Complaint -> CAPA",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_051",
+      "from": {
+        "entity": "ecn",
+        "field": "ecn_id"
+      },
+      "to": {
+        "entity": "item_revision",
+        "field": "ecn_id"
+      },
+      "type": "one_to_many",
+      "label": "ECN → Item Revision",
+      "labelEn": "Ecn -> Item Revision",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_052",
+      "from": {
+        "entity": "ecn",
+        "field": "ecn_id"
+      },
+      "to": {
+        "entity": "bom_header",
+        "field": "ecn_id"
+      },
+      "type": "one_to_many",
+      "label": "ECN → BOM",
+      "labelEn": "Ecn -> Bom Header",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_053",
+      "from": {
+        "entity": "ecn",
+        "field": "ecn_id"
+      },
+      "to": {
+        "entity": "routing_header",
+        "field": "ecn_id"
+      },
+      "type": "one_to_many",
+      "label": "ECN → Routing",
+      "labelEn": "Ecn -> Routing Header",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_054",
+      "from": {
+        "entity": "supplier_audit",
+        "field": "audit_id"
+      },
+      "to": {
+        "entity": "audit_finding",
+        "field": "supplier_audit_id"
+      },
+      "type": "one_to_many",
+      "label": "Đánh giá NCC → Điểm không phù hợp",
+      "labelEn": "Supplier Audit -> Audit Finding",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_055",
+      "from": {
+        "entity": "audit_finding",
+        "field": "finding_id"
+      },
+      "to": {
+        "entity": "capa",
+        "field": "audit_finding_id"
+      },
+      "type": "one_to_many",
+      "label": "Điểm đánh giá → CAPA",
+      "labelEn": "Audit Finding -> CAPA",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_056",
+      "from": {
+        "entity": "audit_finding",
+        "field": "finding_id"
+      },
+      "to": {
+        "entity": "scar",
+        "field": "audit_finding_id"
+      },
+      "type": "one_to_many",
+      "label": "Điểm đánh giá → SCAR",
+      "labelEn": "Audit Finding -> Scar",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_057",
+      "from": {
+        "entity": "ppap",
+        "field": "ppap_id"
+      },
+      "to": {
+        "entity": "fai",
+        "field": "ppap_id"
+      },
+      "type": "one_to_many",
+      "label": "PPAP → FAI",
+      "labelEn": "Ppap -> FAI",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_058",
+      "from": {
+        "entity": "ppap",
+        "field": "ppap_id"
+      },
+      "to": {
+        "entity": "control_plan",
+        "field": "ppap_id"
+      },
+      "type": "one_to_many",
+      "label": "PPAP → Control Plan",
+      "labelEn": "Ppap -> Control Plan",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_059",
+      "from": {
+        "entity": "ppap",
+        "field": "ppap_id"
+      },
+      "to": {
+        "entity": "evidence",
+        "field": "ppap_id"
+      },
+      "type": "one_to_many",
+      "label": "PPAP → Bằng chứng",
+      "labelEn": "Ppap -> Evidence",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_060",
+      "from": {
+        "entity": "ncr",
+        "field": "ncr_id"
+      },
+      "to": {
+        "entity": "deviation",
+        "field": "ncr_id"
+      },
+      "type": "one_to_many",
+      "label": "NCR → Sai lệch / miễn trừ",
+      "labelEn": "NCR -> Deviation",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_061",
+      "from": {
+        "entity": "deviation",
+        "field": "deviation_id"
+      },
+      "to": {
+        "entity": "shipment_release",
+        "field": "deviation_id"
+      },
+      "type": "one_to_many",
+      "label": "Miễn trừ → Phát hành giao hàng",
+      "labelEn": "Deviation -> Shipment Release",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_062",
+      "from": {
+        "entity": "supplier",
+        "field": "supplier_id"
+      },
+      "to": {
+        "entity": "receiving_inspection",
+        "field": "supplier_id"
+      },
+      "type": "one_to_many",
+      "label": "Supplier → Kiểm tra đầu vào",
+      "labelEn": "Supplier -> Receiving Inspection",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_063",
+      "from": {
+        "entity": "supplier",
+        "field": "supplier_id"
+      },
+      "to": {
+        "entity": "goods_receipt",
+        "field": "supplier_id"
+      },
+      "type": "one_to_many",
+      "label": "Supplier → Phiếu nhập",
+      "labelEn": "Supplier -> Goods Receipt",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_064",
+      "from": {
+        "entity": "sales_order",
+        "field": "so_id"
+      },
+      "to": {
+        "entity": "quote",
+        "field": "sales_order_id"
+      },
+      "type": "many_to_one",
+      "label": "SO → Báo giá gốc",
+      "labelEn": "Sales Order -> Quote",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_065",
+      "from": {
+        "entity": "document",
+        "field": "doc_id"
+      },
+      "to": {
+        "entity": "evidence",
+        "field": "doc_id"
+      },
+      "type": "one_to_many",
+      "label": "Tài liệu → Bằng chứng",
+      "labelEn": "Document -> Evidence",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_066",
+      "from": {
+        "entity": "user_profile",
+        "field": "user_id"
+      },
+      "to": {
+        "entity": "digital_signature",
+        "field": "user_id"
+      },
+      "type": "one_to_many",
+      "label": "Người dùng → Chữ ký số",
+      "labelEn": "User Profile -> Digital Signature",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
+      ]
+    },
+    {
+      "id": "rel_067",
+      "from": {
+        "entity": "retention_policy",
+        "field": "policy_id"
+      },
+      "to": {
+        "entity": "evidence",
+        "field": "retention_policy_id"
+      },
+      "type": "one_to_many",
+      "label": "Chính sách lưu giữ → Bằng chứng",
+      "labelEn": "Retention Policy -> Evidence",
+      "digitalThread": true,
+      "cascadeActions": [
+        "refresh_digital_thread_status"
       ]
     }
   ]
