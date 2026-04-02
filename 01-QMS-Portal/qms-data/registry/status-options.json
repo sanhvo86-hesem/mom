@@ -5781,5 +5781,24 @@
       { "value": "initial_release", "label": "Phát hành lần đầu", "labelEn": "Initial Release", "color": "#16a34a", "icon": "fa-rocket", "allowedTransitionsFrom": ["approved"] },
       { "value": "obsolete", "label": "Lỗi thời", "labelEn": "Obsolete", "color": "#94a3b8", "icon": "fa-ban", "allowedTransitionsFrom": ["approved", "initial_release"] }
     ]
+  },
+  "form_submission_status": {
+    "label": "Trạng thái nộp biểu mẫu",
+    "labelEn": "Form Submission Status",
+    "source": "portal",
+    "standard": "internal",
+    "options": [
+      { "value": "draft", "label": "Bản nháp", "labelEn": "Draft", "color": "#94a3b8", "icon": "fa-pencil", "allowedTransitionsFrom": [] },
+      { "value": "allocated", "label": "Đã cấp mã", "labelEn": "Allocated", "color": "#64748b", "icon": "fa-hashtag", "allowedTransitionsFrom": ["draft"] },
+      { "value": "downloaded", "label": "Đã tải biểu mẫu", "labelEn": "Downloaded", "color": "#6366f1", "icon": "fa-download", "allowedTransitionsFrom": ["allocated"] },
+      { "value": "submitted", "label": "Đã nộp", "labelEn": "Submitted", "color": "#3b82f6", "icon": "fa-paper-plane", "allowedTransitionsFrom": ["downloaded"] },
+      { "value": "received", "label": "Đã tiếp nhận", "labelEn": "Received", "color": "#8b5cf6", "icon": "fa-inbox", "allowedTransitionsFrom": ["submitted"] },
+      { "value": "in_review", "label": "Đang xem xét", "labelEn": "In Review", "color": "#f59e0b", "icon": "fa-eye", "allowedTransitionsFrom": ["received"] },
+      { "value": "approved", "label": "Đã phê duyệt", "labelEn": "Approved", "color": "#16a34a", "icon": "fa-check-circle", "allowedTransitionsFrom": ["in_review"] },
+      { "value": "closed", "label": "Đã đóng", "labelEn": "Closed", "color": "#6b7280", "icon": "fa-lock", "allowedTransitionsFrom": ["approved"] },
+      { "value": "rejected", "label": "Bị từ chối", "labelEn": "Rejected", "color": "#ef4444", "icon": "fa-times-circle", "allowedTransitionsFrom": ["in_review"] },
+      { "value": "voided", "label": "Đã hủy", "labelEn": "Voided", "color": "#dc2626", "icon": "fa-ban", "allowedTransitionsFrom": ["draft", "allocated", "downloaded", "submitted"] },
+      { "value": "pending", "label": "Chờ xử lý", "labelEn": "Pending", "color": "#f59e0b", "icon": "fa-clock", "allowedTransitionsFrom": [] }
+    ]
   }
 }

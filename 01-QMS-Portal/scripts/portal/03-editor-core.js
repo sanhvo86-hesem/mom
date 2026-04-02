@@ -248,12 +248,17 @@ function getDocStatus(doc){
 }
 
 function statusLabel(status){
+  /* Delegate to HmRegistry if available */
+  if(window.HmRegistry){
+    var info = HmRegistry.status('doc_status', status);
+    if(info && info.label && info.label !== status) return (typeof lang!=='undefined'&&lang==='en') ? (info.labelEn||info.label) : info.label;
+  }
   const map={
     draft:T('wf_draft'),
     in_review:T('wf_in_review'),
     pending_approval:T('wf_pending'),
     approved:T('wf_approved'),
-    initial_release:(lang==='en'?'Initial Release':'PhÃ¡t hÃ nh láº§n Ä‘áº§u'),
+    initial_release:(lang==='en'?'Initial Release':'Phát hành lần đầu'),
     obsolete:T('wf_obsolete')
   };
   return map[status]||status;

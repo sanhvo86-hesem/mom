@@ -1052,7 +1052,7 @@ function loadVersionHistory(form){
     }
     el.innerHTML = '<div class="ec-timeline">' + versions.map(function(v, i){
       var isCurrent = i === 0;
-      var statusBadge = v.status === 'approved' ? 'pass' : v.status === 'draft' ? 'info' : v.status === 'superseded' ? 'neutral' : 'warn';
+      var statusBadge = (window.HmRegistry ? (function(){ var s=HmRegistry.status('doc_status',v.status); return s.color==='#16a34a'?'pass':s.color==='#f59e0b'?'info':s.color==='#94a3b8'?'neutral':'warn'; })() : (v.status === 'approved' ? 'pass' : v.status === 'draft' ? 'info' : v.status === 'superseded' ? 'neutral' : 'warn'));
       return '<div class="ec-timeline-item' + (isCurrent ? ' current' : '') + '">' +
         '<div class="ec-timeline-dot"></div>' +
         '<div class="ec-timeline-content">' +

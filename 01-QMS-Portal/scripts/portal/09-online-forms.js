@@ -703,6 +703,13 @@ function renderEscalationBadge(item){
 }
 
 function statusLabel(status){
+  /* Delegate to HmRegistry → 'form_submission_status' or 'doc_status' */
+  if(window.HmRegistry){
+    var info = HmRegistry.status('form_submission_status', status);
+    if(info && info.label && info.label !== status) return (typeof lang!=='undefined'&&lang==='en') ? (info.labelEn||info.label) : info.label;
+    info = HmRegistry.status('doc_status', status);
+    if(info && info.label && info.label !== status) return (typeof lang!=='undefined'&&lang==='en') ? (info.labelEn||info.label) : info.label;
+  }
   var key = String(status || '').trim().toLowerCase();
   var labels = {
     draft: t('Bản nháp', 'Draft'),
@@ -722,6 +729,13 @@ function statusLabel(status){
 }
 
 function renderStatusPill(status){
+  /* Delegate to HmRegistry.badge() if available */
+  if(window.HmRegistry){
+    var badge = HmRegistry.badge('form_submission_status', status);
+    if(badge && badge.indexOf('#6b7280') < 0) return badge;
+    badge = HmRegistry.badge('doc_status', status);
+    if(badge && badge.indexOf('#6b7280') < 0) return badge;
+  }
   var key = String(status || '').trim().toLowerCase();
   var tone = 'info';
   if(key === 'approved' || key === 'closed') tone = 'pass';

@@ -48,11 +48,13 @@ var COPQ_COLORS = {
   external_failure: '#ef4444'
 };
 
-var EVIDENCE_STATUS = {
-  present:  { vi:'\u0110\u1ea1t',      en:'Present', color:'#22c55e', icon:'\u2705' },
-  missing:  { vi:'Thi\u1ebfu',     en:'Missing', color:'#ef4444', icon:'\u274c' },
-  pending:  { vi:'Ch\u1edd',       en:'Pending', color:'#f59e0b', icon:'\u23f3' }
-};
+/* EVIDENCE_STATUS — đọc từ HmRegistry → 'evidence_status' */
+var EVIDENCE_STATUS = (function(){
+  var map = {};
+  if(window.HmRegistry){ HmRegistry.statusSet('evidence_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color,icon:o.icon||''}; }); }
+  if(!Object.keys(map).length){ map = {present:{vi:'Đạt',en:'Present',color:'#22c55e',icon:'✅'},missing:{vi:'Thiếu',en:'Missing',color:'#ef4444',icon:'❌'},pending:{vi:'Chờ',en:'Pending',color:'#f59e0b',icon:'⏳'}}; }
+  return map;
+})();
 
 /* ── state ────────────────────────────────────────────── */
 var state = {
