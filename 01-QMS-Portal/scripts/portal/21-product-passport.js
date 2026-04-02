@@ -29,14 +29,22 @@ var TABS = [
   { key:'trace',   vi:'Truy xuat',      en:'Trace' }
 ];
 
-var STATUS = {
-  draft:       { vi:'Nhap',        en:'Draft',       color:'#94a3b8' },
-  active:      { vi:'Hoat dong',   en:'Active',      color:'#3b82f6' },
-  shipped:     { vi:'Da giao',     en:'Shipped',     color:'#10b981' },
-  in_service:  { vi:'Dang su dung', en:'In Service', color:'#8b5cf6' },
-  end_of_life: { vi:'Het han',     en:'End of Life', color:'#6b7280' },
-  recalled:    { vi:'Thu hoi',     en:'Recalled',    color:'#ef4444' }
-};
+/* STATUS — đọc từ HmRegistry → 'dpp_status' */
+var STATUS = (function(){
+  var map = {};
+  if(window.HmRegistry){
+    var opts = HmRegistry.statusSet('dpp_status');
+    opts.forEach(function(o){ map[o.value] = { vi:o.label, en:o.labelEn, color:o.color }; });
+  }
+  if(!Object.keys(map).length){
+    map = {
+      draft:{vi:'Nháp',en:'Draft',color:'#94a3b8'}, active:{vi:'Hoạt động',en:'Active',color:'#3b82f6'},
+      shipped:{vi:'Đã giao',en:'Shipped',color:'#10b981'}, in_service:{vi:'Đang sử dụng',en:'In Service',color:'#8b5cf6'},
+      end_of_life:{vi:'Hết hạn',en:'End of Life',color:'#6b7280'}, recalled:{vi:'Thu hồi',en:'Recalled',color:'#ef4444'}
+    };
+  }
+  return map;
+})();
 
 var EVENT_TYPES = {
   material_received: { vi:'Nhan vat lieu',  en:'Material Received', icon:'\ud83d\udce6' },
@@ -124,6 +132,7 @@ function _ensureStyles(){
 
 /* ── badge / KPI helpers ─────────────────────────────── */
 function _statusBadge(status){
+  if(window.HmRegistry) return HmRegistry.badge('dpp_status', status);
   var m=STATUS[status]||{vi:status,en:status,color:'#64748b'};
   return '<span class="pp-badge" style="background:'+m.color+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }

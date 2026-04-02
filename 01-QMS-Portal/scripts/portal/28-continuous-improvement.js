@@ -46,13 +46,13 @@ var SUGGESTION_CATEGORIES = {
   ergonomics:   { vi:'Ergonomics',   en:'Ergonomics',    color:'#8b5cf6' }
 };
 
-var SUG_STATUS = {
-  submitted: { vi:'Da gui',       en:'Submitted',  color:'#3b82f6' },
-  reviewing: { vi:'Dang xem xet', en:'Reviewing',  color:'#f59e0b' },
-  approved:  { vi:'Chap nhan',    en:'Approved',   color:'#22c55e' },
-  rejected:  { vi:'Tu choi',      en:'Rejected',   color:'#94a3b8' },
-  implemented:{ vi:'Da thuc hien', en:'Implemented', color:'#10b981' }
-};
+/* SUG_STATUS — đọc từ HmRegistry → 'suggestion_status' */
+var SUG_STATUS = (function(){
+  var map = {};
+  if(window.HmRegistry){ HmRegistry.statusSet('suggestion_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color}; }); }
+  if(!Object.keys(map).length){ map = {submitted:{vi:'Đã gửi',en:'Submitted',color:'#3b82f6'},reviewing:{vi:'Đang xem xét',en:'Reviewing',color:'#f59e0b'},approved:{vi:'Chấp nhận',en:'Approved',color:'#22c55e'},rejected:{vi:'Từ chối',en:'Rejected',color:'#94a3b8'},implemented:{vi:'Đã thực hiện',en:'Implemented',color:'#10b981'}}; }
+  return map;
+})();
 
 /* -- state ---------------------------------------------------- */
 var state = {

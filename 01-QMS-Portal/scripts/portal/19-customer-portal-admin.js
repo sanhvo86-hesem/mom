@@ -29,20 +29,21 @@ var TABS = [
   { key:'analytics',  vi:'Phân tích',        en:'Analytics' }
 ];
 
-var USER_STATUS = {
-  active:      { vi:'Hoạt động',    en:'Active',      color:'#22c55e' },
-  pending:     { vi:'Chờ xác nhận', en:'Pending',     color:'#f59e0b' },
-  deactivated: { vi:'Vô hiệu',     en:'Deactivated', color:'#94a3b8' },
-  locked:      { vi:'Bị khóa',     en:'Locked',      color:'#ef4444' }
-};
+/* USER_STATUS — đọc từ HmRegistry → 'customer_portal_user_status' */
+var USER_STATUS = (function(){
+  var map = {};
+  if(window.HmRegistry){ HmRegistry.statusSet('customer_portal_user_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color}; }); }
+  if(!Object.keys(map).length){ map = {active:{vi:'Hoạt động',en:'Active',color:'#22c55e'},pending:{vi:'Chờ xác nhận',en:'Pending',color:'#f59e0b'},deactivated:{vi:'Vô hiệu',en:'Deactivated',color:'#94a3b8'},locked:{vi:'Bị khóa',en:'Locked',color:'#ef4444'}}; }
+  return map;
+})();
 
-var COMPLAINT_STATUS = {
-  new:         { vi:'Mới',         en:'New',         color:'#3b82f6' },
-  acknowledged:{ vi:'Đã nhận',     en:'Acknowledged', color:'#f59e0b' },
-  investigating:{ vi:'Đang xử lý', en:'Investigating', color:'#8b5cf6' },
-  resolved:    { vi:'Đã giải quyết', en:'Resolved',  color:'#22c55e' },
-  closed:      { vi:'Đóng',        en:'Closed',      color:'#6b7280' }
-};
+/* COMPLAINT_STATUS — đọc từ HmRegistry → 'complaint_status' */
+var COMPLAINT_STATUS = (function(){
+  var map = {};
+  if(window.HmRegistry){ HmRegistry.statusSet('complaint_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color}; }); }
+  if(!Object.keys(map).length){ map = {new:{vi:'Mới',en:'New',color:'#3b82f6'},acknowledged:{vi:'Đã nhận',en:'Acknowledged',color:'#f59e0b'},investigating:{vi:'Đang xử lý',en:'Investigating',color:'#8b5cf6'},resolved:{vi:'Đã giải quyết',en:'Resolved',color:'#22c55e'},closed:{vi:'Đóng',en:'Closed',color:'#6b7280'}}; }
+  return map;
+})();
 
 /* ── state ────────────────────────────────────────────── */
 var state = {

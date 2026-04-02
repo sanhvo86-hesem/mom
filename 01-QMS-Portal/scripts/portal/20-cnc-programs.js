@@ -29,20 +29,39 @@ var TABS = [
   { key:'approval', vi:'Duyet',            en:'Approval Queue' }
 ];
 
-var STATUS = {
-  draft:      { vi:'Nhap',       en:'Draft',      color:'#94a3b8' },
-  in_review:  { vi:'Dang duyet', en:'In Review',  color:'#3b82f6' },
-  approved:   { vi:'Da duyet',   en:'Approved',   color:'#8b5cf6' },
-  released:   { vi:'Phat hanh',  en:'Released',   color:'#10b981' },
-  superseded: { vi:'Thay the',   en:'Superseded', color:'#f59e0b' },
-  obsolete:   { vi:'Loi thoi',   en:'Obsolete',   color:'#6b7280' }
-};
+/* STATUS — đọc từ HmRegistry (status-options.json → 'cnc_program_status') */
+var STATUS = (function(){
+  var map = {};
+  if(window.HmRegistry){
+    var opts = HmRegistry.statusSet('cnc_program_status');
+    opts.forEach(function(o){ map[o.value] = { vi:o.label, en:o.labelEn, color:o.color }; });
+  }
+  if(!Object.keys(map).length){
+    map = {
+      draft:{vi:'Nháp',en:'Draft',color:'#94a3b8'}, in_review:{vi:'Đang duyệt',en:'In Review',color:'#3b82f6'},
+      approved:{vi:'Đã duyệt',en:'Approved',color:'#8b5cf6'}, released:{vi:'Phát hành',en:'Released',color:'#10b981'},
+      superseded:{vi:'Thay thế',en:'Superseded',color:'#f59e0b'}, obsolete:{vi:'Lỗi thời',en:'Obsolete',color:'#6b7280'}
+    };
+  }
+  return map;
+})();
 
-var APPROVAL_RESULT = {
-  approved:   { vi:'Chap nhan',    en:'Approved',   color:'#22c55e' },
-  rejected:   { vi:'Tu choi',      en:'Rejected',   color:'#ef4444' },
-  conditional:{ vi:'Co dieu kien',  en:'Conditional', color:'#f59e0b' }
-};
+/* APPROVAL_RESULT — đọc từ HmRegistry → 'cnc_approval_result' */
+var APPROVAL_RESULT = (function(){
+  var map = {};
+  if(window.HmRegistry){
+    var opts = HmRegistry.statusSet('cnc_approval_result');
+    opts.forEach(function(o){ map[o.value] = { vi:o.label, en:o.labelEn, color:o.color }; });
+  }
+  if(!Object.keys(map).length){
+    map = {
+      approved:{vi:'Chấp nhận',en:'Approved',color:'#22c55e'},
+      rejected:{vi:'Từ chối',en:'Rejected',color:'#ef4444'},
+      conditional:{vi:'Có điều kiện',en:'Conditional',color:'#f59e0b'}
+    };
+  }
+  return map;
+})();
 
 /* ── state ────────────────────────────────────────────── */
 var state = {
@@ -114,10 +133,12 @@ function _ensureStyles(){
 
 /* ── badge helpers ────────────────────────────────────── */
 function _statusBadge(status){
+  if(window.HmRegistry) return HmRegistry.badge('cnc_program_status', status);
   var m=STATUS[status]||{vi:status,en:status,color:'#64748b'};
   return '<span class="nc-badge" style="background:'+m.color+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }
 function _approvalBadge(result){
+  if(window.HmRegistry) return HmRegistry.badge('cnc_approval_result', result);
   var m=APPROVAL_RESULT[result]||{vi:result,en:result,color:'#64748b'};
   return '<span class="nc-badge" style="background:'+m.color+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }

@@ -36,28 +36,29 @@ var RATING = {
   suspended:  { vi:'Đình chỉ',    en:'Suspended',  color:'#94a3b8' }
 };
 
-var SCAR_STATUS = {
-  issued:      { vi:'Đã phát hành', en:'Issued',      color:'#ef4444' },
-  acknowledged:{ vi:'Đã nhận',      en:'Acknowledged', color:'#f59e0b' },
-  root_cause:  { vi:'Phân tích NC',  en:'Root Cause',  color:'#8b5cf6' },
-  corrective:  { vi:'Hành động KP',  en:'Corrective',  color:'#3b82f6' },
-  verify:      { vi:'Xác minh',     en:'Verify',      color:'#06b6d4' },
-  closed:      { vi:'Đóng',         en:'Closed',      color:'#22c55e' }
-};
+/* SCAR_STATUS — đọc từ HmRegistry → 'scar_status' */
+var SCAR_STATUS = (function(){
+  var map = {};
+  if(window.HmRegistry){ HmRegistry.statusSet('scar_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color}; }); }
+  if(!Object.keys(map).length){ map = {issued:{vi:'Đã phát hành',en:'Issued',color:'#ef4444'},acknowledged:{vi:'Đã nhận',en:'Acknowledged',color:'#f59e0b'},root_cause:{vi:'Phân tích NC',en:'Root Cause',color:'#8b5cf6'},corrective:{vi:'Hành động KP',en:'Corrective',color:'#3b82f6'},verify:{vi:'Xác minh',en:'Verify',color:'#06b6d4'},closed:{vi:'Đóng',en:'Closed',color:'#22c55e'}}; }
+  return map;
+})();
 
-var AUDIT_STATUS = {
-  planned:    { vi:'Đã lên lịch', en:'Planned',    color:'#94a3b8' },
-  in_progress:{ vi:'Đang thực hiện', en:'In Progress', color:'#f59e0b' },
-  completed:  { vi:'Hoàn thành',  en:'Completed',  color:'#22c55e' },
-  cancelled:  { vi:'Đã hủy',     en:'Cancelled',  color:'#6b7280' }
-};
+/* AUDIT_STATUS — đọc từ HmRegistry → 'supplier_audit_status' */
+var AUDIT_STATUS = (function(){
+  var map = {};
+  if(window.HmRegistry){ HmRegistry.statusSet('supplier_audit_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color}; }); }
+  if(!Object.keys(map).length){ map = {planned:{vi:'Đã lên lịch',en:'Planned',color:'#94a3b8'},in_progress:{vi:'Đang thực hiện',en:'In Progress',color:'#f59e0b'},completed:{vi:'Hoàn thành',en:'Completed',color:'#22c55e'},cancelled:{vi:'Đã hủy',en:'Cancelled',color:'#6b7280'}}; }
+  return map;
+})();
 
-var INSPECTION_STATUS = {
-  pending:  { vi:'Chờ kiểm',  en:'Pending',  color:'#94a3b8' },
-  pass:     { vi:'Đạt',       en:'Pass',     color:'#22c55e' },
-  fail:     { vi:'Không đạt', en:'Fail',     color:'#ef4444' },
-  conditional:{ vi:'Có điều kiện', en:'Conditional', color:'#f59e0b' }
-};
+/* INSPECTION_STATUS — đọc từ HmRegistry → 'incoming_inspection_status' */
+var INSPECTION_STATUS = (function(){
+  var map = {};
+  if(window.HmRegistry){ HmRegistry.statusSet('incoming_inspection_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color}; }); }
+  if(!Object.keys(map).length){ map = {pending:{vi:'Chờ kiểm',en:'Pending',color:'#94a3b8'},pass:{vi:'Đạt',en:'Pass',color:'#22c55e'},fail:{vi:'Không đạt',en:'Fail',color:'#ef4444'},conditional:{vi:'Có điều kiện',en:'Conditional',color:'#f59e0b'}}; }
+  return map;
+})();
 
 var RADAR_AXES = [
   { key:'quality',   vi:'Chất lượng', en:'Quality' },

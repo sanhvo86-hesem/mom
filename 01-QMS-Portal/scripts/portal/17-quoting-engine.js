@@ -28,15 +28,24 @@ var TABS = [
   { key:'dashboard', vi:'Phân tích',      en:'Dashboard' }
 ];
 
-var QUOTE_STATUS = {
-  draft:     { vi:'Nháp',        en:'Draft',      color:'#94a3b8' },
-  sent:      { vi:'Đã gửi',      en:'Sent',       color:'#3b82f6' },
-  review:    { vi:'Đang xem xét', en:'In Review',  color:'#8b5cf6' },
-  accepted:  { vi:'Chấp nhận',    en:'Accepted',   color:'#22c55e' },
-  rejected:  { vi:'Từ chối',      en:'Rejected',   color:'#ef4444' },
-  expired:   { vi:'Hết hạn',      en:'Expired',    color:'#6b7280' },
-  converted: { vi:'Đã chuyển SO',  en:'Converted',  color:'#10b981' }
-};
+/* QUOTE_STATUS — đọc từ HmRegistry (status-options.json → 'quote_status') */
+var QUOTE_STATUS = (function(){
+  var map = {};
+  if(window.HmRegistry){
+    var opts = HmRegistry.statusSet('quote_status');
+    opts.forEach(function(o){ map[o.value] = { vi:o.label, en:o.labelEn, color:o.color }; });
+  }
+  if(!Object.keys(map).length){
+    /* fallback nếu HmRegistry chưa load */
+    map = {
+      draft:{vi:'Nháp',en:'Draft',color:'#94a3b8'}, sent:{vi:'Đã gửi',en:'Sent',color:'#3b82f6'},
+      review:{vi:'Đang xem xét',en:'In Review',color:'#8b5cf6'}, accepted:{vi:'Chấp nhận',en:'Accepted',color:'#22c55e'},
+      rejected:{vi:'Từ chối',en:'Rejected',color:'#ef4444'}, expired:{vi:'Hết hạn',en:'Expired',color:'#6b7280'},
+      converted:{vi:'Đã chuyển SO',en:'Converted',color:'#10b981'}
+    };
+  }
+  return map;
+})();
 
 /* ── state ────────────────────────────────────────────── */
 var state = {
@@ -112,6 +121,7 @@ function _ensureStyles(){
 
 /* ── badge / margin helpers ───────────────────────────── */
 function _statusBadge(status){
+  if(window.HmRegistry) return HmRegistry.badge('quote_status', status);
   var m=QUOTE_STATUS[status]||{vi:status,en:status,color:'#64748b'};
   return '<span class="qe-badge" style="background:'+m.color+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }

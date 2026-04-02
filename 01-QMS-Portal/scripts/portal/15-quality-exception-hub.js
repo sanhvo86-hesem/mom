@@ -46,13 +46,13 @@ var SEVERITY = {
   safety:   { vi:'An toàn',    en:'Safety',   color:'#000000' }
 };
 
-var STATUS = {
-  open:           { vi:'Mở',            en:'Open',           color:'#ef4444' },
-  in_progress:    { vi:'Đang xử lý',    en:'In Progress',    color:'#f59e0b' },
-  pending_review: { vi:'Chờ duyệt',     en:'Pending Review', color:'#8b5cf6' },
-  closed:         { vi:'Đóng',          en:'Closed',         color:'#22c55e' },
-  rejected:       { vi:'Từ chối',       en:'Rejected',       color:'#94a3b8' }
-};
+/* STATUS — đọc từ HmRegistry → 'exception_status' */
+var STATUS = (function(){
+  var map = {};
+  if(window.HmRegistry){ HmRegistry.statusSet('exception_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color}; }); }
+  if(!Object.keys(map).length){ map = {open:{vi:'Mở',en:'Open',color:'#ef4444'},in_progress:{vi:'Đang xử lý',en:'In Progress',color:'#f59e0b'},pending_review:{vi:'Chờ duyệt',en:'Pending Review',color:'#8b5cf6'},closed:{vi:'Đóng',en:'Closed',color:'#22c55e'},rejected:{vi:'Từ chối',en:'Rejected',color:'#94a3b8'}}; }
+  return map;
+})();
 
 var MRB_DISPOSITIONS = {
   use_as_is: { vi:'Dùng nguyên trạng', en:'Use As-Is', color:'#3b82f6' },

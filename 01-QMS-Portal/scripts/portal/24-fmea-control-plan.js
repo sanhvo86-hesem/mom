@@ -35,26 +35,27 @@ var FMEA_TYPE = {
   pfmea: { vi:'PFMEA', en:'PFMEA', color:'#8b5cf6' }
 };
 
-var FMEA_STATUS = {
-  draft:       { vi:'Nhap',           en:'Draft',       color:'#94a3b8' },
-  in_progress: { vi:'Dang thuc hien', en:'In Progress', color:'#f59e0b' },
-  review:      { vi:'Cho duyet',      en:'Review',      color:'#8b5cf6' },
-  approved:    { vi:'Da duyet',       en:'Approved',    color:'#22c55e' },
-  archived:    { vi:'Luu tru',        en:'Archived',    color:'#6b7280' }
-};
+/* FMEA_STATUS — đọc từ HmRegistry → 'fmea_status' */
+var FMEA_STATUS = (function(){
+  var map = {};
+  if(window.HmRegistry){ HmRegistry.statusSet('fmea_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color}; }); }
+  if(!Object.keys(map).length){ map = {draft:{vi:'Nháp',en:'Draft',color:'#94a3b8'},in_progress:{vi:'Đang thực hiện',en:'In Progress',color:'#f59e0b'},review:{vi:'Chờ duyệt',en:'Review',color:'#8b5cf6'},approved:{vi:'Đã duyệt',en:'Approved',color:'#22c55e'},archived:{vi:'Lưu trữ',en:'Archived',color:'#6b7280'}}; }
+  return map;
+})();
 
 var AP_LEVEL = {
-  HIGH:   { vi:'CAO',        en:'HIGH',   color:'#ef4444', text:'#fff' },
-  MEDIUM: { vi:'TRUNG BINH', en:'MEDIUM', color:'#f59e0b', text:'#1a1a1a' },
-  LOW:    { vi:'THAP',       en:'LOW',    color:'#22c55e', text:'#fff' }
+  HIGH:   { vi:'CAO',          en:'HIGH',   color:'#ef4444', text:'#fff' },
+  MEDIUM: { vi:'TRUNG BÌNH',   en:'MEDIUM', color:'#f59e0b', text:'#1a1a1a' },
+  LOW:    { vi:'THẤP',         en:'LOW',    color:'#22c55e', text:'#fff' }
 };
 
-var ACTION_STATUS = {
-  open:        { vi:'Mo',              en:'Open',        color:'#ef4444' },
-  in_progress: { vi:'Dang thuc hien', en:'In Progress', color:'#f59e0b' },
-  completed:   { vi:'Hoan thanh',     en:'Completed',   color:'#22c55e' },
-  overdue:     { vi:'Qua han',        en:'Overdue',     color:'#dc2626' }
-};
+/* ACTION_STATUS — đọc từ HmRegistry → 'fmea_action_status' */
+var ACTION_STATUS = (function(){
+  var map = {};
+  if(window.HmRegistry){ HmRegistry.statusSet('fmea_action_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color}; }); }
+  if(!Object.keys(map).length){ map = {open:{vi:'Mở',en:'Open',color:'#ef4444'},in_progress:{vi:'Đang thực hiện',en:'In Progress',color:'#f59e0b'},completed:{vi:'Hoàn thành',en:'Completed',color:'#22c55e'},overdue:{vi:'Quá hạn',en:'Overdue',color:'#dc2626'}}; }
+  return map;
+})();
 
 var CP_TYPE = {
   prototype:  { vi:'Prototype',   en:'Prototype',   color:'#3b82f6' },
@@ -62,11 +63,13 @@ var CP_TYPE = {
   production: { vi:'Production',  en:'Production',  color:'#22c55e' }
 };
 
-var CP_STATUS = {
-  draft:    { vi:'Nhap',      en:'Draft',    color:'#94a3b8' },
-  active:   { vi:'Hoat dong', en:'Active',   color:'#22c55e' },
-  archived: { vi:'Luu tru',   en:'Archived', color:'#6b7280' }
-};
+/* CP_STATUS — đọc từ HmRegistry → 'control_plan_status' */
+var CP_STATUS = (function(){
+  var map = {};
+  if(window.HmRegistry){ HmRegistry.statusSet('control_plan_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color}; }); }
+  if(!Object.keys(map).length){ map = {draft:{vi:'Nháp',en:'Draft',color:'#94a3b8'},active:{vi:'Hoạt động',en:'Active',color:'#22c55e'},archived:{vi:'Lưu trữ',en:'Archived',color:'#6b7280'}}; }
+  return map;
+})();
 
 var CLASSIFICATION = {
   CC: { vi:'CC', en:'CC', color:'#ef4444', bg:'#fef2f2' },
@@ -160,6 +163,8 @@ function _typeBadge(type){
   return '<span class="fm-badge" style="background:'+m.color+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }
 function _statusBadge(status){
+  if(window.HmRegistry) return HmRegistry.badge('fmea_status', status);
+  /* legacy fallback below */
   var m=FMEA_STATUS[status]||{vi:status,en:status,color:'#64748b'};
   return '<span class="fm-badge" style="background:'+m.color+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }

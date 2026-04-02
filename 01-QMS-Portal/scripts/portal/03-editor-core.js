@@ -260,7 +260,12 @@ function statusLabel(status){
 }
 
 function statusColor(status){
-  const map={
+  /* Delegate to HmRegistry if available → reads from status-options.json 'doc_status' */
+  if(window.HmRegistry){
+    var info = HmRegistry.status('doc_status', status);
+    if(info && info.color && info.color !== '#6b7280') return info.color;
+  }
+  var map={
     draft:'#f59e0b',
     in_review:'#3b82f6',
     pending_approval:'#8b5cf6',

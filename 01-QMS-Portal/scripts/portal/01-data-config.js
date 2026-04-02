@@ -158,6 +158,30 @@ const ROLES = {
 };
 
 // ═══════════════════════════════════════════════════
+// HmRegistry Integration — Centralized Data Layer
+// Khi HmRegistry sẵn sàng, trigger init để eager load status-options.
+// HmRegistry.badge(setKey, value) thay thế mọi statusBadge() cục bộ.
+// ═══════════════════════════════════════════════════
+if(window.HmRegistry && typeof HmRegistry.init === 'function'){
+  HmRegistry.init();
+}
+
+/**
+ * Global statusBadge helper — delegates to HmRegistry if available.
+ * Tất cả module nên gọi hàm này thay vì tự hardcode switch/case colors.
+ * @param {string} setKey - e.g. 'so_status', 'ncr_status', 'doc_status'
+ * @param {string} value  - e.g. 'draft', 'approved', 'closed'
+ * @returns {string} HTML badge span
+ */
+function hmBadge(setKey, value){
+  if(window.HmRegistry) return HmRegistry.badge(setKey, value);
+  // Fallback nếu HmRegistry chưa load
+  var color = '#6b7280';
+  var label = value || '';
+  return '<span style="display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;color:#fff;background:' + color + '">' + label + '</span>';
+}
+
+// ═══════════════════════════════════════════════════
 // DEPARTMENTS & TITLES (Admin-managed)
 // ═══════════════════════════════════════════════════
 const DEFAULT_DEPARTMENTS = [

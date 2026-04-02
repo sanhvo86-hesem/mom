@@ -345,8 +345,10 @@ function _renderApi(){
   return h;
 }
 
-/* ── Status Badge ────────────────────────────────────────────────────── */
+/* ── Status Badge — delegate to HmRegistry for centralized data ───── */
 function _statusBadge(status){
+  /* HmRegistry.badge returns standardized badge from status-options.json */
+  if(window.HmRegistry && typeof hmBadge === 'function') return hmBadge('doc_status', status);
   var map = {
     approved:  { bg:'var(--green-bg)',  color:'var(--green)',  label:_t('Hoàn thiện','Completed') },
     active:    { bg:'var(--amber-bg)',  color:'var(--amber)',  label:_t('Đang xây dựng','In Progress') },

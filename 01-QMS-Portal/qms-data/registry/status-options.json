@@ -5592,5 +5592,194 @@
         "allowedTransitionsFrom": []
       }
     ]
+  },
+  "cnc_program_status": {
+    "label": "Trạng thái chương trình NC",
+    "labelEn": "NC Program Status",
+    "source": "portal",
+    "standard": "internal",
+    "options": [
+      { "value": "draft", "label": "Nháp", "labelEn": "Draft", "color": "#94a3b8", "icon": "fa-pencil", "allowedTransitionsFrom": [] },
+      { "value": "in_review", "label": "Đang duyệt", "labelEn": "In Review", "color": "#3b82f6", "icon": "fa-eye", "allowedTransitionsFrom": ["draft"] },
+      { "value": "approved", "label": "Đã duyệt", "labelEn": "Approved", "color": "#8b5cf6", "icon": "fa-check", "allowedTransitionsFrom": ["in_review"] },
+      { "value": "released", "label": "Phát hành", "labelEn": "Released", "color": "#10b981", "icon": "fa-rocket", "allowedTransitionsFrom": ["approved"] },
+      { "value": "superseded", "label": "Thay thế", "labelEn": "Superseded", "color": "#f59e0b", "icon": "fa-rotate", "allowedTransitionsFrom": ["released"] },
+      { "value": "obsolete", "label": "Lỗi thời", "labelEn": "Obsolete", "color": "#6b7280", "icon": "fa-ban", "allowedTransitionsFrom": ["released", "superseded"] }
+    ]
+  },
+  "cnc_approval_result": {
+    "label": "Kết quả phê duyệt NC",
+    "labelEn": "NC Approval Result",
+    "source": "portal",
+    "standard": "internal",
+    "options": [
+      { "value": "approved", "label": "Chấp nhận", "labelEn": "Approved", "color": "#22c55e", "icon": "fa-check-circle", "allowedTransitionsFrom": [] },
+      { "value": "rejected", "label": "Từ chối", "labelEn": "Rejected", "color": "#ef4444", "icon": "fa-times-circle", "allowedTransitionsFrom": [] },
+      { "value": "conditional", "label": "Có điều kiện", "labelEn": "Conditional", "color": "#f59e0b", "icon": "fa-exclamation-triangle", "allowedTransitionsFrom": [] }
+    ]
+  },
+  "dpp_status": {
+    "label": "Trạng thái hộ chiếu sản phẩm số",
+    "labelEn": "Digital Product Passport Status",
+    "source": "portal",
+    "standard": "ESPR",
+    "options": [
+      { "value": "draft", "label": "Nháp", "labelEn": "Draft", "color": "#94a3b8", "icon": "fa-pencil", "allowedTransitionsFrom": [] },
+      { "value": "active", "label": "Hoạt động", "labelEn": "Active", "color": "#3b82f6", "icon": "fa-circle-check", "allowedTransitionsFrom": ["draft"] },
+      { "value": "shipped", "label": "Đã giao", "labelEn": "Shipped", "color": "#10b981", "icon": "fa-truck", "allowedTransitionsFrom": ["active"] },
+      { "value": "in_service", "label": "Đang sử dụng", "labelEn": "In Service", "color": "#8b5cf6", "icon": "fa-gear", "allowedTransitionsFrom": ["shipped"] },
+      { "value": "end_of_life", "label": "Hết hạn", "labelEn": "End of Life", "color": "#6b7280", "icon": "fa-clock", "allowedTransitionsFrom": ["in_service"] },
+      { "value": "recalled", "label": "Thu hồi", "labelEn": "Recalled", "color": "#ef4444", "icon": "fa-triangle-exclamation", "allowedTransitionsFrom": ["active", "shipped", "in_service"] }
+    ]
+  },
+  "fmea_status": {
+    "label": "Trạng thái FMEA",
+    "labelEn": "FMEA Status",
+    "source": "portal",
+    "standard": "AIAG",
+    "options": [
+      { "value": "draft", "label": "Nháp", "labelEn": "Draft", "color": "#94a3b8", "icon": "fa-pencil", "allowedTransitionsFrom": [] },
+      { "value": "in_progress", "label": "Đang thực hiện", "labelEn": "In Progress", "color": "#f59e0b", "icon": "fa-spinner", "allowedTransitionsFrom": ["draft"] },
+      { "value": "review", "label": "Chờ duyệt", "labelEn": "Review", "color": "#8b5cf6", "icon": "fa-eye", "allowedTransitionsFrom": ["in_progress"] },
+      { "value": "approved", "label": "Đã duyệt", "labelEn": "Approved", "color": "#22c55e", "icon": "fa-check", "allowedTransitionsFrom": ["review"] },
+      { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "color": "#6b7280", "icon": "fa-archive", "allowedTransitionsFrom": ["approved"] }
+    ]
+  },
+  "fmea_action_status": {
+    "label": "Trạng thái hành động FMEA",
+    "labelEn": "FMEA Action Status",
+    "source": "portal",
+    "standard": "AIAG",
+    "options": [
+      { "value": "open", "label": "Mở", "labelEn": "Open", "color": "#ef4444", "icon": "fa-circle-exclamation", "allowedTransitionsFrom": [] },
+      { "value": "in_progress", "label": "Đang thực hiện", "labelEn": "In Progress", "color": "#f59e0b", "icon": "fa-spinner", "allowedTransitionsFrom": ["open"] },
+      { "value": "completed", "label": "Hoàn thành", "labelEn": "Completed", "color": "#22c55e", "icon": "fa-check", "allowedTransitionsFrom": ["in_progress"] },
+      { "value": "overdue", "label": "Quá hạn", "labelEn": "Overdue", "color": "#dc2626", "icon": "fa-clock", "allowedTransitionsFrom": ["open", "in_progress"] }
+    ]
+  },
+  "control_plan_status": {
+    "label": "Trạng thái kế hoạch kiểm soát",
+    "labelEn": "Control Plan Status",
+    "source": "portal",
+    "standard": "IATF",
+    "options": [
+      { "value": "draft", "label": "Nháp", "labelEn": "Draft", "color": "#94a3b8", "icon": "fa-pencil", "allowedTransitionsFrom": [] },
+      { "value": "active", "label": "Hoạt động", "labelEn": "Active", "color": "#22c55e", "icon": "fa-circle-check", "allowedTransitionsFrom": ["draft"] },
+      { "value": "archived", "label": "Lưu trữ", "labelEn": "Archived", "color": "#6b7280", "icon": "fa-archive", "allowedTransitionsFrom": ["active"] }
+    ]
+  },
+  "apqp_project_status": {
+    "label": "Trạng thái dự án APQP",
+    "labelEn": "APQP Project Status",
+    "source": "portal",
+    "standard": "AIAG",
+    "options": [
+      { "value": "active", "label": "Hoạt động", "labelEn": "Active", "color": "#22c55e", "icon": "fa-circle-check", "allowedTransitionsFrom": [] },
+      { "value": "on_hold", "label": "Tạm dừng", "labelEn": "On Hold", "color": "#f59e0b", "icon": "fa-pause", "allowedTransitionsFrom": ["active"] },
+      { "value": "completed", "label": "Hoàn thành", "labelEn": "Completed", "color": "#3b82f6", "icon": "fa-flag-checkered", "allowedTransitionsFrom": ["active"] },
+      { "value": "cancelled", "label": "Đã hủy", "labelEn": "Cancelled", "color": "#94a3b8", "icon": "fa-ban", "allowedTransitionsFrom": ["active", "on_hold"] }
+    ]
+  },
+  "apqp_element_status": {
+    "label": "Trạng thái phần tử PPAP",
+    "labelEn": "PPAP Element Status",
+    "source": "portal",
+    "standard": "AIAG",
+    "options": [
+      { "value": "not_required", "label": "Không yêu cầu", "labelEn": "Not Required", "color": "#94a3b8", "icon": "fa-minus-circle", "allowedTransitionsFrom": [] },
+      { "value": "pending", "label": "Chờ", "labelEn": "Pending", "color": "#f59e0b", "icon": "fa-clock", "allowedTransitionsFrom": [] },
+      { "value": "submitted", "label": "Đã nộp", "labelEn": "Submitted", "color": "#3b82f6", "icon": "fa-paper-plane", "allowedTransitionsFrom": ["pending"] },
+      { "value": "approved", "label": "Đã duyệt", "labelEn": "Approved", "color": "#22c55e", "icon": "fa-check", "allowedTransitionsFrom": ["submitted"] },
+      { "value": "rejected", "label": "Từ chối", "labelEn": "Rejected", "color": "#ef4444", "icon": "fa-times", "allowedTransitionsFrom": ["submitted"] }
+    ]
+  },
+  "exception_status": {
+    "label": "Trạng thái ngoại lệ chất lượng",
+    "labelEn": "Quality Exception Status",
+    "source": "portal",
+    "standard": "AS9100",
+    "options": [
+      { "value": "open", "label": "Mở", "labelEn": "Open", "color": "#ef4444", "icon": "fa-circle-exclamation", "allowedTransitionsFrom": [] },
+      { "value": "in_progress", "label": "Đang xử lý", "labelEn": "In Progress", "color": "#f59e0b", "icon": "fa-spinner", "allowedTransitionsFrom": ["open"] },
+      { "value": "pending_review", "label": "Chờ duyệt", "labelEn": "Pending Review", "color": "#8b5cf6", "icon": "fa-eye", "allowedTransitionsFrom": ["in_progress"] },
+      { "value": "closed", "label": "Đóng", "labelEn": "Closed", "color": "#22c55e", "icon": "fa-check-circle", "allowedTransitionsFrom": ["pending_review"] },
+      { "value": "rejected", "label": "Từ chối", "labelEn": "Rejected", "color": "#94a3b8", "icon": "fa-times-circle", "allowedTransitionsFrom": ["pending_review"] }
+    ]
+  },
+  "supplier_audit_status": {
+    "label": "Trạng thái đánh giá nhà cung cấp",
+    "labelEn": "Supplier Audit Status",
+    "source": "portal",
+    "standard": "AS9100",
+    "options": [
+      { "value": "planned", "label": "Đã lên lịch", "labelEn": "Planned", "color": "#94a3b8", "icon": "fa-calendar", "allowedTransitionsFrom": [] },
+      { "value": "in_progress", "label": "Đang thực hiện", "labelEn": "In Progress", "color": "#f59e0b", "icon": "fa-spinner", "allowedTransitionsFrom": ["planned"] },
+      { "value": "completed", "label": "Hoàn thành", "labelEn": "Completed", "color": "#22c55e", "icon": "fa-check", "allowedTransitionsFrom": ["in_progress"] },
+      { "value": "cancelled", "label": "Đã hủy", "labelEn": "Cancelled", "color": "#6b7280", "icon": "fa-ban", "allowedTransitionsFrom": ["planned"] }
+    ]
+  },
+  "incoming_inspection_status": {
+    "label": "Trạng thái kiểm tra đầu vào",
+    "labelEn": "Incoming Inspection Status",
+    "source": "portal",
+    "standard": "AS9100",
+    "options": [
+      { "value": "pending", "label": "Chờ kiểm", "labelEn": "Pending", "color": "#94a3b8", "icon": "fa-clock", "allowedTransitionsFrom": [] },
+      { "value": "pass", "label": "Đạt", "labelEn": "Pass", "color": "#22c55e", "icon": "fa-check-circle", "allowedTransitionsFrom": ["pending"] },
+      { "value": "fail", "label": "Không đạt", "labelEn": "Fail", "color": "#ef4444", "icon": "fa-times-circle", "allowedTransitionsFrom": ["pending"] },
+      { "value": "conditional", "label": "Có điều kiện", "labelEn": "Conditional", "color": "#f59e0b", "icon": "fa-exclamation-triangle", "allowedTransitionsFrom": ["pending"] }
+    ]
+  },
+  "complaint_status": {
+    "label": "Trạng thái khiếu nại khách hàng",
+    "labelEn": "Customer Complaint Status",
+    "source": "portal",
+    "standard": "ISO9001",
+    "options": [
+      { "value": "new", "label": "Mới", "labelEn": "New", "color": "#3b82f6", "icon": "fa-plus", "allowedTransitionsFrom": [] },
+      { "value": "acknowledged", "label": "Đã nhận", "labelEn": "Acknowledged", "color": "#f59e0b", "icon": "fa-envelope-open", "allowedTransitionsFrom": ["new"] },
+      { "value": "investigating", "label": "Đang xử lý", "labelEn": "Investigating", "color": "#8b5cf6", "icon": "fa-magnifying-glass", "allowedTransitionsFrom": ["acknowledged"] },
+      { "value": "resolved", "label": "Đã giải quyết", "labelEn": "Resolved", "color": "#22c55e", "icon": "fa-check", "allowedTransitionsFrom": ["investigating"] },
+      { "value": "closed", "label": "Đóng", "labelEn": "Closed", "color": "#6b7280", "icon": "fa-lock", "allowedTransitionsFrom": ["resolved"] }
+    ]
+  },
+  "customer_portal_user_status": {
+    "label": "Trạng thái người dùng cổng khách hàng",
+    "labelEn": "Customer Portal User Status",
+    "source": "portal",
+    "standard": "internal",
+    "options": [
+      { "value": "active", "label": "Hoạt động", "labelEn": "Active", "color": "#22c55e", "icon": "fa-circle-check", "allowedTransitionsFrom": [] },
+      { "value": "pending", "label": "Chờ xác nhận", "labelEn": "Pending", "color": "#f59e0b", "icon": "fa-clock", "allowedTransitionsFrom": [] },
+      { "value": "deactivated", "label": "Vô hiệu", "labelEn": "Deactivated", "color": "#94a3b8", "icon": "fa-user-slash", "allowedTransitionsFrom": ["active"] },
+      { "value": "locked", "label": "Bị khóa", "labelEn": "Locked", "color": "#ef4444", "icon": "fa-lock", "allowedTransitionsFrom": ["active"] }
+    ]
+  },
+  "suggestion_status": {
+    "label": "Trạng thái đề xuất cải tiến",
+    "labelEn": "Improvement Suggestion Status",
+    "source": "portal",
+    "standard": "internal",
+    "options": [
+      { "value": "submitted", "label": "Đã gửi", "labelEn": "Submitted", "color": "#3b82f6", "icon": "fa-paper-plane", "allowedTransitionsFrom": [] },
+      { "value": "reviewing", "label": "Đang xem xét", "labelEn": "Reviewing", "color": "#f59e0b", "icon": "fa-eye", "allowedTransitionsFrom": ["submitted"] },
+      { "value": "approved", "label": "Chấp nhận", "labelEn": "Approved", "color": "#22c55e", "icon": "fa-check", "allowedTransitionsFrom": ["reviewing"] },
+      { "value": "rejected", "label": "Từ chối", "labelEn": "Rejected", "color": "#94a3b8", "icon": "fa-times", "allowedTransitionsFrom": ["reviewing"] },
+      { "value": "implemented", "label": "Đã thực hiện", "labelEn": "Implemented", "color": "#10b981", "icon": "fa-flag-checkered", "allowedTransitionsFrom": ["approved"] }
+    ]
+  },
+  "doc_status": {
+    "label": "Trạng thái tài liệu",
+    "labelEn": "Document Status",
+    "source": "portal",
+    "standard": "ISO9001",
+    "options": [
+      { "value": "draft", "label": "Nháp", "labelEn": "Draft", "color": "#f59e0b", "icon": "fa-pencil", "allowedTransitionsFrom": [] },
+      { "value": "in_review", "label": "Đang xem xét", "labelEn": "In Review", "color": "#3b82f6", "icon": "fa-eye", "allowedTransitionsFrom": ["draft"] },
+      { "value": "pending_approval", "label": "Chờ phê duyệt", "labelEn": "Pending Approval", "color": "#8b5cf6", "icon": "fa-hourglass", "allowedTransitionsFrom": ["in_review"] },
+      { "value": "approved", "label": "Đã phê duyệt", "labelEn": "Approved", "color": "#16a34a", "icon": "fa-check-circle", "allowedTransitionsFrom": ["pending_approval"] },
+      { "value": "initial_release", "label": "Phát hành lần đầu", "labelEn": "Initial Release", "color": "#16a34a", "icon": "fa-rocket", "allowedTransitionsFrom": ["approved"] },
+      { "value": "obsolete", "label": "Lỗi thời", "labelEn": "Obsolete", "color": "#94a3b8", "icon": "fa-ban", "allowedTransitionsFrom": ["approved", "initial_release"] }
+    ]
   }
 }

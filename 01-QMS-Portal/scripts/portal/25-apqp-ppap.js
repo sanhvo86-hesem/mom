@@ -37,41 +37,42 @@ var PHASES = [
   { num:5, vi:'San xuat',           en:'Production',       color:'#6b7280' }
 ];
 
-var PROJECT_STATUS = {
-  active:    { vi:'Hoat dong',  en:'Active',    color:'#22c55e' },
-  on_hold:   { vi:'Tam dung',   en:'On Hold',   color:'#f59e0b' },
-  completed: { vi:'Hoan thanh', en:'Completed', color:'#3b82f6' },
-  cancelled: { vi:'Da huy',     en:'Cancelled', color:'#94a3b8' }
-};
+/* PROJECT_STATUS — đọc từ HmRegistry → 'apqp_project_status' */
+var PROJECT_STATUS = (function(){
+  var map = {};
+  if(window.HmRegistry){ HmRegistry.statusSet('apqp_project_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color}; }); }
+  if(!Object.keys(map).length){ map = {active:{vi:'Hoạt động',en:'Active',color:'#22c55e'},on_hold:{vi:'Tạm dừng',en:'On Hold',color:'#f59e0b'},completed:{vi:'Hoàn thành',en:'Completed',color:'#3b82f6'},cancelled:{vi:'Đã hủy',en:'Cancelled',color:'#94a3b8'}}; }
+  return map;
+})();
 
 var GATE_DECISION = {
-  approved:    { vi:'Duyet',        en:'Approved',    color:'#22c55e' },
-  conditional: { vi:'Co dieu kien', en:'Conditional', color:'#f59e0b' },
-  rejected:    { vi:'Tu choi',      en:'Rejected',    color:'#ef4444' },
-  pending:     { vi:'Cho duyet',    en:'Pending',     color:'#94a3b8' }
+  approved:    { vi:'Duyệt',         en:'Approved',    color:'#22c55e' },
+  conditional: { vi:'Có điều kiện',  en:'Conditional', color:'#f59e0b' },
+  rejected:    { vi:'Từ chối',       en:'Rejected',    color:'#ef4444' },
+  pending:     { vi:'Chờ duyệt',     en:'Pending',     color:'#94a3b8' }
 };
 
 var PPAP_ELEMENTS = [
-  { num:1,  vi:'Ho so thiet ke',       en:'Design Records' },
-  { num:2,  vi:'DFMEA',                en:'DFMEA' },
-  { num:3,  vi:'So do quy trinh',      en:'Process Flow Diagram' },
-  { num:4,  vi:'PFMEA',                en:'PFMEA' },
-  { num:5,  vi:'Control Plan',         en:'Control Plan' },
-  { num:6,  vi:'MSA',                  en:'MSA Studies' },
-  { num:7,  vi:'Ket qua do luong',     en:'Dimensional Results' },
-  { num:8,  vi:'Thu nghiem vat lieu',   en:'Material Test Results' },
-  { num:9,  vi:'Thu nghiem hieu suat',  en:'Performance Test Results' },
-  { num:10, vi:'FAI',                  en:'First Article Inspection' },
-  { num:11, vi:'PSW',                  en:'Part Submission Warrant' }
+  { num:1,  vi:'Hồ sơ thiết kế',         en:'Design Records' },
+  { num:2,  vi:'DFMEA',                   en:'DFMEA' },
+  { num:3,  vi:'Sơ đồ quy trình',        en:'Process Flow Diagram' },
+  { num:4,  vi:'PFMEA',                   en:'PFMEA' },
+  { num:5,  vi:'Control Plan',            en:'Control Plan' },
+  { num:6,  vi:'MSA',                     en:'MSA Studies' },
+  { num:7,  vi:'Kết quả đo lường',        en:'Dimensional Results' },
+  { num:8,  vi:'Thử nghiệm vật liệu',    en:'Material Test Results' },
+  { num:9,  vi:'Thử nghiệm hiệu suất',   en:'Performance Test Results' },
+  { num:10, vi:'FAI',                     en:'First Article Inspection' },
+  { num:11, vi:'PSW',                     en:'Part Submission Warrant' }
 ];
 
-var ELEMENT_STATUS = {
-  not_required: { vi:'Khong yeu cau', en:'Not Required', color:'#94a3b8' },
-  pending:      { vi:'Cho',           en:'Pending',      color:'#f59e0b' },
-  submitted:    { vi:'Da nop',        en:'Submitted',    color:'#3b82f6' },
-  approved:     { vi:'Da duyet',      en:'Approved',     color:'#22c55e' },
-  rejected:     { vi:'Tu choi',       en:'Rejected',     color:'#ef4444' }
-};
+/* ELEMENT_STATUS — đọc từ HmRegistry → 'apqp_element_status' */
+var ELEMENT_STATUS = (function(){
+  var map = {};
+  if(window.HmRegistry){ HmRegistry.statusSet('apqp_element_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color}; }); }
+  if(!Object.keys(map).length){ map = {not_required:{vi:'Không yêu cầu',en:'Not Required',color:'#94a3b8'},pending:{vi:'Chờ',en:'Pending',color:'#f59e0b'},submitted:{vi:'Đã nộp',en:'Submitted',color:'#3b82f6'},approved:{vi:'Đã duyệt',en:'Approved',color:'#22c55e'},rejected:{vi:'Từ chối',en:'Rejected',color:'#ef4444'}}; }
+  return map;
+})();
 
 /* AS9145 phase deliverables */
 var PHASE_DELIVERABLES = {
@@ -169,6 +170,8 @@ function _ensureStyles(){
 
 /* -- badge helpers -------------------------------------------- */
 function _statusBadge(status){
+  if(window.HmRegistry) return HmRegistry.badge('apqp_project_status', status);
+  /* legacy fallback below */
   var m=PROJECT_STATUS[status]||{vi:status,en:status,color:'#64748b'};
   return '<span class="ap-badge" style="background:'+m.color+'">'+_esc(_t(m.vi,m.en))+'</span>';
 }
