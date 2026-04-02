@@ -29,6 +29,7 @@ This document locks:
    - `Ch? s? h?u`
    - `Ph? duy?t`
 7. The document code stays in its original coded form and appears in the meta row; the title block renders only `<strong class="doc-name">` and the supporting subtitle below it. Do not merge code and title into the same text node.
+8. Visible path literals, folder trees, file-name examples, SharePoint site/library/list/group names, and note/example code spans remain in canonical English. Do not translate them into Vietnamese anywhere in WI, ANNEX, or core-standard examples.
 
 ---
 
@@ -195,4 +196,3 @@ Such content may stay only in reports, commit logs, or working notes.
 - `26-wi-archetypes-and-qa-guide.md`
 - `27-annex-archetypes-and-qa-guide.md`
 - `28-pou-visual-and-machine-side-rules.md`
-

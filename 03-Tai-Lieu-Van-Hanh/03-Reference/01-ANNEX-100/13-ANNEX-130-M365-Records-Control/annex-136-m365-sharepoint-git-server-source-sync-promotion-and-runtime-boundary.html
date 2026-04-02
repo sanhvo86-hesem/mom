@@ -67,10 +67,10 @@
  <tr><th>Lớp</th><th>Vai trò bắt buộc</th><th>Ví dụ HESEM</th><th>Không được làm</th></tr>
  </thead>
  <tbody>
- <tr><td>Controlled source</td><td>Nơi chứa nội dung nguồn đã được công ty kiểm soát để soạn thảo, review, commit và phát hành.</td><td><span class="code">HESEM-Digital-Control/10-QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</span></td><td>Không chứa session, workflow draft binary, rate-limit log, user secrets hoặc form transaction entries.</td></tr>
+ <tr><td>Controlled source</td><td>Nơi chứa nội dung nguồn đã được công ty kiểm soát để soạn thảo, review, commit và phát hành.</td><td><span class="code">HESEM-Digital/QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</span></td><td>Không chứa session, workflow draft binary, rate-limit log, user secrets hoặc form transaction entries.</td></tr>
  <tr><td>Git version history</td><td>Sổ cái kỹ thuật trung tâm cho commit, branch, merge, pull, push, rollback theo commit.</td><td>Repo remote của <span class="code">qms.hesem.com.vn</span> và local <span class="code">git-dir</span> tách riêng khỏi thư mục đang sync.</td><td>Không xem Git là kho lưu hồ sơ giao dịch, approval log hay runtime export.</td></tr>
  <tr><td>Server deployment</td><td>Bản đang chạy cho portal và point-of-use sau khi pull hoặc deploy thành công.</td><td>Repo worktree đang chạy trên server/cPanel.</td><td>Không để thay đổi meaningful ở server tồn tại lâu mà không quay về Git.</td></tr>
- <tr><td>Runtime and records</td><td>Dữ liệu chạy hệ thống, evidence, log, approval history, record entries, archive binaries, records libraries.</td><td><span class="code">01-QMS-Portal/qms-data/...</span>, <span class="code">09-Digital-System-Records</span>, các library records tại <span class="code">HESEM-QMS-Core</span>.</td><td>Không sync ngược runtime vào controlled source library chỉ vì "cũng là file".</td></tr>
+ <tr><td>Runtime and records</td><td>Dữ liệu chạy hệ thống, evidence, log, approval history, record entries, archive binaries, records libraries.</td><td><span class="code">01-QMS-Portal/qms-data/...</span>, <span class="code">System-Records</span>, các library records tại <span class="code">HESEM-Records</span>.</td><td>Không sync ngược runtime vào controlled source library chỉ vì "cũng là file".</td></tr>
  </tbody>
  </table>
  </div>
@@ -84,16 +84,16 @@
  <tr><th>Site</th><th>Library</th><th>Path bắt buộc</th><th>Mục đích</th><th>Owner</th></tr>
  </thead>
  <tbody>
- <tr><td><span class="code">HESEM-Digital-Control</span></td><td><span class="code">10-QMS-Source-Control</span></td><td class="path">10-QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</td><td>Bộ source docs, source portal, released form definitions, assets và cấu hình được phép đi theo Git.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a></span></td></tr>
- <tr><td><span class="code">HESEM-Digital-Control</span></td><td><span class="code">10-QMS-Source-Control</span></td><td class="path">10-QMS-Source-Control/02-Release-Manifests/{YYYY}/</td><td>Manifest phát hành, commit map, branch, tag, deploy scope, approved release note.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td></tr>
- <tr><td><span class="code">HESEM-Digital-Control</span></td><td><span class="code">10-QMS-Source-Control</span></td><td class="path">10-QMS-Source-Control/03-Server-Deploy-Receipts/{YYYY}/</td><td>Bằng chứng pull/deploy, smoke test, rollback receipt, point-of-use verification.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td></tr>
- <tr><td><span class="code">HESEM-Digital-Control</span></td><td><span class="code">10-QMS-Source-Control</span></td><td class="path">10-QMS-Source-Control/04-Reverse-Sync-Intake/{YYYY}/</td><td>Log tiếp nhận hotfix từ server, lý do chỉnh trực tiếp, commit quay ngược, close-out evidence.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td></tr>
- <tr><td><span class="code">HESEM-Digital-Control</span></td><td><span class="code">09-Digital-System-Records</span></td><td class="path">09-Số hóa-System-Hồ sơ/</td><td>Hồ sơ cấu hình, access review, backup/restore, deploy control, incident/problem, runtime evidence.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-epicor-handbook.html" title="ERP Administration Function (Bo phan quan tri ERP)"><span class="entity-code dept-code">D-ERP</span></a></span></td></tr>
+ <tr><td><span class="code">HESEM-Digital</span></td><td><span class="code">QMS-Source-Control</span></td><td class="path">QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</td><td>Bộ source docs, source portal, released form definitions, assets và cấu hình được phép đi theo Git.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a></span></td></tr>
+ <tr><td><span class="code">HESEM-Digital</span></td><td><span class="code">QMS-Source-Control</span></td><td class="path">QMS-Source-Control/02-Release-Manifests/{YYYY}/</td><td>Manifest phát hành, commit map, branch, tag, deploy scope, approved release note.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td></tr>
+ <tr><td><span class="code">HESEM-Digital</span></td><td><span class="code">QMS-Source-Control</span></td><td class="path">QMS-Source-Control/03-Server-Deploy-Receipts/{YYYY}/</td><td>Bằng chứng pull/deploy, smoke test, rollback receipt, point-of-use verification.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td></tr>
+ <tr><td><span class="code">HESEM-Digital</span></td><td><span class="code">QMS-Source-Control</span></td><td class="path">QMS-Source-Control/04-Reverse-Sync-Intake/{YYYY}/</td><td>Log tiếp nhận hotfix từ server, lý do chỉnh trực tiếp, commit quay ngược, close-out evidence.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td></tr>
+ <tr><td><span class="code">HESEM-Digital</span></td><td><span class="code">System-Records</span></td><td class="path">System-Records/</td><td>Hồ sơ cấu hình, access review, backup/restore, deploy control, incident/problem, runtime evidence.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-epicor-handbook.html" title="ERP Administration Function (Bo phan quan tri ERP)"><span class="entity-code dept-code">D-ERP</span></a></span></td></tr>
  </tbody>
  </table>
  </div>
- <div class="tree">HESEM-Digital-Control
- ├─ 09-Digital-System-Records
+ <div class="tree">HESEM-Digital
+ ├─ System-Records
  │ ├─ 01-Access-and-Identity
  │ ├─ 02-M365-and-SharePoint-Configuration
  │ ├─ 03-Epicor-Role-and-Master-Data-Control
@@ -102,7 +102,7 @@
  │ ├─ 06-Incident-and-Problem-Management
  │ ├─ 07-Asset-and-Endpoint-Control
  │ └─ 08-Automation-Run-Logs
- └─ 10-QMS-Source-Control
+ └─ QMS-Source-Control
  ├─ 01-Controlled-Source
  │ └─ qms.hesem.com.vn
  ├─ 02-Release-Manifests
@@ -115,8 +115,8 @@
  <div class="two-col">
  <div class="figure-box">
  <h3>Local path được phép</h3>
- <p style="margin:8px 0;">Chỉ các máy được chỉ định của IT/QMS mới được sync library <span class="code">10-QMS-Source-Control</span>. Worktree local phải nằm dưới thư mục sync do OneDrive quản lý trong hồ sơ Người dùng, ví dụ:</p>
- <p class="path">%UserProfile%\HESEM Engineering\HESEM-Digital-Control - 10-QMS-Source-Control\01-Controlled-Source\qms.hesem.com.vn\</p>
+ <p style="margin:8px 0;">Chỉ các máy được chỉ định của IT/QMS mới được sync library <span class="code">QMS-Source-Control</span>. Worktree local phải nằm dưới thư mục sync do OneDrive quản lý trong hồ sơ Người dùng, ví dụ:</p>
+ <p class="path">%UserProfile%\HESEM Engineering\HESEM-Digital - QMS-Source-Control\01-Controlled-Source\qms.hesem.com.vn\</p>
  </div>
  <div class="figure-box">
  <h3>Git metadata được phép</h3>
@@ -139,7 +139,7 @@
  <div class="table-card">
  <table class="table">
  <thead>
- <tr><th>Nhóm</th><th>10-QMS-Source-Control</th><th>Quy tắc</th></tr>
+ <tr><th>Nhóm</th><th>QMS-Source-Control</th><th>Quy tắc</th></tr>
  </thead>
  <tbody>
  <tr><td><span class="code">QMS-Owners</span></td><td>Full Control</td><td>Chủ thư viện, thay đổi cấu trúc, restore, audit, emergency revoke.</td></tr>
@@ -151,7 +151,7 @@
  </tbody>
  </table>
  </div>
- <div class="keyline"><strong>Rule cứng:</strong> không cấp quyền trực tiếp theo user ở item/folder trong <span class="code">10-QMS-Source-Control</span>; chỉ cấp qua group. Không dùng external sharing trên library này. Local sync chỉ cấp cho danh sách endpoint đã đăng ký trong register quản lý.</div>
+ <div class="keyline"><strong>Rule cứng:</strong> không cấp quyền trực tiếp theo user ở item/folder trong <span class="code">QMS-Source-Control</span>; chỉ cấp qua group. Không dùng external sharing trên library này. Local sync chỉ cấp cho danh sách endpoint đã đăng ký trong register quản lý.</div>
  </div>
 
  <div class="section">
@@ -197,9 +197,9 @@
  <tr><th>Thành phần</th><th>Nơi lưu bắt buộc</th><th>Đường đi bắt buộc</th></tr>
  </thead>
  <tbody>
- <tr><td>Form definition / schema / release model</td><td><span class="code">10-QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</span></td><td>Đi theo Git và SharePoint local sync như source khác.</td></tr>
+ <tr><td>Form definition / schema / release model</td><td><span class="code">QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</span></td><td>Đi theo Git và SharePoint local sync như source khác.</td></tr>
  <tr><td>Draft binary / in-review binary / archived obsolete workbook</td><td>Server runtime area dưới <span class="code">01-QMS-Portal/qms-data/form-workflow/</span> hoặc path runtime tương đương được duyệt</td><td>Không quay vào source library; chỉ lưu evidence/manifest/receipt ở records khi cần.</td></tr>
- <tr><td>Form entries / submissions / approvals / operational responses</td><td>Records libraries phù hợp tại <span class="code">HESEM-QMS-Core</span> hoặc runtime record area được phê duyệt</td><td>Không đi theo Git source. Chỉ route sang file plan chính thức hoặc runtime index có retention.</td></tr>
+ <tr><td>Form entries / submissions / approvals / operational responses</td><td>Records libraries phù hợp tại <span class="code">HESEM-Records</span> hoặc runtime record area được phê duyệt</td><td>Không đi theo Git source. Chỉ route sang file plan chính thức hoặc runtime index có retention.</td></tr>
  </tbody>
  </table>
  </div>
@@ -243,7 +243,7 @@
  <div class="section">
  <h2>9. Điều kiện không được go-live</h2>
  <ul>
- <li>Chưa tạo library <span class="code">10-QMS-Source-Control</span> và chưa khóa quyền đúng group model.</li>
+ <li>Chưa tạo library <span class="code">QMS-Source-Control</span> và chưa khóa quyền đúng group model.</li>
  <li>Worktree local vẫn chứa thư mục <span class="code">.git</span> trong vùng SharePoint sync.</li>
  <li>Chưa chứng minh được một vòng đầy đủ <span class="code">local sync → Git push → server pull → deploy receipt → local pull</span>.</li>
  <li>Runtime noise vẫn bị stage/commit trong quá trình sync thử Nhiệm.</li>

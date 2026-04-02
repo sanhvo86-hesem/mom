@@ -135,6 +135,8 @@ All eQMS online forms (FRM-xxx-SUFFIX) display **bilingual** in a consistent pat
 | File name in `href`/`download` | **NO** — stay the same | The actual file name on the system |
 | Comment HTML `<!-- -->` | **NO** — stay the same | Technical comments |
 
+**Hard lock for visible literals:** folder trees, path examples, library names, list names, group names, site names, filename examples, and note/example blocks in core standards remain in canonical English. They are identifiers, not reader prose.
+
 ### A3. Illustrative example
 
 **Previous (English):**

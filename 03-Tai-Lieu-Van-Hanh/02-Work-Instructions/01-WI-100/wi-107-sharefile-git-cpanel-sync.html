@@ -52,7 +52,7 @@
  <div class="section">
  <h2>1. Kết quả phải đạt</h2>
  <ul>
- <li>Controlled source nằm trong <span class="code">10-QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</span> trên SharePoint.</li>
+ <li>Controlled source nằm trong <span class="code">QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</span> trên SharePoint.</li>
  <li>Local working copy được sync bởi OneDrive/SharePoint, nhưng thư mục <span class="code">.git</span> nằm ngoài vùng sync.</li>
  <li>Mọi thay đổi source đi theo đường <span class="code">SharePoint local sync → Git → server deployment</span>.</li>
  <li>Mọi hotfix từ server quay về theo đường <span class="code">server → Git → local sync</span>.</li>
@@ -68,7 +68,7 @@
  <tr><th>Điều kiện</th><th>Yêu cầu</th></tr>
  </thead>
  <tbody>
- <tr><td>SharePoint site/library</td><td><span class="code">HESEM-Digital-Control / 10-QMS-Source-Control</span> đã tồn tại theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a>.</td></tr>
+ <tr><td>SharePoint site/library</td><td><span class="code">HESEM-Digital / QMS-Source-Control</span> đã tồn tại theo <a href="../../03-Reference/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a>.</td></tr>
  <tr><td>Endpoint</td><td>Máy local đã được IT phê duyệt để sync source library.</td></tr>
  <tr><td>Git remote</td><td>Remote repository đã được tạo và cấp quyền push/pull đúng Người dùng.</td></tr>
  <tr><td>Server operator</td><td>Tài khoản deploy có quyền pull repo và chạy smoke test.</td></tr>
@@ -84,7 +84,7 @@
  <div class="figure-box">
  <h3>Worktree được phép</h3>
  <p>Ví dụ path sync được phép:</p>
- <div class="path">%UserProfile%\HESEM Engineering\HESEM-Digital-Control - 10-QMS-Source-Control\01-Controlled-Source\qms.hesem.com.vn\</div>
+ <div class="path">%UserProfile%\HESEM Engineering\HESEM-Digital - QMS-Source-Control\01-Controlled-Source\qms.hesem.com.vn\</div>
  </div>
  <div class="figure-box">
  <h3>Git-dir được phép</h3>
@@ -101,14 +101,14 @@
  <h3>Bước 4.1 - Đồng bộ library source xuống máy</h3>
  <ol>
  <li>Đăng nhập OneDrive bằng tài khoản công ty được cấp quyền.</li>
- <li>Mở <span class="code">10-QMS-Source-Control</span> và chọn <span class="code">Sync</span>.</li>
+ <li>Mở <span class="code">QMS-Source-Control</span> và chọn <span class="code">Sync</span>.</li>
  <li>Xác nhận thư mục local xuất hiện đúng dưới profile Người dùng.</li>
  </ol>
  </div>
  <div class="step-box">
  <h3>Bước 4.2 - Clone với separate git-dir</h3>
  <p>Chỉ thực hiện khi thư mục worktree đang trống:</p>
- <div class="cmd">git clone --separate-git-dir C:\HESEM-Git\qms.hesem.com.vn.git &lt;git-remote-url&gt; "%UserProfile%\HESEM Engineering\HESEM-Digital-Control - 10-QMS-Source-Control\01-Controlled-Source\qms.hesem.com.vn"</div>
+ <div class="cmd">git clone --separate-git-dir C:\HESEM-Git\qms.hesem.com.vn.git &lt;git-remote-url&gt; "%UserProfile%\HESEM Engineering\HESEM-Digital - QMS-Source-Control\01-Controlled-Source\qms.hesem.com.vn"</div>
  <p>Nếu worktree đã có dữ liệu sync sẵn, IT phải tạo lại worktree sạch trước khi clone.</p>
  </div>
  <div class="step-box">

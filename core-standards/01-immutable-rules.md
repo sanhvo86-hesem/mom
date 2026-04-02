@@ -118,6 +118,8 @@ The following names are **system proper nouns** (SharePoint, Epicor, M365). If t
 
 **Rules:** Site names, library names, SharePoint list names are proper nouns — **DO NOT** translate, **DO NOT** edit any characters. Architectural details: see `core-standards/14-m365-sharepoint-architecture.md`.
 
+This lock also applies when these identifiers appear in visible examples, notes, folder trees, tables, or training callouts. Reader-facing placement does not make them translatable.
+
 #### B3.2 Internal Column Names — keep 100%
 
 The following column names are technical identifiers in M365 Lists/Epicor. **NEVER** translate:

@@ -248,8 +248,15 @@ KEEP_ENGLISH = {
     'FindingType','AuditType','NonConformanceType',
     'DocumentType','DocumentCode','DocumentTitle',
     'WorkflowStatus','ApprovalStatus','ReviewStatus',
-    # ── SharePoint site names — NEVER translate ──
-    'HESEM-QMS','HESEM-Con','HESEM-Số','Control',
+    # ── SharePoint site / library / list / group names — NEVER translate ──
+    'HESEM-Records','HESEM-Job-Evidence','HESEM-People','HESEM-Digital',
+    'HESEM-QMS-Core','HESEM-People-Restricted','HESEM-Digital-Control',
+    'Quality-Records','QMS-Governance','Training-Records','Department-Ops',
+    'Part-REV-Master','Job-Dossiers','Customer-Received','Tooling-Fixture-Gage',
+    'System-Records','QMS-Source-Control','Employee-Records','HR-Operations',
+    '01-QMS-Records','02-Quality-Records','03-Job-Records','03-Job-Dossiers',
+    '04-Training-Records','05-Department-Records','08-People-Records',
+    '09-Digital-System-Records','10-QMS-Source-Control',
     # ── SharePoint List names — NEVER translate ──
     'QMS-Document-Register','QMS-Change-Register','QMS-NCR-Register',
     'QMS-CAPA-Register','QMS-Training-Register','QMS-Competence-Matrix',
@@ -257,7 +264,16 @@ KEEP_ENGLISH = {
     'M365-Record-Provisioning-Requests','M365-Record-Series-Catalog',
     'Department-Zone-Catalog','People-Dossier-Index',
     'System-Record-Request-Log','External-Share-Approval-Log',
-    'Automation-Run-Log','Archive-Lock-Register',
+    'Automation-Run-Log','Archive-Lock-Register','Employee-Workbench-Index',
+    'QMS-Source-Promotion-Register','Server-Deploy-Register','Reverse-Sync-Register',
+    'QMS-Owner','QMS-Owners','QMS-QA-Editors','QMS-ENG-Editors','QMS-Plan-Editors',
+    'QMS-PRO-Editors','QMS-SCM-Editors','QMS-SAL-Editors','QMS-FIN-Editors',
+    'QMS-EHS-Editors','QMS-IT-Governance','QMS-ERP-Governance',
+    'QMS-HR-Restricted','HR-Payroll-Restricted','HR-Medical-Restricted',
+    'QMS-External-Customer-Restricted','QMS-Portal-Editors','QMS-ReadOnly',
+    'DEP-EXEC-Editors','DEP-QMS-Editors','DEP-QA-Editors','DEP-ENG-Editors',
+    'DEP-PRO-Editors','DEP-SCM-Editors','DEP-SAL-Editors','DEP-FIN-Editors',
+    'DEP-HR-Editors','DEP-EHS-Editors','DEP-IT-Editors','DEP-ERP-Editors',
     'Register','Dossier',
     # ── Industry proper nouns ──
     'Hastelloy','Inconel','Monel','Stellite','Titanium','Invar','Kovar',
@@ -268,10 +284,10 @@ KEEP_ENGLISH = {
 # ── Patterns to COMPLETELY SKIP (regex) ──
 # These are internal names, site names, field names that must never be translated
 SKIP_PATTERNS = [
-    re.compile(r'HESEM-QMS-[^\s<]+'),           # SharePoint site names
-    re.compile(r'HESEM-Con người-[^\s<]+'),       # SharePoint site names
-    re.compile(r'HESEM-Số hóa-[^\s<]+'),          # SharePoint site names
-    re.compile(r'QMS-Chủ sở hữu'),               # SharePoint owner
+    re.compile(r'HESEM-(?:Records|Job-Evidence|People|Digital|QMS-Core|People-Restricted|Digital-Control)\b'),
+    re.compile(r'(?:Quality-Records|QMS-Governance|Training-Records|Department-Ops|Part-REV-Master|Job-Dossiers|Customer-Received|Tooling-Fixture-Gage|System-Records|QMS-Source-Control|Employee-Records|HR-Operations|01-QMS-Records|02-Quality-Records|03-Job-Records|03-Job-Dossiers|04-Training-Records|05-Department-Records|08-People-Records|09-Digital-System-Records|10-QMS-Source-Control)\b'),
+    re.compile(r'(?:QMS-Document-Register|QMS-Change-Register|QMS-NCR-Register|QMS-CAPA-Register|QMS-Training-Register|QMS-Competence-Matrix|OPS-Job-Dossier-Index|PUR-Supplier-Register|M365-Record-Provisioning-Requests|M365-Record-Series-Catalog|Department-Zone-Catalog|People-Dossier-Index|System-Record-Request-Log|External-Share-Approval-Log|Automation-Run-Log|Archive-Lock-Register|Employee-Workbench-Index|QMS-Source-Promotion-Register|Server-Deploy-Register|Reverse-Sync-Register)\b'),
+    re.compile(r'(?:QMS-Owner|QMS-Owners|QMS-QA-Editors|QMS-ENG-Editors|QMS-Plan-Editors|QMS-PRO-Editors|QMS-SCM-Editors|QMS-SAL-Editors|QMS-FIN-Editors|QMS-EHS-Editors|QMS-IT-Governance|QMS-ERP-Governance|QMS-HR-Restricted|HR-Payroll-Restricted|HR-Medical-Restricted|QMS-External-Customer-Restricted|QMS-Portal-Editors|QMS-ReadOnly|DEP-EXEC-Editors|DEP-QMS-Editors|DEP-QA-Editors|DEP-ENG-Editors|DEP-PRO-Editors|DEP-SCM-Editors|DEP-SAL-Editors|DEP-FIN-Editors|DEP-HR-Editors|DEP-EHS-Editors|DEP-IT-Editors|DEP-ERP-Editors)\b'),
     re.compile(r'[A-Z][a-z]+[A-Z][a-zA-Z]*'),    # CamelCase internal names (RecordType, JobNum...)
     re.compile(r'[A-Z]{2,}-\d+'),                 # Code patterns (FRM-101, SOP-201...)
     re.compile(r'\b[A-Z][a-z]+ID\b'),             # IDs (CustomerID, SupplierID...)
@@ -361,6 +377,26 @@ def build_patterns(dictionary):
 # ── HTML TEXT NODE EXTRACTION & TRANSLATION ──
 SKIP_BLOCKS_RE = re.compile(r'(<style[\s>].*?</style>|<script[\s>].*?</script>)', re.DOTALL | re.IGNORECASE)
 TAG_RE = re.compile(r'(<[^>]*>)')
+OPEN_TAG_RE = re.compile(r'^<([a-zA-Z0-9]+)([^>]*)>$')
+CLOSE_TAG_RE = re.compile(r'^</([a-zA-Z0-9]+)>$')
+CLASS_RE = re.compile(r'class\s*=\s*["\']([^"\']+)["\']', re.IGNORECASE)
+CODELIKE_TAGS = {'title', 'code', 'pre'}
+CODELIKE_CLASS_TOKENS = {
+    'code', 'path', 'tree', 'doc-code', 'entity-code', 'role-code',
+    'dept-code', 'bundle-code', 'mono'
+}
+PATHLIKE_TEXT_RE = re.compile(r'(?:[A-Za-z0-9{}]+(?:[-_/][A-Za-z0-9{}]+)+/?)+')
+
+def _class_tokens(tag_attrs):
+    m = CLASS_RE.search(tag_attrs or '')
+    if not m:
+        return set()
+    return {token.strip().lower() for token in m.group(1).split() if token.strip()}
+
+def _is_codelike_context(tag_name, class_tokens):
+    if tag_name.lower() in CODELIKE_TAGS:
+        return True
+    return any(token in CODELIKE_CLASS_TOKENS for token in class_tokens)
 
 def translate_html(html, patterns):
     """Translate English terms in HTML text nodes only."""
@@ -374,14 +410,40 @@ def translate_html(html, patterns):
         return key
     html = SKIP_BLOCKS_RE.sub(protect, html)
 
-    # Split on HTML tags
+    # Split on HTML tags and keep track of code/path/title-like contexts.
+    # Literal paths, file names, folder names, site names, list names, group
+    # names, and header SSOT titles must never be translated by the engine.
     parts = TAG_RE.split(html)
+    context_stack = []
 
     changed = False
     for i in range(len(parts)):
+        if i % 2 == 1:  # tag
+            tag = parts[i]
+            open_m = OPEN_TAG_RE.match(tag)
+            close_m = CLOSE_TAG_RE.match(tag)
+            if close_m:
+                closing = close_m.group(1).lower()
+                while context_stack:
+                    name, _ = context_stack.pop()
+                    if name == closing:
+                        break
+            elif open_m:
+                tag_name = open_m.group(1).lower()
+                attrs = open_m.group(2) or ''
+                if not tag.rstrip().endswith('/>'):
+                    context_stack.append((tag_name, _class_tokens(attrs)))
+            continue
+
         if i % 2 == 0:  # text node (not a tag)
             original = parts[i]
             if not original.strip():
+                continue
+
+            if any(_is_codelike_context(name, tokens) for name, tokens in context_stack):
+                continue
+
+            if '/' in original and PATHLIKE_TEXT_RE.search(original):
                 continue
 
             text = original

@@ -63,8 +63,8 @@
  <tr><th>Thành phần</th><th>Path / ví dụ</th><th>Rule</th></tr>
  </thead>
  <tbody>
- <tr><td>Source library path</td><td><span class="code">HESEM-Digital-Control/10-QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</span></td><td>Đây là nguồn SharePoint được phép sync xuống local.</td></tr>
- <tr><td>Local synced worktree</td><td><span class="code">%UserProfile%\HESEM Engineering\HESEM-Digital-Control - 10-QMS-Source-Control\01-Controlled-Source\qms.hesem.com.vn\</span></td><td>Đây là nơi user làm việc với source content.</td></tr>
+ <tr><td>Source library path</td><td><span class="code">HESEM-Digital/QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</span></td><td>Đây là nguồn SharePoint được phép sync xuống local.</td></tr>
+ <tr><td>Local synced worktree</td><td><span class="code">%UserProfile%\HESEM Engineering\HESEM-Digital - QMS-Source-Control\01-Controlled-Source\qms.hesem.com.vn\</span></td><td>Đây là nơi user làm việc với source content.</td></tr>
  <tr><td>Local git-dir</td><td><span class="code">C:\HESEM-Git\qms.hesem.com.vn.git\</span></td><td>Đặt ngoài vùng sync; không nằm trong worktree.</td></tr>
  <tr><td>Server worktree</td><td><span class="code">/home/&lt;server-user&gt;/qms.hesem.com.vn</span></td><td>Chỉ dùng cho deploy runtime; không phải nơi authoring chính.</td></tr>
  </tbody>
@@ -160,7 +160,7 @@ Git metadata
  <h2>8. Onboarding endpoint mới</h2>
  <ol>
  <li>Phê duyệt endpoint theo register.</li>
- <li>Sync <span class="code">10-QMS-Source-Control</span> xuống máy.</li>
+ <li>Sync <span class="code">QMS-Source-Control</span> xuống máy.</li>
  <li>Tạo git-dir riêng ngoài vùng sync.</li>
  <li>Clone bằng <span class="code">--separate-git-dir</span> hoặc restore worktree đúng chuẩn.</li>
  <li>Chạy kiểm tra boundary và smoke sync.</li>
