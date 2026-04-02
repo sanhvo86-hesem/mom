@@ -1257,8 +1257,11 @@ function renderSidebar(){
       <button class="nav-item ${currentPage==='energy-dashboard'?'active':''}" onclick="navigateTo('energy-dashboard')"><span class="icon">⚡</span><span>${lang==='en'?'Energy':'Năng lượng'}</span></button>
       <button class="nav-item ${currentPage==='deploy'?'active':''}" onclick="navigateTo('deploy')"><span class="icon">🚀</span><span>${lang==='en'?'Deploy':'Triển khai'}</span></button>
       <button class="nav-item ${currentPage==='customer-portal'?'active':''}" onclick="navigateTo('customer-portal')"><span class="icon">🌐</span><span>${lang==='en'?'Customer Portal':'Cổng khách hàng'}</span></button>
-      <button class="nav-item ${currentPage==='template-demo'?'active':''}" onclick="navigateTo('template-demo')" style="border:1px dashed rgba(255,255,255,0.3)"><span class="icon">🧩</span><span>${lang==='en'?'Template Demo':'Template Demo'}</span></button>
     </div>`;
+    // Nút + Tạo Module mới (luôn hiện cho admin)
+    if(isAdmin()){
+      html += `<div class="nav-section" style="padding:0 8px"><button class="nav-item" onclick="navigateTo('module-builder')" style="border:1px dashed rgba(255,255,255,0.3);justify-content:center;opacity:0.7"><span class="icon">➕</span><span>${lang==='en'?'Create Module':'Tạo Module mới'}</span></button></div>`;
+    }
   }
   if(isAdmin() && isPortalSidebarCoreVisible('admin')){
     html += `<div class="nav-section"><div class="nav-section-title">ADMIN</div><button class="nav-item ${currentPage==='admin'?'active':''}" onclick="navigateTo('admin')"><span class="icon">⚙</span><span>${T('admin_panel')}</span></button></div>`;
@@ -1342,7 +1345,11 @@ function navigateTo(page, filter, bypassGuard){
   if(page==='product-passport' && typeof window._renderProductPassport==='function'){ var ppp=document.getElementById('page-product-passport'); if(ppp) window._renderProductPassport(ppp); }
   if(page==='ai-scheduling' && typeof window._renderAiQualityScheduling==='function'){ var asp=document.getElementById('page-ai-scheduling'); if(asp) window._renderAiQualityScheduling(asp); }
   if(page==='compliance-reports' && typeof window._renderComplianceReports==='function'){ var crp=document.getElementById('page-compliance-reports'); if(crp) window._renderComplianceReports(crp); }
-  if(page==='template-demo' && typeof window._renderTemplateModule==='function'){ var tdp=document.getElementById('page-template-demo'); if(tdp) window._renderTemplateModule(tdp); }
+  if(page==='template-demo'){
+    var tdp=document.getElementById('page-template-demo');
+    if(tdp && window.HmModuleRouter){ window.HmModuleRouter.renderModuleById(tdp, 'M2-orders'); }
+    else if(tdp && typeof window._renderTemplateModule==='function'){ window._renderTemplateModule(tdp); }
+  }
   if(page==='fmea' && typeof window._renderFmeaControlPlan==='function'){ var fmp=document.getElementById('page-fmea'); if(fmp) window._renderFmeaControlPlan(fmp); }
   if(page==='apqp-ppap' && typeof window._renderApqpPpap==='function'){ var app=document.getElementById('page-apqp-ppap'); if(app) window._renderApqpPpap(app); }
   if(page==='mobile-shopfloor' && typeof window._renderMobileShopFloor==='function'){ var msp=document.getElementById('page-mobile-shopfloor'); if(msp) window._renderMobileShopFloor(msp); }
@@ -1350,6 +1357,7 @@ function navigateTo(page, filter, bypassGuard){
   if(page==='continuous-improvement' && typeof window._renderContinuousImprovement==='function'){ var cip=document.getElementById('page-continuous-improvement'); if(cip) window._renderContinuousImprovement(cip); }
   if(page==='energy-dashboard' && typeof window._renderEnergyDashboard==='function'){ var edp=document.getElementById('page-energy-dashboard'); if(edp) window._renderEnergyDashboard(edp); }
   if(page==='dispatch' && typeof window._renderProductionDispatch==='function'){ var dsp=document.getElementById('page-dispatch'); if(dsp) window._renderProductionDispatch(dsp); }
+  if(page==='module-builder' && typeof window._renderModuleBuilder==='function'){ var mbp=document.getElementById('page-module-builder'); if(mbp) window._renderModuleBuilder(mbp); }
   if(page==='admin'){ if(!isAdmin()){navigateTo('dashboard');return;} renderAdmin(); }
   
   document.getElementById('page-'+page).classList.add('active');
