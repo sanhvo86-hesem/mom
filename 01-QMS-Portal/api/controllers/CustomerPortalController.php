@@ -52,6 +52,155 @@ class CustomerPortalController extends BaseController
         return (string)($user['username'] ?? $user['user'] ?? 'unknown');
     }
 
+    /**
+     * Roles allowed to view customer-portal administrative data.
+     *
+     * @return array<int, string>
+     */
+    private function portalReadRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            ['sales_manager', 'customer_service', 'quality_manager']
+        )));
+    }
+
+    /**
+     * Roles allowed to mutate customer-portal administrative state.
+     *
+     * @return array<int, string>
+     */
+    private function portalWriteRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            admin_roles(),
+            ['sales_manager', 'customer_service']
+        )));
+    }
+
+    /**
+     * Roles allowed to triage portal complaints against internal records.
+     *
+     * @return array<int, string>
+     */
+    private function portalComplaintRoles(): array
+    {
+        return array_values(array_unique(array_merge(
+            $this->portalReadRoles(),
+            ['quality_engineer']
+        )));
+    }
+
+    /**
+     * @param array<string, mixed> $user
+     * @return void
+     */
+    private function requirePortalReadAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->portalReadRoles());
+    }
+
+    /**
+     * @param array<string, mixed> $user
+     * @return void
+     */
+    private function requirePortalWriteAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->portalWriteRoles());
+    }
+
+    /**
+     * @param array<string, mixed> $user
+     * @return void
+     */
+    private function requirePortalComplaintAccess(array $user): void
+    {
+        $this->requireAnyRole($user, $this->portalComplaintRoles());
+    }
+
+    /**
+     * @return string
+     */
+    private function validatePortalUserId(string $id): string
+    {
+        $id = trim($id);
+        if (!preg_match('/^PU-\d{8}-\d{6}-[a-f0-9]{6}$/i', $id)) {
+            $this->error('invalid_portal_user_id', 400);
+        }
+        return $id;
+    }
+
+    /**
+     * @return string
+     */
+    private function validatePortalEmail(string $email): string
+    {
+        $email = strtolower(trim($email));
+        if ($email === '' || strlen($email) > 190 || filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+            $this->error('invalid_email', 400);
+        }
+        return $email;
+    }
+
+    /**
+     * @return string
+     */
+    private function validatePortalStatus(string $status): string
+    {
+        $status = strtolower(trim($status));
+        $allowed = ['active', 'inactive', 'deactivated', 'invited', 'pending'];
+        if ($status === '' || !in_array($status, $allowed, true)) {
+            $this->error('invalid_status', 400);
+        }
+        return $status;
+    }
+
+    /**
+     * @return string
+     */
+    private function validateSalesOrderNumber(string $value): string
+    {
+        $value = strtoupper(trim($value));
+        if ($value === '' || strlen($value) > 80 || !preg_match('/^[A-Z0-9._\/-]+$/', $value)) {
+            $this->error('invalid_so_number', 400);
+        }
+        return $value;
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $users
+     * @return bool
+     */
+    private function portalEmailExists(array $users, string $email, ?string $exceptId = null): bool
+    {
+        foreach ($users as $entry) {
+            if (!is_array($entry)) {
+                continue;
+            }
+            if ($exceptId !== null && (string)($entry['id'] ?? '') === $exceptId) {
+                continue;
+            }
+            if (strtolower(trim((string)($entry['email'] ?? ''))) === $email) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $users
+     * @return bool
+     */
+    private function portalUserExists(array $users, string $portalUserId): bool
+    {
+        foreach ($users as $entry) {
+            if (is_array($entry) && (string)($entry['id'] ?? '') === $portalUserId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
@@ -67,6 +216,7 @@ class CustomerPortalController extends BaseController
     public function listUsers(): never
     {
         $user = $this->requireAuth();
+        $this->requirePortalReadAccess($user);
 
         try {
             $file  = $this->portalDir() . '/users.json';
@@ -104,6 +254,7 @@ class CustomerPortalController extends BaseController
     public function createUser(): never
     {
         $user = $this->requireAuth();
+        $this->requirePortalWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -114,14 +265,31 @@ class CustomerPortalController extends BaseController
         try {
             $file  = $this->portalDir() . '/users.json';
             $all   = $this->readJsonFile($file) ?? [];
+            $email = $this->validatePortalEmail((string)($body['email'] ?? ''));
+            if ($this->portalEmailExists($all, $email)) {
+                $this->error('email_exists', 409);
+            }
+
+            $name = trim((string)($body['name'] ?? ''));
+            $company = trim((string)($body['company'] ?? $body['customer'] ?? ''));
+            $customerId = trim((string)($body['customer_id'] ?? ''));
+            $phone = trim((string)($body['phone'] ?? ''));
+            if ($name === '' || mb_strlen($name) > 160) {
+                $this->error('invalid_name', 400);
+            }
+            if ($company === '' || mb_strlen($company) > 160) {
+                $this->error('invalid_company', 400);
+            }
 
             $newUser = [
                 'id'          => 'PU-' . gmdate('Ymd-His') . '-' . bin2hex(random_bytes(3)),
-                'email'       => trim((string)($body['email'] ?? '')),
-                'name'        => trim((string)($body['name'] ?? '')),
-                'company'     => trim((string)($body['company'] ?? '')),
-                'customer_id' => trim((string)($body['customer_id'] ?? '')),
-                'status'      => 'active',
+                'email'       => $email,
+                'name'        => $name,
+                'company'     => $company,
+                'customer_name' => $company,
+                'customer_id' => $customerId,
+                'phone'       => $phone,
+                'status'      => isset($body['status']) ? $this->validatePortalStatus((string)$body['status']) : 'active',
                 'created_by'  => $userId,
                 'created_at'  => $this->nowIso(),
                 'updated_at'  => $this->nowIso(),
@@ -154,25 +322,48 @@ class CustomerPortalController extends BaseController
     public function updateUser(): never
     {
         $user = $this->requireAuth();
+        $this->requirePortalWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
         $this->requireFields($body, ['id']);
 
-        $id     = trim((string)($body['id'] ?? ''));
+        $id     = $this->validatePortalUserId((string)($body['id'] ?? ''));
         $userId = $this->userId($user);
 
         try {
             $file  = $this->portalDir() . '/users.json';
             $all   = $this->readJsonFile($file) ?? [];
             $found = false;
+            $nextEmail = isset($body['email']) ? $this->validatePortalEmail((string)$body['email']) : null;
+            if ($nextEmail !== null && $this->portalEmailExists($all, $nextEmail, $id)) {
+                $this->error('email_exists', 409);
+            }
 
             foreach ($all as &$entry) {
                 if (($entry['id'] ?? '') === $id) {
-                    $updatable = ['name', 'email', 'company', 'customer_id', 'status'];
+                    $updatable = ['name', 'email', 'company', 'customer_id', 'status', 'customer_name', 'phone'];
                     foreach ($updatable as $field) {
                         if (isset($body[$field])) {
-                            $entry[$field] = trim((string)$body[$field]);
+                            $value = trim((string)$body[$field]);
+                            if ($field === 'email') {
+                                $entry[$field] = $nextEmail;
+                                continue;
+                            }
+                            if ($field === 'status') {
+                                $entry[$field] = $this->validatePortalStatus($value);
+                                continue;
+                            }
+                            if (($field === 'name' || $field === 'company') && ($value === '' || mb_strlen($value) > 160)) {
+                                $this->error('invalid_' . $field, 400);
+                            }
+                            $entry[$field] = $value;
+                            if ($field === 'company' && !isset($body['customer_name'])) {
+                                $entry['customer_name'] = $value;
+                            }
+                            if ($field === 'customer_name' && !isset($body['company'])) {
+                                $entry['company'] = $value;
+                            }
                         }
                     }
                     $entry['updated_at'] = $this->nowIso();
@@ -217,6 +408,7 @@ class CustomerPortalController extends BaseController
     public function listAccessGrants(): never
     {
         $user = $this->requireAuth();
+        $this->requirePortalReadAccess($user);
 
         try {
             $file = $this->portalDir() . '/access.json';
@@ -263,6 +455,7 @@ class CustomerPortalController extends BaseController
     public function grantAccess(): never
     {
         $user = $this->requireAuth();
+        $this->requirePortalWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -273,12 +466,32 @@ class CustomerPortalController extends BaseController
         try {
             $file  = $this->portalDir() . '/access.json';
             $all   = $this->readJsonFile($file) ?? [];
+            $users = $this->readJsonFile($this->portalDir() . '/users.json') ?? [];
+            $portalUserId = $this->validatePortalUserId((string)($body['portal_user_id'] ?? $body['user_id'] ?? ''));
+            if (!$this->portalUserExists($users, $portalUserId)) {
+                $this->error('portal_user_not_found', 404);
+            }
+            $soNumber = $this->validateSalesOrderNumber((string)($body['so_number'] ?? ''));
+            $scope = strtolower(trim((string)($body['scope'] ?? 'status_only')));
+            if (!in_array($scope, ['full', 'status_only', 'documents'], true)) {
+                $this->error('invalid_scope', 400);
+            }
+            foreach ($all as $entry) {
+                if (!is_array($entry)) {
+                    continue;
+                }
+                if ((string)($entry['portal_user_id'] ?? '') === $portalUserId
+                    && strtoupper((string)($entry['so_number'] ?? '')) === $soNumber
+                    && !($entry['revoked'] ?? false)) {
+                    $this->error('grant_exists', 409);
+                }
+            }
 
             $grant = [
                 'id'             => 'PA-' . gmdate('Ymd-His') . '-' . bin2hex(random_bytes(3)),
-                'portal_user_id' => trim((string)($body['portal_user_id'] ?? '')),
-                'so_number'      => trim((string)($body['so_number'] ?? '')),
-                'scope'          => trim((string)($body['scope'] ?? 'status_only')),
+                'portal_user_id' => $portalUserId,
+                'so_number'      => $soNumber,
+                'scope'          => $scope,
                 'granted_by'     => $userId,
                 'granted_at'     => $this->nowIso(),
                 'revoked'        => false,
@@ -311,12 +524,22 @@ class CustomerPortalController extends BaseController
     public function revokeAccess(): never
     {
         $user = $this->requireAuth();
+        $this->requirePortalWriteAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
-        $this->requireFields($body, ['id']);
-
         $id     = trim((string)($body['id'] ?? ''));
+        $portalUserId = trim((string)($body['portal_user_id'] ?? $body['user_id'] ?? ''));
+        $soNumber = trim((string)($body['so_number'] ?? $body['so_id'] ?? ''));
+        if ($id === '' && ($portalUserId === '' || $soNumber === '')) {
+            $this->error('missing_identifier', 400);
+        }
+        if ($portalUserId !== '') {
+            $portalUserId = $this->validatePortalUserId($portalUserId);
+        }
+        if ($soNumber !== '') {
+            $soNumber = $this->validateSalesOrderNumber($soNumber);
+        }
         $userId = $this->userId($user);
 
         try {
@@ -325,7 +548,12 @@ class CustomerPortalController extends BaseController
             $found = false;
 
             foreach ($all as &$entry) {
-                if (($entry['id'] ?? '') === $id) {
+                $matchesId = $id !== '' && (string)($entry['id'] ?? '') === $id;
+                $matchesComposite = $id === ''
+                    && (string)($entry['portal_user_id'] ?? '') === $portalUserId
+                    && strtoupper((string)($entry['so_number'] ?? '')) === $soNumber
+                    && !($entry['revoked'] ?? false);
+                if ($matchesId || $matchesComposite) {
                     $entry['revoked']    = true;
                     $entry['revoked_by'] = $userId;
                     $entry['revoked_at'] = $this->nowIso();
@@ -365,6 +593,7 @@ class CustomerPortalController extends BaseController
     public function listComplaints(): never
     {
         $user = $this->requireAuth();
+        $this->requirePortalReadAccess($user);
 
         try {
             $file = $this->portalDir() . '/complaints.json';
@@ -405,6 +634,7 @@ class CustomerPortalController extends BaseController
     public function linkComplaint(): never
     {
         $user = $this->requireAuth();
+        $this->requirePortalComplaintAccess($user);
         $this->requireCsrf();
 
         $body = $this->jsonBody();
@@ -462,6 +692,7 @@ class CustomerPortalController extends BaseController
     public function listDocAccess(): never
     {
         $user = $this->requireAuth();
+        $this->requirePortalReadAccess($user);
 
         try {
             $file = $this->portalDir() . '/doc-access.json';
@@ -495,6 +726,7 @@ class CustomerPortalController extends BaseController
     public function getAnalytics(): never
     {
         $user = $this->requireAuth();
+        $this->requirePortalReadAccess($user);
 
         try {
             $usersFile      = $this->portalDir() . '/users.json';

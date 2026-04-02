@@ -5,7 +5,11 @@ declare(strict_types=1);
 require __DIR__ . '/bootstrap.php';
 
 use HESEM\QMS\Api\Controllers\AuthController;
+use HESEM\QMS\Api\Controllers\CustomerPortalController;
+use HESEM\QMS\Api\Controllers\DocumentController;
 use HESEM\QMS\Api\Controllers\ExitException;
+use HESEM\QMS\Api\Controllers\FileController;
+use HESEM\QMS\Api\Controllers\FormController;
 use HESEM\QMS\Api\Controllers\ModuleSchemaController;
 use HESEM\QMS\Api\Middleware\AuthMiddleware;
 use HESEM\QMS\Api\Middleware\CorsMiddleware;
@@ -114,6 +118,130 @@ try {
 } catch (ExitException $e) {
     smoke_assert($e->getStatusCode() === 429, 'Rate limiter returned wrong status.');
     smoke_assert(($e->getPayload()['error'] ?? null) === 'rate_limited', 'Rate limiter returned wrong error.');
+}
+
+$authStore = [
+    'settings' => ['require_mfa' => false],
+    'users' => [[
+        'username' => 'tester',
+        'name' => 'Tester',
+        'role' => 'admin',
+        'active' => true,
+    ]],
+];
+
+// Auth bootstrap endpoints must reject disallowed cross-origin requests.
+smoke_reset_request_state();
+$_SERVER['HTTP_ORIGIN'] = 'https://evil.example';
+try {
+    require_allowed_origin();
+    throw new RuntimeException('Origin guard did not block disallowed origin.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 403, 'Origin guard returned wrong status.');
+    smoke_assert(($e->getPayload()['error'] ?? null) === 'origin_not_allowed', 'Origin guard returned wrong error.');
+}
+
+// Document streaming must not allow arbitrary HTML files outside the managed document catalog.
+smoke_reset_request_state();
+$_SESSION['user'] = 'tester';
+$_SESSION['mfa_ok'] = true;
+$_SERVER['REQUEST_METHOD'] = 'GET';
+$_GET['path'] = '01-QMS-Portal/portal.html';
+smoke_assert(is_file(QMS_TEST_BASE_DIR . '/portal.html'), 'portal.html fixture missing.');
+$documentController = (new DocumentController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($authStore);
+try {
+    $documentController->stream();
+    throw new RuntimeException('Document stream allowed an unmanaged portal file.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 404, 'Document stream returned wrong status for unmanaged file.');
+    smoke_assert(($e->getPayload()['error'] ?? null) === 'doc_not_registered', 'Document stream returned wrong error for unmanaged file.');
+}
+
+// Form entry endpoints must reject path-traversal form codes.
+smoke_reset_request_state();
+$_SESSION['user'] = 'tester';
+$_SESSION['mfa_ok'] = true;
+$_GET['code'] = '../../config/users';
+$formController = (new FormController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($authStore);
+try {
+    $formController->getEntries();
+    throw new RuntimeException('Form entries endpoint accepted an invalid form code.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 400, 'Form code validation returned wrong status.');
+    smoke_assert(($e->getPayload()['error'] ?? null) === 'invalid_form_code', 'Form code validation returned wrong error.');
+}
+
+// Form version streaming must resolve through the form registry, not raw filesystem paths.
+smoke_reset_request_state();
+$_SESSION['user'] = 'tester';
+$_SESSION['mfa_ok'] = true;
+$_SERVER['REQUEST_METHOD'] = 'GET';
+$_GET['code'] = 'FRM-TEST';
+$_GET['path'] = '01-QMS-Portal/portal.html';
+$_GET['id'] = 'latest';
+try {
+    $formController->streamVersion();
+    throw new RuntimeException('Form version stream allowed an unregistered base path.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 404, 'Form version stream returned wrong status for unregistered form.');
+    smoke_assert(($e->getPayload()['error'] ?? null) === 'form_not_found', 'Form version stream returned wrong error for unregistered form.');
+}
+
+// Legacy online-form helpers must reject traversal codes.
+smoke_reset_request_state();
+try {
+    require_existing_online_form('../../config/users');
+    throw new RuntimeException('Legacy online-form helper accepted an invalid form code.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 400, 'Legacy form helper returned wrong status for invalid code.');
+    smoke_assert(($e->getPayload()['error'] ?? null) === 'invalid_form_code', 'Legacy form helper returned wrong error for invalid code.');
+}
+
+// Known online-form fixtures should still resolve through the hardened helper.
+$resolvedForm = require_existing_online_form('FRM-131');
+smoke_assert(($resolvedForm['code'] ?? null) === 'FRM-131', 'Legacy form helper did not resolve existing form fixture.');
+
+// Customer portal administration must not be exposed to arbitrary internal users.
+$portalStore = [
+    'settings' => ['require_mfa' => false],
+    'users' => [[
+        'username' => 'operator-user',
+        'name' => 'Operator',
+        'role' => 'operator',
+        'active' => true,
+    ]],
+];
+smoke_reset_request_state();
+$_SESSION['user'] = 'operator-user';
+$_SESSION['mfa_ok'] = true;
+$customerPortalController = (new CustomerPortalController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($portalStore);
+try {
+    $customerPortalController->listUsers();
+    throw new RuntimeException('Customer portal user list allowed an unauthorized internal role.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 403, 'Customer portal guard returned wrong status.');
+    smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Customer portal guard returned wrong error.');
+}
+
+// File management must resolve source documents through the managed catalog, not arbitrary paths.
+$fileStore = [
+    'settings' => ['require_mfa' => false],
+    'users' => [[
+        'username' => 'doc-owner',
+        'name' => 'QA Manager',
+        'role' => 'qa_manager',
+        'active' => true,
+    ]],
+];
+$fileController = (new FileController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($fileStore);
+$resolveManagedDocument = new ReflectionMethod($fileController, 'resolveManagedDocumentRecord');
+$resolveManagedDocument->setAccessible(true);
+try {
+    $resolveManagedDocument->invoke($fileController, 'PORTAL', '01-QMS-Portal/portal.html');
+    throw new RuntimeException('File controller resolved an unmanaged source document path.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 404, 'File controller guard returned wrong status for unmanaged path.');
+    smoke_assert(($e->getPayload()['error'] ?? null) === 'doc_not_registered', 'File controller guard returned wrong error for unmanaged path.');
 }
 
 echo "backend smoke tests passed\n";

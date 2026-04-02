@@ -135,6 +135,7 @@ class AuthController extends BaseController
         if ($this->method() !== 'POST') {
             $this->error('method_not_allowed', 405);
         }
+        $this->requireAllowedOrigin();
 
         $data     = $this->jsonBody();
         $username = strtolower(trim((string)($data['username'] ?? '')));
@@ -250,6 +251,7 @@ class AuthController extends BaseController
         if ($this->method() !== 'POST') {
             $this->error('method_not_allowed', 405);
         }
+        $this->requireAllowedOrigin();
         if (!is_array($this->store)) {
             $this->error('system_not_initialized', 500);
         }
@@ -330,6 +332,7 @@ class AuthController extends BaseController
         if ($this->method() !== 'POST') {
             $this->error('method_not_allowed', 405);
         }
+        $this->requireAllowedOrigin();
         if (!is_array($this->store)) {
             $this->error('system_not_initialized', 500);
         }
@@ -390,6 +393,7 @@ class AuthController extends BaseController
         if ($this->method() !== 'POST') {
             $this->error('method_not_allowed', 405);
         }
+        $this->requireAllowedOrigin();
         $this->requireCsrf();
         destroy_auth_session();
         $this->json(['ok' => true, 'logged_in' => false]);

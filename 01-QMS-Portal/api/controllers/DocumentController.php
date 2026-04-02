@@ -63,6 +63,9 @@ class DocumentController extends BaseController
                 $this->resolveSubfolder($folder, $code);
             }
             $folder = safe_rel_path($folder);
+            if (is_reserved_root_segment($folder)) {
+                $this->error('invalid_folder', 400);
+            }
 
             if (preg_match('#(^|/)_Archive(/|$)#i', $folder)) {
                 $this->error('invalid_folder', 400);
@@ -193,7 +196,7 @@ class DocumentController extends BaseController
         if ($html === '') $this->error('missing_html', 400);
         if ($path === '') $this->error('missing_path', 400);
 
-        $baseRel = safe_rel_path($path);
+        $baseRel = $this->resolveManagedDocumentPath($code, $path);
         $archiveDir = $this->rootDir . '/archive';
 
         $state = load_doc_state($this->rootDir, $baseRel, $archiveDir, $code);
@@ -269,7 +272,7 @@ class DocumentController extends BaseController
         if ($code === '') $this->error('missing_code', 400);
         if ($path === '') $this->error('missing_path', 400);
 
-        $baseRel    = safe_rel_path($path);
+        $baseRel    = $this->resolveManagedDocumentPath($code, $path);
         $archiveDir = $this->rootDir . '/archive';
 
         $state = load_doc_state($this->rootDir, $baseRel, $archiveDir, $code);
@@ -332,7 +335,7 @@ class DocumentController extends BaseController
         if ($code === '') $this->error('missing_code', 400);
         if ($path === '') $this->error('missing_path', 400);
 
-        $baseRel    = safe_rel_path($path);
+        $baseRel    = $this->resolveManagedDocumentPath($code, $path);
         $archiveDir = $this->rootDir . '/archive';
 
         $state = load_doc_state($this->rootDir, $baseRel, $archiveDir, $code);
@@ -439,7 +442,7 @@ class DocumentController extends BaseController
         if ($code === '') $this->error('missing_code', 400);
         if ($path === '') $this->error('missing_path', 400);
 
-        $baseRel    = safe_rel_path($path);
+        $baseRel    = $this->resolveManagedDocumentPath($code, $path);
         $archiveDir = $this->rootDir . '/archive';
 
         $state = load_doc_state($this->rootDir, $baseRel, $archiveDir, $code);
@@ -537,7 +540,7 @@ class DocumentController extends BaseController
         if ($code === '') $this->error('missing_code', 400);
         if ($path === '') $this->error('missing_path', 400);
 
-        $baseRel    = safe_rel_path($path);
+        $baseRel    = $this->resolveManagedDocumentPath($code, $path);
         $archiveDir = $this->rootDir . '/archive';
 
         $manifest = load_doc_manifest($this->rootDir, $baseRel, $archiveDir, $code);
@@ -605,7 +608,7 @@ class DocumentController extends BaseController
             $this->error('missing_params', 400);
         }
 
-        $baseRel    = safe_rel_path($path);
+        $baseRel    = $this->resolveManagedDocumentPath($code, $path);
         $archiveDir = $this->rootDir . '/archive';
 
         $manifest = load_doc_manifest($this->rootDir, $baseRel, $archiveDir, $code);
@@ -657,7 +660,7 @@ class DocumentController extends BaseController
         if ($code === '') $this->error('missing_code', 400);
         if ($path === '') $this->error('missing_path', 400);
 
-        $baseRel    = safe_rel_path($path);
+        $baseRel    = $this->resolveManagedDocumentPath($code, $path);
         $archiveDir = $this->rootDir . '/archive';
 
         $manifest = load_doc_manifest($this->rootDir, $baseRel, $archiveDir, $code);
@@ -693,7 +696,7 @@ class DocumentController extends BaseController
         if ($code === '') $this->error('missing_code', 400);
         if ($path === '') $this->error('missing_path', 400);
 
-        $baseRel    = safe_rel_path($path);
+        $baseRel    = $this->resolveManagedDocumentPath($code, $path);
         $archiveDir = $this->rootDir . '/archive';
 
         $state = load_doc_state($this->rootDir, $baseRel, $archiveDir, $code);
@@ -757,34 +760,62 @@ class DocumentController extends BaseController
      */
     public function stream(): never
     {
-        $this->requireAuth();
+        if ($this->method() !== 'GET') {
+            $this->error('method_not_allowed', 405);
+        }
+
+        $me = $this->requireAuth();
 
         $path = trim((string)($this->query('path') ?? ''));
         if ($path === '') $this->error('missing_path', 400);
 
         $relPath = safe_rel_path($path);
-        $absPath = join_in_root($this->rootDir, $relPath);
+        $displayConfig = portal_load_display_config($this->confDir . '/portal_display_config.json');
+        $ext = portal_get_doc_extension($relPath);
+        if (!portal_allowed_stream_extension($relPath) || !portal_doc_extension_is_enabled($ext, $displayConfig)) {
+            $this->error('unsupported_type', 403);
+        }
 
-        if (!is_file($absPath)) {
+        $doc = $this->findManagedDocumentByPath($relPath, $displayConfig);
+        if ($doc === null) {
+            $this->error('doc_not_registered', 404);
+        }
+
+        $absPath = join_in_root($this->rootDir, $relPath);
+        if (!is_file($absPath) || !is_inside_root($absPath, $this->rootDir)) {
             $this->error('file_not_found', 404);
         }
 
-        $ext  = portal_get_doc_extension($relPath);
+        $hidden = array_values(array_unique(array_map(
+            static fn($value): string => strtoupper((string)$value),
+            load_doc_visibility($this->confDir . '/docs_visibility.json')
+        )));
+        $roleDocs = portal_load_role_docs($this->portalConfigJsFile());
+        if (!portal_can_access_doc($me, $doc, $roleDocs, $hidden, $displayConfig)) {
+            $this->error('forbidden', 403);
+        }
+
         $mime = portal_stream_mime_type($ext);
+        $asAttachment = $this->query('download') !== null || !portal_stream_can_inline($ext);
 
         if (session_status() === PHP_SESSION_ACTIVE) {
             @session_write_close();
         }
 
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         header('Content-Type: ' . $mime);
-        if (portal_stream_can_inline($ext)) {
-            header('Content-Disposition: inline');
+        header('X-Content-Type-Options: nosniff');
+        header('X-Frame-Options: SAMEORIGIN');
+        header('Referrer-Policy: same-origin');
+        if ($asAttachment) {
+            header('Content-Disposition: attachment; filename="' . rawurlencode(basename($relPath)) . '"');
         } else {
-            $fileName = basename($relPath);
-            header('Content-Disposition: attachment; filename="' . $fileName . '"');
+            header('Content-Disposition: inline; filename="' . rawurlencode(basename($relPath)) . '"');
         }
-        header('Content-Length: ' . filesize($absPath));
-        header('Cache-Control: private, max-age=300');
+        $size = @filesize($absPath);
+        if ($size !== false) {
+            header('Content-Length: ' . (string)$size);
+        }
 
         readfile($absPath);
         exit;
@@ -922,6 +953,89 @@ class DocumentController extends BaseController
      * @param string $code   Document code.
      * @return void
      */
+    /**
+     * Validate a document workflow base path provided by the client.
+     *
+     * @param string $code Expected document code.
+     * @param string $path Relative live document path.
+     * @return string
+     */
+    private function resolveManagedDocumentPath(string $code, string $path): string
+    {
+        $baseRel = safe_rel_path($path);
+        if (is_reserved_root_segment($baseRel)) {
+            $this->error('invalid_base_path', 400);
+        }
+        if (!filename_matches_doc_code(basename($baseRel), $code)) {
+            $this->error('code_path_mismatch', 400);
+        }
+
+        return $baseRel;
+    }
+
+    /**
+     * Return the portal role-doc configuration file path.
+     *
+     * @return string
+     */
+    private function portalConfigJsFile(): string
+    {
+        return $this->rootDir . '/01-QMS-Portal/scripts/portal/01-data-config.js';
+    }
+
+    /**
+     * Build the managed portal document catalog.
+     *
+     * @param array $displayConfig Portal display configuration.
+     * @return array<int, array<string, mixed>>
+     */
+    private function managedDocumentCatalog(array $displayConfig): array
+    {
+        $docs = [];
+        $cacheFile = $this->dataDir . '/scan_cache.json';
+        if (is_file($cacheFile)) {
+            $cached = json_decode((string)@file_get_contents($cacheFile), true);
+            if (is_array($cached['docs'] ?? null)) {
+                $docs = $cached['docs'];
+            }
+        }
+
+        $docs = array_merge(
+            $docs,
+            load_custom_docs($this->confDir . '/docs_custom.json'),
+            load_form_control_registry_docs(
+                $this->confDir . '/form_control_registry.json',
+                $this->rootDir,
+                portal_display_config_enabled_extensions($displayConfig)
+            )
+        );
+
+        return portal_dedupe_docs($docs);
+    }
+
+    /**
+     * Locate a managed document catalog entry by its relative path.
+     *
+     * @param string $relPath Relative document path.
+     * @param array  $displayConfig Portal display configuration.
+     * @return array<string, mixed>|null
+     */
+    private function findManagedDocumentByPath(string $relPath, array $displayConfig): ?array
+    {
+        foreach ($this->managedDocumentCatalog($displayConfig) as $candidate) {
+            if (!is_array($candidate)) {
+                continue;
+            }
+
+            $candidatePath = str_replace('\\', '/', (string)($candidate['path'] ?? ''));
+            if ($candidatePath === $relPath) {
+                return $candidate;
+            }
+        }
+
+        return null;
+    }
+
     private function resolveSubfolder(string &$folder, string $code): void
     {
         $parentAbs = $this->rootDir . '/' . $folder;

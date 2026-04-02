@@ -58,24 +58,8 @@ class FormController extends BaseController
     {
         $this->requireAuth();
 
-        $code = strtoupper(trim((string)($this->query('code') ?? '')));
-        if ($code === '') $this->error('missing_code', 400);
-
-        $registryFile = $this->confDir . '/form_control_registry.json';
-        $registry = $this->readJsonFile($registryFile) ?? [];
-
-        $schema = null;
-        foreach ($registry as $entry) {
-            if (!is_array($entry)) continue;
-            if (strtoupper(trim((string)($entry['code'] ?? ''))) === $code) {
-                $schema = $entry;
-                break;
-            }
-        }
-
-        if ($schema === null) {
-            $this->error('form_not_found', 404);
-        }
+        $code = $this->normalizeFormCode((string)($this->query('code') ?? ''));
+        $schema = $this->findFormRegistryEntry($code);
 
         $this->success(['schema' => $schema]);
     }
@@ -89,13 +73,17 @@ class FormController extends BaseController
      */
     public function submit(): never
     {
+        if ($this->method() !== 'POST') {
+            $this->error('method_not_allowed', 405);
+        }
+
         $me = $this->requireAuth();
         $this->requireCsrf();
 
         $data = $this->jsonBody();
-        $code = strtoupper(trim((string)($data['code'] ?? '')));
-
-        if ($code === '') $this->error('missing_code', 400);
+        $code = $this->normalizeFormCode((string)($data['code'] ?? ''));
+        $form = $this->findFormRegistryEntry($code);
+        $code = strtoupper(trim((string)($form['code'] ?? $code)));
 
         $entryData = $data['data'] ?? $data;
         if (!is_array($entryData)) $this->error('invalid_data', 400);
@@ -142,8 +130,9 @@ class FormController extends BaseController
     {
         $this->requireAuth();
 
-        $code = strtoupper(trim((string)($this->query('code') ?? '')));
-        if ($code === '') $this->error('missing_code', 400);
+        $code = $this->normalizeFormCode((string)($this->query('code') ?? ''));
+        $form = $this->findFormRegistryEntry($code);
+        $code = strtoupper(trim((string)($form['code'] ?? $code)));
 
         $entryFile = $this->dataDir . '/online-forms/entries/' . $code . '.json';
         $entries = [];
@@ -258,35 +247,60 @@ class FormController extends BaseController
      */
     public function streamVersion(): never
     {
-        $this->requireAuth();
-
-        $path = trim((string)($this->query('path') ?? ''));
-        if ($path === '') $this->error('missing_path', 400);
-
-        $relPath = safe_rel_path($path);
-        $absPath = join_in_root($this->rootDir, $relPath);
-
-        if (!is_file($absPath)) {
-            $this->error('file_not_found', 404);
+        if ($this->method() !== 'GET') {
+            $this->error('method_not_allowed', 405);
         }
 
-        $ext  = portal_get_doc_extension($relPath);
+        $me = $this->requireAuth();
+
+        $code = $this->normalizeFormCode((string)($this->query('code') ?? ''));
+        $basePath = (string)($this->query('base_path') ?? ($this->query('path') ?? ''));
+        $id = trim((string)($this->query('id') ?? ''));
+        if (trim($basePath) === '' || $id === '') {
+            $this->error('missing_params', 400);
+        }
+
+        [$baseRel, $formEntry] = $this->resolveManagedFormEntry($code, $basePath);
+        $displayConfig = portal_load_display_config($this->confDir . '/portal_display_config.json');
+        $doc = [
+            'code' => strtoupper(trim((string)($formEntry['code'] ?? $code))),
+            'path' => (string)($formEntry['path'] ?? $baseRel),
+            'folder' => (string)($formEntry['folder'] ?? dirname($baseRel)),
+            'cat' => 'FRM',
+        ];
+        $hidden = array_values(array_unique(array_map(
+            static fn($value): string => strtoupper((string)$value),
+            load_doc_visibility($this->confDir . '/docs_visibility.json')
+        )));
+        $roleDocs = portal_load_role_docs($this->portalConfigJsFile());
+        if (!portal_can_access_doc($me, $doc, $roleDocs, $hidden, $displayConfig)) {
+            $this->error('forbidden', 403);
+        }
+
+        $resolved = form_resolve_version_for_stream($this->dataDir, $this->rootDir, $formEntry, $id);
+        if (!is_array($resolved) || !is_file((string)($resolved['abs'] ?? ''))) {
+            $this->error('not_found', 404);
+        }
+
+        $ext = strtolower((string)($resolved['ext'] ?? ''));
         $mime = portal_stream_mime_type($ext);
 
         if (session_status() === PHP_SESSION_ACTIVE) {
             @session_write_close();
         }
 
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         header('Content-Type: ' . $mime);
-        if (portal_stream_can_inline($ext)) {
-            header('Content-Disposition: inline');
-        } else {
-            header('Content-Disposition: attachment; filename="' . basename($relPath) . '"');
+        header('X-Content-Type-Options: nosniff');
+        header('X-Frame-Options: SAMEORIGIN');
+        header('Referrer-Policy: same-origin');
+        header('Content-Disposition: attachment; filename="' . rawurlencode((string)($resolved['name'] ?? basename((string)$resolved['abs']))) . '"');
+        $size = @filesize((string)$resolved['abs']);
+        if ($size !== false) {
+            header('Content-Length: ' . (string)$size);
         }
-        header('Content-Length: ' . filesize($absPath));
-        header('Cache-Control: private, max-age=300');
 
-        readfile($absPath);
+        readfile((string)$resolved['abs']);
         exit;
     }
 
@@ -309,7 +323,7 @@ class FormController extends BaseController
         $rolePermsFile = $this->confDir . '/role_permissions.json';
         require_doc_workflow_editor($me, $rolePermsFile);
 
-        $code     = strtoupper(trim((string)($_POST['code'] ?? '')));
+        $code     = $this->normalizeFormCode((string)($_POST['code'] ?? ''));
         $basePath = (string)($_POST['base_path'] ?? ($_POST['path'] ?? ''));
         $note     = trim((string)($_POST['note'] ?? ''));
 
@@ -319,10 +333,7 @@ class FormController extends BaseController
             $this->error('missing_file', 400);
         }
 
-        $baseRel      = safe_rel_path($basePath);
-        $registryFile = $this->confDir . '/form_control_registry.json';
-        $formEntry    = form_registry_get_entry($registryFile, $code, $baseRel);
-        if (!is_array($formEntry)) $this->error('form_not_found', 404);
+        [$baseRel, $formEntry] = $this->resolveManagedFormEntry($code, $basePath);
 
         $state = form_load_state($this->dataDir, $this->rootDir, $formEntry);
         if (($state['status'] ?? 'approved') === 'approved') {
@@ -461,5 +472,83 @@ class FormController extends BaseController
             'versions'    => form_public_versions($manifest, $state, (string)$formEntry['code'], (string)$formEntry['path']),
             'server_time' => $this->nowIso(),
         ]);
+    }
+
+    /**
+     * Normalize and validate a form code coming from the client.
+     *
+     * @param string $code Raw form code.
+     * @return string
+     */
+    private function normalizeFormCode(string $code): string
+    {
+        $code = strtoupper(trim($code));
+        if ($code === '') {
+            $this->error('missing_code', 400);
+        }
+        if (!preg_match('/^[A-Z0-9._-]+$/', $code)) {
+            $this->error('invalid_form_code', 400);
+        }
+
+        return $code;
+    }
+
+    /**
+     * Return the form registry file path.
+     *
+     * @return string
+     */
+    private function formRegistryFile(): string
+    {
+        return $this->confDir . '/form_control_registry.json';
+    }
+
+    /**
+     * Look up a form entry by its canonical code.
+     *
+     * @param string $code Validated form code.
+     * @return array<string, mixed>
+     */
+    private function findFormRegistryEntry(string $code): array
+    {
+        $registry = $this->readJsonFile($this->formRegistryFile()) ?? [];
+        foreach ($registry as $entry) {
+            if (!is_array($entry)) {
+                continue;
+            }
+            if (strtoupper(trim((string)($entry['code'] ?? ''))) === $code) {
+                return $entry;
+            }
+        }
+
+        $this->error('form_not_found', 404);
+    }
+
+    /**
+     * Resolve a managed form workflow target by code and base path.
+     *
+     * @param string $code Validated form code.
+     * @param string $basePath Relative form base path.
+     * @return array{0: string, 1: array<string, mixed>}
+     */
+    private function resolveManagedFormEntry(string $code, string $basePath): array
+    {
+        $baseRel = safe_rel_path($basePath);
+        $formEntry = form_registry_get_entry($this->formRegistryFile(), $code, $baseRel);
+        if (!is_array($formEntry)) {
+            $this->error('form_not_found', 404);
+        }
+
+        return [$baseRel, $formEntry];
+    }
+
+    /**
+     * Return the portal role-doc configuration JS file path.
+     *
+     * @return string
+     */
+    private function portalConfigJsFile(): string
+    {
+        return $this->rootDir . '/01-QMS-Portal/scripts/portal/01-data-config.js';
     }
 }

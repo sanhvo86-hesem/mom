@@ -193,6 +193,9 @@ class FileController extends BaseController
         $parent = trim((string)($data['parent'] ?? ''));
         $name   = trim((string)($data['name'] ?? ''));
 
+        if ($parent === '') {
+            $this->error('missing_parent', 400);
+        }
         if ($name === '') $this->error('missing_name', 400);
 
         // Sanitize folder name
@@ -202,10 +205,9 @@ class FileController extends BaseController
             $this->error('invalid_name', 400);
         }
 
-        $relPath = $parent !== '' ? (safe_rel_path($parent) . '/' . $name) : $name;
-        if (is_reserved_root_segment($relPath)) {
-            $this->error('reserved_path', 403);
-        }
+        $parentRel = $this->normalizeManagedFolderPath($parent, true);
+        $relPath = $parentRel . '/' . $name;
+        $this->assertManagedFolderPath($relPath);
 
         $absPath = join_in_root($this->rootDir, $relPath);
         if (is_dir($absPath)) {
@@ -235,17 +237,14 @@ class FileController extends BaseController
         $this->requireAdmin($me);
 
         $data    = $this->jsonBody();
-        $path    = trim((string)($data['path'] ?? ''));
+        $path    = trim((string)($data['path'] ?? $data['old_path'] ?? ''));
         $newName = trim((string)($data['new_name'] ?? ''));
 
         if ($path === '' || $newName === '') {
             $this->error('missing_params', 400);
         }
 
-        $relPath = safe_rel_path($path);
-        if (is_reserved_root_segment($relPath)) {
-            $this->error('reserved_path', 403);
-        }
+        $relPath = $this->normalizeManagedFolderPath($path, false, false);
 
         $absPath = join_in_root($this->rootDir, $relPath);
         if (!is_dir($absPath)) {
@@ -307,14 +306,11 @@ class FileController extends BaseController
         $this->requireAdmin($me);
 
         $data = $this->jsonBody();
-        $path = trim((string)($data['path'] ?? ''));
+        $path = trim((string)($data['path'] ?? $data['folder_path'] ?? ''));
 
         if ($path === '') $this->error('missing_path', 400);
 
-        $relPath = safe_rel_path($path);
-        if (is_reserved_root_segment($relPath)) {
-            $this->error('reserved_path', 403);
-        }
+        $relPath = $this->normalizeManagedFolderPath($path, false, false);
 
         $absPath = join_in_root($this->rootDir, $relPath);
         if (!is_dir($absPath)) {
@@ -353,16 +349,17 @@ class FileController extends BaseController
         require_doc_workflow_editor($me, $rolePermsFile);
 
         $data      = $this->jsonBody();
-        $code      = strtoupper(trim((string)($data['code'] ?? '')));
-        $path      = trim((string)($data['path'] ?? ''));
-        $destFolder = trim((string)($data['dest_folder'] ?? ''));
+        $code      = strtoupper(trim((string)($data['code'] ?? $data['old_code'] ?? '')));
+        $path      = trim((string)($data['path'] ?? $data['old_path'] ?? ''));
+        $destFolder = trim((string)($data['dest_folder'] ?? $data['target_folder'] ?? ''));
 
-        if ($code === '' || $path === '' || $destFolder === '') {
+        if ($code === '' || $destFolder === '') {
             $this->error('missing_params', 400);
         }
 
-        $srcRel    = safe_rel_path($path);
-        $destRel   = safe_rel_path($destFolder);
+        $docEntry  = $this->resolveManagedDocumentRecord($code, $path !== '' ? $path : null);
+        $srcRel    = str_replace('\\', '/', (string)($docEntry['path'] ?? ''));
+        $destRel   = $this->normalizeManagedFolderPath($destFolder, true);
         $srcAbs    = join_in_root($this->rootDir, $srcRel);
         $fileName  = basename($srcRel);
         $newRel    = $destRel . '/' . $fileName;
@@ -481,15 +478,16 @@ class FileController extends BaseController
         require_doc_workflow_editor($me, $rolePermsFile);
 
         $data    = $this->jsonBody();
-        $code    = strtoupper(trim((string)($data['code'] ?? '')));
-        $path    = trim((string)($data['path'] ?? ''));
+        $code    = strtoupper(trim((string)($data['code'] ?? $data['old_code'] ?? '')));
+        $path    = trim((string)($data['path'] ?? $data['old_path'] ?? ''));
         $newName = trim((string)($data['new_name'] ?? ''));
 
-        if ($code === '' || $path === '' || $newName === '') {
+        if ($code === '' || $newName === '') {
             $this->error('missing_params', 400);
         }
 
-        $srcRel = safe_rel_path($path);
+        $docEntry = $this->resolveManagedDocumentRecord($code, $path !== '' ? $path : null);
+        $srcRel = str_replace('\\', '/', (string)($docEntry['path'] ?? ''));
         $srcAbs = join_in_root($this->rootDir, $srcRel);
 
         if (!is_file($srcAbs)) $this->error('file_not_found', 404);
@@ -551,5 +549,134 @@ class FileController extends BaseController
         $descriptions = $this->readJsonFile($descFile) ?? [];
 
         $this->success(['descriptions' => $descriptions]);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function managedRootPrefixes(): array
+    {
+        return [
+            '02-Tai-Lieu-He-Thong',
+            '03-Tai-Lieu-Van-Hanh',
+            '04-Bieu-Mau',
+            '10-Training-Academy',
+        ];
+    }
+
+    /**
+     * @return bool
+     */
+    private function isManagedPath(string $relPath): bool
+    {
+        $first = explode('/', str_replace('\\', '/', $relPath), 2)[0] ?? '';
+        return in_array($first, $this->managedRootPrefixes(), true);
+    }
+
+    /**
+     * @return bool
+     */
+    private function hasRestrictedFolderSegment(string $relPath): bool
+    {
+        foreach (explode('/', str_replace('\\', '/', $relPath)) as $segment) {
+            if ($segment === '') {
+                continue;
+            }
+            if ($segment === '_Archive' || $segment === '_Deleted' || str_starts_with($segment, '.')) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @return void
+     */
+    private function assertManagedFolderPath(string $relPath, bool $allowRoot = true): void
+    {
+        if (!$this->isManagedPath($relPath) || is_reserved_root_segment($relPath) || $this->hasRestrictedFolderSegment($relPath)) {
+            $this->error('invalid_folder_path', 400);
+        }
+        if (!$allowRoot && !str_contains($relPath, '/')) {
+            $this->error('invalid_folder_path', 400);
+        }
+    }
+
+    /**
+     * @return string
+     */
+    private function normalizeManagedFolderPath(string $path, bool $mustExist = false, bool $allowRoot = true): string
+    {
+        $relPath = safe_rel_path($path);
+        $this->assertManagedFolderPath($relPath, $allowRoot);
+        $absPath = join_in_root($this->rootDir, $relPath);
+        if ($mustExist && !is_dir($absPath)) {
+            $this->error('target_folder_not_found', 404);
+        }
+        return $relPath;
+    }
+
+    /**
+     * @param array<string, mixed> $displayConfig
+     * @return array<int, array<string, mixed>>
+     */
+    private function managedDocumentCatalog(array $displayConfig): array
+    {
+        $docs = [];
+        $cacheFile = $this->dataDir . '/scan_cache.json';
+        if (is_file($cacheFile)) {
+            $cached = json_decode((string)@file_get_contents($cacheFile), true);
+            if (is_array($cached['docs'] ?? null)) {
+                $docs = $cached['docs'];
+            }
+        }
+
+        $docs = array_merge(
+            $docs,
+            load_custom_docs($this->confDir . '/docs_custom.json'),
+            load_form_control_registry_docs(
+                $this->confDir . '/form_control_registry.json',
+                $this->rootDir,
+                portal_display_config_enabled_extensions($displayConfig)
+            )
+        );
+
+        return portal_dedupe_docs($docs);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function resolveManagedDocumentRecord(string $code, ?string $path = null): array
+    {
+        $code = strtoupper(trim($code));
+        $requestedPath = $path !== null && trim($path) !== '' ? safe_rel_path((string)$path) : '';
+
+        $displayConfig = portal_load_display_config($this->confDir . '/portal_display_config.json');
+        foreach ($this->managedDocumentCatalog($displayConfig) as $candidate) {
+            if (!is_array($candidate)) {
+                continue;
+            }
+
+            $candidatePath = str_replace('\\', '/', (string)($candidate['path'] ?? ''));
+            if ($candidatePath === '' || !$this->isManagedPath($candidatePath) || $this->hasRestrictedFolderSegment($candidatePath)) {
+                continue;
+            }
+            if ($requestedPath !== '' && $candidatePath !== $requestedPath) {
+                continue;
+            }
+
+            $candidateCode = strtoupper(trim((string)($candidate['code'] ?? '')));
+            if ($code !== '' && $candidateCode !== $code && !filename_matches_doc_code(basename($candidatePath), $code)) {
+                continue;
+            }
+
+            return $candidate;
+        }
+
+        if ($requestedPath !== '') {
+            $this->error('doc_not_registered', 404);
+        }
+        $this->error('doc_not_found', 404);
     }
 }
