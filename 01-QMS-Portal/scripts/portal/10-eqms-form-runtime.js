@@ -522,6 +522,102 @@ function saveAuditLog(){
   }).catch(function(){});
 }
 
+/* ── Formula evaluation (for calculated fields) ── */
+function evalFormula(formula, values){
+  if(!formula) return '';
+  try {
+    var expr = String(formula).replace(/\{([^}]+)\}/g, function(_, fid){
+      var v = values && values[fid];
+      return (v !== undefined && v !== null && v !== '') ? (isNaN(Number(v)) ? 0 : Number(v)) : 0;
+    });
+    /* Allow: digits, operators, parens, spaces, dots, comparison, ternary */
+    if(/[^0-9\s\+\-\*\/\.\(\)\?\:><\=\!]/.test(expr)) return formula;
+    /* eslint-disable-next-line no-new-func */
+    var result = Function('"use strict"; return (' + expr + ')')();
+    if(result === true || result === false) return result ? 1 : 0;
+    return (result !== null && result !== undefined && !isNaN(result)) ? Math.round(result * 100) / 100 : '';
+  } catch(e){ return ''; }
+}
+
+/* ── Conditional field visibility ── */
+function evaluateShowIf(field, values){
+  if(!field || !field.show_if) return true;
+  var conditions = Array.isArray(field.show_if) ? field.show_if : [field.show_if];
+  return conditions.every(function(cond){
+    if(!cond || !cond.field) return true;
+    var val = String((values && values[cond.field]) || '').trim();
+    var op = cond.op || '==';
+    var expected = String(cond.value !== undefined ? cond.value : '').trim();
+    switch(op){
+      case '==': case '=': return val === expected;
+      case '!=': case '<>': return val !== expected;
+      case 'empty': return val === '';
+      case 'not_empty': return val !== '';
+      case 'contains': return val.indexOf(expected) >= 0;
+      case 'in': return expected.split(',').map(function(s){ return s.trim(); }).indexOf(val) >= 0;
+      case 'not_in': return expected.split(',').map(function(s){ return s.trim(); }).indexOf(val) < 0;
+      default: return true;
+    }
+  });
+}
+
+function applyConditions(container, schema){
+  if(!container || !schema || !Array.isArray(schema.fields)) return;
+  schema.fields.forEach(function(field){
+    if(!field || !field.show_if) return;
+    var visible = evaluateShowIf(field, state.fieldValues);
+    var el = container.querySelector('[data-field-wrapper="' + field.id + '"]');
+    if(el) el.style.display = visible ? '' : 'none';
+  });
+}
+
+function updateCalculatedFields(container, schema){
+  if(!container || !schema || !Array.isArray(schema.fields)) return;
+  schema.fields.forEach(function(field){
+    if(field.type !== 'calculated') return;
+    var el = document.getElementById('eqms-f-' + field.id);
+    if(!el) return;
+    var result = evalFormula(field.formula || '', state.fieldValues);
+    el.textContent = (result !== null && result !== undefined && result !== '') ? String(result) : '—';
+  });
+}
+
+/* ── Form completion progress bar ── */
+function renderProgressBar(schema){
+  if(!schema) return '';
+  var eligible = (schema.fields || []).filter(function(f){
+    return f && f.type !== 'heading' && f.type !== 'section' && f.type !== 'calculated' && f.type !== 'hidden';
+  }).filter(function(f){ return evaluateShowIf(f, state.fieldValues); });
+  if(!eligible.length) return '';
+  var filled = eligible.filter(function(f){
+    var val = state.fieldValues[f.id];
+    return val !== undefined && val !== null && val !== '' && !(Array.isArray(val) && !val.length);
+  }).length;
+  var pct = Math.round(100 * filled / eligible.length);
+  return '<div class="eqms-progress">' +
+    '<div class="eqms-progress-track"><div class="eqms-progress-bar" style="width:' + pct + '%"></div></div>' +
+    '<span class="eqms-progress-label">' + esc(filled + ' / ' + eligible.length + ' ' + t('trường', 'fields') + ' (' + pct + '%)') + '</span>' +
+  '</div>';
+}
+
+/* ── Auto-save timer ── */
+var _autoSaveTimer = null;
+function startAutoSave(){
+  stopAutoSave();
+  _autoSaveTimer = setInterval(function(){
+    if(!state.editMode || !state.formCode) return;
+    saveDraft().catch(function(){});
+    var indicator = document.getElementById('eqms-autosave-indicator');
+    if(indicator){
+      var now = new Date();
+      indicator.textContent = t('Tự động lưu ', 'Auto-saved ') + now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+    }
+  }, 90000);
+}
+function stopAutoSave(){
+  if(_autoSaveTimer){ clearInterval(_autoSaveTimer); _autoSaveTimer = null; }
+}
+
 /* ── Field Rendering ── */
 function renderField(field, value, readOnly){
   var id = 'eqms-f-' + field.id;
@@ -533,7 +629,7 @@ function renderField(field, value, readOnly){
   var disabled = readOnly ? ' disabled' : '';
   var cls = 'eqms-field' + (field.width === 'full' || field.type === 'textarea' || field.type === 'table' ? ' full' : field.width === 'third' ? ' third' : '');
 
-  var html = '<div class="' + cls + '">' +
+  var html = '<div class="' + cls + '" data-field-wrapper="' + esc(field.id) + '">' +
     '<label class="eqms-label" for="' + esc(id) + '">' + label + ' ' + required + '</label>';
 
   var val = value !== undefined && value !== null ? value : '';
@@ -590,6 +686,37 @@ function renderField(field, value, readOnly){
       }
       html += '</div>';
       if(val) html += '<input type="hidden" id="' + esc(id) + '" value="' + esc(val) + '">';
+      break;
+    case 'table':
+      var cols = field.columns || [];
+      var rows = Array.isArray(val) ? (val.length ? val : [{}]) : [{}];
+      html += '<div class="eqms-table-wrap"><table class="eqms-table">';
+      if(cols.length){
+        html += '<thead><tr>' + cols.map(function(col){
+          var cl = typeof col === 'string' ? col : t(col.label || col.id || '', col.label_en || col.label || col.id || '');
+          return '<th>' + esc(cl) + '</th>';
+        }).join('') + (readOnly ? '' : '<th class="eqms-table-th-del"></th>') + '</tr></thead>';
+      }
+      html += '<tbody id="' + esc(id) + '-tbody">';
+      rows.forEach(function(row, ri){
+        html += '<tr data-row="' + ri + '">';
+        cols.forEach(function(col){
+          var colId = typeof col === 'string' ? col : (col.id || col.label || '');
+          var cellVal = (row && row[colId] !== undefined) ? row[colId] : '';
+          html += '<td><input class="eqms-table-cell eqms-input" type="text" data-table="' + esc(field.id) + '" data-col="' + esc(colId) + '" data-row="' + ri + '" value="' + esc(cellVal) + '"' + disabled + '></td>';
+        });
+        if(!readOnly) html += '<td><button type="button" class="eqms-table-del" data-table-del="' + esc(field.id) + '" data-row="' + ri + '">×</button></td>';
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+      if(!readOnly) html += '<button type="button" class="eqms-table-add" data-table-add="' + esc(field.id) + '">+ ' + esc(t('Thêm dòng', 'Add row')) + '</button>';
+      html += '</div>';
+      break;
+    case 'calculated':
+      var calcFormula = field.formula || '';
+      var calcResult = evalFormula(calcFormula, state.fieldValues);
+      var calcDisp = (calcResult !== null && calcResult !== undefined && calcResult !== '') ? String(calcResult) : '—';
+      html += '<div class="eqms-calc" id="' + esc(id) + '" data-formula="' + esc(calcFormula) + '">' + esc(calcDisp) + '</div>';
       break;
     case 'heading':
       html += '<div class="eqms-heading">' + esc(labelEn) + '</div>';
@@ -700,12 +827,14 @@ function renderForm(container){
     html += '</div>';
   }
 
-  /* ── Status bar ── */
+  /* ── Status bar + progress ── */
   if(state.editMode){
     html += '<div class="eqms-status-bar editing">' +
       '<span class="eqms-status-indicator"></span>' +
-      '<span>' + esc(t('Dang chinh sua — moi thay doi duoc ghi nhat ky', 'Editing — all changes are audit-logged')) + '</span>' +
-    '</div>';
+      '<span>' + esc(t('Đang chỉnh sửa — mọi thay đổi được ghi nhật ký', 'Editing — all changes are audit-logged')) + '</span>' +
+      '<span class="eqms-autosave-indicator" id="eqms-autosave-indicator"></span>' +
+    '</div>' +
+    renderProgressBar(schema);
   }
 
   /* ── Form sections ── */
@@ -714,12 +843,13 @@ function renderForm(container){
       return fields.find(function(f){ return f.id === fid; });
     }).filter(Boolean);
 
-    html += '<div class="eqms-section">' +
+    var secColor = section.color || '';
+    html += '<div class="eqms-section"' + (secColor ? ' style="border-left:3px solid ' + esc(secColor) + '"' : '') + '>' +
       '<div class="eqms-section-head">' +
-        '<div class="eqms-section-num">' + (sIdx + 1) + '</div>' +
+        '<div class="eqms-section-num"' + (secColor ? ' style="background:' + esc(secColor) + '"' : '') + '>' + (sIdx + 1) + '</div>' +
         '<div>' +
           '<div class="eqms-section-title">' + esc(section.title_en || section.title || '') + '</div>' +
-          (section.description || section.description_en ? '<div class="eqms-section-desc">' + esc(section.description || section.description_en || '') + '</div>' : '') +
+          (section.description || section.description_en ? '<div class="eqms-section-desc">' + esc(section.description_en || section.description || '') + '</div>' : '') +
         '</div>' +
       '</div>' +
       '<div class="eqms-fields">';
@@ -788,6 +918,9 @@ function renderForm(container){
 
   container.innerHTML = html;
   bindFields(container);
+  applyConditions(container, schema);
+  if(state.editMode) startAutoSave();
+  else stopAutoSave();
 }
 
 /* ── Field Binding ── */
@@ -880,6 +1013,8 @@ function bindFields(container){
           var old = state.fieldValues[field.id] || [];
           state.fieldValues[field.id] = vals;
           logFieldChange(field.id, JSON.stringify(old), JSON.stringify(vals));
+          applyConditions(container, schema);
+          updateCalculatedFields(container, schema);
         };
       });
       return;
@@ -893,6 +1028,11 @@ function bindFields(container){
         var old = state.fieldValues[field.id];
         state.fieldValues[field.id] = el.checked;
         logFieldChange(field.id, old, el.checked);
+        applyConditions(container, schema);
+        updateCalculatedFields(container, schema);
+        /* Update progress bar */
+        var progress = container.querySelector('.eqms-progress');
+        if(progress) progress.outerHTML = renderProgressBar(schema);
       };
       return;
     }
@@ -902,6 +1042,60 @@ function bindFields(container){
       var newVal = field.type === 'number' ? (el.value === '' ? '' : Number(el.value)) : el.value;
       state.fieldValues[field.id] = newVal;
       logFieldChange(field.id, old, newVal);
+      /* Clear error styling on change */
+      var wrap = el.closest('[data-field-wrapper]');
+      if(wrap){
+        wrap.classList.remove('eqms-field-error');
+        var em = wrap.querySelector('.eqms-error-msg');
+        if(em && em.parentNode) em.parentNode.removeChild(em);
+      }
+      /* Update conditional visibility and calculated fields */
+      applyConditions(container, schema);
+      updateCalculatedFields(container, schema);
+      /* Update progress bar */
+      var progress = container.querySelector('.eqms-progress');
+      if(progress) progress.outerHTML = renderProgressBar(schema);
+    };
+  });
+
+  /* ── Table field binding ── */
+  Array.prototype.forEach.call(container.querySelectorAll('[data-table-add]'), function(addBtn){
+    addBtn.onclick = function(){
+      var fid = addBtn.getAttribute('data-table-add') || '';
+      var field = fields.find(function(f){ return f.id === fid; });
+      if(!field) return;
+      var cols = field.columns || [];
+      if(!Array.isArray(state.fieldValues[fid])) state.fieldValues[fid] = [];
+      var newRow = {};
+      cols.forEach(function(col){ var cid = typeof col === 'string' ? col : (col.id || col.label || ''); newRow[cid] = ''; });
+      state.fieldValues[fid].push(newRow);
+      logFieldChange(fid, '', '[row added]');
+      renderForm(container);
+    };
+  });
+
+  Array.prototype.forEach.call(container.querySelectorAll('[data-table-del]'), function(delBtn){
+    delBtn.onclick = function(){
+      var fid = delBtn.getAttribute('data-table-del') || '';
+      var rowIndex = parseInt(delBtn.getAttribute('data-row') || '0', 10);
+      var field = fields.find(function(f){ return f.id === fid; });
+      if(!field) return;
+      if(Array.isArray(state.fieldValues[fid])) state.fieldValues[fid].splice(rowIndex, 1);
+      if(!state.fieldValues[fid] || !state.fieldValues[fid].length) state.fieldValues[fid] = [{}];
+      logFieldChange(fid, '', '[row deleted]');
+      renderForm(container);
+    };
+  });
+
+  Array.prototype.forEach.call(container.querySelectorAll('.eqms-table-cell'), function(cell){
+    cell.oninput = cell.onchange = function(){
+      var fid = cell.getAttribute('data-table') || '';
+      var colKey = cell.getAttribute('data-col') || '';
+      var rowIndex = parseInt(cell.getAttribute('data-row') || '0', 10);
+      if(!Array.isArray(state.fieldValues[fid])) state.fieldValues[fid] = [];
+      while(state.fieldValues[fid].length <= rowIndex) state.fieldValues[fid].push({});
+      state.fieldValues[fid][rowIndex][colKey] = cell.value;
+      logFieldChange(fid + '[' + rowIndex + '].' + colKey, '', cell.value);
     };
   });
 
@@ -927,7 +1121,46 @@ function bindFields(container){
   if(submitBtn) submitBtn.onclick = function(){
     var missing = validateRequired();
     if(missing.length){
-      toast(t('Thieu truong bat buoc: ', 'Missing required fields: ') + missing.join(', '), 'warn');
+      /* Clear previous error marks */
+      Array.prototype.forEach.call(container.querySelectorAll('.eqms-field-error'), function(el){
+        el.classList.remove('eqms-field-error');
+        var em = el.querySelector('.eqms-error-msg');
+        if(em && em.parentNode) em.parentNode.removeChild(em);
+      });
+      /* Mark each invalid field */
+      missing.forEach(function(m){
+        var wrap = container.querySelector('[data-field-wrapper="' + m.id + '"]');
+        if(wrap){
+          wrap.classList.add('eqms-field-error');
+          var errMsg = document.createElement('div');
+          errMsg.className = 'eqms-error-msg';
+          errMsg.textContent = t('Trường bắt buộc', 'Required field');
+          wrap.appendChild(errMsg);
+        }
+      });
+      toast(t('Thiếu trường bắt buộc: ', 'Missing required fields: ') + missing.map(function(m){ return m.label; }).join(', '), 'warn');
+      var firstErr = container.querySelector('.eqms-field-error');
+      if(firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    /* Cross-field validation */
+    var crossErrors = validateCrossRules();
+    if(crossErrors.length){
+      crossErrors.forEach(function(err){
+        (err.fields || []).forEach(function(fid){
+          var wrap = container.querySelector('[data-field-wrapper="' + fid + '"]');
+          if(wrap){
+            wrap.classList.add('eqms-field-error');
+            var errMsg = document.createElement('div');
+            errMsg.className = 'eqms-error-msg';
+            errMsg.textContent = err.message;
+            wrap.appendChild(errMsg);
+          }
+        });
+      });
+      toast(crossErrors.map(function(e){ return e.message; }).join(' | '), 'warn');
+      var firstCrossErr = container.querySelector('.eqms-field-error');
+      if(firstCrossErr) firstCrossErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
     submitBtn.disabled = true;
@@ -983,16 +1216,44 @@ function bindFields(container){
   });
 }
 
+/* ── Cross-field validation ── */
+function validateCrossRules(){
+  var schema = state.schema;
+  if(!schema || !Array.isArray(schema.cross_validation)) return [];
+  var errors = [];
+  schema.cross_validation.forEach(function(rule){
+    if(!rule || !rule.rule) return;
+    try {
+      var expr = String(rule.rule).replace(/([a-z_][a-z0-9_]*)/gi, function(match){
+        var v = state.fieldValues[match];
+        if(v === undefined || v === null || v === '') return '0';
+        if(!isNaN(Number(v))) return String(Number(v));
+        return '"' + String(v).replace(/"/g, '\\"') + '"';
+      });
+      /* eslint-disable-next-line no-new-func */
+      var pass = Function('"use strict"; return (' + expr + ')')();
+      if(!pass){
+        errors.push({
+          fields: rule.fields || [],
+          message: t(rule.message || '', rule.message_en || '')
+        });
+      }
+    } catch(e){ /* skip invalid rules */ }
+  });
+  return errors;
+}
+
 /* ── Validation ── */
 function validateRequired(){
   var schema = state.schema;
   if(!schema) return [];
   var missing = [];
   (schema.fields || []).forEach(function(field){
-    if(!field.required) return;
+    if(!field || !field.required) return;
+    if(!evaluateShowIf(field, state.fieldValues)) return;
     var val = state.fieldValues[field.id];
     if(val === undefined || val === null || val === '' || (Array.isArray(val) && !val.length)){
-      missing.push(t(field.label || field.id, field.label_en || field.label || field.id));
+      missing.push({ id: field.id, label: t(field.label || field.id, field.label_en || field.label || field.id) });
     }
   });
   return missing;

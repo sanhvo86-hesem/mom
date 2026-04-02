@@ -901,7 +901,9 @@ function eqmsForms(){
     var runtimeAlias = String(form.html_runtime_form_code || (form.schema && form.schema.html_runtime_form_code) || '').trim();
     if(form.online === false && runtimeAlias) return;
     var standalonePath = eqmsStandalonePath(form);
-    if(!standalonePath) return;
+    /* Include forms with a standalone HTML runtime OR explicitly online JSON-schema forms */
+    var isOnlineJsonForm = !standalonePath && (form.online === true || form.delivery_mode === 'online' || form.delivery_mode === 'hybrid');
+    if(!standalonePath && !isOnlineJsonForm) return;
     var bucketKey = standalonePath || runtimeAlias || String(form.form_code || '').trim().toUpperCase();
     if(!buckets[bucketKey] || eqmsFormRank(form) > eqmsFormRank(buckets[bucketKey])){
       buckets[bucketKey] = form;
@@ -1866,6 +1868,7 @@ function renderEqmsHub(container){
           '<p>' + esc(t('Tạo mới hồ sơ online hoặc offline từ cùng một form, tiếp tục bản nháp đang dở, và chuyển sang sổ quản lý mã đã cấp để theo dõi toàn bộ vòng đời.', 'Start online or offline records from the same form, resume in-progress drafts, and jump into the issued-code registry to track the full lifecycle.')) + '</p>' +
         '</div>' +
         '<div class="ec-toolbar-actions">' +
+          '<button type="button" class="ec-btn primary" id="ec-eqms-create-form">' + esc(t('Tạo form eQMS mới', 'Create new eQMS form')) + '</button>' +
           '<button type="button" class="ec-btn ghost" id="ec-eqms-builder-new">' + esc(t('Mở editor form HTML', 'Open HTML form editor')) + '</button>' +
         '</div>' +
         '<div class="ec-kpi-grid">' +
@@ -1947,6 +1950,223 @@ function renderEqmsHub(container){
     }
     showToast(t('Chưa có mẫu HTML nào sẵn sàng để mở editor.', 'No governed HTML form template is ready for editing yet.'), 'warn');
   };
+
+  /* Create form button */
+  var createBtn = document.getElementById('ec-eqms-create-form');
+  if(createBtn) createBtn.onclick = function(){ openEqmsFormCreator(); };
+}
+
+/* ── eQMS Form Creator Wizard (Module-Builder approach) ── */
+function openEqmsFormCreator(){
+  var overlay = document.createElement('div');
+  overlay.className = 'ec-modal-overlay';
+  overlay.innerHTML =
+    '<div class="ec-modal ec-modal-lg">' +
+      '<div class="ec-modal-header">' +
+        '<h3>' + esc(t('Tạo form eQMS mới', 'Create new eQMS form')) + '</h3>' +
+        '<button type="button" class="ec-modal-close" data-action="close">&times;</button>' +
+      '</div>' +
+      '<div class="ec-modal-body">' +
+        '<p style="color:#64748b;font-size:13px;margin:0 0 16px">' + esc(t('Điền thông tin cơ bản để tạo JSON schema mới. Sau đó thêm sections và fields qua form builder.', 'Fill in basic info to generate a new JSON schema. Then add sections and fields via the form builder.')) + '</p>' +
+        '<div style="display:grid;gap:14px;grid-template-columns:1fr 1fr">' +
+          '<div><label class="ec-field-label">' + esc(t('Mã form', 'Form Code')) + ' *</label><input id="ec-fc-code" class="ec-input" placeholder="VD: FRM-701-AUDIT" style="font-family:monospace"></div>' +
+          '<div><label class="ec-field-label">' + esc(t('Phiên bản', 'Version')) + '</label><input id="ec-fc-version" class="ec-input" value="V1"></div>' +
+          '<div style="grid-column:1/-1"><label class="ec-field-label">' + esc(t('Tên form (EN)', 'Form Title (EN)')) + ' *</label><input id="ec-fc-title" class="ec-input" placeholder="e.g. Internal Audit Report"></div>' +
+          '<div style="grid-column:1/-1"><label class="ec-field-label">' + esc(t('Tên form (VI)', 'Form Title (VI)')) + '</label><input id="ec-fc-title-vi" class="ec-input" placeholder="VD: Báo cáo đánh giá nội bộ"></div>' +
+          '<div><label class="ec-field-label">' + esc(t('Danh mục', 'Category')) + '</label><select id="ec-fc-category" class="ec-select"><option value="quality">Quality</option><option value="production">Production</option><option value="hr">HR</option><option value="logistics">Logistics</option><option value="safety">Safety</option><option value="other">Other</option></select></div>' +
+          '<div><label class="ec-field-label">' + esc(t('SOP tham chiếu', 'SOP Reference')) + '</label><input id="ec-fc-sop" class="ec-input" placeholder="VD: SOP-601"></div>' +
+          '<div><label class="ec-field-label">' + esc(t('Record Type', 'Record Type')) + '</label><input id="ec-fc-record-type" class="ec-input" placeholder="VD: AUDIT, NCR, CAPA"></div>' +
+          '<div><label class="ec-field-label">' + esc(t('Chủ sở hữu', 'Owner')) + '</label><input id="ec-fc-owner" class="ec-input" placeholder="VD: QA / ENG"></div>' +
+          '<div style="grid-column:1/-1"><label class="ec-field-label">' + esc(t('Mô tả (EN)', 'Description (EN)')) + '</label><textarea id="ec-fc-desc" class="ec-input" rows="2" placeholder="Brief description of the form purpose"></textarea></div>' +
+        '</div>' +
+        '<div style="margin-top:16px;padding:14px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0">' +
+          '<div style="font-size:12px;font-weight:700;color:#334155;margin-bottom:8px">' + esc(t('Template khởi tạo', 'Starter Template')) + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+            '<label class="ec-radio-card"><input type="radio" name="ec-fc-template" value="blank" checked> ' + esc(t('Trống', 'Blank')) + '</label>' +
+            '<label class="ec-radio-card"><input type="radio" name="ec-fc-template" value="scar"> SCAR (FRM-403)</label>' +
+            '<label class="ec-radio-card"><input type="radio" name="ec-fc-template" value="ncr"> NCR (FRM-631)</label>' +
+            '<label class="ec-radio-card"><input type="radio" name="ec-fc-template" value="capa"> CAPA (FRM-641)</label>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="ec-modal-footer">' +
+        '<button type="button" class="ec-btn ghost" data-action="close">' + esc(t('Hủy', 'Cancel')) + '</button>' +
+        '<button type="button" class="ec-btn primary" data-action="create">' + esc(t('Tạo schema và mở builder', 'Create schema & open builder')) + '</button>' +
+      '</div>' +
+    '</div>';
+
+  document.body.appendChild(overlay);
+
+  overlay.addEventListener('click', function(e){
+    var action = e.target.getAttribute('data-action') || '';
+    if(action === 'close' || e.target === overlay){
+      if(overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      return;
+    }
+    if(action === 'create'){
+      var code = String((document.getElementById('ec-fc-code') || {}).value || '').trim().toUpperCase();
+      var title = String((document.getElementById('ec-fc-title') || {}).value || '').trim();
+      if(!code || !title){
+        showToast(t('Mã form và tên form là bắt buộc.', 'Form code and title are required.'), 'warn');
+        return;
+      }
+      var templateVal = '';
+      var templateRadios = overlay.querySelectorAll('[name="ec-fc-template"]');
+      for(var i = 0; i < templateRadios.length; i++){ if(templateRadios[i].checked){ templateVal = templateRadios[i].value; break; } }
+
+      var newSchema = buildNewFormSchema({
+        form_code: code,
+        title: title,
+        title_vi: String((document.getElementById('ec-fc-title-vi') || {}).value || '').trim(),
+        version: String((document.getElementById('ec-fc-version') || {}).value || 'V1').trim(),
+        category: String((document.getElementById('ec-fc-category') || {}).value || 'quality').trim(),
+        sop_ref: String((document.getElementById('ec-fc-sop') || {}).value || '').trim(),
+        record_type: String((document.getElementById('ec-fc-record-type') || {}).value || '').trim().toUpperCase(),
+        owner: String((document.getElementById('ec-fc-owner') || {}).value || '').trim(),
+        description: String((document.getElementById('ec-fc-desc') || {}).value || '').trim(),
+        template: templateVal
+      });
+
+      /* Save schema to server */
+      apiCall('eqms_form_schema_save', { schema: newSchema }, 'POST', 15000)
+        .then(function(resp){
+          if(resp && resp.ok){
+            showToast(t('Đã tạo schema ' + code + '. Mở form builder...', 'Created schema ' + code + '. Opening form builder...'), 'success');
+          } else {
+            /* Fallback: save to localStorage */
+            try { localStorage.setItem('hesem:builder:' + code, JSON.stringify({ saved_at: new Date().toISOString(), schema: newSchema })); } catch(e){}
+            showToast(t('Đã lưu schema cục bộ. API chưa sẵn sàng — sẽ đồng bộ sau.', 'Schema saved locally. API not ready — will sync later.'), 'info');
+          }
+          if(overlay.parentNode) overlay.parentNode.removeChild(overlay);
+          /* Open the form builder for the new schema */
+          if(typeof window._ecOpenEqmsBuilder === 'function'){
+            window._ecOpenEqmsBuilder(code, newSchema);
+          } else {
+            openEqmsRuntime(code, { editMode: true, createIfMissing: true });
+          }
+        })
+        .catch(function(){
+          try { localStorage.setItem('hesem:builder:' + code, JSON.stringify({ saved_at: new Date().toISOString(), schema: newSchema })); } catch(e){}
+          showToast(t('Đã lưu schema cục bộ.', 'Schema saved locally.'), 'info');
+          if(overlay.parentNode) overlay.parentNode.removeChild(overlay);
+          openEqmsRuntime(code, { editMode: true, createIfMissing: true });
+        });
+    }
+  });
+}
+
+function buildNewFormSchema(opts){
+  var schema = {
+    '$schema': 'hesem-eqms-form/v1',
+    form_code: opts.form_code,
+    title: opts.title,
+    title_vi: opts.title_vi || '',
+    version: opts.version || 'V1',
+    version_int: 1,
+    category: opts.category || 'quality',
+    frequency: 'per_event',
+    online: true,
+    delivery_mode: 'online',
+    sop_ref: opts.sop_ref || '',
+    record_type: opts.record_type || '',
+    owner: opts.owner || '',
+    approver: opts.owner || '',
+    description: opts.description || '',
+    description_vi: opts.title_vi || '',
+    roles_allowed: {
+      create: ['admin', 'qa_manager', 'quality_engineer'],
+      fill: ['admin', 'qa_manager', 'quality_engineer'],
+      review: ['qa_manager'],
+      approve: ['qa_manager'],
+      view: ['all']
+    },
+    workflow: {
+      type: 'sequential',
+      states: ['draft', 'submitted', 'in_review', 'approved', 'closed', 'voided'],
+      transitions: {
+        draft: { next: ['submitted'], roles: ['fill'] },
+        submitted: { next: ['in_review'], roles: ['review'] },
+        in_review: { next: ['approved', 'draft'], roles: ['approve'] },
+        approved: { next: ['closed', 'voided'], roles: ['approve'] },
+        closed: { next: [], terminal: true },
+        voided: { next: [], terminal: true }
+      }
+    },
+    sections: [
+      {
+        id: 'general',
+        title: 'General Information',
+        title_vi: 'Thông tin chung',
+        description: 'Basic record identification and context.',
+        description_vi: 'Nhận diện hồ sơ và ngữ cảnh cơ bản.',
+        color: '#1971c2',
+        field_ids: ['record_date', 'department', 'description_field']
+      }
+    ],
+    fields: [
+      { id: 'record_date', type: 'date', label: 'Record Date', label_vi: 'Ngày ghi nhận', required: true, default: 'today', audit_tracked: true },
+      { id: 'department', type: 'select', label: 'Department', label_vi: 'Phòng ban', required: true, options: [
+        { value: 'QA', label: 'Chất lượng (QA)' },
+        { value: 'PRO', label: 'Sản xuất (Production)' },
+        { value: 'ENG', label: 'Kỹ thuật (Engineering)' },
+        { value: 'SCM', label: 'Chuỗi cung ứng (SCM)' },
+        { value: 'HR', label: 'Nhân sự (HR)' }
+      ], audit_tracked: true },
+      { id: 'description_field', type: 'textarea', label: 'Description', label_vi: 'Mô tả', width: 'full', required: true, audit_tracked: true }
+    ],
+    signature_blocks: [
+      { id: 'originator', label: 'Người tạo', label_en: 'Originator', meaning: 'Authored', required_on_submit: true, roles: ['fill'] },
+      { id: 'approver', label: 'Người phê duyệt', label_en: 'Approver', meaning: 'Approved', required_on_approve: true, roles: ['approve'] }
+    ],
+    auto_fields: ['record_id', 'submitted_by', 'submitted_at', 'entry_id'],
+    cross_validation: [],
+    evidence_requirements: []
+  };
+
+  /* Apply template sections if selected */
+  if(opts.template === 'scar' || opts.template === 'ncr' || opts.template === 'capa'){
+    schema.sections.push({
+      id: 'findings',
+      title: 'Findings & Containment',
+      title_vi: 'Phát hiện và ngăn chặn',
+      color: '#e03131',
+      field_ids: ['finding_description', 'severity', 'containment_action']
+    });
+    schema.fields.push(
+      { id: 'finding_description', type: 'textarea', label: 'Finding Description', label_vi: 'Mô tả phát hiện', width: 'full', required: true, audit_tracked: true },
+      { id: 'severity', type: 'select', label: 'Severity', label_vi: 'Mức độ', required: true, options: [
+        { value: 'minor', label: 'Nhẹ (Minor)' },
+        { value: 'major', label: 'Nặng (Major)' },
+        { value: 'critical', label: 'Nghiêm trọng (Critical)' }
+      ], audit_tracked: true },
+      { id: 'containment_action', type: 'textarea', label: 'Containment Action', label_vi: 'Hành động ngăn chặn', width: 'full', required: true, audit_tracked: true }
+    );
+    schema.sections.push({
+      id: 'root_cause',
+      title: 'Root Cause & Corrective Action',
+      title_vi: 'Nguyên nhân gốc và hành động khắc phục',
+      color: '#d97706',
+      field_ids: ['root_cause_analysis', 'corrective_action', 'preventive_action']
+    });
+    schema.fields.push(
+      { id: 'root_cause_analysis', type: 'textarea', label: 'Root Cause Analysis', label_vi: 'Phân tích nguyên nhân gốc', width: 'full', required: true, audit_tracked: true },
+      { id: 'corrective_action', type: 'textarea', label: 'Corrective Action', label_vi: 'Hành động khắc phục', width: 'full', required: true, audit_tracked: true },
+      { id: 'preventive_action', type: 'textarea', label: 'Preventive Action', label_vi: 'Hành động phòng ngừa', width: 'full', audit_tracked: true }
+    );
+    schema.sections.push({
+      id: 'verification',
+      title: 'Verification & Closeout',
+      title_vi: 'Xác nhận và đóng hồ sơ',
+      color: '#2f9e44',
+      field_ids: ['verification_method', 'verification_result']
+    });
+    schema.fields.push(
+      { id: 'verification_method', type: 'text', label: 'Verification Method', label_vi: 'Phương pháp xác nhận', width: 'full', audit_tracked: true },
+      { id: 'verification_result', type: 'textarea', label: 'Verification Result', label_vi: 'Kết quả xác nhận', width: 'full', audit_tracked: true }
+    );
+  }
+
+  return schema;
 }
 
 function renderEqmsRegistry(container){

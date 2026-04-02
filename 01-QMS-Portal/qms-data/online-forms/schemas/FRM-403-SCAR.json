@@ -3,8 +3,8 @@
   "form_code": "FRM-403-SCAR",
   "title": "Supplier Corrective Action Request (SCAR)",
   "title_vi": "Yêu cầu hành động khắc phục nhà cung cấp (SCAR)",
-  "version": "V1",
-  "version_int": 1,
+  "version": "V2",
+  "version_int": 2,
   "category": "quality",
   "frequency": "per_event",
   "online": true,
@@ -58,7 +58,7 @@
       "description": "Mô tả lỗi rõ ràng, lượng hàng bị ảnh hưởng và mức độ nghiêm trọng để hành động containment và phản hồi được đặt đúng trọng tâm.",
       "description_en": "Describe defect clearly, quantify affected goods and severity for focused containment and response.",
       "color": "#e03131",
-      "field_ids": ["quantity_received", "quantity_rejected", "defect_type", "severity", "defect_description"]
+      "field_ids": ["quantity_received", "quantity_rejected", "quantity_accepted", "reject_rate", "defect_type", "severity", "defect_description"]
     },
     {
       "id": "containment",
@@ -218,6 +218,24 @@
       "audit_tracked": true
     },
     {
+      "id": "quantity_accepted",
+      "type": "calculated",
+      "label": "Quantity Accepted",
+      "label_vi": "Số lượng chấp nhận",
+      "formula": "{quantity_received} - {quantity_rejected}",
+      "helper": "Tự động tính: Số nhận - Số loại bỏ.",
+      "helper_en": "Auto-calculated: Received - Rejected."
+    },
+    {
+      "id": "reject_rate",
+      "type": "calculated",
+      "label": "Reject Rate (%)",
+      "label_vi": "Tỷ lệ loại bỏ (%)",
+      "formula": "{quantity_received} > 0 ? {quantity_rejected} / {quantity_received} * 100 : 0",
+      "helper": "Tự động tính phần trăm loại bỏ trên tổng nhận.",
+      "helper_en": "Auto-calculated rejection percentage."
+    },
+    {
       "id": "defect_type",
       "type": "lookup",
       "lookup_source": "defect_catalog",
@@ -304,8 +322,10 @@
       "label": "Supplier Root Cause",
       "label_vi": "Nguyên nhân gốc từ NCC",
       "width": "full",
+      "required": true,
       "placeholder": "Nhà cung cấp giải thích nguyên nhân gốc của lỗi...",
       "placeholder_en": "Supplier explains root cause of the defect...",
+      "show_if": { "field": "root_cause_required", "op": "==", "value": "true" },
       "audit_tracked": true
     },
     {
@@ -313,8 +333,10 @@
       "type": "textarea",
       "label": "Supplier Corrective Action",
       "label_vi": "Hành động khắc phục NCC",
+      "required": true,
       "placeholder": "Nêu rõ hành động khắc phục, người chịu trách nhiệm, thời điểm hoàn tất...",
       "placeholder_en": "Describe corrective action, responsible person, completion date...",
+      "show_if": { "field": "root_cause_required", "op": "==", "value": "true" },
       "audit_tracked": true
     },
     {
@@ -405,6 +427,42 @@
     "on_overdue": { "roles": ["review", "approve"], "template": "scar_overdue" },
     "on_critical": { "roles": ["qa_manager", "supply_chain_manager"], "template": "scar_critical" }
   },
+
+  "cross_validation": [
+    {
+      "rule": "quantity_rejected <= quantity_received",
+      "message": "Số lượng loại bỏ không được lớn hơn số lượng nhận.",
+      "message_en": "Quantity rejected must not exceed quantity received.",
+      "fields": ["quantity_rejected"]
+    },
+    {
+      "rule": "supplier_response_due_date > scar_date",
+      "message": "Hạn phản hồi phải sau ngày phát hành SCAR.",
+      "message_en": "Response due date must be after SCAR issue date.",
+      "fields": ["supplier_response_due_date"]
+    }
+  ],
+
+  "evidence_requirements": [
+    {
+      "id": "defect_photo",
+      "label": "Ảnh / tài liệu lỗi",
+      "label_en": "Defect photo / documentation",
+      "type": "photo",
+      "required_on": "submitted",
+      "helper": "Đính kèm ít nhất 1 ảnh hoặc tài liệu mô tả lỗi.",
+      "helper_en": "Attach at least 1 photo or document describing the defect."
+    },
+    {
+      "id": "supplier_response_doc",
+      "label": "Tài liệu phản hồi NCC",
+      "label_en": "Supplier response document",
+      "type": "document",
+      "required_on": "verification",
+      "helper": "Đính kèm bản phản hồi chính thức từ nhà cung cấp.",
+      "helper_en": "Attach official response document from supplier."
+    }
+  ],
 
   "pdf_template": {
     "header": { "logo": true, "form_code": true, "version": true },

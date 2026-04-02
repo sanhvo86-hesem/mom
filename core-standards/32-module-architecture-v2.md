@@ -683,3 +683,239 @@ Tab 4: Cài đặt hệ thống
 -- packing_lists: Packing list header per shipment
 -- packing_list_items: Line items per packing list
 ```
+
+---
+
+## 6. eQMS WEB FORM — LOGIC BUILD XUYÊN SUỐT 10 MODULE
+
+### 6.1 Ba tầng kiến trúc và vai trò
+
+Hệ thống có 3 tầng riêng biệt, không chồng lấn:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│ TẦNG 1: MODULE BUILDER (Dashboard Layer)                            │
+│ File:  00-block-engine.js (6,108 LOC) + 31-module-builder.js       │
+│ Schema: Tab → Block JSON (M1-orders.json, M2-orders.json...)       │
+│ Chức năng: Dàn trang dashboard, KPI, chart, data-table, filter     │
+│ DÙNG CHO: XEM dữ liệu — hiển thị, filter, aggregate, report       │
+│ Phương thức: Block types (kpi-row, data-table, chart-bar, ...)     │
+│ Storage: Module schema JSON, dữ liệu qua API binding               │
+├─────────────────────────────────────────────────────────────────────┤
+│ TẦNG 2: eQMS WEB FORM (Form Layer)                                 │
+│ File:  10-eqms-form-runtime.js (1,744 LOC)                         │
+│ Schema: Section → Field JSON (FRM-631.json, FRM-641.json...)        │
+│ Chức năng: Điền hồ sơ, validation, e-signature, audit trail        │
+│ DÙNG CHO: GHI dữ liệu — data entry, approval, compliance          │
+│ Phương thức: Field types (text, lookup, table, calculated, ...)     │
+│ Storage: form_entries (PostgreSQL) + localStorage draft             │
+├─────────────────────────────────────────────────────────────────────┤
+│ TẦNG 3: EVIDENCE VAULT (Evidence Layer)                             │
+│ File:  18-evidence-vault.js + EvidenceVaultService.php              │
+│ Chức năng: Upload, SHA-256 hash chain, custody trail, link to form  │
+│ DÙNG CHO: LƯU CHỨNG CỨ — tamper-evident storage, 5-year retention │
+│ Storage: evidence_vault + evidence_chain_custody (PostgreSQL)       │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**Quan hệ giữa 3 tầng:**
+- Module Builder **ĐỌC** dữ liệu → hiển thị dashboard
+- eQMS Form **GHI** dữ liệu → tạo records có kiểm soát
+- Evidence Vault **LINK** chứng cứ → gắn vào form entries
+- Module Builder KHÔNG bao giờ ghi dữ liệu chất lượng trực tiếp
+- eQMS Form KHÔNG bao giờ hiển thị dashboard/report
+
+### 6.2 Module Builder vs eQMS Form — Không chia sẻ code
+
+| Khía cạnh | Module Builder | eQMS Web Form |
+|---|---|---|
+| Renderer | `renderBlock()` dispatcher | `renderField()` + `renderForm()` |
+| Schema format | `{ tabs: [{ blocks: [...] }] }` | `{ sections: [{ field_ids: [...] }], fields: [...] }` |
+| Field types | 40+ block types (layout, data, chart) | 16+ field types (input controls) |
+| Data source | API binding declarative `dataSource.api` | Direct `state.fieldValues` + master-data lookup |
+| Validation | Per-block display validation | Per-field required + `show_if` conditional + inline error |
+| Audit | Không | Field-level change tracking + timestamp + user |
+| E-signature | Không | 3-tier workflow (reported → reviewed → approved) |
+| i18n | Full `{ vi, en }` objects | `label` + `label_vi` / `label_en` |
+
+**Kết luận:** Hai hệ thống này là **consumer vs producer** — phát triển SONG SONG, không dependency.
+
+### 6.3 eQMS Form trong từng Module — Mapping chi tiết
+
+```
+MODULE 1 💰 Báo giá     → Không dùng eQMS form (CRUD trực tiếp qua Module Builder)
+MODULE 2 📦 Đơn hàng    → Không dùng eQMS form (CRUD trực tiếp)
+MODULE 3 📋 Kế hoạch    → Không dùng eQMS form
+MODULE 4 🚚 Mua hàng    → eQMS form FRM-403-SCAR (SCAR cho nhà cung cấp)
+MODULE 5 🏭 Sản xuất    → eQMS forms: FRM-501→525 (production records, setup sheets)
+MODULE 6 🔴 Chất lượng  → eQMS forms: FRM-631 (NCR), FRM-641 (CAPA), FRM-651 (FAI)
+MODULE 7 📋 Hồ sơ       → eQMS form runtime HOST — tất cả forms mở qua đây
+MODULE 8 📊 Báo cáo     → Không dùng eQMS form (Module Builder dashboard)
+MODULE 9 📁 Tài liệu    → Không dùng eQMS form (SOP/WI viewer riêng)
+MODULE 10 ⚙ Quản trị   → Không dùng eQMS form (master data CRUD)
+```
+
+### 6.4 M6 Chất lượng — Kiến trúc đích (Form IS the Module)
+
+**Nguyên tắc world-class (Veeva Vault QMS, MasterControl, ETQ Reliance):**
+NCR/CAPA/8D KHÔNG phải module riêng — chúng là **form instances có workflow**.
+Module Chất lượng chỉ là dashboard orchestrator, gọi eQMS form runtime khi cần ghi dữ liệu.
+
+**Hiện trạng (3 hệ thống chồng lấn — CẦN HỢP NHẤT):**
+
+```
+┌────────────────────────────────────────────────────────────────────┐
+│ HỆ THỐNG A: eQMS Form Schemas (CHÍNH XÁC, ĐẦY ĐỦ)               │
+│ FRM-631 NCR V2.1 — 16 fields, lookup, 6M root cause, e-signature │
+│ FRM-641 CAPA V1 — 5Why/Fishbone/8D, effectiveness check 30-90d   │
+│ FRM-403-SCAR V1 — supplier corrective action                     │
+│ Storage: form_entries (PostgreSQL) — audit trail đầy đủ           │
+├────────────────────────────────────────────────────────────────────┤
+│ HỆ THỐNG B: Legacy DB Tables (DƯ THỪA)                           │
+│ ncr_records — defect_type, severity, RPN, disposition             │
+│ capa_records — source_ncr_id, corrective_action                   │
+│ customer_complaints — D1-D8 columns                               │
+│ Storage: PostgreSQL trực tiếp — không e-signature, không audit    │
+├────────────────────────────────────────────────────────────────────┤
+│ HỆ THỐNG C: Quality Exception Hub (ĐƠN GIẢN HÓA QUÁ MỨC)       │
+│ 15-quality-exception-hub.js — simple dialog form                  │
+│ Chỉ capture: subject, severity, department, assigned_to, desc     │
+│ Storage: qms-data/exceptions/ (JSON files) — KHÔNG audit trail    │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+**Kiến trúc đích — M6 gọi eQMS Form:**
+
+```
+┌───────────────────────────────────────────────────────────────────┐
+│ M6 CHẤT LƯỢNG (Dashboard + Orchestrator)                          │
+│ 15-quality-exception-hub.js REFACTORED                            │
+│                                                                    │
+│ Tab 1: NCR & CAPA (dashboard)                                     │
+│   [Tạo NCR] ──→ openEqmsForm('FRM-631', container, {             │
+│                    editMode: true, createIfMissing: true })        │
+│   [Tạo CAPA] ──→ openEqmsForm('FRM-641', container, {            │
+│                    editMode: true, createIfMissing: true })        │
+│   [Xem NCR]  ──→ openEqmsForm('FRM-631', container, {            │
+│                    entryId: entry.entry_id, editMode: false })     │
+│   NCR list   ──→ Module Builder data-table block                  │
+│                   gọi API form_entries?form_code=FRM-631           │
+│                                                                    │
+│ Tab 2: Khiếu nại KH (8D)                                          │
+│   [Tạo 8D]  ──→ openEqmsForm('FRM-8D', container, {...})         │
+│   8D list    ──→ data-table gọi API form_entries?form_code=FRM-8D │
+│                                                                    │
+│ Tab 3: MRB & Deviation                                             │
+│   [Tạo MRB] ──→ openEqmsForm('FRM-MRB', container, {...})        │
+│                                                                    │
+│ Tab 4-6: FMEA, APQP, COPQ/SPC                                     │
+│   Giữ nguyên — đây là analysis tools, không phải data entry forms │
+└───────────────────────────────────────────────────────────────────┘
+          │ form data stored in
+          ▼
+┌───────────────────────────────────────────────────────────────────┐
+│ eQMS FORM RUNTIME (10-eqms-form-runtime.js)                       │
+│                                                                    │
+│ FRM-631.json (NCR V2.1):                                           │
+│   - Master-data lookup: customer → SO → JO → WO → part → rev     │
+│   - 6M root cause multi-select                                     │
+│   - Defect catalog lookup                                          │
+│   - Electronic signature 3 cấp                                     │
+│   - show_if conditional logic                                      │
+│   - Inline validation + progress bar                               │
+│   - Auto-save 90s                                                  │
+│   - Audit trail field-level                                        │
+│                                                                    │
+│ FRM-641.json (CAPA V1):                                            │
+│   - Source reference (NCR, Audit, Complaint, Management Review)    │
+│   - Root cause method (5Why, Fishbone, 8D, IS/IS-NOT)             │
+│   - Effectiveness check 30-90 ngày                                 │
+│   - Evidence requirements enforced                                 │
+│                                                                    │
+│ Tất cả → form_entries (PostgreSQL) — SINGLE SOURCE OF TRUTH       │
+└───────────────────────────────────────────────────────────────────┘
+```
+
+### 6.5 M7 Hồ sơ & Chứng cứ — HOST cho eQMS Form Runtime
+
+M7 là nơi **chứa** eQMS form runtime (tab "Online Form"):
+- Form Hub liệt kê tất cả form schemas có `online: true`
+- Quản lý Record ID (cấp mã NCR-2026-001, CAPA-2026-003...)
+- Upload & verify offline Excel forms
+- Evidence vault link chứng cứ vào form entries
+
+**M6 gọi eQMS form → dữ liệu nằm trong M7 storage → M6 dashboard đọc qua API.**
+Đây là pattern "Cross-reference, not duplication" (mục 1.1).
+
+### 6.6 Phân kỳ phát triển — Chiến lược song song
+
+```
+PHASE 1 (song song, không block nhau):
+├── eQMS Form Runtime ←── nâng cấp field types, show_if, validation [ĐÃ LÀM]
+├── Module Builder     ←── hoàn thiện block library, M1-M10 schemas
+└── Evidence Vault     ←── đã hoàn thiện, chạy được ngay
+
+PHASE 2 (sau khi Phase 1 ổn định):
+├── M6 refactor        ←── exception hub gọi openEqmsForm() thay dialog
+├── form_entries API   ←── API filter form_entries theo form_code cho dashboard
+└── Thêm FRM-8D, FRM-MRB schemas
+
+PHASE 3 (consolidation):
+├── Sync form_entries → ncr_records/capa_records (backward compat reporting)
+├── Deprecate JSON file storage (qms-data/exceptions/)
+└── Module Builder M6 dashboard dùng data-table block gọi form_entries API
+```
+
+### 6.7 eQMS Form Schemas sẵn sàng cho M6
+
+| Form Code | Tên | Trạng thái | Dùng cho Tab M6 |
+|---|---|---|---|
+| FRM-631 | NCR | V2.1, `online: true`, 16 fields | Tab 1: NCR & CAPA |
+| FRM-641 | CAPA | V1, 18 fields | Tab 1: NCR & CAPA |
+| FRM-403-SCAR | SCAR | V1, `online: true`, HTML runtime | Tab 1 (supplier-triggered) |
+| FRM-651 | Final Inspection | V1 | Tab 3: MRB / OQC |
+| *(cần tạo)* FRM-8D | 8D Report | — | Tab 2: Khiếu nại KH |
+| *(cần tạo)* FRM-MRB | MRB Disposition | — | Tab 3: MRB |
+| *(cần tạo)* FRM-DEV | Deviation Request | — | Tab 3: Deviation |
+
+### 6.8 So sánh data richness: Exception Hub simple form vs eQMS FRM-631
+
+| Trường | Exception Hub (hiện tại) | FRM-631 eQMS (sẵn sàng) |
+|---|---|---|
+| Customer | Text tự gõ | Governed master-data lookup |
+| SO → JO → WO chain | Không có | Cascading lookup truy xuất |
+| Part + Revision | Không có | Lookup kèm revision status |
+| Defect type | Không có | Defect catalog lookup |
+| Root cause | Không có | 6M multi-select (Man, Machine, Method, Material, Measurement, Environment) |
+| Disposition | Không có | Select (use_as_is, rework, scrap, return) |
+| Dimensional data | Không có | Table field (measurements grid) |
+| E-signature | Không có | 3 cấp (reported → reviewed → approved) |
+| Audit trail | Không có | Field-level change tracking |
+| Evidence link | Không có | evidence_requirements enforced |
+| Conditional fields | Không có | show_if logic |
+| Auto-save | Không có | 90s auto-save + localStorage + server draft |
+
+### 6.9 Quy tắc phân biệt: Khi nào dùng Module Builder, khi nào dùng eQMS Form
+
+```
+CẦN eQMS Web Form khi:
+  ✓ Dữ liệu cần audit trail (ai sửa gì, lúc nào)
+  ✓ Cần e-signature / approval workflow
+  ✓ Cần evidence attachment có kiểm soát
+  ✓ Hồ sơ ISO / compliance (NCR, CAPA, FAI, SCAR, training record)
+  ✓ Dữ liệu cần version control (resubmission có tracking)
+  → Ví dụ: NCR, CAPA, 8D, SCAR, FAI, training, deviation, concession
+
+CẦN Module Builder khi:
+  ✓ Hiển thị dashboard, KPI, chart, trend
+  ✓ Data table với filter/sort/export
+  ✓ CRUD đơn giản (tạo quote, tạo SO — không cần e-sig)
+  ✓ Aggregation & reporting
+  ✓ Page composition (layout nhiều block)
+  → Ví dụ: SO list, production dispatch board, COPQ Pareto, SPC chart
+
+KHÔNG BAO GIỜ:
+  ✗ Module Builder ghi dữ liệu compliance trực tiếp
+  ✗ eQMS Form hiển thị dashboard/report
+  ✗ Tạo form dialog inline cho dữ liệu cần audit trail
+```

@@ -345,6 +345,165 @@
 .eqms-audit-action { color: var(--eqms-text-2); }
 .eqms-audit-detail { color: var(--eqms-text-3); font-family: var(--eqms-mono); font-size: 10px; }
 
+/* ── Form completion progress bar ── */
+.eqms-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 8px 14px;
+  background: var(--eqms-surface);
+  border: 1px solid var(--eqms-border);
+  border-radius: var(--eqms-radius);
+}
+.eqms-progress-track {
+  flex: 1;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.eqms-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--eqms-primary), #42a5f5);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+  min-width: 4px;
+}
+.eqms-progress-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--eqms-text-2);
+  white-space: nowrap;
+  font-family: var(--eqms-mono);
+}
+
+/* ── Auto-save indicator ── */
+.eqms-autosave-indicator {
+  margin-left: auto;
+  font-size: 10px;
+  color: #92400e;
+  font-family: var(--eqms-mono);
+  opacity: 0.8;
+}
+
+/* ── Inline field validation ── */
+.eqms-field.eqms-field-error > .eqms-input,
+.eqms-field.eqms-field-error > select.eqms-input,
+.eqms-field.eqms-field-error > textarea.eqms-input {
+  border-color: var(--eqms-danger);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+.eqms-error-msg {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--eqms-danger);
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.eqms-error-msg::before {
+  content: '!';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--eqms-danger);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+/* ── Table field ── */
+.eqms-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--eqms-radius);
+  border: 1px solid var(--eqms-border);
+}
+.eqms-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.eqms-table thead {
+  background: #f8fafc;
+}
+.eqms-table th {
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--eqms-text-2);
+  border-bottom: 1px solid var(--eqms-border);
+}
+.eqms-table-th-del { width: 36px; }
+.eqms-table td {
+  padding: 4px 6px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+.eqms-table tr:last-child td { border-bottom: none; }
+.eqms-table .eqms-input {
+  padding: 5px 8px;
+  font-size: 12px;
+  border-radius: 6px;
+  min-width: 80px;
+}
+.eqms-table-del {
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 6px;
+  background: #fee2e2;
+  color: var(--eqms-danger);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.eqms-table-del:hover { background: #fecaca; }
+.eqms-table-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 8px 10px;
+  padding: 6px 12px;
+  border: 1px dashed #93c5fd;
+  border-radius: var(--eqms-radius);
+  background: #eff6ff;
+  color: var(--eqms-primary);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.eqms-table-add:hover { background: #dbeafe; }
+
+/* ── Calculated field ── */
+.eqms-calc {
+  padding: 9px 12px;
+  background: #f8fafc;
+  border: 1px solid var(--eqms-border);
+  border-radius: var(--eqms-radius);
+  font-size: 13px;
+  font-family: var(--eqms-mono);
+  color: var(--eqms-text);
+  font-weight: 600;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+}
+
 /* ── Print styles ── */
 @media print {
   .eqms-runtime { max-width: none; padding: 0; background: #fff; }
