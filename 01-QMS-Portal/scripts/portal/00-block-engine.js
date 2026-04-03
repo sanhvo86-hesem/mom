@@ -5039,7 +5039,7 @@ function _renderBlockInner(block, data, state, reactiveCtx){
     case 'chart-scatter':   return renderScatterChart(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
     case 'chart-radar':     return renderRadarChart(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
     case 'chart-combo':     return renderComboChart(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
-    case 'chart-donut':     return renderDonutChart(resolvedConfig, data);
+    case 'chart-donut':     return renderDonutChart(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
     case 'quality-spc-chart': return renderSpcChart(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
     case 'quality-control-chart': return renderControlChart(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
     case 'quality-pareto':  return renderParetoChart(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
@@ -6027,7 +6027,217 @@ function renderBarChart(config, data){
 }
 
 /* --- Donut Chart --- */
-function renderDonutChart(config, data){
+function _chartHeatColor(value, min, max, scale){
+  var ratio;
+  var start;
+  var mid;
+  var end;
+  var color;
+  if(max <= min) return '#cbd5e1';
+  ratio = _chartClamp((value - min) / (max - min), 0, 1);
+  if(scale === 'green'){
+    start = [220, 252, 231];
+    end = [22, 163, 74];
+  } else if(scale === 'blue'){
+    start = [224, 242, 254];
+    end = [37, 99, 235];
+  } else if(scale === 'red'){
+    start = [254, 226, 226];
+    end = [220, 38, 38];
+  } else if(scale === 'red-yellow-green'){
+    if(ratio <= 0.5){
+      start = [220, 38, 38];
+      end = [245, 158, 11];
+      ratio = ratio / 0.5;
+    } else {
+      start = [245, 158, 11];
+      end = [22, 163, 74];
+      ratio = (ratio - 0.5) / 0.5;
+    }
+  } else {
+    start = [255, 247, 237];
+    mid = [245, 158, 11];
+    end = [22, 163, 74];
+    if(ratio <= 0.55){
+      color = [
+        Math.round(start[0] + ((mid[0] - start[0]) * (ratio / 0.55))),
+        Math.round(start[1] + ((mid[1] - start[1]) * (ratio / 0.55))),
+        Math.round(start[2] + ((mid[2] - start[2]) * (ratio / 0.55)))
+      ];
+    } else {
+      color = [
+        Math.round(mid[0] + ((end[0] - mid[0]) * ((ratio - 0.55) / 0.45))),
+        Math.round(mid[1] + ((end[1] - mid[1]) * ((ratio - 0.55) / 0.45))),
+        Math.round(mid[2] + ((end[2] - mid[2]) * ((ratio - 0.55) / 0.45)))
+      ];
+    }
+    return 'rgb(' + color.join(',') + ')';
+  }
+  color = [
+    Math.round(start[0] + ((end[0] - start[0]) * ratio)),
+    Math.round(start[1] + ((end[1] - start[1]) * ratio)),
+    Math.round(start[2] + ((end[2] - start[2]) * ratio))
+  ];
+  return 'rgb(' + color.join(',') + ')';
+}
+
+function _chartMappedSeriesItems(config, data){
+  var chartCfg = config && config.chart ? config.chart : {};
+  var rows = _chartRows(config, data);
+  var labelKey = chartCfg.labelField || chartCfg.categoryField || config.labelKey || 'label';
+  var valueKey = chartCfg.valueField || config.valueKey || 'value';
+  var colorKey = chartCfg.colorField || config.colorKey || '';
+  var series = (config && Array.isArray(config.series) ? config.series : []).slice();
+  var sourceRow = rows[0] || {};
+  if(series.length){
+    return series.map(function(item, index){
+      var valueField = item.field || item.valueField || item.key || valueKey;
+      return {
+        label: _chartText(item, item.key || valueField, item.key || valueField),
+        value: _chartNumber(item.value != null ? item.value : sourceRow[valueField]),
+        color: item.color || (colorKey && sourceRow[colorKey]) || _chartColor(index)
+      };
+    }).filter(function(item){
+      return item.value || item.value === 0;
+    });
+  }
+  if(rows.length){
+    return rows.map(function(row, index){
+      return {
+        label: row[labelKey] == null ? ('Item ' + (index + 1)) : String(row[labelKey]),
+        value: _chartNumber(row[valueKey]),
+        color: colorKey ? row[colorKey] : _chartColor(index)
+      };
+    }).filter(function(item){
+      return item.value || item.value === 0;
+    });
+  }
+  if(config && Array.isArray(config.items)){
+    return config.items.map(function(item, index){
+      return {
+        label: _chartText(item, item.label || ('Item ' + (index + 1)), item.labelEn || item.label || ('Item ' + (index + 1))),
+        value: _chartNumber(item.value),
+        color: item.color || _chartColor(index)
+      };
+    });
+  }
+  return [];
+}
+
+function _chartGaugePayload(config, data){
+  var gaugeCfg = config && config.gauge ? config.gauge : {};
+  var rows = _chartRows(config, data);
+  var record = rows[0] || ((data && typeof data === 'object' && !Array.isArray(data)) ? data : {});
+  var valueKey = gaugeCfg.valueField || 'value';
+  var targetKey = gaugeCfg.targetField || 'target';
+  var min = _chartNumber(gaugeCfg.min);
+  var max = _chartNumber(gaugeCfg.max);
+  if(max <= min) max = min + 100;
+  return {
+    value: _chartNumber(record[valueKey] != null ? record[valueKey] : config.value),
+    target: _chartNumber(record[targetKey] != null ? record[targetKey] : config.target),
+    min: min,
+    max: max,
+    unit: gaugeCfg.unit || '',
+    showTarget: gaugeCfg.showTarget !== false,
+    showDelta: !!gaugeCfg.showDelta,
+    segments: Array.isArray(gaugeCfg.segments) ? gaugeCfg.segments.slice() : []
+  };
+}
+
+function renderGaugeChart(config, data, state, blockId, block){
+  var payload = _chartGaugePayload(config, data);
+  var type = block && block.type ? String(block.type) : 'chart-gauge';
+  var pct = _chartClamp((payload.value - payload.min) / Math.max(payload.max - payload.min, 1), 0, 1);
+  var targetPct = _chartClamp((payload.target - payload.min) / Math.max(payload.max - payload.min, 1), 0, 1);
+  var delta = payload.target || payload.target === 0 ? (payload.value - payload.target) : null;
+  var segments = payload.segments.length ? payload.segments.slice() : [
+    { to: payload.min + ((payload.max - payload.min) * 0.6), color:'#22c55e', label:{ vi:'Good', en:'Good' } },
+    { to: payload.min + ((payload.max - payload.min) * 0.82), color:'#f59e0b', label:{ vi:'Watch', en:'Watch' } },
+    { to: payload.max, color:'#ef4444', label:{ vi:'Critical', en:'Critical' } }
+  ];
+  var gradientParts = [];
+  var previousPct = 0;
+  var valueText = _chartFormatValue(payload.value, 'number') + payload.unit;
+  var targetText = payload.target || payload.target === 0 ? (_chartFormatValue(payload.target, 'number') + payload.unit) : '';
+  var html = '';
+  segments.sort(function(a, b){
+    return _chartNumber(a.to) - _chartNumber(b.to);
+  }).forEach(function(segment){
+    var stopPct = _chartClamp((_chartNumber(segment.to) - payload.min) / Math.max(payload.max - payload.min, 1), 0, 1) * 100;
+    gradientParts.push((segment.color || '#94a3b8') + ' ' + previousPct.toFixed(2) + '% ' + stopPct.toFixed(2) + '%');
+    previousPct = stopPct;
+  });
+  if(previousPct < 100) gradientParts.push('rgba(148,163,184,0.22) ' + previousPct.toFixed(2) + '% 100%');
+  if(type === 'chart-progress' || type === 'insight-target-tracker'){
+    html += '<div class="hm-donut-container hm-donut-container-progress">';
+    html += '<div class="hm-donut-ring" style="background:conic-gradient(' + gradientParts.join(',') + ')">';
+    html += '<div style="position:absolute;inset:0;border-radius:50%;background:conic-gradient(var(--brand-2) 0 ' + Math.round(pct * 1000) / 10 + '%, rgba(255,255,255,0) ' + Math.round(pct * 1000) / 10 + '% 100%);mix-blend-mode:multiply"></div>';
+    if(payload.showTarget && targetText){
+      html += '<span style="position:absolute;left:50%;top:50%;width:2px;height:44%;background:#0f172a;border-radius:999px;transform-origin:bottom center;transform:translate(-50%, -100%) rotate(' + ((targetPct * 360) - 180) + 'deg)"></span>';
+    }
+    html += '<div class="hm-donut-hole" style="width:62%;height:62%"><div><strong>' + _esc(String(Math.round(pct * 100))) + '%</strong><div style="font-size:11px;color:var(--text-secondary)">' + _esc(valueText) + '</div></div></div>';
+    html += '</div><div class="hm-donut-legend">';
+    if(payload.showTarget && targetText) html += '<div class="hm-donut-legend-item"><span class="hm-donut-swatch" style="background:#0f172a"></span><span>Target: <b>' + _esc(targetText) + '</b></span></div>';
+    if(payload.showDelta && delta != null) html += '<div class="hm-donut-legend-item"><span class="hm-donut-swatch" style="background:' + (delta >= 0 ? '#16a34a' : '#ef4444') + '"></span><span>Delta: <b>' + _esc((delta >= 0 ? '+' : '') + _chartFormatValue(delta, 'number') + payload.unit) + '</b></span></div>';
+    html += '</div></div>';
+    return html;
+  }
+  html += '<div class="hm-chart-card hm-chart-card-gauge"><div class="hm-chart-shell" role="img" aria-label="' + _chartAttrText('Gauge chart') + '" data-chart-block-id="' + _esc(blockId || '') + '">';
+  html += '<div style="display:grid;grid-template-columns:minmax(180px, 220px) 1fr;gap:18px;align-items:center">';
+  html += '<div style="position:relative;width:100%;max-width:220px;height:120px;margin:0 auto;overflow:hidden">';
+  html += '<div style="position:absolute;left:50%;top:0;width:220px;height:220px;border-radius:50%;transform:translateX(-50%);background:conic-gradient(' + gradientParts.join(',') + ')"></div>';
+  html += '<div style="position:absolute;left:50%;top:26px;width:156px;height:156px;border-radius:50%;background:#fff;transform:translateX(-50%)"></div>';
+  html += '<div style="position:absolute;left:50%;bottom:16px;transform:translateX(-50%);text-align:center"><div style="font-size:30px;font-weight:800;color:var(--text-primary)">' + _esc(valueText) + '</div><div style="font-size:11px;color:var(--text-secondary)">Range: ' + _esc(_chartFormatValue(payload.min, 'number') + payload.unit + ' - ' + _chartFormatValue(payload.max, 'number') + payload.unit) + '</div></div>';
+  html += '<div style="position:absolute;left:50%;bottom:28px;width:2px;height:74px;background:#0f172a;border-radius:999px;transform-origin:bottom center;transform:translateX(-50%) rotate(' + ((pct * 180) - 90) + 'deg)"></div>';
+  html += '<div style="position:absolute;left:50%;bottom:22px;width:14px;height:14px;border-radius:50%;background:#0f172a;transform:translateX(-50%)"></div>';
+  html += '</div><div>';
+  if(payload.showTarget && targetText) html += '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px">Target: <strong style="color:var(--text-primary)">' + _esc(targetText) + '</strong></div>';
+  if(payload.showDelta && delta != null) html += '<div style="font-size:12px;color:' + (delta >= 0 ? '#16a34a' : '#ef4444') + ';font-weight:700;margin-bottom:12px">Delta: ' + _esc((delta >= 0 ? '+' : '') + _chartFormatValue(delta, 'number') + payload.unit) + '</div>';
+  html += '<div class="hm-donut-legend">';
+  segments.forEach(function(segment, index){
+    html += '<div class="hm-donut-legend-item"><span class="hm-donut-swatch" style="background:' + _esc(segment.color || _chartColor(index)) + '"></span><span>' + _esc(_chartText(segment, 'Band ' + (index + 1), 'Band ' + (index + 1))) + '</span></div>';
+  });
+  html += '</div></div></div></div></div>';
+  return html;
+}
+
+function renderDonutChart(config, data, state, blockId, reactiveCtx, block){
+  var chartCfg = config && config.chart ? config.chart : {};
+  var type = block && block.type ? String(block.type) : '';
+  var items = _chartMappedSeriesItems(config, data);
+  var total = 0;
+  var gradientParts = [];
+  var cumPct = 0;
+  var innerRadius = _chartClamp(_chartNumber(chartCfg.innerRadius || 62), 0, 92);
+  var showPercent = chartCfg.showPercent !== false;
+  var html = '';
+  if(type === 'chart-gauge' || type === 'chart-progress' || type === 'insight-target-tracker' || config.gauge){
+    return renderGaugeChart(config, data, state, blockId, block || { type:type || 'chart-gauge' });
+  }
+  items.forEach(function(item){
+    total += _chartNumber(item.value);
+  });
+  if(total > 0){
+    items.forEach(function(item, index){
+      var pct = (_chartNumber(item.value) / total) * 100;
+      gradientParts.push((item.color || _chartColor(index)) + ' ' + cumPct.toFixed(2) + '% ' + (cumPct + pct).toFixed(2) + '%');
+      item.percent = pct;
+      cumPct += pct;
+    });
+    html += '<div class="hm-donut-container">';
+    html += '<div class="hm-donut-ring" style="background:conic-gradient(' + gradientParts.join(',') + ')">';
+    html += '<div class="hm-donut-hole" style="width:' + innerRadius + '%;height:' + innerRadius + '%"><div><strong>' + _esc(_fmt(total)) + '</strong>' + (showPercent ? '<div style="font-size:11px;color:var(--text-secondary)">Total</div>' : '') + '</div></div>';
+    html += '</div><div class="hm-donut-legend">';
+    items.forEach(function(item, index){
+      html += '<div class="hm-donut-legend-item">';
+      html += '<span class="hm-donut-swatch" style="background:' + _esc(item.color || _chartColor(index)) + '"></span>';
+      html += '<span>' + _esc(item.label) + ': <b>' + _esc(_fmt(item.value)) + '</b>' + (showPercent ? ' <small>(' + _esc(Math.round(item.percent * 10) / 10 + '%') + ')</small>' : '') + '</span>';
+      html += '</div>';
+    });
+    html += '</div></div>';
+    return html;
+  }
   var items = (data && data[config.dataKey]) || config.items || [];
   var total = 0;
   items.forEach(function(i){ total += (i.value||0); });
@@ -6300,6 +6510,200 @@ function _chartResolveCartesianMeta(config){
 
 function _chartResolveXLabel(value, xType){
   return xType === 'date' ? _chartDateLabel(value) : String(value == null ? '' : value);
+}
+
+function renderCartesianBarChart(config, data, state, blockId){
+  return _renderCartesianChart(config, data, state, blockId, 'bar');
+}
+
+function _chartQuantile(values, q){
+  var sorted = values.slice().sort(function(a, b){ return a - b; });
+  var pos;
+  var base;
+  var rest;
+  if(!sorted.length) return 0;
+  pos = (sorted.length - 1) * q;
+  base = Math.floor(pos);
+  rest = pos - base;
+  if(sorted[base + 1] !== undefined){
+    return sorted[base] + (rest * (sorted[base + 1] - sorted[base]));
+  }
+  return sorted[base];
+}
+
+function renderHeatmapChart(config, data, state, blockId){
+  var chartCfg = config && config.chart ? config.chart : {};
+  var rows = _chartRows(config, data);
+  var xKey = chartCfg.xField || chartCfg.categoryField || 'x';
+  var yKey = chartCfg.yField || chartCfg.seriesField || 'y';
+  var valueKey = chartCfg.colorField || chartCfg.valueField || chartCfg.zField || 'value';
+  var scale = chartCfg.heatScale || 'amber';
+  var xValues = [];
+  var yValues = [];
+  var matrix = {};
+  var min = Infinity;
+  var max = -Infinity;
+  var width = 720;
+  var height = 320;
+  var left = 110;
+  var right = 20;
+  var top = 20;
+  var bottom = 54;
+  var plotWidth;
+  var plotHeight;
+  var cellWidth;
+  var cellHeight;
+  var svg = '';
+  if(!rows.length) return _chartEmpty(_t('Khong co du lieu', 'No data'));
+  rows.forEach(function(row){
+    var xVal = row[xKey] == null ? _t('Unknown', 'Unknown') : String(row[xKey]);
+    var yVal = row[yKey] == null ? _t('Unknown', 'Unknown') : String(row[yKey]);
+    var value = _chartNumber(row[valueKey]);
+    if(xValues.indexOf(xVal) < 0) xValues.push(xVal);
+    if(yValues.indexOf(yVal) < 0) yValues.push(yVal);
+    matrix[yVal + '::' + xVal] = value;
+    min = Math.min(min, value);
+    max = Math.max(max, value);
+  });
+  if(!xValues.length || !yValues.length) return _chartEmpty(_t('Khong du truong de ve heatmap', 'Heatmap fields are missing'));
+  plotWidth = width - left - right;
+  plotHeight = height - top - bottom;
+  cellWidth = plotWidth / Math.max(xValues.length, 1);
+  cellHeight = plotHeight / Math.max(yValues.length, 1);
+  svg += '<div class="hm-chart-card hm-chart-card-heatmap"><div class="hm-chart-shell" role="img" aria-label="' + _chartAttrText('Heatmap chart') + '" data-chart-block-id="' + _esc(blockId || '') + '"><svg class="hm-chart-svg" viewBox="0 0 ' + width + ' ' + height + '" preserveAspectRatio="none">';
+  yValues.forEach(function(yVal, rowIndex){
+    var y = top + (rowIndex * cellHeight);
+    svg += '<text x="' + (left - 10) + '" y="' + (y + (cellHeight / 2) + 4).toFixed(2) + '" class="hm-chart-axis-label hm-chart-axis-label-y">' + _esc(yVal) + '</text>';
+    xValues.forEach(function(xVal, colIndex){
+      var x = left + (colIndex * cellWidth);
+      var value = matrix[yVal + '::' + xVal];
+      var fill = _chartHeatColor(value, min, max, scale);
+      var tip = yVal + ' • ' + xVal + ': ' + _chartFormatValue(value, chartCfg.yFormat || config.format || '');
+      svg += '<rect x="' + x.toFixed(2) + '" y="' + y.toFixed(2) + '" width="' + Math.max(cellWidth - 4, 8).toFixed(2) + '" height="' + Math.max(cellHeight - 4, 8).toFixed(2) + '" rx="10" fill="' + fill + '"' + _chartTooltipAttrs(tip) + '><title>' + _esc(tip) + '</title></rect>';
+      if(chartCfg.showLabels){
+        svg += '<text x="' + (x + (cellWidth / 2)).toFixed(2) + '" y="' + (y + (cellHeight / 2) + 4).toFixed(2) + '" class="hm-chart-axis-label hm-chart-axis-label-x" text-anchor="middle">' + _esc(_chartFormatValue(value, chartCfg.yFormat || config.format || '')) + '</text>';
+      }
+    });
+  });
+  xValues.forEach(function(xVal, colIndex){
+    var x = left + (colIndex * cellWidth) + (cellWidth / 2);
+    svg += '<text x="' + x.toFixed(2) + '" y="' + (top + plotHeight + 18) + '" class="hm-chart-axis-label hm-chart-axis-label-x" text-anchor="middle">' + _esc(xVal) + '</text>';
+  });
+  svg += '</svg></div></div>';
+  return svg;
+}
+
+function renderDistributionChart(config, data, state, blockId, block){
+  var distCfg = config.distribution || {};
+  var variant = block && block.type ? String(block.type) : '';
+  var rows = _chartRows(config, data);
+  var categoryKey = distCfg.categoryField || config.categoryKey || 'category';
+  var valueKey = distCfg.valueField || config.valueKey || 'value';
+  var showLabels = distCfg.showLabels !== false;
+  var width = 720;
+  var height = 320;
+  var left = 54;
+  var right = 24;
+  var top = 18;
+  var bottom = 56;
+  var plotWidth;
+  var plotHeight;
+  var svg = '';
+  if(!rows.length) return _chartEmpty(_t('Khong co du lieu', 'No data'));
+  plotWidth = width - left - right;
+  plotHeight = height - top - bottom;
+  if(variant === 'chart-histogram'){
+    var values = rows.map(function(row){ return _chartNumber(row[valueKey]); }).filter(function(value){ return isFinite(value); });
+    var bins = Math.max(Number(distCfg.binCount || 12), 1);
+    var min = Math.min.apply(null, values);
+    var max = Math.max.apply(null, values);
+    var step = (max - min) / bins || 1;
+    var buckets = [];
+    var maxCount = 1;
+    values.forEach(function(value){
+      var idx = Math.min(Math.floor((value - min) / step), bins - 1);
+      if(!buckets[idx]) buckets[idx] = { label:min + (idx * step), count:0 };
+      buckets[idx].count += 1;
+      maxCount = Math.max(maxCount, buckets[idx].count);
+    });
+    svg += '<div class="hm-chart-card hm-chart-card-histogram"><div class="hm-chart-shell" role="img" aria-label="' + _chartAttrText('Histogram chart') + '" data-chart-block-id="' + _esc(blockId || '') + '"><svg class="hm-chart-svg" viewBox="0 0 ' + width + ' ' + height + '" preserveAspectRatio="none">';
+    buckets.forEach(function(bucket, index){
+      var band = plotWidth / Math.max(buckets.length, 1);
+      var barHeight = (bucket.count / maxCount) * plotHeight;
+      var x = left + (band * index) + 6;
+      var y = top + plotHeight - barHeight;
+      svg += '<rect x="' + x.toFixed(2) + '" y="' + y.toFixed(2) + '" width="' + Math.max(band - 12, 12).toFixed(2) + '" height="' + barHeight.toFixed(2) + '" rx="8" fill="#2563eb"></rect>';
+      svg += '<text x="' + (x + ((Math.max(band - 12, 12)) / 2)).toFixed(2) + '" y="' + (top + plotHeight + 18) + '" class="hm-chart-axis-label hm-chart-axis-label-x" text-anchor="middle">' + _esc(_chartFormatValue(bucket.label, 'number')) + '</text>';
+      if(showLabels) svg += '<text x="' + (x + ((Math.max(band - 12, 12)) / 2)).toFixed(2) + '" y="' + (y - 8).toFixed(2) + '" class="hm-chart-axis-label hm-chart-axis-label-x" text-anchor="middle">' + _esc(String(bucket.count)) + '</text>';
+    });
+    svg += '</svg></div></div>';
+    return svg;
+  }
+  if(variant === 'chart-boxplot'){
+    var grouped = {};
+    var groups = [];
+    rows.forEach(function(row){
+      var key = row[categoryKey] == null ? _t('Data', 'Data') : String(row[categoryKey]);
+      if(!grouped[key]){
+        grouped[key] = [];
+        groups.push(key);
+      }
+      grouped[key].push(_chartNumber(row[valueKey]));
+    });
+    svg += '<div class="hm-chart-card hm-chart-card-boxplot"><div class="hm-chart-shell" role="img" aria-label="' + _chartAttrText('Box plot chart') + '" data-chart-block-id="' + _esc(blockId || '') + '"><svg class="hm-chart-svg" viewBox="0 0 ' + width + ' ' + height + '" preserveAspectRatio="none">';
+    groups.forEach(function(groupKey, index){
+      var values = grouped[groupKey].slice().sort(function(a, b){ return a - b; });
+      var q1 = _chartQuantile(values, 0.25);
+      var median = _chartQuantile(values, 0.5);
+      var q3 = _chartQuantile(values, 0.75);
+      var minV = values[0];
+      var maxV = values[values.length - 1];
+      var globalMin = Math.min.apply(null, values);
+      var globalMax = Math.max.apply(null, values);
+      var band = plotWidth / Math.max(groups.length, 1);
+      var cx = left + (band * index) + (band / 2);
+      var yMin = _chartScaleY(minV, globalMin, globalMax, top, plotHeight);
+      var yQ1 = _chartScaleY(q1, globalMin, globalMax, top, plotHeight);
+      var yMedian = _chartScaleY(median, globalMin, globalMax, top, plotHeight);
+      var yQ3 = _chartScaleY(q3, globalMin, globalMax, top, plotHeight);
+      var yMax = _chartScaleY(maxV, globalMin, globalMax, top, plotHeight);
+      svg += '<line x1="' + cx.toFixed(2) + '" y1="' + yMin.toFixed(2) + '" x2="' + cx.toFixed(2) + '" y2="' + yMax.toFixed(2) + '" class="hm-chart-axis"></line>';
+      svg += '<rect x="' + (cx - 24).toFixed(2) + '" y="' + yQ3.toFixed(2) + '" width="48" height="' + Math.max(yQ1 - yQ3, 4).toFixed(2) + '" rx="10" fill="rgba(37,99,235,0.16)" stroke="#2563eb" stroke-width="2"></rect>';
+      svg += '<line x1="' + (cx - 24).toFixed(2) + '" y1="' + yMedian.toFixed(2) + '" x2="' + (cx + 24).toFixed(2) + '" y2="' + yMedian.toFixed(2) + '" stroke="#0f172a" stroke-width="2"></line>';
+      svg += '<text x="' + cx.toFixed(2) + '" y="' + (top + plotHeight + 18) + '" class="hm-chart-axis-label hm-chart-axis-label-x" text-anchor="middle">' + _esc(groupKey) + '</text>';
+    });
+    svg += '</svg></div></div>';
+    return svg;
+  }
+  var ordered = rows.map(function(row, index){
+    return {
+      key: row[categoryKey] == null ? ('Item ' + (index + 1)) : String(row[categoryKey]),
+      value: _chartNumber(row[valueKey])
+    };
+  });
+  var running = 0;
+  var maxAbs = 1;
+  ordered.forEach(function(item){
+    running += item.value;
+    item.running = running;
+    maxAbs = Math.max(maxAbs, Math.abs(running));
+  });
+  svg += '<div class="hm-chart-card hm-chart-card-waterfall"><div class="hm-chart-shell" role="img" aria-label="' + _chartAttrText('Waterfall chart') + '" data-chart-block-id="' + _esc(blockId || '') + '"><svg class="hm-chart-svg" viewBox="0 0 ' + width + ' ' + height + '" preserveAspectRatio="none">';
+  ordered.forEach(function(item, index){
+    var band = plotWidth / Math.max(ordered.length, 1);
+    var x = left + (band * index) + 8;
+    var barWidth = Math.max(band - 16, 18);
+    var startValue = item.running - item.value;
+    var endValue = item.running;
+    var y1 = _chartScaleY(Math.max(startValue, endValue), -maxAbs, maxAbs, top, plotHeight);
+    var y2 = _chartScaleY(Math.min(startValue, endValue), -maxAbs, maxAbs, top, plotHeight);
+    var color = item.value >= 0 ? '#16a34a' : '#ef4444';
+    svg += '<rect x="' + x.toFixed(2) + '" y="' + Math.min(y1, y2).toFixed(2) + '" width="' + barWidth.toFixed(2) + '" height="' + Math.max(Math.abs(y2 - y1), 4).toFixed(2) + '" rx="8" fill="' + color + '"></rect>';
+    svg += '<text x="' + (x + (barWidth / 2)).toFixed(2) + '" y="' + (top + plotHeight + 18) + '" class="hm-chart-axis-label hm-chart-axis-label-x" text-anchor="middle">' + _esc(item.key) + '</text>';
+    if(showLabels) svg += '<text x="' + (x + (barWidth / 2)).toFixed(2) + '" y="' + (Math.min(y1, y2) - 8).toFixed(2) + '" class="hm-chart-axis-label hm-chart-axis-label-x" text-anchor="middle">' + _esc(_chartFormatValue(item.value, config.format || 'number')) + '</text>';
+  });
+  svg += '</svg></div></div>';
+  return svg;
 }
 
 /**

@@ -3606,6 +3606,12 @@ function _ensureBuilderStyles(){
   css += '.mb-panel-actions{display:flex;align-items:center;gap:6px;flex:0 0 auto}';
   css += '.mb-panel-header>.hm-btn.hm-btn-sm,.mb-panel-actions>.hm-btn.hm-btn-sm{width:28px;height:28px;min-height:28px;padding:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;line-height:1;flex:0 0 auto}';
   css += '.mb-panel-body{padding:14px 16px;overflow:auto;flex:1;min-height:0;overscroll-behavior:contain;scrollbar-width:none;-ms-overflow-style:none}';
+  css += '.mb-panel-body--tabbed{padding:0;overflow:hidden}';
+  css += '.mb-panel-tabbar{padding:12px 16px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94))}';
+  css += '.mb-panel-tabbar .mb-toolbar{padding:0;border:0;background:none;backdrop-filter:none}';
+  css += '.mb-panel-tabbar .mb-library-tabs{margin:0}';
+  css += '.mb-panel-scroll{padding:14px 16px;overflow:auto;flex:1;min-height:0;overscroll-behavior:contain;scrollbar-width:none;-ms-overflow-style:none}';
+  css += '.mb-panel-scroll::-webkit-scrollbar{width:0;height:0}';
   css += '.mb-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);background:rgba(248,250,252,0.9);backdrop-filter:blur(10px)}';
   css += '.mb-toolbar-group{display:flex;gap:8px;align-items:center;flex-wrap:wrap}';
   css += '.mb-toolbar-spacer{flex:1 1 auto}';
@@ -3672,6 +3678,8 @@ function _ensureBuilderStyles(){
   css += '.mb-field-match-item span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}';
   css += '.mb-field-match-item mark{background:rgba(245,158,11,0.22);padding:0 2px;border-radius:4px}';
   css += '.mb-library-tabs{display:flex;gap:8px;margin-bottom:12px}';
+  css += '.mb-panel-body>.mb-toolbar:first-child,.mb-panel-body>.mb-library-tabs:first-child{position:sticky;top:0;z-index:var(--z-sticky);background:linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.94)) !important;padding-bottom:12px !important;border-bottom:1px solid var(--border) !important}';
+  css += '.mb-panel-body>.mb-toolbar:first-child{backdrop-filter:none !important}';
   css += '.mb-library-section{margin-top:14px}';
   css += '.mb-library-section-toggle{width:100%;border:0;background:none;cursor:pointer;text-align:left}';
   css += '.mb-library-section-toggle .mb-prop-section-head{padding-right:12px}';
@@ -4999,10 +5007,10 @@ _renderLibraryPanel = function(){
   h += '<div class="mb-rail-panel">';
   h += '<div class="mb-panel-header"><div class="mb-panel-title"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary)">'+_t('Library', 'Library')+'</div><strong><span>'+_t('Thư viện block', 'Block Library')+'</span></strong></div><div class="mb-panel-actions"><button class="hm-btn hm-btn-ghost hm-btn-sm mb-icon-btn" data-action="close-library" title="'+_esc(_t('Đóng thư viện', 'Close library'))+'"><span class="mb-icon-glyph">&#10005;</span></button></div></div>';
   h += '<div class="mb-panel-body">';
-  h += '<div class="mb-library-tabs">';
+  h += '<div class="mb-panel-tabbar hm-dialog-tabs-bar"><div class="mb-library-tabs">';
   h += '<button class="hm-btn '+(state.libraryMode === 'blocks' ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm" data-action="library-mode" data-mode="blocks">🧩 '+_t('Blocks', 'Blocks')+'</button>';
   h += '<button class="hm-btn '+(state.libraryMode === 'packs' ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm" data-action="library-mode" data-mode="packs">📦 '+_t('Field Packs', 'Field Packs')+'</button>';
-  h += '</div>';
+  h += '</div></div>';
   if(state.libraryMode === 'packs'){
     h += '<div class="mb-helper-note">'+_t('Kéo field pack vào block biểu mẫu, bảng dữ liệu hoặc thanh lọc để builder tự ghép schema theo domain.', 'Drag a field pack into a form, table, or filter bar so the builder can merge domain-aware schema automatically.')+'</div>';
     h += '<input type="text" class="hm-input" id="mb-lib-search" placeholder="'+_t('Tìm field pack...', 'Search field packs...')+'" value="'+_esc(state.librarySearch || '')+'">';
@@ -6245,8 +6253,17 @@ _handleClick = function(e){
       _paint();
       break;
     case 'open-library':
+      var targetTabId = btn.getAttribute('data-tab') || state.activeTab;
+      var targetParentId = btn.getAttribute('data-parent') || null;
+      var targetSlotKey = btn.getAttribute('data-slot') || 'default';
+      var isToolbarToggle = !!(btn.classList && (btn.classList.contains('mb-toolbar-toggle') || btn.classList.contains('mb-hero-action')));
+      if(isToolbarToggle && state.showLibrary){
+        state.showLibrary = false;
+        _paint();
+        break;
+      }
       state.showLibrary = true;
-      _setInsertTarget(btn.getAttribute('data-tab') || state.activeTab, btn.getAttribute('data-parent') || null, btn.getAttribute('data-slot') || 'default', null);
+      _setInsertTarget(targetTabId, targetParentId, targetSlotKey, null);
       _paint();
       break;
     case 'library-mode':

@@ -621,6 +621,9 @@ This section provides the full set of design tokens ready for implementation.
   --tab-fs:      0.875rem;
   --tab-fw:      600;
 
+  /* Multi-tab dialog / side-panel standard:
+     keep the tab bar sticky and let only the content region scroll. */
+
   /* ============================================
      CHECKBOX / RADIO
      ============================================ */
