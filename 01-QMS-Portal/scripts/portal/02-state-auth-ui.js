@@ -5221,6 +5221,7 @@ function renderAdmin(){
       <button class="admin-tab-v2 ${adminTab==='retention'?'active':''}" onclick="adminTab='retention';renderAdmin()">📋 ${lang==='en'?'Retention':'Lưu giữ'}</button>
       <button class="admin-tab-v2 ${adminTab==='manual_runtime'?'active':''}" onclick="adminTab='manual_runtime';renderAdmin()">🧾 ${lang==='en'?'Manual runtime':'Nhập tay vận hành'}</button>
       <button class="admin-tab-v2 ${adminTab==='data_sources'?'active':''}" onclick="adminTab='data_sources';renderAdmin()">🗄 ${lang==='en'?'Data sources':'Nguồn dữ liệu'}</button>
+      <button class="admin-tab-v2 ${adminTab==='metadata_studio'?'active':''}" onclick="adminTab='metadata_studio';renderAdmin()">API &amp; DB Studio</button>
       <button class="admin-tab-v2 ${adminTab==='mfa'?'active':''}" onclick="adminTab='mfa';renderAdmin()">🔑 ${lang==='en'?'MFA Security':'Bảo mật MFA'}</button>
       <button class="admin-tab-v2 ${adminTab==='appearance'?'active':''}" onclick="adminTab='appearance';renderAdmin()">🎨 ${lang==='en'?'Appearance':'Giao diện'}</button>
     </div>
@@ -5237,6 +5238,7 @@ function renderAdmin(){
   if(adminTab==='docs') renderAdminEffectiveDocs();
   if(adminTab==='manual_runtime') renderAdminManualRuntime();
   if(adminTab==='data_sources') renderAdminDataSources();
+  if(adminTab==='metadata_studio') renderAdminMetadataStudio();
   if(adminTab==='version_control') renderAdminVersionControl();
   if(adminTab==='portal_display'){
     renderAdminPortalDisplay();
@@ -5249,6 +5251,45 @@ function renderAdmin(){
 
 /* ── Admin: Appearance Settings — Enterprise Theme Editor v2 ─────────────── */
 var _appSubTab = 'overview';
+
+function renderAdminMetadataStudio(){
+  const el=document.getElementById('admin-content');
+  if(!el) return;
+  if(typeof window._renderAdminMetadataStudio === 'function'){
+    window._renderAdminMetadataStudio(el);
+    return;
+  }
+  el.innerHTML='<div class="hm-empty">'+(lang==='en'?'Loading API & DB Studio...':'Dang tai API & DB Studio...')+'</div>';
+  var existing=document.getElementById('admin-metadata-studio-script');
+  if(existing){
+    var tries=0;
+    (function waitForStudio(){
+      if(typeof window._renderAdminMetadataStudio === 'function'){
+        window._renderAdminMetadataStudio(el);
+        return;
+      }
+      if(tries < 40){
+        tries += 1;
+        setTimeout(waitForStudio, 150);
+        return;
+      }
+      el.innerHTML='<div class="hm-empty">Failed to initialize metadata studio.</div>';
+    })();
+    return;
+  }
+  var script=document.createElement('script');
+  script.id='admin-metadata-studio-script';
+  script.src='scripts/portal/32-admin-metadata-studio.js?v=20260403';
+  script.onload=function(){
+    if(typeof window._renderAdminMetadataStudio === 'function'){
+      window._renderAdminMetadataStudio(el);
+    }
+  };
+  script.onerror=function(){
+    el.innerHTML='<div class="hm-empty">Failed to load metadata studio. Check 32-admin-metadata-studio.js</div>';
+  };
+  document.head.appendChild(script);
+}
 
 function renderAdminAppearance(){
   const el=document.getElementById('admin-content');

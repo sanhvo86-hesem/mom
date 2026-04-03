@@ -1,0 +1,15 @@
+    var color = item.value >= 0 ? '#16a34a' : '#ef4444';
+    svg += '<rect x="' + x.toFixed(2) + '" y="' + Math.min(y1, y2).toFixed(2) + '" width="' + barWidth.toFixed(2) + '" height="' + Math.max(Math.abs(y2 - y1), 4).toFixed(2) + '" rx="8" fill="' + color + '"></rect>';
+    svg += '<text x="' + (x + (barWidth / 2)).toFixed(2) + '" y="' + (top + plotHeight + 18) + '" class="hm-chart-axis-label hm-chart-axis-label-x" text-anchor="middle">' + _esc(item.key) + '</text>';
+    if(showLabels) svg += '<text x="' + (x + (barWidth / 2)).toFixed(2) + '" y="' + (Math.min(y1, y2) - 8).toFixed(2) + '" class="hm-chart-axis-label hm-chart-axis-label-x" text-anchor="middle">' + _esc(_chartFormatValue(item.value, config.format || 'number')) + '</text>';
+  });
+  svg += '</svg></div></div>';
+  return svg;
+}
+
+/**
+ * Render a production-ready bar chart with accessible tooltips.
+ * @param {Object} config
+ * @param {*} data
+ * @param {Object} state
+ * @param {string} blockId

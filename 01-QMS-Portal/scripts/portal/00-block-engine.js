@@ -6494,17 +6494,26 @@ function _chartResolveCartesianSeries(config, mode){
 
 function _chartResolveCartesianMeta(config){
   var chartCfg = config.chart || {};
+  var seriesList = Array.isArray(chartCfg.series) ? chartCfg.series : [];
+  var stackMode = chartCfg.stackMode || (config.stacked ? 'normal' : 'none');
+  var labelRotation = _chartNumber(chartCfg.labelRotation || 0);
+  var hasSeriesStack = seriesList.some(function(series){
+    return !!(series && series.stack);
+  });
   return {
-    xKey: (config.xAxis && config.xAxis.key) || config.xKey || chartCfg.xField || 'label',
+    xKey: (config.xAxis && config.xAxis.key) || config.xKey || chartCfg.xField || chartCfg.categoryField || 'label',
     xType: (config.xAxis && config.xAxis.type) || chartCfg.xType || 'category',
     xLabel: (config.xAxis && (config.xAxis.label || config.xAxis.title)) || config.xLabel || chartCfg.xLabel || '',
     yLabel: (config.yAxis && config.yAxis.label) || config.yLabel || chartCfg.yLabel || '',
-    yFormat: (config.yAxis && config.yAxis.format) || chartCfg.yFormat || '',
+    yFormat: (config.yAxis && config.yAxis.format) || chartCfg.yFormat || (stackMode === 'percent' ? 'percent' : ''),
     yRightLabel: (config.yAxisRight && config.yAxisRight.label) || '',
     yRightFormat: (config.yAxisRight && config.yAxisRight.format) || '',
     showLegend: chartCfg.showLegend !== false,
     showGrid: chartCfg.showGrid !== false,
-    stacked: !!(config.stacked || chartCfg.stackMode === 'normal' || chartCfg.stacked)
+    stackMode: stackMode,
+    labelRotation: _chartClamp(labelRotation, -90, 90),
+    showDataLabels: !!chartCfg.showDataLabels,
+    stacked: !!(config.stacked || chartCfg.stacked || stackMode === 'normal' || stackMode === 'percent' || hasSeriesStack)
   };
 }
 
@@ -6714,27 +6723,49 @@ function renderDistributionChart(config, data, state, blockId, block){
  * @param {string} blockId
  * @returns {string}
  */
-function renderBarChart(config, data, state, blockId){
+function renderBarChart(config, data, state, blockId, reactiveCtx, block){
+  var chartCfg = config && config.chart ? config.chart : {};
+  var type = block && block.type ? String(block.type) : '';
   var items;
+  var labelKey;
+  var valueKey;
+  var colorKey;
   var max;
   var html;
   try{
+    if(type === 'chart-control') return renderControlChart(config, data, state, blockId, reactiveCtx, block);
+    if(type === 'chart-heatmap') return renderHeatmapChart(config, data, state, blockId, reactiveCtx, block);
+    if(type === 'chart-waterfall' || type === 'chart-histogram' || type === 'chart-boxplot') return renderDistributionChart(config, data, state, blockId, block);
+    if(type === 'chart-bubble') return renderScatterChart(config, data, state, blockId, reactiveCtx, block);
+    if(type === 'chart-sparkline'){
+      var sparklineConfig = _clone(config || {});
+      sparklineConfig.chart = _clone(chartCfg);
+      if(sparklineConfig.chart.showLegend == null) sparklineConfig.chart.showLegend = false;
+      if(sparklineConfig.chart.showGrid == null) sparklineConfig.chart.showGrid = false;
+      return renderLineChart(sparklineConfig, data, state, blockId, reactiveCtx, block);
+    }
+    if(type === 'chart-stacked-bar' || (chartCfg.series && chartCfg.series.length) || chartCfg.xField || chartCfg.stackMode === 'normal' || chartCfg.stackMode === 'percent'){
+      return renderCartesianBarChart(config, data, state, blockId, reactiveCtx, block);
+    }
     items = _chartRows(config, data);
+    labelKey = chartCfg.labelField || chartCfg.categoryField || chartCfg.xField || config.labelKey || 'label';
+    valueKey = chartCfg.valueField || chartCfg.yField || config.valueKey || 'value';
+    colorKey = chartCfg.colorField || config.colorKey || '';
     if(!items.length) return _chartEmpty(_t('Không có dữ liệu','No data'));
 
     max = 0;
     items.forEach(function(item){
-      var value = _chartNumber(item.value != null ? item.value : item[(config.valueKey || 'value')]);
+      var value = _chartNumber(item.value != null ? item.value : item[valueKey]);
       if(value > max) max = value;
     });
     if(max === 0) max = 1;
 
     html = '<div class="hm-bar-chart" role="img" aria-label="'+_chartAttrText(_t('Biểu đồ cột so sánh dữ liệu', 'Bar chart comparing values'))+'" data-chart-block-id="'+_esc(blockId || '')+'">';
     items.forEach(function(item, index){
-      var label = _chartText(item, item.label || item.name || ('Item ' + (index + 1)), item.labelEn || item.name || ('Item ' + (index + 1)));
-      var value = _chartNumber(item.value != null ? item.value : item[(config.valueKey || 'value')]);
+      var label = item[labelKey] != null ? String(item[labelKey]) : _chartText(item, item.label || item.name || ('Item ' + (index + 1)), item.labelEn || item.name || ('Item ' + (index + 1)));
+      var value = _chartNumber(item.value != null ? item.value : item[valueKey]);
       var pct = Math.round((value / max) * 100);
-      var color = item.color || _chartColor(index, 'var(--brand-2)');
+      var color = item.color || (colorKey && item[colorKey]) || _chartColor(index, 'var(--brand-2)');
       var tip = label + ': ' + _chartFormatValue(value, config.format || '');
       html += '<div class="hm-bar-row">';
       html += '<span class="hm-bar-label">'+_esc(label)+'</span>';
@@ -6767,6 +6798,7 @@ function _renderCartesianChart(config, data, state, blockId, mode){
   var seriesValues = {};
   var stackTotals = [];
   var stackBases = { left: [], right: [] };
+  var barGroupKeys = { left: [], right: [] };
   var minLeft = 0;
   var maxLeft = 0;
   var minRight = 0;
@@ -6785,6 +6817,11 @@ function _renderCartesianChart(config, data, state, blockId, mode){
       return !chartState.hiddenSeries[_chartSeriesKey(series, index)];
     });
     if(!visibleSeries.length) visibleSeries = seriesList.slice(0, 1);
+    visibleSeries.forEach(function(series, index){
+      if(series.type === 'bar'){
+        barGroupKeys[series.axis === 'right' ? 'right' : 'left'].push(_chartSeriesKey(series, index));
+      }
+    });
     plotWidth = width - left - right;
     plotHeight = height - top - bottom;
 
@@ -6811,6 +6848,10 @@ function _renderCartesianChart(config, data, state, blockId, mode){
         }
       });
     });
+    if(meta.stackMode === 'percent' && meta.stacked){
+      minLeft = 0;
+      maxLeft = 100;
+    }
     if(maxLeft === minLeft) maxLeft = minLeft + 1;
     if(mode === 'combo' && maxRight === minRight) maxRight = minRight + 1;
     ticksLeft = _chartAxisTicks(minLeft, maxLeft, 5);
@@ -6854,7 +6895,9 @@ function _renderCartesianChart(config, data, state, blockId, mode){
     }
     labels.forEach(function(label, labelIndex){
       var lx = _chartScaleX(labelIndex, labels.length, left, plotWidth);
-      svg += '<text x="'+lx.toFixed(2)+'" y="'+(top + plotHeight + 18)+'" class="hm-chart-axis-label hm-chart-axis-label-x">'+_esc(label)+'</text>';
+      var labelY = top + plotHeight + 18;
+      var labelAttrs = meta.labelRotation ? ' transform="rotate(' + meta.labelRotation + ' ' + lx.toFixed(2) + ' ' + labelY + ')" text-anchor="' + (meta.labelRotation < 0 ? 'end' : 'start') + '"' : '';
+      svg += '<text x="'+lx.toFixed(2)+'" y="'+labelY+'" class="hm-chart-axis-label hm-chart-axis-label-x"'+labelAttrs+'>'+_esc(label)+'</text>';
     });
     visibleSeries.forEach(function(series, seriesIndex){
       var key = _chartSeriesKey(series, seriesIndex);
@@ -6864,16 +6907,24 @@ function _renderCartesianChart(config, data, state, blockId, mode){
       var axisMin = axisTicks[0];
       var axisMax = axisTicks[axisTicks.length - 1];
       rows.forEach(function(row, rowIndex){
-        var plottedValue = seriesValues[key][rowIndex];
+        var rawValue = seriesValues[key][rowIndex];
+        var displayValue = rawValue;
+        var plottedValue = rawValue;
         var lowerValue = 0;
         if(meta.stacked && series.axis !== 'right'){
+          if(meta.stackMode === 'percent'){
+            displayValue = stackTotals[rowIndex] ? ((rawValue / stackTotals[rowIndex]) * 100) : 0;
+          }
           lowerValue = stackBases.left[rowIndex] || 0;
-          plottedValue += lowerValue;
+          plottedValue = displayValue + lowerValue;
+        } else {
+          plottedValue = displayValue;
         }
         points.push({
           x: _chartScaleX(rowIndex, labels.length, left, plotWidth),
           y: _chartScaleY(plottedValue, axisMin, axisMax, top, plotHeight),
-          value: seriesValues[key][rowIndex],
+          value: displayValue,
+          rawValue: rawValue,
           plottedValue: plottedValue,
           lowerValue: lowerValue,
           label: labels[rowIndex]
@@ -6884,11 +6935,23 @@ function _renderCartesianChart(config, data, state, blockId, mode){
       });
       if(series.type === 'bar'){
         var band = plotWidth / Math.max(labels.length, 1);
-        var barWidth = Math.max(Math.min((band * 0.56), 34), 10);
+        var axisKey = series.axis === 'right' ? 'right' : 'left';
+        var groupedKeys = meta.stacked && axisKey === 'left' ? [key] : barGroupKeys[axisKey];
+        var groupCount = Math.max(groupedKeys.length || 1, 1);
+        var groupIndex = Math.max(groupedKeys.indexOf(key), 0);
+        var gap = groupCount > 1 ? Math.min(6, band * 0.08) : 0;
+        var barWidth = groupCount > 1 ? Math.max(Math.min(((band * 0.74) - (gap * (groupCount - 1))) / groupCount, 28), 8) : Math.max(Math.min((band * 0.56), 34), 10);
         points.forEach(function(point){
-          var baseY = _chartScaleY(0, axisMin, axisMax, top, plotHeight);
+          var barStart = point.x - (((barWidth * groupCount) + (gap * (groupCount - 1))) / 2);
+          var barX = groupCount > 1 ? (barStart + (groupIndex * (barWidth + gap))) : (point.x - (barWidth / 2));
+          var baseValue = meta.stacked && axisKey === 'left' ? point.lowerValue : 0;
+          var baseY = _chartScaleY(baseValue, axisMin, axisMax, top, plotHeight);
+          var tipValue = _chartFormatValue(point.value, meta.stackMode === 'percent' && meta.stacked && axisKey === 'left' ? 'percent' : (series.format || meta.yFormat));
           var tip = _chartText(series, key, key) + ' • ' + point.label + ': ' + _chartFormatValue(point.value, series.format || meta.yFormat);
-          svg += '<rect x="'+(point.x - (barWidth / 2)).toFixed(2)+'" y="'+Math.min(point.y, baseY).toFixed(2)+'" width="'+barWidth.toFixed(2)+'" height="'+Math.max(Math.abs(baseY - point.y), 1).toFixed(2)+'" rx="6" fill="'+_esc(series.color || _chartColor(seriesIndex))+'" class="hm-chart-bar"'+_chartTooltipAttrs(tip)+'><title>'+_esc(tip)+'</title></rect>';
+          svg += '<rect x="'+barX.toFixed(2)+'" y="'+Math.min(point.y, baseY).toFixed(2)+'" width="'+barWidth.toFixed(2)+'" height="'+Math.max(Math.abs(baseY - point.y), 1).toFixed(2)+'" rx="6" fill="'+_esc(series.color || _chartColor(seriesIndex))+'" class="hm-chart-bar"'+_chartTooltipAttrs(tip)+'><title>'+_esc(tip)+'</title></rect>';
+          if(meta.showDataLabels){
+            svg += '<text x="'+(barX + (barWidth / 2)).toFixed(2)+'" y="'+(Math.min(point.y, baseY) - 6).toFixed(2)+'" class="hm-chart-axis-label hm-chart-axis-label-x" text-anchor="middle">'+_esc(tipValue)+'</text>';
+          }
         });
         return;
       }
@@ -6908,6 +6971,9 @@ function _renderCartesianChart(config, data, state, blockId, mode){
         points.forEach(function(point){
           var pointTip = _chartText(series, key, key) + ' • ' + point.label + ': ' + _chartFormatValue(point.value, series.format || meta.yFormat);
           svg += '<circle cx="'+point.x.toFixed(2)+'" cy="'+point.y.toFixed(2)+'" r="4.5" fill="'+_esc(series.color || _chartColor(seriesIndex))+'" class="hm-chart-point"'+_chartTooltipAttrs(pointTip)+'><title>'+_esc(pointTip)+'</title></circle>';
+          if(meta.showDataLabels){
+            svg += '<text x="'+point.x.toFixed(2)+'" y="'+(point.y - 10).toFixed(2)+'" class="hm-chart-axis-label hm-chart-axis-label-x" text-anchor="middle">'+_esc(_chartFormatValue(point.value, series.format || meta.yFormat))+'</text>';
+          }
         });
       }
     });
@@ -6950,7 +7016,7 @@ function renderAreaChart(config, data, state, blockId){
  * @param {string} blockId
  * @returns {string}
  */
-function renderScatterChart(config, data, state, blockId){
+function renderScatterChart(config, data, state, blockId, reactiveCtx, block){
   var rows;
   var chartCfg;
   var chartState;
@@ -6958,8 +7024,12 @@ function renderScatterChart(config, data, state, blockId){
   var yKey;
   var sizeKey;
   var colorKey;
+  var seriesKey;
+  var labelKey;
+  var markerSize;
   var points = [];
   var categories = [];
+  var categoryColors = {};
   var legendSeries = [];
   var domainX;
   var domainY;
@@ -6975,6 +7045,149 @@ function renderScatterChart(config, data, state, blockId){
   var plotHeight;
   var svg = '';
   try{
+    var compatRows = _chartRows(config, data);
+    var compatCfg = config && config.chart ? config.chart : {};
+    if(compatRows.length){
+      var compatState = _chartState(state, blockId);
+      var compatXKey = config.xKey || compatCfg.xField || 'x';
+      var compatYKey = config.yKey || compatCfg.yField || 'y';
+      var compatSizeKey = config.sizeKey || compatCfg.zField || '';
+      var compatColorKey = config.colorKey || compatCfg.colorField || '';
+      var compatSeriesKey = compatCfg.seriesField || '';
+      var compatLabelKey = compatCfg.categoryField || compatCfg.labelField || '';
+      var compatMarkerSize = _chartClamp(_chartNumber(compatCfg.markerSize || 8), 2, 40);
+      var compatPoints = [];
+      var compatCategories = [];
+      var compatCategoryColors = {};
+      var compatLegend = [];
+      var compatDomainX;
+      var compatDomainY;
+      var compatZoomX;
+      var compatZoomY;
+      var compatRegression = null;
+      plotWidth = width - left - right;
+      plotHeight = height - top - bottom;
+      compatRows.forEach(function(row){
+        var rawSeries = compatSeriesKey ? row[compatSeriesKey] : null;
+        var rawColor = compatColorKey ? row[compatColorKey] : '';
+        var resolvedColor = (rawColor != null && /^#|^rgb|^hsl|^var\(/i.test(String(rawColor))) ? String(rawColor) : '';
+        var cat = rawSeries != null && rawSeries !== '' ? String(rawSeries) : (!resolvedColor && rawColor != null && rawColor !== '' ? String(rawColor) : _t('Dá»¯ liá»‡u', 'Data'));
+        if(compatCategories.indexOf(cat) < 0) compatCategories.push(cat);
+        if(resolvedColor && !compatCategoryColors[cat]) compatCategoryColors[cat] = resolvedColor;
+        compatPoints.push({
+          rawX: _chartNumber(row[compatXKey]),
+          rawY: _chartNumber(row[compatYKey]),
+          size: compatSizeKey ? _chartNumber(row[compatSizeKey]) : compatMarkerSize,
+          category: cat,
+          color: resolvedColor,
+          label: compatLabelKey && row[compatLabelKey] != null ? String(row[compatLabelKey]) : ''
+        });
+      });
+      if(!compatPoints.length) return _chartEmpty(_t('KhÃ´ng cÃ³ dá»¯ liá»‡u','No data'));
+      compatLegend = compatCategories.map(function(cat, index){
+        return { key: cat, label: { vi: cat, en: cat }, color: compatCategoryColors[cat] || _chartColor(index) };
+      });
+      compatPoints = compatPoints.filter(function(point){
+        return !compatState.hiddenSeries[point.category];
+      });
+      if(!compatPoints.length) return _chartEmpty(_t('KhÃ´ng cÃ³ dá»¯ liá»‡u','No data'));
+      compatDomainX = { min: compatPoints[0].rawX, max: compatPoints[0].rawX };
+      compatDomainY = { min: compatPoints[0].rawY, max: compatPoints[0].rawY };
+      compatPoints.forEach(function(point){
+        compatDomainX.min = Math.min(compatDomainX.min, point.rawX);
+        compatDomainX.max = Math.max(compatDomainX.max, point.rawX);
+        compatDomainY.min = Math.min(compatDomainY.min, point.rawY);
+        compatDomainY.max = Math.max(compatDomainY.max, point.rawY);
+      });
+      compatZoomX = _chartWindow(compatDomainX.min, compatDomainX.max, compatState.zoom || 1, compatState.panX);
+      compatZoomY = _chartWindow(compatDomainY.min, compatDomainY.max, compatState.zoom || 1, compatState.panY);
+      if(compatCfg.showRegression && compatPoints.length > 1){
+        var sumX = 0;
+        var sumY = 0;
+        var sumXY = 0;
+        var sumXX = 0;
+        var count = 0;
+        compatPoints.forEach(function(point){
+          if(point.rawX < compatZoomX.min || point.rawX > compatZoomX.max || point.rawY < compatZoomY.min || point.rawY > compatZoomY.max) return;
+          sumX += point.rawX;
+          sumY += point.rawY;
+          sumXY += point.rawX * point.rawY;
+          sumXX += point.rawX * point.rawX;
+          count += 1;
+        });
+        if(count > 1){
+          var denom = (count * sumXX) - (sumX * sumX);
+          if(denom){
+            var slope = ((count * sumXY) - (sumX * sumY)) / denom;
+            var intercept = (sumY - (slope * sumX)) / count;
+            compatRegression = {
+              x1: compatZoomX.min,
+              y1: (slope * compatZoomX.min) + intercept,
+              x2: compatZoomX.max,
+              y2: (slope * compatZoomX.max) + intercept
+            };
+          }
+        }
+      }
+
+      svg += '<div class="hm-chart-card hm-chart-card-scatter">';
+      svg += '<div class="hm-chart-toolbar" role="toolbar" aria-label="'+_chartAttrText(_t('Äiá»u khiá»ƒn biá»ƒu Ä‘á»“ scatter', 'Scatter chart controls'))+'">';
+      svg += '<button type="button" class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-chart-zoom" data-block-id="'+_esc(blockId || '')+'" data-delta="-1">-</button>';
+      svg += '<button type="button" class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-chart-zoom" data-block-id="'+_esc(blockId || '')+'" data-delta="1">+</button>';
+      svg += '<button type="button" class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-chart-pan" data-block-id="'+_esc(blockId || '')+'" data-axis="x" data-delta="-0.1">â—€</button>';
+      svg += '<button type="button" class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-chart-pan" data-block-id="'+_esc(blockId || '')+'" data-axis="x" data-delta="0.1">â–¶</button>';
+      svg += '<button type="button" class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-chart-reset-view" data-block-id="'+_esc(blockId || '')+'">'+_t('Reset','Reset')+'</button>';
+      svg += '</div>';
+      if(compatCfg.showLegend !== false){
+        svg += _chartLegend(compatLegend, compatState, blockId, _t('ChÃº giáº£i scatter', 'Scatter legend'));
+      }
+      svg += '<div class="hm-chart-shell" role="img" aria-label="'+_chartAttrText(_t('Biá»ƒu Ä‘á»“ scatter tÆ°Æ¡ng quan dá»¯ liá»‡u', 'Scatter chart showing data correlation'))+'" data-chart-block-id="'+_esc(blockId || '')+'">';
+      svg += '<svg class="hm-chart-svg" viewBox="0 0 '+width+' '+height+'" preserveAspectRatio="none">';
+      _chartAxisTicks(compatZoomY.min, compatZoomY.max, 5).forEach(function(tick){
+        var y = _chartScaleY(tick, compatZoomY.min, compatZoomY.max, top, plotHeight);
+        svg += '<line x1="'+left+'" y1="'+y.toFixed(2)+'" x2="'+(width - right)+'" y2="'+y.toFixed(2)+'" class="hm-chart-gridline"></line>';
+        svg += '<text x="'+(left - 10)+'" y="'+(y + 4).toFixed(2)+'" class="hm-chart-axis-label hm-chart-axis-label-y">'+_esc(_chartFormatValue(tick, compatCfg.yFormat || ''))+'</text>';
+      });
+      _chartAxisTicks(compatZoomX.min, compatZoomX.max, 5).forEach(function(tick){
+        var x = left + (((tick - compatZoomX.min) / Math.max(compatZoomX.max - compatZoomX.min, 1)) * plotWidth);
+        svg += '<line x1="'+x.toFixed(2)+'" y1="'+top+'" x2="'+x.toFixed(2)+'" y2="'+(top + plotHeight)+'" class="hm-chart-gridline"></line>';
+        svg += '<text x="'+x.toFixed(2)+'" y="'+(top + plotHeight + 18)+'" class="hm-chart-axis-label hm-chart-axis-label-x">'+_esc(_chartFormatValue(tick, compatCfg.xFormat || ''))+'</text>';
+      });
+      svg += '<line x1="'+left+'" y1="'+(top + plotHeight)+'" x2="'+(width - right)+'" y2="'+(top + plotHeight)+'" class="hm-chart-axis"></line>';
+      svg += '<line x1="'+left+'" y1="'+top+'" x2="'+left+'" y2="'+(top + plotHeight)+'" class="hm-chart-axis"></line>';
+      if(compatRegression && isFinite(compatRegression.y1) && isFinite(compatRegression.y2)){
+        var regX1 = left + (((compatRegression.x1 - compatZoomX.min) / Math.max(compatZoomX.max - compatZoomX.min, 1)) * plotWidth);
+        var regX2 = left + (((compatRegression.x2 - compatZoomX.min) / Math.max(compatZoomX.max - compatZoomX.min, 1)) * plotWidth);
+        var regY1 = _chartScaleY(compatRegression.y1, compatZoomY.min, compatZoomY.max, top, plotHeight);
+        var regY2 = _chartScaleY(compatRegression.y2, compatZoomY.min, compatZoomY.max, top, plotHeight);
+        svg += '<line x1="'+regX1.toFixed(2)+'" y1="'+regY1.toFixed(2)+'" x2="'+regX2.toFixed(2)+'" y2="'+regY2.toFixed(2)+'" stroke="#f97316" stroke-width="2.5" stroke-dasharray="6 4"></line>';
+      }
+      compatPoints.forEach(function(point){
+        var px;
+        var py;
+        var radius;
+        var color;
+        var tip;
+        if(point.rawX < compatZoomX.min || point.rawX > compatZoomX.max || point.rawY < compatZoomY.min || point.rawY > compatZoomY.max) return;
+        px = left + (((point.rawX - compatZoomX.min) / Math.max(compatZoomX.max - compatZoomX.min, 1)) * plotWidth);
+        py = _chartScaleY(point.rawY, compatZoomY.min, compatZoomY.max, top, plotHeight);
+        radius = compatSizeKey ? _chartClamp((point.size / 10), 4, 18) : compatMarkerSize;
+        color = point.color || compatCategoryColors[point.category] || _chartColor(compatCategories.indexOf(point.category));
+        tip = point.category + ' â€¢ X: ' + _chartFormatValue(point.rawX, compatCfg.xFormat || '') + ' â€¢ Y: ' + _chartFormatValue(point.rawY, compatCfg.yFormat || '');
+        svg += '<circle cx="'+px.toFixed(2)+'" cy="'+py.toFixed(2)+'" r="'+radius.toFixed(2)+'" fill="'+_esc(color)+'" fill-opacity="0.56" stroke="'+_esc(color)+'" stroke-width="1.5" class="hm-chart-scatter-point"'+_chartTooltipAttrs(tip)+'><title>'+_esc(tip)+'</title></circle>';
+        if(compatCfg.showLabels && point.label){
+          svg += '<text x="'+(px + radius + 4).toFixed(2)+'" y="'+(py - 4).toFixed(2)+'" class="hm-chart-axis-label hm-chart-axis-label-x">'+_esc(point.label)+'</text>';
+        }
+      });
+      if(config.xLabel || compatCfg.xLabel){
+        svg += '<text x="'+(left + (plotWidth / 2))+'" y="'+(height - 12)+'" class="hm-chart-axis-title">'+_esc(config.xLabel || compatCfg.xLabel)+'</text>';
+      }
+      if(config.yLabel || compatCfg.yLabel){
+        svg += '<text x="16" y="'+(top + (plotHeight / 2))+'" class="hm-chart-axis-title" transform="rotate(-90 16 '+(top + (plotHeight / 2))+')">'+_esc(config.yLabel || compatCfg.yLabel)+'</text>';
+      }
+      svg += '</svg></div></div>';
+      return svg;
+    }
     rows = _chartRows(config, data);
     if(!rows.length) return _chartEmpty(_t('Không có dữ liệu','No data'));
     chartCfg = config.chart || {};
@@ -6982,7 +7195,10 @@ function renderScatterChart(config, data, state, blockId){
     xKey = config.xKey || chartCfg.xField || 'x';
     yKey = config.yKey || chartCfg.yField || 'y';
     sizeKey = config.sizeKey || chartCfg.zField || '';
-    colorKey = config.colorKey || chartCfg.colorField || chartCfg.seriesField || '';
+    colorKey = config.colorKey || chartCfg.colorField || '';
+    seriesKey = chartCfg.seriesField || colorKey || '';
+    labelKey = chartCfg.categoryField || chartCfg.labelField || '';
+    markerSize = _chartClamp(_chartNumber(chartCfg.markerSize || 8), 2, 40);
     plotWidth = width - left - right;
     plotHeight = height - top - bottom;
     rows.forEach(function(row){
@@ -7078,6 +7294,114 @@ function renderRadarChart(config, data, state, blockId){
   var radius = 108;
   var svg = '';
   try{
+    var compatCfg = config && config.chart ? config.chart : {};
+    var compatRows = _chartRows(config, data);
+    var compatDims = ((config.dimensions || compatCfg.dimensions) || []).slice();
+    var compatSeries = ((config.series || compatCfg.series) || []).slice();
+    if(!compatDims.length && compatRows.length){
+      var compatCategoryKey = compatCfg.categoryField || compatCfg.xField || 'category';
+      var compatValueKey = compatCfg.yField || compatCfg.valueField || 'value';
+      var compatSeriesKey = compatCfg.seriesField || '';
+      var compatColorKey = compatCfg.colorField || '';
+      var compatDimOrder = [];
+      var compatDimMax = {};
+      var compatSeriesMap = {};
+      var compatSeriesOrder = [];
+      if(compatSeriesKey && compatRows[0] && compatRows[0][compatCategoryKey] != null && compatRows[0][compatValueKey] != null){
+        compatRows.forEach(function(row){
+          var dimKey = row[compatCategoryKey] == null ? _t('KhÃ´ng xÃ¡c Ä‘á»‹nh', 'Unknown') : String(row[compatCategoryKey]);
+          var seriesKeyValue = row[compatSeriesKey] == null ? _t('Dá»¯ liá»‡u', 'Data') : String(row[compatSeriesKey]);
+          var rawColor = compatColorKey ? row[compatColorKey] : '';
+          var resolvedColor = (rawColor != null && /^#|^rgb|^hsl|^var\(/i.test(String(rawColor))) ? String(rawColor) : '';
+          var value = _chartNumber(row[compatValueKey]);
+          if(compatDimOrder.indexOf(dimKey) < 0) compatDimOrder.push(dimKey);
+          compatDimMax[dimKey] = Math.max(compatDimMax[dimKey] || 0, value);
+          if(!compatSeriesMap[seriesKeyValue]){
+            compatSeriesMap[seriesKeyValue] = {
+              key: seriesKeyValue,
+              label: { vi: seriesKeyValue, en: seriesKeyValue },
+              color: resolvedColor || _chartColor(compatSeriesOrder.length),
+              values: {}
+            };
+            compatSeriesOrder.push(seriesKeyValue);
+          }
+          compatSeriesMap[seriesKeyValue].values[dimKey] = value;
+          if(resolvedColor) compatSeriesMap[seriesKeyValue].color = resolvedColor;
+        });
+        compatDims = compatDimOrder.map(function(dimKey){
+          return {
+            key: dimKey,
+            label: { vi: dimKey, en: dimKey },
+            max: Math.max(compatDimMax[dimKey] || 0, 1)
+          };
+        });
+        compatSeries = compatSeriesOrder.map(function(seriesKeyValue){
+          return compatSeriesMap[seriesKeyValue];
+        });
+      }
+    }
+    if(!compatDims.length && compatRows.length && typeof compatRows[0] === 'object'){
+      Object.keys(compatRows[0]).forEach(function(key){
+        if(typeof compatRows[0][key] === 'number') compatDims.push({ key:key, label:{ vi:key, en:key }, max:Math.max(_chartNumber(compatRows[0][key]), 1) });
+      });
+    }
+    if(!compatSeries.length && compatRows.length){
+      compatRows.slice(0, 6).forEach(function(row, index){
+        compatSeries.push({
+          key: row.id || ('series_' + index),
+          label: { vi: row.name || row.label || ('Series ' + (index + 1)), en: row.name || row.label || ('Series ' + (index + 1)) },
+          color: _chartColor(index),
+          values: row
+        });
+      });
+    }
+    if(compatDims.length && compatSeries.length){
+      var compatState = _chartState(state, blockId);
+      var compatLegend = compatCfg.showLegend === false ? '' : _chartLegend(compatSeries, compatState, blockId, _t('ChÃº giáº£i radar', 'Radar legend'));
+      svg += '<div class="hm-chart-card hm-chart-card-radar">';
+      svg += compatLegend;
+      svg += '<div class="hm-chart-shell" role="img" aria-label="'+_chartAttrText(_t('Biá»ƒu Ä‘á»“ radar so sÃ¡nh Ä‘a tiÃªu chÃ­', 'Radar chart comparing multiple dimensions'))+'" data-chart-block-id="'+_esc(blockId || '')+'">';
+      svg += '<svg class="hm-chart-svg" viewBox="0 0 '+width+' '+height+'" preserveAspectRatio="xMidYMid meet">';
+      [0.2,0.4,0.6,0.8,1].forEach(function(level){
+        var ringPoints = [];
+        compatDims.forEach(function(dim, dimIndex){
+          var angle = (-Math.PI / 2) + ((Math.PI * 2 * dimIndex) / compatDims.length);
+          ringPoints.push({ x: cx + (Math.cos(angle) * radius * level), y: cy + (Math.sin(angle) * radius * level) });
+        });
+        svg += '<polygon points="'+_chartPointsToString(ringPoints)+'" class="hm-chart-radar-ring"></polygon>';
+      });
+      compatDims.forEach(function(dim, dimIndex){
+        var angle = (-Math.PI / 2) + ((Math.PI * 2 * dimIndex) / compatDims.length);
+        var lx = cx + (Math.cos(angle) * radius);
+        var ly = cy + (Math.sin(angle) * radius);
+        var tx = cx + (Math.cos(angle) * (radius + 20));
+        var ty = cy + (Math.sin(angle) * (radius + 20));
+        svg += '<line x1="'+cx+'" y1="'+cy+'" x2="'+lx.toFixed(2)+'" y2="'+ly.toFixed(2)+'" class="hm-chart-axis"></line>';
+        svg += '<text x="'+tx.toFixed(2)+'" y="'+ty.toFixed(2)+'" class="hm-chart-axis-label">'+_esc(_chartText(dim, dim.key, dim.key))+'</text>';
+      });
+      compatSeries.forEach(function(series, seriesIndex){
+        var hidden = !!compatState.hiddenSeries[_chartSeriesKey(series, seriesIndex)];
+        var polygonPoints = [];
+        if(hidden) return;
+        compatDims.forEach(function(dim, dimIndex){
+          var rawValue = series.values && typeof series.values === 'object' ? series.values[dim.key] : (Array.isArray(series.values) ? series.values[dimIndex] : 0);
+          var maxValue = _chartNumber(dim.max || 100) || 100;
+          var pct = _chartClamp(_chartNumber(rawValue) / maxValue, 0, 1);
+          var angle = (-Math.PI / 2) + ((Math.PI * 2 * dimIndex) / compatDims.length);
+          var px = cx + (Math.cos(angle) * radius * pct);
+          var py = cy + (Math.sin(angle) * radius * pct);
+          var tip = _chartText(series, series.key || ('Series ' + (seriesIndex + 1)), series.key || ('Series ' + (seriesIndex + 1))) + ' â€¢ ' + _chartText(dim, dim.key, dim.key) + ': ' + _chartFormatValue(rawValue, config.format || compatCfg.yFormat || '');
+          polygonPoints.push({ x:px, y:py });
+          svg += '<circle cx="'+px.toFixed(2)+'" cy="'+py.toFixed(2)+'" r="4" fill="'+_esc(series.color || _chartColor(seriesIndex))+'" class="hm-chart-point"'+_chartTooltipAttrs(tip)+'><title>'+_esc(tip)+'</title></circle>';
+          if(compatCfg.showLabels){
+            svg += '<text x="'+(px + 6).toFixed(2)+'" y="'+(py - 4).toFixed(2)+'" class="hm-chart-axis-label hm-chart-axis-label-x">'+_esc(_chartFormatValue(rawValue, config.format || compatCfg.yFormat || ''))+'</text>';
+          }
+        });
+        svg += '<polygon points="'+_chartPointsToString(polygonPoints)+'" fill="'+_esc(series.color || _chartColor(seriesIndex))+'" fill-opacity="'+(compatCfg.radarFill === false ? '0.08' : '0.18')+'" stroke="'+_esc(series.color || _chartColor(seriesIndex))+'" stroke-width="2.5" class="hm-chart-radar-polygon"></polygon>';
+      });
+      svg += '</svg></div></div>';
+      return svg;
+    }
     dims = (config.dimensions || []).slice();
     if(!dims.length){
       var radarRows = _chartRows(config, data);
@@ -7205,6 +7529,7 @@ function _spcSubgroups(rows, valueKey, subgroupSize, subgroupField, timestampFie
       rows: group.rows,
       mean: _spcMean(group.values),
       range: _spcRange(group.values),
+      stddev: _spcStddev(group.values),
       timestamp: group.rows[0] && timestampField ? group.rows[0][timestampField] : ''
     };
   });
@@ -7260,10 +7585,33 @@ function _spcRuleViolations(values, limits, preset){
   return { status: status, messages: messages };
 }
 
+function _spcNormalizeChartMode(mode){
+  var normalized = String(mode || 'individual').toLowerCase();
+  if(normalized === 'xbar-r' || normalized === 'xbar-s' || normalized === 'xbar') return 'xbar';
+  if(normalized === 'moving-range' || normalized === 'moving_range' || normalized === 'mr') return 'moving_range';
+  if(normalized === 'range' || normalized === 'r') return 'range';
+  if(normalized === 'np' || normalized === 'p') return normalized;
+  return 'individual';
+}
+
+function _spcFirstNumericField(rows, fieldName, fallback){
+  var i;
+  if(!fieldName) return fallback;
+  for(i = 0; i < rows.length; i++){
+    if(rows[i] && rows[i][fieldName] != null && rows[i][fieldName] !== ''){
+      var value = Number(rows[i][fieldName]);
+      if(!isNaN(value)) return value;
+    }
+  }
+  return fallback;
+}
+
 function _spcSeriesFromConfig(config, rows){
   var spcCfg = config.spc || {};
-  var chartType = config.chartType || spcCfg.chartMode || 'individual';
+  var rawChartType = config.chartType || spcCfg.chartMode || 'individual';
+  var chartType = _spcNormalizeChartMode(rawChartType);
   var valueKey = config.measurementKey || spcCfg.valueField || 'measured_value';
+  var sampleField = config.sampleKey || spcCfg.sampleField || '';
   var subgroupSize = Number(config.subgroupSize || spcCfg.subgroupSize || 5);
   var subgroupField = config.subgroupKey || spcCfg.subgroupField || '';
   var timestampField = config.timestampKey || spcCfg.timestampField || 'measured_at';
@@ -7271,13 +7619,16 @@ function _spcSeriesFromConfig(config, rows){
   var values = [];
   var labels = [];
   var tooltips = [];
+  var limitSourceRows = rows;
   if(chartType === 'xbar'){
+    limitSourceRows = subgroups.map(function(group){ return group.rows[0] || {}; });
     subgroups.forEach(function(group){
       values.push(group.mean);
       labels.push(String(group.key));
       tooltips.push(_t('Subgroup', 'Subgroup') + ' #' + group.key + ' • Mean: ' + _chartFormatValue(group.mean, config.format || '') + ' • Range: ' + _chartFormatValue(group.range, config.format || ''));
     });
   } else if(chartType === 'range'){
+    limitSourceRows = subgroups.map(function(group){ return group.rows[0] || {}; });
     subgroups.forEach(function(group){
       values.push(group.range);
       labels.push(String(group.key));
@@ -7292,20 +7643,35 @@ function _spcSeriesFromConfig(config, rows){
       labels.push(String(index + 1));
       tooltips.push(_t('Moving range', 'Moving range') + ': ' + _chartFormatValue(Math.abs(current - previous), config.format || ''));
     });
+  } else if(chartType === 'np' || chartType === 'p'){
+    rows.forEach(function(row, index){
+      values.push(_chartNumber(row[valueKey]));
+      labels.push(String(sampleField && row[sampleField] != null ? row[sampleField] : (row[subgroupField] != null ? row[subgroupField] : (index + 1))));
+      tooltips.push((row[timestampField] ? _chartDateLabel(row[timestampField]) + ' â€¢ ' : '') + _chartFormatValue(row[valueKey], config.format || ''));
+    });
   } else {
     rows.forEach(function(row, index){
       values.push(_chartNumber(row[valueKey]));
-      labels.push(String(row[subgroupField] != null ? row[subgroupField] : (index + 1)));
+      labels.push(String(sampleField && row[sampleField] != null ? row[sampleField] : (row[subgroupField] != null ? row[subgroupField] : (index + 1))));
       tooltips.push((row[timestampField] ? _chartDateLabel(row[timestampField]) + ' • ' : '') + _chartFormatValue(row[valueKey], config.format || ''));
     });
   }
   return {
     chartType: chartType,
+    rawChartType: rawChartType,
     values: values,
     labels: labels,
     tooltips: tooltips,
     subgroups: subgroups,
-    valueKey: valueKey
+    valueKey: valueKey,
+    limitsFromFields: {
+      ucl: _spcFirstNumericField(limitSourceRows, spcCfg.uclField, null),
+      lcl: _spcFirstNumericField(limitSourceRows, spcCfg.lclField, null),
+      cl: _spcFirstNumericField(limitSourceRows, spcCfg.centerLineField, null),
+      target: _spcFirstNumericField(limitSourceRows, spcCfg.targetField, null),
+      lsl: _spcFirstNumericField(limitSourceRows, spcCfg.lslField, null),
+      usl: _spcFirstNumericField(limitSourceRows, spcCfg.uslField, null)
+    }
   };
 }
 
@@ -7320,7 +7686,13 @@ function _spcSeriesFromConfig(config, rows){
 function renderSpcChart(config, data, state, blockId){
   var rows;
   var series;
+  var spcCfg;
   var limits;
+  var limitSeed;
+  var fieldLimits;
+  var targetValue;
+  var lslValue;
+  var uslValue;
   var violations;
   var width = 720;
   var height = 320;
@@ -7334,25 +7706,40 @@ function renderSpcChart(config, data, state, blockId){
   var svg = '';
   try{
     rows = _chartRows(config, data);
+    spcCfg = config.spc || {};
     if(!rows.length) return _chartEmpty(_t('Không có dữ liệu','No data'));
     series = _spcSeriesFromConfig(config, rows);
     if(!series.values.length) return _chartEmpty(_t('Không có dữ liệu đo SPC', 'No SPC measurements available'));
-    limits = _spcResolveLimits(series.values, config.limits || (config.spc && config.spc.limits) || {});
-    violations = _spcRuleViolations(series.values, limits, (config.rules && config.rules[0]) || (config.spc && config.spc.rulePreset) || 'western-electric');
+    fieldLimits = series.limitsFromFields || {};
+    limitSeed = _clone(config.limits || spcCfg.limits || {});
+    if(fieldLimits.ucl != null && (limitSeed.ucl == null || limitSeed.ucl === 'auto')) limitSeed.ucl = fieldLimits.ucl;
+    if(fieldLimits.lcl != null && (limitSeed.lcl == null || limitSeed.lcl === 'auto')) limitSeed.lcl = fieldLimits.lcl;
+    if(fieldLimits.cl != null && (limitSeed.cl == null || limitSeed.cl === 'auto')) limitSeed.cl = fieldLimits.cl;
+    limits = _spcResolveLimits(series.values, limitSeed);
+    targetValue = fieldLimits.target != null ? fieldLimits.target : _spcFirstNumericField(rows, spcCfg.targetField, null);
+    lslValue = fieldLimits.lsl != null ? fieldLimits.lsl : _spcFirstNumericField(rows, spcCfg.lslField, null);
+    uslValue = fieldLimits.usl != null ? fieldLimits.usl : _spcFirstNumericField(rows, spcCfg.uslField, null);
+    violations = spcCfg.highlightViolations === false ? { status:{}, messages:{} } : _spcRuleViolations(series.values, limits, (config.rules && config.rules[0]) || spcCfg.rulePreset || 'western-electric');
     plotWidth = width - left - right;
     plotHeight = height - top - bottom;
-    ticks = _chartAxisTicks(Math.min(limits.lcl, Math.min.apply(null, series.values)), Math.max(limits.ucl, Math.max.apply(null, series.values)), 5);
+    ticks = _chartAxisTicks(
+      Math.min(limits.lcl, Math.min.apply(null, series.values), lslValue != null ? lslValue : limits.lcl, targetValue != null ? targetValue : limits.lcl),
+      Math.max(limits.ucl, Math.max.apply(null, series.values), uslValue != null ? uslValue : limits.ucl, targetValue != null ? targetValue : limits.ucl),
+      5
+    );
 
     svg += '<div class="hm-chart-card hm-chart-card-spc">';
     svg += '<div class="hm-chart-shell" role="img" aria-label="'+_chartAttrText(_t('Biểu đồ SPC với giới hạn kiểm soát', 'SPC chart with control limits'))+'" data-chart-block-id="'+_esc(blockId || '')+'">';
     svg += '<svg class="hm-chart-svg" viewBox="0 0 '+width+' '+height+'" preserveAspectRatio="none">';
-    [3,2,1,-1,-2,-3].forEach(function(zone){
-      var from = limits.cl + (Math.max(zone - 1, 0) * limits.sigma * (zone > 0 ? 1 : -1));
-      var to = limits.cl + (Math.abs(zone) * limits.sigma * (zone > 0 ? 1 : -1));
-      var y1 = _chartScaleY(Math.max(from, to), ticks[0], ticks[ticks.length - 1], top, plotHeight);
-      var y2 = _chartScaleY(Math.min(from, to), ticks[0], ticks[ticks.length - 1], top, plotHeight);
-      svg += '<rect x="'+left+'" y="'+Math.min(y1, y2).toFixed(2)+'" width="'+plotWidth+'" height="'+Math.abs(y2 - y1).toFixed(2)+'" fill="'+(Math.abs(zone) === 3 ? 'rgba(239,68,68,0.05)' : Math.abs(zone) === 2 ? 'rgba(245,158,11,0.05)' : 'rgba(37,99,235,0.04)')+'"></rect>';
-    });
+    if(spcCfg.showSigmaBands !== false){
+      [3,2,1,-1,-2,-3].forEach(function(zone){
+        var from = limits.cl + (Math.max(zone - 1, 0) * limits.sigma * (zone > 0 ? 1 : -1));
+        var to = limits.cl + (Math.abs(zone) * limits.sigma * (zone > 0 ? 1 : -1));
+        var y1 = _chartScaleY(Math.max(from, to), ticks[0], ticks[ticks.length - 1], top, plotHeight);
+        var y2 = _chartScaleY(Math.min(from, to), ticks[0], ticks[ticks.length - 1], top, plotHeight);
+        svg += '<rect x="'+left+'" y="'+Math.min(y1, y2).toFixed(2)+'" width="'+plotWidth+'" height="'+Math.abs(y2 - y1).toFixed(2)+'" fill="'+(Math.abs(zone) === 3 ? 'rgba(239,68,68,0.05)' : Math.abs(zone) === 2 ? 'rgba(245,158,11,0.05)' : 'rgba(37,99,235,0.04)')+'"></rect>';
+      });
+    }
     ticks.forEach(function(tick){
       var y = _chartScaleY(tick, ticks[0], ticks[ticks.length - 1], top, plotHeight);
       svg += '<line x1="'+left+'" y1="'+y.toFixed(2)+'" x2="'+(width - right)+'" y2="'+y.toFixed(2)+'" class="hm-chart-gridline"></line>';
@@ -7361,6 +7748,15 @@ function renderSpcChart(config, data, state, blockId){
     svg += '<line x1="'+left+'" y1="'+_chartScaleY(limits.ucl, ticks[0], ticks[ticks.length - 1], top, plotHeight).toFixed(2)+'" x2="'+(width - right)+'" y2="'+_chartScaleY(limits.ucl, ticks[0], ticks[ticks.length - 1], top, plotHeight).toFixed(2)+'" stroke="#ef4444" stroke-width="2" stroke-dasharray="6 4"></line>';
     svg += '<line x1="'+left+'" y1="'+_chartScaleY(limits.cl, ticks[0], ticks[ticks.length - 1], top, plotHeight).toFixed(2)+'" x2="'+(width - right)+'" y2="'+_chartScaleY(limits.cl, ticks[0], ticks[ticks.length - 1], top, plotHeight).toFixed(2)+'" stroke="#64748b" stroke-width="2" stroke-dasharray="3 3"></line>';
     svg += '<line x1="'+left+'" y1="'+_chartScaleY(limits.lcl, ticks[0], ticks[ticks.length - 1], top, plotHeight).toFixed(2)+'" x2="'+(width - right)+'" y2="'+_chartScaleY(limits.lcl, ticks[0], ticks[ticks.length - 1], top, plotHeight).toFixed(2)+'" stroke="#ef4444" stroke-width="2" stroke-dasharray="6 4"></line>';
+    if(targetValue != null){
+      svg += '<line x1="'+left+'" y1="'+_chartScaleY(targetValue, ticks[0], ticks[ticks.length - 1], top, plotHeight).toFixed(2)+'" x2="'+(width - right)+'" y2="'+_chartScaleY(targetValue, ticks[0], ticks[ticks.length - 1], top, plotHeight).toFixed(2)+'" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="2 4"></line>';
+    }
+    if(lslValue != null){
+      svg += '<line x1="'+left+'" y1="'+_chartScaleY(lslValue, ticks[0], ticks[ticks.length - 1], top, plotHeight).toFixed(2)+'" x2="'+(width - right)+'" y2="'+_chartScaleY(lslValue, ticks[0], ticks[ticks.length - 1], top, plotHeight).toFixed(2)+'" stroke="#b91c1c" stroke-width="1.5" stroke-dasharray="8 4"></line>';
+    }
+    if(uslValue != null){
+      svg += '<line x1="'+left+'" y1="'+_chartScaleY(uslValue, ticks[0], ticks[ticks.length - 1], top, plotHeight).toFixed(2)+'" x2="'+(width - right)+'" y2="'+_chartScaleY(uslValue, ticks[0], ticks[ticks.length - 1], top, plotHeight).toFixed(2)+'" stroke="#b91c1c" stroke-width="1.5" stroke-dasharray="8 4"></line>';
+    }
     svg += '<line x1="'+left+'" y1="'+(top + plotHeight)+'" x2="'+(width - right)+'" y2="'+(top + plotHeight)+'" class="hm-chart-axis"></line>';
     svg += '<line x1="'+left+'" y1="'+top+'" x2="'+left+'" y2="'+(top + plotHeight)+'" class="hm-chart-axis"></line>';
     svg += '<polyline points="'+series.values.map(function(value, index){
@@ -7394,28 +7790,35 @@ function renderSpcChart(config, data, state, blockId){
 function renderControlChart(config, data, state, blockId){
   var rows;
   var spcCfg = config.spc || {};
+  var chartMode = String(spcCfg.chartMode || config.chartType || 'xbar-r').toLowerCase();
   var valueKey = config.measurementKey || spcCfg.valueField || 'measured_value';
   var subgroupSize = Number(config.subgroupSize || spcCfg.subgroupSize || 5);
   var subgroupField = config.subgroupKey || spcCfg.subgroupField || '';
   var groups;
   var means;
-  var ranges;
+  var spreads;
+  var spreadKey = chartMode === 'xbar-s' ? 'stddev' : 'range';
+  var spreadLabel = chartMode === 'xbar-s' ? 'stddev' : 'range';
   var meanLimits;
-  var rangeLimits;
+  var spreadLimits;
   var allValues = [];
   var sigma;
+  var target = null;
   var usl = _chartNumber(config.usl || config.quality && config.quality.usl || 0);
   var lsl = _chartNumber(config.lsl || config.quality && config.quality.lsl || 0);
   var cp = 0;
   var cpk = 0;
   try{
     rows = _chartRows(config, data);
+    target = _spcFirstNumericField(rows, spcCfg.targetField, null);
+    if(spcCfg.uslField) usl = _spcFirstNumericField(rows, spcCfg.uslField, usl);
+    if(spcCfg.lslField) lsl = _spcFirstNumericField(rows, spcCfg.lslField, lsl);
     if(!rows.length) return _chartEmpty(_t('Không có dữ liệu','No data'));
     groups = _spcSubgroups(rows, valueKey, subgroupSize, subgroupField, config.timestampKey || spcCfg.timestampField || 'measured_at');
     means = groups.map(function(group){ return group.mean; });
-    ranges = groups.map(function(group){ return group.range; });
-    meanLimits = _spcResolveLimits(means, config.xbarLimits || {});
-    rangeLimits = _spcResolveLimits(ranges, config.rangeLimits || {});
+    spreads = groups.map(function(group){ return group[spreadKey]; });
+    meanLimits = _spcResolveLimits(means, config.xbarLimits || { ucl:_spcFirstNumericField(rows, spcCfg.uclField, null), lcl:_spcFirstNumericField(rows, spcCfg.lclField, null), cl:_spcFirstNumericField(rows, spcCfg.centerLineField, null) });
+    spreadLimits = _spcResolveLimits(spreads, config.rangeLimits || {});
     groups.forEach(function(group){ allValues = allValues.concat(group.values); });
     sigma = _spcStddev(allValues);
     if(usl && lsl && sigma){
@@ -7427,23 +7830,36 @@ function renderControlChart(config, data, state, blockId){
       renderSpcChart({
         chartType: 'xbar',
         limits: meanLimits,
-        measurementKey: valueKey,
+        spc: {
+          targetField: target != null ? 'target' : '',
+          lslField: lsl ? 'lsl' : '',
+          uslField: usl ? 'usl' : '',
+          showSigmaBands: spcCfg.showSigmaBands,
+          highlightViolations: spcCfg.highlightViolations,
+          rulePreset: spcCfg.rulePreset
+        },
+        measurementKey: 'measured_value',
         subgroupSize: subgroupSize,
         subgroupKey: subgroupField,
         format: config.format || '',
-        items: groups.map(function(group){ return { subgroup: group.key, measured_value: group.mean }; }),
+        items: groups.map(function(group){ return { subgroup: group.key, measured_value: group.mean, target: target, lsl: lsl, usl: usl }; }),
         dataKey: 'items'
-      }, groups.map(function(group){ return { subgroup: group.key, measured_value: group.mean }; }), state, blockId + '_xbar') +
+      }, groups.map(function(group){ return { subgroup: group.key, measured_value: group.mean, target: target, lsl: lsl, usl: usl }; }), state, blockId + '_xbar') +
       renderSpcChart({
-        chartType: 'range',
-        limits: rangeLimits,
-        measurementKey: 'range',
+        chartType: spreadKey === 'stddev' ? 'xbar' : 'range',
+        limits: spreadLimits,
+        measurementKey: spreadLabel,
+        spc: {
+          showSigmaBands: spcCfg.showSigmaBands,
+          highlightViolations: spcCfg.highlightViolations,
+          rulePreset: spcCfg.rulePreset
+        },
         subgroupSize: subgroupSize,
         subgroupKey: subgroupField,
         format: config.format || '',
-        items: groups.map(function(group){ return { subgroup: group.key, range: group.range }; }),
+        items: groups.map(function(group){ var item = { subgroup: group.key }; item[spreadLabel] = group[spreadKey]; return item; }),
         dataKey: 'items'
-      }, groups.map(function(group){ return { subgroup: group.key, range: group.range }; }), state, blockId + '_range') +
+      }, groups.map(function(group){ var item = { subgroup: group.key }; item[spreadLabel] = group[spreadKey]; return item; }), state, blockId + '_' + spreadLabel) +
       '</div>';
   } catch(err){
     return _chartError('control-chart', err);

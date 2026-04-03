@@ -101,6 +101,7 @@ use HESEM\QMS\Api\Controllers\FormController;
 use HESEM\QMS\Api\Controllers\FileController;
 use HESEM\QMS\Api\Controllers\UserController;
 use HESEM\QMS\Api\Controllers\AdminController;
+use HESEM\QMS\Api\Controllers\AdminMetadataStudioController;
 use HESEM\QMS\Api\Controllers\DictController;
 use HESEM\QMS\Api\Controllers\DashboardController;
 use HESEM\QMS\Api\Controllers\OrderController;
@@ -236,6 +237,9 @@ $router->actions([
     'admin_portal_display_config_save' => [AdminController::class, 'savePortalConfig'],
     'admin_mfa_settings_get'           => [AdminController::class, 'getMfaSettings'],
     'admin_mfa_settings_save'          => [AdminController::class, 'saveMfaSettings'],
+    'admin_metadata_studio_summary'    => [AdminMetadataStudioController::class, 'getSummary'],
+    'admin_metadata_studio_detail'     => [AdminMetadataStudioController::class, 'getDetail'],
+    'admin_metadata_studio_save'       => [AdminMetadataStudioController::class, 'saveDetail'],
 ]);
 
 // Dictionary
