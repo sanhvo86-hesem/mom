@@ -1,15 +1,88 @@
 {
   "_meta": {
-    "version": "1.0",
-    "description": "Admin-configurable design system defaults. Managed via Admin > Giao diện hệ thống."
+    "version": "2.0",
+    "description": "Admin-configurable design system. Managed via Admin > 🎨 Giao diện. All modules MUST use CSS variables — NEVER hardcode colors, sizes, or spacing."
   },
   "density": "default",
   "colorMode": "light",
+  "colorSchedule": null,
   "radius": "rounded",
   "motion": "normal",
   "fontSize": 0,
-  "brandPrimary": "#1565c0",
-  "brandAccent": "#f9a825",
-  "sidebarBg": "#0c2d48",
-  "fontFamily": "-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif"
+
+  "typography": {
+    "display": { "family": "Inter", "weight": 700 },
+    "heading": { "family": "Inter", "weight": 600 },
+    "body": { "family": "Inter", "weight": 400 },
+    "label": { "family": "Inter", "weight": 600, "spacing": "0.05em", "transform": "uppercase" },
+    "mono": { "family": "JetBrains Mono" }
+  },
+
+  "fontScale": {
+    "xs": 11, "sm": 13, "base": 14, "md": 16,
+    "lg": 18, "xl": 20, "2xl": 24, "3xl": 32
+  },
+
+  "lineHeight": {
+    "tight": 1.25, "normal": 1.5, "relaxed": 1.75
+  },
+
+  "brand": {
+    "primary": "#1565c0",
+    "light": "#1e88e5",
+    "dark": "#0c2d48",
+    "darkest": "#0a1e32",
+    "accent": "#f9a825",
+    "accentLight": "#fdd835",
+    "sidebarBg": "#0c2d48"
+  },
+
+  "statusColors": {
+    "success": "#16a34a", "error": "#dc2626", "warning": "#d97706",
+    "info": "#2563eb", "purple": "#7c3aed", "cyan": "#0891b2"
+  },
+  "statusColorsDark": {
+    "success": "#22c55e", "error": "#f87171", "warning": "#fbbf24",
+    "info": "#60a5fa", "purple": "#a78bfa", "cyan": "#22d3ee"
+  },
+
+  "colorsLight": {
+    "bgPage": "#f8fafc", "bgSurface": "#ffffff", "bgSurfaceAlt": "#f1f5f9",
+    "bgHeader": "#ffffff", "bgModal": "#ffffff", "bgHover": "#f8fafc",
+    "textPrimary": "#1e293b", "textSecondary": "#64748b", "textTertiary": "#94a3b8",
+    "textLink": "#1565c0", "textInverse": "#ffffff",
+    "border": "#e2e8f0", "borderFocus": "#1565c0", "borderError": "#dc2626", "borderSuccess": "#16a34a"
+  },
+
+  "colorsDark": {
+    "bgPage": "#0f172a", "bgSurface": "#1e293b", "bgSurfaceAlt": "#162032",
+    "bgHeader": "#1e293b", "bgHover": "#263348", "sidebarBg": "#0a1628",
+    "textPrimary": "#f1f5f9", "textSecondary": "#94a3b8", "textTertiary": "#64748b",
+    "textLink": "#60a5fa",
+    "border": "#334155", "borderFocus": "#60a5fa"
+  },
+
+  "layout": {
+    "sidebarW": 260, "sidebarCollapsed": 56, "headerH": 52,
+    "contentMaxW": 1400, "modalMaxW": 800, "modalSmMaxW": 480
+  },
+
+  "effects": {
+    "focusRingWidth": 3, "focusRingColor": "rgba(21,101,192,0.12)", "focusRingOffset": 0,
+    "selectionBg": "#3b82f6", "selectionColor": "#ffffff",
+    "caretColor": "#1565c0",
+    "placeholderColor": "#94a3b8",
+    "disabledOpacity": 0.5,
+    "scrollbarWidth": 8, "scrollbarTrack": "#f1f5f9", "scrollbarThumb": "#cbd5e1", "scrollbarRadius": 4,
+    "backdropBlur": 0, "overlayOpacity": 0.4,
+    "motionFast": 100, "motionNormal": 150, "motionSlow": 250, "motionSpring": 300
+  },
+
+  "shadows": "default",
+
+  "advanced": {
+    "customCSS": "",
+    "printBgWhite": true,
+    "highContrast": false
+  }
 }

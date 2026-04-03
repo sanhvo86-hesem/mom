@@ -1,4 +1,10 @@
 /* ============================================================================
+   ⚠️  CORE STANDARD — CẤM HARDCODE / NO HARDCODING ALLOWED
+   ⚠️  Tất cả thuộc tính đồ họa PHẢI dùng CSS variables dưới đây.
+   ⚠️  Admin điều khiển qua: Quản trị > 🎨 Giao diện
+   ⚠️  Vi phạm hardcode = code review REJECT.
+   ⚠️  Docs: docs/design-system-standard-2026.md
+   ============================================================================
    HESEM QMS Design System — Design Tokens v2.0
    Core CSS variables governing ALL modules.
    Import this FIRST in portal.html before any other stylesheet.

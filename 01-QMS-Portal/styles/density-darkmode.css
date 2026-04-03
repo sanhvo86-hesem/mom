@@ -408,6 +408,60 @@
   border-color: #334155 !important;
 }
 
+/* ============================================================================
+   EFFECT VARIABLES — Focus ring, Selection, Caret, Scrollbar, Backdrop
+   Controlled by admin via HmTheme.setDeep('effects.*')
+   ============================================================================ */
+:root {
+  --focus-ring-width: 3px;
+  --focus-ring-color: rgba(21,101,192,0.12);
+  --focus-ring-offset: 0px;
+  --selection-bg: #3b82f6;
+  --selection-color: #ffffff;
+  --caret-color: var(--brand-2, #1565c0);
+  --placeholder-color: #94a3b8;
+  --disabled-opacity: 0.5;
+  --scrollbar-width: 8px;
+  --scrollbar-track: #f1f5f9;
+  --scrollbar-thumb: #cbd5e1;
+  --scrollbar-radius: 4px;
+  --backdrop-blur: 0px;
+  --overlay-opacity: 0.4;
+  --font-display: var(--font);
+  --font-heading: var(--font);
+  --font-body: var(--font);
+  --font-label: var(--font);
+  --font-display-weight: 700;
+  --font-heading-weight: 600;
+  --font-body-weight: 400;
+  --font-label-weight: 600;
+  --label-letter-spacing: 0.05em;
+  --label-transform: uppercase;
+}
+
+/* Apply effect variables to elements */
+*:focus-visible { outline: var(--focus-ring-width) solid var(--focus-ring-color); outline-offset: var(--focus-ring-offset); }
+::selection { background: var(--selection-bg); color: var(--selection-color); }
+input, textarea { caret-color: var(--caret-color); }
+input::placeholder, textarea::placeholder { color: var(--placeholder-color); }
+:disabled, [disabled], .disabled { opacity: var(--disabled-opacity); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: var(--scrollbar-width); height: var(--scrollbar-width); }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: var(--scrollbar-radius); }
+::-webkit-scrollbar-thumb:hover { filter: brightness(0.85); }
+
+/* Typography context classes */
+.hm-display, .hm-kpi-value { font-family: var(--font-display); font-weight: var(--font-display-weight); }
+h1, h2, h3, .hm-page-title { font-family: var(--font-heading); font-weight: var(--font-heading-weight); }
+body, p, td, li { font-family: var(--font-body); font-weight: var(--font-body-weight); }
+label, .hm-label, .hm-kpi-label, th { font-family: var(--font-label); font-weight: var(--font-label-weight); letter-spacing: var(--label-letter-spacing); }
+code, pre, .hm-mono { font-family: var(--font-mono); }
+
+/* Dark mode scrollbar override */
+[data-color-mode="dark"] { --scrollbar-track: #0f172a; --scrollbar-thumb: #334155; --placeholder-color: #64748b; --caret-color: #60a5fa; --selection-bg: #3b82f6; }
+
 /* ── Reduced motion preference ──────────────────────────────────────────── */
 [data-motion="reduced"] *,
 [data-motion="reduced"] *::before,
