@@ -79,8 +79,12 @@ var state = {
   propsDraft: null,
   libraryMode: 'blocks',
   fieldSearch: {},
+  fieldFilter: {},
+  apiSearch: {},
   packPicker: null,
   showDigitalThreadLinks: true,
+  pendingApiSelection: {},
+  pendingApiSelectionSeq: 0,
   registries: {
     loading: false,
     loaded: false,
@@ -1657,16 +1661,20 @@ function _renderFieldControl(field, path, value){
   var type = field.type;
   var attrs = ' data-field-path="'+_esc(path)+'" data-field-type="'+_esc(type)+'"'+(field.repaintOnChange?' data-trigger-repaint="1"':'');
   var placeholder = field.placeholder ? ' placeholder="'+_esc(field.placeholder)+'"' : '';
-  var options = _getFieldOptions(field);
+  var options;
   var textValue = value == null ? '' : (typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value));
 
+  if(type === 'api-select'){
+    return _renderApiSelect(field, path, textValue, attrs, placeholder);
+  }
   if(type === 'field-select'){
     return _renderRegistryFieldSelect(field, path, textValue, attrs, placeholder);
   }
   if(type === 'toggle'){
     return '<label style="display:flex;align-items:center;gap:var(--space-2);height:40px"><input type="checkbox"'+attrs+(value?' checked':'')+'> <span style="font-size:var(--text-sm);color:var(--text-secondary)">'+_t('Bat','Enabled')+'</span></label>';
   }
-  if(type === 'select' || type === 'api-select' || type === 'formula-select' || type === 'status-set-select' || type === 'iot-connector-select' || type === 'field-type-select' || type === 'workflow-select'){
+  if(type === 'select' || type === 'formula-select' || type === 'status-set-select' || type === 'iot-connector-select' || type === 'field-type-select' || type === 'workflow-select'){
+    options = _getFieldOptions(field);
     if(!options.length){
       return '<input type="text" class="hm-input"'+attrs+' value="'+_esc(textValue)+'"'+placeholder+'>';
     }
@@ -1915,6 +1923,66 @@ function _applyEndpointCatalog(){
   if(window.HmBlockEngine) window.HmBlockEngine.API_CATALOG = items;
 }
 
+function _getApiCatalogOptions(){
+  var items = (BE.API_CATALOG && BE.API_CATALOG.length ? BE.API_CATALOG : _endpointCatalogItems()) || [];
+  return items.map(function(api){
+    var value = '';
+    var label = '';
+    var category = '';
+    var method = '';
+    if(api && typeof api === 'object'){
+      value = api.action || api.value || api.key || api.id || '';
+      label = api.label || api.labelVi || api.labelEn || api.name || api.description || '';
+      category = api.module || api.domain || api.category || '';
+      method = api.method || '';
+    } else {
+      value = String(api == null ? '' : api);
+    }
+    if(!value) return null;
+    return {
+      value: value,
+      label: label || value,
+      displayLabel: value + (label && label !== value ? ' - ' + label : ''),
+      category: category,
+      method: method
+    };
+  }).filter(function(option){
+    return !!option;
+  });
+}
+
+function _sanitizeRegistryFieldList(items){
+  if(!Array.isArray(items)) return [];
+  return items.reduce(function(list, item){
+    if(item == null) return list;
+    if(typeof item === 'string' || typeof item === 'number'){
+      list.push({ key: String(item), label: String(item), type: 'text' });
+      return list;
+    }
+    if(typeof item === 'object' && item.key != null && item.key !== ''){
+      list.push(item);
+    }
+    return list;
+  }, []);
+}
+
+function _cacheRegistryFieldList(key, items){
+  var normalized = _sanitizeRegistryFieldList(items);
+  state.registries.dataFields[key] = normalized;
+  return normalized;
+}
+
+function _trackPendingApiSelection(path){
+  state.pendingApiSelectionSeq = (state.pendingApiSelectionSeq || 0) + 1;
+  if(!state.pendingApiSelection) state.pendingApiSelection = {};
+  state.pendingApiSelection[path] = state.pendingApiSelectionSeq;
+  return state.pendingApiSelectionSeq;
+}
+
+function _isPendingApiSelectionCurrent(path, token){
+  return !!state.pendingApiSelection && state.pendingApiSelection[path] === token;
+}
+
 function _loadRegistry(file, key){
   var fallback = key === 'iotConnectors' ? (BE.IOT_CONNECTORS||{}) : {};
   return _fetchJsonWithFallback(_registryPaths(file), 0).catch(function(){
@@ -2139,11 +2207,13 @@ function _ensureDataFieldsForApi(api, force){
   if(!api) return Promise.resolve([]);
   candidates = _dataFieldKeyCandidates(api);
   candidates.forEach(function(candidate){
-    if(state.registries.dataFields[candidate] && !state.registries.dataFields[api]){
-      state.registries.dataFields[api] = state.registries.dataFields[candidate];
+    if(Array.isArray(state.registries.dataFields[candidate]) && !Array.isArray(state.registries.dataFields[api])){
+      state.registries.dataFields[api] = _cacheRegistryFieldList(candidate, state.registries.dataFields[candidate]);
     }
   });
-  if(state.registries.dataFields[api] && !force) return Promise.resolve(state.registries.dataFields[api]);
+  if(Array.isArray(state.registries.dataFields[api]) && !force){
+    return Promise.resolve(_cacheRegistryFieldList(api, state.registries.dataFields[api]));
+  }
   loadingKey = candidates.join('|');
   if(state.registries.dataFieldsLoading[loadingKey] && !force) return state.registries.dataFieldsLoading[loadingKey];
   state.registries.loading = true;
@@ -2161,26 +2231,23 @@ function _ensureDataFieldsForApi(api, force){
     dataMap = dataMap || {};
     for(i = 0; i < candidates.length; i++){
       if(Array.isArray(dataMap[candidates[i]])){
-        parsed = dataMap[candidates[i]] || [];
-        state.registries.dataFields[candidates[i]] = parsed;
+        parsed = _cacheRegistryFieldList(candidates[i], dataMap[candidates[i]]);
         state.registries.dataFields[api] = parsed;
         return parsed;
       }
     }
-    state.registries.dataFields[api] = [];
-    return [];
+    return _cacheRegistryFieldList(api, []);
   }).then(function(fields){
     delete state.registries.dataFieldsLoading[loadingKey];
     state.registries.loading = false;
     state.registries.loadingMessage = '';
-    return fields;
+    return _cacheRegistryFieldList(api, fields);
   }, function(){
     delete state.registries.dataFieldsLoading[loadingKey];
     state.registries.loading = false;
     state.registries.loadingMessage = '';
     state.registries.error = _t('Không thể nạp danh sách trường cho API đã chọn. Bạn vẫn có thể nhập tay.', 'Could not load fields for the selected API. You can still type manually.');
-    state.registries.dataFields[api] = [];
-    return [];
+    return _cacheRegistryFieldList(api, []);
   });
   state.registries.dataFieldsLoading[loadingKey] = promise;
   return promise;
@@ -2190,10 +2257,14 @@ function _getRegistryFieldsForApi(api){
   var candidates;
   var i;
   if(!api) return [];
-  if(state.registries.dataFields[api]) return state.registries.dataFields[api];
+  if(Array.isArray(state.registries.dataFields[api])){
+    return _cacheRegistryFieldList(api, state.registries.dataFields[api]);
+  }
   candidates = _dataFieldKeyCandidates(api);
   for(i = 0; i < candidates.length; i++){
-    if(state.registries.dataFields[candidates[i]]) return state.registries.dataFields[candidates[i]];
+    if(Array.isArray(state.registries.dataFields[candidates[i]])){
+      return _cacheRegistryFieldList(candidates[i], state.registries.dataFields[candidates[i]]);
+    }
   }
   return [];
 }
@@ -2264,6 +2335,161 @@ function _renderRegistryFieldSelect(field, path, textValue, attrs, placeholder){
       h += '</div>';
     } else {
       h += '<div class="mb-field-hint">'+_t('Không có trường nào khớp với từ khóa vừa nhập.', 'No fields matched the current keyword.')+'</div>';
+    }
+  }
+  h += '</div>';
+  return h;
+}
+
+function _renderApiSelect(field, path, textValue, attrs, placeholder){
+  var search = state.apiSearch[path];
+  var options = _getApiCatalogOptions();
+  var normalizedSearch;
+  var filtered = [];
+  var visible = [];
+  var initialLimit = 80;
+  var limit = 120;
+  var selectedOption = null;
+  var h = '';
+  if(search == null) search = textValue || '';
+  normalizedSearch = _normalizeSearchText(search);
+  filtered = options.filter(function(option){
+    var haystack = _normalizeSearchText((option.value || '') + ' ' + (option.label || '') + ' ' + (option.category || '') + ' ' + (option.method || ''));
+    return !normalizedSearch || haystack.indexOf(normalizedSearch) >= 0;
+  });
+  visible = normalizedSearch ? filtered.slice(0, limit) : filtered.slice(0, initialLimit);
+  if(textValue){
+    selectedOption = options.filter(function(option){
+      return String(option.value) === String(textValue);
+    })[0] || { value: textValue, displayLabel: textValue, category: '', method: '' };
+    if(!visible.some(function(option){ return String(option.value) === String(textValue); })){
+      visible = [selectedOption].concat(visible);
+    }
+  }
+  if(!options.length){
+    return '<div class="mb-field-select-wrap"><input type="text" class="hm-input"'+attrs+' value="'+_esc(textValue)+'"'+placeholder+'><div class="mb-field-hint">'+_t('Chua tai duoc API catalog. Ban van co the nhap endpoint thu cong.', 'API catalog is not available yet. You can still enter an endpoint manually.')+'</div></div>';
+  }
+  h += '<div class="mb-field-select-wrap">';
+  h += '<input type="text" class="hm-input hm-input-sm" data-api-search-path="'+_esc(path)+'" placeholder="'+_t('Tim endpoint, module hoac ten API...', 'Search endpoint, module, or API label...')+'" value="'+_esc(search)+'">';
+  h += '<select class="hm-input hm-select"'+attrs+'>';
+  h += '<option value=""></option>';
+  visible.forEach(function(option){
+    var selected = String(option.value) === String(textValue) ? ' selected' : '';
+    var meta = [option.method, option.category].filter(Boolean).join(' | ');
+    h += '<option value="'+_esc(option.value)+'"'+selected+'>'+_esc(option.displayLabel + (meta ? ' [' + meta + ']' : ''))+'</option>';
+  });
+  h += '</select>';
+  h += '<div class="mb-combo-meta"><span>'+_t('Hien thi ', 'Showing ') + visible.length + ' / ' + filtered.length + ' ' + _t('API', 'APIs') + '</span><span>'+_t('Search truoc roi moi chon trong danh sach.', 'Search first, then pick from the list.')+'</span></div>';
+  if(normalizedSearch && filtered.length > limit){
+    h += '<div class="mb-field-hint">'+_t('Ket qua dang gioi han o 120 API dau tien. Hay bo sung keyword de loc sat hon.', 'Results are capped to the first 120 APIs. Add more keywords to narrow further.')+'</div>';
+  } else if(!normalizedSearch && filtered.length > initialLimit){
+    h += '<div class="mb-field-hint">'+_t('Builder chi hien thi 80 API dau tien khi chua search. Dung o tim kiem de tranh dropdown qua dai.', 'The builder only shows the first 80 APIs until you search. Use search to avoid an oversized dropdown.')+'</div>';
+  }
+  h += '</div>';
+  return h;
+}
+
+function _renderRegistryFieldSelect(field, path, textValue, attrs, placeholder){
+  var api = _getByPath(state.propsDraft, 'config.dataSource.api');
+  var loadingKey = _dataFieldKeyCandidates(api).join('|');
+  var search = state.fieldSearch[path] || '';
+  var filterState = state.fieldFilter[path] || {};
+  var groupFilter = filterState.group || '';
+  var typeFilter = filterState.type || '';
+  var normalizedSearch = _normalizeSearchText(search);
+  var allFields = _sanitizeRegistryFieldList(_getRegistryFieldsForApi(api));
+  var grouped = {};
+  var orderedGroups = ['general', 'dimensions', 'cost', 'quality', 'scheduling', 'compliance', 'traceability'];
+  var availableGroups = {};
+  var availableTypes = {};
+  var filtered = [];
+  var visible = [];
+  var visibleLimit = 120;
+  var exists = false;
+  var h = '';
+  if(!api){
+    return '<div class="mb-field-select-wrap"><input type="text" class="hm-input"'+attrs+' value="'+_esc(textValue)+'"'+placeholder+'><div class="mb-field-hint">'+_t('Chon API endpoint truoc de builder goi y dung truong du lieu.', 'Choose an API endpoint first so the builder can suggest available fields.')+'</div></div>';
+  }
+  if(!allFields.length && !state.registries.dataFieldsLoading[loadingKey]){
+    _ensureDataFieldsForApi(api).then(function(){
+      if(state.selectedBlock) _paint();
+    });
+  }
+  if(state.registries.dataFieldsLoading[loadingKey]){
+    return '<div class="mb-field-select-wrap"><div class="mb-inline-loading"><span class="mb-spinner"></span><span>'+_t('Dang nap truong du lieu cho API ', 'Loading fields for API ')+'<code>'+_esc(api)+'</code></span></div><input type="text" class="hm-input"'+attrs+' value="'+_esc(textValue)+'"'+placeholder+'><div class="mb-field-hint">'+_t('Builder se chuyen sang dropdown sau khi registry tra ve schema endpoint.', 'The builder will switch to a dropdown when the endpoint schema arrives.')+'</div></div>';
+  }
+  if(!allFields.length){
+    return '<div class="mb-field-select-wrap"><input type="text" class="hm-input"'+attrs+' value="'+_esc(textValue)+'"'+placeholder+'><div class="mb-field-hint">'+_t('Registry chua co schema cho API nay. Ban van co the nhap key truong thu cong.', 'No registry schema is available for this API yet. You can still type a field key manually.')+'</div></div>';
+  }
+  allFields.forEach(function(item){
+    availableGroups[item.group || 'general'] = true;
+    availableTypes[item.type || 'text'] = true;
+  });
+  filtered = allFields.filter(function(item){
+    var groupKey = item.group || 'general';
+    var typeKey = item.type || 'text';
+    var haystack = _normalizeSearchText((item.key || '') + ' ' + (item.label || '') + ' ' + (item.labelEn || ''));
+    if(groupFilter && groupKey !== groupFilter) return false;
+    if(typeFilter && typeKey !== typeFilter) return false;
+    return !normalizedSearch || haystack.indexOf(normalizedSearch) >= 0;
+  });
+  visible = filtered.slice(0, visibleLimit);
+  visible.forEach(function(item){
+    var groupKey = item.group || 'general';
+    if(!grouped[groupKey]) grouped[groupKey] = [];
+    grouped[groupKey].push(item);
+    if(String(item.key) === String(textValue)) exists = true;
+  });
+  h += '<div class="mb-field-select-wrap">';
+  h += '<div class="mb-field-filter-row">';
+  h += '<input type="text" class="hm-input hm-input-sm" data-field-search-path="'+_esc(path)+'" placeholder="'+_t('Tim key, nhan VI hoac nhan EN...', 'Search by key, VI label, or EN label...')+'" value="'+_esc(search)+'">';
+  h += '<select class="hm-input hm-select hm-input-sm" data-field-group-filter-path="'+_esc(path)+'"><option value="">'+_esc(_t('Tat ca nhom', 'All groups'))+'</option>';
+  orderedGroups.concat(Object.keys(availableGroups).filter(function(key){ return orderedGroups.indexOf(key) < 0; }).sort()).forEach(function(groupKey){
+    var selected = groupKey === groupFilter ? ' selected' : '';
+    h += '<option value="'+_esc(groupKey)+'"'+selected+'>'+_esc(_humanizeKey(groupKey))+'</option>';
+  });
+  h += '</select>';
+  h += '<select class="hm-input hm-select hm-input-sm" data-field-type-filter-path="'+_esc(path)+'"><option value="">'+_esc(_t('Tat ca kieu', 'All types'))+'</option>';
+  Object.keys(availableTypes).sort().forEach(function(typeKey){
+    var selected = typeKey === typeFilter ? ' selected' : '';
+    h += '<option value="'+_esc(typeKey)+'"'+selected+'>'+_esc(_fieldTypeLabel(typeKey))+'</option>';
+  });
+  h += '</select>';
+  h += '</div>';
+  h += '<select class="hm-input hm-select"'+attrs+'>';
+  h += '<option value=""></option>';
+  orderedGroups.concat(Object.keys(grouped).filter(function(key){ return orderedGroups.indexOf(key) < 0; })).forEach(function(groupKey){
+    var items = grouped[groupKey] || [];
+    if(!items.length) return;
+    h += '<optgroup label="'+_esc(_humanizeKey(groupKey))+' ('+items.length+')">';
+    items.forEach(function(item){
+      var meta = [];
+      var selected = String(item.key) === String(textValue) ? ' selected' : '';
+      meta.push(_fieldTypeLabel(item.type));
+      if(item.required) meta.push(_t('bat buoc', 'required'));
+      if(item.constraints && item.constraints.maxLength) meta.push('<= ' + item.constraints.maxLength);
+      h += '<option value="'+_esc(item.key)+'"'+selected+'>'+_esc((item.label || item.labelEn || item.key) + ' (' + item.key + ') - ' + meta.join(', '))+'</option>';
+    });
+    h += '</optgroup>';
+  });
+  if(textValue && !exists){
+    h += '<option value="'+_esc(textValue)+'" selected>'+_esc(textValue)+'</option>';
+  }
+  h += '</select>';
+  h += '<div class="mb-field-hint">'+_t('Schema dang lay tu registry endpoint ', 'Schema is sourced from registry endpoint ')+'<code>'+_esc(api)+'</code></div>';
+  h += '<div class="mb-combo-meta"><span>'+_t('Hien thi ', 'Showing ') + visible.length + ' / ' + filtered.length + ' ' + _t('truong', 'fields') + '</span><span>'+_t('Loc theo nhom va kieu du lieu de tranh dropdown qua dai.', 'Filter by group and data type to avoid oversized dropdowns.')+'</span></div>';
+  if(filtered.length > visibleLimit){
+    h += '<div class="mb-field-hint">'+_t('Danh sach dang gioi han o 120 field dau tien. Hay them keyword hoac filter de thu hep ket qua.', 'The list is capped to the first 120 fields. Add a keyword or filter to narrow the results.')+'</div>';
+  }
+  if(search){
+    if(filtered.length){
+      h += '<div class="mb-field-match-list">';
+      filtered.slice(0, 5).forEach(function(item){
+        h += '<div class="mb-field-match-item"><strong>'+_highlightRegistryMatch(item.label || item.key, search)+'</strong><span>'+_highlightRegistryMatch(item.key, search)+' | '+_esc(_fieldTypeLabel(item.type))+'</span></div>';
+      });
+      h += '</div>';
+    } else {
+      h += '<div class="mb-field-hint">'+_t('Khong co truong nao khop voi bo loc hien tai.', 'No fields matched the current filters.')+'</div>';
     }
   }
   h += '</div>';
@@ -3108,8 +3334,12 @@ function _ensureBuilderState(){
   if(state.pendingUndoLabel === undefined) state.pendingUndoLabel = '';
   if(!state.libraryMode) state.libraryMode = 'blocks';
   if(!state.fieldSearch) state.fieldSearch = {};
+  if(!state.fieldFilter) state.fieldFilter = {};
+  if(!state.apiSearch) state.apiSearch = {};
   if(state.packPicker === undefined) state.packPicker = null;
   if(state.showDigitalThreadLinks === undefined) state.showDigitalThreadLinks = true;
+  if(!state.pendingApiSelection) state.pendingApiSelection = {};
+  if(state.pendingApiSelectionSeq == null) state.pendingApiSelectionSeq = 0;
   if(!state.registries.dataFieldsLoading) state.registries.dataFieldsLoading = {};
   if(state.registries.loadingMessage === undefined) state.registries.loadingMessage = '';
 }
@@ -3126,13 +3356,13 @@ function _ensureBuilderStyles(){
   css += '.mb-main-panel{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}';
   css += '.mb-right-rail{width:400px;display:flex;flex-direction:column;gap:16px}';
   css += '.mb-rail-panel{display:flex;flex-direction:column;overflow:hidden}';
-  css += '.mb-panel-header{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px;background:linear-gradient(180deg,#fff,rgba(37,99,235,0.03))}';
+  css += '.mb-panel-header{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px;background:linear-gradient(180deg,rgba(255,255,255,0.98),rgba(37,99,235,0.05));backdrop-filter:blur(10px)}';
   css += '.mb-panel-body{padding:14px 16px;overflow:auto;flex:1;min-height:0}';
-  css += '.mb-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--gray-50)}';
+  css += '.mb-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);background:rgba(248,250,252,0.9);backdrop-filter:blur(10px)}';
   css += '.mb-toolbar-group{display:flex;gap:8px;align-items:center;flex-wrap:wrap}';
   css += '.mb-toolbar-spacer{flex:1 1 auto}';
-  css += '.mb-canvas-stage{padding:18px;min-height:520px;background:linear-gradient(180deg,rgba(37,99,235,0.04),rgba(255,255,255,0));overflow:auto;position:relative}';
-  css += '.mb-canvas-root{min-height:400px;padding:18px;border:1px dashed rgba(37,99,235,0.3);border-radius:20px;background:#fff}';
+  css += '.mb-canvas-stage{padding:18px;min-height:520px;background:radial-gradient(circle at top left,rgba(37,99,235,0.08),rgba(255,255,255,0) 34%),linear-gradient(180deg,rgba(37,99,235,0.04),rgba(255,255,255,0));overflow:auto;position:relative}';
+  css += '.mb-canvas-root{min-height:400px;padding:18px;border:1px dashed rgba(37,99,235,0.3);border-radius:20px;background:linear-gradient(180deg,#fff,rgba(248,250,252,0.98));box-shadow:inset 0 1px 0 rgba(255,255,255,0.75)}';
   css += '.mb-layout-stack{display:flex;flex-direction:column}';
   css += '.mb-layout-grid{display:grid}';
   css += '.mb-layout-flex{display:flex;flex-wrap:wrap}';
@@ -3183,7 +3413,9 @@ function _ensureBuilderStyles(){
   css += '.mb-inline-loading{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px dashed rgba(37,99,235,0.22);border-radius:12px;background:rgba(37,99,235,0.04);font-size:12px;color:var(--text-secondary);margin-bottom:10px}';
   css += '.mb-spinner{width:14px;height:14px;border:2px solid rgba(37,99,235,0.18);border-top-color:var(--brand-2);border-radius:50%;display:inline-block;animation:mb-spin .8s linear infinite}';
   css += '.mb-field-select-wrap{display:grid;gap:8px}';
+  css += '.mb-field-filter-row{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(0,1fr) minmax(0,1fr);gap:8px}';
   css += '.mb-field-hint{font-size:12px;color:var(--text-tertiary)}';
+  css += '.mb-combo-meta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--text-tertiary)}';
   css += '.mb-field-match-list{display:grid;gap:6px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:rgba(15,23,42,0.02)}';
   css += '.mb-field-match-item{display:flex;justify-content:space-between;gap:12px;font-size:12px;color:var(--text-secondary)}';
   css += '.mb-field-match-item strong{font-size:12px;color:var(--text-primary)}';
@@ -3211,7 +3443,7 @@ function _ensureBuilderStyles(){
   css += '.mb-choice-card strong{display:block;font-size:14px;color:var(--text-primary)}';
   css += '.mb-kbd-chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--border);padding:4px 8px;border-radius:999px;background:#fff;font-size:12px;color:var(--text-secondary)}';
   css += '@keyframes mb-spin{to{transform:rotate(360deg)}}';
-  css += '@media (max-width: 1360px){.mb-builder-shell{flex-direction:column}.mb-side-panel,.mb-right-rail{width:auto}}';
+  css += '@media (max-width: 1360px){.mb-builder-shell{flex-direction:column}.mb-side-panel,.mb-right-rail{width:auto}.mb-field-filter-row{grid-template-columns:1fr}}';
   style.textContent = css;
   document.head.appendChild(style);
 }
@@ -5190,6 +5422,109 @@ _handleInput = function(e){
 };
 
 /* ── Export ───────────────────────────────────────────────────────────────── */
+_handleInput = function(e){
+  var target = e.target;
+  var path;
+  var api;
+  var requestToken;
+  var selectedBlockId;
+  var workflowId;
+  if(target.id === 'mb-lib-search'){
+    state.librarySearch = target.value;
+    _paint();
+    return;
+  }
+  if(target.id === 'mb-layout-columns'){
+    _mutateSchema(_t('Cap nhat so cot', 'Update column count'), function(){
+      var tab = _getActiveTab();
+      if(!tab) return;
+      _ensureTabLayout(tab);
+      tab.layout.columns = parseInt(target.value, 10) || 1;
+      if(tab.layout.type !== 'grid') tab.layout.type = 'grid';
+    });
+    return;
+  }
+  if(target.id === 'mb-layout-gap'){
+    _mutateSchema(_t('Cap nhat khoang cach canvas', 'Update canvas gap'), function(){
+      var tab = _getActiveTab();
+      if(!tab) return;
+      _ensureTabLayout(tab);
+      tab.layout.gap = target.value || '16px';
+    });
+    return;
+  }
+  if(target.hasAttribute('data-field-search-path')){
+    state.fieldSearch[target.getAttribute('data-field-search-path')] = target.value || '';
+    _paint();
+    return;
+  }
+  if(target.hasAttribute('data-field-group-filter-path')){
+    path = target.getAttribute('data-field-group-filter-path');
+    if(!state.fieldFilter[path]) state.fieldFilter[path] = { group: '', type: '' };
+    state.fieldFilter[path].group = target.value || '';
+    _paint();
+    return;
+  }
+  if(target.hasAttribute('data-field-type-filter-path')){
+    path = target.getAttribute('data-field-type-filter-path');
+    if(!state.fieldFilter[path]) state.fieldFilter[path] = { group: '', type: '' };
+    state.fieldFilter[path].type = target.value || '';
+    _paint();
+    return;
+  }
+  if(target.hasAttribute('data-api-search-path')){
+    state.apiSearch[target.getAttribute('data-api-search-path')] = target.value || '';
+    _paint();
+    return;
+  }
+  if(target.hasAttribute('data-field-path')){
+    path = target.getAttribute('data-field-path');
+    _updateDraftValue(target);
+    if(path === 'config.dataSource.api'){
+      api = target.value || '';
+      state.apiSearch[path] = api;
+      state.fieldSearch = {};
+      state.fieldFilter = {};
+      selectedBlockId = state.selectedBlock;
+      requestToken = _trackPendingApiSelection(path);
+      if(api){
+        _paint();
+        _ensureDataFieldsForApi(api).then(function(){
+          var result;
+          if(!_isPendingApiSelectionCurrent(path, requestToken)) return;
+          if(!state.propsDraft || state.selectedBlock !== selectedBlockId) return;
+          if(_getByPath(state.propsDraft, path) !== api) return;
+          result = _autoPopulateDraftFromApi(state.propsDraft, api);
+          if(result){
+            _syncDraftToSelectedBlock(_t('Tu dong them schema tu registry', 'Auto-populate from registry'));
+            _toastBuilder(_t('Da tu dong them ', 'Auto-added ') + result.count + ' ' + result.noun + _t(' tu registry.', ' from registry.'), 'success');
+          } else if(state.selectedBlock === selectedBlockId){
+            _paint();
+          }
+        }).catch(function(){
+          if(state.selectedBlock === selectedBlockId && _isPendingApiSelectionCurrent(path, requestToken)) _paint();
+        });
+        return;
+      }
+      if(target.getAttribute('data-trigger-repaint') === '1') _paint();
+      return;
+    }
+    if(path === 'config.workflow.workflowId'){
+      workflowId = target.value || '';
+      if(workflowId && _applyWorkflowRegistryToDraft(state.propsDraft, workflowId)){
+        _syncDraftToSelectedBlock(_t('Dong bo workflow tu registry', 'Sync workflow from registry'));
+        _toastBuilder(_t('Da tu dong tao transitions, guards va SLA tu workflow da chon.', 'Transitions, guards, and SLA were generated from the selected workflow.'), 'success');
+        return;
+      }
+    }
+    if(path === 'config.validation.autoApply' && state.propsDraft && state.propsDraft.type === 'form-standard'){
+      _syncDraftToSelectedBlock(_t('Cap nhat validation tu dong', 'Update automatic validation'));
+      return;
+    }
+    if(target.getAttribute('data-trigger-repaint') === '1') _paint();
+  }
+};
+
 window._renderModuleBuilder = render;
 
 })();
