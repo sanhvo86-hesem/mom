@@ -3704,6 +3704,21 @@ function _ensureBuilderStyles(){
   css += '.mb-builder-hero-kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.72}';
   css += '.mb-builder-hero-copy h1{margin:0;font-size:24px;line-height:1.2;color:#fff}';
   css += '.mb-builder-hero-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-self:flex-start}';
+  css += '.mb-hero-commandbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center}';
+  css += '.mb-hero-action,.mb-hero-select{position:relative;display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 14px;border:1px solid rgba(255,255,255,0.16);border-radius:14px;background:rgba(255,255,255,0.08);color:#fff;backdrop-filter:blur(10px);transition:background .18s,border-color .18s,transform .18s,box-shadow .18s;overflow:hidden}';
+  css += '.mb-hero-action{cursor:pointer}';
+  css += '.mb-hero-action:hover,.mb-hero-action:focus-visible,.mb-hero-select:hover,.mb-hero-select:focus-within{background:rgba(255,255,255,0.16);border-color:rgba(255,255,255,0.24);transform:translateY(-1px);box-shadow:0 10px 24px rgba(15,23,42,0.16)}';
+  css += '.mb-hero-action.is-active,.mb-hero-select.is-active{background:#fff;color:var(--brand);border-color:#fff}';
+  css += '.mb-hero-action.is-primary{background:var(--green);border-color:rgba(255,255,255,0.2)}';
+  css += '.mb-hero-action-icon{font-size:15px;line-height:1;flex:0 0 auto}';
+  css += '.mb-hero-action-label{max-width:0;opacity:0;overflow:hidden;white-space:nowrap;font-size:12px;font-weight:700;transition:max-width .18s,opacity .18s,margin .18s}';
+  css += '.mb-hero-action:hover .mb-hero-action-label,.mb-hero-action:focus-visible .mb-hero-action-label,.mb-hero-select:hover .mb-hero-action-label,.mb-hero-select:focus-within .mb-hero-action-label{max-width:140px;opacity:1;margin-right:2px}';
+  css += '.mb-hero-action-badge{min-width:18px;height:18px;padding:0 5px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.16);font-size:11px;font-weight:700;line-height:1}';
+  css += '.mb-hero-action.is-active .mb-hero-action-badge{background:rgba(37,99,235,0.14);color:var(--brand)}';
+  css += '.mb-hero-select{padding-right:12px;cursor:pointer}';
+  css += '.mb-hero-select:after{content:"▾";font-size:10px;line-height:1;opacity:.76;margin-left:-10px}';
+  css += '.mb-hero-select-input{border:0;background:transparent;color:inherit;font:inherit;font-size:13px;font-weight:700;line-height:1;min-width:54px;padding:0 18px 0 0;appearance:none;cursor:pointer;outline:none;box-shadow:none}';
+  css += '.mb-hero-select-input option{color:#0f172a;background:#fff}';
   css += '.mb-canvas-toolbar--hero{padding:12px 14px;border:1px solid rgba(255,255,255,0.16);border-radius:18px;background:rgba(255,255,255,0.08);backdrop-filter:blur(10px)}';
   css += '.mb-canvas-toolbar--hero .mb-toolbar-group{gap:6px}';
   css += '.mb-canvas-toolbar--hero .hm-btn.hm-btn-sm{height:38px;min-height:38px;padding:0 12px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:12px;line-height:1;white-space:nowrap;border-color:rgba(255,255,255,0.16);color:#fff;background:rgba(255,255,255,0.06)}';
@@ -3734,9 +3749,9 @@ function _ensureBuilderStyles(){
   css += '.mb-toggle-control:not(.mb-toggle-control--header) input{width:18px;height:18px}';
   css += '.mb-tree-scroll::-webkit-scrollbar,.mb-panel-body::-webkit-scrollbar,.mb-canvas-stage::-webkit-scrollbar{width:0;height:0}';
   css += '@keyframes mb-spin{to{transform:rotate(360deg)}}';
-  css += '@media (max-width: 1360px){.mb-builder-shell{flex-direction:column}.mb-side-panel,.mb-right-rail{width:auto;flex-basis:auto}.mb-field-filter-row{grid-template-columns:1fr}.mb-builder-hero{padding:18px 20px}.mb-builder-hero-actions{justify-content:flex-start}.mb-canvas-toolbar--hero{width:100%}}';
-  css += '@media (max-width: 900px){.mb-prop-hero{padding:12px 14px}.mb-prop-toggle-row{width:100%}.mb-toggle-control--header{flex:1 1 180px}.mb-builder-hero-main{min-width:100%}}';
-  css += '@media (max-width: 640px){.mb-builder-hero,.mb-prop-hero{padding:14px 16px}.mb-canvas-toolbar--hero{padding:10px}.mb-canvas-toolbar--hero .mb-toolbar-spacer{display:none}.mb-canvas-toolbar--hero .mb-toolbar-group--view{width:100%;justify-content:flex-start}.mb-toggle-control--header{width:100%}}';
+  css += '@media (max-width: 1360px){.mb-builder-shell{flex-direction:column}.mb-side-panel,.mb-right-rail{width:auto;flex-basis:auto}.mb-field-filter-row{grid-template-columns:1fr}.mb-builder-hero{padding:18px 20px}.mb-builder-hero-actions,.mb-hero-commandbar{justify-content:flex-start}.mb-canvas-toolbar--hero{width:100%}}';
+  css += '@media (max-width: 900px){.mb-prop-hero{padding:12px 14px}.mb-prop-toggle-row{width:100%}.mb-toggle-control--header{flex:1 1 180px}.mb-builder-hero-main{min-width:100%}.mb-hero-select,.mb-hero-action{min-height:44px}}';
+  css += '@media (max-width: 640px){.mb-builder-hero,.mb-prop-hero{padding:14px 16px}.mb-canvas-toolbar--hero{padding:10px}.mb-canvas-toolbar--hero .mb-toolbar-spacer{display:none}.mb-canvas-toolbar--hero .mb-toolbar-group--view{width:100%;justify-content:flex-start}.mb-toggle-control--header{width:100%}.mb-builder-hero-actions,.mb-hero-commandbar{width:100%}.mb-hero-select{flex:1 1 132px}.mb-hero-action-label{display:none}}';
   style.textContent = css;
   document.head.appendChild(style);
 }
@@ -4767,6 +4782,33 @@ function _toggleLibrarySection(mode, key){
   state.librarySectionCollapsed[sectionKey] = !_isLibrarySectionCollapsed(mode, key, false);
 }
 
+function _renderHeroActionButton(options){
+  var label = _t(options.labelVi || '', options.labelEn || options.labelVi || '');
+  var classes = 'mb-hero-action';
+  var extraAttrs = options.extraAttrs ? (' ' + options.extraAttrs) : '';
+  if(options.variant) classes += ' is-' + options.variant;
+  if(options.active) classes += ' is-active';
+  return '<button class="'+classes+'" data-action="'+_esc(options.action || '')+'"'+extraAttrs+' title="'+_esc(label)+'" aria-label="'+_esc(label)+'">'+
+    '<span class="mb-hero-action-icon" aria-hidden="true">'+_esc(options.icon || '•')+'</span>'+
+    '<span class="mb-hero-action-label">'+_esc(label)+'</span>'+
+    (options.badge != null ? '<span class="mb-hero-action-badge">'+_esc(options.badge)+'</span>' : '')+
+  '</button>';
+}
+
+function _renderHeroSelectControl(id, labelVi, labelEn, icon, value, options){
+  var label = _t(labelVi, labelEn);
+  var h = '<label class="mb-hero-select" title="'+_esc(label)+'" aria-label="'+_esc(label)+'">';
+  h += '<span class="mb-hero-action-icon" aria-hidden="true">'+_esc(icon || '•')+'</span>';
+  h += '<span class="mb-hero-action-label">'+_esc(label)+'</span>';
+  h += '<select class="mb-hero-select-input" id="'+_esc(id)+'" aria-label="'+_esc(label)+'">';
+  (options || []).forEach(function(option){
+    var raw = _normalizeOption(option);
+    h += '<option value="'+_esc(raw.value)+'"'+(String(raw.value) === String(value) ? ' selected' : '')+'>'+_esc(raw.label)+'</option>';
+  });
+  h += '</select></label>';
+  return h;
+}
+
 _renderLibraryPanel = function(){
   var h = '';
   var catalog = BE.BLOCK_CATALOG || {};
@@ -4978,6 +5020,196 @@ _renderBuilder = function(){
   h += '<button class="hm-btn" style="background:var(--green);color:#fff" data-action="save-module">💾 '+_t('Lưu', 'Save')+'</button>';
   h += '<button class="hm-btn" style="background:rgba(255,255,255,.12);color:#fff" data-action="back-setup">← '+_t('Quay lại', 'Back')+'</button>';
   h += '</div></div>';
+  h += '<div class="mb-builder-shell">';
+  if(state.showTree) h += _renderWidgetTree();
+  h += '<div class="mb-main-panel">';
+  h += '<div class="mb-tab-strip">';
+  (schema.tabs || []).forEach(function(tab){
+    h += '<button class="mb-tab-pill'+(state.activeTab === tab.tabId ? ' is-active' : '')+'" data-action="switch-tab" data-tab="'+_esc(tab.tabId)+'">'+_esc(tab.icon || '📑')+' '+_esc(_t(tab.title.vi, tab.title.en))+'</button>';
+  });
+  h += '<button class="mb-tab-pill" data-action="add-tab">+ '+_t('Thêm tab', 'Add tab')+'</button>';
+  if(schema.tabs && schema.tabs.length > 1){
+    h += '<button class="mb-tab-pill" data-action="remove-tab">'+_t('🗑 Xóa tab hiện tại', '🗑 Remove active tab')+'</button>';
+  }
+  h += '</div>';
+  if(activeTab){
+    if(relationSuggestions.length || configuredLinks.length){
+      h += '<div class="mb-link-banner">';
+      h += '<div><strong>'+_t('Registry phát hiện digital thread giữa các block', 'Registry detected digital thread opportunities between blocks')+'</strong><div style="font-size:12px;color:var(--text-secondary)">'+_t('Gợi ý '+relationSuggestions.length+' liên kết mới và đang hiển thị '+configuredLinks.length+' liên kết đã cấu hình trên canvas hiện tại.', 'There are '+relationSuggestions.length+' suggested links and '+configuredLinks.length+' configured links on the current canvas.')+'</div></div>';
+      h += '<button class="hm-btn '+(state.showDigitalThreadLinks ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm" data-action="toggle-digital-thread-links">'+_t('🔗 Hiện/Ẩn links', '🔗 Toggle links')+'</button>';
+      h += '</div>';
+    }
+    h += '<div class="mb-canvas-stage">';
+    h += '<div class="mb-canvas-root" data-drop-zone="1" data-drop-tab="'+_esc(activeTab.tabId)+'" data-drop-parent="" data-drop-slot="default" style="'+_layoutStyle(activeTab.layout)+'">';
+    if(!roots.length){
+      h += '<div class="mb-slot-empty">'+_t('Trang đang trống. Bấm mở thư viện hoặc kéo block vào canvas để bắt đầu.', 'This page is empty. Open the library or drag a block onto the canvas to start.')+'</div>';
+    }
+    roots.forEach(function(root){
+      h += _renderCanvasBlock(root, activeTab, tree, 0);
+    });
+    h += '<div class="mb-slot-actions"><button class="hm-btn hm-btn-primary hm-btn-sm" data-action="open-library" data-tab="'+_esc(activeTab.tabId)+'" data-parent="" data-slot="default">+ '+_t('Thêm block ở cuối canvas', 'Add block to canvas end')+'</button></div>';
+    h += '</div></div>';
+  }
+  h += '</div>';
+  if(state.showLibrary || state.selectedBlock){
+    h += '<div class="mb-right-rail">';
+    if(state.showLibrary) h += _renderLibraryPanel();
+    if(state.selectedBlock) h += _renderPropertiesPanel();
+    h += '</div>';
+  }
+  h += '</div>';
+  h += _renderShortcutPopover();
+  h += _renderContextMenu();
+  if(state.packPicker) h += _renderPackPickerModal();
+  return h;
+};
+
+_renderCanvasToolbar = function(activeTab, heroMode){
+  var h = '';
+  if(!activeTab) return h;
+  _ensureTabLayout(activeTab);
+  if(!heroMode){
+    h += '<div class="mb-toolbar mb-canvas-toolbar">';
+    h += '<div class="mb-toolbar-group mb-toolbar-group--layout">';
+    h += '<button class="hm-btn '+(activeTab.layout.type === 'stack' ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm mb-toolbar-toggle" data-action="set-tab-layout" data-layout="stack">⬇ '+_t('Stack', 'Stack')+'</button>';
+    h += '<button class="hm-btn '+(activeTab.layout.type === 'grid' ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm mb-toolbar-toggle" data-action="set-tab-layout" data-layout="grid">⊞ '+_t('Grid', 'Grid')+'</button>';
+    h += '<button class="hm-btn '+(activeTab.layout.type === 'flex' ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm mb-toolbar-toggle" data-action="set-tab-layout" data-layout="flex">↔ '+_t('Flex', 'Flex')+'</button>';
+    h += '</div>';
+    h += '<div class="mb-toolbar-group mb-toolbar-group--layout-meta">';
+    h += '<span class="mb-kbd-chip mb-layout-chip">'+_t('Cột', 'Columns')+': <select class="hm-input hm-select mb-layout-inline-select" id="mb-layout-columns"><option value="1"'+(String(activeTab.layout.columns) === '1' ? ' selected' : '')+'>1</option><option value="2"'+(String(activeTab.layout.columns) === '2' ? ' selected' : '')+'>2</option><option value="3"'+(String(activeTab.layout.columns) === '3' ? ' selected' : '')+'>3</option><option value="4"'+(String(activeTab.layout.columns) === '4' ? ' selected' : '')+'>4</option><option value="5"'+(String(activeTab.layout.columns) === '5' ? ' selected' : '')+'>5</option><option value="6"'+(String(activeTab.layout.columns) === '6' ? ' selected' : '')+'>6</option></select></span>';
+    h += '<span class="mb-kbd-chip mb-layout-chip">'+_t('Gap', 'Gap')+': <select class="hm-input hm-select mb-layout-inline-select" id="mb-layout-gap"><option value="8px"'+(activeTab.layout.gap === '8px' ? ' selected' : '')+'>8px</option><option value="12px"'+(activeTab.layout.gap === '12px' ? ' selected' : '')+'>12px</option><option value="16px"'+(activeTab.layout.gap === '16px' ? ' selected' : '')+'>16px</option><option value="24px"'+(activeTab.layout.gap === '24px' ? ' selected' : '')+'>24px</option></select></span>';
+    h += '</div>';
+    h += '<div class="mb-toolbar-spacer"></div>';
+    h += '<div class="mb-toolbar-group mb-toolbar-group--view">';
+    h += '<button class="hm-btn '+(state.showTree ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm mb-toolbar-toggle" data-action="toggle-tree">🌳 '+_t('Tree', 'Tree')+'</button>';
+    h += '<button class="hm-btn '+(state.showLibrary ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm mb-toolbar-toggle" data-action="open-library" data-tab="'+_esc(activeTab.tabId)+'" data-parent="" data-slot="default">📚 '+_t('Library', 'Library')+'</button>';
+    h += '</div></div>';
+    return h;
+  }
+  h += '<div class="mb-hero-commandbar">';
+  h += _renderHeroActionButton({ action:'set-tab-layout', labelVi:'Bố cục dọc', labelEn:'Stack layout', icon:'⬇', active:activeTab.layout.type === 'stack', extraAttrs:'data-layout="stack"' });
+  h += _renderHeroActionButton({ action:'set-tab-layout', labelVi:'Bố cục lưới', labelEn:'Grid layout', icon:'⊞', active:activeTab.layout.type === 'grid', extraAttrs:'data-layout="grid"' });
+  h += _renderHeroActionButton({ action:'set-tab-layout', labelVi:'Bố cục linh hoạt', labelEn:'Flex layout', icon:'↔', active:activeTab.layout.type === 'flex', extraAttrs:'data-layout="flex"' });
+  h += _renderHeroSelectControl('mb-layout-columns', 'Số cột', 'Columns', '▥', String(activeTab.layout.columns || 1), ['1','2','3','4','5','6']);
+  h += _renderHeroSelectControl('mb-layout-gap', 'Khoảng cách', 'Gap', '⇄', activeTab.layout.gap || '16px', ['8px','12px','16px','24px']);
+  h += _renderHeroActionButton({ action:'toggle-tree', labelVi:'Cây module', labelEn:'Module tree', icon:'🌳', active:!!state.showTree });
+  h += _renderHeroActionButton({ action:'open-library', labelVi:'Thư viện block', labelEn:'Block library', icon:'📚', active:!!state.showLibrary, extraAttrs:'data-tab="'+_esc(activeTab.tabId)+'" data-parent="" data-slot="default"' });
+  h += '</div>';
+  return h;
+};
+
+_renderPropertiesPanel = function(){
+  var block = _findBlock(state.selectedBlock);
+  var draft;
+  var catalog;
+  var tabs;
+  var activeKey;
+  var activeTab = null;
+  var activeSections = [];
+  var allSectionsCollapsed = false;
+  var i;
+  var h = '';
+  if(!block) return '';
+  _ensurePropsDraft(block);
+  _ensureRegistriesLoaded();
+  draft = state.propsDraft || block;
+  catalog = (BE.BLOCK_CATALOG || {})[draft.type] || {};
+  tabs = ((BE.BLOCK_PROPERTIES_SCHEMA || {})[draft.type] || []).slice();
+  if(_relationsForSelectedBlock(draft.blockId || draft.id).length || _getRelationList().length){
+    tabs.push({ key:'relations', label:'Liên kết', labelEn:'Links', icon:'🔗' });
+  }
+  activeKey = state.propsTab || (tabs[0] && tabs[0].key) || 'general';
+  for(i = 0; i < tabs.length; i++){
+    if(tabs[i].key === activeKey) activeTab = tabs[i];
+  }
+  if(!activeTab && tabs.length) activeTab = tabs[0];
+  activeSections = activeTab ? (activeTab.sections || []) : [];
+  allSectionsCollapsed = activeKey !== 'relations' && activeSections.length ? _areAllPropSectionsCollapsed(draft.type, activeKey, activeSections) : false;
+  h += '<div class="mb-rail-panel">';
+  h += '<div class="mb-panel-header"><div class="mb-panel-title"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary)">'+_t('Properties', 'Properties')+'</div><strong><span>'+_esc(catalog.icon || '📦')+'</span><span>'+_esc(_getCatalogLabel(draft.type))+'</span></strong></div><div class="mb-panel-actions">';
+  if(activeKey !== 'relations' && activeSections.length){
+    h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="toggle-all-prop-sections" data-collapse="'+(allSectionsCollapsed ? '0' : '1')+'" title="'+_esc(allSectionsCollapsed ? _t('Mở tất cả section', 'Expand all sections') : _t('Thu gọn tất cả section', 'Collapse all sections'))+'">'+(allSectionsCollapsed ? '&#9638;' : '&#9639;')+'</button>';
+  }
+  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm mb-icon-btn" data-action="close-props" title="'+_esc(_t('Đóng thuộc tính', 'Close properties'))+'"><span class="mb-icon-glyph">&#10005;</span></button></div></div>';
+  h += '<div class="mb-panel-body">';
+  if(tabs.length){
+    h += '<div class="mb-toolbar" style="padding:0 0 12px;border:0;background:none">';
+    tabs.forEach(function(tab){
+      h += '<button class="hm-btn '+(activeKey === tab.key ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm" data-action="props-tab" data-tab="'+_esc(tab.key)+'">'+_esc(tab.icon || '')+' '+_esc(_t(tab.label, tab.labelEn || tab.label))+'</button>';
+    });
+    h += '</div>';
+  }
+  if(activeKey === 'relations'){
+    h += _renderRelationsPanel(draft);
+  } else if(activeTab){
+    if(activeKey === 'general'){
+      h += '<div class="mb-prop-hero">';
+      h += '<div class="mb-prop-hero-copy"><div class="mb-prop-hero-title">'+_esc(_getBlockTitle(draft))+'</div><div class="mb-prop-hero-id">#'+_esc(draft.blockId || draft.id || '')+'</div></div>';
+      h += '<div class="mb-prop-toggle-row">';
+      h += _renderPropHeaderToggle('Hiển thị', 'Visible', 'visible', draft.visible !== false, draft.visible === false ? '🙈' : '👁');
+      h += _renderPropHeaderToggle('Khóa chỉnh sửa', 'Lock editing', 'locked', !!draft.locked, draft.locked ? '🔒' : '🔓');
+      h += '</div></div>';
+    }
+    if(block.locked){
+      h += '<div class="mb-prop-lock-note">'+_t('Block này đang khóa. Bạn vẫn có thể đổi hiển thị hoặc mở khóa ở cụm điều khiển phía trên.', 'This block is locked. You can still change visibility or unlock it using the controls above.')+'</div>';
+    }
+    h += '<div class="mb-prop-sections-shell'+(draft.locked ? ' is-readonly' : '')+'">';
+    if(activeKey === 'general' && _isContainerType(draft.type)){
+      h += _renderPropField({ label:_t('Kiểu bố cục', 'Layout type'), labelEn:'Layout type', type:'select', path:'layout.type', repaintOnChange:true, options:[{ value:'stack', label:_t('Xếp dọc', 'Stack') }, { value:'grid', label:_t('Lưới', 'Grid') }, { value:'flex', label:_t('Flex', 'Flex') }] }, 'layout.type', _getByPath(draft, 'layout.type'));
+      h += _renderPropField({ label:_t('Số cột', 'Columns'), labelEn:'Columns', type:'number', path:'layout.columns', repaintOnChange:true, min:1, max:6, step:1 }, 'layout.columns', _getByPath(draft, 'layout.columns'));
+      h += _renderPropField({ label:_t('Khoảng cách', 'Gap'), labelEn:'Gap', type:'text', path:'layout.gap' }, 'layout.gap', _getByPath(draft, 'layout.gap'));
+      h += _renderPropField({ label:_t('Canh flex', 'Flex align'), labelEn:'Flex align', type:'select', path:'layout.align', options:['stretch','start','center','end'] }, 'layout.align', _getByPath(draft, 'layout.align'));
+    }
+    activeSections.forEach(function(section, index){
+      h += _renderPropSection(section, draft, { blockType:draft.type, tabKey:activeKey, index:index });
+    });
+    if(draft.type === 'form-standard'){
+      h += _renderRegistryValidationSummary(draft);
+    }
+    if(draft.type === 'action-status-flow'){
+      h += _renderWorkflowRegistrySummary(draft);
+    }
+    h += '</div>';
+  }
+  h += '</div><div class="mb-panel-header" style="border-top:1px solid var(--border);border-bottom:0;background:#fff">';
+  h += '<button class="hm-btn hm-btn-secondary" data-action="close-props">'+_t('Đóng', 'Close')+'</button>';
+  h += '<button class="hm-btn hm-btn-primary" data-action="save-props">'+_t('Áp dụng', 'Apply')+'</button>';
+  h += '</div></div>';
+  return h;
+};
+
+_renderBuilder = function(){
+  var schema = state.schema;
+  var activeTab;
+  var tree;
+  var roots;
+  var undoInfo;
+  var relationSuggestions;
+  var configuredLinks;
+  var h = '';
+  if(!schema) return '<div class="hm-empty">No schema</div>';
+  activeTab = _getActiveTab();
+  if(activeTab) _ensureTabLayout(activeTab);
+  tree = activeTab ? _buildTabTree(activeTab) : { roots: [] };
+  roots = tree.roots || [];
+  undoInfo = undoManager.getInfo();
+  relationSuggestions = activeTab ? _relationSuggestionsForTab(activeTab) : [];
+  configuredLinks = activeTab ? _configuredDigitalLinks(activeTab) : [];
+  h += '<div class="mb-builder-hero">';
+  h += '<div class="mb-builder-hero-main">';
+  h += '<div class="mb-builder-hero-copy"><div class="mb-builder-hero-kicker">MODULE BUILDER V2</div><h1>'+_esc(schema.icon || '📦')+' '+_esc(_t(schema.title.vi, schema.title.en))+'</h1></div>';
+  h += '</div>';
+  h += '<div class="mb-builder-hero-actions">';
+  if(activeTab) h += _renderCanvasToolbar(activeTab, true);
+  h += '<div class="mb-hero-commandbar">';
+  h += _renderHeroActionButton({ action:'undo-builder', labelVi:'Hoàn tác', labelEn:'Undo', icon:'↩', badge:(undoInfo.position > 0 ? undoInfo.position : 0) });
+  h += _renderHeroActionButton({ action:'redo-builder', labelVi:'Làm lại', labelEn:'Redo', icon:'↪', badge:(undoInfo.canRedo ? (undoInfo.depth - undoInfo.position - 1) : 0) });
+  h += _renderHeroActionButton({ action:'toggle-shortcuts', labelVi:'Phím tắt', labelEn:'Shortcuts', icon:'⌨' });
+  h += _renderHeroActionButton({ action:'preview-module', labelVi:'Xem trước', labelEn:'Preview', icon:'👁' });
+  h += _renderHeroActionButton({ action:'save-module', labelVi:'Lưu module', labelEn:'Save module', icon:'💾', variant:'primary' });
+  h += _renderHeroActionButton({ action:'back-setup', labelVi:'Quay lại', labelEn:'Back', icon:'←' });
+  h += '</div></div>';
+  h += '</div>';
   h += '<div class="mb-builder-shell">';
   if(state.showTree) h += _renderWidgetTree();
   h += '<div class="mb-main-panel">';
