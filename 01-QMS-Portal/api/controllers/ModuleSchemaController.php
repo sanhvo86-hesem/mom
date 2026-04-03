@@ -48,7 +48,11 @@ class ModuleSchemaController extends BaseController
         try {
             $dir = $this->schemaDir();
             $schemas = [];
-            foreach (glob($dir . '/M*.json') as $file) {
+            foreach (glob($dir . '/*.json') as $file) {
+                $base = basename($file);
+                if ($base === '' || $base[0] === '_') {
+                    continue;
+                }
                 $data = $this->readJsonFile($file);
                 if ($data) {
                     $schemas[] = [
@@ -58,11 +62,16 @@ class ModuleSchemaController extends BaseController
                         'route'     => $data['route'] ?? '',
                         'roles'     => $data['roles'] ?? [],
                         'version'   => $data['version'] ?? 1,
+                        'updatedAt' => $data['updatedAt'] ?? ($data['createdAt'] ?? ''),
+                        'updatedBy' => $data['updatedBy'] ?? ($data['createdBy'] ?? ''),
                         'tabCount'  => count($data['tabs'] ?? []),
                         'blockCount'=> array_sum(array_map(function($t){ return count($t['blocks'] ?? []); }, $data['tabs'] ?? [])),
                     ];
                 }
             }
+            usort($schemas, static function(array $a, array $b): int {
+                return strcmp((string)($b['updatedAt'] ?? ''), (string)($a['updatedAt'] ?? ''));
+            });
             $this->success(['schemas' => $schemas]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
@@ -110,7 +119,13 @@ class ModuleSchemaController extends BaseController
             $this->writeJsonFile($file, $schema);
 
             $this->auditLog('module_schema_save', ['moduleId' => $moduleId, 'version' => $schema['version']], $uid);
-            $this->success(['saved' => true, 'moduleId' => $moduleId, 'version' => $schema['version']]);
+            $this->success([
+                'saved' => true,
+                'moduleId' => $moduleId,
+                'version' => $schema['version'],
+                'updatedAt' => $schema['updatedAt'],
+                'updatedBy' => $schema['updatedBy'],
+            ]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
             $this->error('save_failed', 500, $e->getMessage());

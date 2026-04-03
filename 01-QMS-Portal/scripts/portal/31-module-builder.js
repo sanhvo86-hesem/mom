@@ -3850,6 +3850,83 @@ function _clearBuilderSnapshotLocal(moduleId){
   try { localStorage.removeItem(_builderStorageKey(moduleId)); } catch(err){}
 }
 
+function _runtimeSchemaStorageKeys(moduleId){
+  return ['hm_module_schema_' + moduleId, 'hm_schema_' + moduleId];
+}
+
+function _readRuntimeSchemaLocal(moduleId){
+  var raw = null;
+  var keys = _runtimeSchemaStorageKeys(moduleId);
+  var i;
+  try {
+    for(i = 0; i < keys.length; i++){
+      raw = localStorage.getItem(keys[i]);
+      if(raw) return JSON.parse(raw);
+    }
+  } catch(err){}
+  return null;
+}
+
+function _writeRuntimeSchemaLocal(moduleId, schema){
+  try {
+    _runtimeSchemaStorageKeys(moduleId).forEach(function(key){
+      localStorage.setItem(key, JSON.stringify(schema));
+    });
+  } catch(err){}
+}
+
+function _clearRuntimeSchemaLocal(moduleId){
+  try {
+    _runtimeSchemaStorageKeys(moduleId).forEach(function(key){
+      localStorage.removeItem(key);
+    });
+  } catch(err){}
+}
+
+function _clearRuntimeModuleCache(moduleId){
+  if(MR && typeof MR.clearCache === 'function') MR.clearCache(moduleId);
+}
+
+function _normalizeSavedModuleSummary(schema){
+  var fallbackTitle = schema && schema.moduleId ? schema.moduleId : 'module';
+  if(!schema || !schema.moduleId) return null;
+  return {
+    moduleId: schema.moduleId,
+    title: _clone(schema.title || { vi:fallbackTitle, en:fallbackTitle }),
+    icon: schema.icon || '',
+    route: schema.route || '',
+    version: schema.version || 1,
+    updatedAt: schema.updatedAt || schema.createdAt || '',
+    updatedBy: schema.updatedBy || schema.createdBy || ''
+  };
+}
+
+function _mergeSavedModules(primary, secondary){
+  var map = {};
+  var out = [];
+  function pushItem(item){
+    var normalized = _normalizeSavedModuleSummary(item);
+    var existing;
+    if(!normalized) return;
+    existing = map[normalized.moduleId];
+    if(!existing){
+      map[normalized.moduleId] = normalized;
+      out.push(normalized);
+      return;
+    }
+    if((normalized.updatedAt || '') >= (existing.updatedAt || '')){
+      Object.keys(existing).forEach(function(key){ delete existing[key]; });
+      Object.keys(normalized).forEach(function(key){ existing[key] = normalized[key]; });
+    }
+  }
+  (secondary || []).forEach(pushItem);
+  (primary || []).forEach(pushItem);
+  out.sort(function(a, b){
+    return String(b.updatedAt || '').localeCompare(String(a.updatedAt || ''));
+  });
+  return out;
+}
+
 function _getBlockTitle(block){
   var title = block && block.title ? _t(block.title.vi || '', block.title.en || '') : '';
   if(title) return title;
@@ -4350,10 +4427,15 @@ _renderPreview = function(){
   h += '<div id="mb-preview-container" style="border:1px solid var(--border);border-radius:24px;padding:16px;min-height:420px;background:var(--bg-page)"></div>';
   setTimeout(function(){
     var previewEl = document.getElementById('mb-preview-container');
-    if(previewEl && runtimeSchema && MR.renderModuleById){
-      try { localStorage.setItem('hm_module_schema_'+runtimeSchema.moduleId, JSON.stringify(runtimeSchema)); } catch(err){}
+    if(previewEl && runtimeSchema){
+      _writeRuntimeSchemaLocal(runtimeSchema.moduleId, runtimeSchema);
       _saveBuilderSnapshotLocal();
-      MR.renderModuleById(previewEl, runtimeSchema.moduleId);
+      _clearRuntimeModuleCache(runtimeSchema.moduleId);
+      if(BE.renderModuleFromSchema){
+        BE.renderModuleFromSchema(previewEl, runtimeSchema);
+      } else if(MR.renderModuleById){
+        MR.renderModuleById(previewEl, runtimeSchema.moduleId);
+      }
     }
   }, 100);
   return h;
@@ -4499,7 +4581,34 @@ _saveBlockProps = function(){
   });
 };
 
-_saveModule = function(){
+_loadSavedModules = function(){
+  var localModules = [];
+  try {
+    localModules = JSON.parse(localStorage.getItem('hm_saved_modules') || '[]');
+  } catch(err){
+    localModules = [];
+  }
+  state.savedModules = _mergeSavedModules(localModules, []);
+  if(state.savedModulesLoading || state.savedModulesLoaded || typeof apiCall !== 'function') return;
+  state.savedModulesLoading = true;
+  apiCall('module_schema_list', {}, 'GET', 10000).then(function(resp){
+    state.savedModulesLoading = false;
+    state.savedModulesLoaded = true;
+    if(!resp || resp.ok === false || !Array.isArray(resp.schemas)) return;
+    state.savedModules = _mergeSavedModules(resp.schemas, state.savedModules);
+    try { localStorage.setItem('hm_saved_modules', JSON.stringify(state.savedModules)); } catch(err){}
+    if(state.step === 'setup') _paint();
+  }).catch(function(){
+    state.savedModulesLoading = false;
+  });
+};
+
+_addToSavedModules = function(schema){
+  state.savedModules = _mergeSavedModules([schema], state.savedModules);
+  try { localStorage.setItem('hm_saved_modules', JSON.stringify(state.savedModules)); } catch(err){}
+};
+
+var _legacySaveModule = function(){
   var runtimeSchema;
   if(!state.schema) return;
   state.schema.version = (state.schema.version || 0) + 1;
@@ -4514,7 +4623,7 @@ _saveModule = function(){
   if(BE.toast) BE.toast(_t('Đã lưu module: ', 'Module saved: ') + _t(state.schema.title.vi, state.schema.title.en), 'success');
 };
 
-_openSavedModule = function(moduleId){
+var _legacyOpenSavedModule = function(moduleId){
   var raw = null;
   try { raw = localStorage.getItem(_builderStorageKey(moduleId)) || localStorage.getItem('hm_module_schema_'+moduleId); } catch(err){}
   if(!raw) return;
@@ -4531,13 +4640,137 @@ _openSavedModule = function(moduleId){
   } catch(err){}
 };
 
-_deleteSavedModule = function(moduleId){
+var _legacyDeleteSavedModule = function(moduleId){
   try { localStorage.removeItem('hm_module_schema_'+moduleId); } catch(err){}
   _clearBuilderSnapshotLocal(moduleId);
   state.savedModules = state.savedModules.filter(function(item){
     return item.moduleId !== moduleId;
   });
   try { localStorage.setItem('hm_saved_modules', JSON.stringify(state.savedModules)); } catch(err){}
+};
+
+_saveModule = function(){
+  var runtimeSchema;
+  var savedAt;
+  var currentUserName;
+  var saveRequest;
+  if(!state.schema) return;
+  savedAt = new Date().toISOString();
+  currentUserName = (typeof currentUser !== 'undefined' && currentUser && currentUser.username) ? currentUser.username : (state.schema.updatedBy || state.schema.createdBy || 'admin');
+  state.schema.updatedAt = savedAt;
+  state.schema.updatedBy = currentUserName;
+  runtimeSchema = _compileRuntimeSchema(state.schema);
+  runtimeSchema.updatedAt = state.schema.updatedAt;
+  runtimeSchema.updatedBy = state.schema.updatedBy;
+  _writeRuntimeSchemaLocal(state.schema.moduleId, runtimeSchema);
+  _saveBuilderSnapshotLocal();
+  _clearRuntimeModuleCache(state.schema.moduleId);
+  if(typeof apiCall !== 'function'){
+    state.schema.version = (state.schema.version || 0) + 1;
+    runtimeSchema.version = state.schema.version;
+    runtimeSchema.updatedAt = state.schema.updatedAt;
+    runtimeSchema.updatedBy = state.schema.updatedBy;
+    _writeRuntimeSchemaLocal(state.schema.moduleId, runtimeSchema);
+    _saveBuilderSnapshotLocal();
+    _addToSavedModules(state.schema);
+    if(BE.toast) BE.toast(_t('Da luu module: ', 'Module saved: ') + _t(state.schema.title.vi, state.schema.title.en), 'success');
+    return Promise.resolve({ ok:true, local:true, schema:runtimeSchema });
+  }
+  saveRequest = apiCall('module_schema_save', { schema: runtimeSchema }, 'POST', 10000).then(function(resp){
+    if(!resp || resp.ok === false || resp.saved === false){
+      throw new Error((resp && (resp.detail || resp.error)) || 'save_failed');
+    }
+    state.schema.version = resp.version != null ? resp.version : ((state.schema.version || 0) + 1);
+    state.schema.updatedAt = resp.updatedAt || savedAt;
+    state.schema.updatedBy = resp.updatedBy || state.schema.updatedBy;
+    runtimeSchema.version = state.schema.version;
+    runtimeSchema.updatedAt = state.schema.updatedAt;
+    runtimeSchema.updatedBy = state.schema.updatedBy;
+    _writeRuntimeSchemaLocal(state.schema.moduleId, runtimeSchema);
+    _saveBuilderSnapshotLocal();
+    _addToSavedModules(state.schema);
+    _clearRuntimeModuleCache(state.schema.moduleId);
+    if(BE.toast) BE.toast(_t('Da luu module: ', 'Module saved: ') + _t(state.schema.title.vi, state.schema.title.en), 'success');
+    return resp;
+  }).catch(function(err){
+    _addToSavedModules(state.schema);
+    if(BE.toast) BE.toast(_t('Luu that bai, da giu ban local', 'Save failed, kept local copy'), 'warning');
+    return { ok:false, local:true, error: err && err.message ? err.message : 'save_failed' };
+  });
+  return saveRequest;
+};
+
+_openSavedModule = function(moduleId){
+  function applySchema(schema){
+    if(!schema) return false;
+    state.schema = _clone(schema);
+    _normalizeSchemaBlocks();
+    state.selectedBlock = null;
+    state.propsDraft = null;
+    state.propsTab = 'general';
+    state.activeTab = state.schema.tabs && state.schema.tabs.length ? state.schema.tabs[0].tabId : null;
+    state.step = 'build';
+    _clearRuntimeModuleCache(moduleId);
+    _saveBuilderSnapshotLocal();
+    _resetUndoBaseline(_t('Mo module', 'Open module'));
+    _paint();
+    return true;
+  }
+  var raw = null;
+  var runtimeLocal = null;
+  try { raw = localStorage.getItem(_builderStorageKey(moduleId)); } catch(err){}
+  if(raw){
+    try {
+      if(applySchema(JSON.parse(raw))) return Promise.resolve(true);
+    } catch(err){}
+  }
+  runtimeLocal = _readRuntimeSchemaLocal(moduleId);
+  if(runtimeLocal && applySchema(runtimeLocal)){
+    return Promise.resolve(true);
+  }
+  if(typeof apiCall !== 'function') return Promise.resolve(false);
+  return apiCall('module_schema_get', { id: moduleId }, 'GET', 10000).then(function(resp){
+    if(!resp || resp.ok === false || !resp.schema){
+      throw new Error((resp && (resp.detail || resp.error)) || 'not_found');
+    }
+    _writeRuntimeSchemaLocal(moduleId, resp.schema);
+    return applySchema(resp.schema);
+  }).catch(function(){
+    if(BE.toast) BE.toast(_t('Khong mo duoc module da luu', 'Unable to open saved module'), 'error');
+    return false;
+  });
+};
+
+_deleteSavedModule = function(moduleId){
+  function finalizeDelete(){
+    _clearRuntimeSchemaLocal(moduleId);
+    _clearBuilderSnapshotLocal(moduleId);
+    _clearRuntimeModuleCache(moduleId);
+    state.savedModules = (state.savedModules || []).filter(function(item){
+      return item.moduleId !== moduleId;
+    });
+    try { localStorage.setItem('hm_saved_modules', JSON.stringify(state.savedModules)); } catch(err){}
+    if(state.schema && state.schema.moduleId === moduleId){
+      state.schema = null;
+      state.selectedBlock = null;
+      state.propsDraft = null;
+      state.activeTab = null;
+      state.step = 'setup';
+    }
+    return true;
+  }
+  if(typeof apiCall !== 'function'){
+    return Promise.resolve(finalizeDelete());
+  }
+  return apiCall('module_schema_delete', { moduleId: moduleId }, 'POST', 10000).then(function(resp){
+    if(!resp || resp.ok === false || resp.deleted === false){
+      throw new Error((resp && (resp.detail || resp.error)) || 'delete_failed');
+    }
+    return finalizeDelete();
+  }).catch(function(){
+    if(BE.toast) BE.toast(_t('Xoa module that bai', 'Delete module failed'), 'error');
+    return false;
+  });
 };
 
 _openBlockConfig = function(blockId){
@@ -4919,7 +5152,11 @@ _handleClick = function(e){
       _openSavedModule(btn.getAttribute('data-id'));
       break;
     case 'delete-module':
-      if(confirm(_t('Xóa module này?', 'Delete this module?'))){ _deleteSavedModule(btn.getAttribute('data-id')); _paint(); }
+      if(confirm(_t('Xóa module này?', 'Delete this module?'))){
+        _deleteSavedModule(btn.getAttribute('data-id')).then(function(deleted){
+          if(deleted) _paint();
+        });
+      }
       break;
     case 'switch-tab':
       state.activeTab = btn.getAttribute('data-tab');

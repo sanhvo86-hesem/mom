@@ -62,7 +62,7 @@ function _loadSchema(moduleId) {
 
 function _loadLocal(moduleId) {
   try {
-    var raw = localStorage.getItem('hm_module_schema_' + moduleId);
+    var raw = localStorage.getItem('hm_module_schema_' + moduleId) || localStorage.getItem('hm_schema_' + moduleId);
     if (raw) return JSON.parse(raw);
   } catch(e) {}
   return null;
@@ -694,6 +694,10 @@ function _handleFormSubmit(container, moduleId, formBlock, schema) {
 }
 
 /* ── Export ───────────────────────────────────────────────────────────────── */
+_renderFromSchema = function(container, schema) {
+  return BE.renderModuleFromSchema(container, schema);
+};
+
 window.HmModuleRouter = {
   renderModuleById: renderModuleById,
   clearCache: function(moduleId) { if (moduleId) delete _schemaCache[moduleId]; else _schemaCache = {}; },
