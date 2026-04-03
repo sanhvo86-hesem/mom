@@ -128,45 +128,120 @@
 .hm-filter-bar { padding: var(--hds-filter-pad); gap: var(--hds-filter-gap); }
 
 /* ============================================================================
-   DARK MODE — Portal-specific overrides for hardcoded colors
-   portal.main.css uses #fff, #f1f3f5 etc. directly. Override them here.
+   DARK MODE — Comprehensive portal overrides
+   portal.main.css uses hardcoded #fff, #f8fafc, #e2e8f0 etc.
+   We override EVERY class that has light-only colors.
+   Dark surface: #1e293b, Dark bg: #0f172a, Dark border: #334155
    ============================================================================ */
-[data-color-mode="dark"] body { background: var(--bg, #0f172a); color: var(--text, #f1f5f9); }
-[data-color-mode="dark"] #login-right { background: var(--surface, #1e293b); }
+
+/* ── Core ── */
+[data-color-mode="dark"] body { background: #0f172a; color: #f1f5f9; }
+[data-color-mode="dark"] a { color: #60a5fa; }
+
+/* ── Login ── */
+[data-color-mode="dark"] #login-right { background: #1e293b; }
+[data-color-mode="dark"] #login-box h2 { color: #f1f5f9; }
+[data-color-mode="dark"] #login-box .subtitle { color: #94a3b8; }
+[data-color-mode="dark"] #login-box label { color: #94a3b8; }
 [data-color-mode="dark"] #login-box input[type=text],
 [data-color-mode="dark"] #login-box input[type=password] { background: #263348; color: #f1f5f9; border-color: #475569; }
 [data-color-mode="dark"] #login-box .btn-login { background: #3b82f6; }
-[data-color-mode="dark"] #login-box label { color: #94a3b8; }
-[data-color-mode="dark"] #login-box h2 { color: #f1f5f9; }
-[data-color-mode="dark"] #login-box .subtitle { color: #94a3b8; }
 [data-color-mode="dark"] #login-box .demo-section { background: #162032; border-color: #334155; }
 [data-color-mode="dark"] #login-box .demo-section h4 { color: #94a3b8; }
 
-[data-color-mode="dark"] .sidebar { background: var(--bg-sidebar, #0a1628); }
-[data-color-mode="dark"] .main-header { background: var(--surface, #1e293b); border-color: var(--border, #334155); }
-[data-color-mode="dark"] .admin-panel { background: var(--surface, #1e293b); }
-[data-color-mode="dark"] .admin-tab-v2 { background: var(--surface, #1e293b); color: var(--text-2, #94a3b8); border-color: var(--border, #334155); }
+/* ── Sidebar (already dark brand, but darken more) ── */
+[data-color-mode="dark"] #sidebar { background: #0a1628; }
+
+/* ── Header / Breadcrumb ── */
+[data-color-mode="dark"] .main-header,
+[data-color-mode="dark"] .breadcrumb-bar { background: #1e293b; border-color: #334155; color: #f1f5f9; }
+
+/* ── Page content area ── */
+[data-color-mode="dark"] #content { background: #0f172a; }
+
+/* ── Admin stats ── */
+[data-color-mode="dark"] .admin-stat { background: #1e293b; border-color: #334155; color: #f1f5f9; }
+[data-color-mode="dark"] .admin-stat .val { color: #60a5fa; }
+[data-color-mode="dark"] .admin-stat .lbl { color: #94a3b8; }
+
+/* ── Admin tabs (both v1 and v2) ── */
+[data-color-mode="dark"] .admin-tab,
+[data-color-mode="dark"] .admin-tab-v2 { background: #1e293b; color: #94a3b8; border-color: #334155; }
+[data-color-mode="dark"] .admin-tab:hover,
 [data-color-mode="dark"] .admin-tab-v2:hover { background: #263348; color: #60a5fa; border-color: #60a5fa; }
 [data-color-mode="dark"] .admin-tab-v2 .tab-badge { background: rgba(96,165,250,0.15); color: #60a5fa; }
 
-/* Generic dark overrides for common patterns */
+/* ── Admin panel & tables ── */
+[data-color-mode="dark"] .admin-panel { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .admin-table { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .admin-table th { background: #162032; color: #94a3b8; border-color: #334155; }
+[data-color-mode="dark"] .admin-table td { border-color: #263348; color: #e2e8f0; }
+[data-color-mode="dark"] .admin-table tr:hover { background: #263348; }
+
+/* ── Admin buttons ── */
+[data-color-mode="dark"] .btn-admin { background: #1e293b; color: #e2e8f0; border-color: #475569; }
+[data-color-mode="dark"] .btn-admin:hover { background: #263348; border-color: #60a5fa; }
+[data-color-mode="dark"] .btn-admin.primary { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+[data-color-mode="dark"] .btn-admin.danger { background: #1e293b; color: #f87171; border-color: #f87171; }
+[data-color-mode="dark"] .btn-admin.secondary { background: #1e293b; color: #e2e8f0; border-color: #475569; }
+
+/* ── Document viewer ── */
+[data-color-mode="dark"] #doc-viewer-header { background: #1e293b; border-color: #334155; box-shadow: none; }
 [data-color-mode="dark"] .dv-btn { background: #1e293b; color: #e2e8f0; border-color: #475569; }
 [data-color-mode="dark"] .dv-btn:hover { background: #263348; border-color: #60a5fa; }
-[data-color-mode="dark"] input, [data-color-mode="dark"] select, [data-color-mode="dark"] textarea { background: #1e293b; color: #f1f5f9; border-color: #475569; }
-[data-color-mode="dark"] input:focus, [data-color-mode="dark"] select:focus, [data-color-mode="dark"] textarea:focus { border-color: #60a5fa; }
+[data-color-mode="dark"] .dv-btn-neutral { background: #1e293b; color: #e2e8f0; border-color: #475569; }
+[data-color-mode="dark"] .dv-meta { background: #162032; border-color: #334155; }
+[data-color-mode="dark"] .dv-meta-edit { background: #1e293b; border-color: #475569; color: #60a5fa; }
+[data-color-mode="dark"] .dv-meta-note { background: #1e293b; border-color: #334155; color: #94a3b8; }
 
-/* Auto dark mirrors */
-@media (prefers-color-scheme: dark) {
-  [data-color-mode="auto"] body { background: #0f172a; color: #f1f5f9; }
-  [data-color-mode="auto"] #login-right { background: #1e293b; }
-  [data-color-mode="auto"] #login-box input[type=text],
-  [data-color-mode="auto"] #login-box input[type=password] { background: #263348; color: #f1f5f9; border-color: #475569; }
-  [data-color-mode="auto"] .sidebar { background: #0a1628; }
-  [data-color-mode="auto"] .main-header { background: #1e293b; border-color: #334155; }
-  [data-color-mode="auto"] .admin-panel { background: #1e293b; }
-  [data-color-mode="auto"] .admin-tab-v2 { background: #1e293b; color: #94a3b8; border-color: #334155; }
-  [data-color-mode="auto"] input, [data-color-mode="auto"] select, [data-color-mode="auto"] textarea { background: #1e293b; color: #f1f5f9; border-color: #475569; }
-}
+/* ── Document tables ── */
+[data-color-mode="dark"] .doc-table td { border-color: #263348; }
+
+/* ── Quick buttons ── */
+[data-color-mode="dark"] .quick-btn { background: #1e293b; border-color: #334155; color: #e2e8f0; }
+[data-color-mode="dark"] .quick-btn:hover { background: #263348; }
+
+/* ── Activity / filter ── */
+[data-color-mode="dark"] .activity-item { border-color: #263348; }
+[data-color-mode="dark"] .filter-chip { background: #1e293b; border-color: #334155; color: #94a3b8; }
+
+/* ── Search ── */
+[data-color-mode="dark"] .search-result { border-color: #263348; }
+
+/* ── Dict / chips ── */
+[data-color-mode="dark"] .dict-cat-chip { background: #1e293b; border-color: #334155; color: #94a3b8; }
+
+/* ── Permission grid ── */
+[data-color-mode="dark"] .perm-grid { border-color: #334155; }
+
+/* ── Generic forms & inputs ── */
+[data-color-mode="dark"] input,
+[data-color-mode="dark"] select,
+[data-color-mode="dark"] textarea { background: #1e293b; color: #f1f5f9; border-color: #475569; }
+[data-color-mode="dark"] input:focus,
+[data-color-mode="dark"] select:focus,
+[data-color-mode="dark"] textarea:focus { border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(96,165,250,0.15); }
+[data-color-mode="dark"] input::placeholder,
+[data-color-mode="dark"] textarea::placeholder { color: #64748b; }
+
+/* ── Cards, panels, sections (catch-all for hardcoded white backgrounds) ── */
+[data-color-mode="dark"] .hm-card,
+[data-color-mode="dark"] .hm-card-flat { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .hm-filter-bar { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .hm-table th { background: #162032; border-color: #334155; color: #94a3b8; }
+[data-color-mode="dark"] .hm-table td { border-color: #263348; }
+[data-color-mode="dark"] .hm-table tr:hover td { background: #263348; }
+
+/* ── Module builder header already has gradient — keep it ── */
+
+/* ── Toast in dark mode ── */
+[data-color-mode="dark"] .hm-toast { box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+
+/* ── Scrollbar for dark ── */
+[data-color-mode="dark"] ::-webkit-scrollbar { width: 8px; height: 8px; }
+[data-color-mode="dark"] ::-webkit-scrollbar-track { background: #0f172a; }
+[data-color-mode="dark"] ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+[data-color-mode="dark"] ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
 /* ── Reduced motion preference ──────────────────────────────────────────── */
 [data-motion="reduced"] *,
