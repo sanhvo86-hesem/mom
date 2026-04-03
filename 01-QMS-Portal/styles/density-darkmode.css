@@ -462,6 +462,182 @@ code, pre, .hm-mono { font-family: var(--font-mono); }
 /* Dark mode scrollbar override */
 [data-color-mode="dark"] { --scrollbar-track: #0f172a; --scrollbar-thumb: #334155; --placeholder-color: #64748b; --caret-color: #60a5fa; --selection-bg: #3b82f6; }
 
+/* ============================================================================
+   CORE STANDARDS — Global rules that apply everywhere
+   ============================================================================ */
+
+/* STANDARD: Tab bars NEVER scroll horizontally — they wrap */
+.hm-tabs, .ec-tabs, .admin-tabs-v2, [class*="-tabs"] {
+  flex-wrap: wrap !important;
+  overflow-x: visible !important;
+}
+
+/* STANDARD: Popups/dialogs/modals ALWAYS center on screen */
+dialog, [role="dialog"], .hm-modal, .hm-dialog {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+}
+
+/* ============================================================================
+   COMPONENT-LEVEL CSS VARIABLES — Button, Table, Flowchart, ISObox, etc.
+   All controlled from Admin > Giao diện > Thành phần
+   ============================================================================ */
+:root {
+  /* Button inner spacing */
+  --btn-padding-y: 0px;
+  --btn-padding-x: var(--hds-control-px, 10px);
+  --btn-gap: var(--hds-control-gap, 6px);
+  --btn-font-weight: 600;
+  --btn-letter-spacing: 0;
+  --btn-text-transform: none;
+  --btn-border-width: 1px;
+  --btn-min-width: 0px;
+
+  /* Table component */
+  --table-header-bg: var(--bg-surface-alt, #f1f5f9);
+  --table-header-font-weight: 600;
+  --table-header-text-transform: uppercase;
+  --table-header-letter-spacing: 0.05em;
+  --table-row-stripe: transparent;
+  --table-row-stripe-alt: rgba(0,0,0,0.02);
+  --table-border-style: solid;
+  --table-border-width: 1px;
+
+  /* Card component */
+  --card-border-width: 1px;
+  --card-shadow: var(--shadow-sm);
+  --card-header-bg: transparent;
+  --card-header-border: 1px solid var(--border);
+  --card-header-padding: 12px 16px;
+  --card-body-padding: var(--hds-card-pad, 16px);
+
+  /* Badge component */
+  --badge-border-radius: var(--radius-full, 9999px);
+  --badge-font-weight: 600;
+  --badge-letter-spacing: 0;
+  --badge-text-transform: none;
+  --badge-border-width: 0px;
+  --badge-min-width: 0px;
+
+  /* Input component */
+  --input-border-width: 1px;
+  --input-border-style: solid;
+  --input-bg: var(--bg-surface, #fff);
+  --input-padding-y: 0px;
+
+  /* Tab component */
+  --tab-border-width: 2px;
+  --tab-font-weight: 600;
+  --tab-letter-spacing: 0;
+  --tab-gap: var(--space-1, 4px);
+  --tab-active-indicator: var(--brand-2);
+
+  /* Modal/Dialog */
+  --modal-border-radius: var(--radius-2xl, 16px);
+  --modal-shadow: var(--shadow-xl);
+  --modal-padding: var(--space-6, 24px);
+  --modal-header-padding: var(--space-4, 16px) var(--space-6, 24px);
+  --modal-footer-padding: var(--space-4, 16px) var(--space-6, 24px);
+  --modal-backdrop-color: rgba(0,0,0,var(--overlay-opacity, 0.4));
+
+  /* Flowchart / Process diagram */
+  --flow-node-bg: var(--bg-surface);
+  --flow-node-border: 2px solid var(--border);
+  --flow-node-radius: var(--radius-lg, 8px);
+  --flow-node-padding: 12px 16px;
+  --flow-node-font-size: var(--text-sm, 13px);
+  --flow-connector-color: var(--gray-400, #94a3b8);
+  --flow-connector-width: 2px;
+  --flow-arrow-size: 8px;
+
+  /* ISO Document boxes */
+  --iso-box-bg: var(--bg-surface);
+  --iso-box-border: 1px solid var(--border);
+  --iso-box-radius: var(--radius-lg, 8px);
+  --iso-box-header-bg: var(--bg-surface-alt, #f1f5f9);
+  --iso-box-header-padding: 10px 14px;
+  --iso-box-body-padding: 14px;
+  --iso-box-font-size: var(--text-sm, 13px);
+
+  /* ISO Note callouts */
+  --iso-note-bg: #fffbeb;
+  --iso-note-border: 1px solid #fcd34d;
+  --iso-note-border-left: 4px solid #f59e0b;
+  --iso-note-radius: var(--radius-md, 6px);
+  --iso-note-padding: 10px 14px;
+  --iso-note-font-size: var(--text-sm, 13px);
+  --iso-note-icon-size: 16px;
+
+  /* KPI Card extended */
+  --kpi-border-width: 1px;
+  --kpi-border-left: none;
+  --kpi-icon-size: 24px;
+  --kpi-trend-font-size: var(--text-xs, 11px);
+
+  /* Progress bar */
+  --progress-height: 8px;
+  --progress-radius: var(--radius-full, 9999px);
+  --progress-bg: var(--gray-200, #e2e8f0);
+
+  /* Tooltip */
+  --tooltip-bg: var(--gray-900, #0f172a);
+  --tooltip-color: #ffffff;
+  --tooltip-padding: 6px 10px;
+  --tooltip-radius: var(--radius-md, 6px);
+  --tooltip-font-size: var(--text-xs, 11px);
+  --tooltip-max-width: 280px;
+
+  /* Dropdown/Popover */
+  --dropdown-bg: var(--bg-surface);
+  --dropdown-border: 1px solid var(--border);
+  --dropdown-radius: var(--radius-lg, 8px);
+  --dropdown-shadow: var(--shadow-lg);
+  --dropdown-item-padding: 8px 12px;
+  --dropdown-item-font-size: var(--text-sm, 13px);
+  --dropdown-item-hover-bg: var(--bg-hover);
+
+  /* Form field group */
+  --field-gap: 16px;
+  --field-label-gap: 4px;
+  --field-group-gap: 24px;
+  --field-helper-font-size: var(--text-xs, 11px);
+  --field-helper-color: var(--text-tertiary);
+  --field-error-color: var(--red);
+
+  /* Breadcrumb */
+  --breadcrumb-separator: "›";
+  --breadcrumb-font-size: var(--text-sm, 13px);
+  --breadcrumb-color: var(--text-tertiary);
+  --breadcrumb-active-color: var(--text-primary);
+  --breadcrumb-gap: 6px;
+
+  /* Sidebar nav item */
+  --nav-item-height: 36px;
+  --nav-item-padding: 0 12px 0 16px;
+  --nav-item-font-size: var(--text-sm, 13px);
+  --nav-item-icon-size: 16px;
+  --nav-item-gap: 10px;
+  --nav-item-radius: 8px;
+  --nav-item-hover-bg: rgba(255,255,255,0.08);
+  --nav-item-active-bg: rgba(255,255,255,0.12);
+
+  /* Pagination */
+  --pagination-btn-size: 32px;
+  --pagination-btn-radius: var(--radius-md, 6px);
+  --pagination-font-size: var(--text-sm, 13px);
+  --pagination-gap: 4px;
+
+  /* Empty state */
+  --empty-icon-size: 48px;
+  --empty-icon-opacity: 0.4;
+  --empty-title-font-size: var(--text-md, 16px);
+  --empty-desc-font-size: var(--text-sm, 13px);
+  --empty-padding: var(--space-10, 40px) var(--space-6, 24px);
+}
+
 /* ── Reduced motion preference ──────────────────────────────────────────── */
 [data-motion="reduced"] *,
 [data-motion="reduced"] *::before,

@@ -28,6 +28,23 @@ function T(k){
     backdrop:'Backdrop & Overlay',skeleton:'Loading Skeleton',
     themePresets:'Theme Presets',customCSS:'Custom CSS Injection',wcag:'WCAG Contrast Check',
     printTheme:'Print Theme',highContrast:'High Contrast',coreStandard:'Core Standard',
+    components:'Components',
+    btnSettings:'Button',tableSettings:'Table',cardSettings:'Card',badgeSettings:'Badge',
+    inputSettings:'Input',tabSettings:'Tab',modalSettings:'Modal/Dialog',
+    flowSettings:'Flowchart',isoBox:'ISO Document Box',isoNote:'ISO Note/Callout',
+    kpiSettings:'KPI Card',tooltipSettings:'Tooltip',dropdownSettings:'Dropdown',
+    navSettings:'Navigation Item',paginationSettings:'Pagination',
+    emptySettings:'Empty State',progressSettings:'Progress Bar',
+    fieldSettings:'Form Field',breadcrumbSettings:'Breadcrumb',
+    paddingY:'Padding Y',paddingX:'Padding X',gap:'Gap',fontWeight:'Font Weight',
+    letterSpacing:'Letter Spacing',textTransform:'Text Transform',
+    borderWidth:'Border Width',minWidth:'Min Width',headerBg:'Header BG',
+    stripeBg:'Stripe BG',stripeAltBg:'Stripe Alt BG',borderStyle:'Border Style',
+    bodyShadow:'Shadow',headerPadding:'Header Padding',bodyPadding:'Body Padding',
+    nodeBg:'Node BG',nodeBorder:'Node Border',nodeRadius:'Node Radius',nodePadding:'Node Padding',
+    connectorColor:'Connector Color',connectorWidth:'Connector Width',arrowSize:'Arrow Size',
+    boxBg:'Box BG',boxBorder:'Box Border',boxHeaderBg:'Header BG',
+    noteBg:'Note BG',noteBorder:'Note Border',noteBorderLeft:'Left Border',
     importExport:'Import / Export',
     letterSpacing:'Letter Spacing',textTransform:'Text Transform',
     none:'None',uppercase:'UPPERCASE',capitalize:'Capitalize',
@@ -53,6 +70,23 @@ function T(k){
     backdrop:'Lớp phủ & Mờ nền',skeleton:'Hiệu ứng tải',
     themePresets:'Bộ giao diện có sẵn',customCSS:'CSS tùy chỉnh',wcag:'Kiểm tra tương phản WCAG',
     printTheme:'Giao diện in',highContrast:'Tương phản cao',coreStandard:'Tiêu chuẩn lõi',
+    components:'Thành phần',
+    btnSettings:'Nút bấm',tableSettings:'Bảng dữ liệu',cardSettings:'Thẻ',badgeSettings:'Huy hiệu',
+    inputSettings:'Ô nhập',tabSettings:'Tab',modalSettings:'Hộp thoại',
+    flowSettings:'Lưu đồ',isoBox:'Hộp tài liệu ISO',isoNote:'Ghi chú ISO',
+    kpiSettings:'Thẻ KPI',tooltipSettings:'Chú thích nổi',dropdownSettings:'Menu thả',
+    navSettings:'Mục điều hướng',paginationSettings:'Phân trang',
+    emptySettings:'Trạng thái rỗng',progressSettings:'Thanh tiến độ',
+    fieldSettings:'Trường biểu mẫu',breadcrumbSettings:'Đường dẫn',
+    paddingY:'Đệm dọc',paddingX:'Đệm ngang',gap:'Khoảng cách',fontWeight:'Độ đậm chữ',
+    letterSpacing:'Giãn chữ',textTransform:'Kiểu chữ hoa',
+    borderWidth:'Độ dày viền',minWidth:'Chiều rộng tối thiểu',headerBg:'Nền tiêu đề',
+    stripeBg:'Nền sọc',stripeAltBg:'Nền sọc xen kẽ',borderStyle:'Kiểu viền',
+    bodyShadow:'Bóng đổ',headerPadding:'Đệm tiêu đề',bodyPadding:'Đệm nội dung',
+    nodeBg:'Nền node',nodeBorder:'Viền node',nodeRadius:'Bo góc node',nodePadding:'Đệm node',
+    connectorColor:'Màu đường nối',connectorWidth:'Độ dày đường nối',arrowSize:'Cỡ mũi tên',
+    boxBg:'Nền hộp',boxBorder:'Viền hộp',boxHeaderBg:'Nền tiêu đề hộp',
+    noteBg:'Nền ghi chú',noteBorder:'Viền ghi chú',noteBorderLeft:'Viền trái',
     importExport:'Nhập / Xuất',
     letterSpacing:'Giãn chữ',textTransform:'Kiểu chữ hoa',
     none:'Không',uppercase:'IN HOA',capitalize:'Viết Hoa Đầu',
@@ -150,6 +184,7 @@ function render(el, subTab, currentLang){
     {key:'colors', icon:'🎨', label:T('colors')},
     {key:'layout', icon:'📐', label:T('layout')},
     {key:'effects', icon:'✨', label:T('effects')},
+    {key:'components', icon:'🧱', label:T('components')},
     {key:'advanced', icon:'🧩', label:T('advanced')}
   ];
 
@@ -160,7 +195,7 @@ function render(el, subTab, currentLang){
   h += '<div style="margin-top:6px;padding:5px 10px;background:var(--blue-bg,rgba(37,99,235,0.08));border:1px solid var(--blue,#2563eb);border-radius:6px;font-size:11px;color:var(--blue,#2563eb)">💡 '+T('liveHint')+'</div></div>';
 
   /* Sub-tab bar */
-  h += '<div style="display:flex;gap:4px;border-bottom:2px solid var(--border);margin-bottom:16px;overflow-x:auto">';
+  h += '<div style="display:flex;flex-wrap:wrap;gap:4px;border-bottom:2px solid var(--border);margin-bottom:16px">';
   tabs.forEach(function(t){
     var active = _subTab===t.key;
     h += '<button style="padding:8px 14px;font-size:12px;font-weight:600;border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid '
@@ -176,6 +211,7 @@ function render(el, subTab, currentLang){
     case 'colors': h += renderColors(); break;
     case 'layout': h += renderLayout(); break;
     case 'effects': h += renderEffects(); break;
+    case 'components': h += renderComponents(); break;
     case 'advanced': h += renderAdvanced(); break;
     default: h += renderOverview();
   }
@@ -522,7 +558,184 @@ function renderEffects(){
 }
 
 /* ══════════════════════════════════════════════════════════════════════════ */
-/* ── SUB-TAB 6: ADVANCED ────────────────────────────────────────────────── */
+/* ── SUB-TAB 6: COMPONENTS ──────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════ */
+function renderComponents(){
+  var h = '';
+
+  /* BUTTON */
+  h += sect('🔘 '+T('btnSettings'),
+    slider(T('paddingY'), '--btn-padding-y', 'components.btn.paddingY', 0, 12, 0, 'px')
+    + slider(T('paddingX'), '--btn-padding-x', 'components.btn.paddingX', 4, 24, 10, 'px')
+    + slider(T('gap')+' (icon↔text)', '--btn-gap', 'components.btn.gap', 2, 12, 6, 'px')
+    + slider(T('fontWeight'), '--btn-font-weight', 'components.btn.fontWeight', 400, 800, 600, '', 100)
+    + slider(T('letterSpacing'), '--btn-letter-spacing', 'components.btn.letterSpacing', 0, 0.15, 0, 'em', 0.01)
+    + slider(T('borderWidth'), '--btn-border-width', 'components.btn.borderWidth', 0, 3, 1, 'px')
+    + slider(T('minWidth'), '--btn-min-width', 'components.btn.minWidth', 0, 120, 0, 'px')
+  , true);
+
+  /* TABLE */
+  h += sect('📊 '+T('tableSettings'),
+    colorPick(T('headerBg'), '--table-header-bg', 'components.table.headerBg', '#f1f5f9')
+    + slider(T('fontWeight')+' header', '--table-header-font-weight', 'components.table.headerFontWeight', 400, 800, 600, '', 100)
+    + slider(T('letterSpacing')+' header', '--table-header-letter-spacing', 'components.table.headerLetterSpacing', 0, 0.15, 0.05, 'em', 0.01)
+    + colorPick(T('stripeBg'), '--table-row-stripe', 'components.table.stripeBg', 'transparent')
+    + colorPick(T('stripeAltBg'), '--table-row-stripe-alt', 'components.table.stripeAltBg', 'rgba(0,0,0,0.02)')
+    + slider(T('borderWidth'), '--table-border-width', 'components.table.borderWidth', 0, 3, 1, 'px')
+  , false);
+
+  /* CARD */
+  h += sect('🃏 '+T('cardSettings'),
+    slider(T('borderWidth'), '--card-border-width', 'components.card.borderWidth', 0, 3, 1, 'px')
+    + colorPick(T('headerBg'), '--card-header-bg', 'components.card.headerBg', 'transparent')
+    + slider(T('headerPadding'), '--card-header-padding-v', 'components.card.headerPadding', 8, 24, 12, 'px')
+    + slider(T('bodyPadding'), '--card-body-padding', 'components.card.bodyPadding', 8, 32, 16, 'px')
+  , false);
+
+  /* BADGE */
+  h += sect('🏷️ '+T('badgeSettings'),
+    slider(T('fontWeight'), '--badge-font-weight', 'components.badge.fontWeight', 400, 800, 600, '', 100)
+    + slider(T('letterSpacing'), '--badge-letter-spacing', 'components.badge.letterSpacing', 0, 0.15, 0, 'em', 0.01)
+    + slider(T('borderWidth'), '--badge-border-width', 'components.badge.borderWidth', 0, 2, 0, 'px')
+    + slider(T('minWidth'), '--badge-min-width', 'components.badge.minWidth', 0, 60, 0, 'px')
+  , false);
+
+  /* INPUT */
+  h += sect('📝 '+T('inputSettings'),
+    slider(T('borderWidth'), '--input-border-width', 'components.input.borderWidth', 1, 3, 1, 'px')
+    + slider(T('paddingY'), '--input-padding-y', 'components.input.paddingY', 0, 8, 0, 'px')
+    + colorPick('Input BG', '--input-bg', 'components.input.bg', '#ffffff')
+  , false);
+
+  /* TAB */
+  h += sect('📑 '+T('tabSettings'),
+    slider(T('borderWidth')+' indicator', '--tab-border-width', 'components.tab.borderWidth', 1, 4, 2, 'px')
+    + slider(T('fontWeight'), '--tab-font-weight', 'components.tab.fontWeight', 400, 800, 600, '', 100)
+    + slider(T('gap'), '--tab-gap', 'components.tab.gap', 0, 12, 4, 'px')
+    + colorPick('Active indicator', '--tab-active-indicator', 'components.tab.activeIndicator', '#1565c0')
+  , false);
+
+  /* MODAL */
+  h += sect('🪟 '+T('modalSettings'),
+    slider('Border radius', '--modal-border-radius', 'components.modal.radius', 0, 32, 16, 'px')
+    + slider(T('bodyPadding'), '--modal-padding', 'components.modal.padding', 12, 40, 24, 'px')
+    + slider(T('headerPadding'), '--modal-header-padding-v', 'components.modal.headerPadding', 8, 24, 16, 'px')
+  , false);
+
+  /* FLOWCHART */
+  h += sect('🔀 '+T('flowSettings'),
+    colorPick(T('nodeBg'), '--flow-node-bg', 'components.flow.nodeBg', '#ffffff')
+    + slider(T('nodeBorder'), '--flow-node-border-w', 'components.flow.nodeBorderW', 1, 4, 2, 'px')
+    + colorPick(T('nodeBorder')+' color', '--flow-node-border-color', 'components.flow.nodeBorderColor', '#e2e8f0')
+    + slider(T('nodeRadius'), '--flow-node-radius', 'components.flow.nodeRadius', 0, 20, 8, 'px')
+    + slider(T('nodePadding'), '--flow-node-padding', 'components.flow.nodePadding', 6, 24, 12, 'px')
+    + colorPick(T('connectorColor'), '--flow-connector-color', 'components.flow.connectorColor', '#94a3b8')
+    + slider(T('connectorWidth'), '--flow-connector-width', 'components.flow.connectorWidth', 1, 4, 2, 'px')
+    + slider(T('arrowSize'), '--flow-arrow-size', 'components.flow.arrowSize', 4, 16, 8, 'px')
+  , false);
+
+  /* ISO BOX */
+  h += sect('📋 '+T('isoBox'),
+    colorPick(T('boxBg'), '--iso-box-bg', 'components.isoBox.bg', '#ffffff')
+    + slider(T('borderWidth'), '--iso-box-border-w', 'components.isoBox.borderW', 1, 3, 1, 'px')
+    + slider('Border radius', '--iso-box-radius', 'components.isoBox.radius', 0, 16, 8, 'px')
+    + colorPick(T('boxHeaderBg'), '--iso-box-header-bg', 'components.isoBox.headerBg', '#f1f5f9')
+    + slider(T('headerPadding'), '--iso-box-header-padding', 'components.isoBox.headerPadding', 6, 20, 10, 'px')
+    + slider(T('bodyPadding'), '--iso-box-body-padding', 'components.isoBox.bodyPadding', 8, 24, 14, 'px')
+    + slider('Font size', '--iso-box-font-size', 'components.isoBox.fontSize', 11, 16, 13, 'px')
+  , false);
+
+  /* ISO NOTE */
+  h += sect('📝 '+T('isoNote'),
+    colorPick(T('noteBg'), '--iso-note-bg', 'components.isoNote.bg', '#fffbeb')
+    + colorPick(T('noteBorder'), '--iso-note-border-color', 'components.isoNote.borderColor', '#fcd34d')
+    + colorPick(T('noteBorderLeft'), '--iso-note-border-left-color', 'components.isoNote.borderLeftColor', '#f59e0b')
+    + slider(T('noteBorderLeft')+' width', '--iso-note-border-left-w', 'components.isoNote.borderLeftW', 2, 8, 4, 'px')
+    + slider('Border radius', '--iso-note-radius', 'components.isoNote.radius', 0, 12, 6, 'px')
+    + slider(T('bodyPadding'), '--iso-note-padding', 'components.isoNote.padding', 6, 20, 10, 'px')
+    + slider('Font size', '--iso-note-font-size', 'components.isoNote.fontSize', 11, 16, 13, 'px')
+    + slider('Icon size', '--iso-note-icon-size', 'components.isoNote.iconSize', 12, 24, 16, 'px')
+  , false);
+
+  /* KPI CARD */
+  h += sect('📊 '+T('kpiSettings'),
+    slider(T('borderWidth'), '--kpi-border-width', 'components.kpi.borderWidth', 0, 3, 1, 'px')
+    + slider('Icon size', '--kpi-icon-size', 'components.kpi.iconSize', 16, 40, 24, 'px')
+    + slider('Trend font', '--kpi-trend-font-size', 'components.kpi.trendFontSize', 9, 14, 11, 'px')
+  , false);
+
+  /* TOOLTIP */
+  h += sect('💬 '+T('tooltipSettings'),
+    colorPick('BG', '--tooltip-bg', 'components.tooltip.bg', '#0f172a')
+    + colorPick('Color', '--tooltip-color', 'components.tooltip.color', '#ffffff')
+    + slider(T('paddingY'), '--tooltip-padding-y', 'components.tooltip.paddingY', 4, 12, 6, 'px')
+    + slider(T('paddingX'), '--tooltip-padding-x', 'components.tooltip.paddingX', 6, 16, 10, 'px')
+    + slider('Border radius', '--tooltip-radius', 'components.tooltip.radius', 0, 12, 6, 'px')
+    + slider('Font size', '--tooltip-font-size', 'components.tooltip.fontSize', 10, 14, 11, 'px')
+    + slider('Max width', '--tooltip-max-width', 'components.tooltip.maxWidth', 160, 400, 280, 'px')
+  , false);
+
+  /* DROPDOWN */
+  h += sect('📋 '+T('dropdownSettings'),
+    slider('Border radius', '--dropdown-radius', 'components.dropdown.radius', 0, 16, 8, 'px')
+    + slider('Item padding', '--dropdown-item-padding', 'components.dropdown.itemPadding', 4, 16, 8, 'px')
+    + slider('Item font', '--dropdown-item-font-size', 'components.dropdown.itemFontSize', 11, 16, 13, 'px')
+    + colorPick('Hover BG', '--dropdown-item-hover-bg', 'components.dropdown.hoverBg', '#f8fafc')
+  , false);
+
+  /* NAV ITEM */
+  h += sect('🧭 '+T('navSettings'),
+    slider('Height', '--nav-item-height', 'components.nav.height', 28, 48, 36, 'px')
+    + slider('Font size', '--nav-item-font-size', 'components.nav.fontSize', 11, 16, 13, 'px')
+    + slider('Icon size', '--nav-item-icon-size', 'components.nav.iconSize', 12, 24, 16, 'px')
+    + slider(T('gap'), '--nav-item-gap', 'components.nav.gap', 4, 16, 10, 'px')
+    + slider('Border radius', '--nav-item-radius', 'components.nav.radius', 0, 16, 8, 'px')
+  , false);
+
+  /* PAGINATION */
+  h += sect('📄 '+T('paginationSettings'),
+    slider('Button size', '--pagination-btn-size', 'components.pagination.btnSize', 24, 44, 32, 'px')
+    + slider('Border radius', '--pagination-btn-radius', 'components.pagination.radius', 0, 12, 6, 'px')
+    + slider('Font size', '--pagination-font-size', 'components.pagination.fontSize', 11, 16, 13, 'px')
+    + slider(T('gap'), '--pagination-gap', 'components.pagination.gap', 2, 8, 4, 'px')
+  , false);
+
+  /* PROGRESS BAR */
+  h += sect('📏 '+T('progressSettings'),
+    slider('Height', '--progress-height', 'components.progress.height', 4, 16, 8, 'px')
+    + slider('Border radius', '--progress-radius', 'components.progress.radius', 0, 16, 9999, 'px')
+    + colorPick('Track BG', '--progress-bg', 'components.progress.bg', '#e2e8f0')
+  , false);
+
+  /* EMPTY STATE */
+  h += sect('📭 '+T('emptySettings'),
+    slider('Icon size', '--empty-icon-size', 'components.empty.iconSize', 24, 80, 48, 'px')
+    + slider('Icon opacity', '--empty-icon-opacity', 'components.empty.iconOpacity', 0.1, 0.8, 0.4, '', 0.05)
+    + slider('Title font', '--empty-title-font-size', 'components.empty.titleFontSize', 14, 20, 16, 'px')
+    + slider('Desc font', '--empty-desc-font-size', 'components.empty.descFontSize', 12, 16, 13, 'px')
+  , false);
+
+  /* FORM FIELD */
+  h += sect('📝 '+T('fieldSettings'),
+    slider('Field gap', '--field-gap', 'components.field.gap', 8, 28, 16, 'px')
+    + slider('Label gap', '--field-label-gap', 'components.field.labelGap', 2, 8, 4, 'px')
+    + slider('Group gap', '--field-group-gap', 'components.field.groupGap', 12, 40, 24, 'px')
+    + slider('Helper font', '--field-helper-font-size', 'components.field.helperFontSize', 10, 14, 11, 'px')
+  , false);
+
+  /* BREADCRUMB */
+  h += sect('🔗 '+T('breadcrumbSettings'),
+    slider('Font size', '--breadcrumb-font-size', 'components.breadcrumb.fontSize', 11, 16, 13, 'px')
+    + slider(T('gap'), '--breadcrumb-gap', 'components.breadcrumb.gap', 2, 12, 6, 'px')
+    + colorPick('Color', '--breadcrumb-color', 'components.breadcrumb.color', '#94a3b8')
+    + colorPick('Active', '--breadcrumb-active-color', 'components.breadcrumb.activeColor', '#1e293b')
+  , false);
+
+  return h;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* ── SUB-TAB 7: ADVANCED ────────────────────────────────────────────────── */
 /* ══════════════════════════════════════════════════════════════════════════ */
 function renderAdvanced(){
   var h = '';
