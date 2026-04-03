@@ -1236,15 +1236,16 @@ function _buildDataSections(type, entry, renderer){
 }
 
 function _buildSpecializedDataSections(type, renderer){
-  if(type === 'kanban-board' || type === 'status-board' || type === 'auto-approval-lane' || type === 'auto-task-board') return _buildKanbanSections(type);
-  if(type === 'schedule-grid' || type === 'calendar-board' || type === 'gantt-board' || type === 'mfg-production-schedule') return _buildScheduleSections(type);
+  if(type === 'data-kanban' || type === 'kanban-board' || type === 'status-board' || type === 'auto-approval-lane' || type === 'auto-task-board') return _buildKanbanSections(type);
+  if(type === 'data-gantt' || type === 'schedule-grid' || type === 'calendar-board' || type === 'gantt-board' || type === 'mfg-production-schedule') return _buildScheduleSections(type);
   if(type === 'pivot-table' || type === 'matrix-grid' || type === 'heat-table' || type === 'quality-defect-matrix') return _buildMatrixSections(type);
-  if(type === 'record-detail' || type === 'master-detail' || type === 'quality-traceability') return _buildRecordDetailSections(type);
+  if(type === 'data-detail' || type === 'record-detail' || type === 'master-detail' || type === 'quality-traceability') return _buildRecordDetailSections(type);
   if(type === 'mfg-machine-status' || type === 'iot-machine-twin' || type === 'iot-edge-health') return _buildMachineStatusSections(type);
   if(type === 'mfg-oee-trend' || type === 'iot-oee-board' || type === 'iot-energy-monitor') return _buildOeeSections(type);
   if(type === 'quality-spc-chart' || type === 'quality-control-chart' || type === 'chart-control') return _buildSpcSections(type);
   if(type === 'quality-pareto' || type === 'chart-waterfall' || type === 'chart-histogram' || type === 'chart-boxplot') return _buildDistributionChartSections(type);
   if(type === 'form-wizard' || type === 'approval-form') return _buildFormWizardSections(type);
+  if(type === 'form-modal' || type === 'action-quick-create') return _buildFormModalSections(type);
   if(type === 'checklist-form' || type === 'mfg-setup-check' || type === 'quality-inspection-form' || type === 'quality-checksheet') return _buildChecklistSections(type);
   if(type === 'query-builder' || type === 'search-panel') return _buildQueryBuilderSections(type);
   if(type === 'iot-connector-panel') return _buildIoTConnectorPanelSections();
@@ -1508,6 +1509,43 @@ function _buildFormWizardSections(type){
       _blockField('submitMethod', 'Phương thức nộp', 'Submit method', 'select', 'config.wizard.submit.method', { default:'POST', options:['POST','PUT','PATCH'] }),
       _blockField('successRoute', 'Route thành công', 'Success route', 'text', 'config.wizard.successRoute', { default:'' }),
       _blockField('summaryStepKey', 'Bước xác nhận', 'Review step key', 'text', 'config.wizard.summaryStepKey', { default:'' })
+    ])
+  ];
+}
+
+function _buildFormModalSections(type){
+  return [
+    _blockSection('trigger', 'Nút mở modal', 'Modal trigger', [
+      _blockField('triggerLabelVi', 'Nhãn nút VI', 'Button label VI', 'text', 'config.modal.trigger.label.vi', { default:'Tạo mới' }),
+      _blockField('triggerLabelEn', 'Nhãn nút EN', 'Button label EN', 'text', 'config.modal.trigger.label.en', { default:'Create new' }),
+      _blockField('triggerIcon', 'Icon', 'Icon', 'text', 'config.modal.trigger.icon', { default:'+' }),
+      _blockField('triggerStyle', 'Kiểu nút', 'Button style', 'select', 'config.modal.trigger.style', { default:'primary', options:['primary','secondary','ghost','danger','success'] }),
+      _blockField('titleVi', 'Tiêu đề VI', 'Modal title VI', 'text', 'config.modal.title.vi', { default:'Tạo bản ghi mới' }),
+      _blockField('titleEn', 'Tiêu đề EN', 'Modal title EN', 'text', 'config.modal.title.en', { default:'Create new record' }),
+      _blockField('size', 'Kích thước', 'Size', 'select', 'config.modal.size', { default:'md', options:['sm','md','lg','xl'] }),
+      _blockField('closeOnOverlay', 'Đóng khi bấm nền', 'Close on overlay click', 'toggle', 'config.modal.closeOnOverlay', { default:true }),
+      _blockField('closeOnSubmit', 'Đóng sau khi gửi', 'Close after submit', 'toggle', 'config.modal.closeOnSubmit', { default:true })
+    ]),
+    _blockSection('form', 'Biểu mẫu modal', 'Modal form', [
+      _blockField('fields', 'Danh sách field', 'Fields', 'collection', 'config.fields', {
+        default:[
+          { key:'code', label:{vi:'Mã', en:'Code'}, type:'string', required:true, span:'half' },
+          { key:'name', label:{vi:'Tên', en:'Name'}, type:'string', required:true, span:'half' },
+          { key:'notes', label:{vi:'Ghi chú', en:'Notes'}, type:'textarea', required:false, span:'full' }
+        ],
+        addLabel:'Thêm field',
+        itemLabel:'Field',
+        itemFields:[
+          _blockField('key', 'Key', 'Key', 'text', 'key', { default:'field_key' }),
+          _blockField('labelVi', 'Nhãn VI', 'Label VI', 'text', 'label.vi', { default:'Field' }),
+          _blockField('labelEn', 'Nhãn EN', 'Label EN', 'text', 'label.en', { default:'Field' }),
+          _blockField('type', 'Loại', 'Type', 'select', 'type', { default:'string', options:['string','textarea','number','select','date','datetime','boolean','currency','email','phone'] }),
+          _blockField('required', 'Bắt buộc', 'Required', 'toggle', 'required', { default:false }),
+          _blockField('span', 'Độ rộng', 'Span', 'select', 'span', { default:'half', options:['half','full'] })
+        ]
+      }),
+      _blockField('submitApi', 'Submit API', 'Submit API', 'api-select', 'config.submit.api', { default:'', repaintOnChange:true }),
+      _blockField('submitMethod', 'Submit method', 'Submit method', 'select', 'config.submit.method', { default:'POST', options:['POST','PUT','PATCH'] })
     ])
   ];
 }
@@ -3859,6 +3897,11 @@ function getModuleState(moduleId){
       selectedRows: {},
       expandedRows: {},
       columnVisibility: {},
+      chartStates: {},
+      wizardStates: {},
+      modalStates: {},
+      detailStates: {},
+      checksheetStates: {},
     };
   }
   return _moduleStates[moduleId];
@@ -4818,6 +4861,21 @@ function _renderBlockInner(block, data, state, reactiveCtx){
     try { resolvedConfig = _resolveBindings(config, blockCtx); } catch(e){ resolvedConfig = config; }
   }
   if(block.type === 'action-status-flow') renderType = 'action-status-flow';
+  if(block.type === 'chart-line') renderType = 'chart-line';
+  if(block.type === 'chart-area') renderType = 'chart-area';
+  if(block.type === 'chart-scatter') renderType = 'chart-scatter';
+  if(block.type === 'chart-radar') renderType = 'chart-radar';
+  if(block.type === 'chart-combo') renderType = 'chart-combo';
+  if(block.type === 'quality-spc-chart') renderType = 'quality-spc-chart';
+  if(block.type === 'quality-control-chart') renderType = 'quality-control-chart';
+  if(block.type === 'quality-pareto') renderType = 'quality-pareto';
+  if(block.type === 'quality-checksheet') renderType = 'quality-checksheet';
+  if(block.type === 'form-wizard') renderType = 'form-wizard';
+  if(block.type === 'form-modal') renderType = 'form-modal';
+  if(block.type === 'record-detail' || block.type === 'data-detail') renderType = 'record-detail';
+  if(block.type === 'data-kanban') renderType = 'data-kanban';
+  if(block.type === 'data-gantt') renderType = 'data-gantt';
+  if(block.type === 'mfg-machine-status') renderType = 'mfg-machine-status';
 
   switch(renderType){
     case 'kpi-row':         return renderKpiRow(resolvedConfig, data);
@@ -4826,13 +4884,28 @@ function _renderBlockInner(block, data, state, reactiveCtx){
     case 'section-header':  return renderSectionHeader(resolvedConfig);
     case 'spacer':          return '<div style="height:'+(resolvedConfig.height||16)+'px"></div>';
     case 'info-banner':     return renderInfoBanner(resolvedConfig);
-    case 'chart-bar':       return renderBarChart(resolvedConfig, data);
+    case 'chart-bar':       return renderBarChart(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
+    case 'chart-line':      return renderLineChart(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
+    case 'chart-area':      return renderAreaChart(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
+    case 'chart-scatter':   return renderScatterChart(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
+    case 'chart-radar':     return renderRadarChart(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
+    case 'chart-combo':     return renderComboChart(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
     case 'chart-donut':     return renderDonutChart(resolvedConfig, data);
+    case 'quality-spc-chart': return renderSpcChart(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
+    case 'quality-control-chart': return renderControlChart(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
+    case 'quality-pareto':  return renderParetoChart(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
+    case 'quality-checksheet': return renderChecksheet(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
+    case 'data-kanban':     return renderKanban(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
+    case 'data-gantt':      return renderGantt(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
+    case 'record-detail':   return renderRecordDetail(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
     case 'action-status-flow': return renderStatusFlow(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx);
     case 'action-toolbar':  return renderToolbar(resolvedConfig, data);
     case 'data-cards':      return renderCardGrid(resolvedConfig, data);
     case 'data-timeline':   return renderTimeline(resolvedConfig, data);
     case 'form-standard':   return renderFormStandard(resolvedConfig, data, blockCtx || reactiveCtx, block);
+    case 'form-wizard':     return renderFormWizard(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
+    case 'form-modal':      return renderFormModal(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
+    case 'mfg-machine-status': return renderMachineStatus(resolvedConfig, data, state, blockRuntimeId, blockCtx || reactiveCtx, block);
     case 'two-column':
       var columnBlock = _clone(block);
       columnBlock.config = resolvedConfig;
@@ -5645,6 +5718,445 @@ function renderDonutChart(config, data){
   });
   html += '</div></div>';
   return html;
+}
+
+function _chartRows(config, data){
+  var chartCfg = config && config.chart ? config.chart : {};
+  var dataKey = config && (config.dataKey || (config.dataSource && config.dataSource.dataKey) || chartCfg.dataKey) || 'items';
+  if(Array.isArray(data)) return data;
+  if(data && Array.isArray(data[dataKey])) return data[dataKey];
+  if(data && Array.isArray(data.items)) return data.items;
+  if(config && Array.isArray(config.items)) return config.items;
+  return [];
+}
+
+function _chartModuleId(state){
+  return state && state._schema ? (state._schema.moduleId || '_') : '_';
+}
+
+function _chartState(state, blockId){
+  var ms = getModuleState(_chartModuleId(state));
+  if(!ms.chartStates[blockId || '_']){
+    ms.chartStates[blockId || '_'] = {
+      hiddenSeries: {},
+      zoom: 1,
+      panX: 0.5,
+      panY: 0.5,
+      zoomLevel: 'day'
+    };
+  }
+  return ms.chartStates[blockId || '_'];
+}
+
+function _chartText(item, fallbackVi, fallbackEn){
+  if(item && item.label && typeof item.label === 'object'){
+    return _t(item.label.vi || fallbackVi || '', item.label.en || fallbackEn || item.label.vi || fallbackVi || '');
+  }
+  return _t(
+    item && (item.labelVi || item.label || fallbackVi || '') || '',
+    item && (item.labelEn || item.label || fallbackEn || fallbackVi || '') || ''
+  );
+}
+
+function _chartColor(index, fallback){
+  var palette = ['#2563eb','#0ea5e9','#16a34a','#f59e0b','#dc2626','#7c3aed','#14b8a6','#ea580c','#64748b','#e11d48'];
+  return fallback || palette[index % palette.length];
+}
+
+function _chartEmpty(message){
+  return '<div class="hm-empty">'+_esc(message || _t('Không có dữ liệu','No data'))+'</div>';
+}
+
+function _chartError(label, err){
+  console.warn('[BlockEngine] chart render failed:', label, err);
+  return '<div class="hm-empty">'+_esc(_t('Không thể hiển thị biểu đồ', 'Unable to render chart'))+'</div>';
+}
+
+function _chartNumber(value){
+  var num = Number(value);
+  return isNaN(num) ? 0 : num;
+}
+
+function _chartClamp(value, min, max){
+  return Math.max(min, Math.min(max, value));
+}
+
+function _chartDateLabel(value){
+  var d;
+  if(value == null || value === '') return '';
+  d = new Date(value);
+  if(isNaN(d.getTime())) return String(value);
+  return d.toLocaleDateString((typeof lang !== 'undefined' && lang === 'vi') ? 'vi-VN' : 'en-US', {
+    day: '2-digit',
+    month: 'short'
+  });
+}
+
+function _chartFormatValue(value, format){
+  if(value == null || value === '') return '';
+  if(format === 'percent' || format === 'percentage') return _fmt(_chartNumber(value)) + '%';
+  if(format === 'currency'){
+    try{
+      return new Intl.NumberFormat((typeof lang !== 'undefined' && lang === 'vi') ? 'vi-VN' : 'en-US', {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 0
+      }).format(_chartNumber(value));
+    } catch(e){}
+  }
+  if(format === 'date') return _chartDateLabel(value);
+  if(typeof value === 'number' || (!isNaN(Number(value)) && value !== '')){
+    return _fmt(_chartNumber(value));
+  }
+  return String(value);
+}
+
+function _chartAttrText(text){
+  return _esc(String(text == null ? '' : text)).replace(/\n/g, '&#10;');
+}
+
+function _chartAxisTicks(min, max, count){
+  var ticks = [];
+  var range = max - min;
+  var rough;
+  var factor;
+  var err;
+  var step;
+  var niceMin;
+  var niceMax;
+  var v;
+  if(count == null) count = 5;
+  if(!isFinite(min) || !isFinite(max)) return [0, 1];
+  if(min === max){
+    if(min === 0) return [0, 1];
+    min = min - Math.abs(min * 0.2);
+    max = max + Math.abs(max * 0.2);
+  }
+  range = max - min;
+  rough = range / Math.max(count - 1, 1);
+  factor = Math.pow(10, Math.floor(Math.log(rough) / Math.LN10));
+  err = rough / factor;
+  if(err >= 7.5) step = 10 * factor;
+  else if(err >= 3.5) step = 5 * factor;
+  else if(err >= 1.5) step = 2 * factor;
+  else step = factor;
+  niceMin = Math.floor(min / step) * step;
+  niceMax = Math.ceil(max / step) * step;
+  for(v = niceMin; v <= niceMax + (step * 0.5); v += step){
+    ticks.push(Number(v.toFixed(8)));
+  }
+  return ticks;
+}
+
+function _chartScaleX(index, total, left, width){
+  if(total <= 1) return left + (width / 2);
+  return left + ((width / (total - 1)) * index);
+}
+
+function _chartScaleY(value, min, max, top, height){
+  if(max === min) return top + (height / 2);
+  return top + height - (((value - min) / (max - min)) * height);
+}
+
+function _chartPointsToString(points){
+  return points.map(function(point){
+    return point.x.toFixed(2) + ',' + point.y.toFixed(2);
+  }).join(' ');
+}
+
+function _chartLineLength(points){
+  var total = 0;
+  var i;
+  for(i = 1; i < points.length; i++){
+    total += Math.sqrt(Math.pow(points[i].x - points[i - 1].x, 2) + Math.pow(points[i].y - points[i - 1].y, 2));
+  }
+  return total || 1;
+}
+
+function _chartSeriesKey(series, index){
+  return String(series.key || series.field || series.id || ('series_' + index));
+}
+
+function _chartLegend(seriesList, chartState, blockId, label){
+  var html = '<div class="hm-chart-legend" role="toolbar" aria-label="'+_chartAttrText(label || _t('Chú giải biểu đồ', 'Chart legend'))+'">';
+  seriesList.forEach(function(series, index){
+    var key = _chartSeriesKey(series, index);
+    var hidden = !!(chartState.hiddenSeries && chartState.hiddenSeries[key]);
+    html += '<button type="button" class="hm-chart-legend-btn'+(hidden ? ' is-off' : '')+'" role="button" aria-pressed="'+(hidden ? 'false' : 'true')+'" aria-label="'+_chartAttrText(_chartText(series, key, key))+'" data-action="hm-chart-toggle-series" data-block-id="'+_esc(blockId || '')+'" data-series-key="'+_esc(key)+'">';
+    html += '<span class="hm-chart-legend-swatch" style="background:'+_esc(series.color || _chartColor(index))+'"></span>';
+    html += '<span>'+_esc(_chartText(series, key, key))+'</span>';
+    html += '</button>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function _chartWindow(min, max, zoom, pan){
+  var span = max - min;
+  var visible = span / Math.max(zoom || 1, 1);
+  var free = Math.max(span - visible, 0);
+  var offset = free * _chartClamp(pan == null ? 0.5 : pan, 0, 1);
+  return { min: min + offset, max: min + offset + visible };
+}
+
+function _chartTooltipAttrs(text){
+  return ' data-chart-tooltip="' + _chartAttrText(text) + '" tabindex="0"';
+}
+
+function _chartResolveCartesianSeries(config, mode){
+  var chartCfg = config.chart || {};
+  var series = [];
+  if(mode === 'combo'){
+    (config.barSeries || []).forEach(function(item, index){
+      var entry = _clone(item || {});
+      if(!entry.type) entry.type = 'bar';
+      if(!entry.axis) entry.axis = 'left';
+      if(!entry.color) entry.color = _chartColor(index, entry.color);
+      series.push(entry);
+    });
+    (config.lineSeries || []).forEach(function(item, index){
+      var lineEntry = _clone(item || {});
+      if(!lineEntry.type) lineEntry.type = 'line';
+      if(!lineEntry.axis) lineEntry.axis = (config.yAxisRight ? 'right' : 'left');
+      if(!lineEntry.color) lineEntry.color = _chartColor(index + series.length, lineEntry.color);
+      series.push(lineEntry);
+    });
+  }
+  if(!series.length && chartCfg.series && chartCfg.series.length){
+    chartCfg.series.forEach(function(item, index){
+      var chartSeries = _clone(item || {});
+      if(!chartSeries.type) chartSeries.type = mode === 'area' ? 'area' : (mode === 'combo' ? 'bar' : mode);
+      if(!chartSeries.color) chartSeries.color = _chartColor(index, chartSeries.color);
+      if(!chartSeries.axis) chartSeries.axis = chartSeries.yAxis || 'left';
+      series.push(chartSeries);
+    });
+  }
+  if(!series.length){
+    series.push({
+      key: config.yKey || chartCfg.yField || ((config.yAxis || {}).key) || 'value',
+      label: { vi: 'Giá trị', en: 'Value' },
+      color: _chartColor(0),
+      type: mode === 'area' ? 'area' : (mode === 'combo' ? 'bar' : mode),
+      axis: 'left'
+    });
+  }
+  return series;
+}
+
+function _chartResolveCartesianMeta(config){
+  var chartCfg = config.chart || {};
+  return {
+    xKey: (config.xAxis && config.xAxis.key) || config.xKey || chartCfg.xField || 'label',
+    xType: (config.xAxis && config.xAxis.type) || chartCfg.xType || 'category',
+    xLabel: (config.xAxis && (config.xAxis.label || config.xAxis.title)) || config.xLabel || chartCfg.xLabel || '',
+    yLabel: (config.yAxis && config.yAxis.label) || config.yLabel || chartCfg.yLabel || '',
+    yFormat: (config.yAxis && config.yAxis.format) || chartCfg.yFormat || '',
+    yRightLabel: (config.yAxisRight && config.yAxisRight.label) || '',
+    yRightFormat: (config.yAxisRight && config.yAxisRight.format) || '',
+    showLegend: chartCfg.showLegend !== false,
+    showGrid: chartCfg.showGrid !== false,
+    stacked: !!(config.stacked || chartCfg.stackMode === 'normal' || chartCfg.stacked)
+  };
+}
+
+function _chartResolveXLabel(value, xType){
+  return xType === 'date' ? _chartDateLabel(value) : String(value == null ? '' : value);
+}
+
+/**
+ * Render a production-ready bar chart with accessible tooltips.
+ * @param {Object} config
+ * @param {*} data
+ * @param {Object} state
+ * @param {string} blockId
+ * @returns {string}
+ */
+function renderBarChart(config, data, state, blockId){
+  var items;
+  var max;
+  var html;
+  try{
+    items = _chartRows(config, data);
+    if(!items.length) return _chartEmpty(_t('Không có dữ liệu','No data'));
+
+    max = 0;
+    items.forEach(function(item){
+      var value = _chartNumber(item.value != null ? item.value : item[(config.valueKey || 'value')]);
+      if(value > max) max = value;
+    });
+    if(max === 0) max = 1;
+
+    html = '<div class="hm-bar-chart" role="img" aria-label="'+_chartAttrText(_t('Biểu đồ cột so sánh dữ liệu', 'Bar chart comparing values'))+'" data-chart-block-id="'+_esc(blockId || '')+'">';
+    items.forEach(function(item, index){
+      var label = _chartText(item, item.label || item.name || ('Item ' + (index + 1)), item.labelEn || item.name || ('Item ' + (index + 1)));
+      var value = _chartNumber(item.value != null ? item.value : item[(config.valueKey || 'value')]);
+      var pct = Math.round((value / max) * 100);
+      var color = item.color || _chartColor(index, 'var(--brand-2)');
+      var tip = label + ': ' + _chartFormatValue(value, config.format || '');
+      html += '<div class="hm-bar-row">';
+      html += '<span class="hm-bar-label">'+_esc(label)+'</span>';
+      html += '<div class="hm-bar-track"><div class="hm-bar-fill" style="width:'+pct+'%;background:'+color+'"'+_chartTooltipAttrs(tip)+'><span class="hm-sr-only">'+_esc(tip)+'</span></div></div>';
+      html += '<span class="hm-bar-value">'+_esc(_chartFormatValue(value, config.format || ''))+'</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+    return html;
+  } catch(err){
+    return _chartError('bar', err);
+  }
+}
+
+function _renderCartesianChart(config, data, state, blockId, mode){
+  var rows;
+  var chartState;
+  var meta;
+  var seriesList;
+  var visibleSeries;
+  var width = 720;
+  var height = 320;
+  var left = 62;
+  var right = mode === 'combo' ? 62 : 24;
+  var top = 18;
+  var bottom = 64;
+  var plotWidth;
+  var plotHeight;
+  var labels = [];
+  var seriesValues = {};
+  var stackTotals = [];
+  var minLeft = 0;
+  var maxLeft = 0;
+  var minRight = 0;
+  var maxRight = 0;
+  var ticksLeft;
+  var ticksRight;
+  var legendHtml = '';
+  var svg = '';
+  try{
+    rows = _chartRows(config, data);
+    if(!rows.length) return _chartEmpty(_t('Không có dữ liệu','No data'));
+    chartState = _chartState(state, blockId);
+    meta = _chartResolveCartesianMeta(config);
+    seriesList = _chartResolveCartesianSeries(config, mode);
+    visibleSeries = seriesList.filter(function(series, index){
+      return !chartState.hiddenSeries[_chartSeriesKey(series, index)];
+    });
+    if(!visibleSeries.length) visibleSeries = seriesList.slice(0, 1);
+    plotWidth = width - left - right;
+    plotHeight = height - top - bottom;
+
+    rows.forEach(function(row, rowIndex){
+      labels.push(_chartResolveXLabel(row[meta.xKey], meta.xType));
+      if(meta.stacked) stackTotals[rowIndex] = 0;
+    });
+    visibleSeries.forEach(function(series, seriesIndex){
+      var key = _chartSeriesKey(series, seriesIndex);
+      seriesValues[key] = [];
+      rows.forEach(function(row, rowIndex){
+        var rawValue = row[series.field || series.key || series.yKey || series.valueField || 'value'];
+        var value = _chartNumber(rawValue);
+        seriesValues[key].push(value);
+        if(series.axis === 'right'){
+          minRight = Math.min(minRight, value);
+          maxRight = Math.max(maxRight, value);
+        } else if(meta.stacked && (series.type === 'area' || series.type === 'bar' || mode === 'area')){
+          stackTotals[rowIndex] += value;
+          maxLeft = Math.max(maxLeft, stackTotals[rowIndex]);
+        } else {
+          minLeft = Math.min(minLeft, value);
+          maxLeft = Math.max(maxLeft, value);
+        }
+      });
+    });
+    if(maxLeft === minLeft) maxLeft = minLeft + 1;
+    if(mode === 'combo' && maxRight === minRight) maxRight = minRight + 1;
+    ticksLeft = _chartAxisTicks(minLeft, maxLeft, 5);
+    ticksRight = mode === 'combo' ? _chartAxisTicks(minRight, maxRight, 5) : [];
+    legendHtml = meta.showLegend ? _chartLegend(seriesList, chartState, blockId, _t('Chú giải chuỗi dữ liệu', 'Series legend')) : '';
+
+    svg += '<div class="hm-chart-shell" role="img" aria-label="'+_chartAttrText(_t('Biểu đồ dữ liệu nhiều chuỗi', 'Multi-series chart'))+'" data-chart-block-id="'+_esc(blockId || '')+'">';
+    svg += '<svg class="hm-chart-svg" viewBox="0 0 '+width+' '+height+'" preserveAspectRatio="none">';
+    svg += '<defs>';
+    visibleSeries.forEach(function(series, index){
+      var gid = 'hm_chart_fill_' + _safeBlockBindingKey((blockId || 'chart') + '_' + _chartSeriesKey(series, index));
+      svg += '<linearGradient id="'+_esc(gid)+'" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="'+_esc(series.color || _chartColor(index))+'" stop-opacity="0.38"></stop><stop offset="100%" stop-color="'+_esc(series.color || _chartColor(index))+'" stop-opacity="0.04"></stop></linearGradient>';
+    });
+    svg += '</defs>';
+    if(meta.showGrid){
+      ticksLeft.forEach(function(tick){
+        var gy = _chartScaleY(tick, ticksLeft[0], ticksLeft[ticksLeft.length - 1], top, plotHeight);
+        svg += '<line x1="'+left+'" y1="'+gy.toFixed(2)+'" x2="'+(width - right)+'" y2="'+gy.toFixed(2)+'" class="hm-chart-gridline"></line>';
+        svg += '<text x="'+(left - 10)+'" y="'+(gy + 4).toFixed(2)+'" class="hm-chart-axis-label hm-chart-axis-label-y">'+_esc(_chartFormatValue(tick, meta.yFormat))+'</text>';
+      });
+      if(mode === 'combo'){
+        ticksRight.forEach(function(tick){
+          var gry = _chartScaleY(tick, ticksRight[0], ticksRight[ticksRight.length - 1], top, plotHeight);
+          svg += '<text x="'+(width - right + 10)+'" y="'+(gry + 4).toFixed(2)+'" class="hm-chart-axis-label hm-chart-axis-label-y">'+_esc(_chartFormatValue(tick, meta.yRightFormat))+'</text>';
+        });
+      }
+    }
+    svg += '<line x1="'+left+'" y1="'+(top + plotHeight)+'" x2="'+(width - right)+'" y2="'+(top + plotHeight)+'" class="hm-chart-axis"></line>';
+    svg += '<line x1="'+left+'" y1="'+top+'" x2="'+left+'" y2="'+(top + plotHeight)+'" class="hm-chart-axis"></line>';
+    if(mode === 'combo'){
+      svg += '<line x1="'+(width - right)+'" y1="'+top+'" x2="'+(width - right)+'" y2="'+(top + plotHeight)+'" class="hm-chart-axis hm-chart-axis-right"></line>';
+    }
+    if(meta.yLabel){
+      svg += '<text x="16" y="'+(top + (plotHeight / 2))+'" class="hm-chart-axis-title" transform="rotate(-90 16 '+(top + (plotHeight / 2))+')">'+_esc(meta.yLabel)+'</text>';
+    }
+    if(meta.yRightLabel && mode === 'combo'){
+      svg += '<text x="'+(width - 10)+'" y="'+(top + (plotHeight / 2))+'" class="hm-chart-axis-title" transform="rotate(90 '+(width - 10)+' '+(top + (plotHeight / 2))+')">'+_esc(meta.yRightLabel)+'</text>';
+    }
+    if(meta.xLabel){
+      svg += '<text x="'+(left + (plotWidth / 2))+'" y="'+(height - 12)+'" class="hm-chart-axis-title">'+_esc(meta.xLabel)+'</text>';
+    }
+    labels.forEach(function(label, labelIndex){
+      var lx = _chartScaleX(labelIndex, labels.length, left, plotWidth);
+      svg += '<text x="'+lx.toFixed(2)+'" y="'+(top + plotHeight + 18)+'" class="hm-chart-axis-label hm-chart-axis-label-x">'+_esc(label)+'</text>';
+    });
+    visibleSeries.forEach(function(series, seriesIndex){
+      var key = _chartSeriesKey(series, seriesIndex);
+      var points = [];
+      var fillId = 'hm_chart_fill_' + _safeBlockBindingKey((blockId || 'chart') + '_' + key);
+      var axisTicks = series.axis === 'right' && mode === 'combo' ? ticksRight : ticksLeft;
+      var axisMin = axisTicks[0];
+      var axisMax = axisTicks[axisTicks.length - 1];
+      rows.forEach(function(row, rowIndex){
+        points.push({
+          x: _chartScaleX(rowIndex, labels.length, left, plotWidth),
+          y: _chartScaleY(seriesValues[key][rowIndex], axisMin, axisMax, top, plotHeight),
+          value: seriesValues[key][rowIndex],
+          label: labels[rowIndex]
+        });
+      });
+      if(series.type === 'bar'){
+        var band = plotWidth / Math.max(labels.length, 1);
+        var barWidth = Math.max(Math.min((band * 0.56), 34), 10);
+        points.forEach(function(point){
+          var baseY = _chartScaleY(0, axisMin, axisMax, top, plotHeight);
+          var tip = _chartText(series, key, key) + ' • ' + point.label + ': ' + _chartFormatValue(point.value, series.format || meta.yFormat);
+          svg += '<rect x="'+(point.x - (barWidth / 2)).toFixed(2)+'" y="'+Math.min(point.y, baseY).toFixed(2)+'" width="'+barWidth.toFixed(2)+'" height="'+Math.max(Math.abs(baseY - point.y), 1).toFixed(2)+'" rx="6" fill="'+_esc(series.color || _chartColor(seriesIndex))+'" class="hm-chart-bar"'+_chartTooltipAttrs(tip)+'><title>'+_esc(tip)+'</title></rect>';
+        });
+        return;
+      }
+      if((mode === 'area' || series.type === 'area') && points.length){
+        var areaPoints = points.slice();
+        areaPoints.push({ x: points[points.length - 1].x, y: top + plotHeight });
+        areaPoints.push({ x: points[0].x, y: top + plotHeight });
+        svg += '<polygon points="'+_chartPointsToString(areaPoints)+'" fill="url(#'+_esc(fillId)+')" class="hm-chart-area-fill"></polygon>';
+      }
+      if(points.length){
+        var lineLength = _chartLineLength(points);
+        svg += '<polyline points="'+_chartPointsToString(points)+'" fill="none" stroke="'+_esc(series.color || _chartColor(seriesIndex))+'" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="hm-chart-line-path" style="--hm-line-length:'+lineLength.toFixed(2)+'"></polyline>';
+        points.forEach(function(point){
+          var pointTip = _chartText(series, key, key) + ' • ' + point.label + ': ' + _chartFormatValue(point.value, series.format || meta.yFormat);
+          svg += '<circle cx="'+point.x.toFixed(2)+'" cy="'+point.y.toFixed(2)+'" r="4.5" fill="'+_esc(series.color || _chartColor(seriesIndex))+'" class="hm-chart-point"'+_chartTooltipAttrs(pointTip)+'><title>'+_esc(pointTip)+'</title></circle>';
+        });
+      }
+    });
+    svg += '</svg></div>';
+    return '<div class="hm-chart-card hm-chart-card-'+_esc(mode)+'">' + legendHtml + svg + '</div>';
+  } catch(err){
+    return _chartError(mode, err);
+  }
 }
 
 /* --- Toolbar --- */
