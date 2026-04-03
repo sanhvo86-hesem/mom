@@ -243,6 +243,142 @@
 [data-color-mode="dark"] ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
 [data-color-mode="dark"] ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
+/* ============================================================================
+   DARK MODE — Module-specific CSS variable overrides
+   Each module CSS (online-forms, evidence-vault, etc.) defines own :root vars.
+   We override ALL of them for dark mode here.
+   ============================================================================ */
+
+/* ── online-forms.css (--ec-* variables) ── */
+[data-color-mode="dark"] {
+  --ec-bg: #0f172a;
+  --ec-surface: #1e293b;
+  --ec-border: #334155;
+  --ec-border-focus: #60a5fa;
+  --ec-text: #f1f5f9;
+  --ec-text-secondary: #94a3b8;
+  --ec-text-muted: #64748b;
+  --ec-primary: #60a5fa;
+  --ec-primary-hover: #93c5fd;
+  --ec-primary-light: rgba(96,165,250,0.15);
+  --ec-primary-bg: rgba(96,165,250,0.08);
+  --ec-success: #22c55e;
+  --ec-success-light: rgba(34,197,94,0.15);
+  --ec-warning: #fbbf24;
+  --ec-warning-light: rgba(251,191,36,0.15);
+  --ec-danger: #f87171;
+  --ec-danger-light: rgba(248,113,113,0.15);
+  --ec-purple: #a78bfa;
+  --ec-purple-light: rgba(167,139,250,0.15);
+  --ec-shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+  --ec-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  --ec-shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+  --ec-shadow-lg: 0 10px 24px rgba(0,0,0,0.4);
+}
+
+/* ── online-forms.css specific selectors ── */
+[data-color-mode="dark"] .ec-tabs { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .ec-tab { color: #94a3b8; }
+[data-color-mode="dark"] .ec-tab:hover { color: #f1f5f9; background: #263348; }
+[data-color-mode="dark"] .ec-tab.active { color: #60a5fa; border-bottom-color: #60a5fa; }
+[data-color-mode="dark"] .ec-card { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .ec-input, [data-color-mode="dark"] .ec-select { background: #263348; color: #f1f5f9; border-color: #475569; }
+[data-color-mode="dark"] .ec-btn { background: #1e293b; color: #e2e8f0; border-color: #475569; }
+[data-color-mode="dark"] .ec-btn:hover { background: #263348; border-color: #60a5fa; }
+[data-color-mode="dark"] .ec-btn.primary { background: #3b82f6; color: #fff; }
+[data-color-mode="dark"] .ec-badge { background: rgba(96,165,250,0.15); color: #60a5fa; }
+[data-color-mode="dark"] .ec-badge.pass { background: rgba(34,197,94,0.15); color: #22c55e; }
+[data-color-mode="dark"] .ec-badge.fail { background: rgba(248,113,113,0.15); color: #f87171; }
+[data-color-mode="dark"] .ec-badge.warn { background: rgba(251,191,36,0.15); color: #fbbf24; }
+[data-color-mode="dark"] .ec-badge.neutral { background: rgba(148,163,184,0.15); color: #94a3b8; }
+[data-color-mode="dark"] .ec-empty { color: #64748b; }
+[data-color-mode="dark"] .ec-kpi-card { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .ec-section { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .ec-table th { background: #162032; color: #94a3b8; border-color: #334155; }
+[data-color-mode="dark"] .ec-table td { border-color: #263348; }
+[data-color-mode="dark"] .ec-table tr:hover { background: #263348; }
+[data-color-mode="dark"] .ec-sidebar { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .ec-filter-row { background: #1e293b; }
+
+/* ── evidence-vault.css ── */
+[data-color-mode="dark"] .ev-card { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .ev-table th { background: #162032; color: #94a3b8; }
+[data-color-mode="dark"] .ev-table td { border-color: #263348; }
+[data-color-mode="dark"] .ev-tab { color: #94a3b8; }
+[data-color-mode="dark"] .ev-tab:hover { color: #f1f5f9; }
+[data-color-mode="dark"] .ev-tab.active { color: #60a5fa; border-color: #60a5fa; }
+
+/* ── so-jo-wo-dashboard.css ── */
+[data-color-mode="dark"] .owo-card { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .owo-tab { color: #94a3b8; }
+[data-color-mode="dark"] .owo-tab.active { color: #60a5fa; }
+[data-color-mode="dark"] .owo-stat { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .owo-table th { background: #162032; }
+[data-color-mode="dark"] .owo-table td { border-color: #263348; }
+
+/* ── quality-exception.css ── */
+[data-color-mode="dark"] .qe-card, [data-color-mode="dark"] .qe-section { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .qe-tab { color: #94a3b8; }
+[data-color-mode="dark"] .qe-tab.active { color: #60a5fa; }
+
+/* ── supplier-quality.css ── */
+[data-color-mode="dark"] .sq-card { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .sq-tab { color: #94a3b8; }
+[data-color-mode="dark"] .sq-tab.active { color: #60a5fa; }
+
+/* ── quoting.css ── */
+[data-color-mode="dark"] .qe-kpi { background: #1e293b; border-color: #334155; }
+
+/* ── deploy-dashboard.css ── */
+[data-color-mode="dark"] .dd-card { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .dd-stat { background: #1e293b; }
+
+/* ── order-management.css ── */
+[data-color-mode="dark"] .om-card { background: #1e293b; border-color: #334155; }
+
+/* ── form-builder.css ── */
+[data-color-mode="dark"] .fb-container { background: #0f172a; }
+[data-color-mode="dark"] .fb-block-palette { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .fb-canvas { background: #0f172a; }
+[data-color-mode="dark"] .fb-canvas-inner { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .fb-properties { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .fb-field { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .fb-toolbar { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .fb-toolbar-btn { background: #1e293b; color: #e2e8f0; border-color: #475569; }
+[data-color-mode="dark"] .fb-block { color: #e2e8f0; }
+[data-color-mode="dark"] .fb-block:hover { background: #263348; }
+[data-color-mode="dark"] .fb-prop-input { background: #263348; color: #f1f5f9; border-color: #475569; }
+
+/* ── eqms-form.css ── */
+[data-color-mode="dark"] .eqms-section { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .eqms-section-head { background: #162032; border-color: #334155; }
+[data-color-mode="dark"] .eqms-input { background: #263348; color: #f1f5f9; border-color: #475569; }
+[data-color-mode="dark"] .eqms-btn.secondary { background: #1e293b; color: #e2e8f0; border-color: #475569; }
+[data-color-mode="dark"] .eqms-label { color: #94a3b8; }
+[data-color-mode="dark"] .eqms-sig-block { background: #162032; border-color: #334155; }
+[data-color-mode="dark"] .eqms-table th { background: #162032; color: #94a3b8; }
+[data-color-mode="dark"] .eqms-table td { border-color: #263348; }
+[data-color-mode="dark"] .eqms-table .eqms-input { background: #263348; }
+
+/* ── FORM-DESIGN-SYSTEM-SPEC.css ── */
+[data-color-mode="dark"] .qf { color: #f1f5f9; }
+[data-color-mode="dark"] .qf-header { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .qf-status-bar { background: #1e293b; border-color: #334155; }
+
+/* ── Generic catch-all: any element using inline background:white or #fff ── */
+[data-color-mode="dark"] [style*="background:#fff"],
+[data-color-mode="dark"] [style*="background: #fff"],
+[data-color-mode="dark"] [style*="background:white"],
+[data-color-mode="dark"] [style*="background: white"],
+[data-color-mode="dark"] [style*="background:#ffffff"] {
+  background: #1e293b !important;
+}
+[data-color-mode="dark"] [style*="border:1px solid #e2e8f0"],
+[data-color-mode="dark"] [style*="border:1px solid var(--border)"],
+[data-color-mode="dark"] [style*="border-color:#e2e8f0"] {
+  border-color: #334155 !important;
+}
+
 /* ── Reduced motion preference ──────────────────────────────────────────── */
 [data-motion="reduced"] *,
 [data-motion="reduced"] *::before,
