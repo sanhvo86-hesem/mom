@@ -6,17 +6,20 @@ require __DIR__ . '/bootstrap.php';
 
 use HESEM\QMS\Api\Controllers\AuthController;
 use HESEM\QMS\Api\Controllers\AiSchedulingController;
+use HESEM\QMS\Api\Controllers\AllocationController;
 use HESEM\QMS\Api\Controllers\CiController;
 use HESEM\QMS\Api\Controllers\ComplianceReportController;
 use HESEM\QMS\Api\Controllers\CncProgramController;
 use HESEM\QMS\Api\Controllers\CustomerPortalController;
+use HESEM\QMS\Api\Controllers\DashboardController;
 use HESEM\QMS\Api\Controllers\DocumentController;
+use HESEM\QMS\Api\Controllers\DispatchController;
 use HESEM\QMS\Api\Controllers\ExitException;
 use HESEM\QMS\Api\Controllers\FileController;
 use HESEM\QMS\Api\Controllers\FormController;
-use HESEM\QMS\Api\Controllers\KnowledgeController;
 use HESEM\QMS\Api\Controllers\EnergyController;
-use HESEM\QMS\Api\Controllers\AllocationController;
+use HESEM\QMS\Api\Controllers\KnowledgeController;
+use HESEM\QMS\Api\Controllers\LogisticsController;
 use HESEM\QMS\Api\Controllers\MobileController;
 use HESEM\QMS\Api\Controllers\MasterDataController;
 use HESEM\QMS\Api\Controllers\ModuleSchemaController;
@@ -443,6 +446,58 @@ try {
 } catch (ExitException $e) {
     smoke_assert($e->getStatusCode() === 403, 'Allocation guard returned wrong status.');
     smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Allocation guard returned wrong error.');
+}
+
+// Dispatch planning must not be exposed to arbitrary operators.
+smoke_reset_request_state();
+$_SESSION['user'] = 'operator-user';
+$_SESSION['mfa_ok'] = true;
+$dispatchController = (new DispatchController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($portalStore);
+try {
+    $dispatchController->createTarget();
+    throw new RuntimeException('Dispatch planning allowed an unauthorized operator.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 403, 'Dispatch write guard returned wrong status.');
+    smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Dispatch write guard returned wrong error.');
+}
+
+// Operators must not be able to inspect another operator's dispatch queue.
+smoke_reset_request_state();
+$_SESSION['user'] = 'operator-user';
+$_SESSION['mfa_ok'] = true;
+$_GET['operator_id'] = 'another-operator';
+try {
+    $dispatchController->getOperatorDispatch();
+    throw new RuntimeException('Dispatch queue allowed cross-operator access.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 403, 'Dispatch queue scope guard returned wrong status.');
+    smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Dispatch queue scope guard returned wrong error.');
+}
+
+// Logistics mutations must not be exposed to unrelated office roles.
+smoke_reset_request_state();
+$_SESSION['user'] = 'finance-user';
+$_SESSION['mfa_ok'] = true;
+$logisticsController = (new LogisticsController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($financeStore);
+try {
+    $logisticsController->subcontract_create();
+    throw new RuntimeException('Logistics subcontract create allowed an unrelated office role.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 403, 'Logistics write guard returned wrong status.');
+    smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Logistics write guard returned wrong error.');
+}
+
+// Executive analytics must not be exposed to arbitrary shop-floor roles.
+smoke_reset_request_state();
+$_SESSION['user'] = 'operator-user';
+$_SESSION['mfa_ok'] = true;
+$dashboardController = (new DashboardController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($portalStore);
+try {
+    $dashboardController->executive();
+    throw new RuntimeException('Executive dashboard allowed an unauthorized operator.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 403, 'Dashboard guard returned wrong status.');
+    smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Dashboard guard returned wrong error.');
 }
 
 echo "backend smoke tests passed\n";

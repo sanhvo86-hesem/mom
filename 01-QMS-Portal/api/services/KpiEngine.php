@@ -441,11 +441,11 @@ final class KpiEngine
     /**
      * Build aggregated dashboard data for a department and period.
      *
-     * @param string    $department Department code ('ALL' for company-wide).
      * @param DateRange $period     Reporting period.
+     * @param string    $department Department code ('ALL' for company-wide).
      * @return DashboardData
      */
-    public function getDashboardData(string $department = 'ALL', DateRange $period): DashboardData
+    public function getDashboardData(DateRange $period, string $department = 'ALL'): DashboardData
     {
         $dept = strtoupper(trim($department));
         $deptFilter = $dept !== 'ALL' ? $dept : null;
