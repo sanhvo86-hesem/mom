@@ -329,6 +329,7 @@ function _renderBlockPreview(block){
     'pivot-table': 'pivot-table',
     'matrix-grid': 'pivot-table',
     'heat-table': 'pivot-table',
+    'data-detail': 'record-detail',
     'record-detail': 'record-detail',
     'master-detail': 'record-detail',
     'data-tree': 'data-tree',
@@ -343,6 +344,7 @@ function _renderBlockPreview(block){
     'chart-waterfall': 'chart-waterfall',
     'chart-scatter': 'chart-scatter',
     'chart-bubble': 'chart-scatter',
+    'form-modal': 'form-modal',
     'mfg-machine-status': 'mfg-machine-status',
     'mfg-oee-trend': 'mfg-oee-trend',
     'iot-oee-board': 'mfg-oee-trend',
@@ -941,6 +943,19 @@ function _renderBlockPreview(block){
       h += '</div>';
       h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3)"><div><div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px">'+_t('Trường bước hiện tại','Active step field')+'</div><div style="height:34px;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--gray-50)"></div></div><div><div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px">'+_t('Xác nhận dữ liệu','Validation')+'</div><div style="height:34px;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--gray-50)"></div></div></div>';
       h += '</div>';
+      break;
+
+    case 'form-modal':
+      var modalCfg = config.modal || {};
+      var triggerCfg = modalCfg.trigger || config.trigger || {};
+      var modalTitle = modalCfg.title || config.title || { vi:'Tạo bản ghi mới', en:'Create new record' };
+      h += '<div style="border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;padding:var(--space-3)">';
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3)"><button style="padding:var(--space-2) var(--space-3);border:none;border-radius:var(--radius-md);background:var(--brand-2);color:#fff;font-size:11px;font-weight:700">'+_esc((triggerCfg.icon || '+')+' ')+_pvLabel(triggerCfg, 'Tạo mới', 'Create new')+'</button>'+_pvPill(_esc(modalCfg.size || config.size || 'md').toUpperCase(), 'var(--gray-100)', 'var(--text-primary)')+'</div>';
+      h += '<div style="border:1px solid var(--border);border-radius:18px;background:#fff;box-shadow:var(--shadow-sm);padding:var(--space-3)">';
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3)"><div style="font-size:var(--text-sm);font-weight:700;color:var(--text-primary)">'+_pvLabel(typeof modalTitle === 'object' ? modalTitle : { vi:modalTitle, en:(config.titleEn || modalTitle) }, 'Tiêu đề', 'Title')+'</div><span style="font-size:18px;color:var(--text-tertiary)">&times;</span></div>';
+      h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3)"><div><div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px">'+_t('Trường 1','Field 1')+'</div><div style="height:34px;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--gray-50)"></div></div><div><div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px">'+_t('Trường 2','Field 2')+'</div><div style="height:34px;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--gray-50)"></div></div><div style="grid-column:1/-1"><div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px">'+_t('Ghi chú','Notes')+'</div><div style="height:58px;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--gray-50)"></div></div></div>';
+      h += '<div style="display:flex;justify-content:flex-end;gap:var(--space-2);margin-top:var(--space-3)"><div style="padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);border:1px solid var(--border);font-size:11px;font-weight:700;color:var(--text-secondary)">'+_t('Hủy','Cancel')+'</div><div style="padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);background:var(--brand-2);color:#fff;font-size:11px;font-weight:700">'+_t('Lưu','Save')+'</div></div>';
+      h += '</div></div>';
       break;
 
     case 'approval-form':

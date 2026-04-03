@@ -3904,6 +3904,40 @@ function _initKeyboardShortcuts(){
 /* ── Runtime State Management ────────────────────────────────────────── */
 var _moduleStates = {};
 
+BLOCK_TEMPLATES['tpl-quote-quick-create-modal'] = _tplMeta('form-modal', 'Modal tạo báo giá nhanh', 'Quick Quote Modal', 'Biểu mẫu modal tạo nhanh báo giá hoặc yêu cầu báo giá ngay trong dashboard.', 'quoting', {
+  modal: {
+    trigger: { label:{ vi:'Tạo báo giá nhanh', en:'Quick quote' }, icon:'+', style:'primary' },
+    title: { vi:'Tạo báo giá nhanh', en:'Create quick quote' },
+    size: 'lg',
+    closeOnOverlay: true,
+    closeOnSubmit: true
+  },
+  fields: [
+    _tplField('customer_name', 'Khách hàng', 'Customer', 'string', true, 'half'),
+    _tplField('requested_date', 'Ngày yêu cầu', 'Requested date', 'date', true, 'half'),
+    _tplField('currency_code', 'Tiền tệ', 'Currency', 'string', true, 'half'),
+    _tplField('total_order_value', 'Giá trị dự kiến', 'Estimated value', 'currency', false, 'half'),
+    _tplField('notes', 'Ghi chú', 'Notes', 'textarea', false, 'full')
+  ],
+  submit: { api:'quote_create', method:'POST' }
+});
+
+BLOCK_TEMPLATES['tpl-order-record-detail'] = _tplMeta('data-detail', 'Chi tiết Sales Order', 'Sales Order Detail', 'Khối chi tiết đơn hàng với trạng thái, khách hàng và các trường điều hành chính.', 'orders', {
+  dataSource: _tplSource('order_so_detail', 'GET', 'sales_order'),
+  layout: '2-column',
+  editable: true,
+  fields: [
+    { key:'so_number', label:{ vi:'Số SO', en:'SO Number' }, type:'text', span:'half' },
+    { key:'customer_name', label:{ vi:'Khách hàng', en:'Customer' }, type:'text', span:'half' },
+    { key:'status', label:{ vi:'Trạng thái', en:'Status' }, type:'badge', span:'third' },
+    { key:'order_date', label:{ vi:'Ngày đặt', en:'Order date' }, type:'date', span:'third' },
+    { key:'due_date', label:{ vi:'Hạn giao', en:'Due date' }, type:'date', span:'third' },
+    { key:'total_value', label:{ vi:'Tổng giá trị', en:'Total value' }, type:'currency', span:'half' },
+    { key:'priority', label:{ vi:'Ưu tiên', en:'Priority' }, type:'badge', span:'half' },
+    { key:'notes', label:{ vi:'Ghi chú', en:'Notes' }, type:'textarea', span:'full' }
+  ]
+});
+
 function getModuleState(moduleId){
   if(!_moduleStates[moduleId]){
     _moduleStates[moduleId] = {
@@ -6028,6 +6062,9 @@ function _chartRows(config, data){
   if(Array.isArray(data)) return data;
   if(data && Array.isArray(data[dataKey])) return data[dataKey];
   if(data && Array.isArray(data.items)) return data.items;
+  if(data && Array.isArray(data.rows)) return data.rows;
+  if(data && Array.isArray(data.machines)) return data.machines;
+  if(data && Array.isArray(data.assets)) return data.assets;
   if(config && Array.isArray(config.items)) return config.items;
   return [];
 }
@@ -7178,6 +7215,9 @@ function _runtimeRowsRef(blockData, config){
   if(Array.isArray(blockData)) return blockData;
   if(blockData && Array.isArray(blockData[dataKey])) return blockData[dataKey];
   if(blockData && Array.isArray(blockData.items)) return blockData.items;
+  if(blockData && Array.isArray(blockData.rows)) return blockData.rows;
+  if(blockData && Array.isArray(blockData.machines)) return blockData.machines;
+  if(blockData && Array.isArray(blockData.assets)) return blockData.assets;
   return [];
 }
 
@@ -7891,7 +7931,8 @@ function renderFormWizard(config, data, state, blockId, reactiveCtx){
       html += '<div class="hm-form-wizard-progressbar" aria-hidden="true"><span style="width:'+(((ws.step + 1) / steps.length) * 100).toFixed(2)+'%"></span></div>';
       html += '<ol class="hm-form-wizard-steps" role="list" aria-label="'+_esc(_t('Tiến độ biểu mẫu', 'Form progress'))+'">';
       steps.forEach(function(step, index){
-        var label = step.label && typeof step.label === 'object' ? _t(step.label.vi || step.label.en || ('Bước ' + (index + 1)), step.label.en || step.label.vi || ('Step ' + (index + 1))) : _t(step.label || ('Bước ' + (index + 1)), step.labelEn || step.label || ('Step ' + (index + 1)));
+        var stepTitle = step.label != null ? step.label : step.title;
+        var label = stepTitle && typeof stepTitle === 'object' ? _t(stepTitle.vi || stepTitle.en || ('Bước ' + (index + 1)), stepTitle.en || stepTitle.vi || ('Step ' + (index + 1))) : _t(stepTitle || ('Bước ' + (index + 1)), step.labelEn || step.titleEn || stepTitle || ('Step ' + (index + 1)));
         var status = index < ws.step ? 'done' : (index === ws.step ? 'active' : 'pending');
         html += '<li class="hm-form-wizard-step hm-form-wizard-step-'+status+'">';
         html += '<span class="hm-form-wizard-marker" aria-hidden="true">'+(index < ws.step ? '&#10003;' : String(index + 1))+'</span>';
@@ -7902,7 +7943,8 @@ function renderFormWizard(config, data, state, blockId, reactiveCtx){
     }
     (function(){
       var currentStep = steps[ws.step];
-      var currentLabel = currentStep.label && typeof currentStep.label === 'object' ? _t(currentStep.label.vi || currentStep.label.en || 'Bước hiện tại', currentStep.label.en || currentStep.label.vi || 'Current step') : _t(currentStep.label || 'Bước hiện tại', currentStep.labelEn || currentStep.label || 'Current step');
+      var currentTitle = currentStep.label != null ? currentStep.label : currentStep.title;
+      var currentLabel = currentTitle && typeof currentTitle === 'object' ? _t(currentTitle.vi || currentTitle.en || 'Bước hiện tại', currentTitle.en || currentTitle.vi || 'Current step') : _t(currentTitle || 'Bước hiện tại', currentStep.labelEn || currentStep.titleEn || currentTitle || 'Current step');
       var isSummary = _wizardIsSummaryStep(currentStep, config || {}, ws.step, steps.length);
       var currentFields = isSummary ? [] : _wizardStepFields(currentStep, allFields);
       html += '<div class="hm-form-wizard-panel">';
@@ -7965,11 +8007,12 @@ function renderFormModal(config, data, state, blockId, reactiveCtx){
     var titleId = _managedFieldId(blockId, 'modal_title');
     var titleText = modal.title && typeof modal.title === 'object' ? _t(modal.title.vi || 'Tạo bản ghi mới', modal.title.en || modal.title.vi || 'Create new record') : _t(modal.title || 'Tạo bản ghi mới', modal.titleEn || modal.title || 'Create new record');
     var html = '<div class="hm-form-modal-wrap" data-block-id="'+_esc(blockId || '')+'">';
-    html += '<button type="button" class="hm-btn hm-btn-'+_esc(trigger.style || 'primary')+'" data-action="hm-modal-open" data-block-id="'+_esc(blockId || '')+'" aria-label="'+_esc(triggerLabel)+'" aria-expanded="'+(modalState.open ? 'true' : 'false')+'" role="button">';
+    html += '<button type="button" class="hm-btn hm-btn-'+_esc(trigger.style || 'primary')+'" data-action="hm-modal-open" data-block-id="'+_esc(blockId || '')+'" aria-label="'+_esc(triggerLabel)+'" aria-expanded="'+(modalState.open ? 'true' : 'false')+'" aria-haspopup="dialog" role="button">';
     if(trigger.icon) html += '<span class="hm-btn-icon" aria-hidden="true">'+_esc(trigger.icon)+'</span>';
     html += _esc(triggerLabel) + '</button>';
     if(modalState.open){
-      html += '<div class="hm-form-modal-overlay'+(modal.closeOnOverlay === false ? ' is-locked' : '')+'"'+(modal.closeOnOverlay !== false ? ' data-action="hm-modal-close"' : '')+' data-block-id="'+_esc(blockId || '')+'" aria-hidden="true">';
+      html += '<div class="hm-form-modal-overlay'+(modal.closeOnOverlay === false ? ' is-locked' : '')+'">';
+      html += '<div class="hm-form-modal-backdrop"'+(modal.closeOnOverlay !== false ? ' data-action="hm-modal-close"' : '')+' data-block-id="'+_esc(blockId || '')+'"></div>';
       html += '<div class="hm-form-modal hm-form-modal-'+_esc(modal.size || 'md')+'" data-block-id="'+_esc(blockId || '')+'" role="dialog" aria-modal="true" aria-labelledby="'+_esc(titleId)+'">';
       html += '<div class="hm-form-modal-header"><h3 id="'+_esc(titleId)+'">'+_esc(titleText)+'</h3><button type="button" class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-modal-close" data-block-id="'+_esc(blockId || '')+'" aria-label="'+_esc(_t('Đóng hộp thoại', 'Close dialog'))+'" role="button">&times;</button></div>';
       html += '<form class="hm-form hm-form-modal-form" data-hm-form-block="'+_esc(blockId || '')+'" onsubmit="return false" novalidate aria-label="'+_esc(titleText)+'">';
@@ -7997,9 +8040,11 @@ function renderFormModal(config, data, state, blockId, reactiveCtx){
  */
 function renderMachineStatus(config, data, state, blockId){
   try {
-    var rows = _chartRows(data, config || {});
+    var rows = _chartRows(config || {}, data);
     var machine = _machineConfig(config || {});
     var html = '';
+    if(!rows.length && data && Array.isArray(data.machines)) rows = data.machines;
+    if(!rows.length && data && Array.isArray(data.assets)) rows = data.assets;
     if(!rows.length) return _chartEmpty(_t('Không có dữ liệu máy', 'No machine data'));
     html += '<div class="hm-machine-status-grid" data-block-id="'+_esc(blockId || '')+'" style="grid-template-columns:repeat('+Math.max(parseInt(machine.columns, 10) || 4, 1)+', minmax(0, 1fr))">';
     rows.forEach(function(row, index){
@@ -8720,11 +8765,17 @@ window.HmBlockEngine = {
   renderControlChart: renderControlChart,
   renderParetoChart: renderParetoChart,
   renderChecksheet: renderChecksheet,
+  renderKanban: renderKanban,
+  renderGantt: renderGantt,
+  renderRecordDetail: renderRecordDetail,
   renderToolbar: renderToolbar,
   renderStatusFlow: renderStatusFlow,
   renderCardGrid: renderCardGrid,
   renderTimeline: renderTimeline,
   renderFormStandard: renderFormStandard,
+  renderFormWizard: renderFormWizard,
+  renderFormModal: renderFormModal,
+  renderMachineStatus: renderMachineStatus,
   renderSectionHeader: renderSectionHeader,
   renderInfoBanner: renderInfoBanner,
 
