@@ -369,3 +369,264 @@ localStorage: hesem_module_{moduleId} → user customizations
   /* BỎ: overflow-x: auto */
 }
 ```
+
+---
+
+## 9. ĐÁNH GIÁ TOÀN DIỆN VÀ LỘ TRÌNH NÂNG CẤP WORLD-CLASS
+
+### 9.1 Tình trạng hiện tại (Audit 2026-04-03)
+
+**Tổng quan hệ thống:**
+- `00-block-engine.js`: 7,459 dòng — runtime render + expression engine + data table V3
+- `31-module-builder.js`: 5,621 dòng — builder UI (setup → build → preview)
+- `09f-form-builder-engine.js`: 1,218 dòng — form builder palette (26 blocks)
+- **Tổng: ~14,300 dòng JavaScript**
+
+**Scorecard:**
+
+| Hạng mục | Điểm | Ghi chú |
+|---|---|---|
+| Kiến trúc | 4/10 | Monolithic, no module separation |
+| Triển khai | 6/10 | 15/80+ blocks hoạt động, 65+ stubs |
+| Chất lượng code | 3/10 | String HTML, no types, 0 tests |
+| Hiệu suất | 5/10 | Không virtual scrolling, O(n) filters |
+| Accessibility | 3/10 | <30% WCAG compliant |
+| Bảo mật | 7/10 | Function whitelist, XSS protection |
+| Tài liệu | 2/10 | Không JSDoc, chỉ inline comments |
+| Testing | 0/10 | Không unit/E2E/accessibility tests |
+| UX Builder | 7/10 | Workflow rõ ràng, properties panel tốt |
+| Feature parity | 4/10 | Thiếu 50% blocks so với Retool |
+| **Tổng** | **4.1/10** | **MVP — chưa production-ready** |
+
+### 9.2 Benchmark với thế giới (2026)
+
+| Tính năng | Retool | Appsmith | ToolJet | Power Apps | HESEM |
+|---|---|---|---|---|---|
+| **Component count** | 100+ | 50+ | 50+ | 100+ | 80+ declared, **15 working** |
+| **AI generation** | Partial | ✗ | **Full** | **Full** | ✗ |
+| **Data binding** | 2-way reactive | 1-way | 2-way | Good | **1-way only** |
+| **Drag-drop nested** | Excellent | Good | Good | Good | **Basic (1 level)** |
+| **Virtual scrolling** | ✓ | ✓ | ✓ | ✓ | **Declared but unused** |
+| **Responsive preview** | ✓ | ✓ | ✓ | ✓ | ✗ |
+| **Template library** | 20+ | 10+ | 20+ | 100+ | **1 (M2-orders)** |
+| **Connector ecosystem** | 50+ | 20+ | 30+ | 500+ | **192 API actions** |
+| **WCAG 2.1 AA** | Partial | Partial | Partial | Good | **Minimal** |
+| **Git version control** | Limited | Full | Limited | Limited | ✗ |
+| **Custom JS transformers** | ✓ | ✓ | ✓ | ✓ | ✗ |
+| **Real-time collab** | ✓ | ✗ | ✗ | ✗ | ✗ |
+| **Mobile preview** | ✓ | ✓ | ✓ | ✓ | ✗ |
+| **Self-hosted** | Limited | Full | Full | ✗ | **Full** |
+
+### 9.3 Block implementation status
+
+**HOẠT ĐỘNG (15 blocks):**
+```
+kpi-row, data-table (V3), filter-bar, section-header, spacer,
+info-banner, chart-bar, chart-donut, action-toolbar, action-status-flow,
+data-cards, data-timeline, form-standard, two-column, card-container
+```
+
+**STUBS/PLACEHOLDER (65+ blocks):**
+```
+Critical missing:
+- quality-spc-chart, quality-control-chart (AS9100D §8.2.3 compliance)
+- data-kanban, data-gantt (workflow + scheduling)
+- chart-line, chart-area, chart-scatter (basic visualization)
+- form-wizard, form-modal (multi-step forms)
+- iot-live-trend (manufacturing monitoring)
+- mfg-machine-status, mfg-oee-trend (shop floor)
+
+All other 50+ domain blocks return generic placeholder:
+"Block đang dùng renderer mặc định..."
+```
+
+### 9.4 Top 50 component types chuẩn thế giới
+
+**Data Input (15):** text, number, select, multi-select, checkbox, radio, date, date-range, time, toggle, textarea, rich-text-editor, file-upload, autocomplete, rating
+
+**Data Display (12):** data-grid, cards, lists, kanban, calendar, timeline, gantt, gallery, badges, progress-bar, spinner, tooltip
+
+**Visualization (8):** bar-chart, line-chart, pie/donut, area-chart, scatter, heat-map, gauge, KPI-card
+
+**Navigation & Layout (10):** nav-bar, sidebar, tabs, breadcrumbs, pagination, modal, drawer, popover, accordion, stepper/wizard
+
+**Action (5):** button, button-group, link, FAB, command-palette
+
+### 9.5 Lộ trình nâng cấp — 5 Phase
+
+#### PHASE 1: Critical Blocks + Quality (2 tuần)
+
+**Mục tiêu:** Hoàn thiện 15 blocks thiếu quan trọng nhất
+
+```
+A. Charts (5 blocks):
+   chart-line    → Chart.js line renderer
+   chart-area    → Chart.js area renderer
+   chart-scatter → Chart.js scatter renderer
+   chart-radar   → Chart.js radar renderer
+   chart-combo   → Chart.js mixed chart
+
+B. Quality (4 blocks):
+   quality-spc-chart     → UCL/LCL/CL control lines + Western Electric rules
+   quality-control-chart → X-bar/R chart
+   quality-pareto        → Pareto bar + cumulative line
+   quality-checksheet    → Tally input grid
+
+C. Data views (3 blocks):
+   data-kanban  → Drag-drop columns (status-based)
+   data-gantt   → Timeline bar chart (date-based)
+   data-detail  → Record detail view (key-value pairs)
+
+D. Forms (2 blocks):
+   form-wizard → Multi-step with validation per step
+   form-modal  → In-place modal form
+
+E. Manufacturing (1 block):
+   mfg-machine-status → Machine state grid (running/idle/down)
+```
+
+#### PHASE 2: Kiến trúc refactor (4 tuần)
+
+```
+A. Tách file monolithic:
+   00-block-engine.js (7,459 dòng) →
+     ├── block-registry.js       (catalog + type definitions)
+     ├── expression-engine.js    (tokenizer + evaluator)
+     ├── data-table-v3.js        (advanced table renderer)
+     ├── chart-renderers.js      (all chart types)
+     ├── form-renderers.js       (form-standard, wizard, modal)
+     └── block-renderers/        (individual renderers)
+
+   31-module-builder.js (5,621 dòng) →
+     ├── builder-setup.js        (step 1: module config)
+     ├── builder-canvas.js       (step 2: block editing)
+     ├── builder-properties.js   (properties panel)
+     ├── builder-library.js      (block library sidebar)
+     └── builder-preview.js      (step 3: preview + publish)
+
+B. State management:
+   - Implement store pattern (action → reducer → state)
+   - Immutable state updates
+   - Time-travel debugging via undo/redo stack
+
+C. Replace string HTML → template renderer:
+   - Light template engine (no framework dependency)
+   - Auto-escaping by default
+   - Component-based rendering pattern
+```
+
+#### PHASE 3: Performance + Accessibility (3 tuần)
+
+```
+A. Virtual scrolling:
+   - Integrate virtual list for data-table >500 rows
+   - Lazy-load block renderers on demand
+   - Expression compilation (AST → bytecode cache)
+
+B. WCAG 2.1 AA compliance:
+   - Semantic HTML for ALL blocks (<button>, <label>, <input>)
+   - ARIA labels trên tất cả interactive elements
+   - Keyboard navigation (Tab, Arrow, Enter, Escape)
+   - Focus management + visible focus indicators
+   - Color contrast ≥4.5:1 cho text, ≥3:1 cho interactive
+   - prefers-reduced-motion support
+
+C. Mobile responsive:
+   - Responsive breakpoints: 320, 480, 768, 1024, 1280px
+   - Mobile preview pane trong builder
+   - Touch-friendly targets (min 44×44px)
+   - Responsive config per block: config.responsive.mobile.columns
+```
+
+#### PHASE 4: Advanced Features (4 tuần)
+
+```
+A. Two-way data binding:
+   - Form inputs sync back to data source
+   - Reactive computed properties
+   - Cross-block data sharing
+
+B. Template library (30+ presets):
+   Manufacturing: OEE dashboard, production schedule, shift report
+   Quality: SPC dashboard, NCR tracker, CAPA board, audit plan
+   Orders: SO pipeline, JO dispatch, shipment tracker
+   HR: Training matrix, competence dashboard
+   Reporting: KPI scorecard, COPQ analysis, supplier rating
+   Admin: User management, master data, system config
+
+C. Visual workflow designer:
+   - If-then-else logic blocks
+   - Approval chain builder
+   - Scheduled actions
+   - Event-driven triggers
+
+D. Real-time WebSocket layer:
+   - IoT device streaming
+   - Machine status live updates
+   - Dashboard auto-refresh
+```
+
+#### PHASE 5: AI + Enterprise (4 tuần)
+
+```
+A. AI-powered builder:
+   - Natural language → module generation
+   - "Tạo dashboard theo dõi OEE theo máy" → auto-generates blocks
+   - AI chart suggestion (data → best visualization)
+   - AI layout optimization
+
+B. Enterprise governance:
+   - Git-based version control for module schemas
+   - Multi-environment (dev → staging → production)
+   - Change approval workflow (submit → review → deploy)
+   - Audit log (who changed what, when)
+
+C. Component marketplace:
+   - Publish custom blocks
+   - Share between organizations
+   - Quality rating + usage metrics
+
+D. Testing infrastructure:
+   - Unit tests cho expression engine (Jest)
+   - E2E tests cho builder workflow (Playwright)
+   - Visual regression tests
+   - Accessibility automated tests (axe-core)
+   - Performance benchmark suite (10K rows, 150 blocks)
+```
+
+### 9.6 Quy tắc phát triển block mới
+
+```
+Khi thêm block type mới, PHẢI có:
+1. BLOCK_CATALOG entry (type, label, icon, category)
+2. Dedicated render function (không dùng generic placeholder)
+3. BLOCK_PROPERTIES_SCHEMA (General, Data, Events, Design tabs)
+4. BLOCK_TEMPLATES entry (ít nhất 1 preset config)
+5. Responsive config (mobile, tablet, desktop columns)
+6. ARIA attributes (role, aria-label, aria-describedby)
+7. Keyboard navigation support
+8. Print styles (@media print)
+9. Error handling (try-catch, fallback UI)
+10. JSDoc documentation
+
+KHÔNG ĐƯỢC:
+✗ Thêm block type rồi return placeholder
+✗ Dùng generic div cho interactive elements
+✗ Hardcode data/options (phải dùng API binding hoặc registry)
+✗ Skip accessibility attributes
+✗ Skip responsive breakpoints
+```
+
+### 9.7 Metric mục tiêu (Production-ready)
+
+| Metric | Hiện tại | Mục tiêu | Deadline |
+|---|---|---|---|
+| Working blocks | 15 | 50 | Phase 1 + 2 |
+| Template presets | 1 | 30 | Phase 4 |
+| WCAG compliance | 30% | 95% | Phase 3 |
+| Unit test coverage | 0% | 60% | Phase 5 |
+| Table 10K rows | Freeze 3-5s | <100ms | Phase 3 |
+| Module schema save | Network-bound | <500ms | Phase 2 |
+| Bundle size | ~380KB | <150KB | Phase 2 |
+| Accessibility score | N/A | 90+ (Lighthouse) | Phase 3 |
+| Time to create module | ~30 min | <5 min | Phase 4 (AI) |
