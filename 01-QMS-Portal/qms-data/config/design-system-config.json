@@ -1,0 +1,15 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "Admin-configurable design system defaults. Managed via Admin > Giao diện hệ thống."
+  },
+  "density": "default",
+  "colorMode": "light",
+  "radius": "rounded",
+  "motion": "normal",
+  "fontSize": 0,
+  "brandPrimary": "#1565c0",
+  "brandAccent": "#f9a825",
+  "sidebarBg": "#0c2d48",
+  "fontFamily": "-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif"
+}

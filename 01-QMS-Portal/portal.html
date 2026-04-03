@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-density="default" data-color-mode="light" data-radius="rounded" data-motion="normal">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>HESEM QMS Portal — Hệ thống Quản lý Chất lượng</title>
 <link rel="stylesheet" href="../assets/style_scoped.css">
 <link rel="stylesheet" href="./styles/hesem-design-tokens.css">
+<link rel="stylesheet" href="./styles/density-darkmode.css?v=20260403">
 <link rel="stylesheet" href="./styles/portal.main.css?v=20260401k">
 <link rel="stylesheet" href="./styles/deploy-dashboard.css">
 <link rel="stylesheet" href="./styles/online-forms.css">
@@ -326,6 +327,8 @@
 <!-- Modal root OUTSIDE all containers to avoid stacking context traps -->
 
 <script charset="UTF-8" src="./scripts/portal/00a-registry-service.js?v=20260402"></script>
+<script charset="UTF-8" src="./scripts/portal/00b-theme-manager.js?v=20260403"></script>
+<script>if(window.HmTheme) HmTheme.init();</script>
 <script charset="UTF-8" src="./scripts/portal/00-block-engine.js"></script>
 <script charset="UTF-8" src="./scripts/portal/01-module-router.js"></script>
 <script charset="UTF-8" src="./scripts/portal/01-data-config.js"></script>

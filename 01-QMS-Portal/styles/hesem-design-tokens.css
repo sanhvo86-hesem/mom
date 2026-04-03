@@ -1,10 +1,70 @@
 /* ============================================================================
-   HESEM QMS Design System — Design Tokens v1.0
+   HESEM QMS Design System — Design Tokens v2.0
    Core CSS variables governing ALL modules.
    Import this FIRST in portal.html before any other stylesheet.
+
+   ARCHITECTURE (Atlassian + SAP Fiori pattern):
+     <html data-density="default" data-color-mode="light" data-radius="rounded">
+     Density: compact | default | comfortable  (admin + user configurable)
+     Color:   light | dark                      (user configurable)
+     Radius:  sharp(2px) | rounded(6px) | pill(12px) (admin configurable)
+
+   Components ONLY use --hds-* control variables, NEVER hardcode sizes.
    ============================================================================ */
 
 :root {
+  /* ── DENSITY CONTROL TOKENS ────────────────────────────────────────────── */
+  /* These are SET by [data-density] selectors below, READ by all components */
+  --hds-control-h:        32px;
+  --hds-control-h-sm:     28px;
+  --hds-control-h-lg:     40px;
+  --hds-control-px:       10px;
+  --hds-control-px-sm:    8px;
+  --hds-control-px-lg:    14px;
+  --hds-control-font:     var(--text-sm);
+  --hds-control-font-sm:  var(--text-xs);
+  --hds-control-font-lg:  var(--text-base);
+  --hds-control-gap:      6px;
+  --hds-control-radius:   var(--radius-md);
+  --hds-icon-sm:          14px;
+  --hds-icon-md:          16px;
+  --hds-icon-lg:          20px;
+
+  /* Table density */
+  --hds-table-row-h:      40px;
+  --hds-table-cell-px:    12px;
+  --hds-table-cell-py:    8px;
+  --hds-table-head-font:  var(--text-xs);
+  --hds-table-body-font:  var(--text-sm);
+
+  /* Card density */
+  --hds-card-pad:         var(--space-4);
+  --hds-card-radius:      var(--radius-lg);
+
+  /* Badge density */
+  --hds-badge-px:         8px;
+  --hds-badge-py:         2px;
+  --hds-badge-font:       var(--text-xs);
+
+  /* Tab density */
+  --hds-tab-px:           var(--space-4);
+  --hds-tab-py:           var(--space-2);
+  --hds-tab-font:         var(--text-sm);
+
+  /* KPI density */
+  --hds-kpi-value-font:   var(--text-2xl);
+  --hds-kpi-label-font:   var(--text-xs);
+  --hds-kpi-pad:          var(--space-4);
+
+  /* Filter bar density */
+  --hds-filter-pad:       var(--space-3) var(--space-4);
+  --hds-filter-gap:       var(--space-3);
+
+  /* Section header */
+  --hds-section-font:     var(--text-md);
+  --hds-section-weight:   var(--font-semibold);
+  --hds-section-mb:       var(--space-4);
+
   /* ── BRAND ─────────────────────────────────────────────────────────────── */
   --brand:          #0c2d48;
   --brand-2:        #1565c0;

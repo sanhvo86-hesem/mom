@@ -1,0 +1,136 @@
+/* ============================================================================
+   HESEM QMS Design System — Density Presets + Dark Mode + Component Rewire
+   Loaded AFTER hesem-design-tokens.css
+   Architecture: data-density / data-color-mode / data-radius on <html>
+   ============================================================================ */
+
+/* ── COMPACT: Data-heavy screens, power users ────────────────────────────── */
+[data-density="compact"] {
+  --hds-control-h: 28px; --hds-control-h-sm: 24px; --hds-control-h-lg: 34px;
+  --hds-control-px: 8px; --hds-control-px-sm: 6px; --hds-control-px-lg: 10px;
+  --hds-control-font: var(--text-xs); --hds-control-font-sm: 10px; --hds-control-font-lg: var(--text-sm);
+  --hds-control-gap: 4px; --hds-icon-sm: 12px; --hds-icon-md: 14px; --hds-icon-lg: 16px;
+  --hds-table-row-h: 32px; --hds-table-cell-px: 8px; --hds-table-cell-py: 4px;
+  --hds-table-head-font: 10px; --hds-table-body-font: var(--text-xs);
+  --hds-card-pad: var(--space-3); --hds-card-radius: var(--radius-md);
+  --hds-badge-px: 6px; --hds-badge-py: 1px; --hds-badge-font: 10px;
+  --hds-tab-px: var(--space-3); --hds-tab-py: 6px; --hds-tab-font: var(--text-xs);
+  --hds-kpi-value-font: var(--text-xl); --hds-kpi-label-font: 10px; --hds-kpi-pad: var(--space-3);
+  --hds-filter-pad: 6px var(--space-3); --hds-filter-gap: 6px;
+  --hds-section-font: var(--text-sm); --hds-section-mb: var(--space-3);
+}
+
+/* ── DEFAULT: Balanced — already set in :root of hesem-design-tokens.css ── */
+
+/* ── COMFORTABLE: Form entry, mobile, touch targets ──────────────────────── */
+[data-density="comfortable"] {
+  --hds-control-h: 40px; --hds-control-h-sm: 34px; --hds-control-h-lg: 48px;
+  --hds-control-px: 14px; --hds-control-px-sm: 10px; --hds-control-px-lg: 18px;
+  --hds-control-font: var(--text-base); --hds-control-font-sm: var(--text-sm); --hds-control-font-lg: var(--text-md);
+  --hds-control-gap: 8px; --hds-icon-sm: 16px; --hds-icon-md: 20px; --hds-icon-lg: 24px;
+  --hds-table-row-h: 48px; --hds-table-cell-px: 16px; --hds-table-cell-py: 12px;
+  --hds-table-head-font: var(--text-xs); --hds-table-body-font: var(--text-base);
+  --hds-card-pad: var(--space-5); --hds-card-radius: var(--radius-xl);
+  --hds-badge-px: 10px; --hds-badge-py: 3px; --hds-badge-font: var(--text-xs);
+  --hds-tab-px: var(--space-5); --hds-tab-py: var(--space-3); --hds-tab-font: var(--text-base);
+  --hds-kpi-value-font: var(--text-3xl); --hds-kpi-label-font: var(--text-xs); --hds-kpi-pad: var(--space-5);
+  --hds-filter-pad: var(--space-3) var(--space-5); --hds-filter-gap: var(--space-3);
+  --hds-section-font: var(--text-lg); --hds-section-mb: var(--space-5);
+}
+
+/* ── RADIUS PRESETS ──────────────────────────────────────────────────────── */
+[data-radius="sharp"]   { --radius-sm:2px; --radius-md:2px; --radius-lg:4px; --radius-xl:6px; --radius-2xl:8px; --hds-control-radius:2px; --hds-card-radius:4px; }
+[data-radius="pill"]    { --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:20px; --radius-2xl:24px; --hds-control-radius:12px; --hds-card-radius:16px; }
+
+/* ============================================================================
+   DARK MODE — data-color-mode="dark" on <html>
+   ============================================================================ */
+[data-color-mode="dark"] {
+  --gray-50:#0f172a; --gray-100:#1e293b; --gray-200:#334155; --gray-300:#475569;
+  --gray-400:#64748b; --gray-500:#94a3b8; --gray-600:#cbd5e1; --gray-700:#e2e8f0;
+  --gray-800:#f1f5f9; --gray-900:#f8fafc;
+  --bg-page:#0f172a; --bg-surface:#1e293b; --bg-surface-alt:#162032;
+  --bg-sidebar:#0a1628; --bg-header:#1e293b; --bg-modal:#1e293b;
+  --bg-overlay:rgba(0,0,0,0.6); --bg-hover:#263348; --bg-selected:rgba(37,99,235,0.15);
+  --text-primary:#f1f5f9; --text-secondary:#94a3b8; --text-tertiary:#64748b;
+  --text-inverse:#0f172a; --text-link:#60a5fa;
+  --border:#334155; --border-focus:#60a5fa;
+  --brand-2:#3b82f6; --brand-light:#60a5fa;
+  --green:#22c55e; --green-bg:rgba(34,197,94,0.15);
+  --red:#f87171; --red-bg:rgba(248,113,113,0.15);
+  --amber:#fbbf24; --amber-bg:rgba(251,191,36,0.15);
+  --blue:#60a5fa; --blue-bg:rgba(96,165,250,0.15);
+  --purple:#a78bfa; --purple-bg:rgba(167,139,250,0.15);
+  --cyan:#22d3ee; --cyan-bg:rgba(34,211,238,0.15);
+  --shadow-xs:0 1px 2px rgba(0,0,0,0.2); --shadow-sm:0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md:0 4px 6px rgba(0,0,0,0.3); --shadow-lg:0 10px 15px rgba(0,0,0,0.3);
+  --shadow-xl:0 20px 25px rgba(0,0,0,0.4);
+  color-scheme: dark;
+}
+
+/* Auto dark — follows OS preference */
+@media (prefers-color-scheme: dark) {
+  [data-color-mode="auto"] {
+    --gray-50:#0f172a; --gray-100:#1e293b; --gray-200:#334155; --gray-300:#475569;
+    --gray-400:#64748b; --gray-500:#94a3b8; --gray-600:#cbd5e1; --gray-700:#e2e8f0;
+    --gray-800:#f1f5f9; --gray-900:#f8fafc;
+    --bg-page:#0f172a; --bg-surface:#1e293b; --bg-surface-alt:#162032;
+    --bg-sidebar:#0a1628; --bg-header:#1e293b; --bg-modal:#1e293b;
+    --bg-overlay:rgba(0,0,0,0.6); --bg-hover:#263348; --bg-selected:rgba(37,99,235,0.15);
+    --text-primary:#f1f5f9; --text-secondary:#94a3b8; --text-tertiary:#64748b;
+    --text-inverse:#0f172a; --text-link:#60a5fa;
+    --border:#334155; --border-focus:#60a5fa;
+    --brand-2:#3b82f6; --brand-light:#60a5fa;
+    --green:#22c55e; --green-bg:rgba(34,197,94,0.15);
+    --red:#f87171; --red-bg:rgba(248,113,113,0.15);
+    --amber:#fbbf24; --amber-bg:rgba(251,191,36,0.15);
+    --blue:#60a5fa; --blue-bg:rgba(96,165,250,0.15);
+    --purple:#a78bfa; --purple-bg:rgba(167,139,250,0.15);
+    --cyan:#22d3ee; --cyan-bg:rgba(34,211,238,0.15);
+    --shadow-xs:0 1px 2px rgba(0,0,0,0.2); --shadow-sm:0 1px 3px rgba(0,0,0,0.3);
+    --shadow-md:0 4px 6px rgba(0,0,0,0.3); --shadow-lg:0 10px 15px rgba(0,0,0,0.3);
+    --shadow-xl:0 20px 25px rgba(0,0,0,0.4);
+    color-scheme: dark;
+  }
+}
+
+/* ============================================================================
+   COMPONENT REWIRE — Use --hds-* density tokens
+   These override the hardcoded sizes in hesem-design-tokens.css
+   ============================================================================ */
+.hm-btn        { height: var(--hds-control-h); padding: 0 var(--hds-control-px); font-size: var(--hds-control-font); gap: var(--hds-control-gap); border-radius: var(--hds-control-radius); }
+.hm-btn-sm     { height: var(--hds-control-h-sm); padding: 0 var(--hds-control-px-sm); font-size: var(--hds-control-font-sm); }
+.hm-btn-lg     { height: var(--hds-control-h-lg); padding: 0 var(--hds-control-px-lg); font-size: var(--hds-control-font-lg); }
+
+.hm-input,
+.hm-select     { height: var(--hds-control-h); padding: 0 var(--hds-control-px); font-size: var(--hds-control-font); border-radius: var(--hds-control-radius); }
+.hm-input-lg   { height: var(--hds-control-h-lg); padding: 0 var(--hds-control-px-lg); font-size: var(--hds-control-font-lg); }
+
+.hm-card       { padding: var(--hds-card-pad); border-radius: var(--hds-card-radius); }
+.hm-badge      { padding: var(--hds-badge-py) var(--hds-badge-px); font-size: var(--hds-badge-font); }
+.hm-tab        { padding: var(--hds-tab-py) var(--hds-tab-px); font-size: var(--hds-tab-font); }
+
+.hm-table th   { padding: var(--hds-table-cell-py) var(--hds-table-cell-px); font-size: var(--hds-table-head-font); }
+.hm-table td   { padding: var(--hds-table-cell-py) var(--hds-table-cell-px); }
+.hm-table      { font-size: var(--hds-table-body-font); }
+
+.hm-kpi-card   { padding: var(--hds-kpi-pad); }
+.hm-kpi-value  { font-size: var(--hds-kpi-value-font); }
+.hm-kpi-label  { font-size: var(--hds-kpi-label-font); }
+
+.hm-filter-bar { padding: var(--hds-filter-pad); gap: var(--hds-filter-gap); }
+
+/* ── Reduced motion preference ──────────────────────────────────────────── */
+[data-motion="reduced"] *,
+[data-motion="reduced"] *::before,
+[data-motion="reduced"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+[data-motion="off"] *,
+[data-motion="off"] *::before,
+[data-motion="off"] *::after {
+  animation: none !important;
+  transition: none !important;
+}
