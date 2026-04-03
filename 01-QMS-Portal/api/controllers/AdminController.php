@@ -507,4 +507,52 @@ class AdminController extends BaseController
             $this->error('mfa_settings_save_failed', 500, $e->getMessage());
         }
     }
+
+    /**
+     * GET admin_design_config — Load design system configuration.
+     */
+    public function getDesignConfig(): never
+    {
+        $this->requireAuth();
+        try {
+            $file = $this->dataDir . '/config/design-system-config.json';
+            $data = $this->readJsonFile($file) ?? [];
+            $this->success(['config' => $data, 'data' => $data]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('design_config_load_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST admin_design_config_save — Save design system configuration.
+     */
+    public function saveDesignConfig(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAnyRole($user, array_merge(admin_roles(), ['it_admin', 'ceo']));
+
+        $body = $this->jsonBody();
+        $config = $body['config'] ?? null;
+        if (!is_array($config) && !is_object($config)) {
+            $this->error('invalid_config', 400, 'Config must be an object');
+        }
+
+        try {
+            $file = $this->dataDir . '/config/design-system-config.json';
+            $config['_meta'] = [
+                'version' => '2.0',
+                'description' => 'Admin-configurable design system.',
+                'updatedAt' => date('c'),
+                'updatedBy' => $user['username'] ?? 'admin',
+            ];
+            $this->writeJsonFile($file, (array)$config);
+            $this->auditLog('design_config_save', ['keys' => count((array)$config)], (string)($user['username'] ?? ''));
+            $this->success(['saved' => true]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('design_config_save_failed', 500, $e->getMessage());
+        }
+    }
 }

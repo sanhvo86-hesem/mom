@@ -3976,12 +3976,22 @@ let adminDataSourceState = {
   dirty:false
 };
 
-function showToast(msg, duration=2500){
-  const t=document.createElement('div');
+function showToast(msg, type, duration){
+  duration = duration || 3000;
+  var colorMap = {
+    success: {bg:'#16a34a', icon:'✅'},
+    error: {bg:'#dc2626', icon:'❌'},
+    warning: {bg:'#d97706', icon:'⚠️'},
+    info: {bg:'#2563eb', icon:'ℹ️'}
+  };
+  var style = colorMap[type] || colorMap.info;
+  var t=document.createElement('div');
   t.className='toast';
-  t.textContent=msg;
+  t.style.cssText='position:fixed;bottom:24px;right:24px;z-index:1500;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;color:#fff;background:'+style.bg+';box-shadow:0 8px 24px rgba(0,0,0,0.2);opacity:0;transform:translateY(12px);transition:all .3s ease;max-width:420px;display:flex;align-items:center;gap:8px';
+  t.innerHTML=style.icon+' '+String(msg||'');
   document.body.appendChild(t);
-  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300);},duration);
+  requestAnimationFrame(function(){requestAnimationFrame(function(){t.style.opacity='1';t.style.transform='translateY(0)';});});
+  setTimeout(function(){t.style.opacity='0';t.style.transform='translateY(12px)';setTimeout(function(){t.remove();},350);},duration);
 }
 
 function closeGitSyncModal(){

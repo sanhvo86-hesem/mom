@@ -571,6 +571,8 @@ $router->actions([
     'registry_iot_connectors'    => [RegistryController::class, 'getIotConnectors'],
     'registry_full'              => [RegistryController::class, 'getFull'],
     'registry_update'            => [RegistryController::class, 'updateRegistry'],
+    'admin_design_config'        => [AdminController::class, 'getDesignConfig'],
+    'admin_design_config_save'   => [AdminController::class, 'saveDesignConfig'],
 ]);
 
 // Registry-backed generic CRUD
