@@ -61,6 +61,10 @@ function _deleteByPath(obj, path){
   if(ctx && parts.length) delete ctx[parts[parts.length - 1]];
 }
 
+var _legacySaveModule;
+var _legacyOpenSavedModule;
+var _legacyDeleteSavedModule;
+
 var ICONS = ['📦','📋','🏭','🔴','🚚','💰','📊','⚙','🔍','📱','🎯','💡','🔒','🤖','⚡','📝','🌐','🔗','🔄','📈'];
 
 /* ── State ────────────────────────────────────────────────────────────────── */
@@ -77,6 +81,7 @@ var state = {
   savedModules: [],      // List of user-created modules
   propsTab: 'general',
   propsDraft: null,
+  propsSectionCollapsed: {},
   libraryMode: 'blocks',
   fieldSearch: {},
   fieldFilter: {},
@@ -95,6 +100,11 @@ var state = {
     dataFields: {},
     dataFieldsText: '',
     dataFieldsLoading: {},
+    dataFieldsIndex: null,
+    dataFieldParts: {},
+    dataFieldsIndexLoading: null,
+    dataFieldPartTexts: {},
+    dataFieldPartLoading: {},
     computedFormulas: {},
     iotConnectors: {},
     validationRules: {},
@@ -1602,13 +1612,24 @@ function _normalizeSchemaBlocks(){
   });
 }
 
-function _renderPropSection(section, draft){
+function _renderPropSection(section, draft, context){
+  var info = context || {};
+  var fields = section.fields || [];
+  var sectionKey = _propSectionStateKey(info.blockType || (draft && draft.type) || '', info.tabKey || '', section, info.index || 0);
+  var isCollapsed = !!state.propsSectionCollapsed[sectionKey];
   var h = '';
-  h += '<section class="hm-card hm-card-flat" style="margin-bottom:var(--space-3);padding:var(--space-3)">';
-  h += '<div style="margin-bottom:var(--space-3)"><div style="font-weight:var(--font-semibold)">'+_esc(_t(section.label,section.labelEn||section.label))+'</div></div>';
-  (section.fields||[]).forEach(function(field){
-    h += _renderPropField(field, field.path, _getByPath(draft, field.path));
-  });
+  h += '<section class="mb-prop-section'+(isCollapsed ? ' is-collapsed' : '')+'" data-prop-section="'+_esc(sectionKey)+'">';
+  h += '<div class="mb-prop-section-head">';
+  h += '<div class="mb-prop-section-meta"><div class="mb-prop-section-title">'+_esc(_t(section.label,section.labelEn||section.label))+'</div><div class="mb-prop-section-count">'+fields.length+' '+_esc(_t('trường', 'fields'))+'</div></div>';
+  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm mb-icon-btn" data-action="toggle-prop-section" data-section-key="'+_esc(sectionKey)+'" aria-expanded="'+(isCollapsed ? 'false' : 'true')+'" title="'+_esc(isCollapsed ? _t('Mở section', 'Expand section') : _t('Thu gọn section', 'Collapse section'))+'"><span class="mb-icon-glyph">'+(isCollapsed ? '▸' : '▾')+'</span></button>';
+  h += '</div>';
+  if(!isCollapsed){
+    h += '<div class="mb-prop-section-body">';
+    fields.forEach(function(field){
+      h += _renderPropField(field, field.path, _getByPath(draft, field.path));
+    });
+    h += '</div>';
+  }
   h += '</section>';
   return h;
 }
@@ -1993,27 +2014,129 @@ function _loadRegistry(file, key){
   });
 }
 
-function _loadDataFieldsRegistry(){
-  return _fetchJsonWithFallback(_registryPaths('data-fields'), 0).then(function(data){
-    var parts = Array.isArray(data && data.parts) ? data.parts : (data && data._meta && Array.isArray(data._meta.parts) ? data._meta.parts : []);
+function _loadDataFieldsRegistryIndex(){
+  if(state.registries.dataFieldsIndex) return Promise.resolve(state.registries.dataFieldsIndex);
+  if(state.registries.dataFieldsIndexLoading) return state.registries.dataFieldsIndexLoading;
+  state.registries.dataFieldsIndexLoading = _fetchJsonWithFallback(_registryPaths('data-fields-index'), 0).catch(function(){
+    return _fetchJsonWithFallback(_registryPaths('data-fields'), 0);
+  }).then(function(data){
+    state.registries.dataFieldsIndex = data || {};
+    state.registries.dataFieldsIndexLoading = null;
+    return state.registries.dataFieldsIndex;
+  }, function(err){
+    state.registries.dataFieldsIndexLoading = null;
+    throw err;
+  });
+  return state.registries.dataFieldsIndexLoading;
+}
+
+function _candidateDataFieldDomains(api, candidates){
+  var values = [api].concat(candidates || []);
+  var domains = [];
+  values.forEach(function(value){
+    var key = String(value == null ? '' : value).split('.')[0];
+    if(key && domains.indexOf(key) < 0) domains.push(key);
+  });
+  return domains;
+}
+
+function _dataFieldPartFilesForApi(api, candidates, indexData){
+  var parts = Array.isArray(indexData && indexData.parts) ? indexData.parts : (indexData && indexData._meta && Array.isArray(indexData._meta.parts) ? indexData._meta.parts : []);
+  var domains = _candidateDataFieldDomains(api, candidates);
+  var preferred = [];
+  var fallback = [];
+  parts.forEach(function(part){
+    var file = String((part && part.file) || '').replace(/\.json$/i, '');
+    var partDomains = Array.isArray(part && part.domains) ? part.domains : [];
+    var matches = domains.some(function(domain){ return partDomains.indexOf(domain) >= 0; });
+    if(!file) return;
+    if(matches) preferred.push(file);
+    else fallback.push(file);
+  });
+  return preferred.concat(fallback).filter(function(file, index, items){
+    return items.indexOf(file) === index;
+  });
+}
+
+function _extractDataFieldsPayload(text, candidates){
+  var payload = {};
+  var i;
+  var candidate;
+  var jsonSlice;
+  var parsed;
+  for(i = 0; i < (candidates || []).length; i++){
+    candidate = candidates[i];
+    if(Array.isArray(state.registries.dataFields[candidate])){
+      payload[candidate] = _cacheRegistryFieldList(candidate, state.registries.dataFields[candidate]);
+      continue;
+    }
+    if(!text) continue;
+    jsonSlice = _extractNamedJsonArray(text, candidate);
+    if(!jsonSlice) continue;
+    try {
+      parsed = JSON.parse(jsonSlice);
+    } catch(err){
+      parsed = [];
+    }
+    if(Array.isArray(parsed)){
+      payload[candidate] = _cacheRegistryFieldList(candidate, parsed);
+    }
+  }
+  return payload;
+}
+
+function _loadDataFieldsPartText(file){
+  if(!file) return Promise.resolve('');
+  if(typeof state.registries.dataFieldPartTexts[file] === 'string'){
+    return Promise.resolve(state.registries.dataFieldPartTexts[file]);
+  }
+  if(state.registries.dataFieldPartLoading[file]){
+    return state.registries.dataFieldPartLoading[file];
+  }
+  state.registries.dataFieldPartLoading[file] = _loadRegistryText(file).catch(function(){
+    return '';
+  }).then(function(text){
+    state.registries.dataFieldPartTexts[file] = text || '';
+    delete state.registries.dataFieldPartLoading[file];
+    return state.registries.dataFieldPartTexts[file];
+  }, function(err){
+    delete state.registries.dataFieldPartLoading[file];
+    throw err;
+  });
+  return state.registries.dataFieldPartLoading[file];
+}
+
+function _loadDataFieldsPart(file, candidates){
+  var cachedPayload = _extractDataFieldsPayload('', candidates);
+  if(!file) return Promise.resolve({});
+  if(Object.keys(cachedPayload).length) return Promise.resolve(cachedPayload);
+  return _loadDataFieldsPartText(file).then(function(text){
+    if(!text) return {};
+    return _extractDataFieldsPayload(text, candidates);
+  });
+}
+
+function _loadDataFieldsRegistry(api, candidates){
+  return _loadDataFieldsRegistryIndex().then(function(indexData){
+    var files = _dataFieldPartFilesForApi(api, candidates, indexData);
+    var parts = Array.isArray(indexData && indexData.parts) ? indexData.parts : (indexData && indexData._meta && Array.isArray(indexData._meta.parts) ? indexData._meta.parts : []);
     if(!parts.length){
-      state.registries.dataFields = data || {};
+      state.registries.dataFields = indexData || {};
       return state.registries.dataFields;
     }
-    return Promise.all(parts.map(function(part){
-      var file = String((part && part.file) || '').replace(/\.json$/i, '');
-      if(!file) return Promise.resolve({});
-      return _fetchJsonWithFallback(_registryPaths(file), 0).catch(function(){ return {}; });
-    })).then(function(payloads){
-      var merged = data || {};
-      payloads.forEach(function(payload){
-        Object.keys(payload || {}).forEach(function(key){
-          if(key === '_meta') return;
-          merged[key] = payload[key];
+    return files.reduce(function(chain, file){
+      return chain.then(function(found){
+        var hasMatch = false;
+        if(found) return found;
+        return _loadDataFieldsPart(file, candidates).then(function(payload){
+          (candidates || []).forEach(function(candidate){
+            if(Array.isArray(payload[candidate])) hasMatch = true;
+          });
+          return hasMatch ? payload : null;
         });
       });
-      state.registries.dataFields = merged;
-      return merged;
+    }, Promise.resolve(null)).then(function(foundPayload){
+      return foundPayload || {};
     });
   });
 }
@@ -2078,6 +2201,31 @@ function _humanizeKey(key){
   return String(key == null ? '' : key).replace(/[_\-]+/g, ' ').replace(/\s+/g, ' ').replace(/\b([a-z])/g, function(all, ch){
     return ch.toUpperCase();
   }).trim();
+}
+
+function _safeUiKey(value){
+  return String(value == null ? '' : value).replace(/[^A-Za-z0-9_\-:.]/g, '_');
+}
+
+function _propSectionStateKey(blockType, tabKey, section, index){
+  var sectionKey = section && (section.key || section.id || section.labelEn || section.label || ('section_' + index));
+  return [blockType || 'block', tabKey || 'general', _safeUiKey(sectionKey), index == null ? 0 : index].join('::');
+}
+
+function _isPropSectionCollapsed(blockType, tabKey, section, index){
+  return !!state.propsSectionCollapsed[_propSectionStateKey(blockType, tabKey, section, index)];
+}
+
+function _setPropSectionCollapsed(blockType, tabKey, section, index, collapsed){
+  state.propsSectionCollapsed[_propSectionStateKey(blockType, tabKey, section, index)] = !!collapsed;
+}
+
+function _areAllPropSectionsCollapsed(blockType, tabKey, sections){
+  var items = sections || [];
+  if(!items.length) return false;
+  return items.every(function(section, index){
+    return _isPropSectionCollapsed(blockType, tabKey, section, index);
+  });
 }
 
 function _highlightRegistryMatch(text, query){
@@ -2203,7 +2351,6 @@ function _ensureDataFieldsForApi(api, force){
   var candidates;
   var loadingKey;
   var promise;
-  var HR = window.HmRegistry;
   if(!api) return Promise.resolve([]);
   candidates = _dataFieldKeyCandidates(api);
   candidates.forEach(function(candidate){
@@ -2218,14 +2365,7 @@ function _ensureDataFieldsForApi(api, force){
   if(state.registries.dataFieldsLoading[loadingKey] && !force) return state.registries.dataFieldsLoading[loadingKey];
   state.registries.loading = true;
   state.registries.loadingMessage = _t('Đang nạp trường dữ liệu cho API: ', 'Loading field metadata for API: ') + api;
-  promise = ((HR && typeof HR.preload === 'function')
-    ? new Promise(function(resolve){
-        HR.preload('data-fields', function(data){
-          state.registries.dataFields = data || {};
-          resolve(state.registries.dataFields);
-        });
-      })
-    : _loadDataFieldsRegistry()).then(function(dataMap){
+  promise = _loadDataFieldsRegistry(api, candidates).then(function(dataMap){
     var parsed = [];
     var i;
     dataMap = dataMap || {};
@@ -3327,6 +3467,7 @@ function _ensureBuilderState(){
   if(state.showTree === undefined) state.showTree = true;
   if(state.showShortcuts === undefined) state.showShortcuts = false;
   if(!state.treeCollapsed) state.treeCollapsed = {};
+  if(!state.propsSectionCollapsed) state.propsSectionCollapsed = {};
   if(state.insertParent === undefined) state.insertParent = null;
   if(!state.insertSlot) state.insertSlot = 'default';
   if(state.insertPosition === undefined) state.insertPosition = null;
@@ -3341,6 +3482,11 @@ function _ensureBuilderState(){
   if(!state.pendingApiSelection) state.pendingApiSelection = {};
   if(state.pendingApiSelectionSeq == null) state.pendingApiSelectionSeq = 0;
   if(!state.registries.dataFieldsLoading) state.registries.dataFieldsLoading = {};
+  if(state.registries.dataFieldsIndex === undefined) state.registries.dataFieldsIndex = null;
+  if(state.registries.dataFieldsIndexLoading === undefined) state.registries.dataFieldsIndexLoading = null;
+  if(!state.registries.dataFieldParts) state.registries.dataFieldParts = {};
+  if(!state.registries.dataFieldPartTexts) state.registries.dataFieldPartTexts = {};
+  if(!state.registries.dataFieldPartLoading) state.registries.dataFieldPartLoading = {};
   if(state.registries.loadingMessage === undefined) state.registries.loadingMessage = '';
 }
 
@@ -3358,7 +3504,7 @@ function _ensureBuilderStyles(){
   css += '.mb-rail-panel{display:flex;flex-direction:column;overflow:hidden}';
   css += '.mb-panel-header{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px;background:linear-gradient(180deg,rgba(255,255,255,0.98),rgba(37,99,235,0.05));backdrop-filter:blur(10px)}';
   css += '.mb-panel-body{padding:14px 16px;overflow:auto;flex:1;min-height:0}';
-  css += '.mb-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);background:rgba(248,250,252,0.9);backdrop-filter:blur(10px)}';
+  css += '.mb-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);background:rgba(248,250,252,0.9);backdrop-filter:blur(10px)}';
   css += '.mb-toolbar-group{display:flex;gap:8px;align-items:center;flex-wrap:wrap}';
   css += '.mb-toolbar-spacer{flex:1 1 auto}';
   css += '.mb-canvas-stage{padding:18px;min-height:520px;background:radial-gradient(circle at top left,rgba(37,99,235,0.08),rgba(255,255,255,0) 34%),linear-gradient(180deg,rgba(37,99,235,0.04),rgba(255,255,255,0));overflow:auto;position:relative}';
@@ -3400,7 +3546,7 @@ function _ensureBuilderStyles(){
   css += '.mb-tree-type{display:block;font-size:11px;color:var(--text-tertiary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}';
   css += '.mb-tree-tools{display:flex;gap:2px}';
   css += '.mb-tab-strip{display:flex;gap:8px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--border)}';
-  css += '.mb-tab-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:999px;padding:8px 12px;background:#fff;cursor:pointer;font-weight:600;font-size:13px}';
+  css += '.mb-tab-pill{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--border);border-radius:999px;padding:8px 12px;background:#fff;cursor:pointer;font-weight:600;font-size:13px;line-height:1}';
   css += '.mb-tab-pill.is-active{background:var(--brand-2);border-color:var(--brand-2);color:#fff}';
   css += '.mb-shortcuts{position:fixed;right:28px;top:110px;width:300px;max-width:calc(100vw - 32px);background:#0f172a;color:#fff;border-radius:18px;box-shadow:var(--shadow-xl);padding:16px;z-index:1400}';
   css += '.mb-shortcuts h4{margin:0 0 10px;font-size:14px}';
@@ -3442,6 +3588,18 @@ function _ensureBuilderStyles(){
   css += '.mb-choice-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--border);border-radius:14px;background:#fff}';
   css += '.mb-choice-card strong{display:block;font-size:14px;color:var(--text-primary)}';
   css += '.mb-kbd-chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--border);padding:4px 8px;border-radius:999px;background:#fff;font-size:12px;color:var(--text-secondary)}';
+  css += '.mb-main-panel>.mb-tab-strip{gap:6px;padding:8px 16px 2px;border-bottom:0}';
+  css += '.mb-main-panel>.mb-toolbar{padding:0 16px 6px;background:#fff;border-bottom:1px solid var(--border)}';
+  css += '.mb-main-panel>.mb-toolbar .mb-toolbar-group{gap:6px}';
+  css += '.mb-main-panel>.mb-toolbar .mb-toolbar-group--layout-meta{gap:10px}';
+  css += '.mb-main-panel>.mb-toolbar .mb-toolbar-group--view{margin-left:auto}';
+  css += '.mb-main-panel>.mb-tab-strip .mb-tab-pill{min-height:36px;padding:0 14px;border-radius:999px}';
+  css += '.mb-main-panel>.mb-toolbar .hm-btn.hm-btn-sm{height:36px;min-height:36px;padding:0 12px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:12px;line-height:1;white-space:nowrap}';
+  css += '.mb-main-panel>.mb-toolbar .mb-layout-chip{height:36px;padding:0 10px;border-radius:14px;gap:8px;font-size:12px}';
+  css += '.mb-main-panel>.mb-toolbar .mb-layout-inline-select{height:26px;min-height:26px;min-width:46px;padding:0 20px 0 4px;border:0;background:transparent;box-shadow:none;font-size:13px;font-weight:600;color:var(--text-primary)}';
+  css += '.mb-main-panel>.mb-toolbar .mb-layout-inline-select:focus{outline:none;box-shadow:none}';
+  css += '.mb-main-panel>.mb-toolbar .mb-layout-inline-select option{color:#0f172a;background:#fff}';
+  css += '.mb-main-panel>.mb-toolbar .mb-toolbar-spacer{min-width:6px}';
   css += '@keyframes mb-spin{to{transform:rotate(360deg)}}';
   css += '@media (max-width: 1360px){.mb-builder-shell{flex-direction:column}.mb-side-panel,.mb-right-rail{width:auto}.mb-field-filter-row{grid-template-columns:1fr}}';
   style.textContent = css;
@@ -4371,20 +4529,20 @@ _renderBuilder = function(){
   h += '</div>';
   if(activeTab){
     _ensureTabLayout(activeTab);
-    h += '<div class="mb-toolbar">';
-    h += '<div class="mb-toolbar-group">';
-    h += '<button class="hm-btn '+(activeTab.layout.type === 'stack' ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm" data-action="set-tab-layout" data-layout="stack">⬇ '+_t('Stack', 'Stack')+'</button>';
-    h += '<button class="hm-btn '+(activeTab.layout.type === 'grid' ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm" data-action="set-tab-layout" data-layout="grid">⊞ '+_t('Grid', 'Grid')+'</button>';
-    h += '<button class="hm-btn '+(activeTab.layout.type === 'flex' ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm" data-action="set-tab-layout" data-layout="flex">↔ '+_t('Flex', 'Flex')+'</button>';
+    h += '<div class="mb-toolbar mb-canvas-toolbar">';
+    h += '<div class="mb-toolbar-group mb-toolbar-group--layout">';
+    h += '<button class="hm-btn '+(activeTab.layout.type === 'stack' ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm mb-toolbar-toggle" data-action="set-tab-layout" data-layout="stack">⬇ '+_t('Stack', 'Stack')+'</button>';
+    h += '<button class="hm-btn '+(activeTab.layout.type === 'grid' ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm mb-toolbar-toggle" data-action="set-tab-layout" data-layout="grid">⊞ '+_t('Grid', 'Grid')+'</button>';
+    h += '<button class="hm-btn '+(activeTab.layout.type === 'flex' ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm mb-toolbar-toggle" data-action="set-tab-layout" data-layout="flex">↔ '+_t('Flex', 'Flex')+'</button>';
     h += '</div>';
-    h += '<div class="mb-toolbar-group">';
-    h += '<span class="mb-kbd-chip">'+_t('Cột', 'Columns')+': <select class="hm-input hm-select" id="mb-layout-columns" style="height:30px;padding:2px 8px;min-width:68px"><option value="1"'+(String(activeTab.layout.columns) === '1' ? ' selected' : '')+'>1</option><option value="2"'+(String(activeTab.layout.columns) === '2' ? ' selected' : '')+'>2</option><option value="3"'+(String(activeTab.layout.columns) === '3' ? ' selected' : '')+'>3</option><option value="4"'+(String(activeTab.layout.columns) === '4' ? ' selected' : '')+'>4</option><option value="5"'+(String(activeTab.layout.columns) === '5' ? ' selected' : '')+'>5</option><option value="6"'+(String(activeTab.layout.columns) === '6' ? ' selected' : '')+'>6</option></select></span>';
-    h += '<span class="mb-kbd-chip">'+_t('Gap', 'Gap')+': <select class="hm-input hm-select" id="mb-layout-gap" style="height:30px;padding:2px 8px;min-width:84px"><option value="8px"'+(activeTab.layout.gap === '8px' ? ' selected' : '')+'>8px</option><option value="12px"'+(activeTab.layout.gap === '12px' ? ' selected' : '')+'>12px</option><option value="16px"'+(activeTab.layout.gap === '16px' ? ' selected' : '')+'>16px</option><option value="24px"'+(activeTab.layout.gap === '24px' ? ' selected' : '')+'>24px</option></select></span>';
+    h += '<div class="mb-toolbar-group mb-toolbar-group--layout-meta">';
+    h += '<span class="mb-kbd-chip mb-layout-chip">'+_t('Cột', 'Columns')+': <select class="hm-input hm-select mb-layout-inline-select" id="mb-layout-columns"><option value="1"'+(String(activeTab.layout.columns) === '1' ? ' selected' : '')+'>1</option><option value="2"'+(String(activeTab.layout.columns) === '2' ? ' selected' : '')+'>2</option><option value="3"'+(String(activeTab.layout.columns) === '3' ? ' selected' : '')+'>3</option><option value="4"'+(String(activeTab.layout.columns) === '4' ? ' selected' : '')+'>4</option><option value="5"'+(String(activeTab.layout.columns) === '5' ? ' selected' : '')+'>5</option><option value="6"'+(String(activeTab.layout.columns) === '6' ? ' selected' : '')+'>6</option></select></span>';
+    h += '<span class="mb-kbd-chip mb-layout-chip">'+_t('Gap', 'Gap')+': <select class="hm-input hm-select mb-layout-inline-select" id="mb-layout-gap"><option value="8px"'+(activeTab.layout.gap === '8px' ? ' selected' : '')+'>8px</option><option value="12px"'+(activeTab.layout.gap === '12px' ? ' selected' : '')+'>12px</option><option value="16px"'+(activeTab.layout.gap === '16px' ? ' selected' : '')+'>16px</option><option value="24px"'+(activeTab.layout.gap === '24px' ? ' selected' : '')+'>24px</option></select></span>';
     h += '</div>';
     h += '<div class="mb-toolbar-spacer"></div>';
-    h += '<div class="mb-toolbar-group">';
-    h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="toggle-tree">🌳 '+_t('Tree', 'Tree')+'</button>';
-    h += '<button class="hm-btn '+(state.showLibrary ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm" data-action="open-library" data-tab="'+_esc(activeTab.tabId)+'" data-parent="" data-slot="default">📚 '+_t('Library', 'Library')+'</button>';
+    h += '<div class="mb-toolbar-group mb-toolbar-group--view">';
+    h += '<button class="hm-btn hm-btn-ghost hm-btn-sm mb-toolbar-toggle" data-action="toggle-tree">🌳 '+_t('Tree', 'Tree')+'</button>';
+    h += '<button class="hm-btn '+(state.showLibrary ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm mb-toolbar-toggle" data-action="open-library" data-tab="'+_esc(activeTab.tabId)+'" data-parent="" data-slot="default">📚 '+_t('Library', 'Library')+'</button>';
     h += '</div></div>';
     if(relationSuggestions.length || configuredLinks.length){
       h += '<div class="mb-link-banner">';
