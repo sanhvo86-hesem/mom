@@ -365,6 +365,35 @@
 [data-color-mode="dark"] .qf-header { background: #1e293b; border-color: #334155; }
 [data-color-mode="dark"] .qf-status-bar { background: #1e293b; border-color: #334155; }
 
+/* ── 09d-upload-verify.js inline CSS (.uv2-* classes) ── */
+[data-color-mode="dark"] .uv2-card { background: #1e293b; border-color: #334155; box-shadow: 0 10px 24px rgba(0,0,0,0.3); }
+[data-color-mode="dark"] .uv2-row { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .uv2-row:hover { border-color: #60a5fa; }
+[data-color-mode="dark"] .uv2-row.active { background: rgba(96,165,250,0.1); border-color: #3b82f6; }
+[data-color-mode="dark"] .uv2-dropzone { background: #162032; border-color: #475569; }
+[data-color-mode="dark"] .uv2-dropzone strong { color: #f1f5f9; }
+[data-color-mode="dark"] .uv2-dropzone p { color: #94a3b8; }
+[data-color-mode="dark"] .uv2-dropzone.drag, [data-color-mode="dark"] .uv2-dropzone:focus { background: rgba(96,165,250,0.08); border-color: #3b82f6; }
+[data-color-mode="dark"] .uv2-file { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .uv2-file-name { color: #f1f5f9; }
+[data-color-mode="dark"] .uv2-file-meta { color: #94a3b8; }
+[data-color-mode="dark"] .uv2-cell { background: #162032; border-color: #334155; }
+[data-color-mode="dark"] .uv2-cell small { color: #94a3b8; }
+[data-color-mode="dark"] .uv2-cell strong { color: #f1f5f9; }
+[data-color-mode="dark"] .uv2-btn.secondary { background: #263348; color: #e2e8f0; }
+[data-color-mode="dark"] .uv2-btn.ghost { background: #1e293b; border-color: #475569; color: #e2e8f0; }
+[data-color-mode="dark"] .uv2-empty { background: #162032; border-color: #475569; color: #94a3b8; }
+[data-color-mode="dark"] .uv2-empty strong { color: #f1f5f9; }
+[data-color-mode="dark"] .uv2-badge.pending { background: rgba(148,163,184,0.15); color: #94a3b8; }
+[data-color-mode="dark"] .uv2-badge.pass { background: rgba(34,197,94,0.15); color: #22c55e; }
+[data-color-mode="dark"] .uv2-badge.fail { background: rgba(248,113,113,0.15); color: #f87171; }
+[data-color-mode="dark"] .uv2-badge.warn { background: rgba(251,191,36,0.15); color: #fbbf24; }
+
+/* ── 09-online-forms.js inline rendered sections ── */
+[data-color-mode="dark"] .ec-work-empty { color: #94a3b8; }
+[data-color-mode="dark"] .ec-work-card { background: #1e293b; border-color: #334155; }
+[data-color-mode="dark"] .ec-work-card:hover { border-color: #60a5fa; }
+
 /* ── Generic catch-all: any element using inline background:white or #fff ── */
 [data-color-mode="dark"] [style*="background:#fff"],
 [data-color-mode="dark"] [style*="background: #fff"],
