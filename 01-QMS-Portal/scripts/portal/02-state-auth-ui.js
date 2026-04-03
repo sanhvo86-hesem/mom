@@ -5212,6 +5212,7 @@ function renderAdmin(){
       <button class="admin-tab-v2 ${adminTab==='manual_runtime'?'active':''}" onclick="adminTab='manual_runtime';renderAdmin()">🧾 ${lang==='en'?'Manual runtime':'Nhập tay vận hành'}</button>
       <button class="admin-tab-v2 ${adminTab==='data_sources'?'active':''}" onclick="adminTab='data_sources';renderAdmin()">🗄 ${lang==='en'?'Data sources':'Nguồn dữ liệu'}</button>
       <button class="admin-tab-v2 ${adminTab==='mfa'?'active':''}" onclick="adminTab='mfa';renderAdmin()">🔑 ${lang==='en'?'MFA Security':'Bảo mật MFA'}</button>
+      <button class="admin-tab-v2 ${adminTab==='appearance'?'active':''}" onclick="adminTab='appearance';renderAdmin()">🎨 ${lang==='en'?'Appearance':'Giao diện'}</button>
     </div>
     <div class="admin-panel" id="admin-content"></div>`;
   if(adminTab==='version_control' && !gitRepoStatusState.loaded && !gitRepoStatusState.loading && !gitRepoStatusState.error){
@@ -5233,6 +5234,139 @@ function renderAdmin(){
   }
   if(adminTab==='retention') renderAdminRetention();
   if(adminTab==='mfa') renderAdminMfa();
+  if(adminTab==='appearance') renderAdminAppearance();
+}
+
+/* ── Admin: Appearance Settings ──────────────────────────────────────────── */
+function renderAdminAppearance(){
+  const el=document.getElementById('admin-content');
+  if(!el) return;
+  const T=k=>(lang==='en'?{
+    title:'System Appearance',desc:'Configure density, color mode, border radius, and motion for the entire portal.',
+    density:'Display Density',density_desc:'Controls button height, padding, table row size, and overall spacing.',
+    compact:'Compact',default:'Default',comfortable:'Comfortable',
+    color:'Color Mode',color_desc:'Light, dark, or follow your operating system preference.',
+    light:'Light',dark:'Dark',auto:'Auto (OS)',
+    radius:'Border Radius',radius_desc:'Shape style for buttons, inputs, cards, and panels.',
+    sharp:'Sharp',rounded:'Rounded',pill:'Pill',
+    motion:'Motion & Animation',motion_desc:'Controls transition speed and animation throughout the portal.',
+    normal:'Normal',reduced:'Reduced',off:'Off',
+    brand:'Brand Colors',brand_desc:'Primary accent, sidebar, and highlight colors.',
+    primary:'Primary Color',accent_c:'Accent Color',sidebar_c:'Sidebar Color',
+    save_org:'Save for Organization',reset:'Reset to Defaults',saved:'Settings saved',reset_done:'Reset to defaults',
+    preview:'Live preview — changes apply instantly'
+  }:{
+    title:'Giao diện hệ thống',desc:'Cấu hình mật độ, chế độ màu, bo góc và chuyển động cho toàn bộ portal.',
+    density:'Mật độ hiển thị',density_desc:'Điều chỉnh chiều cao nút, khoảng cách, cỡ bảng và khoảng trống tổng thể.',
+    compact:'Gọn',default:'Mặc định',comfortable:'Thoải mái',
+    color:'Chế độ màu',color_desc:'Sáng, tối, hoặc tự động theo hệ điều hành.',
+    light:'Sáng',dark:'Tối',auto:'Tự động (OS)',
+    radius:'Bo góc',radius_desc:'Kiểu dáng bo góc cho nút, ô nhập, thẻ và panel.',
+    sharp:'Sắc nét',rounded:'Bo tròn',pill:'Viên thuốc',
+    motion:'Chuyển động & Hoạt ảnh',motion_desc:'Điều chỉnh tốc độ chuyển cảnh và hoạt ảnh trong portal.',
+    normal:'Bình thường',reduced:'Giảm',off:'Tắt',
+    brand:'Màu thương hiệu',brand_desc:'Màu chủ đạo, thanh bên và màu nhấn.',
+    primary:'Màu chính',accent_c:'Màu nhấn',sidebar_c:'Màu thanh bên',
+    save_org:'Lưu cho tổ chức',reset:'Đặt lại mặc định',saved:'Đã lưu cài đặt',reset_done:'Đã đặt lại mặc định',
+    preview:'Xem trước trực tiếp — thay đổi áp dụng ngay lập tức'
+  })[k]||k;
+
+  const cur=window.HmTheme?HmTheme.getAll():{density:'default',colorMode:'light',radius:'rounded',motion:'normal'};
+  const adminCfg=window.HmTheme?HmTheme.getAdminConfig():{};
+
+  function radio(name,value,label,icon){
+    const checked=cur[name]===value?'checked':'';
+    return `<label style="display:flex;align-items:center;gap:8px;padding:10px 16px;border:2px solid ${checked?'var(--brand-2)':'var(--border)'};border-radius:var(--radius-lg);cursor:pointer;transition:all .15s;background:${checked?'var(--bg-selected)':'var(--bg-surface)'};flex:1;min-width:120px" onmouseover="this.style.borderColor='var(--brand-light)'" onmouseout="this.style.borderColor=${checked}?'var(--brand-2)':'var(--border)'">`
+      +`<input type="radio" name="adm_${name}" value="${value}" ${checked} onchange="HmTheme.set('${name}','${value}');renderAdminAppearance()" style="accent-color:var(--brand-2);width:16px;height:16px">`
+      +`<span style="font-size:1.2em">${icon}</span>`
+      +`<span style="font-weight:var(--font-semibold);font-size:var(--text-sm)">${label}</span>`
+      +`</label>`;
+  }
+
+  function section(title,desc,content){
+    return `<div style="margin-bottom:24px;padding:20px;border:1px solid var(--border);border-radius:var(--radius-xl);background:var(--bg-surface)">
+      <div style="margin-bottom:12px"><strong style="font-size:var(--text-md);color:var(--text-primary)">${title}</strong>
+      <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-top:4px">${desc}</div></div>
+      ${content}</div>`;
+  }
+
+  function colorInput(name,label,value){
+    return `<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+      <input type="color" value="${value||'#1565c0'}" id="adm_color_${name}" onchange="document.getElementById('adm_hex_${name}').value=this.value" style="width:40px;height:32px;border:1px solid var(--border);border-radius:var(--radius-md);cursor:pointer;padding:2px">
+      <input type="text" value="${value||'#1565c0'}" id="adm_hex_${name}" onchange="document.getElementById('adm_color_${name}').value=this.value" style="width:100px;height:32px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-md);font-family:var(--font-mono);font-size:var(--text-sm)">
+      <span style="font-size:var(--text-sm);color:var(--text-secondary)">${label}</span>
+    </div>`;
+  }
+
+  let h=`<div style="max-width:800px;margin:0 auto">`;
+  h+=`<div style="margin-bottom:20px"><h3 style="margin:0;font-size:var(--text-xl);font-weight:var(--font-bold);color:var(--text-primary)">🎨 ${T('title')}</h3>`;
+  h+=`<p style="margin:4px 0 0;color:var(--text-secondary);font-size:var(--text-sm)">${T('desc')}</p>`;
+  h+=`<div style="margin-top:8px;padding:6px 12px;background:var(--blue-bg);border:1px solid var(--blue);border-radius:var(--radius-md);font-size:var(--text-xs);color:var(--blue)">💡 ${T('preview')}</div></div>`;
+
+  // Density
+  h+=section(T('density'),T('density_desc'),
+    `<div style="display:flex;gap:8px;flex-wrap:wrap">`
+    +radio('density','compact',T('compact'),'📐')
+    +radio('density','default',T('default'),'⚖️')
+    +radio('density','comfortable',T('comfortable'),'🖐️')
+    +`</div>`
+  );
+
+  // Color Mode
+  h+=section(T('color'),T('color_desc'),
+    `<div style="display:flex;gap:8px;flex-wrap:wrap">`
+    +radio('colorMode','light',T('light'),'☀️')
+    +radio('colorMode','dark',T('dark'),'🌙')
+    +radio('colorMode','auto',T('auto'),'💻')
+    +`</div>`
+  );
+
+  // Border Radius
+  h+=section(T('radius'),T('radius_desc'),
+    `<div style="display:flex;gap:8px;flex-wrap:wrap">`
+    +radio('radius','sharp',T('sharp'),'◻️')
+    +radio('radius','rounded',T('rounded'),'◼️')
+    +radio('radius','pill',T('pill'),'💊')
+    +`</div>`
+  );
+
+  // Motion
+  h+=section(T('motion'),T('motion_desc'),
+    `<div style="display:flex;gap:8px;flex-wrap:wrap">`
+    +radio('motion','normal',T('normal'),'✨')
+    +radio('motion','reduced',T('reduced'),'🐢')
+    +radio('motion','off',T('off'),'⏹️')
+    +`</div>`
+  );
+
+  // Brand Colors
+  h+=section(T('brand'),T('brand_desc'),
+    colorInput('primary',T('primary'),adminCfg.brandPrimary||'#1565c0')
+    +colorInput('accent',T('accent_c'),adminCfg.brandAccent||'#f9a825')
+    +colorInput('sidebar',T('sidebar_c'),adminCfg.sidebarBg||'#0c2d48')
+  );
+
+  // Actions
+  h+=`<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">`;
+  h+=`<button class="hm-btn hm-btn-primary" onclick="(function(){
+    var cfg={
+      density:document.querySelector('input[name=adm_density]:checked').value,
+      colorMode:document.querySelector('input[name=adm_colorMode]:checked').value,
+      radius:document.querySelector('input[name=adm_radius]:checked').value,
+      motion:document.querySelector('input[name=adm_motion]:checked').value,
+      brandPrimary:document.getElementById('adm_hex_primary').value,
+      brandAccent:document.getElementById('adm_hex_accent').value,
+      sidebarBg:document.getElementById('adm_hex_sidebar').value
+    };
+    if(window.HmTheme) HmTheme.saveAdminConfig(cfg,function(ok){
+      if(typeof showToast==='function') showToast('${T('saved')}','success');
+    });
+  })()">${T('save_org')}</button>`;
+  h+=`<button class="hm-btn hm-btn-secondary" onclick="if(window.HmTheme){HmTheme.reset();renderAdminAppearance();if(typeof showToast==='function')showToast('${T('reset_done')}','info')}">${T('reset')}</button>`;
+  h+=`</div>`;
+
+  h+=`</div>`;
+  el.innerHTML=h;
 }
 
 function renderAdminMfa(){
