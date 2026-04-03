@@ -100,21 +100,33 @@ function esc(v){ var d=document.createElement('div'); d.appendChild(document.cre
 function cfg(path){ return window.HmTheme ? (HmTheme.getDeep(path) || '') : ''; }
 function cfgNum(path, def){ var v=cfg(path); return v!==''&&v!==undefined ? Number(v) : def; }
 
+/**
+ * _hmSet: Apply CSS variable instantly AND persist to localStorage.
+ * This is the CORE function — every control must call this, not setVar alone.
+ */
+window._hmSet = function(cssVar, path, value){
+  HmTheme.setVar(cssVar, value);          /* instant CSS update */
+  HmTheme.setDeep(path, value);           /* persist to localStorage */
+};
+
 /* ── Helper: slider + number input ──────────────────────────────────────── */
 function slider(label, cssVar, path, min, max, def, unit, step){
   var val = cfgNum(path, def);
   step = step || 1;
+  var u = unit || 'px';
   var sid = 'adm_s_'+path.replace(/\./g,'_');
   var nid = 'adm_n_'+path.replace(/\./g,'_');
+  /* For unitless values like opacity, ratio — don't append unit */
+  var suffix = (u === '' || u === 'em') ? "'+'" + u + "'" : "'+'" + u + "'";
   return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
     +'<span style="min-width:140px;font-size:12px;color:var(--text-secondary)">'+esc(label)+'</span>'
     +'<input type="range" id="'+sid+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'"'
-    +' oninput="document.getElementById(\''+nid+'\').value=this.value;HmTheme.setVar(\''+cssVar+'\',this.value+\''+(unit||'px')+'\')"'
+    +' oninput="document.getElementById(\''+nid+'\').value=this.value;_hmSet(\''+cssVar+'\',\''+path+'\',this.value)"'
     +' style="flex:1;accent-color:var(--brand-2)">'
     +'<input type="number" id="'+nid+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'"'
-    +' oninput="document.getElementById(\''+sid+'\').value=this.value;HmTheme.setVar(\''+cssVar+'\',this.value+\''+(unit||'px')+'\')"'
+    +' oninput="document.getElementById(\''+sid+'\').value=this.value;_hmSet(\''+cssVar+'\',\''+path+'\',this.value)"'
     +' style="width:64px;height:28px;text-align:center;border:1px solid var(--border);border-radius:var(--radius-md);font-size:12px;font-family:var(--font-mono)">'
-    +'<span style="font-size:11px;color:var(--text-tertiary);min-width:24px">'+(unit||'px')+'</span>'
+    +'<span style="font-size:11px;color:var(--text-tertiary);min-width:24px">'+u+'</span>'
     +'</div>';
 }
 
@@ -125,10 +137,10 @@ function colorPick(label, cssVar, path, def){
   var hid = 'adm_hp_'+path.replace(/\./g,'_');
   return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
     +'<input type="color" id="'+cid+'" value="'+esc(val)+'"'
-    +' oninput="document.getElementById(\''+hid+'\').value=this.value;HmTheme.setVar(\''+cssVar+'\',this.value)"'
+    +' oninput="document.getElementById(\''+hid+'\').value=this.value;_hmSet(\''+cssVar+'\',\''+path+'\',this.value)"'
     +' style="width:32px;height:28px;border:1px solid var(--border);border-radius:4px;cursor:pointer;padding:1px">'
     +'<input type="text" id="'+hid+'" value="'+esc(val)+'"'
-    +' oninput="document.getElementById(\''+cid+'\').value=this.value;HmTheme.setVar(\''+cssVar+'\',this.value)"'
+    +' oninput="document.getElementById(\''+cid+'\').value=this.value;_hmSet(\''+cssVar+'\',\''+path+'\',this.value)"'
     +' style="width:80px;height:28px;padding:0 6px;border:1px solid var(--border);border-radius:4px;font-family:var(--font-mono);font-size:11px">'
     +'<span style="font-size:11px;color:var(--text-secondary)">'+esc(label)+'</span>'
     +'</div>';
@@ -140,7 +152,7 @@ function textInput(label, cssVar, path, def, placeholder){
   return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
     +'<span style="min-width:140px;font-size:12px;color:var(--text-secondary)">'+esc(label)+'</span>'
     +'<input type="text" value="'+esc(val)+'"'
-    +' oninput="HmTheme.setVar(\''+cssVar+'\',this.value)"'
+    +' oninput="_hmSet(\''+cssVar+'\',\''+path+'\',this.value)"'
     +' placeholder="'+(placeholder||'')+'"'
     +' style="flex:1;height:28px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:12px">'
     +'</div>';
@@ -182,7 +194,7 @@ function fontSelect(label, cssVar, path, def, isMono){
   var h = '<div style="margin-bottom:10px">';
   h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">';
   h += '<span style="min-width:140px;font-size:12px;color:var(--text-secondary)">'+esc(label)+'</span>';
-  h += '<select id="'+sid+'" onchange="var v=this.value;if(v===\'__custom__\'){document.getElementById(\''+tid+'\').style.display=\'block\';}else{document.getElementById(\''+tid+'\').style.display=\'none\';HmTheme.setVar(\''+cssVar+'\',v);}" style="flex:1;height:32px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:12px;background:var(--bg-surface)">';
+  h += '<select id="'+sid+'" onchange="var v=this.value;if(v===\'__custom__\'){document.getElementById(\''+tid+'\').style.display=\'block\';}else{document.getElementById(\''+tid+'\').style.display=\'none\';_hmSet(\''+cssVar+'\',\''+path+'\',v);}" style="flex:1;height:32px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:12px;background:var(--bg-surface)">';
   var matched = false;
   options.forEach(function(o){
     var selected = val === o.value ? 'selected' : '';
@@ -191,7 +203,7 @@ function fontSelect(label, cssVar, path, def, isMono){
   });
   h += '<option value="__custom__" '+(matched?'':'selected')+'>--- Tùy chỉnh / Custom ---</option>';
   h += '</select></div>';
-  h += '<input type="text" id="'+tid+'" value="'+esc(val)+'" oninput="HmTheme.setVar(\''+cssVar+'\',this.value)" placeholder="Nhập font stack tùy ý..." style="display:'+(matched?'none':'block')+';width:100%;height:28px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:11px;font-family:var(--font-mono);margin-top:4px;margin-left:150px">';
+  h += '<input type="text" id="'+tid+'" value="'+esc(val)+'" oninput="_hmSet(\''+cssVar+'\',\''+path+'\',this.value)" placeholder="Nhập font stack tùy ý..." style="display:'+(matched?'none':'block')+';width:100%;height:28px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:11px;font-family:var(--font-mono);margin-top:4px;margin-left:150px">';
   h += '</div>';
   return h;
 }
@@ -405,7 +417,7 @@ function renderTypography(){
       {value:'none',label:T('none')},
       {value:'uppercase',label:T('uppercase')},
       {value:'capitalize',label:T('capitalize')}
-    ], cfg('typography.label.transform')||'uppercase', "HmTheme.setVar('--label-transform',this.value)")
+    ], cfg('typography.label.transform')||'uppercase', "_hmSet('--label-transform','typography.label.transform',this.value)")
   , false);
 
   return h;
