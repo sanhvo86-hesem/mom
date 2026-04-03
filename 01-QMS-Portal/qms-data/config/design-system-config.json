@@ -11,11 +11,11 @@
   "fontSize": 0,
 
   "typography": {
-    "display": { "family": "Inter", "weight": 700 },
-    "heading": { "family": "Inter", "weight": 600 },
-    "body": { "family": "Inter", "weight": 400 },
-    "label": { "family": "Inter", "weight": 600, "spacing": "0.05em", "transform": "uppercase" },
-    "mono": { "family": "JetBrains Mono" }
+    "display": { "family": "-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif", "weight": 700 },
+    "heading": { "family": "-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif", "weight": 600 },
+    "body": { "family": "-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif", "weight": 400 },
+    "label": { "family": "-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif", "weight": 600, "spacing": "0.05em", "transform": "uppercase" },
+    "mono": { "family": "'JetBrains Mono', 'Fira Code', monospace" }
   },
 
   "fontScale": {

@@ -146,6 +146,56 @@ function textInput(label, cssVar, path, def, placeholder){
     +'</div>';
 }
 
+/* Font select: dropdown of popular fonts + preview, with custom option */
+var FONT_OPTIONS = [
+  {value:"-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif", label:'System Default'},
+  {value:"'Inter', -apple-system, 'Segoe UI', sans-serif", label:'Inter'},
+  {value:"'Roboto', -apple-system, 'Segoe UI', sans-serif", label:'Roboto'},
+  {value:"'Noto Sans', -apple-system, 'Segoe UI', sans-serif", label:'Noto Sans'},
+  {value:"'DM Sans', -apple-system, sans-serif", label:'DM Sans'},
+  {value:"'Poppins', -apple-system, sans-serif", label:'Poppins'},
+  {value:"'Montserrat', -apple-system, sans-serif", label:'Montserrat'},
+  {value:"'Open Sans', -apple-system, sans-serif", label:'Open Sans'},
+  {value:"'Lato', -apple-system, sans-serif", label:'Lato'},
+  {value:"'Source Sans 3', -apple-system, sans-serif", label:'Source Sans 3'},
+  {value:"'IBM Plex Sans', -apple-system, sans-serif", label:'IBM Plex Sans'},
+  {value:"'Nunito Sans', -apple-system, sans-serif", label:'Nunito Sans'},
+  {value:"Georgia, 'Times New Roman', serif", label:'Georgia (Serif)'},
+  {value:"'Merriweather', Georgia, serif", label:'Merriweather (Serif)'}
+];
+var MONO_OPTIONS = [
+  {value:"'JetBrains Mono', 'Fira Code', monospace", label:'JetBrains Mono'},
+  {value:"'Fira Code', 'SF Mono', monospace", label:'Fira Code'},
+  {value:"'SF Mono', Consolas, monospace", label:'SF Mono'},
+  {value:"'Cascadia Code', Consolas, monospace", label:'Cascadia Code'},
+  {value:"Consolas, 'Courier New', monospace", label:'Consolas'},
+  {value:"'Source Code Pro', monospace", label:'Source Code Pro'},
+  {value:"'IBM Plex Mono', monospace", label:'IBM Plex Mono'}
+];
+
+function fontSelect(label, cssVar, path, def, isMono){
+  var val = cfg(path) || def || '';
+  var options = isMono ? MONO_OPTIONS : FONT_OPTIONS;
+  var sid = 'adm_fs_'+path.replace(/\./g,'_');
+  var tid = 'adm_ft_'+path.replace(/\./g,'_');
+
+  var h = '<div style="margin-bottom:10px">';
+  h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">';
+  h += '<span style="min-width:140px;font-size:12px;color:var(--text-secondary)">'+esc(label)+'</span>';
+  h += '<select id="'+sid+'" onchange="var v=this.value;if(v===\'__custom__\'){document.getElementById(\''+tid+'\').style.display=\'block\';}else{document.getElementById(\''+tid+'\').style.display=\'none\';HmTheme.setVar(\''+cssVar+'\',v);}" style="flex:1;height:32px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:12px;background:var(--bg-surface)">';
+  var matched = false;
+  options.forEach(function(o){
+    var selected = val === o.value ? 'selected' : '';
+    if(selected) matched = true;
+    h += '<option value="'+esc(o.value)+'" '+selected+' style="font-family:'+o.value+'">'+esc(o.label)+'</option>';
+  });
+  h += '<option value="__custom__" '+(matched?'':'selected')+'>--- Tùy chỉnh / Custom ---</option>';
+  h += '</select></div>';
+  h += '<input type="text" id="'+tid+'" value="'+esc(val)+'" oninput="HmTheme.setVar(\''+cssVar+'\',this.value)" placeholder="Nhập font stack tùy ý..." style="display:'+(matched?'none':'block')+';width:100%;height:28px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:11px;font-family:var(--font-mono);margin-top:4px;margin-left:150px">';
+  h += '</div>';
+  return h;
+}
+
 /* ── Helper: radio group ────────────────────────────────────────────────── */
 function radioRow(name, options, current, onChange){
   var h = '<div style="display:flex;gap:6px;flex-wrap:wrap">';
@@ -320,15 +370,15 @@ function renderTypography(){
   var h = '';
 
   h += sect('📝 '+T('fontFamily'),
-    textInput(T('display'), '--font-display', 'typography.display.family', 'Inter', 'Inter, Roboto, Poppins...')
+    fontSelect(T('display'), '--font-display', 'typography.display.family', "-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif")
     + slider(T('display')+' '+T('fontWeight'), '--font-display-weight', 'typography.display.weight', 100, 900, 700, '', 100)
-    + textInput(T('heading'), '--font-heading', 'typography.heading.family', 'Inter')
+    + fontSelect(T('heading'), '--font-heading', 'typography.heading.family', "-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif")
     + slider(T('heading')+' '+T('fontWeight'), '--font-heading-weight', 'typography.heading.weight', 100, 900, 600, '', 100)
-    + textInput(T('body'), '--font-body', 'typography.body.family', 'Inter')
+    + fontSelect(T('body'), '--font-body', 'typography.body.family', "-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif")
     + slider(T('body')+' '+T('fontWeight'), '--font-body-weight', 'typography.body.weight', 100, 900, 400, '', 100)
-    + textInput(T('label'), '--font-label', 'typography.label.family', 'Inter')
+    + fontSelect(T('label'), '--font-label', 'typography.label.family', "-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif")
     + slider(T('label')+' '+T('fontWeight'), '--font-label-weight', 'typography.label.weight', 100, 900, 600, '', 100)
-    + textInput(T('mono'), '--font-mono', 'typography.mono.family', 'JetBrains Mono')
+    + fontSelect(T('mono'), '--font-mono', 'typography.mono.family', "'JetBrains Mono', 'Fira Code', monospace", true)
   , true);
 
   h += sect('📏 '+T('fontSize'),
