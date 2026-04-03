@@ -102,6 +102,7 @@ var state = {
     dataFields: {},
     dataFieldsText: '',
     dataFieldsLoading: {},
+    dataFieldsRenderQueued: {},
     dataFieldsIndex: null,
     dataFieldParts: {},
     dataFieldsIndexLoading: null,
@@ -2410,6 +2411,24 @@ function _ensureDataFieldsForApi(api, force){
   return promise;
 }
 
+function _queueRegistryFieldLoad(api){
+  var loadingKey;
+  if(!api) return;
+  loadingKey = _dataFieldKeyCandidates(api).join('|');
+  if(Array.isArray(state.registries.dataFields[api])) return;
+  if(_getRegistryFieldsForApi(api).length) return;
+  if(state.registries.dataFieldsLoading[loadingKey]) return;
+  if(state.registries.dataFieldsRenderQueued[loadingKey]) return;
+  state.registries.dataFieldsRenderQueued[loadingKey] = true;
+  _ensureDataFieldsForApi(api).then(function(){
+    delete state.registries.dataFieldsRenderQueued[loadingKey];
+    if(state.selectedBlock && _getByPath(state.propsDraft, 'config.dataSource.api') === api) _paint();
+  }).catch(function(){
+    delete state.registries.dataFieldsRenderQueued[loadingKey];
+    if(state.selectedBlock && _getByPath(state.propsDraft, 'config.dataSource.api') === api) _paint();
+  });
+}
+
 function _getRegistryFieldsForApi(api){
   var candidates;
   var i;
@@ -2568,9 +2587,7 @@ function _renderRegistryFieldSelect(field, path, textValue, attrs, placeholder){
     return '<div class="mb-field-select-wrap"><input type="text" class="hm-input"'+attrs+' value="'+_esc(textValue)+'"'+placeholder+'><div class="mb-field-hint">'+_t('Chon API endpoint truoc de builder goi y dung truong du lieu.', 'Choose an API endpoint first so the builder can suggest available fields.')+'</div></div>';
   }
   if(!allFields.length && !state.registries.dataFieldsLoading[loadingKey]){
-    _ensureDataFieldsForApi(api).then(function(){
-      if(state.selectedBlock) _paint();
-    });
+    _queueRegistryFieldLoad(api);
   }
   if(state.registries.dataFieldsLoading[loadingKey]){
     return '<div class="mb-field-select-wrap"><div class="mb-inline-loading"><span class="mb-spinner"></span><span>'+_t('Dang nap truong du lieu cho API ', 'Loading fields for API ')+'<code>'+_esc(api)+'</code></span></div><input type="text" class="hm-input"'+attrs+' value="'+_esc(textValue)+'"'+placeholder+'><div class="mb-field-hint">'+_t('Builder se chuyen sang dropdown sau khi registry tra ve schema endpoint.', 'The builder will switch to a dropdown when the endpoint schema arrives.')+'</div></div>';
@@ -3560,6 +3577,7 @@ function _ensureBuilderState(){
   if(!state.pendingApiSelection) state.pendingApiSelection = {};
   if(state.pendingApiSelectionSeq == null) state.pendingApiSelectionSeq = 0;
   if(!state.registries.dataFieldsLoading) state.registries.dataFieldsLoading = {};
+  if(!state.registries.dataFieldsRenderQueued) state.registries.dataFieldsRenderQueued = {};
   if(state.registries.dataFieldsIndex === undefined) state.registries.dataFieldsIndex = null;
   if(state.registries.dataFieldsIndexLoading === undefined) state.registries.dataFieldsIndexLoading = null;
   if(!state.registries.dataFieldParts) state.registries.dataFieldParts = {};
@@ -6477,11 +6495,14 @@ _handleInput = function(e){
 /* ── Export ───────────────────────────────────────────────────────────────── */
 _handleInput = function(e){
   var target = e.target;
+  var tagName = target && target.tagName ? String(target.tagName).toLowerCase() : '';
   var path;
   var api;
+  var apiLoad;
   var requestToken;
   var selectedBlockId;
   var workflowId;
+  if(tagName === 'select' && e.type === 'input') return;
   if(target.id === 'mb-lib-search'){
     state.librarySearch = target.value;
     _paint();
@@ -6541,8 +6562,9 @@ _handleInput = function(e){
       selectedBlockId = state.selectedBlock;
       requestToken = _trackPendingApiSelection(path);
       if(api){
+        apiLoad = _ensureDataFieldsForApi(api);
         _paint();
-        _ensureDataFieldsForApi(api).then(function(){
+        apiLoad.then(function(){
           var result;
           if(!_isPendingApiSelectionCurrent(path, requestToken)) return;
           if(!state.propsDraft || state.selectedBlock !== selectedBlockId) return;
