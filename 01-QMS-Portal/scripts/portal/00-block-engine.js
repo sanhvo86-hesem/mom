@@ -1769,8 +1769,12 @@ function _buildCartesianChartSections(type){
   return [
     _blockSection('axes', 'Trục dữ liệu', 'Data axes', [
       _blockField('xField', 'Field trục X', 'X-axis field', 'field-select', 'config.chart.xField', { default:'label' }),
+      _blockField('xType', 'Kiểu trục X', 'X-axis type', 'select', 'config.xAxis.type', { default:'category', options:['category','date'] }),
       _blockField('xLabel', 'Nhãn trục X', 'X-axis label', 'text', 'config.chart.xLabel', { default:'' }),
       _blockField('yLabel', 'Nhãn trục Y', 'Y-axis label', 'text', 'config.chart.yLabel', { default:'' }),
+      _blockField('yFormat', 'Định dạng Y', 'Y-axis format', 'select', 'config.yAxis.format', { default:'', options:['','number','percent','currency'] }),
+      _blockField('rightYLabel', 'Nhãn trục Y phải', 'Right Y-axis label', 'text', 'config.yAxisRight.label', { default:'' }),
+      _blockField('rightYFormat', 'Định dạng Y phải', 'Right Y-axis format', 'select', 'config.yAxisRight.format', { default:'', options:['','number','percent','currency'] }),
       _blockField('series', 'Danh sách series', 'Series list', 'collection', 'config.chart.series', {
         default:[],
         addLabel:'Thêm series',
@@ -1789,6 +1793,7 @@ function _buildCartesianChartSections(type){
       _blockField('smooth', 'Làm mượt', 'Smooth lines', 'toggle', 'config.chart.smooth', { default:type === 'chart-line' || type === 'chart-area' }),
       _blockField('showGrid', 'Hiện lưới', 'Show grid', 'toggle', 'config.chart.showGrid', { default:true }),
       _blockField('showLegend', 'Hiện chú giải', 'Show legend', 'toggle', 'config.chart.showLegend', { default:true }),
+      _blockField('stacked', 'Stacked', 'Stacked', 'toggle', 'config.stacked', { default:type === 'chart-area' }),
       _blockField('stackMode', 'Chế độ stack', 'Stack mode', 'select', 'config.chart.stackMode', { default:type === 'chart-stacked-bar' ? 'normal' : 'none', options:['none','normal','percent'] }),
       _blockField('labelRotation', 'Xoay nhãn X', 'X-label rotation', 'number', 'config.chart.labelRotation', { default:0, min:-90, max:90, step:5 }),
       _blockField('showDataLabels', 'Hiện data labels', 'Show data labels', 'toggle', 'config.chart.showDataLabels', { default:false })
@@ -3506,6 +3511,29 @@ BLOCK_TEMPLATES['tpl-quality-pareto'] = _tplMeta('quality-pareto', 'Pareto lỗi
   }
 });
 
+BLOCK_TEMPLATES['tpl-quality-control-chart'] = _tplMeta('quality-control-chart', 'Biá»ƒu Ä‘á»“ kiá»ƒm soÃ¡t Xbar / R', 'Xbar / R Control Chart', 'Biá»ƒu Ä‘á»“ kÃ©p Xbar vÃ  R Ä‘á»ƒ theo dÃµi á»•n Ä‘á»‹nh quÃ¡ trÃ¬nh, Cp vÃ  Cpk.', 'quality', {
+  dataSource: _tplSource('spc_chart', 'GET'),
+  subgroupSize: 5,
+  spc: {
+    valueField: 'measured_value',
+    subgroupField: 'subgroup',
+    timestampField: 'measured_at'
+  }
+});
+BLOCK_TEMPLATES['tpl-quality-checksheet'] = _tplMeta('quality-checksheet', 'Checksheet kiá»ƒm tra cÃ´ng Ä‘oáº¡n', 'Process Checksheet', 'Báº£ng checksheet sá»‘ ghi nháº­n táº§n suáº¥t NG, káº¿t quáº£ pass/fail vÃ  thÃ´ng sá»‘ Ä‘o.', 'quality', {
+  rows: [
+    { id:'dimension', label:{ vi:'KÃ­ch thÆ°á»›c chÃ­nh', en:'Critical dimension' } },
+    { id:'surface', label:{ vi:'Bá» máº·t', en:'Surface finish' } },
+    { id:'trace', label:{ vi:'Tem truy xuáº¥t', en:'Traceability label' } }
+  ],
+  columns: [
+    { id:'check_1', label:{ vi:'Check', en:'Check' }, type:'check' },
+    { id:'count_ng', label:{ vi:'NG', en:'NG count' }, type:'count' },
+    { id:'result', label:{ vi:'Káº¿t quáº£', en:'Result' }, type:'pass_fail' },
+    { id:'measure', label:{ vi:'ThÃ´ng sá»‘', en:'Measurement' }, type:'measurement' }
+  ],
+  editable: true
+});
 BLOCK_TEMPLATES['tpl-evidence-vault-table'] = _tplMeta('data-table', 'Kho hồ sơ chứng cứ', 'Evidence Vault Table', 'Kho chứng cứ số với hash SHA-256, liên kết hồ sơ và người tải lên.', 'evidence', {
   dataSource: _tplSource('evidence_list', 'GET', 'evidence', 'total'),
   dataKey: 'evidence',
@@ -3902,6 +3930,7 @@ function getModuleState(moduleId){
       modalStates: {},
       detailStates: {},
       checksheetStates: {},
+      machineTimers: {},
     };
   }
   return _moduleStates[moduleId];
@@ -4211,6 +4240,7 @@ function renderModuleFromSchema(container, schema, options){
 
   // Attach event delegation
   _attachModuleEvents(container, moduleId);
+  _initRuntimeBlocks(container, moduleId);
 
   // Initialize drag-drop in edit mode
   if(state.editMode && activeTab){
@@ -4488,6 +4518,51 @@ function _attachModuleEvents(container, moduleId){
       case 'hm-table-export':
         _handleTableExport(moduleId, btn);
         break;
+      case 'hm-chart-toggle-series':
+        _handleChartSeriesToggle(container, moduleId, btn);
+        break;
+      case 'hm-chart-zoom':
+        _handleChartZoom(container, moduleId, btn);
+        break;
+      case 'hm-chart-pan':
+        _handleChartPan(container, moduleId, btn);
+        break;
+      case 'hm-chart-reset-view':
+        _handleChartReset(container, moduleId, btn);
+        break;
+      case 'hm-checksheet-toggle':
+        _handleChecksheetToggle(container, moduleId, btn);
+        break;
+      case 'hm-checksheet-increment':
+        _handleChecksheetIncrement(container, moduleId, btn);
+        break;
+      case 'hm-checksheet-passfail':
+        _handleChecksheetPassFail(container, moduleId, btn);
+        break;
+      case 'hm-gantt-zoom':
+        _handleGanttZoom(container, moduleId, btn);
+        break;
+      case 'hm-detail-edit':
+        _handleDetailEdit(container, moduleId, btn);
+        break;
+      case 'hm-wizard-prev':
+        _handleWizardPrev(container, moduleId, btn);
+        break;
+      case 'hm-wizard-next':
+        _handleWizardNext(container, moduleId, btn);
+        break;
+      case 'hm-wizard-submit':
+        _handleWizardSubmit(container, moduleId, btn);
+        break;
+      case 'hm-modal-open':
+        _handleModalOpen(container, moduleId, btn);
+        break;
+      case 'hm-modal-close':
+        _handleModalClose(container, moduleId, btn);
+        break;
+      case 'hm-machine-card':
+        _handleMachineCard(container, moduleId, btn);
+        break;
       case 'hm-status-transition':
         _handleStatusTransition(container, moduleId, btn);
         break;
@@ -4566,6 +4641,10 @@ function _attachModuleEvents(container, moduleId){
       var act = el.getAttribute('data-action');
       if(act === 'hm-table-pagesize'){
         _handleTablePageSize(container, moduleId, el);
+      } else if(act === 'hm-checksheet-measure'){
+        _handleChecksheetMeasure(container, moduleId, el);
+      } else if(act === 'hm-detail-input'){
+        _handleDetailInput(container, moduleId, el);
       }
     }
     if(el.hasAttribute('data-table-filter')){
@@ -4584,6 +4663,42 @@ function _attachModuleEvents(container, moduleId){
     }
   };
   container.addEventListener('submit', container._hmSubmit);
+
+  container.removeEventListener('keydown', container._hmKeyDown);
+  container._hmKeyDown = function(e){
+    var modal = e.target && e.target.closest ? e.target.closest('.hm-form-modal[aria-modal="true"]') : null;
+    var wizard = e.target && e.target.closest ? e.target.closest('.hm-form-wizard') : null;
+    if(modal && e.key === 'Tab'){
+      _trapModalFocus(e, modal);
+      return;
+    }
+    if(e.key === 'Escape'){
+      if(modal){
+        e.preventDefault();
+        _handleModalClose(container, moduleId, modal.getAttribute('data-block-id') || '');
+        return;
+      }
+      if(wizard){
+        var prevBtn = wizard.querySelector('[data-action="hm-wizard-prev"]:not([disabled])');
+        if(prevBtn){
+          e.preventDefault();
+          prevBtn.click();
+        }
+      }
+      return;
+    }
+    if(e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey){
+      if(e.target && String(e.target.tagName || '').toUpperCase() === 'TEXTAREA') return;
+      if(wizard){
+        var nextBtn = wizard.querySelector('[data-action="hm-wizard-next"]:not([disabled])') || wizard.querySelector('[data-action="hm-wizard-submit"]:not([disabled])');
+        if(nextBtn){
+          e.preventDefault();
+          nextBtn.click();
+        }
+      }
+    }
+  };
+  container.addEventListener('keydown', container._hmKeyDown);
 }
 
 function _debounce(fn, ms){
@@ -5527,6 +5642,193 @@ function _copyToClipboard(text){
   }
 }
 
+function _handleChartSeriesToggle(container, moduleId, btn){
+  var blockId = btn.getAttribute('data-block-id');
+  var seriesKey = btn.getAttribute('data-series-key');
+  var ms = getModuleState(moduleId);
+  if(!ms.chartStates[blockId]) ms.chartStates[blockId] = { hiddenSeries:{}, zoom:1, panX:0.5, panY:0.5, zoomLevel:'day' };
+  ms.chartStates[blockId].hiddenSeries[seriesKey] = !ms.chartStates[blockId].hiddenSeries[seriesKey];
+  renderModuleFromSchema(container, ms._schema);
+}
+
+function _handleChartZoom(container, moduleId, btn){
+  var blockId = btn.getAttribute('data-block-id');
+  var delta = Number(btn.getAttribute('data-delta') || 0);
+  var ms = getModuleState(moduleId);
+  if(!ms.chartStates[blockId]) ms.chartStates[blockId] = { hiddenSeries:{}, zoom:1, panX:0.5, panY:0.5, zoomLevel:'day' };
+  ms.chartStates[blockId].zoom = _chartClamp((ms.chartStates[blockId].zoom || 1) + delta, 1, 6);
+  renderModuleFromSchema(container, ms._schema);
+}
+
+function _handleChartPan(container, moduleId, btn){
+  var blockId = btn.getAttribute('data-block-id');
+  var axis = btn.getAttribute('data-axis') || 'x';
+  var delta = Number(btn.getAttribute('data-delta') || 0);
+  var ms = getModuleState(moduleId);
+  if(!ms.chartStates[blockId]) ms.chartStates[blockId] = { hiddenSeries:{}, zoom:1, panX:0.5, panY:0.5, zoomLevel:'day' };
+  if(axis === 'y') ms.chartStates[blockId].panY = _chartClamp((ms.chartStates[blockId].panY == null ? 0.5 : ms.chartStates[blockId].panY) + delta, 0, 1);
+  else ms.chartStates[blockId].panX = _chartClamp((ms.chartStates[blockId].panX == null ? 0.5 : ms.chartStates[blockId].panX) + delta, 0, 1);
+  renderModuleFromSchema(container, ms._schema);
+}
+
+function _handleChartReset(container, moduleId, btn){
+  var blockId = btn.getAttribute('data-block-id');
+  var ms = getModuleState(moduleId);
+  ms.chartStates[blockId] = { hiddenSeries:{}, zoom:1, panX:0.5, panY:0.5, zoomLevel:'day' };
+  renderModuleFromSchema(container, ms._schema);
+}
+
+function _handleChecksheetToggle(container, moduleId, btn){
+  var blockId = btn.getAttribute('data-block-id');
+  var rowId = btn.getAttribute('data-row');
+  var colId = btn.getAttribute('data-col');
+  var ms = getModuleState(moduleId);
+  if(!ms.checksheetStates[blockId]) ms.checksheetStates[blockId] = {};
+  if(!ms.checksheetStates[blockId][rowId]) ms.checksheetStates[blockId][rowId] = {};
+  ms.checksheetStates[blockId][rowId][colId] = !ms.checksheetStates[blockId][rowId][colId];
+  renderModuleFromSchema(container, ms._schema);
+}
+
+function _handleChecksheetIncrement(container, moduleId, btn){
+  var blockId = btn.getAttribute('data-block-id');
+  var rowId = btn.getAttribute('data-row');
+  var colId = btn.getAttribute('data-col');
+  var ms = getModuleState(moduleId);
+  var current = 0;
+  if(!ms.checksheetStates[blockId]) ms.checksheetStates[blockId] = {};
+  if(!ms.checksheetStates[blockId][rowId]) ms.checksheetStates[blockId][rowId] = {};
+  current = _chartNumber(ms.checksheetStates[blockId][rowId][colId] || 0);
+  ms.checksheetStates[blockId][rowId][colId] = current + 1;
+  renderModuleFromSchema(container, ms._schema);
+}
+
+function _handleChecksheetPassFail(container, moduleId, btn){
+  var blockId = btn.getAttribute('data-block-id');
+  var rowId = btn.getAttribute('data-row');
+  var colId = btn.getAttribute('data-col');
+  var value = btn.getAttribute('data-value');
+  var ms = getModuleState(moduleId);
+  if(!ms.checksheetStates[blockId]) ms.checksheetStates[blockId] = {};
+  if(!ms.checksheetStates[blockId][rowId]) ms.checksheetStates[blockId][rowId] = {};
+  ms.checksheetStates[blockId][rowId][colId] = value;
+  renderModuleFromSchema(container, ms._schema);
+}
+
+function _handleChecksheetMeasure(container, moduleId, input){
+  var blockId = input.getAttribute('data-block-id');
+  var rowId = input.getAttribute('data-row');
+  var colId = input.getAttribute('data-col');
+  var ms = getModuleState(moduleId);
+  if(!ms.checksheetStates[blockId]) ms.checksheetStates[blockId] = {};
+  if(!ms.checksheetStates[blockId][rowId]) ms.checksheetStates[blockId][rowId] = {};
+  ms.checksheetStates[blockId][rowId][colId] = _chartNumber(input.value);
+  renderModuleFromSchema(container, ms._schema);
+}
+
+function _handleGanttZoom(container, moduleId, btn){
+  var blockId = btn.getAttribute('data-block-id');
+  var zoom = btn.getAttribute('data-zoom') || 'day';
+  var ms = getModuleState(moduleId);
+  if(!ms.chartStates[blockId]) ms.chartStates[blockId] = { hiddenSeries:{}, zoom:1, panX:0.5, panY:0.5, zoomLevel:'day' };
+  ms.chartStates[blockId].zoomLevel = zoom;
+  renderModuleFromSchema(container, ms._schema);
+}
+
+function _handleDetailEdit(container, moduleId, btn){
+  var blockId = btn.getAttribute('data-block-id');
+  var field = btn.getAttribute('data-field');
+  var ms = getModuleState(moduleId);
+  if(!ms.detailStates[blockId]) ms.detailStates[blockId] = {};
+  ms.detailStates[blockId].editing = field;
+  renderModuleFromSchema(container, ms._schema);
+}
+
+function _handleDetailInput(container, moduleId, input){
+  var blockId = input.getAttribute('data-block-id');
+  var field = input.getAttribute('data-field');
+  var ms = getModuleState(moduleId);
+  var block = _findBlockById(ms._schema, blockId);
+  var record = _detailRecord(ms.blockData[blockId]);
+  if(!block || !record) return;
+  record[field] = input.value;
+  if(!ms.detailStates[blockId]) ms.detailStates[blockId] = {};
+  ms.detailStates[blockId].editing = '';
+  if(block.config && block.config.updateApi){
+    _api(block.config.updateApi, record, 'POST').catch(function(err){
+      console.warn('[BlockEngine] detail update failed', err);
+    });
+  }
+  renderModuleFromSchema(container, ms._schema);
+}
+
+function _initRuntimeBlocks(container, moduleId){
+  _initKanbanBoards(container, moduleId);
+  _initFormModals(container, moduleId);
+  _initMachineStatusBoards(container, moduleId);
+}
+
+function _initKanbanBoards(container, moduleId){
+  var boards = container.querySelectorAll('.hm-kanban-board[data-block-id]');
+  boards.forEach(function(board){
+    var blockId = board.getAttribute('data-block-id');
+    board.querySelectorAll('.hm-kanban-card[draggable="true"]').forEach(function(card){
+      card.addEventListener('dragstart', function(e){
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', JSON.stringify({
+          blockId: blockId,
+          rowKey: card.getAttribute('data-row-key')
+        }));
+        board.classList.add('is-dragging');
+      });
+      card.addEventListener('dragend', function(){
+        board.classList.remove('is-dragging');
+      });
+    });
+    board.querySelectorAll('[data-kanban-column]').forEach(function(column){
+      column.addEventListener('dragover', function(e){
+        e.preventDefault();
+        column.classList.add('is-drop-target');
+      });
+      column.addEventListener('dragleave', function(){
+        column.classList.remove('is-drop-target');
+      });
+      column.addEventListener('drop', function(e){
+        var payload;
+        var ms = getModuleState(moduleId);
+        var block = _findBlockById(ms._schema, blockId);
+        var rows;
+        var statusKey;
+        var rowKey = 'id';
+        var targetStatus;
+        var draggedRow;
+        var ctx;
+        var onDrop;
+        column.classList.remove('is-drop-target');
+        try { payload = JSON.parse(e.dataTransfer.getData('text/plain') || '{}'); } catch(err){ payload = {}; }
+        if(payload.blockId !== blockId || !block) return;
+        rows = _runtimeRowsRef(ms.blockData[blockId], block.config || {});
+        statusKey = (block.config && (block.config.statusKey || block.config.kanban && block.config.kanban.laneField)) || 'status';
+        rowKey = block.config && block.config.rowKey || 'id';
+        targetStatus = column.getAttribute('data-kanban-column');
+        draggedRow = rows.find(function(row){ return String(row[rowKey] != null ? row[rowKey] : '') === String(payload.rowKey); });
+        if(!draggedRow) return;
+        draggedRow[statusKey] = targetStatus;
+        onDrop = block.config && (block.config.onDrop || block.config.kanban && block.config.kanban.persist && block.config.kanban.persist.api && { type:'api-call', action:block.config.kanban.persist.api, params:{} });
+        if(onDrop && onDrop.action){
+          ctx = _buildReactiveContext(moduleId);
+          ctx.card = draggedRow;
+          ctx.row = draggedRow;
+          ctx.targetColumn = targetStatus;
+          _api(onDrop.action, onDrop.params ? _resolveBindings(onDrop.params, ctx) : { id: draggedRow[rowKey], status: targetStatus }, onDrop.method || 'POST').catch(function(err){
+            console.warn('[BlockEngine] kanban drop failed', err);
+          });
+        }
+        renderModuleFromSchema(container, ms._schema);
+      });
+    });
+  });
+}
+
 /* --- v2 backward-compatible table renderer (delegates to v3) --- */
 function renderAdvancedTable(config, data, state, blockId){
   return renderAdvancedTableV3(config, data, state, blockId, null);
@@ -5900,7 +6202,7 @@ function _chartWindow(min, max, zoom, pan){
 }
 
 function _chartTooltipAttrs(text){
-  return ' data-chart-tooltip="' + _chartAttrText(text) + '" tabindex="0"';
+  return ' data-chart-tooltip="' + _chartAttrText(text) + '" title="' + _chartAttrText(text) + '" tabindex="0"';
 }
 
 function _chartResolveCartesianSeries(config, mode){
@@ -6023,6 +6325,7 @@ function _renderCartesianChart(config, data, state, blockId, mode){
   var labels = [];
   var seriesValues = {};
   var stackTotals = [];
+  var stackBases = { left: [], right: [] };
   var minLeft = 0;
   var maxLeft = 0;
   var minRight = 0;
@@ -6120,12 +6423,23 @@ function _renderCartesianChart(config, data, state, blockId, mode){
       var axisMin = axisTicks[0];
       var axisMax = axisTicks[axisTicks.length - 1];
       rows.forEach(function(row, rowIndex){
+        var plottedValue = seriesValues[key][rowIndex];
+        var lowerValue = 0;
+        if(meta.stacked && series.axis !== 'right'){
+          lowerValue = stackBases.left[rowIndex] || 0;
+          plottedValue += lowerValue;
+        }
         points.push({
           x: _chartScaleX(rowIndex, labels.length, left, plotWidth),
-          y: _chartScaleY(seriesValues[key][rowIndex], axisMin, axisMax, top, plotHeight),
+          y: _chartScaleY(plottedValue, axisMin, axisMax, top, plotHeight),
           value: seriesValues[key][rowIndex],
+          plottedValue: plottedValue,
+          lowerValue: lowerValue,
           label: labels[rowIndex]
         });
+        if(meta.stacked && series.axis !== 'right'){
+          stackBases.left[rowIndex] = plottedValue;
+        }
       });
       if(series.type === 'bar'){
         var band = plotWidth / Math.max(labels.length, 1);
@@ -6138,9 +6452,13 @@ function _renderCartesianChart(config, data, state, blockId, mode){
         return;
       }
       if((mode === 'area' || series.type === 'area') && points.length){
-        var areaPoints = points.slice();
-        areaPoints.push({ x: points[points.length - 1].x, y: top + plotHeight });
-        areaPoints.push({ x: points[0].x, y: top + plotHeight });
+        var areaPoints = points.map(function(point){
+          return { x: point.x, y: point.y };
+        });
+        var lowerPoints = points.slice().reverse().map(function(point){
+          return { x: point.x, y: _chartScaleY(point.lowerValue || 0, axisMin, axisMax, top, plotHeight) };
+        });
+        areaPoints = areaPoints.concat(lowerPoints);
         svg += '<polygon points="'+_chartPointsToString(areaPoints)+'" fill="url(#'+_esc(fillId)+')" class="hm-chart-area-fill"></polygon>';
       }
       if(points.length){
@@ -6156,6 +6474,1559 @@ function _renderCartesianChart(config, data, state, blockId, mode){
     return '<div class="hm-chart-card hm-chart-card-'+_esc(mode)+'">' + legendHtml + svg + '</div>';
   } catch(err){
     return _chartError(mode, err);
+  }
+}
+
+/**
+ * Render a responsive line chart with legend toggles and tooltip support.
+ * @param {Object} config
+ * @param {*} data
+ * @param {Object} state
+ * @param {string} blockId
+ * @returns {string}
+ */
+function renderLineChart(config, data, state, blockId){
+  return _renderCartesianChart(config, data, state, blockId, 'line');
+}
+
+/**
+ * Render an area chart with gradient fills and optional stacked mode.
+ * @param {Object} config
+ * @param {*} data
+ * @param {Object} state
+ * @param {string} blockId
+ * @returns {string}
+ */
+function renderAreaChart(config, data, state, blockId){
+  return _renderCartesianChart(config, data, state, blockId, 'area');
+}
+
+/**
+ * Render a scatter chart with optional size/color encoding and zoom controls.
+ * @param {Object} config
+ * @param {*} data
+ * @param {Object} state
+ * @param {string} blockId
+ * @returns {string}
+ */
+function renderScatterChart(config, data, state, blockId){
+  var rows;
+  var chartCfg;
+  var chartState;
+  var xKey;
+  var yKey;
+  var sizeKey;
+  var colorKey;
+  var points = [];
+  var categories = [];
+  var legendSeries = [];
+  var domainX;
+  var domainY;
+  var zoomX;
+  var zoomY;
+  var width = 720;
+  var height = 320;
+  var left = 58;
+  var right = 22;
+  var top = 20;
+  var bottom = 58;
+  var plotWidth;
+  var plotHeight;
+  var svg = '';
+  try{
+    rows = _chartRows(config, data);
+    if(!rows.length) return _chartEmpty(_t('Không có dữ liệu','No data'));
+    chartCfg = config.chart || {};
+    chartState = _chartState(state, blockId);
+    xKey = config.xKey || chartCfg.xField || 'x';
+    yKey = config.yKey || chartCfg.yField || 'y';
+    sizeKey = config.sizeKey || chartCfg.zField || '';
+    colorKey = config.colorKey || chartCfg.colorField || chartCfg.seriesField || '';
+    plotWidth = width - left - right;
+    plotHeight = height - top - bottom;
+    rows.forEach(function(row){
+      var cat = colorKey ? (row[colorKey] == null ? _t('Không xác định', 'Unknown') : String(row[colorKey])) : _t('Dữ liệu', 'Data');
+      if(categories.indexOf(cat) < 0) categories.push(cat);
+      points.push({
+        rawX: _chartNumber(row[xKey]),
+        rawY: _chartNumber(row[yKey]),
+        size: sizeKey ? _chartNumber(row[sizeKey]) : 8,
+        category: cat
+      });
+    });
+    if(!points.length) return _chartEmpty(_t('Không có dữ liệu','No data'));
+    legendSeries = categories.map(function(cat, index){
+      return { key: cat, label: { vi: cat, en: cat }, color: _chartColor(index) };
+    });
+    points = points.filter(function(point){ return !chartState.hiddenSeries[point.category]; });
+    domainX = { min: points[0].rawX, max: points[0].rawX };
+    domainY = { min: points[0].rawY, max: points[0].rawY };
+    points.forEach(function(point){
+      domainX.min = Math.min(domainX.min, point.rawX);
+      domainX.max = Math.max(domainX.max, point.rawX);
+      domainY.min = Math.min(domainY.min, point.rawY);
+      domainY.max = Math.max(domainY.max, point.rawY);
+    });
+    zoomX = _chartWindow(domainX.min, domainX.max, chartState.zoom || 1, chartState.panX);
+    zoomY = _chartWindow(domainY.min, domainY.max, chartState.zoom || 1, chartState.panY);
+
+    svg += '<div class="hm-chart-card hm-chart-card-scatter">';
+    svg += '<div class="hm-chart-toolbar" role="toolbar" aria-label="'+_chartAttrText(_t('Điều khiển biểu đồ scatter', 'Scatter chart controls'))+'">';
+    svg += '<button type="button" class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-chart-zoom" data-block-id="'+_esc(blockId || '')+'" data-delta="-1">-</button>';
+    svg += '<button type="button" class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-chart-zoom" data-block-id="'+_esc(blockId || '')+'" data-delta="1">+</button>';
+    svg += '<button type="button" class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-chart-pan" data-block-id="'+_esc(blockId || '')+'" data-axis="x" data-delta="-0.1">◀</button>';
+    svg += '<button type="button" class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-chart-pan" data-block-id="'+_esc(blockId || '')+'" data-axis="x" data-delta="0.1">▶</button>';
+    svg += '<button type="button" class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-chart-reset-view" data-block-id="'+_esc(blockId || '')+'">'+_t('Reset','Reset')+'</button>';
+    svg += '</div>';
+    svg += _chartLegend(legendSeries, chartState, blockId, _t('Chú giải scatter', 'Scatter legend'));
+    svg += '<div class="hm-chart-shell" role="img" aria-label="'+_chartAttrText(_t('Biểu đồ scatter tương quan dữ liệu', 'Scatter chart showing data correlation'))+'" data-chart-block-id="'+_esc(blockId || '')+'">';
+    svg += '<svg class="hm-chart-svg" viewBox="0 0 '+width+' '+height+'" preserveAspectRatio="none">';
+    _chartAxisTicks(zoomY.min, zoomY.max, 5).forEach(function(tick){
+      var y = _chartScaleY(tick, zoomY.min, zoomY.max, top, plotHeight);
+      svg += '<line x1="'+left+'" y1="'+y.toFixed(2)+'" x2="'+(width - right)+'" y2="'+y.toFixed(2)+'" class="hm-chart-gridline"></line>';
+      svg += '<text x="'+(left - 10)+'" y="'+(y + 4).toFixed(2)+'" class="hm-chart-axis-label hm-chart-axis-label-y">'+_esc(_chartFormatValue(tick, chartCfg.yFormat || ''))+'</text>';
+    });
+    _chartAxisTicks(zoomX.min, zoomX.max, 5).forEach(function(tick){
+      var x = left + (((tick - zoomX.min) / Math.max(zoomX.max - zoomX.min, 1)) * plotWidth);
+      svg += '<line x1="'+x.toFixed(2)+'" y1="'+top+'" x2="'+x.toFixed(2)+'" y2="'+(top + plotHeight)+'" class="hm-chart-gridline"></line>';
+      svg += '<text x="'+x.toFixed(2)+'" y="'+(top + plotHeight + 18)+'" class="hm-chart-axis-label hm-chart-axis-label-x">'+_esc(_chartFormatValue(tick, chartCfg.xFormat || ''))+'</text>';
+    });
+    svg += '<line x1="'+left+'" y1="'+(top + plotHeight)+'" x2="'+(width - right)+'" y2="'+(top + plotHeight)+'" class="hm-chart-axis"></line>';
+    svg += '<line x1="'+left+'" y1="'+top+'" x2="'+left+'" y2="'+(top + plotHeight)+'" class="hm-chart-axis"></line>';
+    points.forEach(function(point){
+      var px;
+      var py;
+      var radius;
+      var tip;
+      if(point.rawX < zoomX.min || point.rawX > zoomX.max || point.rawY < zoomY.min || point.rawY > zoomY.max) return;
+      px = left + (((point.rawX - zoomX.min) / Math.max(zoomX.max - zoomX.min, 1)) * plotWidth);
+      py = _chartScaleY(point.rawY, zoomY.min, zoomY.max, top, plotHeight);
+      radius = sizeKey ? _chartClamp((point.size / 10), 4, 14) : 6;
+      tip = point.category + ' • X: ' + _chartFormatValue(point.rawX, chartCfg.xFormat || '') + ' • Y: ' + _chartFormatValue(point.rawY, chartCfg.yFormat || '');
+      svg += '<circle cx="'+px.toFixed(2)+'" cy="'+py.toFixed(2)+'" r="'+radius.toFixed(2)+'" fill="'+_esc(_chartColor(categories.indexOf(point.category)))+'" fill-opacity="0.56" stroke="'+_esc(_chartColor(categories.indexOf(point.category)))+'" stroke-width="1.5" class="hm-chart-scatter-point"'+_chartTooltipAttrs(tip)+'><title>'+_esc(tip)+'</title></circle>';
+    });
+    if(config.xLabel || chartCfg.xLabel){
+      svg += '<text x="'+(left + (plotWidth / 2))+'" y="'+(height - 12)+'" class="hm-chart-axis-title">'+_esc(config.xLabel || chartCfg.xLabel)+'</text>';
+    }
+    if(config.yLabel || chartCfg.yLabel){
+      svg += '<text x="16" y="'+(top + (plotHeight / 2))+'" class="hm-chart-axis-title" transform="rotate(-90 16 '+(top + (plotHeight / 2))+')">'+_esc(config.yLabel || chartCfg.yLabel)+'</text>';
+    }
+    svg += '</svg></div></div>';
+    return svg;
+  } catch(err){
+    return _chartError('scatter', err);
+  }
+}
+
+/**
+ * Render a radar chart for multi-dimension comparisons.
+ * @param {Object} config
+ * @param {*} data
+ * @param {Object} state
+ * @param {string} blockId
+ * @returns {string}
+ */
+function renderRadarChart(config, data, state, blockId){
+  var dims;
+  var seriesList;
+  var chartState;
+  var width = 420;
+  var height = 320;
+  var cx = 170;
+  var cy = 156;
+  var radius = 108;
+  var svg = '';
+  try{
+    dims = (config.dimensions || []).slice();
+    if(!dims.length){
+      var radarRows = _chartRows(config, data);
+      if(radarRows.length && typeof radarRows[0] === 'object'){
+        Object.keys(radarRows[0]).forEach(function(key){
+          if(typeof radarRows[0][key] === 'number') dims.push({ key:key, label:key, max:100 });
+        });
+      }
+    }
+    if(!dims.length) return _chartEmpty(_t('Chưa cấu hình trục radar', 'Radar axes are not configured'));
+    seriesList = (config.series || []).slice();
+    if(!seriesList.length){
+      _chartRows(config, data).slice(0, 3).forEach(function(row, index){
+        seriesList.push({
+          key: row.id || ('series_' + index),
+          label: row.name || row.label || ('Series ' + (index + 1)),
+          color: _chartColor(index),
+          values: row
+        });
+      });
+    }
+    if(!seriesList.length) return _chartEmpty(_t('Không có dữ liệu', 'No data'));
+    chartState = _chartState(state, blockId);
+    svg += '<div class="hm-chart-card hm-chart-card-radar">';
+    svg += _chartLegend(seriesList, chartState, blockId, _t('Chú giải radar', 'Radar legend'));
+    svg += '<div class="hm-chart-shell" role="img" aria-label="'+_chartAttrText(_t('Biểu đồ radar so sánh đa tiêu chí', 'Radar chart comparing multiple dimensions'))+'" data-chart-block-id="'+_esc(blockId || '')+'">';
+    svg += '<svg class="hm-chart-svg" viewBox="0 0 '+width+' '+height+'" preserveAspectRatio="xMidYMid meet">';
+    [0.2,0.4,0.6,0.8,1].forEach(function(level){
+      var ringPoints = [];
+      dims.forEach(function(dim, dimIndex){
+        var angle = (-Math.PI / 2) + ((Math.PI * 2 * dimIndex) / dims.length);
+        ringPoints.push({ x: cx + (Math.cos(angle) * radius * level), y: cy + (Math.sin(angle) * radius * level) });
+      });
+      svg += '<polygon points="'+_chartPointsToString(ringPoints)+'" class="hm-chart-radar-ring"></polygon>';
+    });
+    dims.forEach(function(dim, dimIndex){
+      var angle = (-Math.PI / 2) + ((Math.PI * 2 * dimIndex) / dims.length);
+      var lx = cx + (Math.cos(angle) * radius);
+      var ly = cy + (Math.sin(angle) * radius);
+      var tx = cx + (Math.cos(angle) * (radius + 20));
+      var ty = cy + (Math.sin(angle) * (radius + 20));
+      svg += '<line x1="'+cx+'" y1="'+cy+'" x2="'+lx.toFixed(2)+'" y2="'+ly.toFixed(2)+'" class="hm-chart-axis"></line>';
+      svg += '<text x="'+tx.toFixed(2)+'" y="'+ty.toFixed(2)+'" class="hm-chart-axis-label">'+_esc(_chartText(dim, dim.key, dim.key))+'</text>';
+    });
+    seriesList.forEach(function(series, seriesIndex){
+      var hidden = !!chartState.hiddenSeries[_chartSeriesKey(series, seriesIndex)];
+      var polygonPoints = [];
+      if(hidden) return;
+      dims.forEach(function(dim, dimIndex){
+        var rawValue = series.values && typeof series.values === 'object' ? series.values[dim.key] : (Array.isArray(series.values) ? series.values[dimIndex] : 0);
+        var maxValue = _chartNumber(dim.max || 100) || 100;
+        var pct = _chartClamp(_chartNumber(rawValue) / maxValue, 0, 1);
+        var angle = (-Math.PI / 2) + ((Math.PI * 2 * dimIndex) / dims.length);
+        var px = cx + (Math.cos(angle) * radius * pct);
+        var py = cy + (Math.sin(angle) * radius * pct);
+        var tip = _chartText(series, series.key || ('Series ' + (seriesIndex + 1)), series.key || ('Series ' + (seriesIndex + 1))) + ' • ' + _chartText(dim, dim.key, dim.key) + ': ' + _chartFormatValue(rawValue, config.format || '');
+        polygonPoints.push({ x:px, y:py });
+        svg += '<circle cx="'+px.toFixed(2)+'" cy="'+py.toFixed(2)+'" r="4" fill="'+_esc(series.color || _chartColor(seriesIndex))+'" class="hm-chart-point"'+_chartTooltipAttrs(tip)+'><title>'+_esc(tip)+'</title></circle>';
+      });
+      svg += '<polygon points="'+_chartPointsToString(polygonPoints)+'" fill="'+_esc(series.color || _chartColor(seriesIndex))+'" fill-opacity="'+(config.radarFill === false ? '0.08' : '0.18')+'" stroke="'+_esc(series.color || _chartColor(seriesIndex))+'" stroke-width="2.5" class="hm-chart-radar-polygon"></polygon>';
+    });
+    svg += '</svg></div></div>';
+    return svg;
+  } catch(err){
+    return _chartError('radar', err);
+  }
+}
+
+/**
+ * Render a mixed combo chart with bar and line series plus dual Y axes.
+ * @param {Object} config
+ * @param {*} data
+ * @param {Object} state
+ * @param {string} blockId
+ * @returns {string}
+ */
+function renderComboChart(config, data, state, blockId){
+  return _renderCartesianChart(config, data, state, blockId, 'combo');
+}
+
+function _spcMean(values){
+  if(!values || !values.length) return 0;
+  return values.reduce(function(sum, value){ return sum + _chartNumber(value); }, 0) / values.length;
+}
+
+function _spcStddev(values){
+  var mean;
+  if(!values || values.length < 2) return 0;
+  mean = _spcMean(values);
+  return Math.sqrt(values.reduce(function(sum, value){
+    return sum + Math.pow(_chartNumber(value) - mean, 2);
+  }, 0) / (values.length - 1));
+}
+
+function _spcRange(values){
+  if(!values || !values.length) return 0;
+  return Math.max.apply(null, values) - Math.min.apply(null, values);
+}
+
+function _spcSubgroups(rows, valueKey, subgroupSize, subgroupField, timestampField){
+  var groups = [];
+  var map = {};
+  if(subgroupField){
+    rows.forEach(function(row){
+      var key = row[subgroupField];
+      if(map[key] == null){
+        map[key] = { key:key, values:[], rows:[] };
+        groups.push(map[key]);
+      }
+      map[key].values.push(_chartNumber(row[valueKey]));
+      map[key].rows.push(row);
+    });
+  } else {
+    rows.forEach(function(row, index){
+      var bucket = Math.floor(index / Math.max(subgroupSize || 1, 1));
+      if(!groups[bucket]) groups[bucket] = { key: bucket + 1, values:[], rows:[] };
+      groups[bucket].values.push(_chartNumber(row[valueKey]));
+      groups[bucket].rows.push(row);
+    });
+  }
+  return groups.filter(function(group){ return group && group.values && group.values.length; }).map(function(group, index){
+    return {
+      key: group.key != null ? group.key : (index + 1),
+      values: group.values,
+      rows: group.rows,
+      mean: _spcMean(group.values),
+      range: _spcRange(group.values),
+      timestamp: group.rows[0] && timestampField ? group.rows[0][timestampField] : ''
+    };
+  });
+}
+
+function _spcResolveLimits(values, limits){
+  var mean = _spcMean(values);
+  var sigma = _spcStddev(values);
+  var cl = limits && limits.cl !== undefined && limits.cl !== 'auto' ? _chartNumber(limits.cl) : mean;
+  var ucl = limits && limits.ucl !== undefined && limits.ucl !== 'auto' ? _chartNumber(limits.ucl) : (cl + (3 * sigma));
+  var lcl = limits && limits.lcl !== undefined && limits.lcl !== 'auto' ? _chartNumber(limits.lcl) : (cl - (3 * sigma));
+  return {
+    cl: cl,
+    ucl: ucl,
+    lcl: lcl,
+    sigma: sigma
+  };
+}
+
+function _spcRuleViolations(values, limits, preset){
+  var status = {};
+  var messages = {};
+  var rulePreset = preset || 'western-electric';
+  var runThreshold = rulePreset === 'nelson' ? 9 : 7;
+  var runSide = [];
+  var i;
+  for(i = 0; i < values.length; i++){
+    if(values[i] > limits.ucl || values[i] < limits.lcl){
+      status[i] = 'critical';
+      messages[i] = _t('Điểm vượt giới hạn kiểm soát', 'Point is outside the control limits');
+    }
+    runSide[i] = values[i] >= limits.cl ? 1 : -1;
+  }
+  for(i = runThreshold - 1; i < runSide.length; i++){
+    var start = i - runThreshold + 1;
+    var sameSide = true;
+    var j;
+    for(j = start + 1; j <= i; j++){
+      if(runSide[j] !== runSide[start]){
+        sameSide = false;
+        break;
+      }
+    }
+    if(sameSide){
+      for(j = start; j <= i; j++){
+        if(status[j] !== 'critical'){
+          status[j] = 'warning';
+          messages[j] = _t('Chuỗi điểm liên tiếp cùng một phía center line', 'Run of points on the same side of the center line');
+        }
+      }
+    }
+  }
+  return { status: status, messages: messages };
+}
+
+function _spcSeriesFromConfig(config, rows){
+  var spcCfg = config.spc || {};
+  var chartType = config.chartType || spcCfg.chartMode || 'individual';
+  var valueKey = config.measurementKey || spcCfg.valueField || 'measured_value';
+  var subgroupSize = Number(config.subgroupSize || spcCfg.subgroupSize || 5);
+  var subgroupField = config.subgroupKey || spcCfg.subgroupField || '';
+  var timestampField = config.timestampKey || spcCfg.timestampField || 'measured_at';
+  var subgroups = _spcSubgroups(rows, valueKey, subgroupSize, subgroupField, timestampField);
+  var values = [];
+  var labels = [];
+  var tooltips = [];
+  if(chartType === 'xbar'){
+    subgroups.forEach(function(group){
+      values.push(group.mean);
+      labels.push(String(group.key));
+      tooltips.push(_t('Subgroup', 'Subgroup') + ' #' + group.key + ' • Mean: ' + _chartFormatValue(group.mean, config.format || '') + ' • Range: ' + _chartFormatValue(group.range, config.format || ''));
+    });
+  } else if(chartType === 'range'){
+    subgroups.forEach(function(group){
+      values.push(group.range);
+      labels.push(String(group.key));
+      tooltips.push(_t('Subgroup', 'Subgroup') + ' #' + group.key + ' • Range: ' + _chartFormatValue(group.range, config.format || ''));
+    });
+  } else if(chartType === 'moving_range'){
+    rows.forEach(function(row, index){
+      if(index === 0) return;
+      var current = _chartNumber(row[valueKey]);
+      var previous = _chartNumber(rows[index - 1][valueKey]);
+      values.push(Math.abs(current - previous));
+      labels.push(String(index + 1));
+      tooltips.push(_t('Moving range', 'Moving range') + ': ' + _chartFormatValue(Math.abs(current - previous), config.format || ''));
+    });
+  } else {
+    rows.forEach(function(row, index){
+      values.push(_chartNumber(row[valueKey]));
+      labels.push(String(row[subgroupField] != null ? row[subgroupField] : (index + 1)));
+      tooltips.push((row[timestampField] ? _chartDateLabel(row[timestampField]) + ' • ' : '') + _chartFormatValue(row[valueKey], config.format || ''));
+    });
+  }
+  return {
+    chartType: chartType,
+    values: values,
+    labels: labels,
+    tooltips: tooltips,
+    subgroups: subgroups,
+    valueKey: valueKey
+  };
+}
+
+/**
+ * Render an SPC chart with control limits, sigma zones, and rule highlighting.
+ * @param {Object} config
+ * @param {*} data
+ * @param {Object} state
+ * @param {string} blockId
+ * @returns {string}
+ */
+function renderSpcChart(config, data, state, blockId){
+  var rows;
+  var series;
+  var limits;
+  var violations;
+  var width = 720;
+  var height = 320;
+  var left = 58;
+  var right = 24;
+  var top = 20;
+  var bottom = 56;
+  var plotWidth;
+  var plotHeight;
+  var ticks;
+  var svg = '';
+  try{
+    rows = _chartRows(config, data);
+    if(!rows.length) return _chartEmpty(_t('Không có dữ liệu','No data'));
+    series = _spcSeriesFromConfig(config, rows);
+    if(!series.values.length) return _chartEmpty(_t('Không có dữ liệu đo SPC', 'No SPC measurements available'));
+    limits = _spcResolveLimits(series.values, config.limits || (config.spc && config.spc.limits) || {});
+    violations = _spcRuleViolations(series.values, limits, (config.rules && config.rules[0]) || (config.spc && config.spc.rulePreset) || 'western-electric');
+    plotWidth = width - left - right;
+    plotHeight = height - top - bottom;
+    ticks = _chartAxisTicks(Math.min(limits.lcl, Math.min.apply(null, series.values)), Math.max(limits.ucl, Math.max.apply(null, series.values)), 5);
+
+    svg += '<div class="hm-chart-card hm-chart-card-spc">';
+    svg += '<div class="hm-chart-shell" role="img" aria-label="'+_chartAttrText(_t('Biểu đồ SPC với giới hạn kiểm soát', 'SPC chart with control limits'))+'" data-chart-block-id="'+_esc(blockId || '')+'">';
+    svg += '<svg class="hm-chart-svg" viewBox="0 0 '+width+' '+height+'" preserveAspectRatio="none">';
+    [3,2,1,-1,-2,-3].forEach(function(zone){
+      var from = limits.cl + (Math.max(zone - 1, 0) * limits.sigma * (zone > 0 ? 1 : -1));
+      var to = limits.cl + (Math.abs(zone) * limits.sigma * (zone > 0 ? 1 : -1));
+      var y1 = _chartScaleY(Math.max(from, to), ticks[0], ticks[ticks.length - 1], top, plotHeight);
+      var y2 = _chartScaleY(Math.min(from, to), ticks[0], ticks[ticks.length - 1], top, plotHeight);
+      svg += '<rect x="'+left+'" y="'+Math.min(y1, y2).toFixed(2)+'" width="'+plotWidth+'" height="'+Math.abs(y2 - y1).toFixed(2)+'" fill="'+(Math.abs(zone) === 3 ? 'rgba(239,68,68,0.05)' : Math.abs(zone) === 2 ? 'rgba(245,158,11,0.05)' : 'rgba(37,99,235,0.04)')+'"></rect>';
+    });
+    ticks.forEach(function(tick){
+      var y = _chartScaleY(tick, ticks[0], ticks[ticks.length - 1], top, plotHeight);
+      svg += '<line x1="'+left+'" y1="'+y.toFixed(2)+'" x2="'+(width - right)+'" y2="'+y.toFixed(2)+'" class="hm-chart-gridline"></line>';
+      svg += '<text x="'+(left - 10)+'" y="'+(y + 4).toFixed(2)+'" class="hm-chart-axis-label hm-chart-axis-label-y">'+_esc(_chartFormatValue(tick, config.format || ''))+'</text>';
+    });
+    svg += '<line x1="'+left+'" y1="'+_chartScaleY(limits.ucl, ticks[0], ticks[ticks.length - 1], top, plotHeight).toFixed(2)+'" x2="'+(width - right)+'" y2="'+_chartScaleY(limits.ucl, ticks[0], ticks[ticks.length - 1], top, plotHeight).toFixed(2)+'" stroke="#ef4444" stroke-width="2" stroke-dasharray="6 4"></line>';
+    svg += '<line x1="'+left+'" y1="'+_chartScaleY(limits.cl, ticks[0], ticks[ticks.length - 1], top, plotHeight).toFixed(2)+'" x2="'+(width - right)+'" y2="'+_chartScaleY(limits.cl, ticks[0], ticks[ticks.length - 1], top, plotHeight).toFixed(2)+'" stroke="#64748b" stroke-width="2" stroke-dasharray="3 3"></line>';
+    svg += '<line x1="'+left+'" y1="'+_chartScaleY(limits.lcl, ticks[0], ticks[ticks.length - 1], top, plotHeight).toFixed(2)+'" x2="'+(width - right)+'" y2="'+_chartScaleY(limits.lcl, ticks[0], ticks[ticks.length - 1], top, plotHeight).toFixed(2)+'" stroke="#ef4444" stroke-width="2" stroke-dasharray="6 4"></line>';
+    svg += '<line x1="'+left+'" y1="'+(top + plotHeight)+'" x2="'+(width - right)+'" y2="'+(top + plotHeight)+'" class="hm-chart-axis"></line>';
+    svg += '<line x1="'+left+'" y1="'+top+'" x2="'+left+'" y2="'+(top + plotHeight)+'" class="hm-chart-axis"></line>';
+    svg += '<polyline points="'+series.values.map(function(value, index){
+      return _chartScaleX(index, series.values.length, left, plotWidth).toFixed(2) + ',' + _chartScaleY(value, ticks[0], ticks[ticks.length - 1], top, plotHeight).toFixed(2);
+    }).join(' ')+'" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline>';
+    series.values.forEach(function(value, index){
+      var x = _chartScaleX(index, series.values.length, left, plotWidth);
+      var y = _chartScaleY(value, ticks[0], ticks[ticks.length - 1], top, plotHeight);
+      var fill = violations.status[index] === 'critical' ? '#ef4444' : (violations.status[index] === 'warning' ? '#f59e0b' : '#2563eb');
+      var tip = series.tooltips[index] + (violations.messages[index] ? ' • ' + violations.messages[index] : '');
+      svg += '<circle cx="'+x.toFixed(2)+'" cy="'+y.toFixed(2)+'" r="5" fill="'+fill+'" stroke="#fff" stroke-width="1.5"'+_chartTooltipAttrs(tip)+'><title>'+_esc(tip)+'</title></circle>';
+      svg += '<text x="'+x.toFixed(2)+'" y="'+(top + plotHeight + 18)+'" class="hm-chart-axis-label hm-chart-axis-label-x">'+_esc(series.labels[index])+'</text>';
+    });
+    svg += '</svg>';
+    svg += '<div class="hm-chart-legend"><span class="hm-chart-legend-btn"><span class="hm-chart-legend-swatch" style="background:#ef4444"></span><span>UCL / LCL</span></span><span class="hm-chart-legend-btn"><span class="hm-chart-legend-swatch" style="background:#64748b"></span><span>CL</span></span><span class="hm-chart-legend-btn"><span class="hm-chart-legend-swatch" style="background:#f59e0b"></span><span>'+_esc(_t('Chuỗi cảnh báo', 'Run warning'))+'</span></span></div>';
+    svg += '</div></div>';
+    return svg;
+  } catch(err){
+    return _chartError('spc', err);
+  }
+}
+
+/**
+ * Render a dual X-bar / R control chart with Cp and Cpk metrics.
+ * @param {Object} config
+ * @param {*} data
+ * @param {Object} state
+ * @param {string} blockId
+ * @returns {string}
+ */
+function renderControlChart(config, data, state, blockId){
+  var rows;
+  var spcCfg = config.spc || {};
+  var valueKey = config.measurementKey || spcCfg.valueField || 'measured_value';
+  var subgroupSize = Number(config.subgroupSize || spcCfg.subgroupSize || 5);
+  var subgroupField = config.subgroupKey || spcCfg.subgroupField || '';
+  var groups;
+  var means;
+  var ranges;
+  var meanLimits;
+  var rangeLimits;
+  var allValues = [];
+  var sigma;
+  var usl = _chartNumber(config.usl || config.quality && config.quality.usl || 0);
+  var lsl = _chartNumber(config.lsl || config.quality && config.quality.lsl || 0);
+  var cp = 0;
+  var cpk = 0;
+  try{
+    rows = _chartRows(config, data);
+    if(!rows.length) return _chartEmpty(_t('Không có dữ liệu','No data'));
+    groups = _spcSubgroups(rows, valueKey, subgroupSize, subgroupField, config.timestampKey || spcCfg.timestampField || 'measured_at');
+    means = groups.map(function(group){ return group.mean; });
+    ranges = groups.map(function(group){ return group.range; });
+    meanLimits = _spcResolveLimits(means, config.xbarLimits || {});
+    rangeLimits = _spcResolveLimits(ranges, config.rangeLimits || {});
+    groups.forEach(function(group){ allValues = allValues.concat(group.values); });
+    sigma = _spcStddev(allValues);
+    if(usl && lsl && sigma){
+      cp = (usl - lsl) / (6 * sigma);
+      cpk = Math.min((usl - _spcMean(allValues)) / (3 * sigma), (_spcMean(allValues) - lsl) / (3 * sigma));
+    }
+    return '<div class="hm-chart-card hm-chart-card-control">' +
+      '<div class="hm-chart-toolbar"><span class="hm-chart-legend-btn">'+_esc('Cp ' + (cp ? cp.toFixed(2) : '0.00'))+'</span><span class="hm-chart-legend-btn">'+_esc('Cpk ' + (cpk ? cpk.toFixed(2) : '0.00'))+'</span></div>' +
+      renderSpcChart({
+        chartType: 'xbar',
+        limits: meanLimits,
+        measurementKey: valueKey,
+        subgroupSize: subgroupSize,
+        subgroupKey: subgroupField,
+        format: config.format || '',
+        items: groups.map(function(group){ return { subgroup: group.key, measured_value: group.mean }; }),
+        dataKey: 'items'
+      }, groups.map(function(group){ return { subgroup: group.key, measured_value: group.mean }; }), state, blockId + '_xbar') +
+      renderSpcChart({
+        chartType: 'range',
+        limits: rangeLimits,
+        measurementKey: 'range',
+        subgroupSize: subgroupSize,
+        subgroupKey: subgroupField,
+        format: config.format || '',
+        items: groups.map(function(group){ return { subgroup: group.key, range: group.range }; }),
+        dataKey: 'items'
+      }, groups.map(function(group){ return { subgroup: group.key, range: group.range }; }), state, blockId + '_range') +
+      '</div>';
+  } catch(err){
+    return _chartError('control-chart', err);
+  }
+}
+
+/**
+ * Render a Pareto chart with descending bars and cumulative line.
+ * @param {Object} config
+ * @param {*} data
+ * @param {Object} state
+ * @param {string} blockId
+ * @returns {string}
+ */
+function renderParetoChart(config, data, state, blockId){
+  var rows;
+  var distCfg = config.distribution || {};
+  var categoryKey = config.categoryKey || distCfg.categoryField || 'category';
+  var valueKey = config.valueKey || distCfg.valueField || 'value';
+  var topN = Number(config.top || distCfg.topN || 10);
+  var totals = {};
+  var ordered;
+  var cumulative = 0;
+  var total = 0;
+  var width = 720;
+  var height = 320;
+  var left = 48;
+  var right = 48;
+  var top = 18;
+  var bottom = 58;
+  var plotWidth;
+  var plotHeight;
+  var maxValue = 1;
+  var svg = '';
+  try{
+    rows = _chartRows(config, data);
+    if(!rows.length) return _chartEmpty(_t('Không có dữ liệu','No data'));
+    rows.forEach(function(row){
+      var key = row[categoryKey] == null ? _t('Khác', 'Other') : String(row[categoryKey]);
+      totals[key] = (totals[key] || 0) + _chartNumber(row[valueKey]);
+    });
+    ordered = Object.keys(totals).map(function(key){
+      return { key:key, value:totals[key] };
+    }).sort(function(a, b){ return b.value - a.value; });
+    if(topN > 0) ordered = ordered.slice(0, topN);
+    ordered.forEach(function(item){
+      total += item.value;
+      if(item.value > maxValue) maxValue = item.value;
+    });
+    plotWidth = width - left - right;
+    plotHeight = height - top - bottom;
+    svg += '<div class="hm-chart-card hm-chart-card-pareto"><div class="hm-chart-shell" role="img" aria-label="'+_chartAttrText(_t('Biểu đồ Pareto lỗi và phần trăm lũy kế', 'Pareto chart with cumulative percentage'))+'" data-chart-block-id="'+_esc(blockId || '')+'"><svg class="hm-chart-svg" viewBox="0 0 '+width+' '+height+'" preserveAspectRatio="none">';
+    svg += '<line x1="'+left+'" y1="'+(top + plotHeight)+'" x2="'+(width - right)+'" y2="'+(top + plotHeight)+'" class="hm-chart-axis"></line>';
+    svg += '<line x1="'+left+'" y1="'+top+'" x2="'+left+'" y2="'+(top + plotHeight)+'" class="hm-chart-axis"></line>';
+    svg += '<line x1="'+left+'" y1="'+(top + (plotHeight * 0.2))+'" x2="'+(width - right)+'" y2="'+(top + (plotHeight * 0.2))+'" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="6 4"></line>';
+    ordered.forEach(function(item, index){
+      var band = plotWidth / Math.max(ordered.length, 1);
+      var barWidth = Math.max(Math.min((band * 0.62), 48), 18);
+      var x = left + (band * index) + ((band - barWidth) / 2);
+      var h = (item.value / maxValue) * plotHeight;
+      var y = top + plotHeight - h;
+      cumulative += item.value;
+      item.cumulativePct = total ? ((cumulative / total) * 100) : 0;
+      svg += '<rect x="'+x.toFixed(2)+'" y="'+y.toFixed(2)+'" width="'+barWidth.toFixed(2)+'" height="'+h.toFixed(2)+'" rx="6" fill="rgba(37,99,235,'+(0.92 - (index * 0.06))+')" class="hm-chart-bar"'+_chartTooltipAttrs(item.key + ': ' + _chartFormatValue(item.value, config.format || ''))+'><title>'+_esc(item.key + ': ' + _chartFormatValue(item.value, config.format || ''))+'</title></rect>';
+      svg += '<text x="'+(x + (barWidth / 2)).toFixed(2)+'" y="'+(top + plotHeight + 18)+'" class="hm-chart-axis-label hm-chart-axis-label-x">'+_esc(item.key)+'</text>';
+      svg += '<text x="'+(x + (barWidth / 2)).toFixed(2)+'" y="'+(y - 8).toFixed(2)+'" class="hm-chart-axis-label hm-chart-axis-label-x">'+_esc(Math.round(item.cumulativePct) + '%')+'</text>';
+    });
+    svg += '<polyline points="'+ordered.map(function(item, index){
+      var band = plotWidth / Math.max(ordered.length, 1);
+      var x = left + (band * index) + (band / 2);
+      var y = top + plotHeight - ((item.cumulativePct / 100) * plotHeight);
+      return x.toFixed(2) + ',' + y.toFixed(2);
+    }).join(' ')+'" fill="none" stroke="#f97316" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>';
+    svg += '</svg><div class="hm-chart-legend"><span class="hm-chart-legend-btn"><span class="hm-chart-legend-swatch" style="background:#2563eb"></span><span>'+_esc(_t('Giá trị lỗi', 'Defect value'))+'</span></span><span class="hm-chart-legend-btn"><span class="hm-chart-legend-swatch" style="background:#f97316"></span><span>'+_esc(_t('Tỷ lệ lũy kế', 'Cumulative %'))+'</span></span></div></div></div>';
+    return svg;
+  } catch(err){
+    return _chartError('pareto', err);
+  }
+}
+
+function _checksheetState(moduleId, blockId, config, data){
+  var ms = getModuleState(moduleId || '_');
+  var matrix;
+  if(!ms.checksheetStates[blockId]){
+    matrix = {};
+    if(data && !Array.isArray(data) && typeof data === 'object'){
+      Object.keys(data).forEach(function(rowId){
+        if(data[rowId] && typeof data[rowId] === 'object') matrix[rowId] = _clone(data[rowId]);
+      });
+    } else if(Array.isArray(data)){
+      data.forEach(function(item){
+        if(item && item.rowId != null && item.colId != null){
+          if(!matrix[item.rowId]) matrix[item.rowId] = {};
+          matrix[item.rowId][item.colId] = item.value;
+        }
+      });
+    }
+    ms.checksheetStates[blockId] = matrix;
+  }
+  return ms.checksheetStates[blockId];
+}
+
+function _checksheetNumericValue(type, value){
+  if(type === 'check') return value ? 1 : 0;
+  if(type === 'pass_fail') return value === 'pass' ? 1 : 0;
+  return _chartNumber(value);
+}
+
+/**
+ * Render an interactive checksheet grid for quality inspections.
+ * @param {Object} config
+ * @param {*} data
+ * @param {Object} state
+ * @param {string} blockId
+ * @returns {string}
+ */
+function renderChecksheet(config, data, state, blockId){
+  var rows = config.rows || (config.checklist && config.checklist.items) || [];
+  var columns = config.columns || [];
+  var matrix;
+  var html = '';
+  var moduleId = _chartModuleId(state);
+  if(!rows.length || !columns.length) return _chartEmpty(_t('Chưa cấu hình checksheet', 'Checksheet is not configured'));
+  matrix = _checksheetState(moduleId, blockId, config, data);
+  html += '<div class="hm-checksheet-wrap"><table class="hm-checksheet" role="table" aria-label="'+_chartAttrText(_t('Bảng checksheet kiểm tra chất lượng', 'Quality checksheet grid'))+'"><thead><tr><th scope="col">'+_esc(_t('Hạng mục', 'Item'))+'</th>';
+  columns.forEach(function(column){
+    html += '<th scope="col">'+_esc(_chartText(column, column.id || column.key, column.id || column.key))+'</th>';
+  });
+  html += '<th scope="col">'+_esc(_t('Tổng', 'Total'))+'</th></tr></thead><tbody>';
+  rows.forEach(function(row){
+    var rowId = row.id || row.key;
+    var rowTotal = 0;
+    html += '<tr><th scope="row">'+_esc(_chartText(row, rowId, rowId))+'</th>';
+    columns.forEach(function(column){
+      var colId = column.id || column.key;
+      var type = column.type || 'check';
+      var value = matrix[rowId] && matrix[rowId][colId] !== undefined ? matrix[rowId][colId] : (type === 'count' || type === 'measurement' ? 0 : (type === 'pass_fail' ? '' : false));
+      rowTotal += _checksheetNumericValue(type, value);
+      html += '<td class="'+(type === 'pass_fail' && value === 'fail' ? ' hm-checksheet-cell-fail' : '')+'">';
+      if(type === 'check'){
+        html += '<button type="button" class="hm-checksheet-btn'+(value ? ' is-on' : '')+'" data-action="hm-checksheet-toggle" data-block-id="'+_esc(blockId || '')+'" data-row="'+_esc(rowId)+'" data-col="'+_esc(colId)+'" aria-pressed="'+(value ? 'true' : 'false')+'">'+(value ? '&#10003;' : '&#9633;')+'</button>';
+      } else if(type === 'count'){
+        html += '<button type="button" class="hm-checksheet-btn hm-checksheet-btn-count" data-action="hm-checksheet-increment" data-block-id="'+_esc(blockId || '')+'" data-row="'+_esc(rowId)+'" data-col="'+_esc(colId)+'">'+_esc(String(value))+'</button>';
+      } else if(type === 'pass_fail'){
+        html += '<div class="hm-checksheet-passfail">';
+        html += '<button type="button" class="hm-checksheet-btn'+(value === 'pass' ? ' is-pass' : '')+'" data-action="hm-checksheet-passfail" data-block-id="'+_esc(blockId || '')+'" data-row="'+_esc(rowId)+'" data-col="'+_esc(colId)+'" data-value="pass">&#10003;</button>';
+        html += '<button type="button" class="hm-checksheet-btn'+(value === 'fail' ? ' is-fail' : '')+'" data-action="hm-checksheet-passfail" data-block-id="'+_esc(blockId || '')+'" data-row="'+_esc(rowId)+'" data-col="'+_esc(colId)+'" data-value="fail">&#10005;</button>';
+        html += '</div>';
+      } else {
+        html += '<input type="number" class="hm-input hm-input-xs" data-action="hm-checksheet-measure" data-block-id="'+_esc(blockId || '')+'" data-row="'+_esc(rowId)+'" data-col="'+_esc(colId)+'" value="'+_esc(String(value))+'" aria-label="'+_chartAttrText(_chartText(row, rowId, rowId) + ' ' + _chartText(column, colId, colId))+'">';
+      }
+      html += '</td>';
+    });
+    html += '<td class="hm-checksheet-total">'+_esc(_chartFormatValue(rowTotal, 'number'))+'</td></tr>';
+  });
+  html += '</tbody><tfoot><tr><th scope="row">'+_esc(_t('Tổng', 'Total'))+'</th>';
+  columns.forEach(function(column){
+    var colId = column.id || column.key;
+    var total = 0;
+    rows.forEach(function(row){
+      var rowId = row.id || row.key;
+      var value = matrix[rowId] && matrix[rowId][colId] !== undefined ? matrix[rowId][colId] : 0;
+      total += _checksheetNumericValue(column.type || 'check', value);
+    });
+    html += '<td class="hm-checksheet-total">'+_esc(_chartFormatValue(total, 'number'))+'</td>';
+  });
+  html += '<td></td></tr></tfoot></table></div>';
+  return html;
+}
+
+function _runtimeRowsRef(blockData, config){
+  var dataKey = config.dataKey || (config.dataSource && config.dataSource.dataKey) || 'items';
+  if(Array.isArray(blockData)) return blockData;
+  if(blockData && Array.isArray(blockData[dataKey])) return blockData[dataKey];
+  if(blockData && Array.isArray(blockData.items)) return blockData.items;
+  return [];
+}
+
+function _templateText(template, row, extra){
+  var ctx = {};
+  if(extra) Object.keys(extra).forEach(function(key){ ctx[key] = extra[key]; });
+  ctx.row = row || {};
+  ctx.record = row || {};
+  ctx.data = row || {};
+  if(template == null) return '';
+  if(typeof template !== 'string') return String(template);
+  if(template.indexOf('{{') >= 0) return resolveBindings(template, ctx);
+  if(row && row[template] !== undefined) return row[template];
+  return template;
+}
+
+/**
+ * Render a kanban board with WIP limits and drag-ready cards.
+ * @param {Object} config
+ * @param {*} data
+ * @param {Object} state
+ * @param {string} blockId
+ * @returns {string}
+ */
+function renderKanban(config, data, state, blockId){
+  var rows = _chartRows(config, data);
+  var kanbanCfg = config.kanban || {};
+  var statusKey = config.statusKey || kanbanCfg.laneField || 'status';
+  var rowKey = config.rowKey || 'id';
+  var columns = (config.columns || kanbanCfg.lanes || []).slice();
+  var html = '<div class="hm-kanban-board" data-block-id="'+_esc(blockId || '')+'" role="listbox" aria-label="'+_chartAttrText(_t('Bảng Kanban trạng thái', 'Kanban status board'))+'">';
+  if(!rows.length) return _chartEmpty(_t('Không có dữ liệu','No data'));
+  if(!columns.length){
+    rows.forEach(function(row){
+      var value = row[statusKey] == null ? _t('Chưa phân loại', 'Unassigned') : String(row[statusKey]);
+      if(!columns.some(function(column){ return (column.value || column.key || column) === value; })){
+        columns.push({ value:value, label:{ vi:value, en:value }, color:_chartColor(columns.length) });
+      }
+    });
+  }
+  columns.forEach(function(column, columnIndex){
+    var columnValue = column.value || column.key || column;
+    var columnRows = rows.filter(function(row){ return String(row[statusKey] || '') === String(columnValue); });
+    var wipLimit = Number(column.wipLimit || column.limit || 0);
+    html += '<section class="hm-kanban-column'+(wipLimit && columnRows.length > wipLimit ? ' is-over-limit' : '')+'" data-kanban-column="'+_esc(columnValue)+'" data-block-id="'+_esc(blockId || '')+'" aria-label="'+_chartAttrText(_chartText(column, columnValue, columnValue))+'">';
+    html += '<header class="hm-kanban-column-head" style="--hm-kanban-color:'+(column.color || _chartColor(columnIndex))+'">';
+    html += '<div><h3>'+_esc(_chartText(column, columnValue, columnValue))+'</h3></div>';
+    html += '<div class="hm-kanban-count">'+_esc(String(columnRows.length))+(wipLimit ? '/' + _esc(String(wipLimit)) : '')+'</div>';
+    html += '</header>';
+    if(!columnRows.length){
+      html += '<div class="hm-kanban-empty">'+_esc(_t('Không có mục nào', 'No items'))+'</div>';
+    }
+    columnRows.forEach(function(row, rowIndex){
+      var title = _templateText(config.cardTitle || (kanbanCfg.card && kanbanCfg.card.titleField) || 'title', row, {});
+      var subtitle = _templateText(config.cardSubtitle || (kanbanCfg.card && kanbanCfg.card.subtitleField) || '', row, {});
+      var badgeCfg = config.cardBadge || {};
+      var badgeValue = badgeCfg.key ? row[badgeCfg.key] : (kanbanCfg.card && kanbanCfg.card.priorityField ? row[kanbanCfg.card.priorityField] : '');
+      var badgeColor = badgeCfg.colors && badgeCfg.colors[badgeValue] ? badgeCfg.colors[badgeValue] : '';
+      html += '<article class="hm-kanban-card" draggable="'+((config.draggable !== false && kanbanCfg.allowDrag !== false) ? 'true' : 'false')+'" data-card-id="'+_esc(String(row[rowKey] != null ? row[rowKey] : rowIndex))+'" data-row-key="'+_esc(String(row[rowKey] != null ? row[rowKey] : rowIndex))+'" data-block-id="'+_esc(blockId || '')+'" role="option" aria-label="'+_chartAttrText(title)+'">';
+      html += '<div class="hm-kanban-card-head">';
+      html += '<strong>'+_esc(title)+'</strong>';
+      if(badgeValue !== undefined && badgeValue !== '') html += '<span class="hm-badge" style="'+(badgeColor ? ('background:'+badgeColor+'22;color:'+badgeColor+';') : '')+'">'+_esc(String(badgeValue))+'</span>';
+      html += '</div>';
+      if(subtitle) html += '<div class="hm-kanban-card-subtitle">'+_esc(subtitle)+'</div>';
+      html += '</article>';
+    });
+    html += '</section>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function _ganttDate(value){
+  var d = new Date(value);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+/**
+ * Render a gantt view with timeline zoom controls.
+ * @param {Object} config
+ * @param {*} data
+ * @param {Object} state
+ * @param {string} blockId
+ * @returns {string}
+ */
+function renderGantt(config, data, state, blockId){
+  var rows = _chartRows(config, data);
+  var scheduleCfg = config.schedule || {};
+  var taskKey = config.taskKey || scheduleCfg.titleField || 'task_name';
+  var startKey = config.startKey || scheduleCfg.startField || 'start_date';
+  var endKey = config.endKey || scheduleCfg.endField || 'end_date';
+  var progressKey = config.progressKey || scheduleCfg.progressField || 'percent_complete';
+  var groupKey = config.groupKey || scheduleCfg.groupByField || '';
+  var chartState = _chartState(state, blockId);
+  var zoom = chartState.zoomLevel || config.zoomLevel || 'day';
+  var tasks = [];
+  var minDate;
+  var maxDate;
+  var html = '';
+  rows.forEach(function(row){
+    var start = _ganttDate(row[startKey]);
+    var end = _ganttDate(row[endKey] || row[startKey]);
+    if(!start || !end) return;
+    tasks.push({ row: row, start: start, end: end < start ? start : end });
+  });
+  if(!tasks.length) return _chartEmpty(_t('Không có dữ liệu tiến độ', 'No schedule data'));
+  minDate = tasks[0].start;
+  maxDate = tasks[0].end;
+  tasks.forEach(function(task){
+    if(task.start < minDate) minDate = task.start;
+    if(task.end > maxDate) maxDate = task.end;
+  });
+  html += '<div class="hm-gantt" data-block-id="'+_esc(blockId || '')+'">';
+  html += '<div class="hm-gantt-toolbar"><div class="hm-chart-toolbar"><button type="button" class="hm-btn hm-btn-ghost hm-btn-sm'+(zoom === 'day' ? ' is-active' : '')+'" data-action="hm-gantt-zoom" data-block-id="'+_esc(blockId || '')+'" data-zoom="day">Day</button><button type="button" class="hm-btn hm-btn-ghost hm-btn-sm'+(zoom === 'week' ? ' is-active' : '')+'" data-action="hm-gantt-zoom" data-block-id="'+_esc(blockId || '')+'" data-zoom="week">Week</button><button type="button" class="hm-btn hm-btn-ghost hm-btn-sm'+(zoom === 'month' ? ' is-active' : '')+'" data-action="hm-gantt-zoom" data-block-id="'+_esc(blockId || '')+'" data-zoom="month">Month</button></div></div>';
+  html += '<div class="hm-gantt-grid"><div class="hm-gantt-list">';
+  tasks.forEach(function(task){
+    html += '<div class="hm-gantt-row-label"><strong>'+_esc(String(task.row[taskKey] || 'Task'))+'</strong>';
+    if(groupKey && task.row[groupKey]) html += '<small>'+_esc(String(task.row[groupKey]))+'</small>';
+    html += '</div>';
+  });
+  html += '</div><div class="hm-gantt-timeline"><div class="hm-gantt-header">';
+  (function(){
+    var current = new Date(minDate.getTime());
+    var cells = [];
+    while(current <= maxDate){
+      cells.push(new Date(current.getTime()));
+      if(zoom === 'month') current.setMonth(current.getMonth() + 1);
+      else if(zoom === 'week') current.setDate(current.getDate() + 7);
+      else current.setDate(current.getDate() + 1);
+    }
+    cells.forEach(function(cell){
+      html += '<div class="hm-gantt-header-cell">'+_esc(zoom === 'month' ? cell.toLocaleDateString('en-US', { month:'short', year:'2-digit' }) : zoom === 'week' ? ('W' + Math.ceil(cell.getDate() / 7) + ' ' + cell.toLocaleDateString('en-US', { month:'short' })) : cell.toLocaleDateString('en-US', { day:'2-digit', month:'short' }))+'</div>';
+    });
+  }());
+  html += '</div><div class="hm-gantt-body">';
+  tasks.forEach(function(task){
+    var totalMs = Math.max(maxDate.getTime() - minDate.getTime(), 86400000);
+    var leftPct = ((task.start.getTime() - minDate.getTime()) / totalMs) * 100;
+    var widthPct = ((task.end.getTime() - task.start.getTime() + 86400000) / totalMs) * 100;
+    var todayPct = ((Date.now() - minDate.getTime()) / totalMs) * 100;
+    html += '<div class="hm-gantt-row">';
+    if(config.showToday) html += '<div class="hm-gantt-today" style="left:'+todayPct.toFixed(2)+'%"></div>';
+    html += '<div class="hm-gantt-bar" style="left:'+leftPct.toFixed(2)+'%;width:'+Math.max(widthPct, 1).toFixed(2)+'%" title="'+_chartAttrText(String(task.row[taskKey] || 'Task'))+'"><span class="hm-gantt-bar-fill" style="width:'+_chartClamp(_chartNumber(task.row[progressKey]), 0, 100)+'%"></span><span class="hm-gantt-bar-label">'+_esc(String(task.row[taskKey] || 'Task'))+'</span></div></div>';
+  });
+  html += '</div></div></div></div>';
+  return html;
+}
+
+function _detailRecord(data){
+  if(Array.isArray(data)) return data[0] || null;
+  if(data && Array.isArray(data.items)) return data.items[0] || null;
+  return data || null;
+}
+
+function _humanizeKey(key){
+  var text = String(key || '').replace(/[_\-]+/g, ' ').trim();
+  if(!text) return '';
+  return text.replace(/\b([a-z])/g, function(all, ch){ return ch.toUpperCase(); });
+}
+
+function _modalFocusables(modal){
+  return Array.prototype.slice.call(modal.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'));
+}
+
+function _trapModalFocus(e, modal){
+  var nodes = _modalFocusables(modal);
+  var first;
+  var last;
+  if(!nodes.length) return;
+  first = nodes[0];
+  last = nodes[nodes.length - 1];
+  if(e.shiftKey && document.activeElement === first){
+    e.preventDefault();
+    last.focus();
+  } else if(!e.shiftKey && document.activeElement === last){
+    e.preventDefault();
+    first.focus();
+  }
+}
+
+function _managedFormData(moduleId, blockId, seed){
+  var ms = getModuleState(moduleId);
+  var data = {};
+  Object.keys(seed && typeof seed === 'object' ? seed : {}).forEach(function(key){
+    data[key] = seed[key];
+  });
+  if(ms.formDrafts[blockId]){
+    Object.keys(ms.formDrafts[blockId]).forEach(function(key){
+      data[key] = ms.formDrafts[blockId][key];
+    });
+  }
+  return data;
+}
+
+function _managedFieldId(blockId, fieldKey){
+  return 'hm_' + _safeBlockBindingKey(blockId || 'block') + '_' + _safeBlockBindingKey(fieldKey || 'field');
+}
+
+function _managedFieldSpan(field){
+  var span = String(field && field.span || 'half').toLowerCase();
+  if(span === 'full') return '1 / -1';
+  if(span === 'third') return 'span 4';
+  if(span === 'quarter') return 'span 3';
+  if(span === 'half') return 'span 6';
+  if(/^\d+$/.test(span)) return 'span ' + span;
+  return 'span 6';
+}
+
+function _managedFieldType(field){
+  var type = String(field && field.type || 'text').toLowerCase();
+  if(type === 'string' || type === 'badge' || type === 'lookup' || type === 'link') return 'text';
+  if(type === 'integer' || type === 'currency' || type === 'percent' || type === 'percentage') return 'number';
+  if(type === 'datetime') return 'datetime-local';
+  if(type === 'boolean') return 'checkbox';
+  if(type === 'phone') return 'tel';
+  return type;
+}
+
+function _managedFieldPlaceholder(field){
+  if(field && field.placeholder && typeof field.placeholder === 'object'){
+    return _t(field.placeholder.vi || '', field.placeholder.en || field.placeholder.vi || '');
+  }
+  return _t(field && field.placeholder || '', field && (field.placeholderEn || field.placeholder) || '');
+}
+
+function _managedFieldOptions(field){
+  return field && Array.isArray(field.options) ? field.options : [];
+}
+
+function _renderManagedField(field, value, error, blockId){
+  var label = _getFieldLabel(field) || _humanizeKey(field.key || '');
+  var fieldId = _managedFieldId(blockId, field.key);
+  var errorId = fieldId + '_error';
+  var type = _managedFieldType(field);
+  var required = field.required || field.validation && field.validation.required;
+  var invalid = !!error;
+  var attrs = ' id="'+_esc(fieldId)+'" name="'+_esc(field.key || '')+'" aria-label="'+_esc(label)+'" aria-required="'+(required ? 'true' : 'false')+'" aria-invalid="'+(invalid ? 'true' : 'false')+'"'+(invalid ? ' aria-describedby="'+_esc(errorId)+'"' : '');
+  var placeholder = _managedFieldPlaceholder(field);
+  var html = '<div class="hm-form-group hm-managed-field" style="grid-column:'+_managedFieldSpan(field)+'">';
+  html += '<label class="hm-label" for="'+_esc(fieldId)+'">'+_esc(label)+(required ? ' <span class="hm-required">*</span>' : '')+'</label>';
+  if(type === 'textarea'){
+    html += '<textarea class="hm-input hm-textarea'+(invalid ? ' hm-field-invalid' : '')+'" rows="'+_esc(String(field.rows || 3))+'" role="textbox"'+attrs+(placeholder ? ' placeholder="'+_esc(placeholder)+'"' : '')+'>'+_esc(value == null ? '' : String(value))+'</textarea>';
+  } else if(type === 'select'){
+    html += '<select class="hm-input hm-select'+(invalid ? ' hm-field-invalid' : '')+'" role="combobox"'+attrs+'>';
+    html += '<option value="">'+_t('Chọn...', 'Select...')+'</option>';
+    _managedFieldOptions(field).forEach(function(opt){
+      var optionValue = opt && typeof opt === 'object' ? opt.value : opt;
+      var optionLabel = opt && typeof opt === 'object' ? _t(opt.label && opt.label.vi || opt.label || String(optionValue), opt.label && opt.label.en || opt.labelEn || opt.label || String(optionValue)) : String(opt);
+      html += '<option value="'+_esc(optionValue)+'"'+(String(value) === String(optionValue) ? ' selected' : '')+'>'+_esc(optionLabel)+'</option>';
+    });
+    html += '</select>';
+  } else if(type === 'checkbox'){
+    html += '<label class="hm-checkbox-label"><input type="checkbox" class="'+(invalid ? 'hm-field-invalid ' : '')+'" role="checkbox"'+attrs+(value ? ' checked' : '')+' aria-checked="'+(value ? 'true' : 'false')+'"> '+_esc(field.checkLabel ? _t(field.checkLabel, field.checkLabelEn || field.checkLabel) : label)+'</label>';
+  } else {
+    html += '<input type="'+_esc(type)+'" class="hm-input'+(invalid ? ' hm-field-invalid' : '')+'"'+attrs+' value="'+_esc(value == null ? '' : String(value))+'"'+(placeholder ? ' placeholder="'+_esc(placeholder)+'"' : '')+'>';
+  }
+  if(error){
+    html += '<div class="hm-field-error hm-field-error-'+_esc((error.severity || 'error').toLowerCase())+'" id="'+_esc(errorId)+'" role="alert">'+_esc(error.message || error)+'</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function _renderManagedFieldGrid(fields, formData, errors, blockId){
+  var html = '<div class="hm-managed-grid">';
+  (fields || []).forEach(function(field){
+    html += _renderManagedField(field, formData[field.key], errors[field.key], blockId);
+  });
+  html += '</div>';
+  return html;
+}
+
+function _normalizeSubmitConfig(config, mode){
+  var submit = Object.assign({}, config && config.submit || {});
+  var extra = null;
+  if(mode === 'wizard' && config && config.wizard && config.wizard.submit) extra = config.wizard.submit;
+  if(mode === 'modal' && config && config.modal && config.modal.submitApi) extra = config.modal.submitApi;
+  if((!submit.api && !submit.action) && config && config.submitApi) extra = config.submitApi;
+  if(extra) submit = Object.assign({}, extra, submit);
+  if(submit.action && !submit.api) submit.api = submit.action;
+  return submit;
+}
+
+function _wizardConfig(config){
+  return config && config.wizard ? config.wizard : (config || {});
+}
+
+function _wizardFieldCatalog(config){
+  var fields = [];
+  var map = {};
+  function addField(field){
+    if(!field || !field.key || map[field.key]) return;
+    map[field.key] = true;
+    fields.push(field);
+  }
+  (config.fields || []).forEach(addField);
+  (_wizardConfig(config).steps || []).forEach(function(step){
+    (step.fields || []).forEach(addField);
+    String(step.fieldsCsv || '').split(',').forEach(function(key){
+      var trimmed = String(key || '').replace(/^\s+|\s+$/g, '');
+      if(!trimmed || map[trimmed]) return;
+      addField({ key:trimmed, label:{ vi:_humanizeKey(trimmed), en:_humanizeKey(trimmed) }, type:'string', span:'half' });
+    });
+  });
+  return fields;
+}
+
+function _wizardVisibleSteps(config, context){
+  return (_wizardConfig(config).steps || []).filter(function(step){
+    if(!step.visibleWhen) return true;
+    try { return !!evaluateExpression(step.visibleWhen, context || {}); } catch(err){ return true; }
+  });
+}
+
+function _wizardStepFields(step, fields){
+  var map = {};
+  (fields || []).forEach(function(field){ map[field.key] = field; });
+  if(step && Array.isArray(step.fields) && step.fields.length) return step.fields;
+  return String(step && step.fieldsCsv || '').split(',').map(function(key){
+    var trimmed = String(key || '').replace(/^\s+|\s+$/g, '');
+    if(!trimmed) return null;
+    return map[trimmed] || { key:trimmed, label:{ vi:_humanizeKey(trimmed), en:_humanizeKey(trimmed) }, type:'string', span:'half' };
+  }).filter(Boolean);
+}
+
+function _wizardIsSummaryStep(step, config, index, total){
+  var wizard = _wizardConfig(config);
+  if(!step) return false;
+  if(step.summary) return true;
+  if(wizard.summaryStepKey && (step.key === wizard.summaryStepKey || step.id === wizard.summaryStepKey)) return true;
+  if(index === total - 1 && !String(step.fieldsCsv || '').trim() && !(step.fields && step.fields.length)) return true;
+  return false;
+}
+
+function _wizardState(moduleId, blockId){
+  var ms = getModuleState(moduleId);
+  if(!ms.wizardStates[blockId]) ms.wizardStates[blockId] = { step:0, direction:'forward' };
+  return ms.wizardStates[blockId];
+}
+
+function _modalState(moduleId, blockId){
+  var ms = getModuleState(moduleId);
+  if(!ms.modalStates[blockId]) ms.modalStates[blockId] = { open:false, focused:false, restoreFocus:false };
+  return ms.modalStates[blockId];
+}
+
+function _modalConfig(config){
+  var modal = Object.assign({}, config && config.modal || {});
+  if(!modal.trigger) modal.trigger = config && config.trigger ? config.trigger : {};
+  if(!modal.title){
+    if(config && config.title && typeof config.title === 'object') modal.title = config.title;
+    else modal.title = { vi:config && config.title || '', en:config && (config.titleEn || config.title) || '' };
+  }
+  if(modal.closeOnOverlay === undefined && config && config.closeOnOverlay !== undefined) modal.closeOnOverlay = config.closeOnOverlay;
+  if(modal.closeOnSubmit === undefined && config && config.closeOnSubmit !== undefined) modal.closeOnSubmit = config.closeOnSubmit;
+  if(!modal.size) modal.size = config && config.size || 'md';
+  return modal;
+}
+
+function _machineConfig(config){
+  var machine = config && config.machine ? config.machine : {};
+  var cardFields = config && config.cardFields ? config.cardFields : {};
+  var statusColors = Object.assign({}, config && config.statusColors || {});
+  (machine.statusMap || []).forEach(function(item){
+    if(item && item.key && item.color && !statusColors[item.key]) statusColors[item.key] = item.color;
+  });
+  return {
+    columns: config.columns || machine.columns || 4,
+    refreshInterval: config.refreshInterval || machine.refreshInterval || 30000,
+    nameKey: cardFields.name || machine.assetField || 'machine_name',
+    codeKey: cardFields.code || machine.lineField || 'machine_id',
+    statusKey: cardFields.status || machine.statusField || 'status',
+    reasonKey: cardFields.reason || machine.reasonField || 'alarm_code',
+    currentJobKey: cardFields.currentJob || machine.currentJobField || 'current_jo',
+    oeeKey: cardFields.oee || machine.oeeField || 'oee_percent',
+    operatorKey: cardFields.operator || machine.operatorField || 'operator_name',
+    lastUpdateKey: cardFields.lastUpdate || machine.updatedAtField || 'last_heartbeat',
+    navigateUrl: config.navigateUrl || machine.navigateUrl || '',
+    detailTab: config.detailTab || machine.detailTab || '',
+    statusColors: statusColors
+  };
+}
+
+function _focusModalFirstField(container, blockId){
+  var modal = container.querySelector('.hm-form-modal[data-block-id="'+blockId+'"]');
+  var first;
+  if(!modal) return;
+  first = _modalFocusables(modal)[0];
+  if(first && first.focus) first.focus();
+}
+
+function _handleWizardPrev(container, moduleId, btn){
+  var blockId = btn.getAttribute('data-block-id');
+  var ws = _wizardState(moduleId, blockId);
+  var ms = getModuleState(moduleId);
+  ws.step = Math.max(0, (ws.step || 0) - 1);
+  ws.direction = 'backward';
+  renderModuleFromSchema(container, ms._schema);
+}
+
+function _handleWizardNext(container, moduleId, btn){
+  var blockId = btn.getAttribute('data-block-id');
+  var ms = getModuleState(moduleId);
+  var block = _findBlockById(ms._schema, blockId);
+  var formEl = container.querySelector('form[data-hm-form-block="'+blockId+'"]');
+  var formData = formEl ? _storeFormDraftFromElement(moduleId, formEl) : _managedFormData(moduleId, blockId, ms.blockData[blockId] || {});
+  var ctx = _buildReactiveContext(moduleId);
+  var wizard = _wizardConfig(block && block.config || {});
+  var steps;
+  var ws;
+  var currentStep;
+  var fields;
+  var validationResult;
+  var saveDraftConfig;
+  if(!block) return;
+  ctx.block = block;
+  ctx.formData = formData;
+  ctx.row = formData;
+  ctx.data = formData;
+  steps = _wizardVisibleSteps(block.config || {}, ctx);
+  ws = _wizardState(moduleId, blockId);
+  ws.step = _chartClamp(ws.step || 0, 0, Math.max(steps.length - 1, 0));
+  currentStep = steps[ws.step];
+  if(!currentStep) return;
+  if(btn.getAttribute('data-skip') !== '1' && !_wizardIsSummaryStep(currentStep, block.config || {}, ws.step, steps.length)){
+    fields = _wizardStepFields(currentStep, _wizardFieldCatalog(block.config || {}));
+    validationResult = validateForm(fields, formData, ctx);
+    ms.formErrors[blockId] = validationResult.errors || {};
+    if(formEl) showValidationErrors(formEl, ms.formErrors[blockId]);
+    if(!validationResult.valid){
+      toast(_t('Vui lòng hoàn tất các trường bắt buộc của bước hiện tại.', 'Please complete the required fields for the current step.'), 'warning');
+      return;
+    }
+  }
+  saveDraftConfig = wizard.saveDraft && wizard.saveDraft.api ? wizard.saveDraft : null;
+  if(saveDraftConfig){
+    _api(saveDraftConfig.api, formData, saveDraftConfig.method || 'POST').catch(function(err){
+      console.warn('[BlockEngine] wizard save-draft failed', err);
+    });
+  }
+  ws.step = Math.min(ws.step + 1, steps.length - 1);
+  ws.direction = 'forward';
+  renderModuleFromSchema(container, ms._schema);
+}
+
+function _handleWizardSubmit(container, moduleId, btn){
+  var blockId = btn.getAttribute('data-block-id');
+  var ms = getModuleState(moduleId);
+  var block = _findBlockById(ms._schema, blockId);
+  var formEl = container.querySelector('form[data-hm-form-block="'+blockId+'"]');
+  var formData = formEl ? _storeFormDraftFromElement(moduleId, formEl) : _managedFormData(moduleId, blockId, ms.blockData[blockId] || {});
+  var ctx = _buildReactiveContext(moduleId);
+  var submitConfig;
+  var allFields;
+  var validationResult;
+  var wizard;
+  if(!block) return;
+  wizard = _wizardConfig(block.config || {});
+  submitConfig = _normalizeSubmitConfig(block.config || {}, 'wizard');
+  ctx.block = block;
+  ctx.formData = formData;
+  ctx.row = formData;
+  ctx.data = formData;
+  allFields = _wizardFieldCatalog(block.config || {});
+  validationResult = validateForm(allFields, formData, ctx);
+  ms.formErrors[blockId] = validationResult.errors || {};
+  if(formEl) showValidationErrors(formEl, ms.formErrors[blockId]);
+  if(!validationResult.valid){
+    toast(_t('Biểu mẫu wizard còn trường chưa hợp lệ.', 'The wizard still has invalid fields.'), 'danger');
+    return;
+  }
+  function finish(payload){
+    ms.blockData[blockId] = payload && payload.data ? payload.data : payload;
+    ms.formErrors[blockId] = {};
+    refreshDependents(moduleId, blockId);
+    if(wizard.successRoute) window.location.hash = resolveBindings(String(wizard.successRoute), ctx);
+    renderModuleFromSchema(container, ms._schema);
+  }
+  if(!submitConfig.api){
+    toast(_t('Đã lưu dữ liệu wizard trong phiên làm việc.', 'Wizard data saved in the current session.'), 'success');
+    finish(formData);
+    return;
+  }
+  _api(submitConfig.api, formData, submitConfig.method || 'POST').then(function(resp){
+    toast(_t('Đã gửi wizard thành công.', 'Wizard submitted successfully.'), 'success');
+    invalidateCache(submitConfig.api);
+    finish(resp && resp.data ? resp : formData);
+  }).catch(function(err){
+    toast(_t('Gửi wizard thất bại.', 'Wizard submission failed.'), 'danger');
+    console.warn('[BlockEngine] wizard submit failed', err);
+  });
+}
+
+function _handleModalOpen(container, moduleId, btn){
+  var blockId = btn.getAttribute('data-block-id');
+  var state = _modalState(moduleId, blockId);
+  state.open = true;
+  state.focused = false;
+  state.restoreFocus = false;
+  renderModuleFromSchema(container, getModuleState(moduleId)._schema);
+}
+
+function _handleModalClose(container, moduleId, target){
+  var blockId = typeof target === 'string' ? target : target.getAttribute('data-block-id');
+  var ms = getModuleState(moduleId);
+  var block = _findBlockById(ms._schema, blockId);
+  var modalCfg = _modalConfig(block && block.config || {});
+  var state = _modalState(moduleId, blockId);
+  if(typeof target !== 'string' && target.className && String(target.className).indexOf('hm-form-modal-overlay') >= 0 && modalCfg.closeOnOverlay === false){
+    return;
+  }
+  state.open = false;
+  state.focused = false;
+  state.restoreFocus = true;
+  renderModuleFromSchema(container, ms._schema);
+}
+
+function _handleMachineCard(container, moduleId, btn){
+  var blockId = btn.getAttribute('data-block-id');
+  var rowIndex = parseInt(btn.getAttribute('data-row-index'), 10);
+  var ms = getModuleState(moduleId);
+  var block = _findBlockById(ms._schema, blockId);
+  var rows = _runtimeRowsRef(ms.blockData[blockId], block && block.config || {});
+  var row = rows[rowIndex] || null;
+  var cfg = _machineConfig(block && block.config || {});
+  var ctx;
+  if(!block || !row) return;
+  ctx = _buildReactiveContext(moduleId);
+  ctx.row = row;
+  ctx.machine = row;
+  if(cfg.navigateUrl){
+    window.location.href = resolveBindings(String(cfg.navigateUrl), ctx);
+    return;
+  }
+  if(cfg.detailTab){
+    ms.activeTab = cfg.detailTab;
+    ms.customState.selectedMachine = row;
+    renderModuleFromSchema(container, ms._schema);
+  }
+}
+
+function _initFormModals(container, moduleId){
+  var ms = getModuleState(moduleId);
+  container.querySelectorAll('.hm-form-modal[data-block-id]').forEach(function(modal){
+    var blockId = modal.getAttribute('data-block-id');
+    var state = _modalState(moduleId, blockId);
+    if(state.open && !state.focused){
+      _focusModalFirstField(container, blockId);
+      state.focused = true;
+    }
+  });
+  Object.keys(ms.modalStates || {}).forEach(function(blockId){
+    var state = ms.modalStates[blockId];
+    var trigger;
+    if(state && state.restoreFocus && !state.open){
+      trigger = container.querySelector('[data-action="hm-modal-open"][data-block-id="'+blockId+'"]');
+      if(trigger && trigger.focus) trigger.focus();
+      state.restoreFocus = false;
+    }
+  });
+}
+
+function _initMachineStatusBoards(container, moduleId){
+  var ms = getModuleState(moduleId);
+  var liveBlocks = {};
+  container.querySelectorAll('.hm-machine-status-grid[data-block-id]').forEach(function(grid){
+    var blockId = grid.getAttribute('data-block-id');
+    var block = _findBlockById(ms._schema, blockId);
+    var cfg = _machineConfig(block && block.config || {});
+    var refreshMs = Math.max(parseInt(cfg.refreshInterval, 10) || 0, 0);
+    liveBlocks[blockId] = true;
+    if(!refreshMs) return;
+    if(ms.machineTimers[blockId] && ms.machineTimers[blockId].interval === refreshMs) return;
+    if(ms.machineTimers[blockId] && ms.machineTimers[blockId].handle) clearInterval(ms.machineTimers[blockId].handle);
+    ms.machineTimers[blockId] = {
+      interval: refreshMs,
+      handle: setInterval(function(){
+        if(!document.body.contains(container)){
+          if(ms.machineTimers[blockId] && ms.machineTimers[blockId].handle) clearInterval(ms.machineTimers[blockId].handle);
+          delete ms.machineTimers[blockId];
+          return;
+        }
+        if(block && block.config && block.config.dataSource && block.config.dataSource.api){
+          invalidateCache(block.config.dataSource.api);
+        }
+        renderModuleFromSchema(container, ms._schema);
+      }, refreshMs)
+    };
+  });
+  Object.keys(ms.machineTimers || {}).forEach(function(blockId){
+    if(liveBlocks[blockId]) return;
+    if(ms.machineTimers[blockId] && ms.machineTimers[blockId].handle) clearInterval(ms.machineTimers[blockId].handle);
+    delete ms.machineTimers[blockId];
+  });
+}
+
+function _handleFormSubmit(container, moduleId, formEl){
+  var ms = getModuleState(moduleId);
+  var blockId = formEl.getAttribute('data-hm-form-block');
+  var block = _findBlockById(ms._schema, blockId);
+  var formData = _storeFormDraftFromElement(moduleId, formEl);
+  var context = _buildReactiveContext(moduleId);
+  var validationResult = { valid:true, errors:{} };
+  var submitConfig;
+  function finalizeSubmit(payload){
+    var modalCfg = _modalConfig(block && block.config || {});
+    ms.blockData[blockId] = payload && payload.data ? payload.data : payload;
+    ms.formErrors[blockId] = {};
+    if(block && block.type === 'form-modal' && modalCfg.closeOnSubmit !== false){
+      _modalState(moduleId, blockId).open = false;
+      _modalState(moduleId, blockId).focused = false;
+      _modalState(moduleId, blockId).restoreFocus = true;
+    }
+    refreshDependents(moduleId, blockId);
+    renderModuleFromSchema(container, ms._schema);
+  }
+  if(!block) return;
+  context._moduleId = moduleId;
+  context._container = container;
+  context.block = block;
+  context.formData = formData;
+  if(!(block.config && block.config.validation && block.config.validation.autoApply === false)){
+    validationResult = validateForm(block.config.fields || [], formData, context);
+  }
+  ms.formErrors[blockId] = validationResult.errors || {};
+  showValidationErrors(formEl, validationResult.errors || {});
+  if(!validationResult.valid){
+    toast(_t('Biểu mẫu còn lỗi validation.', 'The form still has validation errors.'), 'danger');
+    return;
+  }
+  submitConfig = _normalizeSubmitConfig(block.config || {}, block.type === 'form-modal' ? 'modal' : '');
+  if(!submitConfig.api){
+    toast(_t('Biểu mẫu hợp lệ và đã được lưu trong phiên làm việc.', 'The form is valid and has been stored in the current session.'), 'success');
+    finalizeSubmit(formData);
+    return;
+  }
+  _api(submitConfig.api, formData, submitConfig.method || 'POST').then(function(resp){
+    toast(_t('Đã gửi biểu mẫu thành công.', 'Form submitted successfully.'), 'success');
+    invalidateCache(submitConfig.api);
+    finalizeSubmit(resp && resp.data ? resp : formData);
+  }).catch(function(err){
+    toast(_t('Gửi biểu mẫu thất bại.', 'Form submission failed.'), 'danger');
+    console.warn('[BlockEngine] form submit failed', err);
+  });
+}
+
+/**
+ * Render a record detail view with inline-edit support.
+ * @param {Object} config
+ * @param {*} data
+ * @param {Object} state
+ * @param {string} blockId
+ * @returns {string}
+ */
+function renderRecordDetail(config, data, state, blockId){
+  var record = _detailRecord(data);
+  var fields = config.fields || [];
+  var moduleId = _chartModuleId(state);
+  var ms = getModuleState(moduleId);
+  var detailState = ms.detailStates[blockId] || { editing:'' };
+  var html = '';
+  if(state && state.loading && state.loading[blockId]){
+    return '<div class="hm-skeleton"><div class="hm-skeleton-line"></div><div class="hm-skeleton-line"></div><div class="hm-skeleton-line hm-skeleton-short"></div></div>';
+  }
+  if(!record) return _chartEmpty(_t('Không tìm thấy bản ghi', 'Record not found'));
+  html += '<div class="hm-record-detail" data-block-id="'+_esc(blockId || '')+'">';
+  fields.forEach(function(field){
+    var key = field.key;
+    var label = _chartText(field, key, key);
+    var value = record[key];
+    var editing = detailState.editing === key && config.editable !== false;
+    html += '<div class="hm-record-field hm-record-field-'+_esc(field.span || 'half')+'"><div class="hm-record-label">'+_esc(label)+'</div>';
+    if(editing){
+      html += '<input type="'+(field.type === 'number' || field.type === 'currency' ? 'number' : (field.type === 'date' ? 'date' : 'text'))+'" class="hm-input" data-action="hm-detail-input" data-block-id="'+_esc(blockId || '')+'" data-field="'+_esc(key)+'" value="'+_esc(value == null ? '' : String(value))+'">';
+    } else {
+      html += '<button type="button" class="hm-record-value" data-action="hm-detail-edit" data-block-id="'+_esc(blockId || '')+'" data-field="'+_esc(key)+'">'+_esc(field.type === 'currency' ? _chartFormatValue(value, 'currency') : field.type === 'date' ? _chartDateLabel(value) : value == null ? '' : String(value))+'</button>';
+    }
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+/**
+ * Render a step-by-step form wizard with validation and summary support.
+ * @param {Object} config
+ * @param {*} data
+ * @param {Object} state
+ * @param {string} blockId
+ * @param {Object} reactiveCtx
+ * @returns {string}
+ */
+function renderFormWizard(config, data, state, blockId, reactiveCtx){
+  try {
+    var moduleId = reactiveCtx && reactiveCtx._moduleId ? reactiveCtx._moduleId : _chartModuleId(state);
+    var ms = getModuleState(moduleId);
+    var wizard = _wizardConfig(config || {});
+    var formData = _managedFormData(moduleId, blockId, _detailRecord(data) || {});
+    var ctx = Object.assign({}, reactiveCtx || {}, { formData:formData, row:formData, data:formData });
+    var steps = _wizardVisibleSteps(config || {}, ctx);
+    var allFields = _wizardFieldCatalog(config || {});
+    var ws = _wizardState(moduleId, blockId);
+    var errors = ms.formErrors[blockId] || {};
+    var html = '';
+    if(!steps.length){
+      steps = [{ key:'info', label:{ vi:'Thông tin', en:'Information' }, fields:allFields }];
+    }
+    ws.step = _chartClamp(ws.step || 0, 0, Math.max(steps.length - 1, 0));
+    html += '<div class="hm-form-wizard hm-form-wizard-'+_esc(ws.direction || 'forward')+'" data-block-id="'+_esc(blockId || '')+'">';
+    if(wizard.showProgress !== false){
+      html += '<div class="hm-form-wizard-progressbar" aria-hidden="true"><span style="width:'+(((ws.step + 1) / steps.length) * 100).toFixed(2)+'%"></span></div>';
+      html += '<ol class="hm-form-wizard-steps" role="list" aria-label="'+_esc(_t('Tiến độ biểu mẫu', 'Form progress'))+'">';
+      steps.forEach(function(step, index){
+        var label = step.label && typeof step.label === 'object' ? _t(step.label.vi || step.label.en || ('Bước ' + (index + 1)), step.label.en || step.label.vi || ('Step ' + (index + 1))) : _t(step.label || ('Bước ' + (index + 1)), step.labelEn || step.label || ('Step ' + (index + 1)));
+        var status = index < ws.step ? 'done' : (index === ws.step ? 'active' : 'pending');
+        html += '<li class="hm-form-wizard-step hm-form-wizard-step-'+status+'">';
+        html += '<span class="hm-form-wizard-marker" aria-hidden="true">'+(index < ws.step ? '&#10003;' : String(index + 1))+'</span>';
+        html += '<span class="hm-form-wizard-label">'+_esc(label)+'</span>';
+        html += '</li>';
+      });
+      html += '</ol>';
+    }
+    (function(){
+      var currentStep = steps[ws.step];
+      var currentLabel = currentStep.label && typeof currentStep.label === 'object' ? _t(currentStep.label.vi || currentStep.label.en || 'Bước hiện tại', currentStep.label.en || currentStep.label.vi || 'Current step') : _t(currentStep.label || 'Bước hiện tại', currentStep.labelEn || currentStep.label || 'Current step');
+      var isSummary = _wizardIsSummaryStep(currentStep, config || {}, ws.step, steps.length);
+      var currentFields = isSummary ? [] : _wizardStepFields(currentStep, allFields);
+      html += '<div class="hm-form-wizard-panel">';
+      html += '<div class="hm-form-wizard-header"><div><h3>'+_esc(currentLabel)+'</h3><p>'+_esc(_t('Bước ' + (ws.step + 1) + ' / ' + steps.length, 'Step ' + (ws.step + 1) + ' / ' + steps.length))+'</p></div></div>';
+      html += '<form class="hm-form hm-form-wizard-form" data-hm-form-block="'+_esc(blockId || '')+'" onsubmit="return false" novalidate aria-label="'+_esc(currentLabel)+'">';
+      if(isSummary){
+        html += '<div class="hm-form-wizard-summary" role="region" aria-label="'+_esc(_t('Tóm tắt thông tin đã nhập', 'Entered information summary'))+'">';
+        allFields.forEach(function(field){
+          var rawValue = formData[field.key];
+          var formatted = rawValue == null ? '' : String(rawValue);
+          if(field.type === 'currency') formatted = _chartFormatValue(rawValue, 'currency');
+          else if(field.type === 'date' || field.type === 'datetime') formatted = _chartDateLabel(rawValue);
+          else if(field.type === 'checkbox' || field.type === 'boolean') formatted = rawValue ? _t('Có', 'Yes') : _t('Không', 'No');
+          html += '<div class="hm-form-wizard-summary-item"><small>'+_esc(_getFieldLabel(field) || field.key)+'</small><strong>'+_esc(formatted || '—')+'</strong></div>';
+        });
+        html += '</div>';
+      } else {
+        html += _renderManagedFieldGrid(currentFields, formData, errors, blockId);
+      }
+      html += '<div class="hm-form-wizard-actions">';
+      html += '<button type="button" class="hm-btn hm-btn-ghost" data-action="hm-wizard-prev" data-block-id="'+_esc(blockId || '')+'" aria-label="'+_esc(_t('Quay lại bước trước', 'Go to previous step'))+'" role="button"'+(ws.step <= 0 ? ' disabled' : '')+'>'+_t('Quay lại', 'Back')+'</button>';
+      if(ws.step < steps.length - 1){
+        if(wizard.allowSkip){
+          html += '<button type="button" class="hm-btn hm-btn-secondary" data-action="hm-wizard-next" data-skip="1" data-block-id="'+_esc(blockId || '')+'" aria-label="'+_esc(_t('Bỏ qua bước hiện tại', 'Skip current step'))+'" role="button">'+_t('Bỏ qua', 'Skip')+'</button>';
+        }
+        html += '<button type="button" class="hm-btn hm-btn-primary" data-action="hm-wizard-next" data-block-id="'+_esc(blockId || '')+'" aria-label="'+_esc(_t('Tiếp tục sang bước tiếp theo', 'Continue to the next step'))+'" role="button">'+_t('Tiếp tục', 'Continue')+'</button>';
+      } else {
+        html += '<button type="button" class="hm-btn hm-btn-primary" data-action="hm-wizard-submit" data-block-id="'+_esc(blockId || '')+'" aria-label="'+_esc(_t('Gửi biểu mẫu wizard', 'Submit wizard form'))+'" role="button">'+_t('Gửi', 'Submit')+'</button>';
+      }
+      html += '</div></form></div>';
+    }());
+    html += '</div>';
+    return html;
+  } catch(err){
+    console.warn('[BlockEngine] renderFormWizard failed', err);
+    return _chartError(_t('Không thể hiển thị form wizard', 'Unable to render form wizard'));
+  }
+}
+
+/**
+ * Render an inline modal trigger and managed modal form surface.
+ * @param {Object} config
+ * @param {*} data
+ * @param {Object} state
+ * @param {string} blockId
+ * @param {Object} reactiveCtx
+ * @returns {string}
+ */
+function renderFormModal(config, data, state, blockId, reactiveCtx){
+  try {
+    var moduleId = reactiveCtx && reactiveCtx._moduleId ? reactiveCtx._moduleId : _chartModuleId(state);
+    var ms = getModuleState(moduleId);
+    var modal = _modalConfig(config || {});
+    var modalState = _modalState(moduleId, blockId);
+    var formData = _managedFormData(moduleId, blockId, _detailRecord(data) || {});
+    var fields = config.fields || modal.fields || [];
+    var errors = ms.formErrors[blockId] || {};
+    var trigger = modal.trigger || {};
+    var triggerLabel = trigger.label && typeof trigger.label === 'object' ? _t(trigger.label.vi || 'Tạo mới', trigger.label.en || trigger.label.vi || 'Create new') : _t(trigger.label || 'Tạo mới', trigger.labelEn || trigger.label || 'Create new');
+    var titleId = _managedFieldId(blockId, 'modal_title');
+    var titleText = modal.title && typeof modal.title === 'object' ? _t(modal.title.vi || 'Tạo bản ghi mới', modal.title.en || modal.title.vi || 'Create new record') : _t(modal.title || 'Tạo bản ghi mới', modal.titleEn || modal.title || 'Create new record');
+    var html = '<div class="hm-form-modal-wrap" data-block-id="'+_esc(blockId || '')+'">';
+    html += '<button type="button" class="hm-btn hm-btn-'+_esc(trigger.style || 'primary')+'" data-action="hm-modal-open" data-block-id="'+_esc(blockId || '')+'" aria-label="'+_esc(triggerLabel)+'" aria-expanded="'+(modalState.open ? 'true' : 'false')+'" role="button">';
+    if(trigger.icon) html += '<span class="hm-btn-icon" aria-hidden="true">'+_esc(trigger.icon)+'</span>';
+    html += _esc(triggerLabel) + '</button>';
+    if(modalState.open){
+      html += '<div class="hm-form-modal-overlay'+(modal.closeOnOverlay === false ? ' is-locked' : '')+'"'+(modal.closeOnOverlay !== false ? ' data-action="hm-modal-close"' : '')+' data-block-id="'+_esc(blockId || '')+'" aria-hidden="true">';
+      html += '<div class="hm-form-modal hm-form-modal-'+_esc(modal.size || 'md')+'" data-block-id="'+_esc(blockId || '')+'" role="dialog" aria-modal="true" aria-labelledby="'+_esc(titleId)+'">';
+      html += '<div class="hm-form-modal-header"><h3 id="'+_esc(titleId)+'">'+_esc(titleText)+'</h3><button type="button" class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-modal-close" data-block-id="'+_esc(blockId || '')+'" aria-label="'+_esc(_t('Đóng hộp thoại', 'Close dialog'))+'" role="button">&times;</button></div>';
+      html += '<form class="hm-form hm-form-modal-form" data-hm-form-block="'+_esc(blockId || '')+'" onsubmit="return false" novalidate aria-label="'+_esc(titleText)+'">';
+      html += fields.length ? _renderManagedFieldGrid(fields, formData, errors, blockId) : _chartEmpty(_t('Chưa cấu hình trường cho modal', 'No modal fields configured'));
+      html += '<div class="hm-form-modal-actions">';
+      html += '<button type="button" class="hm-btn hm-btn-ghost" data-action="hm-modal-close" data-block-id="'+_esc(blockId || '')+'" aria-label="'+_esc(_t('Hủy và đóng hộp thoại', 'Cancel and close dialog'))+'" role="button">'+_t('Hủy', 'Cancel')+'</button>';
+      html += '<button type="submit" class="hm-btn hm-btn-primary" aria-label="'+_esc(_t('Lưu biểu mẫu modal', 'Save modal form'))+'">'+_t(config.submitLabel || 'Lưu', config.submitLabelEn || 'Save')+'</button>';
+      html += '</div></form></div></div>';
+    }
+    html += '</div>';
+    return html;
+  } catch(err){
+    console.warn('[BlockEngine] renderFormModal failed', err);
+    return _chartError(_t('Không thể hiển thị form modal', 'Unable to render form modal'));
+  }
+}
+
+/**
+ * Render a live machine status board with OEE mini gauges.
+ * @param {Object} config
+ * @param {*} data
+ * @param {Object} state
+ * @param {string} blockId
+ * @returns {string}
+ */
+function renderMachineStatus(config, data, state, blockId){
+  try {
+    var rows = _chartRows(data, config || {});
+    var machine = _machineConfig(config || {});
+    var html = '';
+    if(!rows.length) return _chartEmpty(_t('Không có dữ liệu máy', 'No machine data'));
+    html += '<div class="hm-machine-status-grid" data-block-id="'+_esc(blockId || '')+'" style="grid-template-columns:repeat('+Math.max(parseInt(machine.columns, 10) || 4, 1)+', minmax(0, 1fr))">';
+    rows.forEach(function(row, index){
+      var status = String(row[machine.statusKey] || 'idle').toLowerCase();
+      var color = machine.statusColors[status] || 'var(--gray-400)';
+      var oee = _chartClamp(_chartNumber(row[machine.oeeKey]), 0, 100);
+      var label = String(row[machine.nameKey] || row[machine.codeKey] || ('MC-' + (index + 1)));
+      var code = String(row[machine.codeKey] || '');
+      var job = row[machine.currentJobKey] == null ? '' : String(row[machine.currentJobKey]);
+      var operatorName = row[machine.operatorKey] == null ? '' : String(row[machine.operatorKey]);
+      var reason = row[machine.reasonKey] == null ? '' : String(row[machine.reasonKey]);
+      var updated = row[machine.lastUpdateKey] == null ? '' : String(row[machine.lastUpdateKey]).replace('T', ' ').slice(0, 16);
+      html += '<button type="button" class="hm-machine-card hm-machine-card-'+_esc(status)+(status === 'running' ? ' is-running' : '')+'" style="--hm-machine-color:'+_esc(color)+'" data-action="hm-machine-card" data-block-id="'+_esc(blockId || '')+'" data-row-index="'+index+'" aria-label="'+_esc(_t('Máy ' + label + ' trạng thái ' + status, 'Machine ' + label + ' status ' + status))+'" role="button">';
+      html += '<div class="hm-machine-card-top"><div><strong>'+_esc(label)+'</strong>'+(code ? '<small>'+_esc(code)+'</small>' : '')+'</div><span class="hm-machine-card-status" style="background:'+_esc(color)+'" role="status" aria-live="polite">'+_esc(status)+'</span></div>';
+      html += '<div class="hm-machine-card-body"><div class="hm-machine-card-gauge" aria-hidden="true"><span class="hm-machine-card-ring" style="background:conic-gradient('+_esc(color)+' 0 '+oee+'%, rgba(148,163,184,0.18) '+oee+'% 100%)"></span><span class="hm-machine-card-ring-center">'+_esc(String(Math.round(oee)))+'%</span></div>';
+      html += '<div class="hm-machine-card-fields">';
+      html += '<div><small>'+_t('Công việc hiện tại', 'Current job')+'</small><strong>'+_esc(job || '—')+'</strong></div>';
+      html += '<div><small>'+_t('Vận hành', 'Operator')+'</small><strong>'+_esc(operatorName || '—')+'</strong></div>';
+      html += '<div><small>'+_t('Cập nhật', 'Last update')+'</small><strong>'+_esc(updated || '—')+'</strong></div>';
+      if(reason) html += '<div><small>'+_t('Lý do / cảnh báo', 'Reason / alarm')+'</small><strong>'+_esc(reason)+'</strong></div>';
+      html += '</div></div></button>';
+    });
+    html += '</div>';
+    return html;
+  } catch(err){
+    console.warn('[BlockEngine] renderMachineStatus failed', err);
+    return _chartError(_t('Không thể hiển thị trạng thái máy', 'Unable to render machine status'));
   }
 }
 
@@ -6839,7 +8710,16 @@ window.HmBlockEngine = {
   renderKpiRow: renderKpiRow,
   renderFilterBar: renderFilterBar,
   renderBarChart: renderBarChart,
+  renderLineChart: renderLineChart,
+  renderAreaChart: renderAreaChart,
+  renderScatterChart: renderScatterChart,
+  renderRadarChart: renderRadarChart,
+  renderComboChart: renderComboChart,
   renderDonutChart: renderDonutChart,
+  renderSpcChart: renderSpcChart,
+  renderControlChart: renderControlChart,
+  renderParetoChart: renderParetoChart,
+  renderChecksheet: renderChecksheet,
   renderToolbar: renderToolbar,
   renderStatusFlow: renderStatusFlow,
   renderCardGrid: renderCardGrid,
@@ -7047,8 +8927,10 @@ function validateForm(fields, formData, context) {
   var errors = {};
   var valid = true;
   (fields || []).forEach(function (field) {
-    if (!field.validation) return;
-    var result = validateField(formData[field.key], field.validation, context);
+    var rules = Object.assign({}, field.validation || {});
+    if(field.required && rules.required === undefined) rules.required = true;
+    if(Object.keys(rules).length === 0) return;
+    var result = validateField(formData[field.key], rules, context);
     if (!result.valid) {
       errors[field.key] = { message: result.message, severity: _fieldSeverity(field) };
       valid = false;

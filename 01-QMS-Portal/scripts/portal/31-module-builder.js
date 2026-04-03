@@ -1692,7 +1692,7 @@ function _renderFieldControl(field, path, value){
     return _renderRegistryFieldSelect(field, path, textValue, attrs, placeholder);
   }
   if(type === 'toggle'){
-    return '<label style="display:flex;align-items:center;gap:var(--space-2);height:40px"><input type="checkbox"'+attrs+(value?' checked':'')+'> <span style="font-size:var(--text-sm);color:var(--text-secondary)">'+_t('Bat','Enabled')+'</span></label>';
+    return '<label class="mb-toggle-control"><input type="checkbox"'+attrs+(value?' checked':'')+'><span class="mb-toggle-text">'+_esc(_t('Bat','Enabled'))+'</span></label>';
   }
   if(type === 'select' || type === 'formula-select' || type === 'status-set-select' || type === 'iot-connector-select' || type === 'field-type-select' || type === 'workflow-select'){
     options = _getFieldOptions(field);
@@ -3444,7 +3444,9 @@ var undoManager = {
 var clipboard = { block: null };
 var dragState = { source: null, target: null, indicatorKey: '' };
 var _keyboardReady = false;
+var _viewportSyncReady = false;
 var _builderStyleId = 'hm-module-builder-v2-style';
+var _handleWheel;
 var _handleDragStart;
 var _handleDragOver;
 var _handleDrop;
@@ -3462,6 +3464,59 @@ var touchDragState = {
   startX: 0,
   startY: 0
 };
+
+function _eventElement(target){
+  if(!target) return null;
+  if(target.nodeType === 1) return target;
+  return target.parentElement || null;
+}
+
+function _resolveWheelRegion(target){
+  var node = _eventElement(target);
+  var header;
+  var panel;
+  if(!node || !node.closest) return null;
+  header = node.closest('.mb-panel-header');
+  if(header){
+    panel = header.parentElement;
+    if(panel && panel.classList && panel.classList.contains('mb-side-panel')) return panel.querySelector('.mb-tree-scroll');
+    if(panel && panel.classList && panel.classList.contains('mb-rail-panel')) return panel.querySelector('.mb-panel-body');
+  }
+  panel = node.closest('.mb-side-panel');
+  if(panel) return panel.querySelector('.mb-tree-scroll');
+  panel = node.closest('.mb-rail-panel');
+  if(panel) return panel.querySelector('.mb-panel-body');
+  if(node.closest('.mb-canvas-stage')) return node.closest('.mb-canvas-stage');
+  panel = node.closest('.mb-main-panel');
+  if(panel) return panel.querySelector('.mb-canvas-stage');
+  return null;
+}
+
+function _syncBuilderViewportMetrics(){
+  var c = state.container;
+  var shell = c && c.querySelector ? c.querySelector('.mb-builder-shell') : null;
+  var viewportHeight;
+  var top;
+  var nextHeight;
+  if(!c) return;
+  if(state.step !== 'build' || !shell){
+    c.style.removeProperty('--mb-shell-height');
+    return;
+  }
+  viewportHeight = window.innerHeight || document.documentElement.clientHeight || 900;
+  top = shell.getBoundingClientRect().top;
+  nextHeight = Math.max(440, viewportHeight - top - 20);
+  c.style.setProperty('--mb-shell-height', nextHeight + 'px');
+}
+
+function _ensureViewportSync(){
+  if(_viewportSyncReady || typeof window === 'undefined' || !window.addEventListener) return;
+  window.addEventListener('resize', function(){
+    _syncBuilderViewportMetrics();
+    _paintDigitalThreadOverlay();
+  }, { passive:true });
+  _viewportSyncReady = true;
+}
 
 function _ensureBuilderState(){
   if(state.showTree === undefined) state.showTree = true;
@@ -3496,19 +3551,25 @@ function _ensureBuilderStyles(){
   if(style) return;
   style = document.createElement('style');
   style.id = _builderStyleId;
-  css += '.mb-builder-shell{display:flex;gap:16px;align-items:stretch;min-height:560px}';
+  css += '.mb-builder-shell{display:flex;gap:16px;align-items:stretch;min-height:560px;height:var(--mb-shell-height,560px);max-height:var(--mb-shell-height,560px)}';
   css += '.mb-side-panel,.mb-main-panel,.mb-rail-panel{background:var(--bg-surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow-sm)}';
-  css += '.mb-side-panel{width:240px;overflow:hidden;display:flex;flex-direction:column}';
-  css += '.mb-main-panel{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}';
-  css += '.mb-right-rail{width:400px;display:flex;flex-direction:column;gap:16px}';
-  css += '.mb-rail-panel{display:flex;flex-direction:column;overflow:hidden}';
-  css += '.mb-panel-header{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px;background:linear-gradient(180deg,rgba(255,255,255,0.98),rgba(37,99,235,0.05));backdrop-filter:blur(10px)}';
-  css += '.mb-panel-body{padding:14px 16px;overflow:auto;flex:1;min-height:0}';
+  css += '.mb-side-panel{width:304px;flex:0 0 304px;overflow:hidden;display:flex;flex-direction:column;min-height:0}';
+  css += '.mb-main-panel{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;min-height:0}';
+  css += '.mb-right-rail{width:400px;flex:0 0 400px;display:flex;flex-direction:column;gap:16px;min-height:0}';
+  css += '.mb-right-rail>.mb-rail-panel{flex:1 1 0;min-height:0}';
+  css += '.mb-rail-panel{display:flex;flex-direction:column;overflow:hidden;min-height:0}';
+  css += '.mb-panel-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px;background:linear-gradient(180deg,rgba(255,255,255,0.98),rgba(37,99,235,0.05));backdrop-filter:blur(10px)}';
+  css += '.mb-panel-title{display:grid;gap:2px;min-width:0}';
+  css += '.mb-panel-title strong{display:flex;align-items:center;gap:8px;min-width:0;font-size:15px;line-height:1.25;color:var(--text-primary)}';
+  css += '.mb-panel-title strong span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}';
+  css += '.mb-panel-actions{display:flex;align-items:center;gap:6px;flex:0 0 auto}';
+  css += '.mb-panel-header>.hm-btn.hm-btn-sm,.mb-panel-actions>.hm-btn.hm-btn-sm{width:28px;height:28px;min-height:28px;padding:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;line-height:1;flex:0 0 auto}';
+  css += '.mb-panel-body{padding:14px 16px;overflow:auto;flex:1;min-height:0;overscroll-behavior:contain;scrollbar-width:none;-ms-overflow-style:none}';
   css += '.mb-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);background:rgba(248,250,252,0.9);backdrop-filter:blur(10px)}';
   css += '.mb-toolbar-group{display:flex;gap:8px;align-items:center;flex-wrap:wrap}';
   css += '.mb-toolbar-spacer{flex:1 1 auto}';
-  css += '.mb-canvas-stage{padding:18px;min-height:520px;background:radial-gradient(circle at top left,rgba(37,99,235,0.08),rgba(255,255,255,0) 34%),linear-gradient(180deg,rgba(37,99,235,0.04),rgba(255,255,255,0));overflow:auto;position:relative}';
-  css += '.mb-canvas-root{min-height:400px;padding:18px;border:1px dashed rgba(37,99,235,0.3);border-radius:20px;background:linear-gradient(180deg,#fff,rgba(248,250,252,0.98));box-shadow:inset 0 1px 0 rgba(255,255,255,0.75)}';
+  css += '.mb-canvas-stage{padding:18px;min-height:0;flex:1 1 auto;background:radial-gradient(circle at top left,rgba(37,99,235,0.08),rgba(255,255,255,0) 34%),linear-gradient(180deg,rgba(37,99,235,0.04),rgba(255,255,255,0));overflow:auto;position:relative;overscroll-behavior:contain;scrollbar-width:none;-ms-overflow-style:none}';
+  css += '.mb-canvas-root{min-height:100%;padding:18px;border:1px dashed rgba(37,99,235,0.3);border-radius:20px;background:linear-gradient(180deg,#fff,rgba(248,250,252,0.98));box-shadow:inset 0 1px 0 rgba(255,255,255,0.75)}';
   css += '.mb-layout-stack{display:flex;flex-direction:column}';
   css += '.mb-layout-grid{display:grid}';
   css += '.mb-layout-flex{display:flex;flex-wrap:wrap}';
@@ -3523,28 +3584,30 @@ function _ensureBuilderStyles(){
   css += '.mb-block-card.is-locked{background:rgba(15,23,42,0.03)}';
   css += '.mb-block-card.hm-block-dragging{opacity:.45;transform:scale(.985)}';
   css += '.mb-block-card,.mb-tree-node,[data-library-type]{touch-action:manipulation}';
-  css += '.mb-block-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:12px 14px;background:linear-gradient(180deg,rgba(15,23,42,0.02),rgba(15,23,42,0))}';
-  css += '.mb-block-meta{display:flex;gap:8px;align-items:flex-start}';
-  css += '.mb-block-icon{font-size:18px;line-height:1;width:24px;text-align:center}';
+  css += '.mb-block-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;background:linear-gradient(180deg,rgba(15,23,42,0.02),rgba(15,23,42,0))}';
+  css += '.mb-block-meta{display:flex;gap:8px;align-items:center;min-width:0;flex:1 1 auto}';
+  css += '.mb-block-icon{font-size:18px;line-height:1;width:24px;text-align:center;flex:0 0 24px}';
   css += '.mb-block-name{font-weight:700;color:var(--text-primary);font-size:14px}';
   css += '.mb-block-type{font-size:11px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}';
-  css += '.mb-block-tools{display:flex;gap:4px;flex-wrap:wrap}';
+  css += '.mb-block-tools{display:flex;gap:6px;align-items:center;flex:0 0 auto}';
+  css += '.mb-block-tools .hm-btn.hm-btn-sm{width:30px;height:30px;min-height:30px;padding:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;line-height:1;font-family:Segoe UI Symbol,Arial,sans-serif}';
   css += '.mb-block-body{padding:0 14px 14px}';
   css += '.mb-drop-above:before,.mb-drop-below:after{content:\"\";position:absolute;left:10px;right:10px;height:2px;background:var(--brand-2);border-radius:999px}';
   css += '.mb-drop-above:before{top:0}';
   css += '.mb-drop-below:after{bottom:0}';
   css += '.mb-drop-zone-active{border-color:var(--brand-2);box-shadow:0 0 0 2px rgba(37,99,235,0.12)}';
-  css += '.mb-tree-scroll{padding:10px 10px 14px;overflow:auto;flex:1}';
+  css += '.mb-tree-scroll{padding:10px 10px 14px;overflow:auto;flex:1;min-height:0;overscroll-behavior:contain;scrollbar-width:none;-ms-overflow-style:none}';
   css += '.mb-tree-root{font-size:12px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.08em;padding:0 8px 8px;font-weight:700}';
-  css += '.mb-tree-node{display:flex;align-items:center;gap:6px;padding:7px 8px;border-radius:12px;cursor:pointer;margin-bottom:4px;position:relative}';
+  css += '.mb-tree-node{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:12px;cursor:pointer;margin-bottom:4px;position:relative}';
   css += '.mb-tree-node:hover{background:var(--gray-50)}';
   css += '.mb-tree-node.is-selected{background:rgba(37,99,235,0.08);color:var(--brand-2)}';
   css += '.mb-tree-node.is-hidden{opacity:.68}';
   css += '.mb-tree-node.is-locked{background:rgba(15,23,42,0.04)}';
-  css += '.mb-tree-label{flex:1 1 auto;min-width:0}';
-  css += '.mb-tree-title{display:block;font-weight:600;font-size:13px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}';
+  css += '.mb-tree-label{flex:1 1 auto;min-width:0;padding-right:2px}';
+  css += '.mb-tree-title{display:-webkit-box;font-weight:600;font-size:13px;color:var(--text-primary);line-height:1.25;overflow:hidden;text-overflow:ellipsis;-webkit-line-clamp:2;-webkit-box-orient:vertical}';
   css += '.mb-tree-type{display:block;font-size:11px;color:var(--text-tertiary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}';
   css += '.mb-tree-tools{display:flex;gap:2px}';
+  css += '.mb-tree-tools .hm-btn.hm-btn-sm,.mb-tree-node>.hm-btn.hm-btn-sm:not([data-action="select-block"]):not([data-action="switch-tab"]){width:26px;height:26px;min-height:26px;padding:0;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;line-height:1;flex:0 0 auto;font-family:Segoe UI Symbol,Arial,sans-serif}';
   css += '.mb-tab-strip{display:flex;gap:8px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--border)}';
   css += '.mb-tab-pill{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--border);border-radius:999px;padding:8px 12px;background:#fff;cursor:pointer;font-weight:600;font-size:13px;line-height:1}';
   css += '.mb-tab-pill.is-active{background:var(--brand-2);border-color:var(--brand-2);color:#fff}';
@@ -3588,6 +3651,18 @@ function _ensureBuilderStyles(){
   css += '.mb-choice-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--border);border-radius:14px;background:#fff}';
   css += '.mb-choice-card strong{display:block;font-size:14px;color:var(--text-primary)}';
   css += '.mb-kbd-chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--border);padding:4px 8px;border-radius:999px;background:#fff;font-size:12px;color:var(--text-secondary)}';
+  css += '.mb-prop-section{margin-bottom:12px;border:1px solid var(--border);border-radius:16px;background:#fff;overflow:hidden}';
+  css += '.mb-prop-section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;min-height:52px;background:linear-gradient(180deg,rgba(15,23,42,0.02),rgba(15,23,42,0))}';
+  css += '.mb-prop-section-meta{min-width:0}';
+  css += '.mb-prop-section-title{font-weight:700;font-size:13px;color:var(--text-primary)}';
+  css += '.mb-prop-section-count{font-size:11px;color:var(--text-tertiary);margin-top:3px}';
+  css += '.mb-prop-section-body{padding:0 14px 14px}';
+  css += '.mb-icon-btn{width:30px;height:30px;min-height:30px;padding:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}';
+  css += '.mb-icon-glyph{font-size:12px;line-height:1}';
+  css += '.mb-toggle-control{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border:1px solid var(--border);border-radius:12px;background:#fff;cursor:pointer}';
+  css += '.mb-toggle-control input{width:16px;height:16px;margin:0;accent-color:var(--brand-2);flex:0 0 auto}';
+  css += '.mb-toggle-text{font-size:12px;color:var(--text-secondary);font-weight:600;line-height:1}';
+  css += '.mb-toggle-control:hover{border-color:rgba(37,99,235,0.28);background:rgba(37,99,235,0.02)}';
   css += '.mb-main-panel>.mb-tab-strip{gap:6px;padding:8px 16px 2px;border-bottom:0}';
   css += '.mb-main-panel>.mb-toolbar{padding:0 16px 6px;background:#fff;border-bottom:1px solid var(--border)}';
   css += '.mb-main-panel>.mb-toolbar .mb-toolbar-group{gap:6px}';
@@ -3600,8 +3675,9 @@ function _ensureBuilderStyles(){
   css += '.mb-main-panel>.mb-toolbar .mb-layout-inline-select:focus{outline:none;box-shadow:none}';
   css += '.mb-main-panel>.mb-toolbar .mb-layout-inline-select option{color:#0f172a;background:#fff}';
   css += '.mb-main-panel>.mb-toolbar .mb-toolbar-spacer{min-width:6px}';
+  css += '.mb-tree-scroll::-webkit-scrollbar,.mb-panel-body::-webkit-scrollbar,.mb-canvas-stage::-webkit-scrollbar{width:0;height:0}';
   css += '@keyframes mb-spin{to{transform:rotate(360deg)}}';
-  css += '@media (max-width: 1360px){.mb-builder-shell{flex-direction:column}.mb-side-panel,.mb-right-rail{width:auto}.mb-field-filter-row{grid-template-columns:1fr}}';
+  css += '@media (max-width: 1360px){.mb-builder-shell{flex-direction:column}.mb-side-panel,.mb-right-rail{width:auto;flex-basis:auto}.mb-field-filter-row{grid-template-columns:1fr}}';
   style.textContent = css;
   document.head.appendChild(style);
 }
@@ -4276,7 +4352,7 @@ function _renderTreeNode(block, tab, tree, depth){
 function _renderWidgetTree(){
   var h = '';
   h += '<div class="mb-side-panel">';
-  h += '<div class="mb-panel-header"><div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary)">'+_t('Widget Tree', 'Widget Tree')+'</div><strong>'+_t('Cây module', 'Module Tree')+'</strong></div><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="toggle-tree">×</button></div>';
+  h += '<div class="mb-panel-header"><div class="mb-panel-title"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary)">'+_t('Widget Tree', 'Widget Tree')+'</div><strong><span>'+_t('Cây module', 'Module Tree')+'</span></strong></div><div class="mb-panel-actions"><button class="hm-btn hm-btn-ghost hm-btn-sm mb-icon-btn" data-action="toggle-tree" title="'+_esc(_t('Đóng cây module', 'Close tree panel'))+'"><span class="mb-icon-glyph">&#10005;</span></button></div></div>';
   h += '<div class="mb-tree-scroll">';
   h += '<div class="mb-tree-root">'+_esc(state.schema ? _t(state.schema.title.vi, state.schema.title.en) : _t('Module', 'Module'))+'</div>';
   (state.schema && state.schema.tabs ? state.schema.tabs : []).forEach(function(tab){
@@ -4331,11 +4407,11 @@ function _renderCanvasBlock(block, tab, tree, depth){
   h += '<div><div class="mb-block-name">'+_esc(_getBlockTitle(block))+'</div><div class="mb-block-type">'+_esc(_getCatalogLabel(block.type))+(block.locked ? ' • '+_t('Đã khóa', 'Locked') : '')+(block.visible === false ? ' • '+_t('Đang ẩn', 'Hidden') : '')+'</div></div>';
   h += '</div>';
   h += '<div class="mb-block-tools">';
-  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="move-up" data-block="'+_esc(block.blockId)+'" title="'+_t('Lên trên', 'Move up')+'">▲</button>';
-  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="move-down" data-block="'+_esc(block.blockId)+'" title="'+_t('Xuống dưới', 'Move down')+'">▼</button>';
-  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="config-block" data-block="'+_esc(block.blockId)+'" title="'+_t('Cấu hình', 'Configure')+'">⚙</button>';
-  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="duplicate-block" data-block="'+_esc(block.blockId)+'" title="'+_t('Nhân đôi', 'Duplicate')+'">📋</button>';
-  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" style="color:var(--red)" data-action="delete-block" data-block="'+_esc(block.blockId)+'" title="'+_t('Xóa', 'Delete')+'">🗑</button>';
+  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="move-up" data-block="'+_esc(block.blockId)+'" title="'+_t('Lên trên', 'Move up')+'">&#9652;</button>';
+  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="move-down" data-block="'+_esc(block.blockId)+'" title="'+_t('Xuống dưới', 'Move down')+'">&#9662;</button>';
+  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="config-block" data-block="'+_esc(block.blockId)+'" title="'+_t('Cấu hình', 'Configure')+'">&#9881;</button>';
+  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="duplicate-block" data-block="'+_esc(block.blockId)+'" title="'+_t('Nhân đôi', 'Duplicate')+'">&#x29C9;</button>';
+  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" style="color:var(--red)" data-action="delete-block" data-block="'+_esc(block.blockId)+'" title="'+_t('Xóa', 'Delete')+'">&#10005;</button>';
   h += '</div></div>';
   h += '<div class="mb-block-body">';
   h += _renderBlockPreview(block);
@@ -4363,7 +4439,7 @@ _renderLibraryPanel = function(){
   var search = state.librarySearch || '';
   var normalizedSearch = _normalizeSearchText(search);
   h += '<div class="mb-rail-panel">';
-  h += '<div class="mb-panel-header"><div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary)">'+_t('Library', 'Library')+'</div><strong>'+_t('Thư viện block', 'Block Library')+'</strong></div><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="close-library">×</button></div>';
+  h += '<div class="mb-panel-header"><div class="mb-panel-title"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary)">'+_t('Library', 'Library')+'</div><strong><span>'+_t('Thư viện block', 'Block Library')+'</span></strong></div><div class="mb-panel-actions"><button class="hm-btn hm-btn-ghost hm-btn-sm mb-icon-btn" data-action="close-library" title="'+_esc(_t('Đóng thư viện', 'Close library'))+'"><span class="mb-icon-glyph">&#10005;</span></button></div></div>';
   h += '<div class="mb-panel-body">';
   h += '<div class="mb-library-tabs">';
   h += '<button class="hm-btn '+(state.libraryMode === 'blocks' ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm" data-action="library-mode" data-mode="blocks">🧩 '+_t('Blocks', 'Blocks')+'</button>';
@@ -4430,6 +4506,8 @@ _renderPropertiesPanel = function(){
   var tabs;
   var activeKey;
   var activeTab = null;
+  var activeSections = [];
+  var allSectionsCollapsed = false;
   var i;
   var h = '';
   if(!block) return '';
@@ -4446,8 +4524,14 @@ _renderPropertiesPanel = function(){
     if(tabs[i].key === activeKey) activeTab = tabs[i];
   }
   if(!activeTab && tabs.length) activeTab = tabs[0];
+  activeSections = activeTab ? (activeTab.sections || []) : [];
+  allSectionsCollapsed = activeKey !== 'relations' && activeSections.length ? _areAllPropSectionsCollapsed(draft.type, activeKey, activeSections) : false;
   h += '<div class="mb-rail-panel">';
-  h += '<div class="mb-panel-header"><div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary)">'+_t('Properties', 'Properties')+'</div><strong>'+_esc(catalog.icon || '📦')+' '+_esc(_getCatalogLabel(draft.type))+'</strong></div><button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="close-props">×</button></div>';
+  h += '<div class="mb-panel-header"><div class="mb-panel-title"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary)">'+_t('Properties', 'Properties')+'</div><strong><span>'+_esc(catalog.icon || '📦')+'</span><span>'+_esc(_getCatalogLabel(draft.type))+'</span></strong></div><div class="mb-panel-actions">';
+  if(activeKey !== 'relations' && activeSections.length){
+    h += '<button class="hm-btn hm-btn-ghost hm-btn-sm" data-action="toggle-all-prop-sections" data-collapse="'+(allSectionsCollapsed ? '0' : '1')+'" title="'+_esc(allSectionsCollapsed ? _t('Mở tất cả section', 'Expand all sections') : _t('Thu gọn tất cả section', 'Collapse all sections'))+'">'+(allSectionsCollapsed ? '&#9638;' : '&#9639;')+'</button>';
+  }
+  h += '<button class="hm-btn hm-btn-ghost hm-btn-sm mb-icon-btn" data-action="close-props" title="'+_esc(_t('Đóng thuộc tính', 'Close properties'))+'"><span class="mb-icon-glyph">&#10005;</span></button></div></div>';
   h += '<div class="mb-panel-body">';
   h += '<div class="mb-helper-note">'+_t('Hỗ trợ binding kiểu {{ data.total || 0 }} và pipe filter như {{ data.total | number }}.', 'Supports bindings like {{ data.total || 0 }} and pipe filters like {{ data.total | number }}.')+'</div>';
   if(block.locked){
@@ -4472,8 +4556,8 @@ _renderPropertiesPanel = function(){
   if(activeKey === 'relations'){
     h += _renderRelationsPanel(draft);
   } else if(activeTab){
-    (activeTab.sections || []).forEach(function(section){
-      h += _renderPropSection(section, draft);
+    activeSections.forEach(function(section, index){
+      h += _renderPropSection(section, draft, { blockType:draft.type, tabKey:activeKey, index:index });
     });
     if(draft.type === 'form-standard'){
       h += _renderRegistryValidationSummary(draft);
@@ -4541,7 +4625,7 @@ _renderBuilder = function(){
     h += '</div>';
     h += '<div class="mb-toolbar-spacer"></div>';
     h += '<div class="mb-toolbar-group mb-toolbar-group--view">';
-    h += '<button class="hm-btn hm-btn-ghost hm-btn-sm mb-toolbar-toggle" data-action="toggle-tree">🌳 '+_t('Tree', 'Tree')+'</button>';
+    h += '<button class="hm-btn '+(state.showTree ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm mb-toolbar-toggle" data-action="toggle-tree">🌳 '+_t('Tree', 'Tree')+'</button>';
     h += '<button class="hm-btn '+(state.showLibrary ? 'hm-btn-primary' : 'hm-btn-ghost')+' hm-btn-sm mb-toolbar-toggle" data-action="open-library" data-tab="'+_esc(activeTab.tabId)+'" data-parent="" data-slot="default">📚 '+_t('Library', 'Library')+'</button>';
     h += '</div></div>';
     if(relationSuggestions.length || configuredLinks.length){
@@ -4960,10 +5044,29 @@ function _scrollSelectedIntoView(){
   }, 30);
 }
 
+_handleWheel = function(e){
+  var region = _resolveWheelRegion(e.target);
+  var deltaX;
+  var deltaY;
+  if(state.step !== 'build' || !region) return;
+  if(e.ctrlKey) return;
+  deltaX = e.deltaX || 0;
+  deltaY = e.deltaY || 0;
+  if(!deltaX && !deltaY) return;
+  e.preventDefault();
+  if(Math.abs(deltaX) > Math.abs(deltaY) && region.scrollWidth > region.clientWidth){
+    region.scrollLeft += deltaX;
+  } else {
+    region.scrollTop += deltaY;
+  }
+  if(region.classList && region.classList.contains('mb-canvas-stage')) _paintDigitalThreadOverlay();
+};
+
 render = function(container){
   state.container = container;
   _ensureBuilderState();
   _ensureBuilderStyles();
+  _ensureViewportSync();
   _setupKeyboardShortcuts();
   _loadSavedModules();
   if(state.schema) _normalizeSchemaBlocks();
@@ -4980,9 +5083,11 @@ _paint = function(){
     case 'preview': c.innerHTML = _renderPreview(); break;
     default: c.innerHTML = _renderBuilder(); break;
   }
+  _syncBuilderViewportMetrics();
   c.onclick = _handleClick;
   c.oninput = _handleInput;
   c.onchange = _handleInput;
+  c.onwheel = state.step === 'build' ? _handleWheel : null;
   c.ondragstart = _handleDragStart;
   c.ondragover = _handleDragOver;
   c.ondrop = _handleDrop;
@@ -4992,6 +5097,8 @@ _paint = function(){
   c.ontouchend = _handleTouchEnd;
   c.ontouchcancel = _handleTouchCancel;
   c.oncontextmenu = _handleContextMenu;
+  var stage = c.querySelector ? c.querySelector('.mb-canvas-stage') : null;
+  if(stage) stage.onscroll = _paintDigitalThreadOverlay;
   _paintDigitalThreadOverlay();
   _scrollSelectedIntoView();
 };
@@ -5393,6 +5500,27 @@ _handleClick = function(e){
       break;
     case 'props-tab':
       state.propsTab = btn.getAttribute('data-tab') || 'general';
+      _paint();
+      break;
+    case 'toggle-prop-section':
+      var sectionKey = btn.getAttribute('data-section-key') || '';
+      state.propsSectionCollapsed[sectionKey] = !state.propsSectionCollapsed[sectionKey];
+      _paint();
+      break;
+    case 'toggle-all-prop-sections':
+      var propsBlock = state.propsDraft || _findBlock(state.selectedBlock);
+      var propsTabs = propsBlock ? ((BE.BLOCK_PROPERTIES_SCHEMA || {})[propsBlock.type] || []) : [];
+      var propsTabKey = state.propsTab || 'general';
+      var propsTab = null;
+      propsTabs.forEach(function(tab){
+        if(tab.key === propsTabKey) propsTab = tab;
+      });
+      if(!propsTab && propsTabs.length) propsTab = propsTabs[0];
+      if(propsBlock && propsTab){
+        (propsTab.sections || []).forEach(function(section, index){
+          _setPropSectionCollapsed(propsBlock.type, propsTabKey, section, index, btn.getAttribute('data-collapse') === '1');
+        });
+      }
       _paint();
       break;
     case 'close-props':
