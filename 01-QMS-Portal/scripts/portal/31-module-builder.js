@@ -64,6 +64,8 @@ function _deleteByPath(obj, path){
 var _legacySaveModule;
 var _legacyOpenSavedModule;
 var _legacyDeleteSavedModule;
+var _heroTooltipEl = null;
+var _heroTooltipTarget = null;
 
 var ICONS = ['📦','📋','🏭','🔴','🚚','💰','📊','⚙','🔍','📱','🎯','💡','🔒','🤖','⚡','📝','🌐','🔗','🔄','📈'];
 
@@ -3529,6 +3531,11 @@ function _ensureViewportSync(){
   window.addEventListener('resize', function(){
     _syncBuilderViewportMetrics();
     _paintDigitalThreadOverlay();
+    if(_heroTooltipTarget && document.body && document.body.contains(_heroTooltipTarget)){
+      _positionHeroTooltip(_heroTooltipTarget);
+    } else {
+      _hideHeroTooltip();
+    }
   }, { passive:true });
   _viewportSyncReady = true;
 }
@@ -3703,22 +3710,24 @@ function _ensureBuilderStyles(){
   css += '.mb-builder-hero-copy{display:grid;gap:6px}';
   css += '.mb-builder-hero-kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.72}';
   css += '.mb-builder-hero-copy h1{margin:0;font-size:24px;line-height:1.2;color:#fff}';
-  css += '.mb-builder-hero-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-self:flex-start}';
+  css += '.mb-builder-hero-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-self:flex-start;align-items:flex-start}';
   css += '.mb-hero-commandbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center}';
-  css += '.mb-hero-action,.mb-hero-select{position:relative;display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 14px;border:1px solid rgba(255,255,255,0.16);border-radius:14px;background:rgba(255,255,255,0.08);color:#fff;backdrop-filter:blur(10px);transition:background .18s,border-color .18s,transform .18s,box-shadow .18s;overflow:hidden}';
-  css += '.mb-hero-action{cursor:pointer}';
-  css += '.mb-hero-action:hover,.mb-hero-action:focus-visible,.mb-hero-select:hover,.mb-hero-select:focus-within{background:rgba(255,255,255,0.16);border-color:rgba(255,255,255,0.24);transform:translateY(-1px);box-shadow:0 10px 24px rgba(15,23,42,0.16)}';
+  css += '.mb-hero-action,.mb-hero-select{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:48px;min-height:48px;padding:0;border:1px solid rgba(255,255,255,0.14);border-radius:14px;background:rgba(255,255,255,0.1);color:#fff;transition:background .12s,border-color .12s,color .12s;overflow:hidden;box-shadow:none;contain:layout paint style;flex:0 0 auto;-webkit-tap-highlight-color:transparent}';
+  css += '.mb-hero-action{cursor:pointer;width:48px;flex-basis:48px}';
+  css += '.mb-hero-action:hover,.mb-hero-action:focus-visible,.mb-hero-select:hover,.mb-hero-select:focus-within{background:rgba(255,255,255,0.18);border-color:rgba(255,255,255,0.24);box-shadow:none;z-index:auto}';
   css += '.mb-hero-action.is-active,.mb-hero-select.is-active{background:#fff;color:var(--brand);border-color:#fff}';
   css += '.mb-hero-action.is-primary{background:var(--green);border-color:rgba(255,255,255,0.2)}';
-  css += '.mb-hero-action-icon{font-size:15px;line-height:1;flex:0 0 auto}';
-  css += '.mb-hero-action-label{max-width:0;opacity:0;overflow:hidden;white-space:nowrap;font-size:12px;font-weight:700;transition:max-width .18s,opacity .18s,margin .18s}';
-  css += '.mb-hero-action:hover .mb-hero-action-label,.mb-hero-action:focus-visible .mb-hero-action-label,.mb-hero-select:hover .mb-hero-action-label,.mb-hero-select:focus-within .mb-hero-action-label{max-width:140px;opacity:1;margin-right:2px}';
-  css += '.mb-hero-action-badge{min-width:18px;height:18px;padding:0 5px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.16);font-size:11px;font-weight:700;line-height:1}';
+  css += '.mb-hero-action-icon{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 18px;line-height:1;font-size:14px;font-family:Segoe UI Symbol,Arial,sans-serif}';
+  css += '.mb-hero-action-icon svg{width:18px;height:18px;display:block;stroke:currentColor;fill:none;stroke-width:1.85;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}';
+  css += '.mb-hero-action-label{display:none !important}';
+  css += '.mb-hero-action-badge{position:absolute;top:5px;right:5px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.16);font-size:11px;font-weight:700;line-height:1}';
   css += '.mb-hero-action.is-active .mb-hero-action-badge{background:rgba(37,99,235,0.14);color:var(--brand)}';
-  css += '.mb-hero-select{padding-right:12px;cursor:pointer}';
-  css += '.mb-hero-select:after{content:"▾";font-size:10px;line-height:1;opacity:.76;margin-left:-10px}';
-  css += '.mb-hero-select-input{border:0;background:transparent;color:inherit;font:inherit;font-size:13px;font-weight:700;line-height:1;min-width:54px;padding:0 18px 0 0;appearance:none;cursor:pointer;outline:none;box-shadow:none}';
+  css += '.mb-hero-select{padding:0 24px 0 12px;cursor:pointer;min-width:76px;justify-content:flex-start}';
+  css += '.mb-hero-select:after{content:"▾";position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;line-height:1;opacity:.76}';
+  css += '.mb-hero-select-input{border:0;background:transparent;color:inherit;font:inherit;font-size:12px;font-weight:700;line-height:1;min-width:0;width:40px;padding:0 12px 0 0;appearance:none;cursor:pointer;outline:none;box-shadow:none;text-align:center;text-align-last:center}';
   css += '.mb-hero-select-input option{color:#0f172a;background:#fff}';
+  css += '.mb-floating-tooltip{position:fixed;left:0;top:0;transform:translateX(-50%);opacity:0;pointer-events:none;white-space:nowrap;font-size:12px;font-weight:700;line-height:1;padding:8px 10px;border-radius:10px;background:#0f172a;color:#fff;box-shadow:0 12px 28px rgba(15,23,42,0.22);transition:none;z-index:1800}';
+  css += '.mb-floating-tooltip.is-visible{opacity:1}';
   css += '.mb-canvas-toolbar--hero{padding:12px 14px;border:1px solid rgba(255,255,255,0.16);border-radius:18px;background:rgba(255,255,255,0.08);backdrop-filter:blur(10px)}';
   css += '.mb-canvas-toolbar--hero .mb-toolbar-group{gap:6px}';
   css += '.mb-canvas-toolbar--hero .hm-btn.hm-btn-sm{height:38px;min-height:38px;padding:0 12px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:12px;line-height:1;white-space:nowrap;border-color:rgba(255,255,255,0.16);color:#fff;background:rgba(255,255,255,0.06)}';
@@ -4782,24 +4791,70 @@ function _toggleLibrarySection(mode, key){
   state.librarySectionCollapsed[sectionKey] = !_isLibrarySectionCollapsed(mode, key, false);
 }
 
+function _renderHeroIcon(icon){
+  var icons = {
+    'layout-stack':'<svg viewBox="0 0 20 20"><path d="M4 5.5h12"></path><path d="M4 10h12"></path><path d="M4 14.5h12"></path></svg>',
+    'layout-grid':'<svg viewBox="0 0 20 20"><rect x="4" y="4" width="5" height="5"></rect><rect x="11" y="4" width="5" height="5"></rect><rect x="4" y="11" width="5" height="5"></rect><rect x="11" y="11" width="5" height="5"></rect></svg>',
+    'layout-flex':'<svg viewBox="0 0 20 20"><path d="M4 10h12"></path><path d="M7 7l-3 3 3 3"></path><path d="M13 7l3 3-3 3"></path></svg>',
+    'columns':'<svg viewBox="0 0 20 20"><rect x="4" y="4" width="4.5" height="12"></rect><rect x="11.5" y="4" width="4.5" height="12"></rect></svg>',
+    'gap':'<svg viewBox="0 0 20 20"><path d="M4 10h12"></path><path d="M7 7l-3 3 3 3"></path><path d="M13 7l3 3-3 3"></path></svg>',
+    'tree':'<svg viewBox="0 0 20 20"><path d="M6 4.5v11"></path><path d="M6 7.5h8"></path><path d="M6 13h8"></path><rect x="12.5" y="5.5" width="3" height="3"></rect><rect x="12.5" y="11" width="3" height="3"></rect><rect x="4.5" y="8.75" width="3" height="3"></rect></svg>',
+    'library':'<svg viewBox="0 0 20 20"><path d="M5 4.5h8l2 2v9H5z"></path><path d="M5 4.5v11a1.5 1.5 0 0 1 1.5-1.5H15"></path><path d="M8 7h3.5"></path></svg>',
+    'undo':'<svg viewBox="0 0 20 20"><path d="M7 6L4 9l3 3"></path><path d="M5 9h6a4 4 0 1 1 0 8h-1"></path></svg>',
+    'redo':'<svg viewBox="0 0 20 20"><path d="M13 6l3 3-3 3"></path><path d="M15 9H9a4 4 0 1 0 0 8h1"></path></svg>',
+    'shortcuts':'<svg viewBox="0 0 20 20"><rect x="3.5" y="5" width="13" height="10" rx="2"></rect><path d="M6.5 8.5h0"></path><path d="M9.5 8.5h0"></path><path d="M12.5 8.5h0"></path><path d="M6.5 11.5h7"></path></svg>',
+    'preview':'<svg viewBox="0 0 20 20"><path d="M2.5 10s2.8-4.5 7.5-4.5S17.5 10 17.5 10 14.7 14.5 10 14.5 2.5 10 2.5 10z"></path><circle cx="10" cy="10" r="2.2"></circle></svg>',
+    'save':'<svg viewBox="0 0 20 20"><path d="M5 4.5h8l2 2v9H5z"></path><path d="M7.5 4.5v4h5v-4"></path><path d="M7.5 15v-3.5h5V15"></path></svg>',
+    'back':'<svg viewBox="0 0 20 20"><path d="M15 10H5"></path><path d="M9 6l-4 4 4 4"></path></svg>'
+  };
+  var aliases = {
+    'â¬‡':'layout-stack',
+    '⬇':'layout-stack',
+    'âŠž':'layout-grid',
+    '⊞':'layout-grid',
+    'â†”':'layout-flex',
+    '↔':'layout-flex',
+    'â–¥':'columns',
+    '▥':'columns',
+    'â‡„':'gap',
+    '⇄':'gap',
+    'ðŸŒ³':'tree',
+    '🌳':'tree',
+    'ðŸ“š':'library',
+    '📚':'library',
+    'â†©':'undo',
+    '↩':'undo',
+    'â†ª':'redo',
+    '↪':'redo',
+    'âŒ¨':'shortcuts',
+    '⌨':'shortcuts',
+    'â—‰':'preview',
+    '◉':'preview',
+    'ðŸ’¾':'save',
+    '💾':'save',
+    'â†':'back'
+    ,'←':'back'
+  };
+  if(aliases[icon]) icon = aliases[icon];
+  return '<span class="mb-hero-action-icon" aria-hidden="true">'+(icons[icon] || _esc(icon || '•'))+'</span>';
+}
+
 function _renderHeroActionButton(options){
   var label = _t(options.labelVi || '', options.labelEn || options.labelVi || '');
   var classes = 'mb-hero-action';
   var extraAttrs = options.extraAttrs ? (' ' + options.extraAttrs) : '';
   if(options.variant) classes += ' is-' + options.variant;
   if(options.active) classes += ' is-active';
-  return '<button class="'+classes+'" data-action="'+_esc(options.action || '')+'"'+extraAttrs+' title="'+_esc(label)+'" aria-label="'+_esc(label)+'">'+
+  return '<button class="'+classes+'" data-action="'+_esc(options.action || '')+'" data-tooltip="'+_esc(label)+'"'+extraAttrs+' aria-label="'+_esc(label)+'">'+
     '<span class="mb-hero-action-icon" aria-hidden="true">'+_esc(options.icon || '•')+'</span>'+
-    '<span class="mb-hero-action-label">'+_esc(label)+'</span>'+
     (options.badge != null ? '<span class="mb-hero-action-badge">'+_esc(options.badge)+'</span>' : '')+
   '</button>';
 }
 
 function _renderHeroSelectControl(id, labelVi, labelEn, icon, value, options){
   var label = _t(labelVi, labelEn);
-  var h = '<label class="mb-hero-select" title="'+_esc(label)+'" aria-label="'+_esc(label)+'">';
+  var h = '<label class="mb-hero-select" data-tooltip="'+_esc(label)+'" aria-label="'+_esc(label)+'">';
   h += '<span class="mb-hero-action-icon" aria-hidden="true">'+_esc(icon || '•')+'</span>';
-  h += '<span class="mb-hero-action-label">'+_esc(label)+'</span>';
   h += '<select class="mb-hero-select-input" id="'+_esc(id)+'" aria-label="'+_esc(label)+'">';
   (options || []).forEach(function(option){
     var raw = _normalizeOption(option);
@@ -4808,6 +4863,113 @@ function _renderHeroSelectControl(id, labelVi, labelEn, icon, value, options){
   h += '</select></label>';
   return h;
 }
+
+function _ensureHeroTooltip(){
+  if(typeof document === 'undefined' || !document.body) return null;
+  if(_heroTooltipEl && document.body.contains(_heroTooltipEl)) return _heroTooltipEl;
+  _heroTooltipEl = document.createElement('div');
+  _heroTooltipEl.className = 'mb-floating-tooltip';
+  _heroTooltipEl.setAttribute('role', 'tooltip');
+  _heroTooltipEl.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(_heroTooltipEl);
+  return _heroTooltipEl;
+}
+
+function _resolveHeroTooltipTrigger(node){
+  return node && node.closest ? node.closest('.mb-hero-action[data-tooltip],.mb-hero-select[data-tooltip]') : null;
+}
+
+function _positionHeroTooltip(trigger){
+  var tooltip = _ensureHeroTooltip();
+  var rect;
+  var viewportWidth;
+  var tooltipWidth;
+  var left;
+  if(!tooltip || !trigger || !trigger.getBoundingClientRect) return;
+  rect = trigger.getBoundingClientRect();
+  viewportWidth = window.innerWidth || document.documentElement.clientWidth || 1280;
+  left = rect.left + (rect.width / 2);
+  tooltip.style.left = left + 'px';
+  tooltip.style.top = (rect.bottom + 12) + 'px';
+  tooltipWidth = tooltip.offsetWidth || 0;
+  if(tooltipWidth){
+    left = Math.max((tooltipWidth / 2) + 12, Math.min(left, viewportWidth - (tooltipWidth / 2) - 12));
+    tooltip.style.left = left + 'px';
+  }
+}
+
+function _showHeroTooltip(trigger){
+  var tooltip = _ensureHeroTooltip();
+  var text;
+  if(!tooltip || !trigger) return;
+  text = trigger.getAttribute('data-tooltip') || trigger.getAttribute('aria-label') || '';
+  if(!text){
+    _hideHeroTooltip();
+    return;
+  }
+  _heroTooltipTarget = trigger;
+  tooltip.textContent = text;
+  tooltip.classList.add('is-visible');
+  tooltip.setAttribute('aria-hidden', 'false');
+  _positionHeroTooltip(trigger);
+}
+
+function _hideHeroTooltip(){
+  if(_heroTooltipEl){
+    _heroTooltipEl.classList.remove('is-visible');
+    _heroTooltipEl.setAttribute('aria-hidden', 'true');
+  }
+  _heroTooltipTarget = null;
+}
+
+function _handleHeroTooltipOver(e){
+  var trigger = _resolveHeroTooltipTrigger(e.target);
+  if(trigger) _showHeroTooltip(trigger);
+}
+
+function _handleHeroTooltipOut(e){
+  var trigger = _resolveHeroTooltipTrigger(e.target);
+  var related = _resolveHeroTooltipTrigger(e.relatedTarget);
+  if(!trigger || trigger === related) return;
+  _hideHeroTooltip();
+}
+
+function _handleHeroTooltipFocus(e){
+  var trigger = _resolveHeroTooltipTrigger(e.target);
+  if(trigger) _showHeroTooltip(trigger);
+}
+
+function _handleHeroTooltipBlur(e){
+  var trigger = _resolveHeroTooltipTrigger(e.target);
+  var related = _resolveHeroTooltipTrigger(e.relatedTarget);
+  if(!trigger || trigger === related) return;
+  _hideHeroTooltip();
+}
+
+_renderHeroActionButton = function(options){
+  var label = _t(options.labelVi || '', options.labelEn || options.labelVi || '');
+  var classes = 'mb-hero-action';
+  var extraAttrs = options.extraAttrs ? (' ' + options.extraAttrs) : '';
+  if(options.variant) classes += ' is-' + options.variant;
+  if(options.active) classes += ' is-active';
+  return '<button class="'+classes+'" data-action="'+_esc(options.action || '')+'" data-tooltip="'+_esc(label)+'"'+extraAttrs+' aria-label="'+_esc(label)+'">'+
+    _renderHeroIcon(options.icon)+
+    (options.badge != null ? '<span class="mb-hero-action-badge">'+_esc(options.badge)+'</span>' : '')+
+  '</button>';
+};
+
+_renderHeroSelectControl = function(id, labelVi, labelEn, icon, value, options){
+  var label = _t(labelVi, labelEn);
+  var h = '<label class="mb-hero-select" data-tooltip="'+_esc(label)+'" aria-label="'+_esc(label)+'">';
+  h += _renderHeroIcon(icon);
+  h += '<select class="mb-hero-select-input" id="'+_esc(id)+'" aria-label="'+_esc(label)+'">';
+  (options || []).forEach(function(option){
+    var raw = _normalizeOption(option);
+    h += '<option value="'+_esc(raw.value)+'"'+(String(raw.value) === String(value) ? ' selected' : '')+'>'+_esc(raw.label)+'</option>';
+  });
+  h += '</select></label>';
+  return h;
+};
 
 _renderLibraryPanel = function(){
   var h = '';
@@ -5205,7 +5367,7 @@ _renderBuilder = function(){
   h += _renderHeroActionButton({ action:'undo-builder', labelVi:'Hoàn tác', labelEn:'Undo', icon:'↩', badge:(undoInfo.position > 0 ? undoInfo.position : 0) });
   h += _renderHeroActionButton({ action:'redo-builder', labelVi:'Làm lại', labelEn:'Redo', icon:'↪', badge:(undoInfo.canRedo ? (undoInfo.depth - undoInfo.position - 1) : 0) });
   h += _renderHeroActionButton({ action:'toggle-shortcuts', labelVi:'Phím tắt', labelEn:'Shortcuts', icon:'⌨' });
-  h += _renderHeroActionButton({ action:'preview-module', labelVi:'Xem trước', labelEn:'Preview', icon:'👁' });
+  h += _renderHeroActionButton({ action:'preview-module', labelVi:'Xem trước', labelEn:'Preview', icon:'◉' });
   h += _renderHeroActionButton({ action:'save-module', labelVi:'Lưu module', labelEn:'Save module', icon:'💾', variant:'primary' });
   h += _renderHeroActionButton({ action:'back-setup', labelVi:'Quay lại', labelEn:'Back', icon:'←' });
   h += '</div></div>';
@@ -5673,6 +5835,7 @@ _paint = function(){
   if(!c) return;
   _ensureBuilderState();
   _ensureBuilderStyles();
+  _hideHeroTooltip();
   switch(state.step){
     case 'setup': c.innerHTML = _renderSetup(); break;
     case 'preview': c.innerHTML = _renderPreview(); break;
@@ -5682,6 +5845,10 @@ _paint = function(){
   c.onclick = _handleClick;
   c.oninput = _handleInput;
   c.onchange = _handleInput;
+  c.onmouseover = _handleHeroTooltipOver;
+  c.onmouseout = _handleHeroTooltipOut;
+  c.onfocusin = _handleHeroTooltipFocus;
+  c.onfocusout = _handleHeroTooltipBlur;
   c.onwheel = state.step === 'build' ? _handleWheel : null;
   c.ondragstart = _handleDragStart;
   c.ondragover = _handleDragOver;
@@ -5988,6 +6155,7 @@ _handleClick = function(e){
     if(!btn){ _paint(); return; }
   }
   if(!btn) return;
+  _hideHeroTooltip();
   action = btn.getAttribute('data-action');
   blockId = btn.getAttribute('data-block');
   if(blockId && ['delete-block', 'duplicate-block', 'move-up', 'move-down'].indexOf(action) >= 0 && _isBlockLocked(blockId)){
