@@ -1710,3 +1710,44 @@
     flex-wrap: wrap;
   }
 }
+
+.ss-browser-subtitle,
+.ss-browser-tabs {
+  display: none !important;
+}
+
+.ss-browser-header {
+  padding-bottom: var(--space-2);
+}
+
+.ss-browser-header-top {
+  align-items: center;
+}
+
+.ss-browser-title-group {
+  padding-right: var(--space-1);
+}
+
+.ss-browser-title {
+  display: block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ss-browser-tools {
+  margin-left: auto;
+  gap: 6px;
+}
+
+.ss-browser-tool {
+  width: 32px;
+  height: 32px;
+  border-radius: 12px;
+  flex: 0 0 auto;
+}
+
+.ss-browser-search-wrap {
+  padding-top: var(--space-2);
+}
