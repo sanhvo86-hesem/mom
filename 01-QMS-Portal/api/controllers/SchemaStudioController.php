@@ -71,6 +71,15 @@ class SchemaStudioController extends BaseController
         return 'CONFIRMED_DESTRUCTIVE_' . $actor;
     }
 
+    private function forbiddenMigrationStatement(string $sql): ?string
+    {
+        if (preg_match('/\b(TRUNCATE|DELETE|UPDATE|INSERT|COPY|VACUUM|ANALYZE|REINDEX|GRANT|REVOKE|ALTER\s+SYSTEM|CREATE\s+ROLE|ALTER\s+ROLE|DROP\s+ROLE|SET\s+ROLE|DO|CALL|EXECUTE)\b/i', $sql, $matches)) {
+            return strtoupper((string)($matches[1] ?? ''));
+        }
+
+        return null;
+    }
+
     private function normalizeFieldList($value): array
     {
         if (is_array($value)) {
@@ -122,7 +131,9 @@ class SchemaStudioController extends BaseController
 
     public function listDesigns(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireWriteAccess($user);
+        $this->requireCsrf();
         $designs = [];
         foreach (glob($this->designDir . '/*.json') ?: [] as $file) {
             $data = $this->readJsonFile($file);
@@ -144,7 +155,9 @@ class SchemaStudioController extends BaseController
 
     public function getDesign(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireWriteAccess($user);
+        $this->requireCsrf();
         $id = $this->input('id', '') ?? '';
         if ($id === '') {
             $this->error('missing_id', 400);
@@ -214,7 +227,9 @@ class SchemaStudioController extends BaseController
 
     public function loadFromRegistry(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireWriteAccess($user);
+        $this->requireCsrf();
         $registryPath = $this->dataDir . '/registry/table-registry.json';
         $relationPath = $this->dataDir . '/registry/relation-map.json';
         $domainPath = $this->dataDir . '/registry/domain-architecture.json';
@@ -420,6 +435,8 @@ class SchemaStudioController extends BaseController
     public function reverseEngineer(): never
     {
         $user = $this->requireAuth();
+        $this->requireWriteAccess($user);
+        $this->requireCsrf();
         try {
             $pdo = $this->db();
             $tables = $pdo->query("
@@ -610,7 +627,13 @@ class SchemaStudioController extends BaseController
         if ($sql === '') {
             $this->error('missing_sql', 400);
         }
-        $destructive = (bool)preg_match('/\bDROP\s+(TABLE|COLUMN|TYPE|INDEX)\b/i', $sql);
+        $forbiddenStatement = $this->forbiddenMigrationStatement($sql);
+        if ($forbiddenStatement !== null) {
+            $this->error('forbidden_migration_statement', 400, null, [
+                'statement' => $forbiddenStatement,
+            ]);
+        }
+        $destructive = (bool)preg_match('/\bDROP\s+(TABLE|COLUMN|TYPE|INDEX|VIEW|SEQUENCE|SCHEMA)\b/i', $sql);
         $allowDestructive = (bool)($body['allow_destructive'] ?? false);
         $confirmToken = (string)($body['confirm_destructive'] ?? '');
         if ($destructive && (!$allowDestructive || $confirmToken !== $this->destructiveConfirmToken($user))) {
@@ -647,7 +670,9 @@ class SchemaStudioController extends BaseController
 
     public function previewTableData(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireWriteAccess($user);
+        $this->requireCsrf();
         $body = $this->jsonBody();
         $schema = $this->safeIdentifier((string)($body['schema'] ?? 'public'), 'public');
         $table = $this->safeIdentifier((string)($body['table'] ?? ''), '');
@@ -712,7 +737,9 @@ class SchemaStudioController extends BaseController
 
     public function export(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireWriteAccess($user);
+        $this->requireCsrf();
         $body = $this->jsonBody();
         $schema = is_array($body['schema'] ?? null) ? $body['schema'] : $body;
         $payload = json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -723,6 +750,13 @@ class SchemaStudioController extends BaseController
         if (@file_put_contents($filename, $payload) === false) {
             $this->error('export_failed', 500);
         }
-        $this->success(['path' => $filename]);
+        $this->auditLog('schema_studio_export', [
+            'filename' => basename($filename),
+            'bytes' => strlen($payload),
+        ], (string)($user['username'] ?? ''));
+        $this->success([
+            'filename' => basename($filename),
+            'bytes' => strlen($payload),
+        ]);
     }
 }
