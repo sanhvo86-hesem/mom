@@ -74,6 +74,7 @@ var EXCEPTION_META = {
   program_mismatches:  { vi:'Lệch chương trình NC', en:'Program mismatch', icon:'💾' },
   overdue_allocations: { vi:'Allocation quá hạn', en:'Overdue allocations', icon:'⏳' },
   review_sla_gaps:     { vi:'Review SLA cần xử lý', en:'Review SLA gaps', icon:'🕰️' },
+  release_followup_overdue: { vi:'Release follow-up quá hạn', en:'Overdue release follow-up', icon:'🎓' },
   failed_uploads:      { vi:'Upload lỗi', en:'Failed uploads', icon:'📤' },
   overdue_orders:      { vi:'Đơn hàng quá hạn', en:'Overdue orders', icon:'📦' },
   overdue_capas:       { vi:'CAPA mở lâu', en:'Overdue CAPA', icon:'🧩' },
@@ -276,6 +277,9 @@ function defaultSnapshot(){
     program_release_queue: [],
     tool_readiness_queue: [],
     alarm_ack_queue: [],
+    review_sla_queue: [],
+    release_followup_queue: [],
+    release_followup_summary: {},
     dpp_queue: [],
     energy_queue: [],
     cost_variance_queue: [],
@@ -1245,6 +1249,8 @@ function render(){
   var toolReadinessQueue = Array.isArray(snapshot.tool_readiness_queue) ? snapshot.tool_readiness_queue : [];
   var alarmAckQueue = Array.isArray(snapshot.alarm_ack_queue) ? snapshot.alarm_ack_queue : [];
   var reviewSlaQueue = Array.isArray(snapshot.review_sla_queue) ? snapshot.review_sla_queue : [];
+  var releaseFollowupQueue = Array.isArray(snapshot.release_followup_queue) ? snapshot.release_followup_queue : [];
+  var releaseFollowupSummary = snapshot.release_followup_summary || {};
   var dppQueue = Array.isArray(snapshot.dpp_queue) ? snapshot.dpp_queue : [];
   var energyQueue = Array.isArray(snapshot.energy_queue) ? snapshot.energy_queue : [];
   var costVarianceQueue = Array.isArray(snapshot.cost_variance_queue) ? snapshot.cost_variance_queue : [];
@@ -1302,6 +1308,7 @@ function render(){
   var evidenceGovernanceBand =
     '<section class="mesx-band" style="margin-top:18px">' +
       '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Evidence review SLA', 'Evidence review SLA')) + '</h2><p>' + esc(t('Giữ hàng đợi review của NCR, CAPA và các hồ sơ quan trọng luôn nhìn thấy được để không bị trễ review, trễ escalation hoặc chậm phản hồi audit.', 'Keep the review queue for NCR, CAPA, and other critical records visible so review due dates, escalations, and audit responses never slip quietly.')) + '</p></div></div><div class="mesx-section"><div class="mesx-mini" style="margin-bottom:10px"><small>' + esc(t('Review governance', 'Review governance')) + '</small><strong>' + esc((kpi.review_sla_gaps || 0) + ' ' + t('hồ sơ cần xử lý', 'records require action')) + '</strong><span class="mesx-sub">' + esc(t('Hàng chờ này gom các hồ sơ in-review đang sắp đến hạn, quá hạn hoặc đã escalation theo policy để QA và owner cùng nhìn một nguồn truth.', 'This queue brings together in-review records that are due soon, overdue, or escalated so QA and process owners share one source of truth.')) + '</span></div><div class="mesx-mini-actions" style="margin-bottom:12px"><button type="button" class="mesx-link warning" id="mes-run-sla">⏰ ' + esc(t('Chạy vòng nhắc SLA', 'Run SLA notification cycle')) + '</button><button type="button" class="mesx-link" id="mes-open-forms-review">📋 ' + esc(t('Mở Evidence Control', 'Open Evidence Control')) + '</button></div>' + renderGovernanceQueue(reviewSlaQueue, { emptyTitle:t('Review SLA đang ổn', 'Review SLA is under control'), emptyText:t('Chưa có hồ sơ in-review nào sắp quá hạn, quá hạn hoặc đã escalation ở thời điểm hiện tại.', 'No in-review records are currently due soon, overdue, or escalated.'), detail:function(row){ return [row.record_type || '', row.record_id || '', row.form_code || ''].filter(Boolean).join(' · '); }, sub:function(row){ return [row.due_at ? ('Due ' + fmtDateTime(row.due_at)) : '', row.escalation_due_at ? ('ESC ' + fmtDateTime(row.escalation_due_at)) : '', Array.isArray(row.review_roles) && row.review_roles.length ? ('Review ' + row.review_roles.join(', ')) : '', Array.isArray(row.escalation_roles) && row.escalation_roles.length ? ('Esc ' + row.escalation_roles.join(', ')) : ''].filter(Boolean).join(' · '); }, actions:function(){ return '<button type="button" class="mesx-link" data-open-forms-review="1">' + esc(t('Mở workspace', 'Open workspace')) + '</button>'; }, fallbackVi:'Hồ sơ đang in-review cần được xử lý theo SLA.', fallbackEn:'The record is in review and needs SLA-driven follow-up.' }) + '</div></article>' +
+      '<article class="mesx-panel"><div class="mesx-panel-head"><div><h2>' + esc(t('Release rollout follow-up', 'Release rollout follow-up')) + '</h2><p>' + esc(t('Khóa vòng follow-up sau khi phát hành để tài liệu và form đã approved không bị treo ở bước briefing, đào tạo hoặc xác nhận triển khai.', 'Close the post-release follow-up loop so approved documents and forms do not stall at briefing, training, or rollout confirmation.')) + '</p></div></div><div class="mesx-section"><div class="mesx-mini" style="margin-bottom:10px"><small>' + esc(t('Deployment follow-up', 'Deployment follow-up')) + '</small><strong>' + esc((kpi.release_followup_open || 0) + ' ' + t('release đang mở', 'open release items')) + '</strong><span class="mesx-sub">' + esc((releaseFollowupSummary.overdue || 0) + ' ' + t('mục quá hạn cần owner chốt ngay.', 'overdue items still need owner closure.')) + '</span></div><div class="mesx-mini-actions" style="margin-bottom:12px"><button type="button" class="mesx-link" data-open-forms-review="1">📋 ' + esc(t('Mở workspace', 'Open workspace')) + '</button></div>' + renderGovernanceQueue(releaseFollowupQueue, { emptyTitle:t('Release follow-up đang kín', 'Release follow-up is closed'), emptyText:t('Chưa có release nào đang mở follow-up briefing, đào tạo hoặc xác nhận triển khai.', 'There are no released documents or forms waiting for briefing, training, or rollout confirmation.'), detail:function(row){ return [row.source_code || '', row.source_title || '', row.release_revision ? ('V' + row.release_revision) : ''].filter(Boolean).join(' · '); }, sub:function(row){ return [row.effective_date ? ('Effect ' + fmtDate(row.effective_date)) : '', row.due_at ? ('Due ' + fmtDateTime(row.due_at)) : '', Array.isArray(row.owner_users) && row.owner_users.length ? ('Owner ' + row.owner_users.join(', ')) : (Array.isArray(row.owner_roles) && row.owner_roles.length ? ('Owner ' + row.owner_roles.join(', ')) : ''), Array.isArray(row.impacted_departments) && row.impacted_departments.length ? ('Dept ' + row.impacted_departments.join(', ')) : ''].filter(Boolean).join(' · '); }, actions:function(row){ var context = esc(jsonAttr(row)); var buttons = []; if(String(row.status || '').toLowerCase() !== 'in_progress'){ buttons.push('<button type="button" class="mesx-link" data-release-followup-action="start" data-release-followup-context="' + context + '">' + esc(t('Bắt đầu', 'Start')) + '</button>'); } buttons.push('<button type="button" class="mesx-link warning" data-release-followup-action="complete" data-release-followup-context="' + context + '">' + esc(t('Đóng follow-up', 'Close follow-up')) + '</button>'); buttons.push('<button type="button" class="mesx-link" data-open-forms-review="1">' + esc(t('Mở workspace', 'Open workspace')) + '</button>'); return buttons.join(''); }, fallbackVi:'Release đã approved nhưng follow-up briefing hoặc đào tạo chưa được chốt.', fallbackEn:'The release is approved but its briefing or training follow-up is still open.' }) + '</div></article>' +
     '</section>';
 
   var worldClassBand =
@@ -1333,6 +1340,7 @@ function render(){
           renderKpiTile(t('WO bị chặn', 'WO launch blockers'), kpi.launch_blocker_hotspots || 0, t('Các lần MES chặn setup / running vì chưa đạt điều kiện bắt buộc', 'Recent MES blocks that prevented setup / running because mandatory launch conditions were not met')) +
           renderKpiTile(t('WO thiếu gate', 'WO missing gates'), kpi.wo_gate_missing || 0, t('Cần bổ sung chứng cứ bắt buộc', 'Evidence gate completion required')) +
           renderKpiTile(t('Review SLA', 'Review SLA gaps'), kpi.review_sla_gaps || 0, t('Hồ sơ in-review đang sắp đến hạn, quá hạn hoặc đã escalation theo SLA review', 'Records in review are due soon, overdue, or already escalated under the review SLA')) +
+          renderKpiTile(t('Release follow-up', 'Release follow-up'), kpi.release_followup_open || 0, t('Các tài liệu hoặc form đã approved nhưng briefing, đào tạo hoặc rollout evidence chưa đóng.', 'Released documents or forms still need briefing, training, or rollout evidence closure.')) +
           renderKpiTile(t('Lệch chương trình NC', 'Program mismatches'), kpi.program_mismatches || 0, t('Máy đang báo sai hoặc thiếu chương trình so với WO', 'Machine-reported program is missing or mismatched against the WO')) +
           renderKpiTile(t('Rủi ro release NC', 'NC release risk'), kpi.program_release_risk || 0, t('WO chưa có release NC hợp lệ để mở cắt', 'WO still missing a valid governed NC release')) +
           renderKpiTile(t('Rủi ro tooling', 'Tool readiness risk'), kpi.tool_readiness_risk || 0, t('WO bị chặn bởi tool-life, offset hoặc runtime tooling chưa đủ', 'WO blocked by tool-life, offset drift, or incomplete tooling runtime')) +
@@ -1458,6 +1466,11 @@ function bind(){
   });
   Array.prototype.forEach.call(state.container.querySelectorAll('[data-open-forms-review]'), function(button){
     button.onclick = function(){ if(typeof navigateTo === 'function') navigateTo('forms'); };
+  });
+  Array.prototype.forEach.call(state.container.querySelectorAll('[data-release-followup-action]'), function(button){
+    button.onclick = function(){
+      updateReleaseFollowup(button.getAttribute('data-release-followup-action') || '', parseJsonAttr(button.getAttribute('data-release-followup-context')));
+    };
   });
   Array.prototype.forEach.call(state.container.querySelectorAll('[data-open-adapter-event]'), function(button){
     button.onclick = function(){
@@ -1670,6 +1683,44 @@ function runEvidenceSlaNotifications(){
     ), Number(result.escalated || 0) > 0 ? 'warning' : 'success');
   }).catch(function(error){
     toast((error && error.message) || t('Không thể chạy vòng nhắc SLA review.', 'Could not run the review SLA notification cycle.'), 'error');
+    if(window.console) console.error(error);
+  });
+}
+
+function updateReleaseFollowup(action, row){
+  var item = row && typeof row === 'object' ? row : {};
+  var followupAction = String(action || '').toLowerCase();
+  if(!item.release_id){
+    toast(t('Không tìm thấy follow-up để cập nhật.', 'Could not find the release follow-up item to update.'), 'error');
+    return;
+  }
+  if(['start', 'complete'].indexOf(followupAction) < 0){
+    toast(t('Hành động follow-up không hợp lệ.', 'Invalid release follow-up action.'), 'error');
+    return;
+  }
+  var promptMessage = followupAction === 'complete'
+    ? t('Ghi chú đóng follow-up (có thể để trống):', 'Optional note to close this release follow-up:')
+    : t('Ghi chú bắt đầu follow-up (có thể để trống):', 'Optional note to start this release follow-up:');
+  var note = window.prompt(promptMessage, followupAction === 'complete' ? (item.completion_note || '') : '');
+  if(note === null) return;
+
+  toast(followupAction === 'complete'
+    ? t('Đang đóng release follow-up...', 'Closing the release follow-up...')
+    : t('Đang chuyển release follow-up sang in-progress...', 'Moving the release follow-up into progress...'), 'info');
+  api('release_followup_update', {
+    release_id: item.release_id,
+    action: followupAction,
+    note: note
+  }, 'POST').then(function(resp){
+    if(!resp || !resp.ok){
+      throw new Error((resp && resp.error) ? String(resp.error) : t('Không thể cập nhật release follow-up.', 'Could not update the release follow-up item.'));
+    }
+    toast(followupAction === 'complete'
+      ? t('Đã đóng release follow-up.', 'The release follow-up has been closed.')
+      : t('Release follow-up đang được xử lý.', 'The release follow-up is now in progress.'), 'success');
+    loadData();
+  }).catch(function(error){
+    toast((error && error.message) || t('Không thể cập nhật release follow-up.', 'Could not update the release follow-up item.'), 'error');
     if(window.console) console.error(error);
   });
 }

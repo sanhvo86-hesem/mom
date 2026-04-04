@@ -46,10 +46,12 @@ $PORTAL_DISPLAY_CONFIG_FILE = $CONF_DIR . '/portal_display_config.json';
 $FORM_CONTROL_REGISTRY_FILE = $CONF_DIR . '/form_control_registry.json';
 $EVIDENCE_RETENTION_POLICY_FILE = $CONF_DIR . '/evidence_retention_policy.json';
 $EVIDENCE_REVIEW_SLA_POLICY_FILE = $CONF_DIR . '/evidence_review_sla_policy.json';
+$RELEASE_FOLLOWUP_POLICY_FILE = $CONF_DIR . '/release_followup_policy.json';
 $ORDERS_FILE = $DATA_DIR . '/orders/orders.json';
 $MASTER_DATA_FILE = $DATA_DIR . '/master-data/master-data.json';
 $MES_RUNTIME_FILE = $DATA_DIR . '/mes/mes-runtime.json';
 $EPICOR_RUNTIME_FILE = $DATA_DIR . '/erp/epicor-runtime.json';
+$RELEASE_FOLLOWUP_STORE_FILE = $DATA_DIR . '/training/release-followup.json';
 $EPICOR_POLICY_FILE = $CONF_DIR . '/epicor_integration_policy.json';
 $RUNTIME_DATA_LAYER_OVERRIDE_FILE = $CONF_DIR . '/runtime_data_layer_overrides.json';
 $PORTAL_CONFIG_JS_FILE = $BASE_DIR . '/scripts/portal/01-data-config.js';
@@ -3063,6 +3065,7 @@ function build_exception_dashboard_data(array $bundle, ?array $mesSnapshot = nul
   }
 
   $reviewSlaGaps = count(evidence_review_sla_queue_rows());
+  $releaseFollowupOverdue = count(release_followup_queue_rows(true));
   $mesSnapshot = is_array($mesSnapshot) ? $mesSnapshot : build_mes_snapshot($orders, $master, $mes);
   $woMissingEvidence = count((array)($mesSnapshot['evidence_gate_queue'] ?? []));
   $programMismatches = count((array)($mesSnapshot['program_handshake_queue'] ?? []));
@@ -3107,6 +3110,7 @@ function build_exception_dashboard_data(array $bundle, ?array $mesSnapshot = nul
     'overdue_orders' => $overdueOrders,
     'overdue_capas' => $overdueCapas,
     'review_sla_gaps' => $reviewSlaGaps,
+    'release_followup_overdue' => $releaseFollowupOverdue,
     'wo_missing_evidence' => $woMissingEvidence,
     'program_mismatches' => $programMismatches,
     'program_release_risk' => $programReleaseRisk,
@@ -3452,6 +3456,652 @@ function save_epicor_runtime_store(array $data): void {
   $data['_meta']['updated'] = now_iso();
   write_json_file($EPICOR_RUNTIME_FILE, $data);
   shadow_sync_epicor_runtime_store($data);
+}
+
+function release_followup_default_policy_store(): array {
+  return [
+    '_meta' => [
+      'version' => '1.0',
+      'updated_at' => now_iso(),
+      'updated_by' => 'system',
+      'workflow_id' => 'HESEM-RELEASE-FOLLOWUP-V1',
+    ],
+    'defaults' => [
+      'enabled' => true,
+      'due_days' => 7,
+      'due_soon_hours' => 72,
+      'priority' => 'high',
+      'watch_roles' => ['qa_manager', 'qms_engineer', 'hr_manager'],
+      'required_actions' => [
+        'Brief the process owner on the released change.',
+        'Confirm affected users training or OJT coverage.',
+        'Capture deployment evidence or implementation note.',
+      ],
+    ],
+    'department_rules' => [
+      'QA' => [
+        'owner_roles' => ['qa_manager', 'qms_engineer'],
+        'impacted_roles' => ['qa_manager', 'qms_engineer'],
+        'due_days' => 5,
+      ],
+      'PRO' => [
+        'owner_roles' => ['production_director', 'qa_manager'],
+        'impacted_roles' => ['production_director', 'shift_leader'],
+        'due_days' => 5,
+      ],
+      'ENG' => [
+        'owner_roles' => ['engineering_manager', 'qa_manager'],
+        'impacted_roles' => ['engineering_manager', 'cam_nc_programmer'],
+        'due_days' => 5,
+      ],
+      'SCM' => [
+        'owner_roles' => ['supply_chain_manager', 'qa_manager'],
+        'impacted_roles' => ['supply_chain_manager', 'buyer'],
+        'due_days' => 5,
+      ],
+      'HR' => [
+        'owner_roles' => ['hr_manager', 'qa_manager'],
+        'impacted_roles' => ['hr_manager'],
+        'due_days' => 3,
+      ],
+      'EXE' => [
+        'owner_roles' => ['ceo', 'qa_manager'],
+        'impacted_roles' => ['ceo'],
+        'due_days' => 3,
+      ],
+      'IT' => [
+        'owner_roles' => ['it_admin', 'qa_manager'],
+        'impacted_roles' => ['it_admin'],
+        'due_days' => 5,
+      ],
+      'WH' => [
+        'owner_roles' => ['supply_chain_manager'],
+        'impacted_roles' => ['warehouse_clerk'],
+        'due_days' => 5,
+      ],
+      'SAL' => [
+        'owner_roles' => ['estimator'],
+        'impacted_roles' => ['estimator'],
+        'due_days' => 5,
+      ],
+      'EHS' => [
+        'owner_roles' => ['ehs_specialist', 'qa_manager'],
+        'impacted_roles' => ['ehs_specialist'],
+        'due_days' => 5,
+      ],
+    ],
+    'category_rules' => [
+      'SOP' => [
+        'impacted_departments' => ['QA', 'PRO', 'ENG', 'SCM'],
+      ],
+      'PROC' => [
+        'impacted_departments' => ['QA', 'PRO', 'ENG', 'SCM'],
+      ],
+      'WI' => [
+        'impacted_departments' => ['QA', 'PRO', 'ENG'],
+      ],
+      'FRM' => [
+        'impacted_departments' => ['QA'],
+        'required_actions' => [
+          'Confirm the released form is linked in the active workspace.',
+          'Confirm the affected users received the updated form usage brief.',
+          'Capture rollout evidence or pilot note before closing.',
+        ],
+      ],
+      'TRN' => [
+        'impacted_departments' => ['HR', 'QA'],
+        'owner_roles' => ['hr_manager', 'qa_manager'],
+        'due_days' => 3,
+      ],
+      'QMS' => [
+        'impacted_departments' => ['QA', 'EXE'],
+      ],
+    ],
+    'form_series_rules' => [
+      '100' => [
+        'impacted_departments' => ['EXE', 'IT', 'QA'],
+        'owner_roles' => ['ceo', 'it_admin', 'qa_manager'],
+      ],
+      '300' => [
+        'impacted_departments' => ['ENG', 'QA'],
+        'owner_roles' => ['engineering_manager', 'qa_manager'],
+      ],
+      '400' => [
+        'impacted_departments' => ['SCM', 'QA'],
+        'owner_roles' => ['supply_chain_manager', 'qa_manager'],
+      ],
+      '500' => [
+        'impacted_departments' => ['PRO', 'QA'],
+        'owner_roles' => ['production_director', 'qa_manager'],
+      ],
+      '600' => [
+        'impacted_departments' => ['QA', 'PRO'],
+        'owner_roles' => ['qa_manager', 'production_director'],
+      ],
+      '700' => [
+        'impacted_departments' => ['WH', 'SCM'],
+        'owner_roles' => ['supply_chain_manager'],
+      ],
+      '800' => [
+        'impacted_departments' => ['HR', 'PRO', 'QA'],
+        'owner_roles' => ['hr_manager', 'qa_manager'],
+        'due_days' => 3,
+      ],
+      '900' => [
+        'impacted_departments' => ['QA', 'EXE'],
+        'owner_roles' => ['qa_manager', 'ceo'],
+      ],
+    ],
+  ];
+}
+
+function release_followup_normalize_list(array $values, string $mode = 'plain'): array {
+  $out = [];
+  $seen = [];
+  foreach ($values as $value) {
+    $item = trim((string)$value);
+    if ($item === '') continue;
+    if ($mode === 'role') $item = migrate_role(strtolower($item));
+    elseif ($mode === 'department') $item = strtoupper($item);
+    elseif ($mode === 'user') $item = strtolower($item);
+    if (isset($seen[$item])) continue;
+    $seen[$item] = true;
+    $out[] = $item;
+  }
+  return $out;
+}
+
+function release_followup_policy_merge(array ...$layers): array {
+  $result = [];
+  foreach ($layers as $layer) {
+    foreach ($layer as $key => $value) {
+      if (is_array($value)) {
+        $isList = array_keys($value) === range(0, count($value) - 1);
+        if ($isList) {
+          $existing = is_array($result[$key] ?? null) ? $result[$key] : [];
+          $mode = in_array((string)$key, ['owner_roles', 'watch_roles', 'impacted_roles'], true)
+            ? 'role'
+            : (in_array((string)$key, ['impacted_departments'], true) ? 'department' : 'plain');
+          $result[$key] = release_followup_normalize_list(array_merge($existing, $value), $mode);
+        } else {
+          $existing = is_array($result[$key] ?? null) ? $result[$key] : [];
+          $result[$key] = array_merge($existing, $value);
+        }
+        continue;
+      }
+      if ($value === null || $value === '') continue;
+      $result[$key] = $value;
+    }
+  }
+  return $result;
+}
+
+function load_release_followup_policy_store(): array {
+  global $RELEASE_FOLLOWUP_POLICY_FILE;
+  $default = release_followup_default_policy_store();
+  $data = read_json_file($RELEASE_FOLLOWUP_POLICY_FILE);
+  if (!is_array($data)) return $default;
+
+  $store = $default;
+  if (is_array($data['_meta'] ?? null)) $store['_meta'] = array_merge($store['_meta'], $data['_meta']);
+  if (is_array($data['defaults'] ?? null)) $store['defaults'] = release_followup_policy_merge($store['defaults'], $data['defaults']);
+  foreach (['department_rules', 'category_rules', 'form_series_rules'] as $section) {
+    if (!is_array($data[$section] ?? null)) continue;
+    foreach ($data[$section] as $key => $rule) {
+      if (!is_array($rule)) continue;
+      $normalizedKey = $section === 'category_rules' ? strtoupper(trim((string)$key)) : strtoupper(trim((string)$key));
+      $base = is_array($store[$section][$normalizedKey] ?? null) ? $store[$section][$normalizedKey] : [];
+      $store[$section][$normalizedKey] = release_followup_policy_merge($base, $rule);
+    }
+  }
+  return $store;
+}
+
+function release_followup_default_store(): array {
+  return [
+    '_meta' => [
+      'version' => '1.0',
+      'created_at' => now_iso(),
+      'updated_at' => now_iso(),
+      'updated_by' => 'system',
+    ],
+    'items' => [],
+  ];
+}
+
+function load_release_followup_store(): array {
+  global $RELEASE_FOLLOWUP_STORE_FILE;
+  $default = release_followup_default_store();
+  $data = read_json_file($RELEASE_FOLLOWUP_STORE_FILE);
+  if (!is_array($data)) return $default;
+  return [
+    '_meta' => is_array($data['_meta'] ?? null) ? array_merge($default['_meta'], $data['_meta']) : $default['_meta'],
+    'items' => array_values(array_filter((array)($data['items'] ?? []), static fn($row) => is_array($row))),
+  ];
+}
+
+function save_release_followup_store(array $store): void {
+  global $RELEASE_FOLLOWUP_STORE_FILE;
+  ensure_dir(dirname($RELEASE_FOLLOWUP_STORE_FILE));
+  $store['_meta'] = is_array($store['_meta'] ?? null) ? $store['_meta'] : [];
+  if (empty($store['_meta']['created_at'])) $store['_meta']['created_at'] = now_iso();
+  $store['_meta']['updated_at'] = now_iso();
+  $store['items'] = array_values(array_filter((array)($store['items'] ?? []), static fn($row) => is_array($row)));
+  write_json_file($RELEASE_FOLLOWUP_STORE_FILE, $store);
+}
+
+function release_followup_category_from_code(string $code): string {
+  if (preg_match('/^([A-Za-z]+)/', trim($code), $m)) return strtoupper($m[1]);
+  return '';
+}
+
+function release_followup_form_series_from_code(string $code): string {
+  if (!preg_match('/-(\d{3})(?:[^0-9]|$)/', trim($code), $m)) return '';
+  return (string)(((int)floor(((int)$m[1]) / 100)) * 100);
+}
+
+function release_followup_departments_from_series(string $series): array {
+  global $CONF_DIR;
+  $series = trim($series);
+  if ($series === '') return [];
+  $data = read_json_file($CONF_DIR . '/document_type_registry.json');
+  $departments = [];
+  foreach ((array)($data['departments'] ?? []) as $deptCode => $dept) {
+    if (!is_array($dept)) continue;
+    $seriesList = array_map('intval', (array)($dept['form_series'] ?? []));
+    if (in_array((int)$series, $seriesList, true)) $departments[] = strtoupper((string)$deptCode);
+  }
+  return release_followup_normalize_list($departments, 'department');
+}
+
+function release_followup_departments_from_owner(string $owner): array {
+  $ownerUpper = strtoupper($owner);
+  $map = [
+    'QA' => ['QA', 'QMS', 'QUALITY'],
+    'PRO' => ['PRODUCTION', 'WORKSHOP', 'PROD'],
+    'ENG' => ['ENGINEERING', 'ENG'],
+    'SCM' => ['SCM', 'SUPPLY CHAIN', 'PROCUREMENT', 'BUYER'],
+    'HR' => ['HR', 'TRAINING'],
+    'EXE' => ['CEO', 'EXECUTIVE', 'DIRECTOR'],
+    'IT' => ['IT', 'DIGITAL'],
+    'WH' => ['WAREHOUSE', 'LOGISTICS'],
+    'SAL' => ['SALES', 'ESTIMATOR'],
+    'EHS' => ['EHS', 'HSE', 'SAFETY'],
+  ];
+  $out = [];
+  foreach ($map as $dept => $tokens) {
+    foreach ($tokens as $token) {
+      if (str_contains($ownerUpper, $token)) {
+        $out[] = $dept;
+        break;
+      }
+    }
+  }
+  return release_followup_normalize_list($out, 'department');
+}
+
+function release_followup_default_owner_roles_for_department(string $department): array {
+  return match (strtoupper(trim($department))) {
+    'QA' => ['qa_manager', 'qms_engineer'],
+    'PRO' => ['production_director'],
+    'ENG' => ['engineering_manager', 'qa_manager'],
+    'SCM' => ['supply_chain_manager', 'qa_manager'],
+    'HR' => ['hr_manager', 'qa_manager'],
+    'EXE' => ['ceo', 'qa_manager'],
+    'IT' => ['it_admin', 'qa_manager'],
+    'WH' => ['supply_chain_manager'],
+    'SAL' => ['estimator'],
+    'EHS' => ['ehs_specialist', 'qa_manager'],
+    default => ['qa_manager'],
+  };
+}
+
+function release_followup_active_users(): array {
+  global $USERS_FILE;
+  $data = read_json_file($USERS_FILE);
+  $users = [];
+  foreach ((array)($data['users'] ?? []) as $user) {
+    if (!is_array($user)) continue;
+    if (array_key_exists('active', $user) && !$user['active']) continue;
+    $username = strtolower(trim((string)($user['username'] ?? '')));
+    if ($username === '') continue;
+    $user['username'] = $username;
+    $user['role'] = migrate_role(strtolower(trim((string)($user['role'] ?? ''))));
+    $user['dept'] = strtoupper(trim((string)($user['dept'] ?? '')));
+    $users[] = $user;
+  }
+  return $users;
+}
+
+function release_followup_resolve_policy(array $source): array {
+  $policyStore = load_release_followup_policy_store();
+  $code = strtoupper(trim((string)($source['code'] ?? '')));
+  $category = strtoupper(trim((string)($source['category'] ?? '')));
+  if ($category === '') $category = release_followup_category_from_code($code);
+  $series = trim((string)($source['form_series'] ?? ''));
+  if ($series === '') $series = release_followup_form_series_from_code($code);
+
+  $categoryRule = is_array($policyStore['category_rules'][$category] ?? null) ? $policyStore['category_rules'][$category] : [];
+  $seriesRule = is_array($policyStore['form_series_rules'][$series] ?? null) ? $policyStore['form_series_rules'][$series] : [];
+
+  $departments = release_followup_normalize_list(array_merge(
+    (array)($source['departments'] ?? []),
+    (array)($categoryRule['impacted_departments'] ?? []),
+    (array)($seriesRule['impacted_departments'] ?? []),
+    release_followup_departments_from_series($series),
+    release_followup_departments_from_owner((string)($source['owner'] ?? ''))
+  ), 'department');
+  if (!$departments) $departments = ['QA'];
+
+  $policy = $policyStore['defaults'];
+  foreach ($departments as $department) {
+    $deptRule = is_array($policyStore['department_rules'][$department] ?? null) ? $policyStore['department_rules'][$department] : [];
+    $policy = release_followup_policy_merge($policy, $deptRule);
+  }
+  $policy = release_followup_policy_merge($policy, $categoryRule, $seriesRule);
+
+  $policy['enabled'] = !array_key_exists('enabled', $policy) || (bool)$policy['enabled'];
+  $policy['due_days'] = max(1, (int)($policy['due_days'] ?? 7));
+  $policy['due_soon_hours'] = max(12, (int)($policy['due_soon_hours'] ?? 72));
+  $priority = strtolower(trim((string)($policy['priority'] ?? 'high')));
+  $policy['priority'] = in_array($priority, ['low', 'medium', 'high', 'critical'], true) ? $priority : 'high';
+  $policy['impacted_departments'] = release_followup_normalize_list(array_merge($departments, (array)($policy['impacted_departments'] ?? [])), 'department');
+  $policy['owner_roles'] = release_followup_normalize_list(array_merge(
+    (array)($policy['owner_roles'] ?? []),
+    array_merge(...array_map('release_followup_default_owner_roles_for_department', $departments))
+  ), 'role');
+  $policy['watch_roles'] = release_followup_normalize_list((array)($policy['watch_roles'] ?? []), 'role');
+  $policy['impacted_roles'] = release_followup_normalize_list(array_merge(
+    (array)($policy['impacted_roles'] ?? []),
+    (array)($source['roles_allowed'] ?? [])
+  ), 'role');
+  $policy['required_actions'] = release_followup_normalize_list((array)($policy['required_actions'] ?? []), 'plain');
+  $policy['category'] = $category;
+  $policy['form_series'] = $series;
+  return $policy;
+}
+
+function release_followup_resolve_users(array $policy): array {
+  $users = release_followup_active_users();
+  $ownerRoles = release_followup_normalize_list((array)($policy['owner_roles'] ?? []), 'role');
+  $watchRoles = release_followup_normalize_list((array)($policy['watch_roles'] ?? []), 'role');
+  $impactedRoles = release_followup_normalize_list((array)($policy['impacted_roles'] ?? []), 'role');
+  $impactedDepartments = release_followup_normalize_list((array)($policy['impacted_departments'] ?? []), 'department');
+  $ownerUsers = [];
+  $watchUsers = [];
+  $impactedUsers = [];
+
+  foreach ($users as $user) {
+    $username = (string)($user['username'] ?? '');
+    $role = (string)($user['role'] ?? '');
+    $department = strtoupper(trim((string)($user['dept'] ?? '')));
+    if ($username === '') continue;
+    if (in_array($role, $ownerRoles, true)) $ownerUsers[] = $username;
+    if (in_array($role, $watchRoles, true)) $watchUsers[] = $username;
+    if (in_array($role, $impactedRoles, true) || in_array($department, $impactedDepartments, true)) $impactedUsers[] = $username;
+  }
+
+  return [
+    'owner_users' => release_followup_normalize_list($ownerUsers, 'user'),
+    'watch_users' => release_followup_normalize_list($watchUsers, 'user'),
+    'impacted_users' => release_followup_normalize_list(array_merge($impactedUsers, $ownerUsers), 'user'),
+  ];
+}
+
+function release_followup_due_at(string $effectiveDate, int $dueDays): string {
+  try {
+    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $effectiveDate)) {
+      $base = new DateTimeImmutable($effectiveDate . ' 23:59:59');
+    } else {
+      $base = new DateTimeImmutable(now_iso());
+    }
+    return $base->modify('+' . max(1, $dueDays) . ' days')->format(DateTimeInterface::ATOM);
+  } catch (Throwable $e) {
+    return now_iso();
+  }
+}
+
+function release_followup_state(array $item): string {
+  $status = strtolower(trim((string)($item['status'] ?? 'open')));
+  if (in_array($status, ['completed', 'waived'], true)) return 'closed';
+  $dueSoonHours = max(12, (int)($item['due_soon_hours'] ?? 72));
+  $dueAt = trim((string)($item['due_at'] ?? ''));
+  try {
+    $now = new DateTimeImmutable(now_iso());
+    if ($dueAt !== '') {
+      $due = new DateTimeImmutable($dueAt);
+      $hours = (int)floor(($due->getTimestamp() - $now->getTimestamp()) / 3600);
+      if ($hours < 0) return 'overdue';
+      if ($hours <= $dueSoonHours) return 'due_soon';
+    }
+  } catch (Throwable $e) {
+    // Fall back to status when due date is invalid.
+  }
+  return $status === 'in_progress' ? 'in_progress' : 'open';
+}
+
+function release_followup_age_days(array $item): ?int {
+  $releasedAt = trim((string)($item['released_at'] ?? ''));
+  if ($releasedAt === '') return null;
+  try {
+    $released = new DateTimeImmutable($releasedAt);
+    $now = new DateTimeImmutable(now_iso());
+    return max(0, (int)floor(($now->getTimestamp() - $released->getTimestamp()) / 86400));
+  } catch (Throwable $e) {
+    return null;
+  }
+}
+
+function release_followup_row_from_item(array $item): array {
+  $state = release_followup_state($item);
+  return [
+    'release_id' => (string)($item['release_id'] ?? ''),
+    'dedupe_key' => (string)($item['dedupe_key'] ?? ''),
+    'source_kind' => (string)($item['source_kind'] ?? ''),
+    'source_code' => (string)($item['source_code'] ?? ''),
+    'source_title' => (string)($item['source_title'] ?? ''),
+    'source_category' => (string)($item['source_category'] ?? ''),
+    'source_path' => (string)($item['source_path'] ?? ''),
+    'release_revision' => (string)($item['release_revision'] ?? ''),
+    'update_type' => (string)($item['update_type'] ?? ''),
+    'released_at' => (string)($item['released_at'] ?? ''),
+    'released_by' => (string)($item['released_by'] ?? ''),
+    'released_by_role' => (string)($item['released_by_role'] ?? ''),
+    'effective_date' => (string)($item['effective_date'] ?? ''),
+    'due_at' => (string)($item['due_at'] ?? ''),
+    'status' => (string)($item['status'] ?? 'open'),
+    'queue_state' => $state,
+    'priority' => (string)($item['priority'] ?? 'high'),
+    'summary_vi' => (string)($item['summary_vi'] ?? ''),
+    'summary_en' => (string)($item['summary_en'] ?? ''),
+    'owner_roles' => array_values((array)($item['owner_roles'] ?? [])),
+    'watch_roles' => array_values((array)($item['watch_roles'] ?? [])),
+    'impacted_roles' => array_values((array)($item['impacted_roles'] ?? [])),
+    'impacted_departments' => array_values((array)($item['impacted_departments'] ?? [])),
+    'owner_users' => array_values((array)($item['owner_users'] ?? [])),
+    'watch_users' => array_values((array)($item['watch_users'] ?? [])),
+    'impacted_users' => array_values((array)($item['impacted_users'] ?? [])),
+    'required_actions' => array_values((array)($item['required_actions'] ?? [])),
+    'release_note' => (string)($item['release_note'] ?? ''),
+    'acknowledged_at' => (string)($item['acknowledged_at'] ?? ''),
+    'acknowledged_by' => (string)($item['acknowledged_by'] ?? ''),
+    'completed_at' => (string)($item['completed_at'] ?? ''),
+    'completed_by' => (string)($item['completed_by'] ?? ''),
+    'completion_note' => (string)($item['completion_note'] ?? ''),
+    'age_days' => release_followup_age_days($item),
+  ];
+}
+
+function release_followup_queue_rows(bool $overdueOnly = false): array {
+  $rows = [];
+  $store = load_release_followup_store();
+  foreach ((array)($store['items'] ?? []) as $item) {
+    if (!is_array($item)) continue;
+    $row = release_followup_row_from_item($item);
+    if ($row['queue_state'] === 'closed') continue;
+    if ($overdueOnly && $row['queue_state'] !== 'overdue') continue;
+    $rows[] = $row;
+  }
+  usort($rows, static function ($a, $b) {
+    $priorityOrder = ['overdue' => 0, 'due_soon' => 1, 'in_progress' => 2, 'open' => 3];
+    $leftState = $priorityOrder[(string)($a['queue_state'] ?? 'open')] ?? 9;
+    $rightState = $priorityOrder[(string)($b['queue_state'] ?? 'open')] ?? 9;
+    if ($leftState !== $rightState) return $leftState <=> $rightState;
+    $leftDue = (string)($a['due_at'] ?? '');
+    $rightDue = (string)($b['due_at'] ?? '');
+    if ($leftDue !== $rightDue) return strcmp($leftDue, $rightDue);
+    return strcmp((string)($b['released_at'] ?? ''), (string)($a['released_at'] ?? ''));
+  });
+  return $rows;
+}
+
+function release_followup_summary(array $rows = []): array {
+  $rows = $rows ?: release_followup_queue_rows();
+  $summary = [
+    'open' => 0,
+    'in_progress' => 0,
+    'due_soon' => 0,
+    'overdue' => 0,
+    'total_open' => 0,
+  ];
+  foreach ($rows as $row) {
+    if (!is_array($row)) continue;
+    $state = (string)($row['queue_state'] ?? 'open');
+    if (isset($summary[$state])) $summary[$state]++;
+    $summary['total_open']++;
+  }
+  return $summary;
+}
+
+function release_followup_is_visible_to_user(array $item, array $user): bool {
+  if (user_is_admin($user)) return true;
+  $username = strtolower(trim((string)($user['username'] ?? $_SESSION['user'] ?? '')));
+  $role = migrate_role(strtolower(trim((string)($user['role'] ?? ''))));
+  $department = strtoupper(trim((string)($user['dept'] ?? '')));
+  if ($username !== '' && in_array($username, release_followup_normalize_list(array_merge(
+    (array)($item['owner_users'] ?? []),
+    (array)($item['watch_users'] ?? []),
+    (array)($item['impacted_users'] ?? [])
+  ), 'user'), true)) return true;
+  if ($role !== '' && in_array($role, release_followup_normalize_list(array_merge(
+    (array)($item['owner_roles'] ?? []),
+    (array)($item['watch_roles'] ?? []),
+    (array)($item['impacted_roles'] ?? [])
+  ), 'role'), true)) return true;
+  if ($department !== '' && in_array($department, release_followup_normalize_list((array)($item['impacted_departments'] ?? []), 'department'), true)) return true;
+  return false;
+}
+
+function release_followup_can_manage(array $item, array $user): bool {
+  if (user_is_admin($user)) return true;
+  $username = strtolower(trim((string)($user['username'] ?? $_SESSION['user'] ?? '')));
+  if ($username !== '' && in_array($username, release_followup_normalize_list((array)($item['owner_users'] ?? []), 'user'), true)) return true;
+  $role = migrate_role(strtolower(trim((string)($user['role'] ?? ''))));
+  return $role !== '' && in_array($role, release_followup_normalize_list(array_merge(
+    (array)($item['owner_roles'] ?? []),
+    (array)($item['watch_roles'] ?? [])
+  ), 'role'), true);
+}
+
+function release_followup_append_history(array &$item, string $event, string $by, string $note = ''): void {
+  $history = is_array($item['history'] ?? null) ? $item['history'] : [];
+  $history[] = [
+    'event' => $event,
+    'at' => now_iso(),
+    'by' => strtolower(trim($by)) ?: 'system',
+    'note' => $note,
+    'status' => (string)($item['status'] ?? ''),
+  ];
+  $item['history'] = array_slice($history, -50);
+}
+
+function release_followup_register_release(array $source): ?array {
+  $code = strtoupper(trim((string)($source['code'] ?? '')));
+  $revision = form_normalize_revision((string)($source['revision'] ?? ''), '');
+  if ($code === '' || $revision === '') return null;
+
+  $policy = release_followup_resolve_policy($source);
+  if (empty($policy['enabled'])) return null;
+  $users = release_followup_resolve_users($policy);
+  $releasedBy = strtolower(trim((string)($source['released_by_username'] ?? $source['released_by'] ?? 'system')));
+  $releasedAt = trim((string)($source['released_at'] ?? now_iso())) ?: now_iso();
+  $effectiveDate = trim((string)($source['effective_date'] ?? ''));
+  if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $effectiveDate)) $effectiveDate = substr($releasedAt, 0, 10);
+  $kind = trim((string)($source['kind'] ?? 'document')) ?: 'document';
+  $category = strtoupper(trim((string)($policy['category'] ?? release_followup_category_from_code($code))));
+  $dedupeKey = strtoupper($kind . '|' . $code . '|V' . $revision);
+  $releaseId = 'RELUP-' . strtoupper(substr(hash('sha1', $dedupeKey), 0, 12));
+  $dueAt = release_followup_due_at($effectiveDate, (int)$policy['due_days']);
+  $title = trim((string)($source['title'] ?? ''));
+  if ($title === '') $title = $code;
+  $baseItem = [
+    'release_id' => $releaseId,
+    'dedupe_key' => $dedupeKey,
+    'source_kind' => $kind,
+    'source_code' => $code,
+    'source_title' => $title,
+    'source_category' => $category,
+    'source_path' => trim((string)($source['path'] ?? '')),
+    'release_revision' => $revision,
+    'update_type' => strtolower(trim((string)($source['update_type'] ?? 'major'))) === 'minor' ? 'minor' : 'major',
+    'released_at' => $releasedAt,
+    'released_by' => trim((string)($source['released_by'] ?? $releasedBy)),
+    'released_by_role' => trim((string)($source['released_by_role'] ?? '')),
+    'effective_date' => $effectiveDate,
+    'due_at' => $dueAt,
+    'due_soon_hours' => (int)$policy['due_soon_hours'],
+    'priority' => (string)$policy['priority'],
+    'owner_roles' => array_values((array)($policy['owner_roles'] ?? [])),
+    'watch_roles' => array_values((array)($policy['watch_roles'] ?? [])),
+    'impacted_roles' => array_values((array)($policy['impacted_roles'] ?? [])),
+    'impacted_departments' => array_values((array)($policy['impacted_departments'] ?? [])),
+    'owner_users' => array_values((array)($users['owner_users'] ?? [])),
+    'watch_users' => array_values((array)($users['watch_users'] ?? [])),
+    'impacted_users' => array_values((array)($users['impacted_users'] ?? [])),
+    'required_actions' => array_values((array)($policy['required_actions'] ?? [])),
+    'release_note' => trim((string)($source['note'] ?? '')),
+    'summary_vi' => 'Phat hanh ' . $code . ' V' . $revision . ' can chot brief, dao tao va bang chung trien khai.',
+    'summary_en' => 'Released ' . $code . ' V' . $revision . ' still requires deployment brief, training, and rollout evidence.',
+    'completion_note' => '',
+  ];
+
+  $store = load_release_followup_store();
+  $idx = -1;
+  foreach ((array)($store['items'] ?? []) as $itemIdx => $item) {
+    if (!is_array($item)) continue;
+    if ((string)($item['dedupe_key'] ?? '') !== $dedupeKey) continue;
+    $idx = $itemIdx;
+    break;
+  }
+
+  if ($idx >= 0) {
+    $existing = is_array($store['items'][$idx] ?? null) ? $store['items'][$idx] : [];
+    $preserve = [
+      'status' => (string)($existing['status'] ?? 'open'),
+      'acknowledged_at' => (string)($existing['acknowledged_at'] ?? ''),
+      'acknowledged_by' => (string)($existing['acknowledged_by'] ?? ''),
+      'completed_at' => (string)($existing['completed_at'] ?? ''),
+      'completed_by' => (string)($existing['completed_by'] ?? ''),
+      'completion_note' => trim((string)($existing['completion_note'] ?? '')),
+      'history' => is_array($existing['history'] ?? null) ? $existing['history'] : [],
+      'created_at' => (string)($existing['created_at'] ?? $releasedAt),
+    ];
+    $store['items'][$idx] = array_merge($existing, $baseItem, $preserve, ['updated_at' => now_iso()]);
+    release_followup_append_history($store['items'][$idx], 'release_refreshed', $releasedBy, trim((string)($source['note'] ?? '')));
+    $item = $store['items'][$idx];
+  } else {
+    $item = array_merge($baseItem, [
+      'status' => 'open',
+      'created_at' => $releasedAt,
+      'updated_at' => now_iso(),
+    ]);
+    release_followup_append_history($item, 'release_created', $releasedBy, trim((string)($source['note'] ?? '')));
+    array_unshift($store['items'], $item);
+  }
+
+  $store['_meta']['updated_by'] = $releasedBy !== '' ? $releasedBy : 'system';
+  save_release_followup_store($store);
+  return release_followup_row_from_item($item);
 }
 
 function upsert_epicor_runtime_item(array &$rows, string $idKey, array $item): array {
@@ -8217,6 +8867,8 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $energyQueue = mes_build_energy_queue($machineWall, $energySnapshotRows);
   $costVarianceQueue = mes_build_cost_variance_queue($dispatch, $costTrackingRows);
   $reviewSlaQueue = evidence_review_sla_queue_rows();
+  $releaseFollowupQueue = release_followup_queue_rows();
+  $releaseFollowupSummary = release_followup_summary($releaseFollowupQueue);
   $shiftHandoverQueue = mes_build_shift_handover_queue($machineWall, $latestShiftHandoverByMachine, $shiftPatterns, $currentShift, $now);
   $epicorPolicy = load_epicor_integration_policy();
   $epicorStore = load_epicor_runtime_store();
@@ -8266,6 +8918,8 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
   $kpis['alarm_hotspots'] = count($alarmHotspotQueue);
   $kpis['alarm_ack_gaps'] = count($alarmAckQueue);
   $kpis['review_sla_gaps'] = count($reviewSlaQueue);
+  $kpis['release_followup_open'] = (int)($releaseFollowupSummary['total_open'] ?? 0);
+  $kpis['release_followup_overdue'] = (int)($releaseFollowupSummary['overdue'] ?? 0);
   $kpis['material_genealogy_gaps'] = count($materialGenealogyQueue);
   $kpis['shift_handover_gaps'] = count($shiftHandoverQueue);
   $kpis['shadow_sync_failures'] = count($shadowSyncFailures);
@@ -8296,6 +8950,8 @@ function build_mes_snapshot(array $orders, array $master, array $mes): array {
     'tool_readiness_queue' => array_slice($toolReadinessQueue, 0, 20),
     'alarm_ack_queue' => array_slice($alarmAckQueue, 0, 20),
     'review_sla_queue' => array_slice($reviewSlaQueue, 0, 20),
+    'release_followup_queue' => array_slice($releaseFollowupQueue, 0, 20),
+    'release_followup_summary' => $releaseFollowupSummary,
     'nc_download_mismatch_queue' => array_slice($ncDownloadMismatchQueue, 0, 20),
     'tool_offset_queue' => array_slice($toolOffsetQueue, 0, 20),
     'dpp_queue' => array_slice($dppQueue, 0, 20),
@@ -13312,12 +13968,29 @@ case 'doc_save_draft': {
         'version_control_model' => 'private_archive_release_control',
         'release_workflow_id' => 'QMS-FRM-EXCEL-PRIVATE-RELEASE-CONTROL',
       ]);
+      $releaseFollowup = release_followup_register_release([
+        'kind' => 'document',
+        'code' => (string)$formEntry['code'],
+        'title' => trim((string)($formEntry['title'] ?? $formEntry['description'] ?? $formEntry['code'] ?? '')),
+        'category' => 'FRM',
+        'owner' => (string)($formEntry['owner'] ?? 'QA/QMS'),
+        'path' => $baseRel,
+        'revision' => $newRevision,
+        'update_type' => $updateType,
+        'effective_date' => $effDate,
+        'released_at' => now_iso(),
+        'released_by' => (string)($me['name'] ?? $me['username'] ?? ''),
+        'released_by_username' => (string)($me['username'] ?? $_SESSION['user'] ?? ''),
+        'released_by_role' => (string)($me['role'] ?? ''),
+        'note' => $note,
+      ]);
       invalidate_scan_cache($DATA_DIR);
       api_json([
         'ok' => true,
         'code' => (string)$formEntry['code'],
         'state' => $state,
         'versions' => form_public_versions($manifest, $state, (string)$formEntry['code'], (string)$formEntry['path']),
+        'release_followup' => $releaseFollowup,
         'server_time' => now_iso(),
       ]);
     }
@@ -13552,8 +14225,34 @@ case 'doc_save_draft': {
       'path' => $baseRel,
       'folder' => (string)$info['dirRel'],
     ]);
+    $customDocs = load_custom_docs($CUSTOM_DOCS_FILE);
+    $docTitle = $code;
+    $docOwner = '';
+    foreach ($customDocs as $docItem) {
+      if (!is_array($docItem)) continue;
+      if (strtoupper((string)($docItem['code'] ?? '')) !== $code) continue;
+      $docTitle = trim((string)($docItem['title'] ?? $docItem['description'] ?? $code)) ?: $code;
+      $docOwner = trim((string)($docItem['owner'] ?? ''));
+      break;
+    }
+    $releaseFollowup = release_followup_register_release([
+      'kind' => 'document',
+      'code' => $code,
+      'title' => $docTitle,
+      'category' => release_followup_category_from_code($code),
+      'owner' => $docOwner,
+      'path' => $baseRel,
+      'revision' => $newRevision,
+      'update_type' => $updateType,
+      'effective_date' => $effDate,
+      'released_at' => now_iso(),
+      'released_by' => (string)($me['name'] ?? $me['username'] ?? ''),
+      'released_by_username' => (string)($me['username'] ?? $_SESSION['user'] ?? ''),
+      'released_by_role' => (string)($me['role'] ?? ''),
+      'note' => $note,
+    ]);
 
-    api_json(['ok' => true, 'code' => $code, 'state' => $state, 'versions' => $versions, 'server_time' => now_iso()]);
+    api_json(['ok' => true, 'code' => $code, 'state' => $state, 'versions' => $versions, 'release_followup' => $releaseFollowup, 'server_time' => now_iso()]);
   }
 
   case 'doc_reject': {
@@ -16908,6 +17607,24 @@ if ($username === '') {
       if ($message === 'approve_revision_mismatch') api_json(['ok' => false, 'error' => 'approve_revision_mismatch'], 409);
       throw $e;
     }
+    $liveSchema = is_array($result['live_schema'] ?? null) ? $result['live_schema'] : [];
+    $releaseFollowup = release_followup_register_release([
+      'kind' => 'form_schema',
+      'code' => strtoupper($code),
+      'title' => trim((string)($liveSchema['title'] ?? $liveSchema['title_vi'] ?? strtoupper($code))),
+      'category' => 'FRM',
+      'owner' => 'QA/QMS',
+      'path' => 'online-forms/schemas/' . strtoupper($code) . '.json',
+      'revision' => (string)($result['state']['released_revision'] ?? $result['state']['revision'] ?? $revision),
+      'update_type' => $updateType,
+      'effective_date' => (string)($result['state']['effective_date'] ?? $effectiveDate),
+      'released_at' => now_iso(),
+      'released_by' => $actorName,
+      'released_by_username' => (string)($me['username'] ?? $_SESSION['user'] ?? ''),
+      'released_by_role' => $actorRole,
+      'roles_allowed' => array_values((array)($liveSchema['roles_allowed'] ?? [])),
+      'note' => $changeNote,
+    ]);
 
     api_json([
       'ok' => true,
@@ -16916,6 +17633,7 @@ if ($username === '') {
       'versions' => $result['versions'] ?? [],
       'draft_schema' => $result['draft_schema'] ?? null,
       'live_schema' => $result['live_schema'] ?? null,
+      'release_followup' => $releaseFollowup,
       'server_time' => now_iso(),
     ]);
   }
@@ -20299,6 +21017,94 @@ if ($username === '') {
     ]);
   }
 
+  case 'release_followup_overview': {
+    $me = require_logged_in($store);
+    $scope = strtolower(trim((string)($_GET['scope'] ?? $_POST['scope'] ?? 'open')));
+    $rows = array_values(array_filter(release_followup_queue_rows(), static fn($row) => is_array($row) && release_followup_is_visible_to_user($row, $me)));
+    if ($scope === 'overdue') {
+      $rows = array_values(array_filter($rows, static fn($row) => (string)($row['queue_state'] ?? '') === 'overdue'));
+    } elseif ($scope === 'due_soon') {
+      $rows = array_values(array_filter($rows, static fn($row) => in_array((string)($row['queue_state'] ?? ''), ['due_soon', 'overdue'], true)));
+    } elseif ($scope === 'in_progress') {
+      $rows = array_values(array_filter($rows, static fn($row) => (string)($row['status'] ?? '') === 'in_progress'));
+    }
+    api_json([
+      'ok' => true,
+      'scope' => $scope,
+      'summary' => release_followup_summary($rows),
+      'items' => array_slice($rows, 0, 100),
+      'server_time' => now_iso(),
+    ]);
+  }
+
+  case 'release_followup_update': {
+    if ($method !== 'POST') api_json(['ok' => false, 'error' => 'method_not_allowed'], 405);
+    $me = require_logged_in($store);
+    require_csrf();
+    $body = read_json_body();
+    $releaseId = trim((string)($body['release_id'] ?? ''));
+    $action = strtolower(trim((string)($body['action'] ?? '')));
+    $note = trim((string)($body['note'] ?? ''));
+    if ($releaseId === '' || $action === '') api_json(['ok' => false, 'error' => 'invalid_payload'], 400);
+
+    $followupStore = load_release_followup_store();
+    $targetIdx = -1;
+    foreach ((array)($followupStore['items'] ?? []) as $idx => $item) {
+      if (!is_array($item)) continue;
+      if ((string)($item['release_id'] ?? '') !== $releaseId) continue;
+      $targetIdx = $idx;
+      break;
+    }
+    if ($targetIdx < 0) api_json(['ok' => false, 'error' => 'release_followup_not_found'], 404);
+
+    $item = is_array($followupStore['items'][$targetIdx] ?? null) ? $followupStore['items'][$targetIdx] : [];
+    if (!release_followup_can_manage($item, $me)) api_json(['ok' => false, 'error' => 'insufficient_role'], 403);
+
+    $actor = strtolower(trim((string)($me['username'] ?? $_SESSION['user'] ?? 'anonymous')));
+    switch ($action) {
+      case 'acknowledge':
+      case 'start':
+        $item['status'] = 'in_progress';
+        $item['acknowledged_at'] = now_iso();
+        $item['acknowledged_by'] = $actor;
+        if ($note !== '') $item['completion_note'] = $note;
+        release_followup_append_history($item, 'acknowledged', $actor, $note);
+        break;
+      case 'complete':
+        $item['status'] = 'completed';
+        if (trim((string)($item['acknowledged_at'] ?? '')) === '') {
+          $item['acknowledged_at'] = now_iso();
+          $item['acknowledged_by'] = $actor;
+        }
+        $item['completed_at'] = now_iso();
+        $item['completed_by'] = $actor;
+        $item['completion_note'] = $note;
+        release_followup_append_history($item, 'completed', $actor, $note);
+        break;
+      case 'reopen':
+        $item['status'] = 'open';
+        $item['completed_at'] = '';
+        $item['completed_by'] = '';
+        if ($note !== '') $item['completion_note'] = $note;
+        release_followup_append_history($item, 'reopened', $actor, $note);
+        break;
+      default:
+        api_json(['ok' => false, 'error' => 'unsupported_action'], 400);
+    }
+
+    $item['updated_at'] = now_iso();
+    $followupStore['items'][$targetIdx] = $item;
+    $followupStore['_meta']['updated_by'] = $actor;
+    save_release_followup_store($followupStore);
+
+    api_json([
+      'ok' => true,
+      'item' => release_followup_row_from_item($item),
+      'summary' => release_followup_summary(),
+      'server_time' => now_iso(),
+    ]);
+  }
+
   case 'evidence_pack_export': {
     require_logged_in($store);
     $allocationId = trim((string)($_GET['allocation_id'] ?? $_POST['allocation_id'] ?? ''));
@@ -20980,6 +21786,29 @@ if ($username === '') {
               (string)($row['form_code'] ?? ''),
               strtoupper($state),
               $timing,
+              (string)($row['summary_vi'] ?? ''),
+            ])),
+          ];
+        }
+        break;
+      }
+      case 'release_followup_overdue': {
+        foreach (release_followup_queue_rows(true) as $row) {
+          if (!is_array($row)) continue;
+          $items[] = [
+            'id' => (string)($row['release_id'] ?? ''),
+            'type' => (string)($row['source_kind'] ?? 'release_followup'),
+            'department' => implode(', ', (array)($row['impacted_departments'] ?? [])),
+            'date' => substr((string)($row['due_at'] ?? ''), 0, 10),
+            'responsible' => implode(', ', array_values(array_filter(array_merge(
+              (array)($row['owner_users'] ?? []),
+              (array)($row['owner_roles'] ?? [])
+            )))),
+            'detail' => implode(' · ', array_filter([
+              (string)($row['source_code'] ?? ''),
+              (string)($row['source_title'] ?? ''),
+              (($row['release_revision'] ?? '') !== '' ? ('V' . $row['release_revision']) : ''),
+              strtoupper((string)($row['queue_state'] ?? 'open')),
               (string)($row['summary_vi'] ?? ''),
             ])),
           ];

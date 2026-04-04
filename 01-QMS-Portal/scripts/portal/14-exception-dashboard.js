@@ -118,6 +118,20 @@ var EXCEPTION_TYPES = [
     severity: 'warning'
   },
   {
+    key: 'release_followup_overdue',
+    icon: '🎓',
+    accent: '#7c3aed',
+    surface: '#f5f3ff',
+    border: '#c4b5fd',
+    labelVi: 'Release follow-up quá hạn',
+    labelEn: 'Overdue release follow-up',
+    descVi: 'Tài liệu hoặc form đã approved nhưng briefing, đào tạo hoặc xác nhận rollout vẫn chưa được đóng đúng hạn.',
+    descEn: 'Released documents or forms still have overdue briefing, training, or rollout follow-up items.',
+    page: 'forms',
+    category: 'evidence',
+    severity: 'warning'
+  },
+  {
     key: 'wo_missing_evidence',
     icon: '\ud83e\uddfe',
     accent: '#ea580c',
