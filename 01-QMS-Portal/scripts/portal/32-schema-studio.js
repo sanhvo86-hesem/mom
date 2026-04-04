@@ -3230,21 +3230,47 @@ var CmdPalette = {
 };
 
 var SchemaLib = {
+  _autoLoadedSystem: false,
+
+  withSystemEntries: function(designs){
+    var items = Array.isArray(designs) ? designs.slice() : [];
+    items.unshift({
+      id: '__system_registry__',
+      name: _t('HESEM System Registry', 'HESEM System Registry'),
+      version: 'registry',
+      updatedAt: '',
+      author: 'system',
+      tableCount: 528,
+      isSystem: true
+    });
+    return items;
+  },
+
   loadList: function(){
     return _api('schema_studio_list', {}, 'POST').then(function(res){
-      STORE.designs = res.designs || [];
+      var savedDesigns = res.designs || [];
+      STORE.designs = SchemaLib.withSystemEntries(savedDesigns);
       SchemaLib.renderSelector();
+      if(!savedDesigns.length && !SchemaLib._autoLoadedSystem && !STORE.currentDesignId && STORE.schema && !((STORE.schema.tables || []).length)){
+        SchemaLib._autoLoadedSystem = true;
+        return SchemaLib.loadSystemRegistry(true);
+      }
     }).catch(function(){
-      STORE.designs = [];
+      STORE.designs = SchemaLib.withSystemEntries([]);
       SchemaLib.renderSelector();
+      if(!SchemaLib._autoLoadedSystem && !STORE.currentDesignId && STORE.schema && !((STORE.schema.tables || []).length)){
+        SchemaLib._autoLoadedSystem = true;
+        return SchemaLib.loadSystemRegistry(true);
+      }
     });
   },
 
   renderSelector: function(){
     var select = document.getElementById('ss-schema-select');
+    var currentValue = STORE.currentDesignId || '';
     if(!select) return;
     select.innerHTML = '<option value="">' + _esc(_t('-- Chon schema --', '-- Select schema --')) + '</option>' + (STORE.designs || []).map(function(item){
-      return '<option value="' + _esc(item.id) + '"' + (item.id === STORE.currentDesignId ? ' selected' : '') + '>' + _esc(item.name) + '</option>';
+      return '<option value="' + _esc(item.id) + '"' + (item.id === currentValue ? ' selected' : '') + '>' + _esc(item.name) + (item.isSystem ? ' [' + _esc(_t('He thong', 'System')) + ']' : '') + '</option>';
     }).join('') + '<option value="__new__">+ ' + _esc(_t('Tao moi', 'Create new')) + '</option><option value="__load_live__">DB ' + _esc(_t('Load DB', 'Load DB')) + '</option>';
   },
 
@@ -3255,6 +3281,10 @@ var SchemaLib = {
     }
     if(value === '__load_live__'){
       SchemaLib.loadFromLiveDB();
+      return;
+    }
+    if(value === '__system_registry__'){
+      SchemaLib.loadSystemRegistry(false);
       return;
     }
     if(value){
@@ -3322,6 +3352,31 @@ var SchemaLib = {
       toast(_t('Da luu schema', 'Schema saved'), 'success');
     }).catch(function(err){
       toast(_t('Khong luu duoc schema', 'Failed to save schema') + ': ' + (err.message || ''), 'error');
+    });
+  },
+
+  loadSystemRegistry: function(silent){
+    return _api('schema_studio_load_registry', {}, 'POST').then(function(res){
+      if(res && res.schema){
+        STORE.schema = res.schema;
+        STORE.currentDesignId = '__system_registry__';
+        STORE.baseline = null;
+        STORE.undo = [];
+        STORE.redo = [];
+        STORE.dirty = false;
+        STORE.schema._meta = STORE.schema._meta || {};
+        STORE.schema._meta.source = 'system_registry';
+        renderShell();
+        Canvas.render();
+        Browser.render();
+        Inspector.close();
+        setTimeout(function(){ Canvas.zoomToFit(); }, 120);
+        if(!silent){
+          toast(_t('Da nap schema he thong tu registry', 'Loaded system schema from registry'), 'success');
+        }
+      }
+    }).catch(function(err){
+      toast(_t('Khong nap duoc schema he thong', 'Failed to load system schema') + ': ' + (err.message || ''), 'error');
     });
   },
 
