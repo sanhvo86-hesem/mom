@@ -1864,6 +1864,27 @@
   flex-wrap: wrap;
 }
 
+#header .breadcrumb.ss-has-doc-toolbar {
+  flex: 0 1 auto;
+}
+
+#header .doc-header-toolbar.is-active {
+  justify-content: flex-start;
+}
+
+#header .doc-header-toolbar .ss-header-toolbar-shell {
+  padding-left: 0;
+}
+
+#header .doc-header-toolbar .ss-toolbar-status {
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+}
+
+#header .doc-header-toolbar .ss-toolbar-status-pill {
+  white-space: nowrap;
+}
+
 .ss-toolbar-status-pill {
   display: inline-flex;
   align-items: center;
