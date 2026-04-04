@@ -3187,7 +3187,7 @@ Browser.focusNeighborhood = function(){
   Browser.setView('domains');
 };
 
-Browser.render = function(){
+Browser._legacyRenderA = function(){
   var tables;
   var filtered;
   var allGroups;
@@ -3282,7 +3282,7 @@ Browser.onFilter = function(value){
   }
 };
 
-function renderToolbar(container){
+function renderToolbarLegacyA(container){
   if(!container) return;
   container.innerHTML = [
     '<div class="ss-toolbar-left"><div class="ss-toolbar-title"><span>Schema Studio</span>' + (STORE.dirty ? '<span class="ss-dirty-badge">●</span>' : '') + '</div><button class="hm-btn hm-btn-ghost ss-btn-sm ss-toolbar-panel-btn' + (STORE.browser.open ? '' : ' is-collapsed') + '" onclick="Browser.toggleOpen()" title="' + _esc(_t('Ẩn/hiện trình duyệt schema (B)', 'Toggle schema browser (B)')) + '" aria-label="' + _esc(_t('Ẩn hoặc hiện trình duyệt schema', 'Toggle schema browser')) + '"><span class="ss-toolbar-panel-icon">' + (STORE.browser.open ? '◂' : '▸') + '</span>' + _esc(_t('Trình duyệt', 'Browser')) + '</button><select class="ss-schema-select" id="ss-schema-select" onchange="SchemaLib.onSelectChange(this.value)"></select></div>',
@@ -4511,7 +4511,7 @@ function switchMode(mode){
   if(STORE.validation.ran) Validator.renderPanel();
 }
 
-function renderToolbar(container){
+function renderToolbarLegacyB(container){
   if(!container) return;
   container.innerHTML = [
     '<div class="ss-toolbar-left"><div class="ss-toolbar-title"><span>Schema Studio</span>' + (STORE.dirty ? '<span class="ss-dirty-badge">●</span>' : '') + '</div><button class="hm-btn hm-btn-ghost ss-btn-sm ss-toolbar-panel-btn' + (STORE.browser.open ? '' : ' is-collapsed') + '" onclick="Browser.toggleOpen()" title="' + _esc(_t('Ẩn/hiện thanh trình duyệt (B)', 'Toggle schema browser (B)')) + '" aria-label="' + _esc(_t('Ẩn hoặc hiện thanh trình duyệt', 'Toggle schema browser')) + '"><span class="ss-toolbar-panel-icon">' + (STORE.browser.open ? '◂' : '▸') + '</span>' + _esc(_t('Trình duyệt', 'Browser')) + '</button><select class="ss-schema-select" id="ss-schema-select" onchange="SchemaLib.onSelectChange(this.value)"></select></div>',
@@ -4678,7 +4678,7 @@ function bindKeyboard(){
   });
 }
 
-function renderToolbar(container){
+function renderToolbarLegacyC(container){
   if(!container) return;
   container.innerHTML = [
     '<div class="ss-toolbar-left"><div class="ss-toolbar-title"><span>Schema Studio</span>' + (STORE.dirty ? '<span class="ss-dirty-badge">●</span>' : '') + '</div><button class="hm-btn hm-btn-ghost ss-btn-sm ss-toolbar-panel-btn' + (STORE.browser.open ? '' : ' is-collapsed') + '" onclick="Browser.toggleOpen()" title="' + _esc(_t('Ẩn/hiện trình duyệt schema (B)', 'Toggle schema browser (B)')) + '" aria-label="' + _esc(_t('Ẩn hoặc hiện trình duyệt schema', 'Toggle schema browser')) + '"><span class="ss-toolbar-panel-icon">' + (STORE.browser.open ? '◂' : '▸') + '</span>' + _esc(_t('Trình duyệt', 'Browser')) + '</button><select class="ss-schema-select" id="ss-schema-select" onchange="SchemaLib.onSelectChange(this.value)"></select></div>',
@@ -4688,7 +4688,7 @@ function renderToolbar(container){
   SchemaLib.renderSelector();
 }
 
-Browser.render = function(){
+Browser._legacyRenderB = function(){
   var tables;
   var filtered;
   var allGroups;

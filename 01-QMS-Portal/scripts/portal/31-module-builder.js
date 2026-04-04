@@ -4540,7 +4540,7 @@ function _renderCanvasBlock(block, tab, tree, depth){
   return h;
 }
 
-_renderLibraryPanel = function(){
+_renderLibraryPanelLegacyA = function(){
   var h = '';
   var catalog = BE.BLOCK_CATALOG || {};
   var categories = BE.BLOCK_CATEGORIES || [];
@@ -4639,7 +4639,7 @@ function _canSaveSelectedDraftWhileLocked(){
   }
 }
 
-_renderPropertiesPanel = function(){
+_renderPropertiesPanelLegacyA = function(){
   var block = _findBlock(state.selectedBlock);
   var draft;
   var catalog;
@@ -4713,7 +4713,7 @@ _renderPropertiesPanel = function(){
   return h;
 };
 
-_renderBuilder = function(){
+_renderBuilderLegacyB = function(){
   var schema = state.schema;
   var activeTab;
   var tree;
@@ -5078,7 +5078,7 @@ _renderLibraryPanel = function(){
   return h;
 };
 
-function _renderCanvasToolbar(activeTab, heroMode){
+function _renderCanvasToolbarLegacyA(activeTab, heroMode){
   var h = '';
   if(!activeTab) return h;
   _ensureTabLayout(activeTab);
@@ -5100,7 +5100,7 @@ function _renderCanvasToolbar(activeTab, heroMode){
   return h;
 }
 
-_renderPropertiesPanel = function(){
+_renderPropertiesPanelLegacyB = function(){
   var block = _findBlock(state.selectedBlock);
   var draft;
   var catalog;
@@ -5178,7 +5178,7 @@ _renderPropertiesPanel = function(){
   return h;
 };
 
-_renderBuilder = function(){
+_renderBuilderLegacyA = function(){
   var schema = state.schema;
   var activeTab;
   var tree;

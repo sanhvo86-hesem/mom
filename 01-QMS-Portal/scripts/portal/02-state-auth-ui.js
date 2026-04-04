@@ -1298,6 +1298,14 @@ function renderSidebar(){
 // ═══════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════
+function teardownCurrentPageModule(){
+  try{
+    if(currentPage === 'schema-studio' && window.SchemaStudio && typeof window.SchemaStudio.destroy === 'function'){
+      window.SchemaStudio.destroy();
+    }
+  }catch(_teardownErr){}
+}
+
 function navigateTo(page, filter, bypassGuard){
   if(!bypassGuard && typeof window._ecBeforePortalNavigate === 'function'){
     try{
@@ -1306,6 +1314,7 @@ function navigateTo(page, filter, bypassGuard){
   }
   // Auto-close sidebar on mobile
   if(window.innerWidth <= 900) closeMobileSidebar();
+  teardownCurrentPageModule();
   currentPage = page;
   if(page==='admin') loadUsersFromServerIfAdmin();
   if(filter !== undefined) currentFilter = filter;

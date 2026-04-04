@@ -10,16 +10,17 @@ setTimeout(function(){ try{ if(typeof fixMojibakeDom==='function') fixMojibakeDo
 function reinforceEqmsTemplateEditorRoute(){
   try{
     if(typeof window._ecOpenEqmsTemplateEditor !== 'function') return;
-    window._renderFormBuilder = function(formOrCode){
+    if(typeof window._renderFormBuilder === 'function' && !window._renderFormBuilder.__hesemEqmsRouteProxy) return;
+    var proxy = function(formOrCode){
       var code = '';
       if(typeof formOrCode === 'string') code = formOrCode;
       else if(formOrCode && typeof formOrCode === 'object') code = formOrCode.form_code || formOrCode.code || '';
       window._ecOpenEqmsTemplateEditor(code || 'FRM-403-SCAR');
     };
+    proxy.__hesemEqmsRouteProxy = true;
+    window._renderFormBuilder = proxy;
   }catch(e){}
 }
 
 reinforceEqmsTemplateEditorRoute();
-setTimeout(reinforceEqmsTemplateEditorRoute, 300);
-setTimeout(reinforceEqmsTemplateEditorRoute, 1200);
 window.addEventListener('load', reinforceEqmsTemplateEditorRoute);
