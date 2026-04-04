@@ -262,6 +262,14 @@ export const tokenTranslations = {
 };
 
 export const fieldLabelOverrides = {
+  org_company_code: { vi: 'Mã công ty tổ chức', en: 'Organization Company Code' },
+  org_legal_entity_code: { vi: 'Mã pháp nhân tổ chức', en: 'Organization Legal Entity Code' },
+  org_plant_id: { vi: 'ID nhà máy tổ chức', en: 'Organization Plant ID' },
+  org_site_id: { vi: 'ID site tổ chức', en: 'Organization Site ID' },
+  source_record_id: { vi: 'ID bản ghi nguồn', en: 'Source Record ID' },
+  source_system: { vi: 'Hệ thống nguồn', en: 'Source System' },
+  row_version: { vi: 'Phiên bản dòng', en: 'Row Version' },
+  payload_schema_version: { vi: 'Phiên bản lược đồ payload', en: 'Payload Schema Version' },
   uom: { vi: 'Đơn vị tính', en: 'UOM' },
   alt_uom: { vi: 'Đơn vị tính thay thế', en: 'Alternate UOM' },
   component_uom: { vi: 'Đơn vị tính thành phần', en: 'Component UOM' },

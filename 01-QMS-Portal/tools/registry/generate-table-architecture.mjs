@@ -660,6 +660,7 @@ const migrationDomainDefaults = new Map([
   ['067_outsource_supplier_execution.sql', 'outsource_execution'],
   ['068_trade_compliance_advanced.sql', 'trade_compliance'],
   ['069_lean_manufacturing_world_class.sql', 'lean_manufacturing'],
+  ['070_enterprise_governance_uplift.sql', 'master_data_governance'],
 ]);
 
 const tableDomainOverrides = {
@@ -2113,6 +2114,7 @@ function inferDomain(tableName, migration) {
   if (/^trade_/.test(tableName)) return 'trade_compliance';
   if (/^calibration_/.test(tableName)) return 'calibration_equipment';
   if (/^lean_/.test(tableName)) return 'lean_manufacturing';
+  if (/^org_/.test(tableName)) return 'master_data_governance';
   return migrationDomainDefaults.get(migration) ?? null;
 }
 
