@@ -80,6 +80,130 @@ class SchemaStudioController extends BaseController
         return null;
     }
 
+    private function reconcileSchemaDocument(array $schema): array
+    {
+        $tables = array_values(is_array($schema['tables'] ?? null) ? $schema['tables'] : []);
+        $relations = array_values(is_array($schema['relations'] ?? null) ? $schema['relations'] : []);
+        $tableIndexMap = [];
+        $columnIndexMap = [];
+        $normalizedRelations = [];
+        $relationBySource = [];
+
+        foreach ($tables as $tableIndex => &$table) {
+            $tableId = (string)($table['id'] ?? '');
+            if ($tableId === '') {
+                $tableId = 'tbl_' . substr(md5((string)($table['name'] ?? 'table_' . $tableIndex)), 0, 10);
+                $table['id'] = $tableId;
+            }
+            $tableIndexMap[$tableId] = $tableIndex;
+            $table['columns'] = array_values(is_array($table['columns'] ?? null) ? $table['columns'] : []);
+
+            $pkOrder = 1;
+            foreach ($table['columns'] as $columnIndex => &$column) {
+                $columnId = (string)($column['id'] ?? '');
+                if ($columnId === '') {
+                    $columnId = 'col_' . substr(md5($tableId . '.' . (string)($column['name'] ?? 'column_' . $columnIndex)), 0, 10);
+                    $column['id'] = $columnId;
+                }
+                $columnIndexMap[$columnId] = ['table' => $tableIndex, 'column' => $columnIndex];
+                if (!empty($column['primary_key'])) {
+                    $column['pk_order'] = $pkOrder++;
+                    $column['nullable'] = false;
+                } else {
+                    $column['pk_order'] = null;
+                }
+            }
+            unset($column);
+        }
+        unset($table);
+
+        foreach ($relations as $relationIndex => $relation) {
+            if (!is_array($relation)) {
+                continue;
+            }
+            $fromTableId = (string)($relation['from_table_id'] ?? '');
+            $fromColId = (string)($relation['from_col_id'] ?? '');
+            $toTableId = (string)($relation['to_table_id'] ?? '');
+            $toColId = (string)($relation['to_col_id'] ?? '');
+            $sourceKey = $fromTableId . '.' . $fromColId;
+
+            if (!isset($tableIndexMap[$fromTableId], $tableIndexMap[$toTableId], $columnIndexMap[$fromColId], $columnIndexMap[$toColId])) {
+                continue;
+            }
+            if (isset($relationBySource[$sourceKey])) {
+                continue;
+            }
+
+            $normalizedRelations[] = [
+                'id' => (string)($relation['id'] ?? ('rel_' . substr(md5($sourceKey . '>' . $toTableId . '.' . $toColId), 0, 10))),
+                'from_table_id' => $fromTableId,
+                'from_col_id' => $fromColId,
+                'to_table_id' => $toTableId,
+                'to_col_id' => $toColId,
+                'name' => (string)($relation['name'] ?? ('fk_' . $fromColId)),
+                'on_delete' => (string)($relation['on_delete'] ?? 'RESTRICT'),
+                'on_update' => (string)($relation['on_update'] ?? 'CASCADE'),
+                'nullable' => (bool)($tables[$columnIndexMap[$fromColId]['table']]['columns'][$columnIndexMap[$fromColId]['column']]['nullable'] ?? true),
+                'edge' => is_array($relation['edge'] ?? null) ? $relation['edge'] : ['type' => 'orthogonal', 'waypoints' => []],
+            ];
+            $relationBySource[$sourceKey] = count($normalizedRelations) - 1;
+        }
+
+        foreach ($tables as $tableIndex => &$table) {
+            foreach ($table['columns'] as $columnIndex => &$column) {
+                $sourceKey = (string)$table['id'] . '.' . (string)$column['id'];
+                $existingFk = is_array($column['foreign_key'] ?? null) ? $column['foreign_key'] : null;
+
+                if (isset($relationBySource[$sourceKey])) {
+                    $relation = $normalizedRelations[$relationBySource[$sourceKey]];
+                    $column['foreign_key'] = [
+                        'ref_table_id' => $relation['to_table_id'],
+                        'ref_col_id' => $relation['to_col_id'],
+                        'on_delete' => $relation['on_delete'],
+                        'on_update' => $relation['on_update'],
+                        'constraint_name' => $relation['name'],
+                        'deferrable' => (bool)($existingFk['deferrable'] ?? false),
+                    ];
+                    continue;
+                }
+
+                if ($existingFk && isset($tableIndexMap[(string)($existingFk['ref_table_id'] ?? '')], $columnIndexMap[(string)($existingFk['ref_col_id'] ?? '')])) {
+                    $normalizedRelations[] = [
+                        'id' => 'rel_' . substr(md5($sourceKey . '>' . (string)$existingFk['ref_table_id'] . '.' . (string)$existingFk['ref_col_id']), 0, 10),
+                        'from_table_id' => (string)$table['id'],
+                        'from_col_id' => (string)$column['id'],
+                        'to_table_id' => (string)$existingFk['ref_table_id'],
+                        'to_col_id' => (string)$existingFk['ref_col_id'],
+                        'name' => (string)($existingFk['constraint_name'] ?? ('fk_' . ((string)$table['name'] ?: 'table') . '_' . ((string)$column['name'] ?: 'column'))),
+                        'on_delete' => (string)($existingFk['on_delete'] ?? 'RESTRICT'),
+                        'on_update' => (string)($existingFk['on_update'] ?? 'CASCADE'),
+                        'nullable' => (bool)($column['nullable'] ?? true),
+                        'edge' => ['type' => 'orthogonal', 'waypoints' => []],
+                    ];
+                    $relationBySource[$sourceKey] = count($normalizedRelations) - 1;
+                    $column['foreign_key'] = [
+                        'ref_table_id' => (string)$existingFk['ref_table_id'],
+                        'ref_col_id' => (string)$existingFk['ref_col_id'],
+                        'on_delete' => (string)($existingFk['on_delete'] ?? 'RESTRICT'),
+                        'on_update' => (string)($existingFk['on_update'] ?? 'CASCADE'),
+                        'constraint_name' => (string)($existingFk['constraint_name'] ?? ('fk_' . ((string)$table['name'] ?: 'table') . '_' . ((string)$column['name'] ?: 'column'))),
+                        'deferrable' => (bool)($existingFk['deferrable'] ?? false),
+                    ];
+                    continue;
+                }
+
+                $column['foreign_key'] = null;
+            }
+            unset($column);
+        }
+        unset($table);
+
+        $schema['tables'] = $tables;
+        $schema['relations'] = array_values($normalizedRelations);
+
+        return $schema;
+    }
+
     private function normalizeFieldList($value): array
     {
         if (is_array($value)) {
@@ -180,6 +304,7 @@ class SchemaStudioController extends BaseController
         if (!is_array($schema) || !isset($schema['_meta'])) {
             $this->error('invalid_schema', 400);
         }
+        $schema = $this->reconcileSchemaDocument($schema);
         $schema['_meta']['id'] = $this->safeId((string)($schema['_meta']['id'] ?? ''));
         $schema['_meta']['updatedAt'] = $this->nowIso();
         $schema['_meta']['author'] = (string)($user['username'] ?? 'system');
@@ -220,6 +345,7 @@ class SchemaStudioController extends BaseController
         if ($designId === '' || !$schema) {
             $this->error('missing_payload', 400);
         }
+        $schema = $this->reconcileSchemaDocument($schema);
         $this->writeJsonFile($this->baselinePath($designId), $schema);
         $this->auditLog('schema_studio_set_baseline', ['design_id' => $designId], (string)($user['username'] ?? ''));
         $this->success(['baselineAt' => $this->nowIso()]);

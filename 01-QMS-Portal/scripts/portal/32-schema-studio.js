@@ -2637,6 +2637,7 @@ var TableDialog = {
     var draft = this.collectForm();
     var names = {};
     var duplicated = false;
+    var pkCount = 0;
     var self = this;
     if(!tbl || !draft) return;
     if(!isValidIdentifier(draft.name)){
@@ -2647,13 +2648,28 @@ var TableDialog = {
       toast(_t('Tên bảng đã tồn tại', 'Table name already exists'), 'error');
       return;
     }
+    if(!(draft.columns || []).length){
+      toast(_t('Bảng phải có ít nhất 1 cột', 'Table must have at least 1 column'), 'error');
+      return;
+    }
     (draft.columns || []).forEach(function(col){
       if(!isValidIdentifier(col.name)) duplicated = col.name || '__invalid__';
       if(names[col.name]) duplicated = col.name;
       names[col.name] = true;
+      if(col.primary_key){
+        pkCount += 1;
+        col.pk_order = pkCount;
+        col.nullable = false;
+      } else {
+        col.pk_order = null;
+      }
     });
     if(duplicated){
       toast(_t('Tên cột chưa hợp lệ hoặc đang bị trùng: ' + duplicated, 'Invalid or duplicate column name: ' + duplicated), 'error');
+      return;
+    }
+    if(!pkCount){
+      toast(_t('Bảng phải có ít nhất 1 khóa chính', 'Table must have at least 1 primary key'), 'error');
       return;
     }
     confirm2(_t('Lưu thay đổi cho bảng ' + draft.name + '?', 'Save changes for table ' + draft.name + '?'), false).then(function(ok){
