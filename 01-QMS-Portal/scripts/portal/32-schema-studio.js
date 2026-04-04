@@ -299,13 +299,23 @@ function _api(action, payload, method){
     body: reqMethod === 'GET' ? undefined : JSON.stringify(body)
   }).catch(function(err){
     Diagnostics.recordApi(action, false, Date.now() - startedAt, {
+      status: 0,
       error: err && err.message ? err.message : 'network_error'
     });
     throw err;
   }).then(function(res){
     return res.text().then(function(text){
       try{
-        return JSON.parse(text);
+        var data = JSON.parse(text);
+        if(!res.ok){
+          Diagnostics.recordApi(action, false, Date.now() - startedAt, {
+            error: data.detail || data.error || ('http_' + res.status),
+            status: res.status,
+            sample: String(text || '').slice(0, 280)
+          });
+          return { ok:false, error:data.detail || data.error || ('http_' + res.status) };
+        }
+        return data;
       }catch(parseErr){
         Diagnostics.recordApi(action, false, Date.now() - startedAt, {
           error: 'invalid_json_response',
@@ -318,11 +328,14 @@ function _api(action, payload, method){
   }).then(function(data){
     if(data && data.ok === false){
       Diagnostics.recordApi(action, false, Date.now() - startedAt, {
-        error: data.detail || data.error || 'request_failed'
+        error: data.detail || data.error || 'request_failed',
+        status: 400
       });
       throw new Error(data.detail || data.error || 'request_failed');
     }
-    Diagnostics.recordApi(action, true, Date.now() - startedAt);
+    Diagnostics.recordApi(action, true, Date.now() - startedAt, {
+      status: 200
+    });
     return data;
   });
 }
@@ -4139,7 +4152,7 @@ var Validator = {
     var infos = results.filter(function(item){ return item.level === 'info'; }).length;
     if(!panel) return;
     panel.innerHTML = [
-      '<div class="ss-val-header"><div class="ss-val-summary">' + (results.length ? '<span class="ss-val-error">● ' + String(errors) + ' ' + _esc(_t('Loi', 'Errors')) + '</span><span class="ss-val-warn">⚠ ' + String(warnings) + ' ' + _esc(_t('Canh bao', 'Warnings')) + '</span><span class="ss-val-info">ℹ ' + String(infos) + ' Info</span>' : '<span class="ss-val-ok">Valid</span>') + '</div><div><button class="hm-btn hm-btn-ghost ss-btn-sm" onclick="Validator.run()">Run</button><button class="hm-btn hm-btn-ghost ss-btn-sm" onclick="Validator.closePanel()">X</button></div></div>',
+      '<div class="ss-val-header"><div class="ss-val-summary">' + (results.length ? '<span class="ss-val-error">● ' + String(errors) + ' ' + _esc(_t('Lỗi', 'Errors')) + '</span><span class="ss-val-warn">⚠ ' + String(warnings) + ' ' + _esc(_t('Cảnh báo', 'Warnings')) + '</span><span class="ss-val-info">ℹ ' + String(infos) + ' ' + _esc(_t('Thông tin', 'Info')) + '</span>' : '<span class="ss-val-ok">' + _esc(_t('Hợp lệ', 'Valid')) + '</span>') + '</div><div><button class="hm-btn hm-btn-ghost ss-btn-sm" onclick="Validator.run()">' + _esc(_t('Chạy', 'Run')) + '</button><button class="hm-btn hm-btn-ghost ss-btn-sm" onclick="Validator.closePanel()">X</button></div></div>',
       '<div class="ss-val-list">',
         results.length ? results.map(function(item){
           return '<div class="ss-val-item ' + _esc(item.level) + '"><span class="ss-val-code">' + _esc(item.code) + '</span><span class="ss-val-msg">' + _esc(item.msg) + '</span>' + (Validator._fixes[item.id] ? '<button class="hm-btn hm-btn-ghost ss-btn-xs" onclick="Validator.runFix(\'' + _esc(item.id) + '\')">Fix</button>' : '') + (item.tableId ? '<button class="hm-btn hm-btn-ghost ss-btn-xs" onclick="Validator.locate(\'' + _esc(item.tableId) + '\')">Locate</button>' : '') + '</div>';
@@ -4313,7 +4326,7 @@ var Importer = {
     Layout.auto('force');
     scheduleZoomToFit(120);
     saveDraft();
-    toast(_t('Import thanh cong', 'Import successful'), 'success');
+    toast(_t('Import thành công', 'Import successful'), 'success');
     Array.prototype.forEach.call(document.querySelectorAll('.ss-modal-overlay'), function(node){ removeNode(node); });
   }
 };
