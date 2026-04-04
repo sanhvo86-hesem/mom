@@ -152,7 +152,9 @@ function _t(vi, en){
 function _api(action, payload, method){
   var reqMethod = String(method || 'POST').toUpperCase();
   var body = payload || {};
-  if(typeof window.apiCall === 'function'){
+  var useMvcEndpoint = String(action || '').indexOf('schema_studio_') === 0;
+  var endpoint = useMvcEndpoint ? 'api/index.php?' : 'api.php?';
+  if(typeof window.apiCall === 'function' && !useMvcEndpoint){
     return window.apiCall(action, body, reqMethod, 30000);
   }
   var qs = new URLSearchParams();
@@ -167,7 +169,7 @@ function _api(action, payload, method){
   var csrf = window.csrfToken || (csrfMeta && csrfMeta.content) || '';
   var headers = { 'Content-Type': 'application/json' };
   if(csrf) headers['X-CSRF-Token'] = csrf;
-  return fetch('api.php?' + qs.toString(), {
+  return fetch(endpoint + qs.toString(), {
     method: reqMethod,
     credentials: 'include',
     headers: headers,

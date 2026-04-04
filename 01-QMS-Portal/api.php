@@ -22593,8 +22593,10 @@ if ($username === '') {
         $mvcRouter = __DIR__ . '/api/index.php';
         if (is_file($mvcRouter)) {
             require $mvcRouter;
-            // MVC Router controllers call exit() on success, so if we reach here
-            // the action was not found by the MVC Router either.
+            // api/index.php now owns the response lifecycle for forwarded actions.
+            // Do not continue into legacy unknown_action handling or headers/body
+            // may be emitted twice, corrupting JSON responses.
+            return;
         }
     }
     api_json(['ok' => false, 'error' => 'unknown_action'], 400);
