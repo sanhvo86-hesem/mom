@@ -1254,6 +1254,7 @@ function renderSidebar(){
     html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'TOOLS':'CÔNG CỤ'}</div>
       <button class="nav-item ${currentPage==='cnc-programs'?'active':''}" onclick="navigateTo('cnc-programs')"><span class="icon">⚙</span><span>${lang==='en'?'CNC Programs':'Chương trình CNC'}</span></button>
       <button class="nav-item ${currentPage==='product-passport'?'active':''}" onclick="navigateTo('product-passport')"><span class="icon">🔗</span><span>${lang==='en'?'Product Passport':'Hộ chiếu sản phẩm'}</span></button>
+      <button class="nav-item ${currentPage==='schema-studio'?'active':''}" onclick="navigateTo('schema-studio')"><span class="icon">🗄</span><span>${lang==='en'?'Schema Studio':'Schema Studio'}</span></button>
       <button class="nav-item ${currentPage==='energy-dashboard'?'active':''}" onclick="navigateTo('energy-dashboard')"><span class="icon">⚡</span><span>${lang==='en'?'Energy':'Năng lượng'}</span></button>
       <button class="nav-item ${currentPage==='deploy'?'active':''}" onclick="navigateTo('deploy')"><span class="icon">🚀</span><span>${lang==='en'?'Deploy':'Triển khai'}</span></button>
       <button class="nav-item ${currentPage==='customer-portal'?'active':''}" onclick="navigateTo('customer-portal')"><span class="icon">🌐</span><span>${lang==='en'?'Customer Portal':'Cổng khách hàng'}</span></button>
@@ -1314,10 +1315,10 @@ function navigateTo(page, filter, bypassGuard){
   document.getElementById('user-dropdown').classList.remove('show');
   
   // Track page view for activity log
-  const pageTitles = {dashboard:'Tổng quan',documents:'Danh sách tài liệu',search:'Tìm kiếm',dictionary:'Từ điển thuật ngữ',access:'Ma trận truy cập',admin:'Quản trị hệ thống',deploy:'Triển khai vận hành',mes:'Trung tâm điều hành MES',exceptions:'Bảng ngoại lệ',orders:'Quản lý đơn hàng',forms:'Kiểm soát chứng cứ','quality-exceptions':'Quản lý ngoại lệ chất lượng','supplier-quality':'Quản lý chất lượng NCC','quoting':'Báo giá & Ước tính',evidence:'Kho chứng cứ','customer-portal':'Cổng khách hàng','cnc-programs':'Chương trình CNC','product-passport':'Hộ chiếu sản phẩm số','ai-scheduling':'AI Chất lượng & Lịch trình','compliance-reports':'Báo cáo tuân thủ',fmea:'FMEA & Control Plan','apqp-ppap':'APQP / PPAP','mobile-shopfloor':'Xưởng di động','knowledge-base':'Kho kiến thức','continuous-improvement':'Cải tiến liên tục','energy-dashboard':'Giám sát năng lượng'};
+  const pageTitles = {dashboard:'Tổng quan',documents:'Danh sách tài liệu',search:'Tìm kiếm',dictionary:'Từ điển thuật ngữ',access:'Ma trận truy cập',admin:'Quản trị hệ thống',deploy:'Triển khai vận hành',mes:'Trung tâm điều hành MES',exceptions:'Bảng ngoại lệ',orders:'Quản lý đơn hàng',forms:'Kiểm soát chứng cứ','quality-exceptions':'Quản lý ngoại lệ chất lượng','supplier-quality':'Quản lý chất lượng NCC','quoting':'Báo giá & Ước tính',evidence:'Kho chứng cứ','customer-portal':'Cổng khách hàng','cnc-programs':'Chương trình CNC','product-passport':'Hộ chiếu sản phẩm số','ai-scheduling':'AI Chất lượng & Lịch trình','compliance-reports':'Báo cáo tuân thủ',fmea:'FMEA & Control Plan','apqp-ppap':'APQP / PPAP','mobile-shopfloor':'Xưởng di động','knowledge-base':'Kho kiến thức','continuous-improvement':'Cải tiến liên tục','energy-dashboard':'Giám sát năng lượng','schema-studio':'Schema Studio'};
   trackPageView(page + (filter ? '/'+filter : ''), (pageTitles[page]||page) + (filter ? ' — '+filter : ''));
   
-  const titles = {dashboard:T('bc_dashboard'),documents:T('bc_documents'),search:T('bc_search'),dictionary:T('bc_dictionary'),access:T('bc_access'),deploy:lang==='en'?'Operations Deployment':'Triển khai vận hành',mes:lang==='en'?'MES Control Center':'Trung tâm điều hành MES',exceptions:lang==='en'?'Exception Dashboard':'Bảng ngoại lệ',orders:lang==='en'?'Order Management':'Quản lý đơn hàng',forms:lang==='en'?'Evidence Control':'Kiểm soát chứng cứ','quality-exceptions':lang==='en'?'Quality Exception Hub':'Quản lý ngoại lệ chất lượng','supplier-quality':lang==='en'?'Supplier Quality':'Quản lý chất lượng NCC',quoting:lang==='en'?'Quoting & Estimation':'Báo giá & Ước tính',evidence:lang==='en'?'Evidence Vault':'Kho chứng cứ','customer-portal':lang==='en'?'Customer Portal Admin':'Quản trị cổng khách hàng','cnc-programs':lang==='en'?'CNC Programs':'Chương trình CNC','product-passport':lang==='en'?'Digital Product Passport':'Hộ chiếu sản phẩm số','ai-scheduling':lang==='en'?'AI Quality & Scheduling':'AI Chất lượng & Lịch trình','compliance-reports':lang==='en'?'Compliance Reports':'Báo cáo tuân thủ',fmea:lang==='en'?'FMEA & Control Plan':'FMEA & Control Plan','apqp-ppap':lang==='en'?'APQP / PPAP':'APQP / PPAP','mobile-shopfloor':lang==='en'?'Shop Floor Mobile':'Xưởng di động','knowledge-base':lang==='en'?'Knowledge Base':'Kho kiến thức','continuous-improvement':lang==='en'?'Continuous Improvement':'Cải tiến liên tục','energy-dashboard':lang==='en'?'Energy Monitor':'Giám sát năng lượng'};
+  const titles = {dashboard:T('bc_dashboard'),documents:T('bc_documents'),search:T('bc_search'),dictionary:T('bc_dictionary'),access:T('bc_access'),deploy:lang==='en'?'Operations Deployment':'Triển khai vận hành',mes:lang==='en'?'MES Control Center':'Trung tâm điều hành MES',exceptions:lang==='en'?'Exception Dashboard':'Bảng ngoại lệ',orders:lang==='en'?'Order Management':'Quản lý đơn hàng',forms:lang==='en'?'Evidence Control':'Kiểm soát chứng cứ','quality-exceptions':lang==='en'?'Quality Exception Hub':'Quản lý ngoại lệ chất lượng','supplier-quality':lang==='en'?'Supplier Quality':'Quản lý chất lượng NCC',quoting:lang==='en'?'Quoting & Estimation':'Báo giá & Ước tính',evidence:lang==='en'?'Evidence Vault':'Kho chứng cứ','customer-portal':lang==='en'?'Customer Portal Admin':'Quản trị cổng khách hàng','cnc-programs':lang==='en'?'CNC Programs':'Chương trình CNC','product-passport':lang==='en'?'Digital Product Passport':'Hộ chiếu sản phẩm số','ai-scheduling':lang==='en'?'AI Quality & Scheduling':'AI Chất lượng & Lịch trình','compliance-reports':lang==='en'?'Compliance Reports':'Báo cáo tuân thủ',fmea:lang==='en'?'FMEA & Control Plan':'FMEA & Control Plan','apqp-ppap':lang==='en'?'APQP / PPAP':'APQP / PPAP','mobile-shopfloor':lang==='en'?'Shop Floor Mobile':'Xưởng di động','knowledge-base':lang==='en'?'Knowledge Base':'Kho kiến thức','continuous-improvement':lang==='en'?'Continuous Improvement':'Cải tiến liên tục','energy-dashboard':lang==='en'?'Energy Monitor':'Giám sát năng lượng','schema-studio':'Schema Studio'};
   titles['template-demo'] = 'Master Module Template';
   // Reset header breadcrumb for non-documents pages
   if(page !== 'documents'){
@@ -1358,6 +1359,7 @@ function navigateTo(page, filter, bypassGuard){
   if(page==='energy-dashboard' && typeof window._renderEnergyDashboard==='function'){ var edp=document.getElementById('page-energy-dashboard'); if(edp) window._renderEnergyDashboard(edp); }
   if(page==='dispatch' && typeof window._renderProductionDispatch==='function'){ var dsp=document.getElementById('page-dispatch'); if(dsp) window._renderProductionDispatch(dsp); }
   if(page==='module-builder' && typeof window._renderModuleBuilder==='function'){ var mbp=document.getElementById('page-module-builder'); if(mbp) window._renderModuleBuilder(mbp); }
+  if(page==='schema-studio' && typeof window._renderSchemaStudio==='function'){ var ssp=document.getElementById('page-schema-studio'); if(ssp) window._renderSchemaStudio(ssp); }
   if(page==='admin'){ if(!isAdmin()){navigateTo('dashboard');return;} renderAdmin(); }
   
   document.getElementById('page-'+page).classList.add('active');
@@ -5335,33 +5337,33 @@ function renderAdminMfa(){
     html+='<h3 style="font-size:16px;font-weight:700;margin-bottom:12px">'+(lang==='en'?'MFA Security Settings':'Cài đặt bảo mật MFA')+'</h3>';
 
     // Global toggle
-    html+='<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;padding:16px;background:var(--bg);border-radius:8px">';
+    html+='<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;padding:16px;background:var(--bg-surface-alt,var(--bg));border:1px solid var(--border);border-radius:8px">';
     html+='<label style="font-weight:600;flex:1">'+(lang==='en'?'Require MFA for all users':'Yêu cầu MFA cho tất cả người dùng')+'</label>';
     html+='<button id="mfa-toggle-btn" style="padding:8px 20px;border-radius:6px;border:none;cursor:pointer;font-weight:600;color:#fff;background:'+(requireMfa?'var(--green)':'var(--red)')+'">'+(requireMfa?(lang==='en'?'ON — Required':'BẬT — Bắt buộc'):(lang==='en'?'OFF — Not required':'TẮT — Không bắt buộc'))+'</button>';
     html+='</div>';
 
     // Stats
     html+='<div style="display:flex;gap:16px;margin-bottom:20px">';
-    html+='<div style="flex:1;padding:12px;background:var(--bg);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700">'+total+'</div><div style="font-size:12px;color:var(--text-3)">'+(lang==='en'?'Total users':'Tổng người dùng')+'</div></div>';
-    html+='<div style="flex:1;padding:12px;background:var(--bg);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:var(--green)">'+enrolled+'</div><div style="font-size:12px;color:var(--text-3)">'+(lang==='en'?'MFA enrolled':'Đã đăng ký MFA')+'</div></div>';
-    html+='<div style="flex:1;padding:12px;background:var(--bg);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:'+(requireMfa?'var(--red)':'var(--text-3)')+'">'+(total-enrolled)+'</div><div style="font-size:12px;color:var(--text-3)">'+(lang==='en'?'Not enrolled':'Chưa đăng ký')+'</div></div>';
+    html+='<div style="flex:1;padding:12px;background:var(--bg-surface-alt,var(--bg));border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700">'+total+'</div><div style="font-size:12px;color:var(--text-3)">'+(lang==='en'?'Total users':'Tổng người dùng')+'</div></div>';
+    html+='<div style="flex:1;padding:12px;background:var(--bg-surface-alt,var(--bg));border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:var(--green)">'+enrolled+'</div><div style="font-size:12px;color:var(--text-3)">'+(lang==='en'?'MFA enrolled':'Đã đăng ký MFA')+'</div></div>';
+    html+='<div style="flex:1;padding:12px;background:var(--bg-surface-alt,var(--bg));border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:'+(requireMfa?'var(--red)':'var(--text-3)')+'">'+(total-enrolled)+'</div><div style="font-size:12px;color:var(--text-3)">'+(lang==='en'?'Not enrolled':'Chưa đăng ký')+'</div></div>';
     html+='</div>';
 
     // User table
     html+='<h4 style="font-size:14px;font-weight:600;margin-bottom:8px">'+(lang==='en'?'Per-User MFA Status':'Trạng thái MFA theo người dùng')+'</h4>';
     html+='<table style="width:100%;border-collapse:collapse;font-size:13px">';
-    html+='<thead><tr style="background:var(--bg)"><th style="padding:8px;text-align:left">'+(lang==='en'?'User':'Người dùng')+'</th><th style="padding:8px;text-align:left">'+(lang==='en'?'Name':'Họ tên')+'</th><th style="padding:8px;text-align:left">'+(lang==='en'?'Role':'Vai trò')+'</th><th style="padding:8px;text-align:center">MFA</th><th style="padding:8px;text-align:center">'+(lang==='en'?'Actions':'Thao tác')+'</th></tr></thead><tbody>';
+    html+='<thead><tr style="background:var(--bg-surface-alt,var(--bg));border-bottom:1px solid var(--border)"><th style="padding:8px;text-align:left">'+(lang==='en'?'User':'Người dùng')+'</th><th style="padding:8px;text-align:left">'+(lang==='en'?'Name':'Họ tên')+'</th><th style="padding:8px;text-align:left">'+(lang==='en'?'Role':'Vai trò')+'</th><th style="padding:8px;text-align:center">MFA</th><th style="padding:8px;text-align:center">'+(lang==='en'?'Actions':'Thao tác')+'</th></tr></thead><tbody>';
 
     users.forEach(function(u){
       html+='<tr style="border-bottom:1px solid var(--border)">';
       html+='<td style="padding:8px;font-weight:600">'+String(u.username||'')+'</td>';
       html+='<td style="padding:8px">'+String(u.name||'')+'</td>';
-      html+='<td style="padding:8px"><span style="padding:2px 8px;border-radius:4px;font-size:11px;background:var(--bg)">'+String(u.role||'')+'</span></td>';
+      html+='<td style="padding:8px"><span style="padding:2px 8px;border-radius:4px;font-size:11px;background:var(--bg-surface-alt,var(--bg));border:1px solid var(--border)">'+String(u.role||'')+'</span></td>';
       html+='<td style="padding:8px;text-align:center">'+(u.mfa_enabled?'<span style="color:var(--green);font-weight:700">✓ '+('BẬT')+'</span>':'<span style="color:var(--text-3)">✗ '+('TẮT')+'</span>')+'</td>';
       html+='<td style="padding:8px;text-align:center">';
       if(u.mfa_enabled){
-        html+='<button data-mfa-reset="'+String(u.username||'')+'" style="padding:4px 10px;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:11px;background:#fff">'+(lang==='en'?'Reset':'Đặt lại')+'</button> ';
-        html+='<button data-mfa-disable="'+String(u.username||'')+'" style="padding:4px 10px;border:1px solid var(--red);border-radius:4px;cursor:pointer;font-size:11px;background:#fff;color:var(--red)">'+(lang==='en'?'Disable':'Tắt')+'</button>';
+        html+='<button data-mfa-reset="'+String(u.username||'')+'" style="padding:4px 10px;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:11px;background:var(--bg-surface,#fff);color:var(--text-primary)">'+(lang==='en'?'Reset':'Đặt lại')+'</button> ';
+        html+='<button data-mfa-disable="'+String(u.username||'')+'" style="padding:4px 10px;border:1px solid color-mix(in srgb, var(--red) 30%, var(--border));border-radius:4px;cursor:pointer;font-size:11px;background:color-mix(in srgb, var(--red) 10%, var(--bg-surface,#fff));color:var(--red)">'+(lang==='en'?'Disable':'Tắt')+'</button>';
       } else {
         html+='<span style="color:var(--text-3);font-size:11px">'+(lang==='en'?'Will enroll on login':'Sẽ đăng ký khi đăng nhập')+'</span>';
       }
@@ -5653,7 +5655,7 @@ function renderAdminManualRuntime(){
   }
 
   if(adminManualRuntimeState.loading && !adminManualRuntimeState.loaded){
-    el.innerHTML = `<div style="padding:28px;border:1px solid #dbe4f0;border-radius:18px;background:#fff;color:#475569">${lang==='en'?'Loading manual runtime workspace...':'Đang tải module nhập tay vận hành...'}</div>`;
+    el.innerHTML = `<div style="padding:28px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff);color:var(--text-secondary,#475569)">${lang==='en'?'Loading manual runtime workspace...':'Đang tải module nhập tay vận hành...'}</div>`;
     return;
   }
 
@@ -5681,7 +5683,7 @@ function renderAdminManualRuntime(){
 
   el.innerHTML = `
     <div style="display:grid;gap:16px">
-      <section style="border:1px solid #dbe4f0;border-radius:22px;background:linear-gradient(135deg,#f8fbff 0%,#eef6ff 48%,#fff9ed 100%);padding:22px 24px">
+      <section style="border:1px solid var(--border);border-radius:22px;background:linear-gradient(135deg,color-mix(in srgb, var(--brand-2) 6%, var(--bg-surface,#fff)) 0%,color-mix(in srgb, var(--blue) 8%, var(--bg-surface,#fff)) 48%,color-mix(in srgb, var(--amber) 8%, var(--bg-surface,#fff)) 100%);padding:22px 24px">
         <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap">
           <div style="max-width:760px">
             <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0f4c81">${lang==='en'?'Manual runtime mode':'Chế độ vận hành nhập tay'}</div>
@@ -5697,11 +5699,11 @@ function renderAdminManualRuntime(){
         </div>
       </section>
 
-      ${adminManualRuntimeState.error ? `<div style="padding:12px 14px;border-radius:14px;background:#fff4e5;border:1px solid #facc15;color:#92400e">${escapeHtml(adminManualRuntimeState.error)}</div>` : ''}
+      ${adminManualRuntimeState.error ? `<div style="padding:12px 14px;border-radius:14px;background:color-mix(in srgb, var(--amber) 12%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));color:var(--amber)">${escapeHtml(adminManualRuntimeState.error)}</div>` : ''}
 
       <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px">
         ${stats.map(card => `
-          <div style="padding:16px;border:1px solid #dbe4f0;border-radius:18px;background:#fff">
+          <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
             <div style="font-size:12px;color:#486581">${escapeHtml(card.label)}</div>
             <div style="margin-top:6px;font-size:28px;font-weight:700;color:#102a43">${escapeHtml(String(card.value))}</div>
           </div>
@@ -5709,14 +5711,14 @@ function renderAdminManualRuntime(){
       </section>
 
       <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
-        <article style="border:1px solid #dbe4f0;border-radius:20px;background:#fff;padding:18px">
+        <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
           <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Seed minimum master data':'Seed dữ liệu nền tối thiểu'}</div>
           <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${lang==='en'
             ? 'Create the reference set first so lookup fields in the order forms work without Epicor.'
             : 'Tạo bộ dữ liệu tham chiếu trước để các trường lookup trong form đơn hàng hoạt động ngay cả khi chưa có Epicor.'}</p>
           <div style="display:grid;gap:10px">
             ${checklist.map(item => `
-              <button type="button" onclick="adminOpenMasterEntity('${item.entity}')" style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:14px;background:${item.count > 0 ? '#effcf6' : '#fff7ed'};border:1px solid ${item.count > 0 ? '#bbf7d0' : '#fed7aa'};cursor:pointer;text-align:left">
+              <button type="button" onclick="adminOpenMasterEntity('${item.entity}')" style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:14px;background:${item.count > 0 ? 'color-mix(in srgb, var(--green) 10%, var(--bg-surface,#fff))' : 'color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff))'};border:1px solid ${item.count > 0 ? 'color-mix(in srgb, var(--green) 28%, var(--border))' : 'color-mix(in srgb, var(--amber) 28%, var(--border))'};cursor:pointer;text-align:left">
                 <span>
                   <strong style="display:block;color:#102a43">${escapeHtml(item.label)}</strong>
                   <small style="color:#52667a">${item.count > 0 ? (lang==='en'?'Available':'Đã có dữ liệu') : (lang==='en'?'Missing baseline':'Đang thiếu dữ liệu nền')}</small>
@@ -5727,7 +5729,7 @@ function renderAdminManualRuntime(){
           </div>
         </article>
 
-        <article style="border:1px solid #dbe4f0;border-radius:20px;background:#fff;padding:18px">
+        <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
           <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Manual order input':'Nhập tay SO / JO / WO'}</div>
           <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${lang==='en'
             ? 'Open the governed order forms directly from Admin so operations can start before Epicor inbound is connected.'
@@ -5738,14 +5740,14 @@ function renderAdminManualRuntime(){
             <button class="btn-admin primary" onclick="adminOpenOrderManualCreate('wo')">+ WO</button>
             <button class="btn-admin secondary" onclick="adminOpenOrderWorkspace()">${lang==='en'?'Open Order Management':'Mở Quản lý đơn hàng'}</button>
           </div>
-          <div style="margin-top:14px;padding:12px 14px;border-radius:14px;background:#f8fafc;border:1px dashed #cbd5e1;color:#475569;font-size:13px;line-height:1.6">
+          <div style="margin-top:14px;padding:12px 14px;border-radius:14px;background:var(--bg-surface-alt,#f8fafc);border:1px dashed var(--border);color:var(--text-secondary,#475569);font-size:13px;line-height:1.6">
             ${lang==='en'
               ? 'Suggested sequence: Customer -> Part Number -> Revision -> Work center / Machine / Operator -> SO -> JO -> WO.'
               : 'Trình tự gợi ý: Khách hàng -> Part Number -> Revision -> Work center / Máy / Người vận hành -> SO -> JO -> WO.'}
           </div>
         </article>
 
-        <article style="border:1px solid #dbe4f0;border-radius:20px;background:#fff;padding:18px">
+        <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
           <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Current readiness':'Độ sẵn sàng hiện tại'}</div>
           <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${missing.length
             ? (lang==='en'
@@ -5756,12 +5758,12 @@ function renderAdminManualRuntime(){
               : 'Bộ dữ liệu nền tối thiểu đã sẵn sàng. Bạn có thể bắt đầu tạo SO / JO / WO thủ công ngay bây giờ.')}
           </p>
           <div style="display:grid;gap:10px">
-            <div style="padding:12px 14px;border-radius:14px;background:#f8fafc;border:1px solid #dbe4f0;color:#334e68;line-height:1.6">
+            <div style="padding:12px 14px;border-radius:14px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border);color:var(--text-secondary,#334e68);line-height:1.6">
               ${lang==='en'
                 ? 'Manual mode keeps the workflow alive: users create orders, operators update progress manually, and evidence still links to WO as usual.'
                 : 'Chế độ thủ công vẫn giữ workflow sống: người dùng tạo đơn, người vận hành cập nhật tiến độ bằng tay, và hồ sơ chứng cứ vẫn liên kết về WO như bình thường.'}
             </div>
-            <div style="padding:12px 14px;border-radius:14px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;line-height:1.6">
+            <div style="padding:12px 14px;border-radius:14px;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));color:var(--amber);line-height:1.6">
               ${lang==='en'
                 ? 'Security note: secrets for database and external connectors stay on the server, not in editable frontend fields.'
                 : 'Lưu ý an toàn: secret cho database và kết nối ngoài vẫn nằm ở server, không đặt trong các ô frontend có thể sửa.'}
@@ -5770,7 +5772,7 @@ function renderAdminManualRuntime(){
         </article>
       </section>
 
-      <section style="border:1px solid #dbe4f0;border-radius:20px;background:#fff;padding:18px">
+      <section style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
         <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
           <div>
             <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Recent records':'Bản ghi gần nhất'}</div>
@@ -5783,7 +5785,7 @@ function renderAdminManualRuntime(){
         <div style="margin-top:14px;overflow:auto">
           <table class="admin-table" style="width:100%;font-size:12px">
             <thead>
-              <tr style="background:#f8fafc">
+              <tr style="background:var(--bg-surface-alt,#f8fafc)">
                 <th style="padding:10px;text-align:left">${lang==='en'?'Type':'Loại'}</th>
                 <th style="padding:10px;text-align:left">${lang==='en'?'Number':'Mã'}</th>
                 <th style="padding:10px;text-align:left">${lang==='en'?'Description':'Mô tả'}</th>
@@ -5903,7 +5905,7 @@ function renderAdminDataSources(){
   }
 
   if(adminDataSourceState.loading && !adminDataSourceState.loaded){
-    el.innerHTML = `<div style="padding:28px;border:1px solid #dbe4f0;border-radius:18px;background:#fff;color:#475569">${lang==='en'?'Loading data source diagnostics...':'Đang tải chẩn đoán nguồn dữ liệu...'}</div>`;
+    el.innerHTML = `<div style="padding:28px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff);color:var(--text-secondary,#475569)">${lang==='en'?'Loading data source diagnostics...':'Đang tải chẩn đoán nguồn dữ liệu...'}</div>`;
     return;
   }
 
@@ -5923,7 +5925,7 @@ function renderAdminDataSources(){
 
   el.innerHTML = `
     <div style="display:grid;gap:16px">
-      <section style="border:1px solid #dbe4f0;border-radius:22px;background:linear-gradient(135deg,#fffdf7 0%,#f4f9ff 55%,#eef2ff 100%);padding:22px 24px">
+      <section style="border:1px solid var(--border);border-radius:22px;background:linear-gradient(135deg,color-mix(in srgb, var(--amber) 7%, var(--bg-surface,#fff)) 0%,color-mix(in srgb, var(--blue) 8%, var(--bg-surface,#fff)) 55%,color-mix(in srgb, var(--purple) 8%, var(--bg-surface,#fff)) 100%);padding:22px 24px">
         <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start">
           <div style="max-width:760px">
             <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7c2d12">${lang==='en'?'Data source and database control':'Nguồn dữ liệu và Database'}</div>
@@ -5936,25 +5938,25 @@ function renderAdminDataSources(){
         </div>
       </section>
 
-      ${adminDataSourceState.error ? `<div style="padding:12px 14px;border-radius:14px;background:#fff4e5;border:1px solid #facc15;color:#92400e">${escapeHtml(adminDataSourceState.error)}</div>` : ''}
+      ${adminDataSourceState.error ? `<div style="padding:12px 14px;border-radius:14px;background:color-mix(in srgb, var(--amber) 12%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));color:var(--amber)">${escapeHtml(adminDataSourceState.error)}</div>` : ''}
 
       <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
-        <div style="padding:16px;border:1px solid #dbe4f0;border-radius:18px;background:#fff">
+        <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
           <div style="font-size:12px;color:#486581">${lang==='en'?'Runtime mode':'Chế độ runtime'}</div>
           <div id="admin-data-source-mode-preview" style="margin-top:6px;font-size:28px;font-weight:700;color:#102a43">${escapeHtml(adminDataSourceModePreview(draft))}</div>
           <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'Applied to new requests immediately':'Áp dụng ngay cho các request mới'}</div>
         </div>
-        <div style="padding:16px;border:1px solid #dbe4f0;border-radius:18px;background:#fff">
+        <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
           <div style="font-size:12px;color:#486581">PostgreSQL</div>
           <div style="margin-top:6px;font-size:28px;font-weight:700;color:${runtimeMode.postgres_reachable ? '#0f766e' : '#b45309'}">${runtimeMode.postgres_reachable ? (lang==='en'?'Reachable':'Kết nối được') : (draft.use_postgres ? (lang==='en'?'Unavailable':'Chưa kết nối') : 'JSON')}</div>
           <div style="margin-top:6px;font-size:12px;color:#52667a">${escapeHtml(runtimeMode.postgres_error || (lang==='en'?'No PostgreSQL error reported':'Không có lỗi PostgreSQL được báo'))}</div>
         </div>
-        <div style="padding:16px;border:1px solid #dbe4f0;border-radius:18px;background:#fff">
+        <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
           <div style="font-size:12px;color:#486581">${lang==='en'?'Shadow-sync failures':'Lỗi shadow-sync'}</div>
           <div style="margin-top:6px;font-size:28px;font-weight:700;color:#102a43">${escapeHtml(String(shadowFailures))}</div>
           <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'JSON fallback reads':'Lượt fallback về JSON'}: ${escapeHtml(String(fallbackReads))}</div>
         </div>
-        <div style="padding:16px;border:1px solid #dbe4f0;border-radius:18px;background:#fff">
+        <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
           <div style="font-size:12px;color:#486581">${lang==='en'?'Connector alerts':'Cảnh báo connector'}</div>
           <div style="margin-top:6px;font-size:28px;font-weight:700;color:#102a43">${escapeHtml(String(connectorFailures))}</div>
           <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'WO launch blockers':'WO bị chặn'}: ${escapeHtml(String(launchBlockers))}</div>
@@ -5962,7 +5964,7 @@ function renderAdminDataSources(){
       </section>
 
       <section style="display:grid;grid-template-columns:minmax(340px,1.25fr) minmax(280px,.95fr);gap:16px">
-        <article style="border:1px solid #dbe4f0;border-radius:20px;background:#fff;padding:18px">
+        <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
           <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'PostgreSQL runtime profile':'Hồ sơ runtime PostgreSQL'}</div>
           <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${lang==='en'
             ? 'Switch between JSON-only, shadow-write, PostgreSQL-primary, and PostgreSQL-only here. Passwords remain on the server and are not exposed in frontend.'
@@ -6012,27 +6014,27 @@ function renderAdminDataSources(){
             </label>
           </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:14px">
-            <label style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:#f8fafc;border:1px solid #dbe4f0">
+            <label style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
               <input type="checkbox" ${draft.use_postgres ? 'checked' : ''} onchange="adminDataSourceSetField('use_postgres', this.checked)">
               <span><strong>use_postgres</strong><br><small>${lang==='en'?'Enable PostgreSQL path':'Bật đường đọc/ghi PostgreSQL'}</small></span>
             </label>
-            <label style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:#f8fafc;border:1px solid #dbe4f0">
+            <label style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
               <input type="checkbox" ${draft.shadow_write ? 'checked' : ''} onchange="adminDataSourceSetField('shadow_write', this.checked)">
               <span><strong>shadow_write</strong><br><small>${lang==='en'?'Write JSON + PostgreSQL in parallel':'Ghi song song JSON + PostgreSQL'}</small></span>
             </label>
-            <label style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:#f8fafc;border:1px solid #dbe4f0">
+            <label style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
               <input type="checkbox" ${draft.json_fallback ? 'checked' : ''} onchange="adminDataSourceSetField('json_fallback', this.checked)">
               <span><strong>json_fallback</strong><br><small>${lang==='en'?'Fallback to JSON if PostgreSQL read fails':'Fallback về JSON nếu đọc PostgreSQL lỗi'}</small></span>
             </label>
           </div>
-          <div style="margin-top:14px;padding:12px 14px;border-radius:14px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;line-height:1.6;font-size:13px">
+          <div style="margin-top:14px;padding:12px 14px;border-radius:14px;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));color:var(--amber);line-height:1.6;font-size:13px">
             ${lang==='en'
               ? 'Frontend edits only non-secret parameters. Database passwords and external connector tokens remain in server environment variables.'
               : 'Frontend chỉ chỉnh các tham số không chứa bí mật. Mật khẩu database và token kết nối ngoài vẫn nằm trong biến môi trường của server.'}
           </div>
         </article>
 
-        <article style="border:1px solid #dbe4f0;border-radius:20px;background:#fff;padding:18px;display:grid;gap:12px">
+        <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px;display:grid;gap:12px">
           <div>
             <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Integration diagnostics':'Chẩn đoán tích hợp'}</div>
             <p style="margin:8px 0 0;color:#52667a;line-height:1.6">${lang==='en'
@@ -6040,20 +6042,20 @@ function renderAdminDataSources(){
               : 'Dùng các thẻ này để đánh giá xem có còn cần chế độ nhập tay hay không, hoặc Epicor / CNC đã đủ khỏe để dựa vào kết nối hay chưa.'}</p>
           </div>
 
-          <div style="padding:14px;border-radius:16px;background:#f8fafc;border:1px solid #dbe4f0">
+          <div style="padding:14px;border-radius:16px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
             <div style="font-size:12px;color:#486581">Epicor</div>
             <div style="margin-top:6px;font-size:22px;font-weight:700;color:#102a43">${epicorHealth.configured ? (lang==='en'?'Configured':'Đã cấu hình') : (lang==='en'?'Not configured':'Chưa cấu hình')}</div>
             <div style="margin-top:6px;font-size:13px;color:#52667a">${epicorHealth.dry_run ? (lang==='en'?'Dry-run is active while transport is incomplete.':'Đang ở chế độ dry-run khi transport chưa cấu hình đủ.') : (lang==='en'?'Live transport is active.':'Transport thực đang hoạt động.')}</div>
             <div style="margin-top:8px;font-size:12px;color:#52667a">${lang==='en'?'Company':'Company'}: ${escapeHtml(String(epicorHealth.company || '-'))} · Plant: ${escapeHtml(String(epicorHealth.plant || '-'))}</div>
           </div>
 
-          <div style="padding:14px;border-radius:16px;background:#f8fafc;border:1px solid #dbe4f0">
+          <div style="padding:14px;border-radius:16px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
             <div style="font-size:12px;color:#486581">${lang==='en'?'CNC connectors':'Kết nối CNC'}</div>
             <div style="margin-top:6px;font-size:22px;font-weight:700;color:#102a43">${escapeHtml(String(connectorKpis.connectors_healthy || 0))}/${escapeHtml(String(connectorKpis.connectors_total || 0))} ${lang==='en'?'healthy':'ổn định'}</div>
             <div style="margin-top:6px;font-size:13px;color:#52667a">${lang==='en'?'Manual bridges':'Manual bridge'}: ${escapeHtml(String(connectorKpis.manual_bridges || 0))} · ${lang==='en'?'Stale links':'Link stale'}: ${escapeHtml(String(connectorKpis.connectors_stale || 0))}</div>
           </div>
 
-          <div style="padding:14px;border-radius:16px;background:#f8fafc;border:1px solid #dbe4f0">
+          <div style="padding:14px;border-radius:16px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
             <div style="font-size:12px;color:#486581">${lang==='en'?'Shadow observability':'Quan sát shadow'}</div>
             <div style="margin-top:6px;font-size:22px;font-weight:700;color:#102a43">${escapeHtml(String(shadowFailures))} ${lang==='en'?'failures':'lỗi'}</div>
             <div style="margin-top:6px;font-size:13px;color:#52667a">${lang==='en'?'JSON fallback reads':'Lượt fallback về JSON'}: ${escapeHtml(String(fallbackReads))}</div>
@@ -6077,15 +6079,15 @@ function renderAdminUsers(){
   const deptMap = {};
   DEPARTMENTS.forEach(d=>deptMap[d.code]=d);
   
-  const viewToggle = `<div style="display:flex;border:1px solid #d1d5db;border-radius:6px;overflow:hidden">
-    <button onclick="adminUserViewMode='cards';renderAdminUsers()" style="padding:5px 10px;font-size:11px;border:none;cursor:pointer;background:${adminUserViewMode==='cards'?'#1565c0':'#fff'};color:${adminUserViewMode==='cards'?'#fff':'#666'};transition:all .15s" title="Card view">&#9638;</button>
-    <button onclick="adminUserViewMode='list';renderAdminUsers()" style="padding:5px 10px;font-size:11px;border:none;border-left:1px solid #d1d5db;cursor:pointer;background:${adminUserViewMode==='list'?'#1565c0':'#fff'};color:${adminUserViewMode==='list'?'#fff':'#666'};transition:all .15s" title="List view">☰</button>
+  const viewToggle = `<div style="display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--bg-surface,#fff)">
+    <button onclick="adminUserViewMode='cards';renderAdminUsers()" style="padding:5px 10px;font-size:11px;border:none;cursor:pointer;background:${adminUserViewMode==='cards'?'var(--brand-2)':'var(--bg-surface,#fff)'};color:${adminUserViewMode==='cards'?'var(--text-inverse,#fff)':'var(--text-secondary,#666)'};transition:all .15s" title="Card view">&#9638;</button>
+    <button onclick="adminUserViewMode='list';renderAdminUsers()" style="padding:5px 10px;font-size:11px;border:none;border-left:1px solid var(--border);cursor:pointer;background:${adminUserViewMode==='list'?'var(--brand-2)':'var(--bg-surface,#fff)'};color:${adminUserViewMode==='list'?'var(--text-inverse,#fff)':'var(--text-secondary,#666)'};transition:all .15s" title="List view">☰</button>
   </div>`;
 
   let usersHtml = '';
   if(adminUserViewMode === 'list'){
     usersHtml = `<div style="overflow-x:auto"><table class="admin-table" id="user-list-table" style="width:100%;font-size:12px">
-      <thead><tr style="background:#f8fafc">
+      <thead><tr style="background:var(--bg-surface-alt,#f8fafc)">
         <th style="padding:8px 10px;text-align:left;font-size:11px">#</th>
         <th style="padding:8px 10px;text-align:left;font-size:11px">${lang==='en'?'Status':'TT'}</th>
         <th style="padding:8px 10px;text-align:left;font-size:11px">${lang==='en'?'Name':'Họ tên'}</th>
@@ -6099,14 +6101,14 @@ function renderAdminUsers(){
       ${USERS.map((u,idx) => {
         const r = ROLES[u.role];
         const dept = deptMap[u.dept];
-        return `<tr class="user-list-row" data-name="${escapeHtml((u.name||'').toLowerCase())}" data-dept="${escapeHtml(u.dept||'')}" style="border-bottom:1px solid #f1f3f5;${u.active===false?'opacity:.5;background:#fef2f2':''}">
+        return `<tr class="user-list-row" data-name="${escapeHtml((u.name||'').toLowerCase())}" data-dept="${escapeHtml(u.dept||'')}" style="border-bottom:1px solid color-mix(in srgb, var(--border) 78%, transparent);${u.active===false?'opacity:.5;background:color-mix(in srgb, var(--red) 8%, var(--bg-surface,#fff))':''}">
           <td style="padding:6px 10px;color:var(--text-3)">${idx+1}</td>
           <td style="padding:6px 10px">${u.active!==false?'🟢':'🔴'}</td>
           <td style="padding:6px 10px;font-weight:600">${escapeHtml(u.name)}</td>
           <td style="padding:6px 10px;font-family:var(--mono);font-size:11px;color:var(--text-3)">@${escapeHtml(u.username)}</td>
-          <td style="padding:6px 10px"><span style="font-size:10px;padding:2px 6px;border-radius:4px;background:${dept?dept.color+'15':'#f1f3f5'};color:${dept?dept.color:'#666'}">${u.dept}${dept?' '+(lang==='en'?dept.labelEn:dept.label):''}</span></td>
+          <td style="padding:6px 10px"><span style="font-size:10px;padding:2px 6px;border-radius:4px;background:${dept?dept.color+'15':'var(--bg-surface-alt,#f1f3f5)'};color:${dept?dept.color:'var(--text-secondary,#666)'}">${u.dept}${dept?' '+(lang==='en'?dept.labelEn:dept.label):''}</span></td>
           <td style="padding:6px 10px;font-size:11px">${escapeHtml(u.title)}</td>
-          <td style="padding:6px 10px"><span style="font-size:10px;padding:2px 6px;border-radius:4px;background:${r?r.color+'15':'#f1f3f5'};color:${r?r.color:'#666'}">${r?r.icon:''} ${r?r.label:u.role}</span></td>
+          <td style="padding:6px 10px"><span style="font-size:10px;padding:2px 6px;border-radius:4px;background:${r?r.color+'15':'var(--bg-surface-alt,#f1f3f5)'};color:${r?r.color:'var(--text-secondary,#666)'}">${r?r.icon:''} ${r?r.label:u.role}</span></td>
           <td style="padding:6px 10px;text-align:center;white-space:nowrap">
             <button onclick="showUserModal('${u.id}')" class="btn-admin secondary sm" style="padding:3px 8px;font-size:10px">✏</button>
             <button onclick="editUserPerms('${u.id}')" class="btn-admin secondary sm" style="padding:3px 8px;font-size:10px">🔐</button>
@@ -6135,7 +6137,7 @@ function renderAdminUsers(){
           </div>
           <div class="uc-meta">
             <span class="tag" style="background:${colorBg}15;color:${colorBg}">${r?r.icon:''} ${r?r.label:u.role}</span>
-            <span class="tag" style="background:${dept?dept.color+'15':'#f1f3f5'};color:${dept?dept.color:'#666'}">${u.dept} ${dept?(lang==='en'?dept.labelEn:dept.label):''}</span>
+            <span class="tag" style="background:${dept?dept.color+'15':'var(--bg-surface-alt,#f1f3f5)'};color:${dept?dept.color:'var(--text-secondary,#666)'}">${u.dept} ${dept?(lang==='en'?dept.labelEn:dept.label):''}</span>
           </div>
           <div class="uc-actions">
             <button onclick="showUserModal('${u.id}')">✏ ${T('admin_edit')}</button>
@@ -6151,7 +6153,7 @@ function renderAdminUsers(){
   el.innerHTML = `
     <div class="admin-toolbar">
       <input type="text" placeholder="${lang==='en'?'Search users...':'Tìm người dùng...'}" oninput="filterAdminUserCards(this.value)" id="admin-user-search">
-      <select id="admin-user-dept-filter" onchange="filterAdminUserCards(document.getElementById('admin-user-search').value)" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;min-width:140px">
+      <select id="admin-user-dept-filter" onchange="filterAdminUserCards(document.getElementById('admin-user-search').value)" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;min-width:140px;background:var(--bg-surface,#fff);color:var(--text-primary)">
         <option value="">${lang==='en'?'All departments':'Tất cả phòng ban'}</option>
         ${DEPARTMENTS.map(d=>`<option value="${d.code}">${d.code} — ${lang==='en'?d.labelEn:d.label}</option>`).join('')}
       </select>
@@ -6867,7 +6869,7 @@ function editUserPerms(userId){
       ${lang==='en'?'Base access':'Quyền mặc định'}: <b>${roleDocs==='ALL'?DOCS.length:DOCS.filter(d=>docMatchesRole(d.code,u.role)).length}</b>/${DOCS.length} |
       ${lang==='en'?'Check/uncheck to override role defaults':'Đánh dấu/bỏ đánh dấu để ghi đè quyền mặc định'}
     </div>
-    <div style="max-height:55vh;overflow-y:auto;border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px">
+    <div style="max-height:55vh;overflow-y:auto;border:1px solid var(--border);border-radius:6px;padding:8px 12px;background:var(--bg-surface,#fff)">
       ${catHtml}
     </div>
     <div class="modal-actions">
@@ -6976,7 +6978,7 @@ function renderAdminPerms(){
   el.innerHTML=`
     <div class="perm-grid">
       <div class="pg-sidebar">
-        <div style="padding:8px 12px;font-size:10px;font-weight:700;color:var(--text-3);border-bottom:1px solid #e2e8f0">${lang==='en'?'SELECT ROLE':'CHỌN VAI TRÒ'}</div>
+        <div style="padding:8px 12px;font-size:10px;font-weight:700;color:var(--text-3);border-bottom:1px solid var(--border)">${lang==='en'?'SELECT ROLE':'CHỌN VAI TRÒ'}</div>
         ${roleEntries.map(([k,v])=>{
           const cnt=ROLE_DOCS[k]==='ALL'?DOCS.length:DOCS.filter(d=>docMatchesRole(d.code,k)).length;
           return `<div class="pg-role-item ${adminEditRole===k?'active':''}" onclick="adminEditRole='${k}';renderAdminPerms()">
@@ -7118,16 +7120,16 @@ function renderAdminDeptTitle(){
     ])
   ]);
 
-  const body=el('div',{style:'margin-top:12px;border:1px solid var(--ln);border-radius:14px;background:#fff;overflow:hidden;'},[]);
-  const tree=el('div',{style:'padding:10px;display:flex;flex-direction:column;gap:8px;background:#f8fafc;'},[]);
+  const body=el('div',{style:'margin-top:12px;border:1px solid var(--border,var(--ln));border-radius:14px;background:var(--bg-surface,#fff);overflow:hidden;'},[]);
+  const tree=el('div',{style:'padding:10px;display:flex;flex-direction:column;gap:8px;background:var(--bg-surface-alt,#f8fafc);'},[]);
 
   DEPARTMENTS.forEach(d=>{
     const titles=titlesForDept(d.code)||[];
     const usersInDept = USERS.filter(u=>u.dept===d.code).length;
-    const folder=el('details',{open:true,class:'fm-folder',style:`border:1px solid ${d.color}33;background:#fff;border-radius:12px;overflow:hidden;`},[]);
-    const summary=el('summary',{style:'list-style:none;cursor:pointer;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(180deg,#fff,#f8fafc);'},[
+    const folder=el('details',{open:true,class:'fm-folder',style:`border:1px solid color-mix(in srgb, ${d.color} 24%, var(--border));background:var(--bg-surface,#fff);border-radius:12px;overflow:hidden;`},[]);
+    const summary=el('summary',{style:'list-style:none;cursor:pointer;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(180deg,var(--bg-surface,#fff),var(--bg-surface-alt,#f8fafc));'},[
       el('div',{style:'display:flex;align-items:center;gap:10px;'},[
-        el('div',{class:'fm-icon',style:`width:36px;height:36px;border-radius:10px;background:${d.color}18;border:1px solid ${d.color}40;display:flex;align-items:center;justify-content:center;font-size:18px;color:${d.color};`},'📁'),
+        el('div',{class:'fm-icon',style:`width:36px;height:36px;border-radius:10px;background:${d.color}18;border:1px solid color-mix(in srgb, ${d.color} 28%, var(--border));display:flex;align-items:center;justify-content:center;font-size:18px;color:${d.color};`},'📁'),
         el('div',{},[
           el('div',{style:'font-weight:800;'},`${d.code} — ${d.label}`),
           el('div',{class:'muted',style:'margin-top:2px;font-size:11px;'},`${titles.length} chức danh • ${usersInDept} người dùng`)
@@ -7160,22 +7162,22 @@ function renderAdminDeptTitle(){
     ]);
     folder.appendChild(summary);
 
-    const list=el('div',{style:'padding:8px 10px 10px;display:flex;flex-direction:column;gap:6px;background:#fff;'},[]);
+    const list=el('div',{style:'padding:8px 10px 10px;display:flex;flex-direction:column;gap:6px;background:var(--bg-surface,#fff);'},[]);
     if(!titles.length){
       list.appendChild(el('div',{class:'muted',style:'padding:8px 10px;'},'Chưa có chức danh trong phòng ban này.'));
     }else{
       titles.forEach(t=>{
         const count = USERS.filter(u=>u.dept===d.code && u.title===t).length;
-        const row=el('div',{class:'fm-file-row',style:'display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--ln);border-radius:10px;background:#f8fafc;'},[
+        const row=el('div',{class:'fm-file-row',style:'display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--border,var(--ln));border-radius:10px;background:var(--bg-surface-alt,#f8fafc);'},[
           el('div',{style:'display:flex;align-items:center;gap:10px;min-width:0;'},[
-            el('div',{class:'fm-file-icon',style:'width:30px;height:34px;display:flex;align-items:center;justify-content:center;background:#e0e7ff;border:1px solid #c7d2fe;border-radius:8px;font-size:15px;'},'📄'),
+            el('div',{class:'fm-file-icon',style:'width:30px;height:34px;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--brand-2) 24%, var(--border));border-radius:8px;font-size:15px;'},'📄'),
             el('div',{style:'min-width:0;'},[
               el('div',{style:'font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'},t),
               el('div',{class:'muted',style:'font-size:11px;margin-top:1px;'},`${d.code}/${t}`)
             ])
           ]),
           el('div',{style:'display:flex;align-items:center;gap:6px;flex-wrap:wrap;'},[
-            el('span',{style:'font-size:10px;padding:2px 8px;border-radius:999px;background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe;'},`${count} user`+(count===1?'':'s')),
+            el('span',{style:'font-size:10px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));color:var(--brand-2);border:1px solid color-mix(in srgb, var(--brand-2) 24%, var(--border));'},`${count} user`+(count===1?'':'s')),
             el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();
               const nt=(prompt('Đổi tên chức danh:',t)||'').trim();
               if(!nt||nt===t)return;
@@ -7325,7 +7327,7 @@ function renderAdminOrgChart(){
     
     // Connector line between levels
     if(li < levels.length - 1){
-      chartHtml += '<div style="width:2px;height:20px;background:#d1d5db;margin:0 auto"></div>';
+      chartHtml += '<div style="width:2px;height:20px;background:var(--border);margin:0 auto"></div>';
     }
     
     chartHtml += '</div>';
@@ -7346,7 +7348,7 @@ function renderAdminOrgChart(){
         ?'Auto-generated from user database. Grouped by role level and department.'
         :'Tự động tạo từ cơ sở dữ liệu người dùng. Nhóm theo cấp vai trò và phòng ban.'}
     </div>
-    <div style="border:1px solid #e2e8f0;border-radius:10px;overflow:auto;background:#fafbfc;max-height:600px">
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:auto;background:var(--bg-surface-alt,#fafbfc);max-height:600px">
       ${chartHtml}
     </div>
     <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
@@ -7384,7 +7386,7 @@ function renderAdminActivity(){
       <div style="display:flex;gap:8px;align-items:center">
         <button class="btn-admin secondary" onclick="document.getElementById('ds-panel').style.display=document.getElementById('ds-panel').style.display==='none'?'':'none'">⚙️ ${lang==='en'?'Settings':'Cài đặt'}</button>
       <div style="display:flex;gap:8px;align-items:center">
-        <select id="activity-user-filter" onchange="filterActivityLog()" style="padding:5px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:11px">
+        <select id="activity-user-filter" onchange="filterActivityLog()" style="padding:5px 10px;border:1px solid var(--border);border-radius:6px;font-size:11px;background:var(--bg-surface,#fff);color:var(--text-primary)">
           <option value="">${lang==='en'?'All users':'Tất cả'}</option>
           ${uniqueUsers.map(u=>`<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`).join('')}
         </select>
@@ -7392,8 +7394,8 @@ function renderAdminActivity(){
         <button class="btn-admin danger" onclick="clearActivityLog()">🗑 ${lang==='en'?'Clear':'Xóa log'}</button>
       </div>
     </div>
-    <div id="ds-panel" style="display:none;margin-bottom:16px;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;background:#fff">
-      <div style="padding:12px 16px;font-weight:700;font-size:13px;background:#f8fafc;border-bottom:1px solid #e2e8f0">⚙️ ${lang==='en'?'Data Collection Settings':'Cài đặt Thu thập Dữ liệu'}</div>
+    <div id="ds-panel" style="display:none;margin-bottom:16px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--bg-surface,#fff)">
+      <div style="padding:12px 16px;font-weight:700;font-size:13px;background:var(--bg-surface-alt,#f8fafc);border-bottom:1px solid var(--border)">⚙️ ${lang==='en'?'Data Collection Settings':'Cài đặt Thu thập Dữ liệu'}</div>
       ${(function(){
         const items=[
           {k:'collect_gps',i:'📍',v:'Tọa độ GPS',e:'GPS',dv:'Nếu tắt, người dùng không cần cho phép vị trí khi đăng nhập.',de:'If OFF, users skip location permission on login.'},
@@ -7408,23 +7410,23 @@ function renderAdminActivity(){
           const on=src[it.k];
           const lb=lang==='en'?it.e:it.v;
           const dc=lang==='en'?it.de:it.dv;
-          return `<div data-ds-key="${it.k}" style="display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-bottom:1px solid #f1f3f5">
+          return `<div data-ds-key="${it.k}" style="display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-bottom:1px solid color-mix(in srgb, var(--border) 78%, transparent)">
             <label style="position:relative;display:inline-block;width:44px;min-width:44px;height:24px;cursor:pointer">
               <input type="checkbox" ${on?"checked":""} onchange="toggleDataSetting('${it.k}',this.checked)" style="opacity:0;width:0;height:0;position:absolute">
-              <span class="ds-track" style="position:absolute;top:0;left:0;right:0;bottom:0;background:${on?"#10b981":"#d1d5db"};border-radius:24px;transition:.3s"></span>
-              <span class="ds-knob" style="position:absolute;height:18px;width:18px;left:${on?"22px":"3px"};bottom:3px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>
+              <span class="ds-track" style="position:absolute;top:0;left:0;right:0;bottom:0;background:${on?"var(--green)":"var(--border)"};border-radius:24px;transition:.3s"></span>
+              <span class="ds-knob" style="position:absolute;height:18px;width:18px;left:${on?"22px":"3px"};bottom:3px;background:var(--bg-surface,#fff);border-radius:50%;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>
             </label>
             <div style="flex:1"><div style="font-weight:700;font-size:13px">${it.i} ${lb}</div><div style="font-size:11px;color:var(--text-3);margin-top:2px">${dc}</div></div>
           </div>`;
         }).join('');
       })()}
-      <div id="ds-action-bar" style="display:${DATA_SETTINGS_DRAFT?'flex':'none'};padding:10px 14px;gap:8px;justify-content:flex-end;background:#fffbeb;border-top:1px solid #fde68a">
+      <div id="ds-action-bar" style="display:${DATA_SETTINGS_DRAFT?'flex':'none'};padding:10px 14px;gap:8px;justify-content:flex-end;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border-top:1px solid color-mix(in srgb, var(--amber) 28%, var(--border))">
         <button class="btn-admin secondary" onclick="cancelDataSettingsDraft()" style="padding:6px 16px;font-size:12px">↩ ${lang==='en'?'Cancel':'Hủy'}</button>
         <button class="btn-admin primary" onclick="saveDataSettingsDraft()" style="padding:6px 16px;font-size:12px">💾 ${lang==='en'?'Save':'Lưu'}</button>
       </div>
-      <div style="padding:10px 14px;background:#f0f7ff;font-size:11px;color:#1e40af">💡 ${lang==='en'?'Toggle options then click Save. Changes take effect on next login.':'Bật/tắt tùy chọn rồi nhấn Lưu. Thay đổi có hiệu lực từ lần đăng nhập kế.'}</div>
+      <div style="padding:10px 14px;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));font-size:11px;color:var(--brand-2)">💡 ${lang==='en'?'Toggle options then click Save. Changes take effect on next login.':'Bật/tắt tùy chọn rồi nhấn Lưu. Thay đổi có hiệu lực từ lần đăng nhập kế.'}</div>
     </div>
-    <div style="font-size:11px;color:var(--text-3);margin-bottom:12px;padding:10px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px">
+    <div style="font-size:11px;color:var(--text-3);margin-bottom:12px;padding:10px;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));border-radius:8px">
       🛡 <b>${lang==='en'?'Security Audit Log':'Nhật ký Kiểm toán Bảo mật'}:</b> 
       ${lang==='en'
         ?'Records session data: login time, IP, GPS coordinates, device fingerprint, detailed page-by-page navigation with exact timestamps and viewing duration.'
@@ -7443,7 +7445,7 @@ function renderAdminActivity(){
               <div style="display:flex;align-items:center;gap:8px;flex:1;flex-wrap:wrap">
                 <span style="font-weight:700;font-size:12px;color:var(--text)">${escapeHtml(s.name||s.user)}</span>
                 <span style="font-family:var(--mono);font-size:10px;color:var(--text-3)">@${escapeHtml(s.user)}</span>
-                <span style="font-size:9px;padding:1px 6px;border-radius:6px;background:#e3f2fd;color:#1565c0">${escapeHtml(s.role||'')}</span>
+                <span style="font-size:9px;padding:1px 6px;border-radius:6px;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));color:var(--brand-2)">${escapeHtml(s.role||'')}</span>
                 <span style="font-size:10px;color:var(--text-2)">🕐 ${dateStr}</span>
               </div>
               <button class="btn-admin secondary sm" onclick="this.parentElement.parentElement.querySelector('.al-detail').style.display=this.parentElement.parentElement.querySelector('.al-detail').style.display==='none'?'':'none';this.textContent=this.textContent.includes('▾')?'▴ Thu gọn':'▾ Chi tiết'">
@@ -7451,7 +7453,7 @@ function renderAdminActivity(){
               </button>
             </div>
             <!-- Summary row -->
-            <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:10px;color:var(--text-3);margin:6px 0;padding:8px;background:#f8fafc;border-radius:6px">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:10px;color:var(--text-3);margin:6px 0;padding:8px;background:var(--bg-surface-alt,#f8fafc);border-radius:6px">
               <span>🌐 <b>IP:</b> ${escapeHtml(s.ip||'—')}</span>
               <span>📍 <b>GPS:</b> ${escapeHtml(s.location||'—')} ${s.location_accuracy&&s.location_accuracy!=='—'?'(±'+escapeHtml(s.location_accuracy)+')':''}</span>
               <span>📱 <b>${lang==='en'?'Device':'Thiết bị'}:</b> ${escapeHtml(s.device_short||s.platform||'—')}</span>
@@ -7463,11 +7465,11 @@ function renderAdminActivity(){
             </div>
             <!-- Detailed page-by-page log (hidden by default) -->
             <div class="al-detail" style="display:none">
-              <div style="font-size:10px;font-weight:700;margin:8px 0 6px;color:var(--text-2);border-bottom:1px solid #e2e8f0;padding-bottom:4px">
+              <div style="font-size:10px;font-weight:700;margin:8px 0 6px;color:var(--text-2);border-bottom:1px solid var(--border);padding-bottom:4px">
                 📋 ${lang==='en'?'Page-by-page navigation log':'Nhật ký điều hướng từng trang'} (${totalPages} ${lang==='en'?'entries':'mục'})
               </div>
               <table style="width:100%;border-collapse:collapse;font-size:10px">
-                <thead><tr style="background:#f0f7ff">
+                <thead><tr style="background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff))">
                   <th style="text-align:left;padding:4px 8px;font-weight:600;color:var(--text-2)">#</th>
                   <th style="text-align:left;padding:4px 8px;font-weight:600;color:var(--text-2)">${lang==='en'?'Page / Document':'Trang / Tài liệu'}</th>
                   <th style="text-align:left;padding:4px 8px;font-weight:600;color:var(--text-2)">${lang==='en'?'Started viewing':'Bắt đầu xem'}</th>
@@ -7481,7 +7483,7 @@ function renderAdminActivity(){
                   const leftStr = p.left_at ? new Date(p.left_at).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '—';
                   const isDoc = (p.page_id||p.page||'').startsWith('doc/');
                   const durColor = (p.duration_sec||0) > 300 ? '#dc2626' : (p.duration_sec||0) > 60 ? '#d97706' : '#16a34a';
-                  return `<tr style="border-bottom:1px solid #f1f3f5">
+                  return `<tr style="border-bottom:1px solid color-mix(in srgb, var(--border) 78%, transparent)">
                     <td style="padding:3px 8px;color:var(--text-3)">${pi+1}</td>
                     <td style="padding:3px 8px">
                       ${isDoc?'📄':'📁'} <b>${escapeHtml(p.page_title||p.page_id||p.page||'—')}</b>
@@ -7494,7 +7496,7 @@ function renderAdminActivity(){
                 }).join('')}
                 </tbody>
               </table>
-              <div style="margin-top:8px;font-size:9px;color:var(--text-3);padding:6px 8px;background:#f8fafc;border-radius:4px">
+              <div style="margin-top:8px;font-size:9px;color:var(--text-3);padding:6px 8px;background:var(--bg-surface-alt,#f8fafc);border-radius:4px">
                 <b>Full User-Agent:</b> ${escapeHtml(s.device||'—')}<br>
                 <b>Language:</b> ${escapeHtml(s.language||'—')} · <b>Cookies:</b> ${s.cookies_enabled?'Yes':'No'} · <b>Online:</b> ${s.online?'Yes':'No'}
               </div>
@@ -7597,7 +7599,7 @@ function renderAdminRoles(){
               </td>
               <td>
                 <div style="display:flex;align-items:center;gap:6px">
-                  <div style="flex:1;background:#e2e8f0;border-radius:3px;height:8px;overflow:hidden">
+                  <div style="flex:1;background:var(--bg-surface-alt,#e2e8f0);border:1px solid color-mix(in srgb, var(--border) 65%, transparent);border-radius:3px;height:8px;overflow:hidden">
                     <div style="width:${pct}%;height:100%;background:${v.color};border-radius:3px"></div>
                   </div>
                   <span style="font-size:10px;font-family:var(--mono);min-width:50px">${cnt}/${DOCS.length}</span>
@@ -7613,14 +7615,14 @@ function renderAdminRoles(){
         </tbody>
       </table>
     </div>
-    <div style="margin-top:16px;border-top:1px solid #e2e8f0;padding-top:16px">
+    <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px">
       <h3 style="font-size:13px;font-weight:700;margin-bottom:10px">${lang==='en'?'Reassign User Role':'Thay đổi vai trò người dùng'}</h3>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <select id="role-reassign-user" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;min-width:180px">
+        <select id="role-reassign-user" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;min-width:180px;background:var(--bg-surface,#fff);color:var(--text-primary)">
           ${USERS.filter(u=>u.active).map(u=>'<option value="'+u.id+'">'+u.name+' ('+u.role+')</option>').join('')}
         </select>
         <span style="font-size:11px;color:var(--text-3)">→</span>
-        <select id="role-reassign-role" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;min-width:180px">
+        <select id="role-reassign-role" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;min-width:180px;background:var(--bg-surface,#fff);color:var(--text-primary)">
           ${roleOpts}
         </select>
         <button class="btn-admin primary" onclick="reassignUserRole()">${lang==='en'?'Apply':'Áp dụng'}</button>

@@ -81,6 +81,21 @@
   min-width: 0;
 }
 
+.ss-table-meta-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.ss-col-header-title {
+  font-weight: var(--font-semibold);
+  color: var(--text-1);
+}
+
+.ss-back-btn {
+  margin-right: auto;
+}
+
 .ss-toolbar-title {
   font-size: var(--text-md);
   font-weight: var(--font-bold);

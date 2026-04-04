@@ -45,7 +45,8 @@
 /* ============================================================================
    DARK MODE — data-color-mode="dark" on <html>
    ============================================================================ */
-[data-color-mode="dark"] {
+[data-color-mode="dark"],
+[data-color-scheme-active="dark"] {
   /* ── Design token overrides ── */
   --gray-50:#0f172a; --gray-100:#1e293b; --gray-200:#334155; --gray-300:#475569;
   --gray-400:#64748b; --gray-500:#94a3b8; --gray-600:#cbd5e1; --gray-700:#e2e8f0;
@@ -794,6 +795,14 @@ dialog, [role="dialog"], .hm-modal, .hm-dialog {
 [data-color-scheme-active="dark"] .admin-stat,
 [data-color-scheme-active="dark"] .admin-panel,
 [data-color-scheme-active="dark"] .admin-table,
+[data-color-scheme-active="dark"] .admin-sync-strip,
+[data-color-scheme-active="dark"] .admin-sync-card,
+[data-color-scheme-active="dark"] .admin-sync-cpanel-card,
+[data-color-scheme-active="dark"] .admin-sync-action,
+[data-color-scheme-active="dark"] .git-sync-modal,
+[data-color-scheme-active="dark"] .git-sync-card-mini,
+[data-color-scheme-active="dark"] .git-sync-table-wrap,
+[data-color-scheme-active="dark"] #consent-overlay .consent-box,
 [data-color-scheme-active="dark"] #doc-viewer-header,
 [data-color-scheme-active="dark"] .ec-tabs,
 [data-color-scheme-active="dark"] .ec-card,
@@ -843,7 +852,17 @@ dialog, [role="dialog"], .hm-modal, .hm-dialog {
 [data-color-scheme-active="dark"] .mesx-list-item,
 [data-color-scheme-active="dark"] .mesx-empty,
 [data-color-scheme-active="dark"] .mesx-table-wrap,
-[data-color-scheme-active="dark"] .mesx-table th {
+[data-color-scheme-active="dark"] .mesx-table th,
+[data-color-scheme-active="dark"] .admin-sync-mini,
+[data-color-scheme-active="dark"] .admin-sync-status-pill,
+[data-color-scheme-active="dark"] .admin-sync-commit-card,
+[data-color-scheme-active="dark"] .admin-sync-callout-bar,
+[data-color-scheme-active="dark"] .git-sync-modal-head,
+[data-color-scheme-active="dark"] .git-sync-modal-actions,
+[data-color-scheme-active="dark"] .git-sync-callout,
+[data-color-scheme-active="dark"] .git-sync-table th,
+[data-color-scheme-active="dark"] #consent-overlay .consent-footer,
+[data-color-scheme-active="dark"] #consent-overlay .consent-body .warn-note {
   background: var(--bg-surface-alt);
   border-color: var(--border);
   color: var(--text-secondary);
@@ -905,6 +924,16 @@ dialog, [role="dialog"], .hm-modal, .hm-dialog {
 [data-color-scheme-active="dark"] .uv2-dropzone strong,
 [data-color-scheme-active="dark"] .uv2-file-name,
 [data-color-scheme-active="dark"] .uv2-cell strong,
+[data-color-scheme-active="dark"] .admin-sync-title-wrap h3,
+[data-color-scheme-active="dark"] .admin-sync-label,
+[data-color-scheme-active="dark"] .admin-sync-panel-title,
+[data-color-scheme-active="dark"] .admin-sync-meta-value,
+[data-color-scheme-active="dark"] .admin-sync-meta-value code,
+[data-color-scheme-active="dark"] .admin-sync-action-copy b,
+[data-color-scheme-active="dark"] .git-sync-modal-head h3,
+[data-color-scheme-active="dark"] .git-sync-card-value,
+[data-color-scheme-active="dark"] .git-sync-section-title,
+[data-color-scheme-active="dark"] #consent-overlay .consent-body h4,
 [data-color-scheme-active="dark"] .qf {
   color: var(--text-primary);
 }
@@ -931,7 +960,16 @@ dialog, [role="dialog"], .hm-modal, .hm-dialog {
 [data-color-scheme-active="dark"] .mesx-empty,
 [data-color-scheme-active="dark"] .uv2-dropzone p,
 [data-color-scheme-active="dark"] .uv2-file-meta,
-[data-color-scheme-active="dark"] .uv2-cell small {
+[data-color-scheme-active="dark"] .uv2-cell small,
+[data-color-scheme-active="dark"] .admin-sync-title-wrap p,
+[data-color-scheme-active="dark"] .admin-sync-desc,
+[data-color-scheme-active="dark"] .admin-sync-meta-label,
+[data-color-scheme-active="dark"] .admin-sync-commit-card span,
+[data-color-scheme-active="dark"] .admin-sync-action-copy small,
+[data-color-scheme-active="dark"] .git-sync-card-label,
+[data-color-scheme-active="dark"] .git-sync-empty,
+[data-color-scheme-active="dark"] .git-sync-empty-inline,
+[data-color-scheme-active="dark"] #consent-overlay .consent-footer .btn-decline {
   color: var(--text-secondary);
 }
 [data-color-scheme-active="dark"] #login-box input[type=password],

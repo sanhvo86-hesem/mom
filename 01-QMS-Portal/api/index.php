@@ -125,6 +125,7 @@ use HESEM\QMS\Api\Controllers\CiController;
 use HESEM\QMS\Api\Controllers\EnergyController;
 use HESEM\QMS\Api\Controllers\GenericCrudController;
 use HESEM\QMS\Api\Controllers\ModuleSchemaController;
+use HESEM\QMS\Api\Controllers\SchemaStudioController;
 use HESEM\QMS\Api\Controllers\RegistryController;
 use HESEM\QMS\Database\DataLayer;
 
@@ -558,6 +559,20 @@ $router->actions([
     'module_schema_delete'  => [ModuleSchemaController::class, 'deleteSchema'],
     'module_schema_reset'   => [ModuleSchemaController::class, 'resetSchema'],
     'module_api_catalog'    => [ModuleSchemaController::class, 'apiCatalog'],
+]);
+
+// Schema Studio
+$router->actions([
+    'schema_studio_list'            => [SchemaStudioController::class, 'listDesigns'],
+    'schema_studio_get'             => [SchemaStudioController::class, 'getDesign'],
+    'schema_studio_save'            => [SchemaStudioController::class, 'saveDesign'],
+    'schema_studio_delete'          => [SchemaStudioController::class, 'deleteDesign'],
+    'schema_studio_set_baseline'    => [SchemaStudioController::class, 'setBaseline'],
+    'schema_studio_reverse_engineer'=> [SchemaStudioController::class, 'reverseEngineer'],
+    'schema_studio_load_registry'   => [SchemaStudioController::class, 'loadFromRegistry'],
+    'schema_studio_validate'        => [SchemaStudioController::class, 'validateSchema'],
+    'schema_studio_apply_migration' => [SchemaStudioController::class, 'applyMigration'],
+    'schema_studio_export'          => [SchemaStudioController::class, 'export'],
 ]);
 
 // Centralized Data Registry
