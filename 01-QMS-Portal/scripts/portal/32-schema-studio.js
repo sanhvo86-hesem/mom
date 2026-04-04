@@ -4,6 +4,7 @@
 var MODULE_ID = 'schema-studio';
 var PAGE_ID = 'page-schema-studio';
 var LS_PREFIX = 'hesem:schema-studio:';
+var UI_PREFS_KEY = LS_PREFIX + 'ui';
 var SVG_NS = 'http://www.w3.org/2000/svg';
 var MIN_ZOOM = 0.1;
 var MAX_ZOOM = 4;
@@ -402,6 +403,38 @@ function clearDraft(id){
   }catch(err){}
 }
 
+function saveUiPrefs(){
+  try{
+    localStorage.setItem(UI_PREFS_KEY, JSON.stringify({
+      browser: {
+        open: STORE.browser.open,
+        expandedDomains: STORE.browser.expandedDomains
+      }
+    }));
+  }catch(err){}
+}
+
+function loadUiPrefs(){
+  try{
+    var raw = localStorage.getItem(UI_PREFS_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(err){
+    return null;
+  }
+}
+
+function applyUiPrefs(prefs){
+  if(!prefs || typeof prefs !== 'object') return;
+  if(prefs.browser && typeof prefs.browser === 'object'){
+    if(typeof prefs.browser.open === 'boolean'){
+      STORE.browser.open = prefs.browser.open;
+    }
+    if(prefs.browser.expandedDomains && typeof prefs.browser.expandedDomains === 'object'){
+      STORE.browser.expandedDomains = _clone(prefs.browser.expandedDomains);
+    }
+  }
+}
+
 function screenToCanvas(screenX, screenY){
   if(!refs.canvasWrap) return { x: 0, y: 0 };
   var rect = refs.canvasWrap.getBoundingClientRect();
@@ -642,7 +675,7 @@ var Canvas = {
     if(zoomReset) zoomReset.textContent = zoomVal;
     var toolbarZoom = document.getElementById('ss-toolbar-zoom');
     if(toolbarZoom) toolbarZoom.textContent = zoomVal;
-    if(refs.modeIndicator) refs.modeIndicator.textContent = _t('Mode', 'Mode') + ': ' + String(STORE.mode || 'canvas').toUpperCase();
+    if(refs.modeIndicator) refs.modeIndicator.textContent = _t('Chế độ', 'Mode') + ': ' + modeLabel(STORE.mode || 'canvas');
     Canvas.updateGrid();
     VirtualRenderer.scheduleUpdate();
   },
@@ -1674,7 +1707,7 @@ var Inspector = {
   },
 
   renderEmpty: function(){
-    refs.inspector.innerHTML = '<div class="ss-empty-state"><div><div class="ss-empty-icon">O</div><div>' + _esc(_t('Chon bang hoac cot de chinh sua', 'Select a table or column to edit')) + '</div><div class="ss-field-hint">' + _esc(_t('Canvas o giua, inspector o ben phai.', 'Canvas in the middle, inspector on the right.')) + '</div></div></div>';
+    refs.inspector.innerHTML = '<div class="ss-empty-state"><div><div class="ss-empty-icon">○</div><div>' + _esc(_t('Chọn bảng hoặc cột để chỉnh sửa', 'Select a table or column to edit')) + '</div><div class="ss-field-hint">' + _esc(_t('Canvas ở giữa, inspector ở bên phải.', 'Canvas in the middle, inspector on the right.')) + '</div></div></div>';
   },
 
   renderTable: function(tableId){
@@ -2184,34 +2217,150 @@ function relationByColumn(tableId, colId){
   })[0] || null;
 }
 
+function formatDomainLabel(domain){
+  var acronyms = {
+    ai: 'AI',
+    ap: 'AP',
+    apqp: 'APQP',
+    ar: 'AR',
+    bi: 'BI',
+    cnc: 'CNC',
+    crm: 'CRM',
+    ehs: 'EHS',
+    erp: 'ERP',
+    fmea: 'FMEA',
+    hcm: 'HCM',
+    hr: 'HR',
+    mes: 'MES',
+    ncc: 'NCC',
+    plm: 'PLM',
+    ppap: 'PPAP',
+    qms: 'QMS',
+    rls: 'RLS',
+    spc: 'SPC',
+    sql: 'SQL',
+    ui: 'UI',
+    ux: 'UX'
+  };
+  return String(domain || 'default').split('_').map(function(part){
+    var key = String(part || '').toLowerCase();
+    if(acronyms[key]) return acronyms[key];
+    return key ? key.charAt(0).toUpperCase() + key.slice(1) : '';
+  }).join(' ');
+}
+
+function modeLabel(mode){
+  if(mode === 'code') return _t('Mã', 'Code');
+  if(mode === 'validate') return _t('Kiểm tra', 'Validate');
+  return _t('Sơ đồ', 'Canvas');
+}
+
 var Browser = {
-  render: function(){
-    var tables;
-    var filtered;
+  getVisibleTables: function(){
+    var tables = (STORE.schema && STORE.schema.tables) || [];
+    var filter = String(STORE.browser.filter || '').trim().toLowerCase();
+    if(!filter) return tables.slice();
+    return tables.filter(function(tbl){
+      if(String(tbl.name || '').toLowerCase().indexOf(filter) >= 0) return true;
+      if(String(tbl.domain || '').toLowerCase().indexOf(filter) >= 0) return true;
+      if(String(tbl.comment || '').toLowerCase().indexOf(filter) >= 0) return true;
+      return (tbl.columns || []).some(function(col){
+        return String(col.name || '').toLowerCase().indexOf(filter) >= 0 || String(col.comment || '').toLowerCase().indexOf(filter) >= 0;
+      });
+    });
+  },
+
+  groupTables: function(tables){
     var groups = {};
-    var domains;
-    if(!refs.browser) return;
-    tables = (STORE.schema && STORE.schema.tables) || [];
-    filtered = STORE.browser.filter ? tables.filter(function(tbl){
-      var filter = STORE.browser.filter.toLowerCase();
-      return String(tbl.name || '').toLowerCase().indexOf(filter) >= 0 || String(tbl.domain || '').toLowerCase().indexOf(filter) >= 0;
-    }) : tables.slice();
-    filtered.forEach(function(tbl){
+    (tables || []).forEach(function(tbl){
       var domain = tbl.domain || 'default';
       if(!groups[domain]) groups[domain] = [];
       groups[domain].push(tbl);
     });
+    return groups;
+  },
+
+  toggleOpen: function(forceState){
+    STORE.browser.open = typeof forceState === 'boolean' ? forceState : !STORE.browser.open;
+    saveUiPrefs();
+    if(refs.root){
+      refs.root.classList.toggle('browser-collapsed', !STORE.browser.open);
+    }
+    if(refs.toolbar){
+      renderToolbar(refs.toolbar);
+    }
+    Browser.render();
+    if(isActivePage()){
+      setTimeout(function(){
+        Canvas.applyTransform();
+        if(window.VirtualRenderer && typeof VirtualRenderer.scheduleUpdate === 'function'){
+          VirtualRenderer.scheduleUpdate();
+        }
+      }, 120);
+    }
+  },
+
+  expandAll: function(){
+    var groups = Browser.groupTables((STORE.schema && STORE.schema.tables) || []);
+    Object.keys(groups).forEach(function(domain){
+      STORE.browser.expandedDomains[domain] = true;
+    });
+    saveUiPrefs();
+    Browser.render();
+  },
+
+  collapseAll: function(){
+    var groups = Browser.groupTables((STORE.schema && STORE.schema.tables) || []);
+    Object.keys(groups).forEach(function(domain){
+      STORE.browser.expandedDomains[domain] = false;
+    });
+    saveUiPrefs();
+    Browser.render();
+  },
+
+  render: function(){
+    var tables;
+    var filtered;
+    var groups;
+    var domains;
+    var filter;
+    var filterActive;
+    if(!refs.browser) return;
+    tables = (STORE.schema && STORE.schema.tables) || [];
+    filtered = Browser.getVisibleTables();
+    groups = Browser.groupTables(filtered);
     domains = Object.keys(groups).sort();
+    filter = String(STORE.browser.filter || '').trim();
+    filterActive = !!filter;
+    if(!STORE.browser.open){
+      refs.browser.innerHTML = [
+        '<div class="ss-browser-collapsed-shell">',
+          '<button class="ss-browser-rail-btn" type="button" onclick="Browser.toggleOpen(true)" title="' + _esc(_t('Mở thanh điều hướng (B)', 'Open schema browser (B)')) + '" aria-label="' + _esc(_t('Mở thanh điều hướng', 'Open schema browser')) + '">▸</button>',
+          '<button class="ss-browser-rail-btn" type="button" onclick="Browser.expandAll(); Browser.toggleOpen(true)" title="' + _esc(_t('Mở rộng tất cả domain', 'Expand all domains')) + '" aria-label="' + _esc(_t('Mở rộng tất cả domain', 'Expand all domains')) + '">＋</button>',
+          '<button class="ss-browser-rail-btn" type="button" onclick="Browser.collapseAll(); Browser.toggleOpen(true)" title="' + _esc(_t('Thu gọn tất cả domain', 'Collapse all domains')) + '" aria-label="' + _esc(_t('Thu gọn tất cả domain', 'Collapse all domains')) + '">－</button>',
+          '<div class="ss-browser-rail-stats"><strong>' + String(tables.length) + '</strong><span>' + _esc(_t('bảng', 'tables')) + '</span></div>',
+        '</div>'
+      ].join('');
+      return;
+    }
     refs.browser.innerHTML = [
-      '<div class="ss-browser-search-wrap"><input class="hm-input ss-browser-search" placeholder="' + _esc(_t('Tim bang...', 'Search tables...')) + '" value="' + _esc(STORE.browser.filter) + '" oninput="Browser.onFilter(this.value)" /></div>',
+      '<div class="ss-browser-header">',
+        '<div class="ss-browser-title-group"><div class="ss-browser-title">' + _esc(_t('Trình duyệt schema', 'Schema browser')) + '</div><div class="ss-browser-subtitle">' + String(tables.length) + ' ' + _esc(_t('bảng', 'tables')) + ' · ' + String(domains.length) + ' ' + _esc(_t('domain', 'domains')) + '</div></div>',
+        '<div class="ss-browser-tools">',
+          '<button class="ss-browser-tool" type="button" onclick="Browser.expandAll()" title="' + _esc(_t('Mở rộng tất cả', 'Expand all')) + '" aria-label="' + _esc(_t('Mở rộng tất cả', 'Expand all')) + '">＋</button>',
+          '<button class="ss-browser-tool" type="button" onclick="Browser.collapseAll()" title="' + _esc(_t('Thu gọn tất cả', 'Collapse all')) + '" aria-label="' + _esc(_t('Thu gọn tất cả', 'Collapse all')) + '">－</button>',
+          '<button class="ss-browser-tool" type="button" onclick="Browser.toggleOpen(false)" title="' + _esc(_t('Ẩn thanh điều hướng (B)', 'Hide schema browser (B)')) + '" aria-label="' + _esc(_t('Ẩn thanh điều hướng', 'Hide schema browser')) + '">◂</button>',
+        '</div>',
+      '</div>',
+      '<div class="ss-browser-search-wrap"><input class="hm-input ss-browser-search" placeholder="' + _esc(_t('Tìm bảng, cột hoặc domain...', 'Search tables, columns, or domains...')) + '" value="' + _esc(STORE.browser.filter) + '" oninput="Browser.onFilter(this.value)" /><div class="ss-browser-search-meta">' + _esc(filterActive ? (_t('Đang hiển thị ' + filtered.length + ' bảng khớp', 'Showing ' + filtered.length + ' matching table(s)')) : _t('Nhấp đúp vào bảng để đưa vào giữa màn hình', 'Double-click a table to focus it on canvas')) + '</div></div>',
       '<div class="ss-browser-list">',
         domains.length ? domains.map(function(domain){
-          var expanded = STORE.browser.expandedDomains[domain] !== false;
+          var expanded = filterActive ? true : STORE.browser.expandedDomains[domain] !== false;
           return [
             '<div class="ss-domain-group" data-domain="' + _esc(domain) + '">',
               '<div class="ss-domain-group-header" style="border-left:3px solid ' + _esc(DOMAIN_COLORS[domain] || DOMAIN_COLORS.default) + '" onclick="Browser.toggleDomain(\'' + _esc(domain) + '\')">',
                 '<span class="ss-domain-chevron">' + (expanded ? '▾' : '▸') + '</span>',
-                '<span class="ss-domain-name">' + _esc(domain.replace(/_/g, ' ')) + '</span>',
+                '<span class="ss-domain-name">' + _esc(formatDomainLabel(domain)) + '</span>',
                 '<span class="ss-domain-count">' + String(groups[domain].length) + '</span>',
               '</div>',
               expanded ? '<div class="ss-domain-tables">' + groups[domain].map(function(tbl){
@@ -2223,9 +2372,9 @@ var Browser = {
               }).join('') + '</div>' : '',
             '</div>'
           ].join('');
-        }).join('') : '<div class="ss-empty-state"><div>' + _esc(_t('Chua co bang nao', 'No tables yet')) + '</div></div>',
+        }).join('') : '<div class="ss-empty-state"><div>' + _esc(_t('Chưa có bảng nào', 'No tables yet')) + '</div></div>',
       '</div>',
-      '<div class="ss-browser-footer"><span>' + String(tables.length) + ' ' + _esc(_t('bang', 'tables')) + '</span><span>&middot;</span><span>' + String(domains.length) + ' domains</span><button class="hm-btn hm-btn-ghost ss-btn-xs" onclick="TableCard.createNew(100,100)">+ ' + _esc(_t('Tao bang', 'New table')) + '</button></div>'
+      '<div class="ss-browser-footer"><span>' + String(tables.length) + ' ' + _esc(_t('bảng', 'tables')) + '</span><span>&middot;</span><span>' + String(domains.length) + ' ' + _esc(_t('domain', 'domains')) + '</span><button class="hm-btn hm-btn-ghost ss-btn-xs" onclick="TableCard.createNew(100,100)">+ ' + _esc(_t('Tạo bảng', 'New table')) + '</button></div>'
     ].join('');
   },
 
@@ -2236,6 +2385,7 @@ var Browser = {
 
   toggleDomain: function(domain){
     STORE.browser.expandedDomains[domain] = STORE.browser.expandedDomains[domain] === false ? true : false;
+    saveUiPrefs();
     Browser.render();
   },
 
@@ -2502,9 +2652,9 @@ var MigGen = {
       schema: STORE.schema
     }).then(function(){
       STORE.baseline = _clone(STORE.schema);
-      toast(_t('Da dat baseline', 'Baseline saved'), 'success');
+      toast(_t('Đã đặt baseline', 'Baseline saved'), 'success');
     }).catch(function(err){
-      toast(_t('Khong dat duoc baseline', 'Failed to save baseline') + ': ' + (err.message || ''), 'error');
+      toast(_t('Không đặt được baseline', 'Failed to save baseline') + ': ' + (err.message || ''), 'error');
     });
   },
 
@@ -2514,7 +2664,7 @@ var MigGen = {
     var overlay;
     if(!STORE.schema) return;
     if(!STORE.baseline){
-      toast(_t('Chua co baseline. Hay dat baseline truoc.', 'No baseline set yet. Save a baseline first.'), 'error');
+      toast(_t('Chưa có baseline. Hãy đặt baseline trước.', 'No baseline set yet. Save a baseline first.'), 'error');
       return;
     }
     diff = MigGen.computeDiff(STORE.baseline, STORE.schema);
@@ -2561,12 +2711,12 @@ var MigGen = {
 
   copySQL: function(){
     navigator.clipboard.writeText(STORE.migration.previewSql || '');
-    toast(_t('Da copy SQL', 'Copied SQL'), 'success');
+    toast(_t('Đã copy SQL', 'Copied SQL'), 'success');
   },
 
   applyMigration: function(){
     var diff = STORE.migration.diff || { destructive:[] };
-    confirm2(_t('Ap dung migration len database?', 'Apply migration to the database?'), diff.destructive.length > 0).then(function(ok){
+    confirm2(_t('Áp dụng migration lên database?', 'Apply migration to the database?'), diff.destructive.length > 0).then(function(ok){
       if(!ok) return;
       return _api('schema_studio_apply_migration', {
         sql: STORE.migration.previewSql || '',
@@ -2575,9 +2725,9 @@ var MigGen = {
       }).then(function(){
         STORE.baseline = _clone(STORE.schema);
         MigGen.closePreview();
-        toast(_t('Migration thanh cong', 'Migration applied'), 'success');
+        toast(_t('Migration thành công', 'Migration applied'), 'success');
       }).catch(function(err){
-        toast(_t('Migration that bai', 'Migration failed') + ': ' + (err.message || ''), 'error');
+        toast(_t('Migration thất bại', 'Migration failed') + ': ' + (err.message || ''), 'error');
       });
     });
   }
@@ -2614,28 +2764,28 @@ var Validator = {
     }
     (schema.tables || []).forEach(function(tbl){
       if(tableNames[tbl.name]){
-        Validator.addResult(results, { level:'error', code:'E03', tableId:tbl.id, table:tbl.name, msg:_t('Bang bi trung ten: ' + tbl.name, 'Duplicate table name: ' + tbl.name) });
+        Validator.addResult(results, { level:'error', code:'E03', tableId:tbl.id, table:tbl.name, msg:_t('Bảng bị trùng tên: ' + tbl.name, 'Duplicate table name: ' + tbl.name) });
       }
       tableNames[tbl.name] = true;
       if(!(tbl.columns || []).some(function(col){ return col.primary_key; })){
-        Validator.addResult(results, { level:'error', code:'E01', tableId:tbl.id, table:tbl.name, msg:_t('Bang "' + tbl.name + '" khong co primary key', 'Table "' + tbl.name + '" has no primary key') });
+        Validator.addResult(results, { level:'error', code:'E01', tableId:tbl.id, table:tbl.name, msg:_t('Bảng "' + tbl.name + '" không có primary key', 'Table "' + tbl.name + '" has no primary key') });
       }
       if(!isValidIdentifier(tbl.name)){
-        Validator.addResult(results, { level:'error', code:'E04', tableId:tbl.id, table:tbl.name, msg:_t('Ten bang khong dung snake_case: ' + tbl.name, 'Table name is not snake_case: ' + tbl.name) });
+        Validator.addResult(results, { level:'error', code:'E04', tableId:tbl.id, table:tbl.name, msg:_t('Tên bảng không đúng snake_case: ' + tbl.name, 'Table name is not snake_case: ' + tbl.name) });
       }
       (tbl.columns || []).forEach(function(col){
         var dupCount = (tbl.columns || []).filter(function(item){ return item.name === col.name; }).length;
         if(dupCount > 1){
-          Validator.addResult(results, { level:'error', code:'E05', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('Cot bi trung ten: ' + tbl.name + '.' + col.name, 'Duplicate column: ' + tbl.name + '.' + col.name) });
+          Validator.addResult(results, { level:'error', code:'E05', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('Cột bị trùng tên: ' + tbl.name + '.' + col.name, 'Duplicate column: ' + tbl.name + '.' + col.name) });
         }
         if(!isValidIdentifier(col.name)){
-          Validator.addResult(results, { level:'error', code:'E06', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('Ten cot khong hop le: ' + tbl.name + '.' + col.name, 'Invalid column name: ' + tbl.name + '.' + col.name) });
+          Validator.addResult(results, { level:'error', code:'E06', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('Tên cột không hợp lệ: ' + tbl.name + '.' + col.name, 'Invalid column name: ' + tbl.name + '.' + col.name) });
         }
         if(isReservedWord(col.name)){
-          Validator.addResult(results, { level:'error', code:'E07', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('Cot dung tu khoa SQL: ' + tbl.name + '.' + col.name, 'Column uses SQL keyword: ' + tbl.name + '.' + col.name) });
+          Validator.addResult(results, { level:'error', code:'E07', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('Cột dùng từ khóa SQL: ' + tbl.name + '.' + col.name, 'Column uses SQL keyword: ' + tbl.name + '.' + col.name) });
         }
         if(col.type === 'varchar' && !col.length){
-          Validator.addResult(results, { level:'warning', code:'W02', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('varchar chua co length: ' + tbl.name + '.' + col.name, 'varchar has no length: ' + tbl.name + '.' + col.name) }, function(){
+          Validator.addResult(results, { level:'warning', code:'W02', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('varchar chưa có length: ' + tbl.name + '.' + col.name, 'varchar has no length: ' + tbl.name + '.' + col.name) }, function(){
             pushUndo();
             col.type = 'text';
             col.length = null;
@@ -2646,7 +2796,7 @@ var Validator = {
           });
         }
         if(col.primary_key && col.type === 'uuid' && String(col.default_val || '').indexOf('uuid_generate_v4') < 0){
-          Validator.addResult(results, { level:'warning', code:'W03', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('UUID PK chua co default uuid_generate_v4(): ' + tbl.name + '.' + col.name, 'UUID PK missing uuid_generate_v4(): ' + tbl.name + '.' + col.name) }, function(){
+          Validator.addResult(results, { level:'warning', code:'W03', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('UUID PK chưa có default uuid_generate_v4(): ' + tbl.name + '.' + col.name, 'UUID PK missing uuid_generate_v4(): ' + tbl.name + '.' + col.name) }, function(){
             pushUndo();
             col.default_val = 'uuid_generate_v4()';
             TableCard.reRender(tbl.id);
@@ -2660,7 +2810,7 @@ var Validator = {
             return (idx.columns || []).some(function(ic){ return ic.name === col.name; });
           });
           if(!indexed){
-            Validator.addResult(results, { level:'warning', code:'W04', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('FK chua duoc index: ' + tbl.name + '.' + col.name, 'FK is not indexed: ' + tbl.name + '.' + col.name) }, function(){
+            Validator.addResult(results, { level:'warning', code:'W04', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('FK chưa được index: ' + tbl.name + '.' + col.name, 'FK is not indexed: ' + tbl.name + '.' + col.name) }, function(){
               pushUndo();
               tbl.indexes = tbl.indexes || [];
               tbl.indexes.push({ id:_uid(), name:'idx_' + tbl.name + '_' + col.name, type:'BTREE', unique:false, columns:[{ name:col.name, order:'ASC' }], where:'', include:[] });
@@ -2671,7 +2821,7 @@ var Validator = {
             });
           }
           if(col.nullable && (!col.foreign_key.on_delete || col.foreign_key.on_delete === 'NO ACTION')){
-            Validator.addResult(results, { level:'warning', code:'W05', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('FK nullable chua co ON DELETE: ' + tbl.name + '.' + col.name, 'Nullable FK missing ON DELETE: ' + tbl.name + '.' + col.name) });
+            Validator.addResult(results, { level:'warning', code:'W05', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('FK nullable chưa có ON DELETE: ' + tbl.name + '.' + col.name, 'Nullable FK missing ON DELETE: ' + tbl.name + '.' + col.name) });
           }
         }
         if(col.type === 'jsonb'){
@@ -2679,15 +2829,15 @@ var Validator = {
             return String(idx.type || '').toUpperCase() === 'GIN' && (idx.columns || []).some(function(ic){ return ic.name === col.name; });
           });
           if(!hasGin){
-            Validator.addResult(results, { level:'warning', code:'W06', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('jsonb chua co GIN index: ' + tbl.name + '.' + col.name, 'jsonb missing GIN index: ' + tbl.name + '.' + col.name) });
+            Validator.addResult(results, { level:'warning', code:'W06', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('jsonb chưa có GIN index: ' + tbl.name + '.' + col.name, 'jsonb missing GIN index: ' + tbl.name + '.' + col.name) });
           }
         }
       });
       if((tbl.columns || []).length > 15 && !(tbl.indexes || []).length){
-        Validator.addResult(results, { level:'warning', code:'W07', tableId:tbl.id, table:tbl.name, msg:_t('Bang lon nhung chua co index: ' + tbl.name, 'Large table has no indexes: ' + tbl.name) });
+        Validator.addResult(results, { level:'warning', code:'W07', tableId:tbl.id, table:tbl.name, msg:_t('Bảng lớn nhưng chưa có index: ' + tbl.name, 'Large table has no indexes: ' + tbl.name) });
       }
       if(!(tbl.columns || []).some(function(col){ return col.name === 'created_at'; }) || !(tbl.columns || []).some(function(col){ return col.name === 'updated_at'; })){
-        Validator.addResult(results, { level:'warning', code:'W01', tableId:tbl.id, table:tbl.name, msg:_t('Bang thieu created_at/updated_at: ' + tbl.name, 'Table missing created_at/updated_at: ' + tbl.name) }, function(){
+        Validator.addResult(results, { level:'warning', code:'W01', tableId:tbl.id, table:tbl.name, msg:_t('Bảng thiếu created_at/updated_at: ' + tbl.name, 'Table missing created_at/updated_at: ' + tbl.name) }, function(){
           pushUndo();
           if(!(tbl.columns || []).some(function(col){ return col.name === 'created_at'; })){
             tbl.columns.push({ id:_uid(), name:'created_at', type:'timestamptz', length:null, scale:null, is_array:false, nullable:false, unique:false, primary_key:false, pk_order:null, default_val:'now()', check_expr:null, generated_expr:null, generated_stored:false, comment:'', foreign_key:null });
@@ -2702,26 +2852,26 @@ var Validator = {
         });
       }
       if(!tbl.comment){
-        Validator.addResult(results, { level:'info', code:'I01', tableId:tbl.id, table:tbl.name, msg:_t('Bang chua co comment: ' + tbl.name, 'Table has no comment: ' + tbl.name) });
+        Validator.addResult(results, { level:'info', code:'I01', tableId:tbl.id, table:tbl.name, msg:_t('Bảng chưa có comment: ' + tbl.name, 'Table has no comment: ' + tbl.name) });
       }
       if(tbl.rls_enabled){
-        Validator.addResult(results, { level:'info', code:'I02', tableId:tbl.id, table:tbl.name, msg:_t('Bang dang bat RLS, nho viet policy trong migration: ' + tbl.name, 'RLS enabled - remember policies in migration: ' + tbl.name) });
+        Validator.addResult(results, { level:'info', code:'I02', tableId:tbl.id, table:tbl.name, msg:_t('Bảng đang bật RLS, nhớ viết policy trong migration: ' + tbl.name, 'RLS enabled - remember policies in migration: ' + tbl.name) });
       }
       if(String(tbl.name || '').length > 63){
-        Validator.addResult(results, { level:'info', code:'I04', tableId:tbl.id, table:tbl.name, msg:_t('Ten bang "' + tbl.name + '" dai ' + tbl.name.length + ' ky tu (PostgreSQL gioi han 63)', 'Table name "' + tbl.name + '" is ' + tbl.name.length + ' chars (PostgreSQL max 63)') });
+        Validator.addResult(results, { level:'info', code:'I04', tableId:tbl.id, table:tbl.name, msg:_t('Tên bảng "' + tbl.name + '" dài ' + tbl.name.length + ' ký tự (PostgreSQL giới hạn 63)', 'Table name "' + tbl.name + '" is ' + tbl.name.length + ' chars (PostgreSQL max 63)') });
       }
       if((tbl.columns || []).length === 1){
-        Validator.addResult(results, { level:'warning', code:'W10', tableId:tbl.id, table:tbl.name, msg:_t('Bang "' + tbl.name + '" chi co 1 cot', 'Table "' + tbl.name + '" has only 1 column') });
+        Validator.addResult(results, { level:'warning', code:'W10', tableId:tbl.id, table:tbl.name, msg:_t('Bảng "' + tbl.name + '" chỉ có 1 cột', 'Table "' + tbl.name + '" has only 1 column') });
       }
       if((tbl.columns || []).some(function(col){ return col.primary_key && col.type === 'uuid'; }) && (tbl.columns || []).some(function(col){ return col.type === 'serial' || col.type === 'bigserial'; })){
-        Validator.addResult(results, { level:'info', code:'I06', tableId:tbl.id, table:tbl.name, msg:_t('Bang "' + tbl.name + '" dang tron UUID PK voi serial', 'Table "' + tbl.name + '" mixes UUID PK with serial') });
+        Validator.addResult(results, { level:'info', code:'I06', tableId:tbl.id, table:tbl.name, msg:_t('Bảng "' + tbl.name + '" đang trộn UUID PK với serial', 'Table "' + tbl.name + '" mixes UUID PK with serial') });
       }
     });
     (schema.relations || []).forEach(function(rel){
       var toTbl = findTable(rel.to_table_id);
       var toCol = findCol(rel.to_table_id, rel.to_col_id);
       if(!toTbl || !toCol){
-        Validator.addResult(results, { level:'error', code:'E02', tableId:rel.from_table_id, msg:_t('Relation bi hong: ' + (rel.name || rel.id), 'Broken relation: ' + (rel.name || rel.id)) });
+        Validator.addResult(results, { level:'error', code:'E02', tableId:rel.from_table_id, msg:_t('Relation bị hỏng: ' + (rel.name || rel.id), 'Broken relation: ' + (rel.name || rel.id)) });
       }
     });
     STORE.validation.results = results;
@@ -3271,9 +3421,9 @@ var SchemaLib = {
     var select = document.getElementById('ss-schema-select');
     var currentValue = STORE.currentDesignId || '';
     if(!select) return;
-    select.innerHTML = '<option value="">' + _esc(_t('-- Chon schema --', '-- Select schema --')) + '</option>' + (STORE.designs || []).map(function(item){
-      return '<option value="' + _esc(item.id) + '"' + (item.id === currentValue ? ' selected' : '') + '>' + _esc(item.name) + (item.isSystem ? ' [' + _esc(_t('He thong', 'System')) + ']' : '') + '</option>';
-    }).join('') + '<option value="__new__">+ ' + _esc(_t('Tao moi', 'Create new')) + '</option><option value="__load_live__">DB ' + _esc(_t('Load DB', 'Load DB')) + '</option>';
+    select.innerHTML = '<option value="">' + _esc(_t('-- Chọn schema --', '-- Select schema --')) + '</option>' + (STORE.designs || []).map(function(item){
+      return '<option value="' + _esc(item.id) + '"' + (item.id === currentValue ? ' selected' : '') + '>' + _esc(item.name) + (item.isSystem ? ' [' + _esc(_t('Hệ thống', 'System')) + ']' : '') + '</option>';
+    }).join('') + '<option value="__new__">+ ' + _esc(_t('Tạo mới', 'Create new')) + '</option><option value="__load_live__">DB ' + _esc(_t('Nạp từ DB', 'Load DB')) + '</option>';
   },
 
   onSelectChange: function(value){
@@ -3295,7 +3445,7 @@ var SchemaLib = {
   },
 
   createNew: function(){
-    var name = window.prompt(_t('Ten schema moi', 'New schema name'), 'schema_studio');
+    var name = window.prompt(_t('Tên schema mới', 'New schema name'), 'schema_studio');
     if(!name) return;
     STORE.schema = createBlankSchemaDoc(name);
     STORE.currentDesignId = STORE.schema._meta.id;
@@ -3307,7 +3457,7 @@ var SchemaLib = {
     Canvas.render();
     Browser.render();
     Inspector.close();
-    toast(_t('Da tao schema moi', 'Created new schema'), 'success');
+    toast(_t('Đã tạo schema mới', 'Created new schema'), 'success');
   },
 
   load: function(designId){
@@ -3351,9 +3501,9 @@ var SchemaLib = {
       clearDraft(STORE.currentDesignId);
       renderToolbar(refs.toolbar);
       SchemaLib.loadList();
-      toast(_t('Da luu schema', 'Schema saved'), 'success');
+      toast(_t('Đã lưu schema', 'Schema saved'), 'success');
     }).catch(function(err){
-      toast(_t('Khong luu duoc schema', 'Failed to save schema') + ': ' + (err.message || ''), 'error');
+      toast(_t('Không lưu được schema', 'Failed to save schema') + ': ' + (err.message || ''), 'error');
     });
   },
 
@@ -3374,11 +3524,11 @@ var SchemaLib = {
         Inspector.close();
         setTimeout(function(){ Canvas.zoomToFit(); }, 120);
         if(!silent){
-          toast(_t('Da nap schema he thong tu registry', 'Loaded system schema from registry'), 'success');
+          toast(_t('Đã nạp schema hệ thống từ registry', 'Loaded system schema from registry'), 'success');
         }
       }
     }).catch(function(err){
-      toast(_t('Khong nap duoc schema he thong', 'Failed to load system schema') + ': ' + (err.message || ''), 'error');
+      toast(_t('Không nạp được schema hệ thống', 'Failed to load system schema') + ': ' + (err.message || ''), 'error');
     });
   },
 
@@ -3393,10 +3543,10 @@ var SchemaLib = {
         Canvas.render();
         Browser.render();
         setTimeout(function(){ Canvas.zoomToFit(); }, 120);
-        toast(_t('Da load schema tu DB', 'Loaded schema from DB'), 'success');
+        toast(_t('Đã nạp schema từ DB', 'Loaded schema from DB'), 'success');
       }
     }).catch(function(err){
-      toast(_t('Khong reverse engineer duoc DB', 'Failed to reverse engineer DB') + ': ' + (err.message || ''), 'error');
+      toast(_t('Không reverse engineer được DB', 'Failed to reverse engineer DB') + ': ' + (err.message || ''), 'error');
     });
   }
 };
@@ -3422,9 +3572,9 @@ function switchMode(mode){
 function renderToolbar(container){
   if(!container) return;
   container.innerHTML = [
-    '<div class="ss-toolbar-left"><div class="ss-toolbar-title"><span>Schema Studio</span>' + (STORE.dirty ? '<span class="ss-dirty-badge">●</span>' : '') + '</div><select class="ss-schema-select" id="ss-schema-select" onchange="SchemaLib.onSelectChange(this.value)"></select></div>',
-    '<div class="ss-toolbar-center"><div class="ss-mode-tabs"><button class="ss-mode-tab' + (STORE.mode === 'canvas' ? ' active' : '') + '" onclick="switchMode(\'canvas\')">Canvas</button><button class="ss-mode-tab' + (STORE.mode === 'code' ? ' active' : '') + '" onclick="switchMode(\'code\')">Code</button><button class="ss-mode-tab' + (STORE.mode === 'validate' ? ' active' : '') + '" onclick="Validator.run()">Validate</button><button class="ss-mode-tab" onclick="MigGen.renderPreview()">Migration</button></div></div>',
-    '<div class="ss-toolbar-right"><span id="ss-toolbar-zoom">100%</span><button class="hm-btn hm-btn-ghost ss-btn-sm" onclick="Canvas.zoomReset()">Reset</button><button class="hm-btn hm-btn-ghost ss-btn-sm" onclick="CmdPalette.open()">Ctrl+K</button><button class="hm-btn hm-btn-ghost ss-btn-sm" onclick="Importer.openModal()">' + _esc(_t('Import', 'Import')) + '</button><button class="hm-btn hm-btn-ghost ss-btn-sm" onclick="MigGen.setBaseline()">' + _esc(_t('Baseline', 'Baseline')) + '</button><button class="hm-btn hm-btn-secondary ss-btn-sm" onclick="SchemaLib.save()">' + _esc(_t('Luu', 'Save')) + '</button><button class="hm-btn hm-btn-primary ss-btn-sm" onclick="CodePanel.open(\'sql\')">SQL</button></div>'
+    '<div class="ss-toolbar-left"><div class="ss-toolbar-title"><span>Schema Studio</span>' + (STORE.dirty ? '<span class="ss-dirty-badge">●</span>' : '') + '</div><button class="hm-btn hm-btn-ghost ss-btn-sm ss-toolbar-panel-btn' + (STORE.browser.open ? '' : ' is-collapsed') + '" onclick="Browser.toggleOpen()" title="' + _esc(_t('Ẩn/hiện thanh trình duyệt (B)', 'Toggle schema browser (B)')) + '" aria-label="' + _esc(_t('Ẩn hoặc hiện thanh trình duyệt', 'Toggle schema browser')) + '"><span class="ss-toolbar-panel-icon">' + (STORE.browser.open ? '◂' : '▸') + '</span>' + _esc(_t('Trình duyệt', 'Browser')) + '</button><select class="ss-schema-select" id="ss-schema-select" onchange="SchemaLib.onSelectChange(this.value)"></select></div>',
+    '<div class="ss-toolbar-center"><div class="ss-mode-tabs"><button class="ss-mode-tab' + (STORE.mode === 'canvas' ? ' active' : '') + '" onclick="switchMode(\'canvas\')">' + _esc(_t('Sơ đồ', 'Canvas')) + '</button><button class="ss-mode-tab' + (STORE.mode === 'code' ? ' active' : '') + '" onclick="switchMode(\'code\')">' + _esc(_t('Mã', 'Code')) + '</button><button class="ss-mode-tab' + (STORE.mode === 'validate' ? ' active' : '') + '" onclick="Validator.run()">' + _esc(_t('Kiểm tra', 'Validate')) + '</button><button class="ss-mode-tab" onclick="MigGen.renderPreview()">' + _esc(_t('Di trú', 'Migration')) + '</button></div></div>',
+    '<div class="ss-toolbar-right"><span id="ss-toolbar-zoom">100%</span><button class="hm-btn hm-btn-ghost ss-btn-sm" onclick="Canvas.zoomReset()">' + _esc(_t('Đặt lại', 'Reset')) + '</button><button class="hm-btn hm-btn-ghost ss-btn-sm" onclick="CmdPalette.open()">Ctrl+K</button><button class="hm-btn hm-btn-ghost ss-btn-sm" onclick="Importer.openModal()">' + _esc(_t('Nhập', 'Import')) + '</button><button class="hm-btn hm-btn-ghost ss-btn-sm" onclick="MigGen.setBaseline()">' + _esc(_t('Mốc gốc', 'Baseline')) + '</button><button class="hm-btn hm-btn-secondary ss-btn-sm" onclick="SchemaLib.save()">' + _esc(_t('Lưu', 'Save')) + '</button><button class="hm-btn hm-btn-primary ss-btn-sm" onclick="CodePanel.open(\'sql\')">SQL</button></div>'
   ].join('');
   SchemaLib.renderSelector();
 }
@@ -3432,7 +3582,7 @@ function renderToolbar(container){
 function renderShell(){
   if(!refs.page) return;
   refs.page.innerHTML = [
-    '<div class="ss-root' + (STORE.codePanel.open ? ' code-open' : '') + '">',
+    '<div class="ss-root' + (STORE.codePanel.open ? ' code-open' : '') + (STORE.browser.open ? '' : ' browser-collapsed') + '">',
       '<div class="ss-toolbar" id="ss-toolbar"></div>',
       '<div class="ss-browser" id="ss-browser"></div>',
       '<div class="ss-canvas-wrap" id="ss-canvas-wrap"></div>',
@@ -3482,6 +3632,11 @@ function bindKeyboard(){
     if(ctrl && ev.key.toLowerCase() === 'k'){
       ev.preventDefault();
       CmdPalette.open();
+      return;
+    }
+    if(!ctrl && !inEditable && ev.key.toLowerCase() === 'b'){
+      ev.preventDefault();
+      Browser.toggleOpen();
       return;
     }
     if(ctrl && ev.key.toLowerCase() === 's'){
@@ -3584,8 +3739,9 @@ function bindKeyboard(){
 function init(page){
   refs.page = page || document.getElementById(PAGE_ID);
   if(!refs.page) return;
+  applyUiPrefs(loadUiPrefs());
   if(!STORE.schema){
-    STORE.schema = createBlankSchemaDoc(_t('Workspace schema', 'Workspace schema'));
+    STORE.schema = createBlankSchemaDoc(_t('Schema làm việc', 'Workspace schema'));
   }
   renderShell();
   bindKeyboard();
