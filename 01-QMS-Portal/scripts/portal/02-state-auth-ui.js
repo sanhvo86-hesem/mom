@@ -2143,8 +2143,8 @@ function renderDashboard(){
       <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:6px;font-size:12px">
         <div style="padding:10px;border:1px solid #dcfce7;border-radius:8px;background:#f0fdf4;text-align:center;min-width:0"><div style="font-size:10px;color:#166534;font-weight:600;text-transform:uppercase">OTD</div><div style="font-size:18px;font-weight:700;color:#16a34a;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'On-Time Delivery':'Giao hàng đúng hạn'}</div><div style="font-size:9px;color:#999;margin-top:2px">≥ 95%</div></div>
         <div style="padding:10px;border:1px solid #dbeafe;border-radius:8px;background:#eff6ff;text-align:center;min-width:0"><div style="font-size:10px;color:#1e40af;font-weight:600;text-transform:uppercase">FPY</div><div style="font-size:18px;font-weight:700;color:#2563eb;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'First Pass Yield':'Tỷ lệ đạt lần đầu'}</div><div style="font-size:9px;color:#999;margin-top:2px">≥ 98%</div></div>
-        <div style="padding:10px;border:1px solid #fef3c7;border-radius:8px;background:#fffbeb;text-align:center;min-width:0"><div style="font-size:10px;color:#92400e;font-weight:600;text-transform:uppercase">COPQ</div><div style="font-size:18px;font-weight:700;color:#d97706;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'Cost of Poor Quality':'Chi phí CL kém'}</div><div style="font-size:9px;color:#999;margin-top:2px">≤ 2%</div></div>
-        <div style="padding:10px;border:1px solid #fee2e2;border-radius:8px;background:#fef2f2;text-align:center;min-width:0"><div style="font-size:10px;color:#991b1b;font-weight:600;text-transform:uppercase">NCR</div><div style="font-size:18px;font-weight:700;color:#dc2626;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'Open NCRs':'NCR đang mở'}</div><div style="font-size:9px;color:#999;margin-top:2px">= 0</div></div>
+        <div style="padding:10px;border:1px solid #fef3c7;border-radius:8px;background:#fffbeb;text-align:center;min-width:0"><div style="font-size:10px;color:var(--amber);font-weight:600;text-transform:uppercase">COPQ</div><div style="font-size:18px;font-weight:700;color:#d97706;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'Cost of Poor Quality':'Chi phí CL kém'}</div><div style="font-size:9px;color:#999;margin-top:2px">≤ 2%</div></div>
+        <div style="padding:10px;border:1px solid #fee2e2;border-radius:8px;background:#fef2f2;text-align:center;min-width:0"><div style="font-size:10px;color:var(--red);font-weight:600;text-transform:uppercase">NCR</div><div style="font-size:18px;font-weight:700;color:#dc2626;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'Open NCRs':'NCR đang mở'}</div><div style="font-size:9px;color:#999;margin-top:2px">= 0</div></div>
         <div style="padding:10px;border:1px solid #f3e8ff;border-radius:8px;background:#faf5ff;text-align:center;min-width:0"><div style="font-size:10px;color:#6b21a8;font-weight:600;text-transform:uppercase">IQC Pass</div><div style="font-size:18px;font-weight:700;color:#7c3aed;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'IQC Pass Rate':'Tỷ lệ đạt IQC'}</div><div style="font-size:9px;color:#999;margin-top:2px">≥ 99%</div></div>
         <div style="padding:10px;border:1px solid #e0f2fe;border-radius:8px;background:#f0f9ff;text-align:center;min-width:0"><div style="font-size:10px;color:#075985;font-weight:600;text-transform:uppercase">OEE</div><div style="font-size:18px;font-weight:700;color:#0284c7;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'Equipment Effectiveness':'Hiệu suất thiết bị'}</div><div style="font-size:9px;color:#999;margin-top:2px">≥ 85%</div></div>
         <div style="padding:10px;border:1px solid #dbeafe;border-radius:8px;background:#eff6ff;text-align:center;min-width:0"><div style="font-size:10px;color:#1e3a5f;font-weight:600;text-transform:uppercase">ENG FTR</div><div style="font-size:18px;font-weight:700;color:#1565c0;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'Eng First-Time-Right':'KT đúng lần đầu'}</div><div style="font-size:9px;color:#999;margin-top:2px">≥ 95%</div></div>
@@ -2825,28 +2825,28 @@ function confirmDeleteDoc(code, title){
   modal.id='delete-confirm-modal';
   modal.innerHTML=`
     <div class="modal" style="max-width:460px">
-      <div class="modal-header" style="background:#fef2f2;border-bottom:1px solid #fecaca">
-        <h3 style="color:#dc2626;font-size:16px;display:flex;align-items:center;gap:8px">🗑️ ${vi?'Xóa tài liệu':'Delete Document'}</h3>
+      <div class="modal-header" style="background:color-mix(in srgb, var(--red) 10%, var(--bg-surface,#fff));border-bottom:1px solid color-mix(in srgb, var(--red) 24%, var(--border))">
+        <h3 style="color:var(--red);font-size:16px;display:flex;align-items:center;gap:8px">🗑️ ${vi?'Xóa tài liệu':'Delete Document'}</h3>
         <button class="icon-btn" onclick="document.getElementById('delete-confirm-modal')?.remove()">✕</button>
       </div>
       <div style="padding:20px">
-        <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px;margin-bottom:16px;display:flex;gap:10px;align-items:start">
+        <div style="background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 24%, var(--border));border-radius:8px;padding:12px;margin-bottom:16px;display:flex;gap:10px;align-items:start">
           <span style="font-size:20px;flex-shrink:0">⚠️</span>
-          <div style="font-size:13px;color:#92400e;line-height:1.5">
+          <div style="font-size:13px;color:var(--amber);line-height:1.5">
             ${vi?'Bạn đang xóa tài liệu:':'You are about to delete:'}
-            <div style="margin-top:6px;font-weight:700;color:#1e293b">${code} — ${title||'(untitled)'}</div>
-            <div style="margin-top:8px;font-size:12px;color:#78716c">${vi?'Tài liệu sẽ được chuyển vào thư mục <b>_Deleted</b> và có thể khôi phục bởi Admin.':'The document will be moved to <b>_Deleted</b> folder and can be recovered by Admin.'}</div>
+            <div style="margin-top:6px;font-weight:700;color:var(--text-primary)">${code} — ${title||'(untitled)'}</div>
+            <div style="margin-top:8px;font-size:12px;color:var(--text-secondary)">${vi?'Tài liệu sẽ được chuyển vào thư mục <b>_Deleted</b> và có thể khôi phục bởi Admin.':'The document will be moved to <b>_Deleted</b> folder and can be recovered by Admin.'}</div>
           </div>
         </div>
         <div style="margin-bottom:12px">
-          <label style="font-size:12px;font-weight:600;color:#dc2626;display:flex;align-items:center;gap:6px">
-            <input type="checkbox" id="del-confirm-check" style="width:16px;height:16px;accent-color:#dc2626">
+          <label style="font-size:12px;font-weight:600;color:var(--red);display:flex;align-items:center;gap:6px">
+            <input type="checkbox" id="del-confirm-check" style="width:16px;height:16px;accent-color:var(--red)">
             ${vi?'Tôi xác nhận muốn xóa tài liệu này':'I confirm I want to delete this document'}
           </label>
         </div>
         <div style="display:flex;gap:10px;justify-content:flex-end">
           <button class="btn-admin secondary" onclick="document.getElementById('delete-confirm-modal')?.remove()">${vi?'Hủy':'Cancel'}</button>
-          <button class="btn-admin" id="del-confirm-btn" disabled style="background:#dc2626;color:#fff;opacity:.5;cursor:not-allowed" onclick="executeDeleteDoc('${escapeHtml(code)}')">🗑️ ${vi?'Xóa vĩnh viễn':'Delete'}</button>
+          <button class="btn-admin" id="del-confirm-btn" disabled style="background:var(--red);color:var(--text-inverse,#fff);opacity:.5;cursor:not-allowed" onclick="executeDeleteDoc('${escapeHtml(code)}')">🗑️ ${vi?'Xóa vĩnh viễn':'Delete'}</button>
         </div>
       </div>
     </div>`;
@@ -2912,43 +2912,43 @@ function confirmDeleteFolder(folderPath, folderKey){
   modal.id='delete-confirm-modal';
   modal.innerHTML=`
     <div class="modal" style="max-width:480px">
-      <div class="modal-header" style="background:#fef2f2;border-bottom:1px solid #fecaca">
-        <h3 style="color:#dc2626;font-size:16px;display:flex;align-items:center;gap:8px">🗑️ ${vi?'Xóa folder':'Delete Folder'}</h3>
+      <div class="modal-header" style="background:color-mix(in srgb, var(--red) 10%, var(--bg-surface,#fff));border-bottom:1px solid color-mix(in srgb, var(--red) 24%, var(--border))">
+        <h3 style="color:var(--red);font-size:16px;display:flex;align-items:center;gap:8px">🗑️ ${vi?'Xóa folder':'Delete Folder'}</h3>
         <button class="icon-btn" onclick="document.getElementById('delete-confirm-modal')?.remove()">✕</button>
       </div>
       <div style="padding:20px">
-        <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px;margin-bottom:16px">
+        <div style="background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 24%, var(--border));border-radius:8px;padding:12px;margin-bottom:16px">
           <div style="display:flex;gap:10px;align-items:start">
             <span style="font-size:20px;flex-shrink:0">⚠️</span>
-            <div style="font-size:13px;color:#92400e;line-height:1.5">
+            <div style="font-size:13px;color:var(--amber);line-height:1.5">
               ${vi?'Bạn đang xóa folder:':'You are about to delete folder:'}
-              <div style="margin-top:6px;font-weight:700;color:#1e293b;font-size:15px">📁 ${label}</div>
-              <div style="margin-top:4px;font-size:11px;color:#a8a29e;font-family:monospace">${folderPath}</div>
+              <div style="margin-top:6px;font-weight:700;color:var(--text-primary);font-size:15px">📁 ${label}</div>
+              <div style="margin-top:4px;font-size:11px;color:var(--text-secondary);font-family:monospace">${folderPath}</div>
             </div>
           </div>
           ${fileCount>0||subCount>0?`
-          <div style="margin-top:12px;padding:10px;background:#fef2f2;border:1px solid #fecaca;border-radius:6px">
-            <div style="font-size:12px;color:#dc2626;font-weight:600">${vi?'⚠️ Cảnh báo: Folder này chứa dữ liệu!':'⚠️ Warning: This folder contains data!'}</div>
-            <div style="font-size:12px;color:#991b1b;margin-top:4px">${fileCount>0?`• ${fileCount} ${vi?'tài liệu':'document(s)'}`:''} ${subCount>0?`• ${subCount} ${vi?'folder con':'subfolder(s)'}`:''}</div>
-            <div style="font-size:11px;color:#78716c;margin-top:4px">${vi?'Tất cả sẽ được chuyển vào _Deleted':'All will be moved to _Deleted'}</div>
+          <div style="margin-top:12px;padding:10px;background:color-mix(in srgb, var(--red) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--red) 24%, var(--border));border-radius:6px">
+            <div style="font-size:12px;color:var(--red);font-weight:600">${vi?'⚠️ Cảnh báo: Folder này chứa dữ liệu!':'⚠️ Warning: This folder contains data!'}</div>
+            <div style="font-size:12px;color:var(--red);margin-top:4px">${fileCount>0?`• ${fileCount} ${vi?'tài liệu':'document(s)'}`:''} ${subCount>0?`• ${subCount} ${vi?'folder con':'subfolder(s)'}`:''}</div>
+            <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">${vi?'Tất cả sẽ được chuyển vào _Deleted':'All will be moved to _Deleted'}</div>
           </div>`:''}
         </div>
         <div style="margin-bottom:12px">
-          <label style="font-size:12px;font-weight:600;color:#dc2626;display:flex;align-items:center;gap:6px">
-            <input type="checkbox" id="del-confirm-check" style="width:16px;height:16px;accent-color:#dc2626">
+          <label style="font-size:12px;font-weight:600;color:var(--red);display:flex;align-items:center;gap:6px">
+            <input type="checkbox" id="del-confirm-check" style="width:16px;height:16px;accent-color:var(--red)">
             ${vi?'Tôi xác nhận muốn xóa folder này':'I confirm I want to delete this folder'}
           </label>
         </div>
         ${fileCount>0?`
         <div style="margin-bottom:12px">
-          <label style="font-size:12px;font-weight:600;color:#dc2626;display:flex;align-items:center;gap:6px">
-            <input type="checkbox" id="del-confirm-check2" style="width:16px;height:16px;accent-color:#dc2626">
+          <label style="font-size:12px;font-weight:600;color:var(--red);display:flex;align-items:center;gap:6px">
+            <input type="checkbox" id="del-confirm-check2" style="width:16px;height:16px;accent-color:var(--red)">
             ${vi?'Tôi hiểu rằng '+fileCount+' tài liệu bên trong cũng sẽ bị xóa':'I understand that '+fileCount+' documents inside will also be deleted'}
           </label>
         </div>`:''}
         <div style="display:flex;gap:10px;justify-content:flex-end">
           <button class="btn-admin secondary" onclick="document.getElementById('delete-confirm-modal')?.remove()">${vi?'Hủy':'Cancel'}</button>
-          <button class="btn-admin" id="del-confirm-btn" disabled style="background:#dc2626;color:#fff;opacity:.5;cursor:not-allowed" onclick="executeDeleteFolder('${escapeHtml(folderPath)}')">🗑️ ${vi?'Xóa folder':'Delete folder'}</button>
+          <button class="btn-admin" id="del-confirm-btn" disabled style="background:var(--red);color:var(--text-inverse,#fff);opacity:.5;cursor:not-allowed" onclick="executeDeleteFolder('${escapeHtml(folderPath)}')">🗑️ ${vi?'Xóa folder':'Delete folder'}</button>
         </div>
       </div>
     </div>`;
@@ -5802,7 +5802,7 @@ function renderAdminManualRuntime(){
                   <td style="padding:10px">${escapeHtml(row.status || '-')}</td>
                   <td style="padding:10px;color:#52667a">${escapeHtml(adminFormatRuntimeStamp(row.updated_at))}</td>
                 </tr>
-              `).join('') : `<tr><td colspan="5" style="padding:14px;color:#64748b">${lang==='en'?'No SO / JO / WO records yet.':'Chưa có SO / JO / WO nào được tạo.'}</td></tr>`}
+              `).join('') : `<tr><td colspan="5" style="padding:14px;color:var(--text-secondary)">${lang==='en'?'No SO / JO / WO records yet.':'Chưa có SO / JO / WO nào được tạo.'}</td></tr>`}
             </tbody>
           </table>
         </div>
@@ -6384,13 +6384,13 @@ async function deleteUserConfirm(userId){
       </div>
       <div class="modal-body" style="padding:20px 24px;display:flex;flex-direction:column;gap:12px">
         <div style="font-size:12px;color:var(--text-2);margin-bottom:4px">@${escapeHtml(u.username)} · ${escapeHtml(u.dept)} · ${escapeHtml(u.title)}</div>
-        <button onclick="doSoftDeleteUser('${u.id}')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:2px solid #fde68a;border-radius:10px;cursor:pointer;background:#fffbeb;text-align:left;width:100%;font-family:var(--font);transition:all .15s" onmouseover="this.style.borderColor='#fbbf24'" onmouseout="this.style.borderColor='#fde68a'">
+        <button onclick="doSoftDeleteUser('${u.id}')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:2px solid color-mix(in srgb, var(--amber) 28%, var(--border));border-radius:10px;cursor:pointer;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));text-align:left;width:100%;font-family:var(--font);transition:all .15s" onmouseover="this.style.borderColor='var(--amber)'" onmouseout="this.style.borderColor='color-mix(in srgb, var(--amber) 28%, var(--border))'">
           <span style="font-size:22px">⏸</span>
-          <div><div style="font-size:13px;font-weight:700;color:#92400e">${lang==='en'?'Deactivate (Soft delete)':'Vô hiệu hóa (Xóa mềm)'}</div><div style="font-size:11px;color:#a16207;margin-top:2px">${lang==='en'?'User becomes inactive but data is preserved. Can be reactivated later.':'Người dùng bị khóa nhưng dữ liệu được giữ lại. Có thể kích hoạt lại sau.'}</div></div>
+          <div><div style="font-size:13px;font-weight:700;color:var(--amber)">${lang==='en'?'Deactivate (Soft delete)':'Vô hiệu hóa (Xóa mềm)'}</div><div style="font-size:11px;color:color-mix(in srgb, var(--amber) 72%, var(--text-secondary));margin-top:2px">${lang==='en'?'User becomes inactive but data is preserved. Can be reactivated later.':'Người dùng bị khóa nhưng dữ liệu được giữ lại. Có thể kích hoạt lại sau.'}</div></div>
         </button>
-        <button onclick="doHardDeleteUser('${u.id}','${escapeHtml(u.username)}','${escapeHtml(u.name)}')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:2px solid #fecaca;border-radius:10px;cursor:pointer;background:#fef2f2;text-align:left;width:100%;font-family:var(--font);transition:all .15s" onmouseover="this.style.borderColor='#f87171'" onmouseout="this.style.borderColor='#fecaca'">
+        <button onclick="doHardDeleteUser('${u.id}','${escapeHtml(u.username)}','${escapeHtml(u.name)}')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:2px solid color-mix(in srgb, var(--red) 28%, var(--border));border-radius:10px;cursor:pointer;background:color-mix(in srgb, var(--red) 10%, var(--bg-surface,#fff));text-align:left;width:100%;font-family:var(--font);transition:all .15s" onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='color-mix(in srgb, var(--red) 28%, var(--border))'">
           <span style="font-size:22px">🗑</span>
-          <div><div style="font-size:13px;font-weight:700;color:#991b1b">${lang==='en'?'Delete permanently':'Xóa hoàn toàn'}</div><div style="font-size:11px;color:#b91c1c;margin-top:2px">${lang==='en'?'Completely removes the user from the system. This action cannot be undone.':'Xóa hoàn toàn người dùng khỏi hệ thống. Hành động này không thể hoàn tác.'}</div></div>
+          <div><div style="font-size:13px;font-weight:700;color:var(--red)">${lang==='en'?'Delete permanently':'Xóa hoàn toàn'}</div><div style="font-size:11px;color:color-mix(in srgb, var(--red) 72%, var(--text-secondary));margin-top:2px">${lang==='en'?'Completely removes the user from the system. This action cannot be undone.':'Xóa hoàn toàn người dùng khỏi hệ thống. Hành động này không thể hoàn tác.'}</div></div>
         </button>
       </div>
     </div>`;

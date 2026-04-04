@@ -200,13 +200,13 @@ function showFilteredDocs(filter){
       var cat=CATEGORIES.find(function(c){return c.id===ru.doc.cat;});
       var daysDiff=Math.floor((new Date()-ru.dateObj)/(1000*60*60*24));
       var daysText=daysDiff===0?(lang==='en'?'Today':'Hôm nay'):(daysDiff+(lang==='en'?' days ago':' ngày trước'));
-      var typeBadge=ru.updateType?('<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;'+(ru.updateType==='major'?'background:#fee2e2;color:#dc2626':'background:#dcfce7;color:#16a34a')+'">'+(ru.updateType==='major'?'MAJOR':'MINOR')+'</span>'):'';
+      var typeBadge=ru.updateType?('<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;'+(ru.updateType==='major'?'background:color-mix(in srgb, var(--red) 12%, var(--bg-surface,#fff));color:var(--red)':'background:color-mix(in srgb, var(--green) 12%, var(--bg-surface,#fff));color:var(--green)')+'">'+(ru.updateType==='major'?'MAJOR':'MINOR')+'</span>'):'';
       return '<tr style="cursor:pointer" onclick="closeFilterModal();openDoc(\''+ru.doc.code+'\')">'
         +'<td style="font-weight:600;color:#1565c0;white-space:nowrap">'+ru.doc.code+'</td>'
         +'<td>'+ru.doc.title+'</td>'
-        +'<td><span style="font-family:var(--mono);font-weight:700;color:#059669">'+ru.version+'</span> '+typeBadge+'</td>'
+        +'<td><span style="font-family:var(--mono);font-weight:700;color:var(--green)">'+ru.version+'</span> '+typeBadge+'</td>'
         +'<td>'+ru.date+'</td>'
-        +'<td>'+ru.user+(ru.submittedBy?' <span style="color:#94a3b8;font-size:10px">(📤 '+ru.submittedBy+')</span>':'')+'</td>'
+        +'<td>'+ru.user+(ru.submittedBy?' <span style="color:var(--text-tertiary);font-size:10px">(📤 '+ru.submittedBy+')</span>':'')+'</td>'
         +'<td style="color:#6b7280;font-size:10px;font-weight:600">'+daysText+'</td>'
         +'</tr>';
     }).join('');
@@ -223,9 +223,9 @@ function showFilteredDocs(filter){
       +'</div>'
       +'<div style="overflow-y:auto;max-height:calc(80vh - 70px);padding:0">'
       +(recentEntries.length===0
-        ?'<div style="padding:40px;text-align:center;color:#94a3b8;font-size:13px">'+(lang==='en'?'No documents updated in the last 30 days':'Không có tài liệu nào được cập nhật trong 30 ngày qua')+'</div>'
+        ?'<div style="padding:40px;text-align:center;color:var(--text-tertiary);font-size:13px">'+(lang==='en'?'No documents updated in the last 30 days':'Không có tài liệu nào được cập nhật trong 30 ngày qua')+'</div>'
         :'<table style="width:100%;border-collapse:collapse;font-size:12px">'
-        +'<thead><tr style="background:#f0fdf4"><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:#059669;text-transform:uppercase;border-bottom:2px solid #d1fae5">Code</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:#059669;text-transform:uppercase;border-bottom:2px solid #d1fae5">'+T('title_label')+'</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:#059669;text-transform:uppercase;border-bottom:2px solid #d1fae5">Version</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:#059669;text-transform:uppercase;border-bottom:2px solid #d1fae5">'+thApproved+'</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:#059669;text-transform:uppercase;border-bottom:2px solid #d1fae5">'+thApprover+'</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:#059669;text-transform:uppercase;border-bottom:2px solid #d1fae5">'+thTime+'</th></tr></thead>'
+        +'<thead><tr style="background:color-mix(in srgb, var(--green) 10%, var(--bg-surface,#fff))"><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;border-bottom:2px solid color-mix(in srgb, var(--green) 24%, var(--border))">Code</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;border-bottom:2px solid color-mix(in srgb, var(--green) 24%, var(--border))">'+T('title_label')+'</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;border-bottom:2px solid color-mix(in srgb, var(--green) 24%, var(--border))">Version</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;border-bottom:2px solid color-mix(in srgb, var(--green) 24%, var(--border))">'+thApproved+'</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;border-bottom:2px solid color-mix(in srgb, var(--green) 24%, var(--border))">'+thApprover+'</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;border-bottom:2px solid color-mix(in srgb, var(--green) 24%, var(--border))">'+thTime+'</th></tr></thead>'
         +'<tbody>'+recentRows+'</tbody></table>'
       )
       +'</div></div>';
@@ -243,7 +243,7 @@ function showFilteredDocs(filter){
     var submitterInfo='';
     if(filter==='review' && state && state.submittedBy){
       var sb=state.submittedBy;
-      var utBadge=sb.updateType?(' <span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:700;'+(sb.updateType==='major'?'background:#fee2e2;color:#dc2626':'background:#dcfce7;color:#16a34a')+'">'+(sb.updateType==='major'?'MAJ':'MIN')+'</span>'):'';
+      var utBadge=sb.updateType?(' <span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:700;'+(sb.updateType==='major'?'background:color-mix(in srgb, var(--red) 12%, var(--bg-surface,#fff));color:var(--red)':'background:color-mix(in srgb, var(--green) 12%, var(--bg-surface,#fff));color:var(--green)')+'">'+(sb.updateType==='major'?'MAJ':'MIN')+'</span>'):'';
       submitterInfo='<div style="font-size:10px;color:var(--text-secondary);margin-top:1px">📤 '+sb.name+' · '+sb.date+utBadge+'</div>';
     }
     if(filter==='approved' && state && state.approvedBy){
@@ -586,11 +586,11 @@ function renderAdminRetention(){
         }).join('')}
       </tbody>
     </table>
-    <div style="margin-top:16px;padding:12px 16px;background:${totalDeletable>0?'#fefce8':'#f0fdf4'};border:1px solid ${totalDeletable>0?'#fde68a':'#bbf7d0'};border-radius:8px;display:flex;align-items:center;gap:12px">
+    <div style="margin-top:16px;padding:12px 16px;background:${totalDeletable>0?'color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff))':'color-mix(in srgb, var(--green) 10%, var(--bg-surface,#fff))'};border:1px solid ${totalDeletable>0?'color-mix(in srgb, var(--amber) 24%, var(--border))':'color-mix(in srgb, var(--green) 24%, var(--border))'};border-radius:8px;display:flex;align-items:center;gap:12px">
       <span style="font-size:24px">${totalDeletable>0?'🗑':'✅'}</span>
       <div style="flex:1">
-        <div style="font-size:12px;font-weight:700;color:${totalDeletable>0?'#92400e':'#166534'}">${lang==='en'?'Deletable Versions':'Phiên bản có thể xóa'}: <span style="font-size:16px">${totalDeletable}</span></div>
-        <div style="font-size:10px;color:${totalDeletable>0?'#a16207':'#15803d'};margin-top:2px">${totalDeletable>0?(lang==='en'?'Obsolete versions past retention period. Delete via DCR record or Purge All below.':'Phiên bản lỗi thời đã quá hạn. Xóa qua Lịch sử phiên bản hoặc Xóa tất cả.'):(lang==='en'?'No versions eligible for deletion.':'Không có phiên bản nào đủ điều kiện xóa.')}</div>
+        <div style="font-size:12px;font-weight:700;color:${totalDeletable>0?'var(--amber)':'var(--green)'}">${lang==='en'?'Deletable Versions':'Phiên bản có thể xóa'}: <span style="font-size:16px">${totalDeletable}</span></div>
+        <div style="font-size:10px;color:${totalDeletable>0?'color-mix(in srgb, var(--amber) 80%, var(--text-secondary))':'color-mix(in srgb, var(--green) 80%, var(--text-secondary))'};margin-top:2px">${totalDeletable>0?(lang==='en'?'Obsolete versions past retention period. Delete via DCR record or Purge All below.':'Phiên bản lỗi thời đã quá hạn. Xóa qua Lịch sử phiên bản hoặc Xóa tất cả.'):(lang==='en'?'No versions eligible for deletion.':'Không có phiên bản nào đủ điều kiện xóa.')}</div>
       </div>
       ${totalDeletable>0?'<button class="btn-admin danger" onclick="bulkDeleteExpired()" style="flex-shrink:0">🗑 '+(lang==='en'?'Purge All Expired':'Xóa tất cả hết hạn')+'</button>':''}
     </div>
@@ -635,30 +635,30 @@ function renderVersionHistory(doc){
           }
           // Show last review submission
           if(st.submittedBy && st.submittedBy.name){
-            summaryHtml+='<div style="padding:6px 12px;font-size:10px;color:var(--text-link);border-bottom:1px solid var(--border);background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff))">📤 '+(lang==='en'?'Last review submission':'Gửi xem xét cuối cùng')+': <b>'+st.submittedBy.name+'</b>'+(st.submittedBy.date?' · '+st.submittedBy.date:'')+(st.submittedBy.updateType?(' <span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;'+(st.submittedBy.updateType==='major'?'background:#fee2e2;color:#dc2626':'background:#dcfce7;color:#16a34a')+'">'+(st.submittedBy.updateType==='major'?'MAJOR':'MINOR')+'</span>'):'')+'</div>';
+            summaryHtml+='<div style="padding:6px 12px;font-size:10px;color:var(--text-link);border-bottom:1px solid var(--border);background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff))">📤 '+(lang==='en'?'Last review submission':'Gửi xem xét cuối cùng')+': <b>'+st.submittedBy.name+'</b>'+(st.submittedBy.date?' · '+st.submittedBy.date:'')+(st.submittedBy.updateType?(' <span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;'+(st.submittedBy.updateType==='major'?'background:color-mix(in srgb, var(--red) 12%, var(--bg-surface,#fff));color:var(--red)':'background:color-mix(in srgb, var(--green) 12%, var(--bg-surface,#fff));color:var(--green)')+'">'+(st.submittedBy.updateType==='major'?'MAJOR':'MINOR')+'</span>'):'')+'</div>';
           }
           return summaryHtml;
         })()}
         ${versions.length===0
-          ?'<div style="padding:16px;text-align:center;font-size:11px;color:#94a3b8">'+T('wf_no_history')+'</div>'
+          ?'<div style="padding:16px;text-align:center;font-size:11px;color:var(--text-tertiary)">'+T('wf_no_history')+'</div>'
           :versions.map((v,i)=>`
             <div class="vh-entry ${isCurrentVersionEntry(doc,v)?'vh-current':''} ${versionHasAccess(doc,v)?'vh-clickable':''}" ${versionHasAccess(doc,v)?'onclick="openVersionPreview(\''+doc.code+'\','+i+')"':''}>
               <div class="vh-dot ${v.status}"></div>
               <div class="vh-info">
                 <span class="ver">${v.version}</span>
                 <span style="color:${statusColor(v.status)};font-size:10px;font-weight:600;margin-left:6px">${statusLabel(v.status)}</span>
-                ${v.updateType?'<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;margin-left:4px;'+(v.updateType==='major'?'background:#fee2e2;color:#dc2626':'background:#dcfce7;color:#16a34a')+'">'+(v.updateType==='major'?'MAJOR':'MINOR')+'</span>':''}
-                ${isCurrentVersionEntry(doc,v)?'<span style="background:#dcfce7;color:#16a34a;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;font-weight:700">'+T('wf_current')+'</span>':''}
-                ${versionHasAccess(doc,v)?'<span style="font-size:9px;color:#1565c0;margin-left:4px;cursor:pointer" title="'+(lang==='en'?(isWorkbook?'Click to download':'Click to view'):(isWorkbook?'Nhấn để tải':'Nhấn để xem'))+'">'+(isWorkbook?'⬇':'👁')+' '+(lang==='en'?(isWorkbook?'Download':'View'):(isWorkbook?'Tải':'Xem'))+'</span>':''}
+                ${v.updateType?'<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;margin-left:4px;'+(v.updateType==='major'?'background:color-mix(in srgb, var(--red) 12%, var(--bg-surface,#fff));color:var(--red)':'background:color-mix(in srgb, var(--green) 12%, var(--bg-surface,#fff));color:var(--green)')+'">'+(v.updateType==='major'?'MAJOR':'MINOR')+'</span>':''}
+                ${isCurrentVersionEntry(doc,v)?'<span style="background:color-mix(in srgb, var(--green) 12%, var(--bg-surface,#fff));color:var(--green);font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;font-weight:700">'+T('wf_current')+'</span>':''}
+                ${versionHasAccess(doc,v)?'<span style="font-size:9px;color:var(--text-link);margin-left:4px;cursor:pointer" title="'+(lang==='en'?(isWorkbook?'Click to download':'Click to view'):(isWorkbook?'Nhấn để tải':'Nhấn để xem'))+'">'+(isWorkbook?'⬇':'👁')+' '+(lang==='en'?(isWorkbook?'Download':'View'):(isWorkbook?'Tải':'Xem'))+'</span>':''}
                 <div class="date">${v.date}</div>
                 <div class="who">${v.user} — ${v.role}</div>
-                ${v.submittedBy?'<div style="font-size:10px;color:#0369a1;margin-top:2px">📤 '+(lang==='en'?'Submitted by':'Gửi bởi')+': '+v.submittedBy+(v.submittedDate?' · '+v.submittedDate:'')+'</div>':''}
+                ${v.submittedBy?'<div style="font-size:10px;color:var(--text-link);margin-top:2px">📤 '+(lang==='en'?'Submitted by':'Gửi bởi')+': '+v.submittedBy+(v.submittedDate?' · '+v.submittedDate:'')+'</div>':''}
                 ${v.lastEditBy?'<div style="font-size:10px;color:var(--text-secondary);margin-top:2px">✏️ '+(lang==='en'?'Last editor':'Người chỉnh sửa cuối')+': '+v.lastEditBy+(v.lastEditRole?' — '+v.lastEditRole:'')+(v.lastEditDate?' · '+v.lastEditDate:'')+'</div>':''}
-                ${v.approvedBy?'<div style="font-size:10px;color:#16a34a;margin-top:2px">✅ '+(lang==='en'?'Approved by':'Duyệt bởi')+': '+v.approvedBy+(v.approvedDate?' · '+v.approvedDate:'')+'</div>':''}
+                ${v.approvedBy?'<div style="font-size:10px;color:var(--green);margin-top:2px">✅ '+(lang==='en'?'Approved by':'Duyệt bởi')+': '+v.approvedBy+(v.approvedDate?' · '+v.approvedDate:'')+'</div>':''}
                 ${v.note?'<div class="note">"'+v.note+'"</div>':''}
               </div>
               ${!isWorkbook && i>0 && versionHasAccess(doc,v) && canEdit({code:doc.code})?'<button class="vh-restore" onclick="event.stopPropagation();restoreVersion(\''+doc.code+'\','+i+')">'+T('wf_restore')+'</button>':''}
-              ${canDeleteVersion(doc.code,v)&&isAdmin()?'<button class="vh-restore" style="color:#dc2626;border-color:#fca5a5" onclick="event.stopPropagation();deleteVersion(\''+doc.code+'\','+i+')" title="'+(lang==='en'?'Retention period exceeded':'Hết hạn lưu giữ')+'">🗑 '+(lang==='en'?'Delete':'Xóa')+'</button>':''}
+              ${canDeleteVersion(doc.code,v)&&isAdmin()?'<button class="vh-restore" style="color:var(--red);border-color:color-mix(in srgb, var(--red) 24%, var(--border))" onclick="event.stopPropagation();deleteVersion(\''+doc.code+'\','+i+')" title="'+(lang==='en'?'Retention period exceeded':'Hết hạn lưu giữ')+'">🗑 '+(lang==='en'?'Delete':'Xóa')+'</button>':''}
             </div>
           `).join('')
         }

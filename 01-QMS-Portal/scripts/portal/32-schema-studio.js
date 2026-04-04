@@ -88,7 +88,10 @@ var STORE = {
     connecting: null,
     isPanning: false,
     lastMouseX: 0,
-    lastMouseY: 0
+    lastMouseY: 0,
+    snapToGrid: false,
+    gridSize: 20,
+    lasso: null
   },
   inspector: {
     target: null,
@@ -124,7 +127,8 @@ var STORE = {
   loading: false,
   loadingMsg: '',
   error: '',
-  notation: 'crowsfoot'
+  notation: 'crowsfoot',
+  clipboard: null
 };
 
 var refs = {
@@ -552,7 +556,7 @@ var Canvas = {
   init: function(container){
     refs.canvasWrap = container;
     container.innerHTML = [
-      '<div class="ss-canvas-bg"></div>',
+      '<div class="ss-canvas-bg ss-canvas-grid"></div>',
       '<svg class="ss-canvas-svg" id="ss-canvas-svg">',
         '<g class="ss-canvas-group" id="ss-canvas-group">',
           '<g class="ss-edges-layer" id="ss-edges-layer"></g>',
@@ -587,9 +591,17 @@ var Canvas = {
       if(ev.target.closest('.ss-table-card')) return;
       if(ev.target.closest('.ss-validation-panel')) return;
       if(ev.target.closest('.ss-cmd-palette')) return;
+      if(ev.shiftKey || ev.ctrlKey || ev.metaKey){
+        Canvas.startLasso(ev);
+        return;
+      }
       Canvas.startPan(ev);
     };
     container.onclick = function(ev){
+      if(Canvas._justLassoed){
+        Canvas._justLassoed = false;
+        return;
+      }
       if(ev.target === container || ev.target === refs.canvasSvg || ev.target === refs.tablesLayer || ev.target.classList.contains('ss-canvas-bg')){
         Canvas.clearSelection();
         Inspector.close();
@@ -630,7 +642,7 @@ var Canvas = {
     if(toolbarZoom) toolbarZoom.textContent = zoomVal;
     if(refs.modeIndicator) refs.modeIndicator.textContent = _t('Mode', 'Mode') + ': ' + String(STORE.mode || 'canvas').toUpperCase();
     Canvas.updateGrid();
-    Canvas.updateMinimap();
+    VirtualRenderer.scheduleUpdate();
   },
 
   zoomIn: function(){
@@ -648,6 +660,11 @@ var Canvas = {
     STORE.canvas.panX = 0;
     STORE.canvas.panY = 0;
     Canvas.applyTransform();
+  },
+
+  toggleSnap: function(){
+    STORE.canvas.snapToGrid = !STORE.canvas.snapToGrid;
+    toast(_t('Snap to grid: ' + (STORE.canvas.snapToGrid ? 'BAT' : 'TAT'), 'Snap to grid: ' + (STORE.canvas.snapToGrid ? 'ON' : 'OFF')), 'info');
   },
 
   zoomToFit: function(){
@@ -718,14 +735,29 @@ var Canvas = {
 
   clearSelection: function(){
     STORE.canvas.selection = [];
+    STORE.canvas.lasso = null;
     Array.prototype.forEach.call(document.querySelectorAll('.ss-table-card.selected'), function(node){ node.classList.remove('selected'); });
+    Array.prototype.forEach.call(document.querySelectorAll('.ss-table-card.multi-selected'), function(node){ node.classList.remove('multi-selected'); });
     Array.prototype.forEach.call(document.querySelectorAll('.ss-edge-group.selected'), function(node){ node.classList.remove('selected'); });
+    Array.prototype.forEach.call(document.querySelectorAll('.ss-col-item.active'), function(node){ node.classList.remove('active'); });
+    removeNode(document.getElementById('ss-lasso'));
+    Canvas.updateSelectionBadge();
     Browser.render();
   },
 
   selectTable: function(tableId, add){
-    if(!add) STORE.canvas.selection = [];
-    STORE.canvas.selection = [{ kind:'table', id:tableId }];
+    var existingIndex;
+    STORE.canvas.selection = (STORE.canvas.selection || []).filter(function(item){ return item.kind === 'table'; });
+    if(!add){
+      STORE.canvas.selection = [{ kind:'table', id:tableId }];
+    } else {
+      existingIndex = STORE.canvas.selection.findIndex(function(item){ return item.kind === 'table' && item.id === tableId; });
+      if(existingIndex >= 0){
+        STORE.canvas.selection.splice(existingIndex, 1);
+      } else {
+        STORE.canvas.selection.push({ kind:'table', id:tableId });
+      }
+    }
     Canvas.syncSelectionClasses();
     Browser.render();
   },
@@ -737,14 +769,132 @@ var Canvas = {
   },
 
   syncSelectionClasses: function(){
+    var selectedTableIds = STORE.canvas.selection.filter(function(item){ return item.kind === 'table'; }).map(function(item){ return item.id; });
+    var multi = selectedTableIds.length > 1;
     Array.prototype.forEach.call(document.querySelectorAll('.ss-table-card'), function(node){
-      var active = STORE.canvas.selection.some(function(item){ return item.kind === 'table' && item.id === node.getAttribute('data-table-id'); });
+      var active = selectedTableIds.indexOf(node.getAttribute('data-table-id')) >= 0;
       node.classList.toggle('selected', active);
+      node.classList.toggle('multi-selected', multi && active);
     });
     Array.prototype.forEach.call(document.querySelectorAll('.ss-edge-group'), function(node){
       var active = STORE.canvas.selection.some(function(item){ return item.kind === 'edge' && item.id === node.getAttribute('data-edge-id'); });
       node.classList.toggle('selected', active);
     });
+    Canvas.updateSelectionBadge();
+  },
+
+  updateSelectionBadge: function(){
+    var count = STORE.canvas.selection.filter(function(item){ return item.kind === 'table'; }).length;
+    var badge = document.getElementById('ss-selection-badge');
+    if(!badge){
+      badge = document.createElement('div');
+      badge.id = 'ss-selection-badge';
+      badge.className = 'ss-selection-badge';
+      document.body.appendChild(badge);
+    }
+    if(count > 1){
+      badge.textContent = count + ' ' + _t('bang duoc chon', 'tables selected');
+      badge.classList.add('visible');
+    } else {
+      badge.classList.remove('visible');
+    }
+  },
+
+  startLasso: function(ev){
+    var pos;
+    if(ev.button !== 0) return;
+    if(ev.target.closest('.ss-table-card')) return;
+    ev.preventDefault();
+    pos = screenToCanvas(ev.clientX, ev.clientY);
+    STORE.canvas.lasso = {
+      startX: pos.x,
+      startY: pos.y,
+      currentX: pos.x,
+      currentY: pos.y,
+      additive: !!(ev.shiftKey || ev.ctrlKey || ev.metaKey),
+      baseSelection: (STORE.canvas.selection || []).filter(function(item){ return item.kind === 'table'; }).map(function(item){ return item.id; })
+    };
+    if(!STORE.canvas.lasso.additive){
+      Canvas.clearSelection();
+      STORE.canvas.lasso.baseSelection = [];
+    }
+    Canvas.renderLasso();
+    document.addEventListener('mousemove', Canvas.updateLasso);
+    document.addEventListener('mouseup', Canvas.endLasso);
+  },
+
+  updateLasso: function(ev){
+    var pos;
+    if(!STORE.canvas.lasso) return;
+    pos = screenToCanvas(ev.clientX, ev.clientY);
+    STORE.canvas.lasso.currentX = pos.x;
+    STORE.canvas.lasso.currentY = pos.y;
+    Canvas.renderLasso();
+    Canvas.selectTablesInLasso();
+  },
+
+  endLasso: function(){
+    document.removeEventListener('mousemove', Canvas.updateLasso);
+    document.removeEventListener('mouseup', Canvas.endLasso);
+    if(!STORE.canvas.lasso) return;
+    Canvas.selectTablesInLasso();
+    STORE.canvas.lasso = null;
+    removeNode(document.getElementById('ss-lasso'));
+    Canvas._justLassoed = true;
+  },
+
+  renderLasso: function(){
+    var l = STORE.canvas.lasso;
+    var lassoEl;
+    var x;
+    var y;
+    var w;
+    var h;
+    if(!l || !refs.canvasGroup) return;
+    x = Math.min(l.startX, l.currentX);
+    y = Math.min(l.startY, l.currentY);
+    w = Math.abs(l.currentX - l.startX);
+    h = Math.abs(l.currentY - l.startY);
+    lassoEl = document.getElementById('ss-lasso');
+    if(!lassoEl){
+      lassoEl = svgNode('rect');
+      lassoEl.setAttribute('id', 'ss-lasso');
+      lassoEl.setAttribute('class', 'ss-lasso');
+      refs.canvasGroup.appendChild(lassoEl);
+    }
+    lassoEl.setAttribute('x', String(x));
+    lassoEl.setAttribute('y', String(y));
+    lassoEl.setAttribute('width', String(w));
+    lassoEl.setAttribute('height', String(h));
+  },
+
+  selectTablesInLasso: function(){
+    var l = STORE.canvas.lasso;
+    var x1;
+    var y1;
+    var x2;
+    var y2;
+    var selectedIds = [];
+    if(!l) return;
+    x1 = Math.min(l.startX, l.currentX);
+    y1 = Math.min(l.startY, l.currentY);
+    x2 = Math.max(l.startX, l.currentX);
+    y2 = Math.max(l.startY, l.currentY);
+    ((STORE.schema && STORE.schema.tables) || []).forEach(function(tbl){
+      var tableHeight = getTableHeight(tbl);
+      if(tbl.canvas.x < x2 && (tbl.canvas.x + (tbl.canvas.width || TABLE_DEFAULT_WIDTH)) > x1 && tbl.canvas.y < y2 && (tbl.canvas.y + tableHeight) > y1){
+        selectedIds.push(tbl.id);
+      }
+    });
+    if(l.additive){
+      l.baseSelection.forEach(function(id){
+        if(selectedIds.indexOf(id) < 0) selectedIds.push(id);
+      });
+    }
+    STORE.canvas.selection = selectedIds.map(function(id){
+      return { kind:'table', id:id };
+    });
+    Canvas.syncSelectionClasses();
   },
 
   updateMinimap: function(){
@@ -815,7 +965,6 @@ var Canvas = {
     ensureSchema();
     if(!refs.tablesLayer) return;
     TableCard.renderAll();
-    EdgeLayer.renderAll();
     Canvas.applyTransform();
   }
 };
@@ -955,6 +1104,20 @@ var EdgeLayer = {
     ((STORE.schema && STORE.schema.relations) || []).forEach(function(rel){ EdgeLayer.renderEdge(rel); });
   },
 
+  clearAll: function(){
+    if(EdgeLayer.svgLayer) EdgeLayer.svgLayer.innerHTML = '';
+  },
+
+  renderForVisible: function(visibleIds){
+    if(!EdgeLayer.svgLayer) return;
+    EdgeLayer.svgLayer.innerHTML = '';
+    ((STORE.schema && STORE.schema.relations) || []).forEach(function(rel){
+      if(!visibleIds || visibleIds.has(rel.from_table_id) || visibleIds.has(rel.to_table_id)){
+        EdgeLayer.renderEdge(rel);
+      }
+    });
+  },
+
   updateEdgesForTable: function(tableId){
     if(!EdgeLayer.svgLayer) return;
     Array.prototype.forEach.call(EdgeLayer.svgLayer.querySelectorAll('.ss-edge-group'), function(node){
@@ -964,7 +1127,8 @@ var EdgeLayer = {
       }
     });
     ((STORE.schema && STORE.schema.relations) || []).forEach(function(rel){
-      if(rel.from_table_id === tableId || rel.to_table_id === tableId){
+      var visibleIds = VirtualRenderer.getVisibleSet();
+      if((rel.from_table_id === tableId || rel.to_table_id === tableId) && (!visibleIds || !visibleIds.size || visibleIds.has(rel.from_table_id) || visibleIds.has(rel.to_table_id))){
         EdgeLayer.renderEdge(rel);
       }
     });
@@ -1094,7 +1258,7 @@ var Connector = {
       edge: { type:'orthogonal', waypoints:[] }
     });
     TableCard.reRender(fromTblId);
-    EdgeLayer.renderAll();
+    VirtualRenderer.scheduleUpdate();
     markDirty();
     Browser.render();
     saveDraft();
@@ -1118,13 +1282,13 @@ var TableCard = {
 
   renderTable: function(tbl){
     if(!refs.tablesLayer) return;
+    if(document.getElementById('tc_' + tbl.id)) return;
     var card = document.createElement('div');
     var domainColor = tbl.color || DOMAIN_COLORS[tbl.domain] || DOMAIN_COLORS.default;
     card.className = 'ss-table-card' + (tbl.canvas.collapsed ? ' collapsed' : '');
     card.id = 'tc_' + tbl.id;
     card.setAttribute('data-table-id', tbl.id);
-    card.style.left = tbl.canvas.x + 'px';
-    card.style.top = tbl.canvas.y + 'px';
+    card.style.transform = 'translate(' + tbl.canvas.x + 'px,' + tbl.canvas.y + 'px)';
     card.style.width = (tbl.canvas.width || TABLE_DEFAULT_WIDTH) + 'px';
     card.style.setProperty('--ss-domain-color', domainColor);
     card.innerHTML = [
@@ -1141,7 +1305,12 @@ var TableCard = {
         (tbl.columns || []).map(function(col){
           var iconClass = col.primary_key ? 'is-pk' : (col.foreign_key ? 'is-fk' : '');
           var icon = col.primary_key ? 'K' : (col.foreign_key ? 'F' : '.');
-          return '<li class="ss-col-item" data-col-id="' + _esc(col.id) + '"><span class="ss-col-icon ' + iconClass + '">' + _esc(icon) + '</span><span class="ss-col-name">' + _esc(col.name) + '</span><span class="ss-col-type">' + _esc(fmtColType(col)) + '</span><span class="ss-col-badges">' + colBadges(col, tbl).map(function(badge){ return '<span class="ss-col-badge ' + _esc(badge.cls) + '">' + _esc(badge.text) + '</span>'; }).join('') + '</span><span class="ss-fk-port" data-port-col="' + _esc(col.id) + '" title="' + _esc(_t('Keo de tao FK', 'Drag to create FK')) + '"></span></li>';
+          return '<li class="ss-col-item" data-col-id="' + _esc(col.id) + '"><span class="ss-col-icon ' + iconClass + '">' + _esc(icon) + '</span><span class="ss-col-name">' + _esc(col.name) + '</span><span class="ss-col-type">' + _esc(fmtColType(col)) + '</span><span class="ss-col-badges">' + colBadges(col, tbl).map(function(badge){
+            if(badge.cls === 'fk' && col.foreign_key){
+              return '<span class="ss-col-badge fk ss-fk-navigate" title="' + _esc(_t('Di toi bang tham chieu', 'Jump to referenced table')) + '" onclick="TableCard.navigateFK(event,\'' + _esc(tbl.id) + '\',\'' + _esc(col.id) + '\')">FK ↗</span>';
+            }
+            return '<span class="ss-col-badge ' + _esc(badge.cls) + '">' + _esc(badge.text) + '</span>';
+          }).join('') + '</span><span class="ss-fk-port" data-port-col="' + _esc(col.id) + '" title="' + _esc(_t('Keo de tao FK', 'Drag to create FK')) + '"></span></li>';
         }).join(''),
       '</ul>',
       '<div class="ss-col-item-add" data-ss-action="add-column">+ ' + _esc(_t('Them cot', 'Add column')) + '</div>',
@@ -1157,7 +1326,7 @@ var TableCard = {
         TableCard.startMove(tbl.id, ev);
         return;
       }
-      Canvas.selectTable(tbl.id);
+      Canvas.selectTable(tbl.id, ev.shiftKey || ev.ctrlKey || ev.metaKey);
     });
     card.querySelector('.ss-tbl-name').ondblclick = function(ev){
       ev.preventDefault();
@@ -1183,30 +1352,78 @@ var TableCard = {
     if(ev.button !== 0) return;
     ev.preventDefault();
     ev.stopPropagation();
+    var modifier = ev.shiftKey || ev.ctrlKey || ev.metaKey;
+    var selectedTableIds = STORE.canvas.selection.filter(function(item){ return item.kind === 'table'; }).map(function(item){ return item.id; });
+    var isMultiMove;
+    var tablesToMove;
     var tbl = findTable(tableId);
+    var rafHandle = null;
+    var startPositions = {};
+    var pendingDX = 0;
+    var pendingDY = 0;
     if(!tbl) return;
+    if(selectedTableIds.indexOf(tableId) < 0){
+      Canvas.selectTable(tableId, modifier);
+      selectedTableIds = STORE.canvas.selection.filter(function(item){ return item.kind === 'table'; }).map(function(item){ return item.id; });
+    }
+    isMultiMove = selectedTableIds.indexOf(tableId) >= 0 && selectedTableIds.length > 1;
+    tablesToMove = isMultiMove ? selectedTableIds.slice() : [tableId];
     pushUndo();
-    Canvas.selectTable(tableId);
-    var startX = ev.clientX;
-    var startY = ev.clientY;
-    var originX = tbl.canvas.x;
-    var originY = tbl.canvas.y;
-    function onMove(moveEv){
-      var deltaX = (moveEv.clientX - startX) / STORE.canvas.zoom;
-      var deltaY = (moveEv.clientY - startY) / STORE.canvas.zoom;
-      tbl.canvas.x = Math.round(originX + deltaX);
-      tbl.canvas.y = Math.round(originY + deltaY);
-      var card = document.getElementById('tc_' + tableId);
-      if(card){
-        card.style.left = tbl.canvas.x + 'px';
-        card.style.top = tbl.canvas.y + 'px';
+    tablesToMove.forEach(function(id){
+      var moveTbl = findTable(id);
+      var moveCard = document.getElementById('tc_' + id);
+      if(moveTbl){
+        startPositions[id] = { x: moveTbl.canvas.x, y: moveTbl.canvas.y };
       }
-      EdgeLayer.updateEdgesForTable(tableId);
-      Canvas.updateMinimap();
+      if(moveCard){
+        moveCard.classList.add('ss-dragging');
+      }
+    });
+    var startCanvasX = (ev.clientX - STORE.canvas.panX) / STORE.canvas.zoom;
+    var startCanvasY = (ev.clientY - STORE.canvas.panY) / STORE.canvas.zoom;
+    function onMove(moveEv){
+      var cx = (moveEv.clientX - STORE.canvas.panX) / STORE.canvas.zoom;
+      var cy = (moveEv.clientY - STORE.canvas.panY) / STORE.canvas.zoom;
+      pendingDX = cx - startCanvasX;
+      pendingDY = cy - startCanvasY;
+      if(rafHandle) return;
+      rafHandle = requestAnimationFrame(function(){
+        rafHandle = null;
+        tablesToMove.forEach(function(id){
+          var moveTbl = findTable(id);
+          var moveCard = document.getElementById('tc_' + id);
+          if(!moveTbl || !startPositions[id]) return;
+          moveTbl.canvas.x = Math.max(0, startPositions[id].x + pendingDX);
+          moveTbl.canvas.y = Math.max(0, startPositions[id].y + pendingDY);
+          if(moveCard){
+            moveCard.style.transform = 'translate(' + moveTbl.canvas.x + 'px,' + moveTbl.canvas.y + 'px)';
+          }
+          EdgeLayer.updateEdgesForTable(id);
+        });
+      });
     }
     function onUp(){
       document.removeEventListener('mousemove', onMove);
       document.removeEventListener('mouseup', onUp);
+      if(rafHandle){
+        cancelAnimationFrame(rafHandle);
+        rafHandle = null;
+      }
+      tablesToMove.forEach(function(id){
+        var moveTbl = findTable(id);
+        var moveCard = document.getElementById('tc_' + id);
+        if(moveCard) moveCard.classList.remove('ss-dragging');
+        if(!moveTbl) return;
+        if(STORE.canvas.snapToGrid){
+          moveTbl.canvas.x = Math.round(moveTbl.canvas.x / STORE.canvas.gridSize) * STORE.canvas.gridSize;
+          moveTbl.canvas.y = Math.round(moveTbl.canvas.y / STORE.canvas.gridSize) * STORE.canvas.gridSize;
+          if(moveCard){
+            moveCard.style.transform = 'translate(' + moveTbl.canvas.x + 'px,' + moveTbl.canvas.y + 'px)';
+          }
+        }
+        EdgeLayer.updateEdgesForTable(id);
+      });
+      VirtualRenderer.scheduleUpdate();
       markDirty();
       saveDraft();
     }
@@ -1328,7 +1545,7 @@ var TableCard = {
         });
       });
       TableCard.reRender(tableId);
-      EdgeLayer.renderAll();
+      VirtualRenderer.scheduleUpdate();
       Inspector.open({ kind:'table', tableId:tableId });
       markDirty();
       saveDraft();
@@ -1339,10 +1556,10 @@ var TableCard = {
     var node = document.getElementById('tc_' + tableId);
     if(node) removeNode(node);
     var tbl = findTable(tableId);
-    if(tbl) TableCard.renderTable(tbl);
+    if(tbl && VirtualRenderer.isVisible(tbl)) TableCard.renderTable(tbl);
     Canvas.syncSelectionClasses();
     EdgeLayer.updateEdgesForTable(tableId);
-    Canvas.updateMinimap();
+    VirtualRenderer.scheduleUpdate();
   },
 
   duplicate: function(tableId){
@@ -1366,10 +1583,38 @@ var TableCard = {
     saveDraft();
   },
 
+  navigateFK: function(ev, tableId, colId){
+    var col;
+    var refTableId;
+    var rel;
+    var edgeEl;
+    var refTable;
+    ev.stopPropagation();
+    col = findCol(tableId, colId);
+    if(!col || !col.foreign_key) return;
+    refTableId = col.foreign_key.ref_table_id;
+    if(!refTableId) return;
+    Browser.focusTable(refTableId);
+    Canvas.selectTable(refTableId);
+    Inspector.open({ kind:'table', tableId:refTableId });
+    rel = ((STORE.schema && STORE.schema.relations) || []).filter(function(item){
+      return item.from_table_id === tableId && item.from_col_id === colId;
+    })[0];
+    if(rel){
+      edgeEl = document.querySelector('[data-edge-id="' + rel.id + '"]');
+      if(edgeEl){
+        edgeEl.classList.add('ss-edge-flash');
+        setTimeout(function(){ edgeEl.classList.remove('ss-edge-flash'); }, 1500);
+      }
+    }
+    refTable = findTable(refTableId);
+    if(refTable){
+      toast('→ ' + refTable.name, 'info');
+    }
+  },
+
   renderAll: function(){
-    if(!refs.tablesLayer) return;
-    refs.tablesLayer.innerHTML = '';
-    ((STORE.schema && STORE.schema.tables) || []).forEach(function(tbl){ TableCard.renderTable(tbl); });
+    VirtualRenderer.reset();
   }
 };
 
@@ -1824,7 +2069,7 @@ var Inspector = {
       col.foreign_key.deferrable = !!document.getElementById('col-fk-deferrable').checked;
     }
     TableCard.reRender(tableId);
-    EdgeLayer.renderAll();
+    VirtualRenderer.scheduleUpdate();
     Browser.render();
     markDirty();
     saveDraft();
@@ -1882,8 +2127,8 @@ var Inspector = {
       fromCol.foreign_key.on_update = rel.on_update;
       fromCol.foreign_key.constraint_name = rel.name;
     }
-    EdgeLayer.renderAll();
     TableCard.reRender(rel.from_table_id);
+    VirtualRenderer.scheduleUpdate();
     markDirty();
     saveDraft();
     toast(_t('Da luu relation', 'Relation saved'), 'success');
@@ -1912,8 +2157,8 @@ var Inspector = {
     fromCol = findCol(rel.from_table_id, rel.from_col_id);
     if(fromCol) fromCol.foreign_key = null;
     STORE.schema.relations = (STORE.schema.relations || []).filter(function(item){ return item.id !== relId; });
-    EdgeLayer.renderAll();
     TableCard.reRender(rel.from_table_id);
+    VirtualRenderer.scheduleUpdate();
     Browser.render();
     markDirty();
     saveDraft();
@@ -2006,6 +2251,7 @@ var Browser = {
     STORE.canvas.panX = (refs.canvasWrap.clientWidth / 2) - ((tbl.canvas.x + ((tbl.canvas.width || TABLE_DEFAULT_WIDTH) / 2)) * STORE.canvas.zoom);
     STORE.canvas.panY = (refs.canvasWrap.clientHeight / 2) - ((tbl.canvas.y + (getTableHeight(tbl) / 2)) * STORE.canvas.zoom);
     Canvas.applyTransform();
+    VirtualRenderer.update();
     Canvas.selectTable(tableId);
     Inspector.open({ kind:'table', tableId:tableId });
     el = document.getElementById('tc_' + tableId);
@@ -2459,6 +2705,15 @@ var Validator = {
       if(tbl.rls_enabled){
         Validator.addResult(results, { level:'info', code:'I02', tableId:tbl.id, table:tbl.name, msg:_t('Bang dang bat RLS, nho viet policy trong migration: ' + tbl.name, 'RLS enabled - remember policies in migration: ' + tbl.name) });
       }
+      if(String(tbl.name || '').length > 63){
+        Validator.addResult(results, { level:'info', code:'I04', tableId:tbl.id, table:tbl.name, msg:_t('Ten bang "' + tbl.name + '" dai ' + tbl.name.length + ' ky tu (PostgreSQL gioi han 63)', 'Table name "' + tbl.name + '" is ' + tbl.name.length + ' chars (PostgreSQL max 63)') });
+      }
+      if((tbl.columns || []).length === 1){
+        Validator.addResult(results, { level:'warning', code:'W10', tableId:tbl.id, table:tbl.name, msg:_t('Bang "' + tbl.name + '" chi co 1 cot', 'Table "' + tbl.name + '" has only 1 column') });
+      }
+      if((tbl.columns || []).some(function(col){ return col.primary_key && col.type === 'uuid'; }) && (tbl.columns || []).some(function(col){ return col.type === 'serial' || col.type === 'bigserial'; })){
+        Validator.addResult(results, { level:'info', code:'I06', tableId:tbl.id, table:tbl.name, msg:_t('Bang "' + tbl.name + '" dang tron UUID PK voi serial', 'Table "' + tbl.name + '" mixes UUID PK with serial') });
+      }
     });
     (schema.relations || []).forEach(function(rel){
       var toTbl = findTable(rel.to_table_id);
@@ -2766,6 +3021,114 @@ var Layout = {
   }
 };
 
+var VirtualRenderer = {
+  BUFFER: 300,
+  _rendered: new Set(),
+  _visible: new Set(),
+  _raf: null,
+  _scheduled: false,
+
+  getViewportBounds: function(){
+    if(!refs.canvasWrap) return null;
+    var zoom = STORE.canvas.zoom || 1;
+    var panX = STORE.canvas.panX || 0;
+    var panY = STORE.canvas.panY || 0;
+    var buf = VirtualRenderer.BUFFER;
+    return {
+      left: (-panX / zoom) - buf,
+      top: (-panY / zoom) - buf,
+      right: ((-panX + refs.canvasWrap.clientWidth) / zoom) + buf,
+      bottom: ((-panY + refs.canvasWrap.clientHeight) / zoom) + buf
+    };
+  },
+
+  isVisible: function(tbl){
+    var vp = VirtualRenderer.getViewportBounds();
+    var width;
+    var height;
+    if(!tbl) return false;
+    if(!vp) return true;
+    width = tbl.canvas && tbl.canvas.width ? tbl.canvas.width : TABLE_DEFAULT_WIDTH;
+    height = getTableHeight(tbl);
+    return !(
+      (tbl.canvas.x + width) < vp.left ||
+      tbl.canvas.x > vp.right ||
+      (tbl.canvas.y + height) < vp.top ||
+      tbl.canvas.y > vp.bottom
+    );
+  },
+
+  getVisibleSet: function(){
+    return VirtualRenderer._visible;
+  },
+
+  scheduleUpdate: function(){
+    if(VirtualRenderer._scheduled) return;
+    VirtualRenderer._scheduled = true;
+    VirtualRenderer._raf = window.requestAnimationFrame(function(){
+      VirtualRenderer._scheduled = false;
+      VirtualRenderer._raf = null;
+      VirtualRenderer.update();
+    });
+  },
+
+  update: function(){
+    var tables = (STORE.schema && STORE.schema.tables) || [];
+    var nowVisible = new Set();
+    var removeIds = [];
+    if(!refs.tablesLayer){
+      return;
+    }
+    if(!tables.length){
+      refs.tablesLayer.innerHTML = '';
+      VirtualRenderer._rendered.clear();
+      VirtualRenderer._visible = nowVisible;
+      EdgeLayer.clearAll();
+      Canvas.updateMinimap();
+      return;
+    }
+    tables.forEach(function(tbl){
+      if(VirtualRenderer.isVisible(tbl)){
+        nowVisible.add(tbl.id);
+      }
+    });
+    nowVisible.forEach(function(id){
+      if(!VirtualRenderer._rendered.has(id)){
+        var tbl = findTable(id);
+        if(tbl) TableCard.renderTable(tbl);
+        VirtualRenderer._rendered.add(id);
+      }
+    });
+    VirtualRenderer._rendered.forEach(function(id){
+      if(!nowVisible.has(id)){
+        removeIds.push(id);
+      }
+    });
+    removeIds.forEach(function(id){
+      var el = document.getElementById('tc_' + id);
+      if(el) removeNode(el);
+      VirtualRenderer._rendered.delete(id);
+    });
+    VirtualRenderer._visible = nowVisible;
+    EdgeLayer.renderForVisible(nowVisible);
+    Canvas.syncSelectionClasses();
+    Canvas.updateMinimap();
+  },
+
+  reset: function(){
+    if(VirtualRenderer._raf){
+      window.cancelAnimationFrame(VirtualRenderer._raf);
+      VirtualRenderer._raf = null;
+    }
+    VirtualRenderer._scheduled = false;
+    VirtualRenderer._visible = new Set();
+    VirtualRenderer._rendered.clear();
+    if(refs.tablesLayer) refs.tablesLayer.innerHTML = '';
+    EdgeLayer.clearAll();
+    VirtualRenderer.update();
+  }
+};
+
 var CmdPalette = {
   _el: null,
   _filteredCommands: [],
@@ -2778,6 +3141,7 @@ var CmdPalette = {
     { icon:'V', label:'Validation', label_en:'Validation', category:'action', action:function(){ Validator.run(); } },
     { icon:'M', label:'Migration preview', label_en:'Migration preview', category:'action', action:function(){ MigGen.renderPreview(); } },
     { icon:'Z', label:'Zoom to fit', label_en:'Zoom to fit', category:'view', action:function(){ Canvas.zoomToFit(); } },
+    { icon:'#', label:'Bat tat snap grid', label_en:'Toggle snap grid', category:'view', action:function(){ Canvas.toggleSnap(); } },
     { icon:'G', label:'Grid layout', label_en:'Grid layout', category:'layout', action:function(){ Layout.auto('grid'); } },
     { icon:'F', label:'Force layout', label_en:'Force layout', category:'layout', action:function(){ Layout.auto('force'); } },
     { icon:'H', label:'Hierarchical layout', label_en:'Hierarchical layout', category:'layout', action:function(){ Layout.auto('hierarchical'); } },
@@ -3055,6 +3419,8 @@ function bindKeyboard(){
   keyboardBound = true;
   document.addEventListener('keydown', function(ev){
     var ctrl = ev.ctrlKey || ev.metaKey;
+    var inEditable = !!(document.activeElement && (/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || document.activeElement.isContentEditable));
+    var selectedTableIds;
     if(!isActivePage()) return;
     if(ctrl && ev.key.toLowerCase() === 'k'){
       ev.preventDefault();
@@ -3076,7 +3442,47 @@ function bindKeyboard(){
       redo();
       return;
     }
+    if(ctrl && ev.key.toLowerCase() === 'c'){
+      if(inEditable) return;
+      selectedTableIds = STORE.canvas.selection.filter(function(item){ return item.kind === 'table'; }).map(function(item){ return item.id; });
+      if(selectedTableIds.length){
+        STORE.clipboard = {
+          tables: selectedTableIds.map(function(id){ return _clone(findTable(id)); }).filter(Boolean)
+        };
+        toast(_t('Da copy ' + selectedTableIds.length + ' bang', 'Copied ' + selectedTableIds.length + ' table(s)'), 'info');
+        ev.preventDefault();
+      }
+      return;
+    }
+    if(ctrl && ev.key.toLowerCase() === 'v'){
+      if(inEditable) return;
+      if(STORE.clipboard && STORE.clipboard.tables && STORE.clipboard.tables.length){
+        pushUndo();
+        Canvas.clearSelection();
+        STORE.clipboard.tables.forEach(function(tbl){
+          var newTbl = _clone(tbl);
+          newTbl.id = _uid();
+          newTbl.name = generateUniqueTableName(tbl.name + '_copy');
+          newTbl.canvas.x += 40;
+          newTbl.canvas.y += 40;
+          newTbl.columns = (newTbl.columns || []).map(function(col){
+            return Object.assign({}, col, { id:_uid(), foreign_key:null });
+          });
+          STORE.schema.tables.push(newTbl);
+          STORE.canvas.selection.push({ kind:'table', id:newTbl.id });
+        });
+        VirtualRenderer.reset();
+        Canvas.syncSelectionClasses();
+        Browser.render();
+        markDirty();
+        saveDraft();
+        toast(_t('Da paste ' + STORE.clipboard.tables.length + ' bang', 'Pasted ' + STORE.clipboard.tables.length + ' table(s)'), 'success');
+        ev.preventDefault();
+      }
+      return;
+    }
     if(ctrl && ev.key.toLowerCase() === 'd'){
+      if(inEditable) return;
       var selected = STORE.canvas.selection[0];
       if(selected && selected.kind === 'table'){
         ev.preventDefault();
@@ -3100,7 +3506,7 @@ function bindKeyboard(){
       return;
     }
     if(ev.key === 'Delete' || ev.key === 'Backspace'){
-      if(document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
+      if(inEditable) return;
       var active = STORE.canvas.selection[0];
       if(active && active.kind === 'table'){
         TableCard.confirmDelete(active.id);
@@ -3142,6 +3548,21 @@ function destroy(){
   refs.validationPanel = null;
 }
 
+window.STORE = STORE;
+window.Canvas = Canvas;
+window.EdgeLayer = EdgeLayer;
+window.Connector = Connector;
+window.TableCard = TableCard;
+window.Inspector = Inspector;
+window.Browser = Browser;
+window.CodePanel = CodePanel;
+window.MigGen = MigGen;
+window.Validator = Validator;
+window.Importer = Importer;
+window.Layout = Layout;
+window.VirtualRenderer = VirtualRenderer;
+window.CmdPalette = CmdPalette;
+window.SchemaLib = SchemaLib;
 window.switchMode = switchMode;
 window.SchemaStudio = { init:init, destroy:destroy };
 window._renderSchemaStudio = function(page){
