@@ -227,7 +227,7 @@ function createBlankSchemaDoc(name){
   return {
     _meta: {
       id: _uid(),
-      name: name || _t('Schema moi', 'New schema'),
+      name: name || _t('Schema mới', 'New schema'),
       version: '1.0.0',
       description: '',
       createdAt: new Date().toISOString(),
@@ -244,7 +244,7 @@ function createBlankSchemaDoc(name){
 
 function ensureSchema(){
   if(!STORE.schema){
-    STORE.schema = createBlankSchemaDoc(_t('Workspace schema', 'Workspace schema'));
+    STORE.schema = createBlankSchemaDoc(_t('Schema làm việc', 'Workspace schema'));
   }
   return STORE.schema;
 }
@@ -753,7 +753,7 @@ var Canvas = {
 
   toggleSnap: function(){
     STORE.canvas.snapToGrid = !STORE.canvas.snapToGrid;
-    toast(_t('Snap to grid: ' + (STORE.canvas.snapToGrid ? 'BAT' : 'TAT'), 'Snap to grid: ' + (STORE.canvas.snapToGrid ? 'ON' : 'OFF')), 'info');
+    toast(_t('Snap to grid: ' + (STORE.canvas.snapToGrid ? 'BẬT' : 'TẮT'), 'Snap to grid: ' + (STORE.canvas.snapToGrid ? 'ON' : 'OFF')), 'info');
   },
 
   zoomToFit: function(){
@@ -882,7 +882,7 @@ var Canvas = {
       document.body.appendChild(badge);
     }
     if(count > 1){
-      badge.textContent = count + ' ' + _t('bang duoc chon', 'tables selected');
+      badge.textContent = count + ' ' + _t('bảng được chọn', 'tables selected');
       badge.classList.add('visible');
     } else {
       badge.classList.remove('visible');
@@ -1287,10 +1287,10 @@ var Connector = {
       var columnState = buildColumnOptions(activeTableId);
       overlay.innerHTML = [
         '<div class="ss-modal">',
-          '<div class="ss-modal-header"><h3>', _esc(_t('Tao khoa ngoai', 'Create foreign key')), '</h3><button type="button" class="hm-btn hm-btn-ghost" data-ss-close="fk">X</button></div>',
+          '<div class="ss-modal-header"><h3>', _esc(_t('Tạo khóa ngoại', 'Create foreign key')), '</h3><button type="button" class="hm-btn hm-btn-ghost" data-ss-close="fk">X</button></div>',
           '<div class="ss-modal-body">',
             '<div class="ss-field-group"><div class="ss-field-label">', _esc(_t('Nguon', 'Source')), '</div><div class="ss-rel-card">', _esc(fromTable.name + '.' + fromCol.name), '</div></div>',
-            '<div class="ss-field-group"><div class="ss-field-label">', _esc(_t('Bang dich', 'Target table')), '</div><select class="hm-input" id="ss-fk-target-table">', tableOptions.map(function(tbl){ return '<option value="' + _esc(tbl.id) + '"' + (tbl.id === activeTableId ? ' selected' : '') + '>' + _esc(tbl.name) + '</option>'; }).join(''), '</select></div>',
+            '<div class="ss-field-group"><div class="ss-field-label">', _esc(_t('Bảng đích', 'Target table')), '</div><select class="hm-input" id="ss-fk-target-table">', tableOptions.map(function(tbl){ return '<option value="' + _esc(tbl.id) + '"' + (tbl.id === activeTableId ? ' selected' : '') + '>' + _esc(tbl.name) + '</option>'; }).join(''), '</select></div>',
             '<div class="ss-field-group"><div class="ss-field-label">', _esc(_t('Cot dich', 'Target column')), '</div><select class="hm-input" id="ss-fk-target-col">', columnState.html, '</select></div>',
             '<div class="ss-field-row">',
               '<div class="ss-field-group" style="flex:1"><div class="ss-field-label">ON DELETE</div><select class="hm-input" id="ss-fk-on-delete">', ON_ACTIONS.map(function(action){ return '<option value="' + _esc(action) + '"' + (action === 'RESTRICT' ? ' selected' : '') + '>' + _esc(action) + '</option>'; }).join(''), '</select></div>',
@@ -1352,7 +1352,7 @@ var Connector = {
     markDirty();
     Browser.render();
     saveDraft();
-    toast(_t('Da tao khoa ngoai', 'Foreign key created'), 'success');
+    toast(_t('Đã tạo khóa ngoại', 'Foreign key created'), 'success');
   }
 };
 
@@ -1404,7 +1404,7 @@ var TableCard = {
           var icon = col.primary_key ? 'K' : (col.foreign_key ? 'F' : '.');
           return '<li class="ss-col-item" data-col-id="' + _esc(col.id) + '"><span class="ss-col-icon ' + iconClass + '">' + _esc(icon) + '</span><span class="ss-col-name">' + _esc(col.name) + '</span><span class="ss-col-type">' + _esc(fmtColType(col)) + '</span><span class="ss-col-badges">' + colBadges(col, tbl).map(function(badge){
             if(badge.cls === 'fk' && col.foreign_key){
-              return '<span class="ss-col-badge fk ss-fk-navigate" title="' + _esc(_t('Di toi bang tham chieu', 'Jump to referenced table')) + '" onclick="TableCard.navigateFK(event,\'' + _esc(tbl.id) + '\',\'' + _esc(col.id) + '\')">FK ↗</span>';
+              return '<span class="ss-col-badge fk ss-fk-navigate" title="' + _esc(_t('Đi tới bảng tham chiếu', 'Jump to referenced table')) + '" onclick="TableCard.navigateFK(event,\'' + _esc(tbl.id) + '\',\'' + _esc(col.id) + '\')">FK ↗</span>';
             }
             return '<span class="ss-col-badge ' + _esc(badge.cls) + '">' + _esc(badge.text) + '</span>';
           }).join('') + '</span><span class="ss-fk-port" data-port-col="' + _esc(col.id) + '" title="' + _esc(_t('Keo de tao FK', 'Drag to create FK')) + '"></span></li>';
@@ -1585,12 +1585,12 @@ var TableCard = {
     function commit(){
       var nextName = _slug(input.value);
       if(!isValidIdentifier(nextName)){
-        toast(_t('Ten bang phai la snake_case', 'Table name must be snake_case'), 'error');
+        toast(_t('Tên bảng phải là snake_case', 'Table name must be snake_case'), 'error');
         cancel();
         return;
       }
       if(findTableByName(nextName) && nextName !== tbl.name){
-        toast(_t('Ten bang da ton tai', 'Table name already exists'), 'error');
+        toast(_t('Tên bảng đã tồn tại', 'Table name already exists'), 'error');
         cancel();
         return;
       }
@@ -1627,8 +1627,8 @@ var TableCard = {
       return rel.from_table_id === tableId || rel.to_table_id === tableId;
     });
     var msg = rels.length > 0
-      ? _t('Bang nay co ' + rels.length + ' lien ket FK. Xoa se xoa toan bo lien ket lien quan.', 'This table has ' + rels.length + ' foreign-key links. Deleting it will remove all related links.')
-      : _t('Xoa bang ' + tbl.name + '?', 'Delete table ' + tbl.name + '?');
+      ? _t('Bảng này có ' + rels.length + ' liên kết FK. Xóa sẽ xóa toàn bộ liên kết liên quan.', 'This table has ' + rels.length + ' foreign-key links. Deleting it will remove all related links.')
+      : _t('Xóa bảng ' + tbl.name + '?', 'Delete table ' + tbl.name + '?');
     confirm2(msg, true).then(function(ok){
       if(!ok) return;
       pushUndo();
@@ -1666,10 +1666,10 @@ var TableCard = {
     var col = findCol(tableId, colId);
     if(!tbl || !col) return;
     if(col.primary_key){
-      toast(_t('Khong the xoa cot Primary Key mac dinh', 'Cannot delete the primary key column'), 'error');
+      toast(_t('Không thể xóa cột Primary Key mặc định', 'Cannot delete the primary key column'), 'error');
       return;
     }
-    confirm2(_t('Xoa cot ' + col.name + '?', 'Delete column ' + col.name + '?'), true).then(function(ok){
+    confirm2(_t('Xóa cột ' + col.name + '?', 'Delete column ' + col.name + '?'), true).then(function(ok){
       if(!ok) return;
       pushUndo();
       tbl.columns = tbl.columns.filter(function(item){ return item.id !== colId; });
@@ -1861,7 +1861,7 @@ var Inspector = {
       return rel.from_table_id === tbl.id || rel.to_table_id === tbl.id;
     }).length;
     return [
-      Inspector.fieldGroup(_t('Ten bang', 'Table name'),
+      Inspector.fieldGroup(_t('Tên bảng', 'Table name'),
         '<input class="hm-input" id="inp-tbl-name" value="' + _esc(tbl.name) + '" placeholder="snake_case_name" />' +
         '<div class="ss-field-hint">snake_case</div>'),
       Inspector.fieldGroup('Schema',
@@ -1883,7 +1883,7 @@ var Inspector = {
         '<div class="ss-index-card"><strong>' + String(relCount) + '</strong><span>FK</span></div>',
       '</div>',
       '<div class="ss-inspector-actions">',
-        '<button class="hm-btn hm-btn-primary" onclick="Inspector.saveTable(\'' + _esc(tbl.id) + '\')">' + _esc(_t('Luu bang', 'Save table')) + '</button>',
+        '<button class="hm-btn hm-btn-primary" onclick="Inspector.saveTable(\'' + _esc(tbl.id) + '\')">' + _esc(_t('Lưu bảng', 'Save table')) + '</button>',
         '<button class="hm-btn hm-btn-ghost" onclick="TableCard.inlineRenameTable(\'' + _esc(tbl.id) + '\')">' + _esc(_t('Doi ten nhanh', 'Quick rename')) + '</button>',
       '</div>'
     ].join('');
@@ -1909,7 +1909,7 @@ var Inspector = {
             '</div>',
           '</div>'
         ].join('');
-      }).join('') : '<div class="ss-empty-state"><div>' + _esc(_t('Chua co index nao', 'No indexes yet')) + '</div></div>'
+      }).join('') : '<div class="ss-empty-state"><div>' + _esc(_t('Chưa có index nào', 'No indexes yet')) + '</div></div>'
     ].join('');
   },
 
@@ -1919,7 +1919,7 @@ var Inspector = {
       '<div class="ss-field-group"><button class="hm-btn hm-btn-secondary" onclick="Inspector.addConstraint(\'' + _esc(tbl.id) + '\')">+ CHECK</button></div>',
       constraints.length ? constraints.map(function(item){
         return '<div class="ss-index-card" data-constraint-id="' + _esc(item.id) + '"><div class="ss-field-group"><div class="ss-field-label">Name</div><input class="hm-input" data-field="name" value="' + _esc(item.name || '') + '" /></div><div class="ss-field-group"><div class="ss-field-label">Expression</div><textarea class="hm-input" rows="3" data-field="expression">' + _esc(item.expression || '') + '</textarea></div><div class="ss-inspector-actions"><button class="hm-btn hm-btn-primary" onclick="Inspector.saveConstraint(\'' + _esc(tbl.id) + '\',\'' + _esc(item.id) + '\')">' + _esc(_t('Luu', 'Save')) + '</button><button class="hm-btn hm-btn-danger" onclick="Inspector.deleteConstraint(\'' + _esc(tbl.id) + '\',\'' + _esc(item.id) + '\')">' + _esc(_t('Xoa', 'Delete')) + '</button></div></div>';
-      }).join('') : '<div class="ss-empty-state"><div>' + _esc(_t('Chua co rang buoc CHECK', 'No CHECK constraints yet')) + '</div></div>'
+      }).join('') : '<div class="ss-empty-state"><div>' + _esc(_t('Chưa có ràng buộc CHECK', 'No CHECK constraints yet')) + '</div></div>'
     ].join('');
   },
 
@@ -1929,7 +1929,7 @@ var Inspector = {
       '<div class="ss-field-group"><button class="hm-btn hm-btn-secondary" onclick="Inspector.addTrigger(\'' + _esc(tbl.id) + '\')">+ Trigger</button></div>',
       triggers.length ? triggers.map(function(item){
         return '<div class="ss-index-card" data-trigger-id="' + _esc(item.id) + '"><div class="ss-field-group"><div class="ss-field-label">Name</div><input class="hm-input" data-field="name" value="' + _esc(item.name || '') + '" /></div><div class="ss-field-row"><div class="ss-field-group" style="flex:1"><div class="ss-field-label">Timing</div><input class="hm-input" data-field="timing" value="' + _esc(item.timing || 'BEFORE') + '" /></div><div class="ss-field-group" style="flex:1"><div class="ss-field-label">Event</div><input class="hm-input" data-field="event" value="' + _esc(item.event || 'INSERT') + '" /></div></div><div class="ss-field-group"><div class="ss-field-label">Function</div><input class="hm-input" data-field="function_name" value="' + _esc(item.function_name || '') + '" placeholder="fn_set_updated_at" /></div><div class="ss-field-group"><div class="ss-field-label">WHEN</div><input class="hm-input" data-field="when_clause" value="' + _esc(item.when_clause || '') + '" placeholder="NEW.status IS DISTINCT FROM OLD.status" /></div><div class="ss-inspector-actions"><button class="hm-btn hm-btn-primary" onclick="Inspector.saveTrigger(\'' + _esc(tbl.id) + '\',\'' + _esc(item.id) + '\')">' + _esc(_t('Luu', 'Save')) + '</button><button class="hm-btn hm-btn-danger" onclick="Inspector.deleteTrigger(\'' + _esc(tbl.id) + '\',\'' + _esc(item.id) + '\')">' + _esc(_t('Xoa', 'Delete')) + '</button></div></div>';
-      }).join('') : '<div class="ss-empty-state"><div>' + _esc(_t('Chua co trigger nao', 'No triggers yet')) + '</div></div>'
+      }).join('') : '<div class="ss-empty-state"><div>' + _esc(_t('Chưa có trigger nào', 'No triggers yet')) + '</div></div>'
     ].join('');
   },
 
@@ -1940,14 +1940,14 @@ var Inspector = {
     if(!tbl) return;
     nextName = _slug(document.getElementById('inp-tbl-name').value);
     if(!isValidIdentifier(nextName)){
-      toast(_t('Ten bang phai la snake_case hop le', 'Table name must be valid snake_case'), 'error');
+      toast(_t('Tên bảng phải là snake_case hợp lệ', 'Table name must be valid snake_case'), 'error');
       return;
     }
     duplicated = ((STORE.schema && STORE.schema.tables) || []).some(function(item){
       return item.id !== tableId && item.name === nextName;
     });
     if(duplicated){
-      toast(_t('Ten bang da ton tai', 'Table name already exists'), 'error');
+      toast(_t('Tên bảng đã tồn tại', 'Table name already exists'), 'error');
       return;
     }
     pushUndo();
@@ -1962,7 +1962,7 @@ var Inspector = {
     Browser.render();
     markDirty();
     saveDraft();
-    toast(_t('Da luu bang ' + tbl.name, 'Saved table ' + tbl.name), 'success');
+    toast(_t('Đã lưu bảng ' + tbl.name, 'Saved table ' + tbl.name), 'success');
   },
 
   addIndex: function(tableId){
@@ -2117,7 +2117,7 @@ var Inspector = {
   buildColumnFormHTML: function(tbl, col){
     var relation = relationByColumn(tbl.id, col.id);
     return [
-      Inspector.fieldGroup(_t('Ten cot', 'Column name'),
+      Inspector.fieldGroup(_t('Tên cột', 'Column name'),
         '<input class="hm-input" id="col-name" value="' + _esc(col.name) + '" />'),
       Inspector.fieldGroup(_t('Kieu du lieu', 'Data type'),
         '<select class="hm-input" id="col-type">' + buildTypeOptions(col.type) + '</select>'),
@@ -2142,9 +2142,9 @@ var Inspector = {
         '<input class="hm-input" id="col-generated" value="' + _esc(col.generated_expr || '') + '" placeholder="col_a + col_b" />'),
       '<div class="ss-field-group" id="col-generated-opts"' + (col.generated_expr ? '' : ' style="display:none"') + '><label class="ss-toggle-row"><input type="checkbox" id="col-generated-stored"' + (col.generated_stored ? ' checked' : '') + ' /><span>STORED</span></label></div>',
       '<div class="ss-fk-section">',
-        relation ? '<div class="ss-field-label">Foreign Key</div><div class="ss-rel-card">' + _esc((findTable(relation.to_table_id) || { name:"?" }).name + "." + ((findCol(relation.to_table_id, relation.to_col_id) || { name:"?" }).name)) + '</div>' + Inspector.fieldGroup('ON DELETE', '<select class="hm-input" id="col-on-delete">' + ON_ACTIONS.map(function(action){ return '<option value="' + _esc(action) + '"' + (action === relation.on_delete ? ' selected' : '') + '>' + _esc(action) + '</option>'; }).join('') + '</select>') + Inspector.fieldGroup('ON UPDATE', '<select class="hm-input" id="col-on-update">' + ON_ACTIONS.map(function(action){ return '<option value="' + _esc(action) + '"' + (action === relation.on_update ? ' selected' : '') + '>' + _esc(action) + '</option>'; }).join('') + '</select>') + '<div class="ss-field-group"><label class="ss-toggle-row"><input type="checkbox" id="col-fk-deferrable"' + ((col.foreign_key && col.foreign_key.deferrable) ? ' checked' : '') + ' /><span>DEFERRABLE</span></label></div><div class="ss-inspector-actions"><button class="hm-btn hm-btn-ghost" onclick="Inspector.openRelation(\'' + _esc(relation.id) + '\')">' + _esc(_t('Mo relation', 'Open relation')) + '</button><button class="hm-btn hm-btn-danger" onclick="Inspector.removeFK(\'' + _esc(tbl.id) + '\',\'' + _esc(col.id) + '\')">' + _esc(_t('Go FK', 'Remove FK')) + '</button></div>' : '<button class="hm-btn hm-btn-secondary" onclick="Connector.openFkWizard(\'' + _esc(tbl.id) + '\',\'' + _esc(col.id) + '\')">+ Foreign Key</button>',
+        relation ? '<div class="ss-field-label">Foreign Key</div><div class="ss-rel-card">' + _esc((findTable(relation.to_table_id) || { name:"?" }).name + "." + ((findCol(relation.to_table_id, relation.to_col_id) || { name:"?" }).name)) + '</div>' + Inspector.fieldGroup('ON DELETE', '<select class="hm-input" id="col-on-delete">' + ON_ACTIONS.map(function(action){ return '<option value="' + _esc(action) + '"' + (action === relation.on_delete ? ' selected' : '') + '>' + _esc(action) + '</option>'; }).join('') + '</select>') + Inspector.fieldGroup('ON UPDATE', '<select class="hm-input" id="col-on-update">' + ON_ACTIONS.map(function(action){ return '<option value="' + _esc(action) + '"' + (action === relation.on_update ? ' selected' : '') + '>' + _esc(action) + '</option>'; }).join('') + '</select>') + '<div class="ss-field-group"><label class="ss-toggle-row"><input type="checkbox" id="col-fk-deferrable"' + ((col.foreign_key && col.foreign_key.deferrable) ? ' checked' : '') + ' /><span>DEFERRABLE</span></label></div><div class="ss-inspector-actions"><button class="hm-btn hm-btn-ghost" onclick="Inspector.openRelation(\'' + _esc(relation.id) + '\')">' + _esc(_t('Mở liên kết', 'Open relation')) + '</button><button class="hm-btn hm-btn-danger" onclick="Inspector.removeFK(\'' + _esc(tbl.id) + '\',\'' + _esc(col.id) + '\')">' + _esc(_t('Gỡ FK', 'Remove FK')) + '</button></div>' : '<button class="hm-btn hm-btn-secondary" onclick="Connector.openFkWizard(\'' + _esc(tbl.id) + '\',\'' + _esc(col.id) + '\')">+ Foreign Key</button>',
       '</div>',
-      '<div class="ss-inspector-actions"><button class="hm-btn hm-btn-primary" onclick="Inspector.saveColumn(\'' + _esc(tbl.id) + '\',\'' + _esc(col.id) + '\')">' + _esc(_t('Luu cot', 'Save column')) + '</button><button class="hm-btn hm-btn-danger" onclick="TableCard.deleteColumn(\'' + _esc(tbl.id) + '\',\'' + _esc(col.id) + '\')">' + _esc(_t('Xoa cot', 'Delete column')) + '</button></div>'
+      '<div class="ss-inspector-actions"><button class="hm-btn hm-btn-primary" onclick="Inspector.saveColumn(\'' + _esc(tbl.id) + '\',\'' + _esc(col.id) + '\')">' + _esc(_t('Lưu cột', 'Save column')) + '</button><button class="hm-btn hm-btn-danger" onclick="TableCard.deleteColumn(\'' + _esc(tbl.id) + '\',\'' + _esc(col.id) + '\')">' + _esc(_t('Xóa cột', 'Delete column')) + '</button></div>'
     ].join('');
   },
 
@@ -2176,15 +2176,15 @@ var Inspector = {
     if(!col || !tbl) return;
     nextName = _slug(document.getElementById('col-name').value);
     if(!isValidIdentifier(nextName)){
-      toast(_t('Ten cot phai la snake_case hop le', 'Column name must be valid snake_case'), 'error');
+      toast(_t('Tên cột phải là snake_case hợp lệ', 'Column name must be valid snake_case'), 'error');
       return;
     }
     if(isReservedWord(nextName)){
-      toast(_t('Ten cot dang trung tu khoa SQL', 'Column name uses a reserved SQL keyword'), 'error');
+      toast(_t('Tên cột đang trùng từ khóa SQL', 'Column name uses a reserved SQL keyword'), 'error');
       return;
     }
     if((tbl.columns || []).some(function(item){ return item.id !== colId && item.name === nextName; })){
-      toast(_t('Ten cot da ton tai trong bang', 'Column name already exists in table'), 'error');
+      toast(_t('Tên cột đã tồn tại trong bảng', 'Column name already exists in table'), 'error');
       return;
     }
     pushUndo();
@@ -2217,7 +2217,7 @@ var Inspector = {
     Browser.render();
     markDirty();
     saveDraft();
-    toast(_t('Da luu cot ' + col.name, 'Saved column ' + col.name), 'success');
+    toast(_t('Đã lưu cột ' + col.name, 'Saved column ' + col.name), 'success');
     Inspector.renderColumn(tableId, colId);
   },
 
@@ -2247,7 +2247,7 @@ var Inspector = {
         Inspector.fieldGroup('ON DELETE', '<select class="hm-input" id="rel-on-delete">' + ON_ACTIONS.map(function(action){ return '<option value="' + _esc(action) + '"' + (action === rel.on_delete ? ' selected' : '') + '>' + _esc(action) + '</option>'; }).join('') + '</select>'),
         Inspector.fieldGroup('ON UPDATE', '<select class="hm-input" id="rel-on-update">' + ON_ACTIONS.map(function(action){ return '<option value="' + _esc(action) + '"' + (action === rel.on_update ? ' selected' : '') + '>' + _esc(action) + '</option>'; }).join('') + '</select>'),
         '<div class="ss-field-group"><label class="ss-toggle-row"><input type="checkbox" id="rel-edge-curved"' + ((rel.edge && rel.edge.type === 'curved') ? ' checked' : '') + ' /><span>' + _esc(_t('Canh cong', 'Curved edge')) + '</span></label></div>',
-        '<div class="ss-inspector-actions"><button class="hm-btn hm-btn-primary" onclick="Inspector.saveRelation(\'' + _esc(rel.id) + '\')">' + _esc(_t('Luu relation', 'Save relation')) + '</button><button class="hm-btn hm-btn-danger" onclick="Inspector.removeRelation(\'' + _esc(rel.id) + '\')">' + _esc(_t('Xoa relation', 'Delete relation')) + '</button></div>',
+        '<div class="ss-inspector-actions"><button class="hm-btn hm-btn-primary" onclick="Inspector.saveRelation(\'' + _esc(rel.id) + '\')">' + _esc(_t('Lưu liên kết', 'Save relation')) + '</button><button class="hm-btn hm-btn-danger" onclick="Inspector.removeRelation(\'' + _esc(rel.id) + '\')">' + _esc(_t('Xóa liên kết', 'Delete relation')) + '</button></div>',
       '</div>'
     ].join('');
   },
@@ -2275,7 +2275,7 @@ var Inspector = {
     VirtualRenderer.scheduleUpdate();
     markDirty();
     saveDraft();
-    toast(_t('Da luu relation', 'Relation saved'), 'success');
+    toast(_t('Đã lưu liên kết', 'Relation saved'), 'success');
   },
 
   removeFK: function(tableId, colId){
@@ -3505,7 +3505,7 @@ var CodePanel = {
 
   copy: function(){
     navigator.clipboard.writeText(STORE.codePanel.content || '');
-    toast(_t('Da copy vao clipboard', 'Copied to clipboard'), 'success');
+    toast(_t('Đã copy vào clipboard', 'Copied to clipboard'), 'success');
   },
 
   download: function(){
@@ -3841,7 +3841,7 @@ var Validator = {
       '<div class="ss-val-list">',
         results.length ? results.map(function(item){
           return '<div class="ss-val-item ' + _esc(item.level) + '"><span class="ss-val-code">' + _esc(item.code) + '</span><span class="ss-val-msg">' + _esc(item.msg) + '</span>' + (Validator._fixes[item.id] ? '<button class="hm-btn hm-btn-ghost ss-btn-xs" onclick="Validator.runFix(\'' + _esc(item.id) + '\')">Fix</button>' : '') + (item.tableId ? '<button class="hm-btn hm-btn-ghost ss-btn-xs" onclick="Validator.locate(\'' + _esc(item.tableId) + '\')">Locate</button>' : '') + '</div>';
-        }).join('') : '<div class="ss-empty-state"><div>' + _esc(_t('Khong co van de nao duoc tim thay', 'No issues found')) + '</div></div>',
+        }).join('') : '<div class="ss-empty-state"><div>' + _esc(_t('Không có vấn đề nào được tìm thấy', 'No issues found')) + '</div></div>',
       '</div>'
     ].join('');
   },
@@ -3984,7 +3984,7 @@ var Importer = {
         Importer.applySchema(res.schema);
       }
     }).catch(function(err){
-      toast(_t('Khong load duoc registry', 'Failed to load registry') + ': ' + (err.message || ''), 'error');
+      toast(_t('Không load được registry', 'Failed to load registry') + ': ' + (err.message || ''), 'error');
     });
   },
 
@@ -4262,8 +4262,8 @@ var CmdPalette = {
   _filteredCommands: [],
   _selectedIdx: 0,
   COMMANDS: [
-    { icon:'+', label:'Tao bang moi', label_en:'New table', category:'action', action:function(){ TableCard.createNew(200, 200); } },
-    { icon:'S', label:'Luu schema', label_en:'Save schema', category:'action', action:function(){ SchemaLib.save(); } },
+    { icon:'+', label:'Tạo bảng mới', label_en:'New table', category:'action', action:function(){ TableCard.createNew(200, 200); } },
+    { icon:'S', label:'Lưu schema', label_en:'Save schema', category:'action', action:function(){ SchemaLib.save(); } },
     { icon:'I', label:'Import schema', label_en:'Import schema', category:'action', action:function(){ Importer.openModal(); } },
     { icon:'D', label:'Load tu DB', label_en:'Load from DB', category:'action', action:function(){ SchemaLib.loadFromLiveDB(); } },
     { icon:'V', label:'Validation', label_en:'Validation', category:'action', action:function(){ Validator.run(); } },
@@ -4278,8 +4278,8 @@ var CmdPalette = {
     { icon:'G', label:'Grid layout', label_en:'Grid layout', category:'layout', action:function(){ Layout.auto('grid'); } },
     { icon:'F', label:'Force layout', label_en:'Force layout', category:'layout', action:function(){ Layout.auto('force'); } },
     { icon:'H', label:'Hierarchical layout', label_en:'Hierarchical layout', category:'layout', action:function(){ Layout.auto('hierarchical'); } },
-    { icon:'C', label:'Mo SQL', label_en:'Open SQL', category:'export', action:function(){ CodePanel.open('sql'); } },
-    { icon:'B', label:'Dat baseline', label_en:'Set baseline', category:'migration', action:function(){ MigGen.setBaseline(); } }
+    { icon:'C', label:'Mở SQL', label_en:'Open SQL', category:'export', action:function(){ CodePanel.open('sql'); } },
+    { icon:'B', label:'Đặt baseline', label_en:'Set baseline', category:'migration', action:function(){ MigGen.setBaseline(); } }
   ],
 
   open: function(){
@@ -4345,13 +4345,13 @@ var CmdPalette = {
     CmdPalette._filteredCommands = commandResults;
     CmdPalette._selectedIdx = 0;
     document.getElementById('ss-cmd-results').innerHTML = [
-      commandResults.length ? '<div class="ss-cmd-group-label">' + _esc(_t('Lenh', 'Commands')) + '</div>' + commandResults.map(function(item, index){
+      commandResults.length ? '<div class="ss-cmd-group-label">' + _esc(_t('Lệnh', 'Commands')) + '</div>' + commandResults.map(function(item, index){
         return '<div class="ss-cmd-item' + (index === 0 ? ' active' : '') + '" onclick="CmdPalette.execute(' + index + ')"><span class="ss-cmd-icon">' + _esc(item.icon) + '</span><span class="ss-cmd-label">' + _esc((window._lang === 'en' ? item.label_en : item.label)) + '</span><span class="ss-cmd-cat">' + _esc(item.category) + '</span></div>';
       }).join('') : '',
-      tableResults.length ? '<div class="ss-cmd-group-label">' + _esc(_t('Bang', 'Tables')) + '</div>' + tableResults.map(function(tbl){
+      tableResults.length ? '<div class="ss-cmd-group-label">' + _esc(_t('Bảng', 'Tables')) + '</div>' + tableResults.map(function(tbl){
         return '<div class="ss-cmd-item" onclick="Browser.focusTable(\'' + _esc(tbl.id) + '\');CmdPalette.close()"><span class="ss-cmd-icon">T</span><span class="ss-cmd-label">' + _esc(tbl.name) + '</span><span class="ss-cmd-cat">' + _esc(tbl.domain || '') + '</span></div>';
       }).join('') : '',
-      (!commandResults.length && !tableResults.length) ? '<div class="ss-cmd-empty">' + _esc(_t('Khong tim thay', 'No results')) + '</div>' : ''
+      (!commandResults.length && !tableResults.length) ? '<div class="ss-cmd-empty">' + _esc(_t('Không tìm thấy', 'No results')) + '</div>' : ''
     ].join('');
   },
 
@@ -4455,7 +4455,7 @@ var SchemaLib = {
           var draftDoc = JSON.parse(draft);
           var draftTime = new Date((draftDoc._meta && draftDoc._meta.updatedAt) || 0).getTime();
           var serverTime = new Date((schema._meta && schema._meta.updatedAt) || 0).getTime();
-          if(draftTime > serverTime && window.confirm(_t('Co ban nhap chua luu. Dung ban nhap?', 'An unsaved draft exists. Use the draft?'))){
+          if(draftTime > serverTime && window.confirm(_t('Có bản nháp chưa lưu. Dùng bản nháp?', 'An unsaved draft exists. Use the draft?'))){
             schema = draftDoc;
           }
         }catch(ignoreErr){}
@@ -4470,7 +4470,7 @@ var SchemaLib = {
       Inspector.close();
       scheduleZoomToFit(120);
     }).catch(function(err){
-      toast(_t('Khong tai duoc schema', 'Failed to load schema') + ': ' + (err.message || ''), 'error');
+      toast(_t('Không tải được schema', 'Failed to load schema') + ': ' + (err.message || ''), 'error');
     });
   },
 
@@ -4641,7 +4641,7 @@ function bindKeyboard(){
         STORE.clipboard = {
           tables: selectedTableIds.map(function(id){ return _clone(findTable(id)); }).filter(Boolean)
         };
-        toast(_t('Da copy ' + selectedTableIds.length + ' bang', 'Copied ' + selectedTableIds.length + ' table(s)'), 'info');
+        toast(_t('Đã copy ' + selectedTableIds.length + ' bảng', 'Copied ' + selectedTableIds.length + ' table(s)'), 'info');
         ev.preventDefault();
       }
       return;
@@ -4668,7 +4668,7 @@ function bindKeyboard(){
         Browser.render();
         markDirty();
         saveDraft();
-        toast(_t('Da paste ' + STORE.clipboard.tables.length + ' bang', 'Pasted ' + STORE.clipboard.tables.length + ' table(s)'), 'success');
+        toast(_t('Đã paste ' + STORE.clipboard.tables.length + ' bảng', 'Pasted ' + STORE.clipboard.tables.length + ' table(s)'), 'success');
         ev.preventDefault();
       }
       return;
