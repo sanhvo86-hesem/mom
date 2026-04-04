@@ -1792,7 +1792,7 @@
 
 .ss-browser.is-domain-view {
   display: grid;
-  grid-template-rows: minmax(240px, 1fr) minmax(260px, 1fr);
+  grid-template-rows: auto 1fr;
 }
 
 .ss-browser.is-domain-view .ss-browser-search-wrap,
@@ -1803,15 +1803,20 @@
 .ss-browser.is-domain-view .ss-browser-search-wrap {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  overflow: hidden;
+  gap: var(--space-2);
+  overflow: visible;
 }
 
 .ss-browser.is-domain-view .ss-domain-chip-strip {
-  flex: 1;
+  flex: 0 0 auto;
   align-content: flex-start;
   overflow: auto;
+  max-height: 96px;
   padding-right: 4px;
+}
+
+.ss-browser.is-domain-view .ss-browser-search-meta {
+  display: none;
 }
 
 .ss-browser.is-domain-view .ss-browser-list {
