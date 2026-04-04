@@ -65,6 +65,12 @@ class SchemaStudioController extends BaseController
         return $this->snapshotDir . '/' . $this->safeId($id) . '.baseline.json';
     }
 
+    private function destructiveConfirmToken(array $user): string
+    {
+        $actor = (string)($user['user_id'] ?? $user['username'] ?? 'system');
+        return 'CONFIRMED_DESTRUCTIVE_' . $actor;
+    }
+
     private function normalizeFieldList($value): array
     {
         if (is_array($value)) {
@@ -245,6 +251,7 @@ class SchemaStudioController extends BaseController
 
         $tableMap = [];
         $colMap = [];
+        $columnIndexMap = [];
         $tables = $tableRegistry['tables'] ?? [];
         $tableIndex = 0;
         foreach ($tables as $tableName => $tableDef) {
@@ -287,6 +294,7 @@ class SchemaStudioController extends BaseController
                     'comment' => is_array($columnDef) ? (string)($columnDef['description'] ?? $columnDef['label'] ?? $columnDef['comment'] ?? '') : '',
                     'foreign_key' => null,
                 ];
+                $columnIndexMap[$colId] = ['table' => $tableIndex, 'column' => count($columns) - 1];
             }
             $schema['tables'][] = [
                 'id' => $tableId,
@@ -311,7 +319,16 @@ class SchemaStudioController extends BaseController
             $tableIndex++;
         }
 
-        foreach (($relationMap['edges'] ?? []) as $edge) {
+        $edges = [];
+        if (is_array($relationMap['edges'] ?? null)) {
+            $edges = $relationMap['edges'];
+        } elseif (is_array($relationMap['relations'] ?? null)) {
+            $edges = $relationMap['relations'];
+        } elseif (is_array($relationMap)) {
+            $edges = $relationMap;
+        }
+
+        foreach ($edges as $edge) {
             $fromTable = is_scalar($edge['from']['entity'] ?? null) ? trim((string)$edge['from']['entity']) : '';
             $toTable = is_scalar($edge['to']['entity'] ?? null) ? trim((string)$edge['to']['entity']) : '';
             $fromFields = $this->normalizeFieldList($edge['from']['field'] ?? '');
@@ -345,6 +362,12 @@ class SchemaStudioController extends BaseController
                     continue;
                 }
 
+                $sourceColumnRef = $columnIndexMap[$fromColId] ?? null;
+                $sourceNullable = true;
+                if ($sourceColumnRef) {
+                    $sourceNullable = (bool)($schema['tables'][$sourceColumnRef['table']]['columns'][$sourceColumnRef['column']]['nullable'] ?? true);
+                }
+
                 $suffix = $pairCount > 1 ? '_' . ($pairIndex + 1) : '';
                 $schema['relations'][] = [
                     'id' => 'rel_' . substr(md5($fromTable . '.' . $fromCol . '>' . $toTable . '.' . $toCol), 0, 10),
@@ -355,9 +378,20 @@ class SchemaStudioController extends BaseController
                     'name' => 'fk_' . $fromTable . '_' . $fromCol . $suffix,
                     'on_delete' => $onDelete,
                     'on_update' => $onUpdate,
-                    'nullable' => true,
+                    'nullable' => $sourceNullable,
                     'edge' => ['type' => 'orthogonal', 'waypoints' => []],
                 ];
+
+                if ($sourceColumnRef) {
+                    $schema['tables'][$sourceColumnRef['table']]['columns'][$sourceColumnRef['column']]['foreign_key'] = [
+                        'ref_table_id' => $toTableId,
+                        'ref_col_id' => $toColId,
+                        'constraint_name' => 'fk_' . $fromTable . '_' . $fromCol . $suffix,
+                        'on_delete' => $onDelete,
+                        'on_update' => $onUpdate,
+                        'deferrable' => false,
+                    ];
+                }
             }
         }
 
@@ -578,8 +612,12 @@ class SchemaStudioController extends BaseController
         }
         $destructive = (bool)preg_match('/\bDROP\s+(TABLE|COLUMN|TYPE|INDEX)\b/i', $sql);
         $allowDestructive = (bool)($body['allow_destructive'] ?? false);
-        if ($destructive && !$allowDestructive) {
-            $this->error('destructive_requires_confirmation', 400);
+        $confirmToken = (string)($body['confirm_destructive'] ?? '');
+        if ($destructive && (!$allowDestructive || $confirmToken !== $this->destructiveConfirmToken($user))) {
+            $this->error('destructive_requires_confirmation', 400, null, [
+                'requires_confirm' => true,
+                'confirm_format' => 'CONFIRMED_DESTRUCTIVE_{user_id}',
+            ]);
         }
         $sql = preg_replace('/^\s*BEGIN\s*;\s*/i', '', $sql) ?? $sql;
         $sql = preg_replace('/\s*COMMIT\s*;\s*$/i', '', $sql) ?? $sql;
@@ -682,7 +720,9 @@ class SchemaStudioController extends BaseController
             $this->error('export_failed', 500);
         }
         $filename = $this->exportDir . '/schema_export_' . gmdate('Ymd_His') . '.json';
-        @file_put_contents($filename, $payload);
+        if (@file_put_contents($filename, $payload) === false) {
+            $this->error('export_failed', 500);
+        }
         $this->success(['path' => $filename]);
     }
 }

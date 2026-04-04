@@ -3599,12 +3599,14 @@ var MigGen = {
 
   applyMigration: function(){
     var diff = STORE.migration.diff || { destructive:[] };
+    var destructiveToken = 'CONFIRMED_DESTRUCTIVE_' + ((window.currentUser && (window.currentUser.user_id || window.currentUser.username)) || 'system');
     confirm2(_t('Áp dụng migration lên database?', 'Apply migration to the database?'), diff.destructive.length > 0).then(function(ok){
       if(!ok) return;
       return _api('schema_studio_apply_migration', {
         sql: STORE.migration.previewSql || '',
         design_id: STORE.currentDesignId || (STORE.schema && STORE.schema._meta && STORE.schema._meta.id) || null,
-        allow_destructive: diff.destructive.length > 0
+        allow_destructive: diff.destructive.length > 0,
+        confirm_destructive: diff.destructive.length > 0 ? destructiveToken : ''
       }).then(function(){
         STORE.baseline = _clone(STORE.schema);
         MigGen.closePreview();
