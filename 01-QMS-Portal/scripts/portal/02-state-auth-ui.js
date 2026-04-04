@@ -311,11 +311,11 @@ async function loadPortalDisplayConfigFromServer(options={}){
           try{ renderSidebar(); }catch(e){}
         }
       }else if(!options.silent){
-        showToast('⚠ ' + ((res && res.error) ? res.error : (lang==='en'?'display_config_load_failed':'Khong tai duoc cau hinh hien thi portal')));
+        showToast('⚠ ' + ((res && res.error) ? res.error : (lang==='en'?'display_config_load_failed':'Không tải được cấu hình hiển thị portal')));
       }
     }catch(e){
       if(!options.silent){
-        showToast('⚠ ' + ((e && e.message) ? e.message : (lang==='en'?'display_config_load_failed':'Khong tai duoc cau hinh hien thi portal')));
+        showToast('⚠ ' + ((e && e.message) ? e.message : (lang==='en'?'display_config_load_failed':'Không tải được cấu hình hiển thị portal')));
       }
     }finally{
       portalDisplayConfigLoadPromise = null;

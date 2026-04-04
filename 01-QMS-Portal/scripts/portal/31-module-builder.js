@@ -2663,7 +2663,7 @@ function _renderRegistryFieldSelect(field, path, textValue, attrs, placeholder){
       });
       h += '</div>';
     } else {
-      h += '<div class="mb-field-hint">'+_t('Khong co truong nao khop voi bo loc hien tai.', 'No fields matched the current filters.')+'</div>';
+      h += '<div class="mb-field-hint">'+_t('Không có trường nào khớp với bộ lọc hiện tại.', 'No fields matched the current filters.')+'</div>';
     }
   }
   h += '</div>';
@@ -5698,7 +5698,7 @@ _saveModule = function(){
     _writeRuntimeSchemaLocal(state.schema.moduleId, runtimeSchema);
     _saveBuilderSnapshotLocal();
     _addToSavedModules(state.schema);
-    if(BE.toast) BE.toast(_t('Da luu module: ', 'Module saved: ') + _t(state.schema.title.vi, state.schema.title.en), 'success');
+    if(BE.toast) BE.toast(_t('Đã lưu module: ', 'Module saved: ') + _t(state.schema.title.vi, state.schema.title.en), 'success');
     return Promise.resolve({ ok:true, local:true, schema:runtimeSchema });
   }
   saveRequest = apiCall('module_schema_save', { schema: runtimeSchema }, 'POST', 10000).then(function(resp){
@@ -5715,11 +5715,11 @@ _saveModule = function(){
     _saveBuilderSnapshotLocal();
     _addToSavedModules(state.schema);
     _clearRuntimeModuleCache(state.schema.moduleId);
-    if(BE.toast) BE.toast(_t('Da luu module: ', 'Module saved: ') + _t(state.schema.title.vi, state.schema.title.en), 'success');
+    if(BE.toast) BE.toast(_t('Đã lưu module: ', 'Module saved: ') + _t(state.schema.title.vi, state.schema.title.en), 'success');
     return resp;
   }).catch(function(err){
     _addToSavedModules(state.schema);
-    if(BE.toast) BE.toast(_t('Luu that bai, da giu ban local', 'Save failed, kept local copy'), 'warning');
+    if(BE.toast) BE.toast(_t('Lưu thất bại, đã giữ bản local', 'Save failed, kept local copy'), 'warning');
     return { ok:false, local:true, error: err && err.message ? err.message : 'save_failed' };
   });
   return saveRequest;
@@ -5737,7 +5737,7 @@ _openSavedModule = function(moduleId){
     state.step = 'build';
     _clearRuntimeModuleCache(moduleId);
     _saveBuilderSnapshotLocal();
-    _resetUndoBaseline(_t('Mo module', 'Open module'));
+    _resetUndoBaseline(_t('Mở module', 'Open module'));
     _paint();
     return true;
   }
@@ -5761,7 +5761,7 @@ _openSavedModule = function(moduleId){
     _writeRuntimeSchemaLocal(moduleId, resp.schema);
     return applySchema(resp.schema);
   }).catch(function(){
-    if(BE.toast) BE.toast(_t('Khong mo duoc module da luu', 'Unable to open saved module'), 'error');
+    if(BE.toast) BE.toast(_t('Không mở được module đã lưu', 'Unable to open saved module'), 'error');
     return false;
   });
 };
@@ -5793,7 +5793,7 @@ _deleteSavedModule = function(moduleId){
     }
     return finalizeDelete();
   }).catch(function(){
-    if(BE.toast) BE.toast(_t('Xoa module that bai', 'Delete module failed'), 'error');
+    if(BE.toast) BE.toast(_t('Xóa module thất bại', 'Delete module failed'), 'error');
     return false;
   });
 };
@@ -6526,7 +6526,7 @@ _handleInput = function(e){
     return;
   }
   if(target.id === 'mb-layout-columns'){
-    _mutateSchema(_t('Cap nhat so cot', 'Update column count'), function(){
+    _mutateSchema(_t('Cập nhật số cột', 'Update column count'), function(){
       var tab = _getActiveTab();
       if(!tab) return;
       _ensureTabLayout(tab);
@@ -6536,7 +6536,7 @@ _handleInput = function(e){
     return;
   }
   if(target.id === 'mb-layout-gap'){
-    _mutateSchema(_t('Cap nhat khoang cach canvas', 'Update canvas gap'), function(){
+    _mutateSchema(_t('Cập nhật khoảng cách canvas', 'Update canvas gap'), function(){
       var tab = _getActiveTab();
       if(!tab) return;
       _ensureTabLayout(tab);
@@ -6588,8 +6588,8 @@ _handleInput = function(e){
           if(_getByPath(state.propsDraft, path) !== api) return;
           result = _autoPopulateDraftFromApi(state.propsDraft, api);
           if(result){
-            _syncDraftToSelectedBlock(_t('Tu dong them schema tu registry', 'Auto-populate from registry'));
-            _toastBuilder(_t('Da tu dong them ', 'Auto-added ') + result.count + ' ' + result.noun + _t(' tu registry.', ' from registry.'), 'success');
+            _syncDraftToSelectedBlock(_t('Tự động thêm schema từ registry', 'Auto-populate from registry'));
+            _toastBuilder(_t('Đã tự động thêm ', 'Auto-added ') + result.count + ' ' + result.noun + _t(' từ registry.', ' from registry.'), 'success');
           } else if(state.selectedBlock === selectedBlockId){
             _paint();
           }
@@ -6604,13 +6604,13 @@ _handleInput = function(e){
     if(path === 'config.workflow.workflowId'){
       workflowId = target.value || '';
       if(workflowId && _applyWorkflowRegistryToDraft(state.propsDraft, workflowId)){
-        _syncDraftToSelectedBlock(_t('Dong bo workflow tu registry', 'Sync workflow from registry'));
-        _toastBuilder(_t('Da tu dong tao transitions, guards va SLA tu workflow da chon.', 'Transitions, guards, and SLA were generated from the selected workflow.'), 'success');
+        _syncDraftToSelectedBlock(_t('Đồng bộ workflow từ registry', 'Sync workflow from registry'));
+        _toastBuilder(_t('Đã tự động tạo transitions, guards và SLA từ workflow đã chọn.', 'Transitions, guards, and SLA were generated from the selected workflow.'), 'success');
         return;
       }
     }
     if(path === 'config.validation.autoApply' && state.propsDraft && state.propsDraft.type === 'form-standard'){
-      _syncDraftToSelectedBlock(_t('Cap nhat validation tu dong', 'Update automatic validation'));
+      _syncDraftToSelectedBlock(_t('Cập nhật validation tự động', 'Update automatic validation'));
       return;
     }
     if(target.getAttribute('data-trigger-repaint') === '1') _paint();

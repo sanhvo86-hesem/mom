@@ -303,7 +303,7 @@ function confirm2(msg, dangerous){
       overlay.innerHTML = [
         '<div class="ss-confirm-modal">',
           '<div class="ss-confirm-header"><strong>',
-            dangerous ? _esc(_t('Xac nhan thao tac nguy hiem', 'Confirm destructive action')) : _esc(_t('Xac nhan', 'Confirm')),
+            dangerous ? _esc(_t('Xác nhận thao tác nguy hiểm', 'Confirm destructive action')) : _esc(_t('Xác nhận', 'Confirm')),
           '</strong></div>',
           '<div class="ss-confirm-body">',
             '<div>', _esc(msg), '</div>',
@@ -312,7 +312,7 @@ function confirm2(msg, dangerous){
           '</div>',
           '<div class="ss-confirm-actions">',
             '<button type="button" class="hm-btn hm-btn-ghost" data-ss-confirm="cancel">', _esc(_t('Huy', 'Cancel')), '</button>',
-            '<button type="button" class="hm-btn ', dangerous ? 'hm-btn-danger' : 'hm-btn-primary', '" data-ss-confirm="ok">', _esc(step === 1 ? _t('Tiep tuc', 'Continue') : _t('Xac nhan', 'Confirm')), '</button>',
+            '<button type="button" class="hm-btn ', dangerous ? 'hm-btn-danger' : 'hm-btn-primary', '" data-ss-confirm="ok">', _esc(step === 1 ? _t('Tiếp tục', 'Continue') : _t('Xác nhận', 'Confirm')), '</button>',
           '</div>',
         '</div>'
       ].join('');
@@ -657,9 +657,9 @@ var Canvas = {
         '<div class="ss-minimap-viewport" id="ss-minimap-viewport"></div>',
       '</div>',
       '<div class="ss-zoom-controls">',
-        '<button type="button" id="ss-zoom-in" title="Zoom in">+</button>',
-        '<button type="button" id="ss-zoom-reset" class="ss-zoom-val" title="Reset zoom">100%</button>',
-        '<button type="button" id="ss-zoom-out" title="Zoom out">-</button>',
+        '<button type="button" id="ss-zoom-in" title="Zoom in" aria-label="' + _esc(_t('Phóng to canvas', 'Zoom in canvas')) + '">+</button>',
+        '<button type="button" id="ss-zoom-reset" class="ss-zoom-val" title="Reset zoom" aria-label="' + _esc(_t('Đặt lại mức zoom', 'Reset zoom level')) + '">100%</button>',
+        '<button type="button" id="ss-zoom-out" title="Zoom out" aria-label="' + _esc(_t('Thu nhỏ canvas', 'Zoom out canvas')) + '">-</button>',
       '</div>',
       '<div class="ss-canvas-mode-indicator" id="ss-canvas-mode-indicator"></div>'
     ].join('');
@@ -1289,15 +1289,15 @@ var Connector = {
         '<div class="ss-modal">',
           '<div class="ss-modal-header"><h3>', _esc(_t('Tạo khóa ngoại', 'Create foreign key')), '</h3><button type="button" class="hm-btn hm-btn-ghost" data-ss-close="fk">X</button></div>',
           '<div class="ss-modal-body">',
-            '<div class="ss-field-group"><div class="ss-field-label">', _esc(_t('Nguon', 'Source')), '</div><div class="ss-rel-card">', _esc(fromTable.name + '.' + fromCol.name), '</div></div>',
+            '<div class="ss-field-group"><div class="ss-field-label">', _esc(_t('Nguồn', 'Source')), '</div><div class="ss-rel-card">', _esc(fromTable.name + '.' + fromCol.name), '</div></div>',
             '<div class="ss-field-group"><div class="ss-field-label">', _esc(_t('Bảng đích', 'Target table')), '</div><select class="hm-input" id="ss-fk-target-table">', tableOptions.map(function(tbl){ return '<option value="' + _esc(tbl.id) + '"' + (tbl.id === activeTableId ? ' selected' : '') + '>' + _esc(tbl.name) + '</option>'; }).join(''), '</select></div>',
-            '<div class="ss-field-group"><div class="ss-field-label">', _esc(_t('Cot dich', 'Target column')), '</div><select class="hm-input" id="ss-fk-target-col">', columnState.html, '</select></div>',
+            '<div class="ss-field-group"><div class="ss-field-label">', _esc(_t('Cột đích', 'Target column')), '</div><select class="hm-input" id="ss-fk-target-col">', columnState.html, '</select></div>',
             '<div class="ss-field-row">',
               '<div class="ss-field-group" style="flex:1"><div class="ss-field-label">ON DELETE</div><select class="hm-input" id="ss-fk-on-delete">', ON_ACTIONS.map(function(action){ return '<option value="' + _esc(action) + '"' + (action === 'RESTRICT' ? ' selected' : '') + '>' + _esc(action) + '</option>'; }).join(''), '</select></div>',
               '<div class="ss-field-group" style="flex:1"><div class="ss-field-label">ON UPDATE</div><select class="hm-input" id="ss-fk-on-update">', ON_ACTIONS.map(function(action){ return '<option value="' + _esc(action) + '"' + (action === 'CASCADE' ? ' selected' : '') + '>' + _esc(action) + '</option>'; }).join(''), '</select></div>',
             '</div>',
           '</div>',
-          '<div class="ss-modal-footer"><button type="button" class="hm-btn hm-btn-ghost" data-ss-close="fk">', _esc(_t('Huy', 'Cancel')), '</button><button type="button" class="hm-btn hm-btn-primary" id="ss-fk-confirm">', _esc(_t('Xac nhan', 'Confirm')), '</button></div>',
+          '<div class="ss-modal-footer"><button type="button" class="hm-btn hm-btn-ghost" data-ss-close="fk">', _esc(_t('Hủy', 'Cancel')), '</button><button type="button" class="hm-btn hm-btn-primary" id="ss-fk-confirm">', _esc(_t('Xác nhận', 'Confirm')), '</button></div>',
         '</div>'
       ].join('');
       overlay.querySelectorAll('[data-ss-close="fk"]').forEach(function(node){ node.onclick = function(){ removeNode(overlay); }; });
@@ -1385,6 +1385,9 @@ var TableCard = {
     card.className = 'ss-table-card' + (tbl.canvas.collapsed ? ' collapsed' : '');
     card.id = 'tc_' + tbl.id;
     card.setAttribute('data-table-id', tbl.id);
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', _t('Bảng ', 'Table ') + tbl.name);
     card.style.transform = 'translate(' + tbl.canvas.x + 'px,' + tbl.canvas.y + 'px)';
     card.style.width = effectiveWidth + 'px';
     card.style.setProperty('--ss-domain-color', domainColor);
@@ -1428,6 +1431,18 @@ var TableCard = {
       if(ev.target.closest('.ss-fk-port') || ev.target.closest('.ss-icon-btn') || ev.target.closest('.ss-col-item') || ev.target.closest('.ss-col-item-add')) return;
       Canvas.selectTable(tbl.id, ev.shiftKey || ev.ctrlKey || ev.metaKey);
       Inspector.open({ kind:'table', tableId:tbl.id });
+    });
+    card.addEventListener('keydown', function(ev){
+      if(ev.key === 'Enter'){
+        ev.preventDefault();
+        TableCard.openDetails(tbl.id);
+        return;
+      }
+      if(ev.key === ' '){
+        ev.preventDefault();
+        Canvas.selectTable(tbl.id, ev.shiftKey || ev.ctrlKey || ev.metaKey);
+        Inspector.open({ kind:'table', tableId:tbl.id });
+      }
     });
     card.querySelector('.ss-table-card-header').ondblclick = function(ev){
       ev.preventDefault();
@@ -2324,10 +2339,13 @@ var TableDialog = {
   currentTableId: null,
   draft: null,
   preview: null,
+  _lastFocus: null,
+  _escapeHandler: null,
 
   open: function(tableId){
     var tbl = findTable(tableId);
     if(!tbl) return;
+    this._lastFocus = document.activeElement || null;
     this.currentTableId = tableId;
     this.draft = _clone(tbl);
     this.preview = {
@@ -2338,12 +2356,33 @@ var TableDialog = {
       message: ''
     };
     this.render();
+    if(this._escapeHandler){
+      document.removeEventListener('keydown', this._escapeHandler);
+    }
+    this._escapeHandler = function(ev){
+      if(ev.key === 'Escape'){
+        TableDialog.close();
+      }
+    };
+    document.addEventListener('keydown', this._escapeHandler);
+    window.setTimeout(function(){
+      var nameInput = document.getElementById('dlg-tbl-name');
+      if(nameInput) nameInput.focus();
+    }, 0);
     this.loadPreview();
   },
 
   close: function(){
     var overlay = document.getElementById('ss-table-dialog-overlay');
     if(overlay) removeNode(overlay);
+    if(this._escapeHandler){
+      document.removeEventListener('keydown', this._escapeHandler);
+      this._escapeHandler = null;
+    }
+    if(this._lastFocus && typeof this._lastFocus.focus === 'function'){
+      this._lastFocus.focus();
+    }
+    this._lastFocus = null;
     this.currentTableId = null;
     this.draft = null;
     this.preview = null;
@@ -2539,10 +2578,10 @@ var TableDialog = {
       document.body.appendChild(overlay);
     }
     overlay.innerHTML = [
-      '<div class="ss-modal ss-table-dialog-modal">',
+      '<div class="ss-modal ss-table-dialog-modal" role="dialog" aria-modal="true" aria-labelledby="ss-table-dialog-title">',
         '<div class="ss-modal-header">',
-          '<div><strong>' + _esc(draft.name) + '</strong><div class="ss-field-hint">' + _esc(_t('Chi tiết bảng và dữ liệu mẫu', 'Table details and sample data')) + '</div></div>',
-          '<button type="button" class="hm-btn hm-btn-ghost ss-btn-sm" onclick="TableDialog.close()">' + _esc(_t('Đóng', 'Close')) + '</button>',
+          '<div><strong id="ss-table-dialog-title">' + _esc(draft.name) + '</strong><div class="ss-field-hint">' + _esc(_t('Chi tiết bảng và dữ liệu mẫu', 'Table details and sample data')) + '</div></div>',
+          '<button type="button" class="hm-btn hm-btn-ghost ss-btn-sm" onclick="TableDialog.close()" aria-label="' + _esc(_t('Đóng hộp thoại chi tiết bảng', 'Close table details dialog')) + '">' + _esc(_t('Đóng', 'Close')) + '</button>',
         '</div>',
         '<div class="ss-modal-body ss-table-dialog-body">',
           '<div class="ss-table-dialog-grid">',
@@ -4265,7 +4304,7 @@ var CmdPalette = {
     { icon:'+', label:'Tạo bảng mới', label_en:'New table', category:'action', action:function(){ TableCard.createNew(200, 200); } },
     { icon:'S', label:'Lưu schema', label_en:'Save schema', category:'action', action:function(){ SchemaLib.save(); } },
     { icon:'I', label:'Import schema', label_en:'Import schema', category:'action', action:function(){ Importer.openModal(); } },
-    { icon:'D', label:'Load tu DB', label_en:'Load from DB', category:'action', action:function(){ SchemaLib.loadFromLiveDB(); } },
+    { icon:'D', label:'Nạp từ DB', label_en:'Load from DB', category:'action', action:function(){ SchemaLib.loadFromLiveDB(); } },
     { icon:'V', label:'Validation', label_en:'Validation', category:'action', action:function(){ Validator.run(); } },
     { icon:'M', label:'Migration preview', label_en:'Migration preview', category:'action', action:function(){ MigGen.renderPreview(); } },
     { icon:'Z', label:'Zoom to fit', label_en:'Zoom to fit', category:'view', action:function(){ Canvas.zoomToFit(); } },
@@ -4274,7 +4313,7 @@ var CmdPalette = {
     { icon:'+', label:'Mở rộng tất cả domain', label_en:'Expand all domains', category:'view', action:function(){ Browser.expandAll(); } },
     { icon:'−', label:'Thu gọn tất cả domain', label_en:'Collapse all domains', category:'view', action:function(){ Browser.collapseAll(); } },
     { icon:'⤢', label:'Nén view đang hiện', label_en:'Compact visible view', category:'layout', action:function(){ Layout.auto('compact-visible'); } },
-    { icon:'#', label:'Bat tat snap grid', label_en:'Toggle snap grid', category:'view', action:function(){ Canvas.toggleSnap(); } },
+    { icon:'#', label:'Bật tắt snap grid', label_en:'Toggle snap grid', category:'view', action:function(){ Canvas.toggleSnap(); } },
     { icon:'G', label:'Grid layout', label_en:'Grid layout', category:'layout', action:function(){ Layout.auto('grid'); } },
     { icon:'F', label:'Force layout', label_en:'Force layout', category:'layout', action:function(){ Layout.auto('force'); } },
     { icon:'H', label:'Hierarchical layout', label_en:'Hierarchical layout', category:'layout', action:function(){ Layout.auto('hierarchical'); } },
@@ -4292,7 +4331,7 @@ var CmdPalette = {
     overlay.onclick = CmdPalette.close;
     palette = document.createElement('div');
     palette.className = 'ss-cmd-palette';
-    palette.innerHTML = '<input class="ss-cmd-input" id="ss-cmd-input" placeholder="' + _esc(_t('Tim lenh hoac bang...', 'Search commands or tables...')) + '" /><div class="ss-cmd-results" id="ss-cmd-results"></div>';
+    palette.innerHTML = '<input class="ss-cmd-input" id="ss-cmd-input" placeholder="' + _esc(_t('Tìm lệnh hoặc bảng...', 'Search commands or tables...')) + '" /><div class="ss-cmd-results" id="ss-cmd-results"></div>';
     document.body.appendChild(overlay);
     document.body.appendChild(palette);
     CmdPalette._el = palette;
