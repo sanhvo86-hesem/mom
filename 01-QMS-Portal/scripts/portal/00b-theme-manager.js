@@ -33,6 +33,8 @@ var _adminConfig = null;
 var _userPrefs = null;
 var _listeners = [];
 var _scheduleTimer = null;
+var _colorSchemeMedia = null;
+var _colorSchemeListenerBound = false;
 
 /* ── Load/Save ──────────────────────────────────────────────────────────── */
 function _loadUserPrefs(){
@@ -111,25 +113,31 @@ function _apply(){
   var colorMode = _resolve('colorMode');
   var radius = _resolve('radius');
   var motion = _resolve('motion');
+  var effectiveColorMode = colorMode;
 
   /* Handle scheduled dark mode */
   var schedule = _resolveDeep('colorSchedule');
   if(colorMode === 'schedule' && schedule && schedule.darkFrom && schedule.darkTo){
-    colorMode = _isInDarkSchedule(schedule.darkFrom, schedule.darkTo) ? 'dark' : 'light';
+    effectiveColorMode = _isInDarkSchedule(schedule.darkFrom, schedule.darkTo) ? 'dark' : 'light';
+    colorMode = effectiveColorMode;
     _startScheduleTimer(schedule);
   } else {
     _stopScheduleTimer();
   }
+  if(effectiveColorMode === 'auto'){
+    effectiveColorMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
 
   ROOT.setAttribute('data-density', density);
   ROOT.setAttribute('data-color-mode', colorMode);
+  ROOT.setAttribute('data-color-scheme-active', effectiveColorMode);
   ROOT.setAttribute('data-radius', radius);
   ROOT.setAttribute('data-motion', motion);
 
   /* Apply ALL custom CSS variables from config */
   _applyCustomVars();
 
-  _emit('change', { density: density, colorMode: colorMode, radius: radius, motion: motion });
+  _emit('change', { density: density, colorMode: colorMode, effectiveColorMode: effectiveColorMode, radius: radius, motion: motion });
 }
 
 /** Inject custom CSS variables from admin config + user prefs */
@@ -145,10 +153,10 @@ function _applyCustomVars(){
   _setVar('--font-mono', cfg, 'typography.mono.family');
 
   /* Typography — weights */
-  _setVarPx('--font-display-weight', cfg, 'typography.display.weight');
-  _setVarPx('--font-heading-weight', cfg, 'typography.heading.weight');
-  _setVarPx('--font-body-weight', cfg, 'typography.body.weight');
-  _setVarPx('--font-label-weight', cfg, 'typography.label.weight');
+  _setVarNumber('--font-display-weight', cfg, 'typography.display.weight');
+  _setVarNumber('--font-heading-weight', cfg, 'typography.heading.weight');
+  _setVarNumber('--font-body-weight', cfg, 'typography.body.weight');
+  _setVarNumber('--font-label-weight', cfg, 'typography.label.weight');
 
   /* Typography — font sizes */
   _setVarPx('--text-xs', cfg, 'fontScale.xs');
@@ -161,12 +169,12 @@ function _applyCustomVars(){
   _setVarPx('--text-3xl', cfg, 'fontScale.3xl');
 
   /* Line heights */
-  _setVar('--leading-tight', cfg, 'lineHeight.tight');
-  _setVar('--leading-normal', cfg, 'lineHeight.normal');
-  _setVar('--leading-relaxed', cfg, 'lineHeight.relaxed');
+  _setVarNumber('--leading-tight', cfg, 'lineHeight.tight');
+  _setVarNumber('--leading-normal', cfg, 'lineHeight.normal');
+  _setVarNumber('--leading-relaxed', cfg, 'lineHeight.relaxed');
 
   /* Label styling */
-  _setVar('--label-letter-spacing', cfg, 'typography.label.spacing');
+  _setVarEm('--label-letter-spacing', cfg, 'typography.label.spacing');
   _setVar('--label-transform', cfg, 'typography.label.transform');
 
   /* Brand colors */
@@ -177,35 +185,79 @@ function _applyCustomVars(){
   _setVar('--accent', cfg, 'brand.accent');
   _setVar('--accent-light', cfg, 'brand.accentLight');
   _setVar('--bg-sidebar', cfg, 'brand.sidebarBg');
+  _setVar('--bg-sidebar-light', cfg, 'brand.sidebarBg');
+  _setVar('--bg-sidebar-dark', cfg, 'colorsDark.sidebarBg');
 
-  /* Status colors — light */
+  /* Status colors — light + dark variants */
   _setVar('--green', cfg, 'statusColors.success');
+  _setVar('--green-light', cfg, 'statusColors.success');
   _setVar('--red', cfg, 'statusColors.error');
+  _setVar('--red-light', cfg, 'statusColors.error');
   _setVar('--amber', cfg, 'statusColors.warning');
+  _setVar('--amber-light', cfg, 'statusColors.warning');
   _setVar('--blue', cfg, 'statusColors.info');
+  _setVar('--blue-light', cfg, 'statusColors.info');
   _setVar('--purple', cfg, 'statusColors.purple');
+  _setVar('--purple-light', cfg, 'statusColors.purple');
   _setVar('--cyan', cfg, 'statusColors.cyan');
+  _setVar('--cyan-light', cfg, 'statusColors.cyan');
+  _setVar('--green-dark', cfg, 'statusColorsDark.success');
+  _setVar('--red-dark', cfg, 'statusColorsDark.error');
+  _setVar('--amber-dark', cfg, 'statusColorsDark.warning');
+  _setVar('--blue-dark', cfg, 'statusColorsDark.info');
+  _setVar('--purple-dark', cfg, 'statusColorsDark.purple');
+  _setVar('--cyan-dark', cfg, 'statusColorsDark.cyan');
 
-  /* Light theme surfaces */
+  /* Light theme semantic tokens + light/dark variants */
   _setVar('--bg-page', cfg, 'colorsLight.bgPage');
+  _setVar('--bg-page-light', cfg, 'colorsLight.bgPage');
   _setVar('--bg-surface', cfg, 'colorsLight.bgSurface');
+  _setVar('--bg-surface-light', cfg, 'colorsLight.bgSurface');
   _setVar('--bg-surface-alt', cfg, 'colorsLight.bgSurfaceAlt');
+  _setVar('--bg-surface-alt-light', cfg, 'colorsLight.bgSurfaceAlt');
   _setVar('--bg-header', cfg, 'colorsLight.bgHeader');
+  _setVar('--bg-header-light', cfg, 'colorsLight.bgHeader');
   _setVar('--bg-modal', cfg, 'colorsLight.bgModal');
+  _setVar('--bg-modal-light', cfg, 'colorsLight.bgModal');
   _setVar('--bg-hover', cfg, 'colorsLight.bgHover');
+  _setVar('--bg-hover-light', cfg, 'colorsLight.bgHover');
+  _setVar('--bg-page-dark', cfg, 'colorsDark.bgPage');
+  _setVar('--bg-surface-dark', cfg, 'colorsDark.bgSurface');
+  _setVar('--bg-surface-alt-dark', cfg, 'colorsDark.bgSurfaceAlt');
+  _setVar('--bg-header-dark', cfg, 'colorsDark.bgHeader');
+  _setVar('--bg-modal-dark', cfg, 'colorsDark.bgModal');
+  _setVar('--bg-hover-dark', cfg, 'colorsDark.bgHover');
 
-  /* Light theme text */
+  /* Text — light + dark variants */
   _setVar('--text-primary', cfg, 'colorsLight.textPrimary');
+  _setVar('--text-primary-light', cfg, 'colorsLight.textPrimary');
   _setVar('--text-secondary', cfg, 'colorsLight.textSecondary');
+  _setVar('--text-secondary-light', cfg, 'colorsLight.textSecondary');
   _setVar('--text-tertiary', cfg, 'colorsLight.textTertiary');
+  _setVar('--text-tertiary-light', cfg, 'colorsLight.textTertiary');
   _setVar('--text-link', cfg, 'colorsLight.textLink');
+  _setVar('--text-link-light', cfg, 'colorsLight.textLink');
   _setVar('--text-inverse', cfg, 'colorsLight.textInverse');
+  _setVar('--text-inverse-light', cfg, 'colorsLight.textInverse');
+  _setVar('--text-primary-dark', cfg, 'colorsDark.textPrimary');
+  _setVar('--text-secondary-dark', cfg, 'colorsDark.textSecondary');
+  _setVar('--text-tertiary-dark', cfg, 'colorsDark.textTertiary');
+  _setVar('--text-inverse-dark', cfg, 'colorsDark.textInverse');
+  _setVar('--text-link-dark', cfg, 'colorsDark.textLink');
 
-  /* Light theme borders */
+  /* Borders — light + dark variants */
   _setVar('--border', cfg, 'colorsLight.border');
+  _setVar('--border-light', cfg, 'colorsLight.border');
   _setVar('--border-focus', cfg, 'colorsLight.borderFocus');
+  _setVar('--border-focus-light', cfg, 'colorsLight.borderFocus');
   _setVar('--border-error', cfg, 'colorsLight.borderError');
+  _setVar('--border-error-light', cfg, 'colorsLight.borderError');
   _setVar('--border-success', cfg, 'colorsLight.borderSuccess');
+  _setVar('--border-success-light', cfg, 'colorsLight.borderSuccess');
+  _setVar('--border-dark', cfg, 'colorsDark.border');
+  _setVar('--border-focus-dark', cfg, 'colorsDark.borderFocus');
+  _setVar('--border-error-dark', cfg, 'colorsDark.borderError');
+  _setVar('--border-success-dark', cfg, 'colorsDark.borderSuccess');
 
   /* Layout */
   _setVarPx('--sidebar-w', cfg, 'layout.sidebarW');
@@ -226,6 +278,28 @@ function _applyCustomVars(){
   _setVarPx('--space-10', cfg, 'spacing.10');
   _setVarPx('--space-12', cfg, 'spacing.12');
   _setVarPx('--space-16', cfg, 'spacing.16');
+
+  /* Density */
+  _setVarPx('--hds-control-h', cfg, 'density.controlH');
+  _setVarPx('--hds-control-h-sm', cfg, 'density.controlHSm');
+  _setVarPx('--hds-control-h-lg', cfg, 'density.controlHLg');
+  _setVarPx('--hds-control-px', cfg, 'density.controlPx');
+  _setVarPx('--hds-control-font', cfg, 'density.controlFont');
+  _setVarPx('--hds-control-gap', cfg, 'density.controlGap');
+  _setVarPx('--hds-icon-sm', cfg, 'density.iconSm');
+  _setVarPx('--hds-icon-md', cfg, 'density.iconMd');
+  _setVarPx('--hds-table-row-h', cfg, 'density.tableRowH');
+  _setVarPx('--hds-table-cell-px', cfg, 'density.tableCellPx');
+  _setVarPx('--hds-table-cell-py', cfg, 'density.tableCellPy');
+  _setVarPx('--hds-table-head-font', cfg, 'density.tableHeadFont');
+  _setVarPx('--hds-table-body-font', cfg, 'density.tableBodyFont');
+
+  /* Radius */
+  _setVarPx('--radius-sm', cfg, 'radius.sm');
+  _setVarPx('--radius-md', cfg, 'radius.md');
+  _setVarPx('--radius-lg', cfg, 'radius.lg');
+  _setVarPx('--radius-xl', cfg, 'radius.xl');
+  _setVarPx('--radius-2xl', cfg, 'radius.2xl');
 
   /* Effects — focus ring */
   _setVarPx('--focus-ring-width', cfg, 'effects.focusRingWidth');
@@ -251,13 +325,133 @@ function _applyCustomVars(){
 
   /* Effects — backdrop */
   _setVarPx('--backdrop-blur', cfg, 'effects.backdropBlur');
-  _setVar('--overlay-opacity', cfg, 'effects.overlayOpacity');
+  _setVarNumber('--overlay-opacity', cfg, 'effects.overlayOpacity');
 
   /* Effects — motion */
   _setVarMs('--transition-fast', cfg, 'effects.motionFast');
   _setVarMs('--transition-normal', cfg, 'effects.motionNormal');
   _setVarMs('--transition-slow', cfg, 'effects.motionSlow');
   _setVarMs('--transition-spring', cfg, 'effects.motionSpring');
+
+  /* Components — buttons */
+  _setVarPx('--btn-padding-y', cfg, 'components.btn.paddingY');
+  _setVarPx('--btn-padding-x', cfg, 'components.btn.paddingX');
+  _setVarPx('--btn-gap', cfg, 'components.btn.gap');
+  _setVarNumber('--btn-font-weight', cfg, 'components.btn.fontWeight');
+  _setVarEm('--btn-letter-spacing', cfg, 'components.btn.letterSpacing');
+  _setVarPx('--btn-border-width', cfg, 'components.btn.borderWidth');
+  _setVarPx('--btn-min-width', cfg, 'components.btn.minWidth');
+
+  /* Components — table */
+  _setVar('--table-header-bg', cfg, 'components.table.headerBg');
+  _setVarNumber('--table-header-font-weight', cfg, 'components.table.headerFontWeight');
+  _setVarEm('--table-header-letter-spacing', cfg, 'components.table.headerLetterSpacing');
+  _setVar('--table-row-stripe', cfg, 'components.table.stripeBg');
+  _setVar('--table-row-stripe-alt', cfg, 'components.table.stripeAltBg');
+  _setVarPx('--table-border-width', cfg, 'components.table.borderWidth');
+
+  /* Components — card */
+  _setVarPx('--card-border-width', cfg, 'components.card.borderWidth');
+  _setVar('--card-header-bg', cfg, 'components.card.headerBg');
+  _setVarPx('--card-header-padding-v', cfg, 'components.card.headerPadding');
+  _setVarPx('--card-body-padding', cfg, 'components.card.bodyPadding');
+
+  /* Components — badge */
+  _setVarNumber('--badge-font-weight', cfg, 'components.badge.fontWeight');
+  _setVarEm('--badge-letter-spacing', cfg, 'components.badge.letterSpacing');
+  _setVarPx('--badge-border-width', cfg, 'components.badge.borderWidth');
+  _setVarPx('--badge-min-width', cfg, 'components.badge.minWidth');
+
+  /* Components — input */
+  _setVarPx('--input-border-width', cfg, 'components.input.borderWidth');
+  _setVarPx('--input-padding-y', cfg, 'components.input.paddingY');
+  _setVar('--input-bg', cfg, 'components.input.bg');
+
+  /* Components — tabs */
+  _setVarPx('--tab-border-width', cfg, 'components.tab.borderWidth');
+  _setVarNumber('--tab-font-weight', cfg, 'components.tab.fontWeight');
+  _setVarPx('--tab-gap', cfg, 'components.tab.gap');
+  _setVar('--tab-active-indicator', cfg, 'components.tab.activeIndicator');
+
+  /* Components — modal */
+  _setVarPx('--modal-border-radius', cfg, 'components.modal.radius');
+  _setVarPx('--modal-padding', cfg, 'components.modal.padding');
+  _setVarPx('--modal-header-padding-v', cfg, 'components.modal.headerPadding');
+
+  /* Components — flow */
+  _setVar('--flow-node-bg', cfg, 'components.flow.nodeBg');
+  _setVarPx('--flow-node-border-w', cfg, 'components.flow.nodeBorderW');
+  _setVar('--flow-node-border-color', cfg, 'components.flow.nodeBorderColor');
+  _setVarPx('--flow-node-radius', cfg, 'components.flow.nodeRadius');
+  _setVarPx('--flow-node-padding', cfg, 'components.flow.nodePadding');
+  _setVar('--flow-connector-color', cfg, 'components.flow.connectorColor');
+  _setVarPx('--flow-connector-width', cfg, 'components.flow.connectorWidth');
+  _setVarPx('--flow-arrow-size', cfg, 'components.flow.arrowSize');
+
+  /* Components — ISO document */
+  _setVar('--iso-box-bg', cfg, 'components.isoBox.bg');
+  _setVarPx('--iso-box-border-w', cfg, 'components.isoBox.borderW');
+  _setVarPx('--iso-box-radius', cfg, 'components.isoBox.radius');
+  _setVar('--iso-box-header-bg', cfg, 'components.isoBox.headerBg');
+  _setVarPx('--iso-box-header-padding', cfg, 'components.isoBox.headerPadding');
+  _setVarPx('--iso-box-body-padding', cfg, 'components.isoBox.bodyPadding');
+  _setVarPx('--iso-box-font-size', cfg, 'components.isoBox.fontSize');
+
+  /* Components — ISO note */
+  _setVar('--iso-note-bg', cfg, 'components.isoNote.bg');
+  _setVar('--iso-note-border-color', cfg, 'components.isoNote.borderColor');
+  _setVar('--iso-note-border-left-color', cfg, 'components.isoNote.borderLeftColor');
+  _setVarPx('--iso-note-border-left-w', cfg, 'components.isoNote.borderLeftW');
+  _setVarPx('--iso-note-radius', cfg, 'components.isoNote.radius');
+  _setVarPx('--iso-note-padding', cfg, 'components.isoNote.padding');
+  _setVarPx('--iso-note-font-size', cfg, 'components.isoNote.fontSize');
+  _setVarPx('--iso-note-icon-size', cfg, 'components.isoNote.iconSize');
+
+  /* Components — KPI and progress */
+  _setVarPx('--kpi-border-width', cfg, 'components.kpi.borderWidth');
+  _setVarPx('--kpi-icon-size', cfg, 'components.kpi.iconSize');
+  _setVarPx('--kpi-trend-font-size', cfg, 'components.kpi.trendFontSize');
+  _setVarPx('--progress-height', cfg, 'components.progress.height');
+  _setVarPx('--progress-radius', cfg, 'components.progress.radius');
+  _setVar('--progress-bg', cfg, 'components.progress.bg');
+
+  /* Components — tooltip & dropdown */
+  _setVar('--tooltip-bg', cfg, 'components.tooltip.bg');
+  _setVar('--tooltip-color', cfg, 'components.tooltip.color');
+  _setVarPx('--tooltip-padding-y', cfg, 'components.tooltip.paddingY');
+  _setVarPx('--tooltip-padding-x', cfg, 'components.tooltip.paddingX');
+  _setVarPx('--tooltip-radius', cfg, 'components.tooltip.radius');
+  _setVarPx('--tooltip-font-size', cfg, 'components.tooltip.fontSize');
+  _setVarPx('--tooltip-max-width', cfg, 'components.tooltip.maxWidth');
+  _setVarPx('--dropdown-radius', cfg, 'components.dropdown.radius');
+  _setVarPx('--dropdown-item-padding', cfg, 'components.dropdown.itemPadding');
+  _setVarPx('--dropdown-item-font-size', cfg, 'components.dropdown.itemFontSize');
+  _setVar('--dropdown-item-hover-bg', cfg, 'components.dropdown.hoverBg');
+
+  /* Components — navigation & pagination */
+  _setVarPx('--nav-item-height', cfg, 'components.nav.height');
+  _setVarPx('--nav-item-font-size', cfg, 'components.nav.fontSize');
+  _setVarPx('--nav-item-icon-size', cfg, 'components.nav.iconSize');
+  _setVarPx('--nav-item-gap', cfg, 'components.nav.gap');
+  _setVarPx('--nav-item-radius', cfg, 'components.nav.radius');
+  _setVarPx('--pagination-btn-size', cfg, 'components.pagination.btnSize');
+  _setVarPx('--pagination-btn-radius', cfg, 'components.pagination.radius');
+  _setVarPx('--pagination-font-size', cfg, 'components.pagination.fontSize');
+  _setVarPx('--pagination-gap', cfg, 'components.pagination.gap');
+
+  /* Components — empty state, form field, breadcrumb */
+  _setVarPx('--empty-icon-size', cfg, 'components.empty.iconSize');
+  _setVarNumber('--empty-icon-opacity', cfg, 'components.empty.iconOpacity');
+  _setVarPx('--empty-title-font-size', cfg, 'components.empty.titleFontSize');
+  _setVarPx('--empty-desc-font-size', cfg, 'components.empty.descFontSize');
+  _setVarPx('--field-gap', cfg, 'components.field.gap');
+  _setVarPx('--field-label-gap', cfg, 'components.field.labelGap');
+  _setVarPx('--field-group-gap', cfg, 'components.field.groupGap');
+  _setVarPx('--field-helper-font-size', cfg, 'components.field.helperFontSize');
+  _setVarPx('--breadcrumb-font-size', cfg, 'components.breadcrumb.fontSize');
+  _setVarPx('--breadcrumb-gap', cfg, 'components.breadcrumb.gap');
+  _setVar('--breadcrumb-color', cfg, 'components.breadcrumb.color');
+  _setVar('--breadcrumb-active-color', cfg, 'components.breadcrumb.activeColor');
 
   /* Custom CSS injection */
   var customCSS = _resolveDeep('advanced.customCSS');
@@ -286,45 +480,55 @@ function _deepMerge(target, source){
   return target;
 }
 
-/** Set CSS variable from nested config path (string value) */
-function _setVar(varName, cfg, path){
+function _getPathValue(cfg, path){
   var parts = path.split('.');
   var val = cfg;
   for(var i = 0; i < parts.length; i++){
     if(val && typeof val === 'object') val = val[parts[i]];
     else { val = undefined; break; }
   }
-  if(val !== undefined && val !== null && val !== ''){
-    ROOT.style.setProperty(varName, String(val));
-  }
+  return val;
+}
+
+/** Set CSS variable from nested config path (string value) */
+function _setVar(varName, cfg, path){
+  var val = _getPathValue(cfg, path);
+  if(val !== undefined && val !== null && val !== '') ROOT.style.setProperty(varName, String(val));
+}
+
+function _setVarNumber(varName, cfg, path){
+  var val = _getPathValue(cfg, path);
+  if(val === undefined || val === null || val === '') return;
+  var num = parseFloat(val);
+  if(!isNaN(num)) ROOT.style.setProperty(varName, String(num));
+  else ROOT.style.setProperty(varName, String(val));
+}
+
+function _setVarUnit(varName, cfg, path, unit){
+  var val = _getPathValue(cfg, path);
+  if(val === undefined || val === null || val === '') return;
+  var str = String(val).trim();
+  if(unit && /^-?\d*\.?\d+$/.test(str)) str += unit;
+  ROOT.style.setProperty(varName, str);
 }
 
 /** Set CSS variable with px unit */
 function _setVarPx(varName, cfg, path){
-  var parts = path.split('.');
-  var val = cfg;
-  for(var i = 0; i < parts.length; i++){
-    if(val && typeof val === 'object') val = val[parts[i]];
-    else { val = undefined; break; }
-  }
-  if(val !== undefined && val !== null && val !== ''){
-    var num = parseFloat(val);
-    if(!isNaN(num)) ROOT.style.setProperty(varName, num + 'px');
-  }
+  _setVarUnit(varName, cfg, path, 'px');
+}
+
+function _setVarEm(varName, cfg, path){
+  _setVarUnit(varName, cfg, path, 'em');
 }
 
 /** Set CSS variable with ms unit (for transitions) */
 function _setVarMs(varName, cfg, path){
-  var parts = path.split('.');
-  var val = cfg;
-  for(var i = 0; i < parts.length; i++){
-    if(val && typeof val === 'object') val = val[parts[i]];
-    else { val = undefined; break; }
-  }
-  if(val !== undefined && val !== null && val !== ''){
-    var num = parseFloat(val);
-    if(!isNaN(num)) ROOT.style.setProperty(varName, num + 'ms ease');
-  }
+  var val = _getPathValue(cfg, path);
+  if(val === undefined || val === null || val === '') return;
+  var str = String(val).trim();
+  if(/^-?\d*\.?\d+$/.test(str)) str += 'ms';
+  if(!/(^|\s)(ease|linear|ease-in|ease-out|ease-in-out|cubic-bezier\()/i.test(str)) str += ' ease';
+  ROOT.style.setProperty(varName, str);
 }
 
 /** Inject custom CSS into a <style> tag */
@@ -362,11 +566,23 @@ function _startScheduleTimer(schedule){
     var current = ROOT.getAttribute('data-color-mode');
     var target = shouldDark ? 'dark' : 'light';
     if(current !== target) ROOT.setAttribute('data-color-mode', target);
+    ROOT.setAttribute('data-color-scheme-active', target);
   }, 60000); /* check every minute */
 }
 
 function _stopScheduleTimer(){
   if(_scheduleTimer){ clearInterval(_scheduleTimer); _scheduleTimer = null; }
+}
+
+function _ensureColorSchemeListener(){
+  if(_colorSchemeListenerBound || !window.matchMedia) return;
+  _colorSchemeMedia = window.matchMedia('(prefers-color-scheme: dark)');
+  var handler = function(){
+    if(_resolve('colorMode') === 'auto') _apply();
+  };
+  if(_colorSchemeMedia.addEventListener) _colorSchemeMedia.addEventListener('change', handler);
+  else if(_colorSchemeMedia.addListener) _colorSchemeMedia.addListener(handler);
+  _colorSchemeListenerBound = true;
 }
 
 /* ── Event system ────────────────────────────────────────────────────────── */
@@ -383,6 +599,7 @@ function _emit(event, detail){
    ══════════════════════════════════════════════════════════════════════════ */
 
 function init(callback){
+  _ensureColorSchemeListener();
   _loadUserPrefs();
   _loadAdminConfig(function(){
     _apply();

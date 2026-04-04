@@ -21,6 +21,18 @@ final class ShipmentGateService
     private readonly string $dataDir;
     private readonly string $confDir;
 
+    /** Roles permitted to invoke shipment readiness checks. */
+    private const ALLOWED_ROLES = [
+        'shipping_coordinator', 'logistics_manager', 'qa_manager',
+        'production_director', 'ceo', 'it_admin', 'qms_engineer',
+        'supply_chain_manager', 'sales_manager',
+    ];
+
+    /** Roles permitted to override (waive) a failed gate with documented reason. */
+    private const OVERRIDE_ROLES = [
+        'qa_manager', 'production_director', 'ceo', 'it_admin',
+    ];
+
     /** Default gate configuration used when no config file exists. */
     private const DEFAULT_GATES = [
         ['code' => 'SG-01', 'label' => 'Contract review completed',              'label_vi' => 'Xem xet hop dong hoan thanh',        'required' => true],
@@ -53,12 +65,22 @@ final class ShipmentGateService
      * Check shipment readiness for a Sales Order.
      *
      * Returns a checklist with pass/fail per gate item and overall readiness.
+     * Enforces RBAC and writes an audit trail entry for every check.
      *
-     * @param string $soNumber Sales Order number.
-     * @return array{ready: bool, so_number: string, checked_at: string, items: array}
+     * @param string      $soNumber Sales Order number.
+     * @param string|null $userId   User performing the check (required for audit).
+     * @param string|null $userRole Role of the user (required for RBAC).
+     * @return array{ready: bool, so_number: string, checked_at: string, checked_by: string, items: array, overrides: array}
      */
-    public function checkReadiness(string $soNumber): array
+    public function checkReadiness(string $soNumber, ?string $userId = null, ?string $userRole = null): array
     {
+        // ── RBAC enforcement ────────────────────────────────────────────
+        if ($userRole !== null && !$this->isRoleAllowed($userRole, self::ALLOWED_ROLES)) {
+            throw new RuntimeException(
+                "Access denied: role '{$userRole}' is not permitted to perform shipment readiness checks."
+            );
+        }
+
         $orders = $this->loadOrders();
         $so     = $this->findSo($soNumber, $orders);
 
@@ -66,10 +88,12 @@ final class ShipmentGateService
             throw new RuntimeException("Sales Order {$soNumber} not found.");
         }
 
-        $config = $this->getGateConfig();
-        $gates  = $config['gates'] ?? self::DEFAULT_GATES;
-        $items  = [];
-        $allPass = true;
+        $config    = $this->getGateConfig();
+        $gates     = $config['gates'] ?? self::DEFAULT_GATES;
+        $overrides = $this->loadOverrides($soNumber);
+        $items     = [];
+        $allPass   = true;
+        $failedGates = [];
 
         foreach ($gates as $gate) {
             $code     = $gate['code'] ?? '';
@@ -79,26 +103,134 @@ final class ShipmentGateService
             $status = $check['status'];
             $detail = $check['detail'] ?? '';
 
+            // Check if a failed required gate has been overridden
+            $overridden = false;
+            if ($required && $status === 'fail' && isset($overrides[$code])) {
+                $overridden = true;
+                $status     = 'waived';
+                $detail     = 'Overridden: ' . ($overrides[$code]['reason'] ?? '');
+            }
+
             if ($required && $status === 'fail') {
                 $allPass = false;
+                $failedGates[] = $code;
             }
 
             $items[] = [
-                'code'     => $code,
-                'label'    => $gate['label'] ?? '',
-                'label_vi' => $gate['label_vi'] ?? '',
-                'required' => $required,
-                'status'   => $status,
-                'detail'   => $detail,
+                'code'       => $code,
+                'label'      => $gate['label'] ?? '',
+                'label_vi'   => $gate['label_vi'] ?? '',
+                'required'   => $required,
+                'status'     => $status,
+                'detail'     => $detail,
+                'overridden' => $overridden,
             ];
         }
 
-        return [
-            'ready'      => $allPass,
-            'so_number'  => $soNumber,
-            'checked_at' => $this->nowIso(),
-            'items'      => $items,
+        $now    = $this->nowIso();
+        $result = [
+            'ready'        => $allPass,
+            'so_number'    => $soNumber,
+            'checked_at'   => $now,
+            'checked_by'   => $userId ?? 'system',
+            'checked_role' => $userRole ?? 'system',
+            'items'        => $items,
+            'failed_gates' => $failedGates,
+            'overrides'    => $overrides,
         ];
+
+        // ── Audit trail: record every readiness check ────────────────────
+        $this->appendAuditLog($soNumber, [
+            'action'       => 'shipment_readiness_check',
+            'ready'        => $allPass,
+            'failed_gates' => $failedGates,
+            'checked_by'   => $userId ?? 'system',
+            'checked_role' => $userRole ?? 'system',
+            'timestamp'    => $now,
+            'gate_count'   => count($items),
+            'pass_count'   => count(array_filter($items, fn($i) => $i['status'] === 'pass')),
+            'fail_count'   => count(array_filter($items, fn($i) => $i['status'] === 'fail')),
+            'waived_count' => count(array_filter($items, fn($i) => $i['status'] === 'waived')),
+        ]);
+
+        return $result;
+    }
+
+    /**
+     * Override (waive) a failed gate with documented reason and approval.
+     *
+     * Only OVERRIDE_ROLES can perform this action. Creates an audit trail entry.
+     *
+     * @param string $soNumber  Sales Order number.
+     * @param string $gateCode  Gate code to override (e.g. "SG-03").
+     * @param string $reason    Mandatory reason for the override.
+     * @param string $userId    Approving user.
+     * @param string $userRole  Role of the approving user.
+     * @return array The override record.
+     */
+    public function overrideGate(
+        string $soNumber,
+        string $gateCode,
+        string $reason,
+        string $userId,
+        string $userRole,
+    ): array {
+        if (!$this->isRoleAllowed($userRole, self::OVERRIDE_ROLES)) {
+            throw new RuntimeException(
+                "Access denied: role '{$userRole}' cannot override shipment gates. " .
+                "Required: " . implode(', ', self::OVERRIDE_ROLES)
+            );
+        }
+
+        if (trim($reason) === '') {
+            throw new RuntimeException('Override reason is required.');
+        }
+
+        // Validate gate code against configured gates
+        $config     = $this->getGateConfig();
+        $gates      = $config['gates'] ?? self::DEFAULT_GATES;
+        $validCodes = array_column($gates, 'code');
+        if (!in_array($gateCode, $validCodes, true)) {
+            throw new RuntimeException("Invalid gate code '{$gateCode}'. Valid codes: " . implode(', ', $validCodes));
+        }
+
+        $now      = $this->nowIso();
+        $override = [
+            'gate_code'   => $gateCode,
+            'reason'      => $reason,
+            'approved_by' => $userId,
+            'approved_role' => $userRole,
+            'approved_at' => $now,
+        ];
+
+        // Persist override
+        $overrides = $this->loadOverrides($soNumber);
+        $overrides[$gateCode] = $override;
+        $this->saveOverrides($soNumber, $overrides);
+
+        // Audit trail
+        $this->appendAuditLog($soNumber, [
+            'action'     => 'gate_override',
+            'gate_code'  => $gateCode,
+            'reason'     => $reason,
+            'user'       => $userId,
+            'role'       => $userRole,
+            'timestamp'  => $now,
+        ]);
+
+        return $override;
+    }
+
+    /**
+     * Get full audit history for shipment readiness of a Sales Order.
+     *
+     * @param string $soNumber Sales Order number.
+     * @return array List of audit entries, newest first.
+     */
+    public function getAuditLog(string $soNumber): array
+    {
+        $log = $this->loadAuditLog($soNumber);
+        return array_reverse($log);
     }
 
     /**
@@ -567,5 +699,71 @@ final class ShipmentGateService
     private function nowIso(): string
     {
         return (new \DateTimeImmutable('now', new \DateTimeZone('+07:00')))->format('c');
+    }
+
+    // ── RBAC helpers ────────────────────────────────────────────────────────
+
+    /**
+     * Check if a role is in an allowed-roles list (admin bypass included).
+     */
+    private function isRoleAllowed(string $role, array $allowedRoles): bool
+    {
+        if (in_array($role, ['it_admin', 'ceo'], true)) {
+            return true;
+        }
+        return in_array($role, $allowedRoles, true);
+    }
+
+    // ── Audit trail persistence ─────────────────────────────────────────────
+
+    private function auditLogPath(string $soNumber): string
+    {
+        return $this->dataDir . '/orders/shipment_gate_audit_' . preg_replace('/[^A-Za-z0-9_-]/', '_', $soNumber) . '.jsonl';
+    }
+
+    private function appendAuditLog(string $soNumber, array $entry): void
+    {
+        $path = $this->auditLogPath($soNumber);
+        $dir  = dirname($path);
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0775, true);
+        }
+        $line = json_encode($entry, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+        @file_put_contents($path, $line, FILE_APPEND | LOCK_EX);
+    }
+
+    private function loadAuditLog(string $soNumber): array
+    {
+        $path = $this->auditLogPath($soNumber);
+        if (!is_file($path)) {
+            return [];
+        }
+        $raw   = @file_get_contents($path);
+        $lines = explode("\n", trim($raw ?: ''));
+        $entries = [];
+        foreach ($lines as $line) {
+            $decoded = json_decode($line, true);
+            if (is_array($decoded)) {
+                $entries[] = $decoded;
+            }
+        }
+        return $entries;
+    }
+
+    // ── Override persistence ────────────────────────────────────────────────
+
+    private function overridesPath(string $soNumber): string
+    {
+        return $this->dataDir . '/orders/shipment_gate_overrides_' . preg_replace('/[^A-Za-z0-9_-]/', '_', $soNumber) . '.json';
+    }
+
+    private function loadOverrides(string $soNumber): array
+    {
+        return $this->readJson($this->overridesPath($soNumber)) ?? [];
+    }
+
+    private function saveOverrides(string $soNumber, array $overrides): void
+    {
+        $this->writeJson($this->overridesPath($soNumber), $overrides);
     }
 }

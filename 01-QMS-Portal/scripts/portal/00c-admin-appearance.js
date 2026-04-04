@@ -98,7 +98,7 @@ function T(k){
 
 function esc(v){ var d=document.createElement('div'); d.appendChild(document.createTextNode(v==null?'':String(v))); return d.innerHTML; }
 function cfg(path){ return window.HmTheme ? (HmTheme.getDeep(path) || '') : ''; }
-function cfgNum(path, def){ var v=cfg(path); return v!==''&&v!==undefined ? Number(v) : def; }
+function cfgNum(path, def){ var v=cfg(path); return v!==''&&v!==undefined ? parseFloat(v) : def; }
 
 /**
  * _hmSet: Apply CSS variable instantly AND persist to localStorage.
@@ -107,6 +107,12 @@ function cfgNum(path, def){ var v=cfg(path); return v!==''&&v!==undefined ? Numb
 window._hmSet = function(cssVar, path, value){
   HmTheme.setVar(cssVar, value);          /* instant CSS update */
   HmTheme.setDeep(path, value);           /* persist to localStorage */
+};
+window._hmSetWithUnit = function(cssVar, path, value, unit){
+  var raw = value == null ? '' : String(value);
+  var applied = raw;
+  if(unit && /^-?\d*\.?\d+$/.test(raw)) applied = raw + unit;
+  window._hmSet(cssVar, path, applied);
 };
 
 /* ── Helper: slider + number input ──────────────────────────────────────── */
@@ -117,14 +123,14 @@ function slider(label, cssVar, path, min, max, def, unit, step){
   var sid = 'adm_s_'+path.replace(/\./g,'_');
   var nid = 'adm_n_'+path.replace(/\./g,'_');
   /* For unitless values like opacity, ratio — don't append unit */
-  var suffix = (u === '' || u === 'em') ? "'+'" + u + "'" : "'+'" + u + "'";
+  var unitArg = JSON.stringify(u);
   return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
     +'<span style="min-width:140px;font-size:12px;color:var(--text-secondary)">'+esc(label)+'</span>'
     +'<input type="range" id="'+sid+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'"'
-    +' oninput="document.getElementById(\''+nid+'\').value=this.value;_hmSet(\''+cssVar+'\',\''+path+'\',this.value)"'
+    +' oninput="document.getElementById(\''+nid+'\').value=this.value;_hmSetWithUnit(\''+cssVar+'\',\''+path+'\',this.value,'+unitArg+')"'
     +' style="flex:1;accent-color:var(--brand-2)">'
     +'<input type="number" id="'+nid+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'"'
-    +' oninput="document.getElementById(\''+sid+'\').value=this.value;_hmSet(\''+cssVar+'\',\''+path+'\',this.value)"'
+    +' oninput="document.getElementById(\''+sid+'\').value=this.value;_hmSetWithUnit(\''+cssVar+'\',\''+path+'\',this.value,'+unitArg+')"'
     +' style="width:64px;height:28px;text-align:center;border:1px solid var(--border);border-radius:var(--radius-md);font-size:12px;font-family:var(--font-mono)">'
     +'<span style="font-size:11px;color:var(--text-tertiary);min-width:24px">'+u+'</span>'
     +'</div>';

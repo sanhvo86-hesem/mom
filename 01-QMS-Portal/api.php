@@ -4104,6 +4104,219 @@ function release_followup_register_release(array $source): ?array {
   return release_followup_row_from_item($item);
 }
 
+// ── Read Acknowledgment for Release Follow-up (AS9100D §7.2 / §7.3) ───────
+
+/**
+ * Record that a specific user has read and acknowledged a released document.
+ * Required for AS9100D compliance: proof that affected personnel are aware of changes.
+ *
+ * @param string $releaseId  Release follow-up ID (e.g. "RELUP-XXXX").
+ * @param string $username   Username acknowledging.
+ * @param string $role       Role of the user.
+ * @param string $note       Optional acknowledgment note.
+ * @return array Updated acknowledgment record.
+ */
+function release_followup_acknowledge(string $releaseId, string $username, string $role, string $note = ''): array {
+  $store = load_release_followup_store();
+  $now   = now_iso();
+  $found = false;
+
+  foreach (($store['items'] ?? []) as $idx => $item) {
+    if (!is_array($item)) continue;
+    if (($item['release_id'] ?? '') !== $releaseId) continue;
+
+    $acknowledgments = is_array($item['acknowledgments'] ?? null) ? $item['acknowledgments'] : [];
+
+    // Check if already acknowledged
+    $alreadyAcked = false;
+    foreach ($acknowledgments as $ack) {
+      if (strtolower($ack['user'] ?? '') === strtolower($username)) {
+        $alreadyAcked = true;
+        break;
+      }
+    }
+
+    if (!$alreadyAcked) {
+      $acknowledgments[] = [
+        'user'      => strtolower(trim($username)),
+        'role'      => $role,
+        'note'      => $note,
+        'acked_at'  => $now,
+      ];
+      $store['items'][$idx]['acknowledgments'] = $acknowledgments;
+      release_followup_append_history($store['items'][$idx], 'acknowledged', $username, $note);
+    }
+
+    // Calculate acknowledgment progress
+    $impactedUsers = release_followup_normalize_list(array_merge(
+      (array)($item['owner_users'] ?? []),
+      (array)($item['watch_users'] ?? []),
+      (array)($item['impacted_users'] ?? [])
+    ), 'user');
+    $ackedUsers = array_map(fn($a) => strtolower($a['user'] ?? ''), $acknowledgments);
+    $pendingUsers = array_diff($impactedUsers, $ackedUsers);
+
+    $store['items'][$idx]['ack_total']   = count($impactedUsers);
+    $store['items'][$idx]['ack_done']    = count($ackedUsers);
+    $store['items'][$idx]['ack_pending'] = array_values($pendingUsers);
+    $store['items'][$idx]['ack_complete'] = empty($pendingUsers);
+
+    save_release_followup_store($store);
+
+    $found = true;
+    return [
+      'ok'             => true,
+      'release_id'     => $releaseId,
+      'user'           => $username,
+      'acked_at'       => $now,
+      'already_acked'  => $alreadyAcked,
+      'ack_total'      => count($impactedUsers),
+      'ack_done'       => count($ackedUsers),
+      'ack_pending'    => array_values($pendingUsers),
+      'ack_complete'   => empty($pendingUsers),
+    ];
+  }
+
+  if (!$found) {
+    return ['ok' => false, 'error' => 'Release follow-up not found'];
+  }
+  return ['ok' => false, 'error' => 'unexpected'];
+}
+
+/**
+ * Get acknowledgment status for a release follow-up item.
+ */
+function release_followup_ack_status(string $releaseId): array {
+  $store = load_release_followup_store();
+  foreach (($store['items'] ?? []) as $item) {
+    if (!is_array($item)) continue;
+    if (($item['release_id'] ?? '') !== $releaseId) continue;
+    return [
+      'release_id'     => $releaseId,
+      'acknowledgments' => (array)($item['acknowledgments'] ?? []),
+      'ack_total'      => (int)($item['ack_total'] ?? 0),
+      'ack_done'       => (int)($item['ack_done'] ?? 0),
+      'ack_pending'    => (array)($item['ack_pending'] ?? []),
+      'ack_complete'   => (bool)($item['ack_complete'] ?? false),
+    ];
+  }
+  return ['release_id' => $releaseId, 'error' => 'not_found'];
+}
+
+// ── Document Review Timeout & Auto-escalation ───────────────────────────────
+
+/**
+ * Check all documents in 'in_review' status and enforce a configurable
+ * timeout. Returns list of timed-out documents that should be escalated.
+ *
+ * Default timeout: 72 hours. Configurable via review_timeout_hours in config.
+ *
+ * @return array List of escalated documents.
+ */
+function doc_review_timeout_check(): array {
+  global $DATA_DIR;
+  $manifestDir = $DATA_DIR . '/docs';
+  $configFile  = $DATA_DIR . '/config/doc_review_policy.json';
+  $config      = json_decode(@file_get_contents($configFile) ?: '{}', true) ?: [];
+
+  $timeoutHours    = (int)($config['review_timeout_hours'] ?? 72);
+  $warningHours    = (int)($config['review_warning_hours'] ?? 48);
+  $escalationRoles = (array)($config['escalation_roles'] ?? ['qa_manager', 'production_director']);
+  $now             = new DateTimeImmutable('now', new DateTimeZone('+07:00'));
+  $escalated       = [];
+
+  // Scan all doc state files for in_review status
+  $stateDir = $DATA_DIR . '/docs/_states';
+  if (!is_dir($stateDir)) return [];
+
+  $stateFiles = glob($stateDir . '/*.json');
+  foreach ($stateFiles as $stateFile) {
+    $state = json_decode(@file_get_contents($stateFile) ?: '{}', true);
+    if (!is_array($state)) continue;
+    if (strtolower($state['status'] ?? '') !== 'in_review') continue;
+
+    $submittedAt = $state['submittedDate'] ?? $state['submitted_at'] ?? null;
+    if ($submittedAt === null) continue;
+
+    try {
+      $submitted = new DateTimeImmutable($submittedAt);
+    } catch (\Exception) {
+      continue;
+    }
+
+    $hoursElapsed = ($now->getTimestamp() - $submitted->getTimestamp()) / 3600;
+
+    if ($hoursElapsed >= $timeoutHours) {
+      $state['review_timeout_status'] = 'escalated';
+      $state['review_escalated_at']   = $now->format('c');
+      $state['escalation_roles']      = $escalationRoles;
+      @file_put_contents($stateFile, json_encode($state, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT), LOCK_EX);
+
+      $escalated[] = [
+        'code'           => $state['code'] ?? basename($stateFile, '.json'),
+        'status'         => 'escalated',
+        'hours_elapsed'  => round($hoursElapsed, 1),
+        'timeout_hours'  => $timeoutHours,
+        'submitted_at'   => $submittedAt,
+        'submitted_by'   => $state['submittedBy'] ?? 'unknown',
+        'escalated_at'   => $now->format('c'),
+        'escalation_roles' => $escalationRoles,
+      ];
+    } elseif ($hoursElapsed >= $warningHours && empty($state['review_warning_sent'])) {
+      $state['review_timeout_status'] = 'warning';
+      $state['review_warning_sent']   = $now->format('c');
+      @file_put_contents($stateFile, json_encode($state, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT), LOCK_EX);
+
+      $escalated[] = [
+        'code'          => $state['code'] ?? basename($stateFile, '.json'),
+        'status'        => 'warning',
+        'hours_elapsed' => round($hoursElapsed, 1),
+        'warning_hours' => $warningHours,
+        'submitted_at'  => $submittedAt,
+      ];
+    }
+  }
+
+  return $escalated;
+}
+
+// ── Signature meaning normalization (21 CFR Part 11 §11.50) ────────────────
+
+/**
+ * Normalize and validate signature meaning for approval actions.
+ * 21 CFR Part 11 requires each signature to include the meaning
+ * (e.g. "approval", "review", "responsibility", "authorship").
+ *
+ * @param string|null $meaning Raw meaning input.
+ * @return string Normalized meaning.
+ */
+function evidence_signature_meaning_normalize_strict(?string $meaning): string {
+  $allowed = ['approval', 'review', 'witness', 'authorship', 'responsibility', 'verification'];
+  $normalized = strtolower(trim((string)($meaning ?? '')));
+
+  // Map common aliases
+  $aliases = [
+    'approved'   => 'approval',
+    'approve'    => 'approval',
+    'reviewed'   => 'review',
+    'witnessed'  => 'witness',
+    'verified'   => 'verification',
+    'verify'     => 'verification',
+    'author'     => 'authorship',
+    'responsible' => 'responsibility',
+  ];
+
+  $normalized = $aliases[$normalized] ?? $normalized;
+
+  if (!in_array($normalized, $allowed, true)) {
+    // Default to 'approval' but log warning
+    error_log("[QMS] Signature meaning '{$meaning}' not recognized. Defaulting to 'approval'. Allowed: " . implode(', ', $allowed));
+    return 'approval';
+  }
+
+  return $normalized;
+}
+
 function upsert_epicor_runtime_item(array &$rows, string $idKey, array $item): array {
   $id = trim((string)($item[$idKey] ?? ''));
   if ($id === '') {
@@ -21246,9 +21459,14 @@ if ($username === '') {
     $reviewAction = strtolower(trim((string)($body['action'] ?? '')));
     $reason = trim((string)($body['reason'] ?? ''));
     $signatureData = is_array($body['signature_data'] ?? null) ? $body['signature_data'] : null;
-    $signatureMeaning = evidence_signature_meaning_normalize(
-      (string)($body['signature_meaning'] ?? ''),
-      $reviewAction === 'reject' ? 'rejected' : 'approved'
+    // 21 CFR Part 11 §11.50: signature meaning is MANDATORY
+    $rawMeaning = trim((string)($body['signature_meaning'] ?? ''));
+    if ($rawMeaning === '' && $reviewAction === 'approve') {
+      // Default to 'approval' but require explicit meaning for compliance
+      $rawMeaning = 'approval';
+    }
+    $signatureMeaning = evidence_signature_meaning_normalize_strict(
+      $rawMeaning !== '' ? $rawMeaning : ($reviewAction === 'reject' ? 'review' : 'approval')
     );
 
     if ($allocationId === '') api_json(['ok' => false, 'error' => 'missing_allocation_id'], 400);

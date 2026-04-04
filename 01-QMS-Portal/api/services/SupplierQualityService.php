@@ -26,7 +26,10 @@ final class SupplierQualityService
     private const WEIGHT_COST       = 0.20;
     private const WEIGHT_COMPLIANCE = 0.10;
 
-    /** SCAR status transitions. */
+    /**
+     * SCAR status transitions -- UNIFIED with WorkflowEngine SCAR template.
+     * This is the single source of truth for SCAR state machine.
+     */
     private const SCAR_TRANSITIONS = [
         'issued'                => ['acknowledged'],
         'acknowledged'          => ['root_cause_analysis'],
@@ -34,6 +37,38 @@ final class SupplierQualityService
         'corrective_action'     => ['verification'],
         'verification'          => ['closed', 'corrective_action'],
         'closed'                => [],
+    ];
+
+    /**
+     * 8D methodology required fields per SCAR state transition.
+     * Enforces that supplier provides structured root cause and corrective data.
+     */
+    private const SCAR_8D_REQUIREMENTS = [
+        'acknowledged'          => ['d1_team_members', 'd2_problem_description'],
+        'root_cause_analysis'   => ['d3_containment_actions', 'd4_root_cause'],
+        'corrective_action'     => ['d5_corrective_actions', 'd6_implementation_plan'],
+        'verification'          => ['d7_preventive_actions'],
+        'closed'                => [],
+    ];
+
+    /** Roles permitted to manage SCAR lifecycle (transition, create). */
+    private const SCAR_ROLES = [
+        'qa_manager', 'quality_engineer', 'qms_engineer',
+        'supply_chain_manager', 'buyer', 'production_director',
+        'ceo', 'it_admin',
+    ];
+
+    /** Roles permitted to manage incoming inspection and skip-lot. */
+    private const INCOMING_ROLES = [
+        'qa_manager', 'quality_engineer', 'qms_engineer',
+        'incoming_inspector', 'warehouse_clerk',
+        'ceo', 'it_admin',
+    ];
+
+    /** Roles permitted to manage ASL and supplier audits. */
+    private const SUPPLIER_MGMT_ROLES = [
+        'qa_manager', 'supply_chain_manager', 'buyer',
+        'production_director', 'ceo', 'it_admin',
     ];
 
     /** Skip-lot inspection levels. */
@@ -216,12 +251,14 @@ final class SupplierQualityService
     /**
      * Create an incoming inspection record.
      *
-     * @param array  $data   Inspection data.
-     * @param string $userId Creating user.
+     * @param array       $data     Inspection data.
+     * @param string      $userId   Creating user.
+     * @param string|null $userRole Role for RBAC check.
      * @return array Created record.
      */
-    public function createIncoming(array $data, string $userId): array
+    public function createIncoming(array $data, string $userId, ?string $userRole = null): array
     {
+        $this->enforceRole($userRole, self::INCOMING_ROLES, 'create incoming inspection');
         $id  = $this->generateNumber('incoming', 'INC', 5);
         $now = $this->nowIso();
 
@@ -485,9 +522,15 @@ final class SupplierQualityService
 
     /**
      * Create or update an ASL entry. Upserts by vendor_id + commodity.
+     *
+     * @param array       $data     ASL data.
+     * @param string      $userId   User performing the action.
+     * @param string|null $userRole Role for RBAC check.
+     * @return array Updated ASL entry.
      */
-    public function upsertAsl(array $data, string $userId): array
+    public function upsertAsl(array $data, string $userId, ?string $userRole = null): array
     {
+        $this->enforceRole($userRole, self::SUPPLIER_MGMT_ROLES, 'manage ASL');
         $asl = $this->loadFile('asl');
         $now = $this->nowIso();
 
@@ -529,10 +572,16 @@ final class SupplierQualityService
     // ── SCAR ───────────────────────────────────────────────────────────────
 
     /**
-     * Create a new SCAR.
+     * Create a new SCAR. Enforces RBAC and initializes 8D methodology fields.
+     *
+     * @param array       $data     SCAR data.
+     * @param string      $userId   Creating user.
+     * @param string|null $userRole Role for RBAC check.
+     * @return array Created SCAR record.
      */
-    public function createScar(array $data, string $userId): array
+    public function createScar(array $data, string $userId, ?string $userRole = null): array
     {
+        $this->enforceRole($userRole, self::SCAR_ROLES, 'create SCAR');
         $id  = $this->generateNumber('scar', 'SCAR', 3);
         $now = $this->nowIso();
 
@@ -594,13 +643,25 @@ final class SupplierQualityService
 
     /**
      * Transition a SCAR to a new status.
+     *
+     * Enforces RBAC, validates 8D methodology fields, and writes audit trail.
+     *
+     * @param string      $scarId   SCAR identifier.
+     * @param string      $target   Target status.
+     * @param string      $userId   User performing the transition.
+     * @param string|null $reason   Reason for transition.
+     * @param string|null $userRole Role for RBAC check.
+     * @return array Updated SCAR record.
      */
     public function transitionScar(
         string  $scarId,
         string  $target,
         string  $userId,
         ?string $reason = null,
+        ?string $userRole = null,
     ): array {
+        $this->enforceRole($userRole, self::SCAR_ROLES, 'transition SCAR');
+
         $records = $this->loadFile('scar');
         $now     = $this->nowIso();
 
@@ -622,6 +683,21 @@ final class SupplierQualityService
                 );
             }
 
+            // ── 8D methodology validation ───────────────────────────────
+            $requiredFields = self::SCAR_8D_REQUIREMENTS[$target] ?? [];
+            $missing8d = [];
+            foreach ($requiredFields as $field) {
+                if (empty($rec[$field]) && empty($rec[$field] ?? null)) {
+                    $missing8d[] = $field;
+                }
+            }
+            if (!empty($missing8d)) {
+                throw new RuntimeException(
+                    "SCAR transition to '{$target}' requires 8D fields: " .
+                    implode(', ', $missing8d) . ". Please complete these before transitioning."
+                );
+            }
+
             $records[$idx]['status']     = $target;
             $records[$idx]['updated_at'] = $now;
             $records[$idx]['updated_by'] = $userId;
@@ -632,6 +708,7 @@ final class SupplierQualityService
                 'to'        => $target,
                 'timestamp' => $now,
                 'user'      => $userId,
+                'role'      => $userRole,
                 'reason'    => $reason,
             ];
             $records[$idx]['status_history'] = $history;
@@ -642,6 +719,18 @@ final class SupplierQualityService
             }
 
             $this->saveFile('scar', $records);
+
+            // ── Audit trail ─────────────────────────────────────────────
+            $this->appendSqAuditEvent('SCAR', $scarId, [
+                'event_type'  => 'STATUS_CHANGED',
+                'from_state'  => $currentStatus,
+                'to_state'    => $target,
+                'user'        => $userId,
+                'role'        => $userRole,
+                'reason'      => $reason,
+                'timestamp'   => $now,
+            ]);
+
             return $records[$idx];
         }
 
@@ -878,5 +967,139 @@ final class SupplierQualityService
         $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
 
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+
+    // ── RBAC enforcement ────────────────────────────────────────────────────
+
+    /**
+     * Enforce role-based access control. Throws if user role is not permitted.
+     * Null role = backward compatibility (no check, but logged as warning).
+     */
+    private function enforceRole(?string $userRole, array $allowedRoles, string $action): void
+    {
+        if ($userRole === null) {
+            // Backward compatibility: log warning but allow
+            error_log("[SupplierQualityService] RBAC warning: no role provided for '{$action}'. Access allowed for backward compatibility.");
+            return;
+        }
+        // Admin bypass
+        if (in_array($userRole, ['it_admin', 'ceo'], true)) {
+            return;
+        }
+        if (!in_array($userRole, $allowedRoles, true)) {
+            throw new RuntimeException(
+                "Access denied: role '{$userRole}' is not permitted to {$action}. " .
+                "Required roles: " . implode(', ', $allowedRoles)
+            );
+        }
+    }
+
+    // ── Immutable audit trail ───────────────────────────────────────────────
+
+    /**
+     * Append a hash-chained audit event for supplier quality actions.
+     */
+    private function appendSqAuditEvent(string $entityType, string $entityId, array $event): void
+    {
+        $logDir = $this->sqDir . '/audit_trail';
+        if (!is_dir($logDir)) {
+            @mkdir($logDir, 0775, true);
+        }
+
+        $logFile = $logDir . '/' . preg_replace('/[^A-Za-z0-9_-]/', '_', $entityType . '_' . $entityId) . '.jsonl';
+
+        // Hash chain
+        $prevHash = '0000000000000000000000000000000000000000000000000000000000000000';
+        if (is_file($logFile)) {
+            $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            if (!empty($lines)) {
+                $lastEvent = json_decode(end($lines), true);
+                $prevHash = $lastEvent['event_hash'] ?? $prevHash;
+            }
+        }
+
+        $event['entity_type'] = $entityType;
+        $event['entity_id']   = $entityId;
+        $event['prev_hash']   = $prevHash;
+        $event['event_hash']  = hash('sha256', json_encode($event, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+
+        $line = json_encode($event, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+        @file_put_contents($logFile, $line, FILE_APPEND | LOCK_EX);
+    }
+
+    // ── Scorecard auto-escalation ───────────────────────────────────────────
+
+    /**
+     * Evaluate scorecard and trigger automatic actions based on score thresholds.
+     *
+     * - Score < 50: flag supplier for disqualification review
+     * - Score < 70: increase inspection level to tightened
+     * - Score < 80: generate warning notification
+     *
+     * @param string $vendorId Vendor identifier.
+     * @param string $period   Period "YYYY-MM".
+     * @return array List of triggered actions.
+     */
+    public function evaluateScorecardEscalation(string $vendorId, string $period): array
+    {
+        $scorecard = $this->getScorecardDetail($vendorId, $period);
+        if ($scorecard === null) {
+            return [];
+        }
+
+        $overall = (float)($scorecard['overall_score'] ?? 100);
+        $actions = [];
+        $now     = $this->nowIso();
+
+        if ($overall < 80.0) {
+            $actions[] = [
+                'action'    => 'scorecard_warning',
+                'vendor_id' => $vendorId,
+                'period'    => $period,
+                'score'     => $overall,
+                'message'   => "Supplier {$vendorId} scorecard below 80% ({$overall}%). Review recommended.",
+                'timestamp' => $now,
+            ];
+        }
+
+        if ($overall < 70.0) {
+            $actions[] = [
+                'action'    => 'increase_inspection',
+                'vendor_id' => $vendorId,
+                'period'    => $period,
+                'score'     => $overall,
+                'message'   => "Supplier {$vendorId} at-risk ({$overall}%). Inspection level should be tightened.",
+                'timestamp' => $now,
+            ];
+        }
+
+        if ($overall < 50.0) {
+            $actions[] = [
+                'action'    => 'disqualification_review',
+                'vendor_id' => $vendorId,
+                'period'    => $period,
+                'score'     => $overall,
+                'message'   => "Supplier {$vendorId} critical ({$overall}%). Disqualification review required.",
+                'timestamp' => $now,
+            ];
+        }
+
+        // Persist escalation actions
+        if (!empty($actions)) {
+            $queueFile = $this->sqDir . '/escalation_queue.jsonl';
+            foreach ($actions as $action) {
+                $line = json_encode($action, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+                @file_put_contents($queueFile, $line, FILE_APPEND | LOCK_EX);
+            }
+
+            $this->appendSqAuditEvent('SCORECARD', $vendorId . '_' . $period, [
+                'event_type' => 'ESCALATION_TRIGGERED',
+                'score'      => $overall,
+                'actions'    => array_column($actions, 'action'),
+                'timestamp'  => $now,
+            ]);
+        }
+
+        return $actions;
     }
 }

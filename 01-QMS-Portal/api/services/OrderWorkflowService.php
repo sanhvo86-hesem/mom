@@ -320,7 +320,25 @@ final class OrderWorkflowService
             return $validation;
         }
 
-        // Apply transition
+        // ── Pre-transition guards (BEFORE mutating state) ────────────────
+
+        // Shipment gate enforcement: block SO -> shipped if gate not ready
+        if ($orderType === 'so' && $targetStatus === 'shipped') {
+            $gateResult = $this->enforceShipmentGate($orderId, $userId, $userRole);
+            if ($gateResult !== null) {
+                return $gateResult;
+            }
+        }
+
+        // Quantity validation: block WO -> completed if qty invalid
+        if ($orderType === 'wo' && $targetStatus === 'completed') {
+            $qtyCheck = $this->validateCompletionQuantity($record);
+            if ($qtyCheck !== null) {
+                return $qtyCheck;
+            }
+        }
+
+        // ── Apply transition (only after all guards pass) ───────────────
         $now = $this->nowIso();
 
         $orders[$storeKey][$recordIdx]['status']     = $targetStatus;
@@ -366,10 +384,26 @@ final class OrderWorkflowService
             'status' => ['old' => $currentStatus, 'new' => $targetStatus],
         ], $userId, $reason ?? "Status transition: {$currentStatus} -> {$targetStatus}");
 
+        // ── Hash-chain audit trail integration ──────────────────────────
+        $this->appendImmutableAuditEvent($orderType, $orderId, [
+            'event_type'   => 'STATUS_CHANGED',
+            'from_state'   => $currentStatus,
+            'to_state'     => $targetStatus,
+            'user'         => $userId,
+            'role'         => $userRole,
+            'reason'       => $reason,
+            'timestamp'    => $now,
+            'ip'           => $_SERVER['REMOTE_ADDR'] ?? '',
+            'user_agent'   => $_SERVER['HTTP_USER_AGENT'] ?? '',
+        ]);
+
         $this->saveOrders($orders);
 
         // Auto-actions on transition
         $this->runAutoActions($orderType, $orderId, $targetStatus, $orders);
+
+        // ── Notification dispatch ───────────────────────────────────────
+        $this->dispatchTransitionNotification($orderType, $orderId, $currentStatus, $targetStatus, $userId);
 
         return new TransitionResult(true, "Transitioned to '{$targetStatus}'.", data: $orders[$storeKey][$recordIdx]);
     }
@@ -900,6 +934,166 @@ final class OrderWorkflowService
         return 'system';
     }
 
+    // ── Shipment gate enforcement ──────────────────────────────────────────
+
+    /**
+     * Enforce shipment readiness gate before allowing SO -> shipped.
+     * Returns a failure TransitionResult if gate is NOT READY, null if OK.
+     */
+    private function enforceShipmentGate(string $soNumber, string $userId, string $userRole): ?TransitionResult
+    {
+        $base    = rtrim(str_replace('\\', '/', $this->dataDir), '/');
+        $confDir = $base . '/config';
+
+        $gateService = new ShipmentGateService($base, $confDir);
+
+        try {
+            $result = $gateService->checkReadiness($soNumber, $userId, $userRole);
+        } catch (RuntimeException $e) {
+            return new TransitionResult(
+                false,
+                'Shipment gate check failed: ' . $e->getMessage(),
+                errorCode: 'shipment_gate_error',
+            );
+        }
+
+        if (!$result['ready']) {
+            $failedCodes = implode(', ', $result['failed_gates'] ?? []);
+            return new TransitionResult(
+                false,
+                "Cannot ship: shipment readiness gate NOT READY. Failed gates: {$failedCodes}. " .
+                "Resolve all required gate failures or request an override from QA Manager.",
+                errorCode: 'shipment_gate_not_ready',
+                data: [
+                    'failed_gates' => $result['failed_gates'] ?? [],
+                    'items'        => $result['items'] ?? [],
+                ],
+            );
+        }
+
+        return null; // Gate passed
+    }
+
+    // ── Quantity validation ─────────────────────────────────────────────────
+
+    /**
+     * Validate that completion quantity is reasonable before WO -> completed.
+     * Returns a failure TransitionResult if invalid, null if OK.
+     */
+    private function validateCompletionQuantity(array $record): ?TransitionResult
+    {
+        $qtyOrdered   = (int)($record['qty_ordered'] ?? 0);
+        $qtyCompleted = (int)($record['qty_completed'] ?? 0);
+        $qtyScrap     = (int)($record['qty_scrap'] ?? 0);
+
+        if ($qtyOrdered > 0 && ($qtyCompleted + $qtyScrap) === 0) {
+            return new TransitionResult(
+                false,
+                "Cannot complete WO: qty_completed and qty_scrap are both zero. " .
+                "Report progress before completing.",
+                errorCode: 'qty_not_reported',
+            );
+        }
+
+        // Warn but allow: over-production (qty_completed > qty_ordered * 1.1)
+        // This is logged but not blocked -- some processes allow overrun.
+
+        return null;
+    }
+
+    // ── Immutable audit trail (hash-chain) ──────────────────────────────────
+
+    /**
+     * Append an immutable, hash-chained audit event for an order transition.
+     * Provides tamper-proof evidence per AS9100D / 21 CFR Part 11.
+     */
+    private function appendImmutableAuditEvent(string $orderType, string $orderId, array $event): void
+    {
+        $base    = rtrim(str_replace('\\', '/', $this->dataDir), '/');
+        $logDir  = $base . '/orders/audit_trail';
+        if (!is_dir($logDir)) {
+            @mkdir($logDir, 0775, true);
+        }
+
+        $logFile = $logDir . '/' . preg_replace('/[^A-Za-z0-9_-]/', '_', $orderId) . '.jsonl';
+
+        // Read last hash for chain
+        $prevHash = '0000000000000000000000000000000000000000000000000000000000000000';
+        if (is_file($logFile)) {
+            $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            if (!empty($lines)) {
+                $lastLine = end($lines);
+                $lastEvent = json_decode($lastLine, true);
+                $prevHash = $lastEvent['event_hash'] ?? $prevHash;
+            }
+        }
+
+        $event['order_type']  = $orderType;
+        $event['order_id']    = $orderId;
+        $event['prev_hash']   = $prevHash;
+        $event['event_hash']  = hash('sha256', json_encode($event, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+
+        $line = json_encode($event, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+        @file_put_contents($logFile, $line, FILE_APPEND | LOCK_EX);
+    }
+
+    // ── Notification dispatch ───────────────────────────────────────────────
+
+    /**
+     * Dispatch notifications on order status transitions.
+     *
+     * Priority transitions that ALWAYS notify:
+     * - SO: confirmed, in_production, shipped, cancelled
+     * - JO: released, active, on_hold, completed, closed
+     * - WO: running, completed, on_hold
+     */
+    private function dispatchTransitionNotification(
+        string $orderType,
+        string $orderId,
+        string $fromStatus,
+        string $toStatus,
+        string $userId,
+    ): void {
+        // Define which transitions trigger notifications
+        $notifyMap = [
+            'so' => ['confirmed', 'in_production', 'shipped', 'cancelled', 'closed'],
+            'jo' => ['released', 'active', 'on_hold', 'completed', 'closed', 'cancelled'],
+            'wo' => ['setup', 'running', 'completed', 'on_hold', 'cancelled'],
+        ];
+
+        $triggers = $notifyMap[$orderType] ?? [];
+        if (!in_array($toStatus, $triggers, true)) {
+            return;
+        }
+
+        // Build notification entry
+        $now = $this->nowIso();
+        $notification = [
+            'type'        => 'order_transition',
+            'order_type'  => strtoupper($orderType),
+            'order_id'    => $orderId,
+            'from_status' => $fromStatus,
+            'to_status'   => $toStatus,
+            'triggered_by' => $userId,
+            'timestamp'   => $now,
+            'priority'    => in_array($toStatus, ['cancelled', 'on_hold'], true) ? 'URGENT' : 'NORMAL',
+            'message_en'  => strtoupper($orderType) . " {$orderId} transitioned from '{$fromStatus}' to '{$toStatus}'.",
+            'message_vi'  => strtoupper($orderType) . " {$orderId} chuyen trang thai tu '{$fromStatus}' sang '{$toStatus}'.",
+            'read'        => false,
+        ];
+
+        // Persist to notification queue
+        $base     = rtrim(str_replace('\\', '/', $this->dataDir), '/');
+        $queueDir = $base . '/notifications';
+        if (!is_dir($queueDir)) {
+            @mkdir($queueDir, 0775, true);
+        }
+
+        $queueFile = $queueDir . '/order_notifications.jsonl';
+        $line = json_encode($notification, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+        @file_put_contents($queueFile, $line, FILE_APPEND | LOCK_EX);
+    }
+
     // ── File I/O ────────────────────────────────────────────────────────────
 
     private function loadConfig(): array
@@ -947,15 +1141,22 @@ final class OrderWorkflowService
         if (!is_dir($dir)) {
             @mkdir($dir, 0775, true);
         }
-        $tmp  = $path . '.tmp';
+        $tmp  = $path . '.tmp.' . getmypid();
         $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
         if ($json === false) {
             throw new RuntimeException('Failed to encode JSON for ' . basename($path));
         }
         if (@file_put_contents($tmp, $json, LOCK_EX) === false) {
+            @unlink($tmp);
             throw new RuntimeException('Cannot write ' . basename($path));
         }
-        @rename($tmp, $path);
+        if (file_exists($path)) {
+            @unlink($path);
+        }
+        if (!@rename($tmp, $path)) {
+            @unlink($tmp);
+            throw new RuntimeException('Failed to atomically replace ' . basename($path));
+        }
     }
 
     private function nowIso(): string

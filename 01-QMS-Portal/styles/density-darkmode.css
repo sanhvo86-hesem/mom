@@ -50,25 +50,26 @@
   --gray-50:#0f172a; --gray-100:#1e293b; --gray-200:#334155; --gray-300:#475569;
   --gray-400:#64748b; --gray-500:#94a3b8; --gray-600:#cbd5e1; --gray-700:#e2e8f0;
   --gray-800:#f1f5f9; --gray-900:#f8fafc;
-  --bg-page:#0f172a; --bg-surface:#1e293b; --bg-surface-alt:#162032;
-  --bg-sidebar:#0a1628; --bg-header:#1e293b; --bg-modal:#1e293b;
-  --bg-overlay:rgba(0,0,0,0.6); --bg-hover:#263348; --bg-selected:rgba(37,99,235,0.15);
-  --text-primary:#f1f5f9; --text-secondary:#94a3b8; --text-tertiary:#64748b;
-  --text-inverse:#0f172a; --text-link:#60a5fa;
-  --border:#334155; --border-focus:#60a5fa;
+  --bg-page:var(--bg-page-dark); --bg-surface:var(--bg-surface-dark); --bg-surface-alt:var(--bg-surface-alt-dark);
+  --bg-sidebar:var(--bg-sidebar-dark); --bg-header:var(--bg-header-dark); --bg-modal:var(--bg-modal-dark, var(--bg-surface-dark));
+  --bg-overlay:rgba(0,0,0,0.6); --bg-hover:var(--bg-hover-dark); --bg-selected:rgba(37,99,235,0.15);
+  --text-primary:var(--text-primary-dark); --text-secondary:var(--text-secondary-dark); --text-tertiary:var(--text-tertiary-dark);
+  --text-inverse:var(--text-inverse-dark, #0f172a); --text-link:var(--text-link-dark);
+  --border:var(--border-dark); --border-focus:var(--border-focus-dark);
+  --border-error:var(--border-error-dark, var(--red-dark)); --border-success:var(--border-success-dark, var(--green-dark));
   --brand-2:#3b82f6; --brand-light:#60a5fa;
-  --green:#22c55e; --green-bg:rgba(34,197,94,0.15);
-  --red:#f87171; --red-bg:rgba(248,113,113,0.15);
-  --amber:#fbbf24; --amber-bg:rgba(251,191,36,0.15);
-  --blue:#60a5fa; --blue-bg:rgba(96,165,250,0.15);
-  --purple:#a78bfa; --purple-bg:rgba(167,139,250,0.15);
-  --cyan:#22d3ee; --cyan-bg:rgba(34,211,238,0.15);
+  --green:var(--green-dark); --green-bg:rgba(34,197,94,0.15);
+  --red:var(--red-dark); --red-bg:rgba(248,113,113,0.15);
+  --amber:var(--amber-dark); --amber-bg:rgba(251,191,36,0.15);
+  --blue:var(--blue-dark); --blue-bg:rgba(96,165,250,0.15);
+  --purple:var(--purple-dark); --purple-bg:rgba(167,139,250,0.15);
+  --cyan:var(--cyan-dark); --cyan-bg:rgba(34,211,238,0.15);
   --shadow-xs:0 1px 2px rgba(0,0,0,0.2); --shadow-sm:0 1px 3px rgba(0,0,0,0.3);
   --shadow-md:0 4px 6px rgba(0,0,0,0.3); --shadow-lg:0 10px 15px rgba(0,0,0,0.3);
   --shadow-xl:0 20px 25px rgba(0,0,0,0.4);
   /* ── Bridge legacy portal.main.css variables ── */
-  --bg:#0f172a; --surface:#1e293b;
-  --text:#f1f5f9; --text-2:#94a3b8; --text-3:#64748b;
+  --bg:var(--bg-page); --surface:var(--bg-surface);
+  --text:var(--text-primary); --text-2:var(--text-secondary); --text-3:var(--text-tertiary);
   color-scheme: dark;
 }
 
@@ -78,25 +79,26 @@
     --gray-50:#0f172a; --gray-100:#1e293b; --gray-200:#334155; --gray-300:#475569;
     --gray-400:#64748b; --gray-500:#94a3b8; --gray-600:#cbd5e1; --gray-700:#e2e8f0;
     --gray-800:#f1f5f9; --gray-900:#f8fafc;
-    --bg-page:#0f172a; --bg-surface:#1e293b; --bg-surface-alt:#162032;
-    --bg-sidebar:#0a1628; --bg-header:#1e293b; --bg-modal:#1e293b;
-    --bg-overlay:rgba(0,0,0,0.6); --bg-hover:#263348; --bg-selected:rgba(37,99,235,0.15);
-    --text-primary:#f1f5f9; --text-secondary:#94a3b8; --text-tertiary:#64748b;
-    --text-inverse:#0f172a; --text-link:#60a5fa;
-    --border:#334155; --border-focus:#60a5fa;
+    --bg-page:var(--bg-page-dark); --bg-surface:var(--bg-surface-dark); --bg-surface-alt:var(--bg-surface-alt-dark);
+    --bg-sidebar:var(--bg-sidebar-dark); --bg-header:var(--bg-header-dark); --bg-modal:var(--bg-modal-dark, var(--bg-surface-dark));
+    --bg-overlay:rgba(0,0,0,0.6); --bg-hover:var(--bg-hover-dark); --bg-selected:rgba(37,99,235,0.15);
+    --text-primary:var(--text-primary-dark); --text-secondary:var(--text-secondary-dark); --text-tertiary:var(--text-tertiary-dark);
+    --text-inverse:var(--text-inverse-dark, #0f172a); --text-link:var(--text-link-dark);
+    --border:var(--border-dark); --border-focus:var(--border-focus-dark);
+    --border-error:var(--border-error-dark, var(--red-dark)); --border-success:var(--border-success-dark, var(--green-dark));
     --brand-2:#3b82f6; --brand-light:#60a5fa;
-    --green:#22c55e; --green-bg:rgba(34,197,94,0.15);
-    --red:#f87171; --red-bg:rgba(248,113,113,0.15);
-    --amber:#fbbf24; --amber-bg:rgba(251,191,36,0.15);
-    --blue:#60a5fa; --blue-bg:rgba(96,165,250,0.15);
-    --purple:#a78bfa; --purple-bg:rgba(167,139,250,0.15);
-    --cyan:#22d3ee; --cyan-bg:rgba(34,211,238,0.15);
+    --green:var(--green-dark); --green-bg:rgba(34,197,94,0.15);
+    --red:var(--red-dark); --red-bg:rgba(248,113,113,0.15);
+    --amber:var(--amber-dark); --amber-bg:rgba(251,191,36,0.15);
+    --blue:var(--blue-dark); --blue-bg:rgba(96,165,250,0.15);
+    --purple:var(--purple-dark); --purple-bg:rgba(167,139,250,0.15);
+    --cyan:var(--cyan-dark); --cyan-bg:rgba(34,211,238,0.15);
     --shadow-xs:0 1px 2px rgba(0,0,0,0.2); --shadow-sm:0 1px 3px rgba(0,0,0,0.3);
     --shadow-md:0 4px 6px rgba(0,0,0,0.3); --shadow-lg:0 10px 15px rgba(0,0,0,0.3);
     --shadow-xl:0 20px 25px rgba(0,0,0,0.4);
     /* Bridge legacy */
-    --bg:#0f172a; --surface:#1e293b;
-    --text:#f1f5f9; --text-2:#94a3b8; --text-3:#64748b;
+    --bg:var(--bg-page); --surface:var(--bg-surface);
+    --text:var(--text-primary); --text-2:var(--text-secondary); --text-3:var(--text-tertiary);
     color-scheme: dark;
   }
 }
@@ -511,7 +513,8 @@ dialog, [role="dialog"], .hm-modal, .hm-dialog {
   --card-shadow: var(--shadow-sm);
   --card-header-bg: transparent;
   --card-header-border: 1px solid var(--border);
-  --card-header-padding: 12px 16px;
+  --card-header-padding-v: 12px;
+  --card-header-padding: var(--card-header-padding-v) var(--space-4, 16px);
   --card-body-padding: var(--hds-card-pad, 16px);
 
   /* Badge component */
@@ -539,13 +542,16 @@ dialog, [role="dialog"], .hm-modal, .hm-dialog {
   --modal-border-radius: var(--radius-2xl, 16px);
   --modal-shadow: var(--shadow-xl);
   --modal-padding: var(--space-6, 24px);
-  --modal-header-padding: var(--space-4, 16px) var(--space-6, 24px);
+  --modal-header-padding-v: var(--space-4, 16px);
+  --modal-header-padding: var(--modal-header-padding-v) var(--space-6, 24px);
   --modal-footer-padding: var(--space-4, 16px) var(--space-6, 24px);
   --modal-backdrop-color: rgba(0,0,0,var(--overlay-opacity, 0.4));
 
   /* Flowchart / Process diagram */
   --flow-node-bg: var(--bg-surface);
-  --flow-node-border: 2px solid var(--border);
+  --flow-node-border-w: 2px;
+  --flow-node-border-color: var(--border);
+  --flow-node-border: var(--flow-node-border-w) solid var(--flow-node-border-color);
   --flow-node-radius: var(--radius-lg, 8px);
   --flow-node-padding: 12px 16px;
   --flow-node-font-size: var(--text-sm, 13px);
@@ -555,7 +561,8 @@ dialog, [role="dialog"], .hm-modal, .hm-dialog {
 
   /* ISO Document boxes */
   --iso-box-bg: var(--bg-surface);
-  --iso-box-border: 1px solid var(--border);
+  --iso-box-border-w: 1px;
+  --iso-box-border: var(--iso-box-border-w) solid var(--border);
   --iso-box-radius: var(--radius-lg, 8px);
   --iso-box-header-bg: var(--bg-surface-alt, #f1f5f9);
   --iso-box-header-padding: 10px 14px;
@@ -564,8 +571,11 @@ dialog, [role="dialog"], .hm-modal, .hm-dialog {
 
   /* ISO Note callouts */
   --iso-note-bg: #fffbeb;
-  --iso-note-border: 1px solid #fcd34d;
-  --iso-note-border-left: 4px solid #f59e0b;
+  --iso-note-border-color: #fcd34d;
+  --iso-note-border-left-color: #f59e0b;
+  --iso-note-border-left-w: 4px;
+  --iso-note-border: 1px solid var(--iso-note-border-color);
+  --iso-note-border-left: var(--iso-note-border-left-w) solid var(--iso-note-border-left-color);
   --iso-note-radius: var(--radius-md, 6px);
   --iso-note-padding: 10px 14px;
   --iso-note-font-size: var(--text-sm, 13px);
@@ -585,7 +595,9 @@ dialog, [role="dialog"], .hm-modal, .hm-dialog {
   /* Tooltip */
   --tooltip-bg: var(--gray-900, #0f172a);
   --tooltip-color: #ffffff;
-  --tooltip-padding: 6px 10px;
+  --tooltip-padding-y: 6px;
+  --tooltip-padding-x: 10px;
+  --tooltip-padding: var(--tooltip-padding-y) var(--tooltip-padding-x);
   --tooltip-radius: var(--radius-md, 6px);
   --tooltip-font-size: var(--text-xs, 11px);
   --tooltip-max-width: 280px;
@@ -766,4 +778,244 @@ dialog, [role="dialog"], .hm-modal, .hm-dialog {
 [data-color-mode="dark"] #admin-content [style*="color:#52667a;"],
 [data-color-mode="dark"] #admin-content [style*="color:#475569;"]{
   color:#94a3b8 !important;
+}
+
+/* Semantic compliance layer â€” applies to dark, auto-dark, and scheduled dark */
+[data-color-scheme-active="dark"] body,
+[data-color-scheme-active="dark"] #content,
+[data-color-scheme-active="dark"] .fb-container,
+[data-color-scheme-active="dark"] .fb-canvas {
+  background: var(--bg-page);
+  color: var(--text-primary);
+}
+[data-color-scheme-active="dark"] a { color: var(--text-link); }
+[data-color-scheme-active="dark"] #login-right,
+[data-color-scheme-active="dark"] .breadcrumb-bar,
+[data-color-scheme-active="dark"] .admin-stat,
+[data-color-scheme-active="dark"] .admin-panel,
+[data-color-scheme-active="dark"] .admin-table,
+[data-color-scheme-active="dark"] #doc-viewer-header,
+[data-color-scheme-active="dark"] .ec-tabs,
+[data-color-scheme-active="dark"] .ec-card,
+[data-color-scheme-active="dark"] .ec-kpi-card,
+[data-color-scheme-active="dark"] .ec-section,
+[data-color-scheme-active="dark"] .ec-sidebar,
+[data-color-scheme-active="dark"] .ev-card,
+[data-color-scheme-active="dark"] .owo-card,
+[data-color-scheme-active="dark"] .owo-stat,
+[data-color-scheme-active="dark"] .qe-card,
+[data-color-scheme-active="dark"] .qe-section,
+[data-color-scheme-active="dark"] .sq-card,
+[data-color-scheme-active="dark"] .qe-kpi,
+[data-color-scheme-active="dark"] .dd-card,
+[data-color-scheme-active="dark"] .dd-stat,
+[data-color-scheme-active="dark"] .om-card,
+[data-color-scheme-active="dark"] .fb-block-palette,
+[data-color-scheme-active="dark"] .fb-canvas-inner,
+[data-color-scheme-active="dark"] .fb-properties,
+[data-color-scheme-active="dark"] .fb-field,
+[data-color-scheme-active="dark"] .fb-toolbar,
+[data-color-scheme-active="dark"] .eqms-section,
+[data-color-scheme-active="dark"] .qf-header,
+[data-color-scheme-active="dark"] .qf-status-bar,
+[data-color-scheme-active="dark"] .uv2-card,
+[data-color-scheme-active="dark"] .uv2-row,
+[data-color-scheme-active="dark"] .uv2-file,
+[data-color-scheme-active="dark"] .ec-work-card,
+[data-color-scheme-active="dark"] .mesx-card,
+[data-color-scheme-active="dark"] .mesx-panel,
+[data-color-scheme-active="dark"] .mesx-modal {
+  background: var(--bg-surface);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+[data-color-scheme-active="dark"] #login-box .demo-section,
+[data-color-scheme-active="dark"] .admin-table th,
+[data-color-scheme-active="dark"] .hm-table th,
+[data-color-scheme-active="dark"] .ec-table th,
+[data-color-scheme-active="dark"] .ev-table th,
+[data-color-scheme-active="dark"] .eqms-section-head,
+[data-color-scheme-active="dark"] .eqms-table th,
+[data-color-scheme-active="dark"] .uv2-cell,
+[data-color-scheme-active="dark"] .uv2-empty,
+[data-color-scheme-active="dark"] .mesx-kpi,
+[data-color-scheme-active="dark"] .mesx-mini,
+[data-color-scheme-active="dark"] .mesx-list-item,
+[data-color-scheme-active="dark"] .mesx-empty,
+[data-color-scheme-active="dark"] .mesx-table-wrap,
+[data-color-scheme-active="dark"] .mesx-table th {
+  background: var(--bg-surface-alt);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+[data-color-scheme-active="dark"] .admin-tab-v2,
+[data-color-scheme-active="dark"] .ec-tab,
+[data-color-scheme-active="dark"] .ev-tab,
+[data-color-scheme-active="dark"] .owo-tab,
+[data-color-scheme-active="dark"] .qe-tab,
+[data-color-scheme-active="dark"] .sq-tab,
+[data-color-scheme-active="dark"] .filter-chip,
+[data-color-scheme-active="dark"] .dict-cat-chip,
+[data-color-scheme-active="dark"] .quick-btn,
+[data-color-scheme-active="dark"] .btn-admin,
+[data-color-scheme-active="dark"] .dv-btn,
+[data-color-scheme-active="dark"] .dv-btn-neutral,
+[data-color-scheme-active="dark"] .ec-btn,
+[data-color-scheme-active="dark"] .fb-toolbar-btn,
+[data-color-scheme-active="dark"] .eqms-btn.secondary,
+[data-color-scheme-active="dark"] .uv2-btn.ghost,
+[data-color-scheme-active="dark"] .mesx-link {
+  background: var(--bg-surface);
+  border-color: var(--gray-300);
+  color: var(--text-primary);
+}
+[data-color-scheme-active="dark"] .admin-tab-v2:hover,
+[data-color-scheme-active="dark"] .ec-tab:hover,
+[data-color-scheme-active="dark"] .ev-tab:hover,
+[data-color-scheme-active="dark"] .mesx-link:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+[data-color-scheme-active="dark"] .btn-admin.primary,
+[data-color-scheme-active="dark"] .ec-btn.primary {
+  background: var(--brand-2);
+  border-color: var(--brand-2);
+  color: var(--text-inverse);
+}
+[data-color-scheme-active="dark"] .btn-admin.danger,
+[data-color-scheme-active="dark"] .mesx-link.danger { color: var(--red); border-color: var(--red); }
+[data-color-scheme-active="dark"] .btn-admin.secondary { color: var(--text-primary); }
+[data-color-scheme-active="dark"] #login-box h2,
+[data-color-scheme-active="dark"] .mesx,
+[data-color-scheme-active="dark"] .mesx-clock strong,
+[data-color-scheme-active="dark"] .mesx-kpi strong,
+[data-color-scheme-active="dark"] .mesx-panel-head h2,
+[data-color-scheme-active="dark"] .mesx-panel-head h3,
+[data-color-scheme-active="dark"] .mesx-center h4,
+[data-color-scheme-active="dark"] .mesx-connector h4,
+[data-color-scheme-active="dark"] .mesx-metric-label strong,
+[data-color-scheme-active="dark"] .mesx-metric-value,
+[data-color-scheme-active="dark"] .mesx-pareto-main strong,
+[data-color-scheme-active="dark"] .mesx-handshake h4,
+[data-color-scheme-active="dark"] .mesx-mini strong,
+[data-color-scheme-active="dark"] .mesx-code,
+[data-color-scheme-active="dark"] .mesx-machine h4,
+[data-color-scheme-active="dark"] .mesx-list-item h4,
+[data-color-scheme-active="dark"] .mesx-empty strong,
+[data-color-scheme-active="dark"] .uv2-dropzone strong,
+[data-color-scheme-active="dark"] .uv2-file-name,
+[data-color-scheme-active="dark"] .uv2-cell strong,
+[data-color-scheme-active="dark"] .qf {
+  color: var(--text-primary);
+}
+[data-color-scheme-active="dark"] #login-box .subtitle,
+[data-color-scheme-active="dark"] #login-box label,
+[data-color-scheme-active="dark"] .admin-stat .lbl,
+[data-color-scheme-active="dark"] .dv-meta-note,
+[data-color-scheme-active="dark"] .eqms-label,
+[data-color-scheme-active="dark"] .ec-work-empty,
+[data-color-scheme-active="dark"] .mesx-clock small,
+[data-color-scheme-active="dark"] .mesx-kpi small,
+[data-color-scheme-active="dark"] .mesx-kpi span,
+[data-color-scheme-active="dark"] .mesx-panel-head p,
+[data-color-scheme-active="dark"] .mesx-center p,
+[data-color-scheme-active="dark"] .mesx-connector p,
+[data-color-scheme-active="dark"] .mesx-metric-label span,
+[data-color-scheme-active="dark"] .mesx-pareto-main span,
+[data-color-scheme-active="dark"] .mesx-handshake p,
+[data-color-scheme-active="dark"] .mesx-mini small,
+[data-color-scheme-active="dark"] .mesx-sub,
+[data-color-scheme-active="dark"] .mesx-machine p,
+[data-color-scheme-active="dark"] .mesx-list-item p,
+[data-color-scheme-active="dark"] .mesx-meta,
+[data-color-scheme-active="dark"] .mesx-empty,
+[data-color-scheme-active="dark"] .uv2-dropzone p,
+[data-color-scheme-active="dark"] .uv2-file-meta,
+[data-color-scheme-active="dark"] .uv2-cell small {
+  color: var(--text-secondary);
+}
+[data-color-scheme-active="dark"] #login-box input[type=password],
+[data-color-scheme-active="dark"] textarea,
+[data-color-scheme-active="dark"] .ec-input,
+[data-color-scheme-active="dark"] .ec-select,
+[data-color-scheme-active="dark"] .fb-prop-input,
+[data-color-scheme-active="dark"] .eqms-input,
+[data-color-scheme-active="dark"] .mesx-input,
+[data-color-scheme-active="dark"] .mesx-select,
+[data-color-scheme-active="dark"] .mesx-textarea {
+  background: var(--input-bg, var(--bg-surface-alt));
+  border-color: var(--gray-300);
+  color: var(--text-primary);
+}
+[data-color-scheme-active="dark"] .dv-meta,
+[data-color-scheme-active="dark"] .eqms-sig-block,
+[data-color-scheme-active="dark"] .mesx-clock,
+[data-color-scheme-active="dark"] .mesx-center,
+[data-color-scheme-active="dark"] .mesx-connector,
+[data-color-scheme-active="dark"] .mesx-handshake,
+[data-color-scheme-active="dark"] .mesx-machine,
+[data-color-scheme-active="dark"] .mesx-chip.stone {
+  background: linear-gradient(180deg, var(--bg-surface-alt) 0%, var(--bg-surface) 100%);
+  border-color: var(--border);
+}
+[data-color-scheme-active="dark"] .mesx-metric-row,
+[data-color-scheme-active="dark"] .mesx-pareto-row,
+[data-color-scheme-active="dark"] .mesx-section,
+[data-color-scheme-active="dark"] .mesx-table th,
+[data-color-scheme-active="dark"] .mesx-table td {
+  border-color: var(--bg-hover);
+}
+[data-color-scheme-active="dark"] .mesx-bar { background: var(--border); }
+[data-color-scheme-active="dark"] .mesx-pill { background: color-mix(in srgb, var(--pill) 18%, var(--bg-page)); color: var(--pill); }
+[data-color-scheme-active="dark"] .mesx-chip { background: color-mix(in srgb, var(--brand-2) 18%, transparent); border-color: color-mix(in srgb, var(--brand-light) 28%, transparent); color: var(--brand-light); }
+[data-color-scheme-active="dark"] .mesx-link.warning { background: color-mix(in srgb, var(--amber) 16%, transparent); color: var(--amber); }
+[data-color-scheme-active="dark"] #admin-content [style*="background:#fff;"],
+[data-color-scheme-active="dark"] #admin-content [style*="background:#ffffff;"],
+[data-color-scheme-active="dark"] #admin-content [style*="background:#f8fafc;"],
+[data-color-scheme-active="dark"] #admin-content [style*="background:#f8fbff;"],
+[data-color-scheme-active="dark"] #admin-content [style*="background:#fbfdff;"],
+[data-color-scheme-active="dark"] #admin-content [style*="background:#f5f9ff;"],
+[data-color-scheme-active="dark"] #admin-content [style*="background:#eef6ff;"],
+[data-color-scheme-active="dark"] #admin-content [style*="background:#eff6ff;"],
+[data-color-scheme-active="dark"] #admin-content [style*="background:#f0f4ff;"],
+[data-color-scheme-active="dark"] #admin-content [style*="background:#faf6f3;"],
+[data-color-scheme-active="dark"] #admin-content [style*="background:#fffbf0;"],
+[data-color-scheme-active="dark"] #admin-content [style*="background:#fdf5ff;"],
+[data-color-scheme-active="dark"] #admin-content [style*="background:#f0fdff;"],
+[data-color-scheme-active="dark"] #admin-content [style*="background:#fff5f5;"],
+[data-color-scheme-active="dark"] #admin-content [style*="background:#f0fdf4;"],
+[data-color-scheme-active="dark"] #admin-content [style*="background:#f0f4f8;"],
+[data-color-scheme-active="dark"] #admin-content [style*="background:#fffbeb;"],
+[data-color-scheme-active="dark"] #admin-content [style*="background:#fef2f2;"],
+[data-color-scheme-active="dark"] #admin-content [style*="background:#faf5ff;"],
+[data-color-scheme-active="dark"] #admin-content [style*="background:#f0f9ff;"],
+[data-color-scheme-active="dark"] #admin-content [style*="background:#fdf2f8;"],
+[data-color-scheme-active="dark"] #admin-content [style*="background:#eef2ff;"] {
+  background: var(--bg-surface) !important;
+}
+[data-color-scheme-active="dark"] #admin-content [style*="border:1px solid #e5e7eb"],
+[data-color-scheme-active="dark"] #admin-content [style*="border:1px solid #e2e8f0"],
+[data-color-scheme-active="dark"] #admin-content [style*="border:1px solid #dbe4f0"],
+[data-color-scheme-active="dark"] #admin-content [style*="border:1px solid #dbeafe"],
+[data-color-scheme-active="dark"] #admin-content [style*="border:1px solid #dcfce7"],
+[data-color-scheme-active="dark"] #admin-content [style*="border:1px solid #fee2e2"],
+[data-color-scheme-active="dark"] #admin-content [style*="border:1px solid #fef3c7"],
+[data-color-scheme-active="dark"] #admin-content [style*="border:1px solid #f3e8ff"],
+[data-color-scheme-active="dark"] #admin-content [style*="border:1px solid #e0f2fe"],
+[data-color-scheme-active="dark"] #admin-content [style*="border:1px solid #fce7f3"] {
+  border-color: var(--border) !important;
+}
+[data-color-scheme-active="dark"] #admin-content [style*="color:#333;"],
+[data-color-scheme-active="dark"] #admin-content [style*="color:#0c2d48;"],
+[data-color-scheme-active="dark"] #admin-content [style*="color:#102a43;"],
+[data-color-scheme-active="dark"] #admin-content [style*="color:#334155;"] {
+  color: var(--text-primary) !important;
+}
+[data-color-scheme-active="dark"] #admin-content [style*="color:#666;"],
+[data-color-scheme-active="dark"] #admin-content [style*="color:#999;"],
+[data-color-scheme-active="dark"] #admin-content [style*="color:#334e68;"],
+[data-color-scheme-active="dark"] #admin-content [style*="color:#486581;"],
+[data-color-scheme-active="dark"] #admin-content [style*="color:#52667a;"],
+[data-color-scheme-active="dark"] #admin-content [style*="color:#475569;"] {
+  color: var(--text-secondary) !important;
 }
