@@ -1,0 +1,2864 @@
+openapi: 3.1.0
+info:
+  title: HESEM QMS Portal API
+  description: |
+    REST and legacy action-based API for the HESEM Engineering Quality Management System Portal.
+
+    **Base URL:** `https://qms.hesem.com.vn/01-QMS-Portal/api/`
+
+    ## Authentication
+
+    The API uses **PHP session cookies** for authentication. All protected endpoints
+    require a valid `PHPSESSID` cookie obtained via the login flow.
+
+    When MFA is required (TOTP), the login flow is multi-step:
+    1. `POST /api/auth/login` with username + password
+    2. If `mfa_required: true` is returned, call `POST /api/auth/mfa` with the TOTP code
+    3. If `enroll_required: true` is returned (first-time MFA setup), call `POST /api/auth/enroll` with the TOTP code
+
+    ## CSRF Protection
+
+    All state-changing endpoints (POST, PUT, DELETE) require a `X-CSRF-Token` header.
+    The token is returned in every auth status / login response as `csrf_token`.
+
+    ## CORS
+
+    Cross-origin requests are handled by the CORS middleware. Preflight `OPTIONS`
+    requests are answered automatically.
+
+    ## Rate Limiting
+
+    Login and MFA endpoints are rate-limited per IP and per username (30 attempts / 300 seconds).
+    Rate limit state is returned via headers:
+
+    | Header                  | Description                        |
+    |-------------------------|------------------------------------|
+    | `X-RateLimit-Limit`     | Max requests in window             |
+    | `X-RateLimit-Remaining` | Remaining requests                 |
+    | `X-RateLimit-Reset`     | Unix timestamp when window resets  |
+
+    ## Legacy Action Interface
+
+    For backward compatibility, all endpoints can also be invoked via
+    `POST /api/?action=<action_name>` with a JSON body. Legacy action names are
+    documented on each endpoint.
+
+    ## Response Envelope
+
+    All JSON responses follow a standard envelope:
+
+    ```json
+    { "ok": true, "server_time": "2025-06-01T12:00:00+00:00", ...data }
+    ```
+
+    Error responses:
+
+    ```json
+    { "ok": false, "error": "error_code", "detail": "optional message", "server_time": "..." }
+    ```
+  version: 2.0.0
+  contact:
+    name: HESEM QMS Team
+    url: https://qms.hesem.com.vn
+  license:
+    name: Proprietary
+    url: https://hesem.com.vn
+
+servers:
+  - url: https://qms.hesem.com.vn/01-QMS-Portal/api
+    description: Production
+  - url: http://localhost:8080/01-QMS-Portal/api
+    description: Local development
+
+tags:
+  - name: Auth
+    description: |
+      Authentication, MFA verification, enrollment, logout, and session status.
+      Xac thuc, MFA, dang nhap, dang xuat.
+  - name: Documents
+    description: |
+      Document lifecycle management -- create, draft, review, approve, reject, versioning, streaming.
+      Quan ly tai lieu -- tao moi, ban nhap, duyet, phe duyet, phien ban.
+  - name: Forms
+    description: |
+      Online form listing, schema retrieval, entry submission, and record ID generation.
+      Bieu mau truc tuyen -- danh sach, schema, gui du lieu, ma so ban ghi.
+  - name: Files
+    description: |
+      Filesystem operations -- folder scanning, CRUD, document move/rename/delete.
+      Quan ly thu muc va tap tin.
+  - name: Users
+    description: |
+      User management and role-based permission control (admin only).
+      Quan ly nguoi dung va phan quyen.
+  - name: Admin
+    description: |
+      Administrative operations -- git sync/pull, cache clearing, settings, portal configuration.
+      Quan tri he thong -- dong bo git, xoa cache, cau hinh.
+  - name: Dictionary
+    description: |
+      QMS glossary / terminology management.
+      Tu dien thuat ngu QMS.
+
+paths:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # AUTH
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  /api/auth/status:
+    get:
+      operationId: authStatus
+      tags: [Auth]
+      summary: Check authentication status
+      description: |
+        Returns the current session state -- whether the user is logged in,
+        whether MFA verification is pending, or whether MFA enrollment is in progress.
+
+        **Legacy action:** `status`, `auth_status`
+      security: []
+      responses:
+        '200':
+          description: Session state returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthStatusResponse'
+              examples:
+                logged_in:
+                  summary: Fully authenticated
+                  value:
+                    ok: true
+                    logged_in: true
+                    mfa_pending: false
+                    enroll_pending: false
+                    pending_expires_in: null
+                    auth_expired: null
+                    user:
+                      username: "john.doe"
+                      name: "John Doe"
+                      role: "admin"
+                      dept: "Quality"
+                      active: true
+                    csrf_token: "abc123def456"
+                    server_time: "2025-06-01T08:00:00+00:00"
+                    initialized: true
+                mfa_pending:
+                  summary: MFA verification required
+                  value:
+                    ok: true
+                    logged_in: false
+                    mfa_pending: true
+                    enroll_pending: false
+                    pending_expires_in: 240
+                    auth_expired: null
+                    user: null
+                    csrf_token: "abc123def456"
+                    server_time: "2025-06-01T08:00:00+00:00"
+                    initialized: true
+
+  /api/auth/login:
+    post:
+      operationId: authLogin
+      tags: [Auth]
+      summary: Login with username and password
+      description: |
+        Authenticate with credentials. If MFA is enabled for the user, the response
+        will indicate `mfa_required: true` and you must follow up with `POST /api/auth/mfa`.
+        If MFA enrollment is required, `enroll_required: true` is returned with the
+        TOTP secret and otpauth URL.
+
+        An optional `code` (OTP) can be provided inline to complete MFA in a single request.
+
+        **Legacy actions:** `auth_login`, `login`
+
+        **Rate limit:** 30 attempts per 300 seconds per IP and per username.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              basic:
+                summary: Username + password only
+                value:
+                  username: "john.doe"
+                  password: "MySecureP@ss1"
+              with_otp:
+                summary: Username + password + inline OTP
+                value:
+                  username: "john.doe"
+                  password: "MySecureP@ss1"
+                  code: "123456"
+      responses:
+        '200':
+          description: Login result (may require additional MFA step).
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/LoginSuccessResponse'
+                  - $ref: '#/components/schemas/LoginMfaRequiredResponse'
+                  - $ref: '#/components/schemas/LoginEnrollRequiredResponse'
+              examples:
+                success:
+                  summary: Login complete (no MFA or inline OTP accepted)
+                  value:
+                    ok: true
+                    logged_in: true
+                    user:
+                      username: "john.doe"
+                      name: "John Doe"
+                      role: "admin"
+                      dept: "Quality"
+                      active: true
+                    csrf_token: "abc123def456"
+                mfa_required:
+                  summary: MFA verification required
+                  value:
+                    ok: true
+                    mfa_required: true
+                    enroll_required: false
+                    message: "Enter your authenticator code"
+                    pending_expires_in: 300
+                    csrf_token: "abc123def456"
+                enroll_required:
+                  summary: First-time MFA enrollment required
+                  value:
+                    ok: true
+                    mfa_required: false
+                    enroll_required: true
+                    issuer: "HESEM QMS"
+                    account: "john.doe"
+                    secret: "JBSWY3DPEHPK3PXP"
+                    otpauth_url: "otpauth://totp/HESEM%20QMS:john.doe?secret=JBSWY3DPEHPK3PXP&issuer=HESEM+QMS"
+                    message: "Enroll MFA in your Authenticator app"
+                    pending_expires_in: 300
+                    csrf_token: "abc123def456"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/auth/mfa:
+    post:
+      operationId: authMfaVerify
+      tags: [Auth]
+      summary: Verify TOTP code during login
+      description: |
+        Submit the 6-digit TOTP code from the user's authenticator app.
+        Must be called after a login response with `mfa_required: true`.
+
+        Alternatively, credentials can be re-supplied in the body (`username` + `password`)
+        if the preauth session has expired.
+
+        **Legacy actions:** `auth_mfa_verify`, `mfa_verify`, `verify`
+
+        **Rate limit:** 60 attempts per 300 seconds per IP.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaVerifyRequest'
+            example:
+              code: "123456"
+      responses:
+        '200':
+          description: MFA verified, session fully authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginSuccessResponse'
+              example:
+                ok: true
+                logged_in: true
+                user:
+                  username: "john.doe"
+                  name: "John Doe"
+                  role: "admin"
+                  dept: "Quality"
+                  active: true
+                csrf_token: "abc123def456"
+        '400':
+          description: MFA not enabled for this user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                ok: false
+                error: "mfa_not_enabled"
+                server_time: "2025-06-01T08:00:00+00:00"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/auth/enroll:
+    post:
+      operationId: authEnrollVerify
+      tags: [Auth]
+      summary: Verify TOTP code during MFA enrollment
+      description: |
+        After a login response with `enroll_required: true`, the user scans the QR code
+        and submits the first TOTP code to confirm enrollment.
+
+        **Legacy actions:** `auth_enroll_verify`, `enroll_verify`, `enroll`
+
+        **Rate limit:** 60 attempts per 300 seconds per IP.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code:
+                  type: string
+                  description: 6-digit TOTP code from authenticator app.
+                  example: "654321"
+      responses:
+        '200':
+          description: MFA enrolled and session authenticated.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/LoginSuccessResponse'
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "MFA enabled"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/auth/logout:
+    post:
+      operationId: authLogout
+      tags: [Auth]
+      summary: Logout and destroy session
+      description: |
+        Destroy the current server-side session. Requires CSRF token.
+
+        **Legacy actions:** `auth_logout`, `logout`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      responses:
+        '200':
+          description: Session destroyed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  logged_in:
+                    type: boolean
+                    example: false
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # DOCUMENTS
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  /api/documents:
+    get:
+      operationId: docsList
+      tags: [Documents]
+      summary: List documents visible to current user
+      description: |
+        Returns documents filtered by the current user's role and visibility settings.
+
+        **Legacy action:** `docs_custom_list`
+      responses:
+        '200':
+          description: Document list.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      docs:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/DocumentSummary'
+              example:
+                ok: true
+                server_time: "2025-06-01T08:00:00+00:00"
+                docs:
+                  - code: "SOP-101"
+                    title: "Document and Data Control"
+                    cat: "SOP"
+                    path: "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-101-document-and-data-control.html"
+                    folder: "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100"
+                    ext: "html"
+                    rev: "1.0"
+                    status: "approved"
+                    owner: "QA/QMS"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      operationId: docCreate
+      tags: [Documents]
+      summary: Create a new document
+      description: |
+        Create a new document with an initial HTML draft. Requires document editor permission.
+
+        **Legacy action:** `doc_create`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocCreateRequest'
+            example:
+              code: "SOP-999"
+              title: "New Procedure"
+              cat: "SOP"
+              owner: "QA/QMS"
+              folder: ""
+              revision: "0.0"
+      responses:
+        '200':
+          description: Document created.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      code:
+                        type: string
+                      path:
+                        type: string
+                      folder:
+                        type: string
+                      file_name:
+                        type: string
+                      revision:
+                        type: string
+                      draft_rel:
+                        type: string
+              example:
+                ok: true
+                server_time: "2025-06-01T08:00:00+00:00"
+                code: "SOP-999"
+                path: "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-999-new-procedure.html"
+                folder: "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100"
+                file_name: "sop-999-new-procedure.html"
+                revision: "0.0"
+                draft_rel: "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/_Archive/sop-999-new-procedure_V00.00.html"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Document code already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                ok: false
+                error: "code_exists"
+                server_time: "2025-06-01T08:00:00+00:00"
+
+  /api/documents/{code}/versions:
+    get:
+      operationId: docsListVersions
+      tags: [Documents]
+      summary: List all versions of a document
+      description: |
+        Returns the version manifest and workflow state for a document.
+
+        **Legacy action:** `doc_versions_list`
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Document code (e.g. SOP-101).
+          example: "SOP-101"
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Relative path to the base document file.
+          example: "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-101-document-and-data-control.html"
+      responses:
+        '200':
+          description: Version list and state.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      code:
+                        type: string
+                      versions:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/VersionEntry'
+                      state:
+                        $ref: '#/components/schemas/DocState'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/documents/stream:
+    get:
+      operationId: docStream
+      tags: [Documents]
+      summary: Stream / download a document file
+      description: |
+        Stream a document file for inline viewing or download. Returns the raw file
+        with appropriate Content-Type and Content-Disposition headers.
+
+        **Legacy action:** `doc_stream`
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Relative path to the document file.
+          example: "03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-101-document-and-data-control.html"
+      responses:
+        '200':
+          description: File content streamed.
+          content:
+            text/html:
+              schema:
+                type: string
+                format: binary
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: File not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/documents/visibility:
+    get:
+      operationId: docsVisibilityGet
+      tags: [Documents]
+      summary: Get hidden document codes
+      description: |
+        Returns the list of document codes that are hidden from the portal.
+
+        **Legacy action:** `docs_visibility_get`
+      responses:
+        '200':
+          description: Hidden document codes.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      hidden:
+                        type: array
+                        items:
+                          type: string
+              example:
+                ok: true
+                server_time: "2025-06-01T08:00:00+00:00"
+                hidden: ["DRAFT-001", "OBSOLETE-X"]
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ── Document action endpoints (legacy POST actions) ──
+
+  /?action=doc_save_draft:
+    post:
+      operationId: docSaveDraft
+      tags: [Documents]
+      summary: Save a working draft
+      description: |
+        Save HTML content as a working draft for an existing document.
+
+        **Legacy action:** `doc_save_draft`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, html, path]
+              properties:
+                code:
+                  type: string
+                  description: Document code.
+                  example: "SOP-101"
+                html:
+                  type: string
+                  description: Full HTML content of the draft.
+                path:
+                  type: string
+                  description: Relative path to the base document file.
+      responses:
+        '200':
+          description: Draft saved.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      draft_rel:
+                        type: string
+                      revision:
+                        type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /?action=doc_submit_review:
+    post:
+      operationId: docSubmitReview
+      tags: [Documents]
+      summary: Submit document for review
+      description: |
+        Submit a document for review/approval. Optionally include updated HTML content.
+
+        **Legacy action:** `doc_submit_review`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, path]
+              properties:
+                code:
+                  type: string
+                html:
+                  type: string
+                  description: Optional updated HTML content.
+                path:
+                  type: string
+                note:
+                  type: string
+                  description: Review note.
+                update_type:
+                  type: string
+                  enum: [minor, major]
+                  default: minor
+      responses:
+        '200':
+          description: Document submitted for review.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "in_review"
+                      revision:
+                        type: string
+
+  /?action=doc_approve:
+    post:
+      operationId: docApprove
+      tags: [Documents]
+      summary: Approve a document
+      description: |
+        Approve a document that is in review. Publishes the approved version to the live file.
+        Requires approver role.
+
+        **Legacy action:** `doc_approve`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, path]
+              properties:
+                code:
+                  type: string
+                path:
+                  type: string
+                effective_date:
+                  type: string
+                  format: date
+                  description: Effective date for the approved version.
+                note:
+                  type: string
+                title:
+                  type: string
+                  description: Optional title update.
+      responses:
+        '200':
+          description: Document approved.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "approved"
+                      revision:
+                        type: string
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Document not found.
+
+  /?action=doc_reject:
+    post:
+      operationId: docReject
+      tags: [Documents]
+      summary: Reject a document review
+      description: |
+        Reject a document submission, reverting it to draft status. Requires approver role.
+
+        **Legacy action:** `doc_reject`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, path]
+              properties:
+                code:
+                  type: string
+                path:
+                  type: string
+                reason:
+                  type: string
+                  description: Rejection reason.
+      responses:
+        '200':
+          description: Document rejected, reverted to draft.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "draft"
+                      revision:
+                        type: string
+
+  /?action=doc_update_meta:
+    post:
+      operationId: docUpdateMeta
+      tags: [Documents]
+      summary: Update document metadata
+      description: |
+        Update metadata fields (title, owner, cat, effective_date, delivery_mode) for a document.
+
+        **Legacy action:** `doc_update_meta`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code:
+                  type: string
+                patch:
+                  type: object
+                  description: Fields to update.
+                  properties:
+                    title:
+                      type: string
+                    owner:
+                      type: string
+                    cat:
+                      type: string
+                    effective_date:
+                      type: string
+                    delivery_mode:
+                      type: string
+      responses:
+        '200':
+          description: Metadata updated.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      updated:
+                        type: boolean
+
+  /?action=doc_delete_drafts:
+    post:
+      operationId: docDeleteDrafts
+      tags: [Documents]
+      summary: Delete all draft versions (admin)
+      description: |
+        Delete all draft version files for a document. Admin only.
+
+        **Legacy action:** `doc_delete_drafts`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, path]
+              properties:
+                code:
+                  type: string
+                path:
+                  type: string
+      responses:
+        '200':
+          description: Drafts deleted.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      removed:
+                        type: integer
+                      state:
+                        $ref: '#/components/schemas/DocState'
+
+  /?action=doc_delete_version:
+    post:
+      operationId: docDeleteVersion
+      tags: [Documents]
+      summary: Delete a specific version entry (admin)
+      description: |
+        Delete a specific version from the manifest and remove its file. Admin only.
+
+        **Legacy action:** `doc_delete_version`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, path, version]
+              properties:
+                code:
+                  type: string
+                path:
+                  type: string
+                version:
+                  type: string
+                  description: Version string (e.g. "v1.0").
+      responses:
+        '200':
+          description: Version deleted.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      deleted:
+                        type: boolean
+                      state:
+                        $ref: '#/components/schemas/DocState'
+
+  /?action=doc_start_new_revision:
+    post:
+      operationId: docStartNewRevision
+      tags: [Documents]
+      summary: Start a new revision cycle
+      description: |
+        Increment the document revision (minor or major) and create a new draft from the live file.
+
+        **Legacy action:** `doc_start_new_revision`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, path]
+              properties:
+                code:
+                  type: string
+                path:
+                  type: string
+                update_type:
+                  type: string
+                  enum: [minor, major]
+                  default: minor
+      responses:
+        '200':
+          description: New revision started.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      revision:
+                        type: string
+                        example: "1.1"
+                      state:
+                        $ref: '#/components/schemas/DocState'
+
+  /?action=doc_descriptions_get:
+    get:
+      operationId: docDescriptionsGet
+      tags: [Documents]
+      summary: Get document descriptions
+      description: |
+        Returns a map of document codes to their descriptions.
+
+        **Legacy action:** `doc_descriptions_get`
+      responses:
+        '200':
+          description: Descriptions map.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      descriptions:
+                        type: object
+                        additionalProperties:
+                          type: string
+
+  /?action=save_doc_description:
+    post:
+      operationId: saveDocDescription
+      tags: [Documents]
+      summary: Save a document description
+      description: |
+        Update the description text for a single document.
+
+        **Legacy action:** `save_doc_description`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessOnly'
+
+  /?action=admin_docs_visibility_save:
+    post:
+      operationId: docsVisibilitySave
+      tags: [Documents]
+      summary: Save document visibility settings (admin)
+      description: |
+        Set the list of document codes that should be hidden from the portal. Admin only.
+
+        **Legacy action:** `admin_docs_visibility_save`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [hidden]
+              properties:
+                hidden:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of document codes to hide.
+      responses:
+        '200':
+          description: Visibility settings saved.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      hidden:
+                        type: array
+                        items:
+                          type: string
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # FORMS
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  /api/forms:
+    get:
+      operationId: formsList
+      tags: [Forms]
+      summary: List available online forms
+      description: |
+        Returns all forms that are marked as online-enabled in the form control registry.
+
+        **Legacy action:** `online_form_list`
+      responses:
+        '200':
+          description: Form list.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      forms:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/FormSummary'
+              example:
+                ok: true
+                server_time: "2025-06-01T08:00:00+00:00"
+                forms:
+                  - code: "FRM-631"
+                    title: "NCR Report Form"
+                    status: "RELEASED"
+                    rev: "1.0"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/forms/{code}/schema:
+    get:
+      operationId: formsGetSchema
+      tags: [Forms]
+      summary: Get form schema
+      description: |
+        Returns the full schema/definition for a specific form from the registry.
+
+        **Legacy action:** `online_form_schema`
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Form code (e.g. FRM-631).
+          example: "FRM-631"
+      responses:
+        '200':
+          description: Form schema.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      schema:
+                        type: object
+                        description: Full form schema from registry.
+        '404':
+          description: Form not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/forms/{code}/entries:
+    get:
+      operationId: formsGetEntries
+      tags: [Forms]
+      summary: Get all entries for a form
+      description: |
+        Returns all submitted entries for a specific form.
+
+        **Legacy action:** `online_form_entries`
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "FRM-631"
+      responses:
+        '200':
+          description: Entry list.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      entries:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/FormEntry'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      operationId: formsSubmitEntry
+      tags: [Forms]
+      summary: Submit a form entry
+      description: |
+        Submit a new entry for an online form. The entry data is stored both
+        as an individual JSON file and appended to the consolidated entries file.
+
+        **Legacy action:** `online_form_submit`
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "FRM-631"
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, data]
+              properties:
+                code:
+                  type: string
+                  description: Form code (redundant with path param for backward compat).
+                data:
+                  type: object
+                  description: Form field values.
+                  additionalProperties: true
+            example:
+              code: "FRM-631"
+              data:
+                ncr_number: "NCR-2025-042"
+                description: "Surface finish out of spec on Part XYZ"
+                severity: "major"
+      responses:
+        '200':
+          description: Entry submitted.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      entry_id:
+                        type: string
+                        description: Generated unique entry ID.
+              example:
+                ok: true
+                server_time: "2025-06-01T08:00:00+00:00"
+                entry_id: "a1b2c3d4e5f6g7h8-1717200000"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/records/registry:
+    get:
+      operationId: recordIdRegistry
+      tags: [Forms]
+      summary: Get record ID counter registry
+      description: |
+        Returns the current state of all record ID counters (type + year -> last number).
+
+        **Legacy action:** `record_id_registry`
+      responses:
+        '200':
+          description: Counter registry.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      registry:
+                        type: object
+                        additionalProperties:
+                          type: integer
+              example:
+                ok: true
+                server_time: "2025-06-01T08:00:00+00:00"
+                registry:
+                  NCR_2025: 42
+                  CAPA_2025: 15
+
+  /api/records/next-id:
+    post:
+      operationId: recordIdNext
+      tags: [Forms]
+      summary: Generate and consume the next record ID
+      description: |
+        Atomically increment the counter and return the formatted record ID.
+        Format: `{TYPE}-{YEAR}-{NNN}` (zero-padded number with configurable digit count).
+
+        **Legacy action:** `record_id_next`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type]
+              properties:
+                type:
+                  type: string
+                  description: Record type prefix (e.g. NCR, CAPA, CAR).
+                  example: "NCR"
+                digits:
+                  type: integer
+                  minimum: 1
+                  maximum: 6
+                  default: 3
+                  description: Number of zero-padded digits.
+            example:
+              type: "NCR"
+              digits: 3
+      responses:
+        '200':
+          description: Record ID generated.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      record_id:
+                        type: string
+                        example: "NCR-2025-043"
+                      number:
+                        type: integer
+                        example: 43
+
+  /?action=record_id_peek:
+    get:
+      operationId: recordIdPeek
+      tags: [Forms]
+      summary: Preview next record ID without consuming
+      description: |
+        Preview what the next record ID would be, without incrementing the counter.
+
+        **Legacy action:** `record_id_peek`
+      parameters:
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+          example: "NCR"
+        - name: digits
+          in: query
+          schema:
+            type: integer
+            default: 3
+      responses:
+        '200':
+          description: Previewed record ID.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      record_id:
+                        type: string
+                      number:
+                        type: integer
+                      peek:
+                        type: boolean
+                        example: true
+
+  /?action=form_version_stream:
+    get:
+      operationId: formVersionStream
+      tags: [Forms]
+      summary: Stream a form version file
+      description: |
+        Stream a specific form version file for viewing or download.
+
+        **Legacy action:** `form_version_stream`
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Relative path to the form version file.
+      responses:
+        '200':
+          description: File content streamed.
+          content:
+            text/html:
+              schema:
+                type: string
+                format: binary
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: File not found.
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # FILES & FOLDERS
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  /api/folders:
+    get:
+      operationId: foldersScan
+      tags: [Files]
+      summary: Scan filesystem and return document listing
+      description: |
+        Full scan of the QMS document tree. Returns documents and folders.
+        Results are cached for 120 seconds.
+
+        **Legacy action:** `scan_folders`
+      responses:
+        '200':
+          description: Document and folder listing.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      docs:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/DocumentSummary'
+                      folders:
+                        type: array
+                        items:
+                          type: string
+                          description: Relative folder path.
+                      cached:
+                        type: boolean
+                        description: Whether results came from cache.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      operationId: foldersCreate
+      tags: [Files]
+      summary: Create a new folder
+      description: |
+        Create a folder in the document tree. Requires document editor permission.
+
+        **Legacy action:** `create_folder`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                parent:
+                  type: string
+                  description: Parent folder relative path (empty for root).
+                  default: ""
+                name:
+                  type: string
+                  description: New folder name (max 120 chars, safe characters only).
+                  example: "06-SOP-600"
+      responses:
+        '200':
+          description: Folder created.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      path:
+                        type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Folder already exists.
+
+  /?action=rename_folder:
+    post:
+      operationId: foldersRename
+      tags: [Files]
+      summary: Rename a folder (admin)
+      description: |
+        Rename a folder in the document tree. Updates all custom docs references. Admin only.
+
+        **Legacy action:** `rename_folder`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [path, new_name]
+              properties:
+                path:
+                  type: string
+                  description: Current relative folder path.
+                new_name:
+                  type: string
+                  description: New folder name.
+      responses:
+        '200':
+          description: Folder renamed.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      old_path:
+                        type: string
+                      new_path:
+                        type: string
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Folder not found.
+
+  /?action=delete_folder:
+    post:
+      operationId: foldersDelete
+      tags: [Files]
+      summary: Delete a folder (admin, soft-delete)
+      description: |
+        Move a folder to `_Deleted` (soft delete). Admin only.
+
+        **Legacy action:** `delete_folder`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [path]
+              properties:
+                path:
+                  type: string
+      responses:
+        '200':
+          description: Folder deleted.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      deleted:
+                        type: string
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Folder not found.
+
+  /?action=move_doc:
+    post:
+      operationId: filesMove
+      tags: [Files]
+      summary: Move a document to a different folder
+      description: |
+        Move a document file to a different folder. Updates archive assets and custom doc entries.
+
+        **Legacy action:** `move_doc`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, path, dest_folder]
+              properties:
+                code:
+                  type: string
+                path:
+                  type: string
+                  description: Current relative file path.
+                dest_folder:
+                  type: string
+                  description: Destination folder relative path.
+      responses:
+        '200':
+          description: Document moved.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      old_path:
+                        type: string
+                      new_path:
+                        type: string
+
+  /?action=delete_doc:
+    post:
+      operationId: filesDeleteDoc
+      tags: [Files]
+      summary: Archive (soft-delete) a document
+      description: |
+        Move a document file to `_Deleted` and remove it from the custom docs registry.
+
+        **Legacy action:** `delete_doc`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code:
+                  type: string
+                  description: Document code.
+      responses:
+        '200':
+          description: Document archived.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      deleted:
+                        type: string
+
+  /?action=rename_doc:
+    post:
+      operationId: filesRenameDoc
+      tags: [Files]
+      summary: Rename a document file
+      description: |
+        Rename a document file (preserving extension). Updates archive assets and custom doc entries.
+
+        **Legacy action:** `rename_doc`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, path, new_name]
+              properties:
+                code:
+                  type: string
+                path:
+                  type: string
+                new_name:
+                  type: string
+                  description: New filename (extension will be preserved/appended).
+      responses:
+        '200':
+          description: Document renamed.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      old_path:
+                        type: string
+                      new_path:
+                        type: string
+        '409':
+          description: Name conflict with existing file.
+
+  /?action=folder_descriptions:
+    get:
+      operationId: folderDescriptions
+      tags: [Files]
+      summary: Get folder descriptions
+      description: |
+        Returns descriptions for folders in the document tree.
+
+        **Legacy action:** `folder_descriptions`
+      responses:
+        '200':
+          description: Folder descriptions map.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      descriptions:
+                        type: object
+                        additionalProperties:
+                          type: string
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # USERS
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  /api/users:
+    get:
+      operationId: usersList
+      tags: [Users]
+      summary: List all users (admin)
+      description: |
+        Returns all user accounts (sanitized, no password hashes). Admin only.
+
+        **Legacy action:** `admin_users_list`
+      responses:
+        '200':
+          description: User list.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      users:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/UserPublic'
+              example:
+                ok: true
+                server_time: "2025-06-01T08:00:00+00:00"
+                users:
+                  - username: "john.doe"
+                    name: "John Doe"
+                    role: "admin"
+                    dept: "Quality"
+                    title: "QMS Engineer"
+                    active: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    post:
+      operationId: usersUpsert
+      tags: [Users]
+      summary: Create or update a user (admin)
+      description: |
+        Create a new user or update an existing one. Admin only.
+        When creating, a random password is generated if none is provided.
+        Updatable fields: name, role, dept, title, phone, personal_email, cccd, active, password.
+
+        **Legacy action:** `admin_user_upsert`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpsertRequest'
+            example:
+              username: "jane.smith"
+              name: "Jane Smith"
+              role: "user"
+              dept: "Engineering"
+              title: "Process Engineer"
+              active: true
+              password: "TempP@ss123"
+      responses:
+        '200':
+          description: User created or updated.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/UserPublic'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /?action=admin_user_delete:
+    post:
+      operationId: usersDelete
+      tags: [Users]
+      summary: Delete a user (admin)
+      description: |
+        Delete a user account. Cannot delete self. Admin only.
+
+        **Legacy action:** `admin_user_delete`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username]
+              properties:
+                username:
+                  type: string
+      responses:
+        '200':
+          description: User deleted.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      deleted:
+                        type: string
+        '400':
+          description: Cannot delete self.
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /?action=admin_user_reset_password:
+    post:
+      operationId: usersResetPassword
+      tags: [Users]
+      summary: Reset a user password (admin)
+      description: |
+        Reset a user's password. If no password is provided, a random 12-character
+        password is generated and returned. Admin only.
+
+        **Legacy action:** `admin_user_reset_password`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username]
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                  description: New password (optional; generated if empty).
+      responses:
+        '200':
+          description: Password reset.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      username:
+                        type: string
+                      temp_password:
+                        type: string
+                        description: The new password (temporary).
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: User not found.
+
+  /?action=role_perms_get:
+    get:
+      operationId: rolePermsGet
+      tags: [Users]
+      summary: Get role permission configuration
+      description: |
+        Returns the role-based permission map (e.g. which roles can create docs).
+
+        **Legacy action:** `role_perms_get`
+      responses:
+        '200':
+          description: Permission configuration.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      perms:
+                        $ref: '#/components/schemas/RolePermissions'
+
+  /?action=admin_role_perms_save:
+    post:
+      operationId: rolePermsSave
+      tags: [Users]
+      summary: Save role permission configuration (admin)
+      description: |
+        Update role-based permissions. Admin only.
+
+        **Legacy action:** `admin_role_perms_save`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [perms]
+              properties:
+                perms:
+                  $ref: '#/components/schemas/RolePermissions'
+      responses:
+        '200':
+          description: Permissions saved.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      perms:
+                        $ref: '#/components/schemas/RolePermissions'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # ADMIN
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  /api/admin/git/sync:
+    post:
+      operationId: adminGitSync
+      tags: [Admin]
+      summary: Commit and push document changes to git
+      description: |
+        Stage all document changes, commit with a timestamped message, and push to remote.
+        Admin only.
+
+        **Legacy action:** `admin_git_sync`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      responses:
+        '200':
+          description: Git sync result.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      pushed:
+                        type: boolean
+                      branch:
+                        type: string
+                      files:
+                        type: array
+                        items:
+                          type: string
+                      status:
+                        type: array
+                        items:
+                          type: string
+                      status_entries:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            xy:
+                              type: string
+                            path:
+                              type: string
+                      message:
+                        type: string
+                      commit_output:
+                        type: string
+                      push_output:
+                        type: string
+                      head_before:
+                        type: string
+                      head_after:
+                        type: string
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          description: Git operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/admin/git/pull:
+    post:
+      operationId: adminGitPull
+      tags: [Admin]
+      summary: Pull latest changes from remote
+      description: |
+        Fetch and pull latest changes. If local changes exist, they are pre-synced
+        (committed and pushed) before pulling. Admin only.
+
+        **Legacy action:** `admin_git_pull`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      responses:
+        '200':
+          description: Git pull result.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      pulled:
+                        type: boolean
+                      branch:
+                        type: string
+                      message:
+                        type: string
+                      before_head:
+                        type: string
+                      after_head:
+                        type: string
+                      changed_files:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            status:
+                              type: string
+                            path:
+                              type: string
+                            old_path:
+                              type: string
+                      presync:
+                        type: object
+                        nullable: true
+                        description: Pre-sync commit result (if local changes were present).
+                      fetch_output:
+                        type: string
+                      pull_output:
+                        type: string
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          description: Git operation failed.
+
+  /api/admin/cache/clear:
+    post:
+      operationId: adminClearCache
+      tags: [Admin]
+      summary: Clear site cache
+      description: |
+        Reset origin caches via Clear-Site-Data header and invalidate server-side scan cache.
+        Admin only.
+
+        **Legacy action:** `admin_clear_site_cache`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      responses:
+        '200':
+          description: Cache cleared.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Origin cache reset requested."
+          headers:
+            Clear-Site-Data:
+              schema:
+                type: string
+                example: '"cache"'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /?action=get_data_settings:
+    get:
+      operationId: adminGetSettings
+      tags: [Admin]
+      summary: Get data collection settings
+      description: |
+        Returns privacy/data collection feature flags.
+
+        **Legacy action:** `get_data_settings`
+      responses:
+        '200':
+          description: Data collection settings.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      settings:
+                        $ref: '#/components/schemas/DataCollectionSettings'
+
+  /?action=save_data_settings:
+    post:
+      operationId: adminSaveSettings
+      tags: [Admin]
+      summary: Save data collection settings (admin)
+      description: |
+        Update privacy/data collection feature flags. Admin only.
+
+        **Legacy action:** `save_data_settings`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataCollectionSettings'
+      responses:
+        '200':
+          description: Settings saved.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      settings:
+                        $ref: '#/components/schemas/DataCollectionSettings'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /?action=admin_portal_display_config_get:
+    get:
+      operationId: adminPortalConfigGet
+      tags: [Admin]
+      summary: Get portal display configuration (admin)
+      description: |
+        Returns the portal display configuration (enabled extensions, categories, etc.). Admin only.
+
+        **Legacy action:** `admin_portal_display_config_get`
+      responses:
+        '200':
+          description: Portal display configuration.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      config:
+                        type: object
+                        description: Portal display configuration object.
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /?action=admin_portal_display_config_save:
+    post:
+      operationId: adminPortalConfigSave
+      tags: [Admin]
+      summary: Save portal display configuration (admin)
+      description: |
+        Update the portal display configuration. Admin only.
+
+        **Legacy action:** `admin_portal_display_config_save`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [config]
+              properties:
+                config:
+                  type: object
+                  description: Portal display configuration to save.
+      responses:
+        '200':
+          description: Configuration saved.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      config:
+                        type: object
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # DICTIONARY
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  /api/dictionary:
+    get:
+      operationId: dictList
+      tags: [Dictionary]
+      summary: List all glossary terms
+      description: |
+        Returns all terms in the QMS glossary / terminology dictionary.
+
+        **Legacy action:** `dict_list`
+      responses:
+        '200':
+          description: Glossary items.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/DictItem'
+              example:
+                ok: true
+                server_time: "2025-06-01T08:00:00+00:00"
+                items:
+                  - term: "NCR"
+                    meaning: "Non-Conformance Report"
+                    vi: "Bao cao khong phu hop"
+                    def: "A formal record documenting a non-conformance."
+                    ctx: "Quality"
+                    rec: "ISO 9001:2015 Clause 10.2"
+                    cat: "Quality"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      operationId: dictUpsert
+      tags: [Dictionary]
+      summary: Create or update a glossary term (admin)
+      description: |
+        Add a new term or update an existing one. Admin only.
+
+        **Legacy action:** `dict_upsert`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DictUpsertRequest'
+            example:
+              term: "CAPA"
+              originalTerm: "CAPA"
+              meaning: "Corrective and Preventive Action"
+              vi: "Hanh dong khac phuc va phong ngua"
+              def: "Systematic approach to identifying and eliminating root causes."
+              ctx: "Quality"
+              rec: "ISO 9001:2015 Clause 10.2"
+              cat: "Quality"
+      responses:
+        '200':
+          description: Term saved; full list returned.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/DictItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    delete:
+      operationId: dictDelete
+      tags: [Dictionary]
+      summary: Delete a glossary term (admin)
+      description: |
+        Remove a term from the glossary. Admin only.
+
+        **Legacy action:** `dict_delete`
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [term]
+              properties:
+                term:
+                  type: string
+                  description: Term to delete (case-insensitive match).
+      responses:
+        '200':
+          description: Term deleted; updated list returned.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/DictItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# COMPONENTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: PHPSESSID
+      description: PHP session cookie obtained after successful login.
+
+  parameters:
+    CsrfHeader:
+      name: X-CSRF-Token
+      in: header
+      required: true
+      schema:
+        type: string
+      description: CSRF token from the latest auth status or login response.
+
+  schemas:
+    # ── Envelopes ──
+
+    SuccessEnvelope:
+      type: object
+      required: [ok, server_time]
+      properties:
+        ok:
+          type: boolean
+          const: true
+        server_time:
+          type: string
+          format: date-time
+          description: Server UTC timestamp (ISO 8601).
+
+    ErrorResponse:
+      type: object
+      required: [ok, error]
+      properties:
+        ok:
+          type: boolean
+          const: false
+        error:
+          type: string
+          description: Machine-readable error code.
+        detail:
+          type: string
+          description: Optional human-readable detail message.
+        server_time:
+          type: string
+          format: date-time
+
+    # ── Auth ──
+
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          description: Username (case-insensitive).
+          example: "john.doe"
+        password:
+          type: string
+          format: password
+          description: User password.
+        code:
+          type: string
+          description: Optional 6-digit TOTP code for inline MFA verification.
+
+    MfaVerifyRequest:
+      type: object
+      required: [code]
+      properties:
+        code:
+          type: string
+          description: 6-digit TOTP code.
+          example: "123456"
+        username:
+          type: string
+          description: Optional fallback -- re-supply credentials if preauth session expired.
+        password:
+          type: string
+          format: password
+          description: Optional fallback password.
+
+    AuthStatusResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        logged_in:
+          type: boolean
+        mfa_pending:
+          type: boolean
+        enroll_pending:
+          type: boolean
+        pending_expires_in:
+          type: integer
+          nullable: true
+          description: Seconds remaining for pending auth (MFA/enroll window).
+        auth_expired:
+          type: string
+          nullable: true
+          enum: [mfa, enroll, null]
+          description: Which pending auth expired, if any.
+        user:
+          $ref: '#/components/schemas/UserPublic'
+        csrf_token:
+          type: string
+        server_time:
+          type: string
+          format: date-time
+        initialized:
+          type: boolean
+          description: Whether the user store has been initialized.
+
+    LoginSuccessResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          const: true
+        logged_in:
+          type: boolean
+          const: true
+        user:
+          $ref: '#/components/schemas/UserPublic'
+        csrf_token:
+          type: string
+
+    LoginMfaRequiredResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          const: true
+        mfa_required:
+          type: boolean
+          const: true
+        enroll_required:
+          type: boolean
+          const: false
+        message:
+          type: string
+        pending_expires_in:
+          type: integer
+        csrf_token:
+          type: string
+
+    LoginEnrollRequiredResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          const: true
+        mfa_required:
+          type: boolean
+          const: false
+        enroll_required:
+          type: boolean
+          const: true
+        issuer:
+          type: string
+        account:
+          type: string
+        secret:
+          type: string
+          description: Base32-encoded TOTP secret.
+        otpauth_url:
+          type: string
+          format: uri
+          description: OTP auth URL for QR code generation.
+        message:
+          type: string
+        pending_expires_in:
+          type: integer
+        csrf_token:
+          type: string
+
+    # ── Users ──
+
+    UserPublic:
+      type: object
+      description: Sanitized user record (no password hash or MFA secret).
+      properties:
+        username:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+          description: "Role key (e.g. admin, user, viewer, editor)."
+        dept:
+          type: string
+          description: Department name.
+        title:
+          type: string
+          description: Job title.
+        phone:
+          type: string
+        personal_email:
+          type: string
+        cccd:
+          type: string
+          description: Vietnamese citizen ID.
+        active:
+          type: boolean
+        mfa_enabled:
+          type: boolean
+        last_login:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    UserUpsertRequest:
+      type: object
+      required: [username]
+      properties:
+        username:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+          default: "user"
+        dept:
+          type: string
+        title:
+          type: string
+        phone:
+          type: string
+        personal_email:
+          type: string
+        cccd:
+          type: string
+        active:
+          type: boolean
+          default: true
+        password:
+          type: string
+          format: password
+          description: Password (generated if empty on create).
+
+    RolePermissions:
+      type: object
+      additionalProperties:
+        type: object
+        properties:
+          canCreateDocs:
+            type: boolean
+      example:
+        admin:
+          canCreateDocs: true
+        editor:
+          canCreateDocs: true
+        user:
+          canCreateDocs: false
+        viewer:
+          canCreateDocs: false
+
+    # ── Documents ──
+
+    DocumentSummary:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Document code (e.g. SOP-101).
+        title:
+          type: string
+        cat:
+          type: string
+          description: Category (SOP, WI, FRM, ANNEX, JD, MAN, POL, etc.).
+        path:
+          type: string
+          description: Relative file path from project root.
+        folder:
+          type: string
+          description: Relative folder path.
+        ext:
+          type: string
+          description: File extension (html, pdf, xlsx, etc.).
+        rev:
+          type: string
+          description: Current revision string (e.g. "1.0").
+        status:
+          type: string
+          enum: [draft, in_review, approved, obsolete]
+        owner:
+          type: string
+          description: Owning department or person.
+
+    DocCreateRequest:
+      type: object
+      required: [code, title, cat]
+      properties:
+        code:
+          type: string
+          description: Unique document code (e.g. SOP-999).
+          pattern: '^[A-Z0-9-]{3,40}$'
+        title:
+          type: string
+          description: Document title (ASCII only).
+        cat:
+          type: string
+          description: Category code (SOP, WI, FRM, etc.).
+        owner:
+          type: string
+          description: Owning department (defaults to user's dept).
+        folder:
+          type: string
+          description: Target folder (auto-resolved if empty).
+        revision:
+          type: string
+          description: Initial revision (e.g. "0.0").
+          default: "0.0"
+
+    DocState:
+      type: object
+      description: Document workflow state.
+      properties:
+        code:
+          type: string
+        status:
+          type: string
+          enum: [draft, in_review, approved]
+        revision:
+          type: string
+        has_release:
+          type: boolean
+        released_revision:
+          type: string
+        approved_by:
+          type: string
+        approved_date:
+          type: string
+          format: date-time
+        effective_date:
+          type: string
+          format: date
+        rejectedBy:
+          type: string
+        rejectedDate:
+          type: string
+          format: date-time
+
+    VersionEntry:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [draft, in_review, approved, rejected]
+        version:
+          type: string
+          description: Version label (e.g. "v1.0").
+        date:
+          type: string
+          description: Human-readable datetime.
+        by:
+          type: string
+          description: Name of the person who performed the action.
+        file:
+          type: string
+          description: Relative path to the version file.
+        note:
+          type: string
+
+    # ── Forms ──
+
+    FormSummary:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Form code (e.g. FRM-631).
+        title:
+          type: string
+        status:
+          type: string
+          description: Control status (e.g. RELEASED).
+        rev:
+          type: string
+
+    FormEntry:
+      type: object
+      description: A submitted form entry with dynamic fields.
+      properties:
+        entry_id:
+          type: string
+        form_code:
+          type: string
+        submitted_by:
+          type: string
+        submitted_name:
+          type: string
+        submitted_at:
+          type: string
+          format: date-time
+      additionalProperties: true
+
+    # ── Dictionary ──
+
+    DictItem:
+      type: object
+      properties:
+        term:
+          type: string
+          description: English term.
+        meaning:
+          type: string
+          description: Short meaning / expansion.
+        vi:
+          type: string
+          description: Vietnamese translation.
+        def:
+          type: string
+          description: Full definition.
+        ctx:
+          type: string
+          description: Context / usage domain.
+        rec:
+          type: string
+          description: Reference (ISO clause, standard, etc.).
+        cat:
+          type: string
+          description: Category.
+          default: "General"
+
+    DictUpsertRequest:
+      type: object
+      required: [term, def]
+      properties:
+        term:
+          type: string
+        originalTerm:
+          type: string
+          description: Original term name if renaming (for lookup).
+        meaning:
+          type: string
+        vi:
+          type: string
+        def:
+          type: string
+        ctx:
+          type: string
+        rec:
+          type: string
+        cat:
+          type: string
+          default: "General"
+
+    # ── Admin ──
+
+    DataCollectionSettings:
+      type: object
+      properties:
+        collect_gps:
+          type: boolean
+          default: true
+        collect_ip:
+          type: boolean
+          default: true
+        collect_device:
+          type: boolean
+          default: true
+        collect_navigation:
+          type: boolean
+          default: true
+        collect_connection:
+          type: boolean
+          default: true
+        require_consent:
+          type: boolean
+          default: true
+
+  responses:
+    SuccessOnly:
+      description: Generic success.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SuccessEnvelope'
+
+    BadRequest:
+      description: Bad request -- missing or invalid parameters.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            ok: false
+            error: "missing_code"
+            server_time: "2025-06-01T08:00:00+00:00"
+
+    Unauthorized:
+      description: Not authenticated or invalid credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            ok: false
+            error: "unauthorized"
+            server_time: "2025-06-01T08:00:00+00:00"
+
+    Forbidden:
+      description: Insufficient permissions (not admin or lacking role).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            ok: false
+            error: "forbidden"
+            server_time: "2025-06-01T08:00:00+00:00"
+
+    RateLimited:
+      description: Too many requests.
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+        X-RateLimit-Reset:
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            ok: false
+            error: "rate_limited"
+            server_time: "2025-06-01T08:00:00+00:00"
+
+    ServerError:
+      description: Internal server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            ok: false
+            error: "server_error"
+            server_time: "2025-06-01T08:00:00+00:00"
+
+security:
+  - sessionCookie: []

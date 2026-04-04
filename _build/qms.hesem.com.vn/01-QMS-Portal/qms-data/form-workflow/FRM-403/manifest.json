@@ -1,0 +1,33 @@
+{
+    "code": "FRM-403",
+    "kind": "excel_form",
+    "base": "04-Bieu-Mau/04-FRM-400/FRM-403_Outsourced_Process_Request.xlsx",
+    "updated_at": "2026-04-01T11:28:00+00:00",
+    "versions": [
+        {
+            "id": "20260401_112800_draft",
+            "version": "v1.0",
+            "status": "draft",
+            "date": "2026-04-01 11:28",
+            "user": "Võ Ngọc Sanh",
+            "role": "ceo",
+            "note": "Khởi tạo phiên bản workbook mới — chờ upload",
+            "updateType": "major",
+            "storage": "private"
+        },
+        {
+            "id": "bootstrap_release",
+            "version": "v0",
+            "status": "initial_release",
+            "date": "2026-03-21",
+            "user": "System Bootstrap",
+            "role": "System",
+            "note": "Baseline imported from form control registry",
+            "updateType": "major",
+            "storage": "live",
+            "live_path": "04-Bieu-Mau/04-FRM-400/FRM-403_Outsourced_Process_Request.xlsx",
+            "sha256": "bf687af3b5a5dc08741ded609baaf573ab41519d08911537bb5ae97f63f31651",
+            "size_bytes": 35356
+        }
+    ]
+}

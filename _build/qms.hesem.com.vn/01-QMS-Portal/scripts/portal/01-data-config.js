@@ -158,6 +158,30 @@ const ROLES = {
 };
 
 // ═══════════════════════════════════════════════════
+// HmRegistry Integration — Centralized Data Layer
+// Khi HmRegistry sẵn sàng, trigger init để eager load status-options.
+// HmRegistry.badge(setKey, value) thay thế mọi statusBadge() cục bộ.
+// ═══════════════════════════════════════════════════
+if(window.HmRegistry && typeof HmRegistry.init === 'function'){
+  HmRegistry.init();
+}
+
+/**
+ * Global statusBadge helper — delegates to HmRegistry if available.
+ * Tất cả module nên gọi hàm này thay vì tự hardcode switch/case colors.
+ * @param {string} setKey - e.g. 'so_status', 'ncr_status', 'doc_status'
+ * @param {string} value  - e.g. 'draft', 'approved', 'closed'
+ * @returns {string} HTML badge span
+ */
+function hmBadge(setKey, value){
+  if(window.HmRegistry) return HmRegistry.badge(setKey, value);
+  // Fallback nếu HmRegistry chưa load
+  var color = '#6b7280';
+  var label = value || '';
+  return '<span style="display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;color:#fff;background:' + color + '">' + label + '</span>';
+}
+
+// ═══════════════════════════════════════════════════
 // DEPARTMENTS & TITLES (Admin-managed)
 // ═══════════════════════════════════════════════════
 const DEFAULT_DEPARTMENTS = [
@@ -476,7 +500,7 @@ function showConsentDialog(){
           </p>
           <h4>ĐIỀU 2 — Thu thập dữ liệu phiên làm việc</h4>
           <p style="font-size:12px;color:var(--text-2);line-height:1.7;margin-bottom:10px">
-            Nhằm đảm bảo tính toàn vẹn, truy xuất nguồn gốc và tuân thủ các yêu cầu kiểm soát tài liệu theo ISO 9001:2015, Hệ thống sẽ tự động ghi nhận các thông tin sau trong suốt phiên làm việc:
+            Nhằm đảm bảo tính toàn vẹn, truy xuất nguồn gốc và tuân thủ các yêu cầu kiểm soát tài liệu theo ISO 9001:2026, Hệ thống sẽ tự động ghi nhận các thông tin sau trong suốt phiên làm việc:
           </p>
           <ul>
             <li><div class="li-icon">§1</div><div><b>Thời gian truy cập</b> — Ngày, giờ đăng nhập, thời lượng phiên làm việc và thời điểm kết thúc</div></li>
@@ -488,7 +512,7 @@ function showConsentDialog(){
           <h4 style="margin-top:14px">ĐIỀU 3 — Mục đích sử dụng dữ liệu</h4>
           <p style="font-size:12px;color:var(--text-2);line-height:1.7;margin-bottom:10px">
             Dữ liệu thu thập được sử dụng cho các mục đích hợp pháp sau đây:
-            <b>(a)</b> Đảm bảo tuân thủ các yêu cầu kiểm soát tài liệu và truy xuất nguồn gốc theo ISO 9001:2015 và SEMI Standards;
+            <b>(a)</b> Đảm bảo tuân thủ các yêu cầu kiểm soát tài liệu và truy xuất nguồn gốc theo ISO 9001:2026 và SEMI Standards;
             <b>(b)</b> Quản lý an ninh thông tin và bảo vệ tài sản trí tuệ của Công ty;
             <b>(c)</b> Kiểm toán nội bộ và đánh giá tuân thủ;
             <b>(d)</b> Phục vụ điều tra khi có dấu hiệu vi phạm quy chế bảo mật.
@@ -514,7 +538,7 @@ function showConsentDialog(){
 
 // ═══════════════════════════════════════════════════
 // DOCUMENT-LEVEL PERMISSIONS (role → [doc codes])
-// ISO 9001:2015 / AS9100D / SEMI — Need-to-know principle
+// ISO 9001:2026 / AS9100D / SEMI — Need-to-know principle
 // "ALL" = full access. Wildcards: "SOP-1*" matches SOP-101, SOP-102, etc.
 // ═══════════════════════════════════════════════════════════════════════
 // Universal access base: policies, manual, training, org chart
@@ -525,7 +549,7 @@ const _UNI = [
   "CERTIFICATE*","CERTIFICATION*","EVIDENCE*","QMS-OPS*",
   "ROLE*","TRAINEE*","TRAINER*",
   "OJT*","DRILL*","SYS-OPS*","TRN-OPS*","MRR*",
-  "ANNEX-QMS-001*","ANNEX-QMS-002*","ANNEX-QMS-020*",
+  "ANNEX-105*","ANNEX-106*","ANNEX-117*",
   "FRM-801*","FRM-802*","FRM-803*","FRM-804*","FRM-805*",
   "FRM-806*","FRM-807*","FRM-808*","FRM-809*",
   "FRM-811*",
@@ -536,7 +560,7 @@ const _MGR = [
   "SOP-1*","SOP-9*",
   "DEPT*",
   "JD*","ANNEX*",
-  "ANNEX-QMS-025*","ANNEX-QMS-026*","ANNEX-QMS-027*","ANNEX-QMS-028*",
+  "ANNEX-120*","ANNEX-121*","ANNEX-122*","ANNEX-123*",
   "LAB*",
   "FRM-1*","FRM-9*",
   "SOP-801*","SOP-804*","FRM-812*",
@@ -846,7 +870,7 @@ const ROLE_DOCS = {
     "SOP-702-*","SOP-703-*",
     "WI-711-*","WI-713-*","WI-721-*",
     "FRM-708-*",
-    "ANNEX-QMS-016*","ANNEX-QMS-011*","ANNEX-QMS-024*",
+    "ANNEX-607*","ANNEX-112*","ANNEX-608*",
     "LAB*","DEPT-EHS-*",
     "WI-8*"
   ],
@@ -856,7 +880,7 @@ const ROLE_DOCS = {
   epicor_admin: [
     ..._UNI, ..._MGR,
     "SOP-104-*","SOP-105-*",
-    "ANNEX-QMS-005*","ANNEX-QMS-006*","ANNEX-QMS-008*","ANNEX-QMS-012*","ANNEX-QMS-015*","ANNEX-QMS-018*","ANNEX-QMS-020*","ANNEX-IT-001*","ANNEX-IT-002*","ANNEX-OPS-003*",
+    "ANNEX-131*","ANNEX-132*","ANNEX-133*","ANNEX-134*","ANNEX-110*","ANNEX-113*","ANNEX-114*","ANNEX-115*","ANNEX-117*","ANNEX-101*","ANNEX-102*","ANNEX-503*",
     "SOP-201-*","SOP-501-*",
     "SOP-401-*","SOP-803-*",
     "FRM-1*","FRM-2*","FRM-4*","FRM-5*",
@@ -871,29 +895,33 @@ function normalizeDocPattern(pattern){
   const base = raw.replace(/-\*$/,'*');
   const out = new Set([base]);
   const aliasMap = {
-    'AUTHORITY-MATRIX':'ANNEX-QMS-025',
-    'RACI-MASTER-MATRIX':'ANNEX-QMS-026',
+    'AUTHORITY-MATRIX':'ANNEX-120',
+    'RACI-MASTER-MATRIX':'ANNEX-121',
     'ANNEX-HR-LAB*':'LAB*',
     'ANNEX-JOB*':'JD*',
-    'REF-001*':'ANNEX-QMS-001*',
-    'REF-002*':'ANNEX-QMS-002*',
-    'REF-005*':'ANNEX-QMS-020*',
-    'REF-006*':'ANNEX-QMS-016*',
-    'REF-007*':'ANNEX-QMS-011*',
-    'REF-008*':'ANNEX-QMS-024*',
-    'REF-010*':'ANNEX-QMS-005*',
-    'REF-011*':'ANNEX-QMS-006*',
-    'REF-012*':'ANNEX-QMS-012*',
-    'REF-013*':'ANNEX-QMS-018*',
-    'REF-014*':'ANNEX-QMS-006*',
-    'REF-015*':'ANNEX-QMS-015*',
-    'REF-020*':'ANNEX-OPS-003*',
-    'REF-021*':'ANNEX-QMS-023*'
+    'ANNEX-108*':'ANNEX-131*',
+    'ANNEX-109*':'ANNEX-132*',
+    'ANNEX-116*':'ANNEX-133*',
+    'ANNEX-125*':'ANNEX-134*',
+    'REF-001*':'ANNEX-105*',
+    'REF-002*':'ANNEX-106*',
+    'REF-005*':'ANNEX-117*',
+    'REF-006*':'ANNEX-607*',
+    'REF-007*':'ANNEX-112*',
+    'REF-008*':'ANNEX-608*',
+    'REF-010*':'ANNEX-131*',
+    'REF-011*':'ANNEX-132*',
+    'REF-012*':'ANNEX-113*',
+    'REF-013*':'ANNEX-115*',
+    'REF-014*':'ANNEX-132*',
+    'REF-015*':'ANNEX-114*',
+    'REF-020*':'ANNEX-503*',
+    'REF-021*':'ANNEX-119*'
   };
   if(aliasMap[base]) out.add(aliasMap[base]);
   if(base === 'REF*' || base === 'REF-*') out.add('ANNEX*');
   if(base === 'REF-01*'){
-    ['ANNEX-QMS-005*','ANNEX-QMS-006*','ANNEX-QMS-008*','ANNEX-QMS-012*','ANNEX-QMS-015*','ANNEX-QMS-018*','ANNEX-IT-001*','ANNEX-IT-002*'].forEach(v=>out.add(v));
+    ['ANNEX-131*','ANNEX-132*','ANNEX-133*','ANNEX-134*','ANNEX-110*','ANNEX-113*','ANNEX-114*','ANNEX-115*','ANNEX-101*','ANNEX-102*'].forEach(v=>out.add(v));
   }
   return Array.from(out);
 }
@@ -931,7 +959,7 @@ const CATEGORIES = [
   // ── Tài liệu vận hành ── (03-Tai-Lieu-Van-Hanh + 04-Bieu-Mau)
   {id:"SOP",icon:"📋",label:"Quy trình (SOP)",color:"#0369a1",dept:"QMS",section:"ops"},
   {id:"WI",icon:"📖",label:"Hướng dẫn công việc (WI)",color:"#059669",dept:"OPS",section:"ops"},
-  {id:"ANNEX",icon:"📚",label:"Phụ lục & Tham chiếu (ANNEX)",color:"#6366f1",dept:"QMS",section:"ops"},
+  {id:"ANNEX",icon:"📚",label:"Phụ lục (ANNEX)",color:"#6366f1",dept:"QMS",section:"ops"},
   {id:"FRM",icon:"📝",label:"Biểu mẫu & Hồ sơ (Forms)",color:"#d97706",dept:"FRM",section:"ops"},
   // ── Đào tạo & Năng lực ── (10)
   {id:"TRN",icon:"🎓",label:"Đào tạo & Năng lực (Training)",color:"#9333ea",dept:"TRN",section:"train"},
@@ -1082,13 +1110,29 @@ const FOLDER_ICON_MAP = {
   '01-WI-100':'📋','02-WI-200':'💰','03-WI-300':'🛠️','04-WI-400':'🛒',
   '05-WI-500':'🔧','06-WI-600':'🔬','07-WI-700':'📦','08-WI-800':'🦺',
   '09-WI-900':'📊',
-  // ANNEX (Reference)
+  // ANNEX series (by department — matches SOP/WI/FRM numbering)
   '03-Reference':'📚',
-  '01-ANNEX-System':'📖','02-ANNEX-Standards':'📏','03-ANNEX-Digital':'💻',
+  '01-ANNEX-100':'🏛️','02-ANNEX-200':'💼','03-ANNEX-300':'⚙️','04-ANNEX-400':'🔗',
+  '10-ANNEX-100-Foundation-Maps-and-Control':'🧭',
+  '11-ANNEX-110-Digital-Control-and-Resilience':'🖥️',
+  '12-ANNEX-120-Authority-KPI-and-Deputy-Control':'🧩',
+  '13-ANNEX-130-M365-Records-Control':'🗂️',
+  '05-ANNEX-500':'🏭','06-ANNEX-600':'🔍','07-ANNEX-700':'📦','08-ANNEX-800':'👥',
+  '09-ANNEX-900':'♻️',
   // Forms series (by department)
   '01-FRM-100':'🏛️','02-FRM-200':'💼','03-FRM-300':'⚙️','04-FRM-400':'🔗',
   '05-FRM-500':'🏭','06-FRM-600':'🔍','07-FRM-700':'📦','08-FRM-800':'👥',
   '09-FRM-900':'♻️',
+  // Competency Levels (C01-C19)
+  '01-C01-Safety-5S':'🦺','02-C02-Process-Discipline':'📋','03-C03-Right-First-Time':'🎯',
+  '04-C04-Cross-Dept-Communication':'🤝','05-C05-Customer-Service-B2B':'🤵',
+  '06-C06-Problem-Solving-RCA':'🔍','07-C07-Kaizen-Lean':'♻️',
+  '08-C08-Data-Driven-ERP':'📊','09-C09-Time-Management':'⏱️',
+  '10-C10-CNC-Job-Order-Process':'🔩','11-C11-Sales-Contract-Review':'💼',
+  '12-C12-Estimating-Costing':'💰','13-C13-Risk-Revision-Control':'⚠️',
+  '14-C14-Drawing-GDT':'📐','15-C15-Material-Science':'🧪',
+  '16-C16-Advanced-Metrology':'🔬','17-C17-CNC-Setup-CAM':'⚙️',
+  '18-C18-Supply-Chain':'🛒','19-C19-Leadership-Coaching':'👨‍🏫',
   // Organization
   '01-Org-Chart':'📊','02-Department-Handbooks':'📕','03-Job-Descriptions':'👔',
   '04-RACI-Authority':'🔑','05-Labor-Relations':'⚖️',
@@ -1207,6 +1251,123 @@ function resetCustomIcon(type,id){
 // ═══════════════════════════════════════════════════
 let DOCS = []; // Populated dynamically from api.php?action=scan_folders
 let DOCS_LOADED = false;
+const LIVE_DOCS_SYNC_INTERVAL_MS = 10000;
+let liveDocsSyncTimer = null;
+let liveDocsSyncInFlight = false;
+let lastDocsSyncFingerprint = '';
+
+function flattenTreeForSyncFingerprint(nodes, bucket=[]){
+  (Array.isArray(nodes) ? nodes : []).forEach(node => {
+    if(!node) return;
+    bucket.push([
+      String(node.path || ''),
+      String(node.num ?? ''),
+      String(node.fileCount ?? ''),
+      String(node.cat || ''),
+      String(node.name || '')
+    ].join('|'));
+    if(Array.isArray(node.subs) && node.subs.length){
+      flattenTreeForSyncFingerprint(node.subs, bucket);
+    }
+  });
+  return bucket;
+}
+
+function buildDocsSyncFingerprint(docs, tree){
+  try{
+    const docFingerprint = (Array.isArray(docs) ? docs : []).map(doc => ([
+      String(doc?.code || ''),
+      String(doc?.path || ''),
+      String(doc?.folder || ''),
+      String(doc?.ext || ''),
+      String(doc?.rev || ''),
+      String(doc?.status || ''),
+      String(doc?.delivery_mode || ''),
+      String(doc?.portal_behavior || ''),
+      doc?.browser_open_enabled ? '1' : '0'
+    ]).join('|')).join('||');
+    const treeFingerprint = flattenTreeForSyncFingerprint(tree, []).join('||');
+    return docFingerprint + '###' + treeFingerprint;
+  }catch(e){
+    return String(Date.now());
+  }
+}
+
+function refreshPortalDocsUiAfterSync(){
+  try{ renderSidebar(); }catch(e){}
+  try{ if(typeof syncSidebarToggleState==='function') syncSidebarToggleState(); }catch(e){}
+  try{
+    if(currentPage==='dashboard' && typeof renderDashboard==='function') renderDashboard();
+    if(currentPage==='documents' && typeof renderDocuments==='function') renderDocuments();
+    if(currentPage==='search' && typeof renderSearch==='function') renderSearch();
+    if(currentPage==='dictionary' && typeof renderDictionary==='function') renderDictionary();
+    if(currentPage==='access' && typeof renderAccessMatrix==='function') renderAccessMatrix();
+    if(currentPage==='admin' && typeof renderAdmin==='function') renderAdmin();
+    if(currentPage==='deploy' && typeof renderDeployDashboard==='function') renderDeployDashboard();
+  }catch(e){}
+  try{
+    const dv = document.getElementById('doc-viewer');
+    if(dv && dv.classList.contains('active') && currentDoc){
+      const doc = DOCS.find(d => String(d?.code || '') === String(currentDoc));
+      if(doc){
+        if(typeof updateDocViewerHeader==='function') updateDocViewerHeader(doc);
+        if(typeof renderWorkflowPanel==='function') renderWorkflowPanel(doc);
+        if(typeof renderVersionHistory==='function') renderVersionHistory(doc);
+        if(!editMode && typeof loadDocContent==='function') loadDocContent(currentDoc);
+      }
+    }
+  }catch(e){}
+}
+
+function applyDocsTreeResponse(res, options={}){
+  if(!(res && res.ok && Array.isArray(res.docs))) return null;
+  const nextDocs = (Array.isArray(res.docs) ? res.docs : []).map(normalizeDocCatalogEntry);
+  const nextTree = Array.isArray(res.tree) ? res.tree : [];
+  const nextFingerprint = buildDocsSyncFingerprint(nextDocs, nextTree);
+  let configChanged = false;
+  try{
+    if(res.display_config && typeof applyPortalDisplayConfig === 'function'){
+      configChanged = !!applyPortalDisplayConfig(res.display_config);
+    }
+  }catch(e){}
+  const changed = nextFingerprint !== lastDocsSyncFingerprint || configChanged;
+
+  DOCS = nextDocs;
+  DOCS_LOADED = true;
+  FOLDER_TREE = nextTree;
+  buildDynamicFolderStructure();
+  lastDocsSyncFingerprint = nextFingerprint;
+
+  if(options.refreshUi && (changed || options.forceUiRefresh)){
+    refreshPortalDocsUiAfterSync();
+  }
+
+  console.log('[QMS] Loaded ' + DOCS.length + ' documents from server' + (res.cached ? ' (cached)' : '') + ', tree: ' + FOLDER_TREE.length + ' nodes');
+  return {changed, count: DOCS.length, cached: !!res.cached};
+}
+
+function shouldPauseLiveDocsSync(){
+  try{
+    const app = document.getElementById('app');
+    if(app && !app.classList.contains('active')) return true;
+  }catch(e){}
+  try{ if(document.hidden) return true; }catch(e){}
+  try{ if(typeof editMode !== 'undefined' && editMode) return true; }catch(e){}
+  try{ if(typeof folderEditMode !== 'undefined' && folderEditMode) return true; }catch(e){}
+  try{
+    const blockingSelector = [
+      '#sync-report-modal',
+      '#recovery-modal',
+      '#preview-modal',
+      '.sync-report-overlay',
+      '.vp-overlay',
+      '.modal-overlay',
+      '.confirm-overlay'
+    ].join(',');
+    if(document.querySelector(blockingSelector)) return true;
+  }catch(e){}
+  return false;
+}
 
 async function fetchDocsTree(forceFresh=true) {
   const url = forceFresh
@@ -1219,20 +1380,60 @@ async function fetchDocsTree(forceFresh=true) {
 async function loadDocsFromServer() {
   try {
     const res = await fetchDocsTree(true);
-    if (res && res.ok && Array.isArray(res.docs)) {
-      DOCS = res.docs;
-      DOCS_LOADED = true;
-      if (Array.isArray(res.tree)) {
-        FOLDER_TREE = res.tree;
-        buildDynamicFolderStructure();
-      }
-      console.log('[QMS] Loaded ' + DOCS.length + ' documents from server' + (res.cached ? ' (cached)' : '') + ', tree: ' + FOLDER_TREE.length + ' nodes');
-      return true;
-    }
+    return !!applyDocsTreeResponse(res);
   } catch (e) {
     console.warn('[QMS] scan_folders failed, using fallback', e);
   }
   return false;
+}
+
+async function runLiveDocsSync(reason='interval'){
+  if(liveDocsSyncInFlight || shouldPauseLiveDocsSync()) return false;
+  liveDocsSyncInFlight = true;
+  try{
+    const res = await fetchDocsTree(true);
+    const applied = applyDocsTreeResponse(res, {refreshUi:true});
+    if(applied && applied.changed){
+      console.log('[QMS] Live document sync applied via ' + reason);
+      return true;
+    }
+  }catch(e){
+    console.warn('[QMS] live sync failed', e);
+  }finally{
+    liveDocsSyncInFlight = false;
+  }
+  return false;
+}
+
+function handleLiveDocsSyncVisibility(){
+  if(document.hidden) return;
+  void runLiveDocsSync('visibility');
+}
+
+function handleLiveDocsSyncFocus(){
+  void runLiveDocsSync('focus');
+}
+
+function startLiveDocsSync(){
+  stopLiveDocsSync();
+  liveDocsSyncTimer = window.setInterval(() => {
+    void runLiveDocsSync('interval');
+  }, LIVE_DOCS_SYNC_INTERVAL_MS);
+  document.addEventListener('visibilitychange', handleLiveDocsSyncVisibility);
+  window.addEventListener('focus', handleLiveDocsSyncFocus);
+  window.setTimeout(() => {
+    void runLiveDocsSync('startup');
+  }, 1500);
+}
+
+function stopLiveDocsSync(){
+  if(liveDocsSyncTimer){
+    clearInterval(liveDocsSyncTimer);
+    liveDocsSyncTimer = null;
+  }
+  liveDocsSyncInFlight = false;
+  document.removeEventListener('visibilitychange', handleLiveDocsSyncVisibility);
+  window.removeEventListener('focus', handleLiveDocsSyncFocus);
 }
 
 // ═══ DYNAMIC FOLDER TREE ═══
@@ -1385,22 +1586,106 @@ function deriveDocTitleFromPath(doc){
     .trim();
 }
 
+function deriveDocCodeFromPath(doc){
+  const relPath = String(doc?.path || '').split(/[?#]/)[0];
+  const base = (relPath.split('/').pop() || '').replace(/\.[^.]+$/, '');
+  if(!base) return '';
+  const match = base.match(/^((?:SOP|FRM|WI|ANNEX)-\d{3}|(?:JD|DEPT|RACI|AUTHORITY|POL|QMS|TRN|SYS|LAB|FORM|MRR)(?:-[A-Z0-9]+)+)(?:[-_]|$)/i);
+  return match ? String(match[1] || '').toUpperCase() : '';
+}
+
+function looksLikeFilenameSlugTitle(text){
+  const value = String(text || '').trim();
+  if(!value) return false;
+  if(/^(?:WI|ANNEX)-\d{3}(?:[-_\s]+[A-Z0-9]+){2,}$/i.test(value)) return true;
+  if(/^(?:WI|ANNEX)\s+\d{3}(?:[-_\s]+[A-Z0-9]+){2,}$/i.test(value)) return true;
+  if(value.includes('_')) return true;
+  return /^[A-Z0-9]+(?:[- ][A-Z0-9]+){4,}$/.test(value) && !looksLikeVietnameseText(value);
+}
+
+function normalizeDocCatalogEntry(doc){
+  const next = Object.assign({}, doc || {});
+  const originalCode = String(next.code || '').trim();
+  const normalizedCode = deriveDocCodeFromPath(next);
+  if(normalizedCode){
+    if(originalCode && originalCode.toUpperCase() !== normalizedCode){
+      next.__rawCode = originalCode;
+    }
+    next.code = normalizedCode;
+  }
+
+  const rawTitle = String(next.title || '').trim();
+  const derivedTitle = deriveDocTitleFromPath(next);
+  if(!rawTitle){
+    if(derivedTitle) next.title = derivedTitle;
+    return next;
+  }
+
+  const originalCodeForTitle = String((next.__rawCode || originalCode || next.code || '')).trim();
+  const rawTitleUpper = rawTitle.toUpperCase();
+  if(
+    looksLikeFilenameSlugTitle(rawTitle) ||
+    (originalCodeForTitle && rawTitleUpper === originalCodeForTitle.toUpperCase()) ||
+    looksLikeVietnameseText(rawTitle)
+  ){
+    next.__rawTitle = rawTitle;
+    if(derivedTitle) next.title = derivedTitle;
+  }
+
+  return next;
+}
+
+function getDocDisplayCode(doc){
+  if(!doc) return '';
+  const runtimeCode = String(doc.__displayCode || '').trim();
+  if(runtimeCode) return runtimeCode;
+  return String(doc.code || '').trim();
+}
+
 function getDocDisplayTitle(doc){
   if(!doc) return '';
-  const rawTitle = String(doc.title || '').trim();
-  const code = String(doc.code || '').trim();
+  const code = getDocDisplayCode(doc);
+  const explicitStandard = String(doc.standard_title || doc.standardTitle || '').trim();
+  if(explicitStandard) return explicitStandard;
   const derivedTitle = deriveDocTitleFromPath(doc);
-  if(!rawTitle || rawTitle.toUpperCase() === code.toUpperCase()) return derivedTitle || rawTitle || code;
-  if(looksLikeVietnameseText(rawTitle) && derivedTitle) return derivedTitle;
-  return rawTitle;
+  if(derivedTitle) return derivedTitle;
+  const runtimeTitle = String(doc.__displayTitle || '').trim();
+  if(runtimeTitle && runtimeTitle.toUpperCase() !== code.toUpperCase() && !looksLikeVietnameseText(runtimeTitle) && !/[^\x20-\x7E]/.test(runtimeTitle)) return runtimeTitle;
+  const rawTitle = String(doc.title || '').trim();
+  if(rawTitle && rawTitle.toUpperCase() !== code.toUpperCase() && !looksLikeVietnameseText(rawTitle) && !/[^\x20-\x7E]/.test(rawTitle)) return rawTitle;
+  return code;
+}
+
+function getDocStandardTitle(doc){
+  if(!doc) return '';
+  const explicitStandard = String(doc.standard_title || doc.standardTitle || '').trim();
+  if(explicitStandard) return explicitStandard;
+
+  const derivedTitle = deriveDocTitleFromPath(doc);
+  if(derivedTitle) return derivedTitle;
+
+  const runtimeTitle = String(doc.__displayTitle || '').trim();
+  const code = getDocDisplayCode(doc);
+  if(runtimeTitle && runtimeTitle.toUpperCase() !== code.toUpperCase() && !looksLikeVietnameseText(runtimeTitle) && !/[^\x20-\x7E]/.test(runtimeTitle)){
+    return runtimeTitle;
+  }
+
+  const rawTitle = String(doc.title || '').trim();
+  if(rawTitle && rawTitle.toUpperCase() !== code.toUpperCase() && !looksLikeVietnameseText(rawTitle) && !/[^\x20-\x7E]/.test(rawTitle)){
+    return rawTitle;
+  }
+
+  return code;
 }
 
 function getDocDisplayDescription(doc){
   if(!doc) return '';
+  const runtimeDesc = String(doc.__displayDesc || '').trim();
+  if(runtimeDesc) return runtimeDesc;
   const explicitDesc = String(getDocDesc(doc.code) || '').trim();
   if(explicitDesc) return explicitDesc;
 
-  const rawTitle = String(doc.title || '').trim();
+  const rawTitle = String(doc.__rawTitle || doc.title || '').trim();
   const displayTitle = getDocDisplayTitle(doc);
   if(rawTitle && rawTitle !== displayTitle && looksLikeVietnameseText(rawTitle)) return rawTitle;
 
@@ -1474,8 +1759,35 @@ function getBestTreeNodeForCategory(catCode, docs){
   return nodes.slice().sort((a,b) => getTreeNodeScore(b, docs) - getTreeNodeScore(a, docs))[0] || null;
 }
 
+function getCategoryTreeRoot(catCode, docs){
+  const nodes = getTreeNodesForCategory(catCode);
+  if(nodes.length === 0) return null;
+  if(nodes.length === 1) return nodes[0];
+  const orderedNodes = nodes.slice().sort((a,b) => {
+    const numDiff = Number(a?.num || 0) - Number(b?.num || 0);
+    if(numDiff !== 0) return numDiff;
+    return String(a?.name || '').localeCompare(String(b?.name || ''));
+  });
+  const cat = (Array.isArray(CATEGORIES) ? CATEGORIES : []).find(item => String(item?.id || '') === String(catCode));
+  const label = cat ? (typeof catLabel === 'function' ? catLabel(cat).split('(')[0].trim() : String(cat.label || catCode)) : String(catCode || '');
+  const nodeParents = orderedNodes
+    .map(node => String(node?.path || '').split('/').slice(0, -1).join('/'))
+    .filter(Boolean);
+  const rootPath = nodeParents.length > 0 && nodeParents.every(path => path === nodeParents[0])
+    ? nodeParents[0]
+    : '';
+  return {
+    path: rootPath,
+    num: 0,
+    name: label || String(catCode || ''),
+    cat: String(catCode || ''),
+    fileCount: orderedNodes.reduce((sum, node) => sum + Number(node?.fileCount || 0), 0),
+    subs: orderedNodes
+  };
+}
+
 function resolveTreeNodeForCategory(catCode, folderSegments, docs){
-  let currentNode = getBestTreeNodeForCategory(catCode, docs);
+  let currentNode = getCategoryTreeRoot(catCode, docs) || getBestTreeNodeForCategory(catCode, docs);
   if(!currentNode) return null;
   const segs = Array.isArray(folderSegments) ? folderSegments : [];
   for(let i=0; i<segs.length && currentNode; i++){
@@ -1520,7 +1832,7 @@ function groupDocsBySubfolder(docs){
 // Uses FOLDER_TREE from API's scan_folders response
 function buildDocFolderTree(docs, catCode){
   // Find tree node for this category
-  const treeNode = getBestTreeNodeForCategory(catCode, docs);
+  const treeNode = getCategoryTreeRoot(catCode, docs) || getBestTreeNodeForCategory(catCode, docs);
   if(!treeNode || !treeNode.subs || treeNode.subs.length === 0){
     return {name: catCode, path: '', docs: docs, children: [], isLeaf: true};
   }
@@ -1543,9 +1855,7 @@ function buildDocFolderTree(docs, catCode){
     if(apiNode.subs && apiNode.subs.length > 0){
       apiNode.subs.forEach(sub => {
         const child = buildNode(sub, allDocs);
-        if(child.docs.length > 0 || child.children.length > 0){
-          node.children.push(child);
-        }
+        node.children.push(child);
       });
     }
     return node;
@@ -1554,9 +1864,7 @@ function buildDocFolderTree(docs, catCode){
   // Build children from API tree subs
   treeNode.subs.forEach(sub => {
     const child = buildNode(sub, docs);
-    if(child.docs.length > 0 || child.children.length > 0){
-      root.children.push(child);
-    }
+    root.children.push(child);
   });
 
   // Docs directly in the category root (no subfolder)
@@ -1576,20 +1884,28 @@ function renderFolderTreeHtml(node, mode, options, depth){
   if(node.children && node.children.length > 0){
     node.children.forEach(child => {
       const allChildDocs = collectTreeDocs(child);
-      if(allChildDocs.length === 0) return;
+      const hasChildDocs = allChildDocs.length > 0;
 
       if(mode === 'perms'){
         const role = options.role;
         const isFullAccess = options.isFullAccess;
         const dAccess = allChildDocs.filter(d=>docMatchesRole(d.code,role)).length;
-        const dAllChecked = dAccess === allChildDocs.length;
+        const dAllChecked = hasChildDocs && dAccess === allChildDocs.length;
         const subPath = child.path.split('/').pop() || child.name;
+        const folderControl = isFullAccess
+          ? '<span style="color:#16a34a;font-weight:700;width:16px;display:inline-block">✓</span>'
+          : (hasChildDocs
+              ? '<input type="checkbox" '+(dAllChecked?'checked':'')+' onchange="toggleSubfolderPerms(this,\''+escapeHtml(options.catId)+'\',\''+escapeHtml(subPath)+'\',\''+role+'\')" style="margin:0">'
+              : '<span style="color:#94a3b8;font-weight:700;width:16px;display:inline-block">•</span>');
+        const folderMeta = hasChildDocs
+          ? `${dAccess}/${allChildDocs.length}`
+          : (lang==='en' ? 'Empty folder' : 'Thư mục trống');
 
         html += `<div style="margin:4px 0 2px ${indent}px;padding:4px 8px;background:${depth>0?'var(--bg-1,#fff)':'var(--bg-2,#f8fafc)'};border-radius:8px;border:1px solid var(--border-light,#e2e8f0)">
           <div style="display:flex;align-items:center;gap:6px;padding:2px 0;font-size:${depth>0?'11':'12'}px;font-weight:600;color:#475569">
-            ${!isFullAccess ? '<input type="checkbox" '+(dAllChecked?'checked':'')+' onchange="toggleSubfolderPerms(this,\''+escapeHtml(options.catId)+'\',\''+escapeHtml(subPath)+'\',\''+role+'\')" style="margin:0"> ' : '<span style="color:#16a34a;font-weight:700;width:16px;display:inline-block">✓</span>'}
+            ${folderControl}
             📁 ${escapeHtml(getSubfolderLabel(child.path.split('/').pop()||child.name))}
-            <span style="font-weight:400;font-size:10px;color:var(--text-3);margin-left:auto">${dAccess}/${allChildDocs.length}</span>
+            <span style="font-weight:400;font-size:10px;color:var(--text-3);margin-left:auto">${folderMeta}</span>
           </div>`;
 
         // If child has sub-children, recurse
@@ -1613,22 +1929,31 @@ function renderFolderTreeHtml(node, mode, options, depth){
 
       } else if(mode === 'effective'){
         const dHiddenCount = allChildDocs.filter(d=>isDocHidden(d.code)).length;
-        const dAllHidden = dHiddenCount === allChildDocs.length;
+        const dAllHidden = hasChildDocs && dHiddenCount === allChildDocs.length;
         const dBtnLabel = dAllHidden ? (lang==='en'?'Show':'Hiện') : (lang==='en'?'Hide':'Ẩn');
         const dBtnIcon = dAllHidden ? '👁️' : '🙈';
         const subPath = child.path.split('/').pop() || child.name;
         const catId = options.catId;
+        const subMeta = hasChildDocs
+          ? `${allChildDocs.length} ${lang==='en'?'docs':'tài liệu'} • ${lang==='en'?'Hidden':'Ẩn'}: ${dHiddenCount}`
+          : (lang==='en' ? 'Empty folder — ready for new controlled files' : 'Thư mục trống — sẵn sàng nhận tài liệu được kiểm soát');
+        const subAction = hasChildDocs
+          ? `<button class="btn-admin" style="font-size:11px;padding:4px 10px" onclick="toggleSubfolderHidden('${escapeHtml(catId)}','${escapeHtml(subPath)}')">${dBtnIcon} ${dBtnLabel}</button>`
+          : `<span style="font-size:11px;color:var(--text-3);font-weight:600">${lang==='en'?'No files yet':'Chưa có file'}</span>`;
+        const emptyNotice = (!hasChildDocs && (!child.children || child.children.length === 0))
+          ? `<div style="padding:8px 2px 2px;font-size:11px;color:var(--text-3)">${lang==='en'?'This folder exists on disk but has no displayable files yet.':'Folder này đã tồn tại trên ổ đĩa nhưng hiện chưa có file hiển thị trên portal.'}</div>`
+          : '';
 
-        html += `<details class="admin-dept-group" ${dAllHidden?'':'open'} style="border:1px solid var(--border-light,#e2e8f0);border-radius:10px;margin:${depth>0?'4':'8'}px 0 ${depth>0?'4':'8'}px ${indent}px;overflow:hidden;background:${depth>0?'var(--bg-1,#fff)':'var(--bg-2,#f8fafc)'}">
+        html += `<details class="admin-dept-group" ${(!hasChildDocs || !dAllHidden)?'open':''} style="border:1px solid var(--border-light,#e2e8f0);border-radius:10px;margin:${depth>0?'4':'8'}px 0 ${depth>0?'4':'8'}px ${indent}px;overflow:hidden;background:${depth>0?'var(--bg-1,#fff)':'var(--bg-2,#f8fafc)'}">
           <summary style="list-style:none;cursor:pointer;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px">
             <div style="display:flex;align-items:center;gap:10px;min-width:0">
               <div style="min-width:0">
                 <div style="font-weight:700;font-size:${depth>0?'12':'13'}px">📁 ${escapeHtml(getSubfolderLabel(subPath))}</div>
-                <div style="font-size:11px;color:var(--muted)">${allChildDocs.length} ${lang==='en'?'docs':'tài liệu'} • ${lang==='en'?'Hidden':'Ẩn'}: ${dHiddenCount}</div>
+                <div style="font-size:11px;color:var(--muted)">${subMeta}</div>
               </div>
             </div>
             <div style="display:flex;gap:6px;align-items:center" onclick="event.stopPropagation();">
-              <button class="btn-admin" style="font-size:11px;padding:4px 10px" onclick="toggleSubfolderHidden('${escapeHtml(catId)}','${escapeHtml(subPath)}')">${dBtnIcon} ${dBtnLabel}</button>
+              ${subAction}
             </div>
           </summary>
           <div style="padding:6px 10px">`;
@@ -1652,6 +1977,7 @@ function renderFolderTreeHtml(node, mode, options, depth){
             }).join('')}
           </table>`;
         }
+        html += emptyNotice;
         html += `</div></details>`;
       }
     });
@@ -1735,16 +2061,8 @@ function _toggleSubPerms(cb, catId, subPath, role){
 async function rescanDocs() {
   try {
     const data = await fetchDocsTree(true);
-    if (data && data.ok && Array.isArray(data.docs)) {
-      DOCS = data.docs;
-      DOCS_LOADED = true;
-      if (Array.isArray(data.tree)) {
-        FOLDER_TREE = data.tree;
-        buildDynamicFolderStructure();
-      }
-      renderSidebar();
-      return data.count;
-    }
+    const applied = applyDocsTreeResponse(data, {refreshUi:true, forceUiRefresh:true});
+    if (applied) return data.count;
   } catch (e) { console.warn('[QMS] rescan failed', e); }
   return 0;
 }
@@ -1854,7 +2172,7 @@ const I = {
   login_btn:{vi:'Đăng nhập',en:'Log in'},
   login_error:{vi:'Sai tài khoản hoặc mã PIN',en:'Invalid username or PIN'},
   login_demo:{vi:'CHỌN NHANH TÀI KHOẢN DEMO',en:'QUICK SELECT DEMO ACCOUNT'},
-  login_hero:{vi:'Hệ thống<br>Quản lý Chất lượng<br><em>ISO 9001:2015 • Revision-ready</em>',en:'Quality<br>Management System<br><em>ISO 9001:2015 • Revision-ready</em>'},
+  login_hero:{vi:'Hệ thống<br>Quản lý Chất lượng<br><em>ISO 9001:2026 • Revision-ready</em>',en:'Quality<br>Management System<br><em>ISO 9001:2026 • Revision-ready</em>'},
   login_desc:{vi:'Nền tảng quản lý tài liệu QMS tập trung cho toàn công ty. Truy cập SOP, quy trình vận hành, biểu mẫu và hướng dẫn công việc theo phân quyền chức năng.',en:'Centralized QMS document management platform. Access SOPs, operating procedures, forms and work instructions based on role-based permissions.'},
   // Dashboard
   hello:{vi:'Xin chào',en:'Hello'},
@@ -1872,7 +2190,7 @@ const I = {
   accessible:{vi:'Được phép truy cập',en:'Accessible'},
   by_role:{vi:'theo vai trò',en:'by role'},
   quick_access:{vi:'Truy cập nhanh theo loại tài liệu',en:'Quick Access by Document Type'},
-  exec_shortcuts_title:{vi:'🚀 Chuẩn thực thi RFQ → Cash (G0–G5)',en:'🚀 RFQ → Cash Execution (G0–G5)'},
+  exec_shortcuts_title:{vi:'🚀 Chuẩn thực thi RFQ → Cash (G0–G7)',en:'🚀 RFQ → Cash Execution (G0–G7)'},
   exec_shortcuts_desc:{vi:'Điểm truy cập nhanh các tài liệu "bắt buộc để chạy" theo Gate và Job Dossier.',en:'Quick access to "must-have" documents per gate and Job Dossier.'},
   system_overview:{vi:'Tổng quan hệ thống',en:'System Overview'},
   // Documents
@@ -2026,7 +2344,7 @@ const I = {
   cat_PROC:{vi:'Quy trình vận hành (PROC)',en:'Procedures (PROC)'},
   cat_WI:{vi:'Hướng dẫn (WI/OPS)',en:'Work Instructions (WI)'},
   cat_FRM:{vi:'Biểu mẫu (Forms)',en:'Forms'},
-  cat_ANNEX:{vi:'Phụ lục & Tham chiếu (ANNEX)',en:'Annexes & References (ANNEX)'},
+  cat_ANNEX:{vi:'Phụ lục (ANNEX)',en:'Annexes (ANNEX)'},
   cat_DEP:{vi:'Phòng ban (Dept)',en:'Departments'},
   cat_ORG:{vi:'Tổ chức & RACI',en:'Organization & RACI'},
   cat_TRN:{vi:'Đào tạo (Training)',en:'Training'},
@@ -2066,7 +2384,8 @@ function setLang(l){
     document.querySelectorAll('.vp-overlay iframe').forEach(f=>frames.push(f));
     frames.forEach(f=>{
       try{
-        if(typeof syncIframeDocumentLanguage==='function') syncIframeDocumentLanguage(f, l);
+        if(typeof scheduleIframeDocumentLanguageSync==='function') scheduleIframeDocumentLanguageSync(f, l);
+        else if(typeof syncIframeDocumentLanguage==='function') syncIframeDocumentLanguage(f, l);
         else if(f && f.contentWindow) f.contentWindow.postMessage({type:'setLang',lang:l},'*');
       }catch(_e){}
     });
@@ -2113,9 +2432,23 @@ function setLang(l){
       updateDocViewerHeader(doc);
       renderWorkflowPanel(doc);
       renderVersionHistory(doc);
-      // Reload iframe so Google Translate cookie + iframe translation apply reliably
+      // Keep the current iframe mounted and re-sync language in place.
+      // Reload only if the viewer has not loaded any document yet.
       if(!editMode){
-        try{ loadDocContent(currentDoc); }catch(e){}
+        try{
+          const iframe = document.getElementById('doc-iframe');
+          const iframeReady = !!(iframe && (
+            iframe.getAttribute('src') ||
+            iframe.getAttribute('srcdoc') ||
+            (iframe.contentDocument && iframe.contentDocument.body && iframe.contentDocument.body.childNodes.length)
+          ));
+          if(iframeReady){
+            if(typeof scheduleIframeDocumentLanguageSync==='function') scheduleIframeDocumentLanguageSync(iframe, l);
+            else if(typeof syncIframeDocumentLanguage==='function') syncIframeDocumentLanguage(iframe, l);
+          }else{
+            loadDocContent(currentDoc);
+          }
+        }catch(e){}
       }
     }
   }

@@ -1,0 +1,4 @@
+{"store_key":"orders","status":"skipped","message":"Shadow sync skipped because runtime is in JSON_ONLY mode.","timestamp":"2026-04-01T09:41:50+00:00","context":{"runtime_mode":"JSON_ONLY","duration_ms":15.95,"item_count":9}}
+{"store_key":"orders","status":"skipped","message":"Shadow sync skipped because runtime is in JSON_ONLY mode.","timestamp":"2026-04-01T09:45:44+00:00","context":{"runtime_mode":"JSON_ONLY","duration_ms":12.69,"item_count":10}}
+{"store_key":"orders","status":"skipped","message":"Shadow sync skipped because runtime is in JSON_ONLY mode.","timestamp":"2026-04-01T09:49:45+00:00","context":{"runtime_mode":"JSON_ONLY","duration_ms":16.34,"item_count":11}}
+{"store_key":"orders","status":"skipped","message":"Shadow sync skipped because runtime is in JSON_ONLY mode.","timestamp":"2026-04-01T09:53:27+00:00","context":{"runtime_mode":"JSON_ONLY","duration_ms":9.16,"item_count":12}}

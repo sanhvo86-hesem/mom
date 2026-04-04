@@ -1,0 +1,146 @@
+<div><p>thead{display:table-header-group}tfoot{display:table-footer-group}
+ p{orphans:3;widows:3}
+}
+.page-body{overflow-x:hidden}
+.table-card,.table-block,.table-wrap{overflow-x:auto;max-width:100%}
+table{max-width:100%;table-layout:auto}
+td,th{max-width:400px;overflow-wrap:break-word;word-wrap:break-word}
+
+<style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
+<link rel="stylesheet" href="../../../../assets/style.css">
+
+</p>
+
+<div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+ <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company">
+ <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
+</div>
+<div class="title">
+<strong class="doc-name">C09-L4</strong>
+<span class="sub-vn"></span>
+</div>
+<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">C09-L4</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+</div>
+<div class="doc-content" id="docContent">
+<h1>C09-L4 - C09-L4</h1>
+<p class="lead"><strong>Level 4 — Thiết kế hệ thống OTD/capacity và cadence điều hành.</strong> Mô-đun này tạo thói quen đúng hạn và ưu tiên đúng để giữ OTD mà không phá cổng kiểm soát chất lượng.</p>
+<div class="hero">
+<h2>Chuẩn thực chiến – Level 4</h2>
+<div class="meta">
+<div><strong>Vai trò mục tiêu</strong><br>Ops Manager, <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span>, GM, <a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> trưởng nhóm</div>
+<div><strong>Đầu ra bắt buộc</strong><ul><li>Thiết kế hệ thống lập kế hoạch: nhịp độ / chu kỳ họp, escalation, KPI OTD.</li><li>Tối ưu công suất và quản trị nút thắt / điểm nghẽn dài hạn.</li><li>Ra quyết định ưu tiên dựa trên dữ liệu: SLA khách, rủi ro, biên lợi nhuận.</li></ul></div>
+<div><strong>Cổng kiểm soát (gate) trọng yếu</strong><br><span class="badge bad">Vượt qua TẠM GIỮ/REV/QC</span> = FAIL</div>
+<div><strong>Thời lượng</strong><br>Lý thuyết 120 phút • Phân xưởng 120 phút • OJT 1 tháng (theo chu kỳ rà soát)</div>
+</div>
+<p class="small-note">Nguyên tắc vận hành: làm đúng việc trước (ưu tiên), làm đúng cách (cổng kiểm soát), và báo sớm (escal) khi bị chặn.</p>
+</div><div class="note-blue" style="margin:12px 0">
+ <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — Competency Module</b>.
+</div>
+<div class="card">
+<span class="badge">Bộ diễn tập (Job CNC)</span>
+<p class="lead" style="margin-top:10px;">
+ Thực hiện diễn tập trên job thật để luyện hành vi và tạo MRR.
+ Mở danh mục diễn tập tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
+ </p>
+<ul class="tight">
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-daily-management-tier.html">DRL-08 — TRN-Bài diễn tập ACA-DRL-08 — Hàng Ngày Quản lý (Tier Cuộc họp) | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html">DRL-01 — TRN-Bài diễn tập ACA-DRL-01 — Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship gói hồ sơ) | HESEM Academy</a></li>
+</ul>
+<p class="small muted" style="margin-top:8px;">
+ Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
+ </p>
+</div>
+<h2>2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
+<div class="card">
+<ul>
+<li>Giữ cam kết giao hàng (OTD) bằng kỷ luật điều phối xuất hàng, cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch), tuổi tồn WIP (tuổi tồn (lão hóa / cũ) / tuổi tồn), escal bậc thang năng lực.</li>
+<li>Chặn 2 nhóm rủi ro song song: (1) trễ đơn; (2) chạy nhanh nhưng phá cổng kiểm soát gây lỗi chất lượng.</li>
+<li>Biến quản lý thời gian thành hành vi quan sát được: bảng kiểm, OJT, hiệu suất test, ĐẠT/KHÔNG ĐẠT.</li>
+</ul>
+</div>
+<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
+<p>C09-L4 nằm ở cấp hệ thống: tạo Operating System cho OTD, gắn với ANNEX-OPS-001, PROC-PLA-002, PROC-OPS-003.</p>
+<div class="vflow"><div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>Define promise</strong><p>Quy tắc cam kết Ngày giao và thay đổi cam kết.</p></div></div><div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Capacity review</strong><p>Review năng lực tuần; bottleneck; outsource strategy.</p></div></div><div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>Dispatch rules</strong><p>Priority class + freeze window + kiểm soát thay đổi.</p></div></div><div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>Escalation cadence</strong><p>Tier 1–3; SLA; quyết định nhanh.</p></div></div><div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>KPI system</strong><p>OTD, WIP tuổi tồn, schedule adherence, cổng kiểm soát chất lượngs.</p></div></div><div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>CI loop</strong><p>Nguyên nhân gốc trễ; CAPA; training recert.</p></div></div></div>
+<h2>4) Điểm đứt gãy (tối thiểu 10 điểm gãy)</h2>
+<ol><li>Không có cadence review; quyết định rời rạc.</li><li>Không có rule promise/change; Sales tự cam kết.</li><li>Không đo bottleneck; capacity review hình thức.</li><li>Dispatch rules không rõ; ưu tiên thay đổi liên tục.</li><li>Escalation ladder không vận hành; quyết định bị treo.</li><li>KPI không gắn hành động; chỉ báo cáo.</li><li>Không liên kết cổng kiểm soát chất lượngs; đẩy hàng nhanh làm lỗi.</li><li>Không có CI loop; trễ lặp lại.</li><li>Không có recert; năng lực điều hành giảm.</li><li>Không có dữ liệu chuẩn; quyết định theo cảm tính.</li></ol>
+<h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát + Người phụ trách + bằng chứng)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Điểm kiểm soát</th><th>Người phụ trách</th><th>Bằng chứng/MRR</th><th>Quy tắc bắt buộc</th></tr></thead><tbody><tr><td><strong>Cadence: Tier meeting + weekly capacity review</strong></td><td>Ops/Planning</td><td>Lịch họp + nhật ký</td><td>Không nhật ký = không quyết định</td></tr><tr><td><strong>Rule priority class + freeze + kiểm soát thay đổi</strong></td><td>Ops Mgr</td><td>ANNEX-OPS-001</td><td>Thay đổi phải có phê duyệt</td></tr><tr><td><strong>Escalation ladder SLA</strong></td><td>Ops Mgr/GM</td><td>PROC-OPS-003</td><td>SLA phản hồi bắt buộc</td></tr><tr><td><strong>Capacity &amp; bottleneck management</strong></td><td>Ops/<span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span></td><td>Báo cáo bottleneck</td><td>Bottleneck phải có kế hoạch</td></tr><tr><td><strong>KPI dictionary + bảng điều khiển</strong></td><td>QMS/Data</td><td>ANNEX-QMS-008</td><td>KPI không dictionary = không dùng</td></tr><tr><td><strong>CI loop: nguyên nhân gốc trễ + CAPA</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a></span></td><td>NCR/CAPA khi cần</td><td>Trễ lặp lại phải có CAPA</td></tr></tbody></table></div>
+<h2>6) Fail-fast rules (STOP/HOLD/BLOCK)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Loại</th><th>Khi kích hoạt</th><th>Hành động bắt buộc</th></tr></thead><tbody><tr><td><span class="badge bad">STOP</span></td><td><strong>Cam kết giao hàng không dựa trên capacity và dispatch rules.</strong></td><td>Dừng cam kết; chạy capacity check; chốt promise lại.</td></tr><tr><td><span class="badge warn">HOLD</span></td><td><strong>OTD cải thiện bằng cách vượt qua cổng kiểm soát chất lượng.</strong></td><td>HOLD ship; đưa lại cổng kiểm soát; mở NCR khi cần.</td></tr><tr><td><span class="badge bad">BLOCK</span></td><td><strong>Không họp cadence/nhật ký quyết định.</strong></td><td>Khóa thay đổi; yêu cầu họp; phát hành nhật ký quyết định.</td></tr></tbody></table></div>
+<h2>7) Phản ứng 60 giây</h2>
+<ol><li>Đánh dấu rủi ro trễ trên bảng điều khiển/bảng.</li><li>Kích hoạt escal Level 2 khi nguy cơ trễ trong 72h.</li><li>Chốt 1 quyết định: outsource/OT/tách / chia-lot/lập kế hoạch lại và cập nhật ERP.</li><li>Thông báo <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></span> để quản trị kỳ vọng khách.</li><li>Gắn người chịu trách nhiệm + due và kết thúc / đóng xác minh.</li></ol>
+<h2>8) Bảng kiểm vận hành (≤ 15 bước)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>#</th><th>Bước</th><th>người chịu trách nhiệm</th><th>Evidence/MRR</th><th>Lặp lại vấn đề lại phải chặn</th></tr></thead><tbody><tr><td>1</td><td><strong>Chạy hàng tuần công suất rà soát</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Planning and Control Function (Dieu do va kiem soat san xuat)"><span class="entity-code dept-code">D-PPC</span></a></span></td><td>Biên bản rà soát</td><td>Không có dữ liệu</td></tr><tr><td>2</td><td><strong>Xác định nút thắt / điểm nghẽn và kế hoạch 4 tuần</strong></td><td>Ops/<span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span></td><td>Kế hoạch nút thắt / điểm nghẽn</td><td>Không plan</td></tr><tr><td>3</td><td><strong>Ban hành rule điều phối xuất hàng và đóng băng</strong></td><td>Ops</td><td>ANNEX-OPS-001</td><td>Rule không rõ</td></tr><tr><td>4</td><td><strong>Thiết lập escalation nhịp độ / chu kỳ họp Tier 1–3</strong></td><td>Ops</td><td>PROC-OPS-003</td><td>Escal không chạy</td></tr><tr><td>5</td><td><strong>Thiết lập KPI OTD/WIP/lịch trình tuân thủ</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>KPI từ điển</td><td>KPI tranh cãi</td></tr><tr><td>6</td><td><strong>Kiểm liên kết cổng kiểm soát chất lượng</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>Cổng kiểm soát bảng kiểm</td><td>Vượt qua cổng kiểm soát</td></tr><tr><td>7</td><td><strong>Review nguyên nhân gốc trễ và CAPA khi lặp</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a></span></td><td>CAPA log</td><td>Trễ lặp</td></tr><tr><td>8</td><td><strong>Training và tái chứng nhận điều hành</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phong Nhan su)"><span class="entity-code dept-code">D-HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>Theo dõi log</td><td>Không tái chứng nhận</td></tr></tbody></table></div>
+<h2>9) OJT thực chiến theo TWI</h2>
+<h3>Job sự cố hỏng máy (Step / Điểm then chốt / Lý do)</h3>
+<div class="table-card"><table class="table"><thead><tr><th>Step</th><th>Vận hành</th><th>Điểm then chốt</th><th>Lý do</th></tr></thead><tbody><tr><td>1</td><td>Nhịp độ</td><td>Họp có log</td><td>Quyết định rõ</td></tr><tr><td>2</td><td>Công suất</td><td>nút thắt / điểm nghẽn trọng tâm</td><td>Chặn trễ</td></tr><tr><td>3</td><td>Điều phối quy tắc</td><td>Đóng băng + kiểm soát thay đổi</td><td>Ổn định nhịp</td></tr><tr><td>4</td><td>Escal bậc thang năng lực</td><td>SLA + kết thúc / đóng</td><td>Mở khóa</td></tr><tr><td>5</td><td>CI vòng lặp</td><td>Nguyên nhân gốc + CAPA</td><td>Không lặp lỗi</td></tr></tbody></table></div>
+<h3>OJT đầu ra bắt buộc</h3>
+<ul><li>01 bộ rule OTD/công suất được ban hành (nhịp độ / chu kỳ họp + điều phối xuất hàng + escal).</li><li>01 bảng điều khiển OTD/WIP có KPI từ điển.</li><li>01 tình huống xử lý nguy cơ trễ trong 72h có quyết định và log.</li></ul>
+<h3>Tiêu chí đánh giá L1–L4 (hành vi quan sát được)</h3>
+<div class="table-card"><table class="table rubric"><thead><tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện đạt</th></tr></thead><tbody><tr><td><strong>L1</strong></td><td>Trong ca</td><td>Theo điều phối xuất hàng</td></tr><tr><td><strong>L2</strong></td><td>Plan &amp; mức sẵn sàng</td><td>Chuẩn bị trước</td></tr><tr><td><strong>L3</strong></td><td>Điều phối nhóm</td><td>Điều phối/đóng băng/tuổi tồn/escal/huấn luyện viên</td></tr><tr><td><strong>L4</strong></td><td>Thiết kế hệ thống</td><td>Nhịp độ + công suất + KPI + CI vòng lặp</td></tr></tbody></table></div>
+<h2>10) Đánh giá</h2>
+<h3>Bài kiểm tra nhanh (≥ 20 câu)</h3>
+<div class="quiz"><ol><li>Nhịp độ điều hành tối thiểu gồm những cuộc họp nào?</li><li>Công suất rà soát cần dữ liệu nào?</li><li>nút thắt / điểm nghẽn là gì và vì sao phải quản trị?</li><li>Quy tắc ưu tiên P0/P1/P2/P3 lấy từ tài liệu nào?</li><li>Escal Level 3 dùng khi nào?</li><li>Vì sao không được cải thiện OTD bằng vượt qua cổng kiểm soát chất lượng?</li><li>KPI lịch trình tuân thủ đo gì?</li><li>KPI OTD đo theo định nghĩa nào?</li><li>Khi rủi ro trễ trong 72h, escal cấp nào?</li><li>tách / chia-lot dùng để giải quyết tình huống nào?</li><li>Outsource chiến lược phải kiểm soát rủi ro gì?</li><li>Vì sao cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch) giúp tăng OTD?</li><li>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate) áp dụng cho nhịp độ / chu kỳ họp ra sao?</li><li>Khi Kinh doanh cần đổi cam kết, kích hoạt là gì?</li><li>Nêu 03 quyết định cấp Ops Manager đưa ra để cứu OTD.</li><li>Vì sao CAPA cần khi trễ lặp?</li><li>Khi tuổi tồn WIP (tuổi tồn / tuổi tồn) BLACK tăng, nguyên nhân gốc cần kiểm gì?</li><li>Khi công suất thiếu, lựa chọn nào phù hợp?</li><li>Vì sao KPI phải có từ điển?</li><li>Cổng kiểm soát chất lượng bắt buộc trong chuỗi OTD là gì?</li><li>Khi không họp nhịp độ / chu kỳ họp, rủi ro lớn nhất là gì?</li><li>Ai chịu trách nhiệm phê duyệt phá cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch)?</li></ol></div>
+<h3>Tình huống (≥ 3 tình huống thật)</h3>
+<details>
+<summary>OTD giảm nhưng chất lượng tăng NCR</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>Ops đẩy nhanh bằng cách bỏ qua <a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a> cổng kiểm soát</li><li>NCR tăng 30%</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Hành động bắt buộc.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>TẠM GIỮ ship; khôi phục cổng kiểm soát; mở NCR/CAPA; điều chỉnh nhịp độ / chu kỳ họp và đào tạo.</li></ul></div>
+</div>
+</details>
+<details>
+<summary>Rủi ro trễ 72h do nút thắt / điểm nghẽn</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>1 máy là nút thắt / điểm nghẽn</li><li>5 job due trong 3 ngày</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Quyết định cấp hệ thống.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>Escal Level 2; quyết định OT/outsource/tách / chia-lot; cập nhật điều phối xuất hàng; thông báo Kinh doanh.</li></ul></div>
+</div>
+</details>
+<details>
+<summary>Kinh doanh cam kết không qua công suất</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>Khách yêu cầu đẩy nhanh tiến độ</li><li>Kinh doanh hứa 2 ngày</li><li>Công suất không đủ</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Ra quyết định.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>STOP cam kết; chạy công suất kiểm tra; chốt cam kết theo rule; log quyết định.</li></ul></div>
+</div>
+</details>
+<h3>Hiệu suất test</h3>
+<div class="card">
+<h3>Bài test tay nghề — Thiết kế và vận hành 1 chu kỳ OTD</h3>
+<h4>Bài làm bắt buộc</h4>
+<ol><li>Xây nhịp độ / chu kỳ họp tuần và log quyết định.</li><li>Chạy công suất rà soát và xác định nút thắt / điểm nghẽn.</li><li>Ban hành điều phối xuất hàng quy tắc và escalation bậc thang năng lực.</li><li>Thiết lập KPI từ điển và bảng điều khiển.</li><li>Xử lý 1 tình huống rủi ro trễ 72h có quyết định và kết thúc / đóng xác minh.</li></ol>
+<h4>ĐẠT/KHÔNG ĐẠT</h4>
+<ul><li>đạt khi: nhịp độ / chu kỳ họp chạy; quyết định có log; KPI có từ điển; rủi ro trễ có quyết định và kết thúc / đóng.</li><li>Không đạt khi: không log; vượt qua cổng kiểm soát; KPI tranh cãi; escal không theo bậc thang năng lực.</li></ul>
+</div>
+<h2>11) ĐẠT/KHÔNG ĐẠT tiêu chí</h2>
+<div class="kpi-gate">
+<strong>ĐẠT/KHÔNG ĐẠT (Không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</strong>
+<ul>
+<li>đạt khi hoàn thành OJT đầu ra và hiệu suất test đạt; tuân thủ điều phối xuất hàng/đóng băng/escal; có log và kết thúc / đóng.</li>
+<li>FAIL ngay khi vượt qua cổng kiểm soát (REV/TẠM GIỮ/QC), giấu vấn đề chặn, không escal theo SLA, hoặc không có bằng chứng bàn giao.</li>
+</ul>
+</div>
+<h2>12) MRR tối thiểu (hồ sơ bắt buộc + đặt tên + nơi lưu)</h2>
+<p><strong>Quy tắc đặt tên:</strong> <span class="mono">YYYYWW_CapacityReview_Log.pdf + YYYYMMDD_TierDecision_Log.pdf</span></p>
+<ul><li>hàng tuần công suất rà soát log.</li><li>ANNEX-OPS-001 điều phối xuất hàng quy tắc + DCR hồ sơ.</li><li>PROC-OPS-003 escalation log.</li><li>KPI từ điển + bảng điều khiển.</li><li>CAPA log (khi trễ lặp).</li></ul>
+<div class="callout"><strong>Nơi lưu (SSOT):</strong> M365/SharePoint → CNC-IMS-HUB → Job-Hồ sơ (điều phối xuất hàng note/bằng chứng) + được kiểm soát biểu mẫu thư viện.</div>
+<h2>13) Chung đánh giá phát hiện &amp; phòng ngừa</h2>
+<ol><li>Không có nhịp độ / chu kỳ họp/log quyết định.</li><li>Cam kết Ngày giao không dựa công suất.</li><li>Điều phối quy tắc không rõ hoặc không tuân thủ.</li><li>Escalation bậc thang năng lực không vận hành.</li><li>OTD cải thiện bằng vượt qua cổng kiểm soát.</li><li>KPI không từ điển; số liệu tranh cãi.</li><li>Không có CI vòng lặp; trễ lặp lại.</li><li>nút thắt / điểm nghẽn không có kế hoạch dài hạn.</li></ol>
+<h2>Tài liệu liên quan</h2>
+<ul>
+<li><a href="../../../03-Tai-Lieu-Van-Hanh//02-Work-Instructions//05-WI-500//">WI-OPS-003 — Điều phối &amp; WIP Tuổi tồn</a></li>
+<li><a href="../../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/">ANNEX-OPS-001 — Quy tắc Điều phối &amp; WIP Tuổi tồn</a></li>
+<li><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">PROC-PLA-002 — Điều phối control &amp; công suất rà soát</a></li>
+<li><a href="../../../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">PROC-OPS-003 — Escalation SLA &amp; WIP Tuổi tồn</a></li>
+<li><a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-502_Daily_Dispatch_List.xlsx">FRM-OPS-006 — Hàng Ngày Điều phối List</a></li>
+<li><a download="" href="../../../04-Bieu-Mau/05-FRM-500/FRM-503_WIP_Aging_Report.xlsx">FRM-OPS-007 — WIP Tuổi tồn Log</a></li>
+</ul>
+</div></div></div>
+</div>
+<script src="../../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
+
+</div>

@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SYS-OPS-06 — KPI Dictionary & Data Model (Power BI Control Tower) | HESEM OS</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>SYS-OPS-06 - 06 | HESEM QMS</title>
+<link href="../../../assets/style.css" rel="stylesheet">
 <style>
  .mini{font-size:12px;color:#374151;}
  .path{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; font-size:12px;}
@@ -15,369 +14,344 @@
  .stop{display:inline-block;padding:2px 8px;border-radius:999px;background:#fee2e2;border:1px solid #fecaca;font-weight:700;}
  .hold{display:inline-block;padding:2px 8px;border-radius:999px;background:#ffedd5;border:1px solid #fed7aa;font-weight:700;}
  .block{display:inline-block;padding:2px 8px;border-radius:999px;background:#e0f2fe;border:1px solid #bae6fd;font-weight:700;}
- .must{font-weight:800;}
-
-/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
-@media print {
- .card, .table-card, .callout, .note, .box, .iso-map,
- .preface-block, .jd-mission, .form-sheet, .lane,
- .legend, .req, .auth-grid, .backup-card, .vstep {
- page-break-inside: avoid;
- break-inside: avoid;
- }
- h1, h2, h3, .h1, .h2, .h3 {
- page-break-after: avoid;
- break-after: avoid;
- }
- .form-header {
- page-break-inside: avoid;
- break-inside: avoid;
- }
- .sig-row, .sign-row, .approval-row {
- page-break-inside: avoid;
- break-inside: avoid;
- }
- tr { page-break-inside: avoid; break-inside: avoid; }
+ .must{
  thead { display: table-header-group; }
  tfoot { display: table-footer-group; }
  p { orphans: 3; widows: 3; }
- .table-card { overflow: visible !important; }
-}
+ 
 .page-body { overflow-x: hidden; }
 .table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
 table { max-width: 100%; table-layout: auto; }
 td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
-
+}
 </style>
+<style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
 </head>
 <body>
 <div class="container"><div class="page"><div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-  <div class="fh-company">
-    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
-  </div>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
 </div>
 <div class="title">
-  <strong>SYS-OPS-06 — KPI Dictionary & Data Model (Power BI Control Tower)</strong>
-  <span class="sub-vn"></span>
+<strong class="doc-name">06</strong>
+<span class="sub-vn"></span>
 </div>
-<div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>SYS-OPS-06</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
-</div>
+<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">SYS-OPS-06</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
 </div>
 
 <!-- 1) Header VI/EN + Form-Header -->
 <div class="doc-content" id="docContent">
+<div class="note-blue" style="margin:12px 0">
+ <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — System Operations Guide</b>.
+</div>
 <div class="card">
 <div class="grid-2">
 <div>
-<div class="badge"><span class="dot"></span>Module SYS-OPS-06</div>
-<h1 style="margin-top:10px">Từ điển KPI &amp; Mô hình dữ liệu (Power BI Control Tower)</h1>
-<p class="muted">Đào tạo thực chiến để vận hành xưởng CNC job shop theo dữ liệu “một sự thật”, có drill‑down về record và minh chứng (MRR). Mọi quyết định gate/ship/quality sử dụng KPI bắt buộc truy vết được.</p>
+<div class="badge"><span class="dot"></span>Mô-đun SYS-OPS-06</div>
+<h1 style="margin-top:10px">SYS-OPS-06 - 06</h1>
+<p class="muted">Đào tạo thực chiến để vận hành xưởng CNC gia công theo đơn (job shop) theo dữ liệu "một sự thật", có diễn tập‑down về hồ sơ và minh chứng (MRR). Mọi quyết định cổng kiểm soát/ship/quality sử dụng KPI bắt buộc truy vết được.</p>
 <div class="tag blue">Phiên bản</div>
 </div>
 <div class="note">
 <strong>Thông tin triển khai (khóa này KHÔNG học kiểu lý thuyết)</strong>
 <ul>
 <li><strong>Đối tượng (BẮT BUỘC):</strong>
-<span class="pill">Operator</span><span class="pill">Setup</span><span class="pill">Programmer</span><span class="pill">QC</span><span class="pill">QA</span><span class="pill">Warehouse</span><span class="pill">Purchasing</span><span class="pill">Planner</span><span class="pill">Maintenance</span><span class="pill">EHS</span><span class="pill">Estimator (SAL-03)</span><span class="pill">Supervisor</span>
+<span class="pill">CNC Operator</span><span class="pill">Setup</span><span class="pill"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></span><span class="pill"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span><span class="pill"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span><span class="pill"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></span><span class="pill"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html" title="Buyer / Purchasing (Nhan vien mua hang)"><span class="entity-code role-code">BUY</span></a></span></span><span class="pill"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span></span><span class="pill"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Maintenance Function (Bo phan Bao tri)"><span class="entity-code dept-code">D-MNT</span></a></span></span><span class="pill"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a></span><span class="pill"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></span></span><span class="pill"><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></span>
 </li>
-<li><strong>Thời lượng chuẩn:</strong> 2.5 giờ lớp chung (mục 2–7) • 1.5 giờ thực hành theo role (mục 8–10) • OJT 1 ca làm việc (mục 9).</li>
-<li><strong>Điều kiện trước:</strong> Có tài khoản M365/SharePoint + quyền truy cập danh sách vận hành; đã hoàn tất Orientation về “No evidence = No gate”.</li>
-<li><strong>Kích hoạt:</strong> Khi tạo KPI mới, khi sửa công thức KPI, khi thay đổi quan hệ mô hình, khi refresh lỗi, khi audit hỏi “đo KPI bằng gì”.</li>
+<li><strong>Thời lượng chuẩn:</strong> 2.5 giờ lớp chung (mục 2–7) • 1.5 giờ thực hành theo vai trò (mục 8–10) • OJT 1 ca làm việc (mục 9).</li>
+<li><strong>Điều kiện trước:</strong> Có tài khoản M365/SharePoint + quyền truy cập danh sách vận hành; đã hoàn tất định hướng / đào tạo hội nhập về "không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)".</li>
+<li><strong>Kích hoạt:</strong> Khi tạo KPI mới, khi sửa công thức KPI, khi thay đổi quan hệ mô hình, khi làm mới lỗi, khi đánh giá hỏi "đo KPI bằng gì".</li>
 </ul>
 </div>
 </div>
 <div class="toc">
 <strong>Mục lục nhanh</strong>
 <ul>
-<li><a href="#sec2">2) Mục đích module &amp; bối cảnh vận hành</a></li>
-<li><a href="#sec3">3) Vị trí trong chuỗi E2E + handoff + điểm chặn</a></li>
-<li><a href="#sec4">4) Failure Points (&gt;=10)</a></li>
-<li><a href="#sec5">5) Risk Controls (&gt;=6)</a></li>
-<li><a href="#sec6">6) Fail-fast rules + STOP/HOLD/BLOCK</a></li>
+<li><a href="#sec2">2) Mục đích mô-đun &amp; bối cảnh vận hành</a></li>
+<li><a href="#sec3">3) Vị trí trong chuỗi E2E + bàn giao + điểm chặn</a></li>
+<li><a href="#sec4">4) Điểm đứt gãy (&gt;=10)</a></li>
+<li><a href="#sec5">5) Biện pháp kiểm soát rủi ro (&gt;=6)</a></li>
+<li><a href="#sec6">6) Fail-nhanh quy tắc + STOP/TẠM GIỮ/CHẶN</a></li>
 <li><a href="#sec7">7) Phản ứng 60 giây</a></li>
-<li><a href="#sec8">8) Checklist vận hành (&lt;=15 bước)</a></li>
+<li><a href="#sec8">8) Bảng kiểm vận hành (&lt;=15 bước)</a></li>
 <li><a href="#sec9">9) OJT theo TWI</a></li>
-<li><a href="#sec10">10) Đánh giá (Quiz + Scenario + Performance test)</a></li>
-<li><a href="#sec11">11) PASS/FAIL criteria</a></li>
+<li><a href="#sec10">10) Đánh giá (Bài kiểm tra nhanh + Tình huống + Hiệu suất test)</a></li>
+<li><a href="#sec11">11) ĐẠT/KHÔNG ĐẠT tiêu chí</a></li>
 <li><a href="#sec12">12) MRR tối thiểu</a></li>
-<li><a href="#sec13">13) Common audit findings &amp; prevention</a></li>
-<li><a href="#sec14">14) DCR record</a></li>
+<li><a href="#sec13">13) Chung đánh giá phát hiện &amp; phòng ngừa</a></li>
+<li><a href="#sec14">14) DCR hồ sơ</a></li>
 </ul>
 </div>
 </div>
-<!-- 2) Mục đích module & bối cảnh vận hành -->
+<!-- 2) Mục đích module & bối cảnh operation -->
 <div class="card" id="sec2">
-<h2>2) Mục đích module &amp; bối cảnh vận hành (gate/handoff; trách nhiệm; kích hoạt)</h2>
-<p><span class="must">Mục tiêu duy nhất:</span> KPI dùng để điều hành xưởng phải có <span class="must">định nghĩa duy nhất</span>, <span class="must">công thức duy nhất</span>, <span class="must">chủ sở hữu rõ</span>, <span class="must">nguồn dữ liệu rõ</span>, và <span class="must">drill‑down về record + MRR</span>. KPI nào không truy vết được bị xem là <span class="must">không hợp lệ</span> trong mọi cuộc họp và mọi quyết định gate.</p>
+<h2>2) Mục đích mô-đun &amp; bối cảnh vận hành (cổng kiểm soát/bàn giao; trách nhiệm; kích hoạt)</h2>
+<p><span class="must">Mục tiêu duy nhất:</span> KPI dùng để điều hành phân xưởng phải có <span class="must">định nghĩa duy nhất</span>, <span class="must">công thức duy nhất</span>, <span class="must">owner rõ</span>, <span class="must">nguồn dữ liệu rõ</span>, và <span class="must">diễn tập‑xuống / Từng về hồ sơ + MRR</span>. KPI nào không truy vết được bị xem là <span class="must">không hợp lệ</span> trong mọi cuộc họp và mọi quyết định cổng kiểm soát.</p>
 <div class="kpi-box">
 <div class="grid-2">
 <div>
-<strong>Vì sao module này tồn tại (Gate Logic)</strong>
+<strong>Vì sao mô-đun này tồn tại (Cổng kiểm soát Logic)</strong>
 <ul>
-<li>Điều hành theo KPI nhưng mỗi phòng hiểu 1 kiểu tạo ra quyết định sai và phá gate.</li>
-<li>Dashboard hiển thị “xanh” khi dữ liệu thiếu/đúp tạo ra ship sai, NCR trễ, bypass hold.</li>
-<li>Audit hỏi “bằng chứng đâu” mà KPI không có record gốc và không có đường dẫn minh chứng.</li>
+<li>Điều hành theo KPI nhưng mỗi phòng hiểu 1 kiểu tạo ra quyết định sai và phá cổng kiểm soát.</li>
+<li>Bảng điều khiển hiển thị "xanh" khi dữ liệu thiếu/đúp tạo ra ship sai, NCR trễ, vượt qua hold.</li>
+<li>Đánh giá hỏi "bằng chứng đâu" mà KPI không có hồ sơ gốc và không có đường dẫn minh chứng.</li>
 </ul>
 </div>
 <div>
 <strong>Trách nhiệm bắt buộc (không né trách nhiệm)</strong>
 <ul>
-<li><span class="must">QA/QMS</span>: khóa định nghĩa KPI, khóa logic gate “No evidence = No gate”, kiểm soát thay đổi.</li>
-<li><span class="must">IT/BI</span>: khóa mô hình dữ liệu, khóa đo Data Health/Refresh/Latency, khóa quyền truy cập (RLS).</li>
-<li><span class="must">Supervisor</span>: dùng KPI để chặn quyết định, ép ghi nhận hành động và MRR trong standup.</li>
-<li><span class="must">Mọi role vận hành</span>: tạo dữ liệu đúng khóa (JobNum/Rev/Date), gắn link minh chứng, không tạo “Excel riêng”.</li>
+<li><span class="must"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span>: khóa định nghĩa KPI, khóa logic cổng kiểm soát "không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)", kiểm soát thay đổi.</li>
+<li><span class="must"><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="SYSTEM_OWNERS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-system-owners" title="System Owners (Nhom so huu he thong) — ITA / ESA"><span class="entity-code bundle-code">SYSTEM_OWNERS</span></a></span></span>: khóa mô hình dữ liệu, khóa đo Data Sức khỏe/Làm mới/độ trễ, khóa quyền truy cập (RLS).</li>
+<li><span class="must"><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></span>: dùng KPI để chặn quyết định, ép ghi nhận hành động và MRR trong họp đứng / họp nhanh.</li>
+<li><span class="must">Mọi vai trò vận hành</span>: tạo dữ liệu đúng khóa (JobNum/Rev/Date), gắn link minh chứng, không tạo "Excel riêng".</li>
 </ul>
 </div>
 </div>
 </div>
-<h3>Áp dụng theo role (phần nào áp dụng riêng + tiêu chí đạt khác nhau)</h3>
-<p class="muted">Bảng dưới là “hợp đồng trách nhiệm dữ liệu”. Role tạo dữ liệu sai làm KPI sai. KPI sai làm quyết định sai. Quy tắc: <span class="must">Sai khóa = Sai KPI = HOLD</span>.</p>
+<h3>Áp dụng theo vai trò (phần nào áp dụng riêng + tiêu chí đạt khác nhau)</h3>
+<p class="muted">Bảng dưới là "hợp đồng trách nhiệm dữ liệu". Vai trò tạo dữ liệu sai làm KPI sai. KPI sai làm quyết định sai. Quy tắc: <span class="must">Sai khóa = Sai KPI = TẠM GIỮ</span>.</p>
 <div class="table-card">
 <table class="table tight">
 <thead>
 <tr>
-<th style="width:140px">Role</th>
-<th>Phần áp dụng riêng trong module</th>
-<th style="width:260px">Tiêu chí đạt theo role (PASS tối thiểu)</th>
+<th style="width:140px">Vai trò</th>
+<th>Phần áp dụng riêng trong mô-đun</th>
+<th style="width:260px">Tiêu chí đạt theo vai trò (PASS tối thiểu)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>Operator</strong></td>
-<td>Nhập dữ liệu thực thi theo ca (downtime, hoàn thành công đoạn, chứng từ kèm JobNum/Rev). Khi dashboard báo thiếu minh chứng phải dừng và báo.</td>
-<td>Ghi đủ <span class="path">JobNum + RevisionNum</span> trong record; gắn link minh chứng; xử lý “data missing” theo phản ứng 60 giây.</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html" title="CNC Operator (Nhan vien van hanh CNC)"><span class="entity-code role-code">OPR</span></a></span></td>
+<td>Nhập dữ liệu thực thi theo ca (thời gian dừng máy, hoàn thành công đoạn, chứng từ kèm JobNum/Rev). Khi bảng điều khiển báo thiếu minh chứng phải dừng và báo.</td>
+<td>Ghi đủ <span class="path">JobNum + RevisionNum</span> trong hồ sơ; gắn link minh chứng; xử lý "data thiếu" theo phản ứng 60 giây.</td>
 </tr>
 <tr>
 <td><strong>Setup</strong></td>
-<td>Ghi tool life / setup event / xác nhận chạy mẫu theo đúng JobNum/OprSeq; khi thay dao/offset có liên quan downtime &amp; chất lượng phải ghi record.</td>
-<td>Record có <span class="path">JobNum + OprSeq + MachineID</span>; mô tả nguyên nhân theo ReasonCode; có ảnh/biên bản kèm link.</td>
+<td>Ghi tuổi dao (tool tuổi thọ / vòng đời) / setup sự kiện / xác nhận chạy mẫu theo đúng JobNum/OprSeq; khi thay dao/bù trừ (offset) có liên quan thời gian dừng máy &amp; chất lượng phải ghi hồ sơ.</td>
+<td>Hồ sơ có <span class="path">JobNum + OprSeq + MachineID</span>; mô tả nguyên nhân theo ReasonCode; có ảnh/biên bản kèm link.</td>
 </tr>
 <tr>
-<td><strong>Programmer</strong></td>
-<td>Khóa Revision/route/OprSeq để dữ liệu “đúng rev”. Khi thay đổi chương trình gây thay đổi KPI (cycle/setup/scrap) phải đi qua change control.</td>
-<td>Không có mismatch <span class="path">RevisionNum</span> giữa JobIndex và dữ liệu thực thi; có ghi nhận thay đổi theo MRR.</td>
+<td><strong><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></strong></td>
+<td>Khóa Phiên bản/lộ trình gia công/OprSeq để dữ liệu "đúng rev". Khi thay đổi chương trình gây thay đổi KPI (cycle/setup/phế phẩm) phải đi qua kiểm soát thay đổi.</td>
+<td>Không có không khớp <span class="path">RevisionNum</span> giữa JobIndex và dữ liệu thực thi; có ghi nhận thay đổi theo MRR.</td>
 </tr>
 <tr>
-<td><strong>QC</strong></td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td>
 <td>Ghi IR/FAI/hold theo JobNum; gắn kết quả đo và minh chứng; không cho pass miệng.</td>
-<td>IR/FAI có link minh chứng; hold có containment; không có “pass không hồ sơ”.</td>
+<td>IR/FAI có link minh chứng; hold có ngăn chặn; không có "pass không hồ sơ".</td>
 </tr>
 <tr>
-<td><strong>QA</strong></td>
-<td>Quản trị Hold/NCR/CAPA; khóa logic gate; phê duyệt định nghĩa KPI; xác nhận drill‑down chạy đến record và evidence.</td>
-<td>Thiết lập PASS/FAIL gate trong KPI dictionary; mọi hold/NCR/CAPA có trạng thái + owner + evidence link.</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td>
+<td>Governance Hold/NCR/CAPA; khóa logic cổng kiểm soát; phê duyệt định nghĩa KPI; xác nhận diễn tập‑xuống / Từng chạy đến hồ sơ và bằng chứng.</td>
+<td>Thiết lập ĐẠT/KHÔNG ĐẠT cổng kiểm soát trong KPI từ điển; mọi hold/NCR/CAPA có trạng thái + người chịu trách nhiệm + bằng chứng link.</td>
 </tr>
 <tr>
-<td><strong>Warehouse</strong></td>
-<td>Ghi ShipRelease/Packaging/SSCC; khóa “Ship Readiness” theo packet complete + reconciliation; không phát hành khi thiếu.</td>
-<td>ShipRelease có đủ cờ gate (PacketComplete/PackagingPass/FinalIRPass/ReconciliationStatus) và link dossier/packet.</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td>
+<td>Ghi ShipRelease/Đóng gói/SSCC; khóa "Ship Mức sẵn sàng" theo gói hồ sơ đầy đủ + đối soát; không phát hành khi thiếu.</td>
+<td>ShipRelease có đủ cờ cổng kiểm soát (PacketComplete/PackagingPass/FinalIRPass/ReconciliationStatus) và link hồ sơ/gói hồ sơ.</td>
 </tr>
 <tr>
-<td><strong>Purchasing</strong></td>
-<td>Ghi ReceivingIQC/Outsource; khóa vendor evidence; không nhập hàng khi thiếu chứng từ bắt buộc.</td>
-<td>IQC/outsource record có JobNum/Part/Rev và link COA/biên bản; vi phạm tạo HOLD.</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Purchasing Function (Bo phan Mua hang)"><span class="entity-code dept-code">D-PUR</span></a></span></td>
+<td>Ghi ReceivingIQC/Outsource; khóa nhà cung cấp bằng chứng; không nhập hàng khi thiếu chứng từ bắt buộc.</td>
+<td>IQC/outsource hồ sơ có JobNum/Part/Rev và link COA/biên bản; vi phạm tạo TẠM GIỮ.</td>
 </tr>
 <tr>
-<td><strong>Planner</strong></td>
-<td>Sở hữu KPI OTD/WIP; quản trị DispatchPlan/WIPTracker; bắt buộc dùng KPI dictionary khi báo cáo.</td>
-<td>OTD/WIP báo cáo theo định nghĩa; drill‑down đến job list; có bucket aging đúng chuẩn.</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span></td>
+<td>Sở hữu KPI OTD/WIP; quản trị DispatchPlan/WIPTracker; bắt buộc dùng KPI từ điển khi báo cáo.</td>
+<td>OTD/WIP báo cáo theo định nghĩa; diễn tập‑xuống / Từng đến job list; có nhóm / phân loại tuổi tồn (lão hóa / cũ) đúng chuẩn.</td>
 </tr>
 <tr>
-<td><strong>Maintenance</strong></td>
-<td>Ghi DowntimeEvents; khóa CauseCode/DowntimeGroup; gắn bằng chứng sửa chữa; khi downtime spike phải mở hành động.</td>
-<td>Downtime record đủ start/end/minutes; cause code rõ; evidence link có.</td>
+<td><strong><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Maintenance Function (Bo phan Bao tri)"><span class="entity-code dept-code">D-MNT</span></a></span></strong></td>
+<td>Ghi DowntimeEvents; khóa CauseCode/DowntimeGroup; gắn bằng chứng sửa chữa; khi thời gian dừng máy đột biến / tăng đột ngột phải mở hành động.</td>
+<td>Thời gian dừng máy hồ sơ đủ start/end/biên bản họp; nguyên nhân code rõ; bằng chứng link có.</td>
 </tr>
 <tr>
-<td><strong>EHS</strong></td>
-<td>Chỉ sử dụng KPI khi dữ liệu incident/near‑miss có SSOT. Khi chưa có bảng dữ liệu chuẩn phải ghi M365/SharePoint → HESEM-QMS-SSOT.</td>
-<td>Không đưa KPI EHS vào scorecard khi chưa có SSOT và naming rule; mục thiếu phải gắn M365/SharePoint → HESEM-QMS-SSOT.</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-ehs-handbook.html" title="EHS Department (Phong EHS)"><span class="entity-code dept-code">D-EHS</span></a></span></td>
+<td>Chỉ sử dụng KPI khi dữ liệu sự cố/sự cố suýt xảy ra (Cần / suýt-thiếu / bỏ sót) có SSOT. Khi chưa có bảng dữ liệu chuẩn phải ghi M365/SharePoint → HESEM-QMS-SSOT.</td>
+<td>Không đưa KPI <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a> vào thẻ điểm (bảng điểm) khi chưa có SSOT và đặt tên rule; mục thiếu phải gắn M365/SharePoint → HESEM-QMS-SSOT.</td>
 </tr>
 <tr>
-<td><strong>Estimator (SAL-03)</strong></td>
-<td>Chỉ sử dụng KPI khi có dữ liệu complaints/feedback có record và evidence. Khi khách hỏi KPI phải trả bằng định nghĩa chuẩn.</td>
-<td>Không báo KPI CS khi thiếu record; mọi complaint có ID + evidence link theo MRR.</td>
+<td><strong><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></span></strong></td>
+<td>Chỉ sử dụng KPI khi có dữ liệu khiếu nại/phản hồi có hồ sơ và bằng chứng. Khi khách hỏi KPI phải trả bằng định nghĩa chuẩn.</td>
+<td>Không báo KPI <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="entity-code role-code">CS</span></a> khi thiếu hồ sơ; mọi khiếu nại có ID + bằng chứng link theo MRR.</td>
 </tr>
 <tr>
-<td><strong>Supervisor</strong></td>
-<td>Dẫn dắt Control Tower; ép dùng KPI dictionary; chặn quyết định khi KPI không đủ evidence; ghi action &amp; owner.</td>
-<td>Standup dùng KPI có drill‑down; mọi bất ổn có action record; không có action bị xem là FAIL.</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td>
+<td>Dẫn dắt Trung tâm điều hành; ép dùng KPI từ điển; chặn quyết định khi KPI không đủ bằng chứng; ghi hành động &amp; người chịu trách nhiệm.</td>
+<td>họp đứng / họp nhanh dùng KPI có diễn tập‑xuống / Từng; mọi bất ổn có hành động hồ sơ; không có hành động bị xem là FAIL.</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<!-- 3) Vị trí E2E + handoff + điểm chặn -->
+<!-- 3) Vị trí E2E + handoff + hold point -->
 <div class="card" id="sec3">
-<h2>3) Vị trí trong chuỗi E2E + luồng handoff (input/output) + “điểm chặn”</h2>
-<p>Module này là “lớp kiểm soát” chạy xuyên suốt chuỗi E2E. KPI chỉ được dùng khi <span class="must">đi qua 3 lớp</span>: (1) định nghĩa trong KPI dictionary, (2) mô hình dữ liệu có khóa truy vết, (3) minh chứng (MRR) có đường dẫn.</p>
+<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + "điểm chặn"</h2>
+<p>Mô-đun này là "lớp kiểm soát" chạy xuyên suốt chuỗi E2E. KPI chỉ được dùng khi <span class="must">đi qua 3 lớp</span>: (1) định nghĩa trong KPI từ điển, (2) mô hình dữ liệu có khóa truy vết, (3) minh chứng (MRR) có đường dẫn.</p>
 <div class="card">
-<h3>Chuỗi E2E (module bám vào bước nào)</h3>
-<p class="muted">Chuỗi chuẩn: Quote/Contract → Planning → Engineering → Purchasing → Receiving → Production → QC/QA → NCR/MRB → Final → Packing → Ship → Feedback/CI.</p>
+<h3>Chuỗi E2E (mô-đun bám vào bước nào)</h3>
+<p class="muted">Chuỗi chuẩn: Báo giá/Hợp đồng → Kế hoạch → Kỹ thuật → Mua hàng → Nhận hàng → Sản xuất → QC/QA → NCR/MRB → Final → Đóng gói → Ship → Phản hồi/CI.</p>
 <div class="table-card">
 <table class="table tight">
 <thead>
 <tr>
 <th style="width:220px">Bước</th>
-<th>Input dữ liệu (tối thiểu)</th>
-<th>Output KPI/điểm chặn</th>
+<th>Đầu vào dữ liệu (tối thiểu)</th>
+<th>Đầu ra KPI/điểm chặn</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>Planning</strong></td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Planning and Control Function (Dieu do va kiem soat san xuat)"><span class="entity-code dept-code">D-PPC</span></a></span></td>
 <td>JobIndex, DispatchPlan, WIPTracker (JobNum/DueDate/WIPStage/AgingStatus)</td>
-<td>OTD, WIP Aging, Dispatch adherence <span class="must">→ chặn</span> khi JobNum/Rev trống hoặc aging bucket sai.</td>
+<td>OTD, WIP Tuổi tồn, Điều phối tuân thủ <span class="must">→ chặn</span> khi JobNum/Rev trống hoặc tuổi tồn nhóm / phân loại sai.</td>
 </tr>
 <tr>
-<td><strong>Production</strong></td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a></span></td>
 <td>LaborMirror, DowntimeEvents, ToolLifeEvents, JobOperIndex</td>
-<td>Downtime minutes, labor hours <span class="must">→ chặn</span> khi thiếu MachineID/JobNum/OprSeq.</td>
+<td>Thời gian dừng máy biên bản họp, nhân công giờ <span class="must">→ chặn</span> khi thiếu MachineID/JobNum/OprSeq.</td>
 </tr>
 <tr>
-<td><strong>QC/QA</strong></td>
-<td>InspectionReports, FAIReports, QCHoldLog, NCRLog, CAPA8D, ApprovalHistory</td>
-<td>Hold SLA, NCR Rate, CAPA Aging <span class="must">→ chặn</span> khi không có evidence link hoặc bypass hold.</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td>
+<td>InspectionReports, Báo cáo FAI, QCHoldLog, NCRLog, CAPA8D, ApprovalHistory</td>
+<td>Hold SLA, NCR Tỷ lệ, CAPA Tuổi tồn <span class="must">→ chặn</span> khi không có bằng chứng link hoặc vượt qua hold.</td>
 </tr>
 <tr>
-<td><strong>Packing/Ship</strong></td>
+<td><strong>Đóng gói/Ship</strong></td>
 <td>PackagingChecks, PackSSCCRegister, ShipRelease, ShipmentMirror</td>
-<td>Ship Readiness, OTD <span class="must">→ chặn</span> khi PacketComplete/ReconciliationStatus không PASS.</td>
+<td>Ship Mức sẵn sàng, OTD <span class="must">→ chặn</span> khi PacketComplete/ReconciliationStatus không PASS.</td>
 </tr>
 <tr>
-<td><strong>Feedback/CI</strong></td>
-<td>M365/SharePoint → HESEM-QMS-SSOT bảng Complaint/Feedback SSOT</td>
-<td>KPI CS chỉ được bật khi SSOT tồn tại và có evidence link.</td>
+<td><strong>Phản hồi/CI</strong></td>
+<td>M365/SharePoint → HESEM-QMS-SSOT bảng Khiếu nại/Phản hồi SSOT</td>
+<td>KPI <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="entity-code role-code">CS</span></a> chỉ được bật khi SSOT tồn tại và có bằng chứng link.</td>
 </tr>
 <tr>
-<td><strong>EHS</strong></td>
-<td>M365/SharePoint → HESEM-QMS-SSOT bảng Incident/Near‑miss SSOT</td>
-<td>KPI EHS chỉ được bật khi SSOT tồn tại và có evidence link.</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-ehs-handbook.html" title="EHS Department (Phong EHS)"><span class="entity-code dept-code">D-EHS</span></a></span></td>
+<td>M365/SharePoint → HESEM-QMS-SSOT bảng Sự cố/Sự cố suýt xảy ra SSOT</td>
+<td>KPI <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a> chỉ được bật khi SSOT tồn tại và có bằng chứng link.</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<h3>Luồng handoff (input/output) bắt buộc</h3>
+<h3>Luồng bàn giao (đầu vào/đầu ra) bắt buộc</h3>
 <div class="grid-2">
 <div class="card">
-<h4 style="margin-top:0">Handoff A — Tạo/Sửa KPI (định nghĩa)</h4>
+<h4 style="margin-top:0">Bàn giao A — Tạo/Sửa KPI (định nghĩa)</h4>
 <ul>
-<li><span class="must">Input:</span> yêu cầu KPI từ Supervisor/Process owner; mô tả quyết định cần chặn; rủi ro cần giảm.</li>
-<li><span class="must">Output:</span> 01 bản ghi KPI dictionary (name/owner/cadence/source/drillthrough) + 01 bản ghi change control.</li>
-<li><span class="must">Điểm chặn:</span> KPI không có owner hoặc không có nguồn dữ liệu bị khóa ở trạng thái <span class="block">BLOCK</span>.</li>
+<li><span class="must">Đầu vào:</span> yêu cầu KPI từ <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span>/<a class="entity-link bundle-link bundle-chip" data-bundle="OPS_SCOPE_OWNERS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-ops-scope-owners" title="Operational Scope Owners (Nhom dau moi so huu pham vi van hanh) — CS / EST / PPL / PD / ENGM / QA[QMR] / QMS / SCM / FIN / HR / EHS / ITA / WKM / SL / QCL / LOG"><span class="entity-code bundle-code">OPS_SCOPE_OWNERS</span></a>; mô tả quyết định cần chặn; rủi ro cần giảm.</li>
+<li><span class="must">Đầu ra:</span> 01 bản ghi KPI từ điển (name/người chịu trách nhiệm/nhịp độ / chu kỳ họp/source/truy vấn chi tiết (drillthrough) + 01 bản ghi kiểm soát thay đổi.</li>
+<li><span class="must">Điểm chặn:</span> KPI không có người chịu trách nhiệm hoặc không có nguồn dữ liệu bị khóa ở trạng thái <span class="block">CHẶN</span>.</li>
 </ul>
 </div>
 <div class="card">
-<h4 style="margin-top:0">Handoff B — Sửa mô hình dữ liệu (relationship / measure)</h4>
+<h4 style="margin-top:0">Bàn giao B — Sửa mô hình dữ liệu (mối quan hệ / đo lường)</h4>
 <ul>
-<li><span class="must">Input:</span> KPI dictionary đã phê duyệt + map bảng dữ liệu + khóa join.</li>
-<li><span class="must">Output:</span> BI release note + kết quả Data Health + drill‑down proof (ảnh/đường dẫn record).</li>
-<li><span class="must">Điểm chặn:</span> quan hệ không qua kiểm thử “job drillthrough” bị khóa publish <span class="stop">STOP</span>.</li>
+<li><span class="must">Đầu vào:</span> KPI từ điển đã phê duyệt + map bảng dữ liệu + khóa tham gia / nối.</li>
+<li><span class="must">Đầu ra:</span> BI phát hành note + kết quả Data Sức khỏe + diễn tập‑xuống / Từng bằng chứng (ảnh/đường dẫn hồ sơ).</li>
+<li><span class="must">Điểm chặn:</span> quan hệ không qua kiểm thử "job truy vấn chi tiết (drillthrough)" bị khóa công bố / phát hành <span class="stop">STOP</span>.</li>
 </ul>
 </div>
 </div>
-<h3>Điểm chặn cốt lõi (No evidence = No gate)</h3>
+<h3>Điểm chặn cốt lõi (Không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</h3>
 <ul>
-<li><span class="must">Gate 1 — Định nghĩa:</span> KPI không nằm trong KPI dictionary bị cấm xuất hiện trên dashboard.</li>
-<li><span class="must">Gate 2 — Truy vết:</span> KPI không drill‑down đến danh sách record (Job/Pack/NCR) bị xem là “không đo”.</li>
-<li><span class="must">Gate 3 — Minh chứng:</span> record không có link minh chứng (EvidenceFolderUrl/PacketFolderUrl) bị gắn trạng thái <span class="hold">HOLD</span> cho quyết định liên quan.</li>
+<li><span class="must">Cổng kiểm soát 1 — Định nghĩa:</span> Bảng điều khiển chỉ được dùng KPI nằm trong KPI từ điển.</li>
+<li><span class="must">Cổng kiểm soát 2 — Truy vết:</span> KPI không diễn tập‑xuống / Từng đến danh sách hồ sơ (Job/Pack/NCR) bị xem là "không đo".</li>
+<li><span class="must">Cổng kiểm soát 3 — Minh chứng:</span> hồ sơ không có link minh chứng (EvidenceFolderUrl/PacketFolderUrl) bị gắn trạng thái <span class="hold">TẠM GIỮ</span> cho quyết định liên quan.</li>
 </ul>
 </div>
 <!-- 4) Failure Points -->
 <div class="card" id="sec4">
-<h2>4) Failure Points (tối thiểu 10 điểm gãy thực tế gắn với bước)</h2>
-<p class="muted">Mỗi điểm gãy phải có “dấu hiệu” và “hậu quả vận hành”. Khi thấy dấu hiệu phải kích hoạt Fail‑fast (mục 6) và phản ứng 60 giây (mục 7).</p>
+<h2>4) Điểm đứt gãy (tối thiểu 10 điểm gãy thực tế gắn với bước)</h2>
+<p class="muted">Mỗi điểm gãy phải có "dấu hiệu" và "hậu quả vận hành". Khi thấy dấu hiệu phải kích hoạt Fail‑nhanh (mục 6) và phản ứng 60 giây (mục 7).</p>
 <div class="table-card">
 <table class="table tight">
 <thead>
 <tr>
 <th style="width:220px">Điểm gãy</th>
 <th>Dấu hiệu (quan sát được)</th>
-<th>Hậu quả (vận hành/audit)</th>
+<th>Hậu quả (vận hành/đánh giá)</th>
 </tr>
 </thead>
 <tbody>
-<tr><td><strong>1) KPI trùng tên, khác định nghĩa</strong></td><td>Hai phòng báo OTD khác nhau trong cùng ngày</td><td>Quyết định sai; audit kết luận “không kiểm soát đo lường”</td></tr>
-<tr><td><strong>2) Sai Rev/phiên bản</strong></td><td>JobIndex[RevisionNum] khác dữ liệu thực thi/ship packet</td><td>Ship sai; NCR nặng; truy vết gãy</td></tr>
-<tr><td><strong>3) Mix‑up JobNum</strong></td><td>Record thiếu JobNum hoặc JobNum không tồn tại</td><td>KPI lệch; drill‑down đứt; mất chứng cứ</td></tr>
-<tr><td><strong>4) Duplicate record</strong></td><td>Hai ShipRelease cùng PackID/SSCC; hoặc NCR trùng</td><td>KPI “đếm đôi”; báo động giả</td></tr>
-<tr><td><strong>5) Missing evidence link</strong></td><td>EvidenceFolderUrl/PacketFolderUrl trống</td><td>Không chứng minh; gate không hợp lệ</td></tr>
-<tr><td><strong>6) Bypass hold</strong></td><td>ShipRelease status “Approved” khi QCHoldLog còn “Open”</td><td>Ship rủi ro; vi phạm QMS</td></tr>
-<tr><td><strong>7) Refresh lỗi/độ trễ</strong></td><td>Dashboard đứng số; last refresh vượt SLA</td><td>Họp dựa trên dữ liệu cũ; quyết định sai</td></tr>
-<tr><td><strong>8) Sai grain mô hình</strong></td><td>Measure join fact‑to‑fact tạo số phình bất ổn</td><td>KPI sai hệ thống; audit không chấp nhận</td></tr>
-<tr><td><strong>9) Không có DimDate chuẩn</strong></td><td>Time intelligence lệch; tuần/tháng sai</td><td>Trend sai; KPI mục tiêu sai</td></tr>
-<tr><td><strong>10) Quyền truy cập sai (RLS)</strong></td><td>User thấy dữ liệu không thuộc phạm vi</td><td>Rủi ro bảo mật; mất kiểm soát khách hàng</td></tr>
-<tr><td><strong>11) KPI không có “coverage/health”</strong></td><td>KPI xanh nhưng nhiều record thiếu khóa</td><td>Ảo giác số liệu; audit đánh FAIL</td></tr>
-<tr><td><strong>12) Dữ liệu ngoài hệ thống</strong></td><td>Phòng ban dùng Excel riêng, không đẩy vào SSOT</td><td>Không đồng nhất; không truy vết; quyết định sai</td></tr>
+<tr><td><strong>1) KPI trùng tên, khác định nghĩa</strong></td><td>Hai phòng báo OTD khác nhau trong cùng ngày</td><td>Quyết định sai; đánh giá kết luận "không kiểm soát đo lường"</td></tr>
+<tr><td><strong>2) Sai phiên bản</strong></td><td>JobIndex[RevisionNum] khác dữ liệu thực thi/bộ hồ sơ giao hàng (ship gói hồ sơ)</td><td>Ship sai; NCR nặng; truy vết gãy</td></tr>
+<tr><td><strong>3) Lẫn lộn (mix-up) JobNum</strong></td><td>Hồ sơ thiếu JobNum hoặc JobNum không tồn tại</td><td>KPI lệch; diễn tập‑xuống / Từng đứt; mất chứng cứ</td></tr>
+<tr><td><strong>4) trùng lặp hồ sơ</strong></td><td>Hai ShipRelease cùng PackID/SSCC; hoặc NCR trùng</td><td>KPI "đếm đôi"; báo động giả</td></tr>
+<tr><td><strong>5) thiếu bằng chứng link</strong></td><td>EvidenceFolderUrl/PacketFolderUrl trống</td><td>Không chứng minh; cổng kiểm soát không hợp lệ</td></tr>
+<tr><td><strong>6) Vượt qua hold</strong></td><td>ShipRelease trạng thái "Đã phê duyệt" khi QCHoldLog còn "Mở"</td><td>Ship rủi ro; vi phạm <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></td></tr>
+<tr><td><strong>7) Làm mới lỗi/độ trễ</strong></td><td>Bảng điều khiển đứng số; cuối cùng làm mới vượt SLA</td><td>Họp dựa trên dữ liệu cũ; quyết định sai</td></tr>
+<tr><td><strong>8) Sai hạt / thớ mô hình</strong></td><td>đo lường tham gia / nối thực tế‑to‑thực tế tạo số phình bất ổn</td><td>KPI sai hệ thống; đánh giá bác bỏ</td></tr>
+<tr><td><strong>9) Không có DimDate chuẩn</strong></td><td>Time trí tuệ lệch; tuần/tháng sai</td><td>Xu hướng sai; KPI mục tiêu sai</td></tr>
+<tr><td><strong>10) Quyền truy cập sai (RLS)</strong></td><td>Người dùng thấy dữ liệu không thuộc phạm vi</td><td>Rủi ro bảo mật; mất kiểm soát khách hàng</td></tr>
+<tr><td><strong>11) KPI không có "phạm vi bao phủ/sức khỏe"</strong></td><td>KPI xanh nhưng nhiều hồ sơ thiếu khóa</td><td>Ảo giác số liệu; đánh giá đánh FAIL</td></tr>
+<tr><td><strong>12) Dữ liệu ngoài hệ thống</strong></td><td>Department dùng Excel riêng, không đẩy vào SSOT</td><td>Không đồng nhất; không truy vết; quyết định sai</td></tr>
 </tbody>
 </table>
 </div>
 </div>
 <!-- 5) Risk Controls -->
 <div class="card" id="sec5">
-<h2>5) Risk Controls (liệt kê control points; ai làm; bằng chứng; tối thiểu 6 control points)</h2>
-<p>Control point là “cửa chặn có bằng chứng”. Mọi control point có owner, trigger, và MRR bắt buộc.</p>
+<h2>5) Biện pháp kiểm soát rủi ro (liệt kê điểm kiểm soát; ai làm; bằng chứng; tối thiểu 6 điểm kiểm soát)</h2>
+<p>điểm kiểm soát là "cửa chặn có bằng chứng". Mọi điểm kiểm soát có người chịu trách nhiệm, kích hoạt, và MRR bắt buộc.</p>
 <div class="table-card">
 <table class="table tight">
 <thead>
 <tr>
-<th style="width:210px">Control point</th>
-<th style="width:160px">Owner</th>
+<th style="width:210px">Điểm kiểm soát</th>
+<th style="width:160px">người chịu trách nhiệm</th>
 <th>Quy tắc bắt buộc</th>
-<th style="width:240px">MRR/Bằng chứng tối thiểu</th>
+<th style="width:240px">MRR/Evidence tối thiểu</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>CP1 — KPI Dictionary Lock</strong></td>
-<td>QA/QMS</td>
-<td>Chỉ KPI có ID duy nhất, owner, cadence, source tables, drill‑through mới được publish.</td>
-<td>01 bản ghi KPI dictionary + 01 phê duyệt (ApprovalHistory).</td>
+<td><strong>CP1 — từ điển KPI (từ điển) khóa</strong></td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td>
+<td>Chỉ KPI có ID duy nhất, người chịu trách nhiệm, nhịp độ / chu kỳ họp, source bảng, diễn tập‑xuyên suốt mới được công bố / phát hành.</td>
+<td>01 bản ghi KPI từ điển + 01 phê duyệt (ApprovalHistory).</td>
 </tr>
 <tr>
-<td><strong>CP2 — BI Release Notes</strong></td>
-<td>IT/BI</td>
-<td>Thay đổi DAX/relationship/refresh/RLS bắt buộc ghi release note và risk/rollback.</td>
-<td>BI_ReleaseNotes: SSOT/BI-ReleaseNotes (SharePoint List) + file export model checksum: SSOT/Data-Model-Checksums (checksum.txt).</td>
+<td><strong>CP2 — BI Phát hành Ghi chú</strong></td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="SYSTEM_OWNERS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-system-owners" title="System Owners (Nhom so huu he thong) — ITA / ESA"><span class="entity-code bundle-code">SYSTEM_OWNERS</span></a></span></td>
+<td>Thay đổi DAX/mối quan hệ/làm mới/RLS bắt buộc ghi phát hành note và rủi ro/hoàn tác / quay lại.</td>
+<td>BI_ReleaseNotes: SSOT/BI-ReleaseNotes (SharePoint List) + file export mô hình tổng kiểm tra: SSOT/Data-Mô hình-giá trị kiểm tra (tổng kiểm tra) (tổng kiểm tra.txt).</td>
 </tr>
 <tr>
-<td><strong>CP3 — Data Health Page</strong></td>
-<td>IT/BI</td>
-<td>Dashboard phải có chỉ số: null key, duplicate, latency, mismatch Rev.</td>
-<td>Ảnh chụp Data Health + log kiểm tra ngày/ca.</td>
+<td><strong>CP3 — Data Sức khỏe Page</strong></td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="SYSTEM_OWNERS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-system-owners" title="System Owners (Nhom so huu he thong) — ITA / ESA"><span class="entity-code bundle-code">SYSTEM_OWNERS</span></a></span></td>
+<td>Bảng điều khiển phải có chỉ số: null key, trùng lặp, độ trễ, không khớp Rev.</td>
+<td>Ảnh chụp Data Sức khỏe + log kiểm tra ngày/ca.</td>
 </tr>
 <tr>
-<td><strong>CP4 — Evidence Completeness Validator</strong></td>
-<td>QA + Warehouse</td>
-<td>ShipRelease chỉ “Approved” khi PacketComplete + PackagingPass + FinalIRPass + ReconciliationStatus đều PASS.</td>
-<td>ShipRelease record + link PacketFolderUrl + PackagingChecks + IR/FAI link.</td>
+<td><strong>CP4 — Evidence Tính đầy đủ Người xác nhận</strong></td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td>
+<td>ShipRelease chỉ "Đã phê duyệt" khi PacketComplete + PackagingPass + FinalIRPass + ReconciliationStatus đều PASS.</td>
+<td>ShipRelease hồ sơ + link PacketFolderUrl + PackagingChecks + IR/FAI link.</td>
 </tr>
 <tr>
-<td><strong>CP5 — Refresh &amp; Alerting</strong></td>
-<td>IT/BI</td>
-<td>Refresh thất bại hoặc vượt SLA phải phát cảnh báo và khóa quyết định bằng dashboard.</td>
-<td>Log refresh (Power BI service) + thông báo Teams: QMS-ALERT + tạo Ticket: IT-HELPDESK.</td>
+<td><strong>CP5 — Làm mới &amp; cảnh báo</strong></td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="SYSTEM_OWNERS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-system-owners" title="System Owners (Nhom so huu he thong) — ITA / ESA"><span class="entity-code bundle-code">SYSTEM_OWNERS</span></a></span></td>
+<td>Làm mới thất bại hoặc vượt SLA phải phát cảnh báo và khóa quyết định bằng bảng điều khiển.</td>
+<td>Log làm mới (Power BI dịch vụ) + thông báo Teams: QMS-ALERT + tạo phiếu yêu cầu: IT-bộ phận hỗ trợ.</td>
 </tr>
 <tr>
-<td><strong>CP6 — RLS &amp; Access Control</strong></td>
-<td>IT + QA/QMS</td>
-<td>Quyền xem theo role; workspace role “Viewer” áp dụng RLS; Admin/Member không được dùng cho người xem dữ liệu giới hạn.</td>
-<td>Danh sách phân quyền + ảnh cấu hình role + kiểm thử 2 user.</td>
+<td><strong>CP6 — RLS &amp; Kiểm soát truy cập</strong></td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td>
+<td>Quyền xem theo vai trò; không gian làm việc vai trò "trình xem" áp dụng RLS; Admin/thành viên không được dùng cho Người xem dữ liệu giới hạn.</td>
+<td>Danh sách phân quyền + ảnh cấu hình vai trò + kiểm thử 2 Người dùng.</td>
 </tr>
 <tr>
 <td><strong>CP7 — Key Governance</strong></td>
-<td>Supervisor + Process owners</td>
-<td>Mọi record execution bắt buộc có JobNum; record chất lượng/hold bắt buộc có OprSeq/ReasonCode.</td>
-<td>Audit mẫu 10 record/tuần (checklist ký) + tỉ lệ thiếu khóa.</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> + Chủ quá trình</td>
+<td>Mọi hồ sơ thực thi bắt buộc có JobNum; hồ sơ chất lượng/hold bắt buộc có OprSeq/ReasonCode.</td>
+<td>Đánh giá mẫu 10 hồ sơ/tuần (bảng kiểm ký) + tỉ lệ thiếu khóa.</td>
 </tr>
 </tbody>
 </table>
@@ -385,8 +359,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 6) Fail-fast rules -->
 <div class="card" id="sec6">
-<h2>6) Fail-fast rules (≥3) + tiêu chí STOP/HOLD/BLOCK</h2>
-<p class="muted">Fail‑fast nghĩa là dừng sớm để tránh ship sai và tránh tạo dữ liệu rác. Quy tắc dưới đây áp dụng ngay lập tức.</p>
+<h2>6) Fail-nhanh quy tắc (≥3) + tiêu chí STOP/TẠM GIỮ/CHẶN</h2>
+<p class="muted">Fail‑nhanh nghĩa là dừng sớm để tránh ship sai và tránh tạo dữ liệu rác. Quy tắc dưới đây áp dụng ngay lập tức.</p>
 <div class="table-card">
 <table class="table tight">
 <thead>
@@ -400,33 +374,33 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td><strong>FF1 — KPI không có SSOT</strong></td>
-<td>KPI xuất hiện trên dashboard nhưng không có bản ghi trong KPI dictionary hoặc không có source tables.</td>
-<td><span class="block">BLOCK</span></td>
-<td>Gỡ KPI khỏi dashboard ngay; mở change record; QA/QMS khóa publish.</td>
+<td>KPI xuất hiện trên bảng điều khiển nhưng không có bản ghi trong KPI từ điển hoặc không có source bảng.</td>
+<td><span class="block">CHẶN</span></td>
+<td>Gỡ KPI khỏi bảng điều khiển ngay; mở thay đổi hồ sơ; <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> khóa công bố / phát hành.</td>
 </tr>
 <tr>
-<td><strong>FF2 — Không drill‑down</strong></td>
-<td>KPI card không click tới bảng chi tiết (Job/Pack/NCR) hoặc không có đường dẫn record.</td>
+<td><strong>FF2 — Không diễn tập‑xuống / Từng</strong></td>
+<td>KPI card không click tới bảng chi tiết (Job/Pack/NCR) hoặc không có đường dẫn hồ sơ.</td>
 <td><span class="stop">STOP</span></td>
-<td>Dừng dùng KPI để quyết định; IT/BI sửa model/measure; kiểm thử lại drill‑through.</td>
+<td>Dừng dùng KPI để quyết định; <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="SYSTEM_OWNERS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-system-owners" title="System Owners (Nhom so huu he thong) — ITA / ESA"><span class="entity-code bundle-code">SYSTEM_OWNERS</span></a></span> sửa mô hình/đo lường; kiểm thử lại diễn tập‑xuyên suốt.</td>
 </tr>
 <tr>
-<td><strong>FF3 — Missing evidence</strong></td>
-<td>Record gate (ShipRelease/Hold/NCR/CAPA) không có EvidenceFolderUrl/PacketFolderUrl hoặc link hỏng.</td>
-<td><span class="hold">HOLD</span></td>
-<td>Giữ hàng/giữ quyết định; owner record bổ sung MRR; Supervisor xác nhận đóng.</td>
+<td><strong>FF3 — thiếu bằng chứng</strong></td>
+<td>Hồ sơ cổng kiểm soát (ShipRelease/Hold/NCR/CAPA) không có EvidenceFolderUrl/PacketFolderUrl hoặc link hỏng.</td>
+<td><span class="hold">TẠM GIỮ</span></td>
+<td>Hold/giữ quyết định; người chịu trách nhiệm hồ sơ bổ sung MRR; <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> xác nhận đóng.</td>
 </tr>
 <tr>
-<td><strong>FF4 — Mismatch Rev</strong></td>
-<td>JobIndex[RevisionNum] khác Rev trên hồ sơ QC/ship packet.</td>
+<td><strong>FF4 — không khớp Rev</strong></td>
+<td>JobIndex[RevisionNum] khác Rev trên hồ sơ QC/bộ hồ sơ giao hàng.</td>
 <td><span class="stop">STOP</span></td>
-<td>Dừng xử lý/ship; QA mở NCR/containment; Programmer/Planner xác minh rev; cập nhật record.</td>
+<td>Dừng xử lý/ship; <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> mở NCR/ngăn chặn; <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span>/<span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span> xác minh rev; cập nhật hồ sơ.</td>
 </tr>
 <tr>
-<td><strong>FF5 — Refresh vượt SLA</strong></td>
-<td>Last refresh vượt SLA ca làm việc hoặc refresh lỗi liên tiếp.</td>
-<td><span class="block">BLOCK</span></td>
-<td>Khóa họp dựa KPI; chuyển sang bảng standup manual có ký xác nhận; IT/BI xử lý refresh và ghi log.</td>
+<td><strong>FF5 — Làm mới vượt SLA</strong></td>
+<td>cuối cùng làm mới vượt SLA ca làm việc hoặc làm mới lỗi liên tiếp.</td>
+<td><span class="block">CHẶN</span></td>
+<td>Khóa họp dựa KPI; chuyển sang bảng họp đứng / họp nhanh sổ tay / thủ công có ký xác nhận; <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="SYSTEM_OWNERS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-system-owners" title="System Owners (Nhom so huu he thong) — ITA / ESA"><span class="entity-code bundle-code">SYSTEM_OWNERS</span></a></span> xử lý làm mới và ghi log.</td>
 </tr>
 </tbody>
 </table>
@@ -434,71 +408,71 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 7) 60-second reaction -->
 <div class="card" id="sec7">
-<h2>7) Phản ứng 60 giây (khi sai Rev/mix-up/thiếu chứng từ/OOT gage/bypass gate/ship risk…)</h2>
+<h2>7) Phản ứng 60 giây (khi sai Rev/lẫn lộn/thiếu chứng từ/OOT gage/vượt qua cổng kiểm soát/rủi ro giao hàng…)</h2>
 <p class="muted">Mục tiêu: chặn lan rộng trong 60 giây. Không tranh luận. Không chờ họp.</p>
 <div class="grid-2">
 <div class="card">
-<h3 style="margin-top:0">Khi phát hiện sai Rev hoặc mix‑up</h3>
+<h3 style="margin-top:0">Khi phát hiện sai Rev hoặc lẫn lộn</h3>
 <ol>
-<li><span class="must">DỪNG</span> thao tác liên quan; gắn nhãn HOLD tại khu vực.</li>
+<li><span class="must">DỪNG</span> vận hành liên quan; gắn nhãn TẠM GIỮ tại khu vực.</li>
 <li>Chụp ảnh nhãn/JobNum/Rev; ghi thời điểm.</li>
-<li>Tạo record Hold hoặc NCR theo phạm vi; điền <span class="path">JobNum + Rev + OprSeq</span>.</li>
-<li>Gắn link minh chứng vào record (EvidenceFolderUrl).</li>
-<li>Báo Supervisor + QA; chờ quyết định GO/HOLD có chữ ký số/ApprovalHistory.</li>
+<li>Tạo hồ sơ Hold hoặc NCR theo phạm vi; điền <span class="path">JobNum + Rev + OprSeq</span>.</li>
+<li>Gắn link minh chứng vào hồ sơ (EvidenceFolderUrl).</li>
+<li>Báo <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> + <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a>; chờ quyết định GO/TẠM GIỮ có chữ ký số/ApprovalHistory.</li>
 </ol>
 </div>
 <div class="card">
-<h3 style="margin-top:0">Khi phát hiện thiếu chứng từ ship packet hoặc bypass gate</h3>
+<h3 style="margin-top:0">Khi phát hiện thiếu chứng từ bộ hồ sơ giao hàng hoặc vượt qua cổng kiểm soát</h3>
 <ol>
-<li><span class="must">KHÓA</span> ShipRelease ở trạng thái HOLD; không in nhãn/không xuất hàng.</li>
-<li>Kiểm tra 4 cờ gate: PacketComplete, PackagingPass, FinalIRPass, ReconciliationStatus.</li>
-<li>Tạo action record (StandupActions) giao owner bổ sung MRR và due time.</li>
-<li>QA/Warehouse xác nhận link PacketFolderUrl và SSCC hợp lệ.</li>
-<li>Chỉ đổi trạng thái Approved khi đủ MRR và có ApprovalHistory.</li>
+<li><span class="must">KHÓA</span> ShipRelease ở trạng thái TẠM GIỮ; không in nhãn/không xuất hàng.</li>
+<li>Kiểm tra 4 cờ cổng kiểm soát: PacketComplete, PackagingPass, FinalIRPass, ReconciliationStatus.</li>
+<li>Tạo hành động hồ sơ (StandupActions) giao người chịu trách nhiệm bổ sung MRR và due time.</li>
+<li>QA/<span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span> xác nhận link PacketFolderUrl và SSCC hợp lệ.</li>
+<li>Chỉ đổi trạng thái Đã phê duyệt khi đủ MRR và có ApprovalHistory.</li>
 </ol>
 </div>
 </div>
 <div class="card">
-<h3 style="margin-top:0">Khi dashboard báo “data missing / refresh lỗi”</h3>
+<h3 style="margin-top:0">Khi bảng điều khiển báo "data thiếu / làm mới lỗi"</h3>
 <ol>
-<li><span class="must">DỪNG</span> dùng KPI để quyết định; đánh dấu cuộc họp là “manual mode”.</li>
-<li>Chụp màn hình lỗi và ghi thời điểm; gửi IT/BI theo kênh cảnh báo Teams: QMS-ALERT + Ticket: IT-HELPDESK.</li>
-<li>Supervisor dùng bảng standup manual có danh sách job/hold/ship và ký xác nhận.</li>
-<li>IT/BI xử lý lỗi; chạy Data Health; ghi BI release note khi có thay đổi.</li>
-<li>Chỉ quay lại “dashboard mode” khi drill‑down chạy và refresh time trong SLA.</li>
+<li><span class="must">DỪNG</span> dùng KPI để quyết định; đánh dấu cuộc họp là "sổ tay / thủ công chế độ".</li>
+<li>Chụp màn hình lỗi và ghi thời điểm; gửi <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="SYSTEM_OWNERS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-system-owners" title="System Owners (Nhom so huu he thong) — ITA / ESA"><span class="entity-code bundle-code">SYSTEM_OWNERS</span></a></span> theo kênh cảnh báo Teams: QMS-ALERT + phiếu yêu cầu: IT-bộ phận hỗ trợ.</li>
+<li><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> dùng bảng họp đứng / họp nhanh sổ tay / thủ công có danh sách job/hold/ship và ký xác nhận.</li>
+<li><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="SYSTEM_OWNERS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-system-owners" title="System Owners (Nhom so huu he thong) — ITA / ESA"><span class="entity-code bundle-code">SYSTEM_OWNERS</span></a></span> xử lý lỗi; chạy Data Sức khỏe; ghi BI phát hành note khi có thay đổi.</li>
+<li>Chỉ quay lại "bảng điều khiển chế độ" khi diễn tập‑xuống / Từng chạy và làm mới time trong SLA.</li>
 </ol>
 </div>
 </div>
-<!-- 8) Checklist vận hành -->
+<!-- 8) Checklist operation -->
 <div class="card" id="sec8">
-<h2>8) Checklist vận hành (≤15 bước) — mỗi bước có: Owner, Evidence/MRR, “điểm sai điển hình”</h2>
-<p class="muted">Checklist này dùng cho 2 tình huống: (A) tạo KPI mới, (B) sửa KPI/model đang chạy. Tổng bước ≤15 và dùng chung cho mọi role bằng cách điền đúng owner.</p>
+<h2>8) Bảng kiểm vận hành (≤15 bước) — mỗi bước có: người chịu trách nhiệm, Evidence/MRR, "điểm sai điển hình"</h2>
+<p class="muted">Bảng kiểm này dùng cho 2 tình huống: (A) tạo KPI mới, (B) sửa KPI/mô hình đang chạy. Tổng bước ≤15 và dùng chung cho mọi vai trò bằng cách điền đúng người chịu trách nhiệm.</p>
 <div class="table-card">
 <table class="table tight">
 <thead>
 <tr>
 <th style="width:50px">#</th>
-<th style="width:160px">Owner</th>
+<th style="width:160px">người chịu trách nhiệm</th>
 <th>Hành động bắt buộc</th>
 <th style="width:260px">Evidence/MRR</th>
 <th style="width:230px">Điểm sai điển hình</th>
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Supervisor</td><td>Chốt “quyết định cần chặn” + rủi ro cần giảm; gắn KPI vào bước E2E.</td><td>01 yêu cầu KPI (ticket) IT-HELPDESK</td><td>KPI đo “cho vui”, không gắn gate/handoff</td></tr>
-<tr><td>2</td><td>QA/QMS</td><td>Đặt tên KPI duy nhất + định nghĩa 1 câu + phạm vi (job/pack/customer) + tiêu chí gate.</td><td>Bản ghi KPI dictionary (draft)</td><td>Tên KPI trùng; định nghĩa dài, mơ hồ</td></tr>
-<tr><td>3</td><td>Process owner</td><td>Chỉ định nguồn dữ liệu SSOT (bảng + cột khóa) và owner dữ liệu.</td><td>Map nguồn (table/column) trong KPI dictionary</td><td>Chọn dữ liệu “ngoài hệ thống”</td></tr>
-<tr><td>4</td><td>IT/BI</td><td>Khóa grain KPI và mô hình: fact nào, dim nào, join key nào.</td><td>Relationship map + mô tả grain</td><td>Join sai grain gây phình số</td></tr>
-<tr><td>5</td><td>QA/QMS</td><td>Định nghĩa minh chứng bắt buộc cho drill‑down (record link + evidence link).</td><td>Quy tắc EvidenceFolderUrl/PacketFolderUrl</td><td>Quên link evidence; link hỏng</td></tr>
-<tr><td>6</td><td>IT/BI</td><td>Xây measure theo định nghĩa; khóa tên measure và mô tả.</td><td>DAX measure + commit log M365/SharePoint → HESEM-QMS-SSOT</td><td>Measure đổi tên gây gãy report</td></tr>
-<tr><td>7</td><td>IT/BI</td><td>Thiết lập drill‑through: KPI → bảng chi tiết → link dossier/evidence.</td><td>Ảnh drill‑through proof (Job/Pack/NCR)</td><td>Không click tới danh sách record</td></tr>
-<tr><td>8</td><td>IT/BI</td><td>Chạy Data Health: null keys, duplicates, latency, mismatch Rev.</td><td>Ảnh Data Health + log ca</td><td>Chỉ nhìn KPI, bỏ qua health</td></tr>
-<tr><td>9</td><td>QA/QMS</td><td>Phê duyệt KPI dictionary và gate rule; ghi ApprovalHistory.</td><td>ApprovalHistory record</td><td>Publish trước khi phê duyệt</td></tr>
-<tr><td>10</td><td>IT/BI</td><td>Ghi BI release note: version, thay đổi, risk, rollback.</td><td>BI_ReleaseNotes: SSOT/BI-ReleaseNotes (SharePoint List)</td><td>Không có rollback; không log</td></tr>
-<tr><td>11</td><td>IT/BI</td><td>Cấu hình refresh schedule và cảnh báo.</td><td>Ảnh cấu hình refresh + log alert Teams: QMS-ALERT + Ticket: IT-HELPDESK</td><td>Refresh ngoài giờ gây nhiễu</td></tr>
-<tr><td>12</td><td>Supervisor</td><td>Chạy 01 cuộc họp standup dùng KPI mới; tạo action cho bất ổn.</td><td>StandupActions record + ảnh bảng job at‑risk</td><td>Không tạo action; chỉ “bàn”</td></tr>
-<tr><td>13</td><td>Process owner</td><td>Audit nhanh 10 record: đúng khóa + có evidence link.</td><td>Checklist audit mẫu có ký</td><td>Chọn mẫu “đẹp”; bỏ mẫu fail</td></tr>
-<tr><td>14</td><td>QA/QMS</td><td>Đóng vòng: cập nhật module training/OJT theo sai lỗi phát hiện.</td><td>Log cập nhật training + DCR record</td><td>Không cập nhật đào tạo</td></tr>
+<tr><td>1</td><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td><td>Chốt "quyết định cần chặn" + rủi ro cần giảm; gắn KPI vào bước E2E.</td><td>01 yêu cầu KPI (phiếu yêu cầu) IT-bộ phận hỗ trợ</td><td>KPI đo "cho vui", không gắn cổng kiểm soát/bàn giao</td></tr>
+<tr><td>2</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>Đặt tên KPI duy nhất + định nghĩa 1 câu + phạm vi (job/pack/khách hàng) + tiêu chí cổng kiểm soát.</td><td>Bản ghi KPI từ điển (draft)</td><td>Tên KPI trùng; định nghĩa dài, mơ hồ</td></tr>
+<tr><td>3</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="entity-code role-code">CS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA[QMR]</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quan ly tai chinh)"><span class="entity-code role-code">FIN</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Truong ca)"><span class="entity-code role-code">SL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (To truong QC)"><span class="entity-code role-code">QCL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-logistics-shipping-coordinator.html" title="Logistics / Shipping Coordinator (Dieu phoi logistics / giao nhan)"><span class="entity-code role-code">LOG</span></a></span></td><td>Chỉ định nguồn dữ liệu SSOT (bảng + cột khóa) và người chịu trách nhiệm dữ liệu.</td><td>Map nguồn (table/cột) trong KPI từ điển</td><td>Chọn dữ liệu "ngoài hệ thống"</td></tr>
+<tr><td>4</td><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="SYSTEM_OWNERS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-system-owners" title="System Owners (Nhom so huu he thong) — ITA / ESA"><span class="entity-code bundle-code">SYSTEM_OWNERS</span></a></span></td><td>Khóa hạt / thớ KPI và mô hình: thực tế nào, dim nào, tham gia / nối key nào.</td><td>mối quan hệ map + mô tả hạt / thớ</td><td>tham gia / nối sai hạt / thớ gây phình số</td></tr>
+<tr><td>5</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>Định nghĩa minh chứng bắt buộc cho diễn tập‑xuống / Từng (hồ sơ link + bằng chứng link).</td><td>Quy tắc EvidenceFolderUrl/PacketFolderUrl</td><td>Quên link bằng chứng; link hỏng</td></tr>
+<tr><td>6</td><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="SYSTEM_OWNERS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-system-owners" title="System Owners (Nhom so huu he thong) — ITA / ESA"><span class="entity-code bundle-code">SYSTEM_OWNERS</span></a></span></td><td>Xây đo lường theo định nghĩa; khóa tên đo lường và mô tả.</td><td>DAX đo lường + cam kết log M365/SharePoint → HESEM-QMS-SSOT</td><td>đo lường đổi tên gây gãy báo cáo</td></tr>
+<tr><td>7</td><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="SYSTEM_OWNERS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-system-owners" title="System Owners (Nhom so huu he thong) — ITA / ESA"><span class="entity-code bundle-code">SYSTEM_OWNERS</span></a></span></td><td>Thiết lập diễn tập‑xuyên suốt: KPI → bảng chi tiết → link hồ sơ/bằng chứng.</td><td>Ảnh diễn tập‑xuyên suốt bằng chứng (Job/Pack/NCR)</td><td>Không click tới danh sách hồ sơ</td></tr>
+<tr><td>8</td><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="SYSTEM_OWNERS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-system-owners" title="System Owners (Nhom so huu he thong) — ITA / ESA"><span class="entity-code bundle-code">SYSTEM_OWNERS</span></a></span></td><td>Chạy Data Sức khỏe: null khóa / phím, trùng lặp, độ trễ, không khớp Rev.</td><td>Ảnh Data Sức khỏe + log ca</td><td>Chỉ nhìn KPI, bỏ qua sức khỏe</td></tr>
+<tr><td>9</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>Phê duyệt KPI từ điển và cổng kiểm soát rule; ghi ApprovalHistory.</td><td>ApprovalHistory hồ sơ</td><td>Công bố trước khi phê duyệt</td></tr>
+<tr><td>10</td><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="SYSTEM_OWNERS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-system-owners" title="System Owners (Nhom so huu he thong) — ITA / ESA"><span class="entity-code bundle-code">SYSTEM_OWNERS</span></a></span></td><td>Ghi BI phát hành note: version, thay đổi, rủi ro, hoàn tác / quay lại.</td><td>BI_ReleaseNotes: SSOT/BI-ReleaseNotes (SharePoint List)</td><td>Không có hoàn tác / quay lại; không log</td></tr>
+<tr><td>11</td><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="SYSTEM_OWNERS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-system-owners" title="System Owners (Nhom so huu he thong) — ITA / ESA"><span class="entity-code bundle-code">SYSTEM_OWNERS</span></a></span></td><td>Cấu hình làm mới lịch trình và cảnh báo.</td><td>Ảnh cấu hình làm mới + log alert Teams: QMS-ALERT + phiếu yêu cầu: IT-bộ phận hỗ trợ</td><td>Làm mới ngoài giờ gây nhiễu</td></tr>
+<tr><td>12</td><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td><td>Chạy 01 cuộc họp họp đứng / họp nhanh dùng KPI mới; tạo hành động cho bất ổn.</td><td>StandupActions hồ sơ + ảnh bảng job at‑rủi ro</td><td>Không tạo hành động; chỉ "bàn"</td></tr>
+<tr><td>13</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="entity-code role-code">CS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA[QMR]</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quan ly tai chinh)"><span class="entity-code role-code">FIN</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Truong ca)"><span class="entity-code role-code">SL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (To truong QC)"><span class="entity-code role-code">QCL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-logistics-shipping-coordinator.html" title="Logistics / Shipping Coordinator (Dieu phoi logistics / giao nhan)"><span class="entity-code role-code">LOG</span></a></span></td><td>Đánh giá nhanh 10 hồ sơ: đúng khóa + có bằng chứng link.</td><td>Bảng kiểm đánh giá mẫu có ký</td><td>Chọn mẫu "đẹp"; bỏ mẫu fail</td></tr>
+<tr><td>14</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>Đóng vòng: cập nhật mô-đun đào tạo/OJT theo sai lỗi phát hiện.</td><td>Log cập nhật đào tạo + DCR hồ sơ</td><td>Không cập nhật đào tạo</td></tr>
 </tbody>
 </table>
 </div>
@@ -506,41 +480,41 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 9) OJT theo TWI -->
 <div class="card" id="sec9">
 <h2>9) OJT thực chiến theo TWI</h2>
-<p class="muted">OJT diễn ra tại hiện trường hoặc tại máy tính có Power BI + SharePoint list. OJT kết thúc khi có đủ output và rubric đạt.</p>
+<p class="muted">OJT diễn ra tại hiện trường hoặc tại máy tính có Power BI + SharePoint list. OJT kết thúc khi có đủ đầu ra và tiêu chí đánh giá đạt.</p>
 <div class="card">
-<h3 style="margin-top:0">Job breakdown (TWI) — Công việc: “Tạo mới hoặc sửa 01 KPI và chứng minh drill‑down + evidence”</h3>
+<h3 style="margin-top:0">Job sự cố hỏng máy (TWI) — Công việc: "Tạo mới hoặc sửa 01 KPI và chứng minh diễn tập‑xuống / Từng + bằng chứng"</h3>
 <div class="table-card">
 <table class="table tight">
 <thead>
 <tr>
 <th style="width:50px">#</th>
 <th>Step</th>
-<th style="width:260px">Key Points (điểm chặn)</th>
-<th style="width:260px">Reasons (rủi ro tránh)</th>
+<th style="width:260px">Điểm then chốt (điểm chặn)</th>
+<th style="width:260px">Lý do (rủi ro tránh)</th>
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Chọn KPI gắn quyết định gate</td><td>Gắn KPI vào bước E2E và quyết định GO/HOLD/BLOCK</td><td>Tránh KPI “đo cho đẹp” và bỏ rủi ro chết người</td></tr>
-<tr><td>2</td><td>Điền KPI dictionary</td><td>Name duy nhất • Owner • Cadence • Source tables • Drill‑through</td><td>Tránh đa định nghĩa, tranh cãi số liệu</td></tr>
-<tr><td>3</td><td>Xác định grain &amp; join key</td><td>Fact đúng • Dim đúng • JobNum là khóa tối thiểu</td><td>Tránh join sai gây phình số</td></tr>
-<tr><td>4</td><td>Thiết lập bằng chứng</td><td>Record link + EvidenceFolderUrl/PacketFolderUrl phải tồn tại</td><td>Tránh audit fail và bypass gate</td></tr>
-<tr><td>5</td><td>Kiểm thử drill‑down</td><td>Click KPI → bảng record → mở evidence link</td><td>Tránh KPI không truy vết</td></tr>
-<tr><td>6</td><td>Chạy Data Health</td><td>Null key = 0 • Duplicate = 0 • Latency trong SLA</td><td>Tránh KPI xanh giả do dữ liệu bẩn</td></tr>
-<tr><td>7</td><td>Ghi release note + phê duyệt</td><td>ApprovalHistory + BI release note đầy đủ</td><td>Tránh thay đổi không kiểm soát</td></tr>
-<tr><td>8</td><td>Vận hành 1 ca</td><td>Họp standup sử dụng KPI và tạo action cho bất ổn</td><td>Tránh số liệu không tạo hành động</td></tr>
+<tr><td>1</td><td>Chọn KPI gắn quyết định cổng kiểm soát</td><td>Gắn KPI vào bước E2E và quyết định GO/TẠM GIỮ/CHẶN</td><td>Tránh KPI "đo cho đẹp" và bỏ rủi ro chết Người</td></tr>
+<tr><td>2</td><td>Điền KPI từ điển</td><td>Name duy nhất • người chịu trách nhiệm • Nhịp độ • Source bảng • Diễn tập‑xuyên suốt</td><td>Tránh đa định nghĩa, tranh cãi số liệu</td></tr>
+<tr><td>3</td><td>Xác định hạt / thớ &amp; tham gia / nối key</td><td>thực tế đúng • Dim đúng • JobNum là khóa tối thiểu</td><td>Tránh tham gia / nối sai gây phình số</td></tr>
+<tr><td>4</td><td>Thiết lập bằng chứng</td><td>Hồ sơ link + EvidenceFolderUrl/PacketFolderUrl phải tồn tại</td><td>Tránh đánh giá không đạt và vượt qua cổng kiểm soát</td></tr>
+<tr><td>5</td><td>Kiểm thử diễn tập‑xuống / Từng</td><td>Click KPI → bảng hồ sơ → mở bằng chứng link</td><td>Tránh KPI không truy vết</td></tr>
+<tr><td>6</td><td>Chạy Data Sức khỏe</td><td>Null key = 0 • trùng lặp = 0 • độ trễ trong SLA</td><td>Tránh KPI xanh giả do dữ liệu bẩn</td></tr>
+<tr><td>7</td><td>Ghi phát hành note + phê duyệt</td><td>ApprovalHistory + BI phát hành note đầy đủ</td><td>Tránh thay đổi không kiểm soát</td></tr>
+<tr><td>8</td><td>Vận hành 1 ca</td><td>Họp họp đứng / họp nhanh sử dụng KPI và tạo hành động cho bất ổn</td><td>Tránh số liệu không tạo hành động</td></tr>
 </tbody>
 </table>
 </div>
 </div>
-<h3>OJT output (sản phẩm đầu ra bắt buộc)</h3>
+<h3>OJT đầu ra (sản phẩm đầu ra bắt buộc)</h3>
 <ul>
-<li>01 bản ghi KPI dictionary (đã phê duyệt hoặc ở trạng thái draft có lý do).</li>
-<li>01 ảnh chứng minh drill‑down chạy đến bảng record và mở được evidence link.</li>
-<li>01 log Data Health (ảnh) thể hiện null key/duplicate/latency.</li>
-<li>01 StandupActions record cho bất ổn phát hiện trong ca.</li>
-<li>01 bản ghi ApprovalHistory cho quyết định phê duyệt KPI hoặc quyết định HOLD/BLOCK.</li>
+<li>01 bản ghi KPI từ điển (đã phê duyệt hoặc ở trạng thái draft có lý do).</li>
+<li>01 ảnh chứng minh diễn tập‑xuống / Từng chạy đến bảng hồ sơ và mở được bằng chứng link.</li>
+<li>01 log Data Sức khỏe (ảnh) thể hiện null key/trùng lặp/độ trễ.</li>
+<li>01 StandupActions hồ sơ cho bất ổn phát hiện trong ca.</li>
+<li>01 bản ghi ApprovalHistory cho quyết định phê duyệt KPI hoặc quyết định TẠM GIỮ/CHẶN.</li>
 </ul>
-<h3>Rubric L1–L4 (hành vi quan sát được; điều kiện lên level; quyền hạn khi đạt)</h3>
+<h3>Tiêu chí đánh giá L1–L4 (hành vi quan sát được; điều kiện lên level; quyền hạn khi đạt)</h3>
 <div class="table-card">
 <table class="table tight">
 <thead>
@@ -553,28 +527,28 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </thead>
 <tbody>
 <tr>
-<td><strong>L1</strong><div class="muted">Nhận biết &amp; làm theo checklist (có giám sát)</div></td>
-<td>Đọc đúng định nghĩa KPI; xác định đúng owner; mở được drill‑down đến bảng record theo hướng dẫn.</td>
-<td>Quiz đạt; thực hiện được checklist bước 1–6 có kèm minh chứng.</td>
-<td>Được xem dashboard và báo lỗi dữ liệu theo phản ứng 60 giây.</td>
+<td><strong>L1</strong><div class="muted">Nhận biết &amp; làm theo bảng kiểm (có giám sát)</div></td>
+<td>Đọc đúng định nghĩa KPI; xác định đúng người chịu trách nhiệm; mở được diễn tập‑xuống / Từng đến bảng hồ sơ theo hướng dẫn.</td>
+<td>Bài kiểm tra nhanh đạt; thực hiện được bảng kiểm bước 1–6 có kèm minh chứng.</td>
+<td>Được xem bảng điều khiển và báo lỗi dữ liệu theo phản ứng 60 giây.</td>
 </tr>
 <tr>
 <td><strong>L2</strong><div class="muted">Thực hiện độc lập (ổn định)</div></td>
-<td>Tạo/sửa KPI dictionary đúng trường; kiểm tra Data Health; tạo action record khi thấy bất ổn.</td>
-<td>Hoàn tất OJT output đầy đủ; không có lỗi thiếu evidence link.</td>
-<td>Được làm “data steward” cho bảng dữ liệu của role và chịu audit mẫu.</td>
+<td>Tạo/sửa KPI từ điển đúng trường; kiểm tra Data Sức khỏe; tạo hành động hồ sơ khi thấy bất ổn.</td>
+<td>Hoàn tất OJT đầu ra đầy đủ; không có lỗi thiếu bằng chứng link.</td>
+<td>Được làm "data Người quản lý" cho bảng dữ liệu của vai trò và chịu đánh giá mẫu.</td>
 </tr>
 <tr>
 <td><strong>L3</strong><div class="muted">Dẫn dắt và chặn rủi ro</div></td>
-<td>Chỉ ra mismatch rev, duplicate, latency; kích hoạt STOP/HOLD/BLOCK đúng; hướng dẫn người khác sửa record.</td>
-<td>Ít nhất 2 ca vận hành không lỗi; đóng 1 vòng CAPA hoặc fix data quality có log.</td>
-<td>Được tham gia phê duyệt thay đổi KPI/mô hình với QA/QMS.</td>
+<td>Chỉ ra không khớp rev, trùng lặp, độ trễ; kích hoạt STOP/TẠM GIỮ/CHẶN đúng; hướng dẫn Người khác sửa hồ sơ.</td>
+<td>Ít nhất 2 ca vận hành không lỗi; đóng 1 vòng CAPA hoặc fix data chất lượng có log.</td>
+<td>Được tham gia phê duyệt thay đổi KPI/mô hình với <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</td>
 </tr>
 <tr>
 <td><strong>L4</strong><div class="muted">Chuẩn hoá hệ thống</div></td>
-<td>Chuẩn hoá naming, quy tắc evidence, và data health; giảm lỗi tái diễn bằng control point.</td>
-<td>Chứng minh giảm lỗi dữ liệu trong 4 tuần 4 tuần liên tục và cập nhật module đào tạo.</td>
-<td>Được ủy quyền làm trainer nội bộ cho SYS-OPS-06.</td>
+<td>Chuẩn hoá đặt tên, quy tắc bằng chứng, và data sức khỏe; giảm lỗi tái diễn bằng điểm kiểm soát.</td>
+<td>Chứng minh giảm lỗi dữ liệu trong 4 tuần 4 tuần liên tục và cập nhật mô-đun đào tạo.</td>
+<td>Được ủy quyền làm Người đào tạo nội bộ cho SYS-OPS-06.</td>
 </tr>
 </tbody>
 </table>
@@ -583,91 +557,91 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- 10) Đánh giá -->
 <div class="card" id="sec10">
 <h2>10) Đánh giá</h2>
-<h3>10.1 Quiz (≥20 câu — trắc nghiệm + tình huống ngắn)</h3>
-<p class="muted">Câu trả lời phải dựa trên “No evidence = No gate” và cấu trúc KPI dictionary/data model. Không chấp nhận trả lời cảm tính.</p>
+<h3>10.1 Bài kiểm tra nhanh (≥20 câu — trắc Nhiệm + tình huống ngắn)</h3>
+<p class="muted">Câu trả lời phải dựa trên "không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)" và cấu trúc KPI từ điển/data mô hình. Câu trả lời phải bám bằng chứng và cấu trúc dữ liệu, không suy diễn cảm tính.</p>
 <ol>
-<li>KPI được phép xuất hiện trên dashboard khi nào?</li>
-<li>Trường nào trong KPI dictionary bắt buộc để ngăn “đa định nghĩa”?</li>
-<li>Khóa tối thiểu để nối dữ liệu fact về JobIndex là gì?</li>
-<li>Hậu quả vận hành của record thiếu EvidenceFolderUrl là gì?</li>
+<li>KPI được phép xuất hiện trên bảng điều khiển khi nào?</li>
+<li>Trường nào trong KPI từ điển bắt buộc để ngăn "đa định nghĩa"?</li>
+<li>Khóa tối thiểu để nối dữ liệu thực tế về JobIndex là gì?</li>
+<li>Hậu quả vận hành của hồ sơ thiếu EvidenceFolderUrl là gì?</li>
 <li>Phân biệt <span class="path">ShipRelease</span> và <span class="path">ShipmentMirror</span> theo mục đích và thời điểm.</li>
-<li>Khi drill‑down không chạy tới danh sách record, hành động bắt buộc là gì?</li>
-<li>Nêu 3 chỉ số Data Health bắt buộc có trên Control Tower.</li>
-<li>Khi phát hiện mismatch Rev giữa JobIndex và ship packet, ai là owner xử lý containment?</li>
-<li>Vì sao “join fact‑to‑fact” tạo rủi ro KPI sai?</li>
-<li>Trong mô hình star schema, “Fact” và “Dim” khác nhau điểm nào?</li>
-<li>Cadence của KPI dùng để làm gì trong điều hành ca?</li>
-<li>Điều kiện tối thiểu để ShipRelease chuyển sang Approved là gì?</li>
-<li>Record nào lưu quyết định phê duyệt thay đổi KPI?</li>
-<li>Khi refresh vượt SLA, cuộc họp điều hành chuyển sang chế độ nào?</li>
-<li>Role nào sở hữu KPI OTD và WIP Aging theo chuẩn HESEM?</li>
+<li>Khi diễn tập‑xuống / Từng không chạy tới danh sách hồ sơ, hành động bắt buộc là gì?</li>
+<li>Nêu 3 chỉ số Data Sức khỏe bắt buộc có trên Trung tâm điều hành.</li>
+<li>Khi phát hiện không khớp Rev giữa JobIndex và bộ hồ sơ giao hàng, ai là người chịu trách nhiệm xử lý ngăn chặn?</li>
+<li>Vì sao "tham gia / nối thực tế‑to‑thực tế" tạo rủi ro KPI sai?</li>
+<li>Trong mô hình ngôi sao / đánh dấu sơ đồ cấu trúc, "thực tế" và "Dim" khác nhau điểm nào?</li>
+<li>Nhịp độ của KPI dùng để làm gì trong điều hành ca?</li>
+<li>Điều kiện tối thiểu để ShipRelease chuyển sang Đã phê duyệt là gì?</li>
+<li>Hồ sơ nào lưu quyết định phê duyệt thay đổi KPI?</li>
+<li>Khi làm mới vượt SLA, cuộc họp điều hành chuyển sang chế độ nào?</li>
+<li>Vai trò nào sở hữu KPI OTD và WIP Tuổi tồn theo chuẩn HESEM?</li>
 <li>RLS dùng để chặn rủi ro nào?</li>
-<li>Nêu 2 lỗi dữ liệu làm KPI “xanh giả”.</li>
-<li>Nguyên tắc đặt tên KPI phải đáp ứng điều gì để truy xuất audit?</li>
+<li>Nêu 2 lỗi dữ liệu làm KPI "xanh giả".</li>
+<li>Nguyên tắc đặt tên KPI phải đáp ứng điều gì để truy xuất nguồn gốc đánh giá?</li>
 <li>Điều kiện để công nhận L2 của SYS-OPS-06 là gì?</li>
 <li>Khi một phòng ban dùng Excel riêng để báo KPI, hành động bắt buộc là gì?</li>
-<li>Trường dữ liệu nào trong ShipRelease liên quan trực tiếp tới reconciliation SSCC?</li>
+<li>Trường dữ liệu nào trong ShipRelease liên quan trực tiếp tới đối soát SSCC?</li>
 <li>Khi KPI thay đổi công thức, MRR nào bắt buộc phải có?</li>
-<li>Khi xuất hiện duplicate ShipRelease theo PackID/SSCC, hành động fail-fast nào được kích hoạt?</li>
+<li>Khi xuất hiện trùng lặp ShipRelease theo PackID/SSCC, hành động fail-nhanh nào được kích hoạt?</li>
 <li>Ai chịu trách nhiệm tạo StandupActions khi KPI báo bất ổn trong ca?</li>
 </ol>
-<h3>10.2 Scenario (≥3 tình huống thật — có dữ kiện; yêu cầu quyết định HOLD/GO và ghi MRR)</h3>
+<h3>10.2 Tình huống (≥3 tình huống thật — có dữ kiện; yêu cầu quyết định TẠM GIỮ/GO và ghi MRR)</h3>
 <div class="card">
-<h4 style="margin-top:0">Scenario 1 — KPI OTD “xanh” nhưng audit hỏi bằng chứng</h4>
-<p><strong>Dữ kiện:</strong> Dashboard OTD = 96%. Drill‑down tới danh sách shipment mở được, nhưng 4 dòng thiếu Tracking và link evidence (PacketFolderUrl trống).</p>
-<p><strong>Yêu cầu:</strong> Quyết định <span class="hold">HOLD</span>/<span class="block">BLOCK</span>/<span class="stop">STOP</span> cho việc dùng KPI OTD trong họp và cho việc ship; liệt kê MRR phải bổ sung và owner.</p>
-<p><strong>MRR bắt buộc:</strong> cập nhật PacketFolderUrl/Tracking; audit mẫu 10 record; log Data Health.</p>
+<h4 style="margin-top:0">Tình huống 1 — KPI OTD "xanh" nhưng đánh giá hỏi bằng chứng</h4>
+<p><strong>Dữ kiện:</strong> Bảng điều khiển OTD = 96%. Diễn tập‑xuống / Từng tới danh sách lô giao hàng mở được, nhưng 4 dòng thiếu Theo dõi và link bằng chứng (PacketFolderUrl trống).</p>
+<p><strong>Yêu cầu:</strong> Quyết định <span class="hold">TẠM GIỮ</span>/<span class="block">CHẶN</span>/<span class="stop">STOP</span> cho việc dùng KPI OTD trong họp và cho việc ship; liệt kê MRR phải bổ sung và người chịu trách nhiệm.</p>
+<p><strong>MRR bắt buộc:</strong> cập nhật PacketFolderUrl/Theo dõi; đánh giá mẫu 10 hồ sơ; log Data Sức khỏe.</p>
 </div>
 <div class="card">
-<h4 style="margin-top:0">Scenario 2 — Mismatch Rev trước khi ship</h4>
-<p><strong>Dữ kiện:</strong> JobIndex[RevisionNum]=B. Ship packet trong thư mục dossier ghi Rev=C. ShipRelease đã ở trạng thái “Approved”.</p>
-<p><strong>Yêu cầu:</strong> Ra quyết định ngay (<span class="stop">STOP</span> + <span class="hold">HOLD</span>), nêu chuỗi hành động 60 giây, record cần tạo (Hold/NCR/ApprovalHistory/StandupActions), và điều kiện mở lại.</p>
+<h4 style="margin-top:0">Tình huống 2 — không khớp Rev trước khi ship</h4>
+<p><strong>Dữ kiện:</strong> JobIndex[RevisionNum]=B. bộ hồ sơ giao hàng trong Record Folder ghi Rev=C. ShipRelease đã ở trạng thái "Đã phê duyệt".</p>
+<p><strong>Yêu cầu:</strong> Ra quyết định ngay (<span class="stop">STOP</span> + <span class="hold">TẠM GIỮ</span>), nêu chuỗi hành động 60 giây, hồ sơ cần tạo (Hold/NCR/ApprovalHistory/StandupActions), và điều kiện mở lại.</p>
 </div>
 <div class="card">
-<h4 style="margin-top:0">Scenario 3 — Refresh lỗi trong ca</h4>
-<p><strong>Dữ kiện:</strong> Power BI refresh fail 2 lần liên tiếp. Last refresh vượt SLA. Supervisor chuẩn bị họp standup 8:00.</p>
-<p><strong>Yêu cầu:</strong> Kích hoạt fail-fast nào; chuyển họp sang “manual mode”; liệt kê MRR (ảnh lỗi, log alert, bảng standup ký) và trách nhiệm IT/BI.</p>
+<h4 style="margin-top:0">Tình huống 3 — Làm mới lỗi trong ca</h4>
+<p><strong>Dữ kiện:</strong> Power BI làm mới fail 2 lần liên tiếp. cuối cùng làm mới vượt SLA. <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> chuẩn bị họp họp đứng / họp nhanh 8:00.</p>
+<p><strong>Yêu cầu:</strong> Kích hoạt fail-nhanh nào; chuyển họp sang "sổ tay / thủ công chế độ"; liệt kê MRR (ảnh lỗi, log alert, bảng họp đứng / họp nhanh ký) và trách nhiệm <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="SYSTEM_OWNERS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-system-owners" title="System Owners (Nhom so huu he thong) — ITA / ESA"><span class="entity-code bundle-code">SYSTEM_OWNERS</span></a></span>.</p>
 </div>
-<h3>10.3 Performance test (bắt buộc — module có thao tác/gate/duyệt)</h3>
+<h3>10.3 Hiệu suất test (bắt buộc — mô-đun có vận hành/cổng kiểm soát/duyệt)</h3>
 <div class="card">
-<h4 style="margin-top:0">Bài test: “Từ KPI card tới record và minh chứng trong 10 phút”</h4>
-<p><strong>Nhiệm vụ:</strong> Chọn 1 KPI bất kỳ trên Control Tower (OTD/WIP/Hold/NCR/Ship Readiness). Thực hiện 5 bước:</p>
+<h4 style="margin-top:0">Bài test: "Từ KPI card tới hồ sơ và minh chứng trong 10 phút"</h4>
+<p><strong>Nhiệm vụ:</strong> Chọn 1 KPI bất kỳ trên Trung tâm điều hành (OTD/WIP/Hold/NCR/Ship Mức sẵn sàng). Thực hiện 5 bước:</p>
 <ol>
-<li>Đọc đúng định nghĩa KPI theo KPI dictionary (nêu owner + cadence).</li>
-<li>Click drill‑down tới bảng chi tiết record (Job/Pack/NCR).</li>
-<li>Mở 1 record và xác minh khóa JobNum/Rev.</li>
+<li>Đọc đúng định nghĩa KPI theo KPI từ điển (nêu người chịu trách nhiệm + nhịp độ / chu kỳ họp).</li>
+<li>Click diễn tập‑xuống / Từng tới bảng chi tiết hồ sơ (Job/Pack/NCR).</li>
+<li>Mở 1 hồ sơ và xác minh khóa JobNum/Rev.</li>
 <li>Mở link minh chứng (EvidenceFolderUrl/PacketFolderUrl) và xác minh tài liệu tồn tại.</li>
-<li>Ghi 1 bất ổn (thiếu link, mismatch rev, duplicate) và tạo StandupActions hoặc Hold theo đúng quy tắc.</li>
+<li>Ghi 1 bất ổn (thiếu link, không khớp rev, trùng lặp) và tạo StandupActions hoặc Hold theo đúng quy tắc.</li>
 </ol>
-<h5>Rubric PASS/FAIL</h5>
+<h5>Tiêu chí đánh giá ĐẠT/KHÔNG ĐẠT</h5>
 <ul>
-<li><span class="must">PASS:</span> hoàn tất đủ 5 bước; không sai định nghĩa; link minh chứng mở được; record tạo đúng loại và đúng khóa.</li>
-<li><span class="must">FAIL:</span> không drill‑down được; không mở được minh chứng; dùng KPI khi thiếu evidence; tạo record thiếu JobNum/Rev.</li>
+<li><span class="must">PASS:</span> hoàn tất đủ 5 bước; không sai định nghĩa; link minh chứng mở được; hồ sơ tạo đúng loại và đúng khóa.</li>
+<li><span class="must">FAIL:</span> không diễn tập‑xuống / Từng được; không mở được minh chứng; dùng KPI khi thiếu bằng chứng; tạo hồ sơ thiếu JobNum/Rev.</li>
 </ul>
 </div>
 </div>
 <!-- 11) PASS/FAIL criteria -->
 <div class="card" id="sec11">
-<h2>11) PASS/FAIL criteria (rõ ràng; nhấn mạnh “No evidence = No gate”)</h2>
+<h2>11) ĐẠT/KHÔNG ĐẠT tiêu chí (rõ ràng; nhấn mạnh "không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)")</h2>
 <div class="kpi-box">
 <ul>
-<li><span class="must">PASS (tối thiểu):</span> Quiz ≥ 80% <span class="mini">Ngưỡng: OTD ≥ 95% • NCR repeat = 0 • Audit finding repeat = 0.</span> + hoàn tất Performance test PASS + nộp đủ OJT output (mục 9) có link minh chứng.</li>
-<li><span class="must">FAIL ngay (Gate Fail):</span> dùng KPI để quyết định khi drill‑down không tới record; hoặc record gate thiếu evidence link; hoặc phát hành ship khi vi phạm gate.</li>
-<li><span class="must">Quy tắc bằng chứng:</span> <span class="must">Không có bằng chứng = Không có gate.</span> Mọi quyết định GO/HOLD/BLOCK phải có record (ApprovalHistory hoặc record tương đương) và có thời điểm.</li>
+<li><span class="must">PASS (tối thiểu):</span> Bài kiểm tra nhanh ≥ 80% <span class="mini">Ngưỡng: OTD ≥ 95% • NCR lặp lại = 0 • Đánh giá phát hiện lặp lại = 0.</span> + hoàn tất Hiệu suất test PASS + nộp đủ OJT đầu ra (mục 9) có link minh chứng.</li>
+<li><span class="must">FAIL ngay (Cổng kiểm soát Fail):</span> dùng KPI để quyết định khi diễn tập‑xuống / Từng không tới hồ sơ; hoặc hồ sơ cổng kiểm soát thiếu bằng chứng link; hoặc phát hành giao hàng khi vi phạm cổng kiểm soát.</li>
+<li><span class="must">Quy tắc bằng chứng:</span> <span class="must">Không có bằng chứng = Không có cổng kiểm soát.</span> Mọi quyết định GO/TẠM GIỮ/CHẶN phải có hồ sơ (ApprovalHistory hoặc hồ sơ tương đương) và có thời điểm.</li>
 </ul>
 </div>
 </div>
 <!-- 12) MRR tối thiểu -->
 <div class="card" id="sec12">
 <h2>12) MRR tối thiểu</h2>
-<p class="muted">MRR là “bằng chứng vận hành” để audit-ready. MRR phải có ID, có người chịu trách nhiệm, có đường dẫn lưu, và truy vết được theo JobNum/PackID/NCRID.</p>
+<p class="muted">MRR là "bằng chứng vận hành" để sẵn sàng đánh giá. MRR phải có ID, có Người chịu trách nhiệm, có đường dẫn lưu, và truy vết được theo JobNum/PackID/NCRID.</p>
 <h3>12.1 Danh sách hồ sơ cần tạo/đính kèm</h3>
 <ul>
-<li><strong>KPI dictionary</strong> (CSV/List): tên KPI, định nghĩa, công thức, owner, cadence, source, drill‑through.</li>
-<li><strong>BI_ReleaseNotes</strong> (List) SSOT/BI-ReleaseNotes (SharePoint List): version, thay đổi, risk, rollback, người thực hiện, ngày.</li>
-<li><strong>ApprovalHistory</strong>: phê duyệt KPI/gate, phê duyệt đổi model, quyết định HOLD/GO.</li>
-<li><strong>Data Health log</strong> SSOT/Data-Health-Log (SharePoint List + ảnh kiểm tra): ảnh/đầu ra kiểm tra null key/duplicate/latency/mismatch Rev.</li>
-<li><strong>StandupActions</strong>: hành động xử lý bất ổn KPI (owner, due date, trạng thái).</li>
+<li><strong>KPI từ điển</strong> (CSV/List): tên KPI, định nghĩa, công thức, người chịu trách nhiệm, nhịp độ / chu kỳ họp, source, diễn tập‑xuyên suốt.</li>
+<li><strong>BI_ReleaseNotes</strong> (List) SSOT/BI-ReleaseNotes (SharePoint List): version, thay đổi, rủi ro, hoàn tác / quay lại, Performer, ngày.</li>
+<li><strong>ApprovalHistory</strong>: phê duyệt KPI/cổng kiểm soát, phê duyệt đổi mô hình, quyết định TẠM GIỮ/GO.</li>
+<li><strong>Data Sức khỏe log</strong> SSOT/Data-Sức khỏe-Log (SharePoint List + ảnh kiểm tra): ảnh/đầu ra kiểm tra null key/trùng lặp/độ trễ/không khớp Rev.</li>
+<li><strong>StandupActions</strong>: hành động xử lý bất ổn KPI (người chịu trách nhiệm, Ngày đến hạn, trạng thái).</li>
 </ul>
 <h3>12.2 Tên chuẩn &amp; quy tắc đặt tên</h3>
 <div class="table-card">
@@ -680,43 +654,43 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td>KPI dictionary entry</td><td><span class="path">KPI-&lt;Area&gt;-&lt;Name&gt;-V&lt;Rev&gt;</span></td><td>KPI ID</td></tr>
-<tr><td>BI release note</td><td><span class="path">BI-RN-&lt;YYYYMMDD&gt;-V&lt;Rev&gt;</span></td><td>Model version</td></tr>
-<tr><td>Data Health log</td><td><span class="path">BI-DH-&lt;YYYYMMDD&gt;-Shift&lt;A|B&gt;</span></td><td>Refresh timestamp</td></tr>
-<tr><td>Standup action</td><td><span class="path">ACT-&lt;YYYYMMDD&gt;-&lt;JobNum|PackID|NCRID&gt;</span></td><td>JobNum/PackID/NCRID</td></tr>
-<tr><td>Approval record</td><td><span class="path">APR-&lt;Source&gt;-&lt;ID&gt;-&lt;YYYYMMDDHHMM&gt;</span></td><td>SourceRecordID</td></tr>
+<tr><td>KPI từ điển mục nhập</td><td><span class="path">KPI-&lt;khu vực&gt;-&lt;Name&gt;-V&lt;Rev&gt;</span></td><td>KPI ID</td></tr>
+<tr><td>BI phát hành note</td><td><span class="path">BI-RN-&lt;YYYYMMDD&gt;-V&lt;Rev&gt;</span></td><td>Mô hình version</td></tr>
+<tr><td>Data Sức khỏe log</td><td><span class="path">BI-DH-&lt;YYYYMMDD&gt;-Shift&lt;A|B&gt;</span></td><td>Làm mới dấu thời gian</td></tr>
+<tr><td>họp đứng / họp nhanh hành động</td><td><span class="path">ACT-&lt;YYYYMMDD&gt;-&lt;JobNum|PackID|NCRID&gt;</span></td><td>JobNum/PackID/NCRID</td></tr>
+<tr><td>Phê duyệt hồ sơ</td><td><span class="path">APR-&lt;Source&gt;-&lt;ID&gt;-&lt;YYYYMMDDHHMM&gt;</span></td><td>SourceRecordID</td></tr>
 </tbody>
 </table>
 </div>
-<h3>12.3 Nơi lưu (SharePoint library/list/path)</h3>
+<h3>12.3 Nơi lưu (SharePoint thư viện/list/path)</h3>
 <ul>
 <li><strong>SharePoint site:</strong> M365/SharePoint → HESEM-QMS-SSOT</li>
-<li><strong>Lists:</strong> JobIndex, ShipRelease, PackagingChecks, NCRLog, QCHoldLog, CAPA8D, DowntimeEvents, DispatchPlan, WIPTracker, StandupActions, ApprovalHistory.</li>
-<li><strong>Libraries:</strong> Job Dossier (evidence folders) SharePoint Site: CNC-IMS-HUB..</li>
-<li><strong>Kho tài liệu kiểm soát:</strong> <span class="path">M365/SharePoint → CNC-IMS-HUB → QMS-Controlled-Documents → training → academy → system-ops</span> (module HTML).</li>
+<li><strong>Danh sách:</strong> JobIndex, ShipRelease, PackagingChecks, NCRLog, QCHoldLog, CAPA8D, DowntimeEvents, DispatchPlan, WIPTracker, StandupActions, ApprovalHistory.</li>
+<li><strong>thư viện:</strong> Hồ sơ công việc (hồ sơ công việc) (bằng chứng thư mục) SharePoint Site: CNC-IMS-HUB..</li>
+<li><strong><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span> tài liệu kiểm soát:</strong> <span class="path">M365/SharePoint → CNC-IMS-HUB → QMS-Được kiểm soát-Tài liệu → đào tạo → academy → system-ops</span> (mô-đun HTML).</li>
 </ul>
 </div>
 <!-- 13) Common audit findings -->
 <div class="card" id="sec13">
-<h2>13) Common audit findings &amp; prevention (≥8 lỗi audit điển hình)</h2>
+<h2>13) Chung đánh giá phát hiện &amp; phòng ngừa (≥8 lỗi đánh giá điển hình)</h2>
 <div class="table-card">
 <table class="table tight">
 <thead>
 <tr>
-<th style="width:260px">Audit finding</th>
+<th style="width:260px">Đánh giá phát hiện</th>
 <th>Biểu hiện</th>
 <th>Phòng ngừa bắt buộc</th>
 </tr>
 </thead>
 <tbody>
-<tr><td><strong>1) KPI không có định nghĩa kiểm soát</strong></td><td>Mỗi phòng nói 1 kiểu</td><td>KPI dictionary lock + ApprovalHistory (CP1)</td></tr>
-<tr><td><strong>2) KPI không truy vết record</strong></td><td>Không drill‑down</td><td>Fail‑fast FF2 + test drill‑through bắt buộc</td></tr>
-<tr><td><strong>3) Thiếu minh chứng</strong></td><td>Link evidence trống/hỏng</td><td>Validator evidence + audit mẫu (CP4, CP7)</td></tr>
-<tr><td><strong>4) Thay đổi không kiểm soát</strong></td><td>Measure đổi, không release note</td><td>BI_ReleaseNotes + rollback plan (CP2)</td></tr>
-<tr><td><strong>5) Dữ liệu bẩn</strong></td><td>Null key/duplicate cao</td><td>Data Health page + log ca (CP3)</td></tr>
-<tr><td><strong>6) Bypass gate quality</strong></td><td>Ship khi hold mở</td><td>Fail‑fast FF3 + CP4 gate flags</td></tr>
-<tr><td><strong>7) Refresh/latency không kiểm soát</strong></td><td>Dashboard số cũ</td><td>Refresh SLA + cảnh báo + manual mode (CP5)</td></tr>
-<tr><td><strong>8) Quyền truy cập sai</strong></td><td>Xem dữ liệu vượt phạm vi</td><td>RLS + role Viewer + kiểm thử user (CP6)</td></tr>
+<tr><td><strong>1) KPI không có định nghĩa kiểm soát</strong></td><td>Mỗi phòng nói 1 kiểu</td><td>KPI từ điển khóa + ApprovalHistory (CP1)</td></tr>
+<tr><td><strong>2) KPI không truy vết hồ sơ</strong></td><td>Không diễn tập‑xuống / Từng</td><td>Fail‑nhanh FF2 + diễn tập thử‑xuyên suốt bắt buộc</td></tr>
+<tr><td><strong>3) Thiếu minh chứng</strong></td><td>Link bằng chứng trống/hỏng</td><td>Người xác nhận bằng chứng + đánh giá mẫu (CP4, CP7)</td></tr>
+<tr><td><strong>4) Thay đổi không kiểm soát</strong></td><td>đo lường đổi, không phát hành note</td><td>BI_ReleaseNotes + hoàn tác / quay lại plan (CP2)</td></tr>
+<tr><td><strong>5) Dữ liệu bẩn</strong></td><td>Null key/trùng lặp cao</td><td>Data Sức khỏe page + log ca (CP3)</td></tr>
+<tr><td><strong>6) Vượt qua cổng kiểm soát chất lượng</strong></td><td>giao hàng khi hold mở</td><td>Fail‑nhanh FF3 + CP4 cổng kiểm soát đánh dấu</td></tr>
+<tr><td><strong>7) Làm mới/độ trễ không kiểm soát</strong></td><td>Bảng điều khiển số cũ</td><td>Làm mới SLA + cảnh báo + sổ tay / thủ công chế độ (CP5)</td></tr>
+<tr><td><strong>8) Quyền truy cập sai</strong></td><td>Xem dữ liệu vượt phạm vi</td><td>RLS + vai trò trình xem + kiểm thử Người dùng (CP6)</td></tr>
 </tbody>
 </table>
 </div>
@@ -727,7 +701,6 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <!-- Doc-Control (tách rời) -->
 
 <script src="../../../assets/app.js"></script>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
-</body>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
+</div></div></body>
 </html>
-

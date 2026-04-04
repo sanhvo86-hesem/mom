@@ -1,0 +1,65 @@
+{
+  "form_code": "FRM-504",
+  "title": "Shift Handover Log",
+  "title_vi": "Nhật ký bàn giao ca",
+  "version": "V1",
+  "category": "production",
+  "frequency": "per_shift",
+  "sop_ref": "SOP-504",
+  "description": "Ghi nhận trạng thái máy, job đang chạy, vấn đề tồn đọng khi bàn giao ca.",
+  "roles_allowed": ["admin", "production_manager", "shift_leader", "cnc_operator"],
+  "fields": [
+    {"id": "handover_date", "type": "date", "label": "Ngày", "label_en": "Date", "required": true, "default": "today"},
+    {"id": "from_shift", "type": "select", "label": "Ca giao", "label_en": "From Shift", "required": true, "options": [
+      {"value": "1", "label": "Ca 1"},
+      {"value": "2", "label": "Ca 2"},
+      {"value": "3", "label": "Ca 3"}
+    ]},
+    {"id": "to_shift", "type": "select", "label": "Ca nhận", "label_en": "To Shift", "required": true, "options": [
+      {"value": "1", "label": "Ca 1"},
+      {"value": "2", "label": "Ca 2"},
+      {"value": "3", "label": "Ca 3"}
+    ]},
+    {"id": "from_person", "type": "text", "label": "Người giao", "label_en": "From", "required": true},
+    {"id": "to_person", "type": "text", "label": "Người nhận", "label_en": "To", "required": true},
+    {
+      "id": "machines",
+      "type": "table",
+      "label": "Trạng thái máy",
+      "label_en": "Machine Status",
+      "min_rows": 1,
+      "max_rows": 30,
+      "columns": [
+        {"id": "machine_id", "type": "text", "label": "Mã máy", "width": "15%", "required": true},
+        {"id": "job_number", "type": "text", "label": "Job No.", "width": "15%"},
+        {"id": "part_no", "type": "text", "label": "Part No.", "width": "15%"},
+        {"id": "status", "type": "select", "label": "Trạng thái", "width": "15%", "options": [
+          {"value": "running", "label": "Đang chạy", "color": "#2f9e44"},
+          {"value": "setup", "label": "Đang setup", "color": "#1971c2"},
+          {"value": "idle", "label": "Chờ việc", "color": "#e67700"},
+          {"value": "down", "label": "Hỏng", "color": "#e03131"},
+          {"value": "pm", "label": "Bảo trì", "color": "#862e9c"}
+        ]},
+        {"id": "progress", "type": "text", "label": "Tiến độ", "width": "15%", "placeholder": "50/100 pcs"},
+        {"id": "note", "type": "text", "label": "Ghi chú", "width": "25%"}
+      ]
+    },
+    {
+      "id": "pending_issues",
+      "type": "textarea",
+      "label": "Vấn đề tồn đọng",
+      "label_en": "Pending Issues",
+      "rows": 4,
+      "placeholder": "Các vấn đề cần ca sau tiếp tục xử lý..."
+    },
+    {
+      "id": "safety_note",
+      "type": "textarea",
+      "label": "Ghi chú an toàn",
+      "label_en": "Safety Notes",
+      "rows": 2,
+      "placeholder": "Các lưu ý an toàn cho ca sau..."
+    }
+  ],
+  "auto_fields": ["submitted_by", "submitted_at", "entry_id"]
+}

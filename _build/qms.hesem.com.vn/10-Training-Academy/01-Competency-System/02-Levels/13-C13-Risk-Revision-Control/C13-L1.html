@@ -1,0 +1,181 @@
+<div><p>thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ 
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
+
+<style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
+<link rel="stylesheet" href="../../../../assets/style.css">
+
+</p>
+
+<div class="container"><div class="page"><div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+ <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company">
+ <a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
+</div>
+<div class="title">
+<strong class="doc-name">C13-L1</strong>
+<span class="sub-vn"></span>
+</div>
+<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">C13-L1</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+</div>
+<div class="doc-content" id="docContent"><h1>C13-L1 - C13-L1</h1>
+<p class="lead"><strong>Level 1 — Kỷ luật phiên bản &amp; mở thay đổi đúng quy trình.</strong> Mô-đun này tạo kỷ luật rủi ro &amp; phiên bản: phát hiện nhanh, ghi nhận đúng, phê duyệt đúng cấp, triển khai có xác minh và dấu vết kiểm toán.</p>
+<div class="hero">
+<h2>Chuẩn thực chiến – Level 1</h2>
+<div class="meta">
+<div><strong>Vai trò mục tiêu</strong><br>Tất cả vị trí chạm bản vẽ/spec/program/hồ sơ: Operator, Setup, <a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a>, Kỹ thuật, Kế hoạch, Mua hàng, <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span>, <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></span></div>
+<div><strong>Đầu ra bắt buộc</strong>
+<ul>
+<li>Xác nhận phiên bản trước khi làm; dùng đúng nguồn phát hành (SSOT).</li><li>Nhận diện kích hoạt thay đổi và mở Thay đổi Thông báo trong 10 phút khi phát hiện.</li><li>Kích hoạt hold khi thay đổi chưa được phê duyệt hoặc thiếu tác động kiểm tra.</li>
+</ul>
+</div>
+<div><strong>Cổng kiểm soát (gate) trọng yếu</strong><br><span class="badge bad">Thay đổi không hồ sơ / dùng sai REV</span> = TẠM GIỮ/FAIL</div>
+<div><strong>Thời lượng</strong><br>Lý thuyết 60 phút • OJT 90 phút</div>
+</div>
+<p class="small-note">Nguyên tắc vận hành: thay đổi không hồ sơ = không thay đổi. Sai REV = dừng ngay tại điểm phát hiện.</p>
+</div><div class="note-blue" style="margin:12px 0">
+ <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — Advanced Competency Module</b>.
+</div>
+<div class="card">
+<span class="badge">Bộ diễn tập (Job CNC)</span>
+<p class="lead" style="margin-top:10px;">
+ Thực hiện diễn tập trên job thật để luyện hành vi và tạo MRR.
+ Mở danh mục diễn tập tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
+ </p>
+<ul class="tight">
+<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-cam-release-changecontrol.html">DRL-05 — TRN-Bài diễn tập ACA-DRL-05 — CAM Gói phát hành + Kiểm soát thay đổi | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-revision-ssot-60s.html">DRL-02 — TRN-Bài diễn tập ACA-DRL-02 — Phiên bản &amp;amp; SSOT (Đánh giá 60-Thứ hai / Giây) | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-ncr-capa-response.html">DRL-06 — TRN-Bài diễn tập ACA-DRL-06 — NCR + CAPA Nhanh Phản hồi | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-material-cert-specialprocess.html">DRL-03 — TRN-Bài diễn tập ACA-DRL-03 — Nguyên vật liệu Cert &amp;amp; Công đoạn đặc biệt Outsource | HESEM Academy</a></li>
+</ul>
+<p class="small muted" style="margin-top:8px;">
+ Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
+ </p>
+</div>
+<h2>2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
+<div class="card">
+<ul>
+<li>Chặn rủi ro số 1 của phân xưởng phân xưởng gia công theo đơn (job xưởng): <strong>sai phiên bản</strong> và <strong>thay đổi ngoài kiểm soát</strong>.</li>
+<li>Biến "rủi ro" thành hành động: kích hoạt → hồ sơ → tác động → phê duyệt → triển khai → xác minh → đóng.</li>
+<li>Gắn kiểm soát thay đổi với vận hành RFQ→Tiền mặt: thay đổi phải cập nhật job pack và bộ hồ sơ giao hàng (ship gói hồ sơ).</li>
+</ul>
+</div>
+<h2>3) Luồng E2E quản lý rủi ro &amp; thay đổi</h2>
+<div class="vflow">
+<div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>Kích hoạt</strong><p>Nhận diện kích hoạt thay đổi: drawing/spec/PO/program/quy trình/nhà cung cấp.</p></div></div>
+<div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Log</strong><p>Mở Thay đổi Thông báo và ghi thời điểm phát hiện + phạm vi ảnh hưởng.</p></div></div>
+<div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>Tác động</strong><p>Đánh giá tác động CTQ/OTD/chi phí/truy xuất nguồn gốc.</p></div></div>
+<div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>phê duyệt</strong><p>Phê duyệt theo ngưỡng; khóa phiên bản set mới.</p></div></div>
+<div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>triển khai</strong><p>Cập nhật bộ hồ sơ chuẩn (mốc chuẩn gói hàng)/phiếu theo dõi công việc (job traveler)/công việc hướng dẫn và thông báo.</p></div></div>
+<div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>Xác minh &amp; Đóng</strong><p>Xác nhận hiệu lực và lưu bằng chứng SSOT.</p></div></div>
+</div>
+<h2>4) Điểm đứt gãy (tối thiểu 10 điểm gãy)</h2>
+<ol><li>Dùng bản vẽ/spec không thuộc phiên bản set (bản in cũ, file gửi qua chat).</li><li>Nhận email thay đổi nhưng không mở hồ sơ; thay đổi trôi mất.</li><li>Sửa program/setup trên máy nhưng không có log và không rà soát đồng cấp.</li><li>Đổi dao/đổi đồ gá ảnh hưởng CTQ nhưng không đánh giá tác động.</li><li>Supplier hoàn thiện bề mặt thay đổi quy trình nhưng không kiểm soát; bề mặt lệch.</li><li>Thay đổi số lượng/Ngày đến hạn bằng miệng; lập kế hoạch và finance lệch dữ liệu.</li><li>Cập nhật phiếu theo dõi công việc sau khi đã chạy nhưng không truy vết; đánh giá không đạt.</li><li>Không thông báo thay đổi cho <a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a>; kế hoạch kiểm tra (plan) dùng REV cũ.</li><li>Thực thi thay đổi khi chưa có phê duyệt; lỗi lan rộng.</li><li>Không lưu bằng chứng SSOT; không chứng minh được ai làm, làm lúc nào.</li></ol>
+<h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát + người chịu trách nhiệm + bằng chứng)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Điểm kiểm soát</th><th>người chịu trách nhiệm</th><th>Evidence/MRR</th><th>Quy tắc bắt buộc</th></tr></thead><tbody><tr><td><strong>SSOT phiên bản source</strong></td><td>All vai trò</td><td>Part-REV-Bản gốc/Hồ sơ công việc (hồ sơ công việc) link</td><td>Không dùng file rời</td></tr><tr><td><strong>Thay đổi Thông báo</strong></td><td>Người phát hiện</td><td>FRM-QMS-022 Tài liệu/Data Thay đổi Thông báo</td><td>Không có thông báo = không thay đổi</td></tr><tr><td><strong>Tác động Matrix</strong></td><td>người chịu trách nhiệm thay đổi</td><td>FRM-QMS-006 Thay đổi Tác động Matrix</td><td>Tác động chưa đánh giá = TẠM GIỮ</td></tr><tr><td><strong>Customer Thay đổi Đơn hàng Review</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></span></td><td>FRM-SAL-003 Customer Thay đổi Đơn hàng Review</td><td>Thay đổi từ khách phải rà soát</td></tr><tr><td><strong>Sổ đăng ký rủi ro (sổ đăng ký)</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>FRM-QMS-005 Register rủi ro</td><td>Rủi ro có người chịu trách nhiệm + due</td></tr><tr><td><strong>Review đồng cấp</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>FRM-QMS-007 Đồng nghiệp / Ngang cấp Review Log</td><td>Program/spec thay đổi phải rà soát đồng cấp</td></tr><tr><td><strong>Tài liệu Control</strong></td><td>Doc Control/QMS</td><td>SOP-QMS-001 Tài liệu Control</td><td>Không sửa tài liệu phát hành ngoài quy trình</td></tr><tr><td><strong>Xác minh plan</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>FAI/xác minh hồ sơ</td><td>Thay đổi ảnh hưởng CTQ phải xác minh</td></tr></tbody></table></div>
+<h2>6) Fail-nhanh quy tắc (STOP/TẠM GIỮ/CHẶN)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Loại</th><th>Khi kích hoạt</th><th>Hành động bắt buộc</th></tr></thead><tbody><tr><td><span class="badge bad">STOP</span></td><td><strong>Sai REV hoặc phát hiện thay đổi chưa kiểm soát.</strong></td><td>Dừng vận hành; gắn TẠM GIỮ; báo trưởng nhóm + <a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / <a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>; mở Thay đổi Thông báo.</td></tr><tr><td><span class="badge warn">TẠM GIỮ</span></td><td><strong>Tác động chưa đánh giá hoặc chưa có phê duyệt.</strong></td><td>Không thực thi thay đổi; không ship; tạo hành động và escal theo SLA.</td></tr><tr><td><span class="badge bad">CHẶN</span></td><td><strong>Chỉnh sửa tài liệu phát hành/đổi nhà cung cấp/quy trình mà không qua luồng công việc.</strong></td><td>Khóa phát hành; thu hồi bản rời; mở lớn / nghiêm trọng thay đổi gói hàng; đánh giá lại.</td></tr></tbody></table></div>
+<h2>7) Phản ứng 60 giây</h2>
+<ol>
+<li>Dừng vận hành và gắn TẠM GIỮ tại điểm phát hiện.</li>
+<li>Chụp 01 bằng chứng có dấu thời gian (email/Photos màn hình ERP/link SSOT).</li>
+<li>Mở Thay đổi Thông báo và ghi phạm vi ảnh hưởng (job/công đoạn/lot).</li>
+<li>Báo trưởng nhóm + <a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / <a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> (≤ 10 phút) và đặt người chịu trách nhiệm/due cho hành động trong ngày.</li>
+</ol>
+<h2>8) Bảng kiểm vận hành (≤ 15 bước)</h2>
+<div class="table-card"><table class="table"><thead><tr><th>#</th><th>Bước</th><th>người chịu trách nhiệm</th><th>Evidence/MRR</th><th>Lặp lại vấn đề lại phải chặn</th></tr></thead><tbody><tr><td>1</td><td><strong>Trước khi làm: mở bản phát hành đúng REV từ SSOT và ghi REV vào hồ sơ đang dùng.</strong></td><td>Performer</td><td>Link SSOT + REV</td><td>Dùng bản in cũ</td></tr><tr><td>2</td><td><strong>Khi thấy khác nhau (drawing/spec/program/quy trình): dừng và gắn TẠM GIỮ.</strong></td><td>Performer</td><td>TẠM GIỮ tag/log</td><td>Tiếp tục làm</td></tr><tr><td>3</td><td><strong>Chụp bằng chứng thời điểm phát hiện (email/Photos màn hình ERP/link SSOT).</strong></td><td>Người phát hiện</td><td>Evidence file</td><td>Không có dấu thời gian</td></tr><tr><td>4</td><td><strong>Mở FRM-QMS-022 Thay đổi Thông báo trong 10 phút và mô tả phạm vi ảnh hưởng.</strong></td><td>Người phát hiện</td><td>FRM-QMS-022</td><td>Thay đổi trôi mất</td></tr><tr><td>5</td><td><strong>Đánh giá tác động theo FRM-QMS-006 (CTQ/OTD/chi phí/truy xuất nguồn gốc).</strong></td><td>người chịu trách nhiệm thay đổi</td><td>Tác động Matrix</td><td>Tác động chưa đánh giá</td></tr><tr><td>6</td><td><strong>Xác định ngưỡng phê duyệt và lấy phê duyệt trước khi thực thi.</strong></td><td>người chịu trách nhiệm thay đổi</td><td>Phê duyệt hồ sơ</td><td>Thực thi trước phê duyệt</td></tr><tr><td>7</td><td><strong>Cập nhật bộ hồ sơ chuẩn/phiếu theo dõi công việc/kế hoạch kiểm tra (plan) và thu hồi bản cũ.</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>đã cập nhật tài liệu SSOT</td><td>Tồn tại 2 bản</td></tr><tr><td>8</td><td><strong>Thông báo thay đổi theo danh sách nhận (sản xuất/QC/PLA/PUR/CS).</strong></td><td>người chịu trách nhiệm thay đổi</td><td>Truyền đạt log</td><td>Người liên quan không biết</td></tr><tr><td>9</td><td><strong>Thực hiện xác minh (FAI/mẫu đầu (tiên chi tiết / sản phẩm)/re-xác nhận) khi thay đổi ảnh hưởng CTQ.</strong></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td><td>Xác minh hồ sơ</td><td>Không xác minh CTQ</td></tr><tr><td>10</td><td><strong>Đóng thay đổi: cập nhật log, link bằng chứng, ghi bài học kinh nghiệm.</strong></td><td>người chịu trách nhiệm thay đổi</td><td>Closed hồ sơ</td><td>Không đóng hồ sơ</td></tr></tbody></table></div>
+<h2>9) OJT thực chiến theo TWI</h2>
+<h3>Job sự cố hỏng máy (Step / Điểm then chốt / Lý do)</h3>
+<div class="table-card"><table class="table"><thead><tr><th>Step</th><th>Vận hành</th><th>Điểm then chốt</th><th>Lý do</th></tr></thead><tbody><tr><td>1</td><td>Nhận diện kích hoạt</td><td>Đọc dữ kiện và xác định loại thay đổi</td><td>Đặt đúng quy trình xử lý</td></tr><tr><td>2</td><td>Dừng &amp; giữ</td><td>TẠM GIỮ tại điểm phát hiện</td><td>Chặn lỗi lan rộng</td></tr><tr><td>3</td><td>Mở hồ sơ</td><td>Tạo Thay đổi Thông báo + tác động matrix</td><td>Có dấu vết kiểm toán</td></tr><tr><td>4</td><td>Phê duyệt</td><td>Lấy đúng cấp phê duyệt</td><td>Tránh thay đổi ngoài kiểm soát</td></tr><tr><td>5</td><td>Triển khai</td><td>Cập nhật mốc chuẩn + thu hồi bản cũ + thông báo</td><td>Không tồn tại 2 bản</td></tr><tr><td>6</td><td>Xác minh &amp; đóng</td><td>Xác minh + đóng hồ sơ + bài học kinh nghiệm</td><td>Ngăn lỗi lặp</td></tr></tbody></table></div>
+<h3>OJT đầu ra bắt buộc</h3>
+<ul>
+<li>01 thay đổi gói hàng đầy đủ (Thay đổi Thông báo + tác động + phê duyệt + triển khai + xác minh + đóng).</li>
+<li>01 bằng chứng thu hồi bản cũ tại hiện trường và chỉ còn 1 bản phát hành trong SSOT.</li>
+<li>01 truyền đạt / giao tiếp log: ai nhận thông tin, ai đã được đào tạo lại.</li>
+</ul>
+<h3>Tiêu chí đánh giá L1–L4 (hành vi quan sát được)</h3>
+<div class="table-card"><table class="table rubric">
+<thead><tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện đạt</th></tr></thead>
+<tbody>
+<tr><td><strong>L1</strong></td><td>Nhận diện kích hoạt và kỷ luật phiên bản tại điểm làm việc</td><td>Không dùng sai REV; mở thông báo đúng; biết TẠM GIỮ</td></tr>
+<tr><td><strong>L2</strong></td><td>Triển khai thay đổi trong phạm vi tổ/công đoạn</td><td>Tác động rõ; đào tạo hồ sơ đủ; xác minh có dữ liệu</td></tr>
+<tr><td><strong>L3</strong></td><td>Dẫn dắt thay đổi bảng và giảm thoát / bỏ qua</td><td>KPI cải thiện; khẩn cấp giảm; nhà cung cấp thay đổi kiểm soát</td></tr>
+<tr><td><strong>L4</strong></td><td>Thiết kế hệ thống rủi ro &amp; thay đổi cấp công ty</td><td>Luồng công việc cưỡng chế; sẵn sàng đánh giá; KPI có phản ứng plan</td></tr>
+</tbody></table></div>
+<h2>10) Đánh giá</h2>
+<h3>Bài kiểm tra nhanh (≥ 20 câu)</h3>
+<div class="quiz"><ol><li>Thế nào là thay đổi trong <a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> của phân xưởng CNC?</li><li>5 kích hoạt thay đổi phổ biến nhất trong phân xưởng gia công theo đơn là gì?</li><li>Phiên bản set là gì và kiểm soát ở đâu?</li><li>Khi phát hiện sai REV, hành động đầu tiên là gì?</li><li>FRM-QMS-022 dùng để làm gì và ai mở?</li><li>FRM-QMS-006 tác động matrix gồm những trục nào?</li><li>Thay đổi nào bắt buộc rà soát đồng cấp?</li><li>Thay đổi nào bắt buộc xác minh/FAI?</li><li>Phân biệt thay đổi và NCR/CAPA.</li><li>Tại sao thu hồi bản cũ là bắt buộc?</li><li>Ai phê duyệt thay đổi ảnh hưởng CTQ?</li><li>Thay đổi từ khách hàng cần hồ sơ nào ở <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></span>?</li><li>Thay đổi nhà cung cấp hoàn thiện bề mặt cần kiểm soát gì?</li><li>Đổi bước tiến (feed)/tốc độ trên máy có phải thay đổi không? Khi nào phải log?</li><li>Tại sao bằng chứng phải có dấu thời gian và người chịu trách nhiệm?</li><li>Sai REV ảnh hưởng tới những hồ sơ nào?</li><li>Tại sao không gửi bản vẽ qua kênh cá nhân?</li><li>Khi thay đổi đã thực thi, đóng hồ sơ cần những mục nào?</li><li>sổ đăng ký rủi ro liên quan gì tới kiểm soát thay đổi?</li><li>Nêu 3 lỗi đánh giá hay gặp về thay đổi/phiên bản.</li><li>No bằng chứng = No thay đổi nghĩa là gì?</li><li>Cách kiểm tra 'chỉ có 1 bản phát hành'.</li></ol></div>
+<h3>Tình huống (≥ 3 tình huống thật)</h3>
+<details>
+<summary>Operator nhận bản in REV A nhưng SSOT đã là REV B</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>Tại máy có bản in REV A</li><li>Trong SSOT Part-REV-Bản gốc là REV B</li><li>Job đang chuẩn bị setup</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Hành động trong 60 giây và hồ sơ phải có.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>STOP setup; gắn TẠM GIỮ cho job tại máy.</li><li>Thu hồi bản in REV A và chụp ảnh làm bằng chứng.</li><li>Mở FRM-QMS-022 và ghi phạm vi: job, công đoạn, số lượng ảnh hưởng.</li><li>Thông báo trưởng nhóm + <a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a>; xác nhận phiên bản set trước khi tiếp tục.</li></ul></div>
+</div>
+</details>
+<details>
+<summary>Kỹ thuật muốn chỉnh program để giảm thời gian chu kỳ</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>Program mới thay đổi đường chạy dao</li><li>CTQ liên quan bề mặt và vị trí lỗ</li><li>Job đang chạy hàng loạt</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Cách thực thi thay đổi đúng kiểm soát.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>Mở thay đổi thông báo + tác động matrix; xác định ảnh hưởng CTQ.</li><li>Review đồng cấp program theo FRM-QMS-007; khóa bản phát hành cũ.</li><li>Chạy xác minh (mẫu đầu) trước phát hành hàng loạt.</li><li>Lưu 1 bản phát hành duy nhất trong SSOT; cập nhật traveler/kế hoạch kiểm tra (plan).</li></ul></div>
+</div>
+</details>
+<details>
+<summary>Supplier xi mạ anốt (anodize) báo đổi hóa chất trong tuần</summary>
+<div class="grid">
+<div class="dl"><h4>Dữ kiện</h4><ul><li>Supplier thay đổi quy trình xi mạ anốt (anodize)</li><li>Customer yêu cầu màu &amp; độ dày lớp</li><li>Có 3 job đang chờ xi mạ anốt (anodize)</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Quyết định và hồ sơ bắt buộc.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>TẠM GIỮ outsource cho 3 job cho đến khi đánh giá tác động.</li><li>Mở thay đổi gói hàng: FRM-QMS-022 + FRM-QMS-006 + nhà cung cấp bằng chứng.</li><li><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> xác định xác minh: test mẫu hoặc CoC bổ sung theo yêu cầu.</li><li>Mua hàng cập nhật đã phê duyệt nhà cung cấp list và điều kiện PO note.</li></ul></div>
+</div>
+</details>
+<h3>Hiệu suất test</h3>
+<div class="card">
+<h3>Bài test tay nghề — Tạo 01 gói Thay đổi Gói hàng đúng chuẩn</h3>
+<h4>Bài làm bắt buộc</h4>
+<ol>
+<li>Tạo FRM-QMS-022 cho tình huống giả lập đổi drawing REV.</li><li>Điền FRM-QMS-006 tác động matrix và chỉ ra 03 rủi ro CTQ/OTD/chi phí.</li><li>Cập nhật 01 hồ sơ công việc: thu hồi bản cũ, gắn link bản mới, và tạo 01 thông báo thay đổi.</li>
+</ol>
+<h4>ĐẠT/KHÔNG ĐẠT</h4>
+<ul>
+<li>đạt khi: thay đổi gói hàng đầy đủ; không tồn tại 2 bản phát hành; xác minh có dữ liệu; đào tạo hồ sơ có.</li>
+<li>Không đạt khi: thực thi thay đổi trước phê duyệt; không có tác động; không có xác minh; dùng sai REV.</li>
+</ul>
+</div>
+<h2>11) ĐẠT/KHÔNG ĐẠT tiêu chí</h2>
+<div class="kpi-gate">
+<strong>ĐẠT/KHÔNG ĐẠT (No bằng chứng = No thay đổi)</strong>
+<ul>
+<li>đạt khi: thay đổi gói hàng đầy đủ; chỉ 1 bản phát hành; xác minh có dữ liệu; đào tạo hồ sơ đủ; truy xuất nguồn gốc ≤ 60 giây.</li>
+<li>FAIL ngay khi: thực thi thay đổi trước phê duyệt; dùng sai REV; không có tác động/xác minh; không có dấu vết kiểm toán.</li>
+</ul>
+</div>
+<h2>12) MRR tối thiểu (hồ sơ bắt buộc + đặt tên + nơi lưu)</h2>
+<p><strong>Quy tắc đặt tên:</strong> <span class="mono">JobNum_or_System_REV_ChangeType_YYYYMMDD_##.ext (chỉ A–Z,0–9, '-', '_'; không dùng dấu cách).</span></p>
+<ul>
+<li>FRM-QMS-022 Tài liệu/Data Thay đổi Thông báo (SSOT).</li><li>FRM-QMS-006 Thay đổi Tác động Matrix (CTQ/OTD/chi phí/truy xuất nguồn gốc).</li><li>FRM-SAL-003 Customer Thay đổi Đơn hàng Review (khi thay đổi từ khách).</li><li>FRM-QMS-007 Đồng nghiệp / Ngang cấp Review Log (program/spec thay đổi).</li><li>FRM-QMS-005 Register rủi ro mục nhập (rủi ro người chịu trách nhiệm + due).</li><li>Bản phát hành mới: drawing/spec/program/setup/kế hoạch kiểm tra (plan) (SSOT).</li><li>Xác minh bằng chứng: mẫu đầu/FAI/re-xác nhận hồ sơ.</li><li>Truyền đạt log: ai Received và ai đã được đào tạo lại.</li>
+</ul>
+<div class="callout"><strong>Nơi lưu (SSOT):</strong> M365/SharePoint → CNC-IMS-HUB → <span class="mono">QMS-Được kiểm soát-Tài liệu</span> và <span class="mono">Job-Hồ sơ</span>.</div>
+<h2>13) Chung đánh giá phát hiện &amp; phòng ngừa</h2>
+<ol>
+<li>Dùng sai REV tại hiện trường (bản in cũ, file rời).</li>
+<li>Thay đổi không có hồ sơ hoặc không có phê duyệt.</li>
+<li>Tác động matrix thiếu CTQ/hồ sơ bị ảnh hưởng.</li>
+<li>Tồn tại 2 bản phát hành; không thu hồi bản cũ.</li>
+<li>Xác minh không có dữ liệu hoặc không link SSOT.</li>
+<li>Training sau thay đổi không có hồ sơ/re-cert.</li>
+<li>Supplier thay đổi không có bằng chứng hoặc PO note không cập nhật.</li>
+<li>sổ đăng ký rủi ro treo, không người chịu trách nhiệm/due.</li>
+</ol>
+<h2>Tài liệu liên quan</h2>
+<ul><li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-106-change-and-configuration-management.html">SOP-QMS-008 — Thay đổi Quản lý</a></li><li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-103-risk-opportunity-fmea-and-control-plan.html">SOP-QMS-003 — Rủi ro &amp; Cơ hội</a></li><li><a href="../../../03-Tai-Lieu-Van-Hanh//01-SOPs//01-SOP-100//sop-101-document-and-data-control.html">SOP-QMS-001 — Tài liệu Control</a></li><li><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-102_Document_Change_Request.xlsx">FRM-QMS-022 — Tài liệu/Data Thay đổi Thông báo</a></li><li><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-162_Change_Impact_Matrix.xlsx">FRM-QMS-006 — Thay đổi Tác động Matrix</a></li><li><a download="" href="../../../04-Bieu-Mau/01-FRM-100/FRM-131_Risks_and_Opportunities_Register.xlsx">FRM-QMS-005 — Register rủi ro</a></li></ul></div></div></div>
+</div>
+<script src="../../../../assets/app.js"></script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
+
+</div>

@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>TRN-ACA-MRR-01 — Job Dossier Pack (RFQ → Cash) | HESEM Academy</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<title>MRR-01 - Job Dossier | HESEM QMS</title>
+<link href="../../../assets/style.css" rel="stylesheet">
 
 <style>
  .chk{font-family:var(--mono); font-weight:800;}
@@ -16,166 +15,89 @@
  .tight li{margin:4px 0;}
  .formline{display:inline-block; min-width:160px; border-bottom:1px solid var(--line);}
  .muted2{color:var(--muted);}
- .pill{display:inline-block; padding:2px 8px; border:1px solid var(--line); border-radius:999px; font-size:.82rem;}
- 
-/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
-@media print {
- .card, .table-card, .callout, .note, .box, .iso-map,
- .preface-block, .jd-mission, .form-sheet, .lane,
- .legend, .req, .auth-grid, .backup-card, .vstep {
- page-break-inside: avoid;
- break-inside: avoid;
- }
- h1, h2, h3, .h1, .h2, .h3 {
- page-break-after: avoid;
- break-after: avoid;
- }
- .form-header {
- page-break-inside: avoid;
- break-inside: avoid;
- }
- .sig-row, .sign-row, .approval-row {
- page-break-inside: avoid;
- break-inside: avoid;
- }
- tr { page-break-inside: avoid; break-inside: avoid; }
+ .pill{
  thead { display: table-header-group; }
  tfoot { display: table-footer-group; }
  p { orphans: 3; widows: 3; }
- .table-card { overflow: visible !important; }
-}
+ 
 .page-body { overflow-x: hidden; }
 .table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
 table { max-width: 100%; table-layout: auto; }
 td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
-
+}
 </style>
+<style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
 </head>
 <body>
 
 <div class="container"><div class="page"><div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-  <div class="fh-company">
-    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
-  </div>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
 </div>
 <div class="title">
-  <strong>MRR-01-JOB-DOSSIER — Job Dossier Pack (RFQ → Cash) | HESEM Academy</strong>
-  <span class="sub-vn"></span>
+<strong class="doc-name">Job Dossier</strong>
+<span class="sub-vn"></span>
 </div>
-<div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>MRR-01-JOB-DOSSIER</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
-</div>
-</div>
-<div class="doc-content" id="docContent">
-<div class="cover">
-<div class="kicker">MRR Pack</div>
-<h1 class="h1">Job Dossier Pack (RFQ → Cash)</h1>
-<p class="lead">Bộ checklist MRR theo gate G0→G5 để vận hành job CNC và truy xuất audit 60 giây.</p>
-<div class="grid-2">
-<div class="note">
-<strong>Áp dụng</strong>
-<ul class="tight">
-<li><b>Vai trò:</b> Sales • Planning • ENG • OPS • QA/QMS • WHS • Finance</li>
-<li><b>Chuẩn lưu:</b> SSOT theo <a href="../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a></li>
-<li><b>Gate:</b> Thiếu MRR → STOP/HOLD/BLOCK theo mục “Fail-fast”.</li>
-<li><b>Gate Packs:</b> <a href="mrr-g0-rfq-quote.html"><b>G0</b></a> <a href="mrr-g1-contract-kickoff.html"><b>G1</b></a> <a href="mrr-g2-engineering-release.html"><b>G2</b></a> <a href="mrr-g3-production-fai-release.html"><b>G3</b></a> <a href="mrr-g4-final-ship-packet.html"><b>G4</b></a> <a href="mrr-g5-closeout-billing.html"><b>G5</b></a></li></ul>
-</div>
-<div class="note">
-<strong>Thông tin Job / Hồ sơ</strong>
-<div class="mini">
- JobCode: <span class="formline"> </span><br/>
- Khách hàng: <span class="formline"> </span><br/>
- Part No: <span class="formline"> </span>   Rev: <span class="formline"> </span><br/>
- Số lượng: <span class="formline"> </span>   Due: <span class="formline"> </span><br/>
-</div>
-</div>
-</div>
-</div>
+<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">MRR-01</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
 <div class="card">
-<h2 class="h2" style="margin-top:0;">Job Dossier Folder Map (SSOT)</h2>
-<p class="mini muted2">Dùng đúng thư mục để truy xuất audit 60 giây. MRR theo gate nằm trong Gate Packs G0→G5.</p>
-<div style="overflow:auto;">
-<table class="form-table">
-<tr><th style="min-width:260px;">Thư mục</th><th>Mục đích</th><th style="min-width:260px;">MRR chính</th></tr>
-<tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/00_RFQ/</td><td>RFQ, spec bundle, CTQ, quote</td><td class="mini">RFQ • SPEC • CTQ • QTE • RISK0</td></tr>
-<tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/01_CONTRACT/</td><td>PO/Contract, contract review, kickoff</td><td class="mini">PO/CON • CR • REVBASE • KOM • PLAN0</td></tr>
-<tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/</td><td>Engineering baseline, CAM/NC, control plan, DCR record</td><td class="mini">DRW • PP • NCREL • CTRL • CHG</td></tr>
-<tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/03_PRODUCTION/</td><td>Traveler, setup, machine readiness, handoff</td><td class="mini">TRV • SETUP • MCH • HO</td></tr>
-<tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/</td><td>FAI/IPQC/Final, NCR/CAPA</td><td class="mini">FAI/IR • IPQC • FIR • DIM • NCR/CAPA</td></tr>
-<tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/05_SUPPLIER/</td><td>Supplier/subcontract, cert bundle</td><td class="mini">PO • SUBCON • MTR/COC • CERT</td></tr>
-<tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/06_SHIPPING/</td><td>Ship packet, CoC, packing, waybill</td><td class="mini">COC • SHPK • PACK • SHIP</td></tr>
-<tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/07_FINANCE/</td><td>Invoice, POD</td><td class="mini">INV • POD</td></tr>
-<tr><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/99_CLOSEOUT/</td><td>Cost capture, lessons learned, job review</td><td class="mini">COST • LL</td></tr>
-</table>
-</div>
-<div class="note mini"><b>Rule:</b> File nằm sai thư mục hoặc sai tên → FAIL (không công nhận bằng chứng).</div>
-</div>
-<div class="card">
-<h2 class="h2" style="margin-top:0;">Checklist MRR (Minimum Required Records)</h2>
-<p class="mini muted2">Tick đủ các dòng dưới đây. Mỗi dòng phải có bằng chứng trong SSOT và đặt tên file đúng chuẩn.</p>
+<h2 class="h2" style="margin-top:0;">Bảng kiểm MRR (Tối thiểu Bắt buộc Hồ sơ)</h2>
+<p class="mini muted2">Dấu tích đủ các dòng dưới đây. Mỗi dòng phải có bằng chứng trong SSOT và đặt tên file đúng chuẩn.</p>
 <div style="overflow:auto;">
 <table class="form-table">
 <tr>
-<th style="min-width:320px;">MRR / Bằng chứng</th>
+<th style="min-width:320px;">MRR / Evidence</th>
 <th style="min-width:140px;">RecordType</th>
-<th style="min-width:110px;">Gate</th>
-<th style="min-width:120px;">Owner</th>
+<th style="min-width:110px;">Cổng kiểm soát</th>
+<th style="min-width:120px;">người chịu trách nhiệm</th>
 <th style="min-width:220px;">SSOT path</th>
 <th style="min-width:260px;">Tên file chuẩn</th>
 </tr>
-<tr><td><span class="chk">☐</span> RFQ + yêu cầu khách hàng (bản gốc)</td><td>RFQ</td><td>G0</td><td>Sales</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/00_RFQ/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_RFQ_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> Contract Review (yêu cầu/CTQ/rủi ro/chấp nhận năng lực)</td><td>CR</td><td>G1</td><td>Sales+QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/01_CONTRACT/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CR_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> PO/WO/JobCode được phát hành</td><td>WO</td><td>G1</td><td>Planning</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/01_CONTRACT/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_WO_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> Baseline bản vẽ + spec (REV kiểm soát)</td><td>DRAW/SPEC</td><td>G2</td><td>ENG</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_DRAWREV_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>.pdf</td></tr>
-<tr><td><span class="chk">☐</span> Route / Process Plan / CTQ map</td><td>PLAN</td><td>G2</td><td>ENG</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_PLAN_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> Risk Register (job-level) + hành động chặn</td><td>RISK</td><td>G2</td><td>QA+OPS</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_RISK_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> NC Release Pack (simulation + checklist release)</td><td>NCREL</td><td>G2</td><td>CAM/ENG</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/NC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_NCREL_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> Traveler / Job Pack (theo route)</td><td>TRV</td><td>G3</td><td>Planning</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/03_PRODUCTION/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_TRV_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> Setup Sheet + Tool list + Offset list</td><td>SETUP</td><td>G3</td><td>Setup</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/03_PRODUCTION/SETUP/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_SETUP_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> FAI/IR (first piece) được QC ký xác nhận</td><td>FAI/IR</td><td>G3</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/FAI/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_FAI_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> IPQC record theo tần suất/CTQ</td><td>IPQC</td><td>G3</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/IPQC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_IPQC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> NCR (khi phát hiện NG) + disposition (HOLD/REWORK/SCRAP)</td><td>NCR</td><td>G3</td><td>QA</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/NCR/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_NCR_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> CAPA (khi NCR lặp/escape) + verification</td><td>CAPA</td><td>G4</td><td>QA/QMS</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/CAPA/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CAPA_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
-<tr><td><span class="chk">☐</span> Final Inspection Report + acceptance</td><td>FQC</td><td>G4</td><td>QC</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/FQC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_FQC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> CoC/CoA + Ship Packet (packing list/label)</td><td>COC/SHIP</td><td>G5</td><td>QA+WHS</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/05_SHIP/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_SHIP_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
-<tr><td><span class="chk">☐</span> Invoice/Costing close-out</td><td>INV</td><td>G5</td><td>Finance</td><td class="mini">SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/06_CLOSE/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_INV_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> RFQ + yêu cầu khách hàng (bản gốc)</td><td>RFQ</td><td>G0</td><td>ENGINEERING/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_DRAWREV_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Lộ trình / Quy trình Plan / CTQ map</td><td>PLAN</td><td>G2</td><td>ENGINEERING/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_PLAN_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> sổ đăng ký rủi ro (sổ đăng ký) (job-level) + hành động chặn</td><td>rủi ro</td><td>G2</td><td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a>+OPS</td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/02_ENGINEERING/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_RISK_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> NC Gói phát hành (mô phỏng + bảng kiểm phát hành)</td><td>NCREL</td><td>G2</td><td>ENGINEERING/NC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_NCREL_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Traveler / Job Pack (theo lộ trình gia công)</td><td>TRV</td><td>G3</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Planning and Control Function (Dieu do va kiem soat san xuat)"><span class="entity-code dept-code">D-PPC</span></a></span></td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/03_PRODUCTION/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_TRV_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Setup Sheet + Tool list + bù trừ (offset) list</td><td>SETUP</td><td>G3</td><td>Setup</td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/03_PRODUCTION/SETUP/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_SETUP_<span class="pill">&lt;REV&gt;</span>_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> FAI/IR (mẫu đầu (tiên chi tiết / sản phẩm) được <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a> ký xác nhận</td><td>FAI/IR</td><td>G3</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/FAI/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_FAI_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> IPQC hồ sơ theo tần suất/CTQ</td><td>IPQC</td><td>G3</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/IPQC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_IPQC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> NCR (khi phát hiện NG) + disposition (TẠM GIỮ/SỬA HÀNG/phế liệu)</td><td>NCR</td><td>G3</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/NCR/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_NCR_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> CAPA (khi NCR lặp/thoát / bỏ qua) + xác minh</td><td>CAPA</td><td>G4</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/CAPA/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_CAPA_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.xlsx</td></tr>
+<tr><td><span class="chk">☐</span> Final Kiểm tra Báo cáo + acceptance</td><td>FQC</td><td>G4</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/04_QUALITY/FQC/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_FQC_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> CoC/CoA + Bộ hồ sơ giao hàng (phiếu kê đóng gói/label)</td><td>COC/SHIP</td><td>G5</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/05_SHIP/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_SHIP_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
+<tr><td><span class="chk">☐</span> Hóa đơn/Tính giá thành đóng-out</td><td>INV</td><td>G5</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-finance-handbook.html" title="Finance Department (Phong Tai chinh)"><span class="entity-code dept-code">D-FIN</span></a></span></td><td class="mini">SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/06_CLOSE/</td><td class="mini"><span class="pill">&lt;JOBCODE&gt;</span>_INV_<span class="pill">&lt;YYYYMMDD&gt;</span>_001.pdf</td></tr>
 </table>
 </div>
-<div class="note mini"><strong>Gắn với module</strong>: C10 (RFQ→Cash), C13 (Change control), C08 (SSOT), C09 (OTD), C15 (Material/Process), C17 (Setup/CAM), C18 (Supply chain).</div>
+<div class="note mini"><strong>Gắn với mô-đun</strong>: C10 (RFQ→Tiền mặt), C13 (Kiểm soát thay đổi), C08 (SSOT), C09 (OTD), C15 (Nguyên vật liệu/Quy trình), C17 (Setup/CAM), C18 (Cung ứng chuỗi).</div>
 </div>
 <div class="card">
-<h2 class="h2" style="margin-top:0;">Fail-fast (STOP/HOLD/BLOCK)</h2>
+<h2 class="h2" style="margin-top:0;">Fail-nhanh (STOP/TẠM GIỮ/CHẶN)</h2>
 <ul class="tight">
-<li>Sai REV bản vẽ hoặc thiếu baseline trong SSOT → BLOCK.</li><li>Thiếu Contract Review hoặc thiếu CTQ map → HOLD tại G2.</li><li>Chạy máy khi chưa có NC Release Pack hoặc setup sheet → STOP.</li><li>FAI/IR chưa ký mà đã chạy hàng loạt → STOP và HOLD toàn bộ WIP.</li><li>Ship khi thiếu CoC/Ship Packet → BLOCK.</li>
+<li>Sai REV bản vẽ hoặc thiếu mốc chuẩn trong SSOT → CHẶN.</li><li>Thiếu rà soát hợp đồng hoặc thiếu CTQ map → TẠM GIỮ tại G3.</li><li>Chạy máy khi chưa có NC Gói phát hành hoặc phiếu cài đặt → STOP.</li><li>FAI/IR chưa ký mà đã chạy hàng loạt → STOP và TẠM GIỮ toàn bộ WIP.</li><li>giao hàng khi thiếu CoC/bộ hồ sơ giao hàng → CHẶN.</li>
 </ul>
 </div>
 <div class="card">
-<h2 class="h2" style="margin-top:0;">Audit 60 giây</h2>
+<h2 class="h2" style="margin-top:0;">Đánh giá 60 giây</h2>
 <ol class="tight">
-<li>Mở SSOT/Jobs/<span class="pill">&lt;JOBCODE&gt;</span>/ và xác nhận có đủ thư mục 00→06.</li><li>Mở file baseline DRAWREV và kiểm tra REV trùng PO/WO.</li><li>Mở NCREL checklist và xác nhận simulation + release sign-off.</li><li>Mở FAI/IR và đối chiếu CTQ map.</li><li>Mở Ship Packet và kiểm tra CoC/packing list/label khớp JobCode.</li>
+<li>Mở SSOT/công việc / đơn hàng/<span class="pill">&lt;JOBCODE&gt;</span>/ và xác nhận có đủ thư mục 00→06.</li><li>Mở file mốc chuẩn phiên bản bản vẽ (DRAWREV) và kiểm tra REV trùng PO/WO.</li><li>Mở NCREL bảng kiểm và xác nhận mô phỏng + phát hành ký-off.</li><li>Mở FAI/IR và đối chiếu CTQ map.</li><li>Mở bộ hồ sơ giao hàng và kiểm tra CoC/phiếu kê đóng gói/label khớp JobCode.</li>
 </ol>
 </div>
 <div class="card">
 <h2 class="h2" style="margin-top:0;">Ký xác nhận</h2>
 <div class="sig">
-<div class="box"><b>Người lập</b><br/><span class="mini">Họ tên / Chức danh / Ngày</span></div>
-<div class="box"><b>Người kiểm</b><br/><span class="mini">Họ tên / Chức danh / Ngày</span></div>
-<div class="box"><b>QA/QMS xác nhận</b><br/><span class="mini">Họ tên / Chức danh / Ngày</span></div>
+<div class="box"><b>Người lập</b><br><span class="mini">Họ tên / Chức danh / Ngày</span></div>
+<div class="box"><b>Người kiểm</b><br><span class="mini">Họ tên / Chức danh / Ngày</span></div>
+<div class="box"><b><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> xác nhận</b><br><span class="mini">Họ tên / Chức danh / Ngày</span></div>
 </div>
 </div>
 </div>
 </div></div></div>
 
 <script src="../../../assets/app.js"></script>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
 </body>
 </html>
-

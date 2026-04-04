@@ -32,11 +32,11 @@
     "UAT result per representative form"
   ],
   "supporting_docs": {
-    "pack": "04-Bieu-Mau/10-FRM-CONTROL/pilot-endpoint-rollout-pack.html",
-    "desktop_baseline": "04-Bieu-Mau/10-FRM-CONTROL/desktop-excel-endpoint-baseline.html",
-    "uat_pack": "04-Bieu-Mau/10-FRM-CONTROL/production-acceptance-uat-pack.html",
-    "windows_endpoint_note": "04-Bieu-Mau/10-FRM-CONTROL/runtime-examples/windows-excel-endpoint-baseline.md"
+    "pack": "04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/pilot-endpoint-rollout-pack.html",
+    "desktop_baseline": "04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/desktop-excel-endpoint-baseline.html",
+    "uat_pack": "04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/production-acceptance-uat-pack.html",
+    "windows_endpoint_note": "04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/runtime-examples/windows-excel-endpoint-baseline.md"
   },
-  "standard_ref": "03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-042-excel-form-pilot-endpoint-rollout-and-save-path-control.html",
+  "standard_ref": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-137-excel-form-pilot-endpoint-rollout-and-save-path-control.html",
   "updated_at": "2026-03-21"
 }

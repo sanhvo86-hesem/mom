@@ -1,31 +1,152 @@
-// WORKFLOW ACTIONS
-// ═══════════════════════════════════════════════════
+﻿// WORKFLOW ACTIONS
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function edClearInjectedDocShellStyles(){
+  try{
+    document.querySelectorAll('[data-ed-doc-shell-style="1"]').forEach(function(node){ node.remove(); });
+  }catch(e){}
+}
+
+function edSyncDocShellStyles(iframeDoc){
+  try{
+    edClearInjectedDocShellStyles();
+    if(!iframeDoc || !iframeDoc.head) return;
+    var head = document.head || document.documentElement;
+    var existing = {};
+    document.querySelectorAll('link[rel="stylesheet"][href]').forEach(function(node){
+      existing[String(node.href || '').trim()] = true;
+    });
+    iframeDoc.querySelectorAll('link[rel="stylesheet"][href], style').forEach(function(node){
+      if(!node) return;
+      if(node.tagName === 'LINK'){
+        var href = String(node.href || '').trim();
+        if(!href || existing[href]) return;
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        link.setAttribute('data-ed-doc-shell-style', '1');
+        head.appendChild(link);
+        existing[href] = true;
+        return;
+      }
+      var css = String(node.textContent || '').trim();
+      if(!css) return;
+      var style = document.createElement('style');
+      style.setAttribute('data-ed-doc-shell-style', '1');
+      style.textContent = css;
+      head.appendChild(style);
+    });
+  }catch(e){}
+}
+
+function edPrepareFormTemplateClone(bodyClone){
+  try{
+    if(!bodyClone || !bodyClone.querySelector) return false;
+    var isFormDoc = !!bodyClone.querySelector('#scarForm,[data-form-edit-root],.qf-section,.scar-record-strip');
+    if(!isFormDoc) return false;
+    bodyClone.setAttribute('data-mode', 'view');
+    bodyClone.querySelectorAll('#runtimeAlert,.scar-runtime-alert,[data-sign-block],[data-sign-clear],[data-workflow-action],.scar-lookup-self').forEach(function(node){
+      if(node) node.remove();
+    });
+    bodyClone.querySelectorAll('#btnPrint,#btnEdit,#btnCancel,#btnSaveDraft,#btnReset,#btnSubmit,.scar-view-btn,.scar-edit-btn').forEach(function(node){
+      if(node) node.remove();
+    });
+    var workflowPanel = bodyClone.querySelector('#scarWorkflowPanel');
+    if(workflowPanel){
+      workflowPanel.innerHTML =
+        '<div class="scar-signature-grid">' +
+          '<div class="scar-signature-card"><div class="scar-signature-head"><div><strong>Originator</strong><span>Người phát hành</span></div><span class="scar-signature-meaning">AUTHORED</span></div><div class="scar-signature-pad"><div class="scar-signature-empty">Block chữ ký mẫu</div><div>Chỉ chỉnh bố cục và thuộc tính. Chữ ký thật chỉ chạy khi mở hồ sơ runtime.</div></div></div>' +
+          '<div class="scar-signature-card"><div class="scar-signature-head"><div><strong>QA Reviewer</strong><span>Người xem xét QA</span></div><span class="scar-signature-meaning">REVIEWED</span></div><div class="scar-signature-pad"><div class="scar-signature-empty">Block chữ ký mẫu</div><div>Chỉ chỉnh bố cục và thuộc tính. Chữ ký thật chỉ chạy khi mở hồ sơ runtime.</div></div></div>' +
+          '<div class="scar-signature-card"><div class="scar-signature-head"><div><strong>Approver</strong><span>Người phê duyệt</span></div><span class="scar-signature-meaning">APPROVED</span></div><div class="scar-signature-pad"><div class="scar-signature-empty">Block chữ ký mẫu</div><div>Chỉ chỉnh bố cục và thuộc tính. Chữ ký thật chỉ chạy khi mở hồ sơ runtime.</div></div></div>' +
+        '</div>' +
+        '<div class="scar-workflow-note">Chế độ chỉnh mẫu: workflow, chữ ký điện tử, gửi xem xét và phê duyệt chỉ hoạt động khi mở hồ sơ thật. Tại đây anh chỉnh block, field, lookup và layout.</div>';
+    }
+    var actionsBar = bodyClone.querySelector('#qfActionsBar');
+    if(actionsBar){
+      actionsBar.classList.add('ed-form-template-actions');
+      actionsBar.innerHTML =
+        '<div class="qf-helper">Chế độ chỉnh mẫu form. Các nút Lưu nháp, Gửi SCAR, Ký và workflow runtime chỉ hoạt động khi mở hồ sơ thật trong workspace.</div>' +
+        '<div class="qf-actions-spacer"></div>' +
+        '<button class="qf-btn primary" type="button" disabled>Đang chỉnh bố cục mẫu HTML</button>';
+    }
+    try{
+      if(typeof window.edRepairMojibake === 'function') window.edRepairMojibake(bodyClone);
+    }catch(_repairErr){}
+    return true;
+  }catch(_err){
+    return false;
+  }
+}
+
+function edScrubLiveFormRuntime(root){
+  try{
+    if(!root || !root.querySelectorAll) return;
+    root.classList.add('ed-form-template-surface');
+    root.querySelectorAll('[data-sign-block],[data-sign-clear],[data-workflow-action],.scar-signature-overlay,.esig-overlay').forEach(function(node){
+      if(node) node.remove();
+    });
+    root.querySelectorAll('#btnPrint,#btnEdit,#btnCancel,#btnSaveDraft,#btnReset,#btnSubmit,.scar-view-btn,.scar-edit-btn,.scar-lookup-self').forEach(function(node){
+      if(node) node.remove();
+    });
+    root.querySelectorAll('#qfActionsBar').forEach(function(node){
+      node.classList.add('ed-form-template-actions');
+      node.innerHTML =
+        '<div class="qf-helper">Chế độ chỉnh mẫu form. Các nút Lưu nháp, Gửi SCAR, Ký và workflow runtime chỉ hoạt động khi mở hồ sơ thật trong workspace.</div>' +
+        '<div class="qf-actions-spacer"></div>' +
+        '<button class="qf-btn primary" type="button" disabled>Đang chỉnh bố cục mẫu HTML</button>';
+    });
+    root.querySelectorAll('#scarWorkflowPanel').forEach(function(node){
+      node.innerHTML =
+        '<div class="scar-signature-grid">' +
+          '<div class="scar-signature-card"><div class="scar-signature-head"><div><strong>Originator</strong><span>Người phát hành</span></div><span class="scar-signature-meaning">AUTHORED</span></div><div class="scar-signature-pad"><div class="scar-signature-empty">Block chữ ký mẫu</div><div>Chỉ chỉnh bố cục và thuộc tính. Chữ ký thật chỉ chạy khi mở hồ sơ runtime.</div></div></div>' +
+          '<div class="scar-signature-card"><div class="scar-signature-head"><div><strong>QA Reviewer</strong><span>Người xem xét QA</span></div><span class="scar-signature-meaning">REVIEWED</span></div><div class="scar-signature-pad"><div class="scar-signature-empty">Block chữ ký mẫu</div><div>Chỉ chỉnh bố cục và thuộc tính. Chữ ký thật chỉ chạy khi mở hồ sơ runtime.</div></div></div>' +
+          '<div class="scar-signature-card"><div class="scar-signature-head"><div><strong>Approver</strong><span>Người phê duyệt</span></div><span class="scar-signature-meaning">APPROVED</span></div><div class="scar-signature-pad"><div class="scar-signature-empty">Block chữ ký mẫu</div><div>Chỉ chỉnh bố cục và thuộc tính. Chữ ký thật chỉ chạy khi mở hồ sơ runtime.</div></div></div>' +
+        '</div>' +
+        '<div class="scar-workflow-note">Chế độ chỉnh mẫu: workflow, chữ ký điện tử, gửi xem xét và phê duyệt chỉ hoạt động khi mở hồ sơ thật. Tại đây anh chỉnh block, field, lookup và layout.</div>';
+    });
+    try{
+      if(typeof window.edRepairMojibake === 'function') window.edRepairMojibake(root);
+    }catch(_repairErr){}
+  }catch(_err){}
+}
+
+function edPrepareFormTemplateHtmlFragment(html){
+  try{
+    var shell = document.createElement('div');
+    shell.innerHTML = String(html || '');
+    edPrepareFormTemplateClone(shell);
+    return shell.innerHTML;
+  }catch(_err){
+    return String(html || '');
+  }
+}
+
 function startEdit(code){
   try{
     if(window.edTiptapAdapter && typeof window.edTiptapAdapter.destroy==='function'){
       try{ window.edTiptapAdapter.destroy(true); }catch(_e){}
     }
-    const doc=DOCS.find(d=>d.code===code);
+    const doc=(typeof window._resolveDocRecord === 'function') ? window._resolveDocRecord(code) : DOCS.find(d=>d.code===code);
     if(!doc||!canEdit(doc)) return;
+    const resolvedCode = String(doc.code || '').trim();
     // Safety: do not allow editing while Google Translate is active (EN mode)
     // to avoid saving translated DOM back into the Vietnamese master HTML.
     if(lang==='en'){
-      showToast(lang==='en'?'↩ Switch to Vietnamese to edit':'↩ Vui lòng chuyển về tiếng Việt để chỉnh sửa');
+      showToast(lang==='en'?'â†© Switch to Vietnamese to edit':'â†© Vui lÃ²ng chuyá»ƒn vá» tiáº¿ng Viá»‡t Ä‘á»ƒ chá»‰nh sá»­a');
       try{ setLang('vi'); }catch(e){}
       return;
     }
-    editingDoc=code;
+    editingDoc=resolvedCode;
     editMode=true;
     edModified=false;
     
     const iframe=document.getElementById('doc-iframe');
     if(!iframe){
-      showToast(lang==='en'?'Document not loaded':'Chưa tải tài liệu');
+      showToast(lang==='en'?'Document not loaded':'ChÆ°a táº£i tÃ i liá»‡u');
       editMode=false; editingDoc=null;
       return;
     }
-    const saved=getEditedHtml(code);
-    const recovery=(!saved && typeof edGetRecoveryDraft==='function') ? edGetRecoveryDraft(code) : null;
+    const saved=getEditedHtml(resolvedCode);
+    const recovery=(!saved && typeof edGetRecoveryDraft==='function') ? edGetRecoveryDraft(resolvedCode) : null;
     
     // Build an editor shell from the currently loaded iframe so edit mode renders
     // the full document (header + correct HTML/CSS context) instead of only docContent.
@@ -33,7 +154,9 @@ function startEdit(code){
     try{
       var iframeDoc = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document);
       if(iframeDoc && iframeDoc.body){
+        edSyncDocShellStyles(iframeDoc);
         var bodyClone = iframeDoc.body.cloneNode(true);
+        edPrepareFormTemplateClone(bodyClone);
         bodyClone.querySelectorAll('script').forEach(function(s){s.remove();});
         bodyClone.querySelectorAll('#goog-gt-tt,.goog-te-banner-frame,#google_translate_element').forEach(function(el){el.remove();});
         // Remove only auto-injected duplicate header; keep original .form-header visible
@@ -61,6 +184,7 @@ function startEdit(code){
           });
         }
       }catch(e){}
+      safeHtml = edPrepareFormTemplateHtmlFragment(safeHtml);
       originalHtml=safeHtml;
       iframe.style.display='none';
       var ec=document.getElementById('editor-container');
@@ -73,7 +197,15 @@ function startEdit(code){
         _ea.classList.add('ed-doc-shell');
         _ea.innerHTML='<div class="qms-doc">'+shellHtml+'</div>';
         const wrap=_ea.querySelector('.qms-doc');
-        const dc=wrap ? wrap.querySelector('#docContent') : null;
+        const hasDocContent=!!(wrap && wrap.querySelector('#docContent'));
+        const dc=wrap
+          ? (wrap.querySelector('#docContent')
+            || wrap.querySelector('[data-form-edit-root]')
+            || wrap.querySelector('.page-body')
+            || wrap.querySelector('main')
+            || wrap.querySelector('form')
+            || wrap)
+          : null;
         // Don't set contenteditable=false on wrapper - it blocks execCommand on children
         // Instead, use CSS user-select:none and pointer-events:none on non-editable parts
         if(wrap){
@@ -82,15 +214,18 @@ function startEdit(code){
           // Some templates nest #docContent inside a wrapper (.container/.page/...),
           // so locking every direct child except #docContent can accidentally lock
           // the whole editable branch and break typing/find-replace inside tables.
-          wrap.querySelectorAll(':scope > *').forEach(el=>{
-            if(dc && (el===dc || el.contains(dc))) return;
-            el.setAttribute('contenteditable','false');
-            el.style.pointerEvents='none';
-            el.style.userSelect='none';
-          });
+          if(dc && dc !== wrap){
+            wrap.querySelectorAll(':scope > *').forEach(el=>{
+              if(el===dc || el.contains(dc)) return;
+              el.setAttribute('contenteditable','false');
+              el.style.pointerEvents='none';
+              el.style.userSelect='none';
+            });
+          }
         }
         if(dc){
-          dc.innerHTML=originalHtml;
+          if(hasDocContent || dc !== wrap) dc.innerHTML=originalHtml;
+          edScrubLiveFormRuntime(dc);
           dc.setAttribute('contenteditable','true');
           dc.setAttribute('spellcheck','true');
           dc.style.pointerEvents='auto';
@@ -110,12 +245,11 @@ function startEdit(code){
             ) return;
             el.removeAttribute('contenteditable');
           });
-        }else{
-          _ea.innerHTML=originalHtml;
         }
       }else{
         _ea.classList.remove('ed-doc-shell');
         _ea.innerHTML=originalHtml;
+        edScrubLiveFormRuntime(_ea);
       }
       try{
         if(typeof edApplyGlobalTablePolicy==='function'){
@@ -131,7 +265,7 @@ function startEdit(code){
       buildEditorToolbar();
       edUpdateWordCount();
       const st=document.getElementById('ed-status-save');
-      if(st){st.textContent=(lang==='en'?'Ready':'Sẵn sàng');st.className='';}
+      if(st){st.textContent=(lang==='en'?'Ready':'Sáºµn sÃ ng');st.className='';}
       renderWorkflowPanel(doc);
     }
     
@@ -160,7 +294,7 @@ function startEdit(code){
         showToast(lang==='en'?'Recovered local draft loaded':'\u0110\u00e3 t\u1ea3i b\u1ea3n nh\u00e1p kh\u00f4i ph\u1ee5c c\u1ee5c b\u1ed9');
         return;
       }
-      try{ if(typeof edClearRecoveryDraft==='function') edClearRecoveryDraft(code); }catch(e){}
+      try{ if(typeof edClearRecoveryDraft==='function') edClearRecoveryDraft(resolvedCode); }catch(e){}
     }
     
     // Try direct iframe access first
@@ -170,6 +304,11 @@ function startEdit(code){
         var docContent = iframeDoc.getElementById('docContent');
         if(docContent){
           _activateEditor(docContent.innerHTML);
+          return;
+        }
+        var formEditRoot = iframeDoc.querySelector('[data-form-edit-root], .page-body, main, form');
+        if(formEditRoot && formEditRoot.innerHTML && formEditRoot.innerHTML.length > 20){
+          _activateEditor(formEditRoot.innerHTML);
           return;
         }
         if(iframeDoc.body.innerHTML.length > 100){
@@ -196,7 +335,7 @@ function startEdit(code){
     // Timeout fallback after 1.5s
     _pmTimeout=setTimeout(function(){
       window.removeEventListener('message', _onMessage);
-      _activateEditor('<h2>'+doc.title+'</h2><p>'+doc.code+' — '+(lang==='en'?'Edit content here. If the document did not load, please open it first then try editing again.':'Chỉnh sửa nội dung tại đây. Nếu tài liệu chưa tải, hãy mở tài liệu trước rồi nhấn chỉnh sửa lại.')+'</p>');
+      _activateEditor('<h2>'+doc.title+'</h2><p>'+doc.code+' â€” '+(lang==='en'?'Edit content here. If the document did not load, please open it first then try editing again.':'Chá»‰nh sá»­a ná»™i dung táº¡i Ä‘Ã¢y. Náº¿u tÃ i liá»‡u chÆ°a táº£i, hÃ£y má»Ÿ tÃ i liá»‡u trÆ°á»›c rá»“i nháº¥n chá»‰nh sá»­a láº¡i.')+'</p>');
     },1500);
   }catch(err){
     console.error('startEdit error:', err);
@@ -205,9 +344,9 @@ function startEdit(code){
   }
 }
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // DOM INSPECTOR PANEL (Dreamweaver-style)
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 let edDomActive = false;
 let edDomSelected = null;
 let edDomDragPath = null;
@@ -233,13 +372,13 @@ function edDomRefresh(){
   const tree = document.getElementById('ed-dom-tree');
   const area = document.getElementById('editor-area');
   if(!tree || !area) return;
-  const root = area.querySelector('#docContent') || area;
+  const root = area.querySelector('#docContent') || area.querySelector('[data-form-edit-root]') || area;
   tree.innerHTML = edDomBuildTree(root, '', 0);
 }
 
 function edDomNodeFromPath(path){
   const area = document.getElementById('editor-area');
-  const root = area ? (area.querySelector('#docContent') || area) : null;
+  const root = area ? (area.querySelector('#docContent') || area.querySelector('[data-form-edit-root]') || area) : null;
   if(!root) return null;
   if(!path) return root;
   const parts = path.split('.').filter(Boolean).map(Number);
@@ -280,7 +419,7 @@ function edDomBuildTree(node, parentPath, depth){
     else if(tag === 'ul' || tag === 'ol') preview = child.children.length + ' items';
     else if(tag === 'li') preview = (child.textContent||'').trim().substring(0,50);
     else preview = (child.textContent||'').trim().substring(0,40);
-    if(preview.length>55) preview=preview.substring(0,55)+'…';
+    if(preview.length>55) preview=preview.substring(0,55)+'â€¦';
     // Tag color class
     const tagCls = ['h1','h2','h3','h4','h5','h6','p','div','table','ul','ol','img','section'].includes(tag) ? 'tag-'+tag : 'tag-default';
     html += `<div class="dom-node dom-block" draggable="true" style="padding-left:${indent}px" data-dom-path="${path}" onclick="edDomSelect(this,event)" ondblclick="edDomFocus(this)" ondragstart="edDomDragStart(event,this)" ondragover="edDomDragOver(event,this)" ondragleave="edDomDragLeave(event,this)" ondrop="edDomDrop(event,this)" ondragend="edDomDragEnd(event,this)">`;
@@ -317,7 +456,7 @@ function edDomSelect(nodeEl, event){
   edDomShowProps(target);
   document.querySelectorAll('.ed-dom-highlight').forEach(el=>el.classList.remove('ed-dom-highlight'));
   const area = document.getElementById('editor-area');
-  const root = area ? (area.querySelector('#docContent') || area) : null;
+  const root = area ? (area.querySelector('#docContent') || area.querySelector('[data-form-edit-root]') || area) : null;
   if(target && target.nodeType === 1 && target !== root){
     target.classList.add('ed-dom-highlight');
     target.scrollIntoView({behavior:'smooth', block:'center'});
@@ -400,7 +539,7 @@ function edDomUpdateBreadcrumb(el){
     parts.unshift(`<span onclick="edDomJumpTo(this)" title="${tag}${id}${cls}">${tag}${id}</span>`);
     cur = cur.parentNode;
   }
-  bc.innerHTML = parts.join(' <span style="color:#45475a">›</span> ');
+  bc.innerHTML = parts.join(' <span style="color:#45475a">â€º</span> ');
 }
 
 function edDomJumpTo(){}
@@ -415,7 +554,7 @@ function edDomShowProps(el){
   const cs = window.getComputedStyle(el);
   
   propsDiv.innerHTML = `
-    <div style="font-weight:700;font-size:10px;color:#89b4fa;margin-bottom:6px">${tag}${el.id?'#'+el.id:''} — Properties</div>
+    <div style="font-weight:700;font-size:10px;color:#89b4fa;margin-bottom:6px">${tag}${el.id?'#'+el.id:''} â€” Properties</div>
     <div class="prop-row"><span class="prop-key">tag</span><div class="prop-val"><input value="${tag}" onchange="edDomChangeTag(this.value)"></div></div>
     <div class="prop-row"><span class="prop-key">id</span><div class="prop-val"><input value="${el.id||''}" onchange="if(edDomSelected)edDomSelected.id=this.value"></div></div>
     <div class="prop-row"><span class="prop-key">class</span><div class="prop-val"><input value="${el.className||''}" onchange="if(edDomSelected)edDomSelected.className=this.value"></div></div>
@@ -434,11 +573,11 @@ function edDomShowProps(el){
       <div class="prop-row"><span class="prop-key">border</span><div class="prop-val"><input value="${cs.border}" onchange="if(edDomSelected)edDomSelected.style.border=this.value"></div></div>
     </div>
     <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
-      <button onclick="edDomMoveUp()" style="font-size:9px;padding:2px 6px;background:#313244;border:1px solid #45475a;color:#cdd6f4;border-radius:4px;cursor:pointer" title="Move up">↑</button>
-      <button onclick="edDomMoveDown()" style="font-size:9px;padding:2px 6px;background:#313244;border:1px solid #45475a;color:#cdd6f4;border-radius:4px;cursor:pointer" title="Move down">↓</button>
-      <button onclick="edDomDuplicate()" style="font-size:9px;padding:2px 6px;background:#313244;border:1px solid #45475a;color:#cdd6f4;border-radius:4px;cursor:pointer" title="Duplicate">📋</button>
-      <button onclick="edDomDelete()" style="font-size:9px;padding:2px 6px;background:#45171a;border:1px solid #f38ba8;color:#f38ba8;border-radius:4px;cursor:pointer" title="Delete">🗑</button>
-      <button onclick="edDomWrap()" style="font-size:9px;padding:2px 6px;background:#313244;border:1px solid #45475a;color:#cdd6f4;border-radius:4px;cursor:pointer" title="Wrap in div">📦 Wrap</button>
+      <button onclick="edDomMoveUp()" style="font-size:9px;padding:2px 6px;background:#313244;border:1px solid #45475a;color:#cdd6f4;border-radius:4px;cursor:pointer" title="Move up">â†‘</button>
+      <button onclick="edDomMoveDown()" style="font-size:9px;padding:2px 6px;background:#313244;border:1px solid #45475a;color:#cdd6f4;border-radius:4px;cursor:pointer" title="Move down">â†“</button>
+      <button onclick="edDomDuplicate()" style="font-size:9px;padding:2px 6px;background:#313244;border:1px solid #45475a;color:#cdd6f4;border-radius:4px;cursor:pointer" title="Duplicate">ðŸ“‹</button>
+      <button onclick="edDomDelete()" style="font-size:9px;padding:2px 6px;background:#45171a;border:1px solid #f38ba8;color:#f38ba8;border-radius:4px;cursor:pointer" title="Delete">ðŸ—‘</button>
+      <button onclick="edDomWrap()" style="font-size:9px;padding:2px 6px;background:#313244;border:1px solid #45475a;color:#cdd6f4;border-radius:4px;cursor:pointer" title="Wrap in div">ðŸ“¦ Wrap</button>
     </div>`;
 }
 
@@ -470,7 +609,7 @@ function edDomDuplicate(){
 }
 function edDomDelete(){
   if(!edDomSelected) return;
-  if(!confirm(lang==='en'?'Delete this element?':'Xóa phần tử này?')) return;
+  if(!confirm(lang==='en'?'Delete this element?':'XÃ³a pháº§n tá»­ nÃ y?')) return;
   edDomSelected.parentNode.removeChild(edDomSelected);
   edDomSelected = null;
   edDomRefresh();
@@ -491,7 +630,7 @@ function rgbToHex(rgb){
   return '#'+(1<<24|m[0]<<16|m[1]<<8|+m[2]).toString(16).slice(1);
 }
 
-// ── Unsaved Changes Dialog ──
+// â”€â”€ Unsaved Changes Dialog â”€â”€
 function showUnsavedDialog(editingCode, targetCode){
   try{ document.querySelectorAll('.unsaved-modal-overlay').forEach(el=>el.remove()); }catch(e){}
   const editDoc = DOCS.find(d=>d.code===editingCode);
@@ -501,34 +640,34 @@ function showUnsavedDialog(editingCode, targetCode){
   overlay.innerHTML = `
     <div class="unsaved-modal">
       <div class="um-header">
-        <h3>${lang==='en'?'Unsaved Changes':'Thay đổi chưa lưu'}</h3>
-        <p>${lang==='en'?'You have unsaved changes in':'Bạn có thay đổi chưa lưu trong'} <b>${editingCode}</b>${editDoc?' — '+editDoc.title:''}</p>
+        <h3>${lang==='en'?'Unsaved Changes':'Thay Ä‘á»•i chÆ°a lÆ°u'}</h3>
+        <p>${lang==='en'?'You have unsaved changes in':'Báº¡n cÃ³ thay Ä‘á»•i chÆ°a lÆ°u trong'} <b>${editingCode}</b>${editDoc?' â€” '+editDoc.title:''}</p>
       </div>
       <div class="um-body">
         <button class="um-btn um-save" onclick="unsavedAction('save','${editingCode}','${targetCode}')">
-          <span class="um-icon">💾</span>
+          <span class="um-icon">ðŸ’¾</span>
           <div>
-            <div class="um-label">${lang==='en'?'Save Draft':'Lưu nháp'}</div>
-            <div class="um-desc">${lang==='en'?'Save current changes as draft, then navigate':'Lưu thay đổi hiện tại thành bản nháp, rồi chuyển trang'}</div>
+            <div class="um-label">${lang==='en'?'Save Draft':'LÆ°u nhÃ¡p'}</div>
+            <div class="um-desc">${lang==='en'?'Save current changes as draft, then navigate':'LÆ°u thay Ä‘á»•i hiá»‡n táº¡i thÃ nh báº£n nhÃ¡p, rá»“i chuyá»ƒn trang'}</div>
           </div>
         </button>
         <button class="um-btn um-discard" onclick="unsavedAction('discard','${editingCode}','${targetCode}')">
-          <span class="um-icon">🚫</span>
+          <span class="um-icon">ðŸš«</span>
           <div>
-            <div class="um-label">${lang==='en'?'Discard Changes':'Không lưu thay đổi'}</div>
-            <div class="um-desc">${lang==='en'?'Discard all unsaved edits and navigate':'Hủy tất cả chỉnh sửa chưa lưu và chuyển trang'}</div>
+            <div class="um-label">${lang==='en'?'Discard Changes':'KhÃ´ng lÆ°u thay Ä‘á»•i'}</div>
+            <div class="um-desc">${lang==='en'?'Discard all unsaved edits and navigate':'Há»§y táº¥t cáº£ chá»‰nh sá»­a chÆ°a lÆ°u vÃ  chuyá»ƒn trang'}</div>
           </div>
         </button>
         <button class="um-btn um-review" onclick="unsavedAction('review','${editingCode}','${targetCode}')">
-          <span class="um-icon">📤</span>
+          <span class="um-icon">ðŸ“¤</span>
           <div>
-            <div class="um-label">${lang==='en'?'Submit for Review':'Gửi xem xét'}</div>
-            <div class="um-desc">${lang==='en'?'Submit current changes for approval':'Gửi thay đổi hiện tại để xem xét duyệt'}</div>
+            <div class="um-label">${lang==='en'?'Submit for Review':'Gá»­i xem xÃ©t'}</div>
+            <div class="um-desc">${lang==='en'?'Submit current changes for approval':'Gá»­i thay Ä‘á»•i hiá»‡n táº¡i Ä‘á»ƒ xem xÃ©t duyá»‡t'}</div>
           </div>
         </button>
       </div>
       <div class="um-footer">
-        <button onclick="closeUnsavedDialog()">${lang==='en'?'Cancel':'Hủy'}</button>
+        <button onclick="closeUnsavedDialog()">${lang==='en'?'Cancel':'Há»§y'}</button>
       </div>
     </div>
   `;
@@ -540,6 +679,12 @@ function closeUnsavedDialog(){
   try{ document.querySelectorAll('.unsaved-modal-overlay').forEach(el=>el.remove()); }catch(e){}
 }
 
+function consumePendingPortalNavigate(){
+  var pending = window._ecPendingPortalNavigate || null;
+  window._ecPendingPortalNavigate = null;
+  return pending;
+}
+
 async function unsavedAction(action, editingCode, targetCode){
   closeUnsavedDialog();
   try{
@@ -548,15 +693,24 @@ async function unsavedAction(action, editingCode, targetCode){
       await saveDraftSilent(editingCode);
       cancelEdit();
       if(targetCode && targetCode !== 'null') openDoc(targetCode);
-      else { closeDocViewerForce(); }
+      else {
+        var pendingSaveNav = consumePendingPortalNavigate();
+        if(pendingSaveNav && typeof navigateTo === 'function') navigateTo(pendingSaveNav.page, pendingSaveNav.filter, true);
+        else closeDocViewerForce();
+      }
     } else if(action === 'discard'){
       // Discard changes and navigate
       try{ setEditedHtml(editingCode, ''); }catch(e){}
       cancelEdit();
       if(targetCode && targetCode !== 'null') openDoc(targetCode);
-      else { closeDocViewerForce(); }
+      else {
+        var pendingDiscardNav = consumePendingPortalNavigate();
+        if(pendingDiscardNav && typeof navigateTo === 'function') navigateTo(pendingDiscardNav.page, pendingDiscardNav.filter, true);
+        else closeDocViewerForce();
+      }
     } else if(action === 'review'){
       // Open submit for review modal (stay on current doc)
+      consumePendingPortalNavigate();
       submitForReview(editingCode);
     }
   }catch(err){
@@ -570,6 +724,8 @@ function closeDocViewerForce(){
   editMode=false;
   editingDoc=null;
   currentDoc=null;
+  edClearInjectedDocShellStyles();
+  try{ resetDocViewerZoom(); }catch(e){}
   var iframe=document.getElementById('doc-iframe');
   iframe.onload=null;
   iframe.removeAttribute('srcdoc');
@@ -602,14 +758,14 @@ async function saveDraftSilent(code){
           edMarkSaved(lang==='en'?'\u2713 Draft synced':'\u2713 \u0110\u00e3 \u0111\u1ed3ng b\u1ed9 b\u1ea3n nh\u00e1p');
         }
       }catch(e){}
-      showToast(lang==='en'?'💾 Draft auto-saved':'💾 Đã tự lưu nháp');
+      showToast(lang==='en'?'ðŸ’¾ Draft auto-saved':'ðŸ’¾ ÄÃ£ tá»± lÆ°u nhÃ¡p');
     }
   }catch(err){
     console.error('saveDraftSilent error:', err);
   }
 }
 
-// ── Collapsible Property Panel ──
+// â”€â”€ Collapsible Property Panel â”€â”€
 let edPropsCollapsed = false;
 function edTogglePropsPanel(){
   edPropsCollapsed = !edPropsCollapsed;
@@ -636,6 +792,7 @@ function cancelEdit(){
   edModified=false;
   edZoom=100;
   edCleanShellHtml=null;
+  edClearInjectedDocShellStyles();
   edDomActive=false; edDomSelected=null;
   var domPanel=document.getElementById('ed-dom-panel');if(domPanel)domPanel.style.display='none';
   document.querySelectorAll('.ed-dom-highlight').forEach(function(el){el.classList.remove('ed-dom-highlight');});
@@ -858,6 +1015,35 @@ function syncIframeDocumentLanguage(iframe, targetLang){
   });
 }
 
+function scheduleIframeDocumentLanguageSync(iframe, targetLang){
+  if(!iframe) return Promise.resolve(false);
+  const normalizedLang = targetLang === 'en' ? 'en' : 'vi';
+  const syncToken = String(Date.now()) + ':' + Math.random().toString(36).slice(2);
+  const retryDelays = normalizedLang === 'en' ? [0, 400, 1200, 2600, 5200] : [0, 180];
+  iframe.__qmsLangSyncToken = syncToken;
+  let chain = Promise.resolve(false);
+  retryDelays.forEach(function(delay){
+    chain = chain.then(function(lastResult){
+      return new Promise(function(resolve){
+        function runSync(){
+          if(!iframe || iframe.__qmsLangSyncToken !== syncToken){
+            resolve(lastResult);
+            return;
+          }
+          syncIframeDocumentLanguage(iframe, normalizedLang).then(function(result){
+            resolve(!!result || lastResult);
+          }).catch(function(){
+            resolve(lastResult);
+          });
+        }
+        if(delay > 0) setTimeout(runSync, delay);
+        else runSync();
+      });
+    });
+  });
+  return chain;
+}
+
 function ensureDocHtmlHasLanguageBridge(clone, docPath){
   try{
     if(!clone) return;
@@ -993,7 +1179,7 @@ async function saveDraft(code){
     
     // Prevent saving while viewing translated EN to avoid capturing translated header/UI into master HTML
     if(lang==='en'){
-      showToast(lang==='en'?'↩ Switch to Vietnamese to save':'↩ Vui lòng chuyển về tiếng Việt trước khi lưu');
+      showToast(lang==='en'?'â†© Switch to Vietnamese to save':'â†© Vui lÃ²ng chuyá»ƒn vá» tiáº¿ng Viá»‡t trÆ°á»›c khi lÆ°u');
       try{ setLang('vi'); }catch(e){}
       return;
     }
@@ -1019,11 +1205,20 @@ const innerHtml = _getCurrentEditorInnerHtml();
           edMarkSaved(lang==='en'?('\u2713 Draft saved \u2014 v'+revision):('\u2713 \u0110\u00e3 l\u01b0u nh\u00e1p \u2014 v'+revision));
         }
       }catch(e){}
-      showToast(lang==='en'?'💾 Draft saved — v'+revision:'💾 Đã lưu nháp — v'+revision);
+      showToast(lang==='en'?'ðŸ’¾ Draft saved â€” v'+revision:'ðŸ’¾ ÄÃ£ lÆ°u nhÃ¡p â€” v'+revision);
       // refresh workflow panel/DCR record in preview
       try{ renderWorkflowPanel(doc); }catch(e){}
       try{ renderVersionHistory(doc); }catch(e){}
     }else{
+      if(res && res.error==='approve_revision_mismatch'){
+        const exp = String(res.expected_revision||'').trim();
+        const got = String(res.received_revision||'').trim();
+        showToast('âš  ' + (lang==='en'
+          ? `Revision mismatch. Server expects v${exp} but received v${got}. Please reload and approve again.`
+          : `Lá»‡ch phiÃªn báº£n. Server yÃªu cáº§u v${exp} nhÆ°ng nháº­n v${got}. Vui lÃ²ng táº£i láº¡i vÃ  duyá»‡t láº¡i.`));
+        try{ await openDocPreview(doc.code); }catch(e){}
+        return;
+      }
       showToast('\u26A0 '+((res&&res.error)?res.error:'server_error'));
     }
   }catch(err){
@@ -1037,11 +1232,15 @@ function submitForReview(code){
   try{
     const doc=DOCS.find(d=>d.code===code);
     if(!doc) return;
+    if(typeof isDownloadOnlyDoc==='function' && isDownloadOnlyDoc(doc)){
+      submitWorkbookForReview(code);
+      return;
+    }
 
     
     // Prevent submit while viewing translated EN to avoid capturing translated header/UI into archive HTML
     if(lang==='en'){
-      showToast(lang==='en'?'↩ Switch to Vietnamese to submit':'↩ Vui lòng chuyển về tiếng Việt trước khi gửi xem xét');
+      showToast(lang==='en'?'â†© Switch to Vietnamese to submit':'â†© Vui lÃ²ng chuyá»ƒn vá» tiáº¿ng Viá»‡t trÆ°á»›c khi gá»­i xem xÃ©t');
       try{ setLang('vi'); }catch(e){}
       return;
     }
@@ -1104,11 +1303,11 @@ function submitForReview(code){
         </div>
         <div class="sm-body">
           <div class="sm-submitter">
-            <div class="sm-avatar">${currentUser.avatar||'👤'}</div>
+            <div class="sm-avatar">${currentUser.avatar||'ðŸ‘¤'}</div>
             <div class="sm-info">
               <div class="sm-name">${currentUser.name}</div>
               <div class="sm-role">${ROLES[currentUser.role]?(lang==='en'?ROLES[currentUser.role].labelEn||ROLES[currentUser.role].label:ROLES[currentUser.role].label):currentUser.role}</div>
-              <div class="sm-date">📅 ${T('sm_submit_date')}: ${submitDate}</div>
+              <div class="sm-date">ðŸ“… ${T('sm_submit_date')}: ${submitDate}</div>
             </div>
           </div>
 
@@ -1116,17 +1315,17 @@ function submitForReview(code){
           <div class="sm-type-grid">
             <div class="sm-type-card" id="sm-card-minor" onclick="selectSubmitType('minor')">
               <div class="sm-check" id="sm-check-minor"></div>
-              <div class="sm-type-icon">📝</div>
+              <div class="sm-type-icon">ðŸ“</div>
               <div class="sm-type-title">${T('sm_minor')}</div>
-              <div class="sm-type-ver">v${baseRev} → v${minorPreview}</div>
+              <div class="sm-type-ver">v${baseRev} â†’ v${minorPreview}</div>
               <div class="sm-type-desc">${T('sm_minor_desc')}</div>
               <div class="sm-type-examples">${T('sm_minor_examples')}</div>
             </div>
             <div class="sm-type-card" id="sm-card-major" onclick="selectSubmitType('major')">
               <div class="sm-check" id="sm-check-major"></div>
-              <div class="sm-type-icon">🔄</div>
+              <div class="sm-type-icon">ðŸ”„</div>
               <div class="sm-type-title">${T('sm_major')}</div>
-              <div class="sm-type-ver">v${baseRev} → v${majorPreview}</div>
+              <div class="sm-type-ver">v${baseRev} â†’ v${majorPreview}</div>
               <div class="sm-type-desc">${T('sm_major_desc')}</div>
               <div class="sm-type-examples">${T('sm_major_examples')}</div>
             </div>
@@ -1163,6 +1362,97 @@ function submitForReview(code){
   }
 }
 
+async function uploadFormDraft(code){
+  try{
+    const doc = DOCS.find(d=>d.code===code);
+    if(!doc) return;
+    const state = getDocState(code) || {revision:doc.rev||'0', status:'draft'};
+    if(state.status === 'approved'){
+      showToast(lang==='en'?'Start a new revision first':'HÃ£y báº¯t Ä‘áº§u phiÃªn báº£n má»›i trÆ°á»›c');
+      return;
+    }
+    const revision = String(state.revision || doc.rev || '0');
+    const note = prompt(
+      lang==='en'
+        ? `Upload workbook draft for ${doc.code} (v${revision})\n\nAdd a short check-in comment:`
+        : `Upload workbook nhÃ¡p cho ${doc.code} (v${revision})\n\nNháº­p ghi chÃº check-in ngáº¯n:`,
+      ''
+    );
+    if(note === null) return;
+    const picker = document.createElement('input');
+    picker.type = 'file';
+    picker.accept = '.xlsx,.xlsm,.xls,.csv';
+    picker.style.display = 'none';
+    picker.onchange = async function(){
+      try{
+        const file = picker.files && picker.files[0];
+        if(!file) return;
+        const fd = new FormData();
+        fd.append('code', doc.code);
+        fd.append('base_path', doc.path);
+        fd.append('revision', revision);
+        fd.append('note', note || '');
+        fd.append('file', file, file.name);
+        showToast(lang==='en'?'Uploading workbook draft...':'Äang upload workbook nhÃ¡p...');
+        const res = await apiCallFormData('form_upload_draft', fd, 180000);
+        if(res && res.ok){
+          if(res.state) setDocState(code, res.state);
+          if(res.versions) setDocVersions(code, res.versions);
+          showToast(lang==='en'?'âœ… Workbook draft uploaded':'âœ… ÄÃ£ upload workbook nhÃ¡p');
+          await openDocPreview(code);
+          return;
+        }
+        showToast('\u26A0 ' + ((res && (res.detail || res.error)) ? (res.detail || res.error) : 'upload_failed'));
+      }catch(err){
+        console.error('uploadFormDraft error:', err);
+        showToast('Error: '+(err && err.message ? err.message : err));
+      }finally{
+        setTimeout(()=>{ try{ picker.remove(); }catch(e){} }, 0);
+      }
+    };
+    document.body.appendChild(picker);
+    picker.click();
+  }catch(err){
+    console.error('uploadFormDraft error:', err);
+    showToast('Error: '+(err && err.message ? err.message : err));
+  }
+}
+
+async function submitWorkbookForReview(code){
+  try{
+    const doc = DOCS.find(d=>d.code===code);
+    if(!doc) return;
+    const state = getDocState(code) || {status:'draft', revision:doc.rev||'0'};
+    const revision = String(state.revision || doc.rev || '0');
+    const versions = getDocVersions(code) || [];
+    const hasDraftUpload = versions.some(v=>v && v.status==='draft' && String(v.version||'').replace(/^v/i,'')===revision && versionHasAccess(doc, v));
+    if(!hasDraftUpload){
+      showToast(lang==='en'?'Upload a draft workbook first':'HÃ£y upload workbook nhÃ¡p trÆ°á»›c');
+      return;
+    }
+    const note = prompt(
+      lang==='en'
+        ? `Submit workbook ${doc.code} v${revision} for review\n\nChange note:`
+        : `Gá»­i workbook ${doc.code} v${revision} Ä‘á»ƒ xem xÃ©t\n\nGhi chÃº thay Ä‘á»•i:`,
+      ''
+    );
+    if(note === null) return;
+    const updateType = String(state.updateType || 'minor') === 'major' ? 'major' : 'minor';
+    const res = await apiCall('doc_submit_review', {code: doc.code, base_path: doc.path, revision, updateType, note: note || ''});
+    if(res && res.ok){
+      if(res.state) setDocState(code, res.state);
+      if(res.versions) setDocVersions(code, res.versions);
+      showToast(lang==='en'?'ðŸ“¤ Workbook submitted for review':'ðŸ“¤ ÄÃ£ gá»­i workbook Ä‘á»ƒ xem xÃ©t');
+      await openDocPreview(code);
+      return;
+    }
+    showToast('\u26A0 ' + ((res && (res.detail || res.error)) ? (res.detail || res.error) : 'submit_failed'));
+  }catch(err){
+    console.error('submitWorkbookForReview error:', err);
+    showToast('Error: '+(err && err.message ? err.message : err));
+  }
+}
+
 let _selectedSubmitType=null;
 let _submitTypeLock=null;
 
@@ -1175,8 +1465,8 @@ function selectSubmitType(type){
   const majorCheck=document.getElementById('sm-check-major');
   minorCard.classList.toggle('selected', type==='minor');
   majorCard.classList.toggle('selected', type==='major');
-  minorCheck.textContent=type==='minor'?'✓':'';
-  majorCheck.textContent=type==='major'?'✓':'';
+  minorCheck.textContent=type==='minor'?'âœ“':'';
+  majorCheck.textContent=type==='major'?'âœ“':'';
   document.getElementById('sm-submit-btn').disabled=false;
 }
 
@@ -1208,7 +1498,7 @@ async function confirmSubmitForReview(code){
     
     // Final validation
     if(!fullHtml || fullHtml.trim().length < 30){
-      showToast(lang==='en'?'⚠ Cannot capture document content. Please try saving draft first.':'⚠ Không thể lấy nội dung tài liệu. Hãy thử lưu nháp trước.');
+      showToast(lang==='en'?'âš  Cannot capture document content. Please try saving draft first.':'âš  KhÃ´ng thá»ƒ láº¥y ná»™i dung tÃ i liá»‡u. HÃ£y thá»­ lÆ°u nhÃ¡p trÆ°á»›c.');
       return;
     }
 
@@ -1233,8 +1523,8 @@ async function confirmSubmitForReview(code){
 
       loadDocContent(code);
 
-      const toastType=updateType==='major'?'🔄 MAJOR':'📝 MINOR';
-      showToast(lang==='en'?'📤 Submitted for review ('+toastType+')':'📤 Đã gửi xem xét ('+toastType+')');
+      const toastType=updateType==='major'?'ðŸ”„ MAJOR':'ðŸ“ MINOR';
+      showToast(lang==='en'?'ðŸ“¤ Submitted for review ('+toastType+')':'ðŸ“¤ ÄÃ£ gá»­i xem xÃ©t ('+toastType+')');
       renderWorkflowPanel(doc);
       renderVersionHistory(doc);
       updateDocViewerHeader(doc);
@@ -1242,7 +1532,7 @@ async function confirmSubmitForReview(code){
     }
 
     // Show specific server error if available
-    const errMsg = (res && res.error) ? res.error : (lang==='en'?'Submit failed':'Gửi xem xét thất bại');
+    const errMsg = (res && res.error) ? res.error : (lang==='en'?'Submit failed':'Gá»­i xem xÃ©t tháº¥t báº¡i');
     showToast('\u26A0 ' + errMsg);
   }catch(err){
     console.error('confirmSubmitForReview error:', err);
@@ -1257,8 +1547,13 @@ async function approveDoc(code){
 
     const state = getDocState(code) || {status:'draft', revision: doc.rev||'0'};
     const updateType = state.updateType || (state.submittedUpdateType||'minor');
-    const currentRev = String(state.revision || doc.rev || '0');
-    const prevRev = String(doc.rev || '0');
+    const versions = (typeof getDocVersions==='function') ? (getDocVersions(code)||[]) : [];
+    const reviewEntry = versions.find(v=>v && v.status==='in_review')
+      || versions.find(v=>v && v.status==='pending_approval')
+      || versions.find(v=>v && v.status==='draft');
+    const reviewRev = reviewEntry ? String(reviewEntry.version||'').replace(/^v/i,'').trim() : '';
+    const currentRev = String(reviewRev || state.revision || doc.rev || '0');
+    const prevRev = String(state.released_revision || doc.rev || '0');
 
     // IMPORTANT: do NOT bump revision here.
     // The revision to approve is the current state.revision (set when starting a new revision / submitting for review).
@@ -1269,10 +1564,10 @@ async function approveDoc(code){
     const msg = isInitial
       ? (lang==='en'
           ? `Approve INITIAL RELEASE (v${newRevision})?`
-          : `Duyệt PHÁT HÀNH LẦN ĐẦU (v${newRevision})?`)
+          : `Duyá»‡t PHÃT HÃ€NH Láº¦N Äáº¦U (v${newRevision})?`)
       : (lang==='en'
-          ? `Approve ${doc.code}\n\n${prevRev===newRevision?`v${newRevision}`:`v${prevRev} → v${newRevision}`}\nType: ${String(updateType||'').toUpperCase()}`
-          : `Duyệt ${doc.code}\n\n${prevRev===newRevision?`v${newRevision}`:`v${prevRev} → v${newRevision}`}\nLoại: ${String(updateType||'').toUpperCase()}`);
+          ? `Approve ${doc.code}\n\n${prevRev===newRevision?`v${newRevision}`:`v${prevRev} â†’ v${newRevision}`}\nType: ${String(updateType||'').toUpperCase()}`
+          : `Duyá»‡t ${doc.code}\n\n${prevRev===newRevision?`v${newRevision}`:`v${prevRev} â†’ v${newRevision}`}\nLoáº¡i: ${String(updateType||'').toUpperCase()}`);
 
     if(!confirm(msg)) return;
 
@@ -1287,7 +1582,7 @@ async function approveDoc(code){
     if(res && res.ok){
       SERVER_DOC_STATE[doc.code] = res.state;
       if(res.versions) setDocVersions(doc.code, res.versions);
-      showToast(lang==='en'?'✅ Approved':'✅ Đã duyệt');
+      showToast(lang==='en'?'âœ… Approved':'âœ… ÄÃ£ duyá»‡t');
 
       // Refresh the preview + lists
       await openDocPreview(doc.code);
@@ -1315,7 +1610,7 @@ async function rejectDoc(code){
       if(res.state) setDocState(code, res.state);
       // Reload versions/state from server to keep folder-sync
       await refreshDocFromServer(code);
-      showToast(lang==='en'?'↩ Rejected — returned to author':'↩ Đã trả lại — về tác giả');
+      showToast(lang==='en'?'â†© Rejected â€” returned to author':'â†© ÄÃ£ tráº£ láº¡i â€” vá» tÃ¡c giáº£');
       renderWorkflowPanel(doc);
       renderVersionHistory(doc);
       updateDocViewerHeader(doc);
@@ -1323,7 +1618,7 @@ async function rejectDoc(code){
       refreshAllDocStatesFromServer().then(()=>{ try{ renderSidebar(); }catch(e){} });
       return;
     }
-    showToast(lang==='en'?'Reject failed':'Trả lại thất bại');
+    showToast(lang==='en'?'Reject failed':'Tráº£ láº¡i tháº¥t báº¡i');
   }catch(err){
     console.error('rejectDoc error:', err);
     showToast('Error: '+(err && err.message ? err.message : err));
@@ -1333,21 +1628,25 @@ async function rejectDoc(code){
 async function restoreVersion(code, idx){
   const doc=DOCS.find(d=>d.code===code);
   if(!doc) return;
+  if(typeof isDownloadOnlyDoc==='function' && isDownloadOnlyDoc(doc)){
+    showToast(lang==='en'?'Restore to draft is not available for workbook versions. Start a new revision and upload a workbook draft instead.':'KhÃ´i phá»¥c thÃ nh nhÃ¡p chÆ°a Ã¡p dá»¥ng cho workbook. HÃ£y báº¯t Ä‘áº§u phiÃªn báº£n má»›i rá»“i upload workbook nhÃ¡p.');
+    return;
+  }
   const versions=getDocVersions(code);
   const v=versions[idx];
-  if(!v || !v.file) return;
+  const url = getVersionAccessUrl(doc, v);
+  if(!v || !url) return;
 
   const msg = lang==='en'
     ? ('Restore ' + (v.version||'this version') + ' as a NEW draft?')
-    : ('Khôi phục ' + (v.version||'phiên bản này') + ' thành bản nháp MỚI?');
+    : ('KhÃ´i phá»¥c ' + (v.version||'phiÃªn báº£n nÃ y') + ' thÃ nh báº£n nhÃ¡p Má»šI?');
   if(!confirm(msg)) return;
 
   try{
     // Fetch the full HTML file of the selected version
-    const url = '../' + v.file + (v.file.indexOf('?')>=0 ? '&' : '?') + 't=' + Date.now();
-    const html = await fetch(url, {credentials:'include'}).then(r=>r.text());
+    const html = await fetch(url + (url.indexOf('?')>=0 ? '&' : '?') + 't=' + Date.now(), {credentials:'include'}).then(r=>r.text());
     const rev = (v.version||'v0').replace(/^v/i,'') || '0';
-    const note = (lang==='en'?'Restored from ':'Khôi phục từ ') + (v.version||'');
+    const note = (lang==='en'?'Restored from ':'KhÃ´i phá»¥c tá»« ') + (v.version||'');
 
     const res = await apiCall('doc_save_draft', {code: code, base_path: doc.path, revision: rev, note: note, html: html});
     if(res && res.ok){
@@ -1355,7 +1654,7 @@ async function restoreVersion(code, idx){
       if(res.versions) setDocVersions(code, res.versions);
       try{ setEditedHtml(code, ''); }catch(e){}
       edCleanShellHtml=null;
-      showToast(lang==='en'?'↩ Restored as draft':'↩ Đã khôi phục thành bản nháp');
+      showToast(lang==='en'?'â†© Restored as draft':'â†© ÄÃ£ khÃ´i phá»¥c thÃ nh báº£n nhÃ¡p');
       openDoc(code);
       return;
     }
@@ -1363,7 +1662,7 @@ async function restoreVersion(code, idx){
     console.error('restoreVersion error:', err);
   }
 
-  showToast(lang==='en'?'Restore failed':'Khôi phục thất bại');
+  showToast(lang==='en'?'Restore failed':'KhÃ´i phá»¥c tháº¥t báº¡i');
 }
 
 // Pick the best file to show in the iframe:
@@ -1385,21 +1684,205 @@ function getLatestWorkingFile(code){
 
 function getDocViewFile(doc){
   if(!doc) return null;
-  const code=doc.code;
-  const st=getDocState(code)||{};
-  const working=getLatestWorkingFile(code);
-  if(working && (st.status==='draft' || st.status==='in_review' || st.status==='pending_approval')){
-    // ISO-style: only editors/reviewers/approvers/admin see the working copy
-    if(isAdmin() || canEdit(doc) || canReview(doc) || canApprove(doc)) return working;
-  }
+  // Master view must always point to the current released file (version history "Hiá»‡n táº¡i")
+  // to keep sidebar/header/document metadata consistent.
   return doc.path;
 }
 
-function loadDocContent(code){
-  const doc=DOCS.find(d=>d.code===code);
-  if(!doc) return;
+let viewerDocZoom = 100;
+const VIEWER_DOC_ZOOM_MIN = 60;
+const VIEWER_DOC_ZOOM_MAX = 200;
+const VIEWER_DOC_ZOOM_STEP = 10;
 
-  const edited=getEditedHtml(code);
+function clampViewerDocZoom(value){
+  const numeric = Number(value);
+  if(!Number.isFinite(numeric)) return 100;
+  return Math.max(VIEWER_DOC_ZOOM_MIN, Math.min(VIEWER_DOC_ZOOM_MAX, numeric));
+}
+
+function getDocIframeDocument(iframe){
+  try{
+    return iframe ? (iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document)) : null;
+  }catch(e){
+    return null;
+  }
+}
+
+function resetIframeViewerScroll(idoc){
+  try{
+    if(!idoc) return;
+    const scroller = idoc.scrollingElement || idoc.documentElement || idoc.body;
+    if(scroller){
+      if(typeof scroller.scrollTo === 'function') scroller.scrollTo(0, 0);
+      scroller.scrollLeft = 0;
+      scroller.scrollTop = 0;
+    }
+    if(idoc.documentElement){
+      idoc.documentElement.scrollLeft = 0;
+      idoc.documentElement.scrollTop = 0;
+    }
+    if(idoc.body){
+      idoc.body.scrollLeft = 0;
+      idoc.body.scrollTop = 0;
+    }
+  }catch(e){}
+}
+
+function applyDocViewerZoomToDocument(idoc){
+  try{
+    if(!idoc) return;
+    let styleEl = idoc.getElementById('portal-doc-viewer-zoom-style');
+    if(!styleEl){
+      styleEl = idoc.createElement('style');
+      styleEl.id = 'portal-doc-viewer-zoom-style';
+      (idoc.head || idoc.documentElement || idoc.body).appendChild(styleEl);
+    }
+    // Keep the iframe viewer in a stable fit-to-frame mode. Using CSS zoom on the
+    // published document body was distorting layouts and causing horizontal drift
+    // in Firefox even when the source HTML itself was valid.
+    viewerDocZoom = 100;
+    styleEl.textContent = [
+      'html{overflow:auto !important; overflow-x:hidden !important;}',
+      'body{zoom:100% !important; transform:none !important; margin:0 !important; min-width:0 !important;}',
+      'body>.container{margin-left:auto !important; margin-right:auto !important; min-width:0 !important;}',
+      'body>.container>.page, body>.container>.page>.page-body{min-width:0 !important;}'
+    ].join('');
+    resetIframeViewerScroll(idoc);
+  }catch(e){}
+}
+
+function resetDocViewerZoom(){
+  viewerDocZoom = 100;
+  const iframe = document.getElementById('doc-iframe');
+  const idoc = getDocIframeDocument(iframe);
+  if(idoc) applyDocViewerZoomToDocument(idoc);
+}
+
+function attachIframeViewerZoom(iframe){
+  const idoc = getDocIframeDocument(iframe);
+  if(!idoc || !idoc.documentElement) return;
+  applyDocViewerZoomToDocument(idoc);
+  // Do not attach custom Ctrl+wheel zoom inside controlled-document iframes.
+  // Browser-level zoom remains available, but portal must preserve stable page
+  // geometry so WI/ANNEX graphics are not deformed or shifted off-frame.
+  resetIframeViewerScroll(idoc);
+}
+
+function extractIframePublishedDocMetadata(idoc){
+  const meta = {code:'', title:'', desc:''};
+  if(!idoc) return meta;
+  try{
+    const codeEl = idoc.querySelector('.form-header .title .doc-code, .form-header .meta .row .doc-code');
+    const nameEl = idoc.querySelector('.form-header .title .doc-name');
+    const descEl = idoc.querySelector('.form-header .title .sub-vn, .form-header .title .sub');
+    if(codeEl) meta.code = String(codeEl.textContent || '').trim().toUpperCase();
+    if(nameEl) meta.title = String(nameEl.textContent || '').trim();
+    if(descEl) meta.desc = String(descEl.textContent || '').trim();
+
+    if((!meta.code || !meta.title)){
+      const h1Text = String((idoc.querySelector('h1')?.textContent || '')).trim();
+      const h1Match = h1Text.match(/^((?:WI|ANNEX)-\d{3})\s*(?:â€”|-|:)\s*(.+)$/i);
+      if(h1Match){
+        if(!meta.code) meta.code = String(h1Match[1] || '').trim().toUpperCase();
+        if(!meta.title) meta.title = String(h1Match[2] || '').trim();
+      }
+    }
+  }catch(e){}
+  return meta;
+}
+
+function ensureIframeHeaderTitleStructure(idoc, titleWrap, code, title, desc){
+  if(!idoc || !titleWrap) return;
+
+  const normalizedDesc = String(desc || '').trim();
+  const preservedMuted = Array.from(titleWrap.querySelectorAll('.muted'))
+    .map((el)=>String(el.textContent || '').trim())
+    .find(Boolean) || '';
+
+  let codeEl = titleWrap.querySelector('.doc-code');
+  let nameEl = titleWrap.querySelector('.doc-name');
+  let subEl = titleWrap.querySelector('.sub-vn, .sub');
+
+  if(!codeEl || !nameEl){
+    titleWrap.innerHTML = '';
+
+    codeEl = idoc.createElement('span');
+    codeEl.className = 'doc-code';
+    titleWrap.appendChild(codeEl);
+
+    nameEl = idoc.createElement('strong');
+    nameEl.className = 'doc-name';
+    titleWrap.appendChild(nameEl);
+
+    if(normalizedDesc){
+      subEl = idoc.createElement('span');
+      subEl.className = 'sub-vn';
+      titleWrap.appendChild(subEl);
+    }
+
+    if(preservedMuted){
+      const mutedEl = idoc.createElement('span');
+      mutedEl.className = 'muted';
+      mutedEl.textContent = preservedMuted;
+      titleWrap.appendChild(mutedEl);
+    }
+  }
+
+  if(codeEl && code){
+    codeEl.textContent = code;
+  }
+  if(nameEl){
+    nameEl.textContent = title || code || '';
+  }
+
+  if(subEl){
+    subEl.textContent = normalizedDesc;
+  }else if(normalizedDesc){
+    subEl = idoc.createElement('span');
+    subEl.className = 'sub-vn';
+    subEl.textContent = normalizedDesc;
+    titleWrap.appendChild(subEl);
+  }
+}
+
+function syncIframeDocumentHeaderMetadata(idoc, doc){
+  if(!idoc || !doc) return;
+  try{
+    const publishedMeta = extractIframePublishedDocMetadata(idoc);
+    const code = String(((typeof getDocDisplayCode === 'function' ? getDocDisplayCode(doc) : doc.code) || publishedMeta.code || '')).trim();
+    const title = String(((typeof getDocDisplayTitle === 'function' ? getDocDisplayTitle(doc) : (doc.title || '')) || publishedMeta.title || '')).trim();
+    const desc = String(((typeof getDocDisplayDescription === 'function' ? getDocDisplayDescription(doc) : '') || publishedMeta.desc || '')).trim();
+
+    const titleWrap = idoc.querySelector('.form-header .title');
+    if(titleWrap){
+      ensureIframeHeaderTitleStructure(idoc, titleWrap, code, title, desc);
+    }
+
+    const codeRows = idoc.querySelectorAll('.form-header .meta .row');
+    codeRows.forEach(function(row){
+      try{
+        const labelEl = row.querySelector('b');
+        const valueEl = row.querySelector('span:last-child');
+        const label = String(labelEl ? labelEl.textContent : '').trim();
+        if(valueEl && /\b(code|mÃ£)\b/i.test(label) && code){
+          valueEl.textContent = code;
+          if(valueEl.classList) valueEl.classList.add('doc-code');
+        }
+      }catch(_e){}
+    });
+
+    if(typeof applyRuntimeDocDisplayMetadata === 'function'){
+      applyRuntimeDocDisplayMetadata(doc, {code, title, desc});
+    }
+  }catch(e){}
+}
+
+function loadDocContent(code){
+  const doc=(typeof window._resolveDocRecord === 'function') ? window._resolveDocRecord(code) : DOCS.find(d=>d.code===code);
+  if(!doc) return;
+  const resolvedCode = String(doc.code || '').trim();
+
+  const edited=getEditedHtml(resolvedCode);
   const iframe=document.getElementById('doc-iframe');
   const loading=document.getElementById('iframe-loading');
 
@@ -1415,6 +1898,88 @@ function loadDocContent(code){
     iframe.removeAttribute('srcdoc');
     iframe.removeAttribute('src');
   }catch(e){}
+
+  if(typeof isDownloadOnlyDoc==='function' && isDownloadOnlyDoc(doc)){
+    const state=getDocState(resolvedCode)||{};
+    const versions=getDocVersions(resolvedCode)||[];
+    const currentEntry=versions.find(v=>isCurrentVersionEntry(doc,v)) || versions.find(v=>v && (v.status==='approved' || v.status==='initial_release')) || null;
+    const workingEntry=versions.find(v=>v && (v.status==='draft' || v.status==='in_review')) || null;
+    const currentUrl=currentEntry ? getVersionAccessUrl(doc,currentEntry) : buildDocStreamUrl(doc,true);
+    const workingUrl=workingEntry ? getVersionAccessUrl(doc,workingEntry) : '';
+    const revision=String(getDocRevision(doc)||'0');
+    const status=String(getDocStatus(doc)||'approved');
+    const title=(typeof escapeHtml==='function') ? escapeHtml(getDocDisplayTitle(doc)||doc.title||doc.code) : (getDocDisplayTitle(doc)||doc.title||doc.code);
+    const desc=(typeof escapeHtml==='function') ? escapeHtml(getDocDisplayDescription(doc)||'') : (getDocDisplayDescription(doc)||'');
+    const owner=(typeof escapeHtml==='function') ? escapeHtml(String((state&&state.owner)||doc.owner||'QA/QMS')) : String((state&&state.owner)||doc.owner||'QA/QMS');
+    const docExt=String(doc.ext || '').toLowerCase();
+    const docTypeLabel=docExt==='pdf'
+      ? (lang==='en' ? 'Controlled PDF file' : 'Tai lieu PDF duoc kiem soat')
+      : (/^(doc|docx|docm)$/i.test(docExt)
+        ? (lang==='en' ? 'Controlled Word file' : 'Tep Word duoc kiem soat')
+        : (/^(ppt|pptx|pptm)$/i.test(docExt)
+          ? (lang==='en' ? 'Controlled PowerPoint file' : 'Tep PowerPoint duoc kiem soat')
+          : (/^(xls|xlsx|xlsm|xlsb|csv)$/i.test(docExt)
+            ? (lang==='en' ? 'Controlled Excel file' : 'Tep Excel duoc kiem soat')
+            : (docExt ? (lang==='en' ? `Controlled file (.${docExt})` : `Tep duoc kiem soat (.${docExt})`) : (lang==='en' ? 'Controlled file' : 'Tep duoc kiem soat')))));
+    const currentFileLabel=lang==='en' ? 'Download current file' : 'Tai file hien hanh';
+    const workingFileLabel=lang==='en' ? 'Download working copy' : 'Tai ban lam viec';
+    const fileNote=lang==='en'
+      ? 'Non-HTML controlled files are version-managed through private staging, review, approval, and immutable archive. Use the buttons below to retrieve the current released file or the latest working copy.'
+      : 'Cac tep khong phai HTML duoc kiem soat phien ban qua private staging, review, approval va immutable archive. Dung cac nut ben duoi de tai file phat hanh hien hanh hoac ban lam viec moi nhat.';
+    iframe.onload=function(){
+      try{ attachIframeViewerZoom(iframe); }catch(e){}
+      if(loading) loading.style.display='none';
+      iframe.style.opacity='1';
+    };
+    iframe.srcdoc = `<!DOCTYPE html>
+      <html lang="vi">
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body{margin:0;background:#f8fafc;font-family:Segoe UI,Arial,sans-serif;color:#0f172a}
+          .wrap{padding:24px}
+          .card{background:#fff;border:1px solid #dbe3ef;border-radius:18px;padding:24px;box-shadow:0 16px 40px rgba(15,23,42,.06)}
+          .eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#475569;margin-bottom:8px}
+          h1{margin:0 0 8px;font-size:28px;line-height:1.2}
+          .sub{font-size:14px;color:#475569;margin-bottom:18px}
+          .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:18px 0 22px}
+          .meta{border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;background:#f8fafc}
+          .meta b{display:block;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+          .meta span{font-size:14px;font-weight:600}
+          .cta{display:flex;flex-wrap:wrap;gap:12px}
+          .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:12px;text-decoration:none;font-weight:700;border:1px solid #cbd5e1;background:#fff;color:#0f172a;cursor:pointer;font:inherit}
+          .btn.primary{background:#0f766e;color:#fff;border-color:#0f766e}
+          .note{margin-top:18px;padding:14px 16px;border-radius:12px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;font-size:13px;line-height:1.6}
+        </style>
+      </head>
+      <body>
+        <div class="wrap">
+          <div class="card">
+            <div class="eyebrow">${docTypeLabel}</div>
+            <h1>${doc.code} â€” ${title}</h1>
+            ${desc?`<div class="sub">${desc}</div>`:''}
+            <div class="grid">
+              <div class="meta"><b>${lang==='en'?'Current revision':'PhiÃªn báº£n hiá»‡n hÃ nh'}</b><span>v${revision}</span></div>
+              <div class="meta"><b>${lang==='en'?'Status':'Tráº¡ng thÃ¡i'}</b><span>${status}</span></div>
+              <div class="meta"><b>${lang==='en'?'Owner':'Chá»§ sá»Ÿ há»¯u'}</b><span>${owner}</span></div>
+              <div class="meta"><b>${lang==='en'?'Delivery mode':'CÃ¡ch phÃ¡t hÃ nh'}</b><span>${lang==='en'?'Download only':'Chá»‰ táº£i vá»'}</span></div>
+            </div>
+            <div class="cta">
+              <button class="btn primary" type="button" onclick='parent.triggerDownloadUrl(${JSON.stringify(currentUrl)})'>${currentFileLabel}</button>
+              ${workingUrl?`<button class="btn" type="button" onclick='parent.triggerDownloadUrl(${JSON.stringify(workingUrl)})'>${workingFileLabel}</button>`:''}
+            </div>
+            <div class="note">
+              ${fileNote}
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>`;
+    setTimeout(function(){
+      if(loading && loading.style.display!=='none'){ loading.style.display='none'; iframe.style.opacity='1'; }
+    }, 5000);
+    return;
+  }
 
   // Load the best file (live approved OR archive working copy), then inject any
   // unsaved local edits (editor-only) on top.
@@ -1432,6 +1997,7 @@ function loadDocContent(code){
           if(dc) dc.innerHTML = edited;
           else if(idoc.body) idoc.body.innerHTML = edited;
         }
+        try{ syncIframeDocumentHeaderMetadata(idoc, doc); }catch(_e){}
         try{
           if(idoc && typeof edApplyGlobalTablePolicyToDocument==='function'){
             edApplyGlobalTablePolicyToDocument(idoc, {force:true, source:'view-load'});
@@ -1439,14 +2005,21 @@ function loadDocContent(code){
             // cannot push table width beyond page frame.
             setTimeout(function(){
               try{ edApplyGlobalTablePolicyToDocument(idoc, {force:true, source:'view-load-late-1'}); }catch(_e){}
+              try{ resetIframeViewerScroll(idoc); }catch(_e){}
             }, 220);
             setTimeout(function(){
               try{ edApplyGlobalTablePolicyToDocument(idoc, {force:true, source:'view-load-late-2'}); }catch(_e){}
+              try{ resetIframeViewerScroll(idoc); }catch(_e){}
             }, 1200);
           }
         }catch(e){}
         // Sync language after injection, even for legacy docs that never loaded assets/app.js.
-        try{ syncIframeDocumentLanguage(iframe, lang); }catch(e){}
+        // Retry a few times in EN mode because Google Translate inside the iframe
+        // can initialize asynchronously after the document load event.
+        try{ scheduleIframeDocumentLanguageSync(iframe, lang); }catch(e){}
+        try{ if(typeof attachIframeLinkBridge==='function') attachIframeLinkBridge(iframe, doc, viewFile); }catch(e){}
+        try{ attachIframeViewerZoom(iframe); }catch(e){}
+        try{ resetIframeViewerScroll(idoc); }catch(e){}
       }catch(e){}
       if(loading) loading.style.display='none';
       iframe.style.opacity='1';
@@ -1459,5 +2032,4 @@ function loadDocContent(code){
 }
 
 
-// ═══════════════════════════════════════════════════
-
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•

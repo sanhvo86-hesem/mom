@@ -1,0 +1,710 @@
+{
+  "_meta": {
+    "version": "2.0",
+    "description": "Normalized connector library for machine, gateway, ERP, batch, and event-stream integrations.",
+    "generatedAt": "2026-04-02T06:00:20.356Z",
+    "connectorCount": 13
+  },
+  "mtconnect": {
+    "label": "MTConnect",
+    "protocol": "http",
+    "category": "machine",
+    "defaultPort": 5000,
+    "direction": "pull",
+    "authType": "none",
+    "description": "Open machine tool standard for CNC state, alarms, spindle, feed, and part counters.",
+    "dataPoints": [
+      "execution_state",
+      "spindle_speed",
+      "feed_rate",
+      "tool_id",
+      "part_count",
+      "alarm_code",
+      "axis_load"
+    ],
+    "pollIntervalMs": 1000,
+    "typicalUseCases": [
+      "machine monitoring",
+      "cycle completion",
+      "utilization tracking"
+    ],
+    "securityFeatures": [
+      "network segmentation",
+      "read-only adapter"
+    ],
+    "configFields": [
+      {
+        "key": "agentUrl",
+        "label": "Agent URL",
+        "type": "url",
+        "required": true,
+        "placeholder": "http://192.168.1.100:5000"
+      },
+      {
+        "key": "deviceId",
+        "label": "Device ID",
+        "type": "string",
+        "required": true
+      },
+      {
+        "key": "pollRate",
+        "label": "Poll Rate (ms)",
+        "type": "number",
+        "default": 1000
+      }
+    ]
+  },
+  "opcua": {
+    "label": "OPC UA",
+    "protocol": "opcua",
+    "category": "machine",
+    "defaultPort": 4840,
+    "direction": "subscribe",
+    "authType": "certificate",
+    "description": "Industrial interoperability stack for PLC, SCADA, machine tools, and contextual manufacturing tags.",
+    "dataPoints": [
+      "node_value",
+      "temperature",
+      "pressure",
+      "vibration",
+      "alarm_state",
+      "energy_kw"
+    ],
+    "pollIntervalMs": 500,
+    "typicalUseCases": [
+      "production telemetry",
+      "energy monitoring",
+      "machine alarms"
+    ],
+    "securityFeatures": [
+      "certificate auth",
+      "message signing",
+      "encryption"
+    ],
+    "configFields": [
+      {
+        "key": "endpointUrl",
+        "label": "Endpoint URL",
+        "type": "url",
+        "required": true,
+        "placeholder": "opc.tcp://192.168.1.50:4840"
+      },
+      {
+        "key": "securityPolicy",
+        "label": "Security Policy",
+        "type": "select",
+        "options": [
+          "None",
+          "Basic128Rsa15",
+          "Basic256",
+          "Basic256Sha256"
+        ],
+        "default": "Basic256Sha256"
+      },
+      {
+        "key": "nodeIds",
+        "label": "Node IDs",
+        "type": "textarea",
+        "required": true
+      }
+    ]
+  },
+  "modbus_tcp": {
+    "label": "Modbus TCP",
+    "protocol": "tcp",
+    "category": "sensor",
+    "defaultPort": 502,
+    "direction": "pull",
+    "authType": "none",
+    "description": "Legacy industrial polling for meters, sensors, and simple controllers.",
+    "dataPoints": [
+      "register_value",
+      "coil_status",
+      "input_register",
+      "holding_register"
+    ],
+    "pollIntervalMs": 2000,
+    "typicalUseCases": [
+      "energy meters",
+      "facility sensors",
+      "legacy PLC telemetry"
+    ],
+    "securityFeatures": [
+      "network segmentation"
+    ],
+    "configFields": [
+      {
+        "key": "host",
+        "label": "Host IP",
+        "type": "string",
+        "required": true
+      },
+      {
+        "key": "port",
+        "label": "Port",
+        "type": "number",
+        "default": 502
+      },
+      {
+        "key": "slaveId",
+        "label": "Slave ID",
+        "type": "number",
+        "default": 1
+      },
+      {
+        "key": "registers",
+        "label": "Register Map",
+        "type": "json",
+        "required": true
+      }
+    ]
+  },
+  "mqtt": {
+    "label": "MQTT",
+    "protocol": "mqtt",
+    "category": "gateway",
+    "defaultPort": 1883,
+    "direction": "subscribe",
+    "authType": "username_password",
+    "description": "Lightweight pub/sub connector for edge gateways and custom sensor payloads.",
+    "dataPoints": [
+      "topic_payload"
+    ],
+    "pollIntervalMs": 0,
+    "typicalUseCases": [
+      "edge telemetry",
+      "shopfloor event stream",
+      "mobile sensor messages"
+    ],
+    "securityFeatures": [
+      "username password",
+      "TLS",
+      "topic isolation"
+    ],
+    "configFields": [
+      {
+        "key": "brokerUrl",
+        "label": "Broker URL",
+        "type": "url",
+        "required": true,
+        "placeholder": "mqtt://192.168.1.10:1883"
+      },
+      {
+        "key": "topics",
+        "label": "Subscribe Topics",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "key": "username",
+        "label": "Username",
+        "type": "string"
+      },
+      {
+        "key": "password",
+        "label": "Password",
+        "type": "string"
+      },
+      {
+        "key": "qos",
+        "label": "QoS Level",
+        "type": "select",
+        "options": [
+          "0",
+          "1",
+          "2"
+        ],
+        "default": "1"
+      }
+    ]
+  },
+  "focas": {
+    "label": "FANUC FOCAS",
+    "protocol": "tcp",
+    "category": "machine",
+    "defaultPort": 8193,
+    "direction": "pull",
+    "authType": "none",
+    "description": "Direct FANUC CNC polling for program, alarm, tool, and load details.",
+    "dataPoints": [
+      "program_number",
+      "sequence_number",
+      "spindle_speed_actual",
+      "tool_number",
+      "alarm_number",
+      "servo_load"
+    ],
+    "pollIntervalMs": 1000,
+    "typicalUseCases": [
+      "fanuc runtime",
+      "program download status",
+      "tool wear trending"
+    ],
+    "securityFeatures": [
+      "network isolation"
+    ],
+    "configFields": [
+      {
+        "key": "host",
+        "label": "CNC IP Address",
+        "type": "string",
+        "required": true
+      },
+      {
+        "key": "port",
+        "label": "Port",
+        "type": "number",
+        "default": 8193
+      },
+      {
+        "key": "timeout",
+        "label": "Timeout (ms)",
+        "type": "number",
+        "default": 5000
+      }
+    ]
+  },
+  "rest_api": {
+    "label": "REST API",
+    "protocol": "https",
+    "category": "integration",
+    "defaultPort": 443,
+    "direction": "pull",
+    "authType": "bearer_token",
+    "description": "Generic HTTP JSON connector for enterprise or custom platform integration.",
+    "dataPoints": [
+      "json_response"
+    ],
+    "pollIntervalMs": 5000,
+    "typicalUseCases": [
+      "erp sync",
+      "external quality data",
+      "warehouse services"
+    ],
+    "securityFeatures": [
+      "https",
+      "bearer token",
+      "custom headers"
+    ],
+    "configFields": [
+      {
+        "key": "url",
+        "label": "API URL",
+        "type": "url",
+        "required": true
+      },
+      {
+        "key": "method",
+        "label": "HTTP Method",
+        "type": "select",
+        "options": [
+          "GET",
+          "POST"
+        ],
+        "default": "GET"
+      },
+      {
+        "key": "headers",
+        "label": "Custom Headers",
+        "type": "json"
+      },
+      {
+        "key": "body",
+        "label": "Request Body",
+        "type": "json"
+      },
+      {
+        "key": "authToken",
+        "label": "Bearer Token",
+        "type": "string"
+      },
+      {
+        "key": "responseMapping",
+        "label": "Response Mapping",
+        "type": "json"
+      }
+    ]
+  },
+  "epicor_kinetic": {
+    "label": "Epicor Kinetic",
+    "protocol": "https",
+    "category": "erp",
+    "defaultPort": 443,
+    "direction": "pull",
+    "authType": "api_key",
+    "description": "Epicor REST v2 / BAQ / BO / Function integration profile for ERP and MES data exchange.",
+    "dataPoints": [
+      "baq_result",
+      "bo_method_result",
+      "efx_result"
+    ],
+    "pollIntervalMs": 30000,
+    "typicalUseCases": [
+      "part master sync",
+      "job status",
+      "quote enrichment"
+    ],
+    "securityFeatures": [
+      "api key",
+      "https",
+      "tenant isolation"
+    ],
+    "configFields": [
+      {
+        "key": "serverUrl",
+        "label": "Epicor Server URL",
+        "type": "url",
+        "required": true,
+        "placeholder": "https://erp.company.com/api/v2"
+      },
+      {
+        "key": "apiKey",
+        "label": "API Key",
+        "type": "string",
+        "required": true
+      },
+      {
+        "key": "company",
+        "label": "Company ID",
+        "type": "string",
+        "required": true
+      },
+      {
+        "key": "baqId",
+        "label": "BAQ ID",
+        "type": "string"
+      },
+      {
+        "key": "boName",
+        "label": "Business Object",
+        "type": "string"
+      },
+      {
+        "key": "methodName",
+        "label": "BO Method",
+        "type": "string"
+      }
+    ]
+  },
+  "database_poll": {
+    "label": "Database Query",
+    "protocol": "tcp",
+    "category": "integration",
+    "defaultPort": 5432,
+    "direction": "pull",
+    "authType": "username_password",
+    "description": "Direct database polling for dashboards and reference sync.",
+    "dataPoints": [
+      "query_result"
+    ],
+    "pollIntervalMs": 10000,
+    "typicalUseCases": [
+      "legacy databases",
+      "report snapshots",
+      "reference master sync"
+    ],
+    "securityFeatures": [
+      "db credential vaulting",
+      "read-only users"
+    ],
+    "configFields": [
+      {
+        "key": "dbType",
+        "label": "Database Type",
+        "type": "select",
+        "options": [
+          "postgresql",
+          "mysql",
+          "sqlserver"
+        ],
+        "default": "postgresql"
+      },
+      {
+        "key": "host",
+        "label": "Host",
+        "type": "string",
+        "required": true
+      },
+      {
+        "key": "port",
+        "label": "Port",
+        "type": "number",
+        "default": 5432
+      },
+      {
+        "key": "database",
+        "label": "Database Name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "key": "username",
+        "label": "Username",
+        "type": "string",
+        "required": true
+      },
+      {
+        "key": "password",
+        "label": "Password",
+        "type": "string",
+        "required": true
+      },
+      {
+        "key": "query",
+        "label": "SQL Query",
+        "type": "textarea",
+        "required": true
+      }
+    ]
+  },
+  "csv_file_watch": {
+    "label": "CSV File Watcher",
+    "protocol": "filesystem",
+    "category": "batch",
+    "defaultPort": null,
+    "direction": "watch",
+    "authType": "none",
+    "description": "Filesystem watcher for measurement exports, CMM programs, or batch uploads.",
+    "dataPoints": [
+      "csv_rows"
+    ],
+    "pollIntervalMs": 5000,
+    "typicalUseCases": [
+      "cmm result import",
+      "lab exports",
+      "supplier batch uploads"
+    ],
+    "securityFeatures": [
+      "path allowlist",
+      "archive after processing"
+    ],
+    "configFields": [
+      {
+        "key": "watchDir",
+        "label": "Watch Directory",
+        "type": "string",
+        "required": true
+      },
+      {
+        "key": "filePattern",
+        "label": "File Pattern",
+        "type": "string",
+        "default": "*.csv"
+      },
+      {
+        "key": "delimiter",
+        "label": "Delimiter",
+        "type": "select",
+        "options": [
+          ",",
+          ";",
+          "\\t",
+          "|"
+        ],
+        "default": ","
+      },
+      {
+        "key": "headerRow",
+        "label": "Header Row",
+        "type": "boolean",
+        "default": true
+      },
+      {
+        "key": "archiveAfterRead",
+        "label": "Archive After Read",
+        "type": "boolean",
+        "default": true
+      }
+    ]
+  },
+  "webhook": {
+    "label": "Webhook",
+    "protocol": "https",
+    "category": "integration",
+    "defaultPort": 443,
+    "direction": "push",
+    "authType": "signature",
+    "description": "Inbound or outbound event webhook connector for transactional event propagation.",
+    "dataPoints": [
+      "event_payload"
+    ],
+    "pollIntervalMs": 0,
+    "typicalUseCases": [
+      "event notifications",
+      "supplier portal callbacks",
+      "workflow alerts"
+    ],
+    "securityFeatures": [
+      "shared secret",
+      "signed payload",
+      "replay protection"
+    ],
+    "configFields": [
+      {
+        "key": "endpointUrl",
+        "label": "Endpoint URL",
+        "type": "url",
+        "required": true
+      },
+      {
+        "key": "sharedSecret",
+        "label": "Shared Secret",
+        "type": "string",
+        "required": true
+      },
+      {
+        "key": "eventFilter",
+        "label": "Event Filter",
+        "type": "tags"
+      }
+    ]
+  },
+  "sftp_drop": {
+    "label": "SFTP Drop",
+    "protocol": "sftp",
+    "category": "batch",
+    "defaultPort": 22,
+    "direction": "watch",
+    "authType": "ssh_key",
+    "description": "Secure file exchange channel for customer, supplier, and compliance data packets.",
+    "dataPoints": [
+      "file_manifest",
+      "file_payload"
+    ],
+    "pollIntervalMs": 60000,
+    "typicalUseCases": [
+      "cert package exchange",
+      "supplier scorecards",
+      "batch inspection uploads"
+    ],
+    "securityFeatures": [
+      "ssh key",
+      "remote folder isolation",
+      "checksum validation"
+    ],
+    "configFields": [
+      {
+        "key": "host",
+        "label": "Host",
+        "type": "string",
+        "required": true
+      },
+      {
+        "key": "port",
+        "label": "Port",
+        "type": "number",
+        "default": 22
+      },
+      {
+        "key": "username",
+        "label": "Username",
+        "type": "string",
+        "required": true
+      },
+      {
+        "key": "privateKeyPath",
+        "label": "Private Key Path",
+        "type": "string",
+        "required": true
+      },
+      {
+        "key": "remoteDir",
+        "label": "Remote Directory",
+        "type": "string",
+        "required": true
+      }
+    ]
+  },
+  "ethernet_ip": {
+    "label": "EtherNet/IP",
+    "protocol": "cip",
+    "category": "machine",
+    "defaultPort": 44818,
+    "direction": "pull",
+    "authType": "none",
+    "description": "Industrial protocol profile for Rockwell and compatible controllers.",
+    "dataPoints": [
+      "tag_value",
+      "run_mode",
+      "alarm_state",
+      "part_counter"
+    ],
+    "pollIntervalMs": 1000,
+    "typicalUseCases": [
+      "plc telemetry",
+      "andon events",
+      "line counters"
+    ],
+    "securityFeatures": [
+      "network segmentation"
+    ],
+    "configFields": [
+      {
+        "key": "host",
+        "label": "Host",
+        "type": "string",
+        "required": true
+      },
+      {
+        "key": "tags",
+        "label": "Controller Tags",
+        "type": "textarea",
+        "required": true
+      }
+    ]
+  },
+  "kafka": {
+    "label": "Kafka",
+    "protocol": "kafka",
+    "category": "event-stream",
+    "defaultPort": 9092,
+    "direction": "subscribe",
+    "authType": "sasl",
+    "description": "High-throughput event streaming connector for digital thread and enterprise event buses.",
+    "dataPoints": [
+      "topic_message"
+    ],
+    "pollIntervalMs": 0,
+    "typicalUseCases": [
+      "enterprise event bus",
+      "traceability stream",
+      "analytics feed"
+    ],
+    "securityFeatures": [
+      "sasl",
+      "tls",
+      "consumer group isolation"
+    ],
+    "configFields": [
+      {
+        "key": "brokers",
+        "label": "Brokers",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "key": "topic",
+        "label": "Topic",
+        "type": "string",
+        "required": true
+      },
+      {
+        "key": "groupId",
+        "label": "Consumer Group",
+        "type": "string",
+        "required": true
+      },
+      {
+        "key": "securityProtocol",
+        "label": "Security Protocol",
+        "type": "select",
+        "options": [
+          "PLAINTEXT",
+          "SSL",
+          "SASL_SSL"
+        ],
+        "default": "SASL_SSL"
+      }
+    ]
+  }
+}

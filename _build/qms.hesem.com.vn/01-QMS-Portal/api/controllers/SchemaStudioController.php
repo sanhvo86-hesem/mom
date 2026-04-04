@@ -1,0 +1,548 @@
+<?php
+declare(strict_types=1);
+
+namespace HESEM\QMS\Api\Controllers;
+
+use HESEM\QMS\Database\Connection;
+use HESEM\QMS\Database\DataLayer;
+use PDO;
+use Throwable;
+
+class SchemaStudioController extends BaseController
+{
+    private string $studioDir;
+    private string $designDir;
+    private string $snapshotDir;
+    private string $exportDir;
+
+    public function __construct(DataLayer $data, string $rootDir, string $dataDir)
+    {
+        parent::__construct($data, $rootDir, $dataDir);
+        $this->studioDir = $this->dataDir . '/schema-studio';
+        $this->designDir = $this->studioDir . '/designs';
+        $this->snapshotDir = $this->studioDir . '/snapshots';
+        $this->exportDir = $this->studioDir . '/exports';
+        $this->ensureDir($this->studioDir);
+        $this->ensureDir($this->designDir);
+        $this->ensureDir($this->snapshotDir);
+        $this->ensureDir($this->exportDir);
+    }
+
+    private function ensureDir(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0775, true);
+        }
+    }
+
+    private function requireWriteAccess(array $user): void
+    {
+        $this->requireAnyRole($user, array_merge(admin_roles(), ['developer', 'qms_engineer', 'quality_manager']));
+    }
+
+    private function safeId(string $value, string $fallback = 'schema_studio'): string
+    {
+        $clean = preg_replace('/[^A-Za-z0-9_-]+/', '_', trim($value));
+        $clean = trim((string)$clean, '_');
+        return $clean !== '' ? $clean : $fallback . '_' . gmdate('Ymd_His');
+    }
+
+    private function endsWith(string $value, string $suffix): bool
+    {
+        if ($suffix === '') {
+            return true;
+        }
+        return substr($value, -strlen($suffix)) === $suffix;
+    }
+
+    private function designPath(string $id): string
+    {
+        return $this->designDir . '/' . $this->safeId($id) . '.json';
+    }
+
+    private function baselinePath(string $id): string
+    {
+        return $this->snapshotDir . '/' . $this->safeId($id) . '.baseline.json';
+    }
+
+    private function db(): PDO
+    {
+        return Connection::getInstance()->getPdo();
+    }
+
+    public function listDesigns(): never
+    {
+        $this->requireAuth();
+        $designs = [];
+        foreach (glob($this->designDir . '/*.json') ?: [] as $file) {
+            $data = $this->readJsonFile($file);
+            if (!$data) {
+                continue;
+            }
+            $designs[] = [
+                'id' => (string)($data['_meta']['id'] ?? basename($file, '.json')),
+                'name' => (string)($data['_meta']['name'] ?? basename($file, '.json')),
+                'version' => (string)($data['_meta']['version'] ?? '1.0.0'),
+                'updatedAt' => (string)($data['_meta']['updatedAt'] ?? ''),
+                'author' => (string)($data['_meta']['author'] ?? ''),
+                'tableCount' => count($data['tables'] ?? []),
+            ];
+        }
+        usort($designs, static fn(array $a, array $b): int => strcmp((string)$b['updatedAt'], (string)$a['updatedAt']));
+        $this->success(['designs' => $designs]);
+    }
+
+    public function getDesign(): never
+    {
+        $this->requireAuth();
+        $id = $this->input('id', '') ?? '';
+        if ($id === '') {
+            $this->error('missing_id', 400);
+        }
+        $schema = $this->readJsonFile($this->designPath($id));
+        if (!$schema) {
+            $this->error('not_found', 404);
+        }
+        $baseline = $this->readJsonFile($this->baselinePath($id));
+        $this->success(['schema' => $schema, 'baseline' => $baseline]);
+    }
+
+    public function saveDesign(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireWriteAccess($user);
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $schema = is_array($body['schema'] ?? null) ? $body['schema'] : $body;
+        if (!is_array($schema) || !isset($schema['_meta'])) {
+            $this->error('invalid_schema', 400);
+        }
+        $schema['_meta']['id'] = $this->safeId((string)($schema['_meta']['id'] ?? ''));
+        $schema['_meta']['updatedAt'] = $this->nowIso();
+        $schema['_meta']['author'] = (string)($user['username'] ?? 'system');
+        $this->writeJsonFile($this->designPath((string)$schema['_meta']['id']), $schema);
+        $this->auditLog('schema_studio_save', ['design_id' => $schema['_meta']['id']], (string)($user['username'] ?? ''));
+        $this->success(['id' => $schema['_meta']['id'], 'savedAt' => $schema['_meta']['updatedAt']]);
+    }
+
+    public function deleteDesign(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireWriteAccess($user);
+        $this->requireCsrf();
+        $id = $this->input('id', '') ?? '';
+        if ($id === '') {
+            $this->error('missing_id', 400);
+        }
+        $path = $this->designPath($id);
+        if (is_file($path)) {
+            @unlink($path);
+        }
+        $baseline = $this->baselinePath($id);
+        if (is_file($baseline)) {
+            @unlink($baseline);
+        }
+        $this->auditLog('schema_studio_delete', ['design_id' => $id], (string)($user['username'] ?? ''));
+        $this->success(['deleted' => true]);
+    }
+
+    public function setBaseline(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireWriteAccess($user);
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $designId = $this->safeId((string)($body['design_id'] ?? ''));
+        $schema = is_array($body['schema'] ?? null) ? $body['schema'] : null;
+        if ($designId === '' || !$schema) {
+            $this->error('missing_payload', 400);
+        }
+        $this->writeJsonFile($this->baselinePath($designId), $schema);
+        $this->auditLog('schema_studio_set_baseline', ['design_id' => $designId], (string)($user['username'] ?? ''));
+        $this->success(['baselineAt' => $this->nowIso()]);
+    }
+
+    public function loadFromRegistry(): never
+    {
+        $this->requireAuth();
+        $registryPath = $this->dataDir . '/registry/table-registry.json';
+        $relationPath = $this->dataDir . '/registry/relation-map.json';
+        $domainPath = $this->dataDir . '/registry/domain-architecture.json';
+        $tableRegistry = $this->readJsonFile($registryPath) ?? [];
+        $relationMap = $this->readJsonFile($relationPath) ?? [];
+        $domainArch = $this->readJsonFile($domainPath) ?? [];
+
+        $domainMap = [];
+        foreach (($domainArch['domains'] ?? []) as $domainKey => $domainDef) {
+            $tables = is_array($domainDef['tables'] ?? null) ? $domainDef['tables'] : [];
+            foreach ($tables as $tableName) {
+                $domainMap[(string)$tableName] = (string)$domainKey;
+            }
+        }
+
+        $schema = [
+            '_meta' => [
+                'id' => 'registry_' . gmdate('Ymd_His'),
+                'name' => 'Registry Import',
+                'version' => '1.0.0',
+                'description' => 'Imported from qms-data/registry',
+                'createdAt' => $this->nowIso(),
+                'updatedAt' => $this->nowIso(),
+                'author' => 'registry',
+            ],
+            'enums' => [],
+            'tables' => [],
+            'relations' => [],
+            'groups' => [],
+            'notes' => [],
+        ];
+
+        $tableMap = [];
+        $colMap = [];
+        $tables = $tableRegistry['tables'] ?? [];
+        $tableIndex = 0;
+        foreach ($tables as $tableName => $tableDef) {
+            if (!is_string($tableName) || !is_array($tableDef)) {
+                continue;
+            }
+            $tableId = 'tbl_' . substr(md5($tableName), 0, 10);
+            $tableMap[$tableName] = $tableId;
+            $columns = [];
+            $rawColumns = $tableDef['columns'] ?? [];
+            foreach ($rawColumns as $columnName => $columnDef) {
+                $name = is_string($columnName) ? $columnName : (is_array($columnDef) ? (string)($columnDef['name'] ?? '') : (string)$columnDef);
+                if ($name === '') {
+                    continue;
+                }
+                $colId = 'col_' . substr(md5($tableName . '.' . $name), 0, 10);
+                $colMap[$tableName . '.' . $name] = $colId;
+                $isIdentifier = $this->endsWith($name, '_id') || $name === 'id';
+                $type = is_array($columnDef) ? (string)($columnDef['type'] ?? ($isIdentifier ? 'uuid' : 'varchar')) : ($isIdentifier ? 'uuid' : 'varchar');
+                $columns[] = [
+                    'id' => $colId,
+                    'name' => $name,
+                    'type' => $type,
+                    'length' => null,
+                    'scale' => null,
+                    'is_array' => false,
+                    'nullable' => !in_array($name, ['id', 'created_at'], true),
+                    'unique' => false,
+                    'primary_key' => $name === 'id',
+                    'pk_order' => $name === 'id' ? 1 : null,
+                    'default_val' => $name === 'id' ? 'uuid_generate_v4()' : (($name === 'created_at' || $name === 'updated_at') ? 'now()' : null),
+                    'check_expr' => null,
+                    'generated_expr' => null,
+                    'generated_stored' => false,
+                    'comment' => is_array($columnDef) ? (string)($columnDef['label'] ?? $columnDef['comment'] ?? '') : '',
+                    'foreign_key' => null,
+                ];
+            }
+            $schema['tables'][] = [
+                'id' => $tableId,
+                'name' => $tableName,
+                'schema' => 'public',
+                'comment' => (string)($tableDef['description'] ?? $tableDef['comment'] ?? ''),
+                'domain' => (string)($domainMap[$tableName] ?? $tableDef['domain'] ?? 'default'),
+                'color' => null,
+                'tags' => [],
+                'rls_enabled' => false,
+                'canvas' => [
+                    'x' => 80 + (($tableIndex % 5) * 300),
+                    'y' => 80 + ((int)floor($tableIndex / 5) * 240),
+                    'width' => 260,
+                    'collapsed' => true,
+                ],
+                'columns' => $columns,
+                'indexes' => [],
+                'check_constraints' => [],
+                'triggers' => [],
+            ];
+            $tableIndex++;
+        }
+
+        foreach (($relationMap['edges'] ?? []) as $edge) {
+            $fromTable = (string)($edge['from']['entity'] ?? '');
+            $fromCol = (string)($edge['from']['field'] ?? '');
+            $toTable = (string)($edge['to']['entity'] ?? '');
+            $toCol = (string)($edge['to']['field'] ?? 'id');
+            $fromTableId = $tableMap[$fromTable] ?? null;
+            $toTableId = $tableMap[$toTable] ?? null;
+            $fromColId = $colMap[$fromTable . '.' . $fromCol] ?? null;
+            $toColId = $colMap[$toTable . '.' . $toCol] ?? null;
+            if (!$fromTableId || !$toTableId || !$fromColId || !$toColId) {
+                continue;
+            }
+            $schema['relations'][] = [
+                'id' => 'rel_' . substr(md5($fromTable . '.' . $fromCol . '>' . $toTable . '.' . $toCol), 0, 10),
+                'from_table_id' => $fromTableId,
+                'from_col_id' => $fromColId,
+                'to_table_id' => $toTableId,
+                'to_col_id' => $toColId,
+                'name' => 'fk_' . $fromTable . '_' . $fromCol,
+                'on_delete' => (string)($edge['cascadeActions']['delete'] ?? 'RESTRICT'),
+                'on_update' => (string)($edge['cascadeActions']['update'] ?? 'CASCADE'),
+                'nullable' => true,
+                'edge' => ['type' => 'orthogonal', 'waypoints' => []],
+            ];
+        }
+
+        foreach ($schema['tables'] as &$table) {
+            foreach ($table['columns'] as &$column) {
+                foreach ($schema['relations'] as $relation) {
+                    if ($relation['from_table_id'] === $table['id'] && $relation['from_col_id'] === $column['id']) {
+                        $column['foreign_key'] = [
+                            'ref_table_id' => $relation['to_table_id'],
+                            'ref_col_id' => $relation['to_col_id'],
+                            'on_delete' => $relation['on_delete'],
+                            'on_update' => $relation['on_update'],
+                            'constraint_name' => $relation['name'],
+                            'deferrable' => false,
+                        ];
+                        break;
+                    }
+                }
+            }
+        }
+        unset($table, $column);
+
+        $this->success(['schema' => $schema]);
+    }
+
+    public function reverseEngineer(): never
+    {
+        $user = $this->requireAuth();
+        try {
+            $pdo = $this->db();
+            $tables = $pdo->query("
+                SELECT table_schema, table_name
+                FROM information_schema.tables
+                WHERE table_type='BASE TABLE'
+                  AND table_schema NOT IN ('pg_catalog','information_schema','pg_toast')
+                ORDER BY table_schema, table_name
+            ")->fetchAll(PDO::FETCH_ASSOC);
+            $columns = $pdo->query("
+                SELECT table_schema, table_name, column_name, data_type, udt_name,
+                       character_maximum_length, numeric_scale, is_nullable, column_default
+                FROM information_schema.columns
+                WHERE table_schema NOT IN ('pg_catalog','information_schema','pg_toast')
+                ORDER BY table_schema, table_name, ordinal_position
+            ")->fetchAll(PDO::FETCH_ASSOC);
+            $fks = $pdo->query("
+                SELECT tc.constraint_name, kcu.table_schema, kcu.table_name, kcu.column_name,
+                       ccu.table_schema AS ref_table_schema, ccu.table_name AS ref_table_name, ccu.column_name AS ref_column_name,
+                       rc.update_rule, rc.delete_rule
+                FROM information_schema.table_constraints tc
+                JOIN information_schema.key_column_usage kcu
+                  ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
+                JOIN information_schema.referential_constraints rc
+                  ON tc.constraint_name = rc.constraint_name AND tc.table_schema = rc.constraint_schema
+                JOIN information_schema.constraint_column_usage ccu
+                  ON rc.unique_constraint_name = ccu.constraint_name AND rc.unique_constraint_schema = ccu.table_schema
+                WHERE tc.constraint_type = 'FOREIGN KEY'
+            ")->fetchAll(PDO::FETCH_ASSOC);
+            $pkRows = $pdo->query("
+                SELECT kcu.table_schema, kcu.table_name, kcu.column_name, kcu.ordinal_position
+                FROM information_schema.table_constraints tc
+                JOIN information_schema.key_column_usage kcu
+                  ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
+                WHERE tc.constraint_type='PRIMARY KEY'
+            ")->fetchAll(PDO::FETCH_ASSOC);
+
+            $pkMap = [];
+            foreach ($pkRows as $pk) {
+                $pkMap[$pk['table_schema'] . '.' . $pk['table_name']][$pk['column_name']] = (int)$pk['ordinal_position'];
+            }
+
+            $schema = [
+                '_meta' => [
+                    'id' => 'live_' . gmdate('Ymd_His'),
+                    'name' => 'Live DB ' . gmdate('Y-m-d H:i'),
+                    'version' => '1.0.0',
+                    'description' => 'Reverse engineered from PostgreSQL',
+                    'createdAt' => $this->nowIso(),
+                    'updatedAt' => $this->nowIso(),
+                    'author' => (string)($user['username'] ?? 'system'),
+                ],
+                'enums' => [],
+                'tables' => [],
+                'relations' => [],
+                'groups' => [],
+                'notes' => [],
+            ];
+            $tableMap = [];
+            $colMap = [];
+            $index = 0;
+            foreach ($tables as $tbl) {
+                $key = $tbl['table_schema'] . '.' . $tbl['table_name'];
+                $tableId = 'tbl_' . substr(md5($key), 0, 10);
+                $tableMap[$key] = $tableId;
+                $tableColumns = [];
+                foreach ($columns as $col) {
+                    if ($col['table_schema'] !== $tbl['table_schema'] || $col['table_name'] !== $tbl['table_name']) {
+                        continue;
+                    }
+                    $colId = 'col_' . substr(md5($key . '.' . $col['column_name']), 0, 10);
+                    $colMap[$key . '.' . $col['column_name']] = $colId;
+                    $isPk = isset($pkMap[$key][$col['column_name']]);
+                    $tableColumns[] = [
+                        'id' => $colId,
+                        'name' => $col['column_name'],
+                        'type' => $col['udt_name'] === 'varchar' ? 'varchar' : $col['udt_name'],
+                        'length' => $col['character_maximum_length'] ? (int)$col['character_maximum_length'] : null,
+                        'scale' => $col['numeric_scale'] ? (int)$col['numeric_scale'] : null,
+                        'is_array' => strpos((string)$col['data_type'], 'ARRAY') === 0,
+                        'nullable' => $col['is_nullable'] === 'YES',
+                        'unique' => false,
+                        'primary_key' => $isPk,
+                        'pk_order' => $isPk ? (int)($pkMap[$key][$col['column_name']] ?? 1) : null,
+                        'default_val' => $col['column_default'],
+                        'check_expr' => null,
+                        'generated_expr' => null,
+                        'generated_stored' => false,
+                        'comment' => '',
+                        'foreign_key' => null,
+                    ];
+                }
+                $schema['tables'][] = [
+                    'id' => $tableId,
+                    'name' => $tbl['table_name'],
+                    'schema' => $tbl['table_schema'],
+                    'comment' => '',
+                    'domain' => 'default',
+                    'color' => null,
+                    'tags' => [],
+                    'rls_enabled' => false,
+                    'canvas' => [
+                        'x' => 80 + (($index % 4) * 320),
+                        'y' => 80 + ((int)floor($index / 4) * 240),
+                        'width' => 260,
+                        'collapsed' => true,
+                    ],
+                    'columns' => $tableColumns,
+                    'indexes' => [],
+                    'check_constraints' => [],
+                    'triggers' => [],
+                ];
+                $index++;
+            }
+
+            foreach ($fks as $fk) {
+                $fromKey = $fk['table_schema'] . '.' . $fk['table_name'];
+                $toKey = $fk['ref_table_schema'] . '.' . $fk['ref_table_name'];
+                $fromTableId = $tableMap[$fromKey] ?? null;
+                $toTableId = $tableMap[$toKey] ?? null;
+                $fromColId = $colMap[$fromKey . '.' . $fk['column_name']] ?? null;
+                $toColId = $colMap[$toKey . '.' . $fk['ref_column_name']] ?? null;
+                if (!$fromTableId || !$toTableId || !$fromColId || !$toColId) {
+                    continue;
+                }
+                $schema['relations'][] = [
+                    'id' => 'rel_' . substr(md5($fk['constraint_name']), 0, 10),
+                    'from_table_id' => $fromTableId,
+                    'from_col_id' => $fromColId,
+                    'to_table_id' => $toTableId,
+                    'to_col_id' => $toColId,
+                    'name' => $fk['constraint_name'],
+                    'on_delete' => (string)($fk['delete_rule'] ?? 'NO ACTION'),
+                    'on_update' => (string)($fk['update_rule'] ?? 'NO ACTION'),
+                    'nullable' => true,
+                    'edge' => ['type' => 'orthogonal', 'waypoints' => []],
+                ];
+            }
+
+            foreach ($schema['tables'] as &$table) {
+                foreach ($table['columns'] as &$column) {
+                    foreach ($schema['relations'] as $relation) {
+                        if ($relation['from_table_id'] === $table['id'] && $relation['from_col_id'] === $column['id']) {
+                            $column['foreign_key'] = [
+                                'ref_table_id' => $relation['to_table_id'],
+                                'ref_col_id' => $relation['to_col_id'],
+                                'on_delete' => $relation['on_delete'],
+                                'on_update' => $relation['on_update'],
+                                'constraint_name' => $relation['name'],
+                                'deferrable' => false,
+                            ];
+                            break;
+                        }
+                    }
+                }
+            }
+            unset($table, $column);
+
+            $this->auditLog('schema_studio_reverse_engineer', ['table_count' => count($schema['tables'])], (string)($user['username'] ?? ''));
+            $this->success(['schema' => $schema]);
+        } catch (Throwable $e) {
+            error_log('[SchemaStudio] reverseEngineer failed: ' . $e->getMessage());
+            $this->error('reverse_engineer_failed', 500, 'Database introspection failed');
+        }
+    }
+
+    public function validateSchema(): never
+    {
+        $this->requireAuth();
+        $body = $this->jsonBody();
+        $schema = is_array($body['schema'] ?? null) ? $body['schema'] : $body;
+        $issues = [];
+        foreach (($schema['tables'] ?? []) as $table) {
+            if (!array_filter($table['columns'] ?? [], static fn(array $column): bool => (bool)($column['primary_key'] ?? false))) {
+                $issues[] = ['level' => 'error', 'code' => 'E01', 'table' => $table['name'] ?? ''];
+            }
+        }
+        $this->success(['issues' => $issues, 'count' => count($issues)]);
+    }
+
+    public function applyMigration(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireWriteAccess($user);
+        $this->requireCsrf();
+        $body = $this->jsonBody();
+        $sql = trim((string)($body['sql'] ?? ''));
+        if ($sql === '') {
+            $this->error('missing_sql', 400);
+        }
+        $destructive = (bool)preg_match('/\bDROP\s+(TABLE|COLUMN|TYPE|INDEX)\b/i', $sql);
+        $allowDestructive = (bool)($body['allow_destructive'] ?? false);
+        if ($destructive && !$allowDestructive) {
+            $this->error('destructive_requires_confirmation', 400);
+        }
+        $sql = preg_replace('/^\s*BEGIN\s*;\s*/i', '', $sql) ?? $sql;
+        $sql = preg_replace('/\s*COMMIT\s*;\s*$/i', '', $sql) ?? $sql;
+        try {
+            $pdo = $this->db();
+            $pdo->beginTransaction();
+            $pdo->exec($sql);
+            $pdo->commit();
+            $this->auditLog('schema_studio_apply_migration', [
+                'design_id' => (string)($body['design_id'] ?? ''),
+                'sql_length' => strlen($sql),
+                'destructive' => $destructive,
+            ], (string)($user['username'] ?? ''));
+            $this->success(['appliedAt' => $this->nowIso()]);
+        } catch (Throwable $e) {
+            try {
+                $pdo = $this->db();
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+            } catch (Throwable $ignored) {
+            }
+            error_log('[SchemaStudio] applyMigration failed: ' . $e->getMessage());
+            $this->error('migration_failed', 500, 'Migration execution failed');
+        }
+    }
+
+    public function export(): never
+    {
+        $this->requireAuth();
+        $body = $this->jsonBody();
+        $schema = is_array($body['schema'] ?? null) ? $body['schema'] : $body;
+        $payload = json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if ($payload === false) {
+            $this->error('export_failed', 500);
+        }
+        $filename = $this->exportDir . '/schema_export_' . gmdate('Ymd_His') . '.json';
+        @file_put_contents($filename, $payload);
+        $this->success(['path' => $filename]);
+    }
+}

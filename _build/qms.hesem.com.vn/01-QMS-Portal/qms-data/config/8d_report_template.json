@@ -1,0 +1,180 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "created": "2026-03-31",
+    "description": "8D problem-solving report template aligned with AS9100D and CQI-20 requirements for structured corrective action"
+  },
+  "report_format": "8D-{YYYY}-{NNNN}",
+  "steps": [
+    {
+      "code": "D0",
+      "label": "Emergency Response Action",
+      "label_vi": "Hanh dong ung pho khan cap",
+      "description": "Determine whether an emergency response is needed to protect the customer",
+      "description_vi": "Xac dinh xem co can hanh dong ung pho khan cap de bao ve khach hang khong",
+      "required_fields": [
+        { "key": "era_needed", "type": "boolean", "label": "ERA Required?", "label_vi": "Can ERA?" },
+        { "key": "era_description", "type": "text", "label": "ERA Description", "label_vi": "Mo ta ERA" },
+        { "key": "era_date", "type": "date", "label": "ERA Implementation Date", "label_vi": "Ngay thuc hien ERA" }
+      ],
+      "tools_available": [],
+      "max_completion_days": 1
+    },
+    {
+      "code": "D1",
+      "label": "Establish the Team",
+      "label_vi": "Thanh lap nhom",
+      "description": "Select cross-functional team members with the process and product knowledge to solve the problem",
+      "description_vi": "Chon thanh vien nhom da chuc nang co kien thuc ve quy trinh va san pham de giai quyet van de",
+      "required_fields": [
+        { "key": "team_leader", "type": "user_ref", "label": "Team Leader", "label_vi": "Truong nhom" },
+        { "key": "team_members", "type": "user_ref_list", "label": "Team Members", "label_vi": "Thanh vien nhom" },
+        { "key": "team_champion", "type": "user_ref", "label": "Champion / Sponsor", "label_vi": "Nguoi bao tro" }
+      ],
+      "tools_available": ["raci_matrix"],
+      "max_completion_days": 2
+    },
+    {
+      "code": "D2",
+      "label": "Describe the Problem",
+      "label_vi": "Mo ta van de",
+      "description": "Specify the problem by identifying in quantifiable terms the who, what, where, when, why, how, and how many (5W2H)",
+      "description_vi": "Chi ro van de bang cach xac dinh dinh luong ai, cai gi, o dau, khi nao, tai sao, the nao va bao nhieu (5W2H)",
+      "required_fields": [
+        { "key": "problem_statement", "type": "text", "label": "Problem Statement", "label_vi": "Phat bieu van de" },
+        { "key": "is_is_not", "type": "json", "label": "IS / IS-NOT Analysis", "label_vi": "Phan tich CO / KHONG CO" },
+        { "key": "defect_code", "type": "string", "label": "Defect Code", "label_vi": "Ma loi" },
+        { "key": "qty_affected", "type": "integer", "label": "Quantity Affected", "label_vi": "So luong bi anh huong" },
+        { "key": "customer_impact", "type": "text", "label": "Customer Impact", "label_vi": "Tac dong khach hang" },
+        { "key": "photos", "type": "attachment_list", "label": "Photos / Evidence", "label_vi": "Anh / Bang chung" }
+      ],
+      "tools_available": ["5w2h_template", "is_is_not_matrix"],
+      "max_completion_days": 3
+    },
+    {
+      "code": "D3",
+      "label": "Interim Containment Action",
+      "label_vi": "Hanh dong ngan chan tam thoi",
+      "description": "Define and implement interim containment actions to isolate the problem from the customer",
+      "description_vi": "Xac dinh va thuc hien hanh dong ngan chan tam thoi de cach ly van de khoi khach hang",
+      "required_fields": [
+        { "key": "containment_actions", "type": "action_list", "label": "Containment Actions", "label_vi": "Hanh dong ngan chan" },
+        { "key": "containment_owner", "type": "user_ref", "label": "Containment Owner", "label_vi": "Nguoi chiu trach nhiem ngan chan" },
+        { "key": "containment_date", "type": "date", "label": "Implementation Date", "label_vi": "Ngay thuc hien" },
+        { "key": "verification_method", "type": "text", "label": "Verification Method", "label_vi": "Phuong phap xac minh" },
+        { "key": "lot_traceability", "type": "text", "label": "Lot / Serial Traceability", "label_vi": "Truy xuat lo / serial" }
+      ],
+      "tools_available": ["containment_checklist"],
+      "max_completion_days": 3
+    },
+    {
+      "code": "D4",
+      "label": "Root Cause Analysis",
+      "label_vi": "Phan tich nguyen nhan goc",
+      "description": "Identify all applicable causes that explain why the problem occurred and why it was not detected",
+      "description_vi": "Xac dinh tat ca nguyen nhan giai thich tai sao van de xay ra va tai sao khong duoc phat hien",
+      "required_fields": [
+        { "key": "occurrence_causes", "type": "text", "label": "Occurrence Root Cause(s)", "label_vi": "Nguyen nhan goc phat sinh" },
+        { "key": "escape_causes", "type": "text", "label": "Detection Escape Cause(s)", "label_vi": "Nguyen nhan goc thoat phat hien" },
+        { "key": "analysis_method", "type": "multi_select", "label": "Analysis Method(s) Used", "label_vi": "Phuong phap phan tich da su dung",
+          "options": ["five_why", "fishbone", "fmea", "fault_tree", "pareto", "scatter_diagram", "doe"] },
+        { "key": "five_why_data", "type": "json", "label": "5-Why Analysis", "label_vi": "Phan tich 5-Tai sao", "conditional": "analysis_method contains five_why" },
+        { "key": "fishbone_data", "type": "json", "label": "Fishbone / Ishikawa Diagram", "label_vi": "Bieu do xuong ca / Ishikawa", "conditional": "analysis_method contains fishbone" },
+        { "key": "fmea_reference", "type": "string", "label": "FMEA Reference", "label_vi": "Tham chieu FMEA", "conditional": "analysis_method contains fmea" },
+        { "key": "evidence_attachments", "type": "attachment_list", "label": "Supporting Evidence", "label_vi": "Bang chung ho tro" }
+      ],
+      "tools_available": ["five_why", "fishbone_ishikawa", "fmea_worksheet", "fault_tree_analysis", "pareto_chart"],
+      "max_completion_days": 10
+    },
+    {
+      "code": "D5",
+      "label": "Permanent Corrective Actions",
+      "label_vi": "Hanh dong khac phuc vinh vien",
+      "description": "Select the best permanent corrective actions to address root cause and escape point",
+      "description_vi": "Chon hanh dong khac phuc vinh vien tot nhat de xu ly nguyen nhan goc va diem thoat",
+      "required_fields": [
+        { "key": "corrective_actions", "type": "action_list", "label": "Proposed Corrective Actions", "label_vi": "Hanh dong khac phuc de xuat" },
+        { "key": "action_owner", "type": "user_ref", "label": "Action Owner", "label_vi": "Nguoi chiu trach nhiem" },
+        { "key": "target_date", "type": "date", "label": "Target Completion Date", "label_vi": "Ngay hoan thanh muc tieu" },
+        { "key": "risk_assessment", "type": "text", "label": "Risk Assessment of Actions", "label_vi": "Danh gia rui ro cua hanh dong" },
+        { "key": "decision_criteria", "type": "text", "label": "Decision Criteria", "label_vi": "Tieu chi quyet dinh" }
+      ],
+      "tools_available": ["decision_matrix", "risk_assessment"],
+      "max_completion_days": 14
+    },
+    {
+      "code": "D6",
+      "label": "Implement & Validate Corrective Actions",
+      "label_vi": "Thuc hien va xac nhan hanh dong khac phuc",
+      "description": "Implement permanent corrective actions, remove interim containment, and validate effectiveness",
+      "description_vi": "Thuc hien hanh dong khac phuc vinh vien, go bo ngan chan tam thoi va xac nhan hieu qua",
+      "required_fields": [
+        { "key": "implementation_date", "type": "date", "label": "Implementation Date", "label_vi": "Ngay thuc hien" },
+        { "key": "containment_removed_date", "type": "date", "label": "Containment Removed Date", "label_vi": "Ngay go bo ngan chan" },
+        { "key": "validation_method", "type": "text", "label": "Validation Method", "label_vi": "Phuong phap xac nhan" },
+        { "key": "validation_results", "type": "text", "label": "Validation Results", "label_vi": "Ket qua xac nhan" },
+        { "key": "statistical_evidence", "type": "attachment_list", "label": "Statistical Evidence", "label_vi": "Bang chung thong ke" }
+      ],
+      "tools_available": ["spc_chart", "before_after_comparison"],
+      "max_completion_days": 21
+    },
+    {
+      "code": "D7",
+      "label": "Prevent Recurrence",
+      "label_vi": "Phong ngua tai phat",
+      "description": "Modify management systems, operating systems, practices, and procedures to prevent recurrence",
+      "description_vi": "Sua doi he thong quan ly, he thong van hanh, thuc hanh va thu tuc de ngan ngua tai phat",
+      "required_fields": [
+        { "key": "systemic_actions", "type": "action_list", "label": "Systemic Preventive Actions", "label_vi": "Hanh dong phong ngua he thong" },
+        { "key": "documents_updated", "type": "string_list", "label": "Documents Updated", "label_vi": "Tai lieu da cap nhat" },
+        { "key": "training_required", "type": "boolean", "label": "Training Required?", "label_vi": "Can dao tao?" },
+        { "key": "training_records", "type": "attachment_list", "label": "Training Records", "label_vi": "Ho so dao tao" },
+        { "key": "fmea_updated", "type": "boolean", "label": "FMEA Updated?", "label_vi": "FMEA da cap nhat?" },
+        { "key": "control_plan_updated", "type": "boolean", "label": "Control Plan Updated?", "label_vi": "Ke hoach kiem soat da cap nhat?" },
+        { "key": "horizontal_deployment", "type": "text", "label": "Horizontal Deployment (similar processes/products)", "label_vi": "Trien khai ngang (quy trinh/san pham tuong tu)" }
+      ],
+      "tools_available": ["lessons_learned_template", "horizontal_deployment_checklist"],
+      "max_completion_days": 30
+    },
+    {
+      "code": "D8",
+      "label": "Congratulate the Team",
+      "label_vi": "Ghi nhan nhom",
+      "description": "Recognize collective team efforts, document lessons learned, and formally close the 8D",
+      "description_vi": "Ghi nhan no luc tap the cua nhom, tai lieu hoa bai hoc kinh nghiem va chinh thuc dong 8D",
+      "required_fields": [
+        { "key": "team_recognition", "type": "text", "label": "Team Recognition Notes", "label_vi": "Ghi chu ghi nhan nhom" },
+        { "key": "lessons_learned", "type": "text", "label": "Lessons Learned", "label_vi": "Bai hoc kinh nghiem" },
+        { "key": "closure_date", "type": "date", "label": "Closure Date", "label_vi": "Ngay dong" },
+        { "key": "closure_approved_by", "type": "user_ref", "label": "Closure Approved By", "label_vi": "Nguoi phe duyet dong" },
+        { "key": "effectiveness_review_date", "type": "date", "label": "Effectiveness Review Date (90 days)", "label_vi": "Ngay xem xet hieu qua (90 ngay)" }
+      ],
+      "tools_available": ["lessons_learned_template"],
+      "max_completion_days": 5
+    }
+  ],
+  "fishbone_categories": {
+    "man": { "label": "Man (People)", "label_vi": "Con nguoi" },
+    "machine": { "label": "Machine (Equipment)", "label_vi": "May moc" },
+    "material": { "label": "Material", "label_vi": "Nguyen vat lieu" },
+    "method": { "label": "Method (Process)", "label_vi": "Phuong phap" },
+    "measurement": { "label": "Measurement", "label_vi": "Do luong" },
+    "environment": { "label": "Environment (Mother Nature)", "label_vi": "Moi truong" }
+  },
+  "five_why_template": {
+    "max_levels": 5,
+    "fields_per_level": [
+      { "key": "why_{n}", "type": "text", "label": "Why {n}?", "label_vi": "Tai sao {n}?" },
+      { "key": "evidence_{n}", "type": "text", "label": "Evidence for Why {n}", "label_vi": "Bang chung cho Tai sao {n}" }
+    ]
+  },
+  "closure_criteria": {
+    "all_steps_completed": true,
+    "root_cause_identified": true,
+    "corrective_actions_verified": true,
+    "containment_removed": true,
+    "effectiveness_review_scheduled": true,
+    "customer_notified_if_applicable": true,
+    "lessons_learned_documented": true
+  }
+}

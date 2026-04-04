@@ -1,0 +1,154 @@
+{
+  "name": "HESEM QMS Portal",
+  "short_name": "QMS",
+  "description": "Hệ thống Quản lý Chất lượng HESEM cho tài liệu có kiểm soát, biểu mẫu, NCR, CAPA và vận hành hiện trường.",
+  "start_url": "/01-QMS-Portal/portal.html",
+  "scope": "/01-QMS-Portal/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b1f34",
+  "theme_color": "#0c2d48",
+  "lang": "vi",
+  "dir": "ltr",
+  "id": "hesem-qms-portal",
+  "categories": ["business", "productivity"],
+
+  "icons": [
+    {
+      "src": "assets/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+
+  "shortcuts": [
+    {
+      "name": "Tài liệu kiểm soát",
+      "short_name": "Tài liệu",
+      "description": "Truy cập SOP, WI, ANNEX và tài liệu đang hiệu lực",
+      "url": "/01-QMS-Portal/portal.html?page=documents",
+      "icons": [
+        {
+          "src": "assets/icons/shortcut-docs.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Biểu mẫu trực tuyến",
+      "short_name": "Biểu mẫu",
+      "description": "Mở biểu mẫu, cấp mã hồ sơ và nộp dữ liệu có kiểm soát",
+      "url": "/01-QMS-Portal/portal.html?page=forms",
+      "icons": [
+        {
+          "src": "assets/icons/shortcut-forms.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "NCR / CAPA",
+      "short_name": "NCR/CAPA",
+      "description": "Báo cáo NCR và theo dõi CAPA trong cùng phân hệ",
+      "url": "/01-QMS-Portal/portal.html?page=ncr",
+      "icons": [
+        {
+          "src": "assets/icons/shortcut-ncr.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Bảng điều hành",
+      "short_name": "Điều hành",
+      "description": "KPI, cảnh báo và báo cáo tổng hợp",
+      "url": "/01-QMS-Portal/portal.html?page=dashboard",
+      "icons": [
+        {
+          "src": "assets/icons/shortcut-dashboard.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+
+  "screenshots": [
+    {
+      "src": "assets/icons/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "HESEM QMS Portal - Giao diện máy tính"
+    },
+    {
+      "src": "assets/icons/screenshot-narrow.png",
+      "sizes": "375x812",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "HESEM QMS Portal - Giao diện di động"
+    }
+  ],
+
+  "related_applications": [],
+  "prefer_related_applications": false,
+
+  "protocol_handlers": [
+    {
+      "protocol": "web+qms",
+      "url": "/01-QMS-Portal/portal.html?action=%s"
+    }
+  ],
+
+  "handle_links": "preferred",
+
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
+}

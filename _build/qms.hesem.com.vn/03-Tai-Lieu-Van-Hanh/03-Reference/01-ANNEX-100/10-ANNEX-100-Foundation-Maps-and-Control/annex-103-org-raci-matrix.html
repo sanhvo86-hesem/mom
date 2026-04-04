@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANNEX-103 - Org RACI Matrix | HESEM QMS</title>
+<link rel="stylesheet" href="../../../../assets/style.css">
+<style>
+thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ 
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
+.role-code {font-family: var(--mono); font-size: 11px; background: var(--bg3); padding: 2px 6px; border-radius: 5px;}
+.raci-cell {text-align:center; font-weight:700; width:34px; min-width:34px; padding:6px 4px !important;}
+.raci-A {background:#fff5f5; color:#c92a2a;}
+.raci-R {background:#e7f5ff; color:#1864ab;}
+.raci-C {background:#fff9db; color:#e67700;}
+.raci-I {background:#ebfbee; color:#2b8a3e;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
+.portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
+.portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
+.doc-link-list {list-style:none; margin:0; padding:0;}
+.doc-link-list li {padding:6px 0 6px 16px; position:relative;}
+.doc-link-list li:before {content:"•"; position:absolute; left:0; color:var(--blue);}
+.inline-tag {display:inline-block;padding:3px 8px;border:1px solid var(--ln);border-radius:999px;font-size:10px;font-weight:700;background:var(--bg2);margin-right:6px;margin-bottom:6px;}
+.svg-wrap,.org-wrap {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:16px; overflow:auto;}
+.nav-toc a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;margin:6px 0;background:var(--bg);}
+kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2px 5px;border-radius:4px;background:#fff;}
+.org-tree{display:flex;flex-direction:column;gap:16px;margin:8px 0;}
+.org-level{display:grid;gap:14px;}
+.org-level.cols-1{grid-template-columns:1fr;}
+.org-level.cols-2{grid-template-columns:repeat(2,minmax(0,1fr));}
+.org-level.cols-3{grid-template-columns:repeat(3,minmax(0,1fr));}
+.org-level.cols-4{grid-template-columns:repeat(4,minmax(0,1fr));}
+.org-level.cols-5{grid-template-columns:repeat(5,minmax(0,1fr));}
+.org-card{border:1px solid var(--ln);border-top:4px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
+.org-card h3{font-size:14px;color:var(--navy);margin:0 0 4px;}
+.org-card p{margin:4px 0;font-size:12px;}
+.org-row{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);margin:12px 0;}
+.org-row h3{margin:0 0 8px;font-size:13px;color:var(--navy);}
+.badge-soft{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:10px;font-weight:700;margin-right:6px;margin-bottom:6px;}
+.kpi-box{border:1px solid var(--ln);border-radius:var(--r);padding:12px;background:var(--bg);margin:8px 0;}
+.kpi-box b{display:block;font-size:11px;color:var(--navy);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
+.auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
+.backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
+.ranh giới trách nhiệm{border:1px solid #cfe0ff;border-left: 3px solid #2563eb;border-radius:8px;background:#eef6ff;padding:14px 16px;margin:14px 0;}
+.milestone-card{border:1px solid var(--ln);border-left: 3px solid var(--gold);border-radius:var(--r);padding:14px;background:#fffdf5;margin:12px 0;}
+.milestone-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
+.milestone-card p:last-child,.ranh giới trách nhiệm p:last-child,.auth-item p:last-child,.backup-card p:last-child{margin-bottom:0;}
+.small-note{font-size:12px;color:var(--ink2);}
+
+.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);margin:0 0 18px}
+.toc-title{font-weight:700;color:var(--navy);margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.toc-grid a{display:block;padding:10px 12px;border:1px solid var(--ln);border-radius:8px;background:var(--bg2)}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0}
+.metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg)}
+.metric-card .value{font-weight:800;font-size:16px;color:var(--navy);margin:6px 0}
+.metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);font-weight:700}
+.check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0}
+.check-item{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:#eef6ff}
+.process-strip{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
+.pill{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:11px;font-weight:700}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.tight{margin:0;padding-left:18px}
+.tight li{margin:4px 0}
+.mini-note{font-size:12px;color:var(--ink2)}
+.footer-note{margin-top:18px;padding:12px 14px;border-top:1px solid var(--ln);font-size:12px;color:var(--ink2)}
+.decision-table th,.decision-table td{vertical-align:top}
+@media (max-width: 960px){.grid-2,.grid-3{grid-template-columns:1fr}.auth-grid{grid-template-columns:1fr}}
+
+.doc-grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;}
+.doc-grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+.card h3{margin-top:0}
+.small{font-size:12px;color:var(--ink3);}
+.tight p{margin:8px 0;}
+.legend-row{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0 18px;}
+.legend-item{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--ln);border-radius:12px;padding:8px 10px;font-size:12px;}
+.legend-swatch{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;border:1px solid var(--ln2);}
+.kpi-good{background:#ebfbee;color:#2b8a3e}
+.kpi-warn{background:#fff9db;color:#e67700}
+.kpi-bad{background:#fff5f5;color:#c92a2a}
+.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;white-space:nowrap}
+.matrix-table{width:100%;border-collapse:collapse;font-size:12px;}
+.matrix-table th{padding:8px 10px;text-align:left;font-size:11px;font-weight:800;color:var(--navy);background:var(--th-bg);border:1px solid var(--th-bdr);text-transform:uppercase;letter-spacing:.3px;vertical-align:bottom}
+.matrix-table td{padding:8px 10px;border:1px solid var(--ln2);vertical-align:top;line-height:1.45}
+.matrix-table tbody tr:nth-child(even){background:#fafcfe}
+.matrix-table .section-row td{background:var(--navy)!important;color:#fff;font-weight:700;letter-spacing:.4px}
+.center{text-align:center}
+.nowrap{white-space:nowrap}
+.cell-a{background:#e3f2fd;color:#1565c0;font-weight:800;text-align:center}
+.cell-p{background:#fff3e0;color:#e65100;font-weight:700;text-align:center}
+.cell-v{background:#f3e5f5;color:#7b1fa2;font-weight:700;text-align:center}
+.cell-c{background:#fff9db;color:#e67700;font-weight:700;text-align:center}
+.cell-i{background:#e8f5e9;color:#2e7d32;font-weight:600;text-align:center}
+.cell-x{background:#f8f9fa;color:#868e96;text-align:center}
+.badge-strip{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
+.badge-chip{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--ln);padding:6px 10px;border-radius:999px;font-size:12px}
+.footer-note{margin-top:18px;padding:14px 16px;border:1px dashed var(--ln2);border-radius:12px;background:var(--bg2);color:var(--ink2)}
+</style>
+</head>
+<body>
+<div class="container">
+ <div class="page">
+ <div class="page-body">
+ <div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company"><a href="../../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a><span>Tài liệu vận hành • Annex</span></div>
+ </div>
+ <div class="title">
+<strong class="doc-name">Org RACI Matrix</strong>
+<span class="sub-vn">Trang điều hướng value-luồng để nối RFQ → Tiền mặt với thẩm quyền, RACI chi tiết, KPI và bố trí Người thay thế</span>
+</div>
+ <div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">ANNEX-103</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+ </div>
+ 
+ <div class="doc-content" id="docContent">
+ <div class="form-sheet">
+ <div class="iso-map">
+ <div class="iso-title">Department / annex control mục đích / ý định</div>
+ <div class="req"><span class="req-tag shall">PHẢI</span><div>Trang này chỉ cung cấp bức tranh RFQ → Tiền mặt ở mức điều hướng. Ma trận chi tiết phải tra <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html">ANNEX-121</a> và thẩm quyền ở <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a>. <span class="iso-clause">§7.5</span></div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Dùng khi hội nhập nhân sự mới hoặc rà soát nhanh các giao điểm value-luồng, không dùng thay hoạt động-level RACI. <span class="iso-clause">§7.5</span></div></div>
+ </div>
+ <div class="preface-block">
+ <div class="grid-2">
+ <div>
+ <p><b>Value-luồng nhóm / cụm</b></p>
+ <div><span class="inline-tag">Thương mại</span><span class="inline-tag"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span></span><span class="inline-tag"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a></span></span><span class="inline-tag"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phong Chat luong)"><span class="entity-code dept-code">D-QUAL</span></a></span></span><span class="inline-tag"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Supply Chain Department (Phong Chuoi cung ung)"><span class="entity-code dept-code">D-SCM</span></a></span></span><span class="inline-tag"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-finance-handbook.html" title="Finance Department (Phong Tai chinh)"><span class="entity-code dept-code">D-FIN</span></a></span></span><span class="inline-tag"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phong Nhan su)"><span class="entity-code dept-code">D-HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-ehs-handbook.html" title="EHS Department (Phong EHS)"><span class="entity-code dept-code">D-EHS</span></a></span></span></div>
+ </div>
+ <div>
+ <p><b>Tài liệu active</b></p>
+ <div><span class="inline-tag"><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></span><span class="inline-tag"><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html">ANNEX-121</a></span><span class="inline-tag"><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html">ANNEX-122</a></span><span class="inline-tag"><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></span></div>
+ </div>
+ </div>
+ </div>
+ <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#s1">1. RACI value-stream RFQ → Cash</a><a href="#s2">2. SLA / escalation cốt lõi</a><a href="#s3">3. Tài liệu active thay thế chi tiết</a></div></div>
+ <h2 class="h2" id="s1">1. RACI value-stream RFQ → Cash</h2><div class="table-card"><table class="table"><colgroup><col style="width:18%"><col style="width:20%"><col style="width:22%"><col style="width:40%"></colgroup><thead><tr><th>Stage</th><th>A cốt lõi</th><th>R cốt lõi</th><th>Bằng chứng bàn giao</th></tr></thead><tbody><tr><td>RFQ / báo giá</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="entity-code role-code">CS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="entity-code role-code">CS</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a><span class="entity-sep role-sep">·</span><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span></td><td>RFQ package, assumptions, technical/commercial review.</td></tr><tr><td>Order review / planning</td><td><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a> / <a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="entity-code role-code">PD</span></a> / <a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a> theo family quyết định</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="entity-code role-code">CS</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="entity-code role-code">SCM</span></a></span></td><td>Reviewed order, capacity/material/cổng kiểm soát mức sẵn sàng.</td></tr><tr><td>Make / inspect</td><td><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="entity-code role-code">PD</span></a> / <a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> theo cổng kiểm soát</td><td><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a>, shopfloor, <a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a>, Engineering</td><td>Traveler/dossier, mẫu đầu (first piece)/trong quá trình/final bằng chứng.</td></tr><tr><td>Ship / invoice</td><td><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / Finance theo cổng kiểm soát</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Logistics and Shipping Function (Bo phan Logistics va Giao van)"><span class="entity-code dept-code">D-LOG</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="entity-code role-code">CS</span></a><span class="entity-sep role-sep">·</span><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-finance-handbook.html" title="Finance Department (Phong Tai chinh)"><span class="entity-code dept-code">D-FIN</span></a></span></td><td>Final release, ship proof, invoice request.</td></tr><tr><td>Cash / close</td><td>Finance Manager / <a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a> theo thẩm quyền</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-ap-ar-and-payments-accountant.html" title="AP/AR and Payments Accountant (Ke toan cong no va thanh toan)"><span class="entity-code role-code">APAR</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-general-ledger-and-payroll-accountant.html" title="General Ledger and Payroll Accountant (Ke toan tong hop va tien luong)"><span class="entity-code role-code">GLP</span></a><span class="entity-sep role-sep">·</span><a class="entity-link dept-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-finance-handbook.html" title="Finance Department (Phong Tai chinh)"><span class="entity-code dept-code">D-FIN</span></a></span></td><td>AR/AP/close bằng chứng, reconciliations, approvals.</td></tr></tbody></table></div><h2 class="h2" id="s2">2. SLA / escalation cốt lõi</h2><div class="table-card"><table class="table"><colgroup><col style="width:42%"><col style="width:58%"></colgroup><thead><tr><th>Khi nào escalte</th><th>Escalation tối thiểu</th></tr></thead><tbody><tr><td>Customer promise rủi ro / hot-rush impact nhiều job</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="entity-code role-code">CS</span></a></span></td></tr><tr><td>Quality hold / suspected escape / stop-rủi ro giao hàng</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="role-code">QA</span></a><span class="role-sep">+</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a><span class="role-sep">+</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="role-code">CS</span></a></span></td></tr><tr><td>Material shortage / outsource failure ảnh hưởng Ngày đến hạn</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="entity-code role-code">CS</span></a></span></td></tr><tr><td>Payroll / payment / close vấn đề ảnh hưởng deadline hoặc cash</td><td><span class="role-cluster"><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quan ly tai chinh)"><span class="role-code">FIN</span></a><span class="role-sep">+</span><a class="role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></td></tr><tr><td>Outage hệ thống / continuity trigger</td><td>ITA/ESA + <a class="entity-link role-link" href="../../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a> + Người phụ trách affected quy trình</td></tr></tbody></table></div><h2 class="h2" id="s3">3. Tài liệu active thay thế chi tiết</h2>
+<p>Đọc cùng <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html">ANNEX-121</a> cho activity-level RACI, <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a> cho quyền phê duyệt/nhả giữ, <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html">ANNEX-122</a> cho Người phụ trách KPI và <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a> cho continuity Người thay thế.</p>
+<div class="footer-note">Trang điều hướng này đã được refresh theo bộ ANNEX active; mọi quyết định chi tiết phải dùng bản chuẩn liên kết ở trên.</div>
+
+ </div>
+ </div>
+ </div>
+ </div>
+</div>
+</body>
+</html>

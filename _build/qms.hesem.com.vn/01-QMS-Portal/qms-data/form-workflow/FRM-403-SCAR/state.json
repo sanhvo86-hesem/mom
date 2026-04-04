@@ -1,0 +1,15 @@
+{
+    "code": "FRM-403-SCAR",
+    "kind": "excel_form",
+    "status": "approved",
+    "revision": "1",
+    "released_revision": "1",
+    "has_release": true,
+    "live_path": "04-Bieu-Mau/04-FRM-400/FRM-403-SCAR_Supplier_Corrective_Action_Request.html",
+    "owner": "QA / SCM",
+    "approver": "General Manager",
+    "effective_date": "2026-03-31",
+    "ext": "html",
+    "version_control_model": "v0_registry_checksum_control",
+    "updated_at": "2026-04-01T12:45:23+00:00"
+}

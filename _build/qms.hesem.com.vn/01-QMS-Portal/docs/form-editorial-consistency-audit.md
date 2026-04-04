@@ -1,7 +1,7 @@
 # HESEM QMS — Editorial Consistency Audit V0
 
 ## Kết luận nhanh
-- Canonical slug cho ANNEX-QMS-035 đã đổi sang `download-only-delivery-profile-and-uat-gate`.
+- Canonical slug cho (removed) đã đổi sang `download-only-delivery-profile-and-uat-gate`.
 - Các portal working docs đã được đổi sang tên phase-neutral để dùng như guidance ổn định.
 - Tài nguyên logo trong HTML active đã chuyển về `assets/hesem-logo.svg`.
 - Đã bổ sung stack delivery profiles, pilot endpoint rollout và final repair register.

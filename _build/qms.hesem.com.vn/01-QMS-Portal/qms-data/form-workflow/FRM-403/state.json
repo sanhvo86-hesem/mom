@@ -1,0 +1,27 @@
+{
+    "code": "FRM-403",
+    "kind": "excel_form",
+    "status": "draft",
+    "revision": "1.0",
+    "released_revision": "0",
+    "has_release": true,
+    "live_path": "04-Bieu-Mau/04-FRM-400/FRM-403_Outsourced_Process_Request.xlsx",
+    "owner": "Buyer / Supply Chain / QA",
+    "approver": "General Manager",
+    "effective_date": "2026-03-21",
+    "ext": "xlsx",
+    "version_control_model": "v0_registry_checksum_control",
+    "updated_at": "2026-04-01T14:50:41+00:00",
+    "updateType": "major",
+    "checked_out_by": {
+        "name": "Võ Ngọc Sanh",
+        "role": "ceo",
+        "date": "2026-04-01 11:28"
+    },
+    "lastEdit": {
+        "by": "Võ Ngọc Sanh",
+        "role": "ceo",
+        "date": "2026-04-01 11:28",
+        "note": "Khởi tạo phiên bản workbook mới"
+    }
+}

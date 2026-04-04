@@ -55,6 +55,7 @@ function resolve_paths(): array
     return [
         'base_dir' => $baseDir,
         'root_dir' => $rootDir,
+        'root_htaccess' => $rootDir . '/.htaccess',
         'legacy_data_dir' => $legacyDataDir,
         'data_dir' => $dataDir,
         'data_source' => $dataSource,
@@ -63,6 +64,7 @@ function resolve_paths(): array
         'sessions_dir' => $dataDir . '/sessions',
         'ratelimit_dir' => $dataDir . '/ratelimit',
         'portal_htaccess' => $baseDir . '/.htaccess',
+        'docs_htaccess' => $baseDir . '/docs/.htaccess',
         'qmsdata_htaccess' => $baseDir . '/qms-data/.htaccess',
         'scripts_htaccess' => $baseDir . '/scripts/.htaccess',
     ];
@@ -114,11 +116,34 @@ foreach (['sessions_dir', 'ratelimit_dir'] as $k) {
     if (!is_dir($p[$k])) $warnings[] = "Directory missing (will be auto-created at runtime): {$p[$k]}";
 }
 
+if (!contains_rule($p['root_htaccess'], 'Options -Indexes')) {
+    $warnings[] = "Root .htaccess is missing directory listing protection: {$p['root_htaccess']}";
+}
+if (!contains_rule($p['root_htaccess'], 'RewriteRule ^(?:\\.git|\\.vscode|\\.claude|tools|_build|_Deleted|_reports|__pycache__)/ - [F,L,NC]')) {
+    $critical[] = "Root .htaccess internal-directory deny rule not found at {$p['root_htaccess']}";
+}
+if (!contains_rule($p['root_htaccess'], 'RewriteRule ^01-QMS-Portal/docs/ - [F,L,NC]')) {
+    $critical[] = "Root .htaccess docs deny rule not found at {$p['root_htaccess']}";
+}
+if (!contains_rule($p['root_htaccess'], 'Header always set Content-Security-Policy')) {
+    $warnings[] = "Root .htaccess CSP header rule not found at {$p['root_htaccess']}";
+}
+
 if (!contains_rule($p['portal_htaccess'], 'RewriteRule ^qms-data/ - [F,L,NC]')) {
     $critical[] = "Missing qms-data deny rule in {$p['portal_htaccess']}";
 }
-if (!contains_rule($p['portal_htaccess'], 'RewriteRule \\.(zip|sql|bak|old)$ - [F,L,NC]')) {
+if (!contains_rule($p['portal_htaccess'], 'RewriteRule \\.(zip|sql|bak|old|md|log)$ - [F,L,NC]')) {
     $warnings[] = "Missing backup-file deny rule in {$p['portal_htaccess']}";
+}
+if (!contains_rule($p['portal_htaccess'], 'RewriteRule ^docs/ - [F,L,NC]')) {
+    $critical[] = "Portal docs deny rule not found at {$p['portal_htaccess']}";
+}
+if (!contains_rule($p['portal_htaccess'], 'RewriteRule ^(?:form_workflow\\.php|SECURITY_OPERATIONS\\.md)$ - [F,L,NC]')) {
+    $warnings[] = "Portal auxiliary-file deny rule not found at {$p['portal_htaccess']}";
+}
+
+if (!contains_rule($p['docs_htaccess'], 'Require all denied') && !contains_rule($p['docs_htaccess'], 'Deny from all')) {
+    $critical[] = "docs/.htaccess deny rule not found at {$p['docs_htaccess']}";
 }
 
 if (!contains_rule($p['qmsdata_htaccess'], 'Require all denied') && !contains_rule($p['qmsdata_htaccess'], 'Deny from all')) {
@@ -148,7 +173,9 @@ echo "DATA_DIR: {$p['data_dir']} ({$p['data_source']})\n";
 echo "LEGACY_DATA_DIR: {$p['legacy_data_dir']}\n";
 echo "users.json exists: " . yesNo(is_file($p['users_file'])) . "\n";
 echo "DATA_DIR writable: " . yesNo(is_writable($p['data_dir'])) . "\n";
+echo "root .htaccess: " . yesNo(is_file($p['root_htaccess'])) . "\n";
 echo "portal .htaccess: " . yesNo(is_file($p['portal_htaccess'])) . "\n";
+echo "docs .htaccess: " . yesNo(is_file($p['docs_htaccess'])) . "\n";
 echo "qms-data .htaccess: " . yesNo(is_file($p['qmsdata_htaccess'])) . "\n";
 echo "scripts .htaccess: " . yesNo(is_file($p['scripts_htaccess'])) . "\n";
 if ($http !== null) {

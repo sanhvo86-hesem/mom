@@ -52,4 +52,4 @@ Tạo **Excel form** dùng trực tiếp để ghi dữ liệu, in A4 rõ ràng,
 - Không tạo chồng lấn giữa form này với form khác.
 - Không duplicate dữ liệu nếu đã có SoR/SSOT trong Epicor/M365; chỉ ghi dữ liệu cần để ra quyết định và lưu bằng chứng.
 - Print được, điền được, ai cầm vào cũng biết phải làm gì và phải ký/nhập gì.
-- Thiết kế phải phù hợp mục tiêu ISO 9001:2015 (revision-ready) và sẵn sàng cho AS9100D ở mức thực tế HESEM.
+- Thiết kế phải phù hợp mục tiêu ISO 9001:2026 (revision-ready) và sẵn sàng cho AS9100D ở mức thực tế HESEM.

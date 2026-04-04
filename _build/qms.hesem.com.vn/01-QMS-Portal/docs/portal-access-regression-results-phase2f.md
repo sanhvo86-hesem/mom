@@ -29,11 +29,11 @@
 
 | ID | Kind | Role/Pattern | Doc code | Expected | Actual | Result |
 |---|---|---|---|---:|---:|---|
-| ROLE-001 | doc-access | ceo | ANNEX-QMS-025 | TRUE | TRUE | PASS |
-| ROLE-002 | doc-access | cnc_operator | ANNEX-QMS-025 | FALSE | FALSE | PASS |
-| ROLE-003 | doc-access | finance_manager | ANNEX-QMS-027 | TRUE | TRUE | PASS |
-| ROLE-004 | doc-access | qa_manager | ANNEX-QMS-029 | TRUE | TRUE | PASS |
-| ROLE-005 | doc-access | cnc_operator | ANNEX-QMS-029 | FALSE | FALSE | PASS |
+| ROLE-001 | doc-access | ceo | ANNEX-120 | TRUE | TRUE | PASS |
+| ROLE-002 | doc-access | cnc_operator | ANNEX-120 | FALSE | FALSE | PASS |
+| ROLE-003 | doc-access | finance_manager | ANNEX-122 | TRUE | TRUE | PASS |
+| ROLE-004 | doc-access | qa_manager | ANNEX-124 | TRUE | TRUE | PASS |
+| ROLE-005 | doc-access | cnc_operator | ANNEX-124 | FALSE | FALSE | PASS |
 | ROLE-006 | doc-access | buyer | FRM-412 | TRUE | TRUE | PASS |
 | ROLE-007 | doc-access | warehouse_clerk | FRM-413 | TRUE | TRUE | PASS |
 | ROLE-008 | doc-access | shift_leader | FRM-511 | TRUE | TRUE | PASS |
@@ -47,8 +47,8 @@
 | HIDE-002 | doc-access | ceo | WI-519-CUSTOM-HIDDEN-PILOT-NOTE | FALSE | FALSE | PASS |
 | CREATE-001 | custom-create | qa_manager |  | TRUE | TRUE | PASS |
 | CREATE-002 | custom-create | cnc_operator |  | FALSE | FALSE | PASS |
-| ALIAS-001 | alias-match | REF-012* | ANNEX-QMS-012 | TRUE | TRUE | PASS |
-| ALIAS-002 | alias-match | REF-020* | ANNEX-OPS-003 | TRUE | TRUE | PASS |
-| ALIAS-003 | alias-match | REF-021* | ANNEX-QMS-023 | TRUE | TRUE | PASS |
-| OVR-001 | doc-access | production_planner | ANNEX-QMS-029 | TRUE | TRUE | PASS |
-| OVR-002 | doc-access | qa_manager | ANNEX-QMS-012 | FALSE | FALSE | PASS |
+| ALIAS-001 | alias-match | REF-012* | ANNEX-113 | TRUE | TRUE | PASS |
+| ALIAS-002 | alias-match | REF-020* | ANNEX-503 | TRUE | TRUE | PASS |
+| ALIAS-003 | alias-match | REF-021* | ANNEX-119 | TRUE | TRUE | PASS |
+| OVR-001 | doc-access | production_planner | ANNEX-124 | TRUE | TRUE | PASS |
+| OVR-002 | doc-access | qa_manager | ANNEX-113 | FALSE | FALSE | PASS |

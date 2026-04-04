@@ -93,7 +93,7 @@ function renderEnrollQR(otpauthUrl){
   function reedSolomonComputeDivisor(degree){
     assert(degree>=1 && degree<=255);
     var result = [1];
-    for(var i=0;i<degree;i++) result = polyMul(result, [1, GF_EXP[i]]); // (x + Î±^i)
+    for(var i=0;i<degree;i++) result = polyMul(result, [1, GF_EXP[i]]); // (x + α^i)
     return result; // length degree+1, leading coef 1
   }
 

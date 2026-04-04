@@ -1,0 +1,258 @@
+{
+  "_meta": {
+    "version": "2.0",
+    "description": "Normalized UI and API field type definitions used across the registry.",
+    "generatedAt": "2026-04-02T06:00:20.356Z",
+    "typeCount": 25
+  },
+  "string": {
+    "icon": "Aa",
+    "format": "text",
+    "apiType": "string",
+    "inputControl": "text",
+    "align": "left",
+    "editable": true,
+    "filterType": "text",
+    "sortable": true
+  },
+  "number": {
+    "icon": "#",
+    "format": "decimal",
+    "apiType": "number",
+    "inputControl": "number",
+    "align": "right",
+    "editable": true,
+    "filterType": "number-range",
+    "sortable": true
+  },
+  "integer": {
+    "icon": "#",
+    "format": "integer",
+    "apiType": "integer",
+    "inputControl": "number",
+    "align": "right",
+    "editable": true,
+    "filterType": "number-range",
+    "sortable": true
+  },
+  "currency": {
+    "icon": "$",
+    "format": "currency",
+    "apiType": "number",
+    "inputControl": "currency",
+    "align": "right",
+    "editable": true,
+    "filterType": "number-range",
+    "sortable": true
+  },
+  "percent": {
+    "icon": "%",
+    "format": "percent",
+    "apiType": "number",
+    "inputControl": "percent",
+    "align": "right",
+    "editable": true,
+    "filterType": "number-range",
+    "sortable": true
+  },
+  "date": {
+    "icon": "DT",
+    "format": "date",
+    "apiType": "string",
+    "inputControl": "date",
+    "align": "left",
+    "editable": true,
+    "filterType": "date-range",
+    "sortable": true
+  },
+  "datetime": {
+    "icon": "TS",
+    "format": "datetime",
+    "apiType": "string",
+    "inputControl": "datetime-local",
+    "align": "left",
+    "editable": true,
+    "filterType": "date-range",
+    "sortable": true
+  },
+  "time": {
+    "icon": "TM",
+    "format": "time",
+    "apiType": "string",
+    "inputControl": "time",
+    "align": "left",
+    "editable": true,
+    "filterType": "text",
+    "sortable": true
+  },
+  "boolean": {
+    "icon": "YN",
+    "format": "boolean",
+    "apiType": "boolean",
+    "inputControl": "checkbox",
+    "align": "center",
+    "editable": true,
+    "filterType": "boolean",
+    "sortable": true
+  },
+  "badge": {
+    "icon": "BG",
+    "format": "badge",
+    "apiType": "string",
+    "inputControl": "select",
+    "align": "center",
+    "editable": false,
+    "filterType": "select",
+    "sortable": true
+  },
+  "email": {
+    "icon": "@",
+    "format": "email",
+    "apiType": "string",
+    "inputControl": "email",
+    "align": "left",
+    "editable": true,
+    "filterType": "text",
+    "sortable": true
+  },
+  "phone": {
+    "icon": "PH",
+    "format": "phone",
+    "apiType": "string",
+    "inputControl": "tel",
+    "align": "left",
+    "editable": true,
+    "filterType": "text",
+    "sortable": false
+  },
+  "url": {
+    "icon": "URL",
+    "format": "url",
+    "apiType": "string",
+    "inputControl": "url",
+    "align": "left",
+    "editable": false,
+    "filterType": "text",
+    "sortable": false
+  },
+  "image": {
+    "icon": "IMG",
+    "format": "image",
+    "apiType": "string",
+    "inputControl": "file",
+    "align": "center",
+    "editable": false,
+    "filterType": null,
+    "sortable": false
+  },
+  "json": {
+    "icon": "{}",
+    "format": "json",
+    "apiType": "object",
+    "inputControl": "json-editor",
+    "align": "left",
+    "editable": true,
+    "filterType": null,
+    "sortable": false
+  },
+  "textarea": {
+    "icon": "TXT",
+    "format": "multiline",
+    "apiType": "string",
+    "inputControl": "textarea",
+    "align": "left",
+    "editable": true,
+    "filterType": "text",
+    "sortable": false
+  },
+  "select": {
+    "icon": "SEL",
+    "format": "select",
+    "apiType": "string",
+    "inputControl": "select",
+    "align": "left",
+    "editable": true,
+    "filterType": "select",
+    "sortable": true
+  },
+  "tags": {
+    "icon": "TAG",
+    "format": "tags",
+    "apiType": "array",
+    "inputControl": "tag-picker",
+    "align": "left",
+    "editable": true,
+    "filterType": "text",
+    "sortable": false
+  },
+  "progress": {
+    "icon": "PRG",
+    "format": "progress-bar",
+    "apiType": "number",
+    "inputControl": "readonly",
+    "align": "center",
+    "editable": false,
+    "filterType": "number-range",
+    "sortable": true
+  },
+  "color": {
+    "icon": "CLR",
+    "format": "color",
+    "apiType": "string",
+    "inputControl": "color",
+    "align": "center",
+    "editable": true,
+    "filterType": null,
+    "sortable": false
+  },
+  "duration": {
+    "icon": "DUR",
+    "format": "duration",
+    "apiType": "number",
+    "inputControl": "duration",
+    "align": "right",
+    "editable": true,
+    "filterType": "number-range",
+    "sortable": true
+  },
+  "weight": {
+    "icon": "WT",
+    "format": "weight",
+    "apiType": "number",
+    "inputControl": "number",
+    "align": "right",
+    "editable": true,
+    "filterType": "number-range",
+    "sortable": true
+  },
+  "dimension": {
+    "icon": "DIM",
+    "format": "dimension",
+    "apiType": "number",
+    "inputControl": "number",
+    "align": "right",
+    "editable": true,
+    "filterType": "number-range",
+    "sortable": true
+  },
+  "uuid": {
+    "icon": "ID",
+    "format": "uuid",
+    "apiType": "string",
+    "inputControl": "readonly",
+    "align": "left",
+    "editable": false,
+    "filterType": "text",
+    "sortable": false
+  },
+  "code": {
+    "icon": "<>",
+    "format": "code",
+    "apiType": "string",
+    "inputControl": "code-editor",
+    "align": "left",
+    "editable": true,
+    "filterType": "text",
+    "sortable": true
+  }
+}

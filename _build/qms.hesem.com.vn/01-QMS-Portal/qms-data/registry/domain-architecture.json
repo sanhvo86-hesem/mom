@@ -1,0 +1,3085 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generatedAt": "2026-04-04T11:01:12.563Z",
+    "domainCount": 48,
+    "tableCount": 528,
+    "description": "Domain architecture map for HESEM QMS Portal aligned to SAP, Epicor, IFS, Oracle, and Dynamics patterns.",
+    "researchReferences": [
+      {
+        "key": "sap_inspection_lot",
+        "platform": "SAP S/4HANA / SAP ERP",
+        "url": "https://help.sap.com/docs/SAP_ERP/250374f0514e4e0f9057066374265eba/a7e4b65334e6b54ce10000000a174cb4.html",
+        "focus": [
+          "QM integration with MM, PP, SD, PM",
+          "inspection lot lifecycle",
+          "normalized logistics linkages"
+        ]
+      },
+      {
+        "key": "sap_status_management",
+        "platform": "SAP S/4HANA",
+        "url": "https://help.sap.com/docs/SAP_S4HANA_ON-PREMISE/5e23dc8fe9be4fd496f8ab556667ea05/0ed49753858ced23e10000000a174cb4.html",
+        "focus": [
+          "system status and user status",
+          "business transaction controls"
+        ]
+      },
+      {
+        "key": "sap_language_texts",
+        "platform": "SAP",
+        "url": "https://help.sap.com/doc/saphelp_ewm900/9.0/en-US/4a/40815bacb51cece10000000a42189b/content.htm",
+        "focus": [
+          "language-dependent text tables",
+          "text-key pattern"
+        ]
+      },
+      {
+        "key": "epicor_cpc",
+        "platform": "Epicor Kinetic / CPC",
+        "url": "https://www.epicor.com/en/products/connected-worker/epicor-connected-process-control/",
+        "focus": [
+          "operator guidance",
+          "traceability",
+          "task-level data collection"
+        ]
+      },
+      {
+        "key": "epicor_track_trace",
+        "platform": "Epicor Kinetic / CPC",
+        "url": "https://www.epicor.com/en/products/connected-worker/epicor-connected-process-control/control-track-and-trace/",
+        "focus": [
+          "serial and lot traceability",
+          "quality containment"
+        ]
+      },
+      {
+        "key": "epicor_industrial_machinery",
+        "platform": "Epicor Kinetic",
+        "url": "https://ondemand.epicor.com/courseResources/r2378_Industrial%20Machinery%20Manufacturing_Transcript_1.pdf",
+        "focus": [
+          "part",
+          "job",
+          "APS",
+          "manufacturing quote flow"
+        ]
+      },
+      {
+        "key": "ifs_projection",
+        "platform": "IFS Cloud",
+        "url": "https://docs.ifs.com/techdocs/25r2/030_administration/010_security/020_permission_sets/004_permission_set_overview/010_projections/",
+        "focus": [
+          "projection as self-contained business function",
+          "bounded API surface"
+        ]
+      },
+      {
+        "key": "ifs_custom_fields",
+        "platform": "IFS Cloud",
+        "url": "https://docs.ifs.com/techdocs/Foundation1/040_administration/220_user_interface/020_custom_objects/040_custom_fields/",
+        "focus": [
+          "logical units",
+          "persistent and calculated custom fields"
+        ]
+      },
+      {
+        "key": "ifs_translation_manager",
+        "platform": "IFS Cloud",
+        "url": "https://docs.ifs.com/techdocs/22r2/060_development/050_development_tools/025_translation_manager_aurena/",
+        "focus": [
+          "field descriptions",
+          "field description translations",
+          "translation manager"
+        ]
+      },
+      {
+        "key": "ifs_cloud_brochure",
+        "platform": "IFS Cloud",
+        "url": "https://www.ifs.com/-/media10/project/ifs/ifs/assets/ifs-cloud-brochure-24r2_02_2025.pdf",
+        "focus": [
+          "manufacturing",
+          "supply chain",
+          "finance",
+          "projects",
+          "asset",
+          "service"
+        ]
+      },
+      {
+        "key": "oracle_workflow_status",
+        "platform": "Oracle Fusion Cloud SCM",
+        "url": "https://docs.oracle.com/en/cloud/saas/supply-chain-and-manufacturing/25a/fauqm/workflow-status.html",
+        "focus": [
+          "quality issue and action workflows",
+          "predefined status models"
+        ]
+      },
+      {
+        "key": "oracle_workflow_templates",
+        "platform": "Oracle Fusion Cloud SCM",
+        "url": "https://docs.oracle.com/en/cloud/saas/supply-chain-and-manufacturing/24b/fauqm/workflow-templates.html",
+        "focus": [
+          "workflow templates",
+          "status sequence governance"
+        ]
+      },
+      {
+        "key": "oracle_translation_table",
+        "platform": "Oracle Fusion Cloud",
+        "url": "https://docs.oracle.com/en/cloud/saas/supply-chain-and-manufacturing/25d/oedsc/acdcomponenttlint-25230.html",
+        "focus": [
+          "_TL translation table pattern",
+          "MLS support",
+          "who columns"
+        ]
+      },
+      {
+        "key": "oracle_who_columns",
+        "platform": "Oracle Applications",
+        "url": "https://docs.oracle.com/cd/B25516_20/current/acrobat/iby115ig.pdf",
+        "focus": [
+          "WHO columns",
+          "base and translation table pattern"
+        ]
+      },
+      {
+        "key": "dynamics_virtual_tables",
+        "platform": "Microsoft Dynamics 365 / Dataverse",
+        "url": "https://learn.microsoft.com/en-us/power-apps/maker/data-platform/create-edit-virtual-entities",
+        "focus": [
+          "virtual tables",
+          "external runtime data",
+          "schema metadata"
+        ]
+      },
+      {
+        "key": "dynamics_table_metadata",
+        "platform": "Microsoft Dynamics 365 / Dataverse",
+        "url": "https://learn.microsoft.com/en-us/power-apps/developer/data-platform/webapi/create-update-entity-definitions-using-web-api",
+        "focus": [
+          "schema names",
+          "display names",
+          "localized labels",
+          "solution prefixes"
+        ]
+      },
+      {
+        "key": "dynamics_audit_columns",
+        "platform": "Microsoft Dynamics 365 / Dataverse",
+        "url": "https://learn.microsoft.com/en-us/power-apps/developer/data-platform/reference/entities/account",
+        "focus": [
+          "createdby",
+          "createdon",
+          "modifiedby",
+          "modifiedon",
+          "logical names"
+        ]
+      }
+    ],
+    "benchmarkPatterns": {
+      "sap_s4hana": {
+        "modules": [
+          "PP",
+          "QM",
+          "PM",
+          "MM",
+          "SD",
+          "FI",
+          "CO",
+          "PS",
+          "HCM"
+        ],
+        "namingConvention": "Short, stable technical table names with language text tables and status profiles.",
+        "linkPattern": "Normalized transactional model with strong integration across logistics and finance objects.",
+        "auditPattern": "System status, user status, change documents, and language-dependent text tables.",
+        "multilingualPattern": "Text tables keyed by language and often by business object key."
+      },
+      "epicor_kinetic": {
+        "modules": [
+          "Part",
+          "Job",
+          "PO",
+          "SO",
+          "Quality",
+          "Inspection",
+          "APS",
+          "WMS"
+        ],
+        "namingConvention": "Business-object naming around parts, jobs, operations, suppliers, and order flows.",
+        "linkPattern": "Normalized operational entities with execution and traceability records around job/part flow.",
+        "auditPattern": "Execution history, operator trace, and approval records around shop-floor objects.",
+        "multilingualPattern": "Localized UI metadata with business-object centric labels rather than text-table-heavy design."
+      },
+      "ifs_cloud": {
+        "modules": [
+          "Manufacturing",
+          "Supply Chain",
+          "Asset",
+          "Projects",
+          "Finance",
+          "HR",
+          "Service"
+        ],
+        "namingConvention": "Bounded logical units exposed via projections that implement defined business functions.",
+        "linkPattern": "DDD-like logical units and projections instead of a monolithic API surface.",
+        "auditPattern": "Persistent custom attributes on logical units plus permissioned projection access.",
+        "multilingualPattern": "Translation Manager and field-description translations over logical units and custom objects."
+      },
+      "oracle_fusion": {
+        "modules": [
+          "Product Management",
+          "Quality",
+          "Manufacturing",
+          "SCM",
+          "Financials"
+        ],
+        "namingConvention": "Business objects backed by base tables, translation tables (_TL), and extensible flexfields.",
+        "linkPattern": "Business-object-centric normalized core with WHO columns and translation tables.",
+        "auditPattern": "WHO columns such as CREATED_BY, CREATION_DATE, LAST_UPDATED_BY, LAST_UPDATE_DATE.",
+        "multilingualPattern": "Translation tables keyed by LANGUAGE and SOURCE_LANG for translatable attributes."
+      },
+      "dynamics_365": {
+        "modules": [
+          "Dataverse tables",
+          "Virtual tables",
+          "Supply Chain entities"
+        ],
+        "namingConvention": "SchemaName + logical name + localized DisplayName/DisplayCollectionName.",
+        "linkPattern": "Metadata-driven tables with lookup columns and optional virtual-table federation.",
+        "auditPattern": "CreatedBy, CreatedOn, ModifiedBy, ModifiedOn as standard system-managed fields.",
+        "multilingualPattern": "LocalizedLabels on metadata objects and label merge semantics by language code."
+      }
+    },
+    "workflowCoverageGeneratedAt": "2026-04-04T11:01:31.005Z"
+  },
+  "domains": {
+    "core_system": {
+      "label": "Hệ thống lõi",
+      "labelEn": "Core System",
+      "icon": "fa-user-shield",
+      "color": "#0f766e",
+      "description": "Người dùng, vai trò, phiên, tổ chức và nhật ký hệ thống lõi.",
+      "businessProcess": "Identity, authorization, tenancy, security, and audit foundation.",
+      "tables": [
+        "audit_events",
+        "departments",
+        "roles",
+        "sessions",
+        "user_roles",
+        "users"
+      ],
+      "primaryWorkflows": [
+        "wf_department",
+        "wf_role",
+        "wf_session",
+        "wf_user_role",
+        "wf_user"
+      ],
+      "upstreamDomains": [
+        "master_data_governance",
+        "mes_execution"
+      ],
+      "downstreamDomains": [
+        "advanced_planning",
+        "ai_predictive",
+        "audit_risk",
+        "bi_datawarehouse",
+        "calibration_equipment",
+        "cnc_programs",
+        "commercial_contracts",
+        "crm",
+        "customer_portal",
+        "demand_supply_planning",
+        "document_control",
+        "ehs_sustainability",
+        "evidence_vault",
+        "finance",
+        "finance_extended",
+        "fmea_apqp",
+        "forms_system",
+        "hcm_workforce",
+        "inventory",
+        "lean_manufacturing",
+        "master_data",
+        "master_data_governance",
+        "mobile_operations",
+        "plant_maintenance",
+        "plm_change_control",
+        "production",
+        "project_management",
+        "purchasing",
+        "quality_lab",
+        "quality_management",
+        "record_system",
+        "sales",
+        "service_warranty",
+        "shipping_compliance",
+        "supplier_relationship",
+        "system_infrastructure",
+        "tooling_lifecycle",
+        "traceability_serialization",
+        "training_hr",
+        "transportation",
+        "warehouse_management"
+      ],
+      "supportDomain": false,
+      "workflows": [
+        "wf_department",
+        "wf_role",
+        "wf_session",
+        "wf_user",
+        "wf_user_role"
+      ]
+    },
+    "document_control": {
+      "label": "Kiểm soát tài liệu",
+      "labelEn": "Document Control",
+      "icon": "fa-file-signature",
+      "color": "#2563eb",
+      "description": "Tài liệu có kiểm soát, phiên bản, phân phối và xác nhận đọc.",
+      "businessProcess": "Controlled documents, revisions, release, acknowledgment, and retrieval.",
+      "tables": [
+        "document_distribution",
+        "document_embeddings",
+        "document_versions",
+        "documents"
+      ],
+      "primaryWorkflows": [
+        "wf_document_distribution",
+        "wf_document_embedding",
+        "wf_document_change_control"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data_governance",
+        "mes_execution"
+      ],
+      "downstreamDomains": [
+        "hcm_workforce",
+        "mfg_engineering",
+        "plm_change_control",
+        "quality_lab"
+      ],
+      "supportDomain": false,
+      "workflows": [
+        "wf_document_change_control",
+        "wf_document_distribution",
+        "wf_document_embedding"
+      ]
+    },
+    "master_data": {
+      "label": "Dữ liệu chủ",
+      "labelEn": "Master Data",
+      "icon": "fa-database",
+      "color": "#0284c7",
+      "description": "Mã hàng, BOM, routing, work center và revision chuẩn sản xuất.",
+      "businessProcess": "Item, BOM, routing, work center, and revision master governance.",
+      "tables": [
+        "bill_of_materials",
+        "bom_components",
+        "item_revisions",
+        "items",
+        "routing_operations",
+        "routings",
+        "work_centers"
+      ],
+      "primaryWorkflows": [
+        "wf_bill_of_material",
+        "wf_bom_component",
+        "wf_item",
+        "wf_routing",
+        "wf_work_center"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data_governance",
+        "mes_execution"
+      ],
+      "downstreamDomains": [
+        "advanced_planning",
+        "ai_predictive",
+        "bi_datawarehouse",
+        "cnc_programs",
+        "commercial_contracts",
+        "crm",
+        "demand_supply_planning",
+        "digital_product_passport",
+        "ehs_sustainability",
+        "finance",
+        "finance_treasury",
+        "fmea_apqp",
+        "inventory",
+        "mes_execution",
+        "mfg_engineering",
+        "outsource_execution",
+        "plant_maintenance",
+        "plm_change_control",
+        "production",
+        "project_management",
+        "purchasing",
+        "quality_lab",
+        "quality_management",
+        "sales",
+        "service_warranty",
+        "shipping_compliance",
+        "supplier_relationship",
+        "tooling_lifecycle",
+        "traceability_serialization",
+        "transportation",
+        "warehouse_management"
+      ],
+      "supportDomain": false,
+      "workflows": [
+        "wf_bill_of_material",
+        "wf_bom_component",
+        "wf_item",
+        "wf_routing",
+        "wf_work_center"
+      ]
+    },
+    "sales": {
+      "label": "Bán hàng",
+      "labelEn": "Sales",
+      "icon": "fa-cart-shopping",
+      "color": "#0891b2",
+      "description": "Khách hàng, đơn hàng bán, line và cộng tác thực hiện đơn.",
+      "businessProcess": "Quote-to-order, order promising, contract review, and customer delivery commitments.",
+      "tables": [
+        "contract_review_items",
+        "customer_sites",
+        "customers",
+        "order_collaboration_events",
+        "order_document_requirements",
+        "order_documents_required",
+        "order_holds",
+        "order_milestones",
+        "order_notes",
+        "order_timeline_events",
+        "quote_history",
+        "quote_lines",
+        "quotes",
+        "sales_order_lines",
+        "sales_orders"
+      ],
+      "primaryWorkflows": [
+        "wf_customer_site",
+        "wf_customer",
+        "wf_order_documents_required",
+        "wf_order_hold",
+        "wf_order_milestone",
+        "wf_order_note",
+        "wf_quote_lifecycle",
+        "wf_sales_order"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data",
+        "master_data_governance",
+        "mes_execution"
+      ],
+      "downstreamDomains": [
+        "advanced_planning",
+        "bi_datawarehouse",
+        "commercial_contracts",
+        "crm",
+        "customer_portal",
+        "demand_supply_planning",
+        "digital_product_passport",
+        "finance_extended",
+        "finance_treasury",
+        "fmea_apqp",
+        "outsource_execution",
+        "plm_change_control",
+        "production",
+        "project_management",
+        "quality_lab",
+        "quality_management",
+        "service_warranty",
+        "shipping_compliance",
+        "trade_compliance",
+        "transportation",
+        "warehouse_management"
+      ],
+      "supportDomain": false,
+      "workflows": [
+        "wf_customer",
+        "wf_customer_site",
+        "wf_order_documents_required",
+        "wf_order_hold",
+        "wf_order_milestone",
+        "wf_order_note",
+        "wf_quote_lifecycle",
+        "wf_sales_order"
+      ]
+    },
+    "purchasing": {
+      "label": "Mua hàng",
+      "labelEn": "Purchasing",
+      "icon": "fa-truck-ramp-box",
+      "color": "#7c3aed",
+      "description": "Nhà cung cấp, PO, line, đánh giá và nguồn cung.",
+      "businessProcess": "Source-to-order, supplier evaluation, approval, and procurement control.",
+      "tables": [
+        "purchase_order_lines",
+        "purchase_orders",
+        "vendor_ratings",
+        "vendors"
+      ],
+      "primaryWorkflows": [
+        "wf_purchase_order",
+        "wf_vendor_rating",
+        "wf_vendor"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data",
+        "master_data_governance",
+        "mes_execution"
+      ],
+      "downstreamDomains": [
+        "bi_datawarehouse",
+        "calibration_equipment",
+        "demand_supply_planning",
+        "finance_extended",
+        "inventory",
+        "outsource_execution",
+        "plant_maintenance",
+        "quality_management",
+        "supplier_relationship",
+        "tooling_lifecycle",
+        "traceability_serialization"
+      ],
+      "supportDomain": false,
+      "workflows": [
+        "wf_purchase_order",
+        "wf_vendor",
+        "wf_vendor_rating"
+      ]
+    },
+    "inventory": {
+      "label": "Tồn kho",
+      "labelEn": "Inventory",
+      "icon": "fa-boxes-stacked",
+      "color": "#6d28d9",
+      "description": "Kho, vị trí, lô, serial và giao dịch tồn kho nền tảng.",
+      "businessProcess": "Inventory receiving, stocking, lot/serial traceability, and stock movement.",
+      "tables": [
+        "inventory_locations",
+        "inventory_transactions",
+        "lot_master",
+        "serial_master",
+        "warehouses"
+      ],
+      "primaryWorkflows": [
+        "wf_inventory_location",
+        "wf_inventory_transaction",
+        "wf_lot_master",
+        "wf_serial_master",
+        "wf_warehous"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "purchasing"
+      ],
+      "downstreamDomains": [
+        "demand_supply_planning",
+        "digital_product_passport",
+        "outsource_execution",
+        "plant_maintenance",
+        "plm_change_control",
+        "quality_lab",
+        "service_warranty",
+        "shipping_compliance",
+        "supplier_relationship",
+        "traceability_serialization",
+        "warehouse_management"
+      ],
+      "supportDomain": false,
+      "workflows": [
+        "wf_inventory_location",
+        "wf_inventory_transaction",
+        "wf_lot_master",
+        "wf_serial_master",
+        "wf_warehous"
+      ]
+    },
+    "production": {
+      "label": "Sản xuất",
+      "labelEn": "Production",
+      "icon": "fa-industry",
+      "color": "#ea580c",
+      "description": "JO, công đoạn, lao động, lịch và điều độ xưởng.",
+      "businessProcess": "Plan-to-produce, execution dispatching, labor collection, and shift performance.",
+      "tables": [
+        "job_operations",
+        "job_orders",
+        "job_release_gates",
+        "labor_transactions",
+        "production_schedule",
+        "shift_assignments",
+        "shift_calendar_holidays",
+        "shift_definitions",
+        "shift_production_log",
+        "shift_targets"
+      ],
+      "primaryWorkflows": [
+        "wf_job_order",
+        "wf_job_release_gate",
+        "wf_labor_transaction",
+        "wf_production_schedule",
+        "wf_shift_calendar_holiday",
+        "wf_shift_definition",
+        "wf_shift_target"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "sales",
+        "training_hr"
+      ],
+      "downstreamDomains": [
+        "advanced_planning",
+        "outsource_execution",
+        "traceability_serialization",
+        "warehouse_management"
+      ],
+      "supportDomain": false,
+      "workflows": [
+        "wf_job_order",
+        "wf_job_release_gate",
+        "wf_labor_transaction",
+        "wf_production_schedule",
+        "wf_shift_calendar_holiday",
+        "wf_shift_definition",
+        "wf_shift_production_log",
+        "wf_shift_target"
+      ]
+    },
+    "quality_management": {
+      "label": "Quản lý chất lượng",
+      "labelEn": "Quality Management",
+      "icon": "fa-shield-halved",
+      "color": "#dc2626",
+      "description": "Kiểm tra, NCR, CAPA, FAI, SPC, OQC và chất lượng vận hành.",
+      "businessProcess": "Inspection, nonconformance, CAPA, first article, SPC, and containment.",
+      "tables": [
+        "capa_8d_steps",
+        "capa_effectiveness_checks",
+        "capa_records",
+        "certificates",
+        "concessions",
+        "contamination_checks",
+        "copq_ledger",
+        "customer_complaints",
+        "deviations",
+        "fai_characteristics",
+        "fai_records",
+        "fai_trigger_log",
+        "incoming_inspection_results",
+        "incoming_inspections",
+        "inspection_plans",
+        "inspection_results",
+        "material_review_board",
+        "ncr_human_factors",
+        "ncr_mrb_decisions",
+        "ncr_records",
+        "oqc_inspections",
+        "spc_data"
+      ],
+      "primaryWorkflows": [
+        "wf_capa",
+        "wf_certificate",
+        "wf_concession",
+        "wf_contamination_check",
+        "wf_copq_ledger",
+        "wf_customer_complaint",
+        "wf_deviation",
+        "wf_fai_characteristic",
+        "wf_fai",
+        "wf_receiving_inspection",
+        "wf_inspection_plan",
+        "wf_material_review_board",
+        "wf_ncr",
+        "wf_oqc_inspection",
+        "wf_spc_data"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "fmea_apqp",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "purchasing",
+        "record_system",
+        "sales"
+      ],
+      "downstreamDomains": [
+        "calibration_equipment",
+        "fmea_apqp",
+        "lean_manufacturing",
+        "mobile_operations",
+        "quality_lab"
+      ],
+      "supportDomain": false,
+      "workflows": [
+        "wf_capa",
+        "wf_certificate",
+        "wf_concession",
+        "wf_contamination_check",
+        "wf_copq_ledger",
+        "wf_customer_complaint",
+        "wf_deviation",
+        "wf_fai",
+        "wf_fai_characteristic",
+        "wf_inspection_plan",
+        "wf_material_review_board",
+        "wf_ncr",
+        "wf_oqc_inspection",
+        "wf_receiving_inspection",
+        "wf_spc_data"
+      ]
+    },
+    "calibration_equipment": {
+      "label": "Hiệu chuẩn và thiết bị",
+      "labelEn": "Calibration and Equipment",
+      "icon": "fa-ruler-combined",
+      "color": "#b91c1c",
+      "description": "Thiết bị, hiệu chuẩn, bảo trì cơ bản và dao dụng cụ nền tảng.",
+      "businessProcess": "Calibration scheduling, equipment control, and baseline tooling records.",
+      "tables": [
+        "calibration_grr_studies",
+        "calibration_oot_investigations",
+        "calibration_records",
+        "equipment",
+        "maintenance_work_orders",
+        "tool_transactions",
+        "tools"
+      ],
+      "primaryWorkflows": [
+        "wf_calibration_control",
+        "wf_calibration_record",
+        "wf_equipment",
+        "wf_maintenance_work_order",
+        "wf_tool_transaction",
+        "wf_tool_life"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data_governance",
+        "mes_execution",
+        "purchasing",
+        "quality_management"
+      ],
+      "downstreamDomains": [
+        "bi_datawarehouse",
+        "mes_execution",
+        "mfg_engineering",
+        "plant_maintenance",
+        "quality_lab",
+        "tooling_lifecycle"
+      ],
+      "supportDomain": false,
+      "workflows": [
+        "wf_calibration_control",
+        "wf_calibration_record",
+        "wf_equipment",
+        "wf_maintenance_work_order",
+        "wf_tool_transaction"
+      ]
+    },
+    "audit_risk": {
+      "label": "Đánh giá và rủi ro",
+      "labelEn": "Audit and Risk",
+      "icon": "fa-magnifying-glass-chart",
+      "color": "#be123c",
+      "description": "Đánh giá, phát hiện, hành động, rủi ro và cải tiến.",
+      "businessProcess": "Audit planning, findings, action closure, management review, and risk tracking.",
+      "tables": [
+        "audit_actions",
+        "audit_findings",
+        "audits",
+        "improvement_projects",
+        "management_reviews",
+        "risk_register"
+      ],
+      "primaryWorkflows": [
+        "wf_audit_action",
+        "wf_audit_finding",
+        "wf_audit",
+        "wf_improvement_project",
+        "wf_management_review",
+        "wf_risk_register"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data_governance",
+        "mes_execution",
+        "record_system"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_audit",
+        "wf_audit_action",
+        "wf_audit_finding",
+        "wf_improvement_project",
+        "wf_management_review",
+        "wf_risk_register"
+      ]
+    },
+    "training_hr": {
+      "label": "Đào tạo và nhân sự",
+      "labelEn": "Training and HR",
+      "icon": "fa-user-graduate",
+      "color": "#0d9488",
+      "description": "Hồ sơ nhân viên, đào tạo, kỹ năng và chứng chỉ nền tảng.",
+      "businessProcess": "Competency, certification, and personnel qualification baseline.",
+      "tables": [
+        "employee_certifications",
+        "employees",
+        "skills_matrix",
+        "training_records"
+      ],
+      "primaryWorkflows": [
+        "wf_employee_certification",
+        "wf_employee",
+        "wf_skills_matrix",
+        "wf_training_qualification"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data_governance",
+        "mes_execution",
+        "record_system"
+      ],
+      "downstreamDomains": [
+        "bi_datawarehouse",
+        "ehs_sustainability",
+        "hcm_workforce",
+        "mobile_operations",
+        "production",
+        "project_management"
+      ],
+      "supportDomain": false,
+      "workflows": [
+        "wf_employee",
+        "wf_employee_certification",
+        "wf_skills_matrix",
+        "wf_training_qualification"
+      ]
+    },
+    "finance": {
+      "label": "Tài chính",
+      "labelEn": "Finance",
+      "icon": "fa-coins",
+      "color": "#a16207",
+      "description": "Giá thành, GL, AP/AR và nghiệp vụ tài chính lõi.",
+      "businessProcess": "Costing, accounting, invoicing, and financial transaction control.",
+      "tables": [
+        "ap_ar_invoices",
+        "cost_elements",
+        "gl_transactions",
+        "job_costing"
+      ],
+      "primaryWorkflows": [
+        "wf_ap_ar_invoice",
+        "wf_cost_element",
+        "wf_gl_transaction",
+        "wf_job_costing"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data",
+        "master_data_governance",
+        "mes_execution"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_ap_ar_invoice",
+        "wf_cost_element",
+        "wf_gl_transaction",
+        "wf_job_costing"
+      ]
+    },
+    "shipping_compliance": {
+      "label": "Giao hàng và tuân thủ",
+      "labelEn": "Shipping and Compliance",
+      "icon": "fa-truck-fast",
+      "color": "#0369a1",
+      "description": "Lô giao, kiện hàng, release giao và hồ sơ tuân thủ xuất hàng.",
+      "businessProcess": "Shipment preparation, compliance release, export documentation, and customer release.",
+      "tables": [
+        "compliance_records",
+        "export_licenses",
+        "packing_list_items",
+        "packing_lists",
+        "shipment_packages",
+        "shipment_releases",
+        "shipments"
+      ],
+      "primaryWorkflows": [
+        "wf_compliance_record",
+        "wf_export_licens",
+        "wf_packing_list",
+        "wf_shipment_package",
+        "wf_shipment_release"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "inventory",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "sales"
+      ],
+      "downstreamDomains": [
+        "trade_compliance",
+        "transportation"
+      ],
+      "supportDomain": false,
+      "workflows": [
+        "wf_compliance_record",
+        "wf_export_licens",
+        "wf_packing_list",
+        "wf_shipment_package",
+        "wf_shipment_release"
+      ]
+    },
+    "mes_execution": {
+      "label": "MES thực thi",
+      "labelEn": "MES Execution",
+      "icon": "fa-microchip",
+      "color": "#1d4ed8",
+      "description": "MES shopfloor gồm core, execution, telemetry, inline quality, material, integration và analytics.",
+      "businessProcess": "Machine connectivity, execution tracking, telemetry, inline quality, genealogy, and OEE.",
+      "tables": [
+        "mes_alarm_catalog",
+        "mes_alarm_playbooks",
+        "mes_areas",
+        "mes_connectivity_adapters",
+        "mes_connectivity_events",
+        "mes_cost_tracking",
+        "mes_cycle_events",
+        "mes_dispatch_queue",
+        "mes_downtime_events",
+        "mes_dpp_passports",
+        "mes_energy_snapshots",
+        "mes_equipment_extended",
+        "mes_erp_inbound_queue",
+        "mes_erp_outbound_queue",
+        "mes_erp_reconciliation_exceptions",
+        "mes_erp_sync_runs",
+        "mes_event_subscriptions",
+        "mes_fixture_assignments",
+        "mes_genealogy_operations",
+        "mes_inline_measurements",
+        "mes_job_execution",
+        "mes_machine_alarms",
+        "mes_machine_snapshot",
+        "mes_machine_state_events",
+        "mes_machine_telemetry",
+        "mes_material_consumption",
+        "mes_nc_download_receipts",
+        "mes_nc_release_packages",
+        "mes_oee_loss_events",
+        "mes_oee_snapshots",
+        "mes_on_time_delivery",
+        "mes_operation_execution",
+        "mes_operator_qualifications",
+        "mes_operator_sessions",
+        "mes_part_genealogy",
+        "mes_pm_execution",
+        "mes_production_kpi_daily",
+        "mes_program_events",
+        "mes_shift_handover",
+        "mes_shop_floor_layout",
+        "mes_sites",
+        "mes_spare_parts_consumption",
+        "mes_spc_control_limits",
+        "mes_spc_violations",
+        "mes_tool_assemblies",
+        "mes_tool_life_events",
+        "mes_tool_preset_offsets",
+        "mes_wip_location",
+        "mes_wip_movements"
+      ],
+      "primaryWorkflows": [
+        "wf_mes_alarm_catalog",
+        "wf_mes_alarm_playbook",
+        "wf_mes_area",
+        "wf_mes_connectivity_adapter",
+        "wf_mes_cost_tracking",
+        "wf_mes_dispatch_queue",
+        "wf_mes_dpp_passport",
+        "wf_mes_equipment_extended",
+        "wf_mes_erp_inbound_queue",
+        "wf_mes_erp_outbound_queue",
+        "wf_mes_erp_reconciliation_exception",
+        "wf_mes_erp_sync_run",
+        "wf_mes_event_subscription",
+        "wf_mes_inline_measurement",
+        "wf_mes_job_execution",
+        "wf_mes_machine_alarm",
+        "wf_mes_machine_snapshot",
+        "wf_mes_machine_telemetry",
+        "wf_mes_material_consumption",
+        "wf_mes_nc_download_receipt",
+        "wf_mes_nc_release_package",
+        "wf_mes_on_time_delivery",
+        "wf_mes_operation_execution",
+        "wf_mes_operator_qualification",
+        "wf_mes_operator_session",
+        "wf_mes_part_genealogy",
+        "wf_mes_pm_execution",
+        "wf_mes_production_kpi_daily",
+        "wf_mes_shift_handover",
+        "wf_mes_shop_floor_layout",
+        "wf_mes_site",
+        "wf_mes_spare_parts_consumption",
+        "wf_mes_spc_control_limit",
+        "wf_mes_spc_violation",
+        "wf_mes_tool_assembly",
+        "wf_mes_tool_preset_offset",
+        "wf_mes_wip_location",
+        "wf_mes_wip_movement"
+      ],
+      "upstreamDomains": [
+        "calibration_equipment",
+        "master_data",
+        "master_data_governance"
+      ],
+      "downstreamDomains": [
+        "advanced_planning",
+        "ai_predictive",
+        "audit_risk",
+        "calibration_equipment",
+        "cnc_programs",
+        "commercial_contracts",
+        "core_system",
+        "crm",
+        "customer_portal",
+        "demand_supply_planning",
+        "digital_product_passport",
+        "document_control",
+        "ehs_sustainability",
+        "evidence_vault",
+        "finance",
+        "finance_extended",
+        "finance_treasury",
+        "fmea_apqp",
+        "forms_system",
+        "hcm_workforce",
+        "inventory",
+        "lean_manufacturing",
+        "master_data",
+        "master_data_governance",
+        "mfg_engineering",
+        "mobile_operations",
+        "outsource_execution",
+        "plant_maintenance",
+        "plm_change_control",
+        "production",
+        "project_management",
+        "purchasing",
+        "quality_lab",
+        "quality_management",
+        "record_system",
+        "sales",
+        "service_warranty",
+        "shipping_compliance",
+        "supplier_relationship",
+        "system_infrastructure",
+        "tooling_lifecycle",
+        "traceability_serialization",
+        "trade_compliance",
+        "training_hr",
+        "transportation",
+        "warehouse_management"
+      ],
+      "supportDomain": false,
+      "subDomains": {
+        "mes_core": {
+          "label": "MES Core",
+          "labelEn": "MES Core",
+          "tables": [
+            "mes_areas",
+            "mes_equipment_extended",
+            "mes_shop_floor_layout",
+            "mes_sites"
+          ]
+        },
+        "mes_execution": {
+          "label": "MES Thực thi",
+          "labelEn": "MES Execution",
+          "tables": [
+            "mes_connectivity_adapters",
+            "mes_connectivity_events",
+            "mes_cycle_events",
+            "mes_dispatch_queue",
+            "mes_job_execution",
+            "mes_nc_download_receipts",
+            "mes_nc_release_packages",
+            "mes_operation_execution",
+            "mes_operator_qualifications",
+            "mes_operator_sessions",
+            "mes_pm_execution",
+            "mes_program_events",
+            "mes_shift_handover"
+          ]
+        },
+        "mes_telemetry": {
+          "label": "MES telemetry",
+          "labelEn": "MES Telemetry",
+          "tables": [
+            "mes_alarm_catalog",
+            "mes_alarm_playbooks",
+            "mes_downtime_events",
+            "mes_machine_alarms",
+            "mes_machine_snapshot",
+            "mes_machine_state_events",
+            "mes_machine_telemetry"
+          ]
+        },
+        "mes_quality": {
+          "label": "MES Chất lượng",
+          "labelEn": "MES Quality",
+          "tables": [
+            "mes_inline_measurements",
+            "mes_spc_control_limits",
+            "mes_spc_violations"
+          ]
+        },
+        "mes_material": {
+          "label": "MES Vật liệu",
+          "labelEn": "MES Material",
+          "tables": [
+            "mes_genealogy_operations",
+            "mes_material_consumption",
+            "mes_part_genealogy",
+            "mes_spare_parts_consumption",
+            "mes_wip_location",
+            "mes_wip_movements"
+          ]
+        },
+        "mes_integration": {
+          "label": "MES Tích hợp",
+          "labelEn": "MES Integration",
+          "tables": [
+            "mes_erp_inbound_queue",
+            "mes_erp_outbound_queue",
+            "mes_erp_reconciliation_exceptions",
+            "mes_erp_sync_runs",
+            "mes_event_subscriptions"
+          ]
+        },
+        "mes_analytics": {
+          "label": "MES Analytic",
+          "labelEn": "MES Analytics",
+          "tables": [
+            "mes_cost_tracking",
+            "mes_dpp_passports",
+            "mes_energy_snapshots",
+            "mes_fixture_assignments",
+            "mes_oee_loss_events",
+            "mes_oee_snapshots",
+            "mes_on_time_delivery",
+            "mes_production_kpi_daily",
+            "mes_tool_assemblies",
+            "mes_tool_life_events",
+            "mes_tool_preset_offsets"
+          ]
+        }
+      },
+      "workflows": [
+        "wf_mes_alarm_catalog",
+        "wf_mes_alarm_playbook",
+        "wf_mes_area",
+        "wf_mes_connectivity_adapter",
+        "wf_mes_cost_tracking",
+        "wf_mes_dispatch_queue",
+        "wf_mes_dpp_passport",
+        "wf_mes_equipment_extended",
+        "wf_mes_erp_inbound_queue",
+        "wf_mes_erp_outbound_queue",
+        "wf_mes_erp_reconciliation_exception",
+        "wf_mes_erp_sync_run",
+        "wf_mes_event_subscription",
+        "wf_mes_inline_measurement",
+        "wf_mes_job_execution",
+        "wf_mes_machine_alarm",
+        "wf_mes_machine_snapshot",
+        "wf_mes_machine_telemetry",
+        "wf_mes_material_consumption",
+        "wf_mes_nc_download_receipt",
+        "wf_mes_nc_release_package",
+        "wf_mes_on_time_delivery",
+        "wf_mes_operation_execution",
+        "wf_mes_operator_qualification",
+        "wf_mes_operator_session",
+        "wf_mes_part_genealogy",
+        "wf_mes_pm_execution",
+        "wf_mes_production_kpi_daily",
+        "wf_mes_shift_handover",
+        "wf_mes_shop_floor_layout",
+        "wf_mes_site",
+        "wf_mes_spare_parts_consumption",
+        "wf_mes_spc_control_limit",
+        "wf_mes_spc_violation",
+        "wf_mes_tool_assembly",
+        "wf_mes_tool_preset_offset",
+        "wf_mes_wip_location",
+        "wf_mes_wip_movement"
+      ]
+    },
+    "plant_maintenance": {
+      "label": "Bảo trì nhà máy",
+      "labelEn": "Plant Maintenance",
+      "icon": "fa-screwdriver-wrench",
+      "color": "#b45309",
+      "description": "CMMS/EAM cho thiết bị, kế hoạch PM, WO, failure và reliability.",
+      "businessProcess": "Preventive, corrective, condition-based maintenance and reliability management.",
+      "tables": [
+        "pm_condition_monitoring",
+        "pm_condition_thresholds",
+        "pm_equipment_counters",
+        "pm_equipment_master",
+        "pm_failure_codes",
+        "pm_failure_history",
+        "pm_functional_locations",
+        "pm_maintenance_budgets",
+        "pm_maintenance_plan_items",
+        "pm_maintenance_plans",
+        "pm_reliability_metrics",
+        "pm_spare_parts_inventory",
+        "pm_work_order_operations",
+        "pm_work_order_parts",
+        "pm_work_orders"
+      ],
+      "primaryWorkflows": [
+        "wf_pm_condition_monitoring",
+        "wf_pm_condition_threshold",
+        "wf_pm_equipment_counter",
+        "wf_pm_equipment_master",
+        "wf_pm_failure_code",
+        "wf_pm_functional_location",
+        "wf_pm_maintenance_budget",
+        "wf_pm_maintenance_plan",
+        "wf_pm_reliability_metric",
+        "wf_pm_spare_parts_inventory",
+        "wf_pm_work_order"
+      ],
+      "upstreamDomains": [
+        "calibration_equipment",
+        "core_system",
+        "inventory",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "purchasing"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_pm_condition_monitoring",
+        "wf_pm_condition_threshold",
+        "wf_pm_equipment_counter",
+        "wf_pm_equipment_master",
+        "wf_pm_failure_code",
+        "wf_pm_functional_location",
+        "wf_pm_maintenance_budget",
+        "wf_pm_maintenance_plan",
+        "wf_pm_reliability_metric",
+        "wf_pm_spare_parts_inventory",
+        "wf_pm_work_order"
+      ]
+    },
+    "advanced_planning": {
+      "label": "Hoạch định nâng cao",
+      "labelEn": "Advanced Planning",
+      "icon": "fa-diagram-project",
+      "color": "#7c2d12",
+      "description": "APS, finite capacity scheduling, scenarios và pegging.",
+      "businessProcess": "Scenario planning, finite scheduling, capacity balancing, and pegging.",
+      "tables": [
+        "aps_capacity_buckets",
+        "aps_constraint_resources",
+        "aps_demand_forecast_lines",
+        "aps_demand_forecasts",
+        "aps_kpi_snapshots",
+        "aps_material_availability",
+        "aps_pegging_links",
+        "aps_planning_horizons",
+        "aps_planning_scenarios",
+        "aps_schedule_blocks",
+        "aps_schedule_conflicts",
+        "aps_setup_matrices",
+        "capacity_snapshots",
+        "mrp_planned_orders",
+        "production_schedule_slots",
+        "schedule_conflicts"
+      ],
+      "primaryWorkflows": [
+        "wf_aps_capacity_bucket",
+        "wf_aps_constraint_resource",
+        "wf_aps_demand_forecast",
+        "wf_aps_material_availability",
+        "wf_aps_planning_horizon",
+        "wf_aps_scenario",
+        "wf_aps_schedule_block",
+        "wf_aps_schedule_conflict",
+        "wf_aps_setup_matrice",
+        "wf_mrp_planned_order",
+        "wf_production_schedule_slot",
+        "wf_schedule_conflict"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "production",
+        "sales"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_aps_capacity_bucket",
+        "wf_aps_constraint_resource",
+        "wf_aps_demand_forecast",
+        "wf_aps_material_availability",
+        "wf_aps_planning_horizon",
+        "wf_aps_scenario",
+        "wf_aps_schedule_block",
+        "wf_aps_schedule_conflict",
+        "wf_aps_setup_matrice",
+        "wf_mrp_planned_order",
+        "wf_production_schedule_slot",
+        "wf_schedule_conflict"
+      ]
+    },
+    "plm_change_control": {
+      "label": "PLM và thay đổi kỹ thuật",
+      "labelEn": "PLM and Change Control",
+      "icon": "fa-code-branch",
+      "color": "#9333ea",
+      "description": "ECR/ECO, review board, yêu cầu, test plan và deviation permit.",
+      "businessProcess": "Engineering change, configuration control, design validation, and product traceability.",
+      "tables": [
+        "engineering_change_requests",
+        "plm_change_order_lines",
+        "plm_change_orders",
+        "plm_change_requests",
+        "plm_change_review_board",
+        "plm_design_reviews",
+        "plm_deviation_permits",
+        "plm_obsolescence_tracking",
+        "plm_product_configurations",
+        "plm_requirement_traces",
+        "plm_requirements",
+        "plm_test_plans",
+        "plm_test_results"
+      ],
+      "primaryWorkflows": [
+        "wf_engineering_change_request",
+        "wf_plm_change_order",
+        "wf_plm_change_request",
+        "wf_plm_change_review_board",
+        "wf_plm_design_review",
+        "wf_plm_deviation_permit",
+        "wf_plm_obsolescence_tracking",
+        "wf_plm_product_configuration",
+        "wf_plm_requirement_trace",
+        "wf_plm_test_plan"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "document_control",
+        "inventory",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "record_system",
+        "sales"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_engineering_change_request",
+        "wf_plm_change_order",
+        "wf_plm_change_request",
+        "wf_plm_change_review_board",
+        "wf_plm_design_review",
+        "wf_plm_deviation_permit",
+        "wf_plm_obsolescence_tracking",
+        "wf_plm_product_configuration",
+        "wf_plm_requirement_trace",
+        "wf_plm_test_plan"
+      ]
+    },
+    "hcm_workforce": {
+      "label": "Nhân lực mở rộng",
+      "labelEn": "HCM Workforce",
+      "icon": "fa-users-gear",
+      "color": "#0f766e",
+      "description": "Cơ cấu tổ chức, vị trí, kỹ năng, chứng chỉ, chấm công và payroll.",
+      "businessProcess": "Workforce structure, qualifications, attendance, and payroll.",
+      "tables": [
+        "hcm_attendance_records",
+        "hcm_certifications",
+        "hcm_disciplinary_actions",
+        "hcm_employee_certifications",
+        "hcm_employee_skills",
+        "hcm_employees",
+        "hcm_leave_balances",
+        "hcm_org_units",
+        "hcm_payroll_lines",
+        "hcm_payroll_periods",
+        "hcm_payroll_runs",
+        "hcm_positions",
+        "hcm_qualification_requirements",
+        "hcm_skills_catalog"
+      ],
+      "primaryWorkflows": [
+        "wf_hcm_attendance_record",
+        "wf_hcm_certification",
+        "wf_hcm_disciplinary_action",
+        "wf_hcm_employee_certification",
+        "wf_hcm_employee_skill",
+        "wf_hcm_employee",
+        "wf_hcm_leave_balance",
+        "wf_hcm_org_unit",
+        "wf_hcm_payroll_period",
+        "wf_hcm_payroll_run",
+        "wf_hcm_position",
+        "wf_hcm_skills_catalog"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "document_control",
+        "master_data_governance",
+        "mes_execution",
+        "record_system",
+        "training_hr"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_hcm_attendance_record",
+        "wf_hcm_certification",
+        "wf_hcm_disciplinary_action",
+        "wf_hcm_employee",
+        "wf_hcm_employee_certification",
+        "wf_hcm_employee_skill",
+        "wf_hcm_leave_balance",
+        "wf_hcm_org_unit",
+        "wf_hcm_payroll_period",
+        "wf_hcm_payroll_run",
+        "wf_hcm_position",
+        "wf_hcm_skills_catalog"
+      ]
+    },
+    "warehouse_management": {
+      "label": "Quản lý kho nâng cao",
+      "labelEn": "Warehouse Management",
+      "icon": "fa-warehouse",
+      "color": "#7e22ce",
+      "description": "Zone, bin, transfer order, putaway, pick list, cycle count và HU.",
+      "businessProcess": "Putaway, bin control, picking, cycle counting, quarantine, and handling units.",
+      "tables": [
+        "wms_bin_contents",
+        "wms_cycle_count_plans",
+        "wms_cycle_count_results",
+        "wms_material_handling_units",
+        "wms_pick_list_lines",
+        "wms_pick_lists",
+        "wms_putaway_rules",
+        "wms_quarantine_holds",
+        "wms_storage_bins",
+        "wms_transfer_order_lines",
+        "wms_transfer_orders",
+        "wms_wave_plans",
+        "wms_zones"
+      ],
+      "primaryWorkflows": [
+        "wf_wms_bin_content",
+        "wf_wms_cycle_count_plan",
+        "wf_wms_material_handling_unit",
+        "wf_wms_pick_list",
+        "wf_wms_putaway_rule",
+        "wf_wms_quarantine_hold",
+        "wf_wms_storage_bin",
+        "wf_wms_transfer_order",
+        "wf_wms_wave_plan",
+        "wf_wms_zone"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "inventory",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "production",
+        "sales"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_wms_bin_content",
+        "wf_wms_cycle_count_plan",
+        "wf_wms_material_handling_unit",
+        "wf_wms_pick_list",
+        "wf_wms_putaway_rule",
+        "wf_wms_quarantine_hold",
+        "wf_wms_storage_bin",
+        "wf_wms_transfer_order",
+        "wf_wms_wave_plan",
+        "wf_wms_zone"
+      ]
+    },
+    "finance_extended": {
+      "label": "Tài chính thương mại mở rộng",
+      "labelEn": "Extended Finance Trade",
+      "icon": "fa-money-bill-transfer",
+      "color": "#92400e",
+      "description": "Tiền tệ, tỷ giá, customs declarations, LC và thuế quốc gia.",
+      "businessProcess": "Multi-currency, trade finance, customs, FX, and tax profile control.",
+      "tables": [
+        "fin_country_tax_profiles",
+        "fin_currencies",
+        "fin_customs_declarations",
+        "fin_customs_tariff_codes",
+        "fin_exchange_rate_types",
+        "fin_exchange_rates",
+        "fin_lc_draw_requests",
+        "fin_letters_of_credit",
+        "fin_multi_book_ledgers",
+        "fin_realized_fx_gains",
+        "fin_withholding_tax_codes"
+      ],
+      "primaryWorkflows": [
+        "wf_fin_country_tax_profile",
+        "wf_fin_currency",
+        "wf_fin_customs_declaration",
+        "wf_fin_customs_tariff_code",
+        "wf_fin_exchange_rate_type",
+        "wf_fin_exchange_rate",
+        "wf_fin_lc_draw_request",
+        "wf_fin_letters_of_credit",
+        "wf_fin_multi_book_ledger",
+        "wf_fin_realized_fx_gain",
+        "wf_fin_withholding_tax_code"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data_governance",
+        "mes_execution",
+        "purchasing",
+        "sales"
+      ],
+      "downstreamDomains": [
+        "finance_treasury"
+      ],
+      "supportDomain": false,
+      "workflows": [
+        "wf_fin_country_tax_profile",
+        "wf_fin_currency",
+        "wf_fin_customs_declaration",
+        "wf_fin_customs_tariff_code",
+        "wf_fin_exchange_rate",
+        "wf_fin_exchange_rate_type",
+        "wf_fin_lc_draw_request",
+        "wf_fin_letters_of_credit",
+        "wf_fin_multi_book_ledger",
+        "wf_fin_realized_fx_gain",
+        "wf_fin_withholding_tax_code"
+      ]
+    },
+    "project_management": {
+      "label": "Quản lý dự án",
+      "labelEn": "Project Management",
+      "icon": "fa-list-check",
+      "color": "#1d4ed8",
+      "description": "Project, WBS, milestone, time, cost, earned value và change request.",
+      "businessProcess": "Project execution, milestone billing, earned value, and project risk/change governance.",
+      "tables": [
+        "npi_projects",
+        "prj_billing_milestones",
+        "prj_change_requests",
+        "prj_cost_collections",
+        "prj_earned_value_snapshots",
+        "prj_milestones",
+        "prj_projects",
+        "prj_resource_assignments",
+        "prj_risk_register",
+        "prj_time_entries",
+        "prj_wbs_elements",
+        "project_milestones",
+        "project_resources",
+        "projects"
+      ],
+      "primaryWorkflows": [
+        "wf_npi_project",
+        "wf_prj_billing_milestone",
+        "wf_project_change_request",
+        "wf_prj_cost_collection",
+        "wf_prj_milestone",
+        "wf_project_execution",
+        "wf_prj_risk_register",
+        "wf_prj_time_entry",
+        "wf_prj_wbs_element",
+        "wf_project_milestone",
+        "wf_project_resource",
+        "wf_project"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "sales",
+        "training_hr"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_npi_project",
+        "wf_prj_billing_milestone",
+        "wf_prj_cost_collection",
+        "wf_prj_milestone",
+        "wf_prj_risk_register",
+        "wf_prj_time_entry",
+        "wf_prj_wbs_element",
+        "wf_project",
+        "wf_project_change_request",
+        "wf_project_execution",
+        "wf_project_milestone",
+        "wf_project_resource"
+      ]
+    },
+    "crm": {
+      "label": "CRM",
+      "labelEn": "CRM",
+      "icon": "fa-handshake",
+      "color": "#0284c7",
+      "description": "Account, contact, lead, opportunity, campaign và forecast.",
+      "businessProcess": "Lead-to-opportunity, customer engagement, and pipeline forecasting.",
+      "tables": [
+        "crm_accounts",
+        "crm_activities",
+        "crm_campaigns",
+        "crm_contacts",
+        "crm_customer_touchpoints",
+        "crm_forecasts",
+        "crm_leads",
+        "crm_opportunities",
+        "crm_opportunity_lines",
+        "crm_quotes_pipeline"
+      ],
+      "primaryWorkflows": [
+        "wf_crm_account",
+        "wf_crm_activity",
+        "wf_crm_campaign",
+        "wf_crm_contact",
+        "wf_crm_customer_touchpoint",
+        "wf_crm_forecast",
+        "wf_crm_lead",
+        "wf_crm_opportunity",
+        "wf_crm_quotes_pipeline"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "sales"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_crm_account",
+        "wf_crm_activity",
+        "wf_crm_campaign",
+        "wf_crm_contact",
+        "wf_crm_customer_touchpoint",
+        "wf_crm_forecast",
+        "wf_crm_lead",
+        "wf_crm_opportunity",
+        "wf_crm_quotes_pipeline"
+      ]
+    },
+    "transportation": {
+      "label": "Vận tải",
+      "labelEn": "Transportation",
+      "icon": "fa-route",
+      "color": "#2563eb",
+      "description": "Carrier, route, shipment line, customs docs, freight audit và delivery events.",
+      "businessProcess": "Freight planning, routing, customs documents, export screening, and proof of delivery.",
+      "tables": [
+        "tms_carriers",
+        "tms_customs_documents",
+        "tms_dangerous_goods",
+        "tms_delivery_events",
+        "tms_export_screenings",
+        "tms_freight_audits",
+        "tms_freight_quotes",
+        "tms_routes",
+        "tms_shipment_lines",
+        "tms_shipments"
+      ],
+      "primaryWorkflows": [
+        "wf_tms_carrier",
+        "wf_tms_customs_document",
+        "wf_tms_dangerous_good",
+        "wf_tms_export_screening",
+        "wf_freight_audit",
+        "wf_tms_freight_quote",
+        "wf_tms_route",
+        "wf_tms_shipment"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "sales",
+        "shipping_compliance",
+        "system_infrastructure"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_freight_audit",
+        "wf_tms_carrier",
+        "wf_tms_customs_document",
+        "wf_tms_dangerous_good",
+        "wf_tms_export_screening",
+        "wf_tms_freight_quote",
+        "wf_tms_route",
+        "wf_tms_shipment"
+      ]
+    },
+    "bi_datawarehouse": {
+      "label": "BI và kho dữ liệu",
+      "labelEn": "BI and Data Warehouse",
+      "icon": "fa-chart-line",
+      "color": "#0f766e",
+      "description": "Dimension, fact, ETL run, KPI snapshots và semantic analytics.",
+      "businessProcess": "Dimensional analytics, KPI scorecards, and ETL orchestration.",
+      "tables": [
+        "dw_customer_dim",
+        "dw_employee_dim",
+        "dw_etl_runs",
+        "dw_fact_delivery",
+        "dw_fact_financial",
+        "dw_fact_production",
+        "dw_fact_quality",
+        "dw_item_dim",
+        "dw_kpi_scorecards",
+        "dw_machine_dim",
+        "dw_supplier_dim",
+        "dw_time_dim",
+        "kpi_definitions",
+        "kpi_snapshots"
+      ],
+      "primaryWorkflows": [
+        "wf_dw_customer_dim",
+        "wf_dw_employee_dim",
+        "wf_dw_etl_run",
+        "wf_dw_fact_delivery",
+        "wf_dw_fact_financial",
+        "wf_dw_fact_production",
+        "wf_dw_fact_quality",
+        "wf_dw_item_dim",
+        "wf_dw_kpi_scorecard",
+        "wf_dw_machine_dim",
+        "wf_dw_supplier_dim",
+        "wf_dw_time_dim",
+        "wf_kpi_definition"
+      ],
+      "upstreamDomains": [
+        "calibration_equipment",
+        "core_system",
+        "master_data",
+        "purchasing",
+        "sales",
+        "training_hr"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": true,
+      "workflows": [
+        "wf_dw_customer_dim",
+        "wf_dw_employee_dim",
+        "wf_dw_etl_run",
+        "wf_dw_fact_delivery",
+        "wf_dw_fact_financial",
+        "wf_dw_fact_production",
+        "wf_dw_fact_quality",
+        "wf_dw_item_dim",
+        "wf_dw_kpi_scorecard",
+        "wf_dw_machine_dim",
+        "wf_dw_supplier_dim",
+        "wf_dw_time_dim",
+        "wf_kpi_definition"
+      ]
+    },
+    "supplier_relationship": {
+      "label": "Quan hệ nhà cung cấp",
+      "labelEn": "Supplier Relationship",
+      "icon": "fa-people-arrows",
+      "color": "#7c3aed",
+      "description": "Supplier quality, sourcing, bids, portal, development plan và VMI.",
+      "businessProcess": "Supplier onboarding, quality, sourcing, collaboration, and performance improvement.",
+      "tables": [
+        "approved_supplier_list",
+        "scar_records",
+        "skip_lot_tracking",
+        "srm_bid_comparisons",
+        "srm_sourcing_bids",
+        "srm_sourcing_events",
+        "srm_supplier_action_requests",
+        "srm_supplier_capabilities",
+        "srm_supplier_capacity",
+        "srm_supplier_contract_lines",
+        "srm_supplier_contracts",
+        "srm_supplier_development_plans",
+        "srm_supplier_portal_messages",
+        "srm_supplier_portal_users",
+        "srm_supplier_ppap_packages",
+        "srm_supplier_risk_events",
+        "srm_vendor_managed_inventory",
+        "supplier_audit_schedule",
+        "supplier_scorecards"
+      ],
+      "primaryWorkflows": [
+        "wf_approved_supplier_list",
+        "wf_scar_record",
+        "wf_skip_lot_tracking",
+        "wf_srm_bid_comparison",
+        "wf_srm_sourcing_bid",
+        "wf_supplier_action_request",
+        "wf_srm_supplier_capability",
+        "wf_srm_supplier_capacity",
+        "wf_srm_supplier_contract",
+        "wf_srm_supplier_development_plan",
+        "wf_srm_supplier_portal_message",
+        "wf_srm_supplier_portal_user",
+        "wf_srm_supplier_ppap_package",
+        "wf_srm_vendor_managed_inventory",
+        "wf_supplier_audit_schedule",
+        "wf_supplier_scorecard"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "inventory",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "purchasing",
+        "record_system"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_approved_supplier_list",
+        "wf_scar_record",
+        "wf_skip_lot_tracking",
+        "wf_srm_bid_comparison",
+        "wf_srm_sourcing_bid",
+        "wf_srm_supplier_capability",
+        "wf_srm_supplier_capacity",
+        "wf_srm_supplier_contract",
+        "wf_srm_supplier_development_plan",
+        "wf_srm_supplier_portal_message",
+        "wf_srm_supplier_portal_user",
+        "wf_srm_supplier_ppap_package",
+        "wf_srm_vendor_managed_inventory",
+        "wf_supplier_action_request",
+        "wf_supplier_audit_schedule",
+        "wf_supplier_scorecard"
+      ]
+    },
+    "tooling_lifecycle": {
+      "label": "Vòng đời tooling",
+      "labelEn": "Tooling Lifecycle",
+      "icon": "fa-toolbox",
+      "color": "#ca8a04",
+      "description": "Tooling family, preset, kit, life limits, regrind, fixture lifecycle.",
+      "businessProcess": "Tool crib, presetting, tool life control, fixture maintenance, and assembly kits.",
+      "tables": [
+        "fixture_maintenance_logs",
+        "fixture_master",
+        "tooling_assemblies",
+        "tooling_calibration_links",
+        "tooling_components",
+        "tooling_crib_transactions",
+        "tooling_families",
+        "tooling_kit_items",
+        "tooling_kits",
+        "tooling_life_limits",
+        "tooling_life_measurements",
+        "tooling_locations",
+        "tooling_presets",
+        "tooling_regrind_cycles"
+      ],
+      "primaryWorkflows": [
+        "wf_fixture_master",
+        "wf_tooling_assembly",
+        "wf_tooling_component",
+        "wf_tooling_crib_transaction",
+        "wf_tooling_family",
+        "wf_tooling_kit",
+        "wf_tool_life",
+        "wf_tooling_life_measurement",
+        "wf_tooling_location",
+        "wf_tooling_preset",
+        "wf_tooling_regrind_cycle"
+      ],
+      "upstreamDomains": [
+        "calibration_equipment",
+        "cnc_programs",
+        "core_system",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "purchasing"
+      ],
+      "downstreamDomains": [
+        "mfg_engineering"
+      ],
+      "supportDomain": false,
+      "workflows": [
+        "wf_fixture_master",
+        "wf_tool_life",
+        "wf_tooling_assembly",
+        "wf_tooling_component",
+        "wf_tooling_crib_transaction",
+        "wf_tooling_family",
+        "wf_tooling_kit",
+        "wf_tooling_life_measurement",
+        "wf_tooling_location",
+        "wf_tooling_preset",
+        "wf_tooling_regrind_cycle"
+      ]
+    },
+    "demand_supply_planning": {
+      "label": "Cân đối cung cầu",
+      "labelEn": "Demand and Supply Planning",
+      "icon": "fa-chart-column",
+      "color": "#1d4ed8",
+      "description": "S&OP, demand consensus, supply consensus, buffer và replenishment policies.",
+      "businessProcess": "Demand consensus, supply consensus, replenishment, and inventory policy management.",
+      "tables": [
+        "demand_classifications",
+        "demand_history_buckets",
+        "inventory_buffer_profiles",
+        "sop_action_items",
+        "sop_demand_consensus",
+        "sop_inventory_policies",
+        "sop_meeting_cycles",
+        "sop_plan_versions",
+        "sop_plans",
+        "sop_scenario_assumptions",
+        "sop_supply_consensus",
+        "supply_replenishment_policies"
+      ],
+      "primaryWorkflows": [
+        "wf_demand_classification",
+        "wf_demand_history_bucket",
+        "wf_inventory_buffer_profile",
+        "wf_sop_demand_consensu",
+        "wf_sop_inventory_policy",
+        "wf_sop_cycle",
+        "wf_sop_plan",
+        "wf_sop_scenario_assumption",
+        "wf_sop_supply_consensu",
+        "wf_supply_replenishment_policy"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "inventory",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "purchasing",
+        "sales"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_demand_classification",
+        "wf_demand_history_bucket",
+        "wf_inventory_buffer_profile",
+        "wf_sop_cycle",
+        "wf_sop_demand_consensu",
+        "wf_sop_inventory_policy",
+        "wf_sop_plan",
+        "wf_sop_scenario_assumption",
+        "wf_sop_supply_consensu",
+        "wf_supply_replenishment_policy"
+      ]
+    },
+    "service_warranty": {
+      "label": "Dịch vụ và bảo hành",
+      "labelEn": "Service and Warranty",
+      "icon": "fa-screwdriver",
+      "color": "#15803d",
+      "description": "Installed base, contract, warranty claim, RMA, service request và field visit.",
+      "businessProcess": "Installed-base service, warranty claims, returns, and service work execution.",
+      "tables": [
+        "rma_orders",
+        "svc_contract_lines",
+        "svc_customer_assets",
+        "svc_field_visit_reports",
+        "svc_installed_base",
+        "svc_return_authorizations",
+        "svc_service_contracts",
+        "svc_service_kpi_snapshots",
+        "svc_service_parts",
+        "svc_service_requests",
+        "svc_service_work_order_lines",
+        "svc_service_work_orders",
+        "svc_warranty_claims"
+      ],
+      "primaryWorkflows": [
+        "wf_rma_order",
+        "wf_svc_customer_asset",
+        "wf_svc_field_visit_report",
+        "wf_svc_installed_base",
+        "wf_svc_return_authorization",
+        "wf_svc_service_contract",
+        "wf_service_request",
+        "wf_svc_service_work_order",
+        "wf_warranty_claim"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "inventory",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "sales"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_rma_order",
+        "wf_service_request",
+        "wf_svc_customer_asset",
+        "wf_svc_field_visit_report",
+        "wf_svc_installed_base",
+        "wf_svc_return_authorization",
+        "wf_svc_service_contract",
+        "wf_svc_service_work_order",
+        "wf_warranty_claim"
+      ]
+    },
+    "finance_treasury": {
+      "label": "Ngân quỹ và tài sản",
+      "labelEn": "Finance Treasury",
+      "icon": "fa-building-columns",
+      "color": "#a16207",
+      "description": "Standard cost, budget, fixed asset, cash, bank reconciliation và revenue schedule.",
+      "businessProcess": "Treasury, budgets, fixed assets, cash management, and revenue scheduling.",
+      "tables": [
+        "fin_asset_depreciation",
+        "fin_bank_reconciliations",
+        "fin_budget_lines",
+        "fin_budget_versions",
+        "fin_cash_accounts",
+        "fin_cash_transactions",
+        "fin_cost_versions",
+        "fin_fixed_assets",
+        "fin_intercompany_pairs",
+        "fin_revenue_schedules",
+        "fin_standard_cost_rollups",
+        "fin_tax_jurisdictions"
+      ],
+      "primaryWorkflows": [
+        "wf_fin_asset_depreciation",
+        "wf_treasury_close",
+        "wf_fin_cash_account",
+        "wf_fin_cash_transaction",
+        "wf_fin_fixed_asset",
+        "wf_fin_intercompany_pair",
+        "wf_fin_revenue_schedule",
+        "wf_fin_standard_cost_rollup",
+        "wf_fin_tax_jurisdiction"
+      ],
+      "upstreamDomains": [
+        "finance_extended",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "sales"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_fin_asset_depreciation",
+        "wf_fin_cash_account",
+        "wf_fin_cash_transaction",
+        "wf_fin_fixed_asset",
+        "wf_fin_intercompany_pair",
+        "wf_fin_revenue_schedule",
+        "wf_fin_standard_cost_rollup",
+        "wf_fin_tax_jurisdiction",
+        "wf_treasury_close"
+      ]
+    },
+    "quality_lab": {
+      "label": "Phòng lab chất lượng",
+      "labelEn": "Quality Lab",
+      "icon": "fa-flask-vial",
+      "color": "#dc2626",
+      "description": "Phương pháp thử, sample, chứng nhận, obligation, escape, containment và FA package.",
+      "businessProcess": "Laboratory test governance, compliance evidence, escape containment, and effectiveness review.",
+      "tables": [
+        "qual_audit_programs",
+        "qual_certificate_revisions",
+        "qual_certificate_templates",
+        "qual_compliance_evidence",
+        "qual_compliance_obligations",
+        "qual_containment_actions",
+        "qual_customer_requirements",
+        "qual_effectiveness_reviews",
+        "qual_escape_events",
+        "qual_first_article_packages",
+        "qual_lab_equipment",
+        "qual_root_cause_sessions",
+        "qual_sample_batches",
+        "qual_sample_plans",
+        "qual_test_labs",
+        "qual_test_methods"
+      ],
+      "primaryWorkflows": [
+        "wf_qual_audit_program",
+        "wf_quality_obligation",
+        "wf_qual_containment_action",
+        "wf_qual_effectiveness_review",
+        "wf_qual_first_article_package",
+        "wf_qual_lab_equipment",
+        "wf_qual_root_cause_session",
+        "wf_quality_lab_case",
+        "wf_qual_sample_plan",
+        "wf_qual_test_lab",
+        "wf_qual_test_method"
+      ],
+      "upstreamDomains": [
+        "calibration_equipment",
+        "core_system",
+        "document_control",
+        "inventory",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "quality_management",
+        "record_system",
+        "sales"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_qual_audit_program",
+        "wf_qual_containment_action",
+        "wf_qual_effectiveness_review",
+        "wf_qual_first_article_package",
+        "wf_qual_lab_equipment",
+        "wf_qual_root_cause_session",
+        "wf_qual_sample_plan",
+        "wf_qual_test_lab",
+        "wf_qual_test_method",
+        "wf_quality_lab_case",
+        "wf_quality_obligation"
+      ]
+    },
+    "ehs_sustainability": {
+      "label": "EHS và phát triển bền vững",
+      "labelEn": "EHS and Sustainability",
+      "icon": "fa-leaf",
+      "color": "#15803d",
+      "description": "Permit, hazardous material, PPE, waste, emissions và sustainability projects.",
+      "businessProcess": "EHS compliance, waste/emissions reporting, contractor safety, and sustainability actions.",
+      "tables": [
+        "ehs_contractors",
+        "ehs_corrective_actions",
+        "ehs_emergency_drills",
+        "ehs_emissions_monitoring",
+        "ehs_energy_targets",
+        "ehs_exposure_assessments",
+        "ehs_hazardous_materials",
+        "ehs_incidents",
+        "ehs_material_safety_data",
+        "ehs_permit_register",
+        "ehs_ppe_issue_logs",
+        "ehs_ppe_requirements",
+        "ehs_regulatory_submissions",
+        "ehs_sustainability_projects",
+        "ehs_training_matrix",
+        "ehs_waste_shipments",
+        "ehs_waste_streams"
+      ],
+      "primaryWorkflows": [
+        "wf_ehs_contractor",
+        "wf_ehs_corrective_action",
+        "wf_ehs_emergency_drill",
+        "wf_ehs_emissions_monitoring",
+        "wf_ehs_energy_target",
+        "wf_ehs_exposure_assessment",
+        "wf_ehs_hazardous_material",
+        "wf_ehs_incident",
+        "wf_ehs_material_safety_data",
+        "wf_ehs_permit_register",
+        "wf_ehs_regulatory_submission",
+        "wf_ehs_training_matrix",
+        "wf_ehs_waste_shipment",
+        "wf_ehs_waste_stream"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "record_system",
+        "training_hr"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_ehs_contractor",
+        "wf_ehs_corrective_action",
+        "wf_ehs_emergency_drill",
+        "wf_ehs_emissions_monitoring",
+        "wf_ehs_energy_target",
+        "wf_ehs_exposure_assessment",
+        "wf_ehs_hazardous_material",
+        "wf_ehs_incident",
+        "wf_ehs_material_safety_data",
+        "wf_ehs_permit_register",
+        "wf_ehs_regulatory_submission",
+        "wf_ehs_training_matrix",
+        "wf_ehs_waste_shipment",
+        "wf_ehs_waste_stream"
+      ]
+    },
+    "mfg_engineering": {
+      "label": "Kỹ thuật sản xuất",
+      "labelEn": "Manufacturing Engineering",
+      "icon": "fa-gears",
+      "color": "#c2410c",
+      "description": "Process family, standard operations, time standards, instructions và calendars.",
+      "businessProcess": "Industrialization, standard work, time standards, and engineering readiness.",
+      "tables": [
+        "eng_capacity_models",
+        "eng_changeover_standards",
+        "eng_factory_calendar_days",
+        "eng_factory_calendars",
+        "eng_line_balancing_studies",
+        "eng_process_families",
+        "eng_process_validation",
+        "eng_resource_group_members",
+        "eng_resource_groups",
+        "eng_standard_operations",
+        "eng_time_standards",
+        "eng_tooling_requirements",
+        "eng_work_instruction_steps",
+        "eng_work_instructions"
+      ],
+      "primaryWorkflows": [
+        "wf_eng_capacity_model",
+        "wf_eng_changeover_standard",
+        "wf_eng_factory_calendar_day",
+        "wf_eng_factory_calendar",
+        "wf_eng_line_balancing_study",
+        "wf_eng_process_family",
+        "wf_eng_process_validation",
+        "wf_eng_resource_group",
+        "wf_eng_time_standard",
+        "wf_work_instruction_release"
+      ],
+      "upstreamDomains": [
+        "calibration_equipment",
+        "document_control",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "tooling_lifecycle"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_eng_capacity_model",
+        "wf_eng_changeover_standard",
+        "wf_eng_factory_calendar",
+        "wf_eng_factory_calendar_day",
+        "wf_eng_line_balancing_study",
+        "wf_eng_process_family",
+        "wf_eng_process_validation",
+        "wf_eng_resource_group",
+        "wf_eng_time_standard",
+        "wf_work_instruction_release"
+      ]
+    },
+    "master_data_governance": {
+      "label": "Quản trị dữ liệu chủ",
+      "labelEn": "Master Data Governance",
+      "icon": "fa-stamp",
+      "color": "#0f766e",
+      "description": "Item class, attributes, reference codes, site params, number series và stewardship.",
+      "businessProcess": "Stewardship, number series, duplicate control, and MDM issue resolution.",
+      "tables": [
+        "data_archival_runs",
+        "mdm_approval_policies",
+        "mdm_attribute_sets",
+        "mdm_attribute_values",
+        "mdm_data_stewards",
+        "mdm_duplicate_candidates",
+        "mdm_governance_issues",
+        "mdm_item_classes",
+        "mdm_number_series",
+        "mdm_reference_code_values",
+        "mdm_reference_codes",
+        "mdm_site_parameters",
+        "mdm_uom_conversions",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "retention_policies",
+        "source_system_registry"
+      ],
+      "primaryWorkflows": [
+        "wf_data_archival_run",
+        "wf_mdm_approval_policy",
+        "wf_mdm_attribute_set",
+        "wf_mdm_attribute_value",
+        "wf_mdm_data_steward",
+        "wf_mdm_duplicate_candidate",
+        "wf_mdm_governance",
+        "wf_mdm_item_class",
+        "wf_mdm_number_sery",
+        "wf_mdm_reference_code_value",
+        "wf_mdm_reference_code",
+        "wf_mdm_site_parameter",
+        "wf_mdm_uom_conversion",
+        "wf_org_company",
+        "wf_org_legal_entity",
+        "wf_org_plant",
+        "wf_retention_policy",
+        "wf_source_system_registry"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "mes_execution"
+      ],
+      "downstreamDomains": [
+        "advanced_planning",
+        "ai_predictive",
+        "audit_risk",
+        "calibration_equipment",
+        "cnc_programs",
+        "commercial_contracts",
+        "core_system",
+        "crm",
+        "customer_portal",
+        "demand_supply_planning",
+        "digital_product_passport",
+        "document_control",
+        "ehs_sustainability",
+        "evidence_vault",
+        "finance",
+        "finance_extended",
+        "finance_treasury",
+        "fmea_apqp",
+        "forms_system",
+        "hcm_workforce",
+        "inventory",
+        "lean_manufacturing",
+        "master_data",
+        "mes_execution",
+        "mfg_engineering",
+        "mobile_operations",
+        "outsource_execution",
+        "plant_maintenance",
+        "plm_change_control",
+        "production",
+        "project_management",
+        "purchasing",
+        "quality_lab",
+        "quality_management",
+        "record_system",
+        "sales",
+        "service_warranty",
+        "shipping_compliance",
+        "supplier_relationship",
+        "system_infrastructure",
+        "tooling_lifecycle",
+        "traceability_serialization",
+        "trade_compliance",
+        "training_hr",
+        "transportation",
+        "warehouse_management"
+      ],
+      "supportDomain": false,
+      "workflows": [
+        "wf_data_archival_run",
+        "wf_mdm_approval_policy",
+        "wf_mdm_attribute_set",
+        "wf_mdm_attribute_value",
+        "wf_mdm_data_steward",
+        "wf_mdm_duplicate_candidate",
+        "wf_mdm_governance",
+        "wf_mdm_item_class",
+        "wf_mdm_number_sery",
+        "wf_mdm_reference_code",
+        "wf_mdm_reference_code_value",
+        "wf_mdm_site_parameter",
+        "wf_mdm_uom_conversion",
+        "wf_org_company",
+        "wf_org_legal_entity",
+        "wf_org_plant",
+        "wf_retention_policy",
+        "wf_source_system_registry"
+      ]
+    },
+    "commercial_contracts": {
+      "label": "Thương mại và hợp đồng",
+      "labelEn": "Commercial Contracts",
+      "icon": "fa-file-contract",
+      "color": "#0369a1",
+      "description": "Contract, price list, rebate, incoterms, credit profile và order promises.",
+      "businessProcess": "Contract governance, pricing, rebates, commercial scorecards, and promise management.",
+      "tables": [
+        "com_contract_amendments",
+        "com_contract_lines",
+        "com_contracts",
+        "com_credit_profiles",
+        "com_customer_scorecards",
+        "com_incoterms_profiles",
+        "com_order_promises",
+        "com_payment_terms_profiles",
+        "com_price_list_lines",
+        "com_price_lists",
+        "com_rebate_accruals",
+        "com_rebate_programs",
+        "commercial_accounts",
+        "machine_rate_cards",
+        "material_cost_templates"
+      ],
+      "primaryWorkflows": [
+        "wf_com_contract_amendment",
+        "wf_contract_lifecycle",
+        "wf_com_credit_profile",
+        "wf_com_customer_scorecard",
+        "wf_com_incoterms_profile",
+        "wf_order_promise",
+        "wf_com_payment_terms_profile",
+        "wf_com_price_list",
+        "wf_com_rebate_accrual",
+        "wf_com_rebate_program",
+        "wf_commercial_account",
+        "wf_machine_rate_card"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "sales"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_com_contract_amendment",
+        "wf_com_credit_profile",
+        "wf_com_customer_scorecard",
+        "wf_com_incoterms_profile",
+        "wf_com_payment_terms_profile",
+        "wf_com_price_list",
+        "wf_com_rebate_accrual",
+        "wf_com_rebate_program",
+        "wf_commercial_account",
+        "wf_contract_lifecycle",
+        "wf_machine_rate_card",
+        "wf_order_promise"
+      ]
+    },
+    "traceability_serialization": {
+      "label": "Truy xuất và serialization",
+      "labelEn": "Traceability and Serialization",
+      "icon": "fa-qrcode",
+      "color": "#7c3aed",
+      "description": "Genealogy, serial events, lot attributes, travelers, labels và recall.",
+      "businessProcess": "Lot/serial genealogy, traveler control, labeling, and recall execution.",
+      "tables": [
+        "trace_dispatch_events",
+        "trace_genealogy_batches",
+        "trace_genealogy_links",
+        "trace_heat_lot_register",
+        "trace_job_traveler_steps",
+        "trace_job_travelers",
+        "trace_label_print_jobs",
+        "trace_label_templates",
+        "trace_lot_attributes",
+        "trace_material_certificates",
+        "trace_recall_campaigns",
+        "trace_serial_events"
+      ],
+      "primaryWorkflows": [
+        "wf_trace_genealogy_batche",
+        "wf_trace_heat_lot_register",
+        "wf_traceability_traveler",
+        "wf_trace_label_print_job",
+        "wf_trace_material_certificate",
+        "wf_traceability_recall"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "inventory",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "production",
+        "purchasing"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_trace_genealogy_batche",
+        "wf_trace_heat_lot_register",
+        "wf_trace_label_print_job",
+        "wf_trace_material_certificate",
+        "wf_traceability_recall",
+        "wf_traceability_traveler"
+      ]
+    },
+    "outsource_execution": {
+      "label": "Gia công ngoài",
+      "labelEn": "Outsource Execution",
+      "icon": "fa-people-carry-box",
+      "color": "#b45309",
+      "description": "Subcontract plan, dispatch batch, receipt, chargeback, recovery và supplier execution.",
+      "businessProcess": "Outside processing planning, dispatch, receipt, recovery, and supplier performance.",
+      "tables": [
+        "osc_dispatch_batch_lines",
+        "osc_dispatch_batches",
+        "osc_subcontract_operations",
+        "osc_subcontract_plans",
+        "osc_supplier_capacity_reservations",
+        "osc_supplier_chargebacks",
+        "osc_supplier_nonconformances",
+        "osc_supplier_portal_documents",
+        "osc_supplier_receipts",
+        "osc_supplier_recovery_claims",
+        "osc_supplier_score_trends",
+        "osc_supplier_shipment_notices",
+        "outside_processing_orders",
+        "subcontract_orders",
+        "subcontract_receipts"
+      ],
+      "primaryWorkflows": [
+        "wf_outsource_dispatch",
+        "wf_osc_subcontract_plan",
+        "wf_osc_supplier_capacity_reservation",
+        "wf_osc_supplier_chargeback",
+        "wf_osc_supplier_nonconformance",
+        "wf_osc_supplier_portal_document",
+        "wf_outsource_receipt",
+        "wf_osc_supplier_recovery_claim",
+        "wf_osc_supplier_score_trend",
+        "wf_osc_supplier_shipment_notice",
+        "wf_outside_processing_order",
+        "wf_subcontract_order",
+        "wf_subcontract_receipt"
+      ],
+      "upstreamDomains": [
+        "inventory",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "production",
+        "purchasing",
+        "sales"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_osc_subcontract_plan",
+        "wf_osc_supplier_capacity_reservation",
+        "wf_osc_supplier_chargeback",
+        "wf_osc_supplier_nonconformance",
+        "wf_osc_supplier_portal_document",
+        "wf_osc_supplier_recovery_claim",
+        "wf_osc_supplier_score_trend",
+        "wf_osc_supplier_shipment_notice",
+        "wf_outside_processing_order",
+        "wf_outsource_dispatch",
+        "wf_outsource_receipt",
+        "wf_subcontract_order",
+        "wf_subcontract_receipt"
+      ]
+    },
+    "trade_compliance": {
+      "label": "Tuân thủ thương mại",
+      "labelEn": "Trade Compliance",
+      "icon": "fa-passport",
+      "color": "#7f1d1d",
+      "description": "ECCN, screening, end use, preference program, drawbacks và audits.",
+      "businessProcess": "Export control, screening, broker management, duty recovery, and compliance audit.",
+      "tables": [
+        "trade_broker_profiles",
+        "trade_certificate_of_origin",
+        "trade_compliance_audits",
+        "trade_duty_drawbacks",
+        "trade_eccn_master",
+        "trade_end_use_certificates",
+        "trade_import_bonds",
+        "trade_license_exceptions",
+        "trade_license_usage_logs",
+        "trade_preference_programs",
+        "trade_restricted_party_lists",
+        "trade_screening_hits"
+      ],
+      "primaryWorkflows": [
+        "wf_trade_broker_profile",
+        "wf_trade_certificate_of_origin",
+        "wf_trade_compliance_audit",
+        "wf_trade_duty_drawback",
+        "wf_trade_eccn_master",
+        "wf_trade_end_use_certificate",
+        "wf_trade_import_bond",
+        "wf_trade_license_exception",
+        "wf_trade_preference_program",
+        "wf_trade_restricted_party_list",
+        "wf_trade_screening"
+      ],
+      "upstreamDomains": [
+        "master_data_governance",
+        "mes_execution",
+        "sales",
+        "shipping_compliance"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_trade_broker_profile",
+        "wf_trade_certificate_of_origin",
+        "wf_trade_compliance_audit",
+        "wf_trade_duty_drawback",
+        "wf_trade_eccn_master",
+        "wf_trade_end_use_certificate",
+        "wf_trade_import_bond",
+        "wf_trade_license_exception",
+        "wf_trade_preference_program",
+        "wf_trade_restricted_party_list",
+        "wf_trade_screening"
+      ]
+    },
+    "forms_system": {
+      "label": "Hệ thống biểu mẫu",
+      "labelEn": "Forms System",
+      "icon": "fa-rectangle-list",
+      "color": "#2563eb",
+      "description": "Schema biểu mẫu, entry và attachment runtime.",
+      "businessProcess": "Schema-driven form publishing, submission, approval, and attachment capture.",
+      "tables": [
+        "form_attachments",
+        "form_entries",
+        "form_schemas"
+      ],
+      "primaryWorkflows": [
+        "wf_form_attachment",
+        "wf_form_submission",
+        "wf_form_schema"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data_governance",
+        "mes_execution"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_form_attachment",
+        "wf_form_schema",
+        "wf_form_submission"
+      ]
+    },
+    "record_system": {
+      "label": "Hệ thống hồ sơ",
+      "labelEn": "Record System",
+      "icon": "fa-folder-open",
+      "color": "#475569",
+      "description": "Counter, hồ sơ và liên kết hồ sơ dùng chung toàn portal.",
+      "businessProcess": "Record numbering, lifecycle governance, and cross-record linkage.",
+      "tables": [
+        "record_counters",
+        "record_links",
+        "records"
+      ],
+      "primaryWorkflows": [
+        "wf_record_counter",
+        "wf_record_lifecycle"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data_governance",
+        "mes_execution"
+      ],
+      "downstreamDomains": [
+        "audit_risk",
+        "ehs_sustainability",
+        "hcm_workforce",
+        "lean_manufacturing",
+        "plm_change_control",
+        "quality_lab",
+        "quality_management",
+        "supplier_relationship",
+        "training_hr"
+      ],
+      "supportDomain": false,
+      "workflows": [
+        "wf_record_counter",
+        "wf_record_lifecycle"
+      ]
+    },
+    "system_infrastructure": {
+      "label": "Hạ tầng hệ thống",
+      "labelEn": "System Infrastructure",
+      "icon": "fa-server",
+      "color": "#334155",
+      "description": "Biến hệ thống, naming, file, tag, comment, notification và workflow runtime.",
+      "businessProcess": "Infrastructure, metadata, notification, workflow runtime, and system-level services.",
+      "tables": [
+        "comments",
+        "escalation_log",
+        "escalation_rules",
+        "file_attachments",
+        "integration_monitors",
+        "naming_patterns",
+        "notifications",
+        "tags",
+        "variable_registry",
+        "workflow_definitions",
+        "workflow_instances",
+        "workflow_step_data"
+      ],
+      "primaryWorkflows": [
+        "wf_comment",
+        "wf_escalation_rule",
+        "wf_file_attachment",
+        "wf_integration_monitor",
+        "wf_naming_pattern",
+        "wf_notification",
+        "wf_tag",
+        "wf_variable_registry",
+        "wf_workflow_definition",
+        "wf_workflow_instance"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data_governance",
+        "mes_execution"
+      ],
+      "downstreamDomains": [
+        "transportation"
+      ],
+      "supportDomain": true,
+      "workflows": [
+        "wf_comment",
+        "wf_escalation_log",
+        "wf_escalation_rule",
+        "wf_file_attachment",
+        "wf_integration_monitor",
+        "wf_naming_pattern",
+        "wf_notification",
+        "wf_tag",
+        "wf_variable_registry",
+        "wf_workflow_definition",
+        "wf_workflow_instance"
+      ]
+    },
+    "customer_portal": {
+      "label": "Cổng khách hàng",
+      "labelEn": "Customer Portal",
+      "icon": "fa-user-circle",
+      "color": "#0284c7",
+      "description": "Portal user, session, token, order view, complaint submission và access.",
+      "businessProcess": "External customer visibility, complaint intake, and secure portal access.",
+      "tables": [
+        "portal_access_tokens",
+        "portal_complaint_submissions",
+        "portal_document_access",
+        "portal_order_views",
+        "portal_sessions",
+        "portal_users"
+      ],
+      "primaryWorkflows": [
+        "wf_portal_access_token",
+        "wf_portal_complaint_submission",
+        "wf_portal_document_access",
+        "wf_portal_order_view",
+        "wf_portal_session",
+        "wf_portal_user"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data_governance",
+        "mes_execution",
+        "sales"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_portal_access_token",
+        "wf_portal_complaint_submission",
+        "wf_portal_document_access",
+        "wf_portal_order_view",
+        "wf_portal_session",
+        "wf_portal_user"
+      ]
+    },
+    "evidence_vault": {
+      "label": "Kho bằng chứng",
+      "labelEn": "Evidence Vault",
+      "icon": "fa-vault",
+      "color": "#4338ca",
+      "description": "Evidence, chain-of-custody, links và full-text search.",
+      "businessProcess": "Evidence retention, chain of custody, indexing, and audit support.",
+      "tables": [
+        "evidence_chain_custody",
+        "evidence_fts",
+        "evidence_links",
+        "evidence_vault"
+      ],
+      "primaryWorkflows": [
+        "wf_evidence_chain_custody",
+        "wf_evidence_ft",
+        "wf_evidence_vault"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data_governance",
+        "mes_execution"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": true,
+      "workflows": [
+        "wf_evidence_chain_custody",
+        "wf_evidence_ft",
+        "wf_evidence_vault"
+      ]
+    },
+    "cnc_programs": {
+      "label": "Chương trình CNC",
+      "labelEn": "CNC Programs",
+      "icon": "fa-code",
+      "color": "#0f766e",
+      "description": "Program, version, approval, setup sheet và item setup.",
+      "businessProcess": "NC program version control, approval, and setup-sheet release.",
+      "tables": [
+        "cnc_program_approvals",
+        "cnc_program_versions",
+        "cnc_programs",
+        "setup_sheet_items",
+        "setup_sheets"
+      ],
+      "primaryWorkflows": [
+        "wf_cnc_program_approval",
+        "wf_setup_sheet"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data",
+        "master_data_governance",
+        "mes_execution"
+      ],
+      "downstreamDomains": [
+        "tooling_lifecycle"
+      ],
+      "supportDomain": false,
+      "workflows": [
+        "wf_cnc_program_approval",
+        "wf_setup_sheet"
+      ]
+    },
+    "digital_product_passport": {
+      "label": "Hộ chiếu sản phẩm số",
+      "labelEn": "Digital Product Passport",
+      "icon": "fa-id-card",
+      "color": "#1d4ed8",
+      "description": "Passport, event và access log cho vòng đời sản phẩm.",
+      "businessProcess": "Passport issuance, event trace, and controlled downstream access.",
+      "tables": [
+        "passport_access_log",
+        "passport_events",
+        "product_passports"
+      ],
+      "primaryWorkflows": [
+        "wf_product_passport"
+      ],
+      "upstreamDomains": [
+        "inventory",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "sales"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_passport_access_log",
+        "wf_product_passport"
+      ]
+    },
+    "ai_predictive": {
+      "label": "AI dự báo",
+      "labelEn": "AI Predictive",
+      "icon": "fa-brain",
+      "color": "#7c3aed",
+      "description": "Prediction models, quality predictions, anomaly rules và AI scheduling signals.",
+      "businessProcess": "Predictive quality, anomaly detection, and AI-assisted planning decisions.",
+      "tables": [
+        "prediction_models",
+        "quality_predictions",
+        "spc_anomaly_rules"
+      ],
+      "primaryWorkflows": [
+        "wf_predictive_quality",
+        "wf_spc_anomaly_rule"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data",
+        "master_data_governance",
+        "mes_execution"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_predictive_quality",
+        "wf_spc_anomaly_rule"
+      ]
+    },
+    "fmea_apqp": {
+      "label": "FMEA và APQP",
+      "labelEn": "FMEA and APQP",
+      "icon": "fa-triangle-exclamation",
+      "color": "#dc2626",
+      "description": "FMEA, action, revision, control plan, APQP và PPAP.",
+      "businessProcess": "Risk analysis, control planning, APQP phase gates, and PPAP readiness.",
+      "tables": [
+        "apqp_gate_reviews",
+        "apqp_projects",
+        "control_plan_characteristics",
+        "control_plans",
+        "fmea_actions",
+        "fmea_failure_modes",
+        "fmea_records",
+        "fmea_revisions",
+        "ppap_submissions"
+      ],
+      "primaryWorkflows": [
+        "wf_apqp_project",
+        "wf_control_plan_characteristic",
+        "wf_fmea",
+        "wf_ppap_submission"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data",
+        "master_data_governance",
+        "mes_execution",
+        "quality_management",
+        "sales"
+      ],
+      "downstreamDomains": [
+        "quality_management"
+      ],
+      "supportDomain": false,
+      "workflows": [
+        "wf_apqp_project",
+        "wf_control_plan_characteristic",
+        "wf_fmea",
+        "wf_ppap_submission"
+      ]
+    },
+    "mobile_operations": {
+      "label": "Vận hành di động",
+      "labelEn": "Mobile Operations",
+      "icon": "fa-mobile-screen-button",
+      "color": "#0891b2",
+      "description": "Shopfloor mobile queue, time entry và capture kiểm tra hiện trường.",
+      "businessProcess": "Mobile task execution, labor capture, and inline inspection collection.",
+      "tables": [
+        "mobile_inspection_captures",
+        "mobile_time_entries",
+        "mobile_work_queue"
+      ],
+      "primaryWorkflows": [
+        "wf_mobile_task"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data_governance",
+        "mes_execution",
+        "quality_management",
+        "training_hr"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_mobile_task"
+      ]
+    },
+    "lean_manufacturing": {
+      "label": "Lean Manufacturing",
+      "labelEn": "Lean Manufacturing",
+      "icon": "fa-arrows-to-dot",
+      "color": "#ea580c",
+      "description": "Kaizen, QRQC, Andon, 5S, Gemba, SMED va tier meeting cho world-class shopfloor.",
+      "businessProcess": "Continuous improvement, rapid response, visual management, layered audits, and lean execution discipline.",
+      "tables": [
+        "lean_5s_audits",
+        "lean_andon_events",
+        "lean_gemba_walks",
+        "lean_kaizen_events",
+        "lean_qrqc_events",
+        "lean_smed_events",
+        "lean_tier_escalations",
+        "lean_tier_meetings"
+      ],
+      "primaryWorkflows": [
+        "wf_lean_5s_audit",
+        "wf_lean_andon",
+        "wf_lean_gemba_walk",
+        "wf_lean_kaizen",
+        "wf_lean_qrqc",
+        "wf_lean_smed",
+        "wf_lean_tier_meeting"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "master_data_governance",
+        "mes_execution",
+        "quality_management",
+        "record_system"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_lean_5s_audit",
+        "wf_lean_andon",
+        "wf_lean_gemba_walk",
+        "wf_lean_kaizen",
+        "wf_lean_qrqc",
+        "wf_lean_smed",
+        "wf_lean_tier_meeting"
+      ]
+    }
+  }
+}

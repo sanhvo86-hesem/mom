@@ -1,0 +1,97 @@
+{
+  "form_code": "FRM-601",
+  "title": "Calibration Record",
+  "title_vi": "Hồ sơ hiệu chuẩn",
+  "version": "V1",
+  "category": "quality",
+  "frequency": "per_event",
+  "sop_ref": "SOP-601",
+  "description": "Ghi nhận kết quả hiệu chuẩn thiết bị đo lường bao gồm chuẩn sử dụng, kết quả đo và ngày hiệu chuẩn tiếp theo.",
+  "roles_allowed": ["admin", "qa_manager", "qc_inspector", "metrology_specialist"],
+  "fields": [
+    {"id": "calibration_date", "type": "date", "label": "Ngày hiệu chuẩn", "label_en": "Calibration Date", "required": true, "default": "today"},
+    {"id": "gage_id", "type": "text", "label": "Mã thiết bị", "label_en": "Gage ID", "required": true, "placeholder": "VD: CAL-001, MIC-015"},
+    {"id": "gage_description", "type": "text", "label": "Mô tả thiết bị", "label_en": "Gage Description", "required": true},
+    {
+      "id": "gage_type",
+      "type": "select",
+      "label": "Loại thiết bị",
+      "label_en": "Gage Type",
+      "required": true,
+      "options": [
+        {"value": "caliper", "label": "Thước cặp (Caliper)"},
+        {"value": "micrometer", "label": "Panme (Micrometer)"},
+        {"value": "indicator", "label": "Đồng hồ so (Indicator)"},
+        {"value": "cmm", "label": "CMM"},
+        {"value": "height_gage", "label": "Thước đo cao (Height Gage)"},
+        {"value": "ring_gage", "label": "Gage vòng (Ring Gage)"},
+        {"value": "pin_gage", "label": "Gage pin (Pin Gage)"},
+        {"value": "thread_gage", "label": "Gage ren (Thread Gage)"},
+        {"value": "surface_plate", "label": "Bàn phẳng (Surface Plate)"},
+        {"value": "torque_wrench", "label": "Cờ lê lực (Torque Wrench)"},
+        {"value": "other", "label": "Khác (Other)"}
+      ]
+    },
+    {"id": "manufacturer", "type": "text", "label": "Nhà sản xuất", "label_en": "Manufacturer", "placeholder": "VD: Mitutoyo, Renishaw"},
+    {"id": "model", "type": "text", "label": "Model", "label_en": "Model"},
+    {"id": "serial_number", "type": "text", "label": "Số serial", "label_en": "Serial Number", "required": true},
+    {"id": "range", "type": "text", "label": "Phạm vi đo", "label_en": "Range", "placeholder": "VD: 0–150 mm, 0–25 mm"},
+    {"id": "resolution", "type": "text", "label": "Độ phân giải", "label_en": "Resolution", "placeholder": "VD: 0.01 mm, 0.001 mm"},
+    {"id": "location", "type": "text", "label": "Vị trí sử dụng", "label_en": "Location", "placeholder": "VD: QC Lab, CNC Workshop"},
+    {
+      "id": "calibration_type",
+      "type": "select",
+      "label": "Loại hiệu chuẩn",
+      "label_en": "Calibration Type",
+      "required": true,
+      "options": [
+        {"value": "internal", "label": "Nội bộ (Internal)"},
+        {"value": "external", "label": "Bên ngoài (External)"}
+      ]
+    },
+    {"id": "calibration_standard", "type": "text", "label": "Chuẩn hiệu chuẩn", "label_en": "Calibration Standard", "required": true, "placeholder": "VD: Gage Block Set GB-001"},
+    {"id": "standard_cert_number", "type": "text", "label": "Số chứng nhận chuẩn", "label_en": "Standard Cert Number"},
+    {"id": "standard_due_date", "type": "date", "label": "Hạn hiệu chuẩn chuẩn", "label_en": "Standard Due Date"},
+    {
+      "id": "measurements",
+      "type": "table",
+      "label": "Kết quả đo",
+      "label_en": "Measurements",
+      "min_rows": 1,
+      "max_rows": 30,
+      "columns": [
+        {"id": "nominal", "type": "text", "label": "Giá trị danh nghĩa", "width": "18%", "required": true},
+        {"id": "tolerance", "type": "text", "label": "Dung sai", "width": "15%", "required": true},
+        {"id": "reading_1", "type": "text", "label": "Lần 1", "width": "15%", "required": true},
+        {"id": "reading_2", "type": "text", "label": "Lần 2", "width": "15%"},
+        {"id": "reading_3", "type": "text", "label": "Lần 3", "width": "15%"},
+        {"id": "pass_fail", "type": "select", "label": "Kết quả", "width": "12%", "options": [
+          {"value": "pass", "label": "Đạt", "color": "#2f9e44"},
+          {"value": "fail", "label": "Không đạt", "color": "#e03131"}
+        ]}
+      ]
+    },
+    {
+      "id": "overall_result",
+      "type": "select",
+      "label": "Kết quả tổng thể",
+      "label_en": "Overall Result",
+      "required": true,
+      "options": [
+        {"value": "pass", "label": "Đạt (Pass)", "color": "#2f9e44"},
+        {"value": "fail", "label": "Không đạt (Fail)", "color": "#e03131"},
+        {"value": "limited_use", "label": "Sử dụng giới hạn (Limited Use)", "color": "#e67700"}
+      ]
+    },
+    {"id": "next_due_date", "type": "date", "label": "Ngày hiệu chuẩn tiếp theo", "label_en": "Next Due Date", "required": true},
+    {"id": "calibrated_by", "type": "text", "label": "Người hiệu chuẩn", "label_en": "Calibrated By", "required": true},
+    {"id": "approved_by", "type": "text", "label": "Người phê duyệt", "label_en": "Approved By"},
+    {"id": "notes", "type": "textarea", "label": "Ghi chú", "label_en": "Notes", "rows": 3},
+    {"id": "out_of_tolerance_action", "type": "textarea", "label": "Hành động khi vượt dung sai", "label_en": "Out of Tolerance Action", "rows": 3, "placeholder": "Hành động xử lý khi thiết bị vượt dung sai (recall, đánh giá lại sản phẩm đã đo)..."}
+  ],
+  "auto_fields": ["submitted_by", "submitted_at", "entry_id"],
+  "notifications": {
+    "on_fail": ["qa_manager", "metrology_specialist"],
+    "on_submit": ["qa_manager"]
+  }
+}

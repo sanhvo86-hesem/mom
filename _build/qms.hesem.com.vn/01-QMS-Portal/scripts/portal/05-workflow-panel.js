@@ -79,14 +79,33 @@ async function deleteDraft(code){
     :'Xóa bản nháp '+doc.code+'? Tất cả chỉnh sửa, dữ liệu xem xét sẽ bị xóa và tài liệu trở về bản gốc.';
   if(!confirm(msg)) return;
   // Clear local unsaved edits
-  try{ sessionStorage.removeItem('doc_html_'+code); }catch(e){}
+  try{
+    if(typeof setEditedHtml==='function') setEditedHtml(code, '');
+    else sessionStorage.removeItem('doc_html_'+code);
+  }catch(e){}
+  try{ if(typeof edClearRecoveryDraft==='function') edClearRecoveryDraft(code); }catch(e){}
 
   // Delete server-backed draft/review files inside /archive (ISO-style)
   try{
     const res = await apiCall('doc_delete_drafts', {code, base_path: doc.path});
     if(res && res.ok){
-      if(res.state) setDocState(code, res.state);
       if(res.versions) setDocVersions(code, res.versions);
+      if(res.state){
+        const nextState = Object.assign({}, res.state);
+        const hasWorkingVersion = Array.isArray(res.versions) && res.versions.some(function(v){
+          return v && (v.status==='draft' || v.status==='in_review' || v.status==='pending_approval');
+        });
+        if(!hasWorkingVersion){
+          delete nextState.lastEdit;
+          delete nextState.submittedBy;
+          delete nextState.submittedDate;
+          delete nextState.submittedUpdateType;
+          delete nextState.rejectedBy;
+          delete nextState.rejectedDate;
+          delete nextState.checked_out_by;
+        }
+        setDocState(code, nextState);
+      }
     }
   }catch(e){}
 
@@ -113,8 +132,23 @@ async function clearDraftHistory(code){
   try{
     const res = await apiCall('doc_delete_drafts', {code, base_path: doc.path});
     if(res && res.ok){
-      if(res.state) setDocState(code, res.state);
       if(res.versions) setDocVersions(code, res.versions);
+      if(res.state){
+        const nextState = Object.assign({}, res.state);
+        const hasWorkingVersion = Array.isArray(res.versions) && res.versions.some(function(v){
+          return v && (v.status==='draft' || v.status==='in_review' || v.status==='pending_approval');
+        });
+        if(!hasWorkingVersion){
+          delete nextState.lastEdit;
+          delete nextState.submittedBy;
+          delete nextState.submittedDate;
+          delete nextState.submittedUpdateType;
+          delete nextState.rejectedBy;
+          delete nextState.rejectedDate;
+          delete nextState.checked_out_by;
+        }
+        setDocState(code, nextState);
+      }
     }
   }catch(e){}
 
@@ -166,13 +200,13 @@ function showFilteredDocs(filter){
       var cat=CATEGORIES.find(function(c){return c.id===ru.doc.cat;});
       var daysDiff=Math.floor((new Date()-ru.dateObj)/(1000*60*60*24));
       var daysText=daysDiff===0?(lang==='en'?'Today':'Hôm nay'):(daysDiff+(lang==='en'?' days ago':' ngày trước'));
-      var typeBadge=ru.updateType?('<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;'+(ru.updateType==='major'?'background:#fee2e2;color:#dc2626':'background:#dcfce7;color:#16a34a')+'">'+(ru.updateType==='major'?'MAJOR':'MINOR')+'</span>'):'';
+      var typeBadge=ru.updateType?('<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;'+(ru.updateType==='major'?'background:color-mix(in srgb, var(--red) 12%, var(--bg-surface,#fff));color:var(--red)':'background:color-mix(in srgb, var(--green) 12%, var(--bg-surface,#fff));color:var(--green)')+'">'+(ru.updateType==='major'?'MAJOR':'MINOR')+'</span>'):'';
       return '<tr style="cursor:pointer" onclick="closeFilterModal();openDoc(\''+ru.doc.code+'\')">'
         +'<td style="font-weight:600;color:#1565c0;white-space:nowrap">'+ru.doc.code+'</td>'
         +'<td>'+ru.doc.title+'</td>'
-        +'<td><span style="font-family:var(--mono);font-weight:700;color:#059669">'+ru.version+'</span> '+typeBadge+'</td>'
+        +'<td><span style="font-family:var(--mono);font-weight:700;color:var(--green)">'+ru.version+'</span> '+typeBadge+'</td>'
         +'<td>'+ru.date+'</td>'
-        +'<td>'+ru.user+(ru.submittedBy?' <span style="color:#94a3b8;font-size:10px">(📤 '+ru.submittedBy+')</span>':'')+'</td>'
+        +'<td>'+ru.user+(ru.submittedBy?' <span style="color:var(--text-tertiary);font-size:10px">(📤 '+ru.submittedBy+')</span>':'')+'</td>'
         +'<td style="color:#6b7280;font-size:10px;font-weight:600">'+daysText+'</td>'
         +'</tr>';
     }).join('');
@@ -182,16 +216,16 @@ function showFilteredDocs(filter){
     var thApproved=lang==='en'?'Approved':'Ngày duyệt';
     var thApprover=lang==='en'?'Approver':'Người duyệt';
     var thTime=lang==='en'?'Time':'Thời gian';
-    modal.innerHTML='<div style="background:#fff;border-radius:12px;width:90%;max-width:950px;max-height:80vh;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.2)">'
-      +'<div style="padding:20px 24px;border-bottom:1px solid #e9ecef;display:flex;justify-content:space-between;align-items:center">'
-      +'<h3 style="font-size:16px;font-weight:700;color:#059669">'+title+' <span style="font-size:12px;font-weight:400;color:#868e96;background:#d1fae5;padding:2px 10px;border-radius:20px">'+recentEntries.length+'</span></h3>'
-      +'<button onclick="closeFilterModal()" style="border:none;background:none;font-size:20px;cursor:pointer;color:#adb5bd">&times;</button>'
+    modal.innerHTML='<div style="background:var(--bg-modal,var(--bg-surface,#fff));border:1px solid var(--border);border-radius:12px;width:90%;max-width:950px;max-height:80vh;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.2)">'
+      +'<div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">'
+      +'<h3 style="font-size:16px;font-weight:700;color:var(--green)">'+title+' <span style="font-size:12px;font-weight:400;color:var(--text-tertiary);background:color-mix(in srgb, var(--green) 12%, var(--bg-surface,#fff));padding:2px 10px;border-radius:20px">'+recentEntries.length+'</span></h3>'
+      +'<button onclick="closeFilterModal()" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--text-tertiary)">&times;</button>'
       +'</div>'
       +'<div style="overflow-y:auto;max-height:calc(80vh - 70px);padding:0">'
       +(recentEntries.length===0
-        ?'<div style="padding:40px;text-align:center;color:#94a3b8;font-size:13px">'+(lang==='en'?'No documents updated in the last 30 days':'Không có tài liệu nào được cập nhật trong 30 ngày qua')+'</div>'
+        ?'<div style="padding:40px;text-align:center;color:var(--text-tertiary);font-size:13px">'+(lang==='en'?'No documents updated in the last 30 days':'Không có tài liệu nào được cập nhật trong 30 ngày qua')+'</div>'
         :'<table style="width:100%;border-collapse:collapse;font-size:12px">'
-        +'<thead><tr style="background:#f0fdf4"><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:#059669;text-transform:uppercase;border-bottom:2px solid #d1fae5">Code</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:#059669;text-transform:uppercase;border-bottom:2px solid #d1fae5">'+T('title_label')+'</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:#059669;text-transform:uppercase;border-bottom:2px solid #d1fae5">Version</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:#059669;text-transform:uppercase;border-bottom:2px solid #d1fae5">'+thApproved+'</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:#059669;text-transform:uppercase;border-bottom:2px solid #d1fae5">'+thApprover+'</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:#059669;text-transform:uppercase;border-bottom:2px solid #d1fae5">'+thTime+'</th></tr></thead>'
+        +'<thead><tr style="background:color-mix(in srgb, var(--green) 10%, var(--bg-surface,#fff))"><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;border-bottom:2px solid color-mix(in srgb, var(--green) 24%, var(--border))">Code</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;border-bottom:2px solid color-mix(in srgb, var(--green) 24%, var(--border))">'+T('title_label')+'</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;border-bottom:2px solid color-mix(in srgb, var(--green) 24%, var(--border))">Version</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;border-bottom:2px solid color-mix(in srgb, var(--green) 24%, var(--border))">'+thApproved+'</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;border-bottom:2px solid color-mix(in srgb, var(--green) 24%, var(--border))">'+thApprover+'</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;border-bottom:2px solid color-mix(in srgb, var(--green) 24%, var(--border))">'+thTime+'</th></tr></thead>'
         +'<tbody>'+recentRows+'</tbody></table>'
       )
       +'</div></div>';
@@ -209,11 +243,11 @@ function showFilteredDocs(filter){
     var submitterInfo='';
     if(filter==='review' && state && state.submittedBy){
       var sb=state.submittedBy;
-      var utBadge=sb.updateType?(' <span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:700;'+(sb.updateType==='major'?'background:#fee2e2;color:#dc2626':'background:#dcfce7;color:#16a34a')+'">'+(sb.updateType==='major'?'MAJ':'MIN')+'</span>'):'';
-      submitterInfo='<div style="font-size:10px;color:#64748b;margin-top:1px">📤 '+sb.name+' · '+sb.date+utBadge+'</div>';
+      var utBadge=sb.updateType?(' <span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:8px;font-weight:700;'+(sb.updateType==='major'?'background:color-mix(in srgb, var(--red) 12%, var(--bg-surface,#fff));color:var(--red)':'background:color-mix(in srgb, var(--green) 12%, var(--bg-surface,#fff));color:var(--green)')+'">'+(sb.updateType==='major'?'MAJ':'MIN')+'</span>'):'';
+      submitterInfo='<div style="font-size:10px;color:var(--text-secondary);margin-top:1px">📤 '+sb.name+' · '+sb.date+utBadge+'</div>';
     }
     if(filter==='approved' && state && state.approvedBy){
-      submitterInfo='<div style="font-size:10px;color:#64748b;margin-top:1px">✅ '+state.approvedBy.name+' · '+(state.approvedBy.date||state.approvedDate||'')+'</div>';
+      submitterInfo='<div style="font-size:10px;color:var(--text-secondary);margin-top:1px">✅ '+state.approvedBy.name+' · '+(state.approvedBy.date||state.approvedDate||'')+'</div>';
     }
     return '<tr style="cursor:pointer" onclick="closeFilterModal();openDoc(\''+d.code+'\')">'
       +'<td style="font-weight:600;color:#1565c0;white-space:nowrap">'+d.code+'</td>'
@@ -228,14 +262,14 @@ function showFilteredDocs(filter){
   modal.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);z-index:99999;display:flex;align-items:center;justify-content:center';
   var thVer=lang==='en'?'Version':'Phiên bản';
   var thSt=lang==='en'?'Status':'Trạng thái';
-  modal.innerHTML='<div style="background:#fff;border-radius:12px;width:90%;max-width:900px;max-height:80vh;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.2)">'
-    +'<div style="padding:20px 24px;border-bottom:1px solid #e9ecef;display:flex;justify-content:space-between;align-items:center">'
-    +'<h3 style="font-size:16px;font-weight:700;color:#0c2d48">'+title+' <span style="font-size:12px;font-weight:400;color:#868e96;background:#f1f3f5;padding:2px 10px;border-radius:20px">'+list.length+'</span></h3>'
-    +'<button onclick="closeFilterModal()" style="border:none;background:none;font-size:20px;cursor:pointer;color:#adb5bd">&times;</button>'
+  modal.innerHTML='<div style="background:var(--bg-modal,var(--bg-surface,#fff));border:1px solid var(--border);border-radius:12px;width:90%;max-width:900px;max-height:80vh;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.2)">'
+    +'<div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">'
+    +'<h3 style="font-size:16px;font-weight:700;color:var(--text-primary)">'+title+' <span style="font-size:12px;font-weight:400;color:var(--text-tertiary);background:var(--bg-surface-alt,#f1f3f5);padding:2px 10px;border-radius:20px">'+list.length+'</span></h3>'
+    +'<button onclick="closeFilterModal()" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--text-tertiary)">&times;</button>'
     +'</div>'
     +'<div style="overflow-y:auto;max-height:calc(80vh - 70px);padding:0">'
     +'<table style="width:100%;border-collapse:collapse;font-size:12px">'
-    +'<thead><tr style="background:#f8f9fa"><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:#0c2d48;text-transform:uppercase;border-bottom:2px solid #dee2e6">Code</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:#0c2d48;text-transform:uppercase;border-bottom:2px solid #dee2e6">'+T('title_label')+'</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:#0c2d48;text-transform:uppercase;border-bottom:2px solid #dee2e6">'+T('category_label')+'</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:#0c2d48;text-transform:uppercase;border-bottom:2px solid #dee2e6">'+thVer+'</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:#0c2d48;text-transform:uppercase;border-bottom:2px solid #dee2e6">'+thSt+'</th></tr></thead>'
+    +'<thead><tr style="background:var(--bg-surface-alt,#f8f9fa)"><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--text-primary);text-transform:uppercase;border-bottom:2px solid var(--border)">Code</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--text-primary);text-transform:uppercase;border-bottom:2px solid var(--border)">'+T('title_label')+'</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--text-primary);text-transform:uppercase;border-bottom:2px solid var(--border)">'+T('category_label')+'</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--text-primary);text-transform:uppercase;border-bottom:2px solid var(--border)">'+thVer+'</th><th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--text-primary);text-transform:uppercase;border-bottom:2px solid var(--border)">'+thSt+'</th></tr></thead>'
     +'<tbody>'+rows+'</tbody></table></div></div>';
   modal.onclick=function(ev){if(ev.target===modal)closeFilterModal();};
   document.body.appendChild(modal);
@@ -415,7 +449,7 @@ function renderEffDocTree(node, catId, depth){
     const allVis=(visCount===allDocs.length);
     const subPath=child.path.split('/').pop()||child.name;
     html+=`<div style="margin:2px 0 2px ${depth*12+8}px;padding:3px 8px;background:${depth>0?'var(--bg-1)':'var(--bg-2)'};border-radius:8px;border:1px solid var(--border-light,#e2e8f0)">
-      <div style="display:flex;align-items:center;gap:6px;padding:2px 0;font-size:12px;font-weight:600;color:#475569">
+      <div style="display:flex;align-items:center;gap:6px;padding:2px 0;font-size:12px;font-weight:600;color:var(--text-secondary)">
         <input type="checkbox" ${allVis?'checked':''} onchange="toggleSubfolderHidden('${escapeHtml(catId)}','${escapeHtml(subPath)}')" style="margin:0">
         📁 ${escapeHtml(getSubfolderLabel(subPath))}
         <span style="font-weight:400;font-size:10px;color:var(--text-3);margin-left:auto">${visCount}/${allDocs.length}</span>
@@ -552,11 +586,11 @@ function renderAdminRetention(){
         }).join('')}
       </tbody>
     </table>
-    <div style="margin-top:16px;padding:12px 16px;background:${totalDeletable>0?'#fefce8':'#f0fdf4'};border:1px solid ${totalDeletable>0?'#fde68a':'#bbf7d0'};border-radius:8px;display:flex;align-items:center;gap:12px">
+    <div style="margin-top:16px;padding:12px 16px;background:${totalDeletable>0?'color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff))':'color-mix(in srgb, var(--green) 10%, var(--bg-surface,#fff))'};border:1px solid ${totalDeletable>0?'color-mix(in srgb, var(--amber) 24%, var(--border))':'color-mix(in srgb, var(--green) 24%, var(--border))'};border-radius:8px;display:flex;align-items:center;gap:12px">
       <span style="font-size:24px">${totalDeletable>0?'🗑':'✅'}</span>
       <div style="flex:1">
-        <div style="font-size:12px;font-weight:700;color:${totalDeletable>0?'#92400e':'#166534'}">${lang==='en'?'Deletable Versions':'Phiên bản có thể xóa'}: <span style="font-size:16px">${totalDeletable}</span></div>
-        <div style="font-size:10px;color:${totalDeletable>0?'#a16207':'#15803d'};margin-top:2px">${totalDeletable>0?(lang==='en'?'Obsolete versions past retention period. Delete via DCR record or Purge All below.':'Phiên bản lỗi thời đã quá hạn. Xóa qua Lịch sử phiên bản hoặc Xóa tất cả.'):(lang==='en'?'No versions eligible for deletion.':'Không có phiên bản nào đủ điều kiện xóa.')}</div>
+        <div style="font-size:12px;font-weight:700;color:${totalDeletable>0?'var(--amber)':'var(--green)'}">${lang==='en'?'Deletable Versions':'Phiên bản có thể xóa'}: <span style="font-size:16px">${totalDeletable}</span></div>
+        <div style="font-size:10px;color:${totalDeletable>0?'color-mix(in srgb, var(--amber) 80%, var(--text-secondary))':'color-mix(in srgb, var(--green) 80%, var(--text-secondary))'};margin-top:2px">${totalDeletable>0?(lang==='en'?'Obsolete versions past retention period. Delete via DCR record or Purge All below.':'Phiên bản lỗi thời đã quá hạn. Xóa qua Lịch sử phiên bản hoặc Xóa tất cả.'):(lang==='en'?'No versions eligible for deletion.':'Không có phiên bản nào đủ điều kiện xóa.')}</div>
       </div>
       ${totalDeletable>0?'<button class="btn-admin danger" onclick="bulkDeleteExpired()" style="flex-shrink:0">🗑 '+(lang==='en'?'Purge All Expired':'Xóa tất cả hết hạn')+'</button>':''}
     </div>
@@ -570,6 +604,10 @@ function renderAdminRetention(){
 function renderVersionHistory(doc){
   if(!doc) return;
   const container=document.getElementById('vh-container');
+  if(container){
+    container.classList.toggle('is-collapsed', !!(typeof docHeaderMetaCollapsed!=='undefined' && docHeaderMetaCollapsed));
+  }
+  const isWorkbook = (typeof isDownloadOnlyDoc==='function') ? isDownloadOnlyDoc(doc) : false;
 
   // Load + normalize history
   let versions=getDocVersions(doc.code);
@@ -588,36 +626,39 @@ function renderVersionHistory(doc){
         ${(function(){
           var st=getDocState(doc.code)||{};
           var summaryHtml='';
+          var hasEdited=!!getEditedHtml(doc.code);
+          var hasWorkingVersion=(typeof docHasWorkingVersion==='function') ? docHasWorkingVersion(doc.code) : false;
+          var hasDraftArtifacts=hasEdited || hasWorkingVersion;
           // Show last editor info
-          if(st.lastEdit && st.lastEdit.by){
-            summaryHtml+='<div style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #e2e8f0;background:#f8fafc">✏️ '+(lang==='en'?'Last editor':'Người chỉnh sửa cuối')+': <b>'+st.lastEdit.by+'</b>'+(st.lastEdit.role?' — '+st.lastEdit.role:'')+(st.lastEdit.date?' · '+st.lastEdit.date:'')+'</div>';
+          if(st.lastEdit && st.lastEdit.by && hasDraftArtifacts){
+            summaryHtml+='<div style="padding:6px 12px;font-size:10px;color:var(--text-secondary);border-bottom:1px solid var(--border);background:var(--bg-surface-alt,#f8fafc)">✏️ '+(lang==='en'?'Last editor':'Người chỉnh sửa cuối')+': <b>'+st.lastEdit.by+'</b>'+(st.lastEdit.role?' — '+st.lastEdit.role:'')+(st.lastEdit.date?' · '+st.lastEdit.date:'')+'</div>';
           }
           // Show last review submission
           if(st.submittedBy && st.submittedBy.name){
-            summaryHtml+='<div style="padding:6px 12px;font-size:10px;color:#0369a1;border-bottom:1px solid #e2e8f0;background:#f0f9ff">📤 '+(lang==='en'?'Last review submission':'Gửi xem xét cuối cùng')+': <b>'+st.submittedBy.name+'</b>'+(st.submittedBy.date?' · '+st.submittedBy.date:'')+(st.submittedBy.updateType?(' <span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;'+(st.submittedBy.updateType==='major'?'background:#fee2e2;color:#dc2626':'background:#dcfce7;color:#16a34a')+'">'+(st.submittedBy.updateType==='major'?'MAJOR':'MINOR')+'</span>'):'')+'</div>';
+            summaryHtml+='<div style="padding:6px 12px;font-size:10px;color:var(--text-link);border-bottom:1px solid var(--border);background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff))">📤 '+(lang==='en'?'Last review submission':'Gửi xem xét cuối cùng')+': <b>'+st.submittedBy.name+'</b>'+(st.submittedBy.date?' · '+st.submittedBy.date:'')+(st.submittedBy.updateType?(' <span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;'+(st.submittedBy.updateType==='major'?'background:color-mix(in srgb, var(--red) 12%, var(--bg-surface,#fff));color:var(--red)':'background:color-mix(in srgb, var(--green) 12%, var(--bg-surface,#fff));color:var(--green)')+'">'+(st.submittedBy.updateType==='major'?'MAJOR':'MINOR')+'</span>'):'')+'</div>';
           }
           return summaryHtml;
         })()}
         ${versions.length===0
-          ?'<div style="padding:16px;text-align:center;font-size:11px;color:#94a3b8">'+T('wf_no_history')+'</div>'
+          ?'<div style="padding:16px;text-align:center;font-size:11px;color:var(--text-tertiary)">'+T('wf_no_history')+'</div>'
           :versions.map((v,i)=>`
-            <div class="vh-entry ${(v.status==='approved' && v.file===doc.path)?'vh-current':''} ${v.file?'vh-clickable':''}" ${v.file?'onclick="openVersionPreview(\''+doc.code+'\','+i+')"':''}>
+            <div class="vh-entry ${isCurrentVersionEntry(doc,v)?'vh-current':''} ${versionHasAccess(doc,v)?'vh-clickable':''}" ${versionHasAccess(doc,v)?'onclick="openVersionPreview(\''+doc.code+'\','+i+')"':''}>
               <div class="vh-dot ${v.status}"></div>
               <div class="vh-info">
                 <span class="ver">${v.version}</span>
                 <span style="color:${statusColor(v.status)};font-size:10px;font-weight:600;margin-left:6px">${statusLabel(v.status)}</span>
-                ${v.updateType?'<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;margin-left:4px;'+(v.updateType==='major'?'background:#fee2e2;color:#dc2626':'background:#dcfce7;color:#16a34a')+'">'+(v.updateType==='major'?'MAJOR':'MINOR')+'</span>':''}
-                ${(v.status==='approved' && v.file===doc.path)?'<span style="background:#dcfce7;color:#16a34a;font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;font-weight:700">'+T('wf_current')+'</span>':''}
-                ${v.file?'<span style="font-size:9px;color:#1565c0;margin-left:4px;cursor:pointer" title="'+(lang==='en'?'Click to view':'Nhấn để xem')+'">👁 '+(lang==='en'?'View':'Xem')+'</span>':''}
+                ${v.updateType?'<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;margin-left:4px;'+(v.updateType==='major'?'background:color-mix(in srgb, var(--red) 12%, var(--bg-surface,#fff));color:var(--red)':'background:color-mix(in srgb, var(--green) 12%, var(--bg-surface,#fff));color:var(--green)')+'">'+(v.updateType==='major'?'MAJOR':'MINOR')+'</span>':''}
+                ${isCurrentVersionEntry(doc,v)?'<span style="background:color-mix(in srgb, var(--green) 12%, var(--bg-surface,#fff));color:var(--green);font-size:9px;padding:1px 6px;border-radius:8px;margin-left:4px;font-weight:700">'+T('wf_current')+'</span>':''}
+                ${versionHasAccess(doc,v)?'<span style="font-size:9px;color:var(--text-link);margin-left:4px;cursor:pointer" title="'+(lang==='en'?(isWorkbook?'Click to download':'Click to view'):(isWorkbook?'Nhấn để tải':'Nhấn để xem'))+'">'+(isWorkbook?'⬇':'👁')+' '+(lang==='en'?(isWorkbook?'Download':'View'):(isWorkbook?'Tải':'Xem'))+'</span>':''}
                 <div class="date">${v.date}</div>
                 <div class="who">${v.user} — ${v.role}</div>
-                ${v.submittedBy?'<div style="font-size:10px;color:#0369a1;margin-top:2px">📤 '+(lang==='en'?'Submitted by':'Gửi bởi')+': '+v.submittedBy+(v.submittedDate?' · '+v.submittedDate:'')+'</div>':''}
-                ${v.lastEditBy?'<div style="font-size:10px;color:#475569;margin-top:2px">✏️ '+(lang==='en'?'Last editor':'Người chỉnh sửa cuối')+': '+v.lastEditBy+(v.lastEditRole?' — '+v.lastEditRole:'')+(v.lastEditDate?' · '+v.lastEditDate:'')+'</div>':''}
-                ${v.approvedBy?'<div style="font-size:10px;color:#16a34a;margin-top:2px">✅ '+(lang==='en'?'Approved by':'Duyệt bởi')+': '+v.approvedBy+(v.approvedDate?' · '+v.approvedDate:'')+'</div>':''}
+                ${v.submittedBy?'<div style="font-size:10px;color:var(--text-link);margin-top:2px">📤 '+(lang==='en'?'Submitted by':'Gửi bởi')+': '+v.submittedBy+(v.submittedDate?' · '+v.submittedDate:'')+'</div>':''}
+                ${v.lastEditBy?'<div style="font-size:10px;color:var(--text-secondary);margin-top:2px">✏️ '+(lang==='en'?'Last editor':'Người chỉnh sửa cuối')+': '+v.lastEditBy+(v.lastEditRole?' — '+v.lastEditRole:'')+(v.lastEditDate?' · '+v.lastEditDate:'')+'</div>':''}
+                ${v.approvedBy?'<div style="font-size:10px;color:var(--green);margin-top:2px">✅ '+(lang==='en'?'Approved by':'Duyệt bởi')+': '+v.approvedBy+(v.approvedDate?' · '+v.approvedDate:'')+'</div>':''}
                 ${v.note?'<div class="note">"'+v.note+'"</div>':''}
               </div>
-              ${i>0&&v.file&&canEdit({code:doc.code})?'<button class="vh-restore" onclick="event.stopPropagation();restoreVersion(\''+doc.code+'\','+i+')">'+T('wf_restore')+'</button>':''}
-              ${canDeleteVersion(doc.code,v)&&isAdmin()?'<button class="vh-restore" style="color:#dc2626;border-color:#fca5a5" onclick="event.stopPropagation();deleteVersion(\''+doc.code+'\','+i+')" title="'+(lang==='en'?'Retention period exceeded':'Hết hạn lưu giữ')+'">🗑 '+(lang==='en'?'Delete':'Xóa')+'</button>':''}
+              ${!isWorkbook && i>0 && versionHasAccess(doc,v) && canEdit({code:doc.code})?'<button class="vh-restore" onclick="event.stopPropagation();restoreVersion(\''+doc.code+'\','+i+')">'+T('wf_restore')+'</button>':''}
+              ${canDeleteVersion(doc.code,v)&&isAdmin()?'<button class="vh-restore" style="color:var(--red);border-color:color-mix(in srgb, var(--red) 24%, var(--border))" onclick="event.stopPropagation();deleteVersion(\''+doc.code+'\','+i+')" title="'+(lang==='en'?'Retention period exceeded':'Hết hạn lưu giữ')+'">🗑 '+(lang==='en'?'Delete':'Xóa')+'</button>':''}
             </div>
           `).join('')
         }
@@ -625,23 +666,29 @@ function renderVersionHistory(doc){
           var st=getDocState(doc.code)||{};
           var hasEdited=!!getEditedHtml(doc.code);
           var docSt=getDocStatus(doc);
-          var draftCount=versions.filter(function(v){return v && v.status==='draft';}).length;
+          var workingVersionCount=versions.filter(function(v){
+            return v && (v.status==='draft' || v.status==='in_review' || v.status==='pending_approval');
+          }).length;
+          var hasWorkingVersion=(typeof docHasWorkingVersion==='function') ? docHasWorkingVersion(doc.code) : (workingVersionCount>0);
           // Show footer if there is draft history OR there is an active draft/edited content
-          if(!(draftCount>0 || (docSt==='draft' && (hasEdited||st.lastEdit)))) return '';
+          if(!(workingVersionCount>0 || (docSt==='draft' && (hasEdited || (st.lastEdit && hasWorkingVersion))))) return '';
 
-          var btnClear = draftCount>0
-            ? '<button style="font-size:10px;padding:4px 10px;border:1px solid #fca5a5;border-radius:6px;background:#fff;color:#dc2626;cursor:pointer" onclick="clearDraftHistory(\''+doc.code+'\')">🧹 '+(lang==='en'?'Clear all drafts':'Xóa tất cả nháp')+'</button>'
+          var btnClear = workingVersionCount>0
+            ? '<button style="font-size:10px;padding:4px 10px;border:1px solid color-mix(in srgb, var(--red) 30%, var(--border));border-radius:6px;background:color-mix(in srgb, var(--red) 10%, var(--bg-surface,#fff));color:var(--red);cursor:pointer" onclick="clearDraftHistory(\''+doc.code+'\')">🧹 '+(lang==='en'?'Clear all drafts':'Xóa tất cả nháp')+'</button>'
             : '';
-          var btnDel = (docSt==='draft' && (hasEdited||st.lastEdit))
-            ? '<button style="font-size:10px;padding:4px 10px;border:1px solid #fecaca;border-radius:6px;background:#fff;color:#dc2626;cursor:pointer" onclick="deleteDraft(\''+doc.code+'\')" title="'+(lang==='en'?'Delete draft & restore original':'Xóa nháp & khôi phục bản gốc')+'">'+T('delete_draft_btn')+'</button>'
+          var btnDel = (docSt==='draft' && (hasEdited || (st.lastEdit && hasWorkingVersion)))
+            ? '<button style="font-size:10px;padding:4px 10px;border:1px solid color-mix(in srgb, var(--red) 30%, var(--border));border-radius:6px;background:color-mix(in srgb, var(--red) 10%, var(--bg-surface,#fff));color:var(--red);cursor:pointer" onclick="deleteDraft(\''+doc.code+'\')" title="'+(lang==='en'?'Delete draft & restore original':'Xóa nháp & khôi phục bản gốc')+'">'+T('delete_draft_btn')+'</button>'
             : '';
 
           if(!btnClear && !btnDel) return '';
-          return '<div style="padding:8px 12px;border-top:1px solid #e9ecef;display:flex;gap:8px;align-items:center;justify-content:flex-end">'+btnDel+btnClear+'</div>';
+          return '<div style="padding:8px 12px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;justify-content:flex-end">'+btnDel+btnClear+'</div>';
         })()}
       </div>
     </div>
   `;
+  if(typeof syncDocViewerDetailVisibility==='function'){
+    syncDocViewerDetailVisibility();
+  }
 }
 
 function openVersionPreview(code, idx){
@@ -649,12 +696,43 @@ function openVersionPreview(code, idx){
 
   const versions=getDocVersions(code);
   const v=versions[idx];
-  if(!v||!v.file) return;
   const doc=DOCS.find(d=>d.code===code);
+  const accessUrl=getVersionAccessUrl(doc,v);
+  if(!v || !accessUrl) return;
+  const isWorkbook = (typeof isDownloadOnlyDoc==='function') ? isDownloadOnlyDoc(doc) : false;
 
   const overlay=document.createElement('div');
   overlay.className='vp-overlay';
-  overlay.innerHTML=`
+  overlay.innerHTML=isWorkbook ? `
+    <div class="vp-modal" style="max-width:720px">
+      <div class="vp-header">
+        <div>
+          <h4>${doc?doc.code:code} — ${v.version} <span style="color:${statusColor(v.status)};font-size:11px">${statusLabel(v.status)}</span></h4>
+          <div class="vp-meta">${v.date} · ${v.user} · ${v.role}${v.note?' · "'+v.note+'"':''}</div>
+        </div>
+        <div class="vp-actions">
+          <button class="vp-open" onclick='event.stopPropagation();triggerDownloadUrl(${JSON.stringify(accessUrl)})'>⬇ ${lang==='en'?'Download version':'Tải phiên bản'}</button>
+          <button class="vp-close" onclick="event.stopPropagation();var o=this.closest('.vp-overlay'); if(o) o.remove();">✕</button>
+        </div>
+      </div>
+      <div class="vp-body" style="padding:22px;background:var(--bg-surface-alt,#f8fafc)">
+        <div style="background:var(--bg-surface,#fff);border:1px solid var(--border);border-radius:16px;padding:20px">
+          <div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:10px">${lang==='en'?'Controlled workbook version':'Phiên bản workbook được kiểm soát'}</div>
+          <div style="font-size:26px;font-weight:800;color:var(--text-primary);margin-bottom:6px">${v.version}</div>
+          <div style="font-size:14px;color:var(--text-secondary);line-height:1.6">
+            ${lang==='en'
+              ?'This Excel version is stored under controlled release history. Use the button above to download the exact staged or archived workbook.'
+              :'Phiên bản Excel này được lưu trong lịch sử phát hành có kiểm soát. Dùng nút phía trên để tải đúng workbook đã được stage hoặc archive.'}
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:18px">
+            <div style="border:1px solid var(--border);border-radius:12px;padding:12px;background:var(--bg-surface,#fff)"><b style="display:block;font-size:11px;color:var(--text-tertiary);text-transform:uppercase;margin-bottom:4px">${lang==='en'?'Status':'Trạng thái'}</b><span>${statusLabel(v.status)}</span></div>
+            <div style="border:1px solid var(--border);border-radius:12px;padding:12px;background:var(--bg-surface,#fff)"><b style="display:block;font-size:11px;color:var(--text-tertiary);text-transform:uppercase;margin-bottom:4px">${lang==='en'?'Updated by':'Cập nhật bởi'}</b><span>${v.user||'—'}</span></div>
+            <div style="border:1px solid var(--border);border-radius:12px;padding:12px;background:var(--bg-surface,#fff)"><b style="display:block;font-size:11px;color:var(--text-tertiary);text-transform:uppercase;margin-bottom:4px">${lang==='en'?'When':'Thời điểm'}</b><span>${v.date||'—'}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  ` : `
     <div class="vp-modal">
       <div class="vp-header">
         <div>
@@ -662,16 +740,20 @@ function openVersionPreview(code, idx){
           <div class="vp-meta">${v.date} · ${v.user} · ${v.role}${v.note?' · "'+v.note+'"':''}</div>
         </div>
         <div class="vp-actions">
-          <button class="vp-open" onclick="event.stopPropagation();window.open('../${v.file}${v.file.indexOf('?')>=0?'&':'?'}t=${Date.now()}','_blank')">↗ ${lang==='en'?'Open in new tab':'Mở tab mới'}</button>
+          <button class="vp-open" onclick="event.stopPropagation();window.open('${accessUrl}${accessUrl.indexOf('?')>=0?'&':'?'}t=${Date.now()}','_blank')">↗ ${lang==='en'?'Open in new tab':'Mở tab mới'}</button>
           <button class="vp-close" onclick="event.stopPropagation();var o=this.closest('.vp-overlay'); if(o) o.remove();">✕</button>
         </div>
       </div>
       <div class="vp-body" style="padding:0">
-        <iframe src="../${v.file}${v.file.indexOf('?')>=0?'&':'?'}t=${Date.now()}" style="width:100%;height:75vh;border:0"></iframe>
+        <iframe src="${accessUrl}${accessUrl.indexOf('?')>=0?'&':'?'}t=${Date.now()}" style="width:100%;height:75vh;border:0"></iframe>
       </div>
     </div>
   `;
   document.body.appendChild(overlay);
+  if(isWorkbook){
+    overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove();});
+    return;
+  }
   // Sync language (VI/EN) for the preview iframe
   try{
     const fr=overlay.querySelector('iframe');
@@ -679,15 +761,17 @@ function openVersionPreview(code, idx){
       fr.addEventListener('load', ()=>{
         try{
           if(fr.contentDocument && typeof repairBrokenDocStyleArtifacts==='function') repairBrokenDocStyleArtifacts(fr.contentDocument);
-          if(typeof syncIframeDocumentLanguage==='function') syncIframeDocumentLanguage(fr, lang);
-          else if(fr.contentWindow) fr.contentWindow.postMessage({type:'setLang',lang:lang},'*');
+                if(typeof scheduleIframeDocumentLanguageSync==='function') scheduleIframeDocumentLanguageSync(fr, lang);
+                else if(typeof syncIframeDocumentLanguage==='function') syncIframeDocumentLanguage(fr, lang);
+                else if(fr.contentWindow) fr.contentWindow.postMessage({type:'setLang',lang:lang},'*');
         }catch(_e){}
       });
       setTimeout(()=>{
         try{
           if(fr.contentDocument && typeof repairBrokenDocStyleArtifacts==='function') repairBrokenDocStyleArtifacts(fr.contentDocument);
-          if(typeof syncIframeDocumentLanguage==='function') syncIframeDocumentLanguage(fr, lang);
-          else if(fr.contentWindow) fr.contentWindow.postMessage({type:'setLang',lang:lang},'*');
+                if(typeof scheduleIframeDocumentLanguageSync==='function') scheduleIframeDocumentLanguageSync(fr, lang);
+                else if(typeof syncIframeDocumentLanguage==='function') syncIframeDocumentLanguage(fr, lang);
+                else if(fr.contentWindow) fr.contentWindow.postMessage({type:'setLang',lang:lang},'*');
         }catch(_e){}
       }, 200);
     }
@@ -696,4 +780,3 @@ function openVersionPreview(code, idx){
 }
 
 // ═══════════════════════════════════════════════════
-

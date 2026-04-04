@@ -1,0 +1,113 @@
+{
+  "form_code": "FRM-131",
+  "title": "Risk Assessment",
+  "title_vi": "Đánh giá rủi ro",
+  "version": "V1",
+  "category": "quality",
+  "frequency": "per_event",
+  "sop_ref": "SOP-103",
+  "description": "Ghi nhận đánh giá rủi ro theo ISO 9001 điều khoản 6.1, bao gồm xác định, phân tích, xử lý và theo dõi rủi ro.",
+  "roles_allowed": ["admin", "qa_manager", "quality_engineer", "production_director", "ceo", "engineering_manager"],
+  "fields": [
+    {"id": "assessment_date", "type": "date", "label": "Ngày đánh giá", "label_en": "Assessment Date", "required": true, "default": "today"},
+    {"id": "risk_id", "type": "text", "label": "Mã rủi ro", "label_en": "Risk ID", "required": true, "placeholder": "VD: RISK-2026-R01"},
+    {
+      "id": "risk_source",
+      "type": "select",
+      "label": "Nguồn rủi ro",
+      "label_en": "Risk Source",
+      "required": true,
+      "options": [
+        {"value": "process", "label": "Quy trình (Process)"},
+        {"value": "product", "label": "Sản phẩm (Product)"},
+        {"value": "supplier", "label": "Nhà cung cấp (Supplier)"},
+        {"value": "equipment", "label": "Thiết bị (Equipment)"},
+        {"value": "regulatory", "label": "Pháp luật (Regulatory)"},
+        {"value": "business", "label": "Kinh doanh (Business)"}
+      ]
+    },
+    {
+      "id": "department",
+      "type": "select",
+      "label": "Phòng ban",
+      "label_en": "Department",
+      "required": true,
+      "options": [
+        {"value": "PROD", "label": "Sản xuất"},
+        {"value": "ENG", "label": "Kỹ thuật"},
+        {"value": "QA", "label": "Chất lượng"},
+        {"value": "SCM", "label": "Chuỗi cung ứng"},
+        {"value": "SALES", "label": "Kinh doanh"},
+        {"value": "FIN", "label": "Tài chính"},
+        {"value": "HR", "label": "Nhân sự"},
+        {"value": "IT", "label": "IT"},
+        {"value": "EHS", "label": "An toàn"},
+        {"value": "ALL", "label": "Toàn nhà máy"}
+      ]
+    },
+    {"id": "process_area", "type": "text", "label": "Lĩnh vực quy trình", "label_en": "Process Area", "required": true, "placeholder": "VD: CNC Machining, Incoming QC"},
+    {"id": "risk_description", "type": "textarea", "label": "Mô tả rủi ro", "label_en": "Risk Description", "rows": 4, "required": true, "placeholder": "Mô tả rủi ro và hậu quả tiềm ẩn..."},
+    {"id": "risk_trigger", "type": "text", "label": "Yếu tố kích hoạt", "label_en": "Risk Trigger", "placeholder": "Dấu hiệu cảnh báo sớm..."},
+    {
+      "id": "likelihood",
+      "type": "select",
+      "label": "Khả năng xảy ra",
+      "label_en": "Likelihood",
+      "required": true,
+      "options": [
+        {"value": "1", "label": "1 — Hiếm (Rare)"},
+        {"value": "2", "label": "2 — Không chắc (Unlikely)"},
+        {"value": "3", "label": "3 — Có thể (Possible)"},
+        {"value": "4", "label": "4 — Hay xảy ra (Likely)"},
+        {"value": "5", "label": "5 — Gần như chắc chắn (Almost Certain)"}
+      ]
+    },
+    {
+      "id": "impact",
+      "type": "select",
+      "label": "Mức ảnh hưởng",
+      "label_en": "Impact",
+      "required": true,
+      "options": [
+        {"value": "1", "label": "1 — Không đáng kể (Negligible)"},
+        {"value": "2", "label": "2 — Nhẹ (Minor)"},
+        {"value": "3", "label": "3 — Trung bình (Moderate)"},
+        {"value": "4", "label": "4 — Nghiêm trọng (Major)"},
+        {"value": "5", "label": "5 — Thảm họa (Catastrophic)"}
+      ]
+    },
+    {"id": "risk_level", "type": "number", "label": "Mức rủi ro (L x I)", "label_en": "Risk Level", "min": 1, "max": 25, "placeholder": "Tự tính: Likelihood x Impact"},
+    {"id": "current_controls", "type": "textarea", "label": "Biện pháp kiểm soát hiện tại", "label_en": "Current Controls", "rows": 3, "required": true},
+    {"id": "residual_risk_level", "type": "number", "label": "Mức rủi ro còn lại", "label_en": "Residual Risk Level", "min": 1, "max": 25},
+    {"id": "mitigation_action", "type": "textarea", "label": "Hành động giảm thiểu", "label_en": "Mitigation Action", "rows": 3, "required": true},
+    {"id": "responsible_person", "type": "text", "label": "Người chịu trách nhiệm", "label_en": "Responsible Person", "required": true},
+    {"id": "target_date", "type": "date", "label": "Ngày mục tiêu", "label_en": "Target Date", "required": true},
+    {"id": "completion_date", "type": "date", "label": "Ngày hoàn thành", "label_en": "Completion Date"},
+    {"id": "effectiveness_review_date", "type": "date", "label": "Ngày đánh giá hiệu lực", "label_en": "Effectiveness Review Date"},
+    {
+      "id": "status",
+      "type": "select",
+      "label": "Trạng thái",
+      "label_en": "Status",
+      "required": true,
+      "default": "identified",
+      "options": [
+        {"value": "identified", "label": "Đã xác định (Identified)", "color": "#e03131"},
+        {"value": "assessed", "label": "Đã đánh giá (Assessed)", "color": "#e67700"},
+        {"value": "mitigating", "label": "Đang xử lý (Mitigating)", "color": "#1971c2"},
+        {"value": "monitoring", "label": "Đang giám sát (Monitoring)", "color": "#862e9c"},
+        {"value": "closed", "label": "Đã đóng (Closed)", "color": "#2f9e44"}
+      ]
+    },
+    {"id": "reviewed_by", "type": "text", "label": "Người xem xét", "label_en": "Reviewed By"},
+    {"id": "approved_by", "type": "text", "label": "Người phê duyệt", "label_en": "Approved By"}
+  ],
+  "auto_fields": ["submitted_by", "submitted_at", "entry_id"],
+  "computed_fields": [
+    {"id": "risk_level_calc", "formula": "multiply(likelihood, impact)", "label": "Mức rủi ro (tự tính)"}
+  ],
+  "notifications": {
+    "on_high_risk": ["qa_manager", "production_director", "ceo"],
+    "on_submit": ["qa_manager"]
+  }
+}

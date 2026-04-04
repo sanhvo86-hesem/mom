@@ -1,0 +1,91 @@
+{
+  "form_code": "FRM-311",
+  "title": "First Article Inspection (FAI) — AS9102",
+  "title_vi": "Kiểm tra sản phẩm đầu tiên (FAI) — AS9102",
+  "version": "V1",
+  "category": "quality",
+  "frequency": "per_event",
+  "sop_ref": "SOP-302",
+  "description": "Báo cáo kiểm tra sản phẩm đầu tiên theo tiêu chuẩn AS9102 cho chi tiết mới, thay đổi kỹ thuật hoặc thay đổi quy trình.",
+  "roles_allowed": ["admin", "qa_manager", "qc_inspector", "quality_engineer", "engineering_manager"],
+  "fields": [
+    {"id": "fai_date", "type": "date", "label": "Ngày FAI", "label_en": "FAI Date", "required": true, "default": "today"},
+    {
+      "id": "fai_type",
+      "type": "select",
+      "label": "Loại FAI",
+      "label_en": "FAI Type",
+      "required": true,
+      "options": [
+        {"value": "full", "label": "Toàn bộ (Full)"},
+        {"value": "partial", "label": "Một phần (Partial)"},
+        {"value": "delta", "label": "Delta"}
+      ]
+    },
+    {
+      "id": "fai_reason",
+      "type": "select",
+      "label": "Lý do FAI",
+      "label_en": "FAI Reason",
+      "required": true,
+      "options": [
+        {"value": "new_part", "label": "Chi tiết mới (New Part)"},
+        {"value": "new_process", "label": "Quy trình mới (New Process)"},
+        {"value": "new_source", "label": "Nguồn cung mới (New Source)"},
+        {"value": "engineering_change", "label": "Thay đổi kỹ thuật (Engineering Change)"},
+        {"value": "tooling_change", "label": "Thay đổi tooling (Tooling Change)"},
+        {"value": "2yr_gap", "label": "Gián đoạn > 2 năm (2-Year Gap)"}
+      ]
+    },
+    {"id": "part_number", "type": "text", "label": "Mã chi tiết", "label_en": "Part Number", "required": true},
+    {"id": "part_name", "type": "text", "label": "Tên chi tiết", "label_en": "Part Name", "required": true},
+    {"id": "part_rev", "type": "text", "label": "Revision chi tiết", "label_en": "Part Revision", "required": true},
+    {"id": "drawing_number", "type": "text", "label": "Số bản vẽ", "label_en": "Drawing Number", "required": true},
+    {"id": "drawing_rev", "type": "text", "label": "Revision bản vẽ", "label_en": "Drawing Revision", "required": true},
+    {"id": "customer", "type": "text", "label": "Khách hàng", "label_en": "Customer", "required": true},
+    {"id": "job_number", "type": "text", "label": "Số Job", "label_en": "Job Number", "required": true},
+    {"id": "operation", "type": "text", "label": "Công đoạn", "label_en": "Operation", "placeholder": "VD: OP10, OP20"},
+    {"id": "material_spec", "type": "text", "label": "Quy cách vật liệu", "label_en": "Material Spec", "required": true, "placeholder": "VD: AL 6061-T6, SS 316L"},
+    {"id": "material_cert_number", "type": "text", "label": "Số chứng nhận vật liệu", "label_en": "Material Cert Number", "placeholder": "Số MTR / CoA"},
+    {
+      "id": "characteristics",
+      "type": "table",
+      "label": "Đặc tính đo lường",
+      "label_en": "Characteristics",
+      "min_rows": 1,
+      "max_rows": 200,
+      "columns": [
+        {"id": "balloon_number", "type": "text", "label": "Balloon #", "width": "8%", "required": true},
+        {"id": "characteristic", "type": "text", "label": "Đặc tính", "width": "18%", "required": true},
+        {"id": "requirement", "type": "text", "label": "Yêu cầu", "width": "15%", "required": true},
+        {"id": "actual_value", "type": "text", "label": "Giá trị thực", "width": "13%", "required": true},
+        {"id": "uom", "type": "text", "label": "Đơn vị", "width": "8%", "placeholder": "mm, in"},
+        {"id": "tool_used", "type": "text", "label": "Dụng cụ đo", "width": "15%", "placeholder": "VD: Caliper-001"},
+        {"id": "pass_fail", "type": "select", "label": "Kết quả", "width": "10%", "options": [
+          {"value": "pass", "label": "Đạt (Pass)", "color": "#2f9e44"},
+          {"value": "fail", "label": "Không đạt (Fail)", "color": "#e03131"}
+        ]}
+      ]
+    },
+    {
+      "id": "overall_result",
+      "type": "select",
+      "label": "Kết quả tổng thể",
+      "label_en": "Overall Result",
+      "required": true,
+      "options": [
+        {"value": "accept", "label": "Chấp nhận (Accept)", "color": "#2f9e44"},
+        {"value": "reject", "label": "Từ chối (Reject)", "color": "#e03131"},
+        {"value": "conditional", "label": "Chấp nhận có điều kiện (Conditional)", "color": "#e67700"}
+      ]
+    },
+    {"id": "inspector_id", "type": "text", "label": "Mã QC Inspector", "label_en": "Inspector ID", "required": true},
+    {"id": "approved_by", "type": "text", "label": "Người phê duyệt", "label_en": "Approved By", "required": false},
+    {"id": "notes", "type": "textarea", "label": "Ghi chú", "label_en": "Notes", "rows": 3}
+  ],
+  "auto_fields": ["submitted_by", "submitted_at", "entry_id"],
+  "notifications": {
+    "on_reject": ["qa_manager", "engineering_manager"],
+    "on_submit": ["qa_manager"]
+  }
+}

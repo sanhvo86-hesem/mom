@@ -1,27 +1,21 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>WI-716 — Lắp sạch, tương thích chân không, bagging và bảo quản cho Job đặc biệt | HESEM QMS</title>
-<link rel="stylesheet" href="../../../assets/style.css"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WI-716 - Vacuum Compatible Clean Build and Bagging | HESEM QMS</title>
+<link rel="stylesheet" href="../../../assets/style.css">
 <style>
-@media print {
- .card, .table-card, .callout, .note, .box, .lane, .legend, .req, .matrix, .kpi-grid, .step-list, .checklist, .grid-2 { break-inside: avoid; page-break-inside: avoid; }
- h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
- tr, td, th { break-inside: avoid; page-break-inside: avoid; }
-}
+
 .page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
 .page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
 .page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);} 
 .page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
-.table-card table {width:100%; border-collapse: collapse; font-size:12px; }
-.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align: top;}
-.table-card th {background: var(--th-bg); border-color: var(--th-bdr); text-align:left;}
+
 .small {font-size:12px;}
 .tiny {font-size:11px; color: var(--ink2);} 
 .kpi-grid, .grid-2 {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
-.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.kpi-box {border:1px solid var(--ln); border-left: 3px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
 .badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
 .badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
 .badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
@@ -29,105 +23,244 @@
 .badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
 .badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
 .step-list, .checklist {display:grid; gap:10px;}
-.step-item {border:1px solid var(--ln); border-left:4px solid var(--blue); padding:10px 12px; border-radius: var(--r); background:#fff;}
-.section {margin-top:16px;}
+.step-item {border:1px solid var(--ln); border-left: 3px solid var(--blue); padding:10px 12px; border-radius: var(--r); background:#fff;}
+.wi-section, .section {margin-top:16px;}
 ul.tight li {margin:4px 0;}
 .code {font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background:#f8f9fa; border:1px solid var(--ln); border-radius:6px; padding:0 6px;}
 .callout-danger,.callout-warning,.callout-info,.callout-ok {padding:12px 14px; border-radius: var(--r); margin:10px 0; border:1px solid var(--ln); background:#fff;}
-.callout-danger{border-left:4px solid #c92a2a; background:#fff5f5;}
-.callout-warning{border-left:4px solid #e67700; background:#fff9db;}
-.callout-info{border-left:4px solid #1971c2; background:#e7f5ff;}
-.callout-ok{border-left:4px solid #2b8a3e; background:#ebfbee;}
+
+.callout-warning{border-left: 3px solid #e67700; background:#fff9db;}
+
+.callout-ok{border-left: 3px solid #2b8a3e; background:#ebfbee;}
 .meta .row{display:grid; grid-template-columns:150px 1fr; gap:10px; margin:4px 0;}
 </style>
 </head>
 <body>
-<div class="page-wrap">
-  <div class="page-body">
-    <div class="hero card">
-      <div class="eyebrow">HESEM ENGINEERING</div>
-      <div class="hero-grid" style="display:grid;grid-template-columns:2fr 1fr;gap:20px;align-items:start;">
-        <div>
-          <div class="doc-type">Tài liệu vận hành • Work Instruction</div>
-          <div class="doc-title" style="font-size:28px;font-weight:800;line-height:1.25;margin:6px 0 8px;">WI-716 — Lắp sạch, tương thích chân không, bagging và bảo quản cho Job đặc biệt</div>
-        </div>
-        <div class="meta">
-          <div class="row"><span><b>Mã:</b></span><span>WI-716</span></div>
-          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Chủ sở hữu:</b></span><span>Clean Pack Supervisor / QA Engineer / Warehouse</span></div>
-          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
-        </div>
-      </div>
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho Job có yêu cầu clean build, vacuum-compatible, particle-sensitive, double-bagging hoặc customer route đặc biệt. Không mở dùng đại trà cho mọi Job.</div>
-      <h1>WI-716 — Lắp sạch, tương thích chân không, bagging và bảo quản cho Job đặc biệt</h1>
-      
-<div class="section"><h2>1. Mục đích và nguyên tắc clean build / vacuum-compatible bagging</h2>
-<p>WI này áp cho Job có yêu cầu clean build, vacuum-compatible, particle-sensitive hoặc clean bagging mức cao. Mục tiêu là sau khi part đã sạch và đạt kiểm tra liên quan, toàn bộ thao tác lắp, chụp nắp, bao gói và bảo quản tiếp theo không làm phát sinh tái nhiễm bẩn, không đưa vật liệu không tương thích vào gần part và không làm mất traceability.</p>
-<div class="callout-danger"><strong>CẤM</strong> đưa carton hở, giấy thường, băng keo không kiểm soát, giẻ sợi, bút mực không phê chuẩn, foam không rõ spec, dầu/mỡ không chỉ định, hoặc bất kỳ vật tư có nguy cơ outgassing / shedding vào khu clean build.</div></div>
+<div class="container">
+ <div class="page">
+ <div class="page-body">
+ <div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu vận hành • Công việc hướng dẫn</span>
+ </div>
+ </div>
+ <div class="title">
+<strong class="doc-name">Vacuum Compatible Clean Build and Bagging</strong>
+</div>
+ <div class="meta"><div class="row">
+<span><b>Mã:</b></span><span class="doc-code">WI-716</span>
+</div>
+<div class="row">
+<span><b>Phiên bản:</b></span><span>V1</span>
+</div>
+<div class="row">
+<span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span>
+</div>
+<div class="row">
+<span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-and-packaging-supervisor.html" title="Cleaning and Packaging Supervisor (Giam sat ve sinh va dong goi)"><span class="entity-code role-code">CPS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html" title="Quality Engineer (Ky su chat luong)"><span class="entity-code role-code">QE</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-warehouse-clerk.html" title="Warehouse Clerk (Nhan vien kho)"><span class="entity-code role-code">WAR</span></a></span></span>
+</div>
+<div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
 
-<div class="section"><h2>2. Kích hoạt và điều kiện vào tuyến clean build</h2>
-<div class="table-card"><table><thead><tr><th>Điều kiện</th><th>Phải có</th><th>HOLD khi</th></tr></thead><tbody>
-<tr><td>Kích hoạt route</td><td>Drawing, PO, QPL, routing note hoặc customer spec ghi rõ clean build / vacuum-compatible / particle-sensitive / double-bagging.</td><td>Nhân sự tự hiểu “hàng quan trọng” rồi tự ý đưa vào clean route mà không có căn cứ kỹ thuật.</td></tr>
-<tr><td>Tình trạng part</td><td>Đã PASS cleaning/inspection liên quan; bề mặt khô; không còn solvent, residue, burr, free chips.</td><td>Thiếu bằng chứng PASS hoặc part vừa rework nhưng chưa re-verify.</td></tr>
-<tr><td>Khu vực</td><td>Khu clean build đạt điều kiện entry/gowning và monitoring theo <a href="wi-711-cleanroom-entry-and-gowning.html">WI-711</a> / <a href="wi-713-environmental-monitoring-and-response.html">WI-713</a>.</td><td>Khu đang open action, housekeeping không đạt, có vật phát bụi hoặc đang làm công việc bẩn song song.</td></tr>
-<tr><td>Người thao tác</td><td>Được ủy quyền clean build / clean pack theo <a href="../../03-Reference/01-ANNEX-System/annex-hr-001-competency-levels-and-certification-rules.html">ANNEX-HR-001</a>.</td><td>Chưa được ủy quyền, đã hết hạn, hoặc vi phạm gowning/handling trong ca hiện tại.</td></tr>
-<tr><td>Vật tư</td><td>Vật tư bao gói đúng <a href="../../03-Reference/02-ANNEX-Standards/annex-whs-001-packaging-labeling-spec.html">ANNEX-WHS-001</a>; vật liệu tiếp xúc part phù hợp <a href="../../03-Reference/02-ANNEX-Standards/annex-qa-007-surface-finish-vacuum-compatibility.html">ANNEX-QA-007</a>.</td><td>Dùng vật tư không rõ spec, tái sử dụng, rách, bẩn, quá hạn hoặc có nguy cơ outgassing / shedding.</td></tr>
-</tbody></table></div></div>
+ </div>
+ 
+ <div class="doc-content" id="docContent">
+<div class="form-sheet">
+<div class="note">
+<strong>ÁP DỤNG KHI</strong><br>Dùng cho Job có yêu cầu clean xây dựng, chân không-tương thích, hạt / phần tử-nhạy cảm, kép / Cấp đôi-đóng túi hoặc khách hàng lộ trình gia công đặc biệt. Không mở dùng đại trà cho mọi Job.</div>
+ <h1>WI-716 - Vacuum Compatible Clean Build and Bagging</h1>
+ 
+<section class="wi-section" id="wi-s1"><h2>1. Mục đích và nguyên tắc clean xây dựng / chân không-tương thích đóng túi</h2>
+<p>WI này áp cho Job có yêu cầu clean xây dựng, chân không-tương thích, hạt / phần tử-nhạy cảm hoặc clean đóng túi mức cao. Mục tiêu là sau khi part đã sạch và đạt kiểm tra liên quan, toàn bộ vận hành lắp, chụp nắp, bao gói và bảo quản tiếp theo không làm phát sinh tái nhiễm bẩn, không đưa vật liệu không tương thích vào Cần part và không làm mất truy xuất nguồn gốc.</p>
+<div class="callout-danger">
+<span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Chỉ đưa vào khu clean xây dựng vật tư đã được kiểm soát về thoát khí (outgassing) và bong tróc, gồm đúng loại bao bì, băng keo, giẻ lau, bút, xốp / bọt và chất bôi trơn đã được phê chuẩn cho chân không-tương thích xây dựng.</div></section>
 
-<div class="section"><h2>3. Quy tắc vật liệu và thao tác được phép / bị cấm</h2>
-<div class="table-card"><table><thead><tr><th>Nhóm</th><th>Được dùng khi</th><th>CẤM / không được mang vào</th></tr></thead><tbody>
-<tr><td>Túi, màng, khay, foam</td><td>Đúng mã vật tư đã phê chuẩn; sạch; còn nguyên; đúng route bagging của Job.</td><td>Túi trầy rách, foam bụi, carton trần chạm trực tiếp part, vật tư trôi nổi không có mã.</td></tr>
-<tr><td>Găng tay, dụng cụ cầm nắm</td><td>Găng sạch đúng loại; dụng cụ đã làm sạch và nhận diện riêng cho clean zone.</td><td>Găng bẩn/rách, găng dính băng keo, nhíp/kềm từ khu bẩn đưa sang không làm sạch lại.</td></tr>
-<tr><td>Nắp chụp, plug, protector</td><td>Đúng size, đúng vật liệu, sạch, không tạo bụi, không làm trầy sealing face.</td><td>Cap/plug tự chế bằng giấy, băng keo quấn trực tiếp lên bề mặt sealing/critical face.</td></tr>
-<tr><td>Nhãn và bút ghi</td><td>Nhãn ở lớp bao ngoài; ghi nhận theo quy tắc label sạch đã duyệt.</td><td>Dán nhãn trực tiếp lên primary clean bag hoặc lên bề mặt part nếu spec không cho phép.</td></tr>
-<tr><td>Hoá chất / lubricant</td><td>Chỉ dùng khi engineering/QA/customer spec nêu rõ, có mã vật tư và cách kiểm soát tồn dư.</td><td>Tự ý bôi dầu, silicone, chống gỉ, chất trượt hoặc chất tẩy để “dễ lắp, dễ đẹp”.</td></tr>
-</tbody></table></div></div>
+<section class="wi-section" id="wi-s2"><h2>2. Kích hoạt và điều kiện vào tuyến clean xây dựng</h2>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+<thead><tr>
+<th>Điều kiện</th>
+<th>Phải có</th>
+<th>hold khi</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Kích hoạt lộ trình gia công</td>
+<td>Drawing, PO, QPL, lộ trình gia công note hoặc khách hàng spec ghi rõ clean xây dựng / chân không-tương thích / hạt / phần tử-nhạy cảm / kép / Cấp đôi-đóng túi.</td>
+<td>Nhân sự tự hiểu "hàng quan trọng" rồi tự ý đưa vào clean lộ trình gia công mà không có căn cứ kỹ thuật.</td>
+</tr>
+<tr>
+<td>Tình trạng part</td>
+<td>Đã PASS làm sạch/kiểm tra liên quan; bề mặt khô; không còn dung môi, cặn / dư lượng, bavia, miễn phí / tự do phoi.</td>
+<td>Thiếu bằng chứng PASS hoặc part vừa làm lại nhưng chưa re-xác minh.</td>
+</tr>
+<tr>
+<td>Khu vực</td>
+<td>Khu clean xây dựng đạt điều kiện mục nhập/mặc đồ bảo hộ (gowning) và giám sát theo <a href="wi-711-cleanroom-entry-and-gowning.html">WI-711</a> / <a href="wi-713-environmental-monitoring-and-response.html">WI-713</a>.</td>
+<td>Khu đang mở hành động, vệ sinh công nghiệp (5S) không đạt, có vật phát bụi hoặc đang làm công việc bẩn song song.</td>
+</tr>
+<tr>
+<td><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html" title="CNC Operator (Nhan vien van hanh CNC)"><span class="role-code">OPR</span></a></span></td>
+<td>Được ủy quyền clean xây dựng / clean pack theo <a href="../../03-Reference/08-ANNEX-800/annex-801-competency-levels-and-certification-rules.html">ANNEX-801</a>.</td>
+<td>Chưa được ủy quyền, đã hết hạn, hoặc vi phạm mặc đồ bảo hộ (gowning)/xử lý / vận chuyển trong ca Current.</td>
+</tr>
+<tr>
+<td>Vật tư</td>
+<td>Vật tư bao gói đúng <a href="../../03-Reference/07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a>; vật liệu tiếp xúc part phù hợp <a href="../../03-Reference/06-ANNEX-600/annex-606-surface-finish-vacuum-compatibility.html">ANNEX-606</a>.</td>
+<td>Dùng vật tư không rõ spec, tái sử dụng, rách, bẩn, quá hạn hoặc có nguy cơ thoát khí (outgassing) / bong tróc.</td>
+</tr>
+</tbody>
+</table></div></section>
 
-<div class="section"><h2>4. Trình tự clean build và bagging</h2>
+<section class="wi-section" id="wi-s3"><h2>3. Quy tắc vật liệu được phép và vận hành phải loại trừ</h2>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+<thead><tr>
+<th>Nhóm</th>
+<th>Được dùng khi</th>
+<th>Phải loại trừ / không được mang vào</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Túi, màng, khay, xốp / bọt</td>
+<td>Đúng mã vật tư đã phê chuẩn; sạch; còn nguyên; đúng lộ trình gia công đóng túi của Job.</td>
+<td>Túi trầy rách, xốp / bọt bụi, thùng thùng carton trần chạm trực tiếp part, vật tư trôi nổi không có mã.</td>
+</tr>
+<tr>
+<td>Găng tay, dụng cụ cầm nắm</td>
+<td>Găng sạch đúng loại; dụng cụ đã làm sạch và nhận diện riêng cho clean khu vực.</td>
+<td>Găng bẩn/rách, găng dính băng keo, nhíp/kềm từ khu bẩn đưa sang không làm sạch lại.</td>
+</tr>
+<tr>
+<td>Nắp chụp, nút bịt, bộ bảo vệ</td>
+<td>Đúng size, đúng vật liệu, sạch, không tạo bụi, không làm trầy niêm phong / bịt kín mặt / bề mặt.</td>
+<td>Cap/nút bịt tự chế bằng giấy, băng keo quấn trực tiếp lên bề mặt niêm phong / bịt kín/quan trọng / nghiêm trọng mặt / bề mặt.</td>
+</tr>
+<tr>
+<td>Nhãn và bút ghi</td>
+<td>Nhãn ở lớp bao ngoài; ghi nhận theo quy tắc label sạch đã duyệt.</td>
+<td>Dán nhãn trực tiếp lên chính / sơ cấp clean bag hoặc lên bề mặt part nếu spec không cho phép.</td>
+</tr>
+<tr>
+<td>Hoá chất / chất bôi trơn</td>
+<td>Chỉ dùng khi kỹ thuật/QA/khách hàng spec nêu rõ, có mã vật tư và cách kiểm soát tồn dư.</td>
+<td>Tự ý bôi dầu, silicone, chống gỉ, chất trượt hoặc chất tẩy để "dễ lắp, dễ đẹp".</td>
+</tr>
+</tbody>
+</table></div></section>
+
+<section class="wi-section" id="wi-s4"><h2>4. Trình tự clean xây dựng và đóng túi</h2>
 <div class="step-list">
-<div class="step-item"><strong>Bước 1 — Line clearance.</strong> Chỉ để lại đúng Job đang làm tại station. Loại khỏi station mọi vật tư và nhãn của Job khác. Kiểm tool count, cap/plug count và trạng thái tray sạch trước khi mở part.</div>
-<div class="step-item"><strong>Bước 2 — Mở bao đúng lớp.</strong> Nếu part về dưới dạng double-bag, chỉ tháo outer bag tại vùng chuyển tiếp; inner bag chỉ được mở trong clean zone hoặc station đã được phê chuẩn.</div>
-<div class="step-item"><strong>Bước 3 — Last-look trước lắp sạch.</strong> Kiểm visual cuối về stain, residue, scratch, chip tự do, burr, seal face, orientation mark và part/rev/qty. Bất kỳ nghi ngờ nào đều HOLD trước khi tiếp tục.</div>
-<div class="step-item"><strong>Bước 4 — Lắp / chụp / bảo vệ.</strong> Lắp cap, plug, cover, protector, gasket phụ hoặc phần tử clean-build theo route. Không đặt part trực tiếp lên mặt bàn trần. Dùng khay lót sạch đúng spec.</div>
-<div class="step-item"><strong>Bước 5 — Bagging.</strong> Thực hiện route bao gói theo mức yêu cầu: single bag, double bag hoặc double bag + barrier/desiccant/humidity card. Primary bag chỉ chứa part sạch và vật tư được phép nằm chung với part.</div>
-<div class="step-item"><strong>Bước 6 — Seal và nhận diện.</strong> Seal đủ kín, không kẹp nếp gây rách, không để nhãn che mất nhận diện part/rev/qty/lot. Label logistics gắn ở lớp ngoài, không phá tuyến sạch.</div>
-<div class="step-item"><strong>Bước 7 — Handoff bảo quản.</strong> Chuyển sang kho hoặc khu staging theo <a href="wi-702-storage-environment-location-and-fifo-control.html">WI-702</a>. Không đặt kiện clean build cùng pallet bẩn, cùng lối đi phoi hoặc dưới vị trí dễ rơi bụi.</div>
-</div></div>
+<div class="step-item">
+<strong>Bước 1 — Dòng / Chuyền thông quan / giải phóng.</strong> Chỉ để lại đúng Job đang làm tại trạm / vị trí làm việc. Loại khỏi trạm / vị trí làm việc mọi vật tư và nhãn của Job khác. Kiểm tool count, cap/nút bịt count và trạng thái khay sạch trước khi mở part.</div>
+<div class="step-item">
+<strong>Bước 2 — Mở bao đúng lớp.</strong> Nếu part về dưới dạng kép / Cấp đôi-bag, chỉ tháo bên ngoài bag tại vùng chuyển tiếp; bên trong bag chỉ được mở trong clean khu vực hoặc trạm / vị trí làm việc đã được phê chuẩn.</div>
+<div class="step-item">
+<strong>Bước 3 — cuối cùng-xem / tra cứu trước lắp sạch.</strong> Kiểm trực quan cuối về vết bẩn / ố, cặn / dư lượng, trầy xước, phoi (chip) tự do, bavia, niêm phong mặt / bề mặt, định hướng / đào tạo hội nhập đánh dấu và part/rev/qty. Bất kỳ nghi ngờ nào đều TẠM GIỮ trước khi tiếp tục.</div>
+<div class="step-item">
+<strong>Bước 4 — Lắp / chụp / bảo vệ.</strong> Lắp cap, nút bịt, bao phủ / che, bộ bảo vệ, gioăng (gasket) phụ hoặc phần tử clean-xây dựng theo lộ trình gia công. Không đặt part trực tiếp lên mặt bàn trần. Dùng khay lót sạch đúng spec.</div>
+<div class="step-item">
+<strong>Bước 5 — đóng túi.</strong> Thực hiện lộ trình gia công bao gói theo mức yêu cầu: đơn lẻ bag, kép / Cấp đôi bag hoặc kép / Cấp đôi bag + rào cản/chất hút ẩm/độ ẩm card. Chính / Sơ cấp bag chỉ chứa part sạch và vật tư được phép nằm chung với part.</div>
+<div class="step-item">
+<strong>Bước 6 — niêm phong và nhận diện.</strong> niêm phong đủ kín, không kẹp nếp gây rách, không để nhãn che mất nhận diện part/rev/qty/lot. Label hậu cần gắn ở lớp ngoài, không phá tuyến sạch.</div>
+<div class="step-item">
+<strong>Bước 7 — Bàn giao bảo quản.</strong> Chuyển sang kho hoặc khu khu vực chuẩn bị / sắp xếp theo <a href="wi-702-storage-environment-location-and-fifo-control.html">WI-702</a>. Không đặt kiện clean xây dựng cùng pallet bẩn, cùng lối đi phoi hoặc dưới vị trí dễ rơi bụi.</div>
+</div></section>
 
-<div class="section"><h2>5. Quy tắc mở lại túi, re-bag và xử lý vi phạm</h2>
-<div class="table-card"><table><thead><tr><th>Tình huống</th><th>Phản ứng bắt buộc</th><th>Ai quyết định mở lại</th></tr></thead><tbody>
-<tr><td>Bag rách / seal hở / mất cap khi chưa giao</td><td>HOLD ngay; đánh giá lại tình trạng sạch; re-clean hoặc re-pack theo kết quả đánh giá. Cấm vá tạm để giao.</td><td>QA + owner của clean build route.</td></tr>
-<tr><td>Part chạm vật bẩn hoặc do người chưa đủ điều kiện thao tác</td><td>HOLD; coi như nghi tái nhiễm bẩn; đánh giá lại toàn bộ route trước khi mở tiếp.</td><td>QA.</td></tr>
-<tr><td>Vượt exposure limit ngoài clean zone</td><td>HOLD; quyết định re-clean / re-verify / re-bag theo QPL và spec khách hàng.</td><td>QA + Engineering khi spec đặc biệt.</td></tr>
-<tr><td>Cần mở túi để bổ sung chứng từ / đếm / chụp ảnh</td><td>Cấm mở primary bag chỉ vì lý do hành chính. Xử lý ở lớp bao ngoài hoặc dùng record có sẵn.</td><td>Không ai được tự mở nếu không có lý do kỹ thuật.</td></tr>
-</tbody></table></div></div>
+<section class="wi-section" id="wi-s5"><h2>5. Quy tắc mở lại túi, re-bag và xử lý vi phạm</h2>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+<thead><tr>
+<th>Tình huống</th>
+<th>Phản ứng bắt buộc</th>
+<th>Ai quyết định mở lại</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Bag rách / niêm phong hở / mất cap khi chưa giao</td>
+<td>TẠM GIỮ ngay; đánh giá lại tình trạng sạch; re-clean hoặc re-pack theo kết quả đánh giá. PHẢI loại bỏ mọi giải pháp vá tạm trước khi giao.</td>
+<td>
+<a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> + người chịu trách nhiệm của clean xây dựng lộ trình gia công.</td>
+</tr>
+<tr>
+<td>Part chạm vật bẩn hoặc do Người chưa đủ điều kiện vận hành</td>
+<td>TẠM GIỮ; coi như nghi tái nhiễm bẩn; đánh giá lại toàn bộ lộ trình gia công trước khi mở tiếp.</td>
+<td>
+<a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a>.</td>
+</tr>
+<tr>
+<td>Vượt mức độ tiếp xúc / phơi nhiễm giới hạn ngoài clean khu vực</td>
+<td>TẠM GIỮ; quyết định re-clean / re-xác minh / re-bag theo QPL và spec khách hàng.</td>
+<td>
+<a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> + Kỹ thuật khi spec đặc biệt.</td>
+</tr>
+<tr>
+<td>Cần mở túi để bổ sung chứng từ / đếm / chụp ảnh</td>
+<td>PHẢI giữ nguyên chính / sơ cấp bag khi lý do chỉ là hành chính. Xử lý ở lớp bao ngoài hoặc dùng hồ sơ có sẵn.</td>
+<td>Không ai được tự mở nếu không có lý do kỹ thuật.</td>
+</tr>
+</tbody>
+</table></div></section>
 
-<div class="section"><h2>6. Record, bằng chứng và KPI</h2>
+<section class="wi-section" id="wi-s6"><h2>6. Hồ sơ, bằng chứng và KPI</h2>
 <div class="grid-2">
-<div class="kpi-box"><h3>Record bắt buộc</h3><ul class="tight" style="padding-left:18px;">
-<li>Record cleanliness / cleaning PASS liên quan của Job.</li>
-<li>Record bagging / label / pack confirmation theo <a href="wi-714-clean-packaging-handling-and-preservation.html">WI-714</a>.</li>
-<li>Ảnh pack cuối và route clean build khi khách hàng hoặc QPL yêu cầu.</li>
-<li>Record HOLD / re-clean / re-bag nếu có mở lại túi hoặc nghi tái nhiễm.</li>
-</ul></div>
-<div class="kpi-box"><h3>KPI</h3><ul class="tight" style="padding-left:18px;">
-<li>KPI-WI716-01: tỷ lệ re-pack / re-clean do vi phạm clean build.</li>
-<li>KPI-WI716-02: số incident bag breach / cap missing / wrong material in clean zone.</li>
-<li>KPI-WI716-03: số lô clean-build bị HOLD ở ship release vì thiếu bằng chứng hoặc sai route.</li>
-</ul></div>
+<div class="kpi-box">
+<h3>Hồ sơ bắt buộc</h3>
+<ul class="tight" style="padding-left:18px;">
+<li>Hồ sơ vệ sinh / sạch sẽ / làm sạch PASS liên quan của Job.</li>
+<li>Hồ sơ đóng túi / label / pack xác nhận theo <a href="wi-714-clean-packaging-handling-and-preservation.html">WI-714</a>.</li>
+<li>Ảnh pack cuối và lộ trình gia công clean xây dựng khi khách hàng hoặc QPL yêu cầu.</li>
+<li>Hồ sơ TẠM GIỮ / re-clean / re-bag nếu có mở lại túi hoặc nghi tái nhiễm.</li>
+</ul>
 </div>
-<div class="table-card"><table><thead><tr><th>Liên kết</th><th>Vai trò</th></tr></thead><tbody>
-<tr><td><a href="../../01-SOPs/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">SOP-702</a></td><td>Khung kiểm soát sạch, xác minh sạch và exposure rule.</td></tr>
-<tr><td><a href="../../01-SOPs/07-SOP-700/sop-703-product-safety-conformity-and-fod-prevention.html">SOP-703</a></td><td>FOD, product safety và mixed hardware control.</td></tr>
-<tr><td><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td><td>Chỉ release khi bằng chứng clean build / clean pack đã đủ.</td></tr>
-<tr><td><a href="wi-711-cleanroom-entry-and-gowning.html">WI-711</a> / <a href="wi-713-environmental-monitoring-and-response.html">WI-713</a> / <a href="wi-714-clean-packaging-handling-and-preservation.html">WI-714</a></td><td>Điều kiện người, môi trường và bagging nền.</td></tr>
-<tr><td><a href="../../03-Reference/02-ANNEX-Standards/annex-qa-003-quality-package-levels-qpl.html">ANNEX-QA-003</a> / <a href="../../03-Reference/02-ANNEX-Standards/annex-qa-007-surface-finish-vacuum-compatibility.html">ANNEX-QA-007</a></td><td>Kích hoạt route, vật liệu tương thích, yêu cầu surface/vacuum đặc biệt.</td></tr>
-</tbody></table></div></div>
+<div class="kpi-box">
+<h3>KPI</h3>
+<ul class="tight" style="padding-left:18px;">
+<li>KPI-WI716-01: tỷ lệ re-pack / re-clean do vi phạm clean xây dựng.</li>
+<li>KPI-WI716-02: số sự cố bag vi phạm / cap thiếu / sai nguyên vật liệu in clean khu vực.</li>
+<li>KPI-WI716-03: số lô clean-xây dựng bị TẠM GIỮ ở phê duyệt giao hàng (phê duyệt giao hàng) vì thiếu bằng chứng hoặc sai lộ trình gia công.</li>
+</ul>
+</div>
+</div>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+<thead><tr>
+<th>Liên kết</th>
+<th>Vai trò</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><a href="../../01-SOPs/07-SOP-700/sop-702-contamination-control-and-cleanliness.html">SOP-702</a></td>
+<td>Khung kiểm soát sạch, xác minh sạch và mức độ tiếp xúc / phơi nhiễm rule.</td>
+</tr>
+<tr>
+<td><a href="../../01-SOPs/07-SOP-700/sop-703-product-safety-conformity-and-fod-prevention.html">SOP-703</a></td>
+<td>FOD, sản phẩm an toàn và hỗn hợp / lẫn lộn phần cứng control.</td>
+</tr>
+<tr>
+<td><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td>
+<td>Chỉ phát hành khi bằng chứng clean xây dựng / clean pack đã đủ.</td>
+</tr>
+<tr>
+<td>
+<a href="wi-711-cleanroom-entry-and-gowning.html">WI-711</a> / <a href="wi-713-environmental-monitoring-and-response.html">WI-713</a> / <a href="wi-714-clean-packaging-handling-and-preservation.html">WI-714</a>
+</td>
+<td>Điều kiện Người, môi trường và đóng túi nền.</td>
+</tr>
+<tr>
+<td>
+<a href="../../03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a> / <a href="../../03-Reference/06-ANNEX-600/annex-606-surface-finish-vacuum-compatibility.html">ANNEX-606</a>
+</td>
+<td>Kích hoạt lộ trình gia công, vật liệu tương thích, yêu cầu bề mặt/chân không đặc biệt.</td>
+</tr>
+</tbody>
+</table></div></section>
 
-    </div>
-  </div>
+ </div>
+ </div>
 </div>
-<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+ </div>
+ </div>
+
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
+<script src="../../../assets/app.js"></script>
 </body>
 </html>

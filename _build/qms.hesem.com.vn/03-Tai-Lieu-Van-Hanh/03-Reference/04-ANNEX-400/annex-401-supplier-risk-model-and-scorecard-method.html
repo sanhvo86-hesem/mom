@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>ANNEX-401 - Supplier Risk Model and Scorecard Method | HESEM QMS</title>
+<link href="../../../assets/style.css" rel="stylesheet">
+<style>
+ h1, h2, h3 { break-after: avoid; page-break-after: avoid; } tr, td, th { break-inside: avoid; page-break-inside: avoid; }
+.page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
+.page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
+.page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
+.page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
+.small {font-size:12px;}
+.tiny {font-size:11px; color: var(--ink2);} .kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
+.kpi-box {border:1px solid var(--ln); border-left: 3px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
+.badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
+.badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
+.badge-green{background:#ebfbee;color:#2b8a3e;border-color:#b2f2bb;}
+.badge-blue{background:#e7f5ff;color:#1971c2;border-color:#a5d8ff;}
+.badge-navy{background:#eef2ff;color:#243b6b;border-color:#c7d2fe;}
+.two-col {display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.three-col {display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+.code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+.figure-box {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:12px 0;}
+.step-list {counter-reset: step; margin: 10px 0;}
+.step-item {position:relative; padding-left:40px; margin:12px 0;}
+.step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
+.matrix {display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:10px 0;}
+.card {border:1px solid var(--ln); border-radius: var(--r); padding:12px; background:#fff;}
+
+.lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
+ul.tight li {margin:4px 0;}
+hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
+@media (max-width: 960px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="page">
+<div class="page-body"><div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+<div class="fh-company">
+<a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+<span>Tài liệu vận hành • Annex</span>
+</div>
+</div>
+<div class="title">
+<strong class="doc-name">Supplier Risk Model and Scorecard Method</strong>
+</div>
+<div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">ANNEX-401</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Supply Chain Department (Phong Chuoi cung ung)"><span class="entity-code dept-code">D-SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+</div>
+
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi chọn nguồn cung mới, tái đánh giá nhà cung cấp hiện hữu, rà soát định kỳ, ra quyết định thử việc/chặn / khóa, xác định mức đầu vào / nhận hàng control và quyết định kép-source hoặc dự phòng source.</div>
+<h1>ANNEX-401 - Supplier Risk Model and Scorecard Method</h1>
+<div class="callout-info"><b>Nguyên tắc nền:</b> Supplier không được đánh giá chỉ bằng giá và thời gian dẫn (lead time). Mọi nhà cung cấp ảnh hưởng CTQ, truy xuất nguồn gốc, cert tính toàn vẹn, công đoạn đặc biệt, giao hàng độ ổn định hoặc khách hàng yêu cầu PHẢI đi qua mô hình rủi ro và thẻ điểm này trước khi cấp PO hoặc cho phép phát hành vào sản xuất.</div>
+<h2>1. Mục đích và phạm vi áp dụng</h2>
+<p>ANNEX này quy định hai lớp kiểm soát song song: <b>(1) rủi ro nền của nhà cung cấp</b> và <b>(2) hiệu năng thực tế theo thẻ điểm</b>. Hai lớp này cùng quyết định nhà cung cấp trạng thái, tần suất rà soát, mức độ xác minh đầu vào, yêu cầu kép-source, kích hoạt thử việc/chặn / khóa và điều kiện mở khóa lại.</p>
+<p>Tài liệu áp dụng cho raw nguyên vật liệu suppliers, khách hàng-được chỉ định suppliers, đặc biệt nhà gia công, gia công ngoài gia công cơ khí nhà / chứa, dịch vụ kiểm định/hiệu chuẩn ảnh hưởng sản phẩm, và các nguồn cung ảnh hưởng trực tiếp tới tiến độ/tuân thủ chất lượng của Lệnh sản xuất CNC.</p>
+<h2>2. Phân loại nhóm sản phẩm và rủi ro nền R1–R4</h2>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+<thead><tr><th>nhóm sản phẩm</th><th>Ví dụ</th><th>Rủi ro nền mặc định</th><th>Kiểm soát tối thiểu bắt buộc</th></tr></thead>
+<tbody>
+<tr><td>Quan trọng raw nguyên vật liệu</td><td>Bar/tấm / bản/ống/rèn/đúc, vật liệu đặc chủng, khách hàng-đã quy định cấp / hạng</td><td><span class="badge-red">R1</span></td><td>Đã phê duyệt source, cert/MTR 100%, mẻ nấu (heat)/lot truy vết, xác minh đầu vào, thay thế control, định kỳ thẻ điểm.</td></tr>
+<tr><td>đặc biệt Người xử lý</td><td>xi mạ anốt (anodize), mạ, thụ động hóa (passivation), mẻ nấu (heat) xử lý, NDT, làm sạch đặc biệt, lớp phủ / mạ</td><td><span class="badge-red">R1</span></td><td>Đã phê duyệt Người xử lý list, quy trình scope/site scope rà soát, bộ chứng từ chứng nhận, khách hàng luồng-xuống / Từng, trả lại xác minh, hết hạn control.</td></tr>
+<tr><td>Gia công ngoài gia công cơ khí / thứ cấp ops</td><td>mài, EDM, laser đánh dấu, thuê ngoài gia công cơ khí, cân bằng, mài rà (lapping)</td><td><span class="badge-amber">R2</span></td><td>Khả năng rà soát, lộ trình gia công/vận hành luồng-xuống / Từng, đầu tiên lot/FAI theo yêu cầu, giao hàng giám sát, ngăn chặn rule.</td></tr>
+<tr><td>Kiểm tra / hiệu chuẩn / bên ngoài test dịch vụ</td><td>Lab, hiệu chuẩn nhà cung cấp dịch vụ, bên ngoài đo lường/xác nhận dịch vụ</td><td><span class="badge-amber">R2</span></td><td>Phê duyệt scope, cert hiệu lực, truy xuất nguồn gốc chuỗi, bằng chứng lưu giữ, re-rà soát khi scope thay đổi.</td></tr>
+<tr><td>Đóng gói / hậu cần / chung / tổng quát cung ứng</td><td>Bao bì, vật tư tiêu hao, vận chuyển, vật tư phụ không trực tiếp tạo đặc tính sản phẩm</td><td><span class="badge-blue">R3</span></td><td>PO sự rõ ràng, nhận hàng cơ bản kiểm tra, OTD giám sát, vấn đề log.</td></tr>
+<tr><td>Tổng / Chung dịch vụ / low-tác động nhà cung cấp</td><td>Dịch vụ văn phòng, vật tư gián tiếp, dịch vụ không chạm sản phẩm</td><td><span class="badge-green">R4</span></td><td>Thương mại control, dịch vụ rà soát theo nhu cầu, vấn đề log khi có phát sinh.</td></tr>
+</tbody></table></div>
+<div class="callout-warn"><b>Quy tắc:</b> Customer-chỉ đạo nhà cung cấp vẫn PHẢI được chấm rủi ro và theo dõi hiệu năng. Customer-chỉ đạo không có nghĩa là tự động "pass" cho các Job khác hoặc được miễn chứng cứ cert/truy vết/scope.</div>
+<h2>3. Cổng kiểm soát (gate) hội nhập nhân sự mới trước PO đầu tiên</h2>
+<div class="step-list">
+<div class="step-item"><b>Xác định nhóm sản phẩm và R-class.</b> Mua hàng xác định nhóm sản phẩm; QA/Kỹ thuật xác nhận mức ảnh hưởng tới CTQ, cert, vệ sinh / sạch sẽ, công đoạn đặc biệt, khách hàng yêu cầu và kinh doanh tính liên tục.</div>
+<div class="step-item"><b>Thu bộ bằng chứng.</b> Supplier hồ sơ / biên dạng, site địa chỉ, quy trình scope, khách hàng scope, cert/công nhận, bảo hiểm/liên hệ escalation, mẫu cert/MTR/CoC, công suất Photos trạng thái, NDA/data bảo vệ nếu cần.</div>
+<div class="step-item"><b>Đánh giá fit.</b> Với raw nguyên vật liệu: cấp / hạng/điều kiện/size/truy vết fit. Với Người xử lý: quy trình scope/site khớp / phù hợp. Với gia công ngoài gia công cơ khí: machine bao bì / phong bì/năng lực / khả năng/gage/quy trình control fit.</div>
+<div class="step-item"><b>Chấm rủi ro nền và thiết lập mức kiểm soát đầu vào.</b> Xác định đầu vào / nhận hàng plan, đầu tiên-lot rule, cert rà soát chiều sâu, kép-source cần và dự phòng yêu cầu.</div>
+<div class="step-item"><b>Chỉ sau khi chủ / gốc được phê duyệt mới được cấp PO.</b> PO không được phát hành trước rồi mới hợp thức hóa hồ sơ nhà cung cấp.</div>
+</div>
+<h2>4. Phương pháp thẻ điểm và trọng số</h2>
+<p>Thẻ Point-of-use thang điểm 0–100. Từng kích thước chấm theo dữ liệu thực tế, không chấm cảm tính. Nếu không có đủ lịch sử, dùng trạng thái <b>New/không đủ lịch sử</b> và áp mức kiểm soát chặt hơn thay vì tự động cho điểm cao.</p>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+<thead><tr><th>kích thước</th><th>Mô tả bắt buộc</th><th>Raw nguyên vật liệu</th><th>đặc biệt Người xử lý</th><th>Gia công ngoài gia công cơ khí</th><th>Tổng / Chung cung ứng</th></tr></thead>
+<tbody>
+<tr><td>Quality hiệu suất</td><td>Từ chối tỷ lệ, lặp lại khuyết tật, SCAR, thoát / bỏ qua, khiếu nại, lot hold</td><td>25%</td><td>25%</td><td>25%</td><td>20%</td></tr>
+<tr><td>Giao hàng độ tin cậy</td><td>OTD, đẩy nhanh tiến độ phản hồi, thời gian dẫn độ ổn định, ngắn / thiếu ship / tách / chia ship</td><td>20%</td><td>15%</td><td>20%</td><td>25%</td></tr>
+<tr><td>Cert / truy vết tính toàn vẹn</td><td>MTR/CoC/cert tính đầy đủ, lot truy vết, phiên bản kỷ luật / chuyên ngành, hồ sơ độ chính xác</td><td>25%</td><td>20%</td><td>15%</td><td>10%</td></tr>
+<tr><td>Khả năng / scope fit</td><td>Khả năng đáp ứng quy trình/size/dung sai/vệ sinh / sạch sẽ/khách hàng scope</td><td>10%</td><td>20%</td><td>20%</td><td>10%</td></tr>
+<tr><td>khả năng phản hồi / thay đổi kỷ luật / chuyên ngành</td><td>Thông báo thay đổi, phản hồi vấn đề, hành động kết thúc / đóng, minh bạch</td><td>10%</td><td>10%</td><td>10%</td><td>15%</td></tr>
+<tr><td>Kinh doanh tính liên tục / công suất</td><td>Đơn lẻ-điểm-of-hỏng / lỗi, công suất, backup lộ trình gia công, địa chính trị/hậu cần rủi ro</td><td>10%</td><td>10%</td><td>10%</td><td>20%</td></tr>
+</tbody></table></div>
+<div class="keyline"><b>Cách chấm:</b> Mỗi kích thước chấm 1–5 rồi nhân trọng số. Điểm quy đổi cuối cùng = tổng (điểm kích thước / 5 × trọng số). Chỉ dùng dữ liệu có nguồn trong Epicor hoặc SSOT; không dùng "ấn tượng cá nhân".</div>
+<h2>5. Dữ liệu dùng để chấm điểm</h2>
+<div class="two-col">
+<div class="card"><h3>5.1 SoR / SSOT</h3><p><b>Epicor</b> là nguồn cho PO, phiếu nhận / biên nhận, trả lại, đã cam kết date, thực tế phiếu nhận / biên nhận date, số lượng Received/đã từ chối, nhà cung cấp code, part/lot và giao dịch liên quan. <b>M365/SSOT</b> là nguồn cho bộ chứng từ chứng nhận, SCAR, đánh giá note, công suất rà soát, khách hàng phê duyệt bằng chứng và thư từ / giao dịch bắt buộc.</p></div>
+<div class="card"><h3>5.2 cửa sổ / khung thời gian đánh giá</h3><p>Dùng luân phiên 12 tháng cho nhà cung cấp ổn định. Supplier mới dùng luân phiên 3 tháng hoặc 3 lô đầu tiên, tùy cái nào đến sau. Không kết luận nhà cung cấp tốt/xấu chỉ bằng 1 lô nếu chưa đủ dữ liệu, trừ khi có kiểm soát cổng sự kiện nghiêm trọng.</p></div>
+</div>
+<h2>6. Kiểm soát cổng sự kiện có quyền ghi đè score</h2>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+<thead><tr><th>Sự kiện</th><th>Hành động bắt buộc</th><th>Thẩm quyền tối thiểu</th></tr></thead>
+<tbody>
+<tr><td>đã giả mạo/đã thay đổi cert, cert không truy được nguồn, sửa tay không kiểm soát</td><td>Chặn ngay; dừng PO mới; giữ toàn bộ lô liên quan; đánh giá ranh giới tác động</td><td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> Mgr + Pur Mgr, đã báo cáo vượt cấp tới GM</td></tr>
+<tr><td>Công đoạn đặc biệt cert/công nhận/scope hết hạn hoặc không đúng site/quy trình</td><td>Hold ngay; không điều phối xuất hàng thêm tới Người xử lý đó cho scope bị ảnh hưởng</td><td>Pur Mgr + <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></td></tr>
+<tr><td>CTQ thoát / bỏ qua / khách hàng khiếu nại nghiêm trọng / lặp lại khuyết tật không kiểm soát</td><td>Thử việc hoặc Chặn; SCAR bắt buộc; rà soát ngăn chặn trước khi dùng lại</td><td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> Mgr</td></tr>
+<tr><td>Supplier tự ý đổi nguồn, đổi vật liệu, đổi sub-tier hoặc đổi quy trình mà không thông báo</td><td>Hold toàn bộ Job/Lot bị ảnh hưởng; chấm điểm lại ngay; xem xét chặn / khóa</td><td>Pur Mgr + Eng/QA</td></tr>
+<tr><td>OTD thu gọn kéo dài hoặc không đáp ứng đẩy nhanh tiến độ trên item nguồn đơn (lẻ-source / nguồn đơn)</td><td>Kích hoạt dự phòng/kép-source; rà soát công suất rủi ro; tăng rà soát tần suất</td><td>Pla Mgr + Pur Mgr</td></tr>
+</tbody></table></div>
+<h2>7. Trạng thái, ngưỡng hành động và tần suất rà soát</h2>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+<thead><tr><th>Điểm / trạng thái</th><th>Ý nghĩa</th><th>Hành động bắt buộc</th><th>Tần suất rà soát tối thiểu</th></tr></thead>
+<tbody>
+<tr><td><span class="badge-green">90–100 ưu tiên</span></td><td>Hiệu năng ổn định, dữ liệu sạch, không có kiểm soát cổng sự kiện mở</td><td>Dùng theo lộ trình gia công chuẩn; vẫn giữ kiểm soát nền theo R-class</td><td>R1 hàng tháng; R2 hàng quý; R3/R4 nửa năm</td></tr>
+<tr><td><span class="badge-blue">80–89 Đã phê duyệt</span></td><td>Dùng được, còn điểm cần theo dõi</td><td>Review cải tiến theo vấn đề log; không bỏ cert/truy vết rà soát nền</td><td>R1 hàng tháng; R2 hàng quý; R3 nửa năm; R4 hàng năm</td></tr>
+<tr><td><span class="badge-amber">65–79 Có điều kiện</span></td><td>Cho phép dùng có điều kiện</td><td>Tăng đầu vào / nhận hàng kiểm tra, giới hạn scope/part nhóm sản phẩm, yêu cầu kế hoạch hành động, xem xét kép-source</td><td>Hàng tháng đến khi phục hồi</td></tr>
+<tr><td><span class="badge-red">50–64 Thử việc</span></td><td>Rủi ro cao, chỉ dùng khi có chấp thuận</td><td>PO mới cần phê duyệt tình huống-by-tình huống; phải có ngăn chặn và kế hoạch hành động; có thể chặn / khóa theo item/quy trình</td><td>Review mỗi lô hoặc mỗi tháng</td></tr>
+<tr><td><span class="badge-red">&lt; 50 Chặn</span></td><td>PHẢI chặn</td><td>Dừng PO mới; chỉ mở lại sau tái đánh giá năng lực và thẩm quyền phê duyệt</td><td>Chỉ rà soát lại khi đã có hồ sơ tái đánh giá năng lực</td></tr>
+</tbody></table></div>
+<h2>8. Quy tắc đặc biệt cho nhà cung cấp quan trọng / nghiêm trọng và khách hàng-cụ thể</h2>
+<ul class="tight">
+<li>Supplier/nhà gia công thuộc <b>R1</b> và là nguồn đơn (lẻ-source / nguồn đơn) cho Job quan trọng / nghiêm trọng PHẢI có dự phòng note hoặc phương án thay thế được duyệt bởi Kế hoạch/Mua hàng/Kỹ thuật.</li>
+<li>Customer-đã phê duyệt hoặc khách hàng-chỉ đạo source chỉ hợp lệ trong phạm vi khách hàng/scope được nêu. Không được dùng phê duyệt của khách hàng A để suy ra phê duyệt cho khách hàng B.</li>
+<li>đặc biệt Người xử lý phải được kiểm theo <a href="annex-403-approved-processor-list.html">ANNEX-403</a>; nhà cung cấp rủi ro score không thay thế việc kiểm scope/site/cert hết hạn.</li>
+<li>Raw nguyên vật liệu nhà cung cấp phải phù hợp với <a href="../03-ANNEX-300/annex-302-approved-materials-list.html">ANNEX-302</a>; score tốt không cho phép tự ý thay thế nguyên vật liệu/cấp / hạng/điều kiện.</li>
+</ul>
+<h2>8A. Quy tắc chấm 1–5 cho từng kích thước</h2>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+<thead><tr><th>kích thước</th><th>Điểm 5</th><th>Điểm 3</th><th>Điểm 1</th></tr></thead>
+<tbody>
+<tr><td>Quality hiệu suất</td><td>Không có từ chối/thoát / bỏ qua lặp, khắc phục hành động đóng đúng hạn, bằng chứng sạch.</td><td>Có vấn đề cục bộ nhưng đã ngăn chặn và không tái diễn kéo dài.</td><td>Lặp lại khuyết tật, CTQ vấn đề, thoát / bỏ qua hoặc lot từ chối kéo dài.</td></tr>
+<tr><td>Giao hàng độ tin cậy</td><td>OTD ổn định, xác nhận tiến độ chủ động, không ngắn / thiếu ship bất ngờ.</td><td>Có trễ rải rác nhưng chủ động báo trước và khôi phục / thu hồi được.</td><td>Trễ lặp lại, thiếu minh bạch, không giữ cam kết đẩy nhanh.</td></tr>
+<tr><td>Cert / truy vết tính toàn vẹn</td><td>Cert/MTR/CoC đầy đủ, đúng scope, đúng lot, không lỗi sơ đồ ánh xạ.</td><td>Có lỗi hình thức nhỏ nhưng không mất truy vết nền và đã sửa ngay.</td><td>Thiếu cert, sai lot, sai scope, chỉnh tay không kiểm soát hoặc không truy xuất nguồn gốc được nguồn.</td></tr>
+<tr><td>Khả năng / scope fit</td><td>Đúng quy trình/site/khách hàng scope, ổn định và có bằng chứng năng lực phù hợp.</td><td>Đáp ứng được nhưng còn phụ thuộc nhiều vào một Người/một máy hoặc cần giám sát tăng cường.</td><td>Không đúng scope, quá tải, năng lực không phù hợp hoặc phải làm ngoài vùng đã phê duyệt.</td></tr>
+<tr><td>khả năng phản hồi / thay đổi kỷ luật / chuyên ngành</td><td>Báo thay đổi trước, phản hồi nhanh, kế hoạch hành động rõ, đóng việc đúng hạn.</td><td>Phản hồi chậm vừa phải nhưng còn kiểm soát được.</td><td>Im lặng, né tránh, tự ý thay đổi hoặc đóng hành động hời hợt.</td></tr>
+<tr><td>Kinh doanh tính liên tục / công suất</td><td>Có năng lực dự phòng, nguồn thay thế, kế hoạch khi tăng tải hoặc gián đoạn.</td><td>Có rủi ro trung bình nhưng Received diện và có biện pháp tạm.</td><td>Đơn lẻ-điểm-of-hỏng / lỗi cao, không có backup, rủi ro hậu cần/công suất chưa kiểm soát.</td></tr>
+</tbody></table></div>
+<h2>8B. tái đánh giá năng lực sau thử việc hoặc chặn / khóa</h2>
+<p>Supplier đang ở trạng thái <b>Thử việc</b> hoặc <b>Chặn</b> chỉ được mở lại khi hoàn tất đầy đủ bộ tái đánh giá năng lực tương ứng với nguyên nhân đã bị hạ cấp. Bộ tái đánh giá năng lực tối thiểu gồm: nguyên nhân gốc đã xác minh, ngăn chặn đã hiệu lực, bằng chứng khắc phục hành động, bằng chứng lô thử hoặc lô đầu tiên sau phục hồi, cert/scope/truy vết sạch, và xác nhận thẩm quyền theo đúng nhóm sản phẩm ảnh hưởng.</p>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+<thead><tr><th>Trạng thái trước đó</th><th>Evidence mở lại tối thiểu</th><th>Ai xác minh</th><th>Ai phê duyệt mở lại</th></tr></thead>
+<tbody>
+<tr><td>Có điều kiện → Đã phê duyệt</td><td>Score hồi phục, không còn mở vấn đề quá hạn, đầu vào / nhận hàng kiểm tra tăng cường đã ổn</td><td><span class="role-cluster"><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html" title="Buyer / Purchasing (Nhan vien mua hang)"><span class="role-code">BUY</span></a><span class="role-sep">+</span><a class="role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="role-code">QA</span></a></span></td><td>Pur Mgr</td></tr>
+<tr><td>Thử việc → Có điều kiện/Đã phê duyệt</td><td>Kế hoạch hành động đóng, ít nhất 1 lô hoặc 1 tháng vận hành sạch theo loại nhà cung cấp, không còn kiểm soát cổng sự kiện mở</td><td>Mua hàng + <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> + bộ phận dùng nguồn</td><td>Pur Mgr + <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> Mgr</td></tr>
+<tr><td>Chặn → Thử việc/Có điều kiện</td><td>Tái đánh giá năng lực đầy đủ, rà soát lãnh đạo, test lot/đầu tiên phiếu nhận / biên nhận pass, khách hàng scope/cert/công đoạn đặc biệt bằng chứng hợp lệ</td><td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> Mgr + Pur Mgr + Eng/Kế hoạch khi liên quan</td><td>Tổng Giám đốc hoặc Người được ủy quyền theo thẩm quyền</td></tr>
+</tbody></table></div>
+<h2>9. Hồ sơ, KPI và tài liệu liên kết</h2>
+<div class="kpi-grid">
+<div class="kpi-box"><b>KPI-01</b><br>% nhà cung cấp/Người xử lý đúng rà soát tần suất theo R-class.</div>
+<div class="kpi-box"><b>KPI-02</b><br>Số kiểm soát cổng sự kiện không được phản ứng trong SLA.</div>
+<div class="kpi-box"><b>KPI-03</b><br>% nhà cung cấp thẻ điểm có đủ bằng chứng vết / nhật ký thay đổi và nguồn dữ liệu.</div>
+<div class="kpi-box"><b>KPI-04</b><br>% PO quan trọng / nghiêm trọng phát hành cho source đã đã phê duyệt đúng scope.</div>
+</div>
+<p><b>Hồ sơ bắt buộc:</b> nhà cung cấp hội nhập nhân sự mới pack, thẻ điểm, SCAR, công suất rà soát, cert scope bằng chứng, khách hàng phê duyệt bằng chứng và quyết định trạng thái. Tài liệu liên kết chặt: <a href="annex-402-outsource-special-process-pack.html">ANNEX-402</a>, <a href="annex-403-approved-processor-list.html">ANNEX-403</a>, <a href="../03-ANNEX-300/annex-302-approved-materials-list.html">ANNEX-302</a>, <a href="../../01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a>, <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-402_Supplier_Evaluation_Form.xlsx" download="">FRM-402</a>, <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-405_Supplier_Scorecard.xlsx" download="">FRM-405</a>.</p>
+<div data-support-control="true">
+<h2 class="h2" id="support-control-form-linkage">Kiểm soát bổ sung — liên kết to vận hành biểu mẫu</h2>
+<div class="note"><b>Triển khai</b><br>ANNEX này là mô hình rủi ro / chấm điểm / xước. Khi đưa vào điều hành, cần nối sang <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-402_Supplier_Evaluation_Form.xlsx" download="">FRM-402</a> để chốt phê duyệt scope, <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-406_SCAR.xlsx" download="">FRM-406</a> để phục hồi nguồn và <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx" download="">FRM-701</a> / <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx" download="">FRM-413</a> để kéo rủi ro xuống cổng kiểm soát phiếu nhận / biên nhận thực tế.</div>
+</div><h2 class="h2 workbook-alignment" id="workbook-alignment-annex-pur001">Biểu mẫu Excel đang hiệu lực — Nối rủi ro mô hình sang sổ tay thực hành phiếu nhận / biên nhận hiện hành</h2><div class="note workbook-alignment"><b>Rule nối dữ liệu</b><br>Rủi ro / thẻ điểm / khôi phục / thu hồi mô hình tại ANNEX-401 phải nối xuống <a href="../../../04-Bieu-Mau/07-FRM-700/FRM-701_Receiving_and_IQC_Log.xlsx" download="">FRM-701</a> sổ tay thực hành để rủi ro class thật sự đi vào phiếu nhận / biên nhận cổng kiểm soát, và dùng <a href="../../../04-Bieu-Mau/04-FRM-400/FRM-413_HOLD_and_Disposition_Log.xlsx" download="">FRM-413</a> khi cần TẠM GIỮ/disposition/phát hành. là mã không phát hành trong danh mục hiện hành và được chuẩn hóa tại ; không phải sổ tay thực hành hiện hành.</div>
+<div data-operating-rule="true">
+<h2>Quy tắc điều hành — Score-to-hành động ghi đè / bỏ qua quy tắc</h2>
+<div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Kích hoạt</th><th>Mặc định hành động</th><th>Điểm score có còn quyết định chính?</th></tr></thead><tbody>
+<tr><td>Customer thoát / bỏ qua / hàng giả / hàng nhái nghi ngờ / trái phép site-quy trình thay đổi</td><td>SCAR + sự kiện đánh giá + source-trạng thái hạ cấp ngay cho scope bị ảnh hưởng.</td><td>Không. Cổng kiểm soát sự kiện ghi đè / bỏ qua thắng điểm tổng.</td></tr>
+<tr><td>định kỳ / lặp lại cert / truy vết không khớp hoặc lặp lại phiếu nhận / biên nhận TẠM GIỮ</td><td>Giữ Có điều kiện / Thử việc và mở khôi phục / thu hồi path cụ thể.</td><td>Không, cho tới khi hiệu lực được chứng minh qua xác minh cửa sổ / khung thời gian.</td></tr>
+<tr><td>mãn tính / kéo dài công suất / tính liên tục rủi ro ở source quan trọng / nghiêm trọng</td><td>Mở thay thế / phương án khác source / dự phòng plan và báo cáo vượt cấp nếu cần.</td><td>Không hoàn toàn; rủi ro tính liên tục có thể giới hạn scope dù score khác còn ổn.</td></tr>
+</tbody></table></div>
+</div>
+</div>
+</div>
+</div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
+</body>
+</html>

@@ -1,0 +1,92 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "updated_at": "2026-04-03T00:00:00Z",
+    "updated_by": "codex",
+    "workflow_id": "HESEM-RELEASE-FOLLOWUP-V1",
+    "description": "Release-to-training and rollout follow-up policy for controlled documents and online forms."
+  },
+  "defaults": {
+    "enabled": true,
+    "due_days": 7,
+    "due_soon_hours": 72,
+    "priority": "high",
+    "watch_roles": ["qa_manager", "qms_engineer", "hr_manager"],
+    "required_actions": [
+      "Brief the process owner on the released change.",
+      "Confirm affected users training or OJT coverage.",
+      "Capture deployment evidence or implementation note."
+    ]
+  },
+  "department_rules": {
+    "QA": {
+      "owner_roles": ["qa_manager", "qms_engineer"],
+      "impacted_roles": ["qa_manager", "qms_engineer"],
+      "due_days": 5
+    },
+    "PRO": {
+      "owner_roles": ["production_director", "qa_manager"],
+      "impacted_roles": ["production_director", "shift_leader"],
+      "due_days": 5
+    },
+    "ENG": {
+      "owner_roles": ["engineering_manager", "qa_manager"],
+      "impacted_roles": ["engineering_manager", "cam_nc_programmer"],
+      "due_days": 5
+    },
+    "SCM": {
+      "owner_roles": ["supply_chain_manager", "qa_manager"],
+      "impacted_roles": ["supply_chain_manager", "buyer"],
+      "due_days": 5
+    },
+    "HR": {
+      "owner_roles": ["hr_manager", "qa_manager"],
+      "impacted_roles": ["hr_manager"],
+      "due_days": 3
+    }
+  },
+  "category_rules": {
+    "SOP": {
+      "impacted_departments": ["QA", "PRO", "ENG", "SCM"]
+    },
+    "WI": {
+      "impacted_departments": ["QA", "PRO", "ENG"]
+    },
+    "FRM": {
+      "impacted_departments": ["QA"],
+      "required_actions": [
+        "Confirm the released form is linked in the active workspace.",
+        "Confirm the affected users received the updated form usage brief.",
+        "Capture rollout evidence or pilot note before closing."
+      ]
+    },
+    "TRN": {
+      "impacted_departments": ["HR", "QA"],
+      "owner_roles": ["hr_manager", "qa_manager"],
+      "due_days": 3
+    }
+  },
+  "form_series_rules": {
+    "300": {
+      "impacted_departments": ["ENG", "QA"],
+      "owner_roles": ["engineering_manager", "qa_manager"]
+    },
+    "400": {
+      "impacted_departments": ["SCM", "QA"],
+      "owner_roles": ["supply_chain_manager", "qa_manager"]
+    },
+    "500": {
+      "impacted_departments": ["PRO", "QA"],
+      "owner_roles": ["production_director", "qa_manager"]
+    },
+    "800": {
+      "impacted_departments": ["HR", "PRO", "QA"],
+      "owner_roles": ["hr_manager", "qa_manager"],
+      "due_days": 3
+    },
+    "900": {
+      "impacted_departments": ["QA", "EXE"],
+      "owner_roles": ["qa_manager", "ceo"]
+    }
+  }
+}

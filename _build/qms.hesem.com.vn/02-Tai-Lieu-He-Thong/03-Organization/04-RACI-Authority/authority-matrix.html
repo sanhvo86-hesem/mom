@@ -1,28 +1,7 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ORG-AUTH-001 — Authority Matrix | HESEM QMS</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
-<style>
-/* PAGE BREAK & OVERFLOW FIX */
-@media print {
- .card, .table-card, .callout, .note, .box, .iso-map,
- .preface-block, .form-sheet, .lane, .legend, .req, .vstep, .auth-grid, .backup-card, .org-row {
- page-break-inside: avoid;
- break-inside: avoid;
- }
- h1, h2, h3, .h1, .h2, .h3 {
- page-break-after: avoid;
- break-after: avoid;
- }
- .form-header { page-break-inside: avoid; break-inside: avoid; }
- tr { page-break-inside: avoid; break-inside: avoid; }
- thead { display: table-header-group; }
+<div><p>thead { display: table-header-group; }
  tfoot { display: table-footer-group; }
  p { orphans: 3; widows: 3; }
- .table-card { overflow: visible !important; }
+ 
 }
 .page-body { overflow-x: hidden; }
 .table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
@@ -61,14 +40,12 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .kpi-box b{display:block;font-size:11px;color:var(--navy);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;}
 .auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
 .auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
-.backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left:4px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
-.role-boundary{border:1px solid #cfe0ff;border-left:4px solid #2563eb;border-radius:8px;background:#eef6ff;padding:14px 16px;margin:14px 0;}
-.phase-card{border:1px solid var(--ln);border-left:4px solid var(--gold);border-radius:var(--r);padding:14px;background:#fffdf5;margin:12px 0;}
+.backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
+.ranh giới trách nhiệm{border:1px solid #cfe0ff;border-left: 3px solid #2563eb;border-radius:8px;background:#eef6ff;padding:14px 16px;margin:14px 0;}
+.phase-card{border:1px solid var(--ln);border-left: 3px solid var(--gold);border-radius:var(--r);padding:14px;background:#fffdf5;margin:12px 0;}
 .phase-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
-.phase-card p:last-child,.role-boundary p:last-child,.auth-item p:last-child,.backup-card p:last-child{margin-bottom:0;}
+.phase-card p:last-child,.ranh giới trách nhiệm p:last-child,.auth-item p:last-child,.backup-card p:last-child{margin-bottom:0;}
 .small-note{font-size:12px;color:var(--ink2);}
-
-
 
 .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);margin:0 0 18px}
 .toc-title{font-weight:700;color:var(--navy);margin-bottom:10px}
@@ -79,7 +56,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .metric-card .value{font-weight:800;font-size:16px;color:var(--navy);margin:6px 0}
 .metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);font-weight:700}
 .check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0}
-.check-item{border:1px solid var(--ln);border-left:4px solid var(--blue);border-radius:var(--r);padding:14px;background:#eef6ff}
+.check-item{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:#eef6ff}
 .process-strip{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
 .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:11px;font-weight:700}
 .card-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px}
@@ -90,7 +67,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .mini-note{font-size:12px;color:var(--ink2)}
 .footer-note{margin-top:18px;padding:12px 14px;border-top:1px solid var(--ln);font-size:12px;color:var(--ink2)}
 .decision-table th,.decision-table td{vertical-align:top}
-@media (max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}.auth-grid{grid-template-columns:1fr}}
+@media (max-width: 960px){.grid-2,.grid-3{grid-template-columns:1fr}.auth-grid{grid-template-columns:1fr}}
 
 .doc-grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;}
 .doc-grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
@@ -122,56 +99,51 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .footer-note{margin-top:18px;padding:14px 16px;border:1px dashed var(--ln2);border-radius:12px;background:var(--bg2);color:var(--ink2)}
 
 
-</style>
-</head>
-<body>
-<div class="container">
-  <div class="page">
-    <div class="page-body">
-      <div class="form-header">
-        <div class="fh-left">
-          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-          <div class="fh-company"><a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a><span>Tài liệu kiểm soát</span></div>
-        </div>
-        <div class="title">
-          <strong>ORG-AUTH-001 — Authority Matrix</strong>
-          <span class="sub-vn">Trang tóm tắt để điều hướng đến authority matrix active và các ANNEX liên quan</span>
-        </div>
-        <div class="meta">
-          <div class="row"><span><b>Mã:</b></span><span>ORG-AUTH-001</span></div>
-          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS Manager</span></div>
-          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
-        </div>
-      </div>
-      <div class="doc-content" id="docContent">
-        <div class="form-sheet">
-          <div class="iso-map">
-            <div class="iso-title">Department / annex control intent</div>
-            <div class="req"><span class="req-tag shall">PHẢI</span><div>Trang này chỉ là summary portal. Mọi quyết định phê duyệt, nhả giữ, stop/restart hoặc ngoại lệ phải tra ANNEX-QMS-025 bản active.</div></div><div class="req"><span class="req-tag should">NÊN</span><div>Dùng trang này như bảng chỉ đường nhanh cho lãnh đạo và owner chức năng, không dùng thay authority matrix chi tiết.</div></div>
-          </div>
-          <div class="preface-block">
-            <div class="grid-2">
-              <div>
-                <p><b>Vai trò sử dụng</b></p>
-                <div><span class="inline-tag">All functional owners</span><span class="inline-tag">Chief Executive Officer</span><span class="inline-tag">Department Heads</span></div>
-              </div>
-              <div>
-                <p><b>Tài liệu chính</b></p>
-                <div><span class="inline-tag">ANNEX-QMS-025</span><span class="inline-tag">ANNEX-QMS-026</span><span class="inline-tag">ANNEX-QMS-027</span><span class="inline-tag">ANNEX-QMS-028</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#s1">1. Tóm tắt authority cốt lõi</a><a href="#s2">2. Điểm cần đọc cùng</a><a href="#s3">3. Khi nào phải tra ANNEX chi tiết</a></div></div>
-          <h2 class="h2" id="s1">1. Tóm tắt authority cốt lõi</h2><div class="table-card"><table class="table"><colgroup><col style="width:34%"/><col style="width:30%"/><col style="width:36%"/></colgroup><thead><tr><th>Chủ đề</th><th>Owner quyết định cuối</th><th>Tài liệu chi tiết</th></tr></thead><tbody><tr><td>Commercial commitment / order acceptance</td><td>CEO / theo ANNEX-QMS-025</td><td><a href="annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a></td></tr><tr><td>Technical release / engineering change</td><td>Engineering Lead/Manager trong phạm vi authority</td><td><a href="annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a></td></tr><tr><td>Dispatch / production recovery</td><td>Production Director / CNC Workshop Manager theo gate</td><td><a href="annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a></td></tr><tr><td>Quality hold / final release / stop-ship</td><td>QA Manager / CEO theo severity</td><td><a href="annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a></td></tr><tr><td>Supplier / outsource / inventory exception</td><td>Supply Chain Manager cùng verification liên quan</td><td><a href="annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a></td></tr><tr><td>Deputy / backup activation</td><td>HR Manager + department owner</td><td><a href="annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028</a></td></tr></tbody></table></div><h2 class="h2" id="s2">2. Điểm cần đọc cùng</h2><div class="table-card"><table class="table"><colgroup><col style="width:30%"/><col style="width:70%"/></colgroup><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody><tr><td><a href="annex-qms-026-raci-master-matrix.html">ANNEX-QMS-026</a></td><td>Làm rõ owner hoạt động/handoff khi authority đã biết.</td></tr><tr><td><a href="annex-qms-027-kpi-cascade-dictionary.html">ANNEX-QMS-027</a></td><td>Làm rõ ai sở hữu KPI và reaction rule sau quyết định.</td></tr><tr><td><a href="annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028</a></td><td>Làm rõ continuity khi owner chính vắng mặt.</td></tr></tbody></table></div><h2 class="h2" id="s3">3. Khi nào phải tra ANNEX chi tiết</h2>
-<p>Bất kỳ trường hợp nào có customer impact, cash impact, quality tạm giữ/phê duyệt, safety incident, change control, access nhạy cảm hoặc contingency activation đều phải mở bản chi tiết tại <a href="annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a>. Summary này không đủ để phê duyệt giao dịch hay release gate.</p>
-<div class="footer-note">Trang summary đã đồng bộ với bộ ANNEX active; không còn dùng REF cũ hoặc authority page legacy làm nguồn chuẩn.</div>
+<style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
+<link rel="stylesheet" href="../../../assets/style.css">
 
-        </div>
-      </div>
-    </div>
-  </div>
+</p>
+<div class="container">
+ <div class="page">
+ <div class="page-body">
+ <div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company"><a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a><span>Tài liệu kiểm soát</span></div>
+ </div>
+ <div class="title">
+<strong class="doc-name">Authority Matrix</strong>
+<span class="sub-vn">Trang tóm tắt để điều hướng đến ma trận thẩm quyền active và các ANNEX liên quan</span>
 </div>
-</body>
-</html>
+ <div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">ORG-AUTH-001</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+ </div>
+ <div class="doc-content" id="docContent">
+ <div class="form-sheet">
+ <div class="iso-map">
+  <div class="iso-title">Authority summary / mục đích điều hành</div>
+ <div class="req"><span class="req-tag shall">PHẢI</span><div>Trang này chỉ là tóm tắt portal. Mọi quyết định phê duyệt, nhả giữ, stop/khởi động lại hoặc ngoại lệ phải tra <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a> bản active. <span class="iso-clause">§5.3</span></div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Dùng trang này như bảng chỉ đường nhanh cho lãnh đạo và <a class="entity-link bundle-link bundle-chip" data-bundle="FUNC_OWNERS" href="role-and-department-bundles.html#bundle-func-owners" title="Functional Content Owners (Nhom so huu noi dung nghiep vu theo chuc nang) — CS / EST / PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA"><span class="entity-code bundle-code">FUNC_OWNERS</span></a>, không dùng thay ma trận thẩm quyền chi tiết. <span class="iso-clause">§5.3</span></div></div>
+ </div>
+ <div class="preface-block">
+ <div class="grid-2">
+ <div>
+ <p><b>Vai trò sử dụng</b></p>
+  <div><span class="inline-tag"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quan ly tai chinh)"><span class="entity-code role-code">FIN</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phong Nhan su)"><span class="entity-code dept-code">D-HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-ehs-handbook.html" title="EHS Department (Phong EHS)"><span class="entity-code dept-code">D-EHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quan tri vien CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quan tri vien he thong Epicor)"><span class="entity-code role-code">ESA</span></a></span></span><span class="inline-tag"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-sales-and-customer-service-handbook.html" title="Sales and Customer Service Department (Phong Kinh doanh va Dich vu khach hang)"><span class="entity-code dept-code">D-SCS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phong Chat luong)"><span class="entity-code dept-code">D-QUAL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-supply-chain-handbook.html" title="Supply Chain Department (Phong Chuoi cung ung)"><span class="entity-code dept-code">D-SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-finance-handbook.html" title="Finance Department (Phong Tai chinh)"><span class="entity-code dept-code">D-FIN</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phong Nhan su)"><span class="entity-code dept-code">D-HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-ehs-handbook.html" title="EHS Department (Phong EHS)"><span class="entity-code dept-code">D-EHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-epicor-handbook.html" title="ERP Administration Function (Bo phan quan tri ERP)"><span class="entity-code dept-code">D-ERP</span></a></span></span><span class="inline-tag">ANNEX-120 / ANNEX-121 / ANNEX-122 / ANNEX-123</span></div>
+ </div>
+ <div>
+ <p><b>Tài liệu chính</b></p>
+ <div><span class="inline-tag"><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></span><span class="inline-tag"><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html">ANNEX-121</a></span><span class="inline-tag"><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html">ANNEX-122</a></span><span class="inline-tag"><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></span></div>
+ </div>
+ </div>
+ </div>
+ <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#s1">1. Tóm tắt thẩm quyền cốt lõi</a><a href="#s2">2. Điểm cần đọc cùng</a><a href="#s3">3. Khi nào phải tra ANNEX chi tiết</a></div></div>
+ <h2 class="h2" id="s1">1. Tóm tắt thẩm quyền cốt lõi</h2><div class="table-card"><table class="table"><colgroup><col style="width:34%"><col style="width:30%"><col style="width:36%"></colgroup><thead><tr><th>Chủ đề</th><th>Người phụ trách quyết định cuối</th><th>Tài liệu chi tiết</th></tr></thead><tbody><tr><td>Commercial commitment / order acceptance</td><td><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a> / theo ANNEX-120</td><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></td></tr><tr><td>Phát hành kỹ thuật / engineering change</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a></span></td><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></td></tr><tr><td>Dispatch / production recovery</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a></span></td><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></td></tr><tr><td>Quality hold / final release / stop-ship</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></td><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></td></tr><tr><td>Supplier / outsource / inventory exception</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="entity-code role-code">SCM</span></a></span> + <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quan ly tai chinh)"><span class="entity-code role-code">FIN</span></a></span> theo loại exception</td><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></td></tr><tr><td>Deputy / backup activation</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a></span> + <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FUNC_HEADS" href="role-and-department-bundles.html#bundle-func-heads" title="Function Heads (Nhom dau moi dieu hanh chuc nang) — PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA"><span class="entity-code bundle-code">FUNC_HEADS</span></a></span></td><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></td></tr></tbody></table></div><h2 class="h2" id="s2">2. Điểm cần đọc cùng</h2><div class="table-card"><table class="table"><colgroup><col style="width:30%"><col style="width:70%"></colgroup><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody><tr><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html">ANNEX-121</a></td><td>Làm rõ Người phụ trách hoạt động/bàn giao khi thẩm quyền đã biết.</td></tr><tr><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html">ANNEX-122</a></td><td>Làm rõ ai sở hữu KPI và reaction rule sau quyết định.</td></tr><tr><td><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></td><td>Làm rõ continuity khi Người phụ trách chính vắng mặt.</td></tr></tbody></table></div><h2 class="h2" id="s3">3. Khi nào phải tra ANNEX chi tiết</h2>
+<p>Bất kỳ trường hợp nào có customer impact, cash impact, quality tạm giữ/phê duyệt, safety incident, kiểm soát thay đổi, access nhạy cảm hoặc contingency activation đều phải mở bản chi tiết tại <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a>. Summary này không đủ để phê duyệt giao dịch hay release cổng kiểm soát.</p>
+<div class="footer-note">Trang summary đã đồng bộ với bộ ANNEX active; không còn dùng REF cũ hoặc thẩm quyền page legacy làm nguồn chuẩn.</div>
+
+ </div>
+ </div>
+ </div>
+ </div>
+</div>
+
+</div>

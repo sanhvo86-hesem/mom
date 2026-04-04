@@ -1,27 +1,21 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>WI-513 — Hướng dẫn vận hành máy phay 5 trục | HESEM QMS</title>
-<link rel="stylesheet" href="../../../assets/style.css"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WI-513 - 5 Axis Milling Guide | HESEM QMS</title>
+<link rel="stylesheet" href="../../../assets/style.css">
 <style>
-@media print {
- .card, .table-card, .callout, .note, .box, .lane, .legend, .req, .matrix, .kpi-grid, .step-list { break-inside: avoid; page-break-inside: avoid; }
- h1, h2, h3 { break-after: avoid; page-break-after: avoid; }
- tr, td, th { break-inside: avoid; page-break-inside: avoid; }
-}
+
 .page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
 .page-body h2 {font-size: 18px; line-height: 1.4; margin:18px 0 10px; color: var(--navy);}
 .page-body h3 {font-size: 14px; line-height: 1.5; margin:12px 0 6px; color: var(--ink);}
 .page-body h4 {font-size: 13px; line-height: 1.5; margin:10px 0 6px; color: var(--ink);} 
-.table-card table {width:100%; border-collapse: collapse; font-size:12px; }
-.table-card th, .table-card td {border:1px solid var(--ln); padding:8px 10px; vertical-align: top;}
-.table-card th {background: var(--th-bg); border-color: var(--th-bdr); text-align:left;}
+
 .small {font-size:12px;}
 .tiny {font-size:11px; color: var(--ink2);} 
 .kpi-grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0;}
-.kpi-box {border:1px solid var(--ln); border-left:4px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
+.kpi-box {border:1px solid var(--ln); border-left: 3px solid var(--blue); border-radius: var(--r); padding:12px; background:#fff;}
 .badge-red,.badge-amber,.badge-green,.badge-blue,.badge-navy {display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid var(--ln);}
 .badge-red{background:#fff5f5;color:#c92a2a;border-color:#ffc9c9;}
 .badge-amber{background:#fff9db;color:#e67700;border-color:#ffe066;}
@@ -38,49 +32,48 @@
 .step-item:before {counter-increment: step; content: counter(step); position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; background:var(--navy); color:#fff; font-weight:700;}
 .matrix {display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:10px 0;}
 .card {border:1px solid var(--ln); border-radius: var(--r); padding:12px; background:#fff;}
-.callout-danger {border-left:4px solid #c92a2a; background:#fff5f5; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
-.callout-info {border-left:4px solid #1971c2; background:#eef7ff; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
-.callout-warn {border-left:4px solid #e67700; background:#fff9db; padding:10px 12px; border-radius:var(--r); margin:10px 0;}
+
 .lane {border:1px solid var(--ln); border-radius:var(--r); padding:12px; background:#fff; margin:8px 0;}
 ul.tight li {margin:4px 0;}
 hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
-@media (max-width: 900px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
+@media (max-width: 960px) { .two-col, .three-col, .kpi-grid, .matrix {grid-template-columns:1fr;} .page-body {padding:24px 18px 36px;} }
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="page">
-    <div class="page-body">
-      <div class="form-header">
-        <div class="fh-left">
-          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-          <div class="fh-company">
-            <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-            <span>Tài liệu vận hành • Work Instruction</span>
-          </div>
-        </div>
-        <div class="title"><strong>WI-513 — Hướng dẫn vận hành máy phay 5 trục</strong></div>
-        <div class="meta">
-          <div class="row"><span><b>Mã:</b></span><span>WI-513</span></div>
+ <div class="page">
+ <div class="page-body">
+ <div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu vận hành • Công việc hướng dẫn</span>
+ </div>
+ </div>
+ <div class="title">
+<strong class="doc-name">5 Axis Milling Guide</strong>
+</div>
+ <div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">WI-513</span></div>
 <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
 <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Chủ sở hữu:</b></span><span>Production Manager / Engineering Manager</span></div>
-<div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
-        </div>
-      </div>
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng cho mọi Job chạy trên máy 5-axis hoặc setup có rotary/tilt và kinematic control tương đương.</div>
-      <h1>WI-513 — Hướng dẫn vận hành máy phay 5 trục</h1>
-      <div class="section"><h2>1. Mục đích, phạm vi và điều kiện bắt buộc</h2><p>WI này áp dụng cho máy 5-axis và mọi setup có rotary/tilt/RTCP hoặc kinematic tương đương. Tài liệu này khóa các bước không được bỏ: kiểm envelope, kiểm zero rotary, prove-out theo góc nguy hiểm, và kiểm first-piece sau các thay đổi có ảnh hưởng kinematic.</p><div class="callout-danger"><strong>KHÔNG THỎA HIỆP</strong> 5-axis chỉ được chạy khi simulation, setup sheet, rotary logic, tool gauge length và clearances nói cùng một tiếng. Chỉ một điểm sai là đủ để crash giá trị lớn.</div></div><div class="section"><h2>2. Chuẩn bị rotary, fixture và kinematic</h2><div class="table-card"><table><thead><tr><th>Hạng mục</th><th>Yêu cầu bắt buộc</th><th>Điểm dừng</th></tr></thead><tbody><tr><td>Fixture envelope</td><td>Chiều cao clamp, bulông, đối trọng, ống khí/nước, probe clearance đã được xác minh</td><td>Bất kỳ phần nào vượt envelope chưa chứng minh = HOLD</td></tr>
-<tr><td>Rotary home / brake / zero</td><td>A/B/C hoặc bàn xoay phải về đúng chuẩn tham chiếu; brake và limit hoạt động đúng</td><td>Sai home/zero hoặc alarm rotary = không chạy</td></tr>
-<tr><td>RTCP/kinematic setting</td><td>Tham số machine mode, pivot length, tool center point logic đúng machine/program</td><td>Chưa xác minh = không prove-out</td></tr>
-<tr><td>Probe / calibration sphere</td><td>Probe ready hoặc có phương án zero thay thế đã phê duyệt</td><td>Probe nghi ngờ sau va chạm = HOLD cho tới khi xác minh</td></tr>
-</tbody></table></div></div><div class="section"><h2>3. Prove-out 5-axis và first-piece</h2><ul><li>Kiểm simulation kèm orientation và holder clearance cho mọi góc quay trọng yếu, không chỉ đường chạy dao trên màn hình.</li><li>Air-cut / single-block cho đoạn nhập dao đầu tiên ở mỗi orientation rủi ro cao; quan sát cả tool tip, holder và phần sau đồ gá.</li><li>Khi đổi tool length, holder, insert projection hoặc fixture shim, phải xem xét lại kinematic risk và prove-out mức phù hợp.</li><li>First-piece phải xác nhận cả hình học phụ thuộc orientation: vị trí tương quan giữa các mặt, true position, profile, tilt-sensitive features khi áp dụng.</li></ul></div><div class="section"><h2>4. Kiểm soát trong quá trình chạy và khi bất thường</h2><div class="table-card"><table><thead><tr><th>Dấu hiệu</th><th>Phản ứng bắt buộc</th></tr></thead><tbody><tr><td>Rotary rung, tiếng cạ, servo load bất thường</td><td>Feed hold hoặc E-stop theo mức độ; không restart cho tới khi xác định nguyên nhân</td></tr>
-<tr><td>Tool path đi vào vùng nghi ngờ va chạm</td><td>Dừng; kiểm simulation, WCS, orientation và tool setup trước khi chạy lại</td></tr>
-<tr><td>Kích thước drift theo góc quay hoặc sau warm-up</td><td>Khoanh vùng part affected; đo lại CTQ; xem xét thermal stabilization và kinematic check</td></tr>
-<tr><td>Part/fixture dịch chuyển sau index</td><td>HOLD toàn bộ part liên quan; kiểm lại clamp logic và mặt tựa; không sửa tắt bằng wear offset</td></tr>
-</tbody></table></div><div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">Số near-miss/crash 5-axis; first-piece pass rate; số lần phải prove-out lại do thay tool/fixture; drift sau warm-up.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;">SOP-502, SOP-504, WI-302, WI-517, WI-519, WI-516, ANNEX-ENG-001, ANNEX-HSE-001.</div></div></div></div>
-    </div>
-  </div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a></span></span></div>
+<div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+ </div>
+ 
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng cho mọi Job chạy trên máy 5-trục hoặc setup có quay/nghiêng và động học control tương đương.</div>
+ <h1>WI-513 - 5 Axis Milling Guide</h1>
+ <div class="section"><h2>1. Mục đích, phạm vi và điều kiện bắt buộc</h2><p>WI này áp dụng cho máy 5-trục và mọi setup có quay/nghiêng/RTCP hoặc động học tương đương. Tài liệu này khóa các bước không được bỏ: kiểm bao bì / phong bì, kiểm không / bằng không quay, chứng minh-out theo góc nguy hiểm, và kiểm mẫu đầu (tiên chi tiết / sản phẩm) sau các thay đổi có ảnh hưởng động học.</p><div class="callout-danger"><strong>KHÔNG THỎA HIỆP</strong> 5-trục chỉ được chạy khi mô phỏng, phiếu cài đặt, quay logic, tool dưỡng đo / đồng hồ đo chiều dài và khe hở nói cùng một tiếng. Chỉ một điểm sai là đủ để sự cố nghiêm trọng giá trị lớn.</div></div><div class="section"><h2>2. Chuẩn bị quay, fixture và động học</h2><div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Hạng mục</th><th>Yêu cầu bắt buộc</th><th>Điểm dừng</th></tr></thead><tbody><tr><td>Fixture bao bì / phong bì</td><td>Chiều cao kẹp / gá kẹp, bulông, đối trọng, ống khí/nước, đầu dò (probe) thông quan / giải phóng đã được xác minh</td><td>Bất kỳ phần nào vượt bao bì / phong bì chưa chứng minh = TẠM GIỮ</td></tr>
+<tr><td>quay home / phanh / không / bằng không</td><td>A/B/C hoặc bàn xoay phải về đúng chuẩn tham chiếu; phanh và giới hạn hoạt động đúng</td><td>Sai home/không / bằng không hoặc cảnh báo quay = không chạy</td></tr>
+<tr><td>RTCP/động học cài đặt</td><td>Tham số machine chế độ, trục / chuyển hướng chiều dài, tool trung tâm điểm logic đúng machine/program</td><td>Chưa xác minh = không chứng minh-out</td></tr>
+<tr><td>đầu dò (probe) / hiệu chuẩn hình cầu</td><td>đầu dò (probe) ready hoặc có phương án không / bằng không thay thế đã phê duyệt</td><td>đầu dò (probe) nghi ngờ sau va chạm = TẠM GIỮ cho tới khi xác minh</td></tr>
+</tbody></table></div></div><div class="section"><h2>3. Chứng minh-out 5-trục và mẫu đầu</h2><ul><li>Kiểm mô phỏng kèm định hướng / đào tạo hội nhập và cán dao / đầu gá thông quan / giải phóng cho mọi góc quay trọng yếu, không chỉ đường chạy dao trên màn hình.</li><li>Air-cut / đơn lẻ-chặn / khóa cho đoạn nhập dao đầu tiên ở mỗi định hướng / đào tạo hội nhập rủi ro cao; quan sát cả tool tip, cán dao / đầu gá và phần sau đồ gá.</li><li>Khi đổi tool chiều dài, cán dao / đầu gá, mảnh dao (insert) phép chiếu hoặc fixture miếng chêm (shim), phải xem xét lại động học rủi ro và chứng minh-out mức phù hợp.</li><li>Mẫu đầu phải xác nhận cả hình học phụ thuộc định hướng / đào tạo hội nhập: vị trí tương quan giữa các mặt, true vị trí / chức vụ, hồ sơ / biên dạng, nghiêng-nhạy cảm tính năng / đặc điểm khi áp dụng.</li></ul></div><div class="section"><h2>4. Kiểm soát trong quá trình chạy và khi bất thường</h2><div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Dấu hiệu</th><th>Phản ứng bắt buộc</th></tr></thead><tbody><tr><td>quay rung, tiếng cạ, servo load bất thường</td><td>bước tiến (feed) hold hoặc E-stop theo mức độ; không khởi động lại cho tới khi xác định nguyên nhân</td></tr>
+<tr><td>Tool path đi vào vùng nghi ngờ va chạm</td><td>Dừng; kiểm mô phỏng, WCS, định hướng / đào tạo hội nhập và tool setup trước khi chạy lại</td></tr>
+<tr><td>Kích thước trôi / sai lệch theo góc quay hoặc sau ấm / làm nóng trước-up</td><td>Khoanh vùng part bị ảnh hưởng; đo lại CTQ; xem xét nhiệt ổn định hóa và động học kiểm tra</td></tr>
+<tr><td>Part/fixture dịch chuyển sau index</td><td>TẠM GIỮ toàn bộ part liên quan; kiểm lại kẹp / gá kẹp logic và mặt tựa; không sửa tắt bằng mài mòn bù trừ (offset)</td></tr>
+</tbody></table></div><div class="kpi-grid"><div class="kpi-box"><strong>KPI bắt buộc</strong><div class="tiny" style="margin-top:6px;">Số sự cố suýt xảy ra (Cần / suýt-thiếu / bỏ sót)/sự cố nghiêm trọng 5-trục; mẫu đầu pass tỷ lệ; số lần phải chứng minh-out lại do thay tool/fixture; trôi / sai lệch sau ấm / làm nóng trước-up.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;"><a href="../../01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">SOP-502</a>, <a href="../../01-SOPs/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a>, <a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a>, <a href="wi-517-setup-changeover-smed-standard-work.html">WI-517</a>, <a href="wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a>, <a href="wi-516-machine-operation-quick-card.html">WI-516</a>, <a href="../../03-Reference/03-ANNEX-300/annex-301-setup-sheet-and-tool-list-standard.html">ANNEX-301</a>, <a href="../../03-Reference/08-ANNEX-800/annex-803-ppe-and-hazard-matrix.html">ANNEX-803</a>.</div></div></div></div>
+ </div>
+ </div>
 </div>
 </body>
 </html>

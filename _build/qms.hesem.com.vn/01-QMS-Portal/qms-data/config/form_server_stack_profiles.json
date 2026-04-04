@@ -11,7 +11,7 @@
         "X-Content-Type-Options nosniff",
         "không preview inline workbook"
       ],
-      "example_path": "04-Bieu-Mau/10-FRM-CONTROL/runtime-examples/apache-download-only-forms.conf.example",
+      "example_path": "04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/runtime-examples/apache-download-only-forms.conf.example",
       "evidence": "server-delivery-rollout-checklist + smoke test download"
     },
     {
@@ -23,7 +23,7 @@
         "nosniff",
         "không strip header ở tầng proxy"
       ],
-      "example_path": "04-Bieu-Mau/10-FRM-CONTROL/runtime-examples/nginx-download-only-forms.conf.example",
+      "example_path": "04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/runtime-examples/nginx-download-only-forms.conf.example",
       "evidence": "server-delivery-rollout-checklist + curl/header capture"
     },
     {
@@ -35,7 +35,7 @@
         "nosniff",
         "không mở inline workbook"
       ],
-      "example_path": "04-Bieu-Mau/10-FRM-CONTROL/runtime-examples/iis-download-only-forms.web.config.example",
+      "example_path": "04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/runtime-examples/iis-download-only-forms.web.config.example",
       "evidence": "server-delivery-rollout-checklist + browser download witness"
     },
     {
@@ -46,11 +46,11 @@
         "không transform xlsx thành preview",
         "cache policy không làm sai workbook mới phát hành"
       ],
-      "example_path": "04-Bieu-Mau/10-FRM-CONTROL/runtime-examples/reverse-proxy-cdn-download-policy.md",
+      "example_path": "04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/runtime-examples/reverse-proxy-cdn-download-policy.md",
       "evidence": "edge policy review + smoke test qua public endpoint"
     }
   ],
   "owner": "IT / QA-QMS",
-  "standard_ref": "03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-041-excel-form-server-stack-download-delivery-profiles.html",
+  "standard_ref": "03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/annex-136-excel-form-server-stack-download-delivery-profiles.html",
   "updated_at": "2026-03-21"
 }

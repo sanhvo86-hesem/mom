@@ -1,28 +1,7 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ORG-RACI-001 — RACI Master Matrix | HESEM QMS</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
-<style>
-/* PAGE BREAK & OVERFLOW FIX */
-@media print {
- .card, .table-card, .callout, .note, .box, .iso-map,
- .preface-block, .form-sheet, .lane, .legend, .req, .vstep, .auth-grid, .backup-card, .org-row {
- page-break-inside: avoid;
- break-inside: avoid;
- }
- h1, h2, h3, .h1, .h2, .h3 {
- page-break-after: avoid;
- break-after: avoid;
- }
- .form-header { page-break-inside: avoid; break-inside: avoid; }
- tr { page-break-inside: avoid; break-inside: avoid; }
- thead { display: table-header-group; }
+<div><p>thead { display: table-header-group; }
  tfoot { display: table-footer-group; }
  p { orphans: 3; widows: 3; }
- .table-card { overflow: visible !important; }
+ 
 }
 .page-body { overflow-x: hidden; }
 .table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
@@ -61,14 +40,12 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .kpi-box b{display:block;font-size:11px;color:var(--navy);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;}
 .auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
 .auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
-.backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left:4px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
-.role-boundary{border:1px solid #cfe0ff;border-left:4px solid #2563eb;border-radius:8px;background:#eef6ff;padding:14px 16px;margin:14px 0;}
-.phase-card{border:1px solid var(--ln);border-left:4px solid var(--gold);border-radius:var(--r);padding:14px;background:#fffdf5;margin:12px 0;}
+.backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
+.ranh giới trách nhiệm{border:1px solid #cfe0ff;border-left: 3px solid #2563eb;border-radius:8px;background:#eef6ff;padding:14px 16px;margin:14px 0;}
+.phase-card{border:1px solid var(--ln);border-left: 3px solid var(--gold);border-radius:var(--r);padding:14px;background:#fffdf5;margin:12px 0;}
 .phase-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
-.phase-card p:last-child,.role-boundary p:last-child,.auth-item p:last-child,.backup-card p:last-child{margin-bottom:0;}
+.phase-card p:last-child,.ranh giới trách nhiệm p:last-child,.auth-item p:last-child,.backup-card p:last-child{margin-bottom:0;}
 .small-note{font-size:12px;color:var(--ink2);}
-
-
 
 .toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);margin:0 0 18px}
 .toc-title{font-weight:700;color:var(--navy);margin-bottom:10px}
@@ -79,7 +56,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .metric-card .value{font-weight:800;font-size:16px;color:var(--navy);margin:6px 0}
 .metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);font-weight:700}
 .check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0}
-.check-item{border:1px solid var(--ln);border-left:4px solid var(--blue);border-radius:var(--r);padding:14px;background:#eef6ff}
+.check-item{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:#eef6ff}
 .process-strip{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
 .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:11px;font-weight:700}
 .card-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px}
@@ -90,7 +67,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .mini-note{font-size:12px;color:var(--ink2)}
 .footer-note{margin-top:18px;padding:12px 14px;border-top:1px solid var(--ln);font-size:12px;color:var(--ink2)}
 .decision-table th,.decision-table td{vertical-align:top}
-@media (max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}.auth-grid{grid-template-columns:1fr}}
+@media (max-width: 960px){.grid-2,.grid-3{grid-template-columns:1fr}.auth-grid{grid-template-columns:1fr}}
 
 .doc-grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;}
 .doc-grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
@@ -122,56 +99,51 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .footer-note{margin-top:18px;padding:14px 16px;border:1px dashed var(--ln2);border-radius:12px;background:var(--bg2);color:var(--ink2)}
 
 
-</style>
-</head>
-<body>
-<div class="container">
-  <div class="page">
-    <div class="page-body">
-      <div class="form-header">
-        <div class="fh-left">
-          <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-          <div class="fh-company"><a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a><span>Tài liệu kiểm soát</span></div>
-        </div>
-        <div class="title">
-          <strong>ORG-RACI-001 — RACI Master Matrix</strong>
-          <span class="sub-vn">Trang tóm tắt để định hướng role clusters và đường handoff trước khi mở bản RACI chi tiết</span>
-        </div>
-        <div class="meta">
-          <div class="row"><span><b>Mã:</b></span><span>ORG-RACI-001</span></div>
-          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS Manager</span></div>
-          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
-        </div>
-      </div>
-      <div class="doc-content" id="docContent">
-        <div class="form-sheet">
-          <div class="iso-map">
-            <div class="iso-title">Department / annex control intent</div>
-            <div class="req"><span class="req-tag shall">PHẢI</span><div>Trang này chỉ tóm tắt role clusters và handoff cốt lõi. RACI chi tiết ở mức hoạt động và stewardship nằm tại ANNEX-QMS-026 bản active.</div></div><div class="req"><span class="req-tag should">NÊN</span><div>Dùng trang này để orientation nhanh cho nhân sự mới hoặc khi mở đầu workshop liên chức năng.</div></div>
-          </div>
-          <div class="preface-block">
-            <div class="grid-2">
-              <div>
-                <p><b>Nhóm người dùng</b></p>
-                <div><span class="inline-tag">All functional owners</span><span class="inline-tag">New managers / supervisors</span><span class="inline-tag">Cross-functional review team</span></div>
-              </div>
-              <div>
-                <p><b>Tài liệu chính</b></p>
-                <div><span class="inline-tag">ANNEX-QMS-026</span><span class="inline-tag">ANNEX-QMS-025</span><span class="inline-tag">ANNEX-QMS-028</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#s1">1. Tóm tắt nhóm vai trò chính</a><a href="#s2">2. Handoff cốt lõi</a><a href="#s3">3. Bản chi tiết cần đọc cùng</a></div></div>
-          <h2 class="h2" id="s1">1. Tóm tắt nhóm vai trò chính</h2><div class="table-card"><table class="table"><colgroup><col style="width:18%"/><col style="width:32%"/><col style="width:50%"/></colgroup><thead><tr><th>Role cluster</th><th>Vai trò chính</th><th>Mục đích sử dụng</th></tr></thead><tbody><tr><td>Commercial</td><td>Customer Service, Estimator, CEO</td><td>RFQ, order data, customer communications, commercial commitments.</td></tr><tr><td>Engineering</td><td>Engineering Lead/Manager, Process Engineer, CAM/NC Programmer</td><td>Technical readiness, change control, release package.</td></tr><tr><td>Operations</td><td>Production Director, Planner, Workshop Manager</td><td>Capacity, dispatch, recovery, execution control.</td></tr><tr><td>Quality</td><td>QA Manager, Quality Engineer, QC Lead/QC, QMS Engineer</td><td>Containment, release, CAPA, document discipline.</td></tr><tr><td>Support</td><td>SCM, Finance, HR, EHS, IT, Epicor</td><td>Materials, money, people, safety, systems and continuity.</td></tr></tbody></table></div><h2 class="h2" id="s2">2. Handoff cốt lõi</h2><div class="table-card"><table class="table"><colgroup><col style="width:32%"/><col style="width:68%"/></colgroup><thead><tr><th>Tuyến handoff</th><th>Output tối thiểu</th></tr></thead><tbody><tr><td>RFQ → quote / order review</td><td>Complete customer data, assumptions, technical risks, pricing basis.</td></tr><tr><td>Plan → shopfloor</td><td>Ready job pack, material/tool readiness, schedule priority, gate status.</td></tr><tr><td>Make → inspect → ship</td><td>Genealogy, inspection evidence, release status, pack/ship requirements.</td></tr><tr><td>Ship → invoice / cash</td><td>Final release + ship evidence + billing trigger + AR follow-up.</td></tr><tr><td>People / IT / continuity</td><td>Authorized-to-work, access lifecycle, deputy activation, fallback rules.</td></tr></tbody></table></div><h2 class="h2" id="s3">3. Bản chi tiết cần đọc cùng</h2>
-<p><a href="annex-qms-026-raci-master-matrix.html">ANNEX-QMS-026</a> là bản chuẩn cho RACI chi tiết. Các quyền phê duyệt cuối cùng vẫn do <a href="annex-qms-025-authority-matrix.html">ANNEX-QMS-025</a> điều chỉnh; continuity người thay thế do <a href="annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028</a> điều chỉnh.</p>
-<div class="footer-note">Trang summary này đã được đồng bộ với cấu trúc role clusters mới và không còn tham chiếu REF legacy.</div>
+<style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
+<link rel="stylesheet" href="../../../assets/style.css">
 
-        </div>
-      </div>
-    </div>
-  </div>
+</p>
+<div class="container">
+ <div class="page">
+ <div class="page-body">
+ <div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company"><a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a><span>Tài liệu kiểm soát</span></div>
+ </div>
+ <div class="title">
+<strong class="doc-name">RACI Master Matrix</strong>
+<span class="sub-vn">Trang tóm tắt để định hướng vai trò nhóm / cụm và đường bàn giao trước khi mở bản RACI chi tiết</span>
 </div>
-</body>
-</html>
+ <div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">ORG-RACI-001</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+ </div>
+ <div class="doc-content" id="docContent">
+ <div class="form-sheet">
+ <div class="iso-map">
+ <div class="iso-title">Department / annex control mục đích / ý định</div>
+ <div class="req"><span class="req-tag shall">PHẢI</span><div>Trang này chỉ tóm tắt vai trò nhóm / cụm và bàn giao cốt lõi. RACI chi tiết ở mức hoạt động và quản lý tài sản nằm tại <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html">ANNEX-121</a> bản active. <span class="iso-clause">§5.3</span></div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Dùng trang này để định hướng / đào tạo hội nhập nhanh cho nhân sự mới hoặc khi mở đầu phân xưởng liên chức năng. <span class="iso-clause">§5.3</span></div></div>
+ </div>
+ <div class="preface-block">
+ <div class="grid-2">
+ <div>
+ <p><b>Nhóm Người dùng</b></p>
+ <div><span class="inline-tag">All chức năng người chịu trách nhiệm</span><span class="inline-tag">New quản lý / giám sát viên</span><span class="inline-tag">chéo-chức năng rà soát team</span></div>
+ </div>
+ <div>
+ <p><b>Tài liệu chính</b></p>
+ <div><span class="inline-tag"><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html">ANNEX-121</a></span><span class="inline-tag"><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></span><span class="inline-tag"><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></span></div>
+ </div>
+ </div>
+ </div>
+ <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#s1">1. Tóm tắt nhóm vai trò chính</a><a href="#s2">2. Bàn giao cốt lõi</a><a href="#s3">3. Bản chi tiết cần đọc cùng</a></div></div>
+ <h2 class="h2" id="s1">1. Tóm tắt nhóm vai trò chính</h2><div class="table-card"><table class="table"><colgroup><col style="width:18%"><col style="width:32%"><col style="width:50%"></colgroup><thead><tr><th>Nhóm actor / bundle</th><th>Vai trò chính</th><th>Mục đích sử dụng</th></tr></thead><tbody><tr><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-sales-and-customer-service-handbook.html" title="Sales and Customer Service Department (Phong Kinh doanh va Dich vu khach hang)"><span class="entity-code dept-code">D-SCS</span></a></span></td><td><span class="role-cluster"><a class="role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhan vien dich vu khach hang)"><span class="role-code">CS</span></a><span class="role-sep">·</span><a class="role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="role-code">EST</span></a><span class="role-sep">·</span><a class="role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="role-code">CEO</span></a></span></td><td>RFQ, dữ liệu đơn hàng, trao đổi khách hàng và cam kết thương mại.</td></tr><tr><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html" title="Process Engineer (Ky su quy trinh)"><span class="entity-code role-code">PE</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></td><td>Mức sẵn sàng kỹ thuật, kiểm soát thay đổi và bộ hồ sơ phát hành.</td></tr><tr><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a></span></td><td><span class="role-cluster"><a class="role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giam doc san xuat)"><span class="role-code">PD</span></a><span class="role-sep">·</span><a class="role-link" href="../03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="role-code">PPL</span></a><span class="role-sep">·</span><a class="role-link" href="../03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="role-code">WKM</span></a></span></td><td>Năng lực, điều độ, khôi phục và kiểm soát thực thi.</td></tr><tr><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phong Chat luong)"><span class="entity-code dept-code">D-QUAL</span></a></span></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html" title="Quality Engineer (Ky su chat luong)"><span class="entity-code role-code">QE</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (To truong QC)"><span class="entity-code role-code">QCL</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>Ngăn chặn, nhả giữ, CAPA và kỷ luật tài liệu.</td></tr><tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-finance-handbook.html" title="Finance Department (Phong Tai chinh)"><span class="entity-code dept-code">D-FIN</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phong Nhan su)"><span class="entity-code dept-code">D-HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-ehs-handbook.html" title="EHS Department (Phong EHS)"><span class="entity-code dept-code">D-EHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-epicor-handbook.html" title="ERP Administration Function (Bo phan quan tri ERP)"><span class="entity-code dept-code">D-ERP</span></a></span></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">·</span><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-finance-handbook.html" title="Finance Department (Phong Tai chinh)"><span class="entity-code dept-code">D-FIN</span></a><span class="entity-sep role-sep">·</span><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phong Nhan su)"><span class="entity-code dept-code">D-HR</span></a><span class="entity-sep role-sep">·</span><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-ehs-handbook.html" title="EHS Department (Phong EHS)"><span class="entity-code dept-code">D-EHS</span></a><span class="entity-sep role-sep">·</span><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phong CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">·</span><a class="entity-link dept-link" href="../02-Department-Handbooks/dept-epicor-handbook.html" title="ERP Administration Function (Bo phan quan tri ERP)"><span class="entity-code dept-code">D-ERP</span></a></span></td><td>Vật tư, tài chính, nhân sự, an toàn, hệ thống và tính liên tục.</td></tr></tbody></table></div><h2 class="h2" id="s2">2. Bàn giao cốt lõi</h2><div class="table-card"><table class="table"><colgroup><col style="width:32%"><col style="width:68%"></colgroup><thead><tr><th>Tuyến bàn giao</th><th>Đầu ra tối thiểu</th></tr></thead><tbody><tr><td>RFQ → báo giá / order review</td><td>Đầy đủ customer data, assumptions, technical risks, pricing basis.</td></tr><tr><td>Plan → shopfloor</td><td>Gói việc sẵn sàng, mức sẵn sàng vật tư/dụng cụ, ưu tiên lịch và trạng thái cổng kiểm soát.</td></tr><tr><td>Make → inspect → ship</td><td>Phả hệ lô, bằng chứng kiểm tra, trạng thái nhả giữ và yêu cầu đóng gói/giao hàng.</td></tr><tr><td>Ship → invoice / cash</td><td>Nhả giữ cuối + bằng chứng giao hàng + điểm kích hoạt lập hóa đơn + theo dõi AR.</td></tr><tr><td>People / IT / continuity</td><td>Điều kiện được phép làm việc, vòng đời quyền truy cập, kích hoạt phó và quy tắc dự phòng.</td></tr></tbody></table></div><h2 class="h2" id="s3">3. Bản chi tiết cần đọc cùng</h2>
+<p><a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html">ANNEX-121</a> là bản chuẩn cho RACI chi tiết. Các quyền phê duyệt cuối cùng vẫn do <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a> điều chỉnh; continuity Người thay thế do <a href="../../../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a> điều chỉnh.</p>
+<div class="footer-note">Trang summary này đã được đồng bộ với cấu trúc vai trò clusters mới và không còn tham chiếu REF legacy.</div>
+
+ </div>
+ </div>
+ </div>
+ </div>
+</div>
+
+</div>

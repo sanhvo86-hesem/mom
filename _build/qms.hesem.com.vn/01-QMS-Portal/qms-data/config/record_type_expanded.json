@@ -1,0 +1,510 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "created": "2026-03-29",
+    "description": "Expanded record type registry covering all document types in aerospace CNC manufacturing QMS. Extends the original 11 types from counters/_registry.json with production, engineering, logistics, HR, admin, and finance record types.",
+    "sources": [
+      "qms-data/counters/_registry.json",
+      "qms-data/config/document_type_registry.json"
+    ],
+    "categories": ["quality", "production", "engineering", "hr", "admin", "logistics", "finance", "maintenance"]
+  },
+
+  "record_types": {
+    "NCR": {
+      "code": "NCR",
+      "label": "Non-Conformity Report",
+      "label_vi": "Phieu bao loi khong phu hop",
+      "digits": 3,
+      "format_pattern": "NCR-{YYYY}-{NNN}",
+      "department_owner": "QA",
+      "linked_form": "FRM-631",
+      "category": "quality",
+      "description": "Documents product, process, or system nonconformance requiring disposition and corrective action"
+    },
+    "CAPA": {
+      "code": "CAPA",
+      "label": "Corrective & Preventive Action",
+      "label_vi": "Hanh dong khac phuc phong ngua",
+      "digits": 3,
+      "format_pattern": "CAPA-{YYYY}-{NNN}",
+      "department_owner": "QA",
+      "linked_form": "FRM-641",
+      "category": "quality",
+      "description": "Corrective and preventive action linked to NCR, audit finding, or customer complaint"
+    },
+    "FAI": {
+      "code": "FAI",
+      "label": "First Article Inspection",
+      "label_vi": "Kiem tra san pham dau tien",
+      "digits": 3,
+      "format_pattern": "FAI-{YYYY}-{NNN}",
+      "department_owner": "QA",
+      "linked_form": "FRM-311",
+      "category": "quality",
+      "description": "AS9102-compliant first article inspection for new part, revision, or process change"
+    },
+    "TRN": {
+      "code": "TRN",
+      "label": "Training Event",
+      "label_vi": "Su kien dao tao",
+      "digits": 3,
+      "format_pattern": "TRN-{YYYY}-{NNN}",
+      "department_owner": "HR",
+      "linked_form": "FRM-802",
+      "category": "hr",
+      "description": "Training session record including attendance, competency assessment, and sign-off"
+    },
+    "AUD": {
+      "code": "AUD",
+      "label": "Audit",
+      "label_vi": "Danh gia noi bo / ben ngoai",
+      "digits": 3,
+      "format_pattern": "AUD-{YYYY}-IA{NN}",
+      "department_owner": "QA",
+      "linked_form": "FRM-913",
+      "category": "quality",
+      "description": "Internal or external audit finding report with corrective action linkage"
+    },
+    "ECR": {
+      "code": "ECR",
+      "label": "Engineering Change Request",
+      "label_vi": "Yeu cau thay doi ky thuat",
+      "digits": 3,
+      "format_pattern": "ECR-{YYYY}-{NNN}",
+      "department_owner": "ENG",
+      "linked_form": "FRM-161",
+      "category": "engineering",
+      "description": "Formal request for engineering change to part, process, tooling, or documentation"
+    },
+    "IMP": {
+      "code": "IMP",
+      "label": "Improvement Project",
+      "label_vi": "Du an cai tien",
+      "digits": 3,
+      "format_pattern": "IMP-{YYYY}-{NNN}",
+      "department_owner": "EXE",
+      "linked_form": null,
+      "category": "quality",
+      "description": "Continual improvement project tracked through PDCA cycle"
+    },
+    "MR": {
+      "code": "MR",
+      "label": "Management Review",
+      "label_vi": "Xem xet cua lanh dao",
+      "digits": 2,
+      "format_pattern": "MR-{YYYY}-Q{N}",
+      "department_owner": "EXE",
+      "linked_form": "FRM-911",
+      "category": "admin",
+      "description": "Periodic management review meeting record per ISO 9001 clause 9.3"
+    },
+    "RISK": {
+      "code": "RISK",
+      "label": "Risk Review",
+      "label_vi": "Danh gia rui ro",
+      "digits": 2,
+      "format_pattern": "RISK-{YYYY}-R{NN}",
+      "department_owner": "EXE",
+      "linked_form": "FRM-131",
+      "category": "quality",
+      "description": "Risk assessment and review record per ISO 9001 clause 6.1"
+    },
+    "CAL": {
+      "code": "CAL",
+      "label": "Calibration Record",
+      "label_vi": "Ho so hieu chuan",
+      "digits": 3,
+      "format_pattern": "CAL-{EquipCode}-{NNN}",
+      "department_owner": "QA",
+      "linked_form": "FRM-601",
+      "category": "quality",
+      "description": "Calibration record for measurement equipment including certificate and result tracking"
+    },
+    "SCAR": {
+      "code": "SCAR",
+      "label": "Supplier Corrective Action Report",
+      "label_vi": "Hanh dong khac phuc nha cung cap",
+      "digits": 3,
+      "format_pattern": "SCAR-{YYYY}-{NNN}",
+      "department_owner": "SCM",
+      "linked_form": "FRM-403",
+      "category": "quality",
+      "description": "Supplier corrective action report for incoming quality or delivery nonconformance"
+    },
+    "DOWNTIME": {
+      "code": "DOWNTIME",
+      "label": "Downtime Record",
+      "label_vi": "Ghi nhan dung may",
+      "digits": 3,
+      "format_pattern": "DT-{YYYY}-{NNN}",
+      "department_owner": "PRO",
+      "linked_form": "FRM-512",
+      "category": "production",
+      "description": "Machine downtime event record for OEE tracking and maintenance analysis"
+    },
+    "PO-EXCEPTION": {
+      "code": "PO-EXCEPTION",
+      "label": "Purchase Order Exception",
+      "label_vi": "Ngoai le don hang mua",
+      "digits": 3,
+      "format_pattern": "POX-{YYYY}-{NNN}",
+      "department_owner": "SCM",
+      "linked_form": null,
+      "category": "logistics",
+      "description": "Purchase order exception or deviation requiring supply chain approval"
+    },
+    "RMA": {
+      "code": "RMA",
+      "label": "Return Material Authorization",
+      "label_vi": "Uy quyen tra hang",
+      "digits": 3,
+      "format_pattern": "RMA-{YYYY}-{NNN}",
+      "department_owner": "QA",
+      "linked_form": null,
+      "category": "quality",
+      "description": "Authorization for return of nonconforming material to supplier or from customer"
+    },
+    "NPI": {
+      "code": "NPI",
+      "label": "New Product Introduction",
+      "label_vi": "Gioi thieu san pham moi",
+      "digits": 3,
+      "format_pattern": "NPI-{YYYY}-{NNN}",
+      "department_owner": "ENG",
+      "linked_form": null,
+      "category": "engineering",
+      "description": "New product introduction tracking from quotation through first production run"
+    },
+    "CONCESSION": {
+      "code": "CONCESSION",
+      "label": "Concession / Use-As-Is",
+      "label_vi": "Nhuong bo / Dung nguyen trang",
+      "digits": 3,
+      "format_pattern": "CON-{YYYY}-{NNN}",
+      "department_owner": "QA",
+      "linked_form": null,
+      "category": "quality",
+      "description": "Authorization to use or release product that does not conform to specified requirements"
+    },
+    "DEVIATION": {
+      "code": "DEVIATION",
+      "label": "Process Deviation",
+      "label_vi": "Sai lech quy trinh",
+      "digits": 3,
+      "format_pattern": "DEV-{YYYY}-{NNN}",
+      "department_owner": "QA",
+      "linked_form": null,
+      "category": "quality",
+      "description": "Temporary deviation from established process, material, or specification with documented justification"
+    },
+    "REWORK": {
+      "code": "REWORK",
+      "label": "Rework Authorization",
+      "label_vi": "Uy quyen lam lai",
+      "digits": 3,
+      "format_pattern": "RWK-{YYYY}-{NNN}",
+      "department_owner": "PRO",
+      "linked_form": null,
+      "category": "production",
+      "description": "Authorization and instruction for rework of nonconforming product to meet specifications"
+    },
+    "CUSTOMER-COMPLAINT": {
+      "code": "CUSTOMER-COMPLAINT",
+      "label": "Customer Complaint",
+      "label_vi": "Khieu nai khach hang",
+      "digits": 3,
+      "format_pattern": "CC-{YYYY}-{NNN}",
+      "department_owner": "QA",
+      "linked_form": "FRM-721",
+      "category": "quality",
+      "description": "Customer complaint record requiring investigation, response, and corrective action"
+    },
+    "SUPPLIER-AUDIT": {
+      "code": "SUPPLIER-AUDIT",
+      "label": "Supplier Audit",
+      "label_vi": "Danh gia nha cung cap",
+      "digits": 3,
+      "format_pattern": "SA-{YYYY}-{NNN}",
+      "department_owner": "SCM",
+      "linked_form": null,
+      "category": "quality",
+      "description": "Supplier quality audit record including findings, score, and approval status"
+    },
+    "PART-NUMBER": {
+      "code": "PART-NUMBER",
+      "label": "Part Number Registration",
+      "label_vi": "Dang ky ma san pham",
+      "digits": 4,
+      "format_pattern": "PN-{NNNN}",
+      "department_owner": "ENG",
+      "linked_form": null,
+      "category": "engineering",
+      "description": "Unique part number assignment for new manufactured or purchased components"
+    },
+    "TOOL-NUMBER": {
+      "code": "TOOL-NUMBER",
+      "label": "Tool Number Registration",
+      "label_vi": "Dang ky ma dung cu",
+      "digits": 4,
+      "format_pattern": "TL-{NNNN}",
+      "department_owner": "PRO",
+      "linked_form": null,
+      "category": "production",
+      "description": "Unique tool number for cutting tools, holders, and tooling assemblies"
+    },
+    "GAGE-NUMBER": {
+      "code": "GAGE-NUMBER",
+      "label": "Gage Number Registration",
+      "label_vi": "Dang ky ma duong do",
+      "digits": 4,
+      "format_pattern": "GG-{NNNN}",
+      "department_owner": "QA",
+      "linked_form": null,
+      "category": "quality",
+      "description": "Unique gage/measurement equipment number for calibration tracking and traceability"
+    },
+    "FIXTURE-NUMBER": {
+      "code": "FIXTURE-NUMBER",
+      "label": "Fixture Number Registration",
+      "label_vi": "Dang ky ma do ga",
+      "digits": 4,
+      "format_pattern": "FX-{NNNN}",
+      "department_owner": "ENG",
+      "linked_form": null,
+      "category": "engineering",
+      "description": "Unique fixture/jig number for workholding devices used in CNC machining"
+    },
+    "WORK-INSTRUCTION-NUMBER": {
+      "code": "WORK-INSTRUCTION-NUMBER",
+      "label": "Work Instruction",
+      "label_vi": "Huong dan cong viec",
+      "digits": 3,
+      "format_pattern": "WI-{NNN}",
+      "department_owner": "QA",
+      "linked_form": null,
+      "category": "admin",
+      "description": "Controlled work instruction document number for operator-level procedures"
+    },
+    "SOP-NUMBER": {
+      "code": "SOP-NUMBER",
+      "label": "Standard Operating Procedure",
+      "label_vi": "Quy trinh thao tac chuan",
+      "digits": 3,
+      "format_pattern": "SOP-{NNN}",
+      "department_owner": "QA",
+      "linked_form": null,
+      "category": "admin",
+      "description": "Controlled SOP document number for department-level procedures"
+    },
+    "ANNEX-NUMBER": {
+      "code": "ANNEX-NUMBER",
+      "label": "Annex / Supporting Document",
+      "label_vi": "Phu luc / Tai lieu ho tro",
+      "digits": 3,
+      "format_pattern": "ANNEX-{NNN}",
+      "department_owner": "QA",
+      "linked_form": null,
+      "category": "admin",
+      "description": "Controlled annex document number for supporting references and appendices"
+    },
+    "JD-NUMBER": {
+      "code": "JD-NUMBER",
+      "label": "Job Description",
+      "label_vi": "Mo ta cong viec",
+      "digits": 3,
+      "format_pattern": "JD-{DeptCode}-{NNN}",
+      "department_owner": "HR",
+      "linked_form": null,
+      "category": "hr",
+      "description": "Controlled job description document for each role in the organization"
+    },
+    "PM-ORDER": {
+      "code": "PM-ORDER",
+      "label": "Preventive Maintenance Order",
+      "label_vi": "Lenh bao tri phong ngua",
+      "digits": 3,
+      "format_pattern": "PM-{YYYY}-{NNN}",
+      "department_owner": "PRO",
+      "linked_form": "FRM-521",
+      "category": "maintenance",
+      "description": "Scheduled preventive maintenance work order for CNC machines and equipment"
+    },
+    "CM-ORDER": {
+      "code": "CM-ORDER",
+      "label": "Corrective Maintenance Order",
+      "label_vi": "Lenh bao tri khac phuc",
+      "digits": 3,
+      "format_pattern": "CM-{YYYY}-{NNN}",
+      "department_owner": "PRO",
+      "linked_form": null,
+      "category": "maintenance",
+      "description": "Unplanned corrective maintenance work order for equipment breakdown or failure"
+    },
+    "SPARE-PART": {
+      "code": "SPARE-PART",
+      "label": "Spare Part Request",
+      "label_vi": "Yeu cau phu tung",
+      "digits": 3,
+      "format_pattern": "SP-{YYYY}-{NNN}",
+      "department_owner": "PRO",
+      "linked_form": null,
+      "category": "maintenance",
+      "description": "Request for spare parts or maintenance consumables for equipment repair"
+    },
+    "MSA": {
+      "code": "MSA",
+      "label": "Measurement System Analysis",
+      "label_vi": "Phan tich he thong do",
+      "digits": 3,
+      "format_pattern": "MSA-{YYYY}-{NNN}",
+      "department_owner": "QA",
+      "linked_form": null,
+      "category": "quality",
+      "description": "Gage R&R and measurement system analysis study per AIAG MSA requirements"
+    },
+    "SPC-STUDY": {
+      "code": "SPC-STUDY",
+      "label": "SPC Study",
+      "label_vi": "Nghien cuu SPC",
+      "digits": 3,
+      "format_pattern": "SPC-{YYYY}-{NNN}",
+      "department_owner": "QA",
+      "linked_form": null,
+      "category": "quality",
+      "description": "Statistical process control study for process capability (Cp/Cpk) and control chart analysis"
+    },
+    "PFMEA": {
+      "code": "PFMEA",
+      "label": "Process FMEA",
+      "label_vi": "FMEA quy trinh",
+      "digits": 3,
+      "format_pattern": "PFMEA-{YYYY}-{NNN}",
+      "department_owner": "ENG",
+      "linked_form": "FRM-132",
+      "category": "engineering",
+      "description": "Process failure mode and effects analysis for risk assessment of manufacturing operations"
+    },
+    "CONTROL-PLAN": {
+      "code": "CONTROL-PLAN",
+      "label": "Control Plan",
+      "label_vi": "Ke hoach kiem soat",
+      "digits": 3,
+      "format_pattern": "CP-{YYYY}-{NNN}",
+      "department_owner": "ENG",
+      "linked_form": null,
+      "category": "engineering",
+      "description": "Control plan defining inspection methods, frequencies, and reaction plans for each process step"
+    },
+    "MATERIAL-CERT": {
+      "code": "MATERIAL-CERT",
+      "label": "Material Certificate",
+      "label_vi": "Chung nhan vat lieu",
+      "digits": 3,
+      "format_pattern": "MC-{YYYY}-{NNN}",
+      "department_owner": "SCM",
+      "linked_form": null,
+      "category": "logistics",
+      "description": "Material test report / mill certificate tracking for incoming raw material traceability"
+    },
+    "SHIPPING-RELEASE": {
+      "code": "SHIPPING-RELEASE",
+      "label": "Shipping Release",
+      "label_vi": "Lenh xuat hang",
+      "digits": 3,
+      "format_pattern": "SR-{YYYY}-{NNN}",
+      "department_owner": "WH",
+      "linked_form": "FRM-711",
+      "category": "logistics",
+      "description": "Authorization to ship completed product including packing list, COC, and delivery note"
+    },
+    "RECEIVING-RECORD": {
+      "code": "RECEIVING-RECORD",
+      "label": "Receiving Record",
+      "label_vi": "Phieu nhap kho",
+      "digits": 3,
+      "format_pattern": "RR-{YYYY}-{NNN}",
+      "department_owner": "WH",
+      "linked_form": "FRM-701",
+      "category": "logistics",
+      "description": "Incoming material receiving record including IQC result and storage location"
+    },
+    "EHS-INCIDENT": {
+      "code": "EHS-INCIDENT",
+      "label": "EHS Incident Report",
+      "label_vi": "Bao cao su co an toan",
+      "digits": 3,
+      "format_pattern": "EHS-{YYYY}-{NNN}",
+      "department_owner": "EHS",
+      "linked_form": null,
+      "category": "quality",
+      "description": "Environmental health and safety incident report including near-miss and accident records"
+    },
+    "DOC-CHANGE": {
+      "code": "DOC-CHANGE",
+      "label": "Document Change Notice",
+      "label_vi": "Thong bao thay doi tai lieu",
+      "digits": 3,
+      "format_pattern": "DCN-{YYYY}-{NNN}",
+      "department_owner": "QA",
+      "linked_form": null,
+      "category": "admin",
+      "description": "Formal notice of change to controlled QMS document requiring review and distribution"
+    },
+    "NC-PROGRAM": {
+      "code": "NC-PROGRAM",
+      "label": "NC Program Registration",
+      "label_vi": "Dang ky chuong trinh NC",
+      "digits": 4,
+      "format_pattern": "NC-{PartCode}-{OP}-{VNN}",
+      "department_owner": "ENG",
+      "linked_form": null,
+      "category": "engineering",
+      "description": "CNC program version registration linking part number, operation, and program revision"
+    },
+    "COST-ESTIMATE": {
+      "code": "COST-ESTIMATE",
+      "label": "Cost Estimate",
+      "label_vi": "Bao gia / Du toan chi phi",
+      "digits": 3,
+      "format_pattern": "CE-{YYYY}-{NNN}",
+      "department_owner": "SAL",
+      "linked_form": "FRM-201",
+      "category": "finance",
+      "description": "Manufacturing cost estimate for quotation including material, labor, overhead, and margin"
+    },
+    "INTERNAL-AUDIT-PLAN": {
+      "code": "INTERNAL-AUDIT-PLAN",
+      "label": "Internal Audit Plan",
+      "label_vi": "Ke hoach danh gia noi bo",
+      "digits": 2,
+      "format_pattern": "IAP-{YYYY}-{NN}",
+      "department_owner": "QA",
+      "linked_form": null,
+      "category": "quality",
+      "description": "Annual or periodic internal audit schedule and plan per ISO 9001 clause 9.2"
+    },
+    "EMPLOYEE-COMPETENCY": {
+      "code": "EMPLOYEE-COMPETENCY",
+      "label": "Employee Competency Record",
+      "label_vi": "Ho so nang luc nhan vien",
+      "digits": 4,
+      "format_pattern": "EC-{EmpCode}",
+      "department_owner": "HR",
+      "linked_form": null,
+      "category": "hr",
+      "description": "Individual employee competency matrix tracking skills, certifications, and training history"
+    }
+  },
+
+  "categories": {
+    "quality":      { "label": "Quality",      "label_vi": "Chat luong",   "color": "#dc2626", "icon": "shield-check" },
+    "production":   { "label": "Production",   "label_vi": "San xuat",     "color": "#059669", "icon": "factory" },
+    "engineering":  { "label": "Engineering",  "label_vi": "Ky thuat",     "color": "#0369a1", "icon": "cog" },
+    "hr":           { "label": "HR",           "label_vi": "Nhan su",      "color": "#8b5cf6", "icon": "users" },
+    "admin":        { "label": "Admin",        "label_vi": "Hanh chinh",   "color": "#6b7280", "icon": "file-text" },
+    "logistics":    { "label": "Logistics",    "label_vi": "Kho van",      "color": "#d97706", "icon": "truck" },
+    "finance":      { "label": "Finance",      "label_vi": "Tai chinh",    "color": "#f59e0b", "icon": "dollar-sign" },
+    "maintenance":  { "label": "Maintenance",  "label_vi": "Bao tri",      "color": "#14b8a6", "icon": "wrench" }
+  }
+}

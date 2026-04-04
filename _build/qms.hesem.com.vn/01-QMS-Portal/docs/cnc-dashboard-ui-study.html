@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HESEM QMS | CNC Dashboard UI Study</title>
+<link rel="icon" href="data:,">
+<style>
+:root {
+  --bg: #07101c;
+  --ink: #101725;
+  --muted: #58677f;
+  --line: rgba(16, 23, 37, 0.12);
+  --panel: rgba(255, 255, 255, 0.92);
+  --accent: #1677ff;
+  --good: #169b62;
+  --warn: #c17a10;
+  --danger: #d3463b;
+  --good-soft: rgba(22, 155, 98, 0.12);
+  --warn-soft: rgba(193, 122, 16, 0.12);
+  --danger-soft: rgba(211, 70, 59, 0.12);
+  --shadow: 0 30px 90px rgba(4, 11, 20, 0.24);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Aptos", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(193, 122, 16, 0.24), transparent 30%),
+    radial-gradient(circle at top right, rgba(22, 119, 255, 0.18), transparent 28%),
+    linear-gradient(180deg, #09111c 0%, #122132 40%, #e8edf2 100%);
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+  background-size: 120px 120px;
+  mask-image: linear-gradient(180deg, rgba(0,0,0,.7), transparent 72%);
+}
+.study-shell {
+  width: min(calc(100% - 32px), 1480px);
+  margin: 24px auto 48px;
+}
+.study-header,
+.study-panel,
+.study-footer {
+  border-radius: 30px;
+  box-shadow: var(--shadow);
+}
+.study-header {
+  padding: 32px 34px;
+  color: #f7fafc;
+  background: linear-gradient(145deg, rgba(8,18,30,.88), rgba(16,29,46,.92));
+  border: 1px solid rgba(255,255,255,.14);
+}
+.header-topline,
+.study-nav,
+.header-copy,
+.thesis-grid,
+.panel-intro,
+.decision-grid,
+.mobile-grid,
+.principle-grid,
+.source-grid,
+.signal-strip,
+.phase-track,
+.link-strip,
+.context-strip,
+.machine-list,
+.cadence-list {
+  display: grid;
+  gap: 14px;
+}
+.header-topline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(247,250,252,.7);
+}
+.header-divider {
+  width: 32px;
+  height: 1px;
+  background: rgba(255,255,255,.2);
+}
+.header-kicker,
+.eyebrow,
+.panel-kicker,
+.surface-kicker,
+.thesis-label,
+.decision-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.header-kicker,
+.eyebrow {
+  color: #f6cc7f;
+}
+.header-copy {
+  grid-template-columns: 1.5fr .9fr;
+  margin-top: 26px;
+}
+.study-header h1,
+.panel-intro h2,
+.study-footer h2 {
+  margin: 0;
+  font-family: "Bahnschrift", "Segoe UI", sans-serif;
+  letter-spacing: -.03em;
+}
+.study-header h1 {
+  max-width: 10ch;
+  font-size: clamp(2.6rem, 5vw, 4.3rem);
+  line-height: .96;
+}
+.header-lead,
+.panel-intro p,
+.mobile-copy p,
+.study-footer p,
+.thesis-card p,
+.decision-card p,
+.principle-card p {
+  line-height: 1.72;
+}
+.header-lead {
+  max-width: 66ch;
+  margin: 18px 0 0;
+  color: rgba(247,250,252,.82);
+}
+.header-note {
+  align-self: end;
+  padding: 20px 22px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.04);
+}
+.header-note span { display: block; margin-bottom: 12px; color: rgba(247,250,252,.64); text-transform: uppercase; font-size: 12px; }
+.header-note strong { display: block; font-size: 1.12rem; line-height: 1.55; }
+.thesis-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 26px;
+}
+.thesis-card,
+.decision-card,
+.principle-card {
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+}
+.study-nav {
+  position: sticky;
+  top: 12px;
+  z-index: 10;
+  display: inline-flex;
+  flex-wrap: wrap;
+  margin: 22px 0 18px;
+  padding: 8px;
+  gap: 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(12,21,34,.72);
+  backdrop-filter: blur(18px);
+}
+.study-tab,
+.segmented-control button,
+.phase-node {
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+.study-tab {
+  padding: 11px 16px;
+  border-radius: 999px;
+  color: rgba(247,250,252,.76);
+  background: transparent;
+}
+.study-tab.is-active { color: #09111c; background: #f6f9fc; }
+.study-panel {
+  display: none;
+  padding: 28px;
+  background: linear-gradient(180deg, rgba(244,247,251,.86), rgba(250,252,255,.92));
+  border: 1px solid rgba(255,255,255,.24);
+}
+.study-panel.is-active { display: block; }
+.panel-intro {
+  grid-template-columns: 1.35fr 1fr;
+  align-items: end;
+}
+.panel-kicker,
+.surface-kicker,
+.decision-label { color: var(--accent); }
+.panel-intro p,
+.mobile-copy p { margin: 14px 0 0; color: var(--muted); }
+.panel-controls {
+  display: grid;
+  gap: 14px;
+  justify-items: end;
+}
+.segmented-control {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 999px;
+  background: rgba(16,23,37,.06);
+  border: 1px solid rgba(16,23,37,.08);
+}
+.segmented-control button {
+  padding: 10px 14px;
+  border-radius: 999px;
+  color: var(--muted);
+  background: transparent;
+}
+.segmented-control button.is-active { color: #fff; background: var(--ink); }
+.focus-copy {
+  margin: 0;
+  max-width: 48ch;
+  color: var(--muted);
+  text-align: right;
+}
+.prototype-frame {
+  margin-top: 22px;
+  overflow: hidden;
+  border-radius: 28px;
+  background: linear-gradient(180deg, #e4ebf1, #f6f8fb 18%);
+  border: 1px solid rgba(16,23,37,.1);
+}
+.frame-topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  background: rgba(8,15,24,.92);
+  color: rgba(247,250,252,.86);
+}
+.frame-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.32);
+}
+.frame-title {
+  margin-left: 6px;
+  font-size: 13px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.live-board,
+.deploy-board {
+  display: grid;
+  gap: 18px;
+  padding: 20px;
+}
+.live-board {
+  grid-template-columns: 1.65fr .95fr;
+  grid-template-areas:
+    "banner banner"
+    "flow exception"
+    "machine inspector"
+    "documents documents";
+}
+.deploy-board {
+  grid-template-columns: 1.45fr 1fr;
+  grid-template-areas:
+    "banner banner"
+    "phase phase"
+    "heatmap gate"
+    "cadence gate"
+    "evidence evidence";
+}
+.surface {
+  padding: 22px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(248,250,252,.96));
+  border: 1px solid var(--line);
+}
+.surface-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: start;
+  margin-bottom: 18px;
+}
+.surface-head h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  line-height: 1.15;
+  letter-spacing: -.02em;
+}
+.head-note {
+  max-width: 24ch;
+  color: var(--muted);
+  text-align: right;
+}
+.live-banner { grid-area: banner; }
+.flow-surface { grid-area: flow; }
+.exception-surface { grid-area: exception; }
+.machine-surface { grid-area: machine; }
+.inspector-surface { grid-area: inspector; }
+.document-surface { grid-area: documents; }
+.deploy-banner { grid-area: banner; }
+.phase-surface { grid-area: phase; }
+.heatmap-surface { grid-area: heatmap; }
+.gate-surface { grid-area: gate; }
+.cadence-surface { grid-area: cadence; }
+.evidence-surface { grid-area: evidence; }
+.signal-strip {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 18px;
+  gap: 10px;
+}
+.signal-chip {
+  display: grid;
+  gap: 6px;
+  padding: 14px 14px 16px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+}
+.signal-chip span {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.signal-chip strong {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+.signal-chip.success { background: var(--good-soft); color: #0d6c47; }
+.signal-chip.warn { background: var(--warn-soft); color: #9a610f; }
+.signal-chip.danger { background: var(--danger-soft); color: #ab3129; }
+.signal-chip.neutral { background: rgba(16,23,37,.06); color: var(--ink); }
+.order-table,
+.heatmap-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.order-table thead th,
+.heatmap-table thead th {
+  padding: 0 0 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.order-row { cursor: pointer; }
+.order-row td {
+  padding: 16px 12px 16px 0;
+  border-bottom: 1px solid rgba(16,23,37,.08);
+  vertical-align: middle;
+}
+.order-row.is-selected td,
+.order-row:hover td {
+  background: rgba(22,119,255,.05);
+}
+.order-row td strong,
+.heatmap-table tbody td strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 1rem;
+}
+.order-row td span,
+.heatmap-table tbody td span {
+  display: block;
+  color: var(--muted);
+}
+.gate-track {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 5px;
+}
+.gate-track span {
+  padding: 8px 0;
+  border-radius: 999px;
+  border: 1px solid rgba(16,23,37,.1);
+  background: rgba(16,23,37,.04);
+  color: var(--muted);
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.gate-track.gate-g3 span:nth-child(-n+4),
+.gate-track.gate-g4 span:nth-child(-n+5),
+.gate-track.gate-g5 span:nth-child(-n+6),
+.gate-track.gate-g6 span:nth-child(-n+7) {
+  color: #fff;
+  background: linear-gradient(90deg, var(--accent), #4ca7ff);
+  border-color: transparent;
+}
+.constraint-cell { font-weight: 700; }
+.danger-text { color: var(--danger); }
+.warn-text { color: var(--warn); }
+.neutral-text { color: #38506c; }
+.issue-list {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.issue-list li {
+  padding-left: 16px;
+  border-left: 3px solid rgba(16,23,37,.12);
+}
+.issue-list strong {
+  display: block;
+  margin-bottom: 4px;
+  line-height: 1.35;
+}
+.issue-list span {
+  display: block;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.machine-list,
+.cadence-list {
+  gap: 10px;
+}
+.machine-row,
+.cadence-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(16,23,37,.08);
+}
+.machine-row strong,
+.cadence-list strong {
+  font-size: .98rem;
+}
+.machine-row span,
+.cadence-list span {
+  max-width: 38ch;
+  text-align: right;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.machine-row.running strong { color: var(--good); }
+.machine-row.setup strong { color: var(--warn); }
+.machine-row.inspect strong { color: var(--accent); }
+.machine-row.idle strong { color: #516179; }
+.inspector-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 18px;
+  margin: 0;
+}
+.inspector-grid dt {
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.inspector-grid dd {
+  margin: 0;
+  line-height: 1.65;
+}
+.link-strip,
+.context-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.link-strip { margin-top: 18px; }
+.link-strip span,
+.context-strip span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 9px 12px;
+  border-radius: 999px;
+  background: rgba(16,23,37,.06);
+  border: 1px solid rgba(16,23,37,.08);
+}
+.phase-track {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+.phase-node {
+  padding: 16px 14px;
+  border-radius: 18px;
+  background: rgba(16,23,37,.05);
+  color: var(--muted);
+  border: 1px solid rgba(16,23,37,.1);
+  text-align: left;
+  line-height: 1.2;
+}
+.phase-node span {
+  display: block;
+  margin-top: 6px;
+}
+.phase-node.is-active {
+  background: linear-gradient(135deg, var(--ink), #25364f);
+  color: #fff;
+  border-color: transparent;
+}
+.heatmap-table tbody td {
+  padding: 14px 10px 14px 0;
+  border-bottom: 1px solid rgba(16,23,37,.08);
+  vertical-align: middle;
+}
+.heatmap-table tbody td.done,
+.heatmap-table tbody td.warn,
+.heatmap-table tbody td.danger,
+.heatmap-table tbody td.todo {
+  padding: 10px 12px;
+  border-radius: 14px;
+  text-align: center;
+  font-size: .88rem;
+  font-weight: 700;
+}
+.heatmap-table tbody td.done { background: var(--good-soft); color: #0d6c47; }
+.heatmap-table tbody td.warn { background: var(--warn-soft); color: #9a610f; }
+.heatmap-table tbody td.danger { background: var(--danger-soft); color: #ab3129; }
+.heatmap-table tbody td.todo { background: rgba(16,23,37,.06); color: var(--muted); }
+.decision-grid,
+.principle-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 18px;
+}
+.mobile-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 22px;
+}
+.phone-study {
+  display: grid;
+  gap: 14px;
+}
+.phone-shell {
+  width: min(100%, 360px);
+  margin: 0 auto;
+  padding: 14px;
+  border-radius: 34px;
+  background: linear-gradient(180deg, #07101c, #1a2738);
+  box-shadow: 0 26px 80px rgba(7,16,28,.32);
+}
+.phone-notch {
+  width: 132px;
+  height: 26px;
+  margin: 0 auto 10px;
+  border-radius: 0 0 18px 18px;
+  background: #03070d;
+}
+.phone-screen {
+  display: grid;
+  gap: 10px;
+  min-height: 620px;
+  padding: 18px 16px 20px;
+  border-radius: 26px;
+  background: linear-gradient(180deg, #f7fafc, #eef3f8);
+}
+.phone-header,
+.phone-row,
+.phone-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.phone-header span,
+.phone-row span { color: var(--muted); }
+.phone-alert {
+  padding: 12px 14px;
+  border-radius: 16px;
+  font-weight: 700;
+}
+.phone-alert.danger { color: #ab3129; background: var(--danger-soft); }
+.phone-alert.warn { color: #9a610f; background: var(--warn-soft); }
+.phone-list {
+  display: grid;
+  gap: 8px;
+}
+.phone-row {
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(16,23,37,.08);
+}
+.phone-inspector {
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(16,23,37,.05);
+}
+.phone-inspector strong {
+  display: block;
+  margin-bottom: 6px;
+}
+.phone-inspector p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.phone-actions { margin-top: auto; }
+.phone-actions span {
+  flex: 1;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 42px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-size: .88rem;
+  font-weight: 700;
+}
+.mobile-copy h3 { margin: 0 0 8px; font-size: 1.1rem; }
+.study-footer {
+  margin-top: 18px;
+  padding: 28px;
+  color: #f7fafc;
+  background: linear-gradient(160deg, rgba(8,18,30,.88), rgba(16,29,46,.92));
+  border: 1px solid rgba(255,255,255,.12);
+}
+.footer-copy {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 20px;
+  align-items: end;
+}
+.source-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 20px;
+  gap: 10px;
+}
+.source-grid a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  color: #f7fafc;
+  text-decoration: none;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.08);
+}
+.study-shell[data-role="operator"] .machine-surface,
+.study-shell[data-role="operator"] .flow-surface,
+.study-shell[data-role="quality"] .exception-surface,
+.study-shell[data-role="quality"] .inspector-surface,
+.study-shell[data-role="planner"] .flow-surface,
+.study-shell[data-role="planner"] .document-surface,
+.study-shell[data-role="executive"] .exception-surface,
+.study-shell[data-role="executive"] .deploy-banner {
+  border-color: rgba(22,119,255,.32);
+  box-shadow: 0 16px 46px rgba(22,119,255,.09);
+}
+@media (max-width: 1220px) {
+  .header-copy,
+  .panel-intro,
+  .footer-copy {
+    grid-template-columns: 1fr;
+  }
+  .panel-controls { justify-items: start; }
+  .focus-copy { text-align: left; }
+  .live-board,
+  .deploy-board {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "banner"
+      "flow"
+      "exception"
+      "machine"
+      "inspector"
+      "documents";
+  }
+  .deploy-board {
+    grid-template-areas:
+      "banner"
+      "phase"
+      "heatmap"
+      "gate"
+      "cadence"
+      "evidence";
+  }
+}
+@media (max-width: 860px) {
+  .study-shell { width: min(calc(100% - 20px), 1480px); margin: 12px auto 28px; }
+  .study-header, .study-panel, .study-footer { padding: 22px 18px; border-radius: 24px; }
+  .thesis-grid, .decision-grid, .principle-grid, .mobile-grid, .source-grid, .signal-strip, .inspector-grid { grid-template-columns: 1fr; }
+  .phase-track { grid-template-columns: 1fr; }
+  .surface-head, .machine-row, .cadence-list div, .phone-header, .phone-row, .phone-actions { flex-direction: column; align-items: start; }
+  .machine-row span, .cadence-list span, .head-note { text-align: left; }
+  .gate-track { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+</style>
+</head>
+<body>
+<div class="study-shell" data-role="operator" data-phase="pilot">
+  <header class="study-header">
+    <div class="header-topline">
+      <span class="header-kicker">HESEM QMS</span>
+      <span class="header-divider"></span>
+      <span>CNC job-order dashboard study</span>
+      <span class="header-divider"></span>
+      <span>27/03/2026</span>
+    </div>
+    <div class="header-copy">
+      <div>
+        <p class="eyebrow">Research to blueprint</p>
+        <h1>Blueprint giao diện cho 2 dashboard CNC job-order</h1>
+        <p class="header-lead">Study nay chuyen hai man hinh hien tai tu document portal thanh control surface cho xuong CNC. Muc tieu la nhin thay cung luc don hang, may, quality, revision, traceability va owner cua moi blocker.</p>
+      </div>
+      <div class="header-note">
+        <span>Inference tu Siemens, SAP, Tulip, MachineMetrics, ProShop</span>
+        <strong>Dashboard chuan van hanh khong bat dau bang thu vien tai lieu; no bat dau bang exception va quyet dinh.</strong>
+      </div>
+    </div>
+    <div class="thesis-grid">
+      <article class="thesis-card">
+        <span class="thesis-label">Visual thesis</span>
+        <p>Industrial control wall, it mau, it chrome, nhan manh risk. Flowboard va heatmap la visual anchor thay vi stat card.</p>
+      </article>
+      <article class="thesis-card">
+        <span class="thesis-label">Content plan</span>
+        <p>Dashboard 1 uu tien live order, may, hold point. Dashboard 2 uu tien phase, readiness, blocker, owner va evidence.</p>
+      </article>
+      <article class="thesis-card">
+        <span class="thesis-label">Interaction thesis</span>
+        <p>Click job mo inspector. Click phase doi focus gate. Role filter doi trong tam hien thi ma khong lam roi layout.</p>
+      </article>
+    </div>
+  </header>
+
+  <nav class="study-nav" aria-label="Study panels">
+    <button class="study-tab is-active" type="button" data-panel="live">01 Live execution</button>
+    <button class="study-tab" type="button" data-panel="deploy">02 Deployment control</button>
+    <button class="study-tab" type="button" data-panel="mobile">03 Mobile behavior</button>
+  </nav>
+
+  <main>
+    <section class="study-panel is-active" id="panel-live">
+      <div class="panel-intro">
+        <div>
+          <p class="panel-kicker">Dashboard 1</p>
+          <h2>Live Execution Command Desk</h2>
+          <p>Viewport dau khong con la thu vien document. No la mat tran quyet dinh: job nao tre, gate nao nghen, may nao dung, revision nao sai, FAI nao chua xong.</p>
+        </div>
+        <div class="panel-controls">
+          <div class="segmented-control" aria-label="Role focus">
+            <button class="is-active" type="button" data-role-target="operator">Operator</button>
+            <button type="button" data-role-target="quality">Quality</button>
+            <button type="button" data-role-target="planner">Planner</button>
+            <button type="button" data-role-target="executive">Executive</button>
+          </div>
+          <p class="focus-copy" id="role-focus-copy">Operator focus: uu tien hot jobs, setup readiness, machine state va WI tai diem dung.</p>
+        </div>
+      </div>
+
+      <div class="prototype-frame">
+        <div class="frame-topbar">
+          <span class="frame-dot"></span>
+          <span class="frame-dot"></span>
+          <span class="frame-dot"></span>
+          <span class="frame-title">HESEM QMS / Live execution prototype</span>
+        </div>
+        <div class="live-board">
+          <section class="surface live-banner">
+            <div>
+              <span class="surface-kicker">Shift command strip</span>
+              <h3>Ca A · HCMC CNC-02 · Last sync 06:20</h3>
+              <p>Mot strip duy nhat de mo ca, khong chen hero. Nguoi xem biet ngay ap luc don hang va exception can quyet trong 30 giay dau.</p>
+            </div>
+            <div class="signal-strip">
+              <div class="signal-chip success"><span>Hot jobs</span><strong>04</strong></div>
+              <div class="signal-chip warn"><span>FAI pending</span><strong>02</strong></div>
+              <div class="signal-chip danger"><span>Hold / NCR</span><strong>03</strong></div>
+              <div class="signal-chip neutral"><span>Rev mismatch</span><strong>01</strong></div>
+            </div>
+          </section>
+
+          <section class="surface flow-surface">
+            <div class="surface-head">
+              <div>
+                <span class="surface-kicker">Primary workspace</span>
+                <h3>Live order flowboard G0-G7</h3>
+              </div>
+              <span class="head-note">Job nao sap tre se noi len tren, gate track hien ngay constraint.</span>
+            </div>
+            <table class="order-table">
+              <thead>
+                <tr>
+                  <th>Job</th>
+                  <th>Due</th>
+                  <th>Gate track</th>
+                  <th>Constraint</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="order-row is-selected" tabindex="0"
+                    data-title="JO-2403187 · ASML bracket A7"
+                    data-gate="G3 Setup"
+                    data-revision="NC program rev C · setup sheet rev C"
+                    data-risk="MCV-07 chua pass tool probe calibration."
+                    data-owner="Cell lead Ca A · Tran Minh Binh"
+                    data-docs="WI-519 Pre-run|SOP-504 Setup release|ANNEX-113 Machine connectivity"
+                    data-note="Khong cho chuyen sang FAI neu setup sheet chua ky dien tu.">
+                  <td><strong>JO-2403187</strong><span>ASML / Bracket A7</span></td>
+                  <td>14:00</td>
+                  <td><div class="gate-track gate-g3"><span>G0</span><span>G1</span><span>G2</span><span>G3</span><span>G4</span><span>G5</span><span>G6</span><span>G7</span></div></td>
+                  <td class="constraint-cell danger-text">Setup lock · probe calibration</td>
+                </tr>
+                <tr class="order-row" tabindex="0"
+                    data-title="JO-2403191 · Lam wafer tray"
+                    data-gate="G4 FAI"
+                    data-revision="FAI pack rev B · drawing rev E"
+                    data-risk="Thieu photo set 03 trong bai dau tien."
+                    data-owner="Quality engineer · Vo Ngoc Sanh"
+                    data-docs="SOP-302 FAI|WI-201 Hold points|WI-203 Evidence pack"
+                    data-note="FAI complete moi duoc mo IPQC. Thieu anh = hold release.">
+                  <td><strong>JO-2403191</strong><span>Lam / Wafer tray</span></td>
+                  <td>15:30</td>
+                  <td><div class="gate-track gate-g4"><span>G0</span><span>G1</span><span>G2</span><span>G3</span><span>G4</span><span>G5</span><span>G6</span><span>G7</span></div></td>
+                  <td class="constraint-cell warn-text">FAI evidence gap</td>
+                </tr>
+                <tr class="order-row" tabindex="0"
+                    data-title="JO-2403204 · Nexchip manifold"
+                    data-gate="G5 IPQC"
+                    data-revision="Traveler rev D · control plan rev D"
+                    data-risk="SPC drift tai OP20, can quality review."
+                    data-owner="QC inspector · Nguyen Hoang Quan"
+                    data-docs="SOP-502 In-process QC|ANNEX-110 KPI dictionary|WI-201 Hold points"
+                    data-note="Can review drift trend truoc khi cho qua final QC.">
+                  <td><strong>JO-2403204</strong><span>Nexchip / Manifold</span></td>
+                  <td>17:00</td>
+                  <td><div class="gate-track gate-g5"><span>G0</span><span>G1</span><span>G2</span><span>G3</span><span>G4</span><span>G5</span><span>G6</span><span>G7</span></div></td>
+                  <td class="constraint-cell warn-text">SPC drift OP20</td>
+                </tr>
+                <tr class="order-row" tabindex="0"
+                    data-title="JO-2403212 · Service lot recovery"
+                    data-gate="G6 Final QC"
+                    data-revision="Traveler rev B · CoC template rev A"
+                    data-risk="CoC cho ky, evidence pack dang thieu 1 file scan."
+                    data-owner="Shipping QA · Pham Hai Long"
+                    data-docs="SOP-605 Final inspection|WI-203 Evidence pack|ANNEX-118 Fallback kit"
+                    data-note="Neu scan thieu, khong duoc release G7 cho customer.">
+                  <td><strong>JO-2403212</strong><span>Service / Recovery lot</span></td>
+                  <td>18:20</td>
+                  <td><div class="gate-track gate-g6"><span>G0</span><span>G1</span><span>G2</span><span>G3</span><span>G4</span><span>G5</span><span>G6</span><span>G7</span></div></td>
+                  <td class="constraint-cell neutral-text">CoC sign-off</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+          <aside class="surface exception-surface">
+            <div class="surface-head">
+              <div><span class="surface-kicker">Exception rail</span><h3>Owner and SLA</h3></div>
+              <span class="head-note">Chi hien issue can quyet ngay trong tier meeting.</span>
+            </div>
+            <ul class="issue-list">
+              <li><strong>MCV-07 down 37m</strong><span>Owner: Maintenance · ETA 08:10</span></li>
+              <li><strong>Material cert missing · AL-62</strong><span>Owner: SCM · ETA 07:45</span></li>
+              <li><strong>FAI photo set incomplete</strong><span>Owner: QE · ETA 09:00</span></li>
+              <li><strong>Traveler rev B/C mismatch</strong><span>Owner: Planner · escalate if open &gt; 20m</span></li>
+            </ul>
+          </aside>
+          <section class="surface machine-surface">
+            <div class="surface-head">
+              <div><span class="surface-kicker">Machine and cell state</span><h3>Nhin may truoc khi nhin KPI</h3></div>
+              <span class="head-note">Moi dong noi mot dieu: may nao chay, cho setup hay dang dung.</span>
+            </div>
+            <div class="machine-list">
+              <div class="machine-row running"><strong>MCV-03</strong><span>RUN · JO-2403204 · ETA gate complete 10:40</span></div>
+              <div class="machine-row setup"><strong>MCV-07</strong><span>SETUP HOLD · JO-2403187 · waiting probe calibration</span></div>
+              <div class="machine-row inspect"><strong>CMM-02</strong><span>FAI CHECK · JO-2403191 · photo set validation</span></div>
+              <div class="machine-row idle"><strong>DMU-05</strong><span>IDLE 12m · next job JO-2403215 · tool pack ready</span></div>
+            </div>
+          </section>
+          <section class="surface inspector-surface">
+            <div class="surface-head">
+              <div><span class="surface-kicker">Selected job inspector</span><h3 id="inspector-title">JO-2403187 · ASML bracket A7</h3></div>
+              <span class="head-note" id="inspector-gate">G3 Setup</span>
+            </div>
+            <dl class="inspector-grid">
+              <div><dt>Revision control</dt><dd id="inspector-revision">NC program rev C · setup sheet rev C</dd></div>
+              <div><dt>Current risk</dt><dd id="inspector-risk">MCV-07 chua pass tool probe calibration.</dd></div>
+              <div><dt>Owner</dt><dd id="inspector-owner">Cell lead Ca A · Tran Minh Binh</dd></div>
+              <div><dt>Decision note</dt><dd id="inspector-note">Khong cho chuyen sang FAI neu setup sheet chua ky dien tu.</dd></div>
+            </dl>
+            <div class="link-strip" id="inspector-docs"><span>WI-519 Pre-run</span><span>SOP-504 Setup release</span><span>ANNEX-113 Machine connectivity</span></div>
+          </section>
+          <section class="surface document-surface">
+            <div class="surface-head">
+              <div><span class="surface-kicker">Context strip</span><h3>Tai lieu chi hien khi bam selected job</h3></div>
+              <span class="head-note">Khong hien thu vien tong o viewport dau.</span>
+            </div>
+            <div class="context-strip"><span>Setup pack</span><span>Control plan</span><span>Evidence pack</span><span>Fallback kit</span><span>ECN note</span></div>
+          </section>
+        </div>
+      </div>
+      <div class="decision-grid">
+        <article class="decision-card"><span class="decision-label">Giu</span><p>G0-G7, vai tro CNC/QC/Planner, logic quality gates va document governance.</p></article>
+        <article class="decision-card"><span class="decision-label">Doi</span><p>Dem tai lieu va KPI tinh thanh queue, blocker, owner, ETA va revision context.</p></article>
+        <article class="decision-card"><span class="decision-label">Bo sung</span><p>Selected job inspector, machine state, hold ownership va evidence readiness.</p></article>
+      </div>
+    </section>
+
+    <section class="study-panel" id="panel-deploy">
+      <div class="panel-intro">
+        <div>
+          <p class="panel-kicker">Dashboard 2</p>
+          <h2>Deployment and Go-Live Control</h2>
+          <p>Man hinh nay phai tra loi 3 cau hoi trong 15 giay: dang o pha nao, bi chan o dau, ai chiu trach nhiem dong gate tiep theo.</p>
+        </div>
+        <div class="panel-controls">
+          <div class="segmented-control" aria-label="Phase focus">
+            <button type="button" data-phase-target="prep">P0 Prep</button>
+            <button type="button" data-phase-target="readiness">P1 Ready</button>
+            <button class="is-active" type="button" data-phase-target="pilot">P2 Pilot</button>
+            <button type="button" data-phase-target="golive">P3 Go-live</button>
+            <button type="button" data-phase-target="hypercare">P4 Hypercare</button>
+          </div>
+          <p class="focus-copy" id="phase-focus-copy">Pilot focus: drill traceback, retrieval, wrong revision test va close issue truoc go-live.</p>
+        </div>
+      </div>
+      <div class="prototype-frame">
+        <div class="frame-topbar">
+          <span class="frame-dot"></span><span class="frame-dot"></span><span class="frame-dot"></span>
+          <span class="frame-title">HESEM QMS / Deployment control prototype</span>
+        </div>
+        <div class="deploy-board">
+          <section class="surface deploy-banner">
+            <div><span class="surface-kicker">Go / no-go header</span><h3 id="phase-focus-title">P2 Pilot · Readiness under proof</h3><p id="phase-focus-note">Header nay thay gradient hero. No cho thay tinh trang gate, confidence va next gate item ngay trong viewport dau.</p></div>
+            <div class="signal-strip">
+              <div class="signal-chip neutral"><span>Confidence</span><strong>78%</strong></div>
+              <div class="signal-chip danger"><span>Blocked dept</span><strong>02</strong></div>
+              <div class="signal-chip warn"><span>Sev1 / Sev2</span><strong>0 / 3</strong></div>
+              <div class="signal-chip success"><span>Next gate</span><strong id="phase-focus-next">P2-02</strong></div>
+            </div>
+          </section>
+          <section class="surface phase-surface">
+            <div class="surface-head"><div><span class="surface-kicker">Phase spine</span><h3>Five-phase rollout</h3></div><span class="head-note">Moi pha la mot trang thai ra quyet dinh, khong phai mot tab de doc.</span></div>
+            <div class="phase-track">
+              <button class="phase-node" type="button">P0<span>Prep</span></button>
+              <button class="phase-node" type="button">P1<span>Readiness</span></button>
+              <button class="phase-node is-active" type="button">P2<span>Pilot</span></button>
+              <button class="phase-node" type="button">P3<span>Go-live</span></button>
+              <button class="phase-node" type="button">P4<span>Hypercare</span></button>
+            </div>
+          </section>
+          <section class="surface heatmap-surface">
+            <div class="surface-head"><div><span class="surface-kicker">Readiness anchor</span><h3>Department heatmap</h3></div><span class="head-note">Phai la visual anchor trung tam cua dashboard 2.</span></div>
+            <table class="heatmap-table">
+              <thead><tr><th>Dept</th><th>Docs</th><th>Training</th><th>Access</th><th>Champion</th><th>Pilot</th><th>Go-live</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Production</strong><span>Wave 1</span></td><td class="done">Done</td><td class="done">Done</td><td class="done">Done</td><td class="warn">90%</td><td class="warn">1 open</td><td class="todo">Hold</td></tr>
+                <tr><td><strong>Engineering</strong><span>Wave 1</span></td><td class="done">Done</td><td class="done">Done</td><td class="done">Done</td><td class="done">Done</td><td class="warn">Traceback drill</td><td class="todo">Wait</td></tr>
+                <tr><td><strong>Quality</strong><span>Wave 1</span></td><td class="done">Done</td><td class="done">Done</td><td class="done">Done</td><td class="done">Done</td><td class="danger">FAI evidence gap</td><td class="todo">Wait</td></tr>
+                <tr><td><strong>SCM</strong><span>Wave 2</span></td><td class="warn">QR sync</td><td class="todo">Bootcamp</td><td class="warn">Access test</td><td class="todo">Nominate</td><td class="todo">Not started</td><td class="todo">Wait</td></tr>
+                <tr><td><strong>IT</strong><span>Wave 3</span></td><td class="done">Done</td><td class="done">Done</td><td class="warn">SLA review</td><td class="done">Done</td><td class="done">Done</td><td class="warn">Hypercare rota</td></tr>
+              </tbody>
+            </table>
+          </section>
+          <aside class="surface gate-surface">
+            <div class="surface-head"><div><span class="surface-kicker">Gate decision</span><h3>Blocker ownership</h3></div><span class="head-note">Issue rail phai o gan heatmap, khong bi day xuong duoi.</span></div>
+            <ul class="issue-list">
+              <li><strong>P2-02 Retrieval drill</strong><span>Owner: QE · due 10:30</span></li>
+              <li><strong>P2-03 Wrong revision test</strong><span>Owner: Planner · due 11:00</span></li>
+              <li><strong>Champion backup matrix</strong><span>Owner: HR · due EOD</span></li>
+              <li><strong>Rollback trigger review</strong><span>Owner: Cutover lead · before P3</span></li>
+            </ul>
+          </aside>
+          <section class="surface cadence-surface">
+            <div class="surface-head"><div><span class="surface-kicker">Command cadence</span><h3>Meeting rhythm tied to decisions</h3></div><span class="head-note">Khong can them nhieu widget. Can dung ba nhip hop.</span></div>
+            <div class="cadence-list">
+              <div><strong>07:30</strong><span>Daily command center · blocker, owner, ETA</span></div>
+              <div><strong>15:00</strong><span>Pilot review · traceability, retrieval, evidence gap</span></div>
+              <div><strong>Fri</strong><span>Wave readiness review · go/no-go and rollback</span></div>
+            </div>
+          </section>
+          <section class="surface evidence-surface">
+            <div class="surface-head"><div><span class="surface-kicker">Evidence lane</span><h3>Document hub lui xuong duoi</h3></div><span class="head-note">Chi nhung goi bang chung phuc vu gate review.</span></div>
+            <div class="context-strip"><span>Master plan</span><span>Runbook go-live</span><span>Escalation matrix</span><span>Evidence pack</span><span>Fallback kit</span></div>
+          </section>
+        </div>
+      </div>
+      <div class="decision-grid">
+        <article class="decision-card"><span class="decision-label">Giu</span><p>Readiness dimensions, phase logic, department waves va command cadence.</p></article>
+        <article class="decision-card"><span class="decision-label">Doi</span><p>Hero banner thanh gate header. Tabs docs giam uu tien. Heatmap lam trung tam.</p></article>
+        <article class="decision-card"><span class="decision-label">Bo sung</span><p>Confidence score, blocker ownership, rollback logic, issue aging va next gate item.</p></article>
+      </div>
+    </section>
+
+    <section class="study-panel" id="panel-mobile">
+      <div class="panel-intro">
+        <div><p class="panel-kicker">Mobile behavior</p><h2>Khong thu nho desktop. Sap xep lai quyet dinh.</h2><p>Tren mobile, nguoi dung can biet viec nao can lam ngay. Moi man hinh chi giu 3 hanh dong chinh va bo card thua.</p></div>
+      </div>
+      <div class="mobile-grid">
+        <article class="phone-study">
+          <div class="phone-shell"><div class="phone-notch"></div><div class="phone-screen"><div class="phone-header"><span>Ca A · 06:20</span><strong>Hot jobs 04</strong></div><div class="phone-alert danger">MCV-07 hold · setup calibration</div><div class="phone-list"><div class="phone-row"><strong>JO-2403187</strong><span>G3 Setup · due 14:00</span></div><div class="phone-row"><strong>JO-2403191</strong><span>G4 FAI · evidence gap</span></div><div class="phone-row"><strong>JO-2403204</strong><span>G5 IPQC · SPC drift</span></div></div><div class="phone-inspector"><span class="surface-kicker">Selected job</span><strong>JO-2403187 · Rev C</strong><p>Open WI-519, xem traveler, escalate blocker.</p></div><div class="phone-actions"><span>Open WI</span><span>Traveler</span><span>Escalate</span></div></div></div>
+          <div class="mobile-copy"><h3>Mobile live execution</h3><p>Thu tu bat buoc: signal, hot jobs, selected job, 3 hanh dong. Machine list va KPI tong hop lui xuong.</p></div>
+        </article>
+        <article class="phone-study">
+          <div class="phone-shell"><div class="phone-notch"></div><div class="phone-screen"><div class="phone-header"><span>P2 Pilot</span><strong>Confidence 78%</strong></div><div class="phone-alert warn">Next gate: P2-02 Retrieval drill</div><div class="phone-list"><div class="phone-row"><strong>Production</strong><span>Pilot 1 open · Go-live hold</span></div><div class="phone-row"><strong>Quality</strong><span>FAI evidence gap</span></div><div class="phone-row"><strong>SCM</strong><span>Training + access not ready</span></div></div><div class="phone-inspector"><span class="surface-kicker">Issue owner</span><strong>QE · due 10:30</strong><p>Close retrieval drill before any P3 sign-off.</p></div><div class="phone-actions"><span>Issue log</span><span>Evidence</span><span>Escalate</span></div></div></div>
+          <div class="mobile-copy"><h3>Mobile deployment control</h3><p>Mobile khong can heatmap day du. Can blocked department list, owner, due time va next gate.</p></div>
+        </article>
+      </div>
+      <div class="principle-grid">
+        <article class="principle-card"><span class="decision-label">Rule 1</span><p>Mot viewport chi tra loi mot cau hoi. Live mobile tra loi job nao can can thiep. Deploy mobile tra loi gate nao chua qua.</p></article>
+        <article class="principle-card"><span class="decision-label">Rule 2</span><p>Khong dem ca heatmap va KPI grid xuong dien thoai. Gom thanh list co owner, due time va status.</p></article>
+        <article class="principle-card"><span class="decision-label">Rule 3</span><p>Moi selected object chi giu 3 action. Neu hon 3, nguoi dung se quay lai desktop de thao tac.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="study-footer">
+    <div class="footer-copy">
+      <div><p class="eyebrow">Repo mapping</p><h2>Current implementation points</h2></div>
+      <p>Dashboard chinh hien render o `page-dashboard`, dashboard trien khai o `page-deploy`. Prototype nay tach rieng de chot thesis, layout va logic uu tien thong tin truoc khi refactor production.</p>
+    </div>
+    <div class="source-grid">
+      <a href="https://www.siemens.com/en-us/products/opcenter/" target="_blank" rel="noreferrer">Siemens Opcenter MOM</a>
+      <a href="https://www.siemens.com/en-us/products/opcenter/quality-x-cloud-qms/" target="_blank" rel="noreferrer">Siemens Opcenter X Quality</a>
+      <a href="https://blogs.sw.siemens.com/opcenter/manufacturing-traceability-how-your-mes-adds-product-value/" target="_blank" rel="noreferrer">Siemens traceability</a>
+      <a href="https://www.sap.com/products/scm/digital-manufacturing.html" target="_blank" rel="noreferrer">SAP Digital Manufacturing</a>
+      <a href="https://tulip.co/production-management/manufacturing-dashboards/" target="_blank" rel="noreferrer">Tulip dashboards</a>
+      <a href="https://tulip.co/traceability-and-compliance/" target="_blank" rel="noreferrer">Tulip traceability</a>
+      <a href="https://www.machinemetrics.com/production-monitoring" target="_blank" rel="noreferrer">MachineMetrics monitoring</a>
+      <a href="https://www.machinemetrics.com/machine-monitoring" target="_blank" rel="noreferrer">MachineMetrics CNC</a>
+      <a href="https://proshoperp.com/" target="_blank" rel="noreferrer">ProShop ERP</a>
+      <a href="https://proshoperp.com/product/sales-work-order-process/" target="_blank" rel="noreferrer">ProShop work order</a>
+      <a href="https://proshoperp.com/product/visual-work-instructions/" target="_blank" rel="noreferrer">ProShop work instructions</a>
+      <a href="https://proshoperp.com/product/shop-floor-management-scheduling/" target="_blank" rel="noreferrer">ProShop scheduling</a>
+    </div>
+  </footer>
+</div>
+<script>
+(() => {
+  const root = document.querySelector(".study-shell");
+  if (!root) return;
+
+  const roleMessages = {
+    operator: "Operator focus: uu tien hot jobs, setup readiness, machine state va WI tai diem dung.",
+    quality: "Quality focus: uu tien FAI, hold point, NCR, evidence gap va release condition.",
+    planner: "Planner focus: uu tien due time, gate nghen, revision mismatch va next dispatch decision.",
+    executive: "Executive focus: uu tien red signals, blocked ownership, on-time release risk va go/no-go confidence."
+  };
+
+  const phaseMessages = {
+    prep: {
+      title: "P0 Prep · Lock source and access before rollout",
+      note: "Truoc readiness, phai chot source of truth, QR route, access map va issue cadence. P0 khong qua = cac pha sau se vo.",
+      copy: "Prep focus: dong bo tai lieu, quyen truy cap, champion va owner truoc khi training bat dau.",
+      next: "P0-04"
+    },
+    readiness: {
+      title: "P1 Readiness · Skills, access, and role confidence",
+      note: "P1 tap trung vao manager briefing, OJT, champion coverage va access test. Muc tieu la user tu thao tac duoc, khong can day manh pilot som.",
+      copy: "Readiness focus: training pass, access pass, role confidence va baseline KPI shell.",
+      next: "P1-03"
+    },
+    pilot: {
+      title: "P2 Pilot · Readiness under proof",
+      note: "Header nay thay gradient hero. No cho thay tinh trang gate, confidence va next gate item ngay trong viewport dau.",
+      copy: "Pilot focus: drill traceback, retrieval, wrong revision test va close issue truoc go-live.",
+      next: "P2-02"
+    },
+    golive: {
+      title: "P3 Go-live · Rollout under command discipline",
+      note: "P3 can support rota, rollback threshold, support channel va severity ownership ro rang.",
+      copy: "Go-live focus: blocked department, support rota, rollback trigger va red signal aging.",
+      next: "P3-01"
+    },
+    hypercare: {
+      title: "P4 Hypercare · Stabilize and hand off",
+      note: "P4 chi duoc ket thuc khi hypercare load giam, owner van hanh thuong xuyen nhan ban giao va dashboard refresh SLA duoc khoa.",
+      copy: "Hypercare focus: sev2 workaround, SLA on refresh, lessons learned va handoff evidence.",
+      next: "P4-02"
+    }
+  };
+
+  const tabs = document.querySelectorAll(".study-tab");
+  const panels = document.querySelectorAll(".study-panel");
+  const roleButtons = document.querySelectorAll("[data-role-target]");
+  const phaseButtons = document.querySelectorAll("[data-phase-target]");
+  const orderRows = document.querySelectorAll(".order-row");
+
+  function setPanel(panelId) {
+    tabs.forEach((tab) => tab.classList.toggle("is-active", tab.dataset.panel === panelId));
+    panels.forEach((panel) => panel.classList.toggle("is-active", panel.id === `panel-${panelId}`));
+  }
+
+  function setRole(role) {
+    root.dataset.role = role;
+    roleButtons.forEach((button) => button.classList.toggle("is-active", button.dataset.roleTarget === role));
+    const copy = document.getElementById("role-focus-copy");
+    if (copy) copy.textContent = roleMessages[role] || "";
+  }
+
+  function setPhase(phase) {
+    root.dataset.phase = phase;
+    phaseButtons.forEach((button) => button.classList.toggle("is-active", button.dataset.phaseTarget === phase));
+    const data = phaseMessages[phase];
+    if (!data) return;
+    const copy = document.getElementById("phase-focus-copy");
+    const title = document.getElementById("phase-focus-title");
+    const note = document.getElementById("phase-focus-note");
+    const next = document.getElementById("phase-focus-next");
+    if (copy) copy.textContent = data.copy;
+    if (title) title.textContent = data.title;
+    if (note) note.textContent = data.note;
+    if (next) next.textContent = data.next;
+  }
+
+  function setOrder(row) {
+    orderRows.forEach((item) => item.classList.toggle("is-selected", item === row));
+    const fields = [
+      ["inspector-title", "title"],
+      ["inspector-gate", "gate"],
+      ["inspector-revision", "revision"],
+      ["inspector-risk", "risk"],
+      ["inspector-owner", "owner"],
+      ["inspector-note", "note"]
+    ];
+    fields.forEach(([id, key]) => {
+      const node = document.getElementById(id);
+      if (node) node.textContent = row.dataset[key] || "";
+    });
+    const docs = document.getElementById("inspector-docs");
+    if (docs) {
+      docs.innerHTML = "";
+      (row.dataset.docs || "").split("|").filter(Boolean).forEach((label) => {
+        const chip = document.createElement("span");
+        chip.textContent = label;
+        docs.appendChild(chip);
+      });
+    }
+  }
+
+  tabs.forEach((tab) => tab.addEventListener("click", () => setPanel(tab.dataset.panel)));
+  roleButtons.forEach((button) => button.addEventListener("click", () => setRole(button.dataset.roleTarget)));
+  phaseButtons.forEach((button) => button.addEventListener("click", () => setPhase(button.dataset.phaseTarget)));
+  orderRows.forEach((row) => {
+    row.addEventListener("click", () => setOrder(row));
+    row.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        setOrder(row);
+      }
+    });
+  });
+
+  setPanel("live");
+  setRole(root.dataset.role || "operator");
+  setPhase(root.dataset.phase || "pilot");
+  if (orderRows[0]) setOrder(orderRows[0]);
+})();
+</script>
+</body>
+</html>

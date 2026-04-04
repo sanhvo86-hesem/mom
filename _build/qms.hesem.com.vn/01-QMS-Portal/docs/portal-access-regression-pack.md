@@ -7,9 +7,9 @@ Bộ regression pack này dùng để kiểm lại ba cơ chế truy cập sau k
 3. **deputy activation by controlled access change** thay vì mở quyền tự động.
 
 ## Nhóm tài liệu nhạy cảm phải kiểm
-- Authority / RACI / KPI cascade (`ANNEX-QMS-025/026/027`)
+- Authority / RACI / KPI cascade (`ANNEX-120/026/027`)
 - HR / Finance / Department handbooks (`DEPT-*`)
-- Dashboard governance (`ANNEX-QMS-012`, `ANNEX-QMS-029`, `WI-901`, `FRM-111`, `FRM-141`, `FRM-911`)
+- Dashboard governance (`ANNEX-113`, `ANNEX-124`, `WI-901`, `FRM-111`, `FRM-141`, `FRM-911`)
 - Các doc có khả năng tạo lỗ hổng SoD hoặc lộ dữ liệu tổng hợp nhạy cảm
 
 ## Cách dùng

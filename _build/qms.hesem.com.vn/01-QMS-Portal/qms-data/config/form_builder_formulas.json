@@ -1,0 +1,331 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "created": "2026-03-29",
+    "description": "Formula definitions for the online form builder. Intra-form formulas compute values within a single form submission. Inter-form formulas reference data from other form submissions or record types. Used by the Form Engine to auto-calculate fields."
+  },
+
+  "operators": ["+", "-", "*", "/", "%", "SUM", "COUNT", "AVG", "MIN", "MAX", "IF", "AND", "OR", "NOT", "ROUND", "ABS", "CONCAT", "DATEDIFF", "NOW", "TODAY", "COALESCE", "LOOKUP"],
+
+  "operator_descriptions": {
+    "+":        "Addition",
+    "-":        "Subtraction",
+    "*":        "Multiplication",
+    "/":        "Division",
+    "%":        "Modulo",
+    "SUM":      "Sum of array/column values",
+    "COUNT":    "Count of non-null values",
+    "AVG":      "Average of array/column values",
+    "MIN":      "Minimum value",
+    "MAX":      "Maximum value",
+    "IF":       "Conditional: IF(condition, true_value, false_value)",
+    "AND":      "Logical AND",
+    "OR":       "Logical OR",
+    "NOT":      "Logical NOT",
+    "ROUND":    "Round to N decimal places",
+    "ABS":      "Absolute value",
+    "CONCAT":   "String concatenation",
+    "DATEDIFF": "Difference between two dates in specified unit",
+    "NOW":      "Current server datetime",
+    "TODAY":    "Current server date",
+    "COALESCE": "First non-null value from list",
+    "LOOKUP":   "Look up value from reference table"
+  },
+
+  "intra_form": [
+    {
+      "id": "duration_calc",
+      "label": "Duration Calculation",
+      "formula": "DATEDIFF(end_time, start_time, 'minutes')",
+      "result_type": "number",
+      "unit": "minutes",
+      "description": "Calculate duration between start and end times",
+      "applicable_forms": ["FRM-512", "FRM-504", "FRM-521"]
+    },
+    {
+      "id": "total_qty",
+      "label": "Total Quantity",
+      "formula": "qty_good + qty_scrap + qty_rework",
+      "result_type": "number",
+      "unit": "pieces",
+      "description": "Sum of good, scrap, and rework quantities",
+      "applicable_forms": ["FRM-511", "FRM-651", "FRM-505"]
+    },
+    {
+      "id": "scrap_rate",
+      "label": "Scrap Rate",
+      "formula": "ROUND((qty_scrap / total_qty) * 100, 2)",
+      "result_type": "number",
+      "unit": "%",
+      "description": "Percentage of total quantity that is scrap",
+      "applicable_forms": ["FRM-511", "FRM-651", "FRM-505"]
+    },
+    {
+      "id": "fpy_rate",
+      "label": "First Pass Yield",
+      "formula": "ROUND((qty_good / total_qty) * 100, 2)",
+      "result_type": "number",
+      "unit": "%",
+      "description": "First pass yield percentage",
+      "applicable_forms": ["FRM-511", "FRM-651"]
+    },
+    {
+      "id": "rpn",
+      "label": "Risk Priority Number",
+      "formula": "severity * occurrence * detection",
+      "result_type": "number",
+      "unit": null,
+      "description": "FMEA Risk Priority Number = S x O x D",
+      "applicable_forms": ["FRM-131", "FRM-132"]
+    },
+    {
+      "id": "rpn_category",
+      "label": "RPN Risk Category",
+      "formula": "IF(rpn >= 200, 'critical', IF(rpn >= 100, 'high', IF(rpn >= 50, 'medium', 'low')))",
+      "result_type": "string",
+      "unit": null,
+      "description": "Categorize RPN into risk levels",
+      "applicable_forms": ["FRM-131", "FRM-132"]
+    },
+    {
+      "id": "oee_availability",
+      "label": "OEE Availability",
+      "formula": "ROUND(((planned_time - downtime_minutes) / planned_time) * 100, 2)",
+      "result_type": "number",
+      "unit": "%",
+      "description": "OEE availability component",
+      "applicable_forms": ["FRM-505"]
+    },
+    {
+      "id": "oee_performance",
+      "label": "OEE Performance",
+      "formula": "ROUND((actual_cycle_time * total_qty) / (planned_time - downtime_minutes) * 100, 2)",
+      "result_type": "number",
+      "unit": "%",
+      "description": "OEE performance component",
+      "applicable_forms": ["FRM-505"]
+    },
+    {
+      "id": "oee_quality",
+      "label": "OEE Quality",
+      "formula": "ROUND((qty_good / total_qty) * 100, 2)",
+      "result_type": "number",
+      "unit": "%",
+      "description": "OEE quality component",
+      "applicable_forms": ["FRM-505"]
+    },
+    {
+      "id": "oee_overall",
+      "label": "OEE Overall",
+      "formula": "ROUND((oee_availability * oee_performance * oee_quality) / 10000, 2)",
+      "result_type": "number",
+      "unit": "%",
+      "description": "Overall Equipment Effectiveness = Availability x Performance x Quality",
+      "applicable_forms": ["FRM-505"]
+    },
+    {
+      "id": "days_overdue",
+      "label": "Days Overdue",
+      "formula": "IF(DATEDIFF(TODAY(), target_date, 'days') > 0, DATEDIFF(TODAY(), target_date, 'days'), 0)",
+      "result_type": "number",
+      "unit": "days",
+      "description": "Number of days past target date (0 if not overdue)",
+      "applicable_forms": ["FRM-641", "FRM-403"]
+    },
+    {
+      "id": "capa_effectiveness",
+      "label": "CAPA Effectiveness Score",
+      "formula": "IF(AND(verification_result == 'pass', recurrence_count == 0), 100, IF(verification_result == 'pass', 75, IF(verification_result == 'partial', 50, 0)))",
+      "result_type": "number",
+      "unit": "%",
+      "description": "CAPA effectiveness scoring based on verification and recurrence",
+      "applicable_forms": ["FRM-641"]
+    },
+    {
+      "id": "inspection_pass_rate",
+      "label": "Inspection Pass Rate",
+      "formula": "ROUND((qty_passed / sample_size) * 100, 2)",
+      "result_type": "number",
+      "unit": "%",
+      "description": "Percentage of inspected samples that passed",
+      "applicable_forms": ["FRM-651", "FRM-701"]
+    },
+    {
+      "id": "downtime_cost",
+      "label": "Estimated Downtime Cost",
+      "formula": "downtime_minutes * machine_hourly_rate / 60",
+      "result_type": "number",
+      "unit": "USD",
+      "description": "Estimated cost impact of downtime event",
+      "applicable_forms": ["FRM-512"]
+    },
+    {
+      "id": "training_hours_total",
+      "label": "Total Training Hours",
+      "formula": "training_duration_hours * COUNT(attendees)",
+      "result_type": "number",
+      "unit": "person-hours",
+      "description": "Total person-hours for the training session",
+      "applicable_forms": ["FRM-802"]
+    },
+    {
+      "id": "cal_deviation",
+      "label": "Calibration Deviation",
+      "formula": "ABS(measured_value - reference_value)",
+      "result_type": "number",
+      "unit": "measurement_unit",
+      "description": "Absolute deviation between measured and reference standard values",
+      "applicable_forms": ["FRM-601"]
+    },
+    {
+      "id": "cal_pass_fail",
+      "label": "Calibration Pass/Fail",
+      "formula": "IF(cal_deviation <= tolerance, 'PASS', 'FAIL')",
+      "result_type": "string",
+      "unit": null,
+      "description": "Automatic pass/fail determination based on deviation vs tolerance",
+      "applicable_forms": ["FRM-601"]
+    },
+    {
+      "id": "shift_handover_issues_count",
+      "label": "Open Issues Count",
+      "formula": "COUNT(issues WHERE status != 'resolved')",
+      "result_type": "number",
+      "unit": "issues",
+      "description": "Count of unresolved issues carried forward in shift handover",
+      "applicable_forms": ["FRM-504"]
+    },
+    {
+      "id": "setup_efficiency",
+      "label": "Setup Efficiency",
+      "formula": "ROUND((setup_time_standard / setup_time_actual) * 100, 2)",
+      "result_type": "number",
+      "unit": "%",
+      "description": "Ratio of standard to actual setup time",
+      "applicable_forms": ["FRM-511", "FRM-514"]
+    }
+  ],
+
+  "inter_form": [
+    {
+      "id": "ncr_count_for_job",
+      "label": "NCR Count for Job",
+      "source_form": "FRM-631",
+      "filter": { "job_number": "$current.job_number" },
+      "aggregate": "COUNT",
+      "result_type": "number",
+      "description": "Count of NCRs raised against the current job number"
+    },
+    {
+      "id": "total_downtime_for_machine_today",
+      "label": "Machine Downtime Today",
+      "source_form": "FRM-512",
+      "filter": { "machine_id": "$current.machine_id", "event_date": "$TODAY" },
+      "aggregate": "SUM",
+      "aggregate_field": "downtime_minutes",
+      "result_type": "number",
+      "unit": "minutes",
+      "description": "Total downtime minutes for this machine today"
+    },
+    {
+      "id": "capa_open_count_for_department",
+      "label": "Open CAPAs for Department",
+      "source_form": "FRM-641",
+      "filter": { "department_code": "$current.department_code", "status": ["open", "in_progress"] },
+      "aggregate": "COUNT",
+      "result_type": "number",
+      "description": "Count of open/in-progress CAPAs in the current department"
+    },
+    {
+      "id": "last_cal_date_for_gage",
+      "label": "Last Calibration Date",
+      "source_form": "FRM-601",
+      "filter": { "gage_id": "$current.gage_id" },
+      "aggregate": "MAX",
+      "aggregate_field": "calibration_date",
+      "result_type": "date",
+      "description": "Most recent calibration date for the selected gage"
+    },
+    {
+      "id": "scrap_rate_mtd_for_machine",
+      "label": "MTD Scrap Rate for Machine",
+      "source_form": "FRM-511",
+      "filter": { "machine_id": "$current.machine_id", "event_date": { "$gte": "$FIRST_DAY_OF_MONTH" } },
+      "aggregate": "AVG",
+      "aggregate_field": "scrap_rate",
+      "result_type": "number",
+      "unit": "%",
+      "description": "Month-to-date average scrap rate for the selected machine"
+    },
+    {
+      "id": "training_hours_ytd_for_employee",
+      "label": "YTD Training Hours",
+      "source_form": "FRM-802",
+      "filter": { "attendees": { "$contains": "$current.employee_id" }, "event_date": { "$gte": "$FIRST_DAY_OF_YEAR" } },
+      "aggregate": "SUM",
+      "aggregate_field": "training_duration_hours",
+      "result_type": "number",
+      "unit": "hours",
+      "description": "Year-to-date training hours for the current employee"
+    },
+    {
+      "id": "scar_count_for_supplier",
+      "label": "SCAR Count for Supplier",
+      "source_form": "FRM-403",
+      "filter": { "supplier_name": "$current.supplier_name" },
+      "aggregate": "COUNT",
+      "result_type": "number",
+      "description": "Total SCARs raised against the current supplier"
+    },
+    {
+      "id": "audit_findings_open",
+      "label": "Open Audit Findings",
+      "source_form": "FRM-913",
+      "filter": { "status": ["open", "in_progress"] },
+      "aggregate": "COUNT",
+      "result_type": "number",
+      "description": "Count of all currently open audit findings across the QMS"
+    },
+    {
+      "id": "fpy_trend_last_10_jobs",
+      "label": "FPY Trend (Last 10 Jobs)",
+      "source_form": "FRM-651",
+      "filter": { "part_number": "$current.part_number" },
+      "aggregate": "AVG",
+      "aggregate_field": "fpy_rate",
+      "limit": 10,
+      "sort": { "event_date": "desc" },
+      "result_type": "number",
+      "unit": "%",
+      "description": "Average FPY from the last 10 final inspections for this part number"
+    },
+    {
+      "id": "customer_complaint_count_ytd",
+      "label": "Customer Complaints YTD",
+      "source_form": "FRM-721",
+      "filter": { "customer_id": "$current.customer_id", "event_date": { "$gte": "$FIRST_DAY_OF_YEAR" } },
+      "aggregate": "COUNT",
+      "result_type": "number",
+      "description": "Year-to-date customer complaint count for the current customer"
+    }
+  ],
+
+  "variable_references": {
+    "$current": "Current form submission being edited",
+    "$TODAY": "Server date (YYYY-MM-DD)",
+    "$NOW": "Server datetime (ISO 8601)",
+    "$FIRST_DAY_OF_MONTH": "First day of current month",
+    "$FIRST_DAY_OF_YEAR": "First day of current year",
+    "$USER": "Current logged-in user ID"
+  },
+
+  "formula_evaluation": {
+    "trigger": "on_field_change",
+    "debounce_ms": 300,
+    "error_handling": "show_error_icon_with_tooltip",
+    "null_handling": "treat_null_as_zero_for_numbers",
+    "division_by_zero": "return_null_with_warning",
+    "circular_reference": "detect_and_block",
+    "max_inter_form_cache_seconds": 60
+  }
+}

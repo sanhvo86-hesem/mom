@@ -1,0 +1,193 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "created": "2026-03-31",
+    "description": "Quoting and estimation policy for CNC aerospace manufacturing, defining margin targets, machine rates, overhead calculations, and win/loss tracking"
+  },
+  "quote_format": "QUO-{YYYY}-{NNNN}",
+  "validity_period_days": 30,
+  "revision_tracking": true,
+  "margin_targets": {
+    "by_customer_type": {
+      "prime_oem": {
+        "label": "Prime / OEM",
+        "label_vi": "Khach hang chinh / OEM",
+        "target_margin_percent": 18,
+        "min_margin_percent": 12,
+        "approval_below_min": "ceo"
+      },
+      "tier_1": {
+        "label": "Tier 1 Supplier",
+        "label_vi": "NCC cap 1",
+        "target_margin_percent": 22,
+        "min_margin_percent": 15,
+        "approval_below_min": "sales_manager"
+      },
+      "tier_2": {
+        "label": "Tier 2 Supplier",
+        "label_vi": "NCC cap 2",
+        "target_margin_percent": 25,
+        "min_margin_percent": 18,
+        "approval_below_min": "sales_manager"
+      },
+      "mro": {
+        "label": "MRO / Aftermarket",
+        "label_vi": "MRO / Hau mai",
+        "target_margin_percent": 30,
+        "min_margin_percent": 20,
+        "approval_below_min": "sales_manager"
+      },
+      "defense": {
+        "label": "Defense / Government",
+        "label_vi": "Quoc phong / Chinh phu",
+        "target_margin_percent": 15,
+        "min_margin_percent": 10,
+        "approval_below_min": "ceo"
+      },
+      "commercial": {
+        "label": "Commercial / Industrial",
+        "label_vi": "Thuong mai / Cong nghiep",
+        "target_margin_percent": 28,
+        "min_margin_percent": 20,
+        "approval_below_min": "sales_manager"
+      }
+    },
+    "by_order_type": {
+      "prototype": { "label": "Prototype", "label_vi": "Mau thu", "margin_adder_percent": 10 },
+      "first_article": { "label": "First Article", "label_vi": "Mau dau tien", "margin_adder_percent": 5 },
+      "repeat_order": { "label": "Repeat Order", "label_vi": "Don hang lap lai", "margin_adder_percent": 0 },
+      "blanket_order": { "label": "Blanket / LTA", "label_vi": "Don hang khung / LTA", "margin_adder_percent": -3 }
+    }
+  },
+  "material_cost_calculation": {
+    "methods": {
+      "last_purchase_price": { "label": "Last Purchase Price", "label_vi": "Gia mua gan nhat", "default": true },
+      "weighted_average": { "label": "Weighted Average", "label_vi": "Binh quan gia quyen" },
+      "supplier_quote": { "label": "Current Supplier Quote", "label_vi": "Bao gia NCC hien tai" },
+      "market_index": { "label": "Market Index", "label_vi": "Chi so thi truong" }
+    },
+    "waste_factor_percent": 15,
+    "minimum_order_charge": true,
+    "material_handling_percent": 3,
+    "certifications_surcharge": {
+      "mil_spec": { "label": "MIL-SPEC Material", "label_vi": "Vat lieu MIL-SPEC", "surcharge_percent": 8 },
+      "aerospace_grade": { "label": "Aerospace Grade", "label_vi": "Cap hang khong", "surcharge_percent": 5 },
+      "nadcap_heat_lot": { "label": "Nadcap Heat Lot", "label_vi": "Lo nhiet Nadcap", "surcharge_percent": 10 }
+    }
+  },
+  "machine_rate_card": {
+    "currency": "USD",
+    "rate_basis": "per_hour",
+    "rates": {
+      "cnc_3axis": {
+        "label": "CNC 3-Axis Milling",
+        "label_vi": "Phay CNC 3 truc",
+        "setup_rate": 75,
+        "run_rate": 65,
+        "typical_machines": ["Haas VF-2", "Mazak VCN-510C"]
+      },
+      "cnc_5axis": {
+        "label": "CNC 5-Axis Milling",
+        "label_vi": "Phay CNC 5 truc",
+        "setup_rate": 120,
+        "run_rate": 95,
+        "typical_machines": ["DMG MORI DMU 50", "Mazak VARIAXIS i-600"]
+      },
+      "cnc_turning": {
+        "label": "CNC Turning",
+        "label_vi": "Tien CNC",
+        "setup_rate": 65,
+        "run_rate": 55,
+        "typical_machines": ["Mazak QTN-200", "Haas ST-20"]
+      },
+      "cnc_turn_mill": {
+        "label": "CNC Turn-Mill",
+        "label_vi": "Tien phay CNC",
+        "setup_rate": 110,
+        "run_rate": 85,
+        "typical_machines": ["Mazak INTEGREX i-200"]
+      },
+      "edm_wire": {
+        "label": "Wire EDM",
+        "label_vi": "Cat day EDM",
+        "setup_rate": 85,
+        "run_rate": 45,
+        "typical_machines": ["Sodick VL400Q"]
+      },
+      "edm_sinker": {
+        "label": "Sinker EDM",
+        "label_vi": "EDM dap",
+        "setup_rate": 80,
+        "run_rate": 40,
+        "typical_machines": ["Sodick AG60L"]
+      },
+      "surface_grinding": {
+        "label": "Surface Grinding",
+        "label_vi": "Mai phang",
+        "setup_rate": 60,
+        "run_rate": 50,
+        "typical_machines": ["Okamoto ACC-818DX"]
+      },
+      "cylindrical_grinding": {
+        "label": "Cylindrical Grinding",
+        "label_vi": "Mai tron",
+        "setup_rate": 70,
+        "run_rate": 55,
+        "typical_machines": ["Studer S33"]
+      },
+      "cmm_inspection": {
+        "label": "CMM Inspection",
+        "label_vi": "Kiem tra CMM",
+        "setup_rate": 60,
+        "run_rate": 55,
+        "typical_machines": ["Zeiss Contura", "Mitutoyo Crysta-Apex"]
+      }
+    },
+    "rate_review_frequency_months": 6
+  },
+  "overhead_defaults": {
+    "shop_overhead_percent": 35,
+    "general_admin_percent": 12,
+    "engineering_nre_rate_per_hour": 90,
+    "programming_rate_per_hour": 85,
+    "quality_overhead_percent": 8,
+    "packaging_handling_percent": 3,
+    "freight_default": "fob_origin",
+    "fai_flat_charge_usd": 500,
+    "nre_charge_applicable": ["engineer_to_order", "prototype", "first_article"]
+  },
+  "quantity_breaks": {
+    "enabled": true,
+    "default_breaks": [1, 5, 10, 25, 50, 100, 250, 500],
+    "setup_amortization": true,
+    "learning_curve_factor": {
+      "enabled": true,
+      "initial_rate": 1.0,
+      "reduction_per_doubling": 0.10,
+      "floor": 0.70
+    }
+  },
+  "win_loss_tracking": {
+    "enabled": true,
+    "categories": {
+      "won": { "label": "Won", "label_vi": "Thang", "color": "#22c55e" },
+      "lost_price": { "label": "Lost - Price", "label_vi": "Thua - Gia", "color": "#ef4444" },
+      "lost_delivery": { "label": "Lost - Delivery", "label_vi": "Thua - Giao hang", "color": "#f59e0b" },
+      "lost_capability": { "label": "Lost - Capability", "label_vi": "Thua - Nang luc", "color": "#8b5cf6" },
+      "lost_relationship": { "label": "Lost - Relationship", "label_vi": "Thua - Quan he", "color": "#6b7280" },
+      "lost_quality": { "label": "Lost - Quality History", "label_vi": "Thua - Lich su chat luong", "color": "#dc2626" },
+      "no_bid": { "label": "No Bid", "label_vi": "Khong bao gia", "color": "#9ca3af" },
+      "cancelled": { "label": "Cancelled by Customer", "label_vi": "Khach hang huy", "color": "#64748b" },
+      "pending": { "label": "Pending Decision", "label_vi": "Cho quyet dinh", "color": "#3b82f6" }
+    },
+    "follow_up_days": 14,
+    "review_frequency_months": 3
+  },
+  "approval_workflow": {
+    "below_5000_usd": { "approver_role": "estimator", "label": "Small Quote", "label_vi": "Bao gia nho" },
+    "5000_to_25000_usd": { "approver_role": "sales_manager", "label": "Standard Quote", "label_vi": "Bao gia tieu chuan" },
+    "25000_to_100000_usd": { "approver_role": "production_director", "label": "Large Quote", "label_vi": "Bao gia lon" },
+    "above_100000_usd": { "approver_role": "ceo", "label": "Strategic Quote", "label_vi": "Bao gia chien luoc" },
+    "below_minimum_margin": { "approver_role": "ceo", "label": "Below Minimum Margin", "label_vi": "Duoi bien loi nhuan toi thieu" }
+  }
+}

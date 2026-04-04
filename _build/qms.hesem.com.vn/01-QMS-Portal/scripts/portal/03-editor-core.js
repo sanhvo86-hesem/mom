@@ -1,8 +1,8 @@
-// DOCUMENT WORKFLOW & EDITING ENGINE
-// ═══════════════════════════════════════════════════
+﻿// DOCUMENT WORKFLOW & EDITING ENGINE
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 // States: draft | in_review | pending_approval | approved | obsolete
-// Workflow: draft → in_review → approved (version bump) OR → draft (rejected)
+// Workflow: draft â†’ in_review â†’ approved (version bump) OR â†’ draft (rejected)
 
 let editingDoc = null;  // currently editing doc code
 let currentDoc = null;  // currently viewing doc code
@@ -32,6 +32,13 @@ function getDocVersions(code){
 }
 function setDocVersions(code, versions){
   try{ SERVER_DOC_VERSIONS[code]=versions; }catch(e){}
+}
+function docHasWorkingVersion(code){
+  const versions=getDocVersions(code);
+  return Array.isArray(versions) && versions.some(function(v){
+    if(!v) return false;
+    return v.status==='draft' || v.status==='in_review' || v.status==='pending_approval';
+  });
 }
 const ED_SESSION_DRAFT_PREFIX = 'doc_html_';
 const ED_RECOVERY_DRAFT_PREFIX = 'doc_recovery_';
@@ -211,9 +218,28 @@ function canCreateNewDoc(){
   return !!(r && r.canCreateDocs);
 }
 
+function getDocCurrentReleasedEntry(doc){
+  if(!doc) return null;
+  const versions=(typeof getDocVersions==='function') ? (getDocVersions(doc.code)||[]) : [];
+  if(!Array.isArray(versions) || versions.length===0) return null;
+  return versions.find(v=>v && v.is_current)
+    || versions.find(v=>v && (v.status==='approved' || v.status==='initial_release'))
+    || null;
+}
+
+function getDocWorkingRevision(doc){
+  const state=getDocState(doc.code)||{};
+  return String(state.revision||doc.rev||'0').replace(/^v/i,'').trim() || '0';
+}
+
 function getDocRevision(doc){
-  const state=getDocState(doc.code);
-  return state ? state.revision : doc.rev;
+  const released=getDocCurrentReleasedEntry(doc);
+  const releasedRev=String((released&&released.version)||'').replace(/^v/i,'').trim();
+  if(releasedRev) return releasedRev;
+  const state=getDocState(doc.code)||{};
+  const fallbackReleased=String(state.released_revision||'').replace(/^v/i,'').trim();
+  if(fallbackReleased) return fallbackReleased;
+  return String(doc.rev||'0').replace(/^v/i,'').trim() || '0';
 }
 
 function getDocStatus(doc){
@@ -222,6 +248,11 @@ function getDocStatus(doc){
 }
 
 function statusLabel(status){
+  /* Delegate to HmRegistry if available */
+  if(window.HmRegistry){
+    var info = HmRegistry.status('doc_status', status);
+    if(info && info.label && info.label !== status) return (typeof lang!=='undefined'&&lang==='en') ? (info.labelEn||info.label) : info.label;
+  }
   const map={
     draft:T('wf_draft'),
     in_review:T('wf_in_review'),
@@ -234,7 +265,12 @@ function statusLabel(status){
 }
 
 function statusColor(status){
-  const map={
+  /* Delegate to HmRegistry if available → reads from status-options.json 'doc_status' */
+  if(window.HmRegistry){
+    var info = HmRegistry.status('doc_status', status);
+    if(info && info.color && info.color !== '#6b7280') return info.color;
+  }
+  var map={
     draft:'#f59e0b',
     in_review:'#3b82f6',
     pending_approval:'#8b5cf6',
@@ -245,9 +281,9 @@ function statusColor(status){
   return map[status]||'#94a3b8';
 }
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // PROFESSIONAL DOCUMENT EDITOR
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 let edSourceMode = false;
 let edZoom = 100;
 let edModified = false;
@@ -285,7 +321,7 @@ const EI={
   zoomIn:S+'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35M11 8v6M8 11h6"/></svg>',
   zoomOut:S+'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35M8 11h6"/></svg>',
   fullscreen:S+'<path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg>',
-  pilcrow:'<span style="font-size:16px;font-weight:700;font-family:serif;opacity:.7">¶</span>',
+  pilcrow:'<span style="font-size:16px;font-weight:700;font-family:serif;opacity:.7">Â¶</span>',
   spacing:S+'<path d="M3 6h18M3 12h18M3 18h18M20 6v12"/></svg>',
   pageBreak:S+'<path d="M3 9h2M9 9h2M15 9h2M21 9h0M7 3v6M17 3v6M7 15v6M17 15v6"/></svg>',
   painter:S+'<rect x="12" y="2" width="8" height="6" rx="1.5" fill="currentColor" opacity=".25" stroke="currentColor" stroke-width="1.5"/><path d="M14 8v2H8v4H6V9a1 1 0 011-1h7z" fill="currentColor"/><path d="M6 14v5l2-2v-3" fill="currentColor"/></svg>',
@@ -344,12 +380,12 @@ function buildEditorToolbar(){
         <option value="Verdana" style="font-family:Verdana">Verdana</option>
       </select>
       <select class="ed-sel ed-sel-size" id="ed-size" onchange="edCmd('fontSize',this.value)" title="${v?'Cỡ chữ':'Size'}">
-        <option value="">—</option>
+        <option value="">â€”</option>
         <option value="1">8</option><option value="2">10</option><option value="3">12</option>
         <option value="4">14</option><option value="5">18</option><option value="6">24</option><option value="7">36</option>
       </select>
       <select class="ed-sel ed-sel-spacing" id="ed-spacing" onchange="edLineSpacing(this.value)" title="${v?'Khoảng cách dòng':'Line Spacing'}">
-        <option value="">↕</option>
+        <option value="">â†•</option>
         <option value="1">1.0</option><option value="1.15">1.15</option><option value="1.5">1.5</option>
         <option value="2">2.0</option><option value="2.5">2.5</option><option value="3">3.0</option>
       </select>
@@ -359,90 +395,97 @@ function buildEditorToolbar(){
       ${btn(EI.underline,'underline',v?'Gạch chân · Ctrl+U':'Underline · Ctrl+U')}
       ${btn(EI.strike,'strikeThrough',v?'Gạch ngang':'Strikethrough')}
       <div class="ed-cpick" id="ed-cpick-fg">
-        <button class="ed-cpick-main" onmousedown="edSaveSelection();event.preventDefault()" onclick="edApplyColor('fg')" title="${v?'Màu chữ':'Text Color'}">
+        <button class="ed-cpick-main" onmousedown="edSaveSelection();event.preventDefault()" onclick="edApplyColor('fg')" title="${v?'MÃ u chá»¯':'Text Color'}">
           <span style="font-weight:700;font-size:15px;font-family:serif;color:var(--ed-fg-c,#c00)">A</span>
           <div class="ed-cpick-bar" id="ed-fg-bar" style="background:var(--ed-fg-c,#cc0000)"></div>
         </button>
-        <button class="ed-cpick-arrow" onmousedown="edSaveSelection();event.preventDefault()" onclick="edToggleColorDD('fg')" title="${v?'Chọn màu chữ':'Pick text color'}">▾</button>
+        <button class="ed-cpick-arrow" onmousedown="edSaveSelection();event.preventDefault()" onclick="edToggleColorDD('fg')" title="${v?'Chá»n mÃ u chá»¯':'Pick text color'}">â–¾</button>
         <div class="ed-cpick-dd" id="ed-fg-dd"></div>
       </div>
       <div class="ed-cpick" id="ed-cpick-bg">
-        <button class="ed-cpick-main" onmousedown="edSaveSelection();event.preventDefault()" onclick="edApplyColor('bg')" title="${v?'Màu nền chữ':'Highlight'}">
+        <button class="ed-cpick-main" onmousedown="edSaveSelection();event.preventDefault()" onclick="edApplyColor('bg')" title="${v?'MÃ u ná»n chá»¯':'Highlight'}">
           <span style="font-weight:700;font-size:14px;padding:0 3px;border-radius:2px;background:var(--ed-bg-c,#ff0)">A</span>
           <div class="ed-cpick-bar" id="ed-bg-bar" style="background:var(--ed-bg-c,#ffff00)"></div>
         </button>
-        <button class="ed-cpick-arrow" onmousedown="edSaveSelection();event.preventDefault()" onclick="edToggleColorDD('bg')" title="${v?'Chọn tô nền':'Pick highlight color'}">▾</button>
+        <button class="ed-cpick-arrow" onmousedown="edSaveSelection();event.preventDefault()" onclick="edToggleColorDD('bg')" title="${v?'Chá»n tÃ´ ná»n':'Pick highlight color'}">â–¾</button>
         <div class="ed-cpick-dd" id="ed-bg-dd"></div>
       </div>
-      ${btn(EI.sup,'superscript',v?'Chỉ số trên':'Superscript')}
-      ${btn(EI.sub,'subscript',v?'Chỉ số dưới':'Subscript')}
+      ${btn(EI.sup,'superscript',v?'Chá»‰ sá»‘ trÃªn':'Superscript')}
+      ${btn(EI.sub,'subscript',v?'Chá»‰ sá»‘ dÆ°á»›i':'Subscript')}
       <div class="ed-sep"></div>
-      ${btn(EI.link,'_link',v?'Liên kết':'Link')}
-      ${btn(EI.image,'_image',v?'Hình ảnh':'Image')}
+      ${btn(EI.link,'_link',v?'LiÃªn káº¿t':'Link')}
+      ${btn(EI.image,'_image',v?'HÃ¬nh áº£nh':'Image')}
 
       <div class="ed-sep"></div>
-      ${btn(EI.alignL,'justifyLeft',v?'Căn trái':'Left')}
-      ${btn(EI.alignC,'justifyCenter',v?'Căn giữa':'Center')}
-      ${btn(EI.alignR,'justifyRight',v?'Căn phải':'Right')}
-      ${btn(EI.alignJ,'justifyFull',v?'Căn đều':'Justify')}
+      ${btn(EI.alignL,'justifyLeft',v?'CÄƒn trÃ¡i':'Left')}
+      ${btn(EI.alignC,'justifyCenter',v?'CÄƒn giá»¯a':'Center')}
+      ${btn(EI.alignR,'justifyRight',v?'CÄƒn pháº£i':'Right')}
+      ${btn(EI.alignJ,'justifyFull',v?'CÄƒn Ä‘á»u':'Justify')}
       <div class="ed-sep"></div>
       <div class="ed-cpick" id="ed-cpick-ul">
-        <button class="ed-cpick-main" onclick="edCmd('insertUnorderedList')" title="${v?'Danh sách':'Bullets'}" style="width:28px">${EI.ul}</button>
-        <button class="ed-cpick-arrow" onclick="edToggleListDD('ul')" title="${v?'Mở kiểu bullet':'Open bullet styles'}">&#9662;</button>
+        <button class="ed-cpick-main" onclick="edCmd('insertUnorderedList')" title="${v?'Danh sÃ¡ch':'Bullets'}" style="width:28px">${EI.ul}</button>
+        <button class="ed-cpick-arrow" onclick="edToggleListDD('ul')" title="${v?'Má»Ÿ kiá»ƒu bullet':'Open bullet styles'}">&#9662;</button>
         <div class="ed-cpick-dd" id="ed-ul-dd"></div>
       </div>
       <div class="ed-cpick" id="ed-cpick-ol">
-        <button class="ed-cpick-main" onclick="edCmd('insertOrderedList')" title="${v?'Số thứ tự':'Numbering'}" style="width:28px">${EI.ol}</button>
-        <button class="ed-cpick-arrow" onclick="edToggleListDD('ol')" title="${v?'Mở kiểu đánh số':'Open numbering styles'}">&#9662;</button>
+        <button class="ed-cpick-main" onclick="edCmd('insertOrderedList')" title="${v?'Sá»‘ thá»© tá»±':'Numbering'}" style="width:28px">${EI.ol}</button>
+        <button class="ed-cpick-arrow" onclick="edToggleListDD('ol')" title="${v?'Má»Ÿ kiá»ƒu Ä‘Ã¡nh sá»‘':'Open numbering styles'}">&#9662;</button>
         <div class="ed-cpick-dd" id="ed-ol-dd"></div>
       </div>
-      ${btn(EI.checklist,'_checklist',v?'Danh sách kiểm':'Checklist')}
-      ${btn(EI.indent,'indent',v?'Thụt vào':'Indent')}
-      ${btn(EI.outdent,'outdent',v?'Thụt ra':'Outdent')}
+      ${btn(EI.checklist,'_checklist',v?'Danh sÃ¡ch kiá»ƒm':'Checklist')}
+      ${btn(EI.indent,'indent',v?'Thá»¥t vÃ o':'Indent')}
+      ${btn(EI.outdent,'outdent',v?'Thá»¥t ra':'Outdent')}
       <div class="ed-sep"></div>
-      ${btn(EI.table,'_table',v?'Bảng':'Table')}
-      ${btn(EI.hr,'insertHorizontalRule',v?'Đường kẻ':'Line')}
-      ${btn(EI.quote,'_quote',v?'Trích dẫn':'Quote')}
-      ${btn(EI.code,'_code',v?'Mã':'Code')}
-      ${btn(EI.pageBreak,'_pageBreak',v?'Ngắt trang':'Page Break')}
+      ${btn(EI.table,'_table',v?'Báº£ng':'Table')}
+      ${btn(EI.hr,'insertHorizontalRule',v?'ÄÆ°á»ng káº»':'Line')}
+      ${btn(EI.quote,'_quote',v?'TrÃ­ch dáº«n':'Quote')}
+      ${btn(EI.code,'_code',v?'MÃ£':'Code')}
+      ${btn(EI.pageBreak,'_pageBreak',v?'Ngáº¯t trang':'Page Break')}
       <div class="ed-sep"></div>
-      <span style="font-size:8px;color:#94a3b8;font-weight:700;letter-spacing:.3px;padding:0 1px">${v?'CHÈN':'INS'}</span>
-      ${btn('<svg width="16" height="16" viewBox="0 0 16 16"><rect x="1.5" y="2.5" width="13" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><text x="4.5" y="11" font-size="8.5" font-weight="700" fill="currentColor" stroke="none">T</text></svg>','_textbox',v?'Hộp văn bản':'Text Box')}
-      ${btn('<svg width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="3" width="6" height="6" rx=".5" fill="#60a5fa" stroke="#2563eb" stroke-width=".8"/><circle cx="12" cy="5" r="3" fill="#4ade80" stroke="#16a34a" stroke-width=".8"/><polygon points="11,10 15,15 7,15" fill="#fbbf24" stroke="#d97706" stroke-width=".8"/></svg>','_shape',v?'Hình dạng':'Shapes')}
-      ${btn('<svg width="16" height="16" viewBox="0 0 16 16"><rect x="2.5" y="5" width="2.5" height="9" rx=".4" fill="#3b82f6"/><rect x="6.5" y="2" width="2.5" height="12" rx=".4" fill="#22c55e"/><rect x="10.5" y="7" width="2.5" height="7" rx=".4" fill="#f59e0b"/></svg>','_chart',v?'Biểu đồ':'Chart')}
-      ${btn('<svg width="16" height="16" viewBox="0 0 16 16"><text x="1" y="13" font-size="13" font-family="serif" font-weight="700" fill="currentColor" stroke="none">\u03A3</text></svg>','_math',v?'Công thức toán':'Math')}
+      <span style="font-size:8px;color:#94a3b8;font-weight:700;letter-spacing:.3px;padding:0 1px">${v?'CHÃˆN':'INS'}</span>
+      ${btn('<svg width="16" height="16" viewBox="0 0 16 16"><rect x="1.5" y="2.5" width="13" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><text x="4.5" y="11" font-size="8.5" font-weight="700" fill="currentColor" stroke="none">T</text></svg>','_textbox',v?'Há»™p vÄƒn báº£n':'Text Box')}
+      ${btn('<svg width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="3" width="6" height="6" rx=".5" fill="#60a5fa" stroke="#2563eb" stroke-width=".8"/><circle cx="12" cy="5" r="3" fill="#4ade80" stroke="#16a34a" stroke-width=".8"/><polygon points="11,10 15,15 7,15" fill="#fbbf24" stroke="#d97706" stroke-width=".8"/></svg>','_shape',v?'HÃ¬nh dáº¡ng':'Shapes')}
+      ${btn('<svg width="16" height="16" viewBox="0 0 16 16"><rect x="2.5" y="5" width="2.5" height="9" rx=".4" fill="#3b82f6"/><rect x="6.5" y="2" width="2.5" height="12" rx=".4" fill="#22c55e"/><rect x="10.5" y="7" width="2.5" height="7" rx=".4" fill="#f59e0b"/></svg>','_chart',v?'Biá»ƒu Ä‘á»“':'Chart')}
+      ${btn('<svg width="16" height="16" viewBox="0 0 16 16"><text x="1" y="13" font-size="13" font-family="serif" font-weight="700" fill="currentColor" stroke="none">\u03A3</text></svg>','_math',v?'CÃ´ng thá»©c toÃ¡n':'Math')}
       <div style="position:relative;display:inline-flex;flex-shrink:0">
-        ${btn('<svg width="16" height="16" viewBox="0 0 16 16"><text x="2" y="13" font-size="13" fill="currentColor" stroke="none">\u03A9</text></svg>','_special',v?'Ký tự đặc biệt':'Special Chars')}
+        ${btn('<svg width="16" height="16" viewBox="0 0 16 16"><text x="2" y="13" font-size="13" fill="currentColor" stroke="none">\u03A9</text></svg>','_special',v?'KÃ½ tá»± Ä‘áº·c biá»‡t':'Special Chars')}
         <div class="ed-special-panel" id="ed-special-panel"></div>
       </div>
-      ${btn('<svg width="16" height="16" viewBox="0 0 16 16"><rect x="2.2" y="3" width="11.6" height="10.6" rx="1.3" fill="none" stroke="currentColor" stroke-width="1.1"/><path d="M4 1.8v2.4M12 1.8v2.4M2.8 6h10.4" stroke="currentColor" stroke-width="1.1"/><circle cx="8" cy="10" r="1.5" fill="currentColor" stroke="none"/></svg>','_date',v?'Chèn ngày giờ · Alt+Shift+D':'Insert date/time · Alt+Shift+D')}
+      ${btn('<svg width="16" height="16" viewBox="0 0 16 16"><rect x="2.2" y="3" width="11.6" height="10.6" rx="1.3" fill="none" stroke="currentColor" stroke-width="1.1"/><path d="M4 1.8v2.4M12 1.8v2.4M2.8 6h10.4" stroke="currentColor" stroke-width="1.1"/><circle cx="8" cy="10" r="1.5" fill="currentColor" stroke="none"/></svg>','_date',v?'ChÃ¨n ngÃ y giá» Â· Alt+Shift+D':'Insert date/time Â· Alt+Shift+D')}
       <div style="position:relative;display:inline-flex;flex-shrink:0">
-        ${btn('<span style="font-size:10px;font-weight:800;letter-spacing:.4px">QMS</span>','_qms',v?'Khối QMS nhanh':'QMS Quick Insert')}
+        ${btn('<span style="font-size:10px;font-weight:800;letter-spacing:.4px">QMS</span>','_qms',v?'Khá»‘i QMS nhanh':'QMS Quick Insert')}
         <div class="ed-special-panel ed-qms-panel" id="ed-qms-panel"></div>
       </div>
       <div class="ed-sep"></div>
-      ${btn(EI.clear,'removeFormat',v?'Xóa định dạng':'Clear')}
+      ${btn(EI.clear,'removeFormat',v?'XÃ³a Ä‘á»‹nh dáº¡ng':'Clear')}
 
-      ${btn(EI.find,'_find',v?'Tìm / Thay thế (Ctrl+F / Ctrl+H)':'Find / Replace (Ctrl+F / Ctrl+H)')}
+      ${btn(EI.find,'_find',v?'TÃ¬m / Thay tháº¿ (Ctrl+F / Ctrl+H)':'Find / Replace (Ctrl+F / Ctrl+H)')}
       ${btn(EI.source,'_source',v?'HTML':'HTML')}
-      <button class="ed-btn" onclick="edDomToggle()" title="${v?'DOM Inspector (bố cục)':'DOM Inspector (layout)'}" style="font-size:11px;font-weight:700;letter-spacing:-.5px">🏗️</button>
+      <button class="ed-btn ed-btn-text" onclick="edDomToggle()" title="${v?'DOM Inspector (bố cục)':'DOM Inspector (layout)'}">DOM</button>
+      <button class="ed-btn ed-btn-text" id="ed-form-dock-toggle-btn" onclick="edFormDockToggle()" title="${v?'Ẩn / hiện Form Blocks':'Toggle Form Blocks'}">BLK</button>
+      <button class="ed-btn ed-btn-text" onclick="if(window._mdOpenControl){window._mdOpenControl();}" title="${v?'Mở dữ liệu nền':'Open master data'}">DATA</button>
       ${btn(EI.print,'_print',v?'In':'Print')}
 
       <div class="ed-sep"></div>
-      ${btn(EI.zoomOut,'_zoomOut',v?'Thu nhỏ':'Zoom out')}
+      ${btn(EI.zoomOut,'_zoomOut',v?'Thu nhá»':'Zoom out')}
       <span style="font-size:10px;font-weight:600;color:#666;min-width:30px;text-align:center;flex-shrink:0" id="ed-zoom-label">100%</span>
       ${btn(EI.zoomIn,'_zoomIn','+')}
-      ${btn(EI.fullscreen,'_fullscreen',v?'Toàn màn hình':'Fullscreen')}
+      ${btn(EI.fullscreen,'_fullscreen',v?'ToÃ n mÃ n hÃ¬nh':'Fullscreen')}
     </div>
   `;
+  edRepairMojibake(tb);
+  edInstallMojibakeObserver();
+  edSyncFormDockToggleButton();
   const area=document.getElementById('editor-area');
   area.removeEventListener('input',edOnInput);
   area.removeEventListener('keydown',edKeyDown);
   area.removeEventListener('mouseup',edUpdateState);
   area.removeEventListener('keyup',edUpdateState);
+  area.removeEventListener('wheel',edHandleEditorWheelZoom,true);
   area.addEventListener('input',edOnInput);
   area.addEventListener('keydown',edKeyDown);
   area.addEventListener('mouseup',edUpdateState);
+  area.addEventListener('wheel',edHandleEditorWheelZoom,{capture:true,passive:false});
   // Named handlers to avoid stacking on repeated buildEditorToolbar calls
   if(!window._edClosePopups){
     window._edClosePopups=function(){document.querySelectorAll('.ed-cpick-dd,.ed-special-panel').forEach(function(d){d.classList.remove('open');});};
@@ -578,7 +621,7 @@ function edColorPalette(onPick,currentColor){
   }
   html+='</div>';
   html+='<div style="display:flex;gap:4px;align-items:center;margin-top:6px;padding:0 4px"><label style="font-size:10px;color:#666">Custom:</label><input type="color" value="'+(currentColor||'#000000')+'" style="width:28px;height:22px;border:1px solid #ddd;border-radius:3px;cursor:pointer;padding:0" data-custom="1"><button style="font-size:10px;padding:2px 8px;border:1px solid #ddd;border-radius:3px;background:#fff;cursor:pointer" data-apply="1">OK</button>';
-  if(currentColor){html+='<button style="font-size:10px;padding:2px 6px;border:1px solid #ddd;border-radius:3px;background:#fff;cursor:pointer;color:#dc2626" data-clear="1">✕</button>';}
+  if(currentColor){html+='<button style="font-size:10px;padding:2px 6px;border:1px solid #ddd;border-radius:3px;background:#fff;cursor:pointer;color:#dc2626" data-clear="1">âœ•</button>';}
   html+='</div>';
   var div=document.createElement('div');
   div.innerHTML=html;
@@ -717,7 +760,7 @@ function edExecCommand(cmd,arg2,arg3){
 function edCmd(cmd,val){
   // Block formatting commands in source mode (only allow source/find/print/zoom/fullscreen)
   if(edSourceMode&&cmd!=='_source'&&cmd!=='_find'&&cmd!=='_print'&&cmd!=='_zoomIn'&&cmd!=='_zoomOut'&&cmd!=='_fullscreen'){
-    showToast(lang!=='en'?'⚠ Chuyển về WYSIWYG trước khi chỉnh sửa':'⚠ Switch back to WYSIWYG before editing');
+    showToast(lang!=='en'?'âš  Chuyá»ƒn vá» WYSIWYG trÆ°á»›c khi chá»‰nh sá»­a':'âš  Switch back to WYSIWYG before editing');
     return;
   }
   const area=document.getElementById('editor-area');
@@ -783,7 +826,7 @@ function edCmd(cmd,val){
   if(ok!==false){
     edMarkModified();
   }else if(tiptapActive){
-    showToast(lang!=='en'?'⚠ Lệnh này chưa hỗ trợ trong Tiptap pilot':'⚠ This command is not supported in Tiptap pilot yet');
+    showToast(lang!=='en'?'âš  Lá»‡nh nÃ y chÆ°a há»— trá»£ trong Tiptap pilot':'âš  This command is not supported in Tiptap pilot yet');
   }
   edUpdateState();
 }
@@ -802,7 +845,7 @@ function edFormatPaint(){
   edFormatPainter={fontFamily:cs.fontFamily,fontSize:cs.fontSize,fontWeight:cs.fontWeight,fontStyle:cs.fontStyle,textDecoration:cs.textDecoration,color:cs.color,backgroundColor:cs.backgroundColor};
   document.getElementById('editor-area').style.cursor='copy';
   document.getElementById('editor-area').addEventListener('mouseup',edApplyPaint,{once:true});
-  showToast(lang!=='en'?'🖌 Chọn văn bản để áp dụng định dạng':'🖌 Select text to apply format');
+  showToast(lang!=='en'?'ðŸ–Œ Chá»n vÄƒn báº£n Ä‘á»ƒ Ã¡p dá»¥ng Ä‘á»‹nh dáº¡ng':'ðŸ–Œ Select text to apply format');
 }
 function edApplyPaint(){
   if(!edFormatPainter)return;
@@ -879,7 +922,7 @@ function edInsertPageBreak(){
 function edInsertChecklist(){
   edFocusAndRestore();
   const vi=lang!=='en';
-  const items=[vi?'Mục 1':'Item 1',vi?'Mục 2':'Item 2',vi?'Mục 3':'Item 3'];
+  const items=[vi?'Má»¥c 1':'Item 1',vi?'Má»¥c 2':'Item 2',vi?'Má»¥c 3':'Item 3'];
   let html='';
   items.forEach(t=>{
     html+='<div class="ed-check-item" style="display:flex;align-items:center;gap:8px;margin:4px 0;padding:2px 0"><input type="checkbox" style="width:16px;height:16px;accent-color:#1967d2;flex-shrink:0"><span contenteditable="true" style="flex:1;outline:none">'+t+'</span></div>';
@@ -911,9 +954,9 @@ function edToggleFullscreen(){
   }
 }
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // COLOR PICKER DROPDOWNS (Word-style)
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const ED_COLORS=[
   '#000000','#434343','#666666','#999999','#b7b7b7','#cccccc','#d9d9d9','#efefef','#f3f3f3','#ffffff',
   '#980000','#ff0000','#ff9900','#ffff00','#00ff00','#00ffff','#4a86e8','#0000ff','#9900ff','#ff00ff',
@@ -930,12 +973,12 @@ function edBuildColorDD(type){
   const dd=document.getElementById('ed-'+type+'-dd');
   const vi=lang!=='en';
   const isHighlight=type==='bg';
-  let html='<h5>'+(isHighlight?(vi?'Màu nền':'Highlight Color'):(vi?'Màu chữ':'Text Color'))+'</h5><div class="ed-cpick-grid">';
-  if(isHighlight) html+='<button class="nocolor" onclick="edPickColor(\'bg\',\'transparent\')" title="'+(vi?'Không màu':'No Color')+'"></button>';
+  let html='<h5>'+(isHighlight?(vi?'MÃ u ná»n':'Highlight Color'):(vi?'MÃ u chá»¯':'Text Color'))+'</h5><div class="ed-cpick-grid">';
+  if(isHighlight) html+='<button class="nocolor" onclick="edPickColor(\'bg\',\'transparent\')" title="'+(vi?'KhÃ´ng mÃ u':'No Color')+'"></button>';
   ED_COLORS.forEach(c=>{
     html+='<button style="background:'+c+'" onclick="edPickColor(\''+type+'\',\''+c+'\')" title="'+c+'"></button>';
   });
-  html+='</div><div class="ed-cpick-custom"><label>'+(vi?'Tùy chỉnh':'Custom')+'</label><input type="color" id="ed-custom-'+type+'" value="'+(isHighlight?'#ffff00':'#cc0000')+'"><button onclick="edPickColor(\''+type+'\',document.getElementById(\'ed-custom-'+type+'\').value)">OK</button></div>';
+  html+='</div><div class="ed-cpick-custom"><label>'+(vi?'TÃ¹y chá»‰nh':'Custom')+'</label><input type="color" id="ed-custom-'+type+'" value="'+(isHighlight?'#ffff00':'#cc0000')+'"><button onclick="edPickColor(\''+type+'\',document.getElementById(\'ed-custom-'+type+'\').value)">OK</button></div>';
   dd.innerHTML=html;
 }
 
@@ -1022,7 +1065,7 @@ function edPickColor(type,color){
   try{
     var sel=window.getSelection();
     if(!sel.rangeCount||!editTarget.contains(sel.getRangeAt(0).commonAncestorContainer)){
-      showToast(lang!=='en'?'⚠ Hãy chọn văn bản trước khi đổi màu':'⚠ Select text before changing color');
+      showToast(lang!=='en'?'âš  HÃ£y chá»n vÄƒn báº£n trÆ°á»›c khi Ä‘á»•i mÃ u':'âš  Select text before changing color');
       return;
     }
   }catch(e){}
@@ -1035,17 +1078,17 @@ function edPickColor(type,color){
   }
 }
 
-// ═══════════════════════════════════════════════════
-// SPECIAL CHARACTERS PANEL (CKEditor Ω)
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SPECIAL CHARACTERS PANEL (CKEditor Î©)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const ED_SPECIAL_CATS={
-  'common':['©','®','™','°','±','×','÷','µ','¶','§','†','‡','•','…','—','–','€','£','¥','¢','¤','ƒ','¹','²','³','¼','½','¾','‰','←','→','↑','↓','↔','↕','⇐','⇒','⇑','⇓'],
-  'math':['∀','∂','∃','∅','∇','∈','∉','∋','∏','∑','−','∗','√','∝','∞','∠','∧','∨','∩','∪','∫','∴','∼','≅','≈','≠','≡','≤','≥','⊂','⊃','⊄','⊆','⊇','⊕','⊗','⊥','⋅','⟨','⟩'],
-  'arrows':['←','→','↑','↓','↔','↕','⇐','⇒','⇑','⇓','⇔','↩','↪','↰','↱','↲','↳','↶','↷','↺','↻','➔','➜','➝','➞','➡','⬆','⬇','⬅','⬊','⬈','⬉','⬋'],
-  'greek':['Α','Β','Γ','Δ','Ε','Ζ','Η','Θ','Ι','Κ','Λ','Μ','Ν','Ξ','Ο','Π','Ρ','Σ','Τ','Υ','Φ','Χ','Ψ','Ω','α','β','γ','δ','ε','ζ','η','θ','ι','κ','λ','μ','ν','ξ','ο','π','ρ','σ','τ','υ','φ','χ','ψ','ω'],
-  'emoji':['😀','😂','🥰','😎','🤔','👍','👎','❤️','⭐','🔥','✅','❌','⚠️','📌','📎','📊','📈','📉','🏆','🎯','💡','🔔','📝','✏️','📂','💼','🔒','🔓','✉️','📞','🌐','⏰','🗓️','⚡','♻️','🎉'],
-  'shapes':['■','□','▪','▫','▲','△','▼','▽','◆','◇','○','●','◎','◉','★','☆','♠','♣','♥','♦','♤','♧','♡','♢','✓','✗','✘','✔','✖','✚','✛','✜','✝','✞','✟','☐','☑','☒'],
-  'currency':['$','€','£','¥','¢','₹','₽','₩','₺','₴','₿','฿','₫','₱','₦','₵','₡','₲','₮','₸','₼','₾','﷼','﹩']
+  'common':['Â©','Â®','â„¢','Â°','Â±','Ã—','Ã·','Âµ','Â¶','Â§','â€ ','â€¡','â€¢','â€¦','â€”','â€“','â‚¬','Â£','Â¥','Â¢','Â¤','Æ’','Â¹','Â²','Â³','Â¼','Â½','Â¾','â€°','â†','â†’','â†‘','â†“','â†”','â†•','â‡','â‡’','â‡‘','â‡“'],
+  'math':['âˆ€','âˆ‚','âˆƒ','âˆ…','âˆ‡','âˆˆ','âˆ‰','âˆ‹','âˆ','âˆ‘','âˆ’','âˆ—','âˆš','âˆ','âˆž','âˆ ','âˆ§','âˆ¨','âˆ©','âˆª','âˆ«','âˆ´','âˆ¼','â‰…','â‰ˆ','â‰ ','â‰¡','â‰¤','â‰¥','âŠ‚','âŠƒ','âŠ„','âŠ†','âŠ‡','âŠ•','âŠ—','âŠ¥','â‹…','âŸ¨','âŸ©'],
+  'arrows':['â†','â†’','â†‘','â†“','â†”','â†•','â‡','â‡’','â‡‘','â‡“','â‡”','â†©','â†ª','â†°','â†±','â†²','â†³','â†¶','â†·','â†º','â†»','âž”','âžœ','âž','âžž','âž¡','â¬†','â¬‡','â¬…','â¬Š','â¬ˆ','â¬‰','â¬‹'],
+  'greek':['Î‘','Î’','Î“','Î”','Î•','Î–','Î—','Î˜','Î™','Îš','Î›','Îœ','Î','Îž','ÎŸ','Î ','Î¡','Î£','Î¤','Î¥','Î¦','Î§','Î¨','Î©','Î±','Î²','Î³','Î´','Îµ','Î¶','Î·','Î¸','Î¹','Îº','Î»','Î¼','Î½','Î¾','Î¿','Ï€','Ï','Ïƒ','Ï„','Ï…','Ï†','Ï‡','Ïˆ','Ï‰'],
+  'emoji':['ðŸ˜€','ðŸ˜‚','ðŸ¥°','ðŸ˜Ž','ðŸ¤”','ðŸ‘','ðŸ‘Ž','â¤ï¸','â­','ðŸ”¥','âœ…','âŒ','âš ï¸','ðŸ“Œ','ðŸ“Ž','ðŸ“Š','ðŸ“ˆ','ðŸ“‰','ðŸ†','ðŸŽ¯','ðŸ’¡','ðŸ””','ðŸ“','âœï¸','ðŸ“‚','ðŸ’¼','ðŸ”’','ðŸ”“','âœ‰ï¸','ðŸ“ž','ðŸŒ','â°','ðŸ—“ï¸','âš¡','â™»ï¸','ðŸŽ‰'],
+  'shapes':['â– ','â–¡','â–ª','â–«','â–²','â–³','â–¼','â–½','â—†','â—‡','â—‹','â—','â—Ž','â—‰','â˜…','â˜†','â™ ','â™£','â™¥','â™¦','â™¤','â™§','â™¡','â™¢','âœ“','âœ—','âœ˜','âœ”','âœ–','âœš','âœ›','âœœ','âœ','âœž','âœŸ','â˜','â˜‘','â˜’'],
+  'currency':['$','â‚¬','Â£','Â¥','Â¢','â‚¹','â‚½','â‚©','â‚º','â‚´','â‚¿','à¸¿','â‚«','â‚±','â‚¦','â‚µ','â‚¡','â‚²','â‚®','â‚¸','â‚¼','â‚¾','ï·¼','ï¹©']
 };
 
 let edSpecialCat='common';
@@ -1075,7 +1118,7 @@ function edToggleSpecial(){
 function edBuildSpecialPanel(){
   const panel=document.getElementById('ed-special-panel');
   const vi=lang!=='en';
-  const catNames={common:vi?'Phổ biến':'Common',math:vi?'Toán học':'Math',arrows:vi?'Mũi tên':'Arrows',greek:vi?'Hy Lạp':'Greek',emoji:'Emoji',shapes:vi?'Hình dạng':'Shapes',currency:vi?'Tiền tệ':'Currency'};
+  const catNames={common:vi?'Phá»• biáº¿n':'Common',math:vi?'ToÃ¡n há»c':'Math',arrows:vi?'MÅ©i tÃªn':'Arrows',greek:vi?'Hy Láº¡p':'Greek',emoji:'Emoji',shapes:vi?'HÃ¬nh dáº¡ng':'Shapes',currency:vi?'Tiá»n tá»‡':'Currency'};
   let html='<div class="ed-special-cats">';
   Object.keys(ED_SPECIAL_CATS).forEach(k=>{
     html+='<button onmousedown="event.preventDefault()"'+(k===edSpecialCat?' class="active"':'')+' onclick="event.stopPropagation();edSpecialCat=\''+k+'\';edBuildSpecialPanel()">'+catNames[k]+'</button>';
@@ -1098,8 +1141,33 @@ function edInsertChar(ch){
 function _edInsertHtmlBlock(html){
   edFocusAndRestore();
   var ok=edExecCommand('insertHTML',false,String(html==null?'':html));
+  if(ok===false){
+    try{
+      var root = edGetContentRoot() || document.getElementById('editor-area');
+      if(!root) return;
+      var host = (window._edActiveQms && window._edActiveQms.parentNode) ? window._edActiveQms.parentNode : root;
+      var temp = document.createElement('div');
+      temp.innerHTML = String(html == null ? '' : html);
+      var frag = document.createDocumentFragment();
+      while(temp.firstChild) frag.appendChild(temp.firstChild);
+      if(window._edActiveQms && window._edActiveQms.parentNode === host){
+        var anchor = window._edActiveQms;
+        if(anchor.nextSibling){
+          host.insertBefore(frag, anchor.nextSibling);
+        } else {
+          host.appendChild(frag);
+        }
+      } else {
+        host.appendChild(frag);
+      }
+      ok = true;
+    }catch(_insertErr){
+      ok = false;
+    }
+  }
   if(ok!==false){
     try{ edApplyGlobalTablePolicy(edGetContentRoot()||document.getElementById('editor-area'), {force:true, source:'qms-insert'}); }catch(e){}
+    try{ if(typeof edRepairMojibake === 'function') edRepairMojibake(edGetContentRoot()||document.getElementById('editor-area')); }catch(e2){}
     edSaveSelection();
     edMarkModified();
     edUpdateState();
@@ -1117,6 +1185,155 @@ function edInsertDateTime(){
     stamp=now();
   }
   _edInsertHtmlBlock('<span class="tag">'+_edEscapeHtml(stamp)+'</span>');
+}
+
+function edRepairMojibake(root){
+  if(!root) return;
+  function cleanup(value){
+    return String(value==null?'':value)
+      .replace(/\uFFFD/g,'')
+      .replace(/[\u0018\u0019]/g,'')
+      .replace(/Â·/g,'·')
+      .replace(/â€”/g,'—')
+      .replace(/â€“/g,'–')
+      .replace(/â€œ/g,'“')
+      .replace(/â€|â€�/g,'”')
+      .replace(/â€˜|â€™/g,'’')
+      .replace(/â€¦/g,'…')
+      .replace(/Ã /g,'à')
+      .replace(/Ã¡/g,'á')
+      .replace(/Ã¢/g,'â')
+      .replace(/Äƒ/g,'ă')
+      .replace(/Ä‘/g,'đ')
+      .replace(/Ä/g,'Đ')
+      .replace(/Æ°/g,'ư')
+      .replace(/Æ¡/g,'ơ')
+      .replace(/áº¡/g,'ạ')
+      .replace(/áº£/g,'ả')
+      .replace(/áº¥/g,'ấ')
+      .replace(/áº§/g,'ầ')
+      .replace(/á»™/g,'ộ')
+      .replace(/á»›/g,'ớ')
+      .replace(/á»/g,'ờ')
+      .replace(/á»§/g,'ủ')
+      .replace(/á»«/g,'ừ')
+      .replace(/á»¯/g,'ữ')
+      .replace(/Dùng người Ēng nhập/g,'Dùng người đăng nhập')
+      .replace(/ChÃ¨n/g,'Chèn')
+      .replace(/NhÃ£n tiáº¿ng Viá»‡t/g,'Nhãn tiếng Việt')
+      .replace(/Giáº£i thÃ­ch tiáº¿ng Viá»‡t cÃ³ dáº¥u/g,'Giải thích tiếng Việt có dấu')
+      .replace(/Khá»‘i chá»¯ kÃ½/g,'Khối chữ ký')
+      .replace(/LÆ°á»›i field 2 cá»™t/g,'Lưới field 2 cột')
+      .replace(/Field nháº­p 1 dÃ²ng/g,'Field nhập 1 dòng')
+      .replace(/Field nháº­p nhiá»u dÃ²ng/g,'Field nhập nhiều dòng')
+      .replace(/Field chá»n dropdown/g,'Field chọn dropdown')
+      .replace(/Field lookup dá»¯ liá»‡u ná»n/g,'Field lookup dữ liệu nền')
+      .replace(/Dáº£i chá»¯ kÃ½ form/g,'Dải chữ ký form')
+      .replace(/Thanh tÃ³m táº¯t há»“ sÆ¡ phÃ­a trÃªn form/g,'Thanh tóm tắt hồ sơ phía trên form')
+      .replace(/Section chuáº©n cÃ³ sá»‘, tiÃªu Ä‘á» tiáº¿ng Anh vÃ  giáº£i thÃ­ch tiáº¿ng Viá»‡t/g,'Section chuẩn có số, tiêu đề tiếng Anh và giải thích tiếng Việt')
+      .replace(/Khung hÃ ng field 2 cá»™t Ä‘Ãºng chuáº©n form runtime/g,'Khung hàng field 2 cột đúng chuẩn form runtime')
+      .replace(/Field text chuáº©n vá»›i nhÃ£n EN vÃ  ghi chÃº VI/g,'Field text chuẩn với nhãn EN và ghi chú VI')
+      .replace(/Field mÃ´ táº£ nhiá»u dÃ²ng Ä‘Ãºng chuáº©n form runtime/g,'Field mô tả nhiều dòng đúng chuẩn form runtime')
+      .replace(/Field select dÃ¹ng cho dá»¯ liá»‡u ná»n hoáº·c tráº¡ng thÃ¡i/g,'Field select dùng cho dữ liệu nền hoặc trạng thái')
+      .replace(/Field tra cá»©u cho supplier, part, customer, person/g,'Field tra cứu cho supplier, part, customer, person')
+      .replace(/Khá»‘i chá»¯ kÃ½ chuáº©n cho ngÆ°á»i láº­p, xem xÃ©t, phÃª duyá»‡t/g,'Khối chữ ký chuẩn cho người lập, xem xét, phê duyệt')
+      .replace(/Khá»‘i kiá»ƒm soÃ¡t tÃ i liá»‡u/g,'Khối kiểm soát tài liệu')
+      .replace(/Báº£ng lá»‹ch sá»­ sá»­a Ä‘á»•i/g,'Bảng lịch sử sửa đổi')
+      .replace(/Khá»‘i kÃ½ duyá»‡t/g,'Khối ký duyệt')
+      .replace(/Báº£ng hÃ nh Ä‘á»™ng \/ CAPA/g,'Bảng hành động / CAPA')
+      .replace(/Báº£ng rá»§i ro & kiá»ƒm soÃ¡t/g,'Bảng rủi ro & kiểm soát')
+      .replace(/Ghi chÃº váº­n hÃ nh/g,'Ghi chú vận hành')
+      .replace(/DÃ²ng trá»‘ng Ä‘iá»n tay/g,'Dòng trống điền tay')
+      .replace(/Thuá»™c tÃ­nh section form/g,'Thuộc tính section form')
+      .replace(/TiÃªu Ä‘á» tiáº¿ng Anh/g,'Tiêu đề tiếng Anh')
+      .replace(/Giáº£i thÃ­ch tiáº¿ng Viá»‡t/g,'Giải thích tiếng Việt')
+      .replace(/MÃ u\/loáº¡i section/g,'Màu/loại section')
+      .replace(/Thuá»™c tÃ­nh field form/g,'Thuộc tính field form')
+      .replace(/Nháºn tiáº¿ng Anh/g,'Nhãn tiếng Anh')
+      .replace(/Nháºn tiáº¿ng Viá»‡t/g,'Nhãn tiếng Việt')
+      .replace(/Nguá»“n lookup dá»¯ liá»‡u ná»n/g,'Nguồn lookup dữ liệu nền')
+      .replace(/Mở quản lý dữ liệu nền/g,'Mở quản lý dữ liệu nền')
+      .replace(/Nội dung dropdown/g,'Nội dung dropdown')
+      .replace(/Kết nối dữ liệu & logic/g,'Kết nối dữ liệu & logic');
+  }
+  function score(value){
+    var text=String(value==null?'':value);
+    var bad=(text.match(/Ã|Â|Æ|Ä|â|ð|�|\uFFFD|\u0018|\u0019|Ē|€™|€|™|!t|trư:c|bu\"c/g)||[]).length;
+    var good=(text.match(/[àáạảãăằắặẳẵâầấậẩẫđèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹÀÁẠẢÃĂẰẮẶẲẴÂẦẤẬẨẪĐÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸ]/g)||[]).length;
+    var bonus=0;
+    ['không','đã','chưa','người','biểu mẫu','dữ liệu','trường','bắt buộc','ký','gửi','chèn','thuộc tính','dòng','cột','nền'].forEach(function(token){
+      if(text.toLowerCase().indexOf(token)>=0) bonus+=2;
+    });
+    return (good*2)+bonus-(bad*6);
+  }
+  function decodeCandidate(value){
+    var source=String(value==null?'':value);
+    var candidates=[source];
+    try{ candidates.push(decodeURIComponent(escape(source))); }catch(_err){}
+    try{
+      var bytes=new Uint8Array(Array.prototype.map.call(source,function(ch){ return ch.charCodeAt(0)&255; }));
+      candidates.push(new TextDecoder('utf-8').decode(bytes));
+    }catch(_err2){}
+    return candidates;
+  }
+  function fix(value){
+    var best=cleanup(value);
+    var bestScore=score(best);
+    for(var attempt=0;attempt<5;attempt+=1){
+      var improved=false;
+      decodeCandidate(best).forEach(function(candidate){
+        var cleaned=cleanup(candidate);
+        var nextScore=score(cleaned);
+        if(nextScore>bestScore){
+          best=cleaned;
+          bestScore=nextScore;
+          improved=true;
+        }
+      });
+      if(!improved) break;
+    }
+    return best;
+  }
+  function repairNode(node){
+    if(!node) return;
+    if(node.nodeType===Node.TEXT_NODE){
+      var fixedText=fix(node.nodeValue);
+      if(fixedText!==node.nodeValue) node.nodeValue=fixedText;
+      return;
+    }
+    if(node.nodeType!==Node.ELEMENT_NODE) return;
+    Array.prototype.forEach.call(node.childNodes||[],repairNode);
+    ['title','placeholder','aria-label','value'].forEach(function(attr){
+      if(node.hasAttribute&&node.hasAttribute(attr)){
+        var raw=node.getAttribute(attr);
+        var fixedAttr=fix(raw);
+        if(fixedAttr!==raw) node.setAttribute(attr,fixedAttr);
+      }
+    });
+  }
+  repairNode(root);
+}
+
+let edMojibakeObserver=null;
+function edInstallMojibakeObserver(){
+  if(edMojibakeObserver||!document.body||typeof MutationObserver!=='function') return;
+  edMojibakeObserver=new MutationObserver(function(records){
+    records.forEach(function(record){
+      if(record.type==='childList'){
+        Array.prototype.forEach.call(record.addedNodes||[],function(node){
+          edRepairMojibake(node);
+        });
+      }else if(record.type==='attributes'&&record.target){
+        edRepairMojibake(record.target);
+      }
+    });
+  });
+  edMojibakeObserver.observe(document.body,{
+    subtree:true,
+    childList:true,
+    attributes:true,
+    attributeFilter:['title','placeholder','aria-label','value']
+  });
 }
 
 function edToggleQmsTools(){
@@ -1145,6 +1362,14 @@ function edBuildQmsPanel(){
   const panel=document.getElementById('ed-qms-panel');
   const vi=lang!=='en';
   const items=[
+    {kind:'formRecordStrip', title:vi?'Record strip cho form':'Form record strip', desc:vi?'Thanh tóm tắt hồ sơ phía trên form':'Top record summary strip for forms'},
+    {kind:'formSection', title:vi?'Section form':'Form section', desc:vi?'Section chuẩn có số, tiêu đề tiếng Anh và giải thích tiếng Việt':'Standard numbered section with EN title and VI explanation'},
+    {kind:'formGrid2', title:vi?'Lưới field 2 cột':'2-column field grid', desc:vi?'Khung hàng field 2 cột đúng chuẩn form runtime':'Standard 2-column row for runtime forms'},
+    {kind:'formTextField', title:vi?'Field nhập 1 dòng':'Single-line form field', desc:vi?'Field text chuẩn với nhãn EN và ghi chú VI':'Standard text field with EN label and VI note'},
+    {kind:'formTextareaField', title:vi?'Field nhập nhiều dòng':'Textarea form field', desc:vi?'Field mô tả nhiều dòng đúng chuẩn form runtime':'Multi-line field for rich descriptions'},
+    {kind:'formSelectField', title:vi?'Field chọn dropdown':'Dropdown form field', desc:vi?'Field select dùng cho dữ liệu nền hoặc trạng thái':'Select field for master-data or state choices'},
+    {kind:'formLookupField', title:vi?'Field lookup dữ liệu nền':'Master-data lookup field', desc:vi?'Field tra cứu cho supplier, part, customer, person...':'Lookup field for supplier, part, customer, person...'},
+    {kind:'formSignatureRow', title:vi?'Dải chữ ký form':'Form signature row', desc:vi?'Khối chữ ký chuẩn cho người lập, xem xét, phê duyệt':'Signature row for originator, reviewer, approver'},
     {kind:'docControl', title:vi?'Khối kiểm soát tài liệu':'Document control', desc:vi?'Mã, phiên bản, owner, hiệu lực, phê duyệt':'Code, revision, owner, effective date, approval'},
     {kind:'revisionTable', title:vi?'Bảng lịch sử sửa đổi':'Revision history', desc:vi?'Bảng Rev / ngày / mô tả / người thực hiện':'Rev / date / description / owner table'},
     {kind:'approval', title:vi?'Khối ký duyệt':'Approval signatures', desc:vi?'Lập, rà soát, phê duyệt':'Prepared, reviewed, approved'},
@@ -1162,6 +1387,7 @@ function edBuildQmsPanel(){
   });
   html+='</div>';
   panel.innerHTML=html;
+  edRepairMojibake(panel);
 }
 
 function edInsertQmsTemplate(kind){
@@ -1177,13 +1403,104 @@ function edInsertQmsTemplate(kind){
     if(block){
       edSelectQmsBlock(block);
       edFocusQmsBlock(block);
+      try{
+        if(typeof block.scrollIntoView === 'function') block.scrollIntoView({ behavior:'smooth', block:'center' });
+        block.classList.add('ed-qms-just-inserted');
+        window.setTimeout(function(){ block.classList.remove('ed-qms-just-inserted'); }, 1600);
+      }catch(_scrollErr){}
+      if(['formSection','formTextField','formTextareaField','formSelectField','formLookupField'].indexOf(kind)>=0){
+        window.setTimeout(function(){
+          edSelectQmsBlock(block);
+          edEditQmsBlockProperties(block);
+        }, 140);
+      }
+      showToast((lang!=='en') ? 'Đã chèn block biểu mẫu mới.' : 'Inserted new form block.');
+    }else{
+      showToast((lang!=='en') ? 'Không thể đặt block vào canvas hiện tại.' : 'Could not place block into the current canvas.');
     }
   },0);
+}
+
+
+function edUnmountFormDesignerDock(){
+  var existing=document.getElementById('ed-form-designer-dock');
+  if(existing) existing.remove();
+  var btn=document.getElementById('ed-form-dock-toggle-btn');
+  if(btn) btn.classList.remove('active');
+}
+
+function edMountFormDesignerDock(ctx){
+  var host=document.getElementById('editor-container') || document.getElementById('editor-area');
+  if(!host) return;
+  var isFormDoc=!!(ctx && ctx.querySelector && (ctx.querySelector('[data-form-edit-root],.qf-section,.qf-field,.scar-record-strip') || ctx.matches('[data-form-edit-root],.qf-section,.qf-field,.scar-record-strip')));
+  if(!isFormDoc){
+    edUnmountFormDesignerDock();
+    return;
+  }
+  var dock=document.getElementById('ed-form-designer-dock');
+  if(!dock){
+    dock=document.createElement('div');
+    dock.id='ed-form-designer-dock';
+    dock.className='ed-form-designer-dock';
+    host.appendChild(dock);
+  }
+  dock.innerHTML=edBuildFormDesignerDock();
+  edRepairMojibake(dock);
+  dock.classList.toggle('is-hidden', !!window._edFormDockHidden);
+  edSyncFormDockToggleButton();
+}
+
+function edFormDockToggle(){
+  var dock = document.getElementById('ed-form-designer-dock');
+  if(!dock){
+    try{ edMountFormDesignerDock(edGetContentRoot() || document.getElementById('editor-area')); }catch(_err){}
+    dock = document.getElementById('ed-form-designer-dock');
+    if(!dock) return;
+  }
+  window._edFormDockHidden = !window._edFormDockHidden;
+  if(dock) dock.classList.toggle('is-hidden', !!window._edFormDockHidden);
+  edSyncFormDockToggleButton();
+}
+
+function edSyncFormDockToggleButton(){
+  var btn=document.getElementById('ed-form-dock-toggle-btn');
+  if(!btn) return;
+  btn.classList.toggle('active', !window._edFormDockHidden);
+}
+
+function edBuildFormDesignerDock(){
+  const items=[
+    {kind:'formSection', title:'Section'},
+    {kind:'formGrid2', title:'2-column grid'},
+    {kind:'formTextField', title:'Text field'},
+    {kind:'formTextareaField', title:'Textarea'},
+    {kind:'formSelectField', title:'Dropdown'},
+    {kind:'formLookupField', title:'Lookup'},
+    {kind:'formSignatureRow', title:'Signatures'},
+    {kind:'formRecordStrip', title:'Record strip'}
+  ];
+  return '<div class="ed-form-dock-head"><strong>Form Blocks</strong><span>Chèn block vào canvas sống. Click phải lên block để chọn và mở menu thuộc tính.</span></div>'
+    + '<div class="ed-form-dock-actions">'
+    +   '<button type="button" class="ed-form-dock-ghost" onmousedown="event.preventDefault()" onclick="edFormDockToggle()">' + _edEscapeHtml((lang!=='en') ? 'Ẩn panel' : 'Hide panel') + '</button>'
+    +   '<button type="button" class="ed-form-dock-ghost" onmousedown="event.preventDefault()" onclick="if(window._mdOpenControl){window._mdOpenControl();}">' + _edEscapeHtml((lang!=='en') ? 'Dữ liệu nền' : 'Master data') + '</button>'
+    + '</div>'
+    + '<div class="ed-form-dock-grid">' + items.map(function(item){
+      return '<button type="button" onmousedown="event.preventDefault();edSaveSelection();" onclick="edInsertQmsTemplate(\'' + item.kind + '\');event.stopPropagation()" title="' + _edEscapeHtml(item.title) + '">' + _edEscapeHtml(item.title) + '</button>';
+    }).join('') + '</div>'
+    + '<button type="button" class="ed-form-dock-manage" onmousedown="event.preventDefault()" onclick="if(window._mdOpenControl){window._mdOpenControl();}">' + _edEscapeHtml((lang!=='en') ? 'Mở quản lý dữ liệu nền' : 'Open master data control') + '</button>';
 }
 
 function edQmsKindMeta(kind){
   const vi=lang!=='en';
   const map={
+    formRecordStrip:{title:vi?'Record strip cho form':'Form record strip'},
+    formSection:{title:vi?'Section form':'Form section'},
+    formGrid2:{title:vi?'Lưới field 2 cột':'2-column field grid'},
+    formTextField:{title:vi?'Field nhập 1 dòng':'Single-line field'},
+    formTextareaField:{title:vi?'Field nhập nhiều dòng':'Textarea field'},
+    formSelectField:{title:vi?'Field chọn dropdown':'Dropdown field'},
+    formLookupField:{title:vi?'Field lookup dữ liệu nền':'Master-data lookup field'},
+    formSignatureRow:{title:vi?'Dải chữ ký form':'Form signature row'},
     docControl:{title:vi?'Kiểm soát tài liệu':'Document control'},
     revisionTable:{title:vi?'Lịch sử sửa đổi':'Revision history'},
     approval:{title:vi?'Ký duyệt':'Approval'},
@@ -1198,12 +1515,12 @@ function edQmsKindMeta(kind){
 
 function edQmsInlineField(minWidth,placeholder){
   const style=minWidth?' style="min-width:'+minWidth+'px"':'';
-  return '<span class="blank ed-qms-field ed-qms-inline-field is-empty" contenteditable="true" data-placeholder="'+_edEscapeHtml(placeholder||((lang!=='en')?'Điền nội dung':'Fill in'))+'"'+style+'></span>';
+  return '<span class="blank ed-qms-field ed-qms-inline-field is-empty" contenteditable="true" data-placeholder="'+_edEscapeHtml(placeholder||((lang!=='en')?'Äiá»n ná»™i dung':'Fill in'))+'"'+style+'></span>';
 }
 
 function edQmsBlockField(minHeight,placeholder){
   const style=minHeight?' style="min-height:'+minHeight+'px"':'';
-  return '<div class="input ed-qms-field ed-qms-block-field is-empty" contenteditable="true" data-placeholder="'+_edEscapeHtml(placeholder||((lang!=='en')?'Nhập nội dung':'Enter details'))+'"'+style+'></div>';
+  return '<div class="input ed-qms-field ed-qms-block-field is-empty" contenteditable="true" data-placeholder="'+_edEscapeHtml(placeholder||((lang!=='en')?'Nháº­p ná»™i dung':'Enter details'))+'"'+style+'></div>';
 }
 
 function edBuildQmsTemplateHtml(kind){
@@ -1218,40 +1535,92 @@ function edBuildQmsTemplateHtml(kind){
   const blank=function(w,ph){return edQmsInlineField(w,ph);};
   const block=function(h,ph){return edQmsBlockField(h,ph);};
   const templates={
+    formRecordStrip:
+      '<div class="scar-record-strip">'
+      +'<div class="scar-record-item"><small>Record ID</small><strong>SCAR-2026-001</strong></div>'
+      +'<div class="scar-record-item"><small>Supplier</small><strong>Supplier name</strong></div>'
+      +'<div class="scar-record-item"><small>PO / Part</small><strong>PO-0001 / PART-001 REV-A</strong></div>'
+      +'<div class="scar-record-item"><small>Status</small><strong>Open</strong></div>'
+      +'</div>',
+    formSection:
+      '<section class="qf-section qf-section--info" data-form-edit-root="1">'
+      +'<div class="qf-section-header"><div><div class="qf-section-title"><span class="qf-section-num">1</span> Section Title</div><div class="qf-section-subtitle">Giải thích tiếng Việt có dấu cho section này để người dùng hiểu rõ mục đích.</div></div></div>'
+      +'<div class="qf-section-body"><div class="qf-grid qf-grid--2">'
+      +'<div class="qf-field"><label class="qf-label" for="field_code">FIELD LABEL <span class="qf-required">*</span><span class="qf-label-vi">Nhãn tiếng Việt</span></label><input class="qf-input" id="field_code" name="field_code" placeholder="Ghi chú tiếng Việt có dấu"/><div class="qf-helper">Giải thích tiếng Việt có dấu cho field này.</div></div>'
+      +'<div class="qf-field"><label class="qf-label" for="field_code_2">FIELD LABEL 2 <span class="qf-label-vi">Nhãn phụ tiếng Việt</span></label><input class="qf-input" id="field_code_2" name="field_code_2" placeholder="Nhập nội dung"/><div class="qf-helper">Ghi chú hướng dẫn hoàn toàn bằng tiếng Việt có dấu.</div></div>'
+      +'</div></div></section>',
+    formGrid2:
+      '<div class="qf-grid qf-grid--2">'
+      +'<div class="qf-field"><label class="qf-label" for="field_left">LEFT FIELD <span class="qf-required">*</span><span class="qf-label-vi">TrÆ°á»ng bÃªn trÃ¡i</span></label><input class="qf-input" id="field_left" name="field_left" placeholder="Nháº­p dá»¯ liá»‡u"/><div class="qf-helper">Ghi chÃº tiáº¿ng Viá»‡t cho field bÃªn trÃ¡i.</div></div>'
+      +'<div class="qf-field"><label class="qf-label" for="field_right">RIGHT FIELD <span class="qf-label-vi">TrÆ°á»ng bÃªn pháº£i</span></label><input class="qf-input" id="field_right" name="field_right" placeholder="Nháº­p dá»¯ liá»‡u"/><div class="qf-helper">Ghi chÃº tiáº¿ng Viá»‡t cho field bÃªn pháº£i.</div></div>'
+      +'</div>',
+    formTextField:
+      '<div class="qf-field">'
+      +'<label class="qf-label" for="field_text">FIELD LABEL <span class="qf-required">*</span><span class="qf-label-vi">NhÃ£n tiáº¿ng Viá»‡t</span></label>'
+      +'<input class="qf-input" id="field_text" name="field_text" placeholder="Ghi chÃº tiáº¿ng Viá»‡t cÃ³ dáº¥u"/>'
+      +'<div class="qf-helper">Giáº£i thÃ­ch tiáº¿ng Viá»‡t cÃ³ dáº¥u cho field nháº­p má»™t dÃ²ng.</div>'
+      +'</div>',
+    formTextareaField:
+      '<div class="qf-field">'
+      +'<label class="qf-label" for="field_textarea">FIELD LABEL <span class="qf-required">*</span><span class="qf-label-vi">NhÃ£n tiáº¿ng Viá»‡t</span></label>'
+      +'<textarea class="qf-textarea" id="field_textarea" name="field_textarea" rows="5" placeholder="MÃ´ táº£ báº±ng tiáº¿ng Viá»‡t cÃ³ dáº¥u..."></textarea>'
+      +'<div class="qf-helper">Giáº£i thÃ­ch tiáº¿ng Viá»‡t cÃ³ dáº¥u cho field nháº­p nhiá»u dÃ²ng.</div>'
+      +'</div>',
+    formSelectField:
+      '<div class="qf-field">'
+      +'<label class="qf-label" for="field_select">FIELD LABEL <span class="qf-required">*</span><span class="qf-label-vi">NhÃ£n tiáº¿ng Viá»‡t</span></label>'
+      +'<select class="qf-select" id="field_select" name="field_select"><option value="">Chá»n</option><option>Option A</option><option>Option B</option><option>Option C</option></select>'
+      +'<div class="qf-helper">Náº¿u field gáº¯n dá»¯ liá»‡u ná»n thÃ¬ runtime sáº½ tá»± thay báº±ng droplist tra cá»©u.</div>'
+      +'</div>',
+    formLookupField:
+      '<div class="qf-field" data-lookup-source="suppliers">'
+      +'<label class="qf-label" for="field_lookup_lookup">FIELD LABEL <span class="qf-required">*</span><span class="qf-label-vi">NhÃ£n tiáº¿ng Viá»‡t</span></label>'
+      +'<div class="scar-lookup-host" id="field_lookup_lookup"></div>'
+      +'<input class="qf-input scar-hidden" id="field_lookup" name="field_lookup" placeholder="TÃ¬m vÃ  chá»n tá»« dá»¯ liá»‡u ná»n"/>'
+      +'<div class="qf-helper">Field lookup dÃ¹ng Ä‘á»ƒ gáº¯n supplier, part, customer, person vÃ  cÃ¡c thá»±c thá»ƒ ERP/MES/eQMS.</div>'
+      +'</div>',
+    formSignatureRow:
+      '<section class="qf-section qf-section--success">'
+      +'<div class="qf-section-header"><div><div class="qf-section-title"><span class="qf-section-num">S</span> Electronic Signatures</div><div class="qf-section-subtitle">Giải thích tiếng Việt có dấu cho quy tắc ký điện tử của biểu mẫu.</div></div></div>'
+      +'<div class="qf-section-body"><div class="qf-grid qf-grid--3">'
+      +'<div class="qf-field"><label class="qf-label">ORIGINATOR<span class="qf-label-vi">Người phát hành</span></label><div class="qf-input" style="min-height:44px;display:flex;align-items:center;color:#64748b">Chưa ký</div></div>'
+      +'<div class="qf-field"><label class="qf-label">REVIEWER<span class="qf-label-vi">Người xem xét</span></label><div class="qf-input" style="min-height:44px;display:flex;align-items:center;color:#64748b">Chưa ký</div></div>'
+      +'<div class="qf-field"><label class="qf-label">APPROVER<span class="qf-label-vi">Người phê duyệt</span></label><div class="qf-input" style="min-height:44px;display:flex;align-items:center;color:#64748b">Chưa ký</div></div>'
+      +'</div></div></section>',
     docControl:
-      '<div class="card"><div class="card-title">'+(vi?'Thông tin kiểm soát tài liệu':'Document Control Information')+'</div><table class="form-table"><tbody>'
-      +'<tr><th style="width:28%">'+(vi?'Mã tài liệu':'Document code')+'</th><td>'+blank(180,vi?'Nhập mã tài liệu':'Enter document code')+'</td><th style="width:22%">'+(vi?'Phiên bản':'Revision')+'</th><td>'+blank(120,vi?'Rev':'Rev')+'</td></tr>'
-      +'<tr><th>'+(vi?'Chủ sở hữu':'Owner')+'</th><td>'+blank(180,vi?'Tên owner':'Owner name')+'</td><th>'+(vi?'Ngày hiệu lực':'Effective date')+'</th><td>'+blank(120,vi?'dd/mm/yyyy':'dd/mm/yyyy')+'</td></tr>'
-      +'<tr><th>'+(vi?'Phòng ban':'Department')+'</th><td>'+blank(180,vi?'Tên phòng ban':'Department name')+'</td><th>'+(vi?'Phê duyệt':'Approved by')+'</th><td>'+blank(120,vi?'Người phê duyệt':'Approver')+'</td></tr>'
+      '<div class="card"><div class="card-title">'+(vi?'ThÃ´ng tin kiá»ƒm soÃ¡t tÃ i liá»‡u':'Document Control Information')+'</div><table class="form-table"><tbody>'
+      +'<tr><th style="width:28%">'+(vi?'MÃ£ tÃ i liá»‡u':'Document code')+'</th><td>'+blank(180,vi?'Nháº­p mÃ£ tÃ i liá»‡u':'Enter document code')+'</td><th style="width:22%">'+(vi?'PhiÃªn báº£n':'Revision')+'</th><td>'+blank(120,vi?'Rev':'Rev')+'</td></tr>'
+      +'<tr><th>'+(vi?'Chá»§ sá»Ÿ há»¯u':'Owner')+'</th><td>'+blank(180,vi?'TÃªn owner':'Owner name')+'</td><th>'+(vi?'NgÃ y hiá»‡u lá»±c':'Effective date')+'</th><td>'+blank(120,vi?'dd/mm/yyyy':'dd/mm/yyyy')+'</td></tr>'
+      +'<tr><th>'+(vi?'PhÃ²ng ban':'Department')+'</th><td>'+blank(180,vi?'TÃªn phÃ²ng ban':'Department name')+'</td><th>'+(vi?'PhÃª duyá»‡t':'Approved by')+'</th><td>'+blank(120,vi?'NgÆ°á»i phÃª duyá»‡t':'Approver')+'</td></tr>'
       +'</tbody></table></div>',
     revisionTable:
-      '<div class="table-card"><table class="form-table"><thead><tr><th style="width:12%">'+(vi?'Rev':'Rev')+'</th><th style="width:18%">'+(vi?'Ngày':'Date')+'</th><th>'+(vi?'Mô tả thay đổi':'Change description')+'</th><th style="width:18%">'+(vi?'Người cập nhật':'Updated by')+'</th><th style="width:18%">'+(vi?'Phê duyệt':'Approved by')+'</th></tr></thead><tbody>'
-      +'<tr><td>0</td><td>'+today+'</td><td>'+(vi?'Phát hành ban đầu':'Initial release')+'</td><td>'+blank(100,vi?'Người cập nhật':'Updated by')+'</td><td>'+blank(100,vi?'Phê duyệt':'Approved by')+'</td></tr>'
-      +'<tr><td>'+blank(48,'1')+'</td><td>'+blank(90,vi?'dd/mm/yyyy':'dd/mm/yyyy')+'</td><td>'+block(38,vi?'Mô tả thay đổi':'Describe the change')+'</td><td>'+blank(100,vi?'Người cập nhật':'Updated by')+'</td><td>'+blank(100,vi?'Phê duyệt':'Approved by')+'</td></tr>'
-      +'<tr><td>'+blank(48,'2')+'</td><td>'+blank(90,vi?'dd/mm/yyyy':'dd/mm/yyyy')+'</td><td>'+block(38,vi?'Mô tả thay đổi':'Describe the change')+'</td><td>'+blank(100,vi?'Người cập nhật':'Updated by')+'</td><td>'+blank(100,vi?'Phê duyệt':'Approved by')+'</td></tr>'
+      '<div class="table-card"><table class="form-table"><thead><tr><th style="width:12%">'+(vi?'Rev':'Rev')+'</th><th style="width:18%">'+(vi?'NgÃ y':'Date')+'</th><th>'+(vi?'MÃ´ táº£ thay Ä‘á»•i':'Change description')+'</th><th style="width:18%">'+(vi?'NgÆ°á»i cáº­p nháº­t':'Updated by')+'</th><th style="width:18%">'+(vi?'PhÃª duyá»‡t':'Approved by')+'</th></tr></thead><tbody>'
+      +'<tr><td>0</td><td>'+today+'</td><td>'+(vi?'PhÃ¡t hÃ nh ban Ä‘áº§u':'Initial release')+'</td><td>'+blank(100,vi?'NgÆ°á»i cáº­p nháº­t':'Updated by')+'</td><td>'+blank(100,vi?'PhÃª duyá»‡t':'Approved by')+'</td></tr>'
+      +'<tr><td>'+blank(48,'1')+'</td><td>'+blank(90,vi?'dd/mm/yyyy':'dd/mm/yyyy')+'</td><td>'+block(38,vi?'MÃ´ táº£ thay Ä‘á»•i':'Describe the change')+'</td><td>'+blank(100,vi?'NgÆ°á»i cáº­p nháº­t':'Updated by')+'</td><td>'+blank(100,vi?'PhÃª duyá»‡t':'Approved by')+'</td></tr>'
+      +'<tr><td>'+blank(48,'2')+'</td><td>'+blank(90,vi?'dd/mm/yyyy':'dd/mm/yyyy')+'</td><td>'+block(38,vi?'MÃ´ táº£ thay Ä‘á»•i':'Describe the change')+'</td><td>'+blank(100,vi?'NgÆ°á»i cáº­p nháº­t':'Updated by')+'</td><td>'+blank(100,vi?'PhÃª duyá»‡t':'Approved by')+'</td></tr>'
       +'</tbody></table></div>',
     approval:
-      '<h2 class="h2">'+(vi?'Ký duyệt':'Approval')+'</h2><div class="sig-row">'
-      +'<div class="sig-box"><b>'+(vi?'Lập':'Prepared')+'</b><br><span class="muted small">'+(vi?'Họ tên / Chữ ký / Ngày':'Name / Signature / Date')+'</span>'+block(46,vi?'Điền tên, ký và ngày':'Enter name, signature, date')+'</div>'
-      +'<div class="sig-box"><b>'+(vi?'Rà soát':'Reviewed')+'</b><br><span class="muted small">'+(vi?'Họ tên / Chữ ký / Ngày':'Name / Signature / Date')+'</span>'+block(46,vi?'Điền tên, ký và ngày':'Enter name, signature, date')+'</div>'
-      +'<div class="sig-box"><b>'+(vi?'Phê duyệt':'Approved')+'</b><br><span class="muted small">'+(vi?'Họ tên / Chữ ký / Ngày':'Name / Signature / Date')+'</span>'+block(46,vi?'Điền tên, ký và ngày':'Enter name, signature, date')+'</div>'
+      '<h2 class="h2">'+(vi?'KÃ½ duyá»‡t':'Approval')+'</h2><div class="sig-row">'
+      +'<div class="sig-box"><b>'+(vi?'Láº­p':'Prepared')+'</b><br><span class="muted small">'+(vi?'Há» tÃªn / Chá»¯ kÃ½ / NgÃ y':'Name / Signature / Date')+'</span>'+block(46,vi?'Äiá»n tÃªn, kÃ½ vÃ  ngÃ y':'Enter name, signature, date')+'</div>'
+      +'<div class="sig-box"><b>'+(vi?'RÃ  soÃ¡t':'Reviewed')+'</b><br><span class="muted small">'+(vi?'Há» tÃªn / Chá»¯ kÃ½ / NgÃ y':'Name / Signature / Date')+'</span>'+block(46,vi?'Äiá»n tÃªn, kÃ½ vÃ  ngÃ y':'Enter name, signature, date')+'</div>'
+      +'<div class="sig-box"><b>'+(vi?'PhÃª duyá»‡t':'Approved')+'</b><br><span class="muted small">'+(vi?'Há» tÃªn / Chá»¯ kÃ½ / NgÃ y':'Name / Signature / Date')+'</span>'+block(46,vi?'Äiá»n tÃªn, kÃ½ vÃ  ngÃ y':'Enter name, signature, date')+'</div>'
       +'</div>',
     actionTable:
-      '<div class="table-card"><table class="form-table"><thead><tr><th style="width:7%">#</th><th>'+(vi?'Hành động / CAPA':'Action / CAPA')+'</th><th style="width:18%">'+(vi?'Owner':'Owner')+'</th><th style="width:16%">'+(vi?'Hạn hoàn thành':'Due date')+'</th><th style="width:16%">'+(vi?'Trạng thái':'Status')+'</th><th style="width:18%">'+(vi?'Bằng chứng':'Evidence')+'</th></tr></thead><tbody>'
-      +'<tr><td>1</td><td>'+block(42,vi?'Mô tả hành động / CAPA':'Describe the action / CAPA')+'</td><td>'+blank(100,vi?'Owner':'Owner')+'</td><td>'+blank(90,vi?'dd/mm/yyyy':'dd/mm/yyyy')+'</td><td><span class="tag orange">'+(vi?'Open':'Open')+'</span></td><td>'+block(42,vi?'Link hoặc bằng chứng':'Evidence or link')+'</td></tr>'
-      +'<tr><td>2</td><td>'+block(42,vi?'Mô tả hành động / CAPA':'Describe the action / CAPA')+'</td><td>'+blank(100,vi?'Owner':'Owner')+'</td><td>'+blank(90,vi?'dd/mm/yyyy':'dd/mm/yyyy')+'</td><td><span class="tag">'+(vi?'Planned':'Planned')+'</span></td><td>'+block(42,vi?'Link hoặc bằng chứng':'Evidence or link')+'</td></tr>'
-      +'<tr><td>3</td><td>'+block(42,vi?'Mô tả hành động / CAPA':'Describe the action / CAPA')+'</td><td>'+blank(100,vi?'Owner':'Owner')+'</td><td>'+blank(90,vi?'dd/mm/yyyy':'dd/mm/yyyy')+'</td><td><span class="tag teal">'+(vi?'Done':'Done')+'</span></td><td>'+block(42,vi?'Link hoặc bằng chứng':'Evidence or link')+'</td></tr>'
+      '<div class="table-card"><table class="form-table"><thead><tr><th style="width:7%">#</th><th>'+(vi?'HÃ nh Ä‘á»™ng / CAPA':'Action / CAPA')+'</th><th style="width:18%">'+(vi?'Owner':'Owner')+'</th><th style="width:16%">'+(vi?'Háº¡n hoÃ n thÃ nh':'Due date')+'</th><th style="width:16%">'+(vi?'Tráº¡ng thÃ¡i':'Status')+'</th><th style="width:18%">'+(vi?'Báº±ng chá»©ng':'Evidence')+'</th></tr></thead><tbody>'
+      +'<tr><td>1</td><td>'+block(42,vi?'MÃ´ táº£ hÃ nh Ä‘á»™ng / CAPA':'Describe the action / CAPA')+'</td><td>'+blank(100,vi?'Owner':'Owner')+'</td><td>'+blank(90,vi?'dd/mm/yyyy':'dd/mm/yyyy')+'</td><td><span class="tag orange">'+(vi?'Open':'Open')+'</span></td><td>'+block(42,vi?'Link hoáº·c báº±ng chá»©ng':'Evidence or link')+'</td></tr>'
+      +'<tr><td>2</td><td>'+block(42,vi?'MÃ´ táº£ hÃ nh Ä‘á»™ng / CAPA':'Describe the action / CAPA')+'</td><td>'+blank(100,vi?'Owner':'Owner')+'</td><td>'+blank(90,vi?'dd/mm/yyyy':'dd/mm/yyyy')+'</td><td><span class="tag">'+(vi?'Planned':'Planned')+'</span></td><td>'+block(42,vi?'Link hoáº·c báº±ng chá»©ng':'Evidence or link')+'</td></tr>'
+      +'<tr><td>3</td><td>'+block(42,vi?'MÃ´ táº£ hÃ nh Ä‘á»™ng / CAPA':'Describe the action / CAPA')+'</td><td>'+blank(100,vi?'Owner':'Owner')+'</td><td>'+blank(90,vi?'dd/mm/yyyy':'dd/mm/yyyy')+'</td><td><span class="tag teal">'+(vi?'Done':'Done')+'</span></td><td>'+block(42,vi?'Link hoáº·c báº±ng chá»©ng':'Evidence or link')+'</td></tr>'
       +'</tbody></table></div>',
     riskTable:
-      '<div class="table-card"><table class="form-table"><thead><tr><th style="width:8%">#</th><th>'+(vi?'Rủi ro':'Risk')+'</th><th style="width:18%">'+(vi?'Tác động':'Impact')+'</th><th>'+(vi?'Kiểm soát hiện có / đề xuất':'Existing / proposed control')+'</th><th style="width:18%">'+(vi?'Owner':'Owner')+'</th></tr></thead><tbody>'
-      +'<tr><td>1</td><td>'+block(38,vi?'Mô tả rủi ro':'Describe the risk')+'</td><td><span class="level l2">M</span></td><td>'+block(38,vi?'Mô tả kiểm soát':'Describe the control')+'</td><td>'+blank(100,vi?'Owner':'Owner')+'</td></tr>'
-      +'<tr><td>2</td><td>'+block(38,vi?'Mô tả rủi ro':'Describe the risk')+'</td><td><span class="level l3">H</span></td><td>'+block(38,vi?'Mô tả kiểm soát':'Describe the control')+'</td><td>'+blank(100,vi?'Owner':'Owner')+'</td></tr>'
+      '<div class="table-card"><table class="form-table"><thead><tr><th style="width:8%">#</th><th>'+(vi?'Rá»§i ro':'Risk')+'</th><th style="width:18%">'+(vi?'TÃ¡c Ä‘á»™ng':'Impact')+'</th><th>'+(vi?'Kiá»ƒm soÃ¡t hiá»‡n cÃ³ / Ä‘á» xuáº¥t':'Existing / proposed control')+'</th><th style="width:18%">'+(vi?'Owner':'Owner')+'</th></tr></thead><tbody>'
+      +'<tr><td>1</td><td>'+block(38,vi?'MÃ´ táº£ rá»§i ro':'Describe the risk')+'</td><td><span class="level l2">M</span></td><td>'+block(38,vi?'MÃ´ táº£ kiá»ƒm soÃ¡t':'Describe the control')+'</td><td>'+blank(100,vi?'Owner':'Owner')+'</td></tr>'
+      +'<tr><td>2</td><td>'+block(38,vi?'MÃ´ táº£ rá»§i ro':'Describe the risk')+'</td><td><span class="level l3">H</span></td><td>'+block(38,vi?'MÃ´ táº£ kiá»ƒm soÃ¡t':'Describe the control')+'</td><td>'+blank(100,vi?'Owner':'Owner')+'</td></tr>'
       +'</tbody></table></div>',
     callout:
-      '<div class="callout"><b>'+(vi?'Yêu cầu kiểm soát:':'Controlled requirement:')+'</b> '+(vi?'Nêu rõ yêu cầu bắt buộc, tiêu chí chấp nhận hoặc điểm kiểm soát quan trọng tại đây.':'State the mandatory requirement, acceptance criteria, or key control point here.')+'</div>',
+      '<div class="callout"><b>'+(vi?'YÃªu cáº§u kiá»ƒm soÃ¡t:':'Controlled requirement:')+'</b> '+(vi?'NÃªu rÃµ yÃªu cáº§u báº¯t buá»™c, tiÃªu chÃ­ cháº¥p nháº­n hoáº·c Ä‘iá»ƒm kiá»ƒm soÃ¡t quan trá»ng táº¡i Ä‘Ã¢y.':'State the mandatory requirement, acceptance criteria, or key control point here.')+'</div>',
     note:
-      '<div class="note"><b>'+(vi?'Lưu ý thực hiện:':'Operational note:')+'</b> '+(vi?'Bổ sung lưu ý, cảnh báo, hoặc hướng dẫn quan trọng để tránh lỗi thao tác.':'Add execution notes, warnings, or important guidance to avoid process errors.')+'</div>',
-    blankField:'<p>'+blank(180,vi?'Điền thông tin':'Fill in here')+'</p>'
+      '<div class="note"><b>'+(vi?'LÆ°u Ã½ thá»±c hiá»‡n:':'Operational note:')+'</b> '+(vi?'Bá»• sung lÆ°u Ã½, cáº£nh bÃ¡o, hoáº·c hÆ°á»›ng dáº«n quan trá»ng Ä‘á»ƒ trÃ¡nh lá»—i thao tÃ¡c.':'Add execution notes, warnings, or important guidance to avoid process errors.')+'</div>',
+    blankField:'<p>'+blank(180,vi?'Äiá»n thÃ´ng tin':'Fill in here')+'</p>'
   };
   return templates[kind]||templates.note;
 }
@@ -1292,8 +1661,8 @@ function edGuessQmsKindFromElement(el){
   if(el.classList.contains('note')) return 'note';
   if(el.classList.contains('sig-row')) return 'approval';
   if(el.classList.contains('table-card')){
-    if(text.indexOf('capa')!==-1||text.indexOf('hành động')!==-1||text.indexOf('due date')!==-1) return 'actionTable';
-    if(text.indexOf('rủi ro')!==-1||text.indexOf('risk')!==-1||text.indexOf('impact')!==-1) return 'riskTable';
+    if(text.indexOf('capa')!==-1||text.indexOf('hÃ nh Ä‘á»™ng')!==-1||text.indexOf('due date')!==-1) return 'actionTable';
+    if(text.indexOf('rá»§i ro')!==-1||text.indexOf('risk')!==-1||text.indexOf('impact')!==-1) return 'riskTable';
     return 'revisionTable';
   }
   if(el.classList.contains('card')) return 'docControl';
@@ -1306,7 +1675,7 @@ function edWrapLegacyQmsElement(target,kind,includeHeading){
   if(includeHeading){
     const prev=target.previousElementSibling;
     const prevText=prev?String(prev.textContent||'').toLowerCase():'';
-    if(prev&&/^H[1-6]$/.test(prev.tagName)&&(prevText.indexOf('approval')!==-1||prevText.indexOf('ký duyệt')!==-1)){
+    if(prev&&/^H[1-6]$/.test(prev.tagName)&&(prevText.indexOf('approval')!==-1||prevText.indexOf('kÃ½ duyá»‡t')!==-1)){
       firstNode=prev;
     }
   }
@@ -1360,8 +1729,8 @@ function edNormalizeQmsField(field){
   field.setAttribute('contenteditable','true');
   if(!field.getAttribute('data-placeholder')){
     field.setAttribute('data-placeholder',isBlock
-      ? ((lang!=='en')?'Nhập nội dung':'Enter details')
-      : ((lang!=='en')?'Điền nội dung':'Fill in'));
+      ? ((lang!=='en')?'Nháº­p ná»™i dung':'Enter details')
+      : ((lang!=='en')?'Äiá»n ná»™i dung':'Fill in'));
   }
   if(!isBlock && !field.style.minWidth) field.style.minWidth='72px';
   if(isBlock){
@@ -1397,15 +1766,492 @@ function edNormalizeQmsSignatureBoxes(ctx){
       if(child.tagName==='DIV'&&!child.querySelector('*')&&edQmsFieldText(child)===''){
         child.classList.add('input');
         if(!child.getAttribute('data-placeholder')){
-          child.setAttribute('data-placeholder',(lang!=='en')?'Điền tên, ký và ngày':'Enter name, signature, date');
+          child.setAttribute('data-placeholder',(lang!=='en')?'Äiá»n tÃªn, kÃ½ vÃ  ngÃ y':'Enter name, signature, date');
         }
       }
     });
   });
 }
 
+function edQmsLookupSources(){
+  return [
+    'suppliers','customers','customer_sites','parts','company_users','defect_catalog','work_centers','operations',
+    'machines','tools','fixtures','materials','bom_items','routing_steps','inspection_plans','control_plans',
+    'travelers','warehouses','locations','shipping_methods','incoterms','payment_terms','commercial_accounts',
+    'quality_gate_profiles','launch_gate_templates','supplier_process_approvals','customer_item_approvals'
+  ];
+}
+
+function edQmsFieldKindFromNode(field){
+  if(!field) return 'formTextField';
+  if(field.querySelector('.scar-lookup-host')) return 'formLookupField';
+  if(field.querySelector('textarea')) return 'formTextareaField';
+  if(field.querySelector('select')) return 'formSelectField';
+  return 'formTextField';
+}
+
+function edQmsMarkFormBlocks(ctx){
+  if(!ctx||!ctx.querySelectorAll) return;
+  ctx.querySelectorAll('.scar-record-strip').forEach(function(strip){
+    if(strip.closest('.ed-qms-block')) return;
+    strip.dataset.qmsKind = strip.dataset.qmsKind || 'formRecordStrip';
+  });
+  ctx.querySelectorAll('.qf-section').forEach(function(section){
+    if(section.closest('.ed-qms-block')) return;
+    section.dataset.qmsKind = section.dataset.qmsKind || 'formSection';
+  });
+  ctx.querySelectorAll('.qf-field').forEach(function(field){
+    if(field.closest('.ed-qms-block')) return;
+    field.dataset.qmsKind = field.dataset.qmsKind || edQmsFieldKindFromNode(field);
+  });
+}
+
+function edQmsDesignerBlocks(ctx){
+  if(!ctx||!ctx.querySelectorAll) return [];
+  return Array.from(ctx.querySelectorAll('.ed-qms-block,[data-qms-kind].qf-section,[data-qms-kind].qf-field,[data-qms-kind].scar-record-strip'));
+}
+
+function edQmsPrimaryTarget(block){
+  if(!block) return null;
+  return block.querySelector('.ed-qms-field,.ed-qms-body,[contenteditable="true"],textarea,select,input:not([type="hidden"])')
+    || block.querySelector('.qf-section-title,.qf-section-subtitle,.qf-label')
+    || block;
+}
+
+function edQmsMoveBlock(block,direction){
+  if(!block || !block.parentNode) return;
+  var sibling = direction === 'up' ? block.previousElementSibling : block.nextElementSibling;
+  if(!sibling) return;
+  if(direction === 'up') block.parentNode.insertBefore(block, sibling);
+  else block.parentNode.insertBefore(sibling, block);
+  edMarkModified();
+  edUpdateState();
+  edSelectQmsBlock(block);
+}
+
+function edQmsApplyFieldWidth(block,width){
+  if(!block || !block.classList || !block.classList.contains('qf-field')) return;
+  block.classList.remove('qf-col-span-2','qf-col-span-3');
+  if(width === '2') block.classList.add('qf-col-span-2');
+  if(width === '3') block.classList.add('qf-col-span-3');
+  edMarkModified();
+  edUpdateState();
+}
+
+
+function edQmsFieldProps(block){
+  if(!block) return null;
+  var label = block.querySelector('.qf-label');
+  var labelVi = label ? label.querySelector('.qf-label-vi') : null;
+  var helper = block.querySelector('.qf-helper');
+  var lookupHost = block.querySelector('.scar-lookup-host');
+  var control = lookupHost
+    ? (block.querySelector('input.qf-input.scar-hidden, input.qf-input[name], textarea.qf-textarea, select.qf-select') || lookupHost)
+    : (block.querySelector('textarea.qf-textarea, select.qf-select, input.qf-input[name]') || null);
+  var fieldId = control && control.id ? control.id : '';
+  var fieldName = control && control.name ? control.name : fieldId;
+  var placeholder = '';
+  var selectOptions = '';
+  if(control && control.tagName === 'SELECT'){
+    placeholder = control.options && control.options.length ? String(control.options[0].textContent || '').trim() : '';
+    selectOptions = Array.from(control.options || []).slice(1).map(function(option){
+      var value = String(option.value || '').trim();
+      var text = String(option.textContent || '').trim();
+      return value && value !== text ? value + ' | ' + text : text;
+    }).join('\n');
+  }else if(control && typeof control.getAttribute === 'function'){
+    placeholder = String(control.getAttribute('placeholder') || '').trim();
+  }
+  var labelText = '';
+  if(label){
+    labelText = Array.from(label.childNodes).filter(function(node){
+      return node.nodeType === 3;
+    }).map(function(node){ return String(node.textContent || '').trim(); }).join(' ').trim();
+  }
+  return {
+    label: labelText,
+    labelVi: labelVi ? String(labelVi.textContent || '').trim() : '',
+    helper: helper ? String(helper.textContent || '').trim() : '',
+    fieldId: fieldId,
+    fieldName: fieldName,
+    placeholder: placeholder,
+    defaultValue: control && typeof control.value === 'string' ? String(control.value || '').trim() : '',
+    required: !!(control && typeof control.hasAttribute === 'function' && control.hasAttribute('required')),
+    type: lookupHost ? 'lookup' : (control ? String(control.tagName || '').toLowerCase() === 'textarea' ? 'textarea' : String(control.tagName || '').toLowerCase() === 'select' ? 'select' : String(control.type || 'text').toLowerCase() : 'text'),
+    width: block.classList.contains('qf-col-span-3') ? '3' : (block.classList.contains('qf-col-span-2') ? '2' : '1'),
+    lookupSource: String(block.dataset.lookupSource || '').trim(),
+    selectOptions: selectOptions,
+    formula: String(block.dataset.formula || '').trim(),
+    apiEndpoint: String(block.dataset.apiEndpoint || '').trim(),
+    apiMethod: String(block.dataset.apiMethod || '').trim() || 'GET',
+    apiParams: String(block.dataset.apiParams || '').trim(),
+    dbEntity: String(block.dataset.dbEntity || '').trim(),
+    dbField: String(block.dataset.dbField || '').trim(),
+    dbFilter: String(block.dataset.dbFilter || '').trim(),
+    relatedForm: String(block.dataset.relatedForm || '').trim(),
+    relatedField: String(block.dataset.relatedField || '').trim(),
+    lookupLabelField: String(block.dataset.lookupLabelField || '').trim(),
+    lookupValueField: String(block.dataset.lookupValueField || '').trim(),
+    lookupFilter: String(block.dataset.lookupFilter || '').trim(),
+    visibilityRule: String(block.dataset.visibilityRule || '').trim(),
+    requiredWhen: String(block.dataset.requiredWhen || '').trim(),
+    functionRef: String(block.dataset.functionRef || '').trim(),
+    formulaPrecision: String(block.dataset.formulaPrecision || '').trim(),
+    autofillMap: String(block.dataset.autofillMap || '').trim(),
+    webhookUrl: String(block.dataset.webhookUrl || '').trim(),
+    readonly: !!((control && control.hasAttribute && control.hasAttribute('readonly')) || String(block.dataset.readonly || '').trim() === '1')
+  };
+}
+
+function edQmsLookupPreview(source){
+  if(!source) return [];
+  try{
+    if(typeof window._mdLookupOptions === 'function'){
+      return (window._mdLookupOptions(source) || []).slice(0, 8);
+    }
+  }catch(_err){}
+  return [];
+}
+
+function edQmsParseSelectOptions(raw){
+  return String(raw || '').split(/\r?\n/).map(function(line){
+    var next = String(line || '').trim();
+    if(!next) return null;
+    var parts = next.split('|');
+    if(parts.length > 1){
+      var value = String(parts.shift() || '').trim();
+      var label = String(parts.join('|') || '').trim();
+      if(!value && !label) return null;
+      return { value:value || label, label:label || value };
+    }
+    return { value:next, label:next };
+  }).filter(Boolean);
+}
+
+function edRefreshQmsFieldTypeUi(){
+  var typeSel = document.getElementById('ed-qms-field-type');
+  var sourceSel = document.getElementById('ed-qms-field-source');
+  var selectWrap = document.getElementById('ed-qms-field-select-wrap');
+  var lookupWrap = document.getElementById('ed-qms-field-lookup-wrap');
+  var preview = document.getElementById('ed-qms-lookup-preview');
+  var type = typeSel ? String(typeSel.value || '').trim() : 'text';
+  var source = sourceSel ? String(sourceSel.value || '').trim() : '';
+  if(selectWrap) selectWrap.style.display = (type === 'select') ? 'block' : 'none';
+  if(lookupWrap) lookupWrap.style.display = (type === 'lookup') ? 'block' : 'none';
+  if(!preview) return;
+  if(type !== 'lookup'){
+    preview.innerHTML = '';
+    return;
+  }
+  if(!source){
+    preview.innerHTML = '<div class="ed-qms-prop-note">Chá»n nguá»“n dá»¯ liá»‡u ná»n Ä‘á»ƒ xem ná»™i dung droplist.</div>';
+    return;
+  }
+  var items = edQmsLookupPreview(source);
+  if(!items.length){
+    preview.innerHTML = '<div class="ed-qms-prop-note">ChÆ°a cÃ³ báº£n ghi trong nguá»“n dá»¯ liá»‡u nÃ y.</div>';
+    return;
+  }
+  preview.innerHTML = '<ul>' + items.map(function(item){
+    return '<li><strong>' + _edEscapeHtml(String(item.label || item.value || '')) + '</strong><span>' + _edEscapeHtml(String(item.value || '')) + '</span></li>';
+  }).join('') + '</ul>';
+}
+
+function edOpenQmsLookupSource(){
+  var sourceSel = document.getElementById('ed-qms-field-source');
+  var source = sourceSel ? String(sourceSel.value || '').trim() : '';
+  if(typeof window._mdOpenControl === 'function'){
+    window._mdOpenControl(source || 'suppliers');
+    return;
+  }
+  if(typeof toast === 'function') toast('Không mở được quản lý dữ liệu nền.', 'warn');
+}
+
+function edQmsSectionProps(block){
+  if(!block) return null;
+  var titleEl = block.querySelector('.qf-section-title');
+  var numEl = titleEl ? titleEl.querySelector('.qf-section-num') : null;
+  var subtitleEl = block.querySelector('.qf-section-subtitle');
+  var titleText = titleEl ? Array.from(titleEl.childNodes).filter(function(node){
+    return node.nodeType === 3;
+  }).map(function(node){ return String(node.textContent || '').trim(); }).join(' ').trim() : '';
+  var tone = 'info';
+  ['warning','error','success'].forEach(function(token){
+    if(block.classList.contains('qf-section--' + token)) tone = token;
+  });
+  return {
+    number: numEl ? String(numEl.textContent || '').trim() : '',
+    title: titleText,
+    subtitle: subtitleEl ? String(subtitleEl.textContent || '').trim() : '',
+    tone: tone
+  };
+}
+
+
+function edQmsReplaceFieldControl(block, cfg){
+  if(!block) return;
+  var helper = block.querySelector('.qf-helper');
+  var dv = block.querySelector('.qf-dv');
+  var error = block.querySelector('.qf-error-msg');
+  block.querySelectorAll('.scar-lookup-host,input.qf-input,select.qf-select,textarea.qf-textarea,datalist').forEach(function(node){
+    if(node === dv || node === error) return;
+    if(helper && node === helper) return;
+    node.remove();
+  });
+  var insertBefore = dv || helper || error || null;
+  var type = String(cfg.type || 'text').trim();
+  var requiredAttr = cfg.required ? ' required' : '';
+  var readonlyAttr = cfg.readonly ? ' readonly' : '';
+  var placeholder = _edEscapeHtml(cfg.placeholder || '');
+  var defaultValue = _edEscapeHtml(cfg.defaultValue || '');
+  var fieldId = _edEscapeHtml(cfg.fieldId || 'field_code');
+  var fieldName = _edEscapeHtml(cfg.fieldName || cfg.fieldId || 'field_code');
+  var options = Array.isArray(cfg.options) ? cfg.options : [];
+  var html = '';
+  if(type === 'textarea'){
+    html = '<textarea class="qf-textarea" id="' + fieldId + '" name="' + fieldName + '"' + requiredAttr + readonlyAttr + ' rows="4" placeholder="' + placeholder + '">' + defaultValue + '</textarea>';
+  }else if(type === 'select'){
+    if(!options.length){
+      options = [
+        { value:'OPTION_A', label:'Option A' },
+        { value:'OPTION_B', label:'Option B' }
+      ];
+    }
+    html = '<select class="qf-select" id="' + fieldId + '" name="' + fieldName + '"' + requiredAttr + readonlyAttr + '><option value="">' + _edEscapeHtml(cfg.placeholder || 'Chọn') + '</option>'
+      + options.map(function(option){
+        var value = String((option && option.value) || '').trim();
+        var label = String((option && option.label) || value).trim();
+        return '<option value="' + _edEscapeHtml(value) + '"' + (defaultValue && defaultValue === value ? ' selected' : '') + '>' + _edEscapeHtml(label) + '</option>';
+      }).join('')
+      + '</select>';
+  }else if(type === 'lookup'){
+    html = '<div class="scar-lookup-host" id="' + fieldId + '_lookup"></div><input class="qf-input scar-hidden" id="' + fieldId + '" name="' + fieldName + '"' + requiredAttr + readonlyAttr + ' placeholder="' + placeholder + '" value="' + defaultValue + '"/>';
+  }else{
+    var inputType = ['date','number','email'].indexOf(type) >= 0 ? type : 'text';
+    html = '<input class="qf-input" id="' + fieldId + '" name="' + fieldName + '"' + requiredAttr + readonlyAttr + ' type="' + inputType + '" placeholder="' + placeholder + '" value="' + defaultValue + '"/>';
+  }
+  var frag = document.createElement('template');
+  frag.innerHTML = html;
+  Array.from(frag.content.childNodes).forEach(function(node){
+    block.insertBefore(node, insertBefore);
+  });
+}
+
+
+function edApplyQmsSectionProps(){
+  var root = edGetModalRoot();
+  var block = root._qmsBlock;
+  if(!block) return edCloseModal();
+  var number = String((document.getElementById('ed-qms-sec-number') || {}).value || '').trim();
+  var title = String((document.getElementById('ed-qms-sec-title') || {}).value || '').trim();
+  var subtitle = String((document.getElementById('ed-qms-sec-subtitle') || {}).value || '').trim();
+  var tone = String((document.getElementById('ed-qms-sec-tone') || {}).value || 'info').trim();
+  var titleEl = block.querySelector('.qf-section-title');
+  var subtitleEl = block.querySelector('.qf-section-subtitle');
+  if(titleEl){
+    titleEl.innerHTML = '<span class="qf-section-num">' + _edEscapeHtml(number || '1') + '</span> ' + _edEscapeHtml(title || 'Section Title');
+  }
+  if(subtitleEl) subtitleEl.textContent = subtitle || '';
+  block.classList.remove('qf-section--warning','qf-section--error','qf-section--success');
+  if(tone !== 'info') block.classList.add('qf-section--' + tone);
+  edMarkModified();
+  edUpdateState();
+  edSelectQmsBlock(block);
+  edCloseModal();
+}
+
+
+function edEditQmsBlockProperties(block){
+  if(!block) return;
+  var vi = lang !== 'en';
+  var isSection = block.classList.contains('qf-section') || String(block.dataset.qmsKind || '') === 'formSection';
+  var isField = block.classList.contains('qf-field');
+  var root = edGetModalRoot();
+  if(isSection){
+    var props = edQmsSectionProps(block) || { number:'', title:'', subtitle:'', tone:'info' };
+    root.innerHTML =
+      '<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal ed-qms-prop-modal">' +
+      '<h4>' + (vi ? 'Thuộc tính section form' : 'Form section properties') + '</h4>' +
+      '<label>' + (vi ? 'Sá»‘ section' : 'Section number') + '</label><input id="ed-qms-sec-number" value="' + _edEscapeHtml(props.number) + '">' +
+      '<label>' + (vi ? 'TiÃªu Ä‘á» tiáº¿ng Anh' : 'English title') + '</label><input id="ed-qms-sec-title" value="' + _edEscapeHtml(props.title) + '">' +
+      '<label>' + (vi ? 'Giáº£i thÃ­ch tiáº¿ng Viá»‡t' : 'Vietnamese explanation') + '</label><textarea id="ed-qms-sec-subtitle" rows="4">' + _edEscapeHtml(props.subtitle) + '</textarea>' +
+      '<label>' + (vi ? 'MÃ u/loáº¡i section' : 'Section tone') + '</label><select id="ed-qms-sec-tone">' +
+      ['info','warning','error','success'].map(function(tone){
+        return '<option value="' + tone + '"' + (props.tone === tone ? ' selected' : '') + '>' + tone + '</option>';
+      }).join('') + '</select>' +
+      '<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">' + (vi ? 'Há»§y' : 'Cancel') + '</button>' +
+      '<button class="ed-m-ok" onclick="edApplyQmsSectionProps()">' + (vi ? 'Ãp dá»¥ng' : 'Apply') + '</button></div></div></div>';
+    root._qmsBlock = block;
+    edRepairMojibake(root);
+    return;
+  }
+  if(isField){
+    var fp = edQmsFieldProps(block) || {};
+    var sourceOptions = edQmsLookupSources().map(function(source){
+      return '<option value="' + source + '"' + (fp.lookupSource === source ? ' selected' : '') + '>' + source + '</option>';
+    }).join('');
+    root.innerHTML =
+      '<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal ed-qms-prop-modal">' +
+      '<h4>' + (vi ? 'Thuộc tính field form' : 'Form field properties') + '</h4>' +
+      '<label>' + (vi ? 'Nhãn tiếng Anh' : 'English label') + '</label><input id="ed-qms-field-label" value="' + _edEscapeHtml(fp.label || '') + '">' +
+      '<label>' + (vi ? 'Nhãn tiếng Việt' : 'Vietnamese label') + '</label><input id="ed-qms-field-label-vi" value="' + _edEscapeHtml(fp.labelVi || '') + '">' +
+      '<label>' + (vi ? 'Giải thích tiếng Việt' : 'Vietnamese helper') + '</label><textarea id="ed-qms-field-helper" rows="3">' + _edEscapeHtml(fp.helper || '') + '</textarea>' +
+      '<div class="ed-qms-prop-grid"><div><label>ID</label><input id="ed-qms-field-id" value="' + _edEscapeHtml(fp.fieldId || '') + '"></div><div><label>' + (vi ? 'Tên field' : 'Field name') + '</label><input id="ed-qms-field-name" value="' + _edEscapeHtml(fp.fieldName || '') + '"></div></div>' +
+      '<div class="ed-qms-prop-grid"><div><label>' + (vi ? 'Loại field' : 'Field type') + '</label><select id="ed-qms-field-type">' +
+      [
+        ['text', vi ? 'Text 1 dòng' : 'Text'],
+        ['textarea', vi ? 'Textarea' : 'Textarea'],
+        ['select', vi ? 'Dropdown' : 'Dropdown'],
+        ['lookup', vi ? 'Lookup dữ liệu nền' : 'Master-data lookup'],
+        ['date', vi ? 'Ngày' : 'Date'],
+        ['number', vi ? 'Số' : 'Number']
+      ].map(function(item){
+        return '<option value="' + item[0] + '"' + (fp.type === item[0] ? ' selected' : '') + '>' + _edEscapeHtml(item[1]) + '</option>';
+      }).join('') + '</select></div><div><label>' + (vi ? 'Độ rộng' : 'Width') + '</label><select id="ed-qms-field-width">' +
+      [['1',vi?'1 cột':'1 column'],['2',vi?'2 cột':'2 columns'],['3',vi?'Toàn hàng':'Full row']].map(function(item){
+        return '<option value="' + item[0] + '"' + (fp.width === item[0] ? ' selected' : '') + '>' + _edEscapeHtml(item[1]) + '</option>';
+      }).join('') + '</select></div></div>' +
+      '<label>' + (vi ? 'Placeholder / ghi chú nhập liệu' : 'Placeholder') + '</label><input id="ed-qms-field-placeholder" value="' + _edEscapeHtml(fp.placeholder || '') + '">' +
+      '<label>' + (vi ? 'Giá trị mặc định' : 'Default value') + '</label><input id="ed-qms-field-default" value="' + _edEscapeHtml(fp.defaultValue || '') + '">' +
+      '<div id="ed-qms-field-select-wrap">' +
+        '<label>' + (vi ? 'Nội dung dropdown' : 'Dropdown items') + '</label>' +
+        '<textarea id="ed-qms-field-options" rows="6" placeholder="value | label&#10;open | Mở&#10;closed | Đóng">' + _edEscapeHtml(fp.selectOptions || '') + '</textarea>' +
+        '<div class="ed-qms-prop-note">' + (vi ? 'Mỗi dòng là một lựa chọn. Có thể dùng mẫu: value | label.' : 'Use one option per line. Format: value | label.') + '</div>' +
+      '</div>' +
+      '<div id="ed-qms-field-lookup-wrap">' +
+        '<label>' + (vi ? 'Nguồn lookup dữ liệu nền' : 'Lookup source') + '</label><select id="ed-qms-field-source"><option value="">' + (vi ? 'Không dùng' : 'None') + '</option>' + sourceOptions + '</select>' +
+        '<div class="ed-qms-prop-grid"><div><label>' + (vi ? 'Field label nguồn' : 'Source label field') + '</label><input id="ed-qms-field-lookup-label" value="' + _edEscapeHtml(fp.lookupLabelField || '') + '" placeholder="supplier_name"></div><div><label>' + (vi ? 'Field value nguồn' : 'Source value field') + '</label><input id="ed-qms-field-lookup-value" value="' + _edEscapeHtml(fp.lookupValueField || '') + '" placeholder="supplier_id"></div></div>' +
+        '<label>' + (vi ? 'Bộ lọc lookup' : 'Lookup filter') + '</label><input id="ed-qms-field-lookup-filter" value="' + _edEscapeHtml(fp.lookupFilter || '') + '" placeholder="[status] = active">' +
+        '<div class="ed-qms-prop-actions"><button type="button" class="ed-qms-secondary" onclick="edOpenQmsLookupSource()">' + (vi ? 'Mở quản lý dữ liệu nền' : 'Open master data') + '</button></div>' +
+        '<div class="ed-qms-prop-note">' + (vi ? 'Xem nhanh nội dung droplist đang dùng cho field lookup này.' : 'Preview the current lookup items for this field.') + '</div>' +
+        '<div class="ed-qms-lookup-preview" id="ed-qms-lookup-preview"></div>' +
+      '</div>' +
+      '<div class="ed-qms-prop-divider">' + (vi ? 'Kết nối dữ liệu & logic' : 'Data binding & logic') + '</div>' +
+      '<div class="ed-qms-prop-grid"><div><label>API endpoint</label><input id="ed-qms-field-api" value="' + _edEscapeHtml(fp.apiEndpoint || '') + '" placeholder="/01-QMS-Portal/api.php?action=..."></div><div><label>' + (vi ? 'Phương thức API' : 'API method') + '</label><select id="ed-qms-field-api-method">' +
+      ['GET','POST','PUT'].map(function(method){ return '<option value="' + method + '"' + (fp.apiMethod === method ? ' selected' : '') + '>' + method + '</option>'; }).join('') + '</select></div></div>' +
+      '<label>' + (vi ? 'Tham số API / query map' : 'API params / query map') + '</label><input id="ed-qms-field-api-params" value="' + _edEscapeHtml(fp.apiParams || '') + '" placeholder="customer_id=[customer_id]&part=[part_number]">' +
+      '<div class="ed-qms-prop-grid"><div><label>Database entity</label><input id="ed-qms-field-db-entity" value="' + _edEscapeHtml(fp.dbEntity || '') + '" placeholder="supplier_approvals"></div><div><label>Database field</label><input id="ed-qms-field-db-field" value="' + _edEscapeHtml(fp.dbField || '') + '" placeholder="supplier_name"></div></div>' +
+      '<label>' + (vi ? 'Bộ lọc database' : 'Database filter') + '</label><input id="ed-qms-field-db-filter" value="' + _edEscapeHtml(fp.dbFilter || '') + '" placeholder="status=active AND site=[site_code]">' +
+      '<div class="ed-qms-prop-grid"><div><label>' + (vi ? 'Form liên kết' : 'Related form') + '</label><input id="ed-qms-field-related-form" value="' + _edEscapeHtml(fp.relatedForm || '') + '" placeholder="FRM-404"></div><div><label>' + (vi ? 'Field liên kết' : 'Related field') + '</label><input id="ed-qms-field-related-field" value="' + _edEscapeHtml(fp.relatedField || '') + '" placeholder="supplier_id"></div></div>' +
+      '<label>' + (vi ? 'Công thức / hàm tính' : 'Formula expression') + '</label><input id="ed-qms-field-formula" value="' + _edEscapeHtml(fp.formula || '') + '" placeholder="=[quantity_rejected]/[quantity_received]*100">' +
+      '<div class="ed-qms-prop-grid"><div><label>' + (vi ? 'Hàm dùng lại' : 'Reusable function') + '</label><input id="ed-qms-field-function-ref" value="' + _edEscapeHtml(fp.functionRef || '') + '" placeholder="scar.computeRejectRate"></div><div><label>' + (vi ? 'Độ chính xác số' : 'Formula precision') + '</label><input id="ed-qms-field-formula-precision" value="' + _edEscapeHtml(fp.formulaPrecision || '') + '" placeholder="2"></div></div>' +
+      '<label>' + (vi ? 'Ánh xạ tự điền' : 'Autofill map') + '</label><textarea id="ed-qms-field-autofill-map" rows="3" placeholder="supplier_name=supplier_name&#10;supplier_contact=contact_email">' + _edEscapeHtml(fp.autofillMap || '') + '</textarea>' +
+      '<label>' + (vi ? 'Webhook / endpoint hậu xử lý' : 'Webhook / post-process endpoint') + '</label><input id="ed-qms-field-webhook-url" value="' + _edEscapeHtml(fp.webhookUrl || '') + '" placeholder="https://.../hooks/scar-created">' +
+      '<label>' + (vi ? 'Điều kiện hiển thị' : 'Visibility rule') + '</label><input id="ed-qms-field-visibility" value="' + _edEscapeHtml(fp.visibilityRule || '') + '" placeholder="[scar_status] = verification">' +
+      '<label>' + (vi ? 'Điều kiện bắt buộc' : 'Required rule') + '</label><input id="ed-qms-field-required-when" value="' + _edEscapeHtml(fp.requiredWhen || '') + '" placeholder="[root_cause_required] = true">' +
+      '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="ed-qms-field-required"' + (fp.required ? ' checked' : '') + '> ' + (vi ? 'Trường bắt buộc' : 'Required field') + '</label>' +
+      '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="ed-qms-field-readonly"' + (fp.readonly ? ' checked' : '') + '> ' + (vi ? 'Chỉ đọc ở runtime' : 'Readonly at runtime') + '</label>' +
+      '<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">' + (vi ? 'Hủy' : 'Cancel') + '</button>' +
+      '<button class="ed-m-ok" onclick="edApplyQmsFieldProps()">' + (vi ? 'Áp dụng' : 'Apply') + '</button></div></div></div>';
+    root._qmsBlock = block;
+    edRepairMojibake(root);
+    var typeSel = document.getElementById('ed-qms-field-type');
+    var sourceSel = document.getElementById('ed-qms-field-source');
+    if(typeSel) typeSel.addEventListener('change', edRefreshQmsFieldTypeUi);
+    if(sourceSel) sourceSel.addEventListener('change', edRefreshQmsFieldTypeUi);
+    edRefreshQmsFieldTypeUi();
+    return;
+  }
+  edDomActive = true;
+  var panel = document.getElementById('ed-dom-panel');
+  if(panel) panel.style.display = 'flex';
+  edDomRefresh();
+  try{
+    edDomSelected = block;
+    edDomShowProps(block);
+  }catch(e){}
+}
+
+function edApplyQmsFieldProps(){
+  var root = edGetModalRoot();
+  var block = root._qmsBlock;
+  if(!block) return edCloseModal();
+  var labelText = String((document.getElementById('ed-qms-field-label') || {}).value || '').trim();
+  var labelVi = String((document.getElementById('ed-qms-field-label-vi') || {}).value || '').trim();
+  var helper = String((document.getElementById('ed-qms-field-helper') || {}).value || '').trim();
+  var fieldId = String((document.getElementById('ed-qms-field-id') || {}).value || '').trim() || 'field_code';
+  var fieldName = String((document.getElementById('ed-qms-field-name') || {}).value || '').trim() || fieldId;
+  var fieldType = String((document.getElementById('ed-qms-field-type') || {}).value || 'text').trim();
+  var fieldWidth = String((document.getElementById('ed-qms-field-width') || {}).value || '1').trim();
+  var placeholder = String((document.getElementById('ed-qms-field-placeholder') || {}).value || '').trim();
+  var defaultValue = String((document.getElementById('ed-qms-field-default') || {}).value || '').trim();
+  var lookupSource = String((document.getElementById('ed-qms-field-source') || {}).value || '').trim();
+  var selectOptions = edQmsParseSelectOptions(String((document.getElementById('ed-qms-field-options') || {}).value || ''));
+  var apiEndpoint = String((document.getElementById('ed-qms-field-api') || {}).value || '').trim();
+  var apiMethod = String((document.getElementById('ed-qms-field-api-method') || {}).value || 'GET').trim();
+  var apiParams = String((document.getElementById('ed-qms-field-api-params') || {}).value || '').trim();
+  var dbEntity = String((document.getElementById('ed-qms-field-db-entity') || {}).value || '').trim();
+  var dbField = String((document.getElementById('ed-qms-field-db-field') || {}).value || '').trim();
+  var dbFilter = String((document.getElementById('ed-qms-field-db-filter') || {}).value || '').trim();
+  var relatedForm = String((document.getElementById('ed-qms-field-related-form') || {}).value || '').trim();
+  var relatedField = String((document.getElementById('ed-qms-field-related-field') || {}).value || '').trim();
+  var lookupLabelField = String((document.getElementById('ed-qms-field-lookup-label') || {}).value || '').trim();
+  var lookupValueField = String((document.getElementById('ed-qms-field-lookup-value') || {}).value || '').trim();
+  var lookupFilter = String((document.getElementById('ed-qms-field-lookup-filter') || {}).value || '').trim();
+  var formula = String((document.getElementById('ed-qms-field-formula') || {}).value || '').trim();
+  var functionRef = String((document.getElementById('ed-qms-field-function-ref') || {}).value || '').trim();
+  var formulaPrecision = String((document.getElementById('ed-qms-field-formula-precision') || {}).value || '').trim();
+  var autofillMap = String((document.getElementById('ed-qms-field-autofill-map') || {}).value || '').trim();
+  var webhookUrl = String((document.getElementById('ed-qms-field-webhook-url') || {}).value || '').trim();
+  var visibilityRule = String((document.getElementById('ed-qms-field-visibility') || {}).value || '').trim();
+  var requiredWhen = String((document.getElementById('ed-qms-field-required-when') || {}).value || '').trim();
+  var required = !!((document.getElementById('ed-qms-field-required') || {}).checked);
+  var readonly = !!((document.getElementById('ed-qms-field-readonly') || {}).checked);
+  var label = block.querySelector('.qf-label');
+  var helperEl = block.querySelector('.qf-helper');
+  var dv = block.querySelector('.qf-dv');
+  var error = block.querySelector('.qf-error-msg');
+  if(label){
+    label.innerHTML = _edEscapeHtml(labelText || 'FIELD LABEL')
+      + (required ? ' <span class="qf-required">*</span>' : '')
+      + '<span class="qf-label-vi">' + _edEscapeHtml(labelVi) + '</span>';
+    label.setAttribute('for', fieldType === 'lookup' ? fieldId + '_lookup' : fieldId);
+  }
+  if(helperEl) helperEl.textContent = helper || '';
+  if(dv) dv.id = fieldId + '__dv';
+  if(error) error.setAttribute('data-error-for', fieldId);
+  block.dataset.lookupSource = fieldType === 'lookup' ? lookupSource : '';
+  block.dataset.lookupLabelField = fieldType === 'lookup' ? lookupLabelField : '';
+  block.dataset.lookupValueField = fieldType === 'lookup' ? lookupValueField : '';
+  block.dataset.lookupFilter = fieldType === 'lookup' ? lookupFilter : '';
+  block.dataset.apiEndpoint = apiEndpoint;
+  block.dataset.apiMethod = apiMethod;
+  block.dataset.apiParams = apiParams;
+  block.dataset.dbEntity = dbEntity;
+  block.dataset.dbField = dbField;
+  block.dataset.dbFilter = dbFilter;
+  block.dataset.relatedForm = relatedForm;
+  block.dataset.relatedField = relatedField;
+  block.dataset.formula = formula;
+  block.dataset.functionRef = functionRef;
+  block.dataset.formulaPrecision = formulaPrecision;
+  block.dataset.autofillMap = autofillMap;
+  block.dataset.webhookUrl = webhookUrl;
+  block.dataset.visibilityRule = visibilityRule;
+  block.dataset.requiredWhen = requiredWhen;
+  block.dataset.readonly = readonly ? '1' : '';
+  block.dataset.qmsKind = fieldType === 'lookup' ? 'formLookupField' :
+    (fieldType === 'textarea' ? 'formTextareaField' :
+    (fieldType === 'select' ? 'formSelectField' : 'formTextField'));
+  edQmsReplaceFieldControl(block, {
+    type: fieldType,
+    fieldId: fieldId,
+    fieldName: fieldName,
+    placeholder: placeholder,
+    defaultValue: defaultValue,
+    required: required,
+    readonly: readonly,
+    options: selectOptions
+  });
+  edQmsApplyFieldWidth(block, fieldWidth);
+  edMarkModified();
+  edUpdateState();
+  edSelectQmsBlock(block);
+  edCloseModal();
+}
+
 function edDeselectAllQmsBlocks(){
-  document.querySelectorAll('.ed-qms-block').forEach(function(block){
+  document.querySelectorAll('.ed-qms-block,[data-qms-kind].qf-section,[data-qms-kind].qf-field,[data-qms-kind].scar-record-strip').forEach(function(block){
     block.classList.remove('ed-qms-selected');
     block.querySelectorAll('.ed-qms-toolbar').forEach(function(x){x.remove();});
   });
@@ -1415,19 +2261,27 @@ function edDeselectAllQmsBlocks(){
 function edBuildQmsToolbar(block){
   const vi=lang!=='en';
   const bar=document.createElement('div');
+  const isField = !!(block && block.classList && block.classList.contains('qf-field'));
   bar.className='ed-qms-toolbar';
   bar.setAttribute('contenteditable','false');
   bar.setAttribute('data-kind-label',edQmsKindMeta((block&&block.dataset&&block.dataset.qmsKind)||'note').title);
   bar.addEventListener('mousedown',function(ev){ev.preventDefault();ev.stopPropagation();});
   bar.addEventListener('click',function(ev){ev.stopPropagation();});
   [
-    {action:'edit',icon:'✎',title:vi?'Chỉnh sửa':'Edit',handler:function(){edFocusQmsBlock(block);}},
-    {action:'duplicate',icon:'⧉',title:vi?'Nhân bản':'Duplicate',handler:function(){edDuplicateQmsBlock(block);}},
-    {action:'delete',icon:'🗑',title:vi?'Xóa':'Delete',handler:function(){edDeleteQmsBlock(block);}}
-  ].forEach(function(cfg){
+    {action:'settings',icon:'SET',title:vi?'Thuộc tính':'Properties',handler:function(){edEditQmsBlockProperties(block);}},
+    {action:'data',icon:'DATA',title:vi?'Nguồn dữ liệu nền':'Master data',handler:function(){ if(typeof window._mdOpenControl==='function'){ window._mdOpenControl(String(block.dataset.lookupSource || 'suppliers').trim() || 'suppliers'); } }},
+    {action:'edit',icon:'EDIT',title:vi?'Chỉnh sửa':'Edit',handler:function(){edFocusQmsBlock(block);}},
+    {action:'up',icon:'UP',title:vi?'Đưa lên':'Move up',handler:function(){edQmsMoveBlock(block,'up');}},
+    {action:'down',icon:'DN',title:vi?'Đưa xuống':'Move down',handler:function(){edQmsMoveBlock(block,'down');}},
+    {action:'col1',icon:'1',title:vi?'Rộng 1 cột':'1 column',handler:function(){edQmsApplyFieldWidth(block,'1');},show:isField},
+    {action:'col2',icon:'2',title:vi?'Rộng 2 cột':'2 columns',handler:function(){edQmsApplyFieldWidth(block,'2');},show:isField},
+    {action:'col3',icon:'3',title:vi?'Toàn hàng':'Full row',handler:function(){edQmsApplyFieldWidth(block,'3');},show:isField},
+    {action:'duplicate',icon:'COPY',title:vi?'Nhân bản':'Duplicate',handler:function(){edDuplicateQmsBlock(block);}},
+    {action:'delete',icon:'DEL',title:vi?'Xóa':'Delete',handler:function(){edDeleteQmsBlock(block);}}
+  ].filter(function(cfg){ return cfg.show !== false; }).forEach(function(cfg){
     const btn=document.createElement('button');
     btn.type='button';
-    btn.className='ed-qms-toolbtn'+(cfg.action==='delete'?' is-danger':'');
+    btn.className='ed-qms-toolbtn'+(cfg.action==='delete'?' is-danger':'')+(cfg.icon.length>2?' is-text':'');
     btn.setAttribute('data-action',cfg.action);
     btn.setAttribute('title',cfg.title);
     btn.textContent=cfg.icon;
@@ -1455,13 +2309,76 @@ function edSelectQmsBlock(block){
 
 function edFocusQmsBlock(block){
   if(!block) return;
-  const target=block.querySelector('.ed-qms-field,.ed-qms-body');
+  const target=edQmsPrimaryTarget(block);
   if(!target) return;
   try{
     target.focus();
-    _edPlaceCaretAtStart(target);
+    if(target.isContentEditable) _edPlaceCaretAtStart(target);
     edSaveSelection();
   }catch(e){}
+}
+
+function edCloseQmsContextMenu(){
+  var menu=document.getElementById('ed-qms-context-menu');
+  if(menu) menu.remove();
+}
+
+function edOpenQmsDropdownSettings(block){
+  edEditQmsBlockProperties(block);
+  setTimeout(function(){
+    var lookup=document.getElementById('ed-qms-field-lookup-source');
+    var dropdown=document.getElementById('ed-qms-field-dropdown');
+    var target=(lookup && lookup.value) ? lookup : dropdown;
+    if(target && typeof target.focus === 'function'){
+      target.focus();
+      if(typeof target.scrollIntoView === 'function') target.scrollIntoView({ behavior:'smooth', block:'center' });
+    }
+  }, 40);
+}
+
+function edOpenQmsContextMenu(block,x,y){
+  if(!block) return;
+  edCloseQmsContextMenu();
+  var isField=block.classList.contains('qf-field');
+  var menu=document.createElement('div');
+  menu.id='ed-qms-context-menu';
+  menu.className='ed-qms-context-menu';
+  menu.setAttribute('contenteditable','false');
+  var actions=[
+    {label:'Thuộc tính',handler:function(){edEditQmsBlockProperties(block);}},
+    {label:'Chỉnh droplist / lookup',handler:function(){edOpenQmsDropdownSettings(block);},show:isField},
+    {label:'Mở dữ liệu nền',handler:function(){ if(typeof window._mdOpenControl==='function'){ window._mdOpenControl(String(block.dataset.lookupSource || 'suppliers').trim() || 'suppliers'); } },show:isField},
+    {label:'Nhân bản block',handler:function(){edDuplicateQmsBlock(block);}},
+    {label:'Đưa lên',handler:function(){edQmsMoveBlock(block,'up');}},
+    {label:'Đưa xuống',handler:function(){edQmsMoveBlock(block,'down');}},
+    {label:'Mở rộng / thu gọn',handler:function(){edQmsApplyFieldWidth(block, block.classList.contains('qf-col-span-2') ? '3' : '2');},show:isField},
+    {label:'Xóa block',handler:function(){edDeleteQmsBlock(block);},danger:true}
+  ];
+  menu.innerHTML=actions.filter(function(item){ return item.show !== false; }).map(function(item){
+    return '<button type="button" class="' + (item.danger ? 'is-danger' : '') + '">' + _edEscapeHtml(item.label) + '</button>';
+  }).join('');
+  document.body.appendChild(menu);
+  var buttons=menu.querySelectorAll('button');
+  actions.filter(function(item){ return item.show !== false; }).forEach(function(item,index){
+    buttons[index].addEventListener('click',function(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+      edCloseQmsContextMenu();
+      item.handler();
+    });
+  });
+  var rect=menu.getBoundingClientRect();
+  var left=Math.min(x, Math.max(12, window.innerWidth - rect.width - 12));
+  var top=Math.min(y, Math.max(12, window.innerHeight - rect.height - 12));
+  menu.style.left=left+'px';
+  menu.style.top=top+'px';
+  setTimeout(function(){
+    document.addEventListener('mousedown', window._edQmsContextCloser=function(ev){
+      if(!menu.contains(ev.target)) edCloseQmsContextMenu();
+      document.removeEventListener('mousedown', window._edQmsContextCloser, true);
+      window._edQmsContextCloser=null;
+    }, true);
+  },0);
 }
 
 function edDeleteQmsBlock(block){
@@ -1514,12 +2431,13 @@ function edQmsEditActive(block){
 function edInitQmsBlocks(ctx){
   if(!ctx||!ctx.querySelectorAll) return;
   edWrapLegacyQmsBlocks(ctx);
+  edQmsMarkFormBlocks(ctx);
   edNormalizeQmsSignatureBoxes(ctx);
   const blocks=[];
-  if(ctx.matches&&ctx.matches('.ed-qms-block')) blocks.push(ctx);
-  ctx.querySelectorAll('.ed-qms-block').forEach(function(block){blocks.push(block);});
+  if(ctx.matches&&ctx.matches('.ed-qms-block,[data-qms-kind].qf-section,[data-qms-kind].qf-field,[data-qms-kind].scar-record-strip')) blocks.push(ctx);
+  edQmsDesignerBlocks(ctx).forEach(function(block){blocks.push(block);});
   blocks.forEach(function(block){
-    block.setAttribute('contenteditable','false');
+    if(block.classList.contains('ed-qms-block')) block.setAttribute('contenteditable','false');
     block.querySelectorAll('.ed-qms-toolbar').forEach(function(x){x.remove();});
     block.classList.remove('ed-qms-selected');
     const body=block.querySelector('.ed-qms-body');
@@ -1537,6 +2455,13 @@ function edInitQmsBlocks(ctx){
         if(ev.target.closest('.ed-qms-toolbar')) return;
         edSelectQmsBlock(block);
       });
+      block.addEventListener('contextmenu',function(ev){
+        if(ev.target.closest('.ed-qms-toolbar')) return;
+        ev.preventDefault();
+        ev.stopPropagation();
+        edSelectQmsBlock(block);
+        edOpenQmsContextMenu(block, ev.clientX, ev.clientY);
+      });
     }
   });
   const fields=[];
@@ -1547,16 +2472,16 @@ function edInitQmsBlocks(ctx){
   });
 }
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // TABLE CELL BACKGROUND COLOR
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function edTableCellColor(){
   const sel=window.getSelection();
   if(!sel.rangeCount)return;
   let node=sel.anchorNode;
   while(node&&node.tagName!=='TD'&&node.tagName!=='TH'&&node!==document.getElementById('editor-area'))node=node.parentElement;
   if(!node||node===document.getElementById('editor-area')||(node.tagName!=='TD'&&node.tagName!=='TH')){
-    showToast(lang!=='en'?'⚠ Đặt con trỏ vào ô bảng trước':'⚠ Place cursor in a table cell first');return;
+    showToast(lang!=='en'?'âš  Äáº·t con trá» vÃ o Ã´ báº£ng trÆ°á»›c':'âš  Place cursor in a table cell first');return;
   }
   edGetModalRoot()._cellNode=node;
   edShowCellColorDialog('cell');
@@ -1565,18 +2490,18 @@ function edTableCellColor(){
 function edShowCellColorDialog(scope){
   const vi=lang!=='en';
   const root=edGetModalRoot();
-  const scopeLabel={cell:vi?'Ô':'Cell',row:vi?'Hàng':'Row',col:vi?'Cột':'Column'}[scope];
+  const scopeLabel={cell:vi?'Ã”':'Cell',row:vi?'HÃ ng':'Row',col:vi?'Cá»™t':'Column'}[scope];
   const colors=['transparent','#ffffff','#f3f3f3','#efefef','#d9d9d9','#cccccc','#b7b7b7','#999999',
    '#fce5cd','#fff2cc','#d9ead3','#d0e0e3','#c9daf8','#cfe2f3','#d9d2e9','#ead1dc',
    '#f4cccc','#ea9999','#f9cb9c','#ffe599','#b6d7a8','#a2c4c9','#a4c2f4','#9fc5e8',
    '#e06666','#f6b26b','#ffd966','#93c47d','#76a5af','#6d9eeb','#6fa8dc','#8e7cc3',
    '#cc0000','#e69138','#f1c232','#6aa84f','#45818e','#3c78d8','#3d85c6','#674ea7',
    '#990000','#b45f06','#bf9000','#38761d','#134f5c','#1155cc','#0b5394','#351c75'];
-  let html='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal"><h4>🎨 '+(vi?'Màu nền — ':'Background — ')+scopeLabel+'</h4>';
+  let html='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal"><h4>ðŸŽ¨ '+(vi?'MÃ u ná»n â€” ':'Background â€” ')+scopeLabel+'</h4>';
   // Scope buttons
   html+='<div style="display:flex;gap:4px;margin-bottom:10px">';
   ['cell','row','col'].forEach(s=>{
-    const lbl={cell:vi?'🔲 Ô':'🔲 Cell',row:vi?'☰ Hàng':'☰ Row',col:vi?'▥ Cột':'▥ Col'}[s];
+    const lbl={cell:vi?'ðŸ”² Ã”':'ðŸ”² Cell',row:vi?'â˜° HÃ ng':'â˜° Row',col:vi?'â–¥ Cá»™t':'â–¥ Col'}[s];
     html+='<button style="flex:1;padding:6px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid '+(s===scope?'#1967d2':'#ddd')+';background:'+(s===scope?'#e8f0fe':'#fff')+';color:'+(s===scope?'#1967d2':'#666')+';cursor:pointer" onclick="edShowCellColorDialog(\''+s+'\')">'+lbl+'</button>';
   });
   html+='</div>';
@@ -1585,8 +2510,8 @@ function edShowCellColorDialog(scope){
     const style=c==='transparent'?'background:linear-gradient(135deg,#fff 45%,#f00 45%,#f00 55%,#fff 55%)':'background:'+c;
     html+='<button style="'+style+';width:20px;height:20px" onclick="edApplyCellColor(\''+scope+'\',\''+c+'\')"></button>';
   });
-  html+='</div><div class="ed-cpick-custom"><label>'+(vi?'Tùy chỉnh':'Custom')+'</label><input type="color" id="ed-cell-color" value="#ffffff"><button onclick="edApplyCellColor(\''+scope+'\',document.getElementById(\'ed-cell-color\').value)">OK</button></div>';
-  html+='<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Đóng':'Close')+'</button></div></div></div>';
+  html+='</div><div class="ed-cpick-custom"><label>'+(vi?'TÃ¹y chá»‰nh':'Custom')+'</label><input type="color" id="ed-cell-color" value="#ffffff"><button onclick="edApplyCellColor(\''+scope+'\',document.getElementById(\'ed-cell-color\').value)">OK</button></div>';
+  html+='<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'ÄÃ³ng':'Close')+'</button></div></div></div>';
   root.innerHTML=html;
 }
 
@@ -1620,9 +2545,9 @@ function edSetCellBgAll(){
 
 
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // IMAGE RESIZE HANDLES (CKEditor-style)
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 let edSelectedImg=null;
 let edResizing=false;
 
@@ -1676,13 +2601,13 @@ function edSelectImg(img){
   // Size tooltip
   const tip=document.createElement('span');
   tip.className='ed-img-size-tooltip';
-  tip.textContent=Math.round(img.offsetWidth)+'×'+Math.round(img.offsetHeight);
+  tip.textContent=Math.round(img.offsetWidth)+'Ã—'+Math.round(img.offsetHeight);
   wrap.appendChild(tip);
   // Alignment bar
   const bar=document.createElement('div');
   bar.className='ed-img-bar';
   bar.contentEditable='false';
-  bar.innerHTML='<button onclick="edImgAlign(\'left\')" title="Left">⫷</button><button onclick="edImgAlign(\'center\')" title="Center">☰</button><button onclick="edImgAlign(\'right\')" title="Right">⫸</button><button onclick="edImgAlign(\'none\')" title="Inline">↩</button><button onclick="edImgResize50()" title="50%">½</button><button onclick="edImgResize75()" title="75%">¾</button><button onclick="edImgResize100()" title="100%">1</button>';
+  bar.innerHTML='<button onclick="edImgAlign(\'left\')" title="Left">â«·</button><button onclick="edImgAlign(\'center\')" title="Center">â˜°</button><button onclick="edImgAlign(\'right\')" title="Right">â«¸</button><button onclick="edImgAlign(\'none\')" title="Inline">â†©</button><button onclick="edImgResize50()" title="50%">Â½</button><button onclick="edImgResize75()" title="75%">Â¾</button><button onclick="edImgResize100()" title="100%">1</button>';
   wrap.appendChild(bar);
 }
 
@@ -1723,7 +2648,7 @@ function edStartResize(e,img,pos){
     img.style.height=(pos==='mr'||pos==='ml')?'auto':Math.round(nh)+'px';
     img.style.maxWidth='none';
     const tip=img.closest('.ed-img-resize-wrap').querySelector('.ed-img-size-tooltip');
-    if(tip)tip.textContent=Math.round(nw)+'×'+Math.round(pos==='mr'||pos==='ml'?img.offsetHeight:nh);
+    if(tip)tip.textContent=Math.round(nw)+'Ã—'+Math.round(pos==='mr'||pos==='ml'?img.offsetHeight:nh);
   }
   function onUp(){
     document.removeEventListener('mousemove',onMove);
@@ -1753,15 +2678,15 @@ function edImgResize50(){if(edSelectedImg){var p=edSelectedImg.closest('.ed-page
 function edImgResize75(){if(edSelectedImg){var p=edSelectedImg.closest('.ed-page');if(p){edSelectedImg.style.width=Math.round(p.offsetWidth*.75)+'px';edSelectedImg.style.height='auto';edSelectedImg.style.maxWidth='none';edMarkModified();_edImgUpdateTip();}}}
 function edImgResize100(){if(edSelectedImg){edSelectedImg.style.width='100%';edSelectedImg.style.height='auto';edSelectedImg.style.maxWidth='100%';edMarkModified();_edImgUpdateTip();}}
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // TABLE CONTEXT MENU (Right-click)
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-// ────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // TABLE COLUMN WIDTH ENGINE (colgroup-based)
 // Fix: support tables WITH <colgroup> widths, allow drag + numeric width edits
 // Applied globally in editor mode
-// ────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const _edTableDefaults = new WeakMap();
 
 function edTableSetAutofitState(table, mode, lock){
@@ -2434,8 +3359,8 @@ function edShowTableBar(table){
     return inp;
   }
 
-  // ═══ 1) TABLE WIDTH (bề rộng bảng) ═══
-  bar.appendChild(mkLbl(vi?'Bảng:':'Table:'));
+  // â•â•â• 1) TABLE WIDTH (bá» rá»™ng báº£ng) â•â•â•
+  bar.appendChild(mkLbl(vi?'Báº£ng:':'Table:'));
 
   var tblW = Math.round(table.getBoundingClientRect().width) || table.offsetWidth || 600;
   var parentW = (table.parentElement?Math.round(table.parentElement.getBoundingClientRect().width):tblW) || tblW;
@@ -2458,7 +3383,7 @@ function edShowTableBar(table){
   });
 
   // PX width input (shown only when px mode)
-  var pxInp=mkNumInput(isPx?Math.round(parseFloat(table.style.width)||tblW):tblW,65,vi?'Bề rộng (px)':'Width (px)',function(inp){
+  var pxInp=mkNumInput(isPx?Math.round(parseFloat(table.style.width)||tblW):tblW,65,vi?'Bá» rá»™ng (px)':'Width (px)',function(inp){
     // When editing px width, keep column widths consistent by adjusting last column
     edTableSetTableWidthPx(table, inp.value);
     edMarkModified();
@@ -2491,8 +3416,8 @@ function edShowTableBar(table){
   bar.appendChild(pxInp);
   bar.appendChild(mkSep());
 
-  // ═══ 2) FONT SIZE ═══
-  bar.appendChild(mkLbl(vi?'Chữ:':'Font:'));
+  // â•â•â• 2) FONT SIZE â•â•â•
+  bar.appendChild(mkLbl(vi?'Chá»¯:':'Font:'));
   var curFs=Math.round(parseFloat(getComputedStyle(table).fontSize))||12;
   var fsSel=document.createElement('select');
   fsSel.style.cssText='height:26px;padding:0 4px;border:1px solid #d1d5db;border-radius:4px;font-size:11px;cursor:pointer;background:#fff;outline:none';
@@ -2510,10 +3435,10 @@ function edShowTableBar(table){
   bar.appendChild(fsSel);
   bar.appendChild(mkSep());
 
-  // ═══ 3) COLUMN WIDTHS (works with/without colgroup) ═══
+  // â•â•â• 3) COLUMN WIDTHS (works with/without colgroup) â•â•â•
   var colCount = edTableGetColCount(table);
   if(colCount>0 && colCount<=12){
-    bar.appendChild(mkLbl(vi?'Cột:':'Col:'));
+    bar.appendChild(mkLbl(vi?'Cá»™t:':'Col:'));
     var widthsPx = edTableGetColWidthsPx(table, colCount).map(function(w){return Math.max(20, Math.round(w));});
     for(var i=0;i<colCount;i++){
       (function(colIdx){
@@ -2537,20 +3462,20 @@ function edShowTableBar(table){
     bar.appendChild(mkSep());
   }
 
-  // ═══ 4) ALIGNMENT ═══
-  bar.appendChild(mkBtn('◧',vi?'Trái':'Left',function(){table.style.marginLeft='';table.style.marginRight='';edMarkModified();}));
-  bar.appendChild(mkBtn('◫',vi?'Giữa':'Center',function(){table.style.marginLeft='auto';table.style.marginRight='auto';edMarkModified();}));
-  bar.appendChild(mkBtn('◨',vi?'Phải':'Right',function(){table.style.marginLeft='auto';table.style.marginRight='0';edMarkModified();}));
+  // â•â•â• 4) ALIGNMENT â•â•â•
+  bar.appendChild(mkBtn('â—§',vi?'TrÃ¡i':'Left',function(){table.style.marginLeft='';table.style.marginRight='';edMarkModified();}));
+  bar.appendChild(mkBtn('â—«',vi?'Giá»¯a':'Center',function(){table.style.marginLeft='auto';table.style.marginRight='auto';edMarkModified();}));
+  bar.appendChild(mkBtn('â—¨',vi?'Pháº£i':'Right',function(){table.style.marginLeft='auto';table.style.marginRight='0';edMarkModified();}));
   bar.appendChild(mkSep());
 
-  // ═══ 5) RESET ═══
-  bar.appendChild(mkBtn('↺ Reset',vi?'Đặt lại mặc định':'Reset to default',function(){
+  // â•â•â• 5) RESET â•â•â•
+  bar.appendChild(mkBtn('â†º Reset',vi?'Äáº·t láº¡i máº·c Ä‘á»‹nh':'Reset to default',function(){
     edTableRestoreDefaults(table);
     edMarkModified();
     edShowTableBar(table); // rebuild UI + refresh values
   },'color:#dc2626;border-color:#fca5a5;background:#fef2f2'));
 
-  // ═══ Position bar above table ═══
+  // â•â•â• Position bar above table â•â•â•
   document.body.appendChild(bar);
   bar._table=table;
   function posBar(){
@@ -2612,7 +3537,7 @@ function edShowTableMenu(x,y,cell){
   const _g=function(l){return '<span style="font-size:7px;color:#94a3b8;padding:0 2px;font-weight:700;letter-spacing:.5px">'+l+'</span>';};
   menu.style.minWidth='auto';menu.style.width='auto';menu.style.padding='0';menu.style.borderRadius='8px';
   menu.innerHTML=`<div style="display:flex;align-items:center;gap:1px;padding:5px 6px;flex-wrap:wrap;max-width:400px">
-    ${_g(vi?'HG':'ROW')}${_b("edTblAddRow('above')","↑",vi?'Thêm hàng trên':'Row above')}${_b("edTblAddRow('below')","↓",vi?'Thêm hàng dưới':'Row below')}${_b("edTblDelRow()","✕",vi?'Xóa hàng':'Del row',1)}${_s}${_g(vi?'CT':'COL')}${_b("edTblAddCol('before')","←",vi?'Thêm cột trái':'Col left')}${_b("edTblAddCol('after')","→",vi?'Thêm cột phải':'Col right')}${_b("edTblDelCol()","✕",vi?'Xóa cột':'Del col',1)}${_s}${_g(vi?'CĂN':'AL')}${_b("edTblCellAlign('left')","◧",vi?'Trái':'Left')}${_b("edTblCellAlign('center')","◫",vi?'Giữa':'Center')}${_b("edTblCellAlign('right')","◨",vi?'Phải':'Right')}${_b("edTblVertAlign('top')","⬆",vi?'Trên':'Top')}${_b("edTblVertAlign('middle')","⬌",vi?'Giữa dọc':'Mid')}${_s}${_g(vi?'GỘP':'MG')}${_b("edTblMergeRight()","⇥",vi?'Gộp phải':'Merge →')}${_b("edTblMergeDown()","⇩",vi?'Gộp dưới':'Merge ↓')}${_b("edTblSplitCell()","⊞",vi?'Tách':'Split')}${_s}${_g(vi?'MÀU':'CLR')}${_b("edTblCellBg()","🎨",vi?'Màu ô':'Cell')}${_b("edTblRowBgPicker()","☰",vi?'Màu hàng':'Row')}${_b("edTblColBgPicker()","▥",vi?'Màu cột':'Col')}${_s}${_b("edTblBorderPicker()","▢",vi?'Viền':'Border')}${_b("edTblRadiusPicker()","◔",vi?'Bo góc':'Radius')}${_b("edTblProperties()","⚙",vi?'Thuộc tính':'Props')}${_b("edTblDelete()","🗑",vi?'Xóa bảng':'Del table',1)}
+    ${_g(vi?'HG':'ROW')}${_b("edTblAddRow('above')","â†‘",vi?'ThÃªm hÃ ng trÃªn':'Row above')}${_b("edTblAddRow('below')","â†“",vi?'ThÃªm hÃ ng dÆ°á»›i':'Row below')}${_b("edTblDelRow()","âœ•",vi?'XÃ³a hÃ ng':'Del row',1)}${_s}${_g(vi?'CT':'COL')}${_b("edTblAddCol('before')","â†",vi?'ThÃªm cá»™t trÃ¡i':'Col left')}${_b("edTblAddCol('after')","â†’",vi?'ThÃªm cá»™t pháº£i':'Col right')}${_b("edTblDelCol()","âœ•",vi?'XÃ³a cá»™t':'Del col',1)}${_s}${_g(vi?'CÄ‚N':'AL')}${_b("edTblCellAlign('left')","â—§",vi?'TrÃ¡i':'Left')}${_b("edTblCellAlign('center')","â—«",vi?'Giá»¯a':'Center')}${_b("edTblCellAlign('right')","â—¨",vi?'Pháº£i':'Right')}${_b("edTblVertAlign('top')","â¬†",vi?'TrÃªn':'Top')}${_b("edTblVertAlign('middle')","â¬Œ",vi?'Giá»¯a dá»c':'Mid')}${_s}${_g(vi?'Gá»˜P':'MG')}${_b("edTblMergeRight()","â‡¥",vi?'Gá»™p pháº£i':'Merge â†’')}${_b("edTblMergeDown()","â‡©",vi?'Gá»™p dÆ°á»›i':'Merge â†“')}${_b("edTblSplitCell()","âŠž",vi?'TÃ¡ch':'Split')}${_s}${_g(vi?'MÃ€U':'CLR')}${_b("edTblCellBg()","ðŸŽ¨",vi?'MÃ u Ã´':'Cell')}${_b("edTblRowBgPicker()","â˜°",vi?'MÃ u hÃ ng':'Row')}${_b("edTblColBgPicker()","â–¥",vi?'MÃ u cá»™t':'Col')}${_s}${_b("edTblBorderPicker()","â–¢",vi?'Viá»n':'Border')}${_b("edTblRadiusPicker()","â—”",vi?'Bo gÃ³c':'Radius')}${_b("edTblProperties()","âš™",vi?'Thuá»™c tÃ­nh':'Props')}${_b("edTblDelete()","ðŸ—‘",vi?'XÃ³a báº£ng':'Del table',1)}
   </div>`;
   document.body.appendChild(menu);
   menu._cell=cell;menu._table=table;menu._tr=tr;menu._cellIdx=cellIdx;
@@ -2774,19 +3699,19 @@ function edTblBorderPicker(){
   const c=_getCtx();if(!c)return;edCloseCtxMenu();
   const vi=lang!=='en';const root=edGetModalRoot();const table=c.table;
   const colors=['#cbd5e1','#1e293b','#1967d2','#dc2626','#16a34a','#f59e0b','#7c3aed','#transparent'];
-  let html='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal"><h4>▢ '+(vi?'Đường viền bảng':'Table Border')+'</h4>';
+  let html='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal"><h4>â–¢ '+(vi?'ÄÆ°á»ng viá»n báº£ng':'Table Border')+'</h4>';
   html+='<div style="display:flex;gap:6px;margin:8px 0;flex-wrap:wrap">';
-  [{w:'0',l:vi?'Không':'None'},{w:'1',l:'1px'},{w:'2',l:'2px'},{w:'3',l:'3px'}].forEach(o=>{
+  [{w:'0',l:vi?'KhÃ´ng':'None'},{w:'1',l:'1px'},{w:'2',l:'2px'},{w:'3',l:'3px'}].forEach(o=>{
     html+='<button style="padding:6px 12px;border:1px solid #ddd;border-radius:4px;background:#fff;cursor:pointer;font-size:11px;font-weight:600" onclick="edApplyTblBorder(\''+o.w+'\')">'+o.l+'</button>';
   });
-  html+='</div><label style="font-size:11px;color:#666">'+(vi?'Màu viền':'Border Color')+'</label>';
+  html+='</div><label style="font-size:11px;color:#666">'+(vi?'MÃ u viá»n':'Border Color')+'</label>';
   html+='<div class="ed-cpick-grid" style="margin:6px 0;grid-template-columns:repeat(8,1fr)">';
   colors.forEach(co=>{
     const st=co==='#transparent'?'background:linear-gradient(135deg,#fff 45%,#f00 45%,#f00 55%,#fff 55%)':'background:'+co;
     html+='<button style="'+st+';width:24px;height:24px" onclick="edApplyTblBorderColor(\''+co+'\')"></button>';
   });
-  html+='</div><div class="ed-cpick-custom"><label>'+(vi?'Tùy chỉnh':'Custom')+'</label><input type="color" id="ed-tbl-bc" value="#cbd5e1"><button onclick="edApplyTblBorderColor(document.getElementById(\'ed-tbl-bc\').value)">OK</button></div>';
-  html+='<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Đóng':'Close')+'</button></div></div></div>';
+  html+='</div><div class="ed-cpick-custom"><label>'+(vi?'TÃ¹y chá»‰nh':'Custom')+'</label><input type="color" id="ed-tbl-bc" value="#cbd5e1"><button onclick="edApplyTblBorderColor(document.getElementById(\'ed-tbl-bc\').value)">OK</button></div>';
+  html+='<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'ÄÃ³ng':'Close')+'</button></div></div></div>';
   root.innerHTML=html;root._tblBorderTarget=table;
 }
 function edApplyTblBorder(w){
@@ -2807,12 +3732,12 @@ function edTblRadiusPicker(){
   if(_edTableModuleCall('radiusPicker',[])!==null)return;
   const c=_getCtx();if(!c)return;edCloseCtxMenu();
   const vi=lang!=='en';const root=edGetModalRoot();const table=c.table;
-  let html='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal"><h4>◔ '+(vi?'Bo góc bảng':'Table Border Radius')+'</h4>';
+  let html='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal"><h4>â—” '+(vi?'Bo gÃ³c báº£ng':'Table Border Radius')+'</h4>';
   html+='<div style="display:flex;gap:8px;margin:12px 0">';
   [0,4,8,12,16,20].forEach(r=>{
     html+='<button style="width:50px;height:40px;border:2px solid #1967d2;border-radius:'+r+'px;background:#e8f0fe;cursor:pointer;font-size:11px;font-weight:600" onclick="edApplyTblRadius('+r+')">'+r+'px</button>';
   });
-  html+='</div><div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Đóng':'Close')+'</button></div></div></div>';
+  html+='</div><div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'ÄÃ³ng':'Close')+'</button></div></div></div>';
   root.innerHTML=html;root._tblRadiusTarget=table;
 }
 function edTblWidth(w){
@@ -2858,7 +3783,7 @@ function edApplyTblRadius(r){
 function edTblDelete(){
   if(_edTableModuleCall('deleteTable',[])!==null)return;
   const c=_getCtx();if(!c)return;edCloseCtxMenu();
-  if(confirm(lang!=='en'?'Xóa bảng này?':'Delete this table?'))c.table.remove();
+  if(confirm(lang!=='en'?'XÃ³a báº£ng nÃ y?':'Delete this table?'))c.table.remove();
   edMarkModified();
 }
 
@@ -2867,16 +3792,16 @@ function edTblProperties(){
   const c=_getCtx();if(!c)return;edCloseCtxMenu();
   const vi=lang!=='en';const table=c.table;
   const root=edGetModalRoot();
-  let html='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal"><h4>⚙ '+(vi?'Thuộc tính bảng':'Table Properties')+'</h4>';
+  let html='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal"><h4>âš™ '+(vi?'Thuá»™c tÃ­nh báº£ng':'Table Properties')+'</h4>';
   html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-  html+='<div><label>'+( vi?'Chiều rộng':'Width')+'</label><input id="ed-tp-w" value="'+(table.style.width||'100%')+'"></div>';
-  html+='<div><label>'+(vi?'Căn chỉnh':'Alignment')+'</label><select id="ed-tp-align"><option value="">'+( vi?'Mặc định':'Default')+'</option><option value="center"'+(table.style.margin==='0px auto'?' selected':'')+'>'+( vi?'Giữa':'Center')+'</option><option value="left">'+( vi?'Trái':'Left')+'</option></select></div>';
-  html+='<div><label>'+(vi?'Viền':'Border')+'</label><input id="ed-tp-border" value="1" type="number" min="0" max="5"></div>';
-  html+='<div><label>'+(vi?'Màu viền':'Border Color')+'</label><input id="ed-tp-bc" type="color" value="#cbd5e1"></div>';
-  html+='<div><label>'+(vi?'Padding ô':'Cell Padding')+'</label><input id="ed-tp-pad" value="8" type="number" min="0" max="30"></div>';
+  html+='<div><label>'+( vi?'Chiá»u rá»™ng':'Width')+'</label><input id="ed-tp-w" value="'+(table.style.width||'100%')+'"></div>';
+  html+='<div><label>'+(vi?'CÄƒn chá»‰nh':'Alignment')+'</label><select id="ed-tp-align"><option value="">'+( vi?'Máº·c Ä‘á»‹nh':'Default')+'</option><option value="center"'+(table.style.margin==='0px auto'?' selected':'')+'>'+( vi?'Giá»¯a':'Center')+'</option><option value="left">'+( vi?'TrÃ¡i':'Left')+'</option></select></div>';
+  html+='<div><label>'+(vi?'Viá»n':'Border')+'</label><input id="ed-tp-border" value="1" type="number" min="0" max="5"></div>';
+  html+='<div><label>'+(vi?'MÃ u viá»n':'Border Color')+'</label><input id="ed-tp-bc" type="color" value="#cbd5e1"></div>';
+  html+='<div><label>'+(vi?'Padding Ã´':'Cell Padding')+'</label><input id="ed-tp-pad" value="8" type="number" min="0" max="30"></div>';
   html+='<div><label>'+(vi?'Spacing':'Spacing')+'</label><input id="ed-tp-space" value="0" type="number" min="0" max="10"></div>';
   html+='</div>';
-  html+='<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Hủy':'Cancel')+'</button><button class="ed-m-ok" onclick="edApplyTblProps()">'+(vi?'Áp dụng':'Apply')+'</button></div></div></div>';
+  html+='<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Há»§y':'Cancel')+'</button><button class="ed-m-ok" onclick="edApplyTblProps()">'+(vi?'Ãp dá»¥ng':'Apply')+'</button></div></div></div>';
   root.innerHTML=html;
   root._tblPropTarget=table;
 }
@@ -2901,9 +3826,9 @@ function edApplyTblProps(){
 }
 
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // LIST STYLE DROPDOWNS
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function edToggleListDD(type){
   document.querySelectorAll('.ed-cpick-dd,.ed-special-panel').forEach(d=>d.classList.remove('open'));
   const dd=document.getElementById('ed-'+type+'-dd');
@@ -2915,21 +3840,21 @@ function edToggleListDD(type){
   dd.style.width='180px';
   const vi=lang!=='en';
   if(type==='ul'){
-    dd.innerHTML='<h5>'+(vi?'Kiểu dấu đầu dòng':'Bullet Style')+'</h5>'+
+    dd.innerHTML='<h5>'+(vi?'Kiá»ƒu dáº¥u Ä‘áº§u dÃ²ng':'Bullet Style')+'</h5>'+
       '<div style="display:flex;flex-direction:column;gap:2px">'+
-      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'disc\')">● '+(vi?'Tròn đặc':'Disc')+'</button>'+
-      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'circle\')">○ '+(vi?'Tròn rỗng':'Circle')+'</button>'+
-      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'square\')">■ '+(vi?'Vuông':'Square')+'</button>'+
-      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'none\')">— '+(vi?'Không dấu':'None')+'</button>'+
+      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'disc\')">â— '+(vi?'TrÃ²n Ä‘áº·c':'Disc')+'</button>'+
+      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'circle\')">â—‹ '+(vi?'TrÃ²n rá»—ng':'Circle')+'</button>'+
+      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'square\')">â–  '+(vi?'VuÃ´ng':'Square')+'</button>'+
+      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'none\')">â€” '+(vi?'KhÃ´ng dáº¥u':'None')+'</button>'+
       '</div>';
   }else{
-    dd.innerHTML='<h5>'+(vi?'Kiểu đánh số':'Number Style')+'</h5>'+
+    dd.innerHTML='<h5>'+(vi?'Kiá»ƒu Ä‘Ã¡nh sá»‘':'Number Style')+'</h5>'+
       '<div style="display:flex;flex-direction:column;gap:2px">'+
-      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'decimal\')">1. 2. 3. '+(vi?'Số':'Decimal')+'</button>'+
-      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'lower-alpha\')">a. b. c. '+(vi?'Chữ thường':'Lower Alpha')+'</button>'+
-      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'upper-alpha\')">A. B. C. '+(vi?'Chữ hoa':'Upper Alpha')+'</button>'+
-      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'lower-roman\')">i. ii. iii. '+(vi?'La Mã thường':'Lower Roman')+'</button>'+
-      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'upper-roman\')">I. II. III. '+(vi?'La Mã hoa':'Upper Roman')+'</button>'+
+      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'decimal\')">1. 2. 3. '+(vi?'Sá»‘':'Decimal')+'</button>'+
+      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'lower-alpha\')">a. b. c. '+(vi?'Chá»¯ thÆ°á»ng':'Lower Alpha')+'</button>'+
+      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'upper-alpha\')">A. B. C. '+(vi?'Chá»¯ hoa':'Upper Alpha')+'</button>'+
+      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'lower-roman\')">i. ii. iii. '+(vi?'La MÃ£ thÆ°á»ng':'Lower Roman')+'</button>'+
+      '<button style="text-align:left;padding:6px 10px;border:1px solid #eee;border-radius:4px;background:none;cursor:pointer;font-size:12px" onclick="edListStyle(\'upper-roman\')">I. II. III. '+(vi?'La MÃ£ hoa':'Upper Roman')+'</button>'+
       '</div>';
   }
   dd.classList.add('open');
@@ -3118,33 +4043,33 @@ function _edNormalizeEmptyTableCell(cell){
   return true;
 }
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // MATH EQUATION INSERT (CKEditor-style)
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function edInsertMath(){
   var vi=lang!=='en';
   var root=edGetModalRoot();
   // Templates with ACTUAL Unicode characters
   var tpls=[
-    {label:'x²+y²',text:'x² + y² = z²'},
+    {label:'xÂ²+yÂ²',text:'xÂ² + yÂ² = zÂ²'},
     {label:'a/b',text:'a/b',html:'<span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;font-size:14px;line-height:1.1"><span style="border-bottom:1px solid #333;padding:0 4px">a</span><span style="padding:0 4px">b</span></span>'},
-    {label:'√x',text:'√x',html:'√<span style="text-decoration:overline;padding:0 2px">x</span>'},
-    {label:'∑',text:'∑ i=1..n',html:'<span style="font-size:20px;vertical-align:middle">∑</span><sub>i=1</sub><sup>n</sup>'},
-    {label:'∫',text:'∫ a..b',html:'<span style="font-size:22px;vertical-align:middle">∫</span><sub>a</sub><sup>b</sup>'},
-    {label:'lim',text:'lim x→∞',html:'<span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle"><span>lim</span><span style="font-size:10px">x→∞</span></span>'},
-    {label:'≤ ≥ ≠',text:'≤ ≥ ≠ ≈ ∝ ∞'},
-    {label:'xⁿ',text:'xⁿ',html:'x<sup>n</sup>'},
-    {label:'x₁',text:'x₁',html:'x<sub>1</sub>'},
-    {label:'π',text:'π ≈ 3.14159'},
-    {label:'Δ',text:'Δ = b² − 4ac'},
+    {label:'âˆšx',text:'âˆšx',html:'âˆš<span style="text-decoration:overline;padding:0 2px">x</span>'},
+    {label:'âˆ‘',text:'âˆ‘ i=1..n',html:'<span style="font-size:20px;vertical-align:middle">âˆ‘</span><sub>i=1</sub><sup>n</sup>'},
+    {label:'âˆ«',text:'âˆ« a..b',html:'<span style="font-size:22px;vertical-align:middle">âˆ«</span><sub>a</sub><sup>b</sup>'},
+    {label:'lim',text:'lim xâ†’âˆž',html:'<span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle"><span>lim</span><span style="font-size:10px">xâ†’âˆž</span></span>'},
+    {label:'â‰¤ â‰¥ â‰ ',text:'â‰¤ â‰¥ â‰  â‰ˆ âˆ âˆž'},
+    {label:'xâ¿',text:'xâ¿',html:'x<sup>n</sup>'},
+    {label:'xâ‚',text:'xâ‚',html:'x<sub>1</sub>'},
+    {label:'Ï€',text:'Ï€ â‰ˆ 3.14159'},
+    {label:'Î”',text:'Î” = bÂ² âˆ’ 4ac'},
     {label:'Matrix',text:'[a b; c d]',html:'<span style="display:inline-flex;align-items:center;vertical-align:middle;font-family:serif"><span style="font-size:18px">[</span><table style="display:inline-table;border-collapse:collapse;vertical-align:middle;margin:0 2px"><tr><td style="border:none;padding:1px 6px;font-size:13px">a</td><td style="border:none;padding:1px 6px;font-size:13px">b</td></tr><tr><td style="border:none;padding:1px 6px;font-size:13px">c</td><td style="border:none;padding:1px 6px;font-size:13px">d</td></tr></table><span style="font-size:18px">]</span></span>'},
-    {label:'α β γ',text:'α β γ δ ε θ λ σ'},
-    {label:'∂/∂x',text:'∂f/∂x',html:'<span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;font-size:14px;line-height:1.1"><span style="border-bottom:1px solid #333;padding:0 3px">∂f</span><span style="padding:0 3px">∂x</span></span>'},
+    {label:'Î± Î² Î³',text:'Î± Î² Î³ Î´ Îµ Î¸ Î» Ïƒ'},
+    {label:'âˆ‚/âˆ‚x',text:'âˆ‚f/âˆ‚x',html:'<span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;font-size:14px;line-height:1.1"><span style="border-bottom:1px solid #333;padding:0 3px">âˆ‚f</span><span style="padding:0 3px">âˆ‚x</span></span>'},
     {label:'n!',text:'n! = n(n-1)(n-2)...1'},
     {label:'log',text:'log?(x)',html:'log<sub>2</sub>(x)'}
   ];
-  var html='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal" style="width:520px"><h4>∑ '+(vi?'Chèn công thức toán':'Insert Math')+'</h4>';
-  html+='<div style="margin-bottom:10px"><div style="font-size:10px;font-weight:600;color:#666;margin-bottom:4px">'+(vi?'Mẫu có sẵn — click chèn vào ô soạn':'Templates — click to insert into editor below')+'</div>';
+  var html='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal" style="width:520px"><h4>âˆ‘ '+(vi?'ChÃ¨n cÃ´ng thá»©c toÃ¡n':'Insert Math')+'</h4>';
+  html+='<div style="margin-bottom:10px"><div style="font-size:10px;font-weight:600;color:#666;margin-bottom:4px">'+(vi?'Máº«u cÃ³ sáºµn â€” click chÃ¨n vÃ o Ã´ soáº¡n':'Templates â€” click to insert into editor below')+'</div>';
   html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">';
   for(var i=0;i<tpls.length;i++){
     var t=tpls[i];
@@ -3152,9 +4077,9 @@ function edInsertMath(){
   }
   html+='</div></div>';
   html+='<div style="border-top:1px solid #e2e8f0;padding-top:10px;margin-top:4px">';
-  html+='<div style="font-size:10px;font-weight:600;color:#666;margin-bottom:4px">'+(vi?'Nhập trực tiếp (click ký tự bên dưới)':'Type directly (click symbols below)')+'</div>';
+  html+='<div style="font-size:10px;font-weight:600;color:#666;margin-bottom:4px">'+(vi?'Nháº­p trá»±c tiáº¿p (click kÃ½ tá»± bÃªn dÆ°á»›i)':'Type directly (click symbols below)')+'</div>';
   html+='<div style="display:flex;gap:3px;margin-bottom:6px;flex-wrap:wrap">';
-  var syms=['²','³','ⁿ','₁','√','π','Δ','∑','∏','∫','∂','∞','→','↔','≤','≥','≠','≈','±','×','÷','∙','≡','∝','⊂','⊃','∈','∉','∪','∩','α','β','γ','δ','ε','θ','λ','σ','φ','ω'];
+  var syms=['Â²','Â³','â¿','â‚','âˆš','Ï€','Î”','âˆ‘','âˆ','âˆ«','âˆ‚','âˆž','â†’','â†”','â‰¤','â‰¥','â‰ ','â‰ˆ','Â±','Ã—','Ã·','âˆ™','â‰¡','âˆ','âŠ‚','âŠƒ','âˆˆ','âˆ‰','âˆª','âˆ©','Î±','Î²','Î³','Î´','Îµ','Î¸','Î»','Ïƒ','Ï†','Ï‰'];
   for(var j=0;j<syms.length;j++){
     html+='<button style="width:26px;height:26px;border:1px solid #e2e8f0;border-radius:4px;background:#fff;cursor:pointer;font-size:14px;font-family:serif;padding:0" onclick="edMathInsertSym(this.textContent)" title="'+syms[j]+'">'+syms[j]+'</button>';
   }
@@ -3162,7 +4087,7 @@ function edInsertMath(){
   html+='<div contenteditable="true" id="ed-math-input" style="width:100%;min-height:36px;padding:8px;border:1px solid #d1d5db;border-radius:6px;font-size:16px;font-family:serif;outline:none;box-sizing:border-box;background:#fff" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"></div>';
   html+='<div id="ed-math-preview" style="margin-top:4px;padding:6px;background:#f8f9fa;border-radius:6px;min-height:28px;font-size:18px;font-family:serif;text-align:center;color:#1e293b"></div>';
   html+='</div>';
-  html+='<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Hủy':'Cancel')+'</button><button class="ed-m-ok" onclick="edInsertMathOK()">'+(vi?'Chèn':'Insert')+'</button></div></div></div>';
+  html+='<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Há»§y':'Cancel')+'</button><button class="ed-m-ok" onclick="edInsertMathOK()">'+(vi?'ChÃ¨n':'Insert')+'</button></div></div></div>';
   root.innerHTML=html;
   root._mathTemplates=tpls;
   var inp=document.getElementById('ed-math-input');
@@ -3231,9 +4156,9 @@ function edInsertMathOK(){
   edMarkModified();edCloseModal();
 }
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // TABLE RESIZE (drag column/row borders)
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function edSetupTableResize(){
   const area=document.getElementById('editor-area');
   let dragging=false;
@@ -3383,9 +4308,9 @@ function edSetupTableResize(){
     edTableUpdateActiveBar(table);
   });
 }
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // TEXTBOX (like Word)
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 function edInsertTextbox(){
@@ -3393,7 +4318,7 @@ function edInsertTextbox(){
   const vi=lang!=='en';
   const id='tb'+Date.now();
   const html='<div class="ed-textbox" id="'+id+'" contenteditable="false" style="width:240px;min-height:60px;display:inline-block">'+
-    '<div class="ed-tb-content" contenteditable="true" style="outline:none;min-height:30px">'+(vi?'Nhập văn bản...':'Type here...')+'</div>'+
+    '<div class="ed-tb-content" contenteditable="true" style="outline:none;min-height:30px">'+(vi?'Nháº­p vÄƒn báº£n...':'Type here...')+'</div>'+
     '</div>&nbsp;';
   edExecCommand('insertHTML',false,html);
   // Attach click via delegation after insertion
@@ -3428,27 +4353,27 @@ function edSelectTextbox(el){
   var vi=lang!=='en';
   // Text color button  
   var btnTC=document.createElement('button');btnTC.style.cssText='width:22px;height:22px;border:1px solid #ddd;border-radius:3px;background:#fff;cursor:pointer;padding:0;font-size:12px;font-weight:700;color:'+(el.querySelector('.ed-tb-content')?el.querySelector('.ed-tb-content').style.color||'#333':'#333');
-  btnTC.textContent='A';btnTC.title=vi?'Màu chữ':'Text color';
+  btnTC.textContent='A';btnTC.title=vi?'MÃ u chá»¯':'Text color';
   btnTC.addEventListener('click',function(ev){ev.stopPropagation();edShowColorPopup(ev.target,function(c){var cnt=el.querySelector('.ed-tb-content');if(cnt){cnt.style.color=c;btnTC.style.color=c;}edMarkModified();});});
   bar.appendChild(btnTC);
   // Border color button
   var btnBC=document.createElement('button');btnBC.style.cssText='width:22px;height:22px;border:2px solid '+(_rgb2hex(el.style.borderColor)||'#1967d2')+';border-radius:3px;background:#fff;cursor:pointer;padding:0;font-size:9px';
-  btnBC.textContent='B';btnBC.title=vi?'Màu viền':'Border';
+  btnBC.textContent='B';btnBC.title=vi?'MÃ u viá»n':'Border';
   btnBC.addEventListener('click',function(ev){ev.stopPropagation();edShowColorPopup(ev.target,function(c){el.style.borderColor=c;btnBC.style.borderColor=c;edMarkModified();});});
   bar.appendChild(btnBC);
   // Fill color button
   var btnFC=document.createElement('button');btnFC.style.cssText='width:22px;height:22px;border:1px solid #ddd;border-radius:3px;background:'+(_rgb2hex(el.style.backgroundColor)||'#fff')+';cursor:pointer;padding:0;font-size:9px';
-  btnFC.textContent='F';btnFC.title=vi?'Nền':'Fill';
+  btnFC.textContent='F';btnFC.title=vi?'Ná»n':'Fill';
   btnFC.addEventListener('click',function(ev){ev.stopPropagation();edShowColorPopup(ev.target,function(c){if(c==='transparent'){el.style.backgroundColor='';btnFC.style.background='#fff';}else{el.style.backgroundColor=c;btnFC.style.background=c;}edMarkModified();});});
   bar.appendChild(btnFC);
   // Border width
-  var selW=document.createElement('select');selW.title=vi?'Bề rộng viền':'Border width';
+  var selW=document.createElement('select');selW.title=vi?'Bá» rá»™ng viá»n':'Border width';
   selW.style.cssText='width:36px;font-size:9px;border:1px solid #ddd;border-radius:3px;padding:0 1px;height:22px;cursor:pointer';
   ['0','1','2','3','4'].forEach(function(v){var o=document.createElement('option');o.value=v+'px';o.textContent=v;if(el.style.borderWidth===v+'px')o.selected=true;selW.appendChild(o);});
   selW.addEventListener('change',function(){el.style.borderWidth=this.value;edMarkModified();});
   bar.appendChild(selW);
   // Border style
-  var selS=document.createElement('select');selS.title=vi?'Kiểu viền':'Border style';
+  var selS=document.createElement('select');selS.title=vi?'Kiá»ƒu viá»n':'Border style';
   selS.style.cssText='width:42px;font-size:9px;border:1px solid #ddd;border-radius:3px;padding:0 1px;height:22px;cursor:pointer';
   [{v:'solid',l:'\u2500\u2500'},{v:'dashed',l:'- -'},{v:'dotted',l:'\u00b7\u00b7'},{v:'double',l:'\u2550\u2550'},{v:'none',l:'\u2715'}].forEach(function(o){
     var opt=document.createElement('option');opt.value=o.v;opt.textContent=o.l;if(el.style.borderStyle===o.v)opt.selected=true;selS.appendChild(opt);
@@ -3456,13 +4381,13 @@ function edSelectTextbox(el){
   selS.addEventListener('change',function(){el.style.borderStyle=this.value;edMarkModified();});
   bar.appendChild(selS);
   // Border radius
-  var selR=document.createElement('select');selR.title=vi?'Bo góc':'Radius';
+  var selR=document.createElement('select');selR.title=vi?'Bo gÃ³c':'Radius';
   selR.style.cssText='width:32px;font-size:9px;border:1px solid #ddd;border-radius:3px;padding:0 1px;height:22px;cursor:pointer';
   ['0','4','8','12','50%'].forEach(function(v){var o=document.createElement('option');o.value=v==='50%'?v:v+'px';o.textContent=v;selR.appendChild(o);});
   selR.addEventListener('change',function(){el.style.borderRadius=this.value;edMarkModified();});
   bar.appendChild(selR);
   // Delete
-  var btnDel=document.createElement('button');btnDel.textContent='\u2717';btnDel.title=vi?'Xóa':'Del';
+  var btnDel=document.createElement('button');btnDel.textContent='\u2717';btnDel.title=vi?'XÃ³a':'Del';
   btnDel.style.cssText='width:22px;height:22px;border:none;background:none;border-radius:3px;cursor:pointer;font-size:14px;color:#dc2626';
   btnDel.addEventListener('click',function(){el.remove();edMarkModified();});
   bar.appendChild(btnDel);
@@ -3505,45 +4430,45 @@ function _rgb2hex(c){
   return'#'+m.slice(0,3).map(x=>(+x).toString(16).padStart(2,'0')).join('');
 }
 
-// ═══════════════════════════════════════════════════
-// SHAPES — Word-like drawing objects (V2 — event delegation)
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SHAPES â€” Word-like drawing objects (V2 â€” event delegation)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const ED_SHAPES={};
 const ED_SHAPE_CATS=[
-  {id:'lines',name:'Lines',nameVi:'Đường kẻ'},
-  {id:'rect',name:'Rectangles',nameVi:'Hình chữ nhật'},
-  {id:'basic',name:'Basic Shapes',nameVi:'Hình cơ bản'},
-  {id:'arrows',name:'Block Arrows',nameVi:'Mũi tên khối'},
-  {id:'equation',name:'Equation Shapes',nameVi:'Phương trình'},
-  {id:'flow',name:'Flowchart',nameVi:'Lưu đồ'},
-  {id:'stars',name:'Stars and Banners',nameVi:'Ngôi sao & Biểu ngữ'},
-  {id:'callout',name:'Callouts',nameVi:'Chú thích'}
+  {id:'lines',name:'Lines',nameVi:'ÄÆ°á»ng káº»'},
+  {id:'rect',name:'Rectangles',nameVi:'HÃ¬nh chá»¯ nháº­t'},
+  {id:'basic',name:'Basic Shapes',nameVi:'HÃ¬nh cÆ¡ báº£n'},
+  {id:'arrows',name:'Block Arrows',nameVi:'MÅ©i tÃªn khá»‘i'},
+  {id:'equation',name:'Equation Shapes',nameVi:'PhÆ°Æ¡ng trÃ¬nh'},
+  {id:'flow',name:'Flowchart',nameVi:'LÆ°u Ä‘á»“'},
+  {id:'stars',name:'Stars and Banners',nameVi:'NgÃ´i sao & Biá»ƒu ngá»¯'},
+  {id:'callout',name:'Callouts',nameVi:'ChÃº thÃ­ch'}
 ];
 (function(){
   function S(k,n,cat,fn){ED_SHAPES[k]={name:n,cat:cat,svg:fn};}
   var P=Math.PI;
 
-  // ═══ LINES ═══
+  // â•â•â• LINES â•â•â•
   S('ln_h','Line','lines',function(w,h){return '<line x1="4" y1="'+h/2+'" x2="'+(w-4)+'" y2="'+h/2+'"/>';});
-  S('ln_d1','Diagonal ╲','lines',function(w,h){return '<line x1="4" y1="4" x2="'+(w-4)+'" y2="'+(h-4)+'"/>';});
-  S('ln_d2','Diagonal ╱','lines',function(w,h){return '<line x1="4" y1="'+(h-4)+'" x2="'+(w-4)+'" y2="4"/>';});
+  S('ln_d1','Diagonal â•²','lines',function(w,h){return '<line x1="4" y1="4" x2="'+(w-4)+'" y2="'+(h-4)+'"/>';});
+  S('ln_d2','Diagonal â•±','lines',function(w,h){return '<line x1="4" y1="'+(h-4)+'" x2="'+(w-4)+'" y2="4"/>';});
   S('ln_v','Vertical','lines',function(w,h){return '<line x1="'+w/2+'" y1="4" x2="'+w/2+'" y2="'+(h-4)+'"/>';});
-  S('ln_45a','Elbow ∠','lines',function(w,h){return '<polyline points="4,'+(h-4)+' 4,4 '+(w-4)+',4" fill="none"/>';});
-  S('ln_45b','Elbow ∟','lines',function(w,h){return '<polyline points="4,4 '+(w-4)+',4 '+(w-4)+','+(h-4)+'" fill="none"/>';});
-  S('ln_elbow','Elbow ⌐','lines',function(w,h){return '<polyline points="4,'+h/2+' '+w/2+','+h/2+' '+w/2+','+(h-4)+'" fill="none"/>';});
+  S('ln_45a','Elbow âˆ ','lines',function(w,h){return '<polyline points="4,'+(h-4)+' 4,4 '+(w-4)+',4" fill="none"/>';});
+  S('ln_45b','Elbow âˆŸ','lines',function(w,h){return '<polyline points="4,4 '+(w-4)+',4 '+(w-4)+','+(h-4)+'" fill="none"/>';});
+  S('ln_elbow','Elbow âŒ','lines',function(w,h){return '<polyline points="4,'+h/2+' '+w/2+','+h/2+' '+w/2+','+(h-4)+'" fill="none"/>';});
   S('ln_elbow2','Double Elbow','lines',function(w,h){return '<polyline points="4,'+(h*.3).toFixed(0)+' '+(w*.35).toFixed(0)+','+(h*.3).toFixed(0)+' '+(w*.35).toFixed(0)+','+(h*.7).toFixed(0)+' '+(w-4)+','+(h*.7).toFixed(0)+'" fill="none"/>';});
-  S('ln_curve','Curve ⌢','lines',function(w,h){return '<path d="M4,'+(h-4)+' Q'+w/2+',4 '+(w-4)+','+(h-4)+'" fill="none"/>';});
+  S('ln_curve','Curve âŒ¢','lines',function(w,h){return '<path d="M4,'+(h-4)+' Q'+w/2+',4 '+(w-4)+','+(h-4)+'" fill="none"/>';});
   S('ln_scurve','S-Curve','lines',function(w,h){return '<path d="M4,'+h/2+' C'+(w*.3).toFixed(0)+',4 '+(w*.7).toFixed(0)+','+(h-4)+' '+(w-4)+','+h/2+'" fill="none"/>';});
   (function(){
-    S('ln_arr_r','Arrow →','lines',function(w,h){var u='ar'+Date.now().toString(36);return '<defs><marker id="'+u+'" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="currentColor"/></marker></defs><line x1="4" y1="'+h/2+'" x2="'+(w-10)+'" y2="'+h/2+'" marker-end="url(#'+u+')"/>';});
-    S('ln_arr_l','Arrow ←','lines',function(w,h){var u='al'+Date.now().toString(36);return '<defs><marker id="'+u+'" markerWidth="8" markerHeight="6" refX="1" refY="3" orient="auto"><path d="M8,0 L0,3 L8,6Z" fill="currentColor"/></marker></defs><line x1="10" y1="'+h/2+'" x2="'+(w-4)+'" y2="'+h/2+'" marker-start="url(#'+u+')"/>';});
-    S('ln_arr_lr','Arrow ↔','lines',function(w,h){var u1='a2r'+Date.now().toString(36),u2='a2l'+Date.now().toString(36);return '<defs><marker id="'+u1+'" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="currentColor"/></marker><marker id="'+u2+'" markerWidth="8" markerHeight="6" refX="1" refY="3" orient="auto"><path d="M8,0 L0,3 L8,6Z" fill="currentColor"/></marker></defs><line x1="10" y1="'+h/2+'" x2="'+(w-10)+'" y2="'+h/2+'" marker-start="url(#'+u2+')" marker-end="url(#'+u1+')"/>';});
-    S('ln_arr_d','Arrow ↗','lines',function(w,h){var u='ad'+Date.now().toString(36);return '<defs><marker id="'+u+'" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="currentColor"/></marker></defs><line x1="4" y1="'+(h-4)+'" x2="'+(w-10)+'" y2="8" marker-end="url(#'+u+')"/>';});
+    S('ln_arr_r','Arrow â†’','lines',function(w,h){var u='ar'+Date.now().toString(36);return '<defs><marker id="'+u+'" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="currentColor"/></marker></defs><line x1="4" y1="'+h/2+'" x2="'+(w-10)+'" y2="'+h/2+'" marker-end="url(#'+u+')"/>';});
+    S('ln_arr_l','Arrow â†','lines',function(w,h){var u='al'+Date.now().toString(36);return '<defs><marker id="'+u+'" markerWidth="8" markerHeight="6" refX="1" refY="3" orient="auto"><path d="M8,0 L0,3 L8,6Z" fill="currentColor"/></marker></defs><line x1="10" y1="'+h/2+'" x2="'+(w-4)+'" y2="'+h/2+'" marker-start="url(#'+u+')"/>';});
+    S('ln_arr_lr','Arrow â†”','lines',function(w,h){var u1='a2r'+Date.now().toString(36),u2='a2l'+Date.now().toString(36);return '<defs><marker id="'+u1+'" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="currentColor"/></marker><marker id="'+u2+'" markerWidth="8" markerHeight="6" refX="1" refY="3" orient="auto"><path d="M8,0 L0,3 L8,6Z" fill="currentColor"/></marker></defs><line x1="10" y1="'+h/2+'" x2="'+(w-10)+'" y2="'+h/2+'" marker-start="url(#'+u2+')" marker-end="url(#'+u1+')"/>';});
+    S('ln_arr_d','Arrow â†—','lines',function(w,h){var u='ad'+Date.now().toString(36);return '<defs><marker id="'+u+'" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="currentColor"/></marker></defs><line x1="4" y1="'+(h-4)+'" x2="'+(w-10)+'" y2="8" marker-end="url(#'+u+')"/>';});
   })();
   S('ln_arc','Arc \u2312','lines',function(w,h){return '<path d="M4,'+h/2+' A'+(w/2-4)+','+(h/2-4)+' 0 0 1 '+(w-4)+','+h/2+'" fill="none"/>';});
   S('ln_freeform','Freeform','lines',function(w,h){return '<path d="M4,'+(h*.6).toFixed(0)+' C'+(w*.2).toFixed(0)+','+(h*.2).toFixed(0)+' '+(w*.4).toFixed(0)+','+(h*.8).toFixed(0)+' '+(w*.6).toFixed(0)+','+(h*.4).toFixed(0)+' S'+(w*.9).toFixed(0)+','+(h*.3).toFixed(0)+' '+(w-4)+','+(h*.5).toFixed(0)+'" fill="none"/>';});
 
-  // ═══ RECTANGLES ═══
+  // â•â•â• RECTANGLES â•â•â•
   S('r_rect','Rectangle','rect',function(w,h){return '<rect x="2" y="2" width="'+(w-4)+'" height="'+(h-4)+'"/>';});
   S('r_rrect','Rounded Rectangle','rect',function(w,h){var r=Math.min(w,h)*.15;return '<rect x="2" y="2" width="'+(w-4)+'" height="'+(h-4)+'" rx="'+r+'"/>';});
   S('r_rrect1','Round Single Corner','rect',function(w,h){var r=Math.min(w,h)*.2;return '<path d="M'+(2+r)+',2 H'+(w-2)+' V'+(h-2)+' H2 V'+(2+r)+' A'+r+','+r+' 0 0 1 '+(2+r)+',2 Z"/>';});
@@ -3553,7 +4478,7 @@ const ED_SHAPE_CATS=[
   S('r_snipd','Snip Diagonal','rect',function(w,h){var s=Math.min(w,h)*.18;return '<polygon points="'+(2+s)+',2 '+(w-2)+',2 '+(w-2)+','+(h-2-s)+' '+(w-2-s)+','+(h-2)+' 2,'+(h-2)+' 2,'+(2+s)+'"/>';});
   S('r_rndall','Same Side Corners','rect',function(w,h){var r=Math.min(w,h)*.2;return '<path d="M'+(2+r)+',2 H'+(w-2-r)+' Q'+(w-2)+',2 '+(w-2)+','+(2+r)+' V'+(h-2)+' H2 V'+(2+r)+' Q2,2 '+(2+r)+',2 Z"/>';});
 
-  // ═══ BASIC SHAPES ═══
+  // â•â•â• BASIC SHAPES â•â•â•
   S('b_textbox','Text Box','basic',function(w,h){return '<rect x="2" y="2" width="'+(w-4)+'" height="'+(h-4)+'" rx="2" fill-opacity="0.05"/>';});
   S('b_ellipse','Oval','basic',function(w,h){return '<ellipse cx="'+w/2+'" cy="'+h/2+'" rx="'+(w/2-2)+'" ry="'+(h/2-2)+'"/>';});
   S('b_tri','Isosceles Triangle','basic',function(w,h){return '<polygon points="'+w/2+',2 '+(w-2)+','+(h-2)+' 2,'+(h-2)+'"/>';});
@@ -3585,7 +4510,7 @@ const ED_SHAPE_CATS=[
   S('b_lbracket','Left Bracket','basic',function(w,h){return '<polyline points="'+(w*.65).toFixed(0)+',4 '+(w*.35).toFixed(0)+',4 '+(w*.35).toFixed(0)+','+(h-4)+' '+(w*.65).toFixed(0)+','+(h-4)+'" fill="none"/>';});
   S('b_rbracket','Right Bracket','basic',function(w,h){return '<polyline points="'+(w*.35).toFixed(0)+',4 '+(w*.65).toFixed(0)+',4 '+(w*.65).toFixed(0)+','+(h-4)+' '+(w*.35).toFixed(0)+','+(h-4)+'" fill="none"/>';});
 
-  // ═══ BLOCK ARROWS ═══
+  // â•â•â• BLOCK ARROWS â•â•â•
   S('a_right','Right Arrow','arrows',function(w,h){return '<polygon points="2,'+(h*.3).toFixed(0)+' '+(w*.6).toFixed(0)+','+(h*.3).toFixed(0)+' '+(w*.6).toFixed(0)+',2 '+(w-2)+','+h/2+' '+(w*.6).toFixed(0)+','+(h-2)+' '+(w*.6).toFixed(0)+','+(h*.7).toFixed(0)+' 2,'+(h*.7).toFixed(0)+'"/>';});
   S('a_left','Left Arrow','arrows',function(w,h){return '<polygon points="'+(w-2)+','+(h*.3).toFixed(0)+' '+(w*.4).toFixed(0)+','+(h*.3).toFixed(0)+' '+(w*.4).toFixed(0)+',2 2,'+h/2+' '+(w*.4).toFixed(0)+','+(h-2)+' '+(w*.4).toFixed(0)+','+(h*.7).toFixed(0)+' '+(w-2)+','+(h*.7).toFixed(0)+'"/>';});
   S('a_up','Up Arrow','arrows',function(w,h){return '<polygon points="'+(w*.3).toFixed(0)+','+(h-2)+' '+(w*.3).toFixed(0)+','+(h*.4).toFixed(0)+' 2,'+(h*.4).toFixed(0)+' '+w/2+',2 '+(w-2)+','+(h*.4).toFixed(0)+' '+(w*.7).toFixed(0)+','+(h*.4).toFixed(0)+' '+(w*.7).toFixed(0)+','+(h-2)+'"/>';});
@@ -3602,7 +4527,7 @@ const ED_SHAPE_CATS=[
   S('a_notch','Notched Arrow','arrows',function(w,h){return '<polygon points="2,'+(h*.3).toFixed(0)+' '+(w*.55).toFixed(0)+','+(h*.3).toFixed(0)+' '+(w*.55).toFixed(0)+',2 '+(w-2)+','+h/2+' '+(w*.55).toFixed(0)+','+(h-2)+' '+(w*.55).toFixed(0)+','+(h*.7).toFixed(0)+' 2,'+(h*.7).toFixed(0)+' '+(w*.15).toFixed(0)+','+h/2+'"/>';});
   S('a_circular','Circular Arrow','arrows',function(w,h){var r=Math.min(w,h)/2-4;var cx=w/2,cy=h/2;return '<path d="M'+(cx+r*0.7).toFixed(1)+','+(cy-r*0.7).toFixed(1)+' A'+r+','+r+' 0 1 0 '+(cx+r).toFixed(1)+','+cy+'" fill="none" stroke-width="'+(Math.min(w,h)*0.08).toFixed(0)+'"/><polygon points="'+(cx+r+4)+','+(cy-4)+' '+(cx+r+4)+','+(cy+4)+' '+(cx+r-4)+','+cy+'" fill="currentColor" stroke="none"/>';});
 
-  // ═══ EQUATION SHAPES ═══
+  // â•â•â• EQUATION SHAPES â•â•â•
   S('eq_plus','Plus','equation',function(w,h){return '<polygon points="'+(w*.35).toFixed(0)+',2 '+(w*.65).toFixed(0)+',2 '+(w*.65).toFixed(0)+','+(h*.35).toFixed(0)+' '+(w-2)+','+(h*.35).toFixed(0)+' '+(w-2)+','+(h*.65).toFixed(0)+' '+(w*.65).toFixed(0)+','+(h*.65).toFixed(0)+' '+(w*.65).toFixed(0)+','+(h-2)+' '+(w*.35).toFixed(0)+','+(h-2)+' '+(w*.35).toFixed(0)+','+(h*.65).toFixed(0)+' 2,'+(h*.65).toFixed(0)+' 2,'+(h*.35).toFixed(0)+' '+(w*.35).toFixed(0)+','+(h*.35).toFixed(0)+'"/>';});
   S('eq_minus','Minus','equation',function(w,h){return '<rect x="2" y="'+(h*.38).toFixed(0)+'" width="'+(w-4)+'" height="'+(h*.24).toFixed(0)+'" rx="2"/>';});
   S('eq_mult','Multiply','equation',function(w,h){return '<path d="M'+(w*.2).toFixed(0)+','+(h*.2).toFixed(0)+' L'+(w*.8).toFixed(0)+','+(h*.8).toFixed(0)+' M'+(w*.8).toFixed(0)+','+(h*.2).toFixed(0)+' L'+(w*.2).toFixed(0)+','+(h*.8).toFixed(0)+'" fill="none" stroke-width="'+(Math.min(w,h)*.12).toFixed(0)+'" stroke-linecap="round"/>';});
@@ -3610,7 +4535,7 @@ const ED_SHAPE_CATS=[
   S('eq_equal','Equal','equation',function(w,h){return '<rect x="4" y="'+(h*.28).toFixed(0)+'" width="'+(w-8)+'" height="'+(h*.14).toFixed(0)+'" rx="2"/><rect x="4" y="'+(h*.58).toFixed(0)+'" width="'+(w-8)+'" height="'+(h*.14).toFixed(0)+'" rx="2"/>';});
   S('eq_neq','Not Equal','equation',function(w,h){return '<rect x="4" y="'+(h*.28).toFixed(0)+'" width="'+(w-8)+'" height="'+(h*.12).toFixed(0)+'" rx="2"/><rect x="4" y="'+(h*.58).toFixed(0)+'" width="'+(w-8)+'" height="'+(h*.12).toFixed(0)+'" rx="2"/><line x1="'+(w*.65).toFixed(0)+'" y1="'+(h*.15).toFixed(0)+'" x2="'+(w*.35).toFixed(0)+'" y2="'+(h*.85).toFixed(0)+'" fill="none" stroke-width="3"/>';});
 
-  // ═══ FLOWCHART ═══
+  // â•â•â• FLOWCHART â•â•â•
   S('f_process','Process','flow',function(w,h){return '<rect x="2" y="2" width="'+(w-4)+'" height="'+(h-4)+'"/>';});
   S('f_decision','Decision','flow',function(w,h){return '<polygon points="'+w/2+',2 '+(w-2)+','+h/2+' '+w/2+','+(h-2)+' 2,'+h/2+'"/>';});
   S('f_data','Data','flow',function(w,h){return '<polygon points="'+(w*.15).toFixed(0)+','+(h-2)+' 2,2 '+(w*.85).toFixed(0)+',2 '+(w-2)+','+(h-2)+'"/>';});
@@ -3634,7 +4559,7 @@ const ED_SHAPE_CATS=[
   S('f_db','Database','flow',function(w,h){var ey=h*.12;return '<ellipse cx="'+w/2+'" cy="'+ey.toFixed(0)+'" rx="'+(w/2-3)+'" ry="'+ey.toFixed(0)+'"/><rect x="3" y="'+ey.toFixed(0)+'" width="'+(w-6)+'" height="'+(h-2*ey).toFixed(0)+'"/><ellipse cx="'+w/2+'" cy="'+(h-ey).toFixed(0)+'" rx="'+(w/2-3)+'" ry="'+ey.toFixed(0)+'"/>';});
   S('f_connector','Connector','flow',function(w,h){var r=Math.min(w,h)/2-2;return '<circle cx="'+w/2+'" cy="'+h/2+'" r="'+r+'"/>';});
 
-  // ═══ STARS AND BANNERS ═══
+  // â•â•â• STARS AND BANNERS â•â•â•
   function star(n,w,h,ir){var cx=w/2,cy=h/2,or=Math.min(w,h)/2-2,inn=or*(ir||0.4),p='';for(var i=0;i<n;i++){var a1=-P/2+i*2*P/n,a2=a1+P/n;p+=(cx+or*Math.cos(a1)).toFixed(1)+','+(cy+or*Math.sin(a1)).toFixed(1)+' '+(cx+inn*Math.cos(a2)).toFixed(1)+','+(cy+inn*Math.sin(a2)).toFixed(1)+' ';}return '<polygon points="'+p.trim()+'"/>';}
   S('s_star4','4-Point Star','stars',function(w,h){return star(4,w,h,0.45);});
   S('s_star5','5-Point Star','stars',function(w,h){return star(5,w,h,0.4);});
@@ -3653,7 +4578,7 @@ const ED_SHAPE_CATS=[
   S('s_wave','Wave','stars',function(w,h){return '<path d="M2,'+(h*.35).toFixed(0)+' Q'+(w*.25).toFixed(0)+',2 '+w/2+','+(h*.35).toFixed(0)+' Q'+(w*.75).toFixed(0)+','+(h*.7).toFixed(0)+' '+(w-2)+','+(h*.35).toFixed(0)+' V'+(h*.65).toFixed(0)+' Q'+(w*.75).toFixed(0)+','+(h-2)+' '+w/2+','+(h*.65).toFixed(0)+' Q'+(w*.25).toFixed(0)+','+(h*.3).toFixed(0)+' 2,'+(h*.65).toFixed(0)+' Z"/>';});
   S('s_dwave','Double Wave','stars',function(w,h){return '<path d="M2,'+(h*.25).toFixed(0)+' Q'+(w*.15).toFixed(0)+',2 '+(w*.3).toFixed(0)+','+(h*.25).toFixed(0)+' Q'+(w*.45).toFixed(0)+','+(h*.5).toFixed(0)+' '+(w*.6).toFixed(0)+','+(h*.25).toFixed(0)+' Q'+(w*.75).toFixed(0)+',2 '+(w-2)+','+(h*.25).toFixed(0)+' V'+(h*.75).toFixed(0)+' Q'+(w*.75).toFixed(0)+','+(h-2)+' '+(w*.6).toFixed(0)+','+(h*.75).toFixed(0)+' Q'+(w*.45).toFixed(0)+','+(h*.5).toFixed(0)+' '+(w*.3).toFixed(0)+','+(h*.75).toFixed(0)+' Q'+(w*.15).toFixed(0)+','+(h-2)+' 2,'+(h*.75).toFixed(0)+' Z"/>';});
 
-  // ═══ CALLOUTS ═══
+  // â•â•â• CALLOUTS â•â•â•
   S('c_rect','Rectangular Callout','callout',function(w,h){return '<path d="M2,2 H'+(w-2)+' V'+(h*.65).toFixed(0)+' H'+(w*.4).toFixed(0)+' L'+(w*.15).toFixed(0)+','+(h-2)+' L'+(w*.3).toFixed(0)+','+(h*.65).toFixed(0)+' H2 Z"/>';});
   S('c_rrect','Rounded Callout','callout',function(w,h){var r=Math.min(w,h)*.1;return '<path d="M'+(2+r)+',2 H'+(w-2-r)+' Q'+(w-2)+',2 '+(w-2)+','+(2+r)+' V'+(h*.65-r).toFixed(0)+' Q'+(w-2)+','+(h*.65).toFixed(0)+' '+(w-2-r)+','+(h*.65).toFixed(0)+' H'+(w*.4).toFixed(0)+' L'+(w*.15).toFixed(0)+','+(h-2)+' L'+(w*.3).toFixed(0)+','+(h*.65).toFixed(0)+' H'+(2+r)+' Q2,'+(h*.65).toFixed(0)+' 2,'+(h*.65-r).toFixed(0)+' V'+(2+r)+' Q2,2 '+(2+r)+',2 Z"/>';});
   S('c_ellipse','Oval Callout','callout',function(w,h){return '<ellipse cx="'+w/2+'" cy="'+(h*.42).toFixed(0)+'" rx="'+(w/2-3)+'" ry="'+(h*.38).toFixed(0)+'"/><polygon points="'+(w*.35).toFixed(0)+','+(h*.72).toFixed(0)+' '+(w*.15).toFixed(0)+','+(h-2)+' '+(w*.45).toFixed(0)+','+(h*.72).toFixed(0)+'"/>';});
@@ -3665,25 +4590,25 @@ const ED_SHAPE_CATS=[
 })();
 
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SHAPE PICKER DIALOG
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function edInsertShape(){
   edClearPendingShapePlacement();
   edSaveSelection();
   var vi=lang!=='en';
   var root=edGetModalRoot();
-  var html='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal" style="width:580px;max-height:85vh;display:flex;flex-direction:column"><h4 style="margin:0 0 8px;font-size:15px">'+(vi?'Chèn Hình Dạng':'Insert Shape')+'</h4>';
+  var html='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal" style="width:580px;max-height:85vh;display:flex;flex-direction:column"><h4 style="margin:0 0 8px;font-size:15px">'+(vi?'ChÃ¨n HÃ¬nh Dáº¡ng':'Insert Shape')+'</h4>';
   // Settings bar
   html+='<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;padding:6px 8px;background:#f8f9fa;border-radius:6px;font-size:11px">';
   html+='<label style="color:#666">W:</label><input id="ed-sh-w" type="number" value="120" min="30" max="800" style="width:48px;padding:2px 4px;border:1px solid #ddd;border-radius:4px;font-size:11px">';
   html+='<label style="color:#666">H:</label><input id="ed-sh-h" type="number" value="80" min="20" max="600" style="width:48px;padding:2px 4px;border:1px solid #ddd;border-radius:4px;font-size:11px">';
-  html+='<label style="color:#666">'+(vi?'Nền':'Fill')+':</label><input type="color" id="ed-sh-fill" value="#4285f4" style="width:22px;height:20px;border:1px solid #ddd;border-radius:3px;cursor:pointer;padding:0">';
-  html+='<label style="color:#666">'+(vi?'Viền':'Stroke')+':</label><input type="color" id="ed-sh-stroke" value="#1a73e8" style="width:22px;height:20px;border:1px solid #ddd;border-radius:3px;cursor:pointer;padding:0">';
+  html+='<label style="color:#666">'+(vi?'Ná»n':'Fill')+':</label><input type="color" id="ed-sh-fill" value="#4285f4" style="width:22px;height:20px;border:1px solid #ddd;border-radius:3px;cursor:pointer;padding:0">';
+  html+='<label style="color:#666">'+(vi?'Viá»n':'Stroke')+':</label><input type="color" id="ed-sh-stroke" value="#1a73e8" style="width:22px;height:20px;border:1px solid #ddd;border-radius:3px;cursor:pointer;padding:0">';
   html+='<select id="ed-sh-sw" style="height:20px;font-size:10px;border:1px solid #ddd;border-radius:3px"><option value="0">0px</option><option value="1">1px</option><option value="1.5" selected>1.5px</option><option value="2">2px</option><option value="3">3px</option></select>';
-  html+='<label style="color:#666;margin-left:4px"><input type="checkbox" id="ed-sh-text"> '+(vi?'Có text':'Text')+'</label>';
+  html+='<label style="color:#666;margin-left:4px"><input type="checkbox" id="ed-sh-text"> '+(vi?'CÃ³ text':'Text')+'</label>';
   html+='</div>';
-  // Category sections — grid of SVG previews like Word
+  // Category sections â€” grid of SVG previews like Word
   html+='<div style="overflow-y:auto;flex:1;padding-right:4px">';
   ED_SHAPE_CATS.forEach(function(cat){
     var shapes=Object.keys(ED_SHAPES).filter(function(k){return ED_SHAPES[k].cat===cat.id;});
@@ -3703,14 +4628,14 @@ function edInsertShape(){
     html+='</div></div>';
   });
   html+='</div>';
-  html+='<div class="ed-modal-actions" style="margin-top:8px"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Đóng':'Close')+'</button></div></div></div>';
+  html+='<div class="ed-modal-actions" style="margin-top:8px"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'ÄÃ³ng':'Close')+'</button></div></div></div>';
   root.innerHTML=html;
 }
 
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // INSERT SHAPE INTO EDITOR
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function edDoInsertShape(key,triggerEvent){
   var s=ED_SHAPES[key];if(!s){showToast('Shape not found: '+key);return;}
   var w=parseInt(document.getElementById('ed-sh-w').value)||120;
@@ -3733,9 +4658,9 @@ function edDoInsertShape(key,triggerEvent){
 }
 
 
-// ═══════════════════════════════════════════════════
-// SHAPE SELECTION — handles, toolbar, drag, rotate
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SHAPE SELECTION â€” handles, toolbar, drag, rotate
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function edDeselectAllShapes(){
   document.querySelectorAll('.ed-shape').forEach(function(s){
     s.classList.remove('ed-sh-selected');
@@ -3906,7 +4831,7 @@ function edEnsureShapePlacementOverlay(){
       return;
     }
     if(!edShapePlacementInsideHost(e.clientX,e.clientY)){
-      showToast(lang!=='en'?'Nhấp vào đúng vùng tài liệu để đặt shape':'Click inside the document page to place the shape');
+      showToast(lang!=='en'?'Nháº¥p vÃ o Ä‘Ãºng vÃ¹ng tÃ i liá»‡u Ä‘á»ƒ Ä‘áº·t shape':'Click inside the document page to place the shape');
       return;
     }
     edPlacePendingShapeAt(e.clientX,e.clientY);
@@ -4007,7 +4932,7 @@ function edBeginShapePlacement(cfg){
   if(area) area.classList.add('ed-shape-placement');
   edEnsureShapePlacementOverlay();
   edCloseModal();
-  showToast(lang!=='en'?'Nhấp vào tài liệu để đặt shape':'Click in the document to place the shape');
+  showToast(lang!=='en'?'Nháº¥p vÃ o tÃ i liá»‡u Ä‘á»ƒ Ä‘áº·t shape':'Click in the document to place the shape');
 }
 
 function edSelectShape(el){
@@ -4048,16 +4973,16 @@ function edSelectShape(el){
   var fill=el.dataset.fill||'#4285f4';var stroke=el.dataset.stroke||'#1a73e8';
   // Fill color
   var btnF=document.createElement('button');btnF.style.cssText='width:22px;height:22px;border:1px solid #ddd;border-radius:3px;background:'+fill+';cursor:pointer;padding:0';
-  btnF.title=vi?'Màu nền':'Fill';
+  btnF.title=vi?'MÃ u ná»n':'Fill';
   btnF.addEventListener('click',function(ev){ev.stopPropagation();edShowColorPopup(ev.target,function(c){edRecolorShape(el,c,null);btnF.style.background=c;});});
   bar.appendChild(btnF);
   // Stroke color
   var btnS=document.createElement('button');btnS.style.cssText='width:22px;height:22px;border:3px solid '+stroke+';border-radius:3px;background:#fff;cursor:pointer;padding:0';
-  btnS.title=vi?'Màu viền':'Stroke';
+  btnS.title=vi?'MÃ u viá»n':'Stroke';
   btnS.addEventListener('click',function(ev){ev.stopPropagation();edShowColorPopup(ev.target,function(c){edRecolorShape(el,null,c);btnS.style.borderColor=c;});});
   bar.appendChild(btnS);
   // Stroke width
-  var selSW=document.createElement('select');selSW.title=vi?'Bề rộng viền':'Width';
+  var selSW=document.createElement('select');selSW.title=vi?'Bá» rá»™ng viá»n':'Width';
   selSW.style.cssText='height:22px;font-size:9px;border:1px solid #ddd;border-radius:3px;padding:0 1px;cursor:pointer';
   ['0','0.5','1','1.5','2','3','4'].forEach(function(v){var o=document.createElement('option');o.value=v;o.textContent=v+'px';if(v===(el.dataset.sw||'1.5'))o.selected=true;selSW.appendChild(o);});
   selSW.addEventListener('change',function(){el.dataset.sw=this.value;var g=el.querySelector('svg g');if(g)g.setAttribute('stroke-width',this.value);edMarkModified();});
@@ -4066,7 +4991,7 @@ function edSelectShape(el){
   var shText=el.querySelector('.ed-sh-text');
   var btnTxt=document.createElement('button');
   btnTxt.textContent=shText?'AÌ²':'A';
-  btnTxt.title=vi?'Thêm/Xóa text':'Toggle text';
+  btnTxt.title=vi?'ThÃªm/XÃ³a text':'Toggle text';
   btnTxt.style.cssText='height:22px;font-size:11px;font-weight:700;border:1px solid #ddd;border-radius:3px;background:'+(shText?'#e8f0fe':'#fff')+';cursor:pointer;padding:0 5px;color:#1a73e8';
   btnTxt.addEventListener('click',function(ev){
     ev.stopPropagation();
@@ -4083,12 +5008,12 @@ function edSelectShape(el){
   // Text color
   if(shText){
     var btnTC=document.createElement('button');btnTC.style.cssText='width:22px;height:22px;border:1px solid #ddd;border-radius:3px;background:#fff;cursor:pointer;padding:0;font-size:12px;font-weight:700;color:'+(shText.style.color||'#333');
-    btnTC.textContent='T';btnTC.title=vi?'Màu chữ':'Text color';
+    btnTC.textContent='T';btnTC.title=vi?'MÃ u chá»¯':'Text color';
     btnTC.addEventListener('click',function(ev){ev.stopPropagation();edShowColorPopup(ev.target,function(c){var t=el.querySelector('.ed-sh-text');if(t)t.style.color=c;btnTC.style.color=c;edMarkModified();});});
     bar.appendChild(btnTC);
   }
   // Duplicate
-  var btnDup=document.createElement('button');btnDup.textContent='⧉';btnDup.title=vi?'Nhân bản':'Duplicate';
+  var btnDup=document.createElement('button');btnDup.textContent='â§‰';btnDup.title=vi?'NhÃ¢n báº£n':'Duplicate';
   btnDup.style.cssText='height:22px;font-size:13px;border:1px solid #ddd;border-radius:3px;background:#fff;cursor:pointer;padding:0 4px';
   btnDup.addEventListener('click',function(ev){
     ev.stopPropagation();
@@ -4101,7 +5026,7 @@ function edSelectShape(el){
   });
   bar.appendChild(btnDup);
   // Delete
-  var btnDel=document.createElement('button');btnDel.textContent='🗑';btnDel.title=vi?'Xóa':'Delete';
+  var btnDel=document.createElement('button');btnDel.textContent='ðŸ—‘';btnDel.title=vi?'XÃ³a':'Delete';
   btnDel.style.cssText='height:22px;font-size:12px;border:1px solid #fca5a5;border-radius:3px;background:#fff;cursor:pointer;padding:0 4px;color:#dc2626';
   btnDel.addEventListener('click',function(ev){ev.stopPropagation();el.remove();window._edActiveSh=null;edMarkModified();});
   bar.appendChild(btnDel);
@@ -4109,9 +5034,9 @@ function edSelectShape(el){
 }
 
 
-// ═══════════════════════════════════════════════════
-// SHAPE EVENT DELEGATION — single handler on editor
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SHAPE EVENT DELEGATION â€” single handler on editor
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function edSetupShapeDelegation(area){
   if(area._edShapeDelegationDone) return;
   area._edShapeDelegationDone=true;
@@ -4123,7 +5048,7 @@ function edSetupShapeDelegation(area){
     }
   },true);
 
-  // MOUSEDOWN on editor area — handles shape selection + drag initiation
+  // MOUSEDOWN on editor area â€” handles shape selection + drag initiation
   area.addEventListener('mousedown',function(e){
     if(window._edPendingShapeInsert){
       if(!window._edShapePlacementOverlay || !window._edShapePlacementOverlay.parentNode){
@@ -4134,10 +5059,10 @@ function edSetupShapeDelegation(area){
     var shapeEl=e.target.closest('.ed-shape');
     var wasSelected=!!(shapeEl && shapeEl.classList.contains('ed-sh-selected'));
 
-    // Click on handle/bar/rotate — let their own handlers deal with it
+    // Click on handle/bar/rotate â€” let their own handlers deal with it
     if(e.target.closest('.ed-sh-handle,.ed-sh-bar,.ed-sh-rotate')) return;
 
-    // Click on shape text area — let contenteditable work
+    // Click on shape text area â€” let contenteditable work
     if(e.target.closest('.ed-sh-text')){
       // Still select the shape but don't prevent default (allow text editing)
       if(shapeEl && !shapeEl.classList.contains('ed-sh-selected')){
@@ -4171,7 +5096,7 @@ function edSetupShapeDelegation(area){
       return;
     }
 
-    // Click outside any shape — deselect all shapes
+    // Click outside any shape â€” deselect all shapes
     if(window._edActiveSh){
       edDeselectAllShapes();
     }
@@ -4231,9 +5156,9 @@ function _edShapeDragStart(e,el){
 }
 
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SHAPE ROTATE
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function edRotateShape(e,el){
   e.preventDefault();
   e.stopPropagation();
@@ -4269,9 +5194,9 @@ function edRotateShape(e,el){
 }
 
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SHAPE RESIZE
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function edResizeShape(e,el,pos){
   e.preventDefault();
   e.stopPropagation();
@@ -4340,9 +5265,9 @@ function edResizeShape(e,el,pos){
 }
 
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SHAPE RECOLOR
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function edRecolorShape(el,newFill,newStroke){
   if(newFill){el.dataset.fill=newFill;}
   if(newStroke){el.dataset.stroke=newStroke;}
@@ -4355,27 +5280,27 @@ function edRecolorShape(el,newFill,newStroke){
   edMarkModified();
 }
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // CHARTS (like Word)
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function edInsertChart(){
   const vi=lang!=='en';
   const root=edGetModalRoot();
-  let html='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal" style="width:480px"><h4>📊 '+(vi?'Chèn biểu đồ':'Insert Chart')+'</h4>';
+  let html='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal" style="width:480px"><h4>ðŸ“Š '+(vi?'ChÃ¨n biá»ƒu Ä‘á»“':'Insert Chart')+'</h4>';
   // Chart type picker
   html+='<div style="display:flex;gap:8px;margin-bottom:12px">';
-  [{t:'bar',icon:'📊',l:vi?'Cột':'Bar'},{t:'line',icon:'📈',l:vi?'Đường':'Line'},{t:'pie',icon:'🥧',l:vi?'Tròn':'Pie'},{t:'hbar',icon:'📊',l:vi?'Ngang':'H-Bar'}].forEach((c,i)=>{
+  [{t:'bar',icon:'ðŸ“Š',l:vi?'Cá»™t':'Bar'},{t:'line',icon:'ðŸ“ˆ',l:vi?'ÄÆ°á»ng':'Line'},{t:'pie',icon:'ðŸ¥§',l:vi?'TrÃ²n':'Pie'},{t:'hbar',icon:'ðŸ“Š',l:vi?'Ngang':'H-Bar'}].forEach((c,i)=>{
     html+='<button onclick="edChartType=\''+c.t+'\';edChartPreview();this.parentElement.querySelectorAll(\'button\').forEach(b=>b.style.outline=\'none\');this.style.outline=\'2px solid #1967d2\'" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:2px'+(i===0?';outline:2px solid #1967d2':'')+'"><span style="font-size:20px">'+c.icon+'</span>'+c.l+'</button>';
   });
   html+='</div>';
   // Data editor
-  html+='<label style="font-size:11px;font-weight:600;color:#666">'+(vi?'Dữ liệu (mỗi dòng: Nhãn, Giá trị)':'Data (each line: Label, Value)')+'</label>';
-  html+='<textarea id="ed-chart-data" rows="5" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;font-family:monospace;outline:none;resize:none;margin-top:4px" oninput="edChartPreview()">'+(vi?'Quý 1, 35\nQuý 2, 50\nQuý 3, 42\nQuý 4, 68':'Q1, 35\nQ2, 50\nQ3, 42\nQ4, 68')+'</textarea>';
-  html+='<div style="display:flex;gap:8px;margin:8px 0;align-items:center"><label style="font-size:11px;color:#666">'+(vi?'Tiêu đề:':'Title:')+'</label><input id="ed-chart-title" value="'+(vi?'Doanh thu':'Revenue')+'" style="flex:1;padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px" oninput="edChartPreview()">';
-  html+='<label style="font-size:11px;color:#666">'+(vi?'Màu:':'Color:')+'</label><input type="color" id="ed-chart-color" value="#4285f4" style="width:28px;height:24px;border:1px solid #ddd;border-radius:4px" onchange="edChartPreview()"></div>';
+  html+='<label style="font-size:11px;font-weight:600;color:#666">'+(vi?'Dá»¯ liá»‡u (má»—i dÃ²ng: NhÃ£n, GiÃ¡ trá»‹)':'Data (each line: Label, Value)')+'</label>';
+  html+='<textarea id="ed-chart-data" rows="5" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;font-family:monospace;outline:none;resize:none;margin-top:4px" oninput="edChartPreview()">'+(vi?'QuÃ½ 1, 35\nQuÃ½ 2, 50\nQuÃ½ 3, 42\nQuÃ½ 4, 68':'Q1, 35\nQ2, 50\nQ3, 42\nQ4, 68')+'</textarea>';
+  html+='<div style="display:flex;gap:8px;margin:8px 0;align-items:center"><label style="font-size:11px;color:#666">'+(vi?'TiÃªu Ä‘á»:':'Title:')+'</label><input id="ed-chart-title" value="'+(vi?'Doanh thu':'Revenue')+'" style="flex:1;padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px" oninput="edChartPreview()">';
+  html+='<label style="font-size:11px;color:#666">'+(vi?'MÃ u:':'Color:')+'</label><input type="color" id="ed-chart-color" value="#4285f4" style="width:28px;height:24px;border:1px solid #ddd;border-radius:4px" onchange="edChartPreview()"></div>';
   // Preview
   html+='<div id="ed-chart-preview" style="background:#f8f9fa;border-radius:6px;padding:8px;min-height:120px;display:flex;align-items:center;justify-content:center"></div>';
-  html+='<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Hủy':'Cancel')+'</button><button class="ed-m-ok" onclick="edDoInsertChart()">'+(vi?'Chèn':'Insert')+'</button></div></div></div>';
+  html+='<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Há»§y':'Cancel')+'</button><button class="ed-m-ok" onclick="edDoInsertChart()">'+(vi?'ChÃ¨n':'Insert')+'</button></div></div></div>';
   root.innerHTML=html;
   window.edChartType='bar';
   setTimeout(edChartPreview,50);
@@ -4510,7 +5435,7 @@ function edSelectChart(el){
   bar.addEventListener('click',function(e){e.stopPropagation();});
   bar.addEventListener('mousedown',function(e){e.stopPropagation();});
   var btnEdit=document.createElement('button');
-  btnEdit.innerHTML=vi?'✏️ Sửa dữ liệu':'✏️ Edit';
+  btnEdit.innerHTML=vi?'âœï¸ Sá»­a dá»¯ liá»‡u':'âœï¸ Edit';
   btnEdit.style.cssText='padding:0 8px;font-weight:600';
   btnEdit.addEventListener('click',function(ev){ev.stopPropagation();edEditChart(el);});
   bar.appendChild(btnEdit);
@@ -4590,7 +5515,7 @@ function edSetCellBgCol(){
 function edGetContentRoot(){
   var area=document.getElementById('editor-area');
   if(!area)return null;
-  return area.querySelector('#docContent') || area;
+  return area.querySelector('#docContent') || area.querySelector('[data-form-edit-root]') || area;
 }
 
 function edInitContent(){
@@ -4631,6 +5556,7 @@ function edInitContent(){
     parent.normalize();
   });
   edInitQmsBlocks(ctx);
+  edMountFormDesignerDock(ctx);
   // Textboxes - use data-ed-init flag to avoid duplicate listeners
   ctx.querySelectorAll('.ed-textbox').forEach(function(el){
     el.setAttribute('contenteditable','false');
@@ -4651,7 +5577,7 @@ function edInitContent(){
       }
     }
   });
-  // Shapes — clean up stale UI, set contenteditable on text, use delegation
+  // Shapes â€” clean up stale UI, set contenteditable on text, use delegation
   ctx.querySelectorAll('.ed-shape').forEach(function(el){
     el.querySelectorAll('.ed-sh-handle,.ed-sh-bar,.ed-sh-rotate').forEach(function(x){x.remove();});
     el.classList.remove('ed-sh-selected');
@@ -4868,7 +5794,7 @@ function edOnInput(){
       var html = edCleanHTML();
       setEditedHtml(editingDoc, html);
       const el = document.getElementById('ed-status-save');
-      if(el){el.textContent=(lang!=='en'?'💾 Đã tự lưu':'💾 Auto-saved');el.className='ed-autosave';}
+      if(el){el.textContent=(lang!=='en'?'ðŸ’¾ ÄÃ£ tá»± lÆ°u':'ðŸ’¾ Auto-saved');el.className='ed-autosave';}
     }
   }, 3000);
 }
@@ -4876,7 +5802,7 @@ function edOnInput(){
 function edMarkModified(){
   edModified = true;
   const el = document.getElementById('ed-status-save');
-  if(el){el.textContent='● '+(lang!=='en'?'Chưa lưu':'Modified');el.className='ed-modified';}
+  if(el){el.textContent='â— '+(lang!=='en'?'ChÆ°a lÆ°u':'Modified');el.className='ed-modified';}
 }
 function edMarkSaved(message){
   edModified = false;
@@ -4899,9 +5825,9 @@ function edUpdateWordCount(){
   const c=document.getElementById('ed-status-chars');
   const l=document.getElementById('ed-status-lines');
   const m=document.getElementById('ed-status-mode');
-  if(w)w.textContent=words+' '+(lang!=='en'?'từ':'words');
-  if(c)c.textContent=chars+' '+(lang!=='en'?'ký tự':'chars');
-  if(l)l.textContent=lines+' '+(lang!=='en'?'dòng':'lines');
+  if(w)w.textContent=words+' '+(lang!=='en'?'tá»«':'words');
+  if(c)c.textContent=chars+' '+(lang!=='en'?'kÃ½ tá»±':'chars');
+  if(l)l.textContent=lines+' '+(lang!=='en'?'dÃ²ng':'lines');
   if(m)m.textContent=edSourceMode?'HTML':'WYSIWYG';
 }
 
@@ -5191,9 +6117,9 @@ function edKeyDown(e){
   }
 }
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // RICH INSERT DIALOGS
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function edShowModal(title, fields, onOK){
   const root = edGetModalRoot();
   const vi = lang!=='en';
@@ -5205,7 +6131,7 @@ function edShowModal(title, fields, onOK){
     var ph=_edEscapeHtml((f&&f.ph)||'');
     html += '<label>'+lbl+'</label><input type="'+typ+'" id="ed-modal-f'+i+'" value="'+val+'" placeholder="'+ph+'">';
   });
-  html += '<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Hủy':'Cancel')+'</button><button class="ed-m-ok" onclick="edModalOK()">'+(vi?'Chèn':'Insert')+'</button></div></div></div>';
+  html += '<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Há»§y':'Cancel')+'</button><button class="ed-m-ok" onclick="edModalOK()">'+(vi?'ChÃ¨n':'Insert')+'</button></div></div></div>';
   root.innerHTML = html;
   root._onOK = onOK;
   root._fieldCount = fields.length;
@@ -5413,14 +6339,14 @@ function edInsertLink(){
       selectedText=String(sel.toString()||'').trim();
     }
   }catch(e){}
-  edShowModal(vi?'Chèn liên kết':'Insert Link',[
+  edShowModal(vi?'ChÃ¨n liÃªn káº¿t':'Insert Link',[
     {label:'URL',ph:'https://example.com',value:'https://'},
-    {label:vi?'Văn bản hiển thị':'Display Text',ph:vi?'Nhấn vào đây':'Click here',value:selectedText}
+    {label:vi?'VÄƒn báº£n hiá»ƒn thá»‹':'Display Text',ph:vi?'Nháº¥n vÃ o Ä‘Ã¢y':'Click here',value:selectedText}
   ],(vals)=>{
     var url=_edSanitizeUrl(vals[0],false);
     var textRaw=String(vals[1]||'').trim();
     if(!url){
-      showToast(vi?'\u26a0 Liên kết không hợp lệ':'\u26a0 Invalid link URL');
+      showToast(vi?'\u26a0 LiÃªn káº¿t khÃ´ng há»£p lá»‡':'\u26a0 Invalid link URL');
       return;
     }
     edFocusAndRestore();
@@ -5451,13 +6377,13 @@ function edInsertLink(){
 function edInsertImage(){
   const vi=lang!=='en';
   const root=edGetModalRoot();
-  root.innerHTML='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal"><h4>'+(vi?'Chèn hình ảnh':'Insert Image')+'</h4>'+
-    '<div class="ed-img-tabs"><button class="active" onclick="edImgTab(0,this)">URL</button><button onclick="edImgTab(1,this)">'+(vi?'Tải lên từ máy':'Upload from PC')+'</button></div>'+
-    '<div id="ed-img-pane0"><label>URL</label><input id="ed-modal-f0" placeholder="https://example.com/image.jpg" value="https://"><label>'+(vi?'Mô tả':'Alt Text')+'</label><input id="ed-modal-f1" placeholder="'+(vi?'Mô tả hình':'Description')+'"><label>'+(vi?'Chiều rộng':'Width')+'</label><input id="ed-modal-f2" value="100%" placeholder="100%"></div>'+
-    '<div id="ed-img-pane1" style="display:none"><div class="ed-img-upload-area" id="ed-img-drop" tabindex="0" role="button" aria-label="'+(vi?'Chọn hình ảnh từ máy':'Choose image from computer')+'">'+
-    '<div class="ed-img-upload-icon">📁</div><div class="ed-img-upload-copy">'+(vi?'Nhấn hoặc kéo thả hình ảnh vào đây':'Click or drag & drop image here')+'</div><div class="ed-img-upload-subcopy">'+(vi?'PNG, JPG, WEBP, GIF · tối đa 10MB':'PNG, JPG, WEBP, GIF · up to 10MB')+'</div><div class="ed-img-upload-status" id="ed-img-drop-status"></div><button type="button" class="ed-img-upload-btn" id="ed-img-upload-trigger">'+(vi?'Chọn ảnh':'Choose image')+'</button><input type="file" id="ed-file-upload2" accept="image/*" style="display:none"></div>'+
-    '<img id="ed-img-preview" class="ed-img-preview"><label>'+(vi?'Mô tả':'Alt Text')+'</label><input id="ed-modal-f3" placeholder="'+(vi?'Mô tả hình':'Description')+'"><label>'+(vi?'Chiều rộng':'Width')+'</label><input id="ed-modal-f4" value="100%"></div>'+
-    '<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Hủy':'Cancel')+'</button><button class="ed-m-ok" onclick="edInsertImgOK()">'+(vi?'Chèn':'Insert')+'</button></div></div></div>';
+  root.innerHTML='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal"><h4>'+(vi?'ChÃ¨n hÃ¬nh áº£nh':'Insert Image')+'</h4>'+
+    '<div class="ed-img-tabs"><button class="active" onclick="edImgTab(0,this)">URL</button><button onclick="edImgTab(1,this)">'+(vi?'Táº£i lÃªn tá»« mÃ¡y':'Upload from PC')+'</button></div>'+
+    '<div id="ed-img-pane0"><label>URL</label><input id="ed-modal-f0" placeholder="https://example.com/image.jpg" value="https://"><label>'+(vi?'MÃ´ táº£':'Alt Text')+'</label><input id="ed-modal-f1" placeholder="'+(vi?'MÃ´ táº£ hÃ¬nh':'Description')+'"><label>'+(vi?'Chiá»u rá»™ng':'Width')+'</label><input id="ed-modal-f2" value="100%" placeholder="100%"></div>'+
+    '<div id="ed-img-pane1" style="display:none"><div class="ed-img-upload-area" id="ed-img-drop" tabindex="0" role="button" aria-label="'+(vi?'Chá»n hÃ¬nh áº£nh tá»« mÃ¡y':'Choose image from computer')+'">'+
+    '<div class="ed-img-upload-icon">ðŸ“</div><div class="ed-img-upload-copy">'+(vi?'Nháº¥n hoáº·c kÃ©o tháº£ hÃ¬nh áº£nh vÃ o Ä‘Ã¢y':'Click or drag & drop image here')+'</div><div class="ed-img-upload-subcopy">'+(vi?'PNG, JPG, WEBP, GIF Â· tá»‘i Ä‘a 10MB':'PNG, JPG, WEBP, GIF Â· up to 10MB')+'</div><div class="ed-img-upload-status" id="ed-img-drop-status"></div><button type="button" class="ed-img-upload-btn" id="ed-img-upload-trigger">'+(vi?'Chá»n áº£nh':'Choose image')+'</button><input type="file" id="ed-file-upload2" accept="image/*" style="display:none"></div>'+
+    '<img id="ed-img-preview" class="ed-img-preview"><label>'+(vi?'MÃ´ táº£':'Alt Text')+'</label><input id="ed-modal-f3" placeholder="'+(vi?'MÃ´ táº£ hÃ¬nh':'Description')+'"><label>'+(vi?'Chiá»u rá»™ng':'Width')+'</label><input id="ed-modal-f4" value="100%"></div>'+
+    '<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Há»§y':'Cancel')+'</button><button class="ed-m-ok" onclick="edInsertImgOK()">'+(vi?'ChÃ¨n':'Insert')+'</button></div></div></div>';
   root._imgTab=0;root._imgData=null;
   edInitImageModal(root);
 }
@@ -5468,7 +6394,7 @@ function edInitImageModal(root){
   if(!drop||!input) return;
   var openPicker=function(){
     try{ input.click(); }
-    catch(e){ showToast(lang!=='en'?'⚠ Không thể mở hộp chọn ảnh':'⚠ Cannot open image picker'); }
+    catch(e){ showToast(lang!=='en'?'âš  KhÃ´ng thá»ƒ má»Ÿ há»™p chá»n áº£nh':'âš  Cannot open image picker'); }
   };
   if(trigger){
     trigger.onclick=function(e){
@@ -5513,14 +6439,14 @@ function edHandleDrop(e){
   e.preventDefault();e.currentTarget.classList.remove('dragover');
   var f=e.dataTransfer.files[0];
   if(f&&f.type.startsWith('image/')){
-    if(f.size>10*1024*1024){showToast(lang!=='en'?'⚠ Hình ảnh quá lớn (tối đa 10MB)':'⚠ Image too large (max 10MB)');return;}
+    if(f.size>10*1024*1024){showToast(lang!=='en'?'âš  HÃ¬nh áº£nh quÃ¡ lá»›n (tá»‘i Ä‘a 10MB)':'âš  Image too large (max 10MB)');return;}
     edReadImageFile(f);
   }
 }
 function edHandleModalFile(input){
   var f=input.files[0];
   if(f){
-    if(f.size>10*1024*1024){showToast(lang!=='en'?'⚠ Hình ảnh quá lớn (tối đa 10MB)':'⚠ Image too large (max 10MB)');input.value='';return;}
+    if(f.size>10*1024*1024){showToast(lang!=='en'?'âš  HÃ¬nh áº£nh quÃ¡ lá»›n (tá»‘i Ä‘a 10MB)':'âš  Image too large (max 10MB)');input.value='';return;}
     edReadImageFile(f);
   }
   input.value='';
@@ -5529,12 +6455,12 @@ function edReadImageFile(file){
   // Check file size (max 10MB)
   var maxSize=10*1024*1024;
   if(file.size>maxSize){
-    showToast(lang!=='en'?'⚠ Hình ảnh quá lớn (tối đa 10MB)':'⚠ Image too large (max 10MB)');
+    showToast(lang!=='en'?'âš  HÃ¬nh áº£nh quÃ¡ lá»›n (tá»‘i Ä‘a 10MB)':'âš  Image too large (max 10MB)');
     return;
   }
   // Check file type
   if(!file.type.startsWith('image/')){
-    showToast(lang!=='en'?'⚠ Chỉ chấp nhận file hình ảnh':'⚠ Only image files accepted');
+    showToast(lang!=='en'?'âš  Chá»‰ cháº¥p nháº­n file hÃ¬nh áº£nh':'âš  Only image files accepted');
     return;
   }
   var reader=new FileReader();
@@ -5547,7 +6473,7 @@ function edReadImageFile(file){
     var status=document.getElementById('ed-img-drop-status');
     var drop=document.getElementById('ed-img-drop');
     if(status){
-      status.innerHTML='<span class="ed-img-upload-ok">✓</span> '+(lang!=='en'?'Đã chọn: ':'Selected: ')+safeName+' ('+sizeStr+')';
+      status.innerHTML='<span class="ed-img-upload-ok">âœ“</span> '+(lang!=='en'?'ÄÃ£ chá»n: ':'Selected: ')+safeName+' ('+sizeStr+')';
       status.style.display='block';
     }
     if(drop) drop.classList.add('has-file');
@@ -5581,21 +6507,21 @@ function edInsertImgOK(){
 function edUploadImage(){
   var input=document.getElementById('ed-file-upload');
   if(!input){
-    showToast(lang!=='en'?'⚠ Không tìm thấy bộ chọn ảnh':'⚠ Image picker not found');
+    showToast(lang!=='en'?'âš  KhÃ´ng tÃ¬m tháº¥y bá»™ chá»n áº£nh':'âš  Image picker not found');
     return;
   }
   try{ input.click(); }
-  catch(e){ showToast(lang!=='en'?'⚠ Không thể mở hộp chọn ảnh':'⚠ Cannot open image picker'); }
+  catch(e){ showToast(lang!=='en'?'âš  KhÃ´ng thá»ƒ má»Ÿ há»™p chá»n áº£nh':'âš  Cannot open image picker'); }
 }
 function edHandleFileUpload(input){
   var f=input.files[0];if(!f)return;
   // Check file size (max 10MB)
   if(f.size>10*1024*1024){
-    showToast(lang!=='en'?'⚠ Hình ảnh quá lớn (tối đa 10MB)':'⚠ Image too large (max 10MB)');
+    showToast(lang!=='en'?'âš  HÃ¬nh áº£nh quÃ¡ lá»›n (tá»‘i Ä‘a 10MB)':'âš  Image too large (max 10MB)');
     input.value='';return;
   }
   if(!f.type.startsWith('image/')){
-    showToast(lang!=='en'?'⚠ Chỉ chấp nhận file hình ảnh':'⚠ Only image files accepted');
+    showToast(lang!=='en'?'âš  Chá»‰ cháº¥p nháº­n file hÃ¬nh áº£nh':'âš  Only image files accepted');
     input.value='';return;
   }
   var reader=new FileReader();
@@ -5604,7 +6530,7 @@ function edHandleFileUpload(input){
     var safeName=_edEscapeHtml(f.name||'');
     var src=_edSanitizeUrl(e.target && e.target.result,{allowData:true,allowBlob:true,dataImageOnly:true});
     if(!src){
-      showToast(lang!=='en'?'⚠ Dữ liệu ảnh không hợp lệ':'⚠ Invalid image data');
+      showToast(lang!=='en'?'âš  Dá»¯ liá»‡u áº£nh khÃ´ng há»£p lá»‡':'âš  Invalid image data');
       return;
     }
     var ok=edExecCommand('insertHTML',false,'<img src="'+_edEscapeHtml(src)+'" alt="'+safeName+'" style="max-width:100%;height:auto;border-radius:4px">');
@@ -5617,40 +6543,40 @@ function edHandleFileUpload(input){
 function edInsertTable(){
   const vi=lang!=='en';
   const root=edGetModalRoot();
-  let html='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal"><h4>'+(vi?'Chèn bảng':'Insert Table')+'</h4>';
+  let html='<div class="ed-modal-overlay" onclick="if(event.target===this)edCloseModal()"><div class="ed-modal"><h4>'+(vi?'ChÃ¨n báº£ng':'Insert Table')+'</h4>';
   // Grid picker
-  html+='<div style="margin-bottom:12px"><label style="font-size:11px;font-weight:600;color:#666">'+(vi?'Chọn kích thước (kéo chuột)':'Pick size (hover)')+'</label>';
+  html+='<div style="margin-bottom:12px"><label style="font-size:11px;font-weight:600;color:#666">'+(vi?'Chá»n kÃ­ch thÆ°á»›c (kÃ©o chuá»™t)':'Pick size (hover)')+'</label>';
   html+='<div id="ed-tbl-grid" style="display:inline-grid;grid-template-columns:repeat(10,22px);gap:2px;margin:8px 0;padding:4px;background:#f8f9fa;border-radius:6px">';
   for(let r=0;r<8;r++)for(let c=0;c<10;c++){
     html+='<div data-r="'+(r+1)+'" data-c="'+(c+1)+'" style="width:20px;height:16px;border:1px solid #d1d5db;border-radius:2px;cursor:pointer;transition:background .05s" onmouseover="edTblGridHover(this)" onclick="edTblGridPick(this)"></div>';
   }
-  html+='</div><div id="ed-tbl-grid-label" style="font-size:11px;color:#666;margin-bottom:8px">0 × 0</div></div>';
+  html+='</div><div id="ed-tbl-grid-label" style="font-size:11px;color:#666;margin-bottom:8px">0 Ã— 0</div></div>';
   // Or manual input
-  html+='<div style="display:flex;gap:8px;align-items:center"><label style="font-size:11px;color:#666">'+(vi?'Hoặc:':'Or:')+'</label>';
-  html+='<input id="ed-tbl-rows" type="number" value="3" min="1" max="50" style="width:50px;padding:4px;border:1px solid #d1d5db;border-radius:4px;font-size:12px"> × ';
+  html+='<div style="display:flex;gap:8px;align-items:center"><label style="font-size:11px;color:#666">'+(vi?'Hoáº·c:':'Or:')+'</label>';
+  html+='<input id="ed-tbl-rows" type="number" value="3" min="1" max="50" style="width:50px;padding:4px;border:1px solid #d1d5db;border-radius:4px;font-size:12px"> Ã— ';
   html+='<input id="ed-tbl-cols" type="number" value="3" min="1" max="20" style="width:50px;padding:4px;border:1px solid #d1d5db;border-radius:4px;font-size:12px">';
-  html+='<label style="font-size:11px;color:#666;margin-left:8px"><input type="checkbox" id="ed-tbl-header" checked> '+(vi?'Tiêu đề':'Header')+'</label></div>';
-  html+='<div style="margin-top:10px"><label style="font-size:11px;font-weight:600;color:#666">'+(vi?'Kiểu bảng':'Table Style')+'</label>';
+  html+='<label style="font-size:11px;color:#666;margin-left:8px"><input type="checkbox" id="ed-tbl-header" checked> '+(vi?'TiÃªu Ä‘á»':'Header')+'</label></div>';
+  html+='<div style="margin-top:10px"><label style="font-size:11px;font-weight:600;color:#666">'+(vi?'Kiá»ƒu báº£ng':'Table Style')+'</label>';
   html+='<div style="display:flex;gap:6px;margin-top:4px">';
   const styles=[
-    {name:vi?'Cơ bản':'Basic',border:'#cbd5e1',headerBg:'#f1f5f9',stripe:''},
+    {name:vi?'CÆ¡ báº£n':'Basic',border:'#cbd5e1',headerBg:'#f1f5f9',stripe:''},
     {name:vi?'Xanh':'Blue',border:'#93c5fd',headerBg:'#1d4ed8',headerColor:'#fff',stripe:'#eff6ff'},
-    {name:vi?'Xanh lá':'Green',border:'#86efac',headerBg:'#15803d',headerColor:'#fff',stripe:'#f0fdf4'},
-    {name:vi?'Tím':'Purple',border:'#c4b5fd',headerBg:'#7c3aed',headerColor:'#fff',stripe:'#faf5ff'},
-    {name:vi?'Không viền':'Minimal',border:'transparent',headerBg:'#f8fafc',stripe:'#f8fafc'}
+    {name:vi?'Xanh lÃ¡':'Green',border:'#86efac',headerBg:'#15803d',headerColor:'#fff',stripe:'#f0fdf4'},
+    {name:vi?'TÃ­m':'Purple',border:'#c4b5fd',headerBg:'#7c3aed',headerColor:'#fff',stripe:'#faf5ff'},
+    {name:vi?'KhÃ´ng viá»n':'Minimal',border:'transparent',headerBg:'#f8fafc',stripe:'#f8fafc'}
   ];
   styles.forEach((s,i)=>{
     html+='<button onclick="document.getElementById(\'ed-modal-root\')._tblStyle='+i+';this.parentElement.querySelectorAll(\'button\').forEach(b=>b.style.outline=\'none\');this.style.outline=\'2px solid #1967d2\'" style="padding:6px 10px;border:1px solid #ddd;border-radius:4px;font-size:10px;background:#fff;cursor:pointer;font-weight:600'+(i===0?';outline:2px solid #1967d2':'')+'" title="'+s.name+'">'+s.name+'</button>';
   });
   html+='</div></div>';
-  html+='<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Hủy':'Cancel')+'</button><button class="ed-m-ok" onclick="edDoInsertTable()">'+(vi?'Chèn':'Insert')+'</button></div></div></div>';
+  html+='<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">'+(vi?'Há»§y':'Cancel')+'</button><button class="ed-m-ok" onclick="edDoInsertTable()">'+(vi?'ChÃ¨n':'Insert')+'</button></div></div></div>';
   root.innerHTML=html;
   root._tblStyle=0;
   root._tblStyles=styles;
 }
 function edTblGridHover(el){
   const r=+el.dataset.r,c=+el.dataset.c;
-  document.getElementById('ed-tbl-grid-label').textContent=r+' × '+c;
+  document.getElementById('ed-tbl-grid-label').textContent=r+' Ã— '+c;
   document.querySelectorAll('#ed-tbl-grid > div').forEach(d=>{
     d.style.background=(+d.dataset.r<=r&&+d.dataset.c<=c)?'#8ab4f8':'';
   });
@@ -5680,7 +6606,7 @@ function edDoInsertTable(){
     });
     if(okTable!==false){
       if((root._tblStyle||0)!==0){
-        showToast(vi?'\u2139 Bảng Tiptap dùng kiểu chuẩn trong pilot':'\u2139 Tiptap table uses default style in pilot');
+        showToast(vi?'\u2139 Báº£ng Tiptap dÃ¹ng kiá»ƒu chuáº©n trong pilot':'\u2139 Tiptap table uses default style in pilot');
       }
       try{
         if(typeof edApplyGlobalTablePolicy==='function'){
@@ -5698,7 +6624,7 @@ function edDoInsertTable(){
   let t='<table style="width:100%;border:1px solid '+s.border+';border-collapse:collapse">';
   if(header){
     t+='<thead><tr>';
-    for(let c=0;c<cols;c++) t+='<th style="border:1px solid '+s.border+';padding:8px 12px;background:'+s.headerBg+(s.headerColor?';color:'+s.headerColor:'')+';width:'+colW+'%">'+(vi?'Cột':'Col')+' '+(c+1)+'</th>';
+    for(let c=0;c<cols;c++) t+='<th style="border:1px solid '+s.border+';padding:8px 12px;background:'+s.headerBg+(s.headerColor?';color:'+s.headerColor:'')+';width:'+colW+'%">'+(vi?'Cá»™t':'Col')+' '+(c+1)+'</th>';
     t+='</tr></thead>';
   }
   t+='<tbody>';
@@ -5721,7 +6647,7 @@ function edDoInsertTable(){
 
 function edInsertQuote(){
   edFocusAndRestore();
-  edExecCommand('insertHTML',false,'<blockquote>'+(lang!=='en'?'Nhập nội dung trích dẫn...':'Enter quote text...')+'</blockquote>');
+  edExecCommand('insertHTML',false,'<blockquote>'+(lang!=='en'?'Nháº­p ná»™i dung trÃ­ch dáº«n...':'Enter quote text...')+'</blockquote>');
   edMarkModified();
 }
 
@@ -5731,9 +6657,9 @@ function edInsertCode(){
   edMarkModified();
 }
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SOURCE CODE VIEW
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function edToggleSource(){
   const area = document.getElementById('editor-area');
   const src = document.getElementById('ed-source');
@@ -5768,7 +6694,7 @@ function edToggleSource(){
     if(dc) dc.innerHTML = safeHtml;
     else area.innerHTML = safeHtml;
     if(safeHtml.trim()!==String(rawHtml).trim()){
-      showToast(lang!=='en'?'⚠ Đã loại bỏ đoạn HTML không an toàn':'⚠ Unsafe HTML was removed');
+      showToast(lang!=='en'?'âš  ÄÃ£ loáº¡i bá» Ä‘oáº¡n HTML khÃ´ng an toÃ n':'âš  Unsafe HTML was removed');
     }
     wrap.style.display = 'flex';
     src.style.display = 'none';
@@ -5783,9 +6709,9 @@ function edToggleSource(){
   }
 }
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // FIND & REPLACE
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 let edFindActiveIndex = -1;
 let edFindLastKey = '';
 let edFindMatchCase = false;
@@ -6033,9 +6959,20 @@ function edReplaceAll(){
   edFindInDoc(0,true);
 }
 
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // ZOOM
-// ═══════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function edHandleEditorWheelZoom(e){
+  if(!e || !e.ctrlKey || !editMode) return;
+  const area=document.getElementById('editor-area');
+  if(!area || !area.contains(e.target)) return;
+  const delta=Number(e.deltaY||0);
+  if(!Number.isFinite(delta) || delta===0) return;
+  e.preventDefault();
+  e.stopPropagation();
+  edSetZoom(edZoom + (delta<0 ? 10 : -10));
+}
+
 function edSetZoom(z){
   edZoom=Math.max(50,Math.min(200,z));
   const page=document.getElementById('editor-area');
@@ -6055,5 +6992,4 @@ function edPrint(){
   win.print();
 }
 
-// ═══════════════════════════════════════════════════
-
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•

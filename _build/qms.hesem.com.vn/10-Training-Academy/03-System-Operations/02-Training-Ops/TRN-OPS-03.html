@@ -1,81 +1,47 @@
-<!DOCTYPE html>
-
-<html lang="vi">
-<head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>TRN-OPS-03 — Skill Matrix Operations &amp; Update: Workflow, Bonus Map, Change Control | HESEM OS</title>
-<link href="../../../assets/style.css" rel="stylesheet"/>
-<style>
-/* ═══ PAGE BREAK & OVERFLOW FIX (auto-applied) ═══ */
-@media print {
- .card, .table-card, .callout, .note, .box, .iso-map,
- .preface-block, .jd-mission, .form-sheet, .lane,
- .legend, .req, .auth-grid, .backup-card, .vstep {
- page-break-inside: avoid;
- break-inside: avoid;
- }
- h1, h2, h3, .h1, .h2, .h3 {
- page-break-after: avoid;
- break-after: avoid;
- }
- .form-header {
- page-break-inside: avoid;
- break-inside: avoid;
- }
- .sig-row, .sign-row, .approval-row {
- page-break-inside: avoid;
- break-inside: avoid;
- }
- tr { page-break-inside: avoid; break-inside: avoid; }
- thead { display: table-header-group; }
+<div><p>thead { display: table-header-group; }
  tfoot { display: table-footer-group; }
  p { orphans: 3; widows: 3; }
- .table-card { overflow: visible !important; }
+ 
 }
 .page-body { overflow-x: hidden; }
 .table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
 table { max-width: 100%; table-layout: auto; }
 td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
-</style>
-</head>
-<body>
+
+<style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
+<link rel="stylesheet" href="../../../assets/style.css">
+
+</p>
 <!-- ====== HEADER (VI/EN) ====== -->
 <div class="container">
 <div class="page">
 <div class="page-body">
 <div class="form-header">
 <div class="fh-left">
-  <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/></a>
-  <div class="fh-company">
-    <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-    <span>Tài liệu kiểm soát</span>
-  </div>
+ <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+ <div class="fh-company">
+ <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
 </div>
 <div class="title">
-  <strong>TRN-OPS-03 — Skill Matrix Operations &amp; Update: Workflow, Bonus Map, Change Control</strong>
-  <span class="sub-vn"></span>
+<strong class="doc-name">03</strong>
+<span class="sub-vn"></span>
 </div>
-<div class="meta">
-  <div class="row"><span><b>Mã:</b></span><span>TRN-OPS-03</span></div>
-  <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-  <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-  <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA/QMS</span></div>
-  <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
-</div>
+<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">TRN-OPS-03</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
 </div>
 
 <!-- ====== FORM-HEADER (tách rời) ====== -->
-<div class="fh-sub">No evidence = No gate • Skill Matrix vận hành như hệ thống kiểm soát chất lượng</div>
+<div class="fh-sub">không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate) • ma trận kỹ năng (matrix) vận hành như hệ thống kiểm soát chất lượng</div>
 </div>
 </div>
 <div class="fh-right">
-<div class="fh-kv"><span class="k">ModuleCode:</span><span class="v">TRN-OPS-03</span></div>
-<div class="fh-kv"><span class="k">ModuleTitle:</span><span class="v">Vận hành Skill Matrix &amp; cập nhật: workflow, bonus map, kiểm soát thay đổi</span></div>
+<div class="fh-kv"><span class="k">Mã mô-đun:</span><span class="v">TRN-OPS-03</span></div>
+<div class="fh-kv"><span class="k">Tên mô-đun:</span><span class="v">Vận hành ma trận kỹ năng (matrix) &amp; cập nhật: luồng công việc, thưởng map, kiểm soát thay đổi</span></div>
 <div class="fh-kv"><span class="k">Phiên bản:</span><span class="v">Draft</span></div>
 <div class="fh-kv"><span class="k">Hiệu lực:</span><span class="v">—</span></div>
-<div class="fh-kv"><span class="k">Chủ sở hữu:</span><span class="v">HR + OPS + QA/QMS</span></div>
-<div class="fh-kv"><span class="k">Phê duyệt:</span><span class="v">General Manager (EXE-01)</span></div>
+<div class="fh-kv"><span class="k">Owner:</span><span class="v"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phong Nhan su)"><span class="entity-code dept-code">D-HR</span></a><span class="entity-sep role-sep">+</span><a class="entity-link bundle-link bundle-chip" data-bundle="FUNC_HEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-heads" title="Function Heads (Nhom dau moi dieu hanh chuc nang) — PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA"><span class="entity-code bundle-code">FUNC_HEADS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div>
+<div class="fh-kv"><span class="k">Phê duyệt:</span><span class="v"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div>
 </div>
 </div>
 <!-- ====== DOC CONTENT ====== -->
@@ -84,122 +50,125 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="doc-header-top">
 <div class="brand">
 <a class="logo-link" href="../../../01-QMS-Portal/portal.html">
-<img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"/>
+<img alt="HESEM Logo" src="../../../assets/hesem-logo.svg">
 </a>
 <div>
 <a class="name" href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-<div class="sub">HESEM Academy • System Ops Module</div>
+<div class="sub">HESEM Academy • System Ops Mô-đun</div>
 </div>
 </div>
 </div>
-<h1 class="h1">TRN-OPS-03 — Vận hành Skill Matrix &amp; cập nhật: workflow, bonus map, kiểm soát thay đổi</h1>
+<h1 class="h1">TRN-OPS-03 - 03</h1>
 <p class="small">
  Tài liệu HESEM bắt buộc tra cứu: 
- <a href="../../01-Competency-System/03-Matrices/training-matrix.html">training/training-matrix.html</a> •
- <a href="../../01-Competency-System/01-Framework/skill-matrix-bonus.html">training/skill-matrix-bonus.html</a> •
- <a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-HR-TRN-007</a> •
- <a  download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-809_Skills_and_KPI_Matrix.xlsx">FRM-HR-TRN-011</a>
+ <a href="../../01-Competency-System/03-Matrices/training-matrix.html">đào tạo/đào tạo-matrix.html</a> •
+ <a href="../../01-Competency-System/01-Framework/skill-matrix-bonus.html">đào tạo/kỹ năng-matrix-thưởng.html</a> •
+ <a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-HR-TRN-007</a> •
+ <a download="" href="../../../04-Bieu-Mau/08-FRM-800/FRM-809_Skills_and_KPI_Matrix.xlsx">FRM-HR-TRN-011</a>
 </p>
 </div>
-<!-- ====== 2) Mục đích & bối cảnh vận hành ====== -->
-<h2>2) Mục đích module &amp; bối cảnh vận hành</h2>
+<!-- ====== 2) Mục đích & bối cảnh operation ====== -->
+<h2>2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
+<div class="note-blue" style="margin:12px 0">
+ <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — Training Operations</b>.
+</div>
 <div class="card">
-<p style="margin:0 0 10px 0"><b>Gate Logic:</b> Skill Matrix là “cổng năng lực” của xưởng CNC. Mọi quyết định giao việc, duyệt thao tác, duyệt đo, duyệt ship release, map thưởng đều phụ thuộc vào Level và bằng chứng (MRR). Khi Skill Matrix sai, xưởng rơi vào 3 loại lỗi chết: (1) giao việc vượt năng lực; (2) pass gate không có bằng chứng; (3) thưởng sai tạo động lực sai.</p>
+<p style="margin:0 0 10px 0"><b>Cổng kiểm soát Logic:</b> ma trận kỹ năng (matrix) là "cổng năng lực" của phân xưởng CNC. Mọi quyết định giao việc, duyệt vận hành, duyệt đo, duyệt phê duyệt giao hàng (phê duyệt giao hàng), map thưởng đều phụ thuộc vào Level và bằng chứng (MRR). Khi ma trận kỹ năng (matrix) sai, phân xưởng rơi vào 3 loại lỗi chết: (1) giao việc vượt năng lực; (2) pass cổng kiểm soát không có bằng chứng; (3) thưởng sai tạo động lực sai.</p>
 <ul style="margin:0 0 0 18px; line-height:1.9">
-<li><b>Mục tiêu vận hành:</b> 01 workflow thống nhất để cập nhật Skill Matrix có kiểm soát; 01 bonus map có KPI gating; 01 cơ chế kiểm soát thay đổi (ISO 7.5) bảo toàn bằng chứng.</li>
+<li><b>Mục tiêu vận hành:</b> 01 luồng công việc thống nhất để cập nhật ma trận kỹ năng (matrix) có kiểm soát; 01 thưởng map có Cơ chế chặn theo KPI (kiểm soát cổng); 01 cơ chế kiểm soát thay đổi (ISO 7.5) bảo toàn bằng chứng.</li>
 <li><b>Trách nhiệm:</b>
 <ul style="margin:6px 0 0 18px; line-height:1.9">
-<li><b>Supervisor:</b> khởi tạo yêu cầu cập nhật Level bằng FRM-HR-TRN-007, xác nhận OJT output và performance test; kích hoạt HOLD khi thiếu bằng chứng.</li>
-<li><b>HR:</b> quản lý dữ liệu Skill Matrix, cập nhật hệ thống, khóa phiên bản; quản lý bonus map theo FRM-HR-TRN-011.</li>
-<li><b>QA/QMS:</b> kiểm soát thay đổi, audit bằng chứng, chặn “No evidence = No gate”, quản lý phiên bản tài liệu liên quan.</li>
-<li><b>EHS:</b> xác nhận điều kiện an toàn khi năng lực liên quan thao tác nguy hiểm/LOTO/thiết bị nâng.</li>
-<li><b>Planner:</b> dùng Skill Matrix để lập kế hoạch nguồn lực theo ca; chặn giao việc sai Level.</li>
-<li><b>Các role còn lại:</b> tạo đúng OJT output, lưu đúng MRR, tuân thủ quyền hạn theo Level.</li>
+<li><b><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span>:</b> khởi tạo yêu cầu cập nhật Level bằng FRM-HR-TRN-007, xác nhận OJT đầu ra và hiệu suất test; kích hoạt hold khi thiếu bằng chứng.</li>
+<li><b><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a>:</b> quản lý dữ liệu ma trận kỹ năng (matrix), cập nhật hệ thống, khóa phiên bản; quản lý thưởng map theo FRM-HR-TRN-011.</li>
+<li><b><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>:</b> kiểm soát thay đổi, đánh giá bằng chứng, chặn "không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)", quản lý phiên bản tài liệu liên quan.</li>
+<li><b><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a>:</b> xác nhận điều kiện an toàn khi năng lực liên quan vận hành nguy hiểm/LOTO/thiết bị nâng.</li>
+<li><b><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span>:</b> dùng ma trận kỹ năng (matrix) để lập kế hoạch nguồn lực theo ca; chặn giao việc sai Level.</li>
+<li><b>Các vai trò còn lại:</b> tạo đúng OJT đầu ra, lưu đúng MRR, tuân thủ quyền hạn theo Level.</li>
 </ul>
 </li>
-<li><b>Khi nào kích hoạt:</b> kích hoạt theo chu kỳ (tuần/tháng) và theo sự kiện: nhân sự mới; thay đổi máy/line; thay đổi quy trình/dao/đồ gá; phát sinh NCR/MRB; sự cố ship sai; phát hiện bypass gate; thay đổi bonus policy.</li>
+<li><b>Khi nào kích hoạt:</b> kích hoạt theo chu kỳ (tuần/tháng) và theo sự kiện: nhân sự mới; thay đổi máy/dòng / chuyền; thay đổi quy trình/dao/đồ gá; phát sinh NCR/MRB; sự cố ship sai; phát hiện vượt qua cổng kiểm soát; thay đổi thưởng policy.</li>
 </ul>
 </div>
-<h3>TargetRoles &amp; khác biệt áp dụng theo role</h3>
+<h3>TargetRoles &amp; khác biệt áp dụng theo vai trò</h3>
 <table class="docx-table">
 <thead>
 <tr>
-<th>Role</th>
-<th>Áp dụng trong module</th>
-<th>Tiêu chí đạt khác nhau theo role</th>
+<th>Vai trò</th>
+<th>Áp dụng trong mô-đun</th>
+<th>Tiêu chí đạt khác nhau theo vai trò</th>
 </tr>
 </thead>
 <tbody>
-<tr><td><b>Operator</b></td><td>Tuân thủ Level khi vận hành; tạo MRR OJT; không tự mở quyền thao tác</td><td>L2–L3 yêu cầu OJT output theo job thật + xác nhận Supervisor</td></tr>
-<tr><td><b>Setup</b></td><td>Quyền setup/prove-out gắn Level; bắt buộc performance test khi nâng Level</td><td>L3 yêu cầu bằng chứng kiểm soát rủi ro crash + sign-off Maintenance/QA khi cần</td></tr>
-<tr><td><b>Programmer</b></td><td>Quyền release chương trình gắn Level; kiểm soát phiên bản</td><td>Draft</td></tr>
-<tr><td><b>QC</b></td><td>Quyền đo/duyệt gage gắn Level; chặn OOT gage</td><td>L3 yêu cầu performance test đo + truy xuất MRR</td></tr>
-<tr><td><b>QA</b></td><td>Gate “No evidence = No gate”; audit Skill Matrix/bonus map</td><td>L3–L4 yêu cầu năng lực audit + kiểm soát thay đổi ISO 7.5</td></tr>
-<tr><td><b>Warehouse</b></td><td>Quyền nhận hàng/nhãn/traceability gắn Level</td><td>L3 yêu cầu case chặn mix-up bằng bằng chứng ảnh + log</td></tr>
-<tr><td><b>Purchasing</b></td><td>Quyền duyệt NCC/giấy tờ gắn Level</td><td>L3 yêu cầu case đóng thiếu chứng từ + record vendor file</td></tr>
-<tr><td><b>Planner</b></td><td>Dùng Skill Matrix để lập ca; chặn giao việc vượt Level</td><td>L3 yêu cầu kế hoạch ca có phân bổ theo Level và evidence check</td></tr>
-<tr><td><b>Maintenance</b></td><td>Xác nhận năng lực LOTO/PM; ghi nhận drill</td><td>L3 yêu cầu performance test LOTO + bàn giao an toàn</td></tr>
-<tr><td><b>EHS</b></td><td>Xác nhận năng lực an toàn; audit tuân thủ</td><td>L3 yêu cầu case audit phát hiện &amp; đóng hành động</td></tr>
-<tr><td><b>Estimator (SAL-03)</b></td><td>Handoff yêu cầu khách liên quan chứng chỉ/ship release</td><td>L3 yêu cầu record handoff đầy đủ, tránh thiếu yêu cầu tại quote/contract</td></tr>
-<tr><td><b>Supervisor</b></td><td>Owner cập nhật Level; vận hành workflow; escalations</td><td>L3 yêu cầu vận hành đầy đủ FRM-007 + đóng hành động + kiểm soát thay đổi</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html" title="CNC Operator (Nhan vien van hanh CNC)"><span class="entity-code role-code">OPR</span></a></span></td><td>Tuân thủ Level khi vận hành; tạo MRR OJT; không tự mở quyền vận hành</td><td>L2–L3 yêu cầu OJT đầu ra theo job thật + xác nhận <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td></tr>
+<tr><td><b>Setup</b></td><td>Quyền setup/chứng minh-out gắn Level; bắt buộc hiệu suất test khi nâng Level</td><td>L3 yêu cầu bằng chứng kiểm soát rủi ro sự cố nghiêm trọng + ký-off <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Maintenance Function (Bo phan Bao tri)"><span class="entity-code dept-code">D-MNT</span></a></span>/QA khi cần</td></tr>
+<tr><td><b><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></b></td><td>Quyền phát hành chương trình gắn Level; kiểm soát phiên bản</td><td>Draft</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td><td>Quyền đo/duyệt gage gắn Level; chặn OOT gage</td><td>L3 yêu cầu hiệu suất test đo + truy xuất nguồn gốc MRR</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>Cổng kiểm soát "không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)"; đánh giá ma trận kỹ năng (matrix)/thưởng map</td><td>L3–L4 yêu cầu năng lực đánh giá + kiểm soát thay đổi ISO 7.5</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td><td>Quyền nhận hàng/nhãn/truy xuất nguồn gốc gắn Level</td><td>L3 yêu cầu tình huống chặn lẫn lộn (mix-up) bằng bằng chứng ảnh + log</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Purchasing Function (Bo phan Mua hang)"><span class="entity-code dept-code">D-PUR</span></a></span></td><td>Quyền duyệt NCC/giấy tờ gắn Level</td><td>L3 yêu cầu tình huống đóng thiếu chứng từ + hồ sơ nhà cung cấp file</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span></td><td>Dùng ma trận kỹ năng (matrix) để lập ca; chặn giao việc vượt Level</td><td>L3 yêu cầu kế hoạch ca có phân bổ theo Level và bằng chứng kiểm tra</td></tr>
+<tr><td><b><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Maintenance Function (Bo phan Bao tri)"><span class="entity-code dept-code">D-MNT</span></a></span></b></td><td>Xác nhận năng lực LOTO/PM; ghi nhận diễn tập</td><td>L3 yêu cầu hiệu suất test LOTO + bàn giao an toàn</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-ehs-handbook.html" title="EHS Department (Phong EHS)"><span class="entity-code dept-code">D-EHS</span></a></span></td><td>Xác nhận năng lực an toàn; đánh giá tuân thủ</td><td>L3 yêu cầu tình huống đánh giá phát hiện &amp; đóng hành động</td></tr>
+<tr><td><b><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></span></b></td><td>Bàn giao yêu cầu khách liên quan chứng chỉ/phê duyệt giao hàng</td><td>L3 yêu cầu hồ sơ bàn giao đầy đủ, tránh thiếu yêu cầu tại báo giá/hợp đồng</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td><td>người chịu trách nhiệm cập nhật Level; vận hành luồng công việc; escalations</td><td>L3 yêu cầu vận hành đầy đủ <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a> + đóng hành động + kiểm soát thay đổi</td></tr>
 </tbody>
 </table>
 <!-- ====== 3) Vị trí trong chuỗi E2E + handoff ====== -->
-<h2>3) Vị trí trong chuỗi E2E + luồng handoff (input/output) + điểm chặn</h2>
+<h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
 <div class="card">
-<p style="margin:0 0 8px 0"><b>Chuỗi E2E:</b> Quote/Contract → Planning → Engineering → Purchasing → Receiving → Production → QC/QA → NCR/MRB → Final → Packing → Ship → Feedback/CI.</p>
-<p style="margin:0 0 10px 0"><b>Vị trí module:</b> Skill Matrix nằm “bên dưới” toàn chuỗi và tác động trực tiếp tại các bước có quyền quyết định: Planning (phân người), Production (vận hành/setup/prove-out), QC/QA (đo/duyệt), Ship (release), Feedback/CI (đóng năng lực sau NCR/sự cố).</p>
+<p style="margin:0 0 8px 0"><b>Chuỗi E2E:</b> Báo giá/Hợp đồng → Kế hoạch → Kỹ thuật → Mua hàng → Nhận hàng → Sản xuất → QC/QA → NCR/MRB → Final → Đóng gói → Ship → Phản hồi/CI.</p>
+<p style="margin:0 0 10px 0"><b>Vị trí mô-đun:</b> ma trận kỹ năng (matrix) nằm "bên dưới" toàn chuỗi và tác động trực tiếp tại các bước có quyền quyết định: Kế hoạch (phân Người), Sản xuất (vận hành/setup/chứng minh-out), QC/QA (đo/duyệt), Ship (phát hành), Phản hồi/CI (đóng năng lực sau NCR/sự cố).</p>
 <table class="docx-table">
 <thead>
 <tr>
 <th>Bước</th>
-<th>Input tối thiểu</th>
-<th>Output bắt buộc</th>
-<th>Điểm chặn (Gate)</th>
+<th>Đầu vào tối thiểu</th>
+<th>Đầu ra bắt buộc</th>
+<th>Điểm chặn (Cổng kiểm soát)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Quote/Contract</td>
+<td>Báo giá/Hợp đồng</td>
 <td>Yêu cầu chứng chỉ/đặc thù khách</td>
-<td>Handoff yêu cầu vào training requirement (role/level)</td>
-<td><b>BLOCK</b> khi yêu cầu khách không chuyển vào kế hoạch đào tạo</td>
+<td>Bàn giao yêu cầu vào đào tạo yêu cầu (vai trò/level)</td>
+<td><b>CHẶN</b> khi yêu cầu khách không chuyển vào kế hoạch đào tạo</td>
 </tr>
 <tr>
-<td>Planning</td>
-<td>Danh sách người + Level theo role</td>
-<td>Phân ca theo Level; job critical gắn người đủ Level</td>
-<td><b>BLOCK</b> khi phân người dưới Level yêu cầu</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Planning and Control Function (Dieu do va kiem soat san xuat)"><span class="entity-code dept-code">D-PPC</span></a></span></td>
+<td>Danh sách Người + Level theo vai trò</td>
+<td>Phân ca theo Level; job quan trọng / nghiêm trọng gắn Người đủ Level</td>
+<td><b>CHẶN</b> khi phân Người dưới Level yêu cầu</td>
 </tr>
 <tr>
-<td>Production</td>
-<td>Danh sách quyền thao tác theo Level</td>
-<td>OJT output + MRR theo ca/job</td>
-<td><b>STOP/HOLD</b> khi thao tác vượt quyền hoặc không có MRR</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a></span></td>
+<td>Danh sách quyền vận hành theo Level</td>
+<td>OJT đầu ra + MRR theo ca/job</td>
+<td><b>STOP/TẠM GIỮ</b> khi vận hành vượt quyền hoặc không có MRR</td>
 </tr>
 <tr>
-<td>QC/QA</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td>
 <td>Quyền đo/duyệt theo Level + trạng thái gage</td>
 <td>Kết quả đo/duyệt có chữ ký đúng Level</td>
-<td><b>HOLD</b> khi người ký không đủ Level hoặc gage OOT</td>
+<td><b>TẠM GIỮ</b> khi Người ký không đủ Level hoặc gage OOT</td>
 </tr>
 <tr>
 <td>Ship</td>
-<td>Ship packet + bằng chứng gate</td>
-<td>Ship release</td>
-<td><b>BLOCK</b> khi thiếu bằng chứng skill/approval theo Level</td>
+<td>bộ hồ sơ giao hàng (ship gói hồ sơ) + bằng chứng cổng kiểm soát</td>
+<td>Phê duyệt giao hàng</td>
+<td><b>CHẶN</b> khi thiếu bằng chứng kỹ năng/phê duyệt theo Level</td>
 </tr>
 <tr>
-<td>Feedback/CI</td>
+<td>Phản hồi/CI</td>
 <td>NCR/MRB/sự cố</td>
 <td>Cập nhật đào tạo/Level/ràng buộc quyền</td>
-<td><b>BLOCK</b> khi NCR tái diễn mà không cập nhật năng lực</td>
+<td><b>CHẶN</b> khi NCR tái diễn mà không cập nhật năng lực</td>
 </tr>
 </tbody>
 </table>
 </div>
 <!-- ====== 4) Failure Points ====== -->
-<h2>4) Failure Points (tối thiểu 10 điểm gãy thực tế gắn với bước)</h2>
+<h2>4) Điểm đứt gãy (tối thiểu 10 điểm gãy thực tế gắn với bước)</h2>
 <table class="docx-table">
 <thead>
 <tr>
@@ -207,217 +176,217 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Planning</td><td>Phân job critical cho người dưới Level</td><td>Crash, NCR, trễ tiến độ</td><td>Board ca ghi tên không đạt L_req</td></tr>
-<tr><td>2</td><td>Production</td><td>Thực hiện thao tác vượt quyền (setup/prove-out/đo)</td><td>Rủi ro an toàn, sai kích thước</td><td>Log máy/nhật ký ca không khớp người</td></tr>
-<tr><td>3</td><td>QC/QA</td><td>Người ký duyệt không đúng Level</td><td>Ship sai, tranh chấp</td><td>Chữ ký không khớp danh sách quyền</td></tr>
-<tr><td>4</td><td>HR/OPS</td><td>Cập nhật Level không có FRM-HR-TRN-007</td><td>Không audit được</td><td>Không có request ID</td></tr>
-<tr><td>5</td><td>HR</td><td>Skill Matrix một phiên bản, bonus map một phiên bản khác</td><td>Thưởng sai, mâu thuẫn nội bộ</td><td>Ngày/phiên bản không khớp</td></tr>
-<tr><td>6</td><td>QA/QMS</td><td>Không khóa thay đổi; file bị sửa không log</td><td>Mất kiểm soát ISO 7.5</td><td>Không có DCR record</td></tr>
-<tr><td>7</td><td>Receiving</td><td>Nhân sự kho mới chưa đạt Level nhưng xử lý traceability</td><td>Lẫn lô, sai Rev</td><td>Sai nhãn, thiếu log</td></tr>
-<tr><td>8</td><td>Engineering</td><td>Thay đổi quy trình/máy nhưng không cập nhật requirement năng lực</td><td>Thiếu đào tạo, lỗi tái diễn</td><td>NCR do thao tác không chuẩn</td></tr>
+<tr><td>1</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Planning and Control Function (Dieu do va kiem soat san xuat)"><span class="entity-code dept-code">D-PPC</span></a></span></td><td>Phân job quan trọng / nghiêm trọng cho Người dưới Level</td><td>sự cố nghiêm trọng, NCR, trễ tiến độ</td><td>Bảng ca ghi tên không đạt L_req</td></tr>
+<tr><td>2</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a></span></td><td>Thực hiện vận hành vượt quyền (setup/chứng minh-out/đo)</td><td>Rủi ro an toàn, sai kích thước</td><td>Log máy/log ca không khớp Người</td></tr>
+<tr><td>3</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>Người ký duyệt không đúng Level</td><td>Ship sai, tranh chấp</td><td>Chữ ký không khớp danh sách quyền</td></tr>
+<tr><td>4</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phong Nhan su)"><span class="entity-code dept-code">D-HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a></span></td><td>Cập nhật Level không có FRM-HR-TRN-007</td><td>Không đánh giá được</td><td>Không có yêu cầu ID</td></tr>
+<tr><td>5</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phong Nhan su)"><span class="entity-code dept-code">D-HR</span></a></span></td><td>ma trận kỹ năng (matrix) một phiên bản, thưởng map một phiên bản khác</td><td>Thưởng sai, mâu thuẫn nội bộ</td><td>Ngày/phiên bản không khớp</td></tr>
+<tr><td>6</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>Không khóa thay đổi; file bị sửa không log</td><td>Mất kiểm soát ISO 7.5</td><td>Không có DCR hồ sơ</td></tr>
+<tr><td>7</td><td>Nhận hàng</td><td>Nhân sự kho mới chưa đạt Level nhưng xử lý truy xuất nguồn gốc</td><td>Lẫn lô, sai Rev</td><td>Sai nhãn, thiếu log</td></tr>
+<tr><td>8</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span></td><td>Thay đổi quy trình/máy nhưng không cập nhật yêu cầu năng lực</td><td>Thiếu đào tạo, lỗi tái diễn</td><td>NCR do vận hành không chuẩn</td></tr>
 <tr><td>9</td><td>NCR/MRB</td><td>Đóng NCR nhưng không gắn hành động đào tạo/Level</td><td>Tái diễn, chi phí tăng</td><td>NCR lặp lỗi cùng nguyên nhân</td></tr>
-<tr><td>10</td><td>Ship</td><td>Release hàng khi thiếu bằng chứng năng lực tại gate</td><td>Ship sai, chargeback</td><td>Ship packet thiếu record</td></tr>
-<tr><td>11</td><td>Bonus</td><td>Map KPI gating mơ hồ, không có evidence</td><td>Thưởng theo cảm tính</td><td>Không truy xuất dữ liệu nguồn</td></tr>
-<tr><td>12</td><td>Training</td><td>OJT output tồn tại nhưng lưu sai nơi, không truy xuất</td><td>No evidence = fail audit</td><td>Không tìm thấy hồ sơ theo ID</td></tr>
+<tr><td>10</td><td>Ship</td><td>Phát hành hàng khi thiếu bằng chứng năng lực tại cổng kiểm soát</td><td>Ship sai, hoàn phí / bồi hoàn</td><td>bộ hồ sơ giao hàng thiếu hồ sơ</td></tr>
+<tr><td>11</td><td>Thưởng</td><td>Map Cơ chế chặn theo KPI mơ hồ, không có bằng chứng</td><td>Thưởng theo cảm tính</td><td>Không truy xuất nguồn gốc dữ liệu nguồn</td></tr>
+<tr><td>12</td><td>Training</td><td>OJT đầu ra tồn tại nhưng lưu sai nơi, không truy xuất nguồn gốc</td><td>No bằng chứng = fail đánh giá</td><td>Không tìm thấy hồ sơ theo ID</td></tr>
 </tbody>
 </table>
 <!-- ====== 5) Risk Controls ====== -->
-<h2>5) Risk Controls (control points; ai làm; bằng chứng; tối thiểu 6)</h2>
+<h2>5) Biện pháp kiểm soát rủi ro (điểm kiểm soát; ai làm; bằng chứng; tối thiểu 6)</h2>
 <table class="docx-table">
 <thead>
 <tr>
-<th>Control Point</th><th>Owner</th><th>Cách thực hiện</th><th>Bằng chứng/MRR</th><th>Tần suất</th>
+<th>Điểm kiểm soát</th><th>người chịu trách nhiệm</th><th>Cách thực hiện</th><th>Evidence/MRR</th><th>Tần suất</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><b>CP1 — Master Skill Matrix (phiên bản khóa)</b></td>
-<td>HR</td>
-<td>Duy trì 01 nguồn dữ liệu master; khóa chỉnh sửa; cập nhật theo workflow mục 8</td>
-<td>Phiên bản matrix + DCR record + danh sách quyền theo Level</td>
+<td><b>CP1 — Bản gốc ma trận kỹ năng (matrix) (phiên bản khóa)</b></td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phong Nhan su)"><span class="entity-code dept-code">D-HR</span></a></span></td>
+<td>Duy trì 01 nguồn dữ liệu chủ / gốc; khóa chỉnh sửa; cập nhật theo luồng công việc mục 8</td>
+<td>Phiên bản matrix + DCR hồ sơ + danh sách quyền theo Level</td>
 <td>Hằng tuần (ổn định) + theo sự kiện</td>
 </tr>
 <tr>
 <td><b>CP2 — Yêu cầu cập nhật Level bằng FRM-HR-TRN-007</b></td>
-<td>Supervisor</td>
-<td>Ghi rõ phạm vi kỹ năng, job minh chứng, điều kiện đạt, bằng chứng; nộp HR</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td>
+<td>Ghi rõ phạm vi kỹ năng, job minh chứng, điều kiện đạt, bằng chứng; nộp <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a></td>
 <td>FRM-HR-TRN-007 có ID + gói bằng chứng</td>
 <td>Mỗi lần nâng/giảm Level</td>
 </tr>
 <tr>
-<td><b>CP3 — Kiểm tra bằng chứng trước cập nhật (“No evidence = No gate”)</b></td>
-<td>QA/QMS</td>
-<td>Soát đủ OJT output + performance test + chữ ký xác nhận; đối chiếu role/level quyền hạn</td>
-<td>Checklist soát bằng chứng (đính kèm FRM-007)</td>
-<td>Mỗi request</td>
+<td><b>CP3 — Kiểm tra bằng chứng trước cập nhật ("không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)")</b></td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td>
+<td>Soát đủ OJT đầu ra + hiệu suất test + chữ ký xác nhận; đối chiếu vai trò/level quyền hạn</td>
+<td>Bảng kiểm soát bằng chứng (đính kèm <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a>)</td>
+<td>Mỗi yêu cầu</td>
 </tr>
 <tr>
-<td><b>CP4 — Bonus Map theo FRM-HR-TRN-011 (KPI gating)</b></td>
-<td>HR + OPS + QA</td>
-<td>Map Level → điều kiện KPI → mức thưởng; ghi rõ gate metric ID và nguồn dữ liệu</td>
+<td><b>CP4 — Thưởng Map theo FRM-HR-TRN-011 (Cơ chế chặn theo KPI)</b></td>
+<td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a> + OPS + <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></td>
+<td>Map Level → điều kiện KPI → mức thưởng; ghi rõ cổng kiểm soát chỉ số ID và nguồn dữ liệu</td>
 <td>FRM-HR-TRN-011 + phiên bản ban hành</td>
 <td>Hằng quý + theo thay đổi policy</td>
 </tr>
 <tr>
 <td><b>CP5 — Phân ca theo Level (chặn giao việc sai)</b></td>
-<td>Planner + Supervisor</td>
-<td>Trước ca, đối chiếu L_req của job/operation với L_cur từng người; ghi trên board ca</td>
-<td>Ảnh board ca + danh sách phân ca</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a><span class="entity-sep role-sep">+</span><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td>
+<td>Trước ca, đối chiếu L_req của job/vận hành với L_cur từng Người; ghi trên bảng ca</td>
+<td>Ảnh bảng ca + danh sách phân ca</td>
 <td>Mỗi ca</td>
 </tr>
 <tr>
-<td><b>CP6 — Audit Skill Matrix/Bonus Map (truy xuất 5 mẫu)</b></td>
-<td>QA/QMS</td>
-<td>Chọn 5 cập nhật gần nhất; truy xuất FRM-007, OJT output, nơi lưu; đối chiếu quyền thao tác</td>
-<td>Biên bản audit nội bộ + action log</td>
+<td><b>CP6 — Đánh giá ma trận kỹ năng (matrix)/Thưởng Map (truy xuất nguồn gốc 5 mẫu)</b></td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td>
+<td>Chọn 5 cập nhật Cần nhất; truy xuất nguồn gốc <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a>, OJT đầu ra, nơi lưu; đối chiếu quyền vận hành</td>
+<td>Biên bản đánh giá nội bộ + log hành động</td>
 <td>Hằng tháng</td>
 </tr>
 <tr>
 <td><b>CP7 — Liên kết NCR/MRB → đào tạo/Level</b></td>
-<td>QA + Supervisor</td>
-<td>Khi NCR có nguyên nhân thao tác/đo/duyệt, tạo hành động đào tạo bắt buộc và chặn quyền thao tác</td>
-<td>NCR record + hành động đào tạo + cập nhật matrix</td>
+<td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> + <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td>
+<td>Khi NCR có nguyên nhân vận hành/đo/duyệt, tạo hành động đào tạo bắt buộc và chặn quyền vận hành</td>
+<td>NCR hồ sơ + hành động đào tạo + cập nhật matrix</td>
 <td>Mỗi NCR liên quan</td>
 </tr>
 </tbody>
 </table>
 <!-- ====== 6) Fail-fast rules ====== -->
-<h2>6) Fail-fast rules (≥3) + tiêu chí STOP/HOLD/BLOCK</h2>
+<h2>6) Fail-nhanh quy tắc (≥3) + tiêu chí STOP/TẠM GIỮ/CHẶN</h2>
 <div class="card">
-<p style="margin:0 0 8px 0"><b>Định nghĩa:</b> STOP = dừng ngay vì rủi ro an toàn/thiệt hại máy; HOLD = giữ lại vì rủi ro chất lượng/traceability/đo; BLOCK = chặn qua gate/hệ thống vì thiếu bằng chứng hoặc sai phiên bản.</p>
+<p style="margin:0 0 8px 0"><b>Định nghĩa:</b> STOP = dừng ngay vì rủi ro an toàn/thiệt hại máy; TẠM GIỮ = giữ lại vì rủi ro chất lượng/truy xuất nguồn gốc/đo; CHẶN = chặn qua cổng kiểm soát/hệ thống vì thiếu bằng chứng hoặc sai phiên bản.</p>
 <ol style="margin:0 0 0 18px; line-height:1.9">
-<li><b>BLOCK-01 (No evidence):</b> Cập nhật Level khi thiếu FRM-HR-TRN-007 hoặc thiếu OJT output/performance test → HR không cập nhật; QA giữ trạng thái “Chưa đủ bằng chứng”.</li>
-<li><b>BLOCK-02 (Version mismatch):</b> Bonus map và Skill Matrix khác phiên bản ban hành → HR khóa chi trả thưởng cho kỳ đó; mở lại sau khi đồng bộ.</li>
-<li><b>HOLD-01 (Wrong signer):</b> QC/QA phát hiện chữ ký duyệt/đo không đúng Level → HOLD lô; mở điều tra; cập nhật quyền theo Level.</li>
-<li><b>HOLD-02 (Assignment mismatch):</b> Planner/Supervisor phát hiện phân ca sai Level → HOLD job/operation; đổi người đủ Level; ghi log.</li>
-<li><b>STOP-01 (Unsafe competence):</b> Thao tác nguy hiểm (LOTO, prove-out, nâng hạ) thực hiện bởi người không đủ Level → STOP, bàn giao cho người đủ quyền; EHS ghi nhận.</li>
+<li><b>CHẶN-01 (No bằng chứng):</b> Cập nhật Level khi thiếu FRM-HR-TRN-007 hoặc thiếu OJT đầu ra/hiệu suất test → <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a> không cập nhật; <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> giữ trạng thái "Chưa đủ bằng chứng".</li>
+<li><b>CHẶN-02 (Version không khớp):</b> Thưởng map và ma trận kỹ năng (matrix) khác phiên bản ban hành → <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a> khóa chi trả thưởng cho kỳ đó; mở lại sau khi đồng bộ.</li>
+<li><b>TẠM GIỮ-01 (Sai Người ký):</b> QC/QA phát hiện chữ ký duyệt/đo không đúng Level → TẠM GIỮ lô; mở điều tra; cập nhật quyền theo Level.</li>
+<li><b>TẠM GIỮ-02 (phân công không khớp):</b> <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span>/<span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> phát hiện phân ca sai Level → TẠM GIỮ job/vận hành; đổi Người đủ Level; ghi log.</li>
+<li><b>STOP-01 (không an toàn năng lực):</b> Vận hành nguy hiểm (LOTO, chứng minh-out, nâng hạ) thực hiện bởi Người không đủ Level → STOP, bàn giao cho Người đủ quyền; <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a> ghi nhận.</li>
 </ol>
 </div>
 <!-- ====== 7) 60-second reaction ====== -->
-<h2>7) Phản ứng 60 giây (sai Rev/mix-up/thiếu chứng từ/OOT gage/bypass gate/ship risk…)</h2>
+<h2>7) Phản ứng 60 giây (sai Rev/lẫn lộn/thiếu chứng từ/OOT gage/vượt qua cổng kiểm soát/rủi ro giao hàng…)</h2>
 <div class="card">
 <table class="docx-table">
 <thead>
 <tr>
-<th>Tình huống</th><th>60 giây đầu</th><th>Ai gọi</th><th>Bằng chứng tối thiểu</th>
+<th>Tình huống</th><th>60 giây đầu</th><th>Ai gọi</th><th>Evidence tối thiểu</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><b>Phân job sai Level</b></td>
-<td>HOLD operation → đổi người đủ Level → cập nhật board ca → tạo action log</td>
-<td>Planner/Supervisor</td>
-<td>Ảnh board trước/sau + action log</td>
+<td>TẠM GIỮ vận hành → đổi Người đủ Level → cập nhật bảng ca → tạo log hành động</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td>
+<td>Ảnh bảng trước/sau + log hành động</td>
 </tr>
 <tr>
 <td><b>Người ký duyệt sai Level</b></td>
-<td>HOLD lô → khoanh vùng vật lý → báo QA → dừng ship packet</td>
-<td>QC → QA</td>
-<td>Ảnh lô HOLD + record ký duyệt</td>
+<td>TẠM GIỮ lô → khoanh vùng vật lý → báo <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> → dừng bộ hồ sơ giao hàng</td>
+<td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a> → <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></td>
+<td>Ảnh lô TẠM GIỮ + hồ sơ ký duyệt</td>
 </tr>
 <tr>
-<td><b>Thiếu FRM-007 khi nâng Level</b></td>
-<td>BLOCK cập nhật → trả request → Supervisor tạo FRM-007 ngay</td>
-<td>HR → Supervisor</td>
-<td>Log trả request + ID FRM-007</td>
+<td><b>Thiếu <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a> khi nâng Level</b></td>
+<td>CHẶN cập nhật → trả yêu cầu → <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> tạo <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a> ngay</td>
+<td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a> → <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td>
+<td>Log trả yêu cầu + ID <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a></td>
 </tr>
 <tr>
-<td><b>Bonus map lệch phiên bản</b></td>
-<td>BLOCK chi trả → khóa file bonus map → họp 15 phút đồng bộ owner</td>
-<td>HR</td>
+<td><b>Thưởng map lệch phiên bản</b></td>
+<td>CHẶN chi trả → khóa file thưởng map → họp 15 phút đồng bộ người chịu trách nhiệm</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phong Nhan su)"><span class="entity-code dept-code">D-HR</span></a></span></td>
 <td>Thông báo khóa + phiên bản mới</td>
 </tr>
 <tr>
-<td><b>Ship risk do thiếu bằng chứng năng lực</b></td>
-<td>BLOCK ship release → bổ sung bằng chứng → QA xác nhận</td>
-<td>QA/Warehouse</td>
-<td>Ship packet + truy xuất matrix snapshot</td>
+<td><b>Rủi ro giao hàng do thiếu bằng chứng năng lực</b></td>
+<td>CHẶN phê duyệt giao hàng → bổ sung bằng chứng → <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> xác nhận</td>
+<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td>
+<td>bộ hồ sơ giao hàng + truy xuất nguồn gốc matrix Photos trạng thái</td>
 </tr>
 </tbody>
 </table>
 </div>
 <!-- ====== 8) Checklist <=15 ====== -->
-<h2>8) Checklist vận hành (≤ 15 bước) — Owner, Evidence/MRR, điểm sai hay gặp</h2>
+<h2>8) Bảng kiểm vận hành (≤ 15 bước) — người chịu trách nhiệm, Evidence/MRR, điểm sai hay gặp</h2>
 <table class="docx-table">
 <thead>
 <tr>
-<th>#</th><th>Bước</th><th>Owner</th><th>Evidence/MRR</th><th>Điểm sai hay gặp</th>
+<th>#</th><th>Bước</th><th>người chịu trách nhiệm</th><th>Evidence/MRR</th><th>Điểm sai hay gặp</th>
 </tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Chốt danh sách job/operation critical và L_req theo role</td><td>Planner + Supervisor</td><td>Board ca + job list</td><td>L_req không được ghi rõ theo công đoạn</td></tr>
-<tr><td>2</td><td>Đối chiếu L_cur từng người trước phân ca</td><td>Planner</td><td>Snapshot matrix (ngày/phiên bản)</td><td>Dùng bản cũ, không có ngày</td></tr>
-<tr><td>3</td><td>Gắn quyền thao tác: ai vận hành, ai setup, ai prove-out, ai đo, ai ký</td><td>Supervisor + QA/QC</td><td>Danh sách quyền theo Level</td><td>Quyền ghi chung chung, không có ranh giới</td></tr>
-<tr><td>4</td><td>Kích hoạt OJT cho người cần nâng Level, chốt OJT output</td><td>Supervisor</td><td>Kế hoạch OJT + output list</td><td>OJT không gắn job thật</td></tr>
-<tr><td>5</td><td>Thu bằng chứng OJT: checklist, ảnh, log ca, sản phẩm minh chứng</td><td>Trainee + Supervisor</td><td>Gói bằng chứng theo ID</td><td>Ảnh rời rạc, không truy xuất</td></tr>
-<tr><td>6</td><td>Thực hiện performance test theo module liên quan (khi có gate/thao tác/đo/duyệt)</td><td>Supervisor + QA/QC/EHS</td><td>Biên bản test + PASS/FAIL</td><td>Không có rubric, chỉ xác nhận miệng</td></tr>
-<tr><td>7</td><td>Tạo FRM-HR-TRN-007: phạm vi, job minh chứng, điều kiện đạt, rủi ro cập nhật sai</td><td>Supervisor</td><td>FRM-007 có ID</td><td>Thiếu phạm vi kỹ năng, thiếu job chứng minh</td></tr>
-<tr><td>8</td><td>Soát “No evidence = No gate” trước khi nộp HR</td><td>QA/QMS</td><td>Checklist soát bằng chứng</td><td>Thiếu nơi lưu, thiếu liên kết hồ sơ</td></tr>
-<tr><td>9</td><td>HR cập nhật master Skill Matrix theo request đã duyệt</td><td>HR</td><td>Matrix version + DCR record</td><td>Cập nhật trực tiếp không log thay đổi</td></tr>
-<tr><td>10</td><td>Thông báo thay đổi Level và ràng buộc quyền thao tác cho OPS/QC/QA/Planner</td><td>HR + Supervisor</td><td>Thông báo nội bộ + danh sách thay đổi</td><td>Thông báo không có phạm vi ảnh hưởng</td></tr>
-<tr><td>11</td><td>Cập nhật bonus map khi thay đổi Level req/KPI gate</td><td>HR + OPS + QA</td><td>FRM-HR-TRN-011 phiên bản mới</td><td>Gate metric ID không xác định</td></tr>
-<tr><td>12</td><td>Khóa phiên bản: lưu snapshot matrix/bonus map theo kỳ</td><td>HR + QA/QMS</td><td>Thư mục lưu snapshot</td><td>Snapshot bị ghi đè</td></tr>
-<tr><td>13</td><td>Kiểm tra hậu cập nhật: 01 ca chạy thử quyền (phân ca, ký duyệt)</td><td>Supervisor + QA/QC</td><td>Record kiểm tra hậu cập nhật</td><td>Không kiểm tra, lỗi xuất hiện ở ship</td></tr>
-<tr><td>14</td><td>Audit truy xuất 5 mẫu: request → bằng chứng → cập nhật → quyền</td><td>QA/QMS</td><td>Biên bản audit + action log</td><td>Không truy xuất được nơi lưu</td></tr>
-<tr><td>15</td><td>Đóng hành động: cập nhật chuẩn/đào tạo khi phát hiện lỗi hệ thống</td><td>Owner theo action log</td><td>Action closed evidence</td><td>Hành động quá hạn không escalations</td></tr>
+<tr><td>1</td><td>Chốt danh sách job/vận hành quan trọng / nghiêm trọng và L_req theo vai trò</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a><span class="entity-sep role-sep">+</span><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td><td>Bảng ca + job list</td><td>L_req không được ghi rõ theo công đoạn</td></tr>
+<tr><td>2</td><td>Đối chiếu L_cur từng Người trước phân ca</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span></td><td>Ảnh chụp trạng thái matrix (ngày/phiên bản)</td><td>Dùng bản cũ, không có ngày</td></tr>
+<tr><td>3</td><td>Gắn quyền vận hành: ai vận hành, ai setup, ai chứng minh-out, ai đo, ai ký</td><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td><td>Danh sách quyền theo Level</td><td>Quyền ghi chung chung, không có ranh giới</td></tr>
+<tr><td>4</td><td>Kích hoạt OJT cho Người cần nâng Level, chốt OJT đầu ra</td><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td><td>Kế hoạch OJT + đầu ra list</td><td>OJT không gắn job thật</td></tr>
+<tr><td>5</td><td>Thu bằng chứng OJT: bảng kiểm, ảnh, log ca, sản phẩm minh chứng</td><td>Học viên + <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td><td>Gói bằng chứng theo ID</td><td>Ảnh rời rạc, không truy xuất nguồn gốc</td></tr>
+<tr><td>6</td><td>Thực hiện hiệu suất test theo mô-đun liên quan (khi có cổng kiểm soát/vận hành/đo/duyệt)</td><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-ehs-handbook.html" title="EHS Department (Phong EHS)"><span class="entity-code dept-code">D-EHS</span></a></span></td><td>Biên bản test + ĐẠT/KHÔNG ĐẠT</td><td>Không có tiêu chí đánh giá, chỉ xác nhận miệng</td></tr>
+<tr><td>7</td><td>Tạo FRM-HR-TRN-007: phạm vi, job minh chứng, điều kiện đạt, rủi ro cập nhật sai</td><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td><td><a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a> có ID</td><td>Thiếu phạm vi kỹ năng, thiếu job chứng minh</td></tr>
+<tr><td>8</td><td>Soát "không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)" trước khi nộp <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>Bảng kiểm soát bằng chứng</td><td>Thiếu nơi lưu, thiếu liên kết hồ sơ</td></tr>
+<tr><td>9</td><td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a> cập nhật chủ / gốc ma trận kỹ năng (matrix) theo yêu cầu đã duyệt</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phong Nhan su)"><span class="entity-code dept-code">D-HR</span></a></span></td><td>Matrix version + DCR hồ sơ</td><td>Cập nhật trực tiếp không log thay đổi</td></tr>
+<tr><td>10</td><td>Thông báo thay đổi Level và ràng buộc quyền vận hành cho OPS/QC/QA/<span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span></td><td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a> + <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td><td>Thông báo nội bộ + danh sách thay đổi</td><td>Thông báo không có phạm vi ảnh hưởng</td></tr>
+<tr><td>11</td><td>Cập nhật thưởng map khi thay đổi Level req/KPI cổng kiểm soát</td><td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a> + OPS + <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></td><td>FRM-HR-TRN-011 phiên bản mới</td><td>Cổng kiểm soát chỉ số ID không xác định</td></tr>
+<tr><td>12</td><td>Khóa phiên bản: lưu Photos trạng thái matrix/thưởng map theo kỳ</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phong Nhan su)"><span class="entity-code dept-code">D-HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>Thư mục lưu Photos trạng thái</td><td>Ảnh chụp trạng thái bị ghi đè</td></tr>
+<tr><td>13</td><td>Kiểm tra hậu cập nhật: 01 ca chạy thử quyền (phân ca, ký duyệt)</td><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td><td>Hồ sơ kiểm tra hậu cập nhật</td><td>Không kiểm tra, lỗi xuất hiện ở ship</td></tr>
+<tr><td>14</td><td>Đánh giá truy xuất nguồn gốc 5 mẫu: yêu cầu → bằng chứng → cập nhật → quyền</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></td><td>Biên bản đánh giá + log hành động</td><td>Không truy xuất nguồn gốc được nơi lưu</td></tr>
+<tr><td>15</td><td>Đóng hành động: cập nhật chuẩn/đào tạo khi phát hiện lỗi hệ thống</td><td>người chịu trách nhiệm theo log hành động</td><td>Hành động closed bằng chứng</td><td>Hành động quá hạn không escalations</td></tr>
 </tbody>
 </table>
 <!-- ====== 9) OJT theo TWI ====== -->
 <h2>9) OJT thực chiến theo TWI</h2>
-<h3>9.1 Job breakdown (TWI) — “Tạo và duyệt 01 yêu cầu cập nhật Level (FRM-HR-TRN-007) kèm bằng chứng”</h3>
+<h3>9.1 Job sự cố hỏng máy (TWI) — "Tạo và duyệt 01 yêu cầu cập nhật Level (FRM-HR-TRN-007) kèm bằng chứng"</h3>
 <table class="docx-table">
 <thead>
-<tr><th>Step</th><th>Key Points (điểm then chốt)</th><th>Reasons (vì sao bắt buộc)</th></tr>
+<tr><th>Step</th><th>Điểm then chốt</th><th>Lý do (vì sao bắt buộc)</th></tr>
 </thead>
 <tbody>
 <tr>
 <td>1) Xác định phạm vi</td>
-<td>Ghi rõ role; máy/line; công đoạn; nhóm vật liệu/part family; ca; phạm vi kỹ năng</td>
+<td>Ghi rõ vai trò; máy/dòng / chuyền; công đoạn; nhóm vật liệu/part nhóm sản phẩm; ca; phạm vi kỹ năng</td>
 <td>Phạm vi mơ hồ làm cập nhật sai, cấp quyền sai</td>
 </tr>
 <tr>
 <td>2) Chọn job minh chứng</td>
 <td>Liệt kê Job/WO thật; chọn job có rủi ro cao nhất trong phạm vi</td>
-<td>Job thật tạo bằng chứng audit-ready</td>
+<td>Job thật tạo bằng chứng sẵn sàng đánh giá</td>
 </tr>
 <tr>
 <td>3) Chốt điều kiện đạt</td>
-<td>Gắn điều kiện với gate: thao tác, đo, duyệt, ship; ghi ngưỡng/tiêu chí</td>
-<td>Điều kiện không gắn gate làm “đạt” vô nghĩa</td>
+<td>Gắn điều kiện với cổng kiểm soát: vận hành, đo, duyệt, ship; ghi ngưỡng/tiêu chí</td>
+<td>Điều kiện không gắn cổng kiểm soát làm "đạt" vô nghĩa</td>
 </tr>
 <tr>
 <td>4) Thu bằng chứng</td>
-<td>OJT output đủ: checklist ký, ảnh, log ca, biên bản performance test, kết quả đo</td>
-<td>No evidence = No gate</td>
+<td>OJT đầu ra đủ: bảng kiểm ký, ảnh, log ca, biên bản hiệu suất test, kết quả đo</td>
+<td>không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</td>
 </tr>
 <tr>
 <td>5) Đánh giá rủi ro cập nhật sai</td>
-<td>Ghi FMEA-lite: lỗi nào xảy ra, hậu quả nào, điểm chặn nào</td>
-<td>Giữ kỷ luật fail-fast và trách nhiệm owner</td>
+<td>Ghi FMEA-rút gọn: lỗi nào xảy ra, hậu quả nào, điểm chặn nào</td>
+<td>Giữ kỷ luật fail-nhanh và trách nhiệm người chịu trách nhiệm</td>
 </tr>
 <tr>
 <td>6) Soát &amp; nộp</td>
-<td>QA/QMS soát đủ hồ sơ; HR nhận, cấp ID, lên lịch cập nhật</td>
+<td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> soát đủ hồ sơ; <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a> nhận, cấp ID, lên lịch cập nhật</td>
 <td>Đảm bảo kiểm soát thay đổi ISO 7.5</td>
 </tr>
 <tr>
 <td>7) Cập nhật &amp; thông báo</td>
-<td>HR cập nhật matrix master; khóa phiên bản; thông báo phạm vi ảnh hưởng</td>
+<td><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a> cập nhật matrix chủ / gốc; khóa phiên bản; thông báo phạm vi ảnh hưởng</td>
 <td>Ngăn dùng bản cũ và ngăn giao việc sai Level</td>
 </tr>
 </tbody>
 </table>
-<h3>9.2 OJT output (sản phẩm đầu ra bắt buộc)</h3>
+<h3>9.2 OJT đầu ra (sản phẩm đầu ra bắt buộc)</h3>
 <div class="card">
 <ul style="margin:0 0 0 18px; line-height:1.9">
-<li>01 bộ <b>FRM-HR-TRN-007</b> hoàn chỉnh, có phạm vi, job minh chứng, điều kiện đạt, FMEA-lite, chữ ký xác nhận.</li>
-<li>01 gói bằng chứng kèm theo: checklist OJT ký, ảnh, log ca, biên bản performance test, kết quả đo/duyệt liên quan.</li>
-<li>01 bản <b>snapshot Skill Matrix</b> trước/sau cập nhật (phiên bản + ngày) để truy xuất.</li>
-<li>01 record thông báo thay đổi quyền thao tác cho các owner liên quan (Planner/QC/QA/OPS).</li>
-<li>01 case “chặn giao việc sai Level” được ghi lại bằng action log (khi xảy ra).</li>
+<li>01 bộ <b>FRM-HR-TRN-007</b> hoàn chỉnh, có phạm vi, job minh chứng, điều kiện đạt, FMEA-rút gọn, chữ ký xác nhận.</li>
+<li>01 gói bằng chứng kèm theo: bảng kiểm OJT ký, ảnh, log ca, biên bản hiệu suất test, kết quả đo/duyệt liên quan.</li>
+<li>01 bản <b>Photos trạng thái Kỹ năng Matrix</b> trước/sau cập nhật (phiên bản + ngày) để truy xuất nguồn gốc.</li>
+<li>01 hồ sơ thông báo thay đổi quyền vận hành cho các người chịu trách nhiệm liên quan (<span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span>/QC/QA/OPS).</li>
+<li>01 tình huống "chặn giao việc sai Level" được ghi lại bằng log hành động (khi xảy ra).</li>
 </ul>
 </div>
-<h3>9.3 Rubric L1–L4 (hành vi quan sát được; điều kiện lên level; quyền hạn)</h3>
+<h3>9.3 Tiêu chí đánh giá L1–L4 (hành vi quan sát được; điều kiện lên level; quyền hạn)</h3>
 <table class="docx-table">
 <thead>
 <tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện lên level</th><th>Quyền hạn được cấp</th></tr>
@@ -426,158 +395,154 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><b>L1</b></td>
 <td>Hiểu ranh giới quyền; tra được L_cur của bản thân; nộp đúng bằng chứng theo hướng dẫn</td>
-<td>Hoàn thành quiz + tạo 01 hồ sơ minh chứng đúng nơi lưu</td>
-<td>Thực hiện thao tác trong phạm vi L1 dưới giám sát; không ký duyệt</td>
+<td>Hoàn thành bài kiểm tra nhanh + tạo 01 hồ sơ minh chứng đúng nơi lưu</td>
+<td>Thực hiện vận hành trong phạm vi L1 dưới giám sát; không ký duyệt</td>
 </tr>
 <tr>
 <td><b>L2</b></td>
-<td>Thực hiện OJT output đầy đủ; hiểu gate/handoff; không vượt quyền thao tác</td>
-<td>01 job minh chứng đạt; Supervisor xác nhận; MRR truy xuất được</td>
-<td>Được giao thao tác theo L2; được ghi nhận làm mentor phụ trong OJT</td>
+<td>Thực hiện OJT đầu ra đầy đủ; hiểu cổng kiểm soát/bàn giao; không vượt quyền vận hành</td>
+<td>01 job minh chứng đạt; <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> xác nhận; MRR truy xuất nguồn gốc được</td>
+<td>Được giao vận hành theo L2; được ghi nhận làm Người hướng dẫn phụ trong OJT</td>
 </tr>
 <tr>
 <td><b>L3</b></td>
-<td>Tạo và dẫn dắt 01 FRM-007 hoàn chỉnh; chặn 01 lỗi phân ca/ ký duyệt sai Level; đóng hành động</td>
-<td>Performance test PASS; QA/QMS soát “No evidence”; HR cập nhật phiên bản khóa</td>
-<td>Được giao quyền xác nhận OJT output; kích hoạt HOLD/BLOCK theo mục 6</td>
+<td>Tạo và dẫn dắt 01 <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a> hoàn chỉnh; chặn 01 lỗi phân ca/ ký duyệt sai Level; đóng hành động</td>
+<td>Hiệu suất test PASS; <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> soát "No bằng chứng"; <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a> cập nhật phiên bản khóa</td>
+<td>Được giao quyền xác nhận OJT đầu ra; kích hoạt TẠM GIỮ/CHẶN theo mục 6</td>
 </tr>
 <tr>
 <td><b>L4</b></td>
-<td>Vận hành hệ thống: đồng bộ bonus map; audit định kỳ; tối ưu KPI gating; giảm tái diễn lỗi năng lực</td>
-<td>02 chu kỳ audit không lỗi trọng yếu; action log đóng đúng hạn; không mismatch phiên bản</td>
+<td>Vận hành hệ thống: đồng bộ thưởng map; đánh giá định kỳ; tối ưu Cơ chế chặn theo KPI; giảm tái diễn lỗi năng lực</td>
+<td>02 chu kỳ đánh giá không lỗi trọng yếu; log hành động đóng đúng hạn; không không khớp phiên bản</td>
 <td>Draft</td>
 </tr>
 </tbody>
 </table>
 <!-- ====== 10) Đánh giá ====== -->
 <h2>10) Đánh giá</h2>
-<h3>10.1 Quiz (≥20 câu) — trắc nghiệm + tình huống ngắn</h3>
+<h3>10.1 Bài kiểm tra nhanh (≥20 câu) — trắc Nhiệm + tình huống ngắn</h3>
 <ol style="line-height:1.9; margin:0 0 0 18px">
-<li>Skill Matrix được dùng như “cổng” tại bước nào trong E2E?</li>
-<li>Định nghĩa “No evidence = No gate” trong cập nhật Level là gì?</li>
-<li>FRM-HR-TRN-007 dùng để làm gì và owner là ai?</li>
+<li>ma trận kỹ năng (matrix) được dùng như "cổng" tại bước nào trong E2E?</li>
+<li>Định nghĩa "không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)" trong cập nhật Level là gì?</li>
+<li>FRM-HR-TRN-007 dùng để làm gì và người chịu trách nhiệm là ai?</li>
 <li>FRM-HR-TRN-011 dùng để làm gì và khi nào bắt buộc cập nhật?</li>
-<li>Khi Planner phân job sai Level, quyết định fail-fast là gì?</li>
-<li>Khi QC phát hiện người ký duyệt không đủ Level, quyết định là gì?</li>
-<li>5 thành phần tối thiểu của gói bằng chứng kèm FRM-007 là gì?</li>
-<li>Vì sao cần snapshot Skill Matrix trước/sau cập nhật?</li>
+<li>Khi <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span> phân job sai Level, quyết định fail-nhanh là gì?</li>
+<li>Khi <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a> phát hiện Người ký duyệt không đủ Level, quyết định là gì?</li>
+<li>5 thành phần tối thiểu của gói bằng chứng kèm <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a> là gì?</li>
+<li>Vì sao cần Photos trạng thái ma trận kỹ năng (matrix) trước/sau cập nhật?</li>
 <li>Điểm gãy nào tạo rủi ro ship sai do thiếu bằng chứng năng lực?</li>
-<li>Vì sao bonus map phải có gate metric ID và nguồn dữ liệu?</li>
-<li>Ai chịu trách nhiệm khóa phiên bản master Skill Matrix?</li>
-<li>Ai chịu trách nhiệm audit truy xuất 5 mẫu cập nhật gần nhất?</li>
-<li>Khi NCR có nguyên nhân thao tác, hành động bắt buộc trong Skill Matrix là gì?</li>
-<li>Khác biệt giữa HOLD và BLOCK trong bối cảnh Skill Matrix là gì?</li>
-<li>Khi bonus map và Skill Matrix lệch phiên bản, hành động xử lý là gì?</li>
+<li>Vì sao thưởng map phải có cổng kiểm soát chỉ số ID và nguồn dữ liệu?</li>
+<li>Ai chịu trách nhiệm khóa phiên bản chủ / gốc ma trận kỹ năng (matrix)?</li>
+<li>Ai chịu trách nhiệm đánh giá truy xuất nguồn gốc 5 mẫu cập nhật Cần nhất?</li>
+<li>Khi NCR có nguyên nhân vận hành, hành động bắt buộc trong ma trận kỹ năng (matrix) là gì?</li>
+<li>Khác biệt giữa TẠM GIỮ và CHẶN trong bối cảnh ma trận kỹ năng (matrix) là gì?</li>
+<li>Khi thưởng map và ma trận kỹ năng (matrix) lệch phiên bản, hành động xử lý là gì?</li>
 <li>Điểm kiểm soát nào ngăn việc cập nhật trực tiếp không log?</li>
-<li>Trong FRM-007, phần “rủi ro khi cập nhật sai” dùng để chặn điều gì?</li>
-<li>Khi role liên quan thao tác nguy hiểm, EHS xác nhận nội dung nào?</li>
-<li>Điều kiện tối thiểu để công nhận L3 trong module này là gì?</li>
-<li>Khi hồ sơ OJT tồn tại nhưng không truy xuất được, trạng thái gate là gì?</li>
+<li>Trong <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a>, phần "rủi ro khi cập nhật sai" dùng để chặn điều gì?</li>
+<li>Khi vai trò liên quan vận hành nguy hiểm, <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyen vien EHS)"><span class="entity-code role-code">EHS</span></a> xác nhận nội dung nào?</li>
+<li>Điều kiện tối thiểu để công nhận L3 trong mô-đun này là gì?</li>
+<li>Khi hồ sơ OJT tồn tại nhưng không truy xuất nguồn gốc được, trạng thái cổng kiểm soát là gì?</li>
 </ol>
-<h3>10.2 Scenario (≥3 tình huống thật) — có dữ kiện; quyết định HOLD/GO và ghi MRR</h3>
+<h3>10.2 Tình huống (≥3 tình huống thật) — có dữ kiện; quyết định TẠM GIỮ/GO và ghi MRR</h3>
 <div class="card">
 <ol style="line-height:1.9; margin:0 0 0 18px">
 <li>
-<b>Scenario 1 — Phân ca sai Level:</b><br/>
- Dữ kiện: job prove-out máy mới yêu cầu Setup L3; board ca ghi Setup L2; Supervisor vắng 10 phút đầu ca.<br/>
- Yêu cầu: quyết định <b>HOLD/GO</b>; liệt kê 60 giây đầu; ghi MRR cần tạo; owner đóng hành động.
+<b>Tình huống 1 — Phân ca sai Level:</b><br>
+ Dữ kiện: job chứng minh-out máy mới yêu cầu Setup L3; bảng ca ghi Setup L2; <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> vắng 10 phút đầu ca.<br>
+ Yêu cầu: quyết định <b>TẠM GIỮ/GO</b>; liệt kê 60 giây đầu; ghi MRR cần tạo; người chịu trách nhiệm đóng hành động.
  </li>
 <li>
-<b>Scenario 2 — Nâng Level không có bằng chứng:</b><br/>
- Dữ kiện: Supervisor muốn nâng Operator từ L1 lên L2 để kịp giao hàng; chỉ có 01 ngày làm việc; không có performance test và không có job minh chứng.<br/>
- Yêu cầu: quyết định <b>BLOCK/GO</b>; chỉ rõ điểm chặn; nêu MRR bắt buộc trong FRM-007; cách lập kế hoạch OJT 2 ngày/tuần.
+<b>Tình huống 2 — Nâng Level không có bằng chứng:</b><br>
+ Dữ kiện: <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> muốn nâng Operator từ L1 lên L2 để kịp giao hàng; chỉ có 01 Ngày làm việc; không có hiệu suất test và không có job minh chứng.<br>
+ Yêu cầu: quyết định <b>CHẶN/GO</b>; chỉ rõ điểm chặn; nêu MRR bắt buộc trong <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a>; cách lập kế hoạch OJT 2 ngày/tuần.
  </li>
 <li>
-<b>Scenario 3 — Bonus map lệch phiên bản:</b><br/>
- Dữ kiện: kỳ thưởng tháng này dùng bonus map phiên bản 2026-01; Skill Matrix cập nhật phiên bản 2026-02; có 3 người vừa nâng Level tuần này.<br/>
- Yêu cầu: quyết định <b>HOLD/BLOCK</b> chi trả; ghi MRR cần tạo; cách đồng bộ phiên bản và lưu snapshot.
+<b>Tình huống 3 — Thưởng map lệch phiên bản:</b><br>
+ Dữ kiện: kỳ thưởng tháng này dùng thưởng map phiên bản 2026-01; ma trận kỹ năng (matrix) cập nhật phiên bản 2026-02; có 3 Người vừa nâng Level tuần này.<br>
+ Yêu cầu: quyết định <b>TẠM GIỮ/CHẶN</b> chi trả; ghi MRR cần tạo; cách đồng bộ phiên bản và lưu Photos trạng thái.
  </li>
 </ol>
 </div>
-<h3>10.3 Performance test (bắt buộc) — mô tả bài test + rubric + PASS/FAIL</h3>
+<h3>10.3 Hiệu suất test (bắt buộc) — mô tả bài test + tiêu chí đánh giá + ĐẠT/KHÔNG ĐẠT</h3>
 <div class="card">
-<p style="margin:0 0 10px 0"><b>Bài test:</b> Trong 45 phút, ứng viên (Supervisor/QA/HR role liên quan) dẫn dắt 01 case cập nhật Level: tạo FRM-007 hoàn chỉnh, kiểm tra gói bằng chứng, áp dụng 01 fail-fast (HOLD/BLOCK) khi phát hiện thiếu bằng chứng, cập nhật snapshot và thông báo thay đổi quyền thao tác.</p>
+<p style="margin:0 0 10px 0"><b>Bài test:</b> Trong 45 phút, ứng viên (<span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span>/QA + <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a> vai trò liên quan) dẫn dắt 01 tình huống cập nhật Level: tạo <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a> hoàn chỉnh, kiểm tra gói bằng chứng, áp dụng 01 fail-nhanh (TẠM GIỮ/CHẶN) khi phát hiện thiếu bằng chứng, cập nhật Photos trạng thái và thông báo thay đổi quyền vận hành.</p>
 <table class="docx-table">
 <thead>
 <tr><th>Tiêu chí</th><th>PASS</th><th>FAIL</th></tr>
 </thead>
 <tbody>
-<tr><td>Độ đầy đủ FRM-007</td><td>Đủ phạm vi + job minh chứng + điều kiện đạt + rủi ro + chữ ký</td><td>Thiếu phạm vi/thiếu job/thiếu rủi ro</td></tr>
-<tr><td>Soát bằng chứng</td><td>Truy xuất được 100% hồ sơ theo ID, đúng nơi lưu</td><td>Không truy xuất được hoặc hồ sơ rời rạc</td></tr>
-<tr><td>Fail-fast</td><td>Ra BLOCK/HOLD đúng tiêu chí, có ghi log và action</td><td>Cho qua khi thiếu bằng chứng</td></tr>
-<tr><td>Kiểm soát phiên bản</td><td>Draft</td><td>Cập nhật không log hoặc snapshot bị ghi đè</td></tr>
-<tr><td>Liên kết bonus map</td><td>Đối chiếu phiên bản; xử lý mismatch đúng mục 6</td><td>Không kiểm tra, để lệch phiên bản</td></tr>Draft</tbody>
+<tr><td>Độ đầy đủ <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a></td><td>Đủ phạm vi + job minh chứng + điều kiện đạt + rủi ro + chữ ký</td><td>Thiếu phạm vi/thiếu job/thiếu rủi ro</td></tr>
+<tr><td>Soát bằng chứng</td><td>Truy xuất nguồn gốc được 100% hồ sơ theo ID, đúng nơi lưu</td><td>Không truy xuất nguồn gốc được hoặc hồ sơ rời rạc</td></tr>
+<tr><td>Fail-nhanh</td><td>Ra CHẶN/TẠM GIỮ đúng tiêu chí, có ghi log và hành động</td><td>Cho qua khi thiếu bằng chứng</td></tr>
+<tr><td>Kiểm soát phiên bản</td><td>Draft</td><td>Cập nhật không log hoặc Photos trạng thái bị ghi đè</td></tr>
+<tr><td>Liên kết thưởng map</td><td>Đối chiếu phiên bản; xử lý không khớp đúng mục 6</td><td>Không kiểm tra, để lệch phiên bản</td></tr>Draft</tbody>
 </table>
 </div>
 <!-- ====== 11) PASS/FAIL ====== -->
-<h2>11) PASS/FAIL criteria (No evidence = No gate)</h2>
+<h2>11) ĐẠT/KHÔNG ĐẠT tiêu chí (Không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate)</h2>
 <div class="card">
 <ul style="margin:0 0 0 18px; line-height:1.9">
-<li><b>PASS:</b> Quiz ≥ 80% • Scenario quyết định đúng và ghi đủ MRR • Performance test PASS toàn bộ tiêu chí.</li>
-<li><b>FAIL:</b> Bất kỳ cập nhật Level không có FRM-007 • Bất kỳ trường hợp “cho qua” khi thiếu bằng chứng • Bất kỳ mismatch phiên bản matrix/bonus map không xử lý.</li>
-<li><b>Gate statement:</b> No evidence = No gate. Không có bằng chứng thì không có quyền thao tác, không có cập nhật Level, không có ship release, không có chi trả thưởng theo Level.</li>
+<li><b>PASS:</b> Bài kiểm tra nhanh ≥ 80% • Tình huống quyết định đúng và ghi đủ MRR • Hiệu suất test PASS toàn bộ tiêu chí.</li>
+<li><b>FAIL:</b> Bất kỳ cập nhật Level không có <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a> • Bất kỳ trường hợp "cho qua" khi thiếu bằng chứng • Bất kỳ không khớp phiên bản matrix/thưởng map không xử lý.</li>
+<li><b>Cổng kiểm soát báo cáo / tuyên bố:</b> không có bằng chứng thì không qua cổng kiểm soát (No bằng chứng = No gate). Không có bằng chứng thì không có quyền vận hành, không có cập nhật Level, không có phê duyệt giao hàng, không có chi trả thưởng theo Level.</li>
 </ul>
 </div>
 <!-- ====== 12) MRR tối thiểu ====== -->
 <h2>12) MRR tối thiểu</h2>
 <h3>12.1 Danh sách hồ sơ cần tạo/đính kèm</h3>
 <ul style="line-height:1.9; margin:0 0 0 18px">
-<li>FRM-HR-TRN-007 — Skill Matrix Update Request (ID duy nhất)</li>
-<li>Gói bằng chứng OJT: checklist ký, ảnh, log ca, sản phẩm minh chứng, biên bản performance test</li>
-<li>Snapshot Skill Matrix trước/sau cập nhật (phiên bản + ngày)</li>
-<li>FRM-HR-TRN-011 — Skill Matrix Bonus Map (phiên bản khóa theo kỳ)</li>
-<li>Thông báo thay đổi quyền thao tác (phạm vi ảnh hưởng)</li>
-<li>Biên bản audit truy xuất 5 mẫu + action log</li>
+<li>FRM-HR-TRN-007 — ma trận kỹ năng (matrix) Cập nhật Yêu cầu (ID duy nhất)</li>
+<li>Gói bằng chứng OJT: bảng kiểm ký, ảnh, log ca, sản phẩm minh chứng, biên bản hiệu suất test</li>
+<li>Ảnh chụp trạng thái ma trận kỹ năng (matrix) trước/sau cập nhật (phiên bản + ngày)</li>
+<li>FRM-HR-TRN-011 — ma trận kỹ năng (matrix) Thưởng Map (phiên bản khóa theo kỳ)</li>
+<li>Thông báo thay đổi quyền vận hành (phạm vi ảnh hưởng)</li>
+<li>Biên bản đánh giá truy xuất nguồn gốc 5 mẫu + log hành động</li>
 <li>Liên kết NCR/MRB → hành động đào tạo/Level (khi có)</li>
 </ul>
 <h3>12.2 Tên chuẩn &amp; quy tắc đặt tên</h3>
 <div class="card">
 <ul style="margin:0 0 0 18px; line-height:1.9">
-<li><b>FRM-007:</b> <code>FRM-HR-TRN-007_[YYYYMMDD]_[DEPT]_[EMPID]_[ROLE]_[Lfrom-Lto]_[SEQ]</code></li>
-<li><b>Evidence pack:</b> <code>EVD_TRN-OPS-03_[FRM007-ID]_[ITEM]_[SEQ]</code></li>
-<li><b>Snapshot matrix:</b> <code>SKM_SNAPSHOT_[YYYYMMDD]_V[Major.Minor]</code></li>
-<li><b>Bonus map:</b> <code>FRM-HR-TRN-011_[YYYYMM]_V[Major.Minor]</code></li>
+<li><b><a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a>:</b> <code>FRM-HR-TRN-007_[YYYYMMDD]_[DEPT]_[mã nhân viên (EMPID)]_[VAI TRÒ]_[từ (Lfrom)-Lto]_[SEQ]</code></li>
+<li><b>Bộ bằng chứng:</b> <code>EVD_TRN-OPS-03_[FRM007-ID]_[ITEM]_[SEQ]</code></li>
+<li><b>Ảnh chụp trạng thái matrix:</b> <code>SKM_SNAPSHOT_[YYYYMMDD]_V[Lớn / Nghiêm trọng.Nhỏ / Không nghiêm trọng]</code></li>
+<li><b>Thưởng map:</b> <code>FRM-HR-TRN-011_[YYYYMM]_V[Lớn / Nghiêm trọng.Nhỏ / Không nghiêm trọng]</code></li>
 </ul>
 </div>
-<h3>12.3 Nơi lưu (SharePoint library/list/path)</h3>
+<h3>12.3 Nơi lưu (SharePoint thư viện/list/path)</h3>
 <div class="card">
 <ul style="margin:0 0 0 18px; line-height:1.9">
-<li>Master Skill Matrix (read-only): <b>M365/SharePoint → HESEM-QMS-SSOT</b></li>
-<li>FRM-007 request library: <b>M365/SharePoint → HESEM-QMS-SSOT</b></li>
-<li>Evidence pack (ảnh/checklist/log): <b>M365/SharePoint → HESEM-QMS-SSOT</b></li>
-<li>Bonus map library: <b>M365/SharePoint → HESEM-QMS-SSOT</b></li>
-<li>Audit records library: <b>M365/SharePoint → HESEM-QMS-SSOT</b></li>
+<li>Bản gốc Kỹ năng Matrix (đọc-chỉ / duy nhất): <b>M365/SharePoint → HESEM-QMS-SSOT</b></li>
+<li><a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a> Requests thư viện: <b>M365/SharePoint → HESEM-QMS-SSOT</b></li>
+<li>Bộ bằng chứng (ảnh/bảng kiểm/log): <b>M365/SharePoint → HESEM-QMS-SSOT</b></li>
+<li>Thưởng map thư viện: <b>M365/SharePoint → HESEM-QMS-SSOT</b></li>
+<li>Đánh giá hồ sơ thư viện: <b>M365/SharePoint → HESEM-QMS-SSOT</b></li>
 </ul>
 </div>
 <!-- ====== 13) Common audit findings ====== -->
-<h2>13) Common audit findings &amp; prevention (≥8 lỗi audit hay gặp)</h2>
+<h2>13) Chung đánh giá phát hiện &amp; phòng ngừa (≥8 lỗi đánh giá hay gặp)</h2>
 <table class="docx-table">
 <thead>
-<tr><th>#</th><th>Lỗi audit hay gặp</th><th>Chặn phòng ngừa bắt buộc</th></tr>
+<tr><th>#</th><th>Lỗi đánh giá hay gặp</th><th>Chặn phòng ngừa bắt buộc</th></tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Cập nhật Level không có FRM-007</td><td>CP2 + BLOCK-01; HR không cập nhật khi thiếu ID</td></tr>
-<tr><td>2</td><td>Không truy xuất được bằng chứng OJT/performance test</td><td>Quy tắc đặt tên + nơi lưu; QA audit truy xuất 5 mẫu</td></tr>
-<tr><td>3</td><td>Bonus map không có gate metric ID / nguồn dữ liệu</td><td>CP4 bắt buộc; thiếu là BLOCK chi trả kỳ đó</td></tr>
-<tr><td>4</td><td>Matrix/bonus map lệch phiên bản, không có snapshot theo kỳ</td><td>CP1/CP4/CP12; khóa phiên bản và lưu snapshot</td></tr>
-<tr><td>5</td><td>Phân ca không đối chiếu Level</td><td>CP5; ảnh board ca bắt buộc; sai là HOLD operation</td></tr>
-<tr><td>6</td><td>Người ký duyệt không đủ Level</td><td>Danh sách quyền theo Level; HOLD lô; cập nhật quyền</td></tr>
-<tr><td>7</td><td>NCR/MRB đóng mà không có hành động đào tạo/Level</td><td>CP7; BLOCK đóng NCR khi thiếu hành động năng lực</td></tr>
-<tr><td>8</td><td>File Skill Matrix bị sửa không log (thiếu kiểm soát thay đổi)</td><td>Khóa chỉnh sửa; DCR record; QA kiểm tra dấu vết</td></tr>
-<tr><td>9</td><td>Request FRM-007 thiếu phạm vi kỹ năng/job minh chứng</td><td>Job breakdown mục 9.1; QA trả request ngay</td></tr>
+<tr><td>1</td><td>Cập nhật Level không có <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a></td><td>CP2 + CHẶN-01; <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a> không cập nhật khi thiếu ID</td></tr>
+<tr><td>2</td><td>Không truy xuất nguồn gốc được bằng chứng OJT/hiệu suất test</td><td>Quy tắc đặt tên + nơi lưu; <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> đánh giá truy xuất nguồn gốc 5 mẫu</td></tr>
+<tr><td>3</td><td>Thưởng map không có cổng kiểm soát chỉ số ID / nguồn dữ liệu</td><td>CP4 bắt buộc; thiếu là CHẶN chi trả kỳ đó</td></tr>
+<tr><td>4</td><td>Matrix/thưởng map lệch phiên bản, không có Photos trạng thái theo kỳ</td><td>CP1/CP4/CP12; khóa phiên bản và lưu Photos trạng thái</td></tr>
+<tr><td>5</td><td>Phân ca không đối chiếu Level</td><td>CP5; ảnh bảng ca bắt buộc; sai là TẠM GIỮ vận hành</td></tr>
+<tr><td>6</td><td>Người ký duyệt không đủ Level</td><td>Danh sách quyền theo Level; TẠM GIỮ lô; cập nhật quyền</td></tr>
+<tr><td>7</td><td>NCR/MRB đóng mà không có hành động đào tạo/Level</td><td>CP7; CHẶN đóng NCR khi thiếu hành động năng lực</td></tr>
+<tr><td>8</td><td>File ma trận kỹ năng (matrix) bị sửa không log (thiếu kiểm soát thay đổi)</td><td>Khóa chỉnh sửa; DCR hồ sơ; <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> kiểm tra dấu vết</td></tr>
+<tr><td>9</td><td>Yêu cầu <a href="../../../04-Bieu-Mau/08-FRM-800/FRM-807_Skills_Matrix.xlsx">FRM-007</a> thiếu phạm vi kỹ năng/job minh chứng</td><td>Job sự cố hỏng máy mục 9.1; <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> trả yêu cầu ngay</td></tr>
 </tbody>
 </table>
 <!-- ====== 14) DCR record ====== -->
 </div><!-- /doc-content -->
-</div><!-- /page-body -->
-</div><!-- /page -->
-</div><!-- /container -->
+<!-- /page-body -->
+<!-- /page -->
+<!-- /container -->
 <!-- ====== DOC-CONTROL (tách rời) ====== -->
 <script src="../../../assets/app.js"></script>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
-</body>
-</html>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
 
-
-
-
+</div>

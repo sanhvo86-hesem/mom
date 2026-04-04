@@ -1,120 +1,534 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ANNEX-QMS-990 — Hệ thống điều hướng QMS, vận hành và đào tạo | HESEM QMS</title>
-<link href="../assets/style.css" rel="stylesheet"/>
-<style>
-
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0;}
-.metric-card{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);}
-.metric-card .value{font-weight:800;font-size:18px;color:var(--navy);margin:6px 0;}
-.metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);font-weight:700}
-.link-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0;}
-.link-card{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);}
-.link-card h3{font-size:14px;color:var(--navy);margin:0 0 8px;}
-.link-card p{margin:0 0 10px;font-size:12px;color:var(--ink2);}
-.link-list{list-style:none;margin:0;padding:0}
-.link-list li{padding:4px 0 4px 0;font-size:12px}
-.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
-.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
-.tight{margin:0;padding-left:18px}
-.tight li{margin:4px 0}
-.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg2);margin:18px 0 24px;}
-.toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
-.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
-.toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);}
-.hero{border:1px solid var(--ln);border-radius:var(--r-lg);padding:18px 20px;background:linear-gradient(135deg,#f8fbff 0%,#fffaf0 100%);margin:0 0 18px;}
-.hero h1{font-size:22px;line-height:1.35;color:var(--navy);margin:0 0 8px}
-.hero p{font-size:13px;color:var(--ink2);margin:0}
-.mini-note{font-size:12px;color:var(--ink2);line-height:1.6}
-.chip{display:inline-flex;padding:3px 10px;border-radius:999px;border:1px solid var(--ln);background:var(--bg2);font-size:11px;font-weight:600;margin-right:6px;margin-bottom:6px;}
-.legend-box{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
-.legend-box .chip{margin:0}
-.svg-wrap{overflow:auto;border:1px solid var(--ln);border-radius:var(--r);background:#fff;padding:12px}
-.notice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:12px 0}
-.notice-item{padding:10px 12px;border:1px solid var(--ln);border-left:4px solid var(--blue);border-radius:var(--r-sm);background:var(--bg);font-size:12px}
-.small{font-size:12px}
-.footer-note{margin-top:18px;padding:12px 14px;border-top:1px solid var(--ln);font-size:12px;color:var(--ink2)}
-@media (max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}}
-
-
-</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HESEM QMS Gateway | ANNEX-50490</title>
+<meta name="description" content="HESEM QMS gateway for controlled documents, CNC operations, forms, and training.">
+<link rel="stylesheet" href="./styles/gateway-landing.css">
 </head>
 <body>
-<div class="container">
-  <div class="page">
-    <div class="page-body">
-      <div class="form-header">
-        <div class="fh-left">
-          <a class="brand-logo" href="portal.html"><img alt="HESEM Logo" src="../assets/hesem-logo.svg"/></a>
-          <div class="fh-company">
-            <a href="portal.html">HESEM ENGINEERING</a>
-            <span>Cổng điều hướng hệ thống</span>
+<div class="page-shell">
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-copy" data-reveal>
+        <div class="hero-topbar">
+          <a class="brand-lockup" href="portal.html" aria-label="HESEM QMS Portal">
+            <img src="../assets/hesem-logo.svg" alt="HESEM Engineering">
+            <span class="brand-text">
+              <strong>HESEM Engineering</strong>
+              <span>Quality Management System</span>
+            </span>
+          </a>
+          <nav class="hero-nav" aria-label="Section navigation">
+            <a href="#lan-truy-cap">Làn truy cập</a>
+            <a href="#gate-flow">Gate flow</a>
+            <a href="#theo-vai-tro">Theo vai trò</a>
+            <a href="#governance">Governance</a>
+          </nav>
+        </div>
+
+        <span class="eyebrow">ANNEX-50490 • Hệ thống điều hướng QMS</span>
+        <h1>HESEM QMS</h1>
+        <p class="hero-statement">Điểm vào chuẩn cho tài liệu kiểm soát, vận hành CNC job order và đào tạo năng lực.</p>
+        <p class="hero-lead">Truy cập đúng phiên bản đang hiệu lực, mở đúng biểu mẫu, và dẫn người vận hành tới đúng bước xử lý từ tiếp nhận đơn hàng đến giao hàng. Mọi tuyến điều hướng trên trang này đều bám theo nguồn chuẩn đang được công bố trong hệ thống.</p>
+
+        <div class="hero-actions">
+          <a class="button-primary" href="portal.html">Vào Portal</a>
+          <a class="button-secondary" href="../03-Tai-Lieu-Van-Hanh/01-SOPs/index.html">Mở SOP &amp; WI</a>
+          <a class="button-secondary" href="../10-Training-Academy/index.html">Xem Training</a>
+        </div>
+
+        <ul class="hero-promise" aria-label="Core principles">
+          <li>Đúng quyền truy cập</li>
+          <li>Đúng bản đang hiệu lực</li>
+          <li>Đúng dấu vết vận hành</li>
+        </ul>
+
+        <div class="hero-metrics" aria-label="Portal highlights">
+          <div class="metric">
+            <strong>300+</strong>
+            <span>Tài liệu kiểm soát</span>
+          </div>
+          <div class="metric">
+            <strong>7</strong>
+            <span>Chặng kiểm soát chính</span>
+          </div>
+          <div class="metric">
+            <strong>19×4</strong>
+            <span>Ma trận năng lực</span>
+          </div>
+          <div class="metric">
+            <strong>24/7</strong>
+            <span>Dự phòng và fallback kit</span>
           </div>
         </div>
-        <div class="title">
-          <strong>ANNEX-QMS-990 — Hệ thống điều hướng QMS, vận hành và đào tạo</strong>
-          <span class="sub-vn">Điểm vào chuẩn cho portal, thư viện hệ thống, tài liệu vận hành, biểu mẫu và đào tạo</span>
-        </div>
-        <div class="meta">
-          <div class="row"><span><b>Mã:</b></span><span>ANNEX-QMS-990</span></div>
-          <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-          <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-          <div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS Manager / IT Administrator</span></div>
-          <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
-        </div>
       </div>
-      <div class="doc-content" id="docContent">
-        <div class="form-sheet">
 
-<div class="hero">
-  <h1>Điểm vào chuẩn cho bộ tài liệu QMS, vận hành và đào tạo</h1>
-  <p>Trang này là <b>entry page điều hướng</b> để người dùng mới, auditor, trưởng bộ phận và deputy vào đúng thư viện ngay từ đầu. Điểm truy cập làm việc hằng ngày vẫn là <a href="portal.html">HESEM Portal</a>; trang này dùng để định hướng, rà soát cấu trúc hệ thống và truy cập nhanh khi cần kiểm tra liên kết chéo.</p>
-</div>
-<div class="note"><b>Nguyên tắc dùng hệ thống</b><br/>Luôn ưu tiên nguồn đang hiệu lực tại library chính. Không dùng bản copy ngoài luồng, không dùng file đính kèm trong email làm nguồn chuẩn và không dùng trang index cũ để suy luận authority nếu đã có handbook, JD và ANNEX active mới hơn.</div>
+      <div class="hero-stage" data-reveal>
+        <div class="hero-stage-shell" aria-hidden="true">
+          <svg class="stage-map" viewBox="0 0 620 620" role="presentation">
+            <defs>
+              <linearGradient id="routeGradient" x1="0%" x2="100%" y1="0%" y2="100%">
+                <stop offset="0%" stop-color="#f1d49b"></stop>
+                <stop offset="45%" stop-color="#c89432"></stop>
+                <stop offset="100%" stop-color="#ffffff"></stop>
+              </linearGradient>
+            </defs>
+            <circle class="ring outer" cx="310" cy="310" r="248"></circle>
+            <circle class="ring inner" cx="310" cy="310" r="214"></circle>
+            <circle class="ring inner" cx="310" cy="310" r="162"></circle>
+            <path class="grid-line" d="M310 30v560"></path>
+            <path class="grid-line" d="M30 310h560"></path>
+            <path class="route" d="M310 92 C424 98 522 182 545 292 C570 404 501 510 395 548 C285 587 161 548 103 451 C42 348 61 210 158 129 C229 69 278 66 310 92"></path>
+            <circle class="pulse" cx="310" cy="92" r="28"></circle>
+            <circle class="pulse" cx="482" cy="162" r="28" style="animation-delay:.4s"></circle>
+            <circle class="pulse" cx="545" cy="292" r="28" style="animation-delay:.8s"></circle>
+            <circle class="pulse" cx="482" cy="462" r="28" style="animation-delay:1.2s"></circle>
+            <circle class="pulse" cx="310" cy="548" r="28" style="animation-delay:1.6s"></circle>
+            <circle class="pulse" cx="140" cy="462" r="28" style="animation-delay:2s"></circle>
+            <circle class="pulse" cx="92" cy="310" r="28" style="animation-delay:2.4s"></circle>
 
-<div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#p1">1. Vai trò của trang này</a><a href="#p2">2. Toàn cảnh thư viện</a><a href="#p3">3. Đi đúng nơi theo nhu cầu</a><a href="#p4">4. Bộ tài liệu vừa được đồng bộ</a><a href="#p5">5. Khi portal/app gặp sự cố</a><a href="#p6">6. Liên kết điều hướng nhanh</a></div></div>
-<h2 class="h2" id="p1">1. Vai trò của trang này</h2>
-<div class="grid-3">
-<div class="link-card"><h3>Người mới / nhân sự chuyển vị trí</h3><p>Dùng để xác định đúng handbook, JD, lộ trình đào tạo và bộ OJT/certification cần đọc trước khi thao tác.</p><ul class="link-list"><li><a href="../02-Tai-Lieu-He-Thong/03-Organization/01-Org-Chart/annex-org-001-org-chart-fullpage.html">Organization / Org chart</a></li><li><a href="../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/index.html">JD Library</a></li><li><a href="../10-Training-Academy/index.html">Training Academy</a></li></ul></div>
-<div class="link-card"><h3>Trưởng bộ phận / owner hệ thống</h3><p>Dùng để kiểm tra boundary giữa handbook, authority, RACI, KPI và deputy trước khi giao việc hoặc thay đổi quyền.</p><ul class="link-list"><li><a href="../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-025-authority-matrix.html">Authority Matrix</a></li><li><a href="../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-026-raci-master-matrix.html">RACI Master Matrix</a></li><li><a href="../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-027-kpi-cascade-dictionary.html">KPI Cascade</a></li><li><a href="../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">Deputy Backup Matrix</a></li></ul></div>
-<div class="link-card"><h3>Audit / management review / escalation</h3><p>Dùng để truy cập nhanh vào QMS manual, pack management review, digital control và các ANNEX vận hành làm nguồn chứng minh.</p><ul class="link-list"><li><a href="../02-Tai-Lieu-He-Thong/01-Quality-Manual/qms-man-001-qms-manual.html">QMS Manual</a></li><li><a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902 Management Review</a></li><li><a href="../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901 Dashboard Pack</a></li><li><a href="../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-it-001-role-based-access-map.html">ANNEX-IT-001 RBAC Map</a></li><li><a href="../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-021-offline-fallback-kit.html">ANNEX-QMS-021 Offline Kit</a></li></ul></div>
-</div>
-<h2 class="h2" id="p2">2. Toàn cảnh thư viện</h2>
-<div class="metric-grid"><div class="metric-card"><div class="label">Tổng số trang HTML</div><div class="value">596</div><div class="mini-note">Bao gồm thư viện QMS, vận hành, biểu mẫu, đào tạo và cổng điều hướng.</div></div><div class="metric-card"><div class="label">SOP / WI / ANNEX</div><div class="value">39 / 48 / 60</div><div class="mini-note">Thư viện vận hành cấp 2–3 và reference annex đang hiệu lực.</div></div><div class="metric-card"><div class="label">Forms / Handbooks / JD</div><div class="value">109 / 10 / 38</div><div class="mini-note">Bằng chứng biểu mẫu, handbook phòng ban và mô tả công việc đã được đồng bộ.</div></div><div class="metric-card"><div class="label">Academy pages</div><div class="value">274</div><div class="mini-note">Bao gồm competency, modules, OJT, templates, drill packs và system guides.</div></div></div>
-<div class="table-card"><table class="table"><colgroup><col style="width:20%"/><col style="width:38%"/><col style="width:42%"/></colgroup><thead><tr><th>Thư viện</th><th>Mục đích</th><th>Điểm vào chuẩn</th></tr></thead><tbody><tr><td>QMS Portal</td><td>Tra cứu, phân quyền truy cập, tìm kiếm library, review/approval và lối vào hệ thống</td><td><a href="portal.html">portal.html</a></td></tr><tr><td>QMS Manual & organization system</td><td>Khóa narrative cấp hệ thống, cơ cấu tổ chức, handbook, JD, authority, KPI, deputy</td><td><a href="../02-Tai-Lieu-He-Thong/01-Quality-Manual/qms-man-001-qms-manual.html">QMS Manual</a> • <a href="../02-Tai-Lieu-He-Thong/03-Organization/01-Org-Chart/annex-org-001-org-chart-fullpage.html">Org Chart</a> • <a href="../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/index.html">JD Library</a></td></tr><tr><td>Operational library</td><td>SOP, WI, ANNEX dùng cho vận hành liên phòng ban và digital governance</td><td><a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/index.html">SOP Index</a> • <a href="../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-it-001-role-based-access-map.html">ANNEX-IT-001</a> • <a href="../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-018-epicor-transaction-and-interface-map.html">ANNEX-QMS-018</a></td></tr><tr><td>Forms & records</td><td>Biểu mẫu làm bằng chứng, pack công việc và hồ sơ quản trị</td><td><a href="../04-Bieu-Mau/index.html">Forms Index</a> • <a  download="" href="../04-Bieu-Mau/02-FRM-200/FRM-205_Job_Dossier_Evidence_Index.xlsx">FRM-205 Job Dossier</a> • <a  download="" href="../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></td></tr><tr><td>Training Academy</td><td>Khung năng lực, level, ma trận đào tạo, OJT, gate tests, certification và evidence rules</td><td><a href="../10-Training-Academy/index.html">Training Academy</a> • <a href="../10-Training-Academy/01-Competency-System/index.html">Competency System</a> • <a href="../10-Training-Academy/02-Training-Content/02-OJT-Guides/ojt-role-index.html">OJT Library</a></td></tr></tbody></table></div>
-<h2 class="h2" id="p3">3. Đi đúng nơi theo nhu cầu</h2>
-<div class="link-grid">
-<div class="link-card"><h3>Tôi cần hiểu vai trò, boundary và thẩm quyền</h3><p>Bắt đầu từ cơ cấu → handbook → JD → authority/RACI/KPI/deputy.</p><ul class="link-list"><li><a href="../02-Tai-Lieu-He-Thong/03-Organization/01-Org-Chart/annex-org-001-org-chart-fullpage.html">Org chart &amp; role dictionary</a></li><li><a href="../02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html">Department handbooks</a></li><li><a href="../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/index.html">JD Library</a></li><li><a href="../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-025-authority-matrix.html">Authority / RACI / KPI / Deputy</a></li></ul></div>
-<div class="link-card"><h3>Tôi cần vận hành job và giữ traceability</h3><p>Dùng SOP/WI/FRM của value stream và map transaction/digital control để không lệch giữa Epicor, M365 và bằng chứng.</p><ul class="link-list"><li><a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/index.html">SOP Index</a></li><li><a href="../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-018-epicor-transaction-and-interface-map.html">Epicor transaction map</a></li><li><a href="../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-021-offline-fallback-kit.html">Offline fallback kit</a></li><li><a  download="" href="../04-Bieu-Mau/02-FRM-200/FRM-205_Job_Dossier_Evidence_Index.xlsx">Job dossier index</a></li></ul></div>
-<div class="link-card"><h3>Tôi cần đào tạo, OJT hoặc cấp chứng nhận</h3><p>Vào Academy để lấy roadmap, competency, OJT, gate test và register chứng nhận.</p><ul class="link-list"><li><a href="../10-Training-Academy/index.html">Training Academy</a></li><li><a href="../10-Training-Academy/04-Templates-Tools/role-roadmaps.html">Role roadmaps</a></li><li><a href="../10-Training-Academy/02-Training-Content/02-OJT-Guides/ojt-role-index.html">OJT role index</a></li><li><a href="../10-Training-Academy/04-Templates-Tools/certification-register.html">Certification register</a></li></ul></div>
-<div class="link-card"><h3>Tôi cần chuẩn bị cho review lãnh đạo hoặc audit</h3><p>Dùng pack quản trị và dashboard owner/source-control đã chốt, không dựng số từ file riêng.</p><ul class="link-list"><li><a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a></li><li><a href="../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a></li><li><a  download="" href="../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></li><li><a href="../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-027-kpi-cascade-dictionary.html">KPI Cascade</a></li><li><a href="../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-012-dashboard-deployment-access-and-refresh-control.html">Dashboard control</a></li></ul></div>
-</div>
-<h2 class="h2" id="p4">4. Bộ tài liệu vừa được đồng bộ</h2>
-<div class="notice-grid">
-<div class="notice-item">QMS Manual và 10 department handbooks đã được khóa lại theo role-boundary, authority, KPI và deputy mới.</div>
-<div class="notice-item">38 JD đã được rebuild theo tài liệu vận hành active; index này dẫn người đọc vào đúng thư viện JD thay vì link summary cũ.</div>
-<div class="notice-item">ANNEX-IT-001 / 002, ANNEX-QMS-018 / 021, WI-901, SOP-902 và FRM-911 là nhóm tài liệu điều phối phase 2C để nối digital control ↔ management review ↔ training.</div>
-<div class="notice-item">Training Academy index, competency system, OJT index, role roadmaps và certification register đã được đồng bộ với HR handbook và Deputy Matrix.</div>
-</div>
-<h2 class="h2" id="p5">5. Khi portal/app gặp sự cố</h2>
+            <g>
+              <circle class="node-glow" cx="310" cy="92" r="36"></circle>
+              <circle class="node-core" cx="310" cy="92" r="24"></circle>
+              <text class="node-label" x="310" y="100">G0</text>
+              <text class="node-word" x="310" y="130">Kickoff</text>
+            </g>
+            <g>
+              <circle class="node-glow" cx="482" cy="162" r="36"></circle>
+              <circle class="node-core" cx="482" cy="162" r="24"></circle>
+              <text class="node-label" x="482" y="170">G2</text>
+              <text class="node-word" x="482" y="200">Incoming</text>
+            </g>
+            <g>
+              <circle class="node-glow" cx="545" cy="292" r="36"></circle>
+              <circle class="node-core" cx="545" cy="292" r="24"></circle>
+              <text class="node-label" x="545" y="300">G3</text>
+              <text class="node-word" x="545" y="330">Setup</text>
+            </g>
+            <g>
+              <circle class="node-glow" cx="482" cy="462" r="36"></circle>
+              <circle class="node-core" cx="482" cy="462" r="24"></circle>
+              <text class="node-label" x="482" y="470">G4</text>
+              <text class="node-word" x="482" y="500">FAI</text>
+            </g>
+            <g>
+              <circle class="node-glow" cx="310" cy="548" r="36"></circle>
+              <circle class="node-core" cx="310" cy="548" r="24"></circle>
+              <text class="node-label" x="310" y="556">G5</text>
+              <text class="node-word" x="310" y="586">Production</text>
+            </g>
+            <g>
+              <circle class="node-glow" cx="140" cy="462" r="36"></circle>
+              <circle class="node-core" cx="140" cy="462" r="24"></circle>
+              <text class="node-label" x="140" y="470">G6</text>
+              <text class="node-word" x="140" y="500">Final QC</text>
+            </g>
+            <g>
+              <circle class="node-glow" cx="92" cy="310" r="36"></circle>
+              <circle class="node-core" cx="92" cy="310" r="24"></circle>
+              <text class="node-label" x="92" y="318">G7</text>
+              <text class="node-word" x="92" y="348">Release</text>
+            </g>
+          </svg>
 
-<p>Khi cổng ứng dụng hoặc hạ tầng số bị gián đoạn, người dùng không được tự bẻ quy trình bằng file rời. Phải chuyển qua <a href="../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-021-offline-fallback-kit.html">ANNEX-QMS-021 Offline Fallback Kit</a> và kích hoạt theo <a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108 Operational Contingency Plan</a>. Các giấy tờ tạm thời, log sự kiện và nhập bù sau phục hồi phải đi theo <a  download="" href="../04-Bieu-Mau/01-FRM-100/FRM-181_Business_Disruption_Event_Log.xlsx">FRM-181 Contingency Event Log</a> và logic deputy tại <a href="../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">ANNEX-QMS-028</a>.</p>
+          <div class="stage-core">
+            <strong>Source<br>Control</strong>
+            <span>Document route, form route, training route</span>
+          </div>
 
-<h2 class="h2" id="p6">6. Liên kết điều hướng nhanh</h2>
-<div class="legend-box"><span class="chip">Portal app</span><span class="chip">QMS Manual</span><span class="chip">Org chart</span><span class="chip">Handbooks</span><span class="chip">JD Library</span><span class="chip">Authority/RACI/KPI/Deputy</span><span class="chip">Operational library</span><span class="chip">Forms</span><span class="chip">Training Academy</span></div>
-<div class="link-grid">
-<div class="link-card"><h3>Entry pages</h3><p>Các trang nên dùng làm điểm vào thay cho bookmark cũ.</p><ul class="link-list"><li><a href="portal.html">Portal app</a></li><li><a href="site-map.html">Site map</a></li><li><a href="../02-Tai-Lieu-He-Thong/03-Organization/01-Org-Chart/annex-org-001-org-chart-fullpage.html">Organization / Org chart</a></li><li><a href="../10-Training-Academy/index.html">Training Academy</a></li></ul></div>
-<div class="link-card"><h3>Organization governance</h3><p>Hệ tài liệu mô tả vai trò và quyết định.</p><ul class="link-list"><li><a href="../02-Tai-Lieu-He-Thong/01-Quality-Manual/qms-man-001-qms-manual.html">QMS Manual</a></li><li><a href="../02-Tai-Lieu-He-Thong/03-Organization/01-Org-Chart/annex-org-001-org-chart-fullpage.html">Org chart</a></li><li><a href="../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/index.html">JD Library</a></li><li><a href="../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-025-authority-matrix.html">Authority Matrix</a></li><li><a href="../02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/annex-qms-028-deputy-backup-matrix.html">Deputy Matrix</a></li></ul></div>
-<div class="link-card"><h3>Digital &amp; management review</h3><p>Điểm điều khiển cho data governance, ERP, contingency và management review.</p><ul class="link-list"><li><a href="../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-it-001-role-based-access-map.html">ANNEX-IT-001</a></li><li><a href="../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-it-002-access-request-field-dictionary.html">ANNEX-IT-002</a></li><li><a href="../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-018-epicor-transaction-and-interface-map.html">ANNEX-QMS-018</a></li><li><a href="../03-Tai-Lieu-Van-Hanh/03-Reference/03-ANNEX-Digital/annex-qms-021-offline-fallback-kit.html">ANNEX-QMS-021</a></li><li><a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a></li><li><a href="../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a></li><li><a  download="" href="../04-Bieu-Mau/09-FRM-900/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a></li></ul></div>
-</div>
-<div class="footer-note">Trang điều hướng này không thay thế nội dung kiểm soát ở handbook, JD, SOP, WI, ANNEX và FRM. Khi có mâu thuẫn, tài liệu chủ quản đã phê duyệt là nguồn chuẩn để thực thi.</div>
+          <div class="stage-copy">
+            <p>Operational route map</p>
+            <ul>
+              <li><strong>01</strong><span>Đi từ portal, SOP/WI, biểu mẫu hoặc academy thay vì dò thư mục thủ công.</span></li>
+              <li><strong>02</strong><span>Gắn từng vai trò vào đúng nhịp xử lý và bộ chứng từ liên quan.</span></li>
+              <li><strong>03</strong><span>Giữ nguồn chuẩn, khả năng truy xuất và phương án dự phòng trong cùng một điểm vào.</span></li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
+  </header>
+
+  <div class="hero-meta" data-reveal>
+    <div class="meta-chip">
+      <span>Mã tài liệu</span>
+      <strong>ANNEX-50490</strong>
+    </div>
+    <div class="meta-chip">
+      <span>Phiên bản</span>
+      <strong>V0 • theo quyết định ban hành</strong>
+    </div>
+    <div class="meta-chip">
+      <span>Chủ quản</span>
+      <strong>QMS Manager / IT Administrator</strong>
+    </div>
+    <div class="meta-chip">
+      <span>Phê duyệt</span>
+      <strong>Tổng Giám đốc</strong>
+    </div>
   </div>
+
+  <main class="content-shell">
+    <section class="section" id="lan-truy-cap">
+      <div class="section-header" data-reveal>
+        <span class="eyebrow">Bốn làn truy cập</span>
+        <h2>Không bắt đầu từ thư mục. Bắt đầu từ đúng tuyến vận hành.</h2>
+        <p>Mỗi làn dưới đây có một nhiệm vụ rõ ràng: vào app để điều hành, mở SOP/WI để thao tác, gọi biểu mẫu chuẩn để ghi nhận, và dùng academy để nâng cấp năng lực theo vai trò.</p>
+      </div>
+
+      <div class="signal-bar">
+        <div data-reveal>
+          <strong>Nguồn chuẩn</strong>
+          <span>Liên kết thẳng tới portal, thư viện SOP/WI, biểu mẫu và academy đang hoạt động.</span>
+        </div>
+        <div data-reveal>
+          <strong>Tuyến vận hành</strong>
+          <span>Mỗi điểm vào đều gắn với bước xử lý thực tế thay vì chỉ liệt kê tài liệu.</span>
+        </div>
+        <div data-reveal>
+          <strong>Dấu vết hệ thống</strong>
+          <span>Giữ đường dẫn cho governance, performance, access map và contingency trong cùng một flow.</span>
+        </div>
+      </div>
+
+      <div class="lane-list">
+        <article class="lane-row" data-reveal>
+          <div class="lane-index">01</div>
+          <div class="lane-title">
+            <h3>Portal điều hành</h3>
+            <p>Mở dashboard, tra cứu tài liệu, matrix phân quyền và các luồng làm việc số từ một điểm vào thống nhất.</p>
+          </div>
+          <div class="lane-links">
+            <a class="inline-link" href="portal.html">Vào Portal</a>
+            <a class="inline-link" href="../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">Access Map</a>
+            <a class="inline-link" href="site-map.html">Site Map</a>
+          </div>
+        </article>
+
+        <article class="lane-row" data-reveal>
+          <div class="lane-index">02</div>
+          <div class="lane-title">
+            <h3>SOP &amp; Work Instruction</h3>
+            <p>Dẫn người vận hành về đúng quy trình chuẩn cho order flow, setup, FAI, IPQC, final inspection và release.</p>
+          </div>
+          <div class="lane-links">
+            <a class="inline-link" href="../03-Tai-Lieu-Van-Hanh/01-SOPs/index.html">Thư viện SOP</a>
+            <a class="inline-link" href="../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519 Pre-run</a>
+            <a class="inline-link" href="../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504 Setup</a>
+          </div>
+        </article>
+
+        <article class="lane-row" data-reveal>
+          <div class="lane-index">03</div>
+          <div class="lane-title">
+            <h3>Biểu mẫu &amp; design system</h3>
+            <p>Dùng thư viện biểu mẫu chuẩn, mở form gốc trước khi phát hành rộng và giữ giao diện biểu mẫu nhất quán.</p>
+          </div>
+          <div class="lane-links">
+            <a class="inline-link" href="../04-Bieu-Mau/index.html">Thư viện biểu mẫu</a>
+            <a class="inline-link" href="../04-Bieu-Mau/00-FORM-DESIGN-SYSTEM/index.html">Form Design System</a>
+            <a class="inline-link" href="portal.html">Biểu mẫu số</a>
+          </div>
+        </article>
+
+        <article class="lane-row" data-reveal>
+          <div class="lane-index">04</div>
+          <div class="lane-title">
+            <h3>Training &amp; competency</h3>
+            <p>Kết nối OJT, cấp độ năng lực và nội dung đào tạo để người dùng không chỉ đọc đúng tài liệu mà còn học đúng chuẩn.</p>
+          </div>
+          <div class="lane-links">
+            <a class="inline-link" href="../10-Training-Academy/index.html">Training Academy</a>
+            <a class="inline-link" href="../10-Training-Academy/01-Competency-System/index.html">Competency System</a>
+            <a class="inline-link" href="../10-Training-Academy/02-Training-Content/02-OJT-Guides/ojt-role-index.html">OJT Guide</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="lifecycle" id="gate-flow">
+      <div class="lifecycle-inner">
+        <div class="section-header" data-reveal>
+          <span class="eyebrow">Gate flow</span>
+          <h2>Bản đồ chặng công việc từ tiếp nhận đến giao hàng.</h2>
+          <p>Phần này giữ trọng tâm vào vận hành thực tế. Mỗi chặng chỉ có một nhiệm vụ, một mô tả ngắn và các tài liệu cần mở ngay để xử lý.</p>
+        </div>
+
+        <div class="lifecycle-grid">
+          <aside class="lifecycle-aside" data-reveal>
+            <strong>7 chặng điều hướng</strong>
+            <p>Từ contract review đến shipment release, tuyến dưới đây gom các tài liệu cốt lõi nhất để người dùng không mất thời gian dò giữa nhiều thư mục.</p>
+            <ul>
+              <li>Điểm vào cho order, incoming, setup, first article, production, final QC và shipment.</li>
+              <li>Mỗi bước đều bám trên tài liệu đang tồn tại trong workspace hiện tại.</li>
+              <li>Hiệu ứng scroll chỉ làm rõ trọng tâm; tài liệu chủ quản vẫn là nguồn chuẩn cuối cùng.</li>
+            </ul>
+          </aside>
+
+          <ol class="gate-list">
+            <li class="gate-step" data-reveal>
+              <div class="gate-badge">G0</div>
+              <div class="gate-body">
+                <h3>Contract &amp; kickoff</h3>
+                <p>Tiếp nhận đơn hàng, xem xét hợp đồng và chốt điều kiện đầu vào trước khi công việc chạy tiếp.</p>
+                <div class="gate-links">
+                  <a class="gate-link" href="../03-Tai-Lieu-Van-Hanh/01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201 Order Fulfillment</a>
+                  <a class="gate-link" href="../04-Bieu-Mau/index.html">Biểu mẫu liên quan</a>
+                </div>
+              </div>
+            </li>
+
+            <li class="gate-step" data-reveal>
+              <div class="gate-badge">G2</div>
+              <div class="gate-body">
+                <h3>IQC &amp; incoming</h3>
+                <p>Kiểm tra đầu vào, xác minh vật tư, truy xuất nguồn gốc và kiểm soát nhà cung cấp hoặc outsource.</p>
+                <div class="gate-links">
+                  <a class="gate-link" href="../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html">WI-701 Receiving &amp; IQC</a>
+                  <a class="gate-link" href="../03-Tai-Lieu-Van-Hanh/01-SOPs/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html">SOP-402 Verification</a>
+                  <a class="gate-link" href="../03-Tai-Lieu-Van-Hanh/01-SOPs/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401 Supplier Control</a>
+                </div>
+              </div>
+            </li>
+
+            <li class="gate-step" data-reveal>
+              <div class="gate-badge">G3</div>
+              <div class="gate-body">
+                <h3>Setup &amp; release</h3>
+                <p>Chuẩn bị máy, phát hành chương trình, kiểm soát package engineering và đảm bảo job packet sẵn sàng.</p>
+                <div class="gate-links">
+                  <a class="gate-link" href="../03-Tai-Lieu-Van-Hanh/01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303 Release</a>
+                  <a class="gate-link" href="../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504 Setup</a>
+                  <a class="gate-link" href="../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519 Quick Check</a>
+                </div>
+              </div>
+            </li>
+
+            <li class="gate-step" data-reveal>
+              <div class="gate-badge">G4</div>
+              <div class="gate-body">
+                <h3>FAI &amp; first piece</h3>
+                <p>Kiểm tra bài đầu tiên, phê duyệt mẫu và khóa đầu ra trước khi sản xuất hàng loạt.</p>
+                <div class="gate-links">
+                  <a class="gate-link" href="../03-Tai-Lieu-Van-Hanh/01-SOPs/03-SOP-300/sop-302-first-article-inspection-fai.html">SOP-302 FAI</a>
+                  <a class="gate-link" href="../04-Bieu-Mau/index.html">Biểu mẫu FAI</a>
+                </div>
+              </div>
+            </li>
+
+            <li class="gate-step" data-reveal>
+              <div class="gate-badge">G5</div>
+              <div class="gate-body">
+                <h3>IPQC &amp; production</h3>
+                <p>Gia công, theo dõi ổn định quá trình, SPC và khả năng đáp ứng theo từng điều kiện vận hành.</p>
+                <div class="gate-links">
+                  <a class="gate-link" href="../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-502-cnc-machining-operations.html">SOP-502 CNC Operation</a>
+                  <a class="gate-link" href="../03-Tai-Lieu-Van-Hanh/01-SOPs/06-SOP-600/sop-604-spc-and-capability-control.html">SOP-604 SPC</a>
+                  <a class="gate-link" href="../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501 Planning</a>
+                </div>
+              </div>
+            </li>
+
+            <li class="gate-step" data-reveal>
+              <div class="gate-badge">G6</div>
+              <div class="gate-body">
+                <h3>Final QC &amp; packaging</h3>
+                <p>Kiểm tra cuối, CoC, đóng gói và bàn giao đầy đủ chứng từ trước khi release shipment.</p>
+                <div class="gate-links">
+                  <a class="gate-link" href="../03-Tai-Lieu-Van-Hanh/01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605 Final Inspection</a>
+                  <a class="gate-link" href="../03-Tai-Lieu-Van-Hanh/01-SOPs/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html">SOP-701 Packaging</a>
+                  <a class="gate-link" href="../03-Tai-Lieu-Van-Hanh/01-SOPs/06-SOP-600/sop-603-aql-sampling-inspection.html">SOP-603 AQL</a>
+                </div>
+              </div>
+            </li>
+
+            <li class="gate-step" data-reveal>
+              <div class="gate-badge">G7</div>
+              <div class="gate-body">
+                <h3>Ship &amp; release</h3>
+                <p>Chốt release, giao hàng, hoàn tất hồ sơ và chuẩn bị khả năng truy xuất cho các bước hậu kiểm cần thiết.</p>
+                <div class="gate-links">
+                  <a class="gate-link" href="../03-Tai-Lieu-Van-Hanh/01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">Shipment release</a>
+                  <a class="gate-link" href="../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901 Dashboard</a>
+                </div>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="section roles" id="theo-vai-tro">
+      <div class="section-header" data-reveal>
+        <span class="eyebrow">Theo vai trò</span>
+        <h2>Mỗi vai trò có một đường dẫn ngắn để vào đúng bộ tài liệu.</h2>
+        <p>Thay vì một ma trận card dày đặc, phần này gom vai trò thành các tuyến thao tác rõ ràng để người dùng quét trong vài giây là biết mình nên mở gì tiếp theo.</p>
+      </div>
+
+      <div class="role-grid">
+        <article class="role-row" data-reveal>
+          <div>
+            <span class="role-kicker">Vận hành</span>
+            <h3 class="role-name">CNC Operator</h3>
+          </div>
+          <div class="role-body">
+            <p>Tập trung vào pre-run, setup, first piece và hướng dẫn OJT để vận hành đúng ngay từ đầu ca.</p>
+            <div class="role-links">
+              <a href="../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a>
+              <a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a>
+              <a href="../10-Training-Academy/02-Training-Content/02-OJT-Guides/ojt-role-index.html">OJT Guide</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="role-row" data-reveal>
+          <div>
+            <span class="role-kicker">Chất lượng</span>
+            <h3 class="role-name">QC Inspector</h3>
+          </div>
+          <div class="role-body">
+            <p>Ưu tiên FAI, AQL, SPC và hiệu chuẩn để giữ ổn định cho toàn bộ vòng kiểm soát chất lượng.</p>
+            <div class="role-links">
+              <a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/03-SOP-300/sop-302-first-article-inspection-fai.html">SOP-302</a>
+              <a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/06-SOP-600/sop-603-aql-sampling-inspection.html">SOP-603</a>
+              <a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/06-SOP-600/sop-604-spc-and-capability-control.html">SOP-604</a>
+              <a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/06-SOP-600/sop-601-calibration-and-gage-control.html">SOP-601</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="role-row" data-reveal>
+          <div>
+            <span class="role-kicker">Điều độ</span>
+            <h3 class="role-name">Team Leader / Foreman</h3>
+          </div>
+          <div class="role-body">
+            <p>Đi vào KPI, dispatch, authority matrix và backup matrix để giữ nhịp sản xuất và điều phối ca.</p>
+            <div class="role-links">
+              <a href="../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a>
+              <a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a>
+              <a href="../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">Authority Matrix</a>
+              <a href="../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">Deputy Matrix</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="role-row" data-reveal>
+          <div>
+            <span class="role-kicker">Kỹ thuật</span>
+            <h3 class="role-name">Planner / Engineer</h3>
+          </div>
+          <div class="role-body">
+            <p>Dùng tuyến này cho planning, release package, Epicor transaction map và risk/FMEA liên quan.</p>
+            <div class="role-links">
+              <a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">Planning</a>
+              <a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a>
+              <a href="../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html">ANNEX-115</a>
+              <a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-103-risk-opportunity-fmea-and-control-plan.html">SOP-103</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="role-row" data-reveal>
+          <div>
+            <span class="role-kicker">Điều hành</span>
+            <h3 class="role-name">Manager / Director</h3>
+          </div>
+          <div class="role-body">
+            <p>Tập trung vào dashboard hiệu suất, KPI cascade và manual cấp hệ thống để ra quyết định nhanh hơn.</p>
+            <div class="role-links">
+              <a href="../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a>
+              <a href="../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html">KPI Dictionary</a>
+              <a href="../02-Tai-Lieu-He-Thong/01-Quality-Manual/qms-man-001-qms-manual.html">QMS Manual</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="role-row" data-reveal>
+          <div>
+            <span class="role-kicker">Quản trị hệ thống</span>
+            <h3 class="role-name">IT / QMS Admin</h3>
+          </div>
+          <div class="role-body">
+            <p>Giữ document control, data governance, access route và Epicor interface trong cùng một tuyến thao tác.</p>
+            <div class="role-links">
+              <a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-101-document-and-data-control.html">SOP-101</a>
+              <a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a>
+              <a href="../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">Access Map</a>
+              <a href="../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html">Epicor Map</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="governance">
+      <div class="section-header" data-reveal>
+        <span class="eyebrow">Governance &amp; continuity</span>
+        <h2>Giữ nguồn chuẩn, ma trận kiểm soát và phương án dự phòng trong cùng một lớp truy cập.</h2>
+        <p>Trang điều hướng này không thay thế tài liệu chủ quản. Nó chỉ gom đúng cổng vào để người dùng mở nhanh hơn, đúng hơn và ít sai hơn.</p>
+      </div>
+
+      <div class="continuity-grid">
+        <article class="continuity-panel" data-reveal>
+          <span class="eyebrow">Nguồn chuẩn</span>
+          <h3 class="role-name" style="margin-top:18px">Governance set</h3>
+          <p>Dành cho manual, JD library, authority matrix, KPI dictionary và các tài liệu cấp hệ thống cần mở thường xuyên.</p>
+          <div class="continuity-links">
+            <a href="../02-Tai-Lieu-He-Thong/01-Quality-Manual/qms-man-001-qms-manual.html">
+              <span>QMS Manual<small>Nguồn chuẩn cấp hệ thống cho phạm vi và nguyên tắc QMS.</small></span>
+              <span>01</span>
+            </a>
+            <a href="../02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/index.html">
+              <span>JD Library<small>Điểm vào cho cơ cấu vai trò, trách nhiệm và mô tả công việc.</small></span>
+              <span>02</span>
+            </a>
+            <a href="../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">
+              <span>Authority Matrix<small>Ma trận quyền, phê duyệt và điểm dừng kiểm soát.</small></span>
+              <span>03</span>
+            </a>
+          </div>
+        </article>
+
+        <article class="continuity-panel" data-reveal>
+          <span class="eyebrow">Dự phòng vận hành</span>
+          <h3 class="role-name" style="margin-top:18px">Continuity set</h3>
+          <p>Dành cho fallback kit, contingency plan, site map và các tuyến hỗ trợ khi hệ thống hoặc luồng làm việc bị gián đoạn.</p>
+          <div class="continuity-links">
+            <a href="../03-Tai-Lieu-Van-Hanh/03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">
+              <span>Offline Fallback Kit<small>Bộ công cụ dự phòng để tiếp tục vận hành khi hệ thống gián đoạn.</small></span>
+              <span>01</span>
+            </a>
+            <a href="../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">
+              <span>SOP-108 Contingency Plan<small>Chuẩn dự phòng cho điều hành và khôi phục flow công việc.</small></span>
+              <span>02</span>
+            </a>
+            <a href="site-map.html">
+              <span>Site Map<small>Bản đồ toàn bộ hệ thống để truy ngược nhanh khi cần điều hướng sâu hơn.</small></span>
+              <span>03</span>
+            </a>
+          </div>
+        </article>
+      </div>
+
+      <div class="final-band" data-reveal>
+        <h3>Vào đúng cổng. Mở đúng tài liệu. Chạy đúng nhịp.</h3>
+        <p>HESEM QMS gateway được dựng lại như một bề mặt điều hướng rõ ràng hơn: thương hiệu mạnh hơn ở màn đầu, tuyến thao tác rõ hơn ở phần thân, và governance cùng continuity được gom về một kết thúc dễ chuyển đổi.</p>
+        <div class="final-actions">
+          <a class="button-primary" href="portal.html">Mở HESEM QMS Portal</a>
+          <a class="button-secondary" href="../03-Tai-Lieu-Van-Hanh/01-SOPs/index.html">Đi tới SOP &amp; WI</a>
+          <a class="button-secondary" href="../10-Training-Academy/index.html">Đi tới Training Academy</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer-note">
+      <strong>Lưu ý:</strong> Trang điều hướng này không thay thế nội dung kiểm soát ở tài liệu chủ quản. Khi có mâu thuẫn, tài liệu đã phê duyệt là nguồn chuẩn.
+    </div>
+  </main>
 </div>
+<script src="./scripts/gateway-landing.js"></script>
 </body>
 </html>

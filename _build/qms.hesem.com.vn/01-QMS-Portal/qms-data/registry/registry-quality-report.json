@@ -1,0 +1,93 @@
+{
+  "_meta": {
+    "version": "5.0",
+    "description": "Internal quality report for registry-backed Module Builder assets.",
+    "generatedAt": "2026-04-04T11:03:30.954Z"
+  },
+  "summary": {
+    "endpoint_count": 2334,
+    "pack_count": 3168,
+    "relation_edge_count": 2440,
+    "workflow_count": 425,
+    "status_set_count": 536,
+    "validation_rule_count": 24776,
+    "formula_count": 960,
+    "formula_reference_count": 960,
+    "field_context_count": 40589
+  },
+  "checks": [
+    {
+      "id": "tables_have_fields",
+      "passed": true,
+      "actual": 528,
+      "target": 528
+    },
+    {
+      "id": "tables_have_endpoint_catalog",
+      "passed": true,
+      "actual": 528,
+      "target": 528
+    },
+    {
+      "id": "tables_have_pack",
+      "passed": true,
+      "actual": 528,
+      "target": 528
+    },
+    {
+      "id": "fk_edges_covered",
+      "passed": true,
+      "actual": 2440,
+      "target": 2440
+    },
+    {
+      "id": "workflow_coverage",
+      "passed": true,
+      "actual": 528,
+      "target": 528
+    },
+    {
+      "id": "status_coverage",
+      "passed": true,
+      "actual": 222,
+      "target": 222
+    },
+    {
+      "id": "workflow_count_target",
+      "passed": true,
+      "actual": 425,
+      "target": 60
+    },
+    {
+      "id": "domain_workflow_target",
+      "passed": true,
+      "actual": 48,
+      "target": 48
+    },
+    {
+      "id": "status_set_target",
+      "passed": true,
+      "actual": 536,
+      "target": 180
+    },
+    {
+      "id": "validation_rule_target",
+      "passed": true,
+      "actual": 24776,
+      "target": 5000
+    },
+    {
+      "id": "formula_target",
+      "passed": true,
+      "actual": 960,
+      "target": 200
+    },
+    {
+      "id": "formula_reference_target",
+      "passed": true,
+      "actual": 960,
+      "target": 960
+    }
+  ],
+  "all_passed": true
+}

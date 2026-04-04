@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-    <html lang="vi">
-    <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>POL-QMS-002 — Mục tiêu Chất lượng | HESEM QMS</title>
-    <link href="../../assets/style.css" rel="stylesheet"/>
+<html lang="vi">
+ <head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>POL-QMS-002 - Quality Objectives | HESEM QMS</title>
+ <link href="../../assets/style.css" rel="stylesheet">
 
 <style>
 .chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
@@ -21,7 +21,7 @@
 .metric-card .label{font-size:11px;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.3px;}
 .mini-note{font-size:12px;color:var(--ink2);line-height:1.55;}
 .gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
-.gate-card{border:1px solid var(--ln);border-left:4px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
+.gate-card{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
 .gate-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
 .field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;}
 .field{padding:10px 12px;border:1px solid var(--ln);border-radius:var(--r-sm);background:var(--bg);}
@@ -50,50 +50,39 @@
 .legend-box span{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--ln);background:var(--bg);padding:4px 8px;border-radius:999px;font-size:11px}
 .sq{width:12px;height:12px;border-radius:3px;display:inline-block}
 .rule-table td:nth-child(1),.rule-table td:nth-child(2){white-space:nowrap}
-.small{font-size:12px}
-@media print {
-  .card,.table-card,.callout,.note,.box,.iso-map,.preface-block,.form-sheet,.lane,.legend,.req,.auth-grid,.backup-card,.vstep,.metric-card,.gate-card,.field,.boxed-list,.svg-wrap{page-break-inside:avoid;break-inside:avoid}
-  h1,h2,h3,.h1,.h2,.h3{page-break-after:avoid;break-after:avoid}
-  .form-header,.sig-row,.sign-row,.approval-row{page-break-inside:avoid;break-inside:avoid}
-  tr{page-break-inside:avoid;break-inside:avoid}
-  thead{display:table-header-group}tfoot{display:table-footer-group}
-  p{orphans:3;widows:3}.table-card{overflow:visible!important}
-}
+.small{
+ thead{display:table-header-group}tfoot{display:table-footer-group}
+ p{orphans:3;widows:3}
 .page-body{overflow-x:hidden}
 .table-card,.table-block,.table-wrap{overflow-x:auto;max-width:100%}
 table{max-width:100%;table-layout:auto}
 td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
-@media (max-width: 900px){.grid-3{grid-template-columns:1fr;}.field-grid{grid-template-columns:1fr;}}
-
+@media (max-width: 960px){.grid-3{grid-template-columns:1fr;}.field-grid{grid-template-columns:1fr;}}
+}
 </style>
 
-    </head>
-    <body>
-    <div class="container"><div class="page"><div class="page-body">
-    <div class="form-header">
-      <div class="fh-left">
-        <a class="brand-logo" href="../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../assets/hesem-logo.svg"/></a>
-        <div class="fh-company">
-          <a href="../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-          <span>Tài liệu kiểm soát</span>
-        </div>
-      </div>
-      <div class="title">
-        <strong>POL-QMS-002 — Mục tiêu Chất lượng</strong>
-        <span class="sub-vn">Khung KPI điều hành chất lượng, giao hàng, năng lực và cải tiến</span>
-      </div>
-      <div class="meta">
-        <div class="row"><span><b>Mã:</b></span><span>POL-QMS-002</span></div>
-        <div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-        <div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-        <div class="row"><span><b>Chủ sở hữu:</b></span><span>QA Manager</span></div>
-        <div class="row"><span><b>Phê duyệt:</b></span><span>Tổng Giám Đốc</span></div>
-      </div>
-    </div>
-    <div class="doc-content" id="docContent"><div class="form-sheet">
-    <div class="card"><div class="badge"><span class="dot"></span>POL-QMS-002</div><h1 class="h1" style="margin-top:10px">POL-QMS-002 — Mục tiêu Chất lượng</h1><p class="mini-note">Khung mục tiêu và KPI điều hành cho doanh nghiệp gia công CNC theo nguyên tắc quality–delivery–capacity–cost–improvement.</p></div><div class="iso-map"><div class="iso-title">Chuẩn mực áp dụng / nguyên tắc bắt buộc</div><div class="req"><span class="req-tag shall">PHẢI</span><div>Mục tiêu phải đo được, có chủ sở hữu, có nguồn dữ liệu, có chu kỳ xem xét và có hành động phản ứng khi lệch ngưỡng.</div></div><div class="req"><span class="req-tag should">NÊN</span><div>Mục tiêu cấp công ty cần được cascade xuống cấp bộ phận, cell, line hoặc value stream phù hợp.</div></div></div><h2 class="h2" id="o1">1. Nguyên tắc thiết lập mục tiêu</h2><ul class="tight"><li>Mục tiêu phải phản ánh rủi ro thực sự của QMS: giao trễ, sai revision, lỗi first pass, escape, sự cố supplier, năng lực đo, WIP ageing và đóng CAPA chậm.</li><li>Không dùng mục tiêu chỉ để “đủ audit”; KPI phải thúc đẩy quyết định vận hành và đầu tư nguồn lực.</li><li>Khi khách hàng/ngành có yêu cầu riêng, mục tiêu chung được giữ nguyên nhưng có thể bổ sung KPI overlay theo chương trình/khách hàng.</li></ul><h2 class="h2" id="o2">2. Bộ mục tiêu cốt lõi</h2><div class="table-card"><table class="table"><colgroup><col style="width:18%"/><col style="width:28%"/><col style="width:18%"/><col style="width:36%"/></colgroup><thead><tr><th>Nhóm mục tiêu</th><th>Ví dụ chỉ số</th><th>Chủ sở hữu chính</th><th>Ngưỡng điều hành gợi ý</th></tr></thead><tbody><tr><td>Chất lượng đầu ra</td><td>Final pass yield, internal NCR rate, customer complaint rate, escape to customer</td><td>Quality / Production</td><td>Mục tiêu tối ưu theo từng nhóm sản phẩm; ưu tiên trend và severity hơn chỉ nhìn % đơn giản</td></tr><tr><td>Đúng hẹn</td><td>OTD, on-time planning release, on-time outsource return, schedule adherence</td><td>Planning / Production / Supply Chain</td><td>Quản lý ở 3 tầng: hôm nay / tuần này / tháng</td></tr><tr><td>Kỹ thuật & readiness</td><td>RFQ response lead time, setup-ready rate, FAI on-time closure, engineering change closure</td><td>Engineering</td><td>Tập trung vào điểm chặn làm trễ release</td></tr><tr><td>Nhà cung cấp</td><td>Supplier OTD, incoming defect rate, certificate accuracy, SCAR closure</td><td>Supply Chain / Quality</td><td>Theo phân tầng supplier và criticality</td></tr><tr><td>Hệ thống & cải tiến</td><td>Audit closure on-time, overdue CAPA, training completion, kaizen savings or impact</td><td>QMS / HR / All functions</td><td>Theo dõi cả đóng việc và hiệu lực sau đóng</td></tr></tbody></table></div><h2 class="h2" id="o3">3. Cơ chế cascade</h2><div class="grid-3"><div class="card"><div class="card-title">Cấp công ty</div><ul class="tight"><li>OTD tổng</li><li>Customer complaint</li><li>Internal quality loss</li><li>On-time CAPA closure</li></ul></div><div class="card"><div class="card-title">Cấp bộ phận</div><ul class="tight"><li>Planning release</li><li>Supplier OTD</li><li>First-off approval</li><li>Calibration due status</li></ul></div><div class="card"><div class="card-title">Cấp cell / line / team</div><ul class="tight"><li>Schedule attainment</li><li>Downtime</li><li>Scrap/rework</li><li>5S / LPA discipline</li></ul></div></div><h2 class="h2" id="o4">4. Cập nhật và review</h2><p>Bộ mục tiêu được rà soát tối thiểu hằng quý tại management review hoặc sớm hơn khi có thay đổi đáng kể về khách hàng, công nghệ, site, tỷ trọng ngành, mức sản lượng hoặc sự cố hệ thống. Khi KPI vượt ngưỡng xấu liên tiếp, chủ sở hữu phải đề xuất reaction plan, không chỉ giải thích kết quả.</p><p class="mini-note">Tài liệu liên quan: <a href="../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-102-quality-policy-objectives-and-organizational-context.html">SOP-102</a>, <a href="../../03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a>, <a href="../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a></p>
-    </div></div>
-    </div></div></div>
-    <script src="../../assets/app.js"></script>
-    </body>
-    </html>
+ <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
+</head>
+ <body>
+ <div class="container"><div class="page"><div class="page-body">
+ <div class="form-header">
+ <div class="fh-left">
+ <a class="brand-logo" href="../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../assets/hesem-logo.svg"></a>
+ <div class="fh-company">
+ <a href="../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
+ <span>Tài liệu kiểm soát</span>
+ </div>
+ </div>
+ <div class="title">
+<strong class="doc-name">Quality Objectives</strong>
+<span class="sub-vn">Khung KPI điều hành chất lượng, giao hàng, năng lực và cải tiến</span>
+</div>
+ <div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">POL-QMS-002</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+ </div>
+ <div class="doc-content" id="docContent"><div class="form-sheet">
+ <div class="card"><div class="badge"><span class="dot"></span>POL-QMS-002</div><h1 class="h1" style="margin-top:10px">POL-QMS-002 - Quality Objectives</h1><p class="mini-note">Khung mục tiêu và KPI điều hành cho doanh nghiệp gia công CNC theo nguyên tắc chất lượng–giao hàng–công suất–chi phí–cải tiến.</p></div><div class="iso-map"><div class="iso-title">Chuẩn mực áp dụng / nguyên tắc bắt buộc</div><div class="req"><span class="req-tag shall">PHẢI</span><div>Mục tiêu phải đo được, có owner, có nguồn dữ liệu, có chu kỳ xem xét và có hành động phản ứng khi lệch ngưỡng. <span class="iso-clause">§6.2</span></div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Mục tiêu cấp công ty cần được lan truyền / phân tầng xuống cấp bộ phận, cell, dòng / chuyền hoặc value luồng phù hợp. <span class="iso-clause">§6.2</span></div></div></div><h2 class="h2" id="o1">1. Nguyên tắc thiết lập mục tiêu</h2><ul class="tight"><li>Mục tiêu phải phản ánh rủi ro thực sự của <a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>: giao trễ, sai phiên bản, lỗi đầu tiên pass, thoát / bỏ qua, sự cố nhà cung cấp, năng lực đo, WIP lão hóa / quá hạn và đóng CAPA chậm.</li><li>Không dùng mục tiêu chỉ để "đủ đánh giá"; KPI phải thúc đẩy quyết định vận hành và đầu tư nguồn lực.</li><li>Khi khách hàng/ngành có yêu cầu riêng, mục tiêu chung được giữ nguyên nhưng có thể bổ sung KPI lớp phủ theo chương trình/khách hàng.</li></ul><h2 class="h2" id="o2">2. Bộ mục tiêu cốt lõi</h2><div class="table-card"><table class="table"><colgroup><col style="width:18%"><col style="width:28%"><col style="width:18%"><col style="width:36%"></colgroup><thead><tr><th>Nhóm mục tiêu</th><th>Ví dụ chỉ số</th><th>Owner chính</th><th>Ngưỡng điều hành</th></tr></thead><tbody><tr><td>Quality đầu ra</td><td>Final pass tỷ lệ đạt, nội bộ NCR tỷ lệ, khách hàng khiếu nại tỷ lệ, thoát / bỏ qua to khách hàng</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phong Chat luong)"><span class="entity-code dept-code">D-QUAL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a></span></td><td>Mục tiêu tối ưu theo từng nhóm sản phẩm; ưu tiên xu hướng và mức nghiêm trọng hơn chỉ nhìn % đơn giản</td></tr><tr><td>Đúng hẹn</td><td>OTD, on-time lập kế hoạch phát hành, on-time outsource trả lại, lịch trình tuân thủ</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Planning and Control Function (Dieu do va kiem soat san xuat)"><span class="entity-code dept-code">D-PPC</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Supply Chain Department (Phong Chuoi cung ung)"><span class="entity-code dept-code">D-SCM</span></a></span></td><td>Quản lý ở 3 tầng: hôm nay / tuần này / tháng</td></tr><tr><td>Kỹ thuật &amp; mức sẵn sàng</td><td>RFQ phản hồi thời gian dẫn (lead time), setup-ready tỷ lệ, FAI on-time kết thúc / đóng, kỹ thuật thay đổi kết thúc / đóng</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span></td><td>Tập trung vào điểm chặn làm trễ phát hành</td></tr><tr><td>Supplier</td><td>Supplier OTD, đầu vào / nhận hàng khuyết tật tỷ lệ, chứng chỉ / giấy chứng nhận độ chính xác, SCAR kết thúc / đóng</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Supply Chain Department (Phong Chuoi cung ung)"><span class="entity-code dept-code">D-SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phong Chat luong)"><span class="entity-code dept-code">D-QUAL</span></a></span></td><td>Theo phân tầng nhà cung cấp và mức độ quan trọng</td></tr><tr><td>Hệ thống &amp; cải tiến</td><td>Đánh giá kết thúc / đóng on-time, quá hạn CAPA, đào tạo hoàn thành, kaizen tiết kiệm or tác động</td><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="ALL_DEPTS" href="../03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-all-depts" title="All Departments (Toan bo phong ban va phan he da cong bo) — D-SCS / D-ENG / D-PROD / D-PPC / D-MNT / D-QUAL / D-SCM / D-PUR / D-WHS / D-TCR / D-LOG / D-FIN / D-HR / D-EHS / D-IT / D-ERP"><span class="entity-code bundle-code">ALL_DEPTS</span></a></span></td><td>Theo dõi cả đóng việc và hiệu lực sau đóng</td></tr></tbody></table></div><h2 class="h2" id="o3">3. Cơ chế lan truyền / phân tầng</h2><div class="grid-3"><div class="card"><div class="card-title">Cấp công ty</div><ul class="tight"><li>OTD tổng</li><li>Customer khiếu nại</li><li>Nội bộ chất lượng tổn thất</li><li>On-time CAPA kết thúc / đóng</li></ul></div><div class="card"><div class="card-title">Cấp bộ phận</div><ul class="tight"><li>Kế hoạch phát hành</li><li>Supplier OTD</li><li>Đầu tiên-off phê duyệt</li><li>Hiệu chuẩn due trạng thái</li></ul></div><div class="card"><div class="card-title">Cấp cell / dòng / chuyền / team</div><ul class="tight"><li>lịch trình đạt được</li><li>Thời gian dừng máy</li><li>Phế phẩm/làm lại</li><li>5S / LPA kỷ luật / chuyên ngành</li></ul></div></div><h2 class="h2" id="o4">4. Cập nhật và rà soát</h2><p>Bộ mục tiêu được rà soát tối thiểu hằng quý tại xem xét của lãnh đạo hoặc sớm hơn khi có thay đổi đáng kể về khách hàng, công nghệ, site, tỷ trọng ngành, mức sản lượng hoặc sự cố hệ thống. Khi KPI vượt ngưỡng xấu liên tiếp, owner phải đề xuất phản ứng plan, không chỉ giải thích kết quả.</p><p class="mini-note">Tài liệu liên quan: <a href="../../03-Tai-Lieu-Van-Hanh/01-SOPs/01-SOP-100/sop-102-quality-policy-objectives-and-organizational-context.html">SOP-102</a>, <a href="../../03-Tai-Lieu-Van-Hanh/01-SOPs/09-SOP-900/sop-902-management-review.html">SOP-902</a>, <a href="../../03-Tai-Lieu-Van-Hanh/02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a></p>
+ </div></div>
+ </div></div></div>
+ <script src="../../assets/app.js"></script>
+ </body>
+ </html>

@@ -6,6 +6,148 @@ let currentFilter = 'ALL';
 let searchQuery = '';
 let currentFolderPath = []; // Hierarchical navigation: ['08-Organization','03-Job-Descriptions','01-JD-EXE']
 let folderEditMode = false; // Toggle for file manager edit mode
+let docHeaderMetaCollapsed = true;
+const PENDING_AUTH_TTL_MS = 10 * 60 * 1000;
+let pendingAuthTimer = null;
+
+function syncCurrentUserRef(user){
+  currentUser = user || null;
+  try{
+    window.currentUser = currentUser;
+    window.__currentUser = currentUser;
+  }catch(e){}
+  return currentUser;
+}
+
+syncCurrentUserRef(null);
+
+function clearPendingAuthTimer(){
+  if(pendingAuthTimer){
+    clearTimeout(pendingAuthTimer);
+    pendingAuthTimer = null;
+  }
+}
+
+function getPendingAuthExpiredMessage(kind){
+  if(kind === 'enroll'){
+    return lang==='en'
+      ? 'Authenticator setup timed out. Please sign in again.'
+      : 'Phiên thiết lập Authenticator đã hết hạn. Vui lòng đăng nhập lại.';
+  }
+  return lang==='en'
+    ? 'Authenticator verification timed out. Please sign in again.'
+    : 'Phiên xác thực OTP đã hết hạn. Vui lòng đăng nhập lại.';
+}
+
+function schedulePendingAuthTimer(stage, pendingExpiresIn){
+  clearPendingAuthTimer();
+  if(stage !== 'mfa' && stage !== 'enroll') return;
+  const ttlSeconds = Number(pendingExpiresIn);
+  const ttlMs = Number.isFinite(ttlSeconds) && ttlSeconds > 0
+    ? Math.max(1000, ttlSeconds * 1000)
+    : PENDING_AUTH_TTL_MS;
+  pendingAuthTimer = setTimeout(()=>{
+    resetPortalToLogin({stage:'password', errorMsg:getPendingAuthExpiredMessage(stage)});
+  }, ttlMs + 250);
+}
+
+function resetPortalToLogin(options={}){
+  const opts = options || {};
+  const stage = opts.stage || 'password';
+  const stageMsg = opts.stageMsg || '';
+  const errorMsg = opts.errorMsg || '';
+  const preserveUsername = opts.preserveUsername !== false;
+
+  clearPendingAuthTimer();
+  try{ if(typeof stopLiveDocsSync==='function') stopLiveDocsSync(); }catch(e){}
+  syncCurrentUserRef(null);
+  csrfToken = null;
+  enrollInfo = null;
+
+  const app = document.getElementById('app');
+  if(app) app.classList.remove('active');
+  const login = document.getElementById('login-screen');
+  if(login) login.style.display = 'flex';
+  document.getElementById('doc-viewer')?.classList.remove('active');
+  document.getElementById('user-dropdown')?.classList.remove('show');
+  setDocHeaderToolbar('');
+
+  const savedUsername = preserveUsername ? (document.getElementById('inp-user')?.value || '') : '';
+  setLoginStage(stage, stageMsg, opts.pendingExpiresIn);
+  if(preserveUsername){
+    const user = document.getElementById('inp-user');
+    if(user) user.value = savedUsername;
+  }
+  if(errorMsg) showLoginError(errorMsg);
+}
+
+function showPendingAuthStage(stage, stageMsg='', pendingExpiresIn=null){
+  resetPortalToLogin({stage, stageMsg, pendingExpiresIn});
+}
+
+function setDocHeaderMetaCollapsed(collapsed){
+  docHeaderMetaCollapsed = !!collapsed;
+}
+
+function syncDocViewerDetailVisibility(){
+  const headerEl = document.getElementById('doc-viewer-header');
+  if(headerEl){
+    headerEl.classList.toggle('details-collapsed', docHeaderMetaCollapsed);
+    headerEl.style.display = docHeaderMetaCollapsed ? 'none' : '';
+  }
+  const historyEl = document.getElementById('vh-container');
+  if(historyEl){
+    historyEl.classList.toggle('is-collapsed', docHeaderMetaCollapsed);
+  }
+}
+
+function setDocHeaderToolbar(html=''){
+  const toolbarEl = document.getElementById('doc-header-toolbar');
+  if(!toolbarEl) return;
+  const content = String(html || '').trim();
+  toolbarEl.innerHTML = content;
+  toolbarEl.classList.toggle('is-active', !!content);
+}
+
+function toggleDocHeaderMeta(force){
+  setDocHeaderMetaCollapsed(typeof force === 'boolean' ? force : !docHeaderMetaCollapsed);
+  syncDocViewerDetailVisibility();
+  if(currentDoc){
+    const doc = DOCS.find(d=>d.code===currentDoc);
+    if(doc) updateDocViewerHeader(doc);
+  }
+}
+
+function getDocHeaderIcon(name){
+  const icons = {
+    edit:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+    save:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>',
+    upload:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M20 16.5a3.5 3.5 0 0 1-3.5 3.5h-9A3.5 3.5 0 0 1 4 16.5"/></svg>',
+    submit:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg>',
+    cancel:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+    approve:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>',
+    reject:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 9 9 15"/><path d="m9 9 6 6"/><circle cx="12" cy="12" r="9"/></svg>',
+    revision:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 4v6h-6"/><path d="M20.5 15a9 9 0 1 1-2.6-9.4L23 10"/></svg>',
+    back:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/><path d="M21 12H9"/></svg>',
+    external:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6"/><path d="M10 14 20 4"/><path d="M20 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5"/></svg>',
+    download:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>',
+    expand:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>',
+    collapse:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>'
+  };
+  return icons[name] || icons.expand;
+}
+
+function cleanDocHeaderButtonLabel(label){
+  return String(label || '').replace(/^[^\p{L}\p{N}]+/u, '').trim();
+}
+
+function renderDocHeaderButton(label, icon, tone, onClick, extraClass='', extraAttrs=''){
+  const toneClass = tone ? ` dv-btn-${tone}` : '';
+  const className = extraClass ? ` ${extraClass}` : '';
+  const attrs = extraAttrs ? ` ${extraAttrs}` : '';
+  const cleanLabel = cleanDocHeaderButtonLabel(label);
+  return `<button class="dv-btn${toneClass}${className}"${attrs} onclick="${onClick}"><span class="dv-btn-ico">${getDocHeaderIcon(icon)}</span><span class="dv-btn-label">${cleanLabel}</span></button>`;
+}
 
 // Server-backed (folder-based) document workflow state + DCR record
 // NOTE: This replaces the old sessionStorage-only versioning for ISO compliance.
@@ -38,6 +180,330 @@ async function loadDocVisibilityFromServer(){
 async function saveDocVisibilityToServer(){
   const hidden = Array.from(HIDDEN_DOCS || []);
   return await apiCall('admin_docs_visibility_save', {hidden});
+}
+
+const PORTAL_DISPLAY_BUILTIN_EXTENSIONS = Object.freeze(['html','pdf','doc','docx','docm','xls','xlsx','xlsm','xlsb','csv','ppt','pptx','pptm']);
+let PORTAL_DISPLAY_CONFIG = createDefaultPortalDisplayConfig();
+let PORTAL_DISPLAY_CONFIG_DRAFT = null;
+let portalDisplayConfigDirty = false;
+let portalDisplayConfigHydrated = false;
+let portalDisplayConfigLoadPromise = null;
+
+function createDefaultPortalDisplayConfig(){
+  return {
+    extensions: {
+      builtin: [...PORTAL_DISPLAY_BUILTIN_EXTENSIONS],
+      custom: [],
+      known: [...PORTAL_DISPLAY_BUILTIN_EXTENSIONS],
+      enabled: [...PORTAL_DISPLAY_BUILTIN_EXTENSIONS]
+    },
+    sidebar: {
+      hidden_core_items: [],
+      hidden_sections: [],
+      hidden_categories: []
+    }
+  };
+}
+
+function normalizePortalDisplayExt(value){
+  return String(value||'').trim().toLowerCase().replace(/^\./,'').replace(/[^a-z0-9]+/g,'').slice(0,16);
+}
+
+function normalizePortalDisplayLowerList(values){
+  const out = [];
+  const seen = new Set();
+  (Array.isArray(values) ? values : []).forEach(value => {
+    const token = String(value||'').trim().toLowerCase().replace(/[^a-z0-9_-]+/g,'');
+    if(!token || seen.has(token)) return;
+    seen.add(token);
+    out.push(token);
+  });
+  return out;
+}
+
+function normalizePortalDisplayUpperList(values){
+  const out = [];
+  const seen = new Set();
+  (Array.isArray(values) ? values : []).forEach(value => {
+    const token = String(value||'').trim().toUpperCase().replace(/[^A-Z0-9_-]+/g,'');
+    if(!token || seen.has(token)) return;
+    seen.add(token);
+    out.push(token);
+  });
+  return out;
+}
+
+function sanitizePortalDisplayConfig(config){
+  const base = createDefaultPortalDisplayConfig();
+  const builtin = [...PORTAL_DISPLAY_BUILTIN_EXTENSIONS];
+  const custom = [];
+  const customSeen = new Set();
+  (Array.isArray(config?.extensions?.custom) ? config.extensions.custom : []).forEach(value => {
+    const ext = normalizePortalDisplayExt(value);
+    if(!ext || customSeen.has(ext) || builtin.includes(ext)) return;
+    customSeen.add(ext);
+    custom.push(ext);
+  });
+  const known = [...builtin, ...custom];
+  const enabledTokens = new Set((Array.isArray(config?.extensions?.enabled) ? config.extensions.enabled : builtin).map(normalizePortalDisplayExt).filter(Boolean));
+  const enabled = known.filter(ext => enabledTokens.has(ext));
+  const hiddenCoreItems = normalizePortalDisplayLowerList(config?.sidebar?.hidden_core_items).filter(id => id !== 'admin');
+  return {
+    extensions: {
+      builtin,
+      custom,
+      known,
+      enabled
+    },
+    sidebar: {
+      hidden_core_items: hiddenCoreItems,
+      hidden_sections: normalizePortalDisplayLowerList(config?.sidebar?.hidden_sections),
+      hidden_categories: normalizePortalDisplayUpperList(config?.sidebar?.hidden_categories)
+    }
+  };
+}
+
+function portalDisplayConfigFingerprint(config){
+  try{ return JSON.stringify(sanitizePortalDisplayConfig(config)); }catch(e){ return String(Date.now()); }
+}
+
+function applyPortalDisplayConfig(config, options={}){
+  const next = sanitizePortalDisplayConfig(config);
+  const changed = portalDisplayConfigFingerprint(next) !== portalDisplayConfigFingerprint(PORTAL_DISPLAY_CONFIG);
+  PORTAL_DISPLAY_CONFIG = next;
+  portalDisplayConfigHydrated = true;
+  if(!portalDisplayConfigDirty || options.forceDraftSync){
+    PORTAL_DISPLAY_CONFIG_DRAFT = sanitizePortalDisplayConfig(next);
+    portalDisplayConfigDirty = false;
+  }
+  try{
+    if(currentPage === 'documents' && currentFilter && !isPortalSidebarCategoryVisible(currentFilter)){
+      currentFilter = '';
+    }
+  }catch(e){}
+  return changed;
+}
+
+function ensurePortalDisplayConfigDraft(){
+  if(!PORTAL_DISPLAY_CONFIG_DRAFT){
+    PORTAL_DISPLAY_CONFIG_DRAFT = sanitizePortalDisplayConfig(PORTAL_DISPLAY_CONFIG);
+  }
+  return PORTAL_DISPLAY_CONFIG_DRAFT;
+}
+
+async function loadPortalDisplayConfigFromServer(options={}){
+  if(!isAdmin()) return PORTAL_DISPLAY_CONFIG;
+  if(portalDisplayConfigLoadPromise && !options.force){
+    return portalDisplayConfigLoadPromise;
+  }
+  if(portalDisplayConfigHydrated && !options.force){
+    return PORTAL_DISPLAY_CONFIG;
+  }
+  const shouldSyncDraft = !!options.forceDraftSync || !portalDisplayConfigDirty;
+  portalDisplayConfigLoadPromise = (async () => {
+    try{
+      const res = await apiCall('admin_portal_display_config_get', null, 'GET');
+      if(res && res.ok && res.config){
+        applyPortalDisplayConfig(res.config, {forceDraftSync: shouldSyncDraft});
+        if(currentPage === 'admin' && adminTab === 'portal_display'){
+          renderAdminPortalDisplay();
+        }else{
+          try{ renderSidebar(); }catch(e){}
+        }
+      }else if(!options.silent){
+        showToast('⚠ ' + ((res && res.error) ? res.error : (lang==='en'?'display_config_load_failed':'Khong tai duoc cau hinh hien thi portal')));
+      }
+    }catch(e){
+      if(!options.silent){
+        showToast('⚠ ' + ((e && e.message) ? e.message : (lang==='en'?'display_config_load_failed':'Khong tai duoc cau hinh hien thi portal')));
+      }
+    }finally{
+      portalDisplayConfigLoadPromise = null;
+    }
+    return PORTAL_DISPLAY_CONFIG;
+  })();
+  return portalDisplayConfigLoadPromise;
+}
+
+function portalSidebarCoreItems(){
+  return [
+    {id:'dashboard', icon:'🏠', label:lang==='en'?'Dashboard':'Dashboard'},
+    {id:'documents', icon:'📁', label:lang==='en'?'All documents':'Tất cả tài liệu'},
+    {id:'search', icon:'🔍', label:lang==='en'?'Search':'Tìm kiếm'},
+    {id:'dictionary', icon:'📖', label:lang==='en'?'Dictionary':'Từ điển thuật ngữ'},
+    {id:'deploy', icon:'🚀', label:lang==='en'?'Operations deploy':'Triển khai vận hành'},
+    {id:'exceptions', icon:'\u26a0\ufe0f', label:lang==='en'?'Exception dashboard':'B\u1ea3ng ngo\u1ea1i l\u1ec7'},
+    {id:'admin', icon:'⚙', label:'Admin', locked:true},
+  ];
+}
+
+function portalSidebarSections(){
+  return [
+    {id:'system', label:lang==='en'?'System documents':'Tài liệu hệ thống'},
+    {id:'ops', label:lang==='en'?'Operational documents':'Tài liệu vận hành'},
+    {id:'train', label:lang==='en'?'Training & competency':'Đào tạo & năng lực'}
+  ];
+}
+
+function portalSidebarCategoryItems(){
+  return (Array.isArray(CATEGORIES) ? CATEGORIES : []).filter(cat => cat && !cat.hidden).map(cat => ({
+    id: String(cat.id||'').toUpperCase(),
+    icon: cat.icon || '•',
+    label: (typeof catLabel === 'function') ? catLabel(cat) : String(cat.label || cat.id || ''),
+    section: String(cat.section || '').toLowerCase()
+  }));
+}
+
+function isPortalSidebarCoreVisible(id){
+  const key = String(id||'').toLowerCase();
+  if(key === 'admin') return true;
+  return !((PORTAL_DISPLAY_CONFIG?.sidebar?.hidden_core_items || []).includes(key));
+}
+
+function isPortalSidebarSectionVisible(id){
+  const key = String(id||'').toLowerCase();
+  return !((PORTAL_DISPLAY_CONFIG?.sidebar?.hidden_sections || []).includes(key));
+}
+
+function isPortalSidebarCategoryVisible(id){
+  const key = String(id||'').toUpperCase();
+  return !((PORTAL_DISPLAY_CONFIG?.sidebar?.hidden_categories || []).includes(key));
+}
+
+function portalCategoryHasPhysicalTree(catId){
+  try{
+    if(typeof getTreeNodesForCategory !== 'function') return false;
+    return getTreeNodesForCategory(catId).length > 0;
+  }catch(e){
+    return false;
+  }
+}
+
+function getPortalCategoryPhysicalNodeCount(catId){
+  try{
+    if(typeof getTreeNodesForCategory !== 'function') return 0;
+    const nodes = getTreeNodesForCategory(catId);
+    if(!Array.isArray(nodes) || nodes.length === 0) return 0;
+    const catDocs = Array.isArray(DOCS) ? DOCS.filter(d => d && d.cat === catId) : [];
+    const root = (typeof getCategoryTreeRoot === 'function') ? getCategoryTreeRoot(catId, catDocs) : null;
+    if(root && Array.isArray(root.subs) && root.subs.length > 0) return root.subs.length;
+    return nodes.length;
+  }catch(e){
+    return 0;
+  }
+}
+
+function setPortalDisplayConfigDirty(value){
+  portalDisplayConfigDirty = !!value;
+  const bar = document.getElementById('portal-display-save-bar');
+  if(bar) bar.style.display = portalDisplayConfigDirty ? 'flex' : 'none';
+}
+
+function setPortalDisplayCoreItemVisible(id, visible){
+  const draft = ensurePortalDisplayConfigDraft();
+  const key = String(id||'').toLowerCase();
+  if(key === 'admin') return;
+  const hidden = new Set(draft.sidebar.hidden_core_items || []);
+  if(visible) hidden.delete(key); else hidden.add(key);
+  draft.sidebar.hidden_core_items = Array.from(hidden);
+  setPortalDisplayConfigDirty(true);
+  renderAdminPortalDisplay();
+}
+
+function setPortalDisplaySectionVisible(id, visible){
+  const draft = ensurePortalDisplayConfigDraft();
+  const key = String(id||'').toLowerCase();
+  const hidden = new Set(draft.sidebar.hidden_sections || []);
+  if(visible) hidden.delete(key); else hidden.add(key);
+  draft.sidebar.hidden_sections = Array.from(hidden);
+  setPortalDisplayConfigDirty(true);
+  renderAdminPortalDisplay();
+}
+
+function setPortalDisplayCategoryVisible(id, visible){
+  const draft = ensurePortalDisplayConfigDraft();
+  const key = String(id||'').toUpperCase();
+  const hidden = new Set(draft.sidebar.hidden_categories || []);
+  if(visible) hidden.delete(key); else hidden.add(key);
+  draft.sidebar.hidden_categories = Array.from(hidden);
+  setPortalDisplayConfigDirty(true);
+  renderAdminPortalDisplay();
+}
+
+function setPortalDisplayExtensionVisible(ext, visible){
+  const draft = ensurePortalDisplayConfigDraft();
+  const key = normalizePortalDisplayExt(ext);
+  if(!key) return;
+  const enabled = new Set(draft.extensions.enabled || []);
+  if(visible) enabled.add(key); else enabled.delete(key);
+  draft.extensions.enabled = draft.extensions.known.filter(item => enabled.has(item));
+  setPortalDisplayConfigDirty(true);
+  renderAdminPortalDisplay();
+}
+
+function removePortalDisplayCustomExtension(ext){
+  const draft = ensurePortalDisplayConfigDraft();
+  const key = normalizePortalDisplayExt(ext);
+  if(!key) return;
+  draft.extensions.custom = (draft.extensions.custom || []).filter(item => item !== key);
+  draft.extensions.known = draft.extensions.builtin.concat(draft.extensions.custom);
+  draft.extensions.enabled = (draft.extensions.enabled || []).filter(item => item !== key);
+  setPortalDisplayConfigDirty(true);
+  renderAdminPortalDisplay();
+}
+
+function addPortalDisplayCustomExtension(){
+  const input = document.getElementById('portal-display-new-ext');
+  const ext = normalizePortalDisplayExt(input ? input.value : '');
+  if(!ext){
+    showToast(lang==='en'?'⚠ Enter a valid extension':'⚠ Nhập đuôi file hợp lệ');
+    return;
+  }
+  const draft = ensurePortalDisplayConfigDraft();
+  if((draft.extensions.known || []).includes(ext)){
+    showToast(lang==='en'?'ℹ Extension already exists':'ℹ Đuôi file đã tồn tại');
+    return;
+  }
+  draft.extensions.custom = [...(draft.extensions.custom || []), ext];
+  draft.extensions.known = draft.extensions.builtin.concat(draft.extensions.custom);
+  draft.extensions.enabled = [...(draft.extensions.enabled || []), ext];
+  setPortalDisplayConfigDirty(true);
+  renderAdminPortalDisplay();
+}
+
+function resetPortalDisplayConfigDraft(){
+  PORTAL_DISPLAY_CONFIG_DRAFT = sanitizePortalDisplayConfig(PORTAL_DISPLAY_CONFIG);
+  setPortalDisplayConfigDirty(false);
+  renderAdminPortalDisplay();
+}
+
+async function savePortalDisplayConfig(){
+  if(!isAdmin()) return;
+  const draft = sanitizePortalDisplayConfig(ensurePortalDisplayConfigDraft());
+  const current = sanitizePortalDisplayConfig(PORTAL_DISPLAY_CONFIG);
+  const extensionsChanged = JSON.stringify(draft.extensions) !== JSON.stringify(current.extensions);
+  try{
+    const res = await apiCall('admin_portal_display_config_save', {config: draft});
+    if(!(res && res.ok && res.config)){
+      showToast('⚠ ' + ((res && res.error) ? res.error : 'save_failed'));
+      return;
+    }
+    applyPortalDisplayConfig(res.config, {forceDraftSync:true});
+    if(extensionsChanged && typeof rescanDocs === 'function'){
+      await rescanDocs();
+    }else{
+      try{ renderSidebar(); }catch(e){}
+      try{
+        if(currentPage==='documents' && typeof renderDocuments==='function') renderDocuments();
+        if(currentPage==='search' && typeof renderSearch==='function') renderSearch();
+        if(currentPage==='dashboard' && typeof renderDashboard==='function') renderDashboard();
+      }catch(e){}
+    }
+    showToast(lang==='en'?'✅ Portal display settings saved':'✅ Đã lưu cấu hình hiển thị portal');
+    if(currentPage === 'admin') renderAdmin();
+  }catch(e){
+    showToast('⚠ ' + ((e && e.message) ? e.message : (lang==='en'?'Server error':'Lỗi server')));
+  }
 }
 
 
@@ -129,14 +595,52 @@ function getNextParam(){
 }
 
 async function apiCall(action, payload=null, method='POST', timeoutMs=45000){
-  const url = 'api.php?action=' + encodeURIComponent(action);
+  let url = 'api.php?action=' + encodeURIComponent(action);
   const controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
   const opts = {method, credentials:'include', headers:{}};
   if(controller) opts.signal = controller.signal;
   if(method !== 'GET') opts.headers['Content-Type'] = 'application/json';
   if(csrfToken) opts.headers['X-CSRF-Token'] = csrfToken;
-  if(payload && method !== 'GET') opts.body = JSON.stringify(payload);
+  if(payload && method !== 'GET') {
+    opts.body = JSON.stringify(payload);
+  } else if(payload && method === 'GET') {
+    const params = new URLSearchParams();
+    Object.keys(payload).forEach(key => {
+      const value = payload[key];
+      if(value === undefined || value === null || value === '') return;
+      params.append(
+        key,
+        (typeof value === 'object')
+          ? JSON.stringify(value)
+          : String(value)
+      );
+    });
+    const query = params.toString();
+    if(query) url += '&' + query;
+  }
 
+  let timer = null;
+  try{
+    if(controller && timeoutMs && timeoutMs > 0){
+      timer = setTimeout(()=>{ try{ controller.abort(); }catch(e){} }, timeoutMs);
+    }
+    const res = await fetch(url, opts);
+    let data = null;
+    try{ data = await res.json(); }catch(e){}
+    if(!data) throw new Error('Invalid server response');
+    return data;
+  }finally{
+    if(timer) clearTimeout(timer);
+  }
+}
+
+async function apiCallFormData(action, formData, timeoutMs=120000){
+  const url = 'api.php?action=' + encodeURIComponent(action);
+  const controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+  const opts = {method:'POST', credentials:'include', headers:{}};
+  if(controller) opts.signal = controller.signal;
+  if(csrfToken) opts.headers['X-CSRF-Token'] = csrfToken;
+  opts.body = formData;
   let timer = null;
   try{
     if(controller && timeoutMs && timeoutMs > 0){
@@ -165,9 +669,10 @@ function clearLoginError(){
   el.style.display = 'none';
 }
 
-function setLoginStage(stage, msg=''){
+function setLoginStage(stage, msg='', pendingExpiresIn=null){
   loginStage = stage;
   clearLoginError();
+  schedulePendingAuthTimer(stage, pendingExpiresIn);
 
   const pass = document.getElementById('inp-pin');
   const user = document.getElementById('inp-user');
@@ -257,80 +762,15 @@ function fillLogin(username){
   document.getElementById('inp-pin').focus();
 }
 
-async function doLogin(){
-  const u = document.getElementById('inp-user').value.trim();
-  const p = document.getElementById('inp-pin').value;
-  const otp = (document.getElementById('inp-otp')?.value || '').trim();
-  const recovery = (document.getElementById('inp-recovery')?.value || '').trim();
-
-  try{
-    if(loginStage === 'password'){
-      if(!u || !p){ showLoginError(lang==='en' ? 'Please enter username and password' : 'Vui lòng nhập tài khoản và mật khẩu'); return; }
-
-      const res = await apiCall('auth_login', {username:u, password:p});
-      if(!res.ok){
-        showLoginError(res.error || T('login_error'));
-        return;
-      }
-      if(res.enroll_required){
-        enrollInfo = res;
-        document.getElementById('enroll-issuer').textContent = res.issuer || '';
-        document.getElementById('enroll-username').textContent = res.username || u;
-        document.getElementById('enroll-secret').textContent = res.secret || '';
-        document.getElementById('enroll-otpauth').textContent = res.otpauth_url || '';
-        renderEnrollQR(res.otpauth_url || '');
-        setLoginStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'Bước 2: Bật 2FA và nhập mã 6 số');
-        return;
-      }
-      if(res.mfa_required){
-        setLoginStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nhập mã xác thực 6 số từ Authenticator');
-        return;
-      }
-      if(res.logged_in){
-        await onLoggedIn(res);
-        return;
-      }
-      showLoginError(res.error || T('login_error'));
-      return;
-    }
-
-    if(loginStage === 'enroll'){
-      if(!otp){ showLoginError(lang==='en' ? 'Enter 6-digit code to confirm' : 'Nhập mã 6 số để xác nhận'); return; }
-      const res = await apiCall('auth_enroll_verify', {code: otp});
-      if(!res.ok){
-        if(res.error === 'unauthorized') showLoginError(lang==='en' ? 'Login session expired. Please sign in again.' : 'Phiên đăng nhập bị mất. Vui lòng thử đăng nhập lại.');
-        else showLoginError(res.error || (lang==='en' ? 'Invalid code' : 'Sai mã'));
-        return;
-      }
-      if(res.recovery_codes && Array.isArray(res.recovery_codes)){
-        showRecoveryCodes(res.recovery_codes);
-      }
-      await onLoggedIn(res);
-      return;
-    }
-
-    if(loginStage === 'mfa'){
-      if(!otp && !recovery){ showLoginError(lang==='en' ? 'Enter authenticator code or recovery code' : 'Nhập mã xác thực hoặc mã dự phòng'); return; }
-      const res = await apiCall('auth_mfa_verify', {username:u, password:p, code: otp, recovery: recovery});
-      if(!res.ok){ showLoginError(res.error || (lang==='en' ? 'Invalid code' : 'Sai mã')); return; }
-      await onLoggedIn(res);
-      return;
-    }
-  }catch(err){
-    console.error(err);
-    showLoginError(lang==='en' ? 'Cannot connect to server. Please try again.' : 'Không thể kết nối máy chủ. Vui lòng thử lại.');
-  }
-}
-
 async function onLoggedIn(res){
   csrfToken = res.csrf_token || csrfToken;
-  currentUser = res.user || currentUser;
+  syncCurrentUserRef(res.user || currentUser);
 
   if(!currentUser){
     // fallback: check status
     try{
       const s = await apiCall('status', null, 'GET');
-      if(s.logged_in){ currentUser = s.user; csrfToken = s.csrf_token || csrfToken; }
+      if(s.logged_in){ syncCurrentUserRef(s.user); csrfToken = s.csrf_token || csrfToken; }
     }catch(e){}
   }
   // V10 Role migration: map old role keys to new JD-based keys
@@ -359,7 +799,7 @@ async function onLoggedIn(res){
     const accepted = await showConsentDialog();
     if(!accepted){
       showToast(lang==='en'?'Access denied — consent required':'Truy cập bị từ chối — cần đồng ý điều khoản');
-      currentUser = null; csrfToken = null;
+      syncCurrentUserRef(null); csrfToken = null;
       try{ await apiCall('auth_logout', {}, 'POST'); }catch(e){}
       setLoginStage('password');
       return;
@@ -379,7 +819,7 @@ async function onLoggedIn(res){
         not_supported: lang==='en'?'Browser does not support geolocation.':'Trình duyệt không hỗ trợ định vị.'
       };
       alert('⚠ ' + (reasons[geo.reason] || reasons.denied) + '\n\n' + (lang==='en'?'Session will be terminated.':'Phiên sẽ kết thúc.'));
-      currentUser = null; csrfToken = null;
+      syncCurrentUserRef(null); csrfToken = null;
       try{ await apiCall('auth_logout', {}, 'POST'); }catch(e){}
       setLoginStage('password');
       return;
@@ -390,23 +830,6 @@ async function onLoggedIn(res){
   startActivityTracking(geo);
 
   showApp();
-}
-
-async function doLogout(){
-  try{ await apiCall('auth_logout', {}, 'POST'); }catch(e){}
-
-  csrfToken = null;
-  currentUser = null;
-
-  document.getElementById('app').classList.remove('active');
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('inp-user').disabled = false;
-  document.getElementById('inp-pin').disabled = false;
-  document.getElementById('inp-user').value = '';
-  document.getElementById('inp-pin').value = '';
-  const otp = document.getElementById('inp-otp'); if(otp) otp.value='';
-  const r = document.getElementById('inp-recovery'); if(r) r.value='';
-  setLoginStage('password');
 }
 
 function setLoginChecking(isChecking, msg){
@@ -421,36 +844,6 @@ function setLoginChecking(isChecking, msg){
     stageMsg.textContent = msg || '';
     stageMsg.style.display = msg ? 'block' : 'none';
   }
-}
-
-async function checkSession(){
-  // Avoid "false logout" on hard refresh when the server is busy or a session file is locked.
-  // We temporarily disable the login form and retry a few times.
-  setLoginChecking(true, lang==='en' ? 'Checking session…' : 'Đang kiểm tra phiên đăng nhập…');
-
-  const delays = [0, 350, 900, 1600];
-  for(let i=0;i<delays.length;i++){
-    if(delays[i]) await new Promise(r=>setTimeout(r, delays[i]));
-    try{
-      const s = await apiCall('status', null, 'GET', 8000);
-      if(s && s.logged_in){
-        csrfToken = s.csrf_token || null;
-        currentUser = s.user;
-        setLoginChecking(false, '');
-        // Resume tracking with geolocation
-        const geo = await requireGeolocation().catch(()=>({ok:false}));
-        startActivityTracking(geo);
-        showApp();
-        return;
-      }
-      // Not logged in
-      break;
-    }catch(e){
-      // try again
-    }
-  }
-
-  setLoginChecking(false, '');
 }
 
 function showRecoveryCodes(codes){
@@ -595,56 +988,303 @@ function getCatForDoc(doc){
 // ═══════════════════════════════════════════════════
 // RENDER APP
 // ═══════════════════════════════════════════════════
+// Auth flow hardening override:
+// - keep MFA/enroll pending on the login screen only
+// - expire pending OTP/enroll sessions cleanly
+// - never render an "empty portal" when auth is incomplete
+async function doLogin(){
+  const u = document.getElementById('inp-user').value.trim();
+  const p = document.getElementById('inp-pin').value;
+  const otp = (document.getElementById('inp-otp')?.value || '').trim();
+  const recovery = (document.getElementById('inp-recovery')?.value || '').trim();
+
+  try{
+    if(loginStage === 'password'){
+      if(!u || !p){ showLoginError(lang==='en' ? 'Please enter username and password' : 'Vui lòng nhập tài khoản và mật khẩu'); return; }
+
+      const res = await apiCall('auth_login', {username:u, password:p});
+      if(!res.ok){
+        showLoginError(res.error || T('login_error'));
+        return;
+      }
+      if(res.enroll_required){
+        enrollInfo = res;
+        csrfToken = res.csrf_token || csrfToken;
+        document.getElementById('enroll-issuer').textContent = res.issuer || '';
+        document.getElementById('enroll-username').textContent = res.username || u;
+        document.getElementById('enroll-secret').textContent = res.secret || '';
+        document.getElementById('enroll-otpauth').textContent = res.otpauth_url || '';
+        renderEnrollQR(res.otpauth_url || '');
+        showPendingAuthStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'Bước 2: Bật 2FA và nhập mã 6 số', res.pending_expires_in);
+        return;
+      }
+      if(res.mfa_required){
+        csrfToken = res.csrf_token || csrfToken;
+        showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nhập mã xác thực 6 số từ Authenticator', res.pending_expires_in);
+        return;
+      }
+      if(res.logged_in){
+        await onLoggedIn(res);
+        return;
+      }
+      showLoginError(res.error || T('login_error'));
+      return;
+    }
+
+    if(loginStage === 'enroll'){
+      if(!otp){ showLoginError(lang==='en' ? 'Enter 6-digit code to confirm' : 'Nhập mã 6 số để xác nhận'); return; }
+      const res = await apiCall('auth_enroll_verify', {code: otp});
+      if(!res.ok){
+        if(res.error === 'unauthorized' || res.error === 'enroll_expired'){
+          resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Authenticator setup timed out. Please sign in again.' : 'Phiên thiết lập Authenticator đã hết hạn. Vui lòng đăng nhập lại.'});
+        } else {
+          showLoginError(res.error || (lang==='en' ? 'Invalid code' : 'Sai mã'));
+        }
+        return;
+      }
+      if(res.recovery_codes && Array.isArray(res.recovery_codes)){
+        showRecoveryCodes(res.recovery_codes);
+      }
+      await onLoggedIn(res);
+      return;
+    }
+
+    if(loginStage === 'mfa'){
+      if(!otp && !recovery){ showLoginError(lang==='en' ? 'Enter authenticator code or recovery code' : 'Nhập mã xác thực hoặc mã dự phòng'); return; }
+      const res = await apiCall('auth_mfa_verify', {username:u, password:p, code: otp, recovery: recovery});
+      if(!res.ok){
+        if(res.error === 'mfa_expired' || res.error === 'unauthorized'){
+          resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Authenticator verification timed out. Please sign in again.' : 'Phiên xác thực OTP đã hết hạn. Vui lòng đăng nhập lại.'});
+        } else {
+          showLoginError(res.error || (lang==='en' ? 'Invalid code' : 'Sai mã'));
+        }
+        return;
+      }
+      await onLoggedIn(res);
+      return;
+    }
+  }catch(err){
+    console.error(err);
+    showLoginError(lang==='en' ? 'Cannot connect to server. Please try again.' : 'Không thể kết nối máy chủ. Vui lòng thử lại.');
+  }
+}
+
+async function doLogout(){
+  clearPendingAuthTimer();
+  try{ await apiCall('auth_logout', {}, 'POST'); }catch(e){}
+
+  csrfToken = null;
+  syncCurrentUserRef(null);
+  try{ if(typeof stopLiveDocsSync==='function') stopLiveDocsSync(); }catch(e){}
+
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('inp-user').disabled = false;
+  document.getElementById('inp-pin').disabled = false;
+  document.getElementById('inp-user').value = '';
+  document.getElementById('inp-pin').value = '';
+  const otp = document.getElementById('inp-otp'); if(otp) otp.value='';
+  const r = document.getElementById('inp-recovery'); if(r) r.value='';
+  setLoginStage('password');
+}
+
+async function checkSession(){
+  setLoginChecking(true, lang==='en' ? 'Checking session…' : 'Đang kiểm tra phiên đăng nhập…');
+
+  let lastStatus = null;
+  const delays = [0, 350, 900, 1600];
+  for(let i=0;i<delays.length;i++){
+    if(delays[i]) await new Promise(r=>setTimeout(r, delays[i]));
+    try{
+      const s = await apiCall('status', null, 'GET', 8000);
+      lastStatus = s;
+      if(s && s.logged_in){
+        clearPendingAuthTimer();
+        csrfToken = s.csrf_token || null;
+        syncCurrentUserRef(s.user);
+        setLoginChecking(false, '');
+        const geo = await requireGeolocation().catch(()=>({ok:false}));
+        startActivityTracking(geo);
+        showApp();
+        return;
+      }
+      if(s && s.enroll_pending){
+        csrfToken = s.csrf_token || null;
+        enrollInfo = s;
+        document.getElementById('enroll-issuer').textContent = s.issuer || '';
+        document.getElementById('enroll-username').textContent = s.username || '';
+        document.getElementById('enroll-secret').textContent = s.secret || '';
+        document.getElementById('enroll-otpauth').textContent = s.otpauth_url || '';
+        renderEnrollQR(s.otpauth_url || '');
+        setLoginChecking(false, '');
+        showPendingAuthStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'Bước 2: Bật 2FA và nhập mã 6 số', s.pending_expires_in);
+        return;
+      }
+      if(s && s.mfa_pending){
+        csrfToken = s.csrf_token || null;
+        setLoginChecking(false, '');
+        showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nhập mã xác thực 6 số từ Authenticator', s.pending_expires_in);
+        return;
+      }
+      break;
+    }catch(e){
+      // retry
+    }
+  }
+
+  setLoginChecking(false, '');
+  if(lastStatus && lastStatus.auth_expired){
+    resetPortalToLogin({stage:'password', errorMsg:getPendingAuthExpiredMessage(lastStatus.auth_expired)});
+    return;
+  }
+  if(document.getElementById('app')?.classList.contains('active')){
+    resetPortalToLogin({stage:'password'});
+  }
+}
+
 async function showApp(){
+  if(!currentUser){
+    resetPortalToLogin({stage:'password', errorMsg: lang==='en' ? 'Login session is no longer valid.' : 'Phiên đăng nhập không còn hợp lệ.'});
+    return;
+  }
+
+  clearPendingAuthTimer();
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').classList.add('active');
   const r = ROLES[currentUser.role] || {label: currentUser.title||currentUser.role, labelEn: currentUser.title||currentUser.role};
   document.getElementById('hdr-name').textContent = currentUser.name;
   document.getElementById('hdr-title').textContent = (lang==='en' ? (r.labelEn||r.label||currentUser.title||'') : (r.label||currentUser.title||''));
-  // Avatar removed
-  // Set avatar text (tricky with dropdown child)
   document.getElementById('dd-name').textContent = currentUser.name;
   document.getElementById('dd-title').textContent = (lang==='en'?(r.labelEn||currentUser.title):currentUser.title) + ' · ' + currentUser.dept;
   document.getElementById('dd-access').textContent = lang==='en'?(r.labelEn||r.label):r.label;
-  // Load server-backed settings/lists before initial render
-  await loadDocsFromServer(); // ★ LIVE: scan filesystem for documents
-  await loadFolderDescriptions(); // ★ Load folder descriptions
+
+  const docsLoaded = await loadDocsFromServer();
+  if(!docsLoaded){
+    let status = null;
+    try{ status = await apiCall('status', null, 'GET', 8000); }catch(e){}
+    if(!(status && status.logged_in)){
+      if(status && status.enroll_pending){
+        csrfToken = status.csrf_token || null;
+        enrollInfo = status;
+        document.getElementById('enroll-issuer').textContent = status.issuer || '';
+        document.getElementById('enroll-username').textContent = status.username || '';
+        document.getElementById('enroll-secret').textContent = status.secret || '';
+        document.getElementById('enroll-otpauth').textContent = status.otpauth_url || '';
+        renderEnrollQR(status.otpauth_url || '');
+        showPendingAuthStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'Bước 2: Bật 2FA và nhập mã 6 số', status.pending_expires_in);
+        return;
+      }
+      if(status && status.mfa_pending){
+        csrfToken = status.csrf_token || null;
+        showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nhập mã xác thực 6 số từ Authenticator', status.pending_expires_in);
+        return;
+      }
+      resetPortalToLogin({
+        stage:'password',
+        errorMsg: status && status.auth_expired
+          ? getPendingAuthExpiredMessage(status.auth_expired)
+          : (lang==='en' ? 'Login session is no longer valid. Please sign in again.' : 'Phiên đăng nhập không còn hợp lệ. Vui lòng đăng nhập lại.')
+      });
+      return;
+    }
+    showToast(lang==='en' ? 'Document index is temporarily unavailable.' : 'Danh mục tài liệu tạm thời chưa tải được.');
+  }
+
+  await loadFolderDescriptions();
   await loadRolePermsFromServer();
   await loadCustomDocsFromServer();
   await loadDocVisibilityFromServer();
   await refreshAllDocStatesFromServer();
 
   renderSidebar();
+  syncSidebarToggleState();
   navigateTo('dashboard');
   loadUsersFromServerIfAdmin();
+  try{ if(typeof startLiveDocsSync==='function') startLiveDocsSync(); }catch(e){}
 }
 
 function renderSidebar(){
   const nav = document.getElementById('sidebar-nav');
   const VDOCS = getVisibleDocs();
 
-  const SIDEBAR_SECTIONS = [
-    {id:'system', label:lang==='en'?'System Documents':'Tài liệu hệ thống'},
-    {id:'ops',    label:lang==='en'?'Operational Documents':'Tài liệu vận hành'},
-    {id:'train',  label:lang==='en'?'Training & Competency':'Đào tạo & Năng lực'}
-  ];
+  const SIDEBAR_SECTIONS = portalSidebarSections();
+  const coreButtons = [];
 
-  let html = `<div class="nav-section">
-    <button class="nav-item ${currentPage==='dashboard'?'active':''}" onclick="navigateTo('dashboard')"><span class="icon">&#127968;</span><span>${T('dashboard')}</span></button>
-    <button class="nav-item ${currentPage==='documents'?'active':''}" onclick="navigateTo('documents')"><span class="icon">&#128193;</span><span>${T('all_docs')}</span><span class="badge">${VDOCS.length}</span></button>
-    <button class="nav-item ${currentPage==='search'?'active':''}" onclick="navigateTo('search')"><span class="icon">&#128269;</span><span>${T('search')}</span></button>
-    <button class="nav-item ${currentPage==='dictionary'?'active':''}" onclick="navigateTo('dictionary')"><span class="icon">&#128214;</span><span>${T('dictionary')}</span><span class="badge" id="dict-badge">${dictData ? dictData.length.toLocaleString() : '...'}</span></button>
-  </div>
-  ${(isAdmin()) ? '<div class="nav-section"><div class="nav-section-title">ADMIN</div><button class="nav-item '+(currentPage==='admin'?'active':'')+'" onclick="navigateTo(\'admin\')"><span class="icon">&#9881;</span><span>'+T('admin_panel')+'</span></button></div>' : ''}`;
+  if(isPortalSidebarCoreVisible('dashboard')){
+    coreButtons.push(`<button class="nav-item ${currentPage==='dashboard'?'active':''}" onclick="navigateTo('dashboard')"><span class="icon">🏠</span><span>${T('dashboard')}</span></button>`);
+  }
+  if(isPortalSidebarCoreVisible('documents')){
+    coreButtons.push(`<button class="nav-item ${currentPage==='documents'?'active':''}" onclick="navigateTo('documents')"><span class="icon">📁</span><span>${T('all_docs')}</span><span class="badge">${VDOCS.length}</span></button>`);
+  }
+  if(isPortalSidebarCoreVisible('search')){
+    coreButtons.push(`<button class="nav-item ${currentPage==='search'?'active':''}" onclick="navigateTo('search')"><span class="icon">🔍</span><span>${T('search')}</span></button>`);
+  }
+  if(isPortalSidebarCoreVisible('dictionary')){
+    coreButtons.push(`<button class="nav-item ${currentPage==='dictionary'?'active':''}" onclick="navigateTo('dictionary')"><span class="icon">📖</span><span>${T('dictionary')}</span><span class="badge" id="dict-badge">${dictData ? dictData.length.toLocaleString() : '...'}</span></button>`);
+  }
+
+  let html = coreButtons.length ? `<div class="nav-section">${coreButtons.join('')}</div>` : '';
+
+  if(isPortalSidebarCoreVisible('deploy')){
+    // ── SẢN XUẤT ──
+    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'PRODUCTION':'SẢN XUẤT'}</div>
+      <button class="nav-item ${currentPage==='orders'?'active':''}" onclick="navigateTo('orders')"><span class="icon">📦</span><span>${lang==='en'?'Orders':'Đơn hàng'}</span></button>
+      <button class="nav-item ${currentPage==='dispatch'?'active':''}" onclick="navigateTo('dispatch')"><span class="icon">📋</span><span>${lang==='en'?'Production Dispatch':'Phân công sản xuất'}</span></button>
+      <button class="nav-item ${currentPage==='mes'?'active':''}" onclick="navigateTo('mes')"><span class="icon">🏭</span><span>${lang==='en'?'Shop Floor':'Xưởng sản xuất'}</span></button>
+      <button class="nav-item ${currentPage==='mobile-shopfloor'?'active':''}" onclick="navigateTo('mobile-shopfloor')"><span class="icon">📱</span><span>${lang==='en'?'Operator Mobile':'Công nhân di động'}</span></button>
+      <button class="nav-item ${currentPage==='quoting'?'active':''}" onclick="navigateTo('quoting')"><span class="icon">💰</span><span>${lang==='en'?'Quoting':'Báo giá'}</span></button>
+    </div>`;
+    // ── CHẤT LƯỢNG ──
+    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'QUALITY':'CHẤT LƯỢNG'}</div>
+      <button class="nav-item ${['quality-exceptions','exceptions'].indexOf(currentPage)>=0?'active':''}" onclick="navigateTo('quality-exceptions')"><span class="icon">🔴</span><span>${lang==='en'?'Nonconformance':'Sự không phù hợp'}</span></button>
+      <button class="nav-item ${currentPage==='supplier-quality'?'active':''}" onclick="navigateTo('supplier-quality')"><span class="icon">🏪</span><span>${lang==='en'?'Supplier Quality':'Chất lượng NCC'}</span></button>
+      <button class="nav-item ${currentPage==='fmea'?'active':''}" onclick="navigateTo('fmea')"><span class="icon">⚡</span><span>${lang==='en'?'FMEA & Control Plan':'FMEA & Control Plan'}</span></button>
+      <button class="nav-item ${currentPage==='apqp-ppap'?'active':''}" onclick="navigateTo('apqp-ppap')"><span class="icon">🎯</span><span>${lang==='en'?'APQP / PPAP':'APQP / PPAP'}</span></button>
+      <button class="nav-item ${currentPage==='ai-scheduling'?'active':''}" onclick="navigateTo('ai-scheduling')"><span class="icon">🤖</span><span>${lang==='en'?'AI Quality':'AI Chất lượng'}</span></button>
+    </div>`;
+    // ── HỒ SƠ & BÁO CÁO ──
+    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'RECORDS & REPORTS':'HỒ SƠ & BÁO CÁO'}</div>
+      <button class="nav-item ${currentPage==='forms'?'active':''}" onclick="navigateTo('forms')"><span class="icon">📋</span><span>${lang==='en'?'Evidence Control':'Kiểm soát chứng cứ'}</span></button>
+      <button class="nav-item ${currentPage==='evidence'?'active':''}" onclick="navigateTo('evidence')"><span class="icon">🔒</span><span>${lang==='en'?'Evidence Vault':'Kho chứng cứ'}</span></button>
+      <button class="nav-item ${currentPage==='compliance-reports'?'active':''}" onclick="navigateTo('compliance-reports')"><span class="icon">📊</span><span>${lang==='en'?'Reports':'Báo cáo'}</span></button>
+      <button class="nav-item ${currentPage==='continuous-improvement'?'active':''}" onclick="navigateTo('continuous-improvement')"><span class="icon">🔄</span><span>${lang==='en'?'Improvement':'Cải tiến liên tục'}</span></button>
+      <button class="nav-item ${currentPage==='knowledge-base'?'active':''}" onclick="navigateTo('knowledge-base')"><span class="icon">💡</span><span>${lang==='en'?'Knowledge Base':'Kho kiến thức'}</span></button>
+    </div>`;
+    // ── CÔNG CỤ ──
+    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'TOOLS':'CÔNG CỤ'}</div>
+      <button class="nav-item ${currentPage==='cnc-programs'?'active':''}" onclick="navigateTo('cnc-programs')"><span class="icon">⚙</span><span>${lang==='en'?'CNC Programs':'Chương trình CNC'}</span></button>
+      <button class="nav-item ${currentPage==='product-passport'?'active':''}" onclick="navigateTo('product-passport')"><span class="icon">🔗</span><span>${lang==='en'?'Product Passport':'Hộ chiếu sản phẩm'}</span></button>
+      <button class="nav-item ${currentPage==='schema-studio'?'active':''}" onclick="navigateTo('schema-studio')"><span class="icon">🗄</span><span>${lang==='en'?'Schema Studio':'Schema Studio'}</span></button>
+      <button class="nav-item ${currentPage==='energy-dashboard'?'active':''}" onclick="navigateTo('energy-dashboard')"><span class="icon">⚡</span><span>${lang==='en'?'Energy':'Năng lượng'}</span></button>
+      <button class="nav-item ${currentPage==='deploy'?'active':''}" onclick="navigateTo('deploy')"><span class="icon">🚀</span><span>${lang==='en'?'Deploy':'Triển khai'}</span></button>
+      <button class="nav-item ${currentPage==='customer-portal'?'active':''}" onclick="navigateTo('customer-portal')"><span class="icon">🌐</span><span>${lang==='en'?'Customer Portal':'Cổng khách hàng'}</span></button>
+    </div>`;
+    // Nút + Tạo Module mới (luôn hiện cho admin)
+    if(isAdmin()){
+      html += `<div class="nav-section" style="padding:0 8px"><button class="nav-item" onclick="navigateTo('module-builder')" style="border:1px dashed rgba(255,255,255,0.3);justify-content:center;opacity:0.7"><span class="icon">➕</span><span>${lang==='en'?'Create Module':'Tạo Module mới'}</span></button></div>`;
+    }
+  }
+  if(isAdmin() && isPortalSidebarCoreVisible('admin')){
+    html += `<div class="nav-section"><div class="nav-section-title">ADMIN</div><button class="nav-item ${currentPage==='admin'?'active':''}" onclick="navigateTo('admin')"><span class="icon">⚙</span><span>${T('admin_panel')}</span></button></div>`;
+  }
+
+  if(isAdmin()){
+    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'TEMPLATE LAB':'TEMPLATE LAB'}</div>
+      <button class="nav-item ${currentPage==='template-demo'?'active':''}" onclick="navigateTo('template-demo')"><span class="icon">🧩</span><span>${lang==='en'?'Master Module Template':'Master Module Template'}</span></button>
+    </div>`;
+  }
 
   SIDEBAR_SECTIONS.forEach(sec => {
-    const catsInSec = CATEGORIES.filter(c => !c.hidden && c.section === sec.id && VDOCS.some(d => d.cat === c.id));
+    if(!isPortalSidebarSectionVisible(sec.id)) return;
+    const catsInSec = CATEGORIES.filter(c => !c.hidden && isPortalSidebarCategoryVisible(c.id) && c.section === sec.id && (VDOCS.some(d => d.cat === c.id) || portalCategoryHasPhysicalTree(c.id)));
     if(catsInSec.length === 0) return;
     html += `<div class="nav-section"><div class="nav-section-title">${sec.label}</div>`;
     catsInSec.forEach(cat => {
-      const cnt = VDOCS.filter(d=>d.cat===cat.id).length;
-      if(cnt === 0) return;
-      const locked = !VDOCS.filter(d=>d.cat===cat.id).some(d=>canAccessDoc(d.code));
+      let cnt = VDOCS.filter(d=>d.cat===cat.id).length;
+      const physicalCount = getPortalCategoryPhysicalNodeCount(cat.id);
+      if(cnt === 0 && physicalCount > 0) cnt = physicalCount;
+      const visibleDocsInCat = VDOCS.filter(d=>d.cat===cat.id);
+      const locked = visibleDocsInCat.length > 0 && !visibleDocsInCat.some(d=>canAccessDoc(d.code));
       html += `<button class="nav-item ${currentFilter===cat.id&&currentPage==='documents'?'active':''}" onclick="navigateTo('documents','${cat.id}')">
         <span class="icon">${cat.icon}</span><span>${catLabel(cat)}</span><span class="badge">${locked?'🔒':cnt}</span>
       </button>`;
@@ -658,7 +1298,12 @@ function renderSidebar(){
 // ═══════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════
-function navigateTo(page, filter){
+function navigateTo(page, filter, bypassGuard){
+  if(!bypassGuard && typeof window._ecBeforePortalNavigate === 'function'){
+    try{
+      if(window._ecBeforePortalNavigate({ page:page, filter:filter })) return;
+    }catch(_guardErr){}
+  }
   // Auto-close sidebar on mobile
   if(window.innerWidth <= 900) closeMobileSidebar();
   currentPage = page;
@@ -670,21 +1315,51 @@ function navigateTo(page, filter){
   document.getElementById('user-dropdown').classList.remove('show');
   
   // Track page view for activity log
-  const pageTitles = {dashboard:'Tổng quan',documents:'Danh sách tài liệu',search:'Tìm kiếm',dictionary:'Từ điển thuật ngữ',access:'Ma trận truy cập',admin:'Quản trị hệ thống'};
+  const pageTitles = {dashboard:'Tổng quan',documents:'Danh sách tài liệu',search:'Tìm kiếm',dictionary:'Từ điển thuật ngữ',access:'Ma trận truy cập',admin:'Quản trị hệ thống',deploy:'Triển khai vận hành',mes:'Trung tâm điều hành MES',exceptions:'Bảng ngoại lệ',orders:'Quản lý đơn hàng',forms:'Kiểm soát chứng cứ','quality-exceptions':'Quản lý ngoại lệ chất lượng','supplier-quality':'Quản lý chất lượng NCC','quoting':'Báo giá & Ước tính',evidence:'Kho chứng cứ','customer-portal':'Cổng khách hàng','cnc-programs':'Chương trình CNC','product-passport':'Hộ chiếu sản phẩm số','ai-scheduling':'AI Chất lượng & Lịch trình','compliance-reports':'Báo cáo tuân thủ',fmea:'FMEA & Control Plan','apqp-ppap':'APQP / PPAP','mobile-shopfloor':'Xưởng di động','knowledge-base':'Kho kiến thức','continuous-improvement':'Cải tiến liên tục','energy-dashboard':'Giám sát năng lượng','schema-studio':'Schema Studio'};
   trackPageView(page + (filter ? '/'+filter : ''), (pageTitles[page]||page) + (filter ? ' — '+filter : ''));
   
-  const titles = {dashboard:T('bc_dashboard'),documents:T('bc_documents'),search:T('bc_search'),dictionary:T('bc_dictionary'),access:T('bc_access')};
+  const titles = {dashboard:T('bc_dashboard'),documents:T('bc_documents'),search:T('bc_search'),dictionary:T('bc_dictionary'),access:T('bc_access'),deploy:lang==='en'?'Operations Deployment':'Triển khai vận hành',mes:lang==='en'?'MES Control Center':'Trung tâm điều hành MES',exceptions:lang==='en'?'Exception Dashboard':'Bảng ngoại lệ',orders:lang==='en'?'Order Management':'Quản lý đơn hàng',forms:lang==='en'?'Evidence Control':'Kiểm soát chứng cứ','quality-exceptions':lang==='en'?'Quality Exception Hub':'Quản lý ngoại lệ chất lượng','supplier-quality':lang==='en'?'Supplier Quality':'Quản lý chất lượng NCC',quoting:lang==='en'?'Quoting & Estimation':'Báo giá & Ước tính',evidence:lang==='en'?'Evidence Vault':'Kho chứng cứ','customer-portal':lang==='en'?'Customer Portal Admin':'Quản trị cổng khách hàng','cnc-programs':lang==='en'?'CNC Programs':'Chương trình CNC','product-passport':lang==='en'?'Digital Product Passport':'Hộ chiếu sản phẩm số','ai-scheduling':lang==='en'?'AI Quality & Scheduling':'AI Chất lượng & Lịch trình','compliance-reports':lang==='en'?'Compliance Reports':'Báo cáo tuân thủ',fmea:lang==='en'?'FMEA & Control Plan':'FMEA & Control Plan','apqp-ppap':lang==='en'?'APQP / PPAP':'APQP / PPAP','mobile-shopfloor':lang==='en'?'Shop Floor Mobile':'Xưởng di động','knowledge-base':lang==='en'?'Knowledge Base':'Kho kiến thức','continuous-improvement':lang==='en'?'Continuous Improvement':'Cải tiến liên tục','energy-dashboard':lang==='en'?'Energy Monitor':'Giám sát năng lượng','schema-studio':'Schema Studio'};
+  titles['template-demo'] = 'Master Module Template';
   // Reset header breadcrumb for non-documents pages
   if(page !== 'documents'){
     const bcEl = document.getElementById('header-breadcrumb');
     if(bcEl) bcEl.innerHTML = `<span>HESEM QMS</span><span style="margin:0 4px">›</span><span class="current">${titles[page]||page}</span>`;
   }
-  
+
+  setDocHeaderToolbar('');
   if(page==='dashboard') renderDashboard();
-  if(page==='documents') renderDocuments();
+  if(page==='documents'){ _lastDocRenderTarget = 'page-documents'; renderDocuments(); }
   if(page==='search') renderSearch();
   if(page==='dictionary') renderDictionary();
   if(page==='access') renderAccessMatrix();
+  if(page==='deploy') renderDeployDashboard();
+  if(page==='mes' && typeof window._renderMesControlCenter==='function'){ var mp=document.getElementById('page-mes'); if(mp) window._renderMesControlCenter(mp); }
+  if(page==='exceptions' && typeof window._renderExceptionDashboard==='function'){ var xp=document.getElementById('page-exceptions'); if(xp) window._renderExceptionDashboard(xp); }
+  if(page==='orders' && typeof window._renderSoJoWoDashboard==='function'){ var op=document.getElementById('page-orders'); if(op) window._renderSoJoWoDashboard(null,null,op); }
+  if(page==='forms' && typeof renderOnlineForms==='function') renderOnlineForms();
+  if(page==='quality-exceptions' && typeof window._renderQualityExceptionHub==='function'){ var qep=document.getElementById('page-quality-exceptions'); if(qep) window._renderQualityExceptionHub(qep); }
+  if(page==='supplier-quality' && typeof window._renderSupplierQuality==='function'){ var sqp=document.getElementById('page-supplier-quality'); if(sqp) window._renderSupplierQuality(sqp); }
+  if(page==='quoting' && typeof window._renderQuotingEngine==='function'){ var qtp=document.getElementById('page-quoting'); if(qtp) window._renderQuotingEngine(qtp); }
+  if(page==='evidence' && typeof window._renderEvidenceVault==='function'){ var evp=document.getElementById('page-evidence'); if(evp) window._renderEvidenceVault(evp); }
+  if(page==='customer-portal' && typeof window._renderCustomerPortalAdmin==='function'){ var cpp=document.getElementById('page-customer-portal'); if(cpp) window._renderCustomerPortalAdmin(cpp); }
+  if(page==='cnc-programs' && typeof window._renderCncPrograms==='function'){ var cnp=document.getElementById('page-cnc-programs'); if(cnp) window._renderCncPrograms(cnp); }
+  if(page==='product-passport' && typeof window._renderProductPassport==='function'){ var ppp=document.getElementById('page-product-passport'); if(ppp) window._renderProductPassport(ppp); }
+  if(page==='ai-scheduling' && typeof window._renderAiQualityScheduling==='function'){ var asp=document.getElementById('page-ai-scheduling'); if(asp) window._renderAiQualityScheduling(asp); }
+  if(page==='compliance-reports' && typeof window._renderComplianceReports==='function'){ var crp=document.getElementById('page-compliance-reports'); if(crp) window._renderComplianceReports(crp); }
+  if(page==='template-demo'){
+    var tdp=document.getElementById('page-template-demo');
+    if(tdp && window.HmModuleRouter){ window.HmModuleRouter.renderModuleById(tdp, 'M2-orders'); }
+    else if(tdp && typeof window._renderTemplateModule==='function'){ window._renderTemplateModule(tdp); }
+  }
+  if(page==='fmea' && typeof window._renderFmeaControlPlan==='function'){ var fmp=document.getElementById('page-fmea'); if(fmp) window._renderFmeaControlPlan(fmp); }
+  if(page==='apqp-ppap' && typeof window._renderApqpPpap==='function'){ var app=document.getElementById('page-apqp-ppap'); if(app) window._renderApqpPpap(app); }
+  if(page==='mobile-shopfloor' && typeof window._renderMobileShopFloor==='function'){ var msp=document.getElementById('page-mobile-shopfloor'); if(msp) window._renderMobileShopFloor(msp); }
+  if(page==='knowledge-base' && typeof window._renderKnowledgeBase==='function'){ var kbp=document.getElementById('page-knowledge-base'); if(kbp) window._renderKnowledgeBase(kbp); }
+  if(page==='continuous-improvement' && typeof window._renderContinuousImprovement==='function'){ var cip=document.getElementById('page-continuous-improvement'); if(cip) window._renderContinuousImprovement(cip); }
+  if(page==='energy-dashboard' && typeof window._renderEnergyDashboard==='function'){ var edp=document.getElementById('page-energy-dashboard'); if(edp) window._renderEnergyDashboard(edp); }
+  if(page==='dispatch' && typeof window._renderProductionDispatch==='function'){ var dsp=document.getElementById('page-dispatch'); if(dsp) window._renderProductionDispatch(dsp); }
+  if(page==='module-builder' && typeof window._renderModuleBuilder==='function'){ var mbp=document.getElementById('page-module-builder'); if(mbp) window._renderModuleBuilder(mbp); }
+  if(page==='schema-studio' && typeof window._renderSchemaStudio==='function'){ var ssp=document.getElementById('page-schema-studio'); if(ssp) window._renderSchemaStudio(ssp); }
   if(page==='admin'){ if(!isAdmin()){navigateTo('dashboard');return;} renderAdmin(); }
   
   document.getElementById('page-'+page).classList.add('active');
@@ -695,28 +1370,205 @@ function isDownloadOnlyDoc(doc){
   try{
     if(!doc) return false;
     if(doc.delivery_mode === 'download' || doc.portal_behavior === 'download_on_open') return true;
-    if(/^(xlsx|xlsm|xls|csv)$/i.test(String(doc.ext||''))) return true;
-    return /\.(xlsx|xlsm|xls|csv)$/i.test(String(doc.path||''));
+    const ext = String(doc.ext||'').trim().toLowerCase();
+    if(ext) return ext !== 'html';
+    const match = String(doc.path||'').match(/\.([a-z0-9]+)$/i);
+    return !!(match && String(match[1]||'').toLowerCase() !== 'html');
   }catch(e){ return false; }
 }
 
-function triggerDocDownload(doc){
-  if(!doc || !doc.path) return;
+function buildDocStreamUrl(doc, download=true, overridePath=''){
+  try{
+    if(!doc) return '';
+    const relPath = String(overridePath || doc.path || '').replace(/^\/+/, '');
+    if(!relPath) return '';
+    const qs = new URLSearchParams();
+    qs.set('action', 'doc_stream');
+    qs.set('path', relPath);
+    if(doc.code) qs.set('code', String(doc.code));
+    if(download) qs.set('download', '1');
+    return 'api.php?' + qs.toString();
+  }catch(e){
+    return '';
+  }
+}
+
+function normalizeDocRelativePath(relPath){
+  try{
+    return String(relPath || '')
+      .trim()
+      .replace(/\\/g,'/')
+      .replace(/^\/+/,'')
+      .replace(/^\.\//,'');
+  }catch(e){
+    return '';
+  }
+}
+
+function findDocByRelativePath(relPath){
+  try{
+    const normalized = normalizeDocRelativePath(relPath);
+    if(!normalized) return null;
+    return DOCS.find(d => normalizeDocRelativePath(d && d.path) === normalized) || null;
+  }catch(e){
+    return null;
+  }
+}
+
+function resolveDocRecord(docOrCode){
+  try{
+    if(!docOrCode) return null;
+    if(typeof docOrCode === 'object'){
+      if(docOrCode.path){
+        const byObjectPath = findDocByRelativePath(docOrCode.path);
+        if(byObjectPath) return byObjectPath;
+      }
+      if(docOrCode.code){
+        const rawObjectCode = String(docOrCode.code || '').trim();
+        if(rawObjectCode){
+          const currentPath = normalizeDocRelativePath(window.currentDocPath || '');
+          if(currentPath){
+            const currentMatch = DOCS.find(d => String(d && d.code || '').trim() === rawObjectCode && normalizeDocRelativePath(d && d.path) === currentPath);
+            if(currentMatch) return currentMatch;
+          }
+          const byObjectCode = DOCS.find(d => String(d && d.code || '').trim() === rawObjectCode);
+          if(byObjectCode) return byObjectCode;
+        }
+      }
+      return docOrCode.code || docOrCode.path ? docOrCode : null;
+    }
+    const raw = String(docOrCode || '').trim();
+    if(!raw) return null;
+    const byPath = findDocByRelativePath(raw);
+    if(byPath) return byPath;
+    const matches = DOCS.filter(d => String(d && d.code || '').trim() === raw);
+    if(!matches.length) return null;
+    const currentPath = normalizeDocRelativePath(window.currentDocPath || '');
+    if(currentPath){
+      const currentMatch = matches.find(d => normalizeDocRelativePath(d && d.path) === currentPath);
+      if(currentMatch) return currentMatch;
+    }
+    return matches[0] || null;
+  }catch(e){
+    return null;
+  }
+}
+window._resolveDocRecord = resolveDocRecord;
+
+function buildPathStreamUrl(relPath, download=true, code=''){
+  try{
+    const normalized = normalizeDocRelativePath(relPath);
+    if(!normalized) return '';
+    const linkedDoc = findDocByRelativePath(normalized);
+    const qs = new URLSearchParams();
+    qs.set('action', 'doc_stream');
+    qs.set('path', normalized);
+    const resolvedCode = String(code || (linkedDoc && linkedDoc.code) || '').trim();
+    if(resolvedCode) qs.set('code', resolvedCode);
+    if(download) qs.set('download', '1');
+    return 'api.php?' + qs.toString();
+  }catch(e){
+    return '';
+  }
+}
+
+function resolveLinkedDocPath(href, baseDocPath=''){
+  try{
+    const rawHref = String(href || '').trim();
+    if(!rawHref || rawHref.startsWith('#')) return '';
+    if(/^(javascript|mailto|tel|data):/i.test(rawHref)) return '';
+    const baseUrl = new URL('../' + normalizeDocRelativePath(baseDocPath), window.location.href);
+    const targetUrl = new URL(rawHref, baseUrl);
+    if(targetUrl.origin !== window.location.origin) return '';
+    return normalizeDocRelativePath(decodeURIComponent(targetUrl.pathname.replace(/^\/+/, '')));
+  }catch(e){
+    return '';
+  }
+}
+
+function attachIframeLinkBridge(iframe, doc, baseDocPath=''){
+  try{
+    const idoc = iframe && (iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document));
+    if(!idoc || !idoc.addEventListener || idoc.__hesemPortalLinkBridgeAttached) return;
+    const effectiveBasePath = normalizeDocRelativePath(baseDocPath || (doc && doc.path) || '');
+    idoc.addEventListener('click', function(e){
+      const anchor = e && e.target && typeof e.target.closest === 'function' ? e.target.closest('a[href]') : null;
+      if(!anchor || e.defaultPrevented) return;
+      if(e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const relPath = resolveLinkedDocPath(anchor.getAttribute('href'), effectiveBasePath);
+      if(!relPath) return;
+      const linkedDoc = findDocByRelativePath(relPath);
+      if(/\.(xlsx|xlsm|xls|csv)$/i.test(relPath) || anchor.hasAttribute('download')){
+        e.preventDefault();
+        e.stopPropagation();
+        triggerDownloadUrl(buildPathStreamUrl(relPath, true, linkedDoc && linkedDoc.code));
+        return;
+      }
+      if(linkedDoc && /\.(html?)$/i.test(relPath) && typeof openDoc === 'function'){
+        e.preventDefault();
+        e.stopPropagation();
+        openDoc(linkedDoc);
+      }
+    }, true);
+    idoc.__hesemPortalLinkBridgeAttached = true;
+  }catch(e){}
+}
+
+function triggerDownloadUrl(url){
+  const href = String(url || '').trim();
+  if(!href) return;
   const a = document.createElement('a');
-  a.href = '../' + String(doc.path).replace(/^\/+/, '');
+  a.href = href;
   a.download = '';
+  a.rel = 'noopener';
   a.style.display = 'none';
   document.body.appendChild(a);
   a.click();
   setTimeout(()=>a.remove(), 0);
 }
 
+function triggerDocDownload(doc){
+  if(!doc || !doc.path) return;
+  triggerDownloadUrl(buildDocStreamUrl(doc, true));
+}
+
+function downloadCurrentDoc(code){
+  const doc = resolveDocRecord(code);
+  if(!doc) return;
+  triggerDocDownload(doc);
+}
+
+function getVersionAccessUrl(doc, version){
+  try{
+    if(version && version.download_url) return String(version.download_url);
+    if(version && version.file){
+      if(isDownloadOnlyDoc(doc)) return buildDocStreamUrl(doc, true, version.file);
+      return '../' + String(version.file).replace(/^\/+/, '');
+    }
+  }catch(e){}
+  return '';
+}
+
+function versionHasAccess(doc, version){
+  return !!getVersionAccessUrl(doc, version);
+}
+
+function isCurrentVersionEntry(doc, version){
+  try{
+    if(version && version.is_current) return true;
+    return !!(version && version.status==='approved' && version.file===doc.path);
+  }catch(e){
+    return false;
+  }
+}
+
 async function openDoc(code){
   // Ensure no stray overlay blocks the UI
   try{ document.querySelectorAll('.vp-overlay').forEach(el=>el.remove()); }catch(e){}
 
-  const doc = DOCS.find(d=>d.code===code);
+  const doc = resolveDocRecord(code);
   if(!doc) return;
+  const resolvedCode = String(doc.code || '').trim();
 
   // Block access to hidden documents for non-admins
   if(isDocHidden(doc.code) && !isAdmin()){
@@ -726,7 +1578,7 @@ async function openDoc(code){
   if(!canAccessDoc(doc.code)) return;
 
   // ── Unsaved Changes Guard ──
-  if(editMode && editingDoc && editingDoc !== code){
+  if(editMode && editingDoc && editingDoc !== resolvedCode){
     let hasUnsaved=true;
     try{
       hasUnsaved=(typeof edHasUnsavedChanges==='function')
@@ -734,7 +1586,7 @@ async function openDoc(code){
         : (!!getEditedHtml(editingDoc) || !!edModified);
     }catch(e){ hasUnsaved=true; }
     if(hasUnsaved){
-      showUnsavedDialog(editingDoc, code);
+      showUnsavedDialog(editingDoc, resolvedCode);
       return;
     }
     try{ cancelEdit(); }catch(e){
@@ -743,20 +1595,16 @@ async function openDoc(code){
     }
   }
 
-  if(isDownloadOnlyDoc(doc)){
-    const displayTitle = getDocDisplayTitle(doc);
-    trackPageView('doc/'+code, '⬇️ '+code+' — '+displayTitle.substring(0,60));
-    triggerDocDownload(doc);
-    showToast(lang==='en' ? 'Downloading workbook: ' + code : 'Đang tải workbook: ' + code);
-    return;
-  }
-
   // Track document view
   const displayTitle = getDocDisplayTitle(doc);
-  trackPageView('doc/'+code, '📄 '+code+' — '+displayTitle.substring(0,60));
+  const displayCode = (typeof getDocDisplayCode === 'function') ? getDocDisplayCode(doc) : String(doc.code || '').trim();
+  trackPageView('doc/'+resolvedCode, (isDownloadOnlyDoc(doc)?'📊 ':'📄 ')+displayCode+' — '+displayTitle.substring(0,60));
   editMode=false;
   editingDoc=null;
-  currentDoc=code;
+  currentDoc=resolvedCode;
+  window.currentDocPath = String(doc.path || '');
+  setDocHeaderMetaCollapsed(true);
+  try{ if(typeof resetDocViewerZoom==='function') resetDocViewerZoom(); }catch(e){}
   edFullscreen=false;
   const _ec=document.getElementById('editor-container');
   if(_ec){ _ec.style.display='none'; _ec.classList.remove('ed-fullscreen'); }
@@ -781,7 +1629,12 @@ async function openDoc(code){
       bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span>`;
       bcHtml += `<span style="cursor:pointer;color:var(--accent);font-weight:600" onclick="currentFolderPath=currentFolderPath.slice(0,${i+1});navigateTo('documents')">${label}</span>`;
     }
-    bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span><span style="font-weight:700">${doc.code}</span>`;
+    const safeCode = (typeof escapeHtml === 'function') ? escapeHtml(displayCode) : displayCode;
+    const safeTitle = (typeof escapeHtml === 'function') ? escapeHtml(displayTitle) : displayTitle;
+    bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span><span style="font-weight:700">${safeCode}</span>`;
+    if(displayTitle && displayTitle.toUpperCase() !== displayCode.toUpperCase()){
+      bcHtml += `<span style="color:var(--text-3);margin:0 6px">•</span><span class="current">${safeTitle}</span>`;
+    }
     bc.innerHTML = bcHtml;
     bc.style.display = 'flex';
     bc.style.alignItems = 'center';
@@ -794,17 +1647,17 @@ async function openDoc(code){
   renderVersionHistory(doc);
 
   // Load current document HTML immediately
-  loadDocContent(code);
+  loadDocContent(doc);
 
   // Background: refresh server-backed state + versions, then re-render once
   try{
-    refreshDocFromServer(code).then(()=>{
+    refreshDocFromServer(resolvedCode).then(()=>{
       try{
         updateDocViewerHeader(doc);
         renderWorkflowPanel(doc);
         renderVersionHistory(doc);
         // Re-load iframe in case the resolved view file changed (draft / inreview / archive)
-        loadDocContent(code);
+        loadDocContent(doc);
       }catch(e){}
     }).catch(()=>{});
   }catch(e){}
@@ -814,13 +1667,16 @@ async function openDoc(code){
 // without navigating away. This is used after server-side state changes (approve/new revision).
 async function openDocPreview(code){
   try{
-    const doc = DOCS.find(d=>d.code===code);
+    const doc = resolveDocRecord(code);
     if(!doc) return;
+    const resolvedCode = String(doc.code || '').trim();
     // Pull the latest server state/versions to keep folder-sync accurate
-    try{ await refreshDocFromServer(code); }catch(e){}
+    try{ await refreshDocFromServer(resolvedCode); }catch(e){}
 
     // Ensure doc viewer is active
-    currentDoc = code;
+    currentDoc = resolvedCode;
+    window.currentDocPath = String(doc.path || '');
+    setDocHeaderMetaCollapsed(true);
     const viewer = document.getElementById('doc-viewer');
     if(viewer) viewer.classList.add('active');
 
@@ -828,7 +1684,7 @@ async function openDocPreview(code){
     updateDocViewerHeader(doc);
     renderWorkflowPanel(doc);
     renderVersionHistory(doc);
-    loadDocContent(code);
+    loadDocContent(doc);
   }catch(err){
     console.error('openDocPreview error:', err);
   }
@@ -855,6 +1711,8 @@ function closeDocViewer(){
   editMode=false;
   editingDoc=null;
   currentDoc=null;
+  setDocHeaderMetaCollapsed(true);
+  try{ if(typeof resetDocViewerZoom==='function') resetDocViewerZoom(); }catch(e){}
   // Clean up iframe state to prevent stale content
   var iframe=document.getElementById('doc-iframe');
   iframe.onload=null;
@@ -874,26 +1732,39 @@ function buildDocHeaderActions(doc){
   try{
     if(!doc) return '';
     const status=getDocStatus(doc);
+    const isWorkbook=isDownloadOnlyDoc(doc);
+    const versions=getDocVersions(doc.code)||[];
+    const workflowRev = (typeof getDocWorkingRevision==='function') ? getDocWorkingRevision(doc) : String(getDocRevision(doc)||'0');
+    const activeDraft=versions.find(v=>v && v.status==='draft' && (v.download_url || v.file) && String(v.version||'').replace(/^v/i,'')===String(workflowRev||''));
+    const hasDiscardableWorkbookDraft=!!activeDraft || ((typeof docHasWorkingVersion==='function') ? docHasWorkingVersion(doc.code) : false);
 
     // While editing: show edit workflow buttons
     if(editMode && editingDoc===doc.code){
       return `
-        <button class="wf-btn save" onclick="saveDraft('${doc.code}')">${T('wf_save_draft')}</button>
-        <button class="wf-btn submit" onclick="submitForReview('${doc.code}')">${T('wf_submit_review')}</button>
-        <button class="wf-btn cancel" onclick="cancelEdit()">${T('wf_cancel_edit')}</button>
+        ${renderDocHeaderButton(T('wf_save_draft'), 'save', 'primary', `saveDraft('${doc.code}')`)}
+        ${renderDocHeaderButton(T('wf_submit_review'), 'submit', 'accent', `submitForReview('${doc.code}')`)}
+        ${renderDocHeaderButton(T('wf_cancel_edit'), 'cancel', 'neutral', 'cancelEdit()')}
       `;
     }
 
     // Draft: show Edit
-    if(status==='draft' && canEdit(doc)){
-      return `<button class="wf-btn edit" onclick="startEdit('${doc.code}')">${T('wf_edit')}</button>`;
+    if(status==='draft' && canEdit(doc) && !isWorkbook){
+      return renderDocHeaderButton(T('wf_edit'), 'edit', 'primary', `startEdit('${doc.code}')`);
+    }
+
+    if(isWorkbook && status==='draft' && canEdit(doc)){
+      return `
+        ${renderDocHeaderButton(lang==='en'?'Upload draft':'Upload bản nháp', 'upload', 'primary', `uploadFormDraft('${doc.code}')`)}
+        ${activeDraft?renderDocHeaderButton(T('wf_submit_review'), 'submit', 'accent', `submitWorkbookForReview('${doc.code}')`):''}
+        ${hasDiscardableWorkbookDraft?renderDocHeaderButton(lang==='en'?'Discard draft':'Hủy nháp', 'cancel', 'danger', `deleteDraft('${doc.code}')`):''}
+      `;
     }
 
     // In review: show Approve/Reject (for approvers)
     if(status==='in_review' && canApprove(doc)){
       return `
-        <button class="wf-btn approve" onclick="approveDoc('${doc.code}')">${T('wf_approve_doc')}</button>
-        <button class="wf-btn reject" onclick="rejectDoc('${doc.code}')">${T('wf_reject_doc')}</button>
+        ${renderDocHeaderButton(T('wf_approve_doc'), 'approve', 'success', `approveDoc('${doc.code}')`)}
+        ${renderDocHeaderButton(T('wf_reject_doc'), 'reject', 'danger', `rejectDoc('${doc.code}')`)}
       `;
     }
 
@@ -901,11 +1772,52 @@ function buildDocHeaderActions(doc){
     if(status==='approved'){
       const canCreateRevision = ROLES[currentUser.role] && ROLES[currentUser.role].canEditDocs;
       if(canCreateRevision){
-        return `<button class="wf-btn edit" onclick="startNewRevision('${doc.code}')">${T('new_revision')}</button>`;
+        return renderDocHeaderButton(T('new_revision'), 'revision', 'neutral', `startNewRevision('${doc.code}')`);
       }
     }
   }catch(e){}
   return '';
+}
+
+function applyRuntimeDocDisplayMetadata(doc, meta){
+  if(!doc || !meta) return;
+  const code = String(meta.code || '').trim().toUpperCase();
+  const title = String(meta.title || '').trim();
+  const desc = String(meta.desc || '').trim();
+  if(code) doc.__displayCode = code;
+  if(title) doc.__displayTitle = title;
+  if(desc) doc.__displayDesc = desc;
+
+  if(String(currentDoc || '') !== String(doc.code || '')) return;
+
+  try{
+    const bc = document.getElementById('header-breadcrumb');
+    if(bc){
+      const displayCode = (typeof getDocDisplayCode === 'function') ? getDocDisplayCode(doc) : String(doc.code || '').trim();
+      const displayTitle = getDocDisplayTitle(doc);
+      let bcHtml = `<span style="cursor:pointer;font-size:16px" onclick="currentFilter='ALL';currentFolderPath=[];navigateTo('documents')">🏠</span>`;
+      if(currentFilter && currentFilter !== 'ALL'){
+        const cat = CATEGORIES.find(c=>c.id===currentFilter);
+        bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span>`;
+        bcHtml += `<span style="cursor:pointer;color:var(--accent);font-weight:600" onclick="currentFolderPath=[];navigateTo('documents','${currentFilter}')">${cat?cat.icon:''} ${cat?catLabel(cat).split('(')[0].trim():currentFilter}</span>`;
+      }
+      for(let i=0; i<currentFolderPath.length; i++){
+        const seg = currentFolderPath[i];
+        const label = getSubfolderLabel(seg);
+        bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span>`;
+        bcHtml += `<span style="cursor:pointer;color:var(--accent);font-weight:600" onclick="currentFolderPath=currentFolderPath.slice(0,${i+1});navigateTo('documents')">${label}</span>`;
+      }
+      const safeCode = (typeof escapeHtml === 'function') ? escapeHtml(displayCode) : displayCode;
+      const safeTitle = (typeof escapeHtml === 'function') ? escapeHtml(displayTitle) : displayTitle;
+      bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span><span style="font-weight:700">${safeCode}</span>`;
+      if(displayTitle && displayTitle.toUpperCase() !== displayCode.toUpperCase()){
+        bcHtml += `<span style="color:var(--text-3);margin:0 6px">•</span><span class="current">${safeTitle}</span>`;
+      }
+      bc.innerHTML = bcHtml;
+    }
+  }catch(e){}
+
+  try{ updateDocViewerHeader(doc); }catch(e){}
 }
 
 function updateDocViewerHeader(doc){
@@ -915,61 +1827,95 @@ function updateDocViewerHeader(doc){
   const rev = getDocRevision(doc);
   const state = getDocState(doc.code);
   const viewFile = getDocViewFile(doc) || doc.path;
+  const hasWorkingDraft = (((typeof docHasWorkingVersion==='function') ? docHasWorkingVersion(doc.code) : false)
+    || ((typeof getEditedHtml==='function') && !!getEditedHtml(doc.code)));
 
   // Build submitted-by meta
   let submittedMeta='';
   if(state && state.submittedBy && state.submittedBy.name){
     const sb=state.submittedBy;
-    const utBadge=sb.updateType?(' <span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;'+(sb.updateType==='major'?'background:#fee2e2;color:#dc2626':'background:#dcfce7;color:#16a34a')+'">'+(sb.updateType==='major'?'MAJOR':'MINOR')+'</span>'):'';
-    submittedMeta=`<div>📤 ${T('sm_submitter_label')}<b>${sb.name}</b> · ${sb.date||''}${utBadge}</div>`;
+    const utBadge=sb.updateType?(' <span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;'+(sb.updateType==='major'?'background:#fee2e2;color:#dc2626':'background:#dcfce7;color:#16a34a')+'">'+(sb.updateType==='major'?'MAJOR':'MINOR')+'</span>'):'';    
+    submittedMeta=`<div class="dv-meta-note submit"><span class="dv-meta-note-label">${T('sm_submitter_label')}</span><b>${sb.name}</b><span>${sb.date||''}</span>${utBadge}</div>`;
   }
 
   // Build last-editor meta (who last edited/saved draft)
   let lastEditMeta='';
-  if(state && state.lastEdit && state.lastEdit.by){
+  if(state && state.lastEdit && state.lastEdit.by && hasWorkingDraft){
     const le=state.lastEdit;
-    lastEditMeta=`<div>✏️ ${lang==='en'?'Last edited by':'Người chỉnh sửa cuối'}:<b> ${le.by}</b>${le.role?' — '+le.role:''} · ${le.date||''}</div>`;
+    lastEditMeta=`<div class="dv-meta-note edit"><span class="dv-meta-note-label">${lang==='en'?'Last edited by':'Người chỉnh sửa cuối'}</span><b>${le.by}</b><span>${le.role?le.role+' · ':''}${le.date||''}</span></div>`;
   }
 
   // Build approved-by meta
   let approvedMeta='';
   if(state && state.approvedBy && state.approvedBy.name && status==='approved'){
-    approvedMeta=`<div>✅ ${T('wf_approved_by')}<b>${state.approvedBy.name}</b> · ${state.approvedBy.date||state.approvedDate||''}</div>`;
+    approvedMeta=`<div class="dv-meta-note approve"><span class="dv-meta-note-label">${T('wf_approved_by')}</span><b>${state.approvedBy.name}</b><span>${state.approvedBy.date||state.approvedDate||''}</span></div>`;
   }
 
   const headerActions = buildDocHeaderActions(doc);
   const headerActionsHtml = headerActions
     ? `<div class="dv-action-group dv-edit-actions">${headerActions}</div>`
     : '';
+  const displayCode = (typeof getDocDisplayCode === 'function') ? getDocDisplayCode(doc) : String(doc.code || '').trim();
   const displayTitle = getDocDisplayTitle(doc);
   const displayDesc = getDocDisplayDescription(doc);
+  const isWorkbook = isDownloadOnlyDoc(doc);
+  const detailToggleLabel = docHeaderMetaCollapsed
+    ? (lang==='en' ? 'Show details' : 'Hiện chi tiết')
+    : (lang==='en' ? 'Hide details' : 'Ẩn chi tiết');
+  const detailToggleHtml = renderDocHeaderButton(
+    detailToggleLabel,
+    docHeaderMetaCollapsed ? 'expand' : 'collapse',
+    'neutral',
+    'toggleDocHeaderMeta()',
+    'dv-detail-toggle',
+    `aria-expanded="${docHeaderMetaCollapsed?'false':'true'}"`
+  );
+  const ownerEditButton = canEdit(doc)
+    ? '<button class="dv-meta-edit" onclick="event.stopPropagation();editDocMeta(\''+doc.code+'\',\'owner\')" title="'+(lang==='en'?'Edit owner':'Chỉnh chủ sở hữu')+'">'+(lang==='en'?'Edit':'Sửa')+'</button>'
+    : '';
+  const approverEditButton = canEdit(doc)
+    ? '<button class="dv-meta-edit" onclick="event.stopPropagation();editDocMeta(\''+doc.code+'\',\'approver\')" title="'+(lang==='en'?'Edit approver':'Chỉnh người duyệt')+'">'+(lang==='en'?'Edit':'Sửa')+'</button>'
+    : '';
+  const activityNotes = [submittedMeta, lastEditMeta, approvedMeta].filter(Boolean).join('');
+  const navActionsHtml = isWorkbook
+    ? `<div class="dv-action-group dv-nav-actions">
+          ${detailToggleHtml}
+          ${renderDocHeaderButton(T('back'), 'back', 'neutral', 'closeDocViewer()')}
+          ${renderDocHeaderButton(lang==='en'?'Download':'Tải về', 'download', 'neutral', `downloadCurrentDoc('${doc.code}')`)}
+       </div>`
+    : `<div class="dv-action-group dv-nav-actions">
+          ${detailToggleHtml}
+          ${renderDocHeaderButton(T('back'), 'back', 'neutral', 'closeDocViewer()')}
+          ${renderDocHeaderButton(T('open_tab'), 'external', 'neutral', `window.open('../${viewFile}','_blank')`)}
+       </div>`;
 
-  document.getElementById('doc-viewer-header').innerHTML = `
+  const headerEl = document.getElementById('doc-viewer-header');
+  setDocHeaderToolbar(`
+    <div class="doc-toolbar-shell">
+      ${headerActionsHtml}
+      ${navActionsHtml}
+    </div>
+  `);
+  headerEl.innerHTML = `
     <div class="dv-top">
       <div class="dv-title-area">
-        <div class="dv-code" style="color:${cat.color}">${doc.code} <span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;background:${statusColor(status)}18;color:${statusColor(status)}">${statusLabel(status)}</span></div>
+        <div class="dv-code" style="color:${cat.color}">${displayCode} <span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;background:${statusColor(status)}18;color:${statusColor(status)}">${statusLabel(status)}</span></div>
         <div class="dv-name">${displayTitle}</div>
         ${displayDesc ? `<div class="dv-desc">${displayDesc}</div>` : ''}
       </div>
-      <div class="dv-top-actions">
-        ${headerActionsHtml}
-        <div class="dv-action-group dv-nav-actions">
-          <button class="dv-back" onclick="closeDocViewer()">${T('back')}</button>
-          <button class="dv-back" onclick="window.open('../${viewFile}','_blank')">${T('open_tab')}</button>
-        </div>
-      </div>
     </div>
-    <div class="dv-meta">
-      <div>${T('code_label')}<b>${doc.code}</b></div>
-      <div>${T('revision_label')}<b style="color:${statusColor(status)}">v${rev}</b></div>
-      <div>${T('type')}<b>${catLabel(cat)}</b></div>
-      <div>${T('owner')}<b>${(state&&state.owner)?state.owner:doc.owner}</b>${canEdit(doc)?'<span style="cursor:pointer;font-size:10px;color:#1565c0;margin-left:4px" onclick="editDocMeta(\''+doc.code+'\',\'owner\')" title="'+(lang==='en'?'Edit owner':'Chỉnh chủ sở hữu')+'">✏</span>':''}</div>
-      <div>${T('approver')}<b>${(state&&state.approver)?state.approver:T('gd')}</b>${canEdit(doc)?'<span style="cursor:pointer;font-size:10px;color:#1565c0;margin-left:4px" onclick="editDocMeta(\''+doc.code+'\',\'approver\')" title="'+(lang==='en'?'Edit approver':'Chỉnh người duyệt')+'">✏</span>':''}</div>
-      <div>${T('status')}<b style="color:${statusColor(status)}">${statusLabel(status)}</b></div>
-      ${submittedMeta}
-      ${lastEditMeta}
-      ${approvedMeta}
+    <div class="dv-meta${docHeaderMetaCollapsed ? ' is-collapsed' : ''}">
+      <div class="dv-meta-grid">
+        <div class="dv-meta-item"><span class="dv-meta-label">${T('code_label')}</span><div class="dv-meta-value"><b>${displayCode}</b></div></div>
+        <div class="dv-meta-item"><span class="dv-meta-label">${T('revision_label')}</span><div class="dv-meta-value"><b style="color:${statusColor(status)}">v${rev}</b></div></div>
+        <div class="dv-meta-item"><span class="dv-meta-label">${T('type')}</span><div class="dv-meta-value"><b>${catLabel(cat)}</b></div></div>
+        <div class="dv-meta-item"><span class="dv-meta-label">${T('owner')}</span><div class="dv-meta-value"><b>${(state&&state.owner)?state.owner:doc.owner}</b>${ownerEditButton}</div></div>
+        <div class="dv-meta-item"><span class="dv-meta-label">${T('approver')}</span><div class="dv-meta-value"><b>${(state&&state.approver)?state.approver:T('gd')}</b>${approverEditButton}</div></div>
+        <div class="dv-meta-item"><span class="dv-meta-label">${T('status')}</span><div class="dv-meta-value"><b style="color:${statusColor(status)}">${statusLabel(status)}</b></div></div>
+      </div>
+      ${activityNotes ? `<div class="dv-meta-notes">${activityNotes}</div>` : ''}
     </div>`;
+  syncDocViewerDetailVisibility();
 }
 
 // ═══════════════════════════════════════════════════
@@ -1038,7 +1984,11 @@ function renderDashboard(){
   });
   const myEditing = VDOCS.filter(d=>{
     const state=getDocState(d.code);
-    return state && state.status==='draft' && state.lastEdit && state.lastEdit.by===currentUser.name;
+    return state
+      && state.status==='draft'
+      && state.lastEdit
+      && state.lastEdit.by===currentUser.name
+      && docHasWorkingVersion(d.code);
   });
   const approvedCount = VDOCS.filter(d=>getDocStatus(d)==='approved').length;
   const draftCount = VDOCS.filter(d=>getDocStatus(d)==='draft').length;
@@ -1126,13 +2076,13 @@ function renderDashboard(){
       </div>`;
   }
 
-  // High-impact execution shortcuts (RFQ → Cash, G0–G5)
+  // High-impact execution shortcuts (RFQ → Cash, G0–G7)
   const execShortcutCodes = [
     "PROC-OPS-001",
     "WI-OPS-001",
-    "ANNEX-OPS-002",
+    "ANNEX-502",
     "WI-OPS-008",
-    "ANNEX-QMS-003",
+    "ANNEX-107",
     "FRM-OPS-008",
     "FRM-PLA-001",
     "FRM-QA-007",
@@ -1143,15 +2093,6 @@ function renderDashboard(){
   const execShortcuts = execShortcutCodes.map(code=>VDOCS.find(d=>d.code===code)).filter(Boolean);
 
   el.innerHTML = `
-    <div class="welcome-banner">
-      <div style="display:flex;align-items:center;gap:20px">
-        <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8IS0tIENyZWF0b3I6IENvcmVsRFJBVyAyMDIxICg2NC1CaXQpIC0tPg0KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIHdpZHRoPSIyODkzcHgiIGhlaWdodD0iMjg1MXB4IiB2ZXJzaW9uPSIxLjEiIHN0eWxlPSJzaGFwZS1yZW5kZXJpbmc6Z2VvbWV0cmljUHJlY2lzaW9uOyB0ZXh0LXJlbmRlcmluZzpnZW9tZXRyaWNQcmVjaXNpb247IGltYWdlLXJlbmRlcmluZzpvcHRpbWl6ZVF1YWxpdHk7IGZpbGwtcnVsZTpldmVub2RkOyBjbGlwLXJ1bGU6ZXZlbm9kZCINCnZpZXdCb3g9IjAgMCA4NDkgODM3Ig0KIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIg0KIHhtbG5zOnhvZG09Imh0dHA6Ly93d3cuY29yZWwuY29tL2NvcmVsZHJhdy9vZG0vMjAwMyI+DQogPGRlZnM+DQogIDxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+DQogICA8IVtDREFUQVsNCiAgICAuZmlsMCB7ZmlsbDojMjA5OUQ1O2ZpbGwtcnVsZTpub256ZXJvfQ0KICAgXV0+DQogIDwvc3R5bGU+DQogPC9kZWZzPg0KIDxnIGlkPSJMYXllcl94MDAyMF8xIj4NCiAgPG1ldGFkYXRhIGlkPSJDb3JlbENvcnBJRF8wQ29yZWwtTGF5ZXIiLz4NCiAgPHBhdGggY2xhc3M9ImZpbDAiIGQ9Ik03OTQgMzI1Yy0yOCwtMTYgLTYwLC0xOCAtODgsLTlsLTM2IC02MiAtOTYgLTE2NiAtMTkxIDAgLTcyIDBjLTEwLC00OSAtNTQsLTg2IC0xMDcsLTg2IC02MCwwIC0xMDksNDkgLTEwOSwxMDkgMCwzMiAxNCw2MSAzNiw4MWwtMzYgNjIgLTk2IDE2NiA5NiAxNjYgMzYgNjJjLTM3LDM0IC00OCw5MCAtMjEsMTM1IDMwLDUyIDk3LDcwIDE0OSw0MCAyOCwtMTYgNDYsLTQyIDUyLC03Mmw3MiAwIDE5MSAwIDk2IC0xNjYgMzYgLTYyYzQ4LDE2IDEwMiwtNCAxMjgsLTQ5IDMwLC01MiAxMiwtMTE5IC00MCwtMTQ5em0tNTUyIDMwMWMtMjMsLTggLTQ4LC05IC03MiwtMWwtMTE5IC0yMDYgMTE5IC0yMDZjMTEsNCAyMyw2IDM1LDYgMTMsMCAyNiwtMiAzNywtNmw0NiA4MGMtMTcsMTIgLTMxLDI4IC00Miw0NyAtNDAsNzAgLTIxLDE1OCA0MiwyMDZsLTQ2IDgwem0zMDcgODFsLTIzNyAwYy0yLC0xMSAtNiwtMjIgLTEzLC0zMyAtNiwtMTEgLTE1LC0yMSAtMjQsLTI5bDQ2IC04MGM3MywzMSAxNTksNCAxOTksLTY3IDExLC0xOSAxOCwtMzkgMjAsLTYwbDkyIDBjNCwyNCAxNiw0NiAzNSw2M2wtMTE5IDIwNnptOTYgLTM0MmMtNywxMSAtMTEsMjMgLTEzLDM1bC05MiAwYy02LC00OCAtMzMsLTkyIC03OCwtMTE4IC00NSwtMjYgLTk3LC0yNyAtMTQxLC05bC00NiAtODBjMTksLTE2IDMyLC0zNyAzNywtNjJsMjM3IDAgMTE5IDIwNmMtOSw4IC0xNiwxNyAtMjIsMjd6bTEyNSAtMzY1YzEzLDAgMjYsMyAzOSwxMCAxMyw3IDIyLDE2IDMwLDI5IDcsMTMgMTAsMjYgMTAsNDAgMCwxMyAtMywyNyAtMTAsMzkgLTcsMTIgLTE2LDIyIC0yOSwyOSAtMTIsNyAtMjUsMTAgLTM5LDEwIC0xNCwwIC0yNywtMyAtMzksLTEwIC0xMiwtNyAtMjIsLTE3IC0yOSwtMjkgLTcsLTEzIC0xMCwtMjYgLTEwLC0zOSAwLC0xNCA0LC0yNyAxMSwtNDAgNywtMTMgMTcsLTIyIDMwLC0yOSAxMywtNyAyNSwtMTAgMzksLTEwem0wIDEzYy0xMSwwIC0yMiwzIC0zMiw5IC0xMCw2IC0xOSwxNCAtMjUsMjQgLTYsMTAgLTksMjEgLTksMzMgMCwxMSAzLDIyIDksMzMgNiwxMCAxNCwxOSAyNCwyNCAxMCw2IDIxLDkgMzMsOSAxMSwwIDIyLC0zIDMzLC05IDEwLC02IDE5LC0xNCAyNCwtMjQgNiwtMTAgOSwtMjEgOSwtMzMgMCwtMTIgLTMsLTIyIC05LC0zMyAtNiwtMTEgLTE0LC0xOSAtMjUsLTI0IC0xMCwtNiAtMjEsLTkgLTMyLC05em0tMzUgMTA5bDAgLTg1IDI5IDBjMTAsMCAxNywxIDIyLDIgNSwyIDgsNCAxMSw4IDMsNCA0LDggNCwxMiAwLDYgLTIsMTIgLTcsMTYgLTQsNCAtMTAsNyAtMTgsOCAzLDEgNiwzIDcsNCAzLDMgOCw5IDEzLDE3bDEwIDE3IC0xNyAwIC03IC0xM2MtNiwtMTEgLTExLC0xNyAtMTQsLTIwIC0zLC0yIC02LC0zIC0xMSwtM2wtOCAwIDAgMzYgLTE0IDB6bTE0IC00OGwxNyAwYzgsMCAxMywtMSAxNiwtNCAzLC0yIDQsLTUgNCwtOSAwLC0zIC0xLC01IC0yLC03IC0xLC0yIC0zLC0zIC02LC00IC0yLC0xIC03LC0yIC0xNCwtMmwtMTYgMCAwIDI1eiIvPg0KIDwvZz4NCjwvc3ZnPg0K" style="width:72px;height:auto;opacity:.2;flex-shrink:0">
-        <div>
-          <h2 style="margin:0">${T('hello')}, ${currentUser.name.split(' ').pop()}! ${currentUser.avatar||''}</h2>
-          <p style="margin:6px 0 0">${ROLE_DOCS[currentUser.role]==='ALL'?T('full_access')+' '+VDOCS.length+' '+T('docs_word')+'.':T('partial_access')+' '+accessibleDocs.length+T('of')+VDOCS.length+' '+T('docs_word')+'.'}</p>
-        </div>
-      </div>
-    </div>
     <div class="stats-row">
       <div class="stat-card" style="cursor:pointer;border-left:3px solid #059669" onclick="showFilteredDocs('recent')"><div class="value" style="color:#059669">${ruCount}</div><div class="label">${lang==='en'?'Updated (30d)':'Cập nhật (30d)'}</div><div class="sub">${lang==='en'?'Last 30 days':'30 ngày qua'}</div></div>
       <div class="stat-card" style="cursor:pointer" onclick="showFilteredDocs('approved')"><div class="value" style="color:#2e7d32">${approvedCount}</div><div class="label">${T('approved')}</div><div class="sub">${T('effective')}</div></div>
@@ -1160,54 +2101,65 @@ function renderDashboard(){
       <div class="stat-card" style="cursor:pointer" onclick="showFilteredDocs('accessible')"><div class="value" style="color:#6366f1">${accessibleDocs.length}</div><div class="label">${T('accessible')}</div><div class="sub">${T('by_role')} ${lang==='en'?(r.labelEn||r.label):r.label}</div></div>
     </div>
     <div id="dash-pending">${pendingHtml}${draftsHtml}</div>
-
-    <div class="grid-2">
+    <div class="card" style="margin-top:12px">
+      <h3 style="margin-bottom:8px">🏭 ${lang==='en'?'Job Order Lifecycle — G0 → G7 (8 Gates)':'Vòng đời đơn hàng — G0 → G7 (8 cổng)'}</h3>
+      <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:6px;overflow-x:auto;padding:4px 0 8px">
+        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #4CAF50;background:#f8fdf8;min-width:0"><div style="font-weight:700;font-size:11px;color:#2e7d32;margin-bottom:3px">G0</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">Contract</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'RFQ, order entry':'Xem xét RFQ, nhập đơn'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-201');return false" style="color:#0369a1">SOP-201</a></div></div>
+        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #1565C0;background:#f0f4ff;min-width:0"><div style="font-weight:700;font-size:11px;color:#0d47a1;margin-bottom:3px">G1</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">Engineering</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'DFM, CAM/NC, baseline':'DFM, CAM/NC, baseline'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-303');return false" style="color:#0369a1">SOP-303</a></div></div>
+        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #795548;background:#faf6f3;min-width:0"><div style="font-weight:700;font-size:11px;color:#4e342e;margin-bottom:3px">G2</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">IQC</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'Receiving, incoming QC':'Nhận hàng, KT đầu vào'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('WI-701');return false" style="color:#0369a1">WI-701</a></div></div>
+        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #2196F3;background:#f5f9ff;min-width:0"><div style="font-weight:700;font-size:11px;color:#1565c0;margin-bottom:3px">G3</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">Setup</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'Program, machine setup':'CT, setup máy'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-504');return false" style="color:#0369a1">SOP-504</a></div></div>
+        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #FF9800;background:#fffbf0;min-width:0"><div style="font-weight:700;font-size:11px;color:#e65100;margin-bottom:3px">G4</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">FAI</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'First article inspection':'Kiểm tra bài đầu tiên'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-302');return false" style="color:#0369a1">SOP-302</a></div></div>
+        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #9C27B0;background:#fdf5ff;min-width:0"><div style="font-weight:700;font-size:11px;color:#7b1fa2;margin-bottom:3px">G5</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">IPQC</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'In-process QC, SPC':'KS trong quá trình'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-502');return false" style="color:#0369a1">SOP-502</a></div></div>
+        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #00BCD4;background:#f0fdff;min-width:0"><div style="font-weight:700;font-size:11px;color:#00838f;margin-bottom:3px">G6</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">Final QC</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'Final inspection, pack':'KT cuối, đóng gói'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-605');return false" style="color:#0369a1">SOP-605</a></div></div>
+        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #F44336;background:#fff5f5;min-width:0"><div style="font-weight:700;font-size:11px;color:#c62828;margin-bottom:3px">G7</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">Ship</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'Shipment, CoC':'Giao hàng, CoC'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-605');return false" style="color:#0369a1">SOP-605</a></div></div>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:12px">
       <div class="card">
-        <h3>${T('quick_access')}</h3>
-        <div class="quick-grid">
-          ${CATEGORIES.filter(c=>!c.hidden&&VDOCS.some(d=>d.cat===c.id)).map(cat => {
-            const cnt = VDOCS.filter(d=>d.cat===cat.id).length;
-            const locked = !VDOCS.filter(d=>d.cat===cat.id).some(d=>canAccessDoc(d.code));
-            return `<button class="quick-btn" style="border-left-color:${cat.color}" onclick="navigateTo('documents','${cat.id}')">
-              <span class="q-icon">${cat.icon}</span>
-              <div><div class="q-label">${catLabel(cat)}</div><div class="q-count">${cnt} ${T('docs_unit')}</div></div>
-              ${locked?'<span class="lock">🔒</span>':''}
-            </button>`;
-          }).join('')}
+        <h3>👤 ${lang==='en'?'Quick Access by Role':'Truy cập nhanh theo vai trò'}</h3>
+        <div style="display:grid;grid-template-columns:1fr;gap:6px;font-size:12px">
+          <div style="padding:8px 10px;border-left:3px solid #2196F3;border-radius:4px;background:#f5f9ff"><b>CNC Operator</b> — <a href="#" onclick="openDoc('SOP-502');return false" style="color:#0369a1">SOP-502</a> · <a href="#" onclick="openDoc('SOP-504');return false" style="color:#0369a1">SOP-504</a> · <a href="#" onclick="openDoc('WI-519');return false" style="color:#0369a1">WI-519</a></div>
+          <div style="padding:8px 10px;border-left:3px solid #4CAF50;border-radius:4px;background:#f8fdf8"><b>QC Inspector</b> — <a href="#" onclick="openDoc('SOP-302');return false" style="color:#0369a1">SOP-302</a> · <a href="#" onclick="openDoc('SOP-604');return false" style="color:#0369a1">SOP-604</a> · <a href="#" onclick="openDoc('SOP-601');return false" style="color:#0369a1">SOP-601</a></div>
+          <div style="padding:8px 10px;border-left:3px solid #FF9800;border-radius:4px;background:#fffbf0"><b>Team Leader / Foreman</b> — <a href="#" onclick="openDoc('WI-202');return false" style="color:#0369a1">WI-202</a> · <a href="#" onclick="openDoc('SOP-501');return false" style="color:#0369a1">SOP-501</a> · <a href="#" onclick="openDoc('SOP-606');return false" style="color:#0369a1">SOP-606</a></div>
+          <div style="padding:8px 10px;border-left:3px solid #9C27B0;border-radius:4px;background:#fdf5ff"><b>Planner / Engineer</b> — <a href="#" onclick="openDoc('SOP-501');return false" style="color:#0369a1">SOP-501</a> · <a href="#" onclick="openDoc('SOP-303');return false" style="color:#0369a1">SOP-303</a> · <a href="#" onclick="openDoc('SOP-103');return false" style="color:#0369a1">SOP-103</a></div>
+          <div style="padding:8px 10px;border-left:3px solid #0C2D48;border-radius:4px;background:#f0f4f8"><b>Manager / Director</b> — <a href="#" onclick="openDoc('SOP-902');return false" style="color:#0369a1">SOP-902</a> · <a href="#" onclick="openDoc('WI-901');return false" style="color:#0369a1">WI-901</a> · <a href="#" onclick="openDoc('ANNEX-122');return false" style="color:#0369a1">ANNEX-122</a></div>
+          <div style="padding:8px 10px;border-left:3px solid #00BCD4;border-radius:4px;background:#f0fdff"><b>IT / QMS Admin</b> — <a href="#" onclick="openDoc('SOP-101');return false" style="color:#0369a1">SOP-101</a> · <a href="#" onclick="openDoc('SOP-104');return false" style="color:#0369a1">SOP-104</a> · <a href="#" onclick="openDoc('ANNEX-101');return false" style="color:#0369a1">ANNEX-101</a></div>
         </div>
       </div>
       <div class="card">
-        <h3>📊 ${T('system_overview')}</h3>
-        <div style="font-size:12px;color:var(--text-2);space-y:8px">
-          <div style="padding:10px 0;border-bottom:1px solid #f1f3f5"><b>Epicor Kinetic</b> — System of Record (transactions)<br><span style="color:var(--text-3)">Job, Dispatch, Time Entry, PO, Inventory</span></div>
-          <div style="padding:10px 0;border-bottom:1px solid #f1f3f5"><b>M365 / SharePoint</b> — SSOT (evidence/records)<br><span style="color:var(--text-3)">${T('controlled_docs')}</span></div>
-          <div style="padding:10px 0;border-bottom:1px solid #f1f3f5"><b>Quality Gates</b> — G0 → G5<br><span style="color:var(--text-3)">Hold/Release ${T('at_each_gate')}</span></div>
-          <div style="padding:10px 0"><b>${T('standards')}</b> — ISO 9001:2015 • revision-ready<br><span style="color:var(--text-3)">CNC Semiconductor Grade</span></div>
+        <h3>📋 ${lang==='en'?'Key Documents & Matrices':'Tài liệu trọng yếu'}</h3>
+        <div style="display:grid;gap:6px;font-size:12px">
+          <div style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-120')"><b>Authority Matrix</b><span style="color:#0369a1;font-size:11px">ANNEX-120 →</span></div>
+          <div style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-121')"><b>RACI Master</b><span style="color:#0369a1;font-size:11px">ANNEX-121 →</span></div>
+          <div style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-122')"><b>KPI Cascade Dictionary</b><span style="color:#0369a1;font-size:11px">ANNEX-122 →</span></div>
+          <div style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-123')"><b>Deputy / Backup Matrix</b><span style="color:#0369a1;font-size:11px">ANNEX-123 →</span></div>
+          <div style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('WI-201')"><b>Quality Gates & Hold Points</b><span style="color:#0369a1;font-size:11px">WI-201 →</span></div>
+          <div style="padding:8px 10px;border:1px solid #fee2e2;border-left:3px solid #ef4444;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-118')"><b>⚠ Offline Fallback Kit</b><span style="color:#ef4444;font-size:11px">ANNEX-118 →</span></div>
         </div>
       </div>
     </div>
-
-    <div class="card" style="margin-top:18px">
-      <h3>${T('exec_shortcuts_title')}</h3>
-      <p style="margin:-8px 0 12px;color:var(--text-3);font-size:12px">${T('exec_shortcuts_desc')}</p>
-      <div class="quick-grid">
-        ${execShortcuts.map(doc=>{
-          const cat=getCatForDoc(doc);
-          const locked=!canAccessDoc(doc.code);
-          const displayTitle = getDocDisplayTitle(doc);
-          const displayDesc = getDocDisplayDescription(doc);
-          return `<button class="quick-btn" style="border-left-color:#6366f1" onclick="openDoc('${doc.code}')">
-            <span class="q-icon">${cat?cat.icon:'📄'}</span>
-            <div class="q-meta"><div class="q-code">${doc.code}</div><div class="q-label">${displayTitle}</div>${displayDesc?`<div class="q-desc">${displayDesc}</div>`:''}</div>
-            ${locked?'<span class="lock">🔒</span>':''}
-          </button>`;
-        }).join('')}
+    <div class="card" style="margin-top:12px">
+      <h3>📊 ${lang==='en'?'Operational KPIs — ISO 9001:2026 §9.1':'KPI vận hành — ISO 9001:2026 §9.1'}</h3>
+      <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:6px;font-size:12px">
+        <div style="padding:10px;border:1px solid #dcfce7;border-radius:8px;background:#f0fdf4;text-align:center;min-width:0"><div style="font-size:10px;color:#166534;font-weight:600;text-transform:uppercase">OTD</div><div style="font-size:18px;font-weight:700;color:#16a34a;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'On-Time Delivery':'Giao hàng đúng hạn'}</div><div style="font-size:9px;color:#999;margin-top:2px">≥ 95%</div></div>
+        <div style="padding:10px;border:1px solid #dbeafe;border-radius:8px;background:#eff6ff;text-align:center;min-width:0"><div style="font-size:10px;color:#1e40af;font-weight:600;text-transform:uppercase">FPY</div><div style="font-size:18px;font-weight:700;color:#2563eb;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'First Pass Yield':'Tỷ lệ đạt lần đầu'}</div><div style="font-size:9px;color:#999;margin-top:2px">≥ 98%</div></div>
+        <div style="padding:10px;border:1px solid #fef3c7;border-radius:8px;background:#fffbeb;text-align:center;min-width:0"><div style="font-size:10px;color:var(--amber);font-weight:600;text-transform:uppercase">COPQ</div><div style="font-size:18px;font-weight:700;color:#d97706;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'Cost of Poor Quality':'Chi phí CL kém'}</div><div style="font-size:9px;color:#999;margin-top:2px">≤ 2%</div></div>
+        <div style="padding:10px;border:1px solid #fee2e2;border-radius:8px;background:#fef2f2;text-align:center;min-width:0"><div style="font-size:10px;color:var(--red);font-weight:600;text-transform:uppercase">NCR</div><div style="font-size:18px;font-weight:700;color:#dc2626;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'Open NCRs':'NCR đang mở'}</div><div style="font-size:9px;color:#999;margin-top:2px">= 0</div></div>
+        <div style="padding:10px;border:1px solid #f3e8ff;border-radius:8px;background:#faf5ff;text-align:center;min-width:0"><div style="font-size:10px;color:#6b21a8;font-weight:600;text-transform:uppercase">IQC Pass</div><div style="font-size:18px;font-weight:700;color:#7c3aed;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'IQC Pass Rate':'Tỷ lệ đạt IQC'}</div><div style="font-size:9px;color:#999;margin-top:2px">≥ 99%</div></div>
+        <div style="padding:10px;border:1px solid #e0f2fe;border-radius:8px;background:#f0f9ff;text-align:center;min-width:0"><div style="font-size:10px;color:#075985;font-weight:600;text-transform:uppercase">OEE</div><div style="font-size:18px;font-weight:700;color:#0284c7;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'Equipment Effectiveness':'Hiệu suất thiết bị'}</div><div style="font-size:9px;color:#999;margin-top:2px">≥ 85%</div></div>
+        <div style="padding:10px;border:1px solid #dbeafe;border-radius:8px;background:#eff6ff;text-align:center;min-width:0"><div style="font-size:10px;color:#1e3a5f;font-weight:600;text-transform:uppercase">ENG FTR</div><div style="font-size:18px;font-weight:700;color:#1565c0;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'Eng First-Time-Right':'KT đúng lần đầu'}</div><div style="font-size:9px;color:#999;margin-top:2px">≥ 95%</div></div>
+        <div style="padding:10px;border:1px solid #fce7f3;border-radius:8px;background:#fdf2f8;text-align:center;min-width:0"><div style="font-size:10px;color:#831843;font-weight:600;text-transform:uppercase">ECN Lead</div><div style="font-size:18px;font-weight:700;color:#be185d;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'Eng Change Lead':'TG thay đổi KT'}</div><div style="font-size:9px;color:#999;margin-top:2px">≤ 48h</div></div>
       </div>
-    </div>`;
+      <div style="margin-top:8px;font-size:10px;color:var(--text-3);text-align:right"><a href="#" onclick="openDoc('ANNEX-122');return false" style="color:#0369a1">${lang==='en'?'Full KPI Dictionary':'Từ điển KPI đầy đủ'} → ANNEX-122</a> · <a href="#" onclick="openDoc('WI-901');return false" style="color:#0369a1">${lang==='en'?'Dashboard Guide':'Hướng dẫn Dashboard'} → WI-901</a></div>
+    </div>
+    `;
+/* OLD DASHBOARD CODE REMOVED — see git history for reference */
 }
 
-function renderDocuments(){
-  const el = document.getElementById('page-documents');
+var _lastDocRenderTarget = 'page-documents';
+function renderDocuments(targetContainerId){
+  if(targetContainerId) _lastDocRenderTarget = targetContainerId;
+  const el = document.getElementById(_lastDocRenderTarget || 'page-documents');
   const VDOCS = getVisibleDocs();
 
   // ═══ Update header breadcrumb ═══
@@ -1229,7 +2181,9 @@ function renderDocuments(){
 
   // ═══ CATEGORY/FOLDER BROWSING MODE ═══
   const catDocs = currentFilter !== 'ALL' ? VDOCS.filter(d=>d.cat===currentFilter) : VDOCS;
-  const treeNode = currentFilter !== 'ALL' ? getBestTreeNodeForCategory(currentFilter, catDocs) : null;
+  const treeNode = currentFilter !== 'ALL'
+    ? ((typeof getCategoryTreeRoot === 'function' ? getCategoryTreeRoot(currentFilter, catDocs) : null) || getBestTreeNodeForCategory(currentFilter, catDocs))
+    : null;
   const currentNode = currentFilter !== 'ALL' ? resolveTreeNodeForCategory(currentFilter, currentFolderPath, catDocs) : null;
 
   // Get child folders and docs at current level
@@ -1345,7 +2299,7 @@ function renderDocSearchBar(VDOCS){
   return `
     <div class="filter-bar">
       <button class="filter-chip ${currentFilter==='ALL'?'active':''}" onclick="currentFilter='ALL';currentFolderPath=[];renderDocuments();renderSidebar()">${T('all')} (${VDOCS.length})</button>
-      ${CATEGORIES.filter(c=>!c.hidden&&VDOCS.some(d=>d.cat===c.id)).map(cat =>
+      ${CATEGORIES.filter(c=>!c.hidden&&(VDOCS.some(d=>d.cat===c.id) || portalCategoryHasPhysicalTree(c.id))).map(cat =>
         `<button class="filter-chip ${currentFilter===cat.id?'active':''}" onclick="currentFilter='${cat.id}';currentFolderPath=[];renderDocuments();renderSidebar()">${cat.icon} ${catLabel(cat).split('(')[0].trim()} (${VDOCS.filter(d=>d.cat===cat.id).length})</button>`
       ).join('')}
     </div>
@@ -1355,13 +2309,13 @@ function renderDocSearchBar(VDOCS){
 // Render ALL docs view as category folder cards
 function renderDocCategoryGrid(VDOCS){
   let html = `<div class="fm-grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;padding:16px 0">`;
-  CATEGORIES.filter(c=>!c.hidden&&VDOCS.some(d=>d.cat===c.id)).forEach(cat => {
+  CATEGORIES.filter(c=>!c.hidden&&(VDOCS.some(d=>d.cat===c.id) || portalCategoryHasPhysicalTree(c.id))).forEach(cat => {
     const cnt = VDOCS.filter(d=>d.cat===cat.id).length;
     html += `
       <div class="fm-folder" onclick="currentFilter='${cat.id}';currentFolderPath=[];renderDocuments();renderSidebar()" style="padding:20px 14px">
         <div style="width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:${cat.color};color:#fff;font-size:24px;box-shadow:0 4px 12px ${cat.color}33">${cat.icon}</div>
         <div class="fm-label" style="font-size:14px;margin-top:4px">${catLabel(cat).split('(')[0].trim()}</div>
-        <div class="fm-count">${cnt} ${lang==='en'?'documents':'tài liệu'}</div>
+        <div class="fm-count">${cnt} ${lang==='en'?'docs':'tài liệu'}</div>
       </div>`;
   });
   html += `</div>`;
@@ -1382,7 +2336,7 @@ function renderDocFileList(docs){
     const displayTitle = getDocDisplayTitle(doc);
     const displayDesc = getDocDisplayDescription(doc);
     html += `
-      <div class="fm-file-row ${locked?'locked':''}" ${locked?'':`onclick="openDoc('${doc.code}')"`} ${dragAttr} oncontextmenu="event.preventDefault();event.stopPropagation();openDocEditMenu(event,'${escapeHtml(doc.code)}','${escapeHtml(doc.title)}')" data-doc-code="${doc.code}">
+      <div class="fm-file-row ${locked?'locked':''}" ${locked?'':`onclick="openDoc('${doc.code}')"`} ${dragAttr} oncontextmenu="event.preventDefault();event.stopPropagation();openDocEditMenu(event,'${escapeHtml(doc.code)}')" data-doc-code="${doc.code}">
         <div class="fm-file-icon" style="border-color:${cat?cat.color:'#a5b4fc'}">${getDocIcon(doc.code)}</div>
         <div class="fm-file-name">
           <span style="color:${cat?cat.color:'#64748b'}">${doc.code}</span>
@@ -1392,7 +2346,7 @@ function renderDocFileList(docs){
         <div class="fm-file-rev">v${getDocRevision(doc)}</div>
         <div class="fm-file-status"><span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:600;background:${statusColor(getDocStatus(doc))}15;color:${statusColor(getDocStatus(doc))}">${statusLabel(getDocStatus(doc))}</span></div>
         <div class="fm-file-access">${locked?'<span style="color:var(--red)">🔒</span>':'<span style="color:var(--green)">✓</span>'}</div>
-        ${folderEditMode&&canCreateNewDoc()?`<div class="fm-file-del"><button class="fm-del-btn-row" onclick="event.stopPropagation();confirmDeleteDoc('${escapeHtml(doc.code)}','${escapeHtml(doc.title)}')" title="${lang==='en'?'Delete':'Xóa'}">🗑️</button></div>`:''}
+        ${folderEditMode&&canCreateNewDoc()?`<div class="fm-file-del"><button class="fm-del-btn-row" onclick="event.stopPropagation();confirmDeleteDoc('${escapeHtml(doc.code)}','${escapeHtml(displayTitle)}')" title="${lang==='en'?'Delete':'Xóa'}">🗑️</button></div>`:''}
       </div>`;
   });
   html += `</div>`;
@@ -1402,8 +2356,9 @@ function renderDocFileList(docs){
 // ═══ EDIT MODE: Folder creation dialog ═══
 function openCreateFolderDialog(){
   // Auto-compute next folder number
-  const treeNode = getBestTreeNodeForCategory(currentFilter, DOCS.filter(d=>d.cat===currentFilter));
-  const currentNode = resolveTreeNodeForCategory(currentFilter, currentFolderPath, DOCS.filter(d=>d.cat===currentFilter));
+  const catDocs = DOCS.filter(d=>d.cat===currentFilter);
+  const treeNode = ((typeof getCategoryTreeRoot === 'function') ? getCategoryTreeRoot(currentFilter, catDocs) : null) || getBestTreeNodeForCategory(currentFilter, catDocs);
+  const currentNode = resolveTreeNodeForCategory(currentFilter, currentFolderPath, catDocs);
   // Find max existing number in current folder
   let maxNum = 0;
   if(currentNode && currentNode.subs){
@@ -1443,8 +2398,9 @@ async function doCreateFolder(nextNum){
   const name = (document.getElementById('nf-name')?.value||'').trim().replace(/[^A-Za-z0-9_-]/g,'-');
   if(!name){ showToast(lang==='en'?'Enter folder name':'Nhập tên folder'); return; }
   const folderName = String(nextNum).padStart(2,'0') + '-' + name;
-  const treeNode = getBestTreeNodeForCategory(currentFilter, DOCS.filter(d=>d.cat===currentFilter));
-  const currentNode = resolveTreeNodeForCategory(currentFilter, currentFolderPath, DOCS.filter(d=>d.cat===currentFilter));
+  const catDocs = DOCS.filter(d=>d.cat===currentFilter);
+  const treeNode = ((typeof getCategoryTreeRoot === 'function') ? getCategoryTreeRoot(currentFilter, catDocs) : null) || getBestTreeNodeForCategory(currentFilter, catDocs);
+  const currentNode = resolveTreeNodeForCategory(currentFilter, currentFolderPath, catDocs);
   const parentPath = currentNode ? currentNode.path : (treeNode ? treeNode.path : '');
   try {
     const res = await apiCall('create_folder', {parent: parentPath, name: folderName});
@@ -1462,8 +2418,9 @@ async function doCreateFolder(nextNum){
 // ═══ QUICK CREATE DOC — defaults to current folder ═══
 function openCreateDocModalQuick(){
   // Compute current folder path
-  const treeNode = getBestTreeNodeForCategory(currentFilter, DOCS.filter(d=>d.cat===currentFilter));
-  const currentNode = resolveTreeNodeForCategory(currentFilter, currentFolderPath, DOCS.filter(d=>d.cat===currentFilter));
+  const catDocs = DOCS.filter(d=>d.cat===currentFilter);
+  const treeNode = ((typeof getCategoryTreeRoot === 'function') ? getCategoryTreeRoot(currentFilter, catDocs) : null) || getBestTreeNodeForCategory(currentFilter, catDocs);
+  const currentNode = resolveTreeNodeForCategory(currentFilter, currentFolderPath, catDocs);
   const folderPath = currentNode ? currentNode.path : (treeNode ? treeNode.path : '');
   const folderLabel = currentNode ? getSubfolderLabel((currentNode.path||'').split('/').pop()) : currentFilter;
 
@@ -1493,8 +2450,8 @@ function openCreateDocModalQuick(){
         <input id="qc-code" type="text" placeholder="VD: PROC-CNC-003" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px" autofocus>
       </div>
       <div class="modal-field" style="margin-top:8px">
-        <label>${lang==='en'?'Title':'Tiêu đề'}</label>
-        <input id="qc-title" type="text" placeholder="${lang==='en'?'Document title':'Tên tài liệu'}" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px">
+        <label>${lang==='en'?'English standard title / file name':'Tên file / tiêu đề chuẩn'}</label>
+        <input id="qc-title" type="text" placeholder="${lang==='en'?'English standard title':'Tên file / tiêu đề chuẩn tiếng Anh'}" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px">
       </div>
       <div class="modal-field" style="margin-top:8px">
         <label>${lang==='en'?'Owner':'Chủ sở hữu'}</label>
@@ -1517,6 +2474,7 @@ async function doQuickCreateDoc(folder, cat){
   const owner = (document.getElementById('qc-owner')?.value||'').trim();
   if(!code){ showToast(lang==='en'?'Enter doc code':'Nhập mã tài liệu'); return; }
   if(!title){ showToast(lang==='en'?'Enter title':'Nhập tiêu đề'); return; }
+  if(!ensureEnglishStandardTitle(title)) return;
   try {
     const res = await apiCall('doc_create', {code, title, cat, owner, folder, revision:'0.0'});
     if(res && res.ok){
@@ -1584,17 +2542,19 @@ function openFolderEditMenu(event, folderPath, folderKey){
   setTimeout(()=>document.addEventListener('click', close), 10);
 }
 
-function openDocEditMenu(event, code, title){
+function openDocEditMenu(event, code){
   event.stopPropagation();
   document.querySelectorAll('.fm-context-menu').forEach(m=>m.remove());
+  const doc = DOCS.find(d=>d.code===code) || {};
+  const standardTitle = getDocStandardTitle(doc) || String(doc.title || '').trim() || code;
   const menu = document.createElement('div');
   menu.className = 'fm-context-menu';
   menu.style.cssText = `position:fixed;top:${event.clientY}px;left:${event.clientX}px;z-index:9999;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.15);padding:6px 0;min-width:180px`;
   const vi=lang!=='en';
   menu.innerHTML = `
     <div class="ctx-item" onclick="openDoc('${escapeHtml(code)}')">📄 ${vi?'Mở tài liệu':'Open document'}</div>
-    <div class="ctx-item" onclick="openDocEditDialog('${escapeHtml(code)}','${escapeHtml(title)}')">✏️ ${vi?'Chỉnh sửa thông tin':'Edit info'}</div>
-    ${canCreateNewDoc()?`<div style="border-top:1px solid #f1f3f5;margin:4px 0"></div><div class="ctx-item ctx-danger" onclick="confirmDeleteDoc('${escapeHtml(code)}','${escapeHtml(title)}')">🗑️ ${vi?'Xóa tài liệu':'Delete document'}</div>`:''}
+    <div class="ctx-item" onclick="openDocEditDialog('${escapeHtml(code)}')">✏️ ${vi?'Chỉnh sửa thông tin':'Edit info'}</div>
+    ${canCreateNewDoc()?`<div style="border-top:1px solid #f1f3f5;margin:4px 0"></div><div class="ctx-item ctx-danger" onclick="confirmDeleteDoc('${escapeHtml(code)}','${escapeHtml(standardTitle)}')">🗑️ ${vi?'Xóa tài liệu':'Delete document'}</div>`:''}
   `;
   document.body.appendChild(menu);
   menu.querySelectorAll('.ctx-item').forEach(item=>{
@@ -1692,9 +2652,32 @@ async function doSaveFolderEdit(folderPath, folderKey){
 }
 
 // ═══ UNIFIED DOC EDIT DIALOG (code + title + desc) ═══
-function openDocEditDialog(code, title){
+function titleHasNonAsciiChars(text){
+  return /[^\x20-\x7E]/.test(String(text||''));
+}
+
+function ensureEnglishStandardTitle(title){
+  const value = String(title || '').trim();
+  if(!value){
+    showToast(lang==='en'?'⚠ Missing standard title':'⚠ Thiếu tên file chuẩn');
+    return false;
+  }
+  if(titleHasNonAsciiChars(value)){
+    showToast(lang==='en'?'⚠ Standard title must be English (ASCII only)':'⚠ Tên file chuẩn phải là tiếng Anh (ASCII)');
+    return false;
+  }
+  if(!/[A-Za-z]/.test(value)){
+    showToast(lang==='en'?'⚠ Invalid standard title':'⚠ Tên file chuẩn không hợp lệ');
+    return false;
+  }
+  return true;
+}
+
+function openDocEditDialog(code){
   document.querySelectorAll('.fm-context-menu').forEach(m=>m.remove());
-  const desc = getDocDesc(code);
+  const doc = DOCS.find(d=>d.code===code) || {};
+  const standardTitle = getDocStandardTitle(doc) || String(doc.title || '').trim() || code;
+  const desc = String(getDocDesc(code) || getDocDisplayDescription(doc) || '').trim();
   const curIcon = getDocIcon(code);
   const modal = document.createElement('div');
   modal.className = 'modal-overlay';
@@ -1720,8 +2703,8 @@ function openDocEditDialog(code, title){
         </div>
 
         <div class="modal-field" style="margin-top:10px">
-          <label>${lang==='en'?'Standard title / file name':'Tên file / tiêu đề chuẩn'}</label>
-          <input id="de-title" type="text" value="${escapeHtml(title)}" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px">
+          <label>${lang==='en'?'English standard title / file name':'Tên file / tiêu đề chuẩn'}</label>
+          <input id="de-title" data-original="${escapeHtml(standardTitle)}" type="text" value="${escapeHtml(standardTitle)}" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px">
         </div>
 
         <div class="modal-field" style="margin-top:10px">
@@ -1729,7 +2712,7 @@ function openDocEditDialog(code, title){
           <textarea id="de-desc" rows="2" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;resize:vertical;font-size:13px" placeholder="${lang==='en'?'Brief Vietnamese description':'Mô tả ngắn bằng tiếng Việt'}">${escapeHtml(desc)}</textarea>
         </div>
 
-        <div style="margin-top:8px;font-size:10px;color:var(--text-3)">⚠️ ${lang==='en'?'Portal layout follows Code → English standard title → Vietnamese description. Renaming updates all cross-references automatically.':'Portal hiển thị theo thứ tự Mã tài liệu → tên file chuẩn tiếng Anh → mô tả tiếng Việt. Đổi mã/tiêu đề sẽ cập nhật tất cả tham chiếu chéo tự động.'}</div>
+        <div style="margin-top:8px;font-size:10px;color:var(--text-3)">⚠️ ${lang==='en'?'Document code + English standard title are SSOT for filename and header title. Vietnamese description syncs to the header note.':'Mã tài liệu + tên file / tiêu đề chuẩn là SSOT cho filename và title header. Mô tả tiếng Việt đồng bộ vào ghi chú trên header.'}</div>
       </div>
       <div class="modal-actions">
         <button class="btn-admin" onclick="document.getElementById('doc-edit-modal')?.remove()">${lang==='en'?'Cancel':'Hủy'}</button>
@@ -1742,23 +2725,33 @@ function openDocEditDialog(code, title){
 
 async function doSaveDocEdit(oldCode){
   const newCode = (document.getElementById('de-code')?.value||'').trim();
-  const newTitle = (document.getElementById('de-title')?.value||'').trim();
+  const titleEl = document.getElementById('de-title');
+  const newTitle = (titleEl?.value||'').trim();
+  const originalTitle = (titleEl?.dataset?.original||'').trim();
   const desc = (document.getElementById('de-desc')?.value||'').trim();
-
-  // Save doc description
-  if(desc !== getDocDesc(oldCode)){
-    DOC_DESCS[oldCode] = desc;
-    try{ await apiCall('save_doc_description', {code: oldCode, description: desc}); }catch(e){}
+  const currentDocMeta = DOCS.find(d=>d.code===oldCode) || {};
+  const originalDesc = String(getDocDesc(oldCode) || getDocDisplayDescription(currentDocMeta) || '').trim();
+  if(!newCode){
+    showToast(lang==='en'?'⚠ Missing document code':'⚠ Thiếu mã tài liệu');
+    return;
   }
+  if(!ensureEnglishStandardTitle(newTitle)) return;
 
-  // Rename if changed
-  if(newCode && (newCode !== oldCode || newTitle)){
+  const codeChanged = newCode !== oldCode;
+  const titleChanged = newTitle !== originalTitle;
+  const descChanged = desc !== originalDesc;
+
+  // Rename file + sync header title when code, standard title, or header note changes
+  if(codeChanged || titleChanged || descChanged){
     try {
-      const res = await apiCall('rename_doc', {old_code: oldCode, new_code: newCode, new_title: newTitle});
+      const res = await apiCall('rename_doc', {old_code: oldCode, new_code: newCode, new_title: newTitle, new_desc: desc});
       if(res && res.ok){
         showToast(`✅ ${lang==='en'?'Saved':'Đã lưu'}`);
         document.getElementById('doc-edit-modal')?.remove();
         await rescanDocs(); renderDocuments(); renderSidebar();
+        if(currentDoc && (currentDoc===oldCode || currentDoc===newCode)){
+          try{ await openDocPreview(newCode || oldCode); }catch(e){}
+        }
         return;
       } else {
         showToast('\u26A0 ' + (res?.detail || res?.error || 'Error'));
@@ -1832,28 +2825,28 @@ function confirmDeleteDoc(code, title){
   modal.id='delete-confirm-modal';
   modal.innerHTML=`
     <div class="modal" style="max-width:460px">
-      <div class="modal-header" style="background:#fef2f2;border-bottom:1px solid #fecaca">
-        <h3 style="color:#dc2626;font-size:16px;display:flex;align-items:center;gap:8px">🗑️ ${vi?'Xóa tài liệu':'Delete Document'}</h3>
+      <div class="modal-header" style="background:color-mix(in srgb, var(--red) 10%, var(--bg-surface,#fff));border-bottom:1px solid color-mix(in srgb, var(--red) 24%, var(--border))">
+        <h3 style="color:var(--red);font-size:16px;display:flex;align-items:center;gap:8px">🗑️ ${vi?'Xóa tài liệu':'Delete Document'}</h3>
         <button class="icon-btn" onclick="document.getElementById('delete-confirm-modal')?.remove()">✕</button>
       </div>
       <div style="padding:20px">
-        <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px;margin-bottom:16px;display:flex;gap:10px;align-items:start">
+        <div style="background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 24%, var(--border));border-radius:8px;padding:12px;margin-bottom:16px;display:flex;gap:10px;align-items:start">
           <span style="font-size:20px;flex-shrink:0">⚠️</span>
-          <div style="font-size:13px;color:#92400e;line-height:1.5">
+          <div style="font-size:13px;color:var(--amber);line-height:1.5">
             ${vi?'Bạn đang xóa tài liệu:':'You are about to delete:'}
-            <div style="margin-top:6px;font-weight:700;color:#1e293b">${code} — ${title||'(untitled)'}</div>
-            <div style="margin-top:8px;font-size:12px;color:#78716c">${vi?'Tài liệu sẽ được chuyển vào thư mục <b>_Deleted</b> và có thể khôi phục bởi Admin.':'The document will be moved to <b>_Deleted</b> folder and can be recovered by Admin.'}</div>
+            <div style="margin-top:6px;font-weight:700;color:var(--text-primary)">${code} — ${title||'(untitled)'}</div>
+            <div style="margin-top:8px;font-size:12px;color:var(--text-secondary)">${vi?'Tài liệu sẽ được chuyển vào thư mục <b>_Deleted</b> và có thể khôi phục bởi Admin.':'The document will be moved to <b>_Deleted</b> folder and can be recovered by Admin.'}</div>
           </div>
         </div>
         <div style="margin-bottom:12px">
-          <label style="font-size:12px;font-weight:600;color:#dc2626;display:flex;align-items:center;gap:6px">
-            <input type="checkbox" id="del-confirm-check" style="width:16px;height:16px;accent-color:#dc2626">
+          <label style="font-size:12px;font-weight:600;color:var(--red);display:flex;align-items:center;gap:6px">
+            <input type="checkbox" id="del-confirm-check" style="width:16px;height:16px;accent-color:var(--red)">
             ${vi?'Tôi xác nhận muốn xóa tài liệu này':'I confirm I want to delete this document'}
           </label>
         </div>
         <div style="display:flex;gap:10px;justify-content:flex-end">
           <button class="btn-admin secondary" onclick="document.getElementById('delete-confirm-modal')?.remove()">${vi?'Hủy':'Cancel'}</button>
-          <button class="btn-admin" id="del-confirm-btn" disabled style="background:#dc2626;color:#fff;opacity:.5;cursor:not-allowed" onclick="executeDeleteDoc('${escapeHtml(code)}')">🗑️ ${vi?'Xóa vĩnh viễn':'Delete'}</button>
+          <button class="btn-admin" id="del-confirm-btn" disabled style="background:var(--red);color:var(--text-inverse,#fff);opacity:.5;cursor:not-allowed" onclick="executeDeleteDoc('${escapeHtml(code)}')">🗑️ ${vi?'Xóa vĩnh viễn':'Delete'}</button>
         </div>
       </div>
     </div>`;
@@ -1900,7 +2893,8 @@ function confirmDeleteFolder(folderPath, folderKey){
   const vi=lang!=='en';
   const label=getSubfolderLabel(folderKey);
   // Count docs in this folder from tree
-  const treeNode=getBestTreeNodeForCategory(currentFilter, DOCS.filter(d=>d.cat===currentFilter));
+  const catDocs = DOCS.filter(d=>d.cat===currentFilter);
+  const treeNode=((typeof getCategoryTreeRoot === 'function') ? getCategoryTreeRoot(currentFilter, catDocs) : null) || getBestTreeNodeForCategory(currentFilter, catDocs);
   let targetNode=null;
   function findNode(node,path){
     if(node.path===path)return node;
@@ -1918,43 +2912,43 @@ function confirmDeleteFolder(folderPath, folderKey){
   modal.id='delete-confirm-modal';
   modal.innerHTML=`
     <div class="modal" style="max-width:480px">
-      <div class="modal-header" style="background:#fef2f2;border-bottom:1px solid #fecaca">
-        <h3 style="color:#dc2626;font-size:16px;display:flex;align-items:center;gap:8px">🗑️ ${vi?'Xóa folder':'Delete Folder'}</h3>
+      <div class="modal-header" style="background:color-mix(in srgb, var(--red) 10%, var(--bg-surface,#fff));border-bottom:1px solid color-mix(in srgb, var(--red) 24%, var(--border))">
+        <h3 style="color:var(--red);font-size:16px;display:flex;align-items:center;gap:8px">🗑️ ${vi?'Xóa folder':'Delete Folder'}</h3>
         <button class="icon-btn" onclick="document.getElementById('delete-confirm-modal')?.remove()">✕</button>
       </div>
       <div style="padding:20px">
-        <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px;margin-bottom:16px">
+        <div style="background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 24%, var(--border));border-radius:8px;padding:12px;margin-bottom:16px">
           <div style="display:flex;gap:10px;align-items:start">
             <span style="font-size:20px;flex-shrink:0">⚠️</span>
-            <div style="font-size:13px;color:#92400e;line-height:1.5">
+            <div style="font-size:13px;color:var(--amber);line-height:1.5">
               ${vi?'Bạn đang xóa folder:':'You are about to delete folder:'}
-              <div style="margin-top:6px;font-weight:700;color:#1e293b;font-size:15px">📁 ${label}</div>
-              <div style="margin-top:4px;font-size:11px;color:#a8a29e;font-family:monospace">${folderPath}</div>
+              <div style="margin-top:6px;font-weight:700;color:var(--text-primary);font-size:15px">📁 ${label}</div>
+              <div style="margin-top:4px;font-size:11px;color:var(--text-secondary);font-family:monospace">${folderPath}</div>
             </div>
           </div>
           ${fileCount>0||subCount>0?`
-          <div style="margin-top:12px;padding:10px;background:#fef2f2;border:1px solid #fecaca;border-radius:6px">
-            <div style="font-size:12px;color:#dc2626;font-weight:600">${vi?'⚠️ Cảnh báo: Folder này chứa dữ liệu!':'⚠️ Warning: This folder contains data!'}</div>
-            <div style="font-size:12px;color:#991b1b;margin-top:4px">${fileCount>0?`• ${fileCount} ${vi?'tài liệu':'document(s)'}`:''} ${subCount>0?`• ${subCount} ${vi?'folder con':'subfolder(s)'}`:''}</div>
-            <div style="font-size:11px;color:#78716c;margin-top:4px">${vi?'Tất cả sẽ được chuyển vào _Deleted':'All will be moved to _Deleted'}</div>
+          <div style="margin-top:12px;padding:10px;background:color-mix(in srgb, var(--red) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--red) 24%, var(--border));border-radius:6px">
+            <div style="font-size:12px;color:var(--red);font-weight:600">${vi?'⚠️ Cảnh báo: Folder này chứa dữ liệu!':'⚠️ Warning: This folder contains data!'}</div>
+            <div style="font-size:12px;color:var(--red);margin-top:4px">${fileCount>0?`• ${fileCount} ${vi?'tài liệu':'document(s)'}`:''} ${subCount>0?`• ${subCount} ${vi?'folder con':'subfolder(s)'}`:''}</div>
+            <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">${vi?'Tất cả sẽ được chuyển vào _Deleted':'All will be moved to _Deleted'}</div>
           </div>`:''}
         </div>
         <div style="margin-bottom:12px">
-          <label style="font-size:12px;font-weight:600;color:#dc2626;display:flex;align-items:center;gap:6px">
-            <input type="checkbox" id="del-confirm-check" style="width:16px;height:16px;accent-color:#dc2626">
+          <label style="font-size:12px;font-weight:600;color:var(--red);display:flex;align-items:center;gap:6px">
+            <input type="checkbox" id="del-confirm-check" style="width:16px;height:16px;accent-color:var(--red)">
             ${vi?'Tôi xác nhận muốn xóa folder này':'I confirm I want to delete this folder'}
           </label>
         </div>
         ${fileCount>0?`
         <div style="margin-bottom:12px">
-          <label style="font-size:12px;font-weight:600;color:#dc2626;display:flex;align-items:center;gap:6px">
-            <input type="checkbox" id="del-confirm-check2" style="width:16px;height:16px;accent-color:#dc2626">
+          <label style="font-size:12px;font-weight:600;color:var(--red);display:flex;align-items:center;gap:6px">
+            <input type="checkbox" id="del-confirm-check2" style="width:16px;height:16px;accent-color:var(--red)">
             ${vi?'Tôi hiểu rằng '+fileCount+' tài liệu bên trong cũng sẽ bị xóa':'I understand that '+fileCount+' documents inside will also be deleted'}
           </label>
         </div>`:''}
         <div style="display:flex;gap:10px;justify-content:flex-end">
           <button class="btn-admin secondary" onclick="document.getElementById('delete-confirm-modal')?.remove()">${vi?'Hủy':'Cancel'}</button>
-          <button class="btn-admin" id="del-confirm-btn" disabled style="background:#dc2626;color:#fff;opacity:.5;cursor:not-allowed" onclick="executeDeleteFolder('${escapeHtml(folderPath)}')">🗑️ ${vi?'Xóa folder':'Delete folder'}</button>
+          <button class="btn-admin" id="del-confirm-btn" disabled style="background:var(--red);color:var(--text-inverse,#fff);opacity:.5;cursor:not-allowed" onclick="executeDeleteFolder('${escapeHtml(folderPath)}')">🗑️ ${vi?'Xóa folder':'Delete folder'}</button>
         </div>
       </div>
     </div>`;
@@ -2008,7 +3002,7 @@ async function executeDeleteFolder(folderPath){
     showToast('\u26A0 Error: '+e.message);
   }
 }
-function openDocContextMenu(event, code, title){ openDocEditMenu(event, code, title); }
+function openDocContextMenu(event, code, title){ openDocEditMenu(event, code); }
 
 // Legacy rename - kept for API compatibility
 async function doRenameFolder(oldPath){
@@ -2038,7 +3032,7 @@ async function doSaveDesc(folderPath){
 }
 
 // Legacy: openRenameDocDialog replaced by openDocEditDialog
-function openRenameDocDialog(code, title){ openDocEditDialog(code, title); }
+function openRenameDocDialog(code, title){ openDocEditDialog(code); }
 
 async function doRenameDoc(oldCode){
   const newCode = (document.getElementById('rd-code')?.value||'').trim();
@@ -2106,7 +3100,7 @@ const CAT_OPTIONS = [
   {id:'WI',   label:'WI — Hướng dẫn công việc',   labelEn:'WI — Work Instruction'},
   {id:'FRM',  label:'FRM — Biểu mẫu / Hồ sơ',    labelEn:'FRM — Forms & Records'},
   {id:'ORG',  label:'ORG — Tổ chức & Nhân sự',    labelEn:'ORG — Organization & HR'},
-  {id:'ANNEX',label:'ANNEX — Phụ lục / Tài liệu tham chiếu',labelEn:'ANNEX — Annexes & References'},
+  {id:'ANNEX',label:'ANNEX — Phụ lục',labelEn:'ANNEX — Annexes'},
   {id:'POL',  label:'POL — Chính sách',            labelEn:'POL — Policy'},
   {id:'MAN',  label:'MAN — Sổ tay chất lượng',    labelEn:'MAN — Quality Manual'},
   {id:'TRN',  label:'TRN — Đào tạo & Năng lực',   labelEn:'TRN — Training & Competency'},
@@ -2114,6 +3108,8 @@ const CAT_OPTIONS = [
 
 function getDefaultFolderForCat(cat){
   const catDocs = DOCS.filter(d=>d.cat===cat);
+  const rootNode = (typeof getCategoryTreeRoot === 'function') ? getCategoryTreeRoot(cat, catDocs) : null;
+  if(rootNode && rootNode.path) return rootNode.path;
   const bestNode = getBestTreeNodeForCategory(cat, catDocs);
   if(bestNode && bestNode.path) return bestNode.path;
   if(DEFAULT_FOLDERS[cat]) return DEFAULT_FOLDERS[cat];
@@ -2139,6 +3135,8 @@ function computeFolder(cat, dept){
     return DYNAMIC_FOLDERS[cat][dept];
   }
   if(!getCatHasDept(cat)){
+    const rootNode = (typeof getCategoryTreeRoot === 'function') ? getCategoryTreeRoot(cat, DOCS.filter(d=>d.cat===cat)) : null;
+    if(rootNode && rootNode.path) return rootNode.path;
     const bestNode = getBestTreeNodeForCategory(cat, DOCS.filter(d=>d.cat===cat));
     if(bestNode && bestNode.path) return bestNode.path;
     if(DEFAULT_FOLDERS[cat]) return DEFAULT_FOLDERS[cat];
@@ -2363,6 +3361,7 @@ async function submitCreateDoc(cat){
 
   if(!code){ showToast(lang==='en'?'⚠ Missing document code':'⚠ Thiếu mã tài liệu'); return; }
   if(!title){ showToast(lang==='en'?'⚠ Missing title':'⚠ Thiếu tiêu đề'); return; }
+  if(!ensureEnglishStandardTitle(title)) return;
 
   if(revision && !/^\d+(?:\.\d+)?$/.test(revision)){
     showToast(lang==='en'?'⚠ Invalid version (e.g., 0.0, 1.0, 1.1)':'⚠ Phiên bản không hợp lệ (ví dụ: 0.0, 1.0, 1.1)');
@@ -2523,7 +3522,7 @@ function renderDictionary(){
   el.innerHTML = `
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px">
       <div>
-        <h2 style="font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px">📖 ${T('dict_title')} <span style="font-size:12px;font-weight:400;color:var(--text-3);background:#f1f3f5;padding:2px 10px;border-radius:20px">ANNEX-QMS-970</span></h2>
+        <h2 style="font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px">📖 ${T('dict_title')} <span style="font-size:12px;font-weight:400;color:var(--text-3);background:#f1f3f5;padding:2px 10px;border-radius:20px">ANNEX-50470</span></h2>
         <p style="font-size:13px;color:var(--text-3);margin-top:4px">${T('dict_desc')}</p>
       </div>
       <div style="display:flex;gap:10px;align-items:center;flex-shrink:0">
@@ -2533,35 +3532,195 @@ function renderDictionary(){
     <input class="search-input-lg" type="text" placeholder="${T('dict_ph')}" id="dict-search" oninput="handleDictSearch(this.value)" autofocus>
     <div id="dict-body">
       <div class="dict-loading"><div class="spinner"></div>${T('dict_loading')}</div>
-    </div>`;
+  </div>`;
   loadDictData().then(()=>{renderDictBody();updateDictBadge();});
+}
+
+function normalizeDictionarySearchText(text){
+  return String(text || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+    .replace(/\s+/g, ' ');
+}
+
+const DICT_STATUS_TERMS = new Set(['PASS', 'FAIL', 'REJECT', 'REWORK']);
+
+function normalizeDictionarySingleLineText(text){
+  return String(text || '').replace(/\s+/g, ' ').trim();
+}
+
+function getDictionaryAliasMatch(term){
+  const match = normalizeDictionarySingleLineText(term).match(/^(.*?)\s*\(([A-Z0-9][A-Z0-9/&+.\-]{1,})\)$/);
+  if(!match) return null;
+  return {
+    phrase: normalizeDictionarySingleLineText(match[1]),
+    abbr: normalizeDictionarySingleLineText(match[2])
+  };
+}
+
+function isDictionaryStatusTerm(term){
+  return DICT_STATUS_TERMS.has(normalizeDictionarySingleLineText(term).toUpperCase());
+}
+
+function isDictionaryAbbreviationTerm(term){
+  const value = normalizeDictionarySingleLineText(term);
+  if(!value || value.includes(' ') || isDictionaryStatusTerm(value)) return false;
+  if(/^[A-Z]{2,}-\d{2,}$/.test(value)) return true;
+  return /^[A-Z0-9][A-Z0-9/&+.\-]{1,}$/.test(value);
+}
+
+function sanitizeDictionaryMeaning(term, meaning){
+  const cleanTerm = normalizeDictionarySingleLineText(term);
+  let cleanMeaning = normalizeDictionarySingleLineText(meaning).replace(/\s*\/\s*/g, ' / ');
+  if(!cleanMeaning) return '';
+  if(isDictionaryAbbreviationTerm(cleanTerm)){
+    const escaped = cleanTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    cleanMeaning = cleanMeaning.replace(new RegExp(`\\s*\\(${escaped}\\)\\s*$`, 'i'), '').trim();
+  }
+  return cleanMeaning;
+}
+
+function getDictionaryValidationError(term, meaning, def, originalTerm){
+  const cleanTerm = normalizeDictionarySingleLineText(term);
+  const cleanMeaning = sanitizeDictionaryMeaning(cleanTerm, meaning);
+  const cleanDef = String(def || '').trim();
+  const cleanOriginal = normalizeDictionarySingleLineText(originalTerm || cleanTerm);
+  const aliasMatch = getDictionaryAliasMatch(cleanTerm);
+
+  if(!cleanTerm) return 'missing_term';
+  if(!cleanMeaning) return 'missing_meaning';
+  if(!cleanDef) return 'missing_definition';
+  if(aliasMatch && (!originalTerm || cleanOriginal.toLowerCase() !== cleanTerm.toLowerCase())){
+    return 'use_abbreviation_canonical_term';
+  }
+  if(isDictionaryAbbreviationTerm(cleanTerm) && cleanMeaning.toLowerCase() === cleanTerm.toLowerCase()){
+    return 'meaning_must_expand_abbreviation';
+  }
+  return '';
+}
+
+function getDictionarySaveErrorMessage(errorCode){
+  const viMessages = {
+    missing_term: 'Cần nhập thuật ngữ',
+    missing_meaning: 'Cần nhập tên đầy đủ tiếng Anh',
+    missing_definition: 'Cần nhập định nghĩa',
+    use_abbreviation_canonical_term: 'Dùng mã viết tắt làm term chính và điền tên đầy đủ tiếng Anh vào trường Meaning',
+    meaning_must_expand_abbreviation: 'Tên đầy đủ tiếng Anh phải khai triển mã viết tắt, không được lặp lại chính mã đó'
+  };
+  const enMessages = {
+    missing_term: 'Term is required',
+    missing_meaning: 'Full English is required',
+    missing_definition: 'Definition is required',
+    use_abbreviation_canonical_term: 'Use the abbreviation as the canonical term and put the full English in Meaning',
+    meaning_must_expand_abbreviation: 'Meaning must expand the abbreviation instead of repeating the code'
+  };
+  const messages = lang === 'en' ? enMessages : viMessages;
+  return messages[errorCode] || errorCode || (lang === 'en' ? 'Save failed' : 'Lưu thất bại');
+}
+
+function isDictionaryWordStart(text, index){
+  return index === 0 || text.charAt(index - 1) === ' ';
+}
+
+function scoreDictionaryField(text, query, fieldWeight){
+  if(!text || !query) return null;
+  const idx = text.indexOf(query);
+  const tokens = query.split(' ').filter(Boolean);
+  let bestScore = null;
+
+  if(text === query){
+    bestScore = fieldWeight + 600;
+  }
+  if(text.startsWith(query)){
+    const score = fieldWeight + 420 - Math.min(160, text.length - query.length);
+    bestScore = bestScore === null ? score : Math.max(bestScore, score);
+  }
+  if(idx >= 0){
+    const boundaryBoost = isDictionaryWordStart(text, idx) ? 290 : 180;
+    const score = fieldWeight + boundaryBoost - Math.min(140, idx * 3);
+    bestScore = bestScore === null ? score : Math.max(bestScore, score);
+  }
+  if(tokens.length > 1){
+    const tokenIndexes = tokens.map(token => text.indexOf(token));
+    if(tokenIndexes.every(tokenIndex => tokenIndex >= 0)){
+      const boundaryHits = tokenIndexes.filter(tokenIndex => isDictionaryWordStart(text, tokenIndex)).length;
+      const tokenPenalty = Math.min(120, tokenIndexes.reduce((sum, tokenIndex) => sum + tokenIndex, 0));
+      const score = fieldWeight + 210 + (boundaryHits * 24) - tokenPenalty;
+      bestScore = bestScore === null ? score : Math.max(bestScore, score);
+    }
+  }
+
+  return bestScore;
+}
+
+function getDictionarySearchMatch(item, rawQuery){
+  const query = normalizeDictionarySearchText(rawQuery);
+  if(!query) return { item, score: 0 };
+  const aliasComposite = item.meaning && item.term ? `${item.meaning} (${item.term})` : '';
+
+  const fields = [
+    { key: 'term', value: normalizeDictionarySearchText(item.term), weight: 1200 },
+    { key: 'alias', value: normalizeDictionarySearchText(aliasComposite), weight: 1140 },
+    { key: 'vi', value: normalizeDictionarySearchText(item.vi), weight: 1120 },
+    { key: 'meaning', value: normalizeDictionarySearchText(item.meaning), weight: 720 },
+    { key: 'def', value: normalizeDictionarySearchText(item.def), weight: 220 }
+  ];
+
+  let bestField = null;
+  let bestScore = null;
+
+  fields.forEach(field => {
+    const score = scoreDictionaryField(field.value, query, field.weight);
+    if(score === null) return;
+    if(bestScore === null || score > bestScore){
+      bestScore = score;
+      bestField = field.key;
+    }
+  });
+
+  if(bestScore === null) return null;
+
+  const termLength = String(item.term || '').trim().length || 999;
+  return {
+    item,
+    score: bestScore,
+    field: bestField,
+    termLength,
+    term: String(item.term || '').toLowerCase()
+  };
+}
+
+function getRankedDictionaryMatches(items, rawQuery){
+  return items
+    .map(item => getDictionarySearchMatch(item, rawQuery))
+    .filter(Boolean)
+    .sort((a, b) => {
+      if(b.score !== a.score) return b.score - a.score;
+      if(a.termLength !== b.termLength) return a.termLength - b.termLength;
+      return a.term.localeCompare(b.term);
+    });
 }
 
 function renderDictBody(){
   if(!dictData) return;
   const el = document.getElementById('dict-body');
-  
+
+  const rankedMatches = dictQuery ? getRankedDictionaryMatches(dictData, dictQuery) : [];
+  const queryMatchedItems = dictQuery ? rankedMatches.map(match => match.item) : dictData;
+
   // Filter
-  let filtered = dictData;
-  if(dictQuery){
-    const q = dictQuery.toLowerCase();
-    filtered = dictData.filter(d => 
-      d.term.toLowerCase().includes(q) || 
-      (d.vi && d.vi.toLowerCase().includes(q)) || 
-      d.def.toLowerCase().includes(q) ||
-      (d.meaning && d.meaning.toLowerCase().includes(q))
-    );
-  }
+  let filtered = queryMatchedItems;
   if(dictCatFilter !== 'ALL'){
     filtered = filtered.filter(d => d.cat === dictCatFilter);
   }
-  
+
   // Category counts
   const catCounts = {};
-  const srcData = dictQuery ? dictData.filter(d => {
-    const q = dictQuery.toLowerCase();
-    return d.term.toLowerCase().includes(q)||(d.vi&&d.vi.toLowerCase().includes(q))||d.def.toLowerCase().includes(q)||(d.meaning&&d.meaning.toLowerCase().includes(q));
-  }) : dictData;
+  const srcData = queryMatchedItems;
   srcData.forEach(d => { catCounts[d.cat] = (catCounts[d.cat]||0)+1; });
   
   const showing = filtered.slice(0, dictShowCount);
@@ -2598,7 +3757,8 @@ function renderDictBody(){
           <div class="dict-card-header">
             <div>
               <div class="dict-term">${highlightMatch(d.term, dictQuery)}</div>
-              ${d.vi && d.vi !== d.term ? `<div class="dict-vi">${highlightMatch(d.vi, dictQuery)}</div>` : ''}
+              ${d.meaning ? `<div class="dict-meaning">${highlightMatch(d.meaning, dictQuery)}</div>` : ''}
+              ${d.vi && d.vi !== d.term && d.vi !== d.meaning ? `<div class="dict-vi">${highlightMatch(d.vi, dictQuery)}</div>` : ''}
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
               <div class="dict-cat-badge"><span class="dot" style="background:${DICT_CAT_COLORS[d.cat]||'#94a3b8'}"></span>${d.cat}</div>
@@ -2616,14 +3776,16 @@ function renderDictBody(){
       }).join('')}
     </div>
     ${hasMore ? `<button class="dict-more-btn" onclick="dictShowCount+=30;renderDictBody()">${T('dict_more')} (${filtered.length - dictShowCount > 0 ? filtered.length - dictShowCount : 0} ${T('dict_remaining')})</button>` : ''}
-    <div style="margin-top:12px;font-size:11px;color:var(--text-3);text-align:center">${T('showing')} ${Math.min(dictShowCount, filtered.length)} / ${filtered.length} · ${T('dict_source')}: ANNEX-QMS-970</div>
+    <div style="margin-top:12px;font-size:11px;color:var(--text-3);text-align:center">${T('showing')} ${Math.min(dictShowCount, filtered.length)} / ${filtered.length} · ${T('dict_source')}: ANNEX-50470</div>
   `;
 }
 
 function highlightMatch(text, query){
   if(!query || !text) return text;
   const escaped = query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-  return text.replace(new RegExp('('+escaped+')','gi'),'<mark style="background:#fff9c4;padding:0 2px;border-radius:2px">$1</mark>');
+  const darkUi = document.documentElement.getAttribute('data-color-mode') === 'dark';
+  const markBg = darkUi ? 'rgba(251,191,36,.28)' : '#fff9c4';
+  return text.replace(new RegExp('('+escaped+')','gi'),'<mark style="background:'+markBg+';color:inherit;padding:0 2px;border-radius:2px">$1</mark>');
 }
 
 function handleDictSearch(q){
@@ -2653,13 +3815,13 @@ function openDictTermModal(term){
 
     <div class="modal-field"><label>${lang==='en'?'Term (EN)':'Thuật ngữ (EN)'}</label><input id="dm-term" value="${existing?escapeHtml(existing.term):''}" ${isEdit?'disabled':''}></div>
     <div class="modal-field"><label>${lang==='en'?'Vietnamese':'Tiếng Việt'}</label><input id="dm-vi" value="${existing?escapeHtml(existing.vi||''):''}"></div>
-    <div class="modal-field"><label>${lang==='en'?'Meaning / short':'Ý nghĩa / ngắn gọn'}</label><input id="dm-meaning" value="${existing?escapeHtml(existing.meaning||''):''}"></div>
+    <div class="modal-field"><label>${lang==='en'?'Full English (required)':'Tên đầy đủ tiếng Anh (bắt buộc)'}</label><input id="dm-meaning" value="${existing?escapeHtml(existing.meaning||''):''}"></div>
     <div class="modal-field"><label>${lang==='en'?'Category':'Nhóm'}</label>
       <select id="dm-cat">${catOptions || '<option value="General">General</option>'}</select>
     </div>
     <div class="modal-field"><label>${lang==='en'?'Definition':'Định nghĩa'}</label><textarea id="dm-def" rows="4" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;resize:vertical">${existing?escapeHtml(existing.def||''):''}</textarea></div>
     <div class="modal-field"><label>${lang==='en'?'Context / Example':'Ngữ cảnh / Ví dụ'}</label><textarea id="dm-ctx" rows="2" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;resize:vertical">${existing?escapeHtml(existing.ctx||''):''}</textarea></div>
-    <div class="modal-field"><label>${lang==='en'?'Recommendation':'Khuyến nghị'}</label><textarea id="dm-rec" rows="2" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;resize:vertical">${existing?escapeHtml(existing.rec||''):''}</textarea></div>
+    <div class="modal-field"><label>${lang==='en'?'Required records':'Hồ sơ phải có'}</label><textarea id="dm-rec" rows="2" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;resize:vertical">${existing?escapeHtml(existing.rec||''):''}</textarea></div>
 
     <div class="modal-actions">
       <button class="btn-admin secondary" onclick="closeModal()">✕ ${T('admin_cancel')}</button>
@@ -2674,19 +3836,22 @@ async function saveDictTerm(originalTerm){
   if(!isAdmin()) return;
   const term = (document.getElementById('dm-term').value||'').trim();
   const vi = (document.getElementById('dm-vi').value||'').trim();
-  const meaning = (document.getElementById('dm-meaning').value||'').trim();
+  const meaning = sanitizeDictionaryMeaning(term, document.getElementById('dm-meaning').value||'');
   const cat = (document.getElementById('dm-cat').value||'General').trim();
   const def = (document.getElementById('dm-def').value||'').trim();
   const ctx = (document.getElementById('dm-ctx').value||'').trim();
   const rec = (document.getElementById('dm-rec').value||'').trim();
 
-  if(!term){ alert(lang==='en'?'Term is required':'Cần nhập thuật ngữ'); return; }
-  if(!def){ alert(lang==='en'?'Definition is required':'Cần nhập định nghĩa'); return; }
+  const validationError = getDictionaryValidationError(term, meaning, def, originalTerm);
+  if(validationError){
+    alert(getDictionarySaveErrorMessage(validationError));
+    return;
+  }
 
   try{
     const res = await apiCall('dict_upsert',{term,vi,meaning,cat,def,ctx,rec,originalTerm});
     if(!(res && res.ok)){
-      showToast((res && res.error)?('⚠ '+res.error):(lang==='en'?'⚠ Save failed':'⚠ Lưu thất bại'));
+      showToast('⚠ ' + getDictionarySaveErrorMessage(res && res.error));
       return;
     }
     dictData = res.items || dictData;
@@ -2719,9 +3884,27 @@ function escapeHtml(s){
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+function syncSidebarToggleState(){
+  const sidebar = document.getElementById('sidebar');
+  const toggleBtn = document.getElementById('sidebar-toggle-btn');
+  const toggleText = document.getElementById('collapse-text');
+  if(!sidebar || !toggleBtn || !toggleText) return;
+  const collapsed = sidebar.classList.contains('collapsed');
+  const label = collapsed ? 'M\u1edf r\u1ed9ng menu' : 'Thu g\u1ecdn menu';
+  toggleBtn.setAttribute('aria-label', label);
+  toggleBtn.setAttribute('title', label);
+  toggleBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+  toggleText.textContent = collapsed ? 'M\u1edf r\u1ed9ng' : 'Thu g\u1ecdn';
+}
+
 function toggleSidebar(){
   // Desktop only: collapse/expand
   if(window.innerWidth > 900){
+    const sidebarEl = document.getElementById('sidebar');
+    if(!sidebarEl) return;
+    sidebarEl.classList.toggle('collapsed');
+    syncSidebarToggleState();
+    return;
     const s = document.getElementById('sidebar');
     s.classList.toggle('collapsed');
     const icon = document.getElementById('collapse-icon');
@@ -2780,13 +3963,301 @@ let adminTab = 'users';
 let adminUserViewMode = 'cards'; // 'cards' or 'list'
 let adminEditRole = 'ceo';
 let adminUnsaved = false;
+let adminManualRuntimeState = {
+  loading:false,
+  loaded:false,
+  master:null,
+  hierarchy:[],
+  lastCreated:null,
+  error:''
+};
+let adminDataSourceState = {
+  loading:false,
+  loaded:false,
+  error:'',
+  draft:null,
+  snapshot:null,
+  dirty:false
+};
 
-function showToast(msg, duration=2500){
-  const t=document.createElement('div');
+function showToast(msg, type, duration){
+  duration = duration || 3000;
+  var colorMap = {
+    success: {bg:'#16a34a', icon:'✅'},
+    error: {bg:'#dc2626', icon:'❌'},
+    warning: {bg:'#d97706', icon:'⚠️'},
+    info: {bg:'#2563eb', icon:'ℹ️'}
+  };
+  var style = colorMap[type] || colorMap.info;
+  var t=document.createElement('div');
   t.className='toast';
-  t.textContent=msg;
+  t.style.cssText='position:fixed;bottom:24px;right:24px;z-index:1500;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;color:#fff;background:'+style.bg+';box-shadow:0 8px 24px rgba(0,0,0,0.2);opacity:0;transform:translateY(12px);transition:all .3s ease;max-width:420px;display:flex;align-items:center;gap:8px';
+  t.innerHTML=style.icon+' '+String(msg||'');
   document.body.appendChild(t);
-  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300);},duration);
+  requestAnimationFrame(function(){requestAnimationFrame(function(){t.style.opacity='1';t.style.transform='translateY(0)';});});
+  setTimeout(function(){t.style.opacity='0';t.style.transform='translateY(12px)';setTimeout(function(){t.remove();},350);},duration);
+}
+
+function closeGitSyncModal(){
+  document.getElementById('git-sync-modal')?.remove();
+}
+
+function gitSyncShortHash(hash){
+  const raw = String(hash||'').trim();
+  return raw ? raw.slice(0,7) : '—';
+}
+
+function gitSyncStatusTone(status){
+  const raw = String(status||'').toUpperCase();
+  if(raw === 'RESTORE') return 'is-modify';
+  if(raw === 'REMOVE') return 'is-delete';
+  if(raw.startsWith('A') || raw === '??') return 'is-add';
+  if(raw.startsWith('D')) return 'is-delete';
+  if(raw.startsWith('R')) return 'is-rename';
+  if(raw.startsWith('M')) return 'is-modify';
+  return 'is-neutral';
+}
+
+function gitSyncEscapeLines(text){
+  return escapeHtml(String(text||'').trim());
+}
+
+function gitSyncRenderSimpleFileTable(items, emptyText){
+  const rows = Array.isArray(items) ? items.filter(Boolean) : [];
+  if(!rows.length){
+    return `<div class="git-sync-empty">${escapeHtml(emptyText)}</div>`;
+  }
+  return `
+    <div class="git-sync-table-wrap">
+      <table class="git-sync-table">
+        <thead>
+          <tr>
+            <th>${lang==='en'?'Status':'Trạng thái'}</th>
+            <th>${lang==='en'?'Path':'Đường dẫn'}</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(row=>{
+            const xy = String(row.xy || row.status || '').trim() || '--';
+            const path = String(row.path || row || '').trim();
+            return `<tr>
+              <td><span class="git-sync-status ${gitSyncStatusTone(xy)}">${escapeHtml(xy)}</span></td>
+              <td><code>${escapeHtml(path)}</code></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function gitSyncRenderChangedFileTable(items, emptyText){
+  const rows = Array.isArray(items) ? items.filter(Boolean) : [];
+  if(!rows.length){
+    return `<div class="git-sync-empty">${escapeHtml(emptyText)}</div>`;
+  }
+  return `
+    <div class="git-sync-table-wrap">
+      <table class="git-sync-table">
+        <thead>
+          <tr>
+            <th>${lang==='en'?'Change':'Thay đổi'}</th>
+            <th>${lang==='en'?'Current path':'Đường dẫn hiện tại'}</th>
+            <th>${lang==='en'?'Previous path':'Đường dẫn cũ'}</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(row=>{
+            const status = String(row.status || '').trim() || '--';
+            const path = String(row.path || '').trim();
+            const oldPath = String(row.old_path || '').trim();
+            return `<tr>
+              <td><span class="git-sync-status ${gitSyncStatusTone(status)}">${escapeHtml(status)}</span></td>
+              <td><code>${escapeHtml(path)}</code></td>
+              <td>${oldPath ? `<code>${escapeHtml(oldPath)}</code>` : '<span class="git-sync-empty-inline">—</span>'}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function gitSyncRenderOutputBlock(title, text){
+  const clean = String(text||'').trim();
+  if(!clean) return '';
+  return `
+    <section class="git-sync-section">
+      <div class="git-sync-section-title">${escapeHtml(title)}</div>
+      <pre class="git-sync-pre">${gitSyncEscapeLines(clean)}</pre>
+    </section>`;
+}
+
+function gitSyncRenderSummaryCard(label, value){
+  return `<div class="git-sync-card-mini"><div class="git-sync-card-label">${escapeHtml(label)}</div><div class="git-sync-card-value">${escapeHtml(value)}</div></div>`;
+}
+
+function gitSyncRenderPresyncSection(presync){
+  if(!presync || typeof presync !== 'object') return '';
+  const pushed = !!presync.pushed;
+  const files = Array.isArray(presync.files) ? presync.files : [];
+  const statusEntries = Array.isArray(presync.status_entries) ? presync.status_entries : [];
+  const sectionTitle = lang==='en'
+    ? 'Auto pre-sync before pull (server-side only)'
+    : 'Auto pre-sync tr\u01b0\u1edbc khi pull (ch\u1ec9 ph\u00eda server)';
+  const callout = pushed
+    ? (lang==='en'
+      ? 'Portal detected meaningful cPanel/server changes, committed them, and pushed them to GitHub before pulling.'
+      : 'Portal ph\u00e1t hi\u1ec7n thay \u0111\u1ed5i meaningful tr\u00ean cPanel/server, \u0111\u00e3 commit v\u00e0 \u0111\u1ea9y ch\u00fang l\u00ean GitHub tr\u01b0\u1edbc khi pull.')
+    : (lang==='en'
+      ? 'No meaningful cPanel/server change needed a pre-sync commit before pull.'
+      : 'Kh\u00f4ng c\u00f3 thay \u0111\u1ed5i meaningful tr\u00ean cPanel/server c\u1ea7n pre-sync commit tr\u01b0\u1edbc khi pull.');
+  const hasAnything = pushed || files.length || statusEntries.length || String(presync.commit_output||'').trim() || String(presync.push_output||'').trim();
+  if(!hasAnything) return '';
+  return `
+    <section class="git-sync-section">
+      <div class="git-sync-section-title">${sectionTitle}</div>
+      <div class="git-sync-callout">${callout}</div>
+      <div class="git-sync-summary-grid git-sync-summary-grid--compact">
+        ${gitSyncRenderSummaryCard(lang==='en'?'Branch':'Nhánh', String(presync.branch || 'main'))}
+        ${gitSyncRenderSummaryCard(lang==='en'?'Files':'Số file', String(files.length))}
+        ${gitSyncRenderSummaryCard(lang==='en'?'Before':'Trước', gitSyncShortHash(presync.head_before))}
+        ${gitSyncRenderSummaryCard(lang==='en'?'After':'Sau', gitSyncShortHash(presync.head_after))}
+      </div>
+      ${gitSyncRenderSimpleFileTable(files.map(path=>({status:'SYNC', path})), lang==='en'?'No meaningful file was auto-pushed before pull.':'Không có file meaningful nào được auto-push trước khi pull.')}
+      ${gitSyncRenderOutputBlock(lang==='en'?'Pre-sync commit output':'Log commit pre-sync', presync.commit_output)}
+      ${gitSyncRenderOutputBlock(lang==='en'?'Pre-sync push output':'Log push pre-sync', presync.push_output)}
+    </section>`;
+}
+
+function openGitSyncReportModal(kind, res){
+  closeGitSyncModal();
+  const isPull = kind === 'pull';
+  const branch = String((res && res.branch) || 'main');
+  const files = Array.isArray(res && res.files) ? res.files : [];
+  const statusEntries = Array.isArray(res && res.status_entries) ? res.status_entries : [];
+  const changedFiles = Array.isArray(res && res.changed_files) ? res.changed_files : [];
+  const presync = res && typeof res.presync === 'object' ? res.presync : null;
+  const pushed = !!(res && res.pushed);
+  const pulled = !!(res && res.pulled);
+  const beforeHead = String((res && (res.before_head || res.head_before)) || '');
+  const afterHead = String((res && (res.after_head || res.head_after)) || '');
+  const title = isPull
+    ? (lang==='en' ? 'Pull Detail' : 'Chi tiết Pull')
+    : (lang==='en' ? 'Push Detail' : 'Chi tiết Push');
+  const kicker = isPull ? 'GitHub -> Portal' : 'Portal -> GitHub';
+  const summaryCards = isPull
+    ? [
+        gitSyncRenderSummaryCard(lang==='en'?'Branch':'Nhánh', branch),
+        gitSyncRenderSummaryCard(lang==='en'?'Changed files':'File thay đổi', String(changedFiles.length)),
+        gitSyncRenderSummaryCard(lang==='en'?'From':'Từ commit', gitSyncShortHash(beforeHead)),
+        gitSyncRenderSummaryCard(lang==='en'?'To':'Đến commit', gitSyncShortHash(afterHead)),
+      ].join('')
+    : [
+        gitSyncRenderSummaryCard(lang==='en'?'Branch':'Nhánh', branch),
+        gitSyncRenderSummaryCard(lang==='en'?'Committed files':'File commit', String(files.length)),
+        gitSyncRenderSummaryCard(lang==='en'?'Before':'Trước', gitSyncShortHash(beforeHead)),
+        gitSyncRenderSummaryCard(lang==='en'?'After':'Sau', gitSyncShortHash(afterHead)),
+      ].join('');
+  const pullSummaryMessageBase = (() => {
+    const base = String(res && res.message || (pulled ? 'Portal updated.' : 'Already up to date.'));
+    if(!pulled && presync && presync.pushed){
+      return `${base} ${lang==='en'
+        ? 'The pre-sync section below shows server-side changes only; workstation edits appear here only after they are pushed to GitHub.'
+        : 'Phần pre-sync bên dưới chỉ hiển thị thay đổi phía server; thay đổi trên máy local chỉ xuất hiện ở đây sau khi đã đẩy lên GitHub.'}`;
+    }
+    return base;
+  })();
+
+  const pullSummaryMessage = (() => {
+    const base = String(res && res.message || (pulled ? 'Portal updated.' : 'Already up to date.'));
+    if(!pulled && presync && presync.pushed){
+      return `${base} ${lang==='en'
+        ? 'The pre-sync section below shows server-side changes only; workstation edits appear here only after they are pushed to GitHub.'
+        : 'Phần pre-sync bên dưới chỉ hiển thị thay đổi phía server; thay đổi trên máy local chỉ xuất hiện ở đây sau khi đã đẩy lên GitHub.'}`;
+    }
+    return base;
+  })();
+
+  const bodySections = isPull
+    ? `
+      <section class="git-sync-section">
+        <div class="git-sync-section-title">${lang==='en'?'Pull summary':'Tóm tắt pull'}</div>
+        <div class="git-sync-callout">${escapeHtml(pullSummaryMessage)}</div>
+      </section>
+      ${gitSyncRenderPresyncSection(presync)}
+      <section class="git-sync-section">
+        <div class="git-sync-section-title">${lang==='en'?'Files applied to portal':'Danh sách file áp dụng xuống portal'}</div>
+        ${gitSyncRenderChangedFileTable(changedFiles, lang==='en'?'No remote file change was applied in this pull.':'Không có file remote nào được áp xuống trong lần pull này.')}
+      </section>
+      ${gitSyncRenderOutputBlock(lang==='en'?'Fetch output':'Log fetch', res && res.fetch_output)}
+      ${gitSyncRenderOutputBlock(lang==='en'?'Pull output':'Log pull', res && res.pull_output)}
+    `
+    : `
+      <section class="git-sync-section">
+        <div class="git-sync-section-title">${lang==='en'?'Push summary':'Tóm tắt push'}</div>
+        <div class="git-sync-callout">${escapeHtml(String(res && res.message || (pushed ? 'Changes pushed.' : 'Nothing to sync.')))}</div>
+      </section>
+      <section class="git-sync-section">
+        <div class="git-sync-section-title">${lang==='en'?'Detected meaningful changes before commit':'Các thay đổi meaningful được phát hiện trước khi commit'}</div>
+        ${gitSyncRenderSimpleFileTable(statusEntries, lang==='en'?'No meaningful file was detected for a new commit.':'Không phát hiện file meaningful nào để tạo commit mới.')}
+      </section>
+      <section class="git-sync-section">
+        <div class="git-sync-section-title">${lang==='en'?'Files included in push':'Danh sách file đi cùng lần push'}</div>
+        ${gitSyncRenderSimpleFileTable(files.map(path=>({status:'SYNC', path})), lang==='en'?'No new file was included in this push.':'Không có file mới nào nằm trong lần push này.')}
+      </section>
+      ${gitSyncRenderOutputBlock(lang==='en'?'Commit output':'Log commit', res && res.commit_output)}
+      ${gitSyncRenderOutputBlock(lang==='en'?'Push output':'Log push', res && res.push_output)}
+    `;
+
+  const primaryButton = isPull
+    ? `<button class="btn-admin primary" onclick="adminReloadLatestPortal()">${lang==='en'?(pulled?'OK - reload latest portal':'OK - refresh portal'):(pulled?'OK - tải lại portal mới nhất':'OK - làm mới portal')}</button>`
+    : '';
+
+  const modal = document.createElement('div');
+  modal.id = 'git-sync-modal';
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal git-sync-modal">
+      <div class="git-sync-modal-head">
+        <div>
+          <div class="git-sync-modal-kicker">${escapeHtml(kicker)}</div>
+          <h3>${escapeHtml(title)}</h3>
+        </div>
+        <button class="icon-btn" onclick="closeGitSyncModal()" aria-label="Close">✕</button>
+      </div>
+      <div class="git-sync-modal-body">
+        <div class="git-sync-summary-grid">${summaryCards}</div>
+        ${bodySections}
+      </div>
+      <div class="modal-actions git-sync-modal-actions">
+        <button class="btn-admin secondary" onclick="closeGitSyncModal()">${lang==='en'?'Close':'Đóng'}</button>
+        ${primaryButton}
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e=>{ if(e.target === modal) closeGitSyncModal(); });
+}
+
+async function adminReloadLatestPortal(){
+  closeGitSyncModal();
+  showToast(lang==='en' ? 'Refreshing portal with cache-busting…' : 'Đang nạp lại portal với cache-busting…', 2200);
+  try{
+    await apiCall('admin_clear_site_cache', {}, 'POST', 15000);
+  }catch(e){}
+  try{
+    if(typeof caches !== 'undefined' && caches && typeof caches.keys === 'function'){
+      const keys = await caches.keys();
+      await Promise.all(keys.map(key => caches.delete(key).catch(()=>false)));
+    }
+  }catch(e){}
+  try{
+    if(navigator.serviceWorker && typeof navigator.serviceWorker.getRegistrations === 'function'){
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all((regs || []).map(reg => reg.update().catch(()=>null)));
+    }
+  }catch(e){}
+  const url = new URL(window.location.href, window.location.origin);
+  url.searchParams.set('_portal_sync_reload', String(Date.now()));
+  window.location.replace(url.toString());
 }
 
 async function adminSaveAll(){
@@ -2820,10 +4291,909 @@ async function adminSaveAll(){
   renderAdmin();
 }
 
+let gitSyncBusyMode = '';
+let gitRepoStatusState = {loading:false, loaded:false, error:'', data:null};
+
+function isGitSyncBusy(){
+  return gitSyncBusyMode === 'pull' || gitSyncBusyMode === 'push' || gitSyncBusyMode === 'discard';
+}
+
+function getGitRepoStatus(){
+  return gitRepoStatusState && gitRepoStatusState.data && gitRepoStatusState.data.ok
+    ? gitRepoStatusState.data
+    : null;
+}
+
+function gitRepoFormatTime(value){
+  const text = String(value||'').trim();
+  if(!text) return '';
+  const date = new Date(text);
+  if(Number.isNaN(date.getTime())) return text;
+  return date.toLocaleString(lang==='en' ? 'en-US' : 'vi-VN');
+}
+
+function gitRepoCommitHeadline(commit){
+  if(!commit || typeof commit !== 'object') return '—';
+  const hash = String(commit.short_hash || commit.hash || '').trim();
+  const subject = String(commit.subject || '').trim();
+  if(!hash && !subject) return '—';
+  return `${hash}${subject ? ` ${subject}` : ''}`.trim();
+}
+
+function gitRepoCommitMeta(commit){
+  if(!commit || typeof commit !== 'object') return '';
+  const author = String(commit.author_name || '').trim();
+  const committedAt = gitRepoFormatTime(commit.committed_at);
+  return [author, committedAt].filter(Boolean).join(' • ');
+}
+
+function gitRepoRelativeState(status){
+  if(!status) return {label:'—', tone:'neutral'};
+  const ahead = Number(status.ahead_count || 0);
+  const behind = Number(status.behind_count || 0);
+  if(ahead > 0 && behind > 0){
+    return {
+      label: lang==='en' ? `Diverged (+${ahead} / -${behind})` : `Phân kỳ (+${ahead} / -${behind})`,
+      tone: 'warn'
+    };
+  }
+  if(behind > 0){
+    return {
+      label: lang==='en' ? `Behind ${behind}` : `Chậm ${behind} commit`,
+      tone: 'info'
+    };
+  }
+  if(ahead > 0){
+    return {
+      label: lang==='en' ? `Ahead ${ahead}` : `Đi trước ${ahead} commit`,
+      tone: 'good'
+    };
+  }
+  return {
+    label: lang==='en' ? 'Up to date' : 'Đã đồng bộ',
+    tone: 'good'
+  };
+}
+
+function gitRepoWorkingTreeState(status){
+  if(!status) return {label:'—', tone:'neutral'};
+  const dirtyCount = Number(status.meaningful_dirty_count || 0);
+  if(dirtyCount > 0){
+    return {
+      label: lang==='en' ? `${dirtyCount} local change(s)` : `${dirtyCount} thay đổi local`,
+      tone: 'warn'
+    };
+  }
+  return {
+    label: lang==='en' ? 'Working tree clean' : 'Working tree sạch',
+    tone: 'good'
+  };
+}
+
+function gitRepoStatusPill(label, tone='neutral'){
+  return `<span class="admin-sync-status-pill is-${escapeHtml(tone)}">${escapeHtml(label)}</span>`;
+}
+
+async function loadGitRepoStatus(options={}){
+  const force = !!options.force;
+  if(gitRepoStatusState.loading && !force) return;
+  if(gitRepoStatusState.loaded && !force) return;
+  gitRepoStatusState.loading = true;
+  if(!options.silent && currentPage === 'admin') renderAdmin();
+  try{
+    const res = await apiCall('admin_git_status', null, 'GET');
+    if(res && res.ok){
+      gitRepoStatusState = {loading:false, loaded:true, error:'', data:res};
+    }else{
+      gitRepoStatusState = {
+        loading:false,
+        loaded:false,
+        error:(res && (res.detail || res.error)) ? String(res.detail || res.error) : 'git_status_failed',
+        data:null
+      };
+    }
+  }catch(e){
+    gitRepoStatusState = {
+      loading:false,
+      loaded:false,
+      error:(e && e.message) ? String(e.message) : 'git_status_failed',
+      data:null
+    };
+  }finally{
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+function adminRefreshGitRepoStatus(){
+  loadGitRepoStatus({force:true});
+}
+
+function adminGitSyncIcon(kind){
+  if(kind === 'pull'){
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12"></path><path d="m7 11 5 5 5-5"></path><path d="M5 19h14"></path></svg>';
+  }
+  if(kind === 'push'){
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V8"></path><path d="m7 13 5-5 5 5"></path><path d="M5 5h14"></path></svg>';
+  }
+  if(kind === 'discard'){
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"></path><path d="M9 7V4h6v3"></path><path d="m10 11 4 4"></path><path d="m14 11-4 4"></path><path d="M6 7l1 12h10l1-12"></path></svg>';
+  }
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.66-5.66L20 8"></path><path d="M20 4v4h-4"></path><path d="M20 12a8 8 0 0 1-13.66 5.66L4 16"></path><path d="M4 20v-4h4"></path></svg>';
+}
+
+function adminGitPushErrorMessage(res){
+  const error = (res && res.error) ? String(res.error) : 'git_sync_failed';
+  const detail = (res && res.detail) ? String(res.detail) : '';
+  if(error === 'staged_changes_present'){
+    return lang==='en'
+      ? 'There are staged meaningful changes on the server already. Review them before using Git sync.'
+      : 'Server đang có thay đổi đã stage sẵn. Hãy commit hoặc unstage trong Terminal trước khi dùng nút đồng bộ Git.';
+  }
+  if(error === 'exec_unavailable'){
+    return lang==='en'
+      ? 'PHP exec is disabled on hosting, so the portal cannot run git commands.'
+      : 'Hosting đang chặn PHP exec nên portal không thể chạy lệnh git.';
+  }
+  if(error === 'git_push_failed'){
+    return lang==='en'
+      ? 'Git push failed. Please verify the server can push to GitHub with SSH key or token.'
+      : 'Git push thất bại. Hãy kiểm tra server đã cấu hình SSH key hoặc token để đẩy lên GitHub chưa.';
+  }
+  if(error === 'not_a_git_repo' || error === 'repo_not_found'){
+    return lang==='en'
+      ? 'The portal root on this server is not available as a git repository.'
+      : 'Thư mục portal trên server này không sẵn sàng như một repo git.';
+  }
+  if(error === 'git_sync_failed' && detail){
+    return detail;
+  }
+  return detail || (lang==='en' ? 'Git sync failed' : 'Đồng bộ Git thất bại');
+}
+
+function adminGitPullErrorMessage(res){
+  const error = (res && res.error) ? String(res.error) : 'git_pull_failed';
+  const detail = (res && res.detail) ? String(res.detail) : '';
+  if(error === 'working_tree_dirty' || error === 'staged_changes_present'){
+    return lang==='en'
+      ? 'The cPanel repository still has meaningful local changes after runtime auto-clean. Review them before pulling from Git.'
+      : 'Repo trên cPanel vẫn còn thay đổi local. Hãy commit hoặc bỏ các thay đổi đó trong Terminal trước khi pull từ Git.';
+  }
+  if(error === 'exec_unavailable'){
+    return lang==='en'
+      ? 'PHP exec is disabled on hosting, so the portal cannot run git commands.'
+      : 'Hosting đang chặn PHP exec nên portal không thể chạy lệnh git.';
+  }
+  if(error === 'git_fetch_failed' || error === 'git_pull_failed'){
+    return lang==='en'
+      ? 'Git pull failed. Please verify the cPanel server can access the remote repository.'
+      : 'Git pull thất bại. Hãy kiểm tra server cPanel có quyền truy cập remote repository.';
+  }
+  if(error === 'not_a_git_repo' || error === 'repo_not_found'){
+    return lang==='en'
+      ? 'The portal root on this server is not available as a git repository.'
+      : 'Thư mục portal trên server này không sẵn sàng như một repo git.';
+  }
+  return detail || (lang==='en' ? 'Git pull failed' : 'Git pull thất bại');
+}
+
+function adminGitExtractDetailPaths(detail){
+  const text = String(detail||'').trim();
+  if(!text) return [];
+  const found = [];
+  const pushUnique = value => {
+    const clean = String(value||'').trim().replace(/^['"]|['"]$/g,'');
+    if(!clean) return;
+    if(!found.includes(clean)) found.push(clean);
+  };
+  const listPatterns = [
+    /(?:^|:\s)(?:working_tree_dirty|staged_changes_present):\s*(.+)$/i,
+    /(?:^|:\s)(?:git_presync_failed):\s*(?:working_tree_dirty|staged_changes_present):\s*(.+)$/i,
+  ];
+  listPatterns.forEach(pattern => {
+    const match = text.match(pattern);
+    if(match && match[1]){
+      match[1].split(',').forEach(part => pushUnique(part));
+    }
+  });
+  Array.from(text.matchAll(/pathspec '([^']+)'/g)).forEach(match => pushUnique(match[1]));
+  return found.filter(path => /[\/\\]/.test(path) || /\.[A-Za-z0-9_-]+$/.test(path));
+}
+
+function adminGitErrorGuidance(kind, res){
+  const error = (res && res.error) ? String(res.error) : '';
+  if(error === 'working_tree_dirty' || error === 'staged_changes_present'){
+    return lang==='en'
+      ? 'Review the listed files first. If those edits are valid, use Push to Git or commit them in Terminal. If they are wrong or temporary, discard them before pulling.'
+      : 'Hãy rà soát các file đang được liệt kê. Nếu đó là thay đổi hợp lệ, dùng Push to Git hoặc commit trong Terminal. Nếu là thay đổi tạm/sai, hãy bỏ chúng trước khi pull.';
+  }
+  if(error === 'git_push_failed'){
+    return lang==='en'
+      ? 'The server could not push to GitHub. Check SSH access, remote URL, and whether origin/main has newer commits that require fetch/rebase first.'
+      : 'Server không thể đẩy lên GitHub. Hãy kiểm tra SSH, remote URL và xem origin/main có commit mới hơn cần fetch/rebase trước hay không.';
+  }
+  if(error === 'git_fetch_failed' || error === 'git_pull_failed'){
+    return lang==='en'
+      ? 'The server could not fetch or pull from the remote. Verify network access, SSH key, and remote branch state.'
+      : 'Server không thể fetch hoặc pull từ remote. Hãy kiểm tra kết nối mạng, SSH key và trạng thái nhánh remote.';
+  }
+  if(error === 'git_add_failed'){
+    return lang==='en'
+      ? 'Git could not stage one or more paths. This usually means the path no longer exists or was renamed. Rescan the document index, then try again.'
+      : 'Git không thể stage một hoặc nhiều đường dẫn. Trường hợp này thường do file đã đổi tên hoặc không còn tồn tại. Hãy quét lại danh mục tài liệu rồi thử lại.';
+  }
+  if(error === 'exec_unavailable'){
+    return lang==='en'
+      ? 'Hosting is blocking PHP exec, so portal buttons cannot run git commands. Terminal or hosting configuration is required.'
+      : 'Hosting đang chặn PHP exec nên các nút trên portal không thể chạy lệnh git. Cần dùng Terminal hoặc mở cấu hình hosting.';
+  }
+  return kind === 'pull'
+    ? (lang==='en'
+      ? 'Review the raw server detail below to decide whether this is a repository state issue, a remote access issue, or a path mismatch.'
+      : 'Hãy xem log chi tiết bên dưới để xác định đây là lỗi trạng thái repo, lỗi truy cập remote hay lỗi không khớp đường dẫn.')
+    : (lang==='en'
+      ? 'Review the raw server detail below to decide whether this is a staging issue, a commit issue, or a GitHub push issue.'
+      : 'Hãy xem log chi tiết bên dưới để xác định đây là lỗi stage, lỗi commit hay lỗi đẩy lên GitHub.');
+}
+
+function openGitSyncErrorModal(kind, res){
+  closeGitSyncModal();
+  const isPull = kind === 'pull';
+  const branch = String((res && res.branch) || 'main');
+  const detail = String((res && res.detail) || '').trim();
+  const errorCode = String((res && res.error) || (isPull ? 'git_pull_failed' : 'git_sync_failed')).trim();
+  const paths = adminGitExtractDetailPaths(detail);
+  const title = isPull
+    ? (lang==='en' ? 'Pull Failed' : 'Pull thất bại')
+    : (lang==='en' ? 'Push Failed' : 'Push thất bại');
+  const summary = isPull ? adminGitPullErrorMessage(res) : adminGitPushErrorMessage(res);
+  const modal = document.createElement('div');
+  modal.id = 'git-sync-modal';
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal git-sync-modal is-error">
+      <div class="git-sync-modal-head">
+        <div>
+          <div class="git-sync-modal-kicker">${escapeHtml(isPull ? 'GitHub -> Portal' : 'Portal -> GitHub')}</div>
+          <h3>${escapeHtml(title)}</h3>
+        </div>
+        <button class="icon-btn" onclick="closeGitSyncModal()" aria-label="Close">✕</button>
+      </div>
+      <div class="git-sync-modal-body">
+        <div class="git-sync-summary-grid git-sync-summary-grid--compact">
+          ${gitSyncRenderSummaryCard(lang==='en'?'Branch':'Nhánh', branch)}
+          ${gitSyncRenderSummaryCard(lang==='en'?'Error code':'Mã lỗi', errorCode || '—')}
+          ${gitSyncRenderSummaryCard(lang==='en'?'Paths found':'Path nhận diện', String(paths.length))}
+          ${gitSyncRenderSummaryCard(lang==='en'?'Time':'Thời gian', String((res && res.server_time) || '—'))}
+        </div>
+        <section class="git-sync-section">
+          <div class="git-sync-section-title">${lang==='en'?'Readable summary':'Tóm tắt dễ hiểu'}</div>
+          <div class="git-sync-callout is-error">${escapeHtml(summary)}</div>
+        </section>
+        <section class="git-sync-section">
+          <div class="git-sync-section-title">${lang==='en'?'Recommended handling':'Hướng xử lý đề nghị'}</div>
+          <div class="git-sync-callout">${escapeHtml(adminGitErrorGuidance(kind, res))}</div>
+        </section>
+        <section class="git-sync-section">
+          <div class="git-sync-section-title">${lang==='en'?'Detected paths from server detail':'Các path nhận diện từ log server'}</div>
+          ${gitSyncRenderSimpleFileTable(paths.map(path=>({status:'PATH', path})), lang==='en'?'No specific path could be extracted from the server detail.':'Không trích xuất được path cụ thể nào từ log server.')}
+        </section>
+        ${gitSyncRenderOutputBlock(lang==='en'?'Raw server detail':'Chi tiết lỗi gốc từ server', detail || errorCode)}
+      </div>
+      <div class="modal-actions git-sync-modal-actions">
+        <button class="btn-admin secondary" onclick="closeGitSyncModal()">${lang==='en'?'Close':'Đóng'}</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e=>{ if(e.target === modal) closeGitSyncModal(); });
+}
+
+async function adminSyncDocsToGit(){
+  if(!isAdmin() || isGitSyncBusy()) return;
+  const msg = lang==='en'
+    ? 'Push allowed document changes from this cPanel server to Git now? Runtime files such as sessions and rate limits will be ignored.'
+    : 'Đẩy ngay các thay đổi tài liệu được cho phép từ server cPanel này lên Git? Các file runtime như sessions và rate limit sẽ bị bỏ qua.';
+  if(!confirm(msg)) return;
+
+  gitSyncBusyMode = 'push';
+  renderAdmin();
+  try{
+    const res = await apiCall('admin_git_sync', {});
+    if(!(res && res.ok)){
+      openGitSyncErrorModal('push', res || {error:'git_sync_failed', detail:''});
+      return;
+    }
+    openGitSyncReportModal('push', res);
+  }catch(e){
+    openGitSyncErrorModal('push', {
+      error:'git_sync_failed',
+      detail:(e && e.message) ? String(e.message) : '',
+      server_time:new Date().toISOString()
+    });
+  }finally{
+    gitSyncBusyMode = '';
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+async function adminPullPortalFromGit(){
+  if(!isAdmin() || isGitSyncBusy()) return;
+  const msg = lang==='en'
+    ? 'Pull the latest commit from Git into this cPanel portal now? The system will auto-clean runtime noise, try to pre-sync meaningful server-side document changes, then run fast-forward update.'
+    : 'Kéo commit mới nhất từ Git xuống portal trên cPanel ngay bây giờ? Hệ thống sẽ tự dọn runtime noise, thử pre-sync thay đổi meaningful trên server, rồi mới fast-forward cập nhật.';
+  if(!confirm(msg)) return;
+
+  gitSyncBusyMode = 'pull';
+  renderAdmin();
+  try{
+    const res = await apiCall('admin_git_pull', {});
+    if(!(res && res.ok)){
+      openGitSyncErrorModal('pull', res || {error:'git_pull_failed', detail:''});
+      return;
+    }
+    openGitSyncReportModal('pull', res);
+  }catch(e){
+    openGitSyncErrorModal('pull', {
+      error:'git_pull_failed',
+      detail:(e && e.message) ? String(e.message) : '',
+      server_time:new Date().toISOString()
+    });
+  }finally{
+    gitSyncBusyMode = '';
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+function renderAdminSyncPanel(){
+  const pullBusy = gitSyncBusyMode === 'pull';
+  const pushBusy = gitSyncBusyMode === 'push';
+  const disablePull = isGitSyncBusy() && !pullBusy;
+  const disablePush = isGitSyncBusy() && !pushBusy;
+
+  return `
+    <section class="admin-sync-strip">
+      <div class="admin-sync-head">
+        <div class="admin-sync-title-wrap">
+          <div class="admin-sync-kicker">${lang==='en'?'Sync Control':'Điều khiển đồng bộ'}</div>
+          <h3>${lang==='en'?'Portal Data Synchronization':'Đồng bộ dữ liệu portal'}</h3>
+          <p>${lang==='en'?'Use Pull to auto-clean runtime noise, pre-sync meaningful portal-side changes when needed, and update cPanel from Git. Use Push when you want to explicitly publish meaningful server-side changes back to GitHub.':'Dùng Pull để tự dọn runtime, pre-sync các thay đổi meaningful trên portal khi cần, rồi cập nhật cPanel từ Git. Dùng Push khi muốn chủ động xuất bản các thay đổi meaningful trên server lên GitHub.'}</p>
+        </div>
+        <button class="admin-sync-mini" onclick="rescanDocs().then(n=>{showToast('🔄 Scanned: '+n+' docs');renderAdmin()})">
+          <span class="admin-sync-mini-ico">${adminGitSyncIcon('sync')}</span>
+          <span>${lang==='en'?'Rescan folders':'Quét lại thư mục'}</span>
+        </button>
+      </div>
+      <div class="admin-sync-grid">
+        <button class="admin-sync-card is-pull ${pullBusy?'is-busy':''}" onclick="adminPullPortalFromGit()" ${(pullBusy || disablePull)?'disabled':''}>
+          <span class="admin-sync-badge">GitHub -> Portal</span>
+          <span class="admin-sync-icon">${adminGitSyncIcon('pull')}</span>
+          <span class="admin-sync-copy">
+            <span class="admin-sync-label">${lang==='en'?'Pull To Portal':'Pull to Portal'}</span>
+            <span class="admin-sync-desc">${lang==='en'?'Bring the latest committed version from Git into this live cPanel portal.':'Kéo phiên bản đã commit mới nhất từ Git xuống portal đang chạy trên cPanel.'}</span>
+            <span class="admin-sync-note">${lang==='en'?'Auto-cleans runtime noise, pre-syncs meaningful server changes when possible, then fast-forwards from Git.':'Tự dọn runtime, pre-sync thay đổi meaningful trên server khi có thể, sau đó fast-forward từ Git.'}</span>
+          </span>
+          <span class="admin-sync-arrow">${pullBusy ? (lang==='en'?'Running...':'Đang chạy...') : (lang==='en'?'Update portal':'Cập nhật portal')}</span>
+        </button>
+        <button class="admin-sync-card is-push ${pushBusy?'is-busy':''}" onclick="adminSyncDocsToGit()" ${(pushBusy || disablePush)?'disabled':''}>
+          <span class="admin-sync-badge">Portal -> GitHub</span>
+          <span class="admin-sync-icon">${adminGitSyncIcon('push')}</span>
+          <span class="admin-sync-copy">
+            <span class="admin-sync-label">${lang==='en'?'Push To Git':'Push to Git'}</span>
+            <span class="admin-sync-desc">${lang==='en'?'Commit meaningful repository changes from cPanel and publish them back to GitHub.':'Commit các thay đổi meaningful trong repo từ cPanel và đẩy ngược trở lại GitHub.'}</span>
+            <span class="admin-sync-note">${lang==='en'?'Ignores runtime files such as sessions, rate limits, scan cache, and local user config noise.':'Bỏ qua file runtime như sessions, rate limits, scan cache và nhiễu do cấu hình user cục bộ.'}</span>
+          </span>
+          <span class="admin-sync-arrow">${pushBusy ? (lang==='en'?'Running...':'Đang chạy...') : (lang==='en'?'Publish changes':'Xuất bản thay đổi')}</span>
+        </button>
+      </div>
+    </section>`;
+}
+
+function openRemoteUpdateReportModal(res){
+  closeGitSyncModal();
+  const branch = String((res && res.branch) || 'main');
+  const changedFiles = Array.isArray(res && res.changed_files) ? res.changed_files : [];
+  const pulled = !!(res && res.pulled);
+  const beforeHead = String((res && (res.before_head || res.head_before)) || '');
+  const afterHead = String((res && (res.after_head || res.head_after)) || '');
+  const summary = String(res && res.message || (pulled ? 'Repository updated from remote.' : 'Repository is already up to date.'));
+  const modal = document.createElement('div');
+  modal.id = 'git-sync-modal';
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal git-sync-modal">
+      <div class="git-sync-modal-head">
+        <div>
+          <div class="git-sync-modal-kicker">${escapeHtml(lang==='en' ? 'Update from Remote' : 'C\u1eadp nh\u1eadt t\u1eeb remote')}</div>
+          <h3>${escapeHtml(lang==='en' ? 'Remote Update Detail' : 'Chi ti\u1ebft c\u1eadp nh\u1eadt remote')}</h3>
+        </div>
+        <button class="icon-btn" onclick="closeGitSyncModal()" aria-label="Close">x</button>
+      </div>
+      <div class="git-sync-modal-body">
+        <div class="git-sync-summary-grid">
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'Branch' : 'Nh\u00e1nh', branch)}
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'Changed files' : 'File thay \u0111\u1ed5i', String(changedFiles.length))}
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'From' : 'T\u1eeb commit', gitSyncShortHash(beforeHead))}
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'To' : '\u0110\u1ebfn commit', gitSyncShortHash(afterHead))}
+        </div>
+        <section class="git-sync-section">
+          <div class="git-sync-section-title">${lang==='en' ? 'Remote update summary' : 'T\u00f3m t\u1eaft c\u1eadp nh\u1eadt remote'}</div>
+          <div class="git-sync-callout">${escapeHtml(summary)}</div>
+        </section>
+        <section class="git-sync-section">
+          <div class="git-sync-section-title">${lang==='en' ? 'Files updated in cPanel' : 'Danh s\u00e1ch file \u0111\u01b0\u1ee3c c\u1eadp nh\u1eadt tr\u00ean cPanel'}</div>
+          ${gitSyncRenderChangedFileTable(changedFiles, lang==='en' ? 'No remote file change was applied in this update.' : 'Kh\u00f4ng c\u00f3 file remote n\u00e0o \u0111\u01b0\u1ee3c \u00e1p xu\u1ed1ng trong l\u1ea7n c\u1eadp nh\u1eadt n\u00e0y.')}
+        </section>
+        ${gitSyncRenderOutputBlock(lang==='en' ? 'Fetch output' : 'Log fetch', res && res.fetch_output)}
+        ${gitSyncRenderOutputBlock(lang==='en' ? 'Update output' : 'Log c\u1eadp nh\u1eadt', res && res.pull_output)}
+      </div>
+      <div class="modal-actions git-sync-modal-actions">
+        <button class="btn-admin secondary" onclick="closeGitSyncModal()">${lang==='en' ? 'Close' : '\u0110\u00f3ng'}</button>
+        <button class="btn-admin primary" onclick="adminReloadLatestPortal()">${lang==='en' ? (pulled ? 'OK - reload latest portal' : 'OK - refresh portal') : (pulled ? 'OK - t\u1ea3i l\u1ea1i portal m\u1edbi nh\u1ea5t' : 'OK - l\u00e0m m\u1edbi portal')}</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e=>{ if(e.target === modal) closeGitSyncModal(); });
+}
+
+function remoteUpdateErrorMessage(res){
+  const error = (res && res.error) ? String(res.error) : 'git_pull_failed';
+  const detail = (res && res.detail) ? String(res.detail) : '';
+  if(error === 'working_tree_dirty' || error === 'staged_changes_present'){
+    return lang==='en'
+      ? 'The checked-out branch still has local repository changes. Clean or publish those changes before updating from remote.'
+      : 'Nh\u00e1nh \u0111ang checkout v\u1eabn c\u00f2n thay \u0111\u1ed5i local. H\u00e3y l\u00e0m s\u1ea1ch ho\u1eb7c xu\u1ea5t b\u1ea3n c\u00e1c thay \u0111\u1ed5i \u0111\u00f3 tr\u01b0\u1edbc khi c\u1eadp nh\u1eadt t\u1eeb remote.';
+  }
+  if(error === 'exec_unavailable'){
+    return lang==='en'
+      ? 'PHP exec is disabled on hosting, so the portal cannot run git commands.'
+      : 'Hosting \u0111ang ch\u1eb7n PHP exec n\u00ean portal kh\u00f4ng th\u1ec3 ch\u1ea1y l\u1ec7nh git.';
+  }
+  if(error === 'git_fetch_failed' || error === 'git_pull_failed'){
+    return lang==='en'
+      ? 'Remote update failed. Verify the cPanel server can access the remote repository and branch.'
+      : 'C\u1eadp nh\u1eadt t\u1eeb remote th\u1ea5t b\u1ea1i. H\u00e3y ki\u1ec3m tra server cPanel c\u00f3 quy\u1ec1n truy c\u1eadp remote repository v\u00e0 nh\u00e1nh \u0111ang theo d\u00f5i.';
+  }
+  if(error === 'not_a_git_repo' || error === 'repo_not_found'){
+    return lang==='en'
+      ? 'The portal root on this server is not available as a git repository.'
+      : 'Th\u01b0 m\u1ee5c portal tr\u00ean server n\u00e0y kh\u00f4ng s\u1eb5n s\u00e0ng nh\u01b0 m\u1ed9t repo git.';
+  }
+  return detail || (lang==='en' ? 'Remote update failed' : 'C\u1eadp nh\u1eadt t\u1eeb remote th\u1ea5t b\u1ea1i');
+}
+
+function remoteUpdateGuidance(res){
+  const error = (res && res.error) ? String(res.error) : '';
+  if(error === 'working_tree_dirty' || error === 'staged_changes_present'){
+    return lang==='en'
+      ? 'This works like cPanel Version Control: update from remote expects a clean checked-out branch. Review the listed files, then push them, commit them in Terminal, or discard them before updating again.'
+      : 'Ph\u1ea7n n\u00e0y ho\u1ea1t \u0111\u1ed9ng gi\u1ed1ng cPanel Version Control: c\u1eadp nh\u1eadt t\u1eeb remote y\u00eau c\u1ea7u nh\u00e1nh \u0111ang checkout ph\u1ea3i s\u1ea1ch. H\u00e3y r\u00e0 so\u00e1t c\u00e1c file b\u00ean d\u01b0\u1edbi, r\u1ed3i push, commit trong Terminal, ho\u1eb7c b\u1ecf ch\u00fang tr\u01b0\u1edbc khi c\u1eadp nh\u1eadt l\u1ea1i.';
+  }
+  if(error === 'git_fetch_failed' || error === 'git_pull_failed'){
+    return lang==='en'
+      ? 'The server could not fetch or pull from origin. Verify network access, SSH key or token, and the remote branch state.'
+      : 'Server kh\u00f4ng th\u1ec3 fetch ho\u1eb7c pull t\u1eeb origin. H\u00e3y ki\u1ec3m tra k\u1ebft n\u1ed1i m\u1ea1ng, SSH key ho\u1eb7c token, v\u00e0 tr\u1ea1ng th\u00e1i nh\u00e1nh remote.';
+  }
+  return lang==='en'
+    ? 'Review the raw server detail below to determine whether this is a repository state issue, a remote access issue, or a branch/path mismatch.'
+    : 'H\u00e3y xem log chi ti\u1ebft b\u00ean d\u01b0\u1edbi \u0111\u1ec3 x\u00e1c \u0111\u1ecbnh \u0111\u00e2y l\u00e0 l\u1ed7i tr\u1ea1ng th\u00e1i repo, l\u1ed7i truy c\u1eadp remote, hay l\u1ed7i kh\u00f4ng kh\u1edbp nh\u00e1nh/\u0111\u01b0\u1eddng d\u1eabn.';
+}
+
+function discardLocalErrorMessage(res){
+  const error = (res && res.error) ? String(res.error) : 'git_discard_failed';
+  const detail = (res && res.detail) ? String(res.detail) : '';
+  if(error === 'exec_unavailable'){
+    return lang==='en'
+      ? 'PHP exec is disabled on hosting, so the portal cannot discard git changes itself.'
+      : 'Hosting \u0111ang ch\u1eb7n PHP exec n\u00ean portal kh\u00f4ng th\u1ec3 t\u1ef1 h\u1ee7y thay \u0111\u1ed5i Git.';
+  }
+  if(error === 'not_a_git_repo' || error === 'repo_not_found'){
+    return lang==='en'
+      ? 'The portal root on this server is not available as a git repository.'
+      : 'Th\u01b0 m\u1ee5c portal tr\u00ean server n\u00e0y kh\u00f4ng s\u1eb5n s\u00e0ng nh\u01b0 m\u1ed9t repo git.';
+  }
+  return detail || (lang==='en' ? 'Discard local changes failed' : 'H\u1ee7y thay \u0111\u1ed5i local th\u1ea5t b\u1ea1i');
+}
+
+function openDiscardLocalReportModal(res){
+  closeGitSyncModal();
+  const branch = String((res && res.branch) || 'main');
+  const restoredPaths = Array.isArray(res && res.restored_paths) ? res.restored_paths : [];
+  const removedPaths = Array.isArray(res && res.removed_paths) ? res.removed_paths : [];
+  const remainingPaths = Array.isArray(res && res.remaining_paths) ? res.remaining_paths : [];
+  const cleanedRows = [
+    ...restoredPaths.map(path=>({status:'RESTORE', path})),
+    ...removedPaths.map(path=>({status:'REMOVE', path}))
+  ];
+  const summary = String((res && res.message) || '').trim() || (remainingPaths.length
+    ? (lang==='en' ? 'Some local changes are still left in the checked-out branch.' : 'Nh\u00e1nh \u0111ang checkout v\u1eabn c\u00f2n m\u1ed9t s\u1ed1 thay \u0111\u1ed5i local.')
+    : (lang==='en' ? 'Meaningful local changes were discarded and the branch is clean.' : '\u0110\u00e3 h\u1ee7y c\u00e1c thay \u0111\u1ed5i local meaningful v\u00e0 l\u00e0m s\u1ea1ch nh\u00e1nh hi\u1ec7n t\u1ea1i.'));
+  const canUpdate = !remainingPaths.length;
+  const modal = document.createElement('div');
+  modal.id = 'git-sync-modal';
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal git-sync-modal">
+      <div class="git-sync-modal-head">
+        <div>
+          <div class="git-sync-modal-kicker">${escapeHtml(lang==='en' ? 'Discard Local Changes' : 'B\u1ecf thay \u0111\u1ed5i local')}</div>
+          <h3>${escapeHtml(lang==='en' ? 'Local Cleanup Detail' : 'Chi ti\u1ebft d\u1ecdn thay \u0111\u1ed5i local')}</h3>
+        </div>
+        <button class="icon-btn" onclick="closeGitSyncModal()" aria-label="Close">x</button>
+      </div>
+      <div class="git-sync-modal-body">
+        <div class="git-sync-summary-grid">
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'Branch' : 'Nh\u00e1nh', branch)}
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'Restored tracked' : 'Kh\u00f4i ph\u1ee5c tracked', String(restoredPaths.length))}
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'Removed untracked' : 'X\u00f3a untracked', String(removedPaths.length))}
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'Remaining' : 'C\u00f2n l\u1ea1i', String(remainingPaths.length))}
+        </div>
+        <section class="git-sync-section">
+          <div class="git-sync-section-title">${lang==='en' ? 'Cleanup summary' : 'T\u00f3m t\u1eaft d\u1ecdn s\u1ea1ch'}</div>
+          <div class="git-sync-callout">${escapeHtml(summary)}</div>
+        </section>
+        <section class="git-sync-section">
+          <div class="git-sync-section-title">${lang==='en' ? 'Discarded paths' : 'C\u00e1c path \u0111\u00e3 h\u1ee7y'}</div>
+          ${gitSyncRenderSimpleFileTable(cleanedRows, lang==='en' ? 'No meaningful local path needed to be discarded.' : 'Kh\u00f4ng c\u00f3 path local meaningful n\u00e0o c\u1ea7n h\u1ee7y.')}
+        </section>
+        ${remainingPaths.length ? `
+          <section class="git-sync-section">
+            <div class="git-sync-section-title">${lang==='en' ? 'Remaining local paths' : 'C\u00e1c path local c\u00f2n l\u1ea1i'}</div>
+            ${gitSyncRenderSimpleFileTable(remainingPaths.map(path=>({status:'PATH', path})), lang==='en' ? 'The branch is clean now.' : 'Nh\u00e1nh hi\u1ec7n \u0111\u00e3 s\u1ea1ch.')}
+          </section>
+        ` : ''}
+      </div>
+      <div class="modal-actions git-sync-modal-actions">
+        <button class="btn-admin secondary" onclick="closeGitSyncModal()">${lang==='en' ? 'Close' : '\u0110\u00f3ng'}</button>
+        ${canUpdate ? `<button class="btn-admin primary" onclick="closeGitSyncModal();adminUpdateFromRemote()">${lang==='en' ? 'Update from Remote' : 'C\u1eadp nh\u1eadt t\u1eeb remote'}</button>` : ''}
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e=>{ if(e.target === modal) closeGitSyncModal(); });
+}
+
+function openDiscardLocalErrorModal(res){
+  closeGitSyncModal();
+  const branch = String((res && res.branch) || 'main');
+  const detail = String((res && res.detail) || '').trim();
+  const errorCode = String((res && res.error) || 'git_discard_failed').trim();
+  const paths = adminGitExtractDetailPaths(detail);
+  const modal = document.createElement('div');
+  modal.id = 'git-sync-modal';
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal git-sync-modal is-error">
+      <div class="git-sync-modal-head">
+        <div>
+          <div class="git-sync-modal-kicker">${escapeHtml(lang==='en' ? 'Discard Local Changes' : 'B\u1ecf thay \u0111\u1ed5i local')}</div>
+          <h3>${escapeHtml(lang==='en' ? 'Discard Failed' : 'H\u1ee7y thay \u0111\u1ed5i th\u1ea5t b\u1ea1i')}</h3>
+        </div>
+        <button class="icon-btn" onclick="closeGitSyncModal()" aria-label="Close">x</button>
+      </div>
+      <div class="git-sync-modal-body">
+        <div class="git-sync-summary-grid git-sync-summary-grid--compact">
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'Branch' : 'Nh\u00e1nh', branch)}
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'Error code' : 'M\u00e3 l\u1ed7i', errorCode || '--')}
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'Detected paths' : 'S\u1ed1 path', String(paths.length))}
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'Server time' : 'Th\u1eddi gian server', gitRepoFormatTime(res && res.server_time) || '--')}
+        </div>
+        <section class="git-sync-section">
+          <div class="git-sync-section-title">${lang==='en' ? 'Readable summary' : 'T\u00f3m t\u1eaft d\u1ec5 hi\u1ec3u'}</div>
+          <div class="git-sync-callout is-error">${escapeHtml(discardLocalErrorMessage(res))}</div>
+        </section>
+        ${paths.length ? `
+          <section class="git-sync-section">
+            <div class="git-sync-section-title">${lang==='en' ? 'Detected paths from server log' : 'C\u00e1c path nh\u1eadn di\u1ec7n t\u1eeb log server'}</div>
+            ${gitSyncRenderSimpleFileTable(paths.map(path=>({status:'PATH', path})), lang==='en' ? 'No file path was extracted from the raw server detail.' : 'Kh\u00f4ng tr\u00edch xu\u1ea5t \u0111\u01b0\u1ee3c path n\u00e0o t\u1eeb log l\u1ed7i server.')}
+          </section>
+        ` : ''}
+        ${gitSyncRenderOutputBlock(lang==='en' ? 'Raw server detail' : 'Chi ti\u1ebft l\u1ed7i g\u1ed1c t\u1eeb server', detail || errorCode)}
+      </div>
+      <div class="modal-actions git-sync-modal-actions">
+        <button class="btn-admin secondary" onclick="closeGitSyncModal()">${lang==='en' ? 'Close' : '\u0110\u00f3ng'}</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e=>{ if(e.target === modal) closeGitSyncModal(); });
+}
+
+function openRemoteUpdateErrorModal(res){
+  closeGitSyncModal();
+  const branch = String((res && res.branch) || 'main');
+  const detail = String((res && res.detail) || '').trim();
+  const errorCode = String((res && res.error) || 'git_pull_failed').trim();
+  const paths = adminGitExtractDetailPaths(detail);
+  const canDiscard = errorCode === 'working_tree_dirty' || errorCode === 'staged_changes_present';
+  const modal = document.createElement('div');
+  modal.id = 'git-sync-modal';
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal git-sync-modal is-error">
+      <div class="git-sync-modal-head">
+        <div>
+          <div class="git-sync-modal-kicker">${escapeHtml(lang==='en' ? 'Update from Remote' : 'C\u1eadp nh\u1eadt t\u1eeb remote')}</div>
+          <h3>${escapeHtml(lang==='en' ? 'Remote Update Failed' : 'C\u1eadp nh\u1eadt t\u1eeb remote th\u1ea5t b\u1ea1i')}</h3>
+        </div>
+        <button class="icon-btn" onclick="closeGitSyncModal()" aria-label="Close">x</button>
+      </div>
+      <div class="git-sync-modal-body">
+        <div class="git-sync-summary-grid git-sync-summary-grid--compact">
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'Branch' : 'Nh\u00e1nh', branch)}
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'Error code' : 'M\u00e3 l\u1ed7i', errorCode || '--')}
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'Detected paths' : 'S\u1ed1 path', String(paths.length))}
+          ${gitSyncRenderSummaryCard(lang==='en' ? 'Server time' : 'Th\u1eddi gian server', gitRepoFormatTime(res && res.server_time) || '--')}
+        </div>
+        <section class="git-sync-section">
+          <div class="git-sync-section-title">${lang==='en' ? 'Readable summary' : 'T\u00f3m t\u1eaft d\u1ec5 hi\u1ec3u'}</div>
+          <div class="git-sync-callout is-error">${escapeHtml(remoteUpdateErrorMessage(res))}</div>
+        </section>
+        <section class="git-sync-section">
+          <div class="git-sync-section-title">${lang==='en' ? 'Recommended handling' : 'H\u01b0\u1edbng x\u1eed l\u00fd \u0111\u1ec1 ngh\u1ecb'}</div>
+          <div class="git-sync-callout">${escapeHtml(remoteUpdateGuidance(res))}</div>
+        </section>
+        ${paths.length ? `
+          <section class="git-sync-section">
+            <div class="git-sync-section-title">${lang==='en' ? 'Detected paths from server log' : 'C\u00e1c path nh\u1eadn di\u1ec7n t\u1eeb log server'}</div>
+            ${gitSyncRenderSimpleFileTable(paths.map(path=>({status:'PATH', path})), lang==='en' ? 'No file path was extracted from the raw server detail.' : 'Kh\u00f4ng tr\u00edch xu\u1ea5t \u0111\u01b0\u1ee3c path n\u00e0o t\u1eeb log l\u1ed7i server.')}
+          </section>
+        ` : ''}
+        ${gitSyncRenderOutputBlock(lang==='en' ? 'Raw server detail' : 'Chi ti\u1ebft l\u1ed7i g\u1ed1c t\u1eeb server', detail)}
+      </div>
+      <div class="modal-actions git-sync-modal-actions">
+        <button class="btn-admin secondary" onclick="closeGitSyncModal()">${lang==='en' ? 'Close' : '\u0110\u00f3ng'}</button>
+        ${canDiscard ? `<button class="btn-admin primary" onclick="closeGitSyncModal();adminDiscardLocalChanges()">${lang==='en' ? 'Discard local changes' : 'B\u1ecf thay \u0111\u1ed5i local'}</button>` : ''}
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e=>{ if(e.target === modal) closeGitSyncModal(); });
+}
+
+async function adminPublishRepoChanges(){
+  if(!isAdmin() || isGitSyncBusy()) return;
+  const msg = lang==='en'
+    ? 'Publish meaningful repository changes from this cPanel server back to Git now? Runtime noise will still be ignored.'
+    : 'Xu\u1ea5t b\u1ea3n c\u00e1c thay \u0111\u1ed5i meaningful t\u1eeb server cPanel n\u00e0y l\u00ean Git ngay b\u00e2y gi\u1edd? C\u00e1c file runtime v\u1eabn s\u1ebd b\u1ecb b\u1ecf qua.';
+  if(!confirm(msg)) return;
+
+  gitSyncBusyMode = 'push';
+  renderAdmin();
+  try{
+    const res = await apiCall('admin_git_sync', {});
+    if(!(res && res.ok)){
+      openGitSyncErrorModal('push', res || {error:'git_sync_failed', detail:''});
+      return;
+    }
+    openGitSyncReportModal('push', res);
+  }catch(e){
+    openGitSyncErrorModal('push', {
+      error:'git_sync_failed',
+      detail:(e && e.message) ? String(e.message) : '',
+      server_time:new Date().toISOString()
+    });
+  }finally{
+    gitSyncBusyMode = '';
+    adminRefreshGitRepoStatus();
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+async function adminUpdateFromRemote(){
+  if(!isAdmin() || isGitSyncBusy()) return;
+  const msg = lang==='en'
+    ? 'Update the checked-out branch from origin now? This follows cPanel Version Control behavior and will not auto-commit server-side runtime changes before pulling.'
+    : 'C\u1eadp nh\u1eadt nh\u00e1nh \u0111ang checkout t\u1eeb origin ngay b\u00e2y gi\u1edd? C\u00e1ch n\u00e0y b\u00e1m theo h\u00e0nh vi cPanel Version Control v\u00e0 s\u1ebd kh\u00f4ng auto-commit c\u00e1c thay \u0111\u1ed5i runtime ph\u00eda server tr\u01b0\u1edbc khi pull.';
+  if(!confirm(msg)) return;
+
+  gitSyncBusyMode = 'pull';
+  renderAdmin();
+  try{
+    const res = await apiCall('admin_git_pull', {});
+    if(!(res && res.ok)){
+      openRemoteUpdateErrorModal(res || {error:'git_pull_failed', detail:''});
+      return;
+    }
+    openRemoteUpdateReportModal(res);
+  }catch(e){
+    openRemoteUpdateErrorModal({
+      error:'git_pull_failed',
+      detail:(e && e.message) ? String(e.message) : '',
+      server_time:new Date().toISOString()
+    });
+  }finally{
+    gitSyncBusyMode = '';
+    adminRefreshGitRepoStatus();
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+async function adminDiscardLocalChanges(){
+  if(!isAdmin() || isGitSyncBusy()) return;
+  const status = getGitRepoStatus();
+  const dirtyCount = Number(status && status.meaningful_dirty_count || 0);
+  const msg = lang==='en'
+    ? `Discard ${dirtyCount || 'all'} meaningful local change(s) on this cPanel repo now? Tracked edits will be restored to HEAD and untracked files will be deleted so you can update from remote.`
+    : `H\u1ee7y ${dirtyCount || 'to\u00e0n b\u1ed9'} thay \u0111\u1ed5i local meaningful tr\u00ean repo cPanel n\u00e0y ngay b\u00e2y gi\u1edd? File \u0111\u00e3 track s\u1ebd \u0111\u01b0\u1ee3c kh\u00f4i ph\u1ee5c v\u1ec1 HEAD, c\u00f2n file ch\u01b0a track s\u1ebd b\u1ecb x\u00f3a \u0111\u1ec3 b\u1ea1n c\u00f3 th\u1ec3 c\u1eadp nh\u1eadt t\u1eeb remote.`;
+  if(!confirm(msg)) return;
+
+  gitSyncBusyMode = 'discard';
+  renderAdmin();
+  try{
+    const res = await apiCall('admin_git_discard_local', {});
+    if(!(res && res.ok)){
+      openDiscardLocalErrorModal(res || {error:'git_discard_failed', detail:''});
+      return;
+    }
+    openDiscardLocalReportModal(res);
+  }catch(e){
+    openDiscardLocalErrorModal({
+      error:'git_discard_failed',
+      detail:(e && e.message) ? String(e.message) : '',
+      server_time:new Date().toISOString()
+    });
+  }finally{
+    gitSyncBusyMode = '';
+    adminRefreshGitRepoStatus();
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+function renderAdminSyncPanelV2(){
+  const pullBusy = gitSyncBusyMode === 'pull';
+  const pushBusy = gitSyncBusyMode === 'push';
+  const discardBusy = gitSyncBusyMode === 'discard';
+  const disablePull = (isGitSyncBusy() && !pullBusy) || (gitRepoStatusState.loading && !gitRepoStatusState.loaded);
+  const disablePush = (isGitSyncBusy() && !pushBusy) || (gitRepoStatusState.loading && !gitRepoStatusState.loaded);
+  const disableDiscard = (isGitSyncBusy() && !discardBusy) || (gitRepoStatusState.loading && !gitRepoStatusState.loaded);
+  const status = gitRepoStatusState.data && typeof gitRepoStatusState.data === 'object' ? gitRepoStatusState.data : null;
+  const statusError = String(gitRepoStatusState.error || '').trim();
+  const relativeState = gitRepoRelativeState(status);
+  const workingTreeState = gitRepoWorkingTreeState(status);
+  const dirtyEntries = Array.isArray(status && status.meaningful_dirty_entries) ? status.meaningful_dirty_entries : [];
+  const fetchError = String((status && status.fetch_error) || '').trim();
+  const deployState = !status
+    ? {label:'--', tone:'neutral'}
+    : status.deploy_ready
+      ? {label:(lang==='en' ? 'Deploy-ready' : 'S\u1eb5n s\u00e0ng deploy'), tone:'good'}
+      : status.cpanel_yml_exists
+        ? {label:(lang==='en' ? 'Deploy blocked' : 'Deploy b\u1ecb ch\u1eb7n'), tone:'warn'}
+        : {label:(lang==='en' ? 'No cpanel.yml' : 'Thi\u1ebfu cpanel.yml'), tone:'neutral'};
+  const branch = String((status && status.branch) || 'main');
+  const remoteBranch = String((status && status.remote_branch) || `origin/${branch}`);
+  const repoPath = String((status && status.repo_path) || '--');
+  const remoteUrl = String((status && status.remote_url) || '--');
+  const headMeta = gitRepoCommitMeta(status && status.head) || (lang==='en' ? 'No local commit metadata available.' : 'Ch\u01b0a \u0111\u1ecdc \u0111\u01b0\u1ee3c metadata commit local.');
+  const remoteMeta = gitRepoCommitMeta(status && status.remote_head) || (lang==='en' ? 'No remote commit metadata available.' : 'Ch\u01b0a \u0111\u1ecdc \u0111\u01b0\u1ee3c metadata commit remote.');
+  const metaRow = (label, value, code=false) => `
+    <div class="admin-sync-meta-row">
+      <div class="admin-sync-meta-label">${escapeHtml(label)}</div>
+      <div class="admin-sync-meta-value">${code ? `<code>${escapeHtml(value || '--')}</code>` : escapeHtml(value || '--')}</div>
+    </div>`;
+  const notice = (() => {
+    if(gitRepoStatusState.loading && !status){
+      return `<div class="admin-sync-callout-bar is-info">${escapeHtml(lang==='en' ? 'Refreshing repository status from the cPanel server...' : '\u0110ang l\u00e0m m\u1edbi tr\u1ea1ng th\u00e1i repo t\u1eeb server cPanel...')}</div>`;
+    }
+    if(statusError){
+      return `<div class="admin-sync-callout-bar is-error">${escapeHtml((lang==='en' ? 'Could not read repository status. ' : 'Kh\u00f4ng \u0111\u1ecdc \u0111\u01b0\u1ee3c tr\u1ea1ng th\u00e1i repo. ') + statusError)}</div>`;
+    }
+    if(fetchError){
+      return `<div class="admin-sync-callout-bar is-warn">${escapeHtml((lang==='en' ? 'Origin fetch returned a warning. Showing the best status available from the server: ' : 'L\u1ec7nh fetch origin tr\u1ea3 v\u1ec1 c\u1ea3nh b\u00e1o. Portal \u0111ang hi\u1ec3n th\u1ecb tr\u1ea1ng th\u00e1i t\u1ed1t nh\u1ea5t \u0111\u1ecdc \u0111\u01b0\u1ee3c t\u1eeb server: ') + fetchError)}</div>`;
+    }
+    if(status && Number(status.meaningful_dirty_count || 0) > 0){
+      return `<div class="admin-sync-callout-bar is-warn">${escapeHtml(lang==='en' ? 'The checked-out branch currently has local repository changes. Update from Remote now behaves like cPanel and expects this working tree to be clean first. Use Discard Local Changes if those edits are temporary or wrong.' : 'Nh\u00e1nh \u0111ang checkout hi\u1ec7n c\u00f2n thay \u0111\u1ed5i local. N\u00fat C\u1eadp nh\u1eadt t\u1eeb remote gi\u1edd s\u1ebd ho\u1ea1t \u0111\u1ed9ng gi\u1ed1ng cPanel v\u00e0 y\u00eau c\u1ea7u working tree ph\u1ea3i s\u1ea1ch tr\u01b0\u1edbc. N\u1ebfu c\u00e1c thay \u0111\u1ed5i n\u00e0y ch\u1ec9 l\u00e0 t\u1ea1m th\u1eddi ho\u1eb7c sai, b\u1ea1n c\u00f3 th\u1ec3 d\u00f9ng B\u1ecf thay \u0111\u1ed5i local.' )}</div>`;
+    }
+    if(status && Number(status.behind_count || 0) > 0){
+      return `<div class="admin-sync-callout-bar is-good">${escapeHtml(lang==='en' ? `Origin has ${Number(status.behind_count || 0)} newer commit(s) ready for this server.` : `Origin \u0111ang c\u00f3 ${Number(status.behind_count || 0)} commit m\u1edbi h\u01a1n s\u1eb5n s\u00e0ng \u00e1p xu\u1ed1ng server n\u00e0y.`)}</div>`;
+    }
+    return `<div class="admin-sync-callout-bar is-info">${escapeHtml(lang==='en' ? 'This repository is currently aligned with its tracked remote branch.' : 'Repo n\u00e0y hi\u1ec7n \u0111ang kh\u1edbp v\u1edbi nh\u00e1nh remote \u0111\u01b0\u1ee3c theo d\u00f5i.')}</div>`;
+  })();
+
+  return `
+    <section class="admin-sync-strip admin-sync-strip--cpanel">
+      <div class="admin-sync-head admin-sync-head--cpanel">
+        <div class="admin-sync-title-wrap">
+          <div class="admin-sync-kicker">${lang==='en' ? 'Version control' : '\u0110i\u1ec1u khi\u1ec3n phi\u00ean b\u1ea3n'}</div>
+          <h3>${lang==='en' ? 'Repository Update Like cPanel' : 'C\u1eadp nh\u1eadt repo gi\u1ed1ng cPanel'}</h3>
+          <p>${lang==='en'
+            ? 'This panel follows the checked-out branch on the cPanel server. Update from Remote only pulls from origin and never auto-commits runtime or telemetry files before updating.'
+            : 'B\u1ea3ng n\u00e0y b\u00e1m theo nh\u00e1nh \u0111ang checkout tr\u00ean server cPanel. C\u1eadp nh\u1eadt t\u1eeb remote ch\u1ec9 k\u00e9o t\u1eeb origin v\u00e0 kh\u00f4ng bao gi\u1edd auto-commit c\u00e1c file runtime ho\u1eb7c telemetry tr\u01b0\u1edbc khi c\u1eadp nh\u1eadt.'}</p>
+        </div>
+        <div class="admin-sync-head-actions">
+          <button class="admin-sync-mini" onclick="adminRefreshGitRepoStatus()">
+            <span class="admin-sync-mini-ico">${adminGitSyncIcon('sync')}</span>
+            <span>${lang==='en' ? 'Refresh status' : 'L\u00e0m m\u1edbi tr\u1ea1ng th\u00e1i'}</span>
+          </button>
+          <button class="admin-sync-mini" onclick="rescanDocs().then(n=>{showToast('Scanned: '+n+' docs');renderAdmin()})">
+            <span class="admin-sync-mini-ico">${adminGitSyncIcon('sync')}</span>
+            <span>${lang==='en' ? 'Rescan folders' : 'Qu\u00e9t l\u1ea1i th\u01b0 m\u1ee5c'}</span>
+          </button>
+        </div>
+      </div>
+      ${notice}
+      <div class="admin-sync-cpanel-grid">
+        <article class="admin-sync-cpanel-card">
+          <div class="admin-sync-panel-title">${lang==='en' ? 'Basic Information' : 'Th\u00f4ng tin c\u01a1 b\u1ea3n'}</div>
+          <div class="admin-sync-meta-list">
+            ${metaRow(lang==='en' ? 'Repository path' : '\u0110\u01b0\u1eddng d\u1eabn repo', repoPath, true)}
+            ${metaRow(lang==='en' ? 'Remote URL' : 'Remote URL', remoteUrl, true)}
+            ${metaRow(lang==='en' ? 'Checked-out branch' : 'Nh\u00e1nh \u0111ang checkout', branch)}
+            ${metaRow(lang==='en' ? 'Tracked remote branch' : 'Nh\u00e1nh remote \u0111ang theo d\u00f5i', remoteBranch)}
+            ${metaRow(lang==='en' ? 'Server time' : 'Th\u1eddi gian server', gitRepoFormatTime(status && status.server_time) || '--')}
+          </div>
+        </article>
+        <article class="admin-sync-cpanel-card">
+          <div class="admin-sync-panel-title">${lang==='en' ? 'Remote State' : 'Tr\u1ea1ng th\u00e1i remote'}</div>
+          <div class="admin-sync-pill-row">
+            ${gitRepoStatusPill(relativeState.label, relativeState.tone)}
+            ${gitRepoStatusPill(workingTreeState.label, workingTreeState.tone)}
+            ${gitRepoStatusPill(deployState.label, deployState.tone)}
+          </div>
+          <div class="admin-sync-commit-stack">
+            <div class="admin-sync-commit-card">
+              <div class="admin-sync-commit-kicker">${lang==='en' ? 'HEAD commit' : 'Commit HEAD'}</div>
+              <strong>${escapeHtml(gitRepoCommitHeadline(status && status.head))}</strong>
+              <span>${escapeHtml(headMeta)}</span>
+            </div>
+            <div class="admin-sync-commit-card is-remote">
+              <div class="admin-sync-commit-kicker">${lang==='en' ? 'Remote HEAD' : 'HEAD remote'}</div>
+              <strong>${escapeHtml(gitRepoCommitHeadline(status && status.remote_head))}</strong>
+              <span>${escapeHtml(remoteMeta)}</span>
+            </div>
+          </div>
+        </article>
+      </div>
+      ${dirtyEntries.length ? `
+        <div class="admin-sync-cpanel-card admin-sync-cpanel-card--full">
+          <div class="admin-sync-panel-title">${lang==='en' ? 'Local changes blocking remote update' : 'C\u00e1c thay \u0111\u1ed5i local \u0111ang ch\u1eb7n c\u1eadp nh\u1eadt remote'}</div>
+          ${gitSyncRenderSimpleFileTable(dirtyEntries, lang==='en' ? 'The checked-out branch is clean.' : 'Nh\u00e1nh \u0111ang checkout \u0111ang s\u1ea1ch.')}
+        </div>
+      ` : ''}
+      <div class="admin-sync-action-row">
+        <button class="admin-sync-action is-primary ${pullBusy?'is-busy':''}" onclick="adminUpdateFromRemote()" ${(pullBusy || disablePull)?'disabled':''}>
+          <span class="admin-sync-action-icon">${adminGitSyncIcon('pull')}</span>
+          <span class="admin-sync-action-copy">
+            <b>${lang==='en' ? 'Update from Remote' : 'C\u1eadp nh\u1eadt t\u1eeb remote'}</b>
+            <small>${lang==='en'
+              ? 'Works like cPanel Version Control on the checked-out branch and never auto-commits server runtime noise.'
+              : 'Ho\u1ea1t \u0111\u1ed9ng gi\u1ed1ng cPanel Version Control tr\u00ean nh\u00e1nh \u0111ang checkout v\u00e0 kh\u00f4ng auto-commit runtime noise ph\u00eda server.'}</small>
+          </span>
+          <span class="admin-sync-action-arrow">${pullBusy ? (lang==='en' ? 'Running...' : '\u0110ang ch\u1ea1y...') : (lang==='en' ? 'Update now' : 'C\u1eadp nh\u1eadt ngay')}</span>
+        </button>
+        ${dirtyEntries.length ? `
+          <button class="admin-sync-action is-warn ${discardBusy?'is-busy':''}" onclick="adminDiscardLocalChanges()" ${(discardBusy || disableDiscard)?'disabled':''}>
+            <span class="admin-sync-action-icon">${adminGitSyncIcon('discard')}</span>
+            <span class="admin-sync-action-copy">
+              <b>${lang==='en' ? 'Discard Local Changes' : 'B\u1ecf thay \u0111\u1ed5i local'}</b>
+              <small>${lang==='en'
+                ? 'Restore tracked files back to HEAD and delete untracked local files so this branch becomes clean for remote update.'
+                : 'Kh\u00f4i ph\u1ee5c file \u0111\u00e3 track v\u1ec1 HEAD v\u00e0 x\u00f3a file local ch\u01b0a track \u0111\u1ec3 nh\u00e1nh n\u00e0y s\u1ea1ch l\u1ea1i tr\u01b0\u1edbc khi c\u1eadp nh\u1eadt remote.'}</small>
+            </span>
+            <span class="admin-sync-action-arrow">${discardBusy ? (lang==='en' ? 'Running...' : '\u0110ang ch\u1ea1y...') : (lang==='en' ? 'Discard now' : 'H\u1ee7y ngay')}</span>
+          </button>
+        ` : ''}
+        <button class="admin-sync-action ${pushBusy?'is-busy':''}" onclick="adminPublishRepoChanges()" ${(pushBusy || disablePush)?'disabled':''}>
+          <span class="admin-sync-action-icon">${adminGitSyncIcon('push')}</span>
+          <span class="admin-sync-action-copy">
+            <b>${lang==='en' ? 'Publish Local Changes' : 'Xu\u1ea5t b\u1ea3n thay \u0111\u1ed5i local'}</b>
+            <small>${lang==='en'
+              ? 'Commit meaningful repository edits from cPanel back to GitHub when you intentionally changed the live repo.'
+              : 'Commit c\u00e1c thay \u0111\u1ed5i meaningful trong repo tr\u00ean cPanel l\u00ean GitHub khi b\u1ea1n c\u1ed1 \u00fd s\u1eeda tr\u1ef1c ti\u1ebfp repo \u0111ang ch\u1ea1y.'}</small>
+          </span>
+          <span class="admin-sync-action-arrow">${pushBusy ? (lang==='en' ? 'Running...' : '\u0110ang ch\u1ea1y...') : (lang==='en' ? 'Push now' : 'Push ngay')}</span>
+        </button>
+      </div>
+    </section>`;
+}
+
 function markUnsaved(){
   adminUnsaved = true;
   const bar = document.getElementById('admin-save-bar');
   if(bar) bar.style.display = 'flex';
+}
+
+function renderAdminVersionControl(){
+  const el = document.getElementById('admin-content');
+  if(!gitRepoStatusState.loaded && !gitRepoStatusState.loading && !gitRepoStatusState.error){
+    loadGitRepoStatus({silent:true});
+  }
+  el.innerHTML = renderAdminSyncPanelV2();
 }
 
 function renderAdmin(){
@@ -2842,10 +5212,6 @@ function renderAdmin(){
       <div class="admin-stat"><div class="val">${DOCS.length}</div><div class="lbl">${T('admin_total_docs')} <span style="font-size:9px;color:#10b981">● LIVE</span></div></div>
       <div class="admin-stat"><div class="val">${activeUsers}</div><div class="lbl">Active</div></div>
     </div>
-    <div style="margin:-8px 0 12px;display:flex;gap:8px">
-      <button onclick="rescanDocs().then(n=>{showToast('🔄 Scanned: '+n+' docs');renderAdmin()})" style="padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg-2);cursor:pointer;font-size:12px;color:var(--text-2)">🔄 ${lang==='en'?'Rescan Folders':'Quét lại thư mục'}</button>
-      <span style="font-size:11px;color:var(--text-3);align-self:center">${lang==='en'?'Auto-detects new files on server':'Tự động phát hiện file mới trên hosting'}</span>
-    </div>
     <div class="admin-tabs-v2">
       <button class="admin-tab-v2 ${adminTab==='users'?'active':''}" onclick="adminTab='users';renderAdmin()">👥 ${T('admin_users')} <span class="tab-badge">${USERS.length}</span></button>
       <button class="admin-tab-v2 ${adminTab==='dept_title'?'active':''}" onclick="adminTab='dept_title';renderAdmin()">🏢 ${lang==='en'?'Dept & Titles':'Phòng ban & Chức danh'}</button>
@@ -2854,9 +5220,19 @@ function renderAdmin(){
       <button class="admin-tab-v2 ${adminTab==='perms'?'active':''}" onclick="adminTab='perms';renderAdmin()">🔐 ${T('admin_perms')}</button>
       <button class="admin-tab-v2 ${adminTab==='activity'?'active':''}" onclick="adminTab='activity';renderAdmin()" ${canViewActivityLog()?'':'style="display:none"'}>📊 ${lang==='en'?'Activity Log':'Kiểm soát hành vi'} <span class="tab-badge">${ACTIVITY_LOG.length}</span></button>
       <button class="admin-tab-v2 ${adminTab==='docs'?'active':''}" onclick="adminTab='docs';renderAdmin()">📄 ${T('admin_effective_docs')}</button>
+      <button class="admin-tab-v2 ${adminTab==='version_control'?'active':''}" onclick="adminTab='version_control';renderAdmin()">🔄 ${lang==='en'?'Version Control':'Điều khiển phiên bản'}</button>
+      <button class="admin-tab-v2 ${adminTab==='portal_display'?'active':''}" onclick="adminTab='portal_display';renderAdmin()">🧭 ${lang==='en'?'Portal display':'Hiển thị portal'}</button>
       <button class="admin-tab-v2 ${adminTab==='retention'?'active':''}" onclick="adminTab='retention';renderAdmin()">📋 ${lang==='en'?'Retention':'Lưu giữ'}</button>
+      <button class="admin-tab-v2 ${adminTab==='manual_runtime'?'active':''}" onclick="adminTab='manual_runtime';renderAdmin()">🧾 ${lang==='en'?'Manual runtime':'Nhập tay vận hành'}</button>
+      <button class="admin-tab-v2 ${adminTab==='data_sources'?'active':''}" onclick="adminTab='data_sources';renderAdmin()">🗄 ${lang==='en'?'Data sources':'Nguồn dữ liệu'}</button>
+      <button class="admin-tab-v2 ${adminTab==='metadata_studio'?'active':''}" onclick="adminTab='metadata_studio';renderAdmin()">API &amp; DB Studio</button>
+      <button class="admin-tab-v2 ${adminTab==='mfa'?'active':''}" onclick="adminTab='mfa';renderAdmin()">🔑 ${lang==='en'?'MFA Security':'Bảo mật MFA'}</button>
+      <button class="admin-tab-v2 ${adminTab==='appearance'?'active':''}" onclick="adminTab='appearance';renderAdmin()">🎨 ${lang==='en'?'Appearance':'Giao diện'}</button>
     </div>
     <div class="admin-panel" id="admin-content"></div>`;
+  if(adminTab==='version_control' && !gitRepoStatusState.loaded && !gitRepoStatusState.loading && !gitRepoStatusState.error){
+    loadGitRepoStatus({silent:true});
+  }
   if(adminTab==='users') renderAdminUsers();
   if(adminTab==='dept_title') renderAdminDeptTitle();
   if(adminTab==='perms') renderAdminPerms();
@@ -2864,7 +5240,836 @@ function renderAdmin(){
   if(adminTab==='orgchart') renderAdminOrgChart();
   if(adminTab==='activity') renderAdminActivity();
   if(adminTab==='docs') renderAdminEffectiveDocs();
+  if(adminTab==='manual_runtime') renderAdminManualRuntime();
+  if(adminTab==='data_sources') renderAdminDataSources();
+  if(adminTab==='metadata_studio') renderAdminMetadataStudio();
+  if(adminTab==='version_control') renderAdminVersionControl();
+  if(adminTab==='portal_display'){
+    renderAdminPortalDisplay();
+    loadPortalDisplayConfigFromServer({silent:true});
+  }
   if(adminTab==='retention') renderAdminRetention();
+  if(adminTab==='mfa') renderAdminMfa();
+  if(adminTab==='appearance') renderAdminAppearance();
+}
+
+/* ── Admin: Appearance Settings — Enterprise Theme Editor v2 ─────────────── */
+var _appSubTab = 'overview';
+
+function renderAdminMetadataStudio(){
+  const el=document.getElementById('admin-content');
+  if(!el) return;
+  if(typeof window._renderAdminMetadataStudio === 'function'){
+    window._renderAdminMetadataStudio(el);
+    return;
+  }
+  el.innerHTML='<div class="hm-empty">'+(lang==='en'?'Loading API & DB Studio...':'Dang tai API & DB Studio...')+'</div>';
+  var existing=document.getElementById('admin-metadata-studio-script');
+  if(existing){
+    var tries=0;
+    (function waitForStudio(){
+      if(typeof window._renderAdminMetadataStudio === 'function'){
+        window._renderAdminMetadataStudio(el);
+        return;
+      }
+      if(tries < 40){
+        tries += 1;
+        setTimeout(waitForStudio, 150);
+        return;
+      }
+      el.innerHTML='<div class="hm-empty">Failed to initialize metadata studio.</div>';
+    })();
+    return;
+  }
+  var script=document.createElement('script');
+  script.id='admin-metadata-studio-script';
+  script.src='scripts/portal/32-admin-metadata-studio.js?v=20260403';
+  script.onload=function(){
+    if(typeof window._renderAdminMetadataStudio === 'function'){
+      window._renderAdminMetadataStudio(el);
+    }
+  };
+  script.onerror=function(){
+    el.innerHTML='<div class="hm-empty">Failed to load metadata studio. Check 32-admin-metadata-studio.js</div>';
+  };
+  document.head.appendChild(script);
+}
+
+function renderAdminAppearance(){
+  const el=document.getElementById('admin-content');
+  if(!el) return;
+  /* Delegate to external file if loaded, otherwise fallback inline */
+  if(typeof window._renderAdminAppearanceFull === 'function'){
+    window._renderAdminAppearanceFull(el, _appSubTab, lang);
+    return;
+  }
+  /* Fallback: load external script then render */
+  var script = document.createElement('script');
+  script.src = 'scripts/portal/00c-admin-appearance.js?v=20260403';
+  script.onload = function(){
+    if(typeof window._renderAdminAppearanceFull === 'function'){
+      window._renderAdminAppearanceFull(el, _appSubTab, lang);
+    }
+  };
+  script.onerror = function(){
+    el.innerHTML = '<div class="hm-empty">Failed to load appearance editor. Check 00c-admin-appearance.js</div>';
+  };
+  document.head.appendChild(script);
+}
+
+function renderAdminMfa(){
+  const el=document.getElementById('admin-content');
+  if(!el) return;
+  el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-3)">Đang tải cài đặt MFA...</div>';
+
+  apiCall('admin_mfa_settings_get',{},'GET').then(function(res){
+    if(!res||!res.ok){
+      el.innerHTML='<div style="color:var(--red);padding:20px">Lỗi tải MFA settings: '+(res?res.error:'unknown')+'</div>';
+      return;
+    }
+    const d=res;
+    const requireMfa=d.require_mfa;
+    const users=d.users_mfa||[];
+    const enrolled=d.mfa_enrolled||0;
+    const total=d.total_users||0;
+
+    let html='<div style="margin-bottom:24px">';
+    html+='<h3 style="font-size:16px;font-weight:700;margin-bottom:12px">'+(lang==='en'?'MFA Security Settings':'Cài đặt bảo mật MFA')+'</h3>';
+
+    // Global toggle
+    html+='<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;padding:16px;background:var(--bg-surface-alt,var(--bg));border:1px solid var(--border);border-radius:8px">';
+    html+='<label style="font-weight:600;flex:1">'+(lang==='en'?'Require MFA for all users':'Yêu cầu MFA cho tất cả người dùng')+'</label>';
+    html+='<button id="mfa-toggle-btn" style="padding:8px 20px;border-radius:6px;border:none;cursor:pointer;font-weight:600;color:#fff;background:'+(requireMfa?'var(--green)':'var(--red)')+'">'+(requireMfa?(lang==='en'?'ON — Required':'BẬT — Bắt buộc'):(lang==='en'?'OFF — Not required':'TẮT — Không bắt buộc'))+'</button>';
+    html+='</div>';
+
+    // Stats
+    html+='<div style="display:flex;gap:16px;margin-bottom:20px">';
+    html+='<div style="flex:1;padding:12px;background:var(--bg-surface-alt,var(--bg));border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700">'+total+'</div><div style="font-size:12px;color:var(--text-3)">'+(lang==='en'?'Total users':'Tổng người dùng')+'</div></div>';
+    html+='<div style="flex:1;padding:12px;background:var(--bg-surface-alt,var(--bg));border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:var(--green)">'+enrolled+'</div><div style="font-size:12px;color:var(--text-3)">'+(lang==='en'?'MFA enrolled':'Đã đăng ký MFA')+'</div></div>';
+    html+='<div style="flex:1;padding:12px;background:var(--bg-surface-alt,var(--bg));border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:'+(requireMfa?'var(--red)':'var(--text-3)')+'">'+(total-enrolled)+'</div><div style="font-size:12px;color:var(--text-3)">'+(lang==='en'?'Not enrolled':'Chưa đăng ký')+'</div></div>';
+    html+='</div>';
+
+    // User table
+    html+='<h4 style="font-size:14px;font-weight:600;margin-bottom:8px">'+(lang==='en'?'Per-User MFA Status':'Trạng thái MFA theo người dùng')+'</h4>';
+    html+='<table style="width:100%;border-collapse:collapse;font-size:13px">';
+    html+='<thead><tr style="background:var(--bg-surface-alt,var(--bg));border-bottom:1px solid var(--border)"><th style="padding:8px;text-align:left">'+(lang==='en'?'User':'Người dùng')+'</th><th style="padding:8px;text-align:left">'+(lang==='en'?'Name':'Họ tên')+'</th><th style="padding:8px;text-align:left">'+(lang==='en'?'Role':'Vai trò')+'</th><th style="padding:8px;text-align:center">MFA</th><th style="padding:8px;text-align:center">'+(lang==='en'?'Actions':'Thao tác')+'</th></tr></thead><tbody>';
+
+    users.forEach(function(u){
+      html+='<tr style="border-bottom:1px solid var(--border)">';
+      html+='<td style="padding:8px;font-weight:600">'+String(u.username||'')+'</td>';
+      html+='<td style="padding:8px">'+String(u.name||'')+'</td>';
+      html+='<td style="padding:8px"><span style="padding:2px 8px;border-radius:4px;font-size:11px;background:var(--bg-surface-alt,var(--bg));border:1px solid var(--border)">'+String(u.role||'')+'</span></td>';
+      html+='<td style="padding:8px;text-align:center">'+(u.mfa_enabled?'<span style="color:var(--green);font-weight:700">✓ '+('BẬT')+'</span>':'<span style="color:var(--text-3)">✗ '+('TẮT')+'</span>')+'</td>';
+      html+='<td style="padding:8px;text-align:center">';
+      if(u.mfa_enabled){
+        html+='<button data-mfa-reset="'+String(u.username||'')+'" style="padding:4px 10px;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:11px;background:var(--bg-surface,#fff);color:var(--text-primary)">'+(lang==='en'?'Reset':'Đặt lại')+'</button> ';
+        html+='<button data-mfa-disable="'+String(u.username||'')+'" style="padding:4px 10px;border:1px solid color-mix(in srgb, var(--red) 30%, var(--border));border-radius:4px;cursor:pointer;font-size:11px;background:color-mix(in srgb, var(--red) 10%, var(--bg-surface,#fff));color:var(--red)">'+(lang==='en'?'Disable':'Tắt')+'</button>';
+      } else {
+        html+='<span style="color:var(--text-3);font-size:11px">'+(lang==='en'?'Will enroll on login':'Sẽ đăng ký khi đăng nhập')+'</span>';
+      }
+      html+='</td></tr>';
+    });
+
+    html+='</tbody></table></div>';
+    el.innerHTML=html;
+
+    // Event handlers
+    document.getElementById('mfa-toggle-btn').addEventListener('click',function(){
+      var newVal=!requireMfa;
+      apiCall('admin_mfa_settings_save',{require_mfa:newVal}).then(function(r){
+        if(r&&r.ok){ renderAdminMfa(); }
+        else { alert('Lỗi: '+(r?r.error:'unknown')); }
+      });
+    });
+
+    el.querySelectorAll('[data-mfa-reset]').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var username=this.getAttribute('data-mfa-reset');
+        if(!confirm((lang==='en'?'Reset MFA for ':'Đặt lại MFA cho ')+username+'?')) return;
+        apiCall('admin_mfa_settings_save',{reset_user:username}).then(function(r){
+          if(r&&r.ok) renderAdminMfa();
+        });
+      });
+    });
+
+    el.querySelectorAll('[data-mfa-disable]').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var username=this.getAttribute('data-mfa-disable');
+        if(!confirm((lang==='en'?'Disable MFA for ':'Tắt MFA cho ')+username+'?')) return;
+        apiCall('admin_mfa_settings_save',{disable_user:username}).then(function(r){
+          if(r&&r.ok) renderAdminMfa();
+        });
+      });
+    });
+  });
+}
+
+function renderAdminPortalDisplay(){
+  const el = document.getElementById('admin-content');
+  if(!el) return;
+
+  const draft = ensurePortalDisplayConfigDraft();
+  const isLoadingConfig = !portalDisplayConfigHydrated && !!portalDisplayConfigLoadPromise;
+  const enabledExt = new Set(draft.extensions.enabled || []);
+  const customExt = new Set(draft.extensions.custom || []);
+  const coreHidden = new Set(draft.sidebar.hidden_core_items || []);
+  const sectionHidden = new Set(draft.sidebar.hidden_sections || []);
+  const catHidden = new Set(draft.sidebar.hidden_categories || []);
+
+  const extRows = (draft.extensions.known || []).map(ext => {
+    const checked = enabledExt.has(ext) ? 'checked' : '';
+    const typeLabel = ext === 'html'
+      ? (lang==='en' ? 'Inline page' : 'Trang HTML hiển thị trực tiếp')
+      : (lang==='en' ? 'Controlled download / file stream' : 'Tệp được quản lý và tải qua portal');
+    const sourceLabel = customExt.has(ext)
+      ? (lang==='en' ? 'Custom' : 'Tự thêm')
+      : (lang==='en' ? 'Built-in' : 'Mặc định');
+    const removeBtn = customExt.has(ext)
+      ? `<button class="btn-admin secondary portal-display-mini-btn" onclick="removePortalDisplayCustomExtension('${ext}')">${lang==='en'?'Remove':'Xóa'}</button>`
+      : `<span class="portal-display-chip is-static">${sourceLabel}</span>`;
+    return `<div class="portal-display-row">
+      <label class="portal-display-check">
+        <input type="checkbox" ${checked} onchange="setPortalDisplayExtensionVisible('${ext}', this.checked)">
+        <span class="portal-display-check-copy">
+          <b>.${ext}</b>
+          <small>${typeLabel}</small>
+        </span>
+      </label>
+      <div class="portal-display-row-actions">
+        <span class="portal-display-chip">${sourceLabel}</span>
+        ${removeBtn}
+      </div>
+    </div>`;
+  }).join('');
+
+  const coreRows = portalSidebarCoreItems().map(item => {
+    const visible = item.locked ? true : !coreHidden.has(item.id);
+    const checked = visible ? 'checked' : '';
+    const disabled = item.locked ? 'disabled' : '';
+    const note = item.locked
+      ? (lang==='en' ? 'Always visible for admin access' : 'Luôn hiện để bảo toàn đường vào trang quản trị')
+      : '';
+    return `<label class="portal-display-option">
+      <input type="checkbox" ${checked} ${disabled} onchange="setPortalDisplayCoreItemVisible('${item.id}', this.checked)">
+      <span class="portal-display-option-copy">
+        <b>${item.icon} ${item.label}</b>
+        ${note ? `<small>${note}</small>` : ''}
+      </span>
+    </label>`;
+  }).join('');
+
+  const sectionRows = portalSidebarSections().map(section => {
+    const visible = !sectionHidden.has(section.id);
+    const checked = visible ? 'checked' : '';
+    const categories = portalSidebarCategoryItems().filter(cat => cat.section === section.id).map(cat => {
+      const catChecked = !catHidden.has(cat.id) ? 'checked' : '';
+      return `<label class="portal-display-option is-compact">
+        <input type="checkbox" ${catChecked} onchange="setPortalDisplayCategoryVisible('${cat.id}', this.checked)">
+        <span class="portal-display-option-copy"><b>${cat.icon} ${cat.label}</b><small>${cat.id}</small></span>
+      </label>`;
+    }).join('');
+    return `<div class="portal-display-section-card">
+      <label class="portal-display-option portal-display-section-head">
+        <input type="checkbox" ${checked} onchange="setPortalDisplaySectionVisible('${section.id}', this.checked)">
+        <span class="portal-display-option-copy">
+          <b>${section.label}</b>
+          <small>${lang==='en'?'Show or hide this whole group in the left sidebar.':'Bật hoặc ẩn cả nhóm này trên thanh bên trái.'}</small>
+        </span>
+      </label>
+      <div class="portal-display-option-grid">${categories}</div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="portal-display-admin">
+      <div class="portal-display-hero">
+        <div>
+          <div class="portal-display-kicker">${lang==='en'?'Portal display control':'Điều khiển hiển thị portal'}</div>
+          <h3>${lang==='en'?'Choose what the portal shows':'Chọn những gì portal được hiển thị'}</h3>
+          <p>${lang==='en'
+            ? 'Control which file extensions are indexed on the portal, add extra extensions when needed, and decide which left-sidebar items remain visible to users.'
+            : 'Quản lý các đuôi file được index trên portal, thêm đuôi mới khi cần, và chọn các mục nào ở thanh bên trái sẽ xuất hiện với người dùng.'}</p>
+          ${isLoadingConfig ? `<div class="portal-display-loading-note">${lang==='en'?'Loading saved configuration from server...':'Đang tải cấu hình hiển thị đã lưu từ server...'}</div>` : ''}
+        </div>
+      </div>
+
+      <div class="portal-display-grid">
+        <section class="portal-display-card">
+          <div class="portal-display-card-head">
+            <div>
+              <h4>${lang==='en'?'Displayed file extensions':'Đuôi file hiển thị'}</h4>
+              <p>${lang==='en'
+                ? 'Only enabled extensions are scanned from server folders and shown on the portal. Non-HTML extensions open through controlled download mode.'
+                : 'Chỉ các đuôi file đang bật mới được scan từ thư mục server và hiển thị lên portal. Các đuôi không phải HTML sẽ mở qua chế độ tải tệp được kiểm soát.'}</p>
+            </div>
+          </div>
+          <div class="portal-display-add-row">
+            <input id="portal-display-new-ext" class="portal-display-input" placeholder="${lang==='en'?'Add extension, e.g. dwg or msg':'Thêm đuôi file, ví dụ dwg hoặc msg'}">
+            <button class="btn-admin primary" onclick="addPortalDisplayCustomExtension()">${lang==='en'?'Add extension':'Thêm đuôi file'}</button>
+          </div>
+          <div class="portal-display-list">${extRows || `<div class="portal-display-empty">${lang==='en'?'No extensions configured.':'Chưa có đuôi file nào được cấu hình.'}</div>`}</div>
+        </section>
+
+        <section class="portal-display-card">
+          <div class="portal-display-card-head">
+            <div>
+              <h4>${lang==='en'?'Left sidebar visibility':'Hiển thị thanh bên trái'}</h4>
+              <p>${lang==='en'
+                ? 'Choose which fixed portal entries and category groups should appear in the left navigation.'
+                : 'Chọn các mục cố định và các nhóm tài liệu nào sẽ xuất hiện ở thanh điều hướng bên trái.'}</p>
+            </div>
+          </div>
+          <div class="portal-display-subtitle">${lang==='en'?'Core portal items':'Mục lõi của portal'}</div>
+          <div class="portal-display-option-grid">${coreRows}</div>
+          <div class="portal-display-subtitle" style="margin-top:16px">${lang==='en'?'Document groups and categories':'Nhóm tài liệu và chuyên mục'}</div>
+          <div class="portal-display-section-stack">${sectionRows}</div>
+        </section>
+      </div>
+
+      <div class="admin-save-bar" id="portal-display-save-bar" style="${portalDisplayConfigDirty?'display:flex':'display:none'}">
+        <span class="save-hint">${portalDisplayConfigDirty
+          ? `<b>⚠ ${lang==='en'?'Unsaved portal display changes':'Có thay đổi hiển thị portal chưa lưu'}</b>`
+          : (lang==='en'?'Adjust the display configuration, then click Save':'Điều chỉnh cấu hình hiển thị rồi nhấn Lưu')}</span>
+        <button class="btn-admin secondary" onclick="resetPortalDisplayConfigDraft()">↩ ${lang==='en'?'Reset draft':'Khôi phục bản nháp'}</button>
+        <button class="btn-admin primary" onclick="savePortalDisplayConfig()" style="padding:8px 24px;font-size:13px">💾 ${lang==='en'?'SAVE':'LƯU'}</button>
+      </div>
+    </div>`;
+}
+
+function adminFormatRuntimeStamp(value){
+  const raw = String(value || '').trim();
+  if(!raw) return lang==='en' ? 'Not available' : 'Chưa có dữ liệu';
+  try{
+    const dt = new Date(raw);
+    if(isNaN(dt.getTime())) return raw;
+    return dt.toLocaleString(lang==='en' ? 'en-US' : 'vi-VN');
+  }catch(e){
+    return raw;
+  }
+}
+
+function adminManualRuntimeCounts(hierarchy){
+  const counts = { so:0, jo:0, wo:0 };
+  (Array.isArray(hierarchy) ? hierarchy : []).forEach(so => {
+    counts.so += 1;
+    (Array.isArray(so.job_orders) ? so.job_orders : []).forEach(jo => {
+      counts.jo += 1;
+      counts.wo += (Array.isArray(jo.work_orders) ? jo.work_orders.length : 0);
+    });
+  });
+  return counts;
+}
+
+function adminManualRuntimeRecentRows(hierarchy){
+  const rows = [];
+  (Array.isArray(hierarchy) ? hierarchy : []).forEach(so => {
+    rows.push({
+      type:'SO',
+      id:String(so.so_number || ''),
+      title:[so.customer_name || so.customer_id || '', so.customer_po ? ('PO ' + so.customer_po) : ''].filter(Boolean).join(' · '),
+      status:String(so.status || ''),
+      updated_at:String(so.updated_at || so.created_at || '')
+    });
+    (Array.isArray(so.job_orders) ? so.job_orders : []).forEach(jo => {
+      rows.push({
+        type:'JO',
+        id:String(jo.jo_number || ''),
+        title:[jo.part_number || '', jo.part_revision || ''].filter(Boolean).join(' / '),
+        status:String(jo.status || ''),
+        updated_at:String(jo.updated_at || jo.created_at || '')
+      });
+      (Array.isArray(jo.work_orders) ? jo.work_orders : []).forEach(wo => {
+        rows.push({
+          type:'WO',
+          id:String(wo.wo_number || ''),
+          title:['OP' + String(wo.operation_number || '-'), wo.operation_desc || '', wo.machine_id || ''].filter(Boolean).join(' · '),
+          status:String(wo.status || ''),
+          updated_at:String(wo.updated_at || wo.created_at || '')
+        });
+      });
+    });
+  });
+  return rows.sort((a,b) => String(b.updated_at || '').localeCompare(String(a.updated_at || ''))).slice(0, 10);
+}
+
+async function loadAdminManualRuntimeState(options={}){
+  if(adminManualRuntimeState.loading && !options.force) return;
+  adminManualRuntimeState.loading = true;
+  adminManualRuntimeState.error = '';
+  if(currentPage === 'admin' && adminTab === 'manual_runtime') renderAdminManualRuntime();
+  try{
+    const [masterRes, hierarchyRes] = await Promise.all([
+      apiCall('master_data_snapshot', null, 'GET'),
+      apiCall('order_hierarchy', null, 'GET')
+    ]);
+    if(!(masterRes && masterRes.ok)) throw new Error((masterRes && masterRes.error) || 'master_data_snapshot_failed');
+    if(!(hierarchyRes && hierarchyRes.ok)) throw new Error((hierarchyRes && hierarchyRes.error) || 'order_hierarchy_failed');
+    adminManualRuntimeState.master = masterRes.data || {};
+    adminManualRuntimeState.hierarchy = hierarchyRes.data || hierarchyRes.hierarchy || [];
+    adminManualRuntimeState.lastCreated = adminManualRuntimeRecentRows(adminManualRuntimeState.hierarchy)[0] || null;
+    adminManualRuntimeState.loaded = true;
+  }catch(e){
+    adminManualRuntimeState.error = (e && e.message) ? e.message : (lang==='en' ? 'Unable to load manual runtime data.' : 'Không tải được dữ liệu vận hành thủ công.');
+  }finally{
+    adminManualRuntimeState.loading = false;
+    if(currentPage === 'admin' && adminTab === 'manual_runtime') renderAdminManualRuntime();
+  }
+}
+
+function adminOpenMasterEntity(entity){
+  if(typeof window._mdOpenControl === 'function'){
+    window._mdOpenControl(entity);
+    return;
+  }
+  showToast(lang==='en' ? '⚠ Master Data Control is not ready.' : '⚠ Chưa mở được màn hình Dữ liệu nền.');
+}
+
+function adminOpenOrderManualCreate(type){
+  const orderType = String(type || '').toLowerCase();
+  if(['so','jo','wo'].indexOf(orderType) < 0) return;
+  navigateTo('orders');
+  let attempts = 0;
+  (function tryOpen(){
+    attempts += 1;
+    if(typeof window._sojowoOpenCreate === 'function' && window._sojowoOpenCreate(orderType)){
+      return;
+    }
+    if(attempts < 16){
+      setTimeout(tryOpen, 180);
+      return;
+    }
+    showToast(lang==='en' ? '⚠ Could not open the order create form.' : '⚠ Không mở được biểu mẫu tạo đơn.');
+  })();
+}
+
+function adminOpenOrderWorkspace(){
+  navigateTo('orders');
+}
+
+function renderAdminManualRuntime(){
+  const el = document.getElementById('admin-content');
+  if(!el) return;
+
+  if(!adminManualRuntimeState.loaded && !adminManualRuntimeState.loading){
+    loadAdminManualRuntimeState({force:true});
+  }
+
+  if(adminManualRuntimeState.loading && !adminManualRuntimeState.loaded){
+    el.innerHTML = `<div style="padding:28px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff);color:var(--text-secondary,#475569)">${lang==='en'?'Loading manual runtime workspace...':'Đang tải module nhập tay vận hành...'}</div>`;
+    return;
+  }
+
+  const master = adminManualRuntimeState.master || {};
+  const hierarchy = Array.isArray(adminManualRuntimeState.hierarchy) ? adminManualRuntimeState.hierarchy : [];
+  const orderCounts = adminManualRuntimeCounts(hierarchy);
+  const recentRows = adminManualRuntimeRecentRows(hierarchy);
+  const checklist = [
+    { label:lang==='en'?'Customers':'Khách hàng', count:(master.customers || []).length, entity:'customers' },
+    { label:'Part Number', count:(master.parts || []).length, entity:'parts' },
+    { label:'Revision', count:(master.revisions || []).length, entity:'revisions' },
+    { label:'Work center', count:(master.work_centers || []).length, entity:'work_centers' },
+    { label:lang==='en'?'Machines':'Máy', count:(master.machines || []).length, entity:'machines' },
+    { label:lang==='en'?'Operators':'Người vận hành', count:(master.operators || []).length, entity:'operators' }
+  ];
+  const missing = checklist.filter(item => Number(item.count || 0) === 0);
+  const stats = [
+    { label:lang==='en'?'Customers':'Khách hàng', value:(master.customers || []).length },
+    { label:'Part Number', value:(master.parts || []).length },
+    { label:'Revision', value:(master.revisions || []).length },
+    { label:'SO', value:orderCounts.so },
+    { label:'JO', value:orderCounts.jo },
+    { label:'WO', value:orderCounts.wo }
+  ];
+
+  el.innerHTML = `
+    <div style="display:grid;gap:16px">
+      <section style="border:1px solid var(--border);border-radius:22px;background:linear-gradient(135deg,color-mix(in srgb, var(--brand-2) 6%, var(--bg-surface,#fff)) 0%,color-mix(in srgb, var(--blue) 8%, var(--bg-surface,#fff)) 48%,color-mix(in srgb, var(--amber) 8%, var(--bg-surface,#fff)) 100%);padding:22px 24px">
+        <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap">
+          <div style="max-width:760px">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0f4c81">${lang==='en'?'Manual runtime mode':'Chế độ vận hành nhập tay'}</div>
+            <h3 style="margin:8px 0 10px;font-size:24px;line-height:1.2;color:#102a43">${lang==='en'?'Operate while Epicor and CNC are offline':'Vẫn vận hành được khi Epicor và CNC chưa kết nối'}</h3>
+            <p style="margin:0;color:#334e68;line-height:1.65">${lang==='en'
+              ? 'Use this area to seed master data, create SO / JO / WO manually, and keep the internal workflow moving before ERP and machine connectors are ready.'
+              : 'Dùng khu vực này để seed dữ liệu nền, tạo SO / JO / WO bằng tay, và giữ workflow nội bộ vận hành trước khi ERP và kết nối máy sẵn sàng.'}</p>
+            <div style="margin-top:12px;font-size:13px;color:#486581">${lang==='en'
+              ? 'The order create forms now accept manual SO / JO / WO numbers. Leave the field blank if you still want automatic numbering.'
+              : 'Biểu mẫu tạo đơn hiện đã cho phép nhập số SO / JO / WO thủ công. Nếu để trống, hệ thống vẫn tự sinh mã như trước.'}</div>
+          </div>
+          <button class="btn-admin secondary" onclick="loadAdminManualRuntimeState({force:true})">⟳ ${lang==='en'?'Refresh':'Làm mới'}</button>
+        </div>
+      </section>
+
+      ${adminManualRuntimeState.error ? `<div style="padding:12px 14px;border-radius:14px;background:color-mix(in srgb, var(--amber) 12%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));color:var(--amber)">${escapeHtml(adminManualRuntimeState.error)}</div>` : ''}
+
+      <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px">
+        ${stats.map(card => `
+          <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
+            <div style="font-size:12px;color:#486581">${escapeHtml(card.label)}</div>
+            <div style="margin-top:6px;font-size:28px;font-weight:700;color:#102a43">${escapeHtml(String(card.value))}</div>
+          </div>
+        `).join('')}
+      </section>
+
+      <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+        <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
+          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Seed minimum master data':'Seed dữ liệu nền tối thiểu'}</div>
+          <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${lang==='en'
+            ? 'Create the reference set first so lookup fields in the order forms work without Epicor.'
+            : 'Tạo bộ dữ liệu tham chiếu trước để các trường lookup trong form đơn hàng hoạt động ngay cả khi chưa có Epicor.'}</p>
+          <div style="display:grid;gap:10px">
+            ${checklist.map(item => `
+              <button type="button" onclick="adminOpenMasterEntity('${item.entity}')" style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:14px;background:${item.count > 0 ? 'color-mix(in srgb, var(--green) 10%, var(--bg-surface,#fff))' : 'color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff))'};border:1px solid ${item.count > 0 ? 'color-mix(in srgb, var(--green) 28%, var(--border))' : 'color-mix(in srgb, var(--amber) 28%, var(--border))'};cursor:pointer;text-align:left">
+                <span>
+                  <strong style="display:block;color:#102a43">${escapeHtml(item.label)}</strong>
+                  <small style="color:#52667a">${item.count > 0 ? (lang==='en'?'Available':'Đã có dữ liệu') : (lang==='en'?'Missing baseline':'Đang thiếu dữ liệu nền')}</small>
+                </span>
+                <strong style="font-size:20px;color:#102a43">${escapeHtml(String(item.count))}</strong>
+              </button>
+            `).join('')}
+          </div>
+        </article>
+
+        <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
+          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Manual order input':'Nhập tay SO / JO / WO'}</div>
+          <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${lang==='en'
+            ? 'Open the governed order forms directly from Admin so operations can start before Epicor inbound is connected.'
+            : 'Mở trực tiếp các form đơn hàng có kiểm soát từ Admin để vận hành có thể bắt đầu trước khi Epicor inbound được kết nối.'}</p>
+          <div style="display:grid;gap:10px">
+            <button class="btn-admin primary" onclick="adminOpenOrderManualCreate('so')">+ SO</button>
+            <button class="btn-admin primary" onclick="adminOpenOrderManualCreate('jo')">+ JO</button>
+            <button class="btn-admin primary" onclick="adminOpenOrderManualCreate('wo')">+ WO</button>
+            <button class="btn-admin secondary" onclick="adminOpenOrderWorkspace()">${lang==='en'?'Open Order Management':'Mở Quản lý đơn hàng'}</button>
+          </div>
+          <div style="margin-top:14px;padding:12px 14px;border-radius:14px;background:var(--bg-surface-alt,#f8fafc);border:1px dashed var(--border);color:var(--text-secondary,#475569);font-size:13px;line-height:1.6">
+            ${lang==='en'
+              ? 'Suggested sequence: Customer -> Part Number -> Revision -> Work center / Machine / Operator -> SO -> JO -> WO.'
+              : 'Trình tự gợi ý: Khách hàng -> Part Number -> Revision -> Work center / Máy / Người vận hành -> SO -> JO -> WO.'}
+          </div>
+        </article>
+
+        <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
+          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Current readiness':'Độ sẵn sàng hiện tại'}</div>
+          <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${missing.length
+            ? (lang==='en'
+              ? ('Still missing baseline data for: ' + missing.map(item => item.label).join(', ') + '.')
+              : ('Hiện vẫn đang thiếu dữ liệu nền cho: ' + missing.map(item => item.label).join(', ') + '.'))
+            : (lang==='en'
+              ? 'The minimum baseline is already in place. You can start creating SO / JO / WO manually now.'
+              : 'Bộ dữ liệu nền tối thiểu đã sẵn sàng. Bạn có thể bắt đầu tạo SO / JO / WO thủ công ngay bây giờ.')}
+          </p>
+          <div style="display:grid;gap:10px">
+            <div style="padding:12px 14px;border-radius:14px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border);color:var(--text-secondary,#334e68);line-height:1.6">
+              ${lang==='en'
+                ? 'Manual mode keeps the workflow alive: users create orders, operators update progress manually, and evidence still links to WO as usual.'
+                : 'Chế độ thủ công vẫn giữ workflow sống: người dùng tạo đơn, người vận hành cập nhật tiến độ bằng tay, và hồ sơ chứng cứ vẫn liên kết về WO như bình thường.'}
+            </div>
+            <div style="padding:12px 14px;border-radius:14px;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));color:var(--amber);line-height:1.6">
+              ${lang==='en'
+                ? 'Security note: secrets for database and external connectors stay on the server, not in editable frontend fields.'
+                : 'Lưu ý an toàn: secret cho database và kết nối ngoài vẫn nằm ở server, không đặt trong các ô frontend có thể sửa.'}
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
+        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
+          <div>
+            <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Recent records':'Bản ghi gần nhất'}</div>
+            <div style="margin-top:6px;color:#52667a">${lang==='en'
+              ? 'Quickly verify that manual data is being created in the expected order.'
+              : 'Kiểm tra nhanh xem dữ liệu nhập tay đã được tạo đúng trình tự mong muốn hay chưa.'}</div>
+          </div>
+          <div style="font-size:12px;color:#486581">${lang==='en'?'Last event':'Lần cập nhật gần nhất'}: ${escapeHtml(adminFormatRuntimeStamp(adminManualRuntimeState.lastCreated && adminManualRuntimeState.lastCreated.updated_at))}</div>
+        </div>
+        <div style="margin-top:14px;overflow:auto">
+          <table class="admin-table" style="width:100%;font-size:12px">
+            <thead>
+              <tr style="background:var(--bg-surface-alt,#f8fafc)">
+                <th style="padding:10px;text-align:left">${lang==='en'?'Type':'Loại'}</th>
+                <th style="padding:10px;text-align:left">${lang==='en'?'Number':'Mã'}</th>
+                <th style="padding:10px;text-align:left">${lang==='en'?'Description':'Mô tả'}</th>
+                <th style="padding:10px;text-align:left">${lang==='en'?'Status':'Trạng thái'}</th>
+                <th style="padding:10px;text-align:left">${lang==='en'?'Updated':'Cập nhật'}</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${recentRows.length ? recentRows.map(row => `
+                <tr style="border-bottom:1px solid #eef2f7">
+                  <td style="padding:10px;font-weight:700">${escapeHtml(row.type)}</td>
+                  <td style="padding:10px"><code>${escapeHtml(row.id || '-')}</code></td>
+                  <td style="padding:10px;color:#334e68">${escapeHtml(row.title || '-')}</td>
+                  <td style="padding:10px">${escapeHtml(row.status || '-')}</td>
+                  <td style="padding:10px;color:#52667a">${escapeHtml(adminFormatRuntimeStamp(row.updated_at))}</td>
+                </tr>
+              `).join('') : `<tr><td colspan="5" style="padding:14px;color:var(--text-secondary)">${lang==='en'?'No SO / JO / WO records yet.':'Chưa có SO / JO / WO nào được tạo.'}</td></tr>`}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>`;
+}
+
+function adminDataSourceClone(value){
+  try{ return JSON.parse(JSON.stringify(value || {})); }catch(e){ return {}; }
+}
+
+function adminDataSourceModePreview(config){
+  const cfg = config || {};
+  if(!cfg.use_postgres) return 'JSON_ONLY';
+  if(cfg.shadow_write) return 'SHADOW_WRITE';
+  if(cfg.json_fallback) return 'POSTGRES_PRIMARY';
+  return 'POSTGRES_ONLY';
+}
+
+function adminDataSourceDirty(value){
+  adminDataSourceState.dirty = !!value;
+  const bar = document.getElementById('admin-data-source-save-bar');
+  if(bar) bar.style.display = adminDataSourceState.dirty ? 'flex' : 'none';
+}
+
+function adminDataSourceSetField(key, value){
+  if(!adminDataSourceState.draft){
+    adminDataSourceState.draft = adminDataSourceClone((adminDataSourceState.snapshot && adminDataSourceState.snapshot.config && adminDataSourceState.snapshot.config.effective_config) || {});
+  }
+  adminDataSourceState.draft[key] = value;
+  adminDataSourceDirty(true);
+  const preview = document.getElementById('admin-data-source-mode-preview');
+  if(preview) preview.textContent = adminDataSourceModePreview(adminDataSourceState.draft);
+}
+
+async function loadAdminDataSourceState(options={}){
+  if(adminDataSourceState.loading && !options.force) return;
+  adminDataSourceState.loading = true;
+  adminDataSourceState.error = '';
+  if(currentPage === 'admin' && adminTab === 'data_sources') renderAdminDataSources();
+  try{
+    const results = await Promise.allSettled([
+      apiCall('admin_data_layer_config_get', null, 'GET'),
+      apiCall('mes_shadow_status', null, 'GET'),
+      apiCall('epicor_transport_health', null, 'GET'),
+      apiCall('mes_connector_snapshot', null, 'GET')
+    ]);
+    const configRes = results[0].status === 'fulfilled' ? results[0].value : null;
+    if(!(configRes && configRes.ok)) throw new Error((configRes && configRes.error) || 'admin_data_layer_config_get_failed');
+    adminDataSourceState.snapshot = {
+      config: configRes,
+      shadow: (results[1].status === 'fulfilled' && results[1].value && results[1].value.ok) ? results[1].value : null,
+      epicor: (results[2].status === 'fulfilled' && results[2].value && results[2].value.ok) ? results[2].value : null,
+      connectors: (results[3].status === 'fulfilled' && results[3].value && results[3].value.ok) ? results[3].value : null
+    };
+    if(!adminDataSourceState.dirty || options.forceDraftSync){
+      adminDataSourceState.draft = adminDataSourceClone(configRes.effective_config || {});
+      adminDataSourceState.dirty = false;
+    }
+    adminDataSourceState.loaded = true;
+  }catch(e){
+    adminDataSourceState.error = (e && e.message) ? e.message : (lang==='en' ? 'Unable to load data source configuration.' : 'Không tải được cấu hình nguồn dữ liệu.');
+  }finally{
+    adminDataSourceState.loading = false;
+    if(currentPage === 'admin' && adminTab === 'data_sources') renderAdminDataSources();
+  }
+}
+
+function adminDataSourceResetDraft(){
+  adminDataSourceState.draft = adminDataSourceClone((adminDataSourceState.snapshot && adminDataSourceState.snapshot.config && adminDataSourceState.snapshot.config.effective_config) || {});
+  adminDataSourceDirty(false);
+  renderAdminDataSources();
+}
+
+async function saveAdminDataSourceConfig(){
+  if(adminDataSourceState.loading) return;
+  try{
+    adminDataSourceState.loading = true;
+    renderAdminDataSources();
+    const res = await apiCall('admin_data_layer_config_save', { config: adminDataSourceState.draft || {} });
+    if(!(res && res.ok)){
+      throw new Error((res && res.error) || 'admin_data_layer_config_save_failed');
+    }
+    adminDataSourceDirty(false);
+    await loadAdminDataSourceState({force:true, forceDraftSync:true});
+    showToast(lang==='en' ? '✅ Data source configuration saved.' : '✅ Đã lưu cấu hình nguồn dữ liệu.');
+  }catch(e){
+    adminDataSourceState.loading = false;
+    renderAdminDataSources();
+    showToast('⚠ ' + ((e && e.message) ? e.message : (lang==='en' ? 'Save failed.' : 'Lưu cấu hình thất bại.')));
+  }
+}
+
+function renderAdminDataSources(){
+  const el = document.getElementById('admin-content');
+  if(!el) return;
+
+  if(!adminDataSourceState.loaded && !adminDataSourceState.loading){
+    loadAdminDataSourceState({force:true});
+  }
+
+  if(adminDataSourceState.loading && !adminDataSourceState.loaded){
+    el.innerHTML = `<div style="padding:28px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff);color:var(--text-secondary,#475569)">${lang==='en'?'Loading data source diagnostics...':'Đang tải chẩn đoán nguồn dữ liệu...'}</div>`;
+    return;
+  }
+
+  const snapshot = adminDataSourceState.snapshot || {};
+  const cfgRes = snapshot.config || {};
+  const runtimeMode = cfgRes.runtime_mode || {};
+  const draft = adminDataSourceState.draft || adminDataSourceClone(cfgRes.effective_config || {});
+  const shadow = snapshot.shadow || {};
+  const epicor = snapshot.epicor || {};
+  const connector = snapshot.connectors || {};
+  const shadowFailures = Array.isArray(shadow.shadow_sync_failures) ? shadow.shadow_sync_failures.length : 0;
+  const fallbackReads = Array.isArray(shadow.primary_read_fallbacks) ? shadow.primary_read_fallbacks.length : 0;
+  const connectorFailures = Array.isArray(shadow.recent_connector_failures) ? shadow.recent_connector_failures.length : 0;
+  const launchBlockers = Array.isArray(shadow.launch_blockers) ? shadow.launch_blockers.length : 0;
+  const epicorHealth = epicor.health || {};
+  const connectorKpis = connector.kpis || {};
+
+  el.innerHTML = `
+    <div style="display:grid;gap:16px">
+      <section style="border:1px solid var(--border);border-radius:22px;background:linear-gradient(135deg,color-mix(in srgb, var(--amber) 7%, var(--bg-surface,#fff)) 0%,color-mix(in srgb, var(--blue) 8%, var(--bg-surface,#fff)) 55%,color-mix(in srgb, var(--purple) 8%, var(--bg-surface,#fff)) 100%);padding:22px 24px">
+        <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start">
+          <div style="max-width:760px">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7c2d12">${lang==='en'?'Data source and database control':'Nguồn dữ liệu và Database'}</div>
+            <h3 style="margin:8px 0 10px;font-size:24px;line-height:1.2;color:#102a43">${lang==='en'?'Inspect and tune the runtime data layer from frontend':'Kiểm tra và chỉnh lớp dữ liệu runtime ngay trên frontend'}</h3>
+            <p style="margin:0;color:#334e68;line-height:1.65">${lang==='en'
+              ? 'This panel exposes the active JSON / PostgreSQL runtime mode, shadow-sync health, and the connection profile you can safely adjust without touching server code.'
+              : 'Panel này hiển thị chế độ runtime JSON / PostgreSQL đang hoạt động, sức khỏe shadow-sync, và bộ cấu hình kết nối mà bạn có thể chỉnh an toàn mà không cần sửa code server.'}</p>
+          </div>
+          <button class="btn-admin secondary" onclick="loadAdminDataSourceState({force:true,forceDraftSync:true})">⟳ ${lang==='en'?'Refresh diagnostics':'Làm mới chẩn đoán'}</button>
+        </div>
+      </section>
+
+      ${adminDataSourceState.error ? `<div style="padding:12px 14px;border-radius:14px;background:color-mix(in srgb, var(--amber) 12%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));color:var(--amber)">${escapeHtml(adminDataSourceState.error)}</div>` : ''}
+
+      <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+        <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
+          <div style="font-size:12px;color:#486581">${lang==='en'?'Runtime mode':'Chế độ runtime'}</div>
+          <div id="admin-data-source-mode-preview" style="margin-top:6px;font-size:28px;font-weight:700;color:#102a43">${escapeHtml(adminDataSourceModePreview(draft))}</div>
+          <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'Applied to new requests immediately':'Áp dụng ngay cho các request mới'}</div>
+        </div>
+        <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
+          <div style="font-size:12px;color:#486581">PostgreSQL</div>
+          <div style="margin-top:6px;font-size:28px;font-weight:700;color:${runtimeMode.postgres_reachable ? '#0f766e' : '#b45309'}">${runtimeMode.postgres_reachable ? (lang==='en'?'Reachable':'Kết nối được') : (draft.use_postgres ? (lang==='en'?'Unavailable':'Chưa kết nối') : 'JSON')}</div>
+          <div style="margin-top:6px;font-size:12px;color:#52667a">${escapeHtml(runtimeMode.postgres_error || (lang==='en'?'No PostgreSQL error reported':'Không có lỗi PostgreSQL được báo'))}</div>
+        </div>
+        <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
+          <div style="font-size:12px;color:#486581">${lang==='en'?'Shadow-sync failures':'Lỗi shadow-sync'}</div>
+          <div style="margin-top:6px;font-size:28px;font-weight:700;color:#102a43">${escapeHtml(String(shadowFailures))}</div>
+          <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'JSON fallback reads':'Lượt fallback về JSON'}: ${escapeHtml(String(fallbackReads))}</div>
+        </div>
+        <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
+          <div style="font-size:12px;color:#486581">${lang==='en'?'Connector alerts':'Cảnh báo connector'}</div>
+          <div style="margin-top:6px;font-size:28px;font-weight:700;color:#102a43">${escapeHtml(String(connectorFailures))}</div>
+          <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'WO launch blockers':'WO bị chặn'}: ${escapeHtml(String(launchBlockers))}</div>
+        </div>
+      </section>
+
+      <section style="display:grid;grid-template-columns:minmax(340px,1.25fr) minmax(280px,.95fr);gap:16px">
+        <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
+          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'PostgreSQL runtime profile':'Hồ sơ runtime PostgreSQL'}</div>
+          <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${lang==='en'
+            ? 'Switch between JSON-only, shadow-write, PostgreSQL-primary, and PostgreSQL-only here. Passwords remain on the server and are not exposed in frontend.'
+            : 'Chuyển giữa JSON-only, shadow-write, PostgreSQL-primary và PostgreSQL-only ngay tại đây. Mật khẩu vẫn được giữ ở server và không lộ ra frontend.'}</p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+            <label style="display:grid;gap:6px">
+              <span style="font-size:12px;color:#486581">Host</span>
+              <input class="sj-input" value="${escapeHtml(String(draft.host || ''))}" oninput="adminDataSourceSetField('host', this.value)">
+            </label>
+            <label style="display:grid;gap:6px">
+              <span style="font-size:12px;color:#486581">Port</span>
+              <input class="sj-input" type="number" value="${escapeHtml(String(draft.port || 5432))}" oninput="adminDataSourceSetField('port', Number(this.value || 0))">
+            </label>
+            <label style="display:grid;gap:6px">
+              <span style="font-size:12px;color:#486581">Database</span>
+              <input class="sj-input" value="${escapeHtml(String(draft.database || ''))}" oninput="adminDataSourceSetField('database', this.value)">
+            </label>
+            <label style="display:grid;gap:6px">
+              <span style="font-size:12px;color:#486581">${lang==='en'?'Username':'Tài khoản'}</span>
+              <input class="sj-input" value="${escapeHtml(String(draft.username || ''))}" oninput="adminDataSourceSetField('username', this.value)">
+            </label>
+            <label style="display:grid;gap:6px">
+              <span style="font-size:12px;color:#486581">Schema</span>
+              <input class="sj-input" value="${escapeHtml(String(draft.schema || 'public'))}" oninput="adminDataSourceSetField('schema', this.value)">
+            </label>
+            <label style="display:grid;gap:6px">
+              <span style="font-size:12px;color:#486581">SSL Mode</span>
+              <select class="sj-input" onchange="adminDataSourceSetField('sslmode', this.value)">
+                ${['disable','allow','prefer','require','verify-ca','verify-full'].map(item => `<option value="${item}" ${String(draft.sslmode || 'prefer')===item ? 'selected' : ''}>${item}</option>`).join('')}
+              </select>
+            </label>
+            <label style="display:grid;gap:6px">
+              <span style="font-size:12px;color:#486581">${lang==='en'?'Connect timeout (s)':'Timeout kết nối (giây)'}</span>
+              <input class="sj-input" type="number" value="${escapeHtml(String(draft.connect_timeout || 5))}" oninput="adminDataSourceSetField('connect_timeout', Number(this.value || 0))">
+            </label>
+            <label style="display:grid;gap:6px">
+              <span style="font-size:12px;color:#486581">${lang==='en'?'Statement timeout (ms)':'Statement timeout (ms)'}</span>
+              <input class="sj-input" type="number" value="${escapeHtml(String(draft.statement_timeout || 30000))}" oninput="adminDataSourceSetField('statement_timeout', Number(this.value || 0))">
+            </label>
+            <label style="display:grid;gap:6px">
+              <span style="font-size:12px;color:#486581">${lang==='en'?'Read retry count':'Số lần retry khi đọc'}</span>
+              <input class="sj-input" type="number" value="${escapeHtml(String(draft.read_retry_count || 3))}" oninput="adminDataSourceSetField('read_retry_count', Number(this.value || 0))">
+            </label>
+            <label style="display:grid;gap:6px">
+              <span style="font-size:12px;color:#486581">${lang==='en'?'Read retry delay (ms)':'Độ trễ retry khi đọc (ms)'}</span>
+              <input class="sj-input" type="number" value="${escapeHtml(String(draft.read_retry_delay_ms || 150))}" oninput="adminDataSourceSetField('read_retry_delay_ms', Number(this.value || 0))">
+            </label>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:14px">
+            <label style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
+              <input type="checkbox" ${draft.use_postgres ? 'checked' : ''} onchange="adminDataSourceSetField('use_postgres', this.checked)">
+              <span><strong>use_postgres</strong><br><small>${lang==='en'?'Enable PostgreSQL path':'Bật đường đọc/ghi PostgreSQL'}</small></span>
+            </label>
+            <label style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
+              <input type="checkbox" ${draft.shadow_write ? 'checked' : ''} onchange="adminDataSourceSetField('shadow_write', this.checked)">
+              <span><strong>shadow_write</strong><br><small>${lang==='en'?'Write JSON + PostgreSQL in parallel':'Ghi song song JSON + PostgreSQL'}</small></span>
+            </label>
+            <label style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
+              <input type="checkbox" ${draft.json_fallback ? 'checked' : ''} onchange="adminDataSourceSetField('json_fallback', this.checked)">
+              <span><strong>json_fallback</strong><br><small>${lang==='en'?'Fallback to JSON if PostgreSQL read fails':'Fallback về JSON nếu đọc PostgreSQL lỗi'}</small></span>
+            </label>
+          </div>
+          <div style="margin-top:14px;padding:12px 14px;border-radius:14px;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));color:var(--amber);line-height:1.6;font-size:13px">
+            ${lang==='en'
+              ? 'Frontend edits only non-secret parameters. Database passwords and external connector tokens remain in server environment variables.'
+              : 'Frontend chỉ chỉnh các tham số không chứa bí mật. Mật khẩu database và token kết nối ngoài vẫn nằm trong biến môi trường của server.'}
+          </div>
+        </article>
+
+        <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px;display:grid;gap:12px">
+          <div>
+            <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Integration diagnostics':'Chẩn đoán tích hợp'}</div>
+            <p style="margin:8px 0 0;color:#52667a;line-height:1.6">${lang==='en'
+              ? 'Use these cards to judge whether manual mode is still necessary or whether Epicor / CNC links are healthy enough to rely on.'
+              : 'Dùng các thẻ này để đánh giá xem có còn cần chế độ nhập tay hay không, hoặc Epicor / CNC đã đủ khỏe để dựa vào kết nối hay chưa.'}</p>
+          </div>
+
+          <div style="padding:14px;border-radius:16px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
+            <div style="font-size:12px;color:#486581">Epicor</div>
+            <div style="margin-top:6px;font-size:22px;font-weight:700;color:#102a43">${epicorHealth.configured ? (lang==='en'?'Configured':'Đã cấu hình') : (lang==='en'?'Not configured':'Chưa cấu hình')}</div>
+            <div style="margin-top:6px;font-size:13px;color:#52667a">${epicorHealth.dry_run ? (lang==='en'?'Dry-run is active while transport is incomplete.':'Đang ở chế độ dry-run khi transport chưa cấu hình đủ.') : (lang==='en'?'Live transport is active.':'Transport thực đang hoạt động.')}</div>
+            <div style="margin-top:8px;font-size:12px;color:#52667a">${lang==='en'?'Company':'Company'}: ${escapeHtml(String(epicorHealth.company || '-'))} · Plant: ${escapeHtml(String(epicorHealth.plant || '-'))}</div>
+          </div>
+
+          <div style="padding:14px;border-radius:16px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
+            <div style="font-size:12px;color:#486581">${lang==='en'?'CNC connectors':'Kết nối CNC'}</div>
+            <div style="margin-top:6px;font-size:22px;font-weight:700;color:#102a43">${escapeHtml(String(connectorKpis.connectors_healthy || 0))}/${escapeHtml(String(connectorKpis.connectors_total || 0))} ${lang==='en'?'healthy':'ổn định'}</div>
+            <div style="margin-top:6px;font-size:13px;color:#52667a">${lang==='en'?'Manual bridges':'Manual bridge'}: ${escapeHtml(String(connectorKpis.manual_bridges || 0))} · ${lang==='en'?'Stale links':'Link stale'}: ${escapeHtml(String(connectorKpis.connectors_stale || 0))}</div>
+          </div>
+
+          <div style="padding:14px;border-radius:16px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
+            <div style="font-size:12px;color:#486581">${lang==='en'?'Shadow observability':'Quan sát shadow'}</div>
+            <div style="margin-top:6px;font-size:22px;font-weight:700;color:#102a43">${escapeHtml(String(shadowFailures))} ${lang==='en'?'failures':'lỗi'}</div>
+            <div style="margin-top:6px;font-size:13px;color:#52667a">${lang==='en'?'JSON fallback reads':'Lượt fallback về JSON'}: ${escapeHtml(String(fallbackReads))}</div>
+            <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'Last config update':'Lần lưu cấu hình gần nhất'}: ${escapeHtml(adminFormatRuntimeStamp((cfgRes.override_meta || {}).updated || ''))}</div>
+          </div>
+        </article>
+      </section>
+
+      <div class="admin-save-bar" id="admin-data-source-save-bar" style="${adminDataSourceState.dirty ? 'display:flex' : 'display:none'}">
+        <span class="save-hint"><b>⚠ ${lang==='en'?'Unsaved data source changes':'Có thay đổi nguồn dữ liệu chưa lưu'}</b></span>
+        <button class="btn-admin secondary" onclick="adminDataSourceResetDraft()">${lang==='en'?'Reset draft':'Khôi phục bản nháp'}</button>
+        <button class="btn-admin primary" onclick="saveAdminDataSourceConfig()">${adminDataSourceState.loading ? (lang==='en'?'Saving...':'Đang lưu...') : (lang==='en'?'Save configuration':'Lưu cấu hình')}</button>
+      </div>
+    </div>`;
 }
 
 function renderAdminUsers(){
@@ -2874,15 +6079,15 @@ function renderAdminUsers(){
   const deptMap = {};
   DEPARTMENTS.forEach(d=>deptMap[d.code]=d);
   
-  const viewToggle = `<div style="display:flex;border:1px solid #d1d5db;border-radius:6px;overflow:hidden">
-    <button onclick="adminUserViewMode='cards';renderAdminUsers()" style="padding:5px 10px;font-size:11px;border:none;cursor:pointer;background:${adminUserViewMode==='cards'?'#1565c0':'#fff'};color:${adminUserViewMode==='cards'?'#fff':'#666'};transition:all .15s" title="Card view">&#9638;</button>
-    <button onclick="adminUserViewMode='list';renderAdminUsers()" style="padding:5px 10px;font-size:11px;border:none;border-left:1px solid #d1d5db;cursor:pointer;background:${adminUserViewMode==='list'?'#1565c0':'#fff'};color:${adminUserViewMode==='list'?'#fff':'#666'};transition:all .15s" title="List view">☰</button>
+  const viewToggle = `<div style="display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--bg-surface,#fff)">
+    <button onclick="adminUserViewMode='cards';renderAdminUsers()" style="padding:5px 10px;font-size:11px;border:none;cursor:pointer;background:${adminUserViewMode==='cards'?'var(--brand-2)':'var(--bg-surface,#fff)'};color:${adminUserViewMode==='cards'?'var(--text-inverse,#fff)':'var(--text-secondary,#666)'};transition:all .15s" title="Card view">&#9638;</button>
+    <button onclick="adminUserViewMode='list';renderAdminUsers()" style="padding:5px 10px;font-size:11px;border:none;border-left:1px solid var(--border);cursor:pointer;background:${adminUserViewMode==='list'?'var(--brand-2)':'var(--bg-surface,#fff)'};color:${adminUserViewMode==='list'?'var(--text-inverse,#fff)':'var(--text-secondary,#666)'};transition:all .15s" title="List view">☰</button>
   </div>`;
 
   let usersHtml = '';
   if(adminUserViewMode === 'list'){
     usersHtml = `<div style="overflow-x:auto"><table class="admin-table" id="user-list-table" style="width:100%;font-size:12px">
-      <thead><tr style="background:#f8fafc">
+      <thead><tr style="background:var(--bg-surface-alt,#f8fafc)">
         <th style="padding:8px 10px;text-align:left;font-size:11px">#</th>
         <th style="padding:8px 10px;text-align:left;font-size:11px">${lang==='en'?'Status':'TT'}</th>
         <th style="padding:8px 10px;text-align:left;font-size:11px">${lang==='en'?'Name':'Họ tên'}</th>
@@ -2896,14 +6101,14 @@ function renderAdminUsers(){
       ${USERS.map((u,idx) => {
         const r = ROLES[u.role];
         const dept = deptMap[u.dept];
-        return `<tr class="user-list-row" data-name="${escapeHtml((u.name||'').toLowerCase())}" data-dept="${escapeHtml(u.dept||'')}" style="border-bottom:1px solid #f1f3f5;${u.active===false?'opacity:.5;background:#fef2f2':''}">
+        return `<tr class="user-list-row" data-name="${escapeHtml((u.name||'').toLowerCase())}" data-dept="${escapeHtml(u.dept||'')}" style="border-bottom:1px solid color-mix(in srgb, var(--border) 78%, transparent);${u.active===false?'opacity:.5;background:color-mix(in srgb, var(--red) 8%, var(--bg-surface,#fff))':''}">
           <td style="padding:6px 10px;color:var(--text-3)">${idx+1}</td>
           <td style="padding:6px 10px">${u.active!==false?'🟢':'🔴'}</td>
           <td style="padding:6px 10px;font-weight:600">${escapeHtml(u.name)}</td>
           <td style="padding:6px 10px;font-family:var(--mono);font-size:11px;color:var(--text-3)">@${escapeHtml(u.username)}</td>
-          <td style="padding:6px 10px"><span style="font-size:10px;padding:2px 6px;border-radius:4px;background:${dept?dept.color+'15':'#f1f3f5'};color:${dept?dept.color:'#666'}">${u.dept}${dept?' '+(lang==='en'?dept.labelEn:dept.label):''}</span></td>
+          <td style="padding:6px 10px"><span style="font-size:10px;padding:2px 6px;border-radius:4px;background:${dept?dept.color+'15':'var(--bg-surface-alt,#f1f3f5)'};color:${dept?dept.color:'var(--text-secondary,#666)'}">${u.dept}${dept?' '+(lang==='en'?dept.labelEn:dept.label):''}</span></td>
           <td style="padding:6px 10px;font-size:11px">${escapeHtml(u.title)}</td>
-          <td style="padding:6px 10px"><span style="font-size:10px;padding:2px 6px;border-radius:4px;background:${r?r.color+'15':'#f1f3f5'};color:${r?r.color:'#666'}">${r?r.icon:''} ${r?r.label:u.role}</span></td>
+          <td style="padding:6px 10px"><span style="font-size:10px;padding:2px 6px;border-radius:4px;background:${r?r.color+'15':'var(--bg-surface-alt,#f1f3f5)'};color:${r?r.color:'var(--text-secondary,#666)'}">${r?r.icon:''} ${r?r.label:u.role}</span></td>
           <td style="padding:6px 10px;text-align:center;white-space:nowrap">
             <button onclick="showUserModal('${u.id}')" class="btn-admin secondary sm" style="padding:3px 8px;font-size:10px">✏</button>
             <button onclick="editUserPerms('${u.id}')" class="btn-admin secondary sm" style="padding:3px 8px;font-size:10px">🔐</button>
@@ -2932,7 +6137,7 @@ function renderAdminUsers(){
           </div>
           <div class="uc-meta">
             <span class="tag" style="background:${colorBg}15;color:${colorBg}">${r?r.icon:''} ${r?r.label:u.role}</span>
-            <span class="tag" style="background:${dept?dept.color+'15':'#f1f3f5'};color:${dept?dept.color:'#666'}">${u.dept} ${dept?(lang==='en'?dept.labelEn:dept.label):''}</span>
+            <span class="tag" style="background:${dept?dept.color+'15':'var(--bg-surface-alt,#f1f3f5)'};color:${dept?dept.color:'var(--text-secondary,#666)'}">${u.dept} ${dept?(lang==='en'?dept.labelEn:dept.label):''}</span>
           </div>
           <div class="uc-actions">
             <button onclick="showUserModal('${u.id}')">✏ ${T('admin_edit')}</button>
@@ -2948,7 +6153,7 @@ function renderAdminUsers(){
   el.innerHTML = `
     <div class="admin-toolbar">
       <input type="text" placeholder="${lang==='en'?'Search users...':'Tìm người dùng...'}" oninput="filterAdminUserCards(this.value)" id="admin-user-search">
-      <select id="admin-user-dept-filter" onchange="filterAdminUserCards(document.getElementById('admin-user-search').value)" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;min-width:140px">
+      <select id="admin-user-dept-filter" onchange="filterAdminUserCards(document.getElementById('admin-user-search').value)" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;min-width:140px;background:var(--bg-surface,#fff);color:var(--text-primary)">
         <option value="">${lang==='en'?'All departments':'Tất cả phòng ban'}</option>
         ${DEPARTMENTS.map(d=>`<option value="${d.code}">${d.code} — ${lang==='en'?d.labelEn:d.label}</option>`).join('')}
       </select>
@@ -3179,13 +6384,13 @@ async function deleteUserConfirm(userId){
       </div>
       <div class="modal-body" style="padding:20px 24px;display:flex;flex-direction:column;gap:12px">
         <div style="font-size:12px;color:var(--text-2);margin-bottom:4px">@${escapeHtml(u.username)} · ${escapeHtml(u.dept)} · ${escapeHtml(u.title)}</div>
-        <button onclick="doSoftDeleteUser('${u.id}')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:2px solid #fde68a;border-radius:10px;cursor:pointer;background:#fffbeb;text-align:left;width:100%;font-family:var(--font);transition:all .15s" onmouseover="this.style.borderColor='#fbbf24'" onmouseout="this.style.borderColor='#fde68a'">
+        <button onclick="doSoftDeleteUser('${u.id}')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:2px solid color-mix(in srgb, var(--amber) 28%, var(--border));border-radius:10px;cursor:pointer;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));text-align:left;width:100%;font-family:var(--font);transition:all .15s" onmouseover="this.style.borderColor='var(--amber)'" onmouseout="this.style.borderColor='color-mix(in srgb, var(--amber) 28%, var(--border))'">
           <span style="font-size:22px">⏸</span>
-          <div><div style="font-size:13px;font-weight:700;color:#92400e">${lang==='en'?'Deactivate (Soft delete)':'Vô hiệu hóa (Xóa mềm)'}</div><div style="font-size:11px;color:#a16207;margin-top:2px">${lang==='en'?'User becomes inactive but data is preserved. Can be reactivated later.':'Người dùng bị khóa nhưng dữ liệu được giữ lại. Có thể kích hoạt lại sau.'}</div></div>
+          <div><div style="font-size:13px;font-weight:700;color:var(--amber)">${lang==='en'?'Deactivate (Soft delete)':'Vô hiệu hóa (Xóa mềm)'}</div><div style="font-size:11px;color:color-mix(in srgb, var(--amber) 72%, var(--text-secondary));margin-top:2px">${lang==='en'?'User becomes inactive but data is preserved. Can be reactivated later.':'Người dùng bị khóa nhưng dữ liệu được giữ lại. Có thể kích hoạt lại sau.'}</div></div>
         </button>
-        <button onclick="doHardDeleteUser('${u.id}','${escapeHtml(u.username)}','${escapeHtml(u.name)}')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:2px solid #fecaca;border-radius:10px;cursor:pointer;background:#fef2f2;text-align:left;width:100%;font-family:var(--font);transition:all .15s" onmouseover="this.style.borderColor='#f87171'" onmouseout="this.style.borderColor='#fecaca'">
+        <button onclick="doHardDeleteUser('${u.id}','${escapeHtml(u.username)}','${escapeHtml(u.name)}')" style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:2px solid color-mix(in srgb, var(--red) 28%, var(--border));border-radius:10px;cursor:pointer;background:color-mix(in srgb, var(--red) 10%, var(--bg-surface,#fff));text-align:left;width:100%;font-family:var(--font);transition:all .15s" onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='color-mix(in srgb, var(--red) 28%, var(--border))'">
           <span style="font-size:22px">🗑</span>
-          <div><div style="font-size:13px;font-weight:700;color:#991b1b">${lang==='en'?'Delete permanently':'Xóa hoàn toàn'}</div><div style="font-size:11px;color:#b91c1c;margin-top:2px">${lang==='en'?'Completely removes the user from the system. This action cannot be undone.':'Xóa hoàn toàn người dùng khỏi hệ thống. Hành động này không thể hoàn tác.'}</div></div>
+          <div><div style="font-size:13px;font-weight:700;color:var(--red)">${lang==='en'?'Delete permanently':'Xóa hoàn toàn'}</div><div style="font-size:11px;color:color-mix(in srgb, var(--red) 72%, var(--text-secondary));margin-top:2px">${lang==='en'?'Completely removes the user from the system. This action cannot be undone.':'Xóa hoàn toàn người dùng khỏi hệ thống. Hành động này không thể hoàn tác.'}</div></div>
         </button>
       </div>
     </div>`;
@@ -3534,7 +6739,7 @@ function downloadLoginInfoFromModal(){
 
 
 function closeModal(){
-  ['user-modal','perm-modal','create-doc-modal','dict-modal','delete-user-modal'].forEach(id=>{
+  ['user-modal','perm-modal','create-doc-modal','dict-modal','delete-user-modal','git-sync-modal'].forEach(id=>{
     const m=document.getElementById(id);
     if(m) m.remove();
   });
@@ -3664,7 +6869,7 @@ function editUserPerms(userId){
       ${lang==='en'?'Base access':'Quyền mặc định'}: <b>${roleDocs==='ALL'?DOCS.length:DOCS.filter(d=>docMatchesRole(d.code,u.role)).length}</b>/${DOCS.length} |
       ${lang==='en'?'Check/uncheck to override role defaults':'Đánh dấu/bỏ đánh dấu để ghi đè quyền mặc định'}
     </div>
-    <div style="max-height:55vh;overflow-y:auto;border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px">
+    <div style="max-height:55vh;overflow-y:auto;border:1px solid var(--border);border-radius:6px;padding:8px 12px;background:var(--bg-surface,#fff)">
       ${catHtml}
     </div>
     <div class="modal-actions">
@@ -3773,7 +6978,7 @@ function renderAdminPerms(){
   el.innerHTML=`
     <div class="perm-grid">
       <div class="pg-sidebar">
-        <div style="padding:8px 12px;font-size:10px;font-weight:700;color:var(--text-3);border-bottom:1px solid #e2e8f0">${lang==='en'?'SELECT ROLE':'CHỌN VAI TRÒ'}</div>
+        <div style="padding:8px 12px;font-size:10px;font-weight:700;color:var(--text-3);border-bottom:1px solid var(--border)">${lang==='en'?'SELECT ROLE':'CHỌN VAI TRÒ'}</div>
         ${roleEntries.map(([k,v])=>{
           const cnt=ROLE_DOCS[k]==='ALL'?DOCS.length:DOCS.filter(d=>docMatchesRole(d.code,k)).length;
           return `<div class="pg-role-item ${adminEditRole===k?'active':''}" onclick="adminEditRole='${k}';renderAdminPerms()">
@@ -3915,16 +7120,16 @@ function renderAdminDeptTitle(){
     ])
   ]);
 
-  const body=el('div',{style:'margin-top:12px;border:1px solid var(--ln);border-radius:14px;background:#fff;overflow:hidden;'},[]);
-  const tree=el('div',{style:'padding:10px;display:flex;flex-direction:column;gap:8px;background:#f8fafc;'},[]);
+  const body=el('div',{style:'margin-top:12px;border:1px solid var(--border,var(--ln));border-radius:14px;background:var(--bg-surface,#fff);overflow:hidden;'},[]);
+  const tree=el('div',{style:'padding:10px;display:flex;flex-direction:column;gap:8px;background:var(--bg-surface-alt,#f8fafc);'},[]);
 
   DEPARTMENTS.forEach(d=>{
     const titles=titlesForDept(d.code)||[];
     const usersInDept = USERS.filter(u=>u.dept===d.code).length;
-    const folder=el('details',{open:true,class:'fm-folder',style:`border:1px solid ${d.color}33;background:#fff;border-radius:12px;overflow:hidden;`},[]);
-    const summary=el('summary',{style:'list-style:none;cursor:pointer;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(180deg,#fff,#f8fafc);'},[
+    const folder=el('details',{open:true,class:'fm-folder',style:`border:1px solid color-mix(in srgb, ${d.color} 24%, var(--border));background:var(--bg-surface,#fff);border-radius:12px;overflow:hidden;`},[]);
+    const summary=el('summary',{style:'list-style:none;cursor:pointer;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(180deg,var(--bg-surface,#fff),var(--bg-surface-alt,#f8fafc));'},[
       el('div',{style:'display:flex;align-items:center;gap:10px;'},[
-        el('div',{class:'fm-icon',style:`width:36px;height:36px;border-radius:10px;background:${d.color}18;border:1px solid ${d.color}40;display:flex;align-items:center;justify-content:center;font-size:18px;color:${d.color};`},'📁'),
+        el('div',{class:'fm-icon',style:`width:36px;height:36px;border-radius:10px;background:${d.color}18;border:1px solid color-mix(in srgb, ${d.color} 28%, var(--border));display:flex;align-items:center;justify-content:center;font-size:18px;color:${d.color};`},'📁'),
         el('div',{},[
           el('div',{style:'font-weight:800;'},`${d.code} — ${d.label}`),
           el('div',{class:'muted',style:'margin-top:2px;font-size:11px;'},`${titles.length} chức danh • ${usersInDept} người dùng`)
@@ -3957,22 +7162,22 @@ function renderAdminDeptTitle(){
     ]);
     folder.appendChild(summary);
 
-    const list=el('div',{style:'padding:8px 10px 10px;display:flex;flex-direction:column;gap:6px;background:#fff;'},[]);
+    const list=el('div',{style:'padding:8px 10px 10px;display:flex;flex-direction:column;gap:6px;background:var(--bg-surface,#fff);'},[]);
     if(!titles.length){
       list.appendChild(el('div',{class:'muted',style:'padding:8px 10px;'},'Chưa có chức danh trong phòng ban này.'));
     }else{
       titles.forEach(t=>{
         const count = USERS.filter(u=>u.dept===d.code && u.title===t).length;
-        const row=el('div',{class:'fm-file-row',style:'display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--ln);border-radius:10px;background:#f8fafc;'},[
+        const row=el('div',{class:'fm-file-row',style:'display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--border,var(--ln));border-radius:10px;background:var(--bg-surface-alt,#f8fafc);'},[
           el('div',{style:'display:flex;align-items:center;gap:10px;min-width:0;'},[
-            el('div',{class:'fm-file-icon',style:'width:30px;height:34px;display:flex;align-items:center;justify-content:center;background:#e0e7ff;border:1px solid #c7d2fe;border-radius:8px;font-size:15px;'},'📄'),
+            el('div',{class:'fm-file-icon',style:'width:30px;height:34px;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--brand-2) 24%, var(--border));border-radius:8px;font-size:15px;'},'📄'),
             el('div',{style:'min-width:0;'},[
               el('div',{style:'font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'},t),
               el('div',{class:'muted',style:'font-size:11px;margin-top:1px;'},`${d.code}/${t}`)
             ])
           ]),
           el('div',{style:'display:flex;align-items:center;gap:6px;flex-wrap:wrap;'},[
-            el('span',{style:'font-size:10px;padding:2px 8px;border-radius:999px;background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe;'},`${count} user`+(count===1?'':'s')),
+            el('span',{style:'font-size:10px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));color:var(--brand-2);border:1px solid color-mix(in srgb, var(--brand-2) 24%, var(--border));'},`${count} user`+(count===1?'':'s')),
             el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();
               const nt=(prompt('Đổi tên chức danh:',t)||'').trim();
               if(!nt||nt===t)return;
@@ -4122,7 +7327,7 @@ function renderAdminOrgChart(){
     
     // Connector line between levels
     if(li < levels.length - 1){
-      chartHtml += '<div style="width:2px;height:20px;background:#d1d5db;margin:0 auto"></div>';
+      chartHtml += '<div style="width:2px;height:20px;background:var(--border);margin:0 auto"></div>';
     }
     
     chartHtml += '</div>';
@@ -4143,7 +7348,7 @@ function renderAdminOrgChart(){
         ?'Auto-generated from user database. Grouped by role level and department.'
         :'Tự động tạo từ cơ sở dữ liệu người dùng. Nhóm theo cấp vai trò và phòng ban.'}
     </div>
-    <div style="border:1px solid #e2e8f0;border-radius:10px;overflow:auto;background:#fafbfc;max-height:600px">
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:auto;background:var(--bg-surface-alt,#fafbfc);max-height:600px">
       ${chartHtml}
     </div>
     <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
@@ -4181,7 +7386,7 @@ function renderAdminActivity(){
       <div style="display:flex;gap:8px;align-items:center">
         <button class="btn-admin secondary" onclick="document.getElementById('ds-panel').style.display=document.getElementById('ds-panel').style.display==='none'?'':'none'">⚙️ ${lang==='en'?'Settings':'Cài đặt'}</button>
       <div style="display:flex;gap:8px;align-items:center">
-        <select id="activity-user-filter" onchange="filterActivityLog()" style="padding:5px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:11px">
+        <select id="activity-user-filter" onchange="filterActivityLog()" style="padding:5px 10px;border:1px solid var(--border);border-radius:6px;font-size:11px;background:var(--bg-surface,#fff);color:var(--text-primary)">
           <option value="">${lang==='en'?'All users':'Tất cả'}</option>
           ${uniqueUsers.map(u=>`<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`).join('')}
         </select>
@@ -4189,8 +7394,8 @@ function renderAdminActivity(){
         <button class="btn-admin danger" onclick="clearActivityLog()">🗑 ${lang==='en'?'Clear':'Xóa log'}</button>
       </div>
     </div>
-    <div id="ds-panel" style="display:none;margin-bottom:16px;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;background:#fff">
-      <div style="padding:12px 16px;font-weight:700;font-size:13px;background:#f8fafc;border-bottom:1px solid #e2e8f0">⚙️ ${lang==='en'?'Data Collection Settings':'Cài đặt Thu thập Dữ liệu'}</div>
+    <div id="ds-panel" style="display:none;margin-bottom:16px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--bg-surface,#fff)">
+      <div style="padding:12px 16px;font-weight:700;font-size:13px;background:var(--bg-surface-alt,#f8fafc);border-bottom:1px solid var(--border)">⚙️ ${lang==='en'?'Data Collection Settings':'Cài đặt Thu thập Dữ liệu'}</div>
       ${(function(){
         const items=[
           {k:'collect_gps',i:'📍',v:'Tọa độ GPS',e:'GPS',dv:'Nếu tắt, người dùng không cần cho phép vị trí khi đăng nhập.',de:'If OFF, users skip location permission on login.'},
@@ -4205,23 +7410,23 @@ function renderAdminActivity(){
           const on=src[it.k];
           const lb=lang==='en'?it.e:it.v;
           const dc=lang==='en'?it.de:it.dv;
-          return `<div data-ds-key="${it.k}" style="display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-bottom:1px solid #f1f3f5">
+          return `<div data-ds-key="${it.k}" style="display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-bottom:1px solid color-mix(in srgb, var(--border) 78%, transparent)">
             <label style="position:relative;display:inline-block;width:44px;min-width:44px;height:24px;cursor:pointer">
               <input type="checkbox" ${on?"checked":""} onchange="toggleDataSetting('${it.k}',this.checked)" style="opacity:0;width:0;height:0;position:absolute">
-              <span class="ds-track" style="position:absolute;top:0;left:0;right:0;bottom:0;background:${on?"#10b981":"#d1d5db"};border-radius:24px;transition:.3s"></span>
-              <span class="ds-knob" style="position:absolute;height:18px;width:18px;left:${on?"22px":"3px"};bottom:3px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>
+              <span class="ds-track" style="position:absolute;top:0;left:0;right:0;bottom:0;background:${on?"var(--green)":"var(--border)"};border-radius:24px;transition:.3s"></span>
+              <span class="ds-knob" style="position:absolute;height:18px;width:18px;left:${on?"22px":"3px"};bottom:3px;background:var(--bg-surface,#fff);border-radius:50%;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>
             </label>
             <div style="flex:1"><div style="font-weight:700;font-size:13px">${it.i} ${lb}</div><div style="font-size:11px;color:var(--text-3);margin-top:2px">${dc}</div></div>
           </div>`;
         }).join('');
       })()}
-      <div id="ds-action-bar" style="display:${DATA_SETTINGS_DRAFT?'flex':'none'};padding:10px 14px;gap:8px;justify-content:flex-end;background:#fffbeb;border-top:1px solid #fde68a">
+      <div id="ds-action-bar" style="display:${DATA_SETTINGS_DRAFT?'flex':'none'};padding:10px 14px;gap:8px;justify-content:flex-end;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border-top:1px solid color-mix(in srgb, var(--amber) 28%, var(--border))">
         <button class="btn-admin secondary" onclick="cancelDataSettingsDraft()" style="padding:6px 16px;font-size:12px">↩ ${lang==='en'?'Cancel':'Hủy'}</button>
         <button class="btn-admin primary" onclick="saveDataSettingsDraft()" style="padding:6px 16px;font-size:12px">💾 ${lang==='en'?'Save':'Lưu'}</button>
       </div>
-      <div style="padding:10px 14px;background:#f0f7ff;font-size:11px;color:#1e40af">💡 ${lang==='en'?'Toggle options then click Save. Changes take effect on next login.':'Bật/tắt tùy chọn rồi nhấn Lưu. Thay đổi có hiệu lực từ lần đăng nhập kế.'}</div>
+      <div style="padding:10px 14px;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));font-size:11px;color:var(--brand-2)">💡 ${lang==='en'?'Toggle options then click Save. Changes take effect on next login.':'Bật/tắt tùy chọn rồi nhấn Lưu. Thay đổi có hiệu lực từ lần đăng nhập kế.'}</div>
     </div>
-    <div style="font-size:11px;color:var(--text-3);margin-bottom:12px;padding:10px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px">
+    <div style="font-size:11px;color:var(--text-3);margin-bottom:12px;padding:10px;background:color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--amber) 28%, var(--border));border-radius:8px">
       🛡 <b>${lang==='en'?'Security Audit Log':'Nhật ký Kiểm toán Bảo mật'}:</b> 
       ${lang==='en'
         ?'Records session data: login time, IP, GPS coordinates, device fingerprint, detailed page-by-page navigation with exact timestamps and viewing duration.'
@@ -4240,15 +7445,15 @@ function renderAdminActivity(){
               <div style="display:flex;align-items:center;gap:8px;flex:1;flex-wrap:wrap">
                 <span style="font-weight:700;font-size:12px;color:var(--text)">${escapeHtml(s.name||s.user)}</span>
                 <span style="font-family:var(--mono);font-size:10px;color:var(--text-3)">@${escapeHtml(s.user)}</span>
-                <span style="font-size:9px;padding:1px 6px;border-radius:6px;background:#e3f2fd;color:#1565c0">${escapeHtml(s.role||'')}</span>
+                <span style="font-size:9px;padding:1px 6px;border-radius:6px;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));color:var(--brand-2)">${escapeHtml(s.role||'')}</span>
                 <span style="font-size:10px;color:var(--text-2)">🕐 ${dateStr}</span>
               </div>
-              <button class="btn-admin secondary sm" onclick="this.parentElement.parentElement.querySelector('.al-detail').style.display=this.parentElement.parentElement.querySelector('.al-detail').style.display==='none'?'':'none';this.textContent=this.textContent.includes('â–¾')?'â–´ Thu gọn':'â–¾ Chi tiết'">
+              <button class="btn-admin secondary sm" onclick="this.parentElement.parentElement.querySelector('.al-detail').style.display=this.parentElement.parentElement.querySelector('.al-detail').style.display==='none'?'':'none';this.textContent=this.textContent.includes('▾')?'▴ Thu gọn':'▾ Chi tiết'">
                 ▾ ${lang==='en'?'Detail':'Chi tiết'}
               </button>
             </div>
             <!-- Summary row -->
-            <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:10px;color:var(--text-3);margin:6px 0;padding:8px;background:#f8fafc;border-radius:6px">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:10px;color:var(--text-3);margin:6px 0;padding:8px;background:var(--bg-surface-alt,#f8fafc);border-radius:6px">
               <span>🌐 <b>IP:</b> ${escapeHtml(s.ip||'—')}</span>
               <span>📍 <b>GPS:</b> ${escapeHtml(s.location||'—')} ${s.location_accuracy&&s.location_accuracy!=='—'?'(±'+escapeHtml(s.location_accuracy)+')':''}</span>
               <span>📱 <b>${lang==='en'?'Device':'Thiết bị'}:</b> ${escapeHtml(s.device_short||s.platform||'—')}</span>
@@ -4260,11 +7465,11 @@ function renderAdminActivity(){
             </div>
             <!-- Detailed page-by-page log (hidden by default) -->
             <div class="al-detail" style="display:none">
-              <div style="font-size:10px;font-weight:700;margin:8px 0 6px;color:var(--text-2);border-bottom:1px solid #e2e8f0;padding-bottom:4px">
+              <div style="font-size:10px;font-weight:700;margin:8px 0 6px;color:var(--text-2);border-bottom:1px solid var(--border);padding-bottom:4px">
                 📋 ${lang==='en'?'Page-by-page navigation log':'Nhật ký điều hướng từng trang'} (${totalPages} ${lang==='en'?'entries':'mục'})
               </div>
               <table style="width:100%;border-collapse:collapse;font-size:10px">
-                <thead><tr style="background:#f0f7ff">
+                <thead><tr style="background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff))">
                   <th style="text-align:left;padding:4px 8px;font-weight:600;color:var(--text-2)">#</th>
                   <th style="text-align:left;padding:4px 8px;font-weight:600;color:var(--text-2)">${lang==='en'?'Page / Document':'Trang / Tài liệu'}</th>
                   <th style="text-align:left;padding:4px 8px;font-weight:600;color:var(--text-2)">${lang==='en'?'Started viewing':'Bắt đầu xem'}</th>
@@ -4278,7 +7483,7 @@ function renderAdminActivity(){
                   const leftStr = p.left_at ? new Date(p.left_at).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '—';
                   const isDoc = (p.page_id||p.page||'').startsWith('doc/');
                   const durColor = (p.duration_sec||0) > 300 ? '#dc2626' : (p.duration_sec||0) > 60 ? '#d97706' : '#16a34a';
-                  return `<tr style="border-bottom:1px solid #f1f3f5">
+                  return `<tr style="border-bottom:1px solid color-mix(in srgb, var(--border) 78%, transparent)">
                     <td style="padding:3px 8px;color:var(--text-3)">${pi+1}</td>
                     <td style="padding:3px 8px">
                       ${isDoc?'📄':'📁'} <b>${escapeHtml(p.page_title||p.page_id||p.page||'—')}</b>
@@ -4291,7 +7496,7 @@ function renderAdminActivity(){
                 }).join('')}
                 </tbody>
               </table>
-              <div style="margin-top:8px;font-size:9px;color:var(--text-3);padding:6px 8px;background:#f8fafc;border-radius:4px">
+              <div style="margin-top:8px;font-size:9px;color:var(--text-3);padding:6px 8px;background:var(--bg-surface-alt,#f8fafc);border-radius:4px">
                 <b>Full User-Agent:</b> ${escapeHtml(s.device||'—')}<br>
                 <b>Language:</b> ${escapeHtml(s.language||'—')} · <b>Cookies:</b> ${s.cookies_enabled?'Yes':'No'} · <b>Online:</b> ${s.online?'Yes':'No'}
               </div>
@@ -4394,7 +7599,7 @@ function renderAdminRoles(){
               </td>
               <td>
                 <div style="display:flex;align-items:center;gap:6px">
-                  <div style="flex:1;background:#e2e8f0;border-radius:3px;height:8px;overflow:hidden">
+                  <div style="flex:1;background:var(--bg-surface-alt,#e2e8f0);border:1px solid color-mix(in srgb, var(--border) 65%, transparent);border-radius:3px;height:8px;overflow:hidden">
                     <div style="width:${pct}%;height:100%;background:${v.color};border-radius:3px"></div>
                   </div>
                   <span style="font-size:10px;font-family:var(--mono);min-width:50px">${cnt}/${DOCS.length}</span>
@@ -4410,14 +7615,14 @@ function renderAdminRoles(){
         </tbody>
       </table>
     </div>
-    <div style="margin-top:16px;border-top:1px solid #e2e8f0;padding-top:16px">
+    <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px">
       <h3 style="font-size:13px;font-weight:700;margin-bottom:10px">${lang==='en'?'Reassign User Role':'Thay đổi vai trò người dùng'}</h3>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <select id="role-reassign-user" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;min-width:180px">
+        <select id="role-reassign-user" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;min-width:180px;background:var(--bg-surface,#fff);color:var(--text-primary)">
           ${USERS.filter(u=>u.active).map(u=>'<option value="'+u.id+'">'+u.name+' ('+u.role+')</option>').join('')}
         </select>
         <span style="font-size:11px;color:var(--text-3)">→</span>
-        <select id="role-reassign-role" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;min-width:180px">
+        <select id="role-reassign-role" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;min-width:180px;background:var(--bg-surface,#fff);color:var(--text-primary)">
           ${roleOpts}
         </select>
         <button class="btn-admin primary" onclick="reassignUserRole()">${lang==='en'?'Apply':'Áp dụng'}</button>
