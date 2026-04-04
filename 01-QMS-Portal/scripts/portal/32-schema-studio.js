@@ -101,7 +101,9 @@ var STORE = {
   browser: {
     open: true,
     filter: '',
-    expandedDomains: {}
+    expandedDomains: {},
+    hiddenDomains: {},
+    isolatedDomain: ''
   },
   codePanel: {
     open: false,
@@ -408,7 +410,9 @@ function saveUiPrefs(){
     localStorage.setItem(UI_PREFS_KEY, JSON.stringify({
       browser: {
         open: STORE.browser.open,
-        expandedDomains: STORE.browser.expandedDomains
+        expandedDomains: STORE.browser.expandedDomains,
+        hiddenDomains: STORE.browser.hiddenDomains,
+        isolatedDomain: STORE.browser.isolatedDomain
       }
     }));
   }catch(err){}
@@ -431,6 +435,12 @@ function applyUiPrefs(prefs){
     }
     if(prefs.browser.expandedDomains && typeof prefs.browser.expandedDomains === 'object'){
       STORE.browser.expandedDomains = _clone(prefs.browser.expandedDomains);
+    }
+    if(prefs.browser.hiddenDomains && typeof prefs.browser.hiddenDomains === 'object'){
+      STORE.browser.hiddenDomains = _clone(prefs.browser.hiddenDomains);
+    }
+    if(typeof prefs.browser.isolatedDomain === 'string'){
+      STORE.browser.isolatedDomain = prefs.browser.isolatedDomain;
     }
   }
 }
@@ -2379,8 +2389,21 @@ var Browser = {
   },
 
   onFilter: function(value){
+    var activeInput = document.activeElement;
+    var keepFocus = !!(activeInput && activeInput.classList && activeInput.classList.contains('ss-browser-search'));
+    var selStart = keepFocus && typeof activeInput.selectionStart === 'number' ? activeInput.selectionStart : null;
+    var selEnd = keepFocus && typeof activeInput.selectionEnd === 'number' ? activeInput.selectionEnd : selStart;
     STORE.browser.filter = value || '';
     Browser.render();
+    if(keepFocus && refs.browser){
+      var nextInput = refs.browser.querySelector('.ss-browser-search');
+      if(nextInput){
+        nextInput.focus();
+        if(selStart !== null && typeof nextInput.setSelectionRange === 'function'){
+          nextInput.setSelectionRange(selStart, selEnd);
+        }
+      }
+    }
   },
 
   toggleDomain: function(domain){
@@ -2922,7 +2945,17 @@ var Validator = {
 
   closePanel: function(){
     STORE.mode = 'canvas';
-    renderShell();
+    STORE.validation.ran = false;
+    if(refs.validationPanel){
+      refs.validationPanel.innerHTML = '';
+      refs.validationPanel.style.display = 'none';
+    }
+    if(refs.toolbar){
+      renderToolbar(refs.toolbar);
+    }
+    if(refs.modeIndicator){
+      refs.modeIndicator.textContent = _t('Chế độ', 'Mode') + ': ' + modeLabel('canvas');
+    }
   }
 };
 
