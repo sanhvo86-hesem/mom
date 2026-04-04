@@ -212,6 +212,8 @@ class SchemaStudioController extends BaseController
                 'name' => 'Registry Import',
                 'version' => '1.0.0',
                 'description' => 'Imported from qms-data/registry',
+                'source' => 'registry',
+                'validation_profile' => 'logical_registry',
                 'createdAt' => $this->nowIso(),
                 'updatedAt' => $this->nowIso(),
                 'author' => 'registry',
@@ -235,6 +237,7 @@ class SchemaStudioController extends BaseController
             $tableMap[$tableName] = $tableId;
             $columns = [];
             $rawColumns = $tableDef['columns'] ?? [];
+            $pkFields = $this->normalizeFieldList($tableDef['primaryKey'] ?? ($tableDef['primaryKeys'] ?? []));
             foreach ($rawColumns as $columnName => $columnDef) {
                 $name = is_string($columnName) ? $columnName : (is_array($columnDef) ? (string)($columnDef['name'] ?? '') : (string)$columnDef);
                 if ($name === '') {
@@ -244,6 +247,10 @@ class SchemaStudioController extends BaseController
                 $colMap[$tableName . '.' . $name] = $colId;
                 $isIdentifier = $this->endsWith($name, '_id') || $name === 'id';
                 $type = is_array($columnDef) ? (string)($columnDef['type'] ?? ($isIdentifier ? 'uuid' : 'varchar')) : ($isIdentifier ? 'uuid' : 'varchar');
+                $isPk = !empty($pkFields) ? in_array($name, $pkFields, true) : $name === 'id';
+                $pkOrder = $isPk ? array_search($name, $pkFields, true) : false;
+                $required = is_array($columnDef) && array_key_exists('required', $columnDef) ? (bool)$columnDef['required'] : null;
+                $defaultVal = is_array($columnDef) && array_key_exists('default', $columnDef) ? $columnDef['default'] : null;
                 $columns[] = [
                     'id' => $colId,
                     'name' => $name,
@@ -251,15 +258,15 @@ class SchemaStudioController extends BaseController
                     'length' => null,
                     'scale' => null,
                     'is_array' => false,
-                    'nullable' => !in_array($name, ['id', 'created_at'], true),
-                    'unique' => false,
-                    'primary_key' => $name === 'id',
-                    'pk_order' => $name === 'id' ? 1 : null,
-                    'default_val' => $name === 'id' ? 'uuid_generate_v4()' : (($name === 'created_at' || $name === 'updated_at') ? 'now()' : null),
+                    'nullable' => $required === null ? !in_array($name, ['id', 'created_at'], true) : !$required,
+                    'unique' => is_array($columnDef) ? (bool)($columnDef['unique'] ?? false) : false,
+                    'primary_key' => $isPk,
+                    'pk_order' => $isPk ? (($pkOrder === false ? 0 : (int)$pkOrder) + 1) : null,
+                    'default_val' => $defaultVal !== null ? (string)$defaultVal : ($isPk && $type === 'UUID' ? 'uuid_generate_v4()' : (($name === 'created_at' || $name === 'updated_at') ? 'now()' : null)),
                     'check_expr' => null,
                     'generated_expr' => null,
                     'generated_stored' => false,
-                    'comment' => is_array($columnDef) ? (string)($columnDef['label'] ?? $columnDef['comment'] ?? '') : '',
+                    'comment' => is_array($columnDef) ? (string)($columnDef['description'] ?? $columnDef['label'] ?? $columnDef['comment'] ?? '') : '',
                     'foreign_key' => null,
                 ];
             }

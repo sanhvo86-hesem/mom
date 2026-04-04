@@ -2755,12 +2755,23 @@ var Validator = {
     var schema = STORE.schema;
     var results = [];
     var tableNames = {};
+    var meta = schema && schema._meta ? schema._meta : {};
+    var validationProfile = String(meta.validation_profile || '').toLowerCase();
+    var isRegistrySchema = validationProfile === 'logical_registry' || String(meta.source || '').toLowerCase().indexOf('registry') >= 0;
+    var lifecycleColumns = ['created_at', 'updated_at', 'recorded_at', 'logged_at', 'event_time', 'posted_at', 'issued_at'];
     Validator._fixes = {};
     if(!schema){
       STORE.validation.results = [];
       STORE.validation.ran = true;
       Validator.renderPanel();
       return [];
+    }
+    if(isRegistrySchema){
+      Validator.addResult(results, {
+        level:'info',
+        code:'I00',
+        msg:_t('Đang kiểm tra schema ở chế độ registry logic. Một số rule vật lý như index và timestamp đã được giảm bớt.', 'Validating this schema in logical registry mode. Some physical rules like indexes and timestamps are softened.')
+      });
     }
     (schema.tables || []).forEach(function(tbl){
       if(tableNames[tbl.name]){
@@ -2809,7 +2820,7 @@ var Validator = {
           var indexed = (tbl.indexes || []).some(function(idx){
             return (idx.columns || []).some(function(ic){ return ic.name === col.name; });
           });
-          if(!indexed){
+          if(!indexed && !isRegistrySchema){
             Validator.addResult(results, { level:'warning', code:'W04', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('FK chưa được index: ' + tbl.name + '.' + col.name, 'FK is not indexed: ' + tbl.name + '.' + col.name) }, function(){
               pushUndo();
               tbl.indexes = tbl.indexes || [];
@@ -2820,7 +2831,7 @@ var Validator = {
               Validator.run();
             });
           }
-          if(col.nullable && (!col.foreign_key.on_delete || col.foreign_key.on_delete === 'NO ACTION')){
+          if(!isRegistrySchema && col.nullable && (!col.foreign_key.on_delete || col.foreign_key.on_delete === 'NO ACTION')){
             Validator.addResult(results, { level:'warning', code:'W05', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('FK nullable chưa có ON DELETE: ' + tbl.name + '.' + col.name, 'Nullable FK missing ON DELETE: ' + tbl.name + '.' + col.name) });
           }
         }
@@ -2828,15 +2839,15 @@ var Validator = {
           var hasGin = (tbl.indexes || []).some(function(idx){
             return String(idx.type || '').toUpperCase() === 'GIN' && (idx.columns || []).some(function(ic){ return ic.name === col.name; });
           });
-          if(!hasGin){
+          if(!hasGin && !isRegistrySchema){
             Validator.addResult(results, { level:'warning', code:'W06', tableId:tbl.id, colId:col.id, table:tbl.name, col:col.name, msg:_t('jsonb chưa có GIN index: ' + tbl.name + '.' + col.name, 'jsonb missing GIN index: ' + tbl.name + '.' + col.name) });
           }
         }
       });
-      if((tbl.columns || []).length > 15 && !(tbl.indexes || []).length){
+      if(!isRegistrySchema && (tbl.columns || []).length > 15 && !(tbl.indexes || []).length){
         Validator.addResult(results, { level:'warning', code:'W07', tableId:tbl.id, table:tbl.name, msg:_t('Bảng lớn nhưng chưa có index: ' + tbl.name, 'Large table has no indexes: ' + tbl.name) });
       }
-      if(!(tbl.columns || []).some(function(col){ return col.name === 'created_at'; }) || !(tbl.columns || []).some(function(col){ return col.name === 'updated_at'; })){
+      if(!isRegistrySchema && !(tbl.columns || []).some(function(col){ return lifecycleColumns.indexOf(String(col.name || '').toLowerCase()) >= 0; })){
         Validator.addResult(results, { level:'warning', code:'W01', tableId:tbl.id, table:tbl.name, msg:_t('Bảng thiếu created_at/updated_at: ' + tbl.name, 'Table missing created_at/updated_at: ' + tbl.name) }, function(){
           pushUndo();
           if(!(tbl.columns || []).some(function(col){ return col.name === 'created_at'; })){
