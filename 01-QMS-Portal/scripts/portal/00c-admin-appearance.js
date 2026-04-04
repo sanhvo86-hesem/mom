@@ -443,18 +443,18 @@ function renderColors(){
     + colorPick('Darkest', '--brand-dark', 'brand.darkest', '#0a1e32')
     + colorPick('Accent', '--accent', 'brand.accent', '#f9a825')
     + colorPick('Accent Light', '--accent-light', 'brand.accentLight', '#fdd835')
-    + colorPick('Sidebar', '--bg-sidebar', 'brand.sidebarBg', '#0c2d48')
+    + colorPick('Sidebar', '--bg-sidebar-light', 'brand.sidebarBg', '#0c2d48')
   , true);
 
   h += sect('🚦 '+T('status')+' (Light + Dark)',
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
     +'<div><strong style="font-size:11px;color:var(--text-secondary)">LIGHT</strong>'
-    + colorPick('Success', '--green', 'statusColors.success', '#16a34a')
-    + colorPick('Error', '--red', 'statusColors.error', '#dc2626')
-    + colorPick('Warning', '--amber', 'statusColors.warning', '#d97706')
-    + colorPick('Info', '--blue', 'statusColors.info', '#2563eb')
-    + colorPick('Purple', '--purple', 'statusColors.purple', '#7c3aed')
-    + colorPick('Cyan', '--cyan', 'statusColors.cyan', '#0891b2')
+    + colorPick('Success', '--green-light', 'statusColors.success', '#16a34a')
+    + colorPick('Error', '--red-light', 'statusColors.error', '#dc2626')
+    + colorPick('Warning', '--amber-light', 'statusColors.warning', '#d97706')
+    + colorPick('Info', '--blue-light', 'statusColors.info', '#2563eb')
+    + colorPick('Purple', '--purple-light', 'statusColors.purple', '#7c3aed')
+    + colorPick('Cyan', '--cyan-light', 'statusColors.cyan', '#0891b2')
     +'</div><div><strong style="font-size:11px;color:var(--text-secondary)">DARK</strong>'
     + colorPick('Success', '--green-dark', 'statusColorsDark.success', '#22c55e')
     + colorPick('Error', '--red-dark', 'statusColorsDark.error', '#f87171')
@@ -466,46 +466,51 @@ function renderColors(){
   , false);
 
   h += sect('☀️ '+T('surfacesLight'),
-    colorPick('Page BG', '--bg-page', 'colorsLight.bgPage', '#f8fafc')
-    + colorPick('Surface', '--bg-surface', 'colorsLight.bgSurface', '#ffffff')
-    + colorPick('Surface Alt', '--bg-surface-alt', 'colorsLight.bgSurfaceAlt', '#f1f5f9')
-    + colorPick('Header', '--bg-header', 'colorsLight.bgHeader', '#ffffff')
-    + colorPick('Modal', '--bg-modal', 'colorsLight.bgModal', '#ffffff')
-    + colorPick('Hover', '--bg-hover', 'colorsLight.bgHover', '#f8fafc')
+    colorPick('Page BG', '--bg-page-light', 'colorsLight.bgPage', '#f8fafc')
+    + colorPick('Surface', '--bg-surface-light', 'colorsLight.bgSurface', '#ffffff')
+    + colorPick('Surface Alt', '--bg-surface-alt-light', 'colorsLight.bgSurfaceAlt', '#f1f5f9')
+    + colorPick('Header', '--bg-header-light', 'colorsLight.bgHeader', '#ffffff')
+    + colorPick('Modal', '--bg-modal-light', 'colorsLight.bgModal', '#ffffff')
+    + colorPick('Hover', '--bg-hover-light', 'colorsLight.bgHover', '#f8fafc')
   , false);
 
   h += sect('🌙 '+T('surfacesDark'),
-    colorPick('Page BG Dark', '--bg-page', 'colorsDark.bgPage', '#0f172a')
-    + colorPick('Surface Dark', '--bg-surface', 'colorsDark.bgSurface', '#1e293b')
-    + colorPick('Surface Alt Dark', '--bg-surface-alt', 'colorsDark.bgSurfaceAlt', '#162032')
-    + colorPick('Header Dark', '--bg-header', 'colorsDark.bgHeader', '#1e293b')
-    + colorPick('Hover Dark', '--bg-hover', 'colorsDark.bgHover', '#263348')
-    + colorPick('Sidebar Dark', '--bg-sidebar', 'colorsDark.sidebarBg', '#0a1628')
+    colorPick('Page BG Dark', '--bg-page-dark', 'colorsDark.bgPage', '#0f172a')
+    + colorPick('Surface Dark', '--bg-surface-dark', 'colorsDark.bgSurface', '#1e293b')
+    + colorPick('Surface Alt Dark', '--bg-surface-alt-dark', 'colorsDark.bgSurfaceAlt', '#162032')
+    + colorPick('Header Dark', '--bg-header-dark', 'colorsDark.bgHeader', '#1e293b')
+    + colorPick('Modal Dark', '--bg-modal-dark', 'colorsDark.bgModal', '#1e293b')
+    + colorPick('Hover Dark', '--bg-hover-dark', 'colorsDark.bgHover', '#263348')
+    + colorPick('Sidebar Dark', '--bg-sidebar-dark', 'colorsDark.sidebarBg', '#0a1628')
   , false);
 
   h += sect('📝 '+T('textLight'),
-    colorPick('Primary', '--text-primary', 'colorsLight.textPrimary', '#1e293b')
-    + colorPick('Secondary', '--text-secondary', 'colorsLight.textSecondary', '#64748b')
-    + colorPick('Muted', '--text-tertiary', 'colorsLight.textTertiary', '#94a3b8')
-    + colorPick('Link', '--text-link', 'colorsLight.textLink', '#1565c0')
-    + colorPick('Inverse', '--text-inverse', 'colorsLight.textInverse', '#ffffff')
+    colorPick('Primary', '--text-primary-light', 'colorsLight.textPrimary', '#1e293b')
+    + colorPick('Secondary', '--text-secondary-light', 'colorsLight.textSecondary', '#64748b')
+    + colorPick('Muted', '--text-tertiary-light', 'colorsLight.textTertiary', '#94a3b8')
+    + colorPick('Link', '--text-link-light', 'colorsLight.textLink', '#1565c0')
+    + colorPick('Inverse', '--text-inverse-light', 'colorsLight.textInverse', '#ffffff')
   , false);
 
   h += sect('📝 '+T('textDark'),
-    colorPick('Primary Dark', '--text-primary', 'colorsDark.textPrimary', '#f1f5f9')
-    + colorPick('Secondary Dark', '--text-secondary', 'colorsDark.textSecondary', '#94a3b8')
-    + colorPick('Muted Dark', '--text-tertiary', 'colorsDark.textTertiary', '#64748b')
-    + colorPick('Link Dark', '--text-link', 'colorsDark.textLink', '#60a5fa')
+    colorPick('Primary Dark', '--text-primary-dark', 'colorsDark.textPrimary', '#f1f5f9')
+    + colorPick('Secondary Dark', '--text-secondary-dark', 'colorsDark.textSecondary', '#94a3b8')
+    + colorPick('Muted Dark', '--text-tertiary-dark', 'colorsDark.textTertiary', '#64748b')
+    + colorPick('Inverse Dark', '--text-inverse-dark', 'colorsDark.textInverse', '#0f172a')
+    + colorPick('Link Dark', '--text-link-dark', 'colorsDark.textLink', '#60a5fa')
   , false);
 
   h += sect('🔲 '+T('borders'),
     '<strong style="font-size:11px">Light</strong>'
-    + colorPick('Border', '--border', 'colorsLight.border', '#e2e8f0')
-    + colorPick('Focus', '--border-focus', 'colorsLight.borderFocus', '#1565c0')
-    + colorPick('Error', '--border-error', 'colorsLight.borderError', '#dc2626')
+    + colorPick('Border', '--border-light', 'colorsLight.border', '#e2e8f0')
+    + colorPick('Focus', '--border-focus-light', 'colorsLight.borderFocus', '#1565c0')
+    + colorPick('Error', '--border-error-light', 'colorsLight.borderError', '#dc2626')
+    + colorPick('Success', '--border-success-light', 'colorsLight.borderSuccess', '#16a34a')
     + '<strong style="font-size:11px;margin-top:8px;display:block">Dark</strong>'
-    + colorPick('Border Dark', '--border', 'colorsDark.border', '#334155')
-    + colorPick('Focus Dark', '--border-focus', 'colorsDark.borderFocus', '#60a5fa')
+    + colorPick('Border Dark', '--border-dark', 'colorsDark.border', '#334155')
+    + colorPick('Focus Dark', '--border-focus-dark', 'colorsDark.borderFocus', '#60a5fa')
+    + colorPick('Error Dark', '--border-error-dark', 'colorsDark.borderError', '#f87171')
+    + colorPick('Success Dark', '--border-success-dark', 'colorsDark.borderSuccess', '#22c55e')
   , false);
 
   return h;

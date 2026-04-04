@@ -92,40 +92,40 @@
   --gray-900: #0f172a;
 
   /* ── STATUS COLORS ─────────────────────────────────────────────────────── */
-  --green:    #16a34a;
+  --green:    var(--green-light);
   --green-bg: rgba(22,163,74,0.08);
   --green-light: #16a34a;
   --green-dark:  #22c55e;
-  --red:      #dc2626;
+  --red:      var(--red-light);
   --red-bg:   rgba(220,38,38,0.08);
   --red-light: #dc2626;
   --red-dark:  #f87171;
-  --amber:    #d97706;
+  --amber:    var(--amber-light);
   --amber-bg: rgba(217,119,6,0.08);
   --amber-light: #d97706;
   --amber-dark:  #fbbf24;
-  --blue:     #2563eb;
+  --blue:     var(--blue-light);
   --blue-bg:  rgba(37,99,235,0.08);
   --blue-light: #2563eb;
   --blue-dark:  #60a5fa;
-  --purple:   #7c3aed;
+  --purple:   var(--purple-light);
   --purple-bg:rgba(124,58,237,0.08);
   --purple-light: #7c3aed;
   --purple-dark:  #a78bfa;
-  --cyan:     #0891b2;
+  --cyan:     var(--cyan-light);
   --cyan-bg:  rgba(8,145,178,0.08);
   --cyan-light: #0891b2;
   --cyan-dark:  #22d3ee;
 
   /* ── SEMANTIC: SURFACE ─────────────────────────────────────────────────── */
-  --bg-page:        var(--gray-50);
-  --bg-surface:     #ffffff;
-  --bg-surface-alt: var(--gray-100);
-  --bg-sidebar:     var(--brand);
-  --bg-header:      #ffffff;
-  --bg-modal:       #ffffff;
+  --bg-page:        var(--bg-page-light);
+  --bg-surface:     var(--bg-surface-light);
+  --bg-surface-alt: var(--bg-surface-alt-light);
+  --bg-sidebar:     var(--bg-sidebar-light);
+  --bg-header:      var(--bg-header-light);
+  --bg-modal:       var(--bg-modal-light);
   --bg-overlay:     rgba(0,0,0,0.4);
-  --bg-hover:       var(--gray-50);
+  --bg-hover:       var(--bg-hover-light);
   --bg-selected:    rgba(37,99,235,0.06);
   --bg-page-light:        var(--gray-50);
   --bg-surface-light:     #ffffff;
@@ -143,11 +143,11 @@
   --bg-hover-dark:        #263348;
 
   /* ── SEMANTIC: TEXT ─────────────────────────────────────────────────────── */
-  --text-primary:   var(--gray-800);
-  --text-secondary: var(--gray-500);
-  --text-tertiary:  var(--gray-400);
-  --text-inverse:   #ffffff;
-  --text-link:      var(--brand-2);
+  --text-primary:   var(--text-primary-light);
+  --text-secondary: var(--text-secondary-light);
+  --text-tertiary:  var(--text-tertiary-light);
+  --text-inverse:   var(--text-inverse-light);
+  --text-link:      var(--text-link-light);
   --text-error:     var(--red);
   --text-success:   var(--green);
   --text-warning:   var(--amber);
@@ -163,10 +163,10 @@
   --text-link-dark:       #60a5fa;
 
   /* ── SEMANTIC: BORDER ──────────────────────────────────────────────────── */
-  --border:         var(--gray-200);
-  --border-focus:   var(--brand-2);
-  --border-error:   var(--red);
-  --border-success: var(--green);
+  --border:         var(--border-light);
+  --border-focus:   var(--border-focus-light);
+  --border-error:   var(--border-error-light);
+  --border-success: var(--border-success-light);
   --border-light:         var(--gray-200);
   --border-focus-light:   var(--brand-2);
   --border-error-light:   var(--red);

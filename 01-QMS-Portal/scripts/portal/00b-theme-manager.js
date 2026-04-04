@@ -184,22 +184,15 @@ function _applyCustomVars(){
   _setVar('--brand-dark', cfg, 'brand.darkest');
   _setVar('--accent', cfg, 'brand.accent');
   _setVar('--accent-light', cfg, 'brand.accentLight');
-  _setVar('--bg-sidebar', cfg, 'brand.sidebarBg');
   _setVar('--bg-sidebar-light', cfg, 'brand.sidebarBg');
   _setVar('--bg-sidebar-dark', cfg, 'colorsDark.sidebarBg');
 
   /* Status colors — light + dark variants */
-  _setVar('--green', cfg, 'statusColors.success');
   _setVar('--green-light', cfg, 'statusColors.success');
-  _setVar('--red', cfg, 'statusColors.error');
   _setVar('--red-light', cfg, 'statusColors.error');
-  _setVar('--amber', cfg, 'statusColors.warning');
   _setVar('--amber-light', cfg, 'statusColors.warning');
-  _setVar('--blue', cfg, 'statusColors.info');
   _setVar('--blue-light', cfg, 'statusColors.info');
-  _setVar('--purple', cfg, 'statusColors.purple');
   _setVar('--purple-light', cfg, 'statusColors.purple');
-  _setVar('--cyan', cfg, 'statusColors.cyan');
   _setVar('--cyan-light', cfg, 'statusColors.cyan');
   _setVar('--green-dark', cfg, 'statusColorsDark.success');
   _setVar('--red-dark', cfg, 'statusColorsDark.error');
@@ -209,17 +202,11 @@ function _applyCustomVars(){
   _setVar('--cyan-dark', cfg, 'statusColorsDark.cyan');
 
   /* Light theme semantic tokens + light/dark variants */
-  _setVar('--bg-page', cfg, 'colorsLight.bgPage');
   _setVar('--bg-page-light', cfg, 'colorsLight.bgPage');
-  _setVar('--bg-surface', cfg, 'colorsLight.bgSurface');
   _setVar('--bg-surface-light', cfg, 'colorsLight.bgSurface');
-  _setVar('--bg-surface-alt', cfg, 'colorsLight.bgSurfaceAlt');
   _setVar('--bg-surface-alt-light', cfg, 'colorsLight.bgSurfaceAlt');
-  _setVar('--bg-header', cfg, 'colorsLight.bgHeader');
   _setVar('--bg-header-light', cfg, 'colorsLight.bgHeader');
-  _setVar('--bg-modal', cfg, 'colorsLight.bgModal');
   _setVar('--bg-modal-light', cfg, 'colorsLight.bgModal');
-  _setVar('--bg-hover', cfg, 'colorsLight.bgHover');
   _setVar('--bg-hover-light', cfg, 'colorsLight.bgHover');
   _setVar('--bg-page-dark', cfg, 'colorsDark.bgPage');
   _setVar('--bg-surface-dark', cfg, 'colorsDark.bgSurface');
@@ -229,15 +216,10 @@ function _applyCustomVars(){
   _setVar('--bg-hover-dark', cfg, 'colorsDark.bgHover');
 
   /* Text — light + dark variants */
-  _setVar('--text-primary', cfg, 'colorsLight.textPrimary');
   _setVar('--text-primary-light', cfg, 'colorsLight.textPrimary');
-  _setVar('--text-secondary', cfg, 'colorsLight.textSecondary');
   _setVar('--text-secondary-light', cfg, 'colorsLight.textSecondary');
-  _setVar('--text-tertiary', cfg, 'colorsLight.textTertiary');
   _setVar('--text-tertiary-light', cfg, 'colorsLight.textTertiary');
-  _setVar('--text-link', cfg, 'colorsLight.textLink');
   _setVar('--text-link-light', cfg, 'colorsLight.textLink');
-  _setVar('--text-inverse', cfg, 'colorsLight.textInverse');
   _setVar('--text-inverse-light', cfg, 'colorsLight.textInverse');
   _setVar('--text-primary-dark', cfg, 'colorsDark.textPrimary');
   _setVar('--text-secondary-dark', cfg, 'colorsDark.textSecondary');
@@ -246,13 +228,9 @@ function _applyCustomVars(){
   _setVar('--text-link-dark', cfg, 'colorsDark.textLink');
 
   /* Borders — light + dark variants */
-  _setVar('--border', cfg, 'colorsLight.border');
   _setVar('--border-light', cfg, 'colorsLight.border');
-  _setVar('--border-focus', cfg, 'colorsLight.borderFocus');
   _setVar('--border-focus-light', cfg, 'colorsLight.borderFocus');
-  _setVar('--border-error', cfg, 'colorsLight.borderError');
   _setVar('--border-error-light', cfg, 'colorsLight.borderError');
-  _setVar('--border-success', cfg, 'colorsLight.borderSuccess');
   _setVar('--border-success-light', cfg, 'colorsLight.borderSuccess');
   _setVar('--border-dark', cfg, 'colorsDark.border');
   _setVar('--border-focus-dark', cfg, 'colorsDark.borderFocus');
