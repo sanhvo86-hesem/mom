@@ -1,15 +1,15 @@
 {
   "_meta": {
     "version": "4.0",
-    "generatedAt": "2026-04-04T05:58:56.754Z",
+    "generatedAt": "2026-04-04T11:03:25.080Z",
     "description": "Canonical data field registry rebuilt from table-registry coverage, orphan field normalization, and full migration-backed schema validation.",
     "sourceEndpointCount": 3,
-    "generatedEndpointCount": 2303,
-    "uniqueFieldKeys": 4068,
-    "uniqueDbColumnNamesCovered": 3645,
-    "totalDbTableColumnsCovered": 6991,
-    "baselineUniqueColumnCoverage": 3645,
-    "migrationCount": 69,
+    "generatedEndpointCount": 2338,
+    "uniqueFieldKeys": 4012,
+    "uniqueDbColumnNamesCovered": 3701,
+    "totalDbTableColumnsCovered": 10339,
+    "baselineUniqueColumnCoverage": 3701,
+    "migrationCount": 70,
     "researchReferences": [
       {
         "key": "sap_inspection_lot",
@@ -183,7 +183,7 @@
     ]
   },
   "split": true,
-  "lineCount": 403742,
+  "lineCount": 626259,
   "parts": [
     {
       "file": "data-fields-part1.json",
@@ -218,7 +218,7 @@
     },
     {
       "file": "data-fields-part2.json",
-      "endpointCount": 959,
+      "endpointCount": 994,
       "domains": [
         "tooling_lifecycle",
         "demand_supply_planning",

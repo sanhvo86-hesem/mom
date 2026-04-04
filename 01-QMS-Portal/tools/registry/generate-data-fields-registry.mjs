@@ -1,4 +1,4 @@
-import fs from 'node:fs';
+﻿import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -15,33 +15,33 @@ const docsDir = path.join(portalRoot, 'docs');
 const generatedAt = new Date().toISOString();
 
 const viTokens = {
-  account: 'tài khoản', actual: 'thực tế', action: 'hành động', alert: 'cảnh báo', analysis: 'phân tích',
-  approver: 'người phê duyệt', audit: 'đánh giá', batch: 'lô', book: 'đặt hàng', branch: 'nhánh',
-  capacity: 'năng lực', certificate: 'chứng chỉ', code: 'mã', company: 'công ty', compliance: 'tuân thủ',
-  confidence: 'độ tin cậy', contract: 'hợp đồng', cost: 'chi phí', count: 'số lượng', customer: 'khách hàng',
-  cycle: 'chu kỳ', date: 'ngày', defect: 'lỗi', delivery: 'giao hàng', department: 'phòng ban',
-  detail: 'chi tiết', dimension: 'kích thước', disposition: 'xử lý', document: 'tài liệu', due: 'đến hạn',
-  email: 'email', end: 'kết thúc', equipment: 'thiết bị', event: 'sự kiện', evidence: 'bằng chứng',
-  field: 'trường', file: 'tệp', formula: 'công thức', from: 'từ', genealogy: 'phả hệ', hold: 'tạm giữ',
-  id: 'mã', inspection: 'kiểm tra', issue: 'vấn đề', item: 'mã hàng', job: 'lệnh', joined: 'liên kết',
-  label: 'nhãn', line: 'dòng', list: 'danh sách', lot: 'lô', message: 'thông điệp', metadata: 'siêu dữ liệu',
-  metric: 'chỉ số', month: 'tháng', name: 'tên', next: 'kế tiếp', note: 'ghi chú', number: 'số',
-  operation: 'công đoạn', order: 'đơn hàng', outcome: 'kết quả', owner: 'chủ sở hữu', param: 'tham số',
-  passport: 'hộ chiếu', path: 'đường dẫn', pct: 'tỷ lệ', phase: 'giai đoạn', phone: 'điện thoại',
-  prediction: 'dự báo', price: 'giá', priority: 'ưu tiên', process: 'quy trình', quantity: 'số lượng',
-  quality: 'chất lượng', reason: 'lý do', record: 'hồ sơ', reference: 'tham chiếu', related: 'liên quan',
-  result: 'kết quả', review: 'xem xét', risk: 'rủi ro', routing: 'quy trình công nghệ', sales: 'bán hàng',
-  schedule: 'lịch', score: 'điểm', serial: 'số sê-ri', severity: 'mức độ nghiêm trọng', shipment: 'lô giao',
-  source: 'nguồn', start: 'bắt đầu', state: 'trạng thái', status: 'trạng thái', supplier: 'nhà cung cấp',
-  summary: 'tóm tắt', table: 'bảng', target: 'mục tiêu', time: 'thời gian', title: 'tiêu đề',
-  total: 'tổng', traceability: 'truy xuất', transition: 'chuyển trạng thái', type: 'loại', update: 'cập nhật',
-  user: 'người dùng', value: 'giá trị', version: 'phiên bản', warehouse: 'kho', workflow: 'luồng công việc',
+  account: 'tÃ i khoáº£n', actual: 'thá»±c táº¿', action: 'hÃ nh Ä‘á»™ng', alert: 'cáº£nh bÃ¡o', analysis: 'phÃ¢n tÃ­ch',
+  approver: 'ngÆ°á»i phÃª duyá»‡t', audit: 'Ä‘Ã¡nh giÃ¡', batch: 'lÃ´', book: 'Ä‘áº·t hÃ ng', branch: 'nhÃ¡nh',
+  capacity: 'nÄƒng lá»±c', certificate: 'chá»©ng chá»‰', code: 'mÃ£', company: 'cÃ´ng ty', compliance: 'tuÃ¢n thá»§',
+  confidence: 'Ä‘á»™ tin cáº­y', contract: 'há»£p Ä‘á»“ng', cost: 'chi phÃ­', count: 'sá»‘ lÆ°á»£ng', customer: 'khÃ¡ch hÃ ng',
+  cycle: 'chu ká»³', date: 'ngÃ y', defect: 'lá»—i', delivery: 'giao hÃ ng', department: 'phÃ²ng ban',
+  detail: 'chi tiáº¿t', dimension: 'kÃ­ch thÆ°á»›c', disposition: 'xá»­ lÃ½', document: 'tÃ i liá»‡u', due: 'Ä‘áº¿n háº¡n',
+  email: 'email', end: 'káº¿t thÃºc', equipment: 'thiáº¿t bá»‹', event: 'sá»± kiá»‡n', evidence: 'báº±ng chá»©ng',
+  field: 'trÆ°á»ng', file: 'tá»‡p', formula: 'cÃ´ng thá»©c', from: 'tá»«', genealogy: 'pháº£ há»‡', hold: 'táº¡m giá»¯',
+  id: 'mÃ£', inspection: 'kiá»ƒm tra', issue: 'váº¥n Ä‘á»', item: 'mÃ£ hÃ ng', job: 'lá»‡nh', joined: 'liÃªn káº¿t',
+  label: 'nhÃ£n', line: 'dÃ²ng', list: 'danh sÃ¡ch', lot: 'lÃ´', message: 'thÃ´ng Ä‘iá»‡p', metadata: 'siÃªu dá»¯ liá»‡u',
+  metric: 'chá»‰ sá»‘', month: 'thÃ¡ng', name: 'tÃªn', next: 'káº¿ tiáº¿p', note: 'ghi chÃº', number: 'sá»‘',
+  operation: 'cÃ´ng Ä‘oáº¡n', order: 'Ä‘Æ¡n hÃ ng', outcome: 'káº¿t quáº£', owner: 'chá»§ sá»Ÿ há»¯u', param: 'tham sá»‘',
+  passport: 'há»™ chiáº¿u', path: 'Ä‘Æ°á»ng dáº«n', pct: 'tá»· lá»‡', phase: 'giai Ä‘oáº¡n', phone: 'Ä‘iá»‡n thoáº¡i',
+  prediction: 'dá»± bÃ¡o', price: 'giÃ¡', priority: 'Æ°u tiÃªn', process: 'quy trÃ¬nh', quantity: 'sá»‘ lÆ°á»£ng',
+  quality: 'cháº¥t lÆ°á»£ng', reason: 'lÃ½ do', record: 'há»“ sÆ¡', reference: 'tham chiáº¿u', related: 'liÃªn quan',
+  result: 'káº¿t quáº£', review: 'xem xÃ©t', risk: 'rá»§i ro', routing: 'quy trÃ¬nh cÃ´ng nghá»‡', sales: 'bÃ¡n hÃ ng',
+  schedule: 'lá»‹ch', score: 'Ä‘iá»ƒm', serial: 'sá»‘ sÃª-ri', severity: 'má»©c Ä‘á»™ nghiÃªm trá»ng', shipment: 'lÃ´ giao',
+  source: 'nguá»“n', start: 'báº¯t Ä‘áº§u', state: 'tráº¡ng thÃ¡i', status: 'tráº¡ng thÃ¡i', supplier: 'nhÃ  cung cáº¥p',
+  summary: 'tÃ³m táº¯t', table: 'báº£ng', target: 'má»¥c tiÃªu', time: 'thá»i gian', title: 'tiÃªu Ä‘á»',
+  total: 'tá»•ng', traceability: 'truy xuáº¥t', transition: 'chuyá»ƒn tráº¡ng thÃ¡i', type: 'loáº¡i', update: 'cáº­p nháº­t',
+  user: 'ngÆ°á»i dÃ¹ng', value: 'giÃ¡ trá»‹', version: 'phiÃªn báº£n', warehouse: 'kho', workflow: 'luá»“ng cÃ´ng viá»‡c',
 };
 
 function readJson(filePath) { return JSON.parse(fs.readFileSync(filePath, 'utf8')); }
 function writeJson(filePath, value) { fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8'); }
 function toSnakeCase(value) { return String(value ?? '').replace(/([a-z0-9])([A-Z])/g, '$1_$2').replace(/[.\-\s/]+/g, '_').replace(/__+/g, '_').replace(/^_+|_+$/g, '').toLowerCase(); }
-function isVietnamese(label) { return /[àáảãạăắằẳẵặâấầẩẫậđèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵ]/i.test(label || ''); }
+function isVietnamese(label) { return /[Ã Ã¡áº£Ã£áº¡Äƒáº¯áº±áº³áºµáº·Ã¢áº¥áº§áº©áº«áº­Ä‘Ã¨Ã©áº»áº½áº¹Ãªáº¿á»á»ƒá»…á»‡Ã¬Ã­á»‰Ä©á»‹Ã²Ã³á»Ãµá»Ã´á»‘á»“á»•á»—á»™Æ¡á»›á»á»Ÿá»¡á»£Ã¹Ãºá»§Å©á»¥Æ°á»©á»«á»­á»¯á»±á»³Ã½á»·á»¹á»µ]/i.test(label || ''); }
 function humanize(key) { return englishLabelFromKey(key); }
 function viLabel(key) {
   return vietnameseLabelFromKeyV2(key);
@@ -99,9 +99,9 @@ function ensureMin(endpointKey, fields) {
   const items = uniqueFields(fields);
   if (items.length >= 3) return items;
   const fallback = [
-    { key: 'ok', label: 'Kết quả', labelEn: 'OK', type: 'boolean', required: false, filterable: false, sortable: false, group: 'status', source: 'param', constraints: {} },
-    { key: 'message', label: 'Thông điệp', labelEn: 'Message', type: 'textarea', required: false, filterable: false, sortable: false, group: 'general', source: 'param', constraints: { maxLength: 4000 } },
-    { key: 'server_time', label: 'Thời gian máy chủ', labelEn: 'Server Time', type: 'datetime', required: false, filterable: false, sortable: false, group: 'general', source: 'param', constraints: {} },
+    { key: 'ok', label: 'Káº¿t quáº£', labelEn: 'OK', type: 'boolean', required: false, filterable: false, sortable: false, group: 'status', source: 'param', constraints: {} },
+    { key: 'response_message', label: 'Response Message', labelEn: 'Response Message', type: 'textarea', required: false, filterable: false, sortable: false, group: 'general', source: 'param', constraints: { maxLength: 4000 } },
+    { key: 'server_time', label: 'Thá»i gian mÃ¡y chá»§', labelEn: 'Server Time', type: 'datetime', required: false, filterable: false, sortable: false, group: 'general', source: 'param', constraints: {} },
   ];
   const merged = uniqueFields([...items, ...fallback]);
   if (merged.length < 3) throw new Error(`Endpoint ${endpointKey} has fewer than 3 fields`);
@@ -148,24 +148,85 @@ function dbField(tableName, columnName, table, kind) {
   };
 }
 
+function joinDisplayCandidates(targetTable) {
+  const columns = Object.keys(targetTable.columns || {});
+  const preferred = [
+    'display_name',
+    'full_name',
+    'name',
+    'title',
+    'username',
+    'email',
+    ...columns.filter((c) => /(?:^|_)name$/.test(c) && !/_name_vi$/.test(c)),
+    ...columns.filter((c) => /(?:^|_)title$/.test(c) && !/_title_vi$/.test(c)),
+    ...columns.filter((c) => /(?:^|_)number$/.test(c)),
+    ...columns.filter((c) => /(?:^|_)code$/.test(c)),
+    ...columns.filter((c) => /(?:^|_)description$/.test(c)),
+    'description',
+    'code',
+    'number',
+  ];
+  const unique = [];
+  const seen = new Set();
+  for (const candidate of preferred) {
+    if (!candidate || !targetTable.columns[candidate] || seen.has(candidate)) continue;
+    seen.add(candidate);
+    unique.push(candidate);
+  }
+  const primaryKey = Array.isArray(targetTable.primaryKey) ? targetTable.primaryKey[0] : targetTable.primaryKey;
+  if (primaryKey && targetTable.columns[primaryKey] && !seen.has(primaryKey)) unique.push(primaryKey);
+  return unique;
+}
+
 function joinDisplayColumn(targetTable) {
-  const preferred = ['name', 'title', 'description', 'code', 'number', 'username', 'email', 'display_name', 'full_name'];
-  for (const candidate of preferred) if (targetTable.columns[candidate]) return candidate;
-  const alt = Object.keys(targetTable.columns).find((c) => /_number$/.test(c)) || Object.keys(targetTable.columns).find((c) => /_code$/.test(c));
-  return alt || (Array.isArray(targetTable.primaryKey) ? targetTable.primaryKey[0] : targetTable.primaryKey);
+  return joinDisplayCandidates(targetTable)[0] || null;
+}
+
+function compactJoinSuffix(displayKey, semanticBase) {
+  const base = toSnakeCase(semanticBase);
+  const display = toSnakeCase(displayKey);
+  if (display.startsWith(`${base}_`)) return display.slice(base.length + 1);
+  return display;
+}
+
+function joinFieldKey(fkColumn, displayColumn) {
+  const fkKey = toSnakeCase(fkColumn);
+  const displayKey = toSnakeCase(displayColumn);
+  const semanticBase = fkKey.replace(/_(id|code|number)$/, '');
+  const semanticRoot = displayKey.replace(/_(name|title|code|number|description)$/, '');
+  let candidate = `${semanticBase}_${displayKey}`;
+
+  if (displayKey === 'name') candidate = `${semanticBase}_name`;
+  else if (displayKey === 'title') candidate = `${semanticBase}_title`;
+  else if (displayKey === 'description') candidate = `${semanticBase}_description`;
+  else if (displayKey === 'username') candidate = `${semanticBase}_username`;
+  else if (displayKey === 'email') candidate = `${semanticBase}_email`;
+  else if (/(?:_name|_title|_code|_number)$/.test(displayKey) && (semanticBase === semanticRoot || semanticBase.endsWith(`_${semanticRoot}`))) {
+    candidate = `${semanticBase}_${displayKey.split('_').slice(-1)[0]}`;
+  }
+
+  if (
+    candidate === fkKey
+    || candidate === displayKey
+    || fkKey.endsWith(`_${displayKey}`)
+    || semanticBase.endsWith(`_${displayKey}`)
+    || columnIndex.has(candidate)
+  ) {
+    candidate = `${semanticBase}_lookup_${compactJoinSuffix(displayKey, semanticBase)}`;
+  }
+
+  return candidate;
 }
 
 function joinField(tableName, fk, targetName, targetTable, kind) {
   const displayColumn = joinDisplayColumn(targetTable);
   if (!displayColumn || !targetTable.columns[displayColumn]) return null;
-  const keyBase = String(fk.column).replace(/_id$/, '');
-  const key = `${toSnakeCase(keyBase)}_${toSnakeCase(displayColumn === 'name' ? 'name' : displayColumn)}`;
-  const displayMeta = targetTable.columns[displayColumn];
+  const key = joinFieldKey(fk.column, displayColumn);
   return {
     key,
-    label: `${targetTable.label} ${isVietnamese(displayMeta.label) ? displayMeta.label.toLowerCase() : viLabel(displayColumn).toLowerCase()}`.trim(),
-    labelEn: `${targetTable.labelEn} ${displayMeta.labelEn || humanize(displayColumn)}`.trim(),
-    type: fieldType(displayColumn, displayMeta.uiType, kind, targetTable.statusColumn),
+    label: viLabel(key),
+    labelEn: humanize(key),
+    type: fieldType(displayColumn, targetTable.columns[displayColumn].uiType, kind, targetTable.statusColumn),
     required: false,
     filterable: ['list', 'detail'].includes(kind),
     sortable: ['list', 'detail'].includes(kind),
@@ -221,8 +282,8 @@ for (const [tableName, table] of Object.entries(tables)) {
   if (table.statusColumn && table.statusSet) generated[`${table.domain}.${tableName}.transition`] = ensureMin(`${table.domain}.${tableName}.transition`, [
     dbField(tableName, Array.isArray(table.primaryKey) ? table.primaryKey[0] : table.primaryKey, table, 'detail'),
     dbField(tableName, table.statusColumn, table, 'detail'),
-    { key: 'next_status', label: 'Trạng thái kế tiếp', labelEn: 'Next Status', type: 'select', required: true, filterable: false, sortable: false, group: 'status', source: 'param', constraints: { enumRef: table.statusSet } },
-    { key: 'transition_note', label: 'Ghi chú chuyển trạng thái', labelEn: 'Transition Note', type: 'textarea', required: false, filterable: false, sortable: false, group: 'status', source: 'param', constraints: { maxLength: 2000 } },
+    { key: 'next_status', label: 'Tráº¡ng thÃ¡i káº¿ tiáº¿p', labelEn: 'Next Status', type: 'select', required: true, filterable: false, sortable: false, group: 'status', source: 'param', constraints: { enumRef: table.statusSet } },
+    { key: 'transition_note', label: 'Ghi chÃº chuyá»ƒn tráº¡ng thÃ¡i', labelEn: 'Transition Note', type: 'textarea', required: false, filterable: false, sortable: false, group: 'status', source: 'param', constraints: { maxLength: 2000 } },
   ]);
   for (const fk of table.foreignKeys) {
     const targetName = String(fk.references).split('.')[0];
@@ -237,10 +298,18 @@ for (const [tableName, table] of Object.entries(tables)) {
   generated[`${table.domain}.${tableName}.detail`] = uniqueFields(generated[`${table.domain}.${tableName}.detail`]);
 }
 
-generated['registry_support.computed.metrics'] = ensureMin('registry_support.computed.metrics', orphanComputed.map((e) => ({ key: e.key, label: viLabel(e.key), labelEn: humanize(e.key), type: fieldType(e.key, 'string', 'detail', null), required: false, filterable: false, sortable: true, group: fieldGroup(e.key, '', 'computed'), source: 'computed', formula: formulaFor(e.key, false), constraints: {} })));
-generated['registry_support.aggregate.metrics'] = ensureMin('registry_support.aggregate.metrics', orphanAggregate.map((e) => ({ key: e.key, label: viLabel(e.key), labelEn: humanize(e.key), type: fieldType(e.key, 'string', 'detail', null), required: false, filterable: false, sortable: true, group: fieldGroup(e.key, '', 'computed'), source: 'computed', formula: formulaFor(e.key, true), constraints: {} })));
-generated['registry_support.join.fields'] = ensureMin('registry_support.join.fields', orphanJoined.map((e) => { const r = resolveJoined(e); return { key: e.key, label: viLabel(e.key), labelEn: humanize(e.key), type: 'string', required: false, filterable: true, sortable: true, group: fieldGroup(e.key, r.dbTable, 'join'), source: 'join', dbTable: r.dbTable, dbColumn: r.dbColumn, joinVia: e.joinVia || null, constraints: {} }; }));
-generated['platform.runtime.params'] = ensureMin('platform.runtime.params', orphanParams.map((e) => ({ key: e.key, label: viLabel(e.key), labelEn: humanize(e.key), type: fieldType(e.key, 'string', 'detail', null), required: false, filterable: false, sortable: false, group: fieldGroup(e.key, '', 'param'), source: 'param', constraints: {} })));
+const reservedKeys = new Set();
+for (const fields of Object.values(generated)) {
+  for (const field of fields) {
+    if (['db_column', 'join', 'param'].includes(field.source)) reservedKeys.add(field.key);
+  }
+}
+const filterSyntheticCollisions = (entries) => entries.filter((entry) => !reservedKeys.has(entry.key));
+
+generated['registry_support.computed.metrics'] = ensureMin('registry_support.computed.metrics', filterSyntheticCollisions(orphanComputed).map((e) => ({ key: e.key, label: viLabel(e.key), labelEn: humanize(e.key), type: fieldType(e.key, 'string', 'detail', null), required: false, filterable: false, sortable: true, group: fieldGroup(e.key, '', 'computed'), source: 'computed', formula: formulaFor(e.key, false), constraints: {} })));
+generated['registry_support.aggregate.metrics'] = ensureMin('registry_support.aggregate.metrics', filterSyntheticCollisions(orphanAggregate).map((e) => ({ key: e.key, label: viLabel(e.key), labelEn: humanize(e.key), type: fieldType(e.key, 'string', 'detail', null), required: false, filterable: false, sortable: true, group: fieldGroup(e.key, '', 'computed'), source: 'computed', formula: formulaFor(e.key, true), constraints: {} })));
+generated['registry_support.join.fields'] = ensureMin('registry_support.join.fields', filterSyntheticCollisions(orphanJoined).map((e) => { const r = resolveJoined(e); return { key: e.key, label: viLabel(e.key), labelEn: humanize(e.key), type: 'string', required: false, filterable: true, sortable: true, group: fieldGroup(e.key, r.dbTable, 'join'), source: 'join', dbTable: r.dbTable, dbColumn: r.dbColumn, joinVia: e.joinVia || null, constraints: {} }; }));
+generated['platform.runtime.params'] = ensureMin('platform.runtime.params', filterSyntheticCollisions(orphanParams).map((e) => ({ key: e.key, label: viLabel(e.key), labelEn: humanize(e.key), type: fieldType(e.key, 'string', 'detail', null), required: false, filterable: false, sortable: false, group: fieldGroup(e.key, '', 'param'), source: 'param', constraints: {} })));
 
 const endpointKeys = Object.keys(generated);
 const uniqueKeys = new Set();

@@ -1,442 +1,331 @@
 {
-  "tables": 521,
-  "columns": 6991,
-  "field_keys": 4068,
-  "matched": 3645,
+  "tables": 528,
+  "columns": 10339,
+  "field_keys": 4012,
+  "matched": 3701,
   "missing_field_defs": [],
   "orphan_fields": {
     "computed": [],
-    "kpi": [
-      "kpi_dept_code"
-    ],
+    "kpi": [],
     "aggregate": [],
-    "joined": [],
-    "action_param": [],
-    "genuine": [
-      "account",
-      "accuracy_pct",
-      "accuracy_trend",
-      "acknowledged_by_username",
-      "action_owner_username",
-      "actor",
-      "actor_role",
-      "actor_username",
-      "actual_wms_storage_bin_bin_code",
-      "adapter_adapter_id",
-      "adjuster_username",
-      "after_head",
-      "alarm_code_alarm_code",
-      "alerts_this_week",
-      "anomalies_this_week",
-      "api",
-      "approved_alternate_item_description",
-      "approved_by_username",
+    "joined": [
+      "acknowledged_by_full_name",
+      "action_owner_full_name",
+      "actor_full_name",
+      "actual_wms_storage_bin_code",
+      "adapter_lookup_name",
+      "adjuster_full_name",
+      "alarm_lookup_title",
+      "approved_alternate_item_customer_part_number",
+      "approved_by_full_name",
       "apqp_title",
-      "aps_forecast_aps_forecast_id",
-      "aps_scenario_aps_scenario_id",
+      "aps_forecast_org_company_code",
+      "aps_scenario_name",
       "aps_schedule_block_job_number",
-      "area_area_id",
-      "assessed_by_username",
-      "assigned_by_username",
-      "assigned_internal_username",
-      "assigned_to_username",
-      "audit_audit_code",
-      "auditor",
-      "auditor_username",
-      "auth_expired",
-      "author_username",
+      "area_lookup_name",
+      "assessed_by_full_name",
+      "assigned_by_full_name",
+      "assigned_internal_full_name",
+      "assigned_to_full_name",
+      "audit_lookup_code",
+      "auditor_full_name",
+      "author_full_name",
       "awarded_quote_converted_so_number",
-      "backlog_value",
-      "base_scenario_aps_scenario_id",
-      "before_head",
-      "beneficiary_customer_default_incoterm_code",
-      "beneficiary_vendor_duns_number",
-      "blockCount",
+      "base_scenario_name",
+      "beneficiary_customer_name",
+      "beneficiary_vendor_name",
       "bom_id,bom_revision_eco_number",
-      "book_to_bill_ratio",
-      "branch",
-      "breakdown",
-      "breakdown_by_type",
-      "broker_broker_code",
-      "browser_language",
-      "buy_to_fly",
-      "by_customer",
-      "by_department",
-      "by_machine",
-      "by_operation",
-      "by_part",
-      "by_phase",
-      "by_product",
-      "by_rating",
-      "by_severity",
-      "calibration_number",
-      "calibration_record_cal_id",
-      "capa_capa_id",
-      "capa_number",
-      "capa_open",
+      "broker_lookup_name",
+      "calibration_record_org_company_code",
+      "capa_org_company_code",
       "capa_record_title",
-      "capacity",
-      "captured_by_username",
-      "chairperson_username",
-      "changed_by_username",
+      "captured_by_full_name",
+      "chairperson_full_name",
+      "changed_by_full_name",
       "child_record_title",
-      "code",
-      "com_contract_contract_number",
-      "com_price_list_currency_code",
-      "com_rebate_program_rebate_code",
-      "commit_date",
-      "commit_output",
-      "completed_by_username",
-      "completed_today",
-      "completion_pct",
-      "component_item_description",
-      "component_item_number",
+      "com_contract_number",
+      "com_price_list_name",
+      "com_rebate_program_org_company_code",
+      "company_lookup_name",
+      "completed_by_full_name",
+      "component_item_customer_part_number",
       "component_tool_catalog_number",
-      "condition_threshold_condition_threshold_id",
-      "confidence",
-      "confirmed_by_username",
-      "conflict_count",
-      "contact_person",
+      "condition_threshold_org_company_code",
+      "confirmed_by_full_name",
       "control_plan_title",
-      "conversion_rate",
-      "coordinator_username",
-      "cost_month",
-      "cost_per_part",
-      "count",
-      "cp_number",
-      "created_by_username",
-      "crm_account_account_number",
+      "coordinator_full_name",
+      "created_by_full_name",
+      "crm_account_name",
       "crm_contact_email",
       "crm_lead_email",
-      "crm_opportunity_opportunity_number",
-      "currency_code_currency_code",
-      "current_counter",
-      "current_user_dept",
-      "current_user_name",
-      "current_user_role",
-      "current_user_username",
-      "current_wear_pct",
-      "current_wms_storage_bin_bin_code",
-      "custody_count",
-      "custody_owner",
-      "customer_default_incoterm_code",
-      "customer_email",
-      "customer_name_cm",
-      "customer_name_so",
-      "customer_phone",
-      "customer_po",
-      "cycle_time",
-      "daily_trend",
-      "date_key_month_number",
-      "default_currency_code_currency_code",
+      "crm_opportunity_name",
+      "currency_lookup_name",
+      "current_wms_storage_bin_code",
+      "customer_lookup_name",
+      "date_key_day_name",
+      "default_currency_name",
       "default_tms_carrier_email",
-      "default_work_center_work_center_id",
-      "deliverable_name",
+      "default_work_center_name",
       "department_dept_code",
-      "dept_code_dept_code",
-      "detected_by_username",
-      "digital_signature_status",
-      "digital_thread_status",
+      "dept_lookup_code",
+      "detected_by_full_name",
       "doc_title",
       "document_title",
-      "dw_customer_key_country_code",
+      "dw_customer_key_customer_name",
       "dw_item_key_item_code",
-      "dw_machine_key_machine_code",
-      "dw_supplier_key_country_code",
-      "ehs_hazardous_material_material_code",
-      "ehs_waste_stream_waste_code",
-      "element_name",
-      "element_number",
-      "employee_default_shift_code",
-      "employee_dept_code",
-      "eng_factory_calendar_calendar_code",
-      "eng_process_family_family_code",
-      "eng_resource_group_resource_group_code",
-      "eng_standard_operation_operation_code",
-      "eng_work_instruction_instruction_code",
-      "enroll_pending",
-      "entry_count",
+      "dw_machine_key_machine_name",
+      "dw_supplier_key_vendor_name",
+      "ehs_hazardous_material_name",
+      "ehs_waste_stream_waste_name",
+      "employee_emergency_contact_name",
+      "employee_lookup_name",
+      "eng_factory_calendar_name",
+      "eng_process_family_name",
+      "eng_resource_group_name",
+      "eng_standard_operation_name",
+      "eng_work_instruction_code",
       "entry_form_code",
-      "equipment_model_number",
-      "escalated_by_username",
-      "escalated_to_username",
-      "evaluated_by_username",
-      "events_count",
+      "equipment_lookup_name",
+      "escalated_by_full_name",
+      "escalated_to_full_name",
+      "evaluated_by_full_name",
       "evidence_doc_title",
       "evidence_title",
-      "exception_number",
-      "executed_by_username",
-      "export_license_license_number",
-      "facilitator_username",
+      "executed_by_full_name",
+      "export_license_lookup_license_number",
+      "facilitator_full_name",
       "fai_fai_form_number",
-      "fai_status",
-      "failure_code_description",
-      "failure_mode_count",
-      "failure_mode_failure_mode_id",
-      "feature_name",
-      "file_attachment_file_id",
-      "fin_budget_version_budget_code",
-      "fin_cash_account_account_number",
-      "fin_cost_version_version_code",
-      "fin_customs_tariff_code_description",
-      "fin_exchange_rate_type_description",
-      "fin_fixed_asset_asset_number",
-      "fin_ledger_currency_code",
+      "failure_code_level_name",
+      "failure_mode_org_company_code",
+      "file_attachment_file_name",
+      "fin_budget_version_name",
+      "fin_cash_account_bank_name",
+      "fin_cost_version_name",
+      "fin_customs_tariff_code_country_code",
+      "fin_exchange_rate_type_name",
+      "fin_fixed_asset_number",
+      "fin_ledger_name",
       "fin_letter_of_credit_lc_number",
-      "finding_finding_id",
-      "findings_count",
-      "first_piece_verified_by_username",
-      "fixture_fixture_code",
-      "fmea_failure_mode_failure_mode_id",
+      "finding_org_company_code",
+      "first_piece_verified_by_full_name",
+      "fixture_lookup_name",
+      "fmea_failure_mode_org_company_code",
       "fmea_title",
       "form_code,form_version_title",
-      "form_name",
-      "from_currency_code_currency_code",
-      "from_wms_storage_bin_bin_code",
-      "from_work_center_work_center_id",
-      "functional_location_description",
+      "from_currency_name",
+      "from_wms_storage_bin_code",
+      "from_work_center_name",
+      "functional_location_bay_code",
       "genealogy_fai_number",
-      "good_qty_today",
-      "granted_by_username",
-      "hcm_certification_certification_code",
-      "hcm_org_unit_org_unit_code",
-      "hcm_payroll_period_period_number",
-      "hcm_payroll_run_run_number",
-      "hcm_position_grade_code",
-      "hcm_skill_skill_code",
-      "headcount",
-      "implementation_owner_username",
-      "initialized",
-      "inspection_inspection_number",
+      "granted_by_full_name",
+      "hcm_certification_name",
+      "hcm_org_unit_name",
+      "hcm_payroll_period_number",
+      "hcm_payroll_run_number",
+      "hcm_position_title",
+      "hcm_skill_name",
+      "implementation_owner_full_name",
+      "inspection_lookup_number",
       "inspection_plan_accept_number",
-      "inspection_status",
-      "inspector_username",
-      "internal_approved_by_username",
-      "investigator_username",
-      "iqc_number",
-      "issued_by_username",
-      "issuer",
-      "item_number",
-      "items_count",
-      "job_count",
-      "job_number_job_number",
+      "inspector_full_name",
+      "internal_approved_by_full_name",
+      "investigator_full_name",
+      "issued_by_full_name",
+      "item_customer_part_number",
+      "job_lookup_number",
       "job_order_job_number",
-      "kwh_today",
-      "lead_auditor_username",
+      "kpi_lookup_name",
+      "lead_auditor_full_name",
       "legacy_maint_wo_cause_code",
-      "legacy_project_project_code",
-      "linked_by_username",
-      "linked_capa_capa_id",
+      "legacy_project_name",
+      "legal_entity_lookup_name",
+      "linked_by_full_name",
+      "linked_capa_org_company_code",
       "linked_control_plan_title",
       "linked_fai_fai_form_number",
-      "linked_failure_mode_failure_mode_id",
+      "linked_failure_mode_org_company_code",
       "linked_fmea_title",
       "linked_inspection_plan_accept_number",
       "linked_ncr_job_number",
       "linked_record_title",
-      "location_zone_code",
-      "locked_by_username",
-      "lot_number_batch_number",
-      "maintenance_plan_plan_number",
-      "manager_employee_dept_code",
-      "matched_list_country_code",
-      "material_status",
-      "mdm_attribute_set_attribute_set_code",
-      "mdm_reference_code_description",
-      "measured_by_username",
-      "melt_number",
-      "mentor_coach_username",
-      "mfa_pending",
-      "mill_cert_number",
-      "monthly_trend",
-      "mrb_chairperson_username",
-      "nadcap_certificate_number",
+      "location_org_company_code",
+      "locked_by_full_name",
+      "lot_batch_number",
+      "maintenance_plan_counter_name",
+      "manager_employee_name",
+      "matched_list_party_name",
+      "mdm_attribute_set_name",
+      "mdm_reference_code_org_company_code",
+      "measured_by_full_name",
+      "mentor_coach_full_name",
+      "mrb_chairperson_full_name",
       "ncr_job_number",
-      "ncr_open",
       "ncr_title",
-      "next_status",
-      "operation_number",
-      "operator_dept_code",
-      "orders_by_status",
-      "orders_count",
-      "osc_dispatch_batch_dispatch_batch_number",
-      "osc_subcontract_plan_plan_number",
-      "otp",
-      "otpauth_url",
-      "owner_username",
-      "package_revision_code",
-      "packing_packing_number",
-      "parent_comment_id",
-      "parent_failure_code_description",
-      "parent_item_description",
-      "parent_location_description",
-      "parent_org_unit_org_unit_code",
-      "parent_prj_wbs_element_wbs_code",
+      "operation_lookup_code",
+      "operator_employee_name",
+      "org_company_name",
+      "org_legal_entity_name",
+      "org_plant_name",
+      "org_site_name",
+      "osc_dispatch_batch_number",
+      "osc_subcontract_plan_number",
+      "owner_full_name",
+      "package_controller_program_name",
+      "packing_customer_name",
+      "parent_failure_code_level_name",
+      "parent_item_customer_part_number",
+      "parent_location_bay_code",
+      "parent_org_company_code",
+      "parent_org_unit_name",
+      "parent_prj_wbs_element_wbs_name",
       "parent_record_title",
       "parent_tool_catalog_number",
-      "parent_wms_handling_unit_handling_unit_code",
-      "part_count",
+      "parent_wms_handling_unit_code",
       "passport_job_number",
-      "performed_by_username",
-      "phase_1_status",
-      "phase_2_status",
-      "phase_3_status",
-      "phase_4_status",
-      "phase_5_status",
-      "picker_username",
-      "pl_number",
+      "performed_by_full_name",
+      "picker_full_name",
       "plan_accept_number",
-      "planner_username",
+      "planner_full_name",
       "plm_change_order_title",
       "plm_change_request_title",
       "plm_requirement_title",
-      "plm_test_plan_test_plan_number",
-      "pm_work_order_work_order_number",
-      "po_line_number",
-      "po_po_number",
-      "portal_user_email",
-      "posted_by_username",
-      "predictions_by_type",
-      "preferred_supplier_duns_number",
-      "preferred_vendor_duns_number",
-      "preferred_wms_zone_zone_code",
-      "prepared_by_username",
-      "primary_role_description",
-      "printed_by_username",
-      "prj_milestone_milestone_code",
-      "prj_project_project_code",
-      "prj_wbs_element_wbs_code",
-      "program_description",
-      "project_lead_username",
-      "project_manager_username",
-      "project_project_code",
-      "promised_by_username",
-      "promoted_by_username",
+      "plm_test_plan_number",
+      "pm_work_order_number",
+      "po_lookup_number",
+      "policy_lookup_name",
+      "portal_user_display_name",
+      "posted_by_full_name",
+      "preferred_supplier_vendor_name",
+      "preferred_vendor_name",
+      "preferred_wms_zone_name",
+      "prepared_by_full_name",
+      "primary_role_dept_code",
+      "printed_by_full_name",
+      "prj_milestone_name",
+      "prj_project_name",
+      "prj_wbs_element_wbs_name",
+      "program_lookup_name",
+      "project_lead_full_name",
+      "project_lookup_name",
+      "project_manager_full_name",
+      "promised_by_full_name",
+      "promoted_by_full_name",
       "purchase_order_po_number",
-      "qual_certificate_template_template_code",
-      "qual_compliance_obligation_obligation_code",
+      "qual_certificate_template_name",
+      "qual_compliance_obligation_title",
       "qual_escape_event_escape_number",
       "qual_sample_plan_acceptance_number",
-      "qual_test_lab_lab_code",
-      "qual_test_method_method_code",
+      "qual_test_lab_name",
+      "qual_test_method_name",
       "quote_converted_so_number",
-      "quotes_by_status",
-      "received_by_username",
-      "recommended_vendor_duns_number",
+      "received_by_full_name",
+      "recommended_vendor_name",
       "record_title",
-      "recorded_by_username",
-      "related_incident_incident_code",
+      "recorded_by_full_name",
+      "related_incident_code",
       "related_record_title",
-      "release_authority_username",
-      "renewal_training_training_id",
-      "report_name",
-      "reported_by_username",
-      "reports_to_position_grade_code",
-      "requested_by_username",
-      "resolved_by_username",
-      "responder_username",
-      "responsible_person_username",
-      "responsible_username",
-      "revenue_this_month",
-      "reviewed_by_username",
-      "reviewer_username",
-      "rfq_number",
-      "risk_owner_username",
-      "risk_priority_number",
+      "release_authority_full_name",
+      "renewal_training_org_company_code",
+      "reported_by_full_name",
+      "reports_to_position_title",
+      "requested_by_full_name",
+      "resolved_by_full_name",
+      "responder_full_name",
+      "responsible_full_name",
+      "responsible_person_full_name",
+      "reviewed_by_full_name",
+      "reviewer_full_name",
+      "risk_owner_full_name",
       "rma_linked_capa_number",
-      "role_description",
-      "routing_id,routing_revision_routing_id",
-      "rule_rule_id",
+      "role_dept_code",
+      "routing_id,routing_revision_org_company_code",
+      "rule_lookup_name",
       "sales_order_customer_po_number",
-      "sc_number",
       "scanned_cert_doc_title",
-      "scores_by_rating",
-      "scrap_qty_today",
-      "scrap_today",
-      "screened_by_username",
-      "secret",
-      "serial_number_lot_number",
-      "server_time",
-      "service_engineer_username",
-      "settlement_currency_currency_code",
+      "screened_by_full_name",
+      "serial_lot_number",
+      "service_engineer_full_name",
+      "settlement_currency_name",
       "setup_title",
-      "setup_verified_by_username",
-      "ship_from_warehouse_warehouse_id",
-      "ship_to_name",
-      "shipment_coc_number",
-      "shipment_package_package_number",
-      "site_site_id",
+      "setup_verified_by_full_name",
+      "ship_from_warehouse_name",
+      "shipment_carrier_name",
+      "shipment_package_number",
+      "site_lookup_name",
       "slot_id_a_jo_number",
       "slot_id_b_jo_number",
-      "so_line_line_number",
       "so_line_number",
-      "sop_meeting_cycle_sop_meeting_cycle_id",
-      "sop_plan_plan_code",
-      "sop_plan_version_version_number",
+      "sop_meeting_cycle_org_company_code",
+      "sop_plan_org_company_code",
+      "sop_plan_version_number",
       "source_content_lot_number",
-      "source_meeting_shift_code",
+      "source_meeting_org_company_code",
       "source_ncr_job_number",
-      "spare_part_item_description",
-      "srm_sourcing_event_event_number",
-      "srm_supplier_contract_contract_number",
+      "source_system_lookup_name",
+      "spare_part_item_customer_part_number",
+      "srm_sourcing_event_number",
+      "srm_supplier_contract_number",
       "srm_supplier_portal_user_full_name",
       "subcontract_job_number",
       "subcontract_order_job_number",
-      "subcontract_receipt_receipt_id",
-      "submitted_by_username",
-      "suggested_wms_storage_bin_bin_code",
-      "supervisor_username",
-      "supplier_duns_number",
-      "svc_installed_base_installed_base_number",
-      "svc_service_contract_contract_number",
-      "svc_service_request_request_number",
-      "svc_service_work_order_service_work_order_number",
-      "tabCount",
+      "subcontract_receipt_org_company_code",
+      "submitted_by_full_name",
+      "suggested_wms_storage_bin_code",
+      "supervisor_full_name",
+      "supplier_vendor_name",
+      "svc_installed_base_number",
+      "svc_service_contract_number",
+      "svc_service_request_number",
+      "svc_service_work_order_number",
       "target_jo_number",
-      "target_status",
-      "tasks_today",
-      "team_lead_username",
-      "team_leader_username",
+      "target_system_source_system_name",
+      "team_lead_full_name",
+      "team_leader_full_name",
       "tms_carrier_email",
       "tms_route_incoterm_code",
-      "tms_shipment_shipment_number",
-      "to_currency_code_currency_code",
-      "to_status",
-      "to_wms_storage_bin_bin_code",
-      "to_work_center_work_center_id",
+      "tms_shipment_number",
+      "to_currency_name",
+      "to_wms_storage_bin_code",
+      "to_work_center_name",
       "tool_catalog_number",
-      "tool_vendor_duns_number",
-      "tooling_assembly_assembly_code",
-      "tooling_family_family_code",
-      "tooling_kit_job_number",
-      "tooling_location_description",
-      "trace_genealogy_batch_genealogy_batch_number",
+      "tool_vendor_name",
+      "tooling_assembly_code",
+      "tooling_family_name",
+      "tooling_kit_name",
+      "tooling_location_code",
+      "trace_genealogy_batch_number",
       "trace_job_traveler_job_number",
-      "trace_label_template_template_code",
-      "trainee_dept_code",
-      "transition_note",
-      "triggered_by_username",
-      "uploaded_by_username",
-      "user_username",
-      "validated_by_username",
-      "vendor_duns_number",
-      "verified_by_username",
+      "trace_label_template_name",
+      "trainee_employee_name",
+      "triggered_by_full_name",
+      "uploaded_by_full_name",
+      "user_full_name",
+      "validated_by_full_name",
+      "vendor_lookup_name",
+      "verified_by_full_name",
       "version_version_id",
-      "waiver_approved_by_username",
-      "walker_username",
-      "warehouse_warehouse_id",
-      "wms_cycle_count_plan_plan_number",
+      "waiver_approved_by_full_name",
+      "walker_full_name",
+      "warehouse_lookup_name",
+      "wms_cycle_count_plan_number",
       "wms_pick_list_job_number",
-      "wms_storage_bin_bin_code",
-      "wms_transfer_order_transfer_order_number",
+      "wms_storage_bin_code",
+      "wms_transfer_order_number",
       "wms_wave_plan_wave_number",
-      "wms_zone_zone_code",
-      "wo_completed_today",
-      "work_center_work_center_id",
-      "workflow_def_description",
-      "workflow_status"
-    ]
+      "wms_zone_name",
+      "work_center_lookup_name",
+      "workflow_def_workflow_name"
+    ],
+    "action_param": [
+      "next_status",
+      "ok",
+      "response_message",
+      "server_time",
+      "transition_note"
+    ],
+    "genuine": []
   },
+  "field_source_conflicts": {},
   "orphan_tables": [],
   "domain_map": {
     "finance": [
@@ -582,6 +471,7 @@
       "escalation_log",
       "escalation_rules",
       "file_attachments",
+      "integration_monitors",
       "naming_patterns",
       "notifications",
       "tags",
@@ -627,6 +517,26 @@
       "crm_opportunities",
       "crm_opportunity_lines",
       "crm_quotes_pipeline"
+    ],
+    "master_data_governance": [
+      "data_archival_runs",
+      "mdm_approval_policies",
+      "mdm_attribute_sets",
+      "mdm_attribute_values",
+      "mdm_data_stewards",
+      "mdm_duplicate_candidates",
+      "mdm_governance_issues",
+      "mdm_item_classes",
+      "mdm_number_series",
+      "mdm_reference_code_values",
+      "mdm_reference_codes",
+      "mdm_site_parameters",
+      "mdm_uom_conversions",
+      "org_companies",
+      "org_legal_entities",
+      "org_plants",
+      "retention_policies",
+      "source_system_registry"
     ],
     "demand_supply_planning": [
       "demand_classifications",
@@ -818,20 +728,6 @@
       "lean_smed_events",
       "lean_tier_escalations",
       "lean_tier_meetings"
-    ],
-    "master_data_governance": [
-      "mdm_approval_policies",
-      "mdm_attribute_sets",
-      "mdm_attribute_values",
-      "mdm_data_stewards",
-      "mdm_duplicate_candidates",
-      "mdm_governance_issues",
-      "mdm_item_classes",
-      "mdm_number_series",
-      "mdm_reference_code_values",
-      "mdm_reference_codes",
-      "mdm_site_parameters",
-      "mdm_uom_conversions"
     ],
     "mes_execution": [
       "mes_alarm_catalog",
@@ -1060,32 +956,32 @@
   "table_list": {
     "ap_ar_invoices": {
       "migration": "015_finance.sql",
-      "col_count": 24,
+      "col_count": 32,
       "domain": "finance"
     },
     "approved_supplier_list": {
       "migration": "035_supplier_quality_management.sql",
-      "col_count": 19,
+      "col_count": 27,
       "domain": "supplier_relationship"
     },
     "apqp_gate_reviews": {
       "migration": "042_fmea_apqp_control_plan_mobile.sql",
-      "col_count": 16,
+      "col_count": 24,
       "domain": "fmea_apqp"
     },
     "apqp_projects": {
       "migration": "042_fmea_apqp_control_plan_mobile.sql",
-      "col_count": 20,
+      "col_count": 28,
       "domain": "fmea_apqp"
     },
     "aps_capacity_buckets": {
       "migration": "047_advanced_planning_scheduling.sql",
-      "col_count": 13,
+      "col_count": 21,
       "domain": "advanced_planning"
     },
     "aps_constraint_resources": {
       "migration": "047_advanced_planning_scheduling.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "advanced_planning"
     },
     "aps_demand_forecast_lines": {
@@ -1095,7 +991,7 @@
     },
     "aps_demand_forecasts": {
       "migration": "047_advanced_planning_scheduling.sql",
-      "col_count": 14,
+      "col_count": 22,
       "domain": "advanced_planning"
     },
     "aps_kpi_snapshots": {
@@ -1105,7 +1001,7 @@
     },
     "aps_material_availability": {
       "migration": "047_advanced_planning_scheduling.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "advanced_planning"
     },
     "aps_pegging_links": {
@@ -1115,32 +1011,32 @@
     },
     "aps_planning_horizons": {
       "migration": "047_advanced_planning_scheduling.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "advanced_planning"
     },
     "aps_planning_scenarios": {
       "migration": "047_advanced_planning_scheduling.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "advanced_planning"
     },
     "aps_schedule_blocks": {
       "migration": "047_advanced_planning_scheduling.sql",
-      "col_count": 15,
+      "col_count": 23,
       "domain": "advanced_planning"
     },
     "aps_schedule_conflicts": {
       "migration": "047_advanced_planning_scheduling.sql",
-      "col_count": 13,
+      "col_count": 21,
       "domain": "advanced_planning"
     },
     "aps_setup_matrices": {
       "migration": "047_advanced_planning_scheduling.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "advanced_planning"
     },
     "audit_actions": {
       "migration": "014_audit_risk.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "audit_risk"
     },
     "audit_events": {
@@ -1150,37 +1046,37 @@
     },
     "audit_findings": {
       "migration": "014_audit_risk.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "audit_risk"
     },
     "audits": {
       "migration": "014_audit_risk.sql",
-      "col_count": 14,
+      "col_count": 22,
       "domain": "audit_risk"
     },
     "bill_of_materials": {
       "migration": "006_erp_master_data.sql",
-      "col_count": 13,
+      "col_count": 21,
       "domain": "master_data"
     },
     "bom_components": {
       "migration": "006_erp_master_data.sql",
-      "col_count": 20,
+      "col_count": 28,
       "domain": "master_data"
     },
     "calibration_grr_studies": {
       "migration": "069_lean_manufacturing_world_class.sql",
-      "col_count": 19,
+      "col_count": 27,
       "domain": "calibration_equipment"
     },
     "calibration_oot_investigations": {
       "migration": "069_lean_manufacturing_world_class.sql",
-      "col_count": 24,
+      "col_count": 32,
       "domain": "calibration_equipment"
     },
     "calibration_records": {
       "migration": "012_calibration_equipment.sql",
-      "col_count": 19,
+      "col_count": 27,
       "domain": "calibration_equipment"
     },
     "capa_8d_steps": {
@@ -1190,12 +1086,12 @@
     },
     "capa_effectiveness_checks": {
       "migration": "069_lean_manufacturing_world_class.sql",
-      "col_count": 19,
+      "col_count": 27,
       "domain": "quality_management"
     },
     "capa_records": {
       "migration": "011_quality.sql",
-      "col_count": 15,
+      "col_count": 23,
       "domain": "quality_management"
     },
     "capacity_snapshots": {
@@ -1205,12 +1101,12 @@
     },
     "certificates": {
       "migration": "011_quality.sql",
-      "col_count": 15,
+      "col_count": 23,
       "domain": "quality_management"
     },
     "cnc_program_approvals": {
       "migration": "039_cnc_program_management.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "cnc_programs"
     },
     "cnc_program_versions": {
@@ -1220,12 +1116,12 @@
     },
     "cnc_programs": {
       "migration": "039_cnc_program_management.sql",
-      "col_count": 22,
+      "col_count": 30,
       "domain": "cnc_programs"
     },
     "com_contract_amendments": {
       "migration": "065_commercial_contract_pricing.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "commercial_contracts"
     },
     "com_contract_lines": {
@@ -1235,32 +1131,32 @@
     },
     "com_contracts": {
       "migration": "065_commercial_contract_pricing.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "commercial_contracts"
     },
     "com_credit_profiles": {
       "migration": "065_commercial_contract_pricing.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "commercial_contracts"
     },
     "com_customer_scorecards": {
       "migration": "065_commercial_contract_pricing.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "commercial_contracts"
     },
     "com_incoterms_profiles": {
       "migration": "065_commercial_contract_pricing.sql",
-      "col_count": 5,
+      "col_count": 13,
       "domain": "commercial_contracts"
     },
     "com_order_promises": {
       "migration": "065_commercial_contract_pricing.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "commercial_contracts"
     },
     "com_payment_terms_profiles": {
       "migration": "065_commercial_contract_pricing.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "commercial_contracts"
     },
     "com_price_list_lines": {
@@ -1270,42 +1166,42 @@
     },
     "com_price_lists": {
       "migration": "065_commercial_contract_pricing.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "commercial_contracts"
     },
     "com_rebate_accruals": {
       "migration": "065_commercial_contract_pricing.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "commercial_contracts"
     },
     "com_rebate_programs": {
       "migration": "065_commercial_contract_pricing.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "commercial_contracts"
     },
     "comments": {
       "migration": "019_system_tables.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "system_infrastructure"
     },
     "commercial_accounts": {
       "migration": "032_order_management_world_class_foundations.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "commercial_contracts"
     },
     "compliance_records": {
       "migration": "016_shipping_compliance.sql",
-      "col_count": 22,
+      "col_count": 30,
       "domain": "shipping_compliance"
     },
     "concessions": {
       "migration": "034_exception_management.sql",
-      "col_count": 21,
+      "col_count": 29,
       "domain": "quality_management"
     },
     "contamination_checks": {
       "migration": "011_quality.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "quality_management"
     },
     "contract_review_items": {
@@ -1315,62 +1211,62 @@
     },
     "control_plan_characteristics": {
       "migration": "042_fmea_apqp_control_plan_mobile.sql",
-      "col_count": 22,
+      "col_count": 30,
       "domain": "fmea_apqp"
     },
     "control_plans": {
       "migration": "042_fmea_apqp_control_plan_mobile.sql",
-      "col_count": 19,
+      "col_count": 27,
       "domain": "fmea_apqp"
     },
     "copq_ledger": {
       "migration": "034_exception_management.sql",
-      "col_count": 16,
+      "col_count": 24,
       "domain": "quality_management"
     },
     "cost_elements": {
       "migration": "015_finance.sql",
-      "col_count": 37,
+      "col_count": 45,
       "domain": "finance"
     },
     "crm_accounts": {
       "migration": "053_crm_pipeline_management.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "crm"
     },
     "crm_activities": {
       "migration": "053_crm_pipeline_management.sql",
-      "col_count": 13,
+      "col_count": 21,
       "domain": "crm"
     },
     "crm_campaigns": {
       "migration": "053_crm_pipeline_management.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "crm"
     },
     "crm_contacts": {
       "migration": "053_crm_pipeline_management.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "crm"
     },
     "crm_customer_touchpoints": {
       "migration": "053_crm_pipeline_management.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "crm"
     },
     "crm_forecasts": {
       "migration": "053_crm_pipeline_management.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "crm"
     },
     "crm_leads": {
       "migration": "053_crm_pipeline_management.sql",
-      "col_count": 13,
+      "col_count": 21,
       "domain": "crm"
     },
     "crm_opportunities": {
       "migration": "053_crm_pipeline_management.sql",
-      "col_count": 15,
+      "col_count": 23,
       "domain": "crm"
     },
     "crm_opportunity_lines": {
@@ -1380,52 +1276,57 @@
     },
     "crm_quotes_pipeline": {
       "migration": "053_crm_pipeline_management.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "crm"
     },
     "customer_complaints": {
       "migration": "034_exception_management.sql",
-      "col_count": 31,
+      "col_count": 39,
       "domain": "quality_management"
     },
     "customer_sites": {
       "migration": "032_order_management_world_class_foundations.sql",
-      "col_count": 16,
+      "col_count": 24,
       "domain": "sales"
     },
     "customers": {
       "migration": "007_customers_sales.sql",
-      "col_count": 41,
+      "col_count": 49,
       "domain": "sales"
+    },
+    "data_archival_runs": {
+      "migration": "070_enterprise_governance_uplift.sql",
+      "col_count": 14,
+      "domain": "master_data_governance"
     },
     "demand_classifications": {
       "migration": "058_sop_demand_supply_planning.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "demand_supply_planning"
     },
     "demand_history_buckets": {
       "migration": "058_sop_demand_supply_planning.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "demand_supply_planning"
     },
     "departments": {
       "migration": "002_core_system.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "core_system"
     },
     "deviations": {
       "migration": "034_exception_management.sql",
-      "col_count": 22,
+      "col_count": 30,
       "domain": "quality_management"
     },
     "document_distribution": {
       "migration": "003_document_management.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "document_control"
     },
     "document_embeddings": {
       "migration": "003_document_management.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "document_control"
     },
     "document_versions": {
@@ -1435,7 +1336,7 @@
     },
     "documents": {
       "migration": "003_document_management.sql",
-      "col_count": 15,
+      "col_count": 23,
       "domain": "document_control"
     },
     "dw_customer_dim": {
@@ -1500,52 +1401,52 @@
     },
     "ehs_contractors": {
       "migration": "062_ehs_sustainability_management.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "ehs_sustainability"
     },
     "ehs_corrective_actions": {
       "migration": "062_ehs_sustainability_management.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "ehs_sustainability"
     },
     "ehs_emergency_drills": {
       "migration": "062_ehs_sustainability_management.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "ehs_sustainability"
     },
     "ehs_emissions_monitoring": {
       "migration": "062_ehs_sustainability_management.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "ehs_sustainability"
     },
     "ehs_energy_targets": {
       "migration": "062_ehs_sustainability_management.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "ehs_sustainability"
     },
     "ehs_exposure_assessments": {
       "migration": "062_ehs_sustainability_management.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "ehs_sustainability"
     },
     "ehs_hazardous_materials": {
       "migration": "062_ehs_sustainability_management.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "ehs_sustainability"
     },
     "ehs_incidents": {
       "migration": "011_quality.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "ehs_sustainability"
     },
     "ehs_material_safety_data": {
       "migration": "062_ehs_sustainability_management.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "ehs_sustainability"
     },
     "ehs_permit_register": {
       "migration": "062_ehs_sustainability_management.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "ehs_sustainability"
     },
     "ehs_ppe_issue_logs": {
@@ -1560,72 +1461,72 @@
     },
     "ehs_regulatory_submissions": {
       "migration": "062_ehs_sustainability_management.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "ehs_sustainability"
     },
     "ehs_sustainability_projects": {
       "migration": "062_ehs_sustainability_management.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "ehs_sustainability"
     },
     "ehs_training_matrix": {
       "migration": "062_ehs_sustainability_management.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "ehs_sustainability"
     },
     "ehs_waste_shipments": {
       "migration": "062_ehs_sustainability_management.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "ehs_sustainability"
     },
     "ehs_waste_streams": {
       "migration": "062_ehs_sustainability_management.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "ehs_sustainability"
     },
     "employee_certifications": {
       "migration": "013_training_hr.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "training_hr"
     },
     "employees": {
       "migration": "013_training_hr.sql",
-      "col_count": 15,
+      "col_count": 23,
       "domain": "training_hr"
     },
     "eng_capacity_models": {
       "migration": "063_manufacturing_engineering_industrialization.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "mfg_engineering"
     },
     "eng_changeover_standards": {
       "migration": "063_manufacturing_engineering_industrialization.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "mfg_engineering"
     },
     "eng_factory_calendar_days": {
       "migration": "063_manufacturing_engineering_industrialization.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "mfg_engineering"
     },
     "eng_factory_calendars": {
       "migration": "063_manufacturing_engineering_industrialization.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "mfg_engineering"
     },
     "eng_line_balancing_studies": {
       "migration": "063_manufacturing_engineering_industrialization.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "mfg_engineering"
     },
     "eng_process_families": {
       "migration": "063_manufacturing_engineering_industrialization.sql",
-      "col_count": 5,
+      "col_count": 13,
       "domain": "mfg_engineering"
     },
     "eng_process_validation": {
       "migration": "063_manufacturing_engineering_industrialization.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "mfg_engineering"
     },
     "eng_resource_group_members": {
@@ -1635,7 +1536,7 @@
     },
     "eng_resource_groups": {
       "migration": "063_manufacturing_engineering_industrialization.sql",
-      "col_count": 5,
+      "col_count": 13,
       "domain": "mfg_engineering"
     },
     "eng_standard_operations": {
@@ -1645,7 +1546,7 @@
     },
     "eng_time_standards": {
       "migration": "063_manufacturing_engineering_industrialization.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "mfg_engineering"
     },
     "eng_tooling_requirements": {
@@ -1660,17 +1561,17 @@
     },
     "eng_work_instructions": {
       "migration": "063_manufacturing_engineering_industrialization.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "mfg_engineering"
     },
     "engineering_change_requests": {
       "migration": "011_quality.sql",
-      "col_count": 22,
+      "col_count": 30,
       "domain": "plm_change_control"
     },
     "equipment": {
       "migration": "012_calibration_equipment.sql",
-      "col_count": 50,
+      "col_count": 58,
       "domain": "calibration_equipment"
     },
     "escalation_log": {
@@ -1680,17 +1581,17 @@
     },
     "escalation_rules": {
       "migration": "034_exception_management.sql",
-      "col_count": 13,
+      "col_count": 21,
       "domain": "system_infrastructure"
     },
     "evidence_chain_custody": {
       "migration": "037_evidence_vault.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "evidence_vault"
     },
     "evidence_fts": {
       "migration": "037_evidence_vault.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "evidence_vault"
     },
     "evidence_links": {
@@ -1700,22 +1601,22 @@
     },
     "evidence_vault": {
       "migration": "037_evidence_vault.sql",
-      "col_count": 22,
+      "col_count": 30,
       "domain": "evidence_vault"
     },
     "export_licenses": {
       "migration": "016_shipping_compliance.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "shipping_compliance"
     },
     "fai_characteristics": {
       "migration": "011_quality.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "quality_management"
     },
     "fai_records": {
       "migration": "011_quality.sql",
-      "col_count": 13,
+      "col_count": 21,
       "domain": "quality_management"
     },
     "fai_trigger_log": {
@@ -1725,17 +1626,17 @@
     },
     "file_attachments": {
       "migration": "019_system_tables.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "system_infrastructure"
     },
     "fin_asset_depreciation": {
       "migration": "060_finance_treasury_assets.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "finance_treasury"
     },
     "fin_bank_reconciliations": {
       "migration": "060_finance_treasury_assets.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "finance_treasury"
     },
     "fin_budget_lines": {
@@ -1750,12 +1651,12 @@
     },
     "fin_cash_accounts": {
       "migration": "060_finance_treasury_assets.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "finance_treasury"
     },
     "fin_cash_transactions": {
       "migration": "060_finance_treasury_assets.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "finance_treasury"
     },
     "fin_cost_versions": {
@@ -1765,82 +1666,82 @@
     },
     "fin_country_tax_profiles": {
       "migration": "051_finance_trade_multicurrency.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "finance_extended"
     },
     "fin_currencies": {
       "migration": "051_finance_trade_multicurrency.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "finance_extended"
     },
     "fin_customs_declarations": {
       "migration": "051_finance_trade_multicurrency.sql",
-      "col_count": 17,
+      "col_count": 25,
       "domain": "finance_extended"
     },
     "fin_customs_tariff_codes": {
       "migration": "051_finance_trade_multicurrency.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "finance_extended"
     },
     "fin_exchange_rate_types": {
       "migration": "051_finance_trade_multicurrency.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "finance_extended"
     },
     "fin_exchange_rates": {
       "migration": "051_finance_trade_multicurrency.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "finance_extended"
     },
     "fin_fixed_assets": {
       "migration": "060_finance_treasury_assets.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "finance_treasury"
     },
     "fin_intercompany_pairs": {
       "migration": "060_finance_treasury_assets.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "finance_treasury"
     },
     "fin_lc_draw_requests": {
       "migration": "051_finance_trade_multicurrency.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "finance_extended"
     },
     "fin_letters_of_credit": {
       "migration": "051_finance_trade_multicurrency.sql",
-      "col_count": 16,
+      "col_count": 24,
       "domain": "finance_extended"
     },
     "fin_multi_book_ledgers": {
       "migration": "051_finance_trade_multicurrency.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "finance_extended"
     },
     "fin_realized_fx_gains": {
       "migration": "051_finance_trade_multicurrency.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "finance_extended"
     },
     "fin_revenue_schedules": {
       "migration": "060_finance_treasury_assets.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "finance_treasury"
     },
     "fin_standard_cost_rollups": {
       "migration": "060_finance_treasury_assets.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "finance_treasury"
     },
     "fin_tax_jurisdictions": {
       "migration": "060_finance_treasury_assets.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "finance_treasury"
     },
     "fin_withholding_tax_codes": {
       "migration": "051_finance_trade_multicurrency.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "finance_extended"
     },
     "fixture_maintenance_logs": {
@@ -1850,22 +1751,22 @@
     },
     "fixture_master": {
       "migration": "057_tooling_lifecycle_management.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "tooling_lifecycle"
     },
     "fmea_actions": {
       "migration": "042_fmea_apqp_control_plan_mobile.sql",
-      "col_count": 18,
+      "col_count": 26,
       "domain": "fmea_apqp"
     },
     "fmea_failure_modes": {
       "migration": "042_fmea_apqp_control_plan_mobile.sql",
-      "col_count": 23,
+      "col_count": 31,
       "domain": "fmea_apqp"
     },
     "fmea_records": {
       "migration": "042_fmea_apqp_control_plan_mobile.sql",
-      "col_count": 21,
+      "col_count": 29,
       "domain": "fmea_apqp"
     },
     "fmea_revisions": {
@@ -1875,62 +1776,62 @@
     },
     "form_attachments": {
       "migration": "004_form_system.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "forms_system"
     },
     "form_entries": {
       "migration": "004_form_system.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "forms_system"
     },
     "form_schemas": {
       "migration": "004_form_system.sql",
-      "col_count": 16,
+      "col_count": 24,
       "domain": "forms_system"
     },
     "gl_transactions": {
       "migration": "015_finance.sql",
-      "col_count": 30,
+      "col_count": 38,
       "domain": "finance"
     },
     "hcm_attendance_records": {
       "migration": "049_hcm_workforce_management.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "hcm_workforce"
     },
     "hcm_certifications": {
       "migration": "049_hcm_workforce_management.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "hcm_workforce"
     },
     "hcm_disciplinary_actions": {
       "migration": "049_hcm_workforce_management.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "hcm_workforce"
     },
     "hcm_employee_certifications": {
       "migration": "049_hcm_workforce_management.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "hcm_workforce"
     },
     "hcm_employee_skills": {
       "migration": "049_hcm_workforce_management.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "hcm_workforce"
     },
     "hcm_employees": {
       "migration": "049_hcm_workforce_management.sql",
-      "col_count": 15,
+      "col_count": 23,
       "domain": "hcm_workforce"
     },
     "hcm_leave_balances": {
       "migration": "049_hcm_workforce_management.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "hcm_workforce"
     },
     "hcm_org_units": {
       "migration": "049_hcm_workforce_management.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "hcm_workforce"
     },
     "hcm_payroll_lines": {
@@ -1940,17 +1841,17 @@
     },
     "hcm_payroll_periods": {
       "migration": "049_hcm_workforce_management.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "hcm_workforce"
     },
     "hcm_payroll_runs": {
       "migration": "049_hcm_workforce_management.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "hcm_workforce"
     },
     "hcm_positions": {
       "migration": "049_hcm_workforce_management.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "hcm_workforce"
     },
     "hcm_qualification_requirements": {
@@ -1960,12 +1861,12 @@
     },
     "hcm_skills_catalog": {
       "migration": "049_hcm_workforce_management.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "hcm_workforce"
     },
     "improvement_projects": {
       "migration": "014_audit_risk.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "audit_risk"
     },
     "incoming_inspection_results": {
@@ -1975,12 +1876,12 @@
     },
     "incoming_inspections": {
       "migration": "035_supplier_quality_management.sql",
-      "col_count": 27,
+      "col_count": 35,
       "domain": "quality_management"
     },
     "inspection_plans": {
       "migration": "011_quality.sql",
-      "col_count": 15,
+      "col_count": 23,
       "domain": "quality_management"
     },
     "inspection_results": {
@@ -1988,19 +1889,24 @@
       "col_count": 25,
       "domain": "quality_management"
     },
+    "integration_monitors": {
+      "migration": "070_enterprise_governance_uplift.sql",
+      "col_count": 16,
+      "domain": "system_infrastructure"
+    },
     "inventory_buffer_profiles": {
       "migration": "058_sop_demand_supply_planning.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "demand_supply_planning"
     },
     "inventory_locations": {
       "migration": "009_inventory.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "inventory"
     },
     "inventory_transactions": {
       "migration": "009_inventory.sql",
-      "col_count": 30,
+      "col_count": 38,
       "domain": "inventory"
     },
     "item_revisions": {
@@ -2010,12 +1916,12 @@
     },
     "items": {
       "migration": "006_erp_master_data.sql",
-      "col_count": 62,
+      "col_count": 70,
       "domain": "master_data"
     },
     "job_costing": {
       "migration": "015_finance.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "finance"
     },
     "job_operations": {
@@ -2025,12 +1931,12 @@
     },
     "job_orders": {
       "migration": "010_production.sql",
-      "col_count": 62,
+      "col_count": 70,
       "domain": "production"
     },
     "job_release_gates": {
       "migration": "032_order_management_world_class_foundations.sql",
-      "col_count": 13,
+      "col_count": 21,
       "domain": "production"
     },
     "kpi_definitions": {
@@ -2045,67 +1951,67 @@
     },
     "labor_transactions": {
       "migration": "010_production.sql",
-      "col_count": 30,
+      "col_count": 38,
       "domain": "production"
     },
     "lean_5s_audits": {
       "migration": "069_lean_manufacturing_world_class.sql",
-      "col_count": 24,
+      "col_count": 32,
       "domain": "lean_manufacturing"
     },
     "lean_andon_events": {
       "migration": "069_lean_manufacturing_world_class.sql",
-      "col_count": 25,
+      "col_count": 33,
       "domain": "lean_manufacturing"
     },
     "lean_gemba_walks": {
       "migration": "069_lean_manufacturing_world_class.sql",
-      "col_count": 20,
+      "col_count": 28,
       "domain": "lean_manufacturing"
     },
     "lean_kaizen_events": {
       "migration": "069_lean_manufacturing_world_class.sql",
-      "col_count": 35,
+      "col_count": 43,
       "domain": "lean_manufacturing"
     },
     "lean_qrqc_events": {
       "migration": "069_lean_manufacturing_world_class.sql",
-      "col_count": 29,
+      "col_count": 37,
       "domain": "lean_manufacturing"
     },
     "lean_smed_events": {
       "migration": "069_lean_manufacturing_world_class.sql",
-      "col_count": 26,
+      "col_count": 34,
       "domain": "lean_manufacturing"
     },
     "lean_tier_escalations": {
       "migration": "069_lean_manufacturing_world_class.sql",
-      "col_count": 20,
+      "col_count": 28,
       "domain": "lean_manufacturing"
     },
     "lean_tier_meetings": {
       "migration": "069_lean_manufacturing_world_class.sql",
-      "col_count": 20,
+      "col_count": 28,
       "domain": "lean_manufacturing"
     },
     "lot_master": {
       "migration": "009_inventory.sql",
-      "col_count": 16,
+      "col_count": 24,
       "domain": "inventory"
     },
     "machine_rate_cards": {
       "migration": "036_quoting_estimation.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "commercial_contracts"
     },
     "maintenance_work_orders": {
       "migration": "012_calibration_equipment.sql",
-      "col_count": 34,
+      "col_count": 42,
       "domain": "calibration_equipment"
     },
     "management_reviews": {
       "migration": "014_audit_risk.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "audit_risk"
     },
     "material_cost_templates": {
@@ -2115,87 +2021,87 @@
     },
     "material_review_board": {
       "migration": "034_exception_management.sql",
-      "col_count": 22,
+      "col_count": 30,
       "domain": "quality_management"
     },
     "mdm_approval_policies": {
       "migration": "064_master_data_governance.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "master_data_governance"
     },
     "mdm_attribute_sets": {
       "migration": "064_master_data_governance.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "master_data_governance"
     },
     "mdm_attribute_values": {
       "migration": "064_master_data_governance.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "master_data_governance"
     },
     "mdm_data_stewards": {
       "migration": "064_master_data_governance.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "master_data_governance"
     },
     "mdm_duplicate_candidates": {
       "migration": "064_master_data_governance.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "master_data_governance"
     },
     "mdm_governance_issues": {
       "migration": "064_master_data_governance.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "master_data_governance"
     },
     "mdm_item_classes": {
       "migration": "064_master_data_governance.sql",
-      "col_count": 5,
+      "col_count": 13,
       "domain": "master_data_governance"
     },
     "mdm_number_series": {
       "migration": "064_master_data_governance.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "master_data_governance"
     },
     "mdm_reference_code_values": {
       "migration": "064_master_data_governance.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "master_data_governance"
     },
     "mdm_reference_codes": {
       "migration": "064_master_data_governance.sql",
-      "col_count": 5,
+      "col_count": 13,
       "domain": "master_data_governance"
     },
     "mdm_site_parameters": {
       "migration": "064_master_data_governance.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "master_data_governance"
     },
     "mdm_uom_conversions": {
       "migration": "064_master_data_governance.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "master_data_governance"
     },
     "mes_alarm_catalog": {
       "migration": "026_mes_world_class_foundations.sql",
-      "col_count": 15,
+      "col_count": 23,
       "domain": "mes_execution"
     },
     "mes_alarm_playbooks": {
       "migration": "026_mes_world_class_foundations.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "mes_execution"
     },
     "mes_areas": {
       "migration": "025_mes_tables.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "mes_execution"
     },
     "mes_connectivity_adapters": {
       "migration": "026_mes_world_class_foundations.sql",
-      "col_count": 16,
+      "col_count": 23,
       "domain": "mes_execution"
     },
     "mes_connectivity_events": {
@@ -2205,7 +2111,7 @@
     },
     "mes_cost_tracking": {
       "migration": "031_mes_dpp_energy_cost_foundations.sql",
-      "col_count": 23,
+      "col_count": 31,
       "domain": "mes_execution"
     },
     "mes_cycle_events": {
@@ -2215,7 +2121,7 @@
     },
     "mes_dispatch_queue": {
       "migration": "025_mes_tables.sql",
-      "col_count": 23,
+      "col_count": 31,
       "domain": "mes_execution"
     },
     "mes_downtime_events": {
@@ -2225,7 +2131,7 @@
     },
     "mes_dpp_passports": {
       "migration": "031_mes_dpp_energy_cost_foundations.sql",
-      "col_count": 19,
+      "col_count": 27,
       "domain": "mes_execution"
     },
     "mes_energy_snapshots": {
@@ -2235,32 +2141,32 @@
     },
     "mes_equipment_extended": {
       "migration": "025_mes_tables.sql",
-      "col_count": 32,
+      "col_count": 40,
       "domain": "mes_execution"
     },
     "mes_erp_inbound_queue": {
       "migration": "025_mes_tables.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "mes_execution"
     },
     "mes_erp_outbound_queue": {
       "migration": "025_mes_tables.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "mes_execution"
     },
     "mes_erp_reconciliation_exceptions": {
       "migration": "028_epicor_mes_integration_foundations.sql",
-      "col_count": 16,
+      "col_count": 24,
       "domain": "mes_execution"
     },
     "mes_erp_sync_runs": {
       "migration": "028_epicor_mes_integration_foundations.sql",
-      "col_count": 18,
+      "col_count": 26,
       "domain": "mes_execution"
     },
     "mes_event_subscriptions": {
       "migration": "025_mes_tables.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "mes_execution"
     },
     "mes_fixture_assignments": {
@@ -2275,22 +2181,22 @@
     },
     "mes_inline_measurements": {
       "migration": "025_mes_tables.sql",
-      "col_count": 27,
+      "col_count": 35,
       "domain": "mes_execution"
     },
     "mes_job_execution": {
       "migration": "025_mes_tables.sql",
-      "col_count": 25,
+      "col_count": 33,
       "domain": "mes_execution"
     },
     "mes_machine_alarms": {
       "migration": "025_mes_tables.sql",
-      "col_count": 25,
+      "col_count": 33,
       "domain": "mes_execution"
     },
     "mes_machine_snapshot": {
       "migration": "025_mes_tables.sql",
-      "col_count": 37,
+      "col_count": 45,
       "domain": "mes_execution"
     },
     "mes_machine_state_events": {
@@ -2300,22 +2206,22 @@
     },
     "mes_machine_telemetry": {
       "migration": "025_mes_tables.sql",
-      "col_count": 33,
+      "col_count": 41,
       "domain": "mes_execution"
     },
     "mes_material_consumption": {
       "migration": "025_mes_tables.sql",
-      "col_count": 18,
+      "col_count": 26,
       "domain": "mes_execution"
     },
     "mes_nc_download_receipts": {
       "migration": "026_mes_world_class_foundations.sql",
-      "col_count": 15,
+      "col_count": 23,
       "domain": "mes_execution"
     },
     "mes_nc_release_packages": {
       "migration": "026_mes_world_class_foundations.sql",
-      "col_count": 16,
+      "col_count": 24,
       "domain": "mes_execution"
     },
     "mes_oee_loss_events": {
@@ -2330,37 +2236,37 @@
     },
     "mes_on_time_delivery": {
       "migration": "025_mes_tables.sql",
-      "col_count": 16,
+      "col_count": 24,
       "domain": "mes_execution"
     },
     "mes_operation_execution": {
       "migration": "025_mes_tables.sql",
-      "col_count": 39,
+      "col_count": 47,
       "domain": "mes_execution"
     },
     "mes_operator_qualifications": {
       "migration": "025_mes_tables.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "mes_execution"
     },
     "mes_operator_sessions": {
       "migration": "025_mes_tables.sql",
-      "col_count": 14,
+      "col_count": 22,
       "domain": "mes_execution"
     },
     "mes_part_genealogy": {
       "migration": "025_mes_tables.sql",
-      "col_count": 26,
+      "col_count": 34,
       "domain": "mes_execution"
     },
     "mes_pm_execution": {
       "migration": "025_mes_tables.sql",
-      "col_count": 16,
+      "col_count": 24,
       "domain": "mes_execution"
     },
     "mes_production_kpi_daily": {
       "migration": "025_mes_tables.sql",
-      "col_count": 23,
+      "col_count": 31,
       "domain": "mes_execution"
     },
     "mes_program_events": {
@@ -2370,37 +2276,37 @@
     },
     "mes_shift_handover": {
       "migration": "025_mes_tables.sql",
-      "col_count": 18,
+      "col_count": 26,
       "domain": "mes_execution"
     },
     "mes_shop_floor_layout": {
       "migration": "025_mes_tables.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "mes_execution"
     },
     "mes_sites": {
       "migration": "025_mes_tables.sql",
-      "col_count": 10,
+      "col_count": 17,
       "domain": "mes_execution"
     },
     "mes_spare_parts_consumption": {
       "migration": "025_mes_tables.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "mes_execution"
     },
     "mes_spc_control_limits": {
       "migration": "025_mes_tables.sql",
-      "col_count": 25,
+      "col_count": 33,
       "domain": "mes_execution"
     },
     "mes_spc_violations": {
       "migration": "025_mes_tables.sql",
-      "col_count": 16,
+      "col_count": 24,
       "domain": "mes_execution"
     },
     "mes_tool_assemblies": {
       "migration": "026_mes_world_class_foundations.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "mes_execution"
     },
     "mes_tool_life_events": {
@@ -2410,72 +2316,72 @@
     },
     "mes_tool_preset_offsets": {
       "migration": "026_mes_world_class_foundations.sql",
-      "col_count": 16,
+      "col_count": 24,
       "domain": "mes_execution"
     },
     "mes_wip_location": {
       "migration": "025_mes_tables.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "mes_execution"
     },
     "mes_wip_movements": {
       "migration": "025_mes_tables.sql",
-      "col_count": 15,
+      "col_count": 23,
       "domain": "mes_execution"
     },
     "mobile_inspection_captures": {
       "migration": "042_fmea_apqp_control_plan_mobile.sql",
-      "col_count": 20,
+      "col_count": 28,
       "domain": "mobile_operations"
     },
     "mobile_time_entries": {
       "migration": "042_fmea_apqp_control_plan_mobile.sql",
-      "col_count": 17,
+      "col_count": 25,
       "domain": "mobile_operations"
     },
     "mobile_work_queue": {
       "migration": "042_fmea_apqp_control_plan_mobile.sql",
-      "col_count": 21,
+      "col_count": 29,
       "domain": "mobile_operations"
     },
     "mrp_planned_orders": {
       "migration": "018_projects_kpi.sql",
-      "col_count": 36,
+      "col_count": 44,
       "domain": "advanced_planning"
     },
     "naming_patterns": {
       "migration": "019_system_tables.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "system_infrastructure"
     },
     "ncr_human_factors": {
       "migration": "069_lean_manufacturing_world_class.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "quality_management"
     },
     "ncr_mrb_decisions": {
       "migration": "069_lean_manufacturing_world_class.sql",
-      "col_count": 20,
+      "col_count": 28,
       "domain": "quality_management"
     },
     "ncr_records": {
       "migration": "011_quality.sql",
-      "col_count": 25,
+      "col_count": 33,
       "domain": "quality_management"
     },
     "notifications": {
       "migration": "019_system_tables.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "system_infrastructure"
     },
     "npi_projects": {
       "migration": "011_quality.sql",
-      "col_count": 22,
+      "col_count": 30,
       "domain": "project_management"
     },
     "oqc_inspections": {
       "migration": "045_oqc_packing_outsource.sql",
-      "col_count": 28,
+      "col_count": 36,
       "domain": "quality_management"
     },
     "order_collaboration_events": {
@@ -2490,28 +2396,43 @@
     },
     "order_documents_required": {
       "migration": "033_order_management_extended.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "sales"
     },
     "order_holds": {
       "migration": "032_order_management_world_class_foundations.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "sales"
     },
     "order_milestones": {
       "migration": "032_order_management_world_class_foundations.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "sales"
     },
     "order_notes": {
       "migration": "033_order_management_extended.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "sales"
     },
     "order_timeline_events": {
       "migration": "033_order_management_extended.sql",
       "col_count": 14,
       "domain": "sales"
+    },
+    "org_companies": {
+      "migration": "070_enterprise_governance_uplift.sql",
+      "col_count": 8,
+      "domain": "master_data_governance"
+    },
+    "org_legal_entities": {
+      "migration": "070_enterprise_governance_uplift.sql",
+      "col_count": 10,
+      "domain": "master_data_governance"
+    },
+    "org_plants": {
+      "migration": "070_enterprise_governance_uplift.sql",
+      "col_count": 10,
+      "domain": "master_data_governance"
     },
     "osc_dispatch_batch_lines": {
       "migration": "067_outsource_supplier_execution.sql",
@@ -2520,7 +2441,7 @@
     },
     "osc_dispatch_batches": {
       "migration": "067_outsource_supplier_execution.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "outsource_execution"
     },
     "osc_subcontract_operations": {
@@ -2530,52 +2451,52 @@
     },
     "osc_subcontract_plans": {
       "migration": "067_outsource_supplier_execution.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "outsource_execution"
     },
     "osc_supplier_capacity_reservations": {
       "migration": "067_outsource_supplier_execution.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "outsource_execution"
     },
     "osc_supplier_chargebacks": {
       "migration": "067_outsource_supplier_execution.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "outsource_execution"
     },
     "osc_supplier_nonconformances": {
       "migration": "067_outsource_supplier_execution.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "outsource_execution"
     },
     "osc_supplier_portal_documents": {
       "migration": "067_outsource_supplier_execution.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "outsource_execution"
     },
     "osc_supplier_receipts": {
       "migration": "067_outsource_supplier_execution.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "outsource_execution"
     },
     "osc_supplier_recovery_claims": {
       "migration": "067_outsource_supplier_execution.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "outsource_execution"
     },
     "osc_supplier_score_trends": {
       "migration": "067_outsource_supplier_execution.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "outsource_execution"
     },
     "osc_supplier_shipment_notices": {
       "migration": "067_outsource_supplier_execution.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "outsource_execution"
     },
     "outside_processing_orders": {
       "migration": "032_order_management_world_class_foundations.sql",
-      "col_count": 14,
+      "col_count": 22,
       "domain": "outsource_execution"
     },
     "packing_list_items": {
@@ -2585,7 +2506,7 @@
     },
     "packing_lists": {
       "migration": "045_oqc_packing_outsource.sql",
-      "col_count": 21,
+      "col_count": 29,
       "domain": "shipping_compliance"
     },
     "passport_access_log": {
@@ -2605,42 +2526,42 @@
     },
     "plm_change_orders": {
       "migration": "048_plm_change_control.sql",
-      "col_count": 18,
+      "col_count": 26,
       "domain": "plm_change_control"
     },
     "plm_change_requests": {
       "migration": "048_plm_change_control.sql",
-      "col_count": 17,
+      "col_count": 25,
       "domain": "plm_change_control"
     },
     "plm_change_review_board": {
       "migration": "048_plm_change_control.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "plm_change_control"
     },
     "plm_design_reviews": {
       "migration": "048_plm_change_control.sql",
-      "col_count": 13,
+      "col_count": 21,
       "domain": "plm_change_control"
     },
     "plm_deviation_permits": {
       "migration": "048_plm_change_control.sql",
-      "col_count": 17,
+      "col_count": 25,
       "domain": "plm_change_control"
     },
     "plm_obsolescence_tracking": {
       "migration": "048_plm_change_control.sql",
-      "col_count": 14,
+      "col_count": 22,
       "domain": "plm_change_control"
     },
     "plm_product_configurations": {
       "migration": "048_plm_change_control.sql",
-      "col_count": 14,
+      "col_count": 22,
       "domain": "plm_change_control"
     },
     "plm_requirement_traces": {
       "migration": "048_plm_change_control.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "plm_change_control"
     },
     "plm_requirements": {
@@ -2650,7 +2571,7 @@
     },
     "plm_test_plans": {
       "migration": "048_plm_change_control.sql",
-      "col_count": 14,
+      "col_count": 22,
       "domain": "plm_change_control"
     },
     "plm_test_results": {
@@ -2660,27 +2581,27 @@
     },
     "pm_condition_monitoring": {
       "migration": "046_plant_maintenance_cmms.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "plant_maintenance"
     },
     "pm_condition_thresholds": {
       "migration": "046_plant_maintenance_cmms.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "plant_maintenance"
     },
     "pm_equipment_counters": {
       "migration": "046_plant_maintenance_cmms.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "plant_maintenance"
     },
     "pm_equipment_master": {
       "migration": "046_plant_maintenance_cmms.sql",
-      "col_count": 18,
+      "col_count": 26,
       "domain": "plant_maintenance"
     },
     "pm_failure_codes": {
       "migration": "046_plant_maintenance_cmms.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "plant_maintenance"
     },
     "pm_failure_history": {
@@ -2690,12 +2611,12 @@
     },
     "pm_functional_locations": {
       "migration": "046_plant_maintenance_cmms.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "plant_maintenance"
     },
     "pm_maintenance_budgets": {
       "migration": "046_plant_maintenance_cmms.sql",
-      "col_count": 13,
+      "col_count": 21,
       "domain": "plant_maintenance"
     },
     "pm_maintenance_plan_items": {
@@ -2705,17 +2626,17 @@
     },
     "pm_maintenance_plans": {
       "migration": "046_plant_maintenance_cmms.sql",
-      "col_count": 15,
+      "col_count": 23,
       "domain": "plant_maintenance"
     },
     "pm_reliability_metrics": {
       "migration": "046_plant_maintenance_cmms.sql",
-      "col_count": 14,
+      "col_count": 22,
       "domain": "plant_maintenance"
     },
     "pm_spare_parts_inventory": {
       "migration": "046_plant_maintenance_cmms.sql",
-      "col_count": 14,
+      "col_count": 22,
       "domain": "plant_maintenance"
     },
     "pm_work_order_operations": {
@@ -2730,62 +2651,62 @@
     },
     "pm_work_orders": {
       "migration": "046_plant_maintenance_cmms.sql",
-      "col_count": 21,
+      "col_count": 29,
       "domain": "plant_maintenance"
     },
     "portal_access_tokens": {
       "migration": "038_customer_portal.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "customer_portal"
     },
     "portal_complaint_submissions": {
       "migration": "038_customer_portal.sql",
-      "col_count": 13,
+      "col_count": 21,
       "domain": "customer_portal"
     },
     "portal_document_access": {
       "migration": "038_customer_portal.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "customer_portal"
     },
     "portal_order_views": {
       "migration": "038_customer_portal.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "customer_portal"
     },
     "portal_sessions": {
       "migration": "038_customer_portal.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "customer_portal"
     },
     "portal_users": {
       "migration": "038_customer_portal.sql",
-      "col_count": 14,
+      "col_count": 22,
       "domain": "customer_portal"
     },
     "ppap_submissions": {
       "migration": "042_fmea_apqp_control_plan_mobile.sql",
-      "col_count": 17,
+      "col_count": 25,
       "domain": "fmea_apqp"
     },
     "prediction_models": {
       "migration": "041_ai_predictive_quality_aps.sql",
-      "col_count": 16,
+      "col_count": 24,
       "domain": "ai_predictive"
     },
     "prj_billing_milestones": {
       "migration": "052_project_system_earned_value.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "project_management"
     },
     "prj_change_requests": {
       "migration": "052_project_system_earned_value.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "project_management"
     },
     "prj_cost_collections": {
       "migration": "052_project_system_earned_value.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "project_management"
     },
     "prj_earned_value_snapshots": {
@@ -2795,12 +2716,12 @@
     },
     "prj_milestones": {
       "migration": "052_project_system_earned_value.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "project_management"
     },
     "prj_projects": {
       "migration": "052_project_system_earned_value.sql",
-      "col_count": 17,
+      "col_count": 25,
       "domain": "project_management"
     },
     "prj_resource_assignments": {
@@ -2810,47 +2731,47 @@
     },
     "prj_risk_register": {
       "migration": "052_project_system_earned_value.sql",
-      "col_count": 13,
+      "col_count": 21,
       "domain": "project_management"
     },
     "prj_time_entries": {
       "migration": "052_project_system_earned_value.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "project_management"
     },
     "prj_wbs_elements": {
       "migration": "052_project_system_earned_value.sql",
-      "col_count": 14,
+      "col_count": 22,
       "domain": "project_management"
     },
     "product_passports": {
       "migration": "040_digital_product_passport.sql",
-      "col_count": 33,
+      "col_count": 41,
       "domain": "digital_product_passport"
     },
     "production_schedule": {
       "migration": "010_production.sql",
-      "col_count": 38,
+      "col_count": 46,
       "domain": "production"
     },
     "production_schedule_slots": {
       "migration": "041_ai_predictive_quality_aps.sql",
-      "col_count": 18,
+      "col_count": 26,
       "domain": "advanced_planning"
     },
     "project_milestones": {
       "migration": "018_projects_kpi.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "project_management"
     },
     "project_resources": {
       "migration": "018_projects_kpi.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "project_management"
     },
     "projects": {
       "migration": "018_projects_kpi.sql",
-      "col_count": 19,
+      "col_count": 27,
       "domain": "project_management"
     },
     "purchase_order_lines": {
@@ -2860,12 +2781,12 @@
     },
     "purchase_orders": {
       "migration": "008_vendors_purchasing.sql",
-      "col_count": 25,
+      "col_count": 33,
       "domain": "purchasing"
     },
     "qual_audit_programs": {
       "migration": "061_quality_lab_compliance.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "quality_lab"
     },
     "qual_certificate_revisions": {
@@ -2885,12 +2806,12 @@
     },
     "qual_compliance_obligations": {
       "migration": "061_quality_lab_compliance.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "quality_lab"
     },
     "qual_containment_actions": {
       "migration": "061_quality_lab_compliance.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "quality_lab"
     },
     "qual_customer_requirements": {
@@ -2900,7 +2821,7 @@
     },
     "qual_effectiveness_reviews": {
       "migration": "061_quality_lab_compliance.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "quality_lab"
     },
     "qual_escape_events": {
@@ -2910,42 +2831,42 @@
     },
     "qual_first_article_packages": {
       "migration": "061_quality_lab_compliance.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "quality_lab"
     },
     "qual_lab_equipment": {
       "migration": "061_quality_lab_compliance.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "quality_lab"
     },
     "qual_root_cause_sessions": {
       "migration": "061_quality_lab_compliance.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "quality_lab"
     },
     "qual_sample_batches": {
       "migration": "061_quality_lab_compliance.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "quality_lab"
     },
     "qual_sample_plans": {
       "migration": "061_quality_lab_compliance.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "quality_lab"
     },
     "qual_test_labs": {
       "migration": "061_quality_lab_compliance.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "quality_lab"
     },
     "qual_test_methods": {
       "migration": "061_quality_lab_compliance.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "quality_lab"
     },
     "quality_predictions": {
       "migration": "041_ai_predictive_quality_aps.sql",
-      "col_count": 26,
+      "col_count": 34,
       "domain": "ai_predictive"
     },
     "quote_history": {
@@ -2960,12 +2881,12 @@
     },
     "quotes": {
       "migration": "036_quoting_estimation.sql",
-      "col_count": 30,
+      "col_count": 38,
       "domain": "sales"
     },
     "record_counters": {
       "migration": "005_record_management.sql",
-      "col_count": 4,
+      "col_count": 12,
       "domain": "record_system"
     },
     "record_links": {
@@ -2975,22 +2896,27 @@
     },
     "records": {
       "migration": "005_record_management.sql",
-      "col_count": 20,
+      "col_count": 28,
       "domain": "record_system"
+    },
+    "retention_policies": {
+      "migration": "070_enterprise_governance_uplift.sql",
+      "col_count": 17,
+      "domain": "master_data_governance"
     },
     "risk_register": {
       "migration": "014_audit_risk.sql",
-      "col_count": 18,
+      "col_count": 26,
       "domain": "audit_risk"
     },
     "rma_orders": {
       "migration": "017_subcontracting_rma.sql",
-      "col_count": 21,
+      "col_count": 29,
       "domain": "service_warranty"
     },
     "roles": {
       "migration": "002_core_system.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "core_system"
     },
     "routing_operations": {
@@ -3000,7 +2926,7 @@
     },
     "routings": {
       "migration": "006_erp_master_data.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "master_data"
     },
     "sales_order_lines": {
@@ -3010,27 +2936,27 @@
     },
     "sales_orders": {
       "migration": "007_customers_sales.sql",
-      "col_count": 55,
+      "col_count": 63,
       "domain": "sales"
     },
     "scar_records": {
       "migration": "035_supplier_quality_management.sql",
-      "col_count": 32,
+      "col_count": 40,
       "domain": "supplier_relationship"
     },
     "schedule_conflicts": {
       "migration": "041_ai_predictive_quality_aps.sql",
-      "col_count": 15,
+      "col_count": 23,
       "domain": "advanced_planning"
     },
     "serial_master": {
       "migration": "009_inventory.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "inventory"
     },
     "sessions": {
       "migration": "002_core_system.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "core_system"
     },
     "setup_sheet_items": {
@@ -3040,7 +2966,7 @@
     },
     "setup_sheets": {
       "migration": "039_cnc_program_management.sql",
-      "col_count": 17,
+      "col_count": 25,
       "domain": "cnc_programs"
     },
     "shift_assignments": {
@@ -3050,12 +2976,12 @@
     },
     "shift_calendar_holidays": {
       "migration": "044_shift_calendar.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "production"
     },
     "shift_definitions": {
       "migration": "044_shift_calendar.sql",
-      "col_count": 15,
+      "col_count": 23,
       "domain": "production"
     },
     "shift_production_log": {
@@ -3065,32 +2991,32 @@
     },
     "shift_targets": {
       "migration": "043_production_dispatch_shift_targets.sql",
-      "col_count": 24,
+      "col_count": 32,
       "domain": "production"
     },
     "shipment_packages": {
       "migration": "016_shipping_compliance.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "shipping_compliance"
     },
     "shipment_releases": {
       "migration": "032_order_management_world_class_foundations.sql",
-      "col_count": 18,
+      "col_count": 26,
       "domain": "shipping_compliance"
     },
     "shipments": {
       "migration": "016_shipping_compliance.sql",
-      "col_count": 34,
+      "col_count": 42,
       "domain": "shipping_compliance"
     },
     "skills_matrix": {
       "migration": "013_training_hr.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "training_hr"
     },
     "skip_lot_tracking": {
       "migration": "035_supplier_quality_management.sql",
-      "col_count": 14,
+      "col_count": 22,
       "domain": "supplier_relationship"
     },
     "sop_action_items": {
@@ -3100,17 +3026,17 @@
     },
     "sop_demand_consensus": {
       "migration": "058_sop_demand_supply_planning.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "demand_supply_planning"
     },
     "sop_inventory_policies": {
       "migration": "058_sop_demand_supply_planning.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "demand_supply_planning"
     },
     "sop_meeting_cycles": {
       "migration": "058_sop_demand_supply_planning.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "demand_supply_planning"
     },
     "sop_plan_versions": {
@@ -3120,37 +3046,42 @@
     },
     "sop_plans": {
       "migration": "058_sop_demand_supply_planning.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "demand_supply_planning"
     },
     "sop_scenario_assumptions": {
       "migration": "058_sop_demand_supply_planning.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "demand_supply_planning"
     },
     "sop_supply_consensus": {
       "migration": "058_sop_demand_supply_planning.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "demand_supply_planning"
+    },
+    "source_system_registry": {
+      "migration": "070_enterprise_governance_uplift.sql",
+      "col_count": 11,
+      "domain": "master_data_governance"
     },
     "spc_anomaly_rules": {
       "migration": "041_ai_predictive_quality_aps.sql",
-      "col_count": 13,
+      "col_count": 21,
       "domain": "ai_predictive"
     },
     "spc_data": {
       "migration": "011_quality.sql",
-      "col_count": 21,
+      "col_count": 29,
       "domain": "quality_management"
     },
     "srm_bid_comparisons": {
       "migration": "056_supplier_relationship_management.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "supplier_relationship"
     },
     "srm_sourcing_bids": {
       "migration": "056_supplier_relationship_management.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "supplier_relationship"
     },
     "srm_sourcing_events": {
@@ -3160,17 +3091,17 @@
     },
     "srm_supplier_action_requests": {
       "migration": "056_supplier_relationship_management.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "supplier_relationship"
     },
     "srm_supplier_capabilities": {
       "migration": "056_supplier_relationship_management.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "supplier_relationship"
     },
     "srm_supplier_capacity": {
       "migration": "056_supplier_relationship_management.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "supplier_relationship"
     },
     "srm_supplier_contract_lines": {
@@ -3180,27 +3111,27 @@
     },
     "srm_supplier_contracts": {
       "migration": "056_supplier_relationship_management.sql",
-      "col_count": 13,
+      "col_count": 21,
       "domain": "supplier_relationship"
     },
     "srm_supplier_development_plans": {
       "migration": "056_supplier_relationship_management.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "supplier_relationship"
     },
     "srm_supplier_portal_messages": {
       "migration": "056_supplier_relationship_management.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "supplier_relationship"
     },
     "srm_supplier_portal_users": {
       "migration": "056_supplier_relationship_management.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "supplier_relationship"
     },
     "srm_supplier_ppap_packages": {
       "migration": "056_supplier_relationship_management.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "supplier_relationship"
     },
     "srm_supplier_risk_events": {
@@ -3210,32 +3141,32 @@
     },
     "srm_vendor_managed_inventory": {
       "migration": "056_supplier_relationship_management.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "supplier_relationship"
     },
     "subcontract_orders": {
       "migration": "017_subcontracting_rma.sql",
-      "col_count": 24,
+      "col_count": 32,
       "domain": "outsource_execution"
     },
     "subcontract_receipts": {
       "migration": "017_subcontracting_rma.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "outsource_execution"
     },
     "supplier_audit_schedule": {
       "migration": "035_supplier_quality_management.sql",
-      "col_count": 19,
+      "col_count": 27,
       "domain": "supplier_relationship"
     },
     "supplier_scorecards": {
       "migration": "035_supplier_quality_management.sql",
-      "col_count": 22,
+      "col_count": 30,
       "domain": "supplier_relationship"
     },
     "supply_replenishment_policies": {
       "migration": "058_sop_demand_supply_planning.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "demand_supply_planning"
     },
     "svc_contract_lines": {
@@ -3245,27 +3176,27 @@
     },
     "svc_customer_assets": {
       "migration": "059_service_warranty_management.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "service_warranty"
     },
     "svc_field_visit_reports": {
       "migration": "059_service_warranty_management.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "service_warranty"
     },
     "svc_installed_base": {
       "migration": "059_service_warranty_management.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "service_warranty"
     },
     "svc_return_authorizations": {
       "migration": "059_service_warranty_management.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "service_warranty"
     },
     "svc_service_contracts": {
       "migration": "059_service_warranty_management.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "service_warranty"
     },
     "svc_service_kpi_snapshots": {
@@ -3280,7 +3211,7 @@
     },
     "svc_service_requests": {
       "migration": "059_service_warranty_management.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "service_warranty"
     },
     "svc_service_work_order_lines": {
@@ -3290,32 +3221,32 @@
     },
     "svc_service_work_orders": {
       "migration": "059_service_warranty_management.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "service_warranty"
     },
     "svc_warranty_claims": {
       "migration": "059_service_warranty_management.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "service_warranty"
     },
     "tags": {
       "migration": "019_system_tables.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "system_infrastructure"
     },
     "tms_carriers": {
       "migration": "054_transportation_management.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "transportation"
     },
     "tms_customs_documents": {
       "migration": "054_transportation_management.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "transportation"
     },
     "tms_dangerous_goods": {
       "migration": "054_transportation_management.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "transportation"
     },
     "tms_delivery_events": {
@@ -3325,22 +3256,22 @@
     },
     "tms_export_screenings": {
       "migration": "054_transportation_management.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "transportation"
     },
     "tms_freight_audits": {
       "migration": "054_transportation_management.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "transportation"
     },
     "tms_freight_quotes": {
       "migration": "054_transportation_management.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "transportation"
     },
     "tms_routes": {
       "migration": "054_transportation_management.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "transportation"
     },
     "tms_shipment_lines": {
@@ -3350,17 +3281,17 @@
     },
     "tms_shipments": {
       "migration": "054_transportation_management.sql",
-      "col_count": 14,
+      "col_count": 22,
       "domain": "transportation"
     },
     "tool_transactions": {
       "migration": "012_calibration_equipment.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "calibration_equipment"
     },
     "tooling_assemblies": {
       "migration": "057_tooling_lifecycle_management.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "tooling_lifecycle"
     },
     "tooling_calibration_links": {
@@ -3370,17 +3301,17 @@
     },
     "tooling_components": {
       "migration": "057_tooling_lifecycle_management.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "tooling_lifecycle"
     },
     "tooling_crib_transactions": {
       "migration": "057_tooling_lifecycle_management.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "tooling_lifecycle"
     },
     "tooling_families": {
       "migration": "057_tooling_lifecycle_management.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "tooling_lifecycle"
     },
     "tooling_kit_items": {
@@ -3390,37 +3321,37 @@
     },
     "tooling_kits": {
       "migration": "057_tooling_lifecycle_management.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "tooling_lifecycle"
     },
     "tooling_life_limits": {
       "migration": "057_tooling_lifecycle_management.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "tooling_lifecycle"
     },
     "tooling_life_measurements": {
       "migration": "057_tooling_lifecycle_management.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "tooling_lifecycle"
     },
     "tooling_locations": {
       "migration": "057_tooling_lifecycle_management.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "tooling_lifecycle"
     },
     "tooling_presets": {
       "migration": "057_tooling_lifecycle_management.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "tooling_lifecycle"
     },
     "tooling_regrind_cycles": {
       "migration": "057_tooling_lifecycle_management.sql",
-      "col_count": 10,
+      "col_count": 18,
       "domain": "tooling_lifecycle"
     },
     "tools": {
       "migration": "012_calibration_equipment.sql",
-      "col_count": 49,
+      "col_count": 57,
       "domain": "calibration_equipment"
     },
     "trace_dispatch_events": {
@@ -3430,7 +3361,7 @@
     },
     "trace_genealogy_batches": {
       "migration": "066_traceability_serialization.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "traceability_serialization"
     },
     "trace_genealogy_links": {
@@ -3440,7 +3371,7 @@
     },
     "trace_heat_lot_register": {
       "migration": "066_traceability_serialization.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "traceability_serialization"
     },
     "trace_job_traveler_steps": {
@@ -3450,12 +3381,12 @@
     },
     "trace_job_travelers": {
       "migration": "066_traceability_serialization.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "traceability_serialization"
     },
     "trace_label_print_jobs": {
       "migration": "066_traceability_serialization.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "traceability_serialization"
     },
     "trace_label_templates": {
@@ -3470,12 +3401,12 @@
     },
     "trace_material_certificates": {
       "migration": "066_traceability_serialization.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "traceability_serialization"
     },
     "trace_recall_campaigns": {
       "migration": "066_traceability_serialization.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "traceability_serialization"
     },
     "trace_serial_events": {
@@ -3485,42 +3416,42 @@
     },
     "trade_broker_profiles": {
       "migration": "068_trade_compliance_advanced.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "trade_compliance"
     },
     "trade_certificate_of_origin": {
       "migration": "068_trade_compliance_advanced.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "trade_compliance"
     },
     "trade_compliance_audits": {
       "migration": "068_trade_compliance_advanced.sql",
-      "col_count": 8,
+      "col_count": 16,
       "domain": "trade_compliance"
     },
     "trade_duty_drawbacks": {
       "migration": "068_trade_compliance_advanced.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "trade_compliance"
     },
     "trade_eccn_master": {
       "migration": "068_trade_compliance_advanced.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "trade_compliance"
     },
     "trade_end_use_certificates": {
       "migration": "068_trade_compliance_advanced.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "trade_compliance"
     },
     "trade_import_bonds": {
       "migration": "068_trade_compliance_advanced.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "trade_compliance"
     },
     "trade_license_exceptions": {
       "migration": "068_trade_compliance_advanced.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "trade_compliance"
     },
     "trade_license_usage_logs": {
@@ -3530,62 +3461,62 @@
     },
     "trade_preference_programs": {
       "migration": "068_trade_compliance_advanced.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "trade_compliance"
     },
     "trade_restricted_party_lists": {
       "migration": "068_trade_compliance_advanced.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "trade_compliance"
     },
     "trade_screening_hits": {
       "migration": "068_trade_compliance_advanced.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "trade_compliance"
     },
     "training_records": {
       "migration": "013_training_hr.sql",
-      "col_count": 18,
+      "col_count": 26,
       "domain": "training_hr"
     },
     "user_roles": {
       "migration": "002_core_system.sql",
-      "col_count": 6,
+      "col_count": 14,
       "domain": "core_system"
     },
     "users": {
       "migration": "002_core_system.sql",
-      "col_count": 19,
+      "col_count": 27,
       "domain": "core_system"
     },
     "variable_registry": {
       "migration": "019_system_tables.sql",
-      "col_count": 14,
+      "col_count": 22,
       "domain": "system_infrastructure"
     },
     "vendor_ratings": {
       "migration": "008_vendors_purchasing.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "purchasing"
     },
     "vendors": {
       "migration": "008_vendors_purchasing.sql",
-      "col_count": 40,
+      "col_count": 48,
       "domain": "purchasing"
     },
     "warehouses": {
       "migration": "009_inventory.sql",
-      "col_count": 7,
+      "col_count": 15,
       "domain": "inventory"
     },
     "wms_bin_contents": {
       "migration": "050_wms_extended_warehouse.sql",
-      "col_count": 13,
+      "col_count": 21,
       "domain": "warehouse_management"
     },
     "wms_cycle_count_plans": {
       "migration": "050_wms_extended_warehouse.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "warehouse_management"
     },
     "wms_cycle_count_results": {
@@ -3595,7 +3526,7 @@
     },
     "wms_material_handling_units": {
       "migration": "050_wms_extended_warehouse.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "warehouse_management"
     },
     "wms_pick_list_lines": {
@@ -3605,22 +3536,22 @@
     },
     "wms_pick_lists": {
       "migration": "050_wms_extended_warehouse.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "warehouse_management"
     },
     "wms_putaway_rules": {
       "migration": "050_wms_extended_warehouse.sql",
-      "col_count": 12,
+      "col_count": 20,
       "domain": "warehouse_management"
     },
     "wms_quarantine_holds": {
       "migration": "050_wms_extended_warehouse.sql",
-      "col_count": 14,
+      "col_count": 22,
       "domain": "warehouse_management"
     },
     "wms_storage_bins": {
       "migration": "050_wms_extended_warehouse.sql",
-      "col_count": 16,
+      "col_count": 24,
       "domain": "warehouse_management"
     },
     "wms_transfer_order_lines": {
@@ -3630,32 +3561,32 @@
     },
     "wms_transfer_orders": {
       "migration": "050_wms_extended_warehouse.sql",
-      "col_count": 13,
+      "col_count": 21,
       "domain": "warehouse_management"
     },
     "wms_wave_plans": {
       "migration": "050_wms_extended_warehouse.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "warehouse_management"
     },
     "wms_zones": {
       "migration": "050_wms_extended_warehouse.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "warehouse_management"
     },
     "work_centers": {
       "migration": "006_erp_master_data.sql",
-      "col_count": 26,
+      "col_count": 34,
       "domain": "master_data"
     },
     "workflow_definitions": {
       "migration": "019_system_tables.sql",
-      "col_count": 11,
+      "col_count": 19,
       "domain": "system_infrastructure"
     },
     "workflow_instances": {
       "migration": "019_system_tables.sql",
-      "col_count": 9,
+      "col_count": 17,
       "domain": "system_infrastructure"
     },
     "workflow_step_data": {

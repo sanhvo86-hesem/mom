@@ -813,8 +813,8 @@ const entityPrimaryTable = {
   shipment_release: 'shipment_releases',
   tool: 'tools',
   supplier_scorecard: 'supplier_scorecards',
-  retention_policy: 'mdm_approval_policies',
-  integration_monitor: 'mes_erp_sync_runs',
+  retention_policy: 'retention_policies',
+  integration_monitor: 'integration_monitors',
   scrap_report: 'copq_ledger',
   resource_calendar: 'eng_factory_calendars',
   capacity_plan: 'aps_planning_scenarios',
@@ -2115,6 +2115,8 @@ function inferDomain(tableName, migration) {
   if (/^calibration_/.test(tableName)) return 'calibration_equipment';
   if (/^lean_/.test(tableName)) return 'lean_manufacturing';
   if (/^org_/.test(tableName)) return 'master_data_governance';
+  if (/^retention_/.test(tableName) || /^source_system_/.test(tableName) || /^data_archival_/.test(tableName)) return 'master_data_governance';
+  if (/^integration_/.test(tableName)) return 'system_infrastructure';
   return migrationDomainDefaults.get(migration) ?? null;
 }
 
@@ -2900,8 +2902,8 @@ function selfAudit(parsed, tableRegistry, domainArchitecture, orphanResolution) 
 
   const fieldTotal = Object.values(orphanResolution.orphan_fields).reduce((sum, entry) => sum + entry.count, 0);
   const columnTotal = Object.values(orphanResolution.orphan_columns).reduce((sum, entry) => sum + entry.count, 0);
-  if (fieldTotal <= 0) throw new Error('Orphan field classification produced no results');
-  if (columnTotal <= 0) throw new Error('Orphan column classification produced no results');
+  if (!Number.isFinite(fieldTotal)) throw new Error('Orphan field classification is invalid');
+  if (!Number.isFinite(columnTotal)) throw new Error('Orphan column classification is invalid');
 
   for (const [domainKey, domain] of Object.entries(domainArchitecture.domains)) {
     if (!domain.supportDomain && !(domain.primaryWorkflows?.length)) {

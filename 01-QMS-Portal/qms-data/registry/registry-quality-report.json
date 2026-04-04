@@ -2,60 +2,60 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-04T05:59:58.822Z"
+    "generatedAt": "2026-04-04T11:03:30.954Z"
   },
   "summary": {
-    "endpoint_count": 2299,
-    "pack_count": 3126,
-    "relation_edge_count": 803,
-    "workflow_count": 420,
-    "status_set_count": 524,
-    "validation_rule_count": 16364,
-    "formula_count": 941,
-    "formula_reference_count": 941,
-    "field_context_count": 26364
+    "endpoint_count": 2334,
+    "pack_count": 3168,
+    "relation_edge_count": 2440,
+    "workflow_count": 425,
+    "status_set_count": 536,
+    "validation_rule_count": 24776,
+    "formula_count": 960,
+    "formula_reference_count": 960,
+    "field_context_count": 40589
   },
   "checks": [
     {
       "id": "tables_have_fields",
       "passed": true,
-      "actual": 521,
-      "target": 521
+      "actual": 528,
+      "target": 528
     },
     {
       "id": "tables_have_endpoint_catalog",
       "passed": true,
-      "actual": 521,
-      "target": 521
+      "actual": 528,
+      "target": 528
     },
     {
       "id": "tables_have_pack",
       "passed": true,
-      "actual": 521,
-      "target": 521
+      "actual": 528,
+      "target": 528
     },
     {
       "id": "fk_edges_covered",
       "passed": true,
-      "actual": 803,
-      "target": 803
+      "actual": 2440,
+      "target": 2440
     },
     {
       "id": "workflow_coverage",
       "passed": true,
-      "actual": 521,
-      "target": 521
+      "actual": 528,
+      "target": 528
     },
     {
       "id": "status_coverage",
       "passed": true,
-      "actual": 215,
-      "target": 215
+      "actual": 222,
+      "target": 222
     },
     {
       "id": "workflow_count_target",
       "passed": true,
-      "actual": 420,
+      "actual": 425,
       "target": 60
     },
     {
@@ -67,26 +67,26 @@
     {
       "id": "status_set_target",
       "passed": true,
-      "actual": 524,
+      "actual": 536,
       "target": 180
     },
     {
       "id": "validation_rule_target",
       "passed": true,
-      "actual": 16364,
+      "actual": 24776,
       "target": 5000
     },
     {
       "id": "formula_target",
       "passed": true,
-      "actual": 941,
+      "actual": 960,
       "target": 200
     },
     {
       "id": "formula_reference_target",
       "passed": true,
-      "actual": 941,
-      "target": 941
+      "actual": 960,
+      "target": 960
     }
   ],
   "all_passed": true

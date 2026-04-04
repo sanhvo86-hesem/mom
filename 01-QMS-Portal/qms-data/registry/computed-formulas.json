@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Computed formula library expanded from computed field registry and table-level KPI coverage.",
-    "generatedAt": "2026-04-04T05:59:53.380Z",
-    "formulaCount": 941
+    "generatedAt": "2026-04-04T11:01:31.005Z",
+    "formulaCount": 960
   },
   "total_line_amount": {
     "formulaId": "total_line_amount",
@@ -21054,6 +21054,390 @@
         "type": "field",
         "endpoint": "registry_support.aggregate.metrics",
         "key": "verified_by_username"
+      }
+    ]
+  },
+  "captured_by_username": {
+    "formulaId": "captured_by_username",
+    "name": "Captured bởi Tên đăng nhập",
+    "nameEn": "Captured By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY captured_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "captured_by_username"
+      }
+    ]
+  },
+  "detected_by_username": {
+    "formulaId": "detected_by_username",
+    "name": "Detected bởi Tên đăng nhập",
+    "nameEn": "Detected By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY detected_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "detected_by_username"
+      }
+    ]
+  },
+  "evaluated_by_username": {
+    "formulaId": "evaluated_by_username",
+    "name": "Evaluated bởi Tên đăng nhập",
+    "nameEn": "Evaluated By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY evaluated_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "evaluated_by_username"
+      }
+    ]
+  },
+  "triggered_by_username": {
+    "formulaId": "triggered_by_username",
+    "name": "Triggered bởi Tên đăng nhập",
+    "nameEn": "Triggered By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY triggered_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "triggered_by_username"
+      }
+    ]
+  },
+  "waiver_approved_by_username": {
+    "formulaId": "waiver_approved_by_username",
+    "name": "Miễn trừ Đã phê duyệt bởi Tên đăng nhập",
+    "nameEn": "Waiver Approved By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY waiver_approved_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "waiver_approved_by_username"
+      }
+    ]
+  },
+  "f_org_companies_record_count": {
+    "formulaId": "f_org_companies_record_count",
+    "name": "Org Company - Số bản ghi",
+    "nameEn": "Org Companies Record Count",
+    "category": "system",
+    "domain": "master_data_governance",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM org_companies",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "org_companies_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data_governance.org_companies.list"
+      }
+    ]
+  },
+  "f_org_companies_closed_count": {
+    "formulaId": "f_org_companies_closed_count",
+    "name": "Org Company - Số hồ sơ đã đóng",
+    "nameEn": "Org Companies Closed Count",
+    "category": "system",
+    "domain": "master_data_governance",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE company_status IN ('closed','completed','archived','paid','delivered')) FROM org_companies",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "org_companies_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data_governance.org_companies.transition"
+      }
+    ]
+  },
+  "f_org_legal_entities_record_count": {
+    "formulaId": "f_org_legal_entities_record_count",
+    "name": "Org Legal đối tượng - Số bản ghi",
+    "nameEn": "Org Legal Entities Record Count",
+    "category": "system",
+    "domain": "master_data_governance",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM org_legal_entities",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "org_legal_entities_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data_governance.org_legal_entities.list"
+      }
+    ]
+  },
+  "f_org_legal_entities_closed_count": {
+    "formulaId": "f_org_legal_entities_closed_count",
+    "name": "Org Legal đối tượng - Số hồ sơ đã đóng",
+    "nameEn": "Org Legal Entities Closed Count",
+    "category": "system",
+    "domain": "master_data_governance",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE legal_entity_status IN ('closed','completed','archived','paid','delivered')) FROM org_legal_entities",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "org_legal_entities_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data_governance.org_legal_entities.transition"
+      }
+    ]
+  },
+  "f_org_plants_record_count": {
+    "formulaId": "f_org_plants_record_count",
+    "name": "Org Plant - Số bản ghi",
+    "nameEn": "Org Plants Record Count",
+    "category": "system",
+    "domain": "master_data_governance",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM org_plants",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "org_plants_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data_governance.org_plants.list"
+      }
+    ]
+  },
+  "f_org_plants_closed_count": {
+    "formulaId": "f_org_plants_closed_count",
+    "name": "Org Plant - Số hồ sơ đã đóng",
+    "nameEn": "Org Plants Closed Count",
+    "category": "system",
+    "domain": "master_data_governance",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE plant_status IN ('closed','completed','archived','paid','delivered')) FROM org_plants",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "org_plants_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data_governance.org_plants.transition"
+      }
+    ]
+  },
+  "f_data_archival_runs_record_count": {
+    "formulaId": "f_data_archival_runs_record_count",
+    "name": "Dữ liệu Archival lần chạy - Số bản ghi",
+    "nameEn": "Data Archival Runs Record Count",
+    "category": "system",
+    "domain": "master_data_governance",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM data_archival_runs",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "data_archival_runs_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data_governance.data_archival_runs.list"
+      }
+    ]
+  },
+  "f_data_archival_runs_closed_count": {
+    "formulaId": "f_data_archival_runs_closed_count",
+    "name": "Dữ liệu Archival lần chạy - Số hồ sơ đã đóng",
+    "nameEn": "Data Archival Runs Closed Count",
+    "category": "system",
+    "domain": "master_data_governance",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE archive_status IN ('closed','completed','archived','paid','delivered')) FROM data_archival_runs",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "data_archival_runs_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data_governance.data_archival_runs.transition"
+      }
+    ]
+  },
+  "f_integration_monitors_record_count": {
+    "formulaId": "f_integration_monitors_record_count",
+    "name": "Tích hợp Monitor - Số bản ghi",
+    "nameEn": "Integration Monitors Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM integration_monitors",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "integration_monitors_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.integration_monitors.list"
+      }
+    ]
+  },
+  "f_integration_monitors_closed_count": {
+    "formulaId": "f_integration_monitors_closed_count",
+    "name": "Tích hợp Monitor - Số hồ sơ đã đóng",
+    "nameEn": "Integration Monitors Closed Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE monitoring_status IN ('closed','completed','archived','paid','delivered')) FROM integration_monitors",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "integration_monitors_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.integration_monitors.transition"
+      }
+    ]
+  },
+  "f_retention_policies_record_count": {
+    "formulaId": "f_retention_policies_record_count",
+    "name": "Lưu giữ Chính sách - Số bản ghi",
+    "nameEn": "Retention Policies Record Count",
+    "category": "system",
+    "domain": "master_data_governance",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM retention_policies",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "retention_policies_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data_governance.retention_policies.list"
+      }
+    ]
+  },
+  "f_retention_policies_closed_count": {
+    "formulaId": "f_retention_policies_closed_count",
+    "name": "Lưu giữ Chính sách - Số hồ sơ đã đóng",
+    "nameEn": "Retention Policies Closed Count",
+    "category": "system",
+    "domain": "master_data_governance",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE policy_status IN ('closed','completed','archived','paid','delivered')) FROM retention_policies",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "retention_policies_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data_governance.retention_policies.transition"
+      }
+    ]
+  },
+  "f_source_system_registry_record_count": {
+    "formulaId": "f_source_system_registry_record_count",
+    "name": "Nguồn System sổ đăng ký - Số bản ghi",
+    "nameEn": "Source System Registry Record Count",
+    "category": "system",
+    "domain": "master_data_governance",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM source_system_registry",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "source_system_registry_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data_governance.source_system_registry.list"
+      }
+    ]
+  },
+  "f_source_system_registry_closed_count": {
+    "formulaId": "f_source_system_registry_closed_count",
+    "name": "Nguồn System sổ đăng ký - Số hồ sơ đã đóng",
+    "nameEn": "Source System Registry Closed Count",
+    "category": "system",
+    "domain": "master_data_governance",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE source_status IN ('closed','completed','archived','paid','delivered')) FROM source_system_registry",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "source_system_registry_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data_governance.source_system_registry.transition"
       }
     ]
   }

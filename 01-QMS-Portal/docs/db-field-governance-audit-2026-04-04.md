@@ -4,7 +4,7 @@
 
 Audit nay duoc lap tu 4 nguon chinh:
 
-1. `01-QMS-Portal/database/migrations/001..069` la nguon su that cho schema.
+1. `01-QMS-Portal/database/migrations/001..070` la nguon su that cho schema.
 2. `01-QMS-Portal/qms-data/registry/table-registry.json` va `orphan-resolution.json` la lop governance field/workflow sau khi da chay lai generator.
 3. `audit_schema.py` la lop doi chieu field registry <-> cot DB <-> workflow library.
 4. `01-QMS-Portal/qms-data/registry/workflow-library.json` la can cu de danh gia bang nao dang nam trong workflow nao.
@@ -21,36 +21,62 @@ Workflow audit duoc thuc hien theo chuoi:
 
 Trang thai hien tai sau khi chay lai audit:
 
-- 521 bang
-- 6,991 cot
-- 3,645 ten cot duy nhat
+- 528 bang
+- 10,339 cot
+- 3,701 ten cot duy nhat
 - 48 domain
-- 4,068 field key dang hoat dong trong `data-fields`
-- 2,303 endpoint field registry
-- 420 workflow definition
+- 4,012 field key dang hoat dong trong `data-fields`
+- 2,338 endpoint field registry
+- 425 workflow definition
 - 0 ten cot DB bi thieu trong active field registry
-- 422 field synthetic/runtime/computed can tiep tuc governance hoa hoac loai bo theo muc dich
+- 311 field synthetic khong phai cot DB, nhung da duoc phan loai ro:
+  - 306 joined field
+  - 5 action/runtime param
+  - 0 genuine orphan
+  - 0 field source conflict
 
 Ket luan ngan:
 
 - He thong da vuot muc "QMS portal" va dang la bo schema ERP/QMS/MES rat lon.
-- Lop schema khong yeu; diem yeu nam o governance field, naming, va ranh gioi giua master/subtype/runtime JSON.
-- Muon dinh vi "world-class", uu tien khong phai la them bang moi, ma la lam ro:
+- Lop schema da co them ca tang governance enterprise va data lifecycle; diem can tiep tuc sau nay se la JSONB normalization va cold-archive execution policy.
+- Muon dinh vi "world-class", uu tien hien tai la giu dung SSOT, lifecycle, va ranh gioi giua master/subtype/runtime:
   - bang nao la master,
   - bang nao la subtype,
   - field nao la persisted business fact,
   - field nao chi la joined/computed/runtime.
+  - retention/integration nao da co table governance va SLA ro rang.
 
 Trang thai sau chuan hoa tu dong:
 
 - `lean_andon_events`, `lean_kaizen_events`, `lean_qrqc_events`, `lean_smed_events` da duoc sua tu support table thanh primary workflow table.
 - `generate-data-fields-registry.mjs` da dung chung bo naming voi `generate-table-architecture.mjs`, khong con moi generator dat ten 1 kieu.
+- Da them bo bang governance moi:
+  - `org_companies`
+  - `org_legal_entities`
+  - `org_plants`
+  - `source_system_registry`
+  - `retention_policies`
+  - `data_archival_runs`
+  - `integration_monitors`
+- Da dong bo field enterprise tren 408 bang giao dich:
+  - `org_company_code`
+  - `org_legal_entity_code`
+  - `org_plant_id`
+  - `org_site_id`
+  - `source_system`
+  - `source_record_id`
+  - `row_version`
+  - `payload_schema_version`
+- Da dong workflow gap:
+  - `wf_retention_policy` nay da map vao `retention_policies`
+  - `wf_integration_monitor` nay da map vao `integration_monitors`
+- Da xoa hoan toan field source conflict va genuine orphan trong audit.
 - `generate-module-builder-registry.mjs` da qua het quality gate:
-  - 2,299 endpoint catalog
-  - 3,126 field pack
-  - 803 relation edge
+  - 2,334 endpoint catalog
+  - 3,168 field pack
+  - 2,440 relation edge
   - `qualityChecksPassed = true`
-- `audit_schema.py` da duoc nang cap de doc registry sinh tu migration lam nguon chuan, khong con lech 6855 vs 6991 cot.
+- `audit_schema.py` da duoc nang cap de doc split registry, workflowId, va source type thuc te; khong con bao cao nham joined/computed la genuine orphan.
 
 ## 3. Phat hien quan trong nhat
 

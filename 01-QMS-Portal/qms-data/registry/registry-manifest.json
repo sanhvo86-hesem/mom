@@ -2,32 +2,32 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-04T05:59:58.822Z"
+    "generatedAt": "2026-04-04T11:03:30.954Z"
   },
   "coverage": {
-    "router_actions": 2299,
-    "field_registry_actions": 2299,
-    "field_definitions": 26364,
-    "unique_field_keys": 4068,
-    "status_sets": 524,
-    "workflow_count": 420,
-    "relation_edges": 803,
-    "validation_rules": 16364,
-    "formula_count": 941,
-    "domain_pack_count": 3126
+    "router_actions": 2334,
+    "field_registry_actions": 2334,
+    "field_definitions": 40589,
+    "unique_field_keys": 4012,
+    "status_sets": 536,
+    "workflow_count": 425,
+    "relation_edges": 2440,
+    "validation_rules": 24776,
+    "formula_count": 960,
+    "domain_pack_count": 3168
   },
   "assets": {
     "endpoint-catalog.json": {
       "kind": "endpoint-catalog",
-      "records": 2299
+      "records": 2334
     },
     "domain-field-packs.json": {
       "kind": "pack-library",
-      "records": 3126
+      "records": 3168
     },
     "relation-map.json": {
       "kind": "relation-map",
-      "records": 803
+      "records": 2440
     },
     "registry-manifest.json": {
       "kind": "manifest",

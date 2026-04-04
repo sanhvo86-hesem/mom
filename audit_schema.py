@@ -95,6 +95,7 @@ if table_registry:
                 for col, col_meta in columns.items()
             },
             'domain': meta.get('domain'),
+            'workflow_id': meta.get('workflowId'),
         }
     for tname, meta in parsed_tables.items():
         if tname not in merged_tables:
@@ -114,8 +115,14 @@ for key, fields in data_fields.items():
                 fkey = fld['key']
                 eps.append(fkey)
                 if fkey not in field_info:
-                    field_info[fkey] = {'endpoints': [], 'label': fld.get('label',''), 'type': fld.get('type','')}
+                    field_info[fkey] = {
+                        'endpoints': [],
+                        'label': fld.get('label',''),
+                        'type': fld.get('type',''),
+                        'sources': set(),
+                    }
                 field_info[fkey]['endpoints'].append(key)
+                field_info[fkey]['sources'].add(fld.get('source', 'unknown'))
         endpoint_fields[key] = eps
 
 workflows = load_workflow_registry("01-QMS-Portal/qms-data/registry/workflow-library.json")
@@ -139,18 +146,30 @@ orphan_fields = all_field_keys - all_col_names
 # Classify orphans
 classified = {'computed':set(),'kpi':set(),'aggregate':set(),'joined':set(),'action_param':set(),'genuine':set()}
 for f in orphan_fields:
-    if any(f.startswith(p) for p in ['avg_','total_','count_','sum_','pct_','rate_','trend_','score_','rank_','ratio_','delta_','variance_','min_','max_']):
+    sources = field_info.get(f, {}).get('sources', set())
+    endpoints = field_info.get(f, {}).get('endpoints', [])
+    if 'join' in sources:
+        classified['joined'].add(f)
+    elif 'param' in sources:
+        classified['action_param'].add(f)
+    elif any(ep.startswith('registry_support.aggregate.metrics') for ep in endpoints):
+        classified['aggregate'].add(f)
+    elif any(ep.startswith('registry_support.computed.metrics') for ep in endpoints):
+        classified['computed'].add(f)
+    elif any(f.startswith(p) for p in ['avg_','total_','count_','sum_','pct_','rate_','trend_','score_','rank_','ratio_','delta_','variance_','min_','max_']):
         classified['computed'].add(f)
     elif any(f.startswith(p) for p in ['kpi_','oee_','otd_','ppm_','dpmo_','copq_','yield_','mtbf_','mttr_']):
         classified['kpi'].add(f)
     elif any(f.startswith(p) for p in ['active_','open_','pending_','overdue_','closed_','this_week','this_month','today_','last_']):
         classified['aggregate'].add(f)
-    elif f.endswith('_name') and f.replace('_name','_id') in all_col_names:
-        classified['joined'].add(f)
-    elif any(f.endswith(s) for s in ['_save','_delete','_create','_update','_transition']):
-        classified['action_param'].add(f)
     else:
         classified['genuine'].add(f)
+
+source_conflicts = {
+    key: sorted([src for src in meta.get('sources', set()) if src])
+    for key, meta in field_info.items()
+    if len([src for src in meta.get('sources', set()) if src]) > 1
+}
 
 # Map tables to workflow/domain
 domain_prefixes = {
@@ -188,7 +207,9 @@ domain_prefixes = {
     'machine_rate':'production', 'material_':'master_data', 'setup_':'production',
     'commercial_':'commercial', 'portal_':'portal', 'contract_':'commercial',
     'incoming_':'quality', 'oqc_':'quality', 'supplier_':'supplier_quality',
-    'lean_':'lean'
+    'lean_':'lean', 'org_':'master_data_governance', 'retention_':'master_data_governance',
+    'source_system_':'master_data_governance', 'data_archival_':'master_data_governance',
+    'integration_':'system_infrastructure'
 }
 
 table_domain = {}
@@ -230,6 +251,7 @@ print(f"  aggregate:        {len(classified['aggregate'])}")
 print(f"  joined (FK name): {len(classified['joined'])}")
 print(f"  action params:    {len(classified['action_param'])}")
 print(f"  GENUINE orphans:  {len(classified['genuine'])}")
+print(f"Field source conflicts: {len(source_conflicts)}")
 
 missing_field_defs = sorted(all_col_names - all_field_keys)
 print(f"\nDB cols without field def: {len(missing_field_defs)}/{len(all_col_names)} ({100*len(missing_field_defs)/col_denominator:.1f}%)")
@@ -252,8 +274,16 @@ if orphan_tables:
 # Workflow entities vs tables
 print(f"\n--- WORKFLOW-TABLE COVERAGE ---")
 for entity, wfkey in sorted(wf_entities.items()):
-    entity_tables = [t for t in tables if entity in t or t.startswith(entity.replace('_',''))]
+    entity_tables = [t for t, meta in tables.items() if meta.get('workflow_id') == wfkey]
+    if not entity_tables:
+        entity_tables = [t for t in tables if entity in t or t.startswith(entity.replace('_',''))]
     print(f"  {entity} ({wfkey}): {len(entity_tables)} tables -> {entity_tables[:5]}")
+
+if source_conflicts:
+    print(f"\n--- MULTI-SOURCE FIELD KEYS ({len(source_conflicts)}) ---")
+    print("These keys are reused across db/join/param/computed sources and should be minimized.")
+    for field_key in sorted(source_conflicts)[:40]:
+        print(f"  {field_key}: {source_conflicts[field_key]}")
 
 # Genuine orphan fields detail
 print(f"\n--- GENUINE ORPHAN FIELDS ({len(classified['genuine'])}) ---")
@@ -271,6 +301,7 @@ audit = {
     'matched': len(matched_fields),
     'missing_field_defs': missing_field_defs,
     'orphan_fields': {k: sorted(list(v)) for k, v in classified.items()},
+    'field_source_conflicts': source_conflicts,
     'orphan_tables': sorted(orphan_tables),
     'domain_map': {d: sorted(ts) for d, ts in domain_counts.items()},
     'table_list': {t: {'migration': tables[t]['migration'], 'col_count': len(tables[t]['columns']), 'domain': table_domain[t]} for t in sorted(tables)},
