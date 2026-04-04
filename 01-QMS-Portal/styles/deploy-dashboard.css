@@ -192,3 +192,160 @@
   .kpi-mini-grid,.deploy-dept-grid,.doc-group-grid,.deploy-pillar-grid{grid-template-columns:1fr}
   .deploy-doc-card{align-items:flex-start;flex-direction:column}
 }
+
+[data-color-mode="dark"] .deploy-summary-card,
+[data-color-mode="dark"] .deploy-pillar-card,
+[data-color-mode="dark"] .wave-card,
+[data-color-mode="dark"] .dept-card,
+[data-color-mode="dark"] .deploy-table-wrap,
+[data-color-mode="dark"] .checklist-item,
+[data-color-mode="dark"] .command-card,
+[data-color-mode="dark"] .cadence-item,
+[data-color-mode="dark"] .kpi-mini-card,
+[data-color-mode="dark"] .doc-group-card{
+  background:#1e293b;
+  border-color:#334155;
+  box-shadow:none;
+}
+[data-color-mode="dark"] .summary-alert,
+[data-color-mode="dark"] .dept-card-blocked{
+  background:linear-gradient(135deg,#1f2937,#2b1f26);
+  border-color:rgba(248,113,113,.28);
+}
+[data-color-mode="dark"] .deploy-tab{
+  background:#1e293b;
+  color:#94a3b8;
+  border-color:#334155;
+}
+[data-color-mode="dark"] .deploy-tab:hover{
+  background:#263348;
+  color:#f1f5f9;
+  border-color:#60a5fa;
+}
+[data-color-mode="dark"] .deploy-section-head h2,
+[data-color-mode="dark"] .deploy-summary-card strong,
+[data-color-mode="dark"] .phase-info strong,
+[data-color-mode="dark"] .deploy-pillar-card h3,
+[data-color-mode="dark"] .wave-card-head strong,
+[data-color-mode="dark"] .wave-score,
+[data-color-mode="dark"] .dept-card h3,
+[data-color-mode="dark"] .readiness-dept-name,
+[data-color-mode="dark"] .checklist-code,
+[data-color-mode="dark"] .cadence-item strong,
+[data-color-mode="dark"] .kpi-mini-label,
+[data-color-mode="dark"] .deploy-doc-code{
+  color:#f1f5f9;
+}
+[data-color-mode="dark"] .deploy-summary-card div,
+[data-color-mode="dark"] .summary-label,
+[data-color-mode="dark"] .deploy-section-head span,
+[data-color-mode="dark"] .phase-info span,
+[data-color-mode="dark"] .pillar-owner,
+[data-color-mode="dark"] .deploy-pillar-card p,
+[data-color-mode="dark"] .wave-card-head span,
+[data-color-mode="dark"] .dept-owner,
+[data-color-mode="dark"] .dept-records,
+[data-color-mode="dark"] .checklist-text,
+[data-color-mode="dark"] .command-label,
+[data-color-mode="dark"] .command-card small,
+[data-color-mode="dark"] .cadence-item span,
+[data-color-mode="dark"] .cadence-item p,
+[data-color-mode="dark"] .kpi-mini-target,
+[data-color-mode="dark"] .doc-group-card p,
+[data-color-mode="dark"] .deploy-doc-title,
+[data-color-mode="dark"] .deploy-footer{
+  color:#94a3b8;
+}
+[data-color-mode="dark"] .phase-node{
+  background:#1e293b;
+  border-color:#334155;
+}
+[data-color-mode="dark"] .phase-weeks,
+[data-color-mode="dark"] .pillar-pass,
+[data-color-mode="dark"] .dept-next-action,
+[data-color-mode="dark"] .wave-card-head,
+[data-color-mode="dark"] .cadence-item,
+[data-color-mode="dark"] .kpi-mini-icon,
+[data-color-mode="dark"] .deploy-doc-card{
+  background:#162032;
+  border-color:#334155;
+}
+[data-color-mode="dark"] .phase-status-dot,
+[data-color-mode="dark"] .phase-connector,
+[data-color-mode="dark"] .dept-progress-ring,
+[data-color-mode="dark"] .dept-progress-bar,
+[data-color-mode="dark"] .hm-dot.hm-pending{
+  background:#334155;
+  border-color:#475569;
+}
+[data-color-mode="dark"] .phase-done{
+  background:linear-gradient(135deg,rgba(15,118,110,.24),#1e293b);
+  border-color:rgba(45,212,191,.28);
+}
+[data-color-mode="dark"] .phase-active{
+  background:linear-gradient(135deg,rgba(37,99,235,.24),#1e293b);
+  border-color:rgba(96,165,250,.45);
+  box-shadow:0 0 0 3px rgba(96,165,250,.16);
+}
+[data-color-mode="dark"] .wave-dept-row{
+  background:#162032;
+  border-color:#334155;
+}
+[data-color-mode="dark"] .wave-dept-main,
+[data-color-mode="dark"] .wave-score{
+  color:#e2e8f0;
+}
+[data-color-mode="dark"] .dept-link-group a,
+[data-color-mode="dark"] .deploy-links-compact a{
+  background:rgba(59,130,246,.18);
+  border-color:rgba(96,165,250,.28);
+  color:#93c5fd;
+}
+[data-color-mode="dark"] .deploy-heatmap td,
+[data-color-mode="dark"] .deploy-heatmap th{
+  border-color:#263348;
+}
+[data-color-mode="dark"] .deploy-heatmap tbody tr:hover{
+  background:#162032;
+}
+[data-color-mode="dark"] .hm-pending{
+  background:#1e293b;
+  color:#94a3b8;
+}
+[data-color-mode="dark"] .hm-in_progress{
+  background:rgba(59,130,246,.18);
+  color:#93c5fd;
+}
+[data-color-mode="dark"] .hm-completed{
+  background:rgba(16,185,129,.18);
+  color:#6ee7b7;
+}
+[data-color-mode="dark"] .hm-blocked{
+  background:rgba(239,68,68,.2);
+  color:#fca5a5;
+}
+[data-color-mode="dark"] .checklist-item.checked{
+  background:linear-gradient(135deg,rgba(16,185,129,.16),#1e293b);
+  border-color:rgba(110,231,183,.25);
+}
+[data-color-mode="dark"] .command-card input,
+[data-color-mode="dark"] .kpi-mini-input{
+  background:#162032;
+  border-color:#475569;
+  color:#f1f5f9;
+}
+[data-color-mode="dark"] .deploy-doc-card{
+  color:#e2e8f0;
+}
+[data-color-mode="dark"] .deploy-doc-card:hover{
+  background:#263348;
+  border-color:#60a5fa;
+}
+[data-color-mode="dark"] .deploy-btn-reset{
+  background:rgba(239,68,68,.16);
+  border-color:rgba(248,113,113,.28);
+  color:#fca5a5;
+}
+[data-color-mode="dark"] .deploy-btn-reset:hover{
+  background:rgba(239,68,68,.22);
+}

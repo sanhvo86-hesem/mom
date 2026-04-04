@@ -3781,7 +3781,9 @@ function renderDictBody(){
 function highlightMatch(text, query){
   if(!query || !text) return text;
   const escaped = query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-  return text.replace(new RegExp('('+escaped+')','gi'),'<mark style="background:#fff9c4;padding:0 2px;border-radius:2px">$1</mark>');
+  const darkUi = document.documentElement.getAttribute('data-color-mode') === 'dark';
+  const markBg = darkUi ? 'rgba(251,191,36,.28)' : '#fff9c4';
+  return text.replace(new RegExp('('+escaped+')','gi'),'<mark style="background:'+markBg+';color:inherit;padding:0 2px;border-radius:2px">$1</mark>');
 }
 
 function handleDictSearch(q){

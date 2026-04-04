@@ -2391,6 +2391,45 @@
   color: var(--ec-text);
 }
 
+[data-color-mode="dark"] .ec-inline-alert.error {
+  background: linear-gradient(180deg, rgba(248,113,113,.18) 0%, rgba(30,41,59,.96) 100%);
+  border-color: rgba(248,113,113,.3);
+  color: #fecaca;
+}
+[data-color-mode="dark"] .ec-inline-alert.error small {
+  color: #cbd5e1;
+}
+[data-color-mode="dark"] .ec-kpi-card.primary {
+  background: linear-gradient(180deg, rgba(37,99,235,.2) 0%, rgba(30,41,59,.98) 100%);
+}
+[data-color-mode="dark"] .ec-kpi-card.warning {
+  background: linear-gradient(180deg, rgba(217,119,6,.22) 0%, rgba(30,41,59,.98) 100%);
+}
+[data-color-mode="dark"] .ec-kpi-card.danger {
+  background: linear-gradient(180deg, rgba(220,38,38,.2) 0%, rgba(30,41,59,.98) 100%);
+}
+[data-color-mode="dark"] .ec-kpi-card.neutral {
+  background: linear-gradient(180deg, rgba(71,85,105,.34) 0%, rgba(30,41,59,.98) 100%);
+}
+[data-color-mode="dark"] .ec-filter-value,
+[data-color-mode="dark"] .ec-mini {
+  background: #162032;
+  border-color: #334155;
+}
+[data-color-mode="dark"] .ec-work-card {
+  background: linear-gradient(180deg, #162032 0%, #1e293b 100%);
+  border-color: #334155;
+}
+[data-color-mode="dark"] .ec-work-card.warn {
+  background: linear-gradient(180deg, rgba(180,83,9,.18) 0%, #1e293b 100%);
+  border-color: rgba(251,191,36,.28);
+}
+[data-color-mode="dark"] .ec-work-empty {
+  background: #162032;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
 .ec-work-review {
   margin-top: 12px;
   padding: 10px 12px;

@@ -303,25 +303,25 @@ button{cursor:pointer;border:none;background:none}
 .dict-term{font-size:15px;font-weight:700;color:var(--text);letter-spacing:.2px}
 .dict-meaning{font-size:13px;color:var(--text);font-weight:600;margin-top:4px;line-height:1.5}
 .dict-vi{font-size:12px;color:var(--brand-2);font-weight:600;margin-top:2px}
-.dict-cat-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;border:1px solid var(--border);background:#f8f9fa;color:var(--text-2);white-space:nowrap;flex-shrink:0}
+.dict-cat-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;border:1px solid var(--border);background:var(--bg-surface-alt,var(--surface));color:var(--text-2);white-space:nowrap;flex-shrink:0}
 .dict-cat-badge .dot{width:7px;height:7px;border-radius:50%;display:inline-block}
 .dict-def{font-size:13px;color:var(--text-2);margin-top:10px;line-height:1.6}
-.dict-ctx{font-size:11px;color:var(--text-3);margin-top:8px;padding:8px 12px;background:#f8f9fa;border-radius:8px;line-height:1.5}
+.dict-ctx{font-size:11px;color:var(--text-3);margin-top:8px;padding:8px 12px;background:var(--bg-surface-alt,var(--surface));border-radius:8px;line-height:1.5}
 .dict-ctx b{color:var(--text-2);font-weight:700}
 .dict-rec{font-size:11px;color:var(--text-3);margin-top:6px;font-style:italic}
 .dict-more-btn{display:block;margin:16px auto;padding:10px 28px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-weight:600;color:var(--brand-2);background:var(--surface);transition:all .15s}
-.dict-more-btn:hover{background:#e3f2fd;border-color:var(--brand-2)}
+.dict-more-btn:hover{background:var(--bg-selected);border-color:var(--brand-2)}
 .dict-loading{text-align:center;padding:40px;color:var(--text-3)}
 .dict-loading .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--brand-2);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}
 
 /* ═══ ACCESS MATRIX ═══ */
 .matrix-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px}
 .matrix-table th,.matrix-table td{padding:8px 10px;border:1px solid var(--border);text-align:center}
-.matrix-table th{background:#f8f9fa;font-weight:600;font-size:10px;color:var(--text-3);letter-spacing:.3px}
+.matrix-table th{background:var(--bg-surface-alt,var(--surface));font-weight:600;font-size:10px;color:var(--text-3);letter-spacing:.3px}
 .matrix-table td:first-child{text-align:left;font-weight:600;font-size:12px}
-.matrix-table tr.current-role{background:#e3f2fd}
+.matrix-table tr.current-role{background:var(--bg-selected)}
 .check{color:var(--green)}
-.cross{color:#e0e0e0}
+.cross{color:var(--text-3)}
 
 /* ═══ RESPONSIVE ═══ */
 @media(max-width:900px){
