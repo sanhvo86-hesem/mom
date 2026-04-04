@@ -713,7 +713,7 @@ var Canvas = {
   },
 
   zoomToFit: function(){
-    var tables = (STORE.schema && STORE.schema.tables) || [];
+    var tables = typeof Browser !== 'undefined' && Browser.getCanvasTables ? Browser.getCanvasTables() : ((STORE.schema && STORE.schema.tables) || []);
     if(!tables.length || !refs.canvasWrap) return;
     var minX = Infinity;
     var minY = Infinity;
@@ -947,7 +947,7 @@ var Canvas = {
     var ctx = refs.minimapCanvas.getContext('2d');
     var canvas = refs.minimapCanvas;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    var tables = (STORE.schema && STORE.schema.tables) || [];
+    var tables = typeof Browser !== 'undefined' && Browser.getCanvasTables ? Browser.getCanvasTables() : ((STORE.schema && STORE.schema.tables) || []);
     if(!tables.length){
       Canvas._miniBounds = null;
       if(refs.minimapViewport){
@@ -976,7 +976,7 @@ var Canvas = {
       var y = padY + ((tbl.canvas.y - minY) * scale);
       var w = Math.max(12, (tbl.canvas.width || TABLE_DEFAULT_WIDTH) * scale);
       var h = Math.max(8, getTableHeight(tbl) * scale);
-      ctx.fillStyle = STORE.canvas.selection.some(function(item){ return item.kind === 'table' && item.id === tbl.id; }) ? '#2563eb' : '#94a3b8';
+      ctx.fillStyle = STORE.canvas.selection.some(function(item){ return item.kind === 'table' && item.id === tbl.id; }) ? '#2563eb' : (tbl.color || DOMAIN_COLORS[tbl.domain] || '#94a3b8');
       ctx.fillRect(x, y, w, h);
     });
     if(refs.minimapViewport && refs.canvasWrap){
@@ -1157,7 +1157,7 @@ var EdgeLayer = {
     if(!EdgeLayer.svgLayer) return;
     EdgeLayer.svgLayer.innerHTML = '';
     ((STORE.schema && STORE.schema.relations) || []).forEach(function(rel){
-      if(!visibleIds || visibleIds.has(rel.from_table_id) || visibleIds.has(rel.to_table_id)){
+      if((!visibleIds || (visibleIds.has(rel.from_table_id) && visibleIds.has(rel.to_table_id))) && (!Browser || (Browser.isTableVisible(findTable(rel.from_table_id)) && Browser.isTableVisible(findTable(rel.to_table_id))))){
         EdgeLayer.renderEdge(rel);
       }
     });
@@ -1173,7 +1173,7 @@ var EdgeLayer = {
     });
     ((STORE.schema && STORE.schema.relations) || []).forEach(function(rel){
       var visibleIds = VirtualRenderer.getVisibleSet();
-      if((rel.from_table_id === tableId || rel.to_table_id === tableId) && (!visibleIds || !visibleIds.size || visibleIds.has(rel.from_table_id) || visibleIds.has(rel.to_table_id))){
+      if((rel.from_table_id === tableId || rel.to_table_id === tableId) && (!visibleIds || !visibleIds.size || (visibleIds.has(rel.from_table_id) && visibleIds.has(rel.to_table_id))) && (!Browser || (Browser.isTableVisible(findTable(rel.from_table_id)) && Browser.isTableVisible(findTable(rel.to_table_id))))){
         EdgeLayer.renderEdge(rel);
       }
     });
@@ -2267,7 +2267,7 @@ function modeLabel(mode){
 
 var Browser = {
   getVisibleTables: function(){
-    var tables = (STORE.schema && STORE.schema.tables) || [];
+    var tables = typeof Browser !== 'undefined' && Browser.getCanvasTables ? Browser.getCanvasTables() : ((STORE.schema && STORE.schema.tables) || []);
     var filter = String(STORE.browser.filter || '').trim().toLowerCase();
     if(!filter) return tables.slice();
     return tables.filter(function(tbl){
@@ -2422,6 +2422,358 @@ var Browser = {
     var tbl = findTable(tableId);
     var el;
     if(!tbl || !refs.canvasWrap) return;
+    STORE.canvas.zoom = Math.min(1.35, Math.max(STORE.canvas.zoom, 0.9));
+    STORE.canvas.panX = (refs.canvasWrap.clientWidth / 2) - ((tbl.canvas.x + ((tbl.canvas.width || TABLE_DEFAULT_WIDTH) / 2)) * STORE.canvas.zoom);
+    STORE.canvas.panY = (refs.canvasWrap.clientHeight / 2) - ((tbl.canvas.y + (getTableHeight(tbl) / 2)) * STORE.canvas.zoom);
+    Canvas.applyTransform();
+    VirtualRenderer.update();
+    Canvas.selectTable(tableId);
+    Inspector.open({ kind:'table', tableId:tableId });
+    el = document.getElementById('tc_' + tableId);
+    if(el){
+      el.classList.add('ss-highlight-pulse');
+      setTimeout(function(){ el.classList.remove('ss-highlight-pulse'); }, 1000);
+    }
+  }
+};
+
+var Browser = {
+  getAllTables: function(){
+    return (STORE.schema && STORE.schema.tables) || [];
+  },
+
+  isDomainHidden: function(domain){
+    var key = domain || 'default';
+    if(STORE.browser.isolatedDomain){
+      return STORE.browser.isolatedDomain !== key;
+    }
+    return STORE.browser.hiddenDomains[key] === true;
+  },
+
+  isDomainVisible: function(domain){
+    return !Browser.isDomainHidden(domain);
+  },
+
+  isTableVisible: function(tbl){
+    return !!(tbl && Browser.isDomainVisible(tbl.domain || 'default'));
+  },
+
+  getCanvasTables: function(){
+    return Browser.getAllTables().filter(function(tbl){
+      return Browser.isTableVisible(tbl);
+    });
+  },
+
+  getVisibleTables: function(){
+    var tables = Browser.getAllTables();
+    var filter = String(STORE.browser.filter || '').trim().toLowerCase();
+    if(!filter) return tables.slice();
+    return tables.filter(function(tbl){
+      if(String(tbl.name || '').toLowerCase().indexOf(filter) >= 0) return true;
+      if(String(tbl.domain || '').toLowerCase().indexOf(filter) >= 0) return true;
+      if(String(tbl.comment || '').toLowerCase().indexOf(filter) >= 0) return true;
+      return (tbl.columns || []).some(function(col){
+        return String(col.name || '').toLowerCase().indexOf(filter) >= 0 || String(col.comment || '').toLowerCase().indexOf(filter) >= 0;
+      });
+    });
+  },
+
+  groupTables: function(tables){
+    var groups = {};
+    (tables || []).forEach(function(tbl){
+      var domain = tbl.domain || 'default';
+      if(!groups[domain]) groups[domain] = [];
+      groups[domain].push(tbl);
+    });
+    return groups;
+  },
+
+  getDomainStats: function(){
+    var groups = Browser.groupTables(Browser.getAllTables());
+    var domains = Object.keys(groups);
+    var visibleTables = Browser.getCanvasTables();
+    var visibleDomains = domains.filter(function(domain){
+      return Browser.isDomainVisible(domain);
+    });
+    return {
+      totalTables: Browser.getAllTables().length,
+      visibleTables: visibleTables.length,
+      hiddenTables: Math.max(Browser.getAllTables().length - visibleTables.length, 0),
+      totalDomains: domains.length,
+      visibleDomains: visibleDomains.length,
+      hiddenDomains: Math.max(domains.length - visibleDomains.length, 0)
+    };
+  },
+
+  syncSelectionToVisibility: function(){
+    STORE.canvas.selection = (STORE.canvas.selection || []).filter(function(item){
+      var rel;
+      var tbl;
+      if(item.kind === 'table'){
+        tbl = findTable(item.id);
+        return Browser.isTableVisible(tbl);
+      }
+      if(item.kind === 'edge'){
+        rel = findRelation(item.id);
+        return !!(rel && Browser.isTableVisible(findTable(rel.from_table_id)) && Browser.isTableVisible(findTable(rel.to_table_id)));
+      }
+      return true;
+    });
+    if(STORE.inspector.target){
+      if(STORE.inspector.target.kind === 'table' && !Browser.isTableVisible(findTable(STORE.inspector.target.tableId))){
+        STORE.inspector.target = null;
+      }
+      if(STORE.inspector.target && STORE.inspector.target.kind === 'column' && !Browser.isTableVisible(findTable(STORE.inspector.target.tableId))){
+        STORE.inspector.target = null;
+      }
+      if(STORE.inspector.target && STORE.inspector.target.kind === 'relation'){
+        var rel = findRelation(STORE.inspector.target.relId);
+        if(!rel || !Browser.isTableVisible(findTable(rel.from_table_id)) || !Browser.isTableVisible(findTable(rel.to_table_id))){
+          STORE.inspector.target = null;
+        }
+      }
+    }
+  },
+
+  refreshVisibility: function(options){
+    saveUiPrefs();
+    Browser.syncSelectionToVisibility();
+    Browser.render();
+    if(refs.inspector){
+      if(STORE.inspector.target){
+        Inspector.render();
+      }else{
+        Inspector.renderEmpty();
+      }
+    }
+    if(refs.tablesLayer){
+      VirtualRenderer.reset();
+    }else if(refs.canvasWrap){
+      Canvas.render();
+    }
+    if(options && options.zoomToFit){
+      setTimeout(function(){ Canvas.zoomToFit(); }, 90);
+    }else{
+      Canvas.updateMinimap();
+    }
+  },
+
+  toggleOpen: function(forceState){
+    STORE.browser.open = typeof forceState === 'boolean' ? forceState : !STORE.browser.open;
+    saveUiPrefs();
+    if(refs.root){
+      refs.root.classList.toggle('browser-collapsed', !STORE.browser.open);
+    }
+    if(refs.toolbar){
+      renderToolbar(refs.toolbar);
+    }
+    Browser.render();
+    if(isActivePage()){
+      setTimeout(function(){
+        Canvas.applyTransform();
+        if(window.VirtualRenderer && typeof VirtualRenderer.scheduleUpdate === 'function'){
+          VirtualRenderer.scheduleUpdate();
+        }
+      }, 120);
+    }
+  },
+
+  setDomainVisible: function(domain, visible, options){
+    var key = domain || 'default';
+    if(visible){
+      delete STORE.browser.hiddenDomains[key];
+    }else{
+      STORE.browser.hiddenDomains[key] = true;
+      if(STORE.browser.isolatedDomain === key){
+        STORE.browser.isolatedDomain = '';
+      }
+    }
+    Browser.refreshVisibility(options);
+  },
+
+  toggleDomainVisibility: function(domain, ev){
+    if(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+    }
+    Browser.setDomainVisible(domain, Browser.isDomainHidden(domain), null);
+  },
+
+  isolateDomain: function(domain, ev){
+    if(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+    }
+    STORE.browser.isolatedDomain = STORE.browser.isolatedDomain === domain ? '' : domain;
+    if(STORE.browser.isolatedDomain){
+      delete STORE.browser.hiddenDomains[domain];
+      STORE.browser.expandedDomains[domain] = true;
+    }
+    Browser.refreshVisibility({ zoomToFit:true });
+  },
+
+  showAllDomains: function(ev){
+    if(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+    }
+    STORE.browser.hiddenDomains = {};
+    STORE.browser.isolatedDomain = '';
+    Browser.refreshVisibility({ zoomToFit:true });
+  },
+
+  ensureDomainVisible: function(domain){
+    var key = domain || 'default';
+    var changed = false;
+    if(STORE.browser.isolatedDomain && STORE.browser.isolatedDomain !== key){
+      STORE.browser.isolatedDomain = '';
+      changed = true;
+    }
+    if(STORE.browser.hiddenDomains[key]){
+      delete STORE.browser.hiddenDomains[key];
+      changed = true;
+    }
+    if(STORE.browser.expandedDomains[key] === false){
+      changed = true;
+    }
+    STORE.browser.expandedDomains[key] = true;
+    if(changed){
+      saveUiPrefs();
+      Browser.render();
+      if(refs.tablesLayer){
+        VirtualRenderer.reset();
+      }
+    }
+  },
+
+  expandAll: function(){
+    var groups = Browser.groupTables(Browser.getAllTables());
+    Object.keys(groups).forEach(function(domain){
+      STORE.browser.expandedDomains[domain] = true;
+    });
+    saveUiPrefs();
+    Browser.render();
+  },
+
+  collapseAll: function(){
+    var groups = Browser.groupTables(Browser.getAllTables());
+    Object.keys(groups).forEach(function(domain){
+      STORE.browser.expandedDomains[domain] = false;
+    });
+    saveUiPrefs();
+    Browser.render();
+  },
+
+  render: function(){
+    var tables;
+    var filtered;
+    var allGroups;
+    var filteredGroups;
+    var domains;
+    var filter;
+    var filterActive;
+    var stats;
+    if(!refs.browser) return;
+    tables = Browser.getAllTables();
+    filtered = Browser.getVisibleTables();
+    allGroups = Browser.groupTables(tables);
+    filteredGroups = Browser.groupTables(filtered);
+    domains = Object.keys(allGroups).sort();
+    filter = String(STORE.browser.filter || '').trim();
+    filterActive = !!filter;
+    stats = Browser.getDomainStats();
+    if(!STORE.browser.open){
+      refs.browser.innerHTML = [
+        '<div class="ss-browser-collapsed-shell">',
+          '<button class="ss-browser-rail-btn" type="button" onclick="Browser.toggleOpen(true)" title="' + _esc(_t('Mở trình duyệt schema (B)', 'Open schema browser (B)')) + '" aria-label="' + _esc(_t('Mở trình duyệt schema', 'Open schema browser')) + '">▸</button>',
+          '<button class="ss-browser-rail-btn" type="button" onclick="Browser.showAllDomains(); Browser.toggleOpen(true)" title="' + _esc(_t('Hiện tất cả domain', 'Show all domains')) + '" aria-label="' + _esc(_t('Hiện tất cả domain', 'Show all domains')) + '">◌</button>',
+          '<button class="ss-browser-rail-btn" type="button" onclick="Browser.expandAll(); Browser.toggleOpen(true)" title="' + _esc(_t('Mở rộng tất cả domain', 'Expand all domains')) + '" aria-label="' + _esc(_t('Mở rộng tất cả domain', 'Expand all domains')) + '">+</button>',
+          '<div class="ss-browser-rail-stats"><strong>' + String(stats.visibleTables) + '</strong><span>' + _esc(_t('đang hiện', 'visible')) + '</span></div>',
+        '</div>'
+      ].join('');
+      return;
+    }
+    refs.browser.innerHTML = [
+      '<div class="ss-browser-header">',
+        '<div class="ss-browser-title-group"><div class="ss-browser-title">' + _esc(_t('Trình duyệt schema', 'Schema browser')) + '</div><div class="ss-browser-subtitle">' + String(stats.visibleTables) + '/' + String(stats.totalTables) + ' ' + _esc(_t('bảng đang hiện', 'tables visible')) + ' · ' + String(stats.visibleDomains) + '/' + String(stats.totalDomains) + ' ' + _esc(_t('domain', 'domains')) + '</div></div>',
+        '<div class="ss-browser-tools">',
+          '<button class="ss-browser-tool" type="button" onclick="Browser.showAllDomains()" title="' + _esc(_t('Hiện tất cả domain', 'Show all domains')) + '" aria-label="' + _esc(_t('Hiện tất cả domain', 'Show all domains')) + '">◌</button>',
+          '<button class="ss-browser-tool" type="button" onclick="Browser.expandAll()" title="' + _esc(_t('Mở rộng tất cả', 'Expand all')) + '" aria-label="' + _esc(_t('Mở rộng tất cả', 'Expand all')) + '">+</button>',
+          '<button class="ss-browser-tool" type="button" onclick="Browser.collapseAll()" title="' + _esc(_t('Thu gọn tất cả', 'Collapse all')) + '" aria-label="' + _esc(_t('Thu gọn tất cả', 'Collapse all')) + '">−</button>',
+          '<button class="ss-browser-tool" type="button" onclick="Browser.toggleOpen(false)" title="' + _esc(_t('Ẩn trình duyệt schema (B)', 'Hide schema browser (B)')) + '" aria-label="' + _esc(_t('Ẩn trình duyệt schema', 'Hide schema browser')) + '">◂</button>',
+        '</div>',
+      '</div>',
+      '<div class="ss-browser-search-wrap"><input class="hm-input ss-browser-search" placeholder="' + _esc(_t('Tìm bảng, cột hoặc domain...', 'Search tables, columns, or domains...')) + '" value="' + _esc(STORE.browser.filter) + '" oninput="Browser.onFilter(this.value)" /><div class="ss-browser-search-meta">' + _esc(filterActive ? (_t('Đang hiển thị ' + filtered.length + ' bảng khớp', 'Showing ' + filtered.length + ' matching table(s)')) : _t('Nhấp đúp vào bảng để đưa vào giữa màn hình', 'Double-click a table to focus it on canvas')) + '</div><div class="ss-domain-chip-strip"><button class="ss-domain-chip ss-domain-chip-reset' + (!stats.hiddenDomains && !STORE.browser.isolatedDomain ? ' active' : '') + '" type="button" onclick="Browser.showAllDomains()" title="' + _esc(_t('Hiện toàn bộ domain', 'Show every domain')) + '"><span class="ss-domain-chip-label">' + _esc(_t('Tất cả', 'All')) + '</span><strong>' + String(stats.totalDomains) + '</strong></button>' + domains.map(function(domain){ var totalCount = (allGroups[domain] || []).length; var hidden = Browser.isDomainHidden(domain); var isolated = STORE.browser.isolatedDomain === domain; return '<button class="ss-domain-chip' + (hidden ? ' is-hidden' : '') + (isolated ? ' is-isolated' : '') + '" type="button" onclick="Browser.isolateDomain(\'' + _esc(domain) + '\', event)" title="' + _esc(_t('Bấm để chỉ hiện domain này', 'Click to isolate this domain')) + '"><span class="ss-domain-chip-dot" style="background:' + _esc(DOMAIN_COLORS[domain] || DOMAIN_COLORS.default) + '"></span><span class="ss-domain-chip-label">' + _esc(formatDomainLabel(domain)) + '</span><strong>' + String(totalCount) + '</strong></button>'; }).join('') + '</div></div>',
+      '<div class="ss-browser-list">',
+        domains.length ? domains.filter(function(domain){
+          return !filterActive || ((filteredGroups[domain] || []).length > 0);
+        }).map(function(domain){
+          var hidden = Browser.isDomainHidden(domain);
+          var isolated = STORE.browser.isolatedDomain === domain;
+          var totalCount = (allGroups[domain] || []).length;
+          var tablesForDomain = filterActive ? (filteredGroups[domain] || []) : (allGroups[domain] || []);
+          var expanded = hidden ? false : (filterActive ? true : STORE.browser.expandedDomains[domain] !== false);
+          return [
+            '<div class="ss-domain-group' + (hidden ? ' is-hidden' : '') + (isolated ? ' is-isolated' : '') + '" data-domain="' + _esc(domain) + '">',
+              '<div class="ss-domain-group-header" style="border-left:3px solid ' + _esc(DOMAIN_COLORS[domain] || DOMAIN_COLORS.default) + '" onclick="Browser.toggleDomain(\'' + _esc(domain) + '\')">',
+                '<span class="ss-domain-chevron">' + (expanded ? '▾' : '▸') + '</span>',
+                '<span class="ss-domain-name">' + _esc(formatDomainLabel(domain)) + '</span>',
+                hidden ? '<span class="ss-domain-state">' + _esc(_t('Ẩn', 'Hidden')) + '</span>' : '',
+                '<div class="ss-domain-actions"><button class="ss-domain-action" type="button" onclick="Browser.isolateDomain(\'' + _esc(domain) + '\', event)" title="' + _esc(isolated ? _t('Bỏ chế độ chỉ xem domain này', 'Clear isolated view') : _t('Chỉ hiện domain này', 'Show only this domain')) + '">' + _esc(isolated ? _t('Tất cả', 'All') : _t('Chỉ', 'Only')) + '</button><button class="ss-domain-action" type="button" onclick="Browser.toggleDomainVisibility(\'' + _esc(domain) + '\', event)" title="' + _esc(hidden ? _t('Hiện lại domain này', 'Show this domain again') : _t('Ẩn domain này khỏi canvas', 'Hide this domain from canvas')) + '">' + _esc(hidden ? _t('Hiện', 'Show') : _t('Ẩn', 'Hide')) + '</button></div>',
+                '<span class="ss-domain-count">' + String(filterActive ? tablesForDomain.length : totalCount) + '</span>',
+              '</div>',
+              expanded ? '<div class="ss-domain-tables">' + tablesForDomain.map(function(tbl){
+                var active = STORE.canvas.selection.some(function(item){ return item.kind === 'table' && item.id === tbl.id; });
+                var fkCount = ((STORE.schema && STORE.schema.relations) || []).filter(function(rel){
+                  return rel.from_table_id === tbl.id || rel.to_table_id === tbl.id;
+                }).length;
+                return '<div class="ss-table-item' + (active ? ' active' : '') + '" onclick="Browser.selectTable(\'' + _esc(tbl.id) + '\')" ondblclick="Browser.focusTable(\'' + _esc(tbl.id) + '\')" title="' + _esc(tbl.name) + '"><span class="ss-tbl-item-name">' + _esc(tbl.name) + '</span>' + (fkCount ? '<span class="ss-tbl-badge">' + String(fkCount) + ' FK</span>' : '') + '</div>';
+              }).join('') + '</div>' : (hidden ? '<div class="ss-domain-hidden-note">' + _esc(_t('Domain này đang ẩn khỏi canvas, minimap và relation', 'This domain is hidden from canvas, minimap, and relations')) + '</div>' : ''),
+            '</div>'
+          ].join('');
+        }).join('') : '<div class="ss-empty-state"><div>' + _esc(_t('Chưa có bảng nào', 'No tables yet')) + '</div></div>',
+      '</div>',
+      '<div class="ss-browser-footer"><div class="ss-browser-footer-meta"><span>' + String(stats.visibleTables) + '/' + String(stats.totalTables) + ' ' + _esc(_t('bảng', 'tables')) + '</span><span>&middot;</span><span>' + String(stats.hiddenDomains) + ' ' + _esc(_t('domain đang ẩn', 'hidden domains')) + '</span></div><div class="ss-browser-footer-actions"><button class="hm-btn hm-btn-ghost ss-btn-xs" onclick="Browser.showAllDomains()">' + _esc(_t('Hiện tất cả', 'Show all')) + '</button><button class="hm-btn hm-btn-ghost ss-btn-xs" onclick="TableCard.createNew(100,100)">+ ' + _esc(_t('Tạo bảng', 'New table')) + '</button></div></div>'
+    ].join('');
+  },
+
+  onFilter: function(value){
+    var activeInput = document.activeElement;
+    var keepFocus = !!(activeInput && activeInput.classList && activeInput.classList.contains('ss-browser-search'));
+    var selStart = keepFocus && typeof activeInput.selectionStart === 'number' ? activeInput.selectionStart : null;
+    var selEnd = keepFocus && typeof activeInput.selectionEnd === 'number' ? activeInput.selectionEnd : selStart;
+    STORE.browser.filter = value || '';
+    Browser.render();
+    if(keepFocus && refs.browser){
+      var nextInput = refs.browser.querySelector('.ss-browser-search');
+      if(nextInput){
+        nextInput.focus();
+        if(selStart !== null && typeof nextInput.setSelectionRange === 'function'){
+          nextInput.setSelectionRange(selStart, selEnd);
+        }
+      }
+    }
+  },
+
+  toggleDomain: function(domain){
+    STORE.browser.expandedDomains[domain] = STORE.browser.expandedDomains[domain] === false ? true : false;
+    saveUiPrefs();
+    Browser.render();
+  },
+
+  selectTable: function(tableId){
+    var tbl = findTable(tableId);
+    if(tbl) Browser.ensureDomainVisible(tbl.domain || 'default');
+    Canvas.selectTable(tableId);
+    Inspector.open({ kind:'table', tableId:tableId });
+    Browser.render();
+  },
+
+  focusTable: function(tableId){
+    var tbl = findTable(tableId);
+    var el;
+    if(!tbl || !refs.canvasWrap) return;
+    Browser.ensureDomainVisible(tbl.domain || 'default');
     STORE.canvas.zoom = Math.min(1.35, Math.max(STORE.canvas.zoom, 0.9));
     STORE.canvas.panX = (refs.canvasWrap.clientWidth / 2) - ((tbl.canvas.x + ((tbl.canvas.width || TABLE_DEFAULT_WIDTH) / 2)) * STORE.canvas.zoom);
     STORE.canvas.panY = (refs.canvasWrap.clientHeight / 2) - ((tbl.canvas.y + (getTableHeight(tbl) / 2)) * STORE.canvas.zoom);
@@ -3337,6 +3689,10 @@ var CmdPalette = {
     { icon:'V', label:'Validation', label_en:'Validation', category:'action', action:function(){ Validator.run(); } },
     { icon:'M', label:'Migration preview', label_en:'Migration preview', category:'action', action:function(){ MigGen.renderPreview(); } },
     { icon:'Z', label:'Zoom to fit', label_en:'Zoom to fit', category:'view', action:function(){ Canvas.zoomToFit(); } },
+    { icon:'B', label:'Ẩn hiện trình duyệt schema', label_en:'Toggle schema browser', category:'view', action:function(){ Browser.toggleOpen(); } },
+    { icon:'◌', label:'Hiện tất cả domain', label_en:'Show all domains', category:'view', action:function(){ Browser.showAllDomains(); } },
+    { icon:'+', label:'Mở rộng tất cả domain', label_en:'Expand all domains', category:'view', action:function(){ Browser.expandAll(); } },
+    { icon:'−', label:'Thu gọn tất cả domain', label_en:'Collapse all domains', category:'view', action:function(){ Browser.collapseAll(); } },
     { icon:'#', label:'Bat tat snap grid', label_en:'Toggle snap grid', category:'view', action:function(){ Canvas.toggleSnap(); } },
     { icon:'G', label:'Grid layout', label_en:'Grid layout', category:'layout', action:function(){ Layout.auto('grid'); } },
     { icon:'F', label:'Force layout', label_en:'Force layout', category:'layout', action:function(){ Layout.auto('force'); } },
