@@ -1340,6 +1340,10 @@ var TableCard = {
     if(document.getElementById('tc_' + tbl.id)) return;
     var card = document.createElement('div');
     var domainColor = tbl.color || DOMAIN_COLORS[tbl.domain] || DOMAIN_COLORS.default;
+    var schemaLabel = String(tbl.schema || 'public');
+    var schemaMeta = schemaLabel && schemaLabel !== 'public'
+      ? '<span class="ss-tbl-meta">' + _esc(schemaLabel) + '</span>'
+      : '';
     card.className = 'ss-table-card' + (tbl.canvas.collapsed ? ' collapsed' : '');
     card.id = 'tc_' + tbl.id;
     card.setAttribute('data-table-id', tbl.id);
@@ -1348,12 +1352,16 @@ var TableCard = {
     card.style.setProperty('--ss-domain-color', domainColor);
     card.innerHTML = [
       '<div class="ss-table-card-header">',
-        '<span class="ss-tbl-drag">::</span>',
-        '<span class="ss-tbl-name" title="' + _esc(tbl.name) + '">' + _esc(tbl.name) + '</span>',
-        '<span class="ss-tbl-schema-badge">' + _esc(tbl.schema || 'public') + '</span>',
+        '<div class="ss-table-head-main" title="' + _esc(schemaLabel + '.' + tbl.name) + '">',
+          '<span class="ss-tbl-drag">::</span>',
+          '<div class="ss-tbl-title-stack">',
+            '<span class="ss-tbl-name">' + _esc(tbl.name) + '</span>',
+            schemaMeta,
+          '</div>',
+        '</div>',
         '<div class="ss-table-actions">',
-          '<button type="button" class="ss-icon-btn" data-ss-action="collapse" title="' + _esc(_t('Thu gon', 'Collapse')) + '">' + (tbl.canvas.collapsed ? '+' : '-') + '</button>',
-          '<button type="button" class="ss-icon-btn danger" data-ss-action="delete" title="' + _esc(_t('Xoa', 'Delete')) + '">&#128465;</button>',
+          '<button type="button" class="ss-icon-btn" data-ss-action="collapse" title="' + _esc(tbl.canvas.collapsed ? _t('Mở rộng bảng', 'Expand table') : _t('Thu gọn bảng', 'Collapse table')) + '">' + (tbl.canvas.collapsed ? '+' : '-') + '</button>',
+          '<button type="button" class="ss-icon-btn danger" data-ss-action="delete" title="' + _esc(_t('Xóa bảng', 'Delete table')) + '">&#128465;</button>',
         '</div>',
       '</div>',
       '<ul class="ss-col-list">',
@@ -1368,8 +1376,8 @@ var TableCard = {
           }).join('') + '</span><span class="ss-fk-port" data-port-col="' + _esc(col.id) + '" title="' + _esc(_t('Keo de tao FK', 'Drag to create FK')) + '"></span></li>';
         }).join(''),
       '</ul>',
-      '<div class="ss-col-item-add" data-ss-action="add-column">+ ' + _esc(_t('Them cot', 'Add column')) + '</div>',
-      '<div class="ss-table-footer">' + _esc(((tbl.indexes || []).length + ' indexes · ' + (tbl.columns || []).length + ' ' + _t('cot', 'columns'))) + '</div>'
+      '<div class="ss-col-item-add" data-ss-action="add-column">+ ' + _esc(_t('Thêm cột', 'Add column')) + '</div>',
+      '<div class="ss-table-footer">' + _esc(((tbl.indexes || []).length + ' indexes · ' + (tbl.columns || []).length + ' ' + _t('cột', 'columns'))) + '</div>'
     ].join('');
     refs.tablesLayer.appendChild(card);
     if(STORE.canvas.selection.some(function(item){ return item.kind === 'table' && item.id === tbl.id; })){
@@ -1388,10 +1396,10 @@ var TableCard = {
       Canvas.selectTable(tbl.id, ev.shiftKey || ev.ctrlKey || ev.metaKey);
       Inspector.open({ kind:'table', tableId:tbl.id });
     });
-    card.querySelector('.ss-tbl-name').ondblclick = function(ev){
+    card.querySelector('.ss-table-card-header').ondblclick = function(ev){
       ev.preventDefault();
       ev.stopPropagation();
-      TableCard.inlineRenameTable(tbl.id);
+      TableCard.openDetails(tbl.id);
     };
     card.querySelector('[data-ss-action="collapse"]').onclick = function(ev){ ev.stopPropagation(); TableCard.toggleCollapse(tbl.id); };
     card.querySelector('[data-ss-action="delete"]').onclick = function(ev){ ev.stopPropagation(); TableCard.confirmDelete(tbl.id); };
@@ -1408,6 +1416,19 @@ var TableCard = {
     });
   },
 
+  openDetails: function(tableId){
+    var tbl = findTable(tableId);
+    if(!tbl) return;
+    Canvas.selectTable(tableId);
+    if(tbl.canvas && tbl.canvas.collapsed){
+      tbl.canvas.collapsed = false;
+      TableCard.reRender(tableId);
+      EdgeLayer.updateEdgesForTable(tableId);
+      saveDraft();
+    }
+    Inspector.open({ kind:'table', tableId:tableId });
+  },
+
   startMove: function(tableId, ev){
     if(ev.button !== 0) return;
     ev.preventDefault();
@@ -1421,6 +1442,8 @@ var TableCard = {
     var startPositions = {};
     var pendingDX = 0;
     var pendingDY = 0;
+    var dragStarted = false;
+    var dragThreshold = 4;
     if(!tbl) return;
     if(selectedTableIds.indexOf(tableId) < 0){
       Canvas.selectTable(tableId, modifier);
@@ -1428,15 +1451,10 @@ var TableCard = {
     }
     isMultiMove = selectedTableIds.indexOf(tableId) >= 0 && selectedTableIds.length > 1;
     tablesToMove = isMultiMove ? selectedTableIds.slice() : [tableId];
-    pushUndo();
     tablesToMove.forEach(function(id){
       var moveTbl = findTable(id);
-      var moveCard = document.getElementById('tc_' + id);
       if(moveTbl){
         startPositions[id] = { x: moveTbl.canvas.x, y: moveTbl.canvas.y };
-      }
-      if(moveCard){
-        moveCard.classList.add('ss-dragging');
       }
     });
     var startCanvasX = (ev.clientX - STORE.canvas.panX) / STORE.canvas.zoom;
@@ -1446,6 +1464,19 @@ var TableCard = {
       var cy = (moveEv.clientY - STORE.canvas.panY) / STORE.canvas.zoom;
       pendingDX = cx - startCanvasX;
       pendingDY = cy - startCanvasY;
+      if(!dragStarted && Math.abs(pendingDX) < dragThreshold && Math.abs(pendingDY) < dragThreshold){
+        return;
+      }
+      if(!dragStarted){
+        dragStarted = true;
+        pushUndo();
+        tablesToMove.forEach(function(id){
+          var moveCard = document.getElementById('tc_' + id);
+          if(moveCard){
+            moveCard.classList.add('ss-dragging');
+          }
+        });
+      }
       if(rafHandle) return;
       rafHandle = requestAnimationFrame(function(){
         rafHandle = null;
@@ -1468,6 +1499,9 @@ var TableCard = {
       if(rafHandle){
         cancelAnimationFrame(rafHandle);
         rafHandle = null;
+      }
+      if(!dragStarted){
+        return;
       }
       tablesToMove.forEach(function(id){
         var moveTbl = findTable(id);
