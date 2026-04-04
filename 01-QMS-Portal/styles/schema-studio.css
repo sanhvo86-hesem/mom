@@ -1899,6 +1899,17 @@
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
+.ss-table-item:focus-visible,
+.ss-table-item-flat:focus-visible,
+.ss-browser-tool:focus-visible,
+.ss-domain-chip:focus-visible,
+.ss-domain-action:focus-visible,
+.ss-browser-rail-btn:focus-visible,
+.ss-browser-splitter:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
 .ss-domain-focus-card .ss-domain-tables {
   flex: 1;
   min-height: 0;
