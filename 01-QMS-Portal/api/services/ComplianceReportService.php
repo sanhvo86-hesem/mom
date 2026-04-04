@@ -36,18 +36,21 @@ final class ComplianceReportService
     /** @var array<string, mixed> Cached templates. */
     private array $templates = [];
 
+    private ?object $db = null;
+
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
      * @param string $dataDir Absolute path to qms-data directory.
      * @param string $confDir Absolute path to qms-data/config directory.
      */
-    public function __construct(string $dataDir, string $confDir)
+    public function __construct(string $dataDir, string $confDir, ?object $db = null)
     {
         $this->dataDir      = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->confDir      = rtrim(str_replace('\\', '/', $confDir), '/');
         $this->reportsDir   = $this->dataDir . '/reports/generated';
         $this->templateFile = $this->confDir . '/compliance_report_templates.json';
+        $this->db           = $db;
 
         // Ensure directories exist
         foreach ([

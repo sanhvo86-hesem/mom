@@ -116,6 +116,7 @@ final class WorkflowEngine
         string $userId,
         ?string $comment = null,
         ?string $onBehalfOf = null,
+        array  $data = [],
     ): TransitionResult {
         $record = $this->loadRecordState($recordId);
         if ($record === null) {
@@ -203,6 +204,19 @@ final class WorkflowEngine
             );
         }
 
+        // ── Step data validation: check required fields per transition ────
+        $stepDataValidation = $this->validateStepData($recordType, $targetState, $data);
+        if (!$stepDataValidation['ok']) {
+            return new TransitionResult(
+                success: false,
+                recordId: $recordId,
+                fromState: $currentState,
+                toState: $targetState,
+                error: 'Required step data missing: ' . implode(', ', array_column($stepDataValidation['missing'], 'label')),
+                errorVi: 'Thieu du lieu bat buoc: ' . implode(', ', array_column($stepDataValidation['missing'], 'label_vi')),
+            );
+        }
+
         // Perform the transition
         $triggeredActions = [];
         $now = gmdate('Y-m-d\TH:i:s\Z');
@@ -238,6 +252,9 @@ final class WorkflowEngine
 
         // Persist state
         $this->saveRecordState($recordId, $record);
+
+        // ── Persist step data to structured table ───────────────────────
+        $this->persistStepData($recordType, $recordId, $currentState, $targetState, $data, $userId, $now);
 
         // Log to audit trail
         if ($this->auditTrail !== null) {
@@ -684,6 +701,92 @@ final class WorkflowEngine
         );
     }
 
+    // ── Step Data Persistence ──────────────────────────────────────────────
+
+    /**
+     * Persist structured step data to the appropriate database table.
+     * Dual-write: PostgreSQL (if available) + JSON file backup.
+     *
+     * This ensures every workflow transition has its business data
+     * captured in a queryable, structured format -- essential for
+     * compliance reporting (AS9100D, ISO 17025).
+     */
+    private function persistStepData(
+        string $recordType,
+        string $recordId,
+        string $fromState,
+        string $toState,
+        array  $data,
+        string $userId,
+        string $now,
+    ): void {
+        $reqs = $this->getStepDataRequirements($recordType, $toState);
+
+        // Only persist if there are defined requirements for this step
+        if (empty($reqs['required_fields']) && empty($reqs['optional_fields'])) {
+            return;
+        }
+
+        // Build the step data record
+        $stepRecord = [
+            'workflow_type' => $recordType,
+            'record_id'     => $recordId,
+            'step_name'     => $toState,
+            'from_state'    => $fromState,
+            'to_state'      => $toState,
+            'data_fields'   => [],
+            'captured_by'   => $userId,
+            'captured_at'   => $now,
+            'target_table'  => $reqs['table'],
+        ];
+
+        // Extract relevant fields from data
+        foreach (array_keys($reqs['required_fields']) as $field) {
+            if (isset($data[$field])) {
+                $stepRecord['data_fields'][$field] = $data[$field];
+            }
+        }
+        foreach ($reqs['optional_fields'] as $field) {
+            if (isset($data[$field])) {
+                $stepRecord['data_fields'][$field] = $data[$field];
+            }
+        }
+
+        // Try PostgreSQL
+        if ($this->db !== null && $this->db->isConnected()) {
+            try {
+                $this->db->execute(
+                    "INSERT INTO workflow_step_data (workflow_type, record_id, step_name, from_state, to_state, data_fields, captured_by, captured_at)
+                     VALUES (:wtype, :rid, :step, :from, :to, :data::jsonb, (SELECT user_id FROM users WHERE username = :user LIMIT 1), :at::timestamptz)
+                     ON CONFLICT (workflow_type, record_id, step_name, to_state)
+                     DO UPDATE SET data_fields = EXCLUDED.data_fields, captured_by = EXCLUDED.captured_by, captured_at = EXCLUDED.captured_at",
+                    [
+                        ':wtype' => $recordType,
+                        ':rid'   => $recordId,
+                        ':step'  => $toState,
+                        ':from'  => $fromState,
+                        ':to'    => $toState,
+                        ':data'  => json_encode($stepRecord['data_fields'], JSON_UNESCAPED_UNICODE),
+                        ':user'  => $userId,
+                        ':at'    => $now,
+                    ],
+                );
+            } catch (\Throwable $e) {
+                error_log('[WorkflowEngine] Step data PG write failed: ' . $e->getMessage());
+            }
+        }
+
+        // Always write JSON backup
+        $stepDir = $this->stateDir . '/step_data';
+        if (!is_dir($stepDir)) {
+            @mkdir($stepDir, 0775, true);
+        }
+        $safeId = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $recordId);
+        $stepFile = $stepDir . '/' . $safeId . '_steps.jsonl';
+        $line = json_encode($stepRecord, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+        @file_put_contents($stepFile, $line, FILE_APPEND | LOCK_EX);
+    }
+
     // ── Role Checking ───────────────────────────────────────────────────────
 
     /**
@@ -973,21 +1076,49 @@ final class WorkflowEngine
                 ],
             ],
 
+            // ── NCR: World-class with MRB routing, human factors, auto-CAPA trigger ──
             'NCR' => [
                 'initial'  => 'open',
-                'terminal' => ['closed'],
-                'states'   => ['open', 'containment', 'investigation', 'disposition', 'closed'],
+                'terminal' => ['closed', 'voided'],
+                'states'   => [
+                    'open', 'containment', 'segregated', 'investigation',
+                    'mrb_review', 'disposition', 'rework_in_progress',
+                    'reinspection', 'closed', 'voided',
+                ],
                 'transitions' => [
                     'open' => [
                         'containment' => [
-                            'label'    => 'Start Containment',
-                            'label_vi' => 'Bat dau kiem soat',
-                            'roles'    => ['qa_manager', 'quality_engineer', 'admin', 'assignee'],
-                            'actions'  => ['set_due_date_7d'],
+                            'label'    => 'Start Containment (24h SLA)',
+                            'label_vi' => 'Bat dau kiem soat (SLA 24h)',
+                            'roles'    => ['qa_manager', 'quality_engineer', 'admin', 'assignee', 'qc_inspector'],
+                            'actions'  => ['set_due_date_7d', 'notify_qa_manager'],
+                            'requires' => [],
+                        ],
+                        'voided' => [
+                            'label'    => 'Void (duplicate/invalid)',
+                            'label_vi' => 'Huy (trung/khong hop le)',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => [],
                             'requires' => [],
                         ],
                     ],
                     'containment' => [
+                        'segregated' => [
+                            'label'    => 'Confirm Segregation',
+                            'label_vi' => 'Xac nhan cach ly',
+                            'roles'    => ['qa_manager', 'quality_engineer', 'admin', 'assignee'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                        'investigation' => [
+                            'label'    => 'Begin Investigation',
+                            'label_vi' => 'Bat dau dieu tra',
+                            'roles'    => ['qa_manager', 'quality_engineer', 'admin', 'assignee'],
+                            'actions'  => ['set_due_date_14d'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'segregated' => [
                         'investigation' => [
                             'label'    => 'Begin Investigation',
                             'label_vi' => 'Bat dau dieu tra',
@@ -997,18 +1128,41 @@ final class WorkflowEngine
                         ],
                     ],
                     'investigation' => [
+                        'mrb_review' => [
+                            'label'    => 'Escalate to MRB',
+                            'label_vi' => 'Chuyen len Hoi dong MRB',
+                            'roles'    => ['qa_manager', 'quality_engineer', 'admin'],
+                            'actions'  => ['notify_production_director', 'notify_approver'],
+                            'requires' => ['has_root_cause'],
+                        ],
                         'disposition' => [
-                            'label'    => 'Record Disposition',
-                            'label_vi' => 'Ghi nhan xu ly',
+                            'label'    => 'Record Disposition (minor)',
+                            'label_vi' => 'Ghi nhan xu ly (nhe)',
                             'roles'    => ['qa_manager', 'quality_engineer', 'admin'],
                             'actions'  => ['notify_approver'],
                             'requires' => ['has_root_cause'],
                         ],
                     ],
+                    'mrb_review' => [
+                        'disposition' => [
+                            'label'    => 'MRB Disposition Decision',
+                            'label_vi' => 'Quyet dinh xu ly cua MRB',
+                            'roles'    => ['qa_manager', 'production_director', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => ['has_disposition'],
+                        ],
+                    ],
                     'disposition' => [
+                        'rework_in_progress' => [
+                            'label'    => 'Start Rework',
+                            'label_vi' => 'Bat dau lam lai',
+                            'roles'    => ['qa_manager', 'quality_engineer', 'admin', 'assignee'],
+                            'actions'  => ['set_due_date_7d'],
+                            'requires' => [],
+                        ],
                         'closed' => [
-                            'label'    => 'Close NCR',
-                            'label_vi' => 'Dong NCR',
+                            'label'    => 'Close NCR (scrap/use-as-is)',
+                            'label_vi' => 'Dong NCR (huy/chap nhan)',
                             'roles'    => ['qa_manager', 'admin'],
                             'actions'  => ['notify_owner', 'clear_due_date'],
                             'requires' => ['has_disposition'],
@@ -1021,19 +1175,60 @@ final class WorkflowEngine
                             'requires' => [],
                         ],
                     ],
+                    'rework_in_progress' => [
+                        'reinspection' => [
+                            'label'    => 'Submit for Reinspection',
+                            'label_vi' => 'Gui kiem tra lai',
+                            'roles'    => ['quality_engineer', 'admin', 'assignee'],
+                            'actions'  => ['notify_approver'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'reinspection' => [
+                        'closed' => [
+                            'label'    => 'Reinspection Pass - Close',
+                            'label_vi' => 'Kiem tra lai Dat - Dong',
+                            'roles'    => ['qa_manager', 'qc_inspector', 'admin'],
+                            'actions'  => ['notify_owner', 'clear_due_date'],
+                            'requires' => [],
+                        ],
+                        'rework_in_progress' => [
+                            'label'    => 'Reinspection Fail - Return',
+                            'label_vi' => 'Kiem tra lai Khong dat - Tra ve',
+                            'roles'    => ['qa_manager', 'qc_inspector', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
+                        ],
+                    ],
                     'closed' => [],
+                    'voided' => [],
                 ],
             ],
 
+            // ── CAPA: 8D methodology, human factors, effectiveness 30/60/90 day ──
             'CAPA' => [
                 'initial'  => 'initiated',
-                'terminal' => ['closed'],
-                'states'   => ['initiated', 'root_cause', 'action_plan', 'implementation', 'verification', 'closed'],
+                'terminal' => ['closed', 'closed_ineffective'],
+                'states'   => [
+                    'initiated', 'containment', 'root_cause', 'action_plan',
+                    'implementation', 'verification',
+                    'effectiveness_30d', 'effectiveness_60d', 'effectiveness_90d',
+                    'closed', 'closed_ineffective',
+                ],
                 'transitions' => [
                     'initiated' => [
+                        'containment' => [
+                            'label'    => 'D3: Define Interim Containment',
+                            'label_vi' => 'D3: Xac dinh hanh dong kiem soat tam thoi',
+                            'roles'    => ['quality_engineer', 'qa_manager', 'admin', 'assignee'],
+                            'actions'  => ['set_due_date_7d'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'containment' => [
                         'root_cause' => [
-                            'label'    => 'Begin Root Cause Analysis',
-                            'label_vi' => 'Bat dau phan tich nguyen nhan goc',
+                            'label'    => 'D4: Root Cause Analysis (incl. human factors)',
+                            'label_vi' => 'D4: Phan tich nguyen nhan goc (gom yeu to con nguoi)',
                             'roles'    => ['quality_engineer', 'qa_manager', 'admin', 'assignee'],
                             'actions'  => ['set_due_date_14d'],
                             'requires' => [],
@@ -1041,8 +1236,8 @@ final class WorkflowEngine
                     ],
                     'root_cause' => [
                         'action_plan' => [
-                            'label'    => 'Define Action Plan',
-                            'label_vi' => 'Xac dinh ke hoach hanh dong',
+                            'label'    => 'D5-D6: Corrective Action Plan',
+                            'label_vi' => 'D5-D6: Ke hoach hanh dong khac phuc',
                             'roles'    => ['quality_engineer', 'qa_manager', 'admin', 'assignee'],
                             'actions'  => [],
                             'requires' => ['has_root_cause'],
@@ -1059,19 +1254,19 @@ final class WorkflowEngine
                     ],
                     'implementation' => [
                         'verification' => [
-                            'label'    => 'Submit for Verification',
-                            'label_vi' => 'Gui xac minh',
+                            'label'    => 'D7: Submit for Verification',
+                            'label_vi' => 'D7: Gui xac minh',
                             'roles'    => ['quality_engineer', 'qa_manager', 'admin', 'assignee'],
                             'actions'  => ['notify_approver'],
                             'requires' => [],
                         ],
                     ],
                     'verification' => [
-                        'closed' => [
-                            'label'    => 'Close CAPA',
-                            'label_vi' => 'Dong CAPA',
+                        'effectiveness_30d' => [
+                            'label'    => 'Approve - Start 30-day Effectiveness Check',
+                            'label_vi' => 'Phe duyet - Bat dau kiem tra hieu qua 30 ngay',
                             'roles'    => ['qa_manager', 'admin'],
-                            'actions'  => ['notify_owner', 'clear_due_date'],
+                            'actions'  => ['set_due_date_30d', 'notify_owner'],
                             'requires' => ['has_verification'],
                         ],
                         'implementation' => [
@@ -1082,28 +1277,116 @@ final class WorkflowEngine
                             'requires' => [],
                         ],
                     ],
+                    'effectiveness_30d' => [
+                        'effectiveness_60d' => [
+                            'label'    => '30-day Check Pass - Continue to 60-day',
+                            'label_vi' => 'Kiem tra 30 ngay Dat - Tiep tuc 60 ngay',
+                            'roles'    => ['qa_manager', 'quality_engineer', 'admin'],
+                            'actions'  => ['set_due_date_30d'],
+                            'requires' => [],
+                        ],
+                        'closed' => [
+                            'label'    => '30-day Check Pass - Close (low severity)',
+                            'label_vi' => 'Kiem tra 30 ngay Dat - Dong (muc do thap)',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner', 'clear_due_date'],
+                            'requires' => [],
+                        ],
+                        'implementation' => [
+                            'label'    => '30-day Check FAIL - Reopen',
+                            'label_vi' => 'Kiem tra 30 ngay KHONG DAT - Mo lai',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'effectiveness_60d' => [
+                        'effectiveness_90d' => [
+                            'label'    => '60-day Check Pass - Continue to 90-day',
+                            'label_vi' => 'Kiem tra 60 ngay Dat - Tiep tuc 90 ngay',
+                            'roles'    => ['qa_manager', 'quality_engineer', 'admin'],
+                            'actions'  => ['set_due_date_30d'],
+                            'requires' => [],
+                        ],
+                        'implementation' => [
+                            'label'    => '60-day Check FAIL - Reopen',
+                            'label_vi' => 'Kiem tra 60 ngay KHONG DAT - Mo lai',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'effectiveness_90d' => [
+                        'closed' => [
+                            'label'    => 'D8: 90-day Effectiveness Confirmed - Close',
+                            'label_vi' => 'D8: Hieu qua 90 ngay xac nhan - Dong',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner', 'clear_due_date'],
+                            'requires' => [],
+                        ],
+                        'closed_ineffective' => [
+                            'label'    => '90-day FAIL - Close as Ineffective',
+                            'label_vi' => '90 ngay KHONG DAT - Dong khong hieu qua',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner', 'notify_production_director'],
+                            'requires' => [],
+                        ],
+                    ],
                     'closed' => [],
+                    'closed_ineffective' => [],
                 ],
             ],
 
+            // ── FAI: AS9102 three-form, trigger detection, partial FAI support ──
             'FAI' => [
-                'initial'  => 'planned',
+                'initial'  => 'triggered',
                 'terminal' => ['closed'],
-                'states'   => ['planned', 'in_progress', 'review', 'approved', 'closed'],
+                'states'   => [
+                    'triggered', 'planning', 'form1_part_accountability',
+                    'form2_material_process', 'form3_characteristics',
+                    'review', 'conditional_approval', 'approved', 'closed',
+                ],
                 'transitions' => [
-                    'planned' => [
-                        'in_progress' => [
-                            'label'    => 'Start Inspection',
-                            'label_vi' => 'Bat dau kiem tra',
+                    'triggered' => [
+                        'planning' => [
+                            'label'    => 'Accept FAI Trigger - Begin Planning',
+                            'label_vi' => 'Chap nhan FAI - Bat dau lap ke hoach',
+                            'roles'    => ['quality_engineer', 'qa_manager', 'admin'],
+                            'actions'  => ['set_due_date_30d', 'notify_owner'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'planning' => [
+                        'form1_part_accountability' => [
+                            'label'    => 'Start Form 1: Part Accountability',
+                            'label_vi' => 'Bat dau Form 1: Truy xuat linh kien',
                             'roles'    => ['qc_inspector', 'quality_engineer', 'admin'],
                             'actions'  => [],
                             'requires' => [],
                         ],
                     ],
-                    'in_progress' => [
+                    'form1_part_accountability' => [
+                        'form2_material_process' => [
+                            'label'    => 'Form 2: Material & Process Verification',
+                            'label_vi' => 'Form 2: Xac minh vat lieu & quy trinh',
+                            'roles'    => ['qc_inspector', 'quality_engineer', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'form2_material_process' => [
+                        'form3_characteristics' => [
+                            'label'    => 'Form 3: Characteristic Inspection',
+                            'label_vi' => 'Form 3: Kiem tra dac tinh san pham',
+                            'roles'    => ['qc_inspector', 'quality_engineer', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'form3_characteristics' => [
                         'review' => [
-                            'label'    => 'Submit for Review',
-                            'label_vi' => 'Gui xem xet',
+                            'label'    => 'Submit All 3 Forms for Review',
+                            'label_vi' => 'Gui ca 3 Form de xem xet',
                             'roles'    => ['qc_inspector', 'quality_engineer', 'admin'],
                             'actions'  => ['notify_approver'],
                             'requires' => [],
@@ -1111,15 +1394,31 @@ final class WorkflowEngine
                     ],
                     'review' => [
                         'approved' => [
-                            'label'    => 'Approve FAI',
-                            'label_vi' => 'Phe duyet FAI',
+                            'label'    => 'Full Approval',
+                            'label_vi' => 'Phe duyet toan bo',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner', 'clear_due_date'],
+                            'requires' => [],
+                        ],
+                        'conditional_approval' => [
+                            'label'    => 'Conditional Approval (minor deviations)',
+                            'label_vi' => 'Phe duyet co dieu kien (sai lech nho)',
                             'roles'    => ['qa_manager', 'admin'],
                             'actions'  => ['notify_owner'],
                             'requires' => [],
                         ],
-                        'in_progress' => [
-                            'label'    => 'Return for Rework',
-                            'label_vi' => 'Tra ve lam lai',
+                        'form3_characteristics' => [
+                            'label'    => 'Return for Re-measurement',
+                            'label_vi' => 'Tra ve do lai',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'conditional_approval' => [
+                        'approved' => [
+                            'label'    => 'Conditions Met - Full Approval',
+                            'label_vi' => 'Dieu kien dat - Phe duyet toan bo',
                             'roles'    => ['qa_manager', 'admin'],
                             'actions'  => ['notify_owner'],
                             'requires' => [],
@@ -1127,8 +1426,8 @@ final class WorkflowEngine
                     ],
                     'approved' => [
                         'closed' => [
-                            'label'    => 'Close FAI',
-                            'label_vi' => 'Dong FAI',
+                            'label'    => 'Close FAI Package',
+                            'label_vi' => 'Dong goi FAI',
                             'roles'    => ['qa_manager', 'admin'],
                             'actions'  => [],
                             'requires' => [],
@@ -1138,10 +1437,15 @@ final class WorkflowEngine
                 ],
             ],
 
+            // ── CAL: ISO 17025, OOT investigation, MSA/Gauge R&R gate ──
             'CAL' => [
                 'initial'  => 'scheduled',
-                'terminal' => ['certified'],
-                'states'   => ['scheduled', 'in_progress', 'pass', 'fail', 'certified'],
+                'terminal' => ['certified', 'condemned'],
+                'states'   => [
+                    'scheduled', 'overdue', 'in_progress', 'as_found_pass', 'as_found_fail',
+                    'oot_investigation', 'impact_assessment', 'adjustment',
+                    'as_left_verification', 'certified', 'condemned',
+                ],
                 'transitions' => [
                     'scheduled' => [
                         'in_progress' => [
@@ -1151,42 +1455,109 @@ final class WorkflowEngine
                             'actions'  => [],
                             'requires' => [],
                         ],
+                        'overdue' => [
+                            'label'    => 'Mark Overdue (auto)',
+                            'label_vi' => 'Danh dau qua han (tu dong)',
+                            'roles'    => ['admin'],
+                            'actions'  => ['notify_qa_manager'],
+                            'requires' => [],
+                        ],
                     ],
-                    'in_progress' => [
-                        'pass' => [
-                            'label'    => 'Record Pass',
-                            'label_vi' => 'Ghi nhan Dat',
+                    'overdue' => [
+                        'in_progress' => [
+                            'label'    => 'Start Calibration (overdue)',
+                            'label_vi' => 'Bat dau hieu chuan (qua han)',
                             'roles'    => ['metrology_specialist', 'qa_manager', 'admin'],
                             'actions'  => [],
                             'requires' => [],
                         ],
-                        'fail' => [
-                            'label'    => 'Record Fail',
-                            'label_vi' => 'Ghi nhan Khong dat',
+                    ],
+                    'in_progress' => [
+                        'as_found_pass' => [
+                            'label'    => 'As-Found: PASS (within tolerance)',
+                            'label_vi' => 'Kiem tra ban dau: DAT (trong dung sai)',
+                            'roles'    => ['metrology_specialist', 'qa_manager', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                        'as_found_fail' => [
+                            'label'    => 'As-Found: FAIL (out of tolerance)',
+                            'label_vi' => 'Kiem tra ban dau: KHONG DAT (ngoai dung sai)',
                             'roles'    => ['metrology_specialist', 'qa_manager', 'admin'],
                             'actions'  => ['notify_qa_manager'],
                             'requires' => [],
                         ],
                     ],
-                    'pass' => [
+                    'as_found_pass' => [
                         'certified' => [
-                            'label'    => 'Certify',
-                            'label_vi' => 'Chung nhan',
+                            'label'    => 'Certify Instrument',
+                            'label_vi' => 'Chung nhan thiet bi',
                             'roles'    => ['qa_manager', 'admin'],
                             'actions'  => ['notify_owner'],
                             'requires' => [],
                         ],
                     ],
-                    'fail' => [
-                        'scheduled' => [
-                            'label'    => 'Reschedule',
-                            'label_vi' => 'Lap lich lai',
+                    'as_found_fail' => [
+                        'oot_investigation' => [
+                            'label'    => 'Begin OOT Investigation',
+                            'label_vi' => 'Bat dau dieu tra vuot dung sai',
+                            'roles'    => ['metrology_specialist', 'qa_manager', 'admin'],
+                            'actions'  => ['set_due_date_7d'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'oot_investigation' => [
+                        'impact_assessment' => [
+                            'label'    => 'Assess Product Impact',
+                            'label_vi' => 'Danh gia anh huong san pham',
+                            'roles'    => ['qa_manager', 'quality_engineer', 'admin'],
+                            'actions'  => ['set_due_date_14d', 'notify_production_director'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'impact_assessment' => [
+                        'adjustment' => [
+                            'label'    => 'Adjust / Repair Instrument',
+                            'label_vi' => 'Dieu chinh / Sua chua thiet bi',
+                            'roles'    => ['metrology_specialist', 'qa_manager', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                        'condemned' => [
+                            'label'    => 'Condemn Instrument (unrepairable)',
+                            'label_vi' => 'Loai bo thiet bi (khong sua duoc)',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'adjustment' => [
+                        'as_left_verification' => [
+                            'label'    => 'As-Left Verification',
+                            'label_vi' => 'Kiem tra sau dieu chinh',
                             'roles'    => ['metrology_specialist', 'qa_manager', 'admin'],
                             'actions'  => [],
                             'requires' => [],
                         ],
                     ],
+                    'as_left_verification' => [
+                        'certified' => [
+                            'label'    => 'As-Left PASS - Certify',
+                            'label_vi' => 'Sau dieu chinh DAT - Chung nhan',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner', 'clear_due_date'],
+                            'requires' => [],
+                        ],
+                        'condemned' => [
+                            'label'    => 'As-Left FAIL - Condemn',
+                            'label_vi' => 'Sau dieu chinh KHONG DAT - Loai bo',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
+                        ],
+                    ],
                     'certified' => [],
+                    'condemned' => [],
                 ],
             ],
 
@@ -1543,6 +1914,1052 @@ final class WorkflowEngine
                     ],
                     'approved' => [],
                 ],
+            ],
+
+            // ══════════════════════════════════════════════════════════════
+            // NEW LEAN MANUFACTURING WORKFLOWS
+            // ══════════════════════════════════════════════════════════════
+
+            // ── KAIZEN: A3 Problem Solving + PDCA (replaces simple IMP) ──
+            'KAIZEN' => [
+                'initial'  => 'identified',
+                'terminal' => ['closed', 'yokoten_deployed'],
+                'states'   => [
+                    'identified', 'a3_background', 'a3_current_state',
+                    'a3_root_cause', 'a3_countermeasures', 'implementation',
+                    'check_results', 'standardize', 'yokoten_deploy',
+                    'closed', 'yokoten_deployed',
+                ],
+                'transitions' => [
+                    'identified' => [
+                        'a3_background' => [
+                            'label'    => 'Start A3: Define Background & Problem',
+                            'label_vi' => 'Bat dau A3: Xac dinh boi canh & van de',
+                            'roles'    => ['assignee', 'owner', 'quality_engineer', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'a3_background' => [
+                        'a3_current_state' => [
+                            'label'    => 'Document Current State (VSM/data)',
+                            'label_vi' => 'Mo ta trang thai hien tai (VSM/du lieu)',
+                            'roles'    => ['assignee', 'owner', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'a3_current_state' => [
+                        'a3_root_cause' => [
+                            'label'    => 'Root Cause Analysis (5 Why / Fishbone)',
+                            'label_vi' => 'Phan tich nguyen nhan goc (5 Why / Fishbone)',
+                            'roles'    => ['assignee', 'owner', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'a3_root_cause' => [
+                        'a3_countermeasures' => [
+                            'label'    => 'Define Countermeasures & Target',
+                            'label_vi' => 'Xac dinh bien phap & muc tieu',
+                            'roles'    => ['assignee', 'owner', 'admin'],
+                            'actions'  => ['set_due_date_14d'],
+                            'requires' => ['has_root_cause'],
+                        ],
+                    ],
+                    'a3_countermeasures' => [
+                        'implementation' => [
+                            'label'    => 'Approve & Implement (DO)',
+                            'label_vi' => 'Phe duyet & Thuc hien (DO)',
+                            'roles'    => ['production_director', 'qa_manager', 'admin'],
+                            'actions'  => ['set_due_date_30d', 'notify_owner'],
+                            'requires' => ['has_action_plan'],
+                        ],
+                    ],
+                    'implementation' => [
+                        'check_results' => [
+                            'label'    => 'CHECK: Measure Results vs Target',
+                            'label_vi' => 'CHECK: Do ket qua so voi muc tieu',
+                            'roles'    => ['assignee', 'owner', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'check_results' => [
+                        'standardize' => [
+                            'label'    => 'ACT: Standardize Success',
+                            'label_vi' => 'ACT: Chuan hoa thanh cong',
+                            'roles'    => ['assignee', 'owner', 'qa_manager', 'admin'],
+                            'actions'  => [],
+                            'requires' => ['has_verification'],
+                        ],
+                        'a3_countermeasures' => [
+                            'label'    => 'Results Not Met - Revise Countermeasures',
+                            'label_vi' => 'Chua dat - Dieu chinh bien phap',
+                            'roles'    => ['assignee', 'owner', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'standardize' => [
+                        'closed' => [
+                            'label'    => 'Close Kaizen (local only)',
+                            'label_vi' => 'Dong Kaizen (chi noi bo)',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner', 'clear_due_date'],
+                            'requires' => [],
+                        ],
+                        'yokoten_deploy' => [
+                            'label'    => 'Yokoten: Deploy Horizontally',
+                            'label_vi' => 'Yokoten: Trien khai ngang',
+                            'roles'    => ['qa_manager', 'production_director', 'admin'],
+                            'actions'  => ['notify_production_director'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'yokoten_deploy' => [
+                        'yokoten_deployed' => [
+                            'label'    => 'All Areas Deployed - Close',
+                            'label_vi' => 'Tat ca khu vuc da trien khai - Dong',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner', 'clear_due_date'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'closed' => [],
+                    'yokoten_deployed' => [],
+                ],
+            ],
+
+            // ── QRQC: Quick Response Quality Control (Safran method) ──
+            'QRQC' => [
+                'initial'  => 'detected',
+                'terminal' => ['closed'],
+                'states'   => [
+                    'detected', 'san_gen_shugi', 'immediate_reaction',
+                    'root_cause_analysis', 'lesson_learned', 'closed',
+                ],
+                'transitions' => [
+                    'detected' => [
+                        'san_gen_shugi' => [
+                            'label'    => 'Go See (Genba/Genbutsu/Genjitsu)',
+                            'label_vi' => 'Di xem thuc te (Hien truong/Hien vat/Hien trang)',
+                            'roles'    => ['shift_leader', 'quality_engineer', 'qa_manager', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'san_gen_shugi' => [
+                        'immediate_reaction' => [
+                            'label'    => 'Define Immediate Reaction (< 24h)',
+                            'label_vi' => 'Xac dinh phan ung ngay (< 24h)',
+                            'roles'    => ['shift_leader', 'quality_engineer', 'qa_manager', 'admin'],
+                            'actions'  => ['set_due_date_7d'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'immediate_reaction' => [
+                        'root_cause_analysis' => [
+                            'label'    => '5-Why + Ishikawa Analysis',
+                            'label_vi' => 'Phan tich 5-Why + Ishikawa',
+                            'roles'    => ['quality_engineer', 'qa_manager', 'admin', 'assignee'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'root_cause_analysis' => [
+                        'lesson_learned' => [
+                            'label'    => 'Document Lesson Learned',
+                            'label_vi' => 'Ghi nhan bai hoc kinh nghiem',
+                            'roles'    => ['quality_engineer', 'qa_manager', 'admin'],
+                            'actions'  => [],
+                            'requires' => ['has_root_cause'],
+                        ],
+                    ],
+                    'lesson_learned' => [
+                        'closed' => [
+                            'label'    => 'Close QRQC',
+                            'label_vi' => 'Dong QRQC',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner', 'clear_due_date'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'closed' => [],
+                ],
+            ],
+
+            // ── ANDON: Digital Escalation System ──
+            'ANDON' => [
+                'initial'  => 'triggered',
+                'terminal' => ['resolved'],
+                'states'   => [
+                    'triggered', 'team_lead_responding', 'supervisor_escalated',
+                    'management_escalated', 'resolved',
+                ],
+                'transitions' => [
+                    'triggered' => [
+                        'team_lead_responding' => [
+                            'label'    => 'Team Lead Response (5 min SLA)',
+                            'label_vi' => 'To truong xu ly (SLA 5 phut)',
+                            'roles'    => ['shift_leader', 'setup_technician', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'team_lead_responding' => [
+                        'resolved' => [
+                            'label'    => 'Issue Resolved',
+                            'label_vi' => 'Van de da giai quyet',
+                            'roles'    => ['shift_leader', 'setup_technician', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                        'supervisor_escalated' => [
+                            'label'    => 'Escalate to Supervisor (15 min)',
+                            'label_vi' => 'Chuyen len giam sat vien (15 phut)',
+                            'roles'    => ['shift_leader', 'admin'],
+                            'actions'  => ['notify_production_director'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'supervisor_escalated' => [
+                        'resolved' => [
+                            'label'    => 'Issue Resolved',
+                            'label_vi' => 'Van de da giai quyet',
+                            'roles'    => ['cnc_workshop_manager', 'production_director', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                        'management_escalated' => [
+                            'label'    => 'Escalate to Management (30 min)',
+                            'label_vi' => 'Chuyen len quan ly (30 phut)',
+                            'roles'    => ['cnc_workshop_manager', 'admin'],
+                            'actions'  => ['notify_production_director'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'management_escalated' => [
+                        'resolved' => [
+                            'label'    => 'Issue Resolved by Management',
+                            'label_vi' => 'Quan ly da giai quyet',
+                            'roles'    => ['production_director', 'ceo', 'admin'],
+                            'actions'  => ['clear_due_date'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'resolved' => [],
+                ],
+            ],
+
+            // ── 5S_AUDIT: Digital 5S Workplace Audit ──
+            'FIVE_S' => [
+                'initial'  => 'scheduled',
+                'terminal' => ['closed'],
+                'states'   => [
+                    'scheduled', 'in_progress', 'scored', 'action_required',
+                    'actions_completed', 'closed',
+                ],
+                'transitions' => [
+                    'scheduled' => [
+                        'in_progress' => [
+                            'label'    => 'Start 5S Audit',
+                            'label_vi' => 'Bat dau danh gia 5S',
+                            'roles'    => ['shift_leader', 'qms_engineer', 'qa_manager', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'in_progress' => [
+                        'scored' => [
+                            'label'    => 'Submit Scores (Sort/Set/Shine/Standardize/Sustain)',
+                            'label_vi' => 'Nop diem (Sang loc/Sap xep/Sach se/San sang/San sang)',
+                            'roles'    => ['shift_leader', 'qms_engineer', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'scored' => [
+                        'closed' => [
+                            'label'    => 'Score >= 80% -- Close (no actions needed)',
+                            'label_vi' => 'Diem >= 80% -- Dong (khong can hanh dong)',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                        'action_required' => [
+                            'label'    => 'Score < 80% -- Corrective Actions Required',
+                            'label_vi' => 'Diem < 80% -- Yeu cau hanh dong khac phuc',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['set_due_date_7d', 'notify_owner'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'action_required' => [
+                        'actions_completed' => [
+                            'label'    => 'Actions Completed - Submit for Verification',
+                            'label_vi' => 'Hanh dong hoan thanh - Gui xac minh',
+                            'roles'    => ['shift_leader', 'assignee', 'admin'],
+                            'actions'  => ['notify_approver'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'actions_completed' => [
+                        'closed' => [
+                            'label'    => 'Verify & Close',
+                            'label_vi' => 'Xac minh & Dong',
+                            'roles'    => ['qa_manager', 'qms_engineer', 'admin'],
+                            'actions'  => ['clear_due_date'],
+                            'requires' => [],
+                        ],
+                        'action_required' => [
+                            'label'    => 'Verification Failed - Redo Actions',
+                            'label_vi' => 'Xac minh khong dat - Lam lai hanh dong',
+                            'roles'    => ['qa_manager', 'admin'],
+                            'actions'  => ['notify_owner'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'closed' => [],
+                ],
+            ],
+
+            // ── GEMBA: Digital Gemba Walk ──
+            'GEMBA' => [
+                'initial'  => 'planned',
+                'terminal' => ['closed'],
+                'states'   => [
+                    'planned', 'walking', 'observations_logged',
+                    'actions_assigned', 'follow_up', 'closed',
+                ],
+                'transitions' => [
+                    'planned' => [
+                        'walking' => [
+                            'label'    => 'Start Gemba Walk',
+                            'label_vi' => 'Bat dau di thuc te',
+                            'roles'    => ['production_director', 'qa_manager', 'cnc_workshop_manager', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'walking' => [
+                        'observations_logged' => [
+                            'label'    => 'Log Observations (Safety/Quality/5S/Flow)',
+                            'label_vi' => 'Ghi nhan quan sat (An toan/Chat luong/5S/Dong chay)',
+                            'roles'    => ['production_director', 'qa_manager', 'cnc_workshop_manager', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'observations_logged' => [
+                        'actions_assigned' => [
+                            'label'    => 'Assign Actions to Responsible Persons',
+                            'label_vi' => 'Giao hanh dong cho nguoi phu trach',
+                            'roles'    => ['production_director', 'qa_manager', 'admin'],
+                            'actions'  => ['set_due_date_7d'],
+                            'requires' => [],
+                        ],
+                        'closed' => [
+                            'label'    => 'No Actions Needed - Close',
+                            'label_vi' => 'Khong can hanh dong - Dong',
+                            'roles'    => ['production_director', 'qa_manager', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'actions_assigned' => [
+                        'follow_up' => [
+                            'label'    => 'Actions Completed - Follow Up',
+                            'label_vi' => 'Hanh dong hoan thanh - Theo doi',
+                            'roles'    => ['assignee', 'owner', 'admin'],
+                            'actions'  => ['notify_approver'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'follow_up' => [
+                        'closed' => [
+                            'label'    => 'Verify & Close Gemba',
+                            'label_vi' => 'Xac minh & Dong Gemba',
+                            'roles'    => ['production_director', 'qa_manager', 'admin'],
+                            'actions'  => ['clear_due_date'],
+                            'requires' => [],
+                        ],
+                    ],
+                    'closed' => [],
+                ],
+            ],
+
+            // ── SMED: Setup Reduction Workflow ──
+            'SMED' => [
+                'initial'  => 'baseline_recorded',
+                'terminal' => ['standardized'],
+                'states'   => [
+                    'baseline_recorded', 'internal_external_separated',
+                    'internal_converted', 'streamlined', 'trial_run',
+                    'standardized',
+                ],
+                'transitions' => [
+                    'baseline_recorded' => [
+                        'internal_external_separated' => [
+                            'label'    => 'Step 1: Separate Internal vs External Tasks',
+                            'label_vi' => 'Buoc 1: Tach cong viec Ben trong vs Ben ngoai',
+                            'roles'    => ['process_engineer', 'cnc_workshop_manager', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'internal_external_separated' => [
+                        'internal_converted' => [
+                            'label'    => 'Step 2: Convert Internal to External',
+                            'label_vi' => 'Buoc 2: Chuyen Ben trong thanh Ben ngoai',
+                            'roles'    => ['process_engineer', 'cnc_workshop_manager', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'internal_converted' => [
+                        'streamlined' => [
+                            'label'    => 'Step 3: Streamline Remaining Internal',
+                            'label_vi' => 'Buoc 3: Tinh gon cong viec Ben trong con lai',
+                            'roles'    => ['process_engineer', 'cnc_workshop_manager', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'streamlined' => [
+                        'trial_run' => [
+                            'label'    => 'Step 4: Trial Run (verify time reduction)',
+                            'label_vi' => 'Buoc 4: Chay thu (xac nhan giam thoi gian)',
+                            'roles'    => ['process_engineer', 'setup_technician', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'trial_run' => [
+                        'standardized' => [
+                            'label'    => 'Step 5: Standardize & Train Operators',
+                            'label_vi' => 'Buoc 5: Chuan hoa & Dao tao operator',
+                            'roles'    => ['cnc_workshop_manager', 'qa_manager', 'admin'],
+                            'actions'  => ['notify_owner', 'clear_due_date'],
+                            'requires' => ['has_verification'],
+                        ],
+                        'streamlined' => [
+                            'label'    => 'Trial Failed - Revise Streamlining',
+                            'label_vi' => 'Chay thu khong dat - Chinh sua lai',
+                            'roles'    => ['process_engineer', 'admin'],
+                            'actions'  => [],
+                            'requires' => [],
+                        ],
+                    ],
+                    'standardized' => [],
+                ],
+            ],
+        ];
+    }
+
+    // ── Step Data Requirements (links workflow transitions to DB tables) ────
+
+    /**
+     * Get required data fields for a workflow state transition.
+     * Maps each workflow type + target state to structured data fields
+     * that MUST be captured and persisted to the corresponding DB table.
+     *
+     * @param string $recordType Workflow type code (NCR, CAPA, FAI, etc.)
+     * @param string $targetState Target state of the transition.
+     * @return array{table: string, required_fields: array, optional_fields: array, attachments: array}
+     */
+    public function getStepDataRequirements(string $recordType, string $targetState): array
+    {
+        $requirements = $this->buildStepDataRequirements();
+        $key = strtoupper($recordType) . '::' . $targetState;
+        return $requirements[$key] ?? [
+            'table'           => 'workflow_step_data',
+            'required_fields' => [],
+            'optional_fields' => [],
+            'attachments'     => [],
+        ];
+    }
+
+    /**
+     * Validate that all required step data is present before transition.
+     *
+     * @param string $recordType Workflow type code.
+     * @param string $targetState Target state.
+     * @param array  $data Data provided by the user.
+     * @return array{ok: bool, missing: array}
+     */
+    public function validateStepData(string $recordType, string $targetState, array $data): array
+    {
+        $reqs = $this->getStepDataRequirements($recordType, $targetState);
+        $missing = [];
+
+        foreach ($reqs['required_fields'] as $field => $fieldDef) {
+            $value = $data[$field] ?? null;
+            if ($value === null || $value === '' || (is_array($value) && empty($value))) {
+                $missing[] = [
+                    'field'    => $field,
+                    'label'    => $fieldDef['label'] ?? $field,
+                    'label_vi' => $fieldDef['label_vi'] ?? $field,
+                    'type'     => $fieldDef['type'] ?? 'text',
+                ];
+            }
+        }
+
+        return ['ok' => empty($missing), 'missing' => $missing, 'table' => $reqs['table']];
+    }
+
+    /**
+     * Build the step data requirements map.
+     * Key format: "RECORD_TYPE::target_state"
+     */
+    private function buildStepDataRequirements(): array
+    {
+        return [
+            // ── NCR Steps ──
+            'NCR::containment' => [
+                'table' => 'ncr_records',
+                'required_fields' => [
+                    'containment_action'  => ['label' => 'Containment Action', 'label_vi' => 'Hanh dong kiem soat', 'type' => 'text'],
+                    'quarantine_location' => ['label' => 'Quarantine Location', 'label_vi' => 'Vi tri cach ly', 'type' => 'text'],
+                    'quantity_affected'   => ['label' => 'Quantity Affected', 'label_vi' => 'So luong anh huong', 'type' => 'integer'],
+                ],
+                'optional_fields' => ['suspect_stock_checked'],
+                'attachments' => ['evidence_photos'],
+            ],
+            'NCR::investigation' => [
+                'table' => 'ncr_records',
+                'required_fields' => [
+                    'root_cause'        => ['label' => 'Root Cause', 'label_vi' => 'Nguyen nhan goc', 'type' => 'text'],
+                    'root_cause_method' => ['label' => 'RCA Method', 'label_vi' => 'Phuong phap RCA', 'type' => 'select'],
+                ],
+                'optional_fields' => ['human_factors'],
+                'attachments' => ['investigation_evidence'],
+            ],
+            'NCR::mrb_review' => [
+                'table' => 'ncr_mrb_decisions',
+                'required_fields' => [
+                    'mrb_members'               => ['label' => 'MRB Members', 'label_vi' => 'Thanh vien MRB', 'type' => 'user_list'],
+                    'engineering_justification' => ['label' => 'Engineering Justification', 'label_vi' => 'Giai trinh ky thuat', 'type' => 'text'],
+                ],
+                'optional_fields' => ['risk_assessment', 'customer_concession_required'],
+                'attachments' => [],
+            ],
+            'NCR::disposition' => [
+                'table' => 'ncr_records',
+                'required_fields' => [
+                    'disposition' => ['label' => 'Disposition', 'label_vi' => 'Xu ly', 'type' => 'select'],
+                ],
+                'optional_fields' => ['rework_instruction', 'cost_impact'],
+                'attachments' => [],
+            ],
+            // ── CAPA Steps ──
+            'CAPA::containment' => [
+                'table' => 'capa_8d_steps',
+                'required_fields' => [
+                    'containment_actions' => ['label' => 'D3: Interim Containment', 'label_vi' => 'D3: Kiem soat tam thoi', 'type' => 'json_array'],
+                ],
+                'optional_fields' => ['customer_notified'],
+                'attachments' => [],
+            ],
+            'CAPA::root_cause' => [
+                'table' => 'capa_8d_steps',
+                'required_fields' => [
+                    'root_cause_description' => ['label' => 'D4: Root Cause', 'label_vi' => 'D4: Nguyen nhan goc', 'type' => 'text'],
+                    'root_cause_method'      => ['label' => 'RCA Method', 'label_vi' => 'Phuong phap', 'type' => 'select'],
+                    'escape_point'           => ['label' => 'Escape Point', 'label_vi' => 'Diem thoat', 'type' => 'text'],
+                ],
+                'optional_fields' => ['human_factors'],
+                'attachments' => ['rca_evidence'],
+            ],
+            'CAPA::action_plan' => [
+                'table' => 'capa_8d_steps',
+                'required_fields' => [
+                    'corrective_actions' => ['label' => 'D5: Corrective Actions', 'label_vi' => 'D5: Hanh dong khac phuc', 'type' => 'json_array'],
+                ],
+                'optional_fields' => ['risk_of_unintended_effects'],
+                'attachments' => [],
+            ],
+            'CAPA::verification' => [
+                'table' => 'capa_8d_steps',
+                'required_fields' => [
+                    'systemic_actions'     => ['label' => 'D7: Prevent Recurrence', 'label_vi' => 'D7: Ngan ngua tai phat', 'type' => 'text'],
+                    'lessons_learned'      => ['label' => 'Lessons Learned', 'label_vi' => 'Bai hoc kinh nghiem', 'type' => 'text'],
+                    'fmea_updated'         => ['label' => 'FMEA Updated?', 'label_vi' => 'FMEA da cap nhat?', 'type' => 'boolean'],
+                    'control_plan_updated' => ['label' => 'Control Plan Updated?', 'label_vi' => 'Control Plan da cap nhat?', 'type' => 'boolean'],
+                ],
+                'optional_fields' => ['horizontal_deployment'],
+                'attachments' => ['implementation_evidence'],
+            ],
+            // ── FAI Steps ──
+            'FAI::form1_part_accountability' => [
+                'table' => 'fai_records',
+                'required_fields' => [
+                    'part_number'    => ['label' => 'Part Number', 'label_vi' => 'Ma chi tiet', 'type' => 'text'],
+                    'drawing_number' => ['label' => 'Drawing Number', 'label_vi' => 'So ban ve', 'type' => 'text'],
+                    'serial_number'  => ['label' => 'Serial Number', 'label_vi' => 'So serial', 'type' => 'text'],
+                ],
+                'optional_fields' => ['sub_parts'],
+                'attachments' => ['balloon_drawing'],
+            ],
+            'FAI::form2_material_process' => [
+                'table' => 'fai_records',
+                'required_fields' => [
+                    'materials'         => ['label' => 'Material Specifications', 'label_vi' => 'Thong so vat lieu', 'type' => 'json_array'],
+                    'special_processes' => ['label' => 'Special Processes', 'label_vi' => 'Quy trinh dac biet', 'type' => 'json_array'],
+                ],
+                'optional_fields' => ['functional_tests'],
+                'attachments' => ['material_certificates'],
+            ],
+            'FAI::form3_characteristics' => [
+                'table' => 'fai_characteristics',
+                'required_fields' => [
+                    'characteristics' => ['label' => 'Measurements', 'label_vi' => 'Do luong', 'type' => 'json_array'],
+                ],
+                'optional_fields' => [],
+                'attachments' => ['cmm_report'],
+            ],
+            // ── CAL Steps ──
+            'CAL::as_found_fail' => [
+                'table' => 'calibration_records',
+                'required_fields' => [
+                    'as_found_readings' => ['label' => 'As-Found Readings', 'label_vi' => 'Ket qua ban dau', 'type' => 'json_array'],
+                ],
+                'optional_fields' => [],
+                'attachments' => ['calibration_certificate'],
+            ],
+            'CAL::oot_investigation' => [
+                'table' => 'calibration_oot_investigations',
+                'required_fields' => [
+                    'oot_parameter'   => ['label' => 'OOT Parameter', 'label_vi' => 'Thong so vuot', 'type' => 'text'],
+                    'oot_magnitude'   => ['label' => 'OOT Magnitude', 'label_vi' => 'Muc do vuot', 'type' => 'number'],
+                    'risk_assessment' => ['label' => 'Risk Assessment', 'label_vi' => 'Danh gia rui ro', 'type' => 'text'],
+                ],
+                'optional_fields' => [],
+                'attachments' => [],
+            ],
+            'CAL::impact_assessment' => [
+                'table' => 'calibration_oot_investigations',
+                'required_fields' => [
+                    'affected_work_orders'  => ['label' => 'Affected WOs', 'label_vi' => 'WO anh huong', 'type' => 'json_array'],
+                    'product_disposition'   => ['label' => 'Product Disposition', 'label_vi' => 'Xu ly san pham', 'type' => 'text'],
+                ],
+                'optional_fields' => ['recall_required'],
+                'attachments' => [],
+            ],
+            // ── Lean: KAIZEN ──
+            'KAIZEN::a3_current_state' => [
+                'table' => 'lean_kaizen_events',
+                'required_fields' => [
+                    'a3_current_condition'  => ['label' => 'Current Condition', 'label_vi' => 'Trang thai hien tai', 'type' => 'text'],
+                    'metric_baseline_value' => ['label' => 'Baseline Value', 'label_vi' => 'Gia tri co so', 'type' => 'number'],
+                ],
+                'optional_fields' => ['vsm_before_lead_time'],
+                'attachments' => ['vsm_map'],
+            ],
+            'KAIZEN::check_results' => [
+                'table' => 'lean_kaizen_events',
+                'required_fields' => [
+                    'metric_actual_value'  => ['label' => 'Actual Value (after)', 'label_vi' => 'Gia tri thuc te', 'type' => 'number'],
+                    'a3_follow_up_results' => ['label' => 'Follow-up Results', 'label_vi' => 'Ket qua theo doi', 'type' => 'text'],
+                ],
+                'optional_fields' => ['cost_savings'],
+                'attachments' => ['results_evidence'],
+            ],
+            // ── Lean: QRQC ──
+            'QRQC::san_gen_shugi' => [
+                'table' => 'lean_qrqc_events',
+                'required_fields' => [
+                    'real_part_verified'  => ['label' => 'Real Part Verified', 'label_vi' => 'Xac nhan hien vat', 'type' => 'boolean'],
+                    'real_place_verified' => ['label' => 'Real Place Verified', 'label_vi' => 'Xac nhan hien truong', 'type' => 'boolean'],
+                    'real_data_collected' => ['label' => 'Real Data Collected', 'label_vi' => 'Thu thap du lieu thuc', 'type' => 'boolean'],
+                ],
+                'optional_fields' => [],
+                'attachments' => ['defect_photos'],
+            ],
+            // ── Lean: 5S ──
+            'FIVE_S::scored' => [
+                'table' => 'lean_5s_audits',
+                'required_fields' => [
+                    'sort_score'         => ['label' => 'Sort', 'label_vi' => 'Sang loc', 'type' => 'decimal'],
+                    'set_in_order_score' => ['label' => 'Set in Order', 'label_vi' => 'Sap xep', 'type' => 'decimal'],
+                    'shine_score'        => ['label' => 'Shine', 'label_vi' => 'Sach se', 'type' => 'decimal'],
+                    'standardize_score'  => ['label' => 'Standardize', 'label_vi' => 'Chuan hoa', 'type' => 'decimal'],
+                    'sustain_score'      => ['label' => 'Sustain', 'label_vi' => 'Duy tri', 'type' => 'decimal'],
+                ],
+                'optional_fields' => ['safety_score'],
+                'attachments' => ['audit_photos'],
+            ],
+            // ── Lean: ANDON ──
+            'ANDON::resolved' => [
+                'table' => 'lean_andon_events',
+                'required_fields' => [
+                    'resolution_description' => ['label' => 'Resolution', 'label_vi' => 'Giai phap', 'type' => 'text'],
+                    'response_time_sec'      => ['label' => 'Response Time (sec)', 'label_vi' => 'Thoi gian phan hoi', 'type' => 'integer'],
+                    'resolution_time_sec'    => ['label' => 'Resolution Time (sec)', 'label_vi' => 'Thoi gian giai quyet', 'type' => 'integer'],
+                ],
+                'optional_fields' => ['root_cause_code'],
+                'attachments' => [],
+            ],
+            // ── Lean: SMED ──
+            'SMED::trial_run' => [
+                'table' => 'lean_smed_events',
+                'required_fields' => [
+                    'trial_setup_time_min' => ['label' => 'Trial Setup Time', 'label_vi' => 'Thoi gian setup thu', 'type' => 'decimal'],
+                ],
+                'optional_fields' => ['trial_internal_min', 'trial_external_min'],
+                'attachments' => ['trial_video'],
+            ],
+            // ── AUD (Audit) Steps ──
+            'AUD::in_progress' => [
+                'table' => 'audits',
+                'required_fields' => [
+                    'audit_scope' => ['label' => 'Audit Scope', 'label_vi' => 'Pham vi danh gia', 'type' => 'text'],
+                    'audit_team' => ['label' => 'Audit Team', 'label_vi' => 'Doi danh gia', 'type' => 'json_array'],
+                ],
+                'optional_fields' => ['audit_plan_ref'],
+                'attachments' => ['audit_plan'],
+            ],
+            'AUD::reporting' => [
+                'table' => 'audit_findings',
+                'required_fields' => [
+                    'findings' => ['label' => 'Audit Findings', 'label_vi' => 'Phat hien danh gia', 'type' => 'json_array'],
+                    'audit_score' => ['label' => 'Audit Score', 'label_vi' => 'Diem danh gia', 'type' => 'number'],
+                ],
+                'optional_fields' => ['observations', 'opportunities_for_improvement'],
+                'attachments' => ['audit_evidence'],
+            ],
+            'AUD::follow_up' => [
+                'table' => 'audit_actions',
+                'required_fields' => [
+                    'action_items' => ['label' => 'Corrective Action Items', 'label_vi' => 'Hang muc hanh dong khac phuc', 'type' => 'json_array'],
+                ],
+                'optional_fields' => ['linked_capa_ids'],
+                'attachments' => [],
+            ],
+            'AUD::closed' => [
+                'table' => 'audits',
+                'required_fields' => [
+                    'audit_conclusion' => ['label' => 'Audit Conclusion', 'label_vi' => 'Ket luan danh gia', 'type' => 'select'],
+                ],
+                'optional_fields' => ['next_audit_date'],
+                'attachments' => ['final_report'],
+            ],
+            // ── TRN (Training) Steps ──
+            'TRN::in_progress' => [
+                'table' => 'training_records',
+                'required_fields' => [
+                    'training_topic' => ['label' => 'Training Topic', 'label_vi' => 'Chu de dao tao', 'type' => 'text'],
+                    'trainer' => ['label' => 'Trainer', 'label_vi' => 'Nguoi dao tao', 'type' => 'text'],
+                    'training_hours' => ['label' => 'Training Hours', 'label_vi' => 'So gio dao tao', 'type' => 'number'],
+                ],
+                'optional_fields' => ['training_materials'],
+                'attachments' => ['training_materials', 'attendance_sheet'],
+            ],
+            'TRN::assessment' => [
+                'table' => 'training_records',
+                'required_fields' => [
+                    'assessment_method' => ['label' => 'Assessment Method', 'label_vi' => 'Phuong phap danh gia', 'type' => 'select'],
+                    'assessment_score' => ['label' => 'Score', 'label_vi' => 'Diem', 'type' => 'number'],
+                    'assessment_result' => ['label' => 'Result (Pass/Fail)', 'label_vi' => 'Ket qua (Dat/Khong dat)', 'type' => 'select'],
+                ],
+                'optional_fields' => ['competence_level'],
+                'attachments' => ['assessment_evidence'],
+            ],
+            'TRN::certified' => [
+                'table' => 'training_records',
+                'required_fields' => [
+                    'certification_expiry' => ['label' => 'Certification Expiry', 'label_vi' => 'Han chung nhan', 'type' => 'date'],
+                ],
+                'optional_fields' => ['certificate_number'],
+                'attachments' => ['certificate'],
+            ],
+            // ── ECR (Engineering Change Request) Steps ──
+            'ECR::review' => [
+                'table' => 'engineering_change_requests',
+                'required_fields' => [
+                    'change_description' => ['label' => 'Change Description', 'label_vi' => 'Mo ta thay doi', 'type' => 'text'],
+                    'impact_assessment' => ['label' => 'Impact Assessment', 'label_vi' => 'Danh gia tac dong', 'type' => 'text'],
+                    'affected_documents' => ['label' => 'Affected Documents', 'label_vi' => 'Tai lieu anh huong', 'type' => 'json_array'],
+                ],
+                'optional_fields' => ['revision_from', 'revision_to'],
+                'attachments' => ['redline_drawing'],
+            ],
+            'ECR::approved' => [
+                'table' => 'engineering_change_requests',
+                'required_fields' => [
+                    'approval_justification' => ['label' => 'Approval Justification', 'label_vi' => 'Ly do phe duyet', 'type' => 'text'],
+                ],
+                'optional_fields' => [],
+                'attachments' => [],
+            ],
+            'ECR::implemented' => [
+                'table' => 'engineering_change_requests',
+                'required_fields' => [
+                    'implementation_evidence' => ['label' => 'Implementation Evidence', 'label_vi' => 'Bang chung thuc hien', 'type' => 'text'],
+                    'documents_updated' => ['label' => 'Documents Updated', 'label_vi' => 'Tai lieu da cap nhat', 'type' => 'json_array'],
+                ],
+                'optional_fields' => ['cam_program_id', 'baseline_version'],
+                'attachments' => ['updated_drawings'],
+            ],
+            'ECR::verified' => [
+                'table' => 'engineering_change_requests',
+                'required_fields' => [
+                    'verification_result' => ['label' => 'Verification Result', 'label_vi' => 'Ket qua xac minh', 'type' => 'text'],
+                ],
+                'optional_fields' => [],
+                'attachments' => ['verification_evidence'],
+            ],
+            // ── SCAR (WorkflowEngine version) Steps ──
+            'SCAR::response_due' => [
+                'table' => 'supplier_scorecards',
+                'required_fields' => [
+                    'supplier_contact' => ['label' => 'Supplier Contact Notified', 'label_vi' => 'Lien he NCC da thong bao', 'type' => 'text'],
+                    'response_deadline' => ['label' => 'Response Deadline', 'label_vi' => 'Han phan hoi', 'type' => 'date'],
+                ],
+                'optional_fields' => [],
+                'attachments' => ['scar_letter'],
+            ],
+            'SCAR::response_received' => [
+                'table' => 'supplier_scorecards',
+                'required_fields' => [
+                    'supplier_root_cause' => ['label' => 'Supplier Root Cause', 'label_vi' => 'Nguyen nhan goc NCC', 'type' => 'text'],
+                    'supplier_corrective_action' => ['label' => 'Supplier Corrective Action', 'label_vi' => 'Hanh dong khac phuc NCC', 'type' => 'text'],
+                ],
+                'optional_fields' => ['supplier_preventive_action'],
+                'attachments' => ['supplier_response_document'],
+            ],
+            'SCAR::verification' => [
+                'table' => 'supplier_scorecards',
+                'required_fields' => [
+                    'verification_method' => ['label' => 'Verification Method', 'label_vi' => 'Phuong phap xac minh', 'type' => 'select'],
+                    'verification_result' => ['label' => 'Verification Result', 'label_vi' => 'Ket qua xac minh', 'type' => 'text'],
+                ],
+                'optional_fields' => [],
+                'attachments' => ['verification_evidence'],
+            ],
+            // ── RISK Steps ──
+            'RISK::assessed' => [
+                'table' => 'risk_register',
+                'required_fields' => [
+                    'likelihood' => ['label' => 'Likelihood (1-5)', 'label_vi' => 'Kha nang xay ra (1-5)', 'type' => 'integer'],
+                    'impact' => ['label' => 'Impact (1-5)', 'label_vi' => 'Muc do tac dong (1-5)', 'type' => 'integer'],
+                    'risk_description' => ['label' => 'Risk Description', 'label_vi' => 'Mo ta rui ro', 'type' => 'text'],
+                ],
+                'optional_fields' => ['risk_category'],
+                'attachments' => [],
+            ],
+            'RISK::mitigated' => [
+                'table' => 'risk_register',
+                'required_fields' => [
+                    'mitigation_action' => ['label' => 'Mitigation Action', 'label_vi' => 'Hanh dong giam thieu', 'type' => 'text'],
+                    'residual_likelihood' => ['label' => 'Residual Likelihood', 'label_vi' => 'Kha nang con lai', 'type' => 'integer'],
+                    'residual_impact' => ['label' => 'Residual Impact', 'label_vi' => 'Tac dong con lai', 'type' => 'integer'],
+                ],
+                'optional_fields' => [],
+                'attachments' => ['mitigation_evidence'],
+            ],
+            'RISK::monitored' => [
+                'table' => 'risk_register',
+                'required_fields' => [
+                    'monitoring_frequency' => ['label' => 'Monitoring Frequency', 'label_vi' => 'Tan suat giam sat', 'type' => 'select'],
+                    'last_review_date' => ['label' => 'Last Review Date', 'label_vi' => 'Ngay xem xet gan nhat', 'type' => 'date'],
+                ],
+                'optional_fields' => ['risk_trend'],
+                'attachments' => [],
+            ],
+            // ── IMP (Improvement/PDCA) Steps ──
+            'IMP::approved' => [
+                'table' => 'improvement_projects',
+                'required_fields' => [
+                    'project_title' => ['label' => 'Project Title', 'label_vi' => 'Ten du an', 'type' => 'text'],
+                    'target_kpi' => ['label' => 'Target KPI', 'label_vi' => 'KPI muc tieu', 'type' => 'text'],
+                    'baseline_value' => ['label' => 'Baseline Value', 'label_vi' => 'Gia tri co so', 'type' => 'number'],
+                    'target_value' => ['label' => 'Target Value', 'label_vi' => 'Gia tri muc tieu', 'type' => 'number'],
+                ],
+                'optional_fields' => ['sponsor'],
+                'attachments' => ['project_charter'],
+            ],
+            'IMP::pdca_do' => [
+                'table' => 'improvement_projects',
+                'required_fields' => [
+                    'do_actions' => ['label' => 'DO Phase Actions', 'label_vi' => 'Hanh dong giai doan DO', 'type' => 'json_array'],
+                ],
+                'optional_fields' => [],
+                'attachments' => [],
+            ],
+            'IMP::pdca_check' => [
+                'table' => 'improvement_projects',
+                'required_fields' => [
+                    'check_results' => ['label' => 'CHECK Results vs Target', 'label_vi' => 'Ket qua CHECK so voi muc tieu', 'type' => 'text'],
+                    'actual_value' => ['label' => 'Actual KPI Value', 'label_vi' => 'Gia tri KPI thuc te', 'type' => 'number'],
+                ],
+                'optional_fields' => [],
+                'attachments' => ['results_data'],
+            ],
+            'IMP::pdca_act' => [
+                'table' => 'improvement_projects',
+                'required_fields' => [
+                    'standardize_or_revise' => ['label' => 'ACT: Standardize or Revise?', 'label_vi' => 'ACT: Chuan hoa hay Dieu chinh?', 'type' => 'select'],
+                    'act_actions' => ['label' => 'ACT Phase Actions', 'label_vi' => 'Hanh dong giai doan ACT', 'type' => 'json_array'],
+                ],
+                'optional_fields' => [],
+                'attachments' => [],
+            ],
+            // ── MR (Management Review) Steps ──
+            'MR::in_progress' => [
+                'table' => 'management_reviews',
+                'required_fields' => [
+                    'attendees' => ['label' => 'Attendees', 'label_vi' => 'Nguoi tham du', 'type' => 'json_array'],
+                    'agenda_items' => ['label' => 'Agenda Items', 'label_vi' => 'Noi dung chuong trinh', 'type' => 'json_array'],
+                ],
+                'optional_fields' => [],
+                'attachments' => [],
+            ],
+            'MR::minutes_drafted' => [
+                'table' => 'management_reviews',
+                'required_fields' => [
+                    'minutes_text' => ['label' => 'Meeting Minutes', 'label_vi' => 'Bien ban hop', 'type' => 'text'],
+                    'action_items' => ['label' => 'Action Items', 'label_vi' => 'Hang muc hanh dong', 'type' => 'json_array'],
+                ],
+                'optional_fields' => ['next_review_date'],
+                'attachments' => ['minutes_document'],
+            ],
+            // ── GEMBA Walk Steps ──
+            'GEMBA::walking' => [
+                'table' => 'lean_gemba_walks',
+                'required_fields' => [
+                    'areas_visited' => ['label' => 'Areas Visited', 'label_vi' => 'Khu vuc da di', 'type' => 'json_array'],
+                ],
+                'optional_fields' => ['theme_focus'],
+                'attachments' => [],
+            ],
+            'GEMBA::observations_logged' => [
+                'table' => 'lean_gemba_walks',
+                'required_fields' => [
+                    'observations' => ['label' => 'Observations (Safety/Quality/5S/Flow)', 'label_vi' => 'Quan sat (An toan/Chat luong/5S/Dong chay)', 'type' => 'json_array'],
+                ],
+                'optional_fields' => [],
+                'attachments' => ['observation_photos'],
+            ],
+            'GEMBA::actions_assigned' => [
+                'table' => 'lean_gemba_walks',
+                'required_fields' => [
+                    'actions_assigned' => ['label' => 'Actions Assigned', 'label_vi' => 'Hanh dong da giao', 'type' => 'json_array'],
+                ],
+                'optional_fields' => [],
+                'attachments' => [],
+            ],
+            // ── SMED Steps ──
+            'SMED::internal_external_separated' => [
+                'table' => 'lean_smed_events',
+                'required_fields' => [
+                    'internal_tasks' => ['label' => 'Internal Tasks (machine stopped)', 'label_vi' => 'Cong viec Ben trong (may dung)', 'type' => 'json_array'],
+                    'external_tasks' => ['label' => 'External Tasks (machine running)', 'label_vi' => 'Cong viec Ben ngoai (may chay)', 'type' => 'json_array'],
+                ],
+                'optional_fields' => [],
+                'attachments' => ['video_recording'],
+            ],
+            'SMED::streamlined' => [
+                'table' => 'lean_smed_events',
+                'required_fields' => [
+                    'streamlining_actions' => ['label' => 'Streamlining Actions', 'label_vi' => 'Bien phap tinh gon', 'type' => 'json_array'],
+                ],
+                'optional_fields' => ['quick_change_fixtures'],
+                'attachments' => [],
+            ],
+            'SMED::standardized' => [
+                'table' => 'lean_smed_events',
+                'required_fields' => [
+                    'final_setup_time_min' => ['label' => 'Final Setup Time (min)', 'label_vi' => 'Thoi gian setup cuoi (phut)', 'type' => 'decimal'],
+                    'standard_work_created' => ['label' => 'Standard Work Created?', 'label_vi' => 'Da tao tieu chuan?', 'type' => 'boolean'],
+                ],
+                'optional_fields' => ['operators_trained'],
+                'attachments' => ['standard_work_document'],
+            ],
+            // ── Additional NCR sub-states ──
+            'NCR::segregated' => [
+                'table' => 'ncr_records',
+                'required_fields' => [
+                    'segregation_location' => ['label' => 'Segregation Location', 'label_vi' => 'Vi tri cach ly', 'type' => 'text'],
+                    'segregation_method' => ['label' => 'Segregation Method', 'label_vi' => 'Phuong phap cach ly', 'type' => 'select'],
+                ],
+                'optional_fields' => [],
+                'attachments' => ['segregation_photos'],
+            ],
+            'NCR::rework_in_progress' => [
+                'table' => 'ncr_records',
+                'required_fields' => [
+                    'rework_instruction' => ['label' => 'Rework Instruction', 'label_vi' => 'Huong dan lam lai', 'type' => 'text'],
+                    'rework_operator' => ['label' => 'Rework Operator', 'label_vi' => 'Nguoi lam lai', 'type' => 'text'],
+                ],
+                'optional_fields' => [],
+                'attachments' => [],
+            ],
+            'NCR::reinspection' => [
+                'table' => 'ncr_records',
+                'required_fields' => [
+                    'reinspection_result' => ['label' => 'Reinspection Result', 'label_vi' => 'Ket qua kiem tra lai', 'type' => 'select'],
+                ],
+                'optional_fields' => ['reinspection_data'],
+                'attachments' => ['reinspection_report'],
+            ],
+            // ── Additional CAPA effectiveness sub-states ──
+            'CAPA::effectiveness_30d' => [
+                'table' => 'capa_effectiveness_checks',
+                'required_fields' => [
+                    'check_method' => ['label' => 'Verification Method', 'label_vi' => 'Phuong phap xac minh', 'type' => 'select'],
+                    'recurrence_check' => ['label' => 'Recurrence Found?', 'label_vi' => 'Co tai phat?', 'type' => 'boolean'],
+                    'check_result' => ['label' => '30-day Result', 'label_vi' => 'Ket qua 30 ngay', 'type' => 'select'],
+                ],
+                'optional_fields' => ['spc_within_limits', 'sample_size'],
+                'attachments' => ['effectiveness_evidence'],
+            ],
+            'CAPA::effectiveness_60d' => [
+                'table' => 'capa_effectiveness_checks',
+                'required_fields' => [
+                    'check_method' => ['label' => 'Verification Method', 'label_vi' => 'Phuong phap xac minh', 'type' => 'select'],
+                    'recurrence_check' => ['label' => 'Recurrence Found?', 'label_vi' => 'Co tai phat?', 'type' => 'boolean'],
+                    'check_result' => ['label' => '60-day Result', 'label_vi' => 'Ket qua 60 ngay', 'type' => 'select'],
+                ],
+                'optional_fields' => ['spc_within_limits'],
+                'attachments' => ['effectiveness_evidence'],
+            ],
+            'CAPA::effectiveness_90d' => [
+                'table' => 'capa_effectiveness_checks',
+                'required_fields' => [
+                    'check_method' => ['label' => 'Verification Method', 'label_vi' => 'Phuong phap xac minh', 'type' => 'select'],
+                    'recurrence_check' => ['label' => 'Recurrence Found?', 'label_vi' => 'Co tai phat?', 'type' => 'boolean'],
+                    'check_result' => ['label' => '90-day Result', 'label_vi' => 'Ket qua 90 ngay', 'type' => 'select'],
+                    'closure_summary' => ['label' => 'D8: Closure Summary', 'label_vi' => 'D8: Tom tat dong', 'type' => 'text'],
+                ],
+                'optional_fields' => ['team_recognition'],
+                'attachments' => ['final_effectiveness_report'],
+            ],
+            // ── Additional CAL sub-states ──
+            'CAL::as_found_pass' => [
+                'table' => 'calibration_records',
+                'required_fields' => [
+                    'as_found_readings' => ['label' => 'As-Found Readings', 'label_vi' => 'Ket qua ban dau', 'type' => 'json_array'],
+                ],
+                'optional_fields' => ['measurement_uncertainty'],
+                'attachments' => ['calibration_certificate'],
+            ],
+            'CAL::adjustment' => [
+                'table' => 'calibration_records',
+                'required_fields' => [
+                    'adjustments_made' => ['label' => 'Adjustments Made', 'label_vi' => 'Dieu chinh da thuc hien', 'type' => 'text'],
+                ],
+                'optional_fields' => [],
+                'attachments' => [],
+            ],
+            'CAL::as_left_verification' => [
+                'table' => 'calibration_records',
+                'required_fields' => [
+                    'as_left_readings' => ['label' => 'As-Left Readings', 'label_vi' => 'Ket qua sau dieu chinh', 'type' => 'json_array'],
+                    'as_left_in_tolerance' => ['label' => 'As-Left In Tolerance?', 'label_vi' => 'Sau dieu chinh trong dung sai?', 'type' => 'boolean'],
+                ],
+                'optional_fields' => ['measurement_uncertainty'],
+                'attachments' => ['as_left_certificate'],
             ],
         ];
     }

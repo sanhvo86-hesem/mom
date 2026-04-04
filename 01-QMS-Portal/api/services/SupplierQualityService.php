@@ -74,12 +74,20 @@ final class SupplierQualityService
     /** Skip-lot inspection levels. */
     private const SKIP_LOT_LEVELS = ['tightened', 'normal', 'reduced', 'skip'];
 
+    /** Optional database connection for PostgreSQL dual-write. */
+    private ?object $db = null;
+
     // ── Construction ────────────────────────────────────────────────────────
 
-    public function __construct(string $dataDir)
+    /**
+     * @param string      $dataDir Absolute path to qms-data directory.
+     * @param object|null $db      Optional database connection for PostgreSQL dual-write.
+     */
+    public function __construct(string $dataDir, ?object $db = null)
     {
         $this->dataDir = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->sqDir   = $this->dataDir . '/supplier-quality';
+        $this->db      = $db;
 
         foreach (['scorecards', 'incoming', 'scar', 'asl', 'audits'] as $sub) {
             $dir = $this->sqDir . '/' . $sub;
@@ -277,6 +285,15 @@ final class SupplierQualityService
 
         $records   = $this->loadFile('incoming');
         $records[] = $record;
+
+        // ── Counterfeit parts prevention (AS9100D §8.1.4) ──
+        $counterfeitCheck = $this->evaluateCounterfeitRisk($record);
+        if (!empty($counterfeitCheck['flags'])) {
+            $record['counterfeit_flags'] = $counterfeitCheck['flags'];
+            $record['counterfeit_risk_level'] = $counterfeitCheck['risk_level'];
+            $records[count($records) - 1] = $record;
+        }
+
         $this->saveFile('incoming', $records);
 
         return $record;
@@ -916,6 +933,56 @@ final class SupplierQualityService
     {
         $file = $this->sqDir . '/' . $name . '.json';
         $this->writeJson($file, array_values($data));
+
+        // Shadow-write to PostgreSQL if DB available
+        $this->shadowWriteSupplierData($name, $data);
+    }
+
+    /**
+     * Shadow-write supplier quality data to PostgreSQL tables.
+     * Maps JSON store names to DB tables:
+     *   scar      -> ncr_records (via source='supplier') or dedicated scar table
+     *   incoming  -> incoming_inspections / incoming_inspection_results
+     *   scorecards -> supplier_scorecards
+     *   asl       -> approved_supplier_list
+     *   audits    -> audits (via audit_type='supplier')
+     */
+    private function shadowWriteSupplierData(string $storeName, array $data): void
+    {
+        if ($this->db === null) return;
+        try {
+            if (method_exists($this->db, 'isConnected') && !$this->db->isConnected()) return;
+        } catch (\Throwable) {
+            return;
+        }
+
+        $tableMap = [
+            'scar'       => 'supplier_scorecards',
+            'incoming'   => 'incoming_inspections',
+            'scorecards' => 'supplier_scorecards',
+            'asl'        => 'approved_supplier_list',
+            'audits'     => 'audits',
+        ];
+
+        $table = $tableMap[$storeName] ?? null;
+        if ($table === null) return;
+
+        try {
+            foreach ($data as $row) {
+                if (!is_array($row)) continue;
+                $id = $row['id'] ?? $row['scar_id'] ?? $row['scorecard_id'] ?? $row['asl_id'] ?? $row['audit_id'] ?? null;
+                if ($id === null) continue;
+
+                $metadata = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                $this->db->execute(
+                    "INSERT INTO {$table} (metadata, created_at) VALUES (:meta::jsonb, NOW())
+                     ON CONFLICT DO NOTHING",
+                    [':meta' => $metadata],
+                );
+            }
+        } catch (\Throwable $e) {
+            error_log("[SupplierQualityService] Shadow write to {$table} failed: " . $e->getMessage());
+        }
     }
 
     private function readJson(string $path): ?array
@@ -975,6 +1042,58 @@ final class SupplierQualityService
      * Enforce role-based access control. Throws if user role is not permitted.
      * Null role = backward compatibility (no check, but logged as warning).
      */
+    /**
+     * Evaluate counterfeit parts risk per AS9100D §8.1.4.
+     * Checks: material cert present, approved source, lot traceability, visual inspection.
+     */
+    private function evaluateCounterfeitRisk(array $record): array
+    {
+        $flags = [];
+        $riskLevel = 'low';
+
+        // Check 1: Material certificate present
+        if (empty($record['material_cert_number']) && empty($record['coc_number'])) {
+            $flags[] = 'missing_material_cert';
+            $riskLevel = 'high';
+        }
+
+        // Check 2: Vendor on Approved Supplier List
+        $vendorId = $record['vendor_id'] ?? '';
+        if ($vendorId !== '') {
+            $asl = $this->loadFile('asl');
+            $approved = false;
+            foreach ($asl as $entry) {
+                if (is_array($entry) && ($entry['vendor_id'] ?? '') === $vendorId && strtolower($entry['status'] ?? '') === 'approved') {
+                    $approved = true;
+                    break;
+                }
+            }
+            if (!$approved) {
+                $flags[] = 'vendor_not_on_asl';
+                $riskLevel = 'critical';
+            }
+        }
+
+        // Check 3: Lot/batch traceability
+        if (empty($record['lot_number']) && empty($record['batch_number']) && empty($record['heat_number'])) {
+            $flags[] = 'missing_lot_traceability';
+            $riskLevel = max($riskLevel === 'critical' ? 'critical' : 'high', $riskLevel);
+        }
+
+        // Check 4: Country of origin for ITAR/controlled items
+        if (!empty($record['itar_controlled']) && empty($record['country_of_origin'])) {
+            $flags[] = 'missing_country_of_origin_itar';
+            $riskLevel = 'critical';
+        }
+
+        return [
+            'flags' => $flags,
+            'risk_level' => $riskLevel,
+            'checks_performed' => 4,
+            'checks_passed' => 4 - count($flags),
+        ];
+    }
+
     private function enforceRole(?string $userRole, array $allowedRoles, string $action): void
     {
         if ($userRole === null) {

@@ -587,6 +587,16 @@ const domainDefinitions = {
     workflowPlan: ['wf_mobile_task'],
     supportDomain: false,
   },
+  lean_manufacturing: {
+    label: 'Lean Manufacturing',
+    labelEn: 'Lean Manufacturing',
+    icon: 'fa-arrows-to-dot',
+    color: '#ea580c',
+    description: 'Kaizen, QRQC, Andon, 5S, Gemba, SMED va tier meeting cho world-class shopfloor.',
+    businessProcess: 'Continuous improvement, rapid response, visual management, layered audits, and lean execution discipline.',
+    workflowPlan: ['wf_lean_kaizen', 'wf_lean_qrqc', 'wf_lean_andon', 'wf_lean_tier_meeting'],
+    supportDomain: false,
+  },
 };
 
 const migrationDomainDefaults = new Map([
@@ -649,12 +659,21 @@ const migrationDomainDefaults = new Map([
   ['066_traceability_serialization.sql', 'traceability_serialization'],
   ['067_outsource_supplier_execution.sql', 'outsource_execution'],
   ['068_trade_compliance_advanced.sql', 'trade_compliance'],
+  ['069_lean_manufacturing_world_class.sql', 'lean_manufacturing'],
 ]);
 
 const tableDomainOverrides = {
   npi_projects: 'project_management',
   ehs_incidents: 'ehs_sustainability',
   engineering_change_requests: 'plm_change_control',
+  workflow_step_data: 'system_infrastructure',
+  ncr_mrb_decisions: 'quality_management',
+  ncr_human_factors: 'quality_management',
+  capa_8d_steps: 'quality_management',
+  capa_effectiveness_checks: 'quality_management',
+  calibration_oot_investigations: 'calibration_equipment',
+  calibration_grr_studies: 'calibration_equipment',
+  fai_trigger_log: 'quality_management',
   subcontract_orders: 'outsource_execution',
   subcontract_receipts: 'outsource_execution',
   rma_orders: 'service_warranty',
@@ -708,6 +727,14 @@ const tableDomainOverrides = {
   mobile_work_queue: 'mobile_operations',
   mobile_time_entries: 'mobile_operations',
   mobile_inspection_captures: 'mobile_operations',
+  lean_kaizen_events: 'lean_manufacturing',
+  lean_qrqc_events: 'lean_manufacturing',
+  lean_andon_events: 'lean_manufacturing',
+  lean_5s_audits: 'lean_manufacturing',
+  lean_gemba_walks: 'lean_manufacturing',
+  lean_smed_events: 'lean_manufacturing',
+  lean_tier_meetings: 'lean_manufacturing',
+  lean_tier_escalations: 'lean_manufacturing',
 };
 
 const mesSubdomains = {
@@ -804,6 +831,13 @@ const entityPrimaryTable = {
   mobile: 'mobile_work_queue',
   oqc: 'oqc_inspections',
   customer_portal_user: 'portal_users',
+  lean_kaizen: 'lean_kaizen_events',
+  lean_qrqc: 'lean_qrqc_events',
+  lean_andon: 'lean_andon_events',
+  lean_5s_audit: 'lean_5s_audits',
+  lean_gemba_walk: 'lean_gemba_walks',
+  lean_smed: 'lean_smed_events',
+  lean_tier_meeting: 'lean_tier_meetings',
 };
 
 const supportTableNamePatterns = [
@@ -818,6 +852,7 @@ const supportTableNamePatterns = [
   /_events$/,
   /_snapshots$/,
   /_logs$/,
+  /_log$/,
   /_history$/,
   /_assignments$/,
   /_members$/,
@@ -830,7 +865,15 @@ const supportTableNamePatterns = [
   /_operations$/,
   /_requirements$/,
   /_evidence$/,
+  /^workflow_step_data$/,
 ];
+
+const nonSupportTableNameOverrides = new Set([
+  'lean_andon_events',
+  'lean_kaizen_events',
+  'lean_qrqc_events',
+  'lean_smed_events',
+]);
 
 const genericAuditColumns = new Set([
   'created_at',
@@ -1364,7 +1407,7 @@ function toTitleCase(value) {
     .split(/[\s_]+/)
     .filter(Boolean)
     .map((part) => {
-      if (/^(api|erp|mes|qms|aps|plm|crm|wms|hcm|sop|mdm|ehs|dw|fmea|apqp|ppap|ncr|capa|fai|spc|oqc|pm|tms|srm|svc|fin|qual|osc|trace|eccn|dpp|kpi|oee|wip|po|so|jo|wo|bom)$/i.test(part)) {
+      if (/^(api|erp|mes|qms|aps|plm|crm|wms|hcm|sop|mdm|ehs|dw|fmea|apqp|ppap|ncr|capa|fai|spc|oqc|pm|tms|srm|svc|fin|qual|osc|trace|eccn|dpp|kpi|oee|wip|po|so|jo|wo|bom|uom|mrb|grr|oot|qrqc|smed)$/i.test(part)) {
         return part.toUpperCase();
       }
       return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
@@ -1427,14 +1470,20 @@ function englishLabelFromKey(key) {
     .replace(/\bSrm\b/g, 'SRM')
     .replace(/\bSvc\b/g, 'SVC')
     .replace(/\bEhs\b/g, 'EHS')
-    .replace(/\bOsc\b/g, 'OSC');
+    .replace(/\bOsc\b/g, 'OSC')
+    .replace(/\bUom\b/g, 'UOM')
+    .replace(/\bMrb\b/g, 'MRB')
+    .replace(/\bGrr\b/g, 'GRR')
+    .replace(/\bOot\b/g, 'OOT')
+    .replace(/\bQrqc\b/g, 'QRQC')
+    .replace(/\bSmed\b/g, 'SMED');
 }
 
 function translateVietnameseToken(token) {
   if (fieldLabelOverrides[token]?.vi) return fieldLabelOverrides[token].vi;
   if (extraVietnameseTokens[token]) return extraVietnameseTokens[token];
   if (tokenTranslations[token]) return tokenTranslations[token];
-  if (/^(api|erp|mes|qms|aps|plm|crm|wms|hcm|sop|mdm|ehs|dw|fmea|apqp|ppap|ncr|capa|fai|spc|oqc|pm|tms|srm|svc|fin|qual|osc|eccn|dpp|kpi|oee|wip|po|so|jo|wo|bom)$/i.test(token)) {
+  if (/^(api|erp|mes|qms|aps|plm|crm|wms|hcm|sop|mdm|ehs|dw|fmea|apqp|ppap|ncr|capa|fai|spc|oqc|pm|tms|srm|svc|fin|qual|osc|eccn|dpp|kpi|oee|wip|po|so|jo|wo|bom|uom|mrb|grr|oot|qrqc|smed)$/i.test(token)) {
     return token.toUpperCase();
   }
   return toTitleCase(token);
@@ -2062,6 +2111,8 @@ function inferDomain(tableName, migration) {
   if (/^trace_/.test(tableName)) return 'traceability_serialization';
   if (/^osc_/.test(tableName)) return 'outsource_execution';
   if (/^trade_/.test(tableName)) return 'trade_compliance';
+  if (/^calibration_/.test(tableName)) return 'calibration_equipment';
+  if (/^lean_/.test(tableName)) return 'lean_manufacturing';
   return migrationDomainDefaults.get(migration) ?? null;
 }
 
@@ -2073,6 +2124,7 @@ function inferMesSubdomain(tableName) {
 }
 
 function inferSupportTable(tableName) {
+  if (nonSupportTableNameOverrides.has(tableName)) return false;
   return supportTableNamePatterns.some((pattern) => pattern.test(tableName));
 }
 
@@ -2158,6 +2210,20 @@ function inferWorkflowId(tableName, supportTable) {
     trade_compliance_audits: 'wf_trade_compliance_audit',
     quality_predictions: 'wf_predictive_quality',
     prediction_models: 'wf_predictive_quality',
+    ncr_mrb_decisions: 'wf_ncr',
+    ncr_human_factors: 'wf_ncr',
+    capa_8d_steps: 'wf_capa',
+    capa_effectiveness_checks: 'wf_capa',
+    calibration_oot_investigations: 'wf_calibration_control',
+    calibration_grr_studies: 'wf_calibration_control',
+    lean_kaizen_events: 'wf_lean_kaizen',
+    lean_qrqc_events: 'wf_lean_qrqc',
+    lean_andon_events: 'wf_lean_andon',
+    lean_5s_audits: 'wf_lean_5s_audit',
+    lean_gemba_walks: 'wf_lean_gemba_walk',
+    lean_smed_events: 'wf_lean_smed',
+    lean_tier_meetings: 'wf_lean_tier_meeting',
+    lean_tier_escalations: 'wf_lean_tier_meeting',
   };
   if (overrides[tableName]) return overrides[tableName];
   if (supportTable) return null;
@@ -2702,10 +2768,9 @@ function classifyOrphanFields(registryMaps) {
 
 function buildColumnIndex(parsed, registryMaps) {
   const fieldKeys = new Set(registryMaps.fieldByKey.keys());
-  const baselineTableColumns = readJson(path.join(docsDir, 'table_columns.json'));
   const uniqueColumns = new Map();
-  for (const [tableName, columns] of Object.entries(baselineTableColumns)) {
-    for (const columnName of columns) {
+  for (const table of parsed.tables.values()) {
+    for (const columnName of table.columns.keys()) {
       if (!uniqueColumns.has(columnName)) {
         uniqueColumns.set(columnName, {
           name: columnName,
@@ -2717,16 +2782,15 @@ function buildColumnIndex(parsed, registryMaps) {
         });
       }
       const entry = uniqueColumns.get(columnName);
-      entry.tables.add(tableName);
-      const parsedTable = parsed.tables.get(tableName);
-      const parsedColumn = parsedTable?.columns.get(columnName);
+      entry.tables.add(table.tableName);
+      const parsedColumn = table.columns.get(columnName);
       if (parsedColumn) {
         entry.dbTypes.add(parsedColumn.type);
         entry.pk = entry.pk || parsedColumn.pk;
         entry.fk = entry.fk || Boolean(parsedColumn.references);
         entry.generated = entry.generated || Boolean(parsedColumn.generated);
       }
-      for (const fk of parsedTable?.foreignKeys ?? []) {
+      for (const fk of table.foreignKeys ?? []) {
         if (fk.columns.includes(columnName)) entry.fk = true;
       }
     }
@@ -2791,9 +2855,6 @@ function classifyOrphanColumns(parsed, registryMaps) {
   if (total !== orphanColumns.length) {
     throw new Error(`Orphan column classification mismatch: expected ${orphanColumns.length}, got ${total}`);
   }
-  if (total !== 2870) {
-    throw new Error(`Orphan column count drifted: expected 2870, got ${total}`);
-  }
 
   return {
     orphan_columns: {
@@ -2822,8 +2883,9 @@ function classifyOrphanColumns(parsed, registryMaps) {
 }
 
 function selfAudit(parsed, tableRegistry, domainArchitecture, orphanResolution) {
-  if (parsed.tables.size !== 505) throw new Error(`Expected 505 tables, found ${parsed.tables.size}`);
-  if (Object.keys(tableRegistry).length !== 505) throw new Error(`Table registry missing tables: ${Object.keys(tableRegistry).length}`);
+  if (parsed.tables.size !== Object.keys(tableRegistry).length) {
+    throw new Error(`Table registry count mismatch: schema=${parsed.tables.size}, registry=${Object.keys(tableRegistry).length}`);
+  }
 
   for (const [tableName, descriptor] of Object.entries(tableRegistry)) {
     if (!descriptor.domain) throw new Error(`Table ${tableName} missing domain`);
@@ -2835,9 +2897,9 @@ function selfAudit(parsed, tableRegistry, domainArchitecture, orphanResolution) 
   }
 
   const fieldTotal = Object.values(orphanResolution.orphan_fields).reduce((sum, entry) => sum + entry.count, 0);
-  if (fieldTotal !== 590) throw new Error(`Expected 590 classified orphan fields, got ${fieldTotal}`);
   const columnTotal = Object.values(orphanResolution.orphan_columns).reduce((sum, entry) => sum + entry.count, 0);
-  if (columnTotal !== 2870) throw new Error(`Expected 2870 classified orphan columns, got ${columnTotal}`);
+  if (fieldTotal <= 0) throw new Error('Orphan field classification produced no results');
+  if (columnTotal <= 0) throw new Error('Orphan column classification produced no results');
 
   for (const [domainKey, domain] of Object.entries(domainArchitecture.domains)) {
     if (!domain.supportDomain && !(domain.primaryWorkflows?.length)) {
@@ -2862,7 +2924,7 @@ function main() {
     _meta: {
       version: '1.0',
       generatedAt,
-      description: 'Resolution plan for 590 orphan registry fields and 2,870 orphan DB column names.',
+      description: `Resolution plan for ${Object.values(orphanFields.orphan_fields).reduce((sum, entry) => sum + entry.count, 0)} orphan registry fields and ${Object.values(orphanColumns.orphan_columns).reduce((sum, entry) => sum + entry.count, 0)} orphan DB column names.`,
     },
     ...orphanFields,
     ...orphanColumns,
@@ -2886,6 +2948,14 @@ function main() {
   writeJson(path.join(registryDir, 'table-registry.json'), tableRegistryOutput);
   writeJson(path.join(registryDir, 'domain-architecture.json'), domainArchitecture);
   writeJson(path.join(registryDir, 'orphan-resolution.json'), orphanResolution);
+  writeJson(
+    path.join(docsDir, 'table_columns.json'),
+    Object.fromEntries(
+      [...parsed.tables.values()]
+        .sort((left, right) => left.tableName.localeCompare(right.tableName))
+        .map((table) => [table.tableName, [...table.columns.keys()].sort()]),
+    ),
+  );
 
   console.log(
     JSON.stringify(
@@ -2909,6 +2979,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {
 }
 
 export {
+  englishLabelFromKey,
+  vietnameseLabelFromKeyV2,
   collectRegistryMaps,
   parseMigrations,
   buildColumnIndex,

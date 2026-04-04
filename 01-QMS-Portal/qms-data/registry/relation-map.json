@@ -2,8 +2,8 @@
   "_meta": {
     "version": "5.0",
     "description": "Relation map generated directly from table-registry foreign keys.",
-    "generatedAt": "2026-04-02T17:09:08.705Z",
-    "edgeCount": 761
+    "generatedAt": "2026-04-04T05:59:58.822Z",
+    "edgeCount": 803
   },
   "entities": {
     "ap_ar_invoices": {
@@ -531,6 +531,69 @@
       ],
       "digitalThread": true
     },
+    "calibration_grr_studies": {
+      "entity": "calibration_grr_studies",
+      "label": "GRR Study hiệu chuẩn",
+      "labelEn": "Calibration GRR Studies",
+      "primaryKey": "grr_id",
+      "domain": "calibration_equipment",
+      "fields": [
+        "approved_by",
+        "created_at",
+        "equipment_id",
+        "grr_id",
+        "grr_pct",
+        "grr_result",
+        "metadata",
+        "ndc",
+        "num_operators",
+        "num_parts",
+        "num_trials",
+        "part_variation_pv_pct",
+        "performed_by",
+        "readings",
+        "repeatability_ev_pct",
+        "reproducibility_av_pct",
+        "specification_tolerance",
+        "study_date",
+        "study_type"
+      ],
+      "digitalThread": true
+    },
+    "calibration_oot_investigations": {
+      "entity": "calibration_oot_investigations",
+      "label": "OOT Investigation hiệu chuẩn",
+      "labelEn": "Calibration OOT Investigations",
+      "primaryKey": "oot_id",
+      "domain": "calibration_equipment",
+      "fields": [
+        "affected_date_range",
+        "affected_part_numbers",
+        "affected_work_orders",
+        "approved_by",
+        "calibration_id",
+        "created_at",
+        "equipment_id",
+        "investigation_conclusion",
+        "investigator_id",
+        "last_known_good_date",
+        "linked_ncr_id",
+        "metadata",
+        "oot_direction",
+        "oot_discovery_date",
+        "oot_id",
+        "oot_magnitude",
+        "oot_parameter",
+        "product_disposition",
+        "products_reinspected",
+        "recall_required",
+        "reinspection_results",
+        "risk_assessment",
+        "status",
+        "updated_at"
+      ],
+      "digitalThread": true
+    },
     "calibration_records": {
       "entity": "calibration_records",
       "label": "Hồ sơ hiệu chuẩn",
@@ -557,6 +620,79 @@
         "uncertainty",
         "valid_from",
         "valid_to"
+      ],
+      "digitalThread": true
+    },
+    "capa_8d_steps": {
+      "entity": "capa_8d_steps",
+      "label": "CAPA 8d bước",
+      "labelEn": "CAPA 8d Steps",
+      "primaryKey": "step_id",
+      "domain": "quality_management",
+      "fields": [
+        "capa_id",
+        "closure_summary",
+        "completed_at",
+        "completed_by",
+        "containment_actions",
+        "containment_verified",
+        "control_plan_updated",
+        "corrective_actions",
+        "created_at",
+        "d_step",
+        "documents_updated",
+        "emergency_response",
+        "escape_point",
+        "fmea_updated",
+        "horizontal_deployment",
+        "human_factors",
+        "implementation_evidence",
+        "is_is_not_analysis",
+        "lessons_learned",
+        "metadata",
+        "problem_statement",
+        "risk_of_unintended_effects",
+        "root_cause_description",
+        "root_cause_method",
+        "step_id",
+        "step_status",
+        "systemic_actions",
+        "team_leader",
+        "team_members",
+        "team_recognition",
+        "training_completed",
+        "updated_at",
+        "verified_at",
+        "verified_by"
+      ],
+      "digitalThread": true
+    },
+    "capa_effectiveness_checks": {
+      "entity": "capa_effectiveness_checks",
+      "label": "CAPA Effectivene kiểm tra",
+      "labelEn": "CAPA Effectiveness Checks",
+      "primaryKey": "check_id",
+      "domain": "quality_management",
+      "fields": [
+        "capa_id",
+        "check_actual_date",
+        "check_due_date",
+        "check_id",
+        "check_interval_days",
+        "check_method",
+        "check_result",
+        "created_at",
+        "data_source",
+        "evidence_reference",
+        "metadata",
+        "notes",
+        "pass_fail_criteria",
+        "performed_by",
+        "post_complaint_count",
+        "recurrence_check",
+        "reopen_required",
+        "sample_size",
+        "spc_within_limits"
       ],
       "digitalThread": true
     },
@@ -2424,7 +2560,7 @@
     },
     "eng_resource_group_members": {
       "entity": "eng_resource_group_members",
-      "label": "Nguồn lực Nhóm Member kỹ thuật",
+      "label": "Nguồn lực Nhóm thành viên kỹ thuật",
       "labelEn": "Eng Resource Group Members",
       "primaryKey": "eng_resource_group_member_id",
       "domain": "mfg_engineering",
@@ -2820,6 +2956,31 @@
         "part_number",
         "part_rev",
         "record_id"
+      ],
+      "digitalThread": true
+    },
+    "fai_trigger_log": {
+      "entity": "fai_trigger_log",
+      "label": "FAI Trigger Nhật ký",
+      "labelEn": "FAI Trigger Log",
+      "primaryKey": "trigger_id",
+      "domain": "quality_management",
+      "fields": [
+        "created_at",
+        "evaluated_at",
+        "evaluated_by",
+        "fai_type_required",
+        "linked_ecr_id",
+        "linked_fai_id",
+        "metadata",
+        "part_number",
+        "status",
+        "trigger_id",
+        "trigger_reason",
+        "trigger_source",
+        "trigger_type",
+        "waiver_approved_by",
+        "waiver_reason"
       ],
       "digitalThread": true
     },
@@ -4436,6 +4597,285 @@
       ],
       "digitalThread": true
     },
+    "lean_5s_audits": {
+      "entity": "lean_5s_audits",
+      "label": "Lean 5s Đánh giá",
+      "labelEn": "Lean 5s Audits",
+      "primaryKey": "audit_5s_id",
+      "domain": "lean_manufacturing",
+      "fields": [
+        "area_id",
+        "area_name",
+        "audit_5s_id",
+        "audit_date",
+        "audit_number",
+        "auditor_id",
+        "corrective_actions",
+        "created_at",
+        "findings",
+        "max_possible_score",
+        "metadata",
+        "photos",
+        "previous_score_percent",
+        "record_id",
+        "safety_score",
+        "score_percent",
+        "set_in_order_score",
+        "shine_score",
+        "sort_score",
+        "standardize_score",
+        "status",
+        "sustain_score",
+        "total_score",
+        "trend_direction"
+      ],
+      "digitalThread": true
+    },
+    "lean_andon_events": {
+      "entity": "lean_andon_events",
+      "label": "Lean Andon sự kiện",
+      "labelEn": "Lean Andon Events",
+      "primaryKey": "andon_id",
+      "domain": "lean_manufacturing",
+      "fields": [
+        "andon_color",
+        "andon_id",
+        "andon_type",
+        "created_at",
+        "description",
+        "escalated_to",
+        "escalation_level",
+        "line_id",
+        "line_stop_duration_sec",
+        "line_stopped",
+        "linked_ncr_id",
+        "machine_id",
+        "metadata",
+        "part_number",
+        "resolution_description",
+        "resolution_time_sec",
+        "responder_id",
+        "responder_role",
+        "response_time_sec",
+        "root_cause_code",
+        "station_id",
+        "status",
+        "trigger_datetime",
+        "triggered_by",
+        "work_order"
+      ],
+      "digitalThread": true
+    },
+    "lean_gemba_walks": {
+      "entity": "lean_gemba_walks",
+      "label": "Lean Gemba Walk",
+      "labelEn": "Lean Gemba Walks",
+      "primaryKey": "gemba_id",
+      "domain": "lean_manufacturing",
+      "fields": [
+        "actions_assigned",
+        "actions_completed",
+        "actions_total",
+        "areas_visited",
+        "created_at",
+        "duration_minutes",
+        "gemba_id",
+        "improvement_observations",
+        "metadata",
+        "observations",
+        "positive_observations",
+        "record_id",
+        "safety_observations",
+        "status",
+        "theme_focus",
+        "walk_date",
+        "walk_end",
+        "walk_number",
+        "walk_start",
+        "walker_id"
+      ],
+      "digitalThread": true
+    },
+    "lean_kaizen_events": {
+      "entity": "lean_kaizen_events",
+      "label": "Lean Kaizen sự kiện",
+      "labelEn": "Lean Kaizen Events",
+      "primaryKey": "kaizen_id",
+      "domain": "lean_manufacturing",
+      "fields": [
+        "a3_background",
+        "a3_countermeasures",
+        "a3_current_condition",
+        "a3_follow_up_results",
+        "a3_implementation_plan",
+        "a3_problem_statement",
+        "a3_rca_method",
+        "a3_root_cause",
+        "a3_target_condition",
+        "actual_close_date",
+        "area_work_center",
+        "cost_savings",
+        "created_at",
+        "date_initiated",
+        "improvement_pct",
+        "kaizen_id",
+        "kaizen_number",
+        "kaizen_type",
+        "mentor_coach_id",
+        "metadata",
+        "metric_actual_value",
+        "metric_baseline_value",
+        "metric_name",
+        "metric_target_value",
+        "owner_id",
+        "record_id",
+        "status",
+        "target_close_date",
+        "team_members",
+        "title",
+        "updated_at",
+        "vsm_after_lead_time",
+        "vsm_before_lead_time",
+        "yokoten_areas",
+        "yokoten_deployed"
+      ],
+      "digitalThread": true
+    },
+    "lean_qrqc_events": {
+      "entity": "lean_qrqc_events",
+      "label": "Lean QRQC sự kiện",
+      "labelEn": "Lean QRQC Events",
+      "primaryKey": "qrqc_id",
+      "domain": "lean_manufacturing",
+      "fields": [
+        "affected_part_number",
+        "affected_quantity",
+        "countermeasure",
+        "created_at",
+        "defect_type",
+        "detected_by",
+        "detection_date",
+        "escalated_to_next",
+        "escalation_reason",
+        "immediate_reaction",
+        "lesson_learned",
+        "linked_capa_id",
+        "linked_ncr_id",
+        "metadata",
+        "problem_description",
+        "qrqc_id",
+        "qrqc_level",
+        "qrqc_number",
+        "real_data_collected",
+        "real_part_photos",
+        "real_part_verified",
+        "real_place_verified",
+        "record_id",
+        "root_cause",
+        "root_cause_method",
+        "status",
+        "time_to_contain_hours",
+        "time_to_resolve_hours",
+        "updated_at"
+      ],
+      "digitalThread": true
+    },
+    "lean_smed_events": {
+      "entity": "lean_smed_events",
+      "label": "Lean SMED sự kiện",
+      "labelEn": "Lean SMED Events",
+      "primaryKey": "smed_id",
+      "domain": "lean_manufacturing",
+      "fields": [
+        "baseline_external_min",
+        "baseline_internal_min",
+        "baseline_setup_time_min",
+        "baseline_video_uri",
+        "created_at",
+        "facilitator_id",
+        "final_setup_time_min",
+        "from_part_number",
+        "machine_id",
+        "metadata",
+        "operators_trained",
+        "quick_change_fixtures",
+        "record_id",
+        "reduction_pct",
+        "smed_id",
+        "smed_number",
+        "standard_work_created",
+        "status",
+        "step1_separation",
+        "step2_conversion",
+        "step3_streamlining",
+        "to_part_number",
+        "trial_external_min",
+        "trial_internal_min",
+        "trial_setup_time_min",
+        "updated_at"
+      ],
+      "digitalThread": true
+    },
+    "lean_tier_escalations": {
+      "entity": "lean_tier_escalations",
+      "label": "Lean Tier leo thang",
+      "labelEn": "Lean Tier Escalations",
+      "primaryKey": "escalation_id",
+      "domain": "lean_manufacturing",
+      "fields": [
+        "countermeasure",
+        "created_at",
+        "days_open",
+        "escalated_by",
+        "escalation_id",
+        "issue_category",
+        "issue_description",
+        "kpi_actual",
+        "kpi_metric",
+        "kpi_target",
+        "metadata",
+        "owner_id",
+        "resolution_notes",
+        "resolved_at",
+        "source_meeting_id",
+        "source_tier",
+        "status",
+        "target_resolution_date",
+        "target_tier",
+        "updated_at"
+      ],
+      "digitalThread": true
+    },
+    "lean_tier_meetings": {
+      "entity": "lean_tier_meetings",
+      "label": "Lean Tier cuộc họp",
+      "labelEn": "Lean Tier Meetings",
+      "primaryKey": "meeting_id",
+      "domain": "lean_manufacturing",
+      "fields": [
+        "action_items",
+        "area_id",
+        "attendees",
+        "cost_status",
+        "created_at",
+        "deescalations_down",
+        "delivery_status",
+        "discussion_items",
+        "duration_minutes",
+        "escalations_up",
+        "facilitator_id",
+        "meeting_date",
+        "meeting_id",
+        "metadata",
+        "morale_status",
+        "quality_status",
+        "safety_status",
+        "shift_code",
+        "started_on_time",
+        "tier_level"
+      ],
+      "digitalThread": true
+    },
     "lot_master": {
       "entity": "lot_master",
       "label": "Lô chuẩn",
@@ -4770,7 +5210,7 @@
     },
     "mdm_site_parameters": {
       "entity": "mdm_site_parameters",
-      "label": "Địa điểm Parameter MDM",
+      "label": "Địa điểm tham số MDM",
       "labelEn": "MDM Site Parameters",
       "primaryKey": "mdm_site_parameter_id",
       "domain": "master_data_governance",
@@ -4787,7 +5227,7 @@
     "mdm_uom_conversions": {
       "entity": "mdm_uom_conversions",
       "label": "Đơn vị tính chuyển đổi MDM",
-      "labelEn": "MDM Uom Conversions",
+      "labelEn": "MDM UOM Conversions",
       "primaryKey": "mdm_uom_conversion_id",
       "domain": "master_data_governance",
       "fields": [
@@ -6334,6 +6774,54 @@
         "template"
       ],
       "digitalThread": false
+    },
+    "ncr_human_factors": {
+      "entity": "ncr_human_factors",
+      "label": "NCR Human Factor",
+      "labelEn": "NCR Human Factors",
+      "primaryKey": "human_factor_id",
+      "domain": "quality_management",
+      "fields": [
+        "assessed_at",
+        "assessed_by",
+        "contributing_level",
+        "corrective_action",
+        "factor_category",
+        "factor_description",
+        "human_factor_id",
+        "ncr_id"
+      ],
+      "digitalThread": true
+    },
+    "ncr_mrb_decisions": {
+      "entity": "ncr_mrb_decisions",
+      "label": "NCR MRB Decision",
+      "labelEn": "NCR MRB Decisions",
+      "primaryKey": "mrb_decision_id",
+      "domain": "quality_management",
+      "fields": [
+        "affected_lot_numbers",
+        "affected_serial_numbers",
+        "cost_impact",
+        "created_at",
+        "customer_concession_number",
+        "customer_concession_required",
+        "customer_notification_date",
+        "customer_notified",
+        "disposition_decision",
+        "engineering_justification",
+        "metadata",
+        "mrb_chairperson",
+        "mrb_date",
+        "mrb_decision_id",
+        "mrb_members",
+        "ncr_id",
+        "reinspection_required",
+        "rework_instruction",
+        "risk_assessment",
+        "updated_at"
+      ],
+      "digitalThread": true
     },
     "ncr_records": {
       "entity": "ncr_records",
@@ -11695,6 +12183,29 @@
         "workflow_def_id"
       ],
       "digitalThread": true
+    },
+    "workflow_step_data": {
+      "entity": "workflow_step_data",
+      "label": "Luồng công việc bước Dữ liệu",
+      "labelEn": "Workflow Step Data",
+      "primaryKey": "step_data_id",
+      "domain": "system_infrastructure",
+      "fields": [
+        "attachments",
+        "captured_at",
+        "captured_by",
+        "data_fields",
+        "from_state",
+        "metadata",
+        "record_id",
+        "signature_hash",
+        "signature_meaning",
+        "step_data_id",
+        "step_name",
+        "to_state",
+        "workflow_type"
+      ],
+      "digitalThread": true
     }
   },
   "edges": [
@@ -12423,6 +12934,118 @@
     },
     {
       "from": {
+        "entity": "calibration_grr_studies",
+        "field": "equipment_id"
+      },
+      "to": {
+        "entity": "equipment",
+        "field": "equipment_id"
+      },
+      "type": "many_to_one",
+      "label": "GRR Study hiệu chuẩn → Thiết bị",
+      "labelEn": "Calibration GRR Studies → Equipment",
+      "domain": "calibration_equipment -> calibration_equipment",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "calibration_grr_studies",
+        "field": "performed_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "GRR Study hiệu chuẩn → Người dùng",
+      "labelEn": "Calibration GRR Studies → Users",
+      "domain": "calibration_equipment -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "calibration_grr_studies",
+        "field": "approved_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "GRR Study hiệu chuẩn → Người dùng",
+      "labelEn": "Calibration GRR Studies → Users",
+      "domain": "calibration_equipment -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "calibration_oot_investigations",
+        "field": "equipment_id"
+      },
+      "to": {
+        "entity": "equipment",
+        "field": "equipment_id"
+      },
+      "type": "many_to_one",
+      "label": "OOT Investigation hiệu chuẩn → Thiết bị",
+      "labelEn": "Calibration OOT Investigations → Equipment",
+      "domain": "calibration_equipment -> calibration_equipment",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "calibration_oot_investigations",
+        "field": "linked_ncr_id"
+      },
+      "to": {
+        "entity": "ncr_records",
+        "field": "ncr_id"
+      },
+      "type": "many_to_one",
+      "label": "OOT Investigation hiệu chuẩn → Hồ sơ NCR",
+      "labelEn": "Calibration OOT Investigations → NCR Records",
+      "domain": "calibration_equipment -> quality_management",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "calibration_oot_investigations",
+        "field": "investigator_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "OOT Investigation hiệu chuẩn → Người dùng",
+      "labelEn": "Calibration OOT Investigations → Users",
+      "domain": "calibration_equipment -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "calibration_oot_investigations",
+        "field": "approved_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "OOT Investigation hiệu chuẩn → Người dùng",
+      "labelEn": "Calibration OOT Investigations → Users",
+      "domain": "calibration_equipment -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
         "entity": "calibration_records",
         "field": "equipment_id"
       },
@@ -12450,6 +13073,102 @@
       "label": "Hồ sơ hiệu chuẩn → Người dùng",
       "labelEn": "Calibration Records → Users",
       "domain": "calibration_equipment -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "capa_8d_steps",
+        "field": "capa_id"
+      },
+      "to": {
+        "entity": "capa_records",
+        "field": "capa_id"
+      },
+      "type": "many_to_one",
+      "label": "CAPA 8d bước → Hồ sơ CAPA",
+      "labelEn": "CAPA 8d Steps → CAPA Records",
+      "domain": "quality_management -> quality_management",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "capa_8d_steps",
+        "field": "team_leader"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "CAPA 8d bước → Người dùng",
+      "labelEn": "CAPA 8d Steps → Users",
+      "domain": "quality_management -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "capa_8d_steps",
+        "field": "completed_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "CAPA 8d bước → Người dùng",
+      "labelEn": "CAPA 8d Steps → Users",
+      "domain": "quality_management -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "capa_8d_steps",
+        "field": "verified_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "CAPA 8d bước → Người dùng",
+      "labelEn": "CAPA 8d Steps → Users",
+      "domain": "quality_management -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "capa_effectiveness_checks",
+        "field": "capa_id"
+      },
+      "to": {
+        "entity": "capa_records",
+        "field": "capa_id"
+      },
+      "type": "many_to_one",
+      "label": "CAPA Effectivene kiểm tra → Hồ sơ CAPA",
+      "labelEn": "CAPA Effectiveness Checks → CAPA Records",
+      "domain": "quality_management -> quality_management",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "capa_effectiveness_checks",
+        "field": "performed_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "CAPA Effectivene kiểm tra → Người dùng",
+      "labelEn": "CAPA Effectiveness Checks → Users",
+      "domain": "quality_management -> core_system",
       "digitalThread": true,
       "cascadeActions": []
     },
@@ -14303,7 +15022,7 @@
         "field": "eng_resource_group_id"
       },
       "type": "many_to_one",
-      "label": "Nguồn lực Nhóm Member kỹ thuật → Nguồn lực Nhóm kỹ thuật",
+      "label": "Nguồn lực Nhóm thành viên kỹ thuật → Nguồn lực Nhóm kỹ thuật",
       "labelEn": "Eng Resource Group Members → Eng Resource Groups",
       "domain": "mfg_engineering -> mfg_engineering",
       "digitalThread": true,
@@ -14738,6 +15457,54 @@
       "label": "Hồ sơ FAI → Hồ sơ",
       "labelEn": "FAI Records → Records",
       "domain": "quality_management -> record_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "fai_trigger_log",
+        "field": "linked_fai_id"
+      },
+      "to": {
+        "entity": "fai_records",
+        "field": "fai_id"
+      },
+      "type": "many_to_one",
+      "label": "FAI Trigger Nhật ký → Hồ sơ FAI",
+      "labelEn": "FAI Trigger Log → FAI Records",
+      "domain": "quality_management -> quality_management",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "fai_trigger_log",
+        "field": "evaluated_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "FAI Trigger Nhật ký → Người dùng",
+      "labelEn": "FAI Trigger Log → Users",
+      "domain": "quality_management -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "fai_trigger_log",
+        "field": "waiver_approved_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "FAI Trigger Nhật ký → Người dùng",
+      "labelEn": "FAI Trigger Log → Users",
+      "domain": "quality_management -> core_system",
       "digitalThread": true,
       "cascadeActions": []
     },
@@ -16490,6 +17257,342 @@
     },
     {
       "from": {
+        "entity": "lean_5s_audits",
+        "field": "record_id"
+      },
+      "to": {
+        "entity": "records",
+        "field": "record_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean 5s Đánh giá → Hồ sơ",
+      "labelEn": "Lean 5s Audits → Records",
+      "domain": "lean_manufacturing -> record_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_5s_audits",
+        "field": "auditor_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean 5s Đánh giá → Người dùng",
+      "labelEn": "Lean 5s Audits → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_andon_events",
+        "field": "triggered_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Andon sự kiện → Người dùng",
+      "labelEn": "Lean Andon Events → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_andon_events",
+        "field": "responder_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Andon sự kiện → Người dùng",
+      "labelEn": "Lean Andon Events → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_andon_events",
+        "field": "escalated_to"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Andon sự kiện → Người dùng",
+      "labelEn": "Lean Andon Events → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_andon_events",
+        "field": "linked_ncr_id"
+      },
+      "to": {
+        "entity": "ncr_records",
+        "field": "ncr_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Andon sự kiện → Hồ sơ NCR",
+      "labelEn": "Lean Andon Events → NCR Records",
+      "domain": "lean_manufacturing -> quality_management",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_gemba_walks",
+        "field": "record_id"
+      },
+      "to": {
+        "entity": "records",
+        "field": "record_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Gemba Walk → Hồ sơ",
+      "labelEn": "Lean Gemba Walks → Records",
+      "domain": "lean_manufacturing -> record_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_gemba_walks",
+        "field": "walker_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Gemba Walk → Người dùng",
+      "labelEn": "Lean Gemba Walks → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_kaizen_events",
+        "field": "record_id"
+      },
+      "to": {
+        "entity": "records",
+        "field": "record_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Kaizen sự kiện → Hồ sơ",
+      "labelEn": "Lean Kaizen Events → Records",
+      "domain": "lean_manufacturing -> record_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_kaizen_events",
+        "field": "owner_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Kaizen sự kiện → Người dùng",
+      "labelEn": "Lean Kaizen Events → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_kaizen_events",
+        "field": "mentor_coach_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Kaizen sự kiện → Người dùng",
+      "labelEn": "Lean Kaizen Events → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_qrqc_events",
+        "field": "record_id"
+      },
+      "to": {
+        "entity": "records",
+        "field": "record_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean QRQC sự kiện → Hồ sơ",
+      "labelEn": "Lean QRQC Events → Records",
+      "domain": "lean_manufacturing -> record_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_qrqc_events",
+        "field": "detected_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean QRQC sự kiện → Người dùng",
+      "labelEn": "Lean QRQC Events → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_qrqc_events",
+        "field": "linked_ncr_id"
+      },
+      "to": {
+        "entity": "ncr_records",
+        "field": "ncr_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean QRQC sự kiện → Hồ sơ NCR",
+      "labelEn": "Lean QRQC Events → NCR Records",
+      "domain": "lean_manufacturing -> quality_management",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_qrqc_events",
+        "field": "linked_capa_id"
+      },
+      "to": {
+        "entity": "capa_records",
+        "field": "capa_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean QRQC sự kiện → Hồ sơ CAPA",
+      "labelEn": "Lean QRQC Events → CAPA Records",
+      "domain": "lean_manufacturing -> quality_management",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_smed_events",
+        "field": "record_id"
+      },
+      "to": {
+        "entity": "records",
+        "field": "record_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean SMED sự kiện → Hồ sơ",
+      "labelEn": "Lean SMED Events → Records",
+      "domain": "lean_manufacturing -> record_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_smed_events",
+        "field": "facilitator_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean SMED sự kiện → Người dùng",
+      "labelEn": "Lean SMED Events → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_tier_escalations",
+        "field": "source_meeting_id"
+      },
+      "to": {
+        "entity": "lean_tier_meetings",
+        "field": "meeting_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Tier leo thang → Lean Tier cuộc họp",
+      "labelEn": "Lean Tier Escalations → Lean Tier Meetings",
+      "domain": "lean_manufacturing -> lean_manufacturing",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_tier_escalations",
+        "field": "escalated_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Tier leo thang → Người dùng",
+      "labelEn": "Lean Tier Escalations → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_tier_escalations",
+        "field": "owner_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Tier leo thang → Người dùng",
+      "labelEn": "Lean Tier Escalations → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_tier_meetings",
+        "field": "facilitator_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Tier cuộc họp → Người dùng",
+      "labelEn": "Lean Tier Meetings → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
         "entity": "lot_master",
         "field": "item_id"
       },
@@ -17045,6 +18148,70 @@
       "label": "Mrp Kế hoạch đơn hàng → Mã hàng",
       "labelEn": "Mrp Planned Orders → Items",
       "domain": "advanced_planning -> master_data",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "ncr_human_factors",
+        "field": "ncr_id"
+      },
+      "to": {
+        "entity": "ncr_records",
+        "field": "ncr_id"
+      },
+      "type": "many_to_one",
+      "label": "NCR Human Factor → Hồ sơ NCR",
+      "labelEn": "NCR Human Factors → NCR Records",
+      "domain": "quality_management -> quality_management",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "ncr_human_factors",
+        "field": "assessed_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "NCR Human Factor → Người dùng",
+      "labelEn": "NCR Human Factors → Users",
+      "domain": "quality_management -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "ncr_mrb_decisions",
+        "field": "ncr_id"
+      },
+      "to": {
+        "entity": "ncr_records",
+        "field": "ncr_id"
+      },
+      "type": "many_to_one",
+      "label": "NCR MRB Decision → Hồ sơ NCR",
+      "labelEn": "NCR MRB Decisions → NCR Records",
+      "domain": "quality_management -> quality_management",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "ncr_mrb_decisions",
+        "field": "mrb_chairperson"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "NCR MRB Decision → Người dùng",
+      "labelEn": "NCR MRB Decisions → Users",
+      "domain": "quality_management -> core_system",
       "digitalThread": true,
       "cascadeActions": []
     },
@@ -23879,6 +25046,22 @@
       "type": "many_to_one",
       "label": "Luồng công việc Instance → Người dùng",
       "labelEn": "Workflow Instances → Users",
+      "domain": "system_infrastructure -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "workflow_step_data",
+        "field": "captured_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Luồng công việc bước Dữ liệu → Người dùng",
+      "labelEn": "Workflow Step Data → Users",
       "domain": "system_infrastructure -> core_system",
       "digitalThread": true,
       "cascadeActions": []
@@ -24610,6 +25793,118 @@
     },
     {
       "from": {
+        "entity": "calibration_grr_studies",
+        "field": "equipment_id"
+      },
+      "to": {
+        "entity": "equipment",
+        "field": "equipment_id"
+      },
+      "type": "many_to_one",
+      "label": "GRR Study hiệu chuẩn → Thiết bị",
+      "labelEn": "Calibration GRR Studies → Equipment",
+      "domain": "calibration_equipment -> calibration_equipment",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "calibration_grr_studies",
+        "field": "performed_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "GRR Study hiệu chuẩn → Người dùng",
+      "labelEn": "Calibration GRR Studies → Users",
+      "domain": "calibration_equipment -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "calibration_grr_studies",
+        "field": "approved_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "GRR Study hiệu chuẩn → Người dùng",
+      "labelEn": "Calibration GRR Studies → Users",
+      "domain": "calibration_equipment -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "calibration_oot_investigations",
+        "field": "equipment_id"
+      },
+      "to": {
+        "entity": "equipment",
+        "field": "equipment_id"
+      },
+      "type": "many_to_one",
+      "label": "OOT Investigation hiệu chuẩn → Thiết bị",
+      "labelEn": "Calibration OOT Investigations → Equipment",
+      "domain": "calibration_equipment -> calibration_equipment",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "calibration_oot_investigations",
+        "field": "linked_ncr_id"
+      },
+      "to": {
+        "entity": "ncr_records",
+        "field": "ncr_id"
+      },
+      "type": "many_to_one",
+      "label": "OOT Investigation hiệu chuẩn → Hồ sơ NCR",
+      "labelEn": "Calibration OOT Investigations → NCR Records",
+      "domain": "calibration_equipment -> quality_management",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "calibration_oot_investigations",
+        "field": "investigator_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "OOT Investigation hiệu chuẩn → Người dùng",
+      "labelEn": "Calibration OOT Investigations → Users",
+      "domain": "calibration_equipment -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "calibration_oot_investigations",
+        "field": "approved_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "OOT Investigation hiệu chuẩn → Người dùng",
+      "labelEn": "Calibration OOT Investigations → Users",
+      "domain": "calibration_equipment -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
         "entity": "calibration_records",
         "field": "equipment_id"
       },
@@ -24637,6 +25932,102 @@
       "label": "Hồ sơ hiệu chuẩn → Người dùng",
       "labelEn": "Calibration Records → Users",
       "domain": "calibration_equipment -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "capa_8d_steps",
+        "field": "capa_id"
+      },
+      "to": {
+        "entity": "capa_records",
+        "field": "capa_id"
+      },
+      "type": "many_to_one",
+      "label": "CAPA 8d bước → Hồ sơ CAPA",
+      "labelEn": "CAPA 8d Steps → CAPA Records",
+      "domain": "quality_management -> quality_management",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "capa_8d_steps",
+        "field": "team_leader"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "CAPA 8d bước → Người dùng",
+      "labelEn": "CAPA 8d Steps → Users",
+      "domain": "quality_management -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "capa_8d_steps",
+        "field": "completed_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "CAPA 8d bước → Người dùng",
+      "labelEn": "CAPA 8d Steps → Users",
+      "domain": "quality_management -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "capa_8d_steps",
+        "field": "verified_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "CAPA 8d bước → Người dùng",
+      "labelEn": "CAPA 8d Steps → Users",
+      "domain": "quality_management -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "capa_effectiveness_checks",
+        "field": "capa_id"
+      },
+      "to": {
+        "entity": "capa_records",
+        "field": "capa_id"
+      },
+      "type": "many_to_one",
+      "label": "CAPA Effectivene kiểm tra → Hồ sơ CAPA",
+      "labelEn": "CAPA Effectiveness Checks → CAPA Records",
+      "domain": "quality_management -> quality_management",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "capa_effectiveness_checks",
+        "field": "performed_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "CAPA Effectivene kiểm tra → Người dùng",
+      "labelEn": "CAPA Effectiveness Checks → Users",
+      "domain": "quality_management -> core_system",
       "digitalThread": true,
       "cascadeActions": []
     },
@@ -26490,7 +27881,7 @@
         "field": "eng_resource_group_id"
       },
       "type": "many_to_one",
-      "label": "Nguồn lực Nhóm Member kỹ thuật → Nguồn lực Nhóm kỹ thuật",
+      "label": "Nguồn lực Nhóm thành viên kỹ thuật → Nguồn lực Nhóm kỹ thuật",
       "labelEn": "Eng Resource Group Members → Eng Resource Groups",
       "domain": "mfg_engineering -> mfg_engineering",
       "digitalThread": true,
@@ -26925,6 +28316,54 @@
       "label": "Hồ sơ FAI → Hồ sơ",
       "labelEn": "FAI Records → Records",
       "domain": "quality_management -> record_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "fai_trigger_log",
+        "field": "linked_fai_id"
+      },
+      "to": {
+        "entity": "fai_records",
+        "field": "fai_id"
+      },
+      "type": "many_to_one",
+      "label": "FAI Trigger Nhật ký → Hồ sơ FAI",
+      "labelEn": "FAI Trigger Log → FAI Records",
+      "domain": "quality_management -> quality_management",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "fai_trigger_log",
+        "field": "evaluated_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "FAI Trigger Nhật ký → Người dùng",
+      "labelEn": "FAI Trigger Log → Users",
+      "domain": "quality_management -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "fai_trigger_log",
+        "field": "waiver_approved_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "FAI Trigger Nhật ký → Người dùng",
+      "labelEn": "FAI Trigger Log → Users",
+      "domain": "quality_management -> core_system",
       "digitalThread": true,
       "cascadeActions": []
     },
@@ -28677,6 +30116,342 @@
     },
     {
       "from": {
+        "entity": "lean_5s_audits",
+        "field": "record_id"
+      },
+      "to": {
+        "entity": "records",
+        "field": "record_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean 5s Đánh giá → Hồ sơ",
+      "labelEn": "Lean 5s Audits → Records",
+      "domain": "lean_manufacturing -> record_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_5s_audits",
+        "field": "auditor_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean 5s Đánh giá → Người dùng",
+      "labelEn": "Lean 5s Audits → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_andon_events",
+        "field": "triggered_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Andon sự kiện → Người dùng",
+      "labelEn": "Lean Andon Events → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_andon_events",
+        "field": "responder_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Andon sự kiện → Người dùng",
+      "labelEn": "Lean Andon Events → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_andon_events",
+        "field": "escalated_to"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Andon sự kiện → Người dùng",
+      "labelEn": "Lean Andon Events → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_andon_events",
+        "field": "linked_ncr_id"
+      },
+      "to": {
+        "entity": "ncr_records",
+        "field": "ncr_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Andon sự kiện → Hồ sơ NCR",
+      "labelEn": "Lean Andon Events → NCR Records",
+      "domain": "lean_manufacturing -> quality_management",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_gemba_walks",
+        "field": "record_id"
+      },
+      "to": {
+        "entity": "records",
+        "field": "record_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Gemba Walk → Hồ sơ",
+      "labelEn": "Lean Gemba Walks → Records",
+      "domain": "lean_manufacturing -> record_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_gemba_walks",
+        "field": "walker_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Gemba Walk → Người dùng",
+      "labelEn": "Lean Gemba Walks → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_kaizen_events",
+        "field": "record_id"
+      },
+      "to": {
+        "entity": "records",
+        "field": "record_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Kaizen sự kiện → Hồ sơ",
+      "labelEn": "Lean Kaizen Events → Records",
+      "domain": "lean_manufacturing -> record_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_kaizen_events",
+        "field": "owner_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Kaizen sự kiện → Người dùng",
+      "labelEn": "Lean Kaizen Events → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_kaizen_events",
+        "field": "mentor_coach_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Kaizen sự kiện → Người dùng",
+      "labelEn": "Lean Kaizen Events → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_qrqc_events",
+        "field": "record_id"
+      },
+      "to": {
+        "entity": "records",
+        "field": "record_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean QRQC sự kiện → Hồ sơ",
+      "labelEn": "Lean QRQC Events → Records",
+      "domain": "lean_manufacturing -> record_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_qrqc_events",
+        "field": "detected_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean QRQC sự kiện → Người dùng",
+      "labelEn": "Lean QRQC Events → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_qrqc_events",
+        "field": "linked_ncr_id"
+      },
+      "to": {
+        "entity": "ncr_records",
+        "field": "ncr_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean QRQC sự kiện → Hồ sơ NCR",
+      "labelEn": "Lean QRQC Events → NCR Records",
+      "domain": "lean_manufacturing -> quality_management",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_qrqc_events",
+        "field": "linked_capa_id"
+      },
+      "to": {
+        "entity": "capa_records",
+        "field": "capa_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean QRQC sự kiện → Hồ sơ CAPA",
+      "labelEn": "Lean QRQC Events → CAPA Records",
+      "domain": "lean_manufacturing -> quality_management",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_smed_events",
+        "field": "record_id"
+      },
+      "to": {
+        "entity": "records",
+        "field": "record_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean SMED sự kiện → Hồ sơ",
+      "labelEn": "Lean SMED Events → Records",
+      "domain": "lean_manufacturing -> record_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_smed_events",
+        "field": "facilitator_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean SMED sự kiện → Người dùng",
+      "labelEn": "Lean SMED Events → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_tier_escalations",
+        "field": "source_meeting_id"
+      },
+      "to": {
+        "entity": "lean_tier_meetings",
+        "field": "meeting_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Tier leo thang → Lean Tier cuộc họp",
+      "labelEn": "Lean Tier Escalations → Lean Tier Meetings",
+      "domain": "lean_manufacturing -> lean_manufacturing",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_tier_escalations",
+        "field": "escalated_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Tier leo thang → Người dùng",
+      "labelEn": "Lean Tier Escalations → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_tier_escalations",
+        "field": "owner_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Tier leo thang → Người dùng",
+      "labelEn": "Lean Tier Escalations → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "lean_tier_meetings",
+        "field": "facilitator_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Lean Tier cuộc họp → Người dùng",
+      "labelEn": "Lean Tier Meetings → Users",
+      "domain": "lean_manufacturing -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
         "entity": "lot_master",
         "field": "item_id"
       },
@@ -29232,6 +31007,70 @@
       "label": "Mrp Kế hoạch đơn hàng → Mã hàng",
       "labelEn": "Mrp Planned Orders → Items",
       "domain": "advanced_planning -> master_data",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "ncr_human_factors",
+        "field": "ncr_id"
+      },
+      "to": {
+        "entity": "ncr_records",
+        "field": "ncr_id"
+      },
+      "type": "many_to_one",
+      "label": "NCR Human Factor → Hồ sơ NCR",
+      "labelEn": "NCR Human Factors → NCR Records",
+      "domain": "quality_management -> quality_management",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "ncr_human_factors",
+        "field": "assessed_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "NCR Human Factor → Người dùng",
+      "labelEn": "NCR Human Factors → Users",
+      "domain": "quality_management -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "ncr_mrb_decisions",
+        "field": "ncr_id"
+      },
+      "to": {
+        "entity": "ncr_records",
+        "field": "ncr_id"
+      },
+      "type": "many_to_one",
+      "label": "NCR MRB Decision → Hồ sơ NCR",
+      "labelEn": "NCR MRB Decisions → NCR Records",
+      "domain": "quality_management -> quality_management",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "ncr_mrb_decisions",
+        "field": "mrb_chairperson"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "NCR MRB Decision → Người dùng",
+      "labelEn": "NCR MRB Decisions → Users",
+      "domain": "quality_management -> core_system",
       "digitalThread": true,
       "cascadeActions": []
     },
@@ -36066,6 +37905,22 @@
       "type": "many_to_one",
       "label": "Luồng công việc Instance → Người dùng",
       "labelEn": "Workflow Instances → Users",
+      "domain": "system_infrastructure -> core_system",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "from": {
+        "entity": "workflow_step_data",
+        "field": "captured_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "label": "Luồng công việc bước Dữ liệu → Người dùng",
+      "labelEn": "Workflow Step Data → Users",
       "domain": "system_infrastructure -> core_system",
       "digitalThread": true,
       "cascadeActions": []

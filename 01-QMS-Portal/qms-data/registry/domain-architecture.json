@@ -1,9 +1,9 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-02T15:10:15.000Z",
-    "domainCount": 47,
-    "tableCount": 505,
+    "generatedAt": "2026-04-04T05:58:07.698Z",
+    "domainCount": 48,
+    "tableCount": 521,
     "description": "Domain architecture map for HESEM QMS Portal aligned to SAP, Epicor, IFS, Oracle, and Dynamics patterns.",
     "researchReferences": [
       {
@@ -250,7 +250,7 @@
         "multilingualPattern": "LocalizedLabels on metadata objects and label merge semantics by language code."
       }
     },
-    "workflowCoverageGeneratedAt": "2026-04-02T17:09:08.060Z"
+    "workflowCoverageGeneratedAt": "2026-04-04T05:59:53.380Z"
   },
   "domains": {
     "core_system": {
@@ -296,6 +296,7 @@
         "forms_system",
         "hcm_workforce",
         "inventory",
+        "lean_manufacturing",
         "master_data",
         "master_data_governance",
         "mobile_operations",
@@ -618,7 +619,6 @@
         "wf_production_schedule",
         "wf_shift_calendar_holiday",
         "wf_shift_definition",
-        "wf_shift_production_log",
         "wf_shift_target"
       ],
       "upstreamDomains": [
@@ -653,6 +653,8 @@
       "description": "Kiểm tra, NCR, CAPA, FAI, SPC, OQC và chất lượng vận hành.",
       "businessProcess": "Inspection, nonconformance, CAPA, first article, SPC, and containment.",
       "tables": [
+        "capa_8d_steps",
+        "capa_effectiveness_checks",
         "capa_records",
         "certificates",
         "concessions",
@@ -662,11 +664,14 @@
         "deviations",
         "fai_characteristics",
         "fai_records",
+        "fai_trigger_log",
         "incoming_inspection_results",
         "incoming_inspections",
         "inspection_plans",
         "inspection_results",
         "material_review_board",
+        "ncr_human_factors",
+        "ncr_mrb_decisions",
         "ncr_records",
         "oqc_inspections",
         "spc_data"
@@ -697,7 +702,9 @@
         "sales"
       ],
       "downstreamDomains": [
+        "calibration_equipment",
         "fmea_apqp",
+        "lean_manufacturing",
         "mobile_operations",
         "quality_lab"
       ],
@@ -728,6 +735,8 @@
       "description": "Thiết bị, hiệu chuẩn, bảo trì cơ bản và dao dụng cụ nền tảng.",
       "businessProcess": "Calibration scheduling, equipment control, and baseline tooling records.",
       "tables": [
+        "calibration_grr_studies",
+        "calibration_oot_investigations",
         "calibration_records",
         "equipment",
         "maintenance_work_orders",
@@ -735,6 +744,7 @@
         "tools"
       ],
       "primaryWorkflows": [
+        "wf_calibration_control",
         "wf_calibration_record",
         "wf_equipment",
         "wf_maintenance_work_order",
@@ -743,7 +753,8 @@
       ],
       "upstreamDomains": [
         "core_system",
-        "purchasing"
+        "purchasing",
+        "quality_management"
       ],
       "downstreamDomains": [
         "bi_datawarehouse",
@@ -755,6 +766,7 @@
       ],
       "supportDomain": false,
       "workflows": [
+        "wf_calibration_control",
         "wf_calibration_record",
         "wf_equipment",
         "wf_maintenance_work_order",
@@ -2535,6 +2547,7 @@
         "audit_risk",
         "ehs_sustainability",
         "hcm_workforce",
+        "lean_manufacturing",
         "plm_change_control",
         "quality_lab",
         "quality_management",
@@ -2564,11 +2577,11 @@
         "tags",
         "variable_registry",
         "workflow_definitions",
-        "workflow_instances"
+        "workflow_instances",
+        "workflow_step_data"
       ],
       "primaryWorkflows": [
         "wf_comment",
-        "wf_escalation_log",
         "wf_escalation_rule",
         "wf_file_attachment",
         "wf_naming_pattern",
@@ -2709,7 +2722,6 @@
         "product_passports"
       ],
       "primaryWorkflows": [
-        "wf_passport_access_log",
         "wf_product_passport"
       ],
       "upstreamDomains": [
@@ -2816,6 +2828,49 @@
       "supportDomain": false,
       "workflows": [
         "wf_mobile_task"
+      ]
+    },
+    "lean_manufacturing": {
+      "label": "Lean Manufacturing",
+      "labelEn": "Lean Manufacturing",
+      "icon": "fa-arrows-to-dot",
+      "color": "#ea580c",
+      "description": "Kaizen, QRQC, Andon, 5S, Gemba, SMED va tier meeting cho world-class shopfloor.",
+      "businessProcess": "Continuous improvement, rapid response, visual management, layered audits, and lean execution discipline.",
+      "tables": [
+        "lean_5s_audits",
+        "lean_andon_events",
+        "lean_gemba_walks",
+        "lean_kaizen_events",
+        "lean_qrqc_events",
+        "lean_smed_events",
+        "lean_tier_escalations",
+        "lean_tier_meetings"
+      ],
+      "primaryWorkflows": [
+        "wf_lean_5s_audit",
+        "wf_lean_andon",
+        "wf_lean_gemba_walk",
+        "wf_lean_kaizen",
+        "wf_lean_qrqc",
+        "wf_lean_smed",
+        "wf_lean_tier_meeting"
+      ],
+      "upstreamDomains": [
+        "core_system",
+        "quality_management",
+        "record_system"
+      ],
+      "downstreamDomains": [],
+      "supportDomain": false,
+      "workflows": [
+        "wf_lean_5s_audit",
+        "wf_lean_andon",
+        "wf_lean_gemba_walk",
+        "wf_lean_kaizen",
+        "wf_lean_qrqc",
+        "wf_lean_smed",
+        "wf_lean_tier_meeting"
       ]
     }
   }

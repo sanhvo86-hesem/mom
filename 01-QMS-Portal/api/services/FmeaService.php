@@ -20,6 +20,7 @@ final class FmeaService
 {
     private readonly string $dataDir;
     private readonly string $fmeaDir;
+    private ?object $db = null;
 
     /** Valid FMEA types. */
     private const FMEA_TYPES = ['design', 'process', 'system', 'msf', 'supplemental'];
@@ -50,10 +51,11 @@ final class FmeaService
 
     // ── Construction ────────────────────────────────────────────────────────
 
-    public function __construct(string $dataDir)
+    public function __construct(string $dataDir, ?object $db = null)
     {
         $this->dataDir = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->fmeaDir = $this->dataDir . '/fmea';
+        $this->db      = $db;
 
         foreach (['records', 'failure_modes', 'actions', 'revisions', 'control_plans', 'control_plan_chars'] as $sub) {
             $dir = $this->fmeaDir . '/' . $sub;
@@ -65,6 +67,23 @@ final class FmeaService
         $countersDir = $this->dataDir . '/counters';
         if (!is_dir($countersDir)) {
             @mkdir($countersDir, 0775, true);
+        }
+    }
+
+    // ── Shadow Write ────────────────────────────────────────────────────────
+
+    private function shadowWriteToDb(string $table, string $idColumn, string $idValue, array $row): void
+    {
+        if ($this->db === null) return;
+        try {
+            $meta = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $this->db->execute(
+                "INSERT INTO {$table} ({$idColumn}, metadata, created_at) VALUES (:id, :meta::jsonb, NOW())
+                 ON CONFLICT ({$idColumn}) DO UPDATE SET metadata = EXCLUDED.metadata",
+                [':id' => $idValue, ':meta' => $meta]
+            );
+        } catch (\Throwable $e) {
+            error_log("[FmeaService] Shadow write to {$table} failed: " . $e->getMessage());
         }
     }
 

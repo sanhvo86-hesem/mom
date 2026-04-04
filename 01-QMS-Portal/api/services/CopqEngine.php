@@ -21,6 +21,7 @@ final class CopqEngine
     private readonly string $dataDir;
     private readonly string $exceptionsDir;
     private readonly string $ordersFile;
+    private ?object $db = null;
 
     /** Default material cost per unit when unknown (USD). */
     private const DEFAULT_MATERIAL_COST_PER_UNIT = 50.0;
@@ -36,11 +37,12 @@ final class CopqEngine
 
     // ── Construction ────────────────────────────────────────────────────────
 
-    public function __construct(string $dataDir)
+    public function __construct(string $dataDir, ?object $db = null)
     {
         $this->dataDir       = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->exceptionsDir = $this->dataDir . '/exceptions';
         $this->ordersFile    = $this->dataDir . '/orders/orders.json';
+        $this->db            = $db;
     }
 
     // ── Public API ──────────────────────────────────────────────────────────
@@ -413,5 +415,22 @@ final class CopqEngine
     private function nowIso(): string
     {
         return (new \DateTimeImmutable('now', new \DateTimeZone('+07:00')))->format('c');
+    }
+
+    // ── PostgreSQL dual-write ──────────────────────────────────────────────
+
+    private function shadowWriteToDb(string $table, string $idColumn, string $idValue, array $row): void
+    {
+        if ($this->db === null) return;
+        try {
+            $meta = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $this->db->execute(
+                "INSERT INTO {$table} ({$idColumn}, metadata, created_at) VALUES (:id, :meta::jsonb, NOW())
+                 ON CONFLICT ({$idColumn}) DO UPDATE SET metadata = EXCLUDED.metadata",
+                [':id' => $idValue, ':meta' => $meta]
+            );
+        } catch (\Throwable $e) {
+            error_log("[CopqEngine] Shadow write to {$table} failed: " . $e->getMessage());
+        }
     }
 }

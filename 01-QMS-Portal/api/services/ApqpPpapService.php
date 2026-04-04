@@ -19,6 +19,7 @@ final class ApqpPpapService
 {
     private readonly string $dataDir;
     private readonly string $apqpDir;
+    private ?object $db = null;
 
     /** APQP phases in order. */
     private const PHASES = [
@@ -118,10 +119,11 @@ final class ApqpPpapService
 
     // ── Construction ────────────────────────────────────────────────────────
 
-    public function __construct(string $dataDir)
+    public function __construct(string $dataDir, ?object $db = null)
     {
         $this->dataDir = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->apqpDir = $this->dataDir . '/apqp';
+        $this->db      = $db;
 
         foreach (['projects', 'gates', 'ppap'] as $sub) {
             $dir = $this->apqpDir . '/' . $sub;
@@ -133,6 +135,23 @@ final class ApqpPpapService
         $countersDir = $this->dataDir . '/counters';
         if (!is_dir($countersDir)) {
             @mkdir($countersDir, 0775, true);
+        }
+    }
+
+    // ── Shadow Write ────────────────────────────────────────────────────────
+
+    private function shadowWriteToDb(string $table, string $idColumn, string $idValue, array $row): void
+    {
+        if ($this->db === null) return;
+        try {
+            $meta = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $this->db->execute(
+                "INSERT INTO {$table} ({$idColumn}, metadata, created_at) VALUES (:id, :meta::jsonb, NOW())
+                 ON CONFLICT ({$idColumn}) DO UPDATE SET metadata = EXCLUDED.metadata",
+                [':id' => $idValue, ':meta' => $meta]
+            );
+        } catch (\Throwable $e) {
+            error_log("[ApqpPpapService] Shadow write to {$table} failed: " . $e->getMessage());
         }
     }
 

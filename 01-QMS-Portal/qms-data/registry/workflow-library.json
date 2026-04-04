@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Workflow library expanded from table-registry and domain-driven lifecycle heuristics.",
-    "generatedAt": "2026-04-02T17:09:08.060Z",
-    "workflowCount": 412
+    "generatedAt": "2026-04-04T05:59:53.380Z",
+    "workflowCount": 420
   },
   "workflows": {
     "wf_ap_ar_invoice": {
@@ -1870,7 +1870,7 @@
         "work_centers"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "aps_planning_horizons_status",
       "states": [
         {
           "id": "complete",
@@ -2982,7 +2982,7 @@
         "users"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "audit_actions_status",
       "states": [
         {
           "id": "complete",
@@ -5189,6 +5189,131 @@
         "downstreamEffects": []
       }
     },
+    "wf_calibration_control": {
+      "workflowId": "wf_calibration_control",
+      "name": "Oot Investigation hiệu chuẩn - Luồng xử lý",
+      "nameEn": "Calibration Oot Investigations Workflow",
+      "entity": "calibration_oot_investigations",
+      "domain": "calibration_equipment",
+      "standard": "ISO17025",
+      "primaryTable": "calibration_oot_investigations",
+      "relatedTables": [
+        "calibration_grr_studies",
+        "calibration_oot_investigations",
+        "equipment",
+        "ncr_records",
+        "users"
+      ],
+      "stateField": "status",
+      "statusSet": "calibration_oot_investigations_status",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "metrology_technician",
+              "template": "calibration_equipment_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "metrology_technician",
+              "template": "calibration_equipment_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "metrology_technician",
+              "template": "calibration_equipment_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {
+        "complete_to_partial": {
+          "hours": 24,
+          "escalateTo": "metrology_technician"
+        },
+        "partial_to_broken": {
+          "hours": 24,
+          "escalateTo": "metrology_technician"
+        },
+        "broken_to_pending": {
+          "hours": 24,
+          "escalateTo": "metrology_technician"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "equipment",
+          "ncr_records",
+          "users"
+        ],
+        "downstreamEffects": []
+      }
+    },
     "wf_calibration_record": {
       "workflowId": "wf_calibration_record",
       "name": "Hồ sơ hiệu chuẩn - Luong xu ly",
@@ -5323,10 +5448,13 @@
       "standard": "AS9100D §10.2 / ISO 13485",
       "primaryTable": "capa_records",
       "relatedTables": [
+        "capa_effectiveness_checks",
         "capa_records",
         "records",
         "ncr_records",
-        "users"
+        "users",
+        "capa_8d_steps",
+        "lean_qrqc_events"
       ],
       "stateField": "capa_status",
       "statusSet": "capa_status",
@@ -22801,7 +22929,7 @@
         "users"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "ehs_corrective_actions_status",
       "states": [
         {
           "id": "complete",
@@ -26314,7 +26442,7 @@
         "ehs_sustainability_projects"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "ehs_sustainability_projects_status",
       "states": [
         {
           "id": "complete",
@@ -27110,7 +27238,7 @@
         "ehs_permit_register"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "ehs_permit_register_status",
       "states": [
         {
           "id": "complete",
@@ -27227,7 +27355,7 @@
         "ehs_regulatory_submissions"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "ehs_regulatory_submissions_status",
       "states": [
         {
           "id": "complete",
@@ -28880,7 +29008,7 @@
         "employees"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "employee_certifications_status",
       "states": [
         {
           "id": "complete",
@@ -34283,6 +34411,8 @@
       "relatedTables": [
         "equipment",
         "departments",
+        "calibration_grr_studies",
+        "calibration_oot_investigations",
         "calibration_records",
         "dw_machine_dim",
         "maintenance_work_orders",
@@ -34917,473 +35047,6 @@
           "qual_lab_equipment",
           "tooling_calibration_links"
         ]
-      }
-    },
-    "wf_escalation_log": {
-      "workflowId": "wf_escalation_log",
-      "name": "Leo thang Nhật ký - Luong xu ly",
-      "nameEn": "Escalation Log Workflow",
-      "entity": "escalation_log",
-      "domain": "system_infrastructure",
-      "standard": "internal",
-      "primaryTable": "escalation_log",
-      "relatedTables": [
-        "escalation_log",
-        "escalation_rules",
-        "users"
-      ],
-      "stateField": "",
-      "statusSet": "",
-      "states": [
-        {
-          "id": "draft",
-          "label": "Nhap",
-          "labelEn": "Draft",
-          "color": "#3b82f6",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        },
-        {
-          "id": "active",
-          "label": "Hoat dong",
-          "labelEn": "Active",
-          "color": "#10b981",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": [
-            "draft"
-          ]
-        },
-        {
-          "id": "on_hold",
-          "label": "Tam dung",
-          "labelEn": "On Hold",
-          "color": "#f59e0b",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": [
-            "active"
-          ]
-        },
-        {
-          "id": "completed",
-          "label": "Hoan thanh",
-          "labelEn": "Completed",
-          "color": "#10b981",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": [
-            "on_hold",
-            "draft",
-            "active"
-          ]
-        },
-        {
-          "id": "closed",
-          "label": "Da dong",
-          "labelEn": "Closed",
-          "color": "#10b981",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": [
-            "completed",
-            "draft",
-            "active",
-            "on_hold"
-          ]
-        },
-        {
-          "id": "cancelled",
-          "label": "Da huy",
-          "labelEn": "Cancelled",
-          "color": "#ef4444",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": [
-            "closed",
-            "draft",
-            "active",
-            "on_hold"
-          ]
-        }
-      ],
-      "transitions": [
-        {
-          "from": "draft",
-          "to": "active",
-          "trigger": "move_to_active",
-          "label": "Hoat dong",
-          "labelEn": "Active",
-          "guards": [],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "system_infrastructure_active"
-            }
-          ]
-        },
-        {
-          "from": "active",
-          "to": "on_hold",
-          "trigger": "move_to_on_hold",
-          "label": "Tam dung",
-          "labelEn": "On Hold",
-          "guards": [],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "system_infrastructure_on_hold"
-            }
-          ]
-        },
-        {
-          "from": "on_hold",
-          "to": "completed",
-          "trigger": "complete",
-          "label": "Hoan thanh",
-          "labelEn": "Completed",
-          "guards": [],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "system_infrastructure_completed"
-            },
-            {
-              "type": "setField",
-              "field": "completed_at",
-              "value": "NOW()"
-            }
-          ]
-        },
-        {
-          "from": "draft",
-          "to": "completed",
-          "trigger": "complete",
-          "label": "Hoan thanh",
-          "labelEn": "Completed",
-          "guards": [],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "system_infrastructure_completed"
-            },
-            {
-              "type": "setField",
-              "field": "completed_at",
-              "value": "NOW()"
-            }
-          ]
-        },
-        {
-          "from": "active",
-          "to": "completed",
-          "trigger": "complete",
-          "label": "Hoan thanh",
-          "labelEn": "Completed",
-          "guards": [],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "system_infrastructure_completed"
-            },
-            {
-              "type": "setField",
-              "field": "completed_at",
-              "value": "NOW()"
-            }
-          ]
-        },
-        {
-          "from": "completed",
-          "to": "closed",
-          "trigger": "close",
-          "label": "Da dong",
-          "labelEn": "Closed",
-          "guards": [
-            {
-              "type": "role",
-              "roles": [
-                "module_admin",
-                "system_admin"
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "system_infrastructure_closed"
-            },
-            {
-              "type": "setField",
-              "field": "closed_at",
-              "value": "NOW()"
-            }
-          ]
-        },
-        {
-          "from": "draft",
-          "to": "closed",
-          "trigger": "close",
-          "label": "Da dong",
-          "labelEn": "Closed",
-          "guards": [
-            {
-              "type": "role",
-              "roles": [
-                "module_admin",
-                "system_admin"
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "system_infrastructure_closed"
-            },
-            {
-              "type": "setField",
-              "field": "closed_at",
-              "value": "NOW()"
-            }
-          ]
-        },
-        {
-          "from": "active",
-          "to": "closed",
-          "trigger": "close",
-          "label": "Da dong",
-          "labelEn": "Closed",
-          "guards": [
-            {
-              "type": "role",
-              "roles": [
-                "module_admin",
-                "system_admin"
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "system_infrastructure_closed"
-            },
-            {
-              "type": "setField",
-              "field": "closed_at",
-              "value": "NOW()"
-            }
-          ]
-        },
-        {
-          "from": "on_hold",
-          "to": "closed",
-          "trigger": "close",
-          "label": "Da dong",
-          "labelEn": "Closed",
-          "guards": [
-            {
-              "type": "role",
-              "roles": [
-                "module_admin",
-                "system_admin"
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "system_infrastructure_closed"
-            },
-            {
-              "type": "setField",
-              "field": "closed_at",
-              "value": "NOW()"
-            }
-          ]
-        },
-        {
-          "from": "closed",
-          "to": "cancelled",
-          "trigger": "cancel",
-          "label": "Da huy",
-          "labelEn": "Cancelled",
-          "guards": [
-            {
-              "type": "role",
-              "roles": [
-                "module_admin",
-                "system_admin"
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "system_infrastructure_cancelled"
-            },
-            {
-              "type": "setField",
-              "field": "cancelled_at",
-              "value": "NOW()"
-            }
-          ]
-        },
-        {
-          "from": "draft",
-          "to": "cancelled",
-          "trigger": "cancel",
-          "label": "Da huy",
-          "labelEn": "Cancelled",
-          "guards": [
-            {
-              "type": "role",
-              "roles": [
-                "module_admin",
-                "system_admin"
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "system_infrastructure_cancelled"
-            },
-            {
-              "type": "setField",
-              "field": "cancelled_at",
-              "value": "NOW()"
-            }
-          ]
-        },
-        {
-          "from": "active",
-          "to": "cancelled",
-          "trigger": "cancel",
-          "label": "Da huy",
-          "labelEn": "Cancelled",
-          "guards": [
-            {
-              "type": "role",
-              "roles": [
-                "module_admin",
-                "system_admin"
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "system_infrastructure_cancelled"
-            },
-            {
-              "type": "setField",
-              "field": "cancelled_at",
-              "value": "NOW()"
-            }
-          ]
-        },
-        {
-          "from": "on_hold",
-          "to": "cancelled",
-          "trigger": "cancel",
-          "label": "Da huy",
-          "labelEn": "Cancelled",
-          "guards": [
-            {
-              "type": "role",
-              "roles": [
-                "module_admin",
-                "system_admin"
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "system_infrastructure_cancelled"
-            },
-            {
-              "type": "setField",
-              "field": "cancelled_at",
-              "value": "NOW()"
-            }
-          ]
-        }
-      ],
-      "sla": {
-        "draft_to_active": {
-          "hours": 24,
-          "escalateTo": "module_admin"
-        },
-        "active_to_on_hold": {
-          "hours": 24,
-          "escalateTo": "module_admin"
-        },
-        "on_hold_to_completed": {
-          "hours": 72,
-          "escalateTo": "module_admin"
-        },
-        "draft_to_completed": {
-          "hours": 72,
-          "escalateTo": "module_admin"
-        },
-        "active_to_completed": {
-          "hours": 72,
-          "escalateTo": "module_admin"
-        },
-        "completed_to_closed": {
-          "hours": 72,
-          "escalateTo": "module_admin"
-        },
-        "draft_to_closed": {
-          "hours": 72,
-          "escalateTo": "module_admin"
-        },
-        "active_to_closed": {
-          "hours": 72,
-          "escalateTo": "module_admin"
-        },
-        "on_hold_to_closed": {
-          "hours": 72,
-          "escalateTo": "module_admin"
-        },
-        "closed_to_cancelled": {
-          "hours": 24,
-          "escalateTo": "module_admin"
-        },
-        "draft_to_cancelled": {
-          "hours": 24,
-          "escalateTo": "module_admin"
-        },
-        "active_to_cancelled": {
-          "hours": 24,
-          "escalateTo": "module_admin"
-        },
-        "on_hold_to_cancelled": {
-          "hours": 24,
-          "escalateTo": "module_admin"
-        }
-      },
-      "digitalThread": {
-        "upstreamTriggers": [
-          "escalation_rules",
-          "users"
-        ],
-        "downstreamEffects": []
       }
     },
     "wf_escalation_rule": {
@@ -37271,7 +36934,7 @@
         "trade_license_usage_logs"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "export_licenses_status",
       "states": [
         {
           "id": "complete",
@@ -37867,6 +37530,7 @@
         "fai_records",
         "records",
         "fai_characteristics",
+        "fai_trigger_log",
         "qual_first_article_packages"
       ],
       "stateField": "",
@@ -40754,7 +40418,7 @@
         "purchase_orders"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "fin_customs_declarations_status",
       "states": [
         {
           "id": "complete",
@@ -42896,7 +42560,7 @@
         "users"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "fin_lc_draw_requests_status",
       "states": [
         {
           "id": "complete",
@@ -43021,7 +42685,7 @@
         "fin_lc_draw_requests"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "fin_letters_of_credit_status",
       "states": [
         {
           "id": "complete",
@@ -43149,7 +42813,7 @@
         "fin_realized_fx_gains"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "fin_multi_book_ledgers_status",
       "states": [
         {
           "id": "complete",
@@ -44812,7 +44476,7 @@
         "fin_withholding_tax_codes"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "fin_withholding_tax_codes_status",
       "states": [
         {
           "id": "complete",
@@ -45995,7 +45659,7 @@
         "form_entries"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "form_schemas_status",
       "states": [
         {
           "id": "complete",
@@ -46713,7 +46377,7 @@
         "hcm_qualification_requirements"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "hcm_certifications_status",
       "states": [
         {
           "id": "complete",
@@ -46837,7 +46501,7 @@
         "documents"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "hcm_disciplinary_actions_status",
       "states": [
         {
           "id": "complete",
@@ -47976,7 +47640,7 @@
         "hcm_positions"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "hcm_org_units_status",
       "states": [
         {
           "id": "complete",
@@ -48101,7 +47765,7 @@
         "hcm_payroll_runs"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "hcm_payroll_periods_status",
       "states": [
         {
           "id": "complete",
@@ -48347,7 +48011,7 @@
         "hcm_employees"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "hcm_positions_status",
       "states": [
         {
           "id": "complete",
@@ -48472,7 +48136,7 @@
         "hcm_qualification_requirements"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "hcm_skills_catalog_status",
       "states": [
         {
           "id": "complete",
@@ -52466,6 +52130,864 @@
         "downstreamEffects": []
       }
     },
+    "wf_lean_5s_audit": {
+      "workflowId": "wf_lean_5s_audit",
+      "name": "Lean 5s Đánh giá - Luồng xử lý",
+      "nameEn": "Lean 5s Audits Workflow",
+      "entity": "lean_5s_audits",
+      "domain": "lean_manufacturing",
+      "standard": "internal",
+      "primaryTable": "lean_5s_audits",
+      "relatedTables": [
+        "lean_5s_audits",
+        "records",
+        "users"
+      ],
+      "stateField": "status",
+      "statusSet": "lean_5s_audits_status",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "lean_manufacturing_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "lean_manufacturing_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "lean_manufacturing_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {
+        "complete_to_partial": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "partial_to_broken": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "broken_to_pending": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "records",
+          "users"
+        ],
+        "downstreamEffects": []
+      }
+    },
+    "wf_lean_andon": {
+      "workflowId": "wf_lean_andon",
+      "name": "Lean Andon sự kiện - Luồng xử lý",
+      "nameEn": "Lean Andon Events Workflow",
+      "entity": "lean_andon_events",
+      "domain": "lean_manufacturing",
+      "standard": "internal",
+      "primaryTable": "lean_andon_events",
+      "relatedTables": [
+        "lean_andon_events",
+        "users",
+        "ncr_records"
+      ],
+      "stateField": "status",
+      "statusSet": "lean_andon_events_status",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "lean_manufacturing_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "lean_manufacturing_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "lean_manufacturing_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {
+        "complete_to_partial": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "partial_to_broken": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "broken_to_pending": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "ncr_records",
+          "users"
+        ],
+        "downstreamEffects": []
+      }
+    },
+    "wf_lean_gemba_walk": {
+      "workflowId": "wf_lean_gemba_walk",
+      "name": "Lean Gemba Walk - Luồng xử lý",
+      "nameEn": "Lean Gemba Walks Workflow",
+      "entity": "lean_gemba_walks",
+      "domain": "lean_manufacturing",
+      "standard": "internal",
+      "primaryTable": "lean_gemba_walks",
+      "relatedTables": [
+        "lean_gemba_walks",
+        "records",
+        "users"
+      ],
+      "stateField": "status",
+      "statusSet": "lean_gemba_walks_status",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "lean_manufacturing_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "lean_manufacturing_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "lean_manufacturing_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {
+        "complete_to_partial": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "partial_to_broken": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "broken_to_pending": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "records",
+          "users"
+        ],
+        "downstreamEffects": []
+      }
+    },
+    "wf_lean_kaizen": {
+      "workflowId": "wf_lean_kaizen",
+      "name": "Lean Kaizen sự kiện - Luồng xử lý",
+      "nameEn": "Lean Kaizen Events Workflow",
+      "entity": "lean_kaizen_events",
+      "domain": "lean_manufacturing",
+      "standard": "internal",
+      "primaryTable": "lean_kaizen_events",
+      "relatedTables": [
+        "lean_kaizen_events",
+        "records",
+        "users"
+      ],
+      "stateField": "status",
+      "statusSet": "lean_kaizen_events_status",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "lean_manufacturing_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "lean_manufacturing_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "lean_manufacturing_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {
+        "complete_to_partial": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "partial_to_broken": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "broken_to_pending": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "records",
+          "users"
+        ],
+        "downstreamEffects": []
+      }
+    },
+    "wf_lean_qrqc": {
+      "workflowId": "wf_lean_qrqc",
+      "name": "Lean QRQC sự kiện - Luồng xử lý",
+      "nameEn": "Lean QRQC Events Workflow",
+      "entity": "lean_qrqc_events",
+      "domain": "lean_manufacturing",
+      "standard": "internal",
+      "primaryTable": "lean_qrqc_events",
+      "relatedTables": [
+        "lean_qrqc_events",
+        "records",
+        "users",
+        "ncr_records",
+        "capa_records"
+      ],
+      "stateField": "status",
+      "statusSet": "lean_qrqc_events_status",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "lean_manufacturing_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "lean_manufacturing_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "lean_manufacturing_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {
+        "complete_to_partial": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "partial_to_broken": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "broken_to_pending": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "capa_records",
+          "ncr_records",
+          "records",
+          "users"
+        ],
+        "downstreamEffects": []
+      }
+    },
+    "wf_lean_smed": {
+      "workflowId": "wf_lean_smed",
+      "name": "Lean SMED sự kiện - Luồng xử lý",
+      "nameEn": "Lean SMED Events Workflow",
+      "entity": "lean_smed_events",
+      "domain": "lean_manufacturing",
+      "standard": "internal",
+      "primaryTable": "lean_smed_events",
+      "relatedTables": [
+        "lean_smed_events",
+        "records",
+        "users"
+      ],
+      "stateField": "status",
+      "statusSet": "lean_smed_events_status",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "lean_manufacturing_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "lean_manufacturing_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "lean_manufacturing_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {
+        "complete_to_partial": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "partial_to_broken": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "broken_to_pending": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "records",
+          "users"
+        ],
+        "downstreamEffects": []
+      }
+    },
+    "wf_lean_tier_meeting": {
+      "workflowId": "wf_lean_tier_meeting",
+      "name": "Lean Tier leo thang - Luồng xử lý",
+      "nameEn": "Lean Tier Escalations Workflow",
+      "entity": "lean_tier_escalations",
+      "domain": "lean_manufacturing",
+      "standard": "internal",
+      "primaryTable": "lean_tier_escalations",
+      "relatedTables": [
+        "lean_tier_escalations",
+        "lean_tier_meetings",
+        "users"
+      ],
+      "stateField": "status",
+      "statusSet": "lean_tier_escalations_status",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "lean_manufacturing_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "lean_manufacturing_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "lean_manufacturing_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {
+        "complete_to_partial": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "partial_to_broken": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "broken_to_pending": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "lean_tier_meetings",
+          "users"
+        ],
+        "downstreamEffects": []
+      }
+    },
     "wf_lot_master": {
       "workflowId": "wf_lot_master",
       "name": "Lô chuẩn - Luong xu ly",
@@ -53975,7 +54497,7 @@
         "users"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "material_review_board_status",
       "states": [
         {
           "id": "complete",
@@ -56525,7 +57047,7 @@
         "mdm_governance_issues"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "mdm_governance_issues_status",
       "states": [
         {
           "id": "complete",
@@ -72477,11 +72999,16 @@
       "standard": "AS9100D §10.2",
       "primaryTable": "ncr_records",
       "relatedTables": [
+        "ncr_human_factors",
+        "ncr_mrb_decisions",
         "ncr_records",
         "records",
         "fmea_failure_modes",
         "control_plans",
-        "capa_records"
+        "calibration_oot_investigations",
+        "capa_records",
+        "lean_andon_events",
+        "lean_qrqc_events"
       ],
       "stateField": "ncr_status",
       "statusSet": "ncr_status",
@@ -78359,7 +78886,7 @@
         "packing_list_items"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "packing_lists_status",
       "states": [
         {
           "id": "complete",
@@ -78468,301 +78995,6 @@
         ]
       }
     },
-    "wf_passport_access_log": {
-      "workflowId": "wf_passport_access_log",
-      "name": "Hộ chiếu truy cập Nhật ký - Luong xu ly",
-      "nameEn": "Passport Access Log Workflow",
-      "entity": "passport_access_log",
-      "domain": "digital_product_passport",
-      "standard": "internal",
-      "primaryTable": "passport_access_log",
-      "relatedTables": [
-        "passport_access_log",
-        "product_passports"
-      ],
-      "stateField": "",
-      "statusSet": "",
-      "states": [
-        {
-          "id": "draft",
-          "label": "Nhap",
-          "labelEn": "Draft",
-          "color": "#3b82f6",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        },
-        {
-          "id": "active",
-          "label": "Hoat dong",
-          "labelEn": "Active",
-          "color": "#10b981",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": [
-            "draft"
-          ]
-        },
-        {
-          "id": "on_hold",
-          "label": "Tam dung",
-          "labelEn": "On Hold",
-          "color": "#f59e0b",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": [
-            "active"
-          ]
-        },
-        {
-          "id": "closed",
-          "label": "Da dong",
-          "labelEn": "Closed",
-          "color": "#10b981",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": [
-            "on_hold",
-            "draft",
-            "active"
-          ]
-        },
-        {
-          "id": "archived",
-          "label": "Da luu tru",
-          "labelEn": "Archived",
-          "color": "#6b7280",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": [
-            "closed",
-            "draft",
-            "active",
-            "on_hold"
-          ]
-        }
-      ],
-      "transitions": [
-        {
-          "from": "draft",
-          "to": "active",
-          "trigger": "move_to_active",
-          "label": "Hoat dong",
-          "labelEn": "Active",
-          "guards": [],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "digital_product_passport_active"
-            }
-          ]
-        },
-        {
-          "from": "active",
-          "to": "on_hold",
-          "trigger": "move_to_on_hold",
-          "label": "Tam dung",
-          "labelEn": "On Hold",
-          "guards": [],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "digital_product_passport_on_hold"
-            }
-          ]
-        },
-        {
-          "from": "on_hold",
-          "to": "closed",
-          "trigger": "close",
-          "label": "Da dong",
-          "labelEn": "Closed",
-          "guards": [
-            {
-              "type": "role",
-              "roles": [
-                "module_admin",
-                "system_admin"
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "digital_product_passport_closed"
-            },
-            {
-              "type": "setField",
-              "field": "closed_at",
-              "value": "NOW()"
-            }
-          ]
-        },
-        {
-          "from": "draft",
-          "to": "closed",
-          "trigger": "close",
-          "label": "Da dong",
-          "labelEn": "Closed",
-          "guards": [
-            {
-              "type": "role",
-              "roles": [
-                "module_admin",
-                "system_admin"
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "digital_product_passport_closed"
-            },
-            {
-              "type": "setField",
-              "field": "closed_at",
-              "value": "NOW()"
-            }
-          ]
-        },
-        {
-          "from": "active",
-          "to": "closed",
-          "trigger": "close",
-          "label": "Da dong",
-          "labelEn": "Closed",
-          "guards": [
-            {
-              "type": "role",
-              "roles": [
-                "module_admin",
-                "system_admin"
-              ]
-            }
-          ],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "digital_product_passport_closed"
-            },
-            {
-              "type": "setField",
-              "field": "closed_at",
-              "value": "NOW()"
-            }
-          ]
-        },
-        {
-          "from": "closed",
-          "to": "archived",
-          "trigger": "archive",
-          "label": "Da luu tru",
-          "labelEn": "Archived",
-          "guards": [],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "digital_product_passport_archived"
-            }
-          ]
-        },
-        {
-          "from": "draft",
-          "to": "archived",
-          "trigger": "archive",
-          "label": "Da luu tru",
-          "labelEn": "Archived",
-          "guards": [],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "digital_product_passport_archived"
-            }
-          ]
-        },
-        {
-          "from": "active",
-          "to": "archived",
-          "trigger": "archive",
-          "label": "Da luu tru",
-          "labelEn": "Archived",
-          "guards": [],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "digital_product_passport_archived"
-            }
-          ]
-        },
-        {
-          "from": "on_hold",
-          "to": "archived",
-          "trigger": "archive",
-          "label": "Da luu tru",
-          "labelEn": "Archived",
-          "guards": [],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "module_admin",
-              "template": "digital_product_passport_archived"
-            }
-          ]
-        }
-      ],
-      "sla": {
-        "draft_to_active": {
-          "hours": 24,
-          "escalateTo": "module_admin"
-        },
-        "active_to_on_hold": {
-          "hours": 24,
-          "escalateTo": "module_admin"
-        },
-        "on_hold_to_closed": {
-          "hours": 72,
-          "escalateTo": "module_admin"
-        },
-        "draft_to_closed": {
-          "hours": 72,
-          "escalateTo": "module_admin"
-        },
-        "active_to_closed": {
-          "hours": 72,
-          "escalateTo": "module_admin"
-        },
-        "closed_to_archived": {
-          "hours": 24,
-          "escalateTo": "module_admin"
-        },
-        "draft_to_archived": {
-          "hours": 24,
-          "escalateTo": "module_admin"
-        },
-        "active_to_archived": {
-          "hours": 24,
-          "escalateTo": "module_admin"
-        },
-        "on_hold_to_archived": {
-          "hours": 24,
-          "escalateTo": "module_admin"
-        }
-      },
-      "digitalThread": {
-        "upstreamTriggers": [
-          "product_passports"
-        ],
-        "downstreamEffects": []
-      }
-    },
     "wf_plm_change_order": {
       "workflowId": "wf_plm_change_order",
       "name": "PLM thay đổi đơn hàng - Luong xu ly",
@@ -78779,7 +79011,7 @@
         "plm_change_review_board"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "plm_change_orders_status",
       "states": [
         {
           "id": "complete",
@@ -78905,7 +79137,7 @@
         "plm_change_orders"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "plm_change_requests_status",
       "states": [
         {
           "id": "complete",
@@ -79966,7 +80198,7 @@
         "users"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "plm_deviation_permits_status",
       "states": [
         {
           "id": "complete",
@@ -80463,7 +80695,7 @@
         "plm_test_results"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "plm_test_plans_status",
       "states": [
         {
           "id": "complete",
@@ -82423,7 +82655,7 @@
         "pm_functional_locations"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "pm_equipment_master_status",
       "states": [
         {
           "id": "complete",
@@ -83157,7 +83389,7 @@
         "pm_equipment_master"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "pm_functional_locations_status",
       "states": [
         {
           "id": "complete",
@@ -83280,7 +83512,7 @@
         "users"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "pm_maintenance_budgets_status",
       "states": [
         {
           "id": "complete",
@@ -83403,7 +83635,7 @@
         "pm_work_orders"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "pm_maintenance_plans_status",
       "states": [
         {
           "id": "complete",
@@ -85269,7 +85501,7 @@
         "customers"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "portal_complaint_submissions_status",
       "states": [
         {
           "id": "complete",
@@ -89135,7 +89367,7 @@
         "projects"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "project_milestones_status",
       "states": [
         {
           "id": "complete",
@@ -90118,7 +90350,7 @@
         "users"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "qual_audit_programs_status",
       "states": [
         {
           "id": "complete",
@@ -90921,7 +91153,7 @@
         "users"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "qual_containment_actions_status",
       "states": [
         {
           "id": "complete",
@@ -91846,7 +92078,7 @@
         "equipment"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "qual_lab_equipment_status",
       "states": [
         {
           "id": "complete",
@@ -95287,6 +95519,11 @@
         "hcm_disciplinary_actions",
         "improvement_projects",
         "inspection_results",
+        "lean_5s_audits",
+        "lean_gemba_walks",
+        "lean_kaizen_events",
+        "lean_qrqc_events",
+        "lean_smed_events",
         "management_reviews",
         "material_review_board",
         "ncr_records",
@@ -95301,7 +95538,7 @@
         "training_records"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "records_status",
       "states": [
         {
           "id": "complete",
@@ -96740,7 +96977,7 @@
         "routing_operations"
       ],
       "stateField": "status",
-      "statusSet": "routing",
+      "statusSet": "routings_status",
       "states": [
         {
           "id": "inactive",
@@ -97730,7 +97967,7 @@
         "wms_transfer_order_lines"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "serial_master_status",
       "states": [
         {
           "id": "complete",
@@ -98330,7 +98567,7 @@
         "tooling_assemblies"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "setup_sheets_status",
       "states": [
         {
           "id": "complete",
@@ -99379,154 +99616,6 @@
       },
       "digitalThread": {
         "upstreamTriggers": [],
-        "downstreamEffects": []
-      }
-    },
-    "wf_shift_production_log": {
-      "workflowId": "wf_shift_production_log",
-      "name": "Ca Sản xuất Nhật ký - Luong xu ly",
-      "nameEn": "Shift Production Log Workflow",
-      "entity": "shift_production_log",
-      "domain": "production",
-      "standard": "internal",
-      "primaryTable": "shift_production_log",
-      "relatedTables": [
-        "shift_production_log",
-        "shift_targets"
-      ],
-      "stateField": "sync_status",
-      "statusSet": "sync_status",
-      "states": [
-        {
-          "id": "queued",
-          "label": "Trong hàng đợi",
-          "labelEn": "Queued",
-          "color": "#94a3b8",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        },
-        {
-          "id": "running",
-          "label": "Đang chạy",
-          "labelEn": "Running",
-          "color": "#3b82f6",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        },
-        {
-          "id": "success",
-          "label": "Thành công",
-          "labelEn": "Success",
-          "color": "#10b981",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        },
-        {
-          "id": "partial",
-          "label": "Một phần",
-          "labelEn": "Partial",
-          "color": "#f59e0b",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        },
-        {
-          "id": "failed",
-          "label": "Không đạt",
-          "labelEn": "Failed",
-          "color": "#ef4444",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        }
-      ],
-      "transitions": [
-        {
-          "from": "queued",
-          "to": "running",
-          "trigger": "move_to_running",
-          "label": "Running",
-          "labelEn": "Running",
-          "guards": [],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "production_supervisor",
-              "template": "production_running"
-            }
-          ]
-        },
-        {
-          "from": "running",
-          "to": "success",
-          "trigger": "move_to_success",
-          "label": "Success",
-          "labelEn": "Success",
-          "guards": [],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "production_supervisor",
-              "template": "production_success"
-            }
-          ]
-        },
-        {
-          "from": "success",
-          "to": "partial",
-          "trigger": "move_to_partial",
-          "label": "Mot phan",
-          "labelEn": "Partial",
-          "guards": [],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "production_supervisor",
-              "template": "production_partial"
-            }
-          ]
-        },
-        {
-          "from": "partial",
-          "to": "failed",
-          "trigger": "move_to_failed",
-          "label": "Khong dat",
-          "labelEn": "Failed",
-          "guards": [],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "production_supervisor",
-              "template": "production_failed"
-            }
-          ]
-        }
-      ],
-      "sla": {
-        "queued_to_running": {
-          "hours": 24,
-          "escalateTo": "production_supervisor"
-        },
-        "running_to_success": {
-          "hours": 24,
-          "escalateTo": "production_supervisor"
-        },
-        "success_to_partial": {
-          "hours": 24,
-          "escalateTo": "production_supervisor"
-        },
-        "partial_to_failed": {
-          "hours": 24,
-          "escalateTo": "production_supervisor"
-        }
-      },
-      "digitalThread": {
-        "upstreamTriggers": [
-          "shift_targets"
-        ],
         "downstreamEffects": []
       }
     },
@@ -109002,7 +109091,7 @@
         "users"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "supplier_audit_schedule_status",
       "states": [
         {
           "id": "complete",
@@ -109577,7 +109666,7 @@
         "customers"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "svc_customer_assets_status",
       "states": [
         {
           "id": "complete",
@@ -125521,7 +125610,11 @@
         "audit_actions",
         "audit_events",
         "audits",
+        "calibration_grr_studies",
+        "calibration_oot_investigations",
         "calibration_records",
+        "capa_8d_steps",
+        "capa_effectiveness_checks",
         "capa_records",
         "certificates",
         "cnc_program_approvals",
@@ -125554,6 +125647,7 @@
         "evidence_chain_custody",
         "evidence_links",
         "evidence_vault",
+        "fai_trigger_log",
         "file_attachments",
         "fin_lc_draw_requests",
         "fixture_maintenance_logs",
@@ -125572,10 +125666,20 @@
         "inventory_transactions",
         "job_operations",
         "labor_transactions",
+        "lean_5s_audits",
+        "lean_andon_events",
+        "lean_gemba_walks",
+        "lean_kaizen_events",
+        "lean_qrqc_events",
+        "lean_smed_events",
+        "lean_tier_escalations",
+        "lean_tier_meetings",
         "maintenance_work_orders",
         "material_review_board",
         "mdm_data_stewards",
         "mobile_inspection_captures",
+        "ncr_human_factors",
+        "ncr_mrb_decisions",
         "notifications",
         "oqc_inspections",
         "order_documents_required",
@@ -125649,10 +125753,11 @@
         "wms_pick_lists",
         "wms_quarantine_holds",
         "wms_transfer_orders",
-        "workflow_instances"
+        "workflow_instances",
+        "workflow_step_data"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "users_status",
       "states": [
         {
           "id": "complete",
@@ -127786,7 +127891,7 @@
         "wms_cycle_count_results"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "wms_cycle_count_plans_status",
       "states": [
         {
           "id": "complete",
@@ -127911,7 +128016,7 @@
         "wms_storage_bins"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "wms_material_handling_units_status",
       "states": [
         {
           "id": "complete",
@@ -128183,7 +128288,7 @@
         "wms_zones"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "wms_putaway_rules_status",
       "states": [
         {
           "id": "complete",
@@ -128308,7 +128413,7 @@
         "users"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "wms_quarantine_holds_status",
       "states": [
         {
           "id": "complete",
@@ -128923,7 +129028,7 @@
         "wms_transfer_order_lines"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "wms_transfer_orders_status",
       "states": [
         {
           "id": "complete",
@@ -129047,7 +129152,7 @@
         "wms_pick_lists"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "wms_wave_plans_status",
       "states": [
         {
           "id": "complete",
@@ -129172,7 +129277,7 @@
         "wms_storage_bins"
       ],
       "stateField": "status",
-      "statusSet": "digital_thread_status",
+      "statusSet": "wms_zones_status",
       "states": [
         {
           "id": "complete",
@@ -130746,6 +130851,916 @@
         "upstreamTriggers": [
           "users",
           "workflow_definitions"
+        ],
+        "downstreamEffects": []
+      }
+    },
+    "wf_escalation_log": {
+      "workflowId": "wf_escalation_log",
+      "name": "Leo thang Nhật ký - Luong xu ly",
+      "nameEn": "Escalation Log Workflow",
+      "entity": "escalation_log",
+      "domain": "system_infrastructure",
+      "standard": "internal",
+      "primaryTable": "escalation_log",
+      "relatedTables": [
+        "escalation_log",
+        "escalation_rules",
+        "users"
+      ],
+      "stateField": "",
+      "statusSet": "",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nhap",
+          "labelEn": "Draft",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "active",
+          "label": "Hoat dong",
+          "labelEn": "Active",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "id": "on_hold",
+          "label": "Tam dung",
+          "labelEn": "On Hold",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        },
+        {
+          "id": "completed",
+          "label": "Hoan thanh",
+          "labelEn": "Completed",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "on_hold",
+            "draft",
+            "active"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Da dong",
+          "labelEn": "Closed",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "completed",
+            "draft",
+            "active",
+            "on_hold"
+          ]
+        },
+        {
+          "id": "cancelled",
+          "label": "Da huy",
+          "labelEn": "Cancelled",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "closed",
+            "draft",
+            "active",
+            "on_hold"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "active",
+          "trigger": "move_to_active",
+          "label": "Hoat dong",
+          "labelEn": "Active",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "system_infrastructure_active"
+            }
+          ]
+        },
+        {
+          "from": "active",
+          "to": "on_hold",
+          "trigger": "move_to_on_hold",
+          "label": "Tam dung",
+          "labelEn": "On Hold",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "system_infrastructure_on_hold"
+            }
+          ]
+        },
+        {
+          "from": "on_hold",
+          "to": "completed",
+          "trigger": "complete",
+          "label": "Hoan thanh",
+          "labelEn": "Completed",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "system_infrastructure_completed"
+            },
+            {
+              "type": "setField",
+              "field": "completed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "draft",
+          "to": "completed",
+          "trigger": "complete",
+          "label": "Hoan thanh",
+          "labelEn": "Completed",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "system_infrastructure_completed"
+            },
+            {
+              "type": "setField",
+              "field": "completed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "active",
+          "to": "completed",
+          "trigger": "complete",
+          "label": "Hoan thanh",
+          "labelEn": "Completed",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "system_infrastructure_completed"
+            },
+            {
+              "type": "setField",
+              "field": "completed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "completed",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Da dong",
+          "labelEn": "Closed",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "module_admin",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "system_infrastructure_closed"
+            },
+            {
+              "type": "setField",
+              "field": "closed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "draft",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Da dong",
+          "labelEn": "Closed",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "module_admin",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "system_infrastructure_closed"
+            },
+            {
+              "type": "setField",
+              "field": "closed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "active",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Da dong",
+          "labelEn": "Closed",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "module_admin",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "system_infrastructure_closed"
+            },
+            {
+              "type": "setField",
+              "field": "closed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "on_hold",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Da dong",
+          "labelEn": "Closed",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "module_admin",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "system_infrastructure_closed"
+            },
+            {
+              "type": "setField",
+              "field": "closed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "closed",
+          "to": "cancelled",
+          "trigger": "cancel",
+          "label": "Da huy",
+          "labelEn": "Cancelled",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "module_admin",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "system_infrastructure_cancelled"
+            },
+            {
+              "type": "setField",
+              "field": "cancelled_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "draft",
+          "to": "cancelled",
+          "trigger": "cancel",
+          "label": "Da huy",
+          "labelEn": "Cancelled",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "module_admin",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "system_infrastructure_cancelled"
+            },
+            {
+              "type": "setField",
+              "field": "cancelled_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "active",
+          "to": "cancelled",
+          "trigger": "cancel",
+          "label": "Da huy",
+          "labelEn": "Cancelled",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "module_admin",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "system_infrastructure_cancelled"
+            },
+            {
+              "type": "setField",
+              "field": "cancelled_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "on_hold",
+          "to": "cancelled",
+          "trigger": "cancel",
+          "label": "Da huy",
+          "labelEn": "Cancelled",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "module_admin",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "system_infrastructure_cancelled"
+            },
+            {
+              "type": "setField",
+              "field": "cancelled_at",
+              "value": "NOW()"
+            }
+          ]
+        }
+      ],
+      "sla": {
+        "draft_to_active": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "active_to_on_hold": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "on_hold_to_completed": {
+          "hours": 72,
+          "escalateTo": "module_admin"
+        },
+        "draft_to_completed": {
+          "hours": 72,
+          "escalateTo": "module_admin"
+        },
+        "active_to_completed": {
+          "hours": 72,
+          "escalateTo": "module_admin"
+        },
+        "completed_to_closed": {
+          "hours": 72,
+          "escalateTo": "module_admin"
+        },
+        "draft_to_closed": {
+          "hours": 72,
+          "escalateTo": "module_admin"
+        },
+        "active_to_closed": {
+          "hours": 72,
+          "escalateTo": "module_admin"
+        },
+        "on_hold_to_closed": {
+          "hours": 72,
+          "escalateTo": "module_admin"
+        },
+        "closed_to_cancelled": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "draft_to_cancelled": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "active_to_cancelled": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "on_hold_to_cancelled": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "escalation_rules",
+          "users"
+        ],
+        "downstreamEffects": []
+      }
+    },
+    "wf_passport_access_log": {
+      "workflowId": "wf_passport_access_log",
+      "name": "Hộ chiếu truy cập Nhật ký - Luong xu ly",
+      "nameEn": "Passport Access Log Workflow",
+      "entity": "passport_access_log",
+      "domain": "digital_product_passport",
+      "standard": "internal",
+      "primaryTable": "passport_access_log",
+      "relatedTables": [
+        "passport_access_log",
+        "product_passports"
+      ],
+      "stateField": "",
+      "statusSet": "",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nhap",
+          "labelEn": "Draft",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "active",
+          "label": "Hoat dong",
+          "labelEn": "Active",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "id": "on_hold",
+          "label": "Tam dung",
+          "labelEn": "On Hold",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Da dong",
+          "labelEn": "Closed",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "on_hold",
+            "draft",
+            "active"
+          ]
+        },
+        {
+          "id": "archived",
+          "label": "Da luu tru",
+          "labelEn": "Archived",
+          "color": "#6b7280",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "closed",
+            "draft",
+            "active",
+            "on_hold"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "active",
+          "trigger": "move_to_active",
+          "label": "Hoat dong",
+          "labelEn": "Active",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "digital_product_passport_active"
+            }
+          ]
+        },
+        {
+          "from": "active",
+          "to": "on_hold",
+          "trigger": "move_to_on_hold",
+          "label": "Tam dung",
+          "labelEn": "On Hold",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "digital_product_passport_on_hold"
+            }
+          ]
+        },
+        {
+          "from": "on_hold",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Da dong",
+          "labelEn": "Closed",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "module_admin",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "digital_product_passport_closed"
+            },
+            {
+              "type": "setField",
+              "field": "closed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "draft",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Da dong",
+          "labelEn": "Closed",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "module_admin",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "digital_product_passport_closed"
+            },
+            {
+              "type": "setField",
+              "field": "closed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "active",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Da dong",
+          "labelEn": "Closed",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "module_admin",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "digital_product_passport_closed"
+            },
+            {
+              "type": "setField",
+              "field": "closed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "closed",
+          "to": "archived",
+          "trigger": "archive",
+          "label": "Da luu tru",
+          "labelEn": "Archived",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "digital_product_passport_archived"
+            }
+          ]
+        },
+        {
+          "from": "draft",
+          "to": "archived",
+          "trigger": "archive",
+          "label": "Da luu tru",
+          "labelEn": "Archived",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "digital_product_passport_archived"
+            }
+          ]
+        },
+        {
+          "from": "active",
+          "to": "archived",
+          "trigger": "archive",
+          "label": "Da luu tru",
+          "labelEn": "Archived",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "digital_product_passport_archived"
+            }
+          ]
+        },
+        {
+          "from": "on_hold",
+          "to": "archived",
+          "trigger": "archive",
+          "label": "Da luu tru",
+          "labelEn": "Archived",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "digital_product_passport_archived"
+            }
+          ]
+        }
+      ],
+      "sla": {
+        "draft_to_active": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "active_to_on_hold": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "on_hold_to_closed": {
+          "hours": 72,
+          "escalateTo": "module_admin"
+        },
+        "draft_to_closed": {
+          "hours": 72,
+          "escalateTo": "module_admin"
+        },
+        "active_to_closed": {
+          "hours": 72,
+          "escalateTo": "module_admin"
+        },
+        "closed_to_archived": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "draft_to_archived": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "active_to_archived": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        },
+        "on_hold_to_archived": {
+          "hours": 24,
+          "escalateTo": "module_admin"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "product_passports"
+        ],
+        "downstreamEffects": []
+      }
+    },
+    "wf_shift_production_log": {
+      "workflowId": "wf_shift_production_log",
+      "name": "Ca Sản xuất Nhật ký - Luong xu ly",
+      "nameEn": "Shift Production Log Workflow",
+      "entity": "shift_production_log",
+      "domain": "production",
+      "standard": "internal",
+      "primaryTable": "shift_production_log",
+      "relatedTables": [
+        "shift_production_log",
+        "shift_targets"
+      ],
+      "stateField": "sync_status",
+      "statusSet": "sync_status",
+      "states": [
+        {
+          "id": "queued",
+          "label": "Trong hàng đợi",
+          "labelEn": "Queued",
+          "color": "#94a3b8",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "running",
+          "label": "Đang chạy",
+          "labelEn": "Running",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "success",
+          "label": "Thành công",
+          "labelEn": "Success",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "failed",
+          "label": "Không đạt",
+          "labelEn": "Failed",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "queued",
+          "to": "running",
+          "trigger": "move_to_running",
+          "label": "Running",
+          "labelEn": "Running",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "production_running"
+            }
+          ]
+        },
+        {
+          "from": "running",
+          "to": "success",
+          "trigger": "move_to_success",
+          "label": "Success",
+          "labelEn": "Success",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "production_success"
+            }
+          ]
+        },
+        {
+          "from": "success",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Mot phan",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "production_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "failed",
+          "trigger": "move_to_failed",
+          "label": "Khong dat",
+          "labelEn": "Failed",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "production_supervisor",
+              "template": "production_failed"
+            }
+          ]
+        }
+      ],
+      "sla": {
+        "queued_to_running": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "running_to_success": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "success_to_partial": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        },
+        "partial_to_failed": {
+          "hours": 24,
+          "escalateTo": "production_supervisor"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [
+          "shift_targets"
         ],
         "downstreamEffects": []
       }

@@ -20,6 +20,7 @@ final class MobileWorkQueueService
 {
     private readonly string $dataDir;
     private readonly string $mobileDir;
+    private ?object $db = null;
 
     /** Valid task types. */
     private const TASK_TYPES = [
@@ -42,16 +43,34 @@ final class MobileWorkQueueService
 
     // ── Construction ────────────────────────────────────────────────────────
 
-    public function __construct(string $dataDir)
+    public function __construct(string $dataDir, ?object $db = null)
     {
-        $this->dataDir  = rtrim(str_replace('\\', '/', $dataDir), '/');
+        $this->dataDir   = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->mobileDir = $this->dataDir . '/mobile';
+        $this->db        = $db;
 
         foreach (['work_queue', 'time_entries', 'inspections'] as $sub) {
             $dir = $this->mobileDir . '/' . $sub;
             if (!is_dir($dir)) {
                 @mkdir($dir, 0775, true);
             }
+        }
+    }
+
+    // ── Shadow Write ────────────────────────────────────────────────────────
+
+    private function shadowWriteToDb(string $table, string $idColumn, string $idValue, array $row): void
+    {
+        if ($this->db === null) return;
+        try {
+            $meta = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $this->db->execute(
+                "INSERT INTO {$table} ({$idColumn}, metadata, created_at) VALUES (:id, :meta::jsonb, NOW())
+                 ON CONFLICT ({$idColumn}) DO UPDATE SET metadata = EXCLUDED.metadata",
+                [':id' => $idValue, ':meta' => $meta]
+            );
+        } catch (\Throwable $e) {
+            error_log("[MobileWorkQueueService] Shadow write to {$table} failed: " . $e->getMessage());
         }
     }
 

@@ -1,15 +1,15 @@
 {
   "_meta": {
     "version": "4.0",
-    "generatedAt": "2026-04-02T15:27:21.123Z",
+    "generatedAt": "2026-04-04T05:58:56.754Z",
     "description": "Canonical data field registry rebuilt from table-registry coverage, orphan field normalization, and full migration-backed schema validation.",
-    "sourceEndpointCount": 838,
-    "generatedEndpointCount": 2228,
-    "uniqueFieldKeys": 3824,
-    "uniqueDbColumnNamesCovered": 3419,
-    "totalDbTableColumnsCovered": 6640,
-    "baselineUniqueColumnCoverage": 3319,
-    "migrationCount": 68,
+    "sourceEndpointCount": 3,
+    "generatedEndpointCount": 2303,
+    "uniqueFieldKeys": 4068,
+    "uniqueDbColumnNamesCovered": 3645,
+    "totalDbTableColumnsCovered": 6991,
+    "baselineUniqueColumnCoverage": 3645,
+    "migrationCount": 69,
     "researchReferences": [
       {
         "key": "sap_inspection_lot",
@@ -183,11 +183,11 @@
     ]
   },
   "split": true,
-  "lineCount": 382598,
+  "lineCount": 403742,
   "parts": [
     {
       "file": "data-fields-part1.json",
-      "endpointCount": 1313,
+      "endpointCount": 1344,
       "domains": [
         "core_system",
         "document_control",
@@ -218,7 +218,7 @@
     },
     {
       "file": "data-fields-part2.json",
-      "endpointCount": 915,
+      "endpointCount": 959,
       "domains": [
         "tooling_lifecycle",
         "demand_supply_planning",
@@ -241,7 +241,8 @@
         "digital_product_passport",
         "ai_predictive",
         "fmea_apqp",
-        "mobile_operations"
+        "mobile_operations",
+        "lean_manufacturing"
       ]
     }
   ]

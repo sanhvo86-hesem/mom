@@ -20,6 +20,7 @@ final class ShipmentGateService
 {
     private readonly string $dataDir;
     private readonly string $confDir;
+    private ?object $db = null;
 
     /** Roles permitted to invoke shipment readiness checks. */
     private const ALLOWED_ROLES = [
@@ -53,10 +54,28 @@ final class ShipmentGateService
      * @param string $dataDir Absolute path to qms-data directory.
      * @param string $confDir Absolute path to qms-data/config directory.
      */
-    public function __construct(string $dataDir, string $confDir)
+    public function __construct(string $dataDir, string $confDir, ?object $db = null)
     {
         $this->dataDir = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->confDir = rtrim(str_replace('\\', '/', $confDir), '/');
+        $this->db      = $db;
+    }
+
+    // ── Shadow Write ────────────────────────────────────────────────────────
+
+    private function shadowWriteToDb(string $table, string $idColumn, string $idValue, array $row): void
+    {
+        if ($this->db === null) return;
+        try {
+            $meta = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $this->db->execute(
+                "INSERT INTO {$table} ({$idColumn}, metadata, created_at) VALUES (:id, :meta::jsonb, NOW())
+                 ON CONFLICT ({$idColumn}) DO UPDATE SET metadata = EXCLUDED.metadata",
+                [':id' => $idValue, ':meta' => $meta]
+            );
+        } catch (\Throwable $e) {
+            error_log("[ShipmentGateService] Shadow write to {$table} failed: " . $e->getMessage());
+        }
     }
 
     // ── Public API ──────────────────────────────────────────────────────────

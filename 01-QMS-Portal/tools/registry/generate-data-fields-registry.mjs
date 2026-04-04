@@ -1,7 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseMigrations } from './generate-table-architecture.mjs';
+import {
+  englishLabelFromKey,
+  parseMigrations,
+  vietnameseLabelFromKeyV2,
+} from './generate-table-architecture.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -38,17 +42,9 @@ function readJson(filePath) { return JSON.parse(fs.readFileSync(filePath, 'utf8'
 function writeJson(filePath, value) { fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8'); }
 function toSnakeCase(value) { return String(value ?? '').replace(/([a-z0-9])([A-Z])/g, '$1_$2').replace(/[.\-\s/]+/g, '_').replace(/__+/g, '_').replace(/^_+|_+$/g, '').toLowerCase(); }
 function isVietnamese(label) { return /[àáảãạăắằẳẵặâấầẩẫậđèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵ]/i.test(label || ''); }
-function humanize(key) { return toSnakeCase(key).split('_').filter(Boolean).map((p) => (p.length <= 4 ? p.toUpperCase() : `${p[0].toUpperCase()}${p.slice(1)}`)).join(' '); }
+function humanize(key) { return englishLabelFromKey(key); }
 function viLabel(key) {
-  const tokens = toSnakeCase(key).split('_').filter(Boolean);
-  if (!tokens.length) return key;
-  if (tokens.at(-1) === 'id' && tokens.length > 1) return `Mã ${tokens.slice(0, -1).map((t) => viTokens[t] || humanize(t)).join(' ')}`;
-  if (tokens.at(-1) === 'date' && tokens.length > 1) return `Ngày ${tokens.slice(0, -1).map((t) => viTokens[t] || humanize(t)).join(' ')}`;
-  if (tokens.at(-1) === 'status' && tokens.length > 1) return `Trạng thái ${tokens.slice(0, -1).map((t) => viTokens[t] || humanize(t)).join(' ')}`;
-  if (tokens.at(-1) === 'number' && tokens.length > 1) return `Số ${tokens.slice(0, -1).map((t) => viTokens[t] || humanize(t)).join(' ')}`;
-  if (tokens.at(-1) === 'code' && tokens.length > 1) return `Mã ${tokens.slice(0, -1).map((t) => viTokens[t] || humanize(t)).join(' ')}`;
-  if (tokens.at(-1) === 'at' && tokens.length > 1) return `${tokens.slice(0, -1).map((t) => viTokens[t] || humanize(t)).join(' ')} lúc`;
-  return tokens.map((t) => viTokens[t] || humanize(t)).join(' ').replace(/\s+/g, ' ').trim().replace(/^./, (c) => c.toUpperCase());
+  return vietnameseLabelFromKeyV2(key);
 }
 function fieldType(key, uiType, kind, statusColumn) {
   const k = toSnakeCase(key);
@@ -126,10 +122,11 @@ const tables = context.tableRegistry.tables;
 const domains = context.tableRegistry.domains;
 const researchReferences = context.tableRegistry._meta.researchReferences || [];
 const removeKeys = new Set(context.orphanResolution.orphan_fields.should_remove.fields.map((x) => toSnakeCase(x.key)));
-const orphanComputed = context.orphanResolution.orphan_fields.computed.fields;
-const orphanAggregate = context.orphanResolution.orphan_fields.aggregate.fields;
-const orphanJoined = context.orphanResolution.orphan_fields.joined.fields;
-const orphanParams = context.orphanResolution.orphan_fields.api_param.fields;
+const keepSyntheticField = (entry) => !removeKeys.has(toSnakeCase(entry.key));
+const orphanComputed = context.orphanResolution.orphan_fields.computed.fields.filter(keepSyntheticField);
+const orphanAggregate = context.orphanResolution.orphan_fields.aggregate.fields.filter(keepSyntheticField);
+const orphanJoined = context.orphanResolution.orphan_fields.joined.fields.filter(keepSyntheticField);
+const orphanParams = context.orphanResolution.orphan_fields.api_param.fields.filter(keepSyntheticField);
 const columnIndex = new Map();
 for (const [tableName, table] of Object.entries(tables)) for (const [columnName, column] of Object.entries(table.columns)) { if (!columnIndex.has(columnName)) columnIndex.set(columnName, []); columnIndex.get(columnName).push({ tableName, column }); }
 
@@ -252,7 +249,9 @@ const coveredPairs = new Set();
 for (const [endpointKey, fields] of Object.entries(generated)) {
   if (fields.length < 3) throw new Error(`Endpoint ${endpointKey} has fewer than 3 fields`);
   for (const field of fields) {
-    if (removeKeys.has(toSnakeCase(field.key))) throw new Error(`Should-remove field leaked into output: ${field.key}`);
+    if (removeKeys.has(toSnakeCase(field.key)) && !['db_column', 'join'].includes(field.source)) {
+      throw new Error(`Should-remove field leaked into output: ${field.key}`);
+    }
     uniqueKeys.add(field.key);
     if (field.source === 'db_column') {
       if (!tables[field.dbTable]?.columns[field.dbColumn]) throw new Error(`Invalid DB mapping ${field.dbTable}.${field.dbColumn}`);

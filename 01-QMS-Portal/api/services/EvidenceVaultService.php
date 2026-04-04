@@ -20,22 +20,41 @@ final class EvidenceVaultService
 {
     private readonly string $dataDir;
     private readonly string $evidenceDir;
+    private ?object $db = null;
     private readonly string $vaultFile;
     private readonly string $custodyFile;
     private readonly string $linksFile;
 
     // ── Construction ────────────────────────────────────────────────────────
 
-    public function __construct(string $dataDir)
+    public function __construct(string $dataDir, ?object $db = null)
     {
         $this->dataDir     = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->evidenceDir = $this->dataDir . '/evidence';
         $this->vaultFile   = $this->evidenceDir . '/vault.json';
         $this->custodyFile = $this->evidenceDir . '/custody.json';
         $this->linksFile   = $this->evidenceDir . '/links.json';
+        $this->db          = $db;
 
         if (!is_dir($this->evidenceDir)) {
             @mkdir($this->evidenceDir, 0775, true);
+        }
+    }
+
+    // ── Shadow Write ────────────────────────────────────────────────────────
+
+    private function shadowWriteToDb(string $table, string $idColumn, string $idValue, array $row): void
+    {
+        if ($this->db === null) return;
+        try {
+            $meta = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $this->db->execute(
+                "INSERT INTO {$table} ({$idColumn}, metadata, created_at) VALUES (:id, :meta::jsonb, NOW())
+                 ON CONFLICT ({$idColumn}) DO UPDATE SET metadata = EXCLUDED.metadata",
+                [':id' => $idValue, ':meta' => $meta]
+            );
+        } catch (\Throwable $e) {
+            error_log("[EvidenceVaultService] Shadow write to {$table} failed: " . $e->getMessage());
         }
     }
 

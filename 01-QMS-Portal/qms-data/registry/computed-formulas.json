@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Computed formula library expanded from computed field registry and table-level KPI coverage.",
-    "generatedAt": "2026-04-02T17:09:08.060Z",
-    "formulaCount": 875
+    "generatedAt": "2026-04-04T05:59:53.380Z",
+    "formulaCount": 941
   },
   "total_line_amount": {
     "formulaId": "total_line_amount",
@@ -19785,6 +19785,1275 @@
       {
         "type": "endpoint",
         "id": "system_infrastructure.workflow_instances.list"
+      }
+    ]
+  },
+  "f_calibration_grr_studies_record_count": {
+    "formulaId": "f_calibration_grr_studies_record_count",
+    "name": "GRR Study hiệu chuẩn - Số bản ghi",
+    "nameEn": "Calibration Grr Studies Record Count",
+    "category": "maintenance",
+    "domain": "calibration_equipment",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM calibration_grr_studies",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "calibration_grr_studies_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "calibration_equipment.calibration_grr_studies.list"
+      }
+    ]
+  },
+  "f_calibration_oot_investigations_record_count": {
+    "formulaId": "f_calibration_oot_investigations_record_count",
+    "name": "Oot Investigation hiệu chuẩn - Số bản ghi",
+    "nameEn": "Calibration Oot Investigations Record Count",
+    "category": "maintenance",
+    "domain": "calibration_equipment",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM calibration_oot_investigations",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "calibration_oot_investigations_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "calibration_equipment.calibration_oot_investigations.list"
+      }
+    ]
+  },
+  "f_calibration_oot_investigations_closed_count": {
+    "formulaId": "f_calibration_oot_investigations_closed_count",
+    "name": "Oot Investigation hiệu chuẩn - Số hồ sơ đã đóng",
+    "nameEn": "Calibration Oot Investigations Closed Count",
+    "category": "maintenance",
+    "domain": "calibration_equipment",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM calibration_oot_investigations",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "calibration_oot_investigations_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "calibration_equipment.calibration_oot_investigations.transition"
+      }
+    ]
+  },
+  "f_capa_8d_steps_record_count": {
+    "formulaId": "f_capa_8d_steps_record_count",
+    "name": "CAPA 8d bước - Số bản ghi",
+    "nameEn": "CAPA 8d Steps Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM capa_8d_steps",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "capa_8d_steps_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.capa_8d_steps.list"
+      }
+    ]
+  },
+  "f_capa_8d_steps_closed_count": {
+    "formulaId": "f_capa_8d_steps_closed_count",
+    "name": "CAPA 8d bước - Số hồ sơ đã đóng",
+    "nameEn": "CAPA 8d Steps Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE step_status IN ('closed','completed','archived','paid','delivered')) FROM capa_8d_steps",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "capa_8d_steps_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.capa_8d_steps.transition"
+      }
+    ]
+  },
+  "f_capa_effectiveness_checks_record_count": {
+    "formulaId": "f_capa_effectiveness_checks_record_count",
+    "name": "CAPA Effectivene kiểm tra - Số bản ghi",
+    "nameEn": "CAPA Effectiveness Checks Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM capa_effectiveness_checks",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "capa_effectiveness_checks_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.capa_effectiveness_checks.list"
+      }
+    ]
+  },
+  "f_fai_trigger_log_record_count": {
+    "formulaId": "f_fai_trigger_log_record_count",
+    "name": "FAI Trigger Nhật ký - Số bản ghi",
+    "nameEn": "FAI Trigger Log Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM fai_trigger_log",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "fai_trigger_log_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.fai_trigger_log.list"
+      }
+    ]
+  },
+  "f_fai_trigger_log_closed_count": {
+    "formulaId": "f_fai_trigger_log_closed_count",
+    "name": "FAI Trigger Nhật ký - Số hồ sơ đã đóng",
+    "nameEn": "FAI Trigger Log Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM fai_trigger_log",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "fai_trigger_log_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.fai_trigger_log.transition"
+      }
+    ]
+  },
+  "f_lean_5s_audits_record_count": {
+    "formulaId": "f_lean_5s_audits_record_count",
+    "name": "Lean 5s Đánh giá - Số bản ghi",
+    "nameEn": "Lean 5s Audits Record Count",
+    "category": "system",
+    "domain": "lean_manufacturing",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM lean_5s_audits",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "lean_5s_audits_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "lean_manufacturing.lean_5s_audits.list"
+      }
+    ]
+  },
+  "f_lean_5s_audits_closed_count": {
+    "formulaId": "f_lean_5s_audits_closed_count",
+    "name": "Lean 5s Đánh giá - Số hồ sơ đã đóng",
+    "nameEn": "Lean 5s Audits Closed Count",
+    "category": "system",
+    "domain": "lean_manufacturing",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM lean_5s_audits",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "lean_5s_audits_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "lean_manufacturing.lean_5s_audits.transition"
+      }
+    ]
+  },
+  "f_lean_andon_events_record_count": {
+    "formulaId": "f_lean_andon_events_record_count",
+    "name": "Lean Andon sự kiện - Số bản ghi",
+    "nameEn": "Lean Andon Events Record Count",
+    "category": "system",
+    "domain": "lean_manufacturing",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM lean_andon_events",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "lean_andon_events_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "lean_manufacturing.lean_andon_events.list"
+      }
+    ]
+  },
+  "f_lean_andon_events_closed_count": {
+    "formulaId": "f_lean_andon_events_closed_count",
+    "name": "Lean Andon sự kiện - Số hồ sơ đã đóng",
+    "nameEn": "Lean Andon Events Closed Count",
+    "category": "system",
+    "domain": "lean_manufacturing",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM lean_andon_events",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "lean_andon_events_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "lean_manufacturing.lean_andon_events.transition"
+      }
+    ]
+  },
+  "f_lean_gemba_walks_record_count": {
+    "formulaId": "f_lean_gemba_walks_record_count",
+    "name": "Lean Gemba Walk - Số bản ghi",
+    "nameEn": "Lean Gemba Walks Record Count",
+    "category": "system",
+    "domain": "lean_manufacturing",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM lean_gemba_walks",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "lean_gemba_walks_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "lean_manufacturing.lean_gemba_walks.list"
+      }
+    ]
+  },
+  "f_lean_gemba_walks_closed_count": {
+    "formulaId": "f_lean_gemba_walks_closed_count",
+    "name": "Lean Gemba Walk - Số hồ sơ đã đóng",
+    "nameEn": "Lean Gemba Walks Closed Count",
+    "category": "system",
+    "domain": "lean_manufacturing",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM lean_gemba_walks",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "lean_gemba_walks_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "lean_manufacturing.lean_gemba_walks.transition"
+      }
+    ]
+  },
+  "f_lean_kaizen_events_record_count": {
+    "formulaId": "f_lean_kaizen_events_record_count",
+    "name": "Lean Kaizen sự kiện - Số bản ghi",
+    "nameEn": "Lean Kaizen Events Record Count",
+    "category": "system",
+    "domain": "lean_manufacturing",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM lean_kaizen_events",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "lean_kaizen_events_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "lean_manufacturing.lean_kaizen_events.list"
+      }
+    ]
+  },
+  "f_lean_kaizen_events_closed_count": {
+    "formulaId": "f_lean_kaizen_events_closed_count",
+    "name": "Lean Kaizen sự kiện - Số hồ sơ đã đóng",
+    "nameEn": "Lean Kaizen Events Closed Count",
+    "category": "system",
+    "domain": "lean_manufacturing",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM lean_kaizen_events",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "lean_kaizen_events_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "lean_manufacturing.lean_kaizen_events.transition"
+      }
+    ]
+  },
+  "f_lean_qrqc_events_record_count": {
+    "formulaId": "f_lean_qrqc_events_record_count",
+    "name": "Lean Qrqc sự kiện - Số bản ghi",
+    "nameEn": "Lean Qrqc Events Record Count",
+    "category": "system",
+    "domain": "lean_manufacturing",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM lean_qrqc_events",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "lean_qrqc_events_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "lean_manufacturing.lean_qrqc_events.list"
+      }
+    ]
+  },
+  "f_lean_qrqc_events_closed_count": {
+    "formulaId": "f_lean_qrqc_events_closed_count",
+    "name": "Lean Qrqc sự kiện - Số hồ sơ đã đóng",
+    "nameEn": "Lean Qrqc Events Closed Count",
+    "category": "system",
+    "domain": "lean_manufacturing",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM lean_qrqc_events",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "lean_qrqc_events_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "lean_manufacturing.lean_qrqc_events.transition"
+      }
+    ]
+  },
+  "f_lean_smed_events_record_count": {
+    "formulaId": "f_lean_smed_events_record_count",
+    "name": "Lean Smed sự kiện - Số bản ghi",
+    "nameEn": "Lean Smed Events Record Count",
+    "category": "system",
+    "domain": "lean_manufacturing",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM lean_smed_events",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "lean_smed_events_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "lean_manufacturing.lean_smed_events.list"
+      }
+    ]
+  },
+  "f_lean_smed_events_closed_count": {
+    "formulaId": "f_lean_smed_events_closed_count",
+    "name": "Lean Smed sự kiện - Số hồ sơ đã đóng",
+    "nameEn": "Lean Smed Events Closed Count",
+    "category": "system",
+    "domain": "lean_manufacturing",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM lean_smed_events",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "lean_smed_events_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "lean_manufacturing.lean_smed_events.transition"
+      }
+    ]
+  },
+  "f_lean_tier_escalations_record_count": {
+    "formulaId": "f_lean_tier_escalations_record_count",
+    "name": "Lean Tier leo thang - Số bản ghi",
+    "nameEn": "Lean Tier Escalations Record Count",
+    "category": "system",
+    "domain": "lean_manufacturing",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM lean_tier_escalations",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "lean_tier_escalations_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "lean_manufacturing.lean_tier_escalations.list"
+      }
+    ]
+  },
+  "f_lean_tier_escalations_closed_count": {
+    "formulaId": "f_lean_tier_escalations_closed_count",
+    "name": "Lean Tier leo thang - Số hồ sơ đã đóng",
+    "nameEn": "Lean Tier Escalations Closed Count",
+    "category": "system",
+    "domain": "lean_manufacturing",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM lean_tier_escalations",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "lean_tier_escalations_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "lean_manufacturing.lean_tier_escalations.transition"
+      }
+    ]
+  },
+  "f_lean_tier_meetings_record_count": {
+    "formulaId": "f_lean_tier_meetings_record_count",
+    "name": "Lean Tier cuộc họp - Số bản ghi",
+    "nameEn": "Lean Tier Meetings Record Count",
+    "category": "system",
+    "domain": "lean_manufacturing",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM lean_tier_meetings",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "lean_tier_meetings_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "lean_manufacturing.lean_tier_meetings.list"
+      }
+    ]
+  },
+  "f_lean_tier_meetings_closed_count": {
+    "formulaId": "f_lean_tier_meetings_closed_count",
+    "name": "Lean Tier cuộc họp - Số hồ sơ đã đóng",
+    "nameEn": "Lean Tier Meetings Closed Count",
+    "category": "system",
+    "domain": "lean_manufacturing",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE cost_status IN ('closed','completed','archived','paid','delivered')) FROM lean_tier_meetings",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "lean_tier_meetings_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "lean_manufacturing.lean_tier_meetings.transition"
+      }
+    ]
+  },
+  "f_ncr_human_factors_record_count": {
+    "formulaId": "f_ncr_human_factors_record_count",
+    "name": "NCR Human Factor - Số bản ghi",
+    "nameEn": "NCR Human Factors Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM ncr_human_factors",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "ncr_human_factors_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.ncr_human_factors.list"
+      }
+    ]
+  },
+  "f_ncr_mrb_decisions_record_count": {
+    "formulaId": "f_ncr_mrb_decisions_record_count",
+    "name": "NCR Mrb Decision - Số bản ghi",
+    "nameEn": "NCR Mrb Decisions Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM ncr_mrb_decisions",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "ncr_mrb_decisions_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.ncr_mrb_decisions.list"
+      }
+    ]
+  },
+  "f_workflow_step_data_record_count": {
+    "formulaId": "f_workflow_step_data_record_count",
+    "name": "Luồng công việc bước Dữ liệu - Số bản ghi",
+    "nameEn": "Workflow Step Data Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM workflow_step_data",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "workflow_step_data_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.workflow_step_data.list"
+      }
+    ]
+  },
+  "acknowledged_by_username": {
+    "formulaId": "acknowledged_by_username",
+    "name": "Acknowledged bởi Tên đăng nhập",
+    "nameEn": "Acknowledged By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY acknowledged_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "acknowledged_by_username"
+      }
+    ]
+  },
+  "approved_by_username": {
+    "formulaId": "approved_by_username",
+    "name": "Bởi Tên đăng nhập Đã phê duyệt",
+    "nameEn": "Approved By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY approved_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "approved_by_username"
+      }
+    ]
+  },
+  "assessed_by_username": {
+    "formulaId": "assessed_by_username",
+    "name": "Assessed bởi Tên đăng nhập",
+    "nameEn": "Assessed By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY assessed_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "assessed_by_username"
+      }
+    ]
+  },
+  "assigned_by_username": {
+    "formulaId": "assigned_by_username",
+    "name": "Được giao bởi Tên đăng nhập",
+    "nameEn": "Assigned By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY assigned_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "assigned_by_username"
+      }
+    ]
+  },
+  "changed_by_username": {
+    "formulaId": "changed_by_username",
+    "name": "Changed bởi Tên đăng nhập",
+    "nameEn": "Changed By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY changed_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "changed_by_username"
+      }
+    ]
+  },
+  "completed_by_username": {
+    "formulaId": "completed_by_username",
+    "name": "Hoàn tất bởi Tên đăng nhập",
+    "nameEn": "Completed By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY completed_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "completed_by_username"
+      }
+    ]
+  },
+  "confirmed_by_username": {
+    "formulaId": "confirmed_by_username",
+    "name": "Đã xác nhận bởi Tên đăng nhập",
+    "nameEn": "Confirmed By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY confirmed_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "confirmed_by_username"
+      }
+    ]
+  },
+  "created_by_username": {
+    "formulaId": "created_by_username",
+    "name": "Created bởi Tên đăng nhập",
+    "nameEn": "Created By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY created_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "created_by_username"
+      }
+    ]
+  },
+  "edge_count": {
+    "formulaId": "edge_count",
+    "name": "Edge Số lượng",
+    "nameEn": "Edge Count",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "number",
+    "expression": "COUNT(*)",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "edge_count"
+      }
+    ]
+  },
+  "escalated_by_username": {
+    "formulaId": "escalated_by_username",
+    "name": "Escalated bởi Tên đăng nhập",
+    "nameEn": "Escalated By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY escalated_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "escalated_by_username"
+      }
+    ]
+  },
+  "executed_by_username": {
+    "formulaId": "executed_by_username",
+    "name": "Executed bởi Tên đăng nhập",
+    "nameEn": "Executed By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY executed_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "executed_by_username"
+      }
+    ]
+  },
+  "first_piece_verified_by_username": {
+    "formulaId": "first_piece_verified_by_username",
+    "name": "Đầu tiên chi tiết Verified bởi Tên đăng nhập",
+    "nameEn": "First Piece Verified By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY first_piece_verified_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "first_piece_verified_by_username"
+      }
+    ]
+  },
+  "granted_by_username": {
+    "formulaId": "granted_by_username",
+    "name": "Granted bởi Tên đăng nhập",
+    "nameEn": "Granted By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY granted_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "granted_by_username"
+      }
+    ]
+  },
+  "internal_approved_by_username": {
+    "formulaId": "internal_approved_by_username",
+    "name": "Nội bộ Đã phê duyệt bởi Tên đăng nhập",
+    "nameEn": "Internal Approved By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY internal_approved_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "internal_approved_by_username"
+      }
+    ]
+  },
+  "issued_by_username": {
+    "formulaId": "issued_by_username",
+    "name": "Issued bởi Tên đăng nhập",
+    "nameEn": "Issued By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY issued_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "issued_by_username"
+      }
+    ]
+  },
+  "linked_by_username": {
+    "formulaId": "linked_by_username",
+    "name": "Liên kết bởi Tên đăng nhập",
+    "nameEn": "Linked By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY linked_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "linked_by_username"
+      }
+    ]
+  },
+  "locked_by_username": {
+    "formulaId": "locked_by_username",
+    "name": "Khóa bởi Tên đăng nhập",
+    "nameEn": "Locked By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY locked_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "locked_by_username"
+      }
+    ]
+  },
+  "measured_by_username": {
+    "formulaId": "measured_by_username",
+    "name": "Measured bởi Tên đăng nhập",
+    "nameEn": "Measured By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY measured_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "measured_by_username"
+      }
+    ]
+  },
+  "notes_count": {
+    "formulaId": "notes_count",
+    "name": "Ghi chú Số lượng",
+    "nameEn": "Notes Count",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "number",
+    "expression": "COUNT(*)",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "notes_count"
+      }
+    ]
+  },
+  "performed_by_username": {
+    "formulaId": "performed_by_username",
+    "name": "Performed bởi Tên đăng nhập",
+    "nameEn": "Performed By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY performed_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "performed_by_username"
+      }
+    ]
+  },
+  "posted_by_username": {
+    "formulaId": "posted_by_username",
+    "name": "Posted bởi Tên đăng nhập",
+    "nameEn": "Posted By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY posted_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "posted_by_username"
+      }
+    ]
+  },
+  "prepared_by_username": {
+    "formulaId": "prepared_by_username",
+    "name": "Prepared bởi Tên đăng nhập",
+    "nameEn": "Prepared By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY prepared_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "prepared_by_username"
+      }
+    ]
+  },
+  "printed_by_username": {
+    "formulaId": "printed_by_username",
+    "name": "Printed bởi Tên đăng nhập",
+    "nameEn": "Printed By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY printed_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "printed_by_username"
+      }
+    ]
+  },
+  "program_change_count": {
+    "formulaId": "program_change_count",
+    "name": "Chương trình thay đổi Số lượng",
+    "nameEn": "Program Change Count",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "number",
+    "expression": "COUNT(*)",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "program_change_count"
+      }
+    ]
+  },
+  "promised_by_username": {
+    "formulaId": "promised_by_username",
+    "name": "Promised bởi Tên đăng nhập",
+    "nameEn": "Promised By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY promised_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "promised_by_username"
+      }
+    ]
+  },
+  "promoted_by_username": {
+    "formulaId": "promoted_by_username",
+    "name": "Promoted bởi Tên đăng nhập",
+    "nameEn": "Promoted By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY promoted_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "promoted_by_username"
+      }
+    ]
+  },
+  "received_by_username": {
+    "formulaId": "received_by_username",
+    "name": "Đã nhận bởi Tên đăng nhập",
+    "nameEn": "Received By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY received_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "received_by_username"
+      }
+    ]
+  },
+  "recorded_by_username": {
+    "formulaId": "recorded_by_username",
+    "name": "Recorded bởi Tên đăng nhập",
+    "nameEn": "Recorded By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY recorded_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "recorded_by_username"
+      }
+    ]
+  },
+  "reported_by_username": {
+    "formulaId": "reported_by_username",
+    "name": "Reported bởi Tên đăng nhập",
+    "nameEn": "Reported By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY reported_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "reported_by_username"
+      }
+    ]
+  },
+  "requested_by_username": {
+    "formulaId": "requested_by_username",
+    "name": "Yêu cầu bởi Tên đăng nhập",
+    "nameEn": "Requested By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY requested_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "requested_by_username"
+      }
+    ]
+  },
+  "resolved_by_username": {
+    "formulaId": "resolved_by_username",
+    "name": "Resolved bởi Tên đăng nhập",
+    "nameEn": "Resolved By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY resolved_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "resolved_by_username"
+      }
+    ]
+  },
+  "reviewed_by_username": {
+    "formulaId": "reviewed_by_username",
+    "name": "Đã xem xét bởi Tên đăng nhập",
+    "nameEn": "Reviewed By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY reviewed_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "reviewed_by_username"
+      }
+    ]
+  },
+  "screened_by_username": {
+    "formulaId": "screened_by_username",
+    "name": "Screened bởi Tên đăng nhập",
+    "nameEn": "Screened By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY screened_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "screened_by_username"
+      }
+    ]
+  },
+  "setup_verified_by_username": {
+    "formulaId": "setup_verified_by_username",
+    "name": "Thiết lập Verified bởi Tên đăng nhập",
+    "nameEn": "Setup Verified By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY setup_verified_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "setup_verified_by_username"
+      }
+    ]
+  },
+  "submitted_by_username": {
+    "formulaId": "submitted_by_username",
+    "name": "Đã gửi bởi Tên đăng nhập",
+    "nameEn": "Submitted By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY submitted_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "submitted_by_username"
+      }
+    ]
+  },
+  "tool_change_count": {
+    "formulaId": "tool_change_count",
+    "name": "Dao cụ thay đổi Số lượng",
+    "nameEn": "Tool Change Count",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "number",
+    "expression": "COUNT(*)",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "tool_change_count"
+      }
+    ]
+  },
+  "uploaded_by_username": {
+    "formulaId": "uploaded_by_username",
+    "name": "Uploaded bởi Tên đăng nhập",
+    "nameEn": "Uploaded By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY uploaded_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "uploaded_by_username"
+      }
+    ]
+  },
+  "validated_by_username": {
+    "formulaId": "validated_by_username",
+    "name": "Validated bởi Tên đăng nhập",
+    "nameEn": "Validated By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY validated_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "validated_by_username"
+      }
+    ]
+  },
+  "verified_by_username": {
+    "formulaId": "verified_by_username",
+    "name": "Verified bởi Tên đăng nhập",
+    "nameEn": "Verified By Username",
+    "category": "system",
+    "domain": "registry_support",
+    "unit": "",
+    "outputType": "string",
+    "expression": "GROUP BY verified_by_username",
+    "source": "data-fields",
+    "referencedBy": [
+      {
+        "type": "field",
+        "endpoint": "registry_support.aggregate.metrics",
+        "key": "verified_by_username"
       }
     ]
   }

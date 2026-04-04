@@ -21,11 +21,15 @@ final class EpicorTransportAdapter
     private array $policy;
     /** @var array<string, mixed>|null */
     private ?array $tokenCache = null;
+    private ?CircuitBreaker $circuitBreaker = null;
 
     public function __construct(string $dataDir)
     {
         $this->dataDir = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->policy = $this->loadPolicy();
+
+        $stateDir = $this->dataDir . '/state';
+        $this->circuitBreaker = new CircuitBreaker($stateDir, 'epicor', 3, 60);
     }
 
     /** @return array<string, mixed> */
@@ -44,6 +48,7 @@ final class EpicorTransportAdapter
             'company' => (string)($config['company'] ?? ''),
             'plant' => (string)($config['plant'] ?? ''),
             'paths' => (array)($config['api_paths'] ?? []),
+            'circuit_breaker' => $this->circuitBreaker?->getStatus() ?? [],
         ];
     }
 
@@ -147,6 +152,20 @@ final class EpicorTransportAdapter
             ];
         }
 
+        // Circuit breaker: fail fast when Epicor is unavailable
+        if ($this->circuitBreaker !== null && !$this->circuitBreaker->allowRequest()) {
+            $status = $this->circuitBreaker->getStatus();
+            return [
+                'ok' => false,
+                'skipped' => false,
+                'error' => 'circuit_open',
+                'status_code' => 0,
+                'domain' => $domain,
+                'message' => 'Epicor circuit breaker is OPEN (failures: ' . $status['failure_count'] . '). Retry after recovery timeout.',
+                'response' => ['circuit_breaker' => $status],
+            ];
+        }
+
         $headers = [
             'Accept: application/json',
         ];
@@ -157,6 +176,7 @@ final class EpicorTransportAdapter
             $headers[] = $header;
         }
 
+        try {
         $response = $this->httpRequest(
             $method,
             $this->buildUrl($config, $path, $query),
@@ -171,6 +191,12 @@ final class EpicorTransportAdapter
         $statusCode = (int)($response['status_code'] ?? 0);
         $ok = $statusCode >= 200 && $statusCode < 300;
 
+        if ($ok) {
+            $this->circuitBreaker?->recordSuccess();
+        } else {
+            $this->circuitBreaker?->recordFailure();
+        }
+
         return [
             'ok' => $ok,
             'skipped' => false,
@@ -181,6 +207,10 @@ final class EpicorTransportAdapter
             'response' => is_array($decoded) ? $decoded : ['raw' => $body],
             'headers' => (array)($response['headers'] ?? []),
         ];
+        } catch (\Throwable $e) {
+            $this->circuitBreaker?->recordFailure();
+            throw $e;
+        }
     }
 
     /** @return array<int, string> */

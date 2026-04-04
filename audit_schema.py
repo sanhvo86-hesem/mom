@@ -4,6 +4,54 @@ sys.stdout.reconfigure(encoding='utf-8')
 migrations_dir = "01-QMS-Portal/database/migrations"
 tables = {}
 
+
+def load_json(path):
+    with open(path, 'r', encoding='utf-8', errors='replace') as f:
+        return json.load(f)
+
+
+def load_data_fields_registry(path):
+    data = load_json(path)
+    if not isinstance(data, dict):
+        return {}
+    if data.get('split') and isinstance(data.get('parts'), list):
+        merged = {}
+        base_dir = os.path.dirname(path)
+        for part in data['parts']:
+            part_file = part.get('file')
+            if not part_file:
+                continue
+            part_path = os.path.join(base_dir, part_file)
+            if not os.path.exists(part_path):
+                continue
+            part_data = load_json(part_path)
+            if not isinstance(part_data, dict):
+                continue
+            for key, value in part_data.items():
+                if key == '_meta':
+                    continue
+                merged[key] = value
+        return merged
+    return {k: v for k, v in data.items() if k != '_meta'}
+
+
+def load_workflow_registry(path):
+    data = load_json(path)
+    if isinstance(data, dict) and isinstance(data.get('workflows'), dict):
+        return data['workflows']
+    return data if isinstance(data, dict) else {}
+
+
+def load_table_registry(path):
+    data = load_json(path)
+    if isinstance(data, dict) and isinstance(data.get('tables'), dict):
+        return data['tables']
+    return {}
+
+
+def normalize_col_type(type_value):
+    return str(type_value or 'UNKNOWN').split('(')[0].upper()
+
 for fname in sorted(os.listdir(migrations_dir)):
     if not fname.endswith('.sql'): continue
     with open(os.path.join(migrations_dir, fname), 'r', encoding='utf-8', errors='replace') as f:
@@ -33,8 +81,27 @@ for fname in sorted(os.listdir(migrations_dir)):
                     col_types[col] = ctype
         tables[tname] = {'migration': fname, 'columns': cols, 'col_types': col_types}
 
-with open("01-QMS-Portal/qms-data/registry/data-fields.json", 'r', encoding='utf-8') as f:
-    data_fields = json.load(f)
+parsed_tables = dict(tables)
+table_registry = load_table_registry("01-QMS-Portal/qms-data/registry/table-registry.json")
+if table_registry:
+    merged_tables = {}
+    for tname, meta in table_registry.items():
+        columns = meta.get('columns') or {}
+        merged_tables[tname] = {
+            'migration': meta.get('migration') or parsed_tables.get(tname, {}).get('migration', 'registry'),
+            'columns': list(columns.keys()),
+            'col_types': {
+                col: normalize_col_type(col_meta.get('type') if isinstance(col_meta, dict) else None)
+                for col, col_meta in columns.items()
+            },
+            'domain': meta.get('domain'),
+        }
+    for tname, meta in parsed_tables.items():
+        if tname not in merged_tables:
+            merged_tables[tname] = meta
+    tables = merged_tables
+
+data_fields = load_data_fields_registry("01-QMS-Portal/qms-data/registry/data-fields.json")
 
 field_info = {}
 endpoint_fields = {}
@@ -51,8 +118,7 @@ for key, fields in data_fields.items():
                 field_info[fkey]['endpoints'].append(key)
         endpoint_fields[key] = eps
 
-with open("01-QMS-Portal/qms-data/registry/workflow-library.json", 'r', encoding='utf-8') as f:
-    workflows = json.load(f)
+workflows = load_workflow_registry("01-QMS-Portal/qms-data/registry/workflow-library.json")
 
 wf_entities = {}
 for wfkey, wf in workflows.items():
@@ -121,16 +187,18 @@ domain_prefixes = {
     'prediction_':'ai', 'schedule_':'planning', 'dispatch_':'production',
     'machine_rate':'production', 'material_':'master_data', 'setup_':'production',
     'commercial_':'commercial', 'portal_':'portal', 'contract_':'commercial',
-    'incoming_':'quality', 'oqc_':'quality', 'supplier_':'supplier_quality'
+    'incoming_':'quality', 'oqc_':'quality', 'supplier_':'supplier_quality',
+    'lean_':'lean'
 }
 
 table_domain = {}
 for tname in tables:
-    domain = None
-    for prefix, dom in sorted(domain_prefixes.items(), key=lambda x: -len(x[0])):
-        if tname.startswith(prefix) or tname == prefix.rstrip('_'):
-            domain = dom
-            break
+    domain = tables[tname].get('domain')
+    if not domain:
+        for prefix, dom in sorted(domain_prefixes.items(), key=lambda x: -len(x[0])):
+            if tname.startswith(prefix) or tname == prefix.rstrip('_'):
+                domain = dom
+                break
     table_domain[tname] = domain
 
 mapped_tables = {t for t, d in table_domain.items() if d}
@@ -152,8 +220,10 @@ print(f"REGISTRY: {len(all_field_keys)} unique field keys, {len(endpoint_fields)
 print(f"WORKFLOWS: {len(wf_entities)} workflow definitions")
 
 print(f"\n--- FIELD-COLUMN LINKAGE ---")
-print(f"Matched: {len(matched_fields)}/{len(all_field_keys)} fields ({100*len(matched_fields)/len(all_field_keys):.1f}%)")
-print(f"Orphan fields: {len(orphan_fields)} ({100*len(orphan_fields)/len(all_field_keys):.1f}%)")
+field_denominator = len(all_field_keys) or 1
+col_denominator = len(all_col_names) or 1
+print(f"Matched: {len(matched_fields)}/{len(all_field_keys)} fields ({100*len(matched_fields)/field_denominator:.1f}%)")
+print(f"Orphan fields: {len(orphan_fields)} ({100*len(orphan_fields)/field_denominator:.1f}%)")
 print(f"  computed/derived: {len(classified['computed'])}")
 print(f"  kpi/metric:       {len(classified['kpi'])}")
 print(f"  aggregate:        {len(classified['aggregate'])}")
@@ -161,7 +231,10 @@ print(f"  joined (FK name): {len(classified['joined'])}")
 print(f"  action params:    {len(classified['action_param'])}")
 print(f"  GENUINE orphans:  {len(classified['genuine'])}")
 
-print(f"\nDB cols without field def: {len(all_col_names - all_field_keys)}/{len(all_col_names)} ({100*len(all_col_names-all_field_keys)/len(all_col_names):.1f}%)")
+missing_field_defs = sorted(all_col_names - all_field_keys)
+print(f"\nDB cols without field def: {len(missing_field_defs)}/{len(all_col_names)} ({100*len(missing_field_defs)/col_denominator:.1f}%)")
+if missing_field_defs:
+    print(f"Missing DB field defs (up to 20): {missing_field_defs[:20]}")
 
 print(f"\n--- TABLE DOMAIN MAPPING ---")
 print(f"Mapped to domain: {len(mapped_tables)}/{len(tables)} ({100*len(mapped_tables)/len(tables):.1f}%)")
@@ -196,6 +269,7 @@ audit = {
     'columns': sum(len(t['columns']) for t in tables.values()),
     'field_keys': len(all_field_keys),
     'matched': len(matched_fields),
+    'missing_field_defs': missing_field_defs,
     'orphan_fields': {k: sorted(list(v)) for k, v in classified.items()},
     'orphan_tables': sorted(orphan_tables),
     'domain_map': {d: sorted(ts) for d, ts in domain_counts.items()},

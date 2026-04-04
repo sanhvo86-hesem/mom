@@ -86,16 +86,19 @@ final class AllocationService
     /** @var RecordIdGenerator Lazy-loaded ID generator. */
     private ?RecordIdGenerator $idGenerator = null;
 
+    private ?object $db = null;
+
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
      * @param string $dataDir Absolute path to qms-data directory.
      */
-    public function __construct(string $dataDir)
+    public function __construct(string $dataDir, ?object $db = null)
     {
         $this->dataDir  = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->allocDir = $this->dataDir . '/allocations';
         $this->logFile  = $this->allocDir . '/allocation_log.json';
+        $this->db       = $db;
 
         if (!is_dir($this->allocDir)) {
             @mkdir($this->allocDir, 0775, true);
@@ -619,5 +622,22 @@ final class AllocationService
         $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // Variant RFC 4122
 
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+
+    // ── PostgreSQL dual-write ──────────────────────────────────────────────
+
+    private function shadowWriteToDb(string $table, string $idColumn, string $idValue, array $row): void
+    {
+        if ($this->db === null) return;
+        try {
+            $meta = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $this->db->execute(
+                "INSERT INTO {$table} ({$idColumn}, metadata, created_at) VALUES (:id, :meta::jsonb, NOW())
+                 ON CONFLICT ({$idColumn}) DO UPDATE SET metadata = EXCLUDED.metadata",
+                [':id' => $idValue, ':meta' => $meta]
+            );
+        } catch (\Throwable $e) {
+            error_log("[AllocationService] Shadow write to {$table} failed: " . $e->getMessage());
+        }
     }
 }

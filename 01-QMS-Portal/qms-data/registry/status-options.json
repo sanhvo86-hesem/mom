@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Expanded status and enum registry generated from table-registry workflow coverage.",
-    "generatedAt": "2026-04-02T17:09:08.060Z",
-    "enumCount": 503
+    "generatedAt": "2026-04-04T05:59:53.380Z",
+    "enumCount": 524
   },
   "so_status": {
     "label": "Trạng thái SO",
@@ -2761,6 +2761,8 @@
     "labelEn": "CAPA",
     "source": "fusion",
     "standard": "internal",
+    "sourceTable": "capa_8d_steps",
+    "statusColumn": "step_status",
     "options": [
       {
         "value": "draft",
@@ -5355,8 +5357,8 @@
     "labelEn": "Digital Thread Status",
     "source": "world",
     "standard": "internal",
-    "sourceTable": "wms_zones",
-    "statusColumn": "status",
+    "sourceTable": "wms_bin_contents",
+    "statusColumn": "content_status",
     "options": [
       {
         "value": "complete",
@@ -6784,7 +6786,6 @@
     "standard": "internal",
     "sourceTable": "aps_planning_horizons",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -7042,7 +7043,6 @@
     "standard": "ISO9001",
     "sourceTable": "audit_actions",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -9346,7 +9346,6 @@
     "standard": "ISO14001",
     "sourceTable": "ehs_corrective_actions",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -9432,7 +9431,6 @@
     "standard": "ISO14001",
     "sourceTable": "ehs_permit_register",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -9518,7 +9516,6 @@
     "standard": "ISO14001",
     "sourceTable": "ehs_regulatory_submissions",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -9604,7 +9601,6 @@
     "standard": "ISO14001",
     "sourceTable": "ehs_sustainability_projects",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -9690,7 +9686,6 @@
     "standard": "internal",
     "sourceTable": "employee_certifications",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -9862,7 +9857,6 @@
     "standard": "AS9100",
     "sourceTable": "export_licenses",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -10206,7 +10200,6 @@
     "standard": "internal",
     "sourceTable": "fin_customs_declarations",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -10378,7 +10371,6 @@
     "standard": "internal",
     "sourceTable": "fin_lc_draw_requests",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -10464,7 +10456,6 @@
     "standard": "internal",
     "sourceTable": "fin_letters_of_credit",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -10550,7 +10541,6 @@
     "standard": "internal",
     "sourceTable": "fin_multi_book_ledgers",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -10722,7 +10712,6 @@
     "standard": "internal",
     "sourceTable": "fin_withholding_tax_codes",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -11003,7 +10992,6 @@
     "standard": "internal",
     "sourceTable": "form_schemas",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -11175,7 +11163,6 @@
     "standard": "internal",
     "sourceTable": "hcm_certifications",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -11261,7 +11248,6 @@
     "standard": "internal",
     "sourceTable": "hcm_disciplinary_actions",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -11519,7 +11505,6 @@
     "standard": "internal",
     "sourceTable": "hcm_org_units",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -11605,7 +11590,6 @@
     "standard": "internal",
     "sourceTable": "hcm_payroll_periods",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -11777,7 +11761,6 @@
     "standard": "internal",
     "sourceTable": "hcm_positions",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -11863,7 +11846,6 @@
     "standard": "internal",
     "sourceTable": "hcm_skills_catalog",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -12135,7 +12117,6 @@
     "standard": "internal",
     "sourceTable": "job_operations",
     "statusColumn": "status",
-    "aliasOf": "job_order_status",
     "options": [
       {
         "value": "draft",
@@ -12814,7 +12795,6 @@
     "standard": "AS9100",
     "sourceTable": "material_review_board",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -12900,7 +12880,6 @@
     "standard": "internal",
     "sourceTable": "mdm_governance_issues",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -16085,7 +16064,6 @@
     "standard": "AS9100",
     "sourceTable": "packing_lists",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -16257,7 +16235,6 @@
     "standard": "internal",
     "sourceTable": "plm_change_orders",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -16343,7 +16320,6 @@
     "standard": "internal",
     "sourceTable": "plm_change_requests",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -16429,7 +16405,6 @@
     "standard": "internal",
     "sourceTable": "plm_deviation_permits",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -16773,7 +16748,6 @@
     "standard": "internal",
     "sourceTable": "plm_requirements",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -16859,7 +16833,6 @@
     "standard": "internal",
     "sourceTable": "plm_test_plans",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -17031,7 +17004,6 @@
     "standard": "internal",
     "sourceTable": "pm_equipment_master",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -17117,7 +17089,6 @@
     "standard": "internal",
     "sourceTable": "pm_functional_locations",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -17203,7 +17174,6 @@
     "standard": "internal",
     "sourceTable": "pm_maintenance_budgets",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -17289,7 +17259,6 @@
     "standard": "internal",
     "sourceTable": "pm_maintenance_plans",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -17611,7 +17580,6 @@
     "standard": "internal",
     "sourceTable": "portal_complaint_submissions",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -18417,7 +18385,6 @@
     "standard": "internal",
     "sourceTable": "project_milestones",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -18668,7 +18635,6 @@
     "standard": "ISO17025",
     "sourceTable": "qual_audit_programs",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -18754,7 +18720,6 @@
     "standard": "ISO17025",
     "sourceTable": "qual_containment_actions",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -19012,7 +18977,6 @@
     "standard": "ISO17025",
     "sourceTable": "qual_lab_equipment",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -19304,7 +19268,6 @@
     "standard": "internal",
     "sourceTable": "records",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -19476,7 +19439,6 @@
     "standard": "internal",
     "sourceTable": "routings",
     "statusColumn": "status",
-    "aliasOf": "routing",
     "options": [
       {
         "value": "inactive",
@@ -19639,7 +19601,6 @@
     "standard": "internal",
     "sourceTable": "serial_master",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -19725,7 +19686,6 @@
     "standard": "internal",
     "sourceTable": "setup_sheets",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -19811,7 +19771,6 @@
     "standard": "internal",
     "sourceTable": "shift_assignments",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -21060,7 +21019,6 @@
     "standard": "AS9100",
     "sourceTable": "srm_supplier_risk_events",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -21146,7 +21104,6 @@
     "standard": "AS9100",
     "sourceTable": "supplier_audit_schedule",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -21232,7 +21189,6 @@
     "standard": "internal",
     "sourceTable": "svc_customer_assets",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -22858,7 +22814,6 @@
     "standard": "internal",
     "sourceTable": "users",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -23116,7 +23071,6 @@
     "standard": "internal",
     "sourceTable": "wms_cycle_count_plans",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -23202,7 +23156,6 @@
     "standard": "internal",
     "sourceTable": "wms_material_handling_units",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -23374,7 +23327,6 @@
     "standard": "internal",
     "sourceTable": "wms_putaway_rules",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -23460,7 +23412,6 @@
     "standard": "internal",
     "sourceTable": "wms_quarantine_holds",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -23546,7 +23497,6 @@
     "standard": "internal",
     "sourceTable": "wms_transfer_orders",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -23632,7 +23582,6 @@
     "standard": "internal",
     "sourceTable": "wms_wave_plans",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -23718,7 +23667,6 @@
     "standard": "internal",
     "sourceTable": "wms_zones",
     "statusColumn": "status",
-    "aliasOf": "digital_thread_status",
     "options": [
       {
         "value": "complete",
@@ -23761,6 +23709,924 @@
     "standard": "internal",
     "sourceTable": "wms_zones",
     "statusColumn": "status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "calibration_oot_investigations_status": {
+    "label": "Oot Investigation hiệu chuẩn - Status",
+    "labelEn": "Calibration Oot Investigations Status",
+    "source": "table-registry-alias",
+    "standard": "ISO17025",
+    "sourceTable": "calibration_oot_investigations",
+    "statusColumn": "status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "calibration_oot_investigations_status_set": {
+    "label": "Oot Investigation hiệu chuẩn - Status",
+    "labelEn": "Calibration Oot Investigations Status",
+    "source": "table-registry-alias",
+    "standard": "ISO17025",
+    "sourceTable": "calibration_oot_investigations",
+    "statusColumn": "status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "capa_8d_steps_step_status": {
+    "label": "CAPA 8d bước - Step Status",
+    "labelEn": "CAPA 8d Steps Step Status",
+    "source": "table-registry-alias",
+    "standard": "AS9100",
+    "sourceTable": "capa_8d_steps",
+    "statusColumn": "step_status",
+    "aliasOf": "capa",
+    "options": [
+      {
+        "value": "draft",
+        "label": "Nháp",
+        "labelEn": "Draft",
+        "color": "#94a3b8",
+        "icon": "FileEdit",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "initiated",
+        "label": "Đã khởi tạo",
+        "labelEn": "Initiated",
+        "color": "#3b82f6",
+        "icon": "Play",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "action_planning",
+        "label": "Lập kế hoạch hành động",
+        "labelEn": "Action Planning",
+        "color": "#3b82f6",
+        "icon": "ListTodo",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "implementation",
+        "label": "Đang triển khai",
+        "labelEn": "Implementation",
+        "color": "#8b5cf6",
+        "icon": "Hammer",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "effectiveness_review",
+        "label": "Đánh giá hiệu quả",
+        "labelEn": "Effectiveness Review",
+        "color": "#3b82f6",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "closed",
+        "label": "Đã đóng",
+        "labelEn": "Closed",
+        "color": "#94a3b8",
+        "icon": "Lock",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "cancelled",
+        "label": "Đã hủy",
+        "labelEn": "Cancelled",
+        "color": "#94a3b8",
+        "icon": "Ban",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "fai_trigger_log_status": {
+    "label": "FAI Trigger Nhật ký - Status",
+    "labelEn": "FAI Trigger Log Status",
+    "source": "table-registry-alias",
+    "standard": "AS9100",
+    "sourceTable": "fai_trigger_log",
+    "statusColumn": "status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "fai_trigger_log_status_set": {
+    "label": "FAI Trigger Nhật ký - Status",
+    "labelEn": "FAI Trigger Log Status",
+    "source": "table-registry-alias",
+    "standard": "AS9100",
+    "sourceTable": "fai_trigger_log",
+    "statusColumn": "status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "lean_5s_audits_status": {
+    "label": "Lean 5s Đánh giá - Status",
+    "labelEn": "Lean 5s Audits Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "lean_5s_audits",
+    "statusColumn": "status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "lean_5s_audits_status_set": {
+    "label": "Lean 5s Đánh giá - Status",
+    "labelEn": "Lean 5s Audits Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "lean_5s_audits",
+    "statusColumn": "status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "lean_andon_events_status": {
+    "label": "Lean Andon sự kiện - Status",
+    "labelEn": "Lean Andon Events Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "lean_andon_events",
+    "statusColumn": "status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "lean_andon_events_status_set": {
+    "label": "Lean Andon sự kiện - Status",
+    "labelEn": "Lean Andon Events Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "lean_andon_events",
+    "statusColumn": "status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "lean_gemba_walks_status": {
+    "label": "Lean Gemba Walk - Status",
+    "labelEn": "Lean Gemba Walks Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "lean_gemba_walks",
+    "statusColumn": "status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "lean_gemba_walks_status_set": {
+    "label": "Lean Gemba Walk - Status",
+    "labelEn": "Lean Gemba Walks Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "lean_gemba_walks",
+    "statusColumn": "status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "lean_kaizen_events_status": {
+    "label": "Lean Kaizen sự kiện - Status",
+    "labelEn": "Lean Kaizen Events Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "lean_kaizen_events",
+    "statusColumn": "status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "lean_kaizen_events_status_set": {
+    "label": "Lean Kaizen sự kiện - Status",
+    "labelEn": "Lean Kaizen Events Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "lean_kaizen_events",
+    "statusColumn": "status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "lean_qrqc_events_status": {
+    "label": "Lean Qrqc sự kiện - Status",
+    "labelEn": "Lean Qrqc Events Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "lean_qrqc_events",
+    "statusColumn": "status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "lean_qrqc_events_status_set": {
+    "label": "Lean Qrqc sự kiện - Status",
+    "labelEn": "Lean Qrqc Events Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "lean_qrqc_events",
+    "statusColumn": "status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "lean_smed_events_status": {
+    "label": "Lean Smed sự kiện - Status",
+    "labelEn": "Lean Smed Events Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "lean_smed_events",
+    "statusColumn": "status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "lean_smed_events_status_set": {
+    "label": "Lean Smed sự kiện - Status",
+    "labelEn": "Lean Smed Events Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "lean_smed_events",
+    "statusColumn": "status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "lean_tier_escalations_status": {
+    "label": "Lean Tier leo thang - Status",
+    "labelEn": "Lean Tier Escalations Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "lean_tier_escalations",
+    "statusColumn": "status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "lean_tier_escalations_status_set": {
+    "label": "Lean Tier leo thang - Status",
+    "labelEn": "Lean Tier Escalations Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "lean_tier_escalations",
+    "statusColumn": "status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "lean_tier_meetings_cost_status": {
+    "label": "Lean Tier cuộc họp - Cost Status",
+    "labelEn": "Lean Tier Meetings Cost Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "lean_tier_meetings",
+    "statusColumn": "cost_status",
+    "aliasOf": "digital_thread_status",
+    "options": [
+      {
+        "value": "complete",
+        "label": "Hoàn chỉnh",
+        "labelEn": "Complete",
+        "color": "#10b981",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "partial",
+        "label": "Một phần",
+        "labelEn": "Partial",
+        "color": "#f59e0b",
+        "icon": "BarChart3",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "broken",
+        "label": "Đứt gãy",
+        "labelEn": "Broken",
+        "color": "#ef4444",
+        "icon": "fa-circle",
+        "allowedTransitionsFrom": []
+      },
+      {
+        "value": "pending",
+        "label": "Chờ hoàn thiện",
+        "labelEn": "Pending",
+        "color": "#3b82f6",
+        "icon": "Clock",
+        "allowedTransitionsFrom": []
+      }
+    ]
+  },
+  "lean_tier_meetings_cost_status_set": {
+    "label": "Lean Tier cuộc họp - Cost Status",
+    "labelEn": "Lean Tier Meetings Cost Status",
+    "source": "table-registry-alias",
+    "standard": "internal",
+    "sourceTable": "lean_tier_meetings",
+    "statusColumn": "cost_status",
     "aliasOf": "digital_thread_status",
     "options": [
       {

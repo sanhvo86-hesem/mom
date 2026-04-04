@@ -44,18 +44,21 @@ final class PredictiveQualityEngine
     /** @var string Absolute path to anomaly rules file. */
     private readonly string $rulesFile;
 
+    private ?object $db = null;
+
     // ── Construction ────────────────────────────────────────────────────────
 
     /**
      * @param string $dataDir Absolute path to qms-data directory.
      */
-    public function __construct(string $dataDir)
+    public function __construct(string $dataDir, ?object $db = null)
     {
         $this->dataDir        = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->predictionsDir = $this->dataDir . '/predictions';
         $this->predictionsFile = $this->predictionsDir . '/predictions.json';
         $this->modelsFile     = $this->predictionsDir . '/models.json';
         $this->rulesFile      = $this->predictionsDir . '/anomaly_rules.json';
+        $this->db             = $db;
 
         // Ensure directories exist
         if (!is_dir($this->predictionsDir)) {
@@ -1098,5 +1101,22 @@ final class PredictiveQualityEngine
         $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // Variant RFC 4122
 
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+
+    // ── PostgreSQL dual-write ──────────────────────────────────────────────
+
+    private function shadowWriteToDb(string $table, string $idColumn, string $idValue, array $row): void
+    {
+        if ($this->db === null) return;
+        try {
+            $meta = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $this->db->execute(
+                "INSERT INTO {$table} ({$idColumn}, metadata, created_at) VALUES (:id, :meta::jsonb, NOW())
+                 ON CONFLICT ({$idColumn}) DO UPDATE SET metadata = EXCLUDED.metadata",
+                [':id' => $idValue, ':meta' => $meta]
+            );
+        } catch (\Throwable $e) {
+            error_log("[PredictiveQualityEngine] Shadow write to {$table} failed: " . $e->getMessage());
+        }
     }
 }
