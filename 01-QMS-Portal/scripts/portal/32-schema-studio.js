@@ -159,11 +159,124 @@ function _t(vi, en){
   return currentLang === 'en' ? en : vi;
 }
 
+var Diagnostics = {
+  entries: [],
+  api: {},
+  maxEntries: 80,
+
+  record: function(kind, message, meta){
+    this.entries.push({
+      at: new Date().toISOString(),
+      kind: kind || 'info',
+      message: String(message || ''),
+      meta: meta || {}
+    });
+    if(this.entries.length > this.maxEntries){
+      this.entries.splice(0, this.entries.length - this.maxEntries);
+    }
+  },
+
+  recordApi: function(action, ok, duration, meta){
+    this.api[action] = {
+      ok: !!ok,
+      duration: Number(duration || 0),
+      at: new Date().toISOString(),
+      meta: meta || {}
+    };
+    this.record(ok ? 'api' : 'api_error', action, Object.assign({
+      ok: !!ok,
+      duration: Number(duration || 0)
+    }, meta || {}));
+  },
+
+  snapshot: function(){
+    var schema = STORE.schema || {};
+    return {
+      at: new Date().toISOString(),
+      currentDesignId: STORE.currentDesignId || '',
+      mode: STORE.mode,
+      dirty: !!STORE.dirty,
+      tableCount: (schema.tables || []).length,
+      relationCount: (schema.relations || []).length,
+      hiddenDomains: Object.keys(STORE.browser.hiddenDomains || {}).filter(function(key){ return !!STORE.browser.hiddenDomains[key]; }).length,
+      selection: (STORE.canvas.selection || []).slice(),
+      lastApi: _clone(this.api),
+      recentEntries: this.entries.slice(-20)
+    };
+  },
+
+  exportReport: function(){
+    var payload = JSON.stringify(this.snapshot(), null, 2);
+    var blob = new Blob([payload], { type:'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'schema-studio-diagnostics-' + new Date().toISOString().replace(/[:.]/g, '-') + '.json';
+    a.click();
+    window.setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    toast(_t('Đã xuất báo cáo chẩn đoán', 'Diagnostics report exported'), 'success');
+  },
+
+  copyReport: function(){
+    var payload = JSON.stringify(this.snapshot(), null, 2);
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(payload).then(function(){
+        toast(_t('Đã copy báo cáo chẩn đoán', 'Diagnostics report copied'), 'success');
+      }).catch(function(){
+        toast(_t('Không thể copy báo cáo chẩn đoán', 'Could not copy diagnostics report'), 'error');
+      });
+      return;
+    }
+    window.prompt(_t('Copy báo cáo chẩn đoán', 'Copy diagnostics report'), payload);
+  },
+
+  runSelfCheck: function(){
+    var schema = STORE.schema || {};
+    var tableNames = {};
+    var columnIds = {};
+    var relationSources = {};
+    var issues = [];
+    (schema.tables || []).forEach(function(tbl){
+      if(tableNames[tbl.name]){
+        issues.push({ level:'error', msg:'duplicate_table:' + tbl.name });
+      }
+      tableNames[tbl.name] = true;
+      (tbl.columns || []).forEach(function(col){
+        if(columnIds[col.id]){
+          issues.push({ level:'error', msg:'duplicate_column_id:' + col.id });
+        }
+        columnIds[col.id] = true;
+      });
+    });
+    (schema.relations || []).forEach(function(rel){
+      var sourceKey = [rel.from_table_id, rel.from_col_id].join('.');
+      if(relationSources[sourceKey]){
+        issues.push({ level:'warning', msg:'duplicate_relation_source:' + sourceKey });
+      }
+      relationSources[sourceKey] = true;
+      if(!findTable(rel.from_table_id) || !findTable(rel.to_table_id) || !findCol(rel.from_table_id, rel.from_col_id) || !findCol(rel.to_table_id, rel.to_col_id)){
+        issues.push({ level:'error', msg:'orphan_relation:' + (rel.id || sourceKey) });
+      }
+    });
+    this.record('self_check', 'schema_self_check', {
+      issues: issues.length,
+      detail: issues.slice(0, 20)
+    });
+    if(issues.length){
+      toast(_t('Tự kiểm tra phát hiện ' + issues.length + ' vấn đề', 'Self-check found ' + issues.length + ' issue(s)'), 'error');
+    } else {
+      toast(_t('Tự kiểm tra không phát hiện vấn đề', 'Self-check found no issues'), 'success');
+    }
+    return issues;
+  }
+};
+
 function _api(action, payload, method){
   var reqMethod = String(method || 'POST').toUpperCase();
   var body = payload || {};
   var useMvcEndpoint = String(action || '').indexOf('schema_studio_') === 0;
   var endpoint = useMvcEndpoint ? 'api/index.php?' : 'api.php?';
+  var startedAt = Date.now();
   if(typeof window.apiCall === 'function' && !useMvcEndpoint){
     return window.apiCall(action, body, reqMethod, 30000);
   }
@@ -184,14 +297,32 @@ function _api(action, payload, method){
     credentials: 'include',
     headers: headers,
     body: reqMethod === 'GET' ? undefined : JSON.stringify(body)
+  }).catch(function(err){
+    Diagnostics.recordApi(action, false, Date.now() - startedAt, {
+      error: err && err.message ? err.message : 'network_error'
+    });
+    throw err;
   }).then(function(res){
-    return res.json().catch(function(){
-      return { ok:false, error:'invalid_json_response' };
+    return res.text().then(function(text){
+      try{
+        return JSON.parse(text);
+      }catch(parseErr){
+        Diagnostics.recordApi(action, false, Date.now() - startedAt, {
+          error: 'invalid_json_response',
+          status: res.status,
+          sample: String(text || '').slice(0, 280)
+        });
+        return { ok:false, error:'invalid_json_response' };
+      }
     });
   }).then(function(data){
     if(data && data.ok === false){
+      Diagnostics.recordApi(action, false, Date.now() - startedAt, {
+        error: data.detail || data.error || 'request_failed'
+      });
       throw new Error(data.detail || data.error || 'request_failed');
     }
+    Diagnostics.recordApi(action, true, Date.now() - startedAt);
     return data;
   });
 }
@@ -261,6 +392,7 @@ function toast(msg, type){
   var el = document.createElement('div');
   el.className = 'ss-toast ' + (type || 'info');
   el.textContent = msg;
+  Diagnostics.record('toast', msg, { type:type || 'info' });
   document.body.appendChild(el);
   setTimeout(function(){
     if(el && el.parentNode) el.parentNode.removeChild(el);
@@ -4553,6 +4685,11 @@ CmdPalette.COMMANDS = CmdPalette.COMMANDS.concat([
   { icon:'⌘', label:'Tập trung vùng lân cận của bảng chọn', label_en:'Focus selected table neighborhood', category:'view', action:function(){ Browser.focusNeighborhood(); } }
 ]);
 
+CmdPalette.COMMANDS.push(
+  { icon:'✓', label:'Chạy tự kiểm tra schema', label_en:'Run schema self-check', category:'diagnostics', action:function(){ Diagnostics.runSelfCheck(); } },
+  { icon:'⤓', label:'Xuất báo cáo chẩn đoán', label_en:'Export diagnostics report', category:'diagnostics', action:function(){ Diagnostics.exportReport(); } }
+);
+
 var SchemaLib = {
   _autoLoadedSystem: false,
 
@@ -5329,8 +5466,15 @@ window.VirtualRenderer = VirtualRenderer;
 window.CmdPalette = CmdPalette;
 window.SchemaLib = SchemaLib;
 window.TableDialog = TableDialog;
+window.Diagnostics = Diagnostics;
 window.switchMode = switchMode;
-window.SchemaStudio = { init:init, destroy:destroy };
+window.SchemaStudio = {
+  init:init,
+  destroy:destroy,
+  getDiagnostics:function(){ return Diagnostics.snapshot(); },
+  runSelfCheck:function(){ return Diagnostics.runSelfCheck(); },
+  exportDiagnostics:function(){ Diagnostics.exportReport(); }
+};
 window._renderSchemaStudio = function(page){
   init(page);
 };
