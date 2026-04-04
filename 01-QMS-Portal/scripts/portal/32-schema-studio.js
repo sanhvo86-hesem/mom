@@ -104,7 +104,8 @@ var STORE = {
     expandedDomains: {},
     hiddenDomains: {},
     isolatedDomain: '',
-    view: 'domains'
+    view: 'domains',
+    activeDomain: ''
   },
   codePanel: {
     open: false,
@@ -414,7 +415,8 @@ function saveUiPrefs(){
         expandedDomains: STORE.browser.expandedDomains,
         hiddenDomains: STORE.browser.hiddenDomains,
         isolatedDomain: STORE.browser.isolatedDomain,
-        view: STORE.browser.view
+        view: STORE.browser.view,
+        activeDomain: STORE.browser.activeDomain
       }
     }));
   }catch(err){}
@@ -446,6 +448,9 @@ function applyUiPrefs(prefs){
     }
     if(prefs.browser.view === 'tables' || prefs.browser.view === 'domains'){
       STORE.browser.view = prefs.browser.view;
+    }
+    if(typeof prefs.browser.activeDomain === 'string'){
+      STORE.browser.activeDomain = prefs.browser.activeDomain;
     }
   }
 }
@@ -4436,6 +4441,139 @@ Browser.render = function(){
       ? (sortedTables.length ? '<div class="ss-browser-flat-list">' + sortedTables.map(function(tbl){ var active = !!selectedTableMap[tbl.id]; var hidden = Browser.isDomainHidden(tbl.domain || 'default'); var domainColor = DOMAIN_COLORS[tbl.domain || 'default'] || DOMAIN_COLORS.default; var fkCount = relatedCountMap[tbl.id] || 0; return '<div class="ss-table-item ss-table-item-flat' + (active ? ' active' : '') + (hidden ? ' is-hidden' : '') + '" onclick="Browser.selectTable(\'' + _esc(tbl.id) + '\')" ondblclick="Browser.focusTable(\'' + _esc(tbl.id) + '\')" title="' + _esc(tbl.name) + '"><span class="ss-tbl-item-name">' + _esc(tbl.name) + '</span><span class="ss-browser-table-domain"><span class="ss-domain-chip-dot" style="background:' + _esc(domainColor) + '"></span>' + _esc(formatDomainLabel(tbl.domain || 'default')) + '</span>' + (fkCount ? '<span class="ss-tbl-badge">' + String(fkCount) + ' FK</span>' : '') + '</div>'; }).join('') + '</div>' : '<div class="ss-empty-state"><div>' + _esc(_t('Không có bảng nào khớp bộ lọc hiện tại', 'No tables match the current filter')) + '</div></div>')
       : (domains.length ? domains.filter(function(domain){ return !filterActive || ((filteredGroups[domain] || []).length > 0); }).map(function(domain){ var hidden = Browser.isDomainHidden(domain); var isolated = STORE.browser.isolatedDomain === domain; var totalCount = (allGroups[domain] || []).length; var tablesForDomain = filterActive ? (filteredGroups[domain] || []) : (allGroups[domain] || []); var expanded = hidden ? false : (filterActive ? true : STORE.browser.expandedDomains[domain] !== false); return ['<div class="ss-domain-group' + (hidden ? ' is-hidden' : '') + (isolated ? ' is-isolated' : '') + '" data-domain="' + _esc(domain) + '">','<div class="ss-domain-group-header" style="border-left:3px solid ' + _esc(DOMAIN_COLORS[domain] || DOMAIN_COLORS.default) + '" onclick="Browser.toggleDomain(\'' + _esc(domain) + '\')">','<span class="ss-domain-chevron">' + (expanded ? '▾' : '▸') + '</span>','<span class="ss-domain-name">' + _esc(formatDomainLabel(domain)) + '</span>', hidden ? '<span class="ss-domain-state">' + _esc(_t('Ẩn', 'Hidden')) + '</span>' : '','<div class="ss-domain-actions"><button class="ss-domain-action" type="button" onclick="Browser.isolateDomain(\'' + _esc(domain) + '\', event)" title="' + _esc(isolated ? _t('Bỏ chế độ chỉ xem domain này', 'Clear isolated view') : _t('Chỉ hiện domain này', 'Show only this domain')) + '">' + _esc(isolated ? _t('Tất cả', 'All') : _t('Chỉ', 'Only')) + '</button><button class="ss-domain-action" type="button" onclick="Browser.toggleDomainVisibility(\'' + _esc(domain) + '\', event)" title="' + _esc(hidden ? _t('Hiện lại domain này', 'Show this domain again') : _t('Ẩn domain này khỏi canvas', 'Hide this domain from canvas')) + '">' + _esc(hidden ? _t('Hiện', 'Show') : _t('Ẩn', 'Hide')) + '</button></div>','<span class="ss-domain-count">' + String(filterActive ? tablesForDomain.length : totalCount) + '</span>','</div>', expanded ? '<div class="ss-domain-tables">' + tablesForDomain.map(function(tbl){ var active = !!selectedTableMap[tbl.id]; var fkCount = relatedCountMap[tbl.id] || 0; return '<div class="ss-table-item' + (active ? ' active' : '') + '" onclick="Browser.selectTable(\'' + _esc(tbl.id) + '\')" ondblclick="Browser.focusTable(\'' + _esc(tbl.id) + '\')" title="' + _esc(tbl.name) + '"><span class="ss-tbl-item-name">' + _esc(tbl.name) + '</span>' + (fkCount ? '<span class="ss-tbl-badge">' + String(fkCount) + ' FK</span>' : '') + '</div>'; }).join('') + '</div>' : (hidden ? '<div class="ss-domain-hidden-note">' + _esc(_t('Domain này đang ẩn khỏi canvas, minimap và relation', 'This domain is hidden from canvas, minimap, and relations')) + '</div>' : ''),'</div>'].join(''); }).join('') : '<div class="ss-empty-state"><div>' + _esc(_t('Chưa có bảng nào', 'No tables yet')) + '</div></div>')) + '</div>',
     '<div class="ss-browser-footer"><div class="ss-browser-footer-meta"><span>' + String(stats.visibleTables) + '/' + String(stats.totalTables) + ' ' + _esc(_t('bảng', 'tables')) + '</span><span>&middot;</span><span>' + String(stats.hiddenDomains) + ' ' + _esc(_t('domain đang ẩn', 'hidden domains')) + '</span></div><div class="ss-browser-footer-actions"><button class="hm-btn hm-btn-ghost ss-btn-xs" onclick="Browser.showAllDomains()">' + _esc(_t('Hiện tất cả', 'Show all')) + '</button><button class="hm-btn hm-btn-ghost ss-btn-xs" onclick="Browser.focusSelectedDomain()">' + _esc(_t('Domain của bảng chọn', 'Selected table domain')) + '</button></div></div>'
+  ].join('');
+};
+
+Browser.resolveActiveDomain = function(allGroups, filteredGroups, filterActive){
+  var domains = Object.keys(allGroups || {});
+  var active = STORE.browser.activeDomain || STORE.browser.isolatedDomain || '';
+  var visibleCandidates;
+  if(!domains.length) return '';
+  if(active && domains.indexOf(active) >= 0 && (!filterActive || ((filteredGroups[active] || []).length > 0))){
+    return active;
+  }
+  visibleCandidates = domains.filter(function(domain){
+    if(filterActive && !(filteredGroups[domain] || []).length) return false;
+    return Browser.isDomainVisible(domain);
+  });
+  if(visibleCandidates.length) return visibleCandidates[0];
+  return domains.filter(function(domain){
+    return !filterActive || ((filteredGroups[domain] || []).length > 0);
+  })[0] || domains[0];
+};
+
+Browser.setActiveDomain = function(domain){
+  if(!domain) return;
+  STORE.browser.activeDomain = domain;
+  saveUiPrefs();
+  Browser.render();
+};
+
+Browser.focusSelectedDomain = function(){
+  var selected = Browser.getSelectedTables()[0];
+  if(!selected){
+    toast(_t('Hãy chọn một bảng trước', 'Select a table first'), 'info');
+    return;
+  }
+  STORE.browser.activeDomain = selected.domain || 'default';
+  Browser.setView('domains');
+  Browser.isolateDomain(STORE.browser.activeDomain);
+};
+
+function renderToolbar(container){
+  if(!container) return;
+  container.innerHTML = [
+    '<div class="ss-toolbar-left"><button class="hm-btn hm-btn-ghost ss-btn-sm ss-toolbar-panel-btn ss-toolbar-icon-btn' + (STORE.browser.open ? '' : ' is-collapsed') + '" onclick="Browser.toggleOpen()" title="' + _esc(_t('Ẩn/hiện trình duyệt schema (B)', 'Toggle schema browser (B)')) + '" aria-label="' + _esc(_t('Ẩn hoặc hiện trình duyệt schema', 'Toggle schema browser')) + '"><span class="ss-toolbar-panel-icon">' + (STORE.browser.open ? '◂' : '▸') + '</span></button><select class="ss-schema-select" id="ss-schema-select" onchange="SchemaLib.onSelectChange(this.value)"></select></div>',
+    '<div class="ss-toolbar-center"><div class="ss-mode-tabs"><button class="ss-mode-tab' + (STORE.mode === 'canvas' ? ' active' : '') + '" onclick="switchMode(\'canvas\')">' + _esc(_t('Sơ đồ', 'Canvas')) + '</button><button class="ss-mode-tab' + (STORE.mode === 'code' ? ' active' : '') + '" onclick="switchMode(\'code\')">' + _esc(_t('Mã', 'Code')) + '</button><button class="ss-mode-tab' + (STORE.mode === 'validate' ? ' active' : '') + '" onclick="Validator.run()">' + _esc(_t('Kiểm tra', 'Validate')) + '</button><button class="ss-mode-tab" onclick="MigGen.renderPreview()">' + _esc(_t('Di trú', 'Migration')) + '</button></div><div class="ss-toolbar-view-tabs"><button class="ss-mode-tab ss-browser-view-tab' + (STORE.browser.view === 'domains' ? ' active' : '') + '" onclick="Browser.setView(\'domains\')">' + _esc(_t('Theo domain', 'By domain')) + '</button><button class="ss-mode-tab ss-browser-view-tab' + (STORE.browser.view === 'tables' ? ' active' : '') + '" onclick="Browser.setView(\'tables\')">' + _esc(_t('Theo bảng', 'By table')) + '</button></div></div>',
+    '<div class="ss-toolbar-right"><span id="ss-toolbar-zoom">100%</span><button class="hm-btn hm-btn-ghost ss-btn-sm" onclick="Canvas.zoomReset()">' + _esc(_t('Đặt lại', 'Reset')) + '</button><button class="hm-btn hm-btn-ghost ss-btn-sm" onclick="CmdPalette.open()">Ctrl+K</button><button class="hm-btn hm-btn-ghost ss-btn-sm" onclick="Importer.openModal()">' + _esc(_t('Nhập', 'Import')) + '</button><button class="hm-btn hm-btn-ghost ss-btn-sm" onclick="MigGen.setBaseline()">' + _esc(_t('Mốc gốc', 'Baseline')) + '</button><button class="hm-btn hm-btn-secondary ss-btn-sm" onclick="SchemaLib.save()">' + _esc(_t('Lưu', 'Save')) + '</button><button class="hm-btn hm-btn-primary ss-btn-sm" onclick="CodePanel.open(\'sql\')">SQL</button></div>'
+  ].join('');
+  SchemaLib.renderSelector();
+}
+
+Browser.render = function(){
+  var tables;
+  var filtered;
+  var allGroups;
+  var filteredGroups;
+  var domains;
+  var filter;
+  var filterActive;
+  var stats;
+  var sortedTables;
+  var selectedTableMap = {};
+  var relatedCountMap = {};
+  var searchMeta;
+  var domainCandidates;
+  var activeDomain;
+  var activeDomainTables;
+  var activeHidden;
+  var activeIsolated;
+  var activeDomainColor;
+  if(!refs.browser) return;
+  tables = Browser.getAllTables();
+  filtered = Browser.getVisibleTables();
+  allGroups = Browser.groupTables(tables);
+  filteredGroups = Browser.groupTables(filtered);
+  domains = Object.keys(allGroups).sort(function(a, b){
+    return formatDomainLabel(a).localeCompare(formatDomainLabel(b));
+  });
+  filter = String(STORE.browser.filter || '').trim();
+  filterActive = !!filter;
+  stats = Browser.getDomainStats();
+  Browser.getSelectedTables().forEach(function(tbl){
+    selectedTableMap[tbl.id] = true;
+  });
+  ((STORE.schema && STORE.schema.relations) || []).forEach(function(rel){
+    relatedCountMap[rel.from_table_id] = (relatedCountMap[rel.from_table_id] || 0) + 1;
+    relatedCountMap[rel.to_table_id] = (relatedCountMap[rel.to_table_id] || 0) + 1;
+  });
+  sortedTables = filtered.slice().sort(function(a, b){
+    var aSelected = selectedTableMap[a.id] ? 0 : 1;
+    var bSelected = selectedTableMap[b.id] ? 0 : 1;
+    var domainCompare;
+    if(aSelected !== bSelected) return aSelected - bSelected;
+    domainCompare = formatDomainLabel(a.domain || 'default').localeCompare(formatDomainLabel(b.domain || 'default'));
+    if(domainCompare !== 0) return domainCompare;
+    return String(a.name || '').localeCompare(String(b.name || ''));
+  });
+  domainCandidates = domains.filter(function(domain){
+    return !filterActive || ((filteredGroups[domain] || []).length > 0);
+  });
+  activeDomain = Browser.resolveActiveDomain(allGroups, filteredGroups, filterActive);
+  STORE.browser.activeDomain = activeDomain;
+  activeDomainTables = activeDomain ? (filterActive ? (filteredGroups[activeDomain] || []) : (allGroups[activeDomain] || [])) : [];
+  activeHidden = !!(activeDomain && Browser.isDomainHidden(activeDomain));
+  activeIsolated = !!(activeDomain && STORE.browser.isolatedDomain === activeDomain);
+  activeDomainColor = activeDomain ? (DOMAIN_COLORS[activeDomain] || DOMAIN_COLORS.default) : DOMAIN_COLORS.default;
+  searchMeta = filterActive
+    ? _t('Đang hiển thị ' + filtered.length + ' bảng khớp', 'Showing ' + filtered.length + ' matching table(s)')
+    : (STORE.browser.view === 'tables'
+      ? _t('Nhấp để chọn, nhấp đúp để đưa bảng vào giữa màn hình', 'Click to select, double-click to focus a table')
+      : _t('Chọn domain ở trên để xem bảng của domain đó', 'Select a domain above to see that domain tables'));
+  if(!STORE.browser.open){
+    refs.browser.innerHTML = [
+      '<div class="ss-browser-collapsed-shell">',
+        '<button class="ss-browser-rail-btn" type="button" onclick="Browser.toggleOpen(true)" title="' + _esc(_t('Mở trình duyệt schema (B)', 'Open schema browser (B)')) + '" aria-label="' + _esc(_t('Mở trình duyệt schema', 'Open schema browser')) + '">▸</button>',
+        '<button class="ss-browser-rail-btn" type="button" onclick="Browser.setView(\'domains\'); Browser.toggleOpen(true)" title="' + _esc(_t('Quản lý theo domain', 'Manage by domain')) + '" aria-label="' + _esc(_t('Quản lý theo domain', 'Manage by domain')) + '">◎</button>',
+        '<button class="ss-browser-rail-btn" type="button" onclick="Browser.setView(\'tables\'); Browser.toggleOpen(true)" title="' + _esc(_t('Quản lý theo bảng', 'Manage by table')) + '" aria-label="' + _esc(_t('Quản lý theo bảng', 'Manage by table')) + '">≣</button>',
+        '<div class="ss-browser-rail-stats"><strong>' + String(stats.visibleTables) + '</strong><span>' + _esc(_t('đang hiện', 'visible')) + '</span></div>',
+      '</div>'
+    ].join('');
+    return;
+  }
+  refs.browser.innerHTML = [
+    '<div class="ss-browser-header">',
+      '<div class="ss-browser-header-top"><div class="ss-browser-tools">',
+        '<button class="ss-browser-tool" type="button" onclick="Layout.auto(\'compact-visible\')" title="' + _esc(_t('Nén phần đang hiện để tiết kiệm không gian', 'Compact visible tables to save space')) + '" aria-label="' + _esc(_t('Nén phần đang hiện', 'Compact visible view')) + '">⤢</button>',
+        '<button class="ss-browser-tool" type="button" onclick="Browser.focusNeighborhood()" title="' + _esc(_t('Tập trung vùng lân cận của bảng đang chọn', 'Focus the neighborhood of the selected table')) + '" aria-label="' + _esc(_t('Tập trung vùng lân cận', 'Focus neighborhood')) + '">⌘</button>',
+      '</div></div>',
+      '<div class="ss-browser-summary"><span class="ss-browser-summary-pill"><strong>' + String(stats.visibleTables) + '/' + String(stats.totalTables) + '</strong><span>' + _esc(_t('bảng đang hiện', 'tables visible')) + '</span></span><span class="ss-browser-summary-pill"><strong>' + String(stats.visibleDomains) + '/' + String(stats.totalDomains) + '</strong><span>' + _esc(_t('domain', 'domains')) + '</span></span><span class="ss-browser-summary-pill"><strong>' + String(stats.hiddenDomains) + '</strong><span>' + _esc(_t('domain đang ẩn', 'hidden domains')) + '</span></span></div>',
+    '</div>',
+    '<div class="ss-browser-search-wrap"><input class="hm-input ss-browser-search" placeholder="' + _esc(_t('Tìm bảng, cột hoặc domain...', 'Search tables, columns, or domains...')) + '" value="' + _esc(STORE.browser.filter) + '" oninput="Browser.onFilter(this.value)" /><div class="ss-browser-search-meta">' + _esc(searchMeta) + '</div>' + (STORE.browser.view === 'domains' ? '<div class="ss-domain-chip-strip">' + domainCandidates.map(function(domain){ var totalCount = (filterActive ? (filteredGroups[domain] || []) : (allGroups[domain] || [])).length; var hidden = Browser.isDomainHidden(domain); var active = STORE.browser.activeDomain === domain; return '<button class="ss-domain-chip' + (hidden ? ' is-hidden' : '') + (active ? ' active' : '') + '" type="button" onclick="Browser.setActiveDomain(\'' + _esc(domain) + '\')" title="' + _esc(_t('Chọn domain này', 'Select this domain')) + '"><span class="ss-domain-chip-dot" style="background:' + _esc(DOMAIN_COLORS[domain] || DOMAIN_COLORS.default) + '"></span><span class="ss-domain-chip-label">' + _esc(formatDomainLabel(domain)) + '</span><strong>' + String(totalCount) + '</strong></button>'; }).join('') + '</div>' : '') + '</div>',
+    '<div class="ss-browser-list">' + (STORE.browser.view === 'tables'
+      ? (sortedTables.length ? '<div class="ss-browser-flat-list">' + sortedTables.map(function(tbl){ var active = !!selectedTableMap[tbl.id]; var hidden = Browser.isDomainHidden(tbl.domain || 'default'); var domainColor = DOMAIN_COLORS[tbl.domain || 'default'] || DOMAIN_COLORS.default; var fkCount = relatedCountMap[tbl.id] || 0; return '<div class="ss-table-item ss-table-item-flat' + (active ? ' active' : '') + (hidden ? ' is-hidden' : '') + '" onclick="Browser.selectTable(\'' + _esc(tbl.id) + '\')" ondblclick="Browser.focusTable(\'' + _esc(tbl.id) + '\')" title="' + _esc(tbl.name) + '"><span class="ss-tbl-item-name">' + _esc(tbl.name) + '</span><span class="ss-browser-table-domain"><span class="ss-domain-chip-dot" style="background:' + _esc(domainColor) + '"></span>' + _esc(formatDomainLabel(tbl.domain || 'default')) + '</span>' + (fkCount ? '<span class="ss-tbl-badge">' + String(fkCount) + ' FK</span>' : '') + '</div>'; }).join('') + '</div>' : '<div class="ss-empty-state"><div>' + _esc(_t('Không có bảng nào khớp bộ lọc hiện tại', 'No tables match the current filter')) + '</div></div>')
+      : (activeDomain ? '<div class="ss-domain-focus-card' + (activeHidden ? ' is-hidden' : '') + '" data-domain="' + _esc(activeDomain) + '"><div class="ss-domain-focus-head" style="border-left:3px solid ' + _esc(activeDomainColor) + '"><span class="ss-domain-name">' + _esc(formatDomainLabel(activeDomain)) + '</span>' + (activeHidden ? '<span class="ss-domain-state">' + _esc(_t('Ẩn', 'Hidden')) + '</span>' : '') + '<div class="ss-domain-actions"><button class="ss-domain-action" type="button" onclick="Browser.isolateDomain(\'' + _esc(activeDomain) + '\', event)" title="' + _esc(activeIsolated ? _t('Bỏ chế độ chỉ xem domain này', 'Clear isolated view') : _t('Chỉ hiện domain này', 'Show only this domain')) + '">' + _esc(activeIsolated ? _t('Tất cả', 'All') : _t('Chỉ', 'Only')) + '</button><button class="ss-domain-action" type="button" onclick="Browser.toggleDomainVisibility(\'' + _esc(activeDomain) + '\', event)" title="' + _esc(activeHidden ? _t('Hiện lại domain này', 'Show this domain again') : _t('Ẩn domain này khỏi canvas', 'Hide this domain from canvas')) + '">' + _esc(activeHidden ? _t('Hiện', 'Show') : _t('Ẩn', 'Hide')) + '</button></div><span class="ss-domain-count">' + String(activeDomainTables.length) + '</span></div>' + (activeHidden ? '<div class="ss-domain-hidden-note">' + _esc(_t('Domain này đang ẩn khỏi canvas, minimap và relation', 'This domain is hidden from canvas, minimap, and relations')) + '</div>' : (activeDomainTables.length ? '<div class="ss-domain-tables">' + activeDomainTables.map(function(tbl){ var active = !!selectedTableMap[tbl.id]; var fkCount = relatedCountMap[tbl.id] || 0; return '<div class="ss-table-item' + (active ? ' active' : '') + '" onclick="Browser.selectTable(\'' + _esc(tbl.id) + '\')" ondblclick="Browser.focusTable(\'' + _esc(tbl.id) + '\')" title="' + _esc(tbl.name) + '"><span class="ss-tbl-item-name">' + _esc(tbl.name) + '</span>' + (fkCount ? '<span class="ss-tbl-badge">' + String(fkCount) + ' FK</span>' : '') + '</div>'; }).join('') + '</div>' : '<div class="ss-empty-state"><div>' + _esc(_t('Không có bảng nào trong domain này', 'No tables in this domain')) + '</div></div>')) + '</div>' : '<div class="ss-empty-state"><div>' + _esc(_t('Chọn một domain để xem danh sách bảng', 'Select a domain to view its tables')) + '</div></div>')) + '</div>',
+    '<div class="ss-browser-footer"><div class="ss-browser-footer-meta"><span>' + String(stats.visibleTables) + '/' + String(stats.totalTables) + ' ' + _esc(_t('bảng', 'tables')) + '</span><span>&middot;</span><span>' + String(stats.hiddenDomains) + ' ' + _esc(_t('domain đang ẩn', 'hidden domains')) + '</span></div></div>'
   ].join('');
 };
 

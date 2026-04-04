@@ -1535,6 +1535,17 @@
   border-left: 1px solid var(--border);
 }
 
+.ss-toolbar-icon-btn {
+  width: 36px;
+  min-width: 36px;
+  padding-inline: 0;
+  justify-content: center;
+}
+
+.ss-toolbar-left {
+  gap: var(--space-2);
+}
+
 .ss-browser-view-tab {
   min-width: 88px;
 }
@@ -1750,4 +1761,33 @@
 
 .ss-browser-search-wrap {
   padding-top: var(--space-2);
+}
+
+.ss-domain-focus-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.ss-domain-focus-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.ss-domain-focus-card .ss-domain-name {
+  flex: 1;
+}
+
+.ss-domain-focus-card.is-hidden {
+  opacity: 0.8;
+}
+
+.ss-browser-footer {
+  min-height: 44px;
+}
+
+.ss-browser-footer-meta {
+  justify-content: flex-start;
 }
