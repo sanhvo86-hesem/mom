@@ -9,6 +9,9 @@
 }
 
 .ss-root {
+  --ss-browser-width: 280px;
+  --ss-browser-width-collapsed: 68px;
+  --ss-inspector-width: 320px;
   --surface: var(--bg-surface);
   --surface-2: var(--bg-surface-alt);
   --sidebar-bg: var(--bg-sidebar);
@@ -18,7 +21,7 @@
   --color-navy: var(--brand);
   --color-blue: var(--brand-2);
   display: grid;
-  grid-template-columns: 280px 1fr 320px;
+  grid-template-columns: minmax(248px, var(--ss-browser-width)) 1fr minmax(288px, var(--ss-inspector-width));
   grid-template-rows: 48px 1fr 0;
   height: 100%;
   min-height: calc(100vh - 120px);
@@ -34,7 +37,7 @@
 }
 
 .ss-root.browser-collapsed {
-  grid-template-columns: 68px 1fr 320px;
+  grid-template-columns: var(--ss-browser-width-collapsed) 1fr minmax(288px, var(--ss-inspector-width));
 }
 
 .ss-root.code-open {
@@ -1828,7 +1831,7 @@
 
 .ss-browser.is-domain-view {
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: minmax(150px, var(--ss-domain-top, 42%)) 12px minmax(150px, 1fr);
 }
 
 .ss-browser.is-domain-view .ss-browser-search-wrap,
@@ -1840,7 +1843,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  overflow: visible;
+  overflow: auto;
+  border-bottom: 0;
 }
 
 .ss-browser.is-domain-view .ss-domain-chip-strip {
@@ -1857,11 +1861,48 @@
 
 .ss-browser.is-domain-view .ss-browser-list {
   overflow: auto;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 0;
+  padding-top: 0;
 }
 
 .ss-browser.is-domain-view .ss-domain-focus-card {
-  min-height: 100%;
+  min-height: 0;
+  height: 100%;
+}
+
+.ss-browser-splitter {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: row-resize;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.03) 100%);
+}
+
+.ss-browser-splitter::before {
+  content: '';
+  position: absolute;
+  inset-inline: var(--space-3);
+  top: 50%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-50%);
+}
+
+.ss-browser-splitter-handle {
+  position: relative;
+  z-index: 1;
+  width: 38px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.ss-domain-focus-card .ss-domain-tables {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
 }
 
 .ss-root {
