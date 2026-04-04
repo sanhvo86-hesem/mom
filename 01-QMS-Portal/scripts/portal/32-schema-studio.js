@@ -1373,6 +1373,11 @@ var TableCard = {
       }
       Canvas.selectTable(tbl.id, ev.shiftKey || ev.ctrlKey || ev.metaKey);
     });
+    card.addEventListener('click', function(ev){
+      if(ev.target.closest('.ss-fk-port') || ev.target.closest('.ss-icon-btn') || ev.target.closest('.ss-col-item') || ev.target.closest('.ss-col-item-add')) return;
+      Canvas.selectTable(tbl.id, ev.shiftKey || ev.ctrlKey || ev.metaKey);
+      Inspector.open({ kind:'table', tableId:tbl.id });
+    });
     card.querySelector('.ss-tbl-name').ondblclick = function(ev){
       ev.preventDefault();
       ev.stopPropagation();
@@ -2698,6 +2703,7 @@ var Browser = {
         '<div class="ss-browser-title-group"><div class="ss-browser-title">' + _esc(_t('Trình duyệt schema', 'Schema browser')) + '</div><div class="ss-browser-subtitle">' + String(stats.visibleTables) + '/' + String(stats.totalTables) + ' ' + _esc(_t('bảng đang hiện', 'tables visible')) + ' · ' + String(stats.visibleDomains) + '/' + String(stats.totalDomains) + ' ' + _esc(_t('domain', 'domains')) + '</div></div>',
         '<div class="ss-browser-tools">',
           '<button class="ss-browser-tool" type="button" onclick="Browser.showAllDomains()" title="' + _esc(_t('Hiện tất cả domain', 'Show all domains')) + '" aria-label="' + _esc(_t('Hiện tất cả domain', 'Show all domains')) + '">◌</button>',
+          '<button class="ss-browser-tool" type="button" onclick="Layout.auto(\'compact-visible\')" title="' + _esc(_t('Nén phần đang hiện để tiết kiệm không gian', 'Compact visible tables to save space')) + '" aria-label="' + _esc(_t('Nén phần đang hiện', 'Compact visible view')) + '">⤢</button>',
           '<button class="ss-browser-tool" type="button" onclick="Browser.expandAll()" title="' + _esc(_t('Mở rộng tất cả', 'Expand all')) + '" aria-label="' + _esc(_t('Mở rộng tất cả', 'Expand all')) + '">+</button>',
           '<button class="ss-browser-tool" type="button" onclick="Browser.collapseAll()" title="' + _esc(_t('Thu gọn tất cả', 'Collapse all')) + '" aria-label="' + _esc(_t('Thu gọn tất cả', 'Collapse all')) + '">−</button>',
           '<button class="ss-browser-tool" type="button" onclick="Browser.toggleOpen(false)" title="' + _esc(_t('Ẩn trình duyệt schema (B)', 'Hide schema browser (B)')) + '" aria-label="' + _esc(_t('Ẩn trình duyệt schema', 'Hide schema browser')) + '">◂</button>',
@@ -3463,6 +3469,8 @@ var Layout = {
       Layout.hierarchical();
     } else if(algorithm === 'domain'){
       Layout.domainClusters();
+    } else if(algorithm === 'compact-visible'){
+      Layout.compactVisible();
     } else {
       Layout.forceDirected();
     }
@@ -3566,6 +3574,35 @@ var Layout = {
       });
       temp *= 0.92;
     }
+  },
+
+  compactVisible: function(){
+    var tables = typeof Browser !== 'undefined' && Browser.getCanvasTables ? Browser.getCanvasTables() : (STORE.schema.tables || []);
+    var cursorX = 80;
+    var cursorY = 80;
+    var maxColumnWidth = 0;
+    var columnBottom = 0;
+    var wrapHeight = refs.canvasWrap ? Math.max(refs.canvasWrap.clientHeight - 120, 520) : 760;
+    var gutterX = 56;
+    var gutterY = 28;
+    if(!tables.length) return;
+    tables.slice().sort(function(a, b){
+      if(a.canvas.y === b.canvas.y) return a.canvas.x - b.canvas.x;
+      return a.canvas.y - b.canvas.y;
+    }).forEach(function(tbl){
+      var width = (tbl.canvas && tbl.canvas.width) || TABLE_DEFAULT_WIDTH;
+      var height = getTableHeight(tbl);
+      if(cursorY + height > wrapHeight && cursorY > 80){
+        cursorX += maxColumnWidth + gutterX;
+        cursorY = 80;
+        maxColumnWidth = 0;
+      }
+      tbl.canvas.x = cursorX;
+      tbl.canvas.y = cursorY;
+      cursorY += height + gutterY;
+      columnBottom = Math.max(columnBottom, tbl.canvas.y + height);
+      maxColumnWidth = Math.max(maxColumnWidth, width);
+    });
   }
 };
 
@@ -3621,7 +3658,7 @@ var VirtualRenderer = {
   },
 
   update: function(){
-    var tables = (STORE.schema && STORE.schema.tables) || [];
+    var tables = typeof Browser !== 'undefined' && Browser.getCanvasTables ? Browser.getCanvasTables() : ((STORE.schema && STORE.schema.tables) || []);
     var nowVisible = new Set();
     var removeIds = [];
     if(!refs.tablesLayer){
@@ -3693,6 +3730,7 @@ var CmdPalette = {
     { icon:'◌', label:'Hiện tất cả domain', label_en:'Show all domains', category:'view', action:function(){ Browser.showAllDomains(); } },
     { icon:'+', label:'Mở rộng tất cả domain', label_en:'Expand all domains', category:'view', action:function(){ Browser.expandAll(); } },
     { icon:'−', label:'Thu gọn tất cả domain', label_en:'Collapse all domains', category:'view', action:function(){ Browser.collapseAll(); } },
+    { icon:'⤢', label:'Nén view đang hiện', label_en:'Compact visible view', category:'layout', action:function(){ Layout.auto('compact-visible'); } },
     { icon:'#', label:'Bat tat snap grid', label_en:'Toggle snap grid', category:'view', action:function(){ Canvas.toggleSnap(); } },
     { icon:'G', label:'Grid layout', label_en:'Grid layout', category:'layout', action:function(){ Layout.auto('grid'); } },
     { icon:'F', label:'Force layout', label_en:'Force layout', category:'layout', action:function(){ Layout.auto('force'); } },
