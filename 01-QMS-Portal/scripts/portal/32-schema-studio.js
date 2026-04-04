@@ -504,6 +504,13 @@ function generateUniqueColumnName(tbl, base){
   return name;
 }
 
+function estimateTableCardWidth(tbl){
+  var titleLength = String((tbl && tbl.name) || '').length;
+  var schemaLength = String((tbl && tbl.schema) || '').length;
+  var computed = 132 + (titleLength * 13) + (schemaLength > 0 && String(tbl.schema || 'public') !== 'public' ? (schemaLength * 7) + 28 : 0);
+  return Math.max(320, Math.min(760, computed));
+}
+
 function parseTypeDefinition(raw){
   var text = String(raw || '').trim();
   var isArray = /\[\]$/.test(text);
@@ -1340,15 +1347,18 @@ var TableCard = {
     if(document.getElementById('tc_' + tbl.id)) return;
     var card = document.createElement('div');
     var domainColor = tbl.color || DOMAIN_COLORS[tbl.domain] || DOMAIN_COLORS.default;
+    var effectiveWidth = Math.max((tbl.canvas && tbl.canvas.width) || TABLE_DEFAULT_WIDTH, estimateTableCardWidth(tbl));
     var schemaLabel = String(tbl.schema || 'public');
     var schemaMeta = schemaLabel && schemaLabel !== 'public'
       ? '<span class="ss-tbl-meta">' + _esc(schemaLabel) + '</span>'
       : '';
+    tbl.canvas = tbl.canvas || {};
+    tbl.canvas.width = effectiveWidth;
     card.className = 'ss-table-card' + (tbl.canvas.collapsed ? ' collapsed' : '');
     card.id = 'tc_' + tbl.id;
     card.setAttribute('data-table-id', tbl.id);
     card.style.transform = 'translate(' + tbl.canvas.x + 'px,' + tbl.canvas.y + 'px)';
-    card.style.width = (tbl.canvas.width || TABLE_DEFAULT_WIDTH) + 'px';
+    card.style.width = effectiveWidth + 'px';
     card.style.setProperty('--ss-domain-color', domainColor);
     card.innerHTML = [
       '<div class="ss-table-card-header">',
@@ -1358,10 +1368,6 @@ var TableCard = {
             '<span class="ss-tbl-name">' + _esc(tbl.name) + '</span>',
             schemaMeta,
           '</div>',
-        '</div>',
-        '<div class="ss-table-actions">',
-          '<button type="button" class="ss-icon-btn" data-ss-action="collapse" title="' + _esc(tbl.canvas.collapsed ? _t('Mở rộng bảng', 'Expand table') : _t('Thu gọn bảng', 'Collapse table')) + '">' + (tbl.canvas.collapsed ? '+' : '-') + '</button>',
-          '<button type="button" class="ss-icon-btn danger" data-ss-action="delete" title="' + _esc(_t('Xóa bảng', 'Delete table')) + '">&#128465;</button>',
         '</div>',
       '</div>',
       '<ul class="ss-col-list">',
@@ -1376,7 +1382,6 @@ var TableCard = {
           }).join('') + '</span><span class="ss-fk-port" data-port-col="' + _esc(col.id) + '" title="' + _esc(_t('Keo de tao FK', 'Drag to create FK')) + '"></span></li>';
         }).join(''),
       '</ul>',
-      '<div class="ss-col-item-add" data-ss-action="add-column">+ ' + _esc(_t('Thêm cột', 'Add column')) + '</div>',
       '<div class="ss-table-footer">' + _esc(((tbl.indexes || []).length + ' indexes · ' + (tbl.columns || []).length + ' ' + _t('cột', 'columns'))) + '</div>'
     ].join('');
     refs.tablesLayer.appendChild(card);
@@ -1401,9 +1406,6 @@ var TableCard = {
       ev.stopPropagation();
       TableCard.openDetails(tbl.id);
     };
-    card.querySelector('[data-ss-action="collapse"]').onclick = function(ev){ ev.stopPropagation(); TableCard.toggleCollapse(tbl.id); };
-    card.querySelector('[data-ss-action="delete"]').onclick = function(ev){ ev.stopPropagation(); TableCard.confirmDelete(tbl.id); };
-    card.querySelector('[data-ss-action="add-column"]').onclick = function(ev){ ev.stopPropagation(); TableCard.addColumn(tbl.id); };
     Array.prototype.forEach.call(card.querySelectorAll('.ss-col-item'), function(node){
       node.onclick = function(ev){
         ev.stopPropagation();
@@ -1427,6 +1429,7 @@ var TableCard = {
       saveDraft();
     }
     Inspector.open({ kind:'table', tableId:tableId });
+    TableDialog.open(tableId);
   },
 
   startMove: function(tableId, ev){
@@ -1777,10 +1780,17 @@ var Inspector = {
     }
     refs.inspector.innerHTML = [
       '<div class="ss-inspector-tabs">',
-        '<button class="ss-itab', STORE.inspector.tab === 'props' ? ' active' : '', '" onclick="Inspector.switchTab(\'props\',\'' + _esc(tableId) + '\')">', _esc(_t('Thuoc tinh', 'Properties')), '</button>',
-        '<button class="ss-itab', STORE.inspector.tab === 'indexes' ? ' active' : '', '" onclick="Inspector.switchTab(\'indexes\',\'' + _esc(tableId) + '\')">Indexes</button>',
-        '<button class="ss-itab', STORE.inspector.tab === 'constraints' ? ' active' : '', '" onclick="Inspector.switchTab(\'constraints\',\'' + _esc(tableId) + '\')">', _esc(_t('Rang buoc', 'Constraints')), '</button>',
-        '<button class="ss-itab', STORE.inspector.tab === 'triggers' ? ' active' : '', '" onclick="Inspector.switchTab(\'triggers\',\'' + _esc(tableId) + '\')">Triggers</button>',
+        '<div class="ss-inspector-tab-list">',
+          '<button class="ss-itab', STORE.inspector.tab === 'props' ? ' active' : '', '" onclick="Inspector.switchTab(\'props\',\'' + _esc(tableId) + '\')">', _esc(_t('Thuộc tính', 'Properties')), '</button>',
+          '<button class="ss-itab', STORE.inspector.tab === 'indexes' ? ' active' : '', '" onclick="Inspector.switchTab(\'indexes\',\'' + _esc(tableId) + '\')">Indexes</button>',
+          '<button class="ss-itab', STORE.inspector.tab === 'constraints' ? ' active' : '', '" onclick="Inspector.switchTab(\'constraints\',\'' + _esc(tableId) + '\')">', _esc(_t('Ràng buộc', 'Constraints')), '</button>',
+          '<button class="ss-itab', STORE.inspector.tab === 'triggers' ? ' active' : '', '" onclick="Inspector.switchTab(\'triggers\',\'' + _esc(tableId) + '\')">Triggers</button>',
+        '</div>',
+        '<div class="ss-inspector-tab-tools">',
+          '<button class="hm-btn hm-btn-ghost ss-btn-xs" onclick="TableDialog.open(\'' + _esc(tableId) + '\')">' + _esc(_t('Chi tiết', 'Details')) + '</button>',
+          '<button class="hm-btn hm-btn-secondary ss-btn-xs" onclick="TableCard.addColumn(\'' + _esc(tableId) + '\')">+ ' + _esc(_t('Cột', 'Column')) + '</button>',
+          '<button class="hm-btn hm-btn-danger ss-btn-xs" onclick="TableCard.confirmDelete(\'' + _esc(tableId) + '\')">' + _esc(_t('Xóa', 'Delete')) + '</button>',
+        '</div>',
       '</div>',
       '<div class="ss-inspector-body" id="ss-inspector-body"></div>'
     ].join('');
@@ -2267,6 +2277,281 @@ var Inspector = {
     var raw = String(value || '').trim();
     if(/^#[0-9a-f]{6}$/i.test(raw)) return raw;
     return '#1565c0';
+  }
+};
+
+var TableDialog = {
+  currentTableId: null,
+  draft: null,
+  preview: null,
+
+  open: function(tableId){
+    var tbl = findTable(tableId);
+    if(!tbl) return;
+    this.currentTableId = tableId;
+    this.draft = _clone(tbl);
+    this.preview = {
+      loading: true,
+      available: false,
+      columns: [],
+      rows: [],
+      message: ''
+    };
+    this.render();
+    this.loadPreview();
+  },
+
+  close: function(){
+    var overlay = document.getElementById('ss-table-dialog-overlay');
+    if(overlay) removeNode(overlay);
+    this.currentTableId = null;
+    this.draft = null;
+    this.preview = null;
+  },
+
+  ensureDraft: function(){
+    if(!this.draft){
+      var tbl = findTable(this.currentTableId);
+      if(tbl) this.draft = _clone(tbl);
+    }
+    return this.draft;
+  },
+
+  addColumn: function(){
+    var draft = this.ensureDraft();
+    if(!draft) return;
+    draft.columns = draft.columns || [];
+    draft.columns.push({
+      id: _uid(),
+      name: generateUniqueColumnName(draft, 'new_column'),
+      type: 'varchar',
+      length: 255,
+      scale: null,
+      is_array: false,
+      nullable: true,
+      unique: false,
+      primary_key: false,
+      pk_order: null,
+      default_val: null,
+      check_expr: null,
+      generated_expr: null,
+      generated_stored: false,
+      comment: '',
+      foreign_key: null
+    });
+    this.render();
+  },
+
+  loadPreview: function(){
+    var draft = this.ensureDraft();
+    var self = this;
+    if(!draft) return;
+    _api('schema_studio_table_preview', {
+      schema: draft.schema || 'public',
+      table: draft.name,
+      limit: 12
+    }, 'POST').then(function(res){
+      if(self.currentTableId !== draft.id) return;
+      self.preview = Object.assign({
+        loading: false,
+        available: false,
+        columns: [],
+        rows: [],
+        message: ''
+      }, res || {});
+      self.preview.loading = false;
+      self.render();
+    }).catch(function(){
+      self.preview = {
+        loading: false,
+        available: false,
+        columns: [],
+        rows: [],
+        message: _t('Không thể tải dữ liệu mẫu ở thời điểm này', 'Could not load sample data right now')
+      };
+      self.render();
+    });
+  },
+
+  previewHtml: function(){
+    var preview = this.preview || {};
+    if(preview.loading){
+      return '<div class="ss-table-dialog-empty">' + _esc(_t('Đang tải dữ liệu mẫu...', 'Loading sample data...')) + '</div>';
+    }
+    if(!preview.available){
+      return '<div class="ss-table-dialog-empty">' + _esc(preview.message || _t('Bảng này chưa có dữ liệu mẫu hoặc chưa truy cập được từ database hiện tại', 'No sample data is available for this table from the current database')) + '</div>';
+    }
+    if(!(preview.columns || []).length){
+      return '<div class="ss-table-dialog-empty">' + _esc(_t('Không có cột nào để hiển thị', 'No columns to display')) + '</div>';
+    }
+    return [
+      '<div class="ss-table-dialog-data-wrap">',
+        '<table class="ss-table-dialog-data-table">',
+          '<thead><tr>',
+            (preview.columns || []).map(function(col){
+              return '<th>' + _esc(col.column_name || col.name || '') + '</th>';
+            }).join(''),
+          '</tr></thead>',
+          '<tbody>',
+            (preview.rows || []).length ? (preview.rows || []).map(function(row){
+              return '<tr>' + (preview.columns || []).map(function(col){
+                var key = col.column_name || col.name || '';
+                var value = row && Object.prototype.hasOwnProperty.call(row, key) ? row[key] : '';
+                if(value == null) value = '';
+                if(typeof value === 'object'){
+                  value = JSON.stringify(value);
+                }
+                return '<td>' + _esc(String(value)) + '</td>';
+              }).join('') + '</tr>';
+            }).join('') : '<tr><td colspan="' + String((preview.columns || []).length || 1) + '">' + _esc(_t('Bảng hiện chưa có dòng dữ liệu nào', 'This table currently has no rows')) + '</td></tr>',
+          '</tbody>',
+        '</table>',
+      '</div>'
+    ].join('');
+  },
+
+  collectForm: function(){
+    var draft = this.ensureDraft();
+    if(!draft) return null;
+    draft.name = _slug((document.getElementById('dlg-tbl-name').value || '').trim());
+    draft.schema = _slug((document.getElementById('dlg-tbl-schema').value || '').trim()) || 'public';
+    draft.domain = document.getElementById('dlg-tbl-domain').value || 'default';
+    draft.comment = (document.getElementById('dlg-tbl-comment').value || '').trim();
+    draft.tags = (document.getElementById('dlg-tbl-tags').value || '').split(',').map(function(item){ return item.trim(); }).filter(Boolean);
+    draft.color = document.getElementById('dlg-tbl-color').value || null;
+    draft.rls_enabled = !!document.getElementById('dlg-tbl-rls').checked;
+    draft.columns = Array.prototype.map.call(document.querySelectorAll('.ss-table-dialog-col-row'), function(row, index){
+      var base = _clone((draft.columns || [])[index] || {});
+      var typeInfo = parseTypeDefinition(row.querySelector('[data-field="type"]').value);
+      base.name = _slug((row.querySelector('[data-field="name"]').value || '').trim());
+      base.type = typeInfo.type || 'text';
+      base.length = typeInfo.length;
+      base.scale = typeInfo.scale;
+      base.is_array = !!typeInfo.is_array;
+      base.default_val = (row.querySelector('[data-field="default"]').value || '').trim() || null;
+      base.comment = (row.querySelector('[data-field="comment"]').value || '').trim();
+      base.nullable = !!row.querySelector('[data-field="nullable"]').checked;
+      base.primary_key = !!row.querySelector('[data-field="pk"]').checked;
+      base.pk_order = base.primary_key ? (base.pk_order || 1) : null;
+      return base;
+    });
+    return draft;
+  },
+
+  save: function(){
+    var tbl = findTable(this.currentTableId);
+    var draft = this.collectForm();
+    var names = {};
+    var duplicated = false;
+    var self = this;
+    if(!tbl || !draft) return;
+    if(!isValidIdentifier(draft.name)){
+      toast(_t('Tên bảng phải là snake_case hợp lệ', 'Table name must be valid snake_case'), 'error');
+      return;
+    }
+    if(((STORE.schema && STORE.schema.tables) || []).some(function(item){ return item.id !== tbl.id && item.name === draft.name; })){
+      toast(_t('Tên bảng đã tồn tại', 'Table name already exists'), 'error');
+      return;
+    }
+    (draft.columns || []).forEach(function(col){
+      if(!isValidIdentifier(col.name)) duplicated = col.name || '__invalid__';
+      if(names[col.name]) duplicated = col.name;
+      names[col.name] = true;
+    });
+    if(duplicated){
+      toast(_t('Tên cột chưa hợp lệ hoặc đang bị trùng: ' + duplicated, 'Invalid or duplicate column name: ' + duplicated), 'error');
+      return;
+    }
+    confirm2(_t('Lưu thay đổi cho bảng ' + draft.name + '?', 'Save changes for table ' + draft.name + '?'), false).then(function(ok){
+      if(!ok) return;
+      pushUndo();
+      tbl.name = draft.name;
+      tbl.schema = draft.schema;
+      tbl.domain = draft.domain;
+      tbl.comment = draft.comment;
+      tbl.tags = draft.tags;
+      tbl.color = draft.color;
+      tbl.rls_enabled = draft.rls_enabled;
+      tbl.columns = _clone(draft.columns || []);
+      tbl.canvas = tbl.canvas || {};
+      tbl.canvas.width = Math.max(tbl.canvas.width || TABLE_DEFAULT_WIDTH, estimateTableCardWidth(tbl));
+      TableCard.reRender(tbl.id);
+      Browser.render();
+      Inspector.renderTable(tbl.id);
+      markDirty();
+      saveDraft();
+      toast(_t('Đã lưu bảng ' + tbl.name, 'Saved table ' + tbl.name), 'success');
+      self.close();
+    });
+  },
+
+  render: function(){
+    var draft = this.ensureDraft();
+    var overlay = document.getElementById('ss-table-dialog-overlay');
+    if(!draft) return;
+    if(!overlay){
+      overlay = document.createElement('div');
+      overlay.className = 'ss-modal-overlay';
+      overlay.id = 'ss-table-dialog-overlay';
+      overlay.addEventListener('click', function(ev){
+        if(ev.target === overlay) TableDialog.close();
+      });
+      document.body.appendChild(overlay);
+    }
+    overlay.innerHTML = [
+      '<div class="ss-modal ss-table-dialog-modal">',
+        '<div class="ss-modal-header">',
+          '<div><strong>' + _esc(draft.name) + '</strong><div class="ss-field-hint">' + _esc(_t('Chi tiết bảng và dữ liệu mẫu', 'Table details and sample data')) + '</div></div>',
+          '<button type="button" class="hm-btn hm-btn-ghost ss-btn-sm" onclick="TableDialog.close()">' + _esc(_t('Đóng', 'Close')) + '</button>',
+        '</div>',
+        '<div class="ss-modal-body ss-table-dialog-body">',
+          '<div class="ss-table-dialog-grid">',
+            '<div class="ss-table-dialog-main">',
+              '<div class="ss-table-dialog-section">',
+                '<div class="ss-table-dialog-section-title">' + _esc(_t('Tổng quan', 'Overview')) + '</div>',
+                '<div class="ss-table-dialog-form-grid">',
+                  Inspector.fieldGroup(_t('Tên bảng', 'Table name'), '<input class="hm-input" id="dlg-tbl-name" value="' + _esc(draft.name) + '" />'),
+                  Inspector.fieldGroup('Schema', '<input class="hm-input" id="dlg-tbl-schema" value="' + _esc(draft.schema || 'public') + '" />'),
+                  Inspector.fieldGroup('Domain', '<select class="hm-input" id="dlg-tbl-domain">' + Object.keys(DOMAIN_COLORS).sort().map(function(domain){ return '<option value="' + _esc(domain) + '"' + (domain === (draft.domain || 'default') ? ' selected' : '') + '>' + _esc(domain) + '</option>'; }).join('') + '</select>'),
+                  Inspector.fieldGroup(_t('Màu', 'Color'), '<input type="color" id="dlg-tbl-color" value="' + _esc(Inspector.colorValue(draft.color || DOMAIN_COLORS[draft.domain] || DOMAIN_COLORS.default)) + '" />'),
+                '</div>',
+                Inspector.fieldGroup(_t('Mô tả', 'Comment'), '<textarea class="hm-input" id="dlg-tbl-comment" rows="3">' + _esc(draft.comment || '') + '</textarea>'),
+                Inspector.fieldGroup('Tags', '<input class="hm-input" id="dlg-tbl-tags" value="' + _esc((draft.tags || []).join(', ')) + '" placeholder="core, audit, qms" />'),
+                '<div class="ss-field-group"><label class="ss-toggle-row"><input type="checkbox" id="dlg-tbl-rls"' + (draft.rls_enabled ? ' checked' : '') + ' /><span>Row Level Security (RLS)</span></label></div>',
+              '</div>',
+              '<div class="ss-table-dialog-section">',
+                '<div class="ss-table-dialog-section-head"><div class="ss-table-dialog-section-title">' + _esc(_t('Cấu trúc cột', 'Columns')) + '</div><button type="button" class="hm-btn hm-btn-secondary ss-btn-xs" onclick="TableDialog.addColumn()">+ ' + _esc(_t('Thêm cột', 'Add column')) + '</button></div>',
+                '<div class="ss-table-dialog-columns">',
+                  (draft.columns || []).map(function(col){
+                    return [
+                      '<div class="ss-table-dialog-col-row">',
+                        '<div class="ss-table-dialog-col-grid">',
+                          Inspector.fieldGroup(_t('Tên cột', 'Column name'), '<input class="hm-input" data-field="name" value="' + _esc(col.name || '') + '" />'),
+                          Inspector.fieldGroup(_t('Kiểu dữ liệu', 'Data type'), '<input class="hm-input" data-field="type" value="' + _esc(fmtColType(col)) + '" placeholder="varchar(255)" />'),
+                          Inspector.fieldGroup('Default', '<input class="hm-input" data-field="default" value="' + _esc(col.default_val || '') + '" />'),
+                        '</div>',
+                        '<div class="ss-table-dialog-col-meta"><label class="ss-toggle-row"><input type="checkbox" data-field="nullable"' + (col.nullable ? ' checked' : '') + ' /><span>' + _esc(_t('Cho phép null', 'Nullable')) + '</span></label><label class="ss-toggle-row"><input type="checkbox" data-field="pk"' + (col.primary_key ? ' checked' : '') + ' /><span>PK</span></label></div>',
+                        Inspector.fieldGroup(_t('Mô tả cột', 'Column comment'), '<input class="hm-input" data-field="comment" value="' + _esc(col.comment || '') + '" />'),
+                      '</div>'
+                    ].join('');
+                  }).join(''),
+                '</div>',
+              '</div>',
+            '</div>',
+            '<div class="ss-table-dialog-side">',
+              '<div class="ss-table-dialog-section">',
+                '<div class="ss-table-dialog-section-title">' + _esc(_t('Dữ liệu mẫu', 'Sample data')) + '</div>',
+                this.previewHtml(),
+              '</div>',
+            '</div>',
+          '</div>',
+        '</div>',
+        '<div class="ss-modal-footer">',
+          '<button type="button" class="hm-btn hm-btn-ghost" onclick="TableDialog.close()">' + _esc(_t('Hủy', 'Cancel')) + '</button>',
+          '<button type="button" class="hm-btn hm-btn-primary" onclick="TableDialog.save()">' + _esc(_t('Lưu', 'Save')) + '</button>',
+        '</div>',
+      '</div>'
+    ].join('');
   }
 };
 
@@ -4690,6 +4975,7 @@ window.Layout = Layout;
 window.VirtualRenderer = VirtualRenderer;
 window.CmdPalette = CmdPalette;
 window.SchemaLib = SchemaLib;
+window.TableDialog = TableDialog;
 window.switchMode = switchMode;
 window.SchemaStudio = { init:init, destroy:destroy };
 window._renderSchemaStudio = function(page){

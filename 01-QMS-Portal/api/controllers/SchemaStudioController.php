@@ -96,6 +96,24 @@ class SchemaStudioController extends BaseController
         return Connection::getInstance()->getPdo();
     }
 
+    private function safeIdentifier(string $value, string $fallback = ''): string
+    {
+        $value = trim($value);
+        if ($value !== '' && preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $value)) {
+            return $value;
+        }
+        return $fallback;
+    }
+
+    private function quoteIdentifier(string $value): string
+    {
+        $safe = $this->safeIdentifier($value);
+        if ($safe === '') {
+            throw new RuntimeException('invalid_identifier');
+        }
+        return '"' . str_replace('"', '""', $safe) . '"';
+    }
+
     public function listDesigns(): never
     {
         $this->requireAuth();
@@ -586,6 +604,71 @@ class SchemaStudioController extends BaseController
             }
             error_log('[SchemaStudio] applyMigration failed: ' . $e->getMessage());
             $this->error('migration_failed', 500, 'Migration execution failed');
+        }
+    }
+
+    public function previewTableData(): never
+    {
+        $this->requireAuth();
+        $body = $this->jsonBody();
+        $schema = $this->safeIdentifier((string)($body['schema'] ?? 'public'), 'public');
+        $table = $this->safeIdentifier((string)($body['table'] ?? ''), '');
+        $limit = (int)($body['limit'] ?? 12);
+        $limit = max(1, min(25, $limit));
+
+        if ($table === '') {
+            $this->error('missing_table', 400);
+        }
+
+        $columns = [];
+
+        try {
+            $pdo = $this->db();
+            $colStmt = $pdo->prepare("
+                SELECT column_name, data_type
+                FROM information_schema.columns
+                WHERE table_schema = :schema AND table_name = :table
+                ORDER BY ordinal_position
+            ");
+            $colStmt->execute([
+                ':schema' => $schema,
+                ':table' => $table,
+            ]);
+            $columns = $colStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+            if (!$columns) {
+                $this->success([
+                    'available' => false,
+                    'schema' => $schema,
+                    'table' => $table,
+                    'columns' => [],
+                    'rows' => [],
+                    'message' => 'table_not_found',
+                ]);
+            }
+
+            $sql = 'SELECT * FROM ' . $this->quoteIdentifier($schema) . '.' . $this->quoteIdentifier($table) . ' LIMIT ' . $limit;
+            $rows = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+            $this->success([
+                'available' => true,
+                'schema' => $schema,
+                'table' => $table,
+                'columns' => $columns,
+                'rows' => $rows,
+                'rowCount' => count($rows),
+                'limit' => $limit,
+            ]);
+        } catch (Throwable $e) {
+            error_log('[SchemaStudio] previewTableData failed: ' . $e->getMessage());
+            $this->success([
+                'available' => false,
+                'schema' => $schema,
+                'table' => $table,
+                'columns' => $columns,
+                'rows' => [],
+                'message' => 'preview_unavailable',
+            ]);
         }
     }
 

@@ -1,6 +1,11 @@
+#content > #page-schema-studio.page {
+  padding: 0;
+}
+
 #page-schema-studio {
-  height: 100%;
-  min-height: calc(100vh - 120px);
+  height: calc(100vh - 56px);
+  min-height: calc(100vh - 56px);
+  overflow: hidden;
 }
 
 .ss-root {
@@ -17,12 +22,15 @@
   grid-template-rows: 48px 1fr 0;
   height: 100%;
   min-height: calc(100vh - 120px);
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
   overflow: hidden;
   background: var(--surface);
   color: var(--text-1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .ss-root.browser-collapsed {
@@ -202,7 +210,7 @@
   flex-direction: column;
   background: var(--sidebar-bg);
   color: var(--text-inverse);
-  border-right: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
 }
 
 .ss-browser-header {
@@ -551,7 +559,7 @@
 }
 
 .ss-root.browser-collapsed .ss-browser {
-  border-right: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
 }
 
 .ss-canvas-wrap {
@@ -699,7 +707,7 @@
   top: 0;
   left: 0;
   min-width: 260px;
-  max-width: 360px;
+  max-width: 560px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
@@ -783,10 +791,10 @@
 .ss-tbl-name {
   flex: 1;
   min-width: 0;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: var(--font-bold);
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
+  text-overflow: clip;
   white-space: nowrap;
   letter-spacing: -0.01em;
 }
@@ -796,19 +804,6 @@
   padding: 3px 7px;
   background: rgba(255, 255, 255, 0.18);
   color: var(--text-inverse);
-}
-
-.ss-table-actions {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  flex: 0 0 auto;
-  opacity: 0;
-  transition: opacity var(--transition-fast);
-}
-
-.ss-table-card:hover .ss-table-actions {
-  opacity: 1;
 }
 
 .ss-icon-btn {
@@ -956,19 +951,6 @@
   transform: scale(1.12);
 }
 
-.ss-col-item-add {
-  padding: 9px 12px;
-  border-top: 1px dashed var(--border);
-  color: var(--text-3);
-  font-size: var(--text-xs);
-  cursor: pointer;
-}
-
-.ss-col-item-add:hover {
-  color: var(--color-blue);
-  background: var(--surface-2);
-}
-
 .ss-table-footer {
   padding: 7px 12px;
   border-top: 1px dashed var(--border);
@@ -977,8 +959,7 @@
 }
 
 .ss-table-card.collapsed .ss-col-list,
-.ss-table-card.collapsed .ss-table-footer,
-.ss-table-card.collapsed .ss-col-item-add {
+.ss-table-card.collapsed .ss-table-footer {
   display: none;
 }
 
@@ -1028,7 +1009,7 @@
 .ss-inspector {
   grid-row: 2;
   overflow: auto;
-  border-left: 1px solid var(--border);
+  border-left: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
   background: var(--surface);
 }
 
@@ -1044,6 +1025,10 @@
 }
 
 .ss-inspector-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
   padding: var(--space-2);
   border-bottom: 1px solid var(--border);
   position: sticky;
@@ -1051,6 +1036,14 @@
   background: color-mix(in srgb, var(--surface) 92%, transparent);
   backdrop-filter: blur(8px);
   z-index: 1;
+}
+
+.ss-inspector-tab-list,
+.ss-inspector-tab-tools {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
 }
 
 .ss-inspector-body {
@@ -1873,6 +1866,12 @@
 
 .ss-root {
   grid-template-rows: minmax(56px, auto) 1fr 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  border-radius: 0;
+  border: 0;
+  box-shadow: none;
 }
 
 .ss-root.code-open {
@@ -1926,6 +1925,124 @@
 
 #header .doc-header-toolbar .ss-toolbar-status-pill {
   white-space: nowrap;
+}
+
+.ss-validation-panel {
+  margin: 0;
+  border-left: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+  border-radius: 0;
+}
+
+.ss-table-dialog-modal {
+  width: min(1180px, calc(100vw - 48px));
+}
+
+.ss-table-dialog-body {
+  padding-top: var(--space-3);
+}
+
+.ss-table-dialog-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.ss-table-dialog-main,
+.ss-table-dialog-side {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.ss-table-dialog-section {
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+}
+
+.ss-table-dialog-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.ss-table-dialog-section-title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-1);
+}
+
+.ss-table-dialog-form-grid,
+.ss-table-dialog-col-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.ss-table-dialog-columns {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.ss-table-dialog-col-row {
+  padding: var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.ss-table-dialog-col-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.ss-table-dialog-empty {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: var(--text-3);
+}
+
+.ss-table-dialog-data-wrap {
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.ss-table-dialog-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.ss-table-dialog-data-table th,
+.ss-table-dialog-data-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.ss-table-dialog-data-table th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-weight: var(--font-semibold);
+}
+
+@media (max-width: 1280px) {
+  .ss-table-dialog-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .ss-toolbar-status-pill {

@@ -572,6 +572,7 @@ $router->actions([
     'schema_studio_load_registry'   => [SchemaStudioController::class, 'loadFromRegistry'],
     'schema_studio_validate'        => [SchemaStudioController::class, 'validateSchema'],
     'schema_studio_apply_migration' => [SchemaStudioController::class, 'applyMigration'],
+    'schema_studio_table_preview'   => [SchemaStudioController::class, 'previewTableData'],
     'schema_studio_export'          => [SchemaStudioController::class, 'export'],
 ]);
 
