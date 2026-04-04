@@ -65,6 +65,32 @@ class SchemaStudioController extends BaseController
         return $this->snapshotDir . '/' . $this->safeId($id) . '.baseline.json';
     }
 
+    private function normalizeFieldList($value): array
+    {
+        if (is_array($value)) {
+            return array_values(array_filter(array_map(static function ($item): string {
+                return trim((string)$item);
+            }, $value), static function (string $item): bool {
+                return $item !== '';
+            }));
+        }
+
+        if (is_string($value)) {
+            return array_values(array_filter(array_map(static function (string $item): string {
+                return trim($item);
+            }, explode(',', $value)), static function (string $item): bool {
+                return $item !== '';
+            }));
+        }
+
+        if (is_scalar($value)) {
+            $single = trim((string)$value);
+            return $single === '' ? [] : [$single];
+        }
+
+        return [];
+    }
+
     private function db(): PDO
     {
         return Connection::getInstance()->getPdo();
@@ -261,29 +287,53 @@ class SchemaStudioController extends BaseController
         }
 
         foreach (($relationMap['edges'] ?? []) as $edge) {
-            $fromTable = (string)($edge['from']['entity'] ?? '');
-            $fromCol = (string)($edge['from']['field'] ?? '');
-            $toTable = (string)($edge['to']['entity'] ?? '');
-            $toCol = (string)($edge['to']['field'] ?? 'id');
+            $fromTable = is_scalar($edge['from']['entity'] ?? null) ? trim((string)$edge['from']['entity']) : '';
+            $toTable = is_scalar($edge['to']['entity'] ?? null) ? trim((string)$edge['to']['entity']) : '';
+            $fromFields = $this->normalizeFieldList($edge['from']['field'] ?? '');
+            $toFields = $this->normalizeFieldList($edge['to']['field'] ?? 'id');
             $fromTableId = $tableMap[$fromTable] ?? null;
             $toTableId = $tableMap[$toTable] ?? null;
-            $fromColId = $colMap[$fromTable . '.' . $fromCol] ?? null;
-            $toColId = $colMap[$toTable . '.' . $toCol] ?? null;
-            if (!$fromTableId || !$toTableId || !$fromColId || !$toColId) {
+            if (!$fromTableId || !$toTableId || empty($fromFields) || empty($toFields)) {
                 continue;
             }
-            $schema['relations'][] = [
-                'id' => 'rel_' . substr(md5($fromTable . '.' . $fromCol . '>' . $toTable . '.' . $toCol), 0, 10),
-                'from_table_id' => $fromTableId,
-                'from_col_id' => $fromColId,
-                'to_table_id' => $toTableId,
-                'to_col_id' => $toColId,
-                'name' => 'fk_' . $fromTable . '_' . $fromCol,
-                'on_delete' => (string)($edge['cascadeActions']['delete'] ?? 'RESTRICT'),
-                'on_update' => (string)($edge['cascadeActions']['update'] ?? 'CASCADE'),
-                'nullable' => true,
-                'edge' => ['type' => 'orthogonal', 'waypoints' => []],
-            ];
+
+            $pairCount = min(count($fromFields), count($toFields));
+            $onDelete = is_scalar($edge['cascadeActions']['delete'] ?? null) ? trim((string)$edge['cascadeActions']['delete']) : 'RESTRICT';
+            $onUpdate = is_scalar($edge['cascadeActions']['update'] ?? null) ? trim((string)$edge['cascadeActions']['update']) : 'CASCADE';
+            if ($onDelete === '') {
+                $onDelete = 'RESTRICT';
+            }
+            if ($onUpdate === '') {
+                $onUpdate = 'CASCADE';
+            }
+
+            for ($pairIndex = 0; $pairIndex < $pairCount; $pairIndex++) {
+                $fromCol = $fromFields[$pairIndex] ?? '';
+                $toCol = $toFields[$pairIndex] ?? 'id';
+                if ($fromCol === '' || $toCol === '') {
+                    continue;
+                }
+
+                $fromColId = $colMap[$fromTable . '.' . $fromCol] ?? null;
+                $toColId = $colMap[$toTable . '.' . $toCol] ?? null;
+                if (!$fromColId || !$toColId) {
+                    continue;
+                }
+
+                $suffix = $pairCount > 1 ? '_' . ($pairIndex + 1) : '';
+                $schema['relations'][] = [
+                    'id' => 'rel_' . substr(md5($fromTable . '.' . $fromCol . '>' . $toTable . '.' . $toCol), 0, 10),
+                    'from_table_id' => $fromTableId,
+                    'from_col_id' => $fromColId,
+                    'to_table_id' => $toTableId,
+                    'to_col_id' => $toColId,
+                    'name' => 'fk_' . $fromTable . '_' . $fromCol . $suffix,
+                    'on_delete' => $onDelete,
+                    'on_update' => $onUpdate,
+                    'nullable' => true,
+                    'edge' => ['type' => 'orthogonal', 'waypoints' => []],
+                ];
+            }
         }
 
         foreach ($schema['tables'] as &$table) {
