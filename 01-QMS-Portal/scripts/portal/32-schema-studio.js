@@ -2265,7 +2265,7 @@ function modeLabel(mode){
   return _t('Sơ đồ', 'Canvas');
 }
 
-var Browser = {
+var BrowserLegacy = {
   getVisibleTables: function(){
     var tables = typeof Browser !== 'undefined' && Browser.getCanvasTables ? Browser.getCanvasTables() : ((STORE.schema && STORE.schema.tables) || []);
     var filter = String(STORE.browser.filter || '').trim().toLowerCase();
