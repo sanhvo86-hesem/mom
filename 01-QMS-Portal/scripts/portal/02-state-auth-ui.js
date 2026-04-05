@@ -1308,7 +1308,7 @@ function teardownCurrentPageModule(){
 
 function resolvePortalScriptUrl(fragment){
   var src = './scripts/portal/' + fragment;
-  return src + (src.indexOf('?') >= 0 ? '&' : '?') + 'v=20260405t';
+  return src + (src.indexOf('?') >= 0 ? '&' : '?') + 'v=20260405u';
 }
 
 function renderModuleBuilderStatus(container, mode, detail){
@@ -1343,24 +1343,57 @@ function renderModuleBuilderStatus(container, mode, detail){
 function ensurePortalRenderer(fragment, globalName, forceReload){
   return new Promise(function(resolve, reject){
     var script;
+    var scriptUrl;
+    function finishResolve(){
+      if(typeof window[globalName] === 'function'){
+        resolve(window[globalName]);
+        return true;
+      }
+      return false;
+    }
+    function loadViaScriptTag(){
+      script = document.createElement('script');
+      script.charset = 'UTF-8';
+      script.src = scriptUrl;
+      script.onload = function(){
+        if(!finishResolve()){
+          reject(new Error(globalName + '_missing'));
+        }
+      };
+      script.onerror = function(){
+        reject(new Error('script_load_failed'));
+      };
+      document.body.appendChild(script);
+    }
     if(!forceReload && typeof window[globalName] === 'function'){
       resolve(window[globalName]);
       return;
     }
-    script = document.createElement('script');
-    script.charset = 'UTF-8';
-    script.src = resolvePortalScriptUrl(fragment) + '&portal_reload=' + Date.now();
-    script.onload = function(){
-      if(typeof window[globalName] === 'function'){
-        resolve(window[globalName]);
-      } else {
-        reject(new Error(globalName + '_missing'));
+    scriptUrl = resolvePortalScriptUrl(fragment) + '&portal_reload=' + Date.now();
+    if(typeof fetch !== 'function'){
+      loadViaScriptTag();
+      return;
+    }
+    fetch(scriptUrl, { credentials:'same-origin', cache:'no-store' }).then(function(resp){
+      if(!resp || !resp.ok) throw new Error('script_http_' + ((resp && resp.status) || 'failed'));
+      return resp.text();
+    }).then(function(text){
+      if(!text || /^\s*</.test(text)) throw new Error('script_response_invalid');
+      try{
+        window.eval(String(text) + '\n//# sourceURL=' + scriptUrl);
+      }catch(evalErr){
+        throw new Error(evalErr && evalErr.message ? evalErr.message : 'script_eval_failed');
       }
-    };
-    script.onerror = function(){
-      reject(new Error('script_load_failed'));
-    };
-    document.body.appendChild(script);
+      if(!finishResolve()){
+        throw new Error(globalName + '_missing');
+      }
+    }).catch(function(fetchErr){
+      if(String(fetchErr && fetchErr.message || '').indexOf(globalName + '_missing') >= 0){
+        reject(fetchErr);
+        return;
+      }
+      loadViaScriptTag();
+    });
   });
 }
 
