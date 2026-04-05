@@ -3752,7 +3752,7 @@ function _ensureBuilderStyles(){
   css += '.mb-hero-select:after{content:"▾";position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;line-height:1;opacity:.76}';
   css += '.mb-hero-select-input{border:0;background:transparent;color:inherit;font:inherit;font-size:12px;font-weight:700;line-height:1;min-width:0;width:40px;padding:0 12px 0 0;appearance:none;cursor:pointer;outline:none;box-shadow:none;text-align:center;text-align-last:center}';
   css += '.mb-hero-select-input option{color:#0f172a;background:#fff}';
-  css += '.mb-floating-tooltip{position:fixed;left:0;top:0;transform:translateX(-50%);opacity:0;pointer-events:none;white-space:nowrap;font-size:12px;font-weight:700;line-height:1;padding:8px 10px;border-radius:10px;background:#0f172a;color:#fff;box-shadow:0 12px 28px rgba(15,23,42,0.22);transition:none;z-index:1800}';
+  css += '.mb-floating-tooltip{position:fixed;left:0;top:0;transform:translateX(-50%);opacity:0;pointer-events:none;white-space:nowrap;max-width:var(--tooltip-max-width,280px);font-size:var(--tooltip-font-size,12px);font-weight:700;line-height:1;padding:var(--tooltip-padding-y,8px) var(--tooltip-padding-x,10px);border-radius:var(--tooltip-radius,10px);background:var(--tooltip-bg,#0f172a);color:var(--tooltip-color,#fff);box-shadow:0 12px 28px rgba(15,23,42,0.22);transition:none;z-index:1800}';
   css += '.mb-floating-tooltip.is-visible{opacity:1}';
   css += '.mb-canvas-toolbar--hero{padding:12px 14px;border:1px solid rgba(255,255,255,0.16);border-radius:18px;background:rgba(255,255,255,0.08);backdrop-filter:blur(10px)}';
   css += '.mb-canvas-toolbar--hero .mb-toolbar-group{gap:6px}';

@@ -83,7 +83,7 @@ function _ensureStyles(){
     '.en-day-bar{flex:1;min-width:12px;max-width:40px;border-radius:4px 4px 0 0;transition:height .3s;cursor:pointer;position:relative}',
     '.en-day-bar:hover{opacity:.85}',
     '.en-day-label{text-align:center;font-size:.6rem;color:var(--text-secondary,#64748b);margin-top:2px}',
-    '.en-day-tooltip{position:absolute;bottom:105%;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:4px 8px;border-radius:4px;font-size:.7rem;white-space:nowrap;display:none;z-index:10}',
+    '.en-day-tooltip{position:absolute;bottom:105%;left:50%;transform:translateX(-50%);background:var(--tooltip-bg,#1a1a1a);color:var(--tooltip-color,#fff);padding:var(--tooltip-padding-y,4px) var(--tooltip-padding-x,8px);border-radius:var(--tooltip-radius,4px);font-size:var(--tooltip-font-size,.7rem);max-width:var(--tooltip-max-width,280px);white-space:nowrap;display:none;z-index:10}',
     '.en-day-bar:hover .en-day-tooltip{display:block}',
     /* split bar (idle vs production) */
     '.en-split-wrap{display:flex;gap:20px;margin:16px 0;flex-wrap:wrap}',
@@ -101,7 +101,7 @@ function _ensureStyles(){
     '.en-month-bar{flex:1;min-width:20px;border-radius:4px 4px 0 0;transition:height .3s;position:relative;cursor:pointer}',
     '.en-month-bar:hover{opacity:.85}',
     '.en-month-label{text-align:center;font-size:.65rem;color:var(--text-secondary,#64748b);margin-top:2px}',
-    '.en-month-tooltip{position:absolute;bottom:105%;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:4px 8px;border-radius:4px;font-size:.7rem;white-space:nowrap;display:none;z-index:10}',
+    '.en-month-tooltip{position:absolute;bottom:105%;left:50%;transform:translateX(-50%);background:var(--tooltip-bg,#1a1a1a);color:var(--tooltip-color,#fff);padding:var(--tooltip-padding-y,4px) var(--tooltip-padding-x,8px);border-radius:var(--tooltip-radius,4px);font-size:var(--tooltip-font-size,.7rem);max-width:var(--tooltip-max-width,280px);white-space:nowrap;display:none;z-index:10}',
     '.en-month-bar:hover .en-month-tooltip{display:block}',
     /* category cost bars */
     '.en-cat-bars{display:flex;flex-direction:column;gap:8px;max-width:600px;margin-top:12px}',

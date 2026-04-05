@@ -41,16 +41,16 @@
       '@keyframes si-spin{to{transform:translateY(-50%) rotate(360deg)}}',
       '.si-wrap.is-loading .si-spinner{display:block}',
       '.si-wrap.is-loading .si-clear{display:none!important}',
-      '.si-dropdown{position:absolute;left:0;right:0;z-index:200;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 10px 25px -5px rgba(0,0,0,.1),0 4px 6px -2px rgba(0,0,0,.05);max-height:240px;overflow-y:auto;display:none;margin-top:4px;scrollbar-width:thin}',
+      '.si-dropdown{position:absolute;left:0;right:0;z-index:200;background:var(--dropdown-bg,var(--bg-surface,#fff));border:var(--dropdown-border,1px solid var(--border,#e2e8f0));border-radius:var(--dropdown-radius,8px);box-shadow:var(--dropdown-shadow,0 10px 25px -5px rgba(0,0,0,.1),0 4px 6px -2px rgba(0,0,0,.05));max-height:240px;overflow-y:auto;display:none;margin-top:4px;scrollbar-width:thin}',
       '.si-dropdown.is-open{display:block}',
       '.si-dropdown.above{margin-top:0;margin-bottom:4px;bottom:100%;top:auto}',
-      '.si-item{padding:8px 12px;font-size:.8125rem;cursor:pointer;transition:background .1s;display:flex;align-items:center;gap:8px;color:#1e293b}',
-      '.si-item:hover,.si-item.is-active{background:#eff6ff}',
+      '.si-item{padding:var(--dropdown-item-padding,8px 12px);font-size:var(--dropdown-item-font-size,.8125rem);cursor:pointer;transition:background .1s;display:flex;align-items:center;gap:8px;color:var(--text-primary,#1e293b);line-height:var(--leading-normal,1.5)}',
+      '.si-item:hover,.si-item.is-active{background:var(--dropdown-item-hover-bg,#eff6ff)}',
       '.si-item-main{flex:1;min-width:0}',
       '.si-item-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-      '.si-item-sub{font-size:.6875rem;color:#94a3b8;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '.si-item-sub{font-size:calc(var(--dropdown-item-font-size,.8125rem) - .125rem);color:var(--text-tertiary,#94a3b8);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
       '.si-highlight{background:#fef08a;color:#92400e;border-radius:2px;font-weight:600}',
-      '.si-empty{padding:16px;text-align:center;font-size:.8125rem;color:#94a3b8}',
+      '.si-empty{padding:16px;text-align:center;font-size:var(--dropdown-item-font-size,.8125rem);color:var(--text-tertiary,#94a3b8)}',
       '.si-empty svg{display:block;margin:0 auto 8px;opacity:.5}'
     ].join('\n');
     document.head.appendChild(style);

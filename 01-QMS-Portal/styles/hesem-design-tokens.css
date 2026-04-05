@@ -317,6 +317,10 @@
 
 /* ── Labels ──────────────────────────────────────────────────────────────── */
 .hm-label { display: block; font-family: var(--font-label, var(--font)); font-size: var(--text-sm); font-weight: var(--font-label-weight, var(--font-semibold)); letter-spacing: var(--label-letter-spacing, 0); text-transform: var(--label-transform, none); color: var(--text-secondary); margin-bottom: var(--field-label-gap, var(--space-1)); }
+.hm-label svg,
+.hm-label i,
+.hm-badge svg,
+.hm-badge i { width: var(--hds-icon-sm, 14px); height: var(--hds-icon-sm, 14px); font-size: var(--hds-icon-sm, 14px); flex-shrink: 0; }
 .hm-label-required::after { content: ' *'; color: var(--red); }
 
 /* ── Cards ───────────────────────────────────────────────────────────────── */
@@ -343,8 +347,8 @@
   padding: var(--card-body-padding, var(--space-4));
   text-align: center;
 }
-.hm-kpi-value { font-size: var(--text-2xl); font-weight: var(--font-bold); color: var(--text-primary); line-height: 1.2; }
-.hm-kpi-label { font-size: var(--text-xs); color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-top: var(--space-1); }
+.hm-kpi-value { font-size: var(--text-2xl); font-weight: var(--font-bold); color: var(--text-primary); line-height: var(--leading-tight, 1.2); }
+.hm-kpi-label { font-size: var(--text-xs); color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; line-height: var(--leading-normal, 1.5); margin-top: var(--space-1); }
 .hm-kpi-trend { font-size: var(--kpi-trend-font-size, var(--text-xs)); margin-top: var(--space-1); }
 .hm-kpi-trend-up { color: var(--green); }
 .hm-kpi-trend-down { color: var(--red); }
@@ -435,12 +439,15 @@
 }
 
 /* ── Tables ──────────────────────────────────────────────────────────────── */
-.hm-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+.hm-table { width: 100%; border-collapse: collapse; font-size: var(--hds-table-body-font, var(--text-sm)); }
+.hm-table thead tr,
+.hm-table tbody tr { height: var(--hds-table-row-h, auto); }
 .hm-table th {
   text-align: left;
-  padding: var(--space-3);
-  font-size: var(--text-xs);
+  padding: var(--hds-table-cell-py, var(--space-3)) var(--hds-table-cell-px, var(--space-3));
+  font-size: var(--hds-table-head-font, var(--text-xs));
   font-weight: var(--table-header-font-weight, var(--font-semibold));
+  line-height: var(--leading-normal, 1.5);
   color: var(--text-secondary);
   text-transform: var(--table-header-text-transform, uppercase);
   letter-spacing: var(--table-header-letter-spacing, 0.05em);
@@ -451,7 +458,7 @@
   top: 0;
   z-index: var(--z-base);
 }
-.hm-table td { padding: var(--space-3); border-bottom: var(--table-border-width, 1px) var(--table-border-style, solid) var(--border); vertical-align: middle; }
+.hm-table td { padding: var(--hds-table-cell-py, var(--space-3)) var(--hds-table-cell-px, var(--space-3)); border-bottom: var(--table-border-width, 1px) var(--table-border-style, solid) var(--border); vertical-align: middle; line-height: var(--leading-normal, 1.5); }
 .hm-table tbody tr:nth-child(odd) td { background: var(--table-row-stripe, transparent); }
 .hm-table tbody tr:nth-child(even) td { background: var(--table-row-stripe-alt, transparent); }
 .hm-table tr:hover td { background: var(--bg-hover); }
@@ -479,8 +486,8 @@
   gap: var(--space-4);
   margin-bottom: var(--space-6);
 }
-.hm-page-title { font-size: var(--text-xl); font-weight: var(--font-bold); color: var(--text-primary); margin: 0; }
-.hm-page-subtitle { font-size: var(--text-sm); color: var(--text-secondary); margin-top: var(--field-label-gap, var(--space-1)); }
+.hm-page-title { font-size: var(--text-xl); font-weight: var(--font-bold); line-height: var(--leading-tight, 1.25); color: var(--text-primary); margin: 0; }
+.hm-page-subtitle { font-size: var(--text-sm); line-height: var(--leading-relaxed, 1.75); color: var(--text-secondary); margin-top: var(--field-label-gap, var(--space-1)); }
 
 /* ── Empty State ─────────────────────────────────────────────────────────── */
 .hm-empty {
@@ -488,6 +495,7 @@
   padding: var(--empty-padding, var(--space-10) var(--space-6));
   color: var(--text-tertiary);
   font-size: var(--empty-desc-font-size, var(--text-sm));
+  line-height: var(--leading-relaxed, 1.75);
 }
 .hm-empty-icon { font-size: var(--empty-icon-size, var(--text-3xl)); margin-bottom: var(--space-3); opacity: var(--empty-icon-opacity, 0.5); }
 .hm-empty strong,
@@ -574,8 +582,8 @@
 .hm-checksheet-wrap { overflow-x: auto; }
 .hm-checksheet { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--bg-surface); border: var(--table-border-width, 1px) var(--table-border-style, solid) var(--border); border-radius: var(--radius-lg); overflow: hidden; }
 .hm-checksheet th,
-.hm-checksheet td { padding: 10px 12px; border-bottom: var(--table-border-width, 1px) var(--table-border-style, solid) var(--border); border-right: var(--table-border-width, 1px) var(--table-border-style, solid) var(--border); text-align: center; vertical-align: middle; }
-.hm-checksheet th { background: var(--table-header-bg, var(--bg-surface-alt)); font-size: var(--text-xs); font-weight: var(--table-header-font-weight, var(--font-semibold)); color: var(--text-secondary); text-transform: var(--table-header-text-transform, none); letter-spacing: var(--table-header-letter-spacing, 0); }
+.hm-checksheet td { padding: var(--hds-table-cell-py, 10px) var(--hds-table-cell-px, 12px); min-height: var(--hds-table-row-h, auto); border-bottom: var(--table-border-width, 1px) var(--table-border-style, solid) var(--border); border-right: var(--table-border-width, 1px) var(--table-border-style, solid) var(--border); text-align: center; vertical-align: middle; line-height: var(--leading-normal, 1.5); }
+.hm-checksheet th { background: var(--table-header-bg, var(--bg-surface-alt)); font-size: var(--hds-table-head-font, var(--text-xs)); font-weight: var(--table-header-font-weight, var(--font-semibold)); color: var(--text-secondary); text-transform: var(--table-header-text-transform, none); letter-spacing: var(--table-header-letter-spacing, 0); line-height: var(--leading-normal, 1.5); }
 .hm-checksheet th[scope="row"] { text-align: left; color: var(--text-primary); }
 .hm-checksheet tfoot td,
 .hm-checksheet .hm-checksheet-total { background: var(--table-row-stripe-alt, var(--gray-50)); font-weight: var(--font-semibold); }
@@ -629,7 +637,7 @@
 .hm-record-field-third { grid-column: span 4; }
 .hm-record-field-full { grid-column: 1 / -1; }
 .hm-record-label { font-size: var(--text-xs); font-weight: var(--font-semibold); color: var(--text-secondary); text-transform: var(--label-transform, uppercase); letter-spacing: var(--label-letter-spacing, 0.05em); margin-bottom: var(--field-label-gap, 8px); }
-.hm-record-value { width: 100%; padding: 0; border: none; background: transparent; text-align: left; font-size: var(--text-sm); color: var(--text-primary); cursor: pointer; }
+.hm-record-value { width: 100%; padding: 0; border: none; background: transparent; text-align: left; font-size: var(--text-sm); line-height: var(--leading-relaxed, 1.75); color: var(--text-primary); cursor: pointer; }
 
 .hm-managed-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--field-group-gap, var(--space-3)); }
 .hm-checkbox-label { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--text-primary); font-size: var(--text-sm); }
@@ -650,7 +658,7 @@
 .hm-form-wizard-panel { border: var(--card-border-width, 1px) solid var(--border); border-radius: var(--radius-xl); background: var(--bg-surface); padding: var(--card-body-padding, var(--space-4)); box-shadow: var(--card-shadow, var(--shadow-xs)); }
 .hm-form-wizard-header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-3); margin-bottom: var(--space-3); }
 .hm-form-wizard-header h3 { margin: 0 0 4px; font-size: var(--text-lg); color: var(--text-primary); }
-.hm-form-wizard-header p { margin: 0; color: var(--text-secondary); font-size: var(--text-sm); }
+.hm-form-wizard-header p { margin: 0; color: var(--text-secondary); font-size: var(--text-sm); line-height: var(--leading-relaxed, 1.75); }
 .hm-form-wizard-forward .hm-form-wizard-panel { animation: hm-chart-fade 0.24s ease; }
 .hm-form-wizard-backward .hm-form-wizard-panel { animation: hm-chart-fade 0.24s ease reverse; }
 .hm-form-wizard-actions { display: flex; justify-content: flex-end; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-4); }
@@ -662,11 +670,11 @@
 .hm-form-modal-wrap { display: grid; gap: var(--field-gap, var(--space-2)); }
 .hm-form-modal-overlay { position: fixed; inset: 0; z-index: var(--z-modal); background: var(--modal-backdrop-color, rgba(15, 23, 42, 0.38)); display: flex; align-items: center; justify-content: center; padding: var(--space-4); backdrop-filter: blur(var(--backdrop-blur, 0px)); }
 .hm-form-modal-backdrop { position: absolute; inset: 0; }
-.hm-form-modal { position: relative; z-index: 1; width: min(100%, 720px); max-height: calc(100vh - 48px); overflow: auto; background: var(--bg-modal); border: var(--card-border-width, 1px) solid var(--border); border-radius: var(--modal-border-radius, 20px); box-shadow: var(--modal-shadow, var(--shadow-xl)); padding: var(--modal-padding, var(--space-4)); }
-.hm-form-modal-sm { max-width: 420px; }
-.hm-form-modal-md { max-width: 640px; }
-.hm-form-modal-lg { max-width: 860px; }
-.hm-form-modal-xl { max-width: 1040px; }
+.hm-form-modal { position: relative; z-index: 1; width: 100%; max-width: var(--modal-max-w, 720px); max-height: calc(100vh - 48px); overflow: auto; background: var(--bg-modal); border: var(--card-border-width, 1px) solid var(--border); border-radius: var(--modal-border-radius, 20px); box-shadow: var(--modal-shadow, var(--shadow-xl)); padding: var(--modal-padding, var(--space-4)); }
+.hm-form-modal-sm { max-width: min(var(--modal-sm-max-w, 420px), var(--modal-max-w, 720px)); }
+.hm-form-modal-md { max-width: min(640px, var(--modal-max-w, 720px)); }
+.hm-form-modal-lg { max-width: min(860px, var(--modal-max-w, 720px)); }
+.hm-form-modal-xl { max-width: min(1040px, var(--modal-max-w, 720px)); }
 .hm-form-modal-header { display: flex; justify-content: space-between; gap: var(--field-gap, var(--space-3)); align-items: center; margin-bottom: var(--modal-header-padding-v, var(--space-3)); }
 .hm-form-modal-header h3 { margin: 0; font-size: var(--text-lg); color: var(--text-primary); }
 .hm-form-modal-actions { display: flex; justify-content: flex-end; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-4); }
