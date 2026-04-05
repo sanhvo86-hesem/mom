@@ -1,5 +1,12 @@
 {
-    "density": "default",
+    "density": {
+        "controlGap": "2px",
+        "controlH": "24px",
+        "controlHSm": "20px",
+        "controlHLg": "32px",
+        "iconSm": "14px",
+        "iconMd": "16px"
+    },
     "colorMode": "light",
     "radius": "rounded",
     "motion": "normal",
@@ -133,20 +140,43 @@
     },
     "components": {
         "btn": {
-            "paddingX": "8",
-            "gap": "3"
+            "paddingX": "8px",
+            "gap": "7px",
+            "paddingY": "6px",
+            "borderWidth": "1px",
+            "minWidth": "12px",
+            "letterSpacing": "0em"
         },
         "tab": {
-            "paddingY": "10px",
-            "paddingX": "10px",
-            "radius": "5px",
+            "paddingY": "8px",
+            "paddingX": "6px",
+            "radius": "6px",
             "fontSize": "12px"
+        },
+        "table": {
+            "borderWidth": "1px",
+            "headerFontWeight": "400px",
+            "headerLetterSpacing": "0em"
+        },
+        "card": {
+            "borderWidth": "0px",
+            "headerPadding": "8px",
+            "bodyPadding": "8px"
+        },
+        "badge": {
+            "letterSpacing": "0em",
+            "borderWidth": "1px",
+            "minWidth": "0px"
+        },
+        "input": {
+            "paddingY": "1px",
+            "borderWidth": "1px"
         }
     },
     "_meta": {
         "version": "2.0",
         "description": "Admin-configurable design system.",
-        "updatedAt": "2026-04-05T10:41:51+07:00",
+        "updatedAt": "2026-04-05T11:25:31+07:00",
         "updatedBy": "sanh.vo"
     }
 }
