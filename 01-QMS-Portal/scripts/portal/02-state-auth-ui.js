@@ -5307,14 +5307,25 @@ function renderAdminMetadataStudio(){
 function renderAdminAppearance(){
   const el=document.getElementById('admin-content');
   if(!el) return;
+  var expectedVersion = '20260405b';
   /* Delegate to external file if loaded, otherwise fallback inline */
-  if(typeof window._renderAdminAppearanceFull === 'function'){
+  if(typeof window._renderAdminAppearanceFull === 'function' && window._renderAdminAppearanceFullVersion === expectedVersion){
     window._renderAdminAppearanceFull(el, _appSubTab, lang);
     return;
   }
+  var existing = document.getElementById('hm-admin-appearance-script');
+  if(existing) existing.remove();
+  try {
+    delete window._renderAdminAppearanceFull;
+    delete window._renderAdminAppearanceFullVersion;
+  } catch(e){
+    window._renderAdminAppearanceFull = null;
+    window._renderAdminAppearanceFullVersion = null;
+  }
   /* Fallback: load external script then render */
   var script = document.createElement('script');
-  script.src = 'scripts/portal/00c-admin-appearance.js?v=20260403';
+  script.id = 'hm-admin-appearance-script';
+  script.src = 'scripts/portal/00c-admin-appearance.js?v=' + expectedVersion;
   script.onload = function(){
     if(typeof window._renderAdminAppearanceFull === 'function'){
       window._renderAdminAppearanceFull(el, _appSubTab, lang);
