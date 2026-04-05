@@ -8,6 +8,45 @@
 
 var BE = window.HmBlockEngine || {};
 var MR = window.HmModuleRouter || {};
+var render;
+var _paint;
+var _renderLibraryPanelLegacyA;
+var _renderPropertiesPanelLegacyA;
+var _renderBuilderLegacyB;
+var _renderHeroActionButton;
+var _renderHeroSelectControl;
+var _renderLibraryPanel;
+var _renderPropertiesPanelLegacyB;
+var _renderBuilderLegacyA;
+var _renderCanvasToolbar;
+var _renderPropertiesPanel;
+var _renderBuilder;
+var _renderPreview;
+var _createBlockScaffold;
+var _createBlankModule;
+var _addBlockToSchema;
+var _removeBlock;
+var _duplicateBlock;
+var _moveBlock;
+var _saveBlockProps;
+var _loadSavedModules;
+var _addToSavedModules;
+var _saveModule;
+var _openSavedModule;
+var _deleteSavedModule;
+var _openBlockConfig;
+var _handleWheel;
+var _handleDragStart;
+var _handleDragOver;
+var _handleDrop;
+var _handleDragEnd;
+var _handleTouchStart;
+var _handleTouchMove;
+var _handleTouchEnd;
+var _handleTouchCancel;
+var _handleContextMenu;
+var _handleClick;
+var _handleInput;
 function _t(vi,en){ return BE._t ? BE._t(vi,en) : vi; }
 function _esc(v){ return BE._esc ? BE._esc(v) : String(v==null?'':v); }
 function _uid(){ return 'blk-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }

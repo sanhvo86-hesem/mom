@@ -1308,7 +1308,7 @@ function teardownCurrentPageModule(){
 
 function resolvePortalScriptUrl(fragment){
   var src = './scripts/portal/' + fragment;
-  return src + (src.indexOf('?') >= 0 ? '&' : '?') + 'v=20260405u';
+  return src + (src.indexOf('?') >= 0 ? '&' : '?') + 'v=20260405v';
 }
 
 function renderModuleBuilderStatus(container, mode, detail){
@@ -1344,24 +1344,65 @@ function ensurePortalRenderer(fragment, globalName, forceReload){
   return new Promise(function(resolve, reject){
     var script;
     var scriptUrl;
+    var timeoutId;
+    var settled = false;
+    var expectedName = String(fragment || '').split('?')[0];
+    function cleanup(){
+      if(timeoutId){
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+      window.removeEventListener('error', onWindowError);
+    }
+    function settleResolve(renderer){
+      if(settled) return;
+      settled = true;
+      cleanup();
+      resolve(renderer);
+    }
+    function settleReject(message){
+      if(settled) return;
+      settled = true;
+      cleanup();
+      reject(new Error(message));
+    }
     function finishResolve(){
       if(typeof window[globalName] === 'function'){
-        resolve(window[globalName]);
+        settleResolve(window[globalName]);
         return true;
       }
       return false;
     }
+    function onWindowError(evt){
+      var fileName = String((evt && evt.filename) || '');
+      var message = String((evt && evt.message) || '');
+      if(fileName && fileName.indexOf(expectedName) < 0 && fileName.indexOf(fragment) < 0){
+        return;
+      }
+      settleReject(message || 'script_runtime_failed');
+    }
     function loadViaScriptTag(){
+      try{ delete window[globalName]; }catch(_deleteRendererErr){}
+      document.querySelectorAll('script[data-portal-runtime="' + fragment + '"]').forEach(function(oldNode){
+        if(oldNode && oldNode.parentNode) oldNode.parentNode.removeChild(oldNode);
+      });
+      window.addEventListener('error', onWindowError);
+      timeoutId = setTimeout(function(){
+        if(!finishResolve()){
+          settleReject('script_timeout');
+        }
+      }, 15000);
       script = document.createElement('script');
       script.charset = 'UTF-8';
       script.src = scriptUrl;
+      script.setAttribute('data-portal-runtime', fragment);
       script.onload = function(){
         if(!finishResolve()){
-          reject(new Error(globalName + '_missing'));
+          settleReject(globalName + '_missing');
         }
       };
       script.onerror = function(){
-        reject(new Error('script_load_failed'));
+        settleReject('script_load_failed');
       };
       document.body.appendChild(script);
     }
@@ -1370,30 +1411,7 @@ function ensurePortalRenderer(fragment, globalName, forceReload){
       return;
     }
     scriptUrl = resolvePortalScriptUrl(fragment) + '&portal_reload=' + Date.now();
-    if(typeof fetch !== 'function'){
-      loadViaScriptTag();
-      return;
-    }
-    fetch(scriptUrl, { credentials:'same-origin', cache:'no-store' }).then(function(resp){
-      if(!resp || !resp.ok) throw new Error('script_http_' + ((resp && resp.status) || 'failed'));
-      return resp.text();
-    }).then(function(text){
-      if(!text || /^\s*</.test(text)) throw new Error('script_response_invalid');
-      try{
-        window.eval(String(text) + '\n//# sourceURL=' + scriptUrl);
-      }catch(evalErr){
-        throw new Error(evalErr && evalErr.message ? evalErr.message : 'script_eval_failed');
-      }
-      if(!finishResolve()){
-        throw new Error(globalName + '_missing');
-      }
-    }).catch(function(fetchErr){
-      if(String(fetchErr && fetchErr.message || '').indexOf(globalName + '_missing') >= 0){
-        reject(fetchErr);
-        return;
-      }
-      loadViaScriptTag();
-    });
+    loadViaScriptTag();
   });
 }
 
@@ -5423,7 +5441,7 @@ function renderAdminMetadataStudio(){
 function renderAdminAppearance(){
   const el=document.getElementById('admin-content');
   if(!el) return;
-  var expectedVersion = '20260405d';
+  var expectedVersion = '20260405g';
   /* Delegate to external file if loaded, otherwise fallback inline */
   if(typeof window._renderAdminAppearanceFull === 'function' && window._renderAdminAppearanceFullVersion === expectedVersion){
     window._renderAdminAppearanceFull(el, _appSubTab, lang);
