@@ -262,8 +262,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  appearance: none;
+  -webkit-appearance: none;
   gap: var(--btn-gap, var(--space-2));
   height: 36px;
+  min-height: 0;
   padding: var(--btn-padding-y, 0px) var(--btn-padding-x, var(--space-4));
   border: var(--btn-border-width, 1px) solid transparent;
   border-radius: var(--radius-md);
@@ -278,6 +281,17 @@
   white-space: nowrap;
   text-decoration: none;
   min-width: var(--btn-min-width, 0);
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+.hm-btn-icon,
+.hm-btn-label {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+.hm-btn-icon {
+  flex: 0 0 auto;
 }
 .hm-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .hm-btn-primary   { background: var(--brand-2); color: var(--text-inverse); }
@@ -393,10 +407,18 @@
   margin-bottom: var(--space-5);
 }
 .hm-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  appearance: none;
+  -webkit-appearance: none;
+  min-height: 0;
+  height: auto;
   padding: var(--hds-tab-py, var(--space-2)) var(--hds-tab-px, var(--space-4));
   font-size: var(--hds-tab-font, var(--text-sm));
   font-weight: var(--tab-font-weight, var(--font-semibold));
   letter-spacing: var(--tab-letter-spacing, 0);
+  line-height: 1;
   color: var(--text-secondary);
   border-bottom: var(--tab-border-width, 2px) solid transparent;
   margin-bottom: calc(var(--tab-border-width, 2px) * -1);
@@ -408,6 +430,17 @@
   border-left: none;
   border-right: none;
   font-family: var(--font);
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+.hm-tab-icon,
+.hm-tab-label {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+.hm-tab-icon {
+  flex: 0 0 auto;
 }
 .hm-tab:hover { color: var(--tab-active-indicator, var(--brand-2)); background: var(--bg-hover); border-radius: var(--tab-radius, var(--radius-md)) var(--tab-radius, var(--radius-md)) 0 0; }
 .hm-tab.active { color: var(--tab-active-indicator, var(--brand-2)); border-bottom-color: var(--tab-active-indicator, var(--brand-2)); }

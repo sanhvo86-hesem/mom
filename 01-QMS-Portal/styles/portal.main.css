@@ -17,7 +17,7 @@
 body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:var(--leading-normal,1.5);overflow:hidden;height:100vh}
 a{color:var(--brand-2);text-decoration:none}
 input,button,select{font-family:var(--font);font-size:14px}
-button{cursor:pointer;border:none;background:none}
+button{cursor:pointer;border:none;background:none;appearance:none;-webkit-appearance:none;box-sizing:border-box}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
 
 /* ═══ LOGIN SCREEN ═══ */
@@ -181,7 +181,7 @@ button{cursor:pointer;border:none;background:none}
 
 /* ═══ DOCUMENT LIST ═══ */
 .filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
-.filter-chip{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--border);color:var(--text-2);background:var(--surface);transition:all .15s}
+.filter-chip{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:0;height:auto;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;line-height:1;border:1px solid var(--border);color:var(--text-2);background:var(--surface);transition:all .15s}
 .filter-chip:hover{border-color:#adb5bd}
 .filter-chip.active{background:var(--brand);color:#fff;border-color:var(--brand)}
 .search-box{padding:10px 16px;border:1.5px solid var(--border);border-radius:10px;width:100%;max-width:400px;margin-bottom:16px;transition:border .2s}
@@ -217,7 +217,7 @@ button{cursor:pointer;border:none;background:none}
 #doc-viewer-header.details-collapsed .dv-desc{display:none}
 .dv-top{display:block}
 .dv-title-area{min-width:0;display:flex;flex-direction:column;gap:5px}
-.dv-btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 11px;border:1px solid #dbe4ef;border-radius:10px;background:#fff;color:#334155;font-size:11px;font-weight:650;letter-spacing:.01em;white-space:nowrap;transition:all .16s ease;box-shadow:0 1px 3px rgba(15,23,42,.03)}
+.dv-btn{display:inline-flex;align-items:center;gap:6px;min-height:0;height:32px;padding:0 11px;border:1px solid #dbe4ef;border-radius:10px;background:#fff;color:#334155;font-size:11px;font-weight:650;letter-spacing:.01em;line-height:1;white-space:nowrap;transition:all .16s ease;box-shadow:0 1px 3px rgba(15,23,42,.03)}
 .dv-btn:hover{background:#fff;border-color:#bfd0e5;box-shadow:0 4px 12px rgba(15,23,42,.08);transform:translateY(-1px)}
 .dv-btn:active{transform:translateY(1px)}
 .dv-btn-ico{width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;color:currentColor;flex-shrink:0;opacity:.92}
@@ -292,7 +292,7 @@ button{cursor:pointer;border:none;background:none}
 .dict-stat{padding:10px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:12px;color:var(--text-3)}
 .dict-stat b{display:block;font-size:20px;color:var(--text);font-weight:700;margin-bottom:2px}
 .dict-cat-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
-.dict-cat-chip{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid var(--border);color:var(--text-2);background:var(--surface);transition:all .15s;display:flex;align-items:center;gap:5px}
+.dict-cat-chip{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;line-height:1;min-height:0;height:auto;border:1px solid var(--border);color:var(--text-2);background:var(--surface);transition:all .15s;display:flex;align-items:center;gap:5px}
 .dict-cat-chip:hover{border-color:#90caf9}
 .dict-cat-chip.active{background:var(--brand);color:#fff;border-color:var(--brand)}
 .dict-cat-chip .chip-dot{width:7px;height:7px;border-radius:50%;display:inline-block}
@@ -404,14 +404,14 @@ button{cursor:pointer;border:none;background:none}
 
 /* ADMIN PANEL */
 .admin-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-.admin-tab{padding:8px 14px;font-size:12px;font-weight:700;color:var(--text-tertiary,var(--text-3));border:1px solid var(--border,#dbe5f0);background:var(--bg-surface,#fff);cursor:pointer;border-radius:999px;transition:all .15s}
+.admin-tab{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:0;height:auto;padding:8px 14px;font-size:12px;font-weight:700;line-height:1;color:var(--text-tertiary,var(--text-3));border:1px solid var(--border,#dbe5f0);background:var(--bg-surface,#fff);cursor:pointer;border-radius:999px;transition:all .15s}
 .admin-tab.active{color:var(--text-inverse,#fff);border-color:var(--brand-2,#1565c0);background:var(--brand-2,#1565c0);box-shadow:0 10px 20px rgba(21,101,192,.18)}
 .admin-tab:hover{color:var(--brand-2,#1565c0);background:color-mix(in srgb, var(--brand-2,#1565c0) 10%, var(--bg-surface,#fff));border-color:color-mix(in srgb, var(--brand-2,#1565c0) 28%, var(--border,#dbe5f0))}
 .admin-tab.active:hover{color:var(--text-inverse,#fff);background:var(--brand-2,#1565c0);border-color:var(--brand-2,#1565c0)}
 .admin-panel{background:var(--bg-surface,#fff);border:1px solid var(--border,#e2e8f0);border-radius:8px;padding:16px}
 .admin-toolbar{display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
 .admin-toolbar input,.admin-toolbar select{flex:1;min-width:200px;padding:6px 12px;border:1px solid var(--border,#d1d5db);border-radius:6px;font-size:12px;background:var(--bg-surface,#fff);color:var(--text-primary,var(--text))}
-.btn-admin{padding:6px 14px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all .15s}
+.btn-admin{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:0;height:auto;padding:6px 14px;border-radius:6px;font-size:11px;font-weight:600;line-height:1;cursor:pointer;border:1px solid transparent;transition:all .15s}
 .btn-admin.primary{background:var(--brand-2,#1565c0);color:var(--text-inverse,#fff);border-color:var(--brand-2,#1565c0)}
 .btn-admin.primary:hover{filter:brightness(.94)}
 .btn-admin.danger{background:color-mix(in srgb, var(--red,#dc2626) 10%, var(--bg-surface,#fff));color:var(--red,#dc2626);border-color:color-mix(in srgb, var(--red,#dc2626) 30%, var(--border,#fca5a5))}

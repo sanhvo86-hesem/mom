@@ -45,10 +45,16 @@
   padding: 0 24px;
 }
 .ec-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  height: auto;
   padding: 10px 20px;
   font-size: 13px;
   font-weight: 600;
   font-family: var(--ec-font);
+  line-height: 1;
   color: var(--ec-text-secondary);
   background: none;
   border: none;
@@ -3011,12 +3017,18 @@ textarea.ec-dialog-input {
 }
 .ec-mode-tab {
   flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  height: auto;
   padding: 10px 16px;
   border: none;
   background: transparent;
   font-size: 13px;
   font-weight: 600;
   font-family: var(--ec-font);
+  line-height: 1;
   color: var(--ec-text-secondary);
   cursor: pointer;
   transition: all var(--ec-transition);
