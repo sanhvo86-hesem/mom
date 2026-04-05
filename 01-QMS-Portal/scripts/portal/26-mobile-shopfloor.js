@@ -22,12 +22,12 @@ function _fmtTime(v){ if(!v) return ''; var d=new Date(v); return isNaN(d.getTim
 /* -- constants ------------------------------------------------ */
 var STYLE_ID = 'ms-styles';
 var TABS = [
-  { key:'queue',    vi:'Hang doi',       en:'My Queue',       icon:'&#9776;' },
-  { key:'clock',    vi:'Cham cong',      en:'Time Clock',     icon:'&#9201;' },
-  { key:'first',    vi:'First Piece',    en:'First Piece',    icon:'&#9989;' },
-  { key:'inprocess',vi:'In-Process',     en:'In-Process',     icon:'&#128270;' },
-  { key:'ncr',      vi:'Quick NCR',      en:'Quick NCR',      icon:'&#9888;' },
-  { key:'sync',     vi:'Dong bo',        en:'Sync Status',    icon:'&#128259;' }
+  { key:'queue',    vi:'Hang doi',       en:'My Queue',       icon:'☰' },
+  { key:'clock',    vi:'Cham cong',      en:'Time Clock',     icon:'⏱' },
+  { key:'first',    vi:'First Piece',    en:'First Piece',    icon:'✅' },
+  { key:'inprocess',vi:'In-Process',     en:'In-Process',     icon:'🔎' },
+  { key:'ncr',      vi:'Quick NCR',      en:'Quick NCR',      icon:'⚠' },
+  { key:'sync',     vi:'Dong bo',        en:'Sync Status',    icon:'🔃' }
 ];
 
 var PRIORITY = {
@@ -46,12 +46,12 @@ var LABOR_TYPES = [
 ];
 
 var DEFECT_TYPES = [
-  { key:'dimensional', vi:'Kich thuoc',  en:'Dimensional', icon:'&#128207;' },
-  { key:'surface',     vi:'Be mat',      en:'Surface',     icon:'&#128065;' },
-  { key:'material',    vi:'Vat lieu',    en:'Material',    icon:'&#129521;' },
-  { key:'visual',      vi:'Ngoai quan',  en:'Visual',      icon:'&#128064;' },
-  { key:'thread',      vi:'Ren',         en:'Thread',      icon:'&#128297;' },
-  { key:'burr',        vi:'Ba via',      en:'Burr',        icon:'&#128296;' }
+  { key:'dimensional', vi:'Kich thuoc',  en:'Dimensional', icon:'📏' },
+  { key:'surface',     vi:'Be mat',      en:'Surface',     icon:'👁' },
+  { key:'material',    vi:'Vat lieu',    en:'Material',    icon:'🧱' },
+  { key:'visual',      vi:'Ngoai quan',  en:'Visual',      icon:'👀' },
+  { key:'thread',      vi:'Ren',         en:'Thread',      icon:'🔩' },
+  { key:'burr',        vi:'Ba via',      en:'Burr',        icon:'🔨' }
 ];
 
 /* -- state ---------------------------------------------------- */

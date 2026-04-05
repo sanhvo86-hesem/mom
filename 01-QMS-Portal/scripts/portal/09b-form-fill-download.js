@@ -1103,7 +1103,7 @@ function saveDraft(form,alloc){
       signatures:ws.signatures,
       savedAt:new Date().toISOString()
     }));
-    toast(t('ÄÃ£ lÆ°u nhÃ¡p.','Draft saved.'),'success');
+    toast(t('Đã lưu nháp.','Draft saved.'),'success');
   }catch(e){}
   saveDraftToServer(form, alloc);
 }
@@ -2384,15 +2384,15 @@ function loadHistoryLegacy(form){
       return bTime - aTime;
     });
     if(!entries.length){
-      el.innerHTML='<div style="text-align:center;color:var(--ec-text-muted);font-size:12px;padding:16px">'+esc(t('ChÆ°a cÃ³ báº£n ná»™p nÃ o.','No submissions yet.'))+'</div>';
+      el.innerHTML='<div style="text-align:center;color:var(--ec-text-muted);font-size:12px;padding:16px">'+esc(t('Chưa có bản nộp nào.','No submissions yet.'))+'</div>';
       return;
     }
-    el.innerHTML='<table class="ec-table"><thead><tr><th>'+esc(t('MÃ£ há»“ sÆ¡','Record ID'))+'</th><th>'+esc(t('NgÆ°á»i ná»™p','Submitted by'))+'</th><th>'+esc(t('NgÃ y','Date'))+'</th><th>'+esc(t('Tráº¡ng thÃ¡i','Status'))+'</th></tr></thead><tbody>'+entries.map(function(e){
+    el.innerHTML='<table class="ec-table"><thead><tr><th>'+esc(t('Mã hồ sơ','Record ID'))+'</th><th>'+esc(t('Người nộp','Submitted by'))+'</th><th>'+esc(t('Ngày','Date'))+'</th><th>'+esc(t('Trạng thái','Status'))+'</th></tr></thead><tbody>'+entries.map(function(e){
       var dt=e.submitted_at||e.created_at||'';
-      return '<tr><td class="mono">'+esc(e.record_id||'â€”')+'</td><td>'+esc(e.submitted_by||'â€”')+'</td><td>'+esc(dt?formatLocalDateTime(dt, true):'â€”')+'</td><td>'+renderHistoryStatusBadge(e._status||e.approval_state||'submitted')+'</td></tr>';
+      return '<tr><td class="mono">'+esc(e.record_id||'—')+'</td><td>'+esc(e.submitted_by||'—')+'</td><td>'+esc(dt?formatLocalDateTime(dt, true):'—')+'</td><td>'+renderHistoryStatusBadge(e._status||e.approval_state||'submitted')+'</td></tr>';
     }).join('')+'</tbody></table>';
   }).catch(function(){
-    el.innerHTML='<div class="ec-inline-alert error"><strong>' + esc(t('KhÃ´ng táº£i Ä‘Æ°á»£c lá»‹ch sá»­ ná»™p', 'Could not load submission history')) + '</strong><span>' + esc(t('HÃ£y thá»­ táº£i láº¡i Ä‘á»ƒ Ä‘á»“ng bá»™ dá»¯ liá»‡u má»›i nháº¥t tá»« mÃ¡y chá»§.', 'Try reloading to sync the latest data from the server.')) + '</span><small><button type="button" class="ec-btn secondary" id="ec-history-retry">' + esc(t('Táº£i láº¡i lá»‹ch sá»­', 'Reload history')) + '</button></small></div>';
+    el.innerHTML='<div class="ec-inline-alert error"><strong>' + esc(t('Không tải được lịch sử nộp', 'Could not load submission history')) + '</strong><span>' + esc(t('Hãy thử tải lại để đồng bộ dữ liệu mới nhất từ máy chủ.', 'Try reloading to sync the latest data from the server.')) + '</span><small><button type="button" class="ec-btn secondary" id="ec-history-retry">' + esc(t('Tải lại lịch sử', 'Reload history')) + '</button></small></div>';
     var retry = document.getElementById('ec-history-retry');
     if(retry) retry.onclick = function(){ loadHistory(form); };
   });

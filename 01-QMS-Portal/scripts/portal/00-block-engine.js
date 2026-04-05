@@ -3511,7 +3511,7 @@ BLOCK_TEMPLATES['tpl-quality-pareto'] = _tplMeta('quality-pareto', 'Pareto lỗi
   }
 });
 
-BLOCK_TEMPLATES['tpl-quality-control-chart'] = _tplMeta('quality-control-chart', 'Biá»ƒu Ä‘á»“ kiá»ƒm soÃ¡t Xbar / R', 'Xbar / R Control Chart', 'Biá»ƒu Ä‘á»“ kÃ©p Xbar vÃ  R Ä‘á»ƒ theo dÃµi á»•n Ä‘á»‹nh quÃ¡ trÃ¬nh, Cp vÃ  Cpk.', 'quality', {
+BLOCK_TEMPLATES['tpl-quality-control-chart'] = _tplMeta('quality-control-chart', 'Biểu đồ kiểm soát Xbar / R', 'Xbar / R Control Chart', 'Biểu đồ kép Xbar và R để theo dõi ổn định quá trình, Cp và Cpk.', 'quality', {
   dataSource: _tplSource('spc_chart', 'GET'),
   subgroupSize: 5,
   spc: {
@@ -3520,17 +3520,17 @@ BLOCK_TEMPLATES['tpl-quality-control-chart'] = _tplMeta('quality-control-chart',
     timestampField: 'measured_at'
   }
 });
-BLOCK_TEMPLATES['tpl-quality-checksheet'] = _tplMeta('quality-checksheet', 'Checksheet kiá»ƒm tra cÃ´ng Ä‘oáº¡n', 'Process Checksheet', 'Báº£ng checksheet sá»‘ ghi nháº­n táº§n suáº¥t NG, káº¿t quáº£ pass/fail vÃ  thÃ´ng sá»‘ Ä‘o.', 'quality', {
+BLOCK_TEMPLATES['tpl-quality-checksheet'] = _tplMeta('quality-checksheet', 'Checksheet kiểm tra công đoạn', 'Process Checksheet', 'Bảng checksheet số ghi nhận tần suất NG, kết quả pass/fail và thông số đo.', 'quality', {
   rows: [
-    { id:'dimension', label:{ vi:'KÃ­ch thÆ°á»›c chÃ­nh', en:'Critical dimension' } },
-    { id:'surface', label:{ vi:'Bá» máº·t', en:'Surface finish' } },
-    { id:'trace', label:{ vi:'Tem truy xuáº¥t', en:'Traceability label' } }
+    { id:'dimension', label:{ vi:'Kích thước chính', en:'Critical dimension' } },
+    { id:'surface', label:{ vi:'Bề mặt', en:'Surface finish' } },
+    { id:'trace', label:{ vi:'Tem truy xuất', en:'Traceability label' } }
   ],
   columns: [
     { id:'check_1', label:{ vi:'Check', en:'Check' }, type:'check' },
     { id:'count_ng', label:{ vi:'NG', en:'NG count' }, type:'count' },
-    { id:'result', label:{ vi:'Káº¿t quáº£', en:'Result' }, type:'pass_fail' },
-    { id:'measure', label:{ vi:'ThÃ´ng sá»‘', en:'Measurement' }, type:'measurement' }
+    { id:'result', label:{ vi:'Kết quả', en:'Result' }, type:'pass_fail' },
+    { id:'measure', label:{ vi:'Thông số', en:'Measurement' }, type:'measurement' }
   ],
   editable: true
 });
@@ -4119,7 +4119,7 @@ function saveModuleSchema(moduleId, schema){
     if(window.HmModuleRouter && typeof window.HmModuleRouter.clearCache === 'function'){
       window.HmModuleRouter.clearCache(moduleId);
     }
-    toast(_t('ÄÃ£ lÆ°u thÃ nh cÃ´ng','Saved successfully'), 'success');
+    toast(_t('Đã lưu thành công','Saved successfully'), 'success');
     return { ok:true, saved:true, version:savedSchema.version, updatedAt:savedSchema.updatedAt, updatedBy:savedSchema.updatedBy || '', schema:savedSchema };
   }).catch(function(err){
     toast(_t('Luu that bai, da luu cuc bo','Save failed, saved locally'), 'warning');
@@ -4130,7 +4130,7 @@ function saveModuleSchema(moduleId, schema){
 function _legacyResetModuleSchema(moduleId){
   _clearSchemaLocal(moduleId);
   return _api('module_schema_reset', { moduleId:moduleId }, 'POST').then(function(resp){
-    toast(_t('ÄÃ£ khÃ´i phá»¥c máº·c Ä‘á»‹nh','Reset to defaults'), 'success');
+    toast(_t('Đã khôi phục mặc định','Reset to defaults'), 'success');
     return resp;
   }).catch(function(){ return { ok:false }; });
 }
@@ -7071,7 +7071,7 @@ function renderScatterChart(config, data, state, blockId, reactiveCtx, block){
         var rawSeries = compatSeriesKey ? row[compatSeriesKey] : null;
         var rawColor = compatColorKey ? row[compatColorKey] : '';
         var resolvedColor = (rawColor != null && /^#|^rgb|^hsl|^var\(/i.test(String(rawColor))) ? String(rawColor) : '';
-        var cat = rawSeries != null && rawSeries !== '' ? String(rawSeries) : (!resolvedColor && rawColor != null && rawColor !== '' ? String(rawColor) : _t('Dá»¯ liá»‡u', 'Data'));
+        var cat = rawSeries != null && rawSeries !== '' ? String(rawSeries) : (!resolvedColor && rawColor != null && rawColor !== '' ? String(rawColor) : _t('Dữ liệu', 'Data'));
         if(compatCategories.indexOf(cat) < 0) compatCategories.push(cat);
         if(resolvedColor && !compatCategoryColors[cat]) compatCategoryColors[cat] = resolvedColor;
         compatPoints.push({
@@ -7083,14 +7083,14 @@ function renderScatterChart(config, data, state, blockId, reactiveCtx, block){
           label: compatLabelKey && row[compatLabelKey] != null ? String(row[compatLabelKey]) : ''
         });
       });
-      if(!compatPoints.length) return _chartEmpty(_t('KhÃ´ng cÃ³ dá»¯ liá»‡u','No data'));
+      if(!compatPoints.length) return _chartEmpty(_t('Không có dữ liệu','No data'));
       compatLegend = compatCategories.map(function(cat, index){
         return { key: cat, label: { vi: cat, en: cat }, color: compatCategoryColors[cat] || _chartColor(index) };
       });
       compatPoints = compatPoints.filter(function(point){
         return !compatState.hiddenSeries[point.category];
       });
-      if(!compatPoints.length) return _chartEmpty(_t('KhÃ´ng cÃ³ dá»¯ liá»‡u','No data'));
+      if(!compatPoints.length) return _chartEmpty(_t('Không có dữ liệu','No data'));
       compatDomainX = { min: compatPoints[0].rawX, max: compatPoints[0].rawX };
       compatDomainY = { min: compatPoints[0].rawY, max: compatPoints[0].rawY };
       compatPoints.forEach(function(point){
@@ -7131,7 +7131,7 @@ function renderScatterChart(config, data, state, blockId, reactiveCtx, block){
       }
 
       svg += '<div class="hm-chart-card hm-chart-card-scatter">';
-      svg += '<div class="hm-chart-toolbar" role="toolbar" aria-label="'+_chartAttrText(_t('Äiá»u khiá»ƒn biá»ƒu Ä‘á»“ scatter', 'Scatter chart controls'))+'">';
+      svg += '<div class="hm-chart-toolbar" role="toolbar" aria-label="'+_chartAttrText(_t('Điều khiển biểu đồ scatter', 'Scatter chart controls'))+'">';
       svg += '<button type="button" class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-chart-zoom" data-block-id="'+_esc(blockId || '')+'" data-delta="-1">-</button>';
       svg += '<button type="button" class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-chart-zoom" data-block-id="'+_esc(blockId || '')+'" data-delta="1">+</button>';
       svg += '<button type="button" class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-chart-pan" data-block-id="'+_esc(blockId || '')+'" data-axis="x" data-delta="-0.1">â—€</button>';
@@ -7139,9 +7139,9 @@ function renderScatterChart(config, data, state, blockId, reactiveCtx, block){
       svg += '<button type="button" class="hm-btn hm-btn-ghost hm-btn-sm" data-action="hm-chart-reset-view" data-block-id="'+_esc(blockId || '')+'">'+_t('Reset','Reset')+'</button>';
       svg += '</div>';
       if(compatCfg.showLegend !== false){
-        svg += _chartLegend(compatLegend, compatState, blockId, _t('ChÃº giáº£i scatter', 'Scatter legend'));
+        svg += _chartLegend(compatLegend, compatState, blockId, _t('Chú giải scatter', 'Scatter legend'));
       }
-      svg += '<div class="hm-chart-shell" role="img" aria-label="'+_chartAttrText(_t('Biá»ƒu Ä‘á»“ scatter tÆ°Æ¡ng quan dá»¯ liá»‡u', 'Scatter chart showing data correlation'))+'" data-chart-block-id="'+_esc(blockId || '')+'">';
+      svg += '<div class="hm-chart-shell" role="img" aria-label="'+_chartAttrText(_t('Biểu đồ scatter tương quan dữ liệu', 'Scatter chart showing data correlation'))+'" data-chart-block-id="'+_esc(blockId || '')+'">';
       svg += '<svg class="hm-chart-svg" viewBox="0 0 '+width+' '+height+'" preserveAspectRatio="none">';
       _chartAxisTicks(compatZoomY.min, compatZoomY.max, 5).forEach(function(tick){
         var y = _chartScaleY(tick, compatZoomY.min, compatZoomY.max, top, plotHeight);
@@ -7173,7 +7173,7 @@ function renderScatterChart(config, data, state, blockId, reactiveCtx, block){
         py = _chartScaleY(point.rawY, compatZoomY.min, compatZoomY.max, top, plotHeight);
         radius = compatSizeKey ? _chartClamp((point.size / 10), 4, 18) : compatMarkerSize;
         color = point.color || compatCategoryColors[point.category] || _chartColor(compatCategories.indexOf(point.category));
-        tip = point.category + ' â€¢ X: ' + _chartFormatValue(point.rawX, compatCfg.xFormat || '') + ' â€¢ Y: ' + _chartFormatValue(point.rawY, compatCfg.yFormat || '');
+        tip = point.category + ' • X: ' + _chartFormatValue(point.rawX, compatCfg.xFormat || '') + ' • Y: ' + _chartFormatValue(point.rawY, compatCfg.yFormat || '');
         svg += '<circle cx="'+px.toFixed(2)+'" cy="'+py.toFixed(2)+'" r="'+radius.toFixed(2)+'" fill="'+_esc(color)+'" fill-opacity="0.56" stroke="'+_esc(color)+'" stroke-width="1.5" class="hm-chart-scatter-point"'+_chartTooltipAttrs(tip)+'><title>'+_esc(tip)+'</title></circle>';
         if(compatCfg.showLabels && point.label){
           svg += '<text x="'+(px + radius + 4).toFixed(2)+'" y="'+(py - 4).toFixed(2)+'" class="hm-chart-axis-label hm-chart-axis-label-x">'+_esc(point.label)+'</text>';
@@ -7309,8 +7309,8 @@ function renderRadarChart(config, data, state, blockId){
       var compatSeriesOrder = [];
       if(compatSeriesKey && compatRows[0] && compatRows[0][compatCategoryKey] != null && compatRows[0][compatValueKey] != null){
         compatRows.forEach(function(row){
-          var dimKey = row[compatCategoryKey] == null ? _t('KhÃ´ng xÃ¡c Ä‘á»‹nh', 'Unknown') : String(row[compatCategoryKey]);
-          var seriesKeyValue = row[compatSeriesKey] == null ? _t('Dá»¯ liá»‡u', 'Data') : String(row[compatSeriesKey]);
+          var dimKey = row[compatCategoryKey] == null ? _t('Không xác định', 'Unknown') : String(row[compatCategoryKey]);
+          var seriesKeyValue = row[compatSeriesKey] == null ? _t('Dữ liệu', 'Data') : String(row[compatSeriesKey]);
           var rawColor = compatColorKey ? row[compatColorKey] : '';
           var resolvedColor = (rawColor != null && /^#|^rgb|^hsl|^var\(/i.test(String(rawColor))) ? String(rawColor) : '';
           var value = _chartNumber(row[compatValueKey]);
@@ -7357,10 +7357,10 @@ function renderRadarChart(config, data, state, blockId){
     }
     if(compatDims.length && compatSeries.length){
       var compatState = _chartState(state, blockId);
-      var compatLegend = compatCfg.showLegend === false ? '' : _chartLegend(compatSeries, compatState, blockId, _t('ChÃº giáº£i radar', 'Radar legend'));
+      var compatLegend = compatCfg.showLegend === false ? '' : _chartLegend(compatSeries, compatState, blockId, _t('Chú giải radar', 'Radar legend'));
       svg += '<div class="hm-chart-card hm-chart-card-radar">';
       svg += compatLegend;
-      svg += '<div class="hm-chart-shell" role="img" aria-label="'+_chartAttrText(_t('Biá»ƒu Ä‘á»“ radar so sÃ¡nh Ä‘a tiÃªu chÃ­', 'Radar chart comparing multiple dimensions'))+'" data-chart-block-id="'+_esc(blockId || '')+'">';
+      svg += '<div class="hm-chart-shell" role="img" aria-label="'+_chartAttrText(_t('Biểu đồ radar so sánh đa tiêu chí', 'Radar chart comparing multiple dimensions'))+'" data-chart-block-id="'+_esc(blockId || '')+'">';
       svg += '<svg class="hm-chart-svg" viewBox="0 0 '+width+' '+height+'" preserveAspectRatio="xMidYMid meet">';
       [0.2,0.4,0.6,0.8,1].forEach(function(level){
         var ringPoints = [];
@@ -7390,7 +7390,7 @@ function renderRadarChart(config, data, state, blockId){
           var angle = (-Math.PI / 2) + ((Math.PI * 2 * dimIndex) / compatDims.length);
           var px = cx + (Math.cos(angle) * radius * pct);
           var py = cy + (Math.sin(angle) * radius * pct);
-          var tip = _chartText(series, series.key || ('Series ' + (seriesIndex + 1)), series.key || ('Series ' + (seriesIndex + 1))) + ' â€¢ ' + _chartText(dim, dim.key, dim.key) + ': ' + _chartFormatValue(rawValue, config.format || compatCfg.yFormat || '');
+          var tip = _chartText(series, series.key || ('Series ' + (seriesIndex + 1)), series.key || ('Series ' + (seriesIndex + 1))) + ' • ' + _chartText(dim, dim.key, dim.key) + ': ' + _chartFormatValue(rawValue, config.format || compatCfg.yFormat || '');
           polygonPoints.push({ x:px, y:py });
           svg += '<circle cx="'+px.toFixed(2)+'" cy="'+py.toFixed(2)+'" r="4" fill="'+_esc(series.color || _chartColor(seriesIndex))+'" class="hm-chart-point"'+_chartTooltipAttrs(tip)+'><title>'+_esc(tip)+'</title></circle>';
           if(compatCfg.showLabels){
@@ -7647,7 +7647,7 @@ function _spcSeriesFromConfig(config, rows){
     rows.forEach(function(row, index){
       values.push(_chartNumber(row[valueKey]));
       labels.push(String(sampleField && row[sampleField] != null ? row[sampleField] : (row[subgroupField] != null ? row[subgroupField] : (index + 1))));
-      tooltips.push((row[timestampField] ? _chartDateLabel(row[timestampField]) + ' â€¢ ' : '') + _chartFormatValue(row[valueKey], config.format || ''));
+      tooltips.push((row[timestampField] ? _chartDateLabel(row[timestampField]) + ' • ' : '') + _chartFormatValue(row[valueKey], config.format || ''));
     });
   } else {
     rows.forEach(function(row, index){

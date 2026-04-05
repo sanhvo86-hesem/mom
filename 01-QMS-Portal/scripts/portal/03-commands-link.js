@@ -13,7 +13,7 @@
       if(typeof window._edEscapeHtml === 'function') return window._edEscapeHtml(text);
     }catch(e){}
     return String(text == null ? '' : text)
-      .replace(/&/g,'&amp;')
+      .replace(/&/g,'&')
       .replace(/</g,'&lt;')
       .replace(/>/g,'&gt;')
       .replace(/"/g,'&quot;')

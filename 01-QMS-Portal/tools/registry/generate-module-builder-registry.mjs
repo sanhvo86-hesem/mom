@@ -75,11 +75,11 @@ function runtimeAccessProfileForDomain(domain) {
 
   if (['core_system', 'system_infrastructure', 'forms_system', 'record_system', 'master_data_governance', 'customer_portal'].includes(key)) {
     return runtimeAccessTemplate({
-      list: expandRuntimeRoles('admin', 'quality_lead'),
-      detail: expandRuntimeRoles('admin', 'quality_lead'),
-      create: expandRuntimeRoles('admin', 'quality_lead'),
-      update: expandRuntimeRoles('admin', 'quality_lead'),
-      transition: expandRuntimeRoles('admin', 'quality_lead'),
+      list: expandRuntimeRoles('admin'),
+      detail: expandRuntimeRoles('admin'),
+      create: expandRuntimeRoles('admin'),
+      update: expandRuntimeRoles('admin'),
+      transition: expandRuntimeRoles('admin'),
     });
   }
 

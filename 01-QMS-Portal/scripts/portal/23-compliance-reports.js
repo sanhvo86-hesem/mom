@@ -8,7 +8,7 @@
 (function(){
 'use strict';
 
-/* â”€â”€ helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── helpers ──────────────────────────────────────────── */
 function _t(vi, en){ return (typeof lang !== 'undefined' && lang === 'en') ? en : vi; }
 function _esc(v){ var d=document.createElement('div'); d.appendChild(document.createTextNode(String(v==null?'':v))); return d.innerHTML; }
 function _api(action, payload, method){
@@ -21,19 +21,19 @@ function _fmtDateTime(v){ if(!v) return ''; var d=new Date(v); return isNaN(d.ge
 function _fmtCurrency(v){ if(v==null) return '-'; return new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND',maximumFractionDigits:0}).format(v); }
 function _pct(v){ return (v==null?0:v).toFixed(1)+'%'; }
 
-/* â”€â”€ constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── constants ────────────────────────────────────────── */
 var STYLE_ID = 'cr-styles';
 function _hasExternalStylesheet(hrefPart){
   try{ return !!document.querySelector('link[rel="stylesheet"][href*="'+hrefPart+'"]'); }
   catch(_){ return false; }
 }
 var TABS = [
-  { key:'dashboard',   vi:'Tá»•ng quan',        en:'Dashboard' },
-  { key:'mgmt_review', vi:'Xem xÃ©t lÃ£nh Ä‘áº¡o', en:'Management Review' },
-  { key:'customer',    vi:'BÃ¡o cÃ¡o KH',       en:'Customer Report' },
-  { key:'supplier',    vi:'ÄÃ¡nh giÃ¡ NCC',     en:'Supplier Review' },
+  { key:'dashboard',   vi:'Tổng quan',        en:'Dashboard' },
+  { key:'mgmt_review', vi:'Xem xét lãnh đạo', en:'Management Review' },
+  { key:'customer',    vi:'Báo cáo KH',       en:'Customer Report' },
+  { key:'supplier',    vi:'Đánh giá NCC',     en:'Supplier Review' },
   { key:'copq',        vi:'COPQ',             en:'COPQ Analysis' },
-  { key:'evidence',    vi:'GÃ³i chá»©ng cá»©',     en:'Evidence Package' }
+  { key:'evidence',    vi:'Gói chứng cứ',     en:'Evidence Package' }
 ];
 
 var REPORT_ICONS = {
@@ -52,15 +52,15 @@ var COPQ_COLORS = {
   external_failure: 'var(--red,#ef4444)'
 };
 
-/* EVIDENCE_STATUS â€” Ä‘á»c tá»« HmRegistry â†’ 'evidence_status' */
+/* EVIDENCE_STATUS — đọc từ HmRegistry → 'evidence_status' */
 var EVIDENCE_STATUS = (function(){
   var map = {};
   if(window.HmRegistry){ HmRegistry.statusSet('evidence_status').forEach(function(o){ map[o.value]={vi:o.label,en:o.labelEn,color:o.color,icon:o.icon||''}; }); }
-  if(!Object.keys(map).length){ map = {present:{vi:'Äáº¡t',en:'Present',color:'var(--green,#22c55e)',icon:'âœ…'},missing:{vi:'Thiáº¿u',en:'Missing',color:'var(--red,#ef4444)',icon:'âŒ'},pending:{vi:'Chá»',en:'Pending',color:'var(--amber,#f59e0b)',icon:'â³'}}; }
+  if(!Object.keys(map).length){ map = {present:{vi:'Đạt',en:'Present',color:'var(--green,#22c55e)',icon:'✅'},missing:{vi:'Thiếu',en:'Missing',color:'var(--red,#ef4444)',icon:'❌'},pending:{vi:'Chờ',en:'Pending',color:'var(--amber,#f59e0b)',icon:'⏳'}}; }
   return map;
 })();
 
-/* â”€â”€ state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── state ────────────────────────────────────────────── */
 var state = {
   container: null,
   activeTab: 'dashboard',
@@ -86,7 +86,7 @@ function _currentQuarter(){
   return d.getFullYear()+'-Q'+q;
 }
 
-/* â”€â”€ CSS injection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── CSS injection ────────────────────────────────────── */
 function _ensureStyles(){
   if(_hasExternalStylesheet('styles/compliance-reports.css') || _hasExternalStylesheet('compliance-reports.css')) return;
   if(document.getElementById(STYLE_ID)) return;
@@ -166,7 +166,7 @@ function _ensureStyles(){
   document.head.appendChild(s);
 }
 
-/* â”€â”€ badge / KPI helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── badge / KPI helpers ─────────────────────────────── */
 function _kpiCard(label, value, color){
   return '<div class="cr-kpi"><div class="cr-kpi-label">'+_esc(label)+'</div><div class="cr-kpi-value" style="color:'+(color||'inherit')+'">'+_esc(value)+'</div></div>';
 }
@@ -175,7 +175,7 @@ function _statusBadge(text, color){
   return '<span class="cr-badge" style="background:'+(color||'var(--text-secondary,#64748b)')+'">'+_esc(text)+'</span>';
 }
 
-/* â”€â”€ CSS bar chart â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── CSS bar chart ───────────────────────────────────── */
 function _barChart(items, maxVal, colorFn){
   if(!items||!items.length) return '<div class="cr-empty">'+_t('Kh\u00f4ng c\u00f3 d\u1eef li\u1ec7u','No data')+'</div>';
   if(!maxVal){ maxVal=0; items.forEach(function(it){ if(it.value>maxVal) maxVal=it.value; }); }
@@ -194,7 +194,7 @@ function _barChart(items, maxVal, colorFn){
   return html;
 }
 
-/* â”€â”€ stacked bar (COPQ categories) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── stacked bar (COPQ categories) ───────────────────── */
 function _stackedBar(segments, total){
   if(!total) return '';
   var html='<div class="cr-stacked-row">';
@@ -207,7 +207,7 @@ function _stackedBar(segments, total){
   return html;
 }
 
-/* â”€â”€ trend chart (12-month vertical bars) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── trend chart (12-month vertical bars) ────────────── */
 function _trendChart(months){
   if(!months||!months.length) return '<div class="cr-empty">'+_t('Kh\u00f4ng c\u00f3 d\u1eef li\u1ec7u','No data')+'</div>';
   var maxVal=0;
@@ -233,7 +233,7 @@ function _trendChart(months){
   return html;
 }
 
-/* â”€â”€ completeness ring (SVG donut) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── completeness ring (SVG donut) ───────────────────── */
 function _completenessRing(pct){
   var r=34, circ=2*Math.PI*r;
   var fill=circ*(pct/100);
@@ -247,7 +247,7 @@ function _completenessRing(pct){
     +'</div>';
 }
 
-/* â”€â”€ period selector HTML â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── period selector HTML ────────────────────────────── */
 function _periodSelector(){
   var y=new Date().getFullYear();
   var opts='';
@@ -260,7 +260,7 @@ function _periodSelector(){
   return '<select data-filter="period">'+opts+'</select>';
 }
 
-/* â”€â”€ TABS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── TABS ─────────────────────────────────────────────── */
 function _renderTabs(){
   var html='<div class="cr-tabs">';
   TABS.forEach(function(tab){
@@ -270,7 +270,7 @@ function _renderTabs(){
   return html;
 }
 
-/* â”€â”€ TAB: Dashboard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── TAB: Dashboard ──────────────────────────────────── */
 function _renderDashboardTab(){
   var html='';
 
@@ -328,7 +328,7 @@ function _renderDashboardTab(){
   return html;
 }
 
-/* â”€â”€ TAB: Management Review â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── TAB: Management Review ──────────────────────────── */
 function _renderMgmtReviewTab(){
   var html='';
   html+='<div class="cr-form-row">';
@@ -398,7 +398,7 @@ function _renderMgmtReviewTab(){
   return html;
 }
 
-/* â”€â”€ TAB: Customer Report â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── TAB: Customer Report ────────────────────────────── */
 function _renderCustomerTab(){
   var html='';
   html+='<div class="cr-form-row">';
@@ -459,7 +459,7 @@ function _renderCustomerTab(){
   return html;
 }
 
-/* â”€â”€ TAB: Supplier Review â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── TAB: Supplier Review ────────────────────────────── */
 function _renderSupplierTab(){
   var html='';
   html+='<div class="cr-form-row">';
@@ -538,7 +538,7 @@ function _renderSupplierTab(){
   return html;
 }
 
-/* â”€â”€ TAB: COPQ Analysis â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── TAB: COPQ Analysis ──────────────────────────────── */
 function _renderCopqTab(){
   var html='';
   html+='<div class="cr-form-row">';
@@ -629,7 +629,7 @@ function _renderCopqTab(){
   return html;
 }
 
-/* â”€â”€ TAB: Evidence Package â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── TAB: Evidence Package ───────────────────────────── */
 function _renderEvidenceTab(){
   var html='';
   html+='<div class="cr-form-row">';
@@ -698,7 +698,7 @@ function _renderEvidenceTab(){
   return html;
 }
 
-/* â”€â”€ paint â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── paint ────────────────────────────────────────────── */
 function _paint(){
   if(!state.container) return;
   var html='<div class="cr">';
@@ -719,7 +719,7 @@ function _paint(){
   state.container.innerHTML=html;
 }
 
-/* â”€â”€ data loading â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── data loading ─────────────────────────────────────── */
 function _loadData(){
   // Load report types from config
   _api('compliance_report_list',{},'POST').then(function(res){
@@ -761,7 +761,7 @@ function _generate(action, payload, targetKey){
   });
 }
 
-/* â”€â”€ tab routing from report type cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── tab routing from report type cards ──────────────── */
 var REPORT_TAB_MAP = {
   management_review: 'mgmt_review',
   customer_quality:  'customer',
@@ -771,7 +771,7 @@ var REPORT_TAB_MAP = {
   evidence_package:  'evidence'
 };
 
-/* â”€â”€ event binding â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── event binding ────────────────────────────────────── */
 function _bind(){
   state.container.addEventListener('click', function(e){
     var el=e.target.closest('[data-tab]');
@@ -837,7 +837,7 @@ function _bind(){
   });
 }
 
-/* â”€â”€ entry point â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── entry point ──────────────────────────────────────── */
 function render(container){
   _ensureStyles();
   state.container=container;

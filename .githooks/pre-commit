@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+
+python 01-QMS-Portal/tools/check_portal_encoding.py --scope shell
+status=$?
+if [ $status -ne 0 ]; then
+  echo ""
+  echo "pre-commit: portal encoding audit failed."
+  exit $status
+fi
+
+exit 0

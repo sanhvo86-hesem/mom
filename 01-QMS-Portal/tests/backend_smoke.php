@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 require __DIR__ . '/bootstrap.php';
 
+ini_set('memory_limit', '512M');
+
 use HESEM\QMS\Api\Controllers\AuthController;
 use HESEM\QMS\Api\Controllers\AiSchedulingController;
 use HESEM\QMS\Api\Controllers\AllocationController;
@@ -27,6 +29,7 @@ use HESEM\QMS\Api\Controllers\ModuleSchemaController;
 use HESEM\QMS\Api\Controllers\ProductPassportController;
 use HESEM\QMS\Api\Controllers\RegistryController;
 use HESEM\QMS\Api\Controllers\SchemaStudioController;
+use HESEM\QMS\Api\Controllers\UserController;
 use HESEM\QMS\Api\Middleware\AuthMiddleware;
 use HESEM\QMS\Api\Middleware\CorsMiddleware;
 use HESEM\QMS\Api\Middleware\RateLimitMiddleware;
@@ -363,6 +366,16 @@ $financeStore = [
         'active' => true,
     ]],
 ];
+
+$permissionAdminStore = [
+    'settings' => ['require_mfa' => false],
+    'users' => [[
+        'username' => 'perm-admin',
+        'name' => 'QA Admin',
+        'role' => 'qa_manager',
+        'active' => true,
+    ]],
+];
 smoke_reset_request_state();
 $_SESSION['user'] = 'finance-user';
 $_SESSION['mfa_ok'] = true;
@@ -425,6 +438,7 @@ try {
 
 // Schema Studio must require explicit builder/governance permissions for both read and write surfaces.
 smoke_reset_request_state();
+session_init();
 $_SESSION['user'] = 'finance-user';
 $_SESSION['mfa_ok'] = true;
 $_SESSION['csrf'] = 'schema-smoke-token';
@@ -440,6 +454,7 @@ try {
 }
 
 smoke_reset_request_state();
+session_init();
 $_SESSION['user'] = 'builder-user';
 $_SESSION['mfa_ok'] = true;
 $_SESSION['csrf'] = 'schema-smoke-token';
@@ -453,6 +468,19 @@ try {
     smoke_assert($e->getStatusCode() === 200, 'Schema Studio read returned wrong status for builder role.');
     smoke_assert(is_array($e->getPayload()['designs'] ?? null), 'Schema Studio read payload missing designs array.');
 }
+
+// Schema Studio DB-backed surfaces must now be limited to DB-admin roles, not generic schema editors.
+$schemaStudioGuardController = (new SchemaStudioController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($builderStore);
+$schemaStudioDbGuard = new ReflectionMethod($schemaStudioGuardController, 'requireDatabaseAccess');
+$schemaStudioDbGuard->setAccessible(true);
+try {
+    $schemaStudioDbGuard->invoke($schemaStudioGuardController, ['role' => 'qms_engineer']);
+    throw new RuntimeException('Schema Studio DB access guard allowed a non-DB-admin builder role.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 403, 'Schema Studio DB access guard returned wrong status for builder role.');
+}
+
+$schemaStudioDbGuard->invoke($schemaStudioGuardController, ['role' => 'developer']);
 
 // AI scheduling write endpoints must be restricted to scheduling/quality roles.
 smoke_reset_request_state();
@@ -550,8 +578,36 @@ $rolePermFile = QMS_TEST_DATA_DIR . '/config/role_permissions.json';
 smoke_assert(permission_matrix_manages_permission('quality_management.capa_records.create', $rolePermFile), 'Permission matrix must manage generic quality write permissions.');
 smoke_assert(user_has_any_permission(['role' => 'qms_engineer'], 'quality_management.capa_records.create', $rolePermFile), 'QMS engineer should retain quality domain generic write permission.');
 smoke_assert(!user_has_any_permission(['role' => 'finance_manager'], 'quality_management.capa_records.create', $rolePermFile), 'Finance manager must not receive quality domain generic write permission.');
+smoke_assert(!user_has_any_permission(['role' => 'qms_engineer'], 'master_data_governance.org_companies.read', $rolePermFile), 'QMS engineer must not inherit generic governance-table access.');
+smoke_assert(!user_has_any_permission(['role' => 'qms_engineer'], 'forms_system.form_definitions.read', $rolePermFile), 'QMS engineer must not inherit generic forms-system access.');
+smoke_assert(!user_has_any_permission(['role' => 'finance_manager'], 'finance.ap_ar_invoices.delete', $rolePermFile), 'Finance manager must not inherit generic delete permission.');
+smoke_assert(!user_has_any_permission(['role' => 'production_planner'], 'advanced_planning.aps_planning_scenarios.delete', $rolePermFile), 'Production planner must not inherit generic delete permission.');
 smoke_assert(user_has_any_permission(['role' => 'developer'], 'schema_studio.write', $rolePermFile), 'Developer must retain Schema Studio write permission.');
 smoke_assert(user_has_any_permission(['role' => 'qms_engineer'], 'schema_studio.write', $rolePermFile), 'QMS engineer must retain Schema Studio write permission.');
+
+smoke_reset_request_state();
+$_SESSION['user'] = 'finance-user';
+$_SESSION['mfa_ok'] = true;
+$restrictedUserController = (new UserController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($financeStore);
+try {
+    $restrictedUserController->getPermissions();
+    throw new RuntimeException('Permission matrix read allowed a non-admin office role.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 403, 'Permission matrix read guard returned wrong status for non-admin role.');
+    smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Permission matrix read guard returned wrong error for non-admin role.');
+}
+
+smoke_reset_request_state();
+$_SESSION['user'] = 'perm-admin';
+$_SESSION['mfa_ok'] = true;
+$allowedUserController = (new UserController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($permissionAdminStore);
+try {
+    $allowedUserController->getPermissions();
+    throw new RuntimeException('Permission matrix read did not terminate through the response pipeline for admin role.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 200, 'Permission matrix read returned wrong status for admin role.');
+    smoke_assert(is_array($e->getPayload()['perms'] ?? null), 'Permission matrix read payload missing perms array.');
+}
 
 // Generic runtime write access must be denied when the permission matrix covers the action but the role does not.
 smoke_reset_request_state();
@@ -581,6 +637,20 @@ try {
 } catch (ExitException $e) {
     smoke_assert($e->getStatusCode() === 403, 'Restricted governance list guard returned wrong status.');
     smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Restricted governance list guard returned wrong error.');
+}
+
+smoke_reset_request_state();
+$_SESSION['user'] = 'qms-runtime-user';
+$_SESSION['mfa_ok'] = true;
+$_GET['domain'] = 'master_data_governance';
+$_GET['table'] = 'org_companies';
+$qmsGovernanceCrudController = (new GenericCrudController($dataLayer, QMS_TEST_ROOT_DIR, QMS_TEST_DATA_DIR))->setStore($genericPermissionStore);
+try {
+    $qmsGovernanceCrudController->listRecords();
+    throw new RuntimeException('Generic CRUD list exposed a restricted governance table to a QMS engineer.');
+} catch (ExitException $e) {
+    smoke_assert($e->getStatusCode() === 403, 'Restricted governance list guard returned wrong status for QMS engineer.');
+    smoke_assert(($e->getPayload()['error'] ?? null) === 'forbidden', 'Restricted governance list guard returned wrong error for QMS engineer.');
 }
 
 // Knowledge write actions must not be exposed to unrelated office roles.
@@ -677,6 +747,7 @@ try {
 // Registry runtime assets must keep composite-identity CRUD contracts available.
 $endpointCatalog = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/endpoint-catalog.json'), true);
 $endpointMap = is_array($endpointCatalog['endpoints'] ?? null) ? $endpointCatalog['endpoints'] : [];
+$runtimeAccessPolicy = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/runtime-access-policy.json'), true);
 $telemetryDetail = $endpointMap['mes_execution.mes_machine_telemetry.detail'] ?? null;
 $bomDetail = $endpointMap['master_data.bill_of_materials.detail'] ?? null;
 $scenarioUpdate = $endpointMap['advanced_planning.aps_planning_scenarios.update'] ?? null;
@@ -689,6 +760,12 @@ smoke_assert(is_array($scenarioUpdate), 'APS planning scenario update endpoint m
 smoke_assert((bool)($scenarioUpdate['request']['optimistic_concurrency']['required'] ?? false) === true, 'APS update endpoint must require optimistic concurrency.');
 smoke_assert(($scenarioUpdate['request']['org_scope']['fields'] ?? null) === ['org_company_code', 'org_legal_entity_code', 'org_plant_id', 'org_site_id'], 'APS update endpoint scope fields mismatch.');
 smoke_assert((bool)($scenarioUpdate['response']['optimistic_concurrency']['enabled'] ?? false) === true, 'APS update response must advertise row_version concurrency.');
+smoke_assert(is_array($runtimeAccessPolicy), 'Runtime access policy registry asset missing.');
+smoke_assert(in_array('production_planner', (array)($runtimeAccessPolicy['domains']['advanced_planning']['update'] ?? []), true), 'Advanced planning runtime policy must allow production planners to mutate APS records.');
+smoke_assert(in_array('qa_manager', (array)($runtimeAccessPolicy['domains']['master_data_governance']['list'] ?? []), true), 'Restricted runtime policy must retain admin-grade governance access.');
+smoke_assert(!in_array('qms_engineer', (array)($runtimeAccessPolicy['domains']['master_data_governance']['list'] ?? []), true), 'Restricted runtime policy must not expose governance tables to QMS engineers.');
+smoke_assert((array)($runtimeAccessPolicy['tables']['audit_events']['delete'] ?? ['unexpected']) === [], 'Audit events runtime policy must block generic delete.');
+smoke_assert(in_array('quality_engineer', (array)($runtimeAccessPolicy['domains']['quality_management']['create'] ?? []), true), 'Quality runtime policy must allow controlled quality operations roles.');
 
 $qualityReport = json_decode((string)file_get_contents(QMS_TEST_DATA_DIR . '/registry/registry-quality-report.json'), true);
 smoke_assert(($qualityReport['all_passed'] ?? null) === true, 'Registry quality report must stay green after composite CRUD generation.');

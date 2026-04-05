@@ -47,7 +47,7 @@ class SchemaStudioController extends BaseController
 
     private function requireDatabaseAccess(array $user): void
     {
-        $this->requireAnyRole($user, array_merge(admin_roles(), ['developer', 'it_admin']));
+        $this->requireAnyRole($user, ['it_admin', 'ceo', 'qa_manager', 'developer']);
     }
 
     private function requireMigrationAccess(array $user): void
@@ -749,7 +749,7 @@ class SchemaStudioController extends BaseController
     public function reverseEngineer(): never
     {
         $user = $this->requireAuth();
-        $this->requireReadAccess($user);
+        $this->requireDatabaseAccess($user);
         $this->requireCsrf();
         try {
             $pdo = $this->db();
@@ -935,6 +935,7 @@ class SchemaStudioController extends BaseController
     public function applyMigration(): never
     {
         $user = $this->requireAuth();
+        $this->requireDatabaseAccess($user);
         $this->requireMigrationAccess($user);
         $this->requireCsrf();
         $body = $this->jsonBody();
@@ -986,7 +987,7 @@ class SchemaStudioController extends BaseController
     public function previewTableData(): never
     {
         $user = $this->requireAuth();
-        $this->requireReadAccess($user);
+        $this->requireDatabaseAccess($user);
         $this->requireCsrf();
         $body = $this->jsonBody();
         $schema = $this->safeIdentifier((string)($body['schema'] ?? 'public'), 'public');
@@ -1093,6 +1094,7 @@ class SchemaStudioController extends BaseController
     public function saveTableRow(): never
     {
         $user = $this->requireAuth();
+        $this->requireDatabaseAccess($user);
         $this->requireDataWriteAccess($user);
         $this->requireCsrf();
 

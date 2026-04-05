@@ -503,12 +503,13 @@ function sanitize_role_permission_row(array $row): array {
 
 function default_role_permissions(): array {
   $nonDestructive = ['*.delete'];
-  $restrictedMetadata = ['master_data_governance.*', 'module_schema.*', 'registry.*', 'schema_studio.*'];
-  $businessRole = static function (array $permissions, bool $canCreateDocs = false) use ($nonDestructive, $restrictedMetadata): array {
+  $genericCrudRestrictedDomains = ['core_system.*', 'system_infrastructure.*', 'forms_system.*', 'record_system.*', 'master_data_governance.*', 'customer_portal.*'];
+  $restrictedMetadata = ['module_schema.*', 'registry.*', 'schema_studio.*'];
+  $businessRole = static function (array $permissions, bool $canCreateDocs = false) use ($nonDestructive, $restrictedMetadata, $genericCrudRestrictedDomains): array {
     return sanitize_role_permission_row([
       'canCreateDocs' => $canCreateDocs,
       'permissions' => array_values(array_unique(array_merge(['*.read'], $permissions))),
-      'denies' => array_values(array_unique(array_merge($nonDestructive, $restrictedMetadata))),
+      'denies' => array_values(array_unique(array_merge($nonDestructive, $restrictedMetadata, $genericCrudRestrictedDomains))),
     ]);
   };
   return [
@@ -545,7 +546,7 @@ function default_role_permissions(): array {
         'supplier_relationship.*',
         'schema_studio.*',
       ],
-      'denies' => $nonDestructive,
+      'denies' => array_values(array_unique(array_merge($nonDestructive, $genericCrudRestrictedDomains))),
     ]),
     'qms_engineer' => sanitize_role_permission_row([
       'canCreateDocs' => true,
@@ -565,12 +566,12 @@ function default_role_permissions(): array {
         'supplier_relationship.*',
         'schema_studio.*',
       ],
-      'denies' => $nonDestructive,
+      'denies' => array_values(array_unique(array_merge($nonDestructive, $genericCrudRestrictedDomains))),
     ]),
     'developer' => sanitize_role_permission_row([
       'canCreateDocs' => false,
       'permissions' => ['schema_studio.*'],
-      'denies' => $nonDestructive,
+      'denies' => array_values(array_unique(array_merge($nonDestructive, $genericCrudRestrictedDomains))),
     ]),
     'production_manager' => $businessRole([
       'advanced_planning.*',
@@ -13104,7 +13105,8 @@ switch ($action) {
 
   case 'role_perms_get': {
     if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
-    require_logged_in($store);
+    $me = require_logged_in($store);
+    if (!user_is_admin($me)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
     $perms = load_role_permissions($ROLE_PERMS_FILE);
     api_json(['ok' => true, 'perms' => $perms, 'server_time' => now_iso()]);
   }

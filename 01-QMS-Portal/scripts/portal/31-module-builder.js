@@ -4994,31 +4994,31 @@ function _renderHeroIcon(icon){
     'back':'<svg viewBox="0 0 20 20"><path d="M15 10H5"></path><path d="M9 6l-4 4 4 4"></path></svg>'
   };
   var aliases = {
-    'â¬‡':'layout-stack',
     '⬇':'layout-stack',
-    'âŠž':'layout-grid',
+    '⬇':'layout-stack',
     '⊞':'layout-grid',
-    'â†”':'layout-flex',
+    '⊞':'layout-grid',
+    '↔':'layout-flex',
     '↔':'layout-flex',
     'â–¥':'columns',
     '▥':'columns',
-    'â‡„':'gap',
     '⇄':'gap',
-    'ðŸŒ³':'tree',
+    '⇄':'gap',
     '🌳':'tree',
-    'ðŸ“š':'library',
+    '🌳':'tree',
     '📚':'library',
-    'â†©':'undo',
+    '📚':'library',
     '↩':'undo',
-    'â†ª':'redo',
+    '↩':'undo',
     '↪':'redo',
-    'âŒ¨':'shortcuts',
+    '↪':'redo',
+    '⌨':'shortcuts',
     '⌨':'shortcuts',
     'â—‰':'preview',
     '◉':'preview',
-    'ðŸ’¾':'save',
     '💾':'save',
-    'â†':'back'
+    '💾':'save',
+    '←':'back'
     ,'←':'back'
   };
   if(aliases[icon]) icon = aliases[icon];

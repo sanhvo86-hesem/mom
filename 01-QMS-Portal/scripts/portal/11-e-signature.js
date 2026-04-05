@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ═══════════════════════════════════════════════════════════
  * HESEM QMS — Electronic Signature Component
  * 11-e-signature.js

@@ -235,7 +235,8 @@ class UserController extends BaseController
      */
     public function getPermissions(): never
     {
-        $this->requireAuth();
+        $me = $this->requireAuth();
+        $this->requireAdmin($me);
 
         $rolePermsFile = $this->confDir . '/role_permissions.json';
         $perms = load_role_permissions($rolePermsFile);

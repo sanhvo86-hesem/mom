@@ -523,9 +523,7 @@ class GenericCrudController extends BaseController
             return;
         }
 
-        $restrictedDomains = ['core_system', 'system_infrastructure', 'forms_system', 'record_system', 'master_data_governance', 'customer_portal'];
-        $domain = (string)($ctx['tableMeta']['domain'] ?? $ctx['domain'] ?? '');
-        if ((bool)($ctx['tableMeta']['supportTable'] ?? false) || in_array($domain, $restrictedDomains, true)) {
+        if ((bool)($ctx['tableMeta']['supportTable'] ?? false)) {
             $this->error('forbidden', 403);
         }
 

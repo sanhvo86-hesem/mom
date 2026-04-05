@@ -3038,8 +3038,8 @@ var BrowserLegacy = {
       refs.browser.innerHTML = [
         '<div class="ss-browser-collapsed-shell">',
           '<button class="ss-browser-rail-btn" type="button" onclick="Browser.toggleOpen(true)" title="' + _esc(_t('Mở thanh điều hướng (B)', 'Open schema browser (B)')) + '" aria-label="' + _esc(_t('Mở thanh điều hướng', 'Open schema browser')) + '">▸</button>',
-          '<button class="ss-browser-rail-btn" type="button" onclick="Browser.expandAll(); Browser.toggleOpen(true)" title="' + _esc(_t('Mở rộng tất cả domain', 'Expand all domains')) + '" aria-label="' + _esc(_t('Mở rộng tất cả domain', 'Expand all domains')) + '">＋</button>',
-          '<button class="ss-browser-rail-btn" type="button" onclick="Browser.collapseAll(); Browser.toggleOpen(true)" title="' + _esc(_t('Thu gọn tất cả domain', 'Collapse all domains')) + '" aria-label="' + _esc(_t('Thu gọn tất cả domain', 'Collapse all domains')) + '">－</button>',
+          '<button class="ss-browser-rail-btn" type="button" onclick="Browser.expandAll(); Browser.toggleOpen(true)" title="' + _esc(_t('Mở rộng tất cả domain', 'Expand all domains')) + '" aria-label="' + _esc(_t('Mở rộng tất cả domain', 'Expand all domains')) + '">+</button>',
+          '<button class="ss-browser-rail-btn" type="button" onclick="Browser.collapseAll(); Browser.toggleOpen(true)" title="' + _esc(_t('Thu gọn tất cả domain', 'Collapse all domains')) + '" aria-label="' + _esc(_t('Thu gọn tất cả domain', 'Collapse all domains')) + '">-</button>',
           '<div class="ss-browser-rail-stats"><strong>' + String(tables.length) + '</strong><span>' + _esc(_t('bảng', 'tables')) + '</span></div>',
         '</div>'
       ].join('');
@@ -3049,8 +3049,8 @@ var BrowserLegacy = {
       '<div class="ss-browser-header">',
         '<div class="ss-browser-title-group"><div class="ss-browser-title">' + _esc(_t('Trình duyệt schema', 'Schema browser')) + '</div><div class="ss-browser-subtitle">' + String(tables.length) + ' ' + _esc(_t('bảng', 'tables')) + ' · ' + String(domains.length) + ' ' + _esc(_t('domain', 'domains')) + '</div></div>',
         '<div class="ss-browser-tools">',
-          '<button class="ss-browser-tool" type="button" onclick="Browser.expandAll()" title="' + _esc(_t('Mở rộng tất cả', 'Expand all')) + '" aria-label="' + _esc(_t('Mở rộng tất cả', 'Expand all')) + '">＋</button>',
-          '<button class="ss-browser-tool" type="button" onclick="Browser.collapseAll()" title="' + _esc(_t('Thu gọn tất cả', 'Collapse all')) + '" aria-label="' + _esc(_t('Thu gọn tất cả', 'Collapse all')) + '">－</button>',
+          '<button class="ss-browser-tool" type="button" onclick="Browser.expandAll()" title="' + _esc(_t('Mở rộng tất cả', 'Expand all')) + '" aria-label="' + _esc(_t('Mở rộng tất cả', 'Expand all')) + '">+</button>',
+          '<button class="ss-browser-tool" type="button" onclick="Browser.collapseAll()" title="' + _esc(_t('Thu gọn tất cả', 'Collapse all')) + '" aria-label="' + _esc(_t('Thu gọn tất cả', 'Collapse all')) + '">-</button>',
           '<button class="ss-browser-tool" type="button" onclick="Browser.toggleOpen(false)" title="' + _esc(_t('Ẩn thanh điều hướng (B)', 'Hide schema browser (B)')) + '" aria-label="' + _esc(_t('Ẩn thanh điều hướng', 'Hide schema browser')) + '">◂</button>',
         '</div>',
       '</div>',
@@ -5849,10 +5849,10 @@ TableDialog = {
     canPrev = !dataView.loading && currentOffset > 0;
     canNext = !dataView.loading && !!dataView.hasMore;
     pageLabel = dataView.syntheticSample
-      ? _t('Dá»¯ liá»‡u máº«u', 'Sample data')
+      ? _t('Dữ liệu mẫu', 'Sample data')
       : (totalRows
-        ? _t('DÃ²ng ' + rowStart + '-' + rowEnd + ' / ' + totalRows, 'Rows ' + rowStart + '-' + rowEnd + ' / ' + totalRows)
-        : _t('Äang hiá»ƒn thá»‹ ' + shownRows + ' dÃ²ng', 'Showing ' + shownRows + ' row(s)'));
+        ? _t('Dòng ' + rowStart + '-' + rowEnd + ' / ' + totalRows, 'Rows ' + rowStart + '-' + rowEnd + ' / ' + totalRows)
+        : _t('Đang hiển thị ' + shownRows + ' dòng', 'Showing ' + shownRows + ' row(s)'));
     dataHint = dataView.syntheticSource === 'draft'
       ? _t('Đang hiển thị 1 dòng mẫu sinh từ cấu trúc bảng trong Schema Studio. Dữ liệu thật sẽ xuất hiện khi database có row hoặc cho phép preview.', 'Showing one sample row generated from the Schema Studio table structure. Real data will appear when the database has rows or preview is available.')
       : (dataView.syntheticSample
@@ -5986,15 +5986,15 @@ TableDialog = {
     var self = this;
     if(!tbl || !draft) return;
     if(!isValidIdentifier(draft.name)){
-      toast(_t('TÃªn báº£ng pháº£i lÃ  snake_case há»£p lá»‡', 'Table name must be valid snake_case'), 'error');
+      toast(_t('Tên bảng phải là snake_case hợp lệ', 'Table name must be valid snake_case'), 'error');
       return;
     }
     if(((STORE.schema && STORE.schema.tables) || []).some(function(item){ return item.id !== tbl.id && item.name === draft.name; })){
-      toast(_t('TÃªn báº£ng Ä‘Ã£ tá»“n táº¡i', 'Table name already exists'), 'error');
+      toast(_t('Tên bảng đã tồn tại', 'Table name already exists'), 'error');
       return;
     }
     if(!(draft.columns || []).length){
-      toast(_t('Báº£ng pháº£i cÃ³ Ã­t nháº¥t 1 cá»™t', 'Table must have at least 1 column'), 'error');
+      toast(_t('Bảng phải có ít nhất 1 cột', 'Table must have at least 1 column'), 'error');
       return;
     }
     (draft.columns || []).forEach(function(col){
@@ -6010,14 +6010,14 @@ TableDialog = {
       }
     });
     if(duplicated){
-      toast(_t('TÃªn cá»™t chÆ°a há»£p lá»‡ hoáº·c Ä‘ang bá»‹ trÃ¹ng: ' + duplicated, 'Invalid or duplicate column name: ' + duplicated), 'error');
+      toast(_t('Tên cột chưa hợp lệ hoặc đang bị trùng: ' + duplicated, 'Invalid or duplicate column name: ' + duplicated), 'error');
       return;
     }
     if(!pkCount){
-      toast(_t('Báº£ng pháº£i cÃ³ Ã­t nháº¥t 1 khÃ³a chÃ­nh', 'Table must have at least 1 primary key'), 'error');
+      toast(_t('Bảng phải có ít nhất 1 khóa chính', 'Table must have at least 1 primary key'), 'error');
       return;
     }
-    confirm2(_t('Báº¡n sáº¯p lÆ°u thay Ä‘á»•i cho báº£ng ' + draft.name + '. Tiáº¿p tá»¥c?', 'You are about to save changes for table ' + draft.name + '. Continue?'), false).then(function(ok){
+    confirm2(_t('Bạn sắp lưu thay đổi cho bảng ' + draft.name + '. Tiếp tục?', 'You are about to save changes for table ' + draft.name + '. Continue?'), false).then(function(ok){
       var removedColumnIds = [];
       var keptColumnIds = {};
       if(!ok) return;
@@ -6058,7 +6058,7 @@ TableDialog = {
       Inspector.renderTable(tbl.id);
       markDirty();
       saveDraft();
-      toast(_t('ÄÃ£ lÆ°u báº£ng ' + tbl.name, 'Saved table ' + tbl.name), 'success');
+      toast(_t('Đã lưu bảng ' + tbl.name, 'Saved table ' + tbl.name), 'success');
       self.close();
     });
   },
@@ -6255,15 +6255,15 @@ TableDialog = {
     var self = this;
     if(!tbl || !draft) return;
     if(!isValidIdentifier(draft.name)){
-      toast(_t('TÃªn báº£ng pháº£i lÃ  snake_case há»£p lá»‡', 'Table name must be valid snake_case'), 'error');
+      toast(_t('Tên bảng phải là snake_case hợp lệ', 'Table name must be valid snake_case'), 'error');
       return;
     }
     if(((STORE.schema && STORE.schema.tables) || []).some(function(item){ return item.id !== tbl.id && item.name === draft.name; })){
-      toast(_t('TÃªn báº£ng Ä‘Ã£ tá»“n táº¡i', 'Table name already exists'), 'error');
+      toast(_t('Tên bảng đã tồn tại', 'Table name already exists'), 'error');
       return;
     }
     if(!(draft.columns || []).length){
-      toast(_t('Báº£ng pháº£i cÃ³ Ã­t nháº¥t 1 cá»™t', 'Table must have at least 1 column'), 'error');
+      toast(_t('Bảng phải có ít nhất 1 cột', 'Table must have at least 1 column'), 'error');
       return;
     }
     (draft.columns || []).forEach(function(col){
@@ -6279,14 +6279,14 @@ TableDialog = {
       }
     });
     if(duplicated){
-      toast(_t('TÃªn cá»™t chÆ°a há»£p lá»‡ hoáº·c Ä‘ang bá»‹ trÃ¹ng: ' + duplicated, 'Invalid or duplicate column name: ' + duplicated), 'error');
+      toast(_t('Tên cột chưa hợp lệ hoặc đang bị trùng: ' + duplicated, 'Invalid or duplicate column name: ' + duplicated), 'error');
       return;
     }
     if(!pkCount){
-      toast(_t('Báº£ng pháº£i cÃ³ Ã­t nháº¥t 1 khÃ³a chÃ­nh', 'Table must have at least 1 primary key'), 'error');
+      toast(_t('Bảng phải có ít nhất 1 khóa chính', 'Table must have at least 1 primary key'), 'error');
       return;
     }
-    confirm2(_t('Báº¡n sáº¯p lÆ°u thay Ä‘á»•i cho báº£ng ' + draft.name + '. Tiáº¿p tá»¥c?', 'You are about to save changes for table ' + draft.name + '. Continue?'), false).then(function(ok){
+    confirm2(_t('Bạn sắp lưu thay đổi cho bảng ' + draft.name + '. Tiếp tục?', 'You are about to save changes for table ' + draft.name + '. Continue?'), false).then(function(ok){
       var removedColumnIds = [];
       var keptColumnIds = {};
       if(!ok) return;
@@ -6327,7 +6327,7 @@ TableDialog = {
       Inspector.renderTable(tbl.id);
       markDirty();
       saveDraft();
-      toast(_t('ÄÃ£ lÆ°u báº£ng ' + tbl.name, 'Saved table ' + tbl.name), 'success');
+      toast(_t('Đã lưu bảng ' + tbl.name, 'Saved table ' + tbl.name), 'success');
       self.close();
     });
   },

@@ -781,7 +781,7 @@ dialog, [role="dialog"], .hm-modal, .hm-dialog {
   color:#94a3b8 !important;
 }
 
-/* Semantic compliance layer â€” applies to dark, auto-dark, and scheduled dark */
+/* Semantic compliance layer — applies to dark, auto-dark, and scheduled dark */
 [data-color-scheme-active="dark"] body,
 [data-color-scheme-active="dark"] #content,
 [data-color-scheme-active="dark"] .fb-container,

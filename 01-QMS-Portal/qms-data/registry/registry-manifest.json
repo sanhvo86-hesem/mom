@@ -2,12 +2,12 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-05T14:44:32.568Z"
+    "generatedAt": "2026-04-05T16:06:39.042Z"
   },
   "coverage": {
     "router_actions": 2862,
     "field_registry_actions": 2866,
-    "field_definitions": 38595,
+    "field_definitions": 39604,
     "unique_field_keys": 4014,
     "status_sets": 536,
     "workflow_count": 425,
@@ -25,6 +25,10 @@
     "endpoint-catalog.json": {
       "kind": "endpoint-catalog",
       "records": 2862
+    },
+    "runtime-access-policy.json": {
+      "kind": "runtime-access-policy",
+      "records": 1
     },
     "domain-field-packs.json": {
       "kind": "pack-library",
