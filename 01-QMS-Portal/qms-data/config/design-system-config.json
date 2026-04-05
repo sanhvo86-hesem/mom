@@ -6,19 +6,19 @@
     "fontSize": 0,
     "typography": {
         "display": {
-            "family": "'Open Sans', -apple-system, sans-serif",
+            "family": "-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif",
             "weight": 700
         },
         "heading": {
-            "family": "Georgia, 'Times New Roman', serif",
+            "family": "-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif",
             "weight": 600
         },
         "body": {
-            "family": "'Poppins', -apple-system, sans-serif",
+            "family": "-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif",
             "weight": 400
         },
         "label": {
-            "family": "'Nunito Sans', -apple-system, sans-serif",
+            "family": "-apple-system, 'Segoe UI', 'Noto Sans', Arial, Helvetica, sans-serif",
             "weight": 600,
             "spacing": "0.05em",
             "transform": "uppercase"
@@ -35,7 +35,7 @@
         "lg": 18,
         "xl": 20,
         "2xl": 24,
-        "3xl": 32
+        "3xl": "32px"
     },
     "lineHeight": {
         "tight": 1.25,
@@ -135,12 +135,18 @@
         "btn": {
             "paddingX": "8",
             "gap": "3"
+        },
+        "tab": {
+            "paddingY": "10px",
+            "paddingX": "10px",
+            "radius": "5px",
+            "fontSize": "12px"
         }
     },
     "_meta": {
         "version": "2.0",
         "description": "Admin-configurable design system.",
-        "updatedAt": "2026-04-03T14:09:28+07:00",
+        "updatedAt": "2026-04-05T10:41:51+07:00",
         "updatedBy": "sanh.vo"
     }
 }
