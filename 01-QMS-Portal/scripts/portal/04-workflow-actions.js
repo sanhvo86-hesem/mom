@@ -667,7 +667,7 @@ function showUnsavedDialog(editingCode, targetCode){
         </button>
       </div>
       <div class="um-footer">
-        <button onclick="closeUnsavedDialog()">${lang==='en'?'Cancel':'Há»§y'}</button>
+        <button onclick="closeUnsavedDialog()">${lang==='en'?'Cancel':'Hủy'}</button>
       </div>
     </div>
   `;
@@ -1213,7 +1213,7 @@ const innerHtml = _getCurrentEditorInnerHtml();
       if(res && res.error==='approve_revision_mismatch'){
         const exp = String(res.expected_revision||'').trim();
         const got = String(res.received_revision||'').trim();
-        showToast('âš  ' + (lang==='en'
+        showToast('⚠ ' + (lang==='en'
           ? `Revision mismatch. Server expects v${exp} but received v${got}. Please reload and approve again.`
           : `Lệch phiên bản. Server yêu cầu v${exp} nhưng nhận v${got}. Vui lòng tải lại và duyệt lại.`));
         try{ await openDocPreview(doc.code); }catch(e){}

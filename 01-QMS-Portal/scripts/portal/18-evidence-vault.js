@@ -587,7 +587,7 @@ function _bind(){
         if(!entityVal){ _toast(_t('Nhập entity','Enter entity'),'error'); break; }
         _api('evidence_link',{id:eId,entity:entityVal}).then(function(r){
           if(r&&r.ok){_toast(_t('Đã liên kết','Linked'),'success');_loadDetail(eId);}
-          else {_toast(_t('Lá»—i','Error'),'error');}
+          else {_toast(_t('Lỗi','Error'),'error');}
         }).catch(function(){_toast(_t('Lỗi kết nối','Connection error'),'error');});
         break;
       case 'page-prev':
@@ -635,4 +635,3 @@ function render(container){
 window._renderEvidenceVault = render;
 
 })();
-

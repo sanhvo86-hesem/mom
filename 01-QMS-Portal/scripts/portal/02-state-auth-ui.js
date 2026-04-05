@@ -333,7 +333,7 @@ function portalSidebarCoreItems(){
     {id:'dictionary', icon:'📖', label:lang==='en'?'Dictionary':'Từ điển thuật ngữ'},
     {id:'deploy', icon:'🚀', label:lang==='en'?'Operations deploy':'Triển khai vận hành'},
     {id:'exceptions', icon:'\u26a0\ufe0f', label:lang==='en'?'Exception dashboard':'B\u1ea3ng ngo\u1ea1i l\u1ec7'},
-    {id:'admin', icon:'âš™', label:'Admin', locked:true},
+    {id:'admin', icon:'⚙', label:'Admin', locked:true},
   ];
 }
 
@@ -485,7 +485,7 @@ async function savePortalDisplayConfig(){
   try{
     const res = await apiCall('admin_portal_display_config_save', {config: draft});
     if(!(res && res.ok && res.config)){
-      showToast('âš  ' + ((res && res.error) ? res.error : 'save_failed'));
+      showToast('⚠ ' + ((res && res.error) ? res.error : 'save_failed'));
       return;
     }
     applyPortalDisplayConfig(res.config, {forceDraftSync:true});
@@ -502,7 +502,7 @@ async function savePortalDisplayConfig(){
     showToast(lang==='en'?'✅ Portal display settings saved':'✅ Đã lưu cấu hình hiển thị portal');
     if(currentPage === 'admin') renderAdmin();
   }catch(e){
-    showToast('âš  ' + ((e && e.message) ? e.message : (lang==='en'?'Server error':'Lá»—i server')));
+    showToast('⚠ ' + ((e && e.message) ? e.message : (lang==='en'?'Server error':'Lỗi server')));
   }
 }
 
@@ -1238,7 +1238,7 @@ function renderSidebar(){
     html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'QUALITY':'CHẤT LƯỢNG'}</div>
       <button class="nav-item ${['quality-exceptions','exceptions'].indexOf(currentPage)>=0?'active':''}" onclick="navigateTo('quality-exceptions')"><span class="icon">🔴</span><span>${lang==='en'?'Nonconformance':'Sự không phù hợp'}</span></button>
       <button class="nav-item ${currentPage==='supplier-quality'?'active':''}" onclick="navigateTo('supplier-quality')"><span class="icon">🏪</span><span>${lang==='en'?'Supplier Quality':'Chất lượng NCC'}</span></button>
-      <button class="nav-item ${currentPage==='fmea'?'active':''}" onclick="navigateTo('fmea')"><span class="icon">âš¡</span><span>${lang==='en'?'FMEA & Control Plan':'FMEA & Control Plan'}</span></button>
+      <button class="nav-item ${currentPage==='fmea'?'active':''}" onclick="navigateTo('fmea')"><span class="icon">⚡</span><span>${lang==='en'?'FMEA & Control Plan':'FMEA & Control Plan'}</span></button>
       <button class="nav-item ${currentPage==='apqp-ppap'?'active':''}" onclick="navigateTo('apqp-ppap')"><span class="icon">🎯</span><span>${lang==='en'?'APQP / PPAP':'APQP / PPAP'}</span></button>
       <button class="nav-item ${currentPage==='ai-scheduling'?'active':''}" onclick="navigateTo('ai-scheduling')"><span class="icon">🤖</span><span>${lang==='en'?'AI Quality':'AI Chất lượng'}</span></button>
     </div>`;
@@ -1265,7 +1265,7 @@ function renderSidebar(){
     }
   }
   if(isAdmin() && isPortalSidebarCoreVisible('admin')){
-    html += `<div class="nav-section"><div class="nav-section-title">ADMIN</div><button class="nav-item ${currentPage==='admin'?'active':''}" onclick="navigateTo('admin')"><span class="icon">âš™</span><span>${T('admin_panel')}</span></button></div>`;
+    html += `<div class="nav-section"><div class="nav-section-title">ADMIN</div><button class="nav-item ${currentPage==='admin'?'active':''}" onclick="navigateTo('admin')"><span class="icon">⚙</span><span>${T('admin_panel')}</span></button></div>`;
   }
 
   if(isAdmin()){
@@ -2527,7 +2527,7 @@ function openCreateFolderDialog(){
         📂 ${lang==='en'?'Will create':'Sẽ tạo'}: <code>${parentPath}/<b>${String(nextNum).padStart(2,'0')}</b>-<span id="nf-preview">???</span>/</code>
       </div>
       <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">
-        <button class="btn-admin secondary" onclick="document.getElementById('folder-create-modal')?.remove()">${lang==='en'?'Cancel':'Há»§y'}</button>
+        <button class="btn-admin secondary" onclick="document.getElementById('folder-create-modal')?.remove()">${lang==='en'?'Cancel':'Hủy'}</button>
         <button class="btn-admin primary" onclick="doCreateFolder(${nextNum})">📁 ${lang==='en'?'Create':'Tạo'}</button>
       </div>
     </div>`;
@@ -2603,7 +2603,7 @@ function openCreateDocModalQuick(){
         </select>
       </div>
       <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">
-        <button class="btn-admin secondary" onclick="document.getElementById('quick-create-modal')?.remove()">${lang==='en'?'Cancel':'Há»§y'}</button>
+        <button class="btn-admin secondary" onclick="document.getElementById('quick-create-modal')?.remove()">${lang==='en'?'Cancel':'Hủy'}</button>
         <button class="btn-admin primary" onclick="doQuickCreateDoc('${escapeHtml(folderPath)}','${escapeHtml(currentFilter)}')">📄 ${lang==='en'?'Create':'Tạo'}</button>
       </div>
     </div>`;
@@ -2753,7 +2753,7 @@ function openFolderEditDialog(folderPath, folderKey){
         <div style="margin-top:8px;font-size:10px;color:var(--text-3)">⚠️ ${lang==='en'?'Renaming updates all internal links automatically':'Đổi tên sẽ cập nhật tất cả liên kết nội bộ tự động'}</div>
       </div>
       <div class="modal-actions">
-        <button class="btn-admin" onclick="document.getElementById('folder-edit-modal')?.remove()">${lang==='en'?'Cancel':'Há»§y'}</button>
+        <button class="btn-admin" onclick="document.getElementById('folder-edit-modal')?.remove()">${lang==='en'?'Cancel':'Hủy'}</button>
         <button class="btn-admin primary" onclick="doSaveFolderEdit('${escapeHtml(folderPath)}','${escapeHtml(folderKey)}')">💾 ${lang==='en'?'Save':'Lưu'}</button>
       </div>
     </div>`;
@@ -2858,7 +2858,7 @@ function openDocEditDialog(code){
         <div style="margin-top:8px;font-size:10px;color:var(--text-3)">⚠️ ${lang==='en'?'Document code + English standard title are SSOT for filename and header title. Vietnamese description syncs to the header note.':'Mã tài liệu + tên file / tiêu đề chuẩn là SSOT cho filename và title header. Mô tả tiếng Việt đồng bộ vào ghi chú trên header.'}</div>
       </div>
       <div class="modal-actions">
-        <button class="btn-admin" onclick="document.getElementById('doc-edit-modal')?.remove()">${lang==='en'?'Cancel':'Há»§y'}</button>
+        <button class="btn-admin" onclick="document.getElementById('doc-edit-modal')?.remove()">${lang==='en'?'Cancel':'Hủy'}</button>
         <button class="btn-admin primary" onclick="doSaveDocEdit('${escapeHtml(code)}')">💾 ${lang==='en'?'Save':'Lưu'}</button>
       </div>
     </div>`;
@@ -2988,7 +2988,7 @@ function confirmDeleteDoc(code, title){
           </label>
         </div>
         <div style="display:flex;gap:10px;justify-content:flex-end">
-          <button class="btn-admin secondary" onclick="document.getElementById('delete-confirm-modal')?.remove()">${vi?'Há»§y':'Cancel'}</button>
+          <button class="btn-admin secondary" onclick="document.getElementById('delete-confirm-modal')?.remove()">${vi?'Hủy':'Cancel'}</button>
           <button class="btn-admin" id="del-confirm-btn" disabled style="background:var(--red);color:var(--text-inverse,#fff);opacity:.5;cursor:not-allowed" onclick="executeDeleteDoc('${escapeHtml(code)}')">🗑️ ${vi?'Xóa vĩnh viễn':'Delete'}</button>
         </div>
       </div>
@@ -3090,7 +3090,7 @@ function confirmDeleteFolder(folderPath, folderKey){
           </label>
         </div>`:''}
         <div style="display:flex;gap:10px;justify-content:flex-end">
-          <button class="btn-admin secondary" onclick="document.getElementById('delete-confirm-modal')?.remove()">${vi?'Há»§y':'Cancel'}</button>
+          <button class="btn-admin secondary" onclick="document.getElementById('delete-confirm-modal')?.remove()">${vi?'Hủy':'Cancel'}</button>
           <button class="btn-admin" id="del-confirm-btn" disabled style="background:var(--red);color:var(--text-inverse,#fff);opacity:.5;cursor:not-allowed" onclick="executeDeleteFolder('${escapeHtml(folderPath)}')">🗑️ ${vi?'Xóa folder':'Delete folder'}</button>
         </div>
       </div>
@@ -3428,7 +3428,7 @@ function openCreateDocModal(cat){
       </div>
 
       <div class="modal-actions">
-        <button class="btn-admin" onclick="closeModal()">${lang==='en'?'Cancel':'Há»§y'}</button>
+        <button class="btn-admin" onclick="closeModal()">${lang==='en'?'Cancel':'Hủy'}</button>
         <button class="btn-admin primary" onclick="submitCreateDoc(document.getElementById('cd-cat').value)">${lang==='en'?'Create':'Tạo mới'}</button>
       </div>
     </div>
@@ -3994,7 +3994,7 @@ async function saveDictTerm(originalTerm){
   try{
     const res = await apiCall('dict_upsert',{term,vi,meaning,cat,def,ctx,rec,originalTerm});
     if(!(res && res.ok)){
-      showToast('âš  ' + getDictionarySaveErrorMessage(res && res.error));
+      showToast('⚠ ' + getDictionarySaveErrorMessage(res && res.error));
       return;
     }
     dictData = res.items || dictData;
@@ -5561,7 +5561,7 @@ function renderAdminMfa(){
       var newVal=!requireMfa;
       apiCall('admin_mfa_settings_save',{require_mfa:newVal}).then(function(r){
         if(r&&r.ok){ renderAdminMfa(); }
-        else { alert('Lá»—i: '+(r?r.error:'unknown')); }
+        else { alert('Lỗi: '+(r?r.error:'unknown')); }
       });
     });
 
@@ -6135,7 +6135,7 @@ function renderAdminDataSources(){
           <div style="margin-top:6px;font-size:12px;color:#52667a">${escapeHtml(runtimeMode.postgres_error || (lang==='en'?'No PostgreSQL error reported':'Không có lỗi PostgreSQL được báo'))}</div>
         </div>
         <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
-          <div style="font-size:12px;color:#486581">${lang==='en'?'Shadow-sync failures':'Lá»—i shadow-sync'}</div>
+          <div style="font-size:12px;color:#486581">${lang==='en'?'Shadow-sync failures':'Lỗi shadow-sync'}</div>
           <div style="margin-top:6px;font-size:28px;font-weight:700;color:#102a43">${escapeHtml(String(shadowFailures))}</div>
           <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'JSON fallback reads':'Lượt fallback về JSON'}: ${escapeHtml(String(fallbackReads))}</div>
         </div>
@@ -6240,7 +6240,7 @@ function renderAdminDataSources(){
 
           <div style="padding:14px;border-radius:16px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
             <div style="font-size:12px;color:#486581">${lang==='en'?'Shadow observability':'Quan sát shadow'}</div>
-            <div style="margin-top:6px;font-size:22px;font-weight:700;color:#102a43">${escapeHtml(String(shadowFailures))} ${lang==='en'?'failures':'lá»—i'}</div>
+            <div style="margin-top:6px;font-size:22px;font-weight:700;color:#102a43">${escapeHtml(String(shadowFailures))} ${lang==='en'?'failures':'lỗi'}</div>
             <div style="margin-top:6px;font-size:13px;color:#52667a">${lang==='en'?'JSON fallback reads':'Lượt fallback về JSON'}: ${escapeHtml(String(fallbackReads))}</div>
             <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'Last config update':'Lần lưu cấu hình gần nhất'}: ${escapeHtml(adminFormatRuntimeStamp((cfgRes.override_meta || {}).updated || ''))}</div>
           </div>
@@ -6737,7 +6737,7 @@ function showUserModal(userId){
       </div>
 
       <div class="modal-actions">
-        <button class="btn-admin" onclick="closeModal()">${lang==='en'?'Cancel':'Há»§y'}</button>
+        <button class="btn-admin" onclick="closeModal()">${lang==='en'?'Cancel':'Hủy'}</button>
         <button class="btn-admin primary" onclick="saveUserFromModal(${isEdit?`'${escapeHtml(u0.id)}'`:"''"})">${lang==='en'?'Save':'Lưu'}</button>
       </div>
     </div>
@@ -7332,7 +7332,7 @@ function renderAdminDeptTitle(){
           const nl=(prompt(`Đổi tên phòng ban ${d.code}:`,d.label)||'').trim();
           if(!nl)return;
           d.label=nl; saveDepartments(); renderAdminDeptTitle();
-        }},'Sá»­a'),
+        }},'Sửa'),
         el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();
           if(!confirm(`Xóa phòng ban ${d.code}? (Người dùng thuộc phòng ban này sẽ bị xóa mapping phòng ban/chức danh)`))return;
           DEPARTMENTS=DEPARTMENTS.filter(x=>x.code!==d.code);
@@ -7367,7 +7367,7 @@ function renderAdminDeptTitle(){
               DEPT_TITLES[d.code]=DEPT_TITLES[d.code].map(x=>x===t?nt:x);
               USERS.forEach(u=>{if(u.dept===d.code && u.title===t)u.title=nt;});
               syncTitlesFromDept();saveDeptTitles();saveTitles(); renderAdminDeptTitle(); renderAdminUsers();
-            }},'Sá»­a'),
+            }},'Sửa'),
             el('button',{class:'btn',onclick:(e)=>{e.preventDefault();e.stopPropagation();
               if(!confirm(`Xóa chức danh "${t}" khỏi ${d.code}?`))return;
               DEPT_TITLES[d.code]=DEPT_TITLES[d.code].filter(x=>x!==t);
@@ -7742,7 +7742,7 @@ function renderAdminRoles(){
       <table class="admin-table">
         <thead><tr>
           <th></th><th>${lang==='en'?'Role':'Vai trò'}</th><th>Level</th>
-          <th>${lang==='en'?'Edit':'Sá»­a'}</th>
+          <th>${lang==='en'?'Edit':'Sửa'}</th>
           <th>${lang==='en'?'Create':'Tạo mới'}</th>
           <th>${lang==='en'?'Approve':'Duyệt'}</th><th>Admin</th>
           <th title="${lang==='en'?'Can view Activity Log tab':'Xem được tab Kiểm soát hành vi'}">👁 ${lang==='en'?'Activity':'Hành vi'}</th>
@@ -7834,4 +7834,3 @@ function reassignUserRole(){
 
 
 // ═══════════════════════════════════════════════════
-

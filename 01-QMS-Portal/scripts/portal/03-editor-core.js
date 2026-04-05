@@ -2079,7 +2079,7 @@ function edEditQmsBlockProperties(block){
       ['info','warning','error','success'].map(function(tone){
         return '<option value="' + tone + '"' + (props.tone === tone ? ' selected' : '') + '>' + tone + '</option>';
       }).join('') + '</select>' +
-      '<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">' + (vi ? 'Há»§y' : 'Cancel') + '</button>' +
+      '<div class="ed-modal-actions"><button class="ed-m-cancel" onclick="edCloseModal()">' + (vi ? 'Hủy' : 'Cancel') + '</button>' +
       '<button class="ed-m-ok" onclick="edApplyQmsSectionProps()">' + (vi ? 'Áp dụng' : 'Apply') + '</button></div></div></div>';
     root._qmsBlock = block;
     edRepairMojibake(root);

@@ -14,12 +14,19 @@ SHELL_TARGETS = [
     ROOT / "scripts" / "portal" / "00c-admin-appearance.js",
     ROOT / "scripts" / "portal" / "05-workflow-panel.js",
     ROOT / "scripts" / "portal" / "32-schema-studio.js",
+    ROOT / "scripts" / "portal" / "04-workflow-actions.js",
+    ROOT / "scripts" / "portal" / "18-evidence-vault.js",
+    ROOT / "api" / "controllers" / "MasterDataController.php",
 ]
 
 FRONTEND_GLOBS = (
     ROOT / "portal.html",
     ROOT / "scripts" / "portal",
     ROOT / "styles",
+)
+
+BACKEND_UI_TARGETS = (
+    ROOT / "api" / "controllers" / "MasterDataController.php",
 )
 
 MOJIBAKE_MARKERS = (
@@ -47,6 +54,21 @@ MOJIBAKE_MARKERS = (
     "Ã¢â‚¬â„¢",
     "Ã¢â‚¬Â¦",
     "Ã°Å¸",
+    "âš",
+    "Há»",
+    "Sá»",
+    "Lá»",
+    "MÃ¡y",
+    "Chi tiáº¿t",
+    "NgÆ°",
+    "KhÃ¡ch",
+    "NhÃ  cung",
+    "Káº¿ hoáº¡ch",
+    "Dá»¥ng cá»¥",
+    "Danh má»¥c",
+    "PhÆ°Æ¡ng",
+    "Äiá»u",
+    "ðŸ",
 )
 
 ALLOWLIST_MARKERS = {
@@ -129,6 +151,7 @@ def iter_frontend_targets() -> list[Path]:
             continue
         for ext in ("*.js", "*.css", "*.html"):
             targets.extend(sorted(item.glob(ext)))
+    targets.extend(BACKEND_UI_TARGETS)
     return targets
 
 
